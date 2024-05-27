@@ -59,5 +59,5 @@ export function useAuthorsQuery( search ) {
 		return fetchedAuthors;
 	}, [ authors, postAuthor ] );
 
-	return { authorId, authorOptions };
+	return { authorId, authorOptions, postAuthor };
 }

@@ -9,8 +9,9 @@ import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
  * Internal dependencies
  */
 import DataViewItem from '../sidebar-dataviews/dataview-item';
-import { useAddedBy } from '../list/added-by';
+import { useAddedBy } from '../page-templates/hooks';
 import { layout } from '@wordpress/icons';
+import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 
 const EMPTY_ARRAY = [];
 
@@ -23,17 +24,16 @@ function TemplateDataviewItem( { template, isActive } ) {
 			title={ text }
 			icon={ icon }
 			isActive={ isActive }
-			isCustom="false"
+			isCustom={ false }
 		/>
 	);
 }
 
 export default function DataviewsTemplatesSidebarContent( {
 	activeView,
-	postType,
-	config,
+	title,
 } ) {
-	const { records } = useEntityRecords( 'postType', postType, {
+	const { records } = useEntityRecords( 'postType', TEMPLATE_POST_TYPE, {
 		per_page: -1,
 	} );
 	const firstItemPerAuthorText = useMemo( () => {
@@ -54,10 +54,10 @@ export default function DataviewsTemplatesSidebarContent( {
 		<ItemGroup>
 			<DataViewItem
 				slug={ 'all' }
-				title={ config[ postType ].title }
+				title={ title }
 				icon={ layout }
 				isActive={ activeView === 'all' }
-				isCustom="false"
+				isCustom={ false }
 			/>
 			{ firstItemPerAuthorText.map( ( template ) => {
 				return (

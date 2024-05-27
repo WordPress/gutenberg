@@ -1,9 +1,23 @@
+/**
+ * External dependencies
+ */
+import { TextDecoder, TextEncoder } from 'node:util';
+
 jest.mock( '@wordpress/compose', () => {
 	return {
 		...jest.requireActual( '@wordpress/compose' ),
 		useViewportMatch: jest.fn(),
 	};
 } );
+
+/**
+ * client-zip is meant to be used in a browser and is therefore released as an ES6 module only,
+ * in order to use it in node environment, we need to mock it.
+ * See: https://github.com/Touffy/client-zip/issues/28
+ */
+jest.mock( 'client-zip', () => ( {
+	downloadZip: jest.fn(),
+} ) );
 
 /**
  * The new gallery block format is not compatible with the use_BalanceTags option
@@ -36,3 +50,10 @@ if ( ! window.DOMRect ) {
  * @see https://github.com/jsdom/jsdom/issues/1695
  */
 global.Element.prototype.scrollIntoView = jest.fn();
+
+if ( ! global.TextDecoder ) {
+	global.TextDecoder = TextDecoder;
+}
+if ( ! global.TextEncoder ) {
+	global.TextEncoder = TextEncoder;
+}

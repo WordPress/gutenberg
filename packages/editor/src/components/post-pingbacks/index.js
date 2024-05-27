@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { CheckboxControl } from '@wordpress/components';
+import { CheckboxControl, ExternalLink } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
@@ -26,9 +26,18 @@ function PostPingbacks() {
 	return (
 		<CheckboxControl
 			__nextHasNoMarginBottom
-			label={ __( 'Allow pingbacks & trackbacks' ) }
+			label={ __( 'Enable pingbacks & trackbacks' ) }
 			checked={ pingStatus === 'open' }
 			onChange={ onTogglePingback }
+			help={
+				<ExternalLink
+					href={ __(
+						'https://wordpress.org/documentation/article/trackbacks-and-pingbacks/'
+					) }
+				>
+					{ __( 'Learn more about pingbacks & trackbacks' ) }
+				</ExternalLink>
+			}
 		/>
 	);
 }

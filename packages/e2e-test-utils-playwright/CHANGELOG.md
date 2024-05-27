@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 0.26.0 (2024-05-16)
+
+## 0.25.0 (2024-05-02)
+
+## 0.24.0 (2024-04-19)
+
+## 0.23.0 (2024-04-03)
+
+## 0.22.0 (2024-03-21)
+
+## 0.21.0 (2024-03-06)
+
 ## 0.20.0 (2024-02-21)
 
 ## 0.19.0 (2024-02-09)
@@ -42,4 +58,4 @@
 
 ## 0.1.0 (2023-05-10)
 
-- Initial version of the package.
+-   Initial version of the package.

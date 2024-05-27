@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 
 /**
@@ -15,6 +15,7 @@ import { getPasteBlocks, setClipboardBlocks } from '../writing-flow/utils';
 // This hook borrows from useClipboardHandler in ../writing-flow/use-clipboard-handler.js
 // and adds behaviour for the list view, while skipping partial selection.
 export default function useClipboardHandler( { selectBlock } ) {
+	const registry = useRegistry();
 	const {
 		getBlockOrder,
 		getBlockRootClientId,
@@ -106,7 +107,7 @@ export default function useClipboardHandler( { selectBlock } ) {
 
 				notifyCopy( event.type, selectedBlockClientIds );
 				const blocks = getBlocksByClientId( selectedBlockClientIds );
-				setClipboardBlocks( event, blocks );
+				setClipboardBlocks( event, blocks, registry );
 			}
 
 			if ( event.type === 'cut' ) {

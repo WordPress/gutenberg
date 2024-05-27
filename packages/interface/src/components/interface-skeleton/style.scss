@@ -5,8 +5,10 @@ html.interface-interface-skeleton__html-container {
 	width: 100%;
 
 	@include break-medium() {
-		position: initial;
-		width: initial;
+		&:not(:has(.is-zoom-out)) {
+			position: initial;
+			width: initial;
+		}
 	}
 }
 
@@ -43,6 +45,7 @@ html.interface-interface-skeleton__html-container {
 @include editor-left(".interface-interface-skeleton");
 
 .interface-interface-skeleton__body {
+	position: relative;
 	flex-grow: 1;
 	display: flex;
 
@@ -102,20 +105,19 @@ html.interface-interface-skeleton__html-container {
 	position: absolute;
 	z-index: z-index(".interface-interface-skeleton__sidebar");
 	top: 0;
-	right: 0;
-	bottom: 0;
 	left: 0;
+	bottom: 0;
 	background: $white;
 	color: $gray-900;
+	width: auto; // Keep the sidebar width flexible.
 
 	// On Mobile the header is fixed to keep HTML as scrollable.
 	@include break-medium() {
 		position: relative !important;
-		width: auto; // Keep the sidebar width flexible.
 
 		// Set this z-index only when the sidebar is opened. When it's closed, the
 		// button to open the sidebar that is shown when navigating regions needs to
-		// be above the footer. See `edit-post-layout__toggle-sidebar-panel`.
+		// be above the footer. See `editor-layout__toggle-sidebar-panel`.
 		.is-sidebar-opened & {
 			z-index: z-index(".interface-interface-skeleton__sidebar {greater than small}");
 		}
@@ -123,7 +125,7 @@ html.interface-interface-skeleton__html-container {
 }
 
 .interface-interface-skeleton__sidebar {
-	overflow: auto;
+	overflow: hidden;
 
 	@include break-medium() {
 		border-left: $border-width solid $gray-200;
@@ -131,6 +133,7 @@ html.interface-interface-skeleton__html-container {
 }
 
 .interface-interface-skeleton__secondary-sidebar {
+	right: 0;
 	@include break-medium() {
 		border-right: $border-width solid $gray-200;
 	}

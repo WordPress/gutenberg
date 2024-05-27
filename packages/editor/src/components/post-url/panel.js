@@ -2,30 +2,44 @@
  * WordPress dependencies
  */
 import { useMemo, useState } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import { Dropdown, Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
+import { safeDecodeURIComponent } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
 import PostURLCheck from './check';
 import PostURL from './index';
-import { usePostURLLabel } from './label';
 import PostPanelRow from '../post-panel-row';
+import { store as editorStore } from '../../store';
 
+/**
+ * Renders the `PostURLPanel` component.
+ *
+ * @return {JSX.Element} The rendered PostURLPanel component.
+ */
 export default function PostURLPanel() {
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
 	// Memoize popoverProps to avoid returning a new object every time.
 	const popoverProps = useMemo(
-		() => ( { anchor: popoverAnchor, placement: 'bottom-end' } ),
+		() => ( {
+			// Anchor the popover to the middle of the entire row so that it doesn't
+			// move around when the label changes.
+			anchor: popoverAnchor,
+			placement: 'left-start',
+			offset: 36,
+			shift: true,
+		} ),
 		[ popoverAnchor ]
 	);
 
 	return (
 		<PostURLCheck>
-			<PostPanelRow label={ __( 'URL' ) } ref={ setPopoverAnchor }>
+			<PostPanelRow label={ __( 'Link' ) } ref={ setPopoverAnchor }>
 				<Dropdown
 					popoverProps={ popoverProps }
 					className="editor-post-url__panel-dropdown"
@@ -44,18 +58,22 @@ export default function PostURLPanel() {
 }
 
 function PostURLToggle( { isOpen, onClick } ) {
-	const label = usePostURLLabel();
+	const slug = useSelect(
+		( select ) => select( editorStore ).getEditedPostSlug(),
+		[]
+	);
+	const decodedSlug = safeDecodeURIComponent( slug );
 	return (
 		<Button
-			__next40pxDefaultSize
+			size="compact"
 			className="editor-post-url__panel-toggle"
 			variant="tertiary"
 			aria-expanded={ isOpen }
-			// translators: %s: Current post URL.
-			aria-label={ sprintf( __( 'Change URL: %s' ), label ) }
+			// translators: %s: Current post link.
+			aria-label={ sprintf( __( 'Change link: %s' ), decodedSlug ) }
 			onClick={ onClick }
 		>
-			{ label }
+			{ decodedSlug }
 		</Button>
 	);
 }

@@ -59,9 +59,7 @@ describe( 'CircularOptionPicker', () => {
 
 	describe( 'when `asButtons` is true', () => {
 		it( 'should render as buttons', async () => {
-			render(
-				<CircularOptionPicker { ...DEFAULT_PROPS } asButtons={ true } />
-			);
+			render( <CircularOptionPicker { ...DEFAULT_PROPS } asButtons /> );
 
 			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
 			expect( screen.queryByRole( 'option' ) ).not.toBeInTheDocument();
@@ -94,7 +92,7 @@ describe( 'CircularOptionPicker', () => {
 				<CircularOptionPicker
 					{ ...DEFAULT_PROPS }
 					options={ MULTIPLE_OPTIONS }
-					loop={ true }
+					loop
 				/>
 			);
 

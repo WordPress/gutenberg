@@ -194,6 +194,22 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 					'padding'  => true,
 					'blockGap' => true,
 				),
+				'shadow'     => array(
+					'presets' => array(
+						'theme' => array(
+							array(
+								'name'   => 'Natural',
+								'slug'   => 'natural',
+								'shadow' => '2px 2px 3px #000',
+							),
+							array(
+								'name'   => 'Test',
+								'slug'   => 'test',
+								'shadow' => '2px 2px 3px #000',
+							),
+						),
+					),
+				),
 				'blocks'     => array(
 					'core/paragraph' => array(
 						'color' => array(
@@ -536,6 +552,22 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 							'name' => 'Custom',
 							'slug' => 'custom',
 							'size' => '100px',
+						),
+					),
+				),
+			),
+			'shadow'     => array(
+				'presets' => array(
+					'theme' => array(
+						array(
+							'name'   => 'Natural',
+							'slug'   => 'natural',
+							'shadow' => '2px 2px 3px #000',
+						),
+						array(
+							'name'   => 'Test',
+							'slug'   => 'test',
+							'shadow' => '2px 2px 3px #000',
 						),
 					),
 				),
@@ -1038,5 +1070,160 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 			$expected_settings,
 			$actual_settings
 		);
+	}
+
+	public function test_theme_shadow_presets_do_not_override_default_shadow_presets() {
+		switch_theme( 'block-theme' );
+
+		$theme_json_resolver = new WP_Theme_JSON_Resolver_Gutenberg();
+		$theme_json          = $theme_json_resolver->get_merged_data();
+		$actual_settings     = $theme_json->get_settings()['shadow']['presets'];
+
+		$expected_settings = array(
+			'default' => array(
+				array(
+					'name'   => 'Natural',
+					'shadow' => '6px 6px 9px rgba(0, 0, 0, 0.2)',
+					'slug'   => 'natural',
+				),
+				array(
+					'name'   => 'Deep',
+					'shadow' => '12px 12px 50px rgba(0, 0, 0, 0.4)',
+					'slug'   => 'deep',
+				),
+				array(
+					'name'   => 'Sharp',
+					'shadow' => '6px 6px 0px rgba(0, 0, 0, 0.2)',
+					'slug'   => 'sharp',
+				),
+				array(
+					'name'   => 'Outlined',
+					'shadow' => '6px 6px 0px -3px rgba(255, 255, 255, 1), 6px 6px rgba(0, 0, 0, 1)',
+					'slug'   => 'outlined',
+				),
+				array(
+					'name'   => 'Crisp',
+					'shadow' => '6px 6px 0px rgba(0, 0, 0, 1)',
+					'slug'   => 'crisp',
+				),
+			),
+			'theme'   => array(
+				array(
+					'name'   => 'Test',
+					'shadow' => '2px 2px 3px #000',
+					'slug'   => 'test',
+				),
+			),
+		);
+
+		wp_recursive_ksort( $actual_settings );
+		wp_recursive_ksort( $expected_settings );
+
+		$this->assertSame(
+			$expected_settings,
+			$actual_settings
+		);
+	}
+
+	public function test_shadow_default_presets_value_for_block_and_classic_themes() {
+		$theme_json_resolver = new WP_Theme_JSON_Resolver_Gutenberg();
+		$theme_json          = $theme_json_resolver->get_merged_data();
+
+		$default_presets_for_classic = $theme_json->get_settings()['shadow']['defaultPresets'];
+		$this->assertFalse( $default_presets_for_classic );
+
+		switch_theme( 'block-theme' );
+		$theme_json_resolver = new WP_Theme_JSON_Resolver_Gutenberg();
+		$theme_json          = $theme_json_resolver->get_merged_data();
+
+		$default_presets_for_block = $theme_json->get_settings()['shadow']['defaultPresets'];
+		$this->assertTrue( $default_presets_for_block );
+	}
+
+	/**
+	 * Tests that relative paths are resolved and merged into the theme.json data.
+	 */
+	public function test_resolve_theme_file_uris() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'background' => array(
+						'backgroundImage' => array(
+							'url' => 'file:./example/img/image.png',
+						),
+					),
+				),
+			)
+		);
+
+		$expected_data = array(
+			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'styles'  => array(
+				'background' => array(
+					'backgroundImage' => array(
+						'url' => 'https://example.org/wp-content/themes/example-theme/example/img/image.png',
+					),
+				),
+			),
+		);
+
+		/*
+		 * This filter callback normalizes the return value from `get_theme_file_uri`
+		 * to guard against changes in test environments.
+		 * The test suite otherwise returns full system dir path, e.g.,
+		 * /wordpress-phpunit/includes/../data/themedir1/default/example/img/image.png
+		 */
+		$filter_theme_file_uri_callback = function ( $file ) {
+			return 'https://example.org/wp-content/themes/example-theme/example/' . explode( 'example/', $file )[1];
+		};
+		add_filter( 'theme_file_uri', $filter_theme_file_uri_callback );
+		$actual = WP_Theme_JSON_Resolver_Gutenberg::resolve_theme_file_uris( $theme_json );
+		remove_filter( 'theme_file_uri', $filter_theme_file_uri_callback );
+
+		$this->assertSame( $expected_data, $actual->get_raw_data() );
+	}
+
+	/**
+	 * Tests that them uris are resolved and bundled with other metadata
+	 * in an array.
+	 */
+	public function test_get_resolved_theme_uris() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'background' => array(
+						'backgroundImage' => array(
+							'url' => 'file:./example/img/image.png',
+						),
+					),
+				),
+			)
+		);
+
+		$expected_data = array(
+			array(
+				'name'   => 'file:./example/img/image.png',
+				'href'   => 'https://example.org/wp-content/themes/example-theme/example/img/image.png',
+				'target' => 'styles.background.backgroundImage.url',
+				'type'   => 'image/png',
+			),
+		);
+
+		/*
+		 * This filter callback normalizes the return value from `get_theme_file_uri`
+		 * to guard against changes in test environments.
+		 * The test suite otherwise returns full system dir path, e.g.,
+		 * /wordpress-phpunit/includes/../data/themedir1/default/example/img/image.png
+		 */
+		$filter_theme_file_uri_callback = function ( $file ) {
+			return 'https://example.org/wp-content/themes/example-theme/example/' . explode( 'example/', $file )[1];
+		};
+		add_filter( 'theme_file_uri', $filter_theme_file_uri_callback );
+		$actual = WP_Theme_JSON_Resolver_Gutenberg::get_resolved_theme_uris( $theme_json );
+		remove_filter( 'theme_file_uri', $filter_theme_file_uri_callback );
+
+		$this->assertSame( $expected_data, $actual );
 	}
 }

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * Internal dependencies
@@ -23,24 +23,21 @@ function getDefaultOrigin( type?: GetAnimateOptions[ 'type' ] ) {
  */
 export function getAnimateClassName( options: GetAnimateOptions ) {
 	if ( options.type === 'loading' ) {
-		return classnames( 'components-animate__loading' );
+		return clsx( 'components-animate__loading' );
 	}
 
 	const { type, origin = getDefaultOrigin( type ) } = options;
 
 	if ( type === 'appear' ) {
 		const [ yAxis, xAxis = 'center' ] = origin.split( ' ' );
-		return classnames( 'components-animate__appear', {
+		return clsx( 'components-animate__appear', {
 			[ 'is-from-' + xAxis ]: xAxis !== 'center',
 			[ 'is-from-' + yAxis ]: yAxis !== 'middle',
 		} );
 	}
 
 	if ( type === 'slide-in' ) {
-		return classnames(
-			'components-animate__slide-in',
-			'is-from-' + origin
-		);
+		return clsx( 'components-animate__slide-in', 'is-from-' + origin );
 	}
 
 	return undefined;

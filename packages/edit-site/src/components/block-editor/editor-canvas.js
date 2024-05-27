@@ -1,48 +1,39 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 import { useState, useEffect, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
-import {
-	FOCUSABLE_ENTITIES,
-	NAVIGATION_POST_TYPE,
-} from '../../utils/constants';
 
-const { EditorCanvas: EditorCanvasRoot } = unlock( editorPrivateApis );
+const { VisualEditor } = unlock( editorPrivateApis );
 
-function EditorCanvas( { enableResizing, settings, children, ...props } ) {
-	const { hasBlocks, isFocusMode, templateType, canvasMode, isZoomOutMode } =
-		useSelect( ( select ) => {
-			const { getBlockCount, __unstableGetEditorMode } =
-				select( blockEditorStore );
-			const { getEditedPostType, getCanvasMode } = unlock(
-				select( editSiteStore )
-			);
-			const _templateType = getEditedPostType();
+function EditorCanvas( { settings } ) {
+	const { canvasMode, currentPostIsTrashed } = useSelect( ( select ) => {
+		const { getCanvasMode } = unlock( select( editSiteStore ) );
 
-			return {
-				templateType: _templateType,
-				isFocusMode: FOCUSABLE_ENTITIES.includes( _templateType ),
-				isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
-				canvasMode: getCanvasMode(),
-				hasBlocks: !! getBlockCount(),
-			};
-		}, [] );
+		return {
+			canvasMode: getCanvasMode(),
+			currentPostIsTrashed:
+				select( editorStore ).getCurrentPostAttribute( 'status' ) ===
+				'trash',
+		};
+	}, [] );
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const [ isFocused, setIsFocused ] = useState( false );
 
@@ -52,31 +43,37 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 		}
 	}, [ canvasMode ] );
 
-	const viewModeProps = {
-		'aria-label': __( 'Editor Canvas' ),
+	// In view mode, make the canvas iframe be perceived and behave as a button
+	// to switch to edit mode, with a meaningful label and no title attribute.
+	const viewModeIframeProps = {
+		'aria-label': __( 'Edit' ),
+		'aria-disabled': currentPostIsTrashed,
+		title: null,
 		role: 'button',
 		tabIndex: 0,
 		onFocus: () => setIsFocused( true ),
 		onBlur: () => setIsFocused( false ),
 		onKeyDown: ( event ) => {
 			const { keyCode } = event;
-			if ( keyCode === ENTER || keyCode === SPACE ) {
+			if (
+				( keyCode === ENTER || keyCode === SPACE ) &&
+				! currentPostIsTrashed
+			) {
 				event.preventDefault();
 				setCanvasMode( 'edit' );
 			}
 		},
-		onClick: () => setCanvasMode( 'edit' ),
+		onClick: () => {
+			setCanvasMode( 'edit' );
+		},
+		onClickCapture: ( event ) => {
+			if ( currentPostIsTrashed ) {
+				event.preventDefault();
+				event.stopPropagation();
+			}
+		},
 		readonly: true,
 	};
-	const isTemplateTypeNavigation = templateType === NAVIGATION_POST_TYPE;
-	const isNavigationFocusMode = isTemplateTypeNavigation && isFocusMode;
-	// Hide the appender when:
-	// - In navigation focus mode (should only allow the root Nav block).
-	// - In view mode (i.e. not editing).
-	const showBlockAppender =
-		( isNavigationFocusMode && hasBlocks ) || canvasMode === 'view'
-			? false
-			: undefined;
 
 	const styles = useMemo(
 		() => [
@@ -85,43 +82,28 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 				// Forming a "block formatting context" to prevent margin collapsing.
 				// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
 
-				css: `.is-root-container{display:flow-root;${
-					// Some themes will have `min-height: 100vh` for the root container,
-					// which isn't a requirement in auto resize mode.
-					enableResizing ? 'min-height:0!important;' : ''
-				}}body{position:relative; ${
+				css: `body{${
 					canvasMode === 'view'
-						? 'cursor: pointer; min-height: 100vh;'
+						? `min-height: 100vh; ${
+								currentPostIsTrashed ? '' : 'cursor: pointer;'
+						  }`
 						: ''
 				}}}`,
 			},
 		],
-		[ settings.styles, enableResizing, canvasMode ]
+		[ settings.styles, canvasMode, currentPostIsTrashed ]
 	);
 
 	return (
-		<EditorCanvasRoot
-			className={ classnames( 'edit-site-editor-canvas__block-list', {
-				'is-navigation-block': isTemplateTypeNavigation,
-			} ) }
-			renderAppender={ showBlockAppender }
+		<VisualEditor
 			styles={ styles }
 			iframeProps={ {
-				expand: isZoomOutMode,
-				scale: isZoomOutMode ? 0.45 : undefined,
-				frameSize: isZoomOutMode ? 100 : undefined,
-				className: classnames(
-					'edit-site-visual-editor__editor-canvas',
-					{
-						'is-focused': isFocused && canvasMode === 'view',
-					}
-				),
-				...props,
-				...( canvasMode === 'view' ? viewModeProps : {} ),
+				className: clsx( 'edit-site-visual-editor__editor-canvas', {
+					'is-focused': isFocused && canvasMode === 'view',
+				} ),
+				...( canvasMode === 'view' ? viewModeIframeProps : {} ),
 			} }
-		>
-			{ children }
-		</EditorCanvasRoot>
+		/>
 	);
 }
 

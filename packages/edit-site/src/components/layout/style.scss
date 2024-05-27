@@ -15,7 +15,7 @@
 	z-index: z-index(".edit-site-layout__hub");
 
 	@include break-medium {
-		width: calc(#{$nav-sidebar-width} - #{$grid-unit-30});
+		width: calc(#{$nav-sidebar-width} - #{$grid-unit-15});
 	}
 
 	.edit-site-layout.is-full-canvas & {
@@ -26,20 +26,15 @@
 	}
 }
 
-.edit-site-layout__header-container {
-	z-index: z-index(".edit-site-layout__header-container");
+.edit-site-layout__header-container:has(+ .edit-site-layout__content > .edit-site-layout__mobile>.edit-site-page) {
+	margin-bottom: $header-height;
+	@include break-medium {
+		margin-bottom: 0;
+	}
 }
 
-.edit-site-layout__header {
-	height: $header-height;
-	display: flex;
-	z-index: z-index(".edit-site-layout__header");
-
-	// This is only necessary for the exit animation
-	.edit-site-layout:not(.is-full-canvas) & {
-		position: fixed;
-		width: 100vw;
-	}
+.edit-site-layout__header-container {
+	z-index: z-index(".edit-site-layout__header-container");
 }
 
 .edit-site-layout__content {
@@ -93,6 +88,8 @@
 	position: relative;
 	flex-grow: 1;
 	z-index: z-index(".edit-site-layout__canvas-container");
+	// When animating the frame size can exceed its container size.
+	overflow: visible;
 
 	&.is-resizing::after {
 		// This covers the whole content which ensures mouse up triggers
@@ -121,7 +118,7 @@
 		justify-content: flex-end;
 	}
 
-	& > div {
+	.edit-site-resizable-frame__inner {
 		color: $gray-900;
 	}
 
@@ -130,25 +127,22 @@
 		bottom: $canvas-padding;
 		width: calc(100% - #{$canvas-padding});
 
-		& > div {
-			border-radius: $radius-block-ui * 4;
-			// Not sure why this is necessary.
-			.edit-site-layout:not(.is-full-canvas) & .edit-site-visual-editor__editor-canvas,
-			.edit-site-layout:not(.is-full-canvas) & .interface-interface-skeleton__content {
+		.edit-site-resizable-frame__inner-content {
+			box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.8), 0 8px 10px -6px rgba(0, 0, 0, 0.8);
+			transition: border-radius 0.4s;
+			// This ensure the radius work properly.
+			overflow: hidden;
+
+			.edit-site-layout:not(.is-full-canvas) & {
 				border-radius: $radius-block-ui * 4;
 			}
 		}
-
 	}
 
 	.edit-site-layout.is-full-canvas & {
 		top: 0;
 		bottom: 0;
 		width: 100%;
-
-		& > div {
-			border-radius: 0;
-		}
 	}
 }
 
@@ -168,19 +162,15 @@
 	position: relative;
 	color: $white;
 	border-radius: 0;
-	height: $header-height;
+	height: $header-height +  $border-width;
 	width: $header-height;
+	margin-bottom: -  $border-width;
 	overflow: hidden;
 	padding: 0;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	border-bottom: 1px solid transparent;
-
-	.edit-site-layout.is-full-canvas & {
-		border-bottom-color: $gray-200;
-		transition: border-bottom-color 0.15s 0.4s ease-out;
-	}
 
 	&:hover,
 	&:active {
@@ -268,26 +258,14 @@
 			div {
 				transform: translateX(0) translateY(0) translateZ(0) !important;
 			}
-
-			.edit-site-layout__header {
-				opacity: 1 !important;
-			}
 		}
 	}
 
-	.edit-site-site-hub,
-	.edit-site-layout__header {
+	.edit-site-site-hub {
 		position: absolute;
 		top: 0;
-		z-index: z-index(".edit-site-layout__header");
-	}
-	.edit-site-site-hub {
 		z-index: z-index(".edit-site-layout__hub");
 	}
-	.edit-site-layout__header {
-		width: 100%;
-	}
-
 }
 
 .edit-site-layout__area {
@@ -298,4 +276,12 @@
 		border-radius: 8px;
 		margin: $canvas-padding $canvas-padding $canvas-padding 0;
 	}
+}
+
+.edit-site .components-editor-notices__snackbar {
+	position: fixed;
+	right: 0;
+	bottom: 16px;
+	padding-left: 16px;
+	padding-right: 16px;
 }

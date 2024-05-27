@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -19,13 +19,18 @@ import useMovingAnimation from '../../use-moving-animation';
 import { PrivateBlockContext } from '../private-block-context';
 import { useFocusFirstElement } from './use-focus-first-element';
 import { useIsHovered } from './use-is-hovered';
-import { useBlockEditContext } from '../../block-edit/context';
+import {
+	blockBindingsKey,
+	useBlockEditContext,
+} from '../../block-edit/context';
 import { useFocusHandler } from './use-focus-handler';
 import { useEventHandlers } from './use-selected-block-event-handlers';
 import { useNavModeExit } from './use-nav-mode-exit';
 import { useBlockRefProvider } from './use-block-refs';
 import { useIntersectionObserver } from './use-intersection-observer';
+import { useScrollIntoView } from './use-scroll-into-view';
 import { useFlashEditableBlocks } from '../../use-flash-editable-blocks';
+import { canBindBlock } from '../../../hooks/use-bindings-attributes';
 
 /**
  * This hook is used to lightly mark an element as a block element. The element
@@ -82,7 +87,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		blockTitle,
 		isSelected,
 		isSubtreeDisabled,
-		isOutlineEnabled,
 		hasOverlay,
 		initialPosition,
 		blockEditingMode,
@@ -92,7 +96,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		isReusable,
 		isDragging,
 		hasChildSelected,
-		removeOutline,
 		isBlockMovingMode,
 		canInsertMovingBlock,
 		isEditingDisabled,
@@ -112,7 +115,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		useFocusHandler( clientId ),
 		useEventHandlers( { clientId, isSelected } ),
 		useNavModeExit( clientId ),
-		useIsHovered( { isEnabled: isOutlineEnabled } ),
+		useIsHovered(),
 		useIntersectionObserver(),
 		useMovingAnimation( { triggerAnimationOnChange: index, clientId } ),
 		useDisabled( { isDisabled: ! hasOverlay } ),
@@ -120,14 +123,35 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			clientId,
 			isEnabled: name === 'core/block' || templateLock === 'contentOnly',
 		} ),
+		useScrollIntoView( { isSelected } ),
 	] );
 
 	const blockEditContext = useBlockEditContext();
+	const hasBlockBindings = !! blockEditContext[ blockBindingsKey ];
+	const bindingsStyle =
+		hasBlockBindings && canBindBlock( name )
+			? {
+					'--wp-admin-theme-color': 'var(--wp-block-synced-color)',
+					'--wp-admin-theme-color--rgb':
+						'var(--wp-block-synced-color--rgb)',
+			  }
+			: {};
+
 	// Ensures it warns only inside the `edit` implementation for the block.
 	if ( blockApiVersion < 2 && clientId === blockEditContext.clientId ) {
 		warning(
 			`Block type "${ name }" must support API version 2 or higher to work correctly with "useBlockProps" method.`
 		);
+	}
+
+	let hasNegativeMargin = false;
+	if (
+		wrapperProps?.style?.marginTop?.charAt( 0 ) === '-' ||
+		wrapperProps?.style?.marginBottom?.charAt( 0 ) === '-' ||
+		wrapperProps?.style?.marginLeft?.charAt( 0 ) === '-' ||
+		wrapperProps?.style?.marginRight?.charAt( 0 ) === '-'
+	) {
+		hasNegativeMargin = true;
 	}
 
 	return {
@@ -142,7 +166,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		'data-type': name,
 		'data-title': blockTitle,
 		inert: isSubtreeDisabled ? 'true' : undefined,
-		className: classnames(
+		className: clsx(
 			'block-editor-block-list__block',
 			{
 				// The wp-block className is important for editor styles.
@@ -155,11 +179,11 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				'is-reusable': isReusable,
 				'is-dragging': isDragging,
 				'has-child-selected': hasChildSelected,
-				'remove-outline': removeOutline,
 				'is-block-moving-mode': isBlockMovingMode,
 				'can-insert-moving-block': canInsertMovingBlock,
 				'is-editing-disabled': isEditingDisabled,
 				'has-editable-outline': hasEditableOutline,
+				'has-negative-margin': hasNegativeMargin,
 				'is-content-locked-temporarily-editing-as-blocks':
 					isTemporarilyEditingAsBlocks,
 			},
@@ -168,7 +192,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			wrapperProps.className,
 			defaultClassName
 		),
-		style: { ...wrapperProps.style, ...props.style },
+		style: { ...wrapperProps.style, ...props.style, ...bindingsStyle },
 	};
 }
 

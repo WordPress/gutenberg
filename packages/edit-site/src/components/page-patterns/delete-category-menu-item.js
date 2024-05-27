@@ -60,8 +60,7 @@ export default function DeleteCategoryMenuItem( { category, onClose } ) {
 
 			onClose?.();
 			history.push( {
-				path: `/patterns`,
-				categoryType: PATTERN_TYPES.theme,
+				postType: PATTERN_TYPES.user,
 				categoryId: PATTERN_DEFAULT_CATEGORY,
 			} );
 		} catch ( error ) {
@@ -90,6 +89,13 @@ export default function DeleteCategoryMenuItem( { category, onClose } ) {
 				onCancel={ () => setIsModalOpen( false ) }
 				confirmButtonText={ __( 'Delete' ) }
 				className="edit-site-patterns__delete-modal"
+				title={ sprintf(
+					// translators: %s: The pattern category's name.
+					__( 'Delete "%s"?' ),
+					decodeEntities( category.label )
+				) }
+				size="medium"
+				__experimentalHideHeader={ false }
 			>
 				{ sprintf(
 					// translators: %s: The pattern category's name.

@@ -10,7 +10,41 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+
+## 1.119.0
+-   [internal] Remove circular dependencies within the components package [#61102]
+-   [internal] Upgrade target sdk version to Android API 34 [#61727]
+
+## 1.118.0
+-   [*] Fix a crash when pasting file images and special comment markup [#60476]
+-   [*] Update Aztec to v2.1.2 [#61007]
+-   [*] KeyboardAwareFlatList - Enable FlatList virtualization for iOS [#59833]
+
+## 1.117.0
+-   [*] Add empty fallback option for the BottomSheetSelectControl component [#60333]
+-   [*] Fix Quote Block styles [#60476]
+-   [*] Prevent passing potential false values to the onPress prop [#60595]
+-   [*] ColorPalette - Check for ScrollView reference [#60562]
+-   [*] Raw Handling - msListIgnore - Check attributes are valid [#60375]
+
+## 1.116.0
+-   [**] Highlight color formatting style improvements [#57650]
+
+## 1.115.0
+-   [*] Improve consistency of the block outline indicating the currently selected block [#59415]
+-   [*] Gallery block items with in-progress, paused, or failed media uploads correctly display an highlight outline when selected [#59423]
+-   [**] [internal] Upgrade React Native to version 0.73.3 [#58475]
+-   [**] Add error boundary components and exception logging [#59221]
+-   [**] Fix crash occurring when the URL associated with a Video block is changed too quickly [#59841]
+-   [**] Enable setting HTML anchor IDs for all supported block types [#59802]
+
+## 1.114.1
+-   [**] Fix a crash produced when the content of a synced pattern is updated [#59632]
+
+## 1.114.0
 -   [*] Prevent crash when autoscrolling to blocks [#59110]
+-   [*] Remove opacity change when images are being uploaded [#59264]
+-   [*] Media & Text blocks correctly show an error message when the attached video upload fails [#59288]
 
 ## 1.112.0
 -   [*] [internal] Upgrade React Native to version 0.71.15 [#57667]

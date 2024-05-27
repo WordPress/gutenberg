@@ -71,7 +71,7 @@ const optionsWithTooltip = (
 			value="gnocchi"
 			label="Delicious Gnocchi"
 			aria-label="Click for Delicious Gnocchi"
-			showTooltip={ true }
+			showTooltip
 		/>
 		<ToggleGroupControlOption
 			value="caponata"

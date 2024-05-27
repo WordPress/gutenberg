@@ -87,17 +87,24 @@ function gutenberg_create_initial_post_types() {
 /**
  * Initializes REST routes.
  *
- * @since 6.5
+ * @global string $wp_version The WordPress version string.
  */
 function gutenberg_create_initial_rest_routes() {
-	$font_collections_controller = new WP_REST_Font_Collections_Controller();
-	$font_collections_controller->register_routes();
+	global $wp_version;
+
+	// Runs only if the Font Library is not available in core ( i.e. in core < 6.5-alpha ).
+	if ( version_compare( $wp_version, '6.5-alpha', '<' ) ) {
+		$font_collections_controller = new WP_REST_Font_Collections_Controller();
+		$font_collections_controller->register_routes();
+	}
 }
+
+add_action( 'rest_api_init', 'gutenberg_create_initial_rest_routes' );
 
 /**
  * Initializes REST routes and post types.
  *
- * @since 6.5
+ * @global string $wp_version The WordPress version string.
  */
 function gutenberg_init_font_library() {
 	global $wp_version;
@@ -105,11 +112,10 @@ function gutenberg_init_font_library() {
 	// Runs only if the Font Library is not available in core ( i.e. in core < 6.5-alpha ).
 	if ( version_compare( $wp_version, '6.5-alpha', '<' ) ) {
 		gutenberg_create_initial_post_types();
-		gutenberg_create_initial_rest_routes();
 	}
 }
 
-add_action( 'rest_api_init', 'gutenberg_init_font_library' );
+add_action( 'init', 'gutenberg_init_font_library' );
 
 
 if ( ! function_exists( 'wp_register_font_collection' ) ) {
@@ -164,7 +170,7 @@ function gutenberg_register_font_collections() {
 		array(
 			'name'          => _x( 'Google Fonts', 'font collection name', 'gutenberg' ),
 			'description'   => __( 'Install from Google Fonts. Fonts are copied to and served from your site.', 'gutenberg' ),
-			'font_families' => 'https://s.w.org/images/fonts/17.7/collections/google-fonts-with-preview.json',
+			'font_families' => 'https://s.w.org/images/fonts/wp-6.5/collections/google-fonts-with-preview.json',
 			'categories'    => array(
 				array(
 					'name' => _x( 'Sans Serif', 'font category', 'gutenberg' ),
@@ -192,25 +198,36 @@ function gutenberg_register_font_collections() {
 }
 add_action( 'init', 'gutenberg_register_font_collections', 11 );
 
-// @core-merge: This code should probably go into Core's src/wp-includes/functions.php.
+// @core-merge: This code should probably go into Core's src/wp-includes/fonts.php.
 if ( ! function_exists( 'wp_get_font_dir' ) ) {
+	/**
+	 * Retrieves font uploads directory information.
+	 *
+	 * Same as wp_font_dir() but "light weight" as it doesn't attempt to create the font uploads directory.
+	 * Intended for use in themes, when only 'basedir' and 'baseurl' are needed, generally in all cases
+	 * when not uploading files.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @see wp_font_dir()
+	 *
+	 * @return array See wp_font_dir() for description.
+	 */
+	function wp_get_font_dir() {
+		return wp_font_dir( false );
+	}
+}
+
+// @core-merge: This code should probably go into Core's src/wp-includes/fonts.php.
+if ( ! function_exists( 'wp_font_dir' ) ) {
 	/**
 	 * Returns an array containing the current fonts upload directory's path and URL.
 	 *
 	 * @since 6.5.0
 	 *
-	 * @param array $defaults {
-	 *     Array of information about the upload directory.
-	 *
-	 *     @type string       $path    Base directory and subdirectory or full path to the fonts upload directory.
-	 *     @type string       $url     Base URL and subdirectory or absolute URL to the fonts upload directory.
-	 *     @type string       $subdir  Subdirectory
-	 *     @type string       $basedir Path without subdir.
-	 *     @type string       $baseurl URL path without subdir.
-	 *     @type string|false $error   False or error message.
-	 * }
-	 * @return array $defaults {
-	 *     Array of information about the upload directory.
+	 * @param bool $create_dir Optional. Whether to check and create the font uploads directory. Default true.
+	 * @return array {
+	 *     Array of information about the font upload directory.
 	 *
 	 *     @type string       $path    Base directory and subdirectory or full path to the fonts upload directory.
 	 *     @type string       $url     Base URL and subdirectory or absolute URL to the fonts upload directory.
@@ -220,19 +237,64 @@ if ( ! function_exists( 'wp_get_font_dir' ) ) {
 	 *     @type string|false $error   False or error message.
 	 * }
 	 */
-	function wp_get_font_dir( $defaults = array() ) {
+	function wp_font_dir( $create_dir = true ) {
+		/*
+		 * Allow extenders to manipulate the font directory consistently.
+		 *
+		 * Ensures the upload_dir filter is fired both when calling this function
+		 * directly and when the upload directory is filtered in the Font Face
+		 * REST API endpoint.
+		 */
+		add_filter( 'upload_dir', '_wp_filter_font_directory' );
+		$font_dir = wp_upload_dir( null, $create_dir, false );
+		remove_filter( 'upload_dir', '_wp_filter_font_directory' );
+		return $font_dir;
+	}
+}
+
+// @core-merge: This code should probably go into Core's src/wp-includes/fonts.php.
+if ( ! function_exists( '_wp_filter_font_directory' ) ) {
+	/**
+	 * Returns the font directory for use by the font library.
+	 *
+	 * This function is a callback for the {@see 'upload_dir'} filter. It is not
+	 * intended to be called directly. Use wp_get_font_dir() instead.
+	 *
+	 * The function can be used when extending the font library to modify the upload
+	 * destination for font files via the upload_dir filter. The recommended way to
+	 * do this is:
+	 *
+	 * ```php
+	 * add_filter( 'upload_dir', '_wp_filter_font_directory' );
+	 * // Your code to upload or sideload a font file.
+	 * remove_filter( 'upload_dir', '_wp_filter_font_directory' );
+	 * ```
+	 *
+	 * @since 6.5.0
+	 * @access private
+	 *
+	 * @param string $font_dir The font directory.
+	 * @return string The modified font directory.
+	 */
+	function _wp_filter_font_directory( $font_dir ) {
+		if ( doing_filter( 'font_dir' ) ) {
+			// Avoid an infinite loop.
+			return $font_dir;
+		}
+
 		$site_path = '';
 		if ( is_multisite() && ! ( is_main_network() && is_main_site() ) ) {
 			$site_path = '/sites/' . get_current_blog_id();
 		}
 
-		// Sets the defaults.
-		$defaults['path']    = path_join( WP_CONTENT_DIR, 'fonts' ) . $site_path;
-		$defaults['url']     = untrailingslashit( content_url( 'fonts' ) ) . $site_path;
-		$defaults['subdir']  = '';
-		$defaults['basedir'] = path_join( WP_CONTENT_DIR, 'fonts' ) . $site_path;
-		$defaults['baseurl'] = untrailingslashit( content_url( 'fonts' ) ) . $site_path;
-		$defaults['error']   = false;
+		$font_dir = array(
+			'path'    => path_join( WP_CONTENT_DIR, 'fonts' ) . $site_path,
+			'url'     => untrailingslashit( content_url( 'fonts' ) ) . $site_path,
+			'subdir'  => '',
+			'basedir' => path_join( WP_CONTENT_DIR, 'fonts' ) . $site_path,
+			'baseurl' => untrailingslashit( content_url( 'fonts' ) ) . $site_path,
+			'error'   => false,
+		);
 
 		/**
 		 * Filters the fonts directory data.
@@ -241,9 +303,18 @@ if ( ! function_exists( 'wp_get_font_dir' ) ) {
 		 *
 		 * @since 6.5.0
 		 *
-		 * @param array $defaults The original fonts directory data.
+		 * @param array $font_dir {
+		 *     Array of information about the font upload directory.
+		 *
+		 *     @type string       $path    Base directory and subdirectory or full path to the fonts upload directory.
+		 *     @type string       $url     Base URL and subdirectory or absolute URL to the fonts upload directory.
+		 *     @type string       $subdir  Subdirectory
+		 *     @type string       $basedir Path without subdir.
+		 *     @type string       $baseurl URL path without subdir.
+		 *     @type string|false $error   False or error message.
+		 * }
 		 */
-		return apply_filters( 'font_dir', $defaults );
+		return apply_filters( 'font_dir', $font_dir );
 	}
 }
 

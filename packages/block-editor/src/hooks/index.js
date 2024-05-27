@@ -8,6 +8,7 @@ import {
 } from './utils';
 import './compat';
 import align from './align';
+import background from './background';
 import './lock';
 import anchor from './anchor';
 import ariaLabel from './aria-label';
@@ -20,6 +21,7 @@ import dimensions from './dimensions';
 import duotone from './duotone';
 import fontFamily from './font-family';
 import fontSize from './font-size';
+import textAlign from './text-align';
 import border from './border';
 import position from './position';
 import layout from './layout';
@@ -27,12 +29,15 @@ import childLayout from './layout-child';
 import contentLockUI from './content-lock-ui';
 import './metadata';
 import blockHooks from './block-hooks';
-import blockRenaming from './block-renaming';
+import blockBindingsPanel from './block-bindings';
+import './block-renaming';
 import './use-bindings-attributes';
 
 createBlockEditFilter(
 	[
+		blockBindingsPanel,
 		align,
+		textAlign,
 		anchor,
 		customClassName,
 		style,
@@ -41,11 +46,13 @@ createBlockEditFilter(
 		layout,
 		contentLockUI,
 		blockHooks,
-		blockRenaming,
+		childLayout,
 	].filter( Boolean )
 );
 createBlockListBlockFilter( [
 	align,
+	textAlign,
+	background,
 	style,
 	color,
 	dimensions,
@@ -58,6 +65,7 @@ createBlockListBlockFilter( [
 ] );
 createBlockSaveFilter( [
 	align,
+	textAlign,
 	anchor,
 	ariaLabel,
 	customClassName,
@@ -77,3 +85,4 @@ export { getSpacingClassesAndStyles } from './use-spacing-props';
 export { getTypographyClassesAndStyles } from './use-typography-props';
 export { getGapCSSValue } from './gap';
 export { useCachedTruthy } from './use-cached-truthy';
+export { useZoomOut } from './use-zoom-out';

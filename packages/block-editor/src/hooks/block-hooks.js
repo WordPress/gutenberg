@@ -19,28 +19,38 @@ import { store as blockEditorStore } from '../store';
 
 const EMPTY_OBJECT = {};
 
-function BlockHooksControlPure( { name, clientId } ) {
+function BlockHooksControlPure( {
+	name,
+	clientId,
+	metadata: { ignoredHookedBlocks = [] } = {},
+} ) {
 	const blockTypes = useSelect(
 		( select ) => select( blocksStore ).getBlockTypes(),
 		[]
 	);
 
+	// A hooked block added via a filter will not be exposed through a block
+	// type's `blockHooks` property; however, if the containing layout has been
+	// modified, it will be present in the anchor block's `ignoredHookedBlocks`
+	// metadata.
 	const hookedBlocksForCurrentBlock = useMemo(
 		() =>
 			blockTypes?.filter(
-				( { blockHooks } ) => blockHooks && name in blockHooks
+				( { name: blockName, blockHooks } ) =>
+					( blockHooks && name in blockHooks ) ||
+					ignoredHookedBlocks.includes( blockName )
 			),
-		[ blockTypes, name ]
+		[ blockTypes, name, ignoredHookedBlocks ]
 	);
 
 	const { blockIndex, rootClientId, innerBlocksLength } = useSelect(
 		( select ) => {
-			const { getBlock, getBlockIndex, getBlockRootClientId } =
+			const { getBlocks, getBlockIndex, getBlockRootClientId } =
 				select( blockEditorStore );
 
 			return {
 				blockIndex: getBlockIndex( clientId ),
-				innerBlocksLength: getBlock( clientId )?.innerBlocks?.length,
+				innerBlocksLength: getBlocks( clientId )?.length,
 				rootClientId: getBlockRootClientId( clientId ),
 			};
 		},
@@ -49,7 +59,7 @@ function BlockHooksControlPure( { name, clientId } ) {
 
 	const hookedBlockClientIds = useSelect(
 		( select ) => {
-			const { getBlock, getGlobalBlockCount } =
+			const { getBlocks, getGlobalBlockCount } =
 				select( blockEditorStore );
 
 			const _hookedBlockClientIds = hookedBlocksForCurrentBlock.reduce(
@@ -69,7 +79,7 @@ function BlockHooksControlPure( { name, clientId } ) {
 							// Any of the current block's siblings (with the right block type) qualifies
 							// as a hooked block (inserted `before` or `after` the current one), as the block
 							// might've been automatically inserted and then moved around a bit by the user.
-							candidates = getBlock( rootClientId )?.innerBlocks;
+							candidates = getBlocks( rootClientId );
 							break;
 
 						case 'first_child':
@@ -77,7 +87,17 @@ function BlockHooksControlPure( { name, clientId } ) {
 							// Any of the current block's child blocks (with the right block type) qualifies
 							// as a hooked first or last child block, as the block might've been automatically
 							// inserted and then moved around a bit by the user.
-							candidates = getBlock( clientId ).innerBlocks;
+							candidates = getBlocks( clientId );
+							break;
+
+						case undefined:
+							// If we haven't found a blockHooks field with a relative position for the hooked
+							// block, it means that it was added by a filter. In this case, we look for the block
+							// both among the current block's siblings and its children.
+							candidates = [
+								...getBlocks( rootClientId ),
+								...getBlocks( clientId ),
+							];
 							break;
 					}
 
@@ -151,6 +171,18 @@ function BlockHooksControlPure( { name, clientId } ) {
 					false
 				);
 				break;
+
+			case undefined:
+				// If we do not know the relative position, it is because the block was
+				// added via a filter. In this case, we default to inserting it after the
+				// current block.
+				insertBlock(
+					block,
+					blockIndex + 1,
+					rootClientId, // Insert as a child of the current block's parent
+					false
+				);
+				break;
 		}
 	};
 
@@ -159,8 +191,13 @@ function BlockHooksControlPure( { name, clientId } ) {
 			<PanelBody
 				className="block-editor-hooks__block-hooks"
 				title={ __( 'Plugins' ) }
-				initialOpen={ true }
+				initialOpen
 			>
+				<p className="block-editor-hooks__block-hooks-helptext">
+					{ __(
+						'Manage the inclusion of blocks added automatically by plugins.'
+					) }
+				</p>
 				{ Object.keys( groupedHookedBlocks ).map( ( vendor ) => {
 					return (
 						<Fragment key={ vendor }>
@@ -214,6 +251,7 @@ function BlockHooksControlPure( { name, clientId } ) {
 
 export default {
 	edit: BlockHooksControlPure,
+	attributeKeys: [ 'metadata' ],
 	hasSupport() {
 		return true;
 	},

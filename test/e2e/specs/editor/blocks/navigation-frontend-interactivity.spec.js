@@ -26,8 +26,8 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await admin.visitSiteEditor( {
 				postId: 'emptytheme//header',
 				postType: 'wp_template_part',
+				canvas: 'edit',
 			} );
-			await editor.canvas.locator( 'body' ).click();
 			await requestUtils.createNavigationMenu( {
 				title: 'Hidden menu',
 				content: `
@@ -39,7 +39,9 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 				name: 'core/navigation',
 				attributes: { overlayMenu: 'always' },
 			} );
-			await editor.saveSiteEditorEntities();
+			await editor.saveSiteEditorEntities( {
+				isOnlyCurrentEntityDirty: true,
+			} );
 		} );
 
 		test( 'Overlay menu interactions', async ( { page, pageUtils } ) => {
@@ -136,8 +138,8 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await admin.visitSiteEditor( {
 				postId: 'emptytheme//header',
 				postType: 'wp_template_part',
+				canvas: 'edit',
 			} );
-			await editor.canvas.locator( 'body' ).click();
 			await requestUtils.createNavigationMenu( {
 				title: 'Hidden menu',
 				content: `
@@ -159,7 +161,9 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 				name: 'core/navigation',
 				attributes: { overlayMenu: 'off', openSubmenusOnClick: true },
 			} );
-			await editor.saveSiteEditorEntities();
+			await editor.saveSiteEditorEntities( {
+				isOnlyCurrentEntityDirty: true,
+			} );
 		} );
 
 		test( 'Submenu interactions', async ( { page, pageUtils } ) => {
@@ -349,8 +353,8 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await admin.visitSiteEditor( {
 				postId: 'emptytheme//header',
 				postType: 'wp_template_part',
+				canvas: 'edit',
 			} );
-			await editor.canvas.locator( 'body' ).click();
 			await requestUtils.createNavigationMenu( {
 				title: 'Hidden menu',
 				content: `
@@ -366,7 +370,9 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 				name: 'core/navigation',
 				attributes: { overlayMenu: 'off' },
 			} );
-			await editor.saveSiteEditorEntities();
+			await editor.saveSiteEditorEntities( {
+				isOnlyCurrentEntityDirty: true,
+			} );
 		} );
 
 		test( 'submenu click on the arrow interactions', async ( { page } ) => {
@@ -443,8 +449,8 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await admin.visitSiteEditor( {
 				postId: 'emptytheme//header',
 				postType: 'wp_template_part',
+				canvas: 'edit',
 			} );
-			await editor.canvas.locator( 'body' ).click();
 			await requestUtils.createNavigationMenu( {
 				title: 'Page list menu',
 				content: `
@@ -456,7 +462,9 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 				name: 'core/navigation',
 				attributes: { overlayMenu: 'off', openSubmenusOnClick: true },
 			} );
-			await editor.saveSiteEditorEntities();
+			await editor.saveSiteEditorEntities( {
+				isOnlyCurrentEntityDirty: true,
+			} );
 		} );
 
 		test( 'page-list submenu user interactions', async ( {

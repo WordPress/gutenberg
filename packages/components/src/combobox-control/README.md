@@ -77,7 +77,7 @@ If this property is added, a help text will be generated using help property as 
 
 The options that can be chosen from.
 
--   Type: `Array<{ value: string, label: string }>`
+-   Type: `Array<{ value: string, label: string, disabled?: boolean }>`
 -   Required: Yes
 
 #### onFilterValueChange
@@ -101,6 +101,15 @@ The current value of the control.
 -   Type: `string | null`
 -   Required: No
 
+#### expandOnFocus
+
+Automatically expand the dropdown when the control is focused.
+If the control is clicked, the dropdown will expand regardless of this prop.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `true`
+
 #### __experimentalRenderItem
 
 Custom renderer invoked for each option in the suggestion list. The render prop receives as its argument an object containing, under the `item` key, the single option's data (directly from the array of data passed to the `options` prop).
@@ -110,8 +119,8 @@ Custom renderer invoked for each option in the suggestion list. The render prop 
 
 ## Related components
 
--   Like this component, but without a search input, the `CustomSelectControl` component.
+-   Like this component, but without a search input, the [`CustomSelectControl`](https://developer.wordpress.org/block-editor/reference-guides/components/custom-select-control/) component.
 
--   To select one option from a set, when you want to show all the available options at once, use the `Radio` component.
--   To select one or more items from a set, use the `CheckboxControl` component.
--   To toggle a single setting on or off, use the `ToggleControl` component.
+-   To select one option from a set, when you want to show all the available options at once, use the [`RadioControl`](https://developer.wordpress.org/block-editor/reference-guides/components/radio-control/) component.
+-   To select one or more items from a set, use the [`CheckboxControl`](https://developer.wordpress.org/block-editor/reference-guides/components/checkbox-control/) component.
+-   To toggle a single setting on or off, use the [`ToggleControl`](https://developer.wordpress.org/block-editor/reference-guides/components/toggle-control/) component.

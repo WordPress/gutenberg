@@ -1,10 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { withDispatch, withSelect } from '@wordpress/data';
-import { Component } from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { compose } from '@wordpress/compose';
 import { safeDecodeURIComponent, cleanForSlug } from '@wordpress/url';
 import { TextControl } from '@wordpress/components';
 
@@ -14,72 +13,55 @@ import { TextControl } from '@wordpress/components';
 import PostSlugCheck from './check';
 import { store as editorStore } from '../../store';
 
-export class PostSlug extends Component {
-	constructor( { postSlug, postTitle, postID } ) {
-		super( ...arguments );
-
-		this.state = {
-			editedSlug:
-				safeDecodeURIComponent( postSlug ) ||
-				cleanForSlug( postTitle ) ||
-				postID,
-		};
-
-		this.setSlug = this.setSlug.bind( this );
-	}
-
-	setSlug( event ) {
-		const { postSlug, onUpdateSlug } = this.props;
-		const { value } = event.target;
-
-		const editedSlug = cleanForSlug( value );
-
-		if ( editedSlug === postSlug ) {
-			return;
-		}
-
-		onUpdateSlug( editedSlug );
-	}
-
-	render() {
-		const { editedSlug } = this.state;
-		return (
-			<PostSlugCheck>
-				<TextControl
-					__nextHasNoMarginBottom
-					label={ __( 'Slug' ) }
-					autoComplete="off"
-					spellCheck="false"
-					value={ editedSlug }
-					onChange={ ( slug ) =>
-						this.setState( { editedSlug: slug } )
-					}
-					onBlur={ this.setSlug }
-					className="editor-post-slug"
-				/>
-			</PostSlugCheck>
+function PostSlugControl() {
+	const postSlug = useSelect( ( select ) => {
+		return safeDecodeURIComponent(
+			select( editorStore ).getEditedPostSlug()
 		);
-	}
+	}, [] );
+	const { editPost } = useDispatch( editorStore );
+	const [ forceEmptyField, setForceEmptyField ] = useState( false );
+
+	return (
+		<TextControl
+			__nextHasNoMarginBottom
+			label={ __( 'Slug' ) }
+			autoComplete="off"
+			spellCheck="false"
+			value={ forceEmptyField ? '' : postSlug }
+			onChange={ ( newValue ) => {
+				editPost( { slug: newValue } );
+				// When we delete the field the permalink gets
+				// reverted to the original value.
+				// The forceEmptyField logic allows the user to have
+				// the field temporarily empty while typing.
+				if ( ! newValue ) {
+					if ( ! forceEmptyField ) {
+						setForceEmptyField( true );
+					}
+					return;
+				}
+				if ( forceEmptyField ) {
+					setForceEmptyField( false );
+				}
+			} }
+			onBlur={ ( event ) => {
+				editPost( {
+					slug: cleanForSlug( event.target.value ),
+				} );
+				if ( forceEmptyField ) {
+					setForceEmptyField( false );
+				}
+			} }
+			className="editor-post-slug"
+		/>
+	);
 }
 
-export default compose( [
-	withSelect( ( select ) => {
-		const { getCurrentPost, getEditedPostAttribute } =
-			select( editorStore );
-
-		const { id } = getCurrentPost();
-		return {
-			postSlug: getEditedPostAttribute( 'slug' ),
-			postTitle: getEditedPostAttribute( 'title' ),
-			postID: id,
-		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		const { editPost } = dispatch( editorStore );
-		return {
-			onUpdateSlug( slug ) {
-				editPost( { slug } );
-			},
-		};
-	} ),
-] )( PostSlug );
+export default function PostSlug() {
+	return (
+		<PostSlugCheck>
+			<PostSlugControl />
+		</PostSlugCheck>
+	);
+}

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -44,7 +44,7 @@ function Header( {
 	return (
 		<>
 			<div
-				className={ classnames( 'customize-widgets-header', {
+				className={ clsx( 'customize-widgets-header', {
 					'is-fixed-toolbar-active': isFixedToolbarActive,
 				} ) }
 			>

@@ -20,7 +20,10 @@ import ScreenHeader from './header';
 import BlockPreviewPanel from './block-preview-panel';
 import { unlock } from '../../lock-unlock';
 import Subtitle from './subtitle';
-import { useBlockVariations, VariationsPanel } from './variations-panel';
+import {
+	useBlockVariations,
+	VariationsPanel,
+} from './variations/variations-panel';
 
 function applyFallbackStyle( border ) {
 	if ( ! border ) {

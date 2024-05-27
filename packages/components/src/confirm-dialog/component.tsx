@@ -86,7 +86,7 @@ const UnconnectedConfirmDialog = (
 					onRequestClose={ handleEvent( onCancel ) }
 					onKeyDown={ handleEnter }
 					closeButtonLabel={ cancelLabel }
-					isDismissible={ true }
+					isDismissible
 					ref={ forwardedRef }
 					overlayClassName={ wrapperClassName }
 					__experimentalHideHeader

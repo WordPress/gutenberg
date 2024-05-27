@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -68,12 +68,17 @@ export function SnackbarList( {
 }: WordPressComponentProps< SnackbarListProps, 'div' > ) {
 	const listRef = useRef< HTMLDivElement | null >( null );
 	const isReducedMotion = useReducedMotion();
-	className = classnames( 'components-snackbar-list', className );
+	className = clsx( 'components-snackbar-list', className );
 	const removeNotice =
 		( notice: SnackbarListProps[ 'notices' ][ number ] ) => () =>
 			onRemove?.( notice.id );
 	return (
-		<div className={ className } tabIndex={ -1 } ref={ listRef }>
+		<div
+			className={ className }
+			tabIndex={ -1 }
+			ref={ listRef }
+			data-testid="snackbar-list"
+		>
 			{ children }
 			<AnimatePresence>
 				{ notices.map( ( notice ) => {

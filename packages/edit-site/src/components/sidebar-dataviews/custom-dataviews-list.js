@@ -27,7 +27,7 @@ import DataViewItem from './dataview-item';
 import AddNewItem from './add-new-view';
 import { unlock } from '../../lock-unlock';
 
-const { useHistory, useLocation } = unlock( routerPrivateApis );
+const { useHistory } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
 
@@ -81,9 +81,6 @@ function RenameItemModalContent( { dataviewId, currentTitle, setIsRenaming } ) {
 }
 
 function CustomDataViewItem( { dataviewId, isActive } ) {
-	const {
-		params: { path },
-	} = useLocation();
 	const history = useHistory();
 	const { dataview } = useSelect(
 		( select ) => {
@@ -110,7 +107,7 @@ function CustomDataViewItem( { dataviewId, isActive } ) {
 				title={ dataview.title }
 				type={ type }
 				isActive={ isActive }
-				isCustom="true"
+				isCustom
 				customViewId={ dataviewId }
 				suffix={
 					<DropdownMenu
@@ -145,9 +142,10 @@ function CustomDataViewItem( { dataviewId, isActive } ) {
 											}
 										);
 										if ( isActive ) {
-											history.replace( {
-												path,
-											} );
+											const {
+												params: { postType },
+											} = history.getLocationWithParams();
+											history.replace( { postType } );
 										}
 										onClose();
 									} }
@@ -216,7 +214,7 @@ export default function CustomDataViewsList( { type, activeView, isCustom } ) {
 							key={ customViewRecord.id }
 							dataviewId={ customViewRecord.id }
 							isActive={
-								isCustom === 'true' &&
+								isCustom &&
 								Number( activeView ) === customViewRecord.id
 							}
 						/>

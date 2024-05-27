@@ -51,6 +51,20 @@ describe( 'transformStyles', () => {
 				//                                                        ^^^^ In PostCSS, a tab is equal four spaces
 			);
 		} );
+
+		it( 'should handle multiple instances of `:where(body)`', () => {
+			const input = `:where(body) { color: pink; } :where(body) { color: orange; }`;
+			const output = transformStyles(
+				[
+					{
+						css: input,
+					},
+				],
+				'.my-namespace'
+			);
+
+			expect( output ).toMatchSnapshot();
+		} );
 	} );
 
 	describe( 'selector wrap', () => {

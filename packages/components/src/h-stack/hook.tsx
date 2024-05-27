@@ -47,7 +47,8 @@ export function useHStack( props: WordPressComponentProps< Props, 'div' > ) {
 		gap: spacing,
 	};
 
-	const flexProps = useFlex( propsForFlex );
+	// Omit `isColumn` because it's not used in HStack.
+	const { isColumn, ...flexProps } = useFlex( propsForFlex );
 
 	return flexProps;
 }

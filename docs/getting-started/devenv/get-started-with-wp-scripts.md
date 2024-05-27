@@ -4,7 +4,7 @@ The [`@wordpress/scripts`](https://developer.wordpress.org/block-editor/referenc
 
 A JavaScript build step refers to the process of transforming, bundling, and optimizing JavaScript source code and related assets into a format suitable for production environments. These build steps often take modern JavaScript (ESNext and JSX) and convert it to a version compatible with most browsers. They can also bundle multiple files into one, minify the code to reduce file size and perform various other tasks to optimize the code.
 
-You will typically be working with ESNext and JSX when building for the Block Editor, and most examples in the Block Editor Handbook are written in these syntaxes. Learning how to set up a build step is essential. However, configuring the necessary tools like [webpack](https://webpack.js.org/), [Babel](https://babeljs.io/), and [ESLint](https://eslint.org/) can become complex. This is where `wp-scripts` comes in. 
+You will typically be working with ESNext and JSX when building for the Block Editor, and all examples in the Block Editor Handbook are written in these syntaxes. Learning how to set up a build step is essential. However, configuring the necessary tools like [webpack](https://webpack.js.org/), [Babel](https://babeljs.io/), and [ESLint](https://eslint.org/) can become complex. This is where `wp-scripts` comes in.
 
 Here are a few things that `wp-scripts` can do: 
 

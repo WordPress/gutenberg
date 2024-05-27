@@ -15,6 +15,7 @@ import { formatFontFaceName } from './preview-styles';
  * Browser dependencies
  */
 const { File } = window;
+const { kebabCase } = unlock( componentsPrivateApis );
 
 export function setUIValuesNeeded( font, extraValues = {} ) {
 	if ( ! font.name && ( font.fontFamily || font.slug ) ) {
@@ -121,7 +122,47 @@ export async function loadFontFaceInBrowser( fontFace, source, addTo = 'all' ) {
 	}
 }
 
-export function getDisplaySrcFromFontFace( input, urlPrefix ) {
+/*
+ * Unloads the font face and remove it from the browser.
+ * It also removes it from the iframe document.
+ *
+ * Note that Font faces that were added to the set using the CSS @font-face rule
+ * remain connected to the corresponding CSS, and cannot be deleted.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/FontFaceSet/delete.
+ */
+export function unloadFontFaceInBrowser( fontFace, removeFrom = 'all' ) {
+	const unloadFontFace = ( fonts ) => {
+		fonts.forEach( ( f ) => {
+			if (
+				f.family === formatFontFaceName( fontFace?.fontFamily ) &&
+				f.weight === fontFace?.fontWeight &&
+				f.style === fontFace?.fontStyle
+			) {
+				fonts.delete( f );
+			}
+		} );
+	};
+
+	if ( removeFrom === 'document' || removeFrom === 'all' ) {
+		unloadFontFace( document.fonts );
+	}
+
+	if ( removeFrom === 'iframe' || removeFrom === 'all' ) {
+		const iframeDocument = document.querySelector(
+			'iframe[name="editor-canvas"]'
+		).contentDocument;
+		unloadFontFace( iframeDocument.fonts );
+	}
+}
+
+/**
+ * Retrieves the display source from a font face src.
+ *
+ * @param {string|string[]} input - The font face src.
+ * @return {string|undefined} The display source or undefined if the input is invalid.
+ */
+export function getDisplaySrcFromFontFace( input ) {
 	if ( ! input ) {
 		return;
 	}
@@ -132,9 +173,9 @@ export function getDisplaySrcFromFontFace( input, urlPrefix ) {
 	} else {
 		src = input;
 	}
-	// If it is a theme font, we need to make the url absolute
-	if ( src.startsWith( 'file:.' ) && urlPrefix ) {
-		src = src.replace( 'file:.', urlPrefix );
+	// It's expected theme fonts will already be loaded in the browser.
+	if ( src.startsWith( 'file:.' ) ) {
+		return;
 	}
 	if ( ! isUrlEncoded( src ) ) {
 		src = encodeURI( src );
@@ -144,7 +185,6 @@ export function getDisplaySrcFromFontFace( input, urlPrefix ) {
 
 export function makeFontFamilyFormData( fontFamily ) {
 	const formData = new FormData();
-	const { kebabCase } = unlock( componentsPrivateApis );
 
 	const { fontFace, category, ...familyWithValidParameters } = fontFamily;
 	const fontFamilySettings = {
@@ -194,10 +234,23 @@ export function makeFontFacesFormData( font ) {
 }
 
 export async function batchInstallFontFaces( fontFamilyId, fontFacesData ) {
-	const promises = fontFacesData.map( ( faceData ) =>
-		fetchInstallFontFace( fontFamilyId, faceData )
-	);
-	const responses = await Promise.allSettled( promises );
+	const responses = [];
+
+	/*
+	 * Uses the same response format as Promise.allSettled, but executes requests in sequence to work
+	 * around a race condition that can cause an error when the fonts directory doesn't exist yet.
+	 */
+	for ( const faceData of fontFacesData ) {
+		try {
+			const response = await fetchInstallFontFace(
+				fontFamilyId,
+				faceData
+			);
+			responses.push( { status: 'fulfilled', value: response } );
+		} catch ( error ) {
+			responses.push( { status: 'rejected', reason: error } );
+		}
+	}
 
 	const results = {
 		errors: [],
@@ -219,7 +272,7 @@ export async function batchInstallFontFaces( fontFamilyId, fontFacesData ) {
 			// Handle network errors or other fetch-related errors
 			results.errors.push( {
 				data: fontFacesData[ index ],
-				message: `Fetch error: ${ result.reason.message }`,
+				message: result.reason.message,
 			} );
 		}
 	} );

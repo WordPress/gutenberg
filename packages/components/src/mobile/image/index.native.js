@@ -1,17 +1,16 @@
 /**
  * External dependencies
  */
-import { Animated, Image as RNImage, Text, View } from 'react-native';
+import { Image as RNImage, Text, View } from 'react-native';
 import FastImage from 'react-native-fast-image';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Icon } from '@wordpress/components';
 import { image, offline } from '@wordpress/icons';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
-import { useEffect, useState, useRef, Platform } from '@wordpress/element';
+import { useEffect, useState, Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -20,6 +19,7 @@ import { getImageWithFocalPointStyles } from './utils';
 import styles from './style.scss';
 import SvgIconRetry from './icon-retry';
 import ImageEditingButton from './image-editing-button';
+import Icon from '../../icon';
 
 const ICON_TYPE = {
 	OFFLINE: 'offline',
@@ -218,19 +218,8 @@ const ImageComponent = ( {
 		focalPoint && styles.focalPointContainer,
 	];
 
-	const opacityValue = useRef( new Animated.Value( 1 ) ).current;
-
-	useEffect( () => {
-		Animated.timing( opacityValue, {
-			toValue: isUploadInProgress ? 0.3 : 1,
-			duration: 100,
-			useNativeDriver: true,
-		} ).start();
-	}, [ isUploadInProgress, opacityValue ] );
-
 	const imageStyles = [
 		{
-			opacity: opacityValue,
 			height: containerSize?.height,
 		},
 		! resizeMode && {
@@ -300,13 +289,9 @@ const ImageComponent = ( {
 				key={ url }
 				style={ imageContainerStyles }
 			>
-				{ isSelected &&
-					highlightSelected &&
-					! (
-						isUploadInProgress ||
-						isUploadFailed ||
-						isUploadPaused
-					) && <View style={ imageSelectedStyles } /> }
+				{ isSelected && highlightSelected && (
+					<View style={ imageSelectedStyles } />
+				) }
 
 				{ ! imageData ? (
 					<View style={ placeholderStyles }>
@@ -319,7 +304,7 @@ const ImageComponent = ( {
 						{ Platform.isAndroid && (
 							<>
 								{ networkImageLoaded && networkURL && (
-									<Animated.Image
+									<Image
 										style={ imageStyles }
 										fadeDuration={ 0 }
 										source={ { uri: networkURL } }
@@ -331,7 +316,7 @@ const ImageComponent = ( {
 									/>
 								) }
 								{ ! networkImageLoaded && ! networkURL && (
-									<Animated.Image
+									<Image
 										style={ imageStyles }
 										fadeDuration={ 0 }
 										source={ { uri: localURL } }
@@ -345,7 +330,7 @@ const ImageComponent = ( {
 						) }
 						{ Platform.isIOS && (
 							<>
-								<Animated.Image
+								<Image
 									style={ imageStyles }
 									source={ {
 										uri:

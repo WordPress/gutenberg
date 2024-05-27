@@ -92,6 +92,8 @@ export default function SpacingInputControl( {
 			! isValueSpacingPreset( value )
 	);
 
+	const [ minValue, setMinValue ] = useState( minimumCustomValue );
+
 	const previousValue = usePrevious( value );
 	if (
 		!! value &&
@@ -222,13 +224,26 @@ export default function SpacingInputControl( {
 						}
 						value={ currentValue }
 						units={ units }
-						min={ minimumCustomValue }
+						min={ minValue }
 						placeholder={ allPlaceholder }
 						disableUnits={ isMixed }
 						label={ ariaLabel }
-						hideLabelFromVision={ true }
+						hideLabelFromVision
 						className="spacing-sizes-control__custom-value-input"
 						size={ '__unstable-large' }
+						onDragStart={ () => {
+							if ( value?.charAt( 0 ) === '-' ) {
+								setMinValue( 0 );
+							}
+						} }
+						onDrag={ () => {
+							if ( value?.charAt( 0 ) === '-' ) {
+								setMinValue( 0 );
+							}
+						} }
+						onDragEnd={ () => {
+							setMinValue( minimumCustomValue );
+						} }
 					/>
 					<RangeControl
 						onMouseOver={ onMouseOver }
@@ -272,8 +287,8 @@ export default function SpacingInputControl( {
 					max={ spacingSizes.length - 1 }
 					marks={ marks }
 					label={ ariaLabel }
-					hideLabelFromVision={ true }
-					__nextHasNoMarginBottom={ true }
+					hideLabelFromVision
+					__nextHasNoMarginBottom
 					onFocus={ onMouseOver }
 					onBlur={ onMouseOut }
 				/>
@@ -296,7 +311,7 @@ export default function SpacingInputControl( {
 					} }
 					options={ options }
 					label={ ariaLabel }
-					hideLabelFromVision={ true }
+					hideLabelFromVision
 					size={ '__unstable-large' }
 					onMouseOver={ onMouseOver }
 					onMouseOut={ onMouseOut }

@@ -39,12 +39,18 @@ import {
 } from '../../utils/template-part-create';
 
 export default function CreateTemplatePartModal( {
-	modalTitle = __( 'Create template part' ),
+	modalTitle,
 	...restProps
 } ) {
+	const defaultModalTitle = useSelect(
+		( select ) =>
+			select( coreStore ).getPostType( TEMPLATE_PART_POST_TYPE )?.labels
+				?.add_new_item,
+		[]
+	);
 	return (
 		<Modal
-			title={ modalTitle }
+			title={ modalTitle || defaultModalTitle }
 			onRequestClose={ restProps.closeModal }
 			overlayClassName="edit-site-create-template-part-modal"
 		>
@@ -56,7 +62,7 @@ export default function CreateTemplatePartModal( {
 export function CreateTemplatePartModalContents( {
 	defaultArea = TEMPLATE_PART_AREA_DEFAULT_CATEGORY,
 	blocks = [],
-	confirmLabel = __( 'Create' ),
+	confirmLabel = __( 'Add' ),
 	closeModal,
 	onCreate,
 	onError,
@@ -127,6 +133,7 @@ export function CreateTemplatePartModalContents( {
 		>
 			<VStack spacing="4">
 				<TextControl
+					__next40pxDefaultSize
 					__nextHasNoMarginBottom
 					label={ __( 'Name' ) }
 					value={ title }
@@ -174,6 +181,7 @@ export function CreateTemplatePartModalContents( {
 				</BaseControl>
 				<HStack justify="right">
 					<Button
+						__next40pxDefaultSize
 						variant="tertiary"
 						onClick={ () => {
 							closeModal();
@@ -182,6 +190,7 @@ export function CreateTemplatePartModalContents( {
 						{ __( 'Cancel' ) }
 					</Button>
 					<Button
+						__next40pxDefaultSize
 						variant="primary"
 						type="submit"
 						aria-disabled={ ! title || isSubmitting }

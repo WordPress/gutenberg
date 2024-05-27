@@ -157,9 +157,7 @@ export default function PreferencesModalTabs( { sections } ) {
 													? chevronRight
 													: chevronLeft
 											}
-											aria-label={ __(
-												'Navigate to the previous view'
-											) }
+											label={ __( 'Back' ) }
 										/>
 										<Text size="16">
 											{ section.tabLabel }

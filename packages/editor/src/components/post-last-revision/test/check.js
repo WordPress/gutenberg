@@ -21,7 +21,11 @@ function setupDataMock( id, count ) {
 			getCurrentPostLastRevisionId: () => id,
 			getCurrentPostRevisionsCount: () => count,
 			getEditedPostAttribute: () => null,
-			getPostType: () => null,
+			getPostType: () => ( {
+				supports: {
+					revisions: true,
+				},
+			} ),
 		} ) )
 	);
 }
