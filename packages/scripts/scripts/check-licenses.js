@@ -218,7 +218,7 @@ function traverseDepTree( deps ) {
 			}
 		} else if ( dep.missing ) {
 			for ( const problem of dep.problems ) {
-				process.stdout.write( `${ WARNING } ${ problem }. ` );
+				process.stdout.write( `${ WARNING } ${ problem }.\n` );
 			}
 		} else {
 			checkDepLicense( dep.path );
