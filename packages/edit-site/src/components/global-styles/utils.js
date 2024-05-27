@@ -11,6 +11,22 @@ export function getVariationClassName( variation ) {
 	return `is-style-${ variation }`;
 }
 
+export function getNewIndexFromPresets( presets, slugPrefix ) {
+	const nameRegex = new RegExp( `^${ slugPrefix }([\\d]+)$` );
+	return presets.reduce( ( previousValue, currentValue ) => {
+		if ( typeof currentValue?.slug === 'string' ) {
+			const matches = currentValue?.slug.match( nameRegex );
+			if ( matches ) {
+				const id = parseInt( matches[ 1 ], 10 );
+				if ( id >= previousValue ) {
+					return id + 1;
+				}
+			}
+		}
+		return previousValue;
+	}, 1 );
+}
+
 function getFontFamilyFromSetting( fontFamilies, setting ) {
 	if ( ! Array.isArray( fontFamilies ) || ! setting ) {
 		return null;

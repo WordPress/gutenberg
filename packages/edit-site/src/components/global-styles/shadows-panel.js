@@ -20,6 +20,7 @@ import { unlock } from '../../lock-unlock';
 import Subtitle from './subtitle';
 import { NavigationButtonAsItem } from './navigation-button';
 import ScreenHeader from './header';
+import { getNewIndexFromPresets } from './utils';
 
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 
@@ -79,34 +80,17 @@ export default function ShadowsPanel() {
 	);
 }
 
-export function getNameAndSlugForShadow( shadows, slugPrefix = 'shadow-' ) {
-	const nameRegex = new RegExp( `^${ slugPrefix }([\\d]+)$` );
-	const position = shadows.reduce( ( previousValue, currentValue ) => {
-		if ( typeof currentValue?.slug === 'string' ) {
-			const matches = currentValue?.slug.match( nameRegex );
-			if ( matches ) {
-				const id = parseInt( matches[ 1 ], 10 );
-				if ( id >= previousValue ) {
-					return id + 1;
-				}
-			}
-		}
-		return previousValue;
-	}, 1 );
-
-	return {
-		name: `Shadow ${ position }`,
-		slug: `${ slugPrefix }${ position }`,
-	};
-}
-
 function ShadowList( { label, shadows, category, canCreate, onCreate } ) {
 	const handleAddShadow = () => {
-		const { name, slug } = getNameAndSlugForShadow( shadows );
+		const newIndex = getNewIndexFromPresets( shadows, 'shadow-' );
 		onCreate( {
-			name,
+			name: sprintf(
+				/* translators: %s: is an index for a preset */
+				__( 'Shadow %s' ),
+				newIndex
+			),
 			shadow: defaultShadow,
-			slug,
+			slug: `shadow-${ newIndex }`,
 		} );
 	};
 
