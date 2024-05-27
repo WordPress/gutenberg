@@ -40,7 +40,7 @@ const Search = memo( function Search( {
 			page: 1,
 			search: debouncedSearch,
 		} );
-	}, [ debouncedSearch, view ] );
+	}, [ debouncedSearch ] );
 	const searchLabel = label || __( 'Search' );
 	return (
 		<SearchControl
