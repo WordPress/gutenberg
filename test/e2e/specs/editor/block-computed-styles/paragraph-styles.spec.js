@@ -143,8 +143,6 @@ test.describe( 'Paragraph computed styles', () => {
 				'background-color',
 				instanceStyles.color.background
 			);
-			// Block gets automatic padding when a background is set on the instance.
-			await expect( block ).toHaveCSS( 'padding', '20px 38px' );
 
 			const link = block.getByRole( 'link' );
 			await expect( link ).toHaveCSS(
@@ -391,11 +389,26 @@ test.describe( 'Paragraph computed styles', () => {
 				'margin',
 				'1px 2px 3px 4px'
 			);
-
-			// Note: This is different to what I reproduce locally. Bottom margin should be 0px.
+			// Note: This is different to what I reproduce locally.
+			// Bottom margin should be 0px for the last block.
 			await expect( nestedParagraph3 ).toHaveCSS(
 				'margin',
 				'1px 2px 3px 4px'
+			);
+
+			// Expect a paragraph with a background color to have some
+			// built-in default padding applied.
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Paragraph with background',
+					styles: { color: { background: '#2d2d2d' } },
+				},
+			} );
+			const paragraphWithBackground = paragraphs.nth( 6 );
+			await expect( paragraphWithBackground ).toHaveCSS(
+				'padding',
+				'20px 38px'
 			);
 		} );
 
@@ -464,6 +477,24 @@ test.describe( 'Paragraph computed styles', () => {
 			await expect( nestedParagraph ).toHaveCSS(
 				'margin',
 				'11px 12px 13px 14px'
+			);
+
+			// Expect a paragraph with a background color to have its
+			// built-in default padding overriden by instance styles.
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Paragraph with background',
+					styles: {
+						color: { background: '#2d2d2d' },
+						...instanceStyles,
+					},
+				},
+			} );
+			const paragraphWithBackground = paragraphs.nth( 2 );
+			await expect( paragraphWithBackground ).toHaveCSS(
+				'padding',
+				'15px 16px 17px 18px'
 			);
 		} );
 	} );
