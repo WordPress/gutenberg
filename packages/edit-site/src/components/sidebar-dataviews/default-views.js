@@ -55,6 +55,36 @@ export const DEFAULT_VIEWS = {
 			view: DEFAULT_PAGE_BASE,
 		},
 		{
+			title: __( 'Published' ),
+			slug: 'published',
+			icon: pages,
+			view: {
+				...DEFAULT_PAGE_BASE,
+				filters: [
+					{
+						field: 'status',
+						operator: OPERATOR_IS_ANY,
+						value: 'publish',
+					},
+				],
+			},
+		},
+		{
+			title: __( 'Scheduled' ),
+			slug: 'future',
+			icon: pages,
+			view: {
+				...DEFAULT_PAGE_BASE,
+				filters: [
+					{
+						field: 'status',
+						operator: OPERATOR_IS_ANY,
+						value: 'future',
+					},
+				],
+			},
+		},
+		{
 			title: __( 'Drafts' ),
 			slug: 'drafts',
 			icon: drafts,
