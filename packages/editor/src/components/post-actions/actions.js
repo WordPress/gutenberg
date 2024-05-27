@@ -9,7 +9,6 @@ import { store as coreStore } from '@wordpress/core-data';
 import { __, _n, sprintf, _x } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useMemo, useState } from '@wordpress/element';
-import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 
 import {
@@ -37,6 +36,33 @@ import { exportPatternAsJSONAction } from './export-pattern-action';
 // Patterns.
 const { PATTERN_TYPES } = unlock( patternsPrivateApis );
 
+/**
+ * Check if a template is removable.
+ *
+ * @param {Object} template The template entity to check.
+ * @return {boolean} Whether the template is removable.
+ */
+function isTemplateRemovable( template ) {
+	if ( ! template ) {
+		return false;
+	}
+	// In patterns list page we map the templates parts to a different object
+	// than the one returned from the endpoint. This is why we need to check for
+	// two props whether is custom or has a theme file.
+	return (
+		[ template.source, template.templatePart?.source ].includes(
+			TEMPLATE_ORIGINS.custom
+		) &&
+		! template.has_theme_file &&
+		! template.templatePart?.has_theme_file
+	);
+}
+const canDeleteOrReset = ( item ) => {
+	const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
+	const isUserPattern = item.type === PATTERN_TYPES.user;
+	return isUserPattern || ( isTemplatePart && item.isCustom );
+};
+
 function getItemTitle( item ) {
 	if ( typeof item.title === 'string' ) {
 		return decodeEntities( item.title );
@@ -44,43 +70,52 @@ function getItemTitle( item ) {
 	return decodeEntities( item.title?.rendered || '' );
 }
 
-const trashPostAction = {
-	id: 'move-to-trash',
-	label: __( 'Move to Trash' ),
+// This action is used for templates, patterns and template parts.
+// Every other post type uses the similar `trashPostAction` which
+// moves the post to trash.
+const deletePostAction = {
+	id: 'delete-post',
+	label: __( 'Delete' ),
 	isPrimary: true,
 	icon: trash,
-	isEligible( item ) {
-		return ! [ 'auto-draft', 'trash' ].includes( item.status );
+	isEligible( post ) {
+		if (
+			[ TEMPLATE_POST_TYPE, TEMPLATE_PART_POST_TYPE ].includes(
+				post.type
+			)
+		) {
+			return isTemplateRemovable( post );
+		}
+		// We can only remove user patterns.
+		return post.type === PATTERN_TYPES.user;
 	},
 	supportsBulk: true,
 	hideModalHeader: true,
 	RenderModal: ( {
-		items: posts,
+		items,
 		closeModal,
 		onActionStart,
 		onActionPerformed,
 	} ) => {
 		const [ isBusy, setIsBusy ] = useState( false );
-		const { createSuccessNotice, createErrorNotice } =
-			useDispatch( noticesStore );
-		const { deleteEntityRecord } = useDispatch( coreStore );
+		const { removeTemplates } = unlock( useDispatch( editorStore ) );
 		return (
 			<VStack spacing="5">
 				<Text>
-					{ posts.length === 1
+					{ items.length > 1
 						? sprintf(
-								// translators: %s: The page's title.
-								__( 'Are you sure you want to delete "%s"?' ),
-								getItemTitle( posts[ 0 ] )
+								// translators: %d: number of items to delete.
+								_n(
+									'Delete %d item?',
+									'Delete %d items?',
+									items.length
+								),
+								items.length
 						  )
 						: sprintf(
-								// translators: %d: The number of pages (2 or more).
-								_n(
-									'Are you sure you want to delete %d page?',
-									'Are you sure you want to delete %d pages?',
-									posts.length
-								),
-								posts.length
+								// translators: %s: The template or template part's titles
+								__( 'Delete "%s"?' ),
+								getItemTitle( items[ 0 ] )
 						  ) }
 				</Text>
 				<HStack justify="right">
@@ -97,18 +132,94 @@ const trashPostAction = {
 						onClick={ async () => {
 							setIsBusy( true );
 							if ( onActionStart ) {
-								onActionStart( posts );
+								onActionStart( items );
+							}
+							await removeTemplates( items, {
+								allowUndo: false,
+							} );
+							onActionPerformed?.( items );
+							setIsBusy( false );
+							closeModal();
+						} }
+						isBusy={ isBusy }
+						disabled={ isBusy }
+						__experimentalIsFocusable
+					>
+						{ __( 'Delete' ) }
+					</Button>
+				</HStack>
+			</VStack>
+		);
+	},
+};
+
+const trashPostAction = {
+	id: 'move-to-trash',
+	label: __( 'Move to Trash' ),
+	isPrimary: true,
+	icon: trash,
+	isEligible( item ) {
+		return ! [ 'auto-draft', 'trash' ].includes( item.status );
+	},
+	supportsBulk: true,
+	hideModalHeader: true,
+	RenderModal: ( {
+		items,
+		closeModal,
+		onActionStart,
+		onActionPerformed,
+	} ) => {
+		const [ isBusy, setIsBusy ] = useState( false );
+		const { createSuccessNotice, createErrorNotice } =
+			useDispatch( noticesStore );
+		const { deleteEntityRecord } = useDispatch( coreStore );
+		return (
+			<VStack spacing="5">
+				<Text>
+					{ items.length === 1
+						? sprintf(
+								// translators: %s: The item's title.
+								__(
+									'Are you sure you want to move to trash "%s"?'
+								),
+								getItemTitle( items[ 0 ] )
+						  )
+						: sprintf(
+								// translators: %d: The number of items (2 or more).
+								_n(
+									'Are you sure you want to move to trash %d item?',
+									'Are you sure you want to move to trash %d items?',
+									items.length
+								),
+								items.length
+						  ) }
+				</Text>
+				<HStack justify="right">
+					<Button
+						variant="tertiary"
+						onClick={ closeModal }
+						disabled={ isBusy }
+						__experimentalIsFocusable
+					>
+						{ __( 'Cancel' ) }
+					</Button>
+					<Button
+						variant="primary"
+						onClick={ async () => {
+							setIsBusy( true );
+							if ( onActionStart ) {
+								onActionStart( items );
 							}
 							const promiseResult = await Promise.allSettled(
-								posts.map( ( post ) => {
-									return deleteEntityRecord(
+								items.map( ( item ) =>
+									deleteEntityRecord(
 										'postType',
-										post.type,
-										post.id,
+										item.type,
+										item.id,
 										{},
 										{ throwOnError: true }
-									);
-								} )
+									)
+								)
 							);
 							// If all the promises were fulfilled with success.
 							if (
@@ -119,41 +230,41 @@ const trashPostAction = {
 								let successMessage;
 								if ( promiseResult.length === 1 ) {
 									successMessage = sprintf(
-										/* translators: The posts's title. */
-										__( '"%s" moved to the Trash.' ),
-										getItemTitle( posts[ 0 ] )
+										/* translators: The item's title. */
+										__( '"%s" moved to trash.' ),
+										getItemTitle( items[ 0 ] )
 									);
-								} else if ( posts[ 0 ].type === 'page' ) {
+								} else if ( items[ 0 ].type === 'page' ) {
 									successMessage = sprintf(
-										/* translators: The number of pages. */
-										__( '%s pages moved to the Trash.' ),
-										posts.length
+										/* translators: The number of items. */
+										__( '%s items moved to trash.' ),
+										items.length
 									);
 								} else {
 									successMessage = sprintf(
 										/* translators: The number of posts. */
-										__( '%s posts moved to the Trash.' ),
-										posts.length
+										__( '%s items move to trash.' ),
+										items.length
 									);
 								}
 								createSuccessNotice( successMessage, {
 									type: 'snackbar',
-									id: 'trash-post-action',
+									id: 'move-to-trash-action',
 								} );
 							} else {
-								// If there was at lease one failure.
+								// If there was at least one failure.
 								let errorMessage;
-								// If we were trying to move a single post to the trash.
+								// If we were trying to delete a single item.
 								if ( promiseResult.length === 1 ) {
 									if ( promiseResult[ 0 ].reason?.message ) {
 										errorMessage =
 											promiseResult[ 0 ].reason.message;
 									} else {
 										errorMessage = __(
-											'An error occurred while moving the post to the trash.'
+											'An error occurred while moving to trash the item.'
 										);
 									}
-									// If we were trying to move multiple posts to the trash
+									// If we were trying to delete multiple items.
 								} else {
 									const errorMessages = new Set();
 									const failedPromises = promiseResult.filter(
@@ -168,13 +279,13 @@ const trashPostAction = {
 									}
 									if ( errorMessages.size === 0 ) {
 										errorMessage = __(
-											'An error occurred while moving the posts to the trash.'
+											'An error occurred while moving to trash the items.'
 										);
 									} else if ( errorMessages.size === 1 ) {
 										errorMessage = sprintf(
 											/* translators: %s: an error message */
 											__(
-												'An error occurred while moving the posts to the trash: %s'
+												'An error occurred while moving to trash the item: %s'
 											),
 											[ ...errorMessages ][ 0 ]
 										);
@@ -182,7 +293,7 @@ const trashPostAction = {
 										errorMessage = sprintf(
 											/* translators: %s: a list of comma separated error messages */
 											__(
-												'Some errors occurred while moving the pages to the trash: %s'
+												'Some errors occurred while moving to trash the items: %s'
 											),
 											[ ...errorMessages ].join( ',' )
 										);
@@ -193,7 +304,7 @@ const trashPostAction = {
 								} );
 							}
 							if ( onActionPerformed ) {
-								onActionPerformed( posts );
+								onActionPerformed( items );
 							}
 							setIsBusy( false );
 							closeModal();
@@ -202,7 +313,7 @@ const trashPostAction = {
 						disabled={ isBusy }
 						__experimentalIsFocusable
 					>
-						{ __( 'Delete' ) }
+						{ __( 'Trash' ) }
 					</Button>
 				</HStack>
 			</VStack>
@@ -511,7 +622,7 @@ const renamePostAction = {
 		) {
 			return true;
 		}
-		// In the case of templates, we can only remove custom templates.
+		// In the case of templates, we can only rename custom templates.
 		if ( post.type === TEMPLATE_POST_TYPE ) {
 			return isTemplateRemovable( post ) && post.is_custom;
 		}
@@ -850,245 +961,6 @@ const resetTemplateAction = {
 	},
 };
 
-/**
- * Check if a template is removable.
- * Copy from packages/edit-site/src/utils/is-template-removable.js.
- *
- * @param {Object} template The template entity to check.
- * @return {boolean} Whether the template is revertable.
- */
-function isTemplateRemovable( template ) {
-	if ( ! template ) {
-		return false;
-	}
-
-	return (
-		template.source === TEMPLATE_ORIGINS.custom && ! template.has_theme_file
-	);
-}
-
-const deleteTemplateAction = {
-	id: 'delete-template',
-	label: __( 'Delete' ),
-	isEligible: isTemplateRemovable,
-	icon: trash,
-	supportsBulk: true,
-	hideModalHeader: true,
-	RenderModal: ( {
-		items: templates,
-		closeModal,
-		onActionStart,
-		onActionPerformed,
-	} ) => {
-		const [ isBusy, setIsBusy ] = useState( false );
-		const { removeTemplates } = unlock( useDispatch( editorStore ) );
-		return (
-			<VStack spacing="5">
-				<Text>
-					{ templates.length > 1
-						? sprintf(
-								// translators: %d: number of items to delete.
-								_n(
-									'Delete %d item?',
-									'Delete %d items?',
-									templates.length
-								),
-								templates.length
-						  )
-						: sprintf(
-								// translators: %s: The template or template part's titles
-								__( 'Delete "%s"?' ),
-								decodeEntities(
-									templates?.[ 0 ]?.title?.rendered
-								)
-						  ) }
-				</Text>
-				<HStack justify="right">
-					<Button
-						variant="tertiary"
-						onClick={ closeModal }
-						disabled={ isBusy }
-						__experimentalIsFocusable
-					>
-						{ __( 'Cancel' ) }
-					</Button>
-					<Button
-						variant="primary"
-						onClick={ async () => {
-							setIsBusy( true );
-							if ( onActionStart ) {
-								onActionStart( templates );
-							}
-							await removeTemplates( templates, {
-								allowUndo: false,
-							} );
-							onActionPerformed?.( templates );
-							setIsBusy( false );
-							closeModal();
-						} }
-						isBusy={ isBusy }
-						disabled={ isBusy }
-						__experimentalIsFocusable
-					>
-						{ __( 'Delete' ) }
-					</Button>
-				</HStack>
-			</VStack>
-		);
-	},
-};
-
-const canDeleteOrReset = ( item ) => {
-	const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
-	const isUserPattern = item.type === PATTERN_TYPES.user;
-	return isUserPattern || ( isTemplatePart && item.isCustom );
-};
-
-export const deletePatternAction = {
-	id: 'delete-pattern',
-	label: __( 'Delete' ),
-	isEligible: ( item ) => {
-		if ( ! item ) {
-			return false;
-		}
-		const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
-		const hasThemeFile =
-			isTemplatePart && item.templatePart?.has_theme_file;
-		return canDeleteOrReset( item ) && ! hasThemeFile;
-	},
-	hideModalHeader: true,
-	supportsBulk: true,
-	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
-		const { __experimentalDeleteReusableBlock } =
-			useDispatch( reusableBlocksStore );
-		const { createErrorNotice, createSuccessNotice } =
-			useDispatch( noticesStore );
-		const { removeTemplates } = unlock( useDispatch( editorStore ) );
-
-		const deletePattern = async () => {
-			const promiseResult = await Promise.allSettled(
-				items.map( ( item ) => {
-					return __experimentalDeleteReusableBlock( item.id );
-				} )
-			);
-			// If all the promises were fulfilled with success.
-			if (
-				promiseResult.every( ( { status } ) => status === 'fulfilled' )
-			) {
-				let successMessage;
-				if ( promiseResult.length === 1 ) {
-					successMessage = sprintf(
-						/* translators: The posts's title. */
-						__( '"%s" deleted.' ),
-						items[ 0 ].title
-					);
-				} else {
-					successMessage = __( 'The patterns were deleted.' );
-				}
-				createSuccessNotice( successMessage, {
-					type: 'snackbar',
-					id: 'edit-site-page-trashed',
-				} );
-			} else {
-				// If there was at lease one failure.
-				let errorMessage;
-				// If we were trying to delete a single pattern.
-				if ( promiseResult.length === 1 ) {
-					if ( promiseResult[ 0 ].reason?.message ) {
-						errorMessage = promiseResult[ 0 ].reason.message;
-					} else {
-						errorMessage = __(
-							'An error occurred while deleting the pattern.'
-						);
-					}
-					// If we were trying to delete multiple patterns.
-				} else {
-					const errorMessages = new Set();
-					const failedPromises = promiseResult.filter(
-						( { status } ) => status === 'rejected'
-					);
-					for ( const failedPromise of failedPromises ) {
-						if ( failedPromise.reason?.message ) {
-							errorMessages.add( failedPromise.reason.message );
-						}
-					}
-					if ( errorMessages.size === 0 ) {
-						errorMessage = __(
-							'An error occurred while deleting the patterns.'
-						);
-					} else if ( errorMessages.size === 1 ) {
-						errorMessage = sprintf(
-							/* translators: %s: an error message */
-							__(
-								'An error occurred while deleting the patterns: %s'
-							),
-							[ ...errorMessages ][ 0 ]
-						);
-					} else {
-						errorMessage = sprintf(
-							/* translators: %s: a list of comma separated error messages */
-							__(
-								'Some errors occurred while deleting the patterns: %s'
-							),
-							[ ...errorMessages ].join( ',' )
-						);
-					}
-					createErrorNotice( errorMessage, {
-						type: 'snackbar',
-					} );
-				}
-			}
-		};
-		const deleteItem = () => {
-			if ( items[ 0 ].type === TEMPLATE_PART_POST_TYPE ) {
-				removeTemplates( items );
-			} else {
-				deletePattern();
-			}
-			if ( onActionPerformed ) {
-				onActionPerformed();
-			}
-			closeModal();
-		};
-		let questionMessage;
-		if ( items.length === 1 ) {
-			questionMessage = sprintf(
-				// translators: %s: The page's title.
-				__( 'Are you sure you want to delete "%s"?' ),
-				decodeEntities( items[ 0 ].title || items[ 0 ].name )
-			);
-		} else if (
-			items.length > 1 &&
-			items[ 0 ].type === TEMPLATE_PART_POST_TYPE
-		) {
-			questionMessage = sprintf(
-				// translators: %d: The number of template parts (2 or more).
-				__( 'Are you sure you want to delete %d template parts?' ),
-				items.length
-			);
-		} else {
-			questionMessage = sprintf(
-				// translators: %d: The number of patterns (2 or more).
-				__( 'Are you sure you want to delete %d patterns?' ),
-				items.length
-			);
-		}
-		return (
-			<VStack spacing="5">
-				<Text>{ questionMessage }</Text>
-				<HStack justify="right">
-					<Button variant="tertiary" onClick={ closeModal }>
-						{ __( 'Cancel' ) }
-					</Button>
-					<Button variant="primary" onClick={ deleteItem }>
-						{ __( 'Delete' ) }
-					</Button>
-				</HStack>
-			</VStack>
-		);
-	},
-};
-
 export function usePostActions( postType, onActionPerformed ) {
 	const { postTypeObject } = useSelect(
 		( select ) => {
@@ -1108,6 +980,7 @@ export function usePostActions( postType, onActionPerformed ) {
 	].includes( postType );
 	const isPattern = postType === PATTERN_POST_TYPE;
 	const isLoaded = !! postTypeObject;
+	const supportsRevisions = !! postTypeObject?.supports?.revisions;
 	return useMemo( () => {
 		if ( ! isLoaded ) {
 			return [];
@@ -1115,7 +988,7 @@ export function usePostActions( postType, onActionPerformed ) {
 
 		const actions = [
 			postTypeObject?.viewable && viewPostAction,
-			postRevisionsAction,
+			supportsRevisions && postRevisionsAction,
 			globalThis.IS_GUTENBERG_PLUGIN
 				? ! isTemplateOrTemplatePart &&
 				  ! isPattern &&
@@ -1124,11 +997,10 @@ export function usePostActions( postType, onActionPerformed ) {
 			renamePostAction,
 			isPattern && exportPatternAsJSONAction,
 			isTemplateOrTemplatePart ? resetTemplateAction : restorePostAction,
-			isTemplateOrTemplatePart
-				? deleteTemplateAction
-				: permanentlyDeletePostAction,
-			isPattern && deletePatternAction,
-			! isTemplateOrTemplatePart && trashPostAction,
+			isTemplateOrTemplatePart || isPattern
+				? deletePostAction
+				: trashPostAction,
+			! isTemplateOrTemplatePart && permanentlyDeletePostAction,
 		].filter( Boolean );
 
 		if ( onActionPerformed ) {
@@ -1181,5 +1053,6 @@ export function usePostActions( postType, onActionPerformed ) {
 		restorePostAction,
 		onActionPerformed,
 		isLoaded,
+		supportsRevisions,
 	] );
 }
