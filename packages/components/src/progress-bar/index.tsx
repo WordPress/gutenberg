@@ -52,8 +52,8 @@ function UnforwardedProgressBar(
  * import { ProgressBar } from '@wordpress/components';
  *
  * const MyLoadingComponent = () => {
- *  return <ProgressBar />
- * }
+ * 	return <ProgressBar />;
+ * };
  * ```
  */
 export const ProgressBar = forwardRef( UnforwardedProgressBar );
