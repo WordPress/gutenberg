@@ -22,7 +22,7 @@ You can also make it determinate by passing a `value` (from 0 to 100) representi
 import { ProgressBar } from '@wordpress/components';
 
 const MyLoadingComponent = ( { progress } ) => {
-  return <ProgressBar value={ progress } />
+	return <ProgressBar value={ progress } />;
 };
 ```
 
