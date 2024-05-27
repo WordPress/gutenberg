@@ -1092,7 +1092,20 @@ Undocumented declaration.
 
 ### PostPreviewButton
 
-Undocumented declaration.
+A button for post preview. It uses WordPress data selectors to get the necessary data for the preview, such as the post ID, the current post link, the preview link, and whether the post is saveable and viewable. When the button is clicked, it opens a new window or tab for the preview, writes the interstitial message to this window, and then navigates to the actual preview link. The button is disabled if the post is not saveable.
+
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.className_ `string`: The class name for the button.
+-   _props.textContent_ `string`: The text content for the button.
+-   _props.forceIsAutosaveable_ `boolean`: Whether to force autosave.
+-   _props.role_ `string`: The role attribute for the button.
+-   _props.onPreview_ `Function`: The callback function for preview event.
+
+_Returns_
+
+-   `JSX.Element|null`: The rendered button component.
 
 ### PostPublishButton
 
