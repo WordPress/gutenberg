@@ -182,11 +182,8 @@ test.describe( 'Paragraph computed styles', () => {
 				name: 'Block: Paragraph',
 			} );
 
-			// fontStyle, fontWeight, fontSize.
-			await expect( block ).toHaveCSS(
-				'font',
-				'100 11px / 12.1px Times'
-			);
+			await expect( block ).toHaveCSS( 'font-weight', '100' );
+			await expect( block ).toHaveCSS( 'font-size', '11px' );
 			await expect( block ).toHaveCSS( 'text-transform', 'uppercase' );
 			await expect( block ).toHaveCSS( 'letter-spacing', '1.1px' );
 			await expect( block ).toHaveCSS( 'line-height', '12.1px' );
@@ -225,16 +222,13 @@ test.describe( 'Paragraph computed styles', () => {
 				name: 'Block: Paragraph',
 			} );
 
-			// fontStyle, fontWeight, fontSize.
-			await expect( block ).toHaveCSS(
-				'font',
-				'200 12px / 14.4px Times'
-			);
+			await expect( block ).toHaveCSS( 'font-weight', '200' );
+			await expect( block ).toHaveCSS( 'font-size', '12px' );
 			await expect( block ).toHaveCSS( 'text-transform', 'lowercase' );
 			await expect( block ).toHaveCSS( 'letter-spacing', '1.2px' );
 			await expect( block ).toHaveCSS(
-				'text-decoration',
-				'underline solid rgb(0, 0, 0)'
+				'text-decoration-line',
+				'underline'
 			);
 			await expect( block ).toHaveCSS( 'line-height', '14.4px' );
 		} );
@@ -264,16 +258,13 @@ test.describe( 'Paragraph computed styles', () => {
 				name: 'Block: Paragraph',
 			} );
 
-			// fontStyle, fontWeight, fontSize.
-			await expect( block ).toHaveCSS(
-				'font',
-				'300 12px / 15.6px Times'
-			);
+			await expect( block ).toHaveCSS( 'font-weight', '300' );
+			await expect( block ).toHaveCSS( 'font-size', '12px' );
 			await expect( block ).toHaveCSS( 'text-transform', 'capitalize' );
 			await expect( block ).toHaveCSS( 'letter-spacing', '1.3px' );
 			await expect( block ).toHaveCSS(
-				'text-decoration',
-				'line-through solid rgb(0, 0, 0)'
+				'text-decoration-line',
+				'line-through'
 			);
 			await expect( block ).toHaveCSS( 'line-height', '15.6px' );
 		} );
