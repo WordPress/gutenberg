@@ -34,7 +34,7 @@ import { ProgressBar } from '@wordpress/components';
 
 const MyLoadingComponent = () => {
 	return <ProgressBar className="my-custom-css-class" />;
-}
+};
 ```
 
 ### Props
