@@ -22,7 +22,7 @@ interface FiltersProps< Item extends AnyItem > {
 	setOpenedFilter: ( openedFilter: string | null ) => void;
 }
 
-const Filters = memo( function Filters< Item extends AnyItem >( {
+function _Filters< Item extends AnyItem >( {
 	fields,
 	view,
 	onChangeView,
@@ -117,6 +117,9 @@ const Filters = memo( function Filters< Item extends AnyItem >( {
 			{ filterComponents }
 		</HStack>
 	);
-} );
+}
+
+// A type assertion is used here to keep the type argument.
+const Filters = memo( _Filters ) as typeof _Filters;
 
 export default Filters;

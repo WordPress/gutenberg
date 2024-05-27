@@ -373,15 +373,35 @@ export type Action< Item extends AnyItem > =
 	| ActionModal< Item >
 	| ActionButton< Item >;
 
-export interface ViewProps< Item extends AnyItem, ViewType extends ViewBase > {
+export interface ViewBaseProps< Item extends AnyItem > {
 	actions: Action< Item >[];
 	data: Item[];
 	fields: NormalizedField< Item >[];
 	getItemId: ( item: Item ) => string;
 	isLoading?: boolean;
-	onChangeView( view: ViewType ): void;
+	onChangeView( view: View ): void;
 	onSelectionChange: ( items: Item[] ) => void;
 	selection: string[];
 	setOpenedFilter: ( fieldId: string ) => void;
-	view: ViewType;
+	view: View;
 }
+
+export interface ViewTableProps< Item extends AnyItem >
+	extends ViewBaseProps< Item > {
+	view: ViewTable;
+}
+
+export interface ViewListProps< Item extends AnyItem >
+	extends ViewBaseProps< Item > {
+	view: ViewList;
+}
+
+export interface ViewGridProps< Item extends AnyItem >
+	extends ViewBaseProps< Item > {
+	view: ViewGrid;
+}
+
+export type ViewProps< Item extends AnyItem > =
+	| ViewTableProps< Item >
+	| ViewGridProps< Item >
+	| ViewListProps< Item >;

@@ -6,20 +6,37 @@ import { useEffect, useRef, memo } from '@wordpress/element';
 import { SearchControl } from '@wordpress/components';
 import { useDebouncedInput } from '@wordpress/compose';
 
-const Search = memo( function Search( { label, view, onChangeView } ) {
+/**
+ * Internal dependencies
+ */
+import type { View } from './types';
+
+interface SearchProps {
+	label?: string;
+	view: View;
+	onChangeView: ( view: View ) => void;
+}
+
+const Search = memo( function Search( {
+	label,
+	view,
+	onChangeView,
+}: SearchProps ) {
 	const [ search, setSearch, debouncedSearch ] = useDebouncedInput(
 		view.search
 	);
 	useEffect( () => {
-		setSearch( view.search );
-	}, [ view ] );
+		setSearch( view.search ?? '' );
+	}, [ view.search, setSearch ] );
 	const onChangeViewRef = useRef( onChangeView );
+	const viewRef = useRef( view );
 	useEffect( () => {
 		onChangeViewRef.current = onChangeView;
-	}, [ onChangeView ] );
+		viewRef.current = view;
+	}, [ onChangeView, view ] );
 	useEffect( () => {
 		onChangeViewRef.current( {
-			...view,
+			...viewRef.current,
 			page: 1,
 			search: debouncedSearch,
 		} );

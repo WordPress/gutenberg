@@ -32,18 +32,9 @@ import { moreVertical } from '@wordpress/icons';
  * Internal dependencies
  */
 import { unlock } from './lock-unlock';
-import type {
-	Action,
-	AnyItem,
-	NormalizedField,
-	ViewList as ViewListType,
-	ViewProps,
-} from './types';
+import type { Action, AnyItem, NormalizedField, ViewListProps } from './types';
 
 import { ActionsDropdownMenuGroup, ActionModal } from './item-actions';
-
-interface ViewListProps< Item extends AnyItem >
-	extends ViewProps< Item, ViewListType > {}
 
 interface ListViewItemProps< Item extends AnyItem > {
 	actions: Action< Item >[];

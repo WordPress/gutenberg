@@ -265,11 +265,11 @@ Helper hook for input fields that need to debounce the value before using it.
 
 _Parameters_
 
--   _defaultValue_ `any`: The default value to use.
+-   _defaultValue_ The default value to use.
 
 _Returns_
 
--   `[string, Function, string]`: The input value, the setter and the debounced input value.
+-   `[ string, ( value: string ) => void, string ]`: The input value, the setter and the debounced input value.
 
 ### useDisabled
 
