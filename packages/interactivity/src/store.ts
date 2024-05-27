@@ -15,7 +15,6 @@ import {
 	setNamespace,
 	resetNamespace,
 } from './hooks';
-
 const isObject = ( item: unknown ): item is Record< string, unknown > =>
 	Boolean( item && typeof item === 'object' && item.constructor === Object );
 
