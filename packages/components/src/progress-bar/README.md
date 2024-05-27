@@ -33,7 +33,7 @@ You can customize its appearance by passing a custom CSS class name to `classNam
 import { ProgressBar } from '@wordpress/components';
 
 const MyLoadingComponent = () => {
-  return <ProgressBar className='my-custom-css-class' />
+	return <ProgressBar className="my-custom-css-class" />;
 }
 ```
 
