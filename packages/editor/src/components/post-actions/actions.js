@@ -70,31 +70,96 @@ function getItemTitle( item ) {
 	return decodeEntities( item.title?.rendered || '' );
 }
 
+// This action is used for templates, patterns and template parts.
+// Every other post type uses the similar `trashPostAction` which
+// moves the post to trash.
 const deletePostAction = {
 	id: 'delete-post',
 	label: __( 'Delete' ),
 	isPrimary: true,
 	icon: trash,
 	isEligible( post ) {
-		if ( [ 'auto-draft', 'trash' ].includes( post.status ) ) {
-			return false;
-		}
-		// Templates, template parts and patterns have special checks for renaming.
-		const isTemplateOrTemplatePart = [
-			TEMPLATE_POST_TYPE,
-			TEMPLATE_PART_POST_TYPE,
-		].includes( post.type );
-		const isPattern = [ ...Object.values( PATTERN_TYPES ) ].includes(
-			post.type
-		);
-		if ( ! isTemplateOrTemplatePart && ! isPattern ) {
-			return true;
-		}
-		if ( isTemplateOrTemplatePart ) {
+		if (
+			[ TEMPLATE_POST_TYPE, TEMPLATE_PART_POST_TYPE ].includes(
+				post.type
+			)
+		) {
 			return isTemplateRemovable( post );
 		}
 		// We can only remove user patterns.
 		return post.type === PATTERN_TYPES.user;
+	},
+	supportsBulk: true,
+	hideModalHeader: true,
+	RenderModal: ( {
+		items,
+		closeModal,
+		onActionStart,
+		onActionPerformed,
+	} ) => {
+		const [ isBusy, setIsBusy ] = useState( false );
+		const { removeTemplates } = unlock( useDispatch( editorStore ) );
+		return (
+			<VStack spacing="5">
+				<Text>
+					{ items.length > 1
+						? sprintf(
+								// translators: %d: number of items to delete.
+								_n(
+									'Delete %d item?',
+									'Delete %d items?',
+									items.length
+								),
+								items.length
+						  )
+						: sprintf(
+								// translators: %s: The template or template part's titles
+								__( 'Delete "%s"?' ),
+								getItemTitle( items[ 0 ] )
+						  ) }
+				</Text>
+				<HStack justify="right">
+					<Button
+						variant="tertiary"
+						onClick={ closeModal }
+						disabled={ isBusy }
+						__experimentalIsFocusable
+					>
+						{ __( 'Cancel' ) }
+					</Button>
+					<Button
+						variant="primary"
+						onClick={ async () => {
+							setIsBusy( true );
+							if ( onActionStart ) {
+								onActionStart( items );
+							}
+							await removeTemplates( items, {
+								allowUndo: false,
+							} );
+							onActionPerformed?.( items );
+							setIsBusy( false );
+							closeModal();
+						} }
+						isBusy={ isBusy }
+						disabled={ isBusy }
+						__experimentalIsFocusable
+					>
+						{ __( 'Delete' ) }
+					</Button>
+				</HStack>
+			</VStack>
+		);
+	},
+};
+
+const trashPostAction = {
+	id: 'move-to-trash',
+	label: __( 'Move to Trash' ),
+	isPrimary: true,
+	icon: trash,
+	isEligible( item ) {
+		return ! [ 'auto-draft', 'trash' ].includes( item.status );
 	},
 	supportsBulk: true,
 	hideModalHeader: true,
@@ -114,14 +179,16 @@ const deletePostAction = {
 					{ items.length === 1
 						? sprintf(
 								// translators: %s: The item's title.
-								__( 'Are you sure you want to delete "%s"?' ),
+								__(
+									'Are you sure you want to move to trash "%s"?'
+								),
 								getItemTitle( items[ 0 ] )
 						  )
 						: sprintf(
 								// translators: %d: The number of items (2 or more).
 								_n(
-									'Are you sure you want to delete %d item?',
-									'Are you sure you want to delete %d items?',
+									'Are you sure you want to move to trash %d item?',
+									'Are you sure you want to move to trash %d items?',
 									items.length
 								),
 								items.length
@@ -164,25 +231,25 @@ const deletePostAction = {
 								if ( promiseResult.length === 1 ) {
 									successMessage = sprintf(
 										/* translators: The item's title. */
-										__( '"%s" deleted.' ),
+										__( '"%s" moved to trash.' ),
 										getItemTitle( items[ 0 ] )
 									);
 								} else if ( items[ 0 ].type === 'page' ) {
 									successMessage = sprintf(
 										/* translators: The number of items. */
-										__( '%s items deleted.' ),
+										__( '%s items moved to trash.' ),
 										items.length
 									);
 								} else {
 									successMessage = sprintf(
 										/* translators: The number of posts. */
-										__( '%s items deleted.' ),
+										__( '%s items move to trash.' ),
 										items.length
 									);
 								}
 								createSuccessNotice( successMessage, {
 									type: 'snackbar',
-									id: 'delete-post-action',
+									id: 'move-to-trash-action',
 								} );
 							} else {
 								// If there was at least one failure.
@@ -194,7 +261,7 @@ const deletePostAction = {
 											promiseResult[ 0 ].reason.message;
 									} else {
 										errorMessage = __(
-											'An error occurred while deleting the item.'
+											'An error occurred while moving to trash the item.'
 										);
 									}
 									// If we were trying to delete multiple items.
@@ -212,13 +279,13 @@ const deletePostAction = {
 									}
 									if ( errorMessages.size === 0 ) {
 										errorMessage = __(
-											'An error occurred while deleting the items.'
+											'An error occurred while moving to trash the items.'
 										);
 									} else if ( errorMessages.size === 1 ) {
 										errorMessage = sprintf(
 											/* translators: %s: an error message */
 											__(
-												'An error occurred while deleting the item: %s'
+												'An error occurred while moving to trash the item: %s'
 											),
 											[ ...errorMessages ][ 0 ]
 										);
@@ -226,7 +293,7 @@ const deletePostAction = {
 										errorMessage = sprintf(
 											/* translators: %s: a list of comma separated error messages */
 											__(
-												'Some errors occurred while deleting the items: %s'
+												'Some errors occurred while moving to trash the items: %s'
 											),
 											[ ...errorMessages ].join( ',' )
 										);
@@ -246,7 +313,7 @@ const deletePostAction = {
 						disabled={ isBusy }
 						__experimentalIsFocusable
 					>
-						{ __( 'Delete' ) }
+						{ __( 'Trash' ) }
 					</Button>
 				</HStack>
 			</VStack>
@@ -929,7 +996,9 @@ export function usePostActions( postType, onActionPerformed ) {
 			renamePostAction,
 			isPattern && exportPatternAsJSONAction,
 			isTemplateOrTemplatePart ? resetTemplateAction : restorePostAction,
-			deletePostAction,
+			isTemplateOrTemplatePart || isPattern
+				? deletePostAction
+				: trashPostAction,
 			! isTemplateOrTemplatePart && permanentlyDeletePostAction,
 		].filter( Boolean );
 

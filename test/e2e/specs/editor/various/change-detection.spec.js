@@ -416,11 +416,11 @@ test.describe( 'Change detection', () => {
 			.click();
 		await page
 			.getByRole( 'menu' )
-			.getByRole( 'menuitem', { name: 'Delete' } )
+			.getByRole( 'menuitem', { name: 'Move to Trash' } )
 			.click();
 		await page
 			.getByRole( 'dialog' )
-			.getByRole( 'button', { name: 'Delete' } )
+			.getByRole( 'button', { name: 'Trash' } )
 			.click();
 
 		await expect( page ).toHaveURL( '/wp-admin/edit.php?post_type=post' );

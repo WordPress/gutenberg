@@ -212,6 +212,7 @@ export default function Editor( { isLoading } ) {
 	const onActionPerformed = useCallback(
 		( actionId, items ) => {
 			switch ( actionId ) {
+				case 'move-to-trash':
 				case 'delete-post':
 					{
 						history.push( {

@@ -277,7 +277,7 @@ function Layout( { initialPost } ) {
 	const onActionPerformed = useCallback(
 		( actionId, items ) => {
 			switch ( actionId ) {
-				case 'delete-post':
+				case 'move-to-trash':
 					{
 						document.location.href = addQueryArgs( 'edit.php', {
 							trashed: 1,
