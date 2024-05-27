@@ -501,7 +501,7 @@ function BackgroundSizeToolsPanelItem( {
 				onChange={ updateBackgroundPosition }
 			/>
 			<ToggleGroupControl
-				size={ '__unstable-large' }
+				size="__unstable-large"
 				label={ __( 'Size' ) }
 				value={ currentValueForToggle }
 				onChange={ updateBackgroundSize }
@@ -509,18 +509,18 @@ function BackgroundSizeToolsPanelItem( {
 				help={ backgroundSizeHelpText( sizeValue ) }
 			>
 				<ToggleGroupControlOption
-					key={ 'cover' }
-					value={ 'cover' }
+					key="cover"
+					value="cover"
 					label={ __( 'Cover' ) }
 				/>
 				<ToggleGroupControlOption
-					key={ 'contain' }
-					value={ 'contain' }
+					key="contain"
+					value="contain"
 					label={ __( 'Contain' ) }
 				/>
 				<ToggleGroupControlOption
-					key={ 'fixed' }
-					value={ 'auto' }
+					key="fixed"
+					value="auto"
 					label={ __( 'Fixed' ) }
 				/>
 			</ToggleGroupControl>
@@ -528,7 +528,7 @@ function BackgroundSizeToolsPanelItem( {
 			currentValueForToggle !== 'cover' &&
 			currentValueForToggle !== 'contain' ? (
 				<UnitControl
-					size={ '__unstable-large' }
+					size="__unstable-large"
 					onChange={ updateBackgroundSize }
 					value={ sizeValue }
 				/>

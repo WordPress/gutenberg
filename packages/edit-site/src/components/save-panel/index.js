@@ -155,7 +155,7 @@ export default function SavePanel() {
 						'edit-site-editor__toggle-save-panel-button'
 					) }
 					onClick={ () => setIsSaveViewOpened( true ) }
-					aria-haspopup={ 'dialog' }
+					aria-haspopup="dialog"
 					disabled={ disabled }
 					__experimentalIsFocusable
 				>

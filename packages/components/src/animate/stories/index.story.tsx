@@ -27,7 +27,10 @@ export const Default = Template.bind( {} );
 Default.args = {
 	children: ( { className } ) => (
 		<Notice className={ className } status="success">
-			<p>{ `No default animation. Use one of type = "appear", "slide-in", or "loading".` }</p>
+			<p>
+				No default animation. Use one of type = "appear", "slide-in", or
+				"loading".
+			</p>
 		</Notice>
 	),
 };

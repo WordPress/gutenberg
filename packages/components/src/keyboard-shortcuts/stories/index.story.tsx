@@ -32,7 +32,7 @@ Default.args = {
 	},
 	children: (
 		<div>
-			<p>{ `Hit the "a" or "b" key in this textarea:` }</p>
+			<p>Hit the "a" or "b" key in this textarea:</p>
 			<textarea />
 		</div>
 	),

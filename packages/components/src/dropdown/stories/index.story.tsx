@@ -66,7 +66,7 @@ WithMorePadding.args = {
 	...Default.args,
 	renderContent: () => (
 		<DropdownContentWrapper paddingSize="medium">
-			Content wrapped with <code>{ `paddingSize="medium"` }</code>.
+			Content wrapped with <code>paddingSize="medium"</code>.
 		</DropdownContentWrapper>
 	),
 };
@@ -81,7 +81,7 @@ WithNoPadding.args = {
 	...Default.args,
 	renderContent: () => (
 		<DropdownContentWrapper paddingSize="none">
-			Content wrapped with <code>{ `paddingSize="none"` }</code>.
+			Content wrapped with <code>paddingSize="none"</code>.
 		</DropdownContentWrapper>
 	),
 };

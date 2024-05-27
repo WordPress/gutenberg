@@ -35,7 +35,7 @@ export function Button( props ) {
 			style={ buttonStyle }
 			activeOpacity={ 0.7 }
 			accessibilityLabel={ accessibilityLabel }
-			accessibilityRole={ 'button' }
+			accessibilityRole="button"
 			onPress={ onClick }
 			disabled={ isDisabled }
 		>

@@ -77,7 +77,7 @@ const ListViewBlockContents = forwardRef(
 				<BlockDraggable
 					appendToOwnerDocument
 					clientIds={ draggableClientIds }
-					cloneClassname={ 'block-editor-list-view-draggable-chip' }
+					cloneClassname="block-editor-list-view-draggable-chip"
 				>
 					{ ( { draggable, onDragStart, onDragEnd } ) => (
 						<ListViewBlockSelectButton
