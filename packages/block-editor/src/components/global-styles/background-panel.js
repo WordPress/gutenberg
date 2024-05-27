@@ -83,6 +83,8 @@ export function hasBackgroundSizeValue( style ) {
 export function hasBackgroundImageValue( style ) {
 	return (
 		!! style?.background?.backgroundImage?.id ||
+		// Supports url() string values in theme.json.
+		'string' === typeof style?.background?.backgroundImage ||
 		!! style?.background?.backgroundImage?.url
 	);
 }
@@ -279,6 +281,23 @@ function BackgroundImageToolsPanelItem( {
 
 	const hasValue = hasBackgroundImageValue( style );
 
+	const closeAndFocus = () => {
+		const [ toggleButton ] = focus.tabbable.find(
+			replaceContainerRef.current
+		);
+		// Focus the toggle button and close the dropdown menu.
+		// This ensures similar behaviour as to selecting an image, where the dropdown is
+		// closed and focus is redirected to the dropdown toggle button.
+		toggleButton?.focus();
+		toggleButton?.click();
+	};
+
+	const onRemove = () =>
+		onChange(
+			setImmutably( style, [ 'background', 'backgroundImage' ], 'none' )
+		);
+	const canRemove = ! hasValue && hasBackgroundImageValue( inheritedValue );
+
 	return (
 		<ToolsPanelItem
 			className="single-column"
@@ -311,17 +330,20 @@ function BackgroundImageToolsPanelItem( {
 					}
 					variant="secondary"
 				>
+					{ canRemove && (
+						<MenuItem
+							onClick={ () => {
+								closeAndFocus();
+								onRemove();
+							} }
+						>
+							{ __( 'Remove' ) }
+						</MenuItem>
+					) }
 					{ hasValue && (
 						<MenuItem
 							onClick={ () => {
-								const [ toggleButton ] = focus.tabbable.find(
-									replaceContainerRef.current
-								);
-								// Focus the toggle button and close the dropdown menu.
-								// This ensures similar behaviour as to selecting an image, where the dropdown is
-								// closed and focus is redirected to the dropdown toggle button.
-								toggleButton?.focus();
-								toggleButton?.click();
+								closeAndFocus();
 								resetBackgroundImage();
 							} }
 						>
