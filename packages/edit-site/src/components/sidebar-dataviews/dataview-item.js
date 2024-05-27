@@ -21,6 +21,7 @@ const { useLocation } = unlock( routerPrivateApis );
 export default function DataViewItem( {
 	title,
 	slug,
+	count,
 	customViewId,
 	type,
 	icon,
@@ -51,6 +52,7 @@ export default function DataViewItem( {
 			<SidebarNavigationItem
 				icon={ iconToUse }
 				{ ...linkInfo }
+				suffix={ <span>{ count }</span> }
 				aria-current={ isActive ? 'true' : undefined }
 			>
 				{ title }
