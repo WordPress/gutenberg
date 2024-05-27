@@ -12,7 +12,7 @@ Basic usage:
 import { ProgressBar } from '@wordpress/components';
 
 const MyLoadingComponent = () => {
-  return <ProgressBar />
+	return <ProgressBar />;
 }
 ```
 
