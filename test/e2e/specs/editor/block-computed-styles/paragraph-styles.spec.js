@@ -376,11 +376,18 @@ test.describe( 'Paragraph computed styles', () => {
 					},
 				],
 			} );
+
+			// Select a different block so that :last-child margin is applied correctly.
+			// This is to work around a bug. See this issue:
+			// https://github.com/WordPress/gutenberg/issues/61846
+			await editor.selectBlocks( rootParagraph2 );
 			const nestedParagraph1 = paragraphs.nth( 3 );
 			const nestedParagraph2 = paragraphs.nth( 4 );
 			const nestedParagraph3 = paragraphs.nth( 5 );
 			// In a default layout, the margins on left/right apply to the
 			// middle paragraph.
+			// The first and last block have start/end margin set to zero
+			// by the layout.
 			await expect( nestedParagraph1 ).toHaveCSS(
 				'margin',
 				'0px 2px 3px 4px'
@@ -389,11 +396,9 @@ test.describe( 'Paragraph computed styles', () => {
 				'margin',
 				'1px 2px 3px 4px'
 			);
-			// Note: This is different to what I reproduce locally.
-			// Bottom margin should be 0px for the last block.
 			await expect( nestedParagraph3 ).toHaveCSS(
 				'margin',
-				'1px 2px 3px 4px'
+				'1px 2px 0px 4px'
 			);
 
 			// Expect a paragraph with a background color to have some
