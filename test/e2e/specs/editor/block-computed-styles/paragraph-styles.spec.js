@@ -407,7 +407,7 @@ test.describe( 'Paragraph computed styles', () => {
 				name: 'core/paragraph',
 				attributes: {
 					content: 'Paragraph with background',
-					styles: { color: { background: '#2d2d2d' } },
+					style: { color: { background: '#f3acac' } },
 				},
 			} );
 			const paragraphWithBackground = paragraphs.nth( 6 );
@@ -490,9 +490,9 @@ test.describe( 'Paragraph computed styles', () => {
 				name: 'core/paragraph',
 				attributes: {
 					content: 'Paragraph with background',
-					styles: {
-						color: { background: '#2d2d2d' },
+					style: {
 						...instanceStyles,
+						color: { background: '#f3acac' },
 					},
 				},
 			} );
