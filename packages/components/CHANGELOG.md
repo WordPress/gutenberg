@@ -2,9 +2,6 @@
 
 ## Unreleased
 
-### Enhancements
-
-- Components: Make the `ProgressBar` public ([#61062](https://github.com/WordPress/gutenberg/pull/61062)).
 ### Breaking Changes
 
 -   Variables like `process.env.IS_GUTENBERG_PLUGIN` have been replaced by `globalThis.IS_GUTENBERG_PLUGIN`. Build systems using `process.env` should be updated ([#61486](https://github.com/WordPress/gutenberg/pull/61486)).
@@ -14,6 +11,7 @@
 
 -   `Tabs`: Animate indicator ([#60560](https://github.com/WordPress/gutenberg/pull/60560)).
 -   `ComboboxControl`: Introduce Combobox expandOnFocus prop ([#61705](https://github.com/WordPress/gutenberg/pull/61705)).
+- Components: Make the `ProgressBar` public ([#61062](https://github.com/WordPress/gutenberg/pull/61062)).
 
 ### Bug Fixes
 
