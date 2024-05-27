@@ -125,8 +125,7 @@ export const hasNonPostEntityChanges = createRegistrySelector(
 			( entityRecord ) =>
 				entityRecord.kind !== 'postType' ||
 				entityRecord.name !== type ||
-				entityRecord.key !== id ||
-				entityRecord.hasMetaChanges
+				entityRecord.key !== id
 		);
 	}
 );
