@@ -23,7 +23,7 @@ import { ProgressBar } from '@wordpress/components';
 
 const MyLoadingComponent = ( { progress } ) => {
   return <ProgressBar value={ progress } />
-}
+};
 ```
 
 You can customize its appearance by passing a custom CSS class name to `className`:
