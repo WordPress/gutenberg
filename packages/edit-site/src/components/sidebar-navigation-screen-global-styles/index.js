@@ -5,10 +5,12 @@ import { __ } from '@wordpress/i18n';
 import { edit, seen } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { __experimentalNavigatorButton as NavigatorButton } from '@wordpress/components';
+import { __experimentalVStack as VStack } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { BlockEditorProvider } from '@wordpress/block-editor';
 import { useCallback } from '@wordpress/element';
+import { store as editorStore } from '@wordpress/editor';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -22,6 +24,12 @@ import SidebarNavigationItem from '../sidebar-navigation-item';
 import StyleBook from '../style-book';
 import useGlobalStylesRevisions from '../global-styles/screen-revisions/use-global-styles-revisions';
 import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-details-footer';
+import ColorVariations from '../global-styles/variations/variations-color';
+import TypographyVariations from '../global-styles/variations/variations-typography';
+import {
+	useColorVariations,
+	useTypographyVariations,
+} from '../global-styles/hooks';
 
 const noop = () => {};
 
@@ -38,10 +46,10 @@ export function SidebarNavigationItemGlobalStyles( props ) {
 	);
 	if ( hasGlobalStyleVariations ) {
 		return (
-			<NavigatorButton
+			<SidebarNavigationItem
 				{ ...props }
-				as={ SidebarNavigationItem }
-				path="/wp_global_styles"
+				params={ { path: '/wp_global_styles' } }
+				uid="global-styles-navigation-item"
 			/>
 		);
 	}
@@ -67,6 +75,10 @@ function SidebarNavigationScreenGlobalStylesContent() {
 		};
 	}, [] );
 
+	const colorVariations = useColorVariations();
+	const typographyVariations = useTypographyVariations();
+	const gap = 3;
+
 	// Wrap in a BlockEditorProvider to ensure that the Iframe's dependencies are
 	// loaded. This is necessary because the Iframe component waits until
 	// the block editor store's `__internalIsInitialized` is true before
@@ -78,16 +90,30 @@ function SidebarNavigationScreenGlobalStylesContent() {
 			onChange={ noop }
 			onInput={ noop }
 		>
-			<StyleVariationsContainer />
+			<VStack
+				spacing={ 10 }
+				className="edit-site-global-styles-variation-container"
+			>
+				<StyleVariationsContainer gap={ gap } />
+				{ colorVariations?.length && (
+					<ColorVariations title={ __( 'Colors' ) } gap={ gap } />
+				) }
+				{ typographyVariations?.length && (
+					<TypographyVariations
+						title={ __( 'Typography' ) }
+						gap={ gap }
+					/>
+				) }
+			</VStack>
 		</BlockEditorProvider>
 	);
 }
 
-export default function SidebarNavigationScreenGlobalStyles() {
+export default function SidebarNavigationScreenGlobalStyles( { backPath } ) {
 	const { revisions, isLoading: isLoadingRevisions } =
 		useGlobalStylesRevisions();
-	const { openGeneralSidebar, setIsListViewOpened } =
-		useDispatch( editSiteStore );
+	const { openGeneralSidebar } = useDispatch( editSiteStore );
+	const { setIsListViewOpened } = useDispatch( editorStore );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const { setCanvasMode, setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
@@ -114,13 +140,15 @@ export default function SidebarNavigationScreenGlobalStyles() {
 		},
 		[]
 	);
+	const { set: setPreference } = useDispatch( preferencesStore );
 
 	const openGlobalStyles = useCallback( async () => {
 		return Promise.all( [
+			setPreference( 'core', 'distractionFree', false ),
 			setCanvasMode( 'edit' ),
 			openGeneralSidebar( 'edit-site/global-styles' ),
 		] );
-	}, [ setCanvasMode, openGeneralSidebar ] );
+	}, [ setCanvasMode, openGeneralSidebar, setPreference ] );
 
 	const openStyleBook = useCallback( async () => {
 		await openGlobalStyles();
@@ -157,6 +185,7 @@ export default function SidebarNavigationScreenGlobalStyles() {
 				description={ __(
 					'Choose a different style combination for the theme styles.'
 				) }
+				backPath={ backPath }
 				content={ <SidebarNavigationScreenGlobalStylesContent /> }
 				footer={
 					shouldShowGlobalStylesFooter && (

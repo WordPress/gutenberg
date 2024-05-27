@@ -3,15 +3,14 @@
  * External dependencies
  */
 import { useSelect } from 'downshift';
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
 import { Icon, check } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
-import { useCallback, useState } from '@wordpress/element';
-import deprecated from '@wordpress/deprecated';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -19,9 +18,9 @@ import deprecated from '@wordpress/deprecated';
 import { VisuallyHidden } from '../visually-hidden';
 import { Select as SelectControlSelect } from '../select-control/styles/select-control-styles';
 import SelectControlChevronDown from '../select-control/chevron-down';
-import { InputBaseWithBackCompatMinWidth } from './styles';
 import { StyledLabel } from '../base-control/styles/base-control-styles';
 import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
+import InputBase from '../input-control/input-base';
 
 const itemToString = ( item ) => item?.name;
 // This is needed so that in Windows, where
@@ -67,8 +66,6 @@ export default function CustomSelectControl( props ) {
 	const {
 		/** Start opting into the larger default height that will become the default size in a future version. */
 		__next40pxDefaultSize = false,
-		/** Start opting into the unconstrained width that will become the default in a future version. */
-		__nextUnconstrainedWidth = false,
 		className,
 		hideLabelFromVision,
 		label,
@@ -83,11 +80,7 @@ export default function CustomSelectControl( props ) {
 		onFocus,
 		onBlur,
 		__experimentalShowSelectedHint = false,
-	} = useDeprecated36pxDefaultSizeProp(
-		props,
-		'wp.components.CustomSelectControl',
-		'6.4'
-	);
+	} = useDeprecated36pxDefaultSizeProp( props );
 
 	const {
 		getLabelProps,
@@ -107,29 +100,6 @@ export default function CustomSelectControl( props ) {
 			: undefined ),
 		stateReducer,
 	} );
-
-	const [ isFocused, setIsFocused ] = useState( false );
-
-	function handleOnFocus( e ) {
-		setIsFocused( true );
-		onFocus?.( e );
-	}
-
-	function handleOnBlur( e ) {
-		setIsFocused( false );
-		onBlur?.( e );
-	}
-
-	if ( ! __nextUnconstrainedWidth ) {
-		deprecated(
-			'Constrained width styles for wp.components.CustomSelectControl',
-			{
-				since: '6.1',
-				version: '6.4',
-				hint: 'Set the `__nextUnconstrainedWidth` prop to true to start opting into the new styles, which will become the default in a future version',
-			}
-		);
-	}
 
 	function getDescribedBy() {
 		if ( describedBy ) {
@@ -165,10 +135,7 @@ export default function CustomSelectControl( props ) {
 	}
 	return (
 		<div
-			className={ classnames(
-				'components-custom-select-control',
-				className
-			) }
+			className={ clsx( 'components-custom-select-control', className ) }
 		>
 			{ hideLabelFromVision ? (
 				<VisuallyHidden as="label" { ...getLabelProps() }>
@@ -184,14 +151,8 @@ export default function CustomSelectControl( props ) {
 					{ label }
 				</StyledLabel>
 			) }
-			<InputBaseWithBackCompatMinWidth
+			<InputBase
 				__next40pxDefaultSize={ __next40pxDefaultSize }
-				__nextUnconstrainedWidth={ __nextUnconstrainedWidth }
-				isFocused={ isOpen || isFocused }
-				__unstableInputWidth={
-					__nextUnconstrainedWidth ? undefined : 'auto'
-				}
-				labelPosition={ __nextUnconstrainedWidth ? undefined : 'top' }
 				size={ size }
 				suffix={ <SelectControlChevronDown /> }
 			>
@@ -199,8 +160,8 @@ export default function CustomSelectControl( props ) {
 					onMouseOver={ onMouseOver }
 					onMouseOut={ onMouseOut }
 					as="button"
-					onFocus={ handleOnFocus }
-					onBlur={ handleOnBlur }
+					onFocus={ onFocus }
+					onBlur={ onBlur }
 					selectSize={ size }
 					__next40pxDefaultSize={ __next40pxDefaultSize }
 					{ ...getToggleButtonProps( {
@@ -219,46 +180,48 @@ export default function CustomSelectControl( props ) {
 							</span>
 						) }
 				</SelectControlSelect>
-			</InputBaseWithBackCompatMinWidth>
-			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
-			<ul { ...menuProps } onKeyDown={ onKeyDownHandler }>
-				{ isOpen &&
-					items.map( ( item, index ) => (
-						// eslint-disable-next-line react/jsx-key
-						<li
-							{ ...getItemProps( {
-								item,
-								index,
-								key: item.key,
-								className: classnames(
-									item.className,
-									'components-custom-select-control__item',
-									{
-										'is-highlighted':
-											index === highlightedIndex,
-										'has-hint': !! item.__experimentalHint,
-										'is-next-40px-default-size':
-											__next40pxDefaultSize,
-									}
-								),
-								style: item.style,
-							} ) }
-						>
-							{ item.name }
-							{ item.__experimentalHint && (
-								<span className="components-custom-select-control__item-hint">
-									{ item.__experimentalHint }
-								</span>
-							) }
-							{ item === selectedItem && (
-								<Icon
-									icon={ check }
-									className="components-custom-select-control__item-icon"
-								/>
-							) }
-						</li>
-					) ) }
-			</ul>
+				<div className="components-custom-select-control__menu-wrapper">
+					{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
+					<ul { ...menuProps } onKeyDown={ onKeyDownHandler }>
+						{ isOpen &&
+							items.map( ( item, index ) => (
+								<li
+									key={ item.key }
+									{ ...getItemProps( {
+										item,
+										index,
+										className: clsx(
+											item.className,
+											'components-custom-select-control__item',
+											{
+												'is-highlighted':
+													index === highlightedIndex,
+												'has-hint':
+													!! item.__experimentalHint,
+												'is-next-40px-default-size':
+													__next40pxDefaultSize,
+											}
+										),
+										style: item.style,
+									} ) }
+								>
+									{ item.name }
+									{ item.__experimentalHint && (
+										<span className="components-custom-select-control__item-hint">
+											{ item.__experimentalHint }
+										</span>
+									) }
+									{ item === selectedItem && (
+										<Icon
+											icon={ check }
+											className="components-custom-select-control__item-icon"
+										/>
+									) }
+								</li>
+							) ) }
+					</ul>
+				</div>
+			</InputBase>
 		</div>
 	);
 }

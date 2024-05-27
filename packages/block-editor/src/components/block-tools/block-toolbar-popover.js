@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
@@ -38,16 +38,10 @@ export default function BlockToolbarPopover( {
 	const { stopTyping } = useDispatch( blockEditorStore );
 	const isToolbarForced = useRef( false );
 
-	useShortcut(
-		'core/block-editor/focus-toolbar',
-		() => {
-			isToolbarForced.current = true;
-			stopTyping( true );
-		},
-		{
-			isDisabled: false,
-		}
-	);
+	useShortcut( 'core/block-editor/focus-toolbar', () => {
+		isToolbarForced.current = true;
+		stopTyping( true );
+	} );
 
 	useEffect( () => {
 		isToolbarForced.current = false;
@@ -63,12 +57,9 @@ export default function BlockToolbarPopover( {
 			<BlockPopover
 				clientId={ capturingClientId || clientId }
 				bottomClientId={ lastClientId }
-				className={ classnames(
-					'block-editor-block-list__block-popover',
-					{
-						'is-insertion-point-visible': isInsertionPointVisible,
-					}
-				) }
+				className={ clsx( 'block-editor-block-list__block-popover', {
+					'is-insertion-point-visible': isInsertionPointVisible,
+				} ) }
 				resize={ false }
 				{ ...popoverProps }
 			>

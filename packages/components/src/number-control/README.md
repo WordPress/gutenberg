@@ -46,9 +46,9 @@ If `isDragEnabled` is true, this controls the amount of `px` to have been dragge
 
 ### spinControls
 
- The type of spin controls to display. These are butons that allow the user to
+ The type of spin controls to display. These are buttons that allow the user to
  quickly increment and decrement the number.
- 
+
  - 'none' - Do not show spin controls.
  - 'native' - Use browser's native HTML `input` controls.
  - 'custom' - Use plus and minus icon buttons.

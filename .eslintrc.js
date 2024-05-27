@@ -47,11 +47,6 @@ const restrictedImports = [
 		message: 'Please use native functionality instead.',
 	},
 	{
-		name: 'reakit',
-		message:
-			'Please use Reakit API through `@wordpress/components` instead.',
-	},
-	{
 		name: '@ariakit/react',
 		message:
 			'Please use Ariakit API through `@wordpress/components` instead.',
@@ -60,10 +55,6 @@ const restrictedImports = [
 		name: 'redux',
 		importNames: [ 'combineReducers' ],
 		message: 'Please use `combineReducers` from `@wordpress/data` instead.',
-	},
-	{
-		name: 'puppeteer-testing-library',
-		message: '`puppeteer-testing-library` is still experimental.',
 	},
 	{
 		name: '@emotion/css',
@@ -85,6 +76,11 @@ const restrictedImports = [
 		message:
 			"edit-widgets is a WordPress top level package that shouldn't be imported into other packages",
 	},
+	{
+		name: 'classnames',
+		message:
+			"Please use `clsx` instead. It's a lighter and faster drop-in replacement for `classnames`.",
+	},
 ];
 
 module.exports = {
@@ -96,6 +92,7 @@ module.exports = {
 	],
 	globals: {
 		wp: 'off',
+		globalThis: 'readonly',
 	},
 	settings: {
 		jsdoc: {
@@ -106,8 +103,9 @@ module.exports = {
 	},
 	rules: {
 		'jest/expect-expect': 'off',
+		'react/jsx-boolean-value': 'error',
 		'@wordpress/dependency-group': 'error',
-		'@wordpress/is-gutenberg-plugin': 'error',
+		'@wordpress/wp-global-usage': 'error',
 		'@wordpress/react-no-unsafe-timeout': 'error',
 		'@wordpress/i18n-text-domain': [
 			'error',
@@ -363,6 +361,31 @@ module.exports = {
 		},
 		{
 			files: [ 'packages/components/src/**' ],
+			excludedFiles: [
+				'packages/components/src/utils/colors-values.js',
+				'packages/components/src/theme/**',
+			],
+			rules: {
+				'no-restricted-syntax': [
+					'error',
+					{
+						selector:
+							':matches(Literal[value=/--wp-admin-theme-/],TemplateElement[value.cooked=/--wp-admin-theme-/])',
+						message:
+							'--wp-admin-theme-* variables do not support component theming. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
+					},
+					{
+						selector:
+							// Allow overriding definitions, but not access with var()
+							':matches(Literal[value=/var\\(\\s*--wp-components-color-/],TemplateElement[value.cooked=/var\\(\\s*--wp-components-color-/])',
+						message:
+							'To ensure proper fallbacks, --wp-components-color-* variables should not be used directly. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
+					},
+				],
+			},
+		},
+		{
+			files: [ 'packages/components/src/**' ],
 			excludedFiles: [ 'packages/components/src/**/@(test|stories)/**' ],
 			plugins: [ 'ssr-friendly' ],
 			extends: [ 'plugin:ssr-friendly/recommended' ],
@@ -388,6 +411,30 @@ module.exports = {
 						],
 					},
 				],
+			},
+		},
+		{
+			files: [ 'packages/edit-post/**', 'packages/edit-site/**' ],
+			rules: {
+				'no-restricted-imports': [
+					'error',
+					{
+						paths: [
+							...restrictedImports,
+							{
+								name: '@wordpress/interface',
+								message:
+									'The edit-post and edit-site package should not directly import the interface package. They should import them from the private APIs of the editor package instead.',
+							},
+						],
+					},
+				],
+			},
+		},
+		{
+			files: [ 'packages/interactivity*/src/**' ],
+			rules: {
+				'react/react-in-jsx-scope': 'error',
 			},
 		},
 	],

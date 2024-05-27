@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -11,7 +11,7 @@ import { isRTL } from '@wordpress/i18n';
 
 export default function save( { attributes } ) {
 	const { align, content, dropCap, direction } = attributes;
-	const className = classnames( {
+	const className = clsx( {
 		'has-drop-cap':
 			align === ( isRTL() ? 'left' : 'right' ) || align === 'center'
 				? false

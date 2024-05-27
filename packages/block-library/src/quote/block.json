@@ -22,7 +22,7 @@
 			"selector": "cite",
 			"__experimentalRole": "content"
 		},
-		"align": {
+		"textAlign": {
 			"type": "string"
 		}
 	},
@@ -58,6 +58,9 @@
 		},
 		"spacing": {
 			"blockGap": true
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	},
 	"styles": [

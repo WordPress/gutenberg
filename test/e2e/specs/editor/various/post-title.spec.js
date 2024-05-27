@@ -7,6 +7,7 @@ test.describe( 'Post title', () => {
 	test.describe( 'Focus handling', () => {
 		test( 'should focus on the post title field when creating a new post in visual mode', async ( {
 			editor,
+			page,
 			admin,
 		} ) => {
 			await admin.createNewPost();
@@ -16,6 +17,13 @@ test.describe( 'Post title', () => {
 			} );
 
 			await expect( pageTitleField ).toBeFocused();
+			await page.keyboard.press( 'Enter' );
+			await expect(
+				editor.canvas.getByRole( 'document', {
+					name: 'Empty block',
+				} ),
+				'sould move focus to an empty paragraph block when the Enter key is pressed'
+			).toBeFocused();
 		} );
 
 		test( 'should focus on the post title field when creating a new post in code editor mode', async ( {

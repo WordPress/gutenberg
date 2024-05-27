@@ -181,7 +181,7 @@ function HeaderToolbar( {
 			<ScrollView
 				ref={ scrollViewRef }
 				onContentSizeChange={ scrollToStart }
-				horizontal={ true }
+				horizontal
 				showsHorizontalScrollIndicator={ false }
 				keyboardShouldPersistTaps="always"
 				alwaysBounceHorizontal={ false }

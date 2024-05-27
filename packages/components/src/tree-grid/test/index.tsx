@@ -123,7 +123,7 @@ describe( 'TreeGrid', () => {
 						level={ 1 }
 						positionInSet={ 1 }
 						setSize={ 3 }
-						isExpanded={ true }
+						isExpanded
 					>
 						<TreeGridCell withoutGridItem>
 							<TestButton aria-expanded="true">Row 1</TestButton>

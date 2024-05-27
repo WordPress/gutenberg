@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -35,7 +35,7 @@ export default function PostDateEdit( {
 	setAttributes,
 } ) {
 	const blockProps = useBlockProps( {
-		className: classnames( {
+		className: clsx( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 			[ `wp-block-post-date__modified-date` ]: displayType === 'modified',
 		} ),
@@ -108,40 +108,45 @@ export default function PostDateEdit( {
 						setAttributes( { textAlign: nextAlign } );
 					} }
 				/>
-				{ date && ! isDescendentOfQueryLoop && (
-					<ToolbarGroup>
-						<Dropdown
-							popoverProps={ popoverProps }
-							renderContent={ ( { onClose } ) => (
-								<PublishDateTimePicker
-									currentDate={ date }
-									onChange={ setDate }
-									is12Hour={ is12HourFormat(
-										siteTimeFormat
-									) }
-									onClose={ onClose }
-								/>
-							) }
-							renderToggle={ ( { isOpen, onToggle } ) => {
-								const openOnArrowDown = ( event ) => {
-									if ( ! isOpen && event.keyCode === DOWN ) {
-										event.preventDefault();
-										onToggle();
-									}
-								};
-								return (
-									<ToolbarButton
-										aria-expanded={ isOpen }
-										icon={ edit }
-										title={ __( 'Change Date' ) }
-										onClick={ onToggle }
-										onKeyDown={ openOnArrowDown }
+				{ date &&
+					displayType === 'date' &&
+					! isDescendentOfQueryLoop && (
+						<ToolbarGroup>
+							<Dropdown
+								popoverProps={ popoverProps }
+								renderContent={ ( { onClose } ) => (
+									<PublishDateTimePicker
+										currentDate={ date }
+										onChange={ setDate }
+										is12Hour={ is12HourFormat(
+											siteTimeFormat
+										) }
+										onClose={ onClose }
 									/>
-								);
-							} }
-						/>
-					</ToolbarGroup>
-				) }
+								) }
+								renderToggle={ ( { isOpen, onToggle } ) => {
+									const openOnArrowDown = ( event ) => {
+										if (
+											! isOpen &&
+											event.keyCode === DOWN
+										) {
+											event.preventDefault();
+											onToggle();
+										}
+									};
+									return (
+										<ToolbarButton
+											aria-expanded={ isOpen }
+											icon={ edit }
+											title={ __( 'Change Date' ) }
+											onClick={ onToggle }
+											onKeyDown={ openOnArrowDown }
+										/>
+									);
+								} }
+							/>
+						</ToolbarGroup>
+					) }
 			</BlockControls>
 
 			<InspectorControls>

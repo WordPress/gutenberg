@@ -1,8 +1,3 @@
-/**
- * WordPress dependencies
- */
-import { __ } from '@wordpress/i18n';
-
 export const PATTERN_TYPES = {
 	theme: 'pattern',
 	user: 'wp_block',
@@ -22,5 +17,10 @@ export const PATTERN_SYNC_TYPES = {
 
 // TODO: This should not be hardcoded. Maybe there should be a config and/or an UI.
 export const PARTIAL_SYNCING_SUPPORTED_BLOCKS = {
-	'core/paragraph': { content: __( 'Content' ) },
+	'core/paragraph': [ 'content' ],
+	'core/heading': [ 'content' ],
+	'core/button': [ 'text', 'url', 'linkTarget', 'rel' ],
+	'core/image': [ 'id', 'url', 'title', 'alt' ],
 };
+
+export const PATTERN_OVERRIDES_BINDING_SOURCE = 'core/pattern-overrides';

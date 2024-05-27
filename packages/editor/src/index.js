@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
+import './bindings';
 import './hooks';
 
 export { storeConfig, store } from './store';

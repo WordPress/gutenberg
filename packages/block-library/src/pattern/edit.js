@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { cloneBlock } from '@wordpress/blocks';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { useState, useEffect } from '@wordpress/element';
 import {
 	Warning,
@@ -18,6 +18,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { useParsePatternDependencies } from './recursion-detector';
 
 const PatternEdit = ( { attributes, clientId } ) => {
+	const registry = useRegistry();
 	const selectedPattern = useSelect(
 		( select ) =>
 			select( blockEditorStore ).__experimentalGetParsedPattern(
@@ -42,7 +43,7 @@ const PatternEdit = ( { attributes, clientId } ) => {
 	const [ hasRecursionError, setHasRecursionError ] = useState( false );
 	const parsePatternDependencies = useParsePatternDependencies();
 
-	// Duplicated in packages/edit-site/src/components/start-template-options/index.js.
+	// Duplicated in packages/editor/src/components/start-template-options/index.js.
 	function injectThemeAttributeInBlockTemplateContent( block ) {
 		if (
 			block.innerBlocks.find(
@@ -96,16 +97,36 @@ const PatternEdit = ( { attributes, clientId } ) => {
 						injectThemeAttributeInBlockTemplateContent( block )
 					)
 				);
+				// If the pattern has a single block and categories, we should add the
+				// categories of the pattern to the block's metadata.
+				if (
+					clonedBlocks.length === 1 &&
+					selectedPattern.categories?.length > 0
+				) {
+					clonedBlocks[ 0 ].attributes = {
+						...clonedBlocks[ 0 ].attributes,
+						metadata: {
+							...clonedBlocks[ 0 ].attributes.metadata,
+							categories: selectedPattern.categories,
+							patternName: selectedPattern.name,
+							name:
+								clonedBlocks[ 0 ].attributes.metadata.name ||
+								selectedPattern.title,
+						},
+					};
+				}
 				const rootEditingMode = getBlockEditingMode( rootClientId );
-				// Temporarily set the root block to default mode to allow replacing the pattern.
-				// This could happen when the page is disabling edits of non-content blocks.
-				__unstableMarkNextChangeAsNotPersistent();
-				setBlockEditingMode( rootClientId, 'default' );
-				__unstableMarkNextChangeAsNotPersistent();
-				replaceBlocks( clientId, clonedBlocks );
-				// Restore the root block's original mode.
-				__unstableMarkNextChangeAsNotPersistent();
-				setBlockEditingMode( rootClientId, rootEditingMode );
+				registry.batch( () => {
+					// Temporarily set the root block to default mode to allow replacing the pattern.
+					// This could happen when the page is disabling edits of non-content blocks.
+					__unstableMarkNextChangeAsNotPersistent();
+					setBlockEditingMode( rootClientId, 'default' );
+					__unstableMarkNextChangeAsNotPersistent();
+					replaceBlocks( clientId, clonedBlocks );
+					// Restore the root block's original mode.
+					__unstableMarkNextChangeAsNotPersistent();
+					setBlockEditingMode( rootClientId, rootEditingMode );
+				} );
 			} );
 		}
 	}, [

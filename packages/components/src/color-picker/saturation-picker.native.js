@@ -56,8 +56,12 @@ export default class SaturationValuePicker extends Component {
 	}
 
 	normalizeValue( value ) {
-		if ( value < 0 ) return 0;
-		if ( value > 1 ) return 1;
+		if ( value < 0 ) {
+			return 0;
+		}
+		if ( value > 1 ) {
+			return 1;
+		}
 		return value;
 	}
 

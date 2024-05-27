@@ -2,10 +2,14 @@
 
 This webpack plugin serves two purposes:
 
--   Externalize dependencies that are available as script dependencies on modern WordPress sites.
--   Add an asset file for each entry point that declares an object with the list of WordPress script dependencies for the entry point. The asset file also contains the current version calculated for the current source code.
+-   Externalize dependencies that are available as shared scripts or modules on WordPress sites.
+-   Add an asset file for each entry point that declares an object with the list of WordPress script or module dependencies for the entry point. The asset file also contains the current version calculated for the current source code.
 
 This allows JavaScript bundles produced by webpack to leverage WordPress style dependency sharing without an error-prone process of manually maintaining a dependency list.
+
+Version 5 of this plugin adds support for module bundling. [Webpack's `output.module` option](https://webpack.js.org/configuration/output/#outputmodule) should
+be used to opt-in to this behavior. This plugin will adapt it's behavior based on the
+`output.module` option, producing an asset file suitable for use with the WordPress Module API.
 
 Consult the [webpack website](https://webpack.js.org) for additional information on webpack concepts.
 
@@ -17,7 +21,7 @@ Install the module
 npm install @wordpress/dependency-extraction-webpack-plugin --save-dev
 ```
 
-**Note**: This package requires Node.js 14.0.0 or later. It also requires webpack 4.8.3 and newer. It is not compatible with older versions.
+**Note**: This package requires Node.js version with long-term support status (check [Active LTS or Maintenance LTS releases](https://nodejs.org/en/about/previous-releases)). It also requires webpack 5.0.0 or newer. It is not compatible with older versions.
 
 ## Usage
 
@@ -39,7 +43,7 @@ module.exports = {
 
 ```js
 const defaultConfig = require( '@wordpress/scripts/config/webpack.config' );
-const config = {
+const webpackConfig = {
 	...defaultConfig,
 	plugins: [
 		...defaultConfig.plugins.filter(
@@ -56,7 +60,9 @@ const config = {
 };
 ```
 
-Each entry point in the webpack bundle will include an asset file that declares the WordPress script dependencies that should be enqueued. Such file also contains the unique version hash calculated based on the file content.
+### Behavior with scripts
+
+Each entry point in the webpack bundle will include an asset file that declares the WordPress script dependencies that should be enqueued. This file also contains the unique version hash calculated based on the file content.
 
 For example:
 
@@ -85,6 +91,68 @@ By default, the following module requests are handled:
 | `react`                      | `React`              | `react`       |
 
 **Note:** This plugin overlaps with the functionality provided by [webpack `externals`](https://webpack.js.org/configuration/externals). This plugin is intended to extract script handles from bundle compilation so that a list of script dependencies does not need to be manually maintained. If you don't need to extract a list of script dependencies, use the `externals` option directly.
+
+This plugin is compatible with `externals`, but they may conflict. For example, adding `{ externals: { '@wordpress/blob': 'wp.blob' } }` to webpack configuration will effectively hide the `@wordpress/blob` module from the plugin and it will not be included in dependency lists.
+
+### Behavior with script modules
+
+**Warning:** Script modules support is considered experimental at this time.
+
+This section describes the behavior of this package to bundle ECMAScript modules and generate asset
+files suitable for use with the WordPress Script Modules API.
+
+Some of this plugin's options change, and webpack requires configuration to output script modules. Refer to
+[webpack's documentation](https://webpack.js.org/configuration/output/#outputmodule) for up-to-date details.
+
+```js
+const webpackConfig = {
+	...defaultConfig,
+
+	// These lines are necessary to enable module compilation at time-of-writing:
+	output: { module: true },
+	experiments: { outputModule: true },
+
+	plugins: [
+		...defaultConfig.plugins.filter(
+			( plugin ) =>
+				plugin.constructor.name !== 'DependencyExtractionWebpackPlugin'
+		),
+		new DependencyExtractionWebpackPlugin( {
+			// With modules, use `requestToExternalModule`:
+			requestToExternalModule( request ) {
+				if ( request === 'my-registered-module' ) {
+					return request;
+				}
+			},
+		} ),
+	],
+};
+```
+
+Each entry point in the webpack bundle will include an asset file that declares the WordPress script module dependencies that should be enqueued. This file also contains the unique version hash calculated based on the file content.
+
+For example:
+
+```
+// Source file entrypoint.js
+import { store, getContext } from '@wordpress/interactivity';
+
+// Webpack will produce the output output/entrypoint.js
+/* bundled JavaScript output */
+
+// Webpack will also produce output/entrypoint.asset.php declaring script dependencies
+<?php return array('dependencies' => array('@wordpress/interactivity'), 'version' => 'dd4c2dc50d046ed9d4c063a7ca95702f');
+```
+
+By default, the following script module requests are handled:
+
+| Request                      |
+| ---------------------------- |
+| `@wordpress/interactivity  ` |
+
+(`@wordpress/interactivity` is currently the only available WordPress script module.)
+
+**Note:** This plugin overlaps with the functionality provided by [webpack `externals`](https://webpack.js.org/configuration/externals). This plugin is intended to extract script module identifiers from bundle compilation so that a list of script module dependencies does not need to be manually maintained. If you don't need to extract a list of script module dependencies, use the `externals` option directly.
 
 This plugin is compatible with `externals`, but they may conflict. For example, adding `{ externals: { '@wordpress/blob': 'wp.blob' } }` to webpack configuration will effectively hide the `@wordpress/blob` module from the plugin and it will not be included in dependency lists.
 
@@ -142,6 +210,8 @@ Pass `useDefaults: false` to disable the default request handling.
 
 Force `wp-polyfill` to be included in each entry point's dependency list. This would be the same as adding `import '@wordpress/polyfill';` to each entry point.
 
+**Note**: This option is not available with script modules.
+
 ##### `externalizedReport`
 
 -   Type: boolean | string
@@ -151,6 +221,8 @@ Report all externalized dependencies as an array in JSON format. It could be use
 You can provide a filename, or set it to `true` to report to a default `externalized-dependencies.json`.
 
 ##### `requestToExternal`
+
+**Note**: This option is not available with script modules. See [`requestToExternalModule`](#requestToExternalModule) for module usage.
 
 -   Type: function
 
@@ -179,7 +251,45 @@ module.exports = {
 };
 ```
 
+##### `requestToExternalModule`
+
+**Note**: This option is only available with script modules. See [`requestToExternal`](#requestToExternal) for script usage.
+
+-   Type: function
+
+`requestToExternalModule` allows the script module handling to be customized. The function should accept a script module request string and may return a string representing the script module to use. Often, the script module will have the same name.
+
+`requestToExternalModule` provided via configuration has precedence over default external handling. Unhandled requests will be handled by the default unless `useDefaults` is set to `false`.
+
+```js
+/**
+ * Externalize 'my-module'
+ *
+ * @param {string} request Requested script module
+ *
+ * @return {(string|boolean|undefined)} Script module ID
+ */
+function requestToExternalModule( request ) {
+	// Handle imports like `import myModule from 'my-module'`
+	if ( request === 'my-module' ) {
+		// Import should be of the form `import { something } from "myModule";` in the final bundle.
+		return 'myModule';
+	}
+
+	// If the script module ID in source is the same as the external script module, `true` can be returned.
+	return request === 'external-module-id-no-change-required';
+}
+
+module.exports = {
+	plugins: [
+		new DependencyExtractionWebpackPlugin( { requestToExternalModule } ),
+	],
+};
+```
+
 ##### `requestToHandle`
+
+**Note**: This option is not available with script modules. It has no corresponding module configuration.
 
 -   Type: function
 
@@ -207,7 +317,7 @@ function requestToHandle( request ) {
 }
 
 module.exports = {
-	plugins: [ new DependencyExtractionWebpackPlugin( { requestToExternal } ) ],
+	plugins: [ new DependencyExtractionWebpackPlugin( { requestToHandle } ) ],
 };
 ```
 
@@ -231,6 +341,19 @@ $script_asset      = file_exists( $script_asset_path )
 	: array( 'dependencies' => array(), 'version' => filemtime( $script_path ) );
 $script_url = plugins_url( $script_path, __FILE__ );
 wp_enqueue_script( 'script', $script_url, $script_asset['dependencies'], $script_asset['version'] );
+```
+
+Or with modules (the Script Module API is only available in WordPress > 6.5):
+
+```php
+$module_path       = 'path/to/module.js';
+$module_asset_path = 'path/to/module.asset.php';
+$module_asset      = file_exists( $module_asset_path )
+	? require( $module_asset_path )
+	: array( 'dependencies' => array(), 'version' => filemtime( $module_path ) );
+$module_url = plugins_url( $module_path, __FILE__ );
+wp_register_script_module( 'my-module', $module_url, $module_asset['dependencies'], $module_asset['version'] );
+wp_enqueue_script_module( 'my-module' );
 ```
 
 ## Contributing to this package

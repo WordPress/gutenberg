@@ -2,6 +2,31 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Variables like `process.env.IS_GUTENBERG_PLUGIN` have been replaced by `globalThis.IS_GUTENBERG_PLUGIN`. Build systems using `process.env` should be updated ([#61486](https://github.com/WordPress/gutenberg/pull/61486)).
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 6.35.0 (2024-05-16)
+
+## 6.34.0 (2024-05-02)
+
+## 6.33.0 (2024-04-19)
+
+## 6.32.0 (2024-04-03)
+
+## 6.31.0 (2024-03-21)
+
+## 6.30.0 (2024-03-06)
+
+## 6.29.0 (2024-02-21)
+
+## 6.28.0 (2024-02-09)
+
+## 6.27.0 (2024-01-24)
+
+## 6.26.0 (2024-01-10)
+
 ## 6.25.0 (2023-12-13)
 
 ## 6.24.0 (2023-11-29)
@@ -77,7 +102,7 @@
 
 ### Breaking Changes
 
-–   Add TypeScript types to the built package (via "types": "build-types" in the package.json)
+– Add TypeScript types to the built package (via "types": "build-types" in the package.json)
 
 ## 4.14.0 (2022-08-24)
 
@@ -112,6 +137,7 @@
 ## 4.3.0 (2022-03-23)
 
 ### New Features
+
 -   The saveEntityRecord, saveEditedEntityRecord, and deleteEntityRecord actions now accept an optional throwOnError option (defaults to false). When set to true, any exceptions occurring when the action was executing are re-thrown, causing dispatch().saveEntityRecord() to reject with an error. ([#39258](https://github.com/WordPress/gutenberg/pull/39258))
 -   Added support for fetching block patterns and their categories, with the `getBlockPatterns` and `getBlockPatternCategories` selectors.
 

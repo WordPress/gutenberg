@@ -1,14 +1,13 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
 import {
 	Disabled,
-	TabPanel,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
@@ -25,9 +24,10 @@ import {
 	__unstableEditorStyles as EditorStyles,
 	__unstableIframe as Iframe,
 } from '@wordpress/block-editor';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { useSelect } from '@wordpress/data';
 import { useResizeObserver } from '@wordpress/compose';
-import { useMemo, useState, memo } from '@wordpress/element';
+import { useMemo, useState, memo, useContext } from '@wordpress/element';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 
 /**
@@ -36,14 +36,19 @@ import { ENTER, SPACE } from '@wordpress/keycodes';
 import { unlock } from '../../lock-unlock';
 import EditorCanvasContainer from '../editor-canvas-container';
 
-const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
-	blockEditorPrivateApis
-);
+const {
+	ExperimentalBlockEditorProvider,
+	useGlobalStyle,
+	GlobalStylesContext,
+	useGlobalStylesOutputWithConfig,
+} = unlock( blockEditorPrivateApis );
+const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
 
 const {
 	CompositeV2: Composite,
 	CompositeItemV2: CompositeItem,
 	useCompositeStoreV2: useCompositeStore,
+	Tabs,
 } = unlock( componentsPrivateApis );
 
 // The content area of the Style Book is rendered within an iframe so that global styles
@@ -118,6 +123,10 @@ const STYLE_BOOK_IFRAME_STYLES = `
 	}
 `;
 
+function isObjectEmpty( object ) {
+	return ! object || Object.keys( object ).length === 0;
+}
+
 function getExamples() {
 	// Use our own example for the Heading block so that we can show multiple
 	// heading levels.
@@ -174,12 +183,14 @@ function StyleBook( {
 	onClick,
 	onSelect,
 	showCloseButton = true,
+	onClose,
 	showTabs = true,
+	userConfig = {},
 } ) {
 	const [ resizeObserver, sizes ] = useResizeObserver();
 	const [ textColor ] = useGlobalStyle( 'color.text' );
 	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
-	const examples = useMemo( getExamples, [] );
+	const [ examples ] = useState( getExamples );
 	const tabs = useMemo(
 		() =>
 			getCategories()
@@ -195,25 +206,42 @@ function StyleBook( {
 				} ) ),
 		[ examples ]
 	);
+	const { base: baseConfig } = useContext( GlobalStylesContext );
 
+	const mergedConfig = useMemo( () => {
+		if ( ! isObjectEmpty( userConfig ) && ! isObjectEmpty( baseConfig ) ) {
+			return mergeBaseAndUserConfigs( baseConfig, userConfig );
+		}
+		return {};
+	}, [ baseConfig, userConfig ] );
+
+	// Copied from packages/edit-site/src/components/revisions/index.js
+	// could we create a shared hook?
 	const originalSettings = useSelect(
 		( select ) => select( blockEditorStore ).getSettings(),
 		[]
 	);
+
 	const settings = useMemo(
 		() => ( { ...originalSettings, __unstableIsPreviewMode: true } ),
 		[ originalSettings ]
 	);
 
+	const [ globalStyles ] = useGlobalStylesOutputWithConfig( mergedConfig );
+
+	settings.styles =
+		! isObjectEmpty( globalStyles ) && ! isObjectEmpty( userConfig )
+			? globalStyles
+			: settings.styles;
+
 	return (
 		<EditorCanvasContainer
+			onClose={ onClose }
 			enableResizing={ enableResizing }
-			closeButtonLabel={
-				showCloseButton ? __( 'Close Style Book' ) : null
-			}
+			closeButtonLabel={ showCloseButton ? __( 'Close' ) : null }
 		>
 			<div
-				className={ classnames( 'edit-site-style-book', {
+				className={ clsx( 'edit-site-style-book', {
 					'is-wide': sizes.width > 600,
 					'is-button': !! onClick,
 				} ) }
@@ -224,22 +252,37 @@ function StyleBook( {
 			>
 				{ resizeObserver }
 				{ showTabs ? (
-					<TabPanel
-						className="edit-site-style-book__tab-panel"
-						tabs={ tabs }
-					>
-						{ ( tab ) => (
-							<StyleBookBody
-								category={ tab.name }
-								examples={ examples }
-								isSelected={ isSelected }
-								onSelect={ onSelect }
-								settings={ settings }
-								sizes={ sizes }
-								title={ tab.title }
-							/>
-						) }
-					</TabPanel>
+					<div className="edit-site-style-book__tabs">
+						<Tabs>
+							<Tabs.TabList>
+								{ tabs.map( ( tab ) => (
+									<Tabs.Tab
+										tabId={ tab.name }
+										key={ tab.name }
+									>
+										{ tab.title }
+									</Tabs.Tab>
+								) ) }
+							</Tabs.TabList>
+							{ tabs.map( ( tab ) => (
+								<Tabs.TabPanel
+									key={ tab.name }
+									tabId={ tab.name }
+									focusable={ false }
+								>
+									<StyleBookBody
+										category={ tab.name }
+										examples={ examples }
+										isSelected={ isSelected }
+										onSelect={ onSelect }
+										settings={ settings }
+										sizes={ sizes }
+										title={ tab.title }
+									/>
+								</Tabs.TabPanel>
+							) ) }
+						</Tabs>
+					</div>
 				) : (
 					<StyleBookBody
 						examples={ examples }
@@ -301,7 +344,7 @@ const StyleBookBody = ( {
 
 	return (
 		<Iframe
-			className={ classnames( 'edit-site-style-book__iframe', {
+			className={ clsx( 'edit-site-style-book__iframe', {
 				'is-focused': isFocused && !! onClick,
 				'is-button': !! onClick,
 			} ) }
@@ -321,7 +364,7 @@ const StyleBookBody = ( {
 				}
 			</style>
 			<Examples
-				className={ classnames( 'edit-site-style-book__examples', {
+				className={ clsx( 'edit-site-style-book__examples', {
 					'is-wide': sizes.width > 600,
 				} ) }
 				examples={ examples }
@@ -381,7 +424,11 @@ const Example = ( { id, title, blocks, isSelected, onClick } ) => {
 		[]
 	);
 	const settings = useMemo(
-		() => ( { ...originalSettings, __unstableIsPreviewMode: true } ),
+		() => ( {
+			...originalSettings,
+			focusMode: false, // Disable "Spotlight mode".
+			__unstableIsPreviewMode: true,
+		} ),
 		[ originalSettings ]
 	);
 
@@ -395,7 +442,7 @@ const Example = ( { id, title, blocks, isSelected, onClick } ) => {
 		<div role="row">
 			<div role="gridcell">
 				<CompositeItem
-					className={ classnames( 'edit-site-style-book__example', {
+					className={ clsx( 'edit-site-style-book__example', {
 						'is-selected': isSelected,
 					} ) }
 					id={ id }

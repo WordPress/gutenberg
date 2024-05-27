@@ -306,19 +306,11 @@ const clickBeginningOfElement = async ( driver, element ) => {
 		.perform();
 };
 
-// Long press to activate context menu.
-const longPressMiddleOfElement = async (
+async function longPressElement(
 	driver,
 	element,
-	waitTime = 1000,
-	customElementSize
-) => {
-	const location = await element.getLocation();
-	const size = customElementSize || ( await element.getSize() );
-
-	const x = location.x + size.width / 2;
-	const y = location.y + size.height / 2;
-
+	{ waitTime = 1000, offset = { x: 0, y: 0 } } = {}
+) {
 	// Focus on the element first, otherwise on iOS it fails to open the context menu.
 	// We can't do it all in one action because it detects it as a force press and it
 	// is not supported by the simulator.
@@ -331,16 +323,43 @@ const longPressMiddleOfElement = async (
 		.up()
 		.perform();
 
+	const location = await element.getLocation();
+	const size = await element.getSize();
+
+	let offsetX = offset.x;
+	if ( typeof offset.x === 'function' ) {
+		offsetX = offset.x( size.width );
+	}
+	let offsetY = offset.y;
+	if ( typeof offset.y === 'function' ) {
+		offsetY = offset.y( size.height );
+	}
+
 	// Long-press
 	await driver
 		.action( 'pointer', {
 			parameters: { pointerType: 'touch' },
 		} )
-		.move( { x, y } )
+		.move( { x: location.x + offsetX, y: location.y + offsetY } )
 		.down()
 		.pause( waitTime )
 		.up()
 		.perform();
+}
+
+// Long press to activate context menu.
+const longPressMiddleOfElement = async (
+	driver,
+	element,
+	{ waitTime = 1000 } = {}
+) => {
+	await longPressElement( driver, element, {
+		waitTime,
+		offset: {
+			x: ( width ) => width / 2,
+			y: ( height ) => height / 2,
+		},
+	} );
 };
 
 const tapStatusBariOS = async ( driver ) => {
@@ -399,13 +418,20 @@ const selectTextFromElement = async ( driver, element ) => {
 	}
 };
 
-// Starts from the middle of the screen or the element(if specified)
-// and swipes upwards.
+/**
+ * Starts from the middle of the screen or the element(if specified)
+ * and swipes upwards.
+ *
+ * @param {Object} driver                  WebdriverIO driver
+ * @param {Object} element                 Element to swipe from
+ * @param {Object} options                 Options
+ * @param {number} options.delay           Delay between the swipe and the next action
+ * @param {number} options.endYCoefficient Multiplier for the end Y coordinate
+ */
 const swipeUp = async (
 	driver,
 	element = undefined,
-	delay = 3000,
-	endYCoefficient = 0.5
+	{ delay = 3000, endYCoefficient = 0.5 } = {}
 ) => {
 	let size = await driver.getWindowSize();
 	let y = 0;
@@ -446,15 +472,25 @@ const swipeFromTo = async (
 		.pause( delay )
 		.perform();
 
-// Starts from the middle of the screen and swipes downwards
-const swipeDown = async ( driver, delay = 3000 ) => {
+/**
+ * Starts from the middle of the screen and swipes downwards
+ *
+ * @param {Object} driver                  WebdriverIO driver
+ * @param {Object} options                 Options
+ * @param {number} options.delay           Delay between the swipe and the next action
+ * @param {number} options.endYCoefficient Multiplier for the end Y coordinate
+ */
+const swipeDown = async (
+	driver,
+	{ delay = 3000, endYCoefficient = 0.5 } = {}
+) => {
 	const size = await driver.getWindowSize();
 	const y = 0;
 
 	const startX = size.width / 2;
 	const startY = y + size.height / 3;
 	const endX = startX;
-	const endY = startY - startY * -1 * 0.5;
+	const endY = startY - startY * -1 * endYCoefficient;
 
 	await swipeFromTo(
 		driver,
@@ -717,6 +753,7 @@ module.exports = {
 	isElementVisible,
 	isLocalEnvironment,
 	launchApp,
+	longPressElement,
 	longPressMiddleOfElement,
 	selectTextFromElement,
 	setupDriver,

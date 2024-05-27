@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -19,7 +19,6 @@ import {
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
-import { NavigableRegion } from '@wordpress/interface';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import {
 	CommandMenu,
@@ -28,21 +27,19 @@ import {
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	privateApis as blockEditorPrivateApis,
-	useBlockCommands,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
+import {
+	EditorSnackbars,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import Sidebar from '../sidebar';
-import Editor from '../editor';
 import ErrorBoundary from '../error-boundary';
 import { store as editSiteStore } from '../../store';
-import getIsListPage from '../../utils/get-is-list-page';
-import Header from '../header-edit-mode';
 import useInitEditedEntityFromURL from '../sync-state-with-url/use-init-edited-entity-from-url';
 import SiteHub from '../site-hub';
 import ResizableFrame from '../resizable-frame';
@@ -53,15 +50,18 @@ import KeyboardShortcutsRegister from '../keyboard-shortcuts/register';
 import KeyboardShortcutsGlobal from '../keyboard-shortcuts/global';
 import { useCommonCommands } from '../../hooks/commands/use-common-commands';
 import { useEditModeCommands } from '../../hooks/commands/use-edit-mode-commands';
-import PageMain from '../page-main';
 import { useIsSiteEditorLoading } from './hooks';
+import useLayoutAreas from './router';
+import useMovingAnimation from './animation';
+import SidebarContent from '../sidebar';
+import SaveHub from '../save-hub';
 
 const { useCommands } = unlock( coreCommandsPrivateApis );
 const { useCommandContext } = unlock( commandsPrivateApis );
-const { useLocation } = unlock( routerPrivateApis );
 const { useGlobalStyle } = unlock( blockEditorPrivateApis );
+const { NavigableRegion } = unlock( editorPrivateApis );
 
-const ANIMATION_DURATION = 0.5;
+const ANIMATION_DURATION = 0.3;
 
 export default function Layout() {
 	// This ensures the edited entity id and type are initialized properly.
@@ -70,12 +70,8 @@ export default function Layout() {
 	useCommands();
 	useEditModeCommands();
 	useCommonCommands();
-	useBlockCommands();
 
-	const { params } = useLocation();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const isListPage = getIsListPage( params, isMobileViewport );
-	const isEditorPage = ! isListPage;
 
 	const {
 		isDistractionFree,
@@ -84,6 +80,7 @@ export default function Layout() {
 		canvasMode,
 		previousShortcut,
 		nextShortcut,
+		hasBlockBreadcrumbs,
 	} = useSelect( ( select ) => {
 		const { getAllShortcutKeyCombinations } = select(
 			keyboardShortcutsStore
@@ -92,45 +89,41 @@ export default function Layout() {
 		return {
 			canvasMode: getCanvasMode(),
 			previousShortcut: getAllShortcutKeyCombinations(
-				'core/edit-site/previous-region'
+				'core/editor/previous-region'
 			),
 			nextShortcut: getAllShortcutKeyCombinations(
-				'core/edit-site/next-region'
+				'core/editor/next-region'
 			),
 			hasFixedToolbar: select( preferencesStore ).get(
-				'core/edit-site',
+				'core',
 				'fixedToolbar'
 			),
 			isDistractionFree: select( preferencesStore ).get(
-				'core/edit-site',
+				'core',
 				'distractionFree'
+			),
+			hasBlockBreadcrumbs: select( preferencesStore ).get(
+				'core',
+				'showBlockBreadcrumbs'
 			),
 			hasBlockSelected:
 				select( blockEditorStore ).getBlockSelectionStart(),
 		};
 	}, [] );
-	const isEditing = canvasMode === 'edit';
 	const navigateRegionsProps = useNavigateRegions( {
 		previous: previousShortcut,
 		next: nextShortcut,
 	} );
 	const disableMotion = useReducedMotion();
-	const showSidebar =
-		( isMobileViewport && canvasMode === 'view' && ! isListPage ) ||
-		( ! isMobileViewport && ( canvasMode === 'view' || ! isEditorPage ) );
-	const showCanvas =
-		( isMobileViewport && isEditorPage && isEditing ) ||
-		! isMobileViewport ||
-		! isEditorPage;
-	const isFullCanvas =
-		( isMobileViewport && isListPage ) || ( isEditorPage && isEditing );
 	const [ canvasResizer, canvasSize ] = useResizeObserver();
 	const [ fullResizer ] = useResizeObserver();
 	const isEditorLoading = useIsSiteEditorLoading();
 	const [ isResizableFrameOversized, setIsResizableFrameOversized ] =
 		useState( false );
-	const [ listViewToggleElement, setListViewToggleElement ] =
-		useState( null );
+	const { key: routeKey, areas, widths } = useLayoutAreas();
+	const animationRef = useMovingAnimation( {
+		triggerAnimationOnChange: canvasMode + '__' + routeKey,
+	} );
 
 	// This determines which animation variant should apply to the header.
 	// There is also a `isDistractionFreeHovering` state that gets priority
@@ -156,8 +149,8 @@ export default function Layout() {
 	// Sets the right context for the command palette
 	let commandContext = 'site-editor';
 
-	if ( canvasMode === 'edit' && isEditorPage ) {
-		commandContext = 'site-editor-edit';
+	if ( canvasMode === 'edit' ) {
+		commandContext = 'entity-edit';
 	}
 	if ( hasBlockSelected ) {
 		commandContext = 'block-selection-edit';
@@ -183,15 +176,19 @@ export default function Layout() {
 			<div
 				{ ...navigateRegionsProps }
 				ref={ navigateRegionsProps.ref }
-				className={ classnames(
+				className={ clsx(
 					'edit-site-layout',
 					navigateRegionsProps.className,
 					{
-						'is-distraction-free': isDistractionFree && isEditing,
-						'is-full-canvas': isFullCanvas,
-						'is-edit-mode': isEditing,
+						'is-distraction-free':
+							isDistractionFree && canvasMode === 'edit',
+						'is-full-canvas': canvasMode === 'edit',
 						'has-fixed-toolbar': hasFixedToolbar,
 						'is-block-toolbar-visible': hasBlockSelected,
+						'has-block-breadcrumbs':
+							hasBlockBreadcrumbs &&
+							! isDistractionFree &&
+							canvasMode === 'edit',
 					}
 				) }
 			>
@@ -228,44 +225,6 @@ export default function Layout() {
 						isTransparent={ isResizableFrameOversized }
 						className="edit-site-layout__hub"
 					/>
-
-					<AnimatePresence initial={ false }>
-						{ isEditorPage && isEditing && (
-							<NavigableRegion
-								key="header"
-								className="edit-site-layout__header"
-								ariaLabel={ __( 'Editor top bar' ) }
-								as={ motion.div }
-								variants={ {
-									isDistractionFree: { opacity: 0, y: 0 },
-									isDistractionFreeHovering: {
-										opacity: 1,
-										y: 0,
-									},
-									view: { opacity: 1, y: '-100%' },
-									edit: { opacity: 1, y: 0 },
-								} }
-								exit={ {
-									y: '-100%',
-								} }
-								initial={ {
-									opacity: isDistractionFree ? 1 : 0,
-									y: isDistractionFree ? 0 : '-100%',
-								} }
-								transition={ {
-									type: 'tween',
-									duration: disableMotion ? 0 : 0.2,
-									ease: 'easeOut',
-								} }
-							>
-								<Header
-									setListViewToggleElement={
-										setListViewToggleElement
-									}
-								/>
-							</NavigableRegion>
-						) }
-					</AnimatePresence>
 				</motion.div>
 
 				<div className="edit-site-layout__content">
@@ -273,116 +232,108 @@ export default function Layout() {
 						The NavigableRegion must always be rendered and not use
 						`inert` otherwise `useNavigateRegions` will fail.
 					*/ }
-					<NavigableRegion
-						ariaLabel={ __( 'Navigation' ) }
-						className="edit-site-layout__sidebar-region"
-					>
-						<AnimatePresence>
-							{ showSidebar && (
-								<motion.div
-									initial={ { opacity: 0 } }
-									animate={ { opacity: 1 } }
-									exit={ { opacity: 0 } }
-									transition={ {
-										type: 'tween',
-										duration:
-											// Disable transition in mobile to emulate a full page transition.
-											disableMotion || isMobileViewport
-												? 0
-												: ANIMATION_DURATION,
-										ease: 'easeOut',
-									} }
-									className="edit-site-layout__sidebar"
-								>
-									<Sidebar />
-								</motion.div>
-							) }
-						</AnimatePresence>
-					</NavigableRegion>
-
-					<SavePanel />
-
-					{ showCanvas && (
-						<>
-							{ isListPage && <PageMain /> }
-							{ isEditorPage && (
-								<div className="edit-site-layout__canvas-container">
-									{ canvasResizer }
-									{ !! canvasSize.width && (
-										<motion.div
-											whileHover={
-												isEditorPage &&
-												canvasMode === 'view'
-													? {
-															scale: 1.005,
-															transition: {
-																duration:
-																	disableMotion
-																		? 0
-																		: 0.5,
-																ease: 'easeOut',
-															},
-													  }
-													: {}
-											}
-											initial={ false }
-											layout="position"
-											className={ classnames(
-												'edit-site-layout__canvas',
-												{
-													'is-right-aligned':
-														isResizableFrameOversized,
-												}
-											) }
-											transition={ {
-												type: 'tween',
-												duration: disableMotion
+					{ ( ! isMobileViewport || ! areas.mobile ) && (
+						<NavigableRegion
+							ariaLabel={ __( 'Navigation' ) }
+							className="edit-site-layout__sidebar-region"
+						>
+							<AnimatePresence>
+								{ canvasMode === 'view' && (
+									<motion.div
+										initial={ { opacity: 0 } }
+										animate={ { opacity: 1 } }
+										exit={ { opacity: 0 } }
+										transition={ {
+											type: 'tween',
+											duration:
+												// Disable transition in mobile to emulate a full page transition.
+												disableMotion ||
+												isMobileViewport
 													? 0
 													: ANIMATION_DURATION,
-												ease: 'easeOut',
+											ease: 'easeOut',
+										} }
+										className="edit-site-layout__sidebar"
+									>
+										<SidebarContent routeKey={ routeKey }>
+											{ areas.sidebar }
+										</SidebarContent>
+										<SaveHub />
+									</motion.div>
+								) }
+							</AnimatePresence>
+						</NavigableRegion>
+					) }
+
+					<EditorSnackbars />
+
+					{ isMobileViewport && areas.mobile && (
+						<div className="edit-site-layout__mobile">
+							{ areas.mobile }
+						</div>
+					) }
+
+					{ ! isMobileViewport &&
+						areas.content &&
+						canvasMode !== 'edit' && (
+							<div
+								className="edit-site-layout__area"
+								style={ {
+									maxWidth: widths?.content,
+								} }
+							>
+								{ areas.content }
+							</div>
+						) }
+
+					{ ! isMobileViewport && areas.preview && (
+						<div className="edit-site-layout__canvas-container">
+							{ canvasResizer }
+							{ !! canvasSize.width && (
+								<div
+									className={ clsx(
+										'edit-site-layout__canvas',
+										{
+											'is-right-aligned':
+												isResizableFrameOversized,
+										}
+									) }
+									ref={ animationRef }
+								>
+									<ErrorBoundary>
+										<ResizableFrame
+											isReady={ ! isEditorLoading }
+											isFullWidth={
+												canvasMode === 'edit'
+											}
+											defaultSize={ {
+												width:
+													canvasSize.width -
+													24 /* $canvas-padding */,
+												height: canvasSize.height,
+											} }
+											isOversized={
+												isResizableFrameOversized
+											}
+											setIsOversized={
+												setIsResizableFrameOversized
+											}
+											innerContentStyle={ {
+												background:
+													gradientValue ??
+													backgroundColor,
 											} }
 										>
-											<ErrorBoundary>
-												<ResizableFrame
-													isReady={
-														! isEditorLoading
-													}
-													isFullWidth={ isEditing }
-													defaultSize={ {
-														width:
-															canvasSize.width -
-															24 /* $canvas-padding */,
-														height: canvasSize.height,
-													} }
-													isOversized={
-														isResizableFrameOversized
-													}
-													setIsOversized={
-														setIsResizableFrameOversized
-													}
-													innerContentStyle={ {
-														background:
-															gradientValue ??
-															backgroundColor,
-													} }
-												>
-													<Editor
-														listViewToggleElement={
-															listViewToggleElement
-														}
-														isLoading={
-															isEditorLoading
-														}
-													/>
-												</ResizableFrame>
-											</ErrorBoundary>
-										</motion.div>
-									) }
+											{ areas.preview }
+										</ResizableFrame>
+									</ErrorBoundary>
 								</div>
 							) }
-						</>
+						</div>
 					) }
 				</div>
+
+				<SavePanel />
 			</div>
 		</>
 	);

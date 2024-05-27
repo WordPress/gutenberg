@@ -2,6 +2,38 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 12.26.0 (2024-05-16)
+
+### Internal
+
+-   Replaced `classnames` package with the faster and smaller `clsx` package ([#61138](https://github.com/WordPress/gutenberg/pull/61138)).
+
+## 12.25.0 (2024-05-02)
+
+## 12.24.0 (2024-04-19)
+
+## 12.23.0 (2024-04-03)
+
+## 12.22.0 (2024-03-21)
+
+## 12.21.0 (2024-03-06)
+
+## 12.20.0 (2024-02-21)
+
+## 12.19.0 (2024-02-09)
+
+-   `FontSizePicker`: Remove deprecated `__nextHasNoMarginBottom` prop and promote to default behavior ([#58702](https://github.com/WordPress/gutenberg/pull/58702)).
+
+## 12.18.0 (2024-01-24)
+
+-   Deprecated `__experimentalRecursionProvider` and `__experimentalUseHasRecursion` in favor of their new stable counterparts `RecursionProvider` and `useHasRecursion`.
+
+## 12.17.0 (2024-01-10)
+
 ## 12.16.0 (2023-12-13)
 
 ## 12.15.0 (2023-11-29)
@@ -229,8 +261,8 @@
 
 ### Breaking Changes
 
--   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/.
--   Increase the minimum Node.js version to v12 matching Long Term Support releases ([#31270](https://github.com/WordPress/gutenberg/pull/31270)). Learn more at https://nodejs.org/en/about/releases/.
+-   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at <https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/>.
+-   Increase the minimum Node.js version to v12 matching Long Term Support releases ([#31270](https://github.com/WordPress/gutenberg/pull/31270)). Learn more at <https://nodejs.org/en/about/releases/>.
 
 ## 5.3.0 (2021-03-17)
 

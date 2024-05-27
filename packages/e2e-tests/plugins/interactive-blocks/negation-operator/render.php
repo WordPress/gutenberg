@@ -4,11 +4,9 @@
  *
  * @package gutenberg-test-interactive-blocks
  */
-
-gutenberg_enqueue_module( 'negation-operator-view' );
 ?>
 
-<div data-wp-interactive='{ "namespace": "negation-operator" }'>
+<div data-wp-interactive="negation-operator">
 	<button
 		data-wp-on--click="actions.toggle"
 		data-testid="toggle active value"

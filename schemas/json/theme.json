@@ -4,7 +4,7 @@
 	"definitions": {
 		"//": {
 			"explainer": "https://developer.wordpress.org/themes/advanced-topics/theme-json/",
-			"createTheme": "https://developer.wordpress.org/block-editor/how-to-guides/themes/create-block-theme/",
+			"createTheme": "https://developer.wordpress.org/themes/",
 			"reference": "https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-json/"
 		},
 		"refComplete": {
@@ -20,7 +20,7 @@
 			"type": "object",
 			"properties": {
 				"appearanceTools": {
-					"description": "Setting that enables the following UI tools:\n\n- background: backgroundImage\n- border: color, radius, style, width\n- color: link\n- dimensions: minHeight\n- position: sticky\n- spacing: blockGap, margin, padding\n- typography: lineHeight",
+					"description": "Setting that enables the following UI tools:\n\n- background: backgroundImage, backgroundSize\n- border: color, radius, style, width\n- color: link, heading, button, caption\n- dimensions: aspectRatio, minHeight\n- position: sticky\n- spacing: blockGap, margin, padding\n- typography: lineHeight",
 					"type": "boolean",
 					"default": false
 				}
@@ -241,6 +241,11 @@
 							"description": "Allow users to set button colors in a block.",
 							"type": "boolean",
 							"default": true
+						},
+						"caption": {
+							"description": "Allow users to set caption colors in a block.",
+							"type": "boolean",
+							"default": true
 						}
 					},
 					"additionalProperties": false
@@ -258,6 +263,11 @@
 							"description": "Allow users to set a background image.",
 							"type": "boolean",
 							"default": false
+						},
+						"backgroundSize": {
+							"description": "Allow users to set values related to the size of a background image, including size, position, and repeat controls.",
+							"type": "boolean",
+							"default": false
 						}
 					},
 					"additionalProperties": false
@@ -271,6 +281,37 @@
 					"description": "Settings related to dimensions.",
 					"type": "object",
 					"properties": {
+						"aspectRatio": {
+							"description": "Allow users to set an aspect ratio.",
+							"type": "boolean",
+							"default": false
+						},
+						"defaultAspectRatios": {
+							"description": "Allow users to choose aspect ratios from the default set of aspect ratios.",
+							"type": "boolean",
+							"default": true
+						},
+						"aspectRatios": {
+							"description": "Allow users to define aspect ratios for some blocks.",
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"name": {
+										"description": "Name of the aspect ratio preset.",
+										"type": "string"
+									},
+									"slug": {
+										"description": "Kebab-case unique identifier for the aspect ratio preset.",
+										"type": "string"
+									},
+									"ratio": {
+										"description": "Aspect ratio expressed as a division or decimal.",
+										"type": "string"
+									}
+								}
+							}
+						},
 						"minHeight": {
 							"description": "Allow users to set custom minimum height.",
 							"type": "boolean",
@@ -484,6 +525,11 @@
 					"description": "Settings related to typography.",
 					"type": "object",
 					"properties": {
+						"defaultFontSizes": {
+							"description": "Allow users to choose font sizes from the default font size presets.",
+							"type": "boolean",
+							"default": true
+						},
 						"customFontSize": {
 							"description": "Allow users to set custom font sizes.",
 							"type": "boolean",
@@ -535,6 +581,11 @@
 							"description": "Allow users to set custom line height.",
 							"type": "boolean",
 							"default": false
+						},
+						"textAlign": {
+							"description": "Allow users to set the text align.",
+							"type": "boolean",
+							"default": true
 						},
 						"textColumns": {
 							"description": "Allow users to set the number of text columns.",
@@ -610,6 +661,7 @@
 							"type": "array",
 							"items": {
 								"type": "object",
+								"description": "Font family preset",
 								"properties": {
 									"name": {
 										"description": "Name of the font family preset, translatable.",
@@ -623,108 +675,11 @@
 										"description": "CSS font-family value.",
 										"type": "string"
 									},
-									"preview": {
-										"description": "URL to a preview image of the font family.",
-										"type": "string"
-									},
 									"fontFace": {
 										"description": "Array of font-face declarations.",
 										"type": "array",
 										"items": {
-											"type": "object",
-											"properties": {
-												"fontFamily": {
-													"description": "CSS font-family value.",
-													"type": "string",
-													"default": ""
-												},
-												"fontStyle": {
-													"description": "CSS font-style value.",
-													"type": "string",
-													"default": "normal"
-												},
-												"fontWeight": {
-													"description": "List of available font weights, separated by a space.",
-													"default": "400",
-													"oneOf": [
-														{
-															"type": "string"
-														},
-														{
-															"type": "integer"
-														}
-													]
-												},
-												"fontDisplay": {
-													"description": "CSS font-display value.",
-													"type": "string",
-													"default": "fallback",
-													"enum": [
-														"auto",
-														"block",
-														"fallback",
-														"swap",
-														"optional"
-													]
-												},
-												"src": {
-													"description": "Paths or URLs to the font files.",
-													"oneOf": [
-														{
-															"type": "string"
-														},
-														{
-															"type": "array",
-															"items": {
-																"type": "string"
-															}
-														}
-													],
-													"default": []
-												},
-												"fontStretch": {
-													"description": "CSS font-stretch value.",
-													"type": "string"
-												},
-												"ascentOverride": {
-													"description": "CSS ascent-override value.",
-													"type": "string"
-												},
-												"descentOverride": {
-													"description": "CSS descent-override value.",
-													"type": "string"
-												},
-												"fontVariant": {
-													"description": "CSS font-variant value.",
-													"type": "string"
-												},
-												"fontFeatureSettings": {
-													"description": "CSS font-feature-settings value.",
-													"type": "string"
-												},
-												"fontVariationSettings": {
-													"description": "CSS font-variation-settings value.",
-													"type": "string"
-												},
-												"lineGapOverride": {
-													"description": "CSS line-gap-override value.",
-													"type": "string"
-												},
-												"sizeAdjust": {
-													"description": "CSS size-adjust value.",
-													"type": "string"
-												},
-												"unicodeRange": {
-													"description": "CSS unicode-range value.",
-													"type": "string"
-												},
-												"preview": {
-													"description": "URL to a preview image of the font face.",
-													"type": "string"
-												}
-											},
-											"required": [ "fontFamily", "src" ],
-											"additionalProperties": false
+											"$ref": "#/definitions/fontFace"
 										}
 									}
 								},
@@ -735,6 +690,92 @@
 					"additionalProperties": false
 				}
 			}
+		},
+		"fontFace": {
+			"type": "object",
+			"properties": {
+				"fontFamily": {
+					"description": "CSS font-family value.",
+					"type": "string",
+					"default": ""
+				},
+				"fontStyle": {
+					"description": "CSS font-style value.",
+					"type": "string",
+					"default": "normal"
+				},
+				"fontWeight": {
+					"description": "List of available font weights, separated by a space.",
+					"default": "400",
+					"oneOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "integer"
+						}
+					]
+				},
+				"fontDisplay": {
+					"description": "CSS font-display value.",
+					"type": "string",
+					"default": "fallback",
+					"enum": [ "auto", "block", "fallback", "swap", "optional" ]
+				},
+				"src": {
+					"description": "Paths or URLs to the font files.",
+					"oneOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "array",
+							"items": {
+								"type": "string"
+							}
+						}
+					],
+					"default": []
+				},
+				"fontStretch": {
+					"description": "CSS font-stretch value.",
+					"type": "string"
+				},
+				"ascentOverride": {
+					"description": "CSS ascent-override value.",
+					"type": "string"
+				},
+				"descentOverride": {
+					"description": "CSS descent-override value.",
+					"type": "string"
+				},
+				"fontVariant": {
+					"description": "CSS font-variant value.",
+					"type": "string"
+				},
+				"fontFeatureSettings": {
+					"description": "CSS font-feature-settings value.",
+					"type": "string"
+				},
+				"fontVariationSettings": {
+					"description": "CSS font-variation-settings value.",
+					"type": "string"
+				},
+				"lineGapOverride": {
+					"description": "CSS line-gap-override value.",
+					"type": "string"
+				},
+				"sizeAdjust": {
+					"description": "CSS size-adjust value.",
+					"type": "string"
+				},
+				"unicodeRange": {
+					"description": "CSS unicode-range value.",
+					"type": "string"
+				}
+			},
+			"required": [ "fontFamily", "src" ],
+			"additionalProperties": false
 		},
 		"settingsPropertiesCustom": {
 			"type": "object",
@@ -1410,6 +1451,17 @@
 					"description": "Dimensions styles",
 					"type": "object",
 					"properties": {
+						"aspectRatio": {
+							"description": "Sets the `aspect-ratio` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						},
 						"minHeight": {
 							"description": "Sets the `min-height` CSS property.",
 							"oneOf": [
@@ -1612,6 +1664,10 @@
 									"$ref": "#/definitions/refComplete"
 								}
 							]
+						},
+						"textAlign": {
+							"description": "Sets the `text-align` CSS property.",
+							"type": "string"
 						},
 						"textColumns": {
 							"description": "Sets the `column-count` CSS property.",
@@ -2219,7 +2275,7 @@
 		"version": {
 			"description": "Version of theme.json to use.",
 			"type": "integer",
-			"enum": [ 2 ]
+			"enum": [ 3 ]
 		},
 		"title": {
 			"type": "string",
@@ -2286,6 +2342,68 @@
 						"blocks": {
 							"description": "Styles defined on a per-block basis using the block's selector.",
 							"$ref": "#/definitions/stylesBlocksPropertiesComplete"
+						},
+						"background": {
+							"description": "Background styles.",
+							"type": "object",
+							"properties": {
+								"backgroundImage": {
+									"description": "Sets the `background-image` CSS property.",
+									"oneOf": [
+										{
+											"description": "A valid CSS value for the background-image property, or a path to a file relative to the theme root directory, and prefixed with `file:`, e.g., 'file:./path/to/file.png'.",
+											"type": "string"
+										},
+										{
+											"type": "object",
+											"properties": {
+												"url": {
+													"description": "A URL to an image file.",
+													"type": "string"
+												}
+											},
+											"additionalProperties": false
+										},
+										{
+											"$ref": "#/definitions/refComplete"
+										}
+									]
+								},
+								"backgroundPosition": {
+									"description": "Sets the `background-position` CSS property.",
+									"oneOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "#/definitions/refComplete"
+										}
+									]
+								},
+								"backgroundRepeat": {
+									"description": "Sets the `background-repeat` CSS property.",
+									"oneOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "#/definitions/refComplete"
+										}
+									]
+								},
+								"backgroundSize": {
+									"description": "Sets the `background-size` CSS property.",
+									"oneOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "#/definitions/refComplete"
+										}
+									]
+								}
+							},
+							"additionalProperties": false
 						}
 					},
 					"additionalProperties": false

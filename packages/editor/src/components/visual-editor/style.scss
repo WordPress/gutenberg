@@ -1,0 +1,11 @@
+.editor-visual-editor {
+	height: 100%;
+
+	&.is-resizable {
+		max-height: 100%;
+	}
+
+	&.has-padding {
+		padding: $grid-unit-30 $grid-unit-30 0;
+	}
+}

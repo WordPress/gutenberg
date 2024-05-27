@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -9,7 +9,6 @@ import classnames from 'classnames';
 import { addFilter } from '@wordpress/hooks';
 import { getBlockSupport } from '@wordpress/blocks';
 import { useMemo, Platform, useCallback } from '@wordpress/element';
-import { pure } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -25,6 +24,7 @@ import {
 	transformStyles,
 	shouldSkipSerialization,
 } from './utils';
+import { getBackgroundImageClasses } from './background';
 import { useSettings } from '../components/use-settings';
 import InspectorControls from '../components/inspector-controls';
 import {
@@ -174,23 +174,16 @@ export function addSaveProps( props, blockNameOrType, attributes ) {
 		style?.color?.background ||
 		( hasGradient && ( gradient || style?.color?.gradient ) );
 
-	const newClassName = classnames(
-		props.className,
-		textClass,
-		gradientClass,
-		{
-			// Don't apply the background class if there's a custom gradient.
-			[ backgroundClass ]:
-				( ! hasGradient || ! style?.color?.gradient ) &&
-				!! backgroundClass,
-			'has-text-color':
-				shouldSerialize( 'text' ) &&
-				( textColor || style?.color?.text ),
-			'has-background': serializeHasBackground && hasBackground,
-			'has-link-color':
-				shouldSerialize( 'link' ) && style?.elements?.link?.color,
-		}
-	);
+	const newClassName = clsx( props.className, textClass, gradientClass, {
+		// Don't apply the background class if there's a custom gradient.
+		[ backgroundClass ]:
+			( ! hasGradient || ! style?.color?.gradient ) && !! backgroundClass,
+		'has-text-color':
+			shouldSerialize( 'text' ) && ( textColor || style?.color?.text ),
+		'has-background': serializeHasBackground && hasBackground,
+		'has-link-color':
+			shouldSerialize( 'link' ) && style?.elements?.link?.color,
+	} );
 	props.className = newClassName ? newClassName : undefined;
 
 	return props;
@@ -267,7 +260,7 @@ function ColorInspectorControl( { children, resetAllFilter } ) {
 	);
 }
 
-function ColorEditPure( { clientId, name, setAttributes, settings } ) {
+export function ColorEdit( { clientId, name, setAttributes, settings } ) {
 	const isEnabled = useHasColorPanel( settings );
 	function selector( select ) {
 		const { style, textColor, backgroundColor, gradient } =
@@ -336,11 +329,6 @@ function ColorEditPure( { clientId, name, setAttributes, settings } ) {
 	);
 }
 
-// We don't want block controls to re-render when typing inside a block. `pure`
-// will prevent re-renders unless props change, so only pass the needed props
-// and not the whole attributes object.
-export const ColorEdit = pure( ColorEditPure );
-
 function useBlockProps( {
 	name,
 	backgroundColor,
@@ -389,12 +377,27 @@ function useBlockProps( {
 		)?.color;
 	}
 
-	return addSaveProps( { style: extraStyles }, name, {
+	const saveProps = addSaveProps( { style: extraStyles }, name, {
 		textColor,
 		backgroundColor,
 		gradient,
 		style,
 	} );
+
+	const hasBackgroundValue =
+		backgroundColor ||
+		style?.color?.background ||
+		gradient ||
+		style?.color?.gradient;
+
+	return {
+		...saveProps,
+		className: clsx(
+			saveProps.className,
+			// Add background image classes in the editor, if not already handled by background color values.
+			! hasBackgroundValue && getBackgroundImageClasses( style )
+		),
+	};
 }
 
 export default {

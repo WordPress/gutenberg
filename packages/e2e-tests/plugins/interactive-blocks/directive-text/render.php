@@ -4,11 +4,9 @@
  *
  * @package gutenberg-test-interactive-blocks
  */
-
-gutenberg_enqueue_module( 'directive-text-view' );
 ?>
 
-<div data-wp-interactive='{ "namespace": "directive-context" }'>
+<div data-wp-interactive="directive-context">
 	<div>
 		<span
 			data-wp-text="state.text"
@@ -33,5 +31,19 @@ gutenberg_enqueue_module( 'directive-text-view' );
 		>
 			Toggle Context Text
 		</button>
+	</div>
+	<div>
+		<span
+			data-wp-text="state.component"
+			data-testid="show state component"
+		></span>
+		<span
+			data-wp-text="state.number"
+			data-testid="show state number"
+		></span>
+		<span
+			data-wp-text="state.boolean"
+			data-testid="show state boolean"
+		></span>
 	</div>
 </div>

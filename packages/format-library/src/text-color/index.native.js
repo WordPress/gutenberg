@@ -8,12 +8,12 @@ import { StyleSheet, View } from 'react-native';
  */
 import { __ } from '@wordpress/i18n';
 import { useCallback, useMemo, useState } from '@wordpress/element';
-import { BlockControls, useSettings } from '@wordpress/block-editor';
 import {
-	ToolbarGroup,
-	ToolbarButton,
+	BlockControls,
+	useSettings,
 	useMobileGlobalStylesColors,
-} from '@wordpress/components';
+} from '@wordpress/block-editor';
+import { ToolbarGroup, ToolbarButton } from '@wordpress/components';
 import {
 	Icon,
 	color as colorIcon,
@@ -25,7 +25,7 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { getActiveColors } from './inline.js';
+import { getActiveColors } from './inline.native.js';
 import { default as InlineColorUI } from './inline';
 import styles from './style.scss';
 

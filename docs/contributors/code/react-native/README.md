@@ -1,6 +1,6 @@
 # React Native mobile editor
 
-The Gutenberg repository includes the source for the [React Native](https://facebook.github.io/react-native/) based editor for mobile.
+The Gutenberg repository includes the source for the [React Native](https://reactnative.dev/) based editor for mobile.
 
 ## Mind the mobile
 

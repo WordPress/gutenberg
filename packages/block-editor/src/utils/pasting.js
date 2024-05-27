@@ -112,7 +112,9 @@ export function shouldDismissPastedFiles( files, html /*, plainText */ ) {
 		// other elements found, like <figure>, but we assume that the user's
 		// intention is to paste the actual image file.
 		const IMAGE_TAG = /<\s*img\b/gi;
-		if ( html.match( IMAGE_TAG )?.length !== 1 ) return true;
+		if ( html.match( IMAGE_TAG )?.length !== 1 ) {
+			return true;
+		}
 
 		// Even when there is exactly one <img> tag in the HTML payload, we
 		// choose to weed out local images, i.e. those whose source starts with
@@ -121,7 +123,9 @@ export function shouldDismissPastedFiles( files, html /*, plainText */ ) {
 		// text and exactly one image, and pasting that content using Google
 		// Chrome.
 		const IMG_WITH_LOCAL_SRC = /<\s*img\b[^>]*\bsrc="file:\/\//i;
-		if ( html.match( IMG_WITH_LOCAL_SRC ) ) return true;
+		if ( html.match( IMG_WITH_LOCAL_SRC ) ) {
+			return true;
+		}
 	}
 
 	return false;

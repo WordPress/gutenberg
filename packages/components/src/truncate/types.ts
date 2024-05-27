@@ -48,6 +48,10 @@ export type TruncateProps = {
 	numberOfLines?: number;
 	/**
 	 * The children elements.
+	 *
+	 * Note: text truncation will be attempted only if the `children` are either
+	 * of type `string` or `number`. In any other scenarios, the component will
+	 * not attempt to truncate the text, and will pass through the `children`.
 	 */
 	children: ReactNode;
 };

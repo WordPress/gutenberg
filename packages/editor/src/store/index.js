@@ -10,6 +10,7 @@ import reducer from './reducer';
 import * as selectors from './selectors';
 import * as actions from './actions';
 import * as privateActions from './private-actions';
+import * as privateSelectors from './private-selectors';
 import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
 
@@ -39,3 +40,4 @@ export const store = createReduxStore( STORE_NAME, {
 
 register( store );
 unlock( store ).registerPrivateActions( privateActions );
+unlock( store ).registerPrivateSelectors( privateSelectors );

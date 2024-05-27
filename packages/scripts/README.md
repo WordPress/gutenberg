@@ -16,7 +16,7 @@ You only need to install one npm module:
 npm install @wordpress/scripts --save-dev
 ```
 
-**Note**: This package requires Node.js 14.0.0 or later, and `npm` 6.14.4 or later. It is not compatible with older versions.
+**Note**: This package requires Node.js version with long-term support status (check [Active LTS or Maintenance LTS releases](https://nodejs.org/en/about/previous-releases)). It is not compatible with older versions.
 
 ## Setup
 
@@ -107,6 +107,11 @@ This script automatically use the optimized config but sometimes you may want to
 -   `--webpack-no-externals` – disables scripts' assets generation, and omits the list of default externals.
 -   `--webpack-src-dir` – Allows customization of the source code directory. Default is `src`.
 -   `--output-path` – Allows customization of the output directory. Default is `build`.
+
+Experimental support for the block.json `viewScriptModule` field is available via the
+`--experimental-modules` option. With this option enabled, script and module fields will all be
+compiled. The `viewScriptModule` field is analogous to the `viewScript` field, but will compile a module
+and should be registered in WordPress using the Modules API.
 
 #### Advanced information
 
@@ -382,7 +387,7 @@ This is how you execute the script with presented setup:
 
 This script automatically use the optimized config but sometimes you may want to specify some custom options:
 
--   `--hot` – enables "Fast Refresh". The page will automatically reload if you make changes to the code. _For now, it requires that WordPress has the [`SCRIPT_DEBUG`](https://wordpress.org/documentation/article/debugging-in-wordpress/#script_debug) flag enabled and the [Gutenberg](https://wordpress.org/plugins/gutenberg/) plugin installed._
+-   `--hot` – enables "Fast Refresh". The page will automatically reload if you make changes to the code. _For now, it requires that WordPress has the [`SCRIPT_DEBUG`](https://developer.wordpress.org/advanced-administration/debug/debug-wordpress/#script_debug) flag enabled and the [Gutenberg](https://wordpress.org/plugins/gutenberg/) plugin installed._
 -   `--no-watch` – Starts the build for development without starting the watcher.
 -   `--webpack-bundle-analyzer` – enables visualization for the size of webpack output files with an interactive zoomable treemap.
 -   `--webpack-copy-php` – enables copying all PHP files from the source directory ( default is `src` ) and its subfolders to the output directory.
@@ -390,6 +395,11 @@ This script automatically use the optimized config but sometimes you may want to
 -   `--webpack-no-externals` – disables scripts' assets generation, and omits the list of default externals.
 -   `--webpack-src-dir` – Allows customization of the source code directory. Default is `src`.
 -   `--output-path` – Allows customization of the output directory. Default is `build`.
+
+Experimental support for the block.json `viewScriptModule` field is available via the
+`--experimental-modules` option. With this option enabled, script and module fields will all be
+compiled. The `viewScriptModule` field is analogous to the `viewScript` field, but will compile a module
+and should be registered in WordPress using the Modules API.
 
 #### Advanced information
 
@@ -723,8 +733,8 @@ module.exports = {
 
 If you follow this approach, please, be aware that:
 
-- You should keep using the `wp-scripts` commands (`start` and `build`). Do not use `webpack` directly.
-- Future versions of this package may change what webpack and Babel plugins we bundle, default configs, etc. Should those changes be necessary, they will be registered in the [package’s CHANGELOG](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/CHANGELOG.md), so make sure to read it before upgrading.
+-   You should keep using the `wp-scripts` commands (`start` and `build`). Do not use `webpack` directly.
+-   Future versions of this package may change what webpack and Babel plugins we bundle, default configs, etc. Should those changes be necessary, they will be registered in the [package’s CHANGELOG](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/CHANGELOG.md), so make sure to read it before upgrading.
 
 ## Contributing to this package
 

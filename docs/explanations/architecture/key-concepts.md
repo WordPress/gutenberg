@@ -12,7 +12,7 @@ The settings and content of a block can be customized in three main places: the 
 
 Blocks are meant to be combined in different ways. Blocks are hierarchical in that a block can be nested within another block. Nested blocks and its container are also called _children_ and _parent_ respectively. For example, a _Columns_ block can be the parent block to multiple child blocks in each of its columns. The API that governs child block usage is named `InnerBlocks`.
 
-### Data & Attributes
+### Data and attributes
 
 Blocks understand content as attributes and are serializable to HTML. To this point, there is a new Block Grammar. Distilled, the block grammar is an HTML comment, either a self-closing tag or with a beginning tag and ending tag. In the main tag, depending on the block type and user customizations, there can be a JSON object. This raw form of the block is referred to as serialized.
 
@@ -28,20 +28,20 @@ Each block contains Attributes or configuration settings, which can be sourced f
 
 More on [Data format and data flow](/docs/explanations/architecture/data-flow.md).
 
-### Block Transforms
+### Block transforms
 
 Blocks have the ability to be transformed into other block types. This allows basic operations like converting a paragraph into a heading, but also more intricate ones like multiple images becoming a gallery. Block transforms work for single blocks and for multi-block selections. Internal block variations are also possible transformation targets.
 
-### Block Variations
+### Block variations
 
 Given a block type, a block variation is a predefined set of its initial attributes. This API allows creating a single block from which multiple configurations are possible. Variations provide different possible interfaces, including showing up as entirely new blocks in the library, or as presets when inserting a new block. Read [the API documentation](/docs/reference-guides/block-api/block-registration.md#variations-optional) for more details.
 
-**More on Blocks**
+**More on blocks**
 
 -   **[Block API](/docs/reference-guides/block-api/README.md)**
--   **[Tutorial: Building A Custom Block](/docs/getting-started/create-block/README.md)**
+-   **[Tutorial: Building A Custom Block](/docs/getting-started/devenv/get-started-with-create-block.md)**
 
-## Reusable Blocks
+## Reusable blocks
 
 A reusable blocks is **an instance** of a block (or multiple blocks) that can be inserted and edited in multiples places, remaining in sync everywhere. If a reusable block is edited in one place, those changes are reflected across all posts and pages that block is used. Examples of reusable blocks include a block consisting of a heading whose content and a custom color that would be appear on multiple pages of the site and sidebar widgets that would appear on every page.
 
@@ -65,6 +65,6 @@ More on [Site editing templates](/docs/explanations/architecture/full-site-editi
 
 ## Styles
 
-Styles, formerly known as Global Styles and as such referenced in the code, is both an interface that users access through the editor and a configuration system done through [a `theme.json` file](/docs/how-to-guides/themes/theme-json.md). This file absorbs most of the configuration aspects usually scattered through various `add_theme_support` calls to simplify communicating with the editor. It thus aims to improve declaring what settings should be enabled, what specific tools a theme offers (like a custom color palette), the available design tools present, and an infrastructure that allows to coordinate the styles coming from WordPress, the active theme, and the user.
+Styles, formerly known as Global Styles and as such referenced in the code, is both an interface that users access through the editor and a configuration system done through [a `theme.json` file](/docs/how-to-guides/themes/global-settings-and-styles.md). This file absorbs most of the configuration aspects usually scattered through various `add_theme_support` calls to simplify communicating with the editor. It thus aims to improve declaring what settings should be enabled, what specific tools a theme offers (like a custom color palette), the available design tools present, and an infrastructure that allows to coordinate the styles coming from WordPress, the active theme, and the user.
 
 Learn more about [Global Styles](/docs/explanations/architecture/styles.md#global-styles).

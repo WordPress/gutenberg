@@ -20,6 +20,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		value: [ 'color', 'link' ],
 		support: [ 'color', 'link' ],
 	},
+	aspectRatio: {
+		value: [ 'dimensions', 'aspectRatio' ],
+		support: [ 'dimensions', 'aspectRatio' ],
+		useEngine: true,
+	},
 	background: {
 		value: [ 'color', 'gradient' ],
 		support: [ 'color', 'gradients' ],
@@ -29,6 +34,26 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		value: [ 'color', 'background' ],
 		support: [ 'color', 'background' ],
 		requiresOptOut: true,
+		useEngine: true,
+	},
+	backgroundImage: {
+		value: [ 'background', 'backgroundImage' ],
+		support: [ 'background', 'backgroundImage' ],
+		useEngine: true,
+	},
+	backgroundRepeat: {
+		value: [ 'background', 'backgroundRepeat' ],
+		support: [ 'background', 'backgroundRepeat' ],
+		useEngine: true,
+	},
+	backgroundSize: {
+		value: [ 'background', 'backgroundSize' ],
+		support: [ 'background', 'backgroundSize' ],
+		useEngine: true,
+	},
+	backgroundPosition: {
+		value: [ 'background', 'backgroundPosition' ],
+		support: [ 'background', 'backgroundPosition' ],
 		useEngine: true,
 	},
 	borderColor: {
@@ -208,6 +233,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		},
 		useEngine: true,
 	},
+	textAlign: {
+		value: [ 'typography', 'textAlign' ],
+		support: [ 'typography', 'textAlign' ],
+		useEngine: false,
+	},
 	textDecoration: {
 		value: [ 'typography', 'textDecoration' ],
 		support: [ 'typography', '__experimentalTextDecoration' ],
@@ -242,7 +272,7 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 };
 
 export const __EXPERIMENTAL_ELEMENTS = {
-	link: 'a',
+	link: 'a:where(:not(.wp-element-button))',
 	heading: 'h1, h2, h3, h4, h5, h6',
 	h1: 'h1',
 	h2: 'h2',
@@ -256,11 +286,14 @@ export const __EXPERIMENTAL_ELEMENTS = {
 	cite: 'cite',
 };
 
-export const __EXPERIMENTAL_PATHS_WITH_MERGE = {
+// These paths may have three origins, custom, theme, and default,
+// and are expected to override other origins with custom, theme,
+// and default priority.
+export const __EXPERIMENTAL_PATHS_WITH_OVERRIDE = {
 	'color.duotone': true,
 	'color.gradients': true,
 	'color.palette': true,
-	'typography.fontFamilies': true,
+	'dimensions.aspectRatios': true,
 	'typography.fontSizes': true,
 	'spacing.spacingSizes': true,
 };

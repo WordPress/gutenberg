@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -39,15 +39,16 @@ function InserterListItem( {
 				color: item.icon.foreground,
 		  }
 		: {};
-	const blocks = useMemo( () => {
-		return [
+	const blocks = useMemo(
+		() => [
 			createBlock(
 				item.name,
 				item.initialAttributes,
 				createBlocksFromInnerBlocksTemplate( item.innerBlocks )
 			),
-		];
-	}, [ item.name, item.initialAttributes, item.initialAttributes ] );
+		],
+		[ item.name, item.initialAttributes, item.innerBlocks ]
+	);
 
 	const isSynced =
 		( isReusableBlock( item ) && item.syncStatus !== 'unsynced' ) ||
@@ -55,15 +56,14 @@ function InserterListItem( {
 
 	return (
 		<InserterDraggableBlocks
-			isEnabled={ isDraggable && ! item.disabled }
+			isEnabled={ isDraggable && ! item.isDisabled }
 			blocks={ blocks }
 			icon={ item.icon }
 		>
 			{ ( { draggable, onDragStart, onDragEnd } ) => (
 				<div
-					className={ classnames(
+					className={ clsx(
 						'block-editor-block-types-list__list-item',
-
 						{
 							'is-synced': isSynced,
 						}
@@ -85,7 +85,7 @@ function InserterListItem( {
 				>
 					<InserterListboxItem
 						isFirst={ isFirst }
-						className={ classnames(
+						className={ clsx(
 							'block-editor-block-types-list__item',
 							className
 						) }

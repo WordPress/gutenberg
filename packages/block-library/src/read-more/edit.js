@@ -33,6 +33,7 @@ export default function ReadMore( {
 				</PanelBody>
 			</InspectorControls>
 			<RichText
+				identifier="content"
 				tagName="a"
 				aria-label={ __( '“Read more” link text' ) }
 				placeholder={ __( 'Read more' ) }
@@ -43,7 +44,7 @@ export default function ReadMore( {
 				__unstableOnSplitAtEnd={ () =>
 					insertBlocksAfter( createBlock( getDefaultBlockName() ) )
 				}
-				withoutInteractiveFormatting={ true }
+				withoutInteractiveFormatting
 				{ ...blockProps }
 			/>
 		</>

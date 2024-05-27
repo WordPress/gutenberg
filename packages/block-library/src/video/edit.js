@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import { getBlobByURL, isBlobURL } from '@wordpress/blob';
+import { isBlobURL } from '@wordpress/blob';
 import {
 	BaseControl,
 	Button,
@@ -24,12 +24,11 @@ import {
 	MediaUploadCheck,
 	MediaReplaceFlow,
 	useBlockProps,
-	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useRef, useEffect } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { video as icon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 
@@ -37,6 +36,7 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import { createUpgradedEmbedBlock } from '../embed/util';
+import { useUploadMediaFromBlobURL } from '../utils/hooks';
 import VideoCommonSettings from './edit-common-settings';
 import TracksEditor from './tracks-editor';
 import Tracks from './tracks';
@@ -47,7 +47,7 @@ const placeholder = ( content ) => {
 	return (
 		<Placeholder
 			className="block-editor-media-placeholder"
-			withIllustration={ true }
+			withIllustration
 			icon={ icon }
 			label={ __( 'Video' ) }
 			instructions={ __(
@@ -63,7 +63,7 @@ const ALLOWED_MEDIA_TYPES = [ 'video' ];
 const VIDEO_POSTER_ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 function VideoEdit( {
-	isSelected,
+	isSelected: isSingleSelected,
 	attributes,
 	className,
 	setAttributes,
@@ -75,24 +75,13 @@ function VideoEdit( {
 	const posterImageButton = useRef();
 	const { id, controls, poster, src, tracks } = attributes;
 	const isTemporaryVideo = ! id && isBlobURL( src );
-	const mediaUpload = useSelect(
-		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
-		[]
-	);
 
-	useEffect( () => {
-		if ( ! id && isBlobURL( src ) ) {
-			const file = getBlobByURL( src );
-			if ( file ) {
-				mediaUpload( {
-					filesList: [ file ],
-					onFileChange: ( [ media ] ) => onSelectVideo( media ),
-					onError: onUploadError,
-					allowedTypes: ALLOWED_MEDIA_TYPES,
-				} );
-			}
-		}
-	}, [] );
+	useUploadMediaFromBlobURL( {
+		url: src,
+		allowedTypes: ALLOWED_MEDIA_TYPES,
+		onChange: onSelectVideo,
+		onError: onUploadError,
+	} );
 
 	useEffect( () => {
 		// Placeholder may be rendered.
@@ -145,7 +134,7 @@ function VideoEdit( {
 		createErrorNotice( message, { type: 'snackbar' } );
 	}
 
-	const classes = classnames( className, {
+	const classes = clsx( className, {
 		'is-transient': isTemporaryVideo,
 	} );
 
@@ -185,25 +174,29 @@ function VideoEdit( {
 
 	return (
 		<>
-			<BlockControls>
-				<TracksEditor
-					tracks={ tracks }
-					onChange={ ( newTracks ) => {
-						setAttributes( { tracks: newTracks } );
-					} }
-				/>
-			</BlockControls>
-			<BlockControls group="other">
-				<MediaReplaceFlow
-					mediaId={ id }
-					mediaURL={ src }
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					accept="video/*"
-					onSelect={ onSelectVideo }
-					onSelectURL={ onSelectURL }
-					onError={ onUploadError }
-				/>
-			</BlockControls>
+			{ isSingleSelected && (
+				<>
+					<BlockControls>
+						<TracksEditor
+							tracks={ tracks }
+							onChange={ ( newTracks ) => {
+								setAttributes( { tracks: newTracks } );
+							} }
+						/>
+					</BlockControls>
+					<BlockControls group="other">
+						<MediaReplaceFlow
+							mediaId={ id }
+							mediaURL={ src }
+							allowedTypes={ ALLOWED_MEDIA_TYPES }
+							accept="video/*"
+							onSelect={ onSelectVideo }
+							onSelectURL={ onSelectURL }
+							onError={ onUploadError }
+						/>
+					</BlockControls>
+				</>
+			) }
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<VideoCommonSettings
@@ -267,7 +260,7 @@ function VideoEdit( {
 					so the user clicking on it won't play the
 					video when the controls are enabled.
 				*/ }
-				<Disabled isDisabled={ ! isSelected }>
+				<Disabled isDisabled={ ! isSingleSelected }>
 					<video
 						controls={ controls }
 						poster={ poster }
@@ -281,9 +274,10 @@ function VideoEdit( {
 				<Caption
 					attributes={ attributes }
 					setAttributes={ setAttributes }
-					isSelected={ isSelected }
+					isSelected={ isSingleSelected }
 					insertBlocksAfter={ insertBlocksAfter }
 					label={ __( 'Video caption text' ) }
+					showToolbarButton={ isSingleSelected }
 				/>
 			</figure>
 		</>

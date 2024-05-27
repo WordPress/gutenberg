@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Children, cloneElement, useState, useMemo } from '@wordpress/element';
+import { Children, cloneElement, useState } from '@wordpress/element';
 import {
 	Button,
 	privateApis as componentsPrivateApis,
@@ -13,13 +13,18 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { closeSmall } from '@wordpress/icons';
 import { useFocusOnMount, useFocusReturn } from '@wordpress/compose';
 import { store as preferencesStore } from '@wordpress/preferences';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
-import ResizableEditor from '../block-editor/resizable-editor';
+
+const { ResizableEditor } = unlock( editorPrivateApis );
 
 /**
  * Returns a translated string for the title of the editor canvas container.
@@ -33,7 +38,8 @@ function getEditorCanvasContainerTitle( view ) {
 		case 'style-book':
 			return __( 'Style Book' );
 		case 'global-styles-revisions':
-			return __( 'Global styles revisions' );
+		case 'global-styles-revisions:style-book':
+			return __( 'Style Revisions' );
 		default:
 			return '';
 	}
@@ -61,7 +67,7 @@ function EditorCanvasContainer( {
 			).getEditorCanvasContainerView();
 
 			const _showListViewByDefault = select( preferencesStore ).get(
-				'core/edit-site',
+				'core',
 				'showListViewByDefault'
 			);
 
@@ -76,22 +82,18 @@ function EditorCanvasContainer( {
 	const { setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
 	);
+	const { setIsListViewOpened } = useDispatch( editorStore );
+
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );
 	const sectionFocusReturnRef = useFocusReturn();
-	const title = useMemo(
-		() => getEditorCanvasContainerTitle( editorCanvasContainerView ),
-		[ editorCanvasContainerView ]
-	);
-
-	const { setIsListViewOpened } = useDispatch( editSiteStore );
 
 	function onCloseContainer() {
-		if ( typeof onClose === 'function' ) {
-			onClose();
-		}
 		setIsListViewOpened( showListViewByDefault );
 		setEditorCanvasContainerView( undefined );
 		setIsClosed( true );
+		if ( typeof onClose === 'function' ) {
+			onClose();
+		}
 	}
 
 	function closeOnEscape( event ) {
@@ -117,30 +119,32 @@ function EditorCanvasContainer( {
 		return null;
 	}
 
+	const title = getEditorCanvasContainerTitle( editorCanvasContainerView );
 	const shouldShowCloseButton = onClose || closeButtonLabel;
 
 	return (
 		<EditorCanvasContainerFill>
-			<ResizableEditor enableResizing={ enableResizing }>
-				{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
-				<section
-					className="edit-site-editor-canvas-container"
-					ref={ shouldShowCloseButton ? focusOnMountRef : null }
-					onKeyDown={ closeOnEscape }
-					aria-label={ title }
-				>
-					{ shouldShowCloseButton && (
-						<Button
-							className="edit-site-editor-canvas-container__close-button"
-							icon={ closeSmall }
-							label={ closeButtonLabel || __( 'Close' ) }
-							onClick={ onCloseContainer }
-							showTooltip={ false }
-						/>
-					) }
-					{ childrenWithProps }
-				</section>
-			</ResizableEditor>
+			<div className="edit-site-editor-canvas-container">
+				<ResizableEditor enableResizing={ enableResizing }>
+					{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
+					<section
+						className="edit-site-editor-canvas-container__section"
+						ref={ shouldShowCloseButton ? focusOnMountRef : null }
+						onKeyDown={ closeOnEscape }
+						aria-label={ title }
+					>
+						{ shouldShowCloseButton && (
+							<Button
+								className="edit-site-editor-canvas-container__close-button"
+								icon={ closeSmall }
+								label={ closeButtonLabel || __( 'Close' ) }
+								onClick={ onCloseContainer }
+							/>
+						) }
+						{ childrenWithProps }
+					</section>
+				</ResizableEditor>
+			</div>
 		</EditorCanvasContainerFill>
 	);
 }

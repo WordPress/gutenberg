@@ -4,11 +4,9 @@
  *
  * @package gutenberg-test-interactive-blocks
  */
-
-gutenberg_enqueue_module( 'directive-bind-view' );
 ?>
 
-<div data-wp-interactive='{ "namespace": "directive-bind" }'>
+<div data-wp-interactive="directive-bind">
 	<a
 		data-wp-bind--href="state.url"
 		data-testid="add missing href at hydration"
@@ -95,6 +93,7 @@ gutenberg_enqueue_module( 'directive-bind-view' );
 		<button
 			data-testid="toggle value"
 			data-wp-on--click="actions.toggleValue"
+			data-wp-bind--data-toggle-count="context.count"
 		>Toggle</button>
 	</div>
 	<?php endforeach; ?>

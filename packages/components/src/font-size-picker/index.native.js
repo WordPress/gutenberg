@@ -10,7 +10,6 @@ import { useNavigation } from '@react-navigation/native';
 import { useState } from '@wordpress/element';
 import { Icon, chevronRight, check } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
-import { BottomSheet } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -18,6 +17,7 @@ import { BottomSheet } from '@wordpress/components';
 import { default as getPxFromCssUnit } from '../mobile/utils/get-px-from-css-unit';
 import { default as UnitControl, useCustomUnits } from '../unit-control';
 import styles from './style.scss';
+import BottomSheet from '../mobile/bottom-sheet';
 
 const DEFAULT_FONT_SIZE = 16;
 
@@ -59,7 +59,7 @@ function FontSizePicker( {
 	const label = __( 'Font Size' );
 
 	const units = useCustomUnits( {
-		availableUnits: [ 'px', 'em', 'rem' ],
+		availableUnits: [ 'px', 'em', 'rem', 'vw', 'vh' ],
 	} );
 
 	const accessibilityLabel = sprintf(
@@ -111,7 +111,7 @@ function FontSizePicker( {
 						separatorType="none"
 						label={ __( 'Default' ) }
 						onPress={ onChangeValue( undefined ) }
-						leftAlign={ true }
+						leftAlign
 						key={ 'default' }
 						accessibilityRole={ 'button' }
 						accessibilityLabel={ __( 'Selected: Default' ) }
@@ -137,7 +137,7 @@ function FontSizePicker( {
 								label={ item.name }
 								subLabel={ item.sizePx }
 								onPress={ onChangeValue( item.sizePx ) }
-								leftAlign={ true }
+								leftAlign
 								key={ index }
 								accessibilityRole={ 'button' }
 								accessibilityLabel={

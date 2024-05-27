@@ -17,6 +17,7 @@ import { STORE_NAME } from './name';
 import { getOrLoadEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
 import { forwardResolver, getNormalizedCommaSeparable } from './utils';
 import { getSyncProvider } from './sync';
+import { fetchBlockPatterns } from './fetch';
 
 /**
  * Requests authors from the REST API.
@@ -58,7 +59,7 @@ export const getCurrentUser =
 export const getEntityRecord =
 	( kind, name, key = '', query ) =>
 	async ( { select, dispatch } ) => {
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
 		);
@@ -80,7 +81,7 @@ export const getEntityRecord =
 				entityConfig.syncConfig &&
 				! query
 			) {
-				if ( process.env.IS_GUTENBERG_PLUGIN ) {
+				if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 					const objectId = entityConfig.getSyncObjectId( key );
 
 					// Loads the persisted document.
@@ -192,8 +193,8 @@ export const getEditedEntityRecord = forwardResolver( 'getEntityRecord' );
  */
 export const getEntityRecords =
 	( kind, name, query = {} ) =>
-	async ( { dispatch } ) => {
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+	async ( { dispatch, registry } ) => {
+		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
 		);
@@ -237,6 +238,9 @@ export const getEntityRecords =
 					totalItems: parseInt(
 						response.headers.get( 'X-WP-Total' )
 					),
+					totalPages: parseInt(
+						response.headers.get( 'X-WP-TotalPages' )
+					),
 				};
 			} else {
 				records = Object.values( await apiFetch( { path } ) );
@@ -257,37 +261,41 @@ export const getEntityRecords =
 				} );
 			}
 
-			dispatch.receiveEntityRecords(
-				kind,
-				name,
-				records,
-				query,
-				false,
-				undefined,
-				meta
-			);
+			registry.batch( () => {
+				dispatch.receiveEntityRecords(
+					kind,
+					name,
+					records,
+					query,
+					false,
+					undefined,
+					meta
+				);
 
-			// When requesting all fields, the list of results can be used to
-			// resolve the `getEntityRecord` selector in addition to `getEntityRecords`.
-			// See https://github.com/WordPress/gutenberg/pull/26575
-			if ( ! query?._fields && ! query.context ) {
-				const key = entityConfig.key || DEFAULT_ENTITY_KEY;
-				const resolutionsArgs = records
-					.filter( ( record ) => record[ key ] )
-					.map( ( record ) => [ kind, name, record[ key ] ] );
+				// When requesting all fields, the list of results can be used to
+				// resolve the `getEntityRecord` selector in addition to `getEntityRecords`.
+				// See https://github.com/WordPress/gutenberg/pull/26575
+				if ( ! query?._fields && ! query.context ) {
+					const key = entityConfig.key || DEFAULT_ENTITY_KEY;
+					const resolutionsArgs = records
+						.filter( ( record ) => record[ key ] )
+						.map( ( record ) => [ kind, name, record[ key ] ] );
 
-				dispatch( {
-					type: 'START_RESOLUTIONS',
-					selectorName: 'getEntityRecord',
-					args: resolutionsArgs,
-				} );
-				dispatch( {
-					type: 'FINISH_RESOLUTIONS',
-					selectorName: 'getEntityRecord',
-					args: resolutionsArgs,
-				} );
-			}
-		} finally {
+					dispatch( {
+						type: 'START_RESOLUTIONS',
+						selectorName: 'getEntityRecord',
+						args: resolutionsArgs,
+					} );
+					dispatch( {
+						type: 'FINISH_RESOLUTIONS',
+						selectorName: 'getEntityRecord',
+						args: resolutionsArgs,
+					} );
+				}
+
+				dispatch.__unstableReleaseStoreLock( lock );
+			} );
+		} catch ( e ) {
 			dispatch.__unstableReleaseStoreLock( lock );
 		}
 	};
@@ -425,7 +433,7 @@ export const canUser =
 export const canUserEditEntityRecord =
 	( kind, name, recordId ) =>
 	async ( { dispatch } ) => {
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
 		);
@@ -619,17 +627,7 @@ getCurrentThemeGlobalStylesRevisions.shouldInvalidate = ( action ) => {
 export const getBlockPatterns =
 	() =>
 	async ( { dispatch } ) => {
-		const restPatterns = await apiFetch( {
-			path: '/wp/v2/block-patterns/patterns',
-		} );
-		const patterns = restPatterns?.map( ( pattern ) =>
-			Object.fromEntries(
-				Object.entries( pattern ).map( ( [ key, value ] ) => [
-					camelCase( key ),
-					value,
-				] )
-			)
-		);
+		const patterns = await fetchBlockPatterns();
 		dispatch( { type: 'RECEIVE_BLOCK_PATTERNS', patterns } );
 	};
 
@@ -688,7 +686,7 @@ export const getNavigationFallbackId =
 			const existingFallbackEntityRecord = select.getEntityRecord(
 				'postType',
 				'wp_navigation',
-				fallback?.id
+				fallback.id
 			);
 			const invalidateNavigationQueries = ! existingFallbackEntityRecord;
 			dispatch.receiveEntityRecords(
@@ -703,7 +701,7 @@ export const getNavigationFallbackId =
 			dispatch.finishResolution( 'getEntityRecord', [
 				'postType',
 				'wp_navigation',
-				fallback?.id,
+				fallback.id,
 			] );
 		}
 	};
@@ -714,7 +712,8 @@ export const getDefaultTemplateId =
 		const template = await apiFetch( {
 			path: addQueryArgs( '/wp/v2/templates/lookup', query ),
 		} );
-		if ( template ) {
+		// Endpoint may return an empty object if no template is found.
+		if ( template?.id ) {
 			dispatch.receiveDefaultTemplateId( query, template.id );
 		}
 	};
@@ -732,7 +731,7 @@ export const getDefaultTemplateId =
 export const getRevisions =
 	( kind, name, recordKey, query = {} ) =>
 	async ( { dispatch } ) => {
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
 		);
@@ -857,7 +856,7 @@ getRevisions.shouldInvalidate = ( action, kind, name, recordKey ) =>
 export const getRevision =
 	( kind, name, recordKey, revisionKey, query ) =>
 	async ( { dispatch } ) => {
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
 		);

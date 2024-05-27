@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 import type { ChangeEvent } from 'react';
 
 /**
@@ -71,7 +71,7 @@ export function RadioControl(
 			id={ id }
 			hideLabelFromVision={ hideLabelFromVision }
 			help={ help }
-			className={ classnames( className, 'components-radio-control' ) }
+			className={ clsx( className, 'components-radio-control' ) }
 		>
 			<VStack spacing={ 1 }>
 				{ options.map( ( option, index ) => (
@@ -92,7 +92,10 @@ export function RadioControl(
 							}
 							{ ...additionalProps }
 						/>
-						<label htmlFor={ `${ id }-${ index }` }>
+						<label
+							className="components-radio-control__label"
+							htmlFor={ `${ id }-${ index }` }
+						>
 							{ option.label }
 						</label>
 					</div>

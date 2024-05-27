@@ -4,6 +4,8 @@ export * from './utils/create-higher-order-component';
 export * from './utils/debounce';
 // The `throttle` helper and its types.
 export * from './utils/throttle';
+// The `ObservableMap` data structure
+export * from './utils/observable-map';
 
 // The `compose` and `pipe` helpers (inspired by `flowRight` and `flow` from Lodash).
 export { default as compose } from './higher-order/compose';
@@ -17,7 +19,7 @@ export { default as withInstanceId } from './higher-order/with-instance-id';
 export { default as withSafeTimeout } from './higher-order/with-safe-timeout';
 export { default as withState } from './higher-order/with-state';
 export { default as withPreferredColorScheme } from './higher-order/with-preferred-color-scheme';
-export { default as withIsConnected } from './higher-order/with-is-connected';
+export { default as withNetworkConnectivity } from './higher-order/with-network-connectivity';
 
 // Hooks.
 export { default as useConstrainedTabbing } from './hooks/use-constrained-tabbing';
@@ -38,3 +40,5 @@ export { default as useDebouncedInput } from './hooks/use-debounced-input';
 export { default as useThrottle } from './hooks/use-throttle';
 export { default as useMergeRefs } from './hooks/use-merge-refs';
 export { default as useRefEffect } from './hooks/use-ref-effect';
+export { default as useNetworkConnectivity } from './hooks/use-network-connectivity';
+export { default as useObservableValue } from './hooks/use-observable-value';

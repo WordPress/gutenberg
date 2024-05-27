@@ -2,6 +2,31 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Use React's automatic runtime to transform JSX ([#61692](https://github.com/WordPress/gutenberg/pull/61692)).
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 7.42.0 (2024-05-16)
+
+## 7.41.0 (2024-05-02)
+
+## 7.40.0 (2024-04-19)
+
+## 7.39.0 (2024-04-03)
+
+## 7.38.0 (2024-03-21)
+
+## 7.37.0 (2024-03-06)
+
+## 7.36.0 (2024-02-21)
+
+## 7.35.0 (2024-02-09)
+
+## 7.34.0 (2024-01-24)
+
+## 7.33.0 (2024-01-10)
+
 ## 7.32.0 (2023-12-13)
 
 ## 7.31.0 (2023-11-29)

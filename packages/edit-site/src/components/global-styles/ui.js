@@ -35,6 +35,7 @@ import ScreenTypography from './screen-typography';
 import ScreenTypographyElement from './screen-typography-element';
 import ScreenColors from './screen-colors';
 import ScreenColorPalette from './screen-color-palette';
+import { ScreenShadows, ScreenShadowsEdit } from './screen-shadows';
 import ScreenLayout from './screen-layout';
 import ScreenStyleVariations from './screen-style-variations';
 import StyleBook from '../style-book';
@@ -75,7 +76,11 @@ function GlobalStylesActionMenu() {
 
 	return (
 		<GlobalStylesMenuFill>
-			<DropdownMenu icon={ moreVertical } label={ __( 'More' ) }>
+			<DropdownMenu
+				icon={ moreVertical }
+				label={ __( 'More' ) }
+				toggleProps={ { size: 'compact' } }
+			>
 				{ ( { onClose } ) => (
 					<>
 						<MenuGroup>
@@ -236,31 +241,48 @@ function GlobalStylesEditorCanvasContainerLink() {
 			unlock( select( editSiteStore ) ).getEditorCanvasContainerView(),
 		[]
 	);
+	const path = location?.path;
+	const isRevisionsOpen = path === '/revisions';
 
 	// If the user switches the editor canvas container view, redirect
 	// to the appropriate screen. This effectively allows deep linking to the
 	// desired screens from outside the global styles navigation provider.
 	useEffect( () => {
-		if ( editorCanvasContainerView === 'global-styles-revisions' ) {
-			// Switching to the revisions container view should
-			// redirect to the revisions screen.
-			goTo( '/revisions' );
-		} else if (
-			!! editorCanvasContainerView &&
-			location?.path === '/revisions'
-		) {
-			// Switching to any container other than revisions should
-			// redirect from the revisions screen to the root global styles screen.
-			goTo( '/' );
-		} else if ( editorCanvasContainerView === 'global-styles-css' ) {
-			goTo( '/css' );
+		switch ( editorCanvasContainerView ) {
+			case 'global-styles-revisions':
+			case 'global-styles-revisions:style-book':
+				goTo( '/revisions' );
+				break;
+			case 'global-styles-css':
+				goTo( '/css' );
+				break;
+			case 'style-book':
+				/*
+				 * The stand-alone style book is open
+				 * and the revisions panel is open,
+				 * close the revisions panel.
+				 * Otherwise keep the style book open while
+				 * browsing global styles panel.
+				 */
+				if ( isRevisionsOpen ) {
+					goTo( '/' );
+				}
+				break;
+			default:
+				/*
+				 * Example: the user has navigated to "Browse styles" or elsewhere
+				 * and changes the editorCanvasContainerView, e.g., closes the style book.
+				 * The panel should not be affected.
+				 * Exclude revisions panel from this behavior,
+				 * as it should close when the editorCanvasContainerView doesn't correspond.
+				 */
+				if ( path !== '/' && ! isRevisionsOpen ) {
+					return;
+				}
+				goTo( '/' );
+				break;
 		}
-
-		// location?.path is not a dependency because we don't want to track it.
-		// Doing so will cause an infinite loop. We could abstract logic to avoid
-		// having to disable the check later.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ editorCanvasContainerView, goTo ] );
+	}, [ editorCanvasContainerView, isRevisionsOpen, goTo ] );
 }
 
 function GlobalStylesUI() {
@@ -313,6 +335,14 @@ function GlobalStylesUI() {
 
 			<GlobalStylesNavigationScreen path="/colors">
 				<ScreenColors />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen path="/shadows">
+				<ScreenShadows />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen path="/shadows/edit/:category/:slug">
+				<ScreenShadowsEdit />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path="/layout">

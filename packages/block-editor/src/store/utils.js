@@ -1,35 +1,9 @@
 /**
  * Internal dependencies
  */
-import { PATTERN_TYPES } from '../components/inserter/block-patterns-tab/utils';
-
-const EMPTY_ARRAY = [];
-
-export function getUserPatterns( state ) {
-	const userPatterns =
-		state?.settings?.__experimentalReusableBlocks ?? EMPTY_ARRAY;
-	const userPatternCategories =
-		state?.settings?.__experimentalUserPatternCategories ?? [];
-	const categories = new Map();
-	userPatternCategories.forEach( ( userCategory ) =>
-		categories.set( userCategory.id, userCategory )
-	);
-	return userPatterns.map( ( userPattern ) => {
-		return {
-			name: `core/block/${ userPattern.id }`,
-			id: userPattern.id,
-			type: PATTERN_TYPES.user,
-			title: userPattern.title.raw,
-			categories: userPattern.wp_pattern_category.map( ( catId ) =>
-				categories && categories.get( catId )
-					? categories.get( catId ).slug
-					: catId
-			),
-			content: userPattern.content.raw,
-			syncStatus: userPattern.wp_pattern_sync_status,
-		};
-	} );
-}
+import { selectBlockPatternsKey } from './private-keys';
+import { unlock } from '../lock-unlock';
+import { STORE_NAME } from './constants';
 
 export const checkAllowList = ( list, item, defaultResult = null ) => {
 	if ( typeof list === 'boolean' ) {
@@ -72,3 +46,24 @@ export const checkAllowListRecursive = ( blocks, allowedBlockTypes ) => {
 
 	return true;
 };
+
+export const getAllPatternsDependants = ( select ) => ( state ) => {
+	return [
+		state.settings.__experimentalBlockPatterns,
+		state.settings.__experimentalUserPatternCategories,
+		state.settings.__experimentalReusableBlocks,
+		state.settings[ selectBlockPatternsKey ]?.( select ),
+		state.blockPatterns,
+		unlock( select( STORE_NAME ) ).getReusableBlocks(),
+	];
+};
+
+export function getInsertBlockTypeDependants( state, rootClientId ) {
+	return [
+		state.blockListSettings[ rootClientId ],
+		state.blocks.byClientId.get( rootClientId ),
+		state.settings.allowedBlockTypes,
+		state.settings.templateLock,
+		state.blockEditingModes,
+	];
+}

@@ -2,6 +2,32 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 5.35.0 (2024-05-16)
+
+## 5.34.0 (2024-05-02)
+
+## 5.33.0 (2024-04-19)
+
+## 5.32.0 (2024-04-03)
+
+## 5.31.0 (2024-03-21)
+
+## 5.30.0 (2024-03-06)
+
+## 5.29.0 (2024-02-21)
+
+## 5.28.0 (2024-02-09)
+
+## 5.27.0 (2024-01-24)
+
+-   Started exporting the `PureComponent` React API ([#58076](https://github.com/WordPress/gutenberg/pull/58076)).
+
+## 5.26.0 (2024-01-10)
+
 ## 5.25.0 (2023-12-13)
 
 ## 5.24.0 (2023-11-29)
@@ -114,7 +140,7 @@
 
 ### Bug Fix
 
-- Serialize will now keep correct casing for SVG attributes ([#38936](https://github.com/WordPress/gutenberg/pull/38936)).
+-   Serialize will now keep correct casing for SVG attributes ([#38936](https://github.com/WordPress/gutenberg/pull/38936)).
 
 ## 4.1.0 (2022-01-27)
 

@@ -30,7 +30,6 @@ import {
 import { BlockDraggableWrapper } from '../block-draggable';
 import { useEditorWrapperStyles } from '../../hooks/use-editor-wrapper-styles';
 import { store as blockEditorStore } from '../../store';
-import OfflineStatus from '../offline-status';
 
 const identity = ( x ) => x;
 
@@ -140,7 +139,7 @@ export default function BlockList( {
 		insertBlock( newBlock, blockCount );
 	};
 
-	const scrollViewRef = useRef( null );
+	const scrollRef = useRef( null );
 
 	const shouldFlatListPreventAutomaticScroll = () =>
 		blockInsertionPointIsVisible;
@@ -212,7 +211,7 @@ export default function BlockList( {
 		);
 	};
 
-	const { blockToolbar, headerToolbar, floatingToolbar } = styles;
+	const { blockToolbar, floatingToolbar } = styles;
 
 	const containerStyle = {
 		flex: isRootList ? 1 : 0,
@@ -225,7 +224,6 @@ export default function BlockList( {
 	const isMultiBlocks = blockClientIds.length > 1;
 	const { isWider } = alignmentHelpers;
 	const extraScrollHeight =
-		headerToolbar.height +
 		blockToolbar.height +
 		( isFloatingToolbarVisible ? floatingToolbar.height : 0 );
 
@@ -236,30 +234,20 @@ export default function BlockList( {
 			onLayout={ onLayout }
 			testID="block-list-wrapper"
 		>
-			{
-				// eslint-disable-next-line no-undef
-				__DEV__ && <OfflineStatus />
-			}
 			{ isRootList ? (
 				<BlockListProvider
 					value={ {
 						...DEFAULT_BLOCK_LIST_CONTEXT,
-						scrollRef: scrollViewRef.current,
+						scrollRef: scrollRef.current,
 					} }
 				>
 					<BlockDraggableWrapper isRTL={ isRTL }>
 						{ ( { onScroll } ) => (
 							<KeyboardAwareFlatList
-								{ ...( Platform.OS === 'android'
-									? { removeClippedSubviews: false }
-									: {} ) } // Disable clipping on Android to fix focus losing. See https://github.com/wordpress-mobile/gutenberg-mobile/pull/741#issuecomment-472746541
 								accessibilityLabel="block-list"
-								innerRef={ ( ref ) => {
-									scrollViewRef.current = ref;
-								} }
+								ref={ scrollRef }
 								extraScrollHeight={ extraScrollHeight }
 								keyboardShouldPersistTaps="always"
-								scrollViewStyle={ { flex: 1 } }
 								extraData={ getExtraData() }
 								scrollEnabled={ isRootList }
 								contentContainerStyle={ [

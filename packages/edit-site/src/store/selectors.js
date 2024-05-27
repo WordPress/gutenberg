@@ -6,14 +6,13 @@ import { createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { Platform } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import { getFilteredTemplatePartBlocks } from './utils';
-import { TEMPLATE_PART_POST_TYPE } from '../utils/constants';
+import { unlock } from '../lock-unlock';
+
 /**
  * @typedef {'template'|'template_type'} TemplateType Template type.
  */
@@ -169,66 +168,58 @@ export function getPage( state ) {
 }
 
 /**
- * Returns the current opened/closed state of the inserter panel.
+ * Returns true if the inserter is opened.
+ *
+ * @deprecated
  *
  * @param {Object} state Global application state.
  *
- * @return {boolean} True if the inserter panel should be open; false if closed.
+ * @return {boolean} Whether the inserter is opened.
  */
-export function isInserterOpened( state ) {
-	return !! state.blockInserterPanel;
-}
+export const isInserterOpened = createRegistrySelector( ( select ) => () => {
+	deprecated( `select( 'core/edit-site' ).isInserterOpened`, {
+		since: '6.5',
+		alternative: `select( 'core/editor' ).isInserterOpened`,
+	} );
+	return select( editorStore ).isInserterOpened();
+} );
 
 /**
  * Get the insertion point for the inserter.
+ *
+ * @deprecated
  *
  * @param {Object} state Global application state.
  *
  * @return {Object} The root client ID, index to insert at and starting filter value.
  */
 export const __experimentalGetInsertionPoint = createRegistrySelector(
-	( select ) => ( state ) => {
-		if ( typeof state.blockInserterPanel === 'object' ) {
-			const { rootClientId, insertionIndex, filterValue } =
-				state.blockInserterPanel;
-			return { rootClientId, insertionIndex, filterValue };
-		}
-
-		if (
-			isPage( state ) &&
-			select( editorStore ).getRenderingMode() !== 'template-only'
-		) {
-			const [ postContentClientId ] =
-				select( blockEditorStore ).__experimentalGetGlobalBlocksByName(
-					'core/post-content'
-				);
-			if ( postContentClientId ) {
-				return {
-					rootClientId: postContentClientId,
-					insertionIndex: undefined,
-					filterValue: undefined,
-				};
+	( select ) => () => {
+		deprecated(
+			`select( 'core/edit-site' ).__experimentalGetInsertionPoint`,
+			{
+				since: '6.5',
+				version: '6.7',
 			}
-		}
-
-		return {
-			rootClientId: undefined,
-			insertionIndex: undefined,
-			filterValue: undefined,
-		};
+		);
+		return unlock( select( editorStore ) ).getInsertionPoint();
 	}
 );
 
 /**
- * Returns the current opened/closed state of the list view panel.
+ * Returns true if the list view is opened.
  *
  * @param {Object} state Global application state.
  *
- * @return {boolean} True if the list view panel should be open; false if closed.
+ * @return {boolean} Whether the list view is opened.
  */
-export function isListViewOpened( state ) {
-	return state.listViewPanel;
-}
+export const isListViewOpened = createRegistrySelector( ( select ) => () => {
+	deprecated( `select( 'core/edit-site' ).isListViewOpened`, {
+		since: '6.5',
+		alternative: `select( 'core/editor' ).isListViewOpened`,
+	} );
+	return select( editorStore ).isListViewOpened();
+} );
 
 /**
  * Returns the current opened/closed state of the save panel.
@@ -249,20 +240,9 @@ export function isSaveViewOpened( state ) {
  */
 export const getCurrentTemplateTemplateParts = createRegistrySelector(
 	( select ) => () => {
-		const templateParts = select( coreDataStore ).getEntityRecords(
-			'postType',
-			TEMPLATE_PART_POST_TYPE,
-			{ per_page: -1 }
-		);
-
-		const clientIds =
-			select( blockEditorStore ).__experimentalGetGlobalBlocksByName(
-				'core/template-part'
-			);
-		const blocks =
-			select( blockEditorStore ).getBlocksByClientId( clientIds );
-
-		return getFilteredTemplatePartBlocks( blocks, templateParts );
+		return unlock(
+			select( editorStore )
+		).getCurrentTemplateTemplateParts();
 	}
 );
 
@@ -274,7 +254,7 @@ export const getCurrentTemplateTemplateParts = createRegistrySelector(
  * @return {string} Editing mode.
  */
 export const getEditorMode = createRegistrySelector( ( select ) => () => {
-	return select( preferencesStore ).get( 'core/edit-site', 'editorMode' );
+	return select( preferencesStore ).get( 'core', 'editorMode' );
 } );
 
 /**

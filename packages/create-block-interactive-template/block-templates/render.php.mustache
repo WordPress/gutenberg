@@ -13,17 +13,12 @@
 
 // Generate unique id for aria-controls.
 $unique_id = wp_unique_id( 'p-' );
-
-// Enqueue the view file.
-if (function_exists('gutenberg_enqueue_module')) {
-	gutenberg_enqueue_module( '{{namespace}}-view' );
-}
 ?>
 
 <div
 	<?php echo get_block_wrapper_attributes(); ?>
-	data-wp-interactive='{ "namespace": "{{namespace}}" }'
-	data-wp-context='{ "isOpen": false }'
+	data-wp-interactive="{{namespace}}"
+	<?php echo wp_interactivity_data_wp_context( array( 'isOpen' => false ) ); ?>
 	data-wp-watch="callbacks.logIsOpen"
 >
 	<button

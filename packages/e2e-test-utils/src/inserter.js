@@ -53,7 +53,8 @@ async function isGlobalInserterOpen() {
 				'.edit-site-header [aria-label="Toggle block inserter"].is-pressed,' +
 				'.edit-widgets-header [aria-label="Toggle block inserter"].is-pressed,' +
 				'.edit-widgets-header [aria-label="Add block"].is-pressed,' +
-				'.edit-site-header-edit-mode__inserter-toggle.is-pressed'
+				'.edit-site-header-edit-mode__inserter-toggle.is-pressed,' +
+				'.editor-header [aria-label="Toggle block inserter"].is-pressed'
 		);
 	} );
 }
@@ -64,7 +65,8 @@ export async function toggleGlobalBlockInserter() {
 	// "Add block" selector is required to make sure performance comparison
 	// doesn't fail on older branches where we still had "Add block" as label.
 	await page.click(
-		'.edit-post-header [aria-label="Add block"],' +
+		'.editor-document-tools__inserter-toggle,' +
+			'.edit-post-header [aria-label="Add block"],' +
 			'.edit-site-header [aria-label="Add block"],' +
 			'.edit-post-header [aria-label="Toggle block inserter"],' +
 			'.edit-site-header [aria-label="Toggle block inserter"],' +

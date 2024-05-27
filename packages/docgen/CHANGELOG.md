@@ -2,6 +2,30 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 1.67.0 (2024-05-16)
+
+## 1.66.0 (2024-05-02)
+
+## 1.65.0 (2024-04-19)
+
+## 1.64.0 (2024-04-03)
+
+## 1.63.0 (2024-03-21)
+
+## 1.62.0 (2024-03-06)
+
+## 1.61.0 (2024-02-21)
+
+## 1.60.0 (2024-02-09)
+
+## 1.59.0 (2024-01-24)
+
+## 1.58.0 (2024-01-10)
+
 ## 1.57.0 (2023-12-13)
 
 ## 1.56.0 (2023-11-29)
@@ -68,7 +92,7 @@
 
 ### Bug Fixes
 
--	Fix getting param annotations for default exported functions. ([#31603](https://github.com/WordPress/gutenberg/pull/31603))
+-   Fix getting param annotations for default exported functions. ([#31603](https://github.com/WordPress/gutenberg/pull/31603))
 
 ## 1.17.0 (2021-04-29)
 

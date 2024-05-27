@@ -1,14 +1,10 @@
 <?php
 /**
- * WP_Theme_JSON_Resolver class
+ * WP_Theme_JSON_Resolver_Gutenberg class
  *
- * @package gutenberg
+ * @package Gutenberg
  * @since 5.8.0
  */
-
-if ( class_exists( 'WP_Theme_JSON_Resolver_Gutenberg' ) ) {
-	return;
-}
 
 /**
  * Class that abstracts the processing of the different data sources
@@ -18,6 +14,7 @@ if ( class_exists( 'WP_Theme_JSON_Resolver_Gutenberg' ) ) {
  * This is a low-level API that may need to do breaking changes. Please,
  * use gutenberg_get_global_settings, gutenberg_get_global_styles, and gutenberg_get_global_stylesheet instead.
  *
+ * @since 5.8.0
  * @access private
  */
 #[AllowDynamicProperties]
@@ -40,7 +37,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * Container for data coming from core.
 	 *
 	 * @since 5.8.0
-	 * @var WP_Theme_JSON
+	 * @var WP_Theme_JSON_Gutenberg
 	 */
 	protected static $core = null;
 
@@ -48,7 +45,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * Container for data coming from the blocks.
 	 *
 	 * @since 6.1.0
-	 * @var WP_Theme_JSON
+	 * @var WP_Theme_JSON_Gutenberg
 	 */
 	protected static $blocks = null;
 
@@ -56,7 +53,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * Container for data coming from the theme.
 	 *
 	 * @since 5.8.0
-	 * @var WP_Theme_JSON
+	 * @var WP_Theme_JSON_Gutenberg
 	 */
 	protected static $theme = null;
 
@@ -64,7 +61,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * Container for data coming from the user.
 	 *
 	 * @since 5.9.0
-	 * @var WP_Theme_JSON
+	 * @var WP_Theme_JSON_Gutenberg
 	 */
 	protected static $user = null;
 
@@ -158,7 +155,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 *
 	 * @since 5.8.0
 	 *
-	 * @return WP_Theme_JSON Entity that holds core data.
+	 * @return WP_Theme_JSON_Gutenberg Entity that holds core data.
 	 */
 	public static function get_core_data() {
 		if ( null !== static::$core && static::has_same_registered_blocks( 'core' ) ) {
@@ -173,11 +170,10 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		 *
 		 * @since 6.1.0
 		 *
-		 * @param WP_Theme_JSON_Data Class to access and update the underlying data.
+		 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
 		 */
 		$theme_json   = apply_filters( 'wp_theme_json_data_default', new WP_Theme_JSON_Data_Gutenberg( $config, 'default' ) );
-		$config       = $theme_json->get_data();
-		static::$core = new WP_Theme_JSON_Gutenberg( $config, 'default' );
+		static::$core = $theme_json->get_theme_json();
 
 		return static::$core;
 	}
@@ -231,7 +227,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 *
 	 *     @type bool $with_supports Whether to include theme supports in the data. Default true.
 	 * }
-	 * @return WP_Theme_JSON Entity that holds theme data.
+	 * @return WP_Theme_JSON_Gutenberg Entity that holds theme data.
 	 */
 	public static function get_theme_data( $deprecated = array(), $options = array() ) {
 		if ( ! empty( $deprecated ) ) {
@@ -247,7 +243,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				$theme_json_data = static::read_json_file( $theme_json_file );
 				$theme_json_data = static::translate( $theme_json_data, $wp_theme->get( 'TextDomain' ) );
 			} else {
-				$theme_json_data = array();
+				$theme_json_data = array( 'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA );
 			}
 
 			/**
@@ -255,11 +251,10 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			 *
 			 * @since 6.1.0
 			 *
-			 * @param WP_Theme_JSON_Data Class to access and update the underlying data.
+			 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
 			 */
-			$theme_json      = apply_filters( 'wp_theme_json_data_theme', new WP_Theme_JSON_Data_Gutenberg( $theme_json_data, 'theme' ) );
-			$theme_json_data = $theme_json->get_data();
-			static::$theme   = new WP_Theme_JSON_Gutenberg( $theme_json_data );
+			$theme_json    = apply_filters( 'wp_theme_json_data_theme', new WP_Theme_JSON_Data_Gutenberg( $theme_json_data, 'theme' ) );
+			static::$theme = $theme_json->get_theme_json();
 
 			if ( $wp_theme->parent() ) {
 				// Get parent theme.json.
@@ -322,8 +317,16 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			}
 			$theme_support_data['settings']['color']['defaultGradients'] = $default_gradients;
 
-			// Classic themes without a theme.json don't support global duotone.
-			$theme_support_data['settings']['color']['defaultDuotone'] = false;
+			if ( ! isset( $theme_support_data['settings']['shadow'] ) ) {
+				$theme_support_data['settings']['shadow'] = array();
+			}
+			/*
+			 * Shadow presets are explicitly disabled for classic themes until a
+			 * decision is made for whether the default presets should match the
+			 * other presets or if they should be disabled by default in classic
+			 * themes. See https://github.com/WordPress/gutenberg/issues/59989.
+			 */
+			$theme_support_data['settings']['shadow']['defaultPresets'] = false;
 
 			// Allow themes to enable all border settings via theme_support.
 			if ( current_theme_supports( 'border' ) ) {
@@ -345,15 +348,10 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				);
 			}
 
-			// BEGIN EXPERIMENTAL.
 			// Allow themes to enable appearance tools via theme_support.
-			// This feature was backported for WordPress 6.2 as of https://core.trac.wordpress.org/ticket/56487
-			// and then reverted as of https://core.trac.wordpress.org/ticket/57649
-			// Not to backport until the issues are resolved.
 			if ( current_theme_supports( 'appearance-tools' ) ) {
 				$theme_support_data['settings']['appearanceTools'] = true;
 			}
-			// END EXPERIMENTAL.
 		}
 		$with_theme_supports = new WP_Theme_JSON_Gutenberg( $theme_support_data );
 		$with_theme_supports->merge( static::$theme );
@@ -365,7 +363,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 *
 	 * @since 6.1.0
 	 *
-	 * @return WP_Theme_JSON
+	 * @return WP_Theme_JSON_Gutenberg
 	 */
 	public static function get_block_data() {
 		$registry = WP_Block_Type_Registry::get_instance();
@@ -375,7 +373,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			return static::$blocks;
 		}
 
-		$config = array( 'version' => 2 );
+		$config = array( 'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA );
 		foreach ( $blocks as $block_name => $block_type ) {
 			if ( isset( $block_type->supports['__experimentalStyle'] ) ) {
 				$config['styles']['blocks'][ $block_name ] = static::remove_json_comments( $block_type->supports['__experimentalStyle'] );
@@ -396,12 +394,11 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		 *
 		 * @since 6.1.0
 		 *
-		 * @param WP_Theme_JSON_Data Class to access and update the underlying data.
+		 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
 		 */
-		$theme_json = apply_filters( 'wp_theme_json_data_blocks', new WP_Theme_JSON_Data_Gutenberg( $config, 'blocks' ) );
-		$config     = $theme_json->get_data();
+		$theme_json     = apply_filters( 'wp_theme_json_data_blocks', new WP_Theme_JSON_Data_Gutenberg( $config, 'blocks' ) );
+		static::$blocks = $theme_json->get_theme_json();
 
-		static::$blocks = new WP_Theme_JSON_Gutenberg( $config, 'blocks' );
 		return static::$blocks;
 	}
 
@@ -509,7 +506,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 *
 	 * @since 5.9.0
 	 *
-	 * @return WP_Theme_JSON Entity that holds styles for user data.
+	 * @return WP_Theme_JSON_Gutenberg Entity that holds styles for user data.
 	 */
 	public static function get_user_data() {
 		if ( null !== static::$user && static::has_same_registered_blocks( 'user' ) ) {
@@ -530,11 +527,11 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				 *
 				 * @since 6.1.0
 				 *
-				 * @param WP_Theme_JSON_Data Class to access and update the underlying data.
+				 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
 				 */
 				$theme_json = apply_filters( 'wp_theme_json_data_user', new WP_Theme_JSON_Data_Gutenberg( $config, 'custom' ) );
-				$config     = $theme_json->get_data();
-				return new WP_Theme_JSON_Gutenberg( $config, 'custom' );
+
+				return $theme_json->get_theme_json();
 			}
 
 			// Very important to verify that the flag isGlobalStylesUserThemeJSON is true.
@@ -544,14 +541,17 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				isset( $decoded_data['isGlobalStylesUserThemeJSON'] ) &&
 				$decoded_data['isGlobalStylesUserThemeJSON']
 			) {
-				unset( $decoded_data['isGlobalStylesUserThemeJSON'] );
 				$config = $decoded_data;
 			}
 		}
 
 		/** This filter is documented in wp-includes/class-wp-theme-json-resolver.php */
-		$theme_json   = apply_filters( 'wp_theme_json_data_user', new WP_Theme_JSON_Data_Gutenberg( $config, 'custom' ) );
-		$config       = $theme_json->get_data();
+		$theme_json = apply_filters( 'wp_theme_json_data_user', new WP_Theme_JSON_Data_Gutenberg( $config, 'custom' ) );
+		$config     = $theme_json->get_data();
+
+		// Needs to be set for schema migrations of user data.
+		$config['isGlobalStylesUserThemeJSON'] = true;
+
 		static::$user = new WP_Theme_JSON_Gutenberg( $config, 'custom' );
 
 		return static::$user;
@@ -590,7 +590,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @param string $origin Optional. To what level should we merge data:'default', 'blocks', 'theme' or 'custom'.
 	 *                       'custom' is used as default value as well as fallback value if the origin is unknown.
 	 *
-	 * @return WP_Theme_JSON
+	 * @return WP_Theme_JSON_Gutenberg
 	 */
 	public static function get_merged_data( $origin = 'custom' ) {
 		if ( is_array( $origin ) ) {
@@ -756,5 +756,79 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			}
 		}
 		return $variations;
+	}
+
+
+	/**
+	 * Resolves relative paths in theme.json styles to theme absolute paths
+	 * and returns them in an array that can be embedded
+	 * as the value of `_link` object in REST API responses.
+	 *
+	 * @since 6.6.0
+	 *
+	 * @param WP_Theme_JSON_Gutenberg  $theme_json A theme json instance.
+	 * @return array An array of resolved paths.
+	 */
+	public static function get_resolved_theme_uris( $theme_json ) {
+		$resolved_theme_uris = array();
+
+		if ( ! $theme_json instanceof WP_Theme_JSON_Gutenberg ) {
+			return $resolved_theme_uris;
+		}
+
+		$theme_json_data = $theme_json->get_raw_data();
+
+		// Top level styles.
+		$background_image_url = $theme_json_data['styles']['background']['backgroundImage']['url'] ?? null;
+		// Using the same file convention when registering web fonts. See: WP_Font_Face_Resolver:: to_theme_file_uri.
+		$placeholder = 'file:./';
+		if (
+			isset( $background_image_url ) &&
+			is_string( $background_image_url ) &&
+			// Skip if the src doesn't start with the placeholder, as there's nothing to replace.
+			str_starts_with( $background_image_url, $placeholder ) ) {
+				$file_type          = wp_check_filetype( $background_image_url );
+				$src_url            = str_replace( $placeholder, '', $background_image_url );
+				$resolved_theme_uri = array(
+					'name'   => $background_image_url,
+					'href'   => sanitize_url( get_theme_file_uri( $src_url ) ),
+					'target' => 'styles.background.backgroundImage.url',
+				);
+				if ( isset( $file_type['type'] ) ) {
+					$resolved_theme_uri['type'] = $file_type['type'];
+				}
+				$resolved_theme_uris[] = $resolved_theme_uri;
+		}
+
+		return $resolved_theme_uris;
+	}
+
+	/**
+	 * Resolves relative paths in theme.json styles to theme absolute paths
+	 * and merges them with incoming theme JSON.
+	 *
+	 * @since 6.6.0
+	 *
+	 * @param WP_Theme_JSON_Gutenberg  $theme_json A theme json instance.
+	 * @return WP_Theme_JSON_Gutenberg Theme merged with resolved paths, if any found.
+	 */
+	public static function resolve_theme_file_uris( $theme_json ) {
+		$resolved_urls = static::get_resolved_theme_uris( $theme_json );
+		if ( empty( $resolved_urls ) ) {
+			return $theme_json;
+		}
+
+		$resolved_theme_json_data = array(
+			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+		);
+
+		foreach ( $resolved_urls as $resolved_url ) {
+			$path = explode( '.', $resolved_url['target'] );
+			_wp_array_set( $resolved_theme_json_data, $path, $resolved_url['href'] );
+		}
+
+		$theme_json->merge( new WP_Theme_JSON_Gutenberg( $resolved_theme_json_data ) );
+
+		return $theme_json;
 	}
 }

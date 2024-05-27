@@ -19,10 +19,9 @@ export type CheckboxControlProps = Pick<
 	/**
 	 * A label for the input field, that appears at the side of the checkbox.
 	 * The prop will be rendered as content a label element. If no prop is
-	 * passed an empty label is rendered. If the prop is set to false no label
-	 * is rendered.
+	 * passed an empty label is rendered.
 	 */
-	label?: string | false;
+	label?: string;
 	/**
 	 * If checked is true the checkbox will be checked. If checked is false the
 	 * checkbox will be unchecked. If no value is passed the checkbox will be

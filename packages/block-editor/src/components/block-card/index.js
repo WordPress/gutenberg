@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -45,7 +45,7 @@ function BlockCard( { title, icon, description, blockType, className } ) {
 	const { selectBlock } = useDispatch( blockEditorStore );
 
 	return (
-		<div className={ classnames( 'block-editor-block-card', className ) }>
+		<div className={ clsx( 'block-editor-block-card', className ) }>
 			{ parentNavBlockClientId && ( // This is only used by the Navigation block for now. It's not ideal having Navigation block specific code here.
 				<Button
 					onClick={ () => selectBlock( parentNavBlockClientId ) }
@@ -56,7 +56,7 @@ function BlockCard( { title, icon, description, blockType, className } ) {
 						{ minWidth: 24, padding: 0 }
 					}
 					icon={ isRTL() ? chevronRight : chevronLeft }
-					isSmall
+					size="small"
 				/>
 			) }
 			<BlockIcon icon={ icon } showColors />

@@ -4,7 +4,6 @@
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { useMemo, useCallback } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { pure } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -18,6 +17,7 @@ import {
 import { LINE_HEIGHT_SUPPORT_KEY } from './line-height';
 import { FONT_FAMILY_SUPPORT_KEY } from './font-family';
 import { FONT_SIZE_SUPPORT_KEY } from './font-size';
+import { TEXT_ALIGN_SUPPORT_KEY } from './text-align';
 import { cleanEmptyObject } from './utils';
 import { store as blockEditorStore } from '../store';
 
@@ -41,6 +41,7 @@ export const TYPOGRAPHY_SUPPORT_KEYS = [
 	FONT_STYLE_SUPPORT_KEY,
 	FONT_WEIGHT_SUPPORT_KEY,
 	FONT_FAMILY_SUPPORT_KEY,
+	TEXT_ALIGN_SUPPORT_KEY,
 	TEXT_COLUMNS_SUPPORT_KEY,
 	TEXT_DECORATION_SUPPORT_KEY,
 	WRITING_MODE_SUPPORT_KEY,
@@ -109,7 +110,7 @@ function TypographyInspectorControl( { children, resetAllFilter } ) {
 	);
 }
 
-function TypographyPanelPure( { clientId, name, setAttributes, settings } ) {
+export function TypographyPanel( { clientId, name, setAttributes, settings } ) {
 	function selector( select ) {
 		const { style, fontFamily, fontSize } =
 			select( blockEditorStore ).getBlockAttributes( clientId ) || {};
@@ -146,11 +147,6 @@ function TypographyPanelPure( { clientId, name, setAttributes, settings } ) {
 		/>
 	);
 }
-
-// We don't want block controls to re-render when typing inside a block. `pure`
-// will prevent re-renders unless props change, so only pass the needed props
-// and not the whole attributes object.
-export const TypographyPanel = pure( TypographyPanelPure );
 
 export const hasTypographySupport = ( blockName ) => {
 	return TYPOGRAPHY_SUPPORT_KEYS.some( ( key ) =>

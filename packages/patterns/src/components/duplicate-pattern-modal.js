@@ -29,11 +29,7 @@ function getTermLabels( pattern, categories ) {
 		.map( ( category ) => category.label );
 }
 
-export default function DuplicatePatternModal( {
-	pattern,
-	onClose,
-	onSuccess,
-} ) {
+export function useDuplicatePatternProps( { pattern, onSuccess } ) {
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const categories = useSelect( ( select ) => {
 		const { getUserPatternCategories, getBlockPatternCategories } =
@@ -44,12 +40,10 @@ export default function DuplicatePatternModal( {
 			user: getUserPatternCategories(),
 		};
 	} );
-
 	if ( ! pattern ) {
 		return null;
 	}
-
-	const duplicatedProps = {
+	return {
 		content: pattern.content,
 		defaultCategories: getTermLabels( pattern, categories ),
 		defaultSyncType:
@@ -63,31 +57,39 @@ export default function DuplicatePatternModal( {
 				? pattern.title
 				: pattern.title.raw
 		),
+		onSuccess: ( { pattern: newPattern } ) => {
+			createSuccessNotice(
+				sprintf(
+					// translators: %s: The new pattern's title e.g. 'Call to action (copy)'.
+					__( '"%s" duplicated.' ),
+					newPattern.title.raw
+				),
+				{
+					type: 'snackbar',
+					id: 'patterns-create',
+				}
+			);
+
+			onSuccess?.( { pattern: newPattern } );
+		},
 	};
+}
 
-	function handleOnSuccess( { pattern: newPattern } ) {
-		createSuccessNotice(
-			sprintf(
-				// translators: %s: The new pattern's title e.g. 'Call to action (copy)'.
-				__( '"%s" duplicated.' ),
-				newPattern.title.raw
-			),
-			{
-				type: 'snackbar',
-				id: 'patterns-create',
-			}
-		);
-
-		onSuccess?.( { pattern: newPattern } );
+export default function DuplicatePatternModal( {
+	pattern,
+	onClose,
+	onSuccess,
+} ) {
+	const duplicatedProps = useDuplicatePatternProps( { pattern, onSuccess } );
+	if ( ! pattern ) {
+		return null;
 	}
-
 	return (
 		<CreatePatternModal
 			modalTitle={ __( 'Duplicate pattern' ) }
 			confirmLabel={ __( 'Duplicate' ) }
 			onClose={ onClose }
 			onError={ onClose }
-			onSuccess={ handleOnSuccess }
 			{ ...duplicatedProps }
 		/>
 	);

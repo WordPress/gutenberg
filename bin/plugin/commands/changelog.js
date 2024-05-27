@@ -108,6 +108,7 @@ const LABEL_FEATURE_MAPPING = {
 	'[Feature] Patterns': 'Patterns',
 	'[Feature] Blocks': 'Block Library',
 	'[Feature] Inserter': 'Block Editor',
+	'[Feature] Interactivity API': 'Interactivity API',
 	'[Feature] Drag and Drop': 'Block Editor',
 	'[Feature] Block Multi Selection': 'Block Editor',
 	'[Feature] Link Editing': 'Block Editor',
