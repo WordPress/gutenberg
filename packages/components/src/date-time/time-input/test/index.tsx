@@ -79,6 +79,7 @@ describe( 'TimePicker', () => {
 		const amButton = screen.getByRole( 'button', { name: 'AM' } );
 		const pmButton = screen.getByRole( 'button', { name: 'PM' } );
 
+		// TODO: Update assert these states through the accessibility tree rather than through styles, see: https://github.com/WordPress/gutenberg/issues/61163
 		expect( amButton ).toHaveClass( 'is-primary' );
 		expect( pmButton ).not.toHaveClass( 'is-primary' );
 		expect( hoursInput ).not.toHaveValue( 0 );
