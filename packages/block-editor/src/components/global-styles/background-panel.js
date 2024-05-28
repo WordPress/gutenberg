@@ -22,12 +22,11 @@ import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
-	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { getFilename } from '@wordpress/url';
-import { useCallback, Platform, useRef, useState } from '@wordpress/element';
+import { useCallback, Platform, useRef } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { focus } from '@wordpress/dom';
 import { isBlobURL } from '@wordpress/blob';
@@ -195,14 +194,8 @@ function BackgroundImageToolsPanelItem( {
 	onChange,
 	style,
 	inheritedValue,
-	defaultValues,
 	themeFileURIs,
 } ) {
-	const sizeValue =
-		style?.background?.backgroundSize ||
-		inheritedValue?.background?.backgroundSize ||
-		defaultValues?.backgroundSize;
-
 	const mediaUpload = useSelect(
 		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
 		[]
@@ -253,18 +246,11 @@ function BackgroundImageToolsPanelItem( {
 		}
 
 		onChange(
-			setImmutably( style, [ 'background' ], {
-				...style?.background,
-				backgroundImage: {
-					url: media.url,
-					id: media.id,
-					source: 'file',
-					title: media.title || undefined,
-				},
-				backgroundSize:
-					'auto' === sizeValue || ! sizeValue
-						? '50%'
-						: style?.background?.backgroundSize,
+			setImmutably( style, [ 'background', 'backgroundImage' ], {
+				url: media.url,
+				id: media.id,
+				source: 'file',
+				title: media.title || undefined,
 			} )
 		);
 	};
@@ -383,8 +369,6 @@ function BackgroundSizeToolsPanelItem( {
 	defaultValues,
 	themeFileURIs,
 } ) {
-	const [ lastKnownImageWidth, setLastKnownImageWidth ] =
-		useState( undefined );
 	const sizeValue =
 		style?.background?.backgroundSize ||
 		inheritedValue?.background?.backgroundSize;
@@ -457,7 +441,6 @@ function BackgroundSizeToolsPanelItem( {
 			next === 'auto'
 		) {
 			nextRepeat = undefined;
-			next = lastKnownImageWidth ?? 'auto';
 		}
 
 		/*
@@ -466,7 +449,6 @@ function BackgroundSizeToolsPanelItem( {
 		 */
 		if ( ! next && currentValueForToggle === 'auto' ) {
 			next = 'auto';
-			setLastKnownImageWidth( undefined );
 		}
 
 		onChange(
@@ -476,11 +458,6 @@ function BackgroundSizeToolsPanelItem( {
 				backgroundSize: next,
 			} )
 		);
-
-		const imageWidth = parseQuantityAndUnitFromRawValue( next );
-		if ( typeof imageWidth?.[ 0 ] !== 'undefined' && imageWidth?.[ 1 ] ) {
-			setLastKnownImageWidth( next );
-		}
 	};
 
 	const updateBackgroundPosition = ( next ) => {
@@ -645,7 +622,6 @@ export default function BackgroundPanel( {
 				isShownByDefault={ defaultControls.backgroundImage }
 				style={ value }
 				inheritedValue={ inheritedValue }
-				defaultValues={ defaultValues }
 				themeFileURIs={ themeFileURIs }
 			/>
 			{ shouldShowBackgroundSizeControls && (
