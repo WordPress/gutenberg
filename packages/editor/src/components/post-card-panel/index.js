@@ -1,4 +1,8 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+/**
  * WordPress dependencies
  */
 import {
@@ -18,11 +22,13 @@ import { store as editorStore } from '../../store';
 import {
 	TEMPLATE_POST_TYPE,
 	TEMPLATE_PART_POST_TYPE,
+	PATTERN_POST_TYPE,
+	GLOBAL_POST_TYPES,
 } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
 
 export default function PostCardPanel( { actions } ) {
-	const { title, icon } = useSelect( ( select ) => {
+	const { title, icon, isSync } = useSelect( ( select ) => {
 		const {
 			getEditedPostAttribute,
 			getCurrentPostType,
@@ -36,11 +42,26 @@ export default function PostCardPanel( { actions } ) {
 		const _templateInfo =
 			[ TEMPLATE_POST_TYPE, TEMPLATE_PART_POST_TYPE ].includes( _type ) &&
 			__experimentalGetTemplateInfo( _record );
+		let _isSync = false;
+		if ( GLOBAL_POST_TYPES.includes( _type ) ) {
+			if ( PATTERN_POST_TYPE === _type ) {
+				// When the post is first created, the top level wp_pattern_sync_status is not set so get meta value instead.
+				const currentSyncStatus =
+					getEditedPostAttribute( 'meta' )?.wp_pattern_sync_status ===
+					'unsynced'
+						? 'unsynced'
+						: getEditedPostAttribute( 'wp_pattern_sync_status' );
+				_isSync = currentSyncStatus !== 'unsynced';
+			} else {
+				_isSync = true;
+			}
+		}
 		return {
 			title: _templateInfo?.title || getEditedPostAttribute( 'title' ),
 			icon: unlock( select( editorStore ) ).getPostIcon( _type, {
 				area: _record?.area,
 			} ),
+			isSync: _isSync,
 		};
 	}, [] );
 	return (
@@ -50,7 +71,12 @@ export default function PostCardPanel( { actions } ) {
 				className="editor-post-card-panel__header"
 				align="flex-start"
 			>
-				<Icon className="editor-post-card-panel__icon" icon={ icon } />
+				<Icon
+					className={ clsx( 'editor-post-card-panel__icon', {
+						'is-sync': isSync,
+					} ) }
+					icon={ icon }
+				/>
 				<Text
 					numberOfLines={ 2 }
 					truncate
