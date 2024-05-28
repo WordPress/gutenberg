@@ -31,15 +31,6 @@ export function BlockTypesTab(
 	{ rootClientId, onInsert, onHover, showMostUsedBlocks },
 	ref
 ) {
-	// Find the root of what we _can_ insert into for this block.
-	// const { rootContentBlockId } = useSelect( ( select ) => {
-	// 	// Try the empty root first.
-	// 	const { getAllowedBlockTypes } = select( 'core/block-editor' );
-
-	// 	select( 'core/block-editor' ).getInserterItems( rootClientId );
-
-	// }, [] );
-
 	const [ allItems, items, categories, collections, onSelectItem ] =
 		useBlockTypesState( rootClientId, onInsert );
 
