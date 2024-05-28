@@ -87,3 +87,43 @@ function gutenberg_register_global_styles_revisions_endpoints() {
 }
 
 add_action( 'rest_api_init', 'gutenberg_register_global_styles_revisions_endpoints' );
+
+/**
+ * Registers a new post_type field for the Templates REST API route.
+ */
+function gutenberg_register_template_post_type_field() {
+	register_rest_field(
+		'wp_template',
+		'post_types',
+		array(
+			'get_callback' => 'gutenberg_rest_template_post_type_callback',
+			'schema'       => array(
+				'description' => __( 'The post types the template is intended for.', 'gutenberg' ),
+				'type'        => 'array',
+				'readonly'    => true,
+			),
+		)
+	);
+}
+add_action( 'rest_api_init', 'gutenberg_register_template_post_type_field' );
+
+/**
+ * Callback for the post_type field in the Templates REST API route.
+ *
+ * @param array $template The template object.
+ *
+ * @return array The post type the template is intended for.
+ */
+function gutenberg_rest_template_post_type_callback( $item ) {
+
+	$template_metadata = _get_block_template_file( 'wp_template', $item['slug'] );
+	if ( null === $template_metadata ) {
+		return array();
+	}
+
+	if ( isset( $template_metadata['postTypes'] ) ) {
+		return $template_metadata['postTypes'];
+	}
+
+	return array();
+}
