@@ -287,8 +287,10 @@ interface ActionBase< Item extends AnyItem > {
 
 	/**
 	 * The label of the action.
+	 * In case we want to adjust the label based on the selected items,
+	 * a function can be provided.
 	 */
-	label: string;
+	label: string | ( ( items: Item[] ) => string );
 
 	/**
 	 * The icon of the action. (Either a string or an SVG element)
