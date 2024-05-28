@@ -1,11 +1,7 @@
-// Lowest specificity styles are used to ensure that the default styles for the cover block can be overridden by global styles.
-:where(.wp-block-cover-image, .wp-block-cover) {
-	min-height: 430px;
-	padding: 1em;
-}
-
 .wp-block-cover-image,
 .wp-block-cover {
+	min-height: 430px;
+	padding: 1em;
 	position: relative;
 	background-position: center center;
 	display: flex;
@@ -118,18 +114,6 @@
 		color: inherit;
 		// Reset the fixed LTR direction at the root of the block in RTL languages.
 		/*rtl:raw: direction: rtl; */
-	}
-
-	p,
-	h1,
-	h2,
-	h3,
-	h4,
-	h5,
-	h6 {
-		&:where(:not(.has-text-color)) {
-			color: inherit;
-		}
 	}
 
 	// Position: Top
@@ -313,4 +297,16 @@ section.wp-block-cover-image > h2,
 :where(.wp-block-cover.is-light:not(.has-text-color)),
 :where(.wp-block-cover-image.is-light:not(.has-text-color)) {
 	color: $black;
+}
+
+:root {
+	:where(.wp-block-cover p:not(.has-text-color)),
+	:where(.wp-block-cover h1:not(.has-text-color)),
+	:where(.wp-block-cover h2:not(.has-text-color)),
+	:where(.wp-block-cover h3:not(.has-text-color)),
+	:where(.wp-block-cover h4:not(.has-text-color)),
+	:where(.wp-block-cover h5:not(.has-text-color)),
+	:where(.wp-block-cover h6:not(.has-text-color)) {
+		color: inherit;
+	}
 }
