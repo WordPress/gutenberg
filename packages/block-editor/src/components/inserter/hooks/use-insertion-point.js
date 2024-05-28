@@ -48,6 +48,7 @@ function useInsertionPoint( {
 		getBlockIndex,
 		getBlockRootClientId,
 		getBlockOrder,
+		getBlocks,
 		canInsertBlockType,
 	} = useSelect( blockEditorStore );
 	const { destinationRootClientId, destinationIndex } = useSelect(
@@ -135,8 +136,10 @@ function useInsertionPoint( {
 							_destinationRootClientId
 						)
 					);
-				if ( ! canInsertBlocks && normalizedBlocks.length === 1 ) {
+				if ( ! canInsertBlocks() && normalizedBlocks.length === 1 ) {
 					// If it's not possible to insert the block in the current location, try to find a new location up the tree
+					const rootBlocks = getBlocks();
+					const currentRootBlock = 0;
 					while (
 						! canInsertBlockType(
 							normalizedBlocks[ 0 ].name,
@@ -160,28 +163,12 @@ function useInsertionPoint( {
 							_previousDestinationRootClientId ===
 							_destinationRootClientId
 						) {
-							break;
-						}
-					}
-				}
-
-				while ( ! canInsertBlocks() ) {
-					_destinationIndex =
-						getBlockIndex( _destinationRootClientId ) + 1;
-					_destinationRootClientId = getBlockRootClientId(
-						_destinationRootClientId
-					);
-
-					if ( _destinationRootClientId === null ) {
-						// If we are at the root, try to find a post content block
-						const postContentBlock =
-							getBlocksByName( 'core/post-content' );
-						if ( postContentBlock.length ) {
-							_destinationRootClientId = postContentBlock[ 0 ];
-							// Insert at the end of the post content block.
-							_destinationIndex = getBlockOrder(
-								postContentBlock[ 0 ]
-							).length;
+							if ( currentRootBlock === rootBlocks.length ) {
+								break;
+							}
+							// also try to find an insertable block top down
+							const rootBlock = rootBlocks[ currentRootBlock ];
+							_destinationRootClientId = rootBlock.clientId;
 						}
 					}
 				}
