@@ -22,11 +22,12 @@ import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
+	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { getFilename } from '@wordpress/url';
-import { useCallback, Platform, useRef } from '@wordpress/element';
+import { useCallback, Platform, useRef, useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { focus } from '@wordpress/dom';
 import { isBlobURL } from '@wordpress/blob';
@@ -196,6 +197,10 @@ function BackgroundImageToolsPanelItem( {
 	inheritedValue,
 	themeFileURIs,
 } ) {
+	const sizeValue =
+		style?.background?.backgroundSize ||
+		inheritedValue?.background?.backgroundSize;
+
 	const mediaUpload = useSelect(
 		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
 		[]
@@ -253,6 +258,12 @@ function BackgroundImageToolsPanelItem( {
 				title: media.title || undefined,
 			} )
 		);
+
+		if ( 'auto' === sizeValue || ! sizeValue ) {
+			onChange(
+				setImmutably( style, [ 'background', 'backgroundSize' ], '50%' )
+			);
+		}
 	};
 
 	const onFilesDrop = ( filesList ) => {
@@ -369,6 +380,8 @@ function BackgroundSizeToolsPanelItem( {
 	defaultValues,
 	themeFileURIs,
 } ) {
+	const [ lastKnownImageWidth, setLastKnownImageWidth ] =
+		useState( undefined );
 	const sizeValue =
 		style?.background?.backgroundSize ||
 		inheritedValue?.background?.backgroundSize;
@@ -441,6 +454,7 @@ function BackgroundSizeToolsPanelItem( {
 			next === 'auto'
 		) {
 			nextRepeat = undefined;
+			next = lastKnownImageWidth ?? '50%';
 		}
 
 		/*
@@ -449,6 +463,7 @@ function BackgroundSizeToolsPanelItem( {
 		 */
 		if ( ! next && currentValueForToggle === 'auto' ) {
 			next = 'auto';
+			setLastKnownImageWidth( undefined );
 		}
 
 		onChange(
@@ -458,6 +473,11 @@ function BackgroundSizeToolsPanelItem( {
 				backgroundSize: next,
 			} )
 		);
+
+		const imageWidth = parseQuantityAndUnitFromRawValue( next );
+		if ( typeof imageWidth?.[ 0 ] !== 'undefined' && imageWidth?.[ 1 ] ) {
+			setLastKnownImageWidth( next );
+		}
 	};
 
 	const updateBackgroundPosition = ( next ) => {
@@ -545,6 +565,7 @@ function BackgroundSizeToolsPanelItem( {
 						size="__unstable-large"
 						__unstableInputWidth="100px"
 						min={ 0 }
+						placeholder={ __( 'Auto' ) }
 					/>
 				) : null }
 				{ currentValueForToggle !== 'cover' && (
