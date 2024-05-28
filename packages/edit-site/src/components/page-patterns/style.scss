@@ -1,15 +1,3 @@
-.edit-site-patterns__header {
-	position: sticky;
-	top: 0;
-	background: $gray-900;
-	padding: $grid-unit-40 $grid-unit-40 $grid-unit-20;
-	z-index: z-index(".edit-site-patterns__header");
-
-	.edit-site-patterns__button {
-		color: $gray-600;
-	}
-}
-
 .edit-site-patterns__section-header {
 	.screen-reader-shortcut:focus {
 		top: 0;
