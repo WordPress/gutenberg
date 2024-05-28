@@ -20,7 +20,6 @@ const meta: Meta< typeof TimeInput > = {
 		docs: { canvas: { sourceState: 'shown' } },
 	},
 	args: {
-		is12Hour: true,
 		onChange: ( obj ) => {
 			action( 'onChange' )( obj );
 		},
