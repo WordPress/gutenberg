@@ -15,6 +15,7 @@ import {
 	getBlockSupport,
 	isUnmodifiedDefaultBlock,
 	isUnmodifiedBlock,
+	store as blocksStore,
 } from '@wordpress/blocks';
 import { speak } from '@wordpress/a11y';
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -155,24 +156,95 @@ export function receiveBlocks( blocks ) {
 /**
  * Action that updates attributes of multiple blocks with the specified client IDs.
  *
+ * Process block bindings to skip updating the bound attributes and run binding source setValue instead.
+ *
  * @param {string|string[]} clientIds     Block client IDs.
  * @param {Object}          attributes    Block attributes to be merged. Should be keyed by clientIds if
  *                                        uniqueByBlock is true.
  * @param {boolean}         uniqueByBlock true if each block in clientIds array has a unique set of attributes
  * @return {Object} Action object.
  */
-export function updateBlockAttributes(
-	clientIds,
-	attributes,
-	uniqueByBlock = false
-) {
-	return {
-		type: 'UPDATE_BLOCK_ATTRIBUTES',
-		clientIds: castArray( clientIds ),
-		attributes,
-		uniqueByBlock,
+export const updateBlockAttributes =
+	( clientIds, attributes, uniqueByBlock = false ) =>
+	( { dispatch, registry } ) => {
+		const keptAttributes = { ...attributes };
+		for ( const clientId of clientIds ) {
+			const { metadata: { bindings } = {} } = registry
+				.select( STORE_NAME )
+				.getBlockAttributes( clientId );
+
+			if ( ! bindings ) {
+				continue;
+			}
+
+			const sources = unlock(
+				registry.select( blocksStore )
+			).getAllBlockBindingsSources();
+
+			const updatesBySource = new Map();
+
+			const attributeEntries = Object.entries(
+				uniqueByBlock ? attributes[ clientId ] : attributes
+			);
+
+			attributeEntries.forEach( ( [ attributeName, newValue ] ) => {
+				if ( ! bindings[ attributeName ] ) {
+					return;
+				}
+
+				const source = sources[ bindings[ attributeName ].source ];
+				if ( ! source?.setValue && ! source?.setValues ) {
+					return;
+				}
+				updatesBySource.set( source, {
+					...updatesBySource.get( source ),
+					[ attributeName ]: newValue,
+				} );
+
+				// Skip attribute.
+				if ( uniqueByBlock ) {
+					delete keptAttributes[ clientId ][ attributeName ];
+				} else {
+					delete keptAttributes[ attributeName ];
+				}
+			} );
+
+			if ( updatesBySource.size ) {
+				// TODO: Access the block context.
+				const context = {};
+				for ( const [ source, boundAttributes ] of updatesBySource ) {
+					if ( source.setValues ) {
+						source.setValues( {
+							registry,
+							context,
+							clientId,
+							attributes: boundAttributes,
+						} );
+					} else {
+						for ( const [ attributeName, value ] of Object.entries(
+							boundAttributes
+						) ) {
+							source.setValue( {
+								registry,
+								context,
+								clientId,
+								attributeName,
+								args: bindings[ attributeName ].args,
+								value,
+							} );
+						}
+					}
+				}
+			}
+		}
+
+		dispatch( {
+			type: 'UPDATE_BLOCK_ATTRIBUTES',
+			clientIds: castArray( clientIds ),
+			attributes: keptAttributes,
+			uniqueByBlock,
+		} );
 	};
-}
 
 /**
  * Action that updates the block with the specified client ID.
