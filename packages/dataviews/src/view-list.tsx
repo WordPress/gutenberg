@@ -105,6 +105,11 @@ function ListItem< Item extends AnyItem >( {
 	}, [ actions, item ] );
 
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
+	const primaryActionLabel =
+		primaryAction &&
+		( typeof primaryAction.label === 'string'
+			? primaryAction.label
+			: primaryAction.label( [ item ] ) );
 
 	return (
 		<CompositeRow
@@ -193,7 +198,7 @@ function ListItem< Item extends AnyItem >( {
 									store={ store }
 									render={
 										<Button
-											label={ primaryAction.label }
+											label={ primaryActionLabel }
 											icon={ primaryAction.icon }
 											isDestructive={
 												primaryAction.isDestructive
@@ -224,7 +229,7 @@ function ListItem< Item extends AnyItem >( {
 										store={ store }
 										render={
 											<Button
-												label={ primaryAction.label }
+												label={ primaryActionLabel }
 												icon={ primaryAction.icon }
 												isDestructive={
 													primaryAction.isDestructive

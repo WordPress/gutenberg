@@ -11,8 +11,18 @@
 	transform: none;
 }
 
-.editor-styles-wrapper .wp-block-social-links {
+// Specificity for the following styles are fixed at 0-1-0 to match and be
+// overridable by global styles.
+:root :where(.wp-block-social-links),
+:root :where(.wp-block-social-links.is-style-logos-only .wp-block-social-links__social-placeholder .wp-social-link) {
 	padding: 0;
+}
+:root :where(.wp-block-social-links__social-placeholder .wp-social-link) {
+	padding: 0.25em;
+}
+:root :where(.wp-block-social-links.is-style-pill-shape .wp-block-social-links__social-placeholder .wp-social-link) {
+	padding-left: calc((2/3) * 1em);
+	padding-right: calc((2/3) * 1em);
 }
 
 // Placeholder/setup state.
@@ -35,19 +45,6 @@
 	// Wrap the remaining placeholders in a container so the plus can overlap.
 	> .wp-block-social-links__social-placeholder-icons {
 		display: flex;
-	}
-
-	.wp-social-link {
-		padding: 0.25em;
-
-		.is-style-pill-shape & {
-			padding-left: calc((2/3) * 1em);
-			padding-right: calc((2/3) * 1em);
-		}
-
-		.is-style-logos-only & {
-			padding: 0;
-		}
 	}
 
 	.wp-social-link::before {

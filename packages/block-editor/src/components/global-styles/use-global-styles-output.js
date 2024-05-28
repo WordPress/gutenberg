@@ -522,10 +522,10 @@ export function getLayoutStyles( {
 							} else {
 								combinedSelector =
 									selector === ROOT_BLOCK_SELECTOR
-										? `:where(.${ className })${
+										? `.${ className }${
 												spacingStyle?.selector || ''
 										  }`
-										: `:where(${ selector }-${ className })${
+										: `${ selector }-${ className }${
 												spacingStyle?.selector || ''
 										  }`;
 							}
@@ -815,23 +815,18 @@ export const toStyles = (
 		 */
 		ruleset += ':where(body) {margin: 0;';
 
-		// Root padding styles should only be output for full templates, not patterns or template parts.
-		if (
-			options.rootPadding &&
-			useRootPaddingAlign &&
-			! disableRootPadding
-		) {
+		// Root padding styles should be output for full templates, patterns and template parts.
+		if ( options.rootPadding && useRootPaddingAlign ) {
 			/*
 			 * These rules reproduce the ones from https://github.com/WordPress/gutenberg/blob/79103f124925d1f457f627e154f52a56228ed5ad/lib/class-wp-theme-json-gutenberg.php#L2508
 			 * almost exactly, but for the selectors that target block wrappers in the front end. This code only runs in the editor, so it doesn't need those selectors.
 			 */
 			ruleset += `padding-right: 0; padding-left: 0; padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom) }
 				.has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }
-				.has-global-padding :where(.has-global-padding:not(.wp-block-block)) { padding-right: 0; padding-left: 0; }
 				.has-global-padding > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); }
-				.has-global-padding :where(.has-global-padding:not(.wp-block-block)) > .alignfull { margin-right: 0; margin-left: 0; }
-				.has-global-padding > .alignfull:where(:not(.has-global-padding):not(.is-layout-flex):not(.is-layout-grid)) > :where(.wp-block:not(.alignfull),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }
-				.has-global-padding :where(.has-global-padding) > .alignfull:where(:not(.has-global-padding)) > :where(.wp-block:not(.alignfull),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: 0; padding-left: 0;`;
+				.has-global-padding :where(.has-global-padding:not(.wp-block-block, .alignfull, .alignwide)) { padding-right: 0; padding-left: 0; }
+				.has-global-padding :where(.has-global-padding:not(.wp-block-block, .alignfull, .alignwide)) > .alignfull { margin-left: 0; margin-right: 0; }
+				`;
 		}
 
 		ruleset += '}';
@@ -860,57 +855,7 @@ export const toStyles = (
 						( [ cssSelector, declarations ] ) => {
 							if ( declarations.length ) {
 								const rules = declarations.join( ';' );
-								ruleset += `:where(${ cssSelector }){${ rules };}`;
-							}
-						}
-					);
-				}
-
-				if ( styleVariationSelectors ) {
-					Object.entries( styleVariationSelectors ).forEach(
-						( [ styleVariationName, styleVariationSelector ] ) => {
-							const styleVariations =
-								styles?.variations?.[ styleVariationName ];
-							if ( styleVariations ) {
-								// If the block uses any custom selectors for block support, add those first.
-								if ( featureSelectors ) {
-									const featureDeclarations =
-										getFeatureDeclarations(
-											featureSelectors,
-											styleVariations
-										);
-
-									Object.entries(
-										featureDeclarations
-									).forEach(
-										( [ baseSelector, declarations ] ) => {
-											if ( declarations.length ) {
-												const cssSelector =
-													concatFeatureVariationSelectorString(
-														baseSelector,
-														styleVariationSelector
-													);
-												const rules =
-													declarations.join( ';' );
-												ruleset += `${ cssSelector }{${ rules };}`;
-											}
-										}
-									);
-								}
-
-								// Otherwise add regular selectors.
-								const styleVariationDeclarations =
-									getStylesDeclarations(
-										styleVariations,
-										styleVariationSelector,
-										useRootPaddingAlign,
-										tree
-									);
-								if ( styleVariationDeclarations.length ) {
-									ruleset += `${ styleVariationSelector }{${ styleVariationDeclarations.join(
-										';'
-									) };}`;
-								}
+								ruleset += `:root :where(${ cssSelector }){${ rules };}`;
 							}
 						}
 					);
@@ -947,17 +892,67 @@ export const toStyles = (
 				}
 
 				// Process the remaining block styles (they use either normal block class or __experimentalSelector).
-				const declarations = getStylesDeclarations(
+				const styleDeclarations = getStylesDeclarations(
 					styles,
 					selector,
 					useRootPaddingAlign,
 					tree,
 					disableRootPadding
 				);
-				if ( declarations?.length ) {
-					ruleset += `:where(${ selector }){${ declarations.join(
+				if ( styleDeclarations?.length ) {
+					ruleset += `:root :where(${ selector }){${ styleDeclarations.join(
 						';'
 					) };}`;
+				}
+
+				if ( styleVariationSelectors ) {
+					Object.entries( styleVariationSelectors ).forEach(
+						( [ styleVariationName, styleVariationSelector ] ) => {
+							const styleVariations =
+								styles?.variations?.[ styleVariationName ];
+							if ( styleVariations ) {
+								// If the block uses any custom selectors for block support, add those first.
+								if ( featureSelectors ) {
+									const featureDeclarations =
+										getFeatureDeclarations(
+											featureSelectors,
+											styleVariations
+										);
+
+									Object.entries(
+										featureDeclarations
+									).forEach(
+										( [ baseSelector, declarations ] ) => {
+											if ( declarations.length ) {
+												const cssSelector =
+													concatFeatureVariationSelectorString(
+														baseSelector,
+														styleVariationSelector
+													);
+												const rules =
+													declarations.join( ';' );
+												ruleset += `:root :where(${ cssSelector }){${ rules };}`;
+											}
+										}
+									);
+								}
+
+								// Otherwise add regular selectors.
+								const styleVariationDeclarations =
+									getStylesDeclarations(
+										styleVariations,
+										styleVariationSelector,
+										useRootPaddingAlign,
+										tree
+									);
+								if ( styleVariationDeclarations.length ) {
+									ruleset += `:root :where(${ styleVariationSelector }){${ styleVariationDeclarations.join(
+										';'
+									) };}`;
+								}
+							}
+						}
+					);
 				}
 
 				// Check for pseudo selector in `styles` and handle separately.
@@ -1018,13 +1013,13 @@ export const toStyles = (
 			getGapCSSValue( tree?.styles?.spacing?.blockGap ) || '0.5em';
 		ruleset =
 			ruleset +
-			`:where(.wp-site-blocks) > * { margin-block-start: ${ gapValue }; margin-block-end: 0; }`;
+			`:root :where(.wp-site-blocks) > * { margin-block-start: ${ gapValue }; margin-block-end: 0; }`;
 		ruleset =
 			ruleset +
-			':where(.wp-site-blocks) > :first-child { margin-block-start: 0; }';
+			':root :where(.wp-site-blocks) > :first-child { margin-block-start: 0; }';
 		ruleset =
 			ruleset +
-			':where(.wp-site-blocks) > :last-child { margin-block-end: 0; }';
+			':root :where(.wp-site-blocks) > :last-child { margin-block-end: 0; }';
 	}
 
 	if ( options.presets ) {
@@ -1185,7 +1180,7 @@ export function processCSSNesting( css, blockSelector ) {
 		const isRootCss = ! part.includes( '{' );
 		if ( isRootCss ) {
 			// If the part doesn't contain braces, it applies to the root level.
-			processedCSS += `${ blockSelector }{${ part.trim() }}`;
+			processedCSS += `:root :where(${ blockSelector }){${ part.trim() }}`;
 		} else {
 			// If the part contains braces, it's a nested CSS rule.
 			const splittedPart = part.replace( '}', '' ).split( '{' );
@@ -1198,7 +1193,7 @@ export function processCSSNesting( css, blockSelector ) {
 				? scopeSelector( blockSelector, nestedSelector )
 				: appendToSelector( blockSelector, nestedSelector );
 
-			processedCSS += `${ combinedSelector }{${ cssValue.trim() }}`;
+			processedCSS += `:root :where(${ combinedSelector }){${ cssValue.trim() }}`;
 		}
 	} );
 	return processedCSS;
