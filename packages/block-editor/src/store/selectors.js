@@ -146,7 +146,9 @@ export const getBlockAttributes = createRegistrySelector(
 		isProcessingBindings = true;
 
 		const newAttributes = { ...blockAttributes };
-		const context = select( STORE_NAME ).getBlockContext( clientId );
+		const context = unlock( select( STORE_NAME ) ).getBlockContext(
+			clientId
+		);
 		const sources = unlock(
 			select( blocksStore )
 		).getAllBlockBindingsSources();

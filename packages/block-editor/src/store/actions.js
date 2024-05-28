@@ -213,9 +213,9 @@ export const updateBlockAttributes =
 			} );
 
 			if ( updatesBySource.size ) {
-				const context = registry
-					.select( STORE_NAME )
-					.getBlockContext( clientId );
+				const context = unlock(
+					registry.select( STORE_NAME )
+				).getBlockContext( clientId );
 				for ( const [ source, boundAttributes ] of updatesBySource ) {
 					if ( source.setValues ) {
 						source.setValues( {
