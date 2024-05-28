@@ -27,3 +27,9 @@ export const TEMPLATE_ORIGINS = {
 	theme: 'theme',
 	plugin: 'plugin',
 };
+export const TEMPLATE_POST_TYPES = [ 'wp_template', 'wp_template_part' ];
+export const GLOBAL_POST_TYPES = [
+	...TEMPLATE_POST_TYPES,
+	'wp_block',
+	'wp_navigation',
+];
