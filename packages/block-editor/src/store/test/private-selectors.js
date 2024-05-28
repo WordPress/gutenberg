@@ -9,6 +9,7 @@ import {
 	getEnabledBlockParents,
 	getExpandedBlock,
 	isDragging,
+	getBlockContext,
 } from '../private-selectors';
 import { getBlockEditingMode } from '../selectors';
 
@@ -507,6 +508,33 @@ describe( 'private selectors', () => {
 			expect( getExpandedBlock( state ) ).toBe(
 				'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f'
 			);
+		} );
+	} );
+
+	describe( 'getBlockContext', () => {
+		it( 'should return the context of a block', () => {
+			const state = {
+				blockContext: {
+					chicken: {
+						context1: false,
+					},
+					ribs: {
+						context2: true,
+					},
+				},
+			};
+
+			expect( getBlockContext( state, 'chicken' ) ).toEqual( {
+				context1: false,
+			} );
+		} );
+
+		it( 'should return undefined if context for the block doesn’t exist', () => {
+			const state = {
+				blockContext: {},
+			};
+
+			expect( getBlockContext( state, 'chicken' ) ).toBe( undefined );
 		} );
 	} );
 } );

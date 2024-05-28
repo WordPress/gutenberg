@@ -9,6 +9,7 @@ import {
 	setOpenedBlockSettingsMenu,
 	startDragging,
 	stopDragging,
+	updateBlockContext,
 } from '../private-actions';
 
 describe( 'private actions', () => {
@@ -120,6 +121,26 @@ describe( 'private actions', () => {
 			expect( expandBlock( 'block-1' ) ).toEqual( {
 				type: 'SET_BLOCK_EXPANDED_IN_LIST_VIEW',
 				clientId: 'block-1',
+			} );
+		} );
+	} );
+
+	describe( 'updateBlockContext', () => {
+		it( 'should return the UPDATE_BLOCK_CONTEXT with undefined context', () => {
+			expect( updateBlockContext( 'chicken' ) ).toEqual( {
+				type: 'UPDATE_BLOCK_CONTEXT',
+				clientId: 'chicken',
+				context: undefined,
+			} );
+		} );
+
+		it( 'should return the UPDATE_BLOCK_CONTEXT action with the passed context', () => {
+			expect(
+				updateBlockContext( 'chicken', { chicken: 'ribs' } )
+			).toEqual( {
+				type: 'UPDATE_BLOCK_CONTEXT',
+				clientId: 'chicken',
+				context: { chicken: 'ribs' },
 			} );
 		} );
 	} );

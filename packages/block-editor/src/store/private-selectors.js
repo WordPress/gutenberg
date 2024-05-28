@@ -511,3 +511,15 @@ export function getTemporarilyEditingAsBlocks( state ) {
 export function getTemporarilyEditingFocusModeToRevert( state ) {
 	return state.temporarilyEditingFocusModeRevert;
 }
+
+/**
+ * Returns the Block Context of a block, if any exist.
+ *
+ * @param {Object}  state    Editor state.
+ * @param {?string} clientId Block client ID.
+ *
+ * @return {?Object} Block context of the block if set.
+ */
+export function getBlockContext( state, clientId ) {
+	return state.blockContext[ clientId ];
+}

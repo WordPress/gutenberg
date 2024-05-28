@@ -20,6 +20,7 @@ import { useContext, useLayoutEffect, useMemo } from '@wordpress/element';
  */
 import BlockContext from '../block-context';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 /**
  * Default value used for blocks which do not define their own context needs,
@@ -55,7 +56,7 @@ const EditWithGeneratedProps = ( props ) => {
 	const blockContext = useContext( BlockContext );
 
 	// Sync the block context with the block editor store.
-	const { updateBlockContext } = useDispatch( blockEditorStore );
+	const { updateBlockContext } = unlock( useDispatch( blockEditorStore ) );
 	useLayoutEffect( () => {
 		if ( blockContext && Object.keys( blockContext ).length > 0 ) {
 			updateBlockContext( clientId, blockContext );

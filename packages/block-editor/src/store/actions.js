@@ -1530,22 +1530,6 @@ export function updateBlockListSettings( clientId, settings ) {
 }
 
 /**
- * Action that changes the block context of the given block(s) in the store.
- *
- * @param {string | SettingsByClientId} clientId Client ID of the block.
- * @param {Object}                      context  Object with the new context.
- *
- * @return {Object} Action object
- */
-export function updateBlockContext( clientId, context ) {
-	return {
-		type: 'UPDATE_BLOCK_CONTEXT',
-		clientId,
-		context,
-	};
-}
-
-/**
  * Action that updates the block editor settings.
  *
  * @param {Object} settings Updated settings
