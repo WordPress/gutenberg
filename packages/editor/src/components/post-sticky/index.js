@@ -26,9 +26,7 @@ export default function PostSticky() {
 				<ToggleControl
 					className="editor-post-sticky__toggle-control"
 					label={
-						<VisuallyHidden>
-							{ __( 'Stick to the top of the blog' ) }
-						</VisuallyHidden>
+						<VisuallyHidden>{ __( 'Sticky' ) }</VisuallyHidden>
 					}
 					checked={ postSticky }
 					onChange={ () => editPost( { sticky: ! postSticky } ) }
