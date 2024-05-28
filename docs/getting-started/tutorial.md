@@ -781,7 +781,7 @@ This block validation error occurs because the `save()` function returns block c
 
 You will see more of these errors as you update the `save()` function in subsequent steps. Just click "Attempt Block Recovery" and update the page.
 
-After preforming block recovery, open the Code editor and you will see the markup now looks like this.
+After performing block recovery, open the Code editor and you will see the markup now looks like this.
 
 ```html
 <!-- wp:create-block/copyright-date-block {"showStartingYear":true,"startingYear":"2017"} -->
