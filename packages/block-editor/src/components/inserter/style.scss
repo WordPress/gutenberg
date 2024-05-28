@@ -525,8 +525,8 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
-.block-editor-inserter__patterns-category-panel-title {
-	font-size: calc(1.25 * 13px);
+.components-heading.block-editor-inserter__patterns-category-panel-title {
+	font-weight: 500;
 }
 
 .block-editor-inserter__patterns-explore-button,
