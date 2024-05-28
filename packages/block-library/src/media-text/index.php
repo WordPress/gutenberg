@@ -36,7 +36,10 @@ function render_block_core_media_text( $attributes, $content ) {
 	$unique_id             = 'wp-block-media-text__media-' . wp_unique_id();
 	$image_tag             = '<img class="wp-block-media-text__featured_image">';
 	$media_tag_processor   = new WP_HTML_Tag_Processor( $content );
-	$wrapping_figure_query = array( 'tag_name' => 'figure', 'class_name' => 'wp-block-media-text__media' );
+	$wrapping_figure_query = array(
+		'tag_name' => 'figure',
+		'class_name' => 'wp-block-media-text__media',
+	);
 
 	if ( $has_media_on_right ) {
 		// Loop through all the figure tags and set a bookmark on the last figure tag.
@@ -49,7 +52,7 @@ function render_block_core_media_text( $attributes, $content ) {
 				$media_tag_processor->set_attribute( 'style', 'background-image:url(' . esc_url( $current_featured_image ) . ');background-position:' . $focal_point . ';' );
 			} else {
 				// Insert a unique ID to identify the figure tag.
-				$media_tag_processor->set_attribute( 'id', $unique_id);
+				$media_tag_processor->set_attribute( 'id', $unique_id );
 			}
 		}
 	} else {
@@ -58,7 +61,7 @@ function render_block_core_media_text( $attributes, $content ) {
 				$media_tag_processor->set_attribute( 'style', 'background-image:url(' . esc_url( $current_featured_image ) . ');background-position:' . $focal_point . ';' );
 			} else {
 				// Insert a unique ID to identify the figure tag.
-				$media_tag_processor->set_attribute( 'id', $unique_id);
+				$media_tag_processor->set_attribute( 'id', $unique_id );
 			}
 		}
 	}
@@ -75,11 +78,21 @@ function render_block_core_media_text( $attributes, $content ) {
 		);
 
 		$image_tag_processor = new WP_HTML_Tag_Processor( $content );
-		$image_tag_processor->next_tag( array( 'tag_name' => 'figure', 'id' => $unique_id ) );
+		$image_tag_processor->next_tag(
+			array(
+				'tag_name' => 'figure',
+				'id' => $unique_id,
+			)
+		);
 		// The ID is only used to ensure that the correct figure tag is selected,
 		// and can now be removed.
 		$image_tag_processor->remove_attribute( 'id' );
-		$image_tag_processor->next_tag( array( 'tag_name' => 'img', 'class_name' => 'wp-block-media-text__featured_image' ) );
+		$image_tag_processor->next_tag(
+			array(
+				'tag_name' => 'img',
+				'class_name' => 'wp-block-media-text__featured_image',
+			)
+		);
 		$image_tag_processor->set_attribute( 'src', esc_url( $current_featured_image ) );
 		$image_tag_processor->set_attribute( 'class', 'wp-image-' . get_post_thumbnail_id() . ' size-' . $media_size_slug );
 		$image_tag_processor->set_attribute( 'alt', trim( strip_tags( get_post_meta( get_post_thumbnail_id(), '_wp_attachment_image_alt', true ) ) ) );
