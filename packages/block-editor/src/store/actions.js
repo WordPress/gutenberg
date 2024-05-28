@@ -171,7 +171,7 @@ export const updateBlockAttributes =
 		const keptAttributes = { ...attributes };
 		for ( const clientId of clientIds ) {
 			const block = registry.select( STORE_NAME ).getBlock( clientId );
-			const bindings = block.attributes?.metadata?.bindings;
+			const bindings = block?.attributes?.metadata?.bindings;
 
 			if ( ! bindings ) {
 				continue;
