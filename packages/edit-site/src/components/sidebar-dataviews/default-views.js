@@ -12,6 +12,7 @@ import {
 	LAYOUT_TABLE,
 	LAYOUT_GRID,
 	OPERATOR_IS_ANY,
+	OPERATOR_IS_NONE,
 } from '../../utils/constants';
 
 export const DEFAULT_CONFIG_PER_VIEW_TYPE = {
@@ -52,7 +53,16 @@ export const DEFAULT_VIEWS = {
 			title: __( 'All pages' ),
 			slug: 'all',
 			icon: pages,
-			view: DEFAULT_PAGE_BASE,
+			view: {
+				...DEFAULT_PAGE_BASE,
+				filters: [
+					{
+						field: 'status',
+						operator: OPERATOR_IS_NONE,
+						value: 'trash',
+					},
+				],
+			},
 		},
 		{
 			title: __( 'Published' ),
