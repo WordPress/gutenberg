@@ -195,11 +195,13 @@ function BackgroundImageToolsPanelItem( {
 	onChange,
 	style,
 	inheritedValue,
+	defaultValues,
 	themeFileURIs,
 } ) {
 	const sizeValue =
 		style?.background?.backgroundSize ||
-		inheritedValue?.background?.backgroundSize;
+		inheritedValue?.background?.backgroundSize ||
+		defaultValues?.backgroundSize;
 
 	const mediaUpload = useSelect(
 		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
@@ -251,19 +253,20 @@ function BackgroundImageToolsPanelItem( {
 		}
 
 		onChange(
-			setImmutably( style, [ 'background', 'backgroundImage' ], {
-				url: media.url,
-				id: media.id,
-				source: 'file',
-				title: media.title || undefined,
+			setImmutably( style, [ 'background' ], {
+				...style?.background,
+				backgroundImage: {
+					url: media.url,
+					id: media.id,
+					source: 'file',
+					title: media.title || undefined,
+				},
+				backgroundSize:
+					'auto' === sizeValue || ! sizeValue
+						? '50%'
+						: style?.background?.backgroundSize,
 			} )
 		);
-
-		if ( 'auto' === sizeValue || ! sizeValue ) {
-			onChange(
-				setImmutably( style, [ 'background', 'backgroundSize' ], '50%' )
-			);
-		}
 	};
 
 	const onFilesDrop = ( filesList ) => {
@@ -454,7 +457,7 @@ function BackgroundSizeToolsPanelItem( {
 			next === 'auto'
 		) {
 			nextRepeat = undefined;
-			next = lastKnownImageWidth ?? '50%';
+			next = lastKnownImageWidth ?? 'auto';
 		}
 
 		/*
@@ -642,6 +645,7 @@ export default function BackgroundPanel( {
 				isShownByDefault={ defaultControls.backgroundImage }
 				style={ value }
 				inheritedValue={ inheritedValue }
+				defaultValues={ defaultValues }
 				themeFileURIs={ themeFileURIs }
 			/>
 			{ shouldShowBackgroundSizeControls && (
