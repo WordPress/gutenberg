@@ -81,11 +81,25 @@ describe( 'actions', () => {
 	} );
 
 	describe( 'updateBlockAttributes', () => {
-		it( 'should return the UPDATE_BLOCK_ATTRIBUTES action (string)', () => {
+		let dispatch, registry;
+		beforeEach( () => {
+			dispatch = jest.fn();
+			registry = createRegistry();
+			registry.registerStore( blockEditorStoreName, {
+				actions,
+				selectors,
+				reducer,
+			} );
+		} );
+
+		it( 'should dispatch the UPDATE_BLOCK_ATTRIBUTES action (string)', () => {
 			const clientId = 'myclientid';
 			const attributes = {};
-			const result = updateBlockAttributes( clientId, attributes );
-			expect( result ).toEqual( {
+			updateBlockAttributes(
+				clientId,
+				attributes
+			)( { dispatch, registry } );
+			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
 				clientIds: [ clientId ],
 				attributes,
@@ -93,11 +107,14 @@ describe( 'actions', () => {
 			} );
 		} );
 
-		it( 'should return the UPDATE_BLOCK_ATTRIBUTES action (array)', () => {
+		it( 'should dispatch the UPDATE_BLOCK_ATTRIBUTES action (array)', () => {
 			const clientIds = [ 'myclientid' ];
 			const attributes = {};
-			const result = updateBlockAttributes( clientIds, attributes );
-			expect( result ).toEqual( {
+			updateBlockAttributes(
+				clientIds,
+				attributes
+			)( { dispatch, registry } );
+			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
 				clientIds,
 				attributes,
