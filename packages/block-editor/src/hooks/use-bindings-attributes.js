@@ -4,7 +4,7 @@
 import { store as blocksStore } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useRegistry, useSelect } from '@wordpress/data';
-import { useCallback } from '@wordpress/element';
+import { useCallback, useMemo } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 
 /**
@@ -29,7 +29,38 @@ const BLOCK_BINDINGS_ALLOWED_BLOCKS = {
 	'core/button': [ 'url', 'text', 'linkTarget', 'rel' ],
 };
 
-const DEFAULT_ATTRIBUTES = '__default';
+const DEFAULT_ATTRIBUTE = '__default';
+
+/**
+ * Returns the bindings with the `__default` binding for pattern overrides
+ * replaced with the full-set of supported attributes. e.g.:
+ *
+ * bindings passed in: `{ bindings: { __default: 'core/pattern-overrides' } }`
+ * bindings returned: `{ bindings: { content: 'core/pattern-overrides' } }`
+ *
+ * @param {string} blockName The block name (e.g. 'core/paragraph').
+ * @param {Object} bindings  A block's bindings from the metadata attribute.
+ *
+ * @return {Object} The bindings with default replaced for pattern overrides.
+ */
+function replacePatternOverrideDefaultBindings( blockName, bindings ) {
+	// The `__default` binding currently only works for pattern overrides.
+	if ( bindings?.[ DEFAULT_ATTRIBUTE ] === 'core/pattern-overrides' ) {
+		const supportedAttributes = BLOCK_BINDINGS_ALLOWED_BLOCKS[ blockName ];
+		const bindingsWithDefaults = {};
+		for ( const attributeName of supportedAttributes ) {
+			// If the block has mixed binding sources, retain any non pattern override bindings.
+			const bindingSourceName = bindings[ attributeName ]
+				? bindings[ attributeName ]
+				: 'core/pattern-overrides';
+			bindingsWithDefaults[ attributeName ] = bindingSourceName;
+		}
+
+		return bindingsWithDefaults;
+	}
+
+	return bindings;
+}
 
 /**
  * Based on the given block name,
@@ -64,26 +95,21 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 			unlock( select( blocksStore ) ).getAllBlockBindingsSources()
 		);
 		const bindings = props.attributes.metadata?.bindings;
+		const bindingsWithDefaults = useMemo(
+			() => replacePatternOverrideDefaultBindings( name, bindings ),
+			[ bindings, name ]
+		);
 		const { name, clientId, context } = props;
 		const boundAttributes = useSelect( () => {
-			if ( ! bindings ) {
+			if ( ! bindingsWithDefaults ) {
 				return;
 			}
 
-			const bindingsEntries = Object.entries( bindings );
 			const attributes = {};
 
-			if ( bindings[ DEFAULT_ATTRIBUTES ] !== undefined ) {
-				const defaultAttributes = BLOCK_BINDINGS_ALLOWED_BLOCKS[ name ];
-				bindingsEntries.push(
-					...defaultAttributes.map( ( attributeName ) => [
-						attributeName,
-						bindings[ DEFAULT_ATTRIBUTES ],
-					] )
-				);
-			}
-
-			for ( const [ attributeName, boundAttribute ] of bindingsEntries ) {
+			for ( const [ attributeName, boundAttribute ] of Object.entries(
+				bindingsWithDefaults
+			) ) {
 				const source = sources[ boundAttribute.source ];
 				if (
 					! source?.getValue ||
@@ -113,14 +139,21 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 			}
 
 			return attributes;
-		}, [ bindings, name, clientId, context, registry, sources ] );
+		}, [
+			bindingsWithDefaults,
+			name,
+			clientId,
+			context,
+			registry,
+			sources,
+		] );
 
 		const { setAttributes } = props;
 
 		const _setAttributes = useCallback(
 			( nextAttributes ) => {
 				registry.batch( () => {
-					if ( ! bindings ) {
+					if ( ! bindingsWithDefaults ) {
 						setAttributes( nextAttributes );
 						return;
 					}
@@ -133,16 +166,13 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 						keptAttributes
 					) ) {
 						if (
-							( ! bindings[ attributeName ] ||
-								! canBindAttribute( name, attributeName ) ) &&
-							! bindings[ DEFAULT_ATTRIBUTES ]
+							! bindingsWithDefaults[ attributeName ] ||
+							! canBindAttribute( name, attributeName )
 						) {
 							continue;
 						}
 
-						const binding =
-							bindings[ attributeName ] ??
-							bindings[ DEFAULT_ATTRIBUTES ];
+						const binding = bindingsWithDefaults[ attributeName ];
 						const source = sources[ binding?.source ];
 						if ( ! source?.setValue && ! source?.setValues ) {
 							continue;
@@ -172,8 +202,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 									value,
 								] of Object.entries( attributes ) ) {
 									const binding =
-										bindings[ attributeName ] ??
-										bindings[ DEFAULT_ATTRIBUTES ];
+										bindingsWithDefaults[ attributeName ];
 									source.setValue( {
 										registry,
 										context,
@@ -194,7 +223,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 			},
 			[
 				registry,
-				bindings,
+				bindingsWithDefaults,
 				name,
 				clientId,
 				context,
