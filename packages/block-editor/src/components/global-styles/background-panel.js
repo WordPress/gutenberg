@@ -599,6 +599,7 @@ function BackgroundSizeControls( {
 					size="__unstable-large"
 					__unstableInputWidth="100px"
 					min={ 0 }
+					allowedUnitValues={ [ '%', 'px', 'em', 'rem', 'vw', 'vh' ] }
 					placeholder={ __( 'Auto' ) }
 					disabled={
 						currentValueForToggle !== 'auto' ||

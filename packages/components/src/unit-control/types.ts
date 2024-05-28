@@ -107,4 +107,8 @@ export type UnitControlProps = Pick< InputControlProps, 'size' > &
 		 * Callback when either the quantity or the unit inputs gains focus.
 		 */
 		onFocus?: FocusEventHandler< HTMLInputElement | HTMLSelectElement >;
+		/**
+		 * A list of allowed unit values. If provided, only these values will be selectable.
+		 */
+		allowedUnitValues?: string[];
 	};

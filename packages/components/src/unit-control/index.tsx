@@ -25,7 +25,11 @@ import {
 } from './utils';
 import { useControlledState } from '../utils/hooks';
 import { escapeRegExp } from '../utils/strings';
-import type { UnitControlProps, UnitControlOnChangeCallback } from './types';
+import type {
+	UnitControlProps,
+	UnitControlOnChangeCallback,
+	WPUnitControlUnit,
+} from './types';
 import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
 
 function UnforwardedUnitControl(
@@ -53,6 +57,7 @@ function UnforwardedUnitControl(
 		size = 'default',
 		unit: unitProp,
 		units: unitsProp = CSS_UNITS,
+		allowedUnitValues,
 		value: valueProp,
 		onFocus: onFocusProp,
 		...props
@@ -71,11 +76,26 @@ function UnforwardedUnitControl(
 	// still passes `null` as a `value`.
 	const nonNullValueProp = valueProp ?? undefined;
 	const [ units, reFirstCharacterOfUnits ] = useMemo( () => {
-		const list = getUnitsWithCurrentUnit(
+		let list = getUnitsWithCurrentUnit(
 			nonNullValueProp,
 			unitProp,
 			unitsProp
 		);
+		// If allowedUnitValues is provided, we need to filter the list of units.
+		if ( allowedUnitValues?.length ) {
+			const filteredUnits: WPUnitControlUnit[] = [];
+			allowedUnitValues.forEach( ( allowedUnit ) => {
+				const filteredUnit = list.find(
+					( unit ) => unit.value === allowedUnit
+				);
+				if ( filteredUnit ) {
+					filteredUnits.push( filteredUnit );
+				}
+			} );
+			if ( filteredUnits.length ) {
+				list = filteredUnits;
+			}
+		}
 		const [ { value: firstUnitValue = '' } = {}, ...rest ] = list;
 		const firstCharacters = rest.reduce(
 			( carry, { value } ) => {
@@ -87,7 +107,7 @@ function UnforwardedUnitControl(
 			escapeRegExp( firstUnitValue.substring( 0, 1 ) )
 		);
 		return [ list, new RegExp( `^(?:${ firstCharacters })$`, 'i' ) ];
-	}, [ nonNullValueProp, unitProp, unitsProp ] );
+	}, [ nonNullValueProp, unitProp, unitsProp, allowedUnitValues ] );
 	const [ parsedQuantity, parsedUnit ] = getParsedQuantityAndUnit(
 		nonNullValueProp,
 		unitProp,
