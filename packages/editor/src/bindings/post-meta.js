@@ -12,10 +12,14 @@ import { store as editorStore } from '../store';
 export default {
 	name: 'core/post-meta',
 	label: _x( 'Post Meta', 'block bindings source' ),
+	usesContext: [ 'postId', 'postType' ],
 	getPlaceholder( { args } ) {
 		return args.key;
 	},
 	getValue( { select, context, args } ) {
+		const postId = context.postId
+			? context.postId
+			: select( editorStore ).getCurrentPostId();
 		const postType = context.postType
 			? context.postType
 			: select( editorStore ).getCurrentPostType();
@@ -23,7 +27,23 @@ export default {
 		return select( coreDataStore ).getEditedEntityRecord(
 			'postType',
 			postType,
-			context.postId
+			postId
 		).meta?.[ args.key ];
 	},
+	setValue( { registry, context, args, value } ) {
+		const postId = context.postId
+			? context.postId
+			: registry.select( editorStore ).getCurrentPostId();
+		const postType = context.postType
+			? context.postType
+			: registry.select( editorStore ).getCurrentPostType();
+		registry
+			.dispatch( coreDataStore )
+			.editEntityRecord( 'postType', postType, postId, {
+				meta: {
+					[ args.key ]: value,
+				},
+			} );
+	},
+	lockAttributesEditing: () => false,
 };
