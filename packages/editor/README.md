@@ -939,7 +939,11 @@ _Returns_
 
 ### PostComments
 
-Undocumented declaration.
+A form for managing comment status.
+
+_Returns_
+
+-   `JSX.Element`: The rendered PostComments component.
 
 ### PostDiscussionPanel
 
