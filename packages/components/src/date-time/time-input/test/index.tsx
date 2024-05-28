@@ -19,8 +19,10 @@ describe( 'TimePicker', () => {
 			<TimeInput hours={ 0 } minutes={ 0 } onChange={ onChangeSpy } />
 		);
 
-		const hoursInput = screen.getByLabelText( 'Hours' );
-		const minutesInput = screen.getByLabelText( 'Minutes' );
+		const hoursInput = screen.getByRole( 'spinbutton', { name: 'Hours' } );
+		const minutesInput = screen.getByRole( 'spinbutton', {
+			name: 'Minutes',
+		} );
 
 		await user.clear( minutesInput );
 		await user.type( minutesInput, '35' );
@@ -70,10 +72,12 @@ describe( 'TimePicker', () => {
 			/>
 		);
 
-		const hoursInput = screen.getByLabelText( 'Hours' );
-		const minutesInput = screen.getByLabelText( 'Minutes' );
-		const amButton = screen.getByText( 'AM' );
-		const pmButton = screen.getByText( 'PM' );
+		const hoursInput = screen.getByRole( 'spinbutton', { name: 'Hours' } );
+		const minutesInput = screen.getByRole( 'spinbutton', {
+			name: 'Minutes',
+		} );
+		const amButton = screen.getByRole( 'button', { name: 'AM' } );
+		const pmButton = screen.getByRole( 'button', { name: 'PM' } );
 
 		expect( amButton ).toHaveClass( 'is-primary' );
 		expect( pmButton ).not.toHaveClass( 'is-primary' );
@@ -115,7 +119,9 @@ describe( 'TimePicker', () => {
 			/>
 		);
 
-		const minutesInput = screen.getByLabelText( 'Minutes' );
+		const minutesInput = screen.getByRole( 'spinbutton', {
+			name: 'Minutes',
+		} );
 
 		await user.clear( minutesInput );
 		await user.keyboard( '{ArrowUp}' );
