@@ -11,6 +11,7 @@
 
 -   `Tabs`: Animate indicator ([#60560](https://github.com/WordPress/gutenberg/pull/60560)).
 -   `ComboboxControl`: Introduce Combobox expandOnFocus prop ([#61705](https://github.com/WordPress/gutenberg/pull/61705)).
+-    Replaced `ButtonGroup` with `ToggleGroupControl` component for "AM/PM" selector in DateTime component ([#61562](https://github.com/WordPress/gutenberg/pull/61562)).
 
 ### Bug Fixes
 
@@ -22,8 +23,8 @@
 -   Remove `reduceMotion` util ([#61963](https://github.com/WordPress/gutenberg/pull/61963)).
 -   Add type support for CSS Custom Properties ([#61872](https://github.com/WordPress/gutenberg/pull/61872)).
 -   Remove usage of deprecated spreading of `key` prop in JSX in CustomSelectControl and FormTokenField components ([#61692](https://github.com/WordPress/gutenberg/pull/61692)).
--   Tooltip: Fix Ariakit tooltip store usage ([#61858](https://github.com/WordPress/gutenberg/pull/61858)).
--   Replaced `ButtonGroup` with `ToggleGroupControl` component for "AM/PM" selector in DateTime component ([#61562](https://github.com/WordPress/gutenberg/pull/61562)).
+-   `Tooltip`: Fix Ariakit tooltip store usage ([#61858](https://github.com/WordPress/gutenberg/pull/61858)).
+-   `CustomSelectControlV2`: Use `InputBase` for styling ([#60261](https://github.com/WordPress/gutenberg/pull/60261)).
 
 ## 27.6.0 (2024-05-16)
 
