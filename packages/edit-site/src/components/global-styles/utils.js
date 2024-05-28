@@ -12,27 +12,30 @@ export function getVariationClassName( variation ) {
 }
 
 /**
- * Returns a new index based on the presets and slug prefix.
+ * Iterates through the presets array and searches for slugs that start with the specified
+ * slugPrefix followed by a numerical suffix. It identifies the highest numerical suffix found
+ * and returns one greater than the highest found suffix, ensuring that the new index is unique.
  *
- * @param {Array}  presets    The array of presets.
- * @param {string} slugPrefix The prefix for the slug.
+ * @param {Array}  presets    The array of preset objects, each potentially containing a slug property.
+ * @param {string} slugPrefix The prefix to look for in the preset slugs.
  *
- * @return {number} The new index.
+ * @return {number} The next available index for a preset with the specified slug prefix, or 1 if no matching slugs are found.
  */
 export function getNewIndexFromPresets( presets, slugPrefix ) {
 	const nameRegex = new RegExp( `^${ slugPrefix }([\\d]+)$` );
-	return presets.reduce( ( previousValue, currentValue ) => {
-		if ( typeof currentValue?.slug === 'string' ) {
-			const matches = currentValue?.slug.match( nameRegex );
+	const highestPresetValue = presets.reduce( ( currentHighest, preset ) => {
+		if ( typeof preset?.slug === 'string' ) {
+			const matches = preset?.slug.match( nameRegex );
 			if ( matches ) {
 				const id = parseInt( matches[ 1 ], 10 );
-				if ( id >= previousValue ) {
-					return id + 1;
+				if ( id > currentHighest ) {
+					return id;
 				}
 			}
 		}
-		return previousValue;
-	}, 1 );
+		return currentHighest;
+	}, 0 );
+	return highestPresetValue + 1;
 }
 
 function getFontFamilyFromSetting( fontFamilies, setting ) {
