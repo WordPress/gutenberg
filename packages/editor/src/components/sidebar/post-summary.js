@@ -79,8 +79,8 @@ export default function PostSummary( { onActionPerformed } ) {
 										<BlogTitle />
 										<PostsPerPage />
 										<SiteDiscussion />
+										<PostStickyPanel />
 									</VStack>
-									<PostStickyPanel />
 									<PostFormatPanel />
 									<TemplateAreas />
 									{ fills }

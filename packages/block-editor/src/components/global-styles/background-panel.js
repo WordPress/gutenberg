@@ -83,6 +83,8 @@ export function hasBackgroundSizeValue( style ) {
 export function hasBackgroundImageValue( style ) {
 	return (
 		!! style?.background?.backgroundImage?.id ||
+		// Supports url() string values in theme.json.
+		'string' === typeof style?.background?.backgroundImage ||
 		!! style?.background?.backgroundImage?.url
 	);
 }
@@ -100,7 +102,7 @@ function backgroundSizeHelpText( value ) {
 	if ( value === 'contain' ) {
 		return __( 'Image is contained without distortion.' );
 	}
-	return __( 'Specify a fixed width.' );
+	return __( 'Image has a fixed width.' );
 }
 
 /**
@@ -172,13 +174,13 @@ function InspectorImagePreview( { label, filename, url: imgUrl } ) {
 						{ imgLabel }
 					</Truncate>
 					<VisuallyHidden as="span">
-						{ filename
+						{ imgUrl
 							? sprintf(
 									/* translators: %s: file name */
-									__( 'Selected image: %s' ),
-									filename
+									__( 'Background image: %s' ),
+									filename || imgLabel
 							  )
-							: __( 'No image selected' ) }
+							: __( 'No background image selected' ) }
 					</VisuallyHidden>
 				</FlexItem>
 			</HStack>
@@ -279,6 +281,23 @@ function BackgroundImageToolsPanelItem( {
 
 	const hasValue = hasBackgroundImageValue( style );
 
+	const closeAndFocus = () => {
+		const [ toggleButton ] = focus.tabbable.find(
+			replaceContainerRef.current
+		);
+		// Focus the toggle button and close the dropdown menu.
+		// This ensures similar behaviour as to selecting an image, where the dropdown is
+		// closed and focus is redirected to the dropdown toggle button.
+		toggleButton?.focus();
+		toggleButton?.click();
+	};
+
+	const onRemove = () =>
+		onChange(
+			setImmutably( style, [ 'background', 'backgroundImage' ], 'none' )
+		);
+	const canRemove = ! hasValue && hasBackgroundImageValue( inheritedValue );
+
 	return (
 		<ToolsPanelItem
 			className="single-column"
@@ -302,7 +321,7 @@ function BackgroundImageToolsPanelItem( {
 					name={
 						<InspectorImagePreview
 							label={ title }
-							filename={ title || __( 'Untitled' ) }
+							filename={ title }
 							url={ getResolvedThemeFilePath(
 								url,
 								themeFileURIs
@@ -311,17 +330,20 @@ function BackgroundImageToolsPanelItem( {
 					}
 					variant="secondary"
 				>
+					{ canRemove && (
+						<MenuItem
+							onClick={ () => {
+								closeAndFocus();
+								onRemove();
+							} }
+						>
+							{ __( 'Remove' ) }
+						</MenuItem>
+					) }
 					{ hasValue && (
 						<MenuItem
 							onClick={ () => {
-								const [ toggleButton ] = focus.tabbable.find(
-									replaceContainerRef.current
-								);
-								// Focus the toggle button and close the dropdown menu.
-								// This ensures similar behaviour as to selecting an image, where the dropdown is
-								// closed and focus is redirected to the dropdown toggle button.
-								toggleButton?.focus();
-								toggleButton?.click();
+								closeAndFocus();
 								resetBackgroundImage();
 							} }
 						>
@@ -421,6 +443,14 @@ function BackgroundSizeToolsPanelItem( {
 			nextRepeat = undefined;
 		}
 
+		/*
+		 * Next will be null when the input is cleared,
+		 * in which case the value should be 'auto'.
+		 */
+		if ( ! next && currentValueForToggle === 'auto' ) {
+			next = 'auto';
+		}
+
 		onChange(
 			setImmutably( style, [ 'background' ], {
 				...style?.background,
@@ -484,7 +514,9 @@ function BackgroundSizeToolsPanelItem( {
 				value={ currentValueForToggle }
 				onChange={ updateBackgroundSize }
 				isBlock
-				help={ backgroundSizeHelpText( sizeValue ) }
+				help={ backgroundSizeHelpText(
+					sizeValue || defaultValues?.backgroundSize
+				) }
 			>
 				<ToggleGroupControlOption
 					key={ 'cover' }
@@ -497,27 +529,32 @@ function BackgroundSizeToolsPanelItem( {
 					label={ __( 'Contain' ) }
 				/>
 				<ToggleGroupControlOption
-					key={ 'fixed' }
+					key={ 'tile' }
 					value={ 'auto' }
-					label={ __( 'Fixed' ) }
+					label={ __( 'Tile' ) }
 				/>
 			</ToggleGroupControl>
-			{ currentValueForToggle !== undefined &&
-			currentValueForToggle !== 'cover' &&
-			currentValueForToggle !== 'contain' ? (
-				<UnitControl
-					size={ '__unstable-large' }
-					onChange={ updateBackgroundSize }
-					value={ sizeValue }
-				/>
-			) : null }
-			{ currentValueForToggle !== 'cover' && (
-				<ToggleControl
-					label={ __( 'Repeat' ) }
-					checked={ repeatCheckedValue }
-					onChange={ toggleIsRepeated }
-				/>
-			) }
+			<HStack justify="flex-start" spacing={ 2 } as="span">
+				{ currentValueForToggle !== undefined &&
+				currentValueForToggle !== 'cover' &&
+				currentValueForToggle !== 'contain' ? (
+					<UnitControl
+						aria-label={ __( 'Background image width' ) }
+						onChange={ updateBackgroundSize }
+						value={ sizeValue }
+						size={ '__unstable-large' }
+						__unstableInputWidth="100px"
+						min={ 0 }
+					/>
+				) : null }
+				{ currentValueForToggle !== 'cover' && (
+					<ToggleControl
+						label={ __( 'Repeat' ) }
+						checked={ repeatCheckedValue }
+						onChange={ toggleIsRepeated }
+					/>
+				) }
+			</HStack>
 		</VStack>
 	);
 }

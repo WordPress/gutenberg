@@ -213,6 +213,7 @@ export default function Editor( { isLoading } ) {
 		( actionId, items ) => {
 			switch ( actionId ) {
 				case 'move-to-trash':
+				case 'delete-post':
 					{
 						history.push( {
 							postType: items[ 0 ].type,

@@ -362,10 +362,7 @@ function ShadowItem( { shadow, onChange, canRemove, onRemove } ) {
 						'edit-site-global-styles__shadow-editor__dropdown-toggle',
 						{ 'is-open': isOpen }
 					),
-					ariaExpanded: isOpen,
-					ariaLabel: shadowObj.inset
-						? __( 'Inner shadow' )
-						: __( 'Drop shadow' ),
+					'aria-expanded': isOpen,
 				};
 				const removeButtonProps = {
 					onClick: onRemove,
