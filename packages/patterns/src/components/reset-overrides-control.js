@@ -6,80 +6,84 @@ import {
 	BlockControls,
 } from '@wordpress/block-editor';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
-import { useSelect, useRegistry } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
-import { parse } from '@wordpress/blocks';
+import { useRegistry, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
-function recursivelyFindBlockWithName( blocks, name ) {
-	for ( const block of blocks ) {
-		if ( block.attributes.metadata?.name === name ) {
-			return block;
-		}
-
-		const found = recursivelyFindBlockWithName( block.innerBlocks, name );
-		if ( found ) {
-			return found;
-		}
-	}
-}
+const CONTENT = 'content';
 
 export default function ResetOverridesControl( props ) {
-	const registry = useRegistry();
 	const name = props.attributes.metadata?.name;
-	const patternWithOverrides = useSelect(
+	const registry = useRegistry();
+	const isOverriden = useSelect(
 		( select ) => {
 			if ( ! name ) {
-				return undefined;
+				return;
 			}
 
-			const { getBlockParentsByBlockName, getBlocksByClientId } =
+			const { getBlockAttributes, getBlockParentsByBlockName } =
 				select( blockEditorStore );
-			const patternBlock = getBlocksByClientId(
-				getBlockParentsByBlockName( props.clientId, 'core/block' )
-			)[ 0 ];
+			const [ patternClientId ] = getBlockParentsByBlockName(
+				props.clientId,
+				'core/block',
+				true
+			);
 
-			if ( ! patternBlock?.attributes.content?.[ name ] ) {
-				return undefined;
+			if ( ! patternClientId ) {
+				return;
 			}
 
-			return patternBlock;
+			const overrides = getBlockAttributes( patternClientId )[ CONTENT ];
+
+			if ( ! overrides ) {
+				return;
+			}
+
+			return overrides.hasOwnProperty( name );
 		},
 		[ props.clientId, name ]
 	);
 
-	const resetOverrides = async () => {
-		const editedRecord = await registry
-			.resolveSelect( coreStore )
-			.getEditedEntityRecord(
-				'postType',
-				'wp_block',
-				patternWithOverrides.attributes.ref
-			);
-		const blocks = editedRecord.blocks ?? parse( editedRecord.content );
-		const block = recursivelyFindBlockWithName( blocks, name );
-
-		const newAttributes = Object.assign(
-			// Reset every existing attribute to undefined.
-			Object.fromEntries(
-				Object.keys( props.attributes ).map( ( key ) => [
-					key,
-					undefined,
-				] )
-			),
-			// Then assign the original attributes.
-			block.attributes
+	function onClick() {
+		const { getBlockAttributes, getBlockParentsByBlockName } =
+			registry.select( blockEditorStore );
+		const [ patternClientId ] = getBlockParentsByBlockName(
+			props.clientId,
+			'core/block',
+			true
 		);
 
-		props.setAttributes( newAttributes );
-	};
+		if ( ! patternClientId ) {
+			return;
+		}
+
+		const overrides = getBlockAttributes( patternClientId )[ CONTENT ];
+
+		if ( ! overrides.hasOwnProperty( name ) ) {
+			return;
+		}
+
+		const { updateBlockAttributes, __unstableMarkLastChangeAsPersistent } =
+			registry.dispatch( blockEditorStore );
+		__unstableMarkLastChangeAsPersistent();
+
+		let newOverrides = { ...overrides };
+		delete newOverrides[ name ];
+
+		if ( ! Object.keys( newOverrides ).length ) {
+			newOverrides = undefined;
+		}
+
+		updateBlockAttributes( patternClientId, {
+			[ CONTENT ]: newOverrides,
+		} );
+	}
 
 	return (
 		<BlockControls group="other">
 			<ToolbarGroup>
 				<ToolbarButton
-					onClick={ resetOverrides }
-					disabled={ ! patternWithOverrides }
+					onClick={ onClick }
+					disabled={ ! isOverriden }
 					__experimentalIsFocusable
 				>
 					{ __( 'Reset' ) }
