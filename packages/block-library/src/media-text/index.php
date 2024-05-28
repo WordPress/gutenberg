@@ -37,7 +37,7 @@ function render_block_core_media_text( $attributes, $content ) {
 	$image_tag             = '<img class="wp-block-media-text__featured_image">';
 	$media_tag_processor   = new WP_HTML_Tag_Processor( $content );
 	$wrapping_figure_query = array(
-		'tag_name' => 'figure',
+		'tag_name'   => 'figure',
 		'class_name' => 'wp-block-media-text__media',
 	);
 
@@ -81,7 +81,7 @@ function render_block_core_media_text( $attributes, $content ) {
 		$image_tag_processor->next_tag(
 			array(
 				'tag_name' => 'figure',
-				'id' => $unique_id,
+				'id'       => $unique_id,
 			)
 		);
 		// The ID is only used to ensure that the correct figure tag is selected,
@@ -89,7 +89,7 @@ function render_block_core_media_text( $attributes, $content ) {
 		$image_tag_processor->remove_attribute( 'id' );
 		$image_tag_processor->next_tag(
 			array(
-				'tag_name' => 'img',
+				'tag_name'   => 'img',
 				'class_name' => 'wp-block-media-text__featured_image',
 			)
 		);
