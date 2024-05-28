@@ -36,6 +36,7 @@ import { useAddedBy } from './hooks';
 import {
 	TEMPLATE_POST_TYPE,
 	OPERATOR_IS_ANY,
+	OPERATOR_IS,
 	LAYOUT_GRID,
 	LAYOUT_TABLE,
 	LAYOUT_LIST,
@@ -62,6 +63,7 @@ const defaultConfigPerViewType = {
 		mediaField: 'preview',
 		primaryField: 'title',
 		columnFields: [ 'description' ],
+		badgeFields: [ 'isCustom' ],
 	},
 	[ LAYOUT_LIST ]: {
 		primaryField: 'title',
@@ -337,6 +339,20 @@ export default function PageTemplates() {
 				],
 				filterBy: {
 					operators: [ OPERATOR_IS_ANY ],
+				},
+			},
+			{
+				header: __( 'Type' ),
+				id: 'isCustom',
+				getValue: ( { item } ) => item.is_custom,
+				render: ( { item } ) =>
+					item.is_custom ? 'Custom' : undefined,
+				elements: [
+					{ value: true, label: 'Custom' },
+					{ value: false, label: 'Default' },
+				],
+				filterBy: {
+					operators: [ OPERATOR_IS ],
 				},
 			},
 		],
