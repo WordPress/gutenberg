@@ -30,7 +30,7 @@ function render_block_core_media_text( $attributes, $content ) {
 	}
 
 	$has_media_on_right = isset( $attributes['mediaPosition'] ) && 'right' === $attributes['mediaPosition'];
-	$image_tag = '<figure class="wp-block-media-text__media"><img class="wp-block-media-text__featured_image">';
+	$image_tag          = '<figure class="wp-block-media-text__media"><img class="wp-block-media-text__featured_image">';
 
 	// When the media is on the right, the img tag is inserted inside the last figure tag.
 	if ( $has_media_on_right ) {
@@ -38,8 +38,8 @@ function render_block_core_media_text( $attributes, $content ) {
 		if ( preg_match( '/<figure\s+class="wp-block-media-text__media">/', $content ) ) {
 			// Find the last figure tag and replace it with the combined figure and img tag.
 			$last_figure = strripos( $content, '<figure class="wp-block-media-text__media">' );
-			if ( $last_figure !== false ) {
-				$content = substr_replace( $content, $image_tag, $last_figure, strlen('<figure class="wp-block-media-text__media">') );
+			if ( false !== $last_figure ) {
+				$content = substr_replace( $content, $image_tag, $last_figure, strlen( '<figure class="wp-block-media-text__media">' ) );
 			}
 		}
 	} else {
