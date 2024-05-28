@@ -187,6 +187,8 @@ _Returns_
 
 Returns a block's attributes given its client ID, or null if no block exists with the client ID.
 
+Process block bindings to modify the value of the attributes if needed.
+
 _Parameters_
 
 -   _state_ `Object`: Editor state.
