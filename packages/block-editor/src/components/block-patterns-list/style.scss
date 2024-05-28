@@ -56,9 +56,10 @@
 		@include reduce-motion("transition");
 	}
 
-	.block-editor-patterns__pattern-details {
+	.block-editor-patterns__pattern-details:not(:empty) {
 		align-items: center;
 		margin-top: $grid-unit-10;
+		margin-bottom: $grid-unit-05; // Add more space as there is a visual label on user-created patterns.
 	}
 
 	.block-editor-patterns__pattern-icon-wrapper {
