@@ -568,7 +568,7 @@ export function createBlockListBlockFilter( features ) {
 						useBlockProps,
 					} = feature;
 
-					const neededProps = { clientId: props.clientId };
+					const neededProps = {};
 					for ( const key of attributeKeys ) {
 						if ( props.attributes[ key ] ) {
 							neededProps[ key ] = props.attributes[ key ];
@@ -595,6 +595,7 @@ export function createBlockListBlockFilter( features ) {
 							// function reference.
 							setAllWrapperProps={ setAllWrapperProps }
 							name={ props.name }
+							clientId={ props.clientId }
 							// This component is pure, so only pass needed
 							// props!!!
 							{ ...neededProps }
