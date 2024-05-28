@@ -33,6 +33,27 @@ let imageRef;
  */
 let buttonRef;
 
+/**
+ * Checks if the given url is a valid.
+ *
+ * @param {string} url The url to check.
+ */
+const isValidLink = ( url ) => {
+	try {
+		const imageUrl = new URL( url );
+		if (
+			imageUrl.origin !== window.location.origin &&
+			! imageUrl.pathname.startsWith( '/wp-admin' ) &&
+			! imageUrl.pathname.startsWith( '/wp-login.php' )
+		) {
+			return false;
+		}
+		return true;
+	} catch {
+		return false;
+	}
+};
+
 const { state, actions, callbacks } = store(
 	'core/image',
 	{
@@ -170,6 +191,21 @@ const { state, actions, callbacks } = store(
 						);
 					}
 				}
+			},
+			prefetchImage() {
+				const ctx = getContext();
+				if ( ! isValidLink( ctx.uploadedSrc ) ) {
+					return;
+				}
+
+				// Creates a link element to prefetch the image.
+				const imageLink = document.createElement( 'link' );
+				imageLink.rel = 'prefetch';
+				imageLink.as = 'image';
+				imageLink.href = ctx.uploadedSrc;
+
+				// Appends the link element to the head of the document to start the prefetch.
+				document.head.appendChild( imageLink );
 			},
 		},
 		callbacks: {
