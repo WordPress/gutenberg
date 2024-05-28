@@ -10,13 +10,14 @@ import { useMemo, useContext, useState } from '@wordpress/element';
 import { ENTER } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import { mergeBaseAndUserConfigs } from '../global-styles-provider';
 import { unlock } from '../../../lock-unlock';
 
+const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
 const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
 	blockEditorPrivateApis
 );
@@ -29,6 +30,7 @@ export default function Variation( { variation, children, isPill } ) {
 			user: {
 				settings: variation.settings ?? {},
 				styles: variation.styles ?? {},
+				_links: variation._links ?? {},
 			},
 			base,
 			merged: mergeBaseAndUserConfigs( base, variation ),
@@ -41,6 +43,7 @@ export default function Variation( { variation, children, isPill } ) {
 		setUserConfig( () => ( {
 			settings: variation.settings,
 			styles: variation.styles,
+			_links: variation._links,
 		} ) );
 	};
 

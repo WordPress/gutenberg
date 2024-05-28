@@ -26,7 +26,11 @@ describe( 'PostSlug', () => {
 
 		useSelect.mockImplementation( ( mapSelect ) =>
 			mapSelect( () => ( {
-				getPostType: () => null,
+				getPostType: () => ( {
+					supports: {
+						slug: true,
+					},
+				} ),
 				getEditedPostAttribute: () => 'post',
 				getEditedPostSlug: () => '1',
 			} ) )

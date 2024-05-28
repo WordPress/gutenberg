@@ -1,17 +1,20 @@
 /**
  * External dependencies
  */
-import { h } from 'preact';
+import { h, type ComponentChild, type JSX } from 'preact';
 /**
  * Internal dependencies
  */
 import { directivePrefix as p } from './constants';
+import { warn } from './utils';
 
 const ignoreAttr = `data-${ p }-ignore`;
 const islandAttr = `data-${ p }-interactive`;
 const fullPrefix = `data-${ p }-`;
-const namespaces = [];
+const namespaces: Array< string | null > = [];
 const currentNamespace = () => namespaces[ namespaces.length - 1 ] ?? null;
+const isObject = ( item: unknown ): item is Record< string, unknown > =>
+	Boolean( item && typeof item === 'object' && item.constructor === Object );
 
 // Regular expression for directive parsing.
 const directiveParser = new RegExp(
@@ -31,98 +34,122 @@ const directiveParser = new RegExp(
 // the reference, separated by `::`, like `some-namespace::state.somePath`.
 // Namespaces can contain any alphanumeric characters, hyphens, underscores or
 // forward slashes. References don't have any restrictions.
-const nsPathRegExp = /^([\w-_\/]+)::(.+)$/;
+const nsPathRegExp = /^([\w_\/-]+)::(.+)$/;
 
 export const hydratedIslands = new WeakSet();
 
 /**
  * Recursive function that transforms a DOM tree into vDOM.
  *
- * @param {Node} root The root element or node to start traversing on.
- * @return {import('preact').VNode[]} The resulting vDOM tree.
+ * @param root The root element or node to start traversing on.
+ * @return The resulting vDOM tree.
  */
-export function toVdom( root ) {
+export function toVdom( root: Node ): Array< ComponentChild > {
 	const treeWalker = document.createTreeWalker(
 		root,
-		205 // ELEMENT + TEXT + COMMENT + CDATA_SECTION + PROCESSING_INSTRUCTION
+		205 // TEXT + CDATA_SECTION + COMMENT + PROCESSING_INSTRUCTION + ELEMENT
 	);
 
-	function walk( node ) {
-		const { attributes, nodeType, localName } = node;
+	function walk(
+		node: Node
+	): [ ComponentChild ] | [ ComponentChild, Node | null ] {
+		const { nodeType } = node;
 
+		// TEXT_NODE (3)
 		if ( nodeType === 3 ) {
-			return [ node.data ];
+			return [ ( node as Text ).data ];
 		}
+
+		// CDATA_SECTION_NODE (4)
 		if ( nodeType === 4 ) {
 			const next = treeWalker.nextSibling();
-			node.replaceWith( new window.Text( node.nodeValue ) );
+			( node as CDATASection ).replaceWith(
+				new window.Text( ( node as CDATASection ).nodeValue ?? '' )
+			);
 			return [ node.nodeValue, next ];
 		}
+
+		// COMMENT_NODE (8) || PROCESSING_INSTRUCTION_NODE (7)
 		if ( nodeType === 8 || nodeType === 7 ) {
 			const next = treeWalker.nextSibling();
-			node.remove();
+			( node as Comment | ProcessingInstruction ).remove();
 			return [ null, next ];
 		}
 
+		const elementNode = node as HTMLElement;
+		const { attributes } = elementNode;
+		const localName = elementNode.localName as keyof JSX.IntrinsicElements;
+
 		const props: Record< string, any > = {};
-		const children = [];
-		const directives = [];
+		const children: Array< ComponentChild > = [];
+		const directives: Array<
+			[ name: string, namespace: string | null, value: unknown ]
+		> = [];
 		let ignore = false;
 		let island = false;
 
 		for ( let i = 0; i < attributes.length; i++ ) {
-			const n = attributes[ i ].name;
+			const attributeName = attributes[ i ].name;
+			const attributeValue = attributes[ i ].value;
 			if (
-				n[ fullPrefix.length ] &&
-				n.slice( 0, fullPrefix.length ) === fullPrefix
+				attributeName[ fullPrefix.length ] &&
+				attributeName.slice( 0, fullPrefix.length ) === fullPrefix
 			) {
-				if ( n === ignoreAttr ) {
+				if ( attributeName === ignoreAttr ) {
 					ignore = true;
 				} else {
-					let [ ns, value ] = nsPathRegExp
-						.exec( attributes[ i ].value )
-						?.slice( 1 ) ?? [ null, attributes[ i ].value ];
+					const regexResult = nsPathRegExp.exec( attributeValue );
+					const namespace = regexResult?.[ 1 ] ?? null;
+					let value: any = regexResult?.[ 2 ] ?? attributeValue;
 					try {
-						value = JSON.parse( value );
-					} catch ( e ) {}
-					if ( n === islandAttr ) {
+						const parsedValue = JSON.parse( value );
+						value = isObject( parsedValue ) ? parsedValue : value;
+					} catch {}
+					if ( attributeName === islandAttr ) {
 						island = true;
-						namespaces.push(
+						const islandNamespace =
+							// eslint-disable-next-line no-nested-ternary
 							typeof value === 'string'
 								? value
-								: value?.namespace ?? null
-						);
+								: typeof value?.namespace === 'string'
+								? value.namespace
+								: null;
+						namespaces.push( islandNamespace );
 					} else {
-						directives.push( [ n, ns, value ] );
+						directives.push( [ attributeName, namespace, value ] );
 					}
 				}
-			} else if ( n === 'ref' ) {
+			} else if ( attributeName === 'ref' ) {
 				continue;
 			}
-			props[ n ] = attributes[ i ].value;
+			props[ attributeName ] = attributeValue;
 		}
 
 		if ( ignore && ! island ) {
 			return [
-				h( localName, {
+				h< any, any >( localName, {
 					...props,
-					innerHTML: node.innerHTML,
+					innerHTML: elementNode.innerHTML,
 					__directives: { ignore: true },
 				} ),
 			];
 		}
 		if ( island ) {
-			hydratedIslands.add( node );
+			hydratedIslands.add( elementNode );
 		}
 
 		if ( directives.length ) {
 			props.__directives = directives.reduce(
 				( obj, [ name, ns, value ] ) => {
-					const [ , prefix, suffix = 'default' ] =
-						directiveParser.exec( name );
-					if ( ! obj[ prefix ] ) {
-						obj[ prefix ] = [];
+					const directiveMatch = directiveParser.exec( name );
+					if ( directiveMatch === null ) {
+						warn( `Found malformed directive name: ${ name }.` );
+						return obj;
 					}
+					const prefix = directiveMatch[ 1 ] || '';
+					const suffix = directiveMatch[ 2 ] || 'default';
+
+					obj[ prefix ] = obj[ prefix ] || [];
 					obj[ prefix ].push( {
 						namespace: ns ?? currentNamespace(),
 						value,
@@ -134,10 +161,11 @@ export function toVdom( root ) {
 			);
 		}
 
+		// @ts-expect-error Fixed in upcoming preact release https://github.com/preactjs/preact/pull/4334
 		if ( localName === 'template' ) {
-			props.content = [ ...node.content.childNodes ].map( ( childNode ) =>
-				toVdom( childNode )
-			);
+			props.content = [
+				...( elementNode as HTMLTemplateElement ).content.childNodes,
+			].map( ( childNode ) => toVdom( childNode ) );
 		} else {
 			let child = treeWalker.firstChild();
 			if ( child ) {

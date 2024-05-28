@@ -9,7 +9,10 @@ import { View } from 'react-native';
 import { Component } from '@wordpress/element';
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { subscribeMediaUpload } from '@wordpress/react-native-bridge';
+import {
+	subscribeMediaUpload,
+	requestImageUploadCancel,
+} from '@wordpress/react-native-bridge';
 
 /**
  * Internal dependencies
@@ -44,17 +47,27 @@ export class MediaUploadProgress extends Component {
 	}
 
 	componentWillUnmount() {
+		const { isUploadInProgress, isUploadFailed } = this.state;
+		const { mediaId } = this.props;
+
+		if ( isUploadInProgress || isUploadFailed ) {
+			requestImageUploadCancel( mediaId );
+		}
 		this.removeMediaUploadListener();
 	}
 
 	mediaUpload( payload ) {
 		const { mediaId } = this.props;
-
 		if (
 			payload.mediaId !== mediaId ||
 			( payload.state === this.state.uploadState &&
 				payload.progress === this.state.progress )
 		) {
+			return;
+		}
+
+		if ( payload?.mediaUrl && ! payload.state ) {
+			this.updateMediaThumbnail( payload );
 			return;
 		}
 
@@ -86,6 +99,13 @@ export class MediaUploadProgress extends Component {
 		} );
 		if ( this.props.onUpdateMediaProgress ) {
 			this.props.onUpdateMediaProgress( payload );
+		}
+	}
+
+	updateMediaThumbnail( payload ) {
+		const { onUpdateMediaProgress } = this.props;
+		if ( onUpdateMediaProgress ) {
+			onUpdateMediaProgress( payload );
 		}
 	}
 

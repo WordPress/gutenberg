@@ -9,7 +9,6 @@ import Clipboard from '@react-native-clipboard/clipboard';
  */
 import { useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { BottomSheet, Icon } from '@wordpress/components';
 import { getProtocol, isURL, prependHTTP } from '@wordpress/url';
 import { link, cancelCircleFilled } from '@wordpress/icons';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
@@ -20,6 +19,8 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import LinkPickerResults from './link-picker-results';
 import NavBar from '../bottom-sheet/nav-bar';
 import styles from './styles.scss';
+import BottomSheet from '../bottom-sheet';
+import Icon from '../../icon';
 
 // This creates a search suggestion for adding a url directly.
 export const createDirectEntry = ( value ) => {
