@@ -131,8 +131,6 @@ let isProcessingBindings;
  */
 export const getBlockAttributes = createRegistrySelector(
 	( select ) => ( state, clientId ) => {
-		// TODO: Check how to properly access the block context.
-		const blockContext = {};
 		const block = state.blocks.byClientId.get( clientId );
 		if ( ! block ) {
 			return null;
@@ -147,6 +145,8 @@ export const getBlockAttributes = createRegistrySelector(
 		}
 		isProcessingBindings = true;
 
+		const context = select( STORE_NAME ).getBlockContext( clientId );
+
 		const sources = unlock(
 			select( blocksStore )
 		).getAllBlockBindingsSources();
@@ -160,14 +160,6 @@ export const getBlockAttributes = createRegistrySelector(
 				! canBindAttribute( block.name, attributeName )
 			) {
 				continue;
-			}
-
-			const context = {};
-
-			if ( source.usesContext?.length ) {
-				for ( const key of source.usesContext ) {
-					context[ key ] = blockContext[ key ];
-				}
 			}
 
 			const args = {
