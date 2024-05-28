@@ -20,19 +20,11 @@ function UnforwardedProgressBar(
 	props: WordPressComponentProps< ProgressBarProps, 'progress', false >,
 	ref: ForwardedRef< HTMLProgressElement >
 ) {
-	const {
-		className,
-		value,
-		hasUnconstrainedWidth = false,
-		...progressProps
-	} = props;
+	const { className, value, ...progressProps } = props;
 	const isIndeterminate = ! Number.isFinite( value );
 
 	return (
-		<ProgressBarStyled.Track
-			className={ className }
-			hasUnconstrainedWidth={ hasUnconstrainedWidth }
-		>
+		<ProgressBarStyled.Track className={ className }>
 			<ProgressBarStyled.Indicator
 				style={ {
 					'--indicator-width': ! isIndeterminate

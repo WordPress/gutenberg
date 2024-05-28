@@ -21,12 +21,11 @@ const animateProgressBar = keyframes( {
 // Width of the indicator for the indeterminate progress bar
 export const INDETERMINATE_TRACK_WIDTH = 50;
 
-export const Track = styled.div< { hasUnconstrainedWidth?: boolean } >`
+export const Track = styled.div`
 	position: relative;
 	overflow: hidden;
 	width: 100%;
-	${ ( { hasUnconstrainedWidth } ) =>
-		! hasUnconstrainedWidth && 'max-width: 160px;' }
+	max-width: 160px;
 	height: ${ CONFIG.borderWidthFocus };
 	/* Text color at 10% opacity */
 	background-color: color-mix(

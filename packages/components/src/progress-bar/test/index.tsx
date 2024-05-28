@@ -79,26 +79,4 @@ describe( 'ProgressBar', () => {
 		);
 		expect( screen.getByRole( 'progressbar' ) ).toHaveStyle( style );
 	} );
-
-	it( 'should expand to fit the parent when `hasUnconstrainedWidth` is `true`', () => {
-		const { container } = render( <ProgressBar hasUnconstrainedWidth /> );
-
-		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-		const track = container.firstChild;
-
-		expect( track ).not.toHaveStyle( {
-			'max-width': '160px',
-		} );
-	} );
-
-	it( 'should have a default `max-width` when `hasUnconstrainedWidth` is `false`', () => {
-		const { container } = render( <ProgressBar /> );
-
-		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-		const track = container.firstChild;
-
-		expect( track ).toHaveStyle( {
-			'max-width': '160px',
-		} );
-	} );
 } );
