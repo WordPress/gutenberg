@@ -501,8 +501,7 @@ export default function PagePages() {
 
 	return (
 		<Page
-			title={ __( 'Pages' ) }
-			subTitle={ viewTitle }
+			title={ viewTitle }
 			actions={
 				addNewLabel && (
 					<>
