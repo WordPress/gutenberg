@@ -5,7 +5,6 @@ import { _x } from '@wordpress/i18n';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 const CONTENT = 'content';
-const DEFAULT_ATTRIBUTES = '__default';
 
 export default {
 	name: 'core/pattern-overrides',
@@ -20,16 +19,10 @@ export default {
 			true
 		);
 
-		const overriddenAttributes =
+		const overridableValue =
 			getBlockAttributes( patternClientId )?.[ CONTENT ]?.[
 				currentBlockAttributes?.metadata?.name
-			];
-		const overridableValue = overriddenAttributes?.[ attributeName ];
-		const defaultValue = overriddenAttributes?.[ DEFAULT_ATTRIBUTES ];
-
-		if ( defaultValue !== undefined ) {
-			return defaultValue;
-		}
+			]?.[ attributeName ];
 
 		// If there is no pattern client ID, or it is not overwritten, return the default value.
 		if ( ! patternClientId || overridableValue === undefined ) {
