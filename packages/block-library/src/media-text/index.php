@@ -53,7 +53,7 @@ function render_block_core_media_text( $attributes, $content ) {
 		if ( isset( $attributes['focalPoint'] ) ) {
 			$position = round( $attributes['focalPoint']['x'] * 100 ) . '% ' . round( $attributes['focalPoint']['y'] * 100 ) . '%';
 		}
-		$processor->next_tag( 'figure' );
+		$processor->next_tag( array( 'class_name' => 'wp-block-media-text__media' ) );
 		$processor->set_attribute( 'style', 'background-image:url(' . esc_url( $current_featured_image ) . ');background-position:' . $position . ';' );
 	}
 	// Locate the img tag with the class wp-block-media-text__featured_image and update its attributes.
