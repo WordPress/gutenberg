@@ -17,9 +17,30 @@ import { useStyleOverride } from './utils';
 import { store as blockEditorStore } from '../store';
 import { globalStylesDataKey } from '../store/private-keys';
 
-function getVariationNameFromClass( className ) {
-	const match = className?.match( /\bis-style-(?!default)(\S+)\b/ );
-	return match ? match[ 1 ] : null;
+/**
+ * Get the first block style variation that has been registered from the class string.
+ *
+ * @param {string} className        CSS class string for a block.
+ * @param {Array}  registeredStyles Currently registered block styles.
+ *
+ * @return {string|null} The name of the first registered variation.
+ */
+function getVariationNameFromClass( className, registeredStyles = [] ) {
+	// The global flag affects how capturing groups work in JS. So the regex
+	// below will only return full CSS classes not just the variation name.
+	const matches = className?.match( /\bis-style-(?!default)(\S+)\b/g );
+
+	if ( ! matches ) {
+		return null;
+	}
+
+	for ( const variationClass of matches ) {
+		const variation = variationClass.substring( 9 ); // Remove 'is-style-' prefix.
+		if ( registeredStyles.some( ( style ) => style.name === variation ) ) {
+			return variation;
+		}
+	}
+	return null;
 }
 
 function useBlockSyleVariation( name, variation, clientId ) {
@@ -69,10 +90,11 @@ function useBlockSyleVariation( name, variation, clientId ) {
 // This is so that the variation style override's ID is predictable
 // when the order of applied style variations changes.
 function useBlockProps( { name, className, clientId } ) {
-	const variation = getVariationNameFromClass( className );
-	const variationClass = `is-style-${ variation }-${ clientId }`;
-
 	const { getBlockStyles } = useSelect( blocksStore );
+
+	const registeredStyles = getBlockStyles( name );
+	const variation = getVariationNameFromClass( className, registeredStyles );
+	const variationClass = `is-style-${ variation }-${ clientId }`;
 
 	const { settings, styles } = useBlockSyleVariation(
 		name,

@@ -19,19 +19,19 @@ function gutenberg_get_block_style_variation_class_name( $block, $variation ) {
 }
 
 /**
- * Determine a block style variation name from a CSS class string.
+ * Determines the block style variation names within a CSS class string.
  *
  * @param string $class_string CSS class string to look for a variation in.
  *
- * @return string|null The block style variation name if found.
+ * @return array|null The block style variation name if found.
  */
 function gutenberg_get_block_style_variation_name_from_class( $class_string ) {
 	if ( ! is_string( $class_string ) ) {
 		return null;
 	}
 
-	preg_match( '/\bis-style-(?!default)(\S+)\b/', $class_string, $matches );
-	return $matches ? $matches[1] : null;
+	preg_match_all( '/\bis-style-(?!default)(\S+)\b/', $class_string, $matches );
+	return $matches[1] ?? null;
 }
 
 /**
@@ -49,16 +49,25 @@ function gutenberg_get_block_style_variation_name_from_class( $class_string ) {
  * @return array The parsed block with block style variation classname added.
  */
 function gutenberg_render_block_style_variation_support_styles( $parsed_block ) {
-	$classes   = $parsed_block['attrs']['className'] ?? null;
-	$variation = gutenberg_get_block_style_variation_name_from_class( $classes );
+	$classes    = $parsed_block['attrs']['className'] ?? null;
+	$variations = gutenberg_get_block_style_variation_name_from_class( $classes );
 
-	if ( ! $variation ) {
+	if ( ! $variations ) {
 		return $parsed_block;
 	}
 
-	$tree           = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
-	$theme_json     = $tree->get_raw_data();
-	$variation_data = $theme_json['styles']['blocks'][ $parsed_block['blockName'] ]['variations'][ $variation ] ?? array();
+	$tree       = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
+	$theme_json = $tree->get_raw_data();
+
+	// Only the first block style variation with data is supported.
+	$variation_data = array();
+	foreach ( $variations as $variation ) {
+		$variation_data = $theme_json['styles']['blocks'][ $parsed_block['blockName'] ]['variations'][ $variation ] ?? array();
+
+		if ( ! empty( $variation_data ) ) {
+			break;
+		}
+	}
 
 	if ( empty( $variation_data ) ) {
 		return $parsed_block;
