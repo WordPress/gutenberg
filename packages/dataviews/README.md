@@ -244,7 +244,7 @@ Collection of operations that can be performed upon each record.
 Each action is an object with the following properties:
 
 -   `id`: string, required. Unique identifier of the action. For example, `move-to-trash`.
--   `label`: string|function, required. User facing description of the action. For example, `Move to Trash`. In case we want to adjust the label based on the selected items, a getter function which accepts the selected records as input can be provided. The getter function should always return a `string` value.
+-   `label`: string|function, required. User facing description of the action. For example, `Move to Trash`. In case we want to adjust the label based on the selected items, a function which accepts the selected records as input can be provided. This function should always return a `string` value.
 -   `isPrimary`: boolean, optional. Whether the action should be listed inline (primary) or in hidden in the more actions menu (secondary).
 -   `icon`: icon to show for primary actions. It's required for a primary action, otherwise the action would be considered secondary.
 -   `isEligible`: function, optional. Whether the action can be performed for a given record. If not present, the action is considered to be eligible for all items. It takes the given record as input.

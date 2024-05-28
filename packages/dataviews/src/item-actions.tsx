@@ -234,7 +234,7 @@ export default function ItemActions< Item extends AnyItem >( {
 							key={ action.id }
 							action={ action }
 							onClick={ () => action.callback( [ item ] ) }
-							items={ item[ 0 ] }
+							items={ [ item ] }
 						/>
 					);
 				} ) }

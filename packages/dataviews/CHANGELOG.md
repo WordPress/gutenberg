@@ -14,7 +14,7 @@
 
 ### Enhancement
 
--   `label` prop in Actions API can be either a `sting` value or a `function`, in case we want to use information from the selected items. ([#61942](https://github.com/WordPress/gutenberg/pull/61942)).
+-   `label` prop in Actions API can be either a `string` value or a `function`, in case we want to use information from the selected items. ([#61942](https://github.com/WordPress/gutenberg/pull/61942)).
 
 ## 1.2.0 (2024-05-16)
 

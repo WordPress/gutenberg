@@ -590,7 +590,6 @@ const postRevisionsAction = {
 			revisionsCount
 		);
 	},
-	isPrimary: false,
 	isEligible: ( post ) => {
 		if ( post.status === 'trash' ) {
 			return false;
