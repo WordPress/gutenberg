@@ -3,7 +3,7 @@
  */
 import { store as blocksStore } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { useRegistry, useSelect } from '@wordpress/data';
+import { useRegistry } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 
@@ -11,6 +11,11 @@ import { addFilter } from '@wordpress/hooks';
  * Internal dependencies
  */
 import { unlock } from '../lock-unlock';
+import {
+	canBindBlock,
+	canBindAttribute,
+	transformBlockAttributesWithBindingsValues,
+} from '../utils/bindings';
 
 /** @typedef {import('@wordpress/compose').WPHigherOrderComponent} WPHigherOrderComponent */
 /** @typedef {import('@wordpress/blocks').WPBlockSettings} WPBlockSettings */
@@ -22,90 +27,32 @@ import { unlock } from '../lock-unlock';
  * @return {WPHigherOrderComponent} Higher-order component.
  */
 
-const BLOCK_BINDINGS_ALLOWED_BLOCKS = {
-	'core/paragraph': [ 'content' ],
-	'core/heading': [ 'content' ],
-	'core/image': [ 'id', 'url', 'title', 'alt' ],
-	'core/button': [ 'url', 'text', 'linkTarget', 'rel' ],
-};
-
-/**
- * Based on the given block name,
- * check if it is possible to bind the block.
- *
- * @param {string} blockName - The block name.
- * @return {boolean} Whether it is possible to bind the block to sources.
- */
-export function canBindBlock( blockName ) {
-	return blockName in BLOCK_BINDINGS_ALLOWED_BLOCKS;
-}
-
-/**
- * Based on the given block name and attribute name,
- * check if it is possible to bind the block attribute.
- *
- * @param {string} blockName     - The block name.
- * @param {string} attributeName - The attribute name.
- * @return {boolean} Whether it is possible to bind the block attribute.
- */
-export function canBindAttribute( blockName, attributeName ) {
-	return (
-		canBindBlock( blockName ) &&
-		BLOCK_BINDINGS_ALLOWED_BLOCKS[ blockName ].includes( attributeName )
-	);
-}
-
 export const withBlockBindingSupport = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const registry = useRegistry();
-		const sources = useSelect( ( select ) =>
-			unlock( select( blocksStore ) ).getAllBlockBindingsSources()
-		);
-		const bindings = props.attributes.metadata?.bindings;
-		const { name, clientId, context } = props;
-		const boundAttributes = useSelect( () => {
-			if ( ! bindings ) {
-				return;
-			}
+		const {
+			attributes: blockAttributes,
+			name,
+			clientId,
+			context,
+			setAttributes,
+		} = props;
+		const bindings = blockAttributes?.metadata?.bindings;
 
-			const attributes = {};
+		let newAttributes = blockAttributes;
+		if ( bindings ) {
+			newAttributes = transformBlockAttributesWithBindingsValues(
+				blockAttributes,
+				clientId,
+				name,
+				context,
+				registry
+			);
+		}
 
-			for ( const [ attributeName, boundAttribute ] of Object.entries(
-				bindings
-			) ) {
-				const source = sources[ boundAttribute.source ];
-				if (
-					! source?.getValue ||
-					! canBindAttribute( name, attributeName )
-				) {
-					continue;
-				}
-
-				const args = {
-					registry,
-					context,
-					clientId,
-					attributeName,
-					args: boundAttribute.args,
-				};
-
-				attributes[ attributeName ] = source.getValue( args );
-
-				if ( attributes[ attributeName ] === undefined ) {
-					if ( attributeName === 'url' ) {
-						attributes[ attributeName ] = null;
-					} else {
-						attributes[ attributeName ] =
-							source.getPlaceholder?.( args );
-					}
-				}
-			}
-
-			return attributes;
-		}, [ bindings, name, clientId, context, registry, sources ] );
-
-		const { setAttributes } = props;
-
+		const sources = unlock(
+			registry.select( blocksStore )
+		).getAllBlockBindingsSources();
 		const _setAttributes = useCallback(
 			( nextAttributes ) => {
 				registry.batch( () => {
@@ -190,7 +137,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 			<>
 				<BlockEdit
 					{ ...props }
-					attributes={ { ...props.attributes, ...boundAttributes } }
+					attributes={ { ...newAttributes } }
 					setAttributes={ _setAttributes }
 				/>
 			</>
@@ -220,6 +167,6 @@ function shimAttributeSource( settings, name ) {
 
 addFilter(
 	'blocks.registerBlockType',
-	'core/editor/custom-sources-backwards-compatibility/shim-attribute-source',
+	'core/editor/use-bindings-attributes',
 	shimAttributeSource
 );
