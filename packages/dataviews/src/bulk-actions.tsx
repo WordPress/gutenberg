@@ -94,9 +94,13 @@ function ActionWithModal< Item extends AnyItem >( {
 	const onCloseModal = useCallback( () => {
 		setActionWithModal( undefined );
 	}, [ setActionWithModal ] );
+	const label =
+		typeof action.label === 'string'
+			? action.label
+			: action.label( selectedItems );
 	return (
 		<Modal
-			title={ ! hideModalHeader ? action.label : undefined }
+			title={ ! hideModalHeader ? label : undefined }
 			__experimentalHideHeader={ !! hideModalHeader }
 			onRequestClose={ onCloseModal }
 			overlayClassName="dataviews-action-modal"

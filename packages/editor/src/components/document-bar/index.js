@@ -25,6 +25,7 @@ import { useReducedMotion } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import { TEMPLATE_POST_TYPES, GLOBAL_POST_TYPES } from '../../store/constants';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
@@ -38,14 +39,6 @@ const TYPE_LABELS = {
 	// translators: 1: Template part title.
 	wp_template_part: __( 'Editing template part: %s' ),
 };
-
-const TEMPLATE_POST_TYPES = [ 'wp_template', 'wp_template_part' ];
-
-const GLOBAL_POST_TYPES = [
-	...TEMPLATE_POST_TYPES,
-	'wp_block',
-	'wp_navigation',
-];
 
 const MotionButton = motion( Button );
 

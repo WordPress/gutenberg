@@ -1293,7 +1293,7 @@ class WP_Theme_JSON_Gutenberg {
 			$is_root_css = ( ! str_contains( $part, '{' ) );
 			if ( $is_root_css ) {
 				// If the part doesn't contain braces, it applies to the root level.
-				$processed_css .= trim( $selector ) . '{' . trim( $part ) . '}';
+				$processed_css .= ':root :where(' . trim( $selector ) . '){' . trim( $part ) . '}';
 			} else {
 				// If the part contains braces, it's a nested CSS rule.
 				$part = explode( '{', str_replace( '}', '', $part ) );
@@ -1305,7 +1305,8 @@ class WP_Theme_JSON_Gutenberg {
 				$part_selector   = str_starts_with( $nested_selector, ' ' )
 					? static::scope_selector( $selector, $nested_selector )
 					: static::append_to_selector( $selector, $nested_selector );
-				$processed_css  .= $part_selector . '{' . trim( $css_value ) . '}';
+				$final_selector  = ":root :where($part_selector)";
+				$processed_css  .= $final_selector . '{' . trim( $css_value ) . '}';
 			}
 		}
 		return $processed_css;
@@ -1322,6 +1323,7 @@ class WP_Theme_JSON_Gutenberg {
 		$block_custom_css = '';
 		$block_nodes      = $this->get_block_custom_css_nodes();
 		foreach ( $block_nodes as $node ) {
+			// The node selector will have its specificity set to 0-1-0 within process_blocks_custom_css.
 			$block_custom_css .= $this->get_block_custom_css( $node['css'], $node['selector'] );
 		}
 
@@ -1564,7 +1566,7 @@ class WP_Theme_JSON_Gutenberg {
 										$spacing_rule['selector']
 									);
 								} else {
-									$format          = static::ROOT_BLOCK_SELECTOR === $selector ? ':where(.%2$s) %3$s' : ':where(%1$s-%2$s) %3$s';
+									$format          = static::ROOT_BLOCK_SELECTOR === $selector ? '.%2$s %3$s' : '%1$s-%2$s %3$s';
 									$layout_selector = sprintf(
 										$format,
 										$selector,
@@ -2745,7 +2747,7 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		// 2. Generate and append the rules that use the general selector.
-		$block_rules .= static::to_ruleset( ":where($selector)", $declarations );
+		$block_rules .= static::to_ruleset( ":root :where($selector)", $declarations );
 
 		// 3. Generate and append the rules that use the duotone selector.
 		if ( isset( $block_metadata['duotone'] ) && ! empty( $declarations_duotone ) ) {
@@ -2762,12 +2764,12 @@ class WP_Theme_JSON_Gutenberg {
 
 		// 5. Generate and append the feature level rulesets.
 		foreach ( $feature_declarations as $feature_selector => $individual_feature_declarations ) {
-			$block_rules .= static::to_ruleset( ":where($feature_selector)", $individual_feature_declarations );
+			$block_rules .= static::to_ruleset( ":root :where($feature_selector)", $individual_feature_declarations );
 		}
 
 		// 6. Generate and append the style variation rulesets.
 		foreach ( $style_variation_declarations as $style_variation_selector => $individual_style_variation_declarations ) {
-			$block_rules .= static::to_ruleset( $style_variation_selector, $individual_style_variation_declarations );
+			$block_rules .= static::to_ruleset( ":root :where($style_variation_selector)", $individual_style_variation_declarations );
 		}
 
 		return $block_rules;
@@ -2816,16 +2818,12 @@ class WP_Theme_JSON_Gutenberg {
 			$css .= '.wp-site-blocks { padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom); }';
 			// Right and left padding are applied to the first container with `.has-global-padding` class.
 			$css .= '.has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
-			// Nested containers with `.has-global-padding` class do not get padding.
-			$css .= '.has-global-padding :where(.has-global-padding:not(.wp-block-block)) { padding-right: 0; padding-left: 0; }';
 			// Alignfull children of the container with left and right padding have negative margins so they can still be full width.
 			$css .= '.has-global-padding > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); }';
-			// The above rule is negated for alignfull children of nested containers.
-			$css .= '.has-global-padding :where(.has-global-padding:not(.wp-block-block)) > .alignfull { margin-right: 0; margin-left: 0; }';
-			// Some of the children of alignfull blocks without content width should also get padding: text blocks and non-alignfull container blocks.
-			$css .= '.has-global-padding > .alignfull:where(:not(.has-global-padding):not(.is-layout-flex):not(.is-layout-grid)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),.wp-block:not(.alignfull),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
-			// The above rule also has to be negated for blocks inside nested `.has-global-padding` blocks.
-			$css .= '.has-global-padding :where(.has-global-padding) > .alignfull:where(:not(.has-global-padding)) > :where([class*="wp-block-"]:not(.alignfull):not([class*="__"]),.wp-block:not(.alignfull),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: 0; padding-left: 0; }';
+			// Nested children of the container with left and right padding that are not wide or full aligned do not get padding.
+			$css .= '.has-global-padding :where(.has-global-padding:not(.wp-block-block, .alignfull, .alignwide)) { padding-right: 0; padding-left: 0; }';
+			// Nested children of the container with left and right padding that are not wide or full aligned do not get negative margin applied.
+			$css .= '.has-global-padding :where(.has-global-padding:not(.wp-block-block, .alignfull, .alignwide)) > .alignfull { margin-left: 0; margin-right: 0; }';
 		}
 
 		$css .= '.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }';

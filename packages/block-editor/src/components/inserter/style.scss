@@ -115,12 +115,25 @@ $block-inserter-tabs-height: 44px;
 	flex-direction: column;
 	overflow: hidden;
 
+	.block-editor-inserter__tablist-and-close-button {
+		border-bottom: $border-width solid $gray-300;
+		padding-right: $grid-unit-15;
+		display: flex;
+		justify-content: space-between;
+	}
+
+	.block-editor-inserter__close-button {
+		/* stylelint-disable-next-line property-disallowed-list -- This should be refactored to avoid order if possible */
+		order: 1;
+		align-self: center;
+	}
+
 	.block-editor-inserter__tablist {
 		width: 100%;
+		margin-bottom: -$border-width;
 
 		button[role="tab"] {
 			flex-grow: 1;
-			margin-bottom: -$border-width;
 			&[id$="reusable"] {
 				flex-grow: inherit;
 				// These are to align the `reusable` icon with the search icon.
