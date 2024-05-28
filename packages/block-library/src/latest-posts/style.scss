@@ -43,7 +43,9 @@
 }
 
 :root {
-	:where(.wp-block-latest-posts.is-grid),
+	:where(.wp-block-latest-posts.is-grid) {
+		padding: 0;
+	}
 	:where(.wp-block-latest-posts.wp-block-latest-posts__list) {
 		padding-left: 0;
 	}
