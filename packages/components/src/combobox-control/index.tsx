@@ -123,6 +123,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
 		help,
 		allowReset = true,
 		className,
+		shouldFilter = true,
 		messages = {
 			selected: __( 'Item selected.' ),
 		},
@@ -152,6 +153,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
 	const matchingSuggestions = useMemo( () => {
 		const startsWithMatch: ComboboxControlOption[] = [];
 		const containsMatch: ComboboxControlOption[] = [];
+		const others: ComboboxControlOption[] = [];
 		const match = normalizeTextString( inputValue );
 		options.forEach( ( option ) => {
 			const index = normalizeTextString( option.label ).indexOf( match );
@@ -159,11 +161,13 @@ function ComboboxControl( props: ComboboxControlProps ) {
 				startsWithMatch.push( option );
 			} else if ( index > 0 ) {
 				containsMatch.push( option );
+			} else if ( ! shouldFilter ) {
+				others.push( option );
 			}
 		} );
 
-		return startsWithMatch.concat( containsMatch );
-	}, [ inputValue, options ] );
+		return startsWithMatch.concat( containsMatch ).concat( others );
+	}, [ shouldFilter, inputValue, options ] );
 
 	const onSuggestionSelected = (
 		newSelectedSuggestion: ComboboxControlOption
@@ -269,18 +273,26 @@ function ComboboxControl( props: ComboboxControlProps ) {
 
 	// Update current selections when the filter input changes.
 	useEffect( () => {
-		const hasMatchingSuggestions = matchingSuggestions.length > 0;
-		const hasSelectedMatchingSuggestions =
-			getIndexOfMatchingSuggestion(
-				selectedSuggestion,
-				matchingSuggestions
-			) > 0;
-
-		if ( hasMatchingSuggestions && ! hasSelectedMatchingSuggestions ) {
-			// If the current selection isn't present in the list of suggestions, then automatically select the first item from the list of suggestions.
-			setSelectedSuggestion( matchingSuggestions[ 0 ] );
+		if ( ! shouldFilter ) {
+			setSelectedSuggestion( null );
+			return;
 		}
-	}, [ matchingSuggestions, selectedSuggestion ] );
+
+		// If the current selection isn't present in the list of suggestions, then automatically select the first item from the list of suggestions.
+		setSelectedSuggestion( ( previousSuggetion ) => {
+			const hasMatchingSuggestions = matchingSuggestions.length > 0;
+			const hasSelectedMatchingSuggestions =
+				getIndexOfMatchingSuggestion(
+					previousSuggetion,
+					matchingSuggestions
+				) > 0;
+
+			if ( hasMatchingSuggestions && ! hasSelectedMatchingSuggestions ) {
+				return matchingSuggestions[ 0 ];
+			}
+			return previousSuggetion;
+		} );
+	}, [ shouldFilter, matchingSuggestions ] );
 
 	// Announcements.
 	useEffect( () => {
