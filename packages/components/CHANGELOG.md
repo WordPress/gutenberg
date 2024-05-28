@@ -11,7 +11,7 @@
 
 -   `Tabs`: Animate indicator ([#60560](https://github.com/WordPress/gutenberg/pull/60560)).
 -   `ComboboxControl`: Introduce Combobox expandOnFocus prop ([#61705](https://github.com/WordPress/gutenberg/pull/61705)).
-- Components: Make the `ProgressBar` public ([#61062](https://github.com/WordPress/gutenberg/pull/61062)).
+-   Components: Make the `ProgressBar` public ([#61062](https://github.com/WordPress/gutenberg/pull/61062)).
 
 ### Bug Fixes
 
