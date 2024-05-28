@@ -28,8 +28,10 @@ Default.args = {
 	children: ( { className } ) => (
 		<Notice className={ className } status="success">
 			<p>
+				{ /* eslint-disable react/no-unescaped-entities */ }
 				No default animation. Use one of type = "appear", "slide-in", or
 				"loading".
+				{ /* eslint-enable react/no-unescaped-entities */ }
 			</p>
 		</Notice>
 	),

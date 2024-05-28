@@ -66,7 +66,9 @@ WithMorePadding.args = {
 	...Default.args,
 	renderContent: () => (
 		<DropdownContentWrapper paddingSize="medium">
+			{ /* eslint-disable react/no-unescaped-entities */ }
 			Content wrapped with <code>paddingSize="medium"</code>.
+			{ /* eslint-enable react/no-unescaped-entities */ }
 		</DropdownContentWrapper>
 	),
 };
@@ -81,7 +83,9 @@ WithNoPadding.args = {
 	...Default.args,
 	renderContent: () => (
 		<DropdownContentWrapper paddingSize="none">
+			{ /* eslint-disable react/no-unescaped-entities */ }
 			Content wrapped with <code>paddingSize="none"</code>.
+			{ /* eslint-enable react/no-unescaped-entities */ }
 		</DropdownContentWrapper>
 	),
 };

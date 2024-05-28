@@ -108,7 +108,6 @@ module.exports = {
 			'error',
 			{ props: 'never', children: 'never' },
 		],
-		'react/no-unescaped-entities': 'off',
 		'@wordpress/dependency-group': 'error',
 		'@wordpress/wp-global-usage': 'error',
 		'@wordpress/react-no-unsafe-timeout': 'error',
