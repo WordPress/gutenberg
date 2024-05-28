@@ -70,9 +70,11 @@ function ButtonTrigger< Item extends AnyItem >( {
 	onClick,
 	items,
 }: ActionTriggerProps< Item > ) {
+	const label =
+		typeof action.label === 'string' ? action.label : action.label( items );
 	return (
 		<Button
-			label={ action.getLabel?.( items ) || action.label }
+			label={ label }
 			icon={ action.icon }
 			isDestructive={ action.isDestructive }
 			size="compact"
@@ -86,14 +88,14 @@ function DropdownMenuItemTrigger< Item extends AnyItem >( {
 	onClick,
 	items,
 }: ActionTriggerProps< Item > ) {
+	const label =
+		typeof action.label === 'string' ? action.label : action.label( items );
 	return (
 		<DropdownMenuItem
 			onClick={ onClick }
 			hideOnClick={ ! ( 'RenderModal' in action ) }
 		>
-			<DropdownMenuItemLabel>
-				{ action.getLabel?.( items ) || action.label }
-			</DropdownMenuItemLabel>
+			<DropdownMenuItemLabel>{ label }</DropdownMenuItemLabel>
 		</DropdownMenuItem>
 	);
 }
@@ -103,9 +105,11 @@ export function ActionModal< Item extends AnyItem >( {
 	items,
 	closeModal,
 }: ActionModalProps< Item > ) {
+	const label =
+		typeof action.label === 'string' ? action.label : action.label( items );
 	return (
 		<Modal
-			title={ action.modalHeader || action.label }
+			title={ action.modalHeader || label }
 			__experimentalHideHeader={ !! action.hideModalHeader }
 			onRequestClose={ closeModal ?? ( () => {} ) }
 			overlayClassName={ `dataviews-action-modal dataviews-action-modal__${ kebabCase(

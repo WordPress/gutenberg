@@ -286,16 +286,11 @@ interface ActionBase< Item extends AnyItem > {
 	id: string;
 
 	/**
-	 * Getter function to return the label of the action in case
-	 * we want to adjust the label based on the selected items.
-	 * It takes precedence over the `label` prop.
-	 */
-	getLabel?: ( items: Item[] ) => string;
-
-	/**
 	 * The label of the action.
+	 * In case we want to adjust the label based on the selected items,
+	 * a function can be provided.
 	 */
-	label?: string;
+	label: string | ( ( items: Item[] ) => string );
 
 	/**
 	 * The icon of the action. (Either a string or an SVG element)

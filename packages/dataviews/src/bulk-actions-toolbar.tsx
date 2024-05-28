@@ -67,10 +67,12 @@ function ActionTrigger< Item extends AnyItem >( {
 	isBusy,
 	items,
 }: ActionTriggerProps< Item > ) {
+	const label =
+		typeof action.label === 'string' ? action.label : action.label( items );
 	return (
 		<ToolbarButton
 			disabled={ isBusy }
-			label={ action.getLabel?.( items ) || action.label }
+			label={ label }
 			icon={ action.icon }
 			isDestructive={ action.isDestructive }
 			size="compact"

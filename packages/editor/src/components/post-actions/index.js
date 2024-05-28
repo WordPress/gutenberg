@@ -88,14 +88,14 @@ export default function PostActions( { onActionPerformed, buttonProps } ) {
 
 // Copied as is from packages/dataviews/src/item-actions.js
 function DropdownMenuItemTrigger( { action, onClick, items } ) {
+	const label =
+		typeof action.label === 'string' ? action.label : action.label( items );
 	return (
 		<DropdownMenuItem
 			onClick={ onClick }
 			hideOnClick={ ! action.RenderModal }
 		>
-			<DropdownMenuItemLabel>
-				{ action.getLabel?.( items ) || action.label }
-			</DropdownMenuItemLabel>
+			<DropdownMenuItemLabel>{ label }</DropdownMenuItemLabel>
 		</DropdownMenuItem>
 	);
 }

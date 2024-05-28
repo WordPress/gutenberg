@@ -581,7 +581,7 @@ const viewPostAction = {
 
 const postRevisionsAction = {
 	id: 'view-post-revisions',
-	getLabel( items ) {
+	label( items ) {
 		const revisionsCount =
 			items[ 0 ]._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0;
 		return sprintf(
