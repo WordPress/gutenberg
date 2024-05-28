@@ -144,4 +144,8 @@ function InputBase(
 	);
 }
 
+/**
+ * `InputBase` is an internal component used to style the standard borders for an input,
+ * as well as handle the layout for prefix/suffix elements.
+ */
 export default contextConnect( InputBase, 'InputBase' );
