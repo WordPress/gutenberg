@@ -41,6 +41,8 @@ export function useUploadMediaFromBlobURL( args = {} ) {
 	} );
 
 	useEffect( () => {
+		// Uploading is a special effect that can't be canceled via the cleanup method.
+		// The extra check avoids duplicate uploads in development mode (React.StrictMode).
 		if ( hasUploadStarted.current ) {
 			return;
 		}
