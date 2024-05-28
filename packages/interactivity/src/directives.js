@@ -268,7 +268,7 @@ export default () => {
 	directive( 'watch', ( { directives: { watch }, evaluate } ) => {
 		watch.forEach( ( entry ) => {
 			useWatch( () => {
-				if ( SCRIPT_DEBUG ) {
+				if ( globalThis.SCRIPT_DEBUG ) {
 					// eslint-disable-next-line no-unused-vars
 					const start = performance.now();
 				}
