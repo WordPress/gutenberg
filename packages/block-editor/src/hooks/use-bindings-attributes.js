@@ -95,11 +95,11 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 			unlock( select( blocksStore ) ).getAllBlockBindingsSources()
 		);
 		const bindings = props.attributes.metadata?.bindings;
+		const { name, clientId, context } = props;
 		const bindingsWithDefaults = useMemo(
 			() => replacePatternOverrideDefaultBindings( name, bindings ),
 			[ bindings, name ]
 		);
-		const { name, clientId, context } = props;
 		const boundAttributes = useSelect( () => {
 			if ( ! bindingsWithDefaults ) {
 				return;
