@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -100,19 +95,14 @@ export default function VisualEditor( { styles } ) {
 		isEditingTemplate;
 
 	return (
-		<div
-			className={ clsx( 'edit-post-visual-editor', {
-				'has-inline-canvas': ! isToBeIframed,
-			} ) }
-		>
-			<VisualEditorRoot
-				disableIframe={ ! isToBeIframed }
-				styles={ styles }
-				// We should auto-focus the canvas (title) on load.
-				// eslint-disable-next-line jsx-a11y/no-autofocus
-				autoFocus={ ! isWelcomeGuideVisible }
-				contentRef={ paddingAppenderRef }
-			/>
-		</div>
+		<VisualEditorRoot
+			className="edit-post-visual-editor"
+			disableIframe={ ! isToBeIframed }
+			styles={ styles }
+			// We should auto-focus the canvas (title) on load.
+			// eslint-disable-next-line jsx-a11y/no-autofocus
+			autoFocus={ ! isWelcomeGuideVisible }
+			contentRef={ paddingAppenderRef }
+		/>
 	);
 }
