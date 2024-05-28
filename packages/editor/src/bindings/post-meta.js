@@ -17,12 +17,10 @@ export default {
 		return args.key;
 	},
 	getValue( { select, context, args } ) {
-		const postId = context.postId
-			? context.postId
-			: select( editorStore ).getCurrentPostId();
-		const postType = context.postType
-			? context.postType
-			: select( editorStore ).getCurrentPostType();
+		const postId =
+			context?.postId || select( editorStore ).getCurrentPostId();
+		const postType =
+			context?.postType || select( editorStore ).getCurrentPostType();
 
 		return select( coreDataStore ).getEditedEntityRecord(
 			'postType',
