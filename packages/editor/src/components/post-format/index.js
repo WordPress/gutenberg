@@ -95,6 +95,7 @@ export default function PostFormat() {
 						label: format.caption,
 						value: format.id,
 					} ) ) }
+					hideLabelFromVision
 				/>
 				{ suggestion && suggestion.id !== postFormat && (
 					<p className="editor-post-format__suggestion">
