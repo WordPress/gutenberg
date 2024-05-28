@@ -19,7 +19,7 @@ import Subtitle from '../subtitle';
 export default function TypographyVariations( { title, gap = 2 } ) {
 	const typographyVariations = useTypographyVariations();
 
-	if ( ! typographyVariations?.length ) {
+	if ( ! typographyVariations?.length <= 1 ) {
 		return null;
 	}
 

@@ -14,7 +14,7 @@ import Variation from './variation';
 export default function ColorVariations( { title, gap = 2 } ) {
 	const colorVariations = useColorVariations();
 
-	if ( ! colorVariations?.length ) {
+	if ( ! colorVariations?.length <= 1 ) {
 		return null;
 	}
 
