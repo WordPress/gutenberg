@@ -90,7 +90,7 @@ const DEFAULT_CONTROLS = {
 	radius: true,
 	color: true,
 	width: true,
-	shadow: false,
+	shadow: true,
 };
 
 export default function BorderPanel( {

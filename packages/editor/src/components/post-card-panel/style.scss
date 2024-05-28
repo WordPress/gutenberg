@@ -26,3 +26,7 @@
 		margin-bottom: $grid-unit-10;
 	}
 }
+
+.editor-post-card-panel__icon.is-sync {
+	fill: var(--wp-block-synced-color);
+}
