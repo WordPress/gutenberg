@@ -33,6 +33,7 @@ export function useCanEditEntity( kind, name, recordId ) {
  */
 export function useUploadMediaFromBlobURL( args = {} ) {
 	const latestArgs = useRef( args );
+	const hasUploadStarted = useRef( false );
 	const { getSettings } = useSelect( blockEditorStore );
 
 	useLayoutEffect( () => {
@@ -40,6 +41,10 @@ export function useUploadMediaFromBlobURL( args = {} ) {
 	} );
 
 	useEffect( () => {
+		if ( hasUploadStarted.current ) {
+			return;
+		}
+
 		if (
 			! latestArgs.current.url ||
 			! isBlobURL( latestArgs.current.url )
@@ -55,6 +60,8 @@ export function useUploadMediaFromBlobURL( args = {} ) {
 		const { url, allowedTypes, onChange, onError } = latestArgs.current;
 		const { mediaUpload } = getSettings();
 
+		hasUploadStarted.current = true;
+
 		mediaUpload( {
 			filesList: [ file ],
 			allowedTypes,
@@ -65,10 +72,12 @@ export function useUploadMediaFromBlobURL( args = {} ) {
 
 				revokeBlobURL( url );
 				onChange( media );
+				hasUploadStarted.current = false;
 			},
 			onError: ( message ) => {
 				revokeBlobURL( url );
 				onError( message );
+				hasUploadStarted.current = false;
 			},
 		} );
 	}, [ getSettings ] );
