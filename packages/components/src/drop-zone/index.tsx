@@ -12,66 +12,22 @@ import { upload, Icon } from '@wordpress/icons';
 import { getFilesFromDataTransfer } from '@wordpress/dom';
 import {
 	__experimentalUseDropZone as useDropZone,
-	useReducedMotion,
+	//useReducedMotion,
 } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import {
-	__unstableMotion as motion,
-	__unstableAnimatePresence as AnimatePresence,
-} from '../animation';
 import type { DropType, DropZoneProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
-const backdrop = {
-	hidden: { opacity: 0 },
-	show: {
-		opacity: 1,
-		transition: {
-			type: 'tween',
-			duration: 0.2,
-			delay: 0,
-			delayChildren: 0.1,
-		},
-	},
-	exit: {
-		opacity: 0,
-		transition: {
-			duration: 0.2,
-			delayChildren: 0,
-		},
-	},
-};
-
-const foreground = {
-	hidden: { opacity: 0, scale: 0.9 },
-	show: {
-		opacity: 1,
-		scale: 1,
-		transition: {
-			duration: 0.1,
-		},
-	},
-	exit: { opacity: 0, scale: 0.9 },
-};
-
 function DropIndicator( { label }: { label?: string } ) {
-	const disableMotion = useReducedMotion();
-	const children = (
-		<motion.div
-			variants={ backdrop }
-			initial={ disableMotion ? 'show' : 'hidden' }
-			animate="show"
-			exit={ disableMotion ? 'show' : 'exit' }
+	return (
+		<div
 			className="components-drop-zone__content"
-			// Without this, when this div is shown,
-			// Safari calls a onDropZoneLeave causing a loop because of this bug
-			// https://bugs.webkit.org/show_bug.cgi?id=66547
 			style={ { pointerEvents: 'none' } }
 		>
-			<motion.div variants={ foreground }>
+			<div className="components-drop-zone__content-inner">
 				<Icon
 					icon={ upload }
 					className="components-drop-zone__content-icon"
@@ -79,15 +35,9 @@ function DropIndicator( { label }: { label?: string } ) {
 				<span className="components-drop-zone__content-text">
 					{ label ? label : __( 'Drop files to upload' ) }
 				</span>
-			</motion.div>
-		</motion.div>
+			</div>
+		</div>
 	);
-
-	if ( disableMotion ) {
-		return children;
-	}
-
-	return <AnimatePresence>{ children }</AnimatePresence>;
 }
 
 /**
@@ -98,15 +48,15 @@ function DropIndicator( { label }: { label?: string } ) {
  * import { useState } from '@wordpress/element';
  *
  * const MyDropZone = () => {
- *   const [ hasDropped, setHasDropped ] = useState( false );
+ *   const [hasDropped, setHasDropped] = useState(false);
  *
  *   return (
  *     <div>
- *       { hasDropped ? 'Dropped!' : 'Drop something here' }
+ *       {hasDropped ? 'Dropped!' : 'Drop something here'}
  *       <DropZone
- *         onFilesDrop={ () => setHasDropped( true ) }
- *         onHTMLDrop={ () => setHasDropped( true ) }
- *         onDrop={ () => setHasDropped( true ) }
+ *         onFilesDrop={() => setHasDropped(true)}
+ *         onHTMLDrop={() => setHasDropped(true)}
+ *         onDrop={() => setHasDropped(true)}
  *       />
  *     </div>
  *   );
@@ -126,6 +76,7 @@ export function DropZoneComponent( {
 	const [ isDraggingOverElement, setIsDraggingOverElement ] =
 		useState< boolean >();
 	const [ type, setType ] = useState< DropType >();
+	//const disableMotion = true;
 	const ref = useDropZone( {
 		onDrop( event ) {
 			const files = event.dataTransfer
@@ -181,9 +132,10 @@ export function DropZoneComponent( {
 			setIsDraggingOverElement( false );
 		},
 	} );
+	const isDraggingOver = isDraggingOverDocument || isDraggingOverElement;
 	const classes = clsx( 'components-drop-zone', className, {
 		'is-active':
-			( isDraggingOverDocument || isDraggingOverElement ) &&
+			isDraggingOver &&
 			( ( type === 'file' && onFilesDrop ) ||
 				( type === 'html' && onHTMLDrop ) ||
 				( type === 'default' && onDrop ) ),
