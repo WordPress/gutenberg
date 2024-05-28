@@ -20,9 +20,7 @@ const meta: Meta< typeof TimeInput > = {
 		docs: { canvas: { sourceState: 'shown' } },
 	},
 	args: {
-		onChange: ( obj ) => {
-			action( 'onChange' )( obj );
-		},
+		onChange: action( 'onChange' ),
 	},
 };
 export default meta;
