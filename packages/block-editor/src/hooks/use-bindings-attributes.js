@@ -35,8 +35,8 @@ const DEFAULT_ATTRIBUTE = '__default';
  * Returns the bindings with the `__default` binding for pattern overrides
  * replaced with the full-set of supported attributes. e.g.:
  *
- * bindings passed in: `{ bindings: { __default: 'core/pattern-overrides' } }`
- * bindings returned: `{ bindings: { content: 'core/pattern-overrides' } }`
+ * bindings passed in: `{ __default: { source: 'core/pattern-overrides' } }`
+ * bindings returned: `{ content: { source: 'core/pattern-overrides' } }`
  *
  * @param {string} blockName The block name (e.g. 'core/paragraph').
  * @param {Object} bindings  A block's bindings from the metadata attribute.
@@ -45,14 +45,16 @@ const DEFAULT_ATTRIBUTE = '__default';
  */
 function replacePatternOverrideDefaultBindings( blockName, bindings ) {
 	// The `__default` binding currently only works for pattern overrides.
-	if ( bindings?.[ DEFAULT_ATTRIBUTE ] === 'core/pattern-overrides' ) {
+	if (
+		bindings?.[ DEFAULT_ATTRIBUTE ]?.source === 'core/pattern-overrides'
+	) {
 		const supportedAttributes = BLOCK_BINDINGS_ALLOWED_BLOCKS[ blockName ];
 		const bindingsWithDefaults = {};
 		for ( const attributeName of supportedAttributes ) {
 			// If the block has mixed binding sources, retain any non pattern override bindings.
 			const bindingSourceName = bindings[ attributeName ]
 				? bindings[ attributeName ]
-				: 'core/pattern-overrides';
+				: { source: 'core/pattern-overrides' };
 			bindingsWithDefaults[ attributeName ] = bindingSourceName;
 		}
 
