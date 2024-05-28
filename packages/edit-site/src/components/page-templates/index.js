@@ -80,7 +80,7 @@ const DEFAULT_VIEW = {
 	},
 	// All fields are visible by default, so it's
 	// better to keep track of the hidden ones.
-	hiddenFields: [ 'preview' ],
+	hiddenFields: [ 'preview', 'postTypes' ],
 	layout: defaultConfigPerViewType[ LAYOUT_GRID ],
 	filters: [],
 };
@@ -183,6 +183,12 @@ function Preview( { item, viewType } ) {
 		</ExperimentalBlockEditorProvider>
 	);
 }
+
+// TODO: templates can target Custom Post Types.
+const POST_TYPES = {
+	post: __( 'Post' ),
+	page: __( 'Page' ),
+};
 
 export default function PageTemplates() {
 	const { params } = useLocation();
@@ -314,6 +320,24 @@ export default function PageTemplates() {
 				},
 				elements: authors,
 				width: '1%',
+			},
+			{
+				header: __( 'Post types' ),
+				id: 'postTypes',
+				getValue: ( { item } ) => item.post_types,
+				render: ( { item } ) =>
+					item.post_types
+						?.map(
+							( postType ) => POST_TYPES[ postType ] || postType
+						)
+						?.join( ',' ),
+				elements: [
+					{ value: 'post', label: POST_TYPES.post },
+					{ value: 'page', label: POST_TYPES.page },
+				],
+				filterBy: {
+					operators: [ OPERATOR_IS_ANY ],
+				},
 			},
 		],
 		[ authors, view.type ]
