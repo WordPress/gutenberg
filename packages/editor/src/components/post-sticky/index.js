@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { CheckboxControl } from '@wordpress/components';
+import { ToggleControl, VisuallyHidden } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
@@ -10,6 +10,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
  */
 import PostStickyCheck from './check';
 import { store as editorStore } from '../../store';
+import PostPanelRow from '../post-panel-row';
 
 export default function PostSticky() {
 	const postSticky = useSelect( ( select ) => {
@@ -21,12 +22,16 @@ export default function PostSticky() {
 
 	return (
 		<PostStickyCheck>
-			<CheckboxControl
-				__nextHasNoMarginBottom
-				label={ __( 'Stick to the top of the blog' ) }
-				checked={ postSticky }
-				onChange={ () => editPost( { sticky: ! postSticky } ) }
-			/>
+			<PostPanelRow label={ __( 'Sticky' ) }>
+				<ToggleControl
+					className="editor-post-sticky__toggle-control"
+					label={
+						<VisuallyHidden>{ __( 'Sticky' ) }</VisuallyHidden>
+					}
+					checked={ postSticky }
+					onChange={ () => editPost( { sticky: ! postSticky } ) }
+				/>
+			</PostPanelRow>
 		</PostStickyCheck>
 	);
 }

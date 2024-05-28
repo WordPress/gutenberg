@@ -126,7 +126,7 @@ test.describe( 'Sidebar', () => {
 			name: 'Change discussion options',
 		} );
 		const postSummarySection = page.getByRole( 'checkbox', {
-			name: 'Stick to the top of the blog',
+			name: 'Sticky',
 		} );
 
 		await expect( postExcerptPanel ).toBeVisible();
