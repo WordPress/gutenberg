@@ -441,6 +441,7 @@ function BackgroundSizeToolsPanelItem( {
 			next === 'auto'
 		) {
 			nextRepeat = undefined;
+			next = !! style?.background?.backgroundImage?.id ? '50%' : next;
 		}
 
 		/*
