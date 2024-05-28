@@ -581,8 +581,15 @@ const viewPostAction = {
 
 const postRevisionsAction = {
 	id: 'view-post-revisions',
-	label: __( 'View revisions' ),
-	isPrimary: false,
+	label( items ) {
+		const revisionsCount =
+			items[ 0 ]._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0;
+		return sprintf(
+			/* translators: %s: number of revisions */
+			__( 'View revisions (%s)' ),
+			revisionsCount
+		);
+	},
 	isEligible: ( post ) => {
 		if ( post.status === 'trash' ) {
 			return false;

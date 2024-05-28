@@ -87,13 +87,15 @@ export default function PostActions( { onActionPerformed, buttonProps } ) {
 // so duplicating the code here seems like the least bad option.
 
 // Copied as is from packages/dataviews/src/item-actions.js
-function DropdownMenuItemTrigger( { action, onClick } ) {
+function DropdownMenuItemTrigger( { action, onClick, items } ) {
+	const label =
+		typeof action.label === 'string' ? action.label : action.label( items );
 	return (
 		<DropdownMenuItem
 			onClick={ onClick }
 			hideOnClick={ ! action.RenderModal }
 		>
-			<DropdownMenuItemLabel>{ action.label }</DropdownMenuItemLabel>
+			<DropdownMenuItemLabel>{ label }</DropdownMenuItemLabel>
 		</DropdownMenuItem>
 	);
 }
@@ -105,6 +107,7 @@ function ActionWithModal( { action, item, ActionTrigger, onClose } ) {
 	const actionTriggerProps = {
 		action,
 		onClick: () => setIsModalOpen( true ),
+		items: [ item ],
 	};
 	const { RenderModal, hideModalHeader } = action;
 	return (
@@ -156,6 +159,7 @@ function ActionsDropdownMenuGroup( { actions, item, onClose } ) {
 						key={ action.id }
 						action={ action }
 						onClick={ () => action.callback( [ item ] ) }
+						items={ [ item ] }
 					/>
 				);
 			} ) }

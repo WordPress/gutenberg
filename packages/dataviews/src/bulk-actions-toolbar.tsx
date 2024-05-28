@@ -65,11 +65,14 @@ function ActionTrigger< Item extends AnyItem >( {
 	action,
 	onClick,
 	isBusy,
+	items,
 }: ActionTriggerProps< Item > ) {
+	const label =
+		typeof action.label === 'string' ? action.label : action.label( items );
 	return (
 		<ToolbarButton
 			disabled={ isBusy }
-			label={ action.label }
+			label={ label }
 			icon={ action.icon }
 			isDestructive={ action.isDestructive }
 			size="compact"
@@ -112,6 +115,7 @@ function ActionButton< Item extends AnyItem >( {
 				setActionInProgress( action.id );
 				action.callback( selectedItems );
 			} }
+			items={ selectedEligibleItems }
 			isBusy={ actionInProgress === action.id }
 		/>
 	);
