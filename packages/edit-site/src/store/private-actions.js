@@ -54,8 +54,11 @@ export const setCanvasMode =
 		if ( ! document.startViewTransition ) {
 			switchCanvasMode();
 		} else {
-			document.startViewTransition( () => {
-				switchCanvasMode();
+			document.startViewTransition( {
+				update: () => {
+					switchCanvasMode();
+				},
+				types: [ 'canvas-mode-' + mode ],
 			} );
 		}
 	};
