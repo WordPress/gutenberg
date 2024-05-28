@@ -7,6 +7,7 @@ import { store as blocksStore } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { unlock } from '../lock-unlock';
+import { store as blockEditorStore } from '../store';
 
 /**
  * List of blocks and block attributes that can be bound.
@@ -47,26 +48,28 @@ export function canBindAttribute( blockName, attributeName ) {
 /**
  * Process the block attributes and replace them with the values obtained from the bindings.
  *
- * @param {Object} attributes   - The block attributes to process.
  * @param {string} clientId     - The block clientId.
- * @param {string} blockName    - The block name.
  * @param {Object} blockContext - The block context, which is needed for the binding sources.
  * @param {Object} registry     - The data registry.
  *
  * @return {Object} The new attributes object with the bindings values.
  */
 export function transformBlockAttributesWithBindingsValues(
-	attributes,
 	clientId,
-	blockName,
 	blockContext,
 	registry
 ) {
+	const attributes = registry
+		.select( blockEditorStore )
+		.getBlockAttributes( clientId );
 	const bindings = attributes?.metadata?.bindings;
 	if ( ! bindings ) {
 		return attributes;
 	}
 
+	const blockName = registry
+		.select( blockEditorStore )
+		.getBlockName( clientId );
 	const sources = unlock(
 		registry.select( blocksStore )
 	).getAllBlockBindingsSources();
