@@ -15,14 +15,15 @@ export default {
 	getPlaceholder( { args } ) {
 		return args.key;
 	},
-	getValue( { registry, context, args } ) {
+	getValue( { select, context, args } ) {
 		const postType = context.postType
 			? context.postType
-			: registry.select( editorStore ).getCurrentPostType();
+			: select( editorStore ).getCurrentPostType();
 
-		return registry
-			.select( coreDataStore )
-			.getEditedEntityRecord( 'postType', postType, context.postId )
-			.meta?.[ args.key ];
+		return select( coreDataStore ).getEditedEntityRecord(
+			'postType',
+			postType,
+			context.postId
+		).meta?.[ args.key ];
 	},
 };
