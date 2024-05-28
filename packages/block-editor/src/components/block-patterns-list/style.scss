@@ -38,21 +38,22 @@
 		border-radius: $radius-block-ui;
 
 		&::after {
-			outline: $border-width solid rgba($black, 0.075);
+			outline: $border-width solid rgba($black, 0.1);
 			outline-offset: -$border-width;
 			border-radius: $radius-block-ui;
-			transition: outline 0.1s linear;
 		}
 	}
 
 	&:hover:not(:focus) .block-editor-block-preview__container::after {
-		outline-color: rgba($black, 0.2);
+		outline-color: rgba($black, 0.3);
 	}
 
 	&:focus .block-editor-block-preview__container::after {
 		outline-color: var(--wp-admin-theme-color);
 		outline-width: var(--wp-admin-border-width-focus);
 		outline-offset: calc((-1 * var(--wp-admin-border-width-focus)));
+		transition: outline 0.1s linear;
+		@include reduce-motion("transition");
 	}
 
 	.block-editor-patterns__pattern-details {
