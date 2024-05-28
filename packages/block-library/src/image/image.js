@@ -597,7 +597,9 @@ export default function Image( {
 										<>{ lockAltControlsMessage }</>
 									) : (
 										<>
-											<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+											<ExternalLink href={
+												__('https://www.w3.org/WAI/tutorials/images/decision-tree/')
+												} >
 												{ __(
 													'Describe the purpose of the image.'
 												) }
@@ -684,7 +686,9 @@ export default function Image( {
 										<>{ lockAltControlsMessage }</>
 									) : (
 										<>
-											<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+											<ExternalLink href={
+												__('https://www.w3.org/WAI/tutorials/images/decision-tree/')
+												} >
 												{ __(
 													'Describe the purpose of the image.'
 												) }
