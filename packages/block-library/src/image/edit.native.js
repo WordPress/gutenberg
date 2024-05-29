@@ -581,7 +581,7 @@ export class ImageEdit extends Component {
 						) }{ ' ' }
 						<FooterMessageLink
 							href={
-								// translators: Localized tutorial, if one exists. Link includes list of existing translations.
+								// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
 								__(
 									'https://www.w3.org/WAI/tutorials/images/decision-tree/'
 								)
