@@ -525,7 +525,13 @@ describe( '__experimentalGetDirtyEntityRecords', () => {
 			},
 		} );
 		expect( __experimentalGetDirtyEntityRecords( state ) ).toEqual( [
-			{ kind: 'someKind', name: 'someName', key: 'someKey', title: '' },
+			{
+				kind: 'someKind',
+				name: 'someName',
+				key: 'someKey',
+				title: '',
+				hasMetaChanges: false,
+			},
 		] );
 	} );
 
@@ -580,7 +586,13 @@ describe( '__experimentalGetDirtyEntityRecords', () => {
 			},
 		} );
 		expect( __experimentalGetDirtyEntityRecords( state ) ).toEqual( [
-			{ kind: 'someKind', name: 'someName', key: 'someKey', title: '' },
+			{
+				kind: 'someKind',
+				name: 'someName',
+				key: 'someKey',
+				title: '',
+				hasMetaChanges: false,
+			},
 		] );
 	} );
 } );
