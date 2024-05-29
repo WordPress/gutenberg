@@ -14,4 +14,11 @@
 		max-height: 250px;
 		@include editor-input-reset();
 	}
+
+	textarea {
+		.block-editor-plain-text {
+			/*rtl:ignore*/
+			direction: ltr !important;
+		}
+	}
 }
