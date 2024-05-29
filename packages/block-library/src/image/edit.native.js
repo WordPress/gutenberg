@@ -581,8 +581,11 @@ export class ImageEdit extends Component {
 						) }{ ' ' }
 						<FooterMessageLink
 							href={
-								__('https://www.w3.org/WAI/tutorials/images/decision-tree/')
-								}
+								// translators: Localized tutorial, if one exists. Link includes list of existing translations.
+								__(
+									'https://www.w3.org/WAI/tutorials/images/decision-tree/'
+								)
+							}
 							value={ __( 'What is alt text?' ) }
 						/>
 					</>

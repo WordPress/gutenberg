@@ -211,9 +211,14 @@ export default function CoverInspectorControls( {
 								}
 								help={
 									<>
-										<ExternalLink href={
-												__('https://www.w3.org/WAI/tutorials/images/decision-tree/')
-												}>
+										<ExternalLink
+											href={
+												// translators: Localized tutorial, if one exists. Link includes list of existing translations.
+												__(
+													'https://www.w3.org/WAI/tutorials/images/decision-tree/'
+												)
+											}
+										>
 											{ __(
 												'Describe the purpose of the image.'
 											) }
