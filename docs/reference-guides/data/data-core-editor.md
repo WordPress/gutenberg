@@ -641,18 +641,6 @@ _Related_
 
 -   hasInserterItems in core/block-editor store.
 
-### hasMetaChanges
-
-Returns true if there are unsaved changes to the post's meta fields, and false otherwise.
-
-_Parameters_
-
--   _state_ `Object`: Global application state.
-
-_Returns_
-
--   `boolean`: Whether there are edits or not.
-
 ### hasMultiSelection
 
 _Related_

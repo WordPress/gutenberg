@@ -135,3 +135,19 @@ export const getCurrentTemplateTemplateParts = createRegistrySelector(
 		return getFilteredTemplatePartBlocks( blocks, templateParts );
 	}
 );
+
+/**
+ * Returns true if there are unsaved changes to the
+ * post's meta fields, and false otherwise.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether there are edits or not.
+ */
+export const hasMetaChanges = createRegistrySelector( ( select ) => () => {
+	const dirtyEntityRecords =
+		select( coreStore ).__experimentalGetDirtyEntityRecords();
+	return dirtyEntityRecords.some(
+		( entityRecord ) => entityRecord.hasMetaChanges
+	);
+} );

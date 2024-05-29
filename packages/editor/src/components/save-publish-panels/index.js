@@ -14,6 +14,7 @@ import PostPublishPanel from '../post-publish-panel';
 import PluginPrePublishPanel from '../plugin-pre-publish-panel';
 import PluginPostPublishPanel from '../plugin-post-publish-panel';
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 const { Fill, Slot } = createSlotFill( 'ActionsPanel' );
 
@@ -34,7 +35,7 @@ export default function SavePublishPanels( {
 				select( editorStore ).isPublishSidebarOpened(),
 			hasNonPostEntityChanges:
 				select( editorStore ).hasNonPostEntityChanges(),
-			hasMetaChanges: select( editorStore ).hasMetaChanges(),
+			hasMetaChanges: unlock( select( editorStore ) ).hasMetaChanges(),
 		} ),
 		[]
 	);

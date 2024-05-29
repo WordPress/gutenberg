@@ -11,6 +11,7 @@ import { compose } from '@wordpress/compose';
  */
 import PublishButtonLabel from './label';
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 const noop = () => {};
 
@@ -215,11 +216,11 @@ export default compose( [
 			getCurrentPostType,
 			getCurrentPostId,
 			hasNonPostEntityChanges,
-			hasMetaChanges,
 			isSavingNonPostEntityChanges,
 			getEditedPostAttribute,
 			getPostEdits,
-		} = select( editorStore );
+			hasMetaChanges,
+		} = unlock( select( editorStore ) );
 		return {
 			isSaving: isSavingPost(),
 			isAutoSaving: isAutosavingPost(),
