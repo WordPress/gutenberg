@@ -14,10 +14,9 @@
 		background: $gray-900;
 		color: $white;
 		border-radius: 0;
-		height: $header-height + $border-width;
+		height: $header-height;
 		width: $header-height;
 		position: relative;
-		margin-bottom: - $border-width;
 
 		&:active {
 			color: $white;

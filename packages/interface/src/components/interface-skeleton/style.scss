@@ -125,26 +125,32 @@ html.interface-interface-skeleton__html-container {
 }
 
 .interface-interface-skeleton__sidebar {
+	border-top: $border-width solid $gray-200;
 	overflow: hidden;
 
 	@include break-medium() {
-		border-left: $border-width solid $gray-200;
+		box-shadow: -$border-width $border-width 0 0 rgba($color: #000, $alpha: 0.133); // 0.133 = $gray-200 but with alpha.
+		outline: 1px solid transparent; // Shown for Windows 10 High Contrast mode.
 	}
 }
 
 .interface-interface-skeleton__secondary-sidebar {
+	border-top: $border-width solid $gray-200;
 	right: 0;
+
 	@include break-medium() {
-		border-right: $border-width solid $gray-200;
+		box-shadow: $border-width $border-width 0 0 rgba($color: #000, $alpha: 0.133); // 0.133 = $gray-200 but with alpha.
+		outline: 1px solid transparent; // Shown for Windows 10 High Contrast mode.
 	}
 }
 
 .interface-interface-skeleton__header {
 	flex-shrink: 0;
 	height: auto;  // Keep the height flexible.
-	border-bottom: $border-width solid $gray-200;
+	box-shadow: 0 $border-width 0 0 rgba($color: #000, $alpha: 0.133); // 0.133 = $gray-200 but with alpha.
 	z-index: z-index(".interface-interface-skeleton__header");
 	color: $gray-900;
+	outline: 1px solid transparent; // Shown for Windows 10 High Contrast mode.
 }
 
 .interface-interface-skeleton__footer {
