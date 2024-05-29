@@ -16,7 +16,7 @@
 	}
 
 	textarea {
-		.block-editor-plain-text {
+		&.block-editor-plain-text {
 			/*rtl:ignore*/
 			direction: ltr !important;
 		}
