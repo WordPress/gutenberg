@@ -46,25 +46,23 @@ export function canBindAttribute( blockName, attributeName ) {
 }
 
 /**
- * Process the block attributes and replace them with the values obtained from the bindings.
+ * Process the bound block attributes and return the values obtained from the bindings.
  *
  * @param {string} clientId     - The block clientId.
  * @param {Object} blockContext - The block context, which is needed for the binding sources.
  * @param {Object} registry     - The data registry.
  *
- * @return {Object} The new attributes object with the bindings values.
+ * @return {Object} Object with the value obtained from the bindings of each bound attribute.
  */
-export function transformBlockAttributesWithBindingsValues(
-	clientId,
-	blockContext,
-	registry
-) {
+export function getBoundAttributesValues( clientId, blockContext, registry ) {
 	const attributes = registry
 		.select( blockEditorStore )
 		.getBlockAttributes( clientId );
 	const bindings = attributes?.metadata?.bindings;
+	const boundAttributes = {};
+
 	if ( ! bindings ) {
-		return attributes;
+		return boundAttributes;
 	}
 
 	const blockName = registry
@@ -73,8 +71,6 @@ export function transformBlockAttributesWithBindingsValues(
 	const sources = unlock(
 		registry.select( blocksStore )
 	).getAllBlockBindingsSources();
-
-	const newAttributes = { ...attributes };
 
 	for ( const [ attributeName, boundAttribute ] of Object.entries(
 		bindings
@@ -95,17 +91,17 @@ export function transformBlockAttributesWithBindingsValues(
 			args: boundAttribute.args,
 		};
 
-		newAttributes[ attributeName ] = source.getValue( args );
+		boundAttributes[ attributeName ] = source.getValue( args );
 
-		if ( newAttributes[ attributeName ] === undefined ) {
+		if ( boundAttributes[ attributeName ] === undefined ) {
 			if ( attributeName === 'url' ) {
-				newAttributes[ attributeName ] = null;
+				boundAttributes[ attributeName ] = null;
 			} else {
-				newAttributes[ attributeName ] =
+				boundAttributes[ attributeName ] =
 					source.getPlaceholder?.( args );
 			}
 		}
 	}
 
-	return newAttributes;
+	return boundAttributes;
 }
