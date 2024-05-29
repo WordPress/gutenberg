@@ -52,11 +52,15 @@ const withCustomWidthCustomCSS = `
  * }
  * ```
  */
-export const WithCustomWidth: StoryFn< typeof ProgressBar > = () => {
-	return (
+export const WithCustomWidth = Template.bind( {} );
+WithCustomWidth.args = {
+	className: 'custom-progress-bar',
+};
+WithCustomWidth.decorators = [
+	( Story ) => (
 		<>
 			<style>{ withCustomWidthCustomCSS }</style>
-			<ProgressBar className="custom-progress-bar" />
+			<Story />
 		</>
-	);
-};
+	),
+];
