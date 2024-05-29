@@ -8,9 +8,10 @@ export type SortDirection = 'asc' | 'desc';
 /**
  * Generic option type.
  */
-interface Option< Value extends any = any > {
+export interface Option< Value extends any = any > {
 	value: Value;
 	label: string;
+	description?: string;
 }
 
 interface FilterByConfig {
@@ -28,15 +29,13 @@ interface FilterByConfig {
 	isPrimary?: boolean;
 }
 
-type DeprecatedOperator = 'in' | 'notIn';
-type Operator =
+export type Operator =
 	| 'is'
 	| 'isNot'
 	| 'isAny'
 	| 'isNone'
 	| 'isAll'
-	| 'isNotAll'
-	| DeprecatedOperator;
+	| 'isNotAll';
 
 export type AnyItem = Record< string, any >;
 
@@ -134,6 +133,43 @@ export interface Filter {
 	 * The value to filter by.
 	 */
 	value: any;
+}
+
+export interface NormalizedFilter {
+	/**
+	 * The field to filter by.
+	 */
+	field: string;
+
+	/**
+	 * The field name.
+	 */
+	name: string;
+
+	/**
+	 * The list of options to pick from when using the field as a filter.
+	 */
+	elements: Option[];
+
+	/**
+	 * Is a single selection filter.
+	 */
+	singleSelection: boolean;
+
+	/**
+	 * The list of operators supported by the field.
+	 */
+	operators: Operator[];
+
+	/**
+	 * Whether the filter is visible.
+	 */
+	isVisible: boolean;
+
+	/**
+	 * Whether it is a primary filter.
+	 */
+	isPrimary: boolean;
 }
 
 interface ViewBase {
@@ -251,8 +287,10 @@ interface ActionBase< Item extends AnyItem > {
 
 	/**
 	 * The label of the action.
+	 * In case we want to adjust the label based on the selected items,
+	 * a function can be provided.
 	 */
-	label: string;
+	label: string | ( ( items: Item[] ) => string );
 
 	/**
 	 * The icon of the action. (Either a string or an SVG element)
@@ -337,15 +375,35 @@ export type Action< Item extends AnyItem > =
 	| ActionModal< Item >
 	| ActionButton< Item >;
 
-export interface ViewProps< Item extends AnyItem, ViewType extends ViewBase > {
+export interface ViewBaseProps< Item extends AnyItem > {
 	actions: Action< Item >[];
 	data: Item[];
 	fields: NormalizedField< Item >[];
 	getItemId: ( item: Item ) => string;
 	isLoading?: boolean;
-	onChangeView( view: ViewType ): void;
+	onChangeView( view: View ): void;
 	onSelectionChange: ( items: Item[] ) => void;
 	selection: string[];
 	setOpenedFilter: ( fieldId: string ) => void;
-	view: ViewType;
+	view: View;
 }
+
+export interface ViewTableProps< Item extends AnyItem >
+	extends ViewBaseProps< Item > {
+	view: ViewTable;
+}
+
+export interface ViewListProps< Item extends AnyItem >
+	extends ViewBaseProps< Item > {
+	view: ViewList;
+}
+
+export interface ViewGridProps< Item extends AnyItem >
+	extends ViewBaseProps< Item > {
+	view: ViewGrid;
+}
+
+export type ViewProps< Item extends AnyItem > =
+	| ViewTableProps< Item >
+	| ViewGridProps< Item >
+	| ViewListProps< Item >;

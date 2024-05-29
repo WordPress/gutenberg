@@ -26,8 +26,8 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await admin.visitSiteEditor( {
 				postId: 'emptytheme//header',
 				postType: 'wp_template_part',
+				canvas: 'edit',
 			} );
-			await editor.canvas.locator( 'body' ).click();
 			await requestUtils.createNavigationMenu( {
 				title: 'Hidden menu',
 				content: `
@@ -138,8 +138,8 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await admin.visitSiteEditor( {
 				postId: 'emptytheme//header',
 				postType: 'wp_template_part',
+				canvas: 'edit',
 			} );
-			await editor.canvas.locator( 'body' ).click();
 			await requestUtils.createNavigationMenu( {
 				title: 'Hidden menu',
 				content: `
@@ -353,8 +353,8 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await admin.visitSiteEditor( {
 				postId: 'emptytheme//header',
 				postType: 'wp_template_part',
+				canvas: 'edit',
 			} );
-			await editor.canvas.locator( 'body' ).click();
 			await requestUtils.createNavigationMenu( {
 				title: 'Hidden menu',
 				content: `
@@ -449,8 +449,8 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await admin.visitSiteEditor( {
 				postId: 'emptytheme//header',
 				postType: 'wp_template_part',
+				canvas: 'edit',
 			} );
-			await editor.canvas.locator( 'body' ).click();
 			await requestUtils.createNavigationMenu( {
 				title: 'Page list menu',
 				content: `

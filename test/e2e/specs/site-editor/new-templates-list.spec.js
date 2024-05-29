@@ -20,7 +20,7 @@ test.describe( 'Templates', () => {
 	} );
 
 	test( 'Sorting', async ( { admin, page } ) => {
-		await admin.visitSiteEditor( { path: '/wp_template' } );
+		await admin.visitSiteEditor( { postType: 'wp_template' } );
 
 		// Descending by title.
 		await page.getByRole( 'button', { name: 'View options' } ).click();
@@ -47,7 +47,7 @@ test.describe( 'Templates', () => {
 			title: 'Date Archives',
 			content: 'hi',
 		} );
-		await admin.visitSiteEditor( { path: '/wp_template' } );
+		await admin.visitSiteEditor( { postType: 'wp_template' } );
 		// Global search.
 		await page.getByRole( 'searchbox', { name: 'Search' } ).fill( 'tag' );
 		const titles = page
@@ -84,7 +84,7 @@ test.describe( 'Templates', () => {
 	} );
 
 	test( 'Field visibility', async ( { admin, page } ) => {
-		await admin.visitSiteEditor( { path: '/wp_template' } );
+		await admin.visitSiteEditor( { postType: 'wp_template' } );
 
 		await page.getByRole( 'button', { name: 'View options' } ).click();
 		await page.getByRole( 'menuitem', { name: 'Layout' } ).click();

@@ -35,20 +35,20 @@ test.describe( 'Pattern Overrides', () => {
 		const editableParagraphName = 'Editable Paragraph';
 
 		await test.step( 'Create a synced pattern and assign blocks to allow overrides', async () => {
-			await admin.visitSiteEditor( { path: '/patterns' } );
+			await admin.visitSiteEditor( { postType: 'wp_block' } );
 
 			await page
-				.getByRole( 'region', { name: 'Navigation' } )
-				.getByRole( 'button', { name: 'Create pattern' } )
+				.getByRole( 'region', { name: 'Patterns content' } )
+				.getByRole( 'button', { name: 'add new pattern' } )
 				.click();
 
 			await page
-				.getByRole( 'menu', { name: 'Create pattern' } )
-				.getByRole( 'menuitem', { name: 'Create pattern' } )
+				.getByRole( 'menu', { name: 'add new pattern' } )
+				.getByRole( 'menuitem', { name: 'add new pattern' } )
 				.click();
 
 			const createPatternDialog = page.getByRole( 'dialog', {
-				name: 'Create pattern',
+				name: 'add new pattern',
 			} );
 			await createPatternDialog
 				.getByRole( 'textbox', { name: 'Name' } )
@@ -57,7 +57,7 @@ test.describe( 'Pattern Overrides', () => {
 				.getByRole( 'checkbox', { name: 'Synced' } )
 				.setChecked( true );
 			await createPatternDialog
-				.getByRole( 'button', { name: 'Create' } )
+				.getByRole( 'button', { name: 'Add' } )
 				.click();
 
 			await editor.canvas
@@ -266,6 +266,47 @@ test.describe( 'Pattern Overrides', () => {
 				name: 'core/paragraph',
 				attributes: {
 					content: 'edited Editable',
+					metadata: { name: paragraphName },
+				},
+			},
+		] );
+	} );
+
+	// See https://github.com/WordPress/gutenberg/pull/62014.
+	test( 'can convert a pattern block to regular blocks when the pattern supports overrides but not override values', async ( {
+		admin,
+		requestUtils,
+		editor,
+	} ) => {
+		const paragraphName = 'paragraph-name';
+		const { id } = await requestUtils.createBlock( {
+			title: 'Pattern',
+			content: `<!-- wp:paragraph {"metadata":{"name":"${ paragraphName }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
+<p>Editable</p>
+<!-- /wp:paragraph -->`,
+			status: 'publish',
+		} );
+
+		await admin.createNewPost();
+
+		await editor.insertBlock( {
+			name: 'core/block',
+			attributes: { ref: id },
+		} );
+
+		// Convert back to regular blocks.
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
+		);
+		await editor.showBlockToolbar();
+		await editor.clickBlockOptionsMenuItem( 'Detach' );
+
+		// Check that the overrides remain.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Editable',
 					metadata: { name: paragraphName },
 				},
 			},
@@ -727,7 +768,6 @@ test.describe( 'Pattern Overrides', () => {
 			await admin.visitSiteEditor( {
 				postId: id,
 				postType: 'wp_block',
-				categoryType: 'pattern',
 				canvas: 'edit',
 			} );
 

@@ -501,7 +501,13 @@ _Returns_
 
 ### PageTemplate
 
-Undocumented declaration.
+Provides a dropdown menu for selecting and managing post templates.
+
+The dropdown menu includes a button for toggling the menu, a list of available templates, and options for creating and editing templates.
+
+_Returns_
+
+-   `JSX.Element`: The rendered ClassicThemeControl component.
 
 ### PanelColorSettings
 
@@ -939,7 +945,11 @@ _Returns_
 
 ### PostComments
 
-Undocumented declaration.
+A form for managing comment status.
+
+_Returns_
+
+-   `JSX.Element`: The rendered PostComments component.
 
 ### PostDiscussionPanel
 
@@ -974,15 +984,49 @@ Undocumented declaration.
 
 ### PostFeaturedImage
 
-Undocumented declaration.
+Renders the component for managing the featured image of a post.
+
+_Parameters_
+
+-   _props_ `Object`: Props.
+-   _props.currentPostId_ `number`: ID of the current post.
+-   _props.featuredImageId_ `number`: ID of the featured image.
+-   _props.onUpdateImage_ `Function`: Function to call when the image is updated.
+-   _props.onRemoveImage_ `Function`: Function to call when the image is removed.
+-   _props.media_ `Object`: The media object representing the featured image.
+-   _props.postType_ `string`: Post type.
+-   _props.noticeUI_ `Element`: UI for displaying notices.
+-   _props.noticeOperations_ `Object`: Operations for managing notices.
+
+_Returns_
+
+-   `Element`: Component to be rendered .
 
 ### PostFeaturedImageCheck
 
-Undocumented declaration.
+Wrapper component that renders its children only if the post type supports a featured image and the theme supports post thumbnails.
+
+_Parameters_
+
+-   _props_ `Object`: Props.
+-   _props.children_ `Element`: Children to be rendered.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### PostFeaturedImagePanel
 
-Undocumented declaration.
+Renders the panel for the post featured image.
+
+_Parameters_
+
+-   _props_ `Object`: Props.
+-   _props.withPanelBody_ `boolean`: Whether to include the panel body. Default true.
+
+_Returns_
+
+-   `Component|null`: The component to be rendered. Return Null if the editor panel is disabled for featured image.
 
 ### PostFormat
 
@@ -1013,19 +1057,40 @@ _Returns_
 
 ### PostLastRevision
 
-Undocumented declaration.
+Renders the component for displaying the last revision of a post.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### PostLastRevisionCheck
 
-Undocumented declaration.
+Wrapper component that renders its children if the post has more than one revision.
+
+_Parameters_
+
+-   _props_ `Object`: Props.
+-   _props.children_ `Element`: Children to be rendered.
+
+_Returns_
+
+-   `Component|null`: Rendered child components if post has more than one revision, otherwise null.
 
 ### PostLastRevisionPanel
 
-Undocumented declaration.
+Renders the panel for displaying the last revision of a post.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### PostLockedModal
 
-Undocumented declaration.
+A modal component that is displayed when a post is locked for editing by another user. The modal provides information about the lock status and options to take over or exit the editor.
+
+_Returns_
+
+-   `JSX.Element|null`: The rendered PostLockedModal component.
 
 ### PostPendingStatus
 
@@ -1169,7 +1234,11 @@ Undocumented declaration.
 
 ### PostTemplatePanel
 
-Undocumented declaration.
+Displays the template controls based on the current editor settings and user permissions.
+
+_Returns_
+
+-   `JSX.Element|null`: The rendered PostTemplatePanel component.
 
 ### PostTextEditor
 
@@ -1177,7 +1246,16 @@ Undocumented declaration.
 
 ### PostTitle
 
-Undocumented declaration.
+Renders the `PostTitle` component.
+
+_Parameters_
+
+-   \_\_\_ `Object`: Unused parameter.
+-   _forwardedRef_ `Element`: Forwarded ref for the component.
+
+_Returns_
+
+-   `Component`: The rendered PostTitle component.
 
 ### PostTitleRaw
 
@@ -1207,19 +1285,50 @@ _Returns_
 
 ### PostURL
 
-Undocumented declaration.
+Renders the `PostURL` component.
+
+_Usage_
+
+```jsx
+<PostURL />
+```
+
+_Parameters_
+
+-   _onClose_ `Function`: Callback function to be executed when the popover is closed.
+
+_Returns_
+
+-   `Component`: The rendered PostURL component.
 
 ### PostURLCheck
 
-Undocumented declaration.
+Check if the post URL is valid and visible.
+
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.children_ `Element`: The child components.
+
+_Returns_
+
+-   `Component|null`: The child components if the post URL is valid and visible, otherwise null.
 
 ### PostURLLabel
 
-Undocumented declaration.
+Represents a label component for a post URL.
+
+_Returns_
+
+-   `Component`: The PostURLLabel component.
 
 ### PostURLPanel
 
-Undocumented declaration.
+Renders the `PostURLPanel` component.
+
+_Returns_
+
+-   `JSX.Element`: The rendered PostURLPanel component.
 
 ### PostVisibility
 
@@ -1362,7 +1471,11 @@ _Returns_
 
 ### usePostURLLabel
 
-Undocumented declaration.
+Custom hook to get the label for the post URL.
+
+_Returns_
+
+-   `string`: The filtered and decoded post URL label.
 
 ### usePostVisibilityLabel
 

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/react-native-editor",
-	"version": "1.118.0",
+	"version": "1.119.0",
 	"description": "Mobile WordPress gutenberg editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -23,8 +23,8 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=12",
-		"npm": ">=6.9"
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
 	},
 	"main": "src/index.js",
 	"react-native": "src/index",

@@ -33,7 +33,7 @@ test.describe( 'Hybrid theme', () => {
 		);
 
 		await expect( page ).toHaveURL(
-			'/wp-admin/site-editor.php?path=%2Fpatterns'
+			'/wp-admin/site-editor.php?postType=wp_template_part'
 		);
 
 		await expect(

@@ -21,12 +21,6 @@
 	}
 
 	.wp-social-link {
-		// By setting the font size, we can scale icons and paddings consistently based on that.
-		// This also allows themes to override this, if need be.
-		a {
-			padding: 0.25em;
-		}
-
 		svg {
 			width: 1em;
 			height: 1em;
@@ -119,13 +113,12 @@
 }
 
 // Treatment for logos only style.
+// The specificity for this selector has not been reduced to 0-1-0 as per
+// global styles variation selectors as the lack of background should be
+// enforced for this block style.
 .wp-block-social-links.is-style-logos-only {
 	.wp-social-link {
 		background: none;
-
-		a {
-			padding: 0;
-		}
 
 		// Make these bigger.
 		svg {
@@ -142,11 +135,19 @@
 	.wp-social-link {
 		width: auto;
 	}
+}
 
-	.wp-social-link a {
-		padding-left: calc((2/3) * 1em);
-		padding-right: calc((2/3) * 1em);
-	}
+// The following rules have their selector specificity set to 0-1-0 to
+// facilitate theme.json styling of the inner social-link block padding.
+:root :where(.wp-block-social-links .wp-social-link a) {
+	padding: 0.25em;
+}
+:root :where(.wp-block-social-links.is-style-logos-only .wp-social-link a) {
+	padding: 0;
+}
+:root :where(.wp-block-social-links.is-style-pill-shape .wp-social-link a) {
+	padding-left: calc((2/3) * 1em);
+	padding-right: calc((2/3) * 1em);
 }
 
 // Ensure the Snapchat label is visible when no custom
