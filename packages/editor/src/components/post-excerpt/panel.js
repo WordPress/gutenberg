@@ -80,8 +80,7 @@ function ExcerptPanel() {
 }
 
 /**
- * `PostExcerptPanel` is a wrapper component that uses the `PostExcerptCheck`
- *  component to conditionally render the `ExcerptPanel` component respectively.
+ * Is rendered if the post type supports excerpts and allows editing the excerpt.
  *
  * @return {JSX.Element} The rendered PostExcerptPanel component.
  */
