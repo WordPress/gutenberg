@@ -38,7 +38,6 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
 import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 import InitPatternModal from '../init-pattern-modal';
@@ -48,7 +47,7 @@ import MetaBoxes from '../meta-boxes';
 import WelcomeGuide from '../welcome-guide';
 import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import useCommonCommands from '../../hooks/commands/use-common-commands';
+import useEditPostCommands from '../../commands/use-commands';
 
 const { getLayoutStyles } = unlock( blockEditorPrivateApis );
 const { useCommands } = unlock( coreCommandsPrivateApis );
@@ -62,6 +61,7 @@ const {
 	InterfaceSkeleton,
 	interfaceStore,
 	Sidebar,
+	TextEditor,
 } = unlock( editorPrivateApis );
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 
@@ -131,7 +131,7 @@ function useEditorStyles() {
 
 function Layout( { initialPost } ) {
 	useCommands();
-	useCommonCommands();
+	useEditPostCommands();
 
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isWideViewport = useViewportMatch( 'large' );

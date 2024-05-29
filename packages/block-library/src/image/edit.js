@@ -283,7 +283,7 @@ export function ImageEdit( {
 		<img
 			alt={ __( 'Edit image' ) }
 			title={ __( 'Edit image' ) }
-			className={ 'edit-image-preview' }
+			className="edit-image-preview"
 			src={ url }
 		/>
 	);
@@ -359,9 +359,7 @@ export function ImageEdit( {
 				} }
 			>
 				{ lockUrlControls ? (
-					<span
-						className={ 'block-bindings-media-placeholder-message' }
-					>
+					<span className="block-bindings-media-placeholder-message">
 						{ lockUrlControlsMessage }
 					</span>
 				) : (

@@ -1,15 +1,7 @@
 .show-icon-labels {
 	.block-editor-block-inspector__tabs [role="tablist"] {
-		.components-button.has-icon {
-			// Hide the button icons when labels are set to display...
-			svg {
-				display: none;
-			}
-			// ... and display labels.
-			// Uses ::before as ::after is already used for active tab styling.
-			&::before {
-				content: attr(aria-label);
-			}
+		.components-button {
+			justify-content: center;
 		}
 	}
 }

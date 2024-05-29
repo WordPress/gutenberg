@@ -39,7 +39,6 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 /**
  * Internal dependencies
  */
-import CodeEditor from '../code-editor';
 import Header from '../header-edit-mode';
 import WelcomeGuide from '../welcome-guide';
 import { store as editSiteStore } from '../../store';
@@ -64,6 +63,7 @@ const {
 	interfaceStore,
 	SavePublishPanels,
 	Sidebar,
+	TextEditor,
 } = unlock( editorPrivateApis );
 const { useHistory } = unlock( routerPrivateApis );
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
@@ -213,6 +213,7 @@ export default function Editor( { isLoading } ) {
 		( actionId, items ) => {
 			switch ( actionId ) {
 				case 'move-to-trash':
+				case 'delete-post':
 					{
 						history.push( {
 							postType: items[ 0 ].type,
@@ -346,7 +347,7 @@ export default function Editor( { isLoading } ) {
 							<>
 								{ isEditMode && <EditorNotices /> }
 								{ editorMode === 'text' && isEditMode && (
-									<CodeEditor />
+									<TextEditor />
 								) }
 								{ ! isLargeViewport && showVisualEditor && (
 									<BlockToolbar hideDragHandle />

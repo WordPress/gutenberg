@@ -6,7 +6,7 @@ import * as interfaceApis from '@wordpress/interface';
 /**
  * Internal dependencies
  */
-import EditorCanvas from './components/editor-canvas';
+import VisualEditor from './components/visual-editor';
 import { ExperimentalEditorProvider } from './components/provider';
 import { lock } from './lock-unlock';
 import { EntitiesSavedStatesExtensible } from './components/entities-saved-states';
@@ -33,7 +33,7 @@ const { store: interfaceStore, ...remainingInterfaceApis } = interfaceApis;
 
 export const privateApis = {};
 lock( privateApis, {
-	EditorCanvas,
+	VisualEditor,
 	ExperimentalEditorProvider,
 	EntitiesSavedStatesExtensible,
 	InserterSidebar,

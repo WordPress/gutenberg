@@ -3,7 +3,10 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-test.describe( 'Zoom Out', () => {
+// The test is flaky and fails almost consistently.
+// See: https://github.com/WordPress/gutenberg/issues/61806.
+// eslint-disable-next-line playwright/no-skipped-test
+test.describe.skip( 'Zoom Out', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
 	} );

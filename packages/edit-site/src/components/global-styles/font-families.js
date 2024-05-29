@@ -48,7 +48,7 @@ function FontFamilies() {
 								}
 								aria-label={ __( 'Manage fonts' ) }
 								icon={ settings }
-								size={ 'small' }
+								size="small"
 							/>
 						</Tooltip>
 					</HStack>
