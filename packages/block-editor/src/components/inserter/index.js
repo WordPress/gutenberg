@@ -18,12 +18,9 @@ import { plus } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../lock-unlock';
-import { privateApis as blockEditorPrivateApis } from '../../private-apis';
+import { PrivateInserterMenu as InserterMenu } from './menu';
 import QuickInserter from './quick-inserter';
 import { store as blockEditorStore } from '../../store';
-
-const { PrivateInserterMenu: InserterMenu } = unlock( blockEditorPrivateApis );
 
 const defaultRenderToggle = ( {
 	onToggle,

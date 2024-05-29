@@ -7,11 +7,9 @@ import { forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../lock-unlock';
-import { privateApis as blockEditorPrivateApis } from '../../private-apis';
+import { PrivateInserterMenu as InserterMenu } from './menu';
 import { store as blockEditorStore } from '../../store';
 
-const { PrivateInserterMenu: InserterMenu } = unlock( blockEditorPrivateApis );
 const noop = () => {};
 
 function InserterLibrary(
