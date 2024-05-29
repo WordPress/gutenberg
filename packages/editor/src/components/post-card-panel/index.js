@@ -93,7 +93,7 @@ export default function PostCardPanel( { actions } ) {
 					className="editor-post-card-panel__title"
 					weight={ 500 }
 					as="h2"
-					lineHeight={ '20px' }
+					lineHeight="20px"
 				>
 					{ title ? decodeEntities( title ) : __( 'No Title' ) }
 					{ isFrontPage && (
