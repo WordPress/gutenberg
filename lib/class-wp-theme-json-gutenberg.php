@@ -123,6 +123,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.0.0 Replaced `override` with `prevent_override` and updated the
 	 *              `prevent_override` value for `color.duotone` to use `color.defaultDuotone`.
 	 * @since 6.2.0 Added 'shadow' presets.
+	 * @since 6.6.0 Updated the 'prevent_override' value for font size presets to use 'typography.defaultFontSizes' and spacing size presets to use `spacing.defaultSpacingSizes`.
 	 * @since 6.6.0 Added `aspectRatios`.
 	 * @var array
 	 */
@@ -618,6 +619,51 @@ class WP_Theme_JSON_Gutenberg {
 	);
 
 	/**
+	 * List of valid settings.spacing.spacingScale.units values.
+	 *
+	 * @since 6.6.0
+	 * @var array
+	 */
+	const VALID_SPACING_UNITS = array(
+		'px',
+		'em',
+		'rem',
+		'%',
+		'vw',
+		'svw',
+		'lvw',
+		'dvw',
+		'vh',
+		'svh',
+		'lvh',
+		'dvh',
+		'vi',
+		'svi',
+		'lvi',
+		'dvi',
+		'vb',
+		'svb',
+		'lvb',
+		'dvb',
+		'vmin',
+		'svmin',
+		'lvmin',
+		'dvmin',
+		'vmax',
+		'svmax',
+		'lvmax',
+		'dvmax',
+	);
+
+	/**
+	 * List of valid settings.spacing.spacingScale.operator values.
+	 *
+	 * @since 6.6.0
+	 * @var array
+	 */
+	const VALID_SPACING_OPERATORS = array( '+', '*' );
+
+	/**
 	 * Return the input schema at the root and per origin.
 	 *
 	 * @since 6.5.0
@@ -728,6 +774,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * Constructor.
 	 *
 	 * @since 5.8.0
+	 * @since 6.6.0 Pre-generate the spacingSizes from spacingScale.
 	 *
 	 * @param array  $theme_json A structure that follows the theme.json schema.
 	 * @param string $origin     Optional. What source of data this object represents.
@@ -743,13 +790,8 @@ class WP_Theme_JSON_Gutenberg {
 		$valid_block_names   = array_keys( $registry->get_all_registered() );
 		$valid_element_names = array_keys( static::ELEMENTS );
 		$valid_variations    = static::get_valid_block_style_variations();
-		$theme_json          = static::sanitize( $this->theme_json, $valid_block_names, $valid_element_names, $valid_variations );
-		$this->theme_json    = static::maybe_opt_in_into_settings( $theme_json );
-
-		// Set directly on the origin so it doesn't have to be moved below.
-		if ( empty( $this->theme_json['settings']['spacing']['spacingSizes'] ) ) {
-			$this->set_spacing_sizes( $origin );
-		}
+		$this->theme_json    = static::sanitize( $this->theme_json, $valid_block_names, $valid_element_names, $valid_variations );
+		$this->theme_json    = static::maybe_opt_in_into_settings( $this->theme_json );
 
 		// Internally, presets are keyed by origin.
 		$nodes = static::get_setting_nodes( $this->theme_json );
@@ -767,6 +809,32 @@ class WP_Theme_JSON_Gutenberg {
 					}
 				}
 			}
+		}
+
+		// In addition to presets, spacingScale (which generates presets) is also keyed by origin.
+		$scale_path    = array( 'settings', 'spacing', 'spacingScale' );
+		$spacing_scale = _wp_array_get( $this->theme_json, $scale_path, null );
+		if ( null !== $spacing_scale ) {
+			// If the spacingScale is not already keyed by origin.
+			if ( empty( array_intersect( array_keys( $spacing_scale ), static::VALID_ORIGINS ) ) ) {
+				_wp_array_set( $this->theme_json, $scale_path, array( $origin => $spacing_scale ) );
+			}
+		}
+
+		/*
+		 * Prior to version 3, spacingSizes were generated in WP_Theme_JSON_Resolver_Gutenberg::get_merged_data().
+		 *
+		 * It's important to use the original $theme_json here because WP_Theme_JSON_Schema_Gutenberg::migrate()
+		 * has already updated the version to latest for $this->theme_json.
+		 */
+		if ( $theme_json['version'] >= 3 ) {
+			$sizes_path           = array( 'settings', 'spacing', 'spacingSizes', $origin );
+			$scale_path           = array( 'settings', 'spacing', 'spacingScale', $origin );
+			$spacing_sizes        = _wp_array_get( $this->theme_json, $sizes_path, array() );
+			$spacing_scale        = _wp_array_get( $this->theme_json, $scale_path, array() );
+			$spacing_scale_sizes  = static::compute_spacing_sizes( $spacing_scale );
+			$merged_spacing_sizes = static::merge_spacing_sizes( $spacing_scale_sizes, $spacing_sizes );
+			_wp_array_set( $this->theme_json, $sizes_path, $merged_spacing_sizes );
 		}
 	}
 
@@ -2960,6 +3028,38 @@ class WP_Theme_JSON_Gutenberg {
 		$incoming_data    = $incoming->get_raw_data();
 		$this->theme_json = array_replace_recursive( $this->theme_json, $incoming_data );
 
+		// Prior to version 3, spacingSizes were generated in WP_Theme_JSON_Resolver_Gutenberg::get_merged_data().
+		if ( $incoming_data['version'] >= 3 ) {
+			/*
+			 * Recompute all the spacing sizes based on the new hierarchy of data. In the constructor
+			 * spacingScale and spacingSizes are both keyed by origin and VALID_ORIGINS is ordered, so
+			 * we can allow partial spacingScale data to inherit missing data from earlier layers when
+			 * computing the spacing sizes.
+			 *
+			 * This happens before the presets are merged to ensure that default spacing sizes can be
+			 * removed from the theme origin if $prevent_override is true.
+			 */
+			$flattened_spacing_scale = array();
+			foreach ( static::VALID_ORIGINS as $origin ) {
+				$scale_path    = array( 'settings', 'spacing', 'spacingScale', $origin );
+				$spacing_scale = _wp_array_get( $incoming_data, $scale_path, null );
+				if ( ! isset( $spacing_scale ) ) {
+					continue;
+				}
+
+				// Allow partial scale settings by merging with lower layers.
+				$flattened_spacing_scale = array_replace( $flattened_spacing_scale, $spacing_scale );
+
+				// Generate and merge the scales for this layer.
+				$sizes_path           = array( 'settings', 'spacing', 'spacingSizes', $origin );
+				$spacing_sizes        = _wp_array_get( $incoming_data, $sizes_path, array() );
+				$spacing_scale_sizes  = static::compute_spacing_sizes( $flattened_spacing_scale );
+				$merged_spacing_sizes = static::merge_spacing_sizes( $spacing_scale_sizes, $spacing_sizes );
+
+				_wp_array_set( $this->theme_json, $sizes_path, $merged_spacing_sizes );
+			}
+		}
+
 		/*
 		 * The array_replace_recursive algorithm merges at the leaf level,
 		 * but we don't want leaf arrays to be merged, so we overwrite it.
@@ -3739,15 +3839,21 @@ class WP_Theme_JSON_Gutenberg {
 	/**
 	 * Sets the spacingSizes array based on the spacingScale values from theme.json.
 	 *
+	 * No longer used since theme.json version 3 as the spacingSizes are now
+	 * automatically generated during construction and merge instead of manually
+	 * set in the resolver.
+	 *
 	 * @since 6.1.0
-	 * @since 6.6.0 Added the `$origin` parameter.
+	 * @since 6.6.0 Added the $origin parameter.
 	 *
 	 * @param string $origin Optional. What source of data to set the spacing sizes for.
 	 *                       One of 'default', 'theme', or 'custom'. Default 'default'.
 	 * @return null|void
 	 */
 	public function set_spacing_sizes( $origin = 'default' ) {
-		$spacing_scale = $this->theme_json['settings']['spacing']['spacingScale'] ?? array();
+		$default_spacing_scale = $this->theme_json['settings']['spacing']['spacingScale']['default'] ?? array();
+		$origin_spacing_scale  = $this->theme_json['settings']['spacing']['spacingScale'][ $origin ] ?? array();
+		$spacing_scale         = array_replace( $default_spacing_scale, $origin_spacing_scale );
 
 		// Gutenberg didn't have the 1st isset check.
 		if ( ! isset( $spacing_scale['steps'] )
@@ -3769,6 +3875,97 @@ class WP_Theme_JSON_Gutenberg {
 		// If theme authors want to prevent the generation of the core spacing scale they can set their theme.json spacingScale.steps to 0.
 		if ( 0 === $spacing_scale['steps'] ) {
 			return null;
+		}
+
+		$spacing_sizes = static::compute_spacing_sizes( $spacing_scale );
+
+		// If there are 7 or less steps in the scale revert to numbers for labels instead of t-shirt sizes.
+		if ( $spacing_scale['steps'] <= 7 ) {
+			for ( $spacing_sizes_count = 0; $spacing_sizes_count < count( $spacing_sizes ); $spacing_sizes_count++ ) {
+				$spacing_sizes[ $spacing_sizes_count ]['name'] = (string) ( $spacing_sizes_count + 1 );
+			}
+		}
+
+		_wp_array_set( $this->theme_json, array( 'settings', 'spacing', 'spacingSizes', $origin ), $spacing_sizes );
+	}
+
+	/**
+	 * Merges two sets of spacing size presets and sorts them by slug using the natsort algorithm
+	 * so slugs beginning with 5 end up before slugs starting with 10, for example.
+	 *
+	 * @since 6.6.0
+	 *
+	 * @param array $base     The base set of spacing sizes.
+	 * @param array $incoming The set of spacing sizes to merge with the base. Duplicate slugs will override the base values.
+	 * @return array The merged set of spacing sizes.
+	 */
+	private static function merge_spacing_sizes( $base, $incoming ) {
+		$merged = array();
+		foreach ( $base as $item ) {
+			$merged[ $item['slug'] ] = $item;
+		}
+		foreach ( $incoming as $item ) {
+			$merged[ $item['slug'] ] = $item;
+		}
+		ksort( $merged, SORT_NATURAL );
+		return array_values( $merged );
+	}
+
+	/**
+	 * Generates a set of spacing sizes by starting with a medium size and
+	 * applying an operator with an increment value to generate the rest of the
+	 * sizes outward from the medium size. The medium slug is '50' with the rest
+	 * of the slugs being 10 apart. The generated names use t-shirt sizing.
+	 *
+	 * Example:
+	 *
+	 *     $spacing_scale = array(
+	 *         'steps'      => 4,
+	 *         'mediumStep' => 16,
+	 *         'unit'       => 'px',
+	 *         'operator'   => '+',
+	 *         'increment'  => 2,
+	 *     );
+	 *     $spacing_sizes = static::compute_spacing_sizes( $spacing_scale );
+	 *     // -> array(
+	 *     //        array( 'name' => 'Small',   'slug' => '40', 'size' => '14px' ),
+	 *     //        array( 'name' => 'Medium',  'slug' => '50', 'size' => '16px' ),
+	 *     //        array( 'name' => 'Large',   'slug' => '60', 'size' => '18px' ),
+	 *     //        array( 'name' => 'X-Large', 'slug' => '70', 'size' => '20px' ),
+	 *     //    )
+	 *
+	 * @since 6.6.0
+	 *
+	 * @param array $spacing_scale {
+	 *      The spacing scale values. All are required.
+	 *
+	 *      @type int    $steps      The number of steps in the scale. (up to 9 steps are supported.)
+	 *      @type float  $mediumStep The middle value that gets the slug '50'. (For even number of steps, this becomes the first middle value.)
+	 *      @type string $unit       The CSS unit to use for the sizes.
+	 *      @type string $operator   The mathematical operator to apply to generate the other sizes. Either '+' or '*'.
+	 *      @type float  $increment  The value used with the operator to generate the other sizes.
+	 * }
+	 * @return array The spacing sizes presets or an empty array if some spacing scale values are missing or invalid.
+	 */
+	private static function compute_spacing_sizes( $spacing_scale ) {
+		if (
+			! isset( $spacing_scale['steps'] ) ||
+			! is_numeric( $spacing_scale['steps'] ) ||
+			! is_int( $spacing_scale['steps'] + 0 ) ||
+			$spacing_scale['steps'] <= 0 ||
+			$spacing_scale['steps'] > 9 ||
+			! isset( $spacing_scale['mediumStep'] ) ||
+			! is_numeric( $spacing_scale['mediumStep'] ) ||
+			$spacing_scale['mediumStep'] <= 0 ||
+			! isset( $spacing_scale['unit'] ) ||
+			! in_array( $spacing_scale['unit'], static::VALID_SPACING_UNITS, true ) ||
+			! isset( $spacing_scale['operator'] ) ||
+			! in_array( $spacing_scale['operator'], static::VALID_SPACING_OPERATORS, true ) ||
+			! isset( $spacing_scale['increment'] ) ||
+			! is_numeric( $spacing_scale['increment'] ) ||
+			$spacing_scale['increment'] <= 0
+		) {
+			return array();
 		}
 
 		$unit            = '%' === $spacing_scale['unit'] ? '%' : sanitize_title( $spacing_scale['unit'] );
@@ -3853,14 +4050,7 @@ class WP_Theme_JSON_Gutenberg {
 			$spacing_sizes[] = $above_sizes_item;
 		}
 
-		// If there are 7 or less steps in the scale revert to numbers for labels instead of t-shirt sizes.
-		if ( $spacing_scale['steps'] <= 7 ) {
-			for ( $spacing_sizes_count = 0; $spacing_sizes_count < count( $spacing_sizes ); $spacing_sizes_count++ ) {
-				$spacing_sizes[ $spacing_sizes_count ]['name'] = (string) ( $spacing_sizes_count + 1 );
-			}
-		}
-
-		_wp_array_set( $this->theme_json, array( 'settings', 'spacing', 'spacingSizes', $origin ), $spacing_sizes );
+		return $spacing_sizes;
 	}
 
 	/**
