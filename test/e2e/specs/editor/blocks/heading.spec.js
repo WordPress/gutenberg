@@ -357,10 +357,8 @@ test.describe( 'Heading', () => {
 			name: 'Block navigation structure',
 		} );
 
-		const headingListViewItem = listView.getByRole( 'link' );
-
 		await expect(
-			headingListViewItem,
+			listView.getByRole( 'link' ),
 			'should show default block name if the content is empty'
 		).toHaveText( 'Heading' );
 
@@ -370,23 +368,23 @@ test.describe( 'Heading', () => {
 			} )
 			.fill( 'Heading content' );
 
-		await expect( headingListViewItem, 'should show content' ).toHaveText(
-			'Heading content'
-		);
+		await expect(
+			listView.getByRole( 'link' ),
+			'should show content'
+		).toHaveText( 'Heading content' );
 
-		await editor.clickBlockOptionsMenuItem( 'Rename' );
+		await editor.openDocumentSettingsSidebar();
+
+		await page.getByRole( 'button', { name: 'Advanced' } ).click();
+
 		await page
-			.getByRole( 'dialog', { name: 'Rename' } )
-			.getByRole( 'textbox', { name: 'Block name' } )
+			.getByRole( 'textbox', {
+				name: 'Block name',
+			} )
 			.fill( 'My new name' );
 
-		await page
-			.getByRole( 'dialog', { name: 'Rename' } )
-			.getByRole( 'button', { name: 'Save' } )
-			.click();
-
 		await expect(
-			headingListViewItem,
+			listView.getByRole( 'link' ),
 			'should show custom name'
 		).toHaveText( 'My new name' );
 	} );
