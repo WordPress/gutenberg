@@ -141,3 +141,7 @@
 	box-sizing: inherit;
 }
 
+.block-library-html__edit textarea.block-editor-plain-text {
+	// Custom HTML input is always LTR regardless of language.
+	direction: ltr;
+}
