@@ -897,91 +897,98 @@
 			]
 		},
 		"variations": {
-			"type": "array",
 			"description": "Block Variations is the API that allows a block to have similar versions of it, but all these versions share some common functionality.",
-			"items": {
-				"type": "object",
-				"required": [ "name", "title" ],
-				"additionalProperties": false,
-				"properties": {
-					"name": {
-						"type": "string",
-						"description": "The unique and machine-readable name."
-					},
-					"title": {
-						"type": "string",
-						"description": "A human-readable variation title."
-					},
-					"description": {
-						"type": "string",
-						"description": "A detailed variation description."
-					},
-					"category": {
-						"description": "A category classification, used in search interfaces to arrange block types by category.",
-						"anyOf": [
-							{
+			"oneOf": [
+				{
+					"type": "string"
+				},
+				{
+					"type": "array",
+					"items": {
+						"type": "object",
+						"required": [ "name", "title" ],
+						"additionalProperties": false,
+						"properties": {
+							"name": {
+								"type": "string",
+								"description": "The unique and machine-readable name."
+							},
+							"title": {
+								"type": "string",
+								"description": "A human-readable variation title."
+							},
+							"description": {
+								"type": "string",
+								"description": "A detailed variation description."
+							},
+							"category": {
+								"description": "A category classification, used in search interfaces to arrange block types by category.",
+								"anyOf": [
+									{
+										"type": "string"
+									},
+									{
+										"enum": [
+											"text",
+											"media",
+											"design",
+											"widgets",
+											"theme",
+											"embed"
+										]
+									}
+								]
+							},
+							"icon": {
+								"description": "An icon helping to visualize the variation. It can have the same shape as the block type.",
 								"type": "string"
 							},
-							{
-								"enum": [
-									"text",
-									"media",
-									"design",
-									"widgets",
-									"theme",
-									"embed"
-								]
+							"isDefault": {
+								"type": "boolean",
+								"default": false,
+								"description": "Indicates whether the current variation is the default one."
+							},
+							"attributes": {
+								"type": "object",
+								"description": "Values that override block attributes."
+							},
+							"innerBlocks": {
+								"type": "array",
+								"items": {
+									"type": "array"
+								},
+								"description": "Initial configuration of nested blocks."
+							},
+							"example": {
+								"type": "object",
+								"description": "Example provides structured data for the block preview. You can set to undefined to disable the preview shown for the block type."
+							},
+							"scope": {
+								"type": "array",
+								"description": "The list of scopes where the variation is applicable.",
+								"items": {
+									"enum": [ "inserter", "block", "transform" ]
+								},
+								"default": [ "inserter", "block" ]
+							},
+							"keywords": {
+								"type": "array",
+								"description": "An array of terms (which can be translated) that help users discover the variation while searching.",
+								"items": {
+									"type": "string"
+								}
+							},
+							"isActive": {
+								"type": "array",
+								"items": {
+									"type": "string"
+								},
+								"description": "The list of attributes that should be compared. Each attributes will be matched and the variation will be active if all of them are matching."
 							}
-						]
-					},
-					"icon": {
-						"description": "An icon helping to visualize the variation. It can have the same shape as the block type.",
-						"type": "string"
-					},
-					"isDefault": {
-						"type": "boolean",
-						"default": false,
-						"description": "Indicates whether the current variation is the default one."
-					},
-					"attributes": {
-						"type": "object",
-						"description": "Values that override block attributes."
-					},
-					"innerBlocks": {
-						"type": "array",
-						"items": {
-							"type": "array"
-						},
-						"description": "Initial configuration of nested blocks."
-					},
-					"example": {
-						"type": "object",
-						"description": "Example provides structured data for the block preview. You can set to undefined to disable the preview shown for the block type."
-					},
-					"scope": {
-						"type": "array",
-						"description": "The list of scopes where the variation is applicable.",
-						"items": {
-							"enum": [ "inserter", "block", "transform" ]
-						},
-						"default": [ "inserter", "block" ]
-					},
-					"keywords": {
-						"type": "array",
-						"description": "An array of terms (which can be translated) that help users discover the variation while searching.",
-						"items": {
-							"type": "string"
 						}
-					},
-					"isActive": {
-						"type": "array",
-						"items": {
-							"type": "string"
-						},
-						"description": "The list of attributes that should be compared. Each attributes will be matched and the variation will be active if all of them are matching."
 					}
 				}
-			}
+			]
 		},
 		"render": {
 			"type": "string",
