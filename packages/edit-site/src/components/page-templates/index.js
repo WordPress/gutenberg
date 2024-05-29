@@ -354,7 +354,7 @@ export default function PageTemplates() {
 	return (
 		<Page
 			className="edit-site-page-templates"
-			title={ __( 'Templates' ) }
+			title={ 'all' === activeView ? __( 'All templates' ) : activeView }
 			actions={ <AddNewTemplate /> }
 		>
 			<DataViews
