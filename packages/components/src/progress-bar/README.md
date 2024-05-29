@@ -26,14 +26,19 @@ const MyLoadingComponent = ( { progress } ) => {
 };
 ```
 
-You can customize its appearance by passing a custom CSS class name to `className`:
+You can customize its appearance by passing a custom CSS class name to `className`.
 
+```css
+.my-custom-progress-bar {
+	width: 100%;
+}
+```
 
 ```jsx
 import { ProgressBar } from '@wordpress/components';
 
 const MyLoadingComponent = () => {
-	return <ProgressBar className="my-custom-css-class" />;
+	return <ProgressBar className="my-custom-progress-bar" />;
 };
 ```
 
@@ -52,7 +57,7 @@ If a `value` is not specified, the progress bar will be considered indeterminate
 
 A CSS class to apply to the underlying `div` element, serving as a progress bar track.
 
-- Required: No
+-   Required: No
 
 #### Inherited props
 
