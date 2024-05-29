@@ -1,9 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
-
+import { useMemo, useContext } from '@wordpress/element';
 import { hasBlockSupport } from '@wordpress/blocks';
+
 /**
  * Internal dependencies
  */
@@ -17,10 +17,8 @@ import {
 	blockBindingsKey,
 	isPreviewModeKey,
 } from './context';
-import {
-	MultipleUsageWarning,
-	useOriginalBlockOnlyUseOnce,
-} from '../block-list/validate-multiple-usage';
+import { MultipleUsageWarning } from './multiple-usage-warning';
+import { PrivateBlockContext } from '../block-list/private-block-context';
 
 /**
  * The `useBlockEditContext` hook provides information about the block this hook is being used in.
@@ -53,7 +51,8 @@ export default function BlockEdit( {
 	const layoutSupport =
 		hasBlockSupport( name, 'layout', false ) ||
 		hasBlockSupport( name, '__experimentalLayout', false );
-	const originalBlockClientId = useOriginalBlockOnlyUseOnce( clientId );
+	const { originalBlockClientId } = useContext( PrivateBlockContext );
+
 	return (
 		<BlockEditContextProvider
 			// It is important to return the same object if props haven't
