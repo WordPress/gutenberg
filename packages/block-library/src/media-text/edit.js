@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useState, useRef } from '@wordpress/element';
 import {
@@ -144,7 +144,6 @@ function MediaTextEdit( {
 		imageFill,
 		isStackedOnMobile,
 		linkClass,
-		featuredImageLink,
 		linkDestination,
 		linkTarget,
 		mediaAlt,
@@ -188,20 +187,15 @@ function MediaTextEdit( {
 			mediaId: undefined,
 			mediaUrl: undefined,
 			mediaAlt: undefined,
+			mediaLink: undefined,
+			linkDestination: undefined,
+			linkTarget: undefined,
+			linkClass: undefined,
+			rel: undefined,
+			href: undefined,
 			useFeaturedImage: ! useFeaturedImage,
 		} );
 	};
-
-	const { postTypeName } = useSelect(
-		( select ) => {
-			const { getPostType } = select( coreStore );
-			return {
-				postTypeName:
-					postType && getPostType( postType )?.labels?.singular_name,
-			};
-		},
-		[ postType ]
-	);
 
 	const { imageSizes, image } = useSelect(
 		( select ) => {
@@ -294,7 +288,6 @@ function MediaTextEdit( {
 					focalPoint: undefined,
 					mediaWidth: 50,
 					mediaSizeSlug: undefined,
-					featuredImageLink: false,
 				} );
 			} }
 			dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
@@ -414,43 +407,6 @@ function MediaTextEdit( {
 					options={ imageSizeOptions }
 					onChange={ updateImage }
 				/>
-			) }
-			{ useFeaturedImage && (
-				<ToolsPanelItem
-					label={
-						postTypeName
-							? sprintf(
-									// translators: %s: Name of the post type e.g: "Page".
-									__( 'Link to %s' ),
-									postTypeName
-							  )
-							: __( 'Link to post' )
-					}
-					isShownByDefault
-					hasValue={ () => featuredImageLink }
-					onDeselect={ () =>
-						setAttributes( { featuredImageLink: false } )
-					}
-				>
-					<ToggleControl
-						__nextHasNoMarginBottom
-						label={
-							postTypeName
-								? sprintf(
-										// translators: %s: Name of the post type e.g: "Page".
-										__( 'Link to %s' ),
-										postTypeName
-								  )
-								: __( 'Link to post' )
-						}
-						onChange={ () =>
-							setAttributes( {
-								featuredImageLink: ! featuredImageLink,
-							} )
-						}
-						checked={ featuredImageLink }
-					/>
-				</ToolsPanelItem>
 			) }
 		</ToolsPanel>
 	);

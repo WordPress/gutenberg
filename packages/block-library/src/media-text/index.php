@@ -15,7 +15,7 @@
  *
  * @return string Returns the Media & Text block markup, if useFeaturedImage is true.
  */
-function render_block_core_media_text( $attributes, $content, $block ) {
+function render_block_core_media_text( $attributes, $content ) {
 	if ( false === $attributes['useFeaturedImage'] ) {
 		return $content;
 	}
@@ -29,29 +29,8 @@ function render_block_core_media_text( $attributes, $content, $block ) {
 		return $content;
 	}
 
-	$image_tag           = '<figure class="wp-block-media-text__media"><img>';
-	$alt                 = trim( strip_tags( get_post_meta( get_post_thumbnail_id(), '_wp_attachment_image_alt', true ) ) );
-	$featured_image_link = isset( $attributes['featuredImageLink'] ) && $attributes['featuredImageLink'];
-
-	if ( $featured_image_link ) {
-		$post_ID = $block->context['postId'];
-		if ( get_the_title( $post_ID ) ) {
-			$alt = trim( strip_tags( get_the_title( $post_ID ) ) );
-		} else {
-			$alt = sprintf(
-				// translators: %d is the post ID.
-				__( 'Untitled post %d' ),
-				$post_ID
-			);
-		}
-
-		$image_tag = sprintf(
-			'<figure class="wp-block-media-text__media"><a href="%1$s"><img></a>',
-			get_the_permalink( $post_ID )
-		);
-	}
-
-	$content = preg_replace( '/<figure\s+class="wp-block-media-text__media">/', $image_tag, $content );
+	$image_tag = '<figure class="wp-block-media-text__media"><img>';
+	$content   = preg_replace( '/<figure\s+class="wp-block-media-text__media">/', $image_tag, $content );
 
 	$processor = new WP_HTML_Tag_Processor( $content );
 	if ( isset( $attributes['imageFill'] ) && $attributes['imageFill'] ) {
@@ -59,13 +38,9 @@ function render_block_core_media_text( $attributes, $content, $block ) {
 		if ( isset( $attributes['focalPoint'] ) ) {
 			$position = round( $attributes['focalPoint']['x'] * 100 ) . '% ' . round( $attributes['focalPoint']['y'] * 100 ) . '%';
 		}
-		// Select the figure with the class `class wp-block-media-text__media`.
-		$processor->next_tag( array( 'class_name' => 'wp-block-media-text__media' ) );
+		$processor->next_tag( 'figure' );
 		$processor->set_attribute( 'style', 'background-image:url(' . esc_url( $current_featured_image ) . ');background-position:' . $position . ';' );
 	}
-	// Select the figure with the class `class wp-block-media-text__media`.
-	$processor->next_tag( array( 'class_name' => 'wp-block-media-text__media' ) );
-	// Select the img tag inside the figure
 	$processor->next_tag( 'img' );
 	$media_size_slug = 'full';
 	if ( isset( $attributes['mediaSizeSlug'] ) ) {
@@ -73,7 +48,7 @@ function render_block_core_media_text( $attributes, $content, $block ) {
 	}
 	$processor->set_attribute( 'src', esc_url( $current_featured_image ) );
 	$processor->set_attribute( 'class', 'wp-image-' . get_post_thumbnail_id() . ' size-' . $media_size_slug );
-	$processor->set_attribute( 'alt', $alt );
+	$processor->set_attribute( 'alt', trim( strip_tags( get_post_meta( get_post_thumbnail_id(), '_wp_attachment_image_alt', true ) ) ) );
 
 	$content = $processor->get_updated_html();
 
