@@ -1092,7 +1092,7 @@ Undocumented declaration.
 
 ### PostPreviewButton
 
-A button for post preview. It uses WordPress data selectors to get the necessary data for the preview, such as the post ID, the current post link, the preview link, and whether the post is saveable and viewable. When the button is clicked, it opens a new window or tab for the preview, writes the interstitial message to this window, and then navigates to the actual preview link. The button is disabled if the post is not saveable.
+Renders a button that opens a new window or tab for the preview, writes the interstitial message to this window, and then navigates to the actual preview link. The button is not rendered if the post is not viewable and disabled if the post is not saveable.
 
 _Parameters_
 
