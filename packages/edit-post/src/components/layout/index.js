@@ -38,7 +38,6 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
 import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 import InitPatternModal from '../init-pattern-modal';
@@ -62,6 +61,7 @@ const {
 	InterfaceSkeleton,
 	interfaceStore,
 	Sidebar,
+	TextEditor,
 } = unlock( editorPrivateApis );
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 

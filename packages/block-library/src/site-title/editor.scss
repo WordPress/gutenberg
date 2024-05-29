@@ -3,8 +3,6 @@
 	border: 1px dashed;
 }
 
-.editor-styles-wrapper .wp-block-site-title {
-	a {
-		color: inherit;
-	}
+.editor-styles-wrapper :where(.wp-block-site-title a) {
+	color: inherit;
 }

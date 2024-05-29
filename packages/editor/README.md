@@ -501,7 +501,13 @@ _Returns_
 
 ### PageTemplate
 
-Undocumented declaration.
+Provides a dropdown menu for selecting and managing post templates.
+
+The dropdown menu includes a button for toggling the menu, a list of available templates, and options for creating and editing templates.
+
+_Returns_
+
+-   `JSX.Element`: The rendered ClassicThemeControl component.
 
 ### PanelColorSettings
 
@@ -939,7 +945,11 @@ _Returns_
 
 ### PostComments
 
-Undocumented declaration.
+A form for managing comment status.
+
+_Returns_
+
+-   `JSX.Element`: The rendered PostComments component.
 
 ### PostDiscussionPanel
 
@@ -1076,7 +1086,11 @@ _Returns_
 
 ### PostLockedModal
 
-Undocumented declaration.
+A modal component that is displayed when a post is locked for editing by another user. The modal provides information about the lock status and options to take over or exit the editor.
+
+_Returns_
+
+-   `JSX.Element|null`: The rendered PostLockedModal component.
 
 ### PostPendingStatus
 
@@ -1220,7 +1234,11 @@ Undocumented declaration.
 
 ### PostTemplatePanel
 
-Undocumented declaration.
+Displays the template controls based on the current editor settings and user permissions.
+
+_Returns_
+
+-   `JSX.Element|null`: The rendered PostTemplatePanel component.
 
 ### PostTextEditor
 

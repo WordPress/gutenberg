@@ -16,6 +16,8 @@ Install the module
 npm install @wordpress/docgen --save-dev
 ```
 
+**Note**: This package requires Node.js version with long-term support status (check [Active LTS or Maintenance LTS releases](https://nodejs.org/en/about/previous-releases)). It is not compatible with older versions.
+
 ## Usage
 
 ```bash
