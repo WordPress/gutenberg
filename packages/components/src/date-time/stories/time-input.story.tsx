@@ -14,6 +14,8 @@ const meta: Meta< typeof TimeInput > = {
 	component: TimeInput,
 	argTypes: {
 		onChange: { action: 'onChange', control: { type: null } },
+		hours: { control: { type: null } },
+		minutes: { control: { type: null } },
 	},
 	parameters: {
 		controls: { expanded: true },
