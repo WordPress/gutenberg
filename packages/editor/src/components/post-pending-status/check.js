@@ -10,9 +10,8 @@ import { store as editorStore } from '../../store';
 
 /**
  * This component checks the publishing status of the current post.
- * It uses the data module to select data from the editor store.
- * If the post is already published or the user doesn't have the capability to publish, it returns null.
- * Otherwise, it renders the child elements passed as props.
+ * If the post is already published or the user doesn't have the
+ * capability to publish, it returns null.
  *
  * @param {Object}  props          Component properties.
  * @param {Element} props.children Children to be rendered.
