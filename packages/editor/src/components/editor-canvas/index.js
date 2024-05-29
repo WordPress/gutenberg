@@ -122,6 +122,7 @@ export default function EditorCanvas( {
 			} }
 			header={
 				<Header
+					forceIsDirty={ forceIsDirty }
 					setEntitiesSavedStatesCallback={
 						setEntitiesSavedStatesCallback
 					}

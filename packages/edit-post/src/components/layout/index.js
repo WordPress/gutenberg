@@ -296,7 +296,7 @@ function Layout( { initialPost } ) {
 			<EditorCanvas
 				className={ className }
 				styles={ styles }
-				forceIsDirty={ showMetaBoxes }
+				forceIsDirty={ hasActiveMetaboxes }
 				contentRef={ paddingAppenderRef }
 				disableIframe={ ! shouldIframe }
 				// We should auto-focus the canvas (title) on load.
