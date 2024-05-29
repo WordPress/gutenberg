@@ -19,7 +19,6 @@ import { store as editorStore } from '@wordpress/editor';
 /**
  * Internal dependencies
  */
-import './hooks';
 import Editor from './editor';
 
 /**
