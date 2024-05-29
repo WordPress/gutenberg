@@ -13,12 +13,8 @@
 		box-sizing: border-box;
 		max-height: 250px;
 		@include editor-input-reset();
-	}
-
-	textarea {
-		&.block-editor-plain-text {
-			/*rtl:ignore*/
-			direction: ltr !important;
-		}
+		// HTML input is always LTR regardless of language.
+		/*rtl:ignore*/
+		direction: ltr;
 	}
 }
