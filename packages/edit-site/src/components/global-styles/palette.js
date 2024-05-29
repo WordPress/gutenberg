@@ -65,7 +65,7 @@ function Palette( { name } ) {
 					path={ screenPath }
 					aria-label={ paletteButtonText }
 				>
-					<HStack direction={ 'row' }>
+					<HStack direction="row">
 						{ colors.length <= 0 && (
 							<FlexItem>{ __( 'Add colors' ) }</FlexItem>
 						) }
