@@ -118,4 +118,14 @@ class Gutenberg_REST_Templates_Controller_6_6 extends Gutenberg_REST_Templates_C
 
 		return rest_ensure_response( $response );
 	}
+
+	/**
+	 * See WP_REST_Templates_Controller::prepare_item_for_response
+	 */
+	public function prepare_item_for_response( $item, $request ) {
+		$blocks        = parse_blocks( $item->content );
+		$blocks        = gutenberg_replace_pattern_blocks( $blocks );
+		$item->content = serialize_blocks( $blocks );
+		return parent::prepare_item_for_response( $item, $request );
+	}
 }
