@@ -22,7 +22,8 @@
 -   Remove `reduceMotion` util ([#61963](https://github.com/WordPress/gutenberg/pull/61963)).
 -   Add type support for CSS Custom Properties ([#61872](https://github.com/WordPress/gutenberg/pull/61872)).
 -   Remove usage of deprecated spreading of `key` prop in JSX in CustomSelectControl and FormTokenField components ([#61692](https://github.com/WordPress/gutenberg/pull/61692)).
--   Tooltip: Fix Ariakit tooltip store usage ([#61858](https://github.com/WordPress/gutenberg/pull/61858)).
+-   `Tooltip`: Fix Ariakit tooltip store usage ([#61858](https://github.com/WordPress/gutenberg/pull/61858)).
+-   `CustomSelectControlV2`: Use `InputBase` for styling ([#60261](https://github.com/WordPress/gutenberg/pull/60261)).
 
 ## 27.6.0 (2024-05-16)
 
