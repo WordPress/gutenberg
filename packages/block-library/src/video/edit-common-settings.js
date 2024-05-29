@@ -74,6 +74,7 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
 			/>
 			<ToggleControl
 				__nextHasNoMarginBottom
+				/* translators: Setting to play videos within the webpage on mobile browsers rather than opening in a fullscreen player. */
 				label={ __( 'Play inline' ) }
 				onChange={ toggleFactory.playsInline }
 				checked={ !! playsInline }
