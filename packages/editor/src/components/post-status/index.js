@@ -27,7 +27,7 @@ import {
 	NAVIGATION_POST_TYPE,
 } from '../../store/constants';
 import PostPanelRow from '../post-panel-row';
-import PostSchedule from '../post-schedule';
+import { PrivatePostSchedule } from '../post-schedule';
 import { store as editorStore } from '../../store';
 
 const labels = {
@@ -228,7 +228,15 @@ export default function PostStatus() {
 												: status
 										}
 									/>
-									{ status === 'future' && <PostSchedule /> }
+									{ status === 'future' && (
+										<div className="editor-change-status__publish-date-wrapper">
+											<PrivatePostSchedule
+												showPopoverHeaderActions={
+													false
+												}
+											/>
+										</div>
+									) }
 									{ status !== 'private' && (
 										<VStack
 											as="fieldset"

@@ -8,7 +8,7 @@ import { parseISO, endOfMonth, startOfMonth } from 'date-fns';
  */
 import { getSettings } from '@wordpress/date';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { __experimentalPublishDateTimePicker as PublishDateTimePicker } from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useState, useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -16,6 +16,9 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const { PrivatePublishDateTimePicker } = unlock( blockEditorPrivateApis );
 
 /**
  * Renders the PostSchedule component. It allows the user to schedule a post.
@@ -25,7 +28,11 @@ import { store as editorStore } from '../../store';
  *
  * @return {Component} The component to be rendered.
  */
-export default function PostSchedule( { onClose } ) {
+export default function PostSchedule( props ) {
+	return <PrivatePostSchedule { ...props } showPopoverHeaderActions />;
+}
+
+export function PrivatePostSchedule( { onClose, showPopoverHeaderActions } ) {
 	const { postDate, postType } = useSelect(
 		( select ) => ( {
 			postDate: select( editorStore ).getEditedPostAttribute( 'date' ),
@@ -77,7 +84,7 @@ export default function PostSchedule( { onClose } ) {
 	);
 
 	return (
-		<PublishDateTimePicker
+		<PrivatePublishDateTimePicker
 			currentDate={ postDate }
 			onChange={ onUpdateDate }
 			is12Hour={ is12HourTime }
@@ -86,6 +93,7 @@ export default function PostSchedule( { onClose } ) {
 				setPreviewedMonth( parseISO( date ) )
 			}
 			onClose={ onClose }
+			showPopoverHeaderActions={ showPopoverHeaderActions }
 		/>
 	);
 }
