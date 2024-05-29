@@ -33,6 +33,19 @@ export const BlockBindingsPanel = ( { metadata } ) => {
 		return null;
 	}
 
+	// Don't show the bindings connected to pattern overrides in the inspectors panel.
+	// TODO: Explore if this should be abstracted to let other sources decide.
+	const filteredBindings = { ...bindings };
+	Object.keys( filteredBindings ).forEach( ( key ) => {
+		if ( filteredBindings[ key ].source === 'core/pattern-overrides' ) {
+			delete filteredBindings[ key ];
+		}
+	} );
+
+	if ( Object.keys( filteredBindings ).length === 0 ) {
+		return null;
+	}
+
 	return (
 		<InspectorControls>
 			<PanelBody
@@ -40,16 +53,20 @@ export const BlockBindingsPanel = ( { metadata } ) => {
 				className="components-panel__block-bindings-panel"
 			>
 				<ItemGroup isBordered isSeparated size="large">
-					{ Object.keys( bindings ).map( ( key ) => {
+					{ Object.keys( filteredBindings ).map( ( key ) => {
 						return (
 							<Item key={ key }>
 								<HStack>
 									<span>{ key }</span>
 									<span className="components-item__block-bindings-source">
-										{ sources[ bindings[ key ].source ]
-											? sources[ bindings[ key ].source ]
-													.label
-											: bindings[ key ].source }
+										{ sources[
+											filteredBindings[ key ].source
+										]
+											? sources[
+													filteredBindings[ key ]
+														.source
+											  ].label
+											: filteredBindings[ key ].source }
 									</span>
 								</HStack>
 							</Item>
