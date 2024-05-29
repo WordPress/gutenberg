@@ -45,7 +45,7 @@ function InserterMenu(
 		showMostUsedBlocks,
 		__experimentalFilterValue = '',
 		shouldFocusBlock = true,
-		__experimentalOnPatternCategorySelection = NOOP,
+		__experimentalOnPatternCategorySelection,
 		onClose,
 		__experimentalInitialTab,
 		__experimentalInitialCategory,
@@ -340,5 +340,18 @@ function InserterMenu(
 		</div>
 	);
 }
+// This is the private API for the InserterMenu component.
+// It allows access to all props, not just the public ones.
+export const PrivateInserterMenu = forwardRef( InserterMenu );
 
-export default forwardRef( InserterMenu );
+// This is the public API for the InserterMenu component.
+// We wrap the PrivateInserterMenu component to hide some props from the public API.
+export default forwardRef( ( props, ref ) => {
+	return (
+		<PrivateInserterMenu
+			ref={ ref }
+			{ ...props }
+			__experimentalOnPatternCategorySelection={ NOOP }
+		/>
+	);
+} );

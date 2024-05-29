@@ -14,6 +14,7 @@ import {
 	normalizeString,
 } from './components/inserter/search-items';
 import { PrivateListView } from './components/list-view';
+import { PrivateInserterMenu } from './components/inserter/menu';
 import BlockInfo from './components/block-info-slot-fill';
 import { useHasBlockToolbar } from './components/block-toolbar/use-has-block-toolbar';
 import { cleanEmptyObject, useStyleOverride } from './hooks/utils';
@@ -57,6 +58,7 @@ lock( privateApis, {
 	getNormalizedSearchTerms,
 	normalizeString,
 	PrivateListView,
+	PrivateInserterMenu,
 	ResizableBoxPopover,
 	BlockInfo,
 	useHasBlockToolbar,

@@ -25,10 +25,13 @@ import { setBlockTypeImpressions } from '@wordpress/react-native-bridge';
 /**
  * Internal dependencies
  */
+import { unlock } from '../../lock-unlock';
+import { privateApis as blockEditorPrivateApis } from '../../private-apis';
 import styles from './style.scss';
-import InserterMenu from './menu';
 import BlockInsertionPoint from '../block-list/insertion-point';
 import { store as blockEditorStore } from '../../store';
+
+const { PrivateInserterMenu: InserterMenu } = unlock( blockEditorPrivateApis );
 
 const VOICE_OVER_ANNOUNCEMENT_DELAY = 1000;
 
