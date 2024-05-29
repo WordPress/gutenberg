@@ -73,7 +73,7 @@ function PostURLToggle( { isOpen, onClick } ) {
 			aria-label={ sprintf( __( 'Change link: %s' ), decodedSlug ) }
 			onClick={ onClick }
 		>
-			{ decodedSlug }
+			/{ decodedSlug }
 		</Button>
 	);
 }
