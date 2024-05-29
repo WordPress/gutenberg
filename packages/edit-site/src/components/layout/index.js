@@ -16,9 +16,10 @@ import {
 	useReducedMotion,
 	useViewportMatch,
 	useResizeObserver,
+	usePrevious,
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { useState, useRef, useEffect } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import {
 	CommandMenu,
@@ -72,7 +73,7 @@ export default function Layout() {
 	useCommonCommands();
 
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-
+	const toggleRef = useRef();
 	const {
 		isDistractionFree,
 		hasFixedToolbar,
@@ -133,6 +134,14 @@ export default function Layout() {
 
 	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
 	const [ gradientValue ] = useGlobalStyle( 'color.gradient' );
+	const previousCanvaMode = usePrevious( canvasMode );
+	useEffect( () => {
+		if ( previousCanvaMode === 'edit' ) {
+			toggleRef.current?.focus();
+		}
+		// Should not depend on the previous canvas mode value but the next.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ canvasMode ] );
 
 	// Synchronizing the URL with the store value of canvasMode happens in an effect
 	// This condition ensures the component is only rendered after the synchronization happens
@@ -191,6 +200,7 @@ export default function Layout() {
 										className="edit-site-layout__sidebar"
 									>
 										<SiteHub
+											ref={ toggleRef }
 											isTransparent={
 												isResizableFrameOversized
 											}
