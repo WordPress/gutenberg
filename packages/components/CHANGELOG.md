@@ -11,6 +11,7 @@
 
 -   `Tabs`: Animate indicator ([#60560](https://github.com/WordPress/gutenberg/pull/60560)).
 -   `ComboboxControl`: Introduce Combobox expandOnFocus prop ([#61705](https://github.com/WordPress/gutenberg/pull/61705)).
+-   `ProgressBar`: Expose as public API ([#61062](https://github.com/WordPress/gutenberg/pull/61062)).
 -    Replaced `ButtonGroup` with `ToggleGroupControl` component for "AM/PM" selector in DateTime component ([#61562](https://github.com/WordPress/gutenberg/pull/61562)).
 
 ### Bug Fixes
