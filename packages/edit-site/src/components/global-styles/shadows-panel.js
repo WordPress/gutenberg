@@ -20,6 +20,7 @@ import { unlock } from '../../lock-unlock';
 import Subtitle from './subtitle';
 import { NavigationButtonAsItem } from './navigation-button';
 import ScreenHeader from './header';
+import { getNewIndexFromPresets } from './utils';
 
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 
@@ -81,10 +82,15 @@ export default function ShadowsPanel() {
 
 function ShadowList( { label, shadows, category, canCreate, onCreate } ) {
 	const handleAddShadow = () => {
+		const newIndex = getNewIndexFromPresets( shadows, 'shadow-' );
 		onCreate( {
-			name: `Shadow ${ shadows.length + 1 }`,
+			name: sprintf(
+				/* translators: %s: is an index for a preset */
+				__( 'Shadow %s' ),
+				newIndex
+			),
 			shadow: defaultShadow,
-			slug: `shadow-${ shadows.length + 1 }`,
+			slug: `shadow-${ newIndex }`,
 		} );
 	};
 
