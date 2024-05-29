@@ -37,7 +37,7 @@ const withCustomWidthCustomCSS = `
 `;
 
 /**
- * A progress bar with a custom overriden width.
+ * A progress bar with a custom width.
  *
  * You can override the default `width` or further customize the behavior
  * and visuals by passing a custom CSS class via the `cssName` prop.
