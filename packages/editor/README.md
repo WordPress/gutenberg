@@ -366,7 +366,11 @@ Undocumented declaration.
 
 ### ErrorBoundary
 
-Undocumented declaration.
+ErrorBoundary is used to catch JavaScript errors anywhere in a child component tree, log those errors, and display a fallback UI.
+
+It uses the lifecycle methods getDerivedStateFromError and componentDidCatch to catch errors in a child component tree.
+
+getDerivedStateFromError is used to render a fallback UI after an error has been thrown, and componentDidCatch is used to log error information.
 
 ### FontSizePicker
 
@@ -422,7 +426,14 @@ _Returns_
 
 ### LocalAutosaveMonitor
 
-Undocumented declaration.
+Monitors local autosaves of a post in the editor. It uses several hooks and functions to manage autosave behavior:
+
+-   `useAutosaveNotice` hook: Manages the creation of a notice prompting the user to restore a local autosave, if one exists.
+-   `useAutosavePurge` hook: Ejects a local autosave after a successful save occurs.
+-   `hasSessionStorageSupport` function: Checks if the current environment supports browser sessionStorage.
+-   `LocalAutosaveMonitor` component: Uses the `AutosaveMonitor` component to perform autosaves at a specified interval.
+
+The module also checks for sessionStorage support and conditionally exports the `LocalAutosaveMonitor` component based on that.
 
 ### MediaPlaceholder
 
@@ -501,7 +512,13 @@ _Returns_
 
 ### PageTemplate
 
-Undocumented declaration.
+Provides a dropdown menu for selecting and managing post templates.
+
+The dropdown menu includes a button for toggling the menu, a list of available templates, and options for creating and editing templates.
+
+_Returns_
+
+-   `JSX.Element`: The rendered ClassicThemeControl component.
 
 ### PanelColorSettings
 
@@ -939,7 +956,11 @@ _Returns_
 
 ### PostComments
 
-Undocumented declaration.
+A form for managing comment status.
+
+_Returns_
+
+-   `JSX.Element`: The rendered PostComments component.
 
 ### PostDiscussionPanel
 
@@ -1076,7 +1097,11 @@ _Returns_
 
 ### PostLockedModal
 
-Undocumented declaration.
+A modal component that is displayed when a post is locked for editing by another user. The modal provides information about the lock status and options to take over or exit the editor.
+
+_Returns_
+
+-   `JSX.Element|null`: The rendered PostLockedModal component.
 
 ### PostPendingStatus
 
@@ -1220,11 +1245,19 @@ Undocumented declaration.
 
 ### PostTemplatePanel
 
-Undocumented declaration.
+Displays the template controls based on the current editor settings and user permissions.
+
+_Returns_
+
+-   `JSX.Element|null`: The rendered PostTemplatePanel component.
 
 ### PostTextEditor
 
-Undocumented declaration.
+Displays the Post Text Editor along with content in Visual and Text mode.
+
+_Returns_
+
+-   `JSX.Element|null`: The rendered PostTextEditor component.
 
 ### PostTitle
 

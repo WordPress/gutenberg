@@ -154,9 +154,7 @@ function InstalledFonts() {
 												>
 													<FontCard
 														font={ font }
-														navigatorPath={
-															'/fontFamily'
-														}
+														navigatorPath="/fontFamily"
 														variantsText={ getFontCardVariantsText(
 															font
 														) }
@@ -193,9 +191,7 @@ function InstalledFonts() {
 												>
 													<FontCard
 														font={ font }
-														navigatorPath={
-															'/fontFamily'
-														}
+														navigatorPath="/fontFamily"
 														variantsText={ getFontCardVariantsText(
 															font
 														) }

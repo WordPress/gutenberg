@@ -350,7 +350,7 @@ function FontCollection( { slug } ) {
 												font={
 													font.font_family_settings
 												}
-												navigatorPath={ '/fontFamily' }
+												navigatorPath="/fontFamily"
 												onClick={ () => {
 													setSelectedFont(
 														font.font_family_settings
@@ -502,7 +502,7 @@ function FontCollection( { slug } ) {
 														parseInt( newPage )
 													)
 												}
-												size={ 'compact' }
+												size="compact"
 												__nextHasNoMarginBottom
 											/>
 										),
