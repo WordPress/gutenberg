@@ -41,24 +41,29 @@ function useInsertionPoint( {
 	onSelect,
 	shouldFocusBlock = true,
 	selectBlockOnInsert = true,
+	blockToInsert,
 } ) {
+	const { getSelectedBlock } = useSelect( blockEditorStore );
 	const {
-		getSelectedBlock,
-		getBlocksByName,
-		getBlockIndex,
-		getBlockRootClientId,
-		getBlockOrder,
-		getBlocks,
-		canInsertBlockType,
-	} = useSelect( blockEditorStore );
-	const { destinationRootClientId, destinationIndex } = useSelect(
+		destinationRootClientId,
+		destinationIndex,
+		blockInsertionRootClientId,
+		blockInsertionIndex,
+	} = useSelect(
 		( select ) => {
-			const { getSelectedBlockClientId } = select( blockEditorStore );
+			const {
+				getSelectedBlockClientId,
+				getBlockOrder,
+				getBlockIndex,
+				getBlockRootClientId,
+				getBlockInsertionPoint,
+			} = select( blockEditorStore );
 			const selectedBlockClientId = getSelectedBlockClientId();
 
 			let _destinationRootClientId = rootClientId;
 			let _destinationIndex;
 
+			const blockInsertionPoint = getBlockInsertionPoint();
 			if ( insertionIndex !== undefined ) {
 				// Insert into a specific index.
 				_destinationIndex = insertionIndex;
@@ -80,6 +85,14 @@ function useInsertionPoint( {
 			return {
 				destinationRootClientId: _destinationRootClientId,
 				destinationIndex: _destinationIndex,
+				blockInsertionRootClientId:
+					blockInsertionPoint?.rootClientId !== undefined
+						? blockInsertionPoint.rootClientId
+						: _destinationRootClientId,
+				blockInsertionIndex:
+					blockInsertionPoint?.index !== undefined
+						? blockInsertionPoint.index
+						: _destinationIndex,
 			};
 		},
 		[ rootClientId, insertionIndex, clientId, isAppender ]
@@ -122,61 +135,10 @@ function useInsertionPoint( {
 					meta
 				);
 			} else {
-				const normalizedBlocks = Array.isArray( blocks )
-					? blocks
-					: [ blocks ];
-
-				let _destinationIndex = destinationIndex;
-				let _destinationRootClientId = destinationRootClientId;
-
-				const canInsertBlocks = () =>
-					normalizedBlocks.every( ( block ) =>
-						canInsertBlockType(
-							block.name,
-							_destinationRootClientId
-						)
-					);
-				if ( ! canInsertBlocks() && normalizedBlocks.length === 1 ) {
-					// If it's not possible to insert the block in the current location, try to find a new location up the tree
-					const rootBlocks = getBlocks();
-					const currentRootBlock = 0;
-					while (
-						! canInsertBlockType(
-							normalizedBlocks[ 0 ].name,
-							_destinationRootClientId
-						)
-					) {
-						// save the index of the previous destination root client ID
-						const _previousDestinationRootClientId =
-							_destinationRootClientId;
-						_destinationIndex =
-							getBlockIndex( _previousDestinationRootClientId ) +
-							1;
-
-						// get the parent of the current destination root client ID
-						_destinationRootClientId = getBlockRootClientId(
-							_destinationRootClientId
-						);
-
-						// Break the loop if we searched the whole tree
-						if (
-							_previousDestinationRootClientId ===
-							_destinationRootClientId
-						) {
-							if ( currentRootBlock === rootBlocks.length ) {
-								break;
-							}
-							// also try to find an insertable block top down
-							const rootBlock = rootBlocks[ currentRootBlock ];
-							_destinationRootClientId = rootBlock.clientId;
-						}
-					}
-				}
-
 				insertBlocks(
 					blocks,
-					_destinationIndex,
-					_destinationRootClientId,
+					blockInsertionIndex,
+					blockInsertionRootClientId,
 					selectBlockOnInsert,
 					shouldFocusBlock || shouldForceFocusBlock ? 0 : null,
 					meta
@@ -197,26 +159,23 @@ function useInsertionPoint( {
 		[
 			isAppender,
 			getSelectedBlock,
-			getBlockIndex,
-			getBlockRootClientId,
 			replaceBlocks,
 			insertBlocks,
-			destinationRootClientId,
-			destinationIndex,
+			blockInsertionRootClientId,
+			blockInsertionIndex,
 			onSelect,
 			shouldFocusBlock,
 			selectBlockOnInsert,
 			setLastFocus,
-			canInsertBlockType,
-			getBlockOrder,
-			getBlocksByName,
 		]
 	);
 
 	const onToggleInsertionPoint = useCallback(
 		( show ) => {
 			if ( show ) {
-				showInsertionPoint( destinationRootClientId, destinationIndex );
+				showInsertionPoint( destinationRootClientId, destinationIndex, {
+					block: blockToInsert,
+				} );
 			} else {
 				hideInsertionPoint();
 			}
@@ -226,6 +185,7 @@ function useInsertionPoint( {
 			hideInsertionPoint,
 			destinationRootClientId,
 			destinationIndex,
+			blockToInsert,
 		]
 	);
 

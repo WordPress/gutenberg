@@ -603,22 +603,76 @@ export const insertBlocks =
  *
  * @return {Object} Action object.
  */
-export function showInsertionPoint(
-	rootClientId,
-	index,
-	__unstableOptions = {}
-) {
-	const { __unstableWithInserter, operation, nearestSide } =
-		__unstableOptions;
-	return {
-		type: 'SHOW_INSERTION_POINT',
-		rootClientId,
-		index,
-		__unstableWithInserter,
-		operation,
-		nearestSide,
+export const showInsertionPoint =
+	( rootClientId, index, __unstableOptions = {} ) =>
+	( { select, dispatch } ) => {
+		const { __unstableWithInserter, operation, nearestSide, block } =
+			__unstableOptions;
+
+		let _destinationIndex = index;
+		let _destinationRootClientId = rootClientId;
+
+		if (
+			( block && block?.name ) ||
+			( Array.isArray( block ) && block?.length > 0 )
+		) {
+			const normalizedBlocks = Array.isArray( block ) ? block : [ block ];
+
+			const canInsertBlocks = () =>
+				normalizedBlocks.every( ( blockToInsert ) =>
+					select.canInsertBlockType(
+						blockToInsert.name,
+						_destinationRootClientId
+					)
+				);
+			if ( ! canInsertBlocks() && normalizedBlocks.length === 1 ) {
+				// If it's not possible to insert the block in the current location, try to find a new location up the tree
+				const rootBlocks = select.getBlocks();
+				const currentRootBlock = 0;
+				while (
+					! select.canInsertBlockType(
+						normalizedBlocks[ 0 ].name,
+						_destinationRootClientId
+					)
+				) {
+					// save the index of the previous destination root client ID
+					const _previousDestinationRootClientId =
+						_destinationRootClientId;
+					_destinationIndex =
+						select.getBlockIndex(
+							_previousDestinationRootClientId
+						) + 1;
+
+					// get the parent of the current destination root client ID
+					_destinationRootClientId = select.getBlockRootClientId(
+						_destinationRootClientId
+					);
+
+					// Break the loop if we searched the whole tree
+					if (
+						_previousDestinationRootClientId ===
+						_destinationRootClientId
+					) {
+						if ( currentRootBlock === rootBlocks.length ) {
+							break;
+						}
+						// also try to find an insertable block top down
+						const rootBlock = rootBlocks[ currentRootBlock ];
+						_destinationRootClientId = rootBlock.clientId;
+					}
+				}
+			}
+		}
+
+		dispatch( {
+			type: 'SHOW_INSERTION_POINT',
+			rootClientId: _destinationRootClientId,
+			index: _destinationIndex,
+			__unstableWithInserter,
+			operation,
+			nearestSide,
+		} );
 	};
-}
 /**
  * Action that hides the insertion point.
  */

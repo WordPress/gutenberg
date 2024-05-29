@@ -12,6 +12,7 @@ import {
 	useCallback,
 	useMemo,
 	useRef,
+	useEffect,
 	useLayoutEffect,
 } from '@wordpress/element';
 import { VisuallyHidden, SearchControl, Popover } from '@wordpress/components';
@@ -77,6 +78,7 @@ function InserterMenu(
 			isAppender,
 			insertionIndex: __experimentalInsertionIndex,
 			shouldFocusBlock,
+			blockToInsert: hoveredItem,
 		} );
 	const blockTypesTabRef = useRef();
 
@@ -111,11 +113,14 @@ function InserterMenu(
 
 	const onHover = useCallback(
 		( item ) => {
-			onToggleInsertionPoint( !! item );
 			setHoveredItem( item );
 		},
-		[ onToggleInsertionPoint, setHoveredItem ]
+		[ setHoveredItem ]
 	);
+
+	useEffect( () => {
+		onToggleInsertionPoint( !! hoveredItem );
+	}, [ onToggleInsertionPoint, hoveredItem ] );
 
 	const onHoverPattern = useCallback(
 		( item ) => {
