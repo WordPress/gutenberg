@@ -118,12 +118,12 @@ function gutenberg_rest_template_post_type_callback( $item ) {
 
 	$template_metadata = _get_block_template_file( 'wp_template', $item['slug'] );
 	if ( null === $template_metadata ) {
-		return array();
+		return null;
 	}
 
 	if ( isset( $template_metadata['postTypes'] ) ) {
 		return $template_metadata['postTypes'];
 	}
 
-	return array();
+	return null;
 }

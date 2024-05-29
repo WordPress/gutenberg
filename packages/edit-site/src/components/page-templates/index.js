@@ -192,6 +192,12 @@ const POST_TYPES = {
 	page: __( 'Page' ),
 };
 
+const SPECIAL_TEMPLATES = {
+	single: [ 'post' ],
+	singular: [ 'post', 'page' ],
+	page: [ 'page' ],
+};
+
 export default function PageTemplates() {
 	const { params } = useLocation();
 	const { activeView = 'all', layout } = params;
@@ -326,8 +332,20 @@ export default function PageTemplates() {
 			{
 				header: __( 'Post types' ),
 				id: 'postTypes',
-				getValue: ( { item } ) => item.post_types,
+				getValue: ( { item } ) =>
+					// This logic would be used by the filter
+					// and replicates what we have in the server at
+					// https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-includes/block-template-utils.php#L1077
+					//
+					// 1. Consider the post types defined by the item, if any
+					item.post_types ||
+					// 2. Otherwise, if a template is custom add it for any CPT.
+					( item.is_custom ? [ 'post', 'page' ] : item.post_types ) || // TODO: take any CPT.
+					// 3. Finally, also consider special templates.
+					( SPECIAL_TEMPLATES[ item.slug ] ?? item.post_types ),
 				render: ( { item } ) =>
+					// TODO: note that getValue returns a different value than render.
+					// getValue is used for filtering, and render is used for display.
 					item.post_types
 						?.map(
 							( postType ) => POST_TYPES[ postType ] || postType
