@@ -140,7 +140,7 @@ The files will automatically be enqueued when specified in the block.json.
 
 <div class="callout callout-info">
 
-If you are using `@wordpress/scripts` you will need to import your stylesheet within your corresponding JavaSript file in order for `@wordpress/scripts` to process the stylesheet.
+If you are using `@wordpress/scripts` you will need to import your stylesheet within your corresponding JavaScript file in order for `@wordpress/scripts` to process the stylesheet.
 
 Example:
 
