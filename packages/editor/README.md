@@ -1263,7 +1263,11 @@ Undocumented declaration.
 
 ### PostTrash
 
-Undocumented declaration.
+Displays the Post Trash Button and Confirm Dialog in the Editor.
+
+_Returns_
+
+-   `JSX.Element|null`: The rendered PostTrash component.
 
 ### PostTrashCheck
 

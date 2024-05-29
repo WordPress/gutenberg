@@ -14,6 +14,11 @@ import { useState } from '@wordpress/element';
  */
 import { store as editorStore } from '../../store';
 
+/**
+ * Displays the Post Trash Button and Confirm Dialog in the Editor.
+ *
+ * @return {JSX.Element|null} The rendered PostTrash component.
+ */
 export default function PostTrash() {
 	const { isNew, isDeleting, postId } = useSelect( ( select ) => {
 		const store = select( editorStore );
