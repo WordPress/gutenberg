@@ -970,7 +970,7 @@ _Returns_
 
 ### PostExcerptPanel
 
-`PostExcerptPanel` is a wrapper component that uses the `PostExcerptCheck` component to conditionally render the `ExcerptPanel` component respectively.
+Is rendered if the post type supports excerpts and allows editing the excerpt.
 
 _Returns_
 
