@@ -39,7 +39,6 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 		} = props;
 		const bindings = blockAttributes?.metadata?.bindings;
 
-		// It seems if I don't wrap this in a useSelect, the reset in pattern overrides doesn't work as expected.
 		const boundAttributes = useSelect( () => {
 			return getBoundAttributesValues( clientId, context, registry );
 		}, [ clientId, context, registry ] );
