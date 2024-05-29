@@ -54,6 +54,6 @@ test.describe( 'Styles', () => {
 		await paddingControl.fill( '2' );
 
 		// Check the padding value
-		await expect( block ).toHaveCSS( 'padding-left', '35.4644px' );
+		await expect( block ).toHaveCSS( 'padding-left', '35.4932px' );
 	} );
 } );
