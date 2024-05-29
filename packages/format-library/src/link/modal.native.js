@@ -19,6 +19,7 @@ const ModalLinkUI = ( { isVisible, ...restProps } ) => {
 				hideHeader
 				onClose={ restProps.onClose }
 				hasNavigation
+				testID="link-settings-modal"
 			>
 				<BottomSheet.NavigationContainer animate main>
 					<BottomSheet.NavigationScreen name={ screens.settings }>

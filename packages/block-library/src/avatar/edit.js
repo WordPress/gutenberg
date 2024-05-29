@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -35,6 +35,8 @@ const AvatarInspectorControls = ( {
 	<InspectorControls>
 		<PanelBody title={ __( 'Settings' ) }>
 			<RangeControl
+				__nextHasNoMarginBottom
+				__next40pxDefaultSize
 				label={ __( 'Image size' ) }
 				onChange={ ( newSize ) =>
 					setAttributes( {
@@ -47,6 +49,7 @@ const AvatarInspectorControls = ( {
 				value={ attributes?.size }
 			/>
 			<ToggleControl
+				__nextHasNoMarginBottom
 				label={ __( 'Link to user profile' ) }
 				onChange={ () =>
 					setAttributes( { isLink: ! attributes.isLink } )
@@ -121,17 +124,14 @@ const ResizableAvatar = ( {
 				<img
 					src={ doubledSizedSrc }
 					alt={ avatar.alt }
-					{ ...borderProps }
-					className={ classnames(
+					className={ clsx(
 						'avatar',
 						'avatar-' + attributes.size,
 						'photo',
 						'wp-block-avatar__image',
 						borderProps.className
 					) }
-					style={ {
-						...borderProps.style, // Border radius, width and style.
-					} }
+					style={ borderProps.style }
 				/>
 			</ResizableBox>
 		</div>
@@ -187,27 +187,17 @@ const UserEdit = ( { attributes, context, setAttributes, isSelected } ) => {
 	return (
 		<>
 			<AvatarInspectorControls
-				selectUser={ true }
+				selectUser
 				attributes={ attributes }
 				avatar={ avatar }
 				setAttributes={ setAttributes }
 			/>
-			<div>
-				{ attributes.isLink ? (
-					<a
-						href="#avatar-pseudo-link"
-						className="wp-block-avatar__link"
-						onClick={ ( event ) => event.preventDefault() }
-					>
-						<ResizableAvatar
-							attributes={ attributes }
-							avatar={ avatar }
-							blockProps={ blockProps }
-							isSelected={ isSelected }
-							setAttributes={ setAttributes }
-						/>
-					</a>
-				) : (
+			{ attributes.isLink ? (
+				<a
+					href="#avatar-pseudo-link"
+					className="wp-block-avatar__link"
+					onClick={ ( event ) => event.preventDefault() }
+				>
 					<ResizableAvatar
 						attributes={ attributes }
 						avatar={ avatar }
@@ -215,8 +205,16 @@ const UserEdit = ( { attributes, context, setAttributes, isSelected } ) => {
 						isSelected={ isSelected }
 						setAttributes={ setAttributes }
 					/>
-				) }
-			</div>
+				</a>
+			) : (
+				<ResizableAvatar
+					attributes={ attributes }
+					avatar={ avatar }
+					blockProps={ blockProps }
+					isSelected={ isSelected }
+					setAttributes={ setAttributes }
+				/>
+			) }
 		</>
 	);
 };

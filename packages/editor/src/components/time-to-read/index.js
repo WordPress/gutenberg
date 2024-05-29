@@ -38,7 +38,7 @@ export default function TimeToRead() {
 	const minutesToReadString =
 		minutesToRead === 0
 			? createInterpolateElement( __( '<span>< 1</span> minute' ), {
-					span: <span className="table-of-contents__number" />,
+					span: <span />,
 			  } )
 			: createInterpolateElement(
 					sprintf(
@@ -51,7 +51,7 @@ export default function TimeToRead() {
 						minutesToRead
 					),
 					{
-						span: <span className="table-of-contents__number" />,
+						span: <span />,
 					}
 			  );
 

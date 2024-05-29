@@ -1,15 +1,14 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
+import { isBlobURL } from '@wordpress/blob';
 import {
 	__unstableGetAnimateClassName as getAnimateClassName,
-	withNotices,
 	ResizableBox,
 	ToolbarButton,
 } from '@wordpress/components';
@@ -36,6 +35,8 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 import FileBlockInspector from './inspector';
 import { browserSupportsPdfs } from './utils';
+import removeAnchorTag from '../utils/remove-anchor-tag';
+import { useUploadMediaFromBlobURL } from '../utils/hooks';
 
 export const MIN_PREVIEW_HEIGHT = 200;
 export const MAX_PREVIEW_HEIGHT = 2000;
@@ -60,17 +61,9 @@ function ClipboardToolbarButton( { text, disabled } ) {
 	);
 }
 
-function FileEdit( {
-	attributes,
-	isSelected,
-	setAttributes,
-	noticeUI,
-	noticeOperations,
-	clientId,
-} ) {
+function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 	const {
 		id,
-		fileId,
 		fileName,
 		href,
 		textLinkHref,
@@ -80,65 +73,59 @@ function FileEdit( {
 		displayPreview,
 		previewHeight,
 	} = attributes;
-	const { media, mediaUpload } = useSelect(
+	const { media } = useSelect(
 		( select ) => ( {
 			media:
 				id === undefined
 					? undefined
 					: select( coreStore ).getMedia( id ),
-			mediaUpload: select( blockEditorStore ).getSettings().mediaUpload,
 		} ),
 		[ id ]
 	);
 
+	const { createErrorNotice } = useDispatch( noticesStore );
 	const { toggleSelection, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
+	useUploadMediaFromBlobURL( {
+		url: href,
+		onChange: onSelectFile,
+		onError: onUploadError,
+	} );
+
+	// Note: Handle setting a default value for `downloadButtonText` via HTML API
+	// when it supports replacing text content for HTML tags.
 	useEffect( () => {
-		// Upload a file drag-and-dropped into the editor.
-		if ( isBlobURL( href ) ) {
-			const file = getBlobByURL( href );
-
-			mediaUpload( {
-				filesList: [ file ],
-				onFileChange: ( [ newMedia ] ) => onSelectFile( newMedia ),
-				onError: onUploadError,
+		if ( RichText.isEmpty( downloadButtonText ) ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( {
+				downloadButtonText: _x( 'Download', 'button label' ),
 			} );
-
-			revokeBlobURL( href );
 		}
-
-		if ( downloadButtonText === undefined ) {
-			changeDownloadButtonText( _x( 'Download', 'button label' ) );
-		}
+		// Reason: This effect should only run on mount.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
 
-	useEffect( () => {
-		if ( ! fileId && href ) {
-			// Add a unique fileId to each file block.
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( { fileId: `wp-block-file--media-${ clientId }` } );
-		}
-	}, [ href, fileId, clientId ] );
-
 	function onSelectFile( newMedia ) {
-		if ( newMedia && newMedia.url ) {
-			const isPdf = newMedia.url.endsWith( '.pdf' );
-			setAttributes( {
-				href: newMedia.url,
-				fileName: newMedia.title,
-				textLinkHref: newMedia.url,
-				id: newMedia.id,
-				displayPreview: isPdf ? true : undefined,
-				previewHeight: isPdf ? 600 : undefined,
-			} );
+		if ( ! newMedia || ! newMedia.url ) {
+			return;
 		}
+
+		const isPdf = newMedia.url.endsWith( '.pdf' );
+		setAttributes( {
+			href: newMedia.url,
+			fileName: newMedia.title,
+			textLinkHref: newMedia.url,
+			id: newMedia.id,
+			displayPreview: isPdf ? true : undefined,
+			previewHeight: isPdf ? 600 : undefined,
+			fileId: `wp-block-file--media-${ clientId }`,
+		} );
 	}
 
 	function onUploadError( message ) {
 		setAttributes( { href: undefined } );
-		noticeOperations.removeAllNotices();
-		noticeOperations.createErrorNotice( message );
+		createErrorNotice( message, { type: 'snackbar' } );
 	}
 
 	function changeLinkDestinationOption( newHref ) {
@@ -154,13 +141,6 @@ function FileEdit( {
 
 	function changeShowDownloadButton( newValue ) {
 		setAttributes( { showDownloadButton: newValue } );
-	}
-
-	function changeDownloadButtonText( newValue ) {
-		// Remove anchor tags from button text content.
-		setAttributes( {
-			downloadButtonText: newValue.replace( /<\/?a[^>]*>/g, '' ),
-		} );
 	}
 
 	function changeDisplayPreview( newValue ) {
@@ -185,7 +165,7 @@ function FileEdit( {
 	const attachmentPage = media && media.link;
 
 	const blockProps = useBlockProps( {
-		className: classnames(
+		className: clsx(
 			isBlobURL( href ) && getAnimateClassName( { type: 'loading' } ),
 			{
 				'is-transient': isBlobURL( href ),
@@ -207,7 +187,6 @@ function FileEdit( {
 						),
 					} }
 					onSelect={ onSelectFile }
-					notices={ noticeUI }
 					onError={ onUploadError }
 					accept="*"
 				/>
@@ -281,12 +260,15 @@ function FileEdit( {
 				) }
 				<div className={ 'wp-block-file__content-wrapper' }>
 					<RichText
+						identifier="fileName"
 						tagName="a"
 						value={ fileName }
 						placeholder={ __( 'Write file name…' ) }
 						withoutInteractiveFormatting
 						onChange={ ( text ) =>
-							setAttributes( { fileName: text } )
+							setAttributes( {
+								fileName: removeAnchorTag( text ),
+							} )
 						}
 						href={ textLinkHref }
 					/>
@@ -298,9 +280,10 @@ function FileEdit( {
 						>
 							{ /* Using RichText here instead of PlainText so that it can be styled like a button. */ }
 							<RichText
+								identifier="downloadButtonText"
 								tagName="div" // Must be block-level or else cursor disappears.
 								aria-label={ __( 'Download button text' ) }
-								className={ classnames(
+								className={ clsx(
 									'wp-block-file__button',
 									__experimentalGetElementClassName(
 										'button'
@@ -310,7 +293,10 @@ function FileEdit( {
 								withoutInteractiveFormatting
 								placeholder={ __( 'Add text…' ) }
 								onChange={ ( text ) =>
-									changeDownloadButtonText( text )
+									setAttributes( {
+										downloadButtonText:
+											removeAnchorTag( text ),
+									} )
 								}
 							/>
 						</div>
@@ -321,4 +307,4 @@ function FileEdit( {
 	);
 }
 
-export default withNotices( FileEdit );
+export default FileEdit;

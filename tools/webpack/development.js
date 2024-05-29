@@ -33,7 +33,7 @@ module.exports = [
 		name: 'react-refresh-runtime',
 		entry: {
 			'react-refresh-runtime': {
-				import: 'react-refresh/runtime.js',
+				import: 'react-refresh/runtime',
 				library: {
 					name: 'ReactRefreshRuntime',
 					type: 'window',

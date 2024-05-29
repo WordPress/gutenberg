@@ -1,14 +1,12 @@
 /**
- * External dependencies
- */
-import { filter } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { NoticeList, SnackbarList } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
+
+// Last three notices. Slices from the tail end of the list.
+const MAX_VISIBLE_NOTICES = -3;
 
 function Notices() {
 	const { removeNotice } = useDispatch( noticesStore );
@@ -18,17 +16,15 @@ function Notices() {
 		};
 	}, [] );
 
-	const dismissibleNotices = filter( notices, {
-		isDismissible: true,
-		type: 'default',
-	} );
-	const nonDismissibleNotices = filter( notices, {
-		isDismissible: false,
-		type: 'default',
-	} );
-	const snackbarNotices = filter( notices, {
-		type: 'snackbar',
-	} );
+	const dismissibleNotices = notices.filter(
+		( { isDismissible, type } ) => isDismissible && type === 'default'
+	);
+	const nonDismissibleNotices = notices.filter(
+		( { isDismissible, type } ) => ! isDismissible && type === 'default'
+	);
+	const snackbarNotices = notices
+		.filter( ( { type } ) => type === 'snackbar' )
+		.slice( MAX_VISIBLE_NOTICES );
 
 	return (
 		<>

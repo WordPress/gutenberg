@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { last } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { compose } from '@wordpress/compose';
@@ -28,7 +23,7 @@ export default compose( [
 		const blockClientIds = getBlockOrder( clientId );
 
 		return {
-			lastBlockClientId: last( blockClientIds ),
+			lastBlockClientId: blockClientIds[ blockClientIds.length - 1 ],
 		};
 	} ),
 ] )( DefaultBlockAppender );

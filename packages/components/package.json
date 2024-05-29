@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/components",
-	"version": "19.16.0",
+	"version": "27.6.0",
 	"description": "UI components for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -19,7 +19,8 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=12"
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
@@ -28,16 +29,20 @@
 		"build-style/**",
 		"src/**/*.scss"
 	],
+	"types": "build-types",
 	"dependencies": {
+		"@ariakit/react": "^0.3.12",
 		"@babel/runtime": "^7.16.0",
 		"@emotion/cache": "^11.7.1",
 		"@emotion/css": "^11.7.1",
 		"@emotion/react": "^11.7.1",
 		"@emotion/serialize": "^1.0.2",
 		"@emotion/styled": "^11.6.0",
-		"@emotion/utils": "1.0.0",
-		"@floating-ui/react-dom": "0.6.3",
-		"@use-gesture/react": "^10.2.6",
+		"@emotion/utils": "^1.0.0",
+		"@floating-ui/react-dom": "^2.0.8",
+		"@types/gradient-parser": "0.1.3",
+		"@types/highlight-words-core": "1.2.1",
+		"@use-gesture/react": "^10.3.1",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/date": "file:../date",
@@ -46,33 +51,37 @@
 		"@wordpress/element": "file:../element",
 		"@wordpress/escape-html": "file:../escape-html",
 		"@wordpress/hooks": "file:../hooks",
+		"@wordpress/html-entities": "file:../html-entities",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/primitives": "file:../primitives",
+		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/warning": "file:../warning",
-		"classnames": "^2.3.1",
+		"change-case": "^4.1.2",
+		"clsx": "^2.1.1",
 		"colord": "^2.7.0",
-		"dom-scroll-into-view": "^1.2.1",
+		"date-fns": "^3.6.0",
+		"deepmerge": "^4.3.0",
 		"downshift": "^6.0.15",
-		"framer-motion": "^6.2.8",
+		"fast-deep-equal": "^3.1.3",
+		"framer-motion": "^11.1.9",
 		"gradient-parser": "^0.1.5",
 		"highlight-words-core": "^1.2.2",
-		"lodash": "^4.17.21",
-		"memize": "^1.1.0",
-		"moment": "^2.26.0",
+		"is-plain-object": "^5.0.0",
+		"memize": "^2.1.0",
+		"path-to-regexp": "^6.2.1",
 		"re-resizable": "^6.4.0",
 		"react-colorful": "^5.3.1",
-		"react-dates": "^21.8.0",
-		"reakit": "^1.3.8",
-		"remove-accents": "^0.4.2",
-		"uuid": "^8.3.0"
+		"remove-accents": "^0.5.0",
+		"use-lilius": "^2.0.5",
+		"uuid": "^9.0.1"
 	},
 	"peerDependencies": {
-		"react": "^17.0.0",
-		"react-dom": "^17.0.0"
+		"react": "^18.0.0",
+		"react-dom": "^18.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

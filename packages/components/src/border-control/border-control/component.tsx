@@ -13,7 +13,8 @@ import { HStack } from '../../h-stack';
 import { StyledLabel } from '../../base-control/styles/base-control-styles';
 import { View } from '../../view';
 import { VisuallyHidden } from '../../visually-hidden';
-import { contextConnect, WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { contextConnect } from '../../context';
 import { useBorderControl } from './hook';
 
 import type { BorderControlProps, LabelProps } from '../types';
@@ -37,13 +38,16 @@ const UnconnectedBorderControl = (
 	forwardedRef: React.ForwardedRef< any >
 ) => {
 	const {
+		__next40pxDefaultSize = false,
 		colors,
 		disableCustomColors,
+		disableUnits,
 		enableAlpha,
-		enableStyle = true,
+		enableStyle,
 		hideLabelFromVision,
 		innerWrapperClassName,
 		inputWidth,
+		isStyleSettable,
 		label,
 		onBorderChange,
 		onSliderChange,
@@ -52,14 +56,13 @@ const UnconnectedBorderControl = (
 		__unstablePopoverProps,
 		previousStyleSelection,
 		showDropdownHeader,
+		size,
 		sliderClassName,
 		value: border,
 		widthUnit,
 		widthValue,
 		withSlider,
-		__experimentalHasMultipleOrigins,
 		__experimentalIsRenderedInSidebar,
-		__next36pxDefaultSize,
 		...otherProps
 	} = useBorderControl( props );
 
@@ -69,7 +72,7 @@ const UnconnectedBorderControl = (
 				label={ label }
 				hideLabelFromVision={ hideLabelFromVision }
 			/>
-			<HStack spacing={ 3 } className={ innerWrapperClassName }>
+			<HStack spacing={ 4 } className={ innerWrapperClassName }>
 				<UnitControl
 					prefix={
 						<BorderControlDropdown
@@ -79,16 +82,14 @@ const UnconnectedBorderControl = (
 							disableCustomColors={ disableCustomColors }
 							enableAlpha={ enableAlpha }
 							enableStyle={ enableStyle }
+							isStyleSettable={ isStyleSettable }
 							onChange={ onBorderChange }
 							previousStyleSelection={ previousStyleSelection }
 							showDropdownHeader={ showDropdownHeader }
-							__experimentalHasMultipleOrigins={
-								__experimentalHasMultipleOrigins
-							}
 							__experimentalIsRenderedInSidebar={
 								__experimentalIsRenderedInSidebar
 							}
-							__next36pxDefaultSize={ __next36pxDefaultSize }
+							size={ size }
 						/>
 					}
 					label={ __( 'Border width' ) }
@@ -97,10 +98,13 @@ const UnconnectedBorderControl = (
 					onChange={ onWidthChange }
 					value={ border?.width || '' }
 					placeholder={ placeholder }
+					disableUnits={ disableUnits }
 					__unstableInputWidth={ inputWidth }
+					size={ size }
 				/>
 				{ withSlider && (
 					<RangeControl
+						__nextHasNoMarginBottom
 						label={ __( 'Border width' ) }
 						hideLabelFromVision
 						className={ sliderClassName }
@@ -111,6 +115,7 @@ const UnconnectedBorderControl = (
 						step={ [ 'px', '%' ].includes( widthUnit ) ? 1 : 0.1 }
 						value={ widthValue || undefined }
 						withInputField={ false }
+						__next40pxDefaultSize={ __next40pxDefaultSize }
 					/>
 				) }
 			</HStack>

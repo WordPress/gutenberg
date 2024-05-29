@@ -3,19 +3,18 @@
 }
 
 .components-inline-color__outline {
-	border-color: $light-dim;
+	border-color: $light-quaternary;
 	top: 6px;
 	bottom: 6px;
 	left: 11px;
 	right: 11px;
 	border-radius: 24px;
-	border-width: $border-width;
 	position: absolute;
 	z-index: 2;
 }
 
 .components-inline-color__outline--dark {
-	border-color: $dark-ultra-dim;
+	border-color: $dark-quaternary;
 }
 
 .components-inline-color__button-container {

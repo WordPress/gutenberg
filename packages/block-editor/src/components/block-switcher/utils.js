@@ -13,7 +13,7 @@ import { __experimentalGetBlockAttributesNamesByRole as getBlockAttributesNamesB
  * @param {string}  selectedBlockName The block's name to use for matching condition.
  * @param {Set}     consumedBlocks    A set holding the previously matched/consumed blocks.
  *
- * @return {WPBlock?} The matched block if found or nothing(`undefined`).
+ * @return {WPBlock | undefined} The matched block if found or nothing(`undefined`).
  */
 export const getMatchingBlockByName = (
 	block,
@@ -22,8 +22,12 @@ export const getMatchingBlockByName = (
 ) => {
 	const { clientId, name, innerBlocks = [] } = block;
 	// Check if block has been consumed already.
-	if ( consumedBlocks.has( clientId ) ) return;
-	if ( name === selectedBlockName ) return block;
+	if ( consumedBlocks.has( clientId ) ) {
+		return;
+	}
+	if ( name === selectedBlockName ) {
+		return block;
+	}
 	// Try to find a matching block from InnerBlocks recursively.
 	for ( const innerBlock of innerBlocks ) {
 		const match = getMatchingBlockByName(
@@ -31,7 +35,9 @@ export const getMatchingBlockByName = (
 			selectedBlockName,
 			consumedBlocks
 		);
-		if ( match ) return match;
+		if ( match ) {
+			return match;
+		}
 	}
 };
 
@@ -47,11 +53,14 @@ export const getMatchingBlockByName = (
  */
 export const getRetainedBlockAttributes = ( name, attributes ) => {
 	const contentAttributes = getBlockAttributesNamesByRole( name, 'content' );
-	if ( ! contentAttributes?.length ) return attributes;
+	if ( ! contentAttributes?.length ) {
+		return attributes;
+	}
 
 	return contentAttributes.reduce( ( _accumulator, attribute ) => {
-		if ( attributes[ attribute ] )
+		if ( attributes[ attribute ] ) {
 			_accumulator[ attribute ] = attributes[ attribute ];
+		}
 		return _accumulator;
 	}, {} );
 };

@@ -1,14 +1,8 @@
 /**
- * External dependencies
- */
-import { filter, includes } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Fragment } from '@wordpress/element';
-import { withSelect } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -20,20 +14,20 @@ import { store as editorStore } from '../../store';
 
 const identity = ( x ) => x;
 
-export function PostTaxonomies( {
-	postType,
-	taxonomies,
-	taxonomyWrapper = identity,
-} ) {
-	const availableTaxonomies = filter( taxonomies, ( taxonomy ) =>
-		includes( taxonomy.types, postType )
+export function PostTaxonomies( { taxonomyWrapper = identity } ) {
+	const { postType, taxonomies } = useSelect( ( select ) => {
+		return {
+			postType: select( editorStore ).getCurrentPostType(),
+			taxonomies: select( coreStore ).getTaxonomies( { per_page: -1 } ),
+		};
+	}, [] );
+	const visibleTaxonomies = ( taxonomies ?? [] ).filter(
+		( taxonomy ) =>
+			// In some circumstances .visibility can end up as undefined so optional chaining operator required.
+			// https://github.com/WordPress/gutenberg/issues/40326
+			taxonomy.types.includes( postType ) && taxonomy.visibility?.show_ui
 	);
-	const visibleTaxonomies = filter(
-		availableTaxonomies,
-		// In some circumstances .visibility can end up as undefined so optional chaining operator required.
-		// https://github.com/WordPress/gutenberg/issues/40326
-		( taxonomy ) => taxonomy.visibility?.show_ui
-	);
+
 	return visibleTaxonomies.map( ( taxonomy ) => {
 		const TaxonomyComponent = taxonomy.hierarchical
 			? HierarchicalTermSelector
@@ -49,11 +43,4 @@ export function PostTaxonomies( {
 	} );
 }
 
-export default compose( [
-	withSelect( ( select ) => {
-		return {
-			postType: select( editorStore ).getCurrentPostType(),
-			taxonomies: select( coreStore ).getTaxonomies( { per_page: -1 } ),
-		};
-	} ),
-] )( PostTaxonomies );
+export default PostTaxonomies;

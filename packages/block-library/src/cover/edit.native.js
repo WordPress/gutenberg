@@ -6,10 +6,11 @@ import {
 	TouchableWithoutFeedback,
 	InteractionManager,
 	AccessibilityInfo,
+	Text,
 	Platform,
 } from 'react-native';
 import Video from 'react-native-video';
-import classnames from 'classnames/dedupe';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -32,7 +33,6 @@ import {
 	ColorPicker,
 	BottomSheetConsumer,
 	useConvertUnitToMobile,
-	useMobileGlobalStylesColors,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -46,6 +46,8 @@ import {
 	getColorObjectByAttributeValues,
 	getGradientValueBySlug,
 	store as blockEditorStore,
+	useGlobalStyles,
+	useMobileGlobalStylesColors,
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { useDispatch, withSelect, withDispatch } from '@wordpress/data';
@@ -58,6 +60,7 @@ import {
 } from '@wordpress/element';
 import { cover as icon, replace, image, warning } from '@wordpress/icons';
 import { getProtocol } from '@wordpress/url';
+// eslint-disable-next-line no-restricted-imports
 import { store as editPostStore } from '@wordpress/edit-post';
 
 /**
@@ -86,6 +89,36 @@ const INNER_BLOCKS_TEMPLATE = [
 		},
 	],
 ];
+
+function useIsScreenReaderEnabled() {
+	const [ isScreenReaderEnabled, setIsScreenReaderEnabled ] =
+		useState( false );
+
+	useEffect( () => {
+		let mounted = true;
+
+		const changeListener = AccessibilityInfo.addEventListener(
+			'screenReaderChanged',
+			( enabled ) => setIsScreenReaderEnabled( enabled )
+		);
+
+		AccessibilityInfo.isScreenReaderEnabled().then(
+			( screenReaderEnabled ) => {
+				if ( mounted && screenReaderEnabled ) {
+					setIsScreenReaderEnabled( screenReaderEnabled );
+				}
+			}
+		);
+
+		return () => {
+			mounted = false;
+
+			changeListener.remove();
+		};
+	}, [] );
+
+	return isScreenReaderEnabled;
+}
 
 const Cover = ( {
 	attributes,
@@ -117,34 +150,18 @@ const Cover = ( {
 		overlayColor,
 		isDark,
 	} = attributes;
-	const [ isScreenReaderEnabled, setIsScreenReaderEnabled ] =
-		useState( false );
+	const isScreenReaderEnabled = useIsScreenReaderEnabled();
 
 	useEffect( () => {
-		let isCurrent = true;
-
 		// Sync with local media store.
 		mediaUploadSync();
-		const a11yInfoChangeSubscription = AccessibilityInfo.addEventListener(
-			'screenReaderChanged',
-			setIsScreenReaderEnabled
-		);
-
-		AccessibilityInfo.isScreenReaderEnabled().then( () => {
-			if ( isCurrent ) {
-				setIsScreenReaderEnabled();
-			}
-		} );
-
-		return () => {
-			isCurrent = false;
-			a11yInfoChangeSubscription.remove();
-		};
 	}, [] );
 
+	const globalStyles = useGlobalStyles();
 	const convertedMinHeight = useConvertUnitToMobile(
 		minHeight || COVER_DEFAULT_HEIGHT,
-		minHeightUnit
+		minHeightUnit,
+		globalStyles
 	);
 
 	const isImage = backgroundType === MEDIA_TYPE_IMAGE;
@@ -193,9 +210,31 @@ const Cover = ( {
 
 	const onSelectMedia = ( media ) => {
 		setDidUploadFail( false );
-		const onSelect = attributesFromMedia( setAttributes, dimRatio );
-		onSelect( media );
+
+		const mediaAttributes = attributesFromMedia( media );
+		setAttributes( {
+			...mediaAttributes,
+			focalPoint: undefined,
+			useFeaturedImage: undefined,
+			dimRatio: dimRatio === 100 ? 50 : dimRatio,
+			isDark: undefined,
+		} );
 	};
+
+	const onUpdateMediaProgress = useCallback(
+		( payload ) => {
+			const { mediaUrl, state } = payload;
+
+			setIsUploadInProgress( true );
+
+			if ( isUploadInProgress && isImage && mediaUrl && ! state ) {
+				setAttributes( {
+					url: mediaUrl,
+				} );
+			}
+		},
+		[ isImage, isUploadInProgress, setAttributes ]
+	);
 
 	const onMediaPressed = () => {
 		if ( isUploadInProgress ) {
@@ -226,6 +265,12 @@ const Cover = ( {
 		} );
 		closeSettingsBottomSheet();
 	}, [ closeSettingsBottomSheet ] );
+
+	const onAddMediaButtonPress = useCallback( () => {
+		if ( openMediaOptionsRef?.current ) {
+			openMediaOptionsRef.current();
+		}
+	}, [] );
 
 	function setColor( color ) {
 		const colorValue = getColorObjectByColorValue( colorsDefault, color );
@@ -271,7 +316,7 @@ const Cover = ( {
 
 		// Ensure that "is-light" is removed from "className" attribute if cover background is dark.
 		if ( isCoverDark && attributes.className?.includes( 'is-light' ) ) {
-			const className = classnames( attributes.className, {
+			const className = clsx( attributes.className, {
 				'is-light': false,
 			} );
 			setAttributes( {
@@ -331,7 +376,7 @@ const Cover = ( {
 			accessibilityHint={ accessibilityHint }
 			accessibilityLabel={ __( 'Add image or video' ) }
 			accessibilityRole="button"
-			onPress={ openMediaOptionsRef.current }
+			onPress={ onAddMediaButtonPress }
 		>
 			<View style={ styles.selectImageContainer }>
 				<View style={ styles.selectImage }>
@@ -350,6 +395,19 @@ const Cover = ( {
 			setCustomColorPickerShowing( false );
 		} );
 	}, [] );
+
+	const selectedColorText = getStylesFromColorScheme(
+		styles.selectedColorText,
+		styles.selectedColorTextDark
+	);
+
+	const bottomLabelText = customOverlayColor ? (
+		<Text style={ selectedColorText }>
+			{ customOverlayColor.toUpperCase() }
+		</Text>
+	) : (
+		__( 'Select a color' )
+	);
 
 	const colorPickerControls = (
 		<InspectorControls>
@@ -380,7 +438,7 @@ const Cover = ( {
 						isBottomSheetContentScrolling={
 							isBottomSheetContentScrolling
 						}
-						bottomLabelText={ __( 'Select a color' ) }
+						bottomLabelText={ bottomLabelText }
 					/>
 				) }
 			</BottomSheetConsumer>
@@ -407,9 +465,7 @@ const Cover = ( {
 					toolbarControls( openMediaOptionsRef.current ) }
 				<MediaUploadProgress
 					mediaId={ id }
-					onUpdateMediaProgress={ () => {
-						setIsUploadInProgress( true );
-					} }
+					onUpdateMediaProgress={ onUpdateMediaProgress }
 					onFinishMediaUploadWithSuccess={ ( {
 						mediaServerId,
 						mediaUrl,
@@ -504,6 +560,7 @@ const Cover = ( {
 						<BottomSheetConsumer>
 							{ ( { shouldEnableBottomSheetScroll } ) => (
 								<ColorPalette
+									enableCustomColor
 									customColorIndicatorStyles={
 										styles.paletteColorIndicator
 									}
@@ -623,12 +680,9 @@ export default compose( [
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 
-		const { getSettings } = select( blockEditorStore );
-
 		const hasInnerBlocks = getBlock( clientId )?.innerBlocks.length > 0;
 
 		return {
-			settings: getSettings(),
 			isParentSelected: selectedBlockClientId === clientId,
 			hasInnerBlocks,
 		};

@@ -1,23 +1,29 @@
 /**
- * External dependencies
- */
-import {
-	pickBy,
-	isEmpty,
-	mapValues,
-	forEach,
-	get,
-	setWith,
-	clone,
-	every,
-} from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { getBlockSupport } from '@wordpress/blocks';
+import { memo, useMemo, useEffect, useId, useState } from '@wordpress/element';
+import { useDispatch, useRegistry } from '@wordpress/data';
+import { createHigherOrderComponent } from '@wordpress/compose';
+import { addFilter } from '@wordpress/hooks';
 
-const identity = ( x ) => x;
+/**
+ * Internal dependencies
+ */
+import {
+	useBlockEditContext,
+	mayDisplayControlsKey,
+	mayDisplayParentControlsKey,
+} from '../components/block-edit/context';
+import { useSettings } from '../components';
+import { useSettingsForBlockElement } from '../components/global-styles/hooks';
+import { getValueFromObjectPath, setImmutably } from '../utils/object';
+import { store as blockEditorStore } from '../store';
+import { unlock } from '../lock-unlock';
+/**
+ * External dependencies
+ */
+import clsx from 'clsx';
 
 /**
  * Removed falsy values from nested object.
@@ -33,16 +39,14 @@ export const cleanEmptyObject = ( object ) => {
 	) {
 		return object;
 	}
-	const cleanedNestedObjects = pickBy(
-		mapValues( object, cleanEmptyObject ),
-		identity
-	);
-	return isEmpty( cleanedNestedObjects ) ? undefined : cleanedNestedObjects;
-};
 
-export function immutableSet( object, path, value ) {
-	return setWith( object ? clone( object ) : {}, path, value, clone );
-}
+	const cleanedNestedObjects = Object.entries( object )
+		.map( ( [ key, value ] ) => [ key, cleanEmptyObject( value ) ] )
+		.filter( ( [ , value ] ) => value !== undefined );
+	return ! cleanedNestedObjects.length
+		? undefined
+		: Object.fromEntries( cleanedNestedObjects );
+};
 
 export function transformStyles(
 	activeSupports,
@@ -53,7 +57,11 @@ export function transformStyles(
 	results
 ) {
 	// If there are no active supports return early.
-	if ( every( activeSupports, ( isActive ) => ! isActive ) ) {
+	if (
+		Object.values( activeSupports ?? {} ).every(
+			( isActive ) => ! isActive
+		)
+	) {
 		return result;
 	}
 	// If the condition verifies we are probably in the presence of a wrapping transform
@@ -77,14 +85,17 @@ export function transformStyles(
 		}
 	}
 	let returnBlock = result;
-	forEach( activeSupports, ( isActive, support ) => {
+	Object.entries( activeSupports ).forEach( ( [ support, isActive ] ) => {
 		if ( isActive ) {
 			migrationPaths[ support ].forEach( ( path ) => {
-				const styleValue = get( referenceBlockAttributes, path );
+				const styleValue = getValueFromObjectPath(
+					referenceBlockAttributes,
+					path
+				);
 				if ( styleValue ) {
 					returnBlock = {
 						...returnBlock,
-						attributes: immutableSet(
+						attributes: setImmutably(
 							returnBlock.attributes,
 							path,
 							styleValue
@@ -101,14 +112,18 @@ export function transformStyles(
  * Check whether serialization of specific block support feature or set should
  * be skipped.
  *
- * @param {string|Object} blockType  Block name or block type object.
- * @param {string}        featureSet Name of block support feature set.
- * @param {string}        feature    Name of the individual feature to check.
+ * @param {string|Object} blockNameOrType Block name or block type object.
+ * @param {string}        featureSet      Name of block support feature set.
+ * @param {string}        feature         Name of the individual feature to check.
  *
  * @return {boolean} Whether serialization should occur.
  */
-export function shouldSkipSerialization( blockType, featureSet, feature ) {
-	const support = getBlockSupport( blockType, featureSet );
+export function shouldSkipSerialization(
+	blockNameOrType,
+	featureSet,
+	feature
+) {
+	const support = getBlockSupport( blockNameOrType, featureSet );
 	const skipSerialization = support?.__experimentalSkipSerialization;
 
 	if ( Array.isArray( skipSerialization ) ) {
@@ -116,4 +131,549 @@ export function shouldSkipSerialization( blockType, featureSet, feature ) {
 	}
 
 	return skipSerialization;
+}
+
+const pendingStyleOverrides = new WeakMap();
+
+export function useStyleOverride( {
+	id,
+	css,
+	assets,
+	__unstableType,
+	clientId,
+} = {} ) {
+	const { setStyleOverride, deleteStyleOverride } = unlock(
+		useDispatch( blockEditorStore )
+	);
+	const registry = useRegistry();
+	const fallbackId = useId();
+	useEffect( () => {
+		// Unmount if there is CSS and assets are empty.
+		if ( ! css && ! assets ) {
+			return;
+		}
+
+		const _id = id || fallbackId;
+		const override = {
+			id,
+			css,
+			assets,
+			__unstableType,
+			clientId,
+		};
+		// Batch updates to style overrides to avoid triggering cascading renders
+		// for each style override block included in a tree and optimize initial render.
+		if ( ! pendingStyleOverrides.get( registry ) ) {
+			pendingStyleOverrides.set( registry, [] );
+		}
+		pendingStyleOverrides.get( registry ).push( [ _id, override ] );
+		window.queueMicrotask( () => {
+			if ( pendingStyleOverrides.get( registry )?.length ) {
+				registry.batch( () => {
+					pendingStyleOverrides.get( registry ).forEach( ( args ) => {
+						setStyleOverride( ...args );
+					} );
+					pendingStyleOverrides.set( registry, [] );
+				} );
+			}
+		} );
+
+		return () => {
+			const isPending = pendingStyleOverrides
+				.get( registry )
+				?.find( ( [ currentId ] ) => currentId === _id );
+			if ( isPending ) {
+				pendingStyleOverrides.set(
+					registry,
+					pendingStyleOverrides
+						.get( registry )
+						.filter( ( [ currentId ] ) => currentId !== _id )
+				);
+			} else {
+				deleteStyleOverride( _id );
+			}
+		};
+	}, [
+		id,
+		css,
+		clientId,
+		assets,
+		__unstableType,
+		fallbackId,
+		setStyleOverride,
+		deleteStyleOverride,
+		registry,
+	] );
+}
+
+/**
+ * Based on the block and its context, returns an object of all the block settings.
+ * This object can be passed as a prop to all the Styles UI components
+ * (TypographyPanel, DimensionsPanel...).
+ *
+ * @param {string} name         Block name.
+ * @param {*}      parentLayout Parent layout.
+ *
+ * @return {Object} Settings object.
+ */
+export function useBlockSettings( name, parentLayout ) {
+	const [
+		backgroundImage,
+		backgroundSize,
+		customFontFamilies,
+		defaultFontFamilies,
+		themeFontFamilies,
+		defaultFontSizesEnabled,
+		customFontSizes,
+		defaultFontSizes,
+		themeFontSizes,
+		customFontSize,
+		fontStyle,
+		fontWeight,
+		lineHeight,
+		textAlign,
+		textColumns,
+		textDecoration,
+		writingMode,
+		textTransform,
+		letterSpacing,
+		padding,
+		margin,
+		blockGap,
+		spacingSizes,
+		units,
+		aspectRatio,
+		minHeight,
+		layout,
+		borderColor,
+		borderRadius,
+		borderStyle,
+		borderWidth,
+		customColorsEnabled,
+		customColors,
+		customDuotone,
+		themeColors,
+		defaultColors,
+		defaultPalette,
+		defaultDuotone,
+		userDuotonePalette,
+		themeDuotonePalette,
+		defaultDuotonePalette,
+		userGradientPalette,
+		themeGradientPalette,
+		defaultGradientPalette,
+		defaultGradients,
+		areCustomGradientsEnabled,
+		isBackgroundEnabled,
+		isLinkEnabled,
+		isTextEnabled,
+		isHeadingEnabled,
+		isButtonEnabled,
+		shadow,
+	] = useSettings(
+		'background.backgroundImage',
+		'background.backgroundSize',
+		'typography.fontFamilies.custom',
+		'typography.fontFamilies.default',
+		'typography.fontFamilies.theme',
+		'typography.defaultFontSizes',
+		'typography.fontSizes.custom',
+		'typography.fontSizes.default',
+		'typography.fontSizes.theme',
+		'typography.customFontSize',
+		'typography.fontStyle',
+		'typography.fontWeight',
+		'typography.lineHeight',
+		'typography.textAlign',
+		'typography.textColumns',
+		'typography.textDecoration',
+		'typography.writingMode',
+		'typography.textTransform',
+		'typography.letterSpacing',
+		'spacing.padding',
+		'spacing.margin',
+		'spacing.blockGap',
+		'spacing.spacingSizes',
+		'spacing.units',
+		'dimensions.aspectRatio',
+		'dimensions.minHeight',
+		'layout',
+		'border.color',
+		'border.radius',
+		'border.style',
+		'border.width',
+		'color.custom',
+		'color.palette.custom',
+		'color.customDuotone',
+		'color.palette.theme',
+		'color.palette.default',
+		'color.defaultPalette',
+		'color.defaultDuotone',
+		'color.duotone.custom',
+		'color.duotone.theme',
+		'color.duotone.default',
+		'color.gradients.custom',
+		'color.gradients.theme',
+		'color.gradients.default',
+		'color.defaultGradients',
+		'color.customGradient',
+		'color.background',
+		'color.link',
+		'color.text',
+		'color.heading',
+		'color.button',
+		'shadow'
+	);
+
+	const rawSettings = useMemo( () => {
+		return {
+			background: {
+				backgroundImage,
+				backgroundSize,
+			},
+			color: {
+				palette: {
+					custom: customColors,
+					theme: themeColors,
+					default: defaultColors,
+				},
+				gradients: {
+					custom: userGradientPalette,
+					theme: themeGradientPalette,
+					default: defaultGradientPalette,
+				},
+				duotone: {
+					custom: userDuotonePalette,
+					theme: themeDuotonePalette,
+					default: defaultDuotonePalette,
+				},
+				defaultGradients,
+				defaultPalette,
+				defaultDuotone,
+				custom: customColorsEnabled,
+				customGradient: areCustomGradientsEnabled,
+				customDuotone,
+				background: isBackgroundEnabled,
+				link: isLinkEnabled,
+				heading: isHeadingEnabled,
+				button: isButtonEnabled,
+				text: isTextEnabled,
+			},
+			typography: {
+				fontFamilies: {
+					custom: customFontFamilies,
+					default: defaultFontFamilies,
+					theme: themeFontFamilies,
+				},
+				fontSizes: {
+					custom: customFontSizes,
+					default: defaultFontSizes,
+					theme: themeFontSizes,
+				},
+				customFontSize,
+				defaultFontSizes: defaultFontSizesEnabled,
+				fontStyle,
+				fontWeight,
+				lineHeight,
+				textAlign,
+				textColumns,
+				textDecoration,
+				textTransform,
+				letterSpacing,
+				writingMode,
+			},
+			spacing: {
+				spacingSizes: {
+					custom: spacingSizes,
+				},
+				padding,
+				margin,
+				blockGap,
+				units,
+			},
+			border: {
+				color: borderColor,
+				radius: borderRadius,
+				style: borderStyle,
+				width: borderWidth,
+			},
+			dimensions: {
+				aspectRatio,
+				minHeight,
+			},
+			layout,
+			parentLayout,
+			shadow,
+		};
+	}, [
+		backgroundImage,
+		backgroundSize,
+		customFontFamilies,
+		defaultFontFamilies,
+		themeFontFamilies,
+		defaultFontSizesEnabled,
+		customFontSizes,
+		defaultFontSizes,
+		themeFontSizes,
+		customFontSize,
+		fontStyle,
+		fontWeight,
+		lineHeight,
+		textAlign,
+		textColumns,
+		textDecoration,
+		textTransform,
+		letterSpacing,
+		writingMode,
+		padding,
+		margin,
+		blockGap,
+		spacingSizes,
+		units,
+		aspectRatio,
+		minHeight,
+		layout,
+		parentLayout,
+		borderColor,
+		borderRadius,
+		borderStyle,
+		borderWidth,
+		customColorsEnabled,
+		customColors,
+		customDuotone,
+		themeColors,
+		defaultColors,
+		defaultPalette,
+		defaultDuotone,
+		userDuotonePalette,
+		themeDuotonePalette,
+		defaultDuotonePalette,
+		userGradientPalette,
+		themeGradientPalette,
+		defaultGradientPalette,
+		defaultGradients,
+		areCustomGradientsEnabled,
+		isBackgroundEnabled,
+		isLinkEnabled,
+		isTextEnabled,
+		isHeadingEnabled,
+		isButtonEnabled,
+		shadow,
+	] );
+
+	return useSettingsForBlockElement( rawSettings, name );
+}
+
+export function createBlockEditFilter( features ) {
+	// We don't want block controls to re-render when typing inside a block.
+	// `memo` will prevent re-renders unless props change, so only pass the
+	// needed props and not the whole attributes object.
+	features = features.map( ( settings ) => {
+		return { ...settings, Edit: memo( settings.edit ) };
+	} );
+	const withBlockEditHooks = createHigherOrderComponent(
+		( OriginalBlockEdit ) => ( props ) => {
+			const context = useBlockEditContext();
+			// CAUTION: code added before this line will be executed for all
+			// blocks, not just those that support the feature! Code added
+			// above this line should be carefully evaluated for its impact on
+			// performance.
+			return [
+				...features.map( ( feature, i ) => {
+					const {
+						Edit,
+						hasSupport,
+						attributeKeys = [],
+						shareWithChildBlocks,
+					} = feature;
+					const shouldDisplayControls =
+						context[ mayDisplayControlsKey ] ||
+						( context[ mayDisplayParentControlsKey ] &&
+							shareWithChildBlocks );
+
+					if (
+						! shouldDisplayControls ||
+						! hasSupport( props.name )
+					) {
+						return null;
+					}
+
+					const neededProps = {};
+					for ( const key of attributeKeys ) {
+						if ( props.attributes[ key ] ) {
+							neededProps[ key ] = props.attributes[ key ];
+						}
+					}
+
+					return (
+						<Edit
+							// We can use the index because the array length
+							// is fixed per page load right now.
+							key={ i }
+							name={ props.name }
+							isSelected={ props.isSelected }
+							clientId={ props.clientId }
+							setAttributes={ props.setAttributes }
+							__unstableParentLayout={
+								props.__unstableParentLayout
+							}
+							// This component is pure, so only pass needed
+							// props!!!
+							{ ...neededProps }
+						/>
+					);
+				} ),
+				<OriginalBlockEdit key="edit" { ...props } />,
+			];
+		},
+		'withBlockEditHooks'
+	);
+	addFilter( 'editor.BlockEdit', 'core/editor/hooks', withBlockEditHooks );
+}
+
+function BlockProps( { index, useBlockProps, setAllWrapperProps, ...props } ) {
+	const wrapperProps = useBlockProps( props );
+	const setWrapperProps = ( next ) =>
+		setAllWrapperProps( ( prev ) => {
+			const nextAll = [ ...prev ];
+			nextAll[ index ] = next;
+			return nextAll;
+		} );
+	// Setting state after every render is fine because this component is
+	// pure and will only re-render when needed props change.
+	useEffect( () => {
+		// We could shallow compare the props, but since this component only
+		// changes when needed attributes change, the benefit is probably small.
+		setWrapperProps( wrapperProps );
+		return () => {
+			setWrapperProps( undefined );
+		};
+	} );
+	return null;
+}
+
+const BlockPropsPure = memo( BlockProps );
+
+export function createBlockListBlockFilter( features ) {
+	const withBlockListBlockHooks = createHigherOrderComponent(
+		( BlockListBlock ) => ( props ) => {
+			const [ allWrapperProps, setAllWrapperProps ] = useState(
+				Array( features.length ).fill( undefined )
+			);
+			return [
+				...features.map( ( feature, i ) => {
+					const {
+						hasSupport,
+						attributeKeys = [],
+						useBlockProps,
+					} = feature;
+
+					const neededProps = {};
+					for ( const key of attributeKeys ) {
+						if ( props.attributes[ key ] ) {
+							neededProps[ key ] = props.attributes[ key ];
+						}
+					}
+
+					if (
+						// Skip rendering if none of the needed attributes are
+						// set.
+						! Object.keys( neededProps ).length ||
+						! hasSupport( props.name )
+					) {
+						return null;
+					}
+
+					return (
+						<BlockPropsPure
+							// We can use the index because the array length
+							// is fixed per page load right now.
+							key={ i }
+							index={ i }
+							useBlockProps={ useBlockProps }
+							// This component is pure, so we must pass a stable
+							// function reference.
+							setAllWrapperProps={ setAllWrapperProps }
+							name={ props.name }
+							// This component is pure, so only pass needed
+							// props!!!
+							{ ...neededProps }
+						/>
+					);
+				} ),
+				<BlockListBlock
+					key="edit"
+					{ ...props }
+					wrapperProps={ allWrapperProps
+						.filter( Boolean )
+						.reduce( ( acc, wrapperProps ) => {
+							return {
+								...acc,
+								...wrapperProps,
+								className: clsx(
+									acc.className,
+									wrapperProps.className
+								),
+								style: {
+									...acc.style,
+									...wrapperProps.style,
+								},
+							};
+						}, props.wrapperProps || {} ) }
+				/>,
+			];
+		},
+		'withBlockListBlockHooks'
+	);
+	addFilter(
+		'editor.BlockListBlock',
+		'core/editor/hooks',
+		withBlockListBlockHooks
+	);
+}
+
+export function createBlockSaveFilter( features ) {
+	function extraPropsFromHooks( props, name, attributes ) {
+		return features.reduce( ( accu, feature ) => {
+			const { hasSupport, attributeKeys = [], addSaveProps } = feature;
+
+			const neededAttributes = {};
+			for ( const key of attributeKeys ) {
+				if ( attributes[ key ] ) {
+					neededAttributes[ key ] = attributes[ key ];
+				}
+			}
+
+			if (
+				// Skip rendering if none of the needed attributes are
+				// set.
+				! Object.keys( neededAttributes ).length ||
+				! hasSupport( name )
+			) {
+				return accu;
+			}
+
+			return addSaveProps( accu, name, neededAttributes );
+		}, props );
+	}
+	addFilter(
+		'blocks.getSaveContent.extraProps',
+		'core/editor/hooks',
+		extraPropsFromHooks,
+		0
+	);
+	addFilter(
+		'blocks.getSaveContent.extraProps',
+		'core/editor/hooks',
+		( props ) => {
+			// Previously we had a filter deleting the className if it was an empty
+			// string. That filter is no longer running, so now we need to delete it
+			// here.
+			if ( props.hasOwnProperty( 'className' ) && ! props.className ) {
+				delete props.className;
+			}
+
+			return props;
+		}
+	);
 }

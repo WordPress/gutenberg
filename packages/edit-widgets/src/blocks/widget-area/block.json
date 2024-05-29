@@ -1,5 +1,7 @@
 {
+	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"name": "core/widget-area",
+	"title": "Widget Area",
 	"category": "widgets",
 	"attributes": {
 		"id": {
@@ -15,7 +17,8 @@
 		"customClassName": false,
 		"reusable": false,
 		"__experimentalToolbar": false,
-		"__experimentalParentSelector": false
+		"__experimentalParentSelector": false,
+		"__experimentalDisableBlockOverlay": true
 	},
 	"editorStyle": "wp-block-widget-area-editor",
 	"style": "wp-block-widget-area"

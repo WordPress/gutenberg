@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { castArray } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -16,6 +11,7 @@ import { useCallback } from '@wordpress/element';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
 
 /**
  * @typedef WPInserterConfig
@@ -44,6 +40,7 @@ function useInsertionPoint( {
 	isAppender,
 	onSelect,
 	shouldFocusBlock = true,
+	selectBlockOnInsert = true,
 } ) {
 	const { getSelectedBlock } = useSelect( blockEditorStore );
 	const { destinationRootClientId, destinationIndex } = useSelect(
@@ -90,10 +87,23 @@ function useInsertionPoint( {
 		insertBlocks,
 		showInsertionPoint,
 		hideInsertionPoint,
-	} = useDispatch( blockEditorStore );
+		setLastFocus,
+	} = unlock( useDispatch( blockEditorStore ) );
 
 	const onInsertBlocks = useCallback(
 		( blocks, meta, shouldForceFocusBlock = false ) => {
+			// When we are trying to move focus or select a new block on insert, we also
+			// need to clear the last focus to avoid the focus being set to the wrong block
+			// when tabbing back into the canvas if the block was added from outside the
+			// editor canvas.
+			if (
+				shouldForceFocusBlock ||
+				shouldFocusBlock ||
+				selectBlockOnInsert
+			) {
+				setLastFocus( null );
+			}
+
 			const selectedBlock = getSelectedBlock();
 
 			if (
@@ -113,24 +123,21 @@ function useInsertionPoint( {
 					blocks,
 					destinationIndex,
 					destinationRootClientId,
-					true,
+					selectBlockOnInsert,
 					shouldFocusBlock || shouldForceFocusBlock ? 0 : null,
 					meta
 				);
 			}
+			const blockLength = Array.isArray( blocks ) ? blocks.length : 1;
 			const message = sprintf(
 				// translators: %d: the name of the block that has been added
-				_n(
-					'%d block added.',
-					'%d blocks added.',
-					castArray( blocks ).length
-				),
-				castArray( blocks ).length
+				_n( '%d block added.', '%d blocks added.', blockLength ),
+				blockLength
 			);
 			speak( message );
 
 			if ( onSelect ) {
-				onSelect();
+				onSelect( blocks );
 			}
 		},
 		[
@@ -142,6 +149,7 @@ function useInsertionPoint( {
 			destinationIndex,
 			onSelect,
 			shouldFocusBlock,
+			selectBlockOnInsert,
 		]
 	);
 

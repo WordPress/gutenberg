@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
-import { isEmpty } from 'lodash';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -36,20 +35,20 @@ export default function save( { attributes } ) {
 		rel,
 	} = attributes;
 	const mediaSizeSlug = attributes.mediaSizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
-	const newRel = isEmpty( rel ) ? undefined : rel;
+	const newRel = ! rel ? undefined : rel;
 
-	const imageClasses = classnames( {
+	const imageClasses = clsx( {
 		[ `wp-image-${ mediaId }` ]: mediaId && mediaType === 'image',
 		[ `size-${ mediaSizeSlug }` ]: mediaId && mediaType === 'image',
 	} );
 
-	let image = (
+	let image = mediaUrl ? (
 		<img
 			src={ mediaUrl }
 			alt={ mediaAlt }
 			className={ imageClasses || null }
 		/>
-	);
+	) : null;
 
 	if ( href ) {
 		image = (
@@ -68,7 +67,7 @@ export default function save( { attributes } ) {
 		image: () => image,
 		video: () => <video controls src={ mediaUrl } />,
 	};
-	const className = classnames( {
+	const className = clsx( {
 		'has-media-on-the-right': 'right' === mediaPosition,
 		'is-stacked-on-mobile': isStackedOnMobile,
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,

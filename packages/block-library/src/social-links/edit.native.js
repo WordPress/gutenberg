@@ -17,11 +17,6 @@ import { compose, usePreferredColorSchemeStyle } from '@wordpress/compose';
  * Internal dependencies
  */
 import styles from './editor.scss';
-import variations from '../social-link/variations';
-
-const ALLOWED_BLOCKS = variations.map(
-	( v ) => `core/social-link-${ v.name }`
-);
 
 // Template contains the links that show when start.
 const TEMPLATE = [
@@ -57,8 +52,8 @@ function SocialLinksEdit( {
 	}, [ shouldRenderFooterAppender ] );
 
 	const renderFooterAppender = useRef( () => (
-		<View>
-			<InnerBlocks.ButtonBlockAppender isFloating={ true } />
+		<View style={ styles.footerAppenderContainer }>
+			<InnerBlocks.ButtonBlockAppender isFloating />
 		</View>
 	) );
 
@@ -69,7 +64,13 @@ function SocialLinksEdit( {
 
 	function renderPlaceholder() {
 		return [ ...new Array( innerBlocks.length || 1 ) ].map(
-			( _, index ) => <View style={ placeholderStyle } key={ index } />
+			( _, index ) => (
+				<View
+					testID="social-links-placeholder"
+					style={ placeholderStyle }
+					key={ index }
+				/>
+			)
 		);
 	}
 
@@ -89,7 +90,6 @@ function SocialLinksEdit( {
 
 	return (
 		<InnerBlocks
-			allowedBlocks={ ALLOWED_BLOCKS }
 			templateLock={ false }
 			template={ initialCreation && TEMPLATE }
 			renderFooterAppender={

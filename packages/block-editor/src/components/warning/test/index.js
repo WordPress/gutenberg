@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * Internal dependencies
@@ -10,47 +11,47 @@ import Warning from '../index';
 
 describe( 'Warning', () => {
 	it( 'should match snapshot', () => {
-		const wrapper = shallow( <Warning>error</Warning> );
+		const { container } = render( <Warning>error</Warning> );
 
-		expect( wrapper ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 
-	it( 'should have valid class', () => {
-		const wrapper = shallow( <Warning /> );
+	it( 'should show primary actions', () => {
+		render(
+			<Warning actions={ <button>Click me</button> }>Message</Warning>
+		);
 
-		expect( wrapper.find( '.block-editor-warning' ) ).toHaveLength( 1 );
-		expect( wrapper.find( '.block-editor-warning__actions' ) ).toHaveLength(
-			0
-		);
-		expect( wrapper.find( '.block-editor-warning__hidden' ) ).toHaveLength(
-			0
-		);
+		expect(
+			screen.getByRole( 'button', { name: 'Click me' } )
+		).toBeVisible();
+
+		expect(
+			screen.queryByRole( 'button', { name: 'More options' } )
+		).not.toBeInTheDocument();
 	} );
 
-	it( 'should show child error message element', () => {
-		const wrapper = shallow(
-			<Warning actions={ <button /> }>Message</Warning>
-		);
+	it( 'should show hidden secondary actions', async () => {
+		const user = userEvent.setup();
 
-		const actions = wrapper.find( '.block-editor-warning__actions' );
-		const action = actions.childAt( 0 );
-
-		expect( actions ).toHaveLength( 1 );
-		expect( action.hasClass( 'block-editor-warning__action' ) ).toBe(
-			true
-		);
-		expect( action.childAt( 0 ).type() ).toBe( 'button' );
-	} );
-
-	it( 'should show hidden actions', () => {
-		const wrapper = shallow(
+		render(
 			<Warning secondaryActions={ [ { title: 'test', onClick: null } ] }>
 				Message
 			</Warning>
 		);
 
-		const actions = wrapper.find( '.block-editor-warning__secondary' );
+		const secondaryActionsBtn = screen.getByRole( 'button', {
+			name: 'More options',
+		} );
 
-		expect( actions ).toHaveLength( 1 );
+		expect( secondaryActionsBtn ).toBeVisible();
+		expect(
+			screen.queryByRole( 'menuitem', { name: 'test' } )
+		).not.toBeInTheDocument();
+
+		await user.click( secondaryActionsBtn );
+
+		expect(
+			screen.getByRole( 'menuitem', { name: 'test' } )
+		).toBeInTheDocument();
 	} );
 } );

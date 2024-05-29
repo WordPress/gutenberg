@@ -22,7 +22,15 @@ The client ID of the block representing the bottom position of the popover.
 -   Type: `String`
 -   Required: No
 
-## BlockPopoverInbetween
+#### shift
+
+This determines whether the block popover always shifts into the viewport or remains at its original position. See FloatingUI for more details on shift.
+
+-	Type: `Boolean`
+-	Required: No
+-	Default: `true`
+
+## BlockPopoverInbetween - Private Component
 
 ### Props
 

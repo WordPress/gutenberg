@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { View, TouchableWithoutFeedback, Text } from 'react-native';
-import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -30,6 +29,7 @@ import {
 	VIDEO_ASPECT_RATIO,
 	VideoPlayer,
 	InspectorControls,
+	RichText,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
@@ -163,7 +163,7 @@ class VideoEdit extends Component {
 	onSelectURL( url ) {
 		const { createErrorNotice, onReplace, setAttributes } = this.props;
 
-		if ( isURL( url ) ) {
+		if ( isURL( url ) && /^https?:/.test( getProtocol( url ) ) ) {
 			// Check if there's an embed block that handles this URL.
 			const embedBlock = createUpgradedEmbedBlock( {
 				attributes: { url },
@@ -173,7 +173,7 @@ class VideoEdit extends Component {
 				return;
 			}
 
-			setAttributes( { id: url, src: url } );
+			setAttributes( { src: url, id: undefined, poster: undefined } );
 		} else {
 			createErrorNotice( __( 'Invalid URL.' ) );
 		}
@@ -218,7 +218,7 @@ class VideoEdit extends Component {
 		const toolbarEditButton = (
 			<MediaUpload
 				allowedTypes={ [ MEDIA_TYPE_VIDEO ] }
-				isReplacingMedia={ true }
+				isReplacingMedia
 				onSelect={ this.onSelectMediaUploadOption }
 				onSelectURL={ this.onSelectURL }
 				render={ ( { open, getMediaOptions } ) => {
@@ -236,7 +236,7 @@ class VideoEdit extends Component {
 			></MediaUpload>
 		);
 
-		if ( ! id ) {
+		if ( ! src ) {
 			return (
 				<View style={ { flex: 1 } }>
 					<MediaPlaceholder
@@ -290,8 +290,10 @@ class VideoEdit extends Component {
 						} ) => {
 							const showVideo =
 								isURL( src ) &&
+								getProtocol( attributes.src ) !== 'file:' &&
 								! isUploadInProgress &&
 								! isUploadFailed;
+
 							const icon = this.getIcon(
 								isUploadFailed
 									? ICON_TYPE.RETRY
@@ -332,7 +334,7 @@ class VideoEdit extends Component {
 												}
 												style={ videoStyle }
 												source={ { uri: src } }
-												paused={ true }
+												paused
 											/>
 										</View>
 									) }
@@ -365,9 +367,9 @@ class VideoEdit extends Component {
 						} }
 					/>
 					<BlockCaption
-						accessible={ true }
+						accessible
 						accessibilityLabelCreator={ ( caption ) =>
-							isEmpty( caption )
+							RichText.isEmpty( caption )
 								? /* translators: accessibility text. Empty video caption. */
 								  __( 'Video caption. Empty' )
 								: sprintf(

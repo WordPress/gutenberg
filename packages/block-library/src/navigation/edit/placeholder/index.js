@@ -18,9 +18,10 @@ export default function NavigationPlaceholder( {
 	isSelected,
 	currentMenuId,
 	clientId,
-	canUserCreateNavigationMenu = false,
-	isResolvingCanUserCreateNavigationMenu,
-	onFinish,
+	canUserCreateNavigationMenus = false,
+	isResolvingCanUserCreateNavigationMenus,
+	onSelectNavigationMenu,
+	onSelectClassicMenu,
 	onCreateEmpty,
 } ) {
 	const { isResolvingMenus, hasResolvedMenus } = useNavigationEntities();
@@ -31,16 +32,16 @@ export default function NavigationPlaceholder( {
 		}
 
 		if ( isResolvingMenus ) {
-			speak( __( 'Loading Navigation block setup options.' ) );
+			speak( __( 'Loading navigation block setup options…' ) );
 		}
 
 		if ( hasResolvedMenus ) {
 			speak( __( 'Navigation block setup options ready.' ) );
 		}
-	}, [ isResolvingMenus, isSelected ] );
+	}, [ hasResolvedMenus, isResolvingMenus, isSelected ] );
 
 	const isResolvingActions =
-		isResolvingMenus && isResolvingCanUserCreateNavigationMenu;
+		isResolvingMenus && isResolvingCanUserCreateNavigationMenus;
 
 	return (
 		<>
@@ -67,18 +68,13 @@ export default function NavigationPlaceholder( {
 						<NavigationMenuSelector
 							currentMenuId={ currentMenuId }
 							clientId={ clientId }
-							onSelect={ onFinish }
-							toggleProps={ {
-								variant: 'tertiary',
-								iconPosition: 'right',
-								className:
-									'wp-block-navigation-placeholder__actions__dropdown',
-							} }
+							onSelectNavigationMenu={ onSelectNavigationMenu }
+							onSelectClassicMenu={ onSelectClassicMenu }
 						/>
 
 						<hr />
 
-						{ canUserCreateNavigationMenu && (
+						{ canUserCreateNavigationMenus && (
 							<Button
 								variant="tertiary"
 								onClick={ onCreateEmpty }

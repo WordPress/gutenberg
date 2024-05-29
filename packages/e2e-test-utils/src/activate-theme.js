@@ -4,6 +4,7 @@
 import { switchUserToAdmin } from './switch-user-to-admin';
 import { switchUserToTest } from './switch-user-to-test';
 import { visitAdminPage } from './visit-admin-page';
+import { isCurrentURL } from './is-current-url';
 
 /**
  * Activates an installed theme.
@@ -23,6 +24,10 @@ export async function activateTheme( slug ) {
 	}
 
 	await page.click( `div[data-slug="${ slug }"] .button.activate` );
+
+	if ( ! isCurrentURL( 'themes.php' ) ) {
+		await visitAdminPage( 'themes.php' );
+	}
 	await page.waitForSelector( `div[data-slug="${ slug }"].active` );
 	await switchUserToTest();
 }

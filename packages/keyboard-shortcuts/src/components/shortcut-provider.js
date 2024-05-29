@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -12,18 +12,22 @@ const { Provider } = context;
 
 /**
  * Handles callbacks added to context by `useShortcut`.
+ * Adding a provider allows to register contextual shortcuts
+ * that are only active when a certain part of the UI is focused.
  *
  * @param {Object} props Props to pass to `div`.
  *
- * @return {import('@wordpress/element').WPElement} Component.
+ * @return {Element} Component.
  */
 export function ShortcutProvider( props ) {
-	const keyboardShortcuts = useRef( new Set() );
+	const [ keyboardShortcuts ] = useState( () => new Set() );
 
 	function onKeyDown( event ) {
-		if ( props.onKeyDown ) props.onKeyDown( event );
+		if ( props.onKeyDown ) {
+			props.onKeyDown( event );
+		}
 
-		for ( const keyboardShortcut of keyboardShortcuts.current ) {
+		for ( const keyboardShortcut of keyboardShortcuts ) {
 			keyboardShortcut( event );
 		}
 	}

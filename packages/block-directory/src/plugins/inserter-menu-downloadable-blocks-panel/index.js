@@ -1,12 +1,8 @@
 /**
- * External dependencies
- */
-import { debounce } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __unstableInserterMenuExtension } from '@wordpress/block-editor';
+import { debounce } from '@wordpress/compose';
 import { useState } from '@wordpress/element';
 
 /**
@@ -20,13 +16,7 @@ function InserterMenuDownloadableBlocksPanel() {
 
 	return (
 		<__unstableInserterMenuExtension>
-			{ ( {
-				onSelect,
-				onHover,
-				filterValue,
-				hasItems,
-				rootClientId,
-			} ) => {
+			{ ( { onSelect, onHover, filterValue, hasItems } ) => {
 				if ( debouncedFilterValue !== filterValue ) {
 					debouncedSetFilterValue( filterValue );
 				}
@@ -39,7 +29,6 @@ function InserterMenuDownloadableBlocksPanel() {
 					<DownloadableBlocksPanel
 						onSelect={ onSelect }
 						onHover={ onHover }
-						rootClientId={ rootClientId }
 						filterValue={ debouncedFilterValue }
 						hasLocalBlocks={ hasItems }
 						isTyping={ filterValue !== debouncedFilterValue }

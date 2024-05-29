@@ -2,12 +2,6 @@
 
 `CustomSelectControl` allows users to select an item from a single-option menu just like [`SelectControl`](/packages/components/src/select-control/readme.md), with the addition of being able to provide custom styles for each item in the menu. This means it does not use a native `<select>`, so should only be used if the custom styling is necessary.
 
-## Table of contents
-
-1. [Design guidelines](#design-guidelines)
-2. [Development guidelines](#development-guidelines)
-3. [Related components](#related-components)
-
 ## Design guidelines
 
 These are the same as [the ones for `SelectControl`s](/packages/components/src/select-control/readme.md#design-guidelines).
@@ -17,11 +11,8 @@ These are the same as [the ones for `SelectControl`s](/packages/components/src/s
 ### Usage
 
 ```jsx
-/**
- * WordPress dependencies
- */
+import { useState } from 'react';
 import { CustomSelectControl } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const options = [
 	{
@@ -119,6 +110,34 @@ Function called with the control's internal state changes. The `selectedItem` pr
 Can be used to externally control the value of the control, like in the `MyControlledCustomSelectControl` example above.
 
 -   Type: `Object`
+-   Required: No
+
+#### onMouseOver
+
+A handler for onMouseOver events.
+
+-   Type: `Function`
+-   Required: No
+
+#### onMouseOut
+
+A handler for onMouseOut events.
+
+-   Type: `Function`
+-   Required: No
+
+#### onFocus
+
+A handler for onFocus events.
+
+-   Type: `Function`
+-   Required: No
+
+#### onBlur
+
+A handler for onBlur events.
+
+-   Type: `Function`
 -   Required: No
 
 ## Related components

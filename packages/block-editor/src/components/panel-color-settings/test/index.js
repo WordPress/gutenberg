@@ -16,7 +16,7 @@ describe( 'PanelColorSettings', () => {
 			<PanelColorSettings
 				title="Test Title"
 				colors={ [] }
-				disableCustomColors={ true }
+				disableCustomColors
 				colorSettings={ [
 					{
 						value: '#000',
@@ -31,7 +31,7 @@ describe( 'PanelColorSettings', () => {
 				] }
 			/>
 		);
-		expect( container.innerHTML ).toBe( '' );
+		expect( container ).toBeEmptyDOMElement();
 	} );
 
 	it( 'should render a color panel if at least one setting supports custom colors', async () => {
@@ -39,7 +39,7 @@ describe( 'PanelColorSettings', () => {
 			<PanelColorSettings
 				title="Test Title"
 				colors={ [] }
-				disableCustomColors={ true }
+				disableCustomColors
 				colorSettings={ [
 					{
 						value: '#000',
@@ -55,7 +55,7 @@ describe( 'PanelColorSettings', () => {
 				] }
 			/>
 		);
-		expect( container.innerHTML ).not.toBe( '' );
+		expect( container ).not.toBeEmptyDOMElement();
 	} );
 
 	it( 'should render a color panel if at least one setting specifies some colors to choose', async () => {
@@ -63,7 +63,7 @@ describe( 'PanelColorSettings', () => {
 			<PanelColorSettings
 				title="Test Title"
 				colors={ [] }
-				disableCustomColors={ true }
+				disableCustomColors
 				colorSettings={ [
 					{
 						value: '#000',
@@ -85,7 +85,7 @@ describe( 'PanelColorSettings', () => {
 				] }
 			/>
 		);
-		expect( container.innerHTML ).not.toBe( '' );
+		expect( container ).not.toBeEmptyDOMElement();
 	} );
 
 	it( 'should not render anything if none of the setting panels has colors to choose', async () => {
@@ -112,6 +112,6 @@ describe( 'PanelColorSettings', () => {
 				] }
 			/>
 		);
-		expect( container.innerHTML ).not.toBe( '' );
+		expect( container ).not.toBeEmptyDOMElement();
 	} );
 } );

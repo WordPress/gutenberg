@@ -2,12 +2,17 @@
  * Clicks on the button in the header which opens Document Settings sidebar when it is closed.
  */
 export async function openDocumentSettingsSidebar() {
-	const openButton = await page.$(
-		'.edit-post-header__settings button[aria-label="Settings"][aria-expanded="false"]'
+	const toggleButton = await page.waitForSelector(
+		'.edit-post-header__settings button[aria-label="Settings"][aria-disabled="false"]'
 	);
 
-	if ( openButton ) {
-		await openButton.click();
-		await page.waitForSelector( '.edit-post-sidebar' );
+	const isClosed = await page.evaluate(
+		( element ) => element.getAttribute( 'aria-expanded' ) === 'false',
+		toggleButton
+	);
+
+	if ( isClosed ) {
+		await toggleButton.click();
+		await page.waitForSelector( '.editor-sidebar' );
 	}
 }

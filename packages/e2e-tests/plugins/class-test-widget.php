@@ -14,7 +14,7 @@ class Test_Widget extends WP_Widget {
 	/**
 	 * Sets up a new test widget instance.
 	 */
-	function __construct() {
+	public function __construct() {
 		parent::__construct(
 			'test_widget',
 			'Test Widget',

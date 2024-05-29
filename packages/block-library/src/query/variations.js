@@ -39,6 +39,7 @@ const variations = [
 		),
 		icon: postList,
 		attributes: {
+			namespace: 'core/posts-list',
 			query: {
 				perPage: 4,
 				pages: 1,
@@ -53,6 +54,9 @@ const variations = [
 			},
 		},
 		scope: [ 'inserter' ],
+		isActive: ( { namespace, query } ) => {
+			return namespace === 'core/posts-list' && query.postType === 'post';
+		},
 	},
 	{
 		name: 'title-date',

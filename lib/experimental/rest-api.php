@@ -28,6 +28,7 @@ function gutenberg_register_block_editor_settings() {
 }
 add_action( 'rest_api_init', 'gutenberg_register_block_editor_settings' );
 
+
 /**
  * Shim for get_sample_permalink() to add support for auto-draft status.
  *

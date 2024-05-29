@@ -2,91 +2,171 @@
 /**
  * WP_Style_Engine_Processor
  *
- * Compiles styles from a store of CSS rules.
+ * Compiles styles from stores or collection of CSS rules.
  *
  * @package Gutenberg
  */
 
-if ( class_exists( 'WP_Style_Engine_Processor' ) ) {
-	return;
-}
-
-/**
- * Compiles styles from a store of CSS rules.
- *
- * @access private
- */
-class WP_Style_Engine_Processor {
+if ( ! class_exists( 'WP_Style_Engine_Processor' ) ) {
 
 	/**
-	 * The Style-Engine Store object.
+	 * Compiles styles from stores or collection of CSS rules.
 	 *
-	 * @var WP_Style_Engine_CSS_Rules_Store
+	 * @access private
 	 */
-	protected $store;
+	class WP_Style_Engine_Processor {
 
-	/**
-	 * Constructor.
-	 *
-	 * @param WP_Style_Engine_CSS_Rules_Store $store The store to render.
-	 */
-	public function __construct( WP_Style_Engine_CSS_Rules_Store $store ) {
-		$this->store = $store;
-	}
+		/**
+		 * A collection of Style Engine Store objects.
+		 *
+		 * @var WP_Style_Engine_CSS_Rules_Store[]
+		 */
+		protected $stores = array();
 
-	/**
-	 * Get the CSS rules as a string.
-	 *
-	 * @return string The computed CSS.
-	 */
-	public function get_css() {
-		// Combine CSS selectors that have identical declarations.
-		$this->combine_rules_selectors();
+		/**
+		 * The set of CSS rules that this processor will work on.
+		 *
+		 * @var WP_Style_Engine_CSS_Rule[]
+		 */
+		protected $css_rules = array();
 
-		// Build the CSS.
-		$css   = '';
-		$rules = $this->store->get_all_rules();
-		foreach ( $rules as $rule ) {
-			$css .= $rule->get_css();
-		}
-		return $css;
-	}
+		/**
+		 * Add a store to the processor.
+		 *
+		 * @param WP_Style_Engine_CSS_Rules_Store $store The store to add.
+		 *
+		 * @return WP_Style_Engine_Processor Returns the object to allow chaining methods.
+		 */
+		public function add_store( $store ) {
+			if ( ! $store instanceof WP_Style_Engine_CSS_Rules_Store ) {
+				_doing_it_wrong(
+					__METHOD__,
+					__( '$store must be an instance of WP_Style_Engine_CSS_Rules_Store', 'default' ),
+					'6.1.0'
+				);
+				return $this;
+			}
 
-	/**
-	 * Combines selectors from the rules store when they have the same styles.
-	 *
-	 * @return void
-	 */
-	private function combine_rules_selectors() {
-		$rules = $this->store->get_all_rules();
+			$this->stores[ $store->get_name() ] = $store;
 
-		// Build an array of selectors along with the JSON-ified styles to make comparisons easier.
-		$selectors_json = array();
-		foreach ( $rules as $selector => $rule ) {
-			$declarations = $rule->get_declarations()->get_declarations();
-			ksort( $declarations );
-			$selectors_json[ $selector ] = json_encode( $declarations );
+			return $this;
 		}
 
-		// Combine selectors that have the same styles.
-		foreach ( $selectors_json as $selector => $json ) {
-			// Get selectors that use the same styles.
-			$duplicates = array_keys( $selectors_json, $json, true );
-			// Skip if there are no duplicates.
-			if ( 1 >= count( $duplicates ) ) {
-				continue;
+		/**
+		 * Adds rules to be processed.
+		 *
+		 * @param WP_Style_Engine_CSS_Rule|WP_Style_Engine_CSS_Rule[] $css_rules A single, or an array of, WP_Style_Engine_CSS_Rule objects from a store or otherwise.
+		 *
+		 * @return WP_Style_Engine_Processor Returns the object to allow chaining methods.
+		 */
+		public function add_rules( $css_rules ) {
+			if ( ! is_array( $css_rules ) ) {
+				$css_rules = array( $css_rules );
 			}
-			foreach ( $duplicates as $key ) {
-				// Unset the duplicates from the $selectors_json array to avoid looping through them as well.
-				unset( $selectors_json[ $key ] );
-				// Remove the rules from the store.
-				$this->store->remove_rule( $key );
+
+			foreach ( $css_rules as $rule ) {
+				$selector    = $rule->get_selector();
+				$rules_group = $rule->get_rules_group();
+
+				/**
+				 * If there is an at_rule and it already exists in the css_rules array,
+				 * add the rule to it.
+				 * Otherwise, create a new entry for the at_rule
+				 */
+				if ( ! empty( $rules_group ) ) {
+					if ( isset( $this->css_rules[ "$rules_group $selector" ] ) ) {
+						$this->css_rules[ "$rules_group $selector" ]->add_declarations( $rule->get_declarations() );
+						continue;
+					}
+					$this->css_rules[ "$rules_group $selector" ] = $rule;
+					continue;
+				}
+
+				// If the selector already exists, add the declarations to it.
+				if ( isset( $this->css_rules[ $selector ] ) ) {
+					$this->css_rules[ $selector ]->add_declarations( $rule->get_declarations() );
+					continue;
+				}
+				$this->css_rules[ $rule->get_selector() ] = $rule;
 			}
-			// Create a new rule with the combined selectors.
-			$new_rule = $this->store->add_rule( implode( ',', $duplicates ) );
-			// Set the declarations. The extra check is in place because `add_rule` in the store can return `null`.
-			if ( $new_rule ) {
-				$new_rule->add_declarations( $rules[ $selector ]->get_declarations() );
+			return $this;
+		}
+
+		/**
+		 * Get the CSS rules as a string.
+		 *
+		 * Since 6.4.0 Optimization is no longer the default.
+		 *
+		 * @param array $options   {
+		 *     Optional. An array of options. Default empty array.
+		 *
+		 *     @type bool $optimize Whether to optimize the CSS output, e.g., combine rules. Default is `false`.
+		 *     @type bool $prettify Whether to add new lines and indents to output. Default is to inherit the value of the global constant `SCRIPT_DEBUG`, if it is defined.
+		 * }
+		 *
+		 * @return string The computed CSS.
+		 */
+		public function get_css( $options = array() ) {
+			$defaults = array(
+				'optimize' => false,
+				'prettify' => SCRIPT_DEBUG,
+			);
+			$options  = wp_parse_args( $options, $defaults );
+
+			// If we have stores, get the rules from them.
+			foreach ( $this->stores as $store ) {
+				$this->add_rules( $store->get_all_rules() );
+			}
+
+			// Combine CSS selectors that have identical declarations.
+			if ( true === $options['optimize'] ) {
+				$this->combine_rules_selectors();
+			}
+
+			// Build the CSS.
+			$css = '';
+			foreach ( $this->css_rules as $rule ) {
+				// See class WP_Style_Engine_CSS_Rule for the get_css method.
+				$css .= $rule->get_css( $options['prettify'] );
+				$css .= $options['prettify'] ? "\n" : '';
+			}
+			return $css;
+		}
+
+		/**
+		 * Combines selectors from the rules store when they have the same styles.
+		 *
+		 * @return void
+		 */
+		private function combine_rules_selectors() {
+			// Build an array of selectors along with the JSON-ified styles to make comparisons easier.
+			$selectors_json = array();
+			foreach ( $this->css_rules as $rule ) {
+				$declarations = $rule->get_declarations()->get_declarations();
+				ksort( $declarations );
+				$selectors_json[ $rule->get_selector() ] = wp_json_encode( $declarations );
+			}
+
+			// Combine selectors that have the same styles.
+			foreach ( $selectors_json as $selector => $json ) {
+				// Get selectors that use the same styles.
+				$duplicates = array_keys( $selectors_json, $json, true );
+				// Skip if there are no duplicates.
+				if ( 1 >= count( $duplicates ) ) {
+					continue;
+				}
+
+				$declarations = $this->css_rules[ $selector ]->get_declarations();
+
+				foreach ( $duplicates as $key ) {
+					// Unset the duplicates from the $selectors_json array to avoid looping through them as well.
+					unset( $selectors_json[ $key ] );
+					// Remove the rules from the rules collection.
+					unset( $this->css_rules[ $key ] );
+				}
+				// Create a new rule with the combined selectors.
+				$duplicate_selectors                     = implode( ',', $duplicates );
+				$this->css_rules[ $duplicate_selectors ] = new WP_Style_Engine_CSS_Rule( $duplicate_selectors, $declarations );
 			}
 		}
 	}

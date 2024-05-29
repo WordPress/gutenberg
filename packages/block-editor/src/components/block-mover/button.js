@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
-import { castArray, first, last } from 'lodash';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -62,7 +61,11 @@ const BlockMoverButton = forwardRef(
 		ref
 	) => {
 		const instanceId = useInstanceId( BlockMoverButton );
-		const blocksCount = castArray( clientIds ).length;
+		const normalizedClientIds = Array.isArray( clientIds )
+			? clientIds
+			: [ clientIds ];
+		const blocksCount = normalizedClientIds.length;
+		const { disabled } = props;
 
 		const {
 			blockType,
@@ -81,12 +84,11 @@ const BlockMoverButton = forwardRef(
 					getBlock,
 					getBlockListSettings,
 				} = select( blockEditorStore );
-				const normalizedClientIds = castArray( clientIds );
-				const firstClientId = first( normalizedClientIds );
+				const firstClientId = normalizedClientIds[ 0 ];
 				const blockRootClientId = getBlockRootClientId( firstClientId );
 				const firstBlockIndex = getBlockIndex( firstClientId );
 				const lastBlockIndex = getBlockIndex(
-					last( normalizedClientIds )
+					normalizedClientIds[ normalizedClientIds.length - 1 ]
 				);
 				const blockOrder = getBlockOrder( blockRootClientId );
 				const block = getBlock( firstClientId );
@@ -97,7 +99,9 @@ const BlockMoverButton = forwardRef(
 
 				return {
 					blockType: block ? getBlockType( block.name ) : null,
-					isDisabled: direction === 'up' ? isFirstBlock : isLastBlock,
+					isDisabled:
+						disabled ||
+						( direction === 'up' ? isFirstBlock : isLastBlock ),
 					rootClientId: blockRootClientId,
 					firstIndex: firstBlockIndex,
 					isFirst: isFirstBlock,
@@ -126,7 +130,7 @@ const BlockMoverButton = forwardRef(
 			<>
 				<Button
 					ref={ ref }
-					className={ classnames(
+					className={ clsx(
 						'block-editor-block-mover-button',
 						`is-${ direction }-button`
 					) }

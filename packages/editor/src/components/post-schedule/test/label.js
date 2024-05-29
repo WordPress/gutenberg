@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalGetSettings, setSettings } from '@wordpress/date';
+import { getSettings, setSettings } from '@wordpress/date';
 
 /**
  * Internal dependencies
@@ -15,7 +15,7 @@ describe( 'getFullPostScheduleLabel', () => {
 	} );
 
 	it( "should show site's timezone abbr", () => {
-		const settings = __experimentalGetSettings();
+		const settings = getSettings();
 
 		setSettings( {
 			...settings,
@@ -23,23 +23,27 @@ describe( 'getFullPostScheduleLabel', () => {
 		} );
 
 		const label = getFullPostScheduleLabel( '2022-04-28T15:30:00' );
-		expect( label ).toBe( 'April 28, 2022 3:30\xa0pm AEST' );
 
+		// Reset date settings before potential failure of the expectation.
 		setSettings( settings );
+
+		expect( label ).toBe( 'April 28, 2022 3:30\xa0pm AEST' );
 	} );
 
 	it( "should show site's timezone offset", () => {
-		const settings = __experimentalGetSettings();
+		const settings = getSettings();
 
 		setSettings( {
 			...settings,
-			timezone: { offset: 10 },
+			timezone: { offsetFormatted: 10 },
 		} );
 
 		const label = getFullPostScheduleLabel( '2022-04-28T15:30:00' );
-		expect( label ).toBe( 'April 28, 2022 3:30\xa0pm UTC+10' );
 
+		// Reset date settings before potential failure of the expectation.
 		setSettings( settings );
+
+		expect( label ).toBe( 'April 28, 2022 3:30\xa0pm UTC+10' );
 	} );
 } );
 
@@ -67,7 +71,7 @@ describe( 'getPostScheduleLabel', () => {
 	} );
 
 	it( "should show today if date is same day as now and user timezone equals site's timezone", () => {
-		const settings = __experimentalGetSettings();
+		const settings = getSettings();
 
 		setSettings( {
 			...settings,
@@ -80,13 +84,15 @@ describe( 'getPostScheduleLabel', () => {
 		);
 
 		const label = getPostScheduleLabel( '2022-04-28T15:30:00', { now } );
-		expect( label ).toBe( 'Today at 3:30\xa0pm' );
 
+		// Reset date settings before potential failure of the expectation.
 		setSettings( settings );
+
+		expect( label ).toBe( 'Today at 3:30\xa0pm' );
 	} );
 
 	it( "should show tomorrow if date is same day as now + 1 day and user timezone equals site's timezone", () => {
-		const settings = __experimentalGetSettings();
+		const settings = getSettings();
 
 		setSettings( {
 			...settings,
@@ -99,13 +105,15 @@ describe( 'getPostScheduleLabel', () => {
 		);
 
 		const label = getPostScheduleLabel( '2022-04-29T15:30:00', { now } );
-		expect( label ).toBe( 'Tomorrow at 3:30\xa0pm' );
 
+		// Reset date settings before potential failure of the expectation.
 		setSettings( settings );
+
+		expect( label ).toBe( 'Tomorrow at 3:30\xa0pm' );
 	} );
 
 	it( "should hide year if date is same year as now and user timezone equals site's timezone", () => {
-		const settings = __experimentalGetSettings();
+		const settings = getSettings();
 
 		setSettings( {
 			...settings,
@@ -118,13 +126,15 @@ describe( 'getPostScheduleLabel', () => {
 		);
 
 		const label = getPostScheduleLabel( '2022-12-25T15:30:00', { now } );
-		expect( label ).toBe( 'December 25 3:30\xa0pm' );
 
+		// Reset date settings before potential failure of the expectation.
 		setSettings( settings );
+
+		expect( label ).toBe( 'December 25 3:30\xa0pm' );
 	} );
 
 	it( "should show year if date is not same year as now and user timezone equals site's timezone", () => {
-		const settings = __experimentalGetSettings();
+		const settings = getSettings();
 
 		setSettings( {
 			...settings,
@@ -137,8 +147,10 @@ describe( 'getPostScheduleLabel', () => {
 		);
 
 		const label = getPostScheduleLabel( '2023-04-28T15:30:00', { now } );
-		expect( label ).toBe( 'April 28, 2023 3:30\xa0pm' );
 
+		// Reset date settings before potential failure of the expectation.
 		setSettings( settings );
+
+		expect( label ).toBe( 'April 28, 2023 3:30\xa0pm' );
 	} );
 } );

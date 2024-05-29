@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -44,6 +44,7 @@ export default function save( { attributes } ) {
 		id,
 		minHeight: minHeightProp,
 		minHeightUnit,
+		tagName: Tag,
 	} = attributes;
 	const overlayColorClass = getColorClassName(
 		'background-color',
@@ -79,7 +80,7 @@ export default function save( { attributes } ) {
 
 	const backgroundPosition = mediaPosition( focalPoint );
 
-	const classes = classnames(
+	const classes = clsx(
 		{
 			'is-light': ! isDark,
 			'has-parallax': hasParallax,
@@ -90,7 +91,7 @@ export default function save( { attributes } ) {
 		getPositionClassName( contentPosition )
 	);
 
-	const imgClasses = classnames(
+	const imgClasses = clsx(
 		'wp-block-cover__image-background',
 		id ? `wp-image-${ id }` : null,
 		{
@@ -102,10 +103,10 @@ export default function save( { attributes } ) {
 	const gradientValue = gradient || customGradient;
 
 	return (
-		<div { ...useBlockProps.save( { className: classes, style } ) }>
+		<Tag { ...useBlockProps.save( { className: classes, style } ) }>
 			<span
 				aria-hidden="true"
-				className={ classnames(
+				className={ clsx(
 					'wp-block-cover__background',
 					overlayColorClass,
 					dimRatioToClass( dimRatio ),
@@ -137,14 +138,15 @@ export default function save( { attributes } ) {
 					/>
 				) : (
 					<div
-						role="img"
+						role={ alt ? 'img' : undefined }
+						aria-label={ alt ? alt : undefined }
 						className={ imgClasses }
 						style={ { backgroundPosition, backgroundImage } }
 					/>
 				) ) }
 			{ isVideoBackground && url && (
 				<video
-					className={ classnames(
+					className={ clsx(
 						'wp-block-cover__video-background',
 						'intrinsic-ignore'
 					) }
@@ -163,6 +165,6 @@ export default function save( { attributes } ) {
 					className: 'wp-block-cover__inner-container',
 				} ) }
 			/>
-		</div>
+		</Tag>
 	);
 }

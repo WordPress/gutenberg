@@ -10,7 +10,6 @@ import type {
 } from './helpers';
 
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
-import type { DefaultContextOf } from './index';
 
 declare module './base-entity-records' {
 	export namespace BaseEntityRecords {
@@ -86,10 +85,14 @@ declare module './base-entity-records' {
 			 * Whether a template is a custom template.
 			 */
 			is_custom: Record< string, string >;
+			/**
+			 * The date the template was last modified, in the site's timezone.
+			 */
+			modified: ContextualField< string, 'view' | 'edit', C >;
 		}
 	}
 }
 
-export type WpTemplate<
-	C extends Context = DefaultContextOf< 'postType', 'wp_template' >
-> = OmitNevers< _BaseEntityRecords.WpTemplate< C > >;
+export type WpTemplate< C extends Context = 'edit' > = OmitNevers<
+	_BaseEntityRecords.WpTemplate< C >
+>;

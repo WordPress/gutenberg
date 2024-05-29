@@ -14,6 +14,7 @@ export default function NavigationMenuNameControl() {
 
 	return (
 		<TextControl
+			__nextHasNoMarginBottom
 			label={ __( 'Menu name' ) }
 			value={ title }
 			onChange={ updateTitle }

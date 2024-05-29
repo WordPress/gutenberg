@@ -11,12 +11,11 @@ import {
 	Platform,
 	Text,
 } from 'react-native';
-import { map, uniq } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useRef, useEffect } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
@@ -34,7 +33,7 @@ let scrollPosition = 0;
 let customIndicatorWidth = 0;
 
 function ColorPalette( {
-	enableCustomColor = true,
+	enableCustomColor = false,
 	setColor,
 	activeColor,
 	isGradientColor,
@@ -62,13 +61,37 @@ function ColorPalette( {
 
 	const scale = useRef( new Animated.Value( 1 ) ).current;
 	const opacity = useRef( new Animated.Value( 1 ) ).current;
+	const delayedScrollRef = useRef();
 
-	const defaultColors = uniq( map( defaultSettings.colors, 'color' ) );
-	const mergedColors = uniq( map( defaultSettings.allColors, 'color' ) );
-	const defaultGradientColors = uniq(
-		map( defaultSettings.gradients, 'gradient' )
-	);
-	const colors = isGradientSegment ? defaultGradientColors : defaultColors;
+	const mergedColors = [
+		...new Set(
+			( defaultSettings.colors ?? [] ).map( ( { color } ) => color )
+		),
+	];
+	const mergedGradients = [
+		...new Set(
+			( defaultSettings.gradients ?? [] ).map(
+				( { gradient } ) => gradient
+			)
+		),
+	];
+	const allAvailableColors = [
+		...new Set(
+			( defaultSettings.allColors ?? [] ).map( ( { color } ) => color )
+		),
+	];
+	const allAvailableGradients = [
+		...new Set(
+			( defaultSettings.allGradients ?? [] ).map(
+				( { gradient } ) => gradient
+			)
+		),
+	];
+
+	const colors = isGradientSegment ? mergedGradients : mergedColors;
+	const allColors = isGradientSegment
+		? allAvailableGradients
+		: allAvailableColors;
 
 	const customIndicatorColor = isGradientSegment
 		? activeColor
@@ -99,7 +122,7 @@ function ColorPalette( {
 
 	function isSelectedCustom() {
 		const isWithinColors =
-			activeColor && mergedColors && mergedColors.includes( activeColor );
+			activeColor && allColors?.includes( activeColor );
 		if ( enableCustomColor && activeColor ) {
 			if ( isGradientSegment ) {
 				return isGradientColor && ! isWithinColors;
@@ -164,6 +187,22 @@ function ColorPalette( {
 		}
 	}
 
+	function getColorGradientName( value ) {
+		const fallbackName = sprintf(
+			/* translators: %s: the hex color value */
+			__( 'Unlabeled color. %s' ),
+			value
+		);
+		const foundColorName = isGradientSegment
+			? defaultSettings.gradients?.find(
+					( gradient ) => gradient.gradient === value
+			  )
+			: defaultSettings.allColors?.find(
+					( color ) => color.color === value
+			  );
+		return foundColorName ? foundColorName?.name : fallbackName;
+	}
+
 	function onColorPress( color ) {
 		deselectCustomGradient();
 		performAnimation( color );
@@ -178,11 +217,11 @@ function ColorPalette( {
 	}
 
 	function scrollToEndWithDelay() {
-		const delayedScroll = setTimeout( () => {
-			scrollViewRef.current.scrollToEnd();
+		delayedScrollRef.current = setTimeout( () => {
+			scrollViewRef?.current.scrollToEnd();
 		}, ANIMATION_DURATION );
 		return () => {
-			clearTimeout( delayedScroll );
+			clearTimeout( delayedScrollRef.current );
 		};
 	}
 
@@ -240,6 +279,8 @@ function ColorPalette( {
 					const scaleValue = isSelected( color )
 						? scaleInterpolation
 						: 1;
+					const colorName = getColorGradientName( color );
+
 					return (
 						<View key={ `${ color }-${ isSelected( color ) }` }>
 							<TouchableWithoutFeedback
@@ -249,6 +290,7 @@ function ColorPalette( {
 									selected: isSelected( color ),
 								} }
 								accessibilityHint={ color }
+								accessibilityLabel={ colorName }
 								testID={ color }
 							>
 								<Animated.View

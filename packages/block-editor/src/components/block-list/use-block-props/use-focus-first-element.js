@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { first, last } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useEffect, useRef } from '@wordpress/element';
@@ -24,38 +19,6 @@ import { store as blockEditorStore } from '../../../store';
 /** @typedef {import('@wordpress/element').RefObject} RefObject */
 
 /**
- * Returns the initial position if the block needs to be focussed, `undefined`
- * otherwise. The initial position is either 0 (start) or -1 (end).
- *
- * @param {string} clientId Block client ID.
- *
- * @return {number} The initial position, either 0 (start) or -1 (end).
- */
-function useInitialPosition( clientId ) {
-	return useSelect(
-		( select ) => {
-			const {
-				getSelectedBlocksInitialCaretPosition,
-				isNavigationMode,
-				isBlockSelected,
-			} = select( blockEditorStore );
-
-			if ( ! isBlockSelected( clientId ) ) {
-				return;
-			}
-
-			if ( isNavigationMode() ) {
-				return;
-			}
-
-			// If there's no initial position, return 0 to focus the start.
-			return getSelectedBlocksInitialCaretPosition();
-		},
-		[ clientId ]
-	);
-}
-
-/**
  * Transitions focus to the block or inner tabbable when the block becomes
  * selected and an initial position is set.
  *
@@ -63,14 +26,18 @@ function useInitialPosition( clientId ) {
  *
  * @return {RefObject} React ref with the block element.
  */
-export function useFocusFirstElement( clientId ) {
+export function useFocusFirstElement( { clientId, initialPosition } ) {
 	const ref = useRef();
-	const initialPosition = useInitialPosition( clientId );
-	const { isBlockSelected, isMultiSelecting } = useSelect( blockEditorStore );
+	const { isBlockSelected, isMultiSelecting, __unstableGetEditorMode } =
+		useSelect( blockEditorStore );
 
 	useEffect( () => {
 		// Check if the block is still selected at the time this effect runs.
-		if ( ! isBlockSelected( clientId ) || isMultiSelecting() ) {
+		if (
+			! isBlockSelected( clientId ) ||
+			isMultiSelecting() ||
+			__unstableGetEditorMode() === 'zoom-out'
+		) {
 			return;
 		}
 
@@ -85,7 +52,7 @@ export function useFocusFirstElement( clientId ) {
 		const { ownerDocument } = ref.current;
 
 		// Do not focus the block if it already contains the active element.
-		if ( ref.current.contains( ownerDocument.activeElement ) ) {
+		if ( isInsideRootBlock( ref.current, ownerDocument.activeElement ) ) {
 			return;
 		}
 
@@ -98,7 +65,7 @@ export function useFocusFirstElement( clientId ) {
 		// tabbables.
 		const isReverse = -1 === initialPosition;
 		const target =
-			( isReverse ? last : first )( textInputs ) || ref.current;
+			textInputs[ isReverse ? textInputs.length - 1 : 0 ] || ref.current;
 
 		if ( ! isInsideRootBlock( ref.current, target ) ) {
 			ref.current.focus();
@@ -118,7 +85,6 @@ export function useFocusFirstElement( clientId ) {
 				return;
 			}
 		}
-
 		placeCaretAtHorizontalEdge( target, isReverse );
 	}, [ initialPosition, clientId ] );
 

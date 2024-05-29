@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { includes } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { createBlobURL } from '@wordpress/blob';
@@ -92,7 +87,7 @@ const transforms = {
 				}
 				const { getMedia } = select( coreStore );
 				const media = getMedia( id );
-				return !! media && includes( media.mime_type, 'audio' );
+				return !! media && media.mime_type.includes( 'audio' );
 			},
 			transform: ( attributes ) => {
 				return createBlock( 'core/audio', {
@@ -112,7 +107,7 @@ const transforms = {
 				}
 				const { getMedia } = select( coreStore );
 				const media = getMedia( id );
-				return !! media && includes( media.mime_type, 'video' );
+				return !! media && media.mime_type.includes( 'video' );
 			},
 			transform: ( attributes ) => {
 				return createBlock( 'core/video', {
@@ -132,7 +127,7 @@ const transforms = {
 				}
 				const { getMedia } = select( coreStore );
 				const media = getMedia( id );
-				return !! media && includes( media.mime_type, 'image' );
+				return !! media && media.mime_type.includes( 'image' );
 			},
 			transform: ( attributes ) => {
 				return createBlock( 'core/image', {

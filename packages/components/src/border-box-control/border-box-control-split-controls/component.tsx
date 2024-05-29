@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useRef } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 
 /**
@@ -11,9 +11,11 @@ import { useMergeRefs } from '@wordpress/compose';
 import BorderBoxControlVisualizer from '../border-box-control-visualizer';
 import { BorderControl } from '../../border-control';
 import { Grid } from '../../grid';
-import { contextConnect, WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { contextConnect } from '../../context';
 import { useBorderBoxControlSplitControls } from './hook';
 
+import type { BorderControlProps } from '../../border-control/types';
 import type { SplitControlsProps } from '../types';
 
 const BorderBoxControlSplitControls = (
@@ -30,22 +32,32 @@ const BorderBoxControlSplitControls = (
 		popoverPlacement,
 		popoverOffset,
 		rightAlignedClassName,
+		size = 'default',
 		value,
-		__experimentalHasMultipleOrigins,
 		__experimentalIsRenderedInSidebar,
-		__next36pxDefaultSize,
 		...otherProps
 	} = useBorderBoxControlSplitControls( props );
-	const containerRef = useRef();
-	const mergedRef = useMergeRefs( [ containerRef, forwardedRef ] );
-	const popoverProps = popoverPlacement
-		? {
-				placement: popoverPlacement,
-				offset: popoverOffset,
-				anchorRef: containerRef,
-				__unstableShift: true,
-		  }
-		: undefined;
+
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when the popover's anchor updates.
+	const [ popoverAnchor, setPopoverAnchor ] = useState< Element | null >(
+		null
+	);
+
+	// Memoize popoverProps to avoid returning a new object every time.
+	const popoverProps: BorderControlProps[ '__unstablePopoverProps' ] =
+		useMemo(
+			() =>
+				popoverPlacement
+					? {
+							placement: popoverPlacement,
+							offset: popoverOffset,
+							anchor: popoverAnchor,
+							shift: true,
+					  }
+					: undefined,
+			[ popoverPlacement, popoverOffset, popoverAnchor ]
+		);
 
 	const sharedBorderControlProps = {
 		colors,
@@ -53,20 +65,18 @@ const BorderBoxControlSplitControls = (
 		enableAlpha,
 		enableStyle,
 		isCompact: true,
-		__experimentalHasMultipleOrigins,
 		__experimentalIsRenderedInSidebar,
-		__next36pxDefaultSize,
+		size,
 	};
+
+	const mergedRef = useMergeRefs( [ setPopoverAnchor, forwardedRef ] );
 
 	return (
 		<Grid { ...otherProps } ref={ mergedRef } gap={ 4 }>
-			<BorderBoxControlVisualizer
-				value={ value }
-				__next36pxDefaultSize={ __next36pxDefaultSize }
-			/>
+			<BorderBoxControlVisualizer value={ value } size={ size } />
 			<BorderControl
 				className={ centeredClassName }
-				hideLabelFromVision={ true }
+				hideLabelFromVision
 				label={ __( 'Top border' ) }
 				onChange={ ( newBorder ) => onChange( newBorder, 'top' ) }
 				__unstablePopoverProps={ popoverProps }
@@ -74,7 +84,7 @@ const BorderBoxControlSplitControls = (
 				{ ...sharedBorderControlProps }
 			/>
 			<BorderControl
-				hideLabelFromVision={ true }
+				hideLabelFromVision
 				label={ __( 'Left border' ) }
 				onChange={ ( newBorder ) => onChange( newBorder, 'left' ) }
 				__unstablePopoverProps={ popoverProps }
@@ -83,7 +93,7 @@ const BorderBoxControlSplitControls = (
 			/>
 			<BorderControl
 				className={ rightAlignedClassName }
-				hideLabelFromVision={ true }
+				hideLabelFromVision
 				label={ __( 'Right border' ) }
 				onChange={ ( newBorder ) => onChange( newBorder, 'right' ) }
 				__unstablePopoverProps={ popoverProps }
@@ -92,7 +102,7 @@ const BorderBoxControlSplitControls = (
 			/>
 			<BorderControl
 				className={ centeredClassName }
-				hideLabelFromVision={ true }
+				hideLabelFromVision
 				label={ __( 'Bottom border' ) }
 				onChange={ ( newBorder ) => onChange( newBorder, 'bottom' ) }
 				__unstablePopoverProps={ popoverProps }

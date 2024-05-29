@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useViewportMatch } from '@wordpress/compose';
-import { BlockBreadcrumb, BlockStyles } from '@wordpress/block-editor';
+import { BlockBreadcrumb } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
@@ -96,17 +96,12 @@ function Interface( { blockEditorSettings } ) {
 			} }
 			header={ <Header /> }
 			secondarySidebar={ hasSecondarySidebar && <SecondarySidebar /> }
-			sidebar={
-				hasSidebarEnabled && (
-					<ComplementaryArea.Slot scope="core/edit-widgets" />
-				)
-			}
+			sidebar={ <ComplementaryArea.Slot scope="core/edit-widgets" /> }
 			content={
 				<>
 					<WidgetAreasBlockEditorContent
 						blockEditorSettings={ blockEditorSettings }
 					/>
-					<BlockStyles.Slot scope="core/block-inspector" />
 				</>
 			}
 			footer={

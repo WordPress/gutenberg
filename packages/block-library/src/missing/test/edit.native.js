@@ -63,47 +63,6 @@ describe( 'Missing block', () => {
 					"' is not fully-supported"
 			);
 		} );
-
-		describe( 'Unsupported block editor (UBE)', () => {
-			beforeEach( () => {
-				// By default we set the web editor as available.
-				storeConfig.selectors.getSettings.mockReturnValue( {
-					unsupportedBlockEditor: true,
-				} );
-			} );
-
-			it( 'renders edit action if UBE is available', () => {
-				const testInstance = getTestComponentWithContent();
-				const bottomSheet =
-					testInstance.UNSAFE_getByType( BottomSheet );
-				const bottomSheetCells = bottomSheet.props.children[ 1 ];
-				expect( bottomSheetCells ).toBeTruthy();
-				expect( bottomSheetCells.props.children.length ).toBe( 2 );
-				expect( bottomSheetCells.props.children[ 0 ].props.label ).toBe(
-					'Edit using web editor'
-				);
-			} );
-
-			it( 'does not render edit action if UBE is not available', () => {
-				storeConfig.selectors.getSettings.mockReturnValue( {
-					unsupportedBlockEditor: false,
-				} );
-
-				const testInstance = getTestComponentWithContent();
-				const bottomSheet =
-					testInstance.UNSAFE_getByType( BottomSheet );
-				expect( bottomSheet.props.children[ 1 ] ).toBeFalsy();
-			} );
-
-			it( 'does not render edit action if the block is incompatible with UBE', () => {
-				const testInstance = getTestComponentWithContent( {
-					originalName: 'core/block',
-				} );
-				const bottomSheet =
-					testInstance.UNSAFE_getByType( BottomSheet );
-				expect( bottomSheet.props.children[ 1 ] ).toBeFalsy();
-			} );
-		} );
 	} );
 
 	it( 'renders admin plugins icon', () => {

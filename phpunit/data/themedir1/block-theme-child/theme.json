@@ -1,5 +1,6 @@
 {
-	"version": 1,
+	"$schema": "../../../../schemas/json/theme.json",
+	"version": 3,
 	"settings": {
 		"color": {
 			"palette": [

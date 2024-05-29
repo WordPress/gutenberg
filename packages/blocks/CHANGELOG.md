@@ -2,13 +2,120 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Variables like `process.env.IS_GUTENBERG_PLUGIN` have been replaced by `globalThis.IS_GUTENBERG_PLUGIN`. Build systems using `process.env` should be updated ([#61486](https://github.com/WordPress/gutenberg/pull/61486)).
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 12.35.0 (2024-05-16)
+
+## 12.34.0 (2024-05-02)
+
+## 12.33.0 (2024-04-19)
+
+## 12.32.0 (2024-04-03)
+
+## 12.31.0 (2024-03-21)
+
+## 12.30.0 (2024-03-06)
+
+## 12.29.0 (2024-02-21)
+
+## 12.28.0 (2024-02-09)
+
+## 12.27.0 (2024-01-24)
+
+## 12.26.0 (2024-01-10)
+
+## 12.25.0 (2023-12-13)
+
+## 12.24.0 (2023-11-29)
+
+## 12.23.0 (2023-11-16)
+
+## 12.22.0 (2023-11-02)
+
+## 12.21.0 (2023-10-18)
+
+## 12.20.0 (2023-10-05)
+
+## 12.19.0 (2023-09-20)
+
+## 12.18.0 (2023-08-31)
+
+## 12.17.0 (2023-08-16)
+
+## 12.16.0 (2023-08-10)
+
+## 12.15.0 (2023-07-20)
+
+## 12.14.0 (2023-07-05)
+
+## 12.13.0 (2023-06-23)
+
+## 12.12.0 (2023-06-07)
+
+## 12.11.0 (2023-05-24)
+
+## 12.10.0 (2023-05-10)
+
+## 12.9.0 (2023-04-26)
+
+## 12.8.0 (2023-04-12)
+
+## 12.7.0 (2023-03-29)
+
+## 12.6.0 (2023-03-15)
+
+## 12.5.0 (2023-03-01)
+
+## 12.4.0 (2023-02-15)
+
+## 12.3.0 (2023-02-01)
+
+## 12.2.0 (2023-01-11)
+
+## 12.1.0 (2023-01-02)
+
+## 12.0.0 (2022-12-14)
+
+### Breaking Changes
+
+-   Updated dependencies to require React 18 ([45235](https://github.com/WordPress/gutenberg/pull/45235))
+
+## 11.21.0 (2022-11-16)
+
+## 11.20.0 (2022-11-02)
+
+## 11.19.0 (2022-10-19)
+
+## 11.18.0 (2022-10-05)
+
+### Deprecations
+
+-   Deprecate non-string descriptions ([#44455](https://github.com/WordPress/gutenberg/pull/44455)).
+
+## 11.17.0 (2022-09-21)
+
+-   The block attribute sources `children` and `node` have been deprecated. Please use the `html` source instead. See https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields/ and the core blocks for examples.
+
+## 11.16.0 (2022-09-13)
+
+## 11.15.0 (2022-08-24)
+
+### Bug Fix
+
+-   Packages: Replace `is-plain-obj` with `is-plain-object` ([#43511](https://github.com/WordPress/gutenberg/pull/43511)).
+
+## 11.14.0 (2022-08-10)
+
 ## 11.13.0 (2022-07-27)
 
 ## 11.12.0 (2022-07-13)
 
 ### Deprecations
 
--   `withBlockContentContext` is no longer used by the block editor and therefore got deprecated ([#41395](https://github.com/WordPress/gutenberg/pull/3204139530)).
+-   `withBlockContentContext` is no longer used by the block editor and therefore got deprecated ([#41395](https://github.com/WordPress/gutenberg/pull/41395)).
 
 ### New API
 

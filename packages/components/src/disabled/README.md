@@ -7,8 +7,8 @@ Disabled is a component which disables descendant tabbable elements and prevents
 Assuming you have a form component, you can disable all form inputs by wrapping the form with `<Disabled>`.
 
 ```jsx
+import { useState } from 'react';
 import { Button, Disabled, TextControl } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const MyDisabled = () => {
 	const [ isDisabled, setIsDisabled ] = useState( true );
@@ -46,6 +46,8 @@ function CustomButton( props ) {
 	);
 }
 ```
+
+_Note: this component may not behave as expected in browsers that don't support [the `inert` HTML attribute](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/inert). We recommend adding [the official WICG polyfill](https://github.com/WICG/inert) when using this component in your project._
 
 ### Props
 

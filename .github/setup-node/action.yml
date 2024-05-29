@@ -1,0 +1,54 @@
+name: 'Setup Node.js and install npm dependencies'
+description: 'Configure Node.js and install npm dependencies while managing all aspects of caching.'
+inputs:
+    node-version:
+        description: 'Optional. The Node.js version to use. When not specified, the version specified in .nvmrc will be used.'
+        required: false
+        type: string
+
+runs:
+    using: 'composite'
+    steps:
+        - name: Use desired version of Node.js
+          uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
+          with:
+              node-version-file: '.nvmrc'
+              node-version: ${{ inputs.node-version }}
+              check-latest: true
+              cache: npm
+
+        - name: Get Node.js and npm version
+          id: node-version
+          run: |
+              echo "NODE_VERSION=$(node -v)" >> $GITHUB_OUTPUT
+          shell: bash
+
+        - name: Cache node_modules
+          id: cache-node_modules
+          uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
+          with:
+              path: '**/node_modules'
+              key: node_modules-${{ runner.os }}-${{ runner.arch }}-${{ steps.node-version.outputs.NODE_VERSION }}-${{ hashFiles('package-lock.json') }}
+
+        - name: Install npm dependencies
+          if: ${{ steps.cache-node_modules.outputs.cache-hit != 'true' }}
+          run: |
+              npm ci
+          shell: bash
+        - name: Upload npm logs as an artifact on failure
+          uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
+          if: failure()
+          with:
+              name: npm-logs
+              path: C:\npm\cache\_logs
+
+        # On cache hit, we run the post-install script to match the native `npm ci` behavior.
+        # An example of this is to patch `node_modules` using patch-package.
+        - name: Post-install
+          if: ${{ steps.cache-node_modules.outputs.cache-hit == 'true' }}
+          run: |
+              # Run the post-install script for the root project.
+              npm run postinstall
+              # Run the post-install scripts for workspaces.
+              npx lerna run postinstall
+          shell: bash

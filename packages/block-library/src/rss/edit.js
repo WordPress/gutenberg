@@ -12,13 +12,13 @@ import {
 	PanelBody,
 	Placeholder,
 	RangeControl,
-	TextControl,
 	ToggleControl,
 	ToolbarGroup,
+	__experimentalInputControl as InputControl,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { grid, list, edit, rss } from '@wordpress/icons';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { prependHTTP } from '@wordpress/url';
 import ServerSideRender from '@wordpress/server-side-render';
 
@@ -58,15 +58,26 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 
 	const blockProps = useBlockProps();
 
+	const label = __( 'RSS URL' );
+
 	if ( isEditing ) {
 		return (
 			<div { ...blockProps }>
-				<Placeholder icon={ rss } label="RSS">
+				<Placeholder
+					icon={ rss }
+					label={ label }
+					instructions={ __(
+						'Display entries from any RSS or Atom feed.'
+					) }
+				>
 					<form
 						onSubmit={ onSubmitURL }
 						className="wp-block-rss__placeholder-form"
 					>
-						<TextControl
+						<InputControl
+							__next40pxDefaultSize
+							label={ label }
+							hideLabelFromVision
 							placeholder={ __( 'Enter URL here…' ) }
 							value={ feedURL }
 							onChange={ ( value ) =>
@@ -74,8 +85,12 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 							}
 							className="wp-block-rss__placeholder-input"
 						/>
-						<Button variant="primary" type="submit">
-							{ __( 'Use URL' ) }
+						<Button
+							__next40pxDefaultSize
+							variant="primary"
+							type="submit"
+						>
+							{ __( 'Apply' ) }
 						</Button>
 					</form>
 				</Placeholder>
@@ -91,13 +106,13 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 		},
 		{
 			icon: list,
-			title: __( 'List view' ),
+			title: _x( 'List view', 'RSS block display setting' ),
 			onClick: () => setAttributes( { blockLayout: 'list' } ),
 			isActive: blockLayout === 'list',
 		},
 		{
 			icon: grid,
-			title: __( 'Grid view' ),
+			title: _x( 'Grid view', 'RSS block display setting' ),
 			onClick: () => setAttributes( { blockLayout: 'grid' } ),
 			isActive: blockLayout === 'grid',
 		},
@@ -111,6 +126,8 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<RangeControl
+						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						label={ __( 'Number of items' ) }
 						value={ itemsToShow }
 						onChange={ ( value ) =>
@@ -121,22 +138,27 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 						required
 					/>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Display author' ) }
 						checked={ displayAuthor }
 						onChange={ toggleAttribute( 'displayAuthor' ) }
 					/>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Display date' ) }
 						checked={ displayDate }
 						onChange={ toggleAttribute( 'displayDate' ) }
 					/>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Display excerpt' ) }
 						checked={ displayExcerpt }
 						onChange={ toggleAttribute( 'displayExcerpt' ) }
 					/>
 					{ displayExcerpt && (
 						<RangeControl
+							__nextHasNoMarginBottom
+							__next40pxDefaultSize
 							label={ __( 'Max number of words in excerpt' ) }
 							value={ excerptLength }
 							onChange={ ( value ) =>
@@ -149,6 +171,8 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 					) }
 					{ blockLayout === 'grid' && (
 						<RangeControl
+							__nextHasNoMarginBottom
+							__next40pxDefaultSize
 							label={ __( 'Columns' ) }
 							value={ columns }
 							onChange={ ( value ) =>

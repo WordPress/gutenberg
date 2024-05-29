@@ -4,7 +4,7 @@ A `FormTokenField` is a field similar to the tags and categories fields in the i
 
 Up to one hundred suggestions that match what the user has typed so far will be shown from which the user can pick from (auto-complete). Tokens are separated by the "," character. Suggestions can be selected with the up or down arrows and added with the tab or enter key.
 
-The `value` property is handled in a manner similar to controlled form components. See [Forms](http://facebook.github.io/react/docs/forms.html) in the React Documentation for more information.
+The `value` property is handled in a manner similar to controlled form components. See [Forms](https://react.dev/reference/react-dom/components#form-components) in the React Documentation for more information.
 
 ## Keyboard Accessibility
 
@@ -56,15 +56,19 @@ The `value` property is handled in a manner similar to controlled form component
     -   `removed` - The user removed an existing token.
     -   `remove` - The user focused the button to remove the token.
     -   `__experimentalInvalid` - The user tried to add a token that didn't pass the validation.
+-   `__experimentalRenderItem` - Custom renderer invoked for each option in the suggestion list. The render prop receives as its argument an object containing, under the `item` key, the single option's data (directly from the array of data passed to the `options` prop).
 -   `__experimentalExpandOnFocus` - If true, the suggestions list will be always expanded when the input field has the focus.
 -   `__experimentalShowHowTo` - If false, the text on how to use the select (ie: _Separate with commas or the Enter key._) will be hidden.
 -   `__experimentalValidateInput` - If passed, all introduced values will be validated before being added as tokens.
+-   `__experimentalAutoSelectFirstMatch` - If true, the select the first matching suggestion when the user presses the Enter key (or space when tokenizeOnSpace is true).
+-   `__nextHasNoMarginBottom` - Start opting into the new margin-free styles that will become the default in a future version, currently scheduled to be WordPress 6.5. (The prop can be safely removed once this happens.)
+-   `tokenizeOnBlur` - If true, add any incompleteTokenValue as a new token when the field loses focus.
 
 ## Usage
 
 ```jsx
+import { useState } from 'react';
 import { FormTokenField } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const continents = [
 	'Africa',
@@ -78,7 +82,7 @@ const continents = [
 const MyFormTokenField = () => {
 	const [ selectedContinents, setSelectedContinents ] = useState( [] );
 
-	return(
+	return (
 		<FormTokenField
 			value={ selectedContinents }
 			suggestions={ continents }

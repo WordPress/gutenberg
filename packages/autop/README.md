@@ -20,9 +20,7 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 Replaces double line-breaks with paragraph elements.
 
-A group of regex replaces used to identify text formatted with newlines and
-replace double line-breaks with HTML paragraph tags. The remaining line-
-breaks after conversion become `<br />` tags, unless br is set to 'false'.
+A group of regex replaces used to identify text formatted with newlines and replace double line-breaks with HTML paragraph tags. The remaining linebreaks after conversion become `<br />` tags, unless br is set to 'false'.
 
 _Usage_
 
@@ -44,8 +42,7 @@ _Returns_
 
 Replaces `<p>` tags with two line breaks. "Opposite" of autop().
 
-Replaces `<p>` tags with two line breaks except where the `<p>` has attributes.
-Unifies whitespace. Indents `<li>`, `<dt>` and `<dd>` for better readability.
+Replaces `<p>` tags with two line breaks except where the `<p>` has attributes. Unifies whitespace. Indents `<li>`, `<dt>` and `<dd>` for better readability.
 
 _Usage_
 

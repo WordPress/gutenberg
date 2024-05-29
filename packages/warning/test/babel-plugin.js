@@ -12,88 +12,92 @@ function join( ...strings ) {
 	return strings.join( '\n' );
 }
 
-function compare( input, output, options = {} ) {
+function transformCode( input, options = {} ) {
 	const { code } = transform( input, {
 		configFile: false,
 		plugins: [ [ babelPlugin, options ] ],
 	} );
-	expect( code ).toEqual( output );
+	return code;
 }
 
 describe( 'babel-plugin', () => {
 	it( 'should replace warning calls with import declaration', () => {
-		compare(
-			join(
-				'import warning from "@wordpress/warning";',
-				'warning("a");'
-			),
-			join(
-				'import warning from "@wordpress/warning";',
-				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warning("a") : void 0;'
-			)
+		const input = join(
+			'import warning from "@wordpress/warning";',
+			'warning("a");'
 		);
+		const expected = join(
+			'import warning from "@wordpress/warning";',
+			'globalThis.SCRIPT_DEBUG === true ? warning("a") : void 0;'
+		);
+
+		expect( transformCode( input ) ).toEqual( expected );
 	} );
 
 	it( 'should not replace warning calls without import declaration', () => {
-		compare( 'warning("a");', 'warning("a");' );
+		const input = 'warning("a");';
+		const expected = 'warning("a");';
+
+		expect( transformCode( input ) ).toEqual( expected );
 	} );
 
 	it( 'should replace warning calls without import declaration with plugin options', () => {
-		compare(
-			'warning("a");',
-			'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warning("a") : void 0;',
-			{ callee: 'warning' }
-		);
+		const input = 'warning("a");';
+		const options = { callee: 'warning' };
+		const expected =
+			'globalThis.SCRIPT_DEBUG === true ? warning("a") : void 0;';
+
+		expect( transformCode( input, options ) ).toEqual( expected );
 	} );
 
 	it( 'should replace multiple warning calls', () => {
-		compare(
-			join(
-				'import warning from "@wordpress/warning";',
-				'warning("a");',
-				'warning("b");',
-				'warning("c");'
-			),
-			join(
-				'import warning from "@wordpress/warning";',
-				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warning("a") : void 0;',
-				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warning("b") : void 0;',
-				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warning("c") : void 0;'
-			)
+		const input = join(
+			'import warning from "@wordpress/warning";',
+			'warning("a");',
+			'warning("b");',
+			'warning("c");'
 		);
+		const expected = join(
+			'import warning from "@wordpress/warning";',
+			'globalThis.SCRIPT_DEBUG === true ? warning("a") : void 0;',
+			'globalThis.SCRIPT_DEBUG === true ? warning("b") : void 0;',
+			'globalThis.SCRIPT_DEBUG === true ? warning("c") : void 0;'
+		);
+
+		expect( transformCode( input ) ).toEqual( expected );
 	} );
 
 	it( 'should identify warning callee name', () => {
-		compare(
-			join(
-				'import warn from "@wordpress/warning";',
-				'warn("a");',
-				'warn("b");',
-				'warn("c");'
-			),
-			join(
-				'import warn from "@wordpress/warning";',
-				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warn("a") : void 0;',
-				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warn("b") : void 0;',
-				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warn("c") : void 0;'
-			)
+		const input = join(
+			'import warn from "@wordpress/warning";',
+			'warn("a");',
+			'warn("b");',
+			'warn("c");'
 		);
+		const expected = join(
+			'import warn from "@wordpress/warning";',
+			'globalThis.SCRIPT_DEBUG === true ? warn("a") : void 0;',
+			'globalThis.SCRIPT_DEBUG === true ? warn("b") : void 0;',
+			'globalThis.SCRIPT_DEBUG === true ? warn("c") : void 0;'
+		);
+
+		expect( transformCode( input ) ).toEqual( expected );
 	} );
 
 	it( 'should identify warning callee name by', () => {
-		compare(
-			join(
-				'import warn from "@wordpress/warning";',
-				'warn("a");',
-				'warn("b");',
-				'warn("c");'
-			),
-			join(
-				'import warn from "@wordpress/warning";',
-				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warn("a") : void 0;',
-				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warn("b") : void 0;',
-				'typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production" ? warn("c") : void 0;'
-			)
+		const input = join(
+			'import warn from "@wordpress/warning";',
+			'warn("a");',
+			'warn("b");',
+			'warn("c");'
 		);
+		const expected = join(
+			'import warn from "@wordpress/warning";',
+			'globalThis.SCRIPT_DEBUG === true ? warn("a") : void 0;',
+			'globalThis.SCRIPT_DEBUG === true ? warn("b") : void 0;',
+			'globalThis.SCRIPT_DEBUG === true ? warn("c") : void 0;'
+		);
+
+		expect( transformCode( input ) ).toEqual( expected );
 	} );
 } );

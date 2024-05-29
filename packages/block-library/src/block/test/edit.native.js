@@ -5,8 +5,9 @@ import {
 	getEditorHtml,
 	initializeEditor,
 	fireEvent,
-	waitFor,
 	within,
+	setupApiFetch,
+	triggerBlockListLayout,
 } from 'test/helpers';
 
 /**
@@ -24,7 +25,7 @@ const getMockedReusableBlock = ( id ) => ( {
 	content: {
 		raw: `
     <!-- wp:heading -->
-    <h2>First Reusable block</h2>
+    <h2 class="wp-block-heading">First Reusable block</h2>
     <!-- /wp:heading -->
 
     <!-- wp:paragraph -->
@@ -43,6 +44,8 @@ const getMockedReusableBlock = ( id ) => ( {
 	id,
 	title: { raw: `Reusable block - ${ id }` },
 	type: 'wp_block',
+	meta: { footnotes: '' },
+	wp_pattern_category: [],
 } );
 
 beforeAll( () => {
@@ -57,8 +60,8 @@ afterAll( () => {
 	} );
 } );
 
-describe( 'Reusable block', () => {
-	it( 'inserts a reusable block', async () => {
+describe( 'Synced patterns', () => {
+	it( 'inserts a synced pattern', async () => {
 		// We have to use different ids because entities are cached in memory.
 		const reusableBlockMock1 = getMockedReusableBlock( 1 );
 		const reusableBlockMock2 = getMockedReusableBlock( 2 );
@@ -70,21 +73,24 @@ describe( 'Reusable block', () => {
 				response = [ reusableBlockMock1, reusableBlockMock2 ];
 			} else if ( path.startsWith( '/wp/v2/blocks/1' ) ) {
 				response = reusableBlockMock1;
+			} else if (
+				path.startsWith( '/wp/v2/block-patterns/categories' )
+			) {
+				response = [];
 			}
 			return Promise.resolve( response );
 		} );
 
-		const { getByA11yLabel, getByTestId, getByText } =
-			await initializeEditor( {
-				initialHtml: '',
-				capabilities: { reusableBlock: true },
-			} );
+		const screen = await initializeEditor( {
+			initialHtml: '',
+			capabilities: { reusableBlock: true },
+		} );
 
 		// Open the inserter menu.
-		fireEvent.press( await waitFor( () => getByA11yLabel( 'Add block' ) ) );
+		fireEvent.press( await screen.findByLabelText( 'Add block' ) );
 
 		// Navigate to reusable tab.
-		const reusableSegment = await waitFor( () => getByText( 'Reusable' ) );
+		const reusableSegment = await screen.findByText( 'Synced patterns' );
 		// onLayout event is required by Segment component.
 		fireEvent( reusableSegment, 'layout', {
 			nativeEvent: {
@@ -95,7 +101,9 @@ describe( 'Reusable block', () => {
 		} );
 		fireEvent.press( reusableSegment );
 
-		const reusableBlockList = getByTestId( 'InserterUI-ReusableBlocks' );
+		const reusableBlockList = screen.getByTestId(
+			'InserterUI-SyncedPatterns'
+		);
 		// onScroll event used to force the FlatList to render all items.
 		fireEvent.scroll( reusableBlockList, {
 			nativeEvent: {
@@ -106,13 +114,11 @@ describe( 'Reusable block', () => {
 		} );
 
 		// Insert a reusable block.
-		fireEvent.press(
-			await waitFor( () => getByText( `Reusable block - 1` ) )
-		);
+		fireEvent.press( await screen.findByText( `Reusable block - 1` ) );
 
 		// Get the reusable block.
-		const reusableBlock = await waitFor( () =>
-			getByA11yLabel( /Reusable block Block\. Row 1/ )
+		const [ reusableBlock ] = await screen.findAllByLabelText(
+			/Pattern Block\. Row 1/
 		);
 
 		expect( reusableBlock ).toBeDefined();
@@ -124,27 +130,23 @@ describe( 'Reusable block', () => {
 		const id = 3;
 		const initialHtml = `<!-- wp:block {"ref":${ id }} /-->`;
 
-		const { getByA11yLabel } = await initializeEditor( {
+		const screen = await initializeEditor( {
 			initialHtml,
 		} );
 
-		const reusableBlock = await waitFor( () =>
-			getByA11yLabel( /Reusable block Block\. Row 1/ )
+		const [ reusableBlock ] = await screen.findAllByLabelText(
+			/Pattern Block\. Row 1/
 		);
 
-		const blockDeleted = await waitFor( () =>
-			within( reusableBlock ).getByText(
-				'Block has been deleted or is unavailable.'
-			)
+		const blockDeleted = within( reusableBlock ).getByText(
+			'Block has been deleted or is unavailable.'
 		);
 
 		expect( reusableBlock ).toBeDefined();
 		expect( blockDeleted ).toBeDefined();
 	} );
 
-	// Skipped until `pointerEvents: 'none'` no longer erroneously prevents
-	// triggering `onLayout*` on the element: https://github.com/callstack/react-native-testing-library/issues/897.
-	it.skip( 'renders block content', async () => {
+	it( 'renders block content', async () => {
 		// We have to use different ids because entities are cached in memory.
 		const id = 4;
 		const initialHtml = `<!-- wp:block {"ref":${ id }} /-->`;
@@ -159,17 +161,16 @@ describe( 'Reusable block', () => {
 			return Promise.resolve( response );
 		} );
 
-		const { getByA11yLabel } = await initializeEditor( {
+		const screen = await initializeEditor( {
 			initialHtml,
 		} );
 
-		const reusableBlock = await waitFor( () =>
-			getByA11yLabel( /Reusable block Block\. Row 1/ )
+		const reusableBlock = await screen.findByLabelText(
+			/Pattern Block\. Row 1/
 		);
 
-		const innerBlockListWrapper = await waitFor( () =>
-			within( reusableBlock ).getByTestId( 'block-list-wrapper' )
-		);
+		const innerBlockListWrapper =
+			await within( reusableBlock ).findByTestId( 'block-list-wrapper' );
 
 		// onLayout event has to be explicitly dispatched in BlockList component,
 		// otherwise the inner blocks are not rendered.
@@ -181,13 +182,77 @@ describe( 'Reusable block', () => {
 			},
 		} );
 
-		const headingInnerBlock = await waitFor( () =>
-			within( reusableBlock ).getByA11yLabel(
-				'Heading Block. Row 1. Level 2. First Reusable block'
-			)
+		const [ headingInnerBlock ] = await within(
+			reusableBlock
+		).findAllByLabelText(
+			'Heading Block. Row 1. Level 2. First Reusable block'
 		);
 
 		expect( reusableBlock ).toBeDefined();
 		expect( headingInnerBlock ).toBeDefined();
+	} );
+
+	it( 'renders block after content is updated due to a side effect', async () => {
+		// We have to use different ids because entities are cached in memory.
+		const id = 5;
+		const initialHtml = `<!-- wp:block {"ref":${ id }} /-->`;
+		const endpoint = `/wp/v2/blocks/${ id }`;
+		const fetchMedia = {
+			request: {
+				path: `/wp/v2/media/1?context=edit`,
+			},
+			response: {
+				source_url: 'https://cldup.com/cXyG__fTLN.jpg',
+				id: 1,
+				// We need to include the sizes to trigger the side effect.
+				media_details: {
+					sizes: {
+						large: {
+							source_url:
+								'https://cldup.com/cXyG__fTLN.jpg?w=500',
+						},
+					},
+				},
+			},
+		};
+
+		// Return mocked response for the block endpoint.
+		fetchRequest.mockImplementation( ( { path } ) => {
+			let response = {};
+			if ( path.startsWith( endpoint ) ) {
+				response = getMockedReusableBlock( id );
+			}
+			// Replace content with an Image block to trigger a side effect.
+			// The side effect will be produced when the `source` attribute is replaced
+			// with an URL that includes the width query parameter:
+			// https://cldup.com/cXyG__fTLN.jpg => https://cldup.com/cXyG__fTLN.jpg?w=500
+			response.content.raw = `<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"none"} -->
+<figure class="wp-block-image size-large"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/></figure>
+<!-- /wp:image -->`;
+			return Promise.resolve( response );
+		} );
+
+		const screen = await initializeEditor( {
+			initialHtml,
+		} );
+
+		const reusableBlock = await screen.findByLabelText(
+			/Pattern Block\. Row 1/
+		);
+
+		// Mock media fetch requests
+		setupApiFetch( [ fetchMedia ] );
+
+		await triggerBlockListLayout(
+			within( reusableBlock ).getByTestId( 'block-list-wrapper' )
+		);
+
+		const imageBlock =
+			await within( reusableBlock ).getByLabelText(
+				'Image Block. Row 1'
+			);
+
+		expect( reusableBlock ).toBeDefined();
+		expect( imageBlock ).toBeDefined();
 	} );
 } );

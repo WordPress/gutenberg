@@ -7,6 +7,7 @@ import { group as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import edit from './edit';
 import metadata from './block.json';
@@ -21,14 +22,6 @@ export { metadata, name };
 export const settings = {
 	icon,
 	example: {
-		attributes: {
-			style: {
-				color: {
-					text: '#000000',
-					background: '#ffffff',
-				},
-			},
-		},
 		innerBlocks: [
 			{
 				name: 'core/paragraph',
@@ -86,3 +79,5 @@ export const settings = {
 	deprecated,
 	variations,
 };
+
+export const init = () => initBlock( { name, metadata, settings } );

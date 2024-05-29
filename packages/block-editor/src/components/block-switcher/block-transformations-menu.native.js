@@ -75,11 +75,12 @@ const BlockTransformationsMenu = ( {
 
 	return (
 		<Picker
+			testID="block-transformations-menu"
 			ref={ pickerRef }
 			options={ pickerOptions() }
 			onChange={ onPickerSelect }
 			hideCancelButton={ Platform.OS !== 'ios' }
-			leftAlign={ true }
+			leftAlign
 			getAnchor={ getAnchor }
 			// translators: %s: block title e.g: "Paragraph".
 			title={ sprintf( __( 'Transform %s to' ), blockTitle ) }

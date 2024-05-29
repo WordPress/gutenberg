@@ -6,7 +6,7 @@ import { applyFilters } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import '../custom-class-name';
+import customClassName from '../custom-class-name';
 
 describe( 'custom className', () => {
 	const blockSettings = {
@@ -40,14 +40,9 @@ describe( 'custom className', () => {
 	} );
 
 	describe( 'addSaveProps', () => {
-		const addSaveProps = applyFilters.bind(
-			null,
-			'blocks.getSaveContent.extraProps'
-		);
-
 		it( 'should do nothing if the block settings do not define custom className support', () => {
 			const attributes = { className: 'foo' };
-			const extraProps = addSaveProps(
+			const extraProps = customClassName.addSaveProps(
 				{},
 				{
 					...blockSettings,
@@ -63,7 +58,7 @@ describe( 'custom className', () => {
 
 		it( 'should inject the custom className', () => {
 			const attributes = { className: 'bar' };
-			const extraProps = addSaveProps(
+			const extraProps = customClassName.addSaveProps(
 				{ className: 'foo' },
 				blockSettings,
 				attributes

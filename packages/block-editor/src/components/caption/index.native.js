@@ -44,7 +44,6 @@ const Caption = ( {
 			onChange={ onChange }
 			placeholder={ placeholder }
 			placeholderTextColor={ placeholderTextColor }
-			rootTagsToEliminate={ [ 'p' ] }
 			style={ style }
 			tagName="p"
 			textAlign="center"
@@ -54,7 +53,7 @@ const Caption = ( {
 			__unstableOnSplitAtEnd={ () =>
 				insertBlocksAfter( createBlock( 'core/paragraph' ) )
 			}
-			deleteEnter={ true }
+			deleteEnter
 		/>
 	</View>
 );

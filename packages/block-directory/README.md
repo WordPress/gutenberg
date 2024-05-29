@@ -30,8 +30,7 @@ The following set of dispatching action creators are available on the object ret
 
 ### addInstalledBlockType
 
-Returns an action object used to add a block type to the "newly installed"
-tracking list.
+Returns an action object used to add a block type to the "newly installed" tracking list.
 
 _Parameters_
 
@@ -55,8 +54,7 @@ _Returns_
 
 ### fetchDownloadableBlocks
 
-Returns an action object used in signalling that the downloadable blocks
-have been requested and are loading.
+Returns an action object used in signalling that the downloadable blocks have been requested and are loading.
 
 _Parameters_
 
@@ -80,8 +78,7 @@ _Returns_
 
 ### receiveDownloadableBlocks
 
-Returns an action object used in signalling that the downloadable blocks
-have been updated.
+Returns an action object used in signalling that the downloadable blocks have been updated.
 
 _Parameters_
 
@@ -94,8 +91,7 @@ _Returns_
 
 ### removeInstalledBlockType
 
-Returns an action object used to remove a block type from the "newly installed"
-tracking list.
+Returns an action object used to remove a block type from the "newly installed" tracking list.
 
 _Parameters_
 
@@ -188,8 +184,7 @@ _Returns_
 
 ### getInstalledBlockTypes
 
-Returns the block types that have been installed on the server in this
-session.
+Returns the block types that have been installed on the server in this session.
 
 _Parameters_
 
@@ -201,8 +196,7 @@ _Returns_
 
 ### getNewBlockTypes
 
-Returns block types that have been installed on the server and used in the
-current post.
+Returns block types that have been installed on the server and used in the current post.
 
 _Parameters_
 
@@ -214,8 +208,7 @@ _Returns_
 
 ### getUnusedBlockTypes
 
-Returns the block types that have been installed on the server but are not
-used in the current post.
+Returns the block types that have been installed on the server but are not used in the current post.
 
 _Parameters_
 

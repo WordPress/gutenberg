@@ -1,21 +1,51 @@
 project 'GutenbergDemo.xcodeproj'
 
-require_relative '../../../node_modules/react-native/scripts/react_native_pods'
-require_relative '../../../node_modules/@react-native-community/cli-platform-ios/native_modules'
+# Resolve react_native_pods.rb with node to allow for hoisting
+require Pod::Executable.execute_command('node', ['-p',
+  'require.resolve(
+    "react-native/scripts/react_native_pods.rb",
+    {paths: [process.argv[1]]},
+  )', __dir__]).strip
 
 # Uncomment the next line to define a global platform for your project
-app_ios_deployment_target = Gem::Version.new('13.0')
+app_ios_deployment_target = Gem::Version.new('13.4')
 platform :ios, app_ios_deployment_target.version
+install! 'cocoapods', min_ios_version_supported
+prepare_react_native_project!
+
+# If you are using a `react-native-flipper` your iOS build will fail when `NO_FLIPPER=1` is set.
+# because `react-native-flipper` depends on (FlipperKit,...) that will be excluded
+#
+# To fix this you can also exclude `react-native-flipper` using a `react-native.config.js`
+# ```js
+# module.exports = {
+#   dependencies: {
+#     ...(process.env.NO_FLIPPER ? { 'react-native-flipper': { platforms: { ios: null } } } : {}),
+# ```
+flipper_config = ENV['NO_FLIPPER'] == "1" ? FlipperConfiguration.disabled : FlipperConfiguration.enabled
+
+linkage = ENV['USE_FRAMEWORKS']
+if linkage != nil
+  Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
+  use_frameworks! :linkage => linkage.to_sym
+end
 
 target 'GutenbergDemo' do
   # Comment the next line if you don't want to use dynamic frameworks
-  use_frameworks!
+  use_frameworks! linkage: :static
 
   config = use_native_modules!
+
   use_react_native!(
     :path => config[:reactNativePath],
-    # to enable hermes on iOS, change `false` to `true` and then install pods
-    :hermes_enabled => false
+    :fabric_enabled => false,
+    # Enables Flipper.
+    #
+    # Note that if you have use_frameworks! enabled, Flipper will not work and
+    # you should disable the next line.
+    # :flipper_configuration => flipper_config,
+    # An absolute path to the application root
+    :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
   target 'GutenbergDemoTests' do
@@ -24,8 +54,12 @@ target 'GutenbergDemo' do
   end
 
   post_install do |installer|
-    react_native_post_install(installer)
-    __apply_Xcode_12_5_M1_post_install_workaround(installer)
+    # https://github.com/facebook/react-native/blob/main/packages/react-native/scripts/react_native_pods.rb#L197-L202
+    react_native_post_install(
+      installer,
+      config[:reactNativePath],
+      :mac_catalyst_enabled => false
+    )
 
     # Let Pods targets inherit deployment target from the app
     # This solution is suggested here: https://github.com/CocoaPods/CocoaPods/issues/4859
@@ -58,6 +92,16 @@ target 'GutenbergDemo' do
         end
       end
     end
+    ### End workaround for https://github.com/facebook/react-native/issues/31034
+
+    ### Begin workaround: https://github.com/CocoaPods/CocoaPods/issues/8891#issuecomment-1201465446
+    installer.pods_project.targets.each do |target|
+    	if target.respond_to?(:product_type) and target.product_type == "com.apple.product-type.bundle"
+        target.build_configurations.each do |config|
+            config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
+        end
+    	end
+    end
+    ### End workaround: https://github.com/CocoaPods/CocoaPods/issues/8891#issuecomment-1201465446
   end
-  ### End workaround for https://github.com/facebook/react-native/issues/31034
 end

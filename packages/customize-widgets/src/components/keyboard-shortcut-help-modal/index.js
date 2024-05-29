@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -49,7 +49,7 @@ const ShortcutList = ( { shortcuts } ) => (
 
 const ShortcutSection = ( { title, shortcuts, className } ) => (
 	<section
-		className={ classnames(
+		className={ clsx(
 			'customize-widgets-keyboard-shortcut-help-modal__section',
 			className
 		) }
@@ -110,7 +110,6 @@ export default function KeyboardShortcutHelpModal( {
 		<Modal
 			className="customize-widgets-keyboard-shortcut-help-modal"
 			title={ __( 'Keyboard shortcuts' ) }
-			closeLabel={ __( 'Close' ) }
 			onRequestClose={ toggleModal }
 		>
 			<ShortcutSection

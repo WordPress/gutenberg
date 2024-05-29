@@ -1,111 +1,147 @@
 /**
  * External dependencies
  */
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { FlatList } from 'react-native';
-import { isEqual } from 'lodash';
-import Animated, {
-	useAnimatedScrollHandler,
-	useSharedValue,
-} from 'react-native-reanimated';
+import { FlatList, View } from 'react-native';
+import Animated from 'react-native-reanimated';
 
 /**
  * WordPress dependencies
  */
-import { memo, useCallback, useRef } from '@wordpress/element';
+import {
+	useCallback,
+	useEffect,
+	forwardRef,
+	useImperativeHandle,
+} from '@wordpress/element';
+import { useThrottle } from '@wordpress/compose';
 
-const List = memo( FlatList, isEqual );
-const AnimatedKeyboardAwareScrollView = Animated.createAnimatedComponent(
-	KeyboardAwareScrollView
-);
+/**
+ * Internal dependencies
+ */
+import useScroll from './use-scroll';
+import useTextInputOffset from './use-text-input-offset';
+import useTextInputCaretPosition from './use-text-input-caret-position';
+import { OPTIMIZATION_ITEMS_THRESHOLD, OPTIMIZATION_PROPS } from './shared';
+import styles from './styles.scss';
 
-export const KeyboardAwareFlatList = ( {
-	extraScrollHeight,
-	shouldPreventAutomaticScroll,
-	innerRef,
-	autoScroll,
-	scrollViewStyle,
-	inputAccessoryViewHeight,
-	onScroll,
-	...listProps
-} ) => {
-	const scrollViewRef = useRef();
-	const keyboardWillShowIndicator = useRef();
+const DEFAULT_FONT_SIZE = 16;
+const AnimatedFlatList = Animated.createAnimatedComponent( FlatList );
+const EMPTY_OBJECT = {};
 
-	const latestContentOffsetY = useSharedValue( -1 );
-
-	const scrollHandler = useAnimatedScrollHandler( {
-		onScroll: ( event ) => {
-			const { contentOffset } = event;
-			latestContentOffsetY.value = contentOffset.y;
-			onScroll( event );
-		},
+/** @typedef {import('@wordpress/element').RefObject} RefObject */
+/**
+ * React component that provides a FlatList that is aware of the keyboard state and can scroll
+ * to the currently focused TextInput.
+ *
+ * @param {Object}    props                              Component props.
+ * @param {number}    props.extraScrollHeight            Extra scroll height for the content.
+ * @param {Function}  props.onScroll                     Function to be called when the list is scrolled.
+ * @param {boolean}   props.scrollEnabled                Whether the list can be scrolled.
+ * @param {boolean}   props.shouldPreventAutomaticScroll Whether to prevent scrolling when there's a Keyboard offset set.
+ * @param {Object}    props...                           Other props to pass to the FlatList component.
+ * @param {RefObject} ref
+ * @return {Component} KeyboardAwareFlatList component.
+ */
+export const KeyboardAwareFlatList = (
+	{
+		extraScrollHeight,
+		onScroll,
+		scrollEnabled,
+		shouldPreventAutomaticScroll,
+		...props
+	},
+	ref
+) => {
+	const {
+		scrollViewRef,
+		scrollHandler,
+		keyboardOffset,
+		scrollToSection,
+		scrollToElement,
+		onContentSizeChange,
+		lastScrollTo,
+	} = useScroll( {
+		scrollEnabled,
+		shouldPreventAutomaticScroll,
+		extraScrollHeight,
+		onScroll,
+		onSizeChange,
 	} );
 
-	const getRef = useCallback(
-		( ref ) => {
-			scrollViewRef.current = ref;
-			innerRef( ref );
-		},
-		[ innerRef ]
+	const [ getTextInputOffset ] = useTextInputOffset(
+		scrollEnabled,
+		scrollViewRef
 	);
-	const onKeyboardWillHide = useCallback( () => {
-		keyboardWillShowIndicator.current = false;
-	}, [] );
-	const onKeyboardDidHide = useCallback( () => {
-		setTimeout( () => {
-			if (
-				! keyboardWillShowIndicator.current &&
-				latestContentOffsetY.value !== -1 &&
-				! shouldPreventAutomaticScroll()
-			) {
-				// Reset the content position if keyboard is still closed.
-				scrollViewRef.current?.scrollToPosition(
-					0,
-					latestContentOffsetY.value,
-					true
-				);
-			}
-		}, 50 );
-	}, [ latestContentOffsetY, shouldPreventAutomaticScroll ] );
-	const onKeyboardWillShow = useCallback( () => {
-		keyboardWillShowIndicator.current = true;
-	}, [] );
+
+	const onScrollToTextInput = useThrottle(
+		useCallback(
+			async ( caret ) => {
+				const { caretHeight = DEFAULT_FONT_SIZE } = caret ?? {};
+				const textInputOffset = await getTextInputOffset( caret );
+				const hasTextInputOffset = textInputOffset !== null;
+
+				if ( hasTextInputOffset ) {
+					scrollToSection( textInputOffset, caretHeight );
+				}
+			},
+			[ getTextInputOffset, scrollToSection ]
+		),
+		200,
+		{ leading: false }
+	);
+
+	const [ currentCaretData ] = useTextInputCaretPosition( scrollEnabled );
+
+	const onSizeChange = useCallback(
+		() => onScrollToTextInput( currentCaretData ),
+		[ currentCaretData, onScrollToTextInput ]
+	);
+
+	useEffect( () => {
+		onScrollToTextInput( currentCaretData );
+	}, [ currentCaretData, onScrollToTextInput ] );
+
+	// Adds content insets when the keyboard is opened to have
+	// extra padding at the bottom.
+	const contentInset = { bottom: keyboardOffset };
+
+	const getFlatListRef = useCallback(
+		( flatListRef ) => {
+			scrollViewRef.current = flatListRef?.getNativeScrollRef();
+		},
+		[ scrollViewRef ]
+	);
+
+	useImperativeHandle( ref, () => {
+		return {
+			scrollViewRef: scrollViewRef.current,
+			scrollToSection,
+			scrollToElement,
+			lastScrollTo,
+		};
+	} );
+
+	const optimizationProps =
+		props.data?.length > OPTIMIZATION_ITEMS_THRESHOLD
+			? OPTIMIZATION_PROPS
+			: EMPTY_OBJECT;
 
 	return (
-		<AnimatedKeyboardAwareScrollView
-			style={ [ { flex: 1 }, scrollViewStyle ] }
-			keyboardDismissMode="none"
-			enableResetScrollToCoords={ false }
-			keyboardShouldPersistTaps="handled"
-			extraScrollHeight={ extraScrollHeight }
-			extraHeight={ 0 }
-			inputAccessoryViewHeight={ inputAccessoryViewHeight }
-			enableAutomaticScroll={
-				autoScroll === undefined ? false : autoScroll
-			}
-			ref={ getRef }
-			onKeyboardWillHide={ onKeyboardWillHide }
-			onKeyboardDidHide={ onKeyboardDidHide }
-			onKeyboardWillShow={ onKeyboardWillShow }
-			scrollEnabled={ listProps.scrollEnabled }
-			onScroll={ scrollHandler }
-		>
-			<List { ...listProps } />
-		</AnimatedKeyboardAwareScrollView>
+		<View style={ styles.list__container }>
+			<AnimatedFlatList
+				ref={ getFlatListRef }
+				automaticallyAdjustContentInsets={ false }
+				contentInset={ contentInset }
+				keyboardShouldPersistTaps="handled"
+				onContentSizeChange={ onContentSizeChange }
+				onScroll={ scrollHandler }
+				scrollEventThrottle={ 16 }
+				style={ styles.list__content }
+				{ ...optimizationProps }
+				{ ...props }
+			/>
+		</View>
 	);
 };
 
-KeyboardAwareFlatList.handleCaretVerticalPositionChange = (
-	scrollView,
-	targetId,
-	caretY,
-	previousCaretY
-) => {
-	if ( previousCaretY ) {
-		// If this is not the first tap.
-		scrollView.refreshScrollForField( targetId );
-	}
-};
-
-export default KeyboardAwareFlatList;
+export default forwardRef( KeyboardAwareFlatList );

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { uniq } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
@@ -26,10 +21,12 @@ export function addGeneratedClassName( extraProps, blockType ) {
 			// We have some extra classes and want to add the default classname
 			// We use uniq to prevent duplicate classnames.
 
-			extraProps.className = uniq( [
-				getBlockDefaultClassName( blockType.name ),
-				...extraProps.className.split( ' ' ),
-			] )
+			extraProps.className = [
+				...new Set( [
+					getBlockDefaultClassName( blockType.name ),
+					...extraProps.className.split( ' ' ),
+				] ),
+			]
 				.join( ' ' )
 				.trim();
 		} else {

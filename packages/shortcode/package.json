@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/shortcode",
-	"version": "3.14.0",
+	"version": "3.58.0",
 	"description": "Shortcode module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -19,14 +19,15 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=12"
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
-		"memize": "^1.1.0"
+		"memize": "^2.0.1"
 	},
 	"publishConfig": {
 		"access": "public"

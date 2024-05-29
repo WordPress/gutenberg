@@ -2,6 +2,98 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 6.55.0 (2024-05-16)
+
+## 6.54.0 (2024-05-02)
+
+## 6.53.0 (2024-04-19)
+
+## 6.52.0 (2024-04-03)
+
+## 6.51.0 (2024-03-21)
+
+## 6.50.0 (2024-03-06)
+
+## 6.49.0 (2024-02-21)
+
+## 6.48.0 (2024-02-09)
+
+## 6.47.0 (2024-01-24)
+
+## 6.46.0 (2024-01-10)
+
+## 6.45.0 (2023-12-13)
+
+## 6.44.0 (2023-11-29)
+
+## 6.43.0 (2023-11-16)
+
+## 6.42.0 (2023-11-02)
+
+## 6.41.0 (2023-10-18)
+
+## 6.40.0 (2023-10-05)
+
+## 6.39.0 (2023-09-20)
+
+## 6.38.0 (2023-08-31)
+
+## 6.37.0 (2023-08-16)
+
+## 6.36.0 (2023-08-10)
+
+## 6.35.0 (2023-07-20)
+
+## 6.34.0 (2023-07-05)
+
+## 6.33.0 (2023-06-23)
+
+## 6.32.0 (2023-06-07)
+
+## 6.31.0 (2023-05-24)
+
+## 6.30.0 (2023-05-10)
+
+## 6.29.0 (2023-04-26)
+
+## 6.28.0 (2023-04-12)
+
+## 6.27.0 (2023-03-29)
+
+## 6.26.0 (2023-03-15)
+
+## 6.25.0 (2023-03-01)
+
+## 6.24.0 (2023-02-15)
+
+## 6.23.0 (2023-02-01)
+
+## 6.22.0 (2023-01-11)
+
+## 6.21.0 (2023-01-02)
+
+## 6.20.0 (2022-12-14)
+
+## 6.19.0 (2022-11-16)
+
+## 6.18.0 (2022-11-02)
+
+## 6.17.0 (2022-10-19)
+
+## 6.16.0 (2022-10-05)
+
+## 6.15.0 (2022-09-21)
+
+## 6.14.0 (2022-09-13)
+
+## 6.13.0 (2022-08-24)
+
+## 6.12.0 (2022-08-10)
+
 ## 6.11.0 (2022-07-27)
 
 ## 6.10.0 (2022-07-13)
@@ -28,7 +120,7 @@
 
 ### Breaking changes
 
-   `OPTIONS` requests handled by the preloading middleware are now resolved as `window.Response` objects if you explicitly set `parse: false` (for consistency with how GET requests are resolved). They used to be resolved as `Plain Old JavaScript Objects`.
+`OPTIONS` requests handled by the preloading middleware are now resolved as `window.Response` objects if you explicitly set `parse: false` (for consistency with how GET requests are resolved). They used to be resolved as `Plain Old JavaScript Objects`.
 
 ## 5.2.5 (2021-11-07)
 

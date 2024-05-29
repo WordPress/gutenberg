@@ -34,6 +34,12 @@ module.exports = {
 		'react/no-children-prop': 'off',
 		'react/prop-types': 'off',
 		'react/react-in-jsx-scope': 'off',
+		'react-hooks/exhaustive-deps': [
+			'warn',
+			{
+				additionalHooks: '^(useSelect|useSuspenseSelect)$',
+			},
+		],
 		'react-hooks/rules-of-hooks': 'error',
 	},
 };

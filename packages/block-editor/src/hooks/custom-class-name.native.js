@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -10,8 +10,7 @@ import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
 
 /**
- * Filters registered block settings, extending attributes with anchor using ID
- * of the first node.
+ * Filters registered block settings, extending attributes to include `className`.
  *
  * @param {Object} settings Original block settings.
  *
@@ -32,8 +31,8 @@ export function addAttribute( settings ) {
 }
 
 /**
- * Override props assigned to save component to inject anchor ID, if block
- * supports anchor. This is only applied if the block's save result is an
+ * Override props assigned to save component to inject the className, if block
+ * supports customClassName. This is only applied if the block's save result is an
  * element and not a markup string.
  *
  * @param {Object} extraProps Additional props applied to save element.
@@ -47,7 +46,7 @@ export function addSaveProps( extraProps, blockType, attributes ) {
 		hasBlockSupport( blockType, 'customClassName', true ) &&
 		attributes.className
 	) {
-		extraProps.className = classnames(
+		extraProps.className = clsx(
 			extraProps.className,
 			attributes.className
 		);
@@ -61,8 +60,11 @@ addFilter(
 	'core/custom-class-name/attribute',
 	addAttribute
 );
-addFilter(
-	'blocks.getSaveContent.extraProps',
-	'core/custom-class-name/save-props',
-	addSaveProps
-);
+
+export default {
+	addSaveProps,
+	attributeKeys: [ 'className' ],
+	hasSupport( name ) {
+		return hasBlockSupport( name, 'customClassName', true );
+	},
+};

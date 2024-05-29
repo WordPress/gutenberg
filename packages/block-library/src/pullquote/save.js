@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -15,13 +15,13 @@ export default function save( { attributes } ) {
 	return (
 		<figure
 			{ ...useBlockProps.save( {
-				className: classnames( {
+				className: clsx( {
 					[ `has-text-align-${ textAlign }` ]: textAlign,
 				} ),
 			} ) }
 		>
 			<blockquote>
-				<RichText.Content value={ value } multiline />
+				<RichText.Content tagName="p" value={ value } />
 				{ shouldShowCitation && (
 					<RichText.Content tagName="cite" value={ citation } />
 				) }

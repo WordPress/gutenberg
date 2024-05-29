@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -26,7 +26,7 @@ export default function PostCommentsCountEdit( {
 	const { postId } = context;
 	const [ commentsCount, setCommentsCount ] = useState();
 	const blockProps = useBlockProps( {
-		className: classnames( {
+		className: clsx( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
@@ -49,6 +49,14 @@ export default function PostCommentsCountEdit( {
 		} );
 	}, [ postId ] );
 
+	const hasPostAndComments = postId && commentsCount !== undefined;
+	const blockStyles = {
+		...blockProps.style,
+		textDecoration: hasPostAndComments
+			? blockProps.style?.textDecoration
+			: undefined,
+	};
+
 	return (
 		<>
 			<BlockControls group="block">
@@ -59,8 +67,8 @@ export default function PostCommentsCountEdit( {
 					} }
 				/>
 			</BlockControls>
-			<div { ...blockProps }>
-				{ postId && commentsCount !== undefined ? (
+			<div { ...blockProps } style={ blockStyles }>
+				{ hasPostAndComments ? (
 					commentsCount
 				) : (
 					<Warning>

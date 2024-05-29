@@ -20,9 +20,6 @@ const input = {
 		fullscreenMode: false,
 		hiddenBlockTypes: [ 'core/audio', 'core/cover' ],
 		editorMode: 'visual',
-		preferredStyleVariations: {
-			'core/quote': 'large',
-		},
 		inactivePanels: [],
 		openPanels: [ 'post-status' ],
 		pinnedItems: {
@@ -41,38 +38,35 @@ describe( 'convertPreferencesPackageData', () => {
 	it( 'converts data to the expected format', () => {
 		expect( convertPreferencesPackageData( input ) )
 			.toMatchInlineSnapshot( `
-		Object {
-		  "core/customize-widgets": Object {
-		    "fixedToolbar": true,
-		    "welcomeGuide": false,
-		  },
-		  "core/edit-post": Object {
+		{
+		  "core": {
 		    "editorMode": "visual",
 		    "fixedToolbar": true,
-		    "fullscreenMode": false,
-		    "hiddenBlockTypes": Array [
+		    "hiddenBlockTypes": [
 		      "core/audio",
 		      "core/cover",
 		    ],
-		    "inactivePanels": Array [],
-		    "openPanels": Array [
+		    "inactivePanels": [],
+		    "openPanels": [
 		      "post-status",
 		    ],
-		    "pinnedItems": Object {
+		    "pinnedItems": {
 		      "my-sidebar-plugin/title-sidebar": false,
 		    },
-		    "preferredStyleVariations": Object {
-		      "core/quote": "large",
-		    },
+		  },
+		  "core/customize-widgets": {
+		    "fixedToolbar": true,
 		    "welcomeGuide": false,
 		  },
-		  "core/edit-site": Object {
-		    "fixedToolbar": true,
-		    "isComplementaryAreaVisible": true,
+		  "core/edit-post": {
+		    "fullscreenMode": false,
+		    "welcomeGuide": false,
+		  },
+		  "core/edit-site": {
 		    "welcomeGuide": false,
 		    "welcomeGuideStyles": false,
 		  },
-		  "core/edit-widgets": Object {
+		  "core/edit-widgets": {
 		    "fixedToolbar": true,
 		    "isComplementaryAreaVisible": true,
 		    "showBlockBreadcrumbs": false,

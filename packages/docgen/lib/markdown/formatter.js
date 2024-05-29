@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+const remark = require( 'remark' );
+
+/**
  * Internal dependencies
  */
 const getSymbolTagsByName = require( '../get-symbol-tags-by-name' );
@@ -35,6 +40,24 @@ const formatExamples = ( tags, docs ) => {
 	}
 };
 
+const formatSince = ( tags, docs ) => {
+	if ( tags && tags.length > 0 ) {
+		docs.push( '\n' );
+		docs.push( '\n' );
+		docs.push( '*Changelog*' );
+		docs.push( '\n' );
+		docs.push( '\n' );
+		docs.push(
+			...tags.map(
+				( tag ) =>
+					`\n${ cleanSpaces(
+						`\`${ tag.name }\` ${ tag.description }`
+					) }`
+			)
+		);
+	}
+};
+
 const formatDeprecated = ( tags, docs ) => {
 	if ( tags && tags.length > 0 ) {
 		docs.push( '\n' );
@@ -50,9 +73,26 @@ const formatDeprecated = ( tags, docs ) => {
 };
 
 const formatDescription = ( description, docs ) => {
+	const processor = remark().use( () => {
+		return function transformer( tree ) {
+			tree.children.forEach( function ( node ) {
+				if ( node.children ) {
+					transformer( node );
+				}
+				if ( node.type === 'text' && node.value ) {
+					// Replace line breaks with spaces and remove line-ending hyphens.
+					node.value = node.value
+						.replace( /([A-Za-z])-\n([A-Za-z])/g, '$1$2' )
+						.replace( /\n/g, ' ' );
+				}
+			} );
+		};
+	} );
+	const processedDescription = processor.processSync( description );
+
 	docs.push( '\n' );
 	docs.push( '\n' );
-	docs.push( description );
+	docs.push( processedDescription );
 };
 
 const getHeading = ( index, text ) => {
@@ -167,8 +207,10 @@ module.exports = (
 				( tag ) => {
 					const name = tag.name;
 					const type = getTypeOutput( tag );
-
-					return `- *${ name }* ${ type }`;
+					const desc = cleanSpaces( tag.description );
+					return `- *${ name }* ${ type }${
+						desc ? `: ${ desc }` : ''
+					}`;
 				},
 				docs
 			);
@@ -187,6 +229,7 @@ module.exports = (
 				},
 				docs
 			);
+			formatSince( getSymbolTagsByName( symbol, 'since' ), docs );
 			docs.push( '\n' );
 			docs.push( '\n' );
 		} );

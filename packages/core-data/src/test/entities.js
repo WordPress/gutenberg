@@ -27,14 +27,8 @@ describe( 'getMethodName', () => {
 		expect( methodName ).toEqual( 'setPostType' );
 	} );
 
-	it( 'should use the plural form', () => {
-		const methodName = getMethodName( 'root', 'postType', 'get', true );
-
-		expect( methodName ).toEqual( 'getPostTypes' );
-	} );
-
 	it( 'should use the given plural form', () => {
-		const methodName = getMethodName( 'root', 'taxonomy', 'get', true );
+		const methodName = getMethodName( 'root', 'taxonomies', 'get' );
 
 		expect( methodName ).toEqual( 'getTaxonomies' );
 	} );
@@ -52,21 +46,22 @@ describe( 'getMethodName', () => {
 describe( 'getKindEntities', () => {
 	beforeEach( async () => {
 		triggerFetch.mockReset();
-		jest.useFakeTimers();
-	} );
-
-	afterEach( () => {
-		jest.runOnlyPendingTimers();
-		jest.useRealTimers();
 	} );
 
 	it( 'shouldn’t do anything if the entities have already been resolved', async () => {
 		const dispatch = jest.fn();
 		const select = {
 			getEntitiesConfig: jest.fn( () => entities ),
+			getEntityConfig: jest.fn( () => ( {
+				kind: 'postType',
+				name: 'post',
+			} ) ),
 		};
 		const entities = [ { kind: 'postType' } ];
-		await getOrLoadEntitiesConfig( 'postType' )( { dispatch, select } );
+		await getOrLoadEntitiesConfig(
+			'postType',
+			'post'
+		)( { dispatch, select } );
 		expect( dispatch ).not.toHaveBeenCalled();
 	} );
 
@@ -74,8 +69,12 @@ describe( 'getKindEntities', () => {
 		const dispatch = jest.fn();
 		const select = {
 			getEntitiesConfig: jest.fn( () => [] ),
+			getEntityConfig: jest.fn( () => undefined ),
 		};
-		await getOrLoadEntitiesConfig( 'unknownKind' )( { dispatch, select } );
+		await getOrLoadEntitiesConfig(
+			'unknownKind',
+			undefined
+		)( { dispatch, select } );
 		expect( dispatch ).not.toHaveBeenCalled();
 	} );
 
@@ -86,21 +85,34 @@ describe( 'getKindEntities', () => {
 				labels: {
 					singular_name: 'post',
 				},
+				supports: {
+					revisions: true,
+				},
 			},
 		];
 		const dispatch = jest.fn();
 		const select = {
 			getEntitiesConfig: jest.fn( () => [] ),
+			getEntityConfig: jest.fn( () => undefined ),
 		};
 		triggerFetch.mockImplementation( () => fetchedEntities );
 
-		await getOrLoadEntitiesConfig( 'postType' )( { dispatch, select } );
+		await getOrLoadEntitiesConfig(
+			'postType',
+			'post'
+		)( { dispatch, select } );
 		expect( dispatch ).toHaveBeenCalledTimes( 1 );
 		expect( dispatch.mock.calls[ 0 ][ 0 ].type ).toBe( 'ADD_ENTITIES' );
 		expect( dispatch.mock.calls[ 0 ][ 0 ].entities.length ).toBe( 1 );
 		expect( dispatch.mock.calls[ 0 ][ 0 ].entities[ 0 ].baseURL ).toBe(
 			'/wp/v2/posts'
 		);
+		expect(
+			dispatch.mock.calls[ 0 ][ 0 ].entities[ 0 ].getRevisionsUrl( 1 )
+		).toBe( '/wp/v2/posts/1/revisions' );
+		expect(
+			dispatch.mock.calls[ 0 ][ 0 ].entities[ 0 ].getRevisionsUrl( 1, 2 )
+		).toBe( '/wp/v2/posts/1/revisions/2' );
 	} );
 } );
 

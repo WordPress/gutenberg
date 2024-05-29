@@ -95,13 +95,7 @@ class RCTAztecView: Aztec.TextView {
         let placeholderWidthInset = 2 * leftTextInset
         return placeholderLabel.widthAnchor.constraint(equalTo: widthAnchor, constant: -placeholderWidthInset)
     }()
-
-    /// If a dictation start with an empty UITextView,
-    /// the dictation engine refreshes the TextView with an empty string when the dictation finishes.
-    /// This helps to avoid propagating that unwanted empty string to RN. (Solving #606)
-    /// on `textViewDidChange` and `textViewDidChangeSelection`
-    private var isInsertingDictationResult = false
-
+    
     // MARK: - Font
 
     /// Flag to enable using the defaultFont in Aztec for specific blocks
@@ -234,7 +228,10 @@ class RCTAztecView: Aztec.TextView {
         previousContentSize = newSize
 
         let body = packForRN(newSize, withName: "contentSize")
-        onContentSizeChange(body)
+        let caretData = packCaretDataForRN()
+        var result = body
+        result.merge(caretData) { (_, new) in new }
+        onContentSizeChange(result)
     }
 
     // MARK: - Paste handling
@@ -349,20 +346,7 @@ class RCTAztecView: Aztec.TextView {
 
         super.deleteBackward()
         updatePlaceholderVisibility()
-    }
-
-    // MARK: - Dictation
-
-    override func dictationRecordingDidEnd() {
-        isInsertingDictationResult = true
-    }
-
-    public override func insertDictationResult(_ dictationResult: [UIDictationPhrase]) {
-        let objectPlaceholder = "\u{FFFC}"
-        let dictationText = dictationResult.reduce("") { $0 + $1.text }
-        isInsertingDictationResult = false
-        self.text = self.text?.replacingOccurrences(of: objectPlaceholder, with: dictationText)
-    }
+    }    
 
     // MARK: - Custom Edit Intercepts
 
@@ -479,6 +463,7 @@ class RCTAztecView: Aztec.TextView {
             if !(caretEndRect.isInfinite || caretEndRect.isNull) {
                 result["selectionEndCaretX"] = caretEndRect.origin.x
                 result["selectionEndCaretY"] = caretEndRect.origin.y
+                result["selectionEndCaretHeight"] = caretEndRect.size.height
             }
         }
 
@@ -648,13 +633,9 @@ class RCTAztecView: Aztec.TextView {
     ///
     private func applyFontConstraints(to baseFont: UIFont) -> UIFont {
         let oldDescriptor = baseFont.fontDescriptor
-        let newFontSize: CGFloat
+        let fontMetrics = UIFontMetrics(forTextStyle: .body)
 
-        if let fontSize = fontSize {
-            newFontSize = fontSize
-        } else {
-            newFontSize = baseFont.pointSize
-        }
+        let newFontSize = fontMetrics.scaledValue(for: fontSize ?? baseFont.pointSize)
 
         var newTraits = oldDescriptor.symbolicTraits
 
@@ -687,7 +668,13 @@ class RCTAztecView: Aztec.TextView {
     ///
     private func refreshFont() {
         let newFont = applyFontConstraints(to: defaultFont)
+        font = newFont
+        placeholderLabel.font = newFont
         defaultFont = newFont
+
+        if textStorage.length > 0 {
+            typingAttributes[NSAttributedString.Key.font] = newFont
+        }
     }
 
     /// This method refreshes the font for the palceholder field and typing attributes.
@@ -730,7 +717,13 @@ class RCTAztecView: Aztec.TextView {
         case "bold": toggleBold(range: emptyRange)
         case "italic": toggleItalic(range: emptyRange)
         case "strikethrough": toggleStrikethrough(range: emptyRange)
-        case "mark": toggleMark(range: emptyRange)
+        case "mark":
+            // When there's a selection the formatting is applied from the RichText library.
+            // If not, it will toggle the active mark format if needed.
+            if selectedRange.length > 0 {
+                return
+            }
+            toggleMark(range: emptyRange, color: nil, resetColor: true)
         default: print("Format not recognized")
         }
     }
@@ -767,7 +760,7 @@ class RCTAztecView: Aztec.TextView {
 extension RCTAztecView: UITextViewDelegate {
 
     func textViewDidChangeSelection(_ textView: UITextView) {
-        guard isFirstResponder, isInsertingDictationResult == false else {
+        guard isFirstResponder else {
             return
         }
 
@@ -780,10 +773,6 @@ extension RCTAztecView: UITextViewDelegate {
     }
 
     func textViewDidChange(_ textView: UITextView) {
-        guard isInsertingDictationResult == false else {
-            return
-        }
-        
         propagateContentChanges()
         updatePlaceholderVisibility()
         //Necessary to send height information to JS after pasting text.
@@ -792,7 +781,8 @@ extension RCTAztecView: UITextViewDelegate {
 
     override func becomeFirstResponder() -> Bool {
         if !isFirstResponder && canBecomeFirstResponder {
-            onFocus?([:])
+            let caretData = packCaretDataForRN()
+            onFocus?(caretData)
         }
         return super.becomeFirstResponder()
     }

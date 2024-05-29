@@ -1,11 +1,19 @@
 /**
  * WordPress dependencies
  */
-import { BlockList } from '@wordpress/block-editor';
-import { useContext, createPortal } from '@wordpress/element';
+import {
+	__experimentalGetGapCSSValue as getGapCSSValue,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../lock-unlock';
+
+const { useStyleOverride } = unlock( blockEditorPrivateApis );
 
 export default function GapStyles( { blockGap, clientId } ) {
-	const styleElement = useContext( BlockList.__unstableElementContext );
 	// --gallery-block--gutter-size is deprecated. --wp--style--gallery-gap-default should be used by themes that want to set a default
 	// gap on the gallery.
 	const fallbackValue = `var( --wp--style--gallery-gap-default, var( --gallery-block--gutter-size, var( --wp--style--block-gap, 0.5em ) ) )`;
@@ -17,25 +25,22 @@ export default function GapStyles( { blockGap, clientId } ) {
 	if ( !! blockGap ) {
 		row =
 			typeof blockGap === 'string'
-				? blockGap
-				: blockGap?.top || fallbackValue;
+				? getGapCSSValue( blockGap )
+				: getGapCSSValue( blockGap?.top ) || fallbackValue;
 		column =
 			typeof blockGap === 'string'
-				? blockGap
-				: blockGap?.left || fallbackValue;
+				? getGapCSSValue( blockGap )
+				: getGapCSSValue( blockGap?.left ) || fallbackValue;
 		gapValue = row === column ? row : `${ row } ${ column }`;
 	}
 
+	// The unstable gallery gap calculation requires a real value (such as `0px`) and not `0`.
 	const gap = `#block-${ clientId } {
-		--wp--style--unstable-gallery-gap: ${ column };
+		--wp--style--unstable-gallery-gap: ${ column === '0' ? '0px' : column };
 		gap: ${ gapValue }
 	}`;
 
-	const GapStyle = () => {
-		return <style>{ gap }</style>;
-	};
+	useStyleOverride( { css: gap } );
 
-	return gap && styleElement
-		? createPortal( <GapStyle />, styleElement )
-		: null;
+	return null;
 }

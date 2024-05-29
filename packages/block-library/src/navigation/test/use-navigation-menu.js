@@ -36,17 +36,43 @@ function resolveRecords( registry, menus ) {
 	dispatch.startResolution( 'getEntityRecords', [
 		'postType',
 		'wp_navigation',
-		{ per_page: -1, status: 'publish' },
+		{
+			per_page: 100,
+			status: [ 'publish', 'draft' ],
+			order: 'desc',
+			orderby: 'date',
+		},
 	] );
 	dispatch.finishResolution( 'getEntityRecords', [
 		'postType',
 		'wp_navigation',
-		{ per_page: -1, status: 'publish' },
+		{
+			per_page: 100,
+			status: [ 'publish', 'draft' ],
+			order: 'desc',
+			orderby: 'date',
+		},
 	] );
 	dispatch.receiveEntityRecords( 'postType', 'wp_navigation', menus, {
-		per_page: -1,
-		status: 'publish',
+		per_page: 100,
+		status: [ 'publish', 'draft' ],
+		order: 'desc',
+		orderby: 'date',
 	} );
+}
+
+function resolveReadPermission( registry, allowed ) {
+	const dispatch = registry.dispatch( coreStore );
+	dispatch.receiveUserPermission( 'create/navigation', allowed );
+	dispatch.startResolution( 'canUser', [ 'read', 'navigation' ] );
+	dispatch.finishResolution( 'canUser', [ 'read', 'navigation' ] );
+}
+
+function resolveReadRecordPermission( registry, ref, allowed ) {
+	const dispatch = registry.dispatch( coreStore );
+	dispatch.receiveUserPermission( 'create/navigation', allowed );
+	dispatch.startResolution( 'canUser', [ 'read', 'navigation', ref ] );
+	dispatch.finishResolution( 'canUser', [ 'read', 'navigation', ref ] );
 }
 
 function resolveCreatePermission( registry, allowed ) {
@@ -91,37 +117,38 @@ describe( 'useNavigationMenus', () => {
 			navigationMenus: null,
 			navigationMenu: undefined,
 			canSwitchNavigationMenu: false,
-			canUserCreateNavigationMenu: false,
+			canUserCreateNavigationMenus: false,
 			canUserDeleteNavigationMenu: undefined,
 			canUserUpdateNavigationMenu: undefined,
-			hasResolvedCanUserCreateNavigationMenu: false,
+			hasResolvedCanUserCreateNavigationMenus: false,
 			hasResolvedCanUserDeleteNavigationMenu: undefined,
 			hasResolvedCanUserUpdateNavigationMenu: undefined,
 			hasResolvedNavigationMenus: false,
 			isNavigationMenuMissing: true,
 			isNavigationMenuResolved: false,
-			isResolvingCanUserCreateNavigationMenu: false,
+			isResolvingCanUserCreateNavigationMenus: false,
 			isResolvingNavigationMenus: false,
 		} );
 	} );
 
-	it( 'Should return information about all menus when ref is missing', () => {
+	it( 'Should return information about all menus when the ref is missing', () => {
 		resolveRecords( registry, navigationMenus );
 		resolveCreatePermission( registry, true );
+		resolveReadPermission( registry, true );
 		expect( useNavigationMenu() ).toEqual( {
 			navigationMenus,
 			navigationMenu: undefined,
 			canSwitchNavigationMenu: true,
-			canUserCreateNavigationMenu: true,
+			canUserCreateNavigationMenus: true,
 			canUserDeleteNavigationMenu: undefined,
 			canUserUpdateNavigationMenu: undefined,
-			hasResolvedCanUserCreateNavigationMenu: true,
+			hasResolvedCanUserCreateNavigationMenus: true,
 			hasResolvedCanUserDeleteNavigationMenu: undefined,
 			hasResolvedCanUserUpdateNavigationMenu: undefined,
 			hasResolvedNavigationMenus: true,
 			isNavigationMenuMissing: true,
 			isNavigationMenuResolved: false,
-			isResolvingCanUserCreateNavigationMenu: false,
+			isResolvingCanUserCreateNavigationMenus: false,
 			isResolvingNavigationMenus: false,
 		} );
 	} );
@@ -132,38 +159,38 @@ describe( 'useNavigationMenus', () => {
 			navigationMenu: navigationMenu1,
 			navigationMenus,
 			canSwitchNavigationMenu: true,
-			canUserCreateNavigationMenu: false,
+			canUserCreateNavigationMenus: false,
 			canUserDeleteNavigationMenu: false,
 			canUserUpdateNavigationMenu: false,
-			hasResolvedCanUserCreateNavigationMenu: false,
+			hasResolvedCanUserCreateNavigationMenus: false,
 			hasResolvedCanUserDeleteNavigationMenu: false,
 			hasResolvedCanUserUpdateNavigationMenu: false,
 			hasResolvedNavigationMenus: true,
 			isNavigationMenuMissing: false,
 			isNavigationMenuResolved: false,
-			isResolvingCanUserCreateNavigationMenu: false,
+			isResolvingCanUserCreateNavigationMenus: false,
 			isResolvingNavigationMenus: false,
 		} );
 	} );
 
-	it( 'Should return null for the menu when menu status is "draft"', () => {
+	it( 'Should return the menu when menu status is "draft"', () => {
 		const navigationMenuDraft = { id: 4, title: 'Menu 3', status: 'draft' };
 		const testMenus = [ ...navigationMenus, navigationMenuDraft ];
 		resolveRecords( registry, testMenus );
 		expect( useNavigationMenu( 4 ) ).toEqual( {
-			navigationMenu: null,
+			navigationMenu: navigationMenuDraft,
 			navigationMenus: testMenus,
 			canSwitchNavigationMenu: true,
-			canUserCreateNavigationMenu: false,
+			canUserCreateNavigationMenus: false,
 			canUserDeleteNavigationMenu: false,
 			canUserUpdateNavigationMenu: false,
-			hasResolvedCanUserCreateNavigationMenu: false,
+			hasResolvedCanUserCreateNavigationMenus: false,
 			hasResolvedCanUserDeleteNavigationMenu: false,
 			hasResolvedCanUserUpdateNavigationMenu: false,
 			hasResolvedNavigationMenus: true,
 			isNavigationMenuMissing: false,
 			isNavigationMenuResolved: false,
-			isResolvingCanUserCreateNavigationMenu: false,
+			isResolvingCanUserCreateNavigationMenus: false,
 			isResolvingNavigationMenus: false,
 		} );
 	} );
@@ -171,22 +198,23 @@ describe( 'useNavigationMenus', () => {
 	it( 'Should return correct permissions (create, update)', () => {
 		resolveRecords( registry, navigationMenus );
 		resolveCreatePermission( registry, true );
+		resolveReadRecordPermission( registry, 1, true );
 		resolveUpdatePermission( registry, 1, true );
 		resolveDeletePermission( registry, 1, false );
 		expect( useNavigationMenu( 1 ) ).toEqual( {
 			navigationMenu: navigationMenu1,
 			navigationMenus,
 			canSwitchNavigationMenu: true,
-			canUserCreateNavigationMenu: true,
+			canUserCreateNavigationMenus: true,
 			canUserDeleteNavigationMenu: false,
 			canUserUpdateNavigationMenu: true,
-			hasResolvedCanUserCreateNavigationMenu: true,
+			hasResolvedCanUserCreateNavigationMenus: true,
 			hasResolvedCanUserDeleteNavigationMenu: true,
 			hasResolvedCanUserUpdateNavigationMenu: true,
 			hasResolvedNavigationMenus: true,
 			isNavigationMenuMissing: false,
 			isNavigationMenuResolved: false,
-			isResolvingCanUserCreateNavigationMenu: false,
+			isResolvingCanUserCreateNavigationMenus: false,
 			isResolvingNavigationMenus: false,
 		} );
 	} );
@@ -194,22 +222,23 @@ describe( 'useNavigationMenus', () => {
 	it( 'Should return correct permissions (delete only)', () => {
 		resolveRecords( registry, navigationMenus );
 		resolveCreatePermission( registry, false );
+		resolveReadRecordPermission( registry, 1, false );
 		resolveUpdatePermission( registry, 1, false );
 		resolveDeletePermission( registry, 1, true );
 		expect( useNavigationMenu( 1 ) ).toEqual( {
 			navigationMenu: navigationMenu1,
 			navigationMenus,
 			canSwitchNavigationMenu: true,
-			canUserCreateNavigationMenu: false,
+			canUserCreateNavigationMenus: false,
 			canUserDeleteNavigationMenu: true,
 			canUserUpdateNavigationMenu: false,
-			hasResolvedCanUserCreateNavigationMenu: true,
+			hasResolvedCanUserCreateNavigationMenus: true,
 			hasResolvedCanUserDeleteNavigationMenu: true,
 			hasResolvedCanUserUpdateNavigationMenu: true,
 			hasResolvedNavigationMenus: true,
 			isNavigationMenuMissing: false,
 			isNavigationMenuResolved: false,
-			isResolvingCanUserCreateNavigationMenu: false,
+			isResolvingCanUserCreateNavigationMenus: false,
 			isResolvingNavigationMenus: false,
 		} );
 	} );
@@ -225,16 +254,16 @@ describe( 'useNavigationMenus', () => {
 			navigationMenu: requestedMenu,
 			navigationMenus,
 			canSwitchNavigationMenu: true,
-			canUserCreateNavigationMenu: false,
+			canUserCreateNavigationMenus: false,
 			canUserDeleteNavigationMenu: false,
 			canUserUpdateNavigationMenu: false,
-			hasResolvedCanUserCreateNavigationMenu: false,
+			hasResolvedCanUserCreateNavigationMenus: false,
 			hasResolvedCanUserDeleteNavigationMenu: false,
 			hasResolvedCanUserUpdateNavigationMenu: false,
 			hasResolvedNavigationMenus: true,
 			isNavigationMenuMissing: false,
 			isNavigationMenuResolved: false,
-			isResolvingCanUserCreateNavigationMenu: false,
+			isResolvingCanUserCreateNavigationMenus: false,
 			isResolvingNavigationMenus: false,
 		} );
 	} );

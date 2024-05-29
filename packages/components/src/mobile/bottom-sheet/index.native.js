@@ -15,12 +15,14 @@ import {
 } from 'react-native';
 import Modal from 'react-native-modal';
 import SafeArea from 'react-native-safe-area';
-import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { subscribeAndroidModalClosed } from '@wordpress/react-native-bridge';
+import {
+	subscribeAndroidModalClosed,
+	showAndroidSoftKeyboard,
+} from '@wordpress/react-native-bridge';
 import { Component } from '@wordpress/element';
 import { withPreferredColorScheme } from '@wordpress/compose';
 
@@ -216,6 +218,11 @@ class BottomSheet extends Component {
 		if ( this.androidModalClosedSubscription ) {
 			this.androidModalClosedSubscription.remove();
 		}
+
+		if ( this.props.isVisible ) {
+			showAndroidSoftKeyboard();
+		}
+
 		if ( this.safeAreaEventSubscription === null ) {
 			return;
 		}
@@ -316,6 +323,9 @@ class BottomSheet extends Component {
 	onDismiss() {
 		const { onDismiss } = this.props;
 
+		// Restore Keyboard Visibility
+		showAndroidSoftKeyboard();
+
 		if ( onDismiss ) {
 			onDismiss();
 		}
@@ -369,6 +379,7 @@ class BottomSheet extends Component {
 	onHardwareButtonPress() {
 		const { onClose } = this.props;
 		const { handleHardwareButtonPress } = this.state;
+
 		if ( handleHardwareButtonPress && handleHardwareButtonPress() ) {
 			return;
 		}
@@ -400,6 +411,7 @@ class BottomSheet extends Component {
 			children,
 			withHeaderSeparator = false,
 			hasNavigation,
+			onDismiss,
 			...rest
 		} = this.props;
 		const {
@@ -527,9 +539,10 @@ class BottomSheet extends Component {
 					panResponder.panHandlers.onMoveShouldSetResponderCapture
 				}
 				onAccessibilityEscape={ this.onCloseBottomSheet }
-				// We need to prevent overwriting the onDismiss prop,
-				// for this reason it is excluded from the rest object.
-				{ ...omit( rest, 'onDismiss' ) }
+				testID="bottom-sheet"
+				hardwareAccelerated
+				useNativeDriverForBackdrop
+				{ ...rest }
 			>
 				<KeyboardAvoidingView
 					behavior={ Platform.OS === 'ios' && 'padding' }
@@ -577,6 +590,8 @@ class BottomSheet extends Component {
 								listProps,
 								setIsFullScreen: this.setIsFullScreen,
 								safeAreaBottomInset,
+								maxHeight,
+								isMaxHeightSet,
 							} }
 						>
 							{ hasNavigation ? (

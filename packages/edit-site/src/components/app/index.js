@@ -2,22 +2,26 @@
  * WordPress dependencies
  */
 import { SlotFillProvider } from '@wordpress/components';
-import { UnsavedChangesWarning } from '@wordpress/editor';
+import {
+	UnsavedChangesWarning,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 import { store as noticesStore } from '@wordpress/notices';
 import { useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { PluginArea } from '@wordpress/plugins';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
-import { Routes } from '../routes';
-import Editor from '../editor';
-import List from '../list';
-import NavigationSidebar from '../navigation-sidebar';
-import getIsListPage from '../../utils/get-is-list-page';
+import Layout from '../layout';
+import { unlock } from '../../lock-unlock';
 
-export default function EditSiteApp( { reboot } ) {
+const { RouterProvider } = unlock( routerPrivateApis );
+const { GlobalStylesProvider } = unlock( editorPrivateApis );
+
+export default function App() {
 	const { createErrorNotice } = useDispatch( noticesStore );
 
 	function onPluginAreaError( name ) {
@@ -34,33 +38,13 @@ export default function EditSiteApp( { reboot } ) {
 
 	return (
 		<SlotFillProvider>
-			<UnsavedChangesWarning />
-
-			<Routes>
-				{ ( { params } ) => {
-					const isListPage = getIsListPage( params );
-
-					return (
-						<>
-							{ isListPage ? (
-								<List />
-							) : (
-								<Editor onError={ reboot } />
-							) }
-							<PluginArea onError={ onPluginAreaError } />
-							{ /* Keep the instance of the sidebar to ensure focus will not be lost
-							 * when navigating to other pages. */ }
-							<NavigationSidebar
-								// Open the navigation sidebar by default when in the list page.
-								isDefaultOpen={ !! isListPage }
-								activeTemplateType={
-									isListPage ? params.postType : undefined
-								}
-							/>
-						</>
-					);
-				} }
-			</Routes>
+			<GlobalStylesProvider>
+				<UnsavedChangesWarning />
+				<RouterProvider>
+					<Layout />
+					<PluginArea onError={ onPluginAreaError } />
+				</RouterProvider>
+			</GlobalStylesProvider>
 		</SlotFillProvider>
 	);
 }

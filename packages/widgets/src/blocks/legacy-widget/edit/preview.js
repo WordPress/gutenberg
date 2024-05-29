@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -61,10 +61,15 @@ export default function Preview( { idBase, instance, isVisible } ) {
 			function setHeight() {
 				// Pick the maximum of these two values to account for margin collapsing.
 				const height = Math.max(
-					iframe.contentDocument.documentElement.offsetHeight,
-					iframe.contentDocument.body.offsetHeight
+					iframe.contentDocument.documentElement?.offsetHeight ?? 0,
+					iframe.contentDocument.body?.offsetHeight ?? 0
 				);
-				iframe.style.height = `${ height }px`;
+
+				// Fallback to a height of 100px if the height cannot be determined.
+				// This ensures the block is still selectable. 100px should hopefully
+				// be not so big that it's annoying, and not so small that nothing
+				// can be seen.
+				iframe.style.height = `${ height !== 0 ? height : 100 }px`;
 			}
 
 			const { IntersectionObserver } = iframe.ownerDocument.defaultView;
@@ -108,12 +113,9 @@ export default function Preview( { idBase, instance, isVisible } ) {
 				</Placeholder>
 			) }
 			<div
-				className={ classnames(
-					'wp-block-legacy-widget__edit-preview',
-					{
-						'is-offscreen': ! isVisible || ! isLoaded,
-					}
-				) }
+				className={ clsx( 'wp-block-legacy-widget__edit-preview', {
+					'is-offscreen': ! isVisible || ! isLoaded,
+				} ) }
 			>
 				<Disabled>
 					{ /*

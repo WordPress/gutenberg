@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { TouchableWithoutFeedback } from 'react-native';
-import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -14,9 +13,9 @@ import {
 	ToggleControl,
 	ToolbarButton,
 	ToolbarGroup,
-	AudioPlayer,
 } from '@wordpress/components';
 import {
+	AudioPlayer,
 	BlockCaption,
 	BlockControls,
 	BlockIcon,
@@ -24,6 +23,7 @@ import {
 	MediaPlaceholder,
 	MediaUpload,
 	MediaUploadProgress,
+	RichText,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __, _x, sprintf } from '@wordpress/i18n';
@@ -31,7 +31,7 @@ import { audio as icon, replace } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
-import { isURL } from '@wordpress/url';
+import { isURL, getProtocol } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -74,7 +74,7 @@ function AudioEdit( {
 
 	function onSelectURL( newSrc ) {
 		if ( newSrc !== src ) {
-			if ( isURL( newSrc ) ) {
+			if ( isURL( newSrc ) && /^https?:/.test( getProtocol( newSrc ) ) ) {
 				setAttributes( { src: newSrc, id: undefined } );
 			} else {
 				createErrorNotice( __( 'Invalid URL. Audio file not found.' ) );
@@ -212,13 +212,13 @@ function AudioEdit( {
 									label: _x( 'None', '"Preload" value' ),
 								},
 							] }
-							hideCancelButton={ true }
+							hideCancelButton
 						/>
 					</PanelBody>
 				</InspectorControls>
 				<MediaUpload
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					isReplacingMedia={ true }
+					isReplacingMedia
 					onSelect={ onSelectAudio }
 					onSelectURL={ onSelectURL }
 					render={ ( { open, getMediaOptions } ) => {
@@ -226,9 +226,9 @@ function AudioEdit( {
 					} }
 				/>
 				<BlockCaption
-					accessible={ true }
+					accessible
 					accessibilityLabelCreator={ ( caption ) =>
-						isEmpty( caption )
+						RichText.isEmpty( caption )
 							? /* translators: accessibility text. Empty Audio caption. */
 							  __( 'Audio caption. Empty' )
 							: sprintf(

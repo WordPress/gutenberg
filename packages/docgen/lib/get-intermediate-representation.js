@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-const { get } = require( 'lodash' );
-
-/**
  * Internal dependencies
  */
 const getExportEntries = require( './get-export-entries' );
@@ -25,7 +20,9 @@ const hasVariableWithName = ( node, name ) =>
 	node.declarations.some( ( declaration ) => {
 		if ( declaration.id.type === 'ObjectPattern' ) {
 			return declaration.id.properties.some(
-				( property ) => property.key.name === name
+				( property ) =>
+					property.key?.name === name ||
+					property.argument?.name === name
 			);
 		}
 		return declaration.id.name === name;
@@ -154,8 +151,8 @@ module.exports = (
 			ir.push( {
 				path,
 				name: entry.exportName,
-				description: get( doc, [ 'description' ], UNDOCUMENTED ),
-				tags: get( doc, [ 'tags' ], [] ),
+				description: doc?.description ?? UNDOCUMENTED,
+				tags: doc?.tags ?? [],
 				lineStart: entry.lineStart,
 				lineEnd: entry.lineEnd,
 			} );

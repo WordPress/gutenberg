@@ -1,7 +1,13 @@
 /**
+ * WordPress dependencies
+ */
+import { Platform } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import { createBlock, findTransform } from '../factory';
+import parse from '../parser';
 import { getBlockAttributes } from '../parser/get-block-attributes';
 import { getRawTransforms } from './get-raw-transforms';
 
@@ -10,11 +16,13 @@ import { getRawTransforms } from './get-raw-transforms';
  * top-level tag. The HTML should be filtered to not have any text between
  * top-level tags and formatted in a way that blocks can handle the HTML.
  *
- * @param {string} html HTML to convert.
+ * @param {string}   html    HTML to convert.
+ * @param {Function} handler The handler calling htmlToBlocks: either rawHandler
+ *                           or pasteHandler.
  *
  * @return {Array} An array of blocks.
  */
-export function htmlToBlocks( html ) {
+export function htmlToBlocks( html, handler ) {
 	const doc = document.implementation.createHTMLDocument( '' );
 
 	doc.body.innerHTML = html;
@@ -26,6 +34,13 @@ export function htmlToBlocks( html ) {
 		);
 
 		if ( ! rawTransform ) {
+			// Until the HTML block is supported in the native version, we'll parse it
+			// instead of creating the block to generate it as an unsupported block.
+			if ( Platform.isNative ) {
+				return parse(
+					`<!-- wp:html -->${ node.outerHTML }<!-- /wp:html -->`
+				);
+			}
 			return createBlock(
 				// Should not be hardcoded.
 				'core/html',
@@ -36,7 +51,11 @@ export function htmlToBlocks( html ) {
 		const { transform, blockName } = rawTransform;
 
 		if ( transform ) {
-			return transform( node );
+			const block = transform( node, handler );
+			if ( node.hasAttribute( 'class' ) ) {
+				block.attributes.className = node.getAttribute( 'class' );
+			}
+			return block;
 		}
 
 		return createBlock(

@@ -1,0 +1,40 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TreeGridRow forwards other props to the rendered tr element 1`] = `
+<div>
+  <table>
+    <tbody>
+      <tr
+        aria-level="1"
+        aria-posinset="1"
+        aria-setsize="1"
+        class="my-row"
+        role="row"
+      >
+        <td>
+          Test
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+`;
+
+exports[`TreeGridRow renders a tr with support for level, positionInSet and setSize props 1`] = `
+<div>
+  <table>
+    <tbody>
+      <tr
+        aria-level="1"
+        aria-posinset="1"
+        aria-setsize="1"
+        role="row"
+      >
+        <td>
+          Test
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+`;

@@ -1,22 +1,17 @@
 /**
- * WordPress dependencies
+ * External dependencies
  */
-import {
-	useBlockProps,
-	useInnerBlocksProps,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
+import clsx from 'clsx';
 
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-import { name as buttonBlockName } from '../button';
-
-const ALLOWED_BLOCKS = [ buttonBlockName ];
+import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
+import { store as blocksStore } from '@wordpress/blocks';
 
 const DEFAULT_BLOCK = {
-	name: buttonBlockName,
+	name: 'core/button',
 	attributesToCopy: [
 		'backgroundColor',
 		'border',
@@ -30,27 +25,30 @@ const DEFAULT_BLOCK = {
 	],
 };
 
-function ButtonsEdit( { attributes: { layout = {} } } ) {
-	const blockProps = useBlockProps();
-	const preferredStyle = useSelect( ( select ) => {
-		const preferredStyleVariations =
-			select( blockEditorStore ).getSettings()
-				.__experimentalPreferredStyleVariations;
-		return preferredStyleVariations?.value?.[ buttonBlockName ];
+function ButtonsEdit( { attributes, className } ) {
+	const { fontSize, layout, style } = attributes;
+	const blockProps = useBlockProps( {
+		className: clsx( className, {
+			'has-custom-font-size': fontSize || style?.typography?.fontSize,
+		} ),
+	} );
+	const { hasButtonVariations } = useSelect( ( select ) => {
+		const buttonVariations = select( blocksStore ).getBlockVariations(
+			'core/button',
+			'inserter'
+		);
+		return {
+			hasButtonVariations: buttonVariations.length > 0,
+		};
 	}, [] );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		allowedBlocks: ALLOWED_BLOCKS,
-		__experimentalDefaultBlock: DEFAULT_BLOCK,
-		__experimentalDirectInsert: true,
-		template: [
-			[
-				buttonBlockName,
-				{ className: preferredStyle && `is-style-${ preferredStyle }` },
-			],
-		],
-		__experimentalLayout: layout,
+		defaultBlock: DEFAULT_BLOCK,
+		// This check should be handled by the `Inserter` internally to be consistent across all blocks that use it.
+		directInsert: ! hasButtonVariations,
+		template: [ [ 'core/button' ] ],
 		templateInsertUpdatesSelection: true,
+		orientation: layout?.orientation ?? 'horizontal',
 	} );
 
 	return <div { ...innerBlocksProps } />;

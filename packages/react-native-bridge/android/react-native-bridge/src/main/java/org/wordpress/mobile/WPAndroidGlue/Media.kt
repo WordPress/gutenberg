@@ -15,7 +15,8 @@ data class Media(
     override val type: String,
     override val caption: String = "",
     override val title: String = "",
-    override val alt: String = ""
+    override val alt: String = "",
+    override val metadata: WritableMap = WritableNativeMap()
 ) : RNMedia {
     override fun toMap(): WritableMap = WritableNativeMap().apply {
         putInt("id", id)
@@ -24,6 +25,7 @@ data class Media(
         putString("caption", caption)
         putString("title", title)
         putString("alt", alt)
+        putMap("metadata", metadata)
     }
 
     companion object {
@@ -58,9 +60,11 @@ data class Media(
             mimeType: String?,
             caption: String?,
             title: String?,
+            alt: String?,
+            metadata: WritableNativeMap = WritableNativeMap()
         ): Media {
             val type = convertToType(mimeType)
-            return Media(id, url, type, caption ?: "", title ?: "")
+            return Media(id, url, type, caption ?: "", title ?: "", alt ?: "", metadata)
         }
     }
 }

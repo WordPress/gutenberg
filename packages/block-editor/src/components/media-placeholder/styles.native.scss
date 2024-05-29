@@ -1,50 +1,63 @@
-.emptyStateContainer {
+.media-placeholder__container {
 	flex: 1;
 	height: 142;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	background-color: $gray-lighten-30;
+	background-color: #e0e0e0; // $light-dim
 	padding-left: 12;
 	padding-right: 12;
 	padding-top: 12;
 	padding-bottom: 12;
-	border-top-left-radius: 4;
-	border-top-right-radius: 4;
-	border-bottom-left-radius: 4;
-	border-bottom-right-radius: 4;
+	border-top-left-radius: 2;
+	border-top-right-radius: 2;
+	border-bottom-left-radius: 2;
+	border-bottom-right-radius: 2;
 }
 
-.emptyStateContainerDark {
-	background-color: $background-dark-secondary;
+.media-placeholder__container--dark {
+	background-color: #1f1f1f; // $dark-dim
 }
 
-.emptyStateTitle {
-	text-align: center;
-	margin-top: 4;
-	margin-bottom: 16;
-	font-size: 14;
-	color: #2e4453;
+.media-placeholder__container-selected {
+	border-width: 2px;
+	border-color: $blue-40;
 }
 
-.emptyStateTitleDark {
-	color: $white;
+.media-placeholder__container-selected--dark {
+	border-color: $blue-50;
 }
 
 .emptyStateDescription {
-	width: 100%;
 	text-align: center;
-	color: $blue-wordpress;
-	font-size: 14;
-	font-weight: 500;
+	color: $white;
+	font-size: 16;
+	font-weight: 400;
 }
 
-.modalIcon {
+.emptyStateDescriptionDark {
+	color: $black;
+}
+
+.media-placeholder__header-icon {
 	width: 24px;
 	height: 24px;
-	justify-content: center;
-	align-items: center;
-	fill: $gray-dark;
+	margin-right: $grid-unit;
+	fill: $light-secondary;
+}
+
+.media-placeholder__header-icon--dark {
+	fill: $dark-tertiary;
+}
+
+.media-placeholder__header-title {
+	text-align: center;
+	font-size: 16;
+	color: $light-secondary;
+}
+
+.media-placeholder__header-title--dark {
+	color: $dark-tertiary;
 }
 
 .appender {
@@ -70,4 +83,26 @@
 .addMediaButtonDark {
 	color: $background-dark-secondary;
 	background-color: $gray-20;
+}
+
+.media-placeholder__button {
+	background-color: $light-primary;
+	border-radius: 3px;
+	padding: $grid-unit $grid-unit-20;
+}
+
+.media-placeholder__button--dark {
+	background-color: $dark-primary;
+}
+
+.media-placeholder__header {
+	flex-direction: row;
+	align-items: center;
+	margin-top: 4;
+	margin-bottom: 16;
+}
+
+.media-placeholder__appender {
+	width: 100%;
+	align-items: center;
 }

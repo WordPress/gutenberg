@@ -4,6 +4,7 @@
 import {
 	createUpgradedEmbedBlock,
 	getClassNames,
+	removeAspectRatioClasses,
 	fallback,
 	getEmbedInfoByProvider,
 	getMergedAttributesWithPreview,
@@ -18,7 +19,7 @@ import EmbedLinkSettings from './embed-link-settings';
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -32,6 +33,7 @@ import {
 } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { View } from '@wordpress/primitives';
+import { getAuthority } from '@wordpress/url';
 
 // The inline preview feature will be released progressible, for this reason
 // the embed will only be considered previewable for the following providers list.
@@ -123,16 +125,14 @@ const EmbedEdit = ( props ) => {
 	/**
 	 * Returns the attributes derived from the preview, merged with the current attributes.
 	 *
-	 * @param {boolean} ignorePreviousClassName Determines if the previous className attribute should be ignored when merging.
 	 * @return {Object} Merged attributes.
 	 */
-	const getMergedAttributes = ( ignorePreviousClassName = false ) =>
+	const getMergedAttributes = () =>
 		getMergedAttributesWithPreview(
 			attributes,
 			preview,
 			title,
-			responsive,
-			ignorePreviousClassName
+			responsive
 		);
 
 	const toggleResponsive = () => {
@@ -159,21 +159,34 @@ const EmbedEdit = ( props ) => {
 		const newURL = url.replace( /\/$/, '' );
 		setIsEditingURL( false );
 		setAttributes( { url: newURL } );
-	}, [ preview?.html, url ] );
+	}, [ preview?.html, url, cannotEmbed, fetching ] );
+
+	// Try a different provider in case the embed url is not supported.
+	useEffect( () => {
+		if ( ! cannotEmbed || fetching || ! url ) {
+			return;
+		}
+
+		// Until X provider is supported in WordPress, as a workaround we use Twitter provider.
+		if ( getAuthority( url ) === 'x.com' ) {
+			const newURL = new URL( url );
+			newURL.host = 'twitter.com';
+			setAttributes( { url: newURL.toString() } );
+		}
+	}, [ url, cannotEmbed, fetching, setAttributes ] );
 
 	// Handle incoming preview.
 	useEffect( () => {
 		if ( preview && ! isEditingURL ) {
-			// When obtaining an incoming preview, we set the attributes derived from
-			// the preview data. In this case when getting the merged attributes,
-			// we ignore the previous classname because it might not match the expected
-			// classes by the new preview.
-			setAttributes( getMergedAttributes( true ) );
+			// When obtaining an incoming preview,
+			// we set the attributes derived from the preview data.
+			const mergedAttributes = getMergedAttributes();
+			setAttributes( mergedAttributes );
 
 			if ( onReplace ) {
 				const upgradedBlock = createUpgradedEmbedBlock(
 					props,
-					getMergedAttributes()
+					mergedAttributes
 				);
 
 				if ( upgradedBlock ) {
@@ -188,13 +201,25 @@ const EmbedEdit = ( props ) => {
 		[ isEditingURL ]
 	);
 
-	const onEditURL = useCallback( ( value ) => {
-		// The order of the following calls is important, we need to update the URL attribute before changing `isEditingURL`,
-		// otherwise the side-effect that potentially replaces the block when updating the local state won't use the new URL
-		// for creating the new block.
-		setAttributes( { url: value } );
-		setIsEditingURL( false );
-	}, [] );
+	const onEditURL = useCallback(
+		( value ) => {
+			// If the embed URL was changed, we need to reset the aspect ratio class.
+			// To do this we have to remove the existing ratio class so it can be recalculated.
+			if ( attributes.url !== value ) {
+				const blockClass = removeAspectRatioClasses(
+					attributes.className
+				);
+				setAttributes( { className: blockClass } );
+			}
+
+			// The order of the following calls is important, we need to update the URL attribute before changing `isEditingURL`,
+			// otherwise the side-effect that potentially replaces the block when updating the local state won't use the new URL
+			// for creating the new block.
+			setAttributes( { url: value } );
+			setIsEditingURL( false );
+		},
+		[ attributes, setAttributes ]
+	);
 
 	const blockProps = useBlockProps();
 
@@ -221,7 +246,7 @@ const EmbedEdit = ( props ) => {
 		allowResponsive,
 		className: classFromPreview,
 	} = getMergedAttributes();
-	const className = classnames( classFromPreview, props.className );
+	const className = clsx( classFromPreview, props.className );
 
 	const isProviderPreviewable =
 		PREVIEWABLE_PROVIDERS.includes( providerNameSlug ) ||

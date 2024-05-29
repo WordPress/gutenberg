@@ -6,30 +6,39 @@ import { ToolbarGroup, ToolbarItem } from '@wordpress/components';
 /**
  * Internal dependencies
  */
+import AspectRatioDropdown from './aspect-ratio-dropdown';
 import BlockControls from '../block-controls';
+import ImageEditingProvider from './context';
 import Cropper from './cropper';
 import ZoomDropdown from './zoom-dropdown';
-import AspectRatioDropdown from './aspect-ratio-dropdown';
 import RotationButton from './rotation-button';
 import FormControls from './form-controls';
 
 export default function ImageEditor( {
+	id,
 	url,
 	width,
 	height,
-	clientWidth,
 	naturalHeight,
 	naturalWidth,
+	onSaveImage,
+	onFinishEditing,
 	borderProps,
 } ) {
 	return (
-		<>
+		<ImageEditingProvider
+			id={ id }
+			url={ url }
+			naturalWidth={ naturalWidth }
+			naturalHeight={ naturalHeight }
+			onSaveImage={ onSaveImage }
+			onFinishEditing={ onFinishEditing }
+		>
 			<Cropper
 				borderProps={ borderProps }
 				url={ url }
 				width={ width }
 				height={ height }
-				clientWidth={ clientWidth }
 				naturalHeight={ naturalHeight }
 				naturalWidth={ naturalWidth }
 			/>
@@ -47,8 +56,6 @@ export default function ImageEditor( {
 					<FormControls />
 				</ToolbarGroup>
 			</BlockControls>
-		</>
+		</ImageEditingProvider>
 	);
 }
-
-export { default as ImageEditingProvider } from './context';

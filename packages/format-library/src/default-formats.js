@@ -12,6 +12,9 @@ import { textColor } from './text-color';
 import { subscript } from './subscript';
 import { superscript } from './superscript';
 import { keyboard } from './keyboard';
+import { unknown } from './unknown';
+import { language } from './language';
+import { nonBreakingSpace } from './non-breaking-space';
 
 export default [
 	bold,
@@ -25,4 +28,7 @@ export default [
 	subscript,
 	superscript,
 	keyboard,
+	unknown,
+	language,
+	nonBreakingSpace,
 ];

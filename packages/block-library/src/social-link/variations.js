@@ -5,6 +5,7 @@ import {
 	AmazonIcon,
 	BandcampIcon,
 	BehanceIcon,
+	BlueskyIcon,
 	ChainIcon,
 	CodepenIcon,
 	DeviantArtIcon,
@@ -19,6 +20,7 @@ import {
 	GoodreadsIcon,
 	GoogleIcon,
 	GitHubIcon,
+	GravatarIcon,
 	InstagramIcon,
 	LastfmIcon,
 	LinkedInIcon,
@@ -35,6 +37,7 @@ import {
 	SoundCloudIcon,
 	SpotifyIcon,
 	TelegramIcon,
+	ThreadsIcon,
 	TiktokIcon,
 	TumblrIcon,
 	TwitchIcon,
@@ -43,6 +46,7 @@ import {
 	VkIcon,
 	WhatsAppIcon,
 	WordPressIcon,
+	XIcon,
 	YelpIcon,
 	YouTubeIcon,
 } from './icons';
@@ -79,6 +83,12 @@ const variations = [
 		attributes: { service: 'behance' },
 		title: 'Behance',
 		icon: BehanceIcon,
+	},
+	{
+		name: 'bluesky',
+		attributes: { service: 'bluesky' },
+		title: 'Bluesky',
+		icon: BlueskyIcon,
 	},
 	{
 		name: 'chain',
@@ -157,6 +167,12 @@ const variations = [
 		attributes: { service: 'github' },
 		title: 'GitHub',
 		icon: GitHubIcon,
+	},
+	{
+		name: 'gravatar',
+		attributes: { service: 'gravatar' },
+		title: 'Gravatar',
+		icon: GravatarIcon,
 	},
 	{
 		name: 'instagram',
@@ -256,6 +272,12 @@ const variations = [
 		icon: TelegramIcon,
 	},
 	{
+		name: 'threads',
+		attributes: { service: 'threads' },
+		title: 'Threads',
+		icon: ThreadsIcon,
+	},
+	{
 		name: 'tiktok',
 		attributes: { service: 'tiktok' },
 		title: 'TikTok',
@@ -298,6 +320,13 @@ const variations = [
 		icon: WhatsAppIcon,
 	},
 	{
+		name: 'x',
+		attributes: { service: 'x' },
+		keywords: [ 'twitter' ],
+		title: 'X',
+		icon: XIcon,
+	},
+	{
 		name: 'yelp',
 		attributes: { service: 'yelp' },
 		title: 'Yelp',
@@ -317,7 +346,9 @@ const variations = [
  *  Block by providing its attributes.
  */
 variations.forEach( ( variation ) => {
-	if ( variation.isActive ) return;
+	if ( variation.isActive ) {
+		return;
+	}
 	variation.isActive = ( blockAttributes, variationAttributes ) =>
 		blockAttributes.service === variationAttributes.service;
 } );

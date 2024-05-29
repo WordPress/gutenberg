@@ -75,10 +75,10 @@ The simplest way to add a production dependency to one of the packages is to run
 _Example:_
 
 ```bash
-lerna add lodash packages/a11y
+lerna add change-case packages/a11y
 ```
 
-This command adds the latest version of `lodash` as a dependency to the `@wordpress/a11y` package, which is located in `packages/a11y` folder.
+This command adds the latest version of `change-case` as a dependency to the `@wordpress/a11y` package, which is located in `packages/a11y` folder.
 
 #### Removing Existing Dependencies
 
@@ -92,9 +92,9 @@ _Example:_
                 "check-node-version": "^4.1.0",
                 "cross-spawn": "^5.1.0",
                 "eslint": "^7.1.0",
--               "jest": "^27.4.4",
+-               "jest": "^29.6.2",
                 "minimist": "^1.2.0",
-                "npm-package-json-lint": "^3.6.0",
+                "npm-package-json-lint": "^6.4.0",
 ```
 
 Next, you need to run `npm install` in the root of the project to ensure that `package-lock.json` file gets properly regenerated.
@@ -180,7 +180,7 @@ While other section naming can be used when appropriate, it's important that are
 
 When in doubt, refer to [Semantic Versioning specification](https://semver.org/).
 
-If you are publishing new versions of packages, note that there are versioning recommendations outlined in the [Gutenberg Release Process document](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/release.md) which prescribe _minimum_ version bumps for specific types of releases. The chosen version should be the greater of the two between the semantic versioning and Gutenberg release minimum version bumps.
+If you are publishing new versions of packages, note that there are versioning recommendations outlined in the [Gutenberg Release Process document](https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/release.md) which prescribe _minimum_ version bumps for specific types of releases. The chosen version should be the greater of the two between the semantic versioning and Gutenberg release minimum version bumps.
 
 ## TypeScript
 

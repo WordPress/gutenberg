@@ -10,7 +10,6 @@ import {
 	Warning,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { getBlockSupport } from '@wordpress/blocks';
 import { PanelBody } from '@wordpress/components';
 
 /**
@@ -24,21 +23,11 @@ const TEMPLATE = [
 	[ 'core/comments-pagination-next' ],
 ];
 
-const getDefaultBlockLayout = ( blockTypeOrName ) => {
-	const layoutBlockSupportConfig = getBlockSupport(
-		blockTypeOrName,
-		'__experimentalLayout'
-	);
-	return layoutBlockSupportConfig?.default;
-};
-
 export default function QueryPaginationEdit( {
-	attributes: { paginationArrow, layout },
+	attributes: { paginationArrow },
 	setAttributes,
 	clientId,
-	name,
 } ) {
-	const usedLayout = layout || getDefaultBlockLayout( name );
 	const hasNextPreviousBlocks = useSelect( ( select ) => {
 		const { getBlocks } = select( blockEditorStore );
 		const innerBlocks = getBlocks( clientId );
@@ -58,12 +47,6 @@ export default function QueryPaginationEdit( {
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
-		allowedBlocks: [
-			'core/comments-pagination-previous',
-			'core/comments-pagination-numbers',
-			'core/comments-pagination-next',
-		],
-		__experimentalLayout: usedLayout,
 	} );
 
 	// Get the Discussion settings

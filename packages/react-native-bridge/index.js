@@ -3,6 +3,16 @@
  */
 import { NativeModules, NativeEventEmitter, Platform } from 'react-native';
 
+/**
+ * WordPress dependencies
+ */
+import RCTAztecView from '@wordpress/react-native-aztec';
+
+/**
+ * Internal dependencies
+ */
+import parseException from './lib/parseException';
+
 const { RNReactNativeGutenbergBridge } = NativeModules;
 const isIOS = Platform.OS === 'ios';
 const isAndroid = Platform.OS === 'android';
@@ -65,6 +75,13 @@ export function subscribeUpdateHtml( callback ) {
 export function subscribeFeaturedImageIdNativeUpdated( callback ) {
 	return gutenbergBridgeEvents.addListener(
 		'featuredImageIdNativeUpdated',
+		callback
+	);
+}
+
+export function subscribePostSaveEvent( callback ) {
+	return gutenbergBridgeEvents.addListener(
+		'postHasBeenJustSaved',
 		callback
 	);
 }
@@ -170,6 +187,25 @@ export function subscribeShowEditorHelp( callback ) {
 	return gutenbergBridgeEvents.addListener( 'showEditorHelp', callback );
 }
 
+export function subscribeOnUndoPressed( callback ) {
+	return gutenbergBridgeEvents.addListener( 'onUndoPressed', callback );
+}
+
+export function subscribeOnRedoPressed( callback ) {
+	return gutenbergBridgeEvents.addListener( 'onRedoPressed', callback );
+}
+
+export function subscribeConnectionStatus( callback ) {
+	return gutenbergBridgeEvents.addListener(
+		'connectionStatusChange',
+		callback
+	);
+}
+
+export function requestConnectionStatus( callback ) {
+	return RNReactNativeGutenbergBridge.requestConnectionStatus( callback );
+}
+
 /**
  * Request media picker for the given media source.
  *
@@ -190,7 +226,7 @@ export function requestMediaPicker( source, filter, multiple, callback ) {
 }
 
 /**
- * Request to render an unsuported block.
+ * Request to render an unsupported block.
  *
  * A way to show unsupported blocks to the user is to render it on a web view.
  *
@@ -229,16 +265,6 @@ export function requestMediaImport( url, callback ) {
  */
 export function mediaUploadSync() {
 	return RNReactNativeGutenbergBridge.mediaUploadSync();
-}
-
-/**
- * Request to start listening to save events when in-progress saves are in place
- *
- * For example, when media is being saved and the user re-enters the editor
- *
- */
-export function mediaSaveSync() {
-	return RNReactNativeGutenbergBridge.mediaSaveSync();
 }
 
 export function requestImageFailedRetryDialog( mediaId ) {
@@ -283,6 +309,18 @@ export function requestImageFullscreenPreview(
 	);
 }
 
+export function requestEmbedFullscreenPreview( content, title ) {
+	if ( isIOS ) {
+		/* eslint-disable-next-line no-console */
+		console.warn( 'requestEmbedFullscreenPreview is not supported on iOS' );
+		return;
+	}
+	return RNReactNativeGutenbergBridge.requestEmbedFullscreenPreview(
+		content,
+		title
+	);
+}
+
 export function requestMediaEditor( mediaUrl, callback ) {
 	return RNReactNativeGutenbergBridge.requestMediaEditor(
 		mediaUrl,
@@ -297,85 +335,16 @@ export function fetchRequest( path, enableCaching = true ) {
 	return RNReactNativeGutenbergBridge.fetchRequest( path );
 }
 
+export function postRequest( path, data = {} ) {
+	return RNReactNativeGutenbergBridge.postRequest( path, data );
+}
+
 export function showUserSuggestions() {
 	return RNReactNativeGutenbergBridge.showUserSuggestions();
 }
 
 export function showXpostSuggestions() {
 	return RNReactNativeGutenbergBridge.showXpostSuggestions();
-}
-
-/**
- * Request the host app to show the block for editing its mediaFiles collection
- *
- * For example, a mediaFiles collection editor can make special handling of visualization
- * in this regard.
- *
- * @param {Array<Map>} mediaFiles    the mediaFiles attribute of the block, containing data about each media item.
- * @param {string}     blockClientId the clientId of the block.
- */
-export function requestMediaFilesEditorLoad( mediaFiles, blockClientId ) {
-	RNReactNativeGutenbergBridge.requestMediaFilesEditorLoad(
-		mediaFiles,
-		blockClientId
-	);
-}
-
-/**
- * Request the host app to show a retry dialog for mediaFiles arrays which contained items that failed
- * to upload
- *
- * For example, tapping on a failed-media overlay would trigger this request and a "Retry?" dialog
- * would be presented to the user
- *
- * @param {Array<Map>} mediaFiles the mediaFiles attribute of the block, containing data about each media item
- */
-export function requestMediaFilesFailedRetryDialog( mediaFiles ) {
-	RNReactNativeGutenbergBridge.requestMediaFilesFailedRetryDialog(
-		mediaFiles
-	);
-}
-
-/**
- * Request the host app to show a cancel dialog for mediaFiles arrays currently being uploaded
- *
- * For example, tapping on a block containing mediaFiles that are currently being uplaoded would trigger this request
- * and a "Cancel upload?" dialog would be presented to the user.
- *
- * @param {Array<Map>} mediaFiles the mediaFiles attribute of the block, containing data about each media item
- */
-export function requestMediaFilesUploadCancelDialog( mediaFiles ) {
-	RNReactNativeGutenbergBridge.requestMediaFilesUploadCancelDialog(
-		mediaFiles
-	);
-}
-
-/**
- * Request the host app to show a cancel dialog for mediaFiles arrays currently undergoing a save operation
- *
- * Save operations on mediaFiles collection could  be lengthy so for example, tapping on a mediaFiles-type block
- * currently being saved would trigger this request and a "Cancel save?" dialog would be presented to the user
- *
- * @param {Array<Map>} mediaFiles the mediaFiles attribute of the block, containing data about each media item.
- */
-export function requestMediaFilesSaveCancelDialog( mediaFiles ) {
-	RNReactNativeGutenbergBridge.requestMediaFilesSaveCancelDialog(
-		mediaFiles
-	);
-}
-
-/**
- * Request the host app to listen to mediaFiles collection based block replacement signals
- * in case such an event was enqueued
- *
- * @param {Array<Map>} mediaFiles    the mediaFiles attribute of the block, containing data about each media item.
- * @param {string}     blockClientId the clientId of the block.
- */
-export function mediaFilesBlockReplaceSync( mediaFiles, blockClientId ) {
-	RNReactNativeGutenbergBridge.mediaFilesBlockReplaceSync(
-		mediaFiles,
-		blockClientId
-	);
 }
 
 export function requestFocalPointPickerTooltipShown( callback ) {
@@ -437,10 +406,105 @@ export function sendEventToHost( eventName, properties ) {
 }
 
 /**
+ * Shows Android's soft keyboard if there's a TextInput focused and
+ * the keyboard is hidden.
+ *
+ * @return {void}
+ */
+export function showAndroidSoftKeyboard() {
+	if ( isIOS ) {
+		return;
+	}
+
+	const hasFocusedTextInput = RCTAztecView.InputState.isFocused();
+
+	if ( hasFocusedTextInput ) {
+		RNReactNativeGutenbergBridge.showAndroidSoftKeyboard();
+	}
+}
+
+/**
+ * Hides Android's soft keyboard.
+ *
+ * @return {void}
+ */
+export function hideAndroidSoftKeyboard() {
+	if ( isIOS ) {
+		return;
+	}
+
+	RNReactNativeGutenbergBridge.hideAndroidSoftKeyboard();
+}
+
+/**
  * Generate haptic feedback.
  */
 export function generateHapticFeedback() {
 	RNReactNativeGutenbergBridge.generateHapticFeedback();
+}
+
+export function toggleUndoButton( isDisabled ) {
+	RNReactNativeGutenbergBridge.toggleUndoButton( isDisabled );
+}
+
+export function toggleRedoButton( isDisabled ) {
+	RNReactNativeGutenbergBridge.toggleRedoButton( isDisabled );
+}
+
+/**
+ * Log exception to host app's crash logging service.
+ * @param {Object}   exception         Exception object
+ * @param {Object}   [extra]           Extra parameters to include in the exception.
+ * @param {Object}   [extra.context]   Context of the exception.
+ * @param {Object}   [extra.tags]      Tags to associate with the exception.
+ * @param {Object}   [extra.isHandled] True if the exception is handled.
+ * @param {Object}   [extra.handledBy] The mechanism that detected the exception.
+ * @param {Function} [callback]        Callback triggered when the exception is sent.
+ */
+export function logException(
+	exception,
+	{ context, tags, isHandled, handledBy } = {
+		context: {},
+		tags: {},
+		isHandled: false,
+		handledBy: 'Unknown',
+	},
+	callback
+) {
+	const parsedException = {
+		...parseException( exception, { context, tags } ),
+		isHandled,
+		handledBy,
+	};
+
+	const onLogException = ( wasSent ) => {
+		if ( ! wasSent ) {
+			// eslint-disable-next-line no-console
+			console.error(
+				'An error ocurred when logging the exception',
+				parsedException
+			);
+		}
+		if ( callback ) {
+			callback();
+		}
+	};
+
+	// Only log exceptions in production
+	// eslint-disable-next-line no-undef
+	if ( __DEV__ ) {
+		// eslint-disable-next-line no-console
+		console.info( 'Exception that would be logged', parsedException );
+		if ( callback ) {
+			callback();
+		}
+		return;
+	}
+
+	RNReactNativeGutenbergBridge.logException(
+		parsedException,
+		onLogException
+	);
 }
 
 export default RNReactNativeGutenbergBridge;

@@ -3,6 +3,7 @@
  */
 import { useDispatch } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
+import { SlotFillProvider } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -11,21 +12,55 @@ import withRegistryProvider from './with-registry-provider';
 import useBlockSync from './use-block-sync';
 import { store as blockEditorStore } from '../../store';
 import { BlockRefsProvider } from './block-refs-provider';
+import { unlock } from '../../lock-unlock';
+import KeyboardShortcuts from '../keyboard-shortcuts';
 
 /** @typedef {import('@wordpress/data').WPDataRegistry} WPDataRegistry */
 
-function BlockEditorProvider( props ) {
-	const { children, settings } = props;
+export const ExperimentalBlockEditorProvider = withRegistryProvider(
+	( props ) => {
+		const { children, settings, stripExperimentalSettings = false } = props;
 
-	const { updateSettings } = useDispatch( blockEditorStore );
-	useEffect( () => {
-		updateSettings( settings );
-	}, [ settings ] );
+		const { __experimentalUpdateSettings } = unlock(
+			useDispatch( blockEditorStore )
+		);
+		useEffect( () => {
+			__experimentalUpdateSettings(
+				{
+					...settings,
+					__internalIsInitialized: true,
+				},
+				{
+					stripExperimentalSettings,
+					reset: true,
+				}
+			);
+		}, [
+			settings,
+			stripExperimentalSettings,
+			__experimentalUpdateSettings,
+		] );
 
-	// Syncs the entity provider with changes in the block-editor store.
-	useBlockSync( props );
+		// Syncs the entity provider with changes in the block-editor store.
+		useBlockSync( props );
 
-	return <BlockRefsProvider>{ children }</BlockRefsProvider>;
-}
+		return (
+			<SlotFillProvider passthrough>
+				{ ! settings?.__unstableIsPreviewMode && (
+					<KeyboardShortcuts.Register />
+				) }
+				<BlockRefsProvider>{ children }</BlockRefsProvider>
+			</SlotFillProvider>
+		);
+	}
+);
 
-export default withRegistryProvider( BlockEditorProvider );
+export const BlockEditorProvider = ( props ) => {
+	return (
+		<ExperimentalBlockEditorProvider { ...props } stripExperimentalSettings>
+			{ props.children }
+		</ExperimentalBlockEditorProvider>
+	);
+};
+
+export default BlockEditorProvider;

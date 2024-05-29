@@ -8,5 +8,11 @@ export default function googleDocsUIdRemover( node ) {
 		return;
 	}
 
-	unwrap( node );
+	// Google Docs sometimes wraps the content in a B tag. We don't want to keep
+	// this.
+	if ( node.tagName === 'B' ) {
+		unwrap( node );
+	} else {
+		node.removeAttribute( 'id' );
+	}
 }

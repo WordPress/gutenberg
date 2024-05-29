@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { last } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useEffect, useRef } from '@wordpress/element';
@@ -14,6 +9,7 @@ import { cloneBlock } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { undoIgnoreBlocks } from '../../store/undo-ignore';
 
 const noop = () => {};
 
@@ -84,7 +80,8 @@ export default function useBlockSync( {
 		setHasControlledInnerBlocks,
 		__unstableMarkNextChangeAsNotPersistent,
 	} = registry.dispatch( blockEditorStore );
-	const { getBlockName, getBlocks } = registry.select( blockEditorStore );
+	const { getBlockName, getBlocks, getSelectionStart, getSelectionEnd } =
+		registry.select( blockEditorStore );
 	const isControlled = useSelect(
 		( select ) => {
 			return (
@@ -131,6 +128,19 @@ export default function useBlockSync( {
 		}
 	};
 
+	// Clean up the changes made by setControlledBlocks() when the component
+	// containing useBlockSync() unmounts.
+	const unsetControlledBlocks = () => {
+		__unstableMarkNextChangeAsNotPersistent();
+		if ( clientId ) {
+			setHasControlledInnerBlocks( clientId, false );
+			__unstableMarkNextChangeAsNotPersistent();
+			replaceInnerBlocks( clientId, [] );
+		} else {
+			resetBlocks( [] );
+		}
+	};
+
 	// Add a subscription to the block-editor registry to detect when changes
 	// have been made. This lets us inform the data source of changes. This
 	// is an effect so that the subscriber can run synchronously without
@@ -152,7 +162,9 @@ export default function useBlockSync( {
 			// to allow that the consumer may apply modifications to reflect
 			// back on the editor.
 			if (
-				last( pendingChanges.current.outgoing ) === controlledBlocks
+				pendingChanges.current.outgoing[
+					pendingChanges.current.outgoing.length - 1
+				] === controlledBlocks
 			) {
 				pendingChanges.current.outgoing = [];
 			}
@@ -174,7 +186,15 @@ export default function useBlockSync( {
 		}
 	}, [ controlledBlocks, clientId ] );
 
+	const isMounted = useRef( false );
+
 	useEffect( () => {
+		// On mount, controlled blocks are already set in the effect above.
+		if ( ! isMounted.current ) {
+			isMounted.current = true;
+			return;
+		}
+
 		// When the block becomes uncontrolled, it means its inner state has been reset
 		// we need to take the blocks again from the external value property.
 		if ( ! isControlled ) {
@@ -185,8 +205,6 @@ export default function useBlockSync( {
 
 	useEffect( () => {
 		const {
-			getSelectionStart,
-			getSelectionEnd,
 			getSelectedBlocksInitialCaretPosition,
 			isLastBlockChangePersistent,
 			__unstableIsLastBlockChangeIgnored,
@@ -206,8 +224,9 @@ export default function useBlockSync( {
 			// the subscription is triggering for a block (`clientId !== null`)
 			// and its block name can't be found because it's not on the list.
 			// (`getBlockName( clientId ) === null`).
-			if ( clientId !== null && getBlockName( clientId ) === null )
+			if ( clientId !== null && getBlockName( clientId ) === null ) {
 				return;
+			}
 
 			// When RESET_BLOCKS on parent blocks get called, the controlled blocks
 			// can reset to uncontrolled, in these situations, it means we need to populate
@@ -223,7 +242,6 @@ export default function useBlockSync( {
 			const newBlocks = getBlocks( clientId );
 			const areBlocksDifferent = newBlocks !== blocks;
 			blocks = newBlocks;
-
 			if (
 				areBlocksDifferent &&
 				( pendingChanges.current.incoming ||
@@ -256,6 +274,10 @@ export default function useBlockSync( {
 				const updateParent = isPersistent
 					? onChangeRef.current
 					: onInputRef.current;
+				const undoIgnore = undoIgnoreBlocks.has( blocks );
+				if ( undoIgnore ) {
+					undoIgnoreBlocks.delete( blocks );
+				}
 				updateParent( blocks, {
 					selection: {
 						selectionStart: getSelectionStart(),
@@ -263,11 +285,21 @@ export default function useBlockSync( {
 						initialPosition:
 							getSelectedBlocksInitialCaretPosition(),
 					},
+					undoIgnore,
 				} );
 			}
 			previousAreBlocksDifferent = areBlocksDifferent;
-		} );
+		}, blockEditorStore );
 
-		return () => unsubscribe();
+		return () => {
+			subscribed.current = false;
+			unsubscribe();
+		};
 	}, [ registry, clientId ] );
+
+	useEffect( () => {
+		return () => {
+			unsetControlledBlocks();
+		};
+	}, [] );
 }

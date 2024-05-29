@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -10,10 +10,13 @@ import {
 	Button,
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
+	Tooltip,
 } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
-import { Icon, lock } from '@wordpress/icons';
+import { Icon, lockSmall as lock, pinSmall } from '@wordpress/icons';
 import { SPACE, ENTER } from '@wordpress/keycodes';
+import { __, sprintf } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -23,18 +26,24 @@ import useBlockDisplayInformation from '../use-block-display-information';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import ListViewExpander from './expander';
 import { useBlockLock } from '../block-lock';
+import useListViewImages from './use-list-view-images';
+import { store as blockEditorStore } from '../../store';
 
 function ListViewBlockSelectButton(
 	{
 		className,
 		block: { clientId },
 		onClick,
+		onContextMenu,
+		onMouseDown,
 		onToggleExpanded,
 		tabIndex,
 		onFocus,
 		onDragStart,
 		onDragEnd,
 		draggable,
+		isExpanded,
+		ariaDescribedBy,
 	},
 	ref
 ) {
@@ -44,6 +53,25 @@ function ListViewBlockSelectButton(
 		context: 'list-view',
 	} );
 	const { isLocked } = useBlockLock( clientId );
+	const { isContentOnly } = useSelect(
+		( select ) => ( {
+			isContentOnly:
+				select( blockEditorStore ).getBlockEditingMode( clientId ) ===
+				'contentOnly',
+		} ),
+		[ clientId ]
+	);
+	const shouldShowLockIcon = isLocked && ! isContentOnly;
+	const isSticky = blockInformation?.positionType === 'sticky';
+	const images = useListViewImages( { clientId, isExpanded } );
+
+	const positionLabel = blockInformation?.positionLabel
+		? sprintf(
+				// translators: 1: Position of selected block, e.g. "Sticky" or "Fixed".
+				__( 'Position: %1$s' ),
+				blockInformation.positionLabel
+		  )
+		: '';
 
 	// The `href` attribute triggers the browser's native HTML drag operations.
 	// When the link is dragged, the element's outerHTML is set in DataTransfer object as text/html.
@@ -54,54 +82,89 @@ function ListViewBlockSelectButton(
 		onDragStart?.( event );
 	};
 
-	function onKeyDownHandler( event ) {
+	/**
+	 * @param {KeyboardEvent} event
+	 */
+	function onKeyDown( event ) {
 		if ( event.keyCode === ENTER || event.keyCode === SPACE ) {
 			onClick( event );
 		}
 	}
 
 	return (
-		<>
-			<Button
-				className={ classnames(
-					'block-editor-list-view-block-select-button',
-					className
-				) }
-				onClick={ onClick }
-				onKeyDown={ onKeyDownHandler }
-				ref={ ref }
-				tabIndex={ tabIndex }
-				onFocus={ onFocus }
-				onDragStart={ onDragStartHandler }
-				onDragEnd={ onDragEnd }
-				draggable={ draggable }
-				href={ `#block-${ clientId }` }
-				aria-hidden={ true }
+		<Button
+			className={ clsx(
+				'block-editor-list-view-block-select-button',
+				className
+			) }
+			onClick={ onClick }
+			onContextMenu={ onContextMenu }
+			onKeyDown={ onKeyDown }
+			onMouseDown={ onMouseDown }
+			ref={ ref }
+			tabIndex={ tabIndex }
+			onFocus={ onFocus }
+			onDragStart={ onDragStartHandler }
+			onDragEnd={ onDragEnd }
+			draggable={ draggable }
+			href={ `#block-${ clientId }` }
+			aria-describedby={ ariaDescribedBy }
+			aria-expanded={ isExpanded }
+		>
+			<ListViewExpander onClick={ onToggleExpanded } />
+			<BlockIcon
+				icon={ blockInformation?.icon }
+				showColors
+				context="list-view"
+			/>
+			<HStack
+				alignment="center"
+				className="block-editor-list-view-block-select-button__label-wrapper"
+				justify="flex-start"
+				spacing={ 1 }
 			>
-				<ListViewExpander onClick={ onToggleExpanded } />
-				<BlockIcon icon={ blockInformation?.icon } showColors />
-				<HStack
-					alignment="center"
-					className="block-editor-list-view-block-select-button__label-wrapper"
-					justify="flex-start"
-					spacing={ 1 }
-				>
-					<span className="block-editor-list-view-block-select-button__title">
-						<Truncate ellipsizeMode="auto">{ blockTitle }</Truncate>
-					</span>
-					{ blockInformation?.anchor && (
-						<span className="block-editor-list-view-block-select-button__anchor">
+				<span className="block-editor-list-view-block-select-button__title">
+					<Truncate ellipsizeMode="auto">{ blockTitle }</Truncate>
+				</span>
+				{ blockInformation?.anchor && (
+					<span className="block-editor-list-view-block-select-button__anchor-wrapper">
+						<Truncate
+							className="block-editor-list-view-block-select-button__anchor"
+							ellipsizeMode="auto"
+						>
 							{ blockInformation.anchor }
-						</span>
-					) }
-					{ isLocked && (
-						<span className="block-editor-list-view-block-select-button__lock">
-							<Icon icon={ lock } />
-						</span>
-					) }
-				</HStack>
-			</Button>
-		</>
+						</Truncate>
+					</span>
+				) }
+				{ positionLabel && isSticky && (
+					<Tooltip text={ positionLabel }>
+						<Icon icon={ pinSmall } />
+					</Tooltip>
+				) }
+				{ images.length ? (
+					<span
+						className="block-editor-list-view-block-select-button__images"
+						aria-hidden
+					>
+						{ images.map( ( image, index ) => (
+							<span
+								className="block-editor-list-view-block-select-button__image"
+								key={ image.clientId }
+								style={ {
+									backgroundImage: `url(${ image.url })`,
+									zIndex: images.length - index, // Ensure the first image is on top, and subsequent images are behind.
+								} }
+							/>
+						) ) }
+					</span>
+				) : null }
+				{ shouldShowLockIcon && (
+					<span className="block-editor-list-view-block-select-button__lock">
+						<Icon icon={ lock } />
+					</span>
+				) }
+			</HStack>
+		</Button>
 	);
 }
 

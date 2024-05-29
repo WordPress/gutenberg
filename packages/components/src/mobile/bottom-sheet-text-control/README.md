@@ -64,7 +64,14 @@ A function that receives the value that's input into the text editor.
 
 #### placeholder
 
-The placeholder text that will display in the component's subsheet, when its text editor is empty.
+The placeholder text that will display in the component's cell and subsheet when there is no set value.
+
+-   Type: `String`
+-   Required: No
+
+### cellPlaceholder
+
+The placeholder text that will display in the component's cell when there is no set value. The `cellPlaceholder` will override the more generic placeholder prop when set, enabling the placeholders in the component's cell and subsheet to be different if desired.
 
 -   Type: `String`
 -   Required: No

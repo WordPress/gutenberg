@@ -8,7 +8,7 @@ import {
 	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
-import { useSetting } from '@wordpress/block-editor';
+import { useSettings } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -17,16 +17,24 @@ import { __ } from '@wordpress/i18n';
 import { MIN_SPACER_SIZE } from './constants';
 import styles from './style.scss';
 
-const DEFAULT_VALUES = { px: 100, em: 10, rem: 10, vw: 10, vh: 25 };
+export const DEFAULT_VALUES = { px: 100, em: 10, rem: 10, vw: 10, vh: 25 };
 
-function Controls( { attributes, context, setAttributes } ) {
+function Controls( {
+	attributes,
+	context,
+	setAttributes,
+	presetWidth,
+	presetHeight,
+} ) {
 	const { orientation } = context;
 	const label = orientation !== 'horizontal' ? __( 'Height' ) : __( 'Width' );
 
-	const { height, width } = attributes;
+	const width = presetWidth || attributes.width;
+	const height = presetHeight || attributes.height;
 	const { valueToConvert, valueUnit: unit } =
 		getValueAndUnit( orientation !== 'horizontal' ? height : width ) || {};
 	const value = Number( valueToConvert );
+	const currentUnit = unit || 'px';
 
 	const setNewDimensions = ( nextValue, nextUnit ) => {
 		const valueWithUnit = `${ nextValue }${ nextUnit }`;
@@ -39,7 +47,7 @@ function Controls( { attributes, context, setAttributes } ) {
 
 	const handleChange = useCallback(
 		( nextValue ) => {
-			setNewDimensions( nextValue, unit );
+			setNewDimensions( nextValue, currentUnit );
 		},
 		[ height, width ]
 	);
@@ -51,14 +59,9 @@ function Controls( { attributes, context, setAttributes } ) {
 		[ height, width ]
 	);
 
+	const [ availableUnits ] = useSettings( 'spacing.units' );
 	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units' ) || [
-			'px',
-			'em',
-			'rem',
-			'vw',
-			'vh',
-		],
+		availableUnits: availableUnits || [ 'px', 'em', 'rem', 'vw', 'vh' ],
 		defaultValues: DEFAULT_VALUES,
 	} );
 
@@ -72,7 +75,7 @@ function Controls( { attributes, context, setAttributes } ) {
 					onChange={ handleChange }
 					onUnitChange={ handleUnitChange }
 					units={ units }
-					unit={ unit }
+					unit={ currentUnit }
 					style={ styles.rangeCellContainer }
 				/>
 			</PanelBody>

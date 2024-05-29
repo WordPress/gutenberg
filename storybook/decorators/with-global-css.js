@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { useEffect } from '@wordpress/element';
@@ -13,6 +8,11 @@ import { useEffect } from '@wordpress/element';
  */
 import basicStyles from '../global-basic.lazy.scss';
 import wordPressStyles from '../global-wordpress.lazy.scss';
+
+/**
+ * External dependencies
+ */
+import clsx from 'clsx';
 
 /**
  * A Storybook decorator to inject global CSS.
@@ -39,6 +39,8 @@ const config = {
 			// that affect wp-components
 			'https://wordpress.org/gutenberg/wp-admin/css/common.min.css',
 			'https://wordpress.org/gutenberg/wp-admin/css/forms.min.css',
+			// Icon components need to support dashicons for backwards compatibility
+			'https://wordpress.org/gutenberg/wp-includes/css/dashicons.min.css',
 		],
 		// In wp-admin, these classes are added to the body element,
 		// which is used as a class scope for some relevant styles in the external
@@ -57,7 +59,7 @@ export const WithGlobalCSS = ( Story, context ) => {
 	}, [ context.globals.css ] );
 
 	return (
-		<div className={ classnames( classes ) }>
+		<div className={ clsx( classes ) }>
 			{ externalStyles.map( ( stylesheet ) => (
 				<link key={ stylesheet } rel="stylesheet" href={ stylesheet } />
 			) ) }

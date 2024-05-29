@@ -1,11 +1,7 @@
 /**
- * External dependencies
- */
-import { has } from 'lodash';
-
-/**
  * WordPress dependencies
  */
+import { speak } from '@wordpress/a11y';
 import apiFetch from '@wordpress/api-fetch';
 import deprecated from '@wordpress/deprecated';
 import {
@@ -16,7 +12,9 @@ import {
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { applyFilters } from '@wordpress/hooks';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -40,7 +38,7 @@ import {
 export const setupEditor =
 	( post, edits, template ) =>
 	( { dispatch } ) => {
-		dispatch.setupEditorState( post );
+		dispatch.setEditedPost( post.type, post.id );
 		// Apply a template for new posts only, if exists.
 		const isNewPost = post.status === 'auto-draft';
 		if ( isNewPost && template ) {
@@ -48,7 +46,7 @@ export const setupEditor =
 			// included as part of editor setup action. Assume edited content as
 			// canonical if provided, falling back to post.
 			let content;
-			if ( has( edits, [ 'content' ] ) ) {
+			if ( 'content' in edits ) {
 				content = edits.content;
 			} else {
 				content = post.content.raw;
@@ -74,10 +72,18 @@ export const setupEditor =
  * Returns an action object signalling that the editor is being destroyed and
  * that any necessary state or side-effect cleanup should occur.
  *
+ * @deprecated
+ *
  * @return {Object} Action object.
  */
 export function __experimentalTearDownEditor() {
-	return { type: 'TEAR_DOWN_EDITOR' };
+	deprecated(
+		"wp.data.dispatch( 'core/editor' ).__experimentalTearDownEditor",
+		{
+			since: '6.5',
+		}
+	);
+	return { type: 'DO_NOTHING' };
 }
 
 /**
@@ -113,17 +119,33 @@ export function updatePost() {
 }
 
 /**
- * Returns an action object used to setup the editor state when first opening
- * an editor.
+ * Setup the editor state.
+ *
+ * @deprecated
  *
  * @param {Object} post Post object.
+ */
+export function setupEditorState( post ) {
+	deprecated( "wp.data.dispatch( 'core/editor' ).setupEditorState", {
+		since: '6.5',
+		alternative: "wp.data.dispatch( 'core/editor' ).setEditedPost",
+	} );
+	return setEditedPost( post.type, post.id );
+}
+
+/**
+ * Returns an action that sets the current post Type and post ID.
+ *
+ * @param {string} postType Post Type.
+ * @param {string} postId   Post ID.
  *
  * @return {Object} Action object.
  */
-export function setupEditorState( post ) {
+export function setEditedPost( postType, postId ) {
 	return {
-		type: 'SETUP_EDITOR_STATE',
-		post,
+		type: 'SET_EDITED_POST',
+		postType,
+		postId,
 	};
 }
 
@@ -182,15 +204,26 @@ export const savePost =
 				edits,
 				options
 			);
-		dispatch( { type: 'REQUEST_POST_UPDATE_FINISH', options } );
 
-		const error = registry
+		let error = registry
 			.select( coreStore )
 			.getLastEntitySaveError(
 				'postType',
 				previousRecord.type,
 				previousRecord.id
 			);
+
+		if ( ! error ) {
+			await applyFilters(
+				'editor.__unstableSavePost',
+				Promise.resolve(),
+				options
+			).catch( ( err ) => {
+				error = err;
+			} );
+		}
+		dispatch( { type: 'REQUEST_POST_UPDATE_FINISH', options } );
+
 		if ( error ) {
 			const args = getNotificationArgumentsForSaveFail( {
 				post: previousRecord,
@@ -252,6 +285,7 @@ export const trashPost =
 		registry.dispatch( noticesStore ).removeNotice( TRASH_POST_NOTICE_ID );
 		const { rest_base: restBase, rest_namespace: restNamespace = 'wp/v2' } =
 			postType;
+		dispatch( { type: 'REQUEST_POST_DELETE_START' } );
 		try {
 			const post = select.getCurrentPost();
 			await apiFetch( {
@@ -267,6 +301,7 @@ export const trashPost =
 					...getNotificationArgumentsForTrashFail( { error } )
 				);
 		}
+		dispatch( { type: 'REQUEST_POST_DELETE_FINISH' } );
 	};
 
 /**
@@ -280,8 +315,14 @@ export const trashPost =
 export const autosave =
 	( { local = false, ...options } = {} ) =>
 	async ( { select, dispatch } ) => {
+		const post = select.getCurrentPost();
+
+		// Currently template autosaving is not supported.
+		if ( post.type === 'wp_template' ) {
+			return;
+		}
+
 		if ( local ) {
-			const post = select.getCurrentPost();
 			const isPostNew = select.isEditedPostNew();
 			const title = select.getEditedPostAttribute( 'title' );
 			const content = select.getEditedPostAttribute( 'content' );
@@ -290,6 +331,26 @@ export const autosave =
 		} else {
 			await dispatch.savePost( { isAutosave: true, ...options } );
 		}
+	};
+
+export const __unstableSaveForPreview =
+	( { forceIsAutosaveable } = {} ) =>
+	async ( { select, dispatch } ) => {
+		if (
+			( forceIsAutosaveable || select.isEditedPostAutosaveable() ) &&
+			! select.isPostLocked()
+		) {
+			const isDraft = [ 'draft', 'auto-draft' ].includes(
+				select.getEditedPostAttribute( 'status' )
+			);
+			if ( isDraft ) {
+				await dispatch.savePost( { isPreview: true } );
+			} else {
+				await dispatch.autosave( { isPreview: true } );
+			}
+		}
+
+		return select.getEditedPostPreviewLink();
 	};
 
 /**
@@ -345,7 +406,7 @@ export const enablePublishSidebar =
 	( { registry } ) => {
 		registry
 			.dispatch( preferencesStore )
-			.set( 'core/edit-post', 'isPublishSidebarEnabled', true );
+			.set( 'core', 'isPublishSidebarEnabled', true );
 	};
 
 /**
@@ -356,7 +417,7 @@ export const disablePublishSidebar =
 	( { registry } ) => {
 		registry
 			.dispatch( preferencesStore )
-			.set( 'core/edit-post', 'isPublishSidebarEnabled', false );
+			.set( 'core', 'isPublishSidebarEnabled', false );
 	};
 
 /**
@@ -516,6 +577,280 @@ export function updateEditorSettings( settings ) {
 	return {
 		type: 'UPDATE_EDITOR_SETTINGS',
 		settings,
+	};
+}
+
+/**
+ * Returns an action used to set the rendering mode of the post editor. We support multiple rendering modes:
+ *
+ * -   `post-only`: This mode extracts the post blocks from the template and renders only those. The idea is to allow the user to edit the post/page in isolation without the wrapping template.
+ * -   `template-locked`: This mode renders both the template and the post blocks but the template blocks are locked and can't be edited. The post blocks are editable.
+ *
+ * @param {string} mode Mode (one of 'post-only' or 'template-locked').
+ */
+export const setRenderingMode =
+	( mode ) =>
+	( { dispatch, registry, select } ) => {
+		if ( select.__unstableIsEditorReady() ) {
+			// We clear the block selection but we also need to clear the selection from the core store.
+			registry.dispatch( blockEditorStore ).clearSelectedBlock();
+			dispatch.editPost( { selection: undefined }, { undoIgnore: true } );
+		}
+
+		dispatch( {
+			type: 'SET_RENDERING_MODE',
+			mode,
+		} );
+	};
+
+/**
+ * Action that changes the width of the editing canvas.
+ *
+ * @param {string} deviceType
+ *
+ * @return {Object} Action object.
+ */
+export function setDeviceType( deviceType ) {
+	return {
+		type: 'SET_DEVICE_TYPE',
+		deviceType,
+	};
+}
+
+/**
+ * Returns an action object used to enable or disable a panel in the editor.
+ *
+ * @param {string} panelName A string that identifies the panel to enable or disable.
+ *
+ * @return {Object} Action object.
+ */
+export const toggleEditorPanelEnabled =
+	( panelName ) =>
+	( { registry } ) => {
+		const inactivePanels =
+			registry
+				.select( preferencesStore )
+				.get( 'core', 'inactivePanels' ) ?? [];
+
+		const isPanelInactive = !! inactivePanels?.includes( panelName );
+
+		// If the panel is inactive, remove it to enable it, else add it to
+		// make it inactive.
+		let updatedInactivePanels;
+		if ( isPanelInactive ) {
+			updatedInactivePanels = inactivePanels.filter(
+				( invactivePanelName ) => invactivePanelName !== panelName
+			);
+		} else {
+			updatedInactivePanels = [ ...inactivePanels, panelName ];
+		}
+
+		registry
+			.dispatch( preferencesStore )
+			.set( 'core', 'inactivePanels', updatedInactivePanels );
+	};
+
+/**
+ * Opens a closed panel and closes an open panel.
+ *
+ * @param {string} panelName A string that identifies the panel to open or close.
+ */
+export const toggleEditorPanelOpened =
+	( panelName ) =>
+	( { registry } ) => {
+		const openPanels =
+			registry.select( preferencesStore ).get( 'core', 'openPanels' ) ??
+			[];
+
+		const isPanelOpen = !! openPanels?.includes( panelName );
+
+		// If the panel is open, remove it to close it, else add it to
+		// make it open.
+		let updatedOpenPanels;
+		if ( isPanelOpen ) {
+			updatedOpenPanels = openPanels.filter(
+				( openPanelName ) => openPanelName !== panelName
+			);
+		} else {
+			updatedOpenPanels = [ ...openPanels, panelName ];
+		}
+
+		registry
+			.dispatch( preferencesStore )
+			.set( 'core', 'openPanels', updatedOpenPanels );
+	};
+
+/**
+ * Returns an action object used to remove a panel from the editor.
+ *
+ * @param {string} panelName A string that identifies the panel to remove.
+ *
+ * @return {Object} Action object.
+ */
+export function removeEditorPanel( panelName ) {
+	return {
+		type: 'REMOVE_PANEL',
+		panelName,
+	};
+}
+
+/**
+ * Returns an action object used to open/close the inserter.
+ *
+ * @param {boolean|Object} value                Whether the inserter should be
+ *                                              opened (true) or closed (false).
+ *                                              To specify an insertion point,
+ *                                              use an object.
+ * @param {string}         value.rootClientId   The root client ID to insert at.
+ * @param {number}         value.insertionIndex The index to insert at.
+ *
+ * @return {Object} Action object.
+ */
+export function setIsInserterOpened( value ) {
+	return {
+		type: 'SET_IS_INSERTER_OPENED',
+		value,
+	};
+}
+
+/**
+ * Returns an action object used to open/close the list view.
+ *
+ * @param {boolean} isOpen A boolean representing whether the list view should be opened or closed.
+ * @return {Object} Action object.
+ */
+export function setIsListViewOpened( isOpen ) {
+	return {
+		type: 'SET_IS_LIST_VIEW_OPENED',
+		isOpen,
+	};
+}
+
+/**
+ * Action that toggles Distraction free mode.
+ * Distraction free mode expects there are no sidebars, as due to the
+ * z-index values set, you can't close sidebars.
+ */
+export const toggleDistractionFree =
+	() =>
+	( { dispatch, registry } ) => {
+		const isDistractionFree = registry
+			.select( preferencesStore )
+			.get( 'core', 'distractionFree' );
+		if ( isDistractionFree ) {
+			registry
+				.dispatch( preferencesStore )
+				.set( 'core', 'fixedToolbar', false );
+		}
+		if ( ! isDistractionFree ) {
+			registry.batch( () => {
+				registry
+					.dispatch( preferencesStore )
+					.set( 'core', 'fixedToolbar', true );
+				dispatch.setIsInserterOpened( false );
+				dispatch.setIsListViewOpened( false );
+			} );
+		}
+		registry.batch( () => {
+			registry
+				.dispatch( preferencesStore )
+				.set( 'core', 'distractionFree', ! isDistractionFree );
+			registry
+				.dispatch( noticesStore )
+				.createInfoNotice(
+					isDistractionFree
+						? __( 'Distraction free off.' )
+						: __( 'Distraction free on.' ),
+					{
+						id: 'core/editor/distraction-free-mode/notice',
+						type: 'snackbar',
+						actions: [
+							{
+								label: __( 'Undo' ),
+								onClick: () => {
+									registry.batch( () => {
+										registry
+											.dispatch( preferencesStore )
+											.set(
+												'core',
+												'fixedToolbar',
+												isDistractionFree ? true : false
+											);
+										registry
+											.dispatch( preferencesStore )
+											.toggle(
+												'core',
+												'distractionFree'
+											);
+									} );
+								},
+							},
+						],
+					}
+				);
+		} );
+	};
+
+/**
+ * Triggers an action used to switch editor mode.
+ *
+ * @param {string} mode The editor mode.
+ */
+export const switchEditorMode =
+	( mode ) =>
+	( { dispatch, registry } ) => {
+		registry.dispatch( preferencesStore ).set( 'core', 'editorMode', mode );
+
+		// Unselect blocks when we switch to a non visual mode.
+		if ( mode !== 'visual' ) {
+			registry.dispatch( blockEditorStore ).clearSelectedBlock();
+		}
+
+		if ( mode === 'visual' ) {
+			speak( __( 'Visual editor selected' ), 'assertive' );
+		} else if ( mode === 'text' ) {
+			const isDistractionFree = registry
+				.select( preferencesStore )
+				.get( 'core', 'distractionFree' );
+			if ( isDistractionFree ) {
+				dispatch.toggleDistractionFree();
+			}
+			speak( __( 'Code editor selected' ), 'assertive' );
+		}
+	};
+
+/**
+ * Returns an action object used in signalling that the user opened the publish
+ * sidebar.
+ *
+ * @return {Object} Action object
+ */
+export function openPublishSidebar() {
+	return {
+		type: 'OPEN_PUBLISH_SIDEBAR',
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the user closed the
+ * publish sidebar.
+ *
+ * @return {Object} Action object.
+ */
+export function closePublishSidebar() {
+	return {
+		type: 'CLOSE_PUBLISH_SIDEBAR',
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the user toggles the publish sidebar.
+ *
+ * @return {Object} Action object
+ */
+export function togglePublishSidebar() {
+	return {
+		type: 'TOGGLE_PUBLISH_SIDEBAR',
 	};
 }
 

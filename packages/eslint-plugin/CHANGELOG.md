@@ -2,11 +2,155 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `@wordpress/is-gutenberg-plugin` rule has been replaced by `@wordpress/wp-global-usage` ([#61486](https://github.com/WordPress/gutenberg/pull/61486)).
+-   `@wordpress/wp-process-env` rule has been added and included in the recommended configurations ([#61486](https://github.com/WordPress/gutenberg/pull/61486)).
+-   `@wordpress/gutenberg-phase` rule has been removed (deprecated in v10.0.0) ([#61486](https://github.com/WordPress/gutenberg/pull/61486)).
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 18.1.0 (2024-05-16)
+
+### Internal
+
+-   Replaced `classnames` package with the faster and smaller `clsx` package ([#61138](https://github.com/WordPress/gutenberg/pull/61138)).
+
+## 18.0.0 (2024-05-02)
+
+### Breaking Changes
+
+-   Enable `curly` eslint rule when using prettier ([#61204](https://github.com/WordPress/gutenberg/pull/61204)).
+
+## 17.13.0 (2024-04-19)
+
+## 17.12.0 (2024-04-03)
+
+## 17.11.0 (2024-03-21)
+
+## 17.10.0 (2024-03-06)
+
+## 17.9.0 (2024-02-21)
+
+## 17.8.0 (2024-02-09)
+
+## 17.7.0 (2024-01-24)
+
+## 17.6.0 (2024-01-10)
+
+## 17.5.0 (2023-12-13)
+
+## 17.4.0 (2023-11-29)
+
+## 17.3.0 (2023-11-16)
+
+## 17.2.0 (2023-11-02)
+
+## 17.1.0 (2023-10-18)
+
+## 17.0.0 (2023-10-05)
+
+### Breaking Changes
+
+-   Change the required major version of Prettier from v2 to v3 ([#54775](https://github.com/WordPress/gutenberg/pull/54775)).
+
+## 16.0.0 (2023-09-20)
+
+### Breaking Changes
+
+-   The bundled `@typescript-eslint/parser` and `@typescript-eslint/eslint-plugin` dependencies has been updated from requiring ^5.62.0 to requiring ^6.4.1 ([#53975](https://github.com/WordPress/gutenberg/pull/53975)):
+    -   Removes the deprecated `@typescript-eslint/no-duplicate-imports` rule in favor of `import/no-duplicates`.
+
+### Enhancements
+
+-   Added a new `test-playwright` ruleset using [`eslint-plugin-playwright`](https://www.npmjs.com/package/eslint-plugin-playwright).
+-   The bundled `eslint-plugin-prettier` dependency has been updated from requiring `^3.3.0` to requiring `^5.0.0` ([#54539](https://github.com/WordPress/gutenberg/pull/54539)).
+
+## 15.1.0 (2023-08-31)
+
+## 15.0.0 (2023-08-16)
+
+### Breaking Changes
+
+-   The bundled `eslint-plugin-jsdoc` dependency has been updated from requiring ^39.6.9 to requiring ^46.4.6 ([#53629](https://github.com/WordPress/gutenberg/pull/53629)):
+    -   Removes `jsdoc/newline-after-description` rule in favor of `jsdoc/tag-lines` with option `startLines: 0` for "never" and `startLines: 1` for "always". Defaults now to `startLines: null`.
+    -   Removes `dropEndLines: true` from `jsdoc/tag-lines` in favor of option `endLines: 0`.
+    -   Drops `jsdoc/tag-lines` rule's `noEndLines: true` in favor of `applyToEndTag: false`.
+    -   Disables the newly introduced `jsdoc/no-defaults` rule.
+
+### Enhancement
+
+-   Support Typescript 5 and 5.1 by updating both `@typescript-eslint/parser` and `@typescript-eslint/eslint-plugin` to version `^5.62.0`. ([#52621](https://github.com/WordPress/gutenberg/pull/52621)).
+
+## 14.12.0 (2023-08-10)
+
+## 14.11.0 (2023-07-20)
+
+## 14.10.0 (2023-07-05)
+
+## 14.9.0 (2023-06-23)
+
+## 14.8.0 (2023-06-07)
+
+## 14.7.0 (2023-05-24)
+
+## 14.6.0 (2023-05-10)
+
+### Enhancement
+
+-   Validate dependencies in `useSelect` and `useSuspenseSelect` hooks. ([#49900](https://github.com/WordPress/gutenberg/pull/49900)).
+
+## 14.5.0 (2023-04-26)
+
+## 14.4.0 (2023-04-12)
+
+## 14.3.0 (2023-03-29)
+
+## 14.2.0 (2023-03-15)
+
+## 14.1.0 (2023-03-01)
+
+## 14.0.0 (2023-02-15)
+
+### Breaking Changes
+
+-   Increase the severity of the rule `jsdoc/check-line-alignment` from `warn` to `error`. ([#47878](https://github.com/WordPress/gutenberg/pull/47878)).
+
+## 13.10.0 (2023-02-01)
+
+-   The bundled `eslint-plugin-jsdoc` dependency has been updated from requiring `^37.0.3` to requiring `^39.6.9`
+
+### Enhancement
+
+-   Bump `eslint-plugin-jest` version to 27.2.1.
+
+## 13.9.0 (2023-01-11)
+
+## 13.8.0 (2023-01-02)
+
+## 13.7.0 (2022-12-14)
+
+## 13.6.0 (2022-11-16)
+
+## 13.5.0 (2022-11-02)
+
+## 13.4.0 (2022-10-19)
+
+## 13.3.0 (2022-10-05)
+
+## 13.2.0 (2022-09-21)
+
+## 13.0.0 (2022-08-24)
+
+### Breaking Change
+
+-   Increase the minimum Node.js version to 14 and minimum npm version to 6.14.4 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
+-   Remove all rules targeting test files from the `recommended` and `recommended-with-formatting` presets when Jest package is installed ([#43272](https://github.com/WordPress/gutenberg/pull/43272)).
+
 ## 12.8.0 (2022-07-27)
 
 ### Code Quality
 
--   Remove deprecated rules `no-negated-in-lhs` replaced with `no-unsafe-negation`, and `jsx-a11y/label-has-for` replaced with `jsx-a11/label-has-associated-control` ([#42654](https://github.com/WordPress/gutenberg/pull/42654)). 
+-   Remove deprecated rules `no-negated-in-lhs` replaced with `no-unsafe-negation`, and `jsx-a11y/label-has-for` replaced with `jsx-a11/label-has-associated-control` ([#42654](https://github.com/WordPress/gutenberg/pull/42654)).
 
 ## 12.6.0 (2022-06-29)
 
@@ -135,6 +279,10 @@
 -   The bundled `eslint-plugin-prettier` dependency has been updated from requiring `^3.1.2` to requiring `^3.3.0` ([#27965](https://github.com/WordPress/gutenberg/pull/27965)).
 -   The bundled `eslint-plugin-react` dependency has been updated from requiring `^7.20.0` to requiring `^7.22.0` ([#27965](https://github.com/WordPress/gutenberg/pull/27965)).
 -   The bundled `eslint-plugin-react-hooks` dependency has been updated from requiring `^4.0.4` to requiring `^4.2.0` ([#27965](https://github.com/WordPress/gutenberg/pull/27965)).
+
+### New Features
+
+-   Enable `react-hooks/exhaustive-deps` rules in the react config in "warn" mode ([#24914](https://github.com/WordPress/gutenberg/pull/24914)).
 
 ## 7.4.0 (2020-12-17)
 
@@ -320,7 +468,7 @@
 
 ### New Features
 
--   The bundled `eslint-plugin-jsx-a11y` dependency has been updated from requiring `^6.0.2` to requiring `^6.2.1` (see new features added in [6.2.0](https://github.com/evcohen/eslint-plugin-jsx-a11y/releases/tag/v6.2.0) and [6.1.0](https://github.com/evcohen/eslint-plugin-jsx-a11y/releases/tag/v6.1.0)).
+-   The bundled `eslint-plugin-jsx-a11y` dependency has been updated from requiring `^6.0.2` to requiring `^6.2.1` (see new features added in [6.2.0](https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/releases/tag/v6.2.0) and [6.1.0](https://github.com/jsx-eslint/eslint-plugin-jsx-a11y/releases/tag/v6.1.0)).
 -   The bundled `eslint-plugin-react` dependency has been updated from requiring `7.7.0` to requiring `^7.12.4` (see new features added in [7.12.0](https://github.com/yannickcr/eslint-plugin-react/releases/tag/v7.12.0), [7.11.0](https://github.com/yannickcr/eslint-plugin-react/releases/tag/v7.11.0), [7.10.0](https://github.com/yannickcr/eslint-plugin-react/releases/tag/v7.10.0), [7.9.0](https://github.com/yannickcr/eslint-plugin-react/releases/tag/v7.9.0) and [7.8.0](https://github.com/yannickcr/eslint-plugin-react/releases/tag/v7.8.0)).
 
 ## 2.0.0 (2019-03-06)

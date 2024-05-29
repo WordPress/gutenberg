@@ -9,11 +9,6 @@ import { __ } from '@wordpress/i18n';
 import { SAVE_POST_NOTICE_ID, TRASH_POST_NOTICE_ID } from '../constants';
 
 /**
- * External dependencies
- */
-import { get, includes } from 'lodash';
-
-/**
  * Builds the arguments for a success notification dispatch.
  *
  * @param {Object} data Incoming data to build the arguments from.
@@ -24,25 +19,25 @@ import { get, includes } from 'lodash';
 export function getNotificationArgumentsForSaveSuccess( data ) {
 	const { previousPost, post, postType } = data;
 	// Autosaves are neither shown a notice nor redirected.
-	if ( get( data.options, [ 'isAutosave' ] ) ) {
-		return [];
-	}
-
-	// No notice is shown after trashing a post
-	if ( post.status === 'trash' && previousPost.status !== 'trash' ) {
+	if ( data.options?.isAutosave ) {
 		return [];
 	}
 
 	const publishStatus = [ 'publish', 'private', 'future' ];
-	const isPublished = includes( publishStatus, previousPost.status );
-	const willPublish = includes( publishStatus, post.status );
+	const isPublished = publishStatus.includes( previousPost.status );
+	const willPublish = publishStatus.includes( post.status );
+	const willTrash =
+		post.status === 'trash' && previousPost.status !== 'trash';
 
 	let noticeMessage;
-	let shouldShowLink = get( postType, [ 'viewable' ], false );
+	let shouldShowLink = postType?.viewable ?? false;
 	let isDraft;
 
 	// Always should a notice, which will be spoken for accessibility.
-	if ( ! isPublished && ! willPublish ) {
+	if ( willTrash ) {
+		noticeMessage = postType.labels.item_trashed;
+		shouldShowLink = false;
+	} else if ( ! isPublished && ! willPublish ) {
 		// If saving a non-published post, don't show notice.
 		noticeMessage = __( 'Draft saved.' );
 		isDraft = true;

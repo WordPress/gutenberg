@@ -2,16 +2,24 @@
  * WordPress dependencies
  */
 import { usePrevious } from '@wordpress/compose';
-import { useCallback, useEffect, useMemo } from '@wordpress/element';
+import {
+	useCallback,
+	useEffect,
+	useLayoutEffect,
+	useMemo,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import * as styles from '../styles';
 import { useToolsPanelContext } from '../context';
-import { useContextSystem, WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { useContextSystem } from '../../context';
 import { useCx } from '../../utils/hooks/use-cx';
 import type { ToolsPanelItemProps } from '../types';
+
+const noop = () => {};
 
 export function useToolsPanelItem(
 	props: WordPressComponentProps< ToolsPanelItemProps, 'div' >
@@ -19,10 +27,10 @@ export function useToolsPanelItem(
 	const {
 		className,
 		hasValue,
-		isShownByDefault,
+		isShownByDefault = false,
 		label,
 		panelId,
-		resetAllFilter,
+		resetAllFilter = noop,
 		onDeselect,
 		onSelect,
 		...otherProps
@@ -31,6 +39,8 @@ export function useToolsPanelItem(
 	const {
 		panelId: currentPanelId,
 		menuItems,
+		registerResetAllFilter,
+		deregisterResetAllFilter,
 		registerPanelItem,
 		deregisterPanelItem,
 		flagItemCustomization,
@@ -42,7 +52,13 @@ export function useToolsPanelItem(
 		__experimentalLastVisibleItemClass,
 	} = useToolsPanelContext();
 
+	// hasValue is a new function on every render, so do not add it as a
+	// dependency to the useCallback hook! If needed, we should use a ref.
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	const hasValueCallback = useCallback( hasValue, [ panelId ] );
+	// resetAllFilter is a new function on every render, so do not add it as a
+	// dependency to the useCallback hook! If needed, we should use a ref.
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	const resetAllFilterCallback = useCallback( resetAllFilter, [ panelId ] );
 	const previousPanelId = usePrevious( currentPanelId );
 
@@ -51,13 +67,16 @@ export function useToolsPanelItem(
 
 	// Registering the panel item allows the panel to include it in its
 	// automatically generated menu and determine its initial checked status.
-	useEffect( () => {
+	//
+	// This is performed in a layout effect to ensure that the panel item
+	// is registered before it is rendered preventing a rendering glitch.
+	// See: https://github.com/WordPress/gutenberg/issues/56470
+	useLayoutEffect( () => {
 		if ( hasMatchingPanel && previousPanelId !== null ) {
 			registerPanelItem( {
 				hasValue: hasValueCallback,
 				isShownByDefault,
 				label,
-				resetAllFilter: resetAllFilterCallback,
 				panelId,
 			} );
 		}
@@ -78,30 +97,57 @@ export function useToolsPanelItem(
 		hasValueCallback,
 		panelId,
 		previousPanelId,
-		resetAllFilterCallback,
+		registerPanelItem,
+		deregisterPanelItem,
 	] );
 
-	const isValueSet = hasValue();
-	const wasValueSet = usePrevious( isValueSet );
-
-	// If this item represents a default control it will need to notify the
-	// panel when a custom value has been set.
 	useEffect( () => {
-		if ( isShownByDefault && isValueSet && ! wasValueSet ) {
-			flagItemCustomization( label );
+		if ( hasMatchingPanel ) {
+			registerResetAllFilter( resetAllFilterCallback );
 		}
-	}, [ isValueSet, wasValueSet, isShownByDefault, label ] );
+		return () => {
+			if ( hasMatchingPanel ) {
+				deregisterResetAllFilter( resetAllFilterCallback );
+			}
+		};
+	}, [
+		registerResetAllFilter,
+		deregisterResetAllFilter,
+		resetAllFilterCallback,
+		hasMatchingPanel,
+	] );
 
 	// Note: `label` is used as a key when building menu item state in
 	// `ToolsPanel`.
 	const menuGroup = isShownByDefault ? 'default' : 'optional';
 	const isMenuItemChecked = menuItems?.[ menuGroup ]?.[ label ];
 	const wasMenuItemChecked = usePrevious( isMenuItemChecked );
+	const isRegistered = menuItems?.[ menuGroup ]?.[ label ] !== undefined;
+
+	const isValueSet = hasValue();
+	// Notify the panel when an item's value has changed except for optional
+	// items without value because the item should not cause itself to hide.
+	useEffect( () => {
+		if ( ! isShownByDefault && ! isValueSet ) {
+			return;
+		}
+
+		flagItemCustomization( isValueSet, label, menuGroup );
+	}, [
+		isValueSet,
+		menuGroup,
+		label,
+		flagItemCustomization,
+		isShownByDefault,
+	] );
 
 	// Determine if the panel item's corresponding menu is being toggled and
 	// trigger appropriate callback if it is.
 	useEffect( () => {
-		if ( isResetting || ! hasMatchingPanel ) {
+		// We check whether this item is currently registered as items rendered
+		// via fills can persist through the parent panel being remounted.
+		// See: https://github.com/WordPress/gutenberg/pull/45673
+		if ( ! isRegistered || isResetting || ! hasMatchingPanel ) {
 			return;
 		}
 
@@ -109,15 +155,18 @@ export function useToolsPanelItem(
 			onSelect?.();
 		}
 
-		if ( ! isMenuItemChecked && wasMenuItemChecked ) {
+		if ( ! isMenuItemChecked && isValueSet && wasMenuItemChecked ) {
 			onDeselect?.();
 		}
 	}, [
 		hasMatchingPanel,
 		isMenuItemChecked,
+		isRegistered,
 		isResetting,
 		isValueSet,
 		wasMenuItemChecked,
+		onSelect,
+		onDeselect,
 	] );
 
 	// The item is shown if it is a default control regardless of whether it
@@ -129,18 +178,16 @@ export function useToolsPanelItem(
 
 	const cx = useCx();
 	const classes = useMemo( () => {
-		const placeholderStyle =
-			shouldRenderPlaceholder &&
-			! isShown &&
-			styles.ToolsPanelItemPlaceholder;
+		const shouldApplyPlaceholderStyles =
+			shouldRenderPlaceholder && ! isShown;
 		const firstItemStyle =
 			firstDisplayedItem === label && __experimentalFirstVisibleItemClass;
 		const lastItemStyle =
 			lastDisplayedItem === label && __experimentalLastVisibleItemClass;
 		return cx(
 			styles.ToolsPanelItem,
-			placeholderStyle,
-			className,
+			shouldApplyPlaceholderStyles && styles.ToolsPanelItemPlaceholder,
+			! shouldApplyPlaceholderStyles && className,
 			firstItemStyle,
 			lastItemStyle
 		);
@@ -153,6 +200,7 @@ export function useToolsPanelItem(
 		lastDisplayedItem,
 		__experimentalFirstVisibleItemClass,
 		__experimentalLastVisibleItemClass,
+		label,
 	] );
 
 	return {

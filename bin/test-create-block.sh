@@ -55,7 +55,7 @@ if [ "$expected" -ne "$actual" ]; then
 	error "Expected $expected files in the project root, but found $actual."
     exit 1
 fi
-expected=6
+expected=7
 actual=$( find src -maxdepth 1 -type f | wc -l )
 if [ "$expected" -ne "$actual" ]; then
 	error "Expected $expected files in the \`src\` directory, but found $actual."
@@ -69,7 +69,7 @@ status "Building block..."
 ../node_modules/.bin/wp-scripts build
 
 status "Verifying build..."
-expected=5
+expected=9
 actual=$( find build -maxdepth 1 -type f | wc -l )
 if [ "$expected" -ne "$actual" ]; then
 	error "Expected $expected files in the \`build\` directory, but found $actual."

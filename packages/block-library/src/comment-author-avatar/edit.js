@@ -48,8 +48,10 @@ export default function Edit( {
 
 	const inspectorControls = (
 		<InspectorControls>
-			<PanelBody title={ __( 'Avatar Settings' ) }>
+			<PanelBody title={ __( 'Settings' ) }>
 				<RangeControl
+					__nextHasNoMarginBottom
+					__next40pxDefaultSize
 					label={ __( 'Image size' ) }
 					onChange={ ( newWidth ) =>
 						setAttributes( {

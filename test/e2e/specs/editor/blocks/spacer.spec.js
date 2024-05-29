@@ -10,7 +10,9 @@ test.describe( 'Spacer', () => {
 
 	test( 'can be created by typing "/spacer"', async ( { editor, page } ) => {
 		// Create a spacer with the slash block shortcut.
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '/spacer' );
 		await page.keyboard.press( 'Enter' );
 
@@ -22,11 +24,13 @@ test.describe( 'Spacer', () => {
 		editor,
 	} ) => {
 		// Create a spacer with the slash block shortcut.
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '/spacer' );
 		await page.keyboard.press( 'Enter' );
 
-		const resizableHandle = page.locator(
+		const resizableHandle = editor.canvas.locator(
 			// Use class name selector until we have `data-testid` for the resize handles.
 			'role=document[name="Block: Spacer"i] >> css=.components-resizable-box__handle'
 		);
@@ -39,7 +43,7 @@ test.describe( 'Spacer', () => {
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 
 		await expect(
-			page.locator( 'role=document[name="Block: Spacer"i]' )
+			editor.canvas.locator( 'role=document[name="Block: Spacer"i]' )
 		).toBeFocused();
 	} );
 } );

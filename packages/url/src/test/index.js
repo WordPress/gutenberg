@@ -2,30 +2,31 @@
  * Internal dependencies
  */
 import {
-	isURL,
-	isEmail,
-	getProtocol,
-	isValidProtocol,
-	getAuthority,
-	isValidAuthority,
-	getPath,
-	isValidPath,
-	getQueryString,
-	buildQueryString,
-	isValidQueryString,
-	getFragment,
-	isValidFragment,
 	addQueryArgs,
-	getQueryArg,
-	hasQueryArg,
-	removeQueryArgs,
-	prependHTTP,
-	safeDecodeURI,
-	filterURLForDisplay,
+	buildQueryString,
 	cleanForSlug,
-	getQueryArgs,
+	filterURLForDisplay,
+	getAuthority,
 	getFilename,
+	getFragment,
+	getPath,
+	getProtocol,
+	getQueryArg,
+	getQueryArgs,
+	getQueryString,
+	hasQueryArg,
+	isEmail,
+	isURL,
+	isValidAuthority,
+	isValidFragment,
+	isValidPath,
+	isValidProtocol,
+	isValidQueryString,
 	normalizePath,
+	prependHTTP,
+	prependHTTPS,
+	removeQueryArgs,
+	safeDecodeURI,
 } from '../';
 import wptData from './fixtures/wpt-data';
 
@@ -253,23 +254,20 @@ describe( 'isValidPath', () => {
 } );
 
 describe( 'getFilename', () => {
-	it( 'returns the filename part of the URL', () => {
-		expect( getFilename( 'https://wordpress.org/image.jpg' ) ).toBe(
-			'image.jpg'
-		);
-		expect(
-			getFilename( 'https://wordpress.org/image.jpg?query=test' )
-		).toBe( 'image.jpg' );
-		expect( getFilename( 'https://wordpress.org/image.jpg#anchor' ) ).toBe(
-			'image.jpg'
-		);
-		expect(
-			getFilename( 'http://localhost:8080/a/path/to/an/image.jpg' )
-		).toBe( 'image.jpg' );
-		expect( getFilename( '/path/to/an/image.jpg' ) ).toBe( 'image.jpg' );
-		expect( getFilename( 'path/to/an/image.jpg' ) ).toBe( 'image.jpg' );
-		expect( getFilename( '/image.jpg' ) ).toBe( 'image.jpg' );
-		expect( getFilename( 'image.jpg' ) ).toBe( 'image.jpg' );
+	it.each( [
+		[ 'https://wordpress.org/image.jpg', 'image.jpg' ],
+		[ 'https://wordpress.org/image.jpg?query=test', 'image.jpg' ],
+		[ 'https://wordpress.org/image.jpg#anchor', 'image.jpg' ],
+		[ 'http://localhost:8080/a/path/to/an/image.jpg', 'image.jpg' ],
+		[ '/path/to/an/image.jpg', 'image.jpg' ],
+		[ 'path/to/an/image.jpg', 'image.jpg' ],
+		[ '/image.jpg', 'image.jpg' ],
+		[ 'https://wordpress.org/file.pdf', 'file.pdf' ],
+		[ 'https://wordpress.org/image.webp?query=test', 'image.webp' ],
+		[ 'https://wordpress.org/video.mov#anchor', 'video.mov' ],
+		[ 'http://localhost:8080/a/path/to/audio.mp3', 'audio.mp3' ],
+	] )( 'returns the filename part of the URL: %s', ( url, filename ) => {
+		expect( getFilename( url ) ).toBe( filename );
 	} );
 
 	it( 'returns undefined when the provided value does not contain a filename', () => {
@@ -285,6 +283,8 @@ describe( 'getFilename', () => {
 		);
 		expect( getFilename( 'a/path/' ) ).toBe( undefined );
 		expect( getFilename( '/' ) ).toBe( undefined );
+		expect( getFilename( undefined ) ).toBe( undefined );
+		expect( getFilename( null ) ).toBe( undefined );
 	} );
 } );
 
@@ -723,6 +723,16 @@ describe( 'getQueryArgs', () => {
 				)
 			).toEqual( data );
 		} );
+
+		it( 'should not blow up on malformed params', () => {
+			const url = 'https://andalouses.example/beach?foo=bar&baz=%E0%A4%A';
+
+			expect( () => getQueryArgs( url ) ).not.toThrow();
+			expect( getQueryArgs( url ) ).toEqual( {
+				baz: '%E0%A4%A',
+				foo: 'bar',
+			} );
+		} );
 	} );
 } );
 
@@ -880,6 +890,92 @@ describe( 'prependHTTP', () => {
 	} );
 } );
 
+describe( 'prependHTTPS', () => {
+	it( 'should prepend https to a domain', () => {
+		const url = 'wordpress.org';
+
+		expect( prependHTTPS( url ) ).toBe( 'https://' + url );
+	} );
+
+	it( 'should not prepend https to an email', () => {
+		const url = 'foo@wordpress.org';
+
+		expect( prependHTTPS( url ) ).toBe( url );
+	} );
+
+	it( 'should not prepend https to an absolute URL', () => {
+		const url = '/wordpress';
+
+		expect( prependHTTPS( url ) ).toBe( url );
+	} );
+
+	it( 'should not prepend https to a relative URL', () => {
+		const url = './wordpress';
+
+		expect( prependHTTPS( url ) ).toBe( url );
+	} );
+
+	it( 'should not prepend https to an anchor URL', () => {
+		const url = '#wordpress';
+
+		expect( prependHTTPS( url ) ).toBe( url );
+	} );
+
+	it( 'should not prepend https to a URL that already has https', () => {
+		const url = 'https://wordpress.org';
+
+		expect( prependHTTPS( url ) ).toBe( url );
+	} );
+
+	it( 'should not prepend https to a URL that already has http', () => {
+		const url = 'http://wordpress.org';
+
+		expect( prependHTTPS( url ) ).toBe( url );
+	} );
+
+	it( 'should not prepend https to a URL that already has ftp', () => {
+		const url = 'ftp://wordpress.org';
+
+		expect( prependHTTPS( url ) ).toBe( url );
+	} );
+
+	it( 'should not prepend https to a URL that already has mailto', () => {
+		const url = 'mailto:foo@wordpress.org';
+
+		expect( prependHTTPS( url ) ).toBe( url );
+	} );
+
+	it( 'should remove leading whitespace before prepending HTTPs', () => {
+		const url = ' wordpress.org';
+
+		expect( prependHTTPS( url ) ).toBe( 'https://wordpress.org' );
+	} );
+
+	it( 'should not have trailing whitespaces', () => {
+		const url = 'wordpress.org ';
+
+		expect( prependHTTPS( url ) ).toBe( 'https://wordpress.org' );
+	} );
+} );
+
+it( 'should prepend https to a domain with an anchor', () => {
+	const url = 'wordpress.org#something';
+
+	expect( prependHTTPS( url ) ).toBe( 'https://' + url );
+} );
+
+it( 'should prepend https to a domain with path', () => {
+	const url = 'wordpress.org/some/thing';
+
+	expect( prependHTTPS( url ) ).toBe( 'https://' + url );
+} );
+
+it( 'should prepend https to a domain with query arguments', () => {
+	const url = 'wordpress.org?foo=bar';
+
+	expect( prependHTTPS( url ) ).toBe( 'https://' + url );
+} );
+
 describe( 'safeDecodeURI', () => {
 	it( 'should decode URI if formed well', () => {
 		const encoded = 'https://mozilla.org/?x=%D1%88%D0%B5%D0%BB%D0%BB%D1%8B';
@@ -1003,6 +1099,11 @@ describe( 'cleanForSlug', () => {
 		expect( cleanForSlug( '  -Is th@t Déjà_vu- 	' ) ).toBe(
 			'is-tht-deja_vu'
 		);
+	} );
+
+	it( 'Should replace multiple hyphens with a single one', () => {
+		expect( cleanForSlug( 'the long - cat' ) ).toBe( 'the-long-cat' );
+		expect( cleanForSlug( 'the----long---cat' ) ).toBe( 'the-long-cat' );
 	} );
 } );
 

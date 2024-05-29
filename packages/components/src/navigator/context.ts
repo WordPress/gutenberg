@@ -12,5 +12,9 @@ const initialContextValue: NavigatorContextType = {
 	location: {},
 	goTo: () => {},
 	goBack: () => {},
+	goToParent: () => {},
+	addScreen: () => {},
+	removeScreen: () => {},
+	params: {},
 };
 export const NavigatorContext = createContext( initialContextValue );

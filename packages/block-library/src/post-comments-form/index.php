@@ -8,6 +8,8 @@
 /**
  * Renders the `core/post-comments-form` block on the server.
  *
+ * @since 6.0.0
+ *
  * @param array    $attributes Block attributes.
  * @param string   $content    Block default content.
  * @param WP_Block $block      Block instance.
@@ -22,12 +24,14 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 		return;
 	}
 
-	$classes = 'comment-respond'; // See comment further below.
+	$classes = array( 'comment-respond' ); // See comment further below.
 	if ( isset( $attributes['textAlign'] ) ) {
-		$classes .= ' has-text-align-' . $attributes['textAlign'];
+		$classes[] = 'has-text-align-' . $attributes['textAlign'];
 	}
-
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
+	if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {
+		$classes[] = 'has-link-color';
+	}
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classes ) ) );
 
 	add_filter( 'comment_form_defaults', 'post_comments_form_block_form_defaults' );
 
@@ -52,6 +56,8 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 
 /**
  * Registers the `core/post-comments-form` block on the server.
+ *
+ * @since 6.0.0
  */
 function register_block_core_post_comments_form() {
 	register_block_type_from_metadata(
@@ -66,13 +72,15 @@ add_action( 'init', 'register_block_core_post_comments_form' );
 /**
  * Use the button block classes for the form-submit button.
  *
+ * @since 6.0.0
+ *
  * @param array $fields The default comment form arguments.
  *
  * @return array Returns the modified fields.
  */
 function post_comments_form_block_form_defaults( $fields ) {
 	if ( wp_is_block_theme() ) {
-		$fields['submit_button'] = '<input name="%1$s" type="submit" id="%2$s" class="wp-block-button__link ' . WP_Theme_JSON_Gutenberg::get_element_class_name( 'button' ) . '" value="%4$s" />';
+		$fields['submit_button'] = '<input name="%1$s" type="submit" id="%2$s" class="wp-block-button__link ' . wp_theme_get_element_class_name( 'button' ) . '" value="%4$s" />';
 		$fields['submit_field']  = '<p class="form-submit wp-block-button">%1$s %2$s</p>';
 	}
 

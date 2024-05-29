@@ -10,11 +10,16 @@ import { useNavigation } from '@react-navigation/native';
 import { useState } from '@wordpress/element';
 import { Icon, chevronRight, check } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
-import { BottomSheet } from '@wordpress/components';
+
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
+import BottomSheet from '../bottom-sheet';
+
+const EMPTY_OPTION = {
+	label: '',
+};
 
 const BottomSheetSelectControl = ( {
 	label,
@@ -22,6 +27,7 @@ const BottomSheetSelectControl = ( {
 	options: items,
 	onChange,
 	value: selectedValue,
+	disabled,
 } ) => {
 	const [ showSubSheet, setShowSubSheet ] = useState( false );
 	const navigation = useNavigation();
@@ -33,9 +39,9 @@ const BottomSheetSelectControl = ( {
 		};
 	};
 
-	const selectedOption = items.find(
-		( option ) => option.value === selectedValue
-	);
+	const selectedOption =
+		items.find( ( option ) => option.value === selectedValue ) ??
+		EMPTY_OPTION;
 
 	const goBack = () => {
 		setShowSubSheet( false );
@@ -68,8 +74,9 @@ const BottomSheetSelectControl = ( {
 						__( 'Navigates to select %s' ),
 						label
 					) }
+					disabled={ disabled }
 				>
-					<Icon icon={ chevronRight }></Icon>
+					{ disabled ? null : <Icon icon={ chevronRight } /> }
 				</BottomSheet.Cell>
 			}
 			showSheet={ showSubSheet }
@@ -89,7 +96,7 @@ const BottomSheetSelectControl = ( {
 							label={ item.label }
 							icon={ item.icon }
 							onPress={ onChangeValue( item.value ) }
-							leftAlign={ true }
+							leftAlign
 							key={ index }
 							accessibilityRole={ 'button' }
 							accessibilityLabel={

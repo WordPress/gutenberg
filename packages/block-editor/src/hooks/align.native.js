@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { without } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
@@ -13,6 +8,7 @@ import { WIDE_ALIGNMENTS } from '@wordpress/components';
 const ALIGNMENTS = [ 'left', 'center', 'right' ];
 
 export * from './align.js';
+export { default } from './align.js';
 
 // Used to filter out blocks that don't support wide/full alignment on mobile
 addFilter(
@@ -28,9 +24,11 @@ addFilter(
 			settings.supports = {
 				...settings.supports,
 				align: Array.isArray( blockAlign )
-					? without(
-							blockAlign,
-							...Object.values( WIDE_ALIGNMENTS.alignments )
+					? blockAlign.filter(
+							( alignment ) =>
+								! Object.values(
+									WIDE_ALIGNMENTS.alignments
+								).includes( alignment )
 					  )
 					: blockAlign,
 				alignWide: false,
@@ -39,8 +37,8 @@ addFilter(
 				...settings.attributes,
 				align: {
 					type: 'string',
-					// Allow for '' since it is used by updateAlignment function
-					// in withToolbarControls for special cases with defined default values.
+					// Allow for '' since it is used by the `updateAlignment` function
+					// in toolbar controls for special cases with defined default values.
 					enum: [ ...ALIGNMENTS, '' ],
 				},
 			};

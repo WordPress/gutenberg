@@ -11,8 +11,8 @@ It uses the [Mousetrap](https://craig.is/killing/mice) library to implement keyb
 Render `<KeyboardShortcuts />` with a `shortcuts` prop object:
 
 ```jsx
+import { useState } from 'react';
 import { KeyboardShortcuts } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const MyKeyboardShortcuts = () => {
 	const [ isAllSelected, setIsAllSelected ] = useState( false );
@@ -41,7 +41,7 @@ The component accepts the following props:
 
 Elements to render, upon whom key events are to be monitored.
 
--   Type: `Element` | `Element[]`
+-   Type: `ReactNode`
 -   Required: No
 
 ### shortcuts

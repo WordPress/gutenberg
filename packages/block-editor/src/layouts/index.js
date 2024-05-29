@@ -3,8 +3,10 @@
  */
 import flex from './flex';
 import flow from './flow';
+import constrained from './constrained';
+import grid from './grid';
 
-const layoutTypes = [ flow, flex ];
+const layoutTypes = [ flow, flex, constrained, grid ];
 
 /**
  * Retrieves a layout type by name.

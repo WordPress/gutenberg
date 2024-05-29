@@ -207,3 +207,14 @@
 .mediaPlaceholderEmptyStateContainer {
 	height: 300;
 }
+
+.selectedColorText {
+	font-family: $default-monospace-font;
+	color: $light-primary;
+	font-size: 16px;
+	font-weight: 400;
+}
+
+.selectedColorTextDark {
+	color: $dark-primary;
+}

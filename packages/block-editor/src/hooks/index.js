@@ -1,24 +1,88 @@
 /**
  * Internal dependencies
  */
+import {
+	createBlockEditFilter,
+	createBlockListBlockFilter,
+	createBlockSaveFilter,
+} from './utils';
 import './compat';
-import './align';
+import align from './align';
+import background from './background';
 import './lock';
-import './anchor';
-import './aria-label';
-import './custom-class-name';
+import anchor from './anchor';
+import ariaLabel from './aria-label';
+import customClassName from './custom-class-name';
 import './generated-class-name';
-import './style';
+import style from './style';
 import './settings';
-import './color';
-import './duotone';
-import './font-size';
-import './border';
-import './layout';
+import color from './color';
+import dimensions from './dimensions';
+import duotone from './duotone';
+import fontFamily from './font-family';
+import fontSize from './font-size';
+import textAlign from './text-align';
+import border from './border';
+import position from './position';
+import layout from './layout';
+import childLayout from './layout-child';
+import contentLockUI from './content-lock-ui';
+import './metadata';
+import blockHooks from './block-hooks';
+import blockBindingsPanel from './block-bindings';
+import './block-renaming';
+import './use-bindings-attributes';
+
+createBlockEditFilter(
+	[
+		blockBindingsPanel,
+		align,
+		textAlign,
+		anchor,
+		customClassName,
+		style,
+		duotone,
+		position,
+		layout,
+		contentLockUI,
+		blockHooks,
+		childLayout,
+	].filter( Boolean )
+);
+createBlockListBlockFilter( [
+	align,
+	textAlign,
+	background,
+	style,
+	color,
+	dimensions,
+	duotone,
+	fontFamily,
+	fontSize,
+	border,
+	position,
+	childLayout,
+] );
+createBlockSaveFilter( [
+	align,
+	textAlign,
+	anchor,
+	ariaLabel,
+	customClassName,
+	border,
+	color,
+	style,
+	fontFamily,
+	fontSize,
+] );
 
 export { useCustomSides } from './dimensions';
+export { useLayoutClasses, useLayoutStyles } from './layout';
 export { getBorderClassesAndStyles, useBorderProps } from './use-border-props';
+export { getShadowClassesAndStyles } from './use-shadow-props';
 export { getColorClassesAndStyles, useColorProps } from './use-color-props';
 export { getSpacingClassesAndStyles } from './use-spacing-props';
+export { getTypographyClassesAndStyles } from './use-typography-props';
 export { getGapCSSValue } from './gap';
 export { useCachedTruthy } from './use-cached-truthy';
+export { useZoomOut } from './use-zoom-out';

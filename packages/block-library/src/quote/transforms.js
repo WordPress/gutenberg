@@ -1,11 +1,8 @@
 /**
  * WordPress dependencies
  */
-import {
-	createBlock,
-	parseWithAttributeSchema,
-	rawHandler,
-} from '@wordpress/blocks';
+import { RichText } from '@wordpress/block-editor';
+import { createBlock } from '@wordpress/blocks';
 
 const transforms = {
 	from: [
@@ -21,27 +18,9 @@ const transforms = {
 						fontSize,
 						style,
 					},
-					parseWithAttributeSchema( value, {
-						type: 'array',
-						source: 'query',
-						selector: 'p',
-						query: {
-							content: {
-								type: 'string',
-								source: 'html',
-							},
-						},
-					} ).map( ( { content } ) =>
-						createBlock( 'core/paragraph', { content } )
-					)
+					[ createBlock( 'core/paragraph', { content: value } ) ]
 				);
 			},
-		},
-		{
-			type: 'block',
-			blocks: [ 'core/group' ],
-			transform: ( { anchor }, innerBlocks ) =>
-				createBlock( 'core/quote', { anchor }, innerBlocks ),
 		},
 		{
 			type: 'prefix',
@@ -59,7 +38,7 @@ const transforms = {
 				},
 			} ),
 			selector: 'blockquote',
-			transform: ( node ) => {
+			transform: ( node, handler ) => {
 				return createBlock(
 					'core/quote',
 					// Don't try to parse any `cite` out of this content.
@@ -68,7 +47,7 @@ const transforms = {
 					// * If the cite is nested in the quoted text, it's wrong to
 					//   remove it.
 					{},
-					rawHandler( {
+					handler( {
 						HTML: node.innerHTML,
 						mode: 'BLOCKS',
 					} )
@@ -80,6 +59,16 @@ const transforms = {
 			isMultiBlock: true,
 			blocks: [ '*' ],
 			isMatch: ( {}, blocks ) => {
+				// When a single block is selected make the tranformation
+				// available only to specific blocks that make sense.
+				if ( blocks.length === 1 ) {
+					return [
+						'core/paragraph',
+						'core/heading',
+						'core/list',
+						'core/pullquote',
+					].includes( blocks[ 0 ].name );
+				}
 				return ! blocks.some( ( { name } ) => name === 'core/quote' );
 			},
 			__experimentalConvert: ( blocks ) =>
@@ -110,10 +99,8 @@ const transforms = {
 				innerBlocks
 			) => {
 				const value = innerBlocks
-					.map(
-						( { attributes } ) => `<p>${ attributes.content }</p>`
-					)
-					.join( '' );
+					.map( ( { attributes } ) => `${ attributes.content }` )
+					.join( '<br>' );
 				return createBlock( 'core/pullquote', {
 					value,
 					citation,
@@ -125,35 +112,44 @@ const transforms = {
 		},
 		{
 			type: 'block',
+			blocks: [ 'core/paragraph' ],
+			transform: ( { citation }, innerBlocks ) =>
+				RichText.isEmpty( citation )
+					? innerBlocks
+					: [
+							...innerBlocks,
+							createBlock( 'core/paragraph', {
+								content: citation,
+							} ),
+					  ],
+		},
+		{
+			type: 'block',
 			blocks: [ 'core/group' ],
 			transform: ( { citation, anchor }, innerBlocks ) =>
 				createBlock(
 					'core/group',
 					{ anchor },
-					citation
-						? [
+					RichText.isEmpty( citation )
+						? innerBlocks
+						: [
 								...innerBlocks,
 								createBlock( 'core/paragraph', {
 									content: citation,
 								} ),
 						  ]
-						: innerBlocks
 				),
 		},
-		{
-			type: 'block',
-			blocks: [ '*' ],
-			transform: ( { citation }, innerBlocks ) =>
-				citation
-					? [
-							...innerBlocks,
-							createBlock( 'core/paragraph', {
-								content: citation,
-							} ),
-					  ]
-					: innerBlocks,
-		},
 	],
+	ungroup: ( { citation }, innerBlocks ) =>
+		RichText.isEmpty( citation )
+			? innerBlocks
+			: [
+					...innerBlocks,
+					createBlock( 'core/paragraph', {
+						content: citation,
+					} ),
+			  ],
 };
 
 export default transforms;

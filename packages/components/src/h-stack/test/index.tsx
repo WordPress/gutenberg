@@ -17,7 +17,7 @@ describe( 'props', () => {
 				<View />
 			</HStack>
 		);
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 
 	test( 'should render alignment', () => {
@@ -27,7 +27,7 @@ describe( 'props', () => {
 				<View />
 			</HStack>
 		);
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
 	} );
 
 	test( 'should render spacing', () => {
@@ -37,6 +37,16 @@ describe( 'props', () => {
 				<View />
 			</HStack>
 		);
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container ).toMatchSnapshot();
+	} );
+
+	test( 'should not pass through invalid props to the `as` component', () => {
+		const AsComponent = ( props: JSX.IntrinsicElements[ 'div' ] ) => {
+			return <div { ...props } />;
+		};
+
+		render( <HStack as={ AsComponent }>foobar</HStack> );
+
+		expect( console ).not.toHaveErrored();
 	} );
 } );

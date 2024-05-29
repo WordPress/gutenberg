@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useCallback, useMemo } from '@wordpress/element';
@@ -12,7 +7,7 @@ import {
 	applyFormat,
 	removeFormat,
 	getActiveFormat,
-	useAnchorRef,
+	useAnchor,
 } from '@wordpress/rich-text';
 import {
 	ColorPalette,
@@ -20,23 +15,39 @@ import {
 	getColorObjectByColorValue,
 	getColorObjectByAttributeValues,
 	store as blockEditorStore,
-	useCachedTruthy,
 } from '@wordpress/block-editor';
-import { Popover, TabPanel } from '@wordpress/components';
+import {
+	Popover,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import { textColor as settings, transparentValue } from './index';
+import { unlock } from '../lock-unlock';
+
+const { Tabs } = unlock( componentsPrivateApis );
+
+const TABS = [
+	{ name: 'color', title: __( 'Text' ) },
+	{ name: 'backgroundColor', title: __( 'Background' ) },
+];
 
 function parseCSS( css = '' ) {
 	return css.split( ';' ).reduce( ( accumulator, rule ) => {
 		if ( rule ) {
 			const [ property, value ] = rule.split( ':' );
-			if ( property === 'color' ) accumulator.color = value;
-			if ( property === 'background-color' && value !== transparentValue )
+			if ( property === 'color' ) {
+				accumulator.color = value;
+			}
+			if (
+				property === 'background-color' &&
+				value !== transparentValue
+			) {
 				accumulator.backgroundColor = value;
+			}
 		}
 		return accumulator;
 	}, {} );
@@ -103,8 +114,12 @@ function setColors( value, name, colorSettings, colors ) {
 		}
 	}
 
-	if ( styles.length ) attributes.style = styles.join( ';' );
-	if ( classNames.length ) attributes.class = classNames.join( ' ' );
+	if ( styles.length ) {
+		attributes.style = styles.join( ';' );
+	}
+	if ( classNames.length ) {
+		attributes.class = classNames.join( ' ' );
+	}
 
 	return applyFormat( value, { type: name, attributes } );
 }
@@ -112,7 +127,7 @@ function setColors( value, name, colorSettings, colors ) {
 function ColorPicker( { name, property, value, onChange } ) {
 	const colors = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
-		return get( getSettings(), [ 'colors' ], [] );
+		return getSettings().colors ?? [];
 	}, [] );
 	const onColorChange = useCallback(
 		( color ) => {
@@ -141,45 +156,42 @@ export default function InlineColorUI( {
 	onChange,
 	onClose,
 	contentRef,
+	isActive,
 } ) {
-	/* 
-	 As you change the text color by typing a HEX value into a field,
-	 the return value of document.getSelection jumps to the field you're editing,
-	 not the highlighted text. Given that useAnchorRef uses document.getSelection,
-	 it will return null, since it can't find the <mark> element within the HEX input.
-	 This caches the last truthy value of the selection anchor reference.
-	 */
-	const anchorRef = useCachedTruthy(
-		useAnchorRef( { ref: contentRef, value, settings } )
-	);
+	const popoverAnchor = useAnchor( {
+		editableContentElement: contentRef.current,
+		settings: { ...settings, isActive },
+	} );
 
 	return (
 		<Popover
 			onClose={ onClose }
-			className="components-inline-color-popover"
-			anchorRef={ anchorRef }
+			className="format-library__inline-color-popover"
+			anchor={ popoverAnchor }
 		>
-			<TabPanel
-				tabs={ [
-					{
-						name: 'color',
-						title: __( 'Text' ),
-					},
-					{
-						name: 'backgroundColor',
-						title: __( 'Background' ),
-					},
-				] }
-			>
-				{ ( tab ) => (
-					<ColorPicker
-						name={ name }
-						property={ tab.name }
-						value={ value }
-						onChange={ onChange }
-					/>
-				) }
-			</TabPanel>
+			<Tabs>
+				<Tabs.TabList>
+					{ TABS.map( ( tab ) => (
+						<Tabs.Tab tabId={ tab.name } key={ tab.name }>
+							{ tab.title }
+						</Tabs.Tab>
+					) ) }
+				</Tabs.TabList>
+				{ TABS.map( ( tab ) => (
+					<Tabs.TabPanel
+						tabId={ tab.name }
+						focusable={ false }
+						key={ tab.name }
+					>
+						<ColorPicker
+							name={ name }
+							property={ tab.name }
+							value={ value }
+							onChange={ onChange }
+						/>
+					</Tabs.TabPanel>
+				) ) }
+			</Tabs>
 		</Popover>
 	);
 }

@@ -7,8 +7,8 @@ Allow users to control the width & height of an image.
 Render a ImageSizeControl.
 
 ```jsx
+import { useState } from 'react';
 import { __experimentalImageSizeControl as ImageSizeControl } from '@wordpress/block-editor';
-import { useState } from '@wordpress/element';
 
 const MyImageSizeControl = () => {
 	const [ size, setSize ] = useState( { width: null, height: null } );
@@ -36,7 +36,7 @@ The component accepts the following props:
 
 If this property is added, a help text will be generated for the image size control, using imageSizeHelp property as the content.
 
--   Type: `String|WPElement`
+-   Type: `String|Element`
 -   Required: No
 
 ### slug

@@ -1,13 +1,6 @@
-.editor-post-title {
-	position: relative;
-
-	&.is-focus-mode {
-		opacity: 0.2;
-		transition: opacity 0.1s linear;
-		@include reduce-motion("transition");
-
-		&:focus {
-			opacity: 1;
-		}
-	}
+// Raw Text Variant
+.editor-post-title.is-raw-text {
+	margin-bottom: $grid-unit-30;
+	margin-top: 2px; // space for focus outline to appear.
+	max-width: none;
 }

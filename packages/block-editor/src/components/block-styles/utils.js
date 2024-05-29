@@ -1,8 +1,4 @@
 /**
- * External dependencies
- */
-import { find } from 'lodash';
-/**
  * WordPress dependencies
  */
 import TokenList from '@wordpress/token-list';
@@ -11,7 +7,7 @@ import { _x } from '@wordpress/i18n';
 /**
  * Returns the active style from the given className.
  *
- * @param {Array}  styles    Block style variations.
+ * @param {Array}  styles    Block styles.
  * @param {string} className Class name
  *
  * @return {Object?} The active style.
@@ -23,13 +19,15 @@ export function getActiveStyle( styles, className ) {
 		}
 
 		const potentialStyleName = style.substring( 9 );
-		const activeStyle = find( styles, { name: potentialStyleName } );
+		const activeStyle = styles?.find(
+			( { name } ) => name === potentialStyleName
+		);
 		if ( activeStyle ) {
 			return activeStyle;
 		}
 	}
 
-	return find( styles, 'isDefault' );
+	return getDefaultStyle( styles );
 }
 
 /**
@@ -59,7 +57,7 @@ export function replaceActiveStyle( className, activeStyle, newStyle ) {
  * act as a fallback for when there is no active style applied to a block. The default item also serves
  * as a switch on the frontend to deactivate non-default styles.
  *
- * @param {Array} styles Block style variations.
+ * @param {Array} styles Block styles.
  *
  * @return {Array<Object?>}        The style collection.
  */
@@ -83,10 +81,10 @@ export function getRenderedStyles( styles ) {
 /**
  * Returns a style object from a collection of styles where that style object is the default block style.
  *
- * @param {Array} styles Block style variations.
+ * @param {Array} styles Block styles.
  *
  * @return {Object?}        The default style object, if found.
  */
 export function getDefaultStyle( styles ) {
-	return find( styles, 'isDefault' );
+	return styles?.find( ( style ) => style.isDefault );
 }

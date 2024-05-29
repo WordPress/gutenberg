@@ -1,14 +1,9 @@
 /**
- * External dependencies
- */
-import { map, flow, groupBy, orderBy } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import { useMemo, useEffect } from '@wordpress/element';
-import { useAsyncList } from '@wordpress/compose';
+import { useMemo, useEffect, forwardRef } from '@wordpress/element';
+import { pipe, useAsyncList } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -17,6 +12,8 @@ import BlockTypesList from '../block-types-list';
 import InserterPanel from './panel';
 import useBlockTypesState from './hooks/use-block-types-state';
 import InserterListbox from '../inserter-listbox';
+import { orderBy } from '../../utils/sorting';
+import InserterNoResults from './no-results';
 
 const getBlockNamespace = ( item ) => item.name.split( '/' )[ 0 ];
 
@@ -30,19 +27,17 @@ const MAX_SUGGESTED_ITEMS = 6;
  */
 const EMPTY_ARRAY = [];
 
-export function BlockTypesTab( {
-	rootClientId,
-	onInsert,
-	onHover,
-	showMostUsedBlocks,
-} ) {
+export function BlockTypesTab(
+	{ rootClientId, onInsert, onHover, showMostUsedBlocks },
+	ref
+) {
 	const [ items, categories, collections, onSelectItem ] = useBlockTypesState(
 		rootClientId,
 		onInsert
 	);
 
 	const suggestedItems = useMemo( () => {
-		return orderBy( items, [ 'frecency' ], [ 'desc' ] ).slice(
+		return orderBy( items, 'frecency', 'desc' ).slice(
 			0,
 			MAX_SUGGESTED_ITEMS
 		);
@@ -53,12 +48,20 @@ export function BlockTypesTab( {
 	}, [ items ] );
 
 	const itemsPerCategory = useMemo( () => {
-		return flow(
+		return pipe(
 			( itemList ) =>
 				itemList.filter(
 					( item ) => item.category && item.category !== 'reusable'
 				),
-			( itemList ) => groupBy( itemList, 'category' )
+			( itemList ) =>
+				itemList.reduce( ( acc, item ) => {
+					const { category } = item;
+					if ( ! acc[ category ] ) {
+						acc[ category ] = [];
+					}
+					acc[ category ].push( item );
+					return acc;
+				}, {} )
 		)( items );
 	}, [ items ] );
 
@@ -98,9 +101,13 @@ export function BlockTypesTab( {
 		didRenderAllCategories ? collectionEntries : EMPTY_ARRAY
 	);
 
+	if ( ! items.length ) {
+		return <InserterNoResults />;
+	}
+
 	return (
 		<InserterListbox>
-			<div>
+			<div ref={ ref }>
 				{ showMostUsedBlocks && !! suggestedItems.length && (
 					<InserterPanel title={ _x( 'Most used', 'blocks' ) }>
 						<BlockTypesList
@@ -112,7 +119,7 @@ export function BlockTypesTab( {
 					</InserterPanel>
 				) }
 
-				{ map( currentlyRenderedCategories, ( category ) => {
+				{ currentlyRenderedCategories.map( ( category ) => {
 					const categoryItems = itemsPerCategory[ category.slug ];
 					if ( ! categoryItems || ! categoryItems.length ) {
 						return null;
@@ -147,8 +154,7 @@ export function BlockTypesTab( {
 					</InserterPanel>
 				) }
 
-				{ map(
-					currentlyRenderedCollections,
+				{ currentlyRenderedCollections.map(
 					( [ namespace, collection ] ) => {
 						const collectionItems = itemsPerCollection[ namespace ];
 						if ( ! collectionItems || ! collectionItems.length ) {
@@ -176,4 +182,4 @@ export function BlockTypesTab( {
 	);
 }
 
-export default BlockTypesTab;
+export default forwardRef( BlockTypesTab );

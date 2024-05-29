@@ -1,21 +1,21 @@
 /**
  * External dependencies
  */
-import classNames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import { getBlockSupport } from '@wordpress/blocks';
-import { Fragment, useEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import {
 	BlockControls,
 	useInnerBlocksProps,
 	useBlockProps,
 	InspectorControls,
 	ContrastChecker,
-	PanelColorSettings,
 	withColors,
+	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
+	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 } from '@wordpress/block-editor';
 import {
 	MenuGroup,
@@ -27,8 +27,6 @@ import {
 import { __ } from '@wordpress/i18n';
 import { check } from '@wordpress/icons';
 
-const ALLOWED_BLOCKS = [ 'core/social-link' ];
-
 const sizeOptions = [
 	{ name: __( 'Small' ), value: 'has-small-icon-size' },
 	{ name: __( 'Normal' ), value: 'has-normal-icon-size' },
@@ -36,17 +34,9 @@ const sizeOptions = [
 	{ name: __( 'Huge' ), value: 'has-huge-icon-size' },
 ];
 
-const getDefaultBlockLayout = ( blockTypeOrName ) => {
-	const layoutBlockSupportConfig = getBlockSupport(
-		blockTypeOrName,
-		'__experimentalLayout'
-	);
-	return layoutBlockSupportConfig?.default;
-};
-
 export function SocialLinksEdit( props ) {
 	const {
-		name,
+		clientId,
 		attributes,
 		iconBackgroundColor,
 		iconColor,
@@ -63,9 +53,7 @@ export function SocialLinksEdit( props ) {
 		openInNewTab,
 		showLabels,
 		size,
-		layout,
 	} = attributes;
-	const usedLayout = layout || getDefaultBlockLayout( name );
 
 	const logosOnly = attributes.className?.includes( 'is-style-logos-only' );
 
@@ -107,7 +95,7 @@ export function SocialLinksEdit( props ) {
 
 	// Fallback color values are used maintain selections in case switching
 	// themes and named colors in palette do not match.
-	const className = classNames( size, {
+	const className = clsx( size, {
 		'has-visible-labels': showLabels,
 		'has-icon-color': iconColor.color || iconColorValue,
 		'has-icon-background-color':
@@ -116,11 +104,10 @@ export function SocialLinksEdit( props ) {
 
 	const blockProps = useBlockProps( { className } );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		allowedBlocks: ALLOWED_BLOCKS,
 		placeholder: isSelected ? SelectedSocialPlaceholder : SocialPlaceholder,
 		templateLock: false,
+		orientation: attributes.layout?.orientation ?? 'horizontal',
 		__experimentalAppenderTagName: 'li',
-		__experimentalLayout: usedLayout,
 	} );
 
 	const POPOVER_PROPS = {
@@ -137,6 +124,10 @@ export function SocialLinksEdit( props ) {
 				setAttributes( { iconColorValue: colorValue } );
 			},
 			label: __( 'Icon color' ),
+			resetAllFilter: () => {
+				setIconColor( undefined );
+				setAttributes( { iconColorValue: undefined } );
+			},
 		},
 	];
 
@@ -152,11 +143,17 @@ export function SocialLinksEdit( props ) {
 				} );
 			},
 			label: __( 'Icon background' ),
+			resetAllFilter: () => {
+				setIconBackgroundColor( undefined );
+				setAttributes( { iconBackgroundColorValue: undefined } );
+			},
 		} );
 	}
 
+	const colorGradientSettings = useMultipleOriginColorsAndGradients();
+
 	return (
-		<Fragment>
+		<>
 			<BlockControls group="other">
 				<ToolbarDropdownMenu
 					label={ __( 'Size' ) }
@@ -195,8 +192,9 @@ export function SocialLinksEdit( props ) {
 				</ToolbarDropdownMenu>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Link settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Open links in new tab' ) }
 						checked={ openInNewTab }
 						onChange={ () =>
@@ -204,19 +202,37 @@ export function SocialLinksEdit( props ) {
 						}
 					/>
 					<ToggleControl
-						label={ __( 'Show labels' ) }
+						__nextHasNoMarginBottom
+						label={ __( 'Show text' ) }
 						checked={ showLabels }
 						onChange={ () =>
 							setAttributes( { showLabels: ! showLabels } )
 						}
 					/>
 				</PanelBody>
-				<PanelColorSettings
-					__experimentalHasMultipleOrigins
-					__experimentalIsRenderedInSidebar
-					title={ __( 'Color' ) }
-					colorSettings={ colorSettings }
-				>
+			</InspectorControls>
+			{ colorGradientSettings.hasColorsOrGradients && (
+				<InspectorControls group="color">
+					{ colorSettings.map(
+						( { onChange, label, value, resetAllFilter } ) => (
+							<ColorGradientSettingsDropdown
+								key={ `social-links-color-${ label }` }
+								__experimentalIsRenderedInSidebar
+								settings={ [
+									{
+										colorValue: value,
+										label,
+										onColorChange: onChange,
+										isShownByDefault: true,
+										resetAllFilter,
+										enableAlpha: true,
+									},
+								] }
+								panelId={ clientId }
+								{ ...colorGradientSettings }
+							/>
+						)
+					) }
 					{ ! logosOnly && (
 						<ContrastChecker
 							{ ...{
@@ -226,10 +242,10 @@ export function SocialLinksEdit( props ) {
 							isLargeText={ false }
 						/>
 					) }
-				</PanelColorSettings>
-			</InspectorControls>
+				</InspectorControls>
+			) }
 			<ul { ...innerBlocksProps } />
-		</Fragment>
+		</>
 	);
 }
 

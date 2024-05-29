@@ -1,21 +1,31 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/query-pagination",
 	"title": "Pagination",
 	"category": "theme",
-	"parent": [ "core/query" ],
+	"ancestor": [ "core/query" ],
+	"allowedBlocks": [
+		"core/query-pagination-previous",
+		"core/query-pagination-numbers",
+		"core/query-pagination-next"
+	],
 	"description": "Displays a paginated navigation to next/previous set of posts, when applicable.",
 	"textdomain": "default",
 	"attributes": {
 		"paginationArrow": {
 			"type": "string",
 			"default": "none"
+		},
+		"showLabel": {
+			"type": "boolean",
+			"default": true
 		}
 	},
 	"usesContext": [ "queryId", "query" ],
 	"providesContext": {
-		"paginationArrow": "paginationArrow"
+		"paginationArrow": "paginationArrow",
+		"showLabel": "showLabel"
 	},
 	"supports": {
 		"align": true,
@@ -30,12 +40,28 @@
 				"link": true
 			}
 		},
-		"__experimentalLayout": {
+		"layout": {
 			"allowSwitching": false,
 			"allowInheriting": false,
 			"default": {
 				"type": "flex"
 			}
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	},
 	"editorStyle": "wp-block-query-pagination-editor",

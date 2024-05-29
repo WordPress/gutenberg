@@ -1,11 +1,7 @@
 /**
- * External dependencies
- */
-import createSelector from 'rememo';
-
-/**
  * WordPress dependencies
  */
+import { createSelector } from '@wordpress/data';
 import {
 	displayShortcut,
 	shortcutAriaLabel,
@@ -64,6 +60,39 @@ function getKeyCombinationRepresentation( shortcut, representation ) {
  * @param {Object} state Global state.
  * @param {string} name  Shortcut name.
  *
+ * @example
+ *
+ *```js
+ * import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+ * import { useSelect } from '@wordpress/data';
+ * import { createInterpolateElement } from '@wordpress/element';
+ * import { sprintf } from '@wordpress/i18n';
+ * const ExampleComponent = () => {
+ *     const {character, modifier} = useSelect(
+ *         ( select ) =>
+ *             select( keyboardShortcutsStore ).getShortcutKeyCombination(
+ *                 'core/editor/next-region'
+ *             ),
+ *         []
+ *     );
+ *
+ *     return (
+ *         <div>
+ *             { createInterpolateElement(
+ *                 sprintf(
+ *                     'Character: <code>%s</code> / Modifier: <code>%s</code>',
+ *                     character,
+ *                     modifier
+ *                 ),
+ *                 {
+ *                     code: <code />,
+ *                 }
+ *             ) }
+ *         </div>
+ *     );
+ * };
+ *```
+ *
  * @return {WPShortcutKeyCombination?} Key combination.
  */
 export function getShortcutKeyCombination( state, name ) {
@@ -77,6 +106,34 @@ export function getShortcutKeyCombination( state, name ) {
  * @param {string}                   name           Shortcut name.
  * @param {keyof FORMATTING_METHODS} representation Type of representation
  *                                                  (display, raw, ariaLabel).
+ * @example
+ *
+ *```js
+ * import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+ * import { useSelect } from '@wordpress/data';
+ * import { sprintf } from '@wordpress/i18n';
+ *
+ * const ExampleComponent = () => {
+ *     const {display, raw, ariaLabel} = useSelect(
+ *         ( select ) =>{
+ *             return {
+ *                 display: select( keyboardShortcutsStore ).getShortcutRepresentation('core/editor/next-region' ),
+ *                 raw: select( keyboardShortcutsStore ).getShortcutRepresentation('core/editor/next-region','raw' ),
+ *                 ariaLabel: select( keyboardShortcutsStore ).getShortcutRepresentation('core/editor/next-region', 'ariaLabel')
+ *             }
+ *         },
+ *         []
+ *     );
+ *
+ *     return (
+ *         <ul>
+ *             <li>{ sprintf( 'display string: %s', display ) }</li>
+ *             <li>{ sprintf( 'raw string: %s', raw ) }</li>
+ *             <li>{ sprintf( 'ariaLabel string: %s', ariaLabel ) }</li>
+ *         </ul>
+ *     );
+ * };
+ *```
  *
  * @return {string?} Shortcut representation.
  */
@@ -95,6 +152,26 @@ export function getShortcutRepresentation(
  * @param {Object} state Global state.
  * @param {string} name  Shortcut name.
  *
+ * @example
+ *
+ *```js
+ * import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+ * import { useSelect } from '@wordpress/data';
+ * import { __ } from '@wordpress/i18n';
+ * const ExampleComponent = () => {
+ *     const shortcutDescription = useSelect(
+ *         ( select ) =>
+ *             select( keyboardShortcutsStore ).getShortcutDescription( 'core/editor/next-region' ),
+ *         []
+ *     );
+ *
+ *     return shortcutDescription ? (
+ *         <div>{ shortcutDescription }</div>
+ *     ) : (
+ *         <div>{ __( 'No description.' ) }</div>
+ *     );
+ * };
+ *```
  * @return {string?} Shortcut description.
  */
 export function getShortcutDescription( state, name ) {
@@ -106,6 +183,44 @@ export function getShortcutDescription( state, name ) {
  *
  * @param {Object} state Global state.
  * @param {string} name  Shortcut name.
+ * @example
+ *
+ *```js
+ * import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+ * import { useSelect } from '@wordpress/data';
+ * import { createInterpolateElement } from '@wordpress/element';
+ * import { sprintf } from '@wordpress/i18n';
+ * const ExampleComponent = () => {
+ *     const shortcutAliases = useSelect(
+ *         ( select ) =>
+ *             select( keyboardShortcutsStore ).getShortcutAliases(
+ *                 'core/editor/next-region'
+ *             ),
+ *         []
+ *     );
+ *
+ *     return (
+ *         shortcutAliases.length > 0 && (
+ *             <ul>
+ *                 { shortcutAliases.map( ( { character, modifier }, index ) => (
+ *                     <li key={ index }>
+ *                         { createInterpolateElement(
+ *                             sprintf(
+ *                                 'Character: <code>%s</code> / Modifier: <code>%s</code>',
+ *                                 character,
+ *                                 modifier
+ *                             ),
+ *                             {
+ *                                 code: <code />,
+ *                             }
+ *                         ) }
+ *                     </li>
+ *                 ) ) }
+ *             </ul>
+ *         )
+ *     );
+ * };
+ *```
  *
  * @return {WPShortcutKeyCombination[]} Key combinations.
  */
@@ -115,6 +230,55 @@ export function getShortcutAliases( state, name ) {
 		: EMPTY_ARRAY;
 }
 
+/**
+ * Returns the shortcuts that include aliases for a given shortcut name.
+ *
+ * @param {Object} state Global state.
+ * @param {string} name  Shortcut name.
+ * @example
+ *
+ *```js
+ * import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+ * import { useSelect } from '@wordpress/data';
+ * import { createInterpolateElement } from '@wordpress/element';
+ * import { sprintf } from '@wordpress/i18n';
+ *
+ * const ExampleComponent = () => {
+ *     const allShortcutKeyCombinations = useSelect(
+ *         ( select ) =>
+ *             select( keyboardShortcutsStore ).getAllShortcutKeyCombinations(
+ *                 'core/editor/next-region'
+ *             ),
+ *         []
+ *     );
+ *
+ *     return (
+ *         allShortcutKeyCombinations.length > 0 && (
+ *             <ul>
+ *                 { allShortcutKeyCombinations.map(
+ *                     ( { character, modifier }, index ) => (
+ *                         <li key={ index }>
+ *                             { createInterpolateElement(
+ *                                 sprintf(
+ *                                     'Character: <code>%s</code> / Modifier: <code>%s</code>',
+ *                                     character,
+ *                                     modifier
+ *                                 ),
+ *                                 {
+ *                                     code: <code />,
+ *                                 }
+ *                             ) }
+ *                         </li>
+ *                     )
+ *                 ) }
+ *             </ul>
+ *         )
+ *     );
+ * };
+ *```
+ *
+ * @return {WPShortcutKeyCombination[]} Key combinations.
+ */
 export const getAllShortcutKeyCombinations = createSelector(
 	( state, name ) => {
 		return [
@@ -130,6 +294,47 @@ export const getAllShortcutKeyCombinations = createSelector(
  *
  * @param {Object} state Global state.
  * @param {string} name  Shortcut name.
+ *
+ * @example
+ *
+ *```js
+ * import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+ * import { useSelect } from '@wordpress/data';
+ * import { createInterpolateElement } from '@wordpress/element';
+ * import { sprintf } from '@wordpress/i18n';
+ *
+ * const ExampleComponent = () => {
+ *     const allShortcutRawKeyCombinations = useSelect(
+ *         ( select ) =>
+ *             select( keyboardShortcutsStore ).getAllShortcutRawKeyCombinations(
+ *                 'core/editor/next-region'
+ *             ),
+ *         []
+ *     );
+ *
+ *     return (
+ *         allShortcutRawKeyCombinations.length > 0 && (
+ *             <ul>
+ *                 { allShortcutRawKeyCombinations.map(
+ *                     ( shortcutRawKeyCombination, index ) => (
+ *                         <li key={ index }>
+ *                             { createInterpolateElement(
+ *                                 sprintf(
+ *                                     ' <code>%s</code>',
+ *                                     shortcutRawKeyCombination
+ *                                 ),
+ *                                 {
+ *                                     code: <code />,
+ *                                 }
+ *                             ) }
+ *                         </li>
+ *                     )
+ *                 ) }
+ *             </ul>
+ *         )
+ *     );
+ * };
+ *```
  *
  * @return {string[]} Shortcuts.
  */
@@ -148,7 +353,32 @@ export const getAllShortcutRawKeyCombinations = createSelector(
  *
  * @param {Object} state Global state.
  * @param {string} name  Category name.
+ * @example
  *
+ *```js
+ * import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+ * import { useSelect } from '@wordpress/data';
+ *
+ * const ExampleComponent = () => {
+ *     const categoryShortcuts = useSelect(
+ *         ( select ) =>
+ *             select( keyboardShortcutsStore ).getCategoryShortcuts(
+ *                 'block'
+ *             ),
+ *         []
+ *     );
+ *
+ *     return (
+ *         categoryShortcuts.length > 0 && (
+ *             <ul>
+ *                 { categoryShortcuts.map( ( categoryShortcut ) => (
+ *                     <li key={ categoryShortcut }>{ categoryShortcut }</li>
+ *                 ) ) }
+ *             </ul>
+ *         )
+ *     );
+ * };
+ *```
  * @return {string[]} Shortcut names.
  */
 export const getCategoryShortcuts = createSelector(

@@ -1,3 +1,5 @@
+import React
+
 public struct MediaInfo: Encodable {
     public let id: Int32?
     public let url: String?
@@ -5,14 +7,20 @@ public struct MediaInfo: Encodable {
     public let title: String?
     public let caption: String?
     public let alt: String?
+    public let metadata: [String: Any]
 
-    public init(id: Int32?, url: String?, type: String?, caption: String? = nil, title: String? = nil, alt: String? = nil) {
+    private enum CodingKeys: String, CodingKey {
+        case id, url, type, title, caption, alt
+    }
+
+    public init(id: Int32?, url: String?, type: String?, caption: String? = nil, title: String? = nil, alt: String? = nil, metadata: [String: Any] = [:]) {
         self.id = id
         self.url = url
         self.type = type
         self.caption = caption
         self.title = title
         self.alt = alt
+        self.metadata = metadata
     }
 }
 
@@ -21,7 +29,8 @@ public enum Capabilities: String {
     case contactInfoBlock
     case layoutGridBlock
     case tiledGalleryBlock
-    case mediaFilesCollectionBlock
+    case videoPressBlock
+    case videoPressV5Support
     case mentions
     case xposts
     case unsupportedBlockEditor
@@ -33,6 +42,8 @@ public enum Capabilities: String {
     case loomEmbed
     case smartframeEmbed
     case shouldUseFastImage
+    case supportSection
+    case onlyCoreBlocks
 }
 
 /// Wrapper for single block data
@@ -131,7 +142,57 @@ extension RCTLogLevel {
     }
 }
 
-public protocol GutenbergBridgeDelegate: class {
+// Definition of JavaScript exception, which will be used to
+// log exception to the Crash Logging service.
+public struct GutenbergJSException {
+    public let type: String
+    public let message: String
+    public let stacktrace: [StacktraceLine]
+    public let context: [String: Any]
+    public let tags: [String: String]
+    public let isHandled: Bool
+    public let handledBy: String
+
+    public struct StacktraceLine {
+        public let filename: String?
+        public let function: String
+        public let lineno: NSNumber?
+        public let colno: NSNumber?
+        
+        init?(from dict: [AnyHashable: Any]) {
+            guard let function = dict["function"] as? String else {
+                return nil
+            }
+            self.filename = dict["filename"] as? String
+            self.function = function
+            self.lineno = dict["lineno"] as? NSNumber
+            self.colno = dict["colno"] as? NSNumber
+        }
+    }
+    
+    init?(from dict: [AnyHashable: Any]) {
+        guard let type = dict["type"] as? String,
+              let message = dict["message"] as? String,
+              let rawStacktrace = dict["stacktrace"] as? [[AnyHashable: Any]],
+              let context = dict["context"] as? [String: Any],
+              let tags = dict["tags"] as? [String: String],
+              let isHandled = dict["isHandled"] as? Bool,
+              let handledBy = dict["handledBy"] as? String
+        else {
+            return nil
+        }
+        
+        self.type = type
+        self.message = message
+        self.stacktrace = rawStacktrace.compactMap { StacktraceLine(from: $0) }
+        self.context = context
+        self.tags = tags
+        self.isHandled = isHandled
+        self.handledBy = handledBy
+    }
+}
+
+public protocol GutenbergBridgeDelegate: AnyObject {
     /// Tells the delegate that Gutenberg had returned the requested HTML content.
     /// You can request HTML content by calling `requestHTML()` on a Gutenberg bridge instance.
     ///
@@ -196,12 +257,19 @@ public protocol GutenbergBridgeDelegate: class {
     ///
     func editorDidAutosave()
 
-    /// Tells the delegate that the editor needs to perform a network request.
+    /// Tells the delegate that the editor needs to perform a GET request.
     /// The paths given to perform the request are from the WP ORG REST API.
     /// https://developer.wordpress.org/rest-api/reference/
     /// - Parameter path: The path to perform the request.
     /// - Parameter completion: Completion handler to be called with the result or an error.
-    func gutenbergDidRequestFetch(path: String, completion: @escaping (Swift.Result<Any, NSError>) -> Void)
+    func gutenbergDidGetRequestFetch(path: String, completion: @escaping (Swift.Result<Any, NSError>) -> Void)
+    
+    /// Tells the delegate that the editor needs to perform a POST request.
+    /// The paths given to perform the request are from the WP ORG REST API.
+    /// https://developer.wordpress.org/rest-api/reference/
+    /// - Parameter path: The path to perform the request.
+    /// - Parameter completion: Completion handler to be called with the result or an error.
+    func gutenbergDidPostRequestFetch(path: String, data: [String: AnyObject]?, completion: @escaping (Swift.Result<Any, NSError>) -> Void)
 
     /// Tells the delegate to display a fullscreen image from a given URL
     ///
@@ -231,20 +299,6 @@ public protocol GutenbergBridgeDelegate: class {
 
     func gutenbergDidSendButtonPressedAction(_ buttonType: Gutenberg.ActionButtonType)
 
-    // Media Collection
-
-    /// Tells the delegate that a media collection block requested to reconnect with media save coordinator.
-    ///
-    func gutenbergDidRequestMediaSaveSync()
-
-    func gutenbergDidRequestMediaFilesEditorLoad(_ mediaFiles: [[String: Any]], blockId: String)
-
-    func gutenbergDidRequestMediaFilesFailedRetryDialog(_ mediaFiles: [[String: Any]])
-
-    func gutenbergDidRequestMediaFilesUploadCancelDialog(_ mediaFiles: [[String: Any]])
-
-    func gutenbergDidRequestMediaFilesSaveCancelDialog(_ mediaFiles: [[String: Any]])
-
     func gutenbergDidRequestPreview()
 
     /// Tells the delegate that the editor requested the block type impression counts
@@ -261,6 +315,14 @@ public protocol GutenbergBridgeDelegate: class {
 
     /// Tells the delegate the editor requested sending an event
     func gutenbergDidRequestSendEventToHost(_ eventName: String, properties: [AnyHashable: Any])
+    
+    func gutenbergDidRequestToggleUndoButton(_ isDisabled: Bool)
+    
+    func gutenbergDidRequestToggleRedoButton(_ isDisabled: Bool)
+
+    func gutenbergDidRequestConnectionStatus() -> Bool
+    
+    func gutenbergDidRequestLogException(_ exception: GutenbergJSException, with callback: @escaping () -> Void)
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods
@@ -270,13 +332,4 @@ public extension GutenbergBridgeDelegate {
     func gutenbergDidLayout() { }
     func gutenbergDidRequestUnsupportedBlockFallback(for block: Block) { }
     func gutenbergDidSendButtonPressedAction(_ buttonType: Gutenberg.ActionButtonType) { }
-
-    // Media Collection
-
-    func gutenbergDidRequestMediaSaveSync() {}
-    func gutenbergDidRequestMediaFilesEditorLoad(_ mediaFiles: [[String: Any]], blockId: String) { }
-    func gutenbergDidRequestMediaFilesFailedRetryDialog(_ mediaFiles: [[String: Any]]) { }
-    func gutenbergDidRequestMediaFilesUploadCancelDialog(_ mediaFiles: [[String: Any]]) { }
-    func gutenbergDidRequestMediaFilesSaveCancelDialog(_ mediaFiles: [[String: Any]]) { }
-    func gutenbergDidRequestMediaFilesBlockReplaceSync(_ mediaFiles: [[String: Any]], clientId: String) {}
 }

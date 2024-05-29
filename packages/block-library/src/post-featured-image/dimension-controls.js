@@ -10,7 +10,11 @@ import {
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { InspectorControls, useSetting } from '@wordpress/block-editor';
+import {
+	useSettings,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
 
 const SCALE_OPTIONS = (
 	<>
@@ -49,14 +53,33 @@ const scaleHelp = {
 
 const DimensionControls = ( {
 	clientId,
-	attributes: { width, height, scale, sizeSlug },
+	attributes: { aspectRatio, width, height, scale, sizeSlug },
 	setAttributes,
-	imageSizeOptions = [],
+	media,
 } ) => {
-	const defaultUnits = [ 'px', '%', 'vw', 'em', 'rem' ];
+	const [ availableUnits, defaultRatios, themeRatios, showDefaultRatios ] =
+		useSettings(
+			'spacing.units',
+			'dimensions.aspectRatios.default',
+			'dimensions.aspectRatios.theme',
+			'dimensions.defaultAspectRatios'
+		);
 	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units' ) || defaultUnits,
+		availableUnits: availableUnits || [ 'px', '%', 'vw', 'em', 'rem' ],
 	} );
+	const imageSizes = useSelect(
+		( select ) => select( blockEditorStore ).getSettings().imageSizes,
+		[]
+	);
+	const imageSizeOptions = imageSizes
+		.filter( ( { slug } ) => {
+			return media?.media_details?.sizes?.[ slug ]?.source_url;
+		} )
+		.map( ( { name, slug } ) => ( {
+			value: slug,
+			label: name,
+		} ) );
+
 	const onDimensionChange = ( dimension, nextValue ) => {
 		const parsedValue = parseFloat( nextValue );
 		/**
@@ -64,14 +87,62 @@ const DimensionControls = ( {
 		 * we don't want to set the attribute, as it would
 		 * end up having the unit as value without any number.
 		 */
-		if ( isNaN( parsedValue ) && nextValue ) return;
+		if ( isNaN( parsedValue ) && nextValue ) {
+			return;
+		}
 		setAttributes( {
 			[ dimension ]: parsedValue < 0 ? '0' : nextValue,
 		} );
 	};
 	const scaleLabel = _x( 'Scale', 'Image scaling options' );
+
+	const showScaleControl =
+		height || ( aspectRatio && aspectRatio !== 'auto' );
+
+	const themeOptions = themeRatios?.map( ( { name, ratio } ) => ( {
+		label: name,
+		value: ratio,
+	} ) );
+
+	const defaultOptions = defaultRatios?.map( ( { name, ratio } ) => ( {
+		label: name,
+		value: ratio,
+	} ) );
+
+	const aspectRatioOptions = [
+		{
+			label: _x(
+				'Original',
+				'Aspect ratio option for dimensions control'
+			),
+			value: 'auto',
+		},
+		...( showDefaultRatios ? defaultOptions : [] ),
+		...( themeOptions ? themeOptions : [] ),
+	];
+
 	return (
-		<InspectorControls __experimentalGroup="dimensions">
+		<>
+			<ToolsPanelItem
+				hasValue={ () => !! aspectRatio }
+				label={ __( 'Aspect ratio' ) }
+				onDeselect={ () => setAttributes( { aspectRatio: undefined } ) }
+				resetAllFilter={ () => ( {
+					aspectRatio: undefined,
+				} ) }
+				isShownByDefault
+				panelId={ clientId }
+			>
+				<SelectControl
+					__nextHasNoMarginBottom
+					label={ __( 'Aspect ratio' ) }
+					value={ aspectRatio }
+					options={ aspectRatioOptions }
+					onChange={ ( nextAspectRatio ) =>
+						setAttributes( { aspectRatio: nextAspectRatio } )
+					}
+				/>
+			</ToolsPanelItem>
 			<ToolsPanelItem
 				className="single-column"
 				hasValue={ () => !! height }
@@ -80,7 +151,7 @@ const DimensionControls = ( {
 				resetAllFilter={ () => ( {
 					height: undefined,
 				} ) }
-				isShownByDefault={ true }
+				isShownByDefault
 				panelId={ clientId }
 			>
 				<UnitControl
@@ -102,7 +173,7 @@ const DimensionControls = ( {
 				resetAllFilter={ () => ( {
 					width: undefined,
 				} ) }
-				isShownByDefault={ true }
+				isShownByDefault
 				panelId={ clientId }
 			>
 				<UnitControl
@@ -116,7 +187,7 @@ const DimensionControls = ( {
 					units={ units }
 				/>
 			</ToolsPanelItem>
-			{ !! height && (
+			{ showScaleControl && (
 				<ToolsPanelItem
 					hasValue={ () => !! scale && scale !== DEFAULT_SCALE }
 					label={ scaleLabel }
@@ -128,10 +199,11 @@ const DimensionControls = ( {
 					resetAllFilter={ () => ( {
 						scale: DEFAULT_SCALE,
 					} ) }
-					isShownByDefault={ true }
+					isShownByDefault
 					panelId={ clientId }
 				>
 					<ToggleGroupControl
+						__nextHasNoMarginBottom
 						label={ scaleLabel }
 						value={ scale }
 						help={ scaleHelp[ scale ] }
@@ -149,7 +221,7 @@ const DimensionControls = ( {
 			{ !! imageSizeOptions.length && (
 				<ToolsPanelItem
 					hasValue={ () => !! sizeSlug }
-					label={ __( 'Image size' ) }
+					label={ __( 'Resolution' ) }
 					onDeselect={ () =>
 						setAttributes( { sizeSlug: undefined } )
 					}
@@ -160,7 +232,8 @@ const DimensionControls = ( {
 					panelId={ clientId }
 				>
 					<SelectControl
-						label={ __( 'Image size' ) }
+						__nextHasNoMarginBottom
+						label={ __( 'Resolution' ) }
 						value={ sizeSlug || DEFAULT_SIZE }
 						options={ imageSizeOptions }
 						onChange={ ( nextSizeSlug ) =>
@@ -170,7 +243,7 @@ const DimensionControls = ( {
 					/>
 				</ToolsPanelItem>
 			) }
-		</InspectorControls>
+		</>
 	);
 };
 

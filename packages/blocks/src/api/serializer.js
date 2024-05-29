@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty, reduce, castArray, startsWith } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -86,12 +81,14 @@ const innerBlocksPropsProvider = {};
  */
 export function getBlockProps( props = {} ) {
 	const { blockType, attributes } = blockPropsProvider;
-	return applyFilters(
-		'blocks.getSaveContent.extraProps',
-		{ ...props },
-		blockType,
-		attributes
-	);
+	return getBlockProps.skipFilters
+		? props
+		: applyFilters(
+				'blocks.getSaveContent.extraProps',
+				{ ...props },
+				blockType,
+				attributes
+		  );
 }
 
 /**
@@ -101,6 +98,11 @@ export function getBlockProps( props = {} ) {
  */
 export function getInnerBlocksProps( props = {} ) {
 	const { innerBlocks } = innerBlocksPropsProvider;
+	// Allow a different component to be passed to getSaveElement to handle
+	// inner blocks, bypassing the default serialisation.
+	if ( ! Array.isArray( innerBlocks ) ) {
+		return { ...props, children: innerBlocks };
+	}
 	// Value is an array of blocks, so defer to block serializer.
 	const html = serialize( innerBlocks, { isInnerBlocks: true } );
 	// Use special-cased raw HTML tag to avoid default escaping.
@@ -125,6 +127,11 @@ export function getSaveElement(
 	innerBlocks = []
 ) {
 	const blockType = normalizeBlockType( blockTypeOrName );
+
+	if ( ! blockType?.save ) {
+		return null;
+	}
+
 	let { save } = blockType;
 
 	// Component classes are unsupported for save since serialization must
@@ -169,9 +176,9 @@ export function getSaveElement(
 	/**
 	 * Filters the save result of a block during serialization.
 	 *
-	 * @param {WPElement} element    Block save result.
-	 * @param {WPBlock}   blockType  Block type definition.
-	 * @param {Object}    attributes Block attributes.
+	 * @param {Element} element    Block save result.
+	 * @param {WPBlock} blockType  Block type definition.
+	 * @param {Object}  attributes Block attributes.
 	 */
 	return applyFilters(
 		'blocks.getSaveElement',
@@ -216,9 +223,8 @@ export function getSaveContent( blockTypeOrName, attributes, innerBlocks ) {
  * @return {Object<string,*>} Subset of attributes for comment serialization.
  */
 export function getCommentAttributes( blockType, attributes ) {
-	return reduce(
-		blockType.attributes,
-		( accumulator, attributeSchema, key ) => {
+	return Object.entries( blockType.attributes ?? {} ).reduce(
+		( accumulator, [ key, attributeSchema ] ) => {
 			const value = attributes[ key ];
 			// Ignore undefined values.
 			if ( undefined === value ) {
@@ -234,7 +240,8 @@ export function getCommentAttributes( blockType, attributes ) {
 			// Ignore default value.
 			if (
 				'default' in attributeSchema &&
-				attributeSchema.default === value
+				JSON.stringify( attributeSchema.default ) ===
+					JSON.stringify( value )
 			) {
 				return accumulator;
 			}
@@ -315,12 +322,13 @@ export function getCommentDelimitedContent(
 	attributes,
 	content
 ) {
-	const serializedAttributes = ! isEmpty( attributes )
-		? serializeAttributes( attributes ) + ' '
-		: '';
+	const serializedAttributes =
+		attributes && Object.entries( attributes ).length
+			? serializeAttributes( attributes ) + ' '
+			: '';
 
 	// Strip core blocks of their namespace prefix.
-	const blockName = startsWith( rawBlockName, 'core/' )
+	const blockName = rawBlockName?.startsWith( 'core/' )
 		? rawBlockName.slice( 5 )
 		: rawBlockName;
 
@@ -384,7 +392,8 @@ export function __unstableSerializeAndClean( blocks ) {
 	// pre-block-editor removep'd content formatting.
 	if (
 		blocks.length === 1 &&
-		blocks[ 0 ].name === getFreeformContentHandlerName()
+		blocks[ 0 ].name === getFreeformContentHandlerName() &&
+		blocks[ 0 ].name === 'core/freeform'
 	) {
 		content = removep( content );
 	}
@@ -401,7 +410,8 @@ export function __unstableSerializeAndClean( blocks ) {
  * @return {string} The post content.
  */
 export default function serialize( blocks, options ) {
-	return castArray( blocks )
+	const blocksArray = Array.isArray( blocks ) ? blocks : [ blocks ];
+	return blocksArray
 		.map( ( block ) => serializeBlock( block, options ) )
 		.join( '\n\n' );
 }

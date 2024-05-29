@@ -4,7 +4,6 @@
 import type { Context, OmitNevers } from './helpers';
 
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
-import type { DefaultContextOf } from './index';
 
 declare module './base-entity-records' {
 	export namespace BaseEntityRecords {
@@ -25,6 +24,6 @@ declare module './base-entity-records' {
 	}
 }
 
-export type MenuLocation<
-	C extends Context = DefaultContextOf< 'root', 'menuLocation' >
-> = OmitNevers< _BaseEntityRecords.MenuLocation< C > >;
+export type MenuLocation< C extends Context = 'edit' > = OmitNevers<
+	_BaseEntityRecords.MenuLocation< C >
+>;

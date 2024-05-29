@@ -1,8 +1,15 @@
 // The `createHigherOrderComponent` helper and helper types.
 export * from './utils/create-higher-order-component';
+// The `debounce` helper and its types.
+export * from './utils/debounce';
+// The `throttle` helper and its types.
+export * from './utils/throttle';
+// The `ObservableMap` data structure
+export * from './utils/observable-map';
 
-// Compose helper (aliased flowRight from Lodash)
+// The `compose` and `pipe` helpers (inspired by `flowRight` and `flow` from Lodash).
 export { default as compose } from './higher-order/compose';
+export { default as pipe } from './higher-order/pipe';
 
 // Higher-order components.
 export { default as ifCondition } from './higher-order/if-condition';
@@ -28,14 +35,17 @@ export { default as useKeyboardShortcut } from './hooks/use-keyboard-shortcut';
 export { default as useMediaQuery } from './hooks/use-media-query';
 export { default as usePrevious } from './hooks/use-previous';
 export { default as useReducedMotion } from './hooks/use-reduced-motion';
+export { default as useStateWithHistory } from './hooks/use-state-with-history';
 export { default as useViewportMatch } from './hooks/use-viewport-match';
 export { default as useResizeObserver } from './hooks/use-resize-observer';
 export { default as useAsyncList } from './hooks/use-async-list';
 export { default as useWarnOnChange } from './hooks/use-warn-on-change';
 export { default as useDebounce } from './hooks/use-debounce';
+export { default as useDebouncedInput } from './hooks/use-debounced-input';
 export { default as useThrottle } from './hooks/use-throttle';
 export { default as useMergeRefs } from './hooks/use-merge-refs';
 export { default as useRefEffect } from './hooks/use-ref-effect';
 export { default as __experimentalUseDropZone } from './hooks/use-drop-zone';
 export { default as useFocusableIframe } from './hooks/use-focusable-iframe';
 export { default as __experimentalUseFixedWindowList } from './hooks/use-fixed-window-list';
+export { default as useObservableValue } from './hooks/use-observable-value';

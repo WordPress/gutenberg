@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
-import { isEmpty } from 'lodash';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -12,6 +11,7 @@ import {
 	useBlockProps,
 	__experimentalGetElementClassName,
 	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
+	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
@@ -25,24 +25,31 @@ export default function save( { attributes } ) {
 		linkClass,
 		width,
 		height,
+		aspectRatio,
+		scale,
 		id,
 		linkTarget,
 		sizeSlug,
 		title,
 	} = attributes;
 
-	const newRel = isEmpty( rel ) ? undefined : rel;
+	const newRel = ! rel ? undefined : rel;
 	const borderProps = getBorderClassesAndStyles( attributes );
+	const shadowProps = getShadowClassesAndStyles( attributes );
 
-	const classes = classnames( {
-		[ `align${ align }` ]: align,
+	const classes = clsx( {
+		// All other align classes are handled by block supports.
+		// `{ align: 'none' }` is unique to transforms for the image block.
+		alignnone: 'none' === align,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 		'is-resized': width || height,
 		'has-custom-border':
-			!! borderProps.className || ! isEmpty( borderProps.style ),
+			!! borderProps.className ||
+			( borderProps.style &&
+				Object.keys( borderProps.style ).length > 0 ),
 	} );
 
-	const imageClasses = classnames( borderProps.className, {
+	const imageClasses = clsx( borderProps.className, {
 		[ `wp-image-${ id }` ]: !! id,
 	} );
 
@@ -51,9 +58,14 @@ export default function save( { attributes } ) {
 			src={ url }
 			alt={ alt }
 			className={ imageClasses || undefined }
-			style={ borderProps.style }
-			width={ width }
-			height={ height }
+			style={ {
+				...borderProps.style,
+				...shadowProps.style,
+				aspectRatio,
+				objectFit: scale,
+				width,
+				height,
+			} }
 			title={ title }
 		/>
 	);

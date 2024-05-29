@@ -10,22 +10,6 @@ The `NavigatorBackButton` component can be used to navigate to a screen and shou
 
 Refer to [the `NavigatorProvider` component](/packages/components/src/navigator/navigator-provider/README.md#usage) for a usage example.
 
-## Props
-
-The component accepts the following props:
-
-### `onClick`: `React.MouseEventHandler< HTMLElement >`
-
-The callback called in response to a `click` event.
-
--   Required: No
-
-### `path`: `string`
-
-The path of the screen to navigate to.
-
--   Required: Yes
-
 ### Inherited props
 
-`NavigatorBackButton` also inherits all of the [`Button` props](/packages/components/src/button/README.md#props), except for `href`.
+`NavigatorBackButton` also inherits all of the [`Button` props](/packages/components/src/button/README.md#props), except for `href` and `target`.

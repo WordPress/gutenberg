@@ -38,8 +38,8 @@ const Edit = ( props ) => {
 			} }
 			onResizeStop={ ( event, direction, elt, delta ) => {
 				setAttributes( {
-					height: parseInt( height + delta.height, 10 ),
-					width: parseInt( width + delta.width, 10 ),
+					height: height + delta.height,
+					width: width + delta.width,
 				} );
 				toggleSelection( true );
 			} }

@@ -14,6 +14,7 @@ import namespaceEndpointMiddleware from './middlewares/namespace-endpoint';
 import httpV1Middleware from './middlewares/http-v1';
 import userLocaleMiddleware from './middlewares/user-locale';
 import mediaUploadMiddleware from './middlewares/media-upload';
+import createThemePreviewMiddleware from './middlewares/theme-preview';
 import {
 	parseResponseAndNormalizeError,
 	parseAndThrowError,
@@ -193,5 +194,6 @@ apiFetch.createPreloadingMiddleware = createPreloadingMiddleware;
 apiFetch.createRootURLMiddleware = createRootURLMiddleware;
 apiFetch.fetchAllMiddleware = fetchAllMiddleware;
 apiFetch.mediaUploadMiddleware = mediaUploadMiddleware;
+apiFetch.createThemePreviewMiddleware = createThemePreviewMiddleware;
 
 export default apiFetch;

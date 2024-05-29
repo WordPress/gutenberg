@@ -3,80 +3,76 @@
  */
 import {
 	store as coreStore,
-	__experimentalUseResourcePermissions as useResourcePermissions,
+	useResourcePermissions,
+	useEntityRecords,
 } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import { PRELOADED_NAVIGATION_MENUS_QUERY } from './constants';
 
 export default function useNavigationMenu( ref ) {
 	const permissions = useResourcePermissions( 'navigation', ref );
 
-	return useSelect(
+	const {
+		navigationMenu,
+		isNavigationMenuResolved,
+		isNavigationMenuMissing,
+	} = useSelect(
 		( select ) => {
-			const [
-				hasResolvedPermissions,
-				{ canCreate, canUpdate, canDelete, isResolving },
-			] = permissions;
-
-			const {
-				navigationMenus,
-				isResolvingNavigationMenus,
-				hasResolvedNavigationMenus,
-			} = selectNavigationMenus( select, ref );
-
-			const {
-				navigationMenu,
-				isNavigationMenuResolved,
-				isNavigationMenuMissing,
-			} = selectExistingMenu( select, ref );
-
-			return {
-				navigationMenus,
-				isResolvingNavigationMenus,
-				hasResolvedNavigationMenus,
-
-				navigationMenu,
-				isNavigationMenuResolved,
-				isNavigationMenuMissing,
-
-				canSwitchNavigationMenu: ref
-					? navigationMenus?.length > 1
-					: navigationMenus?.length > 0,
-
-				canUserCreateNavigationMenu: canCreate,
-				isResolvingCanUserCreateNavigationMenu: isResolving,
-				hasResolvedCanUserCreateNavigationMenu: hasResolvedPermissions,
-
-				canUserUpdateNavigationMenu: canUpdate,
-				hasResolvedCanUserUpdateNavigationMenu: ref
-					? hasResolvedPermissions
-					: undefined,
-
-				canUserDeleteNavigationMenu: canDelete,
-				hasResolvedCanUserDeleteNavigationMenu: ref
-					? hasResolvedPermissions
-					: undefined,
-			};
+			return selectExistingMenu( select, ref );
 		},
-		[ ref, permissions ]
+		[ ref ]
 	);
-}
 
-function selectNavigationMenus( select ) {
-	const { getEntityRecords, hasFinishedResolution, isResolving } =
-		select( coreStore );
+	const {
+		// Can the user create navigation menus?
+		canCreate: canCreateNavigationMenus,
 
-	const args = [
+		// Can the user update the specific navigation menu with the given post ID?
+		canUpdate: canUpdateNavigationMenu,
+
+		// Can the user delete the specific navigation menu with the given post ID?
+		canDelete: canDeleteNavigationMenu,
+		isResolving: isResolvingPermissions,
+		hasResolved: hasResolvedPermissions,
+	} = permissions;
+
+	const {
+		records: navigationMenus,
+		isResolving: isResolvingNavigationMenus,
+		hasResolved: hasResolvedNavigationMenus,
+	} = useEntityRecords(
 		'postType',
-		'wp_navigation',
-		{ per_page: -1, status: 'publish' },
-	];
+		`wp_navigation`,
+		PRELOADED_NAVIGATION_MENUS_QUERY
+	);
+
+	const canSwitchNavigationMenu = ref
+		? navigationMenus?.length > 1
+		: navigationMenus?.length > 0;
+
 	return {
-		navigationMenus: getEntityRecords( ...args ),
-		isResolvingNavigationMenus: isResolving( 'getEntityRecords', args ),
-		hasResolvedNavigationMenus: hasFinishedResolution(
-			'getEntityRecords',
-			args
-		),
+		navigationMenu,
+		isNavigationMenuResolved,
+		isNavigationMenuMissing,
+		navigationMenus,
+		isResolvingNavigationMenus,
+		hasResolvedNavigationMenus,
+		canSwitchNavigationMenu,
+		canUserCreateNavigationMenus: canCreateNavigationMenus,
+		isResolvingCanUserCreateNavigationMenus: isResolvingPermissions,
+		hasResolvedCanUserCreateNavigationMenus: hasResolvedPermissions,
+		canUserUpdateNavigationMenu: canUpdateNavigationMenu,
+		hasResolvedCanUserUpdateNavigationMenu: ref
+			? hasResolvedPermissions
+			: undefined,
+		canUserDeleteNavigationMenu: canDeleteNavigationMenu,
+		hasResolvedCanUserDeleteNavigationMenu: ref
+			? hasResolvedPermissions
+			: undefined,
 	};
 }
 
@@ -99,15 +95,24 @@ function selectExistingMenu( select, ref ) {
 		args
 	);
 
+	// Only published Navigation posts are considered valid.
+	// Draft Navigation posts are valid only on the editor,
+	// requiring a post update to publish to show in frontend.
+	// To achieve that, index.php must reflect this validation only for published.
+	const isNavigationMenuPublishedOrDraft =
+		editedNavigationMenu.status === 'publish' ||
+		editedNavigationMenu.status === 'draft';
+
 	return {
 		isNavigationMenuResolved: hasResolvedNavigationMenu,
-		isNavigationMenuMissing: hasResolvedNavigationMenu && ! navigationMenu,
+		isNavigationMenuMissing:
+			hasResolvedNavigationMenu &&
+			( ! navigationMenu || ! isNavigationMenuPublishedOrDraft ),
 
 		// getEditedEntityRecord will return the post regardless of status.
 		// Therefore if the found post is not published then we should ignore it.
-		navigationMenu:
-			editedNavigationMenu.status === 'publish'
-				? editedNavigationMenu
-				: null,
+		navigationMenu: isNavigationMenuPublishedOrDraft
+			? editedNavigationMenu
+			: null,
 	};
 }

@@ -6,11 +6,6 @@ This component is mostly used for blocks that display text, such as Heading, Par
 
 ![Post Title block alignment options](https://make.wordpress.org/core/files/2020/09/post-title-block-alignment-options.png)
 
-## Table of contents
-
-1. [Development guidelines](#development-guidelines)
-2. [Related components](#related-components)
-
 ## Development guidelines
 
 ### Usage
@@ -40,7 +35,7 @@ _Note:_ In this example that we render `AlignmentControl` as a child of the `Blo
 
 -   **Type:** `String`
 -   **Default:** `undefined`
--   **Options:**: `left`, `center`, `right`
+-   **Options:** `left`, `center`, `right`
 
 The current value of the alignment setting. You may only choose from the `Options` listed above.
 

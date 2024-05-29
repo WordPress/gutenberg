@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { _n, sprintf } from '@wordpress/i18n';
-import { PluginPrePublishPanel } from '@wordpress/edit-post';
 import { useSelect } from '@wordpress/data';
 import { blockDefault } from '@wordpress/icons';
 
@@ -11,6 +10,10 @@ import { blockDefault } from '@wordpress/icons';
  */
 import CompactList from '../../components/compact-list';
 import { store as blockDirectoryStore } from '../../store';
+
+// We shouldn't import the editor package directly
+// because it would include the wp-editor in all pages loading the block-directory script.
+const { PluginPrePublishPanel } = window?.wp?.editor ?? {};
 
 export default function InstalledBlocksPrePublishPanel() {
 	const newBlockTypes = useSelect(
@@ -34,7 +37,7 @@ export default function InstalledBlocksPrePublishPanel() {
 				),
 				newBlockTypes.length
 			) }
-			initialOpen={ true }
+			initialOpen
 		>
 			<p className="installed-blocks-pre-publish-panel__copy">
 				{ _n(

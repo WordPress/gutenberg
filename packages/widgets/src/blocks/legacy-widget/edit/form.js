@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
@@ -92,7 +92,7 @@ export default function Form( {
 	if ( isWide && isMediumLargeViewport ) {
 		return (
 			<div
-				className={ classnames( {
+				className={ clsx( {
 					'wp-block-legacy-widget__container': isVisible,
 				} ) }
 			>
@@ -103,8 +103,11 @@ export default function Form( {
 				) }
 				<Popover
 					focusOnMount={ false }
-					position="middle right"
-					__unstableForcePosition
+					placement="right"
+					offset={ 32 }
+					resize={ false }
+					flip={ false }
+					shift
 				>
 					<div
 						ref={ ref }

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Animated, PanResponder, View } from 'react-native';
+import { Animated, PanResponder, StyleSheet, View } from 'react-native';
 import Video from 'react-native-video';
 
 /**
@@ -12,7 +12,6 @@ import {
 	setFocalPointPickerTooltipShown,
 } from '@wordpress/react-native-bridge';
 import { __ } from '@wordpress/i18n';
-import { Image, UnitControl } from '@wordpress/components';
 import { useRef, useState, useMemo, useEffect } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
@@ -24,6 +23,8 @@ import Tooltip from './tooltip';
 import styles from './style.scss';
 import { isVideoType } from './utils';
 import { clamp } from '../utils/math';
+import Image from '../mobile/image';
+import UnitControl from '../unit-control';
 
 const MIN_POSITION_VALUE = 0;
 const MAX_POSITION_VALUE = 100;
@@ -164,7 +165,7 @@ function FocalPointPicker( props ) {
 		},
 	];
 	const FOCAL_POINT_SIZE = 50;
-	const focalPointStyles = [
+	const focalPointStyles = StyleSheet.flatten( [
 		styles.focalPoint,
 		{
 			height: FOCAL_POINT_SIZE,
@@ -172,7 +173,7 @@ function FocalPointPicker( props ) {
 			marginTop: -( FOCAL_POINT_SIZE / 2 ),
 			width: FOCAL_POINT_SIZE,
 		},
-	];
+	] );
 
 	const onTooltipPress = () => setTooltipVisible( false );
 	const onMediaLayout = ( event ) => {
@@ -243,9 +244,10 @@ function FocalPointPicker( props ) {
 									yOffset={ -( FOCAL_POINT_SIZE / 2 ) }
 								/>
 								<FocalPoint
-									height={ styles.focalPoint?.height }
+									height={ focalPointStyles.height }
 									style={ focalPointStyles }
-									width={ styles.focalPoint?.width }
+									testID="focal-point-picker-handle"
+									width={ focalPointStyles.width }
 								/>
 							</Animated.View>
 						) }

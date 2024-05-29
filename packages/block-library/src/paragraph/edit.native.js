@@ -65,7 +65,7 @@ function ParagraphBlock( {
 				identifier="content"
 				tagName="p"
 				value={ content }
-				deleteEnter={ true }
+				deleteEnter
 				style={ styles }
 				onChange={ ( nextContent ) => {
 					setAttributes( {

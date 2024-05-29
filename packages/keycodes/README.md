@@ -128,8 +128,7 @@ _Returns_
 
 ### isKeyboardEvent
 
-An object that contains functions to check if a keyboard event matches a
-predefined shortcut combination.
+An object that contains functions to check if a keyboard event matches a predefined shortcut combination.
 
 _Usage_
 
@@ -149,8 +148,7 @@ Keycode for LEFT key.
 
 ### modifiers
 
-Object that contains functions that return the available modifier
-depending on platform.
+Object that contains functions that return the available modifier depending on platform.
 
 _Type_
 
@@ -192,8 +190,7 @@ Keycode for SHIFT key.
 
 ### shortcutAriaLabel
 
-An object that contains functions to return an aria label for a keyboard
-shortcut.
+An object that contains functions to return an aria label for a keyboard shortcut.
 
 _Usage_
 

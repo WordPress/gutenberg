@@ -15,8 +15,6 @@ const isWPPrettier = prettierPackage.name === 'wp-prettier';
 const customOptions = isWPPrettier ? { parenSpacing: true } : {};
 const customStyleOptions = isWPPrettier ? { parenSpacing: false } : {};
 
-// Disable reason: The current JSDoc tooling does not yet understand TypeScript
-// union types.
 /** @type {PrettierConfig & WPPrettierOptions} */
 const config = {
 	useTabs: true,

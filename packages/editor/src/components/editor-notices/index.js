@@ -1,14 +1,8 @@
 /**
- * External dependencies
- */
-import { filter } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { NoticeList } from '@wordpress/components';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -16,15 +10,30 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 import TemplateValidationNotice from '../template-validation-notice';
 
-export function EditorNotices( { notices, onRemove } ) {
-	const dismissibleNotices = filter( notices, {
-		isDismissible: true,
-		type: 'default',
-	} );
-	const nonDismissibleNotices = filter( notices, {
-		isDismissible: false,
-		type: 'default',
-	} );
+/**
+ * This component renders the notices displayed in the editor. It displays pinned notices first, followed by dismissible
+ *
+ * @example
+ * ```jsx
+ * <EditorNotices />
+ * ```
+ *
+ * @return {JSX.Element} The rendered EditorNotices component.
+ */
+export function EditorNotices() {
+	const { notices } = useSelect(
+		( select ) => ( {
+			notices: select( noticesStore ).getNotices(),
+		} ),
+		[]
+	);
+	const { removeNotice } = useDispatch( noticesStore );
+	const dismissibleNotices = notices.filter(
+		( { isDismissible, type } ) => isDismissible && type === 'default'
+	);
+	const nonDismissibleNotices = notices.filter(
+		( { isDismissible, type } ) => ! isDismissible && type === 'default'
+	);
 
 	return (
 		<>
@@ -35,7 +44,7 @@ export function EditorNotices( { notices, onRemove } ) {
 			<NoticeList
 				notices={ dismissibleNotices }
 				className="components-editor-notices__dismissible"
-				onRemove={ onRemove }
+				onRemove={ removeNotice }
 			>
 				<TemplateValidationNotice />
 			</NoticeList>
@@ -43,11 +52,4 @@ export function EditorNotices( { notices, onRemove } ) {
 	);
 }
 
-export default compose( [
-	withSelect( ( select ) => ( {
-		notices: select( noticesStore ).getNotices(),
-	} ) ),
-	withDispatch( ( dispatch ) => ( {
-		onRemove: dispatch( noticesStore ).removeNotice,
-	} ) ),
-] )( EditorNotices );
+export default EditorNotices;

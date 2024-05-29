@@ -3,8 +3,21 @@
 
 	// We intentionally hide pinned items (plugins) on mobile, and unhide them at desktop breakpoints.
 	// Otherwise the list can wreak havoc on the layout.
-	.components-button:not(:first-child) {
+	.components-button {
 		display: none;
+		margin: 0;
+
+		&[aria-controls="edit-post:document"],
+		&[aria-controls="edit-post:block"],
+		&[aria-controls="edit-site:template"],
+		&[aria-controls="edit-site:block-inspector"] {
+			display: flex;
+		}
+
+		svg {
+			max-width: $icon-size;
+			max-height: $icon-size;
+		}
 
 		@include break-small() {
 			display: flex;
@@ -12,17 +25,5 @@
 	}
 
 	// Gap between pinned items.
-	gap: $grid-unit-05;
-
-	// Account for larger grid from parent container gap.
-	margin-right: -$grid-unit-05;
-
-	.components-button {
-		margin: 0;
-
-		svg {
-			max-width: $icon-size;
-			max-height: $icon-size;
-		}
-	}
+	gap: $grid-unit-10;
 }

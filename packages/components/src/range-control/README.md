@@ -2,29 +2,20 @@
 
 RangeControls are used to make selections from a range of incremental values.
 
-![](https://make.wordpress.org/design/files/2018/12/rangecontrol.png)
-
-A RangeControl for volume
-
-## Table of contents
-
-1. [Design guidelines](#design-guidelines)
-2. [Development guidelines](#development-guidelines)
-3. [Related components](#related-components)
+![A RangeControl for volume](https://make.wordpress.org/design/files/2018/12/rangecontrol.png)
 
 ## Design guidelines
 
 ### Anatomy
 
-![](https://make.wordpress.org/design/files/2018/12/rangecontrol-anatomy.png)
-
 A RangeControl can contain the following elements:
 
-1. **Track**: The track shows the range available for user selection. For left-to-right (LTR) languages, the smallest value appears on the far left, and the largest value on the far right. For right-to-left (RTL) languages this orientation is reversed, with the smallest value on the far right and the largest value on the far left.
-2. **Thumb**: The thumb slides along the track, displaying the selected value through its position.
-3. **Value entry field**: The value entry field displays the currently selected, specific numerical value.
-4. **Icon** (optional): An icon can be displayed before or after the slider.
-5. **Tick mark** (optional): Tick marks represent predetermined values to which the user can move the slider.
+1. **Rail**: The rail represents the entire surface area of the slider, from the minimum value selectable by the user to the maximum value selectable by the user. For left-to-right (LTR) languages, the minimum value appears on the far left, and the maximum value on the far right. For right-to-left (RTL) languages this orientation is reversed, with the minimum value on the far right and the maximum value on the far left.
+2. **Track**: The track represents the portion of the rail from the minimum value to the currently selected value.
+3. **Thumb**: The thumb slides along the track, displaying the selected value through its position.
+4. **Value entry field**: The value entry field displays the currently selected, specific numerical value.
+5. **Icon** (optional): An icon can be displayed before or after the slider.
+6. **Tick mark** (optional): Tick marks represent predetermined values to which the user can move the slider.
 
 ### Types
 
@@ -91,8 +82,8 @@ RangeControls should provide the full range of choices available for the user to
 Render a RangeControl to make a selection from a range of incremental values.
 
 ```jsx
+import { useState } from 'react';
 import { RangeControl } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const MyRangeControl = () => {
 	const [ columns, setColumns ] = useState( 2 );
@@ -114,7 +105,7 @@ const MyRangeControl = () => {
 The set of props accepted by the component will be specified below.
 Props not included in this set will be applied to the input elements.
 
-### `afterIcon`: `string|Function|WPComponent|null`
+### `afterIcon`: `string|Function|Component|null`
 
 If this property is added, an [Icon component](/packages/components/src/icon/README.md) will be rendered after the slider with the icon equal to `afterIcon`.
 
@@ -131,7 +122,7 @@ If this property is true, a button to reset the slider is rendered.
 -   Default: `false`
 -   Platform: Web | Mobile
 
-### `beforeIcon`: `string|Function|WPComponent|null`
+### `beforeIcon`: `string|Function|Component|null`
 
 If this property is added, an [Icon component](/packages/components/src/icon/README.md) will be rendered before the slider with the icon equal to `beforeIcon`.
 
@@ -162,7 +153,7 @@ Disables the `input`, preventing new values from being applied.
 -   Platform: Web
 
 
-### `help`: `string|WPElement`
+### `help`: `string|Element`
 
 If this property is added, a help text will be generated using help property as the content.
 

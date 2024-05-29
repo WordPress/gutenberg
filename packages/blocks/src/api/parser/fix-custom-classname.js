@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { difference, omit } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import { hasBlockSupport } from '../registration';
@@ -52,13 +47,15 @@ export function fixCustomClassname( blockAttributes, blockType, innerHTML ) {
 		// attributes, with the exception of `className`. This will determine
 		// the default set of classes. From there, any difference in innerHTML
 		// can be considered as custom classes.
-		const attributesSansClassName = omit( blockAttributes, [
-			'className',
-		] );
+		const { className: omittedClassName, ...attributesSansClassName } =
+			blockAttributes;
 		const serialized = getSaveContent( blockType, attributesSansClassName );
 		const defaultClasses = getHTMLRootElementClasses( serialized );
 		const actualClasses = getHTMLRootElementClasses( innerHTML );
-		const customClasses = difference( actualClasses, defaultClasses );
+
+		const customClasses = actualClasses.filter(
+			( className ) => ! defaultClasses.includes( className )
+		);
 
 		if ( customClasses.length ) {
 			blockAttributes.className = customClasses.join( ' ' );

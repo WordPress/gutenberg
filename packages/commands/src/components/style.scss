@@ -1,0 +1,152 @@
+// dirty hack to clean up modal
+.commands-command-menu {
+	border-radius: $grid-unit-05;
+	width: calc(100% - #{$grid-unit-40});
+	margin: auto;
+	max-width: 400px;
+	position: relative;
+	top: calc(5% + #{$header-height});
+
+	@include break-small() {
+		top: calc(10% + #{$header-height});
+	}
+
+	.components-modal__content {
+		margin: 0;
+		padding: 0;
+	}
+}
+
+.commands-command-menu__overlay {
+	display: block;
+	align-items: start;
+}
+
+.commands-command-menu__header {
+	display: flex;
+	align-items: center;
+	padding: 0 $grid-unit-20;
+
+	.components-button {
+		height: $grid-unit-70;
+		width: $grid-unit-70;
+		border: 1px solid $gray-600;
+		border-right: 0;
+		justify-content: center;
+		border-radius: $radius-block-ui 0 0 $radius-block-ui;
+
+		& + [cmdk-input] {
+			border-top-left-radius: 0;
+			border-bottom-left-radius: 0;
+		}
+	}
+}
+
+.commands-command-menu__container {
+	// the style here is a hack to force safari to repaint to avoid a style glitch
+	will-change: transform;
+
+	[cmdk-input] {
+		border: none;
+		width: 100%;
+		padding: $grid-unit-20 $grid-unit-05;
+		outline: none;
+		color: $gray-900;
+		margin: 0;
+		font-size: 15px;
+		line-height: 28px;
+		border-radius: 0;
+
+		&::placeholder {
+			color: $gray-700;
+		}
+
+		&:focus {
+			box-shadow: none;
+			outline: none;
+		}
+	}
+
+	[cmdk-item] {
+		border-radius: $radius-block-ui;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		color: $gray-900;
+		font-size: $default-font-size;
+
+		&[aria-selected="true"],
+		&:active {
+			background: var(--wp-admin-theme-color);
+			color: $white;
+
+			svg {
+				fill: $white;
+			}
+		}
+
+		&[aria-disabled="true"] {
+			color: $gray-600;
+			cursor: not-allowed;
+		}
+
+		svg {
+			fill: $gray-900;
+		}
+
+		> div {
+			min-height: $button-size-next-default-40px;
+			padding: $grid-unit-05;
+			padding-left: $grid-unit-50; // Account for commands without icons.
+		}
+
+		> .has-icon {
+			padding-left: $grid-unit;
+		}
+	}
+
+	[cmdk-root] > [cmdk-list] {
+		max-height: 368px; // Specific to not have commands overflow oddly.
+		overflow: auto;
+
+		// Ensures there is always padding bottom on the last group, when there are commands.
+		& [cmdk-list-sizer] > [cmdk-group]:last-child [cmdk-group-items]:not(:empty) {
+			padding-bottom: $grid-unit-10;
+		}
+
+		& [cmdk-list-sizer] > [cmdk-group] > [cmdk-group-items]:not(:empty) {
+			padding: 0 $grid-unit-10;
+		}
+	}
+
+	[cmdk-empty] {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		white-space: pre-wrap;
+		color: $gray-900;
+		padding: $grid-unit-10 0 $grid-unit-40;
+	}
+
+	[cmdk-loading] {
+		padding: $grid-unit-20;
+	}
+
+	[cmdk-list-sizer] {
+		position: relative;
+	}
+}
+
+.commands-command-menu__item span {
+	// Ensure commands do not run off the edge (great for post titles).
+	display: inline-block;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.commands-command-menu__item mark {
+	color: inherit;
+	background: unset;
+	font-weight: 600;
+}

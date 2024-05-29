@@ -13,7 +13,7 @@ function usePatternsSetup( clientId, blockName, filterPatternsFn ) {
 		( select ) => {
 			const {
 				getBlockRootClientId,
-				__experimentalGetPatternsByBlockTypes,
+				getPatternsByBlockTypes,
 				__experimentalGetAllowedPatterns,
 			} = select( blockEditorStore );
 			const rootClientId = getBlockRootClientId( clientId );
@@ -22,10 +22,7 @@ function usePatternsSetup( clientId, blockName, filterPatternsFn ) {
 					filterPatternsFn
 				);
 			}
-			return __experimentalGetPatternsByBlockTypes(
-				blockName,
-				rootClientId
-			);
+			return getPatternsByBlockTypes( blockName, rootClientId );
 		},
 		[ clientId, blockName, filterPatternsFn ]
 	);

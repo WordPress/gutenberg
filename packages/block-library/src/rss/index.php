@@ -8,6 +8,8 @@
 /**
  * Renders the `core/rss` block on server.
  *
+ * @since 5.2.0
+ *
  * @param array $attributes The block attributes.
  *
  * @return string Returns the block content with received rss items.
@@ -20,7 +22,7 @@ function render_block_core_rss( $attributes ) {
 	$rss = fetch_feed( $attributes['feedURL'] );
 
 	if ( is_wp_error( $rss ) ) {
-		return '<div class="components-placeholder"><div class="notice notice-error"><strong>' . __( 'RSS Error:' ) . '</strong> ' . $rss->get_error_message() . '</div></div>';
+		return '<div class="components-placeholder"><div class="notice notice-error"><strong>' . __( 'RSS Error:' ) . '</strong> ' . esc_html( $rss->get_error_message() ) . '</div></div>';
 	}
 
 	if ( ! $rss->get_item_quantity() ) {
@@ -48,8 +50,8 @@ function render_block_core_rss( $attributes ) {
 			if ( $date ) {
 				$date = sprintf(
 					'<time datetime="%1$s" class="wp-block-rss__item-publish-date">%2$s</time> ',
-					date_i18n( get_option( 'c' ), $date ),
-					date_i18n( get_option( 'date_format' ), $date )
+					esc_attr( date_i18n( 'c', $date ) ),
+					esc_attr( date_i18n( get_option( 'date_format' ), $date ) )
 				);
 			}
 		}
@@ -107,6 +109,8 @@ function render_block_core_rss( $attributes ) {
 
 /**
  * Registers the `core/rss` block on server.
+ *
+ * @since 5.2.0
  */
 function register_block_core_rss() {
 	register_block_type_from_metadata(

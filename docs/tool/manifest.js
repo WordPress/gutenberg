@@ -1,18 +1,24 @@
+/* eslint no-console: [ 'error', { allow: [ 'error' ] } ] */
+
 /**
  * External dependencies
  */
-const { camelCase, upperFirst } = require( 'lodash' );
+const { pascalCase } = require( 'change-case' );
 const fs = require( 'fs' );
 const glob = require( 'glob' ).sync;
 const { join } = require( 'path' );
 
 const baseRepoUrl = '..';
 const componentPaths = glob( 'packages/components/src/*/**/README.md', {
-	// Don't expose documentation for mobile only and G2 components just yet.
+	// Don't expose documentation for mobile only and private components just yet.
 	ignore: [
 		'**/src/mobile/**/README.md',
-		'**/src/ui/**/README.md',
+		'packages/components/src/theme/README.md',
 		'packages/components/src/view/README.md',
+		'packages/components/src/dropdown-menu-v2/README.md',
+		'packages/components/src/progress-bar/README.md',
+		'packages/components/src/tabs/README.md',
+		'packages/components/src/custom-select-control-v2/README.md',
 	],
 } );
 const packagePaths = glob( 'packages/*/package.json' )
@@ -31,15 +37,25 @@ const packagePaths = glob( 'packages/*/package.json' )
  * @return {Array} Manifest
  */
 function getPackageManifest( packageFolderNames ) {
-	return packageFolderNames.map( ( folderName ) => {
+	return packageFolderNames.reduce( ( manifest, folderName ) => {
 		const path = `${ baseRepoUrl }/packages/${ folderName }/README.md`;
-		return {
+		const tocPath = `${ baseRepoUrl }/packages/${ folderName }/docs/toc.json`;
+
+		// First add any README files to the TOC
+		manifest.push( {
 			title: `@wordpress/${ folderName }`,
 			slug: `packages-${ folderName }`,
 			markdown_source: path,
 			parent: 'packages',
-		};
-	} );
+		} );
+
+		// Next add any items in the docs/toc.json if found.
+		if ( fs.existsSync( join( __dirname, '..', tocPath ) ) ) {
+			const toc = require( join( __dirname, '..', tocPath ) ).values();
+			manifest.push( ...toc );
+		}
+		return manifest;
+	}, [] );
 }
 
 /**
@@ -54,7 +70,7 @@ function getComponentManifest( paths ) {
 		const pathFragments = filePath.split( '/' );
 		const slug = pathFragments[ pathFragments.length - 2 ];
 		return {
-			title: upperFirst( camelCase( slug ) ),
+			title: pascalCase( slug ),
 			slug,
 			markdown_source: `${ baseRepoUrl }/${ filePath }`,
 			parent: 'components',
@@ -85,7 +101,7 @@ function generateRootManifestFromTOCItems( items, parent = null ) {
 				slug = 'handbook';
 			}
 		}
-		let title = upperFirst( camelCase( slug ) );
+		let title = pascalCase( slug );
 		const markdownSource = fs.readFileSync( fileName, 'utf8' );
 		const titleMarkdown = markdownSource.match( /^#\s(.+)$/m );
 		if ( titleMarkdown ) {
@@ -110,6 +126,29 @@ function generateRootManifestFromTOCItems( items, parent = null ) {
 			pageItems = pageItems.concat( getPackageManifest( packagePaths ) );
 		}
 	} );
+
+	const slugs = pageItems.map( ( { slug } ) => slug );
+	const duplicatedSlugs = slugs.filter(
+		( item, idx ) => idx !== slugs.indexOf( item )
+	);
+
+	const FgRed = '\x1b[31m';
+	const Reset = '\x1b[0m';
+
+	if ( duplicatedSlugs.length > 0 ) {
+		console.error(
+			`${ FgRed } The handbook generation setup creates pages based on their slug, so each slug has to be unique. ${ Reset }`
+		);
+		console.error(
+			`${ FgRed } More info at https://github.com/WordPress/gutenberg/issues/61206#issuecomment-2085361154 ${ Reset }\n`
+		);
+		throw new Error(
+			`${ FgRed } Duplicate slugs found in the TOC: ${ duplicatedSlugs.join(
+				', '
+			) } ${ Reset }`
+		);
+	}
+
 	return pageItems;
 }
 

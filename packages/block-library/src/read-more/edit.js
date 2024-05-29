@@ -19,8 +19,9 @@ export default function ReadMore( {
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Link settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __( 'Open in new tab' ) }
 						onChange={ ( value ) =>
 							setAttributes( {
@@ -32,8 +33,9 @@ export default function ReadMore( {
 				</PanelBody>
 			</InspectorControls>
 			<RichText
+				identifier="content"
 				tagName="a"
-				aria-label={ __( '"Read more" link text' ) }
+				aria-label={ __( '“Read more” link text' ) }
 				placeholder={ __( 'Read more' ) }
 				value={ content }
 				onChange={ ( newValue ) =>
@@ -42,7 +44,7 @@ export default function ReadMore( {
 				__unstableOnSplitAtEnd={ () =>
 					insertBlocksAfter( createBlock( getDefaultBlockName() ) )
 				}
-				withoutInteractiveFormatting={ true }
+				withoutInteractiveFormatting
 				{ ...blockProps }
 			/>
 		</>

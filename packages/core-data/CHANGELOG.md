@@ -2,6 +2,116 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Variables like `process.env.IS_GUTENBERG_PLUGIN` have been replaced by `globalThis.IS_GUTENBERG_PLUGIN`. Build systems using `process.env` should be updated ([#61486](https://github.com/WordPress/gutenberg/pull/61486)).
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 6.35.0 (2024-05-16)
+
+## 6.34.0 (2024-05-02)
+
+## 6.33.0 (2024-04-19)
+
+## 6.32.0 (2024-04-03)
+
+## 6.31.0 (2024-03-21)
+
+## 6.30.0 (2024-03-06)
+
+## 6.29.0 (2024-02-21)
+
+## 6.28.0 (2024-02-09)
+
+## 6.27.0 (2024-01-24)
+
+## 6.26.0 (2024-01-10)
+
+## 6.25.0 (2023-12-13)
+
+## 6.24.0 (2023-11-29)
+
+## 6.23.0 (2023-11-16)
+
+## 6.22.0 (2023-11-02)
+
+## 6.21.0 (2023-10-18)
+
+## Enhancements
+
+-   Add `getEntityRecordsTotalItems` and `getEntityRecordsTotalPages` selectors. [#55164](https://github.com/WordPress/gutenberg/pull/55164).
+-   Revisions: add new selectors, `getRevisions` and `getRevision`, to fetch entity revisions. [#54046](https://github.com/WordPress/gutenberg/pull/54046).
+
+## 6.20.0 (2023-10-05)
+
+## 6.19.0 (2023-09-20)
+
+## 6.18.0 (2023-08-31)
+
+## 6.17.0 (2023-08-16)
+
+## 6.16.0 (2023-08-10)
+
+## 6.15.0 (2023-07-20)
+
+## 6.14.0 (2023-07-05)
+
+## 6.13.0 (2023-06-23)
+
+## 6.12.0 (2023-06-07)
+
+## 6.11.0 (2023-05-24)
+
+## 6.10.0 (2023-05-10)
+
+## 6.9.0 (2023-04-26)
+
+## 6.8.0 (2023-04-12)
+
+## 6.7.0 (2023-03-29)
+
+## 6.6.0 (2023-03-15)
+
+## 6.5.0 (2023-03-01)
+
+## 6.4.0 (2023-02-15)
+
+## 6.3.0 (2023-02-01)
+
+## 6.2.0 (2023-01-11)
+
+## 6.1.0 (2023-01-02)
+
+## 6.0.0 (2022-12-14)
+
+### Breaking Changes
+
+-   Updated dependencies to require React 18 ([45235](https://github.com/WordPress/gutenberg/pull/45235))
+
+## 5.5.0 (2022-11-16)
+
+## 5.4.0 (2022-11-02)
+
+## 5.3.0 (2022-10-19)
+
+## 5.2.0 (2022-10-05)
+
+## 5.1.0 (2022-09-21)
+
+## 5.0.0 (2022-09-13)
+
+### Breaking Changes
+
+– Add TypeScript types to the built package (via "types": "build-types" in the package.json)
+
+## 4.14.0 (2022-08-24)
+
+### New Features
+
+-   Stabilized the `useResourcePermissions` hook ([#43268](https://github.com/WordPress/gutenberg/pull/43268))
+
+## 4.13.0 (2022-08-10)
+
 ## 4.12.0 (2022-07-27)
 
 ## 4.11.0 (2022-07-13)
@@ -27,6 +137,7 @@
 ## 4.3.0 (2022-03-23)
 
 ### New Features
+
 -   The saveEntityRecord, saveEditedEntityRecord, and deleteEntityRecord actions now accept an optional throwOnError option (defaults to false). When set to true, any exceptions occurring when the action was executing are re-thrown, causing dispatch().saveEntityRecord() to reject with an error. ([#39258](https://github.com/WordPress/gutenberg/pull/39258))
 -   Added support for fetching block patterns and their categories, with the `getBlockPatterns` and `getBlockPatternCategories` selectors.
 

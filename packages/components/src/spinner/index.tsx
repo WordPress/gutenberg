@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import classNames from 'classnames';
+import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
 
 /**
  * Internal dependencies
  */
 import { StyledSpinner, SpinnerTrack, SpinnerIndicator } from './styles';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 
 /**
  * WordPress dependencies
@@ -21,8 +21,10 @@ export function UnforwardedSpinner(
 ) {
 	return (
 		<StyledSpinner
-			className={ classNames( 'components-spinner', className ) }
+			className={ clsx( 'components-spinner', className ) }
 			viewBox="0 0 100 100"
+			width="16"
+			height="16"
 			xmlns="http://www.w3.org/2000/svg"
 			role="presentation"
 			focusable="false"
@@ -48,7 +50,6 @@ export function UnforwardedSpinner(
 /**
  * `Spinner` is a component used to notify users that their action is being processed.
  *
- * @example
  * ```js
  *   import { Spinner } from '@wordpress/components';
  *

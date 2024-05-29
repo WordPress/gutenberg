@@ -1,0 +1,35 @@
+[
+	{
+		"name": "core/cover",
+		"isValid": true,
+		"attributes": {
+			"alt": "",
+			"hasParallax": false,
+			"isRepeated": false,
+			"dimRatio": 50,
+			"customOverlayColor": "#3615d9",
+			"backgroundType": "image",
+			"isDark": true,
+			"useFeaturedImage": true,
+			"tagName": "div",
+			"layout": {
+				"type": "constrained"
+			},
+			"isUserOverlayColor": true
+		},
+		"innerBlocks": [
+			{
+				"name": "core/paragraph",
+				"isValid": true,
+				"attributes": {
+					"align": "center",
+					"content": "",
+					"dropCap": false,
+					"placeholder": "Write title…",
+					"fontSize": "large"
+				},
+				"innerBlocks": []
+			}
+		]
+	}
+]

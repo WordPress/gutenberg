@@ -1,21 +1,25 @@
+// @ts-nocheck
 /**
  * External dependencies
  */
 import { useSelect } from 'downshift';
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import { Icon, check, chevronDown } from '@wordpress/icons';
+import { Icon, check } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
-import { useCallback, useState } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { VisuallyHidden } from '../';
+import { VisuallyHidden } from '../visually-hidden';
 import { Select as SelectControlSelect } from '../select-control/styles/select-control-styles';
+import SelectControlChevronDown from '../select-control/chevron-down';
+import { StyledLabel } from '../base-control/styles/base-control-styles';
+import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
 import InputBase from '../input-control/input-base';
 
 const itemToString = ( item ) => item?.name;
@@ -57,21 +61,27 @@ const stateReducer = (
 			return changes;
 	}
 };
-export default function CustomSelectControl( {
-	/** Start opting into the larger default height that will become the default size in a future version. */
-	__next36pxDefaultSize = false,
-	/** Start opting into the unconstrained width that will become the default in a future version. */
-	__nextUnconstrainedWidth = false,
-	className,
-	hideLabelFromVision,
-	label,
-	describedBy,
-	options: items,
-	onChange: onSelectedItemChange,
-	/** @type {import('../select-control/types').SelectControlProps.size} */
-	size = 'default',
-	value: _selectedItem,
-} ) {
+
+export default function CustomSelectControl( props ) {
+	const {
+		/** Start opting into the larger default height that will become the default size in a future version. */
+		__next40pxDefaultSize = false,
+		className,
+		hideLabelFromVision,
+		label,
+		describedBy,
+		options: items,
+		onChange: onSelectedItemChange,
+		/** @type {import('../select-control/types').SelectControlProps.size} */
+		size = 'default',
+		value: _selectedItem,
+		onMouseOver,
+		onMouseOut,
+		onFocus,
+		onBlur,
+		__experimentalShowSelectedHint = false,
+	} = useDeprecated36pxDefaultSizeProp( props );
+
 	const {
 		getLabelProps,
 		getToggleButtonProps,
@@ -90,8 +100,6 @@ export default function CustomSelectControl( {
 			: undefined ),
 		stateReducer,
 	} );
-
-	const [ isFocused, setIsFocused ] = useState( false );
 
 	function getDescribedBy() {
 		if ( describedBy ) {
@@ -127,10 +135,7 @@ export default function CustomSelectControl( {
 	}
 	return (
 		<div
-			className={ classnames(
-				'components-custom-select-control',
-				className
-			) }
+			className={ clsx( 'components-custom-select-control', className ) }
 		>
 			{ hideLabelFromVision ? (
 				<VisuallyHidden as="label" { ...getLabelProps() }>
@@ -138,88 +143,94 @@ export default function CustomSelectControl( {
 				</VisuallyHidden>
 			) : (
 				/* eslint-disable-next-line jsx-a11y/label-has-associated-control, jsx-a11y/label-has-for */
-				<label
+				<StyledLabel
 					{ ...getLabelProps( {
 						className: 'components-custom-select-control__label',
 					} ) }
 				>
 					{ label }
-				</label>
+				</StyledLabel>
 			) }
 			<InputBase
-				isFocused={ isOpen || isFocused }
-				__unstableInputWidth={
-					__nextUnconstrainedWidth ? undefined : 'auto'
-				}
-				labelPosition={ __nextUnconstrainedWidth ? undefined : 'top' }
+				__next40pxDefaultSize={ __next40pxDefaultSize }
+				size={ size }
+				suffix={ <SelectControlChevronDown /> }
 			>
 				<SelectControlSelect
+					onMouseOver={ onMouseOver }
+					onMouseOut={ onMouseOut }
 					as="button"
-					onFocus={ () => setIsFocused( true ) }
-					onBlur={ () => setIsFocused( false ) }
+					onFocus={ onFocus }
+					onBlur={ onBlur }
 					selectSize={ size }
-					__next36pxDefaultSize={ __next36pxDefaultSize }
+					__next40pxDefaultSize={ __next40pxDefaultSize }
 					{ ...getToggleButtonProps( {
 						// This is needed because some speech recognition software don't support `aria-labelledby`.
 						'aria-label': label,
 						'aria-labelledby': undefined,
-						className: classnames(
-							'components-custom-select-control__button',
-							{
-								'is-next-unconstrained-width':
-									__nextUnconstrainedWidth,
-							}
-						),
+						className: 'components-custom-select-control__button',
 						describedBy: getDescribedBy(),
 					} ) }
 				>
 					{ itemToString( selectedItem ) }
-					<Icon
-						icon={ chevronDown }
-						className="components-custom-select-control__button-icon"
-						size={ 18 }
-					/>
+					{ __experimentalShowSelectedHint &&
+						selectedItem.__experimentalHint && (
+							<span className="components-custom-select-control__hint">
+								{ selectedItem.__experimentalHint }
+							</span>
+						) }
 				</SelectControlSelect>
+				<div className="components-custom-select-control__menu-wrapper">
+					{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
+					<ul { ...menuProps } onKeyDown={ onKeyDownHandler }>
+						{ isOpen &&
+							items.map( ( item, index ) => (
+								<li
+									key={ item.key }
+									{ ...getItemProps( {
+										item,
+										index,
+										className: clsx(
+											item.className,
+											'components-custom-select-control__item',
+											{
+												'is-highlighted':
+													index === highlightedIndex,
+												'has-hint':
+													!! item.__experimentalHint,
+												'is-next-40px-default-size':
+													__next40pxDefaultSize,
+											}
+										),
+										style: item.style,
+									} ) }
+								>
+									{ item.name }
+									{ item.__experimentalHint && (
+										<span className="components-custom-select-control__item-hint">
+											{ item.__experimentalHint }
+										</span>
+									) }
+									{ item === selectedItem && (
+										<Icon
+											icon={ check }
+											className="components-custom-select-control__item-icon"
+										/>
+									) }
+								</li>
+							) ) }
+					</ul>
+				</div>
 			</InputBase>
-			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
-			<ul { ...menuProps } onKeyDown={ onKeyDownHandler }>
-				{ isOpen &&
-					items.map( ( item, index ) => (
-						// eslint-disable-next-line react/jsx-key
-						<li
-							{ ...getItemProps( {
-								item,
-								index,
-								key: item.key,
-								className: classnames(
-									item.className,
-									'components-custom-select-control__item',
-									{
-										'is-highlighted':
-											index === highlightedIndex,
-										'has-hint': !! item.__experimentalHint,
-										'is-next-36px-default-size':
-											__next36pxDefaultSize,
-									}
-								),
-								style: item.style,
-							} ) }
-						>
-							{ item.name }
-							{ item.__experimentalHint && (
-								<span className="components-custom-select-control__item-hint">
-									{ item.__experimentalHint }
-								</span>
-							) }
-							{ item === selectedItem && (
-								<Icon
-									icon={ check }
-									className="components-custom-select-control__item-icon"
-								/>
-							) }
-						</li>
-					) ) }
-			</ul>
 		</div>
+	);
+}
+
+export function StableCustomSelectControl( props ) {
+	return (
+		<CustomSelectControl
+			{ ...props }
+			__experimentalShowSelectedHint={ false }
+		/>
 	);
 }

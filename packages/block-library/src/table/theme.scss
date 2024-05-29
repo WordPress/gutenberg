@@ -1,16 +1,8 @@
 .wp-block-table {
-	thead {
-		border-bottom: 3px solid;
-	}
-
-	tfoot {
-		border-top: 3px solid;
-	}
+	margin: 0 0 1em 0;
 
 	td,
 	th {
-		padding: 0.5em;
-		border: 1px solid;
 		word-break: normal;
 	}
 

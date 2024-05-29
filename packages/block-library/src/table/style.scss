@@ -11,6 +11,21 @@
 		width: 100%;
 	}
 
+	thead {
+		border-bottom: 3px solid;
+	}
+
+	tfoot {
+		border-top: 3px solid;
+	}
+
+	// Match default border style to default style in editor
+	td,
+	th {
+		border: $border-width solid;
+		padding: 0.5em;
+	}
+
 	// Fixed layout toggle
 	.has-fixed-layout {
 		table-layout: fixed;
@@ -56,6 +71,9 @@
 	}
 
 	// "Stripes" style variation.
+	// This block style selector does not have 0-1-0 specificity, as per those
+	// generated via global styles, to maintain current styling. Global styles
+	// support for table borders also only applies to the outer `table` element.
 	&.is-style-stripes {
 		border-spacing: 0;
 		border-collapse: inherit;

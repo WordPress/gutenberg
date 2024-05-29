@@ -3,7 +3,7 @@
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
-import { createBlock, getBlockType } from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 import { RawHTML } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -49,7 +49,8 @@ const getInstallMissing = ( OriginalComponent ) => ( props ) => {
 };
 
 const ModifiedWarning = ( { originalBlock, ...props } ) => {
-	const { originalName, originalUndelimitedContent } = props.attributes;
+	const { originalName, originalUndelimitedContent, clientId } =
+		props.attributes;
 	const { replaceBlock } = useDispatch( blockEditorStore );
 	const convertToHTML = () => {
 		replaceBlock(
@@ -61,7 +62,18 @@ const ModifiedWarning = ( { originalBlock, ...props } ) => {
 	};
 
 	const hasContent = !! originalUndelimitedContent;
-	const hasHTMLBlock = getBlockType( 'core/html' );
+	const hasHTMLBlock = useSelect(
+		( select ) => {
+			const { canInsertBlockType, getBlockRootClientId } =
+				select( blockEditorStore );
+
+			return canInsertBlockType(
+				'core/html',
+				getBlockRootClientId( clientId )
+			);
+		},
+		[ clientId ]
+	);
 
 	let messageHTML = sprintf(
 		/* translators: %s: block name */
@@ -88,7 +100,7 @@ const ModifiedWarning = ( { originalBlock, ...props } ) => {
 			originalBlock.title || originalName
 		);
 		actions.push(
-			<Button key="convert" onClick={ convertToHTML } variant="link">
+			<Button key="convert" onClick={ convertToHTML } variant="tertiary">
 				{ __( 'Keep as HTML' ) }
 			</Button>
 		);

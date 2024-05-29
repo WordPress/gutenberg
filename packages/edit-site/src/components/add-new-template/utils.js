@@ -1,24 +1,34 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
 import { decodeEntities } from '@wordpress/html-entities';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useCallback } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { blockMeta, post } from '@wordpress/icons';
+import { blockMeta, post, archive } from '@wordpress/icons';
+
+/**
+ * Internal dependencies
+ */
+import { TEMPLATE_POST_TYPE } from '../../utils/constants';
+
+const EMPTY_OBJECT = {};
 
 /**
  * @typedef IHasNameAndId
  * @property {string|number} id   The entity's id.
  * @property {string}        name The entity's name.
  */
+
+const getValueFromObjectPath = ( object, path ) => {
+	let value = object;
+	path.split( '.' ).forEach( ( fieldName ) => {
+		value = value?.[ fieldName ];
+	} );
+	return value;
+};
 
 /**
  * Helper util to map records to add a `name` prop from a
@@ -32,7 +42,7 @@ import { blockMeta, post } from '@wordpress/icons';
 export const mapToIHasNameAndId = ( entities, path ) => {
 	return ( entities || [] ).map( ( entity ) => ( {
 		...entity,
-		name: decodeEntities( get( entity, path ) ),
+		name: decodeEntities( getValueFromObjectPath( entity, path ) ),
 	} ) );
 };
 
@@ -45,9 +55,13 @@ export const mapToIHasNameAndId = ( entities, path ) => {
 export const useExistingTemplates = () => {
 	return useSelect(
 		( select ) =>
-			select( coreStore ).getEntityRecords( 'postType', 'wp_template', {
-				per_page: -1,
-			} ),
+			select( coreStore ).getEntityRecords(
+				'postType',
+				TEMPLATE_POST_TYPE,
+				{
+					per_page: -1,
+				}
+			),
 		[]
 	);
 };
@@ -86,10 +100,110 @@ const usePublicTaxonomies = () => {
 	}, [ taxonomies ] );
 };
 
+export function usePostTypeArchiveMenuItems() {
+	const publicPostTypes = usePublicPostTypes();
+	const postTypesWithArchives = useMemo(
+		() => publicPostTypes?.filter( ( postType ) => postType.has_archive ),
+		[ publicPostTypes ]
+	);
+	const existingTemplates = useExistingTemplates();
+	// We need to keep track of naming conflicts. If a conflict
+	// occurs, we need to add slug.
+	const postTypeLabels = useMemo(
+		() =>
+			publicPostTypes?.reduce( ( accumulator, { labels } ) => {
+				const singularName = labels.singular_name.toLowerCase();
+				accumulator[ singularName ] =
+					( accumulator[ singularName ] || 0 ) + 1;
+				return accumulator;
+			}, {} ),
+		[ publicPostTypes ]
+	);
+	const needsUniqueIdentifier = useCallback(
+		( { labels, slug } ) => {
+			const singularName = labels.singular_name.toLowerCase();
+			return postTypeLabels[ singularName ] > 1 && singularName !== slug;
+		},
+		[ postTypeLabels ]
+	);
+	return useMemo(
+		() =>
+			postTypesWithArchives
+				?.filter(
+					( postType ) =>
+						! ( existingTemplates || [] ).some(
+							( existingTemplate ) =>
+								existingTemplate.slug ===
+								'archive-' + postType.slug
+						)
+				)
+				.map( ( postType ) => {
+					let title;
+					if ( needsUniqueIdentifier( postType ) ) {
+						title = sprintf(
+							// translators: %1s: Name of the post type e.g: "Post"; %2s: Slug of the post type e.g: "book".
+							__( 'Archive: %1$s (%2$s)' ),
+							postType.labels.singular_name,
+							postType.slug
+						);
+					} else {
+						title = sprintf(
+							// translators: %s: Name of the post type e.g: "Post".
+							__( 'Archive: %s' ),
+							postType.labels.singular_name
+						);
+					}
+					return {
+						slug: 'archive-' + postType.slug,
+						description: sprintf(
+							// translators: %s: Name of the post type e.g: "Post".
+							__(
+								'Displays an archive with the latest posts of type: %s.'
+							),
+							postType.labels.singular_name
+						),
+						title,
+						// `icon` is the `menu_icon` property of a post type. We
+						// only handle `dashicons` for now, even if the `menu_icon`
+						// also supports urls and svg as values.
+						icon: postType.icon?.startsWith( 'dashicons-' )
+							? postType.icon.slice( 10 )
+							: archive,
+						templatePrefix: 'archive',
+					};
+				} ) || [],
+		[ postTypesWithArchives, existingTemplates, needsUniqueIdentifier ]
+	);
+}
+
 export const usePostTypeMenuItems = ( onClickMenuItem ) => {
 	const publicPostTypes = usePublicPostTypes();
 	const existingTemplates = useExistingTemplates();
 	const defaultTemplateTypes = useDefaultTemplateTypes();
+	// We need to keep track of naming conflicts. If a conflict
+	// occurs, we need to add slug.
+	const templateLabels = useMemo(
+		() =>
+			publicPostTypes?.reduce( ( accumulator, { labels } ) => {
+				const templateName = (
+					labels.template_name || labels.singular_name
+				).toLowerCase();
+				accumulator[ templateName ] =
+					( accumulator[ templateName ] || 0 ) + 1;
+				return accumulator;
+			}, {} ),
+		[ publicPostTypes ]
+	);
+	const needsUniqueIdentifier = useCallback(
+		( { labels, slug } ) => {
+			const templateName = (
+				labels.template_name || labels.singular_name
+			).toLowerCase();
+			return templateLabels[ templateName ] > 1 && templateName !== slug;
+		},
+		[ templateLabels ]
+	);
+
 	// `page`is a special case in template hierarchy.
 	const templatePrefixes = useMemo(
 		() =>
@@ -103,21 +217,6 @@ export const usePostTypeMenuItems = ( onClickMenuItem ) => {
 			}, {} ),
 		[ publicPostTypes ]
 	);
-	// We need to keep track of naming conflicts. If a conflict
-	// occurs, we need to add slug.
-	const postTypeLabels = publicPostTypes?.reduce(
-		( accumulator, { labels } ) => {
-			const singularName = labels.singular_name.toLowerCase();
-			accumulator[ singularName ] =
-				( accumulator[ singularName ] || 0 ) + 1;
-			return accumulator;
-		},
-		{}
-	);
-	const needsUniqueIdentifier = ( labels, slug ) => {
-		const singularName = labels.singular_name.toLowerCase();
-		return postTypeLabels[ singularName ] > 1 && singularName !== slug;
-	};
 	const postTypesInfo = useEntitiesInfo( 'postType', templatePrefixes );
 	const existingTemplateSlugs = ( existingTemplates || [] ).map(
 		( { slug } ) => slug
@@ -134,25 +233,34 @@ export const usePostTypeMenuItems = ( onClickMenuItem ) => {
 			);
 			const hasGeneralTemplate =
 				existingTemplateSlugs?.includes( generalTemplateSlug );
-			const _needsUniqueIdentifier = needsUniqueIdentifier(
-				labels,
-				slug
-			);
-			let menuItemTitle = sprintf(
-				// translators: %s: Name of the post type e.g: "Post".
-				__( 'Single item: %s' ),
-				labels.singular_name
-			);
-			if ( _needsUniqueIdentifier ) {
-				menuItemTitle = sprintf(
-					// translators: %1s: Name of the post type e.g: "Post"; %2s: Slug of the post type e.g: "book".
-					__( 'Single item: %1$s (%2$s)' ),
-					labels.singular_name,
-					slug
+			const _needsUniqueIdentifier = needsUniqueIdentifier( postType );
+			let menuItemTitle =
+				labels.template_name ||
+				sprintf(
+					// translators: %s: Name of the post type e.g: "Post".
+					__( 'Single item: %s' ),
+					labels.singular_name
 				);
+			if ( _needsUniqueIdentifier ) {
+				menuItemTitle = labels.template_name
+					? sprintf(
+							// translators: %1s: Name of the template e.g: "Single Item: Post"; %2s: Slug of the post type e.g: "book".
+							__( '%1$s (%2$s)' ),
+							labels.template_name,
+							slug
+					  )
+					: sprintf(
+							// translators: %1s: Name of the post type e.g: "Post"; %2s: Slug of the post type e.g: "book".
+							__( 'Single item: %1$s (%2$s)' ),
+							labels.singular_name,
+							slug
+					  );
 			}
 			const menuItem = defaultTemplateType
-				? { ...defaultTemplateType }
+				? {
+						...defaultTemplateType,
+						templatePrefix: templatePrefixes[ slug ],
+				  }
 				: {
 						slug: generalTemplateSlug,
 						title: menuItemTitle,
@@ -167,6 +275,7 @@ export const usePostTypeMenuItems = ( onClickMenuItem ) => {
 						icon: icon?.startsWith( 'dashicons-' )
 							? icon.slice( 10 )
 							: post,
+						templatePrefix: templatePrefixes[ slug ],
 				  };
 			const hasEntities = postTypesInfo?.[ slug ]?.hasEntities;
 			// We have a different template creation flow only if they have entities.
@@ -187,29 +296,11 @@ export const usePostTypeMenuItems = ( onClickMenuItem ) => {
 								};
 							},
 							getSpecificTemplate: ( suggestion ) => {
-								let title = sprintf(
-									// translators: Represents the title of a user's custom template in the Site Editor, where %1$s is the singular name of a post type and %2$s is the name of the post, e.g. "Page: Hello".
-									__( '%1$s: %2$s' ),
-									labels.singular_name,
-									suggestion.name
-								);
-								const description = sprintf(
-									// translators: Represents the description of a user's custom template in the Site Editor, e.g. "Template for Page: Hello"
-									__( 'Template for %1$s' ),
-									title
-								);
-								if ( _needsUniqueIdentifier ) {
-									title = sprintf(
-										// translators: Represents the title of a user's custom template in the Site Editor, where %1$s is the template title and %2$s is the slug of the post type, e.g. "Project: Hello (project_type)"
-										__( '%1$s (%2$s)' ),
-										title,
-										slug
-									);
-								}
+								const templateSlug = `${ templatePrefixes[ slug ] }-${ suggestion.slug }`;
 								return {
-									title,
-									description,
-									slug: `${ templatePrefixes[ slug ] }-${ suggestion.slug }`,
+									title: templateSlug,
+									slug: templateSlug,
+									templatePrefix: templatePrefixes[ slug ],
 								};
 							},
 						},
@@ -273,9 +364,11 @@ export const useTaxonomiesMenuItems = ( onClickMenuItem ) => {
 	// occurs, we need to add slug.
 	const taxonomyLabels = publicTaxonomies?.reduce(
 		( accumulator, { labels } ) => {
-			const singularName = labels.singular_name.toLowerCase();
-			accumulator[ singularName ] =
-				( accumulator[ singularName ] || 0 ) + 1;
+			const templateName = (
+				labels.template_name || labels.singular_name
+			).toLowerCase();
+			accumulator[ templateName ] =
+				( accumulator[ templateName ] || 0 ) + 1;
 			return accumulator;
 		},
 		{}
@@ -284,8 +377,10 @@ export const useTaxonomiesMenuItems = ( onClickMenuItem ) => {
 		if ( [ 'category', 'post_tag' ].includes( slug ) ) {
 			return false;
 		}
-		const singularName = labels.singular_name.toLowerCase();
-		return taxonomyLabels[ singularName ] > 1 && singularName !== slug;
+		const templateName = (
+			labels.template_name || labels.singular_name
+		).toLowerCase();
+		return taxonomyLabels[ templateName ] > 1 && templateName !== slug;
 	};
 	const taxonomiesInfo = useEntitiesInfo( 'taxonomy', templatePrefixes );
 	const existingTemplateSlugs = ( existingTemplates || [] ).map(
@@ -307,17 +402,27 @@ export const useTaxonomiesMenuItems = ( onClickMenuItem ) => {
 				labels,
 				slug
 			);
-			let menuItemTitle = labels.singular_name;
+			let menuItemTitle = labels.template_name || labels.singular_name;
 			if ( _needsUniqueIdentifier ) {
-				menuItemTitle = sprintf(
-					// translators: %1s: Name of the taxonomy e.g: "Category"; %2s: Slug of the taxonomy e.g: "product_cat".
-					__( '%1$s (%2$s)' ),
-					labels.singular_name,
-					slug
-				);
+				menuItemTitle = labels.template_name
+					? sprintf(
+							// translators: %1s: Name of the template e.g: "Products by Category"; %2s: Slug of the taxonomy e.g: "product_cat".
+							__( '%1$s (%2$s)' ),
+							labels.template_name,
+							slug
+					  )
+					: sprintf(
+							// translators: %1s: Name of the taxonomy e.g: "Category"; %2s: Slug of the taxonomy e.g: "product_cat".
+							__( '%1$s (%2$s)' ),
+							labels.singular_name,
+							slug
+					  );
 			}
 			const menuItem = defaultTemplateType
-				? { ...defaultTemplateType }
+				? {
+						...defaultTemplateType,
+						templatePrefix: templatePrefixes[ slug ],
+				  }
 				: {
 						slug: generalTemplateSlug,
 						title: menuItemTitle,
@@ -327,6 +432,7 @@ export const useTaxonomiesMenuItems = ( onClickMenuItem ) => {
 							labels.singular_name
 						),
 						icon: blockMeta,
+						templatePrefix: templatePrefixes[ slug ],
 				  };
 			const hasEntities = taxonomiesInfo?.[ slug ]?.hasEntities;
 			// We have a different template creation flow only if they have entities.
@@ -346,29 +452,11 @@ export const useTaxonomiesMenuItems = ( onClickMenuItem ) => {
 								};
 							},
 							getSpecificTemplate: ( suggestion ) => {
-								let title = sprintf(
-									// translators: Represents the title of a user's custom template in the Site Editor, where %1$s is the singular name of a taxonomy and %2$s is the name of the term, e.g. "Category: shoes".
-									__( '%1$s: %2$s' ),
-									labels.singular_name,
-									suggestion.name
-								);
-								const description = sprintf(
-									// translators: Represents the description of a user's custom template in the Site Editor, e.g. "Template for Category: shoes"
-									__( 'Template for %1$s' ),
-									title
-								);
-								if ( _needsUniqueIdentifier ) {
-									title = sprintf(
-										// translators: Represents the title of a user's custom template in the Site Editor, where %1$s is the template title and %2$s is the slug of the taxonomy, e.g. "Category: shoes (product_tag)"
-										__( '%1$s (%2$s)' ),
-										title,
-										slug
-									);
-								}
+								const templateSlug = `${ templatePrefixes[ slug ] }-${ suggestion.slug }`;
 								return {
-									title,
-									description,
-									slug: `${ templatePrefixes[ slug ] }-${ suggestion.slug }`,
+									title: templateSlug,
+									slug: templateSlug,
+									templatePrefix: templatePrefixes[ slug ],
 								};
 							},
 						},
@@ -407,6 +495,71 @@ export const useTaxonomiesMenuItems = ( onClickMenuItem ) => {
 	);
 	return taxonomiesMenuItems;
 };
+
+const USE_AUTHOR_MENU_ITEM_TEMPLATE_PREFIX = { user: 'author' };
+const USE_AUTHOR_MENU_ITEM_QUERY_PARAMETERS = { user: { who: 'authors' } };
+export function useAuthorMenuItem( onClickMenuItem ) {
+	const existingTemplates = useExistingTemplates();
+	const defaultTemplateTypes = useDefaultTemplateTypes();
+	const authorInfo = useEntitiesInfo(
+		'root',
+		USE_AUTHOR_MENU_ITEM_TEMPLATE_PREFIX,
+		USE_AUTHOR_MENU_ITEM_QUERY_PARAMETERS
+	);
+	let authorMenuItem = defaultTemplateTypes?.find(
+		( { slug } ) => slug === 'author'
+	);
+	if ( ! authorMenuItem ) {
+		authorMenuItem = {
+			description: __(
+				'Displays latest posts written by a single author.'
+			),
+			slug: 'author',
+			title: 'Author',
+		};
+	}
+	const hasGeneralTemplate = !! existingTemplates?.find(
+		( { slug } ) => slug === 'author'
+	);
+	if ( authorInfo.user?.hasEntities ) {
+		authorMenuItem = { ...authorMenuItem, templatePrefix: 'author' };
+		authorMenuItem.onClick = ( template ) => {
+			onClickMenuItem( {
+				type: 'root',
+				slug: 'user',
+				config: {
+					queryArgs: ( { search } ) => {
+						return {
+							_fields: 'id,name,slug,link',
+							orderBy: search ? 'name' : 'registered_date',
+							exclude: authorInfo.user.existingEntitiesIds,
+							who: 'authors',
+						};
+					},
+					getSpecificTemplate: ( suggestion ) => {
+						const templateSlug = `author-${ suggestion.slug }`;
+						return {
+							title: templateSlug,
+							slug: templateSlug,
+							templatePrefix: 'author',
+						};
+					},
+				},
+				labels: {
+					singular_name: __( 'Author' ),
+					search_items: __( 'Search Authors' ),
+					not_found: __( 'No authors found.' ),
+					all_items: __( 'All Authors' ),
+				},
+				hasGeneralTemplate,
+				template,
+			} );
+		};
+	}
+	if ( ! hasGeneralTemplate || authorInfo.user?.hasEntities ) {
+		return authorMenuItem;
+	}
+}
 
 /**
  * Helper hook that filters all the existing templates by the given
@@ -456,11 +609,16 @@ const useExistingTemplateSlugs = ( templatePrefixes ) => {
  * Helper hook that finds the existing records with an associated template,
  * as they need to be excluded from the template suggestions.
  *
- * @param {string}                entityName       The entity's name.
- * @param {Record<string,string>} templatePrefixes An object with the entity's slug as key and the template prefix as value.
+ * @param {string}                entityName                The entity's name.
+ * @param {Record<string,string>} templatePrefixes          An object with the entity's slug as key and the template prefix as value.
+ * @param {Record<string,Object>} additionalQueryParameters An object with the entity's slug as key and additional query parameters as value.
  * @return {Record<string,EntitiesInfo>} An object with the entity's slug as key and the existing records as value.
  */
-const useTemplatesToExclude = ( entityName, templatePrefixes ) => {
+const useTemplatesToExclude = (
+	entityName,
+	templatePrefixes,
+	additionalQueryParameters = {}
+) => {
 	const slugsToExcludePerEntity =
 		useExistingTemplateSlugs( templatePrefixes );
 	const recordsToExcludePerEntity = useSelect(
@@ -473,6 +631,7 @@ const useTemplatesToExclude = ( entityName, templatePrefixes ) => {
 						_fields: 'id',
 						context: 'view',
 						slug: slugsWithTemplates,
+						...additionalQueryParameters[ slug ],
 					} );
 					if ( entitiesWithTemplates?.length ) {
 						accumulator[ slug ] = entitiesWithTemplates;
@@ -497,16 +656,22 @@ const useTemplatesToExclude = ( entityName, templatePrefixes ) => {
  * First we need to find the existing records with an associated template,
  * to query afterwards for any remaining record, by excluding them.
  *
- * @param {string}                entityName       The entity's name.
- * @param {Record<string,string>} templatePrefixes An object with the entity's slug as key and the template prefix as value.
+ * @param {string}                entityName                The entity's name.
+ * @param {Record<string,string>} templatePrefixes          An object with the entity's slug as key and the template prefix as value.
+ * @param {Record<string,Object>} additionalQueryParameters An object with the entity's slug as key and additional query parameters as value.
  * @return {Record<string,EntitiesInfo>} An object with the entity's slug as key and the EntitiesInfo as value.
  */
-const useEntitiesInfo = ( entityName, templatePrefixes ) => {
+const useEntitiesInfo = (
+	entityName,
+	templatePrefixes,
+	additionalQueryParameters = EMPTY_OBJECT
+) => {
 	const recordsToExcludePerEntity = useTemplatesToExclude(
 		entityName,
-		templatePrefixes
+		templatePrefixes,
+		additionalQueryParameters
 	);
-	const entitiesInfo = useSelect(
+	const entitiesHasRecords = useSelect(
 		( select ) => {
 			return Object.keys( templatePrefixes || {} ).reduce(
 				( accumulator, slug ) => {
@@ -514,25 +679,42 @@ const useEntitiesInfo = ( entityName, templatePrefixes ) => {
 						recordsToExcludePerEntity?.[ slug ]?.map(
 							( { id } ) => id
 						) || [];
-					accumulator[ slug ] = {
-						hasEntities: !! select( coreStore ).getEntityRecords(
-							entityName,
-							slug,
-							{
-								per_page: 1,
-								_fields: 'id',
-								context: 'view',
-								exclude: existingEntitiesIds,
-							}
-						)?.length,
-						existingEntitiesIds,
-					};
+					accumulator[ slug ] = !! select(
+						coreStore
+					).getEntityRecords( entityName, slug, {
+						per_page: 1,
+						_fields: 'id',
+						context: 'view',
+						exclude: existingEntitiesIds,
+						...additionalQueryParameters[ slug ],
+					} )?.length;
 					return accumulator;
 				},
 				{}
 			);
 		},
-		[ templatePrefixes, recordsToExcludePerEntity ]
+		[
+			templatePrefixes,
+			recordsToExcludePerEntity,
+			entityName,
+			additionalQueryParameters,
+		]
 	);
+	const entitiesInfo = useMemo( () => {
+		return Object.keys( templatePrefixes || {} ).reduce(
+			( accumulator, slug ) => {
+				const existingEntitiesIds =
+					recordsToExcludePerEntity?.[ slug ]?.map(
+						( { id } ) => id
+					) || [];
+				accumulator[ slug ] = {
+					hasEntities: entitiesHasRecords[ slug ],
+					existingEntitiesIds,
+				};
+				return accumulator;
+			},
+			{}
+		);
+	}, [ templatePrefixes, recordsToExcludePerEntity, entitiesHasRecords ] );
 	return entitiesInfo;
 };

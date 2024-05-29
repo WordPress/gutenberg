@@ -27,12 +27,13 @@ import {
 	embedPinterestIcon,
 	embedWolframIcon,
 	embedPocketCastsIcon,
+	embedBlueskyIcon,
 } from './icons';
 
 /** @typedef {import('@wordpress/blocks').WPBlockVariation} WPBlockVariation */
 
 /**
- * Template option choices for predefined columns layouts.
+ * The embed provider services.
  *
  * @type {WPBlockVariation[]}
  */
@@ -168,7 +169,7 @@ const variations = [
 		keywords: [ 'polldaddy', __( 'survey' ) ],
 		description: __( 'Embed Crowdsignal (formerly Polldaddy) content.' ),
 		patterns: [
-			/^https?:\/\/((.+\.)?polldaddy\.com|poll\.fm|.+\.survey\.fm)\/.+/i,
+			/^https?:\/\/((.+\.)?polldaddy\.com|poll\.fm|.+\.crowdsignal\.net|.+\.survey\.fm)\/.+/i,
 		],
 		attributes: { providerNameSlug: 'crowdsignal', responsive: true },
 	},
@@ -218,13 +219,13 @@ const variations = [
 		attributes: { providerNameSlug: 'mixcloud', responsive: true },
 	},
 	{
-		name: 'pocketcasts',
+		name: 'pocket-casts',
 		title: 'Pocket Casts',
 		icon: embedPocketCastsIcon,
 		keywords: [ __( 'podcast' ), __( 'audio' ) ],
 		description: __( 'Embed a podcast player from Pocket Casts.' ),
 		patterns: [ /^https:\/\/pca.st\/\w+/i ],
-		attributes: { providerNameSlug: 'pocketcasts', responsive: true },
+		attributes: { providerNameSlug: 'pocket-casts', responsive: true },
 	},
 	{
 		name: 'reddit',
@@ -309,7 +310,7 @@ const variations = [
 		icon: embedTumblrIcon,
 		keywords: [ __( 'social' ) ],
 		description: __( 'Embed a Tumblr post.' ),
-		patterns: [ /^https?:\/\/(www\.)?tumblr\.com\/.+/i ],
+		patterns: [ /^https?:\/\/(.+)\.tumblr\.com\/.+/i ],
 		attributes: { providerNameSlug: 'tumblr', responsive: true },
 	},
 	{
@@ -360,6 +361,14 @@ const variations = [
 		patterns: [ /^https?:\/\/(www\.)?wolframcloud\.com\/obj\/.+/i ],
 		attributes: { providerNameSlug: 'wolfram-cloud', responsive: true },
 	},
+	{
+		name: 'bluesky',
+		title: 'Bluesky',
+		icon: embedBlueskyIcon,
+		description: __( 'Embed a Bluesky post.' ),
+		patterns: [ /^https?:\/\/bsky\.app\/profile\/.+\/post\/.+/i ],
+		attributes: { providerNameSlug: 'bluesky' },
+	},
 ];
 
 /**
@@ -368,7 +377,9 @@ const variations = [
  *  Block by providing its attributes.
  */
 variations.forEach( ( variation ) => {
-	if ( variation.isActive ) return;
+	if ( variation.isActive ) {
+		return;
+	}
 	variation.isActive = ( blockAttributes, variationAttributes ) =>
 		blockAttributes.providerNameSlug ===
 		variationAttributes.providerNameSlug;

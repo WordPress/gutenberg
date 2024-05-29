@@ -2,6 +2,135 @@
 
 ## Unreleased
 
+## 4.42.0 (2024-05-16)
+
+## 4.41.0 (2024-05-02)
+
+## 4.40.0 (2024-04-19)
+
+## 4.39.0 (2024-04-03)
+
+### New Feature
+
+-   Add new `namespacePascalCase` template variable ([#60223](https://github.com/WordPress/gutenberg/pull/60223)).
+
+## 4.38.0 (2024-03-21)
+
+## 4.37.0 (2024-03-06)
+
+## 4.36.0 (2024-02-21)
+
+### Bug Fix
+
+-   Add missing `viewScriptModule` field ([#59140](https://github.com/WordPress/gutenberg/pull/59140)).
+
+### Internal
+
+-   Remove deprecated `viewModule` field ([#59198](https://github.com/WordPress/gutenberg/pull/59198)).
+
+## 4.35.0 (2024-02-09)
+
+## 4.34.0 (2024-01-24)
+
+## 4.33.0 (2024-01-10)
+
+### New Feature
+
+-   Add support for the `viewModule` property ([#57712](https://github.com/WordPress/gutenberg/pull/57712)).
+
+## 4.32.0 (2023-12-13)
+
+## 4.31.0 (2023-11-29)
+
+## 4.30.0 (2023-11-16)
+
+## 4.29.0 (2023-11-02)
+
+## 4.28.0 (2023-10-18)
+
+### New Feature
+
+-   Add new `transformer` property to external templates to allow customization of any values being passed from cli or the template.[#55423](https://github.com/WordPress/gutenberg/pull/55423)
+
+## 4.27.0 (2023-10-05)
+
+## 4.26.0 (2023-09-20)
+
+## 4.25.0 (2023-08-31)
+
+## 4.24.0 (2023-08-16)
+
+## 4.23.0 (2023-08-10)
+
+### Enhancement
+
+-   Add support for the `example` property and add it to the default template ([#52803](https://github.com/WordPress/gutenberg/pull/52803)).
+
+## 4.22.0 (2023-07-20)
+
+### Enhancement
+
+-   Add support for the `viewScript` property ([#52612](https://github.com/WordPress/gutenberg/pull/52612)).
+
+## 4.21.0 (2023-07-05)
+
+## 4.20.0 (2023-06-23)
+
+## 4.19.0 (2023-06-07)
+
+## 4.18.0 (2023-05-24)
+
+## 4.17.0 (2023-05-10)
+
+## 4.16.0 (2023-04-26)
+
+## 4.15.0 (2023-04-12)
+
+## 4.14.0 (2023-03-29)
+
+## 4.13.0 (2023-03-15)
+
+## 4.12.0 (2023-03-01)
+
+## 4.11.0 (2023-02-15)
+
+## 4.10.0 (2023-02-01)
+
+## 4.9.0 (2023-01-11)
+
+## 4.8.0 (2023-01-02)
+
+## 4.7.0 (2022-12-14)
+
+## 4.6.0 (2022-11-16)
+
+## 4.5.0 (2022-11-02)
+
+### Enhancement
+
+-   Update templates to use the `render` field in `block.json` introduced in WordPress 6.1 ([#44185](https://github.com/WordPress/gutenberg/pull/44185)).
+
+## 4.4.0 (2022-10-19)
+
+### New Feature
+
+-   Add new `customPackageJSON` and `customBlockJSON` keys to allow templates to define custom keys for the resulting `package.json` and `block.json` files respectively.[#44649](https://github.com/WordPress/gutenberg/pull/44649)
+
+## 4.3.0 (2022-10-05)
+
+## 4.2.0 (2022-09-21)
+
+## 4.0.0 (2022-08-24)
+
+### Breaking Change
+
+-   Increase the minimum Node.js version to 14 and minimum npm version to 6.14.4 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
+
+### New Feature
+
+-   Add `--no-plugin` flag to allow scaffolding of a block in an existing plugin ([#41642](https://github.com/WordPress/gutenberg/pull/41642))
+-   Introduce the `--variant` flag to allow selection of a variant as defined in the template ([#41289](https://github.com/WordPress/gutenberg/pull/41289), [#43481](https://github.com/WordPress/gutenberg/pull/43481)).
+
 ## 3.6.0 (2022-07-13)
 
 ### Enhancement

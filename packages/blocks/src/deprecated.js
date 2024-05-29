@@ -9,8 +9,8 @@ import deprecated from '@wordpress/deprecated';
  *
  * @deprecated
  *
- * @param {WPComponent} OriginalComponent The component to enhance.
- * @return {WPComponent} The same component.
+ * @param {Component} OriginalComponent The component to enhance.
+ * @return {Component} The same component.
  */
 export function withBlockContentContext( OriginalComponent ) {
 	deprecated( 'wp.blocks.withBlockContentContext', {

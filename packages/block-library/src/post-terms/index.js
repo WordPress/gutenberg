@@ -7,6 +7,7 @@ import { addFilter } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
+import initBlock from '../utils/init-block';
 import metadata from './block.json';
 import edit from './edit';
 import enhanceVariations from './hooks';
@@ -19,9 +20,12 @@ export const settings = {
 	edit,
 };
 
-// Importing this file includes side effects. This is added in block-library/package.json under sideEffects
-addFilter(
-	'blocks.registerBlockType',
-	'core/template-part',
-	enhanceVariations
-);
+export const init = () => {
+	addFilter(
+		'blocks.registerBlockType',
+		'core/template-part',
+		enhanceVariations
+	);
+
+	return initBlock( { name, metadata, settings } );
+};

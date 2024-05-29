@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { first, last, castArray } from 'lodash';
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -20,7 +19,12 @@ import BlockDraggable from '../block-draggable';
 import { BlockMoverUpButton, BlockMoverDownButton } from './button';
 import { store as blockEditorStore } from '../../store';
 
-function BlockMover( { clientIds, hideDragHandle } ) {
+function BlockMover( {
+	clientIds,
+	hideDragHandle,
+	isBlockMoverUpButtonDisabled,
+	isBlockMoverDownButtonDisabled,
+} ) {
 	const { canMove, rootClientId, isFirst, isLast, orientation } = useSelect(
 		( select ) => {
 			const {
@@ -30,13 +34,15 @@ function BlockMover( { clientIds, hideDragHandle } ) {
 				getBlockOrder,
 				getBlockRootClientId,
 			} = select( blockEditorStore );
-			const normalizedClientIds = castArray( clientIds );
-			const firstClientId = first( normalizedClientIds );
-			const _rootClientId = getBlockRootClientId(
-				first( normalizedClientIds )
-			);
+			const normalizedClientIds = Array.isArray( clientIds )
+				? clientIds
+				: [ clientIds ];
+			const firstClientId = normalizedClientIds[ 0 ];
+			const _rootClientId = getBlockRootClientId( firstClientId );
 			const firstIndex = getBlockIndex( firstClientId );
-			const lastIndex = getBlockIndex( last( normalizedClientIds ) );
+			const lastIndex = getBlockIndex(
+				normalizedClientIds[ normalizedClientIds.length - 1 ]
+			);
 			const blockOrder = getBlockOrder( _rootClientId );
 
 			return {
@@ -58,12 +64,12 @@ function BlockMover( { clientIds, hideDragHandle } ) {
 
 	return (
 		<ToolbarGroup
-			className={ classnames( 'block-editor-block-mover', {
+			className={ clsx( 'block-editor-block-mover', {
 				'is-horizontal': orientation === 'horizontal',
 			} ) }
 		>
 			{ ! hideDragHandle && (
-				<BlockDraggable clientIds={ clientIds }>
+				<BlockDraggable clientIds={ clientIds } fadeWhenDisabled>
 					{ ( draggableProps ) => (
 						<Button
 							icon={ dragHandle }
@@ -82,6 +88,7 @@ function BlockMover( { clientIds, hideDragHandle } ) {
 				<ToolbarItem>
 					{ ( itemProps ) => (
 						<BlockMoverUpButton
+							disabled={ isBlockMoverUpButtonDisabled }
 							clientIds={ clientIds }
 							{ ...itemProps }
 						/>
@@ -90,6 +97,7 @@ function BlockMover( { clientIds, hideDragHandle } ) {
 				<ToolbarItem>
 					{ ( itemProps ) => (
 						<BlockMoverDownButton
+							disabled={ isBlockMoverDownButtonDisabled }
 							clientIds={ clientIds }
 							{ ...itemProps }
 						/>

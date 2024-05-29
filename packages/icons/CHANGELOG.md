@@ -2,6 +2,118 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 9.49.0 (2024-05-16)
+
+## 9.48.0 (2024-05-02)
+
+## 9.47.0 (2024-04-19)
+
+## 9.46.0 (2024-04-03)
+
+-   Add new `chevronDownSmall` icon.
+
+## 9.45.0 (2024-03-21)
+
+## 9.44.0 (2024-03-06)
+
+## 9.43.0 (2024-02-21)
+
+## 9.42.0 (2024-02-09)
+
+## 9.41.0 (2024-01-24)
+
+## 9.40.0 (2024-01-10)
+
+## 9.39.0 (2023-12-13)
+
+## 9.38.0 (2023-11-29)
+
+## 9.37.0 (2023-11-16)
+
+### New features
+
+-   Add new `funnel` icon.
+
+## 9.36.0 (2023-11-02)
+
+## 9.35.0 (2023-10-18)
+
+## 9.34.0 (2023-10-05)
+
+## 9.33.0 (2023-09-20)
+
+### Enhancement
+
+-   `<Icon>` now forwards ref to the underlying child component ([#54492](https://github.com/WordPress/gutenberg/pull/54492)).
+
+## 9.32.0 (2023-08-31)
+
+### Bug Fix
+
+-   Fixed invalid XML namespace on `alignJustify`, `customLink`, `mapMarker`, `postContent` and `title` ([#53955](https://github.com/WordPress/gutenberg/pull/53955)).
+
+## 9.31.0 (2023-08-16)
+
+## 9.30.0 (2023-08-10)
+
+## 9.29.0 (2023-07-20)
+
+## 9.28.0 (2023-07-05)
+
+## 9.27.0 (2023-06-23)
+
+## 9.26.0 (2023-06-07)
+
+## 9.25.0 (2023-05-24)
+
+### New Features
+
+-   Add new `HeadingLevel` icons. ([#50856](https://github.com/WordPress/gutenberg/pull/50856))
+
+## 9.24.0 (2023-05-10)
+
+## 9.23.0 (2023-04-26)
+
+## 9.22.0 (2023-04-12)
+
+### New features
+
+## 9.21.0 (2023-03-29)
+
+## 9.20.0 (2023-03-15)
+
+## 9.19.0 (2023-03-01)
+
+## 9.18.0 (2023-02-15)
+
+## 9.17.0 (2023-02-01)
+
+## 9.16.0 (2023-01-11)
+
+## 9.15.0 (2023-01-02)
+
+## 9.14.0 (2022-12-14)
+
+## 9.13.0 (2022-11-16)
+
+## 9.12.0 (2022-11-02)
+
+## 9.11.0 (2022-10-19)
+
+## 9.10.0 (2022-10-05)
+
+## 9.9.0 (2022-09-21)
+
+## 9.8.0 (2022-09-13)
+
+## 9.7.0 (2022-08-24)
+
+## 9.6.0 (2022-08-10)
+
 ## 9.5.0 (2022-07-27)
 
 ## 9.4.0 (2022-07-13)
@@ -15,14 +127,17 @@
 ## 9.0.0 (2022-05-18)
 
 ### Breaking Changes
+
 -   Removed icons no longer used by the UI: `commentTitle`, `postTitle`, `queryTitle`, `archiveTitle`.
 
 ### Enhancement
+
 -   Update the `title` icon to match g2 design language. ([#40596](https://github.com/WordPress/gutenberg/pull/40596))
 
 ## 8.4.0 (2022-05-04)
 
 ## 8.3.0 (2022-04-21)
+
 ### New Features
 
 -   Add new `filter` icon. ([#40435](https://github.com/WordPress/gutenberg/pull/40435))

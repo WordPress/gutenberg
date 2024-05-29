@@ -1,69 +1,14 @@
 /**
- * External dependencies
- */
-import deepFreeze from 'deep-freeze';
-
-/**
  * Internal dependencies
  */
 import {
-	isModalActive,
 	hasMetaBoxes,
 	isSavingMetaBoxes,
 	getActiveMetaBoxLocations,
 	isMetaBoxLocationActive,
-	isEditorPanelRemoved,
-	isInserterOpened,
-	isListViewOpened,
 } from '../selectors';
 
 describe( 'selectors', () => {
-	describe( 'isModalActive', () => {
-		it( 'returns true if the provided name matches the value in the preferences activeModal property', () => {
-			const state = {
-				activeModal: 'test-modal',
-			};
-
-			expect( isModalActive( state, 'test-modal' ) ).toBe( true );
-		} );
-
-		it( 'returns false if the provided name does not match the preferences activeModal property', () => {
-			const state = {
-				activeModal: 'something-else',
-			};
-
-			expect( isModalActive( state, 'test-modal' ) ).toBe( false );
-		} );
-
-		it( 'returns false if the preferences activeModal property is null', () => {
-			const state = {
-				activeModal: null,
-			};
-
-			expect( isModalActive( state, 'test-modal' ) ).toBe( false );
-		} );
-	} );
-
-	describe( 'isEditorPanelRemoved', () => {
-		it( 'should return false by default', () => {
-			const state = deepFreeze( {
-				removedPanels: [],
-			} );
-
-			expect( isEditorPanelRemoved( state, 'post-status' ) ).toBe(
-				false
-			);
-		} );
-
-		it( 'should return true when panel was removed', () => {
-			const state = deepFreeze( {
-				removedPanels: [ 'post-status' ],
-			} );
-
-			expect( isEditorPanelRemoved( state, 'post-status' ) ).toBe( true );
-		} );
-	} );
-
 	describe( 'hasMetaBoxes', () => {
 		it( 'should return true if there are active meta boxes', () => {
 			const state = {
@@ -158,28 +103,6 @@ describe( 'selectors', () => {
 			const result = isMetaBoxLocationActive( state, 'side' );
 
 			expect( result ).toBe( true );
-		} );
-	} );
-
-	describe( 'isInserterOpened', () => {
-		it( 'returns the block inserter panel isOpened state', () => {
-			const state = {
-				blockInserterPanel: true,
-			};
-			expect( isInserterOpened( state ) ).toBe( true );
-			state.blockInserterPanel = false;
-			expect( isInserterOpened( state ) ).toBe( false );
-		} );
-	} );
-
-	describe( 'isListViewOpened', () => {
-		it( 'returns the list view panel isOpened state', () => {
-			const state = {
-				listViewPanel: true,
-			};
-			expect( isListViewOpened( state ) ).toBe( true );
-			state.listViewPanel = false;
-			expect( isListViewOpened( state ) ).toBe( false );
 		} );
 	} );
 } );

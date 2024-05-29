@@ -1,53 +1,75 @@
 /**
- * WordPress dependencies
- */
-import { addQueryArgs } from '@wordpress/url';
-
-/**
  * Internal dependencies
  */
 import type { Admin } from './';
 
-export interface SiteEditorQueryParams {
-	postId: string | number;
-	postType: string;
+interface SiteEditorOptions {
+	postId?: string | number;
+	postType?: string;
+	path?: string;
+	canvas?: string;
+	showWelcomeGuide?: boolean;
 }
 
-const CANVAS_SELECTOR = 'iframe[title="Editor canvas"i]';
-
 /**
- * Visits the Site Editor main page
+ * Visits the Site Editor main page.
  *
- * By default, it also skips the welcome guide. The option can be disabled if need be.
- *
- * @param {Admin}                 this
- * @param {SiteEditorQueryParams} query            Query params to be serialized as query portion of URL.
- * @param {boolean}               skipWelcomeGuide Whether to skip the welcome guide as part of the navigation.
+ * @param this
+ * @param options Options to visit the site editor.
  */
 export async function visitSiteEditor(
 	this: Admin,
-	query: SiteEditorQueryParams,
-	skipWelcomeGuide = true
+	options: SiteEditorOptions = {}
 ) {
-	const path = addQueryArgs( '', {
-		...query,
-	} ).slice( 1 );
+	const { postId, postType, path, canvas } = options;
+	const query = new URLSearchParams();
 
-	await this.visitAdminPage( 'site-editor.php', path );
-	await this.page.waitForSelector( CANVAS_SELECTOR );
+	if ( postId ) {
+		query.set( 'postId', String( postId ) );
+	}
+	if ( postType ) {
+		query.set( 'postType', postType );
+	}
+	if ( path ) {
+		query.set( 'path', path );
+	}
+	if ( canvas ) {
+		query.set( 'canvas', canvas );
+	}
 
-	if ( skipWelcomeGuide ) {
-		await this.page.evaluate( () => {
-			// TODO, type `window.wp`.
-			// @ts-ignore
-			window.wp.data
-				.dispatch( 'core/preferences' )
-				.set( 'core/edit-site', 'welcomeGuide', false );
+	await this.visitAdminPage( 'site-editor.php', query.toString() );
 
-			// @ts-ignore
-			window.wp.data
-				.dispatch( 'core/preferences' )
-				.toggle( 'core/edit-site', 'welcomeGuideStyles', false );
+	/**
+	 * @todo This is a workaround for the fact that the editor canvas is seen as
+	 * ready and visible before the loading spinner is hidden. Ideally, the
+	 * content underneath the loading overlay should be marked inert until the
+	 * loading is done.
+	 */
+	if ( ! query.size || postId || canvas === 'edit' ) {
+		const canvasLoader = this.page.locator(
+			// Spinner was used instead of the progress bar in an earlier
+			// version of the site editor.
+			'.edit-site-canvas-loader, .edit-site-canvas-spinner'
+		);
+
+		// Wait for the canvas loader to appear first, so that the locator that
+		// waits for the hidden state doesn't resolve prematurely.
+		await canvasLoader.waitFor( { state: 'visible' } );
+		await canvasLoader.waitFor( {
+			state: 'hidden',
+			// Bigger timeout is needed for larger entities, like the Large Post
+			// HTML fixture that we load for performance tests, which often
+			// doesn't make it under the default timeout value.
+			timeout: 60_000,
+		} );
+	}
+
+	if ( ! options.showWelcomeGuide ) {
+		await this.editor.setPreferences( 'core/edit-site', {
+			welcomeGuide: false,
+			welcomeGuideStyles: false,
+			welcomeGuidePage: false,
+			welcomeGuideTemplate: false,
 		} );
 	}
 }

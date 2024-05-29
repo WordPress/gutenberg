@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { kebabCase } from 'lodash';
 import { SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
 import { TransitionPresets } from '@react-navigation/stack';
 
@@ -40,24 +39,37 @@ import HelpSectionTitle from './help-section-title';
 const HELP_TOPICS = [
 	{
 		label: __( 'What is a block?' ),
+		slug: 'what-is-a-block',
 		icon: helpFilled,
 		view: <IntroToBlocks />,
 	},
 	{
 		label: __( 'Add blocks' ),
+		slug: 'add-blocks',
 		icon: plusCircleFilled,
 		view: <AddBlocks />,
 	},
-	{ label: __( 'Move blocks' ), icon: moveBlocksIcon, view: <MoveBlocks /> },
-	{ label: __( 'Remove blocks' ), icon: trash, view: <RemoveBlocks /> },
+	{
+		label: __( 'Move blocks' ),
+		slug: 'move-blocks',
+		icon: moveBlocksIcon,
+		view: <MoveBlocks />,
+	},
+	{
+		label: __( 'Remove blocks' ),
+		slug: 'remove-blocks',
+		icon: trash,
+		view: <RemoveBlocks />,
+	},
 	{
 		label: __( 'Customize blocks' ),
+		slug: 'customize-blocks',
 		icon: cog,
 		view: <CustomizeBlocks />,
 	},
 ];
 
-function EditorHelpTopics( { close, isVisible, onClose } ) {
+function EditorHelpTopics( { close, isVisible, onClose, showSupport } ) {
 	const { postType } = useSelect( ( select ) => ( {
 		postType: select( editorStore ).getEditedPostAttribute( 'type' ),
 	} ) );
@@ -66,6 +78,20 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 		postType === 'page'
 			? __( 'How to edit your page' )
 			: __( 'How to edit your post' );
+
+	const supportSection = (
+		<>
+			<HelpSectionTitle>{ __( 'Get support' ) }</HelpSectionTitle>
+			<HelpGetSupportButton
+				title={ __( 'Contact support' ) }
+				onPress={ requestContactCustomerSupport }
+			/>
+			<HelpGetSupportButton
+				title={ __( 'More support options' ) }
+				onPress={ requestGotoCustomerSupportOptions }
+			/>
+		</>
+	);
 
 	return (
 		<BottomSheet
@@ -76,7 +102,7 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 			contentStyle={ styles.contentContainer }
 			testID="editor-help-modal"
 		>
-			<SafeAreaView>
+			<SafeAreaView style={ styles.safeAreaContainer }>
 				<BottomSheet.NavigationContainer
 					animate
 					main
@@ -127,24 +153,20 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 												{ /* Print out help topics. */ }
 												{ HELP_TOPICS.map(
 													(
-														{ label, icon },
+														{ label, icon, slug },
 														index
 													) => {
-														const labelSlug =
-															kebabCase( label );
 														const isLastItem =
 															index ===
 															HELP_TOPICS.length -
 																1;
 														return (
 															<HelpTopicRow
-																key={
-																	labelSlug
-																}
+																key={ slug }
 																label={ label }
 																icon={ icon }
 																screenName={
-																	labelSlug
+																	slug
 																}
 																isLastItem={
 																	isLastItem
@@ -153,31 +175,8 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 														);
 													}
 												) }
-												{
-													<HelpSectionTitle>
-														{ __( 'Get support' ) }
-													</HelpSectionTitle>
-												}
-												{
-													<HelpGetSupportButton
-														title={ __(
-															'Contact support'
-														) }
-														onPress={
-															requestContactCustomerSupport
-														}
-													/>
-												}
-												{
-													<HelpGetSupportButton
-														title={ __(
-															'More support options'
-														) }
-														onPress={
-															requestGotoCustomerSupportOptions
-														}
-													/>
-												}
+												{ showSupport &&
+													supportSection }
 											</PanelBody>
 										</ScrollView>
 									);
@@ -186,12 +185,11 @@ function EditorHelpTopics( { close, isVisible, onClose } ) {
 						</View>
 					</BottomSheet.NavigationScreen>
 					{ /* Print out help detail screens. */ }
-					{ HELP_TOPICS.map( ( { view, label } ) => {
-						const labelSlug = kebabCase( label );
+					{ HELP_TOPICS.map( ( { view, label, slug } ) => {
 						return (
 							<HelpDetailNavigationScreen
-								key={ labelSlug }
-								name={ labelSlug }
+								key={ slug }
+								name={ slug }
 								content={ view }
 								label={ label }
 								options={ {

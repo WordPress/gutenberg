@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import {
-	__experimentalGetSettings,
+	getSettings,
 	date as dateNoI18n,
 	dateI18n,
 	getDate,
@@ -10,6 +10,7 @@ import {
 	gmdateI18n,
 	isInTheFuture,
 	setSettings,
+	humanTimeDiff,
 } from '../';
 
 describe( 'isInTheFuture', () => {
@@ -28,7 +29,7 @@ describe( 'isInTheFuture', () => {
 	} );
 
 	it( 'should ignore the timezone', () => {
-		const settings = __experimentalGetSettings();
+		const settings = getSettings();
 
 		// Set a timezone in the future.
 		setSettings( {
@@ -75,7 +76,7 @@ describe( 'Function date', () => {
 	] )(
 		'should format date as "%s", ignoring locale settings',
 		( formatString, expected ) => {
-			const settings = __experimentalGetSettings();
+			const settings = getSettings();
 
 			// Simulate different locale.
 			const l10n = settings.l10n;
@@ -110,7 +111,7 @@ describe( 'Function date', () => {
 	);
 
 	it( 'should format date into a date that uses site’s timezone, if no timezone was provided and there’s a site timezone set', () => {
-		const settings = __experimentalGetSettings();
+		const settings = getSettings();
 
 		// Simulate different timezone.
 		setSettings( {
@@ -136,7 +137,7 @@ describe( 'Function date', () => {
 	} );
 
 	it( 'should format date into a date that uses site’s UTC offset setting, if no timezone was provided and there isn’t a timezone set in the site', () => {
-		const settings = __experimentalGetSettings();
+		const settings = getSettings();
 
 		// Simulate different timezone.
 		setSettings( {
@@ -162,7 +163,7 @@ describe( 'Function date', () => {
 	} );
 
 	it( 'should format date into a date that uses the given timezone, if said timezone is valid', () => {
-		const settings = __experimentalGetSettings();
+		const settings = getSettings();
 
 		// Simulate different timezone.
 		setSettings( {
@@ -183,7 +184,7 @@ describe( 'Function date', () => {
 	} );
 
 	it( 'should format date into a date that uses the given UTC offset, if given timezone is actually a UTC offset', () => {
-		const settings = __experimentalGetSettings();
+		const settings = getSettings();
 
 		// Simulate different timezone.
 		setSettings( {
@@ -246,7 +247,7 @@ describe( 'Function gmdate', () => {
 	] )(
 		'should format date as "%s", ignoring locale settings',
 		( formatString, expected ) => {
-			const settings = __experimentalGetSettings();
+			const settings = getSettings();
 
 			// Simulate different locale.
 			const l10n = settings.l10n;
@@ -281,7 +282,7 @@ describe( 'Function gmdate', () => {
 	);
 
 	it( 'should format date into a UTC date', () => {
-		const settings = __experimentalGetSettings();
+		const settings = getSettings();
 
 		// Simulate different timezone.
 		setSettings( {
@@ -325,7 +326,7 @@ describe( 'Function dateI18n', () => {
 	] )(
 		'should format date as "%s", using locale settings',
 		( formatString, expected ) => {
-			const settings = __experimentalGetSettings();
+			const settings = getSettings();
 
 			// Simulate different locale.
 			const l10n = settings.l10n;
@@ -361,7 +362,7 @@ describe( 'Function dateI18n', () => {
 	);
 
 	it( 'should format date into a date that uses site’s timezone, if no timezone was provided and there’s a site timezone set', () => {
-		const settings = __experimentalGetSettings();
+		const settings = getSettings();
 
 		// Simulate different timezone.
 		setSettings( {
@@ -387,7 +388,7 @@ describe( 'Function dateI18n', () => {
 	} );
 
 	it( 'should format date into a date that uses site’s UTC offset setting, if no timezone was provided and there isn’t a timezone set in the site', () => {
-		const settings = __experimentalGetSettings();
+		const settings = getSettings();
 
 		// Simulate different timezone.
 		setSettings( {
@@ -413,7 +414,7 @@ describe( 'Function dateI18n', () => {
 	} );
 
 	it( 'should format date into a date that uses the given timezone, if said timezone is valid', () => {
-		const settings = __experimentalGetSettings();
+		const settings = getSettings();
 
 		// Simulate different timezone.
 		setSettings( {
@@ -434,7 +435,7 @@ describe( 'Function dateI18n', () => {
 	} );
 
 	it( 'should format date into a date that uses the given UTC offset, if given timezone is actually a UTC offset', () => {
-		const settings = __experimentalGetSettings();
+		const settings = getSettings();
 
 		// Simulate different timezone.
 		setSettings( {
@@ -466,7 +467,7 @@ describe( 'Function dateI18n', () => {
 	} );
 
 	it( 'should format date into a UTC date if `gmt` is set to `true`', () => {
-		const settings = __experimentalGetSettings();
+		const settings = getSettings();
 
 		// Simulate different timezone.
 		setSettings( {
@@ -487,7 +488,7 @@ describe( 'Function dateI18n', () => {
 	} );
 
 	it( 'should format date into a date that uses site’s timezone if `gmt` is set to `false`', () => {
-		const settings = __experimentalGetSettings();
+		const settings = getSettings();
 
 		// Simulate different timezone.
 		setSettings( {
@@ -535,7 +536,7 @@ describe( 'Function gmdateI18n', () => {
 	] )(
 		'should format date as "%s", using locale settings',
 		( formatString, expected ) => {
-			const settings = __experimentalGetSettings();
+			const settings = getSettings();
 
 			// Simulate different locale.
 			const l10n = settings.l10n;
@@ -570,7 +571,7 @@ describe( 'Function gmdateI18n', () => {
 	);
 
 	it( 'should format date into a UTC date', () => {
-		const settings = __experimentalGetSettings();
+		const settings = getSettings();
 
 		// Simulate different timezone.
 		setSettings( {
@@ -592,7 +593,7 @@ describe( 'Function gmdateI18n', () => {
 
 describe( 'Moment.js Localization', () => {
 	it( 'should change the relative time strings', () => {
-		const settings = __experimentalGetSettings();
+		const settings = getSettings();
 
 		// Change the locale strings for tests.
 		setSettings( {
@@ -608,7 +609,7 @@ describe( 'Moment.js Localization', () => {
 		} );
 
 		// Get the freshly changed setings.
-		const newSettings = __experimentalGetSettings();
+		const newSettings = getSettings();
 
 		// Test the unchanged values.
 		expect( newSettings.l10n.locale ).toBe( settings.l10n.locale );
@@ -619,5 +620,43 @@ describe( 'Moment.js Localization', () => {
 
 		// Restore default settings.
 		setSettings( settings );
+	} );
+
+	describe( 'humanTimeDiff', () => {
+		it( 'should return human readable time differences in the past', () => {
+			expect(
+				humanTimeDiff(
+					'2023-04-28T11:00:00.000Z',
+					'2023-04-28T12:00:00.000Z'
+				)
+			).toBe( 'an hour ago' );
+			expect(
+				humanTimeDiff(
+					'2023-04-28T11:00:00.000Z',
+					'2023-04-28T13:00:00.000Z'
+				)
+			).toBe( '2 hours ago' );
+			expect(
+				humanTimeDiff(
+					'2023-04-28T11:00:00.000Z',
+					'2023-04-30T13:00:00.000Z'
+				)
+			).toBe( '2 days ago' );
+		} );
+
+		it( 'should return human readable time differences in the future', () => {
+			// Future.
+			const now = new Date();
+			const twoHoursLater = new Date(
+				now.getTime() + 2 * 60 * 60 * 1000
+			);
+			expect( humanTimeDiff( twoHoursLater ) ).toBe( 'in 2 hours' );
+
+			const twoDaysLater = new Date(
+				now.getTime() + 2 * 24 * 60 * 60 * 1000
+			); // Adding 2 days in milliseconds
+
+			expect( humanTimeDiff( twoDaysLater ) ).toBe( 'in 2 days' );
+		} );
 	} );
 } );

@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
-import type { FunctionComponent } from 'react';
+import clsx from 'clsx';
 
 /**
  * Internal dependencies
@@ -16,34 +15,49 @@ import {
 	StyledHelp,
 	StyledVisualLabel,
 } from './styles/base-control-styles';
+import type { WordPressComponentProps } from '../context';
+import { contextConnectWithoutRef, useContextSystem } from '../context';
+
+export { useBaseControlProps } from './hooks';
 
 /**
  * `BaseControl` is a component used to generate labels and help text for components handling user inputs.
  *
- * @example
- * // Render a `BaseControl` for a textarea input
- * import { BaseControl } from '@wordpress/components';
+ * ```jsx
+ * import { BaseControl, useBaseControlProps } from '@wordpress/components';
  *
- * // The `id` prop is necessary to accessibly associate the label with the textarea
- * const MyBaseControl = () => (
- *   <BaseControl id="textarea-1" label="Text" help="Enter some text" __nextHasNoMarginBottom={ true }>
- *     <textarea id="textarea-1" />
- *   </BaseControl>
+ * // Render a `BaseControl` for a textarea input
+ * const MyCustomTextareaControl = ({ children, ...baseProps }) => (
+ * 	// `useBaseControlProps` is a convenience hook to get the props for the `BaseControl`
+ * 	// and the inner control itself. Namely, it takes care of generating a unique `id`,
+ * 	// properly associating it with the `label` and `help` elements.
+ * 	const { baseControlProps, controlProps } = useBaseControlProps( baseProps );
+ *
+ * 	return (
+ * 		<BaseControl { ...baseControlProps } __nextHasNoMarginBottom={ true }>
+ * 			<textarea { ...controlProps }>
+ * 			  { children }
+ * 			</textarea>
+ * 		</BaseControl>
+ * 	);
  * );
+ * ```
  */
-export const BaseControl = ( {
-	__nextHasNoMarginBottom = false,
-	id,
-	label,
-	hideLabelFromVision = false,
-	help,
-	className,
-	children,
-}: BaseControlProps ) => {
+const UnconnectedBaseControl = (
+	props: WordPressComponentProps< BaseControlProps, null >
+) => {
+	const {
+		__nextHasNoMarginBottom = false,
+		id,
+		label,
+		hideLabelFromVision = false,
+		help,
+		className,
+		children,
+	} = useContextSystem( props, 'BaseControl' );
+
 	return (
-		<Wrapper
-			className={ classnames( 'components-base-control', className ) }
-		>
+		<Wrapper className={ className }>
 			<StyledField
 				className="components-base-control__field"
 				// TODO: Official deprecation for this should start after all internal usages have been migrated
@@ -68,9 +82,7 @@ export const BaseControl = ( {
 					( hideLabelFromVision ? (
 						<VisuallyHidden as="label">{ label }</VisuallyHidden>
 					) : (
-						<BaseControl.VisualLabel>
-							{ label }
-						</BaseControl.VisualLabel>
+						<VisualLabel>{ label }</VisualLabel>
 					) ) }
 				{ children }
 			</StyledField>
@@ -104,21 +116,24 @@ export const BaseControl = ( {
  * 	</BaseControl>
  * );
  */
-export const VisualLabel: FunctionComponent< BaseControlVisualLabelProps > = ( {
+export const VisualLabel = ( {
 	className,
 	children,
-} ) => {
+	...props
+}: WordPressComponentProps< BaseControlVisualLabelProps, 'span' > ) => {
 	return (
 		<StyledVisualLabel
-			className={ classnames(
-				'components-base-control__label',
-				className
-			) }
+			{ ...props }
+			className={ clsx( 'components-base-control__label', className ) }
 		>
 			{ children }
 		</StyledVisualLabel>
 	);
 };
-BaseControl.VisualLabel = VisualLabel;
+
+export const BaseControl = Object.assign(
+	contextConnectWithoutRef( UnconnectedBaseControl, 'BaseControl' ),
+	{ VisualLabel }
+);
 
 export default BaseControl;

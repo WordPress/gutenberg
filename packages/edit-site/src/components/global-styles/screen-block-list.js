@@ -9,20 +9,36 @@ import {
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useState, useMemo, useEffect, useRef } from '@wordpress/element';
-import { BlockIcon } from '@wordpress/block-editor';
+import {
+	useState,
+	useEffect,
+	useRef,
+	useDeferredValue,
+	memo,
+} from '@wordpress/element';
+import {
+	BlockIcon,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 import { useDebounce } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
  */
-import { useHasBorderPanel } from './border-panel';
-import { useHasColorPanel } from './color-utils';
-import { useHasDimensionsPanel } from './dimensions-panel';
-import { useHasTypographyPanel } from './typography-panel';
+import { useBlockVariations } from './variations/variations-panel';
 import ScreenHeader from './header';
 import { NavigationButtonAsItem } from './navigation-button';
+import { unlock } from '../../lock-unlock';
+
+const {
+	useHasDimensionsPanel,
+	useHasTypographyPanel,
+	useHasBorderPanel,
+	useGlobalSetting,
+	useSettingsForBlockElement,
+	useHasColorPanel,
+} = unlock( blockEditorPrivateApis );
 
 function useSortedBlockTypes() {
 	const blockItems = useSelect(
@@ -47,15 +63,25 @@ function useSortedBlockTypes() {
 	return [ ...coreItems, ...nonCoreItems ];
 }
 
-function BlockMenuItem( { block } ) {
-	const hasTypographyPanel = useHasTypographyPanel( block.name );
-	const hasColorPanel = useHasColorPanel( block.name );
-	const hasBorderPanel = useHasBorderPanel( block.name );
-	const hasDimensionsPanel = useHasDimensionsPanel( block.name );
+export function useBlockHasGlobalStyles( blockName ) {
+	const [ rawSettings ] = useGlobalSetting( '', blockName );
+	const settings = useSettingsForBlockElement( rawSettings, blockName );
+	const hasTypographyPanel = useHasTypographyPanel( settings );
+	const hasColorPanel = useHasColorPanel( settings );
+	const hasBorderPanel = useHasBorderPanel( settings );
+	const hasDimensionsPanel = useHasDimensionsPanel( settings );
 	const hasLayoutPanel = hasBorderPanel || hasDimensionsPanel;
-	const hasBlockMenuItem =
-		hasTypographyPanel || hasColorPanel || hasLayoutPanel;
+	const hasVariationsPanel = !! useBlockVariations( blockName )?.length;
+	const hasGlobalStyles =
+		hasTypographyPanel ||
+		hasColorPanel ||
+		hasLayoutPanel ||
+		hasVariationsPanel;
+	return hasGlobalStyles;
+}
 
+function BlockMenuItem( { block } ) {
+	const hasBlockMenuItem = useBlockHasGlobalStyles( block.name );
 	if ( ! hasBlockMenuItem ) {
 		return null;
 	}
@@ -68,7 +94,7 @@ function BlockMenuItem( { block } ) {
 
 	return (
 		<NavigationButtonAsItem
-			path={ '/blocks/' + block.name }
+			path={ '/blocks/' + encodeURIComponent( block.name ) }
 			aria-label={ navigationButtonLabel }
 		>
 			<HStack justify="flex-start">
@@ -79,22 +105,16 @@ function BlockMenuItem( { block } ) {
 	);
 }
 
-function ScreenBlockList() {
+function BlockList( { filterValue } ) {
 	const sortedBlockTypes = useSortedBlockTypes();
-	const [ filterValue, setFilterValue ] = useState( '' );
 	const debouncedSpeak = useDebounce( speak, 500 );
-	const isMatchingSearchTerm = useSelect(
-		( select ) => select( blocksStore ).isMatchingSearchTerm,
-		[]
-	);
-	const filteredBlockTypes = useMemo( () => {
-		if ( ! filterValue ) {
-			return sortedBlockTypes;
-		}
-		return sortedBlockTypes.filter( ( blockType ) =>
-			isMatchingSearchTerm( blockType, filterValue )
-		);
-	}, [ filterValue, sortedBlockTypes, isMatchingSearchTerm ] );
+	const { isMatchingSearchTerm } = useSelect( blocksStore );
+
+	const filteredBlockTypes = ! filterValue
+		? sortedBlockTypes
+		: sortedBlockTypes.filter( ( blockType ) =>
+				isMatchingSearchTerm( blockType, filterValue )
+		  );
 
 	const blockTypesListRef = useRef();
 
@@ -121,6 +141,27 @@ function ScreenBlockList() {
 	}, [ filterValue, debouncedSpeak ] );
 
 	return (
+		<div
+			ref={ blockTypesListRef }
+			className="edit-site-block-types-item-list"
+		>
+			{ filteredBlockTypes.map( ( block ) => (
+				<BlockMenuItem
+					block={ block }
+					key={ 'menu-itemblock-' + block.name }
+				/>
+			) ) }
+		</div>
+	);
+}
+
+const MemoizedBlockList = memo( BlockList );
+
+function ScreenBlockList() {
+	const [ filterValue, setFilterValue ] = useState( '' );
+	const deferredFilterValue = useDeferredValue( filterValue );
+
+	return (
 		<>
 			<ScreenHeader
 				title={ __( 'Blocks' ) }
@@ -129,23 +170,14 @@ function ScreenBlockList() {
 				) }
 			/>
 			<SearchControl
+				__nextHasNoMarginBottom
 				className="edit-site-block-types-search"
 				onChange={ setFilterValue }
 				value={ filterValue }
 				label={ __( 'Search for blocks' ) }
 				placeholder={ __( 'Search' ) }
 			/>
-			<div
-				ref={ blockTypesListRef }
-				className="edit-site-block-types-item-list"
-			>
-				{ filteredBlockTypes.map( ( block ) => (
-					<BlockMenuItem
-						block={ block }
-						key={ 'menu-itemblock-' + block.name }
-					/>
-				) ) }
-			</div>
+			<MemoizedBlockList filterValue={ deferredFilterValue } />
 		</>
 	);
 }

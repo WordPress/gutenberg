@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -13,18 +13,21 @@ import {
 	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
-import { useDisabled, useInstanceId } from '@wordpress/compose';
+import { useInstanceId } from '@wordpress/compose';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
 const CommentsFormPlaceholder = () => {
-	const disabledFormRef = useDisabled();
 	const instanceId = useInstanceId( CommentsFormPlaceholder );
 
 	return (
 		<div className="comment-respond">
 			<h3 className="comment-reply-title">{ __( 'Leave a Reply' ) }</h3>
-			<form noValidate className="comment-form" ref={ disabledFormRef }>
+			<form
+				noValidate
+				className="comment-form"
+				onSubmit={ ( event ) => event.preventDefault() }
+			>
 				<p>
 					<label htmlFor={ `comment-${ instanceId }` }>
 						{ __( 'Comment' ) }
@@ -34,18 +37,20 @@ const CommentsFormPlaceholder = () => {
 						name="comment"
 						cols="45"
 						rows="8"
+						readOnly
 					/>
 				</p>
 				<p className="form-submit wp-block-button">
 					<input
 						name="submit"
 						type="submit"
-						className={ classnames(
+						className={ clsx(
 							'wp-block-button__link',
 							__experimentalGetElementClassName( 'button' )
 						) }
 						label={ __( 'Post Comment' ) }
 						value={ __( 'Post Comment' ) }
+						aria-disabled="true"
 					/>
 				</p>
 			</form>

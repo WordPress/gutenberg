@@ -1,6 +1,8 @@
 /**
  * WordPress dependencies
  */
+// Disable Reason: Needs to be refactored.
+// eslint-disable-next-line no-restricted-imports
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { Icon, page, post } from '@wordpress/icons';

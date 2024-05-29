@@ -1,26 +1,22 @@
 /**
- * External dependencies
- */
-import { castArray, reduce, without } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
-import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { speak } from '@wordpress/a11y';
-import { store as noticesStore } from '@wordpress/notices';
-import { store as coreStore } from '@wordpress/core-data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
-import { store as editorStore } from '@wordpress/editor';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
+import deprecated from '@wordpress/deprecated';
+import { addFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
  */
 import { getMetaBoxContainer } from '../utils/meta-boxes';
-import { store as editPostStore } from '.';
+import { unlock } from '../lock-unlock';
+
+const { interfaceStore } = unlock( editorPrivateApis );
 
 /**
  * Returns an action object used in signalling that the user opened an editor sidebar.
@@ -29,10 +25,11 @@ import { store as editPostStore } from '.';
  */
 export const openGeneralSidebar =
 	( name ) =>
-	( { registry } ) =>
+	( { registry } ) => {
 		registry
 			.dispatch( interfaceStore )
-			.enableComplementaryArea( editPostStore.name, name );
+			.enableComplementaryArea( 'core', name );
+	};
 
 /**
  * Returns an action object signalling that the user closed the sidebar.
@@ -40,72 +37,99 @@ export const openGeneralSidebar =
 export const closeGeneralSidebar =
 	() =>
 	( { registry } ) =>
-		registry
-			.dispatch( interfaceStore )
-			.disableComplementaryArea( editPostStore.name );
+		registry.dispatch( interfaceStore ).disableComplementaryArea( 'core' );
 
 /**
  * Returns an action object used in signalling that the user opened a modal.
+ *
+ * @deprecated since WP 6.3 use `core/interface` store's action with the same name instead.
+ *
  *
  * @param {string} name A string that uniquely identifies the modal.
  *
  * @return {Object} Action object.
  */
-export function openModal( name ) {
-	return {
-		type: 'OPEN_MODAL',
-		name,
+export const openModal =
+	( name ) =>
+	( { registry } ) => {
+		deprecated( "select( 'core/edit-post' ).openModal( name )", {
+			since: '6.3',
+			alternative: "select( 'core/interface').openModal( name )",
+		} );
+		return registry.dispatch( interfaceStore ).openModal( name );
 	};
-}
 
 /**
  * Returns an action object signalling that the user closed a modal.
  *
+ * @deprecated since WP 6.3 use `core/interface` store's action with the same name instead.
+ *
  * @return {Object} Action object.
  */
-export function closeModal() {
-	return {
-		type: 'CLOSE_MODAL',
+export const closeModal =
+	() =>
+	( { registry } ) => {
+		deprecated( "select( 'core/edit-post' ).closeModal()", {
+			since: '6.3',
+			alternative: "select( 'core/interface').closeModal()",
+		} );
+		return registry.dispatch( interfaceStore ).closeModal();
 	};
-}
 
 /**
  * Returns an action object used in signalling that the user opened the publish
  * sidebar.
+ * @deprecated
  *
  * @return {Object} Action object
  */
-export function openPublishSidebar() {
-	return {
-		type: 'OPEN_PUBLISH_SIDEBAR',
+export const openPublishSidebar =
+	() =>
+	( { registry } ) => {
+		deprecated( "dispatch( 'core/edit-post' ).openPublishSidebar", {
+			since: '6.6',
+			alternative: "dispatch( 'core/editor').openPublishSidebar",
+		} );
+		registry.dispatch( editorStore ).openPublishSidebar();
 	};
-}
 
 /**
  * Returns an action object used in signalling that the user closed the
  * publish sidebar.
+ * @deprecated
  *
  * @return {Object} Action object.
  */
-export function closePublishSidebar() {
-	return {
-		type: 'CLOSE_PUBLISH_SIDEBAR',
+export const closePublishSidebar =
+	() =>
+	( { registry } ) => {
+		deprecated( "dispatch( 'core/edit-post' ).closePublishSidebar", {
+			since: '6.6',
+			alternative: "dispatch( 'core/editor').closePublishSidebar",
+		} );
+		registry.dispatch( editorStore ).closePublishSidebar();
 	};
-}
 
 /**
  * Returns an action object used in signalling that the user toggles the publish sidebar.
+ * @deprecated
  *
  * @return {Object} Action object
  */
-export function togglePublishSidebar() {
-	return {
-		type: 'TOGGLE_PUBLISH_SIDEBAR',
+export const togglePublishSidebar =
+	() =>
+	( { registry } ) => {
+		deprecated( "dispatch( 'core/edit-post' ).togglePublishSidebar", {
+			since: '6.6',
+			alternative: "dispatch( 'core/editor').togglePublishSidebar",
+		} );
+		registry.dispatch( editorStore ).togglePublishSidebar();
 	};
-}
 
 /**
  * Returns an action object used to enable or disable a panel in the editor.
+ *
+ * @deprecated
  *
  * @param {string} panelName A string that identifies the panel to enable or disable.
  *
@@ -114,73 +138,48 @@ export function togglePublishSidebar() {
 export const toggleEditorPanelEnabled =
 	( panelName ) =>
 	( { registry } ) => {
-		const inactivePanels =
-			registry
-				.select( preferencesStore )
-				.get( 'core/edit-post', 'inactivePanels' ) ?? [];
-
-		const isPanelInactive = !! inactivePanels?.includes( panelName );
-
-		// If the panel is inactive, remove it to enable it, else add it to
-		// make it inactive.
-		let updatedInactivePanels;
-		if ( isPanelInactive ) {
-			updatedInactivePanels = inactivePanels.filter(
-				( invactivePanelName ) => invactivePanelName !== panelName
-			);
-		} else {
-			updatedInactivePanels = [ ...inactivePanels, panelName ];
-		}
-
-		registry
-			.dispatch( preferencesStore )
-			.set( 'core/edit-post', 'inactivePanels', updatedInactivePanels );
+		deprecated( "dispatch( 'core/edit-post' ).toggleEditorPanelEnabled", {
+			since: '6.5',
+			alternative: "dispatch( 'core/editor').toggleEditorPanelEnabled",
+		} );
+		registry.dispatch( editorStore ).toggleEditorPanelEnabled( panelName );
 	};
 
 /**
  * Opens a closed panel and closes an open panel.
+ *
+ * @deprecated
  *
  * @param {string} panelName A string that identifies the panel to open or close.
  */
 export const toggleEditorPanelOpened =
 	( panelName ) =>
 	( { registry } ) => {
-		const openPanels =
-			registry
-				.select( preferencesStore )
-				.get( 'core/edit-post', 'openPanels' ) ?? [];
-
-		const isPanelOpen = !! openPanels?.includes( panelName );
-
-		// If the panel is open, remove it to close it, else add it to
-		// make it open.
-		let updatedOpenPanels;
-		if ( isPanelOpen ) {
-			updatedOpenPanels = openPanels.filter(
-				( openPanelName ) => openPanelName !== panelName
-			);
-		} else {
-			updatedOpenPanels = [ ...openPanels, panelName ];
-		}
-
-		registry
-			.dispatch( preferencesStore )
-			.set( 'core/edit-post', 'openPanels', updatedOpenPanels );
+		deprecated( "dispatch( 'core/edit-post' ).toggleEditorPanelOpened", {
+			since: '6.5',
+			alternative: "dispatch( 'core/editor').toggleEditorPanelOpened",
+		} );
+		registry.dispatch( editorStore ).toggleEditorPanelOpened( panelName );
 	};
 
 /**
  * Returns an action object used to remove a panel from the editor.
  *
+ * @deprecated
+ *
  * @param {string} panelName A string that identifies the panel to remove.
  *
  * @return {Object} Action object.
  */
-export function removeEditorPanel( panelName ) {
-	return {
-		type: 'REMOVE_PANEL',
-		panelName,
+export const removeEditorPanel =
+	( panelName ) =>
+	( { registry } ) => {
+		deprecated( "dispatch( 'core/edit-post' ).removeEditorPanel", {
+			since: '6.5',
+			alternative: "dispatch( 'core/editor').removeEditorPanel",
+		} );
+		registry.dispatch( editorStore ).removeEditorPanel( panelName );
 	};
-}
 
 /**
  * Triggers an action used to toggle a feature flag.
@@ -197,25 +196,18 @@ export const toggleFeature =
 /**
  * Triggers an action used to switch editor mode.
  *
+ * @deprecated
+ *
  * @param {string} mode The editor mode.
  */
 export const switchEditorMode =
 	( mode ) =>
 	( { registry } ) => {
-		registry
-			.dispatch( preferencesStore )
-			.set( 'core/edit-post', 'editorMode', mode );
-
-		// Unselect blocks when we switch to the code editor.
-		if ( mode !== 'visual' ) {
-			registry.dispatch( blockEditorStore ).clearSelectedBlock();
-		}
-
-		const message =
-			mode === 'visual'
-				? __( 'Visual editor selected' )
-				: __( 'Code editor selected' );
-		speak( message, 'assertive' );
+		deprecated( "dispatch( 'core/edit-post' ).switchEditorMode", {
+			since: '6.6',
+			alternative: "dispatch( 'core/editor').switchEditorMode",
+		} );
+		registry.dispatch( editorStore ).switchEditorMode( mode );
 	};
 
 /**
@@ -228,59 +220,25 @@ export const togglePinnedPluginItem =
 	( { registry } ) => {
 		const isPinned = registry
 			.select( interfaceStore )
-			.isItemPinned( 'core/edit-post', pluginName );
+			.isItemPinned( 'core', pluginName );
 
 		registry
 			.dispatch( interfaceStore )
-			[ isPinned ? 'unpinItem' : 'pinItem' ](
-				'core/edit-post',
-				pluginName
-			);
+			[ isPinned ? 'unpinItem' : 'pinItem' ]( 'core', pluginName );
 	};
 
 /**
  * Returns an action object used in signaling that a style should be auto-applied when a block is created.
  *
- * @param {string}  blockName  Name of the block.
- * @param {?string} blockStyle Name of the style that should be auto applied. If undefined, the "auto apply" setting of the block is removed.
+ * @deprecated
  */
-export const updatePreferredStyleVariations =
-	( blockName, blockStyle ) =>
-	( { registry } ) => {
-		if ( ! blockName ) {
-			return;
-		}
-
-		const existingVariations =
-			registry
-				.select( preferencesStore )
-				.get( 'core/edit-post', 'preferredStyleVariations' ) ?? {};
-
-		// When the blockStyle is omitted, remove the block's preferred variation.
-		if ( ! blockStyle ) {
-			const updatedVariations = {
-				...existingVariations,
-			};
-
-			delete updatedVariations[ blockName ];
-
-			registry
-				.dispatch( preferencesStore )
-				.set(
-					'core/edit-post',
-					'preferredStyleVariations',
-					updatedVariations
-				);
-		} else {
-			// Else add the variation.
-			registry
-				.dispatch( preferencesStore )
-				.set( 'core/edit-post', 'preferredStyleVariations', {
-					...existingVariations,
-					[ blockName ]: blockStyle,
-				} );
-		}
-	};
+export function updatePreferredStyleVariations() {
+	deprecated( "dispatch( 'core/edit-post' ).updatePreferredStyleVariations", {
+		since: '6.6',
+		hint: 'Preferred Style Variations are not supported anymore.',
+	} );
+	return { type: 'NOTHING' };
+}
 
 /**
  * Update the provided block types to be visible.
@@ -290,19 +248,7 @@ export const updatePreferredStyleVariations =
 export const showBlockTypes =
 	( blockNames ) =>
 	( { registry } ) => {
-		const existingBlockNames =
-			registry
-				.select( preferencesStore )
-				.get( 'core/edit-post', 'hiddenBlockTypes' ) ?? [];
-
-		const newBlockNames = without(
-			existingBlockNames,
-			...castArray( blockNames )
-		);
-
-		registry
-			.dispatch( preferencesStore )
-			.set( 'core/edit-post', 'hiddenBlockTypes', newBlockNames );
+		unlock( registry.dispatch( editorStore ) ).showBlockTypes( blockNames );
 	};
 
 /**
@@ -313,36 +259,20 @@ export const showBlockTypes =
 export const hideBlockTypes =
 	( blockNames ) =>
 	( { registry } ) => {
-		const existingBlockNames =
-			registry
-				.select( preferencesStore )
-				.get( 'core/edit-post', 'hiddenBlockTypes' ) ?? [];
-
-		const mergedBlockNames = new Set( [
-			...existingBlockNames,
-			...castArray( blockNames ),
-		] );
-
-		registry
-			.dispatch( preferencesStore )
-			.set( 'core/edit-post', 'hiddenBlockTypes', [
-				...mergedBlockNames,
-			] );
+		unlock( registry.dispatch( editorStore ) ).hideBlockTypes( blockNames );
 	};
 
 /**
- * Returns an action object used in signaling
- * what Meta boxes are available in which location.
+ * Stores info about which Meta boxes are available in which location.
  *
  * @param {Object} metaBoxesPerLocation Meta boxes per location.
  */
-export const setAvailableMetaBoxesPerLocation =
-	( metaBoxesPerLocation ) =>
-	( { dispatch } ) =>
-		dispatch( {
-			type: 'SET_META_BOXES_PER_LOCATIONS',
-			metaBoxesPerLocation,
-		} );
+export function setAvailableMetaBoxesPerLocation( metaBoxesPerLocation ) {
+	return {
+		type: 'SET_META_BOXES_PER_LOCATIONS',
+		metaBoxesPerLocation,
+	};
+}
 
 /**
  * Update a metabox.
@@ -385,16 +315,12 @@ export const requestMetaBoxUpdates =
 		];
 
 		// Merge all form data objects into a single one.
-		const formData = reduce(
-			formDataToMerge,
-			( memo, currentFormData ) => {
-				for ( const [ key, value ] of currentFormData ) {
-					memo.append( key, value );
-				}
-				return memo;
-			},
-			new window.FormData()
-		);
+		const formData = formDataToMerge.reduce( ( memo, currentFormData ) => {
+			for ( const [ key, value ] of currentFormData ) {
+				memo.append( key, value );
+			}
+			return memo;
+		}, new window.FormData() );
 		additionalData.forEach( ( [ key, value ] ) =>
 			formData.append( key, value )
 		);
@@ -436,106 +362,84 @@ export function metaBoxUpdatesFailure() {
 }
 
 /**
- * Returns an action object used to toggle the width of the editing canvas.
+ * Action that changes the width of the editing canvas.
+ *
+ * @deprecated
  *
  * @param {string} deviceType
- *
- * @return {Object} Action object.
  */
-export function __experimentalSetPreviewDeviceType( deviceType ) {
-	return {
-		type: 'SET_PREVIEW_DEVICE_TYPE',
-		deviceType,
+export const __experimentalSetPreviewDeviceType =
+	( deviceType ) =>
+	( { registry } ) => {
+		deprecated(
+			"dispatch( 'core/edit-post' ).__experimentalSetPreviewDeviceType",
+			{
+				since: '6.5',
+				version: '6.7',
+				hint: 'registry.dispatch( editorStore ).setDeviceType',
+			}
+		);
+		registry.dispatch( editorStore ).setDeviceType( deviceType );
 	};
-}
 
 /**
  * Returns an action object used to open/close the inserter.
  *
- * @param {boolean|Object} value                Whether the inserter should be
- *                                              opened (true) or closed (false).
- *                                              To specify an insertion point,
- *                                              use an object.
- * @param {string}         value.rootClientId   The root client ID to insert at.
- * @param {number}         value.insertionIndex The index to insert at.
+ * @deprecated
  *
- * @return {Object} Action object.
+ * @param {boolean|Object} value Whether the inserter should be opened (true) or closed (false).
  */
-export function setIsInserterOpened( value ) {
-	return {
-		type: 'SET_IS_INSERTER_OPENED',
-		value,
+export const setIsInserterOpened =
+	( value ) =>
+	( { registry } ) => {
+		deprecated( "dispatch( 'core/edit-post' ).setIsInserterOpened", {
+			since: '6.5',
+			alternative: "dispatch( 'core/editor').setIsInserterOpened",
+		} );
+		registry.dispatch( editorStore ).setIsInserterOpened( value );
 	};
-}
 
 /**
  * Returns an action object used to open/close the list view.
  *
+ * @deprecated
+ *
  * @param {boolean} isOpen A boolean representing whether the list view should be opened or closed.
- * @return {Object} Action object.
  */
-export function setIsListViewOpened( isOpen ) {
-	return {
-		type: 'SET_IS_LIST_VIEW_OPENED',
-		isOpen,
+export const setIsListViewOpened =
+	( isOpen ) =>
+	( { registry } ) => {
+		deprecated( "dispatch( 'core/edit-post' ).setIsListViewOpened", {
+			since: '6.5',
+			alternative: "dispatch( 'core/editor').setIsListViewOpened",
+		} );
+		registry.dispatch( editorStore ).setIsListViewOpened( isOpen );
 	};
-}
 
 /**
  * Returns an action object used to switch to template editing.
  *
- * @param {boolean} value Is editing template.
- * @return {Object} Action object.
+ * @deprecated
  */
-export function setIsEditingTemplate( value ) {
-	return {
-		type: 'SET_IS_EDITING_TEMPLATE',
-		value,
-	};
+export function setIsEditingTemplate() {
+	deprecated( "dispatch( 'core/edit-post' ).setIsEditingTemplate", {
+		since: '6.5',
+		alternative: "dispatch( 'core/editor').setRenderingMode",
+	} );
+	return { type: 'NOTHING' };
 }
-
-/**
- * Switches to the template mode.
- *
- * @param {boolean} newTemplate Is new template.
- */
-export const __unstableSwitchToTemplateMode =
-	( newTemplate = false ) =>
-	( { registry, select, dispatch } ) => {
-		dispatch( setIsEditingTemplate( true ) );
-		const isWelcomeGuideActive = select.isFeatureActive(
-			'welcomeGuideTemplate'
-		);
-		if ( ! isWelcomeGuideActive ) {
-			const message = newTemplate
-				? __( "Custom template created. You're in template mode now." )
-				: __(
-						'Editing template. Changes made here affect all posts and pages that use the template.'
-				  );
-			registry.dispatch( noticesStore ).createSuccessNotice( message, {
-				type: 'snackbar',
-			} );
-		}
-	};
 
 /**
  * Create a block based template.
  *
- * @param {Object?} template Template to create and assign.
+ * @deprecated
  */
-export const __unstableCreateTemplate =
-	( template ) =>
-	async ( { registry } ) => {
-		const savedTemplate = await registry
-			.dispatch( coreStore )
-			.saveEntityRecord( 'postType', 'wp_template', template );
-		const post = registry.select( editorStore ).getCurrentPost();
-		registry
-			.dispatch( coreStore )
-			.editEntityRecord( 'postType', post.type, post.id, {
-				template: savedTemplate.slug,
-			} );
-	};
+export function __unstableCreateTemplate() {
+	deprecated( "dispatch( 'core/edit-post' ).__unstableCreateTemplate", {
+		since: '6.5',
+	} );
+	return { type: 'NOTHING' };
+}
 
 let metaBoxesInitialized = false;
 
@@ -563,41 +467,42 @@ export const initializeMetaBoxes =
 
 		metaBoxesInitialized = true;
 
-		let wasSavingPost = registry.select( editorStore ).isSavingPost();
-		let wasAutosavingPost = registry
-			.select( editorStore )
-			.isAutosavingPost();
-		const hasMetaBoxes = select.hasMetaBoxes();
+		// Save metaboxes on save completion, except for autosaves.
+		addFilter(
+			'editor.__unstableSavePost',
+			'core/edit-post/save-metaboxes',
+			( previous, options ) =>
+				previous.then( () => {
+					if ( options.isAutosave ) {
+						return;
+					}
 
-		// Save metaboxes when performing a full save on the post.
-		registry.subscribe( async () => {
-			const isSavingPost = registry.select( editorStore ).isSavingPost();
-			const isAutosavingPost = registry
-				.select( editorStore )
-				.isAutosavingPost();
+					if ( ! select.hasMetaBoxes() ) {
+						return;
+					}
 
-			// Save metaboxes on save completion, except for autosaves that are not a post preview.
-			//
-			// Meta boxes are initialized once at page load. It is not necessary to
-			// account for updates on each state change.
-			//
-			// See: https://github.com/WordPress/WordPress/blob/5.1.1/wp-admin/includes/post.php#L2307-L2309.
-			const shouldTriggerMetaboxesSave =
-				hasMetaBoxes &&
-				wasSavingPost &&
-				! isSavingPost &&
-				! wasAutosavingPost;
-
-			// Save current state for next inspection.
-			wasSavingPost = isSavingPost;
-			wasAutosavingPost = isAutosavingPost;
-
-			if ( shouldTriggerMetaboxesSave ) {
-				await dispatch.requestMetaBoxUpdates();
-			}
-		} );
+					return dispatch.requestMetaBoxUpdates();
+				} )
+		);
 
 		dispatch( {
 			type: 'META_BOXES_INITIALIZED',
 		} );
+	};
+
+/**
+ * Action that toggles Distraction free mode.
+ * Distraction free mode expects there are no sidebars, as due to the
+ * z-index values set, you can't close sidebars.
+ *
+ * @deprecated
+ */
+export const toggleDistractionFree =
+	() =>
+	( { registry } ) => {
+		deprecated( "dispatch( 'core/edit-post' ).toggleDistractionFree", {
+			since: '6.6',
+			alternative: "dispatch( 'core/editor').toggleDistractionFree",
+		} );
+		registry.dispatch( editorStore ).toggleDistractionFree();
 	};

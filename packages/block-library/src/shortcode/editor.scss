@@ -1,13 +1,8 @@
-[data-type="core/shortcode"] {
-	.block-editor-plain-text {
-		max-height: 250px;
-	}
-
-	&.components-placeholder {
-		min-height: 0;
-	}
-}
-
+// The editing view for the Shortcode block is equivalent to block UI.
+// Therefore we increase specificity to avoid theme styles bleeding in.
 .blocks-shortcode__textarea {
-	@include input-control;
+	box-sizing: border-box;
+	max-height: 250px;
+	resize: none;
+	@include editor-input-reset();
 }

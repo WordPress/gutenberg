@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
 
 /**
@@ -13,14 +13,14 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import type { ButtonGroupProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 
 function UnforwardedButtonGroup(
 	props: WordPressComponentProps< ButtonGroupProps, 'div', false >,
 	ref: ForwardedRef< HTMLDivElement >
 ) {
 	const { className, ...restProps } = props;
-	const classes = classnames( 'components-button-group', className );
+	const classes = clsx( 'components-button-group', className );
 
 	return (
 		<div ref={ ref } role="group" className={ classes } { ...restProps } />

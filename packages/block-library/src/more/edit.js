@@ -16,8 +16,7 @@ export default function MoreEdit( {
 } ) {
 	const onChangeInput = ( event ) => {
 		setAttributes( {
-			customText:
-				event.target.value !== '' ? event.target.value : undefined,
+			customText: event.target.value,
 		} );
 	};
 
@@ -43,6 +42,7 @@ export default function MoreEdit( {
 			<InspectorControls>
 				<PanelBody>
 					<ToggleControl
+						__nextHasNoMarginBottom
 						label={ __(
 							'Hide the excerpt on the full content page'
 						) }
@@ -54,7 +54,7 @@ export default function MoreEdit( {
 			</InspectorControls>
 			<div { ...useBlockProps() }>
 				<input
-					aria-label={ __( 'Read more link text' ) }
+					aria-label={ __( '“Read more” link text' ) }
 					type="text"
 					value={ customText }
 					placeholder={ DEFAULT_TEXT }

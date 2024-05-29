@@ -1,100 +1,64 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
-
+import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	forwardRef,
-	useEffect,
-	useImperativeHandle,
-	useRef,
-	useState,
-} from '@wordpress/element';
+import { forwardRef, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
-import { ENTER } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { pasteHandler } from '@wordpress/blocks';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { __unstableUseRichText as useRichText } from '@wordpress/rich-text';
+import { ENTER } from '@wordpress/keycodes';
+import { pasteHandler } from '@wordpress/blocks';
+import {
+	__unstableUseRichText as useRichText,
+	create,
+	toHTMLString,
+	insert,
+} from '@wordpress/rich-text';
 import { useMergeRefs } from '@wordpress/compose';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
 /**
  * Internal dependencies
  */
+import { DEFAULT_CLASSNAMES, REGEXP_NEWLINES } from './constants';
+import usePostTitleFocus from './use-post-title-focus';
+import usePostTitle from './use-post-title';
 import PostTypeSupportCheck from '../post-type-support-check';
-import { store as editorStore } from '../../store';
-
-/**
- * Constants
- */
-const REGEXP_NEWLINES = /[\r\n]+/g;
 
 function PostTitle( _, forwardedRef ) {
-	const ref = useRef();
+	const { placeholder, hasFixedToolbar } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const { titlePlaceholder, hasFixedToolbar: _hasFixedToolbar } =
+			getSettings();
+
+		return {
+			placeholder: titlePlaceholder,
+			hasFixedToolbar: _hasFixedToolbar,
+		};
+	}, [] );
+
 	const [ isSelected, setIsSelected ] = useState( false );
-	const { editPost } = useDispatch( editorStore );
-	const { insertDefaultBlock, clearSelectedBlock, insertBlocks } =
+
+	const { ref: focusRef } = usePostTitleFocus( forwardedRef );
+
+	const { title, setTitle: onUpdate } = usePostTitle();
+
+	const [ selection, setSelection ] = useState( {} );
+
+	const { clearSelectedBlock, insertBlocks, insertDefaultBlock } =
 		useDispatch( blockEditorStore );
-	const { isCleanNewPost, title, placeholder, isFocusMode, hasFixedToolbar } =
-		useSelect( ( select ) => {
-			const { getEditedPostAttribute, isCleanNewPost: _isCleanNewPost } =
-				select( editorStore );
-			const { getSettings } = select( blockEditorStore );
-			const {
-				titlePlaceholder,
-				focusMode,
-				hasFixedToolbar: _hasFixedToolbar,
-			} = getSettings();
 
-			return {
-				isCleanNewPost: _isCleanNewPost(),
-				title: getEditedPostAttribute( 'title' ),
-				placeholder: titlePlaceholder,
-				isFocusMode: focusMode,
-				hasFixedToolbar: _hasFixedToolbar,
-			};
-		}, [] );
-
-	useImperativeHandle( forwardedRef, () => ( {
-		focus: () => {
-			ref?.current?.focus();
-		},
-	} ) );
-
-	useEffect( () => {
-		if ( ! ref.current ) {
-			return;
-		}
-
-		const { ownerDocument } = ref.current;
-		const { activeElement, body } = ownerDocument;
-
-		// Only autofocus the title when the post is entirely empty. This should
-		// only happen for a new post, which means we focus the title on new
-		// post so the author can start typing right away, without needing to
-		// click anything.
-		if ( isCleanNewPost && ( ! activeElement || body === activeElement ) ) {
-			ref.current.focus();
-		}
-	}, [ isCleanNewPost ] );
-
-	function onEnterPress() {
-		insertDefaultBlock( undefined, undefined, 0 );
+	function onChange( value ) {
+		onUpdate( value.replace( REGEXP_NEWLINES, ' ' ) );
 	}
 
 	function onInsertBlockAfter( blocks ) {
 		insertBlocks( blocks, 0 );
 	}
-
-	function onUpdate( newTitle ) {
-		editPost( { title: newTitle } );
-	}
-
-	const [ selection, setSelection ] = useState( {} );
 
 	function onSelect() {
 		setIsSelected( true );
@@ -106,8 +70,8 @@ function PostTitle( _, forwardedRef ) {
 		setSelection( {} );
 	}
 
-	function onChange( value ) {
-		onUpdate( value.replace( REGEXP_NEWLINES, ' ' ) );
+	function onEnterPress() {
+		insertDefaultBlock( undefined, undefined, 0 );
 	}
 
 	function onKeyDown( event ) {
@@ -163,28 +127,40 @@ function PostTitle( _, forwardedRef ) {
 				( firstBlock.name === 'core/heading' ||
 					firstBlock.name === 'core/paragraph' )
 			) {
-				onUpdate( firstBlock.attributes.content );
+				// Strip HTML to avoid unwanted HTML being added to the title.
+				// In the majority of cases it is assumed that HTML in the title
+				// is undesirable.
+				const contentNoHTML = stripHTML(
+					firstBlock.attributes.content
+				);
+				onUpdate( contentNoHTML );
 				onInsertBlockAfter( content.slice( 1 ) );
 			} else {
 				onInsertBlockAfter( content );
 			}
 		} else {
-			onUpdate( content );
+			const value = {
+				...create( { html: title } ),
+				...selection,
+			};
+
+			// Strip HTML to avoid unwanted HTML being added to the title.
+			// In the majority of cases it is assumed that HTML in the title
+			// is undesirable.
+			const contentNoHTML = stripHTML( content );
+
+			const newValue = insert( value, create( { html: contentNoHTML } ) );
+			onUpdate( toHTMLString( { value: newValue } ) );
+			setSelection( {
+				start: newValue.start,
+				end: newValue.end,
+			} );
 		}
 	}
 
-	// The wp-block className is important for editor styles.
-	// This same block is used in both the visual and the code editor.
-	const className = classnames(
-		'wp-block wp-block-post-title block-editor-block-list__block editor-post-title editor-post-title__input rich-text',
-		{
-			'is-selected': isSelected,
-			'is-focus-mode': isFocusMode,
-			'has-fixed-toolbar': hasFixedToolbar,
-		}
-	);
 	const decodedPlaceholder =
 		decodeEntities( placeholder ) || __( 'Add title' );
+
 	const { ref: richTextRef } = useRichText( {
 		value: title,
 		onChange,
@@ -203,15 +179,21 @@ function PostTitle( _, forwardedRef ) {
 				};
 			} );
 		},
-		__unstableDisableFormats: true,
-		preserveWhiteSpace: true,
+		__unstableDisableFormats: false,
 	} );
 
-	/* eslint-disable jsx-a11y/heading-has-content, jsx-a11y/no-noninteractive-element-to-interactive-role */
+	// The wp-block className is important for editor styles.
+	// This same block is used in both the visual and the code editor.
+	const className = clsx( DEFAULT_CLASSNAMES, {
+		'is-selected': isSelected,
+		'has-fixed-toolbar': hasFixedToolbar,
+	} );
+
 	return (
+		/* eslint-disable jsx-a11y/heading-has-content, jsx-a11y/no-noninteractive-element-to-interactive-role */
 		<PostTypeSupportCheck supportKeys="title">
 			<h1
-				ref={ useMergeRefs( [ richTextRef, ref ] ) }
+				ref={ useMergeRefs( [ richTextRef, focusRef ] ) }
 				contentEditable
 				className={ className }
 				aria-label={ decodedPlaceholder }
@@ -224,8 +206,16 @@ function PostTitle( _, forwardedRef ) {
 				onPaste={ onPaste }
 			/>
 		</PostTypeSupportCheck>
+		/* eslint-enable jsx-a11y/heading-has-content, jsx-a11y/no-noninteractive-element-to-interactive-role */
 	);
-	/* eslint-enable jsx-a11y/heading-has-content, jsx-a11y/no-noninteractive-element-to-interactive-role */
 }
 
+/**
+ * Renders the `PostTitle` component.
+ *
+ * @param {Object}  _            Unused parameter.
+ * @param {Element} forwardedRef Forwarded ref for the component.
+ *
+ * @return {Component} The rendered PostTitle component.
+ */
 export default forwardRef( PostTitle );

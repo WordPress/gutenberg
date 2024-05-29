@@ -1,8 +1,4 @@
 .wp-block-table {
-
-	// Remove default <figure> style.
-	margin: 0;
-
 	.wp-block[data-align="left"] > &,
 	.wp-block[data-align="right"] > &,
 	.wp-block[data-align="center"] > & {
@@ -31,6 +27,7 @@
 	td,
 	th {
 		border: $border-width solid;
+		padding: 0.5em;
 	}
 
 	td.is-selected,
@@ -38,10 +35,6 @@
 		border-color: var(--wp-admin-theme-color);
 		box-shadow: inset 0 0 0 1px var(--wp-admin-theme-color);
 		border-style: double;
-	}
-
-	figcaption {
-		@include caption-style-theme();
 	}
 
 	// This is only required in the editor to overcome the fact the editor
@@ -62,32 +55,14 @@
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
-
-	> * {
-		margin-bottom: $grid-unit-10;
-	}
+	gap: $grid-unit-10;
 
 	@include break-medium() {
 		flex-direction: row;
 		align-items: flex-end;
-
-		> * {
-			margin-bottom: 0;
-		}
 	}
 }
 
 .blocks-table__placeholder-input {
 	width: $grid-unit-10 * 14;
-	margin-right: $grid-unit-10;
-	margin-bottom: 0;
-
-	input {
-		height: $button-size;
-	}
-
-
-	.components-base-control__field {
-		margin-bottom: 0;
-	}
 }

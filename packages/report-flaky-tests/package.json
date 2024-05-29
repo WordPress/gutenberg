@@ -20,16 +20,15 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=14",
-		"npm": ">=6.9"
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
 	},
 	"main": "build/index.js",
 	"types": "build-types",
 	"dependencies": {
 		"@actions/core": "^1.8.0",
 		"@actions/github": "^5.0.1",
-		"jest-message-util": "^28.0.2",
-		"unzipper": "^0.10.11"
+		"jest-message-util": "^29.6.2"
 	},
 	"publishConfig": {
 		"access": "public"

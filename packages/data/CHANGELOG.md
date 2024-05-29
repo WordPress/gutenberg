@@ -2,6 +2,141 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 9.28.0 (2024-05-16)
+
+## 9.27.0 (2024-05-02)
+
+## 9.26.0 (2024-04-19)
+
+-   Add new `createSelector` function for creating memoized store selectors ([#60370](https://github.com/WordPress/gutenberg/pull/60370)).
+
+## 9.25.0 (2024-04-03)
+
+## 9.24.0 (2024-03-21)
+
+-   Deprecate the `getIsResolved` meta-selector ([#59679](https://github.com/WordPress/gutenberg/pull/59679)).
+
+## 9.23.0 (2024-03-06)
+
+## 9.22.0 (2024-02-21)
+
+## 9.21.0 (2024-02-09)
+
+## 9.20.0 (2024-01-24)
+
+## 9.19.0 (2024-01-10)
+
+## 9.18.0 (2023-12-13)
+
+## 9.17.0 (2023-11-29)
+
+## 9.16.0 (2023-11-16)
+
+## 9.15.0 (2023-11-02)
+
+## 9.14.0 (2023-10-18)
+
+## 9.13.1 (2023-10-12)
+
+### Bug Fix
+
+-   Fix `combineReducers()` types ([#55321](https://github.com/WordPress/gutenberg/pull/55321)).
+
+## 9.13.0 (2023-10-05)
+
+### Enhancements
+
+-   Change implementation of `combineReducers` so that it doesn't use `eval` internally, and can run with a CSP policy that doesn't allow `unsafe-eval` ([#54606](https://github.com/WordPress/gutenberg/pull/54606)).
+
+## 9.12.0 (2023-09-20)
+
+## 9.11.0 (2023-08-31)
+
+## 9.10.0 (2023-08-16)
+
+### Enhancements
+
+-   Warn if the `useSelect` hook returns different values when called with the same state and parameters ([#53666](https://github.com/WordPress/gutenberg/pull/53666)).
+
+## 9.9.0 (2023-08-10)
+
+### Bug Fix
+
+-   Update the type definitions for dispatched actions by accounting for Promisified return values and thunks. Previously, a dispatched action's return type was the same as the return type of the original action creator, which did not account for how dispatch works internally. (Plain actions get wrapped in a Promise, and thunk actions ultimately resolve to the innermost function's return type).
+-   Update the type definition for dispatch() to handle string store descriptors correctly.
+
+## 9.8.0 (2023-07-20)
+
+## 9.7.0 (2023-07-05)
+
+## 9.6.0 (2023-06-23)
+
+## 9.5.0 (2023-06-07)
+
+## 9.4.0 (2023-05-24)
+
+## 9.3.0 (2023-05-10)
+
+## 9.2.0 (2023-04-26)
+
+## 9.1.0 (2023-04-12)
+
+## 9.0.0 (2023-03-29)
+
+### Breaking Changes
+
+-   The `registry.register` function will no longer register a store if another instance is registered with the same name.
+
+## 8.6.0 (2023-03-15)
+
+## 8.5.0 (2023-03-01)
+
+## 8.4.0 (2023-02-15)
+
+## 8.3.0 (2023-02-01)
+
+## 8.2.0 (2023-01-11)
+
+## 8.1.0 (2023-01-02)
+
+## 8.0.0 (2022-12-14)
+
+### Breaking Changes
+
+-   Updated dependencies to require React 18 ([45235](https://github.com/WordPress/gutenberg/pull/45235))
+
+### Enhancements
+
+-   The `registry.subscribe` function can now subscribe to updates only from one specific store, with a new optional parameter.
+
+## 7.6.0 (2022-11-16)
+
+## 7.5.0 (2022-11-02)
+
+## 7.4.0 (2022-10-19)
+
+## 7.3.0 (2022-10-05)
+
+## 7.2.0 (2022-09-21)
+
+## 7.1.0 (2022-09-13)
+
+## 7.0.0 (2022-08-24)
+
+### Breaking Changes
+
+– Add TypeScript types to the built package (via "types": "build-types" in the package.json)
+
+### Bug Fix
+
+-   Packages: Replace `is-plain-obj` with `is-plain-object` ([#43511](https://github.com/WordPress/gutenberg/pull/43511)).
+
+## 6.15.0 (2022-08-10)
+
 ## 6.14.0 (2022-07-27)
 
 ## 6.13.0 (2022-07-13)
@@ -32,9 +167,9 @@
 
 ### New Features
 
-- Enabled thunks by default for all stores and removed the `__experimentalUseThunks` flag.
-- Store the resolution errors in store metadata and expose them using `hasResolutionFailed` the `getResolutionError` meta-selectors ([#38669](https://github.com/WordPress/gutenberg/pull/38669)).
-- Expose the resolution status (undefined, resolving, finished, error) via the `getResolutionState` meta-selector ([#38669](https://github.com/WordPress/gutenberg/pull/38669)).
+-   Enabled thunks by default for all stores and removed the `__experimentalUseThunks` flag.
+-   Store the resolution errors in store metadata and expose them using `hasResolutionFailed` the `getResolutionError` meta-selectors ([#38669](https://github.com/WordPress/gutenberg/pull/38669)).
+-   Expose the resolution status (undefined, resolving, finished, error) via the `getResolutionState` meta-selector ([#38669](https://github.com/WordPress/gutenberg/pull/38669)).
 
 ## 6.2.1 (2022-02-10)
 

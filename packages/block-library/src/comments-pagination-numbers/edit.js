@@ -3,9 +3,18 @@
  */
 import { useBlockProps } from '@wordpress/block-editor';
 
-const PaginationItem = ( { content, tag: Tag = 'a', extraClass = '' } ) => (
-	<Tag className={ `page-numbers ${ extraClass }` }>{ content }</Tag>
-);
+const PaginationItem = ( { content, tag: Tag = 'a', extraClass = '' } ) =>
+	Tag === 'a' ? (
+		<Tag
+			className={ `page-numbers ${ extraClass }` }
+			href="#comments-pagination-numbers-pseudo-link"
+			onClick={ ( event ) => event.preventDefault() }
+		>
+			{ content }
+		</Tag>
+	) : (
+		<Tag className={ `page-numbers ${ extraClass }` }>{ content }</Tag>
+	);
 
 export default function CommentsPaginationNumbersEdit() {
 	return (

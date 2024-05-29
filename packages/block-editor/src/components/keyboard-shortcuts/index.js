@@ -94,6 +94,16 @@ function KeyboardShortcutsRegister() {
 		} );
 
 		registerShortcut( {
+			name: 'core/block-editor/multi-text-selection',
+			category: 'selection',
+			description: __( 'Select text across multiple blocks.' ),
+			keyCombination: {
+				modifier: 'shift',
+				character: 'arrow',
+			},
+		} );
+
+		registerShortcut( {
 			name: 'core/block-editor/focus-toolbar',
 			category: 'global',
 			description: __( 'Navigate to the nearest toolbar.' ),
@@ -120,6 +130,29 @@ function KeyboardShortcutsRegister() {
 			keyCombination: {
 				modifier: 'secondary',
 				character: 'y',
+			},
+		} );
+
+		// List view shortcuts.
+		registerShortcut( {
+			name: 'core/block-editor/collapse-list-view',
+			category: 'list-view',
+			description: __( 'Collapse all other items.' ),
+			keyCombination: {
+				modifier: 'alt',
+				character: 'l',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/block-editor/group',
+			category: 'block',
+			description: __(
+				'Create a group block from the selected multiple blocks.'
+			),
+			keyCombination: {
+				modifier: 'primary',
+				character: 'g',
 			},
 		} );
 	}, [ registerShortcut ] );

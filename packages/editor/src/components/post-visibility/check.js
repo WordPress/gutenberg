@@ -1,34 +1,30 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
 
-export function PostVisibilityCheck( { hasPublishAction, render } ) {
-	const canEdit = hasPublishAction;
+/**
+ * Determines if the current post can be edited (published)
+ * and passes this information to the provided render function.
+ *
+ * @param {Object}   props        The component props.
+ * @param {Function} props.render Function to render the component.
+ *                                Receives an object with a `canEdit` property.
+ * @return {JSX.Element} The rendered component.
+ */
+export default function PostVisibilityCheck( { render } ) {
+	const canEdit = useSelect( ( select ) => {
+		return (
+			select( editorStore ).getCurrentPost()._links?.[
+				'wp:action-publish'
+			] ?? false
+		);
+	} );
+
 	return render( { canEdit } );
 }
-
-export default compose( [
-	withSelect( ( select ) => {
-		const { getCurrentPost, getCurrentPostType } = select( editorStore );
-		return {
-			hasPublishAction: get(
-				getCurrentPost(),
-				[ '_links', 'wp:action-publish' ],
-				false
-			),
-			postType: getCurrentPostType(),
-		};
-	} ),
-] )( PostVisibilityCheck );

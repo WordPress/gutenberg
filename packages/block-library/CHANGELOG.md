@@ -2,6 +2,119 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Variables like `process.env.IS_GUTENBERG_PLUGIN` have been replaced by `globalThis.IS_GUTENBERG_PLUGIN`. Build systems using `process.env` should be updated ([#61486](https://github.com/WordPress/gutenberg/pull/61486)).
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 8.35.0 (2024-05-16)
+
+### Internal
+
+-   Replaced `classnames` package with the faster and smaller `clsx` package ([#61138](https://github.com/WordPress/gutenberg/pull/61138)).
+
+## 8.34.0 (2024-05-02)
+
+## 8.33.0 (2024-04-19)
+
+## 8.32.0 (2024-04-03)
+
+## 8.31.0 (2024-03-21)
+
+## 8.30.0 (2024-03-06)
+
+## 8.29.0 (2024-02-21)
+
+## 8.28.0 (2024-02-09)
+
+## 8.27.0 (2024-01-24)
+
+## 8.26.0 (2024-01-10)
+
+## 8.25.0 (2023-12-13)
+
+## 8.24.0 (2023-11-29)
+
+## 8.23.0 (2023-11-16)
+
+## 8.22.0 (2023-11-02)
+
+## 8.21.0 (2023-10-18)
+
+### Bug Fix
+
+-   Fix Image block lightbox missing alt attribute and improve accessibility. ([#54608](https://github.com/WordPress/gutenberg/pull/55010))
+
+## 8.20.0 (2023-10-05)
+
+## 8.19.0 (2023-09-20)
+
+## 8.18.0 (2023-08-31)
+
+## 8.17.0 (2023-08-16)
+
+## 8.16.0 (2023-08-10)
+
+## 8.15.0 (2023-07-20)
+
+## 8.14.0 (2023-07-05)
+
+## 8.13.0 (2023-06-23)
+
+## 8.12.0 (2023-06-07)
+
+## 8.11.0 (2023-05-24)
+
+## 8.10.0 (2023-05-10)
+
+## 8.9.0 (2023-04-26)
+
+## 8.8.0 (2023-04-12)
+
+## 8.7.0 (2023-03-29)
+
+## 8.6.0 (2023-03-15)
+
+## 8.5.0 (2023-03-01)
+
+## 8.4.0 (2023-02-15)
+
+## 8.3.0 (2023-02-01)
+
+## 8.2.0 (2023-01-11)
+
+## 8.1.0 (2023-01-02)
+
+## 8.0.0 (2022-12-14)
+
+### Breaking Changes
+
+-   Updated dependencies to require React 18 ([#45235](https://github.com/WordPress/gutenberg/pull/45235))
+
+## 7.19.0 (2022-11-16)
+
+## 7.18.0 (2022-11-02)
+
+## 7.17.0 (2022-10-19)
+
+## 7.16.0 (2022-10-05)
+
+## 7.15.0 (2022-09-21)
+
+## 7.14.0 (2022-09-13)
+
+### New Feature
+
+-   Made it possible to import individual blocks ([#42258](https://github.com/WordPress/gutenberg/pull/42258)). Check [README](./README.md#loading-individual-blocks) for more information.
+
+## 7.13.0 (2022-08-24)
+
+### Bug Fix
+
+-   Ensure all dependencies allow version ranges ([#43355](https://github.com/WordPress/gutenberg/pull/43355)).
+
+## 7.12.0 (2022-08-10)
+
 ## 7.11.0 (2022-07-27)
 
 ## 7.10.0 (2022-07-13)
@@ -16,7 +129,7 @@
 
 ### Enhancement
 
--   Declare blocks as __experimental in block.json to automate syncing Gutenberg packages to WordPress ([#40655](https://github.com/WordPress/gutenberg/pull/40655)).
+-   Declare blocks as \_\_experimental in block.json to automate syncing Gutenberg packages to WordPress ([#40655](https://github.com/WordPress/gutenberg/pull/40655)).
 
 ## 7.5.0 (2022-05-04)
 
@@ -85,8 +198,8 @@
 
 ### Breaking Changes
 
--   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/.
--   Increase the minimum Node.js version to v12 matching Long Term Support releases ([#31270](https://github.com/WordPress/gutenberg/pull/31270)). Learn more at https://nodejs.org/en/about/releases/.
+-   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at <https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/>.
+-   Increase the minimum Node.js version to v12 matching Long Term Support releases ([#31270](https://github.com/WordPress/gutenberg/pull/31270)). Learn more at <https://nodejs.org/en/about/releases/>.
 
 ## 2.29.0 (2021-03-17)
 

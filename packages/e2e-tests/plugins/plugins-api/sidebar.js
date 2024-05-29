@@ -10,8 +10,8 @@
 	const el = wp.element.createElement;
 	const __ = wp.i18n.__;
 	const registerPlugin = wp.plugins.registerPlugin;
-	const PluginSidebar = wp.editPost.PluginSidebar;
-	const PluginSidebarMoreMenuItem = wp.editPost.PluginSidebarMoreMenuItem;
+	const PluginSidebar = wp.editor.PluginSidebar;
+	const PluginSidebarMoreMenuItem = wp.editor.PluginSidebarMoreMenuItem;
 
 	function SidebarContents() {
 		const postTitle = useSelect( ( select ) =>
@@ -70,7 +70,7 @@
 				PluginSidebar,
 				{
 					name: 'title-sidebar',
-					title: __( 'Plugin sidebar title' ),
+					title: __( 'Plugin title' ),
 				},
 				el( SidebarContents, {} )
 			),
@@ -79,7 +79,7 @@
 				{
 					target: 'title-sidebar',
 				},
-				__( 'Plugin sidebar more menu title' )
+				__( 'Plugin more menu title' )
 			)
 		);
 	}

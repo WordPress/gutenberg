@@ -5,7 +5,7 @@ Multiple areas may be added in a given time, but only one is visible; the compon
 
 The contents passed to ComplementaryArea are rendered in the ComplementaryArea.Slot corresponding to their scope if the complementary area is enabled.
 
-Besides rendering the complimentary area, the component renders a button in `PinnedItems` that allows opening the complementary area. The button only appears if the complementary is marked as favorite. By default, the complementary area headers rendered contain a button to mark and unmark areas as favorites.
+Besides rendering the complementary area, the component renders a button in `PinnedItems` that allows opening the complementary area. The button only appears if the complementary is marked as favorite. By default, the complementary area headers rendered contain a button to mark and unmark areas as favorites.
 
 ## Props
 
@@ -50,7 +50,7 @@ A className passed to the header container.
 
 The icon to render.
 
--   Type: `Function|WPComponent|null`
+-   Type: `Function|Component|null`
 -   Required: No
 -   Default: `null`
 
@@ -79,7 +79,7 @@ A className passed to the panel that contains the contents of the sidebar.
 
 ### scope
 
-The scope of the complementary area e.g: "core/edit-post", "core/edit-site", "myplugin/custom-screen-a",
+The scope of the complementary area e.g: "core", "myplugin/custom-screen-a",
 
 -   Type: `String`
 -   Required: Yes
@@ -114,7 +114,7 @@ A slot that renders the currently active ComplementaryArea.
 
 ### scope
 
-The scope of the complementary area e.g: "core/edit-post", "core/edit-site", "myplugin/custom-screen-a",
+The scope of the complementary area e.g: "core", "myplugin/custom-screen-a",
 
 -   Type: `String`
 -   Required: Yes

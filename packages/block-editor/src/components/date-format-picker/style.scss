@@ -2,21 +2,6 @@
 	margin-bottom: $grid-unit-20;
 }
 
-.block-editor-date-format-picker__default-format-toggle-control__hint {
-	color: $gray-700;
-	display: block;
-}
-
-.block-editor-date-format-picker__custom-format-select-control {
-	&.components-base-control {
-		margin-bottom: 0;
-	}
-
-	.components-custom-select-control__button {
-		width: 100%;
-	}
-}
-
 .block-editor-date-format-picker__custom-format-select-control__custom-option {
 	border-top: 1px solid $gray-300;
 

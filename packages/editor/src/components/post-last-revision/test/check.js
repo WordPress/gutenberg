@@ -1,41 +1,57 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { render, screen } from '@testing-library/react';
+
+/**
+ * WordPress dependencies
+ */
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { PostLastRevisionCheck } from '../check';
+import PostLastRevisionCheck from '../check';
+
+jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
+
+function setupDataMock( id, count ) {
+	useSelect.mockImplementation( ( mapSelect ) =>
+		mapSelect( () => ( {
+			getCurrentPostLastRevisionId: () => id,
+			getCurrentPostRevisionsCount: () => count,
+			getEditedPostAttribute: () => null,
+			getPostType: () => ( {
+				supports: {
+					revisions: true,
+				},
+			} ),
+		} ) )
+	);
+}
 
 describe( 'PostLastRevisionCheck', () => {
 	it( 'should not render anything if the last revision ID is unknown', () => {
-		const wrapper = shallow(
-			<PostLastRevisionCheck revisionsCount={ 2 }>
-				Children
-			</PostLastRevisionCheck>
-		);
+		setupDataMock( null, 2 );
 
-		expect( wrapper.type() ).toBe( null );
+		render( <PostLastRevisionCheck>Children</PostLastRevisionCheck> );
+
+		expect( screen.queryByText( 'Children' ) ).not.toBeInTheDocument();
 	} );
 
 	it( 'should not render anything if there is only one revision', () => {
-		const wrapper = shallow(
-			<PostLastRevisionCheck lastRevisionId={ 1 } revisionsCount={ 1 }>
-				Children
-			</PostLastRevisionCheck>
-		);
+		setupDataMock( 1, 1 );
 
-		expect( wrapper.type() ).toBe( null );
+		render( <PostLastRevisionCheck>Children</PostLastRevisionCheck> );
+
+		expect( screen.queryByText( 'Children' ) ).not.toBeInTheDocument();
 	} );
 
 	it( 'should render if there are two revisions', () => {
-		const wrapper = shallow(
-			<PostLastRevisionCheck lastRevisionId={ 1 } revisionsCount={ 2 }>
-				Children
-			</PostLastRevisionCheck>
-		);
+		setupDataMock( 1, 2 );
 
-		expect( wrapper.text() ).not.toBe( null );
+		render( <PostLastRevisionCheck>Children</PostLastRevisionCheck> );
+
+		expect( screen.getByText( 'Children' ) ).toBeVisible();
 	} );
 } );

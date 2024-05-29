@@ -24,24 +24,47 @@ const predefinedPluginTemplates = {
 			slug: 'example-static-es5',
 			title: 'Example Static (ES5)',
 			description:
-				'Example static block scaffolded with Create Block tool – no build step required.',
-			dashicon: 'smiley',
-			wpScripts: false,
-			editorScript: 'file:./index.js',
-			editorStyle: 'file:./editor.css',
-			style: 'file:./style.css',
-		},
-		templatesPath: join( __dirname, 'templates', 'es5' ),
-	},
-	static: {
-		defaultValues: {
-			slug: 'example-static',
-			title: 'Example Static',
-			description:
-				'Example static block scaffolded with Create Block tool.',
+				'Example block scaffolded with Create Block tool – no build step required.',
 			dashicon: 'smiley',
 			supports: {
 				html: false,
+			},
+			wpScripts: false,
+			editorScript: null,
+			editorStyle: null,
+			style: null,
+			viewStyle: null,
+			viewScript: 'file:./view.js',
+			example: {},
+		},
+		templatesPath: join( __dirname, 'templates', 'es5' ),
+		variants: {
+			static: {},
+			dynamic: {
+				slug: 'example-dynamic-es5',
+				title: 'Example Dynamic (ES5)',
+				render: 'file:./render.php',
+			},
+		},
+	},
+	standard: {
+		defaultValues: {
+			slug: 'example-static',
+			title: 'Example Static',
+			description: 'Example block scaffolded with Create Block tool.',
+			dashicon: 'smiley',
+			supports: {
+				html: false,
+			},
+			viewScript: 'file:./view.js',
+			example: {},
+		},
+		variants: {
+			static: {},
+			dynamic: {
+				slug: 'example-dynamic',
+				title: 'Example Dynamic',
+				render: 'file:./render.php',
 			},
 		},
 	},
@@ -98,8 +121,9 @@ const externalTemplateExists = async ( templateName ) => {
 const configToTemplate = async ( {
 	pluginTemplatesPath,
 	blockTemplatesPath,
-	defaultValues = {},
 	assetsPath,
+	defaultValues = {},
+	variants = {},
 	...deprecated
 } ) => {
 	if ( defaultValues === null || typeof defaultValues !== 'object' ) {
@@ -126,9 +150,10 @@ const configToTemplate = async ( {
 		blockOutputTemplates: blockTemplatesPath
 			? await getOutputTemplates( blockTemplatesPath )
 			: {},
-		defaultValues,
-		outputAssets: assetsPath ? await getOutputAssets( assetsPath ) : {},
 		pluginOutputTemplates: await getOutputTemplates( pluginTemplatesPath ),
+		outputAssets: assetsPath ? await getOutputAssets( assetsPath ) : {},
+		defaultValues,
+		variants,
 	};
 };
 
@@ -178,9 +203,11 @@ const getPluginTemplate = async ( templateName ) => {
 
 		const { name } = npmPackageArg( templateName );
 		return await configToTemplate(
-			require( require.resolve( name, {
-				paths: [ tempCwd ],
-			} ) )
+			require(
+				require.resolve( name, {
+					paths: [ tempCwd ],
+				} )
+			)
 		);
 	} catch ( error ) {
 		if ( error instanceof CLIError ) {
@@ -197,10 +224,10 @@ const getPluginTemplate = async ( templateName ) => {
 	}
 };
 
-const getDefaultValues = ( pluginTemplate ) => {
+const getDefaultValues = ( pluginTemplate, variant ) => {
 	return {
 		$schema: 'https://schemas.wp.org/trunk/block.json',
-		apiVersion: 2,
+		apiVersion: 3,
 		namespace: 'create-block',
 		category: 'widgets',
 		author: 'The WordPress Contributors',
@@ -215,18 +242,38 @@ const getDefaultValues = ( pluginTemplate ) => {
 		editorScript: 'file:./index.js',
 		editorStyle: 'file:./index.css',
 		style: 'file:./style-index.css',
+		transformer: ( view ) => view,
 		...pluginTemplate.defaultValues,
+		...pluginTemplate.variants?.[ variant ],
+		variantVars: getVariantVars( pluginTemplate.variants, variant ),
 	};
 };
 
-const getPrompts = ( pluginTemplate, keys ) => {
-	const defaultValues = getDefaultValues( pluginTemplate );
+const getPrompts = ( pluginTemplate, keys, variant ) => {
+	const defaultValues = getDefaultValues( pluginTemplate, variant );
 	return keys.map( ( promptName ) => {
 		return {
 			...prompts[ promptName ],
 			default: defaultValues[ promptName ],
 		};
 	} );
+};
+
+const getVariantVars = ( variants, variant ) => {
+	const variantVars = {};
+	const variantNames = Object.keys( variants );
+	if ( variantNames.length === 0 ) {
+		return variantVars;
+	}
+
+	const currentVariant = variant ?? variantNames[ 0 ];
+	for ( const variantName of variantNames ) {
+		const key =
+			variantName.charAt( 0 ).toUpperCase() + variantName.slice( 1 );
+		variantVars[ `is${ key }Variant` ] = currentVariant === variantName;
+	}
+
+	return variantVars;
 };
 
 module.exports = {

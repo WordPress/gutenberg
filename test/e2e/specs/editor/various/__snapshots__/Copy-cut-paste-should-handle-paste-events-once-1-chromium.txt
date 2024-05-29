@@ -2,8 +2,8 @@
 <p></p>
 <!-- /wp:paragraph -->
 
-<!-- wp:group -->
-<div class="wp-block-group"><!-- wp:paragraph -->
-<p>P</p>
-<!-- /wp:paragraph --></div>
-<!-- /wp:group -->
+<!-- wp:buttons -->
+<div class="wp-block-buttons"><!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button">Click</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->

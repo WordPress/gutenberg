@@ -1,96 +1,93 @@
 /**
- * WordPress dependencies
+ * External dependencies
  */
-import { createSlotFill, PanelBody } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-import { cog } from '@wordpress/icons';
-import { useEffect, Fragment } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { store as interfaceStore } from '@wordpress/interface';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import clsx from 'clsx';
 
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-import DefaultSidebar from './default-sidebar';
-import GlobalStylesSidebar from './global-styles-sidebar';
-import NavigationMenuSidebar from './navigation-menu-sidebar';
-import { STORE_NAME } from '../../store/constants';
-import SettingsHeader from './settings-header';
-import TemplateCard from './template-card';
-import { SIDEBAR_BLOCK, SIDEBAR_TEMPLATE } from './constants';
+import {
+	createContext,
+	useContext,
+	useState,
+	useRef,
+	useLayoutEffect,
+} from '@wordpress/element';
+import { focus } from '@wordpress/dom';
 
-const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
-	'EditSiteSidebarInspector'
-);
-export const SidebarInspectorFill = InspectorFill;
+export const SidebarNavigationContext = createContext( () => {} );
+// Focus a sidebar element after a navigation. The element to focus is either
+// specified by `focusSelector` (when navigating back) or it is the first
+// tabbable element (usually the "Back" button).
+function focusSidebarElement( el, direction, focusSelector ) {
+	let elementToFocus;
+	if ( direction === 'back' && focusSelector ) {
+		elementToFocus = el.querySelector( focusSelector );
+	}
+	if ( direction !== null && ! elementToFocus ) {
+		const [ firstTabbable ] = focus.tabbable.find( el );
+		elementToFocus = firstTabbable ?? el;
+	}
+	elementToFocus?.focus();
+}
 
-export function SidebarComplementaryAreaFills() {
-	const { sidebar, isEditorSidebarOpened, hasBlockSelection } = useSelect(
-		( select ) => {
-			const _sidebar =
-				select( interfaceStore ).getActiveComplementaryArea(
-					STORE_NAME
-				);
-			const _isEditorSidebarOpened = [
-				SIDEBAR_BLOCK,
-				SIDEBAR_TEMPLATE,
-			].includes( _sidebar );
-			return {
-				sidebar: _sidebar,
-				isEditorSidebarOpened: _isEditorSidebarOpened,
-				hasBlockSelection:
-					!! select( blockEditorStore ).getBlockSelectionStart(),
+// Navigation state that is updated when navigating back or forward. Helps us
+// manage the animations and also focus.
+function createNavState() {
+	let state = {
+		direction: null,
+		focusSelector: null,
+	};
+
+	return {
+		get() {
+			return state;
+		},
+		navigate( direction, focusSelector = null ) {
+			state = {
+				direction,
+				focusSelector:
+					direction === 'forward' && focusSelector
+						? focusSelector
+						: state.focusSelector,
 			};
 		},
-		[]
-	);
-	const { enableComplementaryArea } = useDispatch( interfaceStore );
+	};
+}
 
-	useEffect( () => {
-		if ( ! isEditorSidebarOpened ) return;
-		if ( hasBlockSelection ) {
-			enableComplementaryArea( STORE_NAME, SIDEBAR_BLOCK );
-		} else {
-			enableComplementaryArea( STORE_NAME, SIDEBAR_TEMPLATE );
-		}
-	}, [ hasBlockSelection, isEditorSidebarOpened ] );
+function SidebarContentWrapper( { children } ) {
+	const navState = useContext( SidebarNavigationContext );
+	const wrapperRef = useRef();
+	const [ navAnimation, setNavAnimation ] = useState( null );
 
-	let sidebarName = sidebar;
-	if ( ! isEditorSidebarOpened ) {
-		sidebarName = hasBlockSelection ? SIDEBAR_BLOCK : SIDEBAR_TEMPLATE;
-	}
+	useLayoutEffect( () => {
+		const { direction, focusSelector } = navState.get();
+		focusSidebarElement( wrapperRef.current, direction, focusSelector );
+		setNavAnimation( direction );
+	}, [ navState ] );
 
-	// Conditionally include NavMenu sidebar in Plugin only.
-	// Optimise for dead code elimination.
-	// See https://github.com/WordPress/gutenberg/blob/trunk/docs/how-to-guides/feature-flags.md#dead-code-elimination.
-	let MaybeNavigationMenuSidebar = Fragment;
-
-	if ( process.env.IS_GUTENBERG_PLUGIN ) {
-		MaybeNavigationMenuSidebar = NavigationMenuSidebar;
-	}
+	const wrapperCls = clsx( 'edit-site-sidebar__screen-wrapper', {
+		'slide-from-left': navAnimation === 'back',
+		'slide-from-right': navAnimation === 'forward',
+	} );
 
 	return (
-		<>
-			<DefaultSidebar
-				identifier={ sidebarName }
-				title={ __( 'Settings' ) }
-				icon={ cog }
-				closeLabel={ __( 'Close settings sidebar' ) }
-				header={ <SettingsHeader sidebarName={ sidebarName } /> }
-				headerClassName="edit-site-sidebar__panel-tabs"
-			>
-				{ sidebarName === SIDEBAR_TEMPLATE && (
-					<PanelBody>
-						<TemplateCard />
-					</PanelBody>
-				) }
-				{ sidebarName === SIDEBAR_BLOCK && (
-					<InspectorSlot bubblesVirtually />
-				) }
-			</DefaultSidebar>
-			<GlobalStylesSidebar />
-			<MaybeNavigationMenuSidebar />
-		</>
+		<div ref={ wrapperRef } className={ wrapperCls }>
+			{ children }
+		</div>
+	);
+}
+
+export default function SidebarContent( { routeKey, children } ) {
+	const [ navState ] = useState( createNavState );
+
+	return (
+		<SidebarNavigationContext.Provider value={ navState }>
+			<div className="edit-site-sidebar__content">
+				<SidebarContentWrapper key={ routeKey }>
+					{ children }
+				</SidebarContentWrapper>
+			</div>
+		</SidebarNavigationContext.Provider>
 	);
 }

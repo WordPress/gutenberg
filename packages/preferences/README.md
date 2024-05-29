@@ -138,12 +138,10 @@ wp.data.dispatch( 'core/preferences' ).setPersistenceLayer( {
 
 The `PreferenceToggleMenuItem` components can be used with a `DropdownMenu` to implement a menu for changing preferences.
 
-Also see the `MoreMenuDropdown` component from the `@wordpress/interface` package for implementing a more menu.
-
 ```jsx
 function MyEditorMenu() {
 	return (
-		<MoreMenuDropdown>
+		<DropdownMenu>
 			{ () => (
 				<MenuGroup label={ __( 'Features' ) }>
 					<PreferenceToggleMenuItem
@@ -156,7 +154,7 @@ function MyEditorMenu() {
 					/>
 				</MenuGroup>
 			) }
-		</MoreMenuDropdown>
+		</DropdownMenu>
 	);
 }
 ```
@@ -171,8 +169,7 @@ The following set of dispatching action creators are available on the object ret
 
 #### set
 
-Returns an action object used in signalling that a preference should be set
-to a value
+Returns an action object used in signalling that a preference should be set to a value
 
 _Parameters_
 
@@ -186,8 +183,7 @@ _Returns_
 
 #### setDefaults
 
-Returns an action object used in signalling that preference defaults should
-be set.
+Returns an action object used in signalling that preference defaults should be set.
 
 _Parameters_
 
@@ -207,9 +203,7 @@ When a persistence layer is set, the preferences store will:
 -   call `get` immediately and update the store state to the value returned.
 -   call `set` with all preferences whenever a preference changes value.
 
-`setPersistenceLayer` should ideally be dispatched at the start of an
-application's lifecycle, before any other actions have been dispatched to
-the preferences store.
+`setPersistenceLayer` should ideally be dispatched at the start of an application's lifecycle, before any other actions have been dispatched to the preferences store.
 
 _Parameters_
 
@@ -221,8 +215,7 @@ _Returns_
 
 #### toggle
 
-Returns an action object used in signalling that a preference should be
-toggled.
+Returns an action object used in signalling that a preference should be toggled.
 
 _Parameters_
 
@@ -239,8 +232,7 @@ The following selectors are available on the object returned by `wp.data.select(
 
 #### get
 
-Returns a boolean indicating whether a prefer is active for a particular
-scope.
+Returns a boolean indicating whether a prefer is active for a particular scope.
 
 _Parameters_
 

@@ -52,13 +52,17 @@ add_action( 'after_setup_theme', 'mytheme_setup_theme_supported_features' );
 
 Core blocks include default structural styles. These are loaded in both the editor and the front end by default. An example of these styles is the CSS that powers the columns block. Without these rules, the block would result in a broken layout containing no columns at all.
 
-The block editor allows themes to opt-in to slightly more opinionated styles for the front end. An example of these styles is the default color bar to the left of blockquotes. If you'd like to use these opinionated styles in your theme, add theme support for `wp-block-styles`:
+### Opinionated block styles
+
+The block editor allows themes to opt in to slightly more opinionated styles for the front end. An example of these styles is the default color bar to the left of blockquotes. If you'd like to use these opinionated styles in a classic theme, add theme support for `wp-block-styles`:
 
 ```php
 add_theme_support( 'wp-block-styles' );
 ```
 
 You can see the CSS that will be included in the [block library theme file](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/theme.scss).
+
+For block themes or themes providing a `theme.json` file, it is not recommended to use this theme support. Instead, to ensure there is no styling conflict between global styles rules and block styles, add the desired block styles to the theme's `theme.json` file.
 
 ### Wide Alignment:
 
@@ -136,16 +140,16 @@ The colors will be shown in order on the palette, and there's no limit to how ma
 Themes are responsible for creating the classes that apply the colors in different contexts. Core blocks use "color", "background-color", and "border-color" contexts. So to correctly apply "strong magenta" to all contexts of core blocks a theme should implement the classes itself. The class name is built appending 'has-', followed by the class name _using_ kebab case and ending with the context name.
 
 ```css
-.has-strong-magenta-background-color {
-	background-color: #a156b4;
-}
-
 .has-strong-magenta-color {
 	color: #a156b4;
 }
 
+.has-strong-magenta-background-color {
+	background-color: #a156b4;
+}
+
 .has-strong-magenta-border-color {
-	color: #a156b4;
+	border-color: #a156b4;
 }
 ```
 
@@ -315,7 +319,7 @@ Themes can opt out of generated block layout styles that provide default structu
 add_theme_support( 'disable-layout-styles' );
 ```
 
-For themes looking to customize `blockGap` styles or block spacing, see [the developer docs on Global Settings & Styles](/docs/how-to-guides/themes/theme-json/#what-is-blockgap-and-how-can-i-use-it).
+For themes looking to customize `blockGap` styles or block spacing, see [the developer docs on Global Settings & Styles](/docs/how-to-guides/themes/global-settings-and-styles.md#what-is-blockgap-and-how-can-i-use-it).
 
 ### Supporting custom line heights
 
@@ -434,11 +438,10 @@ add_theme_support( 'custom-spacing' );
 
 ## Link color control
 
-Link support has been made stable as part of WordPress 5.8. It's `false` by default and themes can enable it via the [theme.json file](./theme-json.md):
+Link support has been made stable as part of WordPress 5.8. It's `false` by default and themes can enable it via the [theme.json file](/docs/how-to-guides/curating-the-editor-experience/theme-json.md):
 
 ```json
 {
-	"version": 1,
 	"settings": {
 		"color": {
 			"link": true
@@ -463,3 +466,48 @@ where
 - `<link-color>` is either `var(--wp--preset--color--slug)` (if the user selected a preset value) or a raw color value (if the user selected a custom value)
 
 The block will get attached the class `.wp-elements-<uuid>`.
+
+## Appearance Tools
+
+Use this setting to enable the following Global Styles settings:
+
+- border: color, radius, style, width
+- color: link
+- spacing: blockGap, margin, padding
+- typography: lineHeight
+- dimensions: aspectRatio, minHeight
+- position: sticky
+
+```php
+add_theme_support( 'appearance-tools' );
+```
+
+## Border
+
+Use this to enable all border settings:
+
+```php
+add_theme_support( 'border' );
+```
+
+## Link color
+
+Use this to enable the link color setting:
+
+```php
+add_theme_support( 'link-color' );
+```
+
+## Block Based Template Parts
+
+Block Based Template parts allow administrators to edit parts of the site using blocks. This is off by default, and requires the theme to opt in by declaring support:
+
+```php
+add_theme_support( 'block-template-parts' );
+```
+
+This feature is only relevant for non block based themes, as block based themes already support block based template parts as part of the site editor.
+
+The standalone template part editor does not allow editors to create new, or delete existing template parts. This is because the theme manually needs to include the template part in the PHP template.
+
+You can find out more about block based template parts in the [themes handbook block template and template parts section](https://developer.wordpress.org/themes/block-themes/templates-and-template-parts/#block-c5fa39a2-a27d-4bd2-98d0-dc6249a0801a).

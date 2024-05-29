@@ -22,8 +22,7 @@ Create the live regions.
 
 ### speak
 
-Allows you to easily announce dynamic interface updates to screen readers using ARIA live regions.
-This module is inspired by the `speak` function in `wp-a11y.js`.
+Allows you to easily announce dynamic interface updates to screen readers using ARIA live regions. This module is inspired by the `speak` function in `wp-a11y.js`.
 
 _Usage_
 
@@ -68,7 +67,7 @@ For context I’ll quote [this article on WordPress.org](https://make.wordpress.
 
 ## Browser support
 
-See <https://make.wordpress.org/design/handbook/design-guide/browser-support/>
+See <https://make.wordpress.org/core/handbook/best-practices/browser-support/>
 
 ## Contributing to this package
 

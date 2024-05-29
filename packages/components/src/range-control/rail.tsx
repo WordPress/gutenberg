@@ -9,7 +9,7 @@ import { isRTL } from '@wordpress/i18n';
 import RangeMark from './mark';
 import { MarksWrapper, Rail } from './styles/range-control-styles';
 
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import type {
 	MarksProps,
 	RangeMarkProps,
@@ -92,7 +92,7 @@ function useMarks( {
 	if ( ! Array.isArray( marks ) ) {
 		marks = [];
 		const count = 1 + Math.round( range / step );
-		while ( count > marks.push( { value: step * marks.length + min } ) );
+		while ( count > marks.push( { value: step * marks.length + min } ) ) {}
 	}
 
 	const placedMarks: RangeMarkProps[] = [];

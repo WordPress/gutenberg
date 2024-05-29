@@ -10,7 +10,7 @@ Install the module
 npm install @wordpress/eslint-plugin --save-dev
 ```
 
-**Note**: This package requires `node` 12.0.0 or later, and `npm` 6.9.0 or later. It is not compatible with older versions.
+**Note**: This package requires Node.js version with long-term support status (check [Active LTS or Maintenance LTS releases](https://nodejs.org/en/about/previous-releases)). It is not compatible with older versions.
 
 ## Usage
 
@@ -24,7 +24,7 @@ To opt-in to the default configuration, extend your own project's `.eslintrc` fi
 
 Refer to the [ESLint documentation on Shareable Configs](http://eslint.org/docs/developer-guide/shareable-configs) for more information.
 
-The `recommended` preset will include rules governing an ES2015+ environment, and includes rules from the [`eslint-plugin-jsdoc`](https://github.com/gajus/eslint-plugin-jsdoc), [`eslint-plugin-jsx-a11y`](https://github.com/evcohen/eslint-plugin-jsx-a11y), [`eslint-plugin-react`](https://github.com/yannickcr/eslint-plugin-react), and other similar plugins.
+The `recommended` preset will include rules governing an ES2015+ environment, and includes rules from the [`eslint-plugin-jsdoc`](https://github.com/gajus/eslint-plugin-jsdoc), [`eslint-plugin-jsx-a11y`](https://github.com/jsx-eslint/eslint-plugin-jsx-a11y), [`eslint-plugin-react`](https://github.com/yannickcr/eslint-plugin-react), and other similar plugins.
 
 This preset offers an optional integration with the [`eslint-plugin-prettier`](https://github.com/prettier/eslint-plugin-prettier) package that runs [Prettier](https://prettier.io) code formatter and reports differences as individual ESLint issues. You can activate it by installing the [`prettier`](https://www.npmjs.com/package/prettier) package separately with:
 
@@ -44,15 +44,16 @@ There is also `recommended-with-formatting` ruleset for projects that want to en
 
 Alternatively, you can opt-in to only the more granular rulesets offered by the plugin. These include:
 
--   `custom`
--   `es5`
--   `esnext`
--   `jsdoc`
--   `jsx-a11y`
--   `react`
--   `i18n`
--   `test-e2e`
--   `test-unit`
+-   `custom` – custom rules for WordPress development.
+-   `es5` – rules for legacy ES5 environments.
+-   `esnext` – rules for ES2015+ environments.
+-   `i18n` – rules for internationalization.
+-   `jsdoc` – rules for JSDoc comments.
+-   `jsx-a11y` – rules for accessibility in JSX.
+-   `react` – rules for React components.
+-   `test-e2e` – rules for end-to-end tests written in Puppeteer.
+-   `test-unit`– rules for unit tests written in Jest.
+-   `test-playwright` – rules for end-to-end tests written in Playwright.
 
 For example, if your project does not use React, you could consider extending including only the ESNext rules in your project using the following `extends` definition:
 
@@ -68,25 +69,26 @@ The granular rulesets will not define any environment globals. As such, if they 
 
 ### Rules
 
-| Rule                                                                                                                                                                 | Description                                                                                    | Recommended |
-| -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | ----------- |
-| [data-no-store-string-literals](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/data-no-store-string-literals.md)                 | Discourage passing string literals to reference data stores                                    |             |
-| [dependency-group](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/dependency-group.md)                                           | Enforce dependencies docblocks formatting                                                      | ✓           |
-| [is-gutenberg-plugin](docs/rules/is-gutenberg-plugin.md)                                                                                                             | Governs the use of the `process.env.IS_GUTENBERG_PLUGIN` constant                              | ✓           |
-| [no-base-control-with-label-without-id](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-base-control-with-label-without-id.md) | Disallow the usage of BaseControl component with a label prop set but omitting the id property | ✓           |
-| [no-unguarded-get-range-at](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-unguarded-get-range-at.md)                         | Disallow the usage of unguarded `getRangeAt` calls                                             | ✓           |
-| [no-unsafe-wp-apis](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-unsafe-wp-apis.md)                                         | Disallow the usage of unsafe APIs from `@wordpress/*` packages                                 | ✓           |
-| [no-unused-vars-before-return](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-unused-vars-before-return.md)                   | Disallow assigning variable values if unused before a return                                   | ✓           |
-| [react-no-unsafe-timeout](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/react-no-unsafe-timeout.md)                             | Disallow unsafe `setTimeout` in component                                                      |             |
-| [valid-sprintf](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/valid-sprintf.md)                                                 | Enforce valid sprintf usage                                                                    | ✓           |
-| [i18n-ellipsis](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/i18n-ellipsis.md)                                                 | Disallow using three dots in translatable strings                                              | ✓           |
-| [i18n-no-collapsible-whitespace](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/i18n-no-collapsible-whitespace.md)               | Disallow collapsible whitespace in translatable strings                                        | ✓           |
-| [i18n-no-placeholders-only](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/i18n-no-placeholders-only.md)                         | Prevent using only placeholders in translatable strings                                        | ✓           |
-| [i18n-no-variables](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/i18n-no-variables.md)                                         | Enforce string literals as translation function arguments                                      | ✓           |
-| [i18n-text-domain](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/i18n-text-domain.md)                                           | Enforce passing valid text domains                                                             | ✓           |
-| [i18n-translator-comments](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/i18n-translator-comments.md)                           | Enforce adding translator comments                                                             | ✓           |
-| [i18n-no-flanking-whitespace](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/i18n-no-flanking-whitespace.md)                     | Disallow leading or trailing whitespace in translatable strings                                |             |
-| [i18n-hyphenated-range](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/i18n-hyphenated-range.md)                                 | Disallow hyphenated numerical ranges in translatable strings                                   |             |
+| Rule                                                                                                                                                                 | Description                                                                                     | Recommended |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ----------- |
+| [data-no-store-string-literals](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/data-no-store-string-literals.md)                 | Discourage passing string literals to reference data stores.                                    |             |
+| [dependency-group](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/dependency-group.md)                                           | Enforce dependencies docblocks formatting.                                                      | ✓           |
+| [i18n-ellipsis](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/i18n-ellipsis.md)                                                 | Disallow using three dots in translatable strings.                                              | ✓           |
+| [i18n-hyphenated-range](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/i18n-hyphenated-range.md)                                 | Disallow hyphenated numerical ranges in translatable strings.                                   |             |
+| [i18n-no-collapsible-whitespace](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/i18n-no-collapsible-whitespace.md)               | Disallow collapsible whitespace in translatable strings.                                        | ✓           |
+| [i18n-no-flanking-whitespace](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/i18n-no-flanking-whitespace.md)                     | Disallow leading or trailing whitespace in translatable strings.                                |             |
+| [i18n-no-placeholders-only](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/i18n-no-placeholders-only.md)                         | Prevent using only placeholders in translatable strings.                                        | ✓           |
+| [i18n-no-variables](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/i18n-no-variables.md)                                         | Enforce string literals as translation function arguments.                                      | ✓           |
+| [i18n-text-domain](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/i18n-text-domain.md)                                           | Enforce passing valid text domains.                                                             | ✓           |
+| [i18n-translator-comments](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/i18n-translator-comments.md)                           | Enforce adding translator comments.                                                             | ✓           |
+| [no-base-control-with-label-without-id](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-base-control-with-label-without-id.md) | Disallow the usage of BaseControl component with a label prop set but omitting the id property. | ✓           |
+| [no-unguarded-get-range-at](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-unguarded-get-range-at.md)                         | Disallow the usage of unguarded `getRangeAt` calls.                                             | ✓           |
+| [no-unsafe-wp-apis](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-unsafe-wp-apis.md)                                         | Disallow the usage of unsafe APIs from `@wordpress/*` packagesl                                 | ✓           |
+| [no-unused-vars-before-return](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-unused-vars-before-return.md)                   | Disallow assigning variable values if unused before a return.                                   | ✓           |
+| [no-wp-process-env](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/no-wp-process-env.md)                                         | Disallow legacy usage of WordPress variables via `process.env` like `process.env.SCRIPT_DEBUG`. | ✓           |
+| [react-no-unsafe-timeout](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/react-no-unsafe-timeout.md)                             | Disallow unsafe `setTimeout` in component.                                                      |             |
+| [valid-sprintf](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/valid-sprintf.md)                                                 | Enforce valid sprintf usage.                                                                    | ✓           |
+| [wp-global-usage](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/wp-global-usage.md)                                             | Enforce correct usage of WordPress globals like `globalThis.SCRIPT_DEBUG`.                      |             |
 
 ### Legacy
 

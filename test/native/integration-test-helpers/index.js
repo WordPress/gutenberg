@@ -1,24 +1,25 @@
 export { addBlock } from './add-block';
-export {
-	advanceAnimationByTime,
-	advanceAnimationByFrames,
-} from './advance-animation';
-export { dismissModal } from './dismiss-modal';
-export { getBlock } from './get-block';
-export { getEditorHtml } from './get-editor-html';
-export { getInnerBlock } from './get-inner-block';
-export { initializeEditor } from './initialize-editor';
-export { openBlockSettings } from './open-block-settings';
-export { changeAndSelectTextOfRichText } from './rich-text-change-and-select-text';
-export { changeTextOfRichText } from './rich-text-change-text';
-export { pasteIntoRichText } from './rich-text-paste';
-export { setupCoreBlocks } from './setup-core-blocks';
-export { setupMediaPicker } from './setup-media-picker';
-export { setupMediaUpload } from './setup-media-upload';
-export { changeTextOfTextInput } from './text-input-change-text';
-export { triggerBlockListLayout } from './trigger-block-list-layout';
-export { waitForModalVisible } from './wait-for-modal-visible';
-export { waitForStoreResolvers } from './wait-for-store-resolvers';
-export { waitFor } from './wait-for';
-export { withFakeTimers } from './with-fake-timers';
-export { withReanimatedTimer } from './with-reanimated-timer';
+export { advanceAnimationByFrames } from './advance-animation';
+export * from './dismiss-modal';
+export * from './get-block';
+export * from './get-block-transform-options';
+export * from './get-editor-content';
+export * from './get-inner-block';
+export * from './initialize-editor';
+export * from './open-block-actions-menu';
+export * from './open-block-settings';
+export * from './rich-text-select-range';
+export * from './rich-text-type';
+export * from './rich-text-paste';
+export * from './setup-api-fetch';
+export * from './setup-core-blocks';
+export * from './setup-media-picker';
+export * from './setup-media-upload';
+export * from './setup-picker';
+export * from './text-input-change-text';
+export * from './transform-block';
+export * from './trigger-block-list-layout';
+export * from './wait-for-modal-visible';
+export * from './wait-for-store-resolvers';
+export * from './with-fake-timers';
+export * from './with-reanimated-timer';

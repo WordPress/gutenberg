@@ -1,80 +1,41 @@
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { Popover, ToolbarGroup } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
-import {
-	isCollapsed,
-	getActiveFormats,
-	useAnchorRef,
-	store as richTextStore,
-} from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
  */
 import BlockControls from '../block-controls';
 import FormatToolbar from './format-toolbar';
-import { store as blockEditorStore } from '../../store';
+import NavigableToolbar from '../navigable-toolbar';
 
-function InlineSelectionToolbar( { value, anchorRef, activeFormats } ) {
-	const lastFormat = activeFormats[ activeFormats.length - 1 ];
-	const lastFormatType = lastFormat?.type;
-	const settings = useSelect(
-		( select ) => select( richTextStore ).getFormatType( lastFormatType ),
-		[ lastFormatType ]
-	);
-	const selectionRef = useAnchorRef( {
-		ref: anchorRef,
-		value,
-		settings,
-	} );
-
-	return <InlineToolbar anchorRef={ selectionRef } />;
-}
-
-function InlineToolbar( { anchorRef } ) {
+function InlineToolbar( { popoverAnchor } ) {
 	return (
 		<Popover
-			position="top center"
+			placement="top"
 			focusOnMount={ false }
-			anchorRef={ anchorRef }
+			anchor={ popoverAnchor }
 			className="block-editor-rich-text__inline-format-toolbar"
 			__unstableSlotName="block-toolbar"
 		>
-			<div className="block-editor-rich-text__inline-format-toolbar-group">
+			<NavigableToolbar
+				className="block-editor-rich-text__inline-format-toolbar-group"
+				/* translators: accessibility text for the inline format toolbar */
+				aria-label={ __( 'Format tools' ) }
+			>
 				<ToolbarGroup>
 					<FormatToolbar />
 				</ToolbarGroup>
-			</div>
+			</NavigableToolbar>
 		</Popover>
 	);
 }
 
-const FormatToolbarContainer = ( { inline, anchorRef, value } ) => {
-	const hasInlineToolbar = useSelect(
-		( select ) => select( blockEditorStore ).getSettings().hasInlineToolbar,
-		[]
-	);
-
+const FormatToolbarContainer = ( { inline, editableContentElement } ) => {
 	if ( inline ) {
-		return <InlineToolbar anchorRef={ anchorRef } />;
-	}
-
-	if ( hasInlineToolbar ) {
-		const activeFormats = getActiveFormats( value );
-
-		if ( isCollapsed( value ) && ! activeFormats.length ) {
-			return null;
-		}
-
-		return (
-			<InlineSelectionToolbar
-				anchorRef={ anchorRef }
-				value={ value }
-				activeFormats={ activeFormats }
-			/>
-		);
+		return <InlineToolbar popoverAnchor={ editableContentElement } />;
 	}
 
 	// Render regular toolbar.

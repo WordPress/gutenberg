@@ -1,7 +1,10 @@
 /**
  * Internal dependencies
  */
-import { rendererPath } from '../server-side-render';
+import {
+	rendererPath,
+	removeBlockSupportAttributes,
+} from '../server-side-render';
 
 describe( 'rendererPath', () => {
 	test( 'should return an base path for empty input', () => {
@@ -74,5 +77,67 @@ describe( 'rendererPath', () => {
 		).toBe(
 			'/wp/v2/block-renderer/core/test-block?context=edit&attributes%5BstringArg%5D=test&id=1234'
 		);
+	} );
+
+	test( 'Should remove attributes and style properties applied by the block supports', () => {
+		expect(
+			removeBlockSupportAttributes( {
+				backgroundColor: 'foreground',
+				borderColor: 'foreground',
+				fontFamily: 'system-font',
+				fontSize: 'small',
+				gradient: 'vivid-cyan-blue-to-vivid-purple',
+				textColor: 'foreground',
+				customAttribute: 'customAttribute',
+				className: 'custom-class',
+				style: {
+					border: {
+						radius: '10px',
+						style: 'solid',
+						width: '10px',
+					},
+					color: {
+						background: '#000000',
+						text: '#000000',
+					},
+					elements: {
+						link: {
+							color: {
+								text: '#000000',
+							},
+						},
+					},
+					spacing: {
+						margin: {
+							top: '10px',
+							right: '10px',
+							bottom: '10px',
+							left: '10px',
+						},
+						padding: {
+							top: '10px',
+							right: '10px',
+							bottom: '10px',
+							left: '10px',
+						},
+					},
+					typography: {
+						fontSize: '10px',
+						fontStyle: 'normal',
+						fontWeight: '500',
+						letterSpacing: '10px',
+						lineHeight: '1',
+						textDecoration: 'line-through',
+						textTransform: 'uppercase',
+					},
+					customStyle: 'customStyle',
+				},
+			} )
+		).toEqual( {
+			customAttribute: 'customAttribute',
+			style: {
+				customStyle: 'customStyle',
+			},
+		} );
 	} );
 } );

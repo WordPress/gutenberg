@@ -6,6 +6,7 @@ import { resizeCornerNE as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import edit from './edit';
 import metadata from './block.json';
@@ -21,3 +22,5 @@ export const settings = {
 	save,
 	deprecated,
 };
+
+export const init = () => initBlock( { name, metadata, settings } );

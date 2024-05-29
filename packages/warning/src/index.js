@@ -4,11 +4,8 @@
 import { logged } from './utils';
 
 function isDev() {
-	return (
-		typeof process !== 'undefined' &&
-		process.env &&
-		process.env.NODE_ENV !== 'production'
-	);
+	// eslint-disable-next-line @wordpress/wp-global-usage
+	return globalThis.SCRIPT_DEBUG === true;
 }
 
 /**

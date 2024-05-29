@@ -4,7 +4,7 @@
 import { useDispatch, useSelect } from '@wordpress/data';
 import { switchToBlockType, store as blocksStore } from '@wordpress/blocks';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
-import { group, row, stack } from '@wordpress/icons';
+import { group, row, stack, grid } from '@wordpress/icons';
 import { _x } from '@wordpress/i18n';
 
 /**
@@ -14,9 +14,10 @@ import { useConvertToGroupButtonProps } from '../convert-to-group-buttons';
 import { store as blockEditorStore } from '../../store';
 
 const layouts = {
-	group: undefined,
+	group: { type: 'constrained' },
 	row: { type: 'flex', flexWrap: 'nowrap' },
 	stack: { type: 'flex', orientation: 'vertical' },
+	grid: { type: 'grid' },
 };
 
 function BlockGroupToolbar() {
@@ -40,11 +41,15 @@ function BlockGroupToolbar() {
 		[ clientIds, groupingBlockName ]
 	);
 
-	const onConvertToGroup = ( layout = 'group' ) => {
+	const onConvertToGroup = ( layout ) => {
 		const newBlocks = switchToBlockType(
 			blocksSelection,
 			groupingBlockName
 		);
+
+		if ( typeof layout !== 'string' ) {
+			layout = 'group';
+		}
 
 		if ( newBlocks && newBlocks.length > 0 ) {
 			// Because the block is not in the store yet we can't use
@@ -56,6 +61,7 @@ function BlockGroupToolbar() {
 
 	const onConvertToRow = () => onConvertToGroup( 'row' );
 	const onConvertToStack = () => onConvertToGroup( 'stack' );
+	const onConvertToGrid = () => onConvertToGroup( 'grid' );
 
 	// Don't render the button if the current selection cannot be grouped.
 	// A good example is selecting multiple button blocks within a Buttons block:
@@ -70,6 +76,9 @@ function BlockGroupToolbar() {
 	);
 	const canInsertStack = !! variations.find(
 		( { name } ) => name === 'group-stack'
+	);
+	const canInsertGrid = !! variations.find(
+		( { name } ) => name === 'group-grid'
 	);
 
 	return (
@@ -91,6 +100,13 @@ function BlockGroupToolbar() {
 					icon={ stack }
 					label={ _x( 'Stack', 'verb' ) }
 					onClick={ onConvertToStack }
+				/>
+			) }
+			{ canInsertGrid && (
+				<ToolbarButton
+					icon={ grid }
+					label={ _x( 'Grid', 'verb' ) }
+					onClick={ onConvertToGrid }
 				/>
 			) }
 		</ToolbarGroup>

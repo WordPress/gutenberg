@@ -1,18 +1,13 @@
 /**
- * Internal dependencies
- */
-import { ASPECT_RATIOS, WP_EMBED_TYPE } from './constants';
-
-/**
  * External dependencies
  */
-import { kebabCase } from 'lodash';
-import classnames from 'classnames/dedupe';
+import clsx from 'clsx';
 import memoize from 'memize';
 
 /**
  * WordPress dependencies
  */
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { renderToString } from '@wordpress/element';
 import {
 	createBlock,
@@ -24,8 +19,11 @@ import {
  * Internal dependencies
  */
 import metadata from './block.json';
+import { ASPECT_RATIOS, WP_EMBED_TYPE } from './constants';
+import { unlock } from '../lock-unlock';
 
 const { name: DEFAULT_EMBED_BLOCK } = metadata;
+const { kebabCase } = unlock( componentsPrivateApis );
 
 /** @typedef {import('@wordpress/blocks').WPBlockVariation} WPBlockVariation */
 
@@ -100,7 +98,9 @@ export const createUpgradedEmbedBlock = (
 	const { preview, attributes = {} } = props;
 	const { url, providerNameSlug, type, ...restAttributes } = attributes;
 
-	if ( ! url || ! getBlockType( DEFAULT_EMBED_BLOCK ) ) return;
+	if ( ! url || ! getBlockType( DEFAULT_EMBED_BLOCK ) ) {
+		return;
+	}
 
 	const matchedBlock = findMoreSuitableBlock( url );
 
@@ -153,6 +153,21 @@ export const createUpgradedEmbedBlock = (
 };
 
 /**
+ * Determine if the block already has an aspect ratio class applied.
+ *
+ * @param {string} existingClassNames Existing block classes.
+ * @return {boolean} True or false if the classnames contain an aspect ratio class.
+ */
+export const hasAspectRatioClass = ( existingClassNames ) => {
+	if ( ! existingClassNames ) {
+		return false;
+	}
+	return ASPECT_RATIOS.some( ( { className } ) =>
+		existingClassNames.includes( className )
+	);
+};
+
+/**
  * Removes all previously set aspect ratio related classes and return the rest
  * existing class names.
  *
@@ -163,17 +178,21 @@ export const removeAspectRatioClasses = ( existingClassNames ) => {
 	if ( ! existingClassNames ) {
 		// Avoids extraneous work and also, by returning the same value as
 		// received, ensures the post is not dirtied by a change of the block
-		// attribute from `undefined` to an emtpy string.
+		// attribute from `undefined` to an empty string.
 		return existingClassNames;
 	}
 	const aspectRatioClassNames = ASPECT_RATIOS.reduce(
 		( accumulator, { className } ) => {
-			accumulator[ className ] = false;
+			accumulator.push( className );
 			return accumulator;
 		},
-		{ 'wp-has-aspect-ratio': false }
+		[ 'wp-has-aspect-ratio' ]
 	);
-	return classnames( existingClassNames, aspectRatioClassNames );
+	let outputClassNames = existingClassNames;
+	for ( const className of aspectRatioClassNames ) {
+		outputClassNames = outputClassNames.replace( className, '' );
+	}
+	return outputClassNames.trim();
 };
 
 /**
@@ -216,7 +235,7 @@ export function getClassNames(
 					return removeAspectRatioClasses( existingClassNames );
 				}
 				// Close aspect ratio match found.
-				return classnames(
+				return clsx(
 					removeAspectRatioClasses( existingClassNames ),
 					potentialRatio.className,
 					'wp-has-aspect-ratio'
@@ -283,6 +302,13 @@ export const getAttributesFromPreview = memoize(
 			attributes.providerNameSlug = providerNameSlug;
 		}
 
+		// Aspect ratio classes are removed when the embed URL is updated.
+		// If the embed already has an aspect ratio class, that means the URL has not changed.
+		// Which also means no need to regenerate it with getClassNames.
+		if ( hasAspectRatioClass( currentClassNames ) ) {
+			return attributes;
+		}
+
 		attributes.className = getClassNames(
 			html,
 			currentClassNames,
@@ -296,27 +322,26 @@ export const getAttributesFromPreview = memoize(
 /**
  * Returns the attributes derived from the preview, merged with the current attributes.
  *
- * @param {Object}  currentAttributes       The current attributes of the block.
- * @param {Object}  preview                 The preview data.
- * @param {string}  title                   The block's title, e.g. Twitter.
- * @param {boolean} isResponsive            Boolean indicating if the block supports responsive content.
- * @param {boolean} ignorePreviousClassName Determines if the previous className attribute should be ignored when merging.
+ * @param {Object}  currentAttributes The current attributes of the block.
+ * @param {Object}  preview           The preview data.
+ * @param {string}  title             The block's title, e.g. Twitter.
+ * @param {boolean} isResponsive      Boolean indicating if the block supports responsive content.
  * @return {Object} Merged attributes.
  */
 export const getMergedAttributesWithPreview = (
 	currentAttributes,
 	preview,
 	title,
-	isResponsive,
-	ignorePreviousClassName = false
+	isResponsive
 ) => {
 	const { allowResponsive, className } = currentAttributes;
+
 	return {
 		...currentAttributes,
 		...getAttributesFromPreview(
 			preview,
 			title,
-			ignorePreviousClassName ? undefined : className,
+			className,
 			isResponsive,
 			allowResponsive
 		),

@@ -19,6 +19,9 @@ describe( 'isNavigationCandidate', () => {
 		elements.inputCheckbox = document.createElement( 'input' );
 		elements.inputCheckbox.setAttribute( 'type', 'checkbox' );
 
+		elements.inputNumber = document.createElement( 'input' );
+		elements.inputNumber.setAttribute( 'type', 'number' );
+
 		elements.contentEditable = document.createElement( 'p' );
 		elements.contentEditable.contentEditable = true;
 	} );
@@ -41,6 +44,18 @@ describe( 'isNavigationCandidate', () => {
 				elements.inputText,
 				keyCode,
 				true
+			);
+
+			expect( result ).toBe( false );
+		} );
+	} );
+
+	it( 'should return false if vertically navigating inputs with vertial support like number', () => {
+		[ UP, DOWN ].forEach( ( keyCode ) => {
+			const result = isNavigationCandidate(
+				elements.inputNumber,
+				keyCode,
+				false
 			);
 
 			expect( result ).toBe( false );

@@ -9,12 +9,6 @@ import { View, Text, TouchableWithoutFeedback } from 'react-native';
 import { __ } from '@wordpress/i18n';
 import { useState, useContext } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
-import {
-	ColorControl,
-	PanelBody,
-	BottomSheetContext,
-	useMobileGlobalStylesColors,
-} from '@wordpress/components';
 import { useRoute, useNavigation } from '@react-navigation/native';
 
 /**
@@ -25,11 +19,13 @@ import ColorIndicator from '../../color-indicator';
 import NavBar from '../bottom-sheet/nav-bar';
 import SegmentedControls from '../segmented-control';
 import { colorsUtils } from './utils';
+import PanelBody from '../../panel/body';
+import { BottomSheetContext } from '../bottom-sheet/bottom-sheet-context';
+import ColorControl from '../../color-control';
 
 import styles from './style.scss';
 
 const HIT_SLOP = { top: 8, bottom: 8, left: 8, right: 8 };
-const THEME_PALETTE_NAME = 'Theme';
 
 const PaletteScreen = () => {
 	const route = useRoute();
@@ -48,7 +44,6 @@ const PaletteScreen = () => {
 	const [ currentValue, setCurrentValue ] = useState( colorValue );
 	const isGradientColor = isGradient( currentValue );
 	const selectedSegmentIndex = isGradientColor ? 1 : 0;
-	const allAvailableColors = useMobileGlobalStylesColors();
 
 	const [ currentSegment, setCurrentSegment ] = useState(
 		segments[ selectedSegmentIndex ]
@@ -57,6 +52,10 @@ const PaletteScreen = () => {
 	const currentSegmentColors = ! isGradientSegment
 		? defaultSettings.colors
 		: defaultSettings.gradients;
+	const allAvailableColors = defaultSettings?.allAvailableColors || [];
+	const allAvailableGradients = currentSegmentColors
+		.flatMap( ( { gradients } ) => gradients )
+		.filter( Boolean );
 
 	const horizontalSeparatorStyle = usePreferredColorSchemeStyle(
 		styles.horizontalSeparator,
@@ -78,22 +77,15 @@ const PaletteScreen = () => {
 		setCurrentValue( color );
 		if ( isSolidSegment && onColorChange && onGradientChange ) {
 			onColorChange( color );
-			onGradientChange( '' );
 		} else if ( isSolidSegment && onColorChange ) {
 			onColorChange( color );
 		} else if ( ! isSolidSegment && onGradientChange ) {
 			onGradientChange( color );
-			onColorChange( '' );
 		}
 	};
 
 	function onClear() {
 		setCurrentValue( undefined );
-		if ( isSolidSegment ) {
-			onColorChange( '' );
-		} else {
-			onGradientChange( '' );
-		}
 
 		if ( onColorCleared ) {
 			onColorCleared();
@@ -117,7 +109,11 @@ const PaletteScreen = () => {
 
 	function getClearButton() {
 		return (
-			<TouchableWithoutFeedback onPress={ onClear } hitSlop={ HIT_SLOP }>
+			<TouchableWithoutFeedback
+				accessibilityLabel={ __( 'Clear selected color' ) }
+				onPress={ onClear }
+				hitSlop={ HIT_SLOP }
+			>
 				<View style={ styles.clearButtonContainer }>
 					<Text style={ clearButtonStyle }>{ __( 'Reset' ) }</Text>
 				</View>
@@ -191,10 +187,10 @@ const PaletteScreen = () => {
 						colors: palette.colors,
 						gradients: palette.gradients,
 						allColors: allAvailableColors,
+						allGradients: allAvailableGradients,
 					};
-					const enableCustomColor =
-						! isGradientSegment &&
-						palette.name === THEME_PALETTE_NAME;
+					// Limit to show the custom indicator to the first available palette
+					const enableCustomColor = paletteKey === 0;
 
 					return (
 						<ColorPalette

@@ -32,7 +32,7 @@ Callback to invoke when iframe receives focus. Passes an emulated `FocusEvent` o
 
 ### `iframeRef`
 
--   Type: `wp.element.Ref`
+-   Type: `React.Ref`
 -   Required: No
 
-If a reference to the underlying DOM element is needed, pass `iframeRef` as the result of a `wp.element.createRef` called from your component.
+If a reference to the underlying DOM element is needed, pass `iframeRef` as the result of a `React.createRef` called from your component.

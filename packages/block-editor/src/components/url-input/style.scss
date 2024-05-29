@@ -15,8 +15,6 @@ $input-size: 300px;
 			width: $input-size;
 		}
 		padding: $input-padding;
-		border: none;
-		border-radius: 0;
 		margin-left: 0;
 		margin-right: 0;
 
@@ -45,9 +43,9 @@ $input-size: 300px;
 
 	.components-spinner {
 		position: absolute;
-		right: $input-padding;
-		bottom: $input-padding + $grid-unit-10 + 1;
 		margin: 0;
+		top: calc(50% - #{$spinner-size} / 2);
+		right: $grid-unit;
 	}
 }
 

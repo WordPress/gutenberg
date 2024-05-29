@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -31,6 +31,8 @@ export default function QuickInserter( {
 	clientId,
 	isAppender,
 	prioritizePatterns,
+	selectBlockOnInsert,
+	hasSearch = true,
 } ) {
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ destinationRootClientId, onInsertBlocks ] = useInsertionPoint( {
@@ -38,6 +40,7 @@ export default function QuickInserter( {
 		rootClientId,
 		clientId,
 		isAppender,
+		selectBlockOnInsert,
 	} );
 	const [ blockTypes ] = useBlockTypesState(
 		destinationRootClientId,
@@ -68,8 +71,9 @@ export default function QuickInserter( {
 	const showPatterns =
 		patterns.length && ( !! filterValue || prioritizePatterns );
 	const showSearch =
-		( showPatterns && patterns.length > SEARCH_THRESHOLD ) ||
-		blockTypes.length > SEARCH_THRESHOLD;
+		hasSearch &&
+		( ( showPatterns && patterns.length > SEARCH_THRESHOLD ) ||
+			blockTypes.length > SEARCH_THRESHOLD );
 
 	useEffect( () => {
 		if ( setInserterIsOpened ) {
@@ -92,13 +96,14 @@ export default function QuickInserter( {
 
 	return (
 		<div
-			className={ classnames( 'block-editor-inserter__quick-inserter', {
+			className={ clsx( 'block-editor-inserter__quick-inserter', {
 				'has-search': showSearch,
 				'has-expand': setInserterIsOpened,
 			} ) }
 		>
 			{ showSearch && (
 				<SearchControl
+					__nextHasNoMarginBottom
 					className="block-editor-inserter__search"
 					value={ filterValue }
 					onChange={ ( value ) => {
@@ -120,6 +125,7 @@ export default function QuickInserter( {
 					maxBlockTypes={ SHOWN_BLOCK_TYPES }
 					isDraggable={ false }
 					prioritizePatterns={ prioritizePatterns }
+					selectBlockOnInsert={ selectBlockOnInsert }
 				/>
 			</div>
 

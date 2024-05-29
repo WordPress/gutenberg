@@ -3,11 +3,74 @@
 	align-items: center;
 	justify-content: space-between;
 	height: $header-height;
-	padding: 0 $grid-unit-20;
 	overflow: auto;
+	background: #fff;
 
 	@include break-small {
 		overflow: visible;
+	}
+
+	.selected-block-tools-wrapper {
+		overflow: hidden;
+		display: flex;
+		align-items: center;
+		height: $header-height;
+
+		.block-editor-block-contextual-toolbar {
+			border-bottom: 0;
+			height: 100%;
+		}
+
+		// These rules ensure that icons are always positioned in a way that lines up with the rest of the icons in the toolbar.
+		.block-editor-block-toolbar {
+			height: 100%;
+			// Push down so that buttons are centered vertically.
+			// It should be 14px (60px header height - 32px compact button height = 28 / 2),
+			// but there is a -1px top-margin down the stack that affects this.
+			padding-top: math.div($header-height - $button-size-compact, 2) + 1;
+
+			// Match the height of other buttons in the header toolbar.
+			.components-button:not(.block-editor-block-mover-button) {
+				height: $button-size-compact;
+			}
+		}
+
+		// Modified group borders.
+		.components-toolbar-group,
+		.components-toolbar {
+			border-right: none;
+
+			&::after {
+				content: "";
+				width: $border-width;
+				height: $grid-unit-30;
+				background-color: $gray-300;
+				margin-top: $grid-unit-05;
+				margin-left: $grid-unit;
+			}
+
+			& .components-toolbar-group.components-toolbar-group {
+				&::after {
+					display: none;
+				}
+			}
+		}
+
+		.block-editor-block-mover {
+			// Match the height of other buttons in the header toolbar.
+			&.is-horizontal .block-editor-block-mover-button {
+				height: $button-size-compact;
+				overflow: visible;
+			}
+
+			// Move up a little to prevent the toolbar shift when focus is on the vertical movers.
+			@include break-small() {
+				&:not(.is-horizontal) .block-editor-block-mover__move-button-container {
+					position: relative;
+					top: -10px;
+				}
+			}
+		}
 	}
 }
 
@@ -15,6 +78,10 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	flex-shrink: 2;
+	padding-right: $grid-unit-10;
+	padding-left: $grid-unit-20;
+	overflow: hidden;
 }
 
 .edit-widgets-header__title {
@@ -26,7 +93,7 @@
 .edit-widgets-header__actions {
 	display: flex;
 	align-items: center;
-
+	padding-right: $grid-unit-20;
 	gap: $grid-unit-05;
 
 	@include break-small() {
@@ -35,16 +102,19 @@
 }
 
 .edit-widgets-header-toolbar {
-	border: none;
+	gap: $grid-unit-10;
+	// Some plugins add buttons here despite best practices.
+	// Push them a bit rightwards to fit the top toolbar.
+	margin-right: $grid-unit-10;
 
 	// The Toolbar component adds different styles to buttons, so we reset them
 	// here to the original button styles
 	// Specificity bump needed to offset https://github.com/WordPress/gutenberg/blob/8ea29cb04412c80c9adf7c1db0e816d6a0ac1232/packages/components/src/toolbar/style.scss#L76
 	> .components-button.has-icon.has-icon.has-icon,
 	> .components-dropdown > .components-button.has-icon.has-icon {
-		height: $button-size;
-		min-width: $button-size;
-		padding: 6px;
+		height: $button-size-compact;
+		min-width: $button-size-compact;
+		padding: 4px;
 
 		&.is-pressed {
 			background: $gray-900;

@@ -1,15 +1,12 @@
 /**
  * External dependencies
  */
-import { map } from 'lodash';
-import scrollView from 'dom-scroll-into-view';
-import classnames from 'classnames';
-import type { MouseEventHandler } from 'react';
+import clsx from 'clsx';
+import type { MouseEventHandler, ReactNode } from 'react';
 
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
 
 /**
@@ -22,7 +19,9 @@ const handleMouseDown: MouseEventHandler = ( e ) => {
 	e.preventDefault();
 };
 
-export function SuggestionsList< T extends string | { value: string } >( {
+export function SuggestionsList<
+	T extends string | { value: string; disabled?: boolean },
+>( {
 	selectedIndex,
 	scrollIntoView,
 	match,
@@ -31,35 +30,28 @@ export function SuggestionsList< T extends string | { value: string } >( {
 	suggestions = [],
 	displayTransform,
 	instanceId,
+	__experimentalRenderItem,
 }: SuggestionsListProps< T > ) {
-	const [ scrollingIntoView, setScrollingIntoView ] = useState( false );
-
 	const listRef = useRefEffect< HTMLUListElement >(
 		( listNode ) => {
 			// only have to worry about scrolling selected suggestion into view
 			// when already expanded.
-			let id: number;
+			let rafId: number | undefined;
 			if (
 				selectedIndex > -1 &&
 				scrollIntoView &&
 				listNode.children[ selectedIndex ]
 			) {
-				setScrollingIntoView( true );
-				scrollView(
-					listNode.children[ selectedIndex ] as HTMLLIElement,
-					listNode,
-					{
-						onlyScrollIfNeeded: true,
-					}
-				);
-				id = window.setTimeout( () => {
-					setScrollingIntoView( false );
-				}, 100 );
+				listNode.children[ selectedIndex ].scrollIntoView( {
+					behavior: 'instant',
+					block: 'nearest',
+					inline: 'nearest',
+				} );
 			}
 
 			return () => {
-				if ( id !== undefined ) {
-					window.clearTimeout( id );
+				if ( rafId !== undefined ) {
+					cancelAnimationFrame( rafId );
 				}
 			};
 		},
@@ -68,9 +60,7 @@ export function SuggestionsList< T extends string | { value: string } >( {
 
 	const handleHover = ( suggestion: T ) => {
 		return () => {
-			if ( ! scrollingIntoView ) {
-				onHover?.( suggestion );
-			}
+			onHover?.( suggestion );
 		};
 	};
 
@@ -113,14 +103,40 @@ export function SuggestionsList< T extends string | { value: string } >( {
 			id={ `components-form-token-suggestions-${ instanceId }` }
 			role="listbox"
 		>
-			{ map( suggestions, ( suggestion, index ) => {
+			{ suggestions.map( ( suggestion, index ) => {
 				const matchText = computeSuggestionMatch( suggestion );
-				const className = classnames(
+				const isSelected = index === selectedIndex;
+				const isDisabled =
+					typeof suggestion === 'object' && suggestion?.disabled;
+				const key =
+					typeof suggestion === 'object' && 'value' in suggestion
+						? suggestion?.value
+						: displayTransform( suggestion );
+
+				const className = clsx(
 					'components-form-token-field__suggestion',
 					{
-						'is-selected': index === selectedIndex,
+						'is-selected': isSelected,
 					}
 				);
+
+				let output: ReactNode;
+
+				if ( typeof __experimentalRenderItem === 'function' ) {
+					output = __experimentalRenderItem( { item: suggestion } );
+				} else if ( matchText ) {
+					output = (
+						<span aria-label={ displayTransform( suggestion ) }>
+							{ matchText.suggestionBeforeMatch }
+							<strong className="components-form-token-field__suggestion-match">
+								{ matchText.suggestionMatch }
+							</strong>
+							{ matchText.suggestionAfterMatch }
+						</span>
+					);
+				} else {
+					output = displayTransform( suggestion );
+				}
 
 				/* eslint-disable jsx-a11y/click-events-have-key-events */
 				return (
@@ -128,28 +144,14 @@ export function SuggestionsList< T extends string | { value: string } >( {
 						id={ `components-form-token-suggestions-${ instanceId }-${ index }` }
 						role="option"
 						className={ className }
-						key={
-							typeof suggestion === 'object' &&
-							'value' in suggestion
-								? suggestion?.value
-								: displayTransform( suggestion )
-						}
+						key={ key }
 						onMouseDown={ handleMouseDown }
 						onClick={ handleClick( suggestion ) }
 						onMouseEnter={ handleHover( suggestion ) }
 						aria-selected={ index === selectedIndex }
+						aria-disabled={ isDisabled }
 					>
-						{ matchText ? (
-							<span aria-label={ displayTransform( suggestion ) }>
-								{ matchText.suggestionBeforeMatch }
-								<strong className="components-form-token-field__suggestion-match">
-									{ matchText.suggestionMatch }
-								</strong>
-								{ matchText.suggestionAfterMatch }
-							</span>
-						) : (
-							displayTransform( suggestion )
-						) }
+						{ output }
 					</li>
 				);
 				/* eslint-enable jsx-a11y/click-events-have-key-events */

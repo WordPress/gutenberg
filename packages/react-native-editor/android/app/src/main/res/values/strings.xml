@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">Gutenberg</string>
+    <string name="undo">Undo</string>
+    <string name="redo">Redo</string>
+    <string name="more_options">More options</string>
 </resources>

@@ -15,6 +15,7 @@ import { withPreferredColorScheme } from '@wordpress/compose';
  * Internal dependencies
  */
 import Cell from './cell';
+import LockIcon from './lock-icon';
 import styles from './range-cell.scss';
 import RangeTextInput from './range-text-input';
 import { toFixed } from '../utils';
@@ -180,7 +181,7 @@ class BottomSheetRangeCell extends Component {
 
 		return (
 			<View
-				accessible={ true }
+				accessible
 				accessibilityRole="adjustable"
 				accessibilityActions={ [
 					{ name: 'increment' },
@@ -218,6 +219,8 @@ class BottomSheetRangeCell extends Component {
 						activeOpacity={ 1 }
 						accessible={ false }
 						valueStyle={ styles.valueStyle }
+						disabled={ disabled }
+						showLockIcon={ false }
 					>
 						<View style={ containerStyle }>
 							{ preview }
@@ -225,7 +228,7 @@ class BottomSheetRangeCell extends Component {
 								testID={ `Slider ${ cellProps.label }` }
 								value={ sliderValue }
 								defaultValue={ defaultValue }
-								disabled={ disabled }
+								disabled={ disabled && ! isIOS }
 								step={ step }
 								minimumValue={ minimumValue }
 								maximumValue={ maximumValue }
@@ -259,6 +262,7 @@ class BottomSheetRangeCell extends Component {
 									{ children }
 								</RangeTextInput>
 							) }
+							{ disabled && <LockIcon /> }
 						</View>
 					</Cell>
 				</View>

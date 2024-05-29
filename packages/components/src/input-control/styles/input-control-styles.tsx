@@ -1,19 +1,20 @@
 /**
  * External dependencies
  */
-import { css, SerializedStyles } from '@emotion/react';
+import type { SerializedStyles } from '@emotion/react';
+import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import type { CSSProperties, ReactNode } from 'react';
 
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
 import { Flex, FlexItem } from '../../flex';
 import { Text } from '../../text';
-import { COLORS, rtl } from '../../utils';
+import { baseLabelTypography, COLORS, CONFIG, rtl } from '../../utils';
 import type { LabelPosition, Size } from '../types';
-import { space } from '../../ui/utils/space';
+import { space } from '../../utils/space';
 
 type ContainerProps = {
 	disabled?: boolean;
@@ -22,44 +23,76 @@ type ContainerProps = {
 	labelPosition?: LabelPosition;
 };
 
-type RootProps = {
-	isFocused?: boolean;
-	labelPosition?: LabelPosition;
+export const Prefix = styled.span`
+	box-sizing: border-box;
+	display: block;
+`;
+
+export const Suffix = styled.span`
+	align-items: center;
+	align-self: stretch;
+	box-sizing: border-box;
+	display: flex;
+`;
+
+type BackdropProps = {
+	disabled?: boolean;
+	isBorderless?: boolean;
 };
 
-const rootFocusedStyles = ( { isFocused }: RootProps ) => {
-	if ( ! isFocused ) return '';
-
-	return css( { zIndex: 1 } );
-};
-
-const rootLabelPositionStyles = ( { labelPosition }: RootProps ) => {
-	switch ( labelPosition ) {
-		case 'top':
-			return css`
-				align-items: flex-start;
-				flex-direction: column;
-			`;
-		case 'bottom':
-			return css`
-				align-items: flex-start;
-				flex-direction: column-reverse;
-			`;
-		case 'edge':
-			return css`
-				justify-content: space-between;
-			`;
-		default:
-			return '';
+const backdropBorderColor = ( {
+	disabled,
+	isBorderless,
+}: BackdropProps ): CSSProperties[ 'borderColor' ] => {
+	if ( isBorderless ) {
+		return 'transparent';
 	}
+
+	if ( disabled ) {
+		return COLORS.ui.borderDisabled;
+	}
+
+	return COLORS.ui.border;
 };
 
-export const Root = styled( Flex )< RootProps >`
+export const BackdropUI = styled.div< BackdropProps >`
+	&&& {
+		box-sizing: border-box;
+		border-color: ${ backdropBorderColor };
+		border-radius: inherit;
+		border-style: solid;
+		border-width: 1px;
+		bottom: 0;
+		left: 0;
+		margin: 0;
+		padding: 0;
+		pointer-events: none;
+		position: absolute;
+		right: 0;
+		top: 0;
+
+		${ rtl( { paddingLeft: 2 } ) }
+	}
+`;
+
+export const Root = styled( Flex )`
+	box-sizing: border-box;
 	position: relative;
 	border-radius: 2px;
 	padding-top: 0;
-	${ rootFocusedStyles }
-	${ rootLabelPositionStyles }
+
+	// Focus within, excluding cases where auxiliary controls in prefix or suffix have focus.
+	&:focus-within:not( :has( :is( ${ Prefix }, ${ Suffix } ):focus-within ) ) {
+		z-index: 1;
+
+		${ BackdropUI } {
+			border-color: ${ COLORS.ui.borderFocus };
+			box-shadow: ${ CONFIG.controlBoxShadowFocus };
+			// Windows High Contrast mode will show this outline, but not the box-shadow.
+			outline: 2px solid transparent;
+			outline-offset: -2px;
+		}
+	}
 `;
 
 const containerDisabledStyles = ( { disabled }: ContainerProps ) => {
@@ -70,18 +103,17 @@ const containerDisabledStyles = ( { disabled }: ContainerProps ) => {
 	return css( { backgroundColor } );
 };
 
-// Normalizes the margins from the <Flex /> (components/ui/flex/) container.
-const containerMarginStyles = ( { hideLabel }: ContainerProps ) => {
-	return hideLabel ? css( { margin: '0 !important' } ) : null;
-};
-
 const containerWidthStyles = ( {
 	__unstableInputWidth,
 	labelPosition,
 }: ContainerProps ) => {
-	if ( ! __unstableInputWidth ) return css( { width: '100%' } );
+	if ( ! __unstableInputWidth ) {
+		return css( { width: '100%' } );
+	}
 
-	if ( labelPosition === 'side' ) return '';
+	if ( labelPosition === 'side' ) {
+		return '';
+	}
 
 	if ( labelPosition === 'edge' ) {
 		return css( {
@@ -101,12 +133,11 @@ export const Container = styled.div< ContainerProps >`
 	position: relative;
 
 	${ containerDisabledStyles }
-	${ containerMarginStyles }
 	${ containerWidthStyles }
 `;
 
 type InputProps = {
-	__next36pxDefaultSize?: boolean;
+	__next40pxDefaultSize?: boolean;
 	disabled?: boolean;
 	inputSize?: Size;
 	isDragging?: boolean;
@@ -116,24 +147,29 @@ type InputProps = {
 };
 
 const disabledStyles = ( { disabled }: InputProps ) => {
-	if ( ! disabled ) return '';
+	if ( ! disabled ) {
+		return '';
+	}
 
 	return css( {
 		color: COLORS.ui.textDisabled,
 	} );
 };
 
-const fontSizeStyles = ( { inputSize: size }: InputProps ) => {
+export const fontSizeStyles = ( { inputSize: size }: InputProps ) => {
 	const sizes = {
 		default: '13px',
 		small: '11px',
+		compact: '13px',
 		'__unstable-large': '13px',
 	};
 
 	const fontSize = sizes[ size as Size ] || sizes.default;
 	const fontSizeMobile = '16px';
 
-	if ( ! fontSize ) return '';
+	if ( ! fontSize ) {
+		return '';
+	}
 
 	return css`
 		font-size: ${ fontSizeMobile };
@@ -146,14 +182,14 @@ const fontSizeStyles = ( { inputSize: size }: InputProps ) => {
 
 export const getSizeConfig = ( {
 	inputSize: size,
-	__next36pxDefaultSize,
+	__next40pxDefaultSize,
 }: InputProps ) => {
 	// Paddings may be overridden by the custom paddings props.
 	const sizes = {
 		default: {
-			height: 36,
+			height: 40,
 			lineHeight: 1,
-			minHeight: 36,
+			minHeight: 40,
 			paddingLeft: space( 4 ),
 			paddingRight: space( 4 ),
 		},
@@ -161,6 +197,13 @@ export const getSizeConfig = ( {
 			height: 24,
 			lineHeight: 1,
 			minHeight: 24,
+			paddingLeft: space( 2 ),
+			paddingRight: space( 2 ),
+		},
+		compact: {
+			height: 32,
+			lineHeight: 1,
+			minHeight: 32,
 			paddingLeft: space( 2 ),
 			paddingRight: space( 2 ),
 		},
@@ -173,14 +216,8 @@ export const getSizeConfig = ( {
 		},
 	};
 
-	if ( ! __next36pxDefaultSize ) {
-		sizes.default = {
-			height: 30,
-			lineHeight: 1,
-			minHeight: 30,
-			paddingLeft: space( 2 ),
-			paddingRight: space( 2 ),
-		};
+	if ( ! __next40pxDefaultSize ) {
+		sizes.default = sizes.compact;
 	}
 
 	return sizes[ size as Size ] || sizes.default;
@@ -237,7 +274,7 @@ export const Input = styled.input< InputProps >`
 		box-sizing: border-box;
 		border: none;
 		box-shadow: none !important;
-		color: ${ COLORS.gray[ 900 ] };
+		color: ${ COLORS.theme.foreground };
 		display: block;
 		font-family: inherit;
 		margin: 0;
@@ -256,22 +293,10 @@ export const Input = styled.input< InputProps >`
 	}
 `;
 
-const labelMargin = ( {
-	labelPosition,
-}: {
-	labelPosition?: LabelPosition;
-} ) => {
-	let marginBottom = 8;
-
-	if ( labelPosition === 'edge' || labelPosition === 'side' ) {
-		marginBottom = 0;
-	}
-
-	return css( { marginTop: 0, marginRight: 0, marginBottom, marginLeft: 0 } );
-};
-
 const BaseLabel = styled( Text )< { labelPosition?: LabelPosition } >`
 	&&& {
+		${ baseLabelTypography };
+
 		box-sizing: border-box;
 		display: block;
 		padding-top: 0;
@@ -279,7 +304,6 @@ const BaseLabel = styled( Text )< { labelPosition?: LabelPosition } >`
 		max-width: 100%;
 		z-index: 1;
 
-		${ labelMargin }
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
@@ -296,63 +320,4 @@ export const Label = (
 
 export const LabelWrapper = styled( FlexItem )`
 	max-width: calc( 100% - 10px );
-`;
-
-type BackdropProps = {
-	disabled?: boolean;
-	isFocused?: boolean;
-};
-
-const backdropFocusedStyles = ( {
-	disabled,
-	isFocused,
-}: BackdropProps ): SerializedStyles => {
-	let borderColor = isFocused ? COLORS.ui.borderFocus : COLORS.ui.border;
-
-	let boxShadow;
-
-	if ( isFocused ) {
-		boxShadow = `0 0 0 1px ${ COLORS.ui.borderFocus } inset`;
-	}
-
-	if ( disabled ) {
-		borderColor = COLORS.ui.borderDisabled;
-	}
-
-	return css( {
-		boxShadow,
-		borderColor,
-		borderStyle: 'solid',
-		borderWidth: 1,
-	} );
-};
-
-export const BackdropUI = styled.div< BackdropProps >`
-	&&& {
-		box-sizing: border-box;
-		border-radius: inherit;
-		bottom: 0;
-		left: 0;
-		margin: 0;
-		padding: 0;
-		pointer-events: none;
-		position: absolute;
-		right: 0;
-		top: 0;
-
-		${ backdropFocusedStyles }
-		${ rtl( { paddingLeft: 2 } ) }
-	}
-`;
-
-export const Prefix = styled.span`
-	box-sizing: border-box;
-	display: block;
-`;
-
-export const Suffix = styled.span`
-	align-items: center;
-	align-self: stretch;
-	box-sizing: border-box;
-	display: flex;
 `;

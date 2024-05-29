@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
-import { get, omit } from 'lodash';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -111,14 +110,18 @@ class GalleryImage extends Component {
 		// written by the user, make sure the text is not overwritten.
 		if ( isTemporaryImage( id, url ) ) {
 			if ( alt ) {
-				mediaAttributes = omit( mediaAttributes, [ 'alt' ] );
+				const { alt: omittedAlt, ...restMediaAttributes } =
+					mediaAttributes;
+				mediaAttributes = restMediaAttributes;
 			}
 		}
 
 		// If a caption text was meanwhile written by the user,
 		// make sure the text is not overwritten by empty captions.
-		if ( caption && ! get( mediaAttributes, [ 'caption' ] ) ) {
-			mediaAttributes = omit( mediaAttributes, [ 'caption' ] );
+		if ( caption && ! mediaAttributes.caption ) {
+			const { caption: omittedCaption, ...restMediaAttributes } =
+				mediaAttributes;
+			mediaAttributes = restMediaAttributes;
 		}
 
 		setAttributes( mediaAttributes );
@@ -189,7 +192,7 @@ class GalleryImage extends Component {
 			/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
 		);
 
-		const className = classnames( {
+		const className = clsx( {
 			'is-selected': isSelected,
 			'is-transient': isBlobURL( url ),
 		} );

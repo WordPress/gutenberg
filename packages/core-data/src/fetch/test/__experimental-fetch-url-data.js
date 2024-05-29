@@ -29,7 +29,7 @@ describe( 'fetchUrlData', () => {
 				fetchUrlData( 'https://www.wordpress.org' )
 			).resolves.toEqual( data );
 
-			expect( apiFetch ).toBeCalledTimes( 1 );
+			expect( apiFetch ).toHaveBeenCalledTimes( 1 );
 		} );
 
 		it( 'rejects with error upon fetch failure', async () => {
@@ -49,7 +49,7 @@ describe( 'fetchUrlData', () => {
 				method: 'POST',
 			} );
 
-			expect( apiFetch ).toBeCalledTimes( 1 );
+			expect( apiFetch ).toHaveBeenCalledTimes( 1 );
 
 			const argsPassedToFetchApi = apiFetch.mock.calls[ 0 ][ 0 ];
 
@@ -74,7 +74,7 @@ describe( 'fetchUrlData', () => {
 			apiFetch.mockReturnValueOnce( Promise.resolve( data ) );
 
 			await expect( fetchUrlData( targetUrl ) ).resolves.toEqual( data );
-			expect( apiFetch ).toBeCalledTimes( 1 );
+			expect( apiFetch ).toHaveBeenCalledTimes( 1 );
 
 			// Allow us to reassert on calls without it being polluted by first fetch
 			// but retains the mock implementation from earlier.
@@ -84,7 +84,7 @@ describe( 'fetchUrlData', () => {
 			await expect( fetchUrlData( targetUrl ) ).resolves.toEqual( data );
 
 			// Should now be in cache so no need to refetch from API.
-			expect( apiFetch ).toBeCalledTimes( 0 );
+			expect( apiFetch ).toHaveBeenCalledTimes( 0 );
 		} );
 
 		it( 'does not cache failed requests', async () => {
@@ -109,7 +109,7 @@ describe( 'fetchUrlData', () => {
 			// with a new fetch.
 			await expect( fetchUrlData( targetUrl ) ).resolves.toEqual( data );
 
-			expect( apiFetch ).toBeCalledTimes( 2 );
+			expect( apiFetch ).toHaveBeenCalledTimes( 2 );
 		} );
 	} );
 
@@ -117,7 +117,7 @@ describe( 'fetchUrlData', () => {
 		it.each( [ '#internal-link' ] )(
 			'errors when an invalid URL is passed',
 			async ( targetUrl ) => {
-				expect( apiFetch ).toBeCalledTimes( 0 );
+				expect( apiFetch ).toHaveBeenCalledTimes( 0 );
 
 				await expect( fetchUrlData( targetUrl ) ).rejects.toEqual(
 					expect.stringContaining(
@@ -134,7 +134,7 @@ describe( 'fetchUrlData', () => {
 		] )(
 			'errors when a non-http protocol (%s) is passed as part of URL',
 			async ( targetUrl ) => {
-				expect( apiFetch ).toBeCalledTimes( 0 );
+				expect( apiFetch ).toHaveBeenCalledTimes( 0 );
 
 				await expect( fetchUrlData( targetUrl ) ).rejects.toEqual(
 					expect.stringContaining(

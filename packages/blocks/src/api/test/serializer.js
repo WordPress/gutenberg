@@ -244,7 +244,7 @@ describe( 'block serializer', () => {
 
 	describe( 'serializeBlock()', () => {
 		it( 'serializes the freeform content fallback block without comment delimiters', () => {
-			registerBlockType( 'core/freeform-block', {
+			registerBlockType( 'core/freeform', {
 				category: 'text',
 				title: 'freeform block',
 				attributes: {
@@ -254,8 +254,8 @@ describe( 'block serializer', () => {
 				},
 				save: ( { attributes } ) => attributes.fruit,
 			} );
-			setFreeformContentHandlerName( 'core/freeform-block' );
-			const block = createBlock( 'core/freeform-block', {
+			setFreeformContentHandlerName( 'core/freeform' );
+			const block = createBlock( 'core/freeform', {
 				fruit: 'Bananas',
 			} );
 
@@ -264,7 +264,7 @@ describe( 'block serializer', () => {
 			expect( content ).toBe( 'Bananas' );
 		} );
 		it( 'serializes the freeform content fallback block with comment delimiters in nested context', () => {
-			registerBlockType( 'core/freeform-block', {
+			registerBlockType( 'core/freeform', {
 				category: 'text',
 				title: 'freeform block',
 				attributes: {
@@ -274,17 +274,17 @@ describe( 'block serializer', () => {
 				},
 				save: ( { attributes } ) => attributes.fruit,
 			} );
-			setFreeformContentHandlerName( 'core/freeform-block' );
-			const block = createBlock( 'core/freeform-block', {
+			setFreeformContentHandlerName( 'core/freeform' );
+			const block = createBlock( 'core/freeform', {
 				fruit: 'Bananas',
 			} );
 
 			const content = serializeBlock( block, { isInnerBlocks: true } );
 
 			expect( content ).toBe(
-				'<!-- wp:freeform-block {"fruit":"Bananas"} -->\n' +
+				'<!-- wp:freeform {"fruit":"Bananas"} -->\n' +
 					'Bananas\n' +
-					'<!-- /wp:freeform-block -->'
+					'<!-- /wp:freeform -->'
 			);
 		} );
 		it( 'serializes the unregistered fallback block without comment delimiters', () => {

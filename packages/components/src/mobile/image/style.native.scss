@@ -7,7 +7,7 @@
 }
 
 .imageBorder {
-	border-color: $blue-medium;
+	border-color: $blue-40;
 	border-width: 2px;
 	border-style: solid;
 	position: absolute;
@@ -16,11 +16,28 @@
 	height: 100%;
 }
 
+.imageBorderDark {
+	border-color: $blue-50;
+}
+
 .retryIcon {
-	width: 80px;
-	height: 80px;
-	justify-content: center;
-	align-items: center;
+	background-color: $black;
+	border-radius: 200px;
+	padding: 8px;
+}
+
+.retryIconDark {
+	background-color: $white;
+}
+
+.iconOffline {
+	fill: $white;
+	width: 24px;
+	height: 24px;
+}
+
+.iconOfflineDark {
+	fill: $black;
 }
 
 .customRetryIcon {
@@ -29,9 +46,13 @@
 }
 
 .iconRetry {
-	fill: #fff;
-	width: 100%;
-	height: 100%;
+	fill: $white;
+	width: 24px;
+	height: 24px;
+}
+
+.iconRetryDark {
+	fill: $black;
 }
 
 .iconPlaceholder {
@@ -86,10 +107,15 @@
 }
 
 .uploadFailedText {
-	color: #fff;
+	color: $black;
+	font-weight: bold;
 	font-size: 14;
 	margin-top: 5;
 	text-align: center;
+}
+
+.uploadFailedTextDark {
+	color: $white;
 }
 
 .editContainer {
@@ -112,7 +138,7 @@
 }
 
 .iconCustomise {
-	fill: #fff;
+	fill: $white;
 	position: absolute;
 	top: 7px;
 	left: 7px;
@@ -120,6 +146,10 @@
 
 .retryContainer {
 	flex: 1;
+	background-color: "rgba(255, 255, 255, 0.8)";
+}
+
+.retryContainerDark {
 	background-color: "rgba(0, 0, 0, 0.5)";
 }
 
@@ -140,4 +170,10 @@
 
 .wide {
 	width: 100%;
+}
+
+.nonVisibleImage {
+	height: 1;
+	width: 1;
+	opacity: 0;
 }

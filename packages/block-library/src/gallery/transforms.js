@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { filter, every } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
@@ -18,10 +13,6 @@ import {
 	LINK_DESTINATION_NONE,
 	LINK_DESTINATION_MEDIA,
 } from './constants';
-import {
-	LINK_DESTINATION_ATTACHMENT as DEPRECATED_LINK_DESTINATION_ATTACHMENT,
-	LINK_DESTINATION_MEDIA as DEPRECATED_LINK_DESTINATION_MEDIA,
-} from './v1/constants';
 import { pickRelevantMediaFiles, isGalleryV2Enabled } from './shared';
 
 const parseShortcodeIds = ( ids ) => {
@@ -133,17 +124,24 @@ const transforms = {
 				// Init the align and size from the first item which may be either the placeholder or an image.
 				let { align, sizeSlug } = attributes[ 0 ];
 				// Loop through all the images and check if they have the same align and size.
-				align = every( attributes, [ 'align', align ] )
+				align = attributes.every(
+					( attribute ) => attribute.align === align
+				)
 					? align
 					: undefined;
-				sizeSlug = every( attributes, [ 'sizeSlug', sizeSlug ] )
+				sizeSlug = attributes.every(
+					( attribute ) => attribute.sizeSlug === sizeSlug
+				)
 					? sizeSlug
 					: undefined;
 
-				const validImages = filter( attributes, ( { url } ) => url );
+				const validImages = attributes.filter( ( { url } ) => url );
 
 				if ( isGalleryV2Enabled() ) {
 					const innerBlocks = validImages.map( ( image ) => {
+						// Gallery images can't currently be resized so make sure height and width are undefined.
+						image.width = undefined;
+						image.height = undefined;
 						return createBlock( 'core/image', image );
 					} );
 
@@ -175,57 +173,7 @@ const transforms = {
 		{
 			type: 'shortcode',
 			tag: 'gallery',
-
-			attributes: {
-				images: {
-					type: 'array',
-					shortcode: ( { named: { ids } } ) => {
-						if ( ! isGalleryV2Enabled() ) {
-							return parseShortcodeIds( ids ).map( ( id ) => ( {
-								id: id.toString(),
-							} ) );
-						}
-					},
-				},
-				ids: {
-					type: 'array',
-					shortcode: ( { named: { ids } } ) => {
-						if ( ! isGalleryV2Enabled() ) {
-							return parseShortcodeIds( ids );
-						}
-					},
-				},
-				columns: {
-					type: 'number',
-					shortcode: ( { named: { columns = '3' } } ) => {
-						return parseInt( columns, 10 );
-					},
-				},
-				linkTo: {
-					type: 'string',
-					shortcode: ( { named: { link } } ) => {
-						if ( ! isGalleryV2Enabled() ) {
-							switch ( link ) {
-								case 'post':
-									return DEPRECATED_LINK_DESTINATION_ATTACHMENT;
-								case 'file':
-									return DEPRECATED_LINK_DESTINATION_MEDIA;
-								default:
-									return DEPRECATED_LINK_DESTINATION_ATTACHMENT;
-							}
-						}
-						switch ( link ) {
-							case 'post':
-								return LINK_DESTINATION_ATTACHMENT;
-							case 'file':
-								return LINK_DESTINATION_MEDIA;
-							default:
-								return LINK_DESTINATION_NONE;
-						}
-					},
-				},
-			},
-			transform( { named: { ids, columns = 3, link } } ) {
+			transform( { named: { ids, columns = 3, link, orderby } } ) {
 				const imageIds = parseShortcodeIds( ids ).map( ( id ) =>
 					parseInt( id, 10 )
 				);
@@ -242,6 +190,7 @@ const transforms = {
 					{
 						columns: parseInt( columns, 10 ),
 						linkTo,
+						randomOrder: orderby === 'rand',
 					},
 					imageIds.map( ( imageId ) =>
 						createBlock( 'core/image', { id: imageId } )
@@ -265,8 +214,7 @@ const transforms = {
 			isMatch( files ) {
 				return (
 					files.length !== 1 &&
-					every(
-						files,
+					files.every(
 						( file ) => file.type.indexOf( 'image/' ) === 0
 					)
 				);
@@ -302,26 +250,36 @@ const transforms = {
 						return innerBlocks.map(
 							( {
 								attributes: {
-									id,
 									url,
 									alt,
 									caption,
+									title,
+									href,
+									rel,
+									linkClass,
+									id,
 									sizeSlug: imageSizeSlug,
 									linkDestination,
-									href,
 									linkTarget,
+									anchor,
+									className,
 								},
 							} ) =>
 								createBlock( 'core/image', {
-									id,
+									align,
 									url,
 									alt,
 									caption,
-									sizeSlug: imageSizeSlug,
-									align,
-									linkDestination,
+									title,
 									href,
+									rel,
+									linkClass,
+									id,
+									sizeSlug: imageSizeSlug,
+									linkDestination,
 									linkTarget,
+									anchor,
+									className,
 								} )
 						);
 					}
