@@ -102,7 +102,7 @@ function ListboxCircularOptionPicker(
 					{ ...additionalProps }
 					id={ baseId }
 					store={ compositeStore }
-					role={ 'listbox' }
+					role="listbox"
 				>
 					{ options }
 				</Composite>
@@ -156,7 +156,7 @@ function CircularOptionPicker( props: CircularOptionPickerProps ) {
 	) : undefined;
 
 	const options = (
-		<div className={ 'components-circular-option-picker__swatches' }>
+		<div className="components-circular-option-picker__swatches">
 			{ optionsProp }
 		</div>
 	);

@@ -509,7 +509,7 @@ function BackgroundSizeToolsPanelItem( {
 				onChange={ updateBackgroundPosition }
 			/>
 			<ToggleGroupControl
-				size={ '__unstable-large' }
+				size="__unstable-large"
 				label={ __( 'Size' ) }
 				value={ currentValueForToggle }
 				onChange={ updateBackgroundSize }
@@ -519,18 +519,18 @@ function BackgroundSizeToolsPanelItem( {
 				) }
 			>
 				<ToggleGroupControlOption
-					key={ 'cover' }
-					value={ 'cover' }
+					key="cover"
+					value="cover"
 					label={ __( 'Cover' ) }
 				/>
 				<ToggleGroupControlOption
-					key={ 'contain' }
-					value={ 'contain' }
+					key="contain"
+					value="contain"
 					label={ __( 'Contain' ) }
 				/>
 				<ToggleGroupControlOption
-					key={ 'tile' }
-					value={ 'auto' }
+					key="tile"
+					value="auto"
 					label={ __( 'Tile' ) }
 				/>
 			</ToggleGroupControl>
@@ -542,7 +542,7 @@ function BackgroundSizeToolsPanelItem( {
 						aria-label={ __( 'Background image width' ) }
 						onChange={ updateBackgroundSize }
 						value={ sizeValue }
-						size={ '__unstable-large' }
+						size="__unstable-large"
 						__unstableInputWidth="100px"
 						min={ 0 }
 					/>
