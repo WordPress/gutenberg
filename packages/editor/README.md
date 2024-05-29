@@ -1088,7 +1088,7 @@ _Returns_
 
 ### PostPendingStatusCheck
 
-This component checks the publishing status of the current post. It uses the data module to select data from the editor store. If the post is already published or the user doesn't have the capability to publish, it returns null. Otherwise, it renders the child elements passed as props.
+This component checks the publishing status of the current post. If the post is already published or the user doesn't have the capability to publish, it returns null.
 
 _Parameters_
 
