@@ -3028,17 +3028,18 @@ class WP_Theme_JSON_Gutenberg {
 		$incoming_data    = $incoming->get_raw_data();
 		$this->theme_json = array_replace_recursive( $this->theme_json, $incoming_data );
 
-		// Prior to version 3, spacingSizes were generated in WP_Theme_JSON_Resolver_Gutenberg::get_merged_data().
+		/*
+		 * Prior to version 3, spacingSizes were generated in WP_Theme_JSON_Resolver_Gutenberg::get_merged_data().
+		 *
+		 * Recompute all the spacing sizes based on the new hierarchy of data. In the constructor
+		 * spacingScale and spacingSizes are both keyed by origin and VALID_ORIGINS is ordered, so
+		 * we can allow partial spacingScale data to inherit missing data from earlier layers when
+		 * computing the spacing sizes.
+		 *
+		 * This happens before the presets are merged to ensure that default spacing sizes can be
+		 * removed from the theme origin if $prevent_override is true.
+		 */
 		if ( $incoming_data['version'] >= 3 ) {
-			/*
-			 * Recompute all the spacing sizes based on the new hierarchy of data. In the constructor
-			 * spacingScale and spacingSizes are both keyed by origin and VALID_ORIGINS is ordered, so
-			 * we can allow partial spacingScale data to inherit missing data from earlier layers when
-			 * computing the spacing sizes.
-			 *
-			 * This happens before the presets are merged to ensure that default spacing sizes can be
-			 * removed from the theme origin if $prevent_override is true.
-			 */
 			$flattened_spacing_scale = array();
 			foreach ( static::VALID_ORIGINS as $origin ) {
 				$scale_path    = array( 'settings', 'spacing', 'spacingScale', $origin );
