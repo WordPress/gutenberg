@@ -468,16 +468,22 @@
 								"increment": {
 									"description": "The amount to increment each step by.",
 									"type": "number",
+									"exclusiveMinimum": true,
+									"minimum": 0,
 									"default": 1.5
 								},
 								"steps": {
 									"description": "Number of steps to generate in scale.",
 									"type": "integer",
+									"minimum": 1,
+									"maximum": 9,
 									"default": 7
 								},
 								"mediumStep": {
 									"description": "The value to medium setting in the scale.",
 									"type": "number",
+									"exclusiveMinimum": true,
+									"minimum": 0,
 									"default": 1.5
 								},
 								"unit": {
