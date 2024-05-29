@@ -943,9 +943,7 @@ Undocumented declaration.
 
 ### PostDiscussionPanel
 
-Uses the `useSelect` hook to determine if the discussion panel is enabled. It also uses the `useState` hook to manage the anchor for the popover dialog and the `useMemo` hook to memoize the popover properties.
-
-If the panel is not enabled, it returns null. Otherwise, it renders a `PostPanelRow` with a `Dropdown` that contains the `PostDiscussionToggle` and `ModalContents` components. The `PostTypeSupportCheck` component is used to ensure that the post type supports comments and pingbacks.
+This component allows to update comment and pingback settings for the current post. Internally there are checks whether the current post has support for the above and if the `discussion-panel` panel is enabled.
 
 _Returns_
 
