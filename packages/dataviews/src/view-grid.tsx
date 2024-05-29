@@ -131,7 +131,7 @@ function GridItem< Item extends AnyItem >( {
 						return (
 							<FlexItem
 								key={ field.id }
-								className={ 'dataviews-view-grid__field-value' }
+								className="dataviews-view-grid__field-value"
 							>
 								{ renderedValue }
 							</FlexItem>

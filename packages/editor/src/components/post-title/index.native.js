@@ -166,7 +166,7 @@ class PostTitle extends Component {
 				<RichText.Raw
 					ref={ this.setRef }
 					accessibilityLabel={ this.getTitle( title, postType ) }
-					tagName={ 'p' }
+					tagName="p"
 					tagsToEliminate={ [ 'strong' ] }
 					unstableOnFocus={ this.props.onSelect }
 					onBlur={ this.props.onBlur } // Always assign onBlur as a props.
@@ -174,7 +174,7 @@ class PostTitle extends Component {
 					styles={ styles }
 					fontSize={ 24 }
 					lineHeight={ 1 }
-					fontWeight={ 'bold' }
+					fontWeight="bold"
 					deleteEnter
 					onChange={ ( value ) => {
 						this.props.onUpdate( value );

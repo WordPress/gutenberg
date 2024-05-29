@@ -580,9 +580,7 @@ export class ImageEdit extends Component {
 							'Describe the purpose of the image. Leave empty if decorative.'
 						) }{ ' ' }
 						<FooterMessageLink
-							href={
-								'https://www.w3.org/WAI/tutorials/images/decision-tree/'
-							}
+							href="https://www.w3.org/WAI/tutorials/images/decision-tree/"
 							value={ __( 'What is alt text?' ) }
 						/>
 					</>
@@ -617,7 +615,7 @@ export class ImageEdit extends Component {
 					styles.removeFeaturedButton,
 				] }
 				cellContainerStyle={ styles.setFeaturedButtonCellContainer }
-				separatorType={ 'none' }
+				separatorType="none"
 				onPress={ () =>
 					this.onSetFeatured( MEDIA_ID_NO_FEATURED_IMAGE_SET )
 				}
@@ -629,7 +627,7 @@ export class ImageEdit extends Component {
 				label={ __( 'Set as Featured Image' ) }
 				labelStyle={ setFeaturedButtonStyle }
 				cellContainerStyle={ styles.setFeaturedButtonCellContainer }
-				separatorType={ 'none' }
+				separatorType="none"
 				onPress={ () => this.onSetFeatured( attributes.id ) }
 			/>
 		);

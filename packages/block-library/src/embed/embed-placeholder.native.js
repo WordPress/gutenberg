@@ -125,7 +125,7 @@ const EmbedPlaceholder = ( {
 						</Text>
 						<TouchableOpacity
 							activeOpacity={ 0.5 }
-							accessibilityRole={ 'button' }
+							accessibilityRole="button"
 							accessibilityHint={ __(
 								'Double tap to view embed options.'
 							) }
@@ -155,7 +155,7 @@ const EmbedPlaceholder = ( {
 						</View>
 						<TouchableOpacity
 							activeOpacity={ 0.5 }
-							accessibilityRole={ 'button' }
+							accessibilityRole="button"
 							accessibilityHint={ __(
 								'Double tap to add a link.'
 							) }

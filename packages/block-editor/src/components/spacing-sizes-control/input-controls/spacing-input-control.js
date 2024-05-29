@@ -230,7 +230,7 @@ export default function SpacingInputControl( {
 						label={ ariaLabel }
 						hideLabelFromVision
 						className="spacing-sizes-control__custom-value-input"
-						size={ '__unstable-large' }
+						size="__unstable-large"
 						onDragStart={ () => {
 							if ( value?.charAt( 0 ) === '-' ) {
 								setMinValue( 0 );
@@ -312,7 +312,7 @@ export default function SpacingInputControl( {
 					options={ options }
 					label={ ariaLabel }
 					hideLabelFromVision
-					size={ '__unstable-large' }
+					size="__unstable-large"
 					onMouseOver={ onMouseOver }
 					onMouseOut={ onMouseOut }
 					onFocus={ onMouseOver }

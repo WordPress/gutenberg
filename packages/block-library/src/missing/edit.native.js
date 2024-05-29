@@ -88,7 +88,7 @@ export class UnsupportedBlockEdit extends Component {
 				onPress={ this.onHelpButtonPressed }
 				style={ styles.helpIconContainer }
 				accessibilityLabel={ __( 'Help button' ) }
-				accessibilityRole={ 'button' }
+				accessibilityRole="button"
 				accessibilityHint={ __( 'Tap here to show help' ) }
 			>
 				<Icon
@@ -201,7 +201,7 @@ export class UnsupportedBlockEdit extends Component {
 			<TouchableWithoutFeedback
 				disabled={ ! this.props.isSelected }
 				accessibilityLabel={ __( 'Help button' ) }
-				accessibilityRole={ 'button' }
+				accessibilityRole="button"
 				accessibilityHint={ __( 'Tap here to show help' ) }
 				onPress={ this.toggleSheet }
 			>
