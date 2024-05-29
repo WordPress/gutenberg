@@ -6,6 +6,6 @@ import { MediaUpload } from '@wordpress/media-utils';
 
 addFilter(
 	'editor.MediaUpload',
-	'core/edit-site/components/media-upload',
+	'core/editor/components/media-upload',
 	() => MediaUpload
 );
