@@ -21,6 +21,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as commandsStore } from '@wordpress/commands';
 import { useRef, useEffect } from '@wordpress/element';
 import { useReducedMotion } from '@wordpress/compose';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -190,7 +191,9 @@ export default function DocumentBar() {
 									: undefined
 							}
 						>
-							{ title }
+							{ title
+								? decodeEntities( title )
+								: __( 'No Title' ) }
 						</Text>
 					</motion.div>
 					<span className="editor-document-bar__shortcut">
