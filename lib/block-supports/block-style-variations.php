@@ -9,6 +9,8 @@
 /**
  * Get the class name for this application of this block's variation styles.
  *
+ * @since 6.6.0
+ *
  * @param array  $block     Block object.
  * @param string $variation Slug for the block style variation.
  *
@@ -20,6 +22,8 @@ function gutenberg_get_block_style_variation_class_name( $block, $variation ) {
 
 /**
  * Determines the block style variation names within a CSS class string.
+ *
+ * @since 6.6.0
  *
  * @param string $class_string CSS class string to look for a variation in.
  *
@@ -43,6 +47,8 @@ function gutenberg_get_block_style_variation_name_from_class( $class_string ) {
  * the descendant style to take priority, and this is done by loading it after,
  * in the DOM order. This is why the variation stylesheet generation is in a
  * different filter.
+ *
+ * @since 6.6.0
  *
  * @param array $parsed_block The parsed block.
  *
@@ -125,6 +131,8 @@ function gutenberg_render_block_style_variation_support_styles( $parsed_block ) 
  *
  * @see gutenberg_render_block_style_variation_support_styles
  *
+ * @since 6.6.0
+ *
  * @param  string $block_content Rendered block content.
  * @param  array  $block         Block object.
  *
@@ -166,6 +174,8 @@ function gutenberg_render_block_style_variation_class_name( $block_content, $blo
  * As each block style variation is processed it is registered if it hasn't
  * been already. This registration is required for later sanitization of
  * theme.json data.
+ *
+ * @since 6.6.0
  *
  * @param array $variations Shared block style variations.
  *
@@ -230,6 +240,8 @@ function gutenberg_resolve_and_register_block_style_variations( $variations ) {
  * Merges variations data with existing theme.json data ensuring that the
  * current theme.json data values take precedence.
  *
+ * @since 6.6.0
+ *
  * @param array                        $variations_data Block style variations data keyed by block type.
  * @param WP_Theme_JSON_Data_Gutenberg $theme_json      Current theme.json data.
  * @param string                       $origin          Origin for the theme.json data.
@@ -261,6 +273,8 @@ function gutenberg_merge_block_style_variations_data( $variations_data, $theme_j
  * custom user selections already made will take precedence over the shared
  * style variation value.
  *
+ * @since 6.6.0
+ *
  * @param WP_Theme_JSON_Data_Gutenberg $theme_json Current theme.json data.
  *
  * @return WP_Theme_JSON_Data_Gutenberg
@@ -277,6 +291,8 @@ function gutenberg_resolve_block_style_variations_from_theme_style_variation( $t
  * Merges block style variation data sourced from standalone partial
  * theme.json files.
  *
+ * @since 6.6.0
+ *
  * @param WP_Theme_JSON_Data_Gutenberg $theme_json Current theme.json data.
  *
  * @return WP_Theme_JSON_Data_Gutenberg
@@ -291,6 +307,8 @@ function gutenberg_resolve_block_style_variations_from_theme_json_partials( $the
 /**
  * Merges shared block style variations registered within the
  * `styles.blocks.variations` property of the primary theme.json file.
+ *
+ * @since 6.6.0
  *
  * @param WP_Theme_JSON_Data_Gutenberg $theme_json Current theme.json data.
  *
@@ -309,6 +327,8 @@ function gutenberg_resolve_block_style_variations_from_primary_theme_json( $them
  * style object, under their appropriate block types within theme.json styles.
  * Any variation values defined within the theme.json specific to a block type
  * will take precedence over these shared definitions.
+ *
+ * @since 6.6.0
  *
  * @param WP_Theme_JSON_Data_Gutenberg $theme_json Current theme.json data.
  *
@@ -333,6 +353,8 @@ function gutenberg_resolve_block_style_variations_from_styles_registry( $theme_j
 
 /**
  * Enqueues styles for block style variations.
+ *
+ * @since 6.6.0
  */
 function gutenberg_enqueue_block_style_variation_styles() {
 	wp_enqueue_style( 'block-style-variation-styles' );

@@ -723,6 +723,8 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * related property, e.g. `blockTypes`, it is assumed to be a theme style
 	 * variation.
 	 *
+	 * @since 6.6.0
+	 *
 	 * @param array  $variation Theme.json shaped style variation object.
 	 * @param string $scope     Scope to check e.g. theme, block etc.
 	 *
@@ -794,7 +796,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 *
 	 * @since 6.6.0
 	 *
-	 * @param WP_Theme_JSON_Gutenberg  $theme_json A theme json instance.
+	 * @param WP_Theme_JSON_Gutenberg $theme_json A theme json instance.
 	 * @return array An array of resolved paths.
 	 */
 	public static function get_resolved_theme_uris( $theme_json ) {
@@ -837,7 +839,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 *
 	 * @since 6.6.0
 	 *
-	 * @param WP_Theme_JSON_Gutenberg  $theme_json A theme json instance.
+	 * @param WP_Theme_JSON_Gutenberg $theme_json A theme json instance.
 	 * @return WP_Theme_JSON_Gutenberg Theme merged with resolved paths, if any found.
 	 */
 	public static function resolve_theme_file_uris( $theme_json ) {

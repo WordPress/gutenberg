@@ -3,6 +3,8 @@
 /**
  * Test the block style variations block support.
  *
+ * @since 6.6.0
+ *
  * @package Gutenberg
  */
 

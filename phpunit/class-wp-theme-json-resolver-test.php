@@ -991,6 +991,8 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 	 *
 	 * @dataProvider data_get_style_variations
 	 *
+	 * @since 6.6.0 Added tests for block style variations.
+	 *
 	 * @param string $theme               Name of the theme to use.
 	 * @param string $scope               Scope to filter variations by e.g. theme vs block.
 	 * @param array  $expected_variations Collection of expected variations.
@@ -1009,6 +1011,8 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 
 	/**
 	 * Data provider for test_get_style_variations
+	 *
+	 * @since 6.6.0 Added data provider for testing theme and block style variations.
 	 *
 	 * @return array
 	 */

@@ -817,6 +817,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @since 5.8.0
 	 * @since 5.9.0 Added the `$valid_block_names` and `$valid_element_name` parameters.
+	 * @since 6.6.0 Extended schema definition to allow enhanced block style variations.
 	 *
 	 * @param array $input               Structure to sanitize.
 	 * @param array $valid_block_names   List of valid block names.
@@ -1033,6 +1034,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 5.8.0
 	 * @since 5.9.0 Added `duotone` key with CSS selector.
 	 * @since 6.1.0 Added `features` key with block support feature level selectors.
+	 * @since 6.6.0 Added non-core block style variations to generated metadata.
 	 *
 	 * @return array Block metadata.
 	 */
@@ -1220,6 +1222,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @since 5.8.0
 	 * @since 5.9.0 Removed the `$type` parameter`, added the `$types` and `$origins` parameters.
+	 * @since 6.6.0 Added option to skip root layout styles.
 	 *
 	 * @param array $types   Types of styles to load. Will load all by default. It accepts:
 	 *                       - `variables`: only the CSS Custom Properties for presets & custom ones.
@@ -3218,6 +3221,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * Removes insecure data from theme.json.
 	 *
 	 * @since 5.9.0
+	 * @since 6.6.0 Added support for block style variation element styles.
 	 *
 	 * @param array $theme_json Structure to sanitize.
 	 * @return array Sanitized structure.
