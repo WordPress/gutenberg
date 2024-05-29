@@ -3,67 +3,6 @@
 }
 
 .edit-site-sidebar-navigation-screen-navigation-menus__content {
-	.offcanvas-editor-list-view-leaf {
-		max-width: calc(100% - #{ $grid-unit-05 });
-		border-radius: $radius-block-ui;
-		&:hover,
-		&:focus,
-		&[aria-current] {
-			background: $gray-800;
-		}
-		.block-editor-list-view-block__menu {
-			margin-left: -$grid-unit-10;
-		}
-		&.is-selected {
-			> td {
-				background: transparent;
-			}
-
-			.block-editor-list-view-block-contents {
-				color: inherit;
-			}
-
-			&:not(:hover) {
-				.block-editor-list-view-block__menu {
-					opacity: 0;
-				}
-			}
-
-			&:hover,
-			&:focus {
-				color: $white;
-
-				.block-editor-list-view-block__menu-cell {
-					opacity: 1;
-				}
-			}
-
-			.block-editor-list-view-block__menu {
-				opacity: 1;
-
-				&:focus {
-					box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-				}
-			}
-		}
-
-		.block-editor-list-view-block-contents {
-			&:focus {
-				&::after {
-					box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-				}
-			}
-		}
-
-		&.is-branch-selected:not(.is-selected):not(.is-synced-branch) {
-			background: transparent;
-
-			&:hover {
-				background: $gray-800;
-			}
-		}
-	}
-
 	.block-editor-list-view-leaf .block-editor-list-view-block__contents-cell {
 		width: 100%;
 	}

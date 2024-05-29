@@ -33,25 +33,69 @@ function _gutenberg_add_enhanced_pagination_to_query_block( $parsed_block ) {
 add_filter( 'render_block_data', '_gutenberg_add_enhanced_pagination_to_query_block' );
 
 /**
- * Add directives to all links.
+ * Adds client-side navigation directives to BODY tag.
  *
  * Note: This should probably be done per site, not by default when this option is enabled.
  *
- * @param array $content The block content.
+ * @param string $response_body The response body.
  *
- * @return array The same block content with the directives needed.
+ * @return string The rendered template with modified BODY attributes.
  */
-function _gutenberg_add_client_side_navigation_directives( $content ) {
-	$p = new WP_HTML_Tag_Processor( $content );
-	// Hack to add the necessary directives to the body tag.
-	// TODO: Find a proper way to add directives to the body tag.
-	static $body_interactive_added;
-	if ( ! $body_interactive_added ) {
-		$body_interactive_added = true;
-		return (string) $p . '<body data-wp-interactive="core/experimental" data-wp-context="{}">';
+function _gutenberg_add_client_side_navigation_directives( $response_body ) {
+	$is_html_content_type = false;
+	foreach ( headers_list() as $header ) {
+		$header_parts = preg_split( '/\s*[:;]\s*/', strtolower( $header ) );
+		if ( count( $header_parts ) >= 2 && 'content-type' === $header_parts[0] ) {
+			$is_html_content_type = in_array( $header_parts[1], array( 'text/html', 'application/xhtml+xml' ), true );
+		}
 	}
-	return (string) $p;
+	if ( ! $is_html_content_type ) {
+		return $response_body;
+	}
+
+	$p = new WP_HTML_Tag_Processor( $response_body );
+	if ( $p->next_tag( array( 'tag_name' => 'BODY' ) ) ) {
+		$p->set_attribute( 'data-wp-interactive', 'core/experimental' );
+		$p->set_attribute( 'data-wp-context', '{}' );
+		$response_body = $p->get_updated_html();
+	}
+	return $response_body;
 }
 
 // TODO: Explore moving this to the server directive processing.
-add_filter( 'render_block', '_gutenberg_add_client_side_navigation_directives' );
+add_filter( 'gutenberg_template_output_buffer', '_gutenberg_add_client_side_navigation_directives' );
+
+/**
+ * Starts output buffering at the end of the 'template_include' filter.
+ *
+ * This is to implement #43258 in core.
+ *
+ * This is a hack which would eventually be replaced with something like this in wp-includes/template-loader.php:
+ *
+ *          $template = apply_filters( 'template_include', $template );
+ *     +    ob_start( 'wp_template_output_buffer_callback' );
+ *          if ( $template ) {
+ *              include $template;
+ *          } elseif ( current_user_can( 'switch_themes' ) ) {
+ *
+ * @link https://core.trac.wordpress.org/ticket/43258
+ *
+ * @param string $passthrough Value for the template_include filter which is passed through.
+ *
+ * @return string Unmodified value of $passthrough.
+ */
+function _gutenberg_buffer_template_output( string $passthrough ): string {
+	ob_start(
+		static function ( string $output ): string {
+			/**
+			 * Filters the template output buffer prior to sending to the client.
+			 *
+			 * @param string $output Output buffer.
+			 * @return string Filtered output buffer.
+			 */
+			return (string) apply_filters( 'gutenberg_template_output_buffer', $output );
+		}
+	);
+	return $passthrough;
+}
+add_filter( 'template_include', '_gutenberg_buffer_template_output', PHP_INT_MAX );
