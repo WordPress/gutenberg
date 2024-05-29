@@ -1189,11 +1189,24 @@ Undocumented declaration.
 
 ### PostSticky
 
-Undocumented declaration.
+Renders the PostSticky component. It provide toggle control for the sticky post feature.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### PostStickyCheck
 
-Undocumented declaration.
+Wrapper component that renders its children only if post has a sticky action.
+
+_Parameters_
+
+-   _props_ `Object`: Props.
+-   _props.children_ `Element`: Children to be rendered.
+
+_Returns_
+
+-   `Component`: The component to be rendered or null if post type is not 'post' or hasStickyAction is false.
 
 ### PostSwitchToDraftButton
 
