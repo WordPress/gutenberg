@@ -137,7 +137,6 @@ function Layout( { initialPost } ) {
 	const isWideViewport = useViewportMatch( 'large' );
 	const isLargeViewport = useViewportMatch( 'medium' );
 
-	const { closeGeneralSidebar } = useDispatch( editPostStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const {
 		mode,
@@ -244,22 +243,6 @@ function Layout( { initialPost } ) {
 		? __( 'Document Overview' )
 		: __( 'Block Library' );
 
-	const secondarySidebar = () => {
-		if ( mode === 'visual' && isInserterOpened ) {
-			return (
-				<InserterSidebar
-					closeGeneralSidebar={ closeGeneralSidebar }
-					isRightSidebarOpen={ sidebarIsOpened }
-				/>
-			);
-		}
-		if ( mode === 'visual' && isListViewOpened ) {
-			return <ListViewSidebar />;
-		}
-
-		return null;
-	};
-
 	function onPluginAreaError( name ) {
 		createErrorNotice(
 			sprintf(
@@ -351,7 +334,11 @@ function Layout( { initialPost } ) {
 					/>
 				}
 				editorNotices={ <EditorNotices /> }
-				secondarySidebar={ secondarySidebar() }
+				secondarySidebar={
+					mode === 'visual' &&
+					( ( isInserterOpened && <InserterSidebar /> ) ||
+						( isListViewOpened && <ListViewSidebar /> ) )
+				}
 				sidebar={
 					! isDistractionFree && (
 						<ComplementaryArea.Slot scope="core" />
