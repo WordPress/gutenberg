@@ -24,8 +24,6 @@ export const INDETERMINATE_TRACK_WIDTH = 50;
 export const Track = styled.div`
 	position: relative;
 	overflow: hidden;
-	width: 100%;
-	max-width: 160px;
 	height: ${ CONFIG.borderWidthFocus };
 	/* Text color at 10% opacity */
 	background-color: color-mix(
@@ -38,6 +36,10 @@ export const Track = styled.div`
 	// Windows high contrast mode.
 	outline: 2px solid transparent;
 	outline-offset: 2px;
+
+	:where( & ) {
+		width: 160px;
+	}
 `;
 
 export const Indicator = styled.div< {
