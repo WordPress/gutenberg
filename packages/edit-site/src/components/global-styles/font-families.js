@@ -5,11 +5,13 @@ import { __ } from '@wordpress/i18n';
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalVStack as VStack,
-	__experimentalHStack as HStack,
 	Button,
 } from '@wordpress/components';
+<<<<<<< HEAD
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { settings } from '@wordpress/icons';
+=======
+>>>>>>> 72a59c77a0 (Replace Manage fonts icon button with visible text button.)
 import { useContext } from '@wordpress/element';
 
 /**
@@ -51,24 +53,31 @@ function FontFamilies() {
 			) }
 
 			<VStack spacing={ 2 }>
-				<HStack justify="space-between">
-					<Subtitle level={ 3 }>{ __( 'Fonts' ) }</Subtitle>
-					<Button
-						onClick={ () => setModalTabOpen( 'installed-fonts' ) }
-						label={ __( 'Manage fonts' ) }
-						icon={ settings }
-						size="small"
-					/>
-				</HStack>
+				<Subtitle level={ 3 }>{ __( 'Fonts' ) }</Subtitle>
 				{ hasFonts ? (
-					<ItemGroup isBordered isSeparated>
-						{ customFonts.map( ( font ) => (
-							<FontFamilyItem key={ font.slug } font={ font } />
-						) ) }
-						{ themeFonts.map( ( font ) => (
-							<FontFamilyItem key={ font.slug } font={ font } />
-						) ) }
-					</ItemGroup>
+					<>
+						<ItemGroup isBordered isSeparated>
+							{ customFonts.map( ( font ) => (
+								<FontFamilyItem
+									key={ font.slug }
+									font={ font }
+								/>
+							) ) }
+							{ themeFonts.map( ( font ) => (
+								<FontFamilyItem
+									key={ font.slug }
+									font={ font }
+								/>
+							) ) }
+						</ItemGroup>
+						<Button
+							className="edit-site-global-styles-font-families__manage-fonts"
+							variant="secondary"
+							onClick={ () => setModalTabOpen( 'installed-fonts' ) }
+						>
+							{ __( 'Manage fonts' ) }
+						</Button>
+					</>
 				) : (
 					<>
 						{ __( 'No fonts installed.' ) }
