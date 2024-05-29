@@ -63,7 +63,7 @@ export default function PatternsHeader( {
 				justify="space-between"
 				className="edit-site-patterns__title"
 			>
-				<Heading as="h2" level={ 3 } id={ titleId }>
+				<Heading as="h2" level={ 3 } id={ titleId } weight={ 500 }>
 					{ title }
 				</Heading>
 				<HStack expanded={ false }>
