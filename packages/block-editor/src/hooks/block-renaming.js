@@ -46,6 +46,14 @@ export function addLabelCallback( settings ) {
 }
 
 function BlockRenameControlPure( { metadata, setAttributes } ) {
+	const customName = metadata?.name;
+	const hasPatternOverrides =
+		!! customName &&
+		!! metadata?.bindings &&
+		Object.values( metadata.bindings ).some(
+			( binding ) => binding.source === 'core/pattern-overrides'
+		);
+
 	return (
 		<InspectorControls group="advanced">
 			<TextControl
@@ -58,6 +66,14 @@ function BlockRenameControlPure( { metadata, setAttributes } ) {
 						metadata: { ...metadata, name: newName },
 					} );
 				} }
+				disabled={ hasPatternOverrides }
+				help={
+					hasPatternOverrides
+						? __(
+								'This block allows overrides. Changing the name can cause problems with content entered into instances of this pattern.'
+						  )
+						: null
+				}
 			/>
 		</InspectorControls>
 	);
