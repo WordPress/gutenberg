@@ -87,7 +87,6 @@ export default function PostFormat() {
 			<div className="editor-post-format">
 				<RadioControl
 					className="editor-post-format__options"
-					__nextHasNoMarginBottom
 					label={ __( 'Post Format' ) }
 					selected={ postFormat }
 					onChange={ ( format ) => onUpdatePostFormat( format ) }
