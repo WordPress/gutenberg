@@ -1242,7 +1242,11 @@ _Returns_
 
 ### PostTextEditor
 
-Undocumented declaration.
+Displays the Post Text Editor along with content in Visual and Text mode.
+
+_Returns_
+
+-   `JSX.Element|null`: The rendered PostTextEditor component.
 
 ### PostTitle
 
