@@ -396,10 +396,11 @@ class MediaUpload extends Component {
 
 	onClose() {
 		const { onClose } = this.props;
-
 		if ( onClose ) {
 			onClose();
 		}
+
+		this.isModalOpen = false;
 	}
 
 	updateCollection() {
@@ -421,6 +422,10 @@ class MediaUpload extends Component {
 	}
 
 	openModal() {
+		if ( this.isModalOpen ) {
+			return;
+		}
+
 		const {
 			allowedTypes,
 			gallery = false,
@@ -454,6 +459,7 @@ class MediaUpload extends Component {
 		}
 		this.initializeListeners();
 		this.frame.open();
+		this.isModalOpen = true;
 	}
 
 	render() {
