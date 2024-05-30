@@ -52,11 +52,9 @@ export default function InspectorControlsFill( {
 	return (
 		<>
 			<Fill { ...props }>
-				{
-					<BottomSheetConsumer>
-						{ () => <View>{ children }</View> }
-					</BottomSheetConsumer>
-				}
+				<BottomSheetConsumer>
+					{ () => <View>{ children }</View> }
+				</BottomSheetConsumer>
 			</Fill>
 			{ Children.count( children ) > 0 && <BlockSettingsButton /> }
 		</>

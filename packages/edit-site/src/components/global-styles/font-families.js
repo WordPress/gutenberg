@@ -7,7 +7,6 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 	Button,
-	Tooltip,
 } from '@wordpress/components';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { settings } from '@wordpress/icons';
@@ -54,18 +53,12 @@ function FontFamilies() {
 			<VStack spacing={ 2 }>
 				<HStack justify="space-between">
 					<Subtitle level={ 3 }>{ __( 'Fonts' ) }</Subtitle>
-					<HStack justify="flex-end">
-						<Tooltip text={ __( 'Manage fonts' ) }>
-							<Button
-								onClick={ () =>
-									setModalTabOpen( 'installed-fonts' )
-								}
-								aria-label={ __( 'Manage fonts' ) }
-								icon={ settings }
-								size={ 'small' }
-							/>
-						</Tooltip>
-					</HStack>
+					<Button
+						onClick={ () => setModalTabOpen( 'installed-fonts' ) }
+						label={ __( 'Manage fonts' ) }
+						icon={ settings }
+						size="small"
+					/>
 				</HStack>
 				{ hasFonts ? (
 					<ItemGroup isBordered isSeparated>

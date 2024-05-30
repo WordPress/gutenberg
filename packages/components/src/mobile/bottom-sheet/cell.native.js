@@ -272,7 +272,7 @@ class BottomSheetCell extends Component {
 				<Text
 					style={ textStyle }
 					numberOfLines={ 1 }
-					ellipsizeMode={ 'middle' }
+					ellipsizeMode="middle"
 				>
 					{ value }
 				</Text>
@@ -419,7 +419,7 @@ class BottomSheetCell extends Component {
 						{ customActionButton && (
 							<TouchableOpacity
 								onPress={ handler }
-								accessibilityRole={ 'button' }
+								accessibilityRole="button"
 							>
 								<Text style={ resetButtonStyle }>
 									{ title }

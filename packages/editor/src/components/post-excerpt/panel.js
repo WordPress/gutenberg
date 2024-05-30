@@ -79,6 +79,11 @@ function ExcerptPanel() {
 	);
 }
 
+/**
+ * Is rendered if the post type supports excerpts and allows editing the excerpt.
+ *
+ * @return {JSX.Element} The rendered PostExcerptPanel component.
+ */
 export default function PostExcerptPanel() {
 	return (
 		<PostExcerptCheck>

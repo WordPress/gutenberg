@@ -6,7 +6,8 @@
 	}
 }
 
-.editor-change-status__password-fieldset {
+.editor-change-status__password-fieldset,
+.editor-change-status__publish-date-wrapper {
 	border-top: $border-width solid $gray-200;
 	padding-top: $grid-unit-20;
 }

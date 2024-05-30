@@ -15,7 +15,7 @@ import {
 	__experimentalVStack as VStack,
 	Flex,
 	Notice,
-	privateApis as componentsPrivateApis,
+	ProgressBar,
 } from '@wordpress/components';
 import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
@@ -27,7 +27,6 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../../lock-unlock';
 import { FontLibraryContext } from './context';
 import FontCard from './font-card';
 import LibraryFontVariant from './library-font-variant';
@@ -35,7 +34,6 @@ import { sortFontFaces } from './utils/sort-font-faces';
 import { setUIValuesNeeded } from './utils';
 
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
-const { ProgressBar } = unlock( componentsPrivateApis );
 
 function InstalledFonts() {
 	const {
@@ -191,9 +189,7 @@ function InstalledFonts() {
 												>
 													<FontCard
 														font={ font }
-														navigatorPath={
-															'/fontFamily'
-														}
+														navigatorPath="/fontFamily"
 														variantsText={ getFontCardVariantsText(
 															font
 														) }
@@ -230,9 +226,7 @@ function InstalledFonts() {
 												>
 													<FontCard
 														font={ font }
-														navigatorPath={
-															'/fontFamily'
-														}
+														navigatorPath="/fontFamily"
 														variantsText={ getFontCardVariantsText(
 															font
 														) }

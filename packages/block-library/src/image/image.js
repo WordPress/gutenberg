@@ -499,13 +499,21 @@ export default function Image( {
 		[ clientId, isSingleSelected, metadata?.bindings ]
 	);
 
+	const showUrlInput =
+		isSingleSelected &&
+		! isEditingImage &&
+		! lockHrefControls &&
+		! lockUrlControls;
+
+	const showCoverControls = isSingleSelected && canInsertCover;
+
+	const showBlockControls = showUrlInput || allowCrop || showCoverControls;
+
 	const controls = (
 		<>
-			<BlockControls group="block">
-				{ isSingleSelected &&
-					! isEditingImage &&
-					! lockHrefControls &&
-					! lockUrlControls && (
+			{ showBlockControls && (
+				<BlockControls group="block">
+					{ showUrlInput && (
 						<ImageURLInputUI
 							url={ href || '' }
 							onChangeUrl={ onSetHref }
@@ -521,21 +529,22 @@ export default function Image( {
 							resetLightbox={ resetLightbox }
 						/>
 					) }
-				{ allowCrop && (
-					<ToolbarButton
-						onClick={ () => setIsEditingImage( true ) }
-						icon={ crop }
-						label={ __( 'Crop' ) }
-					/>
-				) }
-				{ isSingleSelected && canInsertCover && (
-					<ToolbarButton
-						icon={ overlayText }
-						label={ __( 'Add text over image' ) }
-						onClick={ switchToCover }
-					/>
-				) }
-			</BlockControls>
+					{ allowCrop && (
+						<ToolbarButton
+							onClick={ () => setIsEditingImage( true ) }
+							icon={ crop }
+							label={ __( 'Crop' ) }
+						/>
+					) }
+					{ showCoverControls && (
+						<ToolbarButton
+							icon={ overlayText }
+							label={ __( 'Add text over image' ) }
+							onClick={ switchToCover }
+						/>
+					) }
+				</BlockControls>
+			) }
 			{ isSingleSelected && ! isEditingImage && ! lockUrlControls && (
 				<BlockControls group="other">
 					<MediaReplaceFlow
@@ -597,7 +606,14 @@ export default function Image( {
 										<>{ lockAltControlsMessage }</>
 									) : (
 										<>
-											<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+											<ExternalLink
+												href={
+													// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
+													__(
+														'https://www.w3.org/WAI/tutorials/images/decision-tree/'
+													)
+												}
+											>
 												{ __(
 													'Describe the purpose of the image.'
 												) }
@@ -684,7 +700,14 @@ export default function Image( {
 										<>{ lockAltControlsMessage }</>
 									) : (
 										<>
-											<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+											<ExternalLink
+												href={
+													// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
+													__(
+														'https://www.w3.org/WAI/tutorials/images/decision-tree/'
+													)
+												}
+											>
 												{ __(
 													'Describe the purpose of the image.'
 												) }
