@@ -1344,48 +1344,6 @@ test.describe( 'Block bindings', () => {
 				await expect( newEmptyParagraph ).toBeEditable();
 			} );
 
-			test( 'should be possible to edit the value of the custom field from the paragraph', async ( {
-				editor,
-			} ) => {
-				await editor.insertBlock( {
-					name: 'core/paragraph',
-					attributes: {
-						anchor: 'paragraph-binding',
-						content: 'paragraph default content',
-						metadata: {
-							bindings: {
-								content: {
-									source: 'core/post-meta',
-									args: { key: 'text_custom_field' },
-								},
-							},
-						},
-					},
-				} );
-				const paragraphBlock = editor.canvas.getByRole( 'document', {
-					name: 'Block: Paragraph',
-				} );
-
-				await expect( paragraphBlock ).toHaveText(
-					'Value of the text_custom_field'
-				);
-				await expect( paragraphBlock ).toHaveAttribute(
-					'contenteditable',
-					'true'
-				);
-				await paragraphBlock.fill( 'new value' );
-				// Check that the paragraph content attribute didn't change.
-				const [ paragraphBlockObject ] = await editor.getBlocks();
-				expect( paragraphBlockObject.attributes.content ).toBe(
-					'paragraph default content'
-				);
-				// Check the value of the custom field is being updated by visiting the frontend.
-				const previewPage = await editor.openPreviewPage();
-				await expect(
-					previewPage.locator( '#paragraph-binding' )
-				).toHaveText( 'new value' );
-			} );
-
 			test( 'should NOT be possible to edit the value of the custom field when it is protected', async ( {
 				editor,
 			} ) => {
@@ -2004,6 +1962,208 @@ test.describe( 'Block bindings', () => {
 					'title',
 					'default title value'
 				);
+			} );
+		} );
+
+		test.describe( 'Edit custom fields', () => {
+			test( 'should be possible to edit the value of the custom field from the paragraph', async ( {
+				editor,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						anchor: 'paragraph-binding',
+						content: 'paragraph default content',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/post-meta',
+									args: { key: 'text_custom_field' },
+								},
+							},
+						},
+					},
+				} );
+				const paragraphBlock = editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} );
+
+				await expect( paragraphBlock ).toHaveAttribute(
+					'contenteditable',
+					'true'
+				);
+				await paragraphBlock.fill( 'new value' );
+				// Check that the paragraph content attribute didn't change.
+				const [ paragraphBlockObject ] = await editor.getBlocks();
+				expect( paragraphBlockObject.attributes.content ).toBe(
+					'paragraph default content'
+				);
+				// Check the value of the custom field is being updated by visiting the frontend.
+				const previewPage = await editor.openPreviewPage();
+				await expect(
+					previewPage.locator( '#paragraph-binding' )
+				).toHaveText( 'new value' );
+			} );
+
+			test( 'should be possible to edit the value of the url custom field from the button', async ( {
+				editor,
+				page,
+				pageUtils,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/buttons',
+					innerBlocks: [
+						{
+							name: 'core/button',
+							attributes: {
+								anchor: 'button-url-binding',
+								text: 'button default text',
+								url: '#default-url',
+								metadata: {
+									bindings: {
+										url: {
+											source: 'core/post-meta',
+											args: { key: 'url_custom_field' },
+										},
+									},
+								},
+							},
+						},
+					],
+				} );
+
+				// Edit the url.
+				const buttonBlock = editor.canvas
+					.getByRole( 'document', {
+						name: 'Block: Button',
+						exact: true,
+					} )
+					.getByRole( 'textbox' );
+				await buttonBlock.click();
+				await page
+					.getByRole( 'button', { name: 'Edit link', exact: true } )
+					.click();
+				await page
+					.getByPlaceholder( 'Search or type url' )
+					.fill( '#url-custom-field-modified' );
+				await pageUtils.pressKeys( 'Enter' );
+
+				// Check that the button url attribute didn't change.
+				const [ buttonsObject ] = await editor.getBlocks();
+				expect( buttonsObject.innerBlocks[ 0 ].attributes.url ).toBe(
+					'#default-url'
+				);
+				// Check the value of the custom field is being updated by visiting the frontend.
+				const previewPage = await editor.openPreviewPage();
+				await expect(
+					previewPage.locator( '#button-url-binding a' )
+				).toHaveAttribute( 'href', '#url-custom-field-modified' );
+			} );
+
+			test( 'should be possible to edit the value of the url custom field from the image', async ( {
+				editor,
+				page,
+				pageUtils,
+				requestUtils,
+			} ) => {
+				const customFieldMedia = await requestUtils.uploadMedia(
+					path.join(
+						'./test/e2e/assets',
+						'1024x768_e2e_test_image_size.jpeg'
+					)
+				);
+				imageCustomFieldSrc = customFieldMedia.source_url;
+
+				await editor.insertBlock( {
+					name: 'core/image',
+					attributes: {
+						anchor: 'image-url-binding',
+						url: imagePlaceholderSrc,
+						alt: 'default alt value',
+						title: 'default title value',
+						metadata: {
+							bindings: {
+								url: {
+									source: 'core/post-meta',
+									args: { key: 'url_custom_field' },
+								},
+							},
+						},
+					},
+				} );
+
+				// Edit image url.
+				await page
+					.getByRole( 'toolbar', { name: 'Block tools' } )
+					.getByRole( 'button', {
+						name: 'Replace',
+					} )
+					.click();
+				await page
+					.getByRole( 'button', { name: 'Edit link', exact: true } )
+					.click();
+				await page
+					.getByPlaceholder( 'Search or type url' )
+					.fill( imageCustomFieldSrc );
+				await pageUtils.pressKeys( 'Enter' );
+
+				// Check that the image url attribute didn't change and still uses the placeholder.
+				const [ imageBlockObject ] = await editor.getBlocks();
+				expect( imageBlockObject.attributes.url ).toBe(
+					imagePlaceholderSrc
+				);
+
+				// Check the value of the custom field is being updated by visiting the frontend.
+				const previewPage = await editor.openPreviewPage();
+				await expect(
+					previewPage.locator( '#image-url-binding img' )
+				).toHaveAttribute( 'src', imageCustomFieldSrc );
+			} );
+
+			test( 'should be possible to edit the value of the text custom field from the image alt', async ( {
+				editor,
+				page,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/image',
+					attributes: {
+						anchor: 'image-alt-binding',
+						url: imagePlaceholderSrc,
+						alt: 'default alt value',
+						metadata: {
+							bindings: {
+								alt: {
+									source: 'core/post-meta',
+									args: { key: 'text_custom_field' },
+								},
+							},
+						},
+					},
+				} );
+				const imageBlockImg = editor.canvas
+					.getByRole( 'document', {
+						name: 'Block: Image',
+					} )
+					.locator( 'img' );
+				await imageBlockImg.click();
+
+				// Edit the custom field value in the alt textarea.
+				const altInputArea = page
+					.getByRole( 'tabpanel', { name: 'Settings' } )
+					.getByLabel( 'Alternative text' );
+				await expect( altInputArea ).not.toHaveAttribute( 'readonly' );
+				await altInputArea.fill( 'new value' );
+
+				// Check that the image alt attribute didn't change.
+				const [ imageBlockObject ] = await editor.getBlocks();
+				expect( imageBlockObject.attributes.alt ).toBe(
+					'default alt value'
+				);
+				// Check the value of the custom field is being updated by visiting the frontend.
+				const previewPage = await editor.openPreviewPage();
+				await expect(
+					previewPage.locator( '#image-alt-binding img' )
+				).toHaveAttribute( 'alt', 'new value' );
 			} );
 		} );
 	} );
