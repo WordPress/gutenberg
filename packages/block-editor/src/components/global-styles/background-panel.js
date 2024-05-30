@@ -426,6 +426,7 @@ function BackgroundSizeToolsPanelItem( {
 	const updateBackgroundSize = ( next ) => {
 		// When switching to 'contain' toggle the repeat off.
 		let nextRepeat = repeatValue;
+		let nextPosition = positionValue;
 
 		if ( next === 'contain' ) {
 			nextRepeat = 'no-repeat';
@@ -441,7 +442,15 @@ function BackgroundSizeToolsPanelItem( {
 			next === 'auto'
 		) {
 			nextRepeat = undefined;
-			next = !! style?.background?.backgroundImage?.id ? '50%' : next;
+			/*
+			 * A background image uploaded and set in the editor (an image with a record id),
+			 * receives a default background position of '50% 0',
+			 * when the toggle switches to "Tile". This is to increase the chance that
+			 * the image's focus point is visible.
+			 */
+			if ( !! style?.background?.backgroundImage?.id ) {
+				nextPosition = '50% 0';
+			}
 		}
 
 		/*
@@ -455,6 +464,7 @@ function BackgroundSizeToolsPanelItem( {
 		onChange(
 			setImmutably( style, [ 'background' ], {
 				...style?.background,
+				backgroundPosition: nextPosition,
 				backgroundRepeat: nextRepeat,
 				backgroundSize: next,
 			} )
