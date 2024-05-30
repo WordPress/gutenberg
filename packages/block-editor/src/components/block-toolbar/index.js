@@ -37,7 +37,7 @@ import NavigableToolbar from '../navigable-toolbar';
 import Shuffle from './shuffle';
 import BlockBindingsIndicator from '../block-bindings-toolbar-indicator';
 import { useHasBlockToolbar } from './use-has-block-toolbar';
-import { canBindBlock } from '../../hooks/use-bindings-attributes';
+import { canBindBlock } from '../../utils/bindings';
 /**
  * Renders the block toolbar.
  *

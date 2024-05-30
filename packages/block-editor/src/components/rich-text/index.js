@@ -39,7 +39,7 @@ import { getAllowedFormats } from './utils';
 import { Content, valueToHTMLString } from './content';
 import { withDeprecations } from './with-deprecations';
 import { unlock } from '../../lock-unlock';
-import { canBindBlock } from '../../hooks/use-bindings-attributes';
+import { canBindBlock } from '../../utils/bindings';
 import BlockContext from '../block-context';
 
 export const keyboardShortcutContext = createContext();
