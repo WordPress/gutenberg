@@ -71,17 +71,17 @@ export default function PostSummary( { onActionPerformed } ) {
 									<VStack spacing={ 1 }>
 										<PostStatusPanel />
 										<PostSchedulePanel />
-										<PostTemplatePanel />
 										<PostURLPanel />
 										<PostAuthorPanel />
+										<PostTemplatePanel />
 										<PostDiscussionPanel />
 										<PostSyncStatus />
 										<BlogTitle />
 										<PostsPerPage />
 										<SiteDiscussion />
+										<PostFormatPanel />
+										<PostStickyPanel />
 									</VStack>
-									<PostStickyPanel />
-									<PostFormatPanel />
 									<TemplateAreas />
 									{ fills }
 								</VStack>

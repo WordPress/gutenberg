@@ -303,7 +303,7 @@ export function PositionPanelPure( {
 							onChange={ ( { selectedItem } ) => {
 								onChangeType( selectedItem.value );
 							} }
-							size={ '__unstable-large' }
+							size="__unstable-large"
 						/>
 					</BaseControl>
 				</InspectorControls>

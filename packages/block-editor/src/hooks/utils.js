@@ -595,6 +595,7 @@ export function createBlockListBlockFilter( features ) {
 							// function reference.
 							setAllWrapperProps={ setAllWrapperProps }
 							name={ props.name }
+							clientId={ props.clientId }
 							// This component is pure, so only pass needed
 							// props!!!
 							{ ...neededProps }

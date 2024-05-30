@@ -1,9 +1,4 @@
 .wp-block-latest-posts {
-	padding-left: 2.5em;
-	&.is-grid {
-		padding-left: 0;
-	}
-
 	// Apply overflow for post items, so any floated featured images won't crop the focus style.
 	> li {
 		overflow: hidden;
@@ -14,10 +9,6 @@
 	display: inline;
 }
 
-.edit-post-visual-editor .wp-block-latest-posts.is-grid li {
-	margin-bottom: 20px;
-}
-
 .editor-latest-posts-image-alignment-control {
 	.components-base-control__label {
 		display: block;
@@ -25,5 +16,15 @@
 
 	.components-toolbar {
 		border-radius: $radius-block-ui;
+	}
+}
+
+:root :where(.wp-block-latest-posts) {
+	padding-left: 2.5em;
+}
+:root {
+	:where(.wp-block-latest-posts.is-grid),
+	:where(.wp-block-latest-posts__list) {
+		padding-left: 0;
 	}
 }

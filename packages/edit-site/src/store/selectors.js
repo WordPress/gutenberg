@@ -126,7 +126,7 @@ export function getHomeTemplateId() {
  *
  * @param {Object} state Global application state.
  *
- * @return {TemplateType?} Template type.
+ * @return {?TemplateType} Template type.
  */
 export function getEditedPostType( state ) {
 	return state.editedPost.postType;
@@ -137,7 +137,7 @@ export function getEditedPostType( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @return {string?} Post ID.
+ * @return {?string} Post ID.
  */
 export function getEditedPostId( state ) {
 	return state.editedPost.id;
