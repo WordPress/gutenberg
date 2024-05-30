@@ -14,6 +14,7 @@ test.describe( 'Columns', () => {
 
 	test( 'restricts all blocks inside the columns block', async ( {
 		page,
+		pageUtils,
 		editor,
 	} ) => {
 		// Open Columns
@@ -39,11 +40,12 @@ test.describe( 'Columns', () => {
 			.click();
 
 		// Verify Column
-		const inserterOptions = page.locator(
-			'role=region[name="Block Library"i] >> role=option'
-		);
-		await expect( inserterOptions ).toHaveCount( 1 );
-		await expect( inserterOptions ).toHaveText( 'Column' );
+		const columnOption = page.getByRole( 'option', {
+			name: 'Column',
+			exact: true,
+		} );
+		await pageUtils.pressKeys( 'Tab', { times: 2 } );
+		await expect( columnOption ).toBeFocused();
 	} );
 
 	test( 'prevent the removal of locked column block from the column count change UI', async ( {
