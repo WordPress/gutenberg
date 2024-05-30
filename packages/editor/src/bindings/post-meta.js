@@ -24,9 +24,10 @@ export default {
 	},
 	setValue( { registry, context, args, value } ) {
 		const postId =
-			context.postId || registry.select( editorStore ).getCurrentPostId();
+			context?.postId ||
+			registry.select( editorStore ).getCurrentPostId();
 		const postType =
-			context.postType ||
+			context?.postType ||
 			registry.select( editorStore ).getCurrentPostType();
 		registry
 			.dispatch( coreDataStore )
@@ -36,13 +37,11 @@ export default {
 				},
 			} );
 	},
-	lockAttributesEditing( { select, context = {}, args } ) {
-		const postId = context.postId
-			? context.postId
-			: select( editorStore ).getCurrentPostId();
-		const postType = context.postType
-			? context.postType
-			: select( editorStore ).getCurrentPostType();
+	lockAttributesEditing( { select, context, args } ) {
+		const postId =
+			context?.postId || select( editorStore ).getCurrentPostId();
+		const postType =
+			context?.postType || select( editorStore ).getCurrentPostType();
 
 		// Check that editing is happening in the post editor and not a template.
 		if ( postType === 'wp_template' ) {
