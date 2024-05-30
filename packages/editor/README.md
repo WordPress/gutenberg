@@ -1271,7 +1271,16 @@ _Returns_
 
 ### PostTrashCheck
 
-Undocumented declaration.
+Wrapper component that renders its children only if the post can trashed.
+
+_Parameters_
+
+-   _props_ `Object`: - The component props.
+-   _props.children_ `Element`: - The child components to render.
+
+_Returns_
+
+-   `Component|null`: The rendered child components or null if the post can not trashed.
 
 ### PostTypeSupportCheck
 
