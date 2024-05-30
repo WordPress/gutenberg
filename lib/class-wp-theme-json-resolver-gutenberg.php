@@ -608,13 +608,8 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			return $result;
 		}
 
-		$theme_data = static::get_theme_data();
-		$result->merge( $theme_data );
+		$result->merge( static::get_theme_data() );
 		if ( 'theme' === $origin ) {
-			// Since theme.json version 3, spacingSizes are generated in (WP_Theme_JSON_Gutenberg) $theme_json->merge().
-			if ( $theme_data->get_raw_data()['version'] < 3 ) {
-				$result->set_spacing_sizes( $origin );
-			}
 			return $result;
 		}
 

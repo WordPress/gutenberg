@@ -824,8 +824,14 @@ class WP_Theme_JSON_Gutenberg {
 		/*
 		 * Prior to version 3, spacingSizes were generated in WP_Theme_JSON_Resolver_Gutenberg::get_merged_data().
 		 *
-		 * It's important to use the original $theme_json here because WP_Theme_JSON_Schema_Gutenberg::migrate()
-		 * has already updated the version to latest for $this->theme_json.
+		 * It's important to use the original $theme_json for the version check
+		 * here because WP_Theme_JSON_Schema_Gutenberg::migrate() has already updated the
+		 * version for $this->theme_json. It's only really relevant in order to
+		 * keep backwards compatibility for the wp_theme_json_data_theme filter
+		 * in WP_Theme_JSON_Resolver_Gutenberg. The WP_Theme_JSON_Data_Gutenberg
+		 * instances of v2 themes did not have have the generated spacingSizes
+		 * included, but since the preset generation was moved inside this class
+		 * it makes the most sense to generate them here.
 		 */
 		$scale_path    = array( 'settings', 'spacing', 'spacingScale', $origin );
 		$spacing_scale = _wp_array_get( $this->theme_json, $scale_path, null );
@@ -3039,31 +3045,29 @@ class WP_Theme_JSON_Gutenberg {
 		 * This happens before the presets are merged to ensure that default spacing sizes can be
 		 * removed from the theme origin if $prevent_override is true.
 		 */
-		if ( $incoming_data['version'] >= 3 ) {
-			$flattened_spacing_scale = array();
-			foreach ( static::VALID_ORIGINS as $origin ) {
-				$scale_path = array( 'settings', 'spacing', 'spacingScale', $origin );
+		$flattened_spacing_scale = array();
+		foreach ( static::VALID_ORIGINS as $origin ) {
+			$scale_path = array( 'settings', 'spacing', 'spacingScale', $origin );
 
-				// Apply the base spacing scale to the current layer.
-				$base_spacing_scale      = _wp_array_get( $this->theme_json, $scale_path, array() );
-				$flattened_spacing_scale = array_replace( $flattened_spacing_scale, $base_spacing_scale );
+			// Apply the base spacing scale to the current layer.
+			$base_spacing_scale      = _wp_array_get( $this->theme_json, $scale_path, array() );
+			$flattened_spacing_scale = array_replace( $flattened_spacing_scale, $base_spacing_scale );
 
-				$spacing_scale = _wp_array_get( $incoming_data, $scale_path, null );
-				if ( ! isset( $spacing_scale ) ) {
-					continue;
-				}
-
-				// Allow partial scale settings by merging with lower layers.
-				$flattened_spacing_scale = array_replace( $flattened_spacing_scale, $spacing_scale );
-
-				// Generate and merge the scales for this layer.
-				$sizes_path           = array( 'settings', 'spacing', 'spacingSizes', $origin );
-				$spacing_sizes        = _wp_array_get( $incoming_data, $sizes_path, array() );
-				$spacing_scale_sizes  = static::compute_spacing_sizes( $flattened_spacing_scale );
-				$merged_spacing_sizes = static::merge_spacing_sizes( $spacing_scale_sizes, $spacing_sizes );
-
-				_wp_array_set( $incoming_data, $sizes_path, $merged_spacing_sizes );
+			$spacing_scale = _wp_array_get( $incoming_data, $scale_path, null );
+			if ( ! isset( $spacing_scale ) ) {
+				continue;
 			}
+
+			// Allow partial scale settings by merging with lower layers.
+			$flattened_spacing_scale = array_replace( $flattened_spacing_scale, $spacing_scale );
+
+			// Generate and merge the scales for this layer.
+			$sizes_path           = array( 'settings', 'spacing', 'spacingSizes', $origin );
+			$spacing_sizes        = _wp_array_get( $incoming_data, $sizes_path, array() );
+			$spacing_scale_sizes  = static::compute_spacing_sizes( $flattened_spacing_scale );
+			$merged_spacing_sizes = static::merge_spacing_sizes( $spacing_scale_sizes, $spacing_sizes );
+
+			_wp_array_set( $incoming_data, $sizes_path, $merged_spacing_sizes );
 		}
 
 		/*

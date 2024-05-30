@@ -131,7 +131,6 @@ class WP_Theme_JSON_Schema_Gutenberg {
 		 * fontSizes or spacingSizes as they could match the default ones and
 		 * affect the generated CSS.
 		 */
-
 		if ( isset( $old['settings']['typography']['fontSizes'] ) ) {
 			if ( ! isset( $new['settings'] ) ) {
 				$new['settings'] = array();
@@ -153,6 +152,19 @@ class WP_Theme_JSON_Schema_Gutenberg {
 				$new['settings']['spacing'] = array();
 			}
 			$new['settings']['spacing']['defaultSpacingSizes'] = false;
+		}
+
+		/*
+		 * In v3 spacingSizes is merged with the generated spacingScale sizes
+		 * instead of completely replacing them. The v3 behavior is what was
+		 * documented for the v2 schema, but the code never actually did work
+		 * that way. Instead of surprising users with a behavior change two
+		 * years after the fact at the same time as a v3 update is introduced,
+		 * we'll continue using the "bugged" behavior for v2 themes. And treat
+		 * the "bug fix" as a breaking change for v3.
+		 */
+		if ( isset( $old['settings']['spacing']['spacingSizes'] ) ) {
+			unset( $new['settings']['spacing']['spacingScale'] );
 		}
 
 		return $new;
