@@ -14,6 +14,8 @@ import useBlockTypesState from './hooks/use-block-types-state';
 import InserterListbox from '../inserter-listbox';
 import { orderBy } from '../../utils/sorting';
 import InserterNoResults from './no-results';
+import { select } from '@wordpress/data';
+import { store as blockEditorStore } from '../../store';
 
 const getBlockNamespace = ( item ) => item.name.split( '/' )[ 0 ];
 
@@ -31,6 +33,7 @@ export function BlockTypesTab(
 	{ rootClientId, onInsert, onHover, showMostUsedBlocks },
 	ref
 ) {
+	const { getBlockName } = select( blockEditorStore );
 	const [ items, categories, collections, onSelectItem, allItems ] =
 		useBlockTypesState( rootClientId, onInsert );
 
@@ -99,6 +102,13 @@ export function BlockTypesTab(
 	// Hide block preview on unmount.
 	useEffect( () => () => onHover( null ), [] );
 
+	const getRootBlockTitle = () => {
+		const blockName = getBlockName( rootClientId );
+		// Find the title within the list of all possible blocks.
+		const block = allItems.find( ( item ) => item.name === blockName );
+		return block ? block.title : __( 'Allowed' );
+	};
+
 	/**
 	 * The inserter contains a big number of blocks and opening it is a costful operation.
 	 * The rendering is the most costful part of it, in order to improve the responsiveness
@@ -150,7 +160,7 @@ export function BlockTypesTab(
 							key={ category.slug }
 							title={
 								categoryItems.length === 1
-									? __( 'Allowed' ) // Maybe check the parent block name and use that instead, like "List Block"?
+									? getRootBlockTitle()
 									: category.title
 							}
 							icon={ category.icon }
