@@ -22,9 +22,11 @@ export function formatFontWeight( fontWeight ) {
 
 	switch ( fontWeight ) {
 		case 'normal':
+		case '400':
 			name = _x( 'Regular', 'font weight' );
 			break;
 		case 'bold':
+		case '700':
 			name = _x( 'Bold', 'font weight' );
 			break;
 		case '100':
@@ -36,17 +38,11 @@ export function formatFontWeight( fontWeight ) {
 		case '300':
 			name = _x( 'Light', 'font weight' );
 			break;
-		case '400':
-			name = _x( 'Regular', 'font weight' );
-			break;
 		case '500':
 			name = _x( 'Medium', 'font weight' );
 			break;
 		case '600':
 			name = _x( 'Semi Bold', 'font weight' );
-			break;
-		case '700':
-			name = _x( 'Bold', 'font weight' );
 			break;
 		case '800':
 			name = _x( 'Extra Bold', 'font weight' );
