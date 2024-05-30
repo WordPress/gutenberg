@@ -222,11 +222,8 @@ public class Gutenberg: UIResponder {
         bridgeModule.sendEventIfNeeded(.connectionStatusChange, body: data)
     }
     
-    public func onContentUpdate(title: String? = nil, content: String) {
+    public func onContentUpdate(content: String) {
         var payload: [String: Any] = ["content": content]
-        if let title = title {
-            payload["title"] = title
-        }
         bridgeModule.sendEventIfNeeded(.onContentUpdate, body: payload)
     }
 
