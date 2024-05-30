@@ -1134,7 +1134,7 @@ _Returns_
 
 ### PostPingbacks
 
-Undocumented declaration.
+Renders a control for enabling or disabling pingbacks and trackbacks in a WordPress post.
 
 ### PostPreviewButton
 
