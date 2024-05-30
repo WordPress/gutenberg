@@ -1369,7 +1369,10 @@ test.describe( 'Block bindings', () => {
 				await expect( paragraphBlock ).toHaveText(
 					'Value of the text_custom_field'
 				);
-				await expect( paragraphBlock ).toBeEditable();
+				await expect( paragraphBlock ).toHaveAttribute(
+					'contenteditable',
+					'true'
+				);
 				await paragraphBlock.fill( 'new value' );
 				// Check that the paragraph content attribute didn't change.
 				const [ paragraphBlockObject ] = await editor.getBlocks();
