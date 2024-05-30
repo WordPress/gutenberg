@@ -29,7 +29,6 @@ import {
 	findRichTextAttributeKey,
 	START_OF_SELECTED_AREA,
 } from '../utils/selection';
-import { getBoundAttributesValues } from '../utils/bindings';
 import {
 	__experimentalUpdateSettings,
 	privateRemoveBlocks,
@@ -824,11 +823,10 @@ export const __unstableDeleteSelection =
 
 /**
  * Split the current selection.
- * @param {?Array}  blocks
- * @param {?Object} context
+ * @param {?Array} blocks
  */
 export const __unstableSplitSelection =
-	( blocks = [], context = {} ) =>
+	( blocks = [] ) =>
 	( { registry, select, dispatch } ) => {
 		const selectionAnchor = select.getSelectionStart();
 		const selectionFocus = select.getSelectionEnd();
@@ -874,6 +872,16 @@ export const __unstableSplitSelection =
 			typeof selectionB.attributeKey === 'string'
 				? selectionB.attributeKey
 				: findRichTextAttributeKey( blockBType );
+		const blockAttributes = select.getBlockAttributes(
+			selectionA.clientId
+		);
+		const bindings = blockAttributes?.metadata?.bindings;
+
+		// If the attribute is bound, don't split the selection and insert a new block instead.
+		if ( bindings?.[ attributeKeyA ] ) {
+			dispatch.insertAfterBlock( selectionA.clientId );
+			return;
+		}
 
 		// Can't split if the selection is not set.
 		if (
@@ -919,17 +927,6 @@ export const __unstableSplitSelection =
 								select.getBlockName( selectionA.clientId )
 						  );
 				}
-
-				const boundAttributes = getBoundAttributesValues(
-					selectionA.clientId,
-					context,
-					registry
-				);
-
-				const blockAttributes = {
-					...select.getBlockAttributes( selectionA.clientId ),
-					...boundAttributes,
-				};
 
 				const length = blockAttributes[ attributeKeyA ].length;
 
