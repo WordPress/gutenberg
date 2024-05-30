@@ -197,13 +197,13 @@ export function isValidByEnum( value, enumSet ) {
  */
 export const matcherFromSource = memoize( ( sourceConfig ) => {
 	switch ( sourceConfig.source ) {
-		case 'attribute':
+		case 'attribute': {
 			let matcher = attr( sourceConfig.selector, sourceConfig.attribute );
 			if ( sourceConfig.type === 'boolean' ) {
 				matcher = toBooleanAttributeMatcher( matcher );
 			}
-
 			return matcher;
+		}
 		case 'html':
 			return html( sourceConfig.selector, sourceConfig.multiline );
 		case 'text':
@@ -227,8 +227,10 @@ export const matcherFromSource = memoize( ( sourceConfig ) => {
 				)
 			);
 			return query( sourceConfig.selector, subMatchers );
-		case 'tag':
-			return prop( sourceConfig.selector, 'nodeName' )?.toLowerCase();
+		case 'tag': {
+			const matcher = prop( sourceConfig.selector, 'nodeName' );
+			return ( domNode ) => matcher( domNode )?.toLowerCase();
+		}
 		default:
 			// eslint-disable-next-line no-console
 			console.error( `Unknown source type "${ sourceConfig.source }"` );
