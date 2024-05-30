@@ -30,20 +30,4 @@ export default {
 			postId
 		).meta?.[ args.key ];
 	},
-	setValue( { registry, context, args, value } ) {
-		const postId = context.postId
-			? context.postId
-			: registry.select( editorStore ).getCurrentPostId();
-		const postType = context.postType
-			? context.postType
-			: registry.select( editorStore ).getCurrentPostType();
-		registry
-			.dispatch( coreDataStore )
-			.editEntityRecord( 'postType', postType, postId, {
-				meta: {
-					[ args.key ]: value,
-				},
-			} );
-	},
-	lockAttributesEditing: () => false,
 };
