@@ -28,29 +28,25 @@ figcaption.block-editor-rich-text__editable [data-rich-text-placeholder]::before
 	opacity: 0.8;
 }
 
+[data-rich-text-script] {
+	display: inline;
+
+	&::before {
+		content: "</>";
+		background: rgb(255, 255, 0);
+	}
+}
+
 [data-rich-text-comment],
-[data-rich-text-script],
 [data-rich-text-format-boundary] {
 	border-radius: 2px;
 }
 
-[data-rich-text-comment],
-[data-rich-text-script] {
-	display: inline;
+[data-rich-text-comment] {
 	background-color: currentColor;
 
-	&::before {
+	span {
 		filter: invert(100%);
 		color: currentColor;
 	}
-}
-
-[data-rich-text-script]::before {
-	content: "</>";
-}
-
-// Only fill in the comment content if the comment is not replaced (in the
-// future they might be by Bits).
-[data-rich-text-comment]:empty::before {
-	content: "[" attr(data-rich-text-comment) "]";
 }
