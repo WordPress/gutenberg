@@ -16,7 +16,7 @@ import { useCopyToClipboard } from '@wordpress/compose';
 import {
 	filterURLForDisplay,
 	safeDecodeURI,
-	removeProtocol,
+	stripDomainPrefixes,
 } from '@wordpress/url';
 import { Icon, globe, info, linkOff, edit, copySmall } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
@@ -64,7 +64,7 @@ export default function LinkPreview( {
 		stripHTML( richData?.title || value?.title || displayURL );
 
 	const isTitleRedundant =
-		value?.url && removeProtocol( displayTitle ) === displayURL;
+		value?.url && stripDomainPrefixes( displayTitle ) === displayURL;
 
 	let icon;
 

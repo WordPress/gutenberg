@@ -14,7 +14,7 @@
  */
 export function filterURLForDisplay( url, maxLength = null ) {
 	// Remove protocol and www prefixes.
-	let filteredURL = removeProtocol( url );
+	let filteredURL = stripDomainPrefixes( url );
 
 	// Ends with / and only has that single slash, strip it.
 	if ( filteredURL.match( /^[^\/]+\/$/ ) ) {
@@ -55,12 +55,17 @@ export function filterURLForDisplay( url, maxLength = null ) {
 }
 
 /**
- * Removes the protocol from a URL.
+ * Removes domain prefixes from a URL.
  *
- * @param {string} url - The URL to remove the protocol from.
+ * @param {string} url The URL to strip domain prefixes from.
  *
- * @return {string} The URL without the protocol.
+ * @return {string} The URL without domain prefixes.
  */
-export function removeProtocol( url ) {
-	return url.replace( /^(?:https?:)\/\/(?:www\.)?/, '' );
+export function stripDomainPrefixes( url ) {
+	if ( ! url ) {
+		return '';
+	}
+	return url
+		.replace( /^[a-z\-.\+]+[0-9]*:(\/\/)?/i, '' )
+		.replace( /^www\./i, '' );
 }

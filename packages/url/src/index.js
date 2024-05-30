@@ -25,4 +25,4 @@ export { cleanForSlug } from './clean-for-slug';
 export { getFilename } from './get-filename';
 export { normalizePath } from './normalize-path';
 export { prependHTTPS } from './prepend-https';
-export { removeProtocol } from './filter-url-for-display';
+export { stripDomainPrefixes } from './filter-url-for-display';
