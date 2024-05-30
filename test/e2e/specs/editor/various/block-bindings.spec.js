@@ -1381,6 +1381,64 @@ test.describe( 'Block bindings', () => {
 					previewPage.locator( '#paragraph-binding' )
 				).toHaveText( 'new value' );
 			} );
+
+			test( 'should NOT be possible to edit the value of the custom field when it is protected', async ( {
+				editor,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						anchor: 'protected-field-binding',
+						content: 'fallback value',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/post-meta',
+									args: { key: '_protected_field' },
+								},
+							},
+						},
+					},
+				} );
+
+				const protectedFieldBlock = editor.canvas.getByRole(
+					'document',
+					{
+						name: 'Block: Paragraph',
+					}
+				);
+
+				await expect( protectedFieldBlock ).not.toBeEditable();
+			} );
+
+			test( 'should NOT be possible to edit the value of the custom field when it is not shown in the REST API', async ( {
+				editor,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						anchor: 'show-in-rest-false-binding',
+						content: 'fallback value',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/post-meta',
+									args: { key: 'show_in_rest_false_field' },
+								},
+							},
+						},
+					},
+				} );
+
+				const showInRestFalseBlock = editor.canvas.getByRole(
+					'document',
+					{
+						name: 'Block: Paragraph',
+					}
+				);
+
+				await expect( showInRestFalseBlock ).not.toBeEditable();
+			} );
 		} );
 
 		test.describe( 'Heading', () => {
