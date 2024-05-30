@@ -29,7 +29,7 @@ import {
 	findRichTextAttributeKey,
 	START_OF_SELECTED_AREA,
 } from '../utils/selection';
-import { transformBlockAttributesWithBindingsValues } from '../utils/bindings';
+import { getBoundAttributesValues } from '../utils/bindings';
 import {
 	__experimentalUpdateSettings,
 	privateRemoveBlocks,
@@ -920,12 +920,16 @@ export const __unstableSplitSelection =
 						  );
 				}
 
-				const blockAttributes =
-					transformBlockAttributesWithBindingsValues(
-						selectionA.clientId,
-						context,
-						registry
-					);
+				const boundAttributes = getBoundAttributesValues(
+					selectionA.clientId,
+					context,
+					registry
+				);
+
+				const blockAttributes = {
+					...select.getBlockAttributes( selectionA.clientId ),
+					...boundAttributes,
+				};
 
 				const length = blockAttributes[ attributeKeyA ].length;
 
