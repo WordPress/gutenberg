@@ -27,6 +27,7 @@ import {
 	prependHTTPS,
 	removeQueryArgs,
 	safeDecodeURI,
+	stripDomainPrefixes,
 } from '../';
 import wptData from './fixtures/wpt-data';
 
@@ -124,6 +125,68 @@ describe( 'isValidProtocol', () => {
 		expect( isValidProtocol( 'test#protocol:' ) ).toBe( false );
 		expect( isValidProtocol( 'test?protocol:' ) ).toBe( false );
 		expect( isValidProtocol( '123test+protocol:' ) ).toBe( false );
+	} );
+} );
+
+describe( 'stripDomainPrefixes', () => {
+	it( 'should remove the protocol (http, https, file, tel, etc.) from the URL', () => {
+		expect( stripDomainPrefixes( 'http://wordpress.org' ) ).toBe(
+			'wordpress.org'
+		);
+		expect( stripDomainPrefixes( 'https://wordpress.org' ) ).toBe(
+			'wordpress.org'
+		);
+		expect( stripDomainPrefixes( 'https://localhost:8080' ) ).toBe(
+			'localhost:8080'
+		);
+		expect( stripDomainPrefixes( 'file:///folder/file.txt' ) ).toBe(
+			'/folder/file.txt'
+		);
+		expect( stripDomainPrefixes( 'ftp://wordpress.org' ) ).toBe(
+			'wordpress.org'
+		);
+		expect( stripDomainPrefixes( 'tel:0123456789' ) ).toBe( '0123456789' );
+		expect( stripDomainPrefixes( 'blob:data' ) ).toBe( 'data' );
+	} );
+
+	it( 'should remove both the protocol and www prefix if both are present', () => {
+		expect( stripDomainPrefixes( 'http://www.google.com' ) ).toBe(
+			'google.com'
+		);
+		expect( stripDomainPrefixes( 'https://www.google.com' ) ).toBe(
+			'google.com'
+		);
+		expect( stripDomainPrefixes( 'ftp://www.google.com' ) ).toBe(
+			'google.com'
+		);
+	} );
+
+	it( 'should handle URLs without a protocol', () => {
+		expect( stripDomainPrefixes( 'www.example.com' ) ).toBe(
+			'example.com'
+		);
+		expect( stripDomainPrefixes( 'example.com' ) ).toBe( 'example.com' );
+		expect( stripDomainPrefixes( 'example.com/path' ) ).toBe(
+			'example.com/path'
+		);
+	} );
+
+	it( 'should handle URLs with both parameters and fragments correctly', () => {
+		expect(
+			stripDomainPrefixes(
+				'https://user:password@www.test-this.com:1020/test-path/file.extension#anchor?query=params&more'
+			)
+		).toBe(
+			'user:password@www.test-this.com:1020/test-path/file.extension#anchor?query=params&more'
+		);
+		expect( stripDomainPrefixes( 'https://www.example.com#section' ) ).toBe(
+			'example.com#section'
+		);
+		expect(
+			stripDomainPrefixes(
+				'https://www.example.com?param1=value1&param2=value2'
+			)
+		).toBe( 'example.com?param1=value1&param2=value2' );
 	} );
 } );
 
