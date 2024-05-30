@@ -450,7 +450,7 @@ function BackgroundSizeToolsPanelItem( {
 			 * when the toggle switches to "Tile". This is to increase the chance that
 			 * the image's focus point is visible.
 			 */
-			if ( !! style?.background?.backgroundImage?.id && ! nextPosition ) {
+			if ( !! style?.background?.backgroundImage?.id ) {
 				nextPosition = '50% 0';
 			}
 		}
