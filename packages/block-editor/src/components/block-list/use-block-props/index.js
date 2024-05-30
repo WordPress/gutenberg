@@ -31,6 +31,7 @@ import { useIntersectionObserver } from './use-intersection-observer';
 import { useScrollIntoView } from './use-scroll-into-view';
 import { useFlashEditableBlocks } from '../../use-flash-editable-blocks';
 import { canBindBlock } from '../../../hooks/use-bindings-attributes';
+
 /**
  * This hook is used to lightly mark an element as a block element. The element
  * should be the outermost element of a block. Call this hook and pass the
