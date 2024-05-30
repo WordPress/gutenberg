@@ -2501,6 +2501,18 @@ export function getBlockListSettings( state, clientId ) {
 }
 
 /**
+ * Returns the Block Context of a block, if any exist.
+ *
+ * @param {Object}  state    Editor state.
+ * @param {?string} clientId Block client ID.
+ *
+ * @return {?Object} Block context of the block if set.
+ */
+export function getBlockContext( state, clientId ) {
+	return state.blockContext[ clientId ];
+}
+
+/**
  * Returns the editor settings.
  *
  * @param {Object} state Editor state.

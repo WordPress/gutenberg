@@ -196,6 +196,19 @@ _Returns_
 
 -   `Object?`: Block attributes.
 
+### getBlockContext
+
+Returns the Block Context of a block, if any exist.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _clientId_ `?string`: Block client ID.
+
+_Returns_
+
+-   `?Object`: Block context of the block if set.
+
 ### getBlockCount
 
 Returns the number of blocks currently present in the post.
@@ -1838,6 +1851,19 @@ _Parameters_
 _Returns_
 
 -   `Object`: Action object.
+
+### updateBlockContext
+
+Action that changes the block context of the given block(s) in the store.
+
+_Parameters_
+
+-   _clientId_ `string | SettingsByClientId`: Client ID of the block.
+-   _context_ `Object`: Object with the new context.
+
+_Returns_
+
+-   `Object`: Action object
 
 ### updateBlockListSettings
 
