@@ -24,12 +24,15 @@ export default function SavePublishPanels( {
 	setEntitiesSavedStatesCallback,
 	closeEntitiesSavedStates,
 	isEntitiesSavedStatesOpen,
-	hasPostMetaChanges,
 	forceIsDirtyPublishPanel,
 } ) {
 	const { closePublishSidebar, togglePublishSidebar } =
 		useDispatch( editorStore );
-	const { publishSidebarOpened, hasNonPostEntityChanges } = useSelect(
+	const {
+		publishSidebarOpened,
+		hasNonPostEntityChanges,
+		hasPostMetaChanges,
+	} = useSelect(
 		( select ) => ( {
 			publishSidebarOpened:
 				select( editorStore ).isPublishSidebarOpened(),
