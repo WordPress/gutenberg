@@ -19,7 +19,6 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
-import { store as editorStore } from '@wordpress/editor';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 import { check } from '@wordpress/icons';
@@ -28,15 +27,16 @@ import { serialize } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
+import { store as editorStore } from '../../store';
 import {
 	TEMPLATE_PART_POST_TYPE,
 	TEMPLATE_PART_AREA_DEFAULT_CATEGORY,
-} from '../../utils/constants';
+} from '../../store/constants';
 import {
 	useExistingTemplateParts,
 	getUniqueTemplatePartTitle,
 	getCleanTemplatePartSlug,
-} from '../../utils/template-part-create';
+} from './utils';
 
 export default function CreateTemplatePartModal( {
 	modalTitle,
@@ -52,7 +52,7 @@ export default function CreateTemplatePartModal( {
 		<Modal
 			title={ modalTitle || defaultModalTitle }
 			onRequestClose={ restProps.closeModal }
-			overlayClassName="edit-site-create-template-part-modal"
+			overlayClassName="editor-create-template-part-modal"
 		>
 			<CreateTemplatePartModalContents { ...restProps } />
 		</Modal>
@@ -142,13 +142,13 @@ export function CreateTemplatePartModalContents( {
 				/>
 				<BaseControl
 					label={ __( 'Area' ) }
-					id={ `edit-site-create-template-part-modal__area-selection-${ instanceId }` }
-					className="edit-site-create-template-part-modal__area-base-control"
+					id={ `editor-create-template-part-modal__area-selection-${ instanceId }` }
+					className="editor-create-template-part-modal__area-base-control"
 				>
 					<RadioGroup
 						label={ __( 'Area' ) }
-						className="edit-site-create-template-part-modal__area-radio-group"
-						id={ `edit-site-create-template-part-modal__area-selection-${ instanceId }` }
+						className="editor-create-template-part-modal__area-radio-group"
+						id={ `editor-create-template-part-modal__area-selection-${ instanceId }` }
 						onChange={ setArea }
 						checked={ area }
 					>
@@ -157,18 +157,18 @@ export function CreateTemplatePartModalContents( {
 								<Radio
 									key={ label }
 									value={ value }
-									className="edit-site-create-template-part-modal__area-radio"
+									className="editor-create-template-part-modal__area-radio"
 								>
 									<Flex align="start" justify="start">
 										<FlexItem>
 											<Icon icon={ icon } />
 										</FlexItem>
-										<FlexBlock className="edit-site-create-template-part-modal__option-label">
+										<FlexBlock className="editor-create-template-part-modal__option-label">
 											{ label }
 											<div>{ description }</div>
 										</FlexBlock>
 
-										<FlexItem className="edit-site-create-template-part-modal__checkbox">
+										<FlexItem className="editor-create-template-part-modal__checkbox">
 											{ area === value && (
 												<Icon icon={ check } />
 											) }

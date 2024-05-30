@@ -12,6 +12,7 @@ import { EntitiesSavedStatesExtensible } from './components/entities-saved-state
 import useAutoSwitchEditorSidebars from './components/provider/use-auto-switch-editor-sidebars';
 import useBlockEditorSettings from './components/provider/use-block-editor-settings';
 import Header from './components/header';
+import CreateTemplatePartModal from './components/create-template-part-modal';
 import InserterSidebar from './components/inserter-sidebar';
 import ListViewSidebar from './components/list-view-sidebar';
 import PatternOverridesPanel from './components/pattern-overrides-panel';
@@ -41,6 +42,7 @@ const { store: interfaceStore, ...remainingInterfaceApis } = interfaceApis;
 
 export const privateApis = {};
 lock( privateApis, {
+	CreateTemplatePartModal,
 	ExperimentalEditorProvider,
 	EntitiesSavedStatesExtensible,
 	GlobalStylesProvider,

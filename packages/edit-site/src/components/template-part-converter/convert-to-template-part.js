@@ -9,12 +9,15 @@ import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { symbolFilled } from '@wordpress/icons';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import CreateTemplatePartModal from '../create-template-part-modal';
+import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
+
+const { CreateTemplatePartModal } = unlock( editorPrivateApis );
 
 export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
