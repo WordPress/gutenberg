@@ -245,12 +245,22 @@ function BackgroundImageToolsPanelItem( {
 			return;
 		}
 
+		const sizeValue = style?.background?.backgroundSize;
+		const positionValue = style?.background?.backgroundPosition;
+
 		onChange(
-			setImmutably( style, [ 'background', 'backgroundImage' ], {
-				url: media.url,
-				id: media.id,
-				source: 'file',
-				title: media.title || undefined,
+			setImmutably( style, [ 'background' ], {
+				...style?.background,
+				backgroundImage: {
+					url: media.url,
+					id: media.id,
+					source: 'file',
+					title: media.title || undefined,
+				},
+				backgroundPosition:
+					! positionValue && ( 'auto' === sizeValue || ! sizeValue )
+						? '50% 0'
+						: positionValue,
 			} )
 		);
 	};
@@ -426,13 +436,16 @@ function BackgroundSizeToolsPanelItem( {
 	const updateBackgroundSize = ( next ) => {
 		// When switching to 'contain' toggle the repeat off.
 		let nextRepeat = repeatValue;
+		let nextPosition = positionValue;
 
 		if ( next === 'contain' ) {
 			nextRepeat = 'no-repeat';
+			nextPosition = undefined;
 		}
 
 		if ( next === 'cover' ) {
 			nextRepeat = undefined;
+			nextPosition = undefined;
 		}
 
 		if (
@@ -441,6 +454,15 @@ function BackgroundSizeToolsPanelItem( {
 			next === 'auto'
 		) {
 			nextRepeat = undefined;
+			/*
+			 * A background image uploaded and set in the editor (an image with a record id),
+			 * receives a default background position of '50% 0',
+			 * when the toggle switches to "Tile". This is to increase the chance that
+			 * the image's focus point is visible.
+			 */
+			if ( !! style?.background?.backgroundImage?.id ) {
+				nextPosition = '50% 0';
+			}
 		}
 
 		/*
@@ -454,6 +476,7 @@ function BackgroundSizeToolsPanelItem( {
 		onChange(
 			setImmutably( style, [ 'background' ], {
 				...style?.background,
+				backgroundPosition: nextPosition,
 				backgroundRepeat: nextRepeat,
 				backgroundSize: next,
 			} )
@@ -545,6 +568,7 @@ function BackgroundSizeToolsPanelItem( {
 						size="__unstable-large"
 						__unstableInputWidth="100px"
 						min={ 0 }
+						placeholder={ __( 'Auto' ) }
 					/>
 				) : null }
 				{ currentValueForToggle !== 'cover' && (
