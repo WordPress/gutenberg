@@ -234,6 +234,7 @@ export default function PostStatus() {
 												showPopoverHeaderActions={
 													false
 												}
+												isCompact
 											/>
 										</div>
 									) }

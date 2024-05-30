@@ -29,10 +29,20 @@ const { PrivatePublishDateTimePicker } = unlock( blockEditorPrivateApis );
  * @return {Component} The component to be rendered.
  */
 export default function PostSchedule( props ) {
-	return <PrivatePostSchedule { ...props } showPopoverHeaderActions />;
+	return (
+		<PrivatePostSchedule
+			{ ...props }
+			showPopoverHeaderActions
+			isCompact={ false }
+		/>
+	);
 }
 
-export function PrivatePostSchedule( { onClose, showPopoverHeaderActions } ) {
+export function PrivatePostSchedule( {
+	onClose,
+	showPopoverHeaderActions,
+	isCompact,
+} ) {
 	const { postDate, postType } = useSelect(
 		( select ) => ( {
 			postDate: select( editorStore ).getEditedPostAttribute( 'date' ),
@@ -93,6 +103,7 @@ export function PrivatePostSchedule( { onClose, showPopoverHeaderActions } ) {
 				setPreviewedMonth( parseISO( date ) )
 			}
 			onClose={ onClose }
+			isCompact={ isCompact }
 			showPopoverHeaderActions={ showPopoverHeaderActions }
 		/>
 	);

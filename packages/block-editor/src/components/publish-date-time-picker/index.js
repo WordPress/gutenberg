@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { DateTimePicker } from '@wordpress/components';
+import { DateTimePicker, TimePicker } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { forwardRef } from '@wordpress/element';
 import { getSettings } from '@wordpress/date';
@@ -12,9 +12,16 @@ import { getSettings } from '@wordpress/date';
 import InspectorPopoverHeader from '../inspector-popover-header';
 
 export function PublishDateTimePicker(
-	{ onClose, onChange, showPopoverHeaderActions, ...additionalProps },
+	{
+		onClose,
+		onChange,
+		showPopoverHeaderActions,
+		isCompact,
+		...additionalProps
+	},
 	ref
 ) {
+	const DatePickerComponent = isCompact ? TimePicker : DateTimePicker;
 	return (
 		<div ref={ ref } className="block-editor-publish-date-time-picker">
 			<InspectorPopoverHeader
@@ -31,7 +38,7 @@ export function PublishDateTimePicker(
 				}
 				onClose={ onClose }
 			/>
-			<DateTimePicker
+			<DatePickerComponent
 				startOfWeek={ getSettings().l10n.startOfWeek }
 				onChange={ onChange }
 				{ ...additionalProps }
@@ -47,6 +54,7 @@ function PublicPublishDateTimePicker( props, ref ) {
 		<PrivatePublishDateTimePicker
 			{ ...props }
 			showPopoverHeaderActions
+			isCompact={ false }
 			ref={ ref }
 		/>
 	);
