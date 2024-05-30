@@ -145,8 +145,8 @@ export const getBlockAttributes = createRegistrySelector(
 		}
 		isProcessingBindings = true;
 
+		const newAttributes = { ...blockAttributes };
 		const context = select( STORE_NAME ).getBlockContext( clientId );
-
 		const sources = unlock(
 			select( blocksStore )
 		).getAllBlockBindingsSources();
@@ -170,20 +170,20 @@ export const getBlockAttributes = createRegistrySelector(
 				args: boundAttribute.args,
 			};
 
-			blockAttributes[ attributeName ] = source.getValue( args );
+			newAttributes[ attributeName ] = source.getValue( args );
 
-			if ( blockAttributes[ attributeName ] === undefined ) {
+			if ( newAttributes[ attributeName ] === undefined ) {
 				if ( attributeName === 'url' ) {
-					blockAttributes[ attributeName ] = null;
+					newAttributes[ attributeName ] = null;
 				} else {
-					blockAttributes[ attributeName ] =
+					newAttributes[ attributeName ] =
 						source.getPlaceholder?.( args );
 				}
 			}
 		}
 
 		isProcessingBindings = false;
-		return blockAttributes;
+		return newAttributes;
 	}
 );
 
