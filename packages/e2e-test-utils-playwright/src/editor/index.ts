@@ -16,7 +16,7 @@ import { clickBlockToolbarButton } from './click-block-toolbar-button';
 import { getBlocks } from './get-blocks';
 import { getEditedPostContent } from './get-edited-post-content';
 import { insertBlock } from './insert-block';
-import { modifyMetadata } from './modify-metadata';
+import { modifyPostMetadata } from './modify-post-metadata';
 import { openDocumentSettingsSidebar } from './open-document-settings-sidebar';
 import { openPreviewPage } from './preview';
 import { publishPost } from './publish-post';
@@ -62,8 +62,9 @@ export class Editor {
 		getEditedPostContent.bind( this );
 	/** @borrows insertBlock as this.insertBlock */
 	insertBlock: typeof insertBlock = insertBlock.bind( this );
-	/** @borrows modifyMetadata as this.modifyMetadata */
-	modifyMetadata: typeof modifyMetadata = modifyMetadata.bind( this );
+	/** @borrows modifyPostMetadata as this.modifyPostMetadata */
+	modifyPostMetadata: typeof modifyPostMetadata =
+		modifyPostMetadata.bind( this );
 	/** @borrows openDocumentSettingsSidebar as this.openDocumentSettingsSidebar */
 	openDocumentSettingsSidebar: typeof openDocumentSettingsSidebar =
 		openDocumentSettingsSidebar.bind( this );

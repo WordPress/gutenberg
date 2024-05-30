@@ -13,7 +13,7 @@ import type { Editor } from './index';
  * @param metaKey
  * @param metaValue
  */
-export async function modifyMetadata(
+export async function modifyPostMetadata(
 	this: Editor,
 	postType: string,
 	postId: string,
@@ -22,18 +22,23 @@ export async function modifyMetadata(
 ) {
 	await this.page.waitForFunction( () => window?.wp?.data );
 
-	const data = {
+	const parameters = {
 		postType,
 		postId,
 		metaKey,
 		metaValue,
 	};
 
-	await this.page.evaluate( ( _data ) => {
+	await this.page.evaluate( ( _parameters ) => {
 		window.wp.data
 			.dispatch( 'core' )
-			.editEntityRecord( 'postType', _data.postType, _data.postId, {
-				meta: { [ _data.metaKey ]: _data.metaValue },
-			} );
-	}, data );
+			.editEntityRecord(
+				'postType',
+				_parameters.postType,
+				_parameters.postId,
+				{
+					meta: { [ _parameters.metaKey ]: _parameters.metaValue },
+				}
+			);
+	}, parameters );
 }

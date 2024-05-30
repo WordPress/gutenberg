@@ -137,7 +137,7 @@ test.describe( 'Post publish panel', () => {
 			},
 		} );
 		const postId = await editor.publishPost();
-		await editor.modifyMetadata(
+		await editor.modifyPostMetadata(
 			'post',
 			postId,
 			'text_custom_field',
