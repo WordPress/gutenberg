@@ -22,6 +22,7 @@ import TextDecorationControl from '../text-decoration-control';
 import WritingModeControl from '../writing-mode-control';
 import { getValueFromVariable, TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
 import { setImmutably } from '../../utils/object';
+import { getMergedFontFamiliesAndFontFamilyFaces } from './typography-utils';
 
 const MIN_TEXT_COLUMNS = 1;
 const MAX_TEXT_COLUMNS = 6;
@@ -171,18 +172,13 @@ export default function TypographyPanel( {
 
 	// Font Family
 	const hasFontFamilyEnabled = useHasFontFamilyControl( settings );
-	const fontFamilies = settings?.typography?.fontFamilies;
-	const mergedFontFamilies = useMemo( () => {
-		return [ 'default', 'theme', 'custom' ].flatMap(
-			( key ) => fontFamilies?.[ key ] ?? []
-		);
-	}, [ fontFamilies ] );
 	const fontFamily = decodeValue( inheritedValue?.typography?.fontFamily );
-	const fontFamilyFaces = mergedFontFamilies.find(
-		( family ) => family.fontFamily === fontFamily
-	)?.fontFace;
+	const { fontFamilies, fontFamilyFaces } = useMemo( () => {
+		return getMergedFontFamiliesAndFontFamilyFaces( settings, fontFamily );
+	}, [ settings, fontFamily ] );
+
 	const setFontFamily = ( newValue ) => {
-		const slug = mergedFontFamilies?.find(
+		const slug = fontFamilies?.find(
 			( { fontFamily: f } ) => f === newValue
 		)?.slug;
 		onChange(
@@ -365,7 +361,7 @@ export default function TypographyPanel( {
 					panelId={ panelId }
 				>
 					<FontFamilyControl
-						fontFamilies={ mergedFontFamilies }
+						fontFamilies={ fontFamilies }
 						value={ fontFamily }
 						onChange={ setFontFamily }
 						size="__unstable-large"

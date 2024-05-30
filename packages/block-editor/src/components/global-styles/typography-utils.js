@@ -122,3 +122,29 @@ export function getFluidTypographyOptionsFromSettings( settings ) {
 				fluid: typographySettings?.fluid,
 		  };
 }
+
+/**
+ * Returns an object of merged font families and the font faces from the selected font family
+ * based on the theme.json settings object and the currently selected font family.
+ *
+ * @param {Object} settings           Theme.json settings
+ * @param {string} selectedFontFamily Decoded font family string
+ * @return {Object} Merged font families and font faces from the selected font family
+ */
+export function getMergedFontFamiliesAndFontFamilyFaces(
+	settings,
+	selectedFontFamily
+) {
+	const fontFamiliesFromSettings = settings?.typography?.fontFamilies;
+
+	const fontFamilies = [ 'default', 'theme', 'custom' ].flatMap(
+		( key ) => fontFamiliesFromSettings?.[ key ] ?? []
+	);
+
+	const fontFamilyFaces =
+		fontFamilies.find(
+			( family ) => family.fontFamily === selectedFontFamily
+		)?.fontFace ?? [];
+
+	return { fontFamilies, fontFamilyFaces };
+}
