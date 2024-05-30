@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Prevent deleting content when backspacing in the first Paragraph block [#62069]
 
 ## 1.119.0
 -   [internal] Remove circular dependencies within the components package [#61102]
