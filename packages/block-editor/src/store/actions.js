@@ -1540,10 +1540,9 @@ export function updateBlockListSettings( clientId, settings ) {
  *
  * @return {Object} Action object
  */
-export function updateBlockContext( clientId, context ) {
+export function updateBlockContext( context ) {
 	return {
 		type: 'UPDATE_BLOCK_CONTEXT',
-		clientId,
 		context,
 	};
 }

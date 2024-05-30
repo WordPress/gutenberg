@@ -1,7 +1,13 @@
 /**
  * WordPress dependencies
  */
+import { useDispatch } from '@wordpress/data';
 import { createContext, useContext, useMemo } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
 
 /** @typedef {import('react').ReactNode} ReactNode */
 
@@ -29,6 +35,7 @@ export function BlockContextProvider( { value, children } ) {
 		() => ( { ...context, ...value } ),
 		[ context, value ]
 	);
+	useDispatch( blockEditorStore ).updateBlockContext( nextValue );
 
 	return <Context.Provider value={ nextValue } children={ children } />;
 }

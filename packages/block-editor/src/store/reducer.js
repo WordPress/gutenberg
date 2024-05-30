@@ -1797,19 +1797,7 @@ export const blockListSettings = ( state = {}, action ) => {
  */
 export const blockContext = ( state = {}, action ) => {
 	if ( action.type === 'UPDATE_BLOCK_CONTEXT' ) {
-		const { clientId } = action;
-		if ( ! action.context ) {
-			return state;
-		}
-
-		if ( fastDeepEqual( state[ clientId ], action.context ) ) {
-			return state;
-		}
-
-		return {
-			...state,
-			[ clientId ]: action.context,
-		};
+		return action.context;
 	}
 	return state;
 };
