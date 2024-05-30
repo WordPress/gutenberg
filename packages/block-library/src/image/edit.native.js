@@ -620,7 +620,7 @@ export class ImageEdit extends Component {
 					styles.removeFeaturedButton,
 				] }
 				cellContainerStyle={ styles.setFeaturedButtonCellContainer }
-				separatorType={ 'none' }
+				separatorType="none"
 				onPress={ () =>
 					this.onSetFeatured( MEDIA_ID_NO_FEATURED_IMAGE_SET )
 				}
@@ -632,7 +632,7 @@ export class ImageEdit extends Component {
 				label={ __( 'Set as Featured Image' ) }
 				labelStyle={ setFeaturedButtonStyle }
 				cellContainerStyle={ styles.setFeaturedButtonCellContainer }
-				separatorType={ 'none' }
+				separatorType="none"
 				onPress={ () => this.onSetFeatured( attributes.id ) }
 			/>
 		);

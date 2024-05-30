@@ -366,7 +366,11 @@ Undocumented declaration.
 
 ### ErrorBoundary
 
-Undocumented declaration.
+ErrorBoundary is used to catch JavaScript errors anywhere in a child component tree, log those errors, and display a fallback UI.
+
+It uses the lifecycle methods getDerivedStateFromError and componentDidCatch to catch errors in a child component tree.
+
+getDerivedStateFromError is used to render a fallback UI after an error has been thrown, and componentDidCatch is used to log error information.
 
 ### FontSizePicker
 
@@ -422,7 +426,14 @@ _Returns_
 
 ### LocalAutosaveMonitor
 
-Undocumented declaration.
+Monitors local autosaves of a post in the editor. It uses several hooks and functions to manage autosave behavior:
+
+-   `useAutosaveNotice` hook: Manages the creation of a notice prompting the user to restore a local autosave, if one exists.
+-   `useAutosavePurge` hook: Ejects a local autosave after a successful save occurs.
+-   `hasSessionStorageSupport` function: Checks if the current environment supports browser sessionStorage.
+-   `LocalAutosaveMonitor` component: Uses the `AutosaveMonitor` component to perform autosaves at a specified interval.
+
+The module also checks for sessionStorage support and conditionally exports the `LocalAutosaveMonitor` component based on that.
 
 ### MediaPlaceholder
 
@@ -1242,7 +1253,11 @@ _Returns_
 
 ### PostTextEditor
 
-Undocumented declaration.
+Displays the Post Text Editor along with content in Visual and Text mode.
+
+_Returns_
+
+-   `JSX.Element|null`: The rendered PostTextEditor component.
 
 ### PostTitle
 

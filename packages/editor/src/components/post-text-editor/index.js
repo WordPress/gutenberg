@@ -19,6 +19,11 @@ import { VisuallyHidden } from '@wordpress/components';
  */
 import { store as editorStore } from '../../store';
 
+/**
+ * Displays the Post Text Editor along with content in Visual and Text mode.
+ *
+ * @return {JSX.Element|null} The rendered PostTextEditor component.
+ */
 export default function PostTextEditor() {
 	const instanceId = useInstanceId( PostTextEditor );
 	const { content, blocks, type, id } = useSelect( ( select ) => {

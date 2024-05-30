@@ -79,7 +79,7 @@ function CoverHeightInput( {
 			min={ min }
 			onChange={ handleOnChange }
 			onUnitChange={ onUnitChange }
-			__unstableInputWidth={ '80px' }
+			__unstableInputWidth="80px"
 			units={ units }
 			value={ computedValue }
 		/>

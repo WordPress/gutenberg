@@ -348,6 +348,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @var string[]
 	 */
 	const VALID_TOP_LEVEL_KEYS = array(
+		'blockTypes',
 		'customTemplates',
 		'description',
 		'patterns',
@@ -816,6 +817,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @since 5.8.0
 	 * @since 5.9.0 Added the `$valid_block_names` and `$valid_element_name` parameters.
+	 * @since 6.6.0 Extended schema definition to allow enhanced block style variations.
 	 *
 	 * @param array $input               Structure to sanitize.
 	 * @param array $valid_block_names   List of valid block names.
@@ -874,6 +876,27 @@ class WP_Theme_JSON_Gutenberg {
 
 		$schema_styles_blocks   = array();
 		$schema_settings_blocks = array();
+
+		/*
+		 * Generate a schema for blocks.
+		 * - Block styles can contain `elements` & `variations` definitions.
+		 * - Variations definitions cannot be nested.
+		 * - Variations can contain styles for inner `blocks`.
+		 * - Variation inner `blocks` styles can contain `elements`.
+		 *
+		 * As each variation needs a `blocks` schema but further nested
+		 * inner `blocks`, the overall schema will be generated in multiple passes.
+		 */
+		foreach ( $valid_block_names as $block ) {
+			$schema_settings_blocks[ $block ]           = static::VALID_SETTINGS;
+			$schema_styles_blocks[ $block ]             = $styles_non_top_level;
+			$schema_styles_blocks[ $block ]['elements'] = $schema_styles_elements;
+		}
+
+		$block_style_variation_styles             = static::VALID_STYLES;
+		$block_style_variation_styles['blocks']   = $schema_styles_blocks;
+		$block_style_variation_styles['elements'] = $schema_styles_elements;
+
 		foreach ( $valid_block_names as $block ) {
 			// Build the schema for each block style variation.
 			$style_variation_names = array();
@@ -890,12 +913,9 @@ class WP_Theme_JSON_Gutenberg {
 
 			$schema_styles_variations = array();
 			if ( ! empty( $style_variation_names ) ) {
-				$schema_styles_variations = array_fill_keys( $style_variation_names, $styles_non_top_level );
+				$schema_styles_variations = array_fill_keys( $style_variation_names, $block_style_variation_styles );
 			}
 
-			$schema_settings_blocks[ $block ]             = static::VALID_SETTINGS;
-			$schema_styles_blocks[ $block ]               = $styles_non_top_level;
-			$schema_styles_blocks[ $block ]['elements']   = $schema_styles_elements;
 			$schema_styles_blocks[ $block ]['variations'] = $schema_styles_variations;
 		}
 
@@ -905,6 +925,12 @@ class WP_Theme_JSON_Gutenberg {
 		$schema['settings']                               = static::VALID_SETTINGS;
 		$schema['settings']['blocks']                     = $schema_settings_blocks;
 		$schema['settings']['typography']['fontFamilies'] = static::schema_in_root_and_per_origin( static::FONT_FAMILY_SCHEMA );
+
+		/*
+		 * Shared block style variations can be registered from the theme.json data so we can't
+		 * validate them against pre-registered block style variations.
+		 */
+		$schema['styles']['blocks']['variations'] = null;
 
 		// Remove anything that's not present in the schema.
 		foreach ( array( 'styles', 'settings' ) as $subtree ) {
@@ -1008,17 +1034,37 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 5.8.0
 	 * @since 5.9.0 Added `duotone` key with CSS selector.
 	 * @since 6.1.0 Added `features` key with block support feature level selectors.
+	 * @since 6.6.0 Added non-core block style variations to generated metadata.
 	 *
 	 * @return array Block metadata.
 	 */
 	protected static function get_blocks_metadata() {
 		// NOTE: the compat/6.1 version of this method in Gutenberg did not have these changes.
-		$registry = WP_Block_Type_Registry::get_instance();
-		$blocks   = $registry->get_all_registered();
+		$registry       = WP_Block_Type_Registry::get_instance();
+		$blocks         = $registry->get_all_registered();
+		$style_registry = WP_Block_Styles_Registry::get_instance();
 
 		// Is there metadata for all currently registered blocks?
 		$blocks = array_diff_key( $blocks, static::$blocks_metadata );
 		if ( empty( $blocks ) ) {
+			/*
+			 * New block styles may have been registered within WP_Block_Styles_Registry.
+			 * Update block metadata for any new block style variations.
+			 */
+			$registered_styles = $style_registry->get_all_registered();
+			foreach ( static::$blocks_metadata as $block_name => $block_metadata ) {
+				if ( ! empty( $registered_styles[ $block_name ] ) ) {
+					$style_selectors = $block_metadata['styleVariations'] ?? array();
+
+					foreach ( $registered_styles[ $block_name ] as $block_style ) {
+						if ( ! isset( $style_selectors[ $block_style['name'] ] ) ) {
+							$style_selectors[ $block_style['name'] ] = static::get_block_style_variation_selector( $block_style['name'], $block_metadata['selector'] );
+						}
+					}
+
+					static::$blocks_metadata[ $block_name ]['styleVariations'] = $style_selectors;
+				}
+			}
 			return static::$blocks_metadata;
 		}
 
@@ -1051,11 +1097,20 @@ class WP_Theme_JSON_Gutenberg {
 			}
 
 			// If the block has style variations, append their selectors to the block metadata.
+			$style_selectors = array();
 			if ( ! empty( $block_type->styles ) ) {
-				$style_selectors = array();
 				foreach ( $block_type->styles as $style ) {
 					$style_selectors[ $style['name'] ] = static::get_block_style_variation_selector( $style['name'], static::$blocks_metadata[ $block_name ]['selector'] );
 				}
+			}
+
+			// Block style variations can be registered through the WP_Block_Styles_Registry as well as block.json.
+			$registered_styles = $style_registry->get_registered_styles_for_block( $block_name );
+			foreach ( $registered_styles as $style ) {
+				$style_selectors[ $style['name'] ] = static::get_block_style_variation_selector( $style['name'], static::$blocks_metadata[ $block_name ]['selector'] );
+			}
+
+			if ( ! empty( $style_selectors ) ) {
 				static::$blocks_metadata[ $block_name ]['styleVariations'] = $style_selectors;
 			}
 		}
@@ -1167,6 +1222,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @since 5.8.0
 	 * @since 5.9.0 Removed the `$type` parameter`, added the `$types` and `$origins` parameters.
+	 * @since 6.6.0 Added option to skip root layout styles.
 	 *
 	 * @param array $types   Types of styles to load. Will load all by default. It accepts:
 	 *                       - `variables`: only the CSS Custom Properties for presets & custom ones.
@@ -1174,8 +1230,10 @@ class WP_Theme_JSON_Gutenberg {
 	 *                       - `presets`: only the classes for the presets.
 	 * @param array $origins A list of origins to include. By default it includes VALID_ORIGINS.
 	 * @param array $options An array of options for now used for internal purposes only (may change without notice).
-	 *                       The options currently supported are 'scope' that makes sure all style are scoped to a given selector,
-	 *                       and root_selector which overwrites and forces a given selector to be used on the root node.
+	 *                       The options currently supported are:
+	 *                       - 'scope' that makes sure all style are scoped to a given selector
+	 *                       - `root_selector` which overwrites and forces a given selector to be used on the root node
+	 *                       - `skip_root_layout_styles` which omits root layout styles from the generated stylesheet.
 	 * @return string The resulting stylesheet.
 	 */
 	public function get_stylesheet( $types = array( 'variables', 'styles', 'presets' ), $origins = null, $options = array() ) {
@@ -1228,7 +1286,7 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		if ( in_array( 'styles', $types, true ) ) {
-			if ( false !== $root_style_key ) {
+			if ( false !== $root_style_key && empty( $options['skip_root_layout_styles'] ) ) {
 				$stylesheet .= $this->get_root_layout_rules( $style_nodes[ $root_style_key ]['selector'], $style_nodes[ $root_style_key ] );
 			}
 			$stylesheet .= $this->get_block_classes( $style_nodes );
@@ -3159,6 +3217,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * Removes insecure data from theme.json.
 	 *
 	 * @since 5.9.0
+	 * @since 6.6.0 Added support for block style variation element styles.
 	 *
 	 * @param array $theme_json Structure to sanitize.
 	 * @return array Sanitized structure.
@@ -3220,6 +3279,29 @@ class WP_Theme_JSON_Gutenberg {
 					}
 
 					$variation_output = static::remove_insecure_styles( $variation_input );
+
+					// Process a variation's elements and element pseudo selector styles.
+					if ( isset( $variation_input['elements'] ) ) {
+						foreach ( $valid_element_names as $element_name ) {
+							$element_input = $variation_input['elements'][ $element_name ] ?? null;
+							if ( $element_input ) {
+								$element_output = static::remove_insecure_styles( $element_input );
+
+								if ( isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element_name ] ) ) {
+									foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element_name ] as $pseudo_selector ) {
+										if ( isset( $element_input[ $pseudo_selector ] ) ) {
+											$element_output[ $pseudo_selector ] = static::remove_insecure_styles( $element_input[ $pseudo_selector ] );
+										}
+									}
+								}
+
+								if ( ! empty( $element_output ) ) {
+									_wp_array_set( $variation_output, array( 'elements', $element_name ), $element_output );
+								}
+							}
+						}
+					}
+
 					if ( ! empty( $variation_output ) ) {
 						_wp_array_set( $sanitized, $variation['path'], $variation_output );
 					}

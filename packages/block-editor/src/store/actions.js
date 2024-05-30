@@ -1000,7 +1000,10 @@ export const __unstableSplitSelection =
 			const first = firstBlocks.shift();
 			head = {
 				...head,
-				attributes: headType.merge( head.attributes, first.attributes ),
+				attributes: {
+					...head.attributes,
+					...headType.merge( head.attributes, first.attributes ),
+				},
 			};
 			output.push( head );
 			selection = {
@@ -1034,10 +1037,10 @@ export const __unstableSplitSelection =
 				const last = lastBlocks.pop();
 				output.push( {
 					...tail,
-					attributes: tailType.merge(
-						last.attributes,
-						tail.attributes
-					),
+					attributes: {
+						...tail.attributes,
+						...tailType.merge( last.attributes, tail.attributes ),
+					},
 				} );
 				output.push( ...lastBlocks );
 				selection = {
