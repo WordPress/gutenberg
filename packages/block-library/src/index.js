@@ -29,6 +29,7 @@ import * as calendar from './calendar';
 import * as categories from './categories';
 import * as classic from './freeform';
 import * as code from './code';
+import * as collab from './collab';
 import * as column from './column';
 import * as columns from './columns';
 import * as comments from './comments';
@@ -147,6 +148,7 @@ const getAllBlocks = () => {
 		calendar,
 		categories,
 		code,
+		collab,
 		column,
 		columns,
 		commentAuthorAvatar,
