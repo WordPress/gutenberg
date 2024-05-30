@@ -168,6 +168,7 @@ export default function PostPreviewButton( {
 			className={ className || 'editor-post-preview' }
 			href={ href }
 			target={ targetId }
+			__experimentalIsFocusable
 			disabled={ ! isSaveable }
 			onClick={ openPreviewWindow }
 			role={ role }
