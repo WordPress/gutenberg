@@ -242,16 +242,30 @@ export function getActiveBlockVariation( state, blockName, attributes, scope ) {
 			const blockType = getBlockType( state, blockName );
 			const attributeKeys = Object.keys( blockType?.attributes || {} );
 			const definedAttributes = variation.isActive.filter(
-				( attribute ) => attributeKeys.includes( attribute )
+				( attribute ) => {
+					// We support nested attribute paths, e.g. `layout.type`.
+					// In this case, we need to check if the part before the
+					// first dot is a known attribute.
+					const topLevelAttribute = attribute.split( '.' )[ 0 ];
+					return attributeKeys.includes( topLevelAttribute );
+				}
 			);
 			if ( definedAttributes.length === 0 ) {
 				return false;
 			}
-			return definedAttributes.every(
-				( attribute ) =>
-					attributes[ attribute ] ===
-					variation.attributes[ attribute ]
-			);
+			return definedAttributes.every( ( attribute ) => {
+				const attributeValue = getValueFromObjectPath(
+					attributes,
+					attribute
+				);
+				if ( attributeValue === undefined ) {
+					return false;
+				}
+				return (
+					attributeValue ===
+					getValueFromObjectPath( variation.attributes, attribute )
+				);
+			} );
 		}
 
 		return variation.isActive?.( attributes, variation.attributes );
