@@ -237,10 +237,17 @@ export const getBlockVariations = createSelector(
 export function getActiveBlockVariation( state, blockName, attributes, scope ) {
 	const variations = getBlockVariations( state, blockName, scope );
 
-	const match = variations?.find( ( variation ) => {
+	if ( ! variations ) {
+		return variations;
+	}
+
+	const blockType = getBlockType( state, blockName );
+	const attributeKeys = Object.keys( blockType?.attributes || {} );
+
+	const matches = [];
+
+	for ( const variation of variations ) {
 		if ( Array.isArray( variation.isActive ) ) {
-			const blockType = getBlockType( state, blockName );
-			const attributeKeys = Object.keys( blockType?.attributes || {} );
 			const definedAttributes = variation.isActive.filter(
 				( attribute ) => {
 					// We support nested attribute paths, e.g. `layout.type`.
@@ -251,27 +258,49 @@ export function getActiveBlockVariation( state, blockName, attributes, scope ) {
 				}
 			);
 			if ( definedAttributes.length === 0 ) {
-				return false;
+				continue;
 			}
-			return definedAttributes.every( ( attribute ) => {
-				const attributeValue = getValueFromObjectPath(
-					attributes,
-					attribute
-				);
-				if ( attributeValue === undefined ) {
-					return false;
-				}
-				return (
-					attributeValue ===
-					getValueFromObjectPath( variation.attributes, attribute )
-				);
-			} );
+			if (
+				! definedAttributes.every( ( attribute ) => {
+					const attributeValue = getValueFromObjectPath(
+						attributes,
+						attribute
+					);
+					if ( attributeValue === undefined ) {
+						return false;
+					}
+					return (
+						attributeValue ===
+						getValueFromObjectPath(
+							variation.attributes,
+							attribute
+						)
+					);
+				} )
+			) {
+				continue;
+			}
+			// We assign a specificity score to each variation based on the number of attributes
+			// that it matches.
+			matches.push( [ variation, definedAttributes.length ] );
+		} else if ( variation.isActive?.( attributes, variation.attributes ) ) {
+			// If isActive is a function, we cannot know how many attributes it matches.
+			// This means that we cannot compare the specificity of our matches,
+			// and simply return the first match we have found.
+			if ( matches.length > 0 ) {
+				return matches[ 0 ][ 0 ];
+			}
+			return variation;
 		}
+	}
 
-		return variation.isActive?.( attributes, variation.attributes );
-	} );
-
-	return match;
+	let candidate = [ undefined, 0 ];
+	for ( const [ variation, specificity ] of matches ) {
+		if ( specificity > candidate[ 1 ] ) {
+			candidate = [ variation, specificity ];
+		}
+	}
+	return candidate?.[ 0 ];
 }
 
 /**
