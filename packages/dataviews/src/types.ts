@@ -189,6 +189,11 @@ interface ViewBase {
 	filters: Filter[];
 
 	/**
+	 * Initial filters of the view.
+	 */
+	initialFilters: Filter[];
+
+	/**
 	 * The sorting configuration.
 	 */
 	sort?: {

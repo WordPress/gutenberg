@@ -25,11 +25,13 @@ export default function ResetFilter( {
 			( _filter ) => _filter.field === field && _filter.isPrimary
 		);
 	const isDisabled =
-		! view.search &&
-		! view.filters?.some(
-			( _filter ) =>
-				_filter.value !== undefined || ! isPrimary( _filter.field )
-		);
+		( ! view.search &&
+			! view.filters?.some(
+				( _filter ) =>
+					_filter.value !== undefined || ! isPrimary( _filter.field )
+			) ) ||
+		view.filters === view.initialFilters;
+
 	return (
 		<Button
 			disabled={ isDisabled }
@@ -42,7 +44,7 @@ export default function ResetFilter( {
 					...view,
 					page: 1,
 					search: '',
-					filters: [],
+					filters: view.initialFilters,
 				} );
 			} }
 		>

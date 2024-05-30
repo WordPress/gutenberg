@@ -61,6 +61,7 @@ function useView( postType ) {
 			DEFAULT_VIEWS[ postType ].find(
 				( { slug } ) => slug === activeView
 			)?.view;
+		defaultView.initialFilters = defaultView.filters;
 		if ( isCustom === 'false' && layout ) {
 			return {
 				...defaultView,

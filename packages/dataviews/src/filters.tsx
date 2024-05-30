@@ -36,6 +36,15 @@ function _Filters< Item extends AnyItem >( {
 			return;
 		}
 
+		// Check if this filter is applied by the default view.
+		const isPreAppliedFilter = view.initialFilters.some(
+			( f ) =>
+				f.field === field.id && ALL_OPERATORS.includes( f.operator )
+		);
+		if ( isPreAppliedFilter ) {
+			return;
+		}
+
 		const operators = sanitizeOperators( field );
 		if ( operators.length === 0 ) {
 			return;
