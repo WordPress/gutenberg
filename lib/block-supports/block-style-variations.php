@@ -7,7 +7,7 @@
  */
 
 /**
- * Get the class name for this application of this block's variation styles.
+ * Generate class name for this application of this block's variation styles.
  *
  * @since 6.6.0
  *
@@ -16,7 +16,7 @@
  *
  * @return string The unique class name.
  */
-function gutenberg_get_block_style_variation_class_name( $block, $variation ) {
+function gutenberg_create_block_style_variation_class_name( $block, $variation ) {
 	return 'is-style-' . $variation . '--' . md5( serialize( $block ) );
 }
 
@@ -79,20 +79,27 @@ function gutenberg_render_block_style_variation_support_styles( $parsed_block ) 
 		return $parsed_block;
 	}
 
-	$class_name         = gutenberg_get_block_style_variation_class_name( $parsed_block, $variation );
+	$class_name         = gutenberg_create_block_style_variation_class_name( $parsed_block, $variation );
 	$updated_class_name = $parsed_block['attrs']['className'] . " $class_name";
 	$variation_instance = substr( $class_name, 9 );
-	$class_name         = ".$class_name";
+	$selector           = ".$class_name";
 
 	/*
-	 * To support blocks with more complex selectors, that can apply styles to
-	 * inner markup or even different inner elements depending on the feature,
-	 * the variation style data needs to be manipulated some. If the root variation
-	 * styles are moved under a variations property they will generate as desired.
+	 * Even though block style variations are effectively theme.json partials,
+	 * they can't be processed completely as though they are.
 	 *
-	 * Example blocks that require this approach include:
-	 *  - Button: `.wp-block-button .wp-block-button__link`
-	 *  - Image: `.wp-block-image` and `.wp-block-image img` for borders, shadow etc.
+	 * Block styles support custom selectors to direct specific types of styles
+	 * to inner elements. For example, borders on Image block's get applied to
+	 * the inner `img` element rather than the wrapping `figure`.
+	 *
+	 * The following relocates the "root" block style variation styles to
+	 * under an appropriate blocks property to leverage the preexisting style
+	 * generation for simple block style variations. This way they get the
+	 * custom selectors they need.
+	 *
+	 * The inner elements and block styles for the variation itself are
+	 * still included at the top level but scoped by the variation's selector
+	 * when the stylesheet is generated.
 	 */
 	$elements_data = $variation_data['elements'] ?? array();
 	$blocks_data   = $variation_data['blocks'] ?? array();
@@ -113,7 +120,7 @@ function gutenberg_render_block_style_variation_support_styles( $parsed_block ) 
 		),
 	);
 
-	// Turn off filter that excludes block nodes. They are needed here.
+	// Turn off filter that excludes block nodes. They are needed here for the variation's inner block types.
 	if ( ! is_admin() ) {
 		remove_filter( 'wp_theme_json_get_style_nodes', 'wp_filter_out_block_nodes' );
 	}
@@ -128,14 +135,14 @@ function gutenberg_render_block_style_variation_support_styles( $parsed_block ) 
 		array( 'custom' ),
 		array(
 			'skip_root_layout_styles' => true,
-			'scope'                   => $class_name,
+			'scope'                   => $selector,
 		)
 	);
 
 	// Clean up temporary block style now instance styles have been processed.
 	$styles_registry->unregister( $parsed_block['blockName'], $variation_instance );
 
-	// Restore filter that excludes block nodes. They are needed here.
+	// Restore filter that excludes block nodes.
 	if ( ! is_admin() ) {
 		add_filter( 'wp_theme_json_get_style_nodes', 'wp_filter_out_block_nodes' );
 	}
@@ -179,7 +186,7 @@ function gutenberg_render_block_style_variation_class_name( $block_content, $blo
 	 * Matches a class prefixed by `is-style`, followed by the
 	 * variation slug, then `--`, and finally a hash.
 	 *
-	 * See `gutenberg_get_block_style_variation_class_name` for class generation.
+	 * See `gutenberg_create_block_style_variation_class_name` for class generation.
 	 */
 	preg_match( '/\bis-style-(\S+?--\w+)\b/', $block['attrs']['className'], $matches );
 
@@ -211,7 +218,7 @@ function gutenberg_render_block_style_variation_class_name( $block_content, $blo
  *
  * @param array $variations Shared block style variations.
  *
- * @return array Block variations data to be merged under styles.blocks
+ * @return array Block variations data to be merged under `styles.blocks`.
  */
 function gutenberg_resolve_and_register_block_style_variations( $variations ) {
 	$variations_data = array();
