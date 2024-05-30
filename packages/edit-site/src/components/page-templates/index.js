@@ -187,19 +187,23 @@ function Preview( { item, viewType } ) {
 	);
 }
 
-// TODO: what are the possible post types?
-// How about CPTs added by plugins, etc.?
+// TODO: how about CPTs added by plugins, etc.?
 const POST_TYPES = {
 	post: __( 'Post' ),
 	page: __( 'Page' ),
 };
 
 // This maps the template slug to the post types it should be available for.
-// TODO: review the hierarchy and consider single-{post_type}, archives-{post_type}, etc.
+// https://developer.wordpress.org/themes/basics/template-hierarchy/#visual-overview
+// It only addresses primary and secondary templates, but not tertiary (aka variable) templates.
 const TEMPLATE_TO_POST_TYPE = {
-	single: [ 'post' ],
+	// 1. Primary templates.
+	index: [ 'post', 'page' ],
 	singular: [ 'post', 'page' ],
+	single: [ 'post' ],
 	page: [ 'page' ],
+	// 2. Secondary templates.
+	'single-post': [ 'post' ],
 };
 
 export default function PageTemplates() {
