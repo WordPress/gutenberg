@@ -23,28 +23,17 @@ export default {
 		).meta?.[ args.key ];
 	},
 	setValue( { registry, context, args, value } ) {
-		const postId =
-			context?.postId ||
-			registry.select( editorStore ).getCurrentPostId();
-		const postType =
-			context?.postType ||
-			registry.select( editorStore ).getCurrentPostType();
 		registry
 			.dispatch( coreDataStore )
-			.editEntityRecord( 'postType', postType, postId, {
+			.editEntityRecord( 'postType', context?.postType, context?.postId, {
 				meta: {
 					[ args.key ]: value,
 				},
 			} );
 	},
 	lockAttributesEditing( { select, context, args } ) {
-		const postId =
-			context?.postId || select( editorStore ).getCurrentPostId();
-		const postType =
-			context?.postType || select( editorStore ).getCurrentPostType();
-
 		// Check that editing is happening in the post editor and not a template.
-		if ( postType === 'wp_template' ) {
+		if ( context?.postType === 'wp_template' ) {
 			return true;
 		}
 
@@ -58,8 +47,8 @@ export default {
 		// Check that the user has the capability to edit post meta.
 		const canUserEdit = select( coreDataStore ).canUserEditEntityRecord(
 			'postType',
-			postType,
-			postId
+			context?.postType,
+			context?.postId
 		);
 		if ( ! canUserEdit ) {
 			return true;
