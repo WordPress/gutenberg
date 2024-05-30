@@ -12,7 +12,7 @@ import { EntitiesSavedStatesExtensible } from './components/entities-saved-state
 import useAutoSwitchEditorSidebars from './components/provider/use-auto-switch-editor-sidebars';
 import useBlockEditorSettings from './components/provider/use-block-editor-settings';
 import BackButton from './components/header/back-button';
-import EditorCanvas from './components/editor-canvas';
+import EditorInterface from './components/editor-interface';
 import Header from './components/header';
 import CreateTemplatePartModal from './components/create-template-part-modal';
 import InserterSidebar from './components/inserter-sidebar';
@@ -49,7 +49,7 @@ lock( privateApis, {
 	ExperimentalEditorProvider,
 	EntitiesSavedStatesExtensible,
 	GlobalStylesProvider,
-	EditorCanvas,
+	EditorInterface,
 	Header,
 	InserterSidebar,
 	ListViewSidebar,

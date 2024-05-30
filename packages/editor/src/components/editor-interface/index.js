@@ -45,7 +45,7 @@ const interfaceLabels = {
 	footer: __( 'Editor footer' ),
 };
 
-export default function EditorCanvas( {
+export default function EditorInterface( {
 	className,
 	styles,
 	children,
@@ -143,7 +143,7 @@ export default function EditorCanvas( {
 					{ ! isDistractionFree && <EditorNotices /> }
 					{ ( mode === 'text' || ! isRichEditingEnabled ) && (
 						<TextEditor
-							// We should auto-focus the canvas (title) on load.
+							// We should auto-focus the (title) on load.
 							// eslint-disable-next-line jsx-a11y/no-autofocus
 							autoFocus={ autoFocus }
 						/>
@@ -156,7 +156,7 @@ export default function EditorCanvas( {
 							styles={ styles }
 							contentRef={ contentRef }
 							disableIframe={ disableIframe }
-							// We should auto-focus the canvas (title) on load.
+							// We should auto-focus the (title) on load.
 							// eslint-disable-next-line jsx-a11y/no-autofocus
 							autoFocus={ autoFocus }
 						/>

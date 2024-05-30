@@ -49,7 +49,8 @@ import { useShouldIframe } from './use-should-iframe';
 const { getLayoutStyles } = unlock( blockEditorPrivateApis );
 const { useCommands } = unlock( coreCommandsPrivateApis );
 const { useCommandContext } = unlock( commandsPrivateApis );
-const { FullscreenMode, EditorCanvas, Sidebar } = unlock( editorPrivateApis );
+const { EditorInterface, FullscreenMode, Sidebar } =
+	unlock( editorPrivateApis );
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 const DESIGN_POST_TYPES = [
 	'wp_template',
@@ -293,7 +294,7 @@ function Layout( { initialPost } ) {
 			) }
 			<PostEditorMoreMenu />
 			<BackButton initialPost={ initialPost } />
-			<EditorCanvas
+			<EditorInterface
 				className={ className }
 				styles={ styles }
 				forceIsDirty={ hasActiveMetaboxes }
@@ -309,7 +310,7 @@ function Layout( { initialPost } ) {
 						<MetaBoxes location="advanced" />
 					</div>
 				) }
-			</EditorCanvas>
+			</EditorInterface>
 		</>
 	);
 }
