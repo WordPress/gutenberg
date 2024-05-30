@@ -42,9 +42,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 		let newAttributes = blockAttributes;
 		if ( bindings ) {
 			newAttributes = transformBlockAttributesWithBindingsValues(
-				blockAttributes,
 				clientId,
-				name,
 				context,
 				registry
 			);
