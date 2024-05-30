@@ -821,21 +821,10 @@ class WP_Theme_JSON_Gutenberg {
 			}
 		}
 
-		/*
-		 * Prior to version 3, spacingSizes were generated in WP_Theme_JSON_Resolver_Gutenberg::get_merged_data().
-		 *
-		 * It's important to use the original $theme_json for the version check
-		 * here because WP_Theme_JSON_Schema_Gutenberg::migrate() has already updated the
-		 * version for $this->theme_json. It's only really relevant in order to
-		 * keep backwards compatibility for the wp_theme_json_data_theme filter
-		 * in WP_Theme_JSON_Resolver_Gutenberg. The WP_Theme_JSON_Data_Gutenberg
-		 * instances of v2 themes did not have have the generated spacingSizes
-		 * included, but since the preset generation was moved inside this class
-		 * it makes the most sense to generate them here.
-		 */
+		// Pre-generate the spacingSizes from spacingScale.
 		$scale_path    = array( 'settings', 'spacing', 'spacingScale', $origin );
 		$spacing_scale = _wp_array_get( $this->theme_json, $scale_path, null );
-		if ( $theme_json['version'] >= 3 && isset( $spacing_scale ) ) {
+		if ( isset( $spacing_scale ) ) {
 			$sizes_path           = array( 'settings', 'spacing', 'spacingSizes', $origin );
 			$spacing_sizes        = _wp_array_get( $this->theme_json, $sizes_path, array() );
 			$spacing_scale_sizes  = static::compute_spacing_sizes( $spacing_scale );
