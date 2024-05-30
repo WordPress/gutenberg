@@ -163,6 +163,7 @@ function RevisionsButtons( {
 					>
 						<Button
 							className="edit-site-global-styles-screen-revisions__revision-button"
+							__experimentalIsFocusable
 							disabled={ isSelected }
 							onClick={ () => {
 								onChange( revision );
