@@ -188,6 +188,10 @@ export function RichTextWrapper(
 						! blockBindingsSource ||
 						blockBindingsSource.lockAttributesEditing( {
 							select,
+							context:
+								select( blockEditorStore ).getBlockContext(
+									clientId
+								),
 							args: binding.args,
 						} )
 					) {
