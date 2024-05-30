@@ -1342,6 +1342,45 @@ test.describe( 'Block bindings', () => {
 				await expect( newEmptyParagraph ).toHaveText( '' );
 				await expect( newEmptyParagraph ).toBeEditable();
 			} );
+
+			test( 'should be possible to edit the value of the custom field from the paragraph', async ( {
+				editor,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						anchor: 'paragraph-binding',
+						content: 'paragraph default content',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/post-meta',
+									args: { key: 'text_custom_field' },
+								},
+							},
+						},
+					},
+				} );
+				const paragraphBlock = editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} );
+
+				await expect( paragraphBlock ).toHaveText(
+					'Value of the text_custom_field'
+				);
+				await expect( paragraphBlock ).toBeEditable();
+				await paragraphBlock.fill( 'new value' );
+				// Check that the paragraph content attribute didn't change.
+				const [ paragraphBlockObject ] = await editor.getBlocks();
+				expect( paragraphBlockObject.attributes.content ).toBe(
+					'paragraph default content'
+				);
+				// Check the value of the custom field is being updated by visiting the frontend.
+				const previewPage = await editor.openPreviewPage();
+				await expect(
+					previewPage.locator( '#paragraph-binding' )
+				).toHaveText( 'new value' );
+			} );
 		} );
 
 		test.describe( 'Heading', () => {
