@@ -13,6 +13,7 @@ import {
 import { useCallback, useRef } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { ESCAPE } from '@wordpress/keycodes';
+import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -22,22 +23,23 @@ import { store as editorStore } from '../../store';
 
 const { PrivateInserterLibrary } = unlock( blockEditorPrivateApis );
 
-export default function InserterSidebar( {
-	closeGeneralSidebar,
-	isRightSidebarOpen,
-} ) {
+export default function InserterSidebar() {
 	const {
 		blockSectionRootClientId,
 		inserterSidebarToggleRef,
 		insertionPoint,
 		showMostUsedBlocks,
+		sidebarIsOpened,
 	} = useSelect( ( select ) => {
-		const { getInserterSidebarToggleRef, getInsertionPoint } = unlock(
-			select( editorStore )
-		);
+		const {
+			getInserterSidebarToggleRef,
+			getInsertionPoint,
+			isPublishSidebarOpened,
+		} = unlock( select( editorStore ) );
 		const { getBlockRootClientId, __unstableGetEditorMode, getSettings } =
 			select( blockEditorStore );
 		const { get } = select( preferencesStore );
+		const { getActiveComplementaryArea } = select( interfaceStore );
 		const getBlockSectionRootClientId = () => {
 			if ( __unstableGetEditorMode() === 'zoom-out' ) {
 				const { sectionRootClientId } = unlock( getSettings() );
@@ -52,9 +54,13 @@ export default function InserterSidebar( {
 			insertionPoint: getInsertionPoint(),
 			showMostUsedBlocks: get( 'core', 'mostUsedBlocks' ),
 			blockSectionRootClientId: getBlockSectionRootClientId(),
+			sidebarIsOpened: !! (
+				getActiveComplementaryArea( 'core' ) || isPublishSidebarOpened()
+			),
 		};
 	}, [] );
 	const { setIsInserterOpened } = useDispatch( editorStore );
+	const { disableComplementaryArea } = useDispatch( interfaceStore );
 
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
@@ -93,7 +99,9 @@ export default function InserterSidebar( {
 				__experimentalInitialCategory={ insertionPoint.category }
 				__experimentalFilterValue={ insertionPoint.filterValue }
 				onPatternCategorySelection={
-					isRightSidebarOpen ? closeGeneralSidebar : undefined
+					sidebarIsOpened
+						? () => disableComplementaryArea( 'core' )
+						: undefined
 				}
 				ref={ libraryRef }
 				onClose={ closeInserterSidebar }

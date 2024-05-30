@@ -60,7 +60,6 @@ const {
 	ListViewSidebar,
 	InterfaceSkeleton,
 	ComplementaryArea,
-	interfaceStore,
 	SavePublishPanels,
 	Sidebar,
 	TextEditor,
@@ -101,7 +100,6 @@ export default function Editor( { isLoading } ) {
 		editorMode,
 		canvasMode,
 		blockEditorMode,
-		isRightSidebarOpen,
 		isInserterOpen,
 		isListViewOpen,
 		isDistractionFree,
@@ -116,7 +114,6 @@ export default function Editor( { isLoading } ) {
 			select( editSiteStore )
 		);
 		const { __unstableGetEditorMode } = select( blockEditorStore );
-		const { getActiveComplementaryArea } = select( interfaceStore );
 		const { getEntityRecord, getCurrentTheme } = select( coreDataStore );
 		const {
 			isInserterOpened,
@@ -142,7 +139,6 @@ export default function Editor( { isLoading } ) {
 			blockEditorMode: __unstableGetEditorMode(),
 			isInserterOpen: isInserterOpened(),
 			isListViewOpen: isListViewOpened(),
-			isRightSidebarOpen: getActiveComplementaryArea( 'core' ),
 			isDistractionFree: get( 'core', 'distractionFree' ),
 			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
 			showIconLabels: get( 'core', 'showIconLabels' ),
@@ -187,8 +183,6 @@ export default function Editor( { isLoading } ) {
 		CanvasLoader,
 		'edit-site-editor__loading-progress'
 	);
-
-	const { closeGeneralSidebar } = useDispatch( editSiteStore );
 
 	const settings = useSpecificEditorSettings();
 
@@ -357,12 +351,7 @@ export default function Editor( { isLoading } ) {
 						}
 						secondarySidebar={
 							isEditMode &&
-							( ( shouldShowInserter && (
-								<InserterSidebar
-									closeGeneralSidebar={ closeGeneralSidebar }
-									isRightSidebarOpen={ isRightSidebarOpen }
-								/>
-							) ) ||
+							( ( shouldShowInserter && <InserterSidebar /> ) ||
 								( shouldShowListView && <ListViewSidebar /> ) )
 						}
 						sidebar={
