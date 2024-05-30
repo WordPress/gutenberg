@@ -185,7 +185,7 @@ function gutenberg_render_block_style_variation_class_name( $block_content, $blo
 	 * Matches a class prefixed by `is-style`, followed by the
 	 * variation slug, then `--`, and finally a hash.
 	 *
-	 * See `gutenberg_create_block_style_variation_class_name` for class generation.
+	 * See `gutenberg_create_block_style_variation_instance_name` for class generation.
 	 */
 	preg_match( '/\bis-style-(\S+?--\w+)\b/', $block['attrs']['className'], $matches );
 
