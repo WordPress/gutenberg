@@ -774,7 +774,8 @@ class WP_Theme_JSON_Gutenberg {
 	 * Constructor.
 	 *
 	 * @since 5.8.0
-	 * @since 6.6.0 Pre-generate the spacingSizes from spacingScale.
+	 * @since 6.6.0 Key spacingScale by origin, and pre-generate the
+	 *              spacingSizes from spacingScale.
 	 *
 	 * @param array  $theme_json A structure that follows the theme.json schema.
 	 * @param string $origin     Optional. What source of data this object represents.
@@ -3016,6 +3017,8 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @since 5.8.0
 	 * @since 5.9.0 Duotone preset also has origins.
+	 * @since 6.6.0 Use the spacingScale keyed by origin, and re-generate the
+	 *              spacingSizes from spacingScale.
 	 *
 	 * @param WP_Theme_JSON_Gutenberg $incoming Data to merge.
 	 */
