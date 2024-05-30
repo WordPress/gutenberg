@@ -1114,7 +1114,11 @@ Undocumented declaration.
 
 ### PostPublishButtonLabel
 
-Undocumented declaration.
+Component for publish button label.
+
+_Returns_
+
+-   `Element`: The component to be rendered.
 
 ### PostPublishPanel
 
@@ -1431,7 +1435,9 @@ Undocumented declaration.
 
 ### TextEditorGlobalKeyboardShortcuts
 
-Undocumented declaration.
+Component handles the global keyboard shortcuts for the Text editor.
+
+It provides functionality for various keyboard shortcuts such as toggling editor mode, toggling distraction-free mode, undo/redo.
 
 ### ThemeSupportCheck
 
@@ -1439,7 +1445,11 @@ Undocumented declaration.
 
 ### TimeToRead
 
-Undocumented declaration.
+Component for showing Time To Read in Content.
+
+_Returns_
+
+-   `JSX.Element`: The rendered TimeToRead component.
 
 ### transformStyles
 
