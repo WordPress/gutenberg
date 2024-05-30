@@ -31,7 +31,7 @@ export function BlockTypesTab(
 	{ rootClientId, onInsert, onHover, showMostUsedBlocks },
 	ref
 ) {
-	const [ allItems, items, categories, collections, onSelectItem ] =
+	const [ items, categories, collections, onSelectItem, allItems ] =
 		useBlockTypesState( rootClientId, onInsert );
 
 	const allItemsPerCategory = useMemo( () => {

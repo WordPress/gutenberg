@@ -76,7 +76,7 @@ const useBlockTypesState = ( rootClientId, onInsert ) => {
 		[ onInsert ]
 	);
 
-	return [ allItems, items, categories, collections, onSelectItem ];
+	return [ items, categories, collections, onSelectItem, allItems ];
 };
 
 export default useBlockTypesState;
