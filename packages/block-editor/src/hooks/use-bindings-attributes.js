@@ -3,7 +3,7 @@
  */
 import { store as blocksStore } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { useRegistry } from '@wordpress/data';
+import { useRegistry, useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 
@@ -14,7 +14,7 @@ import { unlock } from '../lock-unlock';
 import {
 	canBindBlock,
 	canBindAttribute,
-	transformBlockAttributesWithBindingsValues,
+	getBoundAttributesValues,
 } from '../utils/bindings';
 
 /** @typedef {import('@wordpress/compose').WPHigherOrderComponent} WPHigherOrderComponent */
@@ -39,14 +39,10 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 		} = props;
 		const bindings = blockAttributes?.metadata?.bindings;
 
-		let newAttributes = blockAttributes;
-		if ( bindings ) {
-			newAttributes = transformBlockAttributesWithBindingsValues(
-				clientId,
-				context,
-				registry
-			);
-		}
+		// It seems if I don't wrap this in a useSelect, the reset in pattern overrides doesn't work as expected.
+		const boundAttributes = useSelect( () => {
+			return getBoundAttributesValues( clientId, context, registry );
+		}, [ clientId, context, registry ] );
 
 		const sources = unlock(
 			registry.select( blocksStore )
@@ -135,7 +131,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 			<>
 				<BlockEdit
 					{ ...props }
-					attributes={ { ...newAttributes } }
+					attributes={ { ...blockAttributes, ...boundAttributes } }
 					setAttributes={ _setAttributes }
 				/>
 			</>
