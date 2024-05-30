@@ -36,6 +36,7 @@ import {
 	getTemporarilyEditingAsBlocks,
 	getTemporarilyEditingFocusModeToRevert,
 } from './private-selectors';
+import { canBindAttribute } from '../utils/bindings';
 
 /**
  * A block selection object.
@@ -136,26 +137,6 @@ export const getBlockAttributes = createRegistrySelector(
 		const bindings = blockAttributes?.metadata?.bindings;
 		if ( ! bindings ) {
 			return blockAttributes;
-		}
-
-		const BLOCK_BINDINGS_ALLOWED_BLOCKS = {
-			'core/paragraph': [ 'content' ],
-			'core/heading': [ 'content' ],
-			'core/image': [ 'id', 'url', 'title', 'alt' ],
-			'core/button': [ 'url', 'text', 'linkTarget', 'rel' ],
-		};
-
-		function canBindBlock( blockName ) {
-			return blockName in BLOCK_BINDINGS_ALLOWED_BLOCKS;
-		}
-
-		function canBindAttribute( blockName, attributeName ) {
-			return (
-				canBindBlock( blockName ) &&
-				BLOCK_BINDINGS_ALLOWED_BLOCKS[ blockName ].includes(
-					attributeName
-				)
-			);
 		}
 
 		const sources = unlock(
