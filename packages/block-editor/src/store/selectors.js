@@ -112,6 +112,13 @@ export function isBlockValid( state, clientId ) {
 }
 
 /**
+ * Variable to avoid processing bindings recursively.
+ *
+ * @type {boolean}
+ */
+let isProcessingBindings;
+
+/**
  * Returns a block's attributes given its client ID, or null if no block exists with
  * the client ID.
  *
@@ -135,9 +142,10 @@ export const getBlockAttributes = createRegistrySelector(
 
 		// Change attribute values if bindings are present.
 		const bindings = blockAttributes?.metadata?.bindings;
-		if ( ! bindings ) {
+		if ( ! bindings || isProcessingBindings ) {
 			return blockAttributes;
 		}
+		isProcessingBindings = true;
 
 		const sources = unlock(
 			select( blocksStore )
@@ -182,6 +190,7 @@ export const getBlockAttributes = createRegistrySelector(
 			}
 		}
 
+		isProcessingBindings = false;
 		return blockAttributes;
 	}
 );
