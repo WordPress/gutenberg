@@ -25,6 +25,7 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
+import { canBindAttribute } from '../utils/bindings';
 import {
 	retrieveSelectedAttribute,
 	findRichTextAttributeKey,
@@ -169,10 +170,8 @@ export const updateBlockAttributes =
 	( { dispatch, registry } ) => {
 		const keptAttributes = { ...attributes };
 		for ( const clientId of clientIds ) {
-			const blockAttributes = registry
-				.select( STORE_NAME )
-				.getBlockAttributes( clientId );
-			const bindings = blockAttributes?.metadata?.bindings;
+			const block = registry.select( STORE_NAME ).getBlock( clientId );
+			const bindings = block.attributes?.metadata?.bindings;
 
 			if ( ! bindings ) {
 				continue;
@@ -189,7 +188,10 @@ export const updateBlockAttributes =
 			);
 
 			attributeEntries.forEach( ( [ attributeName, newValue ] ) => {
-				if ( ! bindings[ attributeName ] ) {
+				if (
+					! bindings[ attributeName ] ||
+					! canBindAttribute( block.name, attributeName )
+				) {
 					return;
 				}
 
