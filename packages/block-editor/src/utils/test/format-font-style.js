@@ -27,7 +27,7 @@ describe( 'formatFontStyle', () => {
 			value: 'oblique',
 		} );
 		expect( formatFontStyle( 'oblique 40deg' ) ).toEqual( {
-			name: 'Oblique 40deg',
+			name: 'oblique 40deg',
 			value: 'oblique 40deg',
 		} );
 	} );
