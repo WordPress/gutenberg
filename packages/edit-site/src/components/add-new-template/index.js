@@ -354,6 +354,7 @@ function NewTemplate() {
 				variant="primary"
 				onClick={ () => setShowModal( true ) }
 				label={ postType.labels.add_new_item }
+				__next40pxDefaultSize
 			>
 				{ postType.labels.add_new_item }
 			</Button>

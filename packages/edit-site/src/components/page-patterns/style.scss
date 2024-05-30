@@ -87,14 +87,22 @@
 
 	.edit-site-patterns__section-header {
 		border-bottom: 1px solid #f0f0f0;
-		min-height: 72px;
-		padding: $grid-unit-30 $grid-unit-60;
+		padding: $grid-unit-20 $grid-unit-60;
 		position: sticky;
 		top: 0;
 		z-index: 2;
 		flex-shrink: 0;
 		transition: padding ease-out 0.1s;
 		@include reduce-motion("transition");
+		min-height: $grid-unit-50;
+
+		.edit-site-patterns__title {
+			min-height: $grid-unit-50;
+		}
+
+		.edit-site-patterns__sub-title {
+			margin-bottom: $grid-unit-10;
+		}
 	}
 
 	.edit-site-patterns__pattern-title {
