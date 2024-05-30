@@ -4394,27 +4394,27 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 				'expected_output' => array(
 					array(
-						'name' => 'X-Small',
+						'name' => 'Small',
 						'slug' => '40',
 						'size' => '2.5rem',
 					),
 					array(
-						'name' => 'Small',
+						'name' => 'Medium',
 						'slug' => '50',
 						'size' => '5rem',
 					),
 					array(
-						'name' => 'Medium',
+						'name' => 'Large',
 						'slug' => '60',
 						'size' => '7.5rem',
 					),
 					array(
-						'name' => 'Large',
+						'name' => 'X-Large',
 						'slug' => '70',
 						'size' => '10rem',
 					),
 					array(
-						'name' => 'X-Large',
+						'name' => '2X-Large',
 						'slug' => '80',
 						'size' => '12.5rem',
 					),
