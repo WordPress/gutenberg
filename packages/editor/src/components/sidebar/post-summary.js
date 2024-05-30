@@ -71,9 +71,9 @@ export default function PostSummary( { onActionPerformed } ) {
 									<VStack spacing={ 1 }>
 										<PostStatusPanel />
 										<PostSchedulePanel />
-										<PostTemplatePanel />
 										<PostURLPanel />
 										<PostAuthorPanel />
+										<PostTemplatePanel />
 										<PostDiscussionPanel />
 										<PostSyncStatus />
 										<BlogTitle />
