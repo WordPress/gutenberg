@@ -13,11 +13,13 @@ import {
 	getBlockType,
 } from '@wordpress/blocks';
 import { useContext, useMemo } from '@wordpress/element';
+import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import BlockContext from '../block-context';
+import { store as blockEditorStore } from '../../store';
 
 /**
  * Default value used for blocks which do not define their own context needs,
@@ -48,9 +50,14 @@ const Edit = ( props ) => {
 const EditWithFilters = withFilters( 'editor.BlockEdit' )( Edit );
 
 const EditWithGeneratedProps = ( props ) => {
-	const { attributes = {}, name } = props;
+	const { clientId, attributes = {}, name } = props;
 	const blockType = getBlockType( name );
 	const blockContext = useContext( BlockContext );
+	// Sync the block context with the block editor store.
+	useDispatch( blockEditorStore ).updateBlockContext(
+		clientId,
+		blockContext
+	);
 
 	// Assign context values using the block type's declared context needs.
 	const context = useMemo( () => {
