@@ -145,7 +145,7 @@ export function ImageEdit( {
 				scale: undefined,
 			} );
 		}
-	}, [ align ] );
+	}, [ __unstableMarkNextChangeAsNotPersistent, align, setAttributes ] );
 
 	const { getSettings } = useSelect( blockEditorStore );
 	const blockEditingMode = useBlockEditingMode();
@@ -328,7 +328,7 @@ export function ImageEdit( {
 					: __( 'Connected to dynamic data' ),
 			};
 		},
-		[ isSingleSelected ]
+		[ isSingleSelected, metadata?.bindings?.url ]
 	);
 	const placeholder = ( content ) => {
 		return (
