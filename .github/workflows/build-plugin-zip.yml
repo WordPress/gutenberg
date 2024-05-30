@@ -69,7 +69,7 @@ jobs:
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@44c2b7a8a4ea60a981eaca3cf939b5f4305c123b # v4.1.5
+              uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
               with:
                   token: ${{ secrets.GUTENBERG_TOKEN }}
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
@@ -165,7 +165,7 @@ jobs:
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@44c2b7a8a4ea60a981eaca3cf939b5f4305c123b # v4.1.5
+              uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
               with:
                   ref: ${{ needs.bump-version.outputs.release_branch || github.ref }}
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
@@ -222,7 +222,7 @@ jobs:
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@44c2b7a8a4ea60a981eaca3cf939b5f4305c123b # v4.1.5
+              uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
               with:
                   fetch-depth: 2
                   ref: ${{ needs.bump-version.outputs.release_branch }}
@@ -311,14 +311,14 @@ jobs:
         if: ${{ endsWith( needs.bump-version.outputs.new_version, '-rc.1' ) }}
         steps:
             - name: Checkout (for CLI)
-              uses: actions/checkout@44c2b7a8a4ea60a981eaca3cf939b5f4305c123b # v4.1.5
+              uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
               with:
                   path: main
                   ref: trunk
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Checkout (for publishing)
-              uses: actions/checkout@44c2b7a8a4ea60a981eaca3cf939b5f4305c123b # v4.1.5
+              uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
               with:
                   path: publish
                   # Later, we switch this branch in the script that publishes packages.

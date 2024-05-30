@@ -83,12 +83,15 @@ function ClassicEdit( {
 		}
 
 		const editor = window.tinymce.get( `editor-${ clientId }` );
-		const currentContent = editor?.getContent();
+		if ( ! editor ) {
+			return;
+		}
 
+		const currentContent = editor.getContent();
 		if ( currentContent !== content ) {
 			editor.setContent( content || '' );
 		}
-	}, [ content ] );
+	}, [ clientId, content ] );
 
 	useEffect( () => {
 		const { baseURL, suffix } = window.wpEditorL10n.tinymce;
@@ -227,6 +230,7 @@ function ClassicEdit( {
 				onReadyStateChange
 			);
 			wp.oldEditor.remove( `editor-${ clientId }` );
+			didMount.current = false;
 		};
 	}, [] );
 
