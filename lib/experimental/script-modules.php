@@ -212,9 +212,9 @@ function gutenberg_dequeue_module( $module_identifier ) {
  */
 function gutenberg_print_script_module_data(): void {
 	$get_marked_for_enqueue = new ReflectionMethod( 'WP_Script_Modules', 'get_marked_for_enqueue' );
-	$get_marked_for_enqueue->setAccessible(true);
+	$get_marked_for_enqueue->setAccessible( true );
 	$get_import_map = new ReflectionMethod( 'WP_Script_Modules', 'get_import_map' );
-	$get_import_map->setAccessible(true);
+	$get_import_map->setAccessible( true );
 
 	$modules = array();
 	foreach ( array_keys( $get_marked_for_enqueue->invoke( wp_script_modules() ) ) as $id ) {
