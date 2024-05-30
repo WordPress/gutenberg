@@ -318,7 +318,11 @@ export function ImageEdit( {
 				lockUrlControls:
 					!! metadata?.bindings?.url &&
 					( ! blockBindingsSource ||
-						blockBindingsSource?.lockAttributesEditing() ),
+						blockBindingsSource?.lockAttributesEditing( {
+							select,
+							context,
+							args: metadata?.bindings?.url?.args,
+						} ) ),
 				lockUrlControlsMessage: blockBindingsSource?.label
 					? sprintf(
 							/* translators: %s: Label of the bindings source. */

@@ -170,7 +170,7 @@ export function RichTextWrapper(
 				const { getBlockBindingsSource } = unlock(
 					select( blocksStore )
 				);
-				for ( const [ attribute, args ] of Object.entries(
+				for ( const [ attribute, binding ] of Object.entries(
 					blockBindings
 				) ) {
 					if (
@@ -182,11 +182,14 @@ export function RichTextWrapper(
 
 					// If the source is not defined, or if its value of `lockAttributesEditing` is `true`, disable it.
 					const blockBindingsSource = getBlockBindingsSource(
-						args.source
+						binding.source
 					);
 					if (
 						! blockBindingsSource ||
-						blockBindingsSource.lockAttributesEditing()
+						blockBindingsSource.lockAttributesEditing( {
+							select,
+							args: binding.args,
+						} )
 					) {
 						_disableBoundBlocks = true;
 						break;

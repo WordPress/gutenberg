@@ -156,6 +156,7 @@ function ButtonEdit( props ) {
 		onReplace,
 		mergeBlocks,
 		clientId,
+		context,
 	} = props;
 	const {
 		tagName,
@@ -247,7 +248,11 @@ function ButtonEdit( props ) {
 				lockUrlControls:
 					!! metadata?.bindings?.url &&
 					( ! blockBindingsSource ||
-						blockBindingsSource?.lockAttributesEditing() ),
+						blockBindingsSource?.lockAttributesEditing( {
+							select,
+							context,
+							args: metadata?.bindings?.url?.args,
+						} ) ),
 			};
 		},
 		[ isSelected, metadata?.bindings?.url ]
