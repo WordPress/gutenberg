@@ -108,6 +108,7 @@ export default function FontAppearanceControl( props ) {
 	// Build font style and weight options based on the font family faces.
 	let fontWeights = [];
 	let fontStyles = [];
+	let variableFont = false;
 
 	fontFamilyFaces?.forEach( ( face ) => {
 		if ( face.fontWeight ) {
@@ -116,6 +117,11 @@ export default function FontAppearanceControl( props ) {
 					( weight ) => weight.value === face.fontWeight
 				)
 			) {
+				// Check if font weight includes a space, if so it must be a variable font.
+				if ( /\s/.test( face.fontWeight ) ) {
+					variableFont = true;
+				}
+
 				fontWeights.push( formatFontWeight( face.fontWeight ) );
 			}
 		}
@@ -128,8 +134,10 @@ export default function FontAppearanceControl( props ) {
 		}
 	} );
 
-	fontWeights = fontWeights.length === 0 ? FONT_WEIGHTS : fontWeights;
-	fontStyles = fontStyles.length === 0 ? FONT_STYLES : fontStyles;
+	fontWeights =
+		fontWeights.length === 0 || variableFont ? FONT_WEIGHTS : fontWeights;
+	fontStyles =
+		fontStyles.length === 0 || variableFont ? FONT_STYLES : fontStyles;
 
 	// Combines both font style and weight options into a single dropdown.
 	const combineOptions = () => {
