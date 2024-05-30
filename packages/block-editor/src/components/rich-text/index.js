@@ -11,6 +11,7 @@ import {
 	useCallback,
 	forwardRef,
 	createContext,
+	useContext,
 } from '@wordpress/element';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useMergeRefs, useInstanceId } from '@wordpress/compose';
@@ -39,6 +40,7 @@ import { Content, valueToHTMLString } from './content';
 import { withDeprecations } from './with-deprecations';
 import { unlock } from '../../lock-unlock';
 import { canBindBlock } from '../../hooks/use-bindings-attributes';
+import BlockContext from '../block-context';
 
 export const keyboardShortcutContext = createContext();
 export const inputEventContext = createContext();
@@ -121,6 +123,7 @@ export function RichTextWrapper(
 	const context = useBlockEditContext();
 	const { clientId, isSelected: isBlockSelected, name: blockName } = context;
 	const blockBindings = context[ blockBindingsKey ];
+	const blockContext = useContext( BlockContext );
 	const selector = ( select ) => {
 		// Avoid subscribing to the block editor store if the block is not
 		// selected.
@@ -187,10 +190,7 @@ export function RichTextWrapper(
 					if (
 						! blockBindingsSource?.canUserEditValue( {
 							select,
-							context:
-								select( blockEditorStore ).getBlockContext(
-									clientId
-								),
+							context: blockContext,
 							args: binding.args,
 						} )
 					) {
