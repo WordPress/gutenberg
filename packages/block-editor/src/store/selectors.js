@@ -114,19 +114,97 @@ export function isBlockValid( state, clientId ) {
  * Returns a block's attributes given its client ID, or null if no block exists with
  * the client ID.
  *
+ * Process block bindings to modify the value of the attributes if needed.
+ *
  * @param {Object} state    Editor state.
  * @param {string} clientId Block client ID.
  *
  * @return {Object?} Block attributes.
  */
-export function getBlockAttributes( state, clientId ) {
-	const block = state.blocks.byClientId.get( clientId );
-	if ( ! block ) {
-		return null;
-	}
+export const getBlockAttributes = createRegistrySelector(
+	( select ) => ( state, clientId ) => {
+		// TODO: Check how to properly access the registry and the block context.
+		const registry = { select };
+		const blockContext = {};
+		const block = state.blocks.byClientId.get( clientId );
+		if ( ! block ) {
+			return null;
+		}
 
-	return state.blocks.attributes.get( clientId );
-}
+		const blockAttributes = state.blocks.attributes.get( clientId );
+
+		// Change attribute values if bindings are present.
+		const bindings = blockAttributes?.metadata?.bindings;
+		if ( ! bindings ) {
+			return blockAttributes;
+		}
+
+		const BLOCK_BINDINGS_ALLOWED_BLOCKS = {
+			'core/paragraph': [ 'content' ],
+			'core/heading': [ 'content' ],
+			'core/image': [ 'id', 'url', 'title', 'alt' ],
+			'core/button': [ 'url', 'text', 'linkTarget', 'rel' ],
+		};
+
+		function canBindBlock( blockName ) {
+			return blockName in BLOCK_BINDINGS_ALLOWED_BLOCKS;
+		}
+
+		function canBindAttribute( blockName, attributeName ) {
+			return (
+				canBindBlock( blockName ) &&
+				BLOCK_BINDINGS_ALLOWED_BLOCKS[ blockName ].includes(
+					attributeName
+				)
+			);
+		}
+
+		const sources = unlock(
+			select( blocksStore )
+		).getAllBlockBindingsSources();
+
+		for ( const [ attributeName, boundAttribute ] of Object.entries(
+			bindings
+		) ) {
+			const source = sources[ boundAttribute.source ];
+			if (
+				! source?.getValue ||
+				! canBindAttribute( block.name, attributeName )
+			) {
+				continue;
+			}
+
+			const context = {};
+
+			if ( source.usesContext?.length ) {
+				for ( const key of source.usesContext ) {
+					context[ key ] = blockContext[ key ];
+				}
+			}
+
+			const args = {
+				registry,
+				context,
+				clientId,
+				attributeName,
+				args: boundAttribute.args,
+			};
+
+			blockAttributes[ attributeName ] = source.getValue( args );
+
+			if ( blockAttributes[ attributeName ] === undefined ) {
+				if ( attributeName === 'url' ) {
+					blockAttributes[ attributeName ] = null;
+				} else {
+					blockAttributes[ attributeName ] =
+						source.getPlaceholder?.( args );
+				}
+			}
+		}
+
+		return blockAttributes;
+	}
+);
 
 /**
  * Returns a block given its client ID. This is a parsed copy of the block,
