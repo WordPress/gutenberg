@@ -240,7 +240,7 @@ export function toTree( {
 				} );
 				append(
 					append( pointer, { type: 'span' } ),
-					attributes[ 'data-rich-text-comment' ]
+					'[' + attributes[ 'data-rich-text-comment' ] + ']'
 				);
 			} else if ( ! isEditableTree && type === 'script' ) {
 				pointer = append(
