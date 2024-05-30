@@ -43,8 +43,12 @@ export default {
 		}
 
 		// Check that the custom field is not protected and available in the REST API.
-		const isFieldExposed =
-			select( editorStore ).getEditedPostAttribute( 'meta' )[ args.key ];
+		const isFieldExposed = !! select( coreDataStore ).getEntityRecord(
+			'postType',
+			postType,
+			context?.postId
+		)?.meta?.[ args.key ];
+
 		if ( ! isFieldExposed ) {
 			return false;
 		}
