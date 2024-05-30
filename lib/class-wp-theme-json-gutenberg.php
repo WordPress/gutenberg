@@ -3940,7 +3940,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param array $spacing_scale {
 	 *      The spacing scale values. All are required.
 	 *
-	 *      @type int    $steps      The number of steps in the scale. (up to 9 steps are supported.)
+	 *      @type int    $steps      The number of steps in the scale. (up to 10 steps are supported.)
 	 *      @type float  $mediumStep The middle value that gets the slug '50'. (For even number of steps, this becomes the first middle value.)
 	 *      @type string $unit       The CSS unit to use for the sizes.
 	 *      @type string $operator   The mathematical operator to apply to generate the other sizes. Either '+' or '*'.
@@ -3954,7 +3954,7 @@ class WP_Theme_JSON_Gutenberg {
 			! is_numeric( $spacing_scale['steps'] ) ||
 			! is_int( $spacing_scale['steps'] + 0 ) ||
 			$spacing_scale['steps'] <= 0 ||
-			$spacing_scale['steps'] > 9 ||
+			$spacing_scale['steps'] > 10 ||
 			! isset( $spacing_scale['mediumStep'] ) ||
 			! is_numeric( $spacing_scale['mediumStep'] ) ||
 			$spacing_scale['mediumStep'] <= 0 ||

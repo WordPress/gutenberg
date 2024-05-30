@@ -476,7 +476,7 @@
 									"description": "Number of steps to generate in scale.",
 									"type": "integer",
 									"minimum": 1,
-									"maximum": 9,
+									"maximum": 10,
 									"default": 7
 								},
 								"mediumStep": {
