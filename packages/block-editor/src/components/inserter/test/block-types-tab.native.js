@@ -25,6 +25,7 @@ const selectMock = {
 	getBlockType: jest.fn(),
 	getClipboard: jest.fn(),
 	getSettings: jest.fn( () => ( { impressions: {} } ) ),
+	getBlocks: jest.fn().mockReturnValue( [] ),
 };
 
 describe( 'BlockTypesTab component', () => {
