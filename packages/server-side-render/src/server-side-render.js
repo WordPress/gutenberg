@@ -112,6 +112,11 @@ export default function ServerSideRender( props ) {
 
 		setIsLoading( true );
 
+		// Schedule showing the Spinner after 1 second.
+		const timeout = setTimeout( () => {
+			setShowLoader( true );
+		}, 1000 );
+
 		let sanitizedAttributes =
 			attributes &&
 			__experimentalSanitizeBlockAttributes( block, attributes );
@@ -165,6 +170,9 @@ export default function ServerSideRender( props ) {
 					fetchRequest === fetchRequestRef.current
 				) {
 					setIsLoading( false );
+					// Cancel the timeout to show the Spinner.
+					setShowLoader( false );
+					clearTimeout( timeout );
 				}
 			} ) );
 
@@ -191,21 +199,6 @@ export default function ServerSideRender( props ) {
 			debouncedFetchData();
 		}
 	} );
-
-	/**
-	 * Effect to handle showing the loading placeholder.
-	 * Show it only if there is no previous response or
-	 * the request takes more than one second.
-	 */
-	useEffect( () => {
-		if ( ! isLoading ) {
-			return;
-		}
-		const timeout = setTimeout( () => {
-			setShowLoader( true );
-		}, 1000 );
-		return () => clearTimeout( timeout );
-	}, [ isLoading ] );
 
 	const hasResponse = !! response;
 	const hasEmptyResponse = response === '';
