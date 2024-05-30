@@ -29,6 +29,7 @@ import {
 	findRichTextAttributeKey,
 	START_OF_SELECTED_AREA,
 } from '../utils/selection';
+import { transformBlockAttributesWithBindingsValues } from '../utils/bindings';
 import {
 	__experimentalUpdateSettings,
 	privateRemoveBlocks,
@@ -823,10 +824,11 @@ export const __unstableDeleteSelection =
 
 /**
  * Split the current selection.
- * @param {?Array} blocks
+ * @param {?Array}  blocks
+ * @param {?Object} context
  */
 export const __unstableSplitSelection =
-	( blocks = [] ) =>
+	( blocks = [], context = {} ) =>
 	( { registry, select, dispatch } ) => {
 		const selectionAnchor = select.getSelectionStart();
 		const selectionFocus = select.getSelectionEnd();
@@ -918,9 +920,14 @@ export const __unstableSplitSelection =
 						  );
 				}
 
-				const length = select.getBlockAttributes( selectionA.clientId )[
-					attributeKeyA
-				].length;
+				const blockAttributes =
+					transformBlockAttributesWithBindingsValues(
+						selectionA.clientId,
+						context,
+						registry
+					);
+
+				const length = blockAttributes[ attributeKeyA ].length;
 
 				if ( selectionA.offset === 0 && length ) {
 					dispatch.insertBlocks(
