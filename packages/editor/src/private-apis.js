@@ -9,6 +9,7 @@ import * as interfaceApis from '@wordpress/interface';
 import { ExperimentalEditorProvider } from './components/provider';
 import { lock } from './lock-unlock';
 import { EntitiesSavedStatesExtensible } from './components/entities-saved-states';
+import EditorContentSlotFill from './components/editor-interface/content-slot-fill';
 import useAutoSwitchEditorSidebars from './components/provider/use-auto-switch-editor-sidebars';
 import useBlockEditorSettings from './components/provider/use-block-editor-settings';
 import BackButton from './components/header/back-button';
@@ -48,8 +49,9 @@ lock( privateApis, {
 	BackButton,
 	ExperimentalEditorProvider,
 	EntitiesSavedStatesExtensible,
-	GlobalStylesProvider,
 	EditorInterface,
+	EditorContentSlotFill,
+	GlobalStylesProvider,
 	Header,
 	InserterSidebar,
 	ListViewSidebar,
