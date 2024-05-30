@@ -250,7 +250,7 @@ function ButtonEdit( props ) {
 						blockBindingsSource?.lockAttributesEditing() ),
 			};
 		},
-		[ isSelected ]
+		[ isSelected, metadata?.bindings?.url ]
 	);
 
 	return (
