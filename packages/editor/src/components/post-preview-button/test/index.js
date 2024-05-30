@@ -144,7 +144,10 @@ describe( 'PostPreviewButton', () => {
 
 		render( <PostPreviewButton /> );
 
-		expect( screen.getByRole( 'button' ) ).toBeDisabled();
+		expect( screen.getByRole( 'button' ) ).toHaveAttribute(
+			'aria-disabled',
+			'true'
+		);
 	} );
 
 	it( 'should not be disabled if post is saveable.', () => {
