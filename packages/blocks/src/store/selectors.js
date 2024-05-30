@@ -6,7 +6,6 @@ import removeAccents from 'remove-accents';
 /**
  * WordPress dependencies
  */
-import { pipe } from '@wordpress/compose';
 import { createSelector } from '@wordpress/data';
 
 /**
@@ -646,6 +645,18 @@ export function hasBlockSupport( state, nameOrType, feature, defaultSupports ) {
 }
 
 /**
+ * Normalizes a search term string: removes accents, converts to lowercase, removes extra whitespace.
+ *
+ * @param {string|null|undefined} term Search term to normalize.
+ * @return {string} Normalized search term.
+ */
+function getNormalizedSearchTerm( term ) {
+	return removeAccents( term ?? '' )
+		.toLowerCase()
+		.trim();
+}
+
+/**
  * Returns true if the block type by the given name or object value matches a
  * search term, or false otherwise.
  *
@@ -684,30 +695,12 @@ export function hasBlockSupport( state, nameOrType, feature, defaultSupports ) {
  *
  * @return {Object[]} Whether block type matches search term.
  */
-export function isMatchingSearchTerm( state, nameOrType, searchTerm ) {
+export function isMatchingSearchTerm( state, nameOrType, searchTerm = '' ) {
 	const blockType = getNormalizedBlockType( state, nameOrType );
-
-	const getNormalizedSearchTerm = pipe( [
-		// Disregard diacritics.
-		//  Input: "média"
-		( term ) => removeAccents( term ?? '' ),
-
-		// Lowercase.
-		//  Input: "MEDIA"
-		( term ) => term.toLowerCase(),
-
-		// Strip leading and trailing whitespace.
-		//  Input: " media "
-		( term ) => term.trim(),
-	] );
-
 	const normalizedSearchTerm = getNormalizedSearchTerm( searchTerm );
 
-	const isSearchMatch = pipe( [
-		getNormalizedSearchTerm,
-		( normalizedCandidate ) =>
-			normalizedCandidate.includes( normalizedSearchTerm ),
-	] );
+	const isSearchMatch = ( candidate ) =>
+		getNormalizedSearchTerm( candidate ).includes( normalizedSearchTerm );
 
 	return (
 		isSearchMatch( blockType.title ) ||
