@@ -113,4 +113,59 @@ test.describe( 'Post publish panel', () => {
 			} )
 		).toBeFocused();
 	} );
+
+	test( 'should show panel and indicator when metadata has been modified', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost( {
+			title: 'Test metadata changes with save panel',
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content: 'paragraph default content',
+				metadata: {
+					bindings: {
+						content: {
+							source: 'core/post-meta',
+							args: { key: 'text_custom_field' },
+						},
+					},
+				},
+			},
+		} );
+		const postId = await editor.publishPost();
+		await editor.modifyMetadata(
+			'post',
+			postId,
+			'text_custom_field',
+			'test value'
+		);
+		const editorTopBar = page.getByRole( 'region', {
+			name: 'Editor top bar',
+		} );
+
+		const saveButton = editorTopBar.getByRole( 'button', {
+			name: 'Save',
+			exact: true,
+		} );
+
+		await expect( saveButton ).toBeVisible();
+
+		await saveButton.click();
+
+		const publishPanel = page.getByRole( 'region', {
+			name: 'Editor publish',
+		} );
+
+		await expect( publishPanel ).toBeVisible();
+
+		const postMetaPanel = publishPanel.locator(
+			'.entities-saved-states__block-bindings'
+		);
+
+		await expect( postMetaPanel ).toBeVisible();
+	} );
 } );
