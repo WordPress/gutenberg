@@ -18,6 +18,7 @@ import {
 } from '@wordpress/blocks';
 import { speak } from '@wordpress/a11y';
 import { __, _n, sprintf } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
 import { create, insert, remove, toHTMLString } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
 
@@ -879,6 +880,20 @@ export const __unstableSplitSelection =
 
 		// If the attribute is bound, don't split the selection and insert a new block instead.
 		if ( bindings?.[ attributeKeyA ] ) {
+			// Show warning if user tries to insert a block into another block with bindings.
+			if ( blocks.length ) {
+				const { createWarningNotice } =
+					registry.dispatch( noticesStore );
+				createWarningNotice(
+					__(
+						"Blocks can't be inserted into other blocks with bindings"
+					),
+					{
+						type: 'snackbar',
+					}
+				);
+				return;
+			}
 			dispatch.insertAfterBlock( selectionA.clientId );
 			return;
 		}
