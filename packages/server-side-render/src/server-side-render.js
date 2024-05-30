@@ -98,7 +98,7 @@ export default function ServerSideRender( props ) {
 		LoadingResponsePlaceholder = DefaultLoadingResponsePlaceholder,
 	} = props;
 
-	const isMountedRef = useRef( true );
+	const isMountedRef = useRef( false );
 	const [ showLoader, setShowLoader ] = useState( false );
 	const fetchRequestRef = useRef();
 	const [ response, setResponse ] = useState( null );
@@ -175,12 +175,12 @@ export default function ServerSideRender( props ) {
 
 	// When the component unmounts, set isMountedRef to false. This will
 	// let the async fetch callbacks know when to stop.
-	useEffect(
-		() => () => {
+	useEffect( () => {
+		isMountedRef.current = true;
+		return () => {
 			isMountedRef.current = false;
-		},
-		[]
-	);
+		};
+	}, [] );
 
 	useEffect( () => {
 		// Don't debounce the first fetch. This ensures that the first render
