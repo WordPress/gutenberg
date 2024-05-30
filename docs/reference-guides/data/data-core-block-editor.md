@@ -187,8 +187,6 @@ _Returns_
 
 Returns a block's attributes given its client ID, or null if no block exists with the client ID.
 
-Process block bindings to modify the value of the attributes if needed.
-
 _Parameters_
 
 -   _state_ `Object`: Editor state.
@@ -197,19 +195,6 @@ _Parameters_
 _Returns_
 
 -   `Object?`: Block attributes.
-
-### getBlockContext
-
-Returns the Block Context of a block, if any exist.
-
-_Parameters_
-
--   _state_ `Object`: Editor state.
--   _clientId_ `?string`: Block client ID.
-
-_Returns_
-
--   `?Object`: Block context of the block if set.
 
 ### getBlockCount
 
@@ -1844,8 +1829,6 @@ _Returns_
 
 Action that updates attributes of multiple blocks with the specified client IDs.
 
-Process block bindings to skip updating the bound attributes and run binding source setValue instead.
-
 _Parameters_
 
 -   _clientIds_ `string|string[]`: Block client IDs.
@@ -1855,19 +1838,6 @@ _Parameters_
 _Returns_
 
 -   `Object`: Action object.
-
-### updateBlockContext
-
-Action that changes the block context of the given block(s) in the store.
-
-_Parameters_
-
--   _clientId_ `string | SettingsByClientId`: Client ID of the block.
--   _context_ `Object`: Object with the new context.
-
-_Returns_
-
--   `Object`: Action object
 
 ### updateBlockListSettings
 

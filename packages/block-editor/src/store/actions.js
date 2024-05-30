@@ -15,7 +15,6 @@ import {
 	getBlockSupport,
 	isUnmodifiedDefaultBlock,
 	isUnmodifiedBlock,
-	store as blocksStore,
 } from '@wordpress/blocks';
 import { speak } from '@wordpress/a11y';
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -25,7 +24,6 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
-import { canBindAttribute } from '../utils/bindings';
 import {
 	retrieveSelectedAttribute,
 	findRichTextAttributeKey,
@@ -157,98 +155,24 @@ export function receiveBlocks( blocks ) {
 /**
  * Action that updates attributes of multiple blocks with the specified client IDs.
  *
- * Process block bindings to skip updating the bound attributes and run binding source setValue instead.
- *
  * @param {string|string[]} clientIds     Block client IDs.
  * @param {Object}          attributes    Block attributes to be merged. Should be keyed by clientIds if
  *                                        uniqueByBlock is true.
  * @param {boolean}         uniqueByBlock true if each block in clientIds array has a unique set of attributes
  * @return {Object} Action object.
  */
-export const updateBlockAttributes =
-	( clientIds, attributes, uniqueByBlock = false ) =>
-	( { dispatch, registry } ) => {
-		const keptAttributes = { ...attributes };
-		for ( const clientId of clientIds ) {
-			const block = registry.select( STORE_NAME ).getBlock( clientId );
-			const bindings = block?.attributes?.metadata?.bindings;
-
-			if ( ! bindings ) {
-				continue;
-			}
-
-			const sources = unlock(
-				registry.select( blocksStore )
-			).getAllBlockBindingsSources();
-
-			const updatesBySource = new Map();
-
-			const attributeEntries = Object.entries(
-				uniqueByBlock ? attributes[ clientId ] : attributes
-			);
-
-			attributeEntries.forEach( ( [ attributeName, newValue ] ) => {
-				if (
-					! bindings[ attributeName ] ||
-					! canBindAttribute( block.name, attributeName )
-				) {
-					return;
-				}
-
-				const source = sources[ bindings[ attributeName ].source ];
-				if ( ! source?.setValue && ! source?.setValues ) {
-					return;
-				}
-				updatesBySource.set( source, {
-					...updatesBySource.get( source ),
-					[ attributeName ]: newValue,
-				} );
-
-				// Skip attribute.
-				if ( uniqueByBlock ) {
-					delete keptAttributes[ clientId ][ attributeName ];
-				} else {
-					delete keptAttributes[ attributeName ];
-				}
-			} );
-
-			if ( updatesBySource.size ) {
-				const context = registry
-					.select( STORE_NAME )
-					.getBlockContext( clientId );
-				for ( const [ source, boundAttributes ] of updatesBySource ) {
-					if ( source.setValues ) {
-						source.setValues( {
-							registry,
-							context,
-							clientId,
-							attributes: boundAttributes,
-						} );
-					} else {
-						for ( const [ attributeName, value ] of Object.entries(
-							boundAttributes
-						) ) {
-							source.setValue( {
-								registry,
-								context,
-								clientId,
-								attributeName,
-								args: bindings[ attributeName ].args,
-								value,
-							} );
-						}
-					}
-				}
-			}
-		}
-
-		dispatch( {
-			type: 'UPDATE_BLOCK_ATTRIBUTES',
-			clientIds: castArray( clientIds ),
-			attributes: keptAttributes,
-			uniqueByBlock,
-		} );
+export function updateBlockAttributes(
+	clientIds,
+	attributes,
+	uniqueByBlock = false
+) {
+	return {
+		type: 'UPDATE_BLOCK_ATTRIBUTES',
+		clientIds: castArray( clientIds ),
+		attributes,
+		uniqueByBlock,
 	};
+}
 
 /**
  * Action that updates the block with the specified client ID.
@@ -1605,22 +1529,6 @@ export function updateBlockListSettings( clientId, settings ) {
 		type: 'UPDATE_BLOCK_LIST_SETTINGS',
 		clientId,
 		settings,
-	};
-}
-
-/**
- * Action that changes the block context of the given block(s) in the store.
- *
- * @param {string | SettingsByClientId} clientId Client ID of the block.
- * @param {Object}                      context  Object with the new context.
- *
- * @return {Object} Action object
- */
-export function updateBlockContext( clientId, context ) {
-	return {
-		type: 'UPDATE_BLOCK_CONTEXT',
-		clientId,
-		context,
 	};
 }
 

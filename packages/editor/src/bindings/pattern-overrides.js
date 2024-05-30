@@ -9,9 +9,9 @@ const CONTENT = 'content';
 export default {
 	name: 'core/pattern-overrides',
 	label: _x( 'Pattern Overrides', 'block bindings source' ),
-	getValue( { select, clientId, attributeName } ) {
+	getValue( { registry, clientId, attributeName } ) {
 		const { getBlockAttributes, getBlockParentsByBlockName } =
-			select( blockEditorStore );
+			registry.select( blockEditorStore );
 		const currentBlockAttributes = getBlockAttributes( clientId );
 		const [ patternClientId ] = getBlockParentsByBlockName(
 			clientId,

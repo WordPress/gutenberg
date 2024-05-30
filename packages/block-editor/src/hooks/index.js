@@ -32,6 +32,7 @@ import './metadata';
 import blockHooks from './block-hooks';
 import blockBindingsPanel from './block-bindings';
 import './block-renaming';
+import './use-bindings-attributes';
 
 createBlockEditFilter(
 	[

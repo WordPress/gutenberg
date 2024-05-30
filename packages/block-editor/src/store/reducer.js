@@ -1787,34 +1787,6 @@ export const blockListSettings = ( state = {}, action ) => {
 };
 
 /**
- * Reducer returning an object where each key is a block client ID, its value
- * representing the block context.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export const blockContext = ( state = {}, action ) => {
-	if ( action.type === 'UPDATE_BLOCK_CONTEXT' ) {
-		const { clientId } = action;
-		if ( ! action.context ) {
-			return state;
-		}
-
-		if ( fastDeepEqual( state[ clientId ], action.context ) ) {
-			return state;
-		}
-
-		return {
-			...state,
-			[ clientId ]: action.context,
-		};
-	}
-	return state;
-};
-
-/**
  * Reducer returning which mode is enabled.
  *
  * @param {string} state  Current state.
@@ -2108,7 +2080,6 @@ const combinedReducers = combineReducers( {
 	initialPosition,
 	blocksMode,
 	blockListSettings,
-	blockContext,
 	insertionPoint,
 	template,
 	settings,

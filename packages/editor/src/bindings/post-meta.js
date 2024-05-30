@@ -15,12 +15,14 @@ export default {
 	getPlaceholder( { args } ) {
 		return args.key;
 	},
-	getValue( { select, context, args } ) {
-		return select( coreDataStore ).getEditedEntityRecord(
-			'postType',
-			context?.postType,
-			context?.postId
-		).meta?.[ args.key ];
+	getValue( { registry, context, args } ) {
+		return registry
+			.select( coreDataStore )
+			.getEditedEntityRecord(
+				'postType',
+				context?.postType,
+				context?.postId
+			).meta?.[ args.key ];
 	},
 	setValue( { registry, context, args, value } ) {
 		registry
