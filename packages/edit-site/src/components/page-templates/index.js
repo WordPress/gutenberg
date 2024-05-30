@@ -63,7 +63,6 @@ const defaultConfigPerViewType = {
 		mediaField: 'preview',
 		primaryField: 'title',
 		columnFields: [ 'description' ],
-		badgeFields: [ 'isCustom' ],
 	},
 	[ LAYOUT_LIST ]: {
 		primaryField: 'title',
@@ -82,8 +81,7 @@ const DEFAULT_VIEW = {
 	},
 	// All fields are visible by default, so it's
 	// better to keep track of the hidden ones.
-	hiddenFields: [ 'preview' ],
-	// hiddenFields: [ 'preview', 'postTypes' ],
+	hiddenFields: [ 'preview', 'postTypes', 'isCustom' ],
 	layout: defaultConfigPerViewType[ LAYOUT_GRID ],
 	filters: [],
 };
@@ -205,6 +203,9 @@ const TEMPLATE_TO_POST_TYPE = {
 	// 2. Secondary templates.
 	'single-post': [ 'post' ],
 };
+
+const CUSTOM_TEMPLATE = __( 'Custom' );
+const NOT_CUSTOM_TEMPLATE = __( 'Not custom' );
 
 export default function PageTemplates() {
 	const { params } = useLocation();
@@ -388,12 +389,12 @@ export default function PageTemplates() {
 			{
 				header: __( 'Type' ),
 				id: 'isCustom',
-				getValue: ( { item } ) => item.is_custom,
+				getValue: ( { item } ) => !! item.is_custom,
 				render: ( { item } ) =>
-					item.is_custom ? 'Custom' : undefined,
+					!! item.is_custom ? CUSTOM_TEMPLATE : NOT_CUSTOM_TEMPLATE,
 				elements: [
-					{ value: true, label: 'Custom' },
-					{ value: false, label: 'Default' },
+					{ value: true, label: CUSTOM_TEMPLATE },
+					{ value: false, label: NOT_CUSTOM_TEMPLATE },
 				],
 				filterBy: {
 					operators: [ OPERATOR_IS ],
