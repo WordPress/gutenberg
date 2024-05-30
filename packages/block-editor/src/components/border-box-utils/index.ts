@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import type { CSSProperties } from 'react';
-
-/**
  * Internal dependencies
  */
 import type {
