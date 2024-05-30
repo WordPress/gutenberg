@@ -1844,6 +1844,8 @@ _Returns_
 
 Action that updates attributes of multiple blocks with the specified client IDs.
 
+Process block bindings to skip updating the bound attributes and run binding source setValue instead.
+
 _Parameters_
 
 -   _clientIds_ `string|string[]`: Block client IDs.
