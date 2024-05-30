@@ -619,51 +619,6 @@ class WP_Theme_JSON_Gutenberg {
 	);
 
 	/**
-	 * List of valid settings.spacing.spacingScale.units values.
-	 *
-	 * @since 6.6.0
-	 * @var array
-	 */
-	const VALID_SPACING_UNITS = array(
-		'px',
-		'em',
-		'rem',
-		'%',
-		'vw',
-		'svw',
-		'lvw',
-		'dvw',
-		'vh',
-		'svh',
-		'lvh',
-		'dvh',
-		'vi',
-		'svi',
-		'lvi',
-		'dvi',
-		'vb',
-		'svb',
-		'lvb',
-		'dvb',
-		'vmin',
-		'svmin',
-		'lvmin',
-		'dvmin',
-		'vmax',
-		'svmax',
-		'lvmax',
-		'dvmax',
-	);
-
-	/**
-	 * List of valid settings.spacing.spacingScale.operator values.
-	 *
-	 * @since 6.6.0
-	 * @var array
-	 */
-	const VALID_SPACING_OPERATORS = array( '+', '*' );
-
-	/**
 	 * Return the input schema at the root and per origin.
 	 *
 	 * @since 6.5.0
@@ -3949,19 +3904,14 @@ class WP_Theme_JSON_Gutenberg {
 		if (
 			! isset( $spacing_scale['steps'] ) ||
 			! is_numeric( $spacing_scale['steps'] ) ||
-			! is_int( $spacing_scale['steps'] + 0 ) ||
-			$spacing_scale['steps'] <= 0 ||
-			$spacing_scale['steps'] > 10 ||
+			0 === $spacing_scale['steps'] ||
 			! isset( $spacing_scale['mediumStep'] ) ||
 			! is_numeric( $spacing_scale['mediumStep'] ) ||
-			$spacing_scale['mediumStep'] <= 0 ||
 			! isset( $spacing_scale['unit'] ) ||
-			! in_array( $spacing_scale['unit'], static::VALID_SPACING_UNITS, true ) ||
 			! isset( $spacing_scale['operator'] ) ||
-			! in_array( $spacing_scale['operator'], static::VALID_SPACING_OPERATORS, true ) ||
+			( '+' !== $spacing_scale['operator'] && '*' !== $spacing_scale['operator'] ) ||
 			! isset( $spacing_scale['increment'] ) ||
-			! is_numeric( $spacing_scale['increment'] ) ||
-			$spacing_scale['increment'] <= 0
+			! is_numeric( $spacing_scale['increment'] )
 		) {
 			return array();
 		}
