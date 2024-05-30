@@ -123,8 +123,7 @@ export function isBlockValid( state, clientId ) {
  */
 export const getBlockAttributes = createRegistrySelector(
 	( select ) => ( state, clientId ) => {
-		// TODO: Check how to properly access the registry and the block context.
-		const registry = { select };
+		// TODO: Check how to properly access the block context.
 		const blockContext = {};
 		const block = state.blocks.byClientId.get( clientId );
 		if ( ! block ) {
@@ -183,7 +182,7 @@ export const getBlockAttributes = createRegistrySelector(
 			}
 
 			const args = {
-				registry,
+				select,
 				context,
 				clientId,
 				attributeName,
