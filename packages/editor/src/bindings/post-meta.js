@@ -34,12 +34,27 @@ export default {
 				},
 			} );
 	},
-	lockAttributesEditing() {
+	lockAttributesEditing( { select, context = {} } ) {
+		const postId = context.postId
+			? context.postId
+			: select( editorStore ).getCurrentPostId();
+		const postType = context.postType
+			? context.postType
+			: select( editorStore ).getCurrentPostType();
+
 		// TODO: Check that editing is happening in the post editor and not a template.
 
 		// TODO: Check that the custom field is not protected and available in the REST API.
 
-		// TODO: Check that the user has the capability to edit post meta.
+		// Check that the user has the capability to edit post meta.
+		const canUserEdit = select( coreDataStore ).canUserEditEntityRecord(
+			'postType',
+			postType,
+			postId
+		);
+		if ( ! canUserEdit ) {
+			return true;
+		}
 
 		return false;
 	},
