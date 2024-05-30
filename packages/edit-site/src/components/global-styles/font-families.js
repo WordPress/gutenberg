@@ -7,7 +7,6 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 	Button,
-	Tooltip,
 } from '@wordpress/components';
 import { settings } from '@wordpress/icons';
 import { useContext } from '@wordpress/element';
@@ -40,18 +39,12 @@ function FontFamilies() {
 			<VStack spacing={ 2 }>
 				<HStack justify="space-between">
 					<Subtitle level={ 3 }>{ __( 'Fonts' ) }</Subtitle>
-					<HStack justify="flex-end">
-						<Tooltip text={ __( 'Manage fonts' ) }>
-							<Button
-								onClick={ () =>
-									toggleModal( 'installed-fonts' )
-								}
-								aria-label={ __( 'Manage fonts' ) }
-								icon={ settings }
-								size={ 'small' }
-							/>
-						</Tooltip>
-					</HStack>
+					<Button
+						onClick={ () => toggleModal( 'installed-fonts' ) }
+						label={ __( 'Manage fonts' ) }
+						icon={ settings }
+						size="small"
+					/>
 				</HStack>
 				{ hasFonts ? (
 					<ItemGroup isBordered isSeparated>

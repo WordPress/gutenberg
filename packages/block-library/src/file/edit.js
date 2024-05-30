@@ -258,7 +258,7 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 						) }
 					</ResizableBox>
 				) }
-				<div className={ 'wp-block-file__content-wrapper' }>
+				<div className="wp-block-file__content-wrapper">
 					<RichText
 						identifier="fileName"
 						tagName="a"
@@ -273,11 +273,7 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 						href={ textLinkHref }
 					/>
 					{ showDownloadButton && (
-						<div
-							className={
-								'wp-block-file__button-richtext-wrapper'
-							}
-						>
+						<div className="wp-block-file__button-richtext-wrapper">
 							{ /* Using RichText here instead of PlainText so that it can be styled like a button. */ }
 							<RichText
 								identifier="downloadButtonText"

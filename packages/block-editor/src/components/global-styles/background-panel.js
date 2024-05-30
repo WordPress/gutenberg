@@ -102,7 +102,7 @@ function backgroundSizeHelpText( value ) {
 	if ( value === 'contain' ) {
 		return __( 'Image is contained without distortion.' );
 	}
-	return __( 'Specify a fixed width.' );
+	return __( 'Image has a fixed width.' );
 }
 
 /**
@@ -174,13 +174,13 @@ function InspectorImagePreview( { label, filename, url: imgUrl } ) {
 						{ imgLabel }
 					</Truncate>
 					<VisuallyHidden as="span">
-						{ filename
+						{ imgUrl
 							? sprintf(
 									/* translators: %s: file name */
-									__( 'Selected image: %s' ),
-									filename
+									__( 'Background image: %s' ),
+									filename || imgLabel
 							  )
-							: __( 'No image selected' ) }
+							: __( 'No background image selected' ) }
 					</VisuallyHidden>
 				</FlexItem>
 			</HStack>
@@ -245,12 +245,22 @@ function BackgroundImageToolsPanelItem( {
 			return;
 		}
 
+		const sizeValue = style?.background?.backgroundSize;
+		const positionValue = style?.background?.backgroundPosition;
+
 		onChange(
-			setImmutably( style, [ 'background', 'backgroundImage' ], {
-				url: media.url,
-				id: media.id,
-				source: 'file',
-				title: media.title || undefined,
+			setImmutably( style, [ 'background' ], {
+				...style?.background,
+				backgroundImage: {
+					url: media.url,
+					id: media.id,
+					source: 'file',
+					title: media.title || undefined,
+				},
+				backgroundPosition:
+					! positionValue && ( 'auto' === sizeValue || ! sizeValue )
+						? '50% 0'
+						: positionValue,
 			} )
 		);
 	};
@@ -321,7 +331,7 @@ function BackgroundImageToolsPanelItem( {
 					name={
 						<InspectorImagePreview
 							label={ title }
-							filename={ title || __( 'Untitled' ) }
+							filename={ title }
 							url={ getResolvedThemeFilePath(
 								url,
 								themeFileURIs
@@ -426,13 +436,16 @@ function BackgroundSizeToolsPanelItem( {
 	const updateBackgroundSize = ( next ) => {
 		// When switching to 'contain' toggle the repeat off.
 		let nextRepeat = repeatValue;
+		let nextPosition = positionValue;
 
 		if ( next === 'contain' ) {
 			nextRepeat = 'no-repeat';
+			nextPosition = undefined;
 		}
 
 		if ( next === 'cover' ) {
 			nextRepeat = undefined;
+			nextPosition = undefined;
 		}
 
 		if (
@@ -441,11 +454,29 @@ function BackgroundSizeToolsPanelItem( {
 			next === 'auto'
 		) {
 			nextRepeat = undefined;
+			/*
+			 * A background image uploaded and set in the editor (an image with a record id),
+			 * receives a default background position of '50% 0',
+			 * when the toggle switches to "Tile". This is to increase the chance that
+			 * the image's focus point is visible.
+			 */
+			if ( !! style?.background?.backgroundImage?.id ) {
+				nextPosition = '50% 0';
+			}
+		}
+
+		/*
+		 * Next will be null when the input is cleared,
+		 * in which case the value should be 'auto'.
+		 */
+		if ( ! next && currentValueForToggle === 'auto' ) {
+			next = 'auto';
 		}
 
 		onChange(
 			setImmutably( style, [ 'background' ], {
 				...style?.background,
+				backgroundPosition: nextPosition,
 				backgroundRepeat: nextRepeat,
 				backgroundSize: next,
 			} )
@@ -501,45 +532,53 @@ function BackgroundSizeToolsPanelItem( {
 				onChange={ updateBackgroundPosition }
 			/>
 			<ToggleGroupControl
-				size={ '__unstable-large' }
+				size="__unstable-large"
 				label={ __( 'Size' ) }
 				value={ currentValueForToggle }
 				onChange={ updateBackgroundSize }
 				isBlock
-				help={ backgroundSizeHelpText( sizeValue ) }
+				help={ backgroundSizeHelpText(
+					sizeValue || defaultValues?.backgroundSize
+				) }
 			>
 				<ToggleGroupControlOption
-					key={ 'cover' }
-					value={ 'cover' }
+					key="cover"
+					value="cover"
 					label={ __( 'Cover' ) }
 				/>
 				<ToggleGroupControlOption
-					key={ 'contain' }
-					value={ 'contain' }
+					key="contain"
+					value="contain"
 					label={ __( 'Contain' ) }
 				/>
 				<ToggleGroupControlOption
-					key={ 'fixed' }
-					value={ 'auto' }
-					label={ __( 'Fixed' ) }
+					key="tile"
+					value="auto"
+					label={ __( 'Tile' ) }
 				/>
 			</ToggleGroupControl>
-			{ currentValueForToggle !== undefined &&
-			currentValueForToggle !== 'cover' &&
-			currentValueForToggle !== 'contain' ? (
-				<UnitControl
-					size={ '__unstable-large' }
-					onChange={ updateBackgroundSize }
-					value={ sizeValue }
-				/>
-			) : null }
-			{ currentValueForToggle !== 'cover' && (
-				<ToggleControl
-					label={ __( 'Repeat' ) }
-					checked={ repeatCheckedValue }
-					onChange={ toggleIsRepeated }
-				/>
-			) }
+			<HStack justify="flex-start" spacing={ 2 } as="span">
+				{ currentValueForToggle !== undefined &&
+				currentValueForToggle !== 'cover' &&
+				currentValueForToggle !== 'contain' ? (
+					<UnitControl
+						aria-label={ __( 'Background image width' ) }
+						onChange={ updateBackgroundSize }
+						value={ sizeValue }
+						size="__unstable-large"
+						__unstableInputWidth="100px"
+						min={ 0 }
+						placeholder={ __( 'Auto' ) }
+					/>
+				) : null }
+				{ currentValueForToggle !== 'cover' && (
+					<ToggleControl
+						label={ __( 'Repeat' ) }
+						checked={ repeatCheckedValue }
+						onChange={ toggleIsRepeated }
+					/>
+				) }
+			</HStack>
 		</VStack>
 	);
 }
