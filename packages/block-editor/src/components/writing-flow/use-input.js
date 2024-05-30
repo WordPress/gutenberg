@@ -3,6 +3,7 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
+import { useContext } from '@wordpress/element';
 import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import {
 	createBlock,
@@ -16,6 +17,7 @@ import {
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import BlockContext from '../block-context';
 
 /**
  * Handles input for selections across blocks.
@@ -42,6 +44,7 @@ export default function useInput() {
 		__unstableExpandSelection,
 		__unstableMarkAutomaticChange,
 	} = useDispatch( blockEditorStore );
+	const blockContext = useContext( BlockContext );
 
 	return useRefEffect( ( node ) => {
 		function onBeforeInput( event ) {
@@ -115,7 +118,7 @@ export default function useInput() {
 							getBlockRootClientId( clientId )
 						)
 					) {
-						__unstableSplitSelection();
+						__unstableSplitSelection( [], blockContext );
 						event.preventDefault();
 					}
 				}
@@ -131,7 +134,7 @@ export default function useInput() {
 						createBlock( getDefaultBlockName() )
 					);
 				} else {
-					__unstableSplitSelection();
+					__unstableSplitSelection( [], blockContext );
 				}
 			} else if (
 				event.keyCode === BACKSPACE ||
