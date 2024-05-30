@@ -430,10 +430,12 @@ function BackgroundSizeToolsPanelItem( {
 
 		if ( next === 'contain' ) {
 			nextRepeat = 'no-repeat';
+			nextPosition = undefined;
 		}
 
 		if ( next === 'cover' ) {
 			nextRepeat = undefined;
+			nextPosition = undefined;
 		}
 
 		if (
