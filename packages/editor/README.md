@@ -995,7 +995,11 @@ _Returns_
 
 ### PostExcerptPanel
 
-Undocumented declaration.
+Is rendered if the post type supports excerpts and allows editing the excerpt.
+
+_Returns_
+
+-   `JSX.Element`: The rendered PostExcerptPanel component.
 
 ### PostFeaturedImage
 
