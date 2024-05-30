@@ -79,31 +79,61 @@ function gutenberg_render_block_style_variation_support_styles( $parsed_block ) 
 		return $parsed_block;
 	}
 
-	$config = array(
-		'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-		'styles'  => $variation_data,
-	);
-
 	$class_name         = gutenberg_get_block_style_variation_class_name( $parsed_block, $variation );
 	$updated_class_name = $parsed_block['attrs']['className'] . " $class_name";
+	$variation_instance = substr( $class_name, 9 );
+	$class_name         = ".$class_name";
 
-	$class_name = ".$class_name";
+	// To support blocks with more complex selectors, that can apply styles to
+	// inner markup or even different inner elements depending on the feature,
+	// the variation style data needs to be manipulated some. If the root variation
+	// styles are moved under a variations property they will generate as desired.
+	//
+	// Example blocks that require this approach include:
+	// - Button: `.wp-block-button .wp-block-button__link`
+	// - Image: `.wp-block-image` and `.wp-block-image img` for borders, shadow etc.
+	$elements_data = $variation_data['elements'] ?? array();
+	$blocks_data   = $variation_data['blocks'] ?? array();
+	unset( $variation_data['elements'] );
+	unset( $variation_data['blocks'] );
 
+	_wp_array_set(
+		$blocks_data,
+		array( $parsed_block['blockName'], 'variations', $variation_instance ),
+		$variation_data
+	);
+
+	$config = array(
+		'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+		'styles'  => array(
+			'elements' => $elements_data,
+			'blocks'   => $blocks_data,
+		),
+	);
+
+	// Turn off filter that excludes block nodes. They are needed here.
 	if ( ! is_admin() ) {
 		remove_filter( 'wp_theme_json_get_style_nodes', 'wp_filter_out_block_nodes' );
 	}
+
+	// Temporarily prevent variation instance from being sanitized while processing theme.json.
+	$styles_registry = WP_Block_Styles_Registry::get_instance();
+	$styles_registry->register( $parsed_block['blockName'], array( 'name' => $variation_instance ) );
 
 	$variation_theme_json = new WP_Theme_JSON_Gutenberg( $config, 'blocks' );
 	$variation_styles     = $variation_theme_json->get_stylesheet(
 		array( 'styles' ),
 		array( 'custom' ),
 		array(
-			'root_selector'           => $class_name,
 			'skip_root_layout_styles' => true,
 			'scope'                   => $class_name,
 		)
 	);
 
+	// Clean up temporary block style now instance styles have been processed.
+	$styles_registry->unregister( $parsed_block['blockName'], $variation_instance );
+
+	// Restore filter that excludes block nodes. They are needed here.
 	if ( ! is_admin() ) {
 		add_filter( 'wp_theme_json_get_style_nodes', 'wp_filter_out_block_nodes' );
 	}
