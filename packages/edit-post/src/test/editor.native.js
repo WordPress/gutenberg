@@ -7,6 +7,7 @@ import {
 	fireEvent,
 	getBlock,
 	getEditorHtml,
+	getEditorTitle,
 	initializeEditor,
 	screen,
 	setupCoreBlocks,
@@ -157,45 +158,72 @@ describe( 'Editor', () => {
 	} );
 
 	describe( 'on content update', () => {
-		it( 'parses markdown into blocks', async () => {
-			// Arrange
-			await initializeEditor();
-
-			// Act
-			act( () => {
-				onContentUpdateCallback( {
-					content: `# Sample Document\nLorem ipsum dolor sit amet, consectetur adipiscing 
+		const MARKDOWN = `# Sample Document\nLorem ipsum dolor sit amet, consectetur adipiscing 
 						elit.\n## Overview\n- Lorem ipsum dolor sit amet\n- Consectetur adipiscing
 						 elit\n- Integer nec odio\n## Details\n1. Sed cursus ante dapibus diam\n2. 
 						 Nulla quis sem at nibh elementum imperdiet\n3. Duis sagittis ipsum\n
 						 ## Mixed Lists\n- Key Points:\n 1. Lorem ipsum dolor sit amet\n 2. 
 						 Consectetur adipiscing elit\n 3. Integer nec odio\n- Additional Info:\n -
-						  Sed cursus ante dapibus diam\n - Nulla quis sem at nibh elementum imperdiet\n`,
-				} );
-			} );
+						  Sed cursus ante dapibus diam\n - Nulla quis sem at nibh elementum imperdiet\n`;
 
-			// Assert
-			// Needed to for the "Processed HTML piece" log.
-			expect( console ).toHaveLogged();
-			expect( getEditorHtml() ).toMatchSnapshot();
-		} );
-
-		it( 'parses standard text into blocks', async () => {
+		it( 'parses markdown into blocks', async () => {
 			// Arrange
-			await initializeEditor();
+			await initializeEditor( {
+				initialTitle: null,
+			} );
 
 			// Act
 			act( () => {
 				onContentUpdateCallback( {
-					content: `Lorem ipsum dolor sit amet. Qui rerum quae sed sciunt
-					 animi rem voluptate quas aut impedit accusamus ut`,
+					content: MARKDOWN,
 				} );
 			} );
 
 			// Assert
 			// Needed to for the "Processed HTML piece" log.
 			expect( console ).toHaveLogged();
+			expect( getEditorTitle() ).toBe( 'Sample Document' );
 			expect( getEditorHtml() ).toMatchSnapshot();
+		} );
+
+		it( 'parses a markdown heading into a title', async () => {
+			// Arrange
+			await initializeEditor( {
+				initialTitle: null,
+			} );
+
+			// Act
+			act( () => {
+				onContentUpdateCallback( {
+					content: `# Sample Document`,
+				} );
+			} );
+
+			// Assert
+			// Needed to for the "Processed HTML piece" log.
+			expect( console ).toHaveLogged();
+			expect( getEditorTitle() ).toBe( 'Sample Document' );
+			expect( getEditorHtml() ).toBe( '' );
+		} );
+
+		it( 'parses standard text into blocks', async () => {
+			// Arrange
+			await initializeEditor( {
+				initialTitle: null,
+			} );
+
+			// Act
+			act( () => {
+				onContentUpdateCallback( {
+					content: `Lorem ipsum dolor sit amet`,
+				} );
+			} );
+
+			// Assert
+			// Needed to for the "Processed HTML piece" log.
+			expect( console ).toHaveLogged();
+			expect( getEditorTitle() ).toBe( 'Lorem ipsum dolor sit amet' );
+			expect( getEditorHtml() ).toBe( '' );
 		} );
 	} );
 } );

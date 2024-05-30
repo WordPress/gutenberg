@@ -69,6 +69,7 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import EditorProvider from './index.js';
+import { insertContentWithTitle } from '../post-title';
 
 class NativeEditorProvider extends Component {
 	constructor() {
@@ -316,15 +317,19 @@ class NativeEditorProvider extends Component {
 		return false;
 	}
 
-	onContentUpdate( { content } ) {
-		const { insertBlocks } = this.props;
-		const blocks = pasteHandler( {
-			plainText: content,
+	onContentUpdate( { content: rawContent } ) {
+		const {
+			editTitle,
+			onClearPostTitleSelection,
+			onInsertBlockAfter: onInsertBlocks,
+			title,
+		} = this.props;
+		const content = pasteHandler( {
+			plainText: rawContent,
 		} );
 
-		if ( blocks ) {
-			insertBlocks( blocks, undefined, undefined, false );
-		}
+		insertContentWithTitle( title, content, editTitle, onInsertBlocks );
+		onClearPostTitleSelection();
 	}
 
 	serializeToNativeAction() {
@@ -447,6 +452,7 @@ const ComposedNativeProvider = compose( [
 			resetEditorBlocks,
 			updateEditorSettings,
 			switchEditorMode,
+			togglePostTitleSelection,
 		} = dispatch( editorStore );
 		const {
 			clearSelectedBlock,
@@ -479,6 +485,12 @@ const ComposedNativeProvider = compose( [
 			},
 			switchMode( mode ) {
 				switchEditorMode( mode );
+			},
+			onInsertBlockAfter( blocks ) {
+				insertBlocks( blocks, undefined, undefined, false );
+			},
+			onClearPostTitleSelection() {
+				togglePostTitleSelection( false );
 			},
 			replaceBlock,
 		};
