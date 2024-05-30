@@ -7,7 +7,6 @@ import memoize from 'memize';
 /**
  * WordPress dependencies
  */
-import { pipe } from '@wordpress/compose';
 import { applyFilters } from '@wordpress/hooks';
 import { RichTextData } from '@wordpress/rich-text';
 
@@ -37,24 +36,8 @@ import { normalizeBlockType, getDefault } from '../utils';
  *
  * @return {Function} Enhanced hpq matcher.
  */
-export const toBooleanAttributeMatcher = ( matcher ) =>
-	pipe( [
-		matcher,
-		// Expected values from `attr( 'disabled' )`:
-		//
-		// <input>
-		// - Value:       `undefined`
-		// - Transformed: `false`
-		//
-		// <input disabled>
-		// - Value:       `''`
-		// - Transformed: `true`
-		//
-		// <input disabled="disabled">
-		// - Value:       `'disabled'`
-		// - Transformed: `true`
-		( value ) => value !== undefined,
-	] );
+export const toBooleanAttributeMatcher = ( matcher ) => ( value ) =>
+	matcher( value ) !== undefined;
 
 /**
  * Returns true if value is of the given JSON schema type, or false otherwise.
@@ -245,11 +228,7 @@ export const matcherFromSource = memoize( ( sourceConfig ) => {
 			);
 			return query( sourceConfig.selector, subMatchers );
 		case 'tag':
-			return pipe( [
-				prop( sourceConfig.selector, 'nodeName' ),
-				( nodeName ) =>
-					nodeName ? nodeName.toLowerCase() : undefined,
-			] );
+			return prop( sourceConfig.selector, 'nodeName' )?.toLowerCase();
 		default:
 			// eslint-disable-next-line no-console
 			console.error( `Unknown source type "${ sourceConfig.source }"` );
