@@ -376,11 +376,17 @@ function VisualEditor( {
 
 	return (
 		<div
-			className={ clsx( 'editor-visual-editor', className, {
-				'has-padding': isFocusedEntity || enableResizing,
-				'is-resizable': enableResizing,
-				'is-iframed': shouldIframe,
-			} ) }
+			className={ clsx(
+				'editor-visual-editor',
+				// this class is here for backward compatibility reasons.
+				'edit-post-visual-editor',
+				className,
+				{
+					'has-padding': isFocusedEntity || enableResizing,
+					'is-resizable': enableResizing,
+					'is-iframed': shouldIframe,
+				}
+			) }
 		>
 			<ResizableEditor
 				enableResizing={ enableResizing }

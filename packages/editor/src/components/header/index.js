@@ -17,6 +17,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
+import BackButton from './back-button';
 import CollapsableBlockToolbar from '../collapsible-block-toolbar';
 import DocumentBar from '../document-bar';
 import DocumentTools from '../document-tools';
@@ -41,7 +42,6 @@ function Header( {
 	forceDisableBlockTools,
 	setEntitiesSavedStatesCallback,
 	title,
-	children,
 } ) {
 	const isWideViewport = useViewportMatch( 'large' );
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -81,7 +81,7 @@ function Header( {
 	// as some plugins might be relying on its presence.
 	return (
 		<div className="editor-header edit-post-header">
-			{ children }
+			<BackButton.Slot />
 			<motion.div
 				variants={ slideY }
 				transition={ { type: 'tween', delay: 0.8 } }

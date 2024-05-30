@@ -22,7 +22,7 @@ import { useReducedMotion } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { store as editPostStore } from '../../../store';
+import { store as editPostStore } from '../../store';
 
 function FullscreenModeClose( { showTooltip, icon, href, initialPost } ) {
 	const { isActive, isRequestingSiteIcon, postType, siteIconUrl } = useSelect(

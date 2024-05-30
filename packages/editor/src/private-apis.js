@@ -11,6 +11,8 @@ import { lock } from './lock-unlock';
 import { EntitiesSavedStatesExtensible } from './components/entities-saved-states';
 import useAutoSwitchEditorSidebars from './components/provider/use-auto-switch-editor-sidebars';
 import useBlockEditorSettings from './components/provider/use-block-editor-settings';
+import BackButton from './components/header/back-button';
+import EditorInterface from './components/editor-interface';
 import Header from './components/header';
 import CreateTemplatePartModal from './components/create-template-part-modal';
 import InserterSidebar from './components/inserter-sidebar';
@@ -43,9 +45,11 @@ const { store: interfaceStore, ...remainingInterfaceApis } = interfaceApis;
 export const privateApis = {};
 lock( privateApis, {
 	CreateTemplatePartModal,
+	BackButton,
 	ExperimentalEditorProvider,
 	EntitiesSavedStatesExtensible,
 	GlobalStylesProvider,
+	EditorInterface,
 	Header,
 	InserterSidebar,
 	ListViewSidebar,
