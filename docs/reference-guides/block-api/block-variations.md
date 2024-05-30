@@ -175,6 +175,12 @@ The `string[]` version is used to declare which attributes should be compared as
 isActive: [ 'providerNameSlug' ]
 ```
 
+Nested object paths are also supported. For example, consider a block variation that has a `query` object as an attribute. It is possible to determine if the variation is active solely based on that object's `postType` property (while ignoring all its other properties):
+
+```js
+isActive: [ 'query.postType' ]
+```
+
 ### Caveats to using `isActive`
 
 The `isActive` property can return false positives if multiple variations exist for a specific block and the `isActive` checks are not specific enough. To demonstrate this, consider the following example:
