@@ -513,9 +513,37 @@ describe( 'actions', () => {
 	} );
 
 	describe( 'showInsertionPoint', () => {
-		it( 'should return the SHOW_INSERTION_POINT action', () => {
-			expect( showInsertionPoint() ).toEqual( {
+		it( 'should dispatch the SHOW_INSERTION_POINT action', () => {
+			const select = {};
+
+			const dispatch = jest.fn();
+
+			showInsertionPoint()( { select, dispatch } );
+
+			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'SHOW_INSERTION_POINT',
+				rootClientId: undefined,
+				index: undefined,
+				__unstableWithInserter: undefined,
+				operation: undefined,
+				nearestSide: undefined,
+			} );
+		} );
+
+		it( 'should dispatch the SHOW_INSERTION_POINT action with passed rootClientId and index', () => {
+			const select = {};
+
+			const dispatch = jest.fn();
+
+			showInsertionPoint( '', 0 )( { select, dispatch } );
+
+			expect( dispatch ).toHaveBeenCalledWith( {
+				type: 'SHOW_INSERTION_POINT',
+				rootClientId: '',
+				index: 0,
+				__unstableWithInserter: undefined,
+				operation: undefined,
+				nearestSide: undefined,
 			} );
 		} );
 	} );
