@@ -6,7 +6,6 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 import { useState, useEffect, useMemo } from '@wordpress/element';
@@ -21,38 +20,15 @@ import {
  */
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
-import {
-	FOCUSABLE_ENTITIES,
-	NAVIGATION_POST_TYPE,
-} from '../../utils/constants';
 
-const { EditorCanvas: EditorCanvasRoot } = unlock( editorPrivateApis );
+const { VisualEditor } = unlock( editorPrivateApis );
 
-function EditorCanvas( {
-	enableResizing,
-	settings,
-	children,
-	onClick,
-	...props
-} ) {
-	const {
-		hasBlocks,
-		isFocusMode,
-		templateType,
-		canvasMode,
-		currentPostIsTrashed,
-	} = useSelect( ( select ) => {
-		const { getBlockCount } = select( blockEditorStore );
-		const { getEditedPostType, getCanvasMode } = unlock(
-			select( editSiteStore )
-		);
-		const _templateType = getEditedPostType();
+function EditorCanvas( { settings } ) {
+	const { canvasMode, currentPostIsTrashed } = useSelect( ( select ) => {
+		const { getCanvasMode } = unlock( select( editSiteStore ) );
 
 		return {
-			templateType: _templateType,
-			isFocusMode: FOCUSABLE_ENTITIES.includes( _templateType ),
 			canvasMode: getCanvasMode(),
-			hasBlocks: !! getBlockCount(),
 			currentPostIsTrashed:
 				select( editorStore ).getCurrentPostAttribute( 'status' ) ===
 				'trash',
@@ -88,11 +64,7 @@ function EditorCanvas( {
 			}
 		},
 		onClick: () => {
-			if ( !! onClick ) {
-				onClick();
-			} else {
-				setCanvasMode( 'edit' );
-			}
+			setCanvasMode( 'edit' );
 		},
 		onClickCapture: ( event ) => {
 			if ( currentPostIsTrashed ) {
@@ -102,15 +74,6 @@ function EditorCanvas( {
 		},
 		readonly: true,
 	};
-	const isTemplateTypeNavigation = templateType === NAVIGATION_POST_TYPE;
-	const isNavigationFocusMode = isTemplateTypeNavigation && isFocusMode;
-	// Hide the appender when:
-	// - In navigation focus mode (should only allow the root Nav block).
-	// - In view mode (i.e. not editing).
-	const showBlockAppender =
-		( isNavigationFocusMode && hasBlocks ) || canvasMode === 'view'
-			? false
-			: undefined;
 
 	const styles = useMemo(
 		() => [
@@ -119,11 +82,7 @@ function EditorCanvas( {
 				// Forming a "block formatting context" to prevent margin collapsing.
 				// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
 
-				css: `.is-root-container{display:flow-root;${
-					// Some themes will have `min-height: 100vh` for the root container,
-					// which isn't a requirement in auto resize mode.
-					enableResizing ? 'min-height:0!important;' : ''
-				}}body{position:relative; ${
+				css: `body{${
 					canvasMode === 'view'
 						? `min-height: 100vh; ${
 								currentPostIsTrashed ? '' : 'cursor: pointer;'
@@ -132,26 +91,19 @@ function EditorCanvas( {
 				}}}`,
 			},
 		],
-		[ settings.styles, enableResizing, canvasMode, currentPostIsTrashed ]
+		[ settings.styles, canvasMode, currentPostIsTrashed ]
 	);
 
 	return (
-		<EditorCanvasRoot
-			className={ clsx( 'edit-site-editor-canvas__block-list', {
-				'is-navigation-block': isTemplateTypeNavigation,
-			} ) }
-			renderAppender={ showBlockAppender }
+		<VisualEditor
 			styles={ styles }
 			iframeProps={ {
 				className: clsx( 'edit-site-visual-editor__editor-canvas', {
 					'is-focused': isFocused && canvasMode === 'view',
 				} ),
-				...props,
 				...( canvasMode === 'view' ? viewModeIframeProps : {} ),
 			} }
-		>
-			{ children }
-		</EditorCanvasRoot>
+		/>
 	);
 }
 

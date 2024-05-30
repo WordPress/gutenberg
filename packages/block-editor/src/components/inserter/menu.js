@@ -31,7 +31,6 @@ import { MediaTab, MediaCategoryPanel } from './media-tab';
 import InserterSearchResults from './search-results';
 import useInsertionPoint from './hooks/use-insertion-point';
 import InserterTabs from './tabs';
-import { useZoomOut } from '../../hooks/use-zoom-out';
 import { store as blockEditorStore } from '../../store';
 
 const NOOP = () => {};
@@ -46,7 +45,7 @@ function InserterMenu(
 		showMostUsedBlocks,
 		__experimentalFilterValue = '',
 		shouldFocusBlock = true,
-		__experimentalOnPatternCategorySelection = NOOP,
+		onPatternCategorySelection,
 		onClose,
 		__experimentalInitialTab,
 		__experimentalInitialCategory,
@@ -129,9 +128,9 @@ function InserterMenu(
 		( patternCategory, filter ) => {
 			setSelectedPatternCategory( patternCategory );
 			setPatternFilter( filter );
-			__experimentalOnPatternCategorySelection();
+			onPatternCategorySelection?.();
 		},
-		[ setSelectedPatternCategory, __experimentalOnPatternCategorySelection ]
+		[ setSelectedPatternCategory, onPatternCategorySelection ]
 	);
 
 	const showPatternPanel =
@@ -282,9 +281,6 @@ function InserterMenu(
 		showMediaPanel,
 	] );
 
-	// When the pattern panel is showing, we want to use zoom out mode
-	useZoomOut( showPatternPanel );
-
 	const handleSetSelectedTab = ( value ) => {
 		// If no longer on patterns tab remove the category setting.
 		if ( value !== 'patterns' ) {
@@ -345,4 +341,16 @@ function InserterMenu(
 	);
 }
 
-export default forwardRef( InserterMenu );
+export const PrivateInserterMenu = forwardRef( InserterMenu );
+
+function PublicInserterMenu( props, ref ) {
+	return (
+		<PrivateInserterMenu
+			{ ...props }
+			onPatternCategorySelection={ NOOP }
+			ref={ ref }
+		/>
+	);
+}
+
+export default forwardRef( PublicInserterMenu );

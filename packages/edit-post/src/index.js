@@ -19,7 +19,6 @@ import { store as editorStore } from '@wordpress/editor';
 /**
  * Internal dependencies
  */
-import './hooks';
 import Editor from './editor';
 
 /**
@@ -80,7 +79,7 @@ export function initializeEditor(
 	registerCoreBlocks();
 	registerLegacyWidgetBlock( { inserter: false } );
 	registerWidgetGroupBlock( { inserter: false } );
-	if ( process.env.IS_GUTENBERG_PLUGIN ) {
+	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 		__experimentalRegisterExperimentalCoreBlocks( {
 			enableFSEBlocks: settings.__unstableEnableFullSiteEditingBlocks,
 		} );

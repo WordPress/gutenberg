@@ -83,8 +83,6 @@ export const Root = styled( Flex )`
 
 	// Focus within, excluding cases where auxiliary controls in prefix or suffix have focus.
 	&:focus-within:not( :has( :is( ${ Prefix }, ${ Suffix } ):focus-within ) ) {
-		z-index: 1;
-
 		${ BackdropUI } {
 			border-color: ${ COLORS.ui.borderFocus };
 			box-shadow: ${ CONFIG.controlBoxShadowFocus };

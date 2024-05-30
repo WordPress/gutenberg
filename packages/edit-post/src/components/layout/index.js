@@ -12,7 +12,6 @@ import {
 	UnsavedChangesWarning,
 	EditorNotices,
 	EditorKeyboardShortcutsRegister,
-	EditorKeyboardShortcuts,
 	EditorSnackbars,
 	store as editorStore,
 	privateApis as editorPrivateApis,
@@ -24,7 +23,6 @@ import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { ScrollLock } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
 import { __, _x, sprintf } from '@wordpress/i18n';
@@ -40,7 +38,6 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
 import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 import InitPatternModal from '../init-pattern-modal';
@@ -50,7 +47,7 @@ import MetaBoxes from '../meta-boxes';
 import WelcomeGuide from '../welcome-guide';
 import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import useCommonCommands from '../../hooks/commands/use-common-commands';
+import useEditPostCommands from '../../commands/use-commands';
 
 const { getLayoutStyles } = unlock( blockEditorPrivateApis );
 const { useCommands } = unlock( coreCommandsPrivateApis );
@@ -64,6 +61,7 @@ const {
 	InterfaceSkeleton,
 	interfaceStore,
 	Sidebar,
+	TextEditor,
 } = unlock( editorPrivateApis );
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 
@@ -133,13 +131,12 @@ function useEditorStyles() {
 
 function Layout( { initialPost } ) {
 	useCommands();
-	useCommonCommands();
+	useEditPostCommands();
 
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isWideViewport = useViewportMatch( 'large' );
 	const isLargeViewport = useViewportMatch( 'medium' );
 
-	const { closeGeneralSidebar } = useDispatch( editPostStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const {
 		mode,
@@ -206,7 +203,7 @@ function Layout( { initialPost } ) {
 	// Set the right context for the command palette
 	const commandContext = hasBlockSelected
 		? 'block-selection-edit'
-		: 'post-editor-edit';
+		: 'entity-edit';
 	useCommandContext( commandContext );
 
 	const styles = useEditorStyles();
@@ -245,22 +242,6 @@ function Layout( { initialPost } ) {
 	const secondarySidebarLabel = isListViewOpened
 		? __( 'Document Overview' )
 		: __( 'Block Library' );
-
-	const secondarySidebar = () => {
-		if ( mode === 'visual' && isInserterOpened ) {
-			return (
-				<InserterSidebar
-					closeGeneralSidebar={ closeGeneralSidebar }
-					isRightSidebarOpen={ sidebarIsOpened }
-				/>
-			);
-		}
-		if ( mode === 'visual' && isListViewOpened ) {
-			return <ListViewSidebar />;
-		}
-
-		return null;
-	};
 
 	function onPluginAreaError( name ) {
 		createErrorNotice(
@@ -335,7 +316,6 @@ function Layout( { initialPost } ) {
 			<LocalAutosaveMonitor />
 			<EditPostKeyboardShortcuts />
 			<EditorKeyboardShortcutsRegister />
-			<EditorKeyboardShortcuts />
 			<BlockKeyboardShortcuts />
 
 			<InterfaceSkeleton
@@ -354,7 +334,11 @@ function Layout( { initialPost } ) {
 					/>
 				}
 				editorNotices={ <EditorNotices /> }
-				secondarySidebar={ secondarySidebar() }
+				secondarySidebar={
+					mode === 'visual' &&
+					( ( isInserterOpened && <InserterSidebar /> ) ||
+						( isListViewOpened && <ListViewSidebar /> ) )
+				}
 				sidebar={
 					! isDistractionFree && (
 						<ComplementaryArea.Slot scope="core" />
@@ -367,7 +351,9 @@ function Layout( { initialPost } ) {
 						{ ( mode === 'text' || ! isRichEditingEnabled ) && (
 							<TextEditor />
 						) }
-						{ ! isLargeViewport && <BlockToolbar hideDragHandle /> }
+						{ ! isLargeViewport && mode === 'visual' && (
+							<BlockToolbar hideDragHandle />
+						) }
 						{ isRichEditingEnabled && mode === 'visual' && (
 							<VisualEditor styles={ styles } />
 						) }
@@ -376,9 +362,6 @@ function Layout( { initialPost } ) {
 								<MetaBoxes location="normal" />
 								<MetaBoxes location="advanced" />
 							</div>
-						) }
-						{ isMobileViewport && sidebarIsOpened && (
-							<ScrollLock />
 						) }
 					</>
 				}

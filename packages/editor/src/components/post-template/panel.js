@@ -13,6 +13,11 @@ import ClassicThemeControl from './classic-theme';
 import BlockThemeControl from './block-theme';
 import PostPanelRow from '../post-panel-row';
 
+/**
+ * Displays the template controls based on the current editor settings and user permissions.
+ *
+ * @return {JSX.Element|null} The rendered PostTemplatePanel component.
+ */
 export default function PostTemplatePanel() {
 	const { templateId, isBlockTheme } = useSelect( ( select ) => {
 		const { getCurrentTemplateId, getEditorSettings } =

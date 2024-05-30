@@ -111,10 +111,8 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 	// displays based on the relationship between the selected block
 	// and its parent, and only enable it if the parent is controlling
 	// its children blocks.
-	const blockInspectorAnimationSettings = useBlockInspectorAnimationSettings(
-		blockType,
-		selectedBlockClientId
-	);
+	const blockInspectorAnimationSettings =
+		useBlockInspectorAnimationSettings( blockType );
 
 	const borderPanelLabel = useBorderPanelLabel( {
 		blockName: selectedBlockName,

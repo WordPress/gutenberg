@@ -1000,7 +1000,10 @@ export const __unstableSplitSelection =
 			const first = firstBlocks.shift();
 			head = {
 				...head,
-				attributes: headType.merge( head.attributes, first.attributes ),
+				attributes: {
+					...head.attributes,
+					...headType.merge( head.attributes, first.attributes ),
+				},
 			};
 			output.push( head );
 			selection = {
@@ -1034,10 +1037,10 @@ export const __unstableSplitSelection =
 				const last = lastBlocks.pop();
 				output.push( {
 					...tail,
-					attributes: tailType.merge(
-						last.attributes,
-						tail.attributes
-					),
+					attributes: {
+						...tail.attributes,
+						...tailType.merge( last.attributes, tail.attributes ),
+					},
 				} );
 				output.push( ...lastBlocks );
 				selection = {
@@ -1506,11 +1509,18 @@ export const insertDefaultBlock =
 	};
 
 /**
- * Action that changes the nested settings of a given block.
+ * @typedef {Object< string, Object >} SettingsByClientId
+ */
+
+/**
+ * Action that changes the nested settings of the given block(s).
  *
- * @param {string} clientId Client ID of the block whose nested setting are
- *                          being received.
- * @param {Object} settings Object with the new settings for the nested block.
+ * @param {string | SettingsByClientId} clientId Client ID of the block whose
+ *                                               nested setting are being
+ *                                               received, or object of settings
+ *                                               by client ID.
+ * @param {Object}                      settings Object with the new settings
+ *                                               for the nested block.
  *
  * @return {Object} Action object
  */

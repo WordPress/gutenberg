@@ -6,13 +6,13 @@ import * as interfaceApis from '@wordpress/interface';
 /**
  * Internal dependencies
  */
-import EditorCanvas from './components/editor-canvas';
 import { ExperimentalEditorProvider } from './components/provider';
 import { lock } from './lock-unlock';
 import { EntitiesSavedStatesExtensible } from './components/entities-saved-states';
 import useAutoSwitchEditorSidebars from './components/provider/use-auto-switch-editor-sidebars';
 import useBlockEditorSettings from './components/provider/use-block-editor-settings';
 import Header from './components/header';
+import CreateTemplatePartModal from './components/create-template-part-modal';
 import InserterSidebar from './components/inserter-sidebar';
 import ListViewSidebar from './components/list-view-sidebar';
 import PatternOverridesPanel from './components/pattern-overrides-panel';
@@ -29,7 +29,10 @@ import { PrivatePostExcerptPanel } from './components/post-excerpt/panel';
 import SavePublishPanels from './components/save-publish-panels';
 import PostContentInformation from './components/post-content-information';
 import PostLastEditedPanel from './components/post-last-edited-panel';
+import ResizableEditor from './components/resizable-editor';
 import Sidebar from './components/sidebar';
+import TextEditor from './components/text-editor';
+import VisualEditor from './components/visual-editor';
 import {
 	mergeBaseAndUserConfigs,
 	GlobalStylesProvider,
@@ -39,7 +42,7 @@ const { store: interfaceStore, ...remainingInterfaceApis } = interfaceApis;
 
 export const privateApis = {};
 lock( privateApis, {
-	EditorCanvas,
+	CreateTemplatePartModal,
 	ExperimentalEditorProvider,
 	EntitiesSavedStatesExtensible,
 	GlobalStylesProvider,
@@ -61,7 +64,10 @@ lock( privateApis, {
 	SavePublishPanels,
 	PostContentInformation,
 	PostLastEditedPanel,
+	ResizableEditor,
 	Sidebar,
+	TextEditor,
+	VisualEditor,
 
 	// This is a temporary private API while we're updating the site editor to use EditorProvider.
 	useAutoSwitchEditorSidebars,

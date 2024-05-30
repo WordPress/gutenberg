@@ -13,7 +13,7 @@ PODS:
     - ReactCommon/turbomodule/core (= 0.73.3)
   - fmt (6.2.1)
   - glog (0.3.5)
-  - Gutenberg (1.118.0):
+  - Gutenberg (1.119.0):
     - React-Core (= 0.73.3)
     - React-CoreModules (= 0.73.3)
     - React-RCTImage (= 0.73.3)
@@ -912,10 +912,10 @@ PODS:
     - React-Core
   - react-native-slider (3.0.2-wp-4):
     - React-Core
-  - react-native-video (5.2.0-wp-6):
+  - react-native-video (5.2.0-wp-7):
     - React-Core
-    - react-native-video/Video (= 5.2.0-wp-6)
-  - react-native-video/Video (5.2.0-wp-6):
+    - react-native-video/Video (= 5.2.0-wp-7)
+  - react-native-video/Video (5.2.0-wp-7):
     - React-Core
   - react-native-webview (13.6.1):
     - React-Core
@@ -1109,7 +1109,7 @@ PODS:
     - React-Core
   - RNSVG (14.0.0):
     - React-Core
-  - RNTAztecView (1.118.0):
+  - RNTAztecView (1.119.0):
     - React-Core
     - WordPress-Aztec-iOS (= 1.19.11)
   - SDWebImage (5.11.1):
@@ -1343,7 +1343,7 @@ SPEC CHECKSUMS:
   FBReactNativeSpec: 73b3972e2bd20b3235ff2014f06a3d3af675ed29
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
   glog: c5d68082e772fa1c511173d6b30a9de2c05a69a2
-  Gutenberg: c0094e0fdfa895be7ad038dbb7b42dc0d21074cf
+  Gutenberg: 8f5a5b16c987c6532add8413cb3411f583f43b69
   hermes-engine: 5420539d016f368cd27e008f65f777abd6098c56
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   libwebp: 60305b2e989864154bd9be3d772730f08fc6a59c
@@ -1373,7 +1373,7 @@ SPEC CHECKSUMS:
   react-native-safe-area: c9cf765aa2dd96159476a99633e7d462ce5bb94f
   react-native-safe-area-context: 0ee144a6170530ccc37a0fd9388e28d06f516a89
   react-native-slider: dff0d8a46f368a8d1bacd8638570d75b9b0be400
-  react-native-video: 6dee623307ed9d04d1be2de87494f9a0fa2041d1
+  react-native-video: 6768bf960f45c24bf75d2ba68d433d3ae3829a8e
   react-native-webview: 02e4beee6b2b2b7391ee1c565788b8f8d6df9d05
   React-nativeconfig: 4662ac75a0a77789c9ed896ed77baa1a25cdf006
   React-NativeModulesApple: 92bc296f2ae166d10cb4d6a05498c80bf4ef9fa2
@@ -1402,7 +1402,7 @@ SPEC CHECKSUMS:
   RNReanimated: 6936b41d8afb97175e7c0ab40425b53103f71046
   RNScreens: 2b73f5eb2ac5d94fbd61fa4be0bfebd345716825
   RNSVG: 255767813dac22db1ec2062c8b7e7b856d4e5ae6
-  RNTAztecView: caf0e76a80867970eaa182cf9bf2d5b3c89285c5
+  RNTAztecView: c0a124a24b01a96ceeac8c0dcdc461f2d06e13f2
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
   SDWebImageWebPCoder: 908b83b6adda48effe7667cd2b7f78c897e5111d
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17

@@ -49,8 +49,8 @@ import type {
 	AnyItem,
 	NormalizedField,
 	SortDirection,
-	ViewProps,
 	ViewTable as ViewTableType,
+	ViewTableProps,
 } from './types';
 
 const {
@@ -89,9 +89,6 @@ interface TableRowProps< Item extends AnyItem > {
 	onSelectionChange: ( items: Item[] ) => void;
 	data: Item[];
 }
-
-interface ViewTableProps< Item extends AnyItem >
-	extends ViewProps< Item, ViewTableType > {}
 
 function WithDropDownMenuSeparators( { children }: { children: ReactNode } ) {
 	return Children.toArray( children )

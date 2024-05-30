@@ -23,6 +23,7 @@ import {
 	isUnmodifiedBlock,
 	isReusableBlock,
 	getBlockDefaultClassName,
+	hasBlockSupport,
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
@@ -216,12 +217,14 @@ function BlockListBlock( {
 	}
 
 	const { 'data-align': dataAlign, ...restWrapperProps } = wrapperProps ?? {};
-
-	restWrapperProps.className = clsx(
-		restWrapperProps.className,
-		dataAlign && themeSupportsLayout && `align${ dataAlign }`,
-		! ( dataAlign && isSticky ) && className
-	);
+	const updatedWrapperProps = {
+		...restWrapperProps,
+		className: clsx(
+			restWrapperProps.className,
+			dataAlign && themeSupportsLayout && `align${ dataAlign }`,
+			! ( dataAlign && isSticky ) && className
+		),
+	};
 
 	// We set a new context with the adjusted and filtered wrapperProps (through
 	// `editor.BlockListBlock`), which the `BlockListBlockProvider` did not have
@@ -234,7 +237,7 @@ function BlockListBlock( {
 	return (
 		<PrivateBlockContext.Provider
 			value={ {
-				wrapperProps: restWrapperProps,
+				wrapperProps: updatedWrapperProps,
 				isAligned,
 				...context,
 			} }
@@ -532,6 +535,7 @@ function BlockListBlockProvider( props ) {
 				isFirstMultiSelectedBlock,
 				getMultiSelectedBlockClientIds,
 				hasSelectedInnerBlock,
+				getBlocksByName,
 
 				getBlockIndex,
 				isBlockMultiSelected,
@@ -605,6 +609,17 @@ function BlockListBlockProvider( props ) {
 			const movingClientId = hasBlockMovingClientId();
 			const blockEditingMode = getBlockEditingMode( clientId );
 
+			const multiple = hasBlockSupport( blockName, 'multiple', true );
+
+			// For block types with `multiple` support, there is no "original
+			// block" to be found in the content, as the block itself is valid.
+			const blocksWithSameName = multiple
+				? []
+				: getBlocksByName( blockName );
+			const isInvalid =
+				blocksWithSameName.length &&
+				blocksWithSameName[ 0 ] !== clientId;
+
 			return {
 				...previewContext,
 				mode: getBlockMode( clientId ),
@@ -662,6 +677,9 @@ function BlockListBlockProvider( props ) {
 				hasEditableOutline:
 					blockEditingMode !== 'disabled' &&
 					getBlockEditingMode( rootClientId ) === 'disabled',
+				originalBlockClientId: isInvalid
+					? blocksWithSameName[ 0 ]
+					: false,
 			};
 		},
 		[ clientId, rootClientId ]
@@ -705,6 +723,7 @@ function BlockListBlockProvider( props ) {
 		hasEditableOutline,
 		className,
 		defaultClassName,
+		originalBlockClientId,
 	} = selectedProps;
 
 	// Users of the editor.BlockListBlock filter used to be able to
@@ -752,6 +771,7 @@ function BlockListBlockProvider( props ) {
 		defaultClassName,
 		mayDisplayControls,
 		mayDisplayParentControls,
+		originalBlockClientId,
 		themeSupportsLayout,
 	};
 

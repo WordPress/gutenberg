@@ -1759,16 +1759,13 @@ export function canMoveBlock( state, clientId, rootClientId = null ) {
 	if ( attributes === null ) {
 		return true;
 	}
-	if ( getBlockEditingMode( state, rootClientId ) !== 'default' ) {
-		return false;
-	}
 	if ( attributes.lock?.move !== undefined ) {
 		return ! attributes.lock.move;
 	}
 	if ( getTemplateLock( state, rootClientId ) === 'all' ) {
 		return false;
 	}
-	return true;
+	return getBlockEditingMode( state, rootClientId ) !== 'disabled';
 }
 
 /**
