@@ -185,12 +185,6 @@ function Preview( { item, viewType } ) {
 	);
 }
 
-// TODO: how about CPTs added by plugins, etc.?
-const POST_TYPES = {
-	post: __( 'Post' ),
-	page: __( 'Page' ),
-};
-
 // This maps the template slug to the post types it should be available for.
 // https://developer.wordpress.org/themes/basics/template-hierarchy/#visual-overview
 // It only addresses primary and secondary templates, but not tertiary (aka variable) templates.
@@ -252,6 +246,23 @@ export default function PageTemplates() {
 			per_page: -1,
 		}
 	);
+	const { records: types } = useEntityRecords( 'root', 'postType', {
+		per_page: -1,
+		context: 'edit',
+	} );
+
+	const registeredPostTypes = useMemo( () => {
+		const result =
+			types
+				?.filter( ( type ) => type.viewable )
+				.map( ( { name, slug } ) => ( { name, slug } ) )
+				.reduce( ( acc, current ) => {
+					acc[ current.slug ] = current.name;
+					return acc;
+				}, {} ) || {};
+		return result;
+	}, [ types ] );
+
 	const history = useHistory();
 	const onSelectionChange = useCallback(
 		( items ) => {
@@ -294,7 +305,7 @@ export default function PageTemplates() {
 
 		return (
 			item.post_types ||
-			( item.is_custom && Object.keys( POST_TYPES ) ) ||
+			( item.is_custom && Object.keys( registeredPostTypes ) ) ||
 			TEMPLATE_TO_POST_TYPE[ item.slug ] ||
 			[]
 		);
@@ -370,20 +381,22 @@ export default function PageTemplates() {
 					}
 
 					if (
-						postTypes.length === Object.keys( POST_TYPES ).length
+						postTypes.length ===
+						Object.keys( registeredPostTypes ).length
 					) {
 						return __( 'Any' );
 					}
 
 					return postTypes
 						.map(
-							( postType ) => POST_TYPES[ postType ] || postType
+							( postType ) =>
+								registeredPostTypes[ postType ] || postType
 						)
 						.join( ',' );
 				},
-				elements: Object.keys( POST_TYPES ).map( ( key ) => ( {
+				elements: Object.keys( registeredPostTypes ).map( ( key ) => ( {
 					value: key,
-					label: POST_TYPES[ key ],
+					label: registeredPostTypes[ key ],
 				} ) ),
 			},
 			{
@@ -401,7 +414,7 @@ export default function PageTemplates() {
 				},
 			},
 		],
-		[ authors, view.type ]
+		[ authors, view.type, registeredPostTypes, getPostTypesFromItem ]
 	);
 
 	const { data, paginationInfo } = useMemo( () => {
