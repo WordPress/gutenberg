@@ -84,14 +84,16 @@ function gutenberg_render_block_style_variation_support_styles( $parsed_block ) 
 	$variation_instance = substr( $class_name, 9 );
 	$class_name         = ".$class_name";
 
-	// To support blocks with more complex selectors, that can apply styles to
-	// inner markup or even different inner elements depending on the feature,
-	// the variation style data needs to be manipulated some. If the root variation
-	// styles are moved under a variations property they will generate as desired.
-	//
-	// Example blocks that require this approach include:
-	// - Button: `.wp-block-button .wp-block-button__link`
-	// - Image: `.wp-block-image` and `.wp-block-image img` for borders, shadow etc.
+	/*
+	 * To support blocks with more complex selectors, that can apply styles to
+	 * inner markup or even different inner elements depending on the feature,
+	 * the variation style data needs to be manipulated some. If the root variation
+	 * styles are moved under a variations property they will generate as desired.
+	 *
+	 * Example blocks that require this approach include:
+	 *  - Button: `.wp-block-button .wp-block-button__link`
+	 *  - Image: `.wp-block-image` and `.wp-block-image img` for borders, shadow etc.
+	 */
 	$elements_data = $variation_data['elements'] ?? array();
 	$blocks_data   = $variation_data['blocks'] ?? array();
 	unset( $variation_data['elements'] );
