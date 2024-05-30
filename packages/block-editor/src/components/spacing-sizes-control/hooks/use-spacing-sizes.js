@@ -35,31 +35,24 @@ export default function useSpacingSizes() {
 			: EMPTY_ARRAY;
 
 	return useMemo( () => {
-		const zeroSize = [ { name: 0, slug: '0', size: 0 } ];
-
-		const sizesLength =
-			zeroSize.length +
-			customSizes.length +
-			themeSizes.length +
-			defaultSizes.length;
-
-		const maybeUnsetSize =
-			sizesLength > RANGE_CONTROL_MAX_SIZE
-				? [
-						{
-							name: __( 'Default' ),
-							slug: 'default',
-							size: undefined,
-						},
-				  ]
-				: EMPTY_ARRAY;
-
-		return [
-			...maybeUnsetSize,
-			...zeroSize,
+		const sizes = [
+			{ name: __( 'None' ), slug: '0', size: 0 },
 			...customSizes,
 			...themeSizes,
 			...defaultSizes,
 		];
+
+		return sizes.length > RANGE_CONTROL_MAX_SIZE
+			? [
+					{
+						name: __( 'Default' ),
+						slug: 'default',
+						size: undefined,
+					},
+					...sizes,
+			  ]
+			: // See https://github.com/WordPress/gutenberg/pull/44247 for reasoning
+			  // to use the index as the name in the range control.
+			  sizes.map( ( { slug, size }, i ) => ( { name: i, slug, size } ) );
 	}, [ customSizes, themeSizes, defaultSizes ] );
 }
