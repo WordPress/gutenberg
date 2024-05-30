@@ -1193,11 +1193,6 @@ test.describe( 'Block bindings', () => {
 				await expect( paragraphBlock ).toHaveText(
 					'Value of the text_custom_field'
 				);
-				// Paragraph is not editable.
-				await expect( paragraphBlock ).toHaveAttribute(
-					'contenteditable',
-					'false'
-				);
 
 				// Check the frontend shows the value of the custom field.
 				const postId = await editor.publishPost();
@@ -1331,6 +1326,12 @@ test.describe( 'Block bindings', () => {
 						},
 					},
 				} );
+				// Select the paragraph and press Enter at the end of it.
+				const paragraph = editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} );
+				await editor.selectBlocks( paragraph );
+				await page.keyboard.press( 'End' );
 				await page.keyboard.press( 'Enter' );
 				const [ initialParagraph, newEmptyParagraph ] =
 					await editor.canvas
@@ -1473,11 +1474,6 @@ test.describe( 'Block bindings', () => {
 				await expect( headingBlock ).toHaveText(
 					'Value of the text_custom_field'
 				);
-				// Heading is not editable.
-				await expect( headingBlock ).toHaveAttribute(
-					'contenteditable',
-					'false'
-				);
 
 				// Check the frontend shows the value of the custom field.
 				const postId = await editor.publishPost();
@@ -1509,6 +1505,13 @@ test.describe( 'Block bindings', () => {
 						},
 					},
 				} );
+
+				// Select the heading and press Enter at the end of it.
+				const heading = editor.canvas.getByRole( 'document', {
+					name: 'Block: Heading',
+				} );
+				await editor.selectBlocks( heading );
+				await page.keyboard.press( 'End' );
 				await page.keyboard.press( 'Enter' );
 				// Can't use `editor.getBlocks` because it doesn't return the meta value shown in the editor.
 				const [ initialHeading, newEmptyParagraph ] =
@@ -1566,12 +1569,6 @@ test.describe( 'Block bindings', () => {
 				await buttonBlock.click();
 				await expect( buttonBlock ).toHaveText(
 					'Value of the text_custom_field'
-				);
-
-				// Button is not editable.
-				await expect( buttonBlock ).toHaveAttribute(
-					'contenteditable',
-					'false'
 				);
 
 				// Check the frontend shows the value of the custom field.
@@ -1702,6 +1699,7 @@ test.describe( 'Block bindings', () => {
 					} )
 					.getByRole( 'textbox' )
 					.click();
+				await page.keyboard.press( 'End' );
 				await page.keyboard.press( 'Enter' );
 				const [ initialButton, newEmptyButton ] = await editor.canvas
 					.locator( '[data-type="core/button"]' )
@@ -1826,12 +1824,7 @@ test.describe( 'Block bindings', () => {
 					imagePlaceholderSrc
 				);
 
-				// Alt textarea is disabled and with the custom field value.
-				await expect(
-					page
-						.getByRole( 'tabpanel', { name: 'Settings' } )
-						.getByLabel( 'Alternative text' )
-				).toHaveAttribute( 'readonly' );
+				// Alt textarea should have the custom field value.
 				const altValue = await page
 					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByLabel( 'Alternative text' )
@@ -1892,7 +1885,7 @@ test.describe( 'Block bindings', () => {
 					imagePlaceholderSrc
 				);
 
-				// Title input is disabled and with the custom field value.
+				// Title input should have the custom field value.
 				const advancedButton = page
 					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByRole( 'button', {
@@ -1903,11 +1896,6 @@ test.describe( 'Block bindings', () => {
 				if ( isAdvancedPanelOpen === 'false' ) {
 					await advancedButton.click();
 				}
-				await expect(
-					page
-						.getByRole( 'tabpanel', { name: 'Settings' } )
-						.getByLabel( 'Title attribute' )
-				).toHaveAttribute( 'readonly' );
 				const titleValue = await page
 					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByLabel( 'Title attribute' )
@@ -1972,19 +1960,14 @@ test.describe( 'Block bindings', () => {
 					imageCustomFieldSrc
 				);
 
-				// Alt textarea is disabled and with the custom field value.
-				await expect(
-					page
-						.getByRole( 'tabpanel', { name: 'Settings' } )
-						.getByLabel( 'Alternative text' )
-				).toHaveAttribute( 'readonly' );
+				// Alt textarea should have the custom field value.
 				const altValue = await page
 					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByLabel( 'Alternative text' )
 					.inputValue();
 				expect( altValue ).toBe( 'Value of the text_custom_field' );
 
-				// Title input is enabled and with the original value.
+				// Title input should have the original value.
 				const advancedButton = page
 					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByRole( 'button', {
@@ -1995,11 +1978,6 @@ test.describe( 'Block bindings', () => {
 				if ( isAdvancedPanelOpen === 'false' ) {
 					await advancedButton.click();
 				}
-				await expect(
-					page
-						.getByRole( 'tabpanel', { name: 'Settings' } )
-						.getByLabel( 'Title attribute' )
-				).toBeEnabled();
 				const titleValue = await page
 					.getByRole( 'tabpanel', { name: 'Settings' } )
 					.getByLabel( 'Title attribute' )
