@@ -3843,8 +3843,7 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
-	 * Merges two sets of spacing size presets and sorts them by slug using the natsort algorithm
-	 * so slugs beginning with 5 end up before slugs starting with 10, for example.
+	 * Merges two sets of spacing size presets.
 	 *
 	 * @since 6.6.0
 	 *
@@ -3860,7 +3859,6 @@ class WP_Theme_JSON_Gutenberg {
 		foreach ( $incoming as $item ) {
 			$merged[ $item['slug'] ] = $item;
 		}
-		ksort( $merged, SORT_NATURAL );
 		return array_values( $merged );
 	}
 

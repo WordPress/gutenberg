@@ -12,6 +12,8 @@ import { RANGE_CONTROL_MAX_SIZE } from '../utils';
 
 const EMPTY_ARRAY = [];
 
+const compare = new Intl.Collator( 'und', { numeric: true } ).compare;
+
 export default function useSpacingSizes() {
 	const [
 		customSpacingSizes,
@@ -40,7 +42,7 @@ export default function useSpacingSizes() {
 			...customSizes,
 			...themeSizes,
 			...defaultSizes,
-		];
+		].sort( ( a, b ) => compare( a.slug, b.slug ) );
 
 		return sizes.length > RANGE_CONTROL_MAX_SIZE
 			? [
