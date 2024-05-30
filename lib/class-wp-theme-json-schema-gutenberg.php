@@ -132,7 +132,7 @@ class WP_Theme_JSON_Schema_Gutenberg {
 		 * affect the generated CSS.
 		 */
 
-		if ( isset( $new['settings']['typography']['fontSizes'] ) ) {
+		if ( isset( $old['settings']['typography']['fontSizes'] ) ) {
 			if ( ! isset( $new['settings'] ) ) {
 				$new['settings'] = array();
 			}
@@ -143,8 +143,8 @@ class WP_Theme_JSON_Schema_Gutenberg {
 		}
 
 		if (
-			isset( $new['settings']['spacing']['spacingSizes'] ) ||
-			isset( $new['settings']['spacing']['spacingScale'] )
+			isset( $old['settings']['spacing']['spacingSizes'] ) ||
+			isset( $old['settings']['spacing']['spacingScale'] )
 		) {
 			if ( ! isset( $new['settings'] ) ) {
 				$new['settings'] = array();
