@@ -169,9 +169,10 @@ export const updateBlockAttributes =
 	( { dispatch, registry } ) => {
 		const keptAttributes = { ...attributes };
 		for ( const clientId of clientIds ) {
-			const { metadata: { bindings } = {} } = registry
+			const blockAttributes = registry
 				.select( STORE_NAME )
 				.getBlockAttributes( clientId );
+			const bindings = blockAttributes?.metadata?.bindings;
 
 			if ( ! bindings ) {
 				continue;
