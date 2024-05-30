@@ -124,6 +124,16 @@ export function OrderRow() {
 							title={ __( 'Order' ) }
 							onClose={ onClose }
 						/>
+						<div>
+							{ __(
+								'This attribute determines the order of pages in the Pages List block.'
+							) }
+							<p>
+								{ __(
+									'Pages with the same order value will sorted alphabetically. Negative order values can be used.'
+								) }
+							</p>
+						</div>
 						<PageAttributesOrder />
 					</div>
 				) }

@@ -7,7 +7,12 @@ import removeAccents from 'remove-accents';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { Button, Dropdown, ComboboxControl } from '@wordpress/components';
+import {
+	Button,
+	Dropdown,
+	ComboboxControl,
+	ExternalLink,
+} from '@wordpress/components';
 import { debounce } from '@wordpress/compose';
 import { useState, useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -242,6 +247,23 @@ export function ParentRow() {
 							title={ __( 'Parent' ) }
 							onClose={ onClose }
 						/>
+						<div>
+							{ __(
+								'Child pages inherit characteristics from their parent, like URL structure. For instance, if "Web Design" is a child of "Services," its URL would be mysite.com/services/web-design.'
+							) }
+							<p>
+								{ __(
+									'They also show up as sub-items in the default navigation menu. '
+								) }
+								<ExternalLink
+									href={ __(
+										'https://wordpress.org/documentation/article/page-post-settings-sidebar/#permalink'
+									) }
+								>
+									{ __( 'Learn more.' ) }
+								</ExternalLink>
+							</p>
+						</div>
 						<PageAttributesParent />
 					</div>
 				) }
