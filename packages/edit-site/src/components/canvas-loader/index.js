@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
+import {
+	privateApis as componentsPrivateApis,
+	ProgressBar,
+} from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
@@ -12,7 +15,7 @@ import { useSelect } from '@wordpress/data';
 import { unlock } from '../../lock-unlock';
 import { useStylesPreviewColors } from '../global-styles/hooks';
 
-const { ProgressBar, Theme } = unlock( componentsPrivateApis );
+const { Theme } = unlock( componentsPrivateApis );
 const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 
 export default function CanvasLoader( { id } ) {

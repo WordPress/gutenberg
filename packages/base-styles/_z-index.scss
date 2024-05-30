@@ -10,8 +10,7 @@ $z-layers: (
 	".block-library-classic__toolbar": 31, // When scrolled to top this toolbar needs to sit over block-editor-block-toolbar
 	".block-editor-block-list__block-selection-button": 22,
 	".components-form-toggle__input": 1,
-	".edit-post-text-editor__toolbar": 1,
-	".edit-site-code-editor__toolbar": 1,
+	".editor-text-editor__toolbar": 1,
 
 	// These next three share a stacking context
 	".block-library-template-part__selection-search": 2, // higher sticky element
@@ -126,7 +125,7 @@ $z-layers: (
 	// Should be above the popover (dropdown)
 	".reusable-blocks-menu-items__convert-modal": 1000001,
 	".patterns-menu-items__convert-modal": 1000001,
-	".edit-site-create-template-part-modal": 1000001,
+	".editor-create-template-part-modal": 1000001,
 	".block-editor-block-lock-modal": 1000001,
 	".block-editor-template-part__selection-modal": 1000001,
 	".block-editor-block-rename-modal": 1000001,
@@ -195,7 +194,6 @@ $z-layers: (
 	".edit-site-layout__hub": 3,
 	".edit-site-page-header": 2,
 	".edit-site-page-content": 1,
-	".edit-site-patterns__header": 2,
 	".edit-site-patterns__dataviews-list-pagination": 2,
 	".edit-site-templates__dataviews-list-pagination": 2,
 	".edit-site-layout__canvas-container": 2,
