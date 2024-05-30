@@ -18,7 +18,9 @@ function transformStyle(
 	if ( ! wrapperSelector && ! baseURL ) {
 		return css;
 	}
-	const postcssFriendlyCSS = css.replace( /:where\(body\)/g, 'body' );
+	const postcssFriendlyCSS = css
+		.replace( /:root :where\(body\)/g, 'body' )
+		.replace( /:where\(body\)/g, 'body' );
 	try {
 		return postcss(
 			[
