@@ -254,7 +254,7 @@ export default function PageTemplates() {
 	const registeredPostTypes = useMemo( () => {
 		const result =
 			types
-				?.filter( ( type ) => type.viewable )
+				?.filter( ( type ) => type.viewable && type.supports.editor ) // supports.editor is a proxy for supporting templates.
 				.map( ( { name, slug } ) => ( { name, slug } ) )
 				.reduce( ( acc, current ) => {
 					acc[ current.slug ] = current.name;
