@@ -380,9 +380,6 @@ export default function PageTemplates() {
 					value: key,
 					label: POST_TYPES[ key ],
 				} ) ),
-				filterBy: {
-					operators: [ OPERATOR_IS_ANY ],
-				},
 			},
 			{
 				header: __( 'Type' ),
