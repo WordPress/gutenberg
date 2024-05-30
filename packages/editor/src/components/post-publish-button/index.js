@@ -50,14 +50,18 @@ export class PostPublishButton extends Component {
 				hasNonPostEntityChanges,
 				hasPostMetaChanges,
 				setEntitiesSavedStatesCallback,
+				isPublished,
 			} = this.props;
 			// If a post with non-post entities is published, but the user
 			// elects to not save changes to the non-post entities, those
 			// entities will still be dirty when the Publish button is clicked.
 			// We also need to check that the `setEntitiesSavedStatesCallback`
 			// prop was passed. See https://github.com/WordPress/gutenberg/pull/37383
+			//
+			// TODO: Explore how to manage `hasPostMetaChanges` and pre-publish workflow properly.
 			if (
-				( hasNonPostEntityChanges || hasPostMetaChanges ) &&
+				( hasNonPostEntityChanges ||
+					( hasPostMetaChanges && isPublished ) ) &&
 				setEntitiesSavedStatesCallback
 			) {
 				// The modal for multiple entity saving will open,

@@ -9,7 +9,6 @@ import { useViewportMatch } from '@wordpress/compose';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
 
 export default function PublishButtonLabel() {
 	const isSmallerThanMediumViewport = useViewportMatch( 'medium', '<' );
@@ -21,7 +20,6 @@ export default function PublishButtonLabel() {
 		hasPublishAction,
 		isAutosaving,
 		hasNonPostEntityChanges,
-		hasPostMetaChanges,
 		postStatusHasChanged,
 		postStatus,
 	} = useSelect( ( select ) => {
@@ -47,9 +45,6 @@ export default function PublishButtonLabel() {
 			isAutosaving: isAutosavingPost(),
 			hasNonPostEntityChanges:
 				select( editorStore ).hasNonPostEntityChanges(),
-			hasPostMetaChanges: unlock(
-				select( editorStore )
-			).hasPostMetaChanges(),
 			postStatusHasChanged: !! getPostEdits()?.status,
 			postStatus: getEditedPostAttribute( 'status' ),
 		};
@@ -74,7 +69,6 @@ export default function PublishButtonLabel() {
 	}
 	if (
 		hasNonPostEntityChanges ||
-		hasPostMetaChanges ||
 		isPublished ||
 		( postStatusHasChanged &&
 			! [ 'future', 'publish' ].includes( postStatus ) ) ||
