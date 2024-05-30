@@ -243,7 +243,7 @@ function gutenberg_print_script_module_data(): void {
 		 */
 		$data = apply_filters( "scriptmoduledata_{$module_id}", array() );
 
-		if ( ! empty( $data ) ) {
+		if ( is_array( $data ) && ! empty( $data ) ) {
 			/*
 			 * This data will be printed as JSON inside a script tag like this:
 			 *   <script type="application/json"></script>
