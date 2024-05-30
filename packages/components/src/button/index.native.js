@@ -183,7 +183,7 @@ export function Button( props ) {
 			accessible
 			accessibilityLabel={ label }
 			accessibilityStates={ states }
-			accessibilityRole={ 'button' }
+			accessibilityRole="button"
 			accessibilityHint={ hint }
 			onPress={ onClick }
 			style={ containerStyle }

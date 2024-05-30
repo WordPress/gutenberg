@@ -11,17 +11,22 @@
 
 -   `Tabs`: Animate indicator ([#60560](https://github.com/WordPress/gutenberg/pull/60560)).
 -   `ComboboxControl`: Introduce Combobox expandOnFocus prop ([#61705](https://github.com/WordPress/gutenberg/pull/61705)).
+-   `ProgressBar`: Expose as public API ([#61062](https://github.com/WordPress/gutenberg/pull/61062)).
+-   `ProgressBar`: Simplify default width implementation and make it more easily overridable ([#61976](https://github.com/WordPress/gutenberg/pull/61976)).
 
 ### Bug Fixes
 
 -   `Autocomplete`: Stabilize rendering of autocomplete items ([#61877](https://github.com/WordPress/gutenberg/pull/61877)).
 -   `TabPanel`: Make the the focus styles consistent with `Tabs`. ([#61317](https://github.com/WordPress/gutenberg/pull/61317)).
+-   `InputControl`: Fixed z-index issue where slider dots appeared in front of the Appearance dropdown. ([#61937](https://github.com/WordPress/gutenberg/pull/61937))
 
 ### Internal
 
+-   Remove `reduceMotion` util ([#61963](https://github.com/WordPress/gutenberg/pull/61963)).
 -   Add type support for CSS Custom Properties ([#61872](https://github.com/WordPress/gutenberg/pull/61872)).
 -   Remove usage of deprecated spreading of `key` prop in JSX in CustomSelectControl and FormTokenField components ([#61692](https://github.com/WordPress/gutenberg/pull/61692)).
--   Tooltip: Fix Ariakit tooltip store usage ([#61858](https://github.com/WordPress/gutenberg/pull/61858)).
+-   `Tooltip`: Fix Ariakit tooltip store usage ([#61858](https://github.com/WordPress/gutenberg/pull/61858)).
+-   `CustomSelectControlV2`: Use `InputBase` for styling ([#60261](https://github.com/WordPress/gutenberg/pull/60261)).
 
 ## 27.6.0 (2024-05-16)
 

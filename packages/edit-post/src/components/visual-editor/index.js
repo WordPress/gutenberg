@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -22,7 +17,7 @@ import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { usePaddingAppender } from './use-padding-appender';
 
-const { EditorCanvas } = unlock( editorPrivateApis );
+const { VisualEditor: VisualEditorRoot } = unlock( editorPrivateApis );
 
 const isGutenbergPlugin = globalThis.IS_GUTENBERG_PLUGIN ? true : false;
 const DESIGN_POST_TYPES = [
@@ -100,19 +95,14 @@ export default function VisualEditor( { styles } ) {
 		isEditingTemplate;
 
 	return (
-		<div
-			className={ clsx( 'edit-post-visual-editor', {
-				'has-inline-canvas': ! isToBeIframed,
-			} ) }
-		>
-			<EditorCanvas
-				disableIframe={ ! isToBeIframed }
-				styles={ styles }
-				// We should auto-focus the canvas (title) on load.
-				// eslint-disable-next-line jsx-a11y/no-autofocus
-				autoFocus={ ! isWelcomeGuideVisible }
-				contentRef={ paddingAppenderRef }
-			/>
-		</div>
+		<VisualEditorRoot
+			className="edit-post-visual-editor"
+			disableIframe={ ! isToBeIframed }
+			styles={ styles }
+			// We should auto-focus the canvas (title) on load.
+			// eslint-disable-next-line jsx-a11y/no-autofocus
+			autoFocus={ ! isWelcomeGuideVisible }
+			contentRef={ paddingAppenderRef }
+		/>
 	);
 }
