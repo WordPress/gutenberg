@@ -28,7 +28,7 @@
 
 	.block-editor-block-patterns-list__item-title {
 		flex-grow: 1;
-		font-size: 12px;
+		font-size: $helptext-font-size;
 		text-align: left;
 	}
 
@@ -60,7 +60,7 @@
 	.block-editor-patterns__pattern-details:not(:empty) {
 		align-items: center;
 		margin-top: $grid-unit-10;
-		margin-bottom: $grid-unit-10; // Add more space as there is a visual label on user-created patterns.
+		padding-bottom: $grid-unit-05; // Add more space for labels on user-created patterns.
 	}
 
 	.block-editor-patterns__pattern-icon-wrapper {
