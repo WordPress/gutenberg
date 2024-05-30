@@ -827,11 +827,11 @@ class WP_Theme_JSON_Gutenberg {
 		 * It's important to use the original $theme_json here because WP_Theme_JSON_Schema_Gutenberg::migrate()
 		 * has already updated the version to latest for $this->theme_json.
 		 */
-		if ( $theme_json['version'] >= 3 ) {
+		$scale_path    = array( 'settings', 'spacing', 'spacingScale', $origin );
+		$spacing_scale = _wp_array_get( $this->theme_json, $scale_path, null );
+		if ( $theme_json['version'] >= 3 && isset( $spacing_scale ) ) {
 			$sizes_path           = array( 'settings', 'spacing', 'spacingSizes', $origin );
-			$scale_path           = array( 'settings', 'spacing', 'spacingScale', $origin );
 			$spacing_sizes        = _wp_array_get( $this->theme_json, $sizes_path, array() );
-			$spacing_scale        = _wp_array_get( $this->theme_json, $scale_path, array() );
 			$spacing_scale_sizes  = static::compute_spacing_sizes( $spacing_scale );
 			$merged_spacing_sizes = static::merge_spacing_sizes( $spacing_scale_sizes, $spacing_sizes );
 			_wp_array_set( $this->theme_json, $sizes_path, $merged_spacing_sizes );
@@ -3042,7 +3042,12 @@ class WP_Theme_JSON_Gutenberg {
 		if ( $incoming_data['version'] >= 3 ) {
 			$flattened_spacing_scale = array();
 			foreach ( static::VALID_ORIGINS as $origin ) {
-				$scale_path    = array( 'settings', 'spacing', 'spacingScale', $origin );
+				$scale_path = array( 'settings', 'spacing', 'spacingScale', $origin );
+
+				// Apply the base spacing scale to the current layer.
+				$base_spacing_scale      = _wp_array_get( $this->theme_json, $scale_path, array() );
+				$flattened_spacing_scale = array_replace( $flattened_spacing_scale, $base_spacing_scale );
+
 				$spacing_scale = _wp_array_get( $incoming_data, $scale_path, null );
 				if ( ! isset( $spacing_scale ) ) {
 					continue;
@@ -3057,7 +3062,7 @@ class WP_Theme_JSON_Gutenberg {
 				$spacing_scale_sizes  = static::compute_spacing_sizes( $flattened_spacing_scale );
 				$merged_spacing_sizes = static::merge_spacing_sizes( $spacing_scale_sizes, $spacing_sizes );
 
-				_wp_array_set( $this->theme_json, $sizes_path, $merged_spacing_sizes );
+				_wp_array_set( $incoming_data, $sizes_path, $merged_spacing_sizes );
 			}
 		}
 
