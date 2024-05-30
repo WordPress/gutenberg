@@ -86,11 +86,12 @@ function useInsertionPoint( {
 				destinationRootClientId: _destinationRootClientId,
 				destinationIndex: _destinationIndex,
 				blockInsertionRootClientId:
-					blockInsertionPoint?.rootClientId !== undefined
+					blockInsertionPoint?.rootClientId !== undefined &&
+					! isAppender
 						? blockInsertionPoint.rootClientId
 						: _destinationRootClientId,
 				blockInsertionIndex:
-					blockInsertionPoint?.index !== undefined
+					blockInsertionPoint?.index !== undefined && ! isAppender
 						? blockInsertionPoint.index
 						: _destinationIndex,
 			};
