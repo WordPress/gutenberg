@@ -3843,16 +3843,16 @@ class WP_Theme_JSON_Gutenberg {
 	 * set in the resolver.
 	 *
 	 * @since 6.1.0
-	 * @since 6.6.0 Added the $origin parameter.
+	 * @deprecated 6.6.0
 	 *
 	 * @param string $origin Optional. What source of data to set the spacing sizes for.
 	 *                       One of 'default', 'theme', or 'custom'. Default 'default'.
 	 * @return null|void
 	 */
-	public function set_spacing_sizes( $origin = 'default' ) {
-		$default_spacing_scale = $this->theme_json['settings']['spacing']['spacingScale']['default'] ?? array();
-		$origin_spacing_scale  = $this->theme_json['settings']['spacing']['spacingScale'][ $origin ] ?? array();
-		$spacing_scale         = array_replace( $default_spacing_scale, $origin_spacing_scale );
+	public function set_spacing_sizes() {
+		_deprecated_function( __METHOD__, '6.6.0' );
+
+		$spacing_scale = $this->theme_json['settings']['spacing']['spacingScale']['default'] ?? array();
 
 		// Gutenberg didn't have the 1st isset check.
 		if ( ! isset( $spacing_scale['steps'] )
@@ -3885,7 +3885,7 @@ class WP_Theme_JSON_Gutenberg {
 			}
 		}
 
-		_wp_array_set( $this->theme_json, array( 'settings', 'spacing', 'spacingSizes', $origin ), $spacing_sizes );
+		_wp_array_set( $this->theme_json, array( 'settings', 'spacing', 'spacingSizes', 'default' ), $spacing_sizes );
 	}
 
 	/**
