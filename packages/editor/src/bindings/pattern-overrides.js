@@ -10,9 +10,9 @@ export default {
 	name: 'core/pattern-overrides',
 	label: _x( 'Pattern Overrides', 'block bindings source' ),
 	getValue( { select, clientId, attributeName } ) {
-		const { getBlockAttributes, getBlockParentsByBlockName } =
+		const { getBlock, getBlockParentsByBlockName } =
 			select( blockEditorStore );
-		const currentBlockAttributes = getBlockAttributes( clientId );
+		const { attributes: currentBlockAttributes } = getBlock( clientId );
 		const [ patternClientId ] = getBlockParentsByBlockName(
 			clientId,
 			'core/block',
@@ -20,7 +20,7 @@ export default {
 		);
 
 		const overridableValue =
-			getBlockAttributes( patternClientId )?.[ CONTENT ]?.[
+			getBlock( patternClientId )?.attributes?.[ CONTENT ]?.[
 				currentBlockAttributes?.metadata?.name
 			]?.[ attributeName ];
 
