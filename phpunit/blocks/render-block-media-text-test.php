@@ -1,0 +1,128 @@
+<?php
+/**
+ * Media & Text block rendering tests.
+ *
+ * @package WordPress
+ * @subpackage Blocks
+ */
+
+/**
+ * Tests for the Media & Text block.
+ *
+ * @group blocks
+ *
+ * @covers ::render_block_core_media_text
+ */
+//class Tests_Blocks_Render_MediaText extends WP_UnitTestCase {
+class Render_Block_MediaText_Test extends WP_UnitTestCase {
+
+	/**
+	 * Post object.
+	 *
+	 * @var object
+	 */
+	protected static $post;
+
+	/**
+	 * Attachment id.
+	 *
+	 * @var int
+	 */
+	protected static $attachment_id;
+
+	/**
+	 * Setup method.
+	 */
+	public static function wpSetUpBeforeClass() {
+		self::$post = self::factory()->post->create_and_get();
+		$file       = DIR_TESTDATA . '/images/canola.jpg';
+
+		self::$attachment_id = self::factory()->attachment->create_upload_object(
+			$file,
+			self::$post->ID,
+			array(
+				'post_mime_type' => 'image/jpeg',
+			)
+		);
+
+		set_post_thumbnail( self::$post, self::$attachment_id );
+	}
+
+	/**
+	 * Tear down method.
+	 */
+	public static function wpTearDownAfterClass() {
+		wp_delete_post( self::$post->ID, true );
+		wp_delete_post( self::$attachment_id, true );
+	}
+
+	/**
+	 * Test gutenberg_render_block_core_media_text with the featured image.
+	 */
+	public function test_render_block_core_media_text_featured_image() {
+
+		global $wp_query;
+
+		// Fake being in the loop.
+		$wp_query->in_the_loop = true;
+		$wp_query->post        = self::$post;
+
+		$wp_query->posts = array( self::$post );
+		$GLOBALS['post'] = self::$post;
+
+		$content                       = '<div class="wp-block-media-text is-stacked-on-mobile"><figure class="wp-block-media-text__media"></figure><div class="wp-block-media-text__content"><p></p></div></div>';
+		$content_media_on_right        = '<div class="wp-block-media-text has-media-on-the-right is-stacked-on-mobile"><div class="wp-block-media-text__content"><p></p></div><figure class="wp-block-media-text__media"></figure></div>';
+		$content_nested                = '<div class="wp-block-media-text is-stacked-on-mobile"><figure class="wp-block-media-text__media"></figure><div class="wp-block-media-text__content"><div class="wp-block-media-text is-stacked-on-mobile"><figure class="wp-block-media-text__media"></figure><div class="wp-block-media-text__content"><p></p></div></div></div></div>';
+		$content_nested_media_on_right = '<div class="wp-block-media-text has-media-on-the-right is-stacked-on-mobile"><div class="wp-block-media-text__content"><div class="wp-block-media-text is-stacked-on-mobile"><div class="wp-block-media-text__content"><p></p></div><figure class="wp-block-media-text__media"></figure></div></div><figure class="wp-block-media-text__media"></figure></div>';
+
+		// Assert that the rendered block contains the featured image.
+		$attributes = array(
+			'useFeaturedImage' => true,
+		);
+		$rendered   = gutenberg_render_block_core_media_text( $attributes, $content );
+		$this->assertStringContainsString( wp_get_attachment_image_url( self::$attachment_id, 'full' ), $rendered );
+
+		$rendered = gutenberg_render_block_core_media_text( $attributes, $content_nested );
+		$this->assertStringContainsString( wp_get_attachment_image_url( self::$attachment_id, 'full' ), $rendered );
+
+		// Assert that the rendered block contains the featured image as the background-image url,
+		// and not the image element, when image fill is true.
+		$attributes = array(
+			'useFeaturedImage' => true,
+			'imageFill'        => true,
+		);
+		$rendered   = gutenberg_render_block_core_media_text( $attributes, $content );
+		$this->assertStringContainsString( 'background-image:url(' . wp_get_attachment_image_url( self::$attachment_id, 'full' ) . ')', $rendered );
+		$this->assertStringNotContainsString( '<img', $rendered );
+
+		$rendered = gutenberg_render_block_core_media_text( $attributes, $content_nested );
+		$this->assertStringContainsString( 'background-image:url(' . wp_get_attachment_image_url( self::$attachment_id, 'full' ) . ')', $rendered );
+		$this->assertStringNotContainsString( '<img', $rendered );
+
+		// Assert that the rendered block contains the featured image when media is on the right.
+		$attributes = array(
+			'useFeaturedImage' => true,
+			'mediaPosition'    => 'right',
+		);
+		$rendered   = gutenberg_render_block_core_media_text( $attributes, $content_media_on_right );
+		$this->assertStringContainsString( wp_get_attachment_image_url( self::$attachment_id, 'full' ), $rendered );
+
+		$rendered = gutenberg_render_block_core_media_text( $attributes, $content_nested_media_on_right );
+		$this->assertStringContainsString( wp_get_attachment_image_url( self::$attachment_id, 'full' ), $rendered );
+
+		// Assert that the rendered block contains the featured image as the background-image url,
+		// and not the image element, when image fill is true and the media is on the right.
+		$attributes = array(
+			'useFeaturedImage' => true,
+			'mediaPosition'    => 'right',
+			'imageFill'        => true,
+		);
+		$rendered   = gutenberg_render_block_core_media_text( $attributes, $content_media_on_right );
+		$this->assertStringContainsString( 'background-image:url(' . wp_get_attachment_image_url( self::$attachment_id, 'full' ) . ')', $rendered );
+		$this->assertStringNotContainsString( '<img', $rendered );
+
+		$rendered = gutenberg_render_block_core_media_text( $attributes, $content_nested_media_on_right );
+		$this->assertStringContainsString( 'background-image:url(' . wp_get_attachment_image_url( self::$attachment_id, 'full' ) . ')', $rendered );
+		$this->assertStringNotContainsString( '<img', $rendered );
+	}
+}
