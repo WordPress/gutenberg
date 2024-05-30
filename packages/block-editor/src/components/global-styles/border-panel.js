@@ -8,7 +8,6 @@ import {
 	__experimentalItemGroup as ItemGroup,
 	BaseControl,
 } from '@wordpress/components';
-
 import { useCallback, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
