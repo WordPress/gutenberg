@@ -4300,7 +4300,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 				'expected_output' => array(
 					array(
-						'name' => '1',
+						'name' => 'Medium',
 						'slug' => '50',
 						'size' => '4rem',
 					),
@@ -4316,12 +4316,12 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 				'expected_output' => array(
 					array(
-						'name' => '1',
+						'name' => 'Medium',
 						'slug' => '50',
 						'size' => '4rem',
 					),
 					array(
-						'name' => '2',
+						'name' => 'Large',
 						'slug' => '60',
 						'size' => '5.5rem',
 					),
@@ -4337,17 +4337,17 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 				'expected_output' => array(
 					array(
-						'name' => '1',
+						'name' => 'Small',
 						'slug' => '40',
 						'size' => '2.5rem',
 					),
 					array(
-						'name' => '2',
+						'name' => 'Medium',
 						'slug' => '50',
 						'size' => '4rem',
 					),
 					array(
-						'name' => '3',
+						'name' => 'Large',
 						'slug' => '60',
 						'size' => '5.5rem',
 					),
@@ -4363,22 +4363,22 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 				'expected_output' => array(
 					array(
-						'name' => '1',
+						'name' => 'Small',
 						'slug' => '40',
 						'size' => '2.5rem',
 					),
 					array(
-						'name' => '2',
+						'name' => 'Medium',
 						'slug' => '50',
 						'size' => '4rem',
 					),
 					array(
-						'name' => '3',
+						'name' => 'Large',
 						'slug' => '60',
 						'size' => '5.5rem',
 					),
 					array(
-						'name' => '4',
+						'name' => 'X-Large',
 						'slug' => '70',
 						'size' => '7rem',
 					),
@@ -4394,27 +4394,27 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 				'expected_output' => array(
 					array(
-						'name' => '1',
+						'name' => 'X-Small',
 						'slug' => '40',
 						'size' => '2.5rem',
 					),
 					array(
-						'name' => '2',
+						'name' => 'Small',
 						'slug' => '50',
 						'size' => '5rem',
 					),
 					array(
-						'name' => '3',
+						'name' => 'Medium',
 						'slug' => '60',
 						'size' => '7.5rem',
 					),
 					array(
-						'name' => '4',
+						'name' => 'Large',
 						'slug' => '70',
 						'size' => '10rem',
 					),
 					array(
-						'name' => '5',
+						'name' => 'X-Large',
 						'slug' => '80',
 						'size' => '12.5rem',
 					),
@@ -4430,27 +4430,27 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 				'expected_output' => array(
 					array(
-						'name' => '1',
+						'name' => 'X-Small',
 						'slug' => '30',
 						'size' => '0.67rem',
 					),
 					array(
-						'name' => '2',
+						'name' => 'Small',
 						'slug' => '40',
 						'size' => '1rem',
 					),
 					array(
-						'name' => '3',
+						'name' => 'Medium',
 						'slug' => '50',
 						'size' => '1.5rem',
 					),
 					array(
-						'name' => '4',
+						'name' => 'Large',
 						'slug' => '60',
 						'size' => '2.25rem',
 					),
 					array(
-						'name' => '5',
+						'name' => 'X-Large',
 						'slug' => '70',
 						'size' => '3.38rem',
 					),
@@ -4466,27 +4466,27 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 				'expected_output' => array(
 					array(
-						'name' => '1',
+						'name' => 'X-Small',
 						'slug' => '30',
 						'size' => '0.09rem',
 					),
 					array(
-						'name' => '2',
+						'name' => 'Small',
 						'slug' => '40',
 						'size' => '0.38rem',
 					),
 					array(
-						'name' => '3',
+						'name' => 'Medium',
 						'slug' => '50',
 						'size' => '1.5rem',
 					),
 					array(
-						'name' => '4',
+						'name' => 'Large',
 						'slug' => '60',
 						'size' => '6rem',
 					),
 					array(
-						'name' => '5',
+						'name' => 'X-Large',
 						'slug' => '70',
 						'size' => '24rem',
 					),
@@ -4555,18 +4555,6 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 * @param array $expected_output Expected output from data provider.
 	 */
 	public function test_set_spacing_sizes_when_invalid( $spacing_scale, $expected_output ) {
-		$this->expectException( Exception::class );
-		$this->expectExceptionMessage( 'Some of the theme.json settings.spacing.spacingScale values are invalid' );
-
-		// Ensure PHPUnit 10 compatibility.
-		set_error_handler(
-			static function ( $errno, $errstr ) {
-				restore_error_handler();
-				throw new Exception( $errstr, $errno );
-			},
-			E_ALL
-		);
-
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -4597,7 +4585,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'mediumStep' => 4,
 					'unit'       => 'rem',
 				),
-				'expected_output' => null,
+				'expected_output' => array(),
 			),
 			'non numeric increment'   => array(
 				'spacing_scale'   => array(
@@ -4607,7 +4595,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'mediumStep' => 4,
 					'unit'       => 'rem',
 				),
-				'expected_output' => null,
+				'expected_output' => array(),
 			),
 			'non numeric steps'       => array(
 				'spacing_scale'   => array(
@@ -4617,7 +4605,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'mediumStep' => 4,
 					'unit'       => 'rem',
 				),
-				'expected_output' => null,
+				'expected_output' => array(),
 			),
 			'non numeric medium step' => array(
 				'spacing_scale'   => array(
@@ -4627,7 +4615,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'mediumStep' => 'That which is just right',
 					'unit'       => 'rem',
 				),
-				'expected_output' => null,
+				'expected_output' => array(),
 			),
 			'missing unit value'      => array(
 				'spacing_scale'   => array(
@@ -4636,7 +4624,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'steps'      => 5,
 					'mediumStep' => 4,
 				),
-				'expected_output' => null,
+				'expected_output' => array(),
 			),
 		);
 	}
