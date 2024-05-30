@@ -176,6 +176,7 @@ export function PageAttributesParent() {
 			__next40pxDefaultSize
 			className="editor-page-attributes__parent"
 			label={ __( 'Parent' ) }
+			help={ __( 'Choose a parent page.' ) }
 			value={ parentPostId }
 			options={ parentOptions }
 			onFilterValueChange={ debounce( handleKeydown, 300 ) }
@@ -249,7 +250,7 @@ export function ParentRow() {
 						/>
 						<div>
 							{ __(
-								'Child pages inherit characteristics from their parent, like URL structure. For instance, if "Web Design" is a child of "Services," its URL would be mysite.com/services/web-design.'
+								"Child pages inherit characteristics from their parent, such as URL structure. For instance, if 'Web Design' is a child of 'Services,' its URL would be mysite.com/services/web-design."
 							) }
 							<p>
 								{ __(
@@ -257,10 +258,10 @@ export function ParentRow() {
 								) }
 								<ExternalLink
 									href={ __(
-										'https://wordpress.org/documentation/article/page-post-settings-sidebar/#permalink'
+										'https://wordpress.org/documentation/article/page-post-settings-sidebar/#page-attributes'
 									) }
 								>
-									{ __( 'Learn more.' ) }
+									{ __( 'Learn more' ) }
 								</ExternalLink>
 							</p>
 						</div>

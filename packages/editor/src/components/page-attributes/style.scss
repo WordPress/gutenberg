@@ -6,9 +6,14 @@
 	}
 }
 
-.editor-post-parent__panel-dialog .editor-post-parent,
-.editor-post-order__panel-dialog .editor-post-order {
-	// sidebar width - popover padding - form margin
-	min-width: $sidebar-width - $grid-unit-20 - $grid-unit-20;
-	margin: $grid-unit-10;
+.editor-post-parent__panel-dialog,
+.editor-post-order__panel-dialog {
+	.editor-post-parent,
+	.editor-post-order {
+		margin: $grid-unit-10;
+	}
+
+	.components-popover__content {
+		min-width: 320px;
+	}
 }

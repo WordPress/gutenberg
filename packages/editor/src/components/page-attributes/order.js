@@ -45,6 +45,7 @@ function PageAttributesOrder() {
 				<NumberControl
 					__next40pxDefaultSize
 					label={ __( 'Order' ) }
+					help={ __( 'Set the page order.' ) }
 					value={ value }
 					onChange={ setUpdatedOrder }
 					hideLabelFromVision
@@ -130,7 +131,7 @@ export function OrderRow() {
 							) }
 							<p>
 								{ __(
-									'Pages with the same order value will sorted alphabetically. Negative order values can be used.'
+									'Pages with the same order value will sorted alphabetically. Negative order values are also supported.'
 								) }
 							</p>
 						</div>
