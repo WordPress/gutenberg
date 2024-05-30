@@ -131,20 +131,21 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 		}
 
 		/**
-		 * Adds interactivity data to filtered data to be passed to the client.
+		 * Prints the serialized client-side interactivity data.
 		 *
-		 * Once in the browser, the state will be parsed and used to hydrate the client-side
-		 * interactivity stores and the configuration will be available using a `getConfig` utility.
+		 * Encodes the config and initial state into JSON and prints them inside a
+		 * script tag of type "application/json". Once in the browser, the state will
+		 * be parsed and used to hydrate the client-side interactivity stores and the
+		 * configuration will be available using a `getConfig` utility.
 		 *
 		 * @since 6.5.0
-		 *
-		 * @param array $interactivity_data Interactivity data.
-		 * @return array $interactivity_data Interactivity data with store data added (if it exists).
 		 */
-		public function print_client_interactivity_data( $interactivity_data ) {
+		public function print_client_interactivity_data() {
 			if ( empty( $this->state_data ) && empty( $this->config_data ) ) {
-				return $interactivity_data;
+				return;
 			}
+
+			$interactivity_data = array();
 
 			$config = array();
 			foreach ( $this->config_data as $key => $value ) {
@@ -166,7 +167,18 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 				$interactivity_data['state'] = $state;
 			}
 
-			return $interactivity_data;
+			if ( ! empty( $interactivity_data ) ) {
+				wp_print_inline_script_tag(
+					wp_json_encode(
+						$interactivity_data,
+						JSON_HEX_TAG | JSON_HEX_AMP
+					),
+					array(
+						'type' => 'application/json',
+						'id'   => 'wp-interactivity-data',
+					)
+				);
+			}
 		}
 
 		/**
@@ -196,7 +208,7 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 		 */
 		public function add_hooks() {
 			add_action( 'wp_enqueue_scripts', array( $this, 'register_script_modules' ) );
-			add_filter( 'scriptmoduledata_@wordpress/interactivity', array( $this, 'print_client_interactivity_data' ) );
+			add_action( 'wp_footer', array( $this, 'print_client_interactivity_data' ) );
 		}
 
 		/**
