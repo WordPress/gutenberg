@@ -4,6 +4,7 @@
 import {
 	getTypographyFontSizeValue,
 	getFluidTypographyOptionsFromSettings,
+	getMergedFontFamiliesAndFontFamilyFaces,
 } from '../typography-utils';
 
 describe( 'typography utils', () => {
@@ -678,6 +679,218 @@ describe( 'typography utils', () => {
 				expect( getTypographyFontSizeValue( preset, settings ) ).toBe(
 					expected
 				);
+			} );
+		} );
+	} );
+
+	describe( 'getMergedFontFamiliesAndFontFamilyFaces', () => {
+		[
+			{
+				message:
+					'should return empty arrays when settings and fontFamily are empty',
+				settings: {},
+				fontFamily: '',
+				expected: {
+					fontFamilies: [],
+					fontFamilyFaces: [],
+				},
+			},
+
+			{
+				message:
+					'should return empty arrays when only settings is `undefined`',
+				settings: undefined,
+				fontFamily: 'ABeeZee, sans-serif',
+				expected: {
+					fontFamilies: [],
+					fontFamilyFaces: [],
+				},
+			},
+
+			{
+				message:
+					'should return fontFamilies array and an empty fontFamilyFaces array when fontfamily is empty',
+				settings: {
+					typography: {
+						fontFamilies: {
+							custom: [
+								{
+									name: 'ABeeZee',
+									slug: 'abeezee',
+									fontFamily: 'ABeeZee, sans-serif',
+									fontFace: [
+										{
+											src: 'http://www.wordpress.org/wp-content/uploads/fonts/esDT31xSG-6AGleN2tCkkJUCGpG-GQ.woff2',
+											fontWeight: '400',
+											fontStyle: 'italic',
+											fontFamily: 'ABeeZee',
+										},
+									],
+								},
+							],
+						},
+					},
+				},
+				fontFamily: '',
+				expected: {
+					fontFamilies: [
+						{
+							fontFace: [
+								{
+									fontFamily: 'ABeeZee',
+									fontStyle: 'italic',
+									fontWeight: '400',
+									src: 'http://www.wordpress.org/wp-content/uploads/fonts/esDT31xSG-6AGleN2tCkkJUCGpG-GQ.woff2',
+								},
+							],
+							fontFamily: 'ABeeZee, sans-serif',
+							name: 'ABeeZee',
+							slug: 'abeezee',
+						},
+					],
+					fontFamilyFaces: [],
+				},
+			},
+
+			{
+				message:
+					'should return font families and font faces when both settings and fontFamily are defined',
+				settings: {
+					typography: {
+						fontFamilies: {
+							theme: [
+								{
+									fontFace: [
+										{
+											fontFamily: 'PT Sans',
+											fontStyle: 'normal',
+											fontWeight: '400',
+											src: [
+												'file:./assets/fonts/pt-sans_normal_400.ttf',
+											],
+										},
+										{
+											fontFamily: 'PT Sans',
+											fontStyle: 'normal',
+											fontWeight: '700',
+											src: [
+												'file:./assets/fonts/pt-sans_normal_700.ttf',
+											],
+										},
+										{
+											fontFamily: 'PT Sans',
+											fontStyle: 'italic',
+											fontWeight: '400',
+											src: [
+												'file:./assets/fonts/pt-sans_italic_400.ttf',
+											],
+										},
+										{
+											fontFamily: 'PT Sans',
+											fontStyle: 'italic',
+											fontWeight: '700',
+											src: [
+												'file:./assets/fonts/pt-sans_italic_700.ttf',
+											],
+										},
+									],
+									fontFamily: 'PT Sans',
+									name: 'PT Sans',
+									slug: 'pt-sans',
+								},
+							],
+							custom: [
+								{
+									name: 'ABeeZee',
+									slug: 'abeezee',
+									fontFamily: 'ABeeZee, sans-serif',
+									fontFace: [
+										{
+											src: 'http://www.wordpress.org/wp-content/uploads/fonts/esDT31xSG-6AGleN2tCkkJUCGpG-GQ.woff2',
+											fontWeight: '400',
+											fontStyle: 'italic',
+											fontFamily: 'ABeeZee',
+										},
+									],
+								},
+							],
+						},
+					},
+				},
+				fontFamily: 'ABeeZee, sans-serif',
+				expected: {
+					fontFamilyFaces: [
+						{
+							fontFamily: 'ABeeZee',
+							fontStyle: 'italic',
+							fontWeight: '400',
+							src: 'http://www.wordpress.org/wp-content/uploads/fonts/esDT31xSG-6AGleN2tCkkJUCGpG-GQ.woff2',
+						},
+					],
+					fontFamilies: [
+						{
+							fontFace: [
+								{
+									fontFamily: 'PT Sans',
+									fontStyle: 'normal',
+									fontWeight: '400',
+									src: [
+										'file:./assets/fonts/pt-sans_normal_400.ttf',
+									],
+								},
+								{
+									fontFamily: 'PT Sans',
+									fontStyle: 'normal',
+									fontWeight: '700',
+									src: [
+										'file:./assets/fonts/pt-sans_normal_700.ttf',
+									],
+								},
+								{
+									fontFamily: 'PT Sans',
+									fontStyle: 'italic',
+									fontWeight: '400',
+									src: [
+										'file:./assets/fonts/pt-sans_italic_400.ttf',
+									],
+								},
+								{
+									fontFamily: 'PT Sans',
+									fontStyle: 'italic',
+									fontWeight: '700',
+									src: [
+										'file:./assets/fonts/pt-sans_italic_700.ttf',
+									],
+								},
+							],
+							fontFamily: 'PT Sans',
+							name: 'PT Sans',
+							slug: 'pt-sans',
+						},
+						{
+							fontFace: [
+								{
+									fontFamily: 'ABeeZee',
+									fontStyle: 'italic',
+									fontWeight: '400',
+									src: 'http://www.wordpress.org/wp-content/uploads/fonts/esDT31xSG-6AGleN2tCkkJUCGpG-GQ.woff2',
+								},
+							],
+							fontFamily: 'ABeeZee, sans-serif',
+							name: 'ABeeZee',
+							slug: 'abeezee',
+						},
+					],
+				},
+			},
+		].forEach( ( { message, settings, fontFamily, expected } ) => {
+			it( `${ message }`, () => {
+				expect(
+					getMergedFontFamiliesAndFontFamilyFaces(
+						settings,
+						fontFamily
+					)
+				).toEqual( expected );
 			} );
 		} );
 	} );
