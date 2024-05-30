@@ -28,12 +28,7 @@ export {
 	useAutocompleteProps as __unstableUseAutocompleteProps,
 } from './autocomplete';
 export { default as BaseControl, useBaseControlProps } from './base-control';
-export {
-	BorderBoxControl as __experimentalBorderBoxControl,
-	hasSplitBorders as __experimentalHasSplitBorders,
-	isDefinedBorder as __experimentalIsDefinedBorder,
-	isEmptyBorder as __experimentalIsEmptyBorder,
-} from './border-box-control';
+export { BorderBoxControl as __experimentalBorderBoxControl } from './border-box-control';
 export { BorderControl as __experimentalBorderControl } from './border-control';
 export {
 	default as __experimentalBoxControl,

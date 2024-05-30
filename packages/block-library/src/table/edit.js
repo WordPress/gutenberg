@@ -14,6 +14,7 @@ import {
 	BlockIcon,
 	AlignmentControl,
 	useBlockProps,
+	hasSplitBorders,
 	__experimentalUseColorProps as useColorProps,
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalGetElementClassName,
@@ -26,7 +27,6 @@ import {
 	TextControl,
 	ToggleControl,
 	ToolbarDropdownMenu,
-	__experimentalHasSplitBorders as hasSplitBorders,
 } from '@wordpress/components';
 import {
 	alignLeft,

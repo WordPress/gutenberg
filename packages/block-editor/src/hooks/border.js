@@ -7,7 +7,6 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { hasBlockSupport, getBlockSupport } from '@wordpress/blocks';
-import { __experimentalHasSplitBorders as hasSplitBorders } from '@wordpress/components';
 import { Platform, useCallback, useMemo } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { useSelect } from '@wordpress/data';
@@ -30,6 +29,7 @@ import {
 } from '../components/global-styles';
 import { store as blockEditorStore } from '../store';
 import { __ } from '@wordpress/i18n';
+import { hasSplitBorders } from '../components/border-box-utils';
 
 export const BORDER_SUPPORT_KEY = '__experimentalBorder';
 export const SHADOW_SUPPORT_KEY = 'shadow';
