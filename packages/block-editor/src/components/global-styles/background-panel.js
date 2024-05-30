@@ -245,12 +245,22 @@ function BackgroundImageToolsPanelItem( {
 			return;
 		}
 
+		const sizeValue = style?.background?.backgroundSize;
+		const positionValue = style?.background?.backgroundPosition;
+
 		onChange(
-			setImmutably( style, [ 'background', 'backgroundImage' ], {
-				url: media.url,
-				id: media.id,
-				source: 'file',
-				title: media.title || undefined,
+			setImmutably( style, [ 'background' ], {
+				...style?.background,
+				backgroundImage: {
+					url: media.url,
+					id: media.id,
+					source: 'file',
+					title: media.title || undefined,
+				},
+				backgroundPosition:
+					! positionValue && ( 'auto' === sizeValue || ! sizeValue )
+						? '50% 0'
+						: positionValue,
 			} )
 		);
 	};
