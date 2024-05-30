@@ -3843,8 +3843,6 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.1.0
 	 * @deprecated 6.6.0
 	 *
-	 * @param string $origin Optional. What source of data to set the spacing sizes for.
-	 *                       One of 'default', 'theme', or 'custom'. Default 'default'.
 	 * @return null|void
 	 */
 	public function set_spacing_sizes() {
