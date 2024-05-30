@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { useMemo, useEffect, forwardRef } from '@wordpress/element';
 import { pipe, useAsyncList } from '@wordpress/compose';
 
@@ -106,7 +106,13 @@ export function BlockTypesTab(
 		const blockName = getBlockName( rootClientId );
 		// Find the title within the list of all possible blocks.
 		const block = allItems.find( ( item ) => item.name === blockName );
-		return block ? block.title : __( 'Allowed' );
+		return block
+			? sprintf(
+					// translators: %s: Block title, e.g: "List", "Buttons", "Group"
+					__( '%s Block' ),
+					block.title
+			  )
+			: __( 'Allowed' );
 	};
 
 	/**
