@@ -60,6 +60,8 @@ function ButtonBlockAppender(
 						onClick={ onToggle }
 						aria-haspopup={ isToggleButton ? 'true' : undefined }
 						aria-expanded={ isToggleButton ? isOpen : undefined }
+						// TODO: Investigate whether this button should be accessible when disabled.
+						// eslint-disable-next-line no-restricted-syntax
 						disabled={ disabled }
 						label={ label }
 					>
