@@ -23,12 +23,14 @@ export default {
 		).meta?.[ args.key ];
 	},
 	setValue( { registry, context, args, value } ) {
-		const postType = context.postType
-			? context.postType
-			: registry.select( editorStore ).getCurrentPostType();
+		const postId =
+			context.postId || registry.select( editorStore ).getCurrentPostId();
+		const postType =
+			context.postType ||
+			registry.select( editorStore ).getCurrentPostType();
 		registry
 			.dispatch( coreDataStore )
-			.editEntityRecord( 'postType', postType, context.postId, {
+			.editEntityRecord( 'postType', postType, postId, {
 				meta: {
 					[ args.key ]: value,
 				},
