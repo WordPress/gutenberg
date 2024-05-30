@@ -20,11 +20,11 @@ const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
 
 export default function StyleVariationsContainer( { gap = 2 } ) {
 	const { user } = useContext( GlobalStylesContext );
-	const [ currentUserStyles, setCurrentUserStyles ] = useState( { ...user } );
+	const [ currentUserStyles, setCurrentUserStyles ] = useState( user );
 	const userStyles = currentUserStyles?.styles;
 
 	useEffect( () => {
-		setCurrentUserStyles( { ...user } );
+		setCurrentUserStyles( user );
 	}, [ user ] );
 
 	const variations = useSelect( ( select ) => {
@@ -53,6 +53,7 @@ export default function StyleVariationsContainer( { gap = 2 } ) {
 		return [
 			...withEmptyVariation.map( ( variation ) => {
 				const blockStyles = { ...variation?.styles?.blocks } || {};
+
 				// We need to copy any user custom CSS to the variation to prevent it being lost
 				// when switching variations.
 				if ( userStyles?.blocks ) {
@@ -62,20 +63,14 @@ export default function StyleVariationsContainer( { gap = 2 } ) {
 						if ( userStyles.blocks[ blockName ].css ) {
 							const variationBlockStyles =
 								blockStyles[ blockName ] || {};
-							const customCSS =
-								blockStyles[ blockName ]?.css ||
-								userStyles.blocks[ blockName ].css
-									? {
-											css: `${
-												blockStyles[ blockName ]?.css ||
-												''
-											} ${
-												userStyles.blocks[ blockName ]
-													.css || ''
-											}`,
-									  }
-									: {};
-
+							const customCSS = {
+								css: `${
+									blockStyles[ blockName ]?.css || ''
+								} ${
+									userStyles.blocks[ blockName ].css.trim() ||
+									''
+								}`,
+							};
 							blockStyles[ blockName ] = {
 								...variationBlockStyles,
 								...customCSS,
@@ -110,7 +105,7 @@ export default function StyleVariationsContainer( { gap = 2 } ) {
 				};
 			} ),
 		];
-	}, [ multiplePropertyVariations, userStyles.blocks, userStyles?.css ] );
+	}, [ multiplePropertyVariations, userStyles?.blocks, userStyles?.css ] );
 
 	return (
 		<Grid
