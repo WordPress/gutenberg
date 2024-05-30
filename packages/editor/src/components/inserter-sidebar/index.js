@@ -3,8 +3,8 @@
  */
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
-	__experimentalLibrary as Library,
 	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import {
 	useViewportMatch,
@@ -19,6 +19,8 @@ import { ESCAPE } from '@wordpress/keycodes';
  */
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
+
+const { PrivateInserterLibrary } = unlock( blockEditorPrivateApis );
 
 export default function InserterSidebar( {
 	closeGeneralSidebar,
@@ -79,7 +81,7 @@ export default function InserterSidebar( {
 
 	const inserterContents = (
 		<div className="editor-inserter-sidebar__content">
-			<Library
+			<PrivateInserterLibrary
 				showMostUsedBlocks={ showMostUsedBlocks }
 				showInserterHelpPanel
 				shouldFocusBlock={ isMobileViewport }
@@ -90,7 +92,7 @@ export default function InserterSidebar( {
 				__experimentalInitialTab={ insertionPoint.tab }
 				__experimentalInitialCategory={ insertionPoint.category }
 				__experimentalFilterValue={ insertionPoint.filterValue }
-				__experimentalOnPatternCategorySelection={
+				onPatternCategorySelection={
 					isRightSidebarOpen ? closeGeneralSidebar : undefined
 				}
 				ref={ libraryRef }
