@@ -34,7 +34,7 @@ export default {
 				},
 			} );
 	},
-	lockAttributesEditing( { select, context = {} } ) {
+	lockAttributesEditing( { select, context = {}, args } ) {
 		const postId = context.postId
 			? context.postId
 			: select( editorStore ).getCurrentPostId();
@@ -44,7 +44,12 @@ export default {
 
 		// TODO: Check that editing is happening in the post editor and not a template.
 
-		// TODO: Check that the custom field is not protected and available in the REST API.
+		// Check that the custom field is not protected and available in the REST API.
+		const isFieldExposed =
+			select( editorStore ).getEditedPostAttribute( 'meta' )[ args.key ];
+		if ( ! isFieldExposed ) {
+			return true;
+		}
 
 		// Check that the user has the capability to edit post meta.
 		const canUserEdit = select( coreDataStore ).canUserEditEntityRecord(
