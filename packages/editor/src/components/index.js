@@ -29,6 +29,7 @@ export { default as PageTemplate } from './post-template/classic-theme';
 export { default as PluginDocumentSettingPanel } from './plugin-document-setting-panel';
 export { default as PluginBlockSettingsMenuItem } from './block-settings-menu/plugin-block-settings-menu-item';
 export { default as PluginMoreMenuItem } from './plugin-more-menu-item';
+export { default as PluginPageAttributesPanel } from './plugin-page-attributes-panel';
 export { default as PluginPostPublishPanel } from './plugin-post-publish-panel';
 export { default as PluginPostStatusInfo } from './plugin-post-status-info';
 export { default as PluginPrePublishPanel } from './plugin-pre-publish-panel';
