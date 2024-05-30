@@ -1408,7 +1408,10 @@ test.describe( 'Block bindings', () => {
 					}
 				);
 
-				await expect( protectedFieldBlock ).not.toBeEditable();
+				await expect( protectedFieldBlock ).toHaveAttribute(
+					'contenteditable',
+					'false'
+				);
 			} );
 
 			test( 'should NOT be possible to edit the value of the custom field when it is not shown in the REST API', async ( {
@@ -1437,7 +1440,10 @@ test.describe( 'Block bindings', () => {
 					}
 				);
 
-				await expect( showInRestFalseBlock ).not.toBeEditable();
+				await expect( showInRestFalseBlock ).toHaveAttribute(
+					'contenteditable',
+					'false'
+				);
 			} );
 		} );
 
