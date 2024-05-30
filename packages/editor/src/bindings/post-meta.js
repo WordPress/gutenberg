@@ -32,8 +32,11 @@ export default {
 			} );
 	},
 	lockAttributesEditing( { select, context, args } ) {
+		const postType =
+			context?.postType || select( editorStore ).getCurrentPostType();
+
 		// Check that editing is happening in the post editor and not a template.
-		if ( context?.postType === 'wp_template' ) {
+		if ( postType === 'wp_template' ) {
 			return true;
 		}
 
