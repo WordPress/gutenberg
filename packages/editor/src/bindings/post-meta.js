@@ -42,7 +42,10 @@ export default {
 			? context.postType
 			: select( editorStore ).getCurrentPostType();
 
-		// TODO: Check that editing is happening in the post editor and not a template.
+		// Check that editing is happening in the post editor and not a template.
+		if ( postType === 'wp_template' ) {
+			return true;
+		}
 
 		// Check that the custom field is not protected and available in the REST API.
 		const isFieldExposed =
