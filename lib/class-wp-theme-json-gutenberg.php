@@ -3901,6 +3901,10 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return array The spacing sizes presets or an empty array if some spacing scale values are missing or invalid.
 	 */
 	private static function compute_spacing_sizes( $spacing_scale ) {
+		/*
+		 * This condition is intentionally missing some checks on ranges for the values in order to
+		 * keep backwards compatibility with the previous implementation.
+		 */
 		if (
 			! isset( $spacing_scale['steps'] ) ||
 			! is_numeric( $spacing_scale['steps'] ) ||
