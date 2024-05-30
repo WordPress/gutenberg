@@ -428,6 +428,11 @@
 							"type": "boolean",
 							"default": true
 						},
+						"defaultSpacingSizes": {
+							"description": "Allow users to choose space sizes from the default space size presets.",
+							"type": "boolean",
+							"default": true
+						},
 						"spacingSizes": {
 							"description": "Space size presets for the space size selector.\nGenerates a custom property (`--wp--preset--spacing--{slug}`) per preset value.",
 							"type": "array",

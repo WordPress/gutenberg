@@ -124,13 +124,14 @@ class WP_Theme_JSON_Schema_Gutenberg {
 		}
 
 		/*
-		 * Even though defaultFontSizes is a new setting, we need to migrate
-		 * it as it controls the PRESETS_METADATA prevent_override which was
-		 * previously hardcoded to false. This only needs to happen when the
-		 * theme provided font sizes as they could match the default ones and
-		 * affect the generated CSS. And in v2 we provided default font sizes
-		 * when the theme did not provide any.
+		 * Even though defaultFontSizes and defaultSpacingSizes are new
+		 * settings, we need to migrate them as they each control
+		 * PRESETS_METADATA prevent_override values which were previously
+		 * hardcoded to false. This only needs to happen when the theme provides
+		 * fontSizes or spacingSizes as they could match the default ones and
+		 * affect the generated CSS.
 		 */
+
 		if ( isset( $new['settings']['typography']['fontSizes'] ) ) {
 			if ( ! isset( $new['settings'] ) ) {
 				$new['settings'] = array();
@@ -139,6 +140,19 @@ class WP_Theme_JSON_Schema_Gutenberg {
 				$new['settings']['typography'] = array();
 			}
 			$new['settings']['typography']['defaultFontSizes'] = false;
+		}
+
+		if (
+			isset( $new['settings']['spacing']['spacingSizes'] ) ||
+			isset( $new['settings']['spacing']['spacingScale'] )
+		) {
+			if ( ! isset( $new['settings'] ) ) {
+				$new['settings'] = array();
+			}
+			if ( ! isset( $new['settings']['typography'] ) ) {
+				$new['settings']['typography'] = array();
+			}
+			$new['settings']['spacing']['defaultSpacingSizes'] = false;
 		}
 
 		return $new;

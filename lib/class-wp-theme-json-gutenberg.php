@@ -187,7 +187,7 @@ class WP_Theme_JSON_Gutenberg {
 		),
 		array(
 			'path'              => array( 'spacing', 'spacingSizes' ),
-			'prevent_override'  => false,
+			'prevent_override'  => array( 'spacing', 'defaultSpacingSizes' ),
 			'use_default_names' => true,
 			'value_key'         => 'size',
 			'css_vars'          => '--wp--preset--spacing--$slug',
@@ -427,13 +427,14 @@ class WP_Theme_JSON_Gutenberg {
 			'sticky' => null,
 		),
 		'spacing'                       => array(
-			'customSpacingSize' => null,
-			'spacingSizes'      => null,
-			'spacingScale'      => null,
-			'blockGap'          => null,
-			'margin'            => null,
-			'padding'           => null,
-			'units'             => null,
+			'customSpacingSize'   => null,
+			'defaultSpacingSizes' => null,
+			'spacingSizes'        => null,
+			'spacingScale'        => null,
+			'blockGap'            => null,
+			'margin'              => null,
+			'padding'             => null,
+			'units'               => null,
 		),
 		'shadow'                        => array(
 			'presets'        => null,
@@ -744,6 +745,11 @@ class WP_Theme_JSON_Gutenberg {
 		$valid_variations    = static::get_valid_block_style_variations();
 		$theme_json          = static::sanitize( $this->theme_json, $valid_block_names, $valid_element_names, $valid_variations );
 		$this->theme_json    = static::maybe_opt_in_into_settings( $theme_json );
+
+		// Set directly on the origin so it doesn't have to be moved below.
+		if ( empty( $this->theme_json['settings']['spacing']['spacingSizes'] ) ) {
+			$this->set_spacing_sizes( $origin );
+		}
 
 		// Internally, presets are keyed by origin.
 		$nodes = static::get_setting_nodes( $this->theme_json );
@@ -3734,10 +3740,13 @@ class WP_Theme_JSON_Gutenberg {
 	 * Sets the spacingSizes array based on the spacingScale values from theme.json.
 	 *
 	 * @since 6.1.0
+	 * @since 6.6.0 Added the `$origin` parameter.
 	 *
+	 * @param string $origin Optional. What source of data to set the spacing sizes for.
+	 *                       One of 'default', 'theme', or 'custom'. Default 'default'.
 	 * @return null|void
 	 */
-	public function set_spacing_sizes() {
+	public function set_spacing_sizes( $origin = 'default' ) {
 		$spacing_scale = $this->theme_json['settings']['spacing']['spacingScale'] ?? array();
 
 		// Gutenberg didn't have the 1st isset check.
@@ -3851,7 +3860,7 @@ class WP_Theme_JSON_Gutenberg {
 			}
 		}
 
-		_wp_array_set( $this->theme_json, array( 'settings', 'spacing', 'spacingSizes', 'default' ), $spacing_sizes );
+		_wp_array_set( $this->theme_json, array( 'settings', 'spacing', 'spacingSizes', $origin ), $spacing_sizes );
 	}
 
 	/**
