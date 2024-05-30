@@ -846,8 +846,9 @@ public class WPAndroidGlueCode {
         mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().onRedoPressed();
     }
 
-    public void onVoiceToContent(String content) {
-        mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().onVoiceToContent(content);
+    public void onContentUpdate(String title, String content) {
+        mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule()
+            .onContentUpdate(title, content);
     }
 
     public void setTitle(String title) {

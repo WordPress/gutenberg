@@ -20,7 +20,7 @@ exports[`Editor appends media correctly for allowed types and skips unsupported 
 <!-- /wp:video -->"
 `;
 
-exports[`Editor on voice to content parses markdown into blocks 1`] = `
+exports[`Editor on content update parses markdown into blocks 1`] = `
 "<!-- wp:heading {"level":1} -->
 <h1 class="wp-block-heading">Sample Document</h1>
 <!-- /wp:heading -->
@@ -96,7 +96,7 @@ exports[`Editor on voice to content parses markdown into blocks 1`] = `
 <!-- /wp:list -->"
 `;
 
-exports[`Editor on voice to content parses standard text into blocks 1`] = `
+exports[`Editor on content update parses standard text into blocks 1`] = `
 "<!-- wp:paragraph -->
 <p>Lorem ipsum dolor sit amet. Qui rerum quae sed sciunt<br />animi rem voluptate quas aut impedit accusamus ut</p>
 <!-- /wp:paragraph -->"

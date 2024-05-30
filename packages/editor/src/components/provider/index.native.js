@@ -21,7 +21,7 @@ import RNReactNativeGutenbergBridge, {
 	subscribeUpdateCapabilities,
 	subscribeShowNotice,
 	subscribeShowEditorHelp,
-	subscribeVoiceToContent,
+	subscribeToContentUpdate,
 } from '@wordpress/react-native-bridge';
 import { Component } from '@wordpress/element';
 import { count as wordCount } from '@wordpress/wordcount';
@@ -84,7 +84,7 @@ class NativeEditorProvider extends Component {
 		);
 
 		this.onHardwareBackPress = this.onHardwareBackPress.bind( this );
-		this.onVoiceToContent = this.onVoiceToContent.bind( this );
+		this.onContentUpdate = this.onContentUpdate.bind( this );
 
 		this.getEditorSettings = memize(
 			( settings, capabilities ) => ( {
@@ -203,9 +203,9 @@ class NativeEditorProvider extends Component {
 			this.onHardwareBackPress
 		);
 
-		this.subscriptionOnVoiceToContent = subscribeVoiceToContent(
-			( content ) => {
-				this.onVoiceToContent( content );
+		this.subscriptionOnContentUpdate = subscribeToContentUpdate(
+			( data ) => {
+				this.onContentUpdate( data );
 			}
 		);
 
@@ -273,8 +273,8 @@ class NativeEditorProvider extends Component {
 			this.hardwareBackPressListener.remove();
 		}
 
-		if ( this.subscriptionOnVoiceToContent ) {
-			this.subscriptionOnVoiceToContent.remove();
+		if ( this.subscriptionOnContentUpdate ) {
+			this.subscriptionOnContentUpdate.remove();
 		}
 	}
 
@@ -316,7 +316,7 @@ class NativeEditorProvider extends Component {
 		return false;
 	}
 
-	onVoiceToContent( { content } ) {
+	onContentUpdate( { content } ) {
 		const { insertBlocks } = this.props;
 		const blocks = pasteHandler( {
 			plainText: content,

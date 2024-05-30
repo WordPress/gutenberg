@@ -20,7 +20,7 @@ import {
 	requestMediaImport,
 	subscribeMediaAppend,
 	subscribeParentToggleHTMLMode,
-	subscribeVoiceToContent,
+	subscribeToContentUpdate,
 } from '@wordpress/react-native-bridge';
 
 setupCoreBlocks();
@@ -35,9 +35,9 @@ subscribeMediaAppend.mockImplementation( ( callback ) => {
 	mediaAppendCallback = callback;
 } );
 
-let onVoiceToContentCallback;
-subscribeVoiceToContent.mockImplementation( ( callback ) => {
-	onVoiceToContentCallback = callback;
+let onContentUpdateCallback;
+subscribeToContentUpdate.mockImplementation( ( callback ) => {
+	onContentUpdateCallback = callback;
 } );
 
 const MEDIA = [
@@ -156,14 +156,14 @@ describe( 'Editor', () => {
 		expect( openBlockSettingsButton.length ).toBe( 0 );
 	} );
 
-	describe( 'on voice to content', () => {
+	describe( 'on content update', () => {
 		it( 'parses markdown into blocks', async () => {
 			// Arrange
 			await initializeEditor();
 
 			// Act
 			act( () => {
-				onVoiceToContentCallback( {
+				onContentUpdateCallback( {
 					content: `# Sample Document\nLorem ipsum dolor sit amet, consectetur adipiscing 
 						elit.\n## Overview\n- Lorem ipsum dolor sit amet\n- Consectetur adipiscing
 						 elit\n- Integer nec odio\n## Details\n1. Sed cursus ante dapibus diam\n2. 
@@ -186,7 +186,7 @@ describe( 'Editor', () => {
 
 			// Act
 			act( () => {
-				onVoiceToContentCallback( {
+				onContentUpdateCallback( {
 					content: `Lorem ipsum dolor sit amet. Qui rerum quae sed sciunt
 					 animi rem voluptate quas aut impedit accusamus ut`,
 				} );

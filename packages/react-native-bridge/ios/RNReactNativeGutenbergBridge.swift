@@ -422,7 +422,7 @@ extension RNReactNativeGutenbergBridge {
         case onUndoPressed
         case onRedoPressed
         case connectionStatusChange
-        case onVoiceToContent
+        case onContentUpdate
     }
 
     public override func supportedEvents() -> [String]! {

@@ -203,16 +203,16 @@ export function subscribeConnectionStatus( callback ) {
 }
 
 /**
- * Subscribes a callback function to the 'onVoiceToContent' event.
- * This event is triggered with markdown content that will be passed to the block editor
+ * Subscribes a callback function to the 'onContentUpdate' event.
+ * This event is triggered with content that will be passed to the block editor
  * to be converted into blocks.
  *
- * @param {Function} callback - The function to be called when the 'onVoiceToContent' event is triggered.
- *                            This function receives markdown content as an argument.
- * @return {Object} - The listener object that was added to the event.
+ * @param {Function} callback The function to be called when the 'onContentUpdate' event is triggered.
+ *                            This function receives content plain text/markdown as an argument.
+ * @return {Object} The listener object that was added to the event.
  */
-export function subscribeVoiceToContent( callback ) {
-	return gutenbergBridgeEvents.addListener( 'onVoiceToContent', callback );
+export function subscribeToContentUpdate( callback ) {
+	return gutenbergBridgeEvents.addListener( 'onContentUpdate', callback );
 }
 
 export function requestConnectionStatus( callback ) {
