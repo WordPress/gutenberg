@@ -247,12 +247,11 @@ function ButtonEdit( props ) {
 			return {
 				lockUrlControls:
 					!! metadata?.bindings?.url &&
-					( ! blockBindingsSource ||
-						blockBindingsSource?.lockAttributesEditing( {
-							select,
-							context,
-							args: metadata?.bindings?.url?.args,
-						} ) ),
+					! blockBindingsSource?.canUserEditValue( {
+						select,
+						context,
+						args: metadata?.bindings?.url?.args,
+					} ),
 			};
 		},
 		[ isSelected, metadata?.bindings?.url ]

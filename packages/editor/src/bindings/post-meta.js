@@ -31,20 +31,20 @@ export default {
 				},
 			} );
 	},
-	lockAttributesEditing( { select, context, args } ) {
+	canUserEditValue( { select, context, args } ) {
 		const postType =
 			context?.postType || select( editorStore ).getCurrentPostType();
 
 		// Check that editing is happening in the post editor and not a template.
 		if ( postType === 'wp_template' ) {
-			return true;
+			return false;
 		}
 
 		// Check that the custom field is not protected and available in the REST API.
 		const isFieldExposed =
 			select( editorStore ).getEditedPostAttribute( 'meta' )[ args.key ];
 		if ( ! isFieldExposed ) {
-			return true;
+			return false;
 		}
 
 		// Check that the user has the capability to edit post meta.
@@ -54,9 +54,9 @@ export default {
 			context?.postId
 		);
 		if ( ! canUserEdit ) {
-			return true;
+			return false;
 		}
 
-		return false;
+		return true;
 	},
 };

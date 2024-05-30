@@ -180,13 +180,12 @@ export function RichTextWrapper(
 						break;
 					}
 
-					// If the source is not defined, or if its value of `lockAttributesEditing` is `true`, disable it.
+					// If the source is not defined, or if its value of `canUserEditValue` is `false`, disable it.
 					const blockBindingsSource = getBlockBindingsSource(
 						binding.source
 					);
 					if (
-						! blockBindingsSource ||
-						blockBindingsSource.lockAttributesEditing( {
+						! blockBindingsSource?.canUserEditValue( {
 							select,
 							context:
 								select( blockEditorStore ).getBlockContext(

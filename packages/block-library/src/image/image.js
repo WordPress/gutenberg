@@ -462,12 +462,11 @@ export default function Image( {
 			return {
 				lockUrlControls:
 					!! urlBinding &&
-					( ! urlBindingSource ||
-						urlBindingSource?.lockAttributesEditing( {
-							select,
-							context,
-							args: urlBinding?.args,
-						} ) ),
+					! urlBindingSource?.canUserEditValue( {
+						select,
+						context,
+						args: urlBinding?.args,
+					} ),
 				lockHrefControls:
 					// Disable editing the link of the URL if the image is inside a pattern instance.
 					// This is a temporary solution until we support overriding the link on the frontend.
@@ -478,12 +477,11 @@ export default function Image( {
 					hasParentPattern,
 				lockAltControls:
 					!! altBinding &&
-					( ! altBindingSource ||
-						altBindingSource?.lockAttributesEditing( {
-							select,
-							context,
-							args: altBinding?.args,
-						} ) ),
+					! altBindingSource?.canUserEditValue( {
+						select,
+						context,
+						args: altBinding?.args,
+					} ),
 				lockAltControlsMessage: altBindingSource?.label
 					? sprintf(
 							/* translators: %s: Label of the bindings source. */
@@ -493,12 +491,11 @@ export default function Image( {
 					: __( 'Connected to dynamic data' ),
 				lockTitleControls:
 					!! titleBinding &&
-					( ! titleBindingSource ||
-						titleBindingSource?.lockAttributesEditing( {
-							select,
-							context,
-							args: titleBinding?.args,
-						} ) ),
+					! titleBindingSource?.canUserEditValue( {
+						select,
+						context,
+						args: titleBinding?.args,
+					} ),
 				lockTitleControlsMessage: titleBindingSource?.label
 					? sprintf(
 							/* translators: %s: Label of the bindings source. */
