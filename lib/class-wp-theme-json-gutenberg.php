@@ -3024,8 +3024,6 @@ class WP_Theme_JSON_Gutenberg {
 		$this->theme_json = array_replace_recursive( $this->theme_json, $incoming_data );
 
 		/*
-		 * Prior to version 3, spacingSizes were generated in WP_Theme_JSON_Resolver_Gutenberg::get_merged_data().
-		 *
 		 * Recompute all the spacing sizes based on the new hierarchy of data. In the constructor
 		 * spacingScale and spacingSizes are both keyed by origin and VALID_ORIGINS is ordered, so
 		 * we can allow partial spacingScale data to inherit missing data from earlier layers when
