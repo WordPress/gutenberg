@@ -48,7 +48,7 @@ export class PostPublishButton extends Component {
 		return ( ...args ) => {
 			const {
 				hasNonPostEntityChanges,
-				hasMetaChanges,
+				hasPostMetaChanges,
 				setEntitiesSavedStatesCallback,
 			} = this.props;
 			// If a post with non-post entities is published, but the user
@@ -57,7 +57,7 @@ export class PostPublishButton extends Component {
 			// We also need to check that the `setEntitiesSavedStatesCallback`
 			// prop was passed. See https://github.com/WordPress/gutenberg/pull/37383
 			if (
-				( hasNonPostEntityChanges || hasMetaChanges ) &&
+				( hasNonPostEntityChanges || hasPostMetaChanges ) &&
 				setEntitiesSavedStatesCallback
 			) {
 				// The modal for multiple entity saving will open,
@@ -219,7 +219,7 @@ export default compose( [
 			isSavingNonPostEntityChanges,
 			getEditedPostAttribute,
 			getPostEdits,
-			hasMetaChanges,
+			hasPostMetaChanges,
 		} = unlock( select( editorStore ) );
 		return {
 			isSaving: isSavingPost(),
@@ -237,7 +237,7 @@ export default compose( [
 			postStatus: getEditedPostAttribute( 'status' ),
 			postStatusHasChanged: getPostEdits()?.status,
 			hasNonPostEntityChanges: hasNonPostEntityChanges(),
-			hasMetaChanges: hasMetaChanges(),
+			hasPostMetaChanges: hasPostMetaChanges(),
 			isSavingNonPostEntityChanges: isSavingNonPostEntityChanges(),
 		};
 	} ),

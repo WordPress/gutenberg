@@ -17,6 +17,7 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import {
 	getRenderingMode,
+	getCurrentPost,
 	__experimentalGetDefaultTemplatePartAreas,
 } from './selectors';
 import { TEMPLATE_PART_POST_TYPE } from './constants';
@@ -142,12 +143,16 @@ export const getCurrentTemplateTemplateParts = createRegistrySelector(
  *
  * @param {Object} state Global application state.
  *
- * @return {boolean} Whether there are edits or not.
+ * @return {boolean} Whether there are edits or not in the meta fields.
  */
-export const hasMetaChanges = createRegistrySelector( ( select ) => () => {
-	const dirtyEntityRecords =
-		select( coreStore ).__experimentalGetDirtyEntityRecords();
-	return dirtyEntityRecords.some(
-		( entityRecord ) => entityRecord.hasMetaChanges
-	);
-} );
+export const hasPostMetaChanges = createRegistrySelector(
+	( select ) => ( state ) => {
+		const { type, id } = getCurrentPost( state );
+		const edits = select( coreStore ).getEntityRecordNonTransientEdits(
+			'postType',
+			type,
+			id
+		);
+		return !! edits?.meta;
+	}
+);

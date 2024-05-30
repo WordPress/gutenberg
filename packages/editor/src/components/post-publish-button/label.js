@@ -21,7 +21,7 @@ export default function PublishButtonLabel() {
 		hasPublishAction,
 		isAutosaving,
 		hasNonPostEntityChanges,
-		hasMetaChanges,
+		hasPostMetaChanges,
 		postStatusHasChanged,
 		postStatus,
 	} = useSelect( ( select ) => {
@@ -47,7 +47,9 @@ export default function PublishButtonLabel() {
 			isAutosaving: isAutosavingPost(),
 			hasNonPostEntityChanges:
 				select( editorStore ).hasNonPostEntityChanges(),
-			hasMetaChanges: unlock( select( editorStore ) ).hasMetaChanges(),
+			hasPostMetaChanges: unlock(
+				select( editorStore )
+			).hasPostMetaChanges(),
 			postStatusHasChanged: !! getPostEdits()?.status,
 			postStatus: getEditedPostAttribute( 'status' ),
 		};
@@ -72,7 +74,7 @@ export default function PublishButtonLabel() {
 	}
 	if (
 		hasNonPostEntityChanges ||
-		hasMetaChanges ||
+		hasPostMetaChanges ||
 		isPublished ||
 		( postStatusHasChanged &&
 			! [ 'future', 'publish' ].includes( postStatus ) ) ||

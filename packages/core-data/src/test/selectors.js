@@ -530,7 +530,6 @@ describe( '__experimentalGetDirtyEntityRecords', () => {
 				name: 'someName',
 				key: 'someKey',
 				title: '',
-				hasMetaChanges: false,
 			},
 		] );
 	} );
@@ -591,7 +590,6 @@ describe( '__experimentalGetDirtyEntityRecords', () => {
 				name: 'someName',
 				key: 'someKey',
 				title: '',
-				hasMetaChanges: false,
 			},
 		] );
 	} );

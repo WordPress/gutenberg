@@ -639,7 +639,6 @@ type DirtyEntityRecord = {
 	key: EntityRecordKey;
 	name: string;
 	kind: string;
-	hasMetaChanges?: boolean;
 };
 /**
  * Returns the list of dirty entity records.
@@ -687,12 +686,6 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 								entityConfig?.getTitle?.( entityRecord ) || '',
 							name,
 							kind,
-							hasMetaChanges: !! getEntityRecordNonTransientEdits(
-								state,
-								kind,
-								name,
-								primaryKey
-							)?.meta,
 						} );
 					} );
 				}

@@ -24,7 +24,7 @@ export default function SavePublishPanels( {
 	setEntitiesSavedStatesCallback,
 	closeEntitiesSavedStates,
 	isEntitiesSavedStatesOpen,
-	hasMetaChanges,
+	hasPostMetaChanges,
 	forceIsDirtyPublishPanel,
 } ) {
 	const { closePublishSidebar, togglePublishSidebar } =
@@ -35,7 +35,9 @@ export default function SavePublishPanels( {
 				select( editorStore ).isPublishSidebarOpened(),
 			hasNonPostEntityChanges:
 				select( editorStore ).hasNonPostEntityChanges(),
-			hasMetaChanges: unlock( select( editorStore ) ).hasMetaChanges(),
+			hasPostMetaChanges: unlock(
+				select( editorStore )
+			).hasPostMetaChanges(),
 		} ),
 		[]
 	);
@@ -57,7 +59,7 @@ export default function SavePublishPanels( {
 				PostPublishExtension={ PluginPostPublishPanel.Slot }
 			/>
 		);
-	} else if ( hasNonPostEntityChanges || hasMetaChanges ) {
+	} else if ( hasNonPostEntityChanges || hasPostMetaChanges ) {
 		unmountableContent = (
 			<div className="editor-layout__toggle-entities-saved-states-panel">
 				<Button
