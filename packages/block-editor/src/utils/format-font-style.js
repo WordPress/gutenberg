@@ -36,8 +36,5 @@ export function formatFontStyle( fontStyle ) {
 			break;
 	}
 
-	// Ensure first letter of font style name is capitalized.
-	name = name.charAt( 0 ).toUpperCase() + name.slice( 1 );
-
 	return { name, value: fontStyle };
 }
