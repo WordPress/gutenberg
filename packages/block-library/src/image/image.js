@@ -499,43 +499,55 @@ export default function Image( {
 		[ clientId, isSingleSelected, metadata?.bindings ]
 	);
 
+	const shouldRenderOtherControls =
+		( isSingleSelected &&
+			! isEditingImage &&
+			! lockHrefControls &&
+			! lockUrlControls ) ||
+		allowCrop ||
+		( isSingleSelected && canInsertCover );
+
 	const controls = (
 		<>
-			<BlockControls group="block">
-				{ isSingleSelected &&
-					! isEditingImage &&
-					! lockHrefControls &&
-					! lockUrlControls && (
-						<ImageURLInputUI
-							url={ href || '' }
-							onChangeUrl={ onSetHref }
-							linkDestination={ linkDestination }
-							mediaUrl={ ( image && image.source_url ) || url }
-							mediaLink={ image && image.link }
-							linkTarget={ linkTarget }
-							linkClass={ linkClass }
-							rel={ rel }
-							showLightboxSetting={ showLightboxSetting }
-							lightboxEnabled={ lightboxChecked }
-							onSetLightbox={ onSetLightbox }
-							resetLightbox={ resetLightbox }
+			{ shouldRenderOtherControls && (
+				<BlockControls group="block">
+					{ isSingleSelected &&
+						! isEditingImage &&
+						! lockHrefControls &&
+						! lockUrlControls && (
+							<ImageURLInputUI
+								url={ href || '' }
+								onChangeUrl={ onSetHref }
+								linkDestination={ linkDestination }
+								mediaUrl={
+									( image && image.source_url ) || url
+								}
+								mediaLink={ image && image.link }
+								linkTarget={ linkTarget }
+								linkClass={ linkClass }
+								rel={ rel }
+								showLightboxSetting={ showLightboxSetting }
+								lightboxEnabled={ lightboxChecked }
+								onSetLightbox={ onSetLightbox }
+								resetLightbox={ resetLightbox }
+							/>
+						) }
+					{ allowCrop && (
+						<ToolbarButton
+							onClick={ () => setIsEditingImage( true ) }
+							icon={ crop }
+							label={ __( 'Crop' ) }
 						/>
 					) }
-				{ allowCrop && (
-					<ToolbarButton
-						onClick={ () => setIsEditingImage( true ) }
-						icon={ crop }
-						label={ __( 'Crop' ) }
-					/>
-				) }
-				{ isSingleSelected && canInsertCover && (
-					<ToolbarButton
-						icon={ overlayText }
-						label={ __( 'Add text over image' ) }
-						onClick={ switchToCover }
-					/>
-				) }
-			</BlockControls>
+					{ isSingleSelected && canInsertCover && (
+						<ToolbarButton
+							icon={ overlayText }
+							label={ __( 'Add text over image' ) }
+							onClick={ switchToCover }
+						/>
+					) }
+				</BlockControls>
+			) }
 			{ isSingleSelected && ! isEditingImage && ! lockUrlControls && (
 				<BlockControls group="other">
 					<MediaReplaceFlow
