@@ -606,7 +606,14 @@ export default function Image( {
 										<>{ lockAltControlsMessage }</>
 									) : (
 										<>
-											<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+											<ExternalLink
+												href={
+													// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
+													__(
+														'https://www.w3.org/WAI/tutorials/images/decision-tree/'
+													)
+												}
+											>
 												{ __(
 													'Describe the purpose of the image.'
 												) }
@@ -693,7 +700,14 @@ export default function Image( {
 										<>{ lockAltControlsMessage }</>
 									) : (
 										<>
-											<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+											<ExternalLink
+												href={
+													// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
+													__(
+														'https://www.w3.org/WAI/tutorials/images/decision-tree/'
+													)
+												}
+											>
 												{ __(
 													'Describe the purpose of the image.'
 												) }
