@@ -101,7 +101,7 @@ export default function StyleVariationsContainer( { gap = 2 } ) {
 				return {
 					...variation,
 					settings: variation.settings ?? {},
-					styles: styles ?? {},
+					styles,
 				};
 			} ),
 		];
