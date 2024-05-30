@@ -499,39 +499,36 @@ export default function Image( {
 		[ clientId, isSingleSelected, metadata?.bindings ]
 	);
 
-	const shouldRenderOtherControls =
-		( isSingleSelected &&
-			! isEditingImage &&
-			! lockHrefControls &&
-			! lockUrlControls ) ||
-		allowCrop ||
-		( isSingleSelected && canInsertCover );
+	const showUrlInput =
+		isSingleSelected &&
+		! isEditingImage &&
+		! lockHrefControls &&
+		! lockUrlControls;
+
+	const showCoverControls = isSingleSelected && canInsertCover;
+
+	const showBlockControls = showUrlInput || allowCrop || showCoverControls;
 
 	const controls = (
 		<>
-			{ shouldRenderOtherControls && (
+			{ showBlockControls && (
 				<BlockControls group="block">
-					{ isSingleSelected &&
-						! isEditingImage &&
-						! lockHrefControls &&
-						! lockUrlControls && (
-							<ImageURLInputUI
-								url={ href || '' }
-								onChangeUrl={ onSetHref }
-								linkDestination={ linkDestination }
-								mediaUrl={
-									( image && image.source_url ) || url
-								}
-								mediaLink={ image && image.link }
-								linkTarget={ linkTarget }
-								linkClass={ linkClass }
-								rel={ rel }
-								showLightboxSetting={ showLightboxSetting }
-								lightboxEnabled={ lightboxChecked }
-								onSetLightbox={ onSetLightbox }
-								resetLightbox={ resetLightbox }
-							/>
-						) }
+					{ showUrlInput && (
+						<ImageURLInputUI
+							url={ href || '' }
+							onChangeUrl={ onSetHref }
+							linkDestination={ linkDestination }
+							mediaUrl={ ( image && image.source_url ) || url }
+							mediaLink={ image && image.link }
+							linkTarget={ linkTarget }
+							linkClass={ linkClass }
+							rel={ rel }
+							showLightboxSetting={ showLightboxSetting }
+							lightboxEnabled={ lightboxChecked }
+							onSetLightbox={ onSetLightbox }
+							resetLightbox={ resetLightbox }
+						/>
+					) }
 					{ allowCrop && (
 						<ToolbarButton
 							onClick={ () => setIsEditingImage( true ) }
@@ -539,7 +536,7 @@ export default function Image( {
 							label={ __( 'Crop' ) }
 						/>
 					) }
-					{ isSingleSelected && canInsertCover && (
+					{ showCoverControls && (
 						<ToolbarButton
 							icon={ overlayText }
 							label={ __( 'Add text over image' ) }
