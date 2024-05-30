@@ -219,7 +219,6 @@ function RevisionsButtons( {
 								</p>
 							) : (
 								<Button
-									disabled={ areStylesEqual }
 									size="compact"
 									variant="primary"
 									className="edit-site-global-styles-screen-revisions__apply-button"
