@@ -82,18 +82,23 @@ function useInsertionPoint( {
 				).length;
 			}
 
+			// When we're using the appender or an insertion index has been passed directly,
+			// we want to use that over our "best guess" block insertion point
+			const isDirectInsert = insertionIndex !== undefined || isAppender;
+			const shouldUseBlockInsertionPoint =
+				! isDirectInsert &&
+				blockInsertionPoint?.rootClientId !== undefined &&
+				blockInsertionPoint?.index !== undefined;
+
 			return {
 				destinationRootClientId: _destinationRootClientId,
 				destinationIndex: _destinationIndex,
-				blockInsertionRootClientId:
-					blockInsertionPoint?.rootClientId !== undefined &&
-					! isAppender
-						? blockInsertionPoint.rootClientId
-						: _destinationRootClientId,
-				blockInsertionIndex:
-					blockInsertionPoint?.index !== undefined && ! isAppender
-						? blockInsertionPoint.index
-						: _destinationIndex,
+				blockInsertionRootClientId: shouldUseBlockInsertionPoint
+					? blockInsertionPoint.rootClientId
+					: _destinationRootClientId,
+				blockInsertionIndex: shouldUseBlockInsertionPoint
+					? blockInsertionPoint.index
+					: _destinationIndex,
 			};
 		},
 		[ rootClientId, insertionIndex, clientId, isAppender ]
