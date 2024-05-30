@@ -512,7 +512,7 @@ const Cover = ( {
 						muted
 						disableFocus
 						repeat
-						resizeMode={ 'cover' }
+						resizeMode="cover"
 						source={ { uri: url } }
 						onLoad={ onVideoLoad }
 						onLoadStart={ onVideoLoadStart }

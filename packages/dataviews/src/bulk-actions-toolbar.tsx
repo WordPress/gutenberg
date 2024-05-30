@@ -250,9 +250,9 @@ export default function BulkActionsToolbar< Item extends AnyItem >( {
 		<AnimatePresence>
 			<motion.div
 				layout={ ! isReducedMotion } // See https://www.framer.com/docs/animation/#layout-animations
-				initial={ 'init' }
-				animate={ 'open' }
-				exit={ 'exit' }
+				initial="init"
+				animate="open"
+				exit="exit"
 				variants={ isReducedMotion ? undefined : SNACKBAR_VARIANTS }
 				className="dataviews-bulk-actions"
 			>

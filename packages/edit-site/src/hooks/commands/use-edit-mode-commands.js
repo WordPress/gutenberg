@@ -3,23 +3,11 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
-import {
-	trash,
-	rotateLeft,
-	rotateRight,
-	layout,
-	page,
-	drawerLeft,
-	drawerRight,
-	blockDefault,
-} from '@wordpress/icons';
+import { trash, rotateLeft, rotateRight, layout, page } from '@wordpress/icons';
 import { useCommandLoader } from '@wordpress/commands';
 import { decodeEntities } from '@wordpress/html-entities';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import {
-	store as editorStore,
-	privateApis as editorPrivateApis,
-} from '@wordpress/editor';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -32,7 +20,6 @@ import { unlock } from '../../lock-unlock';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 import { useLink } from '../../components/routes/link';
 
-const { interfaceStore } = unlock( editorPrivateApis );
 const { useHistory } = unlock( routerPrivateApis );
 
 function usePageContentFocusCommands() {
@@ -171,57 +158,6 @@ function useManipulateDocumentCommands() {
 	};
 }
 
-function useEditUICommands() {
-	const { openGeneralSidebar, closeGeneralSidebar } =
-		useDispatch( editSiteStore );
-	const { canvasMode, activeSidebar } = useSelect( ( select ) => {
-		return {
-			canvasMode: unlock( select( editSiteStore ) ).getCanvasMode(),
-			activeSidebar:
-				select( interfaceStore ).getActiveComplementaryArea( 'core' ),
-		};
-	}, [] );
-
-	if ( canvasMode !== 'edit' ) {
-		return { isLoading: false, commands: [] };
-	}
-
-	const commands = [];
-
-	commands.push( {
-		name: 'core/open-settings-sidebar',
-		label: __( 'Toggle settings sidebar' ),
-		icon: isRTL() ? drawerLeft : drawerRight,
-		callback: ( { close } ) => {
-			close();
-			if ( activeSidebar === 'edit-post/document' ) {
-				closeGeneralSidebar();
-			} else {
-				openGeneralSidebar( 'edit-post/document' );
-			}
-		},
-	} );
-
-	commands.push( {
-		name: 'core/open-block-inspector',
-		label: __( 'Toggle block inspector' ),
-		icon: blockDefault,
-		callback: ( { close } ) => {
-			close();
-			if ( activeSidebar === 'edit-site/block' ) {
-				closeGeneralSidebar();
-			} else {
-				openGeneralSidebar( 'edit-site/block' );
-			}
-		},
-	} );
-
-	return {
-		isLoading: false,
-		commands,
-	};
-}
-
 export function useEditModeCommands() {
 	useCommandLoader( {
 		name: 'core/edit-site/page-content-focus',
@@ -232,10 +168,5 @@ export function useEditModeCommands() {
 	useCommandLoader( {
 		name: 'core/edit-site/manipulate-document',
 		hook: useManipulateDocumentCommands,
-	} );
-
-	useCommandLoader( {
-		name: 'core/edit-site/edit-ui',
-		hook: useEditUICommands,
 	} );
 }
