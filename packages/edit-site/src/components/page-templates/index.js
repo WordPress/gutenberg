@@ -82,7 +82,8 @@ const DEFAULT_VIEW = {
 	},
 	// All fields are visible by default, so it's
 	// better to keep track of the hidden ones.
-	hiddenFields: [ 'preview', 'postTypes' ],
+	hiddenFields: [ 'preview' ],
+	// hiddenFields: [ 'preview', 'postTypes' ],
 	layout: defaultConfigPerViewType[ LAYOUT_GRID ],
 	filters: [],
 };
@@ -186,13 +187,16 @@ function Preview( { item, viewType } ) {
 	);
 }
 
-// TODO: templates can target Custom Post Types.
+// TODO: what are the possible post types?
+// How about CPTs added by plugins, etc.?
 const POST_TYPES = {
 	post: __( 'Post' ),
 	page: __( 'Page' ),
 };
 
-const SPECIAL_TEMPLATES = {
+// This maps the template slug to the post types it should be available for.
+// TODO: review the hierarchy and consider single-{post_type}, archives-{post_type}, etc.
+const TEMPLATE_TO_POST_TYPE = {
 	single: [ 'post' ],
 	singular: [ 'post', 'page' ],
 	page: [ 'page' ],
@@ -270,6 +274,27 @@ export default function PageTemplates() {
 		} ) );
 	}, [ records ] );
 
+	const getPostTypesFromItem = ( item ) => {
+		// This logic replicates querying the REST templates endpoint with a post_type parameter.
+		// https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-includes/block-template-utils.php#L1077
+		//
+		// Additionaly, it also maps the the WordPress template hierarchy to known post types.
+		//
+		// This is how it works:
+		//
+		// 1. Return the list of post types defined by the item, if any.
+		// 2. If a template is custom, add it for any CPT.
+		// 3. Consider the template hierarchy and how it maps to post types. E.g.: single, page, etc.
+		// 4. If none of the above, default to no post types.
+
+		return (
+			item.post_types ||
+			( item.is_custom && Object.keys( POST_TYPES ) ) ||
+			TEMPLATE_TO_POST_TYPE[ item.slug ] ||
+			[]
+		);
+	};
+
 	const fields = useMemo(
 		() => [
 			{
@@ -332,29 +357,29 @@ export default function PageTemplates() {
 			{
 				header: __( 'Post types' ),
 				id: 'postTypes',
-				getValue: ( { item } ) =>
-					// This logic would be used by the filter
-					// and replicates what we have in the server at
-					// https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-includes/block-template-utils.php#L1077
-					//
-					// 1. Consider the post types defined by the item, if any
-					item.post_types ||
-					// 2. Otherwise, if a template is custom add it for any CPT.
-					( item.is_custom ? [ 'post', 'page' ] : item.post_types ) || // TODO: take any CPT.
-					// 3. Finally, also consider special templates.
-					( SPECIAL_TEMPLATES[ item.slug ] ?? item.post_types ),
-				render: ( { item } ) =>
-					// TODO: note that getValue returns a different value than render.
-					// getValue is used for filtering, and render is used for display.
-					item.post_types
-						?.map(
+				getValue: ( { item } ) => getPostTypesFromItem( item ),
+				render: ( { item } ) => {
+					const postTypes = getPostTypesFromItem( item );
+					if ( ! postTypes || ! postTypes.length ) {
+						return __( 'n/a' );
+					}
+
+					if (
+						postTypes.length === Object.keys( POST_TYPES ).length
+					) {
+						return __( 'Any' );
+					}
+
+					return postTypes
+						.map(
 							( postType ) => POST_TYPES[ postType ] || postType
 						)
-						?.join( ',' ),
-				elements: [
-					{ value: 'post', label: POST_TYPES.post },
-					{ value: 'page', label: POST_TYPES.page },
-				],
+						.join( ',' );
+				},
+				elements: Object.keys( POST_TYPES ).map( ( key ) => ( {
+					value: key,
+					label: POST_TYPES[ key ],
+				} ) ),
 				filterBy: {
 					operators: [ OPERATOR_IS_ANY ],
 				},
