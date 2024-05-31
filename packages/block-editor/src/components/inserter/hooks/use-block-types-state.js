@@ -14,6 +14,7 @@ import { useCallback } from '@wordpress/element';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../../store';
+import { withRootClientIdOptionKey } from '../../../store/utils';
 
 /**
  * Retrieves the block types inserter state.
@@ -25,7 +26,9 @@ import { store as blockEditorStore } from '../../../store';
 const useBlockTypesState = ( rootClientId, onInsert ) => {
 	const [ items ] = useSelect(
 		( select ) => [
-			select( blockEditorStore ).getInserterItems( rootClientId ),
+			select( blockEditorStore ).getInserterItems( rootClientId, {
+				[ withRootClientIdOptionKey ]: true,
+			} ),
 		],
 		[ rootClientId ]
 	);
