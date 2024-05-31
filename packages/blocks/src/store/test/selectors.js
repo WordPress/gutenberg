@@ -626,14 +626,14 @@ describe( 'selectors', () => {
 				).toEqual( variations[ 0 ] );
 				// All variations match the following attributes. However, since the third variation has a function
 				// for its isActive field, we cannot compare the specificity of each match, so instead we return the
-				// first match.
+				// best match we've found.
 				expect(
 					getActiveBlockVariation( state, blockName, {
 						firstTestAttribute: 1,
 						secondTestAttribute: 2,
 						thirdTestAttribute: 3,
 					} )
-				).toEqual( variations[ 0 ] );
+				).toEqual( variations[ 1 ] );
 				expect(
 					getActiveBlockVariation( state, blockName, {
 						firstTestAttribute: 1,

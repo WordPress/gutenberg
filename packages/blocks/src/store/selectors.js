@@ -243,8 +243,8 @@ export function getActiveBlockVariation( state, blockName, attributes, scope ) {
 
 	const blockType = getBlockType( state, blockName );
 	const attributeKeys = Object.keys( blockType?.attributes || {} );
-
-	const matches = [];
+	let match;
+	let maxMatchedAttributes = 0;
 
 	for ( const variation of variations ) {
 		if ( Array.isArray( variation.isActive ) ) {
@@ -257,50 +257,35 @@ export function getActiveBlockVariation( state, blockName, attributes, scope ) {
 					return attributeKeys.includes( topLevelAttribute );
 				}
 			);
-			if ( definedAttributes.length === 0 ) {
+			const definedAttributesLength = definedAttributes.length;
+			if ( definedAttributesLength === 0 ) {
 				continue;
 			}
-			if (
-				! definedAttributes.every( ( attribute ) => {
-					const attributeValue = getValueFromObjectPath(
-						attributes,
-						attribute
-					);
-					if ( attributeValue === undefined ) {
-						return false;
-					}
-					return (
-						attributeValue ===
-						getValueFromObjectPath(
-							variation.attributes,
-							attribute
-						)
-					);
-				} )
-			) {
-				continue;
+			const isMatch = definedAttributes.every( ( attribute ) => {
+				const attributeValue = getValueFromObjectPath(
+					attributes,
+					attribute
+				);
+				if ( attributeValue === undefined ) {
+					return false;
+				}
+				return (
+					attributeValue ===
+					getValueFromObjectPath( variation.attributes, attribute )
+				);
+			} );
+			if ( isMatch && definedAttributesLength > maxMatchedAttributes ) {
+				match = variation;
+				maxMatchedAttributes = definedAttributesLength;
 			}
-			// We assign a specificity score to each variation based on the number of attributes
-			// that it matches.
-			matches.push( [ variation, definedAttributes.length ] );
 		} else if ( variation.isActive?.( attributes, variation.attributes ) ) {
 			// If isActive is a function, we cannot know how many attributes it matches.
 			// This means that we cannot compare the specificity of our matches,
-			// and simply return the first match we have found.
-			if ( matches.length > 0 ) {
-				return matches[ 0 ][ 0 ];
-			}
-			return variation;
+			// and simply return the best match we have found.
+			return match || variation;
 		}
 	}
-
-	let candidate = [ undefined, 0 ];
-	for ( const [ variation, specificity ] of matches ) {
-		if ( specificity > candidate[ 1 ] ) {
-			candidate = [ variation, specificity ];
-		}
-	}
-	return candidate?.[ 0 ];
+	return match;
 }
 
 /**
