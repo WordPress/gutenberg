@@ -81,7 +81,6 @@ function InterfaceSkeleton(
 		editorNotices,
 		sidebar,
 		secondarySidebar,
-		notices,
 		content,
 		actions,
 		labels,
@@ -210,11 +209,6 @@ function InterfaceSkeleton(
 							</NavigableRegion>
 						) }
 					</AnimatePresence>
-					{ !! notices && (
-						<div className="interface-interface-skeleton__notices">
-							{ notices }
-						</div>
-					) }
 					<NavigableRegion
 						className="interface-interface-skeleton__content"
 						ariaLabel={ mergedLabels.body }
