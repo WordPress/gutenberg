@@ -106,12 +106,6 @@ export default function BlockBindingsToolbarIndicator( { clientIds } ) {
 									className="block-editor-block-bindings-toolbar-indicator-icon"
 									showColors
 								/>
-								{ isSingleBlockSelected &&
-									!! firstBlockName && (
-										<span className="block-editor-block-switcher__toggle-text">
-											{ firstBlockName }
-										</span>
-									) }
 							</>
 						}
 						toggleProps={ {
