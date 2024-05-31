@@ -1765,7 +1765,6 @@ export function canMoveBlock( state, clientId, rootClientId = null ) {
 	if ( getTemplateLock( state, rootClientId ) === 'all' ) {
 		return false;
 	}
-
 	return getBlockEditingMode( state, rootClientId ) !== 'disabled';
 }
 

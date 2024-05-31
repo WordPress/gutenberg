@@ -27,16 +27,16 @@
 	left: 0;
 	outline-color: var(--wp-admin-theme-color);
 	outline-style: solid;
-	outline-width: var(--wp-admin-border-width-focus);
-	outline-offset: calc(-1 * var(--wp-admin-border-width-focus));
+	outline-width: calc(var(--wp-admin-border-width-focus) / var(--wp-block-editor-iframe-zoom-out-scale, 1));
+	outline-offset: calc((-1 * var(--wp-admin-border-width-focus)) / var(--wp-block-editor-iframe-zoom-out-scale, 1));
 }
 
 // Hide selections on this element, otherwise Safari will include it stacked
 // under your actual selection.
 // This uses a CSS hack to show the rules to Safari only. Failing here is okay,
 // it just makes the selection indication slightly less precise. That makes this
-// hack a progressive enhancement. Stylelint is disabled to allow the hack to work.
-/* stylelint-disable */
+// hack a progressive enhancement.
+/* stylelint-disable -- Stylelint is disabled to allow the hack to work. */
 _::-webkit-full-page-media, _:future, :root .block-editor-block-list__layout::selection,
 _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-block-list__layout::selection {
 	background-color: transparent;
@@ -384,29 +384,6 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 	z-index: z-index("{core/image aligned left or right} .wp-block");
 }
 
-// Increase width when zoomed out to match visually.
-body.is-zoomed-out {
-	display: flex;
-	flex-direction: column;
-
-	.is-outline-mode .block-editor-block-list__block:not(.remove-outline):not(.rich-text).is-selected::after,
-	.is-outline-mode .block-editor-block-list__block:not(.remove-outline).is-hovered:not(.is-selected)::after {
-		outline-width: calc(2 * var(--wp-admin-border-width-focus)); // Adjusted for the zoom scale.
-		outline-offset: calc(-2 * var(--wp-admin-border-width-focus));
-	}
-
-	> .is-root-container {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		height: 100%;
-
-		> main {
-			flex: 1;
-		}
-	}
-}
-
 .wp-site-blocks > [data-align="left"] {
 	float: left;
 	margin-right: 2em;
@@ -498,14 +475,4 @@ body.is-zoomed-out {
 		// solves this.
 		margin-bottom: auto;
 	}
-}
-
-.block-editor-iframe__html {
-	transform-origin: top center;
-	transition: all 0.3s;
-	@include reduce-motion("transition");
-}
-
-.block-editor-iframe__html[style*="scale"] {
-	background-color: $gray-300;
 }

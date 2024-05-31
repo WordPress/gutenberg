@@ -48,7 +48,8 @@
 
 	// Let the parent be selectable in the placeholder area.
 	pointer-events: none;
-	.block-editor-inserter {
+	.block-editor-inserter,
+	.block-editor-button-block-appender {
 		pointer-events: all;
 	}
 }

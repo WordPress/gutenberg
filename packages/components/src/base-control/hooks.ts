@@ -27,10 +27,6 @@ export function useBaseControlProps(
 		preferredId
 	);
 
-	// ARIA descriptions can only contain plain text, so fall back to aria-details if not.
-	const helpPropName =
-		typeof help === 'string' ? 'aria-describedby' : 'aria-details';
-
 	return {
 		baseControlProps: {
 			id: uniqueId,
@@ -39,7 +35,7 @@ export function useBaseControlProps(
 		},
 		controlProps: {
 			id: uniqueId,
-			...( !! help ? { [ helpPropName ]: `${ uniqueId }__help` } : {} ),
+			...( !! help ? { 'aria-describedby': `${ uniqueId }__help` } : {} ),
 		},
 	};
 }

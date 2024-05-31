@@ -64,7 +64,7 @@ function getUIFlexProps( labelPosition?: LabelPosition ) {
 	return props;
 }
 
-export function InputBase(
+function InputBase(
 	props: WordPressComponentProps< InputBaseProps, 'div' >,
 	ref: ForwardedRef< HTMLDivElement >
 ) {
@@ -144,4 +144,8 @@ export function InputBase(
 	);
 }
 
+/**
+ * `InputBase` is an internal component used to style the standard borders for an input,
+ * as well as handle the layout for prefix/suffix elements.
+ */
 export default contextConnect( InputBase, 'InputBase' );

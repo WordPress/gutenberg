@@ -182,8 +182,8 @@
 	.block-editor-block-list__block-selection-button,
 	.block-editor-block-contextual-toolbar {
 		pointer-events: all;
-		margin-top: $grid-unit-15;
-		margin-bottom: $grid-unit-15;
+		margin-top: $grid-unit-10;
+		margin-bottom: $grid-unit-10;
 	}
 
 	.block-editor-block-contextual-toolbar {
@@ -261,4 +261,12 @@
 
 .is-dragging-components-draggable .components-tooltip {
 	display: none;
+}
+
+.components-popover.block-editor-block-popover__inbetween .block-editor-button-pattern-inserter__button {
+	pointer-events: all;
+	position: absolute;
+	transform: translateX(-50%) translateY(-50%);
+	top: 50%;
+	left: 50%;
 }

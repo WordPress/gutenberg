@@ -55,9 +55,7 @@ $blocks-block__margin: 0.5em;
 	//
 	// This back compat rule is ignored if the user decides to use the
 	// newer justification options on the button block, hence the :not.
-	//
-	// Disable the stylelint rule, otherwise this selector is ugly!
-	/* stylelint-disable indentation */
+	/* stylelint-disable indentation -- Disable the stylelint rule, otherwise this selector is ugly! */
 	&:not(
 		.is-content-justification-space-between,
 		.is-content-justification-right,

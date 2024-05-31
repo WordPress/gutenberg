@@ -986,6 +986,45 @@ test.describe( 'List View', () => {
 			] );
 	} );
 
+	test( 'should create a group block from the selected multiple blocks', async ( {
+		editor,
+		pageUtils,
+		listViewUtils,
+	} ) => {
+		// Insert some blocks of different types.
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await editor.insertBlock( { name: 'core/heading' } );
+		await editor.insertBlock( { name: 'core/file' } );
+
+		await listViewUtils.openListView();
+
+		// Group Heading and File blocks.
+		await pageUtils.pressKeys( 'shift+ArrowUp' );
+		await pageUtils.pressKeys( 'primary+g' );
+		await expect
+			.poll( listViewUtils.getBlocksWithA11yAttributes )
+			.toMatchObject( [
+				{ name: 'core/paragraph', selected: false, focused: false },
+				{
+					name: 'core/group',
+					selected: true,
+					focused: true,
+					innerBlocks: [
+						{
+							name: 'core/heading',
+							selected: false,
+							focused: false,
+						},
+						{
+							name: 'core/file',
+							selected: false,
+							focused: false,
+						},
+					],
+				},
+			] );
+	} );
+
 	test( 'block settings dropdown menu', async ( {
 		editor,
 		page,

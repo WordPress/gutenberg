@@ -6,22 +6,20 @@ import * as interfaceApis from '@wordpress/interface';
 /**
  * Internal dependencies
  */
-import CollapsableBlockToolbar from './components/collapsible-block-toolbar';
-import EditorCanvas from './components/editor-canvas';
 import { ExperimentalEditorProvider } from './components/provider';
 import { lock } from './lock-unlock';
 import { EntitiesSavedStatesExtensible } from './components/entities-saved-states';
 import useAutoSwitchEditorSidebars from './components/provider/use-auto-switch-editor-sidebars';
 import useBlockEditorSettings from './components/provider/use-block-editor-settings';
-import DocumentTools from './components/document-tools';
+import BackButton from './components/header/back-button';
+import EditorInterface from './components/editor-interface';
+import Header from './components/header';
+import CreateTemplatePartModal from './components/create-template-part-modal';
 import InserterSidebar from './components/inserter-sidebar';
 import ListViewSidebar from './components/list-view-sidebar';
-import MoreMenu from './components/more-menu';
 import PatternOverridesPanel from './components/pattern-overrides-panel';
 import PluginPostExcerpt from './components/post-excerpt/plugin';
 import PostPanelRow from './components/post-panel-row';
-import PostViewLink from './components/post-view-link';
-import PreviewDropdown from './components/preview-dropdown';
 import PreferencesModal from './components/preferences-modal';
 import PostActions from './components/post-actions';
 import { usePostActions } from './components/post-actions/actions';
@@ -30,29 +28,36 @@ import PostStatus from './components/post-status';
 import ToolsMoreMenuGroup from './components/more-menu/tools-more-menu-group';
 import ViewMoreMenuGroup from './components/more-menu/view-more-menu-group';
 import { PrivatePostExcerptPanel } from './components/post-excerpt/panel';
-import PostPublishButtonOrToggle from './components/post-publish-button/post-publish-button-or-toggle';
 import SavePublishPanels from './components/save-publish-panels';
 import PostContentInformation from './components/post-content-information';
 import PostLastEditedPanel from './components/post-last-edited-panel';
+import ResizableEditor from './components/resizable-editor';
+import Sidebar from './components/sidebar';
+import TextEditor from './components/text-editor';
+import VisualEditor from './components/visual-editor';
+import {
+	mergeBaseAndUserConfigs,
+	GlobalStylesProvider,
+} from './components/global-styles-provider';
 
 const { store: interfaceStore, ...remainingInterfaceApis } = interfaceApis;
 
 export const privateApis = {};
 lock( privateApis, {
-	CollapsableBlockToolbar,
-	DocumentTools,
-	EditorCanvas,
+	CreateTemplatePartModal,
+	BackButton,
 	ExperimentalEditorProvider,
 	EntitiesSavedStatesExtensible,
+	GlobalStylesProvider,
+	EditorInterface,
+	Header,
 	InserterSidebar,
 	ListViewSidebar,
-	MoreMenu,
+	mergeBaseAndUserConfigs,
 	PatternOverridesPanel,
 	PluginPostExcerpt,
 	PostActions,
 	PostPanelRow,
-	PostViewLink,
-	PreviewDropdown,
 	PreferencesModal,
 	usePostActions,
 	PostCardPanel,
@@ -60,10 +65,13 @@ lock( privateApis, {
 	ToolsMoreMenuGroup,
 	ViewMoreMenuGroup,
 	PrivatePostExcerptPanel,
-	PostPublishButtonOrToggle,
 	SavePublishPanels,
 	PostContentInformation,
 	PostLastEditedPanel,
+	ResizableEditor,
+	Sidebar,
+	TextEditor,
+	VisualEditor,
 
 	// This is a temporary private API while we're updating the site editor to use EditorProvider.
 	useAutoSwitchEditorSidebars,

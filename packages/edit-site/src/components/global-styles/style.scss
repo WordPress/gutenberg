@@ -7,7 +7,6 @@
 }
 
 .edit-site-global-styles-preview__iframe {
-	border-radius: $radius-block-ui + 1px; // Visually resembles the $radius-block-ui.
 	max-width: 100%;
 	display: block;
 	width: 100%;
@@ -59,10 +58,6 @@
 	row-gap: calc(#{$grid-unit-05} * 3);
 }
 
-.edit-site-global-styles-screen-colors__palette-count {
-	color: $gray-700;
-}
-
 .edit-site-global-styles-header__description {
 	padding: 0 $grid-unit-20;
 }
@@ -104,12 +99,66 @@
 	flex-shrink: 0;
 }
 
+.edit-site-global-styles__shadows-panel__title,
+.edit-site-global-styles__shadows-panel__options-container {
+	height: $grid-unit * 3;
+}
+
 .edit-site-global-styles__block-preview-panel {
 	position: relative;
 	width: 100%;
 	overflow: auto;
 	border: $gray-200 $border-width solid;
 	border-radius: $radius-block-ui;
+}
+
+.edit-site-global-styles__shadow-preview-panel {
+	height: 150px;
+	border: $gray-200 $border-width solid;
+	border-radius: $radius-block-ui;
+	overflow: auto;
+	background-image: repeating-linear-gradient(45deg, #f5f5f5 25%, #0000 0, #0000 75%, #f5f5f5 0, #f5f5f5), repeating-linear-gradient(45deg, #f5f5f5 25%, #0000 0, #0000 75%, #f5f5f5 0, #f5f5f5);
+	background-position: 0 0, 8px 8px;
+	background-size: 16px 16px;
+
+	.edit-site-global-styles__shadow-preview-block {
+		border: $gray-200 $border-width solid;
+		border-radius: $radius-block-ui;
+		background-color: $white;
+		width: 60%;
+		height: 60px;
+	}
+}
+
+.edit-site-global-styles__shadow-editor-panel {
+	width: 280px;
+	padding: $grid-unit-20;
+	// because tooltip of the range control is too close to the edge and creates overflow
+	margin-bottom: $grid-unit-05;
+
+	& .edit-site-global-styles__shadow-editor-color-palette {
+		// color palette adds empty .components-circular-option-picker
+		margin-bottom: -1 * $grid-unit-05;
+	}
+}
+
+.edit-site-global-styles__shadow-editor__dropdown {
+	width: 100%;
+
+	.edit-site-global-styles__shadow-editor__dropdown-toggle,
+	.edit-site-global-styles__shadow-editor__remove-button {
+		width: 100%;
+		height: auto;
+		padding-top: $grid-unit;
+		padding-bottom: $grid-unit;
+		text-align: left;
+		border-radius: inherit;
+
+		&.is-open {
+			background: $gray-100;
+			color: var(--wp-admin-theme-color);
+		}
+	}
 }
 
 .edit-site-global-styles-screen-css {

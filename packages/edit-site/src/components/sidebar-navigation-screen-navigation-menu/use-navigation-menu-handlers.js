@@ -42,7 +42,7 @@ function useDeleteNavigationMenu() {
 					type: 'snackbar',
 				}
 			);
-			history.push( { path: '/navigation' } );
+			history.push( { postType: 'wp_navigation' } );
 		} catch ( error ) {
 			createErrorNotice(
 				sprintf(

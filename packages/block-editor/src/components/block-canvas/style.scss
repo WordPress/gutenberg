@@ -3,9 +3,5 @@ iframe[name="editor-canvas"] {
 	height: 100%;
 	display: block;
 	background-color: $gray-300;
-}
-
-
-iframe[name="editor-canvas"].has-editor-padding {
-	padding: $grid-unit-30 $grid-unit-30 0;
+	box-sizing: border-box;
 }

@@ -2,15 +2,16 @@
  * WordPress dependencies
  */
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { useMemo, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { mergeBaseAndUserConfigs } from '../global-styles-provider';
 import { default as GlobalStylesUIComponent } from '../ui';
 import { unlock } from '../../../lock-unlock';
 
+const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
 const { GlobalStylesContext, ExperimentalBlockEditorProvider } = unlock(
 	blockEditorPrivateApis
 );

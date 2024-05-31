@@ -410,6 +410,47 @@ describe( 'selectors', () => {
 					expect( result ).toEqual( variation );
 				} );
 			} );
+			it( 'should support nested attribute paths in the isActive array', () => {
+				const variations = [
+					{
+						name: 'variation-1',
+						attributes: {
+							firstTestAttribute: {
+								nestedProperty: 1,
+								otherNestedProperty: 5555,
+							},
+						},
+						isActive: [ 'firstTestAttribute.nestedProperty' ],
+					},
+					{
+						name: 'variation-2',
+						attributes: {
+							firstTestAttribute: {
+								nestedProperty: 2,
+								otherNestedProperty: 5555,
+							},
+						},
+						isActive: [ 'firstTestAttribute.nestedProperty' ],
+					},
+				];
+				const state =
+					createBlockVariationsStateWithTestBlockType( variations );
+
+				expect(
+					getActiveBlockVariation( state, blockName, {
+						firstTestAttribute: {
+							nestedProperty: 1,
+						},
+					} )
+				).toEqual( variations[ 0 ] );
+				expect(
+					getActiveBlockVariation( state, blockName, {
+						firstTestAttribute: {
+							nestedProperty: 2,
+						},
+					} )
+				).toEqual( variations[ 1 ] );
+			} );
 			it( 'should return the active variation based on the given isActive array (multiple values)', () => {
 				const variations = [
 					{

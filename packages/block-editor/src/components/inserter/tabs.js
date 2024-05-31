@@ -33,15 +33,15 @@ const mediaTab = {
 	title: __( 'Media' ),
 };
 
-function InserterTabs( { onSelect, children, onClose }, ref ) {
+function InserterTabs( { onSelect, children, onClose, selectedTab }, ref ) {
 	const tabs = [ blocksTab, patternsTab, mediaTab ];
 
 	return (
 		<div className="block-editor-inserter__tabs" ref={ ref }>
-			<Tabs onSelect={ onSelect }>
-				<div className="block-editor-inserter-sidebar__header">
+			<Tabs onSelect={ onSelect } selectedTabId={ selectedTab }>
+				<div className="block-editor-inserter__tablist-and-close-button">
 					<Button
-						className="block-editor-inserter-sidebar__close-button"
+						className="block-editor-inserter__close-button"
 						icon={ closeSmall }
 						label={ __( 'Close block inserter' ) }
 						onClick={ () => onClose() }

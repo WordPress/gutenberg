@@ -28,6 +28,11 @@ import useCommands from '../commands';
 import BlockRemovalWarnings from '../block-removal-warnings';
 import StartPageOptions from '../start-page-options';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
+import ContentOnlySettingsMenu from '../block-settings-menu/content-only-settings-menu';
+import StartTemplateOptions from '../start-template-options';
+import EditorKeyboardShortcuts from '../global-keyboard-shortcuts';
+import PatternRenameModal from '../pattern-rename-modal';
+import PatternDuplicateModal from '../pattern-duplicate-modal';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
@@ -54,6 +59,12 @@ const NON_CONTEXTUAL_POST_TYPES = [
  * @param {Array}   post     Block list.
  * @param {boolean} template Whether the page content has focus (and the surrounding template is inert). If `true` return page content blocks. Default `false`.
  * @param {string}  mode     Rendering mode.
+ *
+ * @example
+ * ```jsx
+ * const [ blocks, onInput, onChange ] = useBlockEditorProps( post, template, mode );
+ * ```
+ *
  * @return {Array} Block editor props.
  */
 function useBlockEditorProps( post, template, mode ) {
@@ -113,6 +124,32 @@ function useBlockEditorProps( post, template, mode ) {
 	];
 }
 
+/**
+ * This component provides the editor context and manages the state of the block editor.
+ *
+ * @param {Object}  props                                The component props.
+ * @param {Object}  props.post                           The post object.
+ * @param {Object}  props.settings                       The editor settings.
+ * @param {boolean} props.recovery                       Indicates if the editor is in recovery mode.
+ * @param {Array}   props.initialEdits                   The initial edits for the editor.
+ * @param {Object}  props.children                       The child components.
+ * @param {Object}  [props.BlockEditorProviderComponent] The block editor provider component to use. Defaults to ExperimentalBlockEditorProvider.
+ * @param {Object}  [props.__unstableTemplate]           The template object.
+ *
+ * @example
+ * ```jsx
+ * <ExperimentalEditorProvider
+ *   post={ post }
+ *   settings={ settings }
+ *   recovery={ recovery }
+ *   initialEdits={ initialEdits }
+ *   __unstableTemplate={ template }
+ * >
+ *   { children }
+ * </ExperimentalEditorProvider>
+ *
+ * @return {Object} The rendered ExperimentalEditorProvider component.
+ */
 export const ExperimentalEditorProvider = withRegistryProvider(
 	( {
 		post,
@@ -264,15 +301,20 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 							{ ! settings.__unstableIsPreviewMode && (
 								<>
 									<PatternsMenuItems />
+									<ContentOnlySettingsMenu />
 									{ mode === 'template-locked' && (
 										<DisableNonPageContentBlocks />
 									) }
 									{ type === 'wp_navigation' && (
 										<NavigationBlockEditingMode />
 									) }
+									<EditorKeyboardShortcuts />
 									<KeyboardShortcutHelpModal />
 									<BlockRemovalWarnings />
 									<StartPageOptions />
+									<StartTemplateOptions />
+									<PatternRenameModal />
+									<PatternDuplicateModal />
 								</>
 							) }
 						</BlockEditorProviderComponent>
@@ -283,6 +325,36 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 	}
 );
 
+/**
+ * This component establishes a new post editing context, and serves as the entry point for a new post editor (or post with template editor).
+ *
+ * It supports a large number of post types, including post, page, templates,
+ * custom post types, patterns, template parts.
+ *
+ * All modification and changes are performed to the `@wordpress/core-data` store.
+ *
+ * @param {Object}  props                      The component props.
+ * @param {Object}  [props.post]               The post object to edit. This is required.
+ * @param {Object}  [props.__unstableTemplate] The template object wrapper the edited post.
+ *                                             This is optional and can only be used when the post type supports templates (like posts and pages).
+ * @param {Object}  [props.settings]           The settings object to use for the editor.
+ *                                             This is optional and can be used to override the default settings.
+ * @param {Element} [props.children]           Children elements for which the BlockEditorProvider context should apply.
+ *                                             This is optional.
+ *
+ * @example
+ * ```jsx
+ * <EditorProvider
+ *   post={ post }
+ *   settings={ settings }
+ *   __unstableTemplate={ template }
+ * >
+ *   { children }
+ * </EditorProvider>
+ * ```
+ *
+ * @return {JSX.Element} The rendered EditorProvider component.
+ */
 export function EditorProvider( props ) {
 	return (
 		<ExperimentalEditorProvider
