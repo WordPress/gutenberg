@@ -4,8 +4,6 @@
 import { __, _x } from '@wordpress/i18n';
 import { useMemo, useEffect, forwardRef } from '@wordpress/element';
 import { useAsyncList } from '@wordpress/compose';
-import { getBlockType } from '@wordpress/blocks';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -16,7 +14,6 @@ import useBlockTypesState from './hooks/use-block-types-state';
 import InserterListbox from '../inserter-listbox';
 import { orderBy } from '../../utils/sorting';
 import InserterNoResults from './no-results';
-import { store as blockEditorStore } from '../../store';
 
 const getBlockNamespace = ( item ) => item.name.split( '/' )[ 0 ];
 
@@ -170,12 +167,6 @@ export function BlockTypesTab(
 		rootClientId,
 		onInsert
 	);
-	const rootBlockName = useSelect(
-		( select ) => {
-			return select( blockEditorStore ).getBlockName( rootClientId );
-		},
-		[ rootClientId ]
-	);
 
 	if ( ! items.length ) {
 		return <InserterNoResults />;
@@ -185,6 +176,11 @@ export function BlockTypesTab(
 	const itemsRemaining = [];
 
 	for ( const item of items ) {
+		// Skip reusable blocks, they moved to the patterns tab.
+		if ( item.category === 'reusable' ) {
+			continue;
+		}
+
 		if ( rootClientId && item.rootClientId === rootClientId ) {
 			itemsForCurrentRoot.push( item );
 		} else {
@@ -197,15 +193,6 @@ export function BlockTypesTab(
 			<div ref={ ref }>
 				{ !! itemsForCurrentRoot.length && (
 					<>
-						<div
-							className="block-editor-inserter__panel-header"
-							style={ { display: 'block' } }
-						>
-							<h2 className="block-editor-inserter__panel-title">
-								{ __( 'Can be inserted into ' ) +
-									getBlockType( rootBlockName )?.title }
-							</h2>
-						</div>
 						<BlockTypesTabPanel
 							items={ itemsForCurrentRoot }
 							categories={ categories }
