@@ -111,7 +111,7 @@ export default function ChildLayoutControl( {
 				>
 					<ToggleGroupControl
 						__nextHasNoMarginBottom
-						size={ '__unstable-large' }
+						size="__unstable-large"
 						label={ childLayoutOrientation( parentLayout ) }
 						value={ selfStretch || 'fit' }
 						help={ helpText( selfStretch, parentLayout ) }
@@ -126,24 +126,24 @@ export default function ChildLayoutControl( {
 						isBlock
 					>
 						<ToggleGroupControlOption
-							key={ 'fit' }
-							value={ 'fit' }
+							key="fit"
+							value="fit"
 							label={ __( 'Fit' ) }
 						/>
 						<ToggleGroupControlOption
-							key={ 'fill' }
-							value={ 'fill' }
+							key="fill"
+							value="fill"
 							label={ __( 'Fill' ) }
 						/>
 						<ToggleGroupControlOption
-							key={ 'fixed' }
-							value={ 'fixed' }
+							key="fixed"
+							value="fixed"
 							label={ __( 'Fixed' ) }
 						/>
 					</ToggleGroupControl>
 					{ selfStretch === 'fixed' && (
 						<UnitControl
-							size={ '__unstable-large' }
+							size="__unstable-large"
 							onChange={ ( value ) => {
 								onChange( {
 									selfStretch,
@@ -166,7 +166,7 @@ export default function ChildLayoutControl( {
 						panelId={ panelId }
 					>
 						<InputControl
-							size={ '__unstable-large' }
+							size="__unstable-large"
 							label={ __( 'Column span' ) }
 							type="number"
 							onChange={ ( value ) => {
@@ -181,7 +181,7 @@ export default function ChildLayoutControl( {
 							min={ 1 }
 						/>
 						<InputControl
-							size={ '__unstable-large' }
+							size="__unstable-large"
 							label={ __( 'Row span' ) }
 							type="number"
 							onChange={ ( value ) => {
@@ -210,7 +210,7 @@ export default function ChildLayoutControl( {
 						>
 							<FlexItem style={ { width: '50%' } }>
 								<InputControl
-									size={ '__unstable-large' }
+									size="__unstable-large"
 									label={ __( 'Column' ) }
 									type="number"
 									onChange={ ( value ) => {
@@ -234,7 +234,7 @@ export default function ChildLayoutControl( {
 							</FlexItem>
 							<FlexItem style={ { width: '50%' } }>
 								<InputControl
-									size={ '__unstable-large' }
+									size="__unstable-large"
 									label={ __( 'Row' ) }
 									type="number"
 									onChange={ ( value ) => {
