@@ -3859,6 +3859,7 @@ class WP_Theme_JSON_Gutenberg {
 		foreach ( $incoming as $item ) {
 			$merged[ $item['slug'] ] = $item;
 		}
+		ksort( $merged, SORT_NUMERIC );
 		return array_values( $merged );
 	}
 
