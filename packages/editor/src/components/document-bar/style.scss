@@ -1,6 +1,7 @@
 // The height (4px greater than compact buttons) is to create room for focus rings of contained buttons.
 $bar-height: $button-size-compact + $grid-unit-05;
 $bar-content-inset: ( $bar-height - $button-size-compact ) * 0.5;
+$back-button-width-fallback: 74px;
 
 .editor-document-bar {
 	display: flex;
@@ -31,6 +32,12 @@ $bar-content-inset: ( $bar-height - $button-size-compact ) * 0.5;
 	flex-grow: 1;
 	max-width: 100%;
 
+	.has-back-button.editor-document-bar & {
+		// Prevents transitory overflow during animation by limiting the width
+		// to 100% minus the back button width plus the gap.
+		max-width: calc(100% - (#{$bar-content-inset} + var(--back-button-width, #{$back-button-width-fallback})));
+	}
+
 	button {
 		max-width: 100%;
 		position: absolute;
@@ -54,14 +61,14 @@ $bar-content-inset: ( $bar-height - $button-size-compact ) * 0.5;
 	@include break-medium() {
 		// Offsets by the width of the command shortcut label plus its spacing from the side plus the gap.
 		padding-inline: $grid-unit-30 + $grid-unit-15 + $grid-unit-05;
-
-		// Offsets by the width of the back button.
-		:nth-child(2).editor-document-bar__core & {
-			padding-inline: 0 74px;
-		}
 	}
 
-	.editor-document-bar.is-global & {
+	// Offsets by the width of the back button when present.
+	.has-back-button .editor-document-bar__core & {
+		padding-inline: 0 var(--back-button-width, $back-button-width-fallback);
+	}
+
+	&.is-global {
 		color: var(--wp-block-synced-color);
 	}
 
