@@ -12,6 +12,8 @@ import {
 	sidesVertical,
 } from '@wordpress/icons';
 
+export const RANGE_CONTROL_MAX_SIZE = 8;
+
 export const ALL_SIDES = [ 'top', 'right', 'bottom', 'left' ];
 
 export const DEFAULT_VALUES = {

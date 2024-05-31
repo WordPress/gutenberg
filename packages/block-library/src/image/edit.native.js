@@ -580,7 +580,12 @@ export class ImageEdit extends Component {
 							'Describe the purpose of the image. Leave empty if decorative.'
 						) }{ ' ' }
 						<FooterMessageLink
-							href="https://www.w3.org/WAI/tutorials/images/decision-tree/"
+							href={
+								// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
+								__(
+									'https://www.w3.org/WAI/tutorials/images/decision-tree/'
+								)
+							}
 							value={ __( 'What is alt text?' ) }
 						/>
 					</>

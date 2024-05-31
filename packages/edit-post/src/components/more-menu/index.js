@@ -10,10 +10,10 @@ import { displayShortcut } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../../lock-unlock';
+import { unlock } from '../../lock-unlock';
 import ManagePatternsMenuItem from './manage-patterns-menu-item';
 import WelcomeGuideMenuItem from './welcome-guide-menu-item';
-import EditPostPreferencesModal from '../../preferences-modal';
+import EditPostPreferencesModal from '../preferences-modal';
 
 const { ToolsMoreMenuGroup, ViewMoreMenuGroup } = unlock( editorPrivateApis );
 
