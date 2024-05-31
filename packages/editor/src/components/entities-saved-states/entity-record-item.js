@@ -61,7 +61,7 @@ export default function EntityRecordItem( { record, checked, onChange } ) {
 			</PanelRow>
 			{ hasPostMetaChanges && (
 				<PanelRow>
-					<Flex className="entities-saved-states__block-bindings">
+					<Flex className="entities-saved-states__post-meta">
 						<Icon
 							className="entities-saved-states__connections-icon"
 							icon={ connection }
