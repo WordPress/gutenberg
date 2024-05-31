@@ -89,7 +89,5 @@ export default {
 				},
 			} );
 	},
-	lockAttributesEditing() {
-		return false;
-	},
+	canUserEditValue: () => true,
 };
