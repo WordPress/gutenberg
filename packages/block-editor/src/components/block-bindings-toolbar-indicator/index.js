@@ -85,7 +85,7 @@ export default function BlockBindingsToolbarIndicator( { clientIds } ) {
 			? sprintf(
 					/* translators: %1s: The block type's name; %2s: The block's user-provided name. */
 					__( 'This %1$s is editable using the "%2$s" override.' ),
-					firstBlockTitle,
+					firstBlockTitle.toLowerCase(),
 					firstBlockName
 			  )
 			: __( 'These blocks are editable using overrides.' );
