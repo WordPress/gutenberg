@@ -168,7 +168,7 @@ export function PrivateBlockToolbar( {
 					isLargeViewport &&
 					isDefaultEditingMode && <BlockParentSelector /> }
 				{ isUsingBindings && canBindBlock( blockName ) && (
-					<BlockBindingsIndicator />
+					<BlockBindingsIndicator clientIds={ blockClientIds } />
 				) }
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) &&
 					( isDefaultEditingMode || isSynced ) && (
