@@ -598,10 +598,14 @@ export const saveEntityRecord =
 							return acc;
 						},
 						{
+							// Do not update the `status` if we have edited it when auto saving.
+							// It's very important to let the user explicitly save this change,
+							// because it can lead to unexpected results. An example would be to
+							// have a draft post and change the status to publish.
 							status:
 								data.status === 'auto-draft'
 									? 'draft'
-									: data.status,
+									: undefined,
 						}
 					);
 					updatedRecord = await __unstableFetch( {
