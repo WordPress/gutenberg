@@ -78,26 +78,28 @@ function render_block_core_media_text( $attributes, $content ) {
 		);
 
 		$image_tag_processor = new WP_HTML_Tag_Processor( $content );
-		$image_tag_processor->next_tag(
+		if ( $image_tag_processor->next_tag(
 			array(
 				'tag_name' => 'figure',
 				'id'       => $unique_id,
-			)
-		);
-		// The ID is only used to ensure that the correct figure tag is selected,
-		// and can now be removed.
-		$image_tag_processor->remove_attribute( 'id' );
-		$image_tag_processor->next_tag(
-			array(
-				'tag_name'   => 'img',
-				'class_name' => 'wp-block-media-text__featured_image',
-			)
-		);
-		$image_tag_processor->set_attribute( 'src', esc_url( $current_featured_image ) );
-		$image_tag_processor->set_attribute( 'class', 'wp-image-' . get_post_thumbnail_id() . ' size-' . $media_size_slug );
-		$image_tag_processor->set_attribute( 'alt', trim( strip_tags( get_post_meta( get_post_thumbnail_id(), '_wp_attachment_image_alt', true ) ) ) );
-
-		$content = $image_tag_processor->get_updated_html();
+			) )
+		) {
+			// The ID is only used to ensure that the correct figure tag is selected,
+			// and can now be removed.
+			$image_tag_processor->remove_attribute( 'id' );
+			if ( $image_tag_processor->next_tag(
+				array(
+					'tag_name'   => 'img',
+					'class_name' => 'wp-block-media-text__featured_image',
+				)
+			) ) {
+				$image_tag_processor->set_attribute( 'src', esc_url( $current_featured_image ) );
+				$image_tag_processor->set_attribute( 'class', 'wp-image-' . get_post_thumbnail_id() . ' size-' . $media_size_slug );
+				$image_tag_processor->set_attribute( 'alt', trim( strip_tags( get_post_meta( get_post_thumbnail_id(), '_wp_attachment_image_alt', true ) ) ) );
+		
+				$content = $image_tag_processor->get_updated_html();
+			}
+		}
 	}
 
 	return $content;
