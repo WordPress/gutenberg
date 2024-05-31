@@ -205,7 +205,7 @@ function gutenberg_dequeue_module( $module_identifier ) {
  * This embeds data in the page HTML so that it is available on page load.
  *
  * Data can be associated with a given Script Module by using the
- * `scriptmoduledata_{$module_id}` filter.
+ * `script_module_data_{$module_id}` filter.
  *
  * The data for a given Script Module will be JSON serialized in a script tag with an ID
  * like `wp-scriptmodule-data_{$module_id}`.
@@ -243,7 +243,7 @@ function gutenberg_print_script_module_data(): void {
 		 *
 		 * @param array $data The data that should be associated with the array.
 		 */
-		$data = apply_filters( "scriptmoduledata_{$module_id}", array() );
+		$data = apply_filters( "script_module_data_{$module_id}", array() );
 
 		if ( is_array( $data ) && ! empty( $data ) ) {
 			/*
