@@ -85,41 +85,6 @@ function render_block_core_block( $attributes ) {
 			return $context;
 		};
 		add_filter( 'render_block_context', $filter_block_context, 1 );
-
-		// Add bindings for the default pattern overrides source.
-		$apply_default_pattern_overrides_bindings = static function ( $parsed_block ) {
-			$supported_block_attrs = array(
-				'core/paragraph' => array( 'content' ),
-				'core/heading'   => array( 'content' ),
-				'core/image'     => array( 'id', 'url', 'title', 'alt' ),
-				'core/button'    => array( 'url', 'text', 'linkTarget', 'rel' ),
-			);
-
-			if (
-				// Return early if the block isn't one of the supported block types,
-				! isset( $supported_block_attrs[ $parsed_block['blockName'] ] ) ||
-				// or doesn't have a name,
-				! isset( $parsed_block['attrs']['metadata']['name'] ) ||
-				// or doesn't have the default binding.
-				empty( $parsed_block['attrs']['metadata']['bindings']['__default'] ) ||
-				// or the default binding isn't the pattern overrides source.
-				'core/pattern-overrides' !== $parsed_block['attrs']['metadata']['bindings']['__default']['source']
-			) {
-				return $parsed_block;
-			}
-
-			$bindings = array();
-			foreach ( $supported_block_attrs[ $parsed_block['blockName'] ] as $attribute_name ) {
-				$bindings[ $attribute_name ] = array( 'source' => 'core/pattern-overrides' );
-			}
-			$parsed_block['attrs']['metadata']['bindings'] = array_merge(
-				$bindings,
-				$parsed_block['attrs']['metadata']['bindings']
-			);
-
-			return $parsed_block;
-		};
-		add_filter( 'render_block_data', $apply_default_pattern_overrides_bindings );
 	}
 
 	$content = do_blocks( $content );
@@ -127,7 +92,6 @@ function render_block_core_block( $attributes ) {
 
 	if ( $has_pattern_overrides ) {
 		remove_filter( 'render_block_context', $filter_block_context, 1 );
-		remove_filter( 'render_block_data', $apply_default_pattern_overrides_bindings );
 	}
 
 	return $content;
