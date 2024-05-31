@@ -13,6 +13,8 @@ const islandAttr = `data-${ p }-interactive`;
 const fullPrefix = `data-${ p }-`;
 const namespaces: Array< string | null > = [];
 const currentNamespace = () => namespaces[ namespaces.length - 1 ] ?? null;
+const isObject = ( item: unknown ): item is Record< string, unknown > =>
+	Boolean( item && typeof item === 'object' && item.constructor === Object );
 
 // Regular expression for directive parsing.
 const directiveParser = new RegExp(
@@ -100,8 +102,9 @@ export function toVdom( root: Node ): Array< ComponentChild > {
 					const namespace = regexResult?.[ 1 ] ?? null;
 					let value: any = regexResult?.[ 2 ] ?? attributeValue;
 					try {
-						value = value && JSON.parse( value );
-					} catch ( e ) {}
+						const parsedValue = JSON.parse( value );
+						value = isObject( parsedValue ) ? parsedValue : value;
+					} catch {}
 					if ( attributeName === islandAttr ) {
 						island = true;
 						const islandNamespace =

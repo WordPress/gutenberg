@@ -9,7 +9,7 @@ export default function BlockBindingsToolbarIndicator() {
 	return (
 		<ToolbarGroup>
 			<ToolbarItem
-				as={ 'div' }
+				as="div"
 				aria-label={ _x( 'Connected', 'block toolbar button label' ) }
 				className="block-editor-block-bindings-toolbar-indicator"
 			>

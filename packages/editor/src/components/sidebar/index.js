@@ -26,7 +26,6 @@ import PageAttributesPanel from '../page-attributes/panel';
 import PatternOverridesPanel from '../pattern-overrides-panel';
 import PluginDocumentSettingPanel from '../plugin-document-setting-panel';
 import PluginSidebar from '../plugin-sidebar';
-import PostLastRevisionPanel from '../post-last-revision/panel';
 import PostSummary from './post-summary';
 import PostTaxonomiesPanel from '../post-taxonomies/panel';
 import PostTransformPanel from '../post-transform-panel';
@@ -117,7 +116,6 @@ const SidebarContent = ( {
 						<TemplateContentPanel />
 					) }
 					<PostTransformPanel />
-					<PostLastRevisionPanel />
 					<PostTaxonomiesPanel />
 					<PageAttributesPanel />
 					<PatternOverridesPanel />
