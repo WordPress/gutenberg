@@ -21,6 +21,10 @@
 		opacity: 0;
 		transform: scale(0.9);
 	}
+	50% {
+		opacity: 0;
+		transform: scale(0.9);
+	}
 	100% {
 		opacity: 1;
 		transform: scale(1);
@@ -29,6 +33,10 @@
 
 @keyframes scaleOut {
 	0% {
+		opacity: 1;
+		transform: scale(1);
+	}
+	50% {
 		opacity: 1;
 		transform: scale(1);
 	}
@@ -46,6 +54,7 @@
 	animation: fadeOut 0.2s forwards;
 }
 
+/* Ensure the inner animation starts after a delay, matching the outer animation length */
 .fade-enter .components-drop-zone__content-inner {
 	animation: scaleIn 0.2s forwards;
 }
