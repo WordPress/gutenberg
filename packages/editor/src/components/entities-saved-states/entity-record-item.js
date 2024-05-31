@@ -25,7 +25,7 @@ export default function EntityRecordItem( { record, checked, onChange } ) {
 					entityRecordTitle: title,
 					hasPostMetaChanges: unlock(
 						select( editorStore )
-					).hasPostMetaChanges(),
+					).hasPostMetaChanges( name, key ),
 				};
 			}
 
@@ -41,7 +41,7 @@ export default function EntityRecordItem( { record, checked, onChange } ) {
 					).title,
 				hasPostMetaChanges: unlock(
 					select( editorStore )
-				).hasPostMetaChanges(),
+				).hasPostMetaChanges( name, key ),
 			};
 		},
 		[ name, kind, title, key ]
@@ -61,7 +61,7 @@ export default function EntityRecordItem( { record, checked, onChange } ) {
 			</PanelRow>
 			{ hasPostMetaChanges && (
 				<PanelRow>
-					<Flex className="entities-saved-states__post-meta">
+					<Flex className="entities-saved-states__block-bindings">
 						<Icon
 							className="entities-saved-states__connections-icon"
 							icon={ connection }

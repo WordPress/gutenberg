@@ -141,17 +141,21 @@ export const getCurrentTemplateTemplateParts = createRegistrySelector(
  * Returns true if there are unsaved changes to the
  * post's meta fields, and false otherwise.
  *
- * @param {Object} state Global application state.
+ * @param {Object} state    Global application state.
+ * @param {string} postType The post type of the post.
+ * @param {number} postId   The ID of the post.
  *
- * @return {boolean} Whether there are edits or not in the meta fields.
+ * @return {boolean} Whether there are edits or not in the meta fields of the relevant post.
  */
 export const hasPostMetaChanges = createRegistrySelector(
-	( select ) => ( state ) => {
-		const { type, id } = getCurrentPost( state );
+	( select ) => ( state, postType, postId ) => {
+		const { type: currentPostType, id: currentPostId } =
+			getCurrentPost( state );
+		// If no postType or postId is passed, use the current post.
 		const edits = select( coreStore ).getEntityRecordNonTransientEdits(
 			'postType',
-			type,
-			id
+			postType || currentPostType,
+			postId || currentPostId
 		);
 		return !! edits?.meta;
 	}
