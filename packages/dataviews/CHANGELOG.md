@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.0.0 (2024-05-31)
+
 ### Breaking Changes
 
 -   Legacy support for `in` and `notIn` operators introduced in 0.8 .0 has been removed and they no longer work. Please, convert them to `is` and `isNot` respectively.

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 6.0.0 (2024-05-31)
+
 ### New Features
 
 -   Introduce `wp-on-async` directive as performant alternative over synchronous `wp-on` directive. ([#61885](https://github.com/WordPress/gutenberg/pull/61885))
