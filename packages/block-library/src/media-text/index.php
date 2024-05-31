@@ -34,6 +34,7 @@ function render_block_core_media_text( $attributes, $content ) {
 	$focal_point           = isset( $attributes['focalPoint'] ) ? round( $attributes['focalPoint']['x'] * 100 ) . '% ' . round( $attributes['focalPoint']['y'] * 100 ) . '%' : '50% 50%';
 	$media_size_slug       = isset( $attributes['mediaSizeSlug'] ) ? $attributes['mediaSizeSlug'] : 'full';
 	$unique_id             = 'wp-block-media-text__media-' . wp_unique_id();
+	$image_tag             = '<img class="wp-block-media-text__featured_image">';
 	$media_tag_processor   = new WP_HTML_Tag_Processor( $content );
 	$wrapping_figure_query = array(
 		'tag_name'   => 'figure',
@@ -72,7 +73,7 @@ function render_block_core_media_text( $attributes, $content ) {
 	if ( ! $image_fill ) {
 		$content = preg_replace(
 			'/(<figure\s+id="' . preg_quote( $unique_id, '/' ) . '"\s+class="wp-block-media-text__media"\s*>)/',
-			'$1<img>',
+			'$1' . $image_tag,
 			$content
 		);
 
@@ -89,6 +90,7 @@ function render_block_core_media_text( $attributes, $content ) {
 		$image_tag_processor->next_tag(
 			array(
 				'tag_name'   => 'img',
+				'class_name' => 'wp-block-media-text__featured_image',
 			)
 		);
 		$image_tag_processor->set_attribute( 'src', esc_url( $current_featured_image ) );
