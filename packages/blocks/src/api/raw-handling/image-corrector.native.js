@@ -10,7 +10,8 @@ export default function imageCorrector( node ) {
 		return;
 	}
 
-	if ( node.src.indexOf( 'file:' ) === 0 ) {
+	// For local files makes sure the extension is a valid one, if not it removes the path.
+	if ( node.src.startsWith( 'file:' ) && node.src.slice( -1 ) === '/' ) {
 		node.setAttribute( 'src', '' );
 	}
 
