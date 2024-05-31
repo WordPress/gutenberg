@@ -60,6 +60,7 @@ const VALID_SETTINGS = [
 	'position.fixed',
 	'position.sticky',
 	'spacing.customSpacingSize',
+	'spacing.defaultSpacingSizes',
 	'spacing.spacingSizes',
 	'spacing.spacingScale',
 	'spacing.blockGap',

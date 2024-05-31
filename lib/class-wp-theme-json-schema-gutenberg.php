@@ -131,7 +131,7 @@ class WP_Theme_JSON_Schema_Gutenberg {
 		 * affect the generated CSS. And in v2 we provided default font sizes
 		 * when the theme did not provide any.
 		 */
-		if ( isset( $new['settings']['typography']['fontSizes'] ) ) {
+		if ( isset( $old['settings']['typography']['fontSizes'] ) ) {
 			if ( ! isset( $new['settings'] ) ) {
 				$new['settings'] = array();
 			}
@@ -139,6 +139,38 @@ class WP_Theme_JSON_Schema_Gutenberg {
 				$new['settings']['typography'] = array();
 			}
 			$new['settings']['typography']['defaultFontSizes'] = false;
+		}
+
+		/*
+		 * Similarly to defaultFontSizes, we need to migrate defaultSpacingSizes
+		 * as it controls the PRESETS_METADATA prevent_override which was
+		 * previously hardcoded to false. This only needs to happen when the
+		 * theme provided spacing sizes via spacingSizes or spacingScale.
+		 */
+		if (
+			isset( $old['settings']['spacing']['spacingSizes'] ) ||
+			isset( $old['settings']['spacing']['spacingScale'] )
+		) {
+			if ( ! isset( $new['settings'] ) ) {
+				$new['settings'] = array();
+			}
+			if ( ! isset( $new['settings']['spacing'] ) ) {
+				$new['settings']['spacing'] = array();
+			}
+			$new['settings']['spacing']['defaultSpacingSizes'] = false;
+		}
+
+		/*
+		 * In v3 spacingSizes is merged with the generated spacingScale sizes
+		 * instead of completely replacing them. The v3 behavior is what was
+		 * documented for the v2 schema, but the code never actually did work
+		 * that way. Instead of surprising users with a behavior change two
+		 * years after the fact at the same time as a v3 update is introduced,
+		 * we'll continue using the "bugged" behavior for v2 themes. And treat
+		 * the "bug fix" as a breaking change for v3.
+		 */
+		if ( isset( $old['settings']['spacing']['spacingSizes'] ) ) {
+			unset( $new['settings']['spacing']['spacingScale'] );
 		}
 
 		return $new;

@@ -42,6 +42,7 @@ import { PrivateRichText } from './components/rich-text/';
 import { PrivateBlockPopover } from './components/block-popover';
 import { PrivateInserterLibrary } from './components/inserter/library';
 import { PrivatePublishDateTimePicker } from './components/publish-date-time-picker';
+import useSpacingSizes from './components/spacing-sizes-control/hooks/use-spacing-sizes';
 
 /**
  * Private @wordpress/block-editor APIs.
@@ -84,4 +85,5 @@ lock( privateApis, {
 	reusableBlocksSelectKey,
 	PrivateBlockPopover,
 	PrivatePublishDateTimePicker,
+	useSpacingSizes,
 } );
