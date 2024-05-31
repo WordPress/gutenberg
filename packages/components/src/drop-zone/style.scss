@@ -54,17 +54,6 @@
 	animation: scaleOut 0.2s forwards;
 }
 
-/* Ensure end state after animation */
-.fade-enter,
-.fade-exit {
-	animation-fill-mode: forwards;
-}
-
-.fade-enter .components-drop-zone__content-inner,
-.fade-exit .components-drop-zone__content-inner {
-	animation-fill-mode: forwards;
-}
-
 .components-drop-zone {
 	position: absolute;
 	top: 0;
