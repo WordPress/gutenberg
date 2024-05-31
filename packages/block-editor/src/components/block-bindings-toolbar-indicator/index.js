@@ -3,7 +3,12 @@
  */
 import { useId } from '@wordpress/element';
 import { __, sprintf, _x } from '@wordpress/i18n';
-import { DropdownMenu, ToolbarGroup, ToolbarItem } from '@wordpress/components';
+import {
+	DropdownMenu,
+	ToolbarGroup,
+	ToolbarItem,
+	__experimentalText as Text,
+} from '@wordpress/components';
 import { store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { copy } from '@wordpress/icons';
@@ -79,11 +84,11 @@ export default function BlockBindingsToolbarIndicator( { clientIds } ) {
 		blockDescription = isSingleBlockSelected
 			? sprintf(
 					/* translators: %1s: The block type's name; %2s: The block's user-provided name. */
-					__( 'This %1$s is using the "%2$s" override.' ),
+					__( 'This %1$s is editable using the "%2$s" override.' ),
 					firstBlockTitle,
 					firstBlockName
 			  )
-			: __( 'These blocks are using multiple overrides.' );
+			: __( 'These blocks are editable using overrides.' );
 	}
 	const descriptionId = useId();
 
@@ -118,9 +123,9 @@ export default function BlockBindingsToolbarIndicator( { clientIds } ) {
 						} }
 					>
 						{ () => (
-							<span id={ descriptionId }>
+							<Text id={ descriptionId }>
 								{ blockDescription }
-							</span>
+							</Text>
 						) }
 					</DropdownMenu>
 				) }
