@@ -80,7 +80,7 @@ describe( 'createInterpolateElement', () => {
 		);
 		const component = createInterpolateElement( testString, {
 			// eslint-disable-next-line jsx-a11y/anchor-has-content
-			a: <a href={ 'https://github.com' } className={ 'some_class' } />,
+			a: <a href="https://github.com" className="some_class" />,
 		} );
 		expect( JSON.stringify( component ) ).toEqual(
 			JSON.stringify( expectedElement )

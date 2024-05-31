@@ -145,7 +145,7 @@ export default function ShadowsEditPanel() {
 	};
 
 	return ! selectedShadow ? (
-		<ScreenHeader title={ '' } />
+		<ScreenHeader title="" />
 	) : (
 		<>
 			<HStack justify="space-between">
@@ -506,7 +506,7 @@ function ShadowInputControl( { label, value, onChange, hasNegativeRange } ) {
 	};
 
 	return (
-		<VStack justify={ 'flex-start' }>
+		<VStack justify="flex-start">
 			<HStack justify="space-between">
 				<Subtitle>{ label }</Subtitle>
 				<Button

@@ -171,7 +171,7 @@ const SocialLinkEdit = ( {
 
 			<TouchableWithoutFeedback
 				onPress={ onIconPress }
-				accessibilityRole={ 'button' }
+				accessibilityRole="button"
 				accessibilityLabel={ sprintf(
 					// translators: %s: social link name e.g: "Instagram".
 					__( '%s social icon' ),

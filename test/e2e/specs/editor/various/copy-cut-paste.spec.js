@@ -640,4 +640,41 @@ test.describe( 'Copy/cut/paste', () => {
 			},
 		] );
 	} );
+
+	// See https://github.com/WordPress/gutenberg/pull/61900
+	test( 'should inherit heading attributes on paste split', async ( {
+		pageUtils,
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/heading',
+			attributes: {
+				content: 'AB',
+			},
+		} );
+		await page.keyboard.press( 'ArrowRight' );
+
+		pageUtils.setClipboardData( {
+			html: '<p>a</p><p>b</p>',
+		} );
+		await pageUtils.pressKeys( 'primary+v' );
+
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/heading',
+				attributes: {
+					content: 'Aa',
+					level: 2,
+				},
+			},
+			{
+				name: 'core/heading',
+				attributes: {
+					content: 'bB',
+					level: 2,
+				},
+			},
+		] );
+	} );
 } );

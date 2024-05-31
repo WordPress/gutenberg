@@ -15,7 +15,6 @@ import {
 	privateApis as componentsPrivateApis,
 	CheckboxControl,
 	Spinner,
-	VisuallyHidden,
 } from '@wordpress/components';
 import {
 	forwardRef,
@@ -50,8 +49,8 @@ import type {
 	AnyItem,
 	NormalizedField,
 	SortDirection,
-	ViewProps,
 	ViewTable as ViewTableType,
+	ViewTableProps,
 } from './types';
 
 const {
@@ -90,9 +89,6 @@ interface TableRowProps< Item extends AnyItem > {
 	onSelectionChange: ( items: Item[] ) => void;
 	data: Item[];
 }
-
-interface ViewTableProps< Item extends AnyItem >
-	extends ViewProps< Item, ViewTableType > {}
 
 function WithDropDownMenuSeparators( { children }: { children: ReactNode } ) {
 	return Children.toArray( children )
@@ -552,9 +548,9 @@ function ViewTable< Item extends AnyItem >( {
 								data-field-id="actions"
 								className="dataviews-view-table__actions-column"
 							>
-								<VisuallyHidden>
+								<span className="dataviews-view-table-header">
 									{ __( 'Actions' ) }
-								</VisuallyHidden>
+								</span>
 							</th>
 						) }
 					</tr>

@@ -40,6 +40,9 @@ import {
 import { requiresWrapperOnCopy } from './components/writing-flow/utils';
 import { PrivateRichText } from './components/rich-text/';
 import { PrivateBlockPopover } from './components/block-popover';
+import { PrivateInserterLibrary } from './components/inserter/library';
+import { PrivatePublishDateTimePicker } from './components/publish-date-time-picker';
+import useSpacingSizes from './components/spacing-sizes-control/hooks/use-spacing-sizes';
 
 /**
  * Private @wordpress/block-editor APIs.
@@ -78,6 +81,9 @@ lock( privateApis, {
 	selectBlockPatternsKey,
 	requiresWrapperOnCopy,
 	PrivateRichText,
+	PrivateInserterLibrary,
 	reusableBlocksSelectKey,
 	PrivateBlockPopover,
+	PrivatePublishDateTimePicker,
+	useSpacingSizes,
 } );

@@ -31,20 +31,23 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 	}, [] );
 
 	return (
-		<EditorHeader
-			setEntitiesSavedStatesCallback={ setEntitiesSavedStatesCallback }
-			customSaveButton={
-				_isPreviewingTheme && <SaveButton size="compact" />
-			}
-			forceDisableBlockTools={ ! hasDefaultEditorCanvasView }
-			title={
-				! hasDefaultEditorCanvasView
-					? getEditorCanvasContainerTitle( editorCanvasView )
-					: undefined
-			}
-		>
+		<>
+			<EditorHeader
+				setEntitiesSavedStatesCallback={
+					setEntitiesSavedStatesCallback
+				}
+				customSaveButton={
+					_isPreviewingTheme && <SaveButton size="compact" />
+				}
+				forceDisableBlockTools={ ! hasDefaultEditorCanvasView }
+				title={
+					! hasDefaultEditorCanvasView
+						? getEditorCanvasContainerTitle( editorCanvasView )
+						: undefined
+				}
+			/>
 			<SiteEditorMoreMenu />
-		</EditorHeader>
+		</>
 	);
 }
 

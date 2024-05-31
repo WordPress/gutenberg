@@ -45,7 +45,7 @@ function InserterMenu(
 		showMostUsedBlocks,
 		__experimentalFilterValue = '',
 		shouldFocusBlock = true,
-		__experimentalOnPatternCategorySelection = NOOP,
+		onPatternCategorySelection,
 		onClose,
 		__experimentalInitialTab,
 		__experimentalInitialCategory,
@@ -128,9 +128,9 @@ function InserterMenu(
 		( patternCategory, filter ) => {
 			setSelectedPatternCategory( patternCategory );
 			setPatternFilter( filter );
-			__experimentalOnPatternCategorySelection();
+			onPatternCategorySelection?.();
 		},
-		[ setSelectedPatternCategory, __experimentalOnPatternCategorySelection ]
+		[ setSelectedPatternCategory, onPatternCategorySelection ]
 	);
 
 	const showPatternPanel =
@@ -341,4 +341,16 @@ function InserterMenu(
 	);
 }
 
-export default forwardRef( InserterMenu );
+export const PrivateInserterMenu = forwardRef( InserterMenu );
+
+function PublicInserterMenu( props, ref ) {
+	return (
+		<PrivateInserterMenu
+			{ ...props }
+			onPatternCategorySelection={ NOOP }
+			ref={ ref }
+		/>
+	);
+}
+
+export default forwardRef( PublicInserterMenu );

@@ -96,6 +96,7 @@ export class PostPublishPanel extends Component {
 									disabled={ isSavingNonPostEntityChanges }
 									onClick={ onClose }
 									variant="secondary"
+									size="compact"
 								>
 									{ __( 'Cancel' ) }
 								</Button>
