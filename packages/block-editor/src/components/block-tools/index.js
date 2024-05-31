@@ -81,6 +81,7 @@ export default function BlockTools( {
 	} = useShowBlockTools();
 
 	const {
+		clearSelectedBlock,
 		duplicateBlocks,
 		removeBlocks,
 		replaceBlocks,
@@ -152,6 +153,10 @@ export default function BlockTools( {
 				// block so that focus is directed back to the beginning of the selection.
 				// In effect, to the user this feels like deselecting the multi-selection.
 				selectBlock( clientIds[ 0 ] );
+			} else if ( clientIds.length === 1 ) {
+				event.preventDefault();
+				clearSelectedBlock();
+				__unstableContentRef?.current.focus();
 			}
 		} else if ( isMatch( 'core/block-editor/collapse-list-view', event ) ) {
 			// If focus is currently within a text field, such as a rich text block or other editable field,

@@ -164,11 +164,6 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 		const isEnter = keyCode === ENTER;
 		const isSpace = keyCode === SPACE;
 		const isShift = event.shiftKey;
-		if ( isEscape && editorMode === 'navigation' ) {
-			setNavigationMode( false );
-			event.preventDefault();
-			return;
-		}
 
 		if ( keyCode === BACKSPACE || keyCode === DELETE ) {
 			removeBlock( clientId );
@@ -188,7 +183,7 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 		const navigateUp = ( isTab && isShift ) || isUp;
 		const navigateDown = ( isTab && ! isShift ) || isDown;
 		// Move out of current nesting level (no effect if at root level).
-		const navigateOut = isLeft;
+		const navigateOut = isLeft || isEscape;
 		// Move into next nesting level (no effect if the current block has no innerBlocks).
 		const navigateIn = isRight;
 

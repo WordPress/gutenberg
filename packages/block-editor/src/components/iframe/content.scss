@@ -1,5 +1,10 @@
 .block-editor-iframe__body {
 	position: relative;
+
+	&:focus {
+		outline: calc(2 * var(--wp-admin-border-width-focus)) solid var(--wp-admin-theme-color);
+		outline-offset: calc(-2 * var(--wp-admin-border-width-focus));
+	}
 }
 
 .block-editor-iframe__container {
