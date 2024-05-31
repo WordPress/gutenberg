@@ -88,8 +88,6 @@ The new `defaultFontSizes` option gives control over showing default font sizes 
 
 It is `true` by default when switching to v3. This is to be consistent with how other `default*` options work such as `settings.color.defaultPalette`, but differs from the behavior in v2.
 
-In theme.json v2, the default font sizes were only shown when theme sizes were not defined. A theme providing font sizes with the same slugs as the defaults would always override the default ones.
-
 To keep behavior similar to v2 with a v3 theme.json:
 * If you do not have any `fontSizes` defined, `defaultFontSizes` can be left out or set to `true`.
 * If you have some `fontSizes` defined, set `defaultFontSizes` to `false`.
