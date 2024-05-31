@@ -75,13 +75,13 @@
 	vertical-align: middle;
 }
 
-.wp-block-media-text.is-image-fill .wp-block-media-text__media {
+.wp-block-media-text.is-image-fill > .wp-block-media-text__media {
 	height: 100%;
 	min-height: 250px;
 	background-size: cover;
 }
 
-.wp-block-media-text.is-image-fill .wp-block-media-text__media > a {
+.wp-block-media-text.is-image-fill > .wp-block-media-text__media > a {
 	display: block;
 	height: 100%;
 }
