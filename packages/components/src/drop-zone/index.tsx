@@ -7,7 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { upload, Icon } from '@wordpress/icons';
 import { getFilesFromDataTransfer } from '@wordpress/dom';
 import {
@@ -20,23 +20,72 @@ import {
  */
 import type { DropType, DropZoneProps } from './types';
 import type { WordPressComponentProps } from '../context';
+import type { ReactNode } from 'react';
 
-function DropIndicator( { label }: { label?: string } ) {
+interface FadeProps {
+	show: boolean;
+	children: ReactNode;
+	duration?: number;
+}
+
+// Could call it Animate? Also, probably need to move out so it can be used
+// across other components. The idea is to "hook" into the mount/unmount
+// lifecycle to animate the component.
+const Fade: React.FC< FadeProps > = ( { show, children, duration } ) => {
+	const [ shouldRender, setRender ] = useState( show );
+
+	useEffect( () => {
+		if ( show ) {
+			setRender( true );
+		}
+	}, [ show ] );
+
+	const onAnimationEnd = () => {
+		if ( ! show ) {
+			setRender( false );
+		}
+	};
+
 	return (
-		<div
-			className="components-drop-zone__content"
-			style={ { pointerEvents: 'none' } }
-		>
-			<div className="components-drop-zone__content-inner">
-				<Icon
-					icon={ upload }
-					className="components-drop-zone__content-icon"
-				/>
-				<span className="components-drop-zone__content-text">
-					{ label ? label : __( 'Drop files to upload' ) }
-				</span>
+		shouldRender && (
+			<div
+				className={ show ? 'fade-enter' : 'fade-exit' }
+				style={ { animationDuration: `${ duration }ms` } }
+				onAnimationEnd={ onAnimationEnd }
+			>
+				{ children }
 			</div>
-		</div>
+		)
+	);
+};
+
+function DropIndicator( {
+	label,
+	isActive,
+}: {
+	label?: string;
+	isActive: boolean;
+} ) {
+	const disableMotion = false;
+	return (
+		<Fade show={ isActive } duration={ disableMotion ? 0 : 200 }>
+			<div
+				className={ `components-drop-zone__content ${
+					disableMotion ? 'no-motion' : ''
+				}` }
+				style={ { pointerEvents: 'none' } }
+			>
+				<div className="components-drop-zone__content-inner">
+					<Icon
+						icon={ upload }
+						className="components-drop-zone__content-icon"
+					/>
+					<span className="components-drop-zone__content-text">
+						{ label ? label : __( 'Drop files to upload' ) }
+					</span>
+				</div>
+			</div>
+		</Fade>
 	);
 }
 
@@ -132,10 +181,10 @@ export function DropZoneComponent( {
 			setIsDraggingOverElement( false );
 		},
 	} );
-	const isDraggingOver = isDraggingOverDocument || isDraggingOverElement;
+	const isDragging = isDraggingOverDocument || isDraggingOverElement;
 	const classes = clsx( 'components-drop-zone', className, {
 		'is-active':
-			isDraggingOver &&
+			isDragging &&
 			( ( type === 'file' && onFilesDrop ) ||
 				( type === 'html' && onHTMLDrop ) ||
 				( type === 'default' && onDrop ) ),
@@ -146,7 +195,10 @@ export function DropZoneComponent( {
 
 	return (
 		<div { ...restProps } ref={ ref } className={ classes }>
-			{ isDraggingOverElement && <DropIndicator label={ label } /> }
+			<DropIndicator
+				label={ label }
+				isActive={ isDraggingOverElement || false }
+			/>
 		</div>
 	);
 }

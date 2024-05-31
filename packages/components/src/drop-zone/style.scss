@@ -1,3 +1,29 @@
+@keyframes fadeIn {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+
+@keyframes fadeOut {
+	0% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+	}
+}
+
+.fade-enter {
+	animation: fadeIn 0.2s forwards;
+}
+
+.fade-exit {
+	animation: fadeOut 0.2s forwards;
+}
+
 .components-drop-zone {
 	position: absolute;
 	top: 0;
@@ -8,74 +34,43 @@
 	visibility: hidden;
 	opacity: 0;
 	border-radius: $radius-block-ui;
-	transition:
-		opacity 0.2s ease-in-out,
-		visibility 0.2s step-end;
 
 	&.is-active {
-		visibility: visible;
 		opacity: 1;
-		transition:
-			opacity 0.2s ease-in-out,
-			visibility 0s step-start;
+		visibility: visible;
 	}
+}
 
-	&__content {
-		position: absolute;
-		top: 0;
-		bottom: 0;
-		left: 0;
-		right: 0;
-		height: 100%;
-		width: 100%;
-		display: flex;
-		background-color: $components-color-accent;
-		align-items: center;
-		justify-content: center;
-		z-index: z-index(".components-drop-zone__content");
-		text-align: center;
-		color: $white;
-		opacity: 0;
-		transform: scale(0.9);
-		transition:
-			opacity 0.2s ease-in-out,
-			transform 0.2s ease-in-out;
-		transition-delay: 0.1s;
-		pointer-events: none;
+.components-drop-zone__content {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	height: 100%;
+	width: 100%;
+	display: flex;
+	background-color: $components-color-accent;
+	align-items: center;
+	justify-content: center;
+	z-index: z-index(".components-drop-zone__content");
+	text-align: center;
+	color: $white;
+}
 
-		.components-drop-zone.is-active & {
-			opacity: 1;
-			transform: scale(1);
-		}
-	}
+.components-drop-zone__content-icon,
+.components-drop-zone__content-text {
+	display: block;
+}
 
-	&__content-inner {
-		opacity: 0;
-		transform: scale(0.9);
-		transition:
-			opacity 0.1s ease-in-out,
-			transform 0.1s ease-in-out;
+.components-drop-zone__content-icon {
+	margin: 0 auto $grid-unit-10;
+	line-height: 0;
+	fill: currentColor;
+	pointer-events: none;
+}
 
-		.components-drop-zone.is-active & {
-			opacity: 1;
-			transform: scale(1);
-		}
-	}
-
-	&__content-icon,
-	&__content-text {
-		display: block;
-	}
-
-	&__content-icon {
-		margin: 0 auto $grid-unit-10;
-		line-height: 0;
-		fill: currentColor;
-		pointer-events: none;
-	}
-
-	&__content-text {
-		font-family: $default-font;
-		font-size: $default-font-size;
-	}
+.components-drop-zone__content-text {
+	font-family: $default-font;
+	font-size: $default-font-size;
 }
