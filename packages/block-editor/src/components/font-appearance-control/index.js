@@ -117,8 +117,11 @@ export default function FontAppearanceControl( props ) {
 					( weight ) => weight.value === face.fontWeight
 				)
 			) {
+				// Remove any leading or trailing whitespace from the font weight.
+				face.fontWeight.trim();
+
 				// Check if font weight includes a space, if so it must be a variable font.
-				if ( /\s/.test( face.fontWeight.trim() ) ) {
+				if ( /\s/.test( face.fontWeight ) ) {
 					variableFont = true;
 				}
 
