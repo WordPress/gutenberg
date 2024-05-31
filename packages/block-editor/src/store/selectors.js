@@ -2039,13 +2039,37 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 
 			const blockTypeInserterItems = getBlockTypes()
 				.filter( ( blockType ) =>
-					canIncludeBlockTypeInInserter(
-						state,
-						blockType,
-						rootClientId
-					)
+					hasBlockSupport( blockType, 'inserter', true )
 				)
-				.map( buildBlockTypeInserterItem );
+				.map( buildBlockTypeInserterItem )
+				.reduce( ( accumulator, item ) => {
+					item.rootClientId = rootClientId;
+
+					while (
+						! canInsertBlockTypeUnmemoized(
+							state,
+							item.name,
+							item.rootClientId
+						)
+					) {
+						if ( ! item.rootClientId ) {
+							delete item.rootClientId;
+							break;
+						} else {
+							const parentClientId = getBlockRootClientId(
+								state,
+								item.rootClientId
+							);
+							item.rootClientId = parentClientId;
+						}
+					}
+
+					if ( item.hasOwnProperty( 'rootClientId' ) ) {
+						accumulator.push( item );
+					}
+
+					return accumulator;
+				}, [] );
 
 			const items = blockTypeInserterItems.reduce(
 				( accumulator, item ) => {

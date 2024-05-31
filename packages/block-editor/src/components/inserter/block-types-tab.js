@@ -3,7 +3,9 @@
  */
 import { __, _x } from '@wordpress/i18n';
 import { useMemo, useEffect, forwardRef } from '@wordpress/element';
-import { pipe, useAsyncList } from '@wordpress/compose';
+import { useAsyncList } from '@wordpress/compose';
+import { getBlockType } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -14,6 +16,7 @@ import useBlockTypesState from './hooks/use-block-types-state';
 import InserterListbox from '../inserter-listbox';
 import { orderBy } from '../../utils/sorting';
 import InserterNoResults from './no-results';
+import { store as blockEditorStore } from '../../store';
 
 const getBlockNamespace = ( item ) => item.name.split( '/' )[ 0 ];
 
@@ -27,15 +30,14 @@ const MAX_SUGGESTED_ITEMS = 6;
  */
 const EMPTY_ARRAY = [];
 
-export function BlockTypesTab(
-	{ rootClientId, onInsert, onHover, showMostUsedBlocks },
-	ref
-) {
-	const [ items, categories, collections, onSelectItem ] = useBlockTypesState(
-		rootClientId,
-		onInsert
-	);
-
+export function BlockTypesTabPanel( {
+	items,
+	collections,
+	categories,
+	onSelectItem,
+	onHover,
+	showMostUsedBlocks,
+} ) {
 	const suggestedItems = useMemo( () => {
 		return orderBy( items, 'frecency', 'desc' ).slice(
 			0,
@@ -45,24 +47,6 @@ export function BlockTypesTab(
 
 	const uncategorizedItems = useMemo( () => {
 		return items.filter( ( item ) => ! item.category );
-	}, [ items ] );
-
-	const itemsPerCategory = useMemo( () => {
-		return pipe(
-			( itemList ) =>
-				itemList.filter(
-					( item ) => item.category && item.category !== 'reusable'
-				),
-			( itemList ) =>
-				itemList.reduce( ( acc, item ) => {
-					const { category } = item;
-					if ( ! acc[ category ] ) {
-						acc[ category ] = [];
-					}
-					acc[ category ].push( item );
-					return acc;
-				}, {} )
-		)( items );
 	}, [ items ] );
 
 	const itemsPerCollection = useMemo( () => {
@@ -101,82 +85,146 @@ export function BlockTypesTab(
 		didRenderAllCategories ? collectionEntries : EMPTY_ARRAY
 	);
 
+	return (
+		<>
+			{ showMostUsedBlocks && !! suggestedItems.length && (
+				<InserterPanel title={ _x( 'Most used', 'blocks' ) }>
+					<BlockTypesList
+						items={ suggestedItems }
+						onSelect={ onSelectItem }
+						onHover={ onHover }
+						label={ _x( 'Most used', 'blocks' ) }
+					/>
+				</InserterPanel>
+			) }
+
+			{ currentlyRenderedCategories.map( ( category ) => {
+				const categoryItems = items.filter(
+					( item ) => item.category === category.slug
+				);
+				if ( ! categoryItems || ! categoryItems.length ) {
+					return null;
+				}
+				return (
+					<InserterPanel
+						key={ category.slug }
+						title={ category.title }
+						icon={ category.icon }
+					>
+						<BlockTypesList
+							items={ categoryItems }
+							onSelect={ onSelectItem }
+							onHover={ onHover }
+							label={ category.title }
+						/>
+					</InserterPanel>
+				);
+			} ) }
+
+			{ didRenderAllCategories && uncategorizedItems.length > 0 && (
+				<InserterPanel
+					className="block-editor-inserter__uncategorized-blocks-panel"
+					title={ __( 'Uncategorized' ) }
+				>
+					<BlockTypesList
+						items={ uncategorizedItems }
+						onSelect={ onSelectItem }
+						onHover={ onHover }
+						label={ __( 'Uncategorized' ) }
+					/>
+				</InserterPanel>
+			) }
+
+			{ currentlyRenderedCollections.map(
+				( [ namespace, collection ] ) => {
+					const collectionItems = itemsPerCollection[ namespace ];
+					if ( ! collectionItems || ! collectionItems.length ) {
+						return null;
+					}
+
+					return (
+						<InserterPanel
+							key={ namespace }
+							title={ collection.title }
+							icon={ collection.icon }
+						>
+							<BlockTypesList
+								items={ collectionItems }
+								onSelect={ onSelectItem }
+								onHover={ onHover }
+								label={ collection.title }
+							/>
+						</InserterPanel>
+					);
+				}
+			) }
+		</>
+	);
+}
+
+export function BlockTypesTab(
+	{ rootClientId, onInsert, onHover, showMostUsedBlocks },
+	ref
+) {
+	const [ items, categories, collections, onSelectItem ] = useBlockTypesState(
+		rootClientId,
+		onInsert
+	);
+	const rootBlockName = useSelect(
+		( select ) => {
+			return select( blockEditorStore ).getBlockName( rootClientId );
+		},
+		[ rootClientId ]
+	);
+
 	if ( ! items.length ) {
 		return <InserterNoResults />;
+	}
+
+	const itemsForCurrentRoot = [];
+	const itemsRemaining = [];
+
+	for ( const item of items ) {
+		if ( rootClientId && item.rootClientId === rootClientId ) {
+			itemsForCurrentRoot.push( item );
+		} else {
+			itemsRemaining.push( item );
+		}
 	}
 
 	return (
 		<InserterListbox>
 			<div ref={ ref }>
-				{ showMostUsedBlocks && !! suggestedItems.length && (
-					<InserterPanel title={ _x( 'Most used', 'blocks' ) }>
-						<BlockTypesList
-							items={ suggestedItems }
-							onSelect={ onSelectItem }
-							onHover={ onHover }
-							label={ _x( 'Most used', 'blocks' ) }
-						/>
-					</InserterPanel>
-				) }
-
-				{ currentlyRenderedCategories.map( ( category ) => {
-					const categoryItems = itemsPerCategory[ category.slug ];
-					if ( ! categoryItems || ! categoryItems.length ) {
-						return null;
-					}
-					return (
-						<InserterPanel
-							key={ category.slug }
-							title={ category.title }
-							icon={ category.icon }
+				{ !! itemsForCurrentRoot.length && (
+					<>
+						<div
+							className="block-editor-inserter__panel-header"
+							style={ { display: 'block' } }
 						>
-							<BlockTypesList
-								items={ categoryItems }
-								onSelect={ onSelectItem }
-								onHover={ onHover }
-								label={ category.title }
-							/>
-						</InserterPanel>
-					);
-				} ) }
-
-				{ didRenderAllCategories && uncategorizedItems.length > 0 && (
-					<InserterPanel
-						className="block-editor-inserter__uncategorized-blocks-panel"
-						title={ __( 'Uncategorized' ) }
-					>
-						<BlockTypesList
-							items={ uncategorizedItems }
-							onSelect={ onSelectItem }
+							<h2 className="block-editor-inserter__panel-title">
+								{ __( 'Can be inserted into ' ) +
+									getBlockType( rootBlockName )?.title }
+							</h2>
+						</div>
+						<BlockTypesTabPanel
+							items={ itemsForCurrentRoot }
+							categories={ categories }
+							collections={ collections }
+							onSelectItem={ onSelectItem }
 							onHover={ onHover }
-							label={ __( 'Uncategorized' ) }
+							showMostUsedBlocks={ showMostUsedBlocks }
 						/>
-					</InserterPanel>
+						<hr />
+					</>
 				) }
-
-				{ currentlyRenderedCollections.map(
-					( [ namespace, collection ] ) => {
-						const collectionItems = itemsPerCollection[ namespace ];
-						if ( ! collectionItems || ! collectionItems.length ) {
-							return null;
-						}
-
-						return (
-							<InserterPanel
-								key={ namespace }
-								title={ collection.title }
-								icon={ collection.icon }
-							>
-								<BlockTypesList
-									items={ collectionItems }
-									onSelect={ onSelectItem }
-									onHover={ onHover }
-									label={ collection.title }
-								/>
-							</InserterPanel>
-						);
-					}
-				) }
+				<BlockTypesTabPanel
+					items={ itemsRemaining }
+					categories={ categories }
+					collections={ collections }
+					onSelectItem={ onSelectItem }
+					onHover={ onHover }
+					showMostUsedBlocks={ showMostUsedBlocks }
+				/>
 			</div>
 		</InserterListbox>
 	);

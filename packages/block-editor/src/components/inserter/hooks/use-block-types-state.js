@@ -37,7 +37,14 @@ const useBlockTypesState = ( rootClientId, onInsert ) => {
 
 	const onSelectItem = useCallback(
 		(
-			{ name, initialAttributes, innerBlocks, syncStatus, content },
+			{
+				name,
+				initialAttributes,
+				innerBlocks,
+				syncStatus,
+				content,
+				rootClientId: _rootClientId,
+			},
 			shouldFocusBlock
 		) => {
 			const insertedBlock =
@@ -51,7 +58,12 @@ const useBlockTypesState = ( rootClientId, onInsert ) => {
 							createBlocksFromInnerBlocksTemplate( innerBlocks )
 					  );
 
-			onInsert( insertedBlock, undefined, shouldFocusBlock );
+			onInsert(
+				insertedBlock,
+				undefined,
+				shouldFocusBlock,
+				_rootClientId
+			);
 		},
 		[ onInsert ]
 	);
