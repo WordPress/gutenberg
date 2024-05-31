@@ -120,9 +120,13 @@ function useInsertionPoint( {
 					meta
 				);
 			} else {
-				const parents = registry
-					.select( blockEditorStore )
-					.getBlockParents( destinationRootClientId );
+				const parents = [
+					'',
+					...registry
+						.select( blockEditorStore )
+						.getBlockParents( destinationRootClientId ),
+					destinationRootClientId,
+				];
 				const index =
 					_rootClientId === destinationRootClientId
 						? destinationIndex
@@ -169,10 +173,14 @@ function useInsertionPoint( {
 
 	const onToggleInsertionPoint = useCallback(
 		( item ) => {
-			if ( item?.rootClientId ) {
-				const parents = registry
-					.select( blockEditorStore )
-					.getBlockParents( destinationRootClientId );
+			if ( item?.hasOwnProperty( 'rootClientId' ) ) {
+				const parents = [
+					'',
+					...registry
+						.select( blockEditorStore )
+						.getBlockParents( destinationRootClientId ),
+					destinationRootClientId,
+				];
 				const index =
 					item.rootClientId === destinationRootClientId
 						? destinationIndex
