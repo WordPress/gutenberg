@@ -669,8 +669,16 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 					}
 
 					moveFirstItemUp( rootClientId );
-				} else {
-					removeBlock( clientId );
+				} else if (
+					getBlockName( clientId ) !== getDefaultBlockName()
+				) {
+					const replacement = switchToBlockType(
+						getBlock( clientId ),
+						getDefaultBlockName()
+					);
+					if ( replacement && replacement.length ) {
+						replaceBlocks( clientId, replacement );
+					}
 				}
 			}
 		},

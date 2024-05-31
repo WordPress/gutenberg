@@ -350,7 +350,35 @@ _Returns_
 
 ### EditorProvider
 
-Undocumented declaration.
+This component establishes a new post editing context, and serves as the entry point for a new post editor (or post with template editor).
+
+It supports a large number of post types, including post, page, templates, custom post types, patterns, template parts.
+
+All modification and changes are performed to the `@wordpress/core-data` store.
+
+_Usage_
+
+```jsx
+<EditorProvider
+	post={ post }
+	settings={ settings }
+	__unstableTemplate={ template }
+>
+	{ children }
+</EditorProvider>
+```
+
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.post_ `[Object]`: The post object to edit. This is required.
+-   _props.\_\_unstableTemplate_ `[Object]`: The template object wrapper the edited post. This is optional and can only be used when the post type supports templates (like posts and pages).
+-   _props.settings_ `[Object]`: The settings object to use for the editor. This is optional and can be used to override the default settings.
+-   _props.children_ `[Element]`: Children elements for which the BlockEditorProvider context should apply. This is optional.
+
+_Returns_
+
+-   `JSX.Element`: The rendered EditorProvider component.
 
 ### EditorSnackbars
 
@@ -964,7 +992,11 @@ _Returns_
 
 ### PostDiscussionPanel
 
-Undocumented declaration.
+This component allows to update comment and pingback settings for the current post. Internally there are checks whether the current post has support for the above and if the `discussion-panel` panel is enabled.
+
+_Returns_
+
+-   `JSX.Element|null`: The rendered PostDiscussionPanel component.
 
 ### PostExcerpt
 
@@ -991,7 +1023,11 @@ _Returns_
 
 ### PostExcerptPanel
 
-Undocumented declaration.
+Is rendered if the post type supports excerpts and allows editing the excerpt.
+
+_Returns_
+
+-   `JSX.Element`: The rendered PostExcerptPanel component.
 
 ### PostFeaturedImage
 
@@ -1105,19 +1141,45 @@ _Returns_
 
 ### PostPendingStatus
 
-Undocumented declaration.
+A component for displaying and toggling the pending status of a post.
+
+_Returns_
+
+-   `JSX.Element`: The rendered component.
 
 ### PostPendingStatusCheck
 
-Undocumented declaration.
+This component checks the publishing status of the current post. If the post is already published or the user doesn't have the capability to publish, it returns null.
+
+_Parameters_
+
+-   _props_ `Object`: Component properties.
+-   _props.children_ `Element`: Children to be rendered.
+
+_Returns_
+
+-   `JSX.Element|null`: The rendered child elements or null if the post is already published or the user doesn't have the capability to publish.
 
 ### PostPingbacks
 
-Undocumented declaration.
+Renders a control for enabling or disabling pingbacks and trackbacks in a WordPress post.
 
 ### PostPreviewButton
 
-Undocumented declaration.
+Renders a button that opens a new window or tab for the preview, writes the interstitial message to this window, and then navigates to the actual preview link. The button is not rendered if the post is not viewable and disabled if the post is not saveable.
+
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.className_ `string`: The class name for the button.
+-   _props.textContent_ `string`: The text content for the button.
+-   _props.forceIsAutosaveable_ `boolean`: Whether to force autosave.
+-   _props.role_ `string`: The role attribute for the button.
+-   _props.onPreview_ `Function`: The callback function for preview event.
+
+_Returns_
+
+-   `JSX.Element|null`: The rendered button component.
 
 ### PostPublishButton
 

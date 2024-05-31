@@ -64,3 +64,18 @@
 		margin-top: -($border-width);
 	}
 }
+
+/**
+ *  Show icon label overrides.
+ */
+.show-icon-labels .editor-header {
+	.edit-post-fullscreen-mode-close.has-icon {
+		width: $header-height;
+		svg {
+			display: block;
+		}
+		&::after {
+			content: none;
+		}
+	}
+}

@@ -12,6 +12,7 @@ import PostActions from '../post-actions';
 import PostAuthorPanel from '../post-author/panel';
 import PostCardPanel from '../post-card-panel';
 import PostContentInformation from '../post-content-information';
+import PageAttributesPanel from '../page-attributes/panel';
 import PostDiscussionPanel from '../post-discussion/panel';
 import { PrivatePostExcerptPanel as PostExcerptPanel } from '../post-excerpt/panel';
 import PostFeaturedImagePanel from '../post-featured-image/panel';
@@ -71,10 +72,11 @@ export default function PostSummary( { onActionPerformed } ) {
 									<VStack spacing={ 1 }>
 										<PostStatusPanel />
 										<PostSchedulePanel />
-										<PostTemplatePanel />
 										<PostURLPanel />
 										<PostAuthorPanel />
+										<PostTemplatePanel />
 										<PostDiscussionPanel />
+										<PageAttributesPanel />
 										<PostSyncStatus />
 										<BlogTitle />
 										<PostsPerPage />

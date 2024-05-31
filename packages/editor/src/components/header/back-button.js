@@ -6,13 +6,13 @@ import {
 	createSlotFill,
 } from '@wordpress/components';
 
+// Keeping an old name for backward compatibility.
 const slotName = '__experimentalMainDashboardButton';
 
-const { Fill, Slot: MainDashboardButtonSlot } = createSlotFill( slotName );
+const { Fill, Slot } = createSlotFill( slotName );
 
-const MainDashboardButton = Fill;
-
-const Slot = ( { children } ) => {
+const BackButton = Fill;
+const BackButtonSlot = ( { children } ) => {
 	const fills = useSlotFills( slotName );
 	const hasFills = Boolean( fills && fills.length );
 
@@ -20,9 +20,8 @@ const Slot = ( { children } ) => {
 		return children;
 	}
 
-	return <MainDashboardButtonSlot bubblesVirtually />;
+	return <Slot bubblesVirtually />;
 };
+BackButton.Slot = BackButtonSlot;
 
-MainDashboardButton.Slot = Slot;
-
-export default MainDashboardButton;
+export default BackButton;

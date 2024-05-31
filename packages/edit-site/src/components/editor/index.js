@@ -7,16 +7,8 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
-import {
-	Notice,
-	__unstableAnimatePresence as AnimatePresence,
-	__unstableMotion as motion,
-} from '@wordpress/components';
-import {
-	useInstanceId,
-	useViewportMatch,
-	useReducedMotion,
-} from '@wordpress/compose';
+import { Notice } from '@wordpress/components';
+import { useInstanceId, useViewportMatch } from '@wordpress/compose';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	BlockBreadcrumb,
@@ -60,7 +52,6 @@ const {
 	ListViewSidebar,
 	InterfaceSkeleton,
 	ComplementaryArea,
-	interfaceStore,
 	SavePublishPanels,
 	Sidebar,
 	TextEditor,
@@ -81,8 +72,6 @@ const interfaceLabels = {
 	header: __( 'Editor top bar' ),
 };
 
-const ANIMATION_DURATION = 0.25;
-
 export default function Editor( { isLoading } ) {
 	const {
 		record: editedPost,
@@ -93,7 +82,6 @@ export default function Editor( { isLoading } ) {
 	const { type: editedPostType } = editedPost;
 
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const disableMotion = useReducedMotion();
 
 	const {
 		context,
@@ -101,7 +89,6 @@ export default function Editor( { isLoading } ) {
 		editorMode,
 		canvasMode,
 		blockEditorMode,
-		isRightSidebarOpen,
 		isInserterOpen,
 		isListViewOpen,
 		isDistractionFree,
@@ -116,7 +103,6 @@ export default function Editor( { isLoading } ) {
 			select( editSiteStore )
 		);
 		const { __unstableGetEditorMode } = select( blockEditorStore );
-		const { getActiveComplementaryArea } = select( interfaceStore );
 		const { getEntityRecord, getCurrentTheme } = select( coreDataStore );
 		const {
 			isInserterOpened,
@@ -142,7 +128,6 @@ export default function Editor( { isLoading } ) {
 			blockEditorMode: __unstableGetEditorMode(),
 			isInserterOpen: isInserterOpened(),
 			isListViewOpen: isListViewOpened(),
-			isRightSidebarOpen: getActiveComplementaryArea( 'core' ),
 			isDistractionFree: get( 'core', 'distractionFree' ),
 			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
 			showIconLabels: get( 'core', 'showIconLabels' ),
@@ -187,8 +172,6 @@ export default function Editor( { isLoading } ) {
 		CanvasLoader,
 		'edit-site-editor__loading-progress'
 	);
-
-	const { closeGeneralSidebar } = useDispatch( editSiteStore );
 
 	const settings = useSpecificEditorSettings();
 
@@ -298,37 +281,13 @@ export default function Editor( { isLoading } ) {
 							}
 						) }
 						header={
-							<AnimatePresence initial={ false }>
-								{ canvasMode === 'edit' && (
-									<motion.div
-										initial={ {
-											marginTop: -60,
-										} }
-										animate={ {
-											marginTop: 0,
-										} }
-										exit={ {
-											marginTop: -60,
-										} }
-										transition={ {
-											type: 'tween',
-											duration:
-												// Disable transition in mobile to emulate a full page transition.
-												disableMotion ||
-												! isLargeViewport
-													? 0
-													: ANIMATION_DURATION,
-											ease: [ 0.6, 0, 0.4, 1 ],
-										} }
-									>
-										<Header
-											setEntitiesSavedStatesCallback={
-												setEntitiesSavedStatesCallback
-											}
-										/>
-									</motion.div>
-								) }
-							</AnimatePresence>
+							canvasMode === 'edit' && (
+								<Header
+									setEntitiesSavedStatesCallback={
+										setEntitiesSavedStatesCallback
+									}
+								/>
+							)
 						}
 						actions={
 							<SavePublishPanels
@@ -357,12 +316,7 @@ export default function Editor( { isLoading } ) {
 						}
 						secondarySidebar={
 							isEditMode &&
-							( ( shouldShowInserter && (
-								<InserterSidebar
-									closeGeneralSidebar={ closeGeneralSidebar }
-									isRightSidebarOpen={ isRightSidebarOpen }
-								/>
-							) ) ||
+							( ( shouldShowInserter && <InserterSidebar /> ) ||
 								( shouldShowListView && <ListViewSidebar /> ) )
 						}
 						sidebar={
