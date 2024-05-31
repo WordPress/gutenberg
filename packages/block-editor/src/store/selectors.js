@@ -2053,7 +2053,21 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 						)
 					) {
 						if ( ! item.rootClientId ) {
-							delete item.rootClientId;
+							const { sectionRootClientId } = unlock(
+								getSettings( state )
+							);
+							if (
+								sectionRootClientId &&
+								canInsertBlockTypeUnmemoized(
+									state,
+									item.name,
+									sectionRootClientId
+								)
+							) {
+								item.rootClientId = sectionRootClientId;
+							} else {
+								delete item.rootClientId;
+							}
 							break;
 						} else {
 							const parentClientId = getBlockRootClientId(
@@ -2064,6 +2078,7 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 						}
 					}
 
+					// We could also add non insertable items and gray them out.
 					if ( item.hasOwnProperty( 'rootClientId' ) ) {
 						accumulator.push( item );
 					}

@@ -13,6 +13,34 @@ import { useCallback } from '@wordpress/element';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
+function getIndex( {
+	destinationRootClientId,
+	destinationIndex,
+	rootClientId,
+	registry,
+} ) {
+	if ( rootClientId === destinationRootClientId ) {
+		return destinationIndex;
+	}
+	const parents = [
+		'',
+		...registry
+			.select( blockEditorStore )
+			.getBlockParents( destinationRootClientId ),
+		destinationRootClientId,
+	];
+	const parentIndex = parents.indexOf( rootClientId );
+	if ( parentIndex !== -1 ) {
+		return (
+			registry
+				.select( blockEditorStore )
+				.getBlockIndex( parents[ parentIndex + 1 ] ) + 1
+		);
+	}
+	return registry.select( blockEditorStore ).getBlockOrder( rootClientId )
+		.length;
+}
+
 /**
  * @typedef WPInserterConfig
  *
@@ -120,26 +148,14 @@ function useInsertionPoint( {
 					meta
 				);
 			} else {
-				const parents = [
-					'',
-					...registry
-						.select( blockEditorStore )
-						.getBlockParents( destinationRootClientId ),
-					destinationRootClientId,
-				];
-				const index =
-					_rootClientId === destinationRootClientId
-						? destinationIndex
-						: registry
-								.select( blockEditorStore )
-								.getBlockIndex(
-									parents[
-										parents.indexOf( _rootClientId ) + 1
-									]
-								) + 1;
 				insertBlocks(
 					blocks,
-					index,
+					getIndex( {
+						destinationRootClientId,
+						destinationIndex,
+						rootClientId: _rootClientId,
+						registry,
+					} ),
 					_rootClientId,
 					selectBlockOnInsert,
 					shouldFocusBlock || shouldForceFocusBlock ? 0 : null,
@@ -174,24 +190,15 @@ function useInsertionPoint( {
 	const onToggleInsertionPoint = useCallback(
 		( item ) => {
 			if ( item?.hasOwnProperty( 'rootClientId' ) ) {
-				const parents = [
-					'',
-					...registry
-						.select( blockEditorStore )
-						.getBlockParents( destinationRootClientId ),
-					destinationRootClientId,
-				];
-				const index =
-					item.rootClientId === destinationRootClientId
-						? destinationIndex
-						: registry
-								.select( blockEditorStore )
-								.getBlockIndex(
-									parents[
-										parents.indexOf( item.rootClientId ) + 1
-									]
-								) + 1;
-				showInsertionPoint( item.rootClientId, index );
+				showInsertionPoint(
+					item.rootClientId,
+					getIndex( {
+						destinationRootClientId,
+						destinationIndex,
+						rootClientId: item.rootClientId,
+						registry,
+					} )
+				);
 			} else {
 				hideInsertionPoint();
 			}
