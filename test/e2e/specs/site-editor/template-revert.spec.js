@@ -56,7 +56,7 @@ test.describe( 'Template Revert', () => {
 			page.locator(
 				'role=region[name="Editor settings"i] >> role=button[name="Actions"i]'
 			)
-		).toBeHidden();
+		).toBeDisabled();
 	} );
 
 	test( 'should show the original content after revert', async ( {
@@ -179,6 +179,10 @@ test.describe( 'Template Revert', () => {
 		await editor.saveSiteEditorEntities( {
 			isOnlyCurrentEntityDirty: true,
 		} );
+		await page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.getByText( /(updated|published)\./ )
+			.click();
 		const contentBefore =
 			await templateRevertUtils.getCurrentSiteEditorContent();
 
@@ -190,7 +194,6 @@ test.describe( 'Template Revert', () => {
 		await editor.saveSiteEditorEntities( {
 			isOnlyCurrentEntityDirty: true,
 		} );
-
 		await admin.visitSiteEditor();
 
 		const contentAfter =

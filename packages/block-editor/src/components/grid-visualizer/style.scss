@@ -13,7 +13,8 @@
 }
 
 .block-editor-grid-visualizer__item {
-	border: $border-width dashed $gray-300;
+	outline: 1px solid transparent;
+	border-radius: $radius-block-ui;
 }
 
 .block-editor-grid-item-resizer {

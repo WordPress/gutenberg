@@ -35,9 +35,13 @@ import { useFlashEditableBlocks } from './components/use-flash-editable-blocks';
 import {
 	selectBlockPatternsKey,
 	reusableBlocksSelectKey,
+	globalStylesDataKey,
 } from './store/private-keys';
 import { requiresWrapperOnCopy } from './components/writing-flow/utils';
 import { PrivateRichText } from './components/rich-text/';
+import { PrivateBlockPopover } from './components/block-popover';
+import { PrivateInserterLibrary } from './components/inserter/library';
+import { PrivatePublishDateTimePicker } from './components/publish-date-time-picker';
 
 /**
  * Private @wordpress/block-editor APIs.
@@ -72,8 +76,12 @@ lock( privateApis, {
 	useReusableBlocksRenameHint,
 	usesContextKey,
 	useFlashEditableBlocks,
+	globalStylesDataKey,
 	selectBlockPatternsKey,
 	requiresWrapperOnCopy,
 	PrivateRichText,
+	PrivateInserterLibrary,
 	reusableBlocksSelectKey,
+	PrivateBlockPopover,
+	PrivatePublishDateTimePicker,
 } );

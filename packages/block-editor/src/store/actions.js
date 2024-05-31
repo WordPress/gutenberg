@@ -1000,7 +1000,10 @@ export const __unstableSplitSelection =
 			const first = firstBlocks.shift();
 			head = {
 				...head,
-				attributes: headType.merge( head.attributes, first.attributes ),
+				attributes: {
+					...head.attributes,
+					...headType.merge( head.attributes, first.attributes ),
+				},
 			};
 			output.push( head );
 			selection = {
@@ -1034,10 +1037,10 @@ export const __unstableSplitSelection =
 				const last = lastBlocks.pop();
 				output.push( {
 					...tail,
-					attributes: tailType.merge(
-						last.attributes,
-						tail.attributes
-					),
+					attributes: {
+						...tail.attributes,
+						...tailType.merge( last.attributes, tail.attributes ),
+					},
 				} );
 				output.push( ...lastBlocks );
 				selection = {
@@ -1506,11 +1509,18 @@ export const insertDefaultBlock =
 	};
 
 /**
- * Action that changes the nested settings of a given block.
+ * @typedef {Object< string, Object >} SettingsByClientId
+ */
+
+/**
+ * Action that changes the nested settings of the given block(s).
  *
- * @param {string} clientId Client ID of the block whose nested setting are
- *                          being received.
- * @param {Object} settings Object with the new settings for the nested block.
+ * @param {string | SettingsByClientId} clientId Client ID of the block whose
+ *                                               nested setting are being
+ *                                               received, or object of settings
+ *                                               by client ID.
+ * @param {Object}                      settings Object with the new settings
+ *                                               for the nested block.
  *
  * @return {Object} Action object
  */
@@ -1612,42 +1622,31 @@ export const __unstableSetEditorMode =
 		// When switching to zoom-out mode, we need to select the parent section
 		if ( mode === 'zoom-out' ) {
 			const firstSelectedClientId = select.getBlockSelectionStart();
-			const allBlocks = select.getBlocks();
-
 			const { sectionRootClientId } = unlock(
 				registry.select( STORE_NAME ).getSettings()
 			);
-			if ( sectionRootClientId ) {
-				const sectionClientIds =
-					select.getBlockOrder( sectionRootClientId );
-				const lastSectionClientId =
-					sectionClientIds[ sectionClientIds.length - 1 ];
-				if ( sectionClientIds ) {
-					if ( firstSelectedClientId ) {
-						const parents = select.getBlockParents(
-							firstSelectedClientId
-						);
-						const firstSectionClientId = parents.find( ( parent ) =>
+			if ( firstSelectedClientId ) {
+				let sectionClientId;
+
+				if ( sectionRootClientId ) {
+					const sectionClientIds =
+						select.getBlockOrder( sectionRootClientId );
+					sectionClientId = select
+						.getBlockParents( firstSelectedClientId )
+						.find( ( parent ) =>
 							sectionClientIds.includes( parent )
 						);
-						if ( firstSectionClientId ) {
-							dispatch.selectBlock( firstSectionClientId );
-						} else {
-							dispatch.selectBlock( lastSectionClientId );
-						}
-					} else {
-						dispatch.selectBlock( lastSectionClientId );
-					}
+				} else {
+					sectionClientId = select.getBlockHierarchyRootClientId(
+						firstSelectedClientId
+					);
 				}
-			} else if ( firstSelectedClientId ) {
-				const rootClientId = select.getBlockHierarchyRootClientId(
-					firstSelectedClientId
-				);
-				dispatch.selectBlock( rootClientId );
-			} else {
-				// If there's no block selected and no sectionRootClientId, select the last root block.
-				const lastRootBlock = allBlocks[ allBlocks.length - 1 ];
-				dispatch.selectBlock( lastRootBlock?.clientId );
+
+				if ( sectionClientId ) {
+					dispatch.selectBlock( sectionClientId );
+				} else {
+					dispatch.clearSelectedBlock();
+				}
 			}
 		}
 

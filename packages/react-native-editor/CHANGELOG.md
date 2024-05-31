@@ -10,6 +10,11 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Prevent deleting content when backspacing in the first Paragraph block [#62069]
+
+## 1.119.0
+-   [internal] Remove circular dependencies within the components package [#61102]
+-   [internal] Upgrade target sdk version to Android API 34 [#61727]
 
 ## 1.118.0
 -   [*] Fix a crash when pasting file images and special comment markup [#60476]

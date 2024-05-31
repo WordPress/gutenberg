@@ -327,7 +327,7 @@ test.describe( 'Image', () => {
 		await editor.clickBlockToolbarButton( 'Crop' );
 		await editor.clickBlockToolbarButton( 'Aspect Ratio' );
 		await page.click(
-			'role=menu[name="Aspect Ratio"i] >> role=menuitemradio[name="16:9"i]'
+			'role=menu[name="Aspect Ratio"i] >> role=menuitemradio[name="Wide - 16:9"i]'
 		);
 		await editor.clickBlockToolbarButton( 'Apply' );
 
@@ -424,6 +424,9 @@ test.describe( 'Image', () => {
 		page,
 		editor,
 	} ) => {
+		// This is a temp workaround for dragging and dropping images from the inserter.
+		// This should be removed when we have the zoom out view for media categories.
+		await page.setViewportSize( { width: 1400, height: 800 } );
 		await editor.insertBlock( { name: 'core/image' } );
 		const imageBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Image',
@@ -842,552 +845,97 @@ test.describe( 'Image', () => {
 	} );
 } );
 
-// Skipping these tests for now as we plan
-// to update them to use the new lightbox syntax
-// once it's merged -- see the following PRs
-// https://github.com/WordPress/gutenberg/pull/53851
-// https://github.com/WordPress/gutenberg/pull/54071
-test.describe.skip( 'Image - interactivity', () => {
+test.describe( 'Image - lightbox', () => {
+	let uploadedMedia;
+
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
+		uploadedMedia = await requestUtils.uploadMedia(
+			path.resolve(
+				process.cwd(),
+				'test/e2e/assets/10x10_e2e_test_image_z9T8jK.png'
+			)
+		);
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
 	} );
 
-	test.beforeEach( async ( { admin, editor } ) => {
+	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
-		await editor.insertBlock( { name: 'core/image' } );
 	} );
 
-	test.afterEach( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllMedia();
-	} );
-
-	test.describe( 'tests using uploaded image', () => {
-		let filename = null;
-
-		test( 'should toggle "lightbox" in saved attributes', async ( {
-			editor,
-			page,
-			imageBlockUtils,
-		} ) => {
-			const imageBlock = editor.canvas.locator(
-				'role=document[name="Block: Image"i]'
-			);
-			await expect( imageBlock ).toBeVisible();
-
-			filename = await imageBlockUtils.upload(
-				imageBlock.locator( 'data-testid=form-file-upload-input' )
-			);
-			const image = imageBlock.locator( 'role=img' );
-			await expect( image ).toBeVisible();
-			await expect( image ).toHaveAttribute(
-				'src',
-				new RegExp( filename )
-			);
-
-			await editor.openDocumentSettingsSidebar();
-
-			await page.getByRole( 'button', { name: 'Advanced' } ).click();
-			await page
-				.getByRole( 'combobox', { name: 'Behaviors' } )
-				.selectOption( 'lightbox' );
-
-			let blocks = await editor.getBlocks();
-			expect( blocks[ 0 ].attributes ).toMatchObject( {
-				behaviors: {
-					lightbox: {
-						animation: 'zoom',
-						enabled: true,
-					},
-				},
-				linkDestination: 'none',
+	test.describe( 'should respect theme.json settings and block overrides', () => {
+		test.describe( 'Theme.json settings - allow editing FALSE, enabled FALSE', () => {
+			test.beforeAll( async ( { requestUtils } ) => {
+				await requestUtils.activatePlugin(
+					'lightbox-allow-editing-false-enabled-false'
+				);
 			} );
-			expect( blocks[ 0 ].attributes.url ).toContain( filename );
 
-			await page.getByLabel( 'Behaviors' ).selectOption( '' );
-			blocks = await editor.getBlocks();
-			expect( blocks[ 0 ].attributes ).toMatchObject( {
-				behaviors: {
-					lightbox: {
-						animation: '',
-						enabled: false,
-					},
-				},
-				linkDestination: 'none',
+			test.afterAll( async ( { requestUtils } ) => {
+				await requestUtils.deactivatePlugin(
+					'lightbox-allow-editing-false-enabled-false'
+				);
 			} );
-			expect( blocks[ 0 ].attributes.url ).toContain( filename );
-		} );
 
-		test.describe( 'should open and close the image in a lightbox when using a mouse and dynamically load src', () => {
-			test( 'zoom animation', async ( {
+			test( 'Block settings - link DISABLED, lightbox UNDEFINED - should hide UI when block override is undefined', async ( {
 				editor,
 				page,
-				imageBlockUtils,
 			} ) => {
+				await editor.setContent( `<!-- wp:image {"id":${ uploadedMedia.id },"sizeSlug":"full","linkDestination":"none"} -->
+				<figure class="wp-block-image size-full"><img src="${ uploadedMedia.source_url }" alt="" class="wp-image-${ uploadedMedia.id }"/></figure>
+				<!-- /wp:image --> ` );
+
 				const imageBlock = editor.canvas.locator(
 					'role=document[name="Block: Image"i]'
 				);
-				await expect( imageBlock ).toBeVisible();
 
-				filename = await imageBlockUtils.upload(
-					imageBlock.locator( 'data-testid=form-file-upload-input' ),
-					'3200x2400_e2e_test_image_responsive_lightbox.jpeg'
-				);
-				const image = imageBlock.locator( 'role=img' );
-				await expect( image ).toBeVisible();
-				await expect( image ).toHaveAttribute(
-					'src',
-					new RegExp( filename ),
-					{ timeout: 10_000 }
-				);
-
-				await editor.openDocumentSettingsSidebar();
-
-				await page.getByRole( 'button', { name: 'Advanced' } ).click();
+				await imageBlock.click();
 				await page
-					.getByRole( 'combobox', { name: 'Behaviors' } )
-					.selectOption( 'lightbox' );
-
-				await page
-					.getByRole( 'combobox', { name: 'Animation' } )
-					.selectOption( 'zoom' );
-
-				const postId = await editor.publishPost();
-				await page.goto( `/?p=${ postId }` );
-
-				// getByRole() doesn't work for the image here for
-				// some reason, so let's use locators instead
-				const contentFigure = page.locator( '.entry-content figure' );
-				const contentImage = page.locator(
-					'.entry-content figure img'
-				);
-
-				const wpContext =
-					await contentFigure.getAttribute( 'data-wp-context' );
-
-				const imageUploadedSrc =
-					JSON.parse( wpContext ).core.image.imageUploadedSrc;
-
-				const contentImageCurrentSrc = await contentImage.evaluate(
-					( img ) => img.currentSrc
-				);
-
-				const lightbox = page.locator( '.wp-lightbox-overlay' );
-				await expect( lightbox ).toBeHidden();
-				const responsiveImage = lightbox.locator(
-					'.responsive-image img'
-				);
-				const enlargedImage = lightbox.locator( '.enlarged-image img' );
-
-				await expect( responsiveImage ).toHaveAttribute(
-					'src',
-					contentImageCurrentSrc
-				);
-				await expect( enlargedImage ).toHaveAttribute( 'src', '' );
-
-				await page
-					.getByRole( 'button', { name: 'Enlarge image' } )
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
 					.click();
 
-				await expect( responsiveImage ).toHaveAttribute(
-					'src',
-					contentImageCurrentSrc
-				);
-				await expect( enlargedImage ).toHaveAttribute(
-					'src',
-					imageUploadedSrc
-				);
-
-				await expect( lightbox ).toBeVisible();
-
-				// Use page.evaluate to get the content of the style tag
-				const styleTagContent = await page.evaluate( () => {
-					const styleTag = document.querySelector(
-						'style#wp-lightbox-styles'
-					);
-					return styleTag ? styleTag.textContent : '';
-				} );
-
-				// Define the keys you want to check for
-				const keysToCheck = [
-					'--wp--lightbox-initial-top-position',
-					'--wp--lightbox-initial-left-position',
-					'--wp--lightbox-container-width',
-					'--wp--lightbox-container-height',
-					'--wp--lightbox-image-width',
-					'--wp--lightbox-image-height',
-					'--wp--lightbox-scale',
-				];
-
-				// Check if all the keys are present in the style tag's content
-				const keysPresent = keysToCheck.every( ( key ) =>
-					styleTagContent.includes( key )
-				);
-
-				expect( keysPresent ).toBe( true );
-
-				const closeButton = lightbox.getByRole( 'button', {
-					name: 'Close',
-				} );
-				await closeButton.click();
-
-				await expect( responsiveImage ).toHaveAttribute(
-					'src',
-					contentImageCurrentSrc
-				);
-				await expect( enlargedImage ).toHaveAttribute(
-					'src',
-					imageUploadedSrc
-				);
-
-				await expect( lightbox ).toBeHidden();
-			} );
-		} );
-
-		test( 'lightbox should be overriden when link is configured for image', async ( {
-			editor,
-			page,
-			imageBlockUtils,
-		} ) => {
-			const imageBlock = editor.canvas.locator(
-				'role=document[name="Block: Image"i]'
-			);
-			await expect( imageBlock ).toBeVisible();
-
-			filename = await imageBlockUtils.upload(
-				imageBlock.locator( 'data-testid=form-file-upload-input' )
-			);
-			const image = imageBlock.locator( 'role=img' );
-			await expect( image ).toBeVisible();
-			await expect( image ).toHaveAttribute(
-				'src',
-				new RegExp( filename )
-			);
-
-			await editor.openDocumentSettingsSidebar();
-
-			await page.getByRole( 'button', { name: 'Advanced' } ).click();
-			const behaviorSelect = page.getByRole( 'combobox', {
-				name: 'Behaviors',
-			} );
-			await behaviorSelect.selectOption( 'lightbox' );
-
-			await page
-				.getByLabel( 'Block tools' )
-				.getByLabel( 'Insert link' )
-				.click();
-
-			const form = page.locator(
-				'.block-editor-url-popover__link-editor'
-			);
-
-			const url = 'https://wordpress.org';
-
-			await form.getByLabel( 'URL' ).fill( url );
-
-			await form.getByRole( 'button', { name: 'Apply' } ).click();
-			await expect( behaviorSelect ).toBeDisabled();
-
-			const postId = await editor.publishPost();
-			await page.goto( `/?p=${ postId }` );
-
-			// The lightbox markup should not appear in the DOM at all
-			await expect(
-				page.getByRole( 'button', { name: 'Enlarge image' } )
-			).not.toBeInViewport();
-		} );
-
-		test( 'markup should not appear if Lightbox is disabled', async ( {
-			editor,
-			page,
-			imageBlockUtils,
-		} ) => {
-			const imageBlock = editor.canvas.locator(
-				'role=document[name="Block: Image"i]'
-			);
-			await expect( imageBlock ).toBeVisible();
-
-			filename = await imageBlockUtils.upload(
-				imageBlock.locator( 'data-testid=form-file-upload-input' )
-			);
-			const image = imageBlock.locator( 'role=img' );
-			await expect( image ).toBeVisible();
-			await expect( image ).toHaveAttribute(
-				'src',
-				new RegExp( filename )
-			);
-
-			await editor.openDocumentSettingsSidebar();
-
-			await page.getByRole( 'button', { name: 'Advanced' } ).click();
-			const behaviorSelect = page.getByRole( 'combobox', {
-				name: 'Behaviors',
-			} );
-			await behaviorSelect.selectOption( '' );
-
-			const postId = await editor.publishPost();
-			await page.goto( `/?p=${ postId }` );
-
-			// The lightbox markup should not appear in the DOM at all
-			await expect(
-				page.getByRole( 'button', { name: 'Enlarge image' } )
-			).not.toBeInViewport();
-		} );
-
-		test.describe( 'Animation Select visibility', () => {
-			test( 'Animation selector should appear if Behavior is Lightbox', async ( {
-				editor,
-				page,
-				imageBlockUtils,
-			} ) => {
-				const imageBlock = editor.canvas.locator(
-					'role=document[name="Block: Image"i]'
-				);
-				await expect( imageBlock ).toBeVisible();
-
-				filename = await imageBlockUtils.upload(
-					imageBlock.locator( 'data-testid=form-file-upload-input' )
-				);
-				const image = imageBlock.locator( 'role=img' );
-				await expect( image ).toBeVisible();
-				await expect( image ).toHaveAttribute(
-					'src',
-					new RegExp( filename )
-				);
-
-				await editor.openDocumentSettingsSidebar();
-
-				await page.getByRole( 'button', { name: 'Advanced' } ).click();
-				const behaviorSelect = page.getByRole( 'combobox', {
-					name: 'Behaviors',
-				} );
-				await behaviorSelect.selectOption( 'lightbox' );
 				await expect(
-					page.getByRole( 'combobox', {
-						name: 'Animation',
-					} )
-				).toBeVisible();
-			} );
-			test( 'Animation selector should NOT appear if Behavior is None', async ( {
-				page,
-				editor,
-				imageBlockUtils,
-			} ) => {
-				const imageBlock = editor.canvas.locator(
-					'role=document[name="Block: Image"i]'
-				);
-				await expect( imageBlock ).toBeVisible();
-
-				filename = await imageBlockUtils.upload(
-					imageBlock.locator( 'data-testid=form-file-upload-input' )
-				);
-				const image = imageBlock.locator( 'role=img' );
-				await expect( image ).toBeVisible();
-				await expect( image ).toHaveAttribute(
-					'src',
-					new RegExp( filename )
-				);
-
-				await editor.openDocumentSettingsSidebar();
-
-				await page.getByRole( 'button', { name: 'Advanced' } ).click();
-				const behaviorSelect = page.getByRole( 'combobox', {
-					name: 'Behaviors',
-				} );
-				await behaviorSelect.selectOption( '' );
-				await expect(
-					page.getByRole( 'combobox', {
-						name: 'Animation',
+					page.getByRole( 'menuitem', {
+						name: 'Expand on click',
 					} )
 				).toBeHidden();
 			} );
-			test( 'Animation selector should NOT appear if Behavior is Default', async ( {
-				page,
+
+			test( 'Block settings - link DISABLED, lightbox ENABLED - should show UI while block override is active, but hide UI if override is removed', async ( {
 				editor,
-				imageBlockUtils,
+				page,
 			} ) => {
+				await editor.setContent( `<!-- wp:image {"id":${ uploadedMedia.id },"sizeSlug":"full","linkDestination":"none","lightbox":{"enabled":true}} -->
+				<figure class="wp-block-image size-full"><img src="${ uploadedMedia.source_url }" alt="" class="wp-image-${ uploadedMedia.id }"/></figure>
+				<!-- /wp:image --> ` );
+
 				const imageBlock = editor.canvas.locator(
 					'role=document[name="Block: Image"i]'
 				);
-				await expect( imageBlock ).toBeVisible();
 
-				filename = await imageBlockUtils.upload(
-					imageBlock.locator( 'data-testid=form-file-upload-input' )
-				);
-				const image = imageBlock.locator( 'role=img' );
-				await expect( image ).toBeVisible();
-				await expect( image ).toHaveAttribute(
-					'src',
-					new RegExp( filename )
-				);
-
-				await editor.openDocumentSettingsSidebar();
-
-				await page.getByRole( 'button', { name: 'Advanced' } ).click();
-				const behaviorSelect = page.getByRole( 'combobox', {
-					name: 'Behaviors',
-				} );
-				await behaviorSelect.selectOption( 'default' );
-				await expect(
-					page.getByRole( 'combobox', {
-						name: 'Animation',
-					} )
-				).toBeHidden();
-			} );
-		} );
-
-		test.describe( 'keyboard navigation', () => {
-			let openLightboxButton;
-			let lightbox;
-			let closeButton;
-
-			test.beforeEach( async ( { page, editor, imageBlockUtils } ) => {
-				const imageBlock = editor.canvas.locator(
-					'role=document[name="Block: Image"i]'
-				);
-				await expect( imageBlock ).toBeVisible();
-
-				filename = await imageBlockUtils.upload(
-					imageBlock.locator( 'data-testid=form-file-upload-input' )
-				);
-				const image = imageBlock.locator( 'role=img' );
-				await expect( image ).toBeVisible();
-				await expect( image ).toHaveAttribute(
-					'src',
-					new RegExp( filename )
-				);
-
-				await editor.openDocumentSettingsSidebar();
-
-				await page.getByRole( 'button', { name: 'Advanced' } ).click();
+				await imageBlock.click();
 				await page
-					.getByRole( 'combobox', { name: 'Behaviors' } )
-					.selectOption( 'lightbox' );
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
+					.click();
 
-				const postId = await editor.publishPost();
-				await page.goto( `/?p=${ postId }` );
+				await page
+					.getByRole( 'button', {
+						name: 'Disable expand on click',
+					} )
+					.click();
 
-				openLightboxButton = page.getByRole( 'button', {
-					name: 'Enlarge image',
-				} );
-				lightbox = page.getByRole( 'dialog' );
-				closeButton = lightbox.getByRole( 'button', {
-					name: 'Close',
-				} );
+				await expect(
+					page.getByRole( 'menuitem', {
+						name: 'Expand on click',
+					} )
+				).toBeHidden();
 			} );
-
-			test( 'should open and focus appropriately using enter key', async ( {
-				page,
-			} ) => {
-				// Open and close lightbox using the close button
-				await openLightboxButton.focus();
-				await page.keyboard.press( 'Enter' );
-				await expect( lightbox ).toBeVisible();
-				await expect( closeButton ).toBeFocused();
-			} );
-
-			test( 'should close and focus appropriately using enter key on close button', async ( {
-				page,
-			} ) => {
-				// Open and close lightbox using the close button
-				await openLightboxButton.focus();
-				await page.keyboard.press( 'Enter' );
-				await expect( lightbox ).toBeVisible();
-				await expect( closeButton ).toBeFocused();
-				await page.keyboard.press( 'Enter' );
-				await expect( lightbox ).toBeHidden();
-				await expect( openLightboxButton ).toBeFocused();
-			} );
-
-			test( 'should close and focus appropriately using escape key', async ( {
-				page,
-			} ) => {
-				await openLightboxButton.focus();
-				await page.keyboard.press( 'Enter' );
-				await expect( lightbox ).toBeVisible();
-				await expect( closeButton ).toBeFocused();
-				await page.keyboard.press( 'Escape' );
-				await expect( lightbox ).toBeHidden();
-				await expect( openLightboxButton ).toBeFocused();
-			} );
-
-			// TO DO: Add these tests, which will involve adding a caption
-			// to uploaded test images
-			// test( 'should trap focus appropriately when using tab', async ( {
-			// 	page,
-			// } ) => {
-
-			// } );
-
-			// test( 'should trap focus appropriately using shift+tab', async ( {
-			// 	page,
-			// } ) => {
-
-			// } );
 		} );
-	} );
-
-	test( 'lightbox should work as expected when inserting image from URL', async ( {
-		editor,
-		page,
-	} ) => {
-		await editor.openDocumentSettingsSidebar();
-
-		const imageBlockFromUrl = editor.canvas.locator(
-			'role=document[name="Block: Image"i]'
-		);
-		await expect( imageBlockFromUrl ).toBeVisible();
-
-		await imageBlockFromUrl
-			.getByRole( 'button' )
-			.filter( { hasText: 'Insert from URL' } )
-			.click();
-
-		const form = page.locator(
-			'.block-editor-media-placeholder__url-input-form'
-		);
-
-		const imgUrl =
-			'https://wp20.wordpress.net/wp-content/themes/twentyseventeen-wp20/images/wp20-logo-white.svg';
-
-		await form.getByLabel( 'URL' ).fill( imgUrl );
-
-		await form.getByRole( 'button', { name: 'Apply' } ).click();
-
-		const image = imageBlockFromUrl.locator( 'role=img' );
-		await expect( image ).toBeVisible();
-		await expect( image ).toHaveAttribute( 'src', imgUrl );
-
-		await page.getByRole( 'button', { name: 'Advanced' } ).click();
-		await page
-			.getByRole( 'combobox', { name: 'Behaviors' } )
-			.selectOption( 'lightbox' );
-
-		const postId = await editor.publishPost();
-		await page.goto( `/?p=${ postId }` );
-
-		const lightbox = page.locator( '.wp-lightbox-overlay' );
-		const responsiveImage = lightbox.locator( '.responsive-image img' );
-		const enlargedImage = lightbox.locator( '.enlarged-image img' );
-
-		await expect( responsiveImage ).toHaveAttribute(
-			'src',
-			new RegExp( imgUrl )
-		);
-		await expect( enlargedImage ).toHaveAttribute( 'src', '' );
-
-		await page.getByRole( 'button', { name: 'Enlarge image' } ).click();
-
-		await expect( responsiveImage ).toHaveAttribute( 'src', imgUrl );
-		await expect( enlargedImage ).toHaveAttribute( 'src', imgUrl );
-
-		await page.getByRole( 'button', { name: 'Close' } ).click();
-
-		await expect( responsiveImage ).toHaveAttribute( 'src', imgUrl );
-		await expect( enlargedImage ).toHaveAttribute( 'src', imgUrl );
 	} );
 } );
 
@@ -1398,12 +946,12 @@ test.describe( 'Image - Site editor', () => {
 		await requestUtils.activateTheme( 'emptytheme' );
 	} );
 
-	test.beforeEach( async ( { admin, editor } ) => {
+	test.beforeEach( async ( { admin } ) => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//index',
 			postType: 'wp_template',
+			canvas: 'edit',
 		} );
-		await editor.canvas.locator( 'body' ).click();
 	} );
 
 	test.afterEach( async ( { requestUtils } ) => {

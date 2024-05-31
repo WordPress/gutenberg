@@ -28,7 +28,7 @@ const HelpGetSupportButton = ( { onPress, title } ) => {
 		<Pressable
 			style={ buttonStyle }
 			onPress={ onPress }
-			accessibilityRole={ 'button' }
+			accessibilityRole="button"
 		>
 			<Text style={ textStyle }>{ title }</Text>
 		</Pressable>

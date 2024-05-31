@@ -24,16 +24,19 @@ import fontSize from './font-size';
 import textAlign from './text-align';
 import border from './border';
 import position from './position';
+import blockStyleVariation from './block-style-variation';
 import layout from './layout';
 import childLayout from './layout-child';
 import contentLockUI from './content-lock-ui';
 import './metadata';
 import blockHooks from './block-hooks';
+import blockBindingsPanel from './block-bindings';
 import './block-renaming';
 import './use-bindings-attributes';
 
 createBlockEditFilter(
 	[
+		blockBindingsPanel,
 		align,
 		textAlign,
 		anchor,
@@ -59,6 +62,7 @@ createBlockListBlockFilter( [
 	fontSize,
 	border,
 	position,
+	blockStyleVariation,
 	childLayout,
 ] );
 createBlockSaveFilter( [

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import { useMemo, useEffect } from '@wordpress/element';
+import { useMemo, useEffect, forwardRef } from '@wordpress/element';
 import { pipe, useAsyncList } from '@wordpress/compose';
 
 /**
@@ -27,12 +27,10 @@ const MAX_SUGGESTED_ITEMS = 6;
  */
 const EMPTY_ARRAY = [];
 
-export function BlockTypesTab( {
-	rootClientId,
-	onInsert,
-	onHover,
-	showMostUsedBlocks,
-} ) {
+export function BlockTypesTab(
+	{ rootClientId, onInsert, onHover, showMostUsedBlocks },
+	ref
+) {
 	const [ items, categories, collections, onSelectItem ] = useBlockTypesState(
 		rootClientId,
 		onInsert
@@ -109,7 +107,7 @@ export function BlockTypesTab( {
 
 	return (
 		<InserterListbox>
-			<div>
+			<div ref={ ref }>
 				{ showMostUsedBlocks && !! suggestedItems.length && (
 					<InserterPanel title={ _x( 'Most used', 'blocks' ) }>
 						<BlockTypesList
@@ -184,4 +182,4 @@ export function BlockTypesTab( {
 	);
 }
 
-export default BlockTypesTab;
+export default forwardRef( BlockTypesTab );

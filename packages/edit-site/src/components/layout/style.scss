@@ -118,7 +118,7 @@
 		justify-content: flex-end;
 	}
 
-	& > div {
+	.edit-site-resizable-frame__inner {
 		color: $gray-900;
 	}
 
@@ -128,6 +128,7 @@
 		width: calc(100% - #{$canvas-padding});
 
 		.edit-site-resizable-frame__inner-content {
+			box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.8), 0 8px 10px -6px rgba(0, 0, 0, 0.8);
 			transition: border-radius 0.4s;
 			// This ensure the radius work properly.
 			overflow: hidden;
@@ -142,10 +143,6 @@
 		top: 0;
 		bottom: 0;
 		width: 100%;
-
-		& > div {
-			border-radius: 0;
-		}
 	}
 }
 
@@ -172,7 +169,6 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	border-bottom: 1px solid transparent;
 
 	&:hover,
 	&:active {
@@ -278,4 +274,12 @@
 		border-radius: 8px;
 		margin: $canvas-padding $canvas-padding $canvas-padding 0;
 	}
+}
+
+.edit-site .components-editor-notices__snackbar {
+	position: fixed;
+	right: 0;
+	bottom: 16px;
+	padding-left: 16px;
+	padding-right: 16px;
 }

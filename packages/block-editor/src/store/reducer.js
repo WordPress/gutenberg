@@ -1750,24 +1750,37 @@ export const blockListSettings = ( state = {}, action ) => {
 			);
 		}
 		case 'UPDATE_BLOCK_LIST_SETTINGS': {
-			const { clientId } = action;
-			if ( ! action.settings ) {
-				if ( state.hasOwnProperty( clientId ) ) {
-					const { [ clientId ]: removedBlock, ...restBlocks } = state;
-					return restBlocks;
+			const updates =
+				typeof action.clientId === 'string'
+					? { [ action.clientId ]: action.settings }
+					: action.clientId;
+
+			// Remove settings that are the same as the current state.
+			for ( const clientId in updates ) {
+				if ( ! updates[ clientId ] ) {
+					if ( ! state[ clientId ] ) {
+						delete updates[ clientId ];
+					}
+				} else if (
+					fastDeepEqual( state[ clientId ], updates[ clientId ] )
+				) {
+					delete updates[ clientId ];
 				}
+			}
 
+			if ( Object.keys( updates ).length === 0 ) {
 				return state;
 			}
 
-			if ( fastDeepEqual( state[ clientId ], action.settings ) ) {
-				return state;
+			const merged = { ...state, ...updates };
+
+			for ( const clientId in updates ) {
+				if ( ! updates[ clientId ] ) {
+					delete merged[ clientId ];
+				}
 			}
 
-			return {
-				...state,
-				[ clientId ]: action.settings,
-			};
+			return merged;
 		}
 	}
 	return state;

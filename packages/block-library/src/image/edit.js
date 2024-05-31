@@ -103,6 +103,7 @@ export function ImageEdit( {
 	onReplace,
 	context,
 	clientId,
+	__unstableParentLayout: parentLayout,
 } ) {
 	const {
 		url = '',
@@ -144,7 +145,7 @@ export function ImageEdit( {
 				scale: undefined,
 			} );
 		}
-	}, [ align ] );
+	}, [ __unstableMarkNextChangeAsNotPersistent, align, setAttributes ] );
 
 	const { getSettings } = useSelect( blockEditorStore );
 	const blockEditingMode = useBlockEditingMode();
@@ -282,7 +283,7 @@ export function ImageEdit( {
 		<img
 			alt={ __( 'Edit image' ) }
 			title={ __( 'Edit image' ) }
-			className={ 'edit-image-preview' }
+			className="edit-image-preview"
 			src={ url }
 		/>
 	);
@@ -317,7 +318,7 @@ export function ImageEdit( {
 				lockUrlControls:
 					!! metadata?.bindings?.url &&
 					( ! blockBindingsSource ||
-						blockBindingsSource?.lockAttributesEditing ),
+						blockBindingsSource?.lockAttributesEditing() ),
 				lockUrlControlsMessage: blockBindingsSource?.label
 					? sprintf(
 							/* translators: %s: Label of the bindings source. */
@@ -327,7 +328,7 @@ export function ImageEdit( {
 					: __( 'Connected to dynamic data' ),
 			};
 		},
-		[ isSingleSelected ]
+		[ isSingleSelected, metadata?.bindings?.url ]
 	);
 	const placeholder = ( content ) => {
 		return (
@@ -358,9 +359,7 @@ export function ImageEdit( {
 				} }
 			>
 				{ lockUrlControls ? (
-					<span
-						className={ 'block-bindings-media-placeholder-message' }
-					>
+					<span className="block-bindings-media-placeholder-message">
 						{ lockUrlControlsMessage }
 					</span>
 				) : (
@@ -385,6 +384,7 @@ export function ImageEdit( {
 				context={ context }
 				clientId={ clientId }
 				blockEditingMode={ blockEditingMode }
+				parentLayoutType={ parentLayout?.type }
 			/>
 			<MediaPlaceholder
 				icon={ <BlockIcon icon={ icon } /> }

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/react-native-editor",
-	"version": "1.118.0",
+	"version": "1.119.0",
 	"description": "Mobile WordPress gutenberg editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -23,8 +23,8 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=12",
-		"npm": ">=6.9"
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
 	},
 	"main": "src/index.js",
 	"react-native": "src/index",
@@ -32,7 +32,7 @@
 		"@babel/runtime": "^7.20.0",
 		"@react-native-clipboard/clipboard": "1.11.2",
 		"@react-native-community/blur": "4.2.0",
-		"@react-native-community/slider": "https://raw.githubusercontent.com/wordpress-mobile/react-native-slider/v3.0.2-wp-4/react-native-community-slider-3.0.2-wp-4.tgz",
+		"@react-native-community/slider": "https://raw.githubusercontent.com/wordpress-mobile/react-native-slider/v3.0.2-wp-5/react-native-community-slider-3.0.2-wp-5.tgz",
 		"@react-native-masked-view/masked-view": "0.3.0",
 		"@react-navigation/core": "5.12.0",
 		"@react-navigation/native": "6.0.14",
@@ -69,7 +69,7 @@
 		"react-native-screens": "3.29.0",
 		"react-native-svg": "14.0.0",
 		"react-native-url-polyfill": "1.3.0",
-		"react-native-video": "https://raw.githubusercontent.com/wordpress-mobile/react-native-video/5.2.0-wp-6/react-native-video-5.2.0-wp-6.tgz",
+		"react-native-video": "https://raw.githubusercontent.com/wordpress-mobile/react-native-video/5.2.0-wp-7/react-native-video-5.2.0-wp-7.tgz",
 		"react-native-webview": "13.6.1"
 	},
 	"publishConfig": {

@@ -4,17 +4,14 @@
 	"compilerOptions": {
 		"rootDir": "src",
 		"declarationDir": "build-types",
-		"skipLibCheck": true,
 		"checkJs": false
 	},
 	"references": [
-		{ "path": "../a11y" },
 		{ "path": "../components" },
 		{ "path": "../compose" },
 		{ "path": "../element" },
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
-		{ "path": "../keycodes" },
 		{ "path": "../primitives" },
 		{ "path": "../private-apis" }
 	],

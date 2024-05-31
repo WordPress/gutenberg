@@ -6,17 +6,20 @@
 
 	.edit-site-global-styles-variations_item-preview {
 		border-radius: $radius-block-ui;
-		outline: $border-width solid rgba($black, 0.15);
+		outline: $border-width solid rgba($black, 0.1);
 		outline-offset: -$border-width;
+		overflow: hidden;
 		position: relative;
 		// Add the same transition that block style variations and other buttons have.
 		transition: outline 0.1s linear;
 		@include reduce-motion("transition");
 
 		&.is-pill {
-			height: $button-size-next-default-40px;
-			border-radius: 100px;
-			overflow: hidden;
+			height: $button-size-compact;
+
+			.block-editor-iframe__scale-container {
+				overflow: hidden;
+			}
 		}
 	}
 

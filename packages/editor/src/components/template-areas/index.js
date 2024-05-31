@@ -15,6 +15,7 @@ import { __ } from '@wordpress/i18n';
  */
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import { TEMPLATE_POST_TYPE } from '../../store/constants';
 
 function TemplateAreaItem( { area, clientId } ) {
 	const { selectBlock, toggleBlockHighlight } =
@@ -54,13 +55,21 @@ function TemplateAreaItem( { area, clientId } ) {
 }
 
 export default function TemplateAreas() {
-	const templateParts = useSelect(
-		( select ) =>
-			unlock( select( editorStore ) ).getCurrentTemplateTemplateParts(),
-		[]
-	);
+	const { isTemplate, templateParts } = useSelect( ( select ) => {
+		const _isTemplate =
+			select( editorStore ).getCurrentPostType() === TEMPLATE_POST_TYPE;
 
-	if ( ! templateParts.length ) {
+		return {
+			isTemplate: _isTemplate,
+			templateParts:
+				_isTemplate &&
+				unlock(
+					select( editorStore )
+				).getCurrentTemplateTemplateParts(),
+		};
+	}, [] );
+
+	if ( ! isTemplate || ! templateParts.length ) {
 		return null;
 	}
 

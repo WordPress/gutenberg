@@ -50,13 +50,13 @@ _Dynamic block example_
     Toggle
   </button>
  
-  <p id="p-1" data-wp-show="context.isOpen">
+  <p id="p-1" data-wp-bind--hidden="!context.isOpen">
     This element is now visible!
   </p>
 </div>
 ```
 
-As you can see, directives like `data-wp-on--click` or `data-wp-show` are added as custom HTML attributes. WordPress can process this HTML on the server, handling the directives’ logic and creating the appropriate markup.
+As you can see, directives like [`data-wp-on--click`](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/api-reference/#wp-on) or [`data-wp-bind--hidden`](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/api-reference/#wp-bind) are added as custom HTML attributes. WordPress can process this HTML on the server, handling the directives’ logic and creating the appropriate markup.
 
 ### Backward compatible
 
@@ -136,7 +136,7 @@ store( 'wpmovies', {
     Toggle
   </button>
  
-  <p id="p-1" data-wp-show="context.isOpen">
+  <p id="p-1" data-wp-bind--hidden="!context.isOpen">
     This element is now visible!
   </p>
 </div>
@@ -155,15 +155,13 @@ The API has been designed to be as performant as possible:
 
 Directives can be added, removed, or modified directly from the HTML. For example, users could use the [`render_block` filter](https://developer.wordpress.org/reference/hooks/render_block/) to modify the HTML and its behavior.
 
-In addition to using built-in directives, users can create custom directives to add any custom behaviors to their HTML.
-
 ### Atomic and composable
 
 Each directive controls a small part of the DOM, and you can combine multiple directives to create rich, interactive user experiences.
 
 ### Compatible with the existing block development tooling
 
-Using built-in directives does not require a build step and only requires a small runtime. A build step is necessary only when creating custom directives that return JSX. For such use cases, the API works out of the box with common block-building tools like [`wp-scripts`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/).
+The API works out of the box with standard block-building tools like [`wp-scripts`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/). The only requirement for `wp-scripts` to properly build the [Script Modules](https://make.wordpress.org/core/2024/03/04/script-modules-in-6-5/) using the Interactivity API is the use of the --experimental-modules flag for both [`build`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/#build) and [`start`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/#start) scripts.
 
 ### Client-side navigation
 

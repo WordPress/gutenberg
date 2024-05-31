@@ -247,10 +247,10 @@ function ButtonEdit( props ) {
 				lockUrlControls:
 					!! metadata?.bindings?.url &&
 					( ! blockBindingsSource ||
-						blockBindingsSource?.lockAttributesEditing ),
+						blockBindingsSource?.lockAttributesEditing() ),
 			};
 		},
-		[ isSelected ]
+		[ isSelected, metadata?.bindings?.url ]
 	);
 
 	return (
@@ -339,7 +339,7 @@ function ButtonEdit( props ) {
 						} }
 						anchor={ popoverAnchor }
 						focusOnMount={ isEditingURL ? 'firstElement' : false }
-						__unstableSlotName={ '__unstable-block-tools-after' }
+						__unstableSlotName="__unstable-block-tools-after"
 						shift
 					>
 						<LinkControl

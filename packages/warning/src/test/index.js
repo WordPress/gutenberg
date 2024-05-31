@@ -4,28 +4,31 @@
 import warning from '..';
 import { logged } from '../utils';
 
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable @wordpress/wp-global-usage */
+
 describe( 'warning', () => {
-	const initialScriptDebug = global.SCRIPT_DEBUG;
+	const initialScriptDebug = globalThis.SCRIPT_DEBUG;
 
 	afterEach( () => {
-		global.SCRIPT_DEBUG = initialScriptDebug;
+		globalThis.SCRIPT_DEBUG = initialScriptDebug;
 		logged.clear();
 	} );
 
 	it( 'logs to console.warn when SCRIPT_DEBUG is set to `true`', () => {
-		global.SCRIPT_DEBUG = true;
+		globalThis.SCRIPT_DEBUG = true;
 		warning( 'warning' );
 		expect( console ).toHaveWarnedWith( 'warning' );
 	} );
 
 	it( 'does not log to console.warn if SCRIPT_DEBUG not set to `true`', () => {
-		global.SCRIPT_DEBUG = false;
+		globalThis.SCRIPT_DEBUG = false;
 		warning( 'warning' );
 		expect( console ).not.toHaveWarned();
 	} );
 
 	it( 'should show a message once', () => {
-		global.SCRIPT_DEBUG = true;
+		globalThis.SCRIPT_DEBUG = true;
 		warning( 'warning' );
 		warning( 'warning' );
 

@@ -15,7 +15,6 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 /**
  * Internal dependencies
  */
-import AddNewPattern from '../add-new-pattern';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import CategoryItem from './category-item';
 import {
@@ -31,7 +30,6 @@ import { unlock } from '../../lock-unlock';
 const { useLocation } = unlock( routerPrivateApis );
 
 function CategoriesGroup( {
-	path,
 	templatePartAreas,
 	patternCategories,
 	currentCategory,
@@ -43,7 +41,6 @@ function CategoriesGroup( {
 		<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
 			<CategoryItem
 				key="all"
-				path={ path }
 				count={ Object.values( templatePartAreas )
 					.map( ( { templateParts } ) => templateParts?.length || 0 )
 					.reduce( ( acc, val ) => acc + val, 0 ) }
@@ -60,7 +57,6 @@ function CategoriesGroup( {
 				( [ area, { label, templateParts } ] ) => (
 					<CategoryItem
 						key={ area }
-						path={ path }
 						count={ templateParts?.length }
 						icon={ getTemplatePartIcon( area ) }
 						label={ label }
@@ -77,32 +73,28 @@ function CategoriesGroup( {
 			{ allPatterns && (
 				<CategoryItem
 					key={ allPatterns.name }
-					path={ path }
 					count={ allPatterns.count }
 					label={ allPatterns.label }
 					icon={ file }
 					id={ allPatterns.name }
-					type="pattern"
+					type={ PATTERN_TYPES.user }
 					isActive={
 						currentCategory === `${ allPatterns.name }` &&
-						( currentType === PATTERN_TYPES.theme ||
-							currentType === PATTERN_TYPES.user )
+						currentType === PATTERN_TYPES.user
 					}
 				/>
 			) }
 			{ otherPatterns.map( ( category ) => (
 				<CategoryItem
 					key={ category.name }
-					path={ path }
 					count={ category.count }
 					label={ category.label }
 					icon={ file }
 					id={ category.name }
-					type="pattern"
+					type={ PATTERN_TYPES.user }
 					isActive={
 						currentCategory === `${ category.name }` &&
-						( currentType === PATTERN_TYPES.theme ||
-							currentType === PATTERN_TYPES.user )
+						currentType === PATTERN_TYPES.user
 					}
 				/>
 			) ) }
@@ -110,12 +102,12 @@ function CategoriesGroup( {
 	);
 }
 
-export default function SidebarNavigationScreenPatterns() {
+export default function SidebarNavigationScreenPatterns( { backPath } ) {
 	const {
-		params: { categoryType, categoryId, path },
+		params: { postType, categoryId },
 	} = useLocation();
 	const currentCategory = categoryId || PATTERN_DEFAULT_CATEGORY;
-	const currentType = categoryType || PATTERN_TYPES.theme;
+	const currentType = postType || PATTERN_TYPES.user;
 
 	const { templatePartAreas, hasTemplateParts, isLoading } =
 		useTemplatePartAreas();
@@ -125,18 +117,6 @@ export default function SidebarNavigationScreenPatterns() {
 		[]
 	);
 
-	/**
-	 * This sidebar needs to temporarily accomodate two different "URLs":
-	 *
-	 * 1. path = /patterns
-	 *    Block based themes. Also classic themes can access this URL, though it's not linked anywhere.
-	 *
-	 * 2. path = /wp_template_part/all
-	 *    Classic themes with support for block-template-parts. We need to list only Template Parts in this case.
-	 *    The URL is accessible from the Appearance > Template Parts menu.
-	 *
-	 * This is temporary. We aim to consolidate to /patterns.
-	 */
 	return (
 		<SidebarNavigationScreen
 			isRoot={ ! isBlockBasedTheme }
@@ -144,7 +124,7 @@ export default function SidebarNavigationScreenPatterns() {
 			description={ __(
 				'Manage what patterns are available when editing the site.'
 			) }
-			actions={ <AddNewPattern /> }
+			backPath={ backPath }
 			content={
 				<>
 					{ isLoading && __( 'Loading items…' ) }
@@ -156,7 +136,6 @@ export default function SidebarNavigationScreenPatterns() {
 								</ItemGroup>
 							) }
 							<CategoriesGroup
-								path={ path }
 								templatePartAreas={ templatePartAreas }
 								patternCategories={ patternCategories }
 								currentCategory={ currentCategory }
