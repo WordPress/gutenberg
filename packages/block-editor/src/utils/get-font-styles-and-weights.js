@@ -88,11 +88,8 @@ export function getFontStylesAndWeights( fontFamilyFaces ) {
 					( weight ) => weight.value === face.fontWeight
 				)
 			) {
-				// Remove any leading or trailing whitespace from the font weight.
-				face.fontWeight.trim();
-
-				// Check if font weight includes a space, if so it must be a variable font.
-				if ( /\s/.test( face.fontWeight ) ) {
+				// Check if font weight includes a space that is not at the start or end of the string. If so, it must be a variable font. e.g. "100 900"
+				if ( /\s/.test( face.fontWeight.trim() ) ) {
 					variableFont = true;
 				}
 
