@@ -119,7 +119,7 @@ function render_block_core_block( $attributes ) {
 
 			return $parsed_block;
 		};
-		add_filter( 'render_block_data', $apply_default_pattern_overrides_bindings, 10, 1 );
+		add_filter( 'render_block_data', $apply_default_pattern_overrides_bindings );
 	}
 
 	$content = do_blocks( $content );
@@ -127,6 +127,7 @@ function render_block_core_block( $attributes ) {
 
 	if ( $has_pattern_overrides ) {
 		remove_filter( 'render_block_context', $filter_block_context, 1 );
+		remove_filter( 'render_block_data', $apply_default_pattern_overrides_bindings );
 	}
 
 	return $content;
