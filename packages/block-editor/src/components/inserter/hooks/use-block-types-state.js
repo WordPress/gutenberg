@@ -14,20 +14,24 @@ import { useCallback } from '@wordpress/element';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../../store';
+import { withRootClientIdOptionKey } from '../../../store/utils';
 
 /**
  * Retrieves the block types inserter state.
  *
  * @param {string=}  rootClientId Insertion's root client ID.
  * @param {Function} onInsert     function called when inserter a list of blocks.
+ * @param {boolean}  isQuick
  * @return {Array} Returns the block types state. (block types, categories, collections, onSelect handler)
  */
-const useBlockTypesState = ( rootClientId, onInsert ) => {
+const useBlockTypesState = ( rootClientId, onInsert, isQuick ) => {
 	const [ items ] = useSelect(
 		( select ) => [
-			select( blockEditorStore ).getInserterItems( rootClientId ),
+			select( blockEditorStore ).getInserterItems( rootClientId, {
+				[ withRootClientIdOptionKey ]: ! isQuick,
+			} ),
 		],
-		[ rootClientId ]
+		[ rootClientId, isQuick ]
 	);
 
 	const [ categories, collections ] = useSelect( ( select ) => {
@@ -37,7 +41,14 @@ const useBlockTypesState = ( rootClientId, onInsert ) => {
 
 	const onSelectItem = useCallback(
 		(
-			{ name, initialAttributes, innerBlocks, syncStatus, content },
+			{
+				name,
+				initialAttributes,
+				innerBlocks,
+				syncStatus,
+				content,
+				rootClientId: _rootClientId,
+			},
 			shouldFocusBlock
 		) => {
 			const insertedBlock =
@@ -51,7 +62,12 @@ const useBlockTypesState = ( rootClientId, onInsert ) => {
 							createBlocksFromInnerBlocksTemplate( innerBlocks )
 					  );
 
-			onInsert( insertedBlock, undefined, shouldFocusBlock );
+			onInsert(
+				insertedBlock,
+				undefined,
+				shouldFocusBlock,
+				_rootClientId
+			);
 		},
 		[ onInsert ]
 	);
