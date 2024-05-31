@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import fastDeepEqual from 'fast-deep-equal';
+
+/**
  * WordPress dependencies
  */
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -157,6 +162,21 @@ export const hasPostMetaChanges = createRegistrySelector(
 			postType || currentPostType,
 			postId || currentPostId
 		);
-		return !! edits?.meta;
+
+		if ( ! edits?.meta ) {
+			return false;
+		}
+
+		// Compare if anything apart from `footnotes` has changed.
+		const originalPostMeta = select( coreStore ).getEntityRecord(
+			'postType',
+			postType || currentPostType,
+			postId || currentPostId
+		)?.meta;
+
+		return ! fastDeepEqual(
+			{ ...originalPostMeta, footnotes: undefined },
+			{ ...edits.meta, footnotes: undefined }
+		);
 	}
 );
