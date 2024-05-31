@@ -82,12 +82,12 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 		);
 
 		return (
-			<>
+			<Styled.SelectedExperimentalHintWrapper>
 				{ currentValue }
 				<Styled.SelectedExperimentalHintItem className="components-custom-select-control__hint">
 					{ currentHint?.__experimentalHint }
 				</Styled.SelectedExperimentalHintItem>
-			</>
+			</Styled.SelectedExperimentalHintWrapper>
 		);
 	};
 

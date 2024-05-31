@@ -15,10 +15,20 @@ import type { CustomSelectButtonSize } from './types';
 
 const ITEM_PADDING = space( 2 );
 
+const truncateStyles = css`
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+`;
+
 export const WithHintWrapper = styled.div`
 	display: flex;
 	justify-content: space-between;
 	flex: 1;
+`;
+
+export const SelectedExperimentalHintWrapper = styled.div`
+	${ truncateStyles }
 `;
 
 export const SelectedExperimentalHintItem = styled.span`
@@ -74,14 +84,6 @@ export const Select = styled( Ariakit.Select, {
 		return sizes[ size ] || sizes.default;
 	};
 
-	const truncateStyles =
-		! hasCustomRenderProp &&
-		css`
-			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
-		`;
-
 	return css`
 		display: block;
 		background-color: ${ COLORS.theme.background };
@@ -98,7 +100,7 @@ export const Select = styled( Ariakit.Select, {
 		}
 
 		${ getSize() }
-		${ truncateStyles }
+		${ ! hasCustomRenderProp && truncateStyles }
 	`;
 } );
 
