@@ -7,17 +7,17 @@
  */
 
 /**
- * Get the class name for this application of this block's variation styles.
+ * Generate block style variation instance name.
  *
  * @since 6.6.0
  *
  * @param array  $block     Block object.
  * @param string $variation Slug for the block style variation.
  *
- * @return string The unique class name.
+ * @return string The unique variation name.
  */
-function gutenberg_get_block_style_variation_class_name( $block, $variation ) {
-	return 'is-style-' . $variation . '--' . md5( serialize( $block ) );
+function gutenberg_create_block_style_variation_instance_name( $block, $variation ) {
+	return $variation . '--' . md5( serialize( $block ) );
 }
 
 /**
@@ -79,31 +79,69 @@ function gutenberg_render_block_style_variation_support_styles( $parsed_block ) 
 		return $parsed_block;
 	}
 
-	$config = array(
-		'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-		'styles'  => $variation_data,
-	);
-
-	$class_name         = gutenberg_get_block_style_variation_class_name( $parsed_block, $variation );
+	$variation_instance = gutenberg_create_block_style_variation_instance_name( $parsed_block, $variation );
+	$class_name         = "is-style-$variation_instance";
 	$updated_class_name = $parsed_block['attrs']['className'] . " $class_name";
 
-	$class_name = ".$class_name";
+	/*
+	 * Even though block style variations are effectively theme.json partials,
+	 * they can't be processed completely as though they are.
+	 *
+	 * Block styles support custom selectors to direct specific types of styles
+	 * to inner elements. For example, borders on Image block's get applied to
+	 * the inner `img` element rather than the wrapping `figure`.
+	 *
+	 * The following relocates the "root" block style variation styles to
+	 * under an appropriate blocks property to leverage the preexisting style
+	 * generation for simple block style variations. This way they get the
+	 * custom selectors they need.
+	 *
+	 * The inner elements and block styles for the variation itself are
+	 * still included at the top level but scoped by the variation's selector
+	 * when the stylesheet is generated.
+	 */
+	$elements_data = $variation_data['elements'] ?? array();
+	$blocks_data   = $variation_data['blocks'] ?? array();
+	unset( $variation_data['elements'] );
+	unset( $variation_data['blocks'] );
 
+	_wp_array_set(
+		$blocks_data,
+		array( $parsed_block['blockName'], 'variations', $variation_instance ),
+		$variation_data
+	);
+
+	$config = array(
+		'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+		'styles'  => array(
+			'elements' => $elements_data,
+			'blocks'   => $blocks_data,
+		),
+	);
+
+	// Turn off filter that excludes block nodes. They are needed here for the variation's inner block types.
 	if ( ! is_admin() ) {
 		remove_filter( 'wp_theme_json_get_style_nodes', 'wp_filter_out_block_nodes' );
 	}
+
+	// Temporarily prevent variation instance from being sanitized while processing theme.json.
+	$styles_registry = WP_Block_Styles_Registry::get_instance();
+	$styles_registry->register( $parsed_block['blockName'], array( 'name' => $variation_instance ) );
 
 	$variation_theme_json = new WP_Theme_JSON_Gutenberg( $config, 'blocks' );
 	$variation_styles     = $variation_theme_json->get_stylesheet(
 		array( 'styles' ),
 		array( 'custom' ),
 		array(
-			'root_selector'           => $class_name,
 			'skip_root_layout_styles' => true,
-			'scope'                   => $class_name,
+			'scope'                   => ".$class_name",
 		)
 	);
 
+	// Clean up temporary block style now instance styles have been processed.
+	$styles_registry->unregister( $parsed_block['blockName'], $variation_instance );
+
+	// Restore filter that excludes block nodes.
 	if ( ! is_admin() ) {
 		add_filter( 'wp_theme_json_get_style_nodes', 'wp_filter_out_block_nodes' );
 	}
@@ -112,7 +150,7 @@ function gutenberg_render_block_style_variation_support_styles( $parsed_block ) 
 		return $parsed_block;
 	}
 
-	wp_register_style( 'block-style-variation-styles', false, array( 'global-styles' ) );
+	wp_register_style( 'block-style-variation-styles', false, array( 'global-styles', 'wp-block-library' ) );
 	wp_add_inline_style( 'block-style-variation-styles', $variation_styles );
 
 	/*
@@ -147,7 +185,7 @@ function gutenberg_render_block_style_variation_class_name( $block_content, $blo
 	 * Matches a class prefixed by `is-style`, followed by the
 	 * variation slug, then `--`, and finally a hash.
 	 *
-	 * See `gutenberg_get_block_style_variation_class_name` for class generation.
+	 * See `gutenberg_create_block_style_variation_instance_name` for class generation.
 	 */
 	preg_match( '/\bis-style-(\S+?--\w+)\b/', $block['attrs']['className'], $matches );
 
@@ -179,7 +217,7 @@ function gutenberg_render_block_style_variation_class_name( $block_content, $blo
  *
  * @param array $variations Shared block style variations.
  *
- * @return array Block variations data to be merged under styles.blocks
+ * @return array Block variations data to be merged under `styles.blocks`.
  */
 function gutenberg_resolve_and_register_block_style_variations( $variations ) {
 	$variations_data = array();
