@@ -92,7 +92,7 @@
 		"webpack-dev-server": "^4.15.1"
 	},
 	"peerDependencies": {
-		"@playwright/test": "^1.44.0",
+		"@playwright/test": "^1.44.1",
 		"react": "^18.0.0",
 		"react-dom": "^18.0.0"
 	},
