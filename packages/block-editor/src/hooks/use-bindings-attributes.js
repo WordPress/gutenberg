@@ -52,10 +52,10 @@ function replacePatternOverrideDefaultBindings( blockName, bindings ) {
 		const bindingsWithDefaults = {};
 		for ( const attributeName of supportedAttributes ) {
 			// If the block has mixed binding sources, retain any non pattern override bindings.
-			const bindingSourceName = bindings[ attributeName ]
+			const bindingSource = bindings[ attributeName ]
 				? bindings[ attributeName ]
 				: { source: 'core/pattern-overrides' };
-			bindingsWithDefaults[ attributeName ] = bindingSourceName;
+			bindingsWithDefaults[ attributeName ] = bindingSource;
 		}
 
 		return bindingsWithDefaults;
