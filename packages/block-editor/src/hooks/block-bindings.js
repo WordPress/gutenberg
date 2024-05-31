@@ -14,10 +14,11 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
+import { canBindAttribute } from '../hooks/use-bindings-attributes';
 import { unlock } from '../lock-unlock';
 import InspectorControls from '../components/inspector-controls';
 
-export const BlockBindingsPanel = ( { metadata } ) => {
+export const BlockBindingsPanel = ( { name, metadata } ) => {
 	const { bindings } = metadata || {};
 	const { sources } = useSelect( ( select ) => {
 		const _sources = unlock(
@@ -33,11 +34,15 @@ export const BlockBindingsPanel = ( { metadata } ) => {
 		return null;
 	}
 
+	// Don't show not allowed attributes.
 	// Don't show the bindings connected to pattern overrides in the inspectors panel.
 	// TODO: Explore if this should be abstracted to let other sources decide.
 	const filteredBindings = { ...bindings };
 	Object.keys( filteredBindings ).forEach( ( key ) => {
-		if ( filteredBindings[ key ].source === 'core/pattern-overrides' ) {
+		if (
+			! canBindAttribute( name, key ) ||
+			filteredBindings[ key ].source === 'core/pattern-overrides'
+		) {
 			delete filteredBindings[ key ];
 		}
 	} );
