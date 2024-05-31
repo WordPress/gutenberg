@@ -96,21 +96,24 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 		const sources = useSelect( ( select ) =>
 			unlock( select( blocksStore ) ).getAllBlockBindingsSources()
 		);
-		const bindings = props.attributes.metadata?.bindings;
 		const { name, clientId, context } = props;
-		const bindingsWithDefaults = useMemo(
-			() => replacePatternOverrideDefaultBindings( name, bindings ),
-			[ bindings, name ]
+		const bindings = useMemo(
+			() =>
+				replacePatternOverrideDefaultBindings(
+					name,
+					props.attributes.metadata?.bindings
+				),
+			[ props.attributes.metadata?.bindings, name ]
 		);
 		const boundAttributes = useSelect( () => {
-			if ( ! bindingsWithDefaults ) {
+			if ( ! bindings ) {
 				return;
 			}
 
 			const attributes = {};
 
 			for ( const [ attributeName, boundAttribute ] of Object.entries(
-				bindingsWithDefaults
+				bindings
 			) ) {
 				const source = sources[ boundAttribute.source ];
 				if (
@@ -141,21 +144,14 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 			}
 
 			return attributes;
-		}, [
-			bindingsWithDefaults,
-			name,
-			clientId,
-			context,
-			registry,
-			sources,
-		] );
+		}, [ bindings, name, clientId, context, registry, sources ] );
 
 		const { setAttributes } = props;
 
 		const _setAttributes = useCallback(
 			( nextAttributes ) => {
 				registry.batch( () => {
-					if ( ! bindingsWithDefaults ) {
+					if ( ! bindings ) {
 						setAttributes( nextAttributes );
 						return;
 					}
@@ -168,13 +164,13 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 						keptAttributes
 					) ) {
 						if (
-							! bindingsWithDefaults[ attributeName ] ||
+							! bindings[ attributeName ] ||
 							! canBindAttribute( name, attributeName )
 						) {
 							continue;
 						}
 
-						const binding = bindingsWithDefaults[ attributeName ];
+						const binding = bindings[ attributeName ];
 						const source = sources[ binding?.source ];
 						if ( ! source?.setValue && ! source?.setValues ) {
 							continue;
@@ -203,8 +199,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 									attributeName,
 									value,
 								] of Object.entries( attributes ) ) {
-									const binding =
-										bindingsWithDefaults[ attributeName ];
+									const binding = bindings[ attributeName ];
 									source.setValue( {
 										registry,
 										context,
@@ -225,7 +220,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 			},
 			[
 				registry,
-				bindingsWithDefaults,
+				bindings,
 				name,
 				clientId,
 				context,
