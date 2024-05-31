@@ -54,14 +54,14 @@ export default function BottomSheetSwitchCell( props ) {
 		<Cell
 			{ ...cellProps }
 			accessibilityLabel={ getAccessibilityLabel() }
-			accessibilityRole={ 'none' }
+			accessibilityRole="none"
 			accessibilityHint={
 				/* translators: accessibility text (hint for switches) */
 				__( 'Double tap to toggle setting' )
 			}
 			onPress={ onPress }
 			editable={ false }
-			value={ '' }
+			value=""
 			disabled={ disabled }
 			disabledStyle={ EMPTY_STYLE }
 		>

@@ -1,6 +1,6 @@
 .block-editor-block-patterns-list__list-item {
 	cursor: pointer;
-	margin-bottom: $grid-unit-30;
+	margin-bottom: $grid-unit-20;
 
 	// The list item contains absolutely positioned visually hidden text,
 	// so make this container relative. This prevents the bug experienced in
@@ -26,38 +26,41 @@
 	// the bottom margin set on `...__list-item` above
 	scroll-margin-bottom: ($grid-unit-40 + $grid-unit-30);
 
+	.block-editor-block-patterns-list__item-title {
+		flex-grow: 1;
+		font-size: $helptext-font-size;
+		text-align: left;
+	}
+
 	.block-editor-block-preview__container {
 		display: flex;
 		align-items: center;
 		overflow: hidden;
-		border-radius: 4px;
-	}
+		border-radius: $radius-block-ui;
 
-	.block-editor-block-patterns-list__item-title {
-		text-align: left;
-		flex-grow: 1;
-	}
-
-	&:hover .block-editor-block-preview__container {
-		box-shadow: 0 0 0 2px $gray-900;
-	}
-
-	&:focus .block-editor-block-preview__container {
-		@include button-style-outset__focus($gray-900);
-	}
-
-	&.block-editor-block-patterns-list__list-item-synced {
-		&:hover,
-		&:focus {
-			.block-editor-block-preview__container {
-				box-shadow: 0 0 0 2px var(--wp-block-synced-color);
-			}
+		&::after {
+			outline: $border-width solid rgba($black, 0.1);
+			outline-offset: -$border-width;
+			border-radius: $radius-block-ui;
 		}
 	}
 
-	.block-editor-patterns__pattern-details {
+	&:hover:not(:focus) .block-editor-block-preview__container::after {
+		outline-color: rgba($black, 0.3);
+	}
+
+	&:focus .block-editor-block-preview__container::after {
+		outline-color: var(--wp-admin-theme-color);
+		outline-width: var(--wp-admin-border-width-focus);
+		outline-offset: calc((-1 * var(--wp-admin-border-width-focus)));
+		transition: outline 0.1s linear;
+		@include reduce-motion("transition");
+	}
+
+	.block-editor-patterns__pattern-details:not(:empty) {
 		align-items: center;
 		margin-top: $grid-unit-10;
+		padding-bottom: $grid-unit-05; // Add more space for labels on user-created patterns.
 	}
 
 	.block-editor-patterns__pattern-icon-wrapper {

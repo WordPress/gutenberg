@@ -501,7 +501,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				'expected_output' => '<p class="wp-container-content-1">Some text.</p>', // The generated classname number assumes `wp_unique_id` will not have run previously in this test.
+				'expected_output' => '<p class="wp-container-content-1">Some text.</p>', // The generated classname number assumes `wp_unique_prefixed_id( 'wp-container-content-' )` will not have run previously in this test.
 			),
 		);
 	}

@@ -32,12 +32,7 @@ const preventDefault = ( event ) => {
 	event.preventDefault();
 };
 
-function DocumentTools( {
-	className,
-	disableBlockTools = false,
-	// This is a temporary prop until the list view is fully unified between post and site editors.
-	listViewLabel = __( 'Document Overview' ),
-} ) {
+function DocumentTools( { className, disableBlockTools = false } ) {
 	const { setIsInserterOpened, setIsListViewOpened } =
 		useDispatch( editorStore );
 	const {
@@ -164,7 +159,7 @@ function DocumentTools( {
 								disabled={ disableBlockTools }
 								isPressed={ isListViewOpen }
 								/* translators: button label text should, if possible, be under 16 characters. */
-								label={ listViewLabel }
+								label={ __( 'Document Overview' ) }
 								onClick={ toggleListView }
 								shortcut={ listViewShortcut }
 								showTooltip={ ! showIconLabels }

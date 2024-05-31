@@ -14,13 +14,19 @@ import {
 	registerLegacyWidgetBlock,
 	registerWidgetGroupBlock,
 } from '@wordpress/widgets';
-import { store as editorStore } from '@wordpress/editor';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import './hooks';
 import Editor from './editor';
+import { unlock } from './lock-unlock';
+
+const { BackButton: __experimentalMainDashboardButton } =
+	unlock( editorPrivateApis );
 
 /**
  * Initializes and returns an instance of Editor.
@@ -80,7 +86,7 @@ export function initializeEditor(
 	registerCoreBlocks();
 	registerLegacyWidgetBlock( { inserter: false } );
 	registerWidgetGroupBlock( { inserter: false } );
-	if ( process.env.IS_GUTENBERG_PLUGIN ) {
+	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 		__experimentalRegisterExperimentalCoreBlocks( {
 			enableFSEBlocks: settings.__unstableEnableFullSiteEditingBlocks,
 		} );
@@ -152,8 +158,7 @@ export function reinitializeEditor() {
 	} );
 }
 
-export { default as __experimentalFullscreenModeClose } from './components/header/fullscreen-mode-close';
-export { default as __experimentalMainDashboardButton } from './components/header/main-dashboard-button';
-
+export { default as __experimentalFullscreenModeClose } from './components/back-button/fullscreen-mode-close';
+export { __experimentalMainDashboardButton };
 export { store } from './store';
 export * from './deprecated';

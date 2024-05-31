@@ -10,26 +10,20 @@ import {
 	AutosaveMonitor,
 	LocalAutosaveMonitor,
 	UnsavedChangesWarning,
-	EditorNotices,
 	EditorKeyboardShortcutsRegister,
-	EditorKeyboardShortcuts,
 	EditorSnackbars,
 	store as editorStore,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
-	BlockBreadcrumb,
-	BlockToolbar,
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { ScrollLock } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
-import { __, _x, sprintf } from '@wordpress/i18n';
-import { useState, useCallback, useMemo } from '@wordpress/element';
-import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { __, sprintf } from '@wordpress/i18n';
+import { useCallback, useMemo } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { privateApis as commandsPrivateApis } from '@wordpress/commands';
@@ -40,55 +34,54 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import TextEditor from '../text-editor';
-import VisualEditor from '../visual-editor';
+import BackButton from '../back-button';
 import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 import InitPatternModal from '../init-pattern-modal';
 import BrowserURL from '../browser-url';
-import Header from '../header';
 import MetaBoxes from '../meta-boxes';
+import PostEditorMoreMenu from '../more-menu';
 import WelcomeGuide from '../welcome-guide';
 import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import useCommonCommands from '../../hooks/commands/use-common-commands';
+import useEditPostCommands from '../../commands/use-commands';
+import { usePaddingAppender } from './use-padding-appender';
+import { useShouldIframe } from './use-should-iframe';
 
 const { getLayoutStyles } = unlock( blockEditorPrivateApis );
 const { useCommands } = unlock( coreCommandsPrivateApis );
 const { useCommandContext } = unlock( commandsPrivateApis );
-const {
-	InserterSidebar,
-	ListViewSidebar,
-	ComplementaryArea,
-	FullscreenMode,
-	SavePublishPanels,
-	InterfaceSkeleton,
-	interfaceStore,
-	Sidebar,
-} = unlock( editorPrivateApis );
+const { EditorInterface, FullscreenMode, Sidebar } =
+	unlock( editorPrivateApis );
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
-
-const interfaceLabels = {
-	/* translators: accessibility text for the editor top bar landmark region. */
-	header: __( 'Editor top bar' ),
-	/* translators: accessibility text for the editor content landmark region. */
-	body: __( 'Editor content' ),
-	/* translators: accessibility text for the editor settings landmark region. */
-	sidebar: __( 'Editor settings' ),
-	/* translators: accessibility text for the editor publish landmark region. */
-	actions: __( 'Editor publish' ),
-	/* translators: accessibility text for the editor footer landmark region. */
-	footer: __( 'Editor footer' ),
-};
+const DESIGN_POST_TYPES = [
+	'wp_template',
+	'wp_template_part',
+	'wp_block',
+	'wp_navigation',
+];
 
 function useEditorStyles() {
-	const { hasThemeStyleSupport, editorSettings } = useSelect(
-		( select ) => ( {
+	const {
+		hasThemeStyleSupport,
+		editorSettings,
+		isZoomedOutView,
+		hasMetaBoxes,
+		renderingMode,
+		postType,
+	} = useSelect( ( select ) => {
+		const { __unstableGetEditorMode } = select( blockEditorStore );
+		const { getCurrentPostType, getRenderingMode } = select( editorStore );
+		const _postType = getCurrentPostType();
+		return {
 			hasThemeStyleSupport:
 				select( editPostStore ).isFeatureActive( 'themeStyles' ),
 			editorSettings: select( editorStore ).getEditorSettings(),
-		} ),
-		[]
-	);
+			isZoomedOutView: __unstableGetEditorMode() === 'zoom-out',
+			hasMetaBoxes: select( editPostStore ).hasMetaBoxes(),
+			renderingMode: getRenderingMode(),
+			postType: _postType,
+		};
+	}, [] );
 
 	// Compute the default styles.
 	return useMemo( () => {
@@ -122,7 +115,24 @@ function useEditorStyles() {
 			} );
 		}
 
-		return hasThemeStyles ? editorSettings.styles : defaultEditorStyles;
+		const baseStyles = hasThemeStyles
+			? editorSettings.styles ?? []
+			: defaultEditorStyles;
+
+		// Add a constant padding for the typewritter effect. When typing at the
+		// bottom, there needs to be room to scroll up.
+		if (
+			! isZoomedOutView &&
+			! hasMetaBoxes &&
+			renderingMode === 'post-only' &&
+			! DESIGN_POST_TYPES.includes( postType )
+		) {
+			baseStyles.push( {
+				css: 'body{padding-bottom: 40vh}',
+			} );
+		}
+
+		return baseStyles;
 	}, [
 		editorSettings.defaultEditorStyles,
 		editorSettings.disableLayoutStyles,
@@ -133,98 +143,55 @@ function useEditorStyles() {
 
 function Layout( { initialPost } ) {
 	useCommands();
-	useCommonCommands();
-
-	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	useEditPostCommands();
 	const isWideViewport = useViewportMatch( 'large' );
-	const isLargeViewport = useViewportMatch( 'medium' );
-
-	const { closeGeneralSidebar } = useDispatch( editPostStore );
+	const paddingAppenderRef = usePaddingAppender();
+	const shouldIframe = useShouldIframe();
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const {
 		mode,
 		isFullscreenActive,
-		isRichEditingEnabled,
 		sidebarIsOpened,
 		hasActiveMetaboxes,
-		previousShortcut,
-		nextShortcut,
 		hasBlockSelected,
-		isInserterOpened,
-		isListViewOpened,
 		showIconLabels,
 		isDistractionFree,
 		showBlockBreadcrumbs,
 		showMetaBoxes,
-		documentLabel,
 		hasHistory,
-		hasBlockBreadcrumbs,
-		blockEditorMode,
 		isEditingTemplate,
+		isWelcomeGuideVisible,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
-		const { getEditorSettings, getPostTypeLabel } = select( editorStore );
-		const editorSettings = getEditorSettings();
-		const postTypeLabel = getPostTypeLabel();
+		const { getEditorSettings } = select( editorStore );
+		const { isFeatureActive } = select( editPostStore );
 
 		return {
-			showMetaBoxes:
-				select( editorStore ).getRenderingMode() === 'post-only',
-			sidebarIsOpened: !! (
-				select( interfaceStore ).getActiveComplementaryArea( 'core' ) ||
-				select( editorStore ).isPublishSidebarOpened()
-			),
+			mode: select( editorStore ).getEditorMode(),
 			isFullscreenActive:
 				select( editPostStore ).isFeatureActive( 'fullscreenMode' ),
-			isInserterOpened: select( editorStore ).isInserterOpened(),
-			isListViewOpened: select( editorStore ).isListViewOpened(),
-			mode: select( editorStore ).getEditorMode(),
-			isRichEditingEnabled: editorSettings.richEditingEnabled,
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
-			previousShortcut: select(
-				keyboardShortcutsStore
-			).getAllShortcutKeyCombinations( 'core/editor/previous-region' ),
-			nextShortcut: select(
-				keyboardShortcutsStore
-			).getAllShortcutKeyCombinations( 'core/editor/next-region' ),
+			hasBlockSelected:
+				!! select( blockEditorStore ).getBlockSelectionStart(),
 			showIconLabels: get( 'core', 'showIconLabels' ),
 			isDistractionFree: get( 'core', 'distractionFree' ),
 			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
-			// translators: Default label for the Document in the Block Breadcrumb.
-			documentLabel: postTypeLabel || _x( 'Document', 'noun' ),
-			hasBlockSelected:
-				!! select( blockEditorStore ).getBlockSelectionStart(),
+			showMetaBoxes:
+				select( editorStore ).getRenderingMode() === 'post-only',
 			hasHistory: !! getEditorSettings().onNavigateToPreviousEntityRecord,
-			hasBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
-			blockEditorMode:
-				select( blockEditorStore ).__unstableGetEditorMode(),
 			isEditingTemplate:
 				select( editorStore ).getCurrentPostType() === 'wp_template',
+			isWelcomeGuideVisible: isFeatureActive( 'welcomeGuide' ),
 		};
 	}, [] );
 
 	// Set the right context for the command palette
 	const commandContext = hasBlockSelected
 		? 'block-selection-edit'
-		: 'post-editor-edit';
+		: 'entity-edit';
 	useCommandContext( commandContext );
 
 	const styles = useEditorStyles();
-
-	// Local state for save panel.
-	// Note 'truthy' callback implies an open panel.
-	const [ entitiesSavedStatesCallback, setEntitiesSavedStatesCallback ] =
-		useState( false );
-
-	const closeEntitiesSavedStates = useCallback(
-		( arg ) => {
-			if ( typeof entitiesSavedStatesCallback === 'function' ) {
-				entitiesSavedStatesCallback( arg );
-			}
-			setEntitiesSavedStatesCallback( false );
-		},
-		[ entitiesSavedStatesCallback ]
-	);
 
 	// We need to add the show-icon-labels class to the body element so it is applied to modals.
 	if ( showIconLabels ) {
@@ -237,30 +204,9 @@ function Layout( { initialPost } ) {
 		'is-sidebar-opened': sidebarIsOpened,
 		'has-metaboxes': hasActiveMetaboxes,
 		'is-distraction-free': isDistractionFree && isWideViewport,
-		'is-entity-save-view-open': !! entitiesSavedStatesCallback,
 		'has-block-breadcrumbs':
-			hasBlockBreadcrumbs && ! isDistractionFree && isWideViewport,
+			showBlockBreadcrumbs && ! isDistractionFree && isWideViewport,
 	} );
-
-	const secondarySidebarLabel = isListViewOpened
-		? __( 'Document Overview' )
-		: __( 'Block Library' );
-
-	const secondarySidebar = () => {
-		if ( mode === 'visual' && isInserterOpened ) {
-			return (
-				<InserterSidebar
-					closeGeneralSidebar={ closeGeneralSidebar }
-					isRightSidebarOpen={ sidebarIsOpened }
-				/>
-			);
-		}
-		if ( mode === 'visual' && isListViewOpened ) {
-			return <ListViewSidebar />;
-		}
-
-		return null;
-	};
 
 	function onPluginAreaError( name ) {
 		createErrorNotice(
@@ -335,82 +281,7 @@ function Layout( { initialPost } ) {
 			<LocalAutosaveMonitor />
 			<EditPostKeyboardShortcuts />
 			<EditorKeyboardShortcutsRegister />
-			<EditorKeyboardShortcuts />
 			<BlockKeyboardShortcuts />
-
-			<InterfaceSkeleton
-				isDistractionFree={ isDistractionFree && isWideViewport }
-				className={ className }
-				labels={ {
-					...interfaceLabels,
-					secondarySidebar: secondarySidebarLabel,
-				} }
-				header={
-					<Header
-						setEntitiesSavedStatesCallback={
-							setEntitiesSavedStatesCallback
-						}
-						initialPost={ initialPost }
-					/>
-				}
-				editorNotices={ <EditorNotices /> }
-				secondarySidebar={ secondarySidebar() }
-				sidebar={
-					! isDistractionFree && (
-						<ComplementaryArea.Slot scope="core" />
-					)
-				}
-				notices={ <EditorSnackbars /> }
-				content={
-					<>
-						{ ! isDistractionFree && <EditorNotices /> }
-						{ ( mode === 'text' || ! isRichEditingEnabled ) && (
-							<TextEditor />
-						) }
-						{ ! isLargeViewport && <BlockToolbar hideDragHandle /> }
-						{ isRichEditingEnabled && mode === 'visual' && (
-							<VisualEditor styles={ styles } />
-						) }
-						{ ! isDistractionFree && showMetaBoxes && (
-							<div className="edit-post-layout__metaboxes">
-								<MetaBoxes location="normal" />
-								<MetaBoxes location="advanced" />
-							</div>
-						) }
-						{ isMobileViewport && sidebarIsOpened && (
-							<ScrollLock />
-						) }
-					</>
-				}
-				footer={
-					! isDistractionFree &&
-					! isMobileViewport &&
-					showBlockBreadcrumbs &&
-					isRichEditingEnabled &&
-					blockEditorMode !== 'zoom-out' &&
-					mode === 'visual' && (
-						<div className="edit-post-layout__footer">
-							<BlockBreadcrumb rootLabelText={ documentLabel } />
-						</div>
-					)
-				}
-				actions={
-					<SavePublishPanels
-						closeEntitiesSavedStates={ closeEntitiesSavedStates }
-						isEntitiesSavedStatesOpen={
-							entitiesSavedStatesCallback
-						}
-						setEntitiesSavedStatesCallback={
-							setEntitiesSavedStatesCallback
-						}
-						forceIsDirtyPublishPanel={ hasActiveMetaboxes }
-					/>
-				}
-				shortcuts={ {
-					previous: previousShortcut,
-					next: nextShortcut,
-				} }
-			/>
 			<WelcomeGuide />
 			<InitPatternModal />
 			<PluginArea onError={ onPluginAreaError } />
@@ -422,6 +293,26 @@ function Layout( { initialPost } ) {
 					}
 				/>
 			) }
+			<PostEditorMoreMenu />
+			<BackButton initialPost={ initialPost } />
+			<EditorSnackbars />
+			<EditorInterface
+				className={ className }
+				styles={ styles }
+				forceIsDirty={ hasActiveMetaboxes }
+				contentRef={ paddingAppenderRef }
+				disableIframe={ ! shouldIframe }
+				// We should auto-focus the canvas (title) on load.
+				// eslint-disable-next-line jsx-a11y/no-autofocus
+				autoFocus={ ! isWelcomeGuideVisible }
+			>
+				{ ! isDistractionFree && showMetaBoxes && (
+					<div className="edit-post-layout__metaboxes">
+						<MetaBoxes location="normal" />
+						<MetaBoxes location="advanced" />
+					</div>
+				) }
+			</EditorInterface>
 		</>
 	);
 }

@@ -27,8 +27,8 @@ test.describe( 'Template Part', () => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//header',
 			postType: 'wp_template_part',
+			canvas: 'edit',
 		} );
-		await editor.canvas.locator( 'body' ).click();
 
 		// Insert a new template block and 'start blank'.
 		await editor.insertBlock( { name: 'core/template-part' } );
@@ -186,8 +186,8 @@ test.describe( 'Template Part', () => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//header',
 			postType: 'wp_template_part',
+			canvas: 'edit',
 		} );
-		await editor.canvas.locator( 'body' ).click();
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: {
@@ -229,8 +229,8 @@ test.describe( 'Template Part', () => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//header',
 			postType: 'wp_template_part',
+			canvas: 'edit',
 		} );
-		await editor.canvas.locator( 'body' ).click();
 		// Edit the header.
 		await editor.insertBlock( {
 			name: 'core/paragraph',
@@ -264,8 +264,8 @@ test.describe( 'Template Part', () => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//header',
 			postType: 'wp_template_part',
+			canvas: 'edit',
 		} );
-		await editor.canvas.locator( 'body' ).click();
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: {
@@ -371,8 +371,8 @@ test.describe( 'Template Part', () => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//header',
 			postType: 'wp_template_part',
+			canvas: 'edit',
 		} );
-		await editor.canvas.locator( 'body' ).click();
 
 		// Select the site title block.
 		const siteTitle = editor.canvas.getByRole( 'document', {

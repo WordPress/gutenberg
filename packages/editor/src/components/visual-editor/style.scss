@@ -1,0 +1,37 @@
+.editor-visual-editor {
+	position: relative;
+	height: 100%;
+	display: block;
+	background-color: $gray-300;
+
+	// Centralize the editor horizontally (flex-direction is column).
+	align-items: center;
+
+	&.is-resizable {
+		max-height: 100%;
+	}
+
+	&.has-padding {
+		padding: $grid-unit-30 $grid-unit-30 0;
+	}
+
+	// In the iframed canvas this keeps extra scrollbars from appearing (when block toolbars overflow). In the
+	// legacy (non-iframed) canvas, overflow must not be hidden in order to maintain support for sticky positioning.
+	.is-iframed {
+		overflow: hidden;
+	}
+
+	// The button element easily inherits styles that are meant for the editor style.
+	// These rules enhance the specificity to reduce that inheritance.
+	// This is duplicated in edit-site.
+	& .components-button {
+		font-family: $default-font;
+		font-size: $default-font-size;
+		padding: 6px 12px;
+
+		&.is-tertiary,
+		&.has-icon {
+			padding: 6px;
+		}
+	}
+}

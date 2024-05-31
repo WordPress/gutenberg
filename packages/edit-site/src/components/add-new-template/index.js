@@ -128,6 +128,7 @@ function TemplateListItem( {
 					spacing={ 0 }
 				>
 					<Text
+						align="center"
 						weight={ 500 }
 						lineHeight={ 1.53846153846 } // 20px
 					>
@@ -354,6 +355,7 @@ function NewTemplate() {
 				variant="primary"
 				onClick={ () => setShowModal( true ) }
 				label={ postType.labels.add_new_item }
+				__next40pxDefaultSize
 			>
 				{ postType.labels.add_new_item }
 			</Button>

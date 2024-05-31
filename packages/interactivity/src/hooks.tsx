@@ -1,5 +1,3 @@
-/* @jsx createElement */
-
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable react-hooks/exhaustive-deps */
 
@@ -20,8 +18,8 @@ import type { VNode, Context, RefObject } from 'preact';
  * Internal dependencies
  */
 import { store, stores, universalUnlock } from './store';
-import { warn } from './utils/warn';
-interface DirectiveEntry {
+import { warn } from './utils';
+export interface DirectiveEntry {
 	value: string | object;
 	namespace: string;
 	suffix: string;
@@ -271,7 +269,7 @@ export const directive = (
 const resolve = ( path: string, namespace: string ) => {
 	if ( ! namespace ) {
 		warn(
-			`The "namespace" cannot be "{}", "null" or an empty string. Path: ${ path }`
+			`Namespace missing for "${ path }". The value for that path won't be resolved.`
 		);
 		return;
 	}
@@ -352,17 +350,15 @@ const Directives = ( {
 
 	// Recursively render the wrapper for the next priority level.
 	const children =
-		nextPriorityLevels.length > 0 ? (
-			<Directives
-				directives={ directives }
-				priorityLevels={ nextPriorityLevels }
-				element={ element }
-				originalProps={ originalProps }
-				previousScope={ scope }
-			/>
-		) : (
-			element
-		);
+		nextPriorityLevels.length > 0
+			? createElement( Directives, {
+					directives,
+					priorityLevels: nextPriorityLevels,
+					element,
+					originalProps,
+					previousScope: scope,
+			  } )
+			: element;
 
 	const props = { ...originalProps, children };
 	const directiveArgs = {

@@ -29,7 +29,10 @@ export function useZoomOut( zoomOut = true ) {
 
 		return () => {
 			// We need to use  __unstableGetEditorMode() here and not `mode`, as mode may not update on unmount
-			if ( __unstableGetEditorMode() !== originalEditingMode.current ) {
+			if (
+				__unstableGetEditorMode() === 'zoom-out' &&
+				__unstableGetEditorMode() !== originalEditingMode.current
+			) {
 				__unstableSetEditorMode( originalEditingMode.current );
 			}
 		};
@@ -39,7 +42,11 @@ export function useZoomOut( zoomOut = true ) {
 	useEffect( () => {
 		if ( zoomOut && mode !== 'zoom-out' ) {
 			__unstableSetEditorMode( 'zoom-out' );
-		} else if ( ! zoomOut && originalEditingMode.current !== mode ) {
+		} else if (
+			! zoomOut &&
+			__unstableGetEditorMode() === 'zoom-out' &&
+			originalEditingMode.current !== mode
+		) {
 			__unstableSetEditorMode( originalEditingMode.current );
 		}
 	}, [ __unstableSetEditorMode, zoomOut, mode ] );
