@@ -128,6 +128,7 @@ function TemplateListItem( {
 					spacing={ 0 }
 				>
 					<Text
+						align="center"
 						weight={ 500 }
 						lineHeight={ 1.53846153846 } // 20px
 					>
