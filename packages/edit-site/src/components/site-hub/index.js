@@ -12,7 +12,7 @@ import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { memo, forwardRef } from '@wordpress/element';
-import { search, external } from '@wordpress/icons';
+import { search } from '@wordpress/icons';
 import { store as commandsStore } from '@wordpress/commands';
 import { displayShortcut } from '@wordpress/keycodes';
 import { filterURLForDisplay } from '@wordpress/url';
@@ -73,22 +73,20 @@ const SiteHub = memo(
 
 					<HStack>
 						<div className="edit-site-site-hub__title">
-							{ decodeEntities( siteTitle ) }
+							<Button
+								variant="link"
+								href={ homeUrl }
+								target="_blank"
+								label={ __( 'View site (opens in a new tab)' ) }
+							>
+								{ decodeEntities( siteTitle ) }
+							</Button>
 						</div>
 						<HStack
 							spacing={ 0 }
 							expanded={ false }
 							className="edit-site-site-hub__actions"
 						>
-							<Button
-								variant="link"
-								href={ homeUrl }
-								target="_blank"
-								label={ __( 'View site (opens in a new tab)' ) }
-								icon={ external }
-								className="edit-site-site-hub__site-view-link"
-							/>
-
 							<Button
 								className="edit-site-site-hub_toggle-command-center"
 								icon={ search }
