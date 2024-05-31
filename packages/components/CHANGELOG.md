@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Experimental
+
+-   `CustomSelectControlV2`: Handle long strings in selected value ([#62198](https://github.com/WordPress/gutenberg/pull/62198)).
+
 ## 28.0.0 (2024-05-31)
 
 ### Breaking Changes
