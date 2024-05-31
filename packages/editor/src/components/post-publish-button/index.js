@@ -11,6 +11,7 @@ import { compose } from '@wordpress/compose';
  */
 import PublishButtonLabel from './label';
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 const noop = () => {};
 
@@ -45,14 +46,24 @@ export class PostPublishButton extends Component {
 
 	createOnClick( callback ) {
 		return ( ...args ) => {
-			const { hasNonPostEntityChanges, setEntitiesSavedStatesCallback } =
-				this.props;
+			const {
+				hasNonPostEntityChanges,
+				hasPostMetaChanges,
+				setEntitiesSavedStatesCallback,
+				isPublished,
+			} = this.props;
 			// If a post with non-post entities is published, but the user
 			// elects to not save changes to the non-post entities, those
 			// entities will still be dirty when the Publish button is clicked.
 			// We also need to check that the `setEntitiesSavedStatesCallback`
 			// prop was passed. See https://github.com/WordPress/gutenberg/pull/37383
-			if ( hasNonPostEntityChanges && setEntitiesSavedStatesCallback ) {
+			//
+			// TODO: Explore how to manage `hasPostMetaChanges` and pre-publish workflow properly.
+			if (
+				( hasNonPostEntityChanges ||
+					( hasPostMetaChanges && isPublished ) ) &&
+				setEntitiesSavedStatesCallback
+			) {
 				// The modal for multiple entity saving will open,
 				// hold the callback for saving/publishing the post
 				// so that we can call it if the post entity is checked.
@@ -212,7 +223,8 @@ export default compose( [
 			isSavingNonPostEntityChanges,
 			getEditedPostAttribute,
 			getPostEdits,
-		} = select( editorStore );
+			hasPostMetaChanges,
+		} = unlock( select( editorStore ) );
 		return {
 			isSaving: isSavingPost(),
 			isAutoSaving: isAutosavingPost(),
@@ -229,6 +241,7 @@ export default compose( [
 			postStatus: getEditedPostAttribute( 'status' ),
 			postStatusHasChanged: getPostEdits()?.status,
 			hasNonPostEntityChanges: hasNonPostEntityChanges(),
+			hasPostMetaChanges: hasPostMetaChanges(),
 			isSavingNonPostEntityChanges: isSavingNonPostEntityChanges(),
 		};
 	} ),
