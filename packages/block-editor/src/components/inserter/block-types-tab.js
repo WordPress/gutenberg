@@ -84,16 +84,20 @@ export function BlockTypesTabPanel( {
 
 	return (
 		<>
-			{ showMostUsedBlocks && !! suggestedItems.length && (
-				<InserterPanel title={ _x( 'Most used', 'blocks' ) }>
-					<BlockTypesList
-						items={ suggestedItems }
-						onSelect={ onSelectItem }
-						onHover={ onHover }
-						label={ _x( 'Most used', 'blocks' ) }
-					/>
-				</InserterPanel>
-			) }
+			{ showMostUsedBlocks &&
+				// Only show the most used blocks if the total amount of block
+				// is larger than 1 row, otherwise it is not so useful.
+				items.length > 3 &&
+				!! suggestedItems.length && (
+					<InserterPanel title={ _x( 'Most used', 'blocks' ) }>
+						<BlockTypesList
+							items={ suggestedItems }
+							onSelect={ onSelectItem }
+							onHover={ onHover }
+							label={ _x( 'Most used', 'blocks' ) }
+						/>
+					</InserterPanel>
+				) }
 
 			{ currentlyRenderedCategories.map( ( category ) => {
 				const categoryItems = items.filter(
