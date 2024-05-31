@@ -172,10 +172,8 @@ test.describe( 'Post publish panel', () => {
 } );
 
 /**
- * Clicks on the button in the header which opens Document Settings sidebar when
- * it is closed.
+ * Utilities for working with metadata.
  *
- * @param this
  * @param postType
  * @param postId
  * @param metaKey
