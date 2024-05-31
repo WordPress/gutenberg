@@ -30,10 +30,20 @@ import PostViewLink from '../post-view-link';
 import PreviewDropdown from '../preview-dropdown';
 import { store as editorStore } from '../../store';
 
-const slideY = {
-	hidden: { y: '-50px' },
-	distractionFreeInactive: { y: 0 },
-	hover: { y: 0, transition: { type: 'tween', delay: 0.2 } },
+const toolbarVariations = {
+	distractionFreeDisabled: { y: '-50px' },
+	distractionFreeHover: { y: 0 },
+	distractionFreeHidden: { y: '-50px' },
+	visible: { y: 0 },
+	hidden: { y: 0 },
+};
+
+const backButtonVariations = {
+	distractionFreeDisabled: { x: '-100%' },
+	distractionFreeHover: { x: 0 },
+	distractionFreeHidden: { x: '-100%' },
+	visible: { x: 0 },
+	hidden: { x: 0 },
 };
 
 function Header( {
@@ -81,9 +91,14 @@ function Header( {
 	// as some plugins might be relying on its presence.
 	return (
 		<div className="editor-header edit-post-header">
-			<BackButton.Slot />
 			<motion.div
-				variants={ slideY }
+				variants={ backButtonVariations }
+				transition={ { type: 'tween', delay: 0.2 } }
+			>
+				<BackButton.Slot />
+			</motion.div>
+			<motion.div
+				variants={ toolbarVariations }
 				transition={ { type: 'tween', delay: 0.8 } }
 				className="editor-header__toolbar"
 			>
@@ -112,7 +127,7 @@ function Header( {
 				</div>
 			</motion.div>
 			<motion.div
-				variants={ slideY }
+				variants={ toolbarVariations }
 				transition={ { type: 'tween', delay: 0.8 } }
 				className="editor-header__settings"
 			>
