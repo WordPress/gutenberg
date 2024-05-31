@@ -2057,9 +2057,12 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 							)
 						) {
 							if ( ! item.rootClientId ) {
-								const { sectionRootClientId } = unlock(
-									getSettings( state )
-								);
+								let sectionRootClientId;
+								try {
+									sectionRootClientId = unlock(
+										getSettings( state )
+									).sectionRootClientId;
+								} catch ( e ) {}
 								if (
 									sectionRootClientId &&
 									canInsertBlockTypeUnmemoized(
