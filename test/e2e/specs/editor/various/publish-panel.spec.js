@@ -137,7 +137,8 @@ test.describe( 'Post publish panel', () => {
 			},
 		} );
 		const postId = await editor.publishPost();
-		await editor.modifyPostMetadata(
+		const metadataUtils = new MetadataUtils( page );
+		await metadataUtils.modifyPostMetadata(
 			'post',
 			postId,
 			'text_custom_field',
@@ -169,3 +170,43 @@ test.describe( 'Post publish panel', () => {
 		await expect( postMetaPanel ).toBeVisible();
 	} );
 } );
+
+/**
+ * Clicks on the button in the header which opens Document Settings sidebar when
+ * it is closed.
+ *
+ * @param this
+ * @param postType
+ * @param postId
+ * @param metaKey
+ * @param metaValue
+ */
+class MetadataUtils {
+	constructor( page ) {
+		this.page = page;
+	}
+
+	async modifyPostMetadata( postType, postId, metaKey, metaValue ) {
+		const parameters = {
+			postType,
+			postId,
+			metaKey,
+			metaValue,
+		};
+
+		await this.page.evaluate( ( _parameters ) => {
+			window.wp.data
+				.dispatch( 'core' )
+				.editEntityRecord(
+					'postType',
+					_parameters.postType,
+					_parameters.postId,
+					{
+						meta: {
+							[ _parameters.metaKey ]: _parameters.metaValue,
+						},
+					}
+				);
+		}, parameters );
+	}
+}
