@@ -34,6 +34,7 @@ export function BlockTypesTabPanel( {
 	onSelectItem,
 	onHover,
 	showMostUsedBlocks,
+	className,
 } ) {
 	const suggestedItems = useMemo( () => {
 		return orderBy( items, 'frecency', 'desc' ).slice(
@@ -83,7 +84,7 @@ export function BlockTypesTabPanel( {
 	);
 
 	return (
-		<>
+		<div className={ className }>
 			{ showMostUsedBlocks &&
 				// Only show the most used blocks if the total amount of block
 				// is larger than 1 row, otherwise it is not so useful.
@@ -159,7 +160,7 @@ export function BlockTypesTabPanel( {
 					);
 				}
 			) }
-		</>
+		</div>
 	);
 }
 
@@ -204,6 +205,7 @@ export function BlockTypesTab(
 							onSelectItem={ onSelectItem }
 							onHover={ onHover }
 							showMostUsedBlocks={ showMostUsedBlocks }
+							className="block-editor-inserter__insertable-blocks-at-selection"
 						/>
 						<hr />
 					</>
@@ -215,6 +217,7 @@ export function BlockTypesTab(
 					onSelectItem={ onSelectItem }
 					onHover={ onHover }
 					showMostUsedBlocks={ showMostUsedBlocks }
+					className="block-editor-inserter__all-blocks"
 				/>
 			</div>
 		</InserterListbox>
