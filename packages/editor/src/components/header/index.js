@@ -91,12 +91,16 @@ function Header( {
 	// as some plugins might be relying on its presence.
 	return (
 		<div className="editor-header edit-post-header">
-			<motion.div variants={ backButtonVariations }>
+			<motion.div
+				variants={ backButtonVariations }
+				transition={ { type: 'tween' } }
+			>
 				<BackButton.Slot />
 			</motion.div>
 			<motion.div
 				variants={ toolbarVariations }
 				className="editor-header__toolbar"
+				transition={ { type: 'tween' } }
 			>
 				<DocumentTools
 					disableBlockTools={ forceDisableBlockTools || isTextEditor }
@@ -124,6 +128,7 @@ function Header( {
 			</motion.div>
 			<motion.div
 				variants={ toolbarVariations }
+				transition={ { type: 'tween' } }
 				className="editor-header__settings"
 			>
 				{ ! customSaveButton && ! isPublishSidebarOpened && (
