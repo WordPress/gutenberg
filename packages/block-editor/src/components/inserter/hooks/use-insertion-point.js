@@ -150,13 +150,15 @@ function useInsertionPoint( {
 			} else {
 				insertBlocks(
 					blocks,
-					getIndex( {
-						destinationRootClientId,
-						destinationIndex,
-						rootClientId: _rootClientId,
-						registry,
-					} ),
-					_rootClientId,
+					isAppender
+						? getIndex( {
+								destinationRootClientId,
+								destinationIndex,
+								rootClientId: _rootClientId,
+								registry,
+						  } )
+						: destinationIndex,
+					isAppender ? rootClientId : _rootClientId,
 					selectBlockOnInsert,
 					shouldFocusBlock || shouldForceFocusBlock ? 0 : null,
 					meta
