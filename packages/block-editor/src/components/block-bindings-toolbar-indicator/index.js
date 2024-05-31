@@ -83,7 +83,7 @@ export default function BlockBindingsToolbarIndicator( { clientIds } ) {
 					firstBlockTitle,
 					firstBlockName
 			  )
-			: __( 'These blocks are using the multiple overrides.' );
+			: __( 'These blocks are using multiple overrides.' );
 	}
 	const descriptionId = useId();
 
