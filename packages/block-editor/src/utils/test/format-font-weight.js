@@ -50,5 +50,13 @@ describe( 'formatFontWeight', () => {
 			name: 'Black',
 			value: '900',
 		} );
+		expect( formatFontWeight( 'normal' ) ).toEqual( {
+			name: 'Regular',
+			value: 'normal',
+		} );
+		expect( formatFontWeight( 'bold' ) ).toEqual( {
+			name: 'Bold',
+			value: 'bold',
+		} );
 	} );
 } );
