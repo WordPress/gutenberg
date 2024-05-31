@@ -189,7 +189,7 @@ export default function PageTemplates() {
 	const { activeView = 'all', layout } = params;
 	const defaultView = useMemo( () => {
 		const usedType = layout ?? DEFAULT_VIEW.type;
-		return {
+		const view = {
 			...DEFAULT_VIEW,
 			type: usedType,
 			layout: defaultConfigPerViewType[ usedType ],
@@ -204,22 +204,28 @@ export default function PageTemplates() {
 					  ]
 					: [],
 		};
+		view.initialFilters = view.filters;
+		return view;
 	}, [ layout, activeView ] );
 	const [ view, setView ] = useState( defaultView );
 	useEffect( () => {
-		setView( ( currentView ) => ( {
-			...currentView,
-			filters:
-				activeView !== 'all'
-					? [
-							{
-								field: 'author',
-								operator: OPERATOR_IS_ANY,
-								value: [ activeView ],
-							},
-					  ]
-					: [],
-		} ) );
+		setView( ( currentView ) => {
+			const newView = {
+				...currentView,
+				filters:
+					activeView !== 'all'
+						? [
+								{
+									field: 'author',
+									operator: OPERATOR_IS_ANY,
+									value: [ activeView ],
+								},
+						  ]
+						: [],
+			};
+			newView.initialFilters = newView.filters;
+			return newView;
+		} );
 	}, [ activeView ] );
 
 	const { records, isResolving: isLoadingData } = useEntityRecords(
