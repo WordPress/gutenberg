@@ -86,7 +86,7 @@
 	height: 100%;
 }
 
-.wp-block-media-text.is-image-fill .wp-block-media-text__media img {
+.wp-block-media-text.is-image-fill > .wp-block-media-text__media img {
 	// The image is visually hidden but accessible to assistive technologies.
 	position: absolute;
 	width: 1px;
