@@ -11,6 +11,7 @@ import {
 	LocalAutosaveMonitor,
 	UnsavedChangesWarning,
 	EditorKeyboardShortcutsRegister,
+	EditorSnackbars,
 	store as editorStore,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
@@ -294,6 +295,7 @@ function Layout( { initialPost } ) {
 			) }
 			<PostEditorMoreMenu />
 			<BackButton initialPost={ initialPost } />
+			<EditorSnackbars />
 			<EditorInterface
 				className={ className }
 				styles={ styles }

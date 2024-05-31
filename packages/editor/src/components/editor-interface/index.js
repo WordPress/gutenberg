@@ -24,13 +24,13 @@ import { useState, useCallback } from '@wordpress/element';
  */
 import { store as editorStore } from '../../store';
 import EditorNotices from '../editor-notices';
-import EditorSnackbars from '../editor-snackbars';
 import Header from '../header';
 import InserterSidebar from '../inserter-sidebar';
 import ListViewSidebar from '../list-view-sidebar';
 import SavePublishPanels from '../save-publish-panels';
 import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
+import EditorContentSlotFill from './content-slot-fill';
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor top bar landmark region. */
@@ -47,12 +47,17 @@ const interfaceLabels = {
 
 export default function EditorInterface( {
 	className,
+	enableRegionNavigation,
 	styles,
 	children,
 	forceIsDirty,
 	contentRef,
 	disableIframe,
 	autoFocus,
+	customSaveButton,
+	forceDisableBlockTools,
+	title,
+	iframeProps,
 } ) {
 	const {
 		mode,
@@ -60,6 +65,7 @@ export default function EditorInterface( {
 		isInserterOpened,
 		isListViewOpened,
 		isDistractionFree,
+		isPreviewMode,
 		previousShortcut,
 		nextShortcut,
 		showBlockBreadcrumbs,
@@ -77,6 +83,7 @@ export default function EditorInterface( {
 			isInserterOpened: select( editorStore ).isInserterOpened(),
 			isListViewOpened: select( editorStore ).isListViewOpened(),
 			isDistractionFree: get( 'core', 'distractionFree' ),
+			isPreviewMode: editorSettings.__unstableIsPreviewMode,
 			previousShortcut: select(
 				keyboardShortcutsStore
 			).getAllShortcutKeyCombinations( 'core/editor/previous-region' ),
@@ -112,6 +119,7 @@ export default function EditorInterface( {
 
 	return (
 		<InterfaceSkeleton
+			enableRegionNavigation={ enableRegionNavigation }
 			isDistractionFree={ isDistractionFree && isWideViewport }
 			className={ clsx( className, {
 				'is-entity-save-view-open': !! entitiesSavedStatesCallback,
@@ -121,50 +129,77 @@ export default function EditorInterface( {
 				secondarySidebar: secondarySidebarLabel,
 			} }
 			header={
-				<Header
-					forceIsDirty={ forceIsDirty }
-					setEntitiesSavedStatesCallback={
-						setEntitiesSavedStatesCallback
-					}
-				/>
+				! isPreviewMode && (
+					<Header
+						forceIsDirty={ forceIsDirty }
+						setEntitiesSavedStatesCallback={
+							setEntitiesSavedStatesCallback
+						}
+						customSaveButton={ customSaveButton }
+						forceDisableBlockTools={ forceDisableBlockTools }
+						title={ title }
+					/>
+				)
 			}
 			editorNotices={ <EditorNotices /> }
 			secondarySidebar={
+				! isPreviewMode &&
 				mode === 'visual' &&
 				( ( isInserterOpened && <InserterSidebar /> ) ||
 					( isListViewOpened && <ListViewSidebar /> ) )
 			}
 			sidebar={
+				! isPreviewMode &&
 				! isDistractionFree && <ComplementaryArea.Slot scope="core" />
 			}
-			notices={ <EditorSnackbars /> }
 			content={
 				<>
-					{ ! isDistractionFree && <EditorNotices /> }
-					{ ( mode === 'text' || ! isRichEditingEnabled ) && (
-						<TextEditor
-							// We should auto-focus the (title) on load.
-							// eslint-disable-next-line jsx-a11y/no-autofocus
-							autoFocus={ autoFocus }
-						/>
+					{ ! isDistractionFree && ! isPreviewMode && (
+						<EditorNotices />
 					) }
-					{ ! isLargeViewport && mode === 'visual' && (
-						<BlockToolbar hideDragHandle />
-					) }
-					{ isRichEditingEnabled && mode === 'visual' && (
-						<VisualEditor
-							styles={ styles }
-							contentRef={ contentRef }
-							disableIframe={ disableIframe }
-							// We should auto-focus the (title) on load.
-							// eslint-disable-next-line jsx-a11y/no-autofocus
-							autoFocus={ autoFocus }
-						/>
-					) }
-					{ children }
+
+					<EditorContentSlotFill.Slot>
+						{ ( [ editorCanvasView ] ) =>
+							! isPreviewMode && editorCanvasView ? (
+								editorCanvasView
+							) : (
+								<>
+									{ ! isPreviewMode &&
+										( mode === 'text' ||
+											! isRichEditingEnabled ) && (
+											<TextEditor
+												// We should auto-focus the canvas (title) on load.
+												// eslint-disable-next-line jsx-a11y/no-autofocus
+												autoFocus={ autoFocus }
+											/>
+										) }
+									{ ! isPreviewMode &&
+										! isLargeViewport &&
+										mode === 'visual' && (
+											<BlockToolbar hideDragHandle />
+										) }
+									{ ( isPreviewMode ||
+										( isRichEditingEnabled &&
+											mode === 'visual' ) ) && (
+										<VisualEditor
+											styles={ styles }
+											contentRef={ contentRef }
+											disableIframe={ disableIframe }
+											// We should auto-focus the canvas (title) on load.
+											// eslint-disable-next-line jsx-a11y/no-autofocus
+											autoFocus={ autoFocus }
+											iframeProps={ iframeProps }
+										/>
+									) }
+									{ children }
+								</>
+							)
+						}
+					</EditorContentSlotFill.Slot>
 				</>
 			}
 			footer={
+				! isPreviewMode &&
 				! isDistractionFree &&
 				isLargeViewport &&
 				showBlockBreadcrumbs &&
