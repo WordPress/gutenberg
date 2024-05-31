@@ -5,10 +5,6 @@
 	padding: $grid-unit-20;
 }
 
-.block-editor-block-card__content {
-	flex-grow: 1;
-}
-
 .block-editor-block-card__title {
 	font-weight: 500;
 
@@ -18,13 +14,6 @@
 		margin: 0;
 		padding: 3px 0; // This makes the title as high as the icon.
 	}
-}
-
-.block-editor-block-card__description {
-	display: block;
-	font-size: $default-font-size;
-	line-height: $default-line-height;
-	margin-top: $grid-unit-05;
 }
 
 .block-editor-block-card .block-editor-block-icon {

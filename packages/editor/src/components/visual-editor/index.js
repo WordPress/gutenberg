@@ -363,7 +363,7 @@ function VisualEditor( {
 
 	const iframeStyles = useMemo( () => {
 		return [
-			...styles,
+			...( styles ?? [] ),
 			{
 				css: `.is-root-container{display:flow-root;${
 					// Some themes will have `min-height: 100vh` for the root container,
