@@ -96,7 +96,7 @@ function SidebarNavigationScreenGlobalStylesContent() {
 			>
 				<StyleVariationsContainer gap={ gap } />
 				{ colorVariations?.length && (
-					<ColorVariations title={ __( 'Colors' ) } gap={ gap } />
+					<ColorVariations title={ __( 'Palettes' ) } gap={ gap } />
 				) }
 				{ typographyVariations?.length && (
 					<TypographyVariations

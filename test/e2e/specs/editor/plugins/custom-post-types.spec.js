@@ -36,16 +36,7 @@ test.describe( 'Test Custom Post Types', () => {
 			} )
 			.click();
 
-		// Open the Document -> Page Attributes panel.
-		const pageAttributes = page.getByRole( 'button', {
-			name: 'Page Attributes',
-		} );
-		const isClosed =
-			( await pageAttributes.getAttribute( 'aria-expanded' ) ) ===
-			'false';
-		if ( isClosed ) {
-			await pageAttributes.click();
-		}
+		await page.locator( '.editor-post-parent__panel-toggle' ).click();
 
 		const parentPageLocator = page.getByRole( 'combobox', {
 			name: 'Parent',
@@ -61,6 +52,8 @@ test.describe( 'Test Custom Post Types', () => {
 		await page.keyboard.type( 'Child Post' );
 		await editor.publishPost();
 		await page.reload();
+
+		await page.locator( '.editor-post-parent__panel-toggle' ).click();
 
 		// Confirm parent page selection matches after reloading.
 		await expect( parentPageLocator ).toHaveValue( parentPage );

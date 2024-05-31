@@ -366,7 +366,11 @@ Undocumented declaration.
 
 ### ErrorBoundary
 
-Undocumented declaration.
+ErrorBoundary is used to catch JavaScript errors anywhere in a child component tree, log those errors, and display a fallback UI.
+
+It uses the lifecycle methods getDerivedStateFromError and componentDidCatch to catch errors in a child component tree.
+
+getDerivedStateFromError is used to render a fallback UI after an error has been thrown, and componentDidCatch is used to log error information.
 
 ### FontSizePicker
 
@@ -422,7 +426,14 @@ _Returns_
 
 ### LocalAutosaveMonitor
 
-Undocumented declaration.
+Monitors local autosaves of a post in the editor. It uses several hooks and functions to manage autosave behavior:
+
+-   `useAutosaveNotice` hook: Manages the creation of a notice prompting the user to restore a local autosave, if one exists.
+-   `useAutosavePurge` hook: Ejects a local autosave after a successful save occurs.
+-   `hasSessionStorageSupport` function: Checks if the current environment supports browser sessionStorage.
+-   `LocalAutosaveMonitor` component: Uses the `AutosaveMonitor` component to perform autosaves at a specified interval.
+
+The module also checks for sessionStorage support and conditionally exports the `LocalAutosaveMonitor` component based on that.
 
 ### MediaPlaceholder
 
@@ -953,7 +964,11 @@ _Returns_
 
 ### PostDiscussionPanel
 
-Undocumented declaration.
+This component allows to update comment and pingback settings for the current post. Internally there are checks whether the current post has support for the above and if the `discussion-panel` panel is enabled.
+
+_Returns_
+
+-   `JSX.Element|null`: The rendered PostDiscussionPanel component.
 
 ### PostExcerpt
 
@@ -980,7 +995,11 @@ _Returns_
 
 ### PostExcerptPanel
 
-Undocumented declaration.
+Is rendered if the post type supports excerpts and allows editing the excerpt.
+
+_Returns_
+
+-   `JSX.Element`: The rendered PostExcerptPanel component.
 
 ### PostFeaturedImage
 
@@ -1094,19 +1113,45 @@ _Returns_
 
 ### PostPendingStatus
 
-Undocumented declaration.
+A component for displaying and toggling the pending status of a post.
+
+_Returns_
+
+-   `JSX.Element`: The rendered component.
 
 ### PostPendingStatusCheck
 
-Undocumented declaration.
+This component checks the publishing status of the current post. If the post is already published or the user doesn't have the capability to publish, it returns null.
+
+_Parameters_
+
+-   _props_ `Object`: Component properties.
+-   _props.children_ `Element`: Children to be rendered.
+
+_Returns_
+
+-   `JSX.Element|null`: The rendered child elements or null if the post is already published or the user doesn't have the capability to publish.
 
 ### PostPingbacks
 
-Undocumented declaration.
+Renders a control for enabling or disabling pingbacks and trackbacks in a WordPress post.
 
 ### PostPreviewButton
 
-Undocumented declaration.
+Renders a button that opens a new window or tab for the preview, writes the interstitial message to this window, and then navigates to the actual preview link. The button is not rendered if the post is not viewable and disabled if the post is not saveable.
+
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.className_ `string`: The class name for the button.
+-   _props.textContent_ `string`: The text content for the button.
+-   _props.forceIsAutosaveable_ `boolean`: Whether to force autosave.
+-   _props.role_ `string`: The role attribute for the button.
+-   _props.onPreview_ `Function`: The callback function for preview event.
+
+_Returns_
+
+-   `JSX.Element|null`: The rendered button component.
 
 ### PostPublishButton
 
@@ -1242,7 +1287,11 @@ _Returns_
 
 ### PostTextEditor
 
-Undocumented declaration.
+Displays the Post Text Editor along with content in Visual and Text mode.
+
+_Returns_
+
+-   `JSX.Element|null`: The rendered PostTextEditor component.
 
 ### PostTitle
 
