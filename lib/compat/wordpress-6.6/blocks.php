@@ -26,15 +26,18 @@ function gutenberg_replace_pattern_override_default_binding( $parsed_block ) {
 		isset( $bindings['__default']['source'] ) &&
 		'core/pattern-overrides' === $bindings['__default']['source']
 	) {
+		$updated_bindings = array();
+
 		// Build an binding array of all supported attributes.
+		// Note that this also omits the `__default` attribute from the
+		// resulting array.
 		foreach ( $supported_block_attrs[ $parsed_block['blockName'] ] as $attribute_name ) {
-			$bindings[ $attribute_name ] = array( 'source' => 'core/pattern-overrides' );
+			// Retain any non-pattern override bindings that might be present.
+			$updated_bindings[ $attribute_name ] = isset( $bindings[ $attribute_name ] )
+				? $bindings[ $attribute_name ]
+				: array( 'source' => 'core/pattern-overrides' );
 		}
-		// Merge this into the parsed block's bindings & avoid overwriting existing bindings.
-		$parsed_block['attrs']['metadata']['bindings'] = array_merge(
-			$bindings,
-			$parsed_block['attrs']['metadata']['bindings']
-		);
+		$parsed_block['attrs']['metadata']['bindings'] = $updated_bindings;
 	}
 
 	return $parsed_block;
