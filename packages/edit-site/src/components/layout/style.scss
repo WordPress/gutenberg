@@ -135,7 +135,7 @@
 /* stylelint-disable -- Disable reason: View Transitions not supported properly by stylelint. */
 html:active-view-transition-type(canvas-mode-edit) {
 	&::view-transition-group(toggle) {
-		animation-delay: 250ms;
+		animation-delay: 255ms;
 	}
 }
 .edit-site-layout:not(.is-full-canvas) .edit-site-layout__sidebar-region .edit-site-layout__view-mode-toggle {
