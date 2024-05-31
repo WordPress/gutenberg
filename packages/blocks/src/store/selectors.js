@@ -237,10 +237,17 @@ export const getBlockVariations = createSelector(
 export function getActiveBlockVariation( state, blockName, attributes, scope ) {
 	const variations = getBlockVariations( state, blockName, scope );
 
-	const match = variations?.find( ( variation ) => {
+	if ( ! variations ) {
+		return variations;
+	}
+
+	const blockType = getBlockType( state, blockName );
+	const attributeKeys = Object.keys( blockType?.attributes || {} );
+	let match;
+	let maxMatchedAttributes = 0;
+
+	for ( const variation of variations ) {
 		if ( Array.isArray( variation.isActive ) ) {
-			const blockType = getBlockType( state, blockName );
-			const attributeKeys = Object.keys( blockType?.attributes || {} );
 			const definedAttributes = variation.isActive.filter(
 				( attribute ) => {
 					// We support nested attribute paths, e.g. `layout.type`.
@@ -250,10 +257,11 @@ export function getActiveBlockVariation( state, blockName, attributes, scope ) {
 					return attributeKeys.includes( topLevelAttribute );
 				}
 			);
-			if ( definedAttributes.length === 0 ) {
-				return false;
+			const definedAttributesLength = definedAttributes.length;
+			if ( definedAttributesLength === 0 ) {
+				continue;
 			}
-			return definedAttributes.every( ( attribute ) => {
+			const isMatch = definedAttributes.every( ( attribute ) => {
 				const attributeValue = getValueFromObjectPath(
 					attributes,
 					attribute
@@ -266,11 +274,17 @@ export function getActiveBlockVariation( state, blockName, attributes, scope ) {
 					getValueFromObjectPath( variation.attributes, attribute )
 				);
 			} );
+			if ( isMatch && definedAttributesLength > maxMatchedAttributes ) {
+				match = variation;
+				maxMatchedAttributes = definedAttributesLength;
+			}
+		} else if ( variation.isActive?.( attributes, variation.attributes ) ) {
+			// If isActive is a function, we cannot know how many attributes it matches.
+			// This means that we cannot compare the specificity of our matches,
+			// and simply return the best match we have found.
+			return match || variation;
 		}
-
-		return variation.isActive?.( attributes, variation.attributes );
-	} );
-
+	}
 	return match;
 }
 

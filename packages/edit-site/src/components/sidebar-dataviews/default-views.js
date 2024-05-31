@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { trash, pages, drafts, published, scheduled } from '@wordpress/icons';
+import { trash, pages, drafts, published, scheduled, pending, private } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -95,6 +95,36 @@ export const DEFAULT_VIEWS = {
 						field: 'status',
 						operator: OPERATOR_IS_ANY,
 						value: 'draft',
+					},
+				],
+			},
+		},
+		{
+			title: __( 'Pending' ),
+			slug: 'pending',
+			icon: pending,
+			view: {
+				...DEFAULT_PAGE_BASE,
+				filters: [
+					{
+						field: 'status',
+						operator: OPERATOR_IS_ANY,
+						value: 'pending',
+					},
+				],
+			},
+		},
+		{
+			title: __( 'Private' ),
+			slug: 'private',
+			icon: private,
+			view: {
+				...DEFAULT_PAGE_BASE,
+				filters: [
+					{
+						field: 'status',
+						operator: OPERATOR_IS_ANY,
+						value: 'private',
 					},
 				],
 			},
