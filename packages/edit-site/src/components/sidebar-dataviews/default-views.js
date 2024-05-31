@@ -2,7 +2,15 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { trash, pages, drafts, published, scheduled, pending, private } from '@wordpress/icons';
+import {
+	trash,
+	pages,
+	drafts,
+	published,
+	scheduled,
+	pending,
+	notAllowed,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -117,7 +125,7 @@ export const DEFAULT_VIEWS = {
 		{
 			title: __( 'Private' ),
 			slug: 'private',
-			icon: private,
+			icon: notAllowed,
 			view: {
 				...DEFAULT_PAGE_BASE,
 				filters: [

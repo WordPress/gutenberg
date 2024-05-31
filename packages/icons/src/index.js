@@ -160,6 +160,7 @@ export { default as moreHorizontalMobile } from './library/more-horizontal-mobil
 export { default as moreVertical } from './library/more-vertical';
 export { default as moveTo } from './library/move-to';
 export { default as navigation } from './library/navigation';
+export { default as notAllowed } from './library/not-allowed';
 export { default as notFound } from './library/not-found';
 export { default as overlayText } from './library/overlay-text';
 export { default as pageBreak } from './library/page-break';
@@ -168,6 +169,7 @@ export { default as page } from './library/page';
 export { default as pages } from './library/pages';
 export { default as paragraph } from './library/paragraph';
 export { default as payment } from './library/payment';
+export { default as pending } from './library/pending';
 export { default as percent } from './library/percent';
 export { default as positionCenter } from './library/position-center';
 export { default as positionLeft } from './library/position-left';
