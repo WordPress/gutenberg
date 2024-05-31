@@ -83,7 +83,7 @@ export default function BlockBindingsToolbarIndicator( { clientIds } ) {
 	if ( isConnectedToPatternOverrides && firstBlockName ) {
 		blockDescription = isSingleBlockSelected
 			? sprintf(
-					/* translators: %1s: The block type's name; %2s: The block's user-provided name. */
+					/* translators: %1s: The block type's name; %2s: The block's user-provided name (the same as the override name). */
 					__( 'This %1$s is editable using the "%2$s" override.' ),
 					firstBlockTitle.toLowerCase(),
 					firstBlockName
