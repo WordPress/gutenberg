@@ -42,7 +42,19 @@ export default function useSpacingSizes() {
 			...customSizes,
 			...themeSizes,
 			...defaultSizes,
-		].sort( ( a, b ) => compare( a.slug, b.slug ) );
+		];
+
+		// Only sort if more than one origin has presets defined in order to
+		// preserve order for themes that don't include default presets and
+		// want a custom order.
+		if (
+			( customSizes.length && 1 ) +
+				( themeSizes.length && 1 ) +
+				( defaultSizes.length && 1 ) >
+			1
+		) {
+			sizes.sort( ( a, b ) => compare( a.slug, b.slug ) );
+		}
 
 		return sizes.length > RANGE_CONTROL_MAX_SIZE
 			? [
