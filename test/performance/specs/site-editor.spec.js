@@ -333,7 +333,7 @@ test.describe( 'Site Editor Performance', () => {
 						.click();
 				} else {
 					await page
-						.getByRole( 'button', { name: 'Transform into:' } )
+						.getByRole( 'button', { name: 'Design' } )
 						.click();
 				}
 
