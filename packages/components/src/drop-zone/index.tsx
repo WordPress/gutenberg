@@ -2,6 +2,7 @@
  * External dependencies
  */
 import clsx from 'clsx';
+import type { ReactNode } from 'react';
 
 /**
  * WordPress dependencies
@@ -20,7 +21,6 @@ import {
  */
 import type { DropType, DropZoneProps } from './types';
 import type { WordPressComponentProps } from '../context';
-import type { ReactNode } from 'react';
 
 /**
  * Handles fade-in/fade-out animation for its children if `reducedMotion` is disabled,
