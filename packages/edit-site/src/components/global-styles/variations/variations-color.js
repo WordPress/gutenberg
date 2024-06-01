@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalVStack as VStack } from '@wordpress/components';
+import { __experimentalVStack as VStack, Tooltip } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -24,9 +24,13 @@ export default function ColorVariations( { title, gap = 2 } ) {
 			{ title && <Subtitle level={ 3 }>{ title }</Subtitle> }
 			<VStack spacing={ gap }>
 				{ colorVariations.map( ( variation, index ) => (
-					<Variation key={ index } variation={ variation } isPill>
-						{ () => <StylesPreviewColors /> }
-					</Variation>
+					<Tooltip key={ index } text={ variation?.title }>
+						<div>
+							<Variation variation={ variation } isPill>
+								{ () => <StylesPreviewColors /> }
+							</Variation>
+						</div>
+					</Tooltip>
 				) ) }
 			</VStack>
 		</VStack>
