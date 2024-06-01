@@ -23,16 +23,16 @@ import type { WordPressComponentProps } from '../context';
 import type { ReactNode } from 'react';
 
 /**
- * Handles fade-in/fade-out animation for its children if `reducedMotion` is disabled.
- * Relies on the animations being defined in the CSS styles.
+ * Handles fade-in/fade-out animation for its children if `reducedMotion` is disabled,
+ * if not, just shows/hides the children without any animation.
  *
- * @returns {JSX.Element | null} The animated container with children or null.
+ * Relies on the animations being defined in CSS styles.
  */
 const MaybeFade: React.FC< {
 	show: boolean;
 	children: ReactNode;
 	duration?: number;
-} > = ( { show, children, duration = 200 } ) => {
+} > = ( { show, children } ) => {
 	const [ shouldRender, setRender ] = useState( show );
 	const reducedMotion = useReducedMotion();
 
@@ -47,7 +47,6 @@ const MaybeFade: React.FC< {
 	const props = ! reducedMotion
 		? {
 				className: show ? 'fade-enter' : 'fade-exit',
-				style: { animationDuration: `${ duration }ms` },
 				onAnimationEnd: () => {
 					if ( ! show ) {
 						setRender( false );
@@ -59,30 +58,22 @@ const MaybeFade: React.FC< {
 	return shouldRender && <div { ...props }>{ children }</div>;
 };
 
-function DropIndicator( {
-	label,
-	isActive,
-}: {
-	label?: string;
-	isActive: boolean;
-} ) {
+function DropIndicator( { label }: { label?: string } ) {
 	return (
-		<MaybeFade show={ isActive }>
-			<div
-				className="components-drop-zone__content"
-				style={ { pointerEvents: 'none' } }
-			>
-				<div className="components-drop-zone__content-inner">
-					<Icon
-						icon={ upload }
-						className="components-drop-zone__content-icon"
-					/>
-					<span className="components-drop-zone__content-text">
-						{ label ? label : __( 'Drop files to upload' ) }
-					</span>
-				</div>
+		<div
+			className="components-drop-zone__content"
+			style={ { pointerEvents: 'none' } }
+		>
+			<div className="components-drop-zone__content-inner">
+				<Icon
+					icon={ upload }
+					className="components-drop-zone__content-icon"
+				/>
+				<span className="components-drop-zone__content-text">
+					{ label ? label : __( 'Drop files to upload' ) }
+				</span>
 			</div>
-		</MaybeFade>
+		</div>
 	);
 }
 
@@ -192,10 +183,9 @@ export function DropZoneComponent( {
 
 	return (
 		<div { ...restProps } ref={ ref } className={ classes }>
-			<DropIndicator
-				label={ label }
-				isActive={ isDraggingOverElement || false }
-			/>
+			<MaybeFade show={ isDraggingOverElement || false }>
+				<DropIndicator label={ label } />
+			</MaybeFade>
 		</div>
 	);
 }
