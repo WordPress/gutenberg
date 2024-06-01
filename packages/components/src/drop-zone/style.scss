@@ -63,11 +63,6 @@
 	animation: scaleOut 0.2s forwards;
 }
 
-.no-motion,
-.no-motion .components-drop-zone__content-inner {
-	animation: none !important;
-}
-
 .components-drop-zone {
 	position: absolute;
 	top: 0;
@@ -100,12 +95,6 @@
 	z-index: z-index(".components-drop-zone__content");
 	text-align: center;
 	color: $white;
-}
-
-.components-drop-zone__content-inner {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
 }
 
 .components-drop-zone__content-icon,
