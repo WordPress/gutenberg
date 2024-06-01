@@ -85,15 +85,15 @@ function DropIndicator( { label }: { label?: string } ) {
  * import { useState } from '@wordpress/element';
  *
  * const MyDropZone = () => {
- *   const [hasDropped, setHasDropped] = useState(false);
+ *   const [ hasDropped, setHasDropped ] = useState( false );
  *
  *   return (
  *     <div>
- *       {hasDropped ? 'Dropped!' : 'Drop something here'}
+ *       { hasDropped ? 'Dropped!' : 'Drop something here' }
  *       <DropZone
- *         onFilesDrop={() => setHasDropped(true)}
- *         onHTMLDrop={() => setHasDropped(true)}
- *         onDrop={() => setHasDropped(true)}
+ *         onFilesDrop={ () => setHasDropped( true ) }
+ *         onHTMLDrop={ () => setHasDropped( true ) }
+ *         onDrop={ () => setHasDropped( true ) }
  *       />
  *     </div>
  *   );
