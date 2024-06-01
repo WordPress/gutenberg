@@ -63,6 +63,11 @@
 	animation: scaleOut 0.2s forwards;
 }
 
+.no-motion,
+.no-motion .components-drop-zone__content-inner {
+	animation: none !important;
+}
+
 .components-drop-zone {
 	position: absolute;
 	top: 0;

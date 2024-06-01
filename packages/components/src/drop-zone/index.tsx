@@ -12,7 +12,7 @@ import { upload, Icon } from '@wordpress/icons';
 import { getFilesFromDataTransfer } from '@wordpress/dom';
 import {
 	__experimentalUseDropZone as useDropZone,
-	//useReducedMotion,
+	useReducedMotion,
 } from '@wordpress/compose';
 
 /**
@@ -22,41 +22,41 @@ import type { DropType, DropZoneProps } from './types';
 import type { WordPressComponentProps } from '../context';
 import type { ReactNode } from 'react';
 
-interface FadeProps {
+/**
+ * Handles fade-in/fade-out animation for its children if `reducedMotion` is disabled.
+ * Relies on the animations being defined in the CSS styles.
+ *
+ * @returns {JSX.Element | null} The animated container with children or null.
+ */
+const MaybeFade: React.FC< {
 	show: boolean;
 	children: ReactNode;
 	duration?: number;
-}
-
-// Could call it Animate? Also, probably need to move out so it can be used
-// across other components. The idea is to "hook" into the mount/unmount
-// lifecycle to animate the component.
-const Fade: React.FC< FadeProps > = ( { show, children, duration } ) => {
+} > = ( { show, children, duration = 200 } ) => {
 	const [ shouldRender, setRender ] = useState( show );
+	const reducedMotion = useReducedMotion();
 
 	useEffect( () => {
 		if ( show ) {
 			setRender( true );
-		}
-	}, [ show ] );
-
-	const onAnimationEnd = () => {
-		if ( ! show ) {
+		} else if ( reducedMotion ) {
 			setRender( false );
 		}
-	};
+	}, [ show, reducedMotion ] );
 
-	return (
-		shouldRender && (
-			<div
-				className={ show ? 'fade-enter' : 'fade-exit' }
-				style={ { animationDuration: `${ duration }ms` } }
-				onAnimationEnd={ onAnimationEnd }
-			>
-				{ children }
-			</div>
-		)
-	);
+	const props = ! reducedMotion
+		? {
+				className: show ? 'fade-enter' : 'fade-exit',
+				style: { animationDuration: `${ duration }ms` },
+				onAnimationEnd: () => {
+					if ( ! show ) {
+						setRender( false );
+					}
+				},
+		  }
+		: {};
+
+	return shouldRender && <div { ...props }>{ children }</div>;
 };
 
 function DropIndicator( {
@@ -66,13 +66,10 @@ function DropIndicator( {
 	label?: string;
 	isActive: boolean;
 } ) {
-	const disableMotion = false;
 	return (
-		<Fade show={ isActive } duration={ disableMotion ? 0 : 200 }>
+		<MaybeFade show={ isActive }>
 			<div
-				className={ `components-drop-zone__content ${
-					disableMotion ? 'no-motion' : ''
-				}` }
+				className="components-drop-zone__content"
 				style={ { pointerEvents: 'none' } }
 			>
 				<div className="components-drop-zone__content-inner">
@@ -85,7 +82,7 @@ function DropIndicator( {
 					</span>
 				</div>
 			</div>
-		</Fade>
+		</MaybeFade>
 	);
 }
 
