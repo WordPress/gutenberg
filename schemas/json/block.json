@@ -640,6 +640,11 @@
 							}
 						}
 					]
+				},
+				"splitting": {
+					"type": "boolean",
+					"description": "This property indicates whether the block should merge its content with the content of the pasted block when it is pasted, and whether it should split the block when the Enter key is pressed.",
+					"default": false
 				}
 			},
 			"additionalProperties": true
