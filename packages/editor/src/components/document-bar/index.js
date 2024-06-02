@@ -198,6 +198,8 @@ export default function DocumentBar() {
 						onClick={ () => openCommandCenter() }
 						size="compact"
 						variant="tertiary"
+						label={ __( 'Open the command palette' ) }
+						aria-haspopup="true"
 					>
 						<span className="editor-document-bar__shortcut">
 							{ displayShortcut.primary( 'k' ) }
