@@ -19,10 +19,25 @@
 function render_block_core_button( $attributes, $content, $block ) {
 	$p = new WP_HTML_Tag_Processor( $content );
 
-	if ( ! $p->next_tag( 'a' ) ) {
+	/*
+	 * The button block can render an `<a>` or `<button>` and also has a
+	 * `<div>` wrapper. Find the a or button tag.
+	 *
+	 */
+	$tag = null;
+	while ( $p->next_tag() ) {
+		$tag = $p->get_tag();
+		if ( 'A' === $tag || 'BUTTON' === $tag ) {
+			break;
+		}
+	}
+
+	// If this happens, the likelihood is there's no block content.
+	if ( null === $tag ) {
 		return '';
 	}
 
+	// Build a string of the inner text.
 	$text = '';
 	while ( $p->next_token() ) {
 		switch ( $p->get_token_name() ) {
@@ -36,8 +51,12 @@ function render_block_core_button( $attributes, $content, $block ) {
 		}
 	}
 
-	// When there's no `text` set, avoid rendering an inaccessible button.
-	if ( trim( $text ) === '' ) {
+	/*
+	 * When there's no text, render nothing for the block.
+	 * It's this way because an anchor or button element without text results
+	 * in poor accessibility.
+	 */
+	if ( '' === trim( $text ) ) {
 		return '';
 	}
 
