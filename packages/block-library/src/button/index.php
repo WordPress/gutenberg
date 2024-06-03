@@ -5,7 +5,7 @@
  * @package WordPress
  */
 
- /**
+/**
  * Renders the `core/button` block on the server,
  *
  * @since 6.6.0
@@ -16,7 +16,7 @@
  *
  * @return string The block content.
  */
-function render_block_core_button( $attributes, $content, $block ) {
+function render_block_core_button( $attributes, $content ) {
 	$p = new WP_HTML_Tag_Processor( $content );
 
 	/*
