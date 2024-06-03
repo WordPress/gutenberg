@@ -59,6 +59,42 @@ test.describe( 'Test Custom Post Types', () => {
 		await expect( parentPageLocator ).toHaveValue( parentPage );
 	} );
 
+	test( 'should not be able to rename a post that is either auto-drafted or lacks title support', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost( { postType: 'hierar-no-title' } );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( 'hi' );
+		await editor.openDocumentSettingsSidebar();
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'tab', {
+				name: 'Hierarchical No Title',
+			} )
+			.click();
+		await page.getByRole( 'button', { name: 'Actions' } ).click();
+		await page.getByRole( 'menu', { name: 'Actions' } ).isVisible();
+		await expect(
+			page.getByRole( 'menuitem', { name: 'Rename' } )
+		).toHaveCount( 0 );
+		await page.keyboard.press( 'Escape' );
+
+		await editor.publishPost();
+		await page.reload();
+
+		// Make sure rename is omitted not just because the post status had been auto-draft.
+		await editor.openDocumentSettingsSidebar();
+		await page.getByRole( 'button', { name: 'Actions' } ).click();
+		await page.getByRole( 'menu', { name: 'Actions' } ).isVisible();
+		await expect(
+			page.getByRole( 'menuitem', { name: 'Rename' } )
+		).toHaveCount( 0 );
+	} );
+
 	test( 'should create a cpt with a legacy block in its template without WSOD', async ( {
 		admin,
 		editor,
