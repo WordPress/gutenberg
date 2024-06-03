@@ -46,6 +46,8 @@ export default function Pagination( {
 				<Button
 					variant={ buttonVariant }
 					onClick={ () => changePage( 1 ) }
+					// Disable reason: Would not cause confusion, and allows quicker access to a relevant nav button.
+					// eslint-disable-next-line no-restricted-syntax
 					disabled={ disabled || currentPage === 1 }
 					aria-label={ __( 'First page' ) }
 				>
@@ -54,6 +56,8 @@ export default function Pagination( {
 				<Button
 					variant={ buttonVariant }
 					onClick={ () => changePage( currentPage - 1 ) }
+					// Disable reason: Would not cause confusion, and allows quicker access to a relevant nav button.
+					// eslint-disable-next-line no-restricted-syntax
 					disabled={ disabled || currentPage === 1 }
 					aria-label={ __( 'Previous page' ) }
 				>
@@ -72,6 +76,8 @@ export default function Pagination( {
 				<Button
 					variant={ buttonVariant }
 					onClick={ () => changePage( currentPage + 1 ) }
+					// Disable reason: Would not cause confusion, and allows quicker access to a relevant nav button.
+					// eslint-disable-next-line no-restricted-syntax
 					disabled={ disabled || currentPage === numPages }
 					aria-label={ __( 'Next page' ) }
 				>
@@ -80,6 +86,8 @@ export default function Pagination( {
 				<Button
 					variant={ buttonVariant }
 					onClick={ () => changePage( numPages ) }
+					// Disable reason: Would not cause confusion, and allows quicker access to a relevant nav button.
+					// eslint-disable-next-line no-restricted-syntax
 					disabled={ disabled || currentPage === numPages }
 					aria-label={ __( 'Last page' ) }
 				>

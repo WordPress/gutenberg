@@ -255,6 +255,24 @@ module.exports = {
 		},
 		{
 			files: [
+				'packages/*/src/**/*.[tj]s?(x)',
+				'storybook/stories/**/*.[tj]s?(x)',
+			],
+			excludedFiles: [ '**/*.native.js' ],
+			rules: {
+				'no-restricted-syntax': [
+					'error',
+					{
+						selector:
+							'JSXOpeningElement[name.name="Button"]:not(:has(JSXAttribute[name.name="__experimentalIsFocusable"])) JSXAttribute[name.name="disabled"]',
+						message:
+							'`disabled` used without the `__experimentalIsFocusable` prop. Disabling a control without maintaining focusability can cause accessibility issues, by hiding their presence from screen reader users, or preventing focus from returning to a trigger element. (Ignore this error if you truly mean to disable.)',
+					},
+				],
+			},
+		},
+		{
+			files: [
 				// Components package.
 				'packages/components/src/**/*.[tj]s?(x)',
 				// Navigation block.
