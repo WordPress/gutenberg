@@ -44,17 +44,12 @@ export class UnsupportedBlockEdit extends Component {
 	}
 
 	toggleSheet() {
-		const {
-			attributes,
-			block,
-			clientId,
-			isUnsupportedBlockEditorSupported,
-		} = this.props;
+		const { attributes, block, clientId } = this.props;
 		const { originalName } = attributes;
 		const title = this.getTitle();
 		const blockContent = serialize( block ? [ block ] : [] );
 
-		if ( isUnsupportedBlockEditorSupported ) {
+		if ( this.canEditUnsupportedBlock() ) {
 			requestUnsupportedBlockFallback(
 				blockContent,
 				clientId,
@@ -67,6 +62,18 @@ export class UnsupportedBlockEdit extends Component {
 		this.setState( {
 			showHelp: ! this.state.showHelp,
 		} );
+	}
+
+	canEditUnsupportedBlock() {
+		const {
+			canEnableUnsupportedBlockEditor,
+			isUnsupportedBlockEditorSupported,
+		} = this.props;
+
+		return (
+			! canEnableUnsupportedBlockEditor &&
+			isUnsupportedBlockEditorSupported
+		);
 	}
 
 	closeSheet() {
@@ -207,7 +214,7 @@ export class UnsupportedBlockEdit extends Component {
 
 		const subtitle = (
 			<Text style={ subTitleStyle }>
-				{ isUnsupportedBlockEditorSupported
+				{ this.canEditUnsupportedBlock()
 					? __( 'Tap to edit' )
 					: __( 'Unsupported' ) }
 			</Text>
