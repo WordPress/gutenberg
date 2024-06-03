@@ -16,6 +16,8 @@ export const setCanvasMode =
 		const switchCanvasMode = () => {
 			const isMediumOrBigger =
 				window.matchMedia( '(min-width: 782px)' ).matches;
+			registry.dispatch( blockEditorStore ).clearSelectedBlock();
+			registry.dispatch( editorStore ).setDeviceType( 'Desktop' );
 			registry
 				.dispatch( blockEditorStore )
 				.__unstableSetEditorMode( 'edit' );
