@@ -643,7 +643,7 @@
 				},
 				"splitting": {
 					"type": "boolean",
-					"description": "This property indicates whether the block should merge its content with the content of the pasted block when it is pasted, and whether it should split the block when the Enter key is pressed.",
+					"description": "This property indicates whether the block can split when the Enter key is pressed or when blocks are pasted.",
 					"default": false
 				}
 			},
