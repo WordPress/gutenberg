@@ -13,11 +13,7 @@ import {
 	__experimentalTruncate as Truncate,
 } from '@wordpress/components';
 import { useCopyToClipboard } from '@wordpress/compose';
-import {
-	filterURLForDisplay,
-	safeDecodeURI,
-	stripDomainPrefixes,
-} from '@wordpress/url';
+import { filterURLForDisplay, safeDecodeURI } from '@wordpress/url';
 import { Icon, globe, info, linkOff, edit, copySmall } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -63,8 +59,21 @@ export default function LinkPreview( {
 		! isEmptyURL &&
 		stripHTML( richData?.title || value?.title || displayURL );
 
+	/**
+	 * Filters the title for display. Removes the protocol and www prefix.
+	 *
+	 * @param {string} title - The title to be filtered.
+	 *
+	 * @return {string} The filtered title.
+	 */
+	function filterTitleForDisplay( title ) {
+		return title
+			.replace( /^[a-z\-.\+]+[0-9]*:(\/\/)?/i, '' )
+			.replace( /^www\./i, '' );
+	}
+
 	const isTitleRedundant =
-		value?.url && stripDomainPrefixes( displayTitle ) === displayURL;
+		value?.url && filterTitleForDisplay( displayTitle ) === displayURL;
 
 	let icon;
 

@@ -13,8 +13,14 @@
  * @return {string} Displayed URL.
  */
 export function filterURLForDisplay( url, maxLength = null ) {
+	if ( ! url ) {
+		return '';
+	}
+
 	// Remove protocol and www prefixes.
-	let filteredURL = stripDomainPrefixes( url );
+	let filteredURL = url
+		.replace( /^[a-z\-.\+]+[0-9]*:(\/\/)?/i, '' )
+		.replace( /^www\./i, '' );
 
 	// Ends with / and only has that single slash, strip it.
 	if ( filteredURL.match( /^[^\/]+\/$/ ) ) {
@@ -52,20 +58,4 @@ export function filterURLForDisplay( url, maxLength = null ) {
 		'…' +
 		truncatedFile
 	);
-}
-
-/**
- * Removes domain prefixes from a URL.
- *
- * @param {string} url The URL to strip domain prefixes from.
- *
- * @return {string} The URL without domain prefixes.
- */
-export function stripDomainPrefixes( url ) {
-	if ( ! url ) {
-		return '';
-	}
-	return url
-		.replace( /^[a-z\-.\+]+[0-9]*:(\/\/)?/i, '' )
-		.replace( /^www\./i, '' );
 }
