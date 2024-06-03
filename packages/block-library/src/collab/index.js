@@ -22,4 +22,4 @@ export const settings = {
 	edit: () => {},
 };
 
-export const init = () => initBlock({ name, metadata, settings });
+export const init = () => initBlock( { name, metadata, settings } );

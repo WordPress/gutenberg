@@ -27,7 +27,8 @@ export const format = {
 
 function Edit( { isActive, contentRef } ) {
 	// State to manage the visibility of the discussion board.
-	const [ isDiscussionBoardVisible, setIsDiscussionBoardVisible ] = useState( false );
+	const [ isDiscussionBoardVisible, setIsDiscussionBoardVisible ] =
+		useState( false );
 
 	// Function to toggle the visibility of the discussion board.
 	const toggleDiscussionBoardVisibility = () => {
@@ -36,7 +37,7 @@ function Edit( { isActive, contentRef } ) {
 
 	return (
 		<>
-			{ isBlockCommentExperimentEnabled &&
+			{ isBlockCommentExperimentEnabled && (
 				<RichTextToolbarButton
 					icon={ commentIcon }
 					isActive={ isActive }
@@ -44,13 +45,13 @@ function Edit( { isActive, contentRef } ) {
 					role="menuitemcheckbox"
 					title={ title }
 				/>
-			}
-			{ isDiscussionBoardVisible &&
-				<DiscussionBoard 
-			 		contentRef={ contentRef }
+			) }
+			{ isDiscussionBoardVisible && (
+				<DiscussionBoard
+					contentRef={ contentRef }
 					onClose={ toggleDiscussionBoardVisibility }
 				/>
-			}
+			) }
 		</>
 	);
 }
