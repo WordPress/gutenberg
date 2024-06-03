@@ -15,6 +15,11 @@ import PostURL from './index';
 import PostPanelRow from '../post-panel-row';
 import { store as editorStore } from '../../store';
 
+/**
+ * Renders the `PostURLPanel` component.
+ *
+ * @return {JSX.Element} The rendered PostURLPanel component.
+ */
 export default function PostURLPanel() {
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
@@ -68,7 +73,7 @@ function PostURLToggle( { isOpen, onClick } ) {
 			aria-label={ sprintf( __( 'Change link: %s' ), decodedSlug ) }
 			onClick={ onClick }
 		>
-			{ decodedSlug }
+			/{ decodedSlug }
 		</Button>
 	);
 }

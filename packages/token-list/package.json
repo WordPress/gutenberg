@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/token-list",
-	"version": "2.57.0",
+	"version": "3.0.0",
 	"description": "Constructable, plain JavaScript DOMTokenList implementation, supporting non-browser runtimes.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -19,7 +19,8 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=12"
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",

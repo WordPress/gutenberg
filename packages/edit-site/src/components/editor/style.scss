@@ -18,17 +18,6 @@
 	justify-content: center;
 }
 
-// Adjust the position of the notices when breadcrumbs are present
-.edit-site .has-block-breadcrumbs.is-full-canvas .components-editor-notices__snackbar {
-	bottom: 40px;
+.editor-header {
+	padding-left: $header-height;
 }
-
-// Adjust the position of the notices
-.edit-site .components-editor-notices__snackbar {
-	position: absolute;
-	right: 0;
-	bottom: 16px;
-	padding-left: 16px;
-	padding-right: 16px;
-}
-@include editor-left(".edit-site .components-editor-notices__snackbar")

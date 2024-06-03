@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/docgen",
-	"version": "1.66.0",
+	"version": "2.0.0",
 	"description": "Autogenerate public API documentation from exports and JSDoc comments.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -18,6 +18,10 @@
 	},
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
 	},
 	"files": [
 		"bin",

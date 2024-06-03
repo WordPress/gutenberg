@@ -3,12 +3,13 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Icon, chevronRight } from '@wordpress/icons';
-import { ColorIndicator } from '@wordpress/components';
+
 /**
  * Internal dependencies
  */
 import Cell from './cell';
 import styles from './styles.scss';
+import ColorIndicator from '../../color-indicator';
 
 export default function BottomSheetColorCell( props ) {
 	const { color, withColorIndicator = true, disabled, ...cellProps } = props;
@@ -16,7 +17,7 @@ export default function BottomSheetColorCell( props ) {
 	return (
 		<Cell
 			{ ...cellProps }
-			accessibilityRole={ 'button' }
+			accessibilityRole="button"
 			accessibilityHint={
 				/* translators: accessibility text (hint for moving to color settings) */
 				__( 'Double tap to go to color settings' )

@@ -7,12 +7,12 @@ import { useRoute, useNavigation } from '@react-navigation/native';
  * WordPress dependencies
  */
 import { useContext, useMemo } from '@wordpress/element';
-import { BottomSheetContext } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import { ColorPicker } from '../../color-picker';
+import { BottomSheetContext } from '../bottom-sheet/bottom-sheet-context';
 
 const PickerScreen = () => {
 	const route = useRoute();

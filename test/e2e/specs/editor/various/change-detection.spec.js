@@ -80,8 +80,9 @@ test.describe( 'Change detection', () => {
 
 		// Toggle post as needing review (not persisted for autosave).
 		await editor.openDocumentSettingsSidebar();
-		const postStatusButton = page.locator( '.editor-post-status-trigger' );
-		await postStatusButton.click();
+		await page
+			.getByRole( 'button', { name: 'Change post status:' } )
+			.click();
 		await page.getByRole( 'radio', { name: 'Pending' } ).click();
 		// Force autosave to occur immediately.
 		await Promise.all( [
@@ -419,7 +420,7 @@ test.describe( 'Change detection', () => {
 			.click();
 		await page
 			.getByRole( 'dialog' )
-			.getByRole( 'button', { name: 'Delete' } )
+			.getByRole( 'button', { name: 'Trash' } )
 			.click();
 
 		await expect( page ).toHaveURL( '/wp-admin/edit.php?post_type=post' );

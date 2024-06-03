@@ -50,6 +50,7 @@ export default function PostAuthorCombobox() {
 			onFilterValueChange={ debounce( handleKeydown, 300 ) }
 			onChange={ handleSelect }
 			allowReset={ false }
+			hideLabelFromVision
 		/>
 	);
 }

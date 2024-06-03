@@ -22,6 +22,7 @@ import { createSelector, createRegistrySelector } from '@wordpress/data';
  * Internal dependencies
  */
 import {
+	withRootClientIdOptionKey,
 	checkAllowListRecursive,
 	checkAllowList,
 	getAllPatternsDependants,
@@ -1759,16 +1760,13 @@ export function canMoveBlock( state, clientId, rootClientId = null ) {
 	if ( attributes === null ) {
 		return true;
 	}
-	if ( getBlockEditingMode( state, rootClientId ) !== 'default' ) {
-		return false;
-	}
 	if ( attributes.lock?.move !== undefined ) {
 		return ! attributes.lock.move;
 	}
 	if ( getTemplateLock( state, rootClientId ) === 'all' ) {
 		return false;
 	}
-	return true;
+	return getBlockEditingMode( state, rootClientId ) !== 'disabled';
 }
 
 /**
@@ -1998,7 +1996,7 @@ const buildBlockTypeItem =
  */
 export const getInserterItems = createRegistrySelector( ( select ) =>
 	createSelector(
-		( state, rootClientId = null ) => {
+		( state, rootClientId = null, options = {} ) => {
 			const buildReusableBlockInserterItem = ( reusableBlock ) => {
 				const icon = ! reusableBlock.wp_pattern_sync_status
 					? {
@@ -2040,15 +2038,72 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 				buildScope: 'inserter',
 			} );
 
-			const blockTypeInserterItems = getBlockTypes()
+			let blockTypeInserterItems = getBlockTypes()
 				.filter( ( blockType ) =>
-					canIncludeBlockTypeInInserter(
-						state,
-						blockType,
-						rootClientId
-					)
+					hasBlockSupport( blockType, 'inserter', true )
 				)
 				.map( buildBlockTypeInserterItem );
+
+			if ( options[ withRootClientIdOptionKey ] ) {
+				blockTypeInserterItems = blockTypeInserterItems.reduce(
+					( accumulator, item ) => {
+						item.rootClientId = rootClientId ?? '';
+
+						while (
+							! canInsertBlockTypeUnmemoized(
+								state,
+								item.name,
+								item.rootClientId
+							)
+						) {
+							if ( ! item.rootClientId ) {
+								let sectionRootClientId;
+								try {
+									sectionRootClientId = unlock(
+										getSettings( state )
+									).sectionRootClientId;
+								} catch ( e ) {}
+								if (
+									sectionRootClientId &&
+									canInsertBlockTypeUnmemoized(
+										state,
+										item.name,
+										sectionRootClientId
+									)
+								) {
+									item.rootClientId = sectionRootClientId;
+								} else {
+									delete item.rootClientId;
+								}
+								break;
+							} else {
+								const parentClientId = getBlockRootClientId(
+									state,
+									item.rootClientId
+								);
+								item.rootClientId = parentClientId;
+							}
+						}
+
+						// We could also add non insertable items and gray them out.
+						if ( item.hasOwnProperty( 'rootClientId' ) ) {
+							accumulator.push( item );
+						}
+
+						return accumulator;
+					},
+					[]
+				);
+			} else {
+				blockTypeInserterItems = blockTypeInserterItems.filter(
+					( blockType ) =>
+						canIncludeBlockTypeInInserter(
+							state,
+							blockType,
+							rootClientId
+						)
+				);
+			}
 
 			const items = blockTypeInserterItems.reduce(
 				( accumulator, item ) => {

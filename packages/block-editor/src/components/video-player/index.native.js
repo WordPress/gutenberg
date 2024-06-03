@@ -99,7 +99,7 @@ class Video extends Component {
 					// So we are setting controls=false and adding a play button that
 					// will trigger presentFullscreenPlayer()
 					controls={ false }
-					ignoreSilentSwitch={ 'ignore' }
+					ignoreSilentSwitch="ignore"
 					paused={ ! isFullScreen }
 					onLayout={ this.onVideoLayout }
 					onFullscreenPlayerWillPresent={ () => {

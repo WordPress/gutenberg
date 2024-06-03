@@ -32,38 +32,20 @@ import { moreVertical } from '@wordpress/icons';
  * Internal dependencies
  */
 import { unlock } from './lock-unlock';
-import type {
-	Action,
-	Data,
-	Item,
-	NormalizedField,
-	ViewList as ViewListType,
-} from './types';
+import type { Action, AnyItem, NormalizedField, ViewListProps } from './types';
 
 import { ActionsDropdownMenuGroup, ActionModal } from './item-actions';
 
-interface ListViewProps {
-	actions: Action[];
-	data: Data;
-	fields: NormalizedField[];
-	getItemId: ( item: Item ) => string;
-	id: string;
-	isLoading: boolean;
-	onSelectionChange: ( selection: Item[] ) => void;
-	selection: string[];
-	view: ViewListType;
-}
-
-interface ListViewItemProps {
-	actions: Action[];
+interface ListViewItemProps< Item extends AnyItem > {
+	actions: Action< Item >[];
 	id?: string;
 	isSelected: boolean;
 	item: Item;
-	mediaField?: NormalizedField;
+	mediaField?: NormalizedField< Item >;
 	onSelect: ( item: Item ) => void;
-	primaryField?: NormalizedField;
+	primaryField?: NormalizedField< Item >;
 	store: CompositeStore;
-	visibleFields: NormalizedField[];
+	visibleFields: NormalizedField< Item >[];
 }
 
 const {
@@ -74,7 +56,7 @@ const {
 	DropdownMenuV2: DropdownMenu,
 } = unlock( componentsPrivateApis );
 
-function ListItem( {
+function ListItem< Item extends AnyItem >( {
 	actions,
 	id,
 	isSelected,
@@ -84,7 +66,7 @@ function ListItem( {
 	primaryField,
 	store,
 	visibleFields,
-}: ListViewItemProps ) {
+}: ListViewItemProps< Item > ) {
 	const itemRef = useRef< HTMLElement >( null );
 	const labelId = `${ id }-label`;
 	const descriptionId = `${ id }-description`;
@@ -123,6 +105,11 @@ function ListItem( {
 	}, [ actions, item ] );
 
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
+	const primaryActionLabel =
+		primaryAction &&
+		( typeof primaryAction.label === 'string'
+			? primaryAction.label
+			: primaryAction.label( [ item ] ) );
 
 	return (
 		<CompositeRow
@@ -138,7 +125,8 @@ function ListItem( {
 		>
 			<HStack
 				className="dataviews-view-list__item-wrapper"
-				alignment="top"
+				alignment="center"
+				spacing={ 0 }
 			>
 				<div role="gridcell">
 					<CompositeItem
@@ -162,7 +150,7 @@ function ListItem( {
 									<div className="dataviews-view-list__media-placeholder"></div>
 								) }
 							</div>
-							<VStack spacing={ 1 }>
+							<VStack spacing={ 0 }>
 								<span
 									className="dataviews-view-list__primary-field"
 									id={ labelId }
@@ -210,7 +198,7 @@ function ListItem( {
 									store={ store }
 									render={
 										<Button
-											label={ primaryAction.label }
+											label={ primaryActionLabel }
 											icon={ primaryAction.icon }
 											isDestructive={
 												primaryAction.isDestructive
@@ -223,14 +211,12 @@ function ListItem( {
 									}
 								>
 									{ isModalOpen && (
-										<ActionModal
+										<ActionModal< Item >
 											action={ primaryAction }
 											items={ [ item ] }
 											closeModal={ () =>
 												setIsModalOpen( false )
 											}
-											onActionStart={ () => {} }
-											onActionPerformed={ () => {} }
 										/>
 									) }
 								</CompositeItem>
@@ -243,7 +229,7 @@ function ListItem( {
 										store={ store }
 										render={
 											<Button
-												label={ primaryAction.label }
+												label={ primaryActionLabel }
 												icon={ primaryAction.icon }
 												isDestructive={
 													primaryAction.isDestructive
@@ -313,7 +299,9 @@ function ListItem( {
 	);
 }
 
-export default function ViewList( props: ListViewProps ) {
+export default function ViewList< Item extends AnyItem >(
+	props: ViewListProps< Item >
+) {
 	const {
 		actions,
 		data,

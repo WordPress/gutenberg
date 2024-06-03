@@ -2,6 +2,36 @@
 
 ## Unreleased
 
+## 28.0.0 (2024-05-31)
+
+### Breaking Changes
+
+-   Variables like `process.env.IS_GUTENBERG_PLUGIN` have been replaced by `globalThis.IS_GUTENBERG_PLUGIN`. Build systems using `process.env` should be updated ([#61486](https://github.com/WordPress/gutenberg/pull/61486)).
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+### Enhancements
+
+-   `Tabs`: Animate indicator ([#60560](https://github.com/WordPress/gutenberg/pull/60560)).
+-   `ComboboxControl`: Introduce Combobox expandOnFocus prop ([#61705](https://github.com/WordPress/gutenberg/pull/61705)).
+-   `ProgressBar`: Expose as public API ([#61062](https://github.com/WordPress/gutenberg/pull/61062)).
+-   `ProgressBar`: Simplify default width implementation and make it more easily overridable ([#61976](https://github.com/WordPress/gutenberg/pull/61976)).
+
+### Bug Fixes
+
+-   `Autocomplete`: Stabilize rendering of autocomplete items ([#61877](https://github.com/WordPress/gutenberg/pull/61877)).
+-   `TabPanel`: Make the the focus styles consistent with `Tabs`. ([#61317](https://github.com/WordPress/gutenberg/pull/61317)).
+-   `InputControl`: Fixed z-index issue where slider dots appeared in front of the Appearance dropdown. ([#61937](https://github.com/WordPress/gutenberg/pull/61937))
+
+### Internal
+
+-   Remove `reduceMotion` util ([#61963](https://github.com/WordPress/gutenberg/pull/61963)).
+-   Add type support for CSS Custom Properties ([#61872](https://github.com/WordPress/gutenberg/pull/61872)).
+-   Remove usage of deprecated spreading of `key` prop in JSX in CustomSelectControl and FormTokenField components ([#61692](https://github.com/WordPress/gutenberg/pull/61692)).
+-   `Tooltip`: Fix Ariakit tooltip store usage ([#61858](https://github.com/WordPress/gutenberg/pull/61858)).
+-   `CustomSelectControlV2`: Use `InputBase` for styling ([#60261](https://github.com/WordPress/gutenberg/pull/60261)).
+
+## 27.6.0 (2024-05-16)
+
 ### Internal
 
 -   Replaced `classnames` package with the faster and smaller `clsx` package ([#61138](https://github.com/WordPress/gutenberg/pull/61138)).
@@ -10,6 +40,7 @@
 
 ### Enhancements
 
+-   `FontSizePicker`: Add `vw` and `vh` units to the default units in the font size picker ([#60507](<(https://github.com/WordPress/gutenberg/pull/60607)>).
 -   `PaletteEdit`: Use consistent spacing and metrics. ([#61368](https://github.com/WordPress/gutenberg/pull/61368)).
 -   `FormTokenField`: Hide label when not defined ([#61336](https://github.com/WordPress/gutenberg/pull/61336)).
 -   `ComboboxControl`: supports disabled items ([#61294](https://github.com/WordPress/gutenberg/pull/61294)).
@@ -19,6 +50,7 @@
 ### Bug Fix
 
 -   `ToolsPanel`: Fix sticking “Reset” option ([#60621](https://github.com/WordPress/gutenberg/pull/60621)).
+-   Fix an issue where types used a synthetic default import ([#61679](https://github.com/WordPress/gutenberg/pull/61679)).
 
 ## 27.5.0 (2024-05-02)
 

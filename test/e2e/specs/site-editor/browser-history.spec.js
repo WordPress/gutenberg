@@ -27,7 +27,7 @@ test.describe( 'Site editor browser history', () => {
 		// Navigate back to the template list
 		await page.goBack();
 		await expect( page ).toHaveURL(
-			'/wp-admin/site-editor.php?path=%2Fwp_template'
+			'/wp-admin/site-editor.php?postType=wp_template'
 		);
 
 		// Navigate back to the dashboard

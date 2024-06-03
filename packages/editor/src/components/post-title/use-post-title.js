@@ -7,6 +7,11 @@ import { useSelect, useDispatch } from '@wordpress/data';
  */
 import { store as editorStore } from '../../store';
 
+/**
+ * Custom hook for managing the post title in the editor.
+ *
+ * @return {Object} An object containing the current title and a function to update the title.
+ */
 export default function usePostTitle() {
 	const { editPost } = useDispatch( editorStore );
 	const { title } = useSelect( ( select ) => {

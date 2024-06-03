@@ -70,4 +70,9 @@ function PostComments() {
 	);
 }
 
+/**
+ * A form for managing comment status.
+ *
+ * @return {JSX.Element} The rendered PostComments component.
+ */
 export default PostComments;
