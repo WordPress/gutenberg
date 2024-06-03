@@ -72,7 +72,7 @@ export default function LinkPreview( {
 			.replace( /^www\./i, '' );
 	}
 
-	const isTitleRedundant =
+	const isUrlRedundant =
 		value?.url && filterTitleForDisplay( displayTitle ) === displayURL;
 
 	let icon;
@@ -128,7 +128,7 @@ export default function LinkPreview( {
 										{ displayTitle }
 									</Truncate>
 								</ExternalLink>
-								{ ! isTitleRedundant && (
+								{ ! isUrlRedundant && (
 									<span className="block-editor-link-control__search-item-info">
 										<Truncate numberOfLines={ 1 }>
 											{ displayURL }
