@@ -129,9 +129,9 @@ While the `isActive` property is optional, it's recommended. This API is used by
 
 If `isActive` is not set, the Editor cannot distinguish between an instance of the original block and your variation, so the original block information will be displayed.
 
-The property can be set to either a function or an array of strings (`string[]`).
+The property can be set to either an array of strings (`string[]`), or a function. It is recommended to use the string array version whenever possible.
 
-The function version of this property accepts a block instance's `blockAttributes` as the first argument, and the `variationAttributes` declared for a variation as the second argument. These arguments can be used to determine if a variation is active by comparing them and returning a `true` or `false` (indicating whether this variation is inactive for this block instance).
+The `string[]` version is used to declare which of the block instance's attributes should be compared to the given variation's. Each attribute will be checked and the variation will be active if all of them match.
 
 As an example, in the core Embed block, the `providerNameSlug` attribute is used to determine the embed provider (e.g. 'youtube' or 'twitter'). The variations may be declared like this:
 
@@ -162,22 +162,32 @@ const variations = [
 ]
 ```
 
- The `isActive` function can compare the block instance value for `providerNameSlug` to the value declared in the variation's declaration (the values in the code snippet above) to determine which embed variation is active:
+The `isActive` property would then look like this:
+
+```js
+isActive: [ 'providerNameSlug' ]
+```
+
+This will cause the block instance value for `providerNameSlug` to be compared to the value declared in the variation's declaration (the values in the code snippet above) to determine which embed variation is active.
+
+Nested object paths are also supported. For example, consider a block variation that has a `query` object as an attribute. It is possible to determine if the variation is active solely based on that object's `postType` property (while ignoring all its other properties):
+
+```js
+isActive: [ 'query.postType' ]
+```
+
+The function version of this property accepts a block instance's `blockAttributes` as the first argument, and the `variationAttributes` declared for a variation as the second argument. These arguments can be used to determine if a variation is active by comparing them and returning a `true` or `false` (indicating whether this variation is inactive for this block instance).
+
+Using the same example for the embed block, the function version would look like this:
 
 ```js
 isActive: ( blockAttributes, variationAttributes ) =>
 	blockAttributes.providerNameSlug === variationAttributes.providerNameSlug,
 ```
 
-The `string[]` version is used to declare which attributes should be compared as a shorthand. Each attribute will be checked and the variation will be active if all of them match. Using the same example for the embed block, the string version would look like this:
+### Specificity of `isActive` matches
 
-```js
-isActive: [ 'providerNameSlug' ]
-```
-
-### Caveats to using `isActive`
-
-The `isActive` property can return false positives if multiple variations exist for a specific block and the `isActive` checks are not specific enough. To demonstrate this, consider the following example:
+If there are multiple variations whose `isActive` check matches a given block instance, and all of them are string arrays, then the variation with the highest _specificity_ will be chosen. Consider the following example:
 
 ```js
 wp.blocks.registerBlockVariation(
@@ -206,6 +216,6 @@ wp.blocks.registerBlockVariation(
 );
 ```
 
-The `isActive` check on both variations tests the `textColor`, but each variations uses `vivid-red`. Since the `paragraph-red` variation is registered first, once the `paragraph-red-grey` variation is inserted into the Editor, it will have the title `Red Paragraph` instead of `Red/Grey Paragraph`. As soon as the Editor finds a match, it stops checking.
+If a block instance has attributes `textColor: vivid-red` and `backgroundColor: cyan-bluish-gray`, both variations' `isActive` criterion will match that block instance. In this case, the more _specific_ match will be determined to be the active variation, where specificity is calculated as the length of each `isActive` array. This means that the `Red/Grey Paragraph` will be shown as the active variation.
 
-There have been [discussions](https://github.com/WordPress/gutenberg/issues/41303#issuecomment-1526193087) around how the API can be improved, but as of WordPress 6.3, this remains an issue to watch out for.
+Note that specificity cannot be determined for a matching variation if its `isActive` property is a function rather than a `string[]`. In this case, the first matching variation will be determined to be the active variation. For this reason, it is generally recommended to use a `string[]` rather than a `function` for the `isActive` property.
