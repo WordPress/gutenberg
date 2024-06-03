@@ -208,7 +208,7 @@ function gutenberg_dequeue_module( $module_identifier ) {
  * `script_module_data_{$module_id}` filter.
  *
  * The data for a given Script Module will be JSON serialized in a script tag with an ID
- * like `wp-scriptmodule-data_{$module_id}`.
+ * like `wp-script-module-data-{$module_id}`.
  */
 function gutenberg_print_script_module_data(): void {
 	$get_marked_for_enqueue = new ReflectionMethod( 'WP_Script_Modules', 'get_marked_for_enqueue' );
@@ -236,7 +236,7 @@ function gutenberg_print_script_module_data(): void {
 		 * If the filter returns no data (an empty array), nothing will be embedded in the page.
 		 *
 		 * The data for a given Script Module, if provided, will be JSON serialized in a script tag
-		 * with an ID like `wp-scriptmodule-data_{$module_id}`.
+		 * with an ID like `wp-script-module-data-{$module_id}`.
 		 *
 		 * The dynamic portion of the hook name, `$module_id`, refers to the Script Module ID that
 		 * the data is associated with.
@@ -281,7 +281,7 @@ function gutenberg_print_script_module_data(): void {
 				wp_json_encode( $data, $json_encode_flags ),
 				array(
 					'type' => 'application/json',
-					'id'   => "wp-scriptmodule-data_{$module_id}",
+					'id'   => "wp-script-module-data-{$module_id}",
 				)
 			);
 		}
