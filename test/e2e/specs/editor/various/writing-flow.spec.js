@@ -958,7 +958,8 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 <!-- /wp:table -->` );
 	} );
 
-	test( 'escape should toggle between edit and navigation modes', async ( {
+	test( 'escape should set select mode and then focus the canvas', async ( {
+		editor,
 		page,
 		writingFlowUtils,
 	} ) => {
@@ -975,15 +976,11 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 			.poll( writingFlowUtils.getActiveBlockName )
 			.toBe( 'core/paragraph' );
 
-		// Second escape Toggles back to Edit Mode
+		// Second escape should send focus to the canvas
 		await page.keyboard.press( 'Escape' );
+		// The navigation button should be hidden.
 		await expect( navigationButton ).toBeHidden();
-		const blockToolbar = page.getByLabel( 'Block tools' );
-
-		await expect( blockToolbar ).toBeVisible();
-		await expect
-			.poll( writingFlowUtils.getActiveBlockName )
-			.toBe( 'core/paragraph' );
+		await expect( editor.canvas.locator( 'body' ) ).toBeFocused();
 	} );
 
 	// Checks for regressions of https://github.com/WordPress/gutenberg/issues/40091.
