@@ -330,6 +330,19 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			}
 			$theme_support_data['settings']['typography']['defaultFontSizes'] = $default_font_sizes;
 
+			if ( ! isset( $theme_support_data['settings']['spacing'] ) ) {
+				$theme_support_data['settings']['spacing'] = array();
+			}
+			$default_spacing_sizes = false;
+			if ( current_theme_supports( 'default-spacing-sizes' ) ) {
+				$default_spacing_sizes = true;
+			}
+			if ( ! isset( $theme_support_data['settings']['spacing']['spacingSizes'] ) ) {
+				// If the theme does not have any spacing sizes, we still want to show the core one.
+				$default_spacing_sizes = true;
+			}
+			$theme_support_data['settings']['spacing']['defaultSpacingSizes'] = $default_spacing_sizes;
+
 			if ( ! isset( $theme_support_data['settings']['shadow'] ) ) {
 				$theme_support_data['settings']['shadow'] = array();
 			}
