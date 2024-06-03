@@ -317,6 +317,19 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			}
 			$theme_support_data['settings']['color']['defaultGradients'] = $default_gradients;
 
+			if ( ! isset( $theme_support_data['settings']['typography'] ) ) {
+				$theme_support_data['settings']['typography'] = array();
+			}
+			$default_font_sizes = false;
+			if ( current_theme_supports( 'default-font-sizes' ) ) {
+				$default_font_sizes = true;
+			}
+			if ( ! isset( $theme_support_data['settings']['typography']['fontSizes'] ) ) {
+				// If the theme does not have any font sizes, we still want to show the core one.
+				$default_font_sizes = true;
+			}
+			$theme_support_data['settings']['typography']['defaultFontSizes'] = $default_font_sizes;
+
 			if ( ! isset( $theme_support_data['settings']['shadow'] ) ) {
 				$theme_support_data['settings']['shadow'] = array();
 			}
