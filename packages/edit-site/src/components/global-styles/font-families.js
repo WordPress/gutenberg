@@ -7,11 +7,7 @@ import {
 	__experimentalVStack as VStack,
 	Button,
 } from '@wordpress/components';
-<<<<<<< HEAD
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-import { settings } from '@wordpress/icons';
-=======
->>>>>>> 72a59c77a0 (Replace Manage fonts icon button with visible text button.)
 import { useContext } from '@wordpress/element';
 
 /**
@@ -73,7 +69,9 @@ function FontFamilies() {
 						<Button
 							className="edit-site-global-styles-font-families__manage-fonts"
 							variant="secondary"
-							onClick={ () => setModalTabOpen( 'installed-fonts' ) }
+							onClick={ () =>
+								setModalTabOpen( 'installed-fonts' )
+							}
 						>
 							{ __( 'Manage fonts' ) }
 						</Button>
