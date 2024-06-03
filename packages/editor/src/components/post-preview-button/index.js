@@ -121,8 +121,8 @@ export default function PostPreviewButton( {
 	role,
 	onPreview,
 } ) {
-	const { postId, currentPostLink, previewLink, isSaveable, isViewable } =
-		useSelect( ( select ) => {
+	const { postId, currentPostLink, previewLink, isViewable } = useSelect(
+		( select ) => {
 			const editor = select( editorStore );
 			const core = select( coreStore );
 
@@ -134,10 +134,11 @@ export default function PostPreviewButton( {
 				postId: editor.getCurrentPostId(),
 				currentPostLink: editor.getCurrentPostAttribute( 'link' ),
 				previewLink: editor.getEditedPostPreviewLink(),
-				isSaveable: editor.isEditedPostSaveable(),
 				isViewable: postType?.viewable ?? false,
 			};
-		}, [] );
+		},
+		[]
+	);
 
 	const { __unstableSaveForPreview } = useDispatch( editorStore );
 
@@ -183,7 +184,6 @@ export default function PostPreviewButton( {
 			className={ className || 'editor-post-preview' }
 			href={ href }
 			target={ targetId }
-			disabled={ ! isSaveable }
 			onClick={ openPreviewWindow }
 			role={ role }
 			size="compact"

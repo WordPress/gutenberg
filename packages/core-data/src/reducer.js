@@ -93,6 +93,29 @@ export function currentUser( state = {}, action ) {
 }
 
 /**
+ * Reducer returning the login session for current user.
+ *
+ * The default state is { isActive: true }. We are just going to assume that by default the user session is active.
+ * If the block editor is already being loaded for user and if the data store is already being initialised for the user,
+ * it means user is already logged in.
+ * Eventually Heartbeat API can update this state if the auth cookie either expires or is deleted for the user.
+ *
+ * @param {Object} state  Current state for login session.
+ * @param {Object} action Dispatched action.
+ */
+export function currentUserSession( state = { isActive: true }, action ) {
+	switch ( action.type ) {
+		case 'UPDATE_CURRENT_USER_SESSION':
+			return {
+				...state,
+				...action.currentUserSession,
+			};
+	}
+
+	return state;
+}
+
+/**
  * Reducer managing taxonomies.
  *
  * @param {Object} state  Current state.
@@ -629,6 +652,7 @@ export default combineReducers( {
 	currentTheme,
 	currentGlobalStylesId,
 	currentUser,
+	currentUserSession,
 	themeGlobalStyleVariations,
 	themeBaseGlobalStyles,
 	themeGlobalStyleRevisions,
