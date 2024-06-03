@@ -1,7 +1,16 @@
 .block-editor-iframe__body {
 	position: relative;
 
-	&:focus {
+	// Float an outline on the top of the iframe to show focus on the canvas when pressing
+	// escape while in select mode.
+	&:focus::before {
+		content: "";
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		z-index: 1;
 		outline: calc(2 * var(--wp-admin-border-width-focus)) solid var(--wp-admin-theme-color);
 		outline-offset: calc(-2 * var(--wp-admin-border-width-focus));
 	}

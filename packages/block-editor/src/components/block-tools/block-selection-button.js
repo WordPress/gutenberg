@@ -183,7 +183,7 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 		const navigateUp = ( isTab && isShift ) || isUp;
 		const navigateDown = ( isTab && ! isShift ) || isDown;
 		// Move out of current nesting level (no effect if at root level).
-		const navigateOut = isLeft || isEscape;
+		const navigateOut = isLeft;
 		// Move into next nesting level (no effect if the current block has no innerBlocks).
 		const navigateIn = isRight;
 
