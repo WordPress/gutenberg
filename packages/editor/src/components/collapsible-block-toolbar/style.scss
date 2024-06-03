@@ -2,7 +2,7 @@
 	overflow: hidden;
 	display: flex;
 	align-items: center;
-	height: $header-height;
+	height: $header-height - $border-width; // Fix visual artifacting at the bottom.
 
 	.block-editor-block-contextual-toolbar {
 		border-bottom: 0;
