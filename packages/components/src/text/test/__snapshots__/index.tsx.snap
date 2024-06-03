@@ -54,6 +54,7 @@ exports[`Text snapshot tests should render correctly 1`] = `
   color: #1e1e1e;
   line-height: 1.4;
   margin: 0;
+  text-wrap: balance; /* Fallback for Safari. */
   text-wrap: pretty;
   font-size: calc((13 / 13) * 13px);
   font-weight: normal;
