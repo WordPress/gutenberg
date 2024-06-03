@@ -53,10 +53,10 @@ function useTrackElementOffset(
 
 		function updateIndicator( element: HTMLElement ) {
 			setIndicatorPosition( {
-				left: element.offsetLeft,
-				top: element.offsetTop,
-				width: Math.max( 0, element.offsetWidth - 1 ),
-				height: element.offsetHeight,
+				left: Math.max( element.offsetLeft - 1, 0 ),
+				top: Math.max( element.offsetTop - 1, 0 ),
+				width: parseFloat( getComputedStyle( element ).width ),
+				height: parseFloat( getComputedStyle( element ).height ),
 			} );
 			updateCallbackRef.current?.();
 		}
