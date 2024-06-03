@@ -1,3 +1,7 @@
 .editor-action-modal {
 	z-index: z-index(".editor-action-modal");
 }
+
+.editor-action-modal__reorder-pages .components-modal__frame {
+	max-width: $modal-width-small;
+}
