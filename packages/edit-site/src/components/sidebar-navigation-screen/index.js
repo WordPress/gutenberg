@@ -77,7 +77,7 @@ export default function SidebarNavigationScreen( {
 			>
 				<HStack
 					spacing={ 3 }
-					alignment="center"
+					alignment="flex-start"
 					className="edit-site-sidebar-navigation-screen__title-icon"
 				>
 					{ ! isRoot && (
