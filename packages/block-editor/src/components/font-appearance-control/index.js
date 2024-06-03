@@ -53,7 +53,8 @@ export default function FontAppearanceControl( props ) {
 		name: __( 'Default' ),
 		style: { fontStyle: undefined, fontWeight: undefined },
 	};
-	const { fontStyles, fontWeights } =
+	const isSystemFont = ! fontFamilyFaces;
+	const { allStylesAndWeights, fontStyles, fontWeights, isVariableFont } =
 		getFontStylesAndWeights( fontFamilyFaces );
 
 	// Combines both font style and weight options into a single dropdown.
@@ -88,6 +89,14 @@ export default function FontAppearanceControl( props ) {
 		return combinedOptions;
 	};
 
+	const allOptions = () => {
+		const allFontOptions = [ defaultOption ];
+		if ( allStylesAndWeights ) {
+			allFontOptions.push( ...allStylesAndWeights );
+		}
+		return allFontOptions;
+	};
+
 	// Generates select options for font styles only.
 	const styleOptions = () => {
 		const combinedOptions = [ defaultOption ];
@@ -116,12 +125,26 @@ export default function FontAppearanceControl( props ) {
 
 	// Map font styles and weights to select options.
 	const selectOptions = useMemo( () => {
-		if ( hasFontStyles && hasFontWeights ) {
+		// Display combined font style and weight options if font family
+		// is a system font or a variable font.
+		if ( isSystemFont || isVariableFont ) {
 			return combineOptions();
 		}
 
+		// Display all available font style and weight options.
+		if ( hasFontStyles && hasFontWeights ) {
+			return allOptions();
+		}
+
+		// Display only font style options or font weight options.
 		return hasFontStyles ? styleOptions() : weightOptions();
-	}, [ props.options, fontStyles, fontWeights ] );
+	}, [
+		props.options,
+		fontStyles,
+		fontWeights,
+		isSystemFont,
+		isVariableFont,
+	] );
 
 	// Find current selection by comparing font style & weight against options,
 	// and fall back to the Default option if there is no matching option.

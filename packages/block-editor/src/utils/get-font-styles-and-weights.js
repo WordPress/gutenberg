@@ -61,47 +61,68 @@ const FONT_WEIGHTS = [
 
 /**
  * Builds a list of font style and weight options based on font family faces.
+ * Defaults to the standard font styles and weights if no font family faces are provided.
  *
  * @param {Array} fontFamilyFaces font family faces array
- * @return {Object} new object with font style and weight options
+ * @return {Object} new object with font style, weight, and variable font properties
  */
 export function getFontStylesAndWeights( fontFamilyFaces ) {
-	if ( ! fontFamilyFaces ) {
-		return {};
-	}
-
+	const allStylesAndWeights = [];
 	let fontStyles = [];
 	let fontWeights = [];
-	let variableFont = false;
+	let isVariableFont = false;
+
+	if ( ! fontFamilyFaces ) {
+		// Return default font styles and weights if no font family faces are provided.
+		return { fontStyles: FONT_STYLES, fontWeights: FONT_WEIGHTS };
+	}
 
 	fontFamilyFaces.forEach( ( face ) => {
-		if ( face.fontStyle ) {
+		const fontStyle = formatFontStyle( face.fontStyle );
+		const fontWeight = formatFontWeight( face.fontWeight );
+		const optionName =
+			fontStyle.value === 'normal'
+				? fontWeight.name
+				: `${ fontWeight.name } ${ fontStyle.name }`;
+
+		allStylesAndWeights.push( {
+			key: `${ fontWeight.value }-${ fontStyle.value }`,
+			name: optionName,
+			style: {
+				fontStyle: fontStyle.value,
+				fontWeight: fontWeight.value,
+			},
+		} );
+
+		if ( fontStyle ) {
 			if (
-				! fontStyles.some( ( style ) => style.value === face.fontStyle )
+				! fontStyles.some(
+					( style ) => style.value === fontStyle.value
+				)
 			) {
-				fontStyles.push( formatFontStyle( face.fontStyle ) );
+				fontStyles.push( fontStyle );
 			}
 		}
-		if ( face.fontWeight ) {
+		if ( fontWeight ) {
 			if (
 				! fontWeights.some(
-					( weight ) => weight.value === face.fontWeight
+					( weight ) => weight.value === fontWeight.value
 				)
 			) {
 				// Check if font weight includes a space that is not at the start or end of the string. If so, it must be a variable font. e.g. "100 900"
 				if ( /\s/.test( face.fontWeight.trim() ) ) {
-					variableFont = true;
+					isVariableFont = true;
 				}
 
-				fontWeights.push( formatFontWeight( face.fontWeight ) );
+				fontWeights.push( fontWeight );
 			}
 		}
 	} );
 
 	fontStyles =
-		fontStyles.length === 0 || variableFont ? FONT_STYLES : fontStyles;
+		fontStyles.length === 0 || isVariableFont ? FONT_STYLES : fontStyles;
 	fontWeights =
-		fontWeights.length === 0 || variableFont ? FONT_WEIGHTS : fontWeights;
+		fontWeights.length === 0 || isVariableFont ? FONT_WEIGHTS : fontWeights;
 
-	return { fontStyles, fontWeights };
+	return { allStylesAndWeights, fontStyles, fontWeights, isVariableFont };
 }
