@@ -52,17 +52,11 @@ function useTrackElementOffset(
 		observedElementRef.current = targetElement ?? undefined;
 
 		function updateIndicator( element: HTMLElement ) {
-			const parentElement = element.offsetParent;
-			if ( ! parentElement ) {
-				return;
-			}
-			const parentRect = parentElement?.getBoundingClientRect();
-			const rect = element.getBoundingClientRect();
 			setIndicatorPosition( {
-				left: rect.left - parentRect.left,
-				top: rect.top - parentRect.top,
-				width: rect.width,
-				height: rect.height,
+				left: element.offsetLeft,
+				top: element.offsetTop,
+				width: Math.max( 0, element.offsetWidth - 1 ),
+				height: element.offsetHeight,
 			} );
 			updateCallbackRef.current?.();
 		}
