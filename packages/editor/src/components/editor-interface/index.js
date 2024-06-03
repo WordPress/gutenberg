@@ -208,9 +208,7 @@ export default function EditorInterface( {
 				isRichEditingEnabled &&
 				blockEditorMode !== 'zoom-out' &&
 				mode === 'visual' && (
-					<div className="editor-interface__footer">
-						<BlockBreadcrumb rootLabelText={ documentLabel } />
-					</div>
+					<BlockBreadcrumb rootLabelText={ documentLabel } />
 				)
 			}
 			actions={
