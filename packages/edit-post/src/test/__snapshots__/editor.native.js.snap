@@ -8,7 +8,7 @@ exports[`Editor adds empty image block when pasting unsupported HTML local image
 
 exports[`Editor adds image block when pasting HTML local image path 1`] = `
 "<!-- wp:image -->
-<figure class="wp-block-image"><img src="file://path/to/file.png" alt=""/></figure>
+<figure class="wp-block-image"><img src="file:///path/to/file.png" alt=""/></figure>
 <!-- /wp:image -->"
 `;
 
