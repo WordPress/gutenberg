@@ -36,6 +36,7 @@ import { useAddedBy } from './hooks';
 import {
 	TEMPLATE_POST_TYPE,
 	OPERATOR_IS_ANY,
+	OPERATOR_IS,
 	LAYOUT_GRID,
 	LAYOUT_TABLE,
 	LAYOUT_LIST,
@@ -80,7 +81,7 @@ const DEFAULT_VIEW = {
 	},
 	// All fields are visible by default, so it's
 	// better to keep track of the hidden ones.
-	hiddenFields: [ 'preview' ],
+	hiddenFields: [ 'preview', 'postTypes', 'isCustom' ],
 	layout: defaultConfigPerViewType[ LAYOUT_GRID ],
 	filters: [],
 };
@@ -184,6 +185,22 @@ function Preview( { item, viewType } ) {
 	);
 }
 
+// This maps the template slug to the post types it should be available for.
+// https://developer.wordpress.org/themes/basics/template-hierarchy/#visual-overview
+// It only addresses primary and secondary templates, but not tertiary (aka variable) templates.
+const TEMPLATE_TO_POST_TYPE = {
+	// 1. Primary templates.
+	index: [ 'post', 'page' ],
+	singular: [ 'post', 'page' ],
+	single: [ 'post' ],
+	page: [ 'page' ],
+	// 2. Secondary templates.
+	'single-post': [ 'post' ],
+};
+
+const CUSTOM_TEMPLATE = __( 'Custom' );
+const NOT_CUSTOM_TEMPLATE = __( 'Not custom' );
+
 export default function PageTemplates() {
 	const { params } = useLocation();
 	const { activeView = 'all', layout } = params;
@@ -229,6 +246,23 @@ export default function PageTemplates() {
 			per_page: -1,
 		}
 	);
+	const { records: types } = useEntityRecords( 'root', 'postType', {
+		per_page: -1,
+		context: 'edit',
+	} );
+
+	const registeredPostTypes = useMemo( () => {
+		const result =
+			types
+				?.filter( ( type ) => type.viewable && type.supports.editor ) // supports.editor is a proxy for supporting templates.
+				.map( ( { name, slug } ) => ( { name, slug } ) )
+				.reduce( ( acc, current ) => {
+					acc[ current.slug ] = current.name;
+					return acc;
+				}, {} ) || {};
+		return result;
+	}, [ types ] );
+
 	const history = useHistory();
 	const onSelectionChange = useCallback(
 		( items ) => {
@@ -255,6 +289,27 @@ export default function PageTemplates() {
 			label: author,
 		} ) );
 	}, [ records ] );
+
+	const getPostTypesFromItem = ( item ) => {
+		// This logic replicates querying the REST templates endpoint with a post_type parameter.
+		// https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-includes/block-template-utils.php#L1077
+		//
+		// Additionaly, it also maps the the WordPress template hierarchy to known post types.
+		//
+		// This is how it works:
+		//
+		// 1. Return the list of post types defined by the item, if any.
+		// 2. If a template is custom, add it for any CPT.
+		// 3. Consider the template hierarchy and how it maps to post types. E.g.: single, page, etc.
+		// 4. If none of the above, default to no post types.
+
+		return (
+			item.post_types ||
+			( item.is_custom && Object.keys( registeredPostTypes ) ) ||
+			TEMPLATE_TO_POST_TYPE[ item.slug ] ||
+			[]
+		);
+	};
 
 	const fields = useMemo(
 		() => [
@@ -315,8 +370,51 @@ export default function PageTemplates() {
 				elements: authors,
 				width: '1%',
 			},
+			{
+				header: __( 'Post types' ),
+				id: 'postTypes',
+				getValue: ( { item } ) => getPostTypesFromItem( item ),
+				render: ( { item } ) => {
+					const postTypes = getPostTypesFromItem( item );
+					if ( ! postTypes || ! postTypes.length ) {
+						return __( 'n/a' );
+					}
+
+					if (
+						postTypes.length ===
+						Object.keys( registeredPostTypes ).length
+					) {
+						return __( 'Any' );
+					}
+
+					return postTypes
+						.map(
+							( postType ) =>
+								registeredPostTypes[ postType ] || postType
+						)
+						.join( ',' );
+				},
+				elements: Object.keys( registeredPostTypes ).map( ( key ) => ( {
+					value: key,
+					label: registeredPostTypes[ key ],
+				} ) ),
+			},
+			{
+				header: __( 'Type' ),
+				id: 'isCustom',
+				getValue: ( { item } ) => !! item.is_custom,
+				render: ( { item } ) =>
+					!! item.is_custom ? CUSTOM_TEMPLATE : NOT_CUSTOM_TEMPLATE,
+				elements: [
+					{ value: true, label: CUSTOM_TEMPLATE },
+					{ value: false, label: NOT_CUSTOM_TEMPLATE },
+				],
+				filterBy: {
+					operators: [ OPERATOR_IS ],
+				},
+			},
 		],
-		[ authors, view.type ]
+		[ authors, view.type, registeredPostTypes, getPostTypesFromItem ]
 	);
 
 	const { data, paginationInfo } = useMemo( () => {
