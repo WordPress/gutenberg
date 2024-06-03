@@ -2,7 +2,13 @@
 	position: relative;
 	height: 100%;
 	display: block;
-	background-color: $gray-300;
+
+	// Show a dark background in "frame" mode to avoid edge artifacts.
+	// Show a gray background in all other contexts, such as zoom.
+	background-color: $gray-900;
+	.is-full-canvas & {
+		background-color: $gray-300;
+	}
 
 	// Centralize the editor horizontally (flex-direction is column).
 	align-items: center;
