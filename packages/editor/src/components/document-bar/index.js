@@ -29,7 +29,6 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { TEMPLATE_POST_TYPES, GLOBAL_POST_TYPES } from '../../store/constants';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import PostTypeSupportCheck from '../post-type-support-check';
 
 const TYPE_LABELS = {
 	// translators: 1: Pattern title.
@@ -182,25 +181,20 @@ export default function DocumentBar() {
 						}
 					>
 						<BlockIcon icon={ templateIcon } />
-						<PostTypeSupportCheck supportKeys="title">
-							<Text
-								size="body"
-								as="h1"
-								aria-label={
-									TYPE_LABELS[ postType ]
-										? // eslint-disable-next-line @wordpress/valid-sprintf
-										  sprintf(
-												TYPE_LABELS[ postType ],
-												title
-										  )
-										: undefined
-								}
-							>
-								{ title
-									? decodeEntities( title )
-									: __( 'No Title' ) }
-							</Text>
-						</PostTypeSupportCheck>
+						<Text
+							size="body"
+							as="h1"
+							aria-label={
+								TYPE_LABELS[ postType ]
+									? // eslint-disable-next-line @wordpress/valid-sprintf
+									  sprintf( TYPE_LABELS[ postType ], title )
+									: undefined
+							}
+						>
+							{ title
+								? decodeEntities( title )
+								: __( 'No Title' ) }
+						</Text>
 					</motion.div>
 					<span className="editor-document-bar__shortcut">
 						{ displayShortcut.primary( 'k' ) }
