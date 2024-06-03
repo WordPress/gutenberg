@@ -53,6 +53,8 @@ function useTrackElementOffset(
 
 		function updateIndicator( element: HTMLElement ) {
 			setIndicatorPosition( {
+				// Workaround to prevent unwanted scrollbars, see:
+				// https://github.com/WordPress/gutenberg/pull/61979
 				left: Math.max( element.offsetLeft - 1, 0 ),
 				top: Math.max( element.offsetTop - 1, 0 ),
 				width: parseFloat( getComputedStyle( element ).width ),
