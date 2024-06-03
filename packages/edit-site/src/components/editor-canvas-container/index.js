@@ -4,7 +4,6 @@
 import { Children, cloneElement, useState } from '@wordpress/element';
 import {
 	Button,
-	privateApis as componentsPrivateApis,
 	__experimentalUseSlotFills as useSlotFills,
 } from '@wordpress/components';
 import { ESCAPE } from '@wordpress/keycodes';
@@ -24,7 +23,7 @@ import {
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 
-const { ResizableEditor } = unlock( editorPrivateApis );
+const { EditorContentSlotFill, ResizableEditor } = unlock( editorPrivateApis );
 
 /**
  * Returns a translated string for the title of the editor canvas container.
@@ -44,15 +43,6 @@ function getEditorCanvasContainerTitle( view ) {
 			return '';
 	}
 }
-
-// Creates a private slot fill.
-const { createPrivateSlotFill } = unlock( componentsPrivateApis );
-const SLOT_FILL_NAME = 'EditSiteEditorCanvasContainerSlot';
-const {
-	privateKey,
-	Slot: EditorCanvasContainerSlot,
-	Fill: EditorCanvasContainerFill,
-} = createPrivateSlotFill( SLOT_FILL_NAME );
 
 function EditorCanvasContainer( {
 	children,
@@ -123,7 +113,7 @@ function EditorCanvasContainer( {
 	const shouldShowCloseButton = onClose || closeButtonLabel;
 
 	return (
-		<EditorCanvasContainerFill>
+		<EditorContentSlotFill.Fill>
 			<div className="edit-site-editor-canvas-container">
 				<ResizableEditor enableResizing={ enableResizing }>
 					{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
@@ -145,14 +135,13 @@ function EditorCanvasContainer( {
 					</section>
 				</ResizableEditor>
 			</div>
-		</EditorCanvasContainerFill>
+		</EditorContentSlotFill.Fill>
 	);
 }
 function useHasEditorCanvasContainer() {
-	const fills = useSlotFills( privateKey );
+	const fills = useSlotFills( EditorContentSlotFill.privateKey );
 	return !! fills?.length;
 }
 
-EditorCanvasContainer.Slot = EditorCanvasContainerSlot;
 export default EditorCanvasContainer;
 export { useHasEditorCanvasContainer, getEditorCanvasContainerTitle };

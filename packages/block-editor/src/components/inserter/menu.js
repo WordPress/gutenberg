@@ -45,7 +45,7 @@ function InserterMenu(
 		showMostUsedBlocks,
 		__experimentalFilterValue = '',
 		shouldFocusBlock = true,
-		__experimentalOnPatternCategorySelection = NOOP,
+		onPatternCategorySelection,
 		onClose,
 		__experimentalInitialTab,
 		__experimentalInitialCategory,
@@ -81,8 +81,13 @@ function InserterMenu(
 	const blockTypesTabRef = useRef();
 
 	const onInsert = useCallback(
-		( blocks, meta, shouldForceFocusBlock ) => {
-			onInsertBlocks( blocks, meta, shouldForceFocusBlock );
+		( blocks, meta, shouldForceFocusBlock, _rootClientId ) => {
+			onInsertBlocks(
+				blocks,
+				meta,
+				shouldForceFocusBlock,
+				_rootClientId
+			);
 			onSelect();
 
 			// Check for focus loss due to filtering blocks by selected block type
@@ -111,7 +116,7 @@ function InserterMenu(
 
 	const onHover = useCallback(
 		( item ) => {
-			onToggleInsertionPoint( !! item );
+			onToggleInsertionPoint( item );
 			setHoveredItem( item );
 		},
 		[ onToggleInsertionPoint, setHoveredItem ]
@@ -128,9 +133,9 @@ function InserterMenu(
 		( patternCategory, filter ) => {
 			setSelectedPatternCategory( patternCategory );
 			setPatternFilter( filter );
-			__experimentalOnPatternCategorySelection();
+			onPatternCategorySelection?.();
 		},
-		[ setSelectedPatternCategory, __experimentalOnPatternCategorySelection ]
+		[ setSelectedPatternCategory, onPatternCategorySelection ]
 	);
 
 	const showPatternPanel =
@@ -341,4 +346,16 @@ function InserterMenu(
 	);
 }
 
-export default forwardRef( InserterMenu );
+export const PrivateInserterMenu = forwardRef( InserterMenu );
+
+function PublicInserterMenu( props, ref ) {
+	return (
+		<PrivateInserterMenu
+			{ ...props }
+			onPatternCategorySelection={ NOOP }
+			ref={ ref }
+		/>
+	);
+}
+
+export default forwardRef( PublicInserterMenu );

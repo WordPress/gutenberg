@@ -86,7 +86,7 @@ export default function ColorPalettePanel( { name } ) {
 				slugPrefix="custom-"
 				popoverProps={ popoverProps }
 			/>
-			<ColorVariations title={ __( 'Presets' ) } />
+			<ColorVariations title={ __( 'Palettes' ) } />
 		</VStack>
 	);
 }

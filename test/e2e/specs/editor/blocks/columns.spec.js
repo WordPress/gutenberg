@@ -40,7 +40,7 @@ test.describe( 'Columns', () => {
 
 		// Verify Column
 		const inserterOptions = page.locator(
-			'role=region[name="Block Library"i] >> role=option'
+			'role=region[name="Block Library"i] >> .block-editor-inserter__insertable-blocks-at-selection >> role=option'
 		);
 		await expect( inserterOptions ).toHaveCount( 1 );
 		await expect( inserterOptions ).toHaveText( 'Column' );

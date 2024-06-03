@@ -329,18 +329,20 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__category-panel {
 	background: $gray-100;
-	border-left: $border-width solid $gray-200;
-	border-right: $border-width solid $gray-200;
+	border-top: $border-width solid $gray-200;
+	box-shadow: $border-width $border-width 0 0 rgba($color: #000, $alpha: 0.133); // 0.133 = $gray-200 but with alpha.
+	outline: 1px solid transparent; // Shown for Windows 10 High Contrast mode.
 	position: absolute;
-	top: 0;
+	top: -$border-width;
 	left: 0;
-	height: 100%;
+	height: calc(100% + #{$border-width});
 	width: 100%;
 	padding: 0 $grid-unit-20;
 	display: flex;
 	flex-direction: column;
 
 	@include break-medium {
+		border-left: $border-width solid $gray-200;
 		padding: 0;
 		left: 100%;
 		width: 300px;
@@ -525,8 +527,8 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
-.block-editor-inserter__patterns-category-panel-title {
-	font-size: calc(1.25 * 13px);
+.components-heading.block-editor-inserter__patterns-category-panel-title {
+	font-weight: 500;
 }
 
 .block-editor-inserter__patterns-explore-button,

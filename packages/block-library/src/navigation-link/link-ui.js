@@ -20,6 +20,7 @@ import {
 	useState,
 	useRef,
 	useEffect,
+	forwardRef,
 } from '@wordpress/element';
 import {
 	store as coreStore,
@@ -145,7 +146,7 @@ function LinkUIBlockInserter( { clientId, onBack, onSelectBlock } ) {
 	);
 }
 
-export function LinkUI( props ) {
+function UnforwardedLinkUI( props, ref ) {
 	const [ addingBlock, setAddingBlock ] = useState( false );
 	const [ focusAddBlockButton, setFocusAddBlockButton ] = useState( false );
 	const { saveEntityRecord } = useDispatch( coreStore );
@@ -214,6 +215,7 @@ export function LinkUI( props ) {
 
 	return (
 		<Popover
+			ref={ ref }
 			placement="bottom"
 			onClose={ props.onClose }
 			anchor={ props.anchor }
@@ -297,6 +299,8 @@ export function LinkUI( props ) {
 		</Popover>
 	);
 }
+
+export const LinkUI = forwardRef( UnforwardedLinkUI );
 
 const LinkUITools = ( { setAddingBlock, focusAddBlockButton } ) => {
 	const blockInserterAriaRole = 'listbox';
