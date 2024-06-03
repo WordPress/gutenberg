@@ -30,12 +30,6 @@ test.describe( 'Block bindings', () => {
 		await requestUtils.deactivatePlugin( 'gutenberg-test-block-bindings' );
 	} );
 
-	test.use( {
-		BlockBindingsUtils: async ( { editor, page, pageUtils }, use ) => {
-			await use( new BlockBindingsUtils( { editor, page, pageUtils } ) );
-		},
-	} );
-
 	test.describe( 'Template context', () => {
 		test.beforeEach( async ( { admin, editor } ) => {
 			await admin.visitSiteEditor( {
@@ -2144,24 +2138,3 @@ test.describe( 'Block bindings', () => {
 		} );
 	} );
 } );
-
-class BlockBindingsUtils {
-	constructor( { page } ) {
-		this.page = page;
-	}
-
-	// Helper to update the post.
-	async updatePost() {
-		await this.page
-			.getByRole( 'region', { name: 'Editor top bar' } )
-			.getByRole( 'button', { name: 'Save' } )
-			.click();
-		await this.page
-			.getByRole( 'button', { name: 'Dismiss this notice' } )
-			.filter( { hasText: 'updated' } )
-			.waitFor();
-		const postId = new URL( this.page.url() ).searchParams.get( 'post' );
-
-		return typeof postId === 'string' ? parseInt( postId, 10 ) : null;
-	}
-}
