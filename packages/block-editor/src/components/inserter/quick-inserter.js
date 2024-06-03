@@ -44,7 +44,8 @@ export default function QuickInserter( {
 	} );
 	const [ blockTypes ] = useBlockTypesState(
 		destinationRootClientId,
-		onInsertBlocks
+		onInsertBlocks,
+		true
 	);
 
 	const [ patterns ] = usePatternsState(
@@ -126,6 +127,7 @@ export default function QuickInserter( {
 					isDraggable={ false }
 					prioritizePatterns={ prioritizePatterns }
 					selectBlockOnInsert={ selectBlockOnInsert }
+					isQuick
 				/>
 			</div>
 
