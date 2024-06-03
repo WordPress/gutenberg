@@ -29,3 +29,23 @@ function gutenberg_block_editor_preload_paths_6_7( $paths, $context ) {
 	return $paths;
 }
 add_filter( 'block_editor_rest_api_preload_paths', 'gutenberg_block_editor_preload_paths_6_7', 10, 2 );
+
+if ( ! function_exists( 'wp_api_template_registry' ) ) {
+	/**
+	 * Hook in to the template and template part post types and modify the
+	 * the rest endpoint to include modifications to read templates from the
+	 * BlockTemplatesRegistry.
+	 *
+	 * @param array  $args Current registered post type args.
+	 * @param string $post_type Name of post type.
+	 *
+	 * @return array
+	 */
+	function wp_api_template_registry( $args, $post_type ) {
+		if ( 'wp_template' === $post_type || 'wp_template_part' === $post_type ) {
+			$args['rest_controller_class'] = 'Gutenberg_REST_Templates_Controller_6_7';
+		}
+		return $args;
+	}
+}
+add_filter( 'register_post_type_args', 'wp_api_template_registry', 10, 2 );
