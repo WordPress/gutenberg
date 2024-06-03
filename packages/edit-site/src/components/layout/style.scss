@@ -138,12 +138,6 @@ html:active-view-transition-type(canvas-mode-edit) {
 		animation-delay: 255ms;
 	}
 }
-.edit-site-layout:not(.is-full-canvas) .edit-site-layout__sidebar-region .edit-site-layout__view-mode-toggle {
-	view-transition-name: toggle;
-}
-.edit-site-layout.is-full-canvas .edit-site-layout__canvas .edit-site-layout__view-mode-toggle {
-	view-transition-name: toggle;
-}
 /* stylelint-enable  */
 
 .edit-site-layout.is-full-canvas .edit-site-layout__sidebar-region .edit-site-layout__view-mode-toggle {
@@ -151,6 +145,9 @@ html:active-view-transition-type(canvas-mode-edit) {
 }
 
 .edit-site-layout__view-mode-toggle.components-button {
+	/* stylelint-disable -- Disable reason: View Transitions not supported properly by stylelint. */
+	view-transition-name: toggle;
+	/* stylelint-enable  */
 	position: relative;
 	color: $white;
 	height: $header-height;
