@@ -180,7 +180,8 @@
 		margin-bottom: $grid-unit-05;
 		line-height: 1.2;
 	}
-	.components-button.is-tertiary:disabled {
+	.components-button.is-tertiary:disabled,
+	.components-button.is-tertiary[aria-disabled="true"] {
 		color: $gray-600;
 	}
 	.components-button.is-tertiary:hover {
