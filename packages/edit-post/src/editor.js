@@ -31,6 +31,20 @@ function Editor( {
 	initialEdits,
 	...props
 } ) {
+	// Get the rendering mode for the post type.
+	const postTypeRenderingMode = useSelect(
+		( select ) => {
+			const postTypeObject =
+				select( coreStore ).getPostType( initialPostType );
+			if ( postTypeObject && postTypeObject?.rendering_mode ) {
+				return postTypeObject?.rendering_mode;
+			}
+
+			return 'post-only';
+		},
+		[ initialPostType ]
+	);
+
 	const {
 		currentPost,
 		onNavigateToEntityRecord,
@@ -38,7 +52,7 @@ function Editor( {
 	} = useNavigateToEntityRecord(
 		initialPostId,
 		initialPostType,
-		'post-only'
+		postTypeRenderingMode
 	);
 
 	const { post, template } = useSelect(
@@ -78,7 +92,7 @@ function Editor( {
 			...settings,
 			onNavigateToEntityRecord,
 			onNavigateToPreviousEntityRecord,
-			defaultRenderingMode: 'post-only',
+			defaultRenderingMode: postTypeRenderingMode,
 		} ),
 		[ settings, onNavigateToEntityRecord, onNavigateToPreviousEntityRecord ]
 	);
