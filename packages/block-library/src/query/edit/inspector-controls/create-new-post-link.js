@@ -6,12 +6,7 @@ import { addQueryArgs } from '@wordpress/url';
 import { store as coreStore } from '@wordpress/core-data';
 import { select } from '@wordpress/data';
 
-const CreateNewPostLink = ( {
-	attributes: { query: { postType } = {} } = {},
-} ) => {
-	if ( ! postType ) {
-		return null;
-	}
+const CreateNewPostLink = ( postType ) => {
 	const newPostUrl = addQueryArgs( 'post-new.php', {
 		post_type: postType,
 	} );
