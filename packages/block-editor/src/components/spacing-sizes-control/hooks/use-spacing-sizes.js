@@ -65,8 +65,6 @@ export default function useSpacingSizes() {
 					},
 					...sizes,
 			  ]
-			: // See https://github.com/WordPress/gutenberg/pull/44247 for reasoning
-			  // to use the index as the name in the range control.
-			  sizes.map( ( { slug, size }, i ) => ( { name: i, slug, size } ) );
+			: sizes;
 	}, [ customSizes, themeSizes, defaultSizes ] );
 }
