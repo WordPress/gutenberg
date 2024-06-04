@@ -49,12 +49,14 @@ export default function EditorWithUndoRedo() {
 					<Button
 						onClick={ undo }
 						disabled={ ! hasUndo }
+						__experimentalIsFocusable
 						icon={ undoIcon }
 						label="Undo"
 					/>
 					<Button
 						onClick={ redo }
 						disabled={ ! hasRedo }
+						__experimentalIsFocusable
 						icon={ redoIcon }
 						label="Redo"
 					/>
