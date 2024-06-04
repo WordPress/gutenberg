@@ -499,22 +499,40 @@ describe( 'selectors', () => {
 					{
 						name: 'variation-1',
 						attributes: {
-							testAttribute: {
+							firstTestAttribute: {
 								nestedProperty: 1,
 								secondNestedProperty: 10,
 							},
+							secondTestAttribute: {
+								nestedProperty: {
+									firstDeeplyNestedProperty: 'a1',
+									secondDeeplyNestedProperty: 'a2',
+								},
+							},
 						},
-						isActive: [ 'testAttribute' ],
+						isActive: [
+							'firstTestAttribute',
+							'secondTestAttribute.nestedProperty',
+						],
 					},
 					{
 						name: 'variation-2',
 						attributes: {
-							testAttribute: {
+							firstTestAttribute: {
 								nestedProperty: 2,
 								secondNestedProperty: 20,
 							},
+							secondTestAttribute: {
+								nestedProperty: {
+									firstDeeplyNestedProperty: 'b1',
+									secondDeeplyNestedProperty: 'b2',
+								},
+							},
 						},
-						isActive: [ 'testAttribute' ],
+						isActive: [
+							'firstTestAttribute',
+							'secondTestAttribute.nestedProperty',
+						],
 					},
 				];
 				const state =
@@ -522,19 +540,33 @@ describe( 'selectors', () => {
 
 				expect(
 					getActiveBlockVariation( state, blockName, {
-						testAttribute: {
+						firstTestAttribute: {
 							nestedProperty: 1,
 							secondNestedProperty: 10,
 							otherNestedProperty: 5555,
+						},
+						secondTestAttribute: {
+							nestedProperty: {
+								firstDeeplyNestedProperty: 'a1',
+								secondDeeplyNestedProperty: 'a2',
+								otherDeeplyNestedProperty: 'ffff',
+							},
 						},
 					} )
 				).toEqual( variations[ 0 ] );
 				expect(
 					getActiveBlockVariation( state, blockName, {
-						testAttribute: {
+						firstTestAttribute: {
 							nestedProperty: 2,
 							secondNestedProperty: 20,
 							otherNestedProperty: 5555,
+						},
+						secondTestAttribute: {
+							nestedProperty: {
+								firstDeeplyNestedProperty: 'b1',
+								secondDeeplyNestedProperty: 'b2',
+								otherDeeplyNestedProperty: 'ffff',
+							},
 						},
 					} )
 				).toEqual( variations[ 1 ] );
