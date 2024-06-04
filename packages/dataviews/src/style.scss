@@ -370,8 +370,7 @@
 		line-height: 16px;
 
 		&:not(:empty) {
-			padding: $grid-unit-15 0;
-			padding-top: 0;
+			padding: 0 0 $grid-unit-15;
 		}
 
 		.dataviews-view-grid__field {
