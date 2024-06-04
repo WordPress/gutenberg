@@ -68,6 +68,7 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
   color: #1e1e1e;
   line-height: 1.4;
   margin: 0;
+  text-wrap: balance;
   text-wrap: pretty;
   font-size: calc((13 / 13) * 13px);
   font-weight: normal;
@@ -347,6 +348,7 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
   color: #1e1e1e;
   line-height: 1.4;
   margin: 0;
+  text-wrap: balance;
   text-wrap: pretty;
   font-size: calc((13 / 13) * 13px);
   font-weight: normal;
@@ -636,6 +638,7 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
   color: #1e1e1e;
   line-height: 1.4;
   margin: 0;
+  text-wrap: balance;
   text-wrap: pretty;
   font-size: calc((13 / 13) * 13px);
   font-weight: normal;
@@ -937,6 +940,7 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
   color: #1e1e1e;
   line-height: 1.4;
   margin: 0;
+  text-wrap: balance;
   text-wrap: pretty;
   font-size: calc((13 / 13) * 13px);
   font-weight: normal;
