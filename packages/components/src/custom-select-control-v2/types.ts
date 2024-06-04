@@ -79,6 +79,7 @@ type LegacyOption = {
 	style?: React.CSSProperties;
 	className?: string;
 	__experimentalHint?: string;
+	[ key: string ]: any;
 };
 
 /**
