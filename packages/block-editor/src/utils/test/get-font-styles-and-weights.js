@@ -411,27 +411,39 @@ describe( 'getFontStylesAndWeights', () => {
 		} );
 	} );
 
-	it( 'should return correct font styles and weights based on available options', () => {
+	it( 'should return only provided font styles and weights', () => {
 		const fontFamilyFaces = [
 			{
-				fontFamily: 'ABeeZee',
-				fontStyle: 'italic',
+				fontFamily: 'Piazzolla',
+				fontStyle: 'normal',
 				fontWeight: '400',
-				src: 'http://www.wordpress.org/wp-content/uploads/fonts/esDT31xSG-6AGleN2tCkkJUCGpG-GQ.woff2',
+				src: 'http://www.wordpress.org/wp-content/uploads/fonts/N0b52SlTPu5rIkWIZjVKKtYtfxYqZ4RJBFzFfYUjkSDdlqZgy7LYxnL31AHfAAy5.woff2',
+			},
+			{
+				fontFamily: 'Piazzolla',
+				fontStyle: 'normal',
+				fontWeight: '900',
+				src: 'http://www.wordpress.org/wp-content/uploads/fonts/N0b52SlTPu5rIkWIZjVKKtYtfxYqZ4RJBFzFfYUjkSDdlqZgy7JxwXL31AHfAAy5.woff2',
+			},
+			{
+				fontFamily: 'Piazzolla',
+				fontStyle: 'italic',
+				fontWeight: '300',
+				src: 'http://www.wordpress.org/wp-content/uploads/fonts/N0b72SlTPu5rIkWIZjVgI-TckS03oGpPETyEJ88Rbvi0_TzOzKcQhcSx3gD9BRy5m5M.woff2',
+			},
+			{
+				fontFamily: 'Piazzolla',
+				fontStyle: 'italic',
+				fontWeight: '900',
+				src: 'http://www.wordpress.org/wp-content/uploads/fonts/N0b72SlTPu5rIkWIZjVgI-TckS03oGpPETyEJ88Rbvi0_TzOzKcQhTO23gD9BRy5m5M.woff2',
 			},
 		];
 		expect( getFontStylesAndWeights( fontFamilyFaces ) ).toEqual( {
-			combinedStyleAndWeightOptions: [
-				{
-					key: 'italic-400',
-					name: 'Regular Italic',
-					style: {
-						fontStyle: 'italic',
-						fontWeight: '400',
-					},
-				},
-			],
 			fontStyles: [
+				{
+					name: 'Regular',
+					value: 'normal',
+				},
 				{
 					name: 'Italic',
 					value: 'italic',
@@ -441,6 +453,48 @@ describe( 'getFontStylesAndWeights', () => {
 				{
 					name: 'Regular',
 					value: '400',
+				},
+				{
+					name: 'Black',
+					value: '900',
+				},
+				{
+					name: 'Light',
+					value: '300',
+				},
+			],
+			combinedStyleAndWeightOptions: [
+				{
+					key: 'normal-400',
+					name: 'Regular',
+					style: {
+						fontStyle: 'normal',
+						fontWeight: '400',
+					},
+				},
+				{
+					key: 'normal-900',
+					name: 'Black',
+					style: {
+						fontStyle: 'normal',
+						fontWeight: '900',
+					},
+				},
+				{
+					key: 'italic-300',
+					name: 'Light Italic',
+					style: {
+						fontStyle: 'italic',
+						fontWeight: '300',
+					},
+				},
+				{
+					key: 'italic-900',
+					name: 'Black Italic',
+					style: {
+						fontStyle: 'italic',
+						fontWeight: '900',
+					},
 				},
 			],
 		} );
