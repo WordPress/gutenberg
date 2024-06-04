@@ -22,7 +22,6 @@ function render_block_core_button( $attributes, $content ) {
 	/*
 	 * The button block can render an `<a>` or `<button>` and also has a
 	 * `<div>` wrapper. Find the a or button tag.
-	 *
 	 */
 	$tag = null;
 	while ( $p->next_tag() ) {
@@ -32,29 +31,32 @@ function render_block_core_button( $attributes, $content ) {
 		}
 	}
 
-	// If this happens, the likelihood is there's no block content.
+	/*
+	 * If this happens, the likelihood is there's no block content,
+	 * or the block has been modified by a plugin.
+	 */
 	if ( null === $tag ) {
-		return '';
+		return $content;
 	}
 
 	// Build a string of the inner text.
 	$text = '';
 	while ( $p->next_token() ) {
-		switch ( $p->get_token_name() ) {
-			case '#text':
-				$text .= $p->get_modifiable_text();
-				break;
+		$token_name = $p->get_token_name();
+		// Stop when encountering the closing tag.
+		if ( $tag === $token_name ) {
+			break;
+		}
 
-			case 'BR':
-				$text .= '';
-				break;
+		if ( '#text' === $token_name ) {
+			$text .= $p->get_modifiable_text();
+			continue;
 		}
 	}
 
 	/*
 	 * When there's no text, render nothing for the block.
-	 * It's this way because an anchor or button element without text results
-	 * in poor accessibility.
+	 * See https://github.com/WordPress/gutenberg/issues/17221.
 	 */
 	if ( '' === trim( $text ) ) {
 		return '';
