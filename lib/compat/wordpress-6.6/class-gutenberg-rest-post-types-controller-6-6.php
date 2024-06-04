@@ -23,7 +23,8 @@ class Gutenberg_REST_Post_Types_Controller_6_6 extends WP_REST_Post_Types_Contro
 		$response = parent::prepare_item_for_response( $item, $request );
 		$context  = ! empty( $request['context'] ) ? $request['context'] : 'view';
 
-		if ( 'edit' === $context && post_type_supports( $item->name, 'editor' ) ) {
+		// Property will only exist if the post type supports the block editor.
+		if ( 'edit' === $context && property_exists( $item, 'rendering_mode' ) ) {
 			/**
 			 * Filters the block editor rendering mode for a specific post type.
 			 *
