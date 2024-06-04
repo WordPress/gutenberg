@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { _x } from '@wordpress/i18n';
+import { _x, __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -64,22 +64,18 @@ const FONT_WEIGHTS = [
  * Defaults to the standard font styles and weights if no font family faces are provided.
  *
  * @param {Array} fontFamilyFaces font family faces array
- * @return {Object} new object with font style, weight, and variable font properties
+ * @return {Object} new object with combined and separated font style and weight properties
  */
 export function getFontStylesAndWeights( fontFamilyFaces ) {
-	const allStylesAndWeights = [];
 	let fontStyles = [];
 	let fontWeights = [];
+	const combinedStyleAndWeightOptions = [];
+	const isSystemFont = ! fontFamilyFaces;
 	let isVariableFont = false;
 
-	if ( ! fontFamilyFaces ) {
-		// Return default font styles and weights if no font family faces are provided.
-		return { fontStyles: FONT_STYLES, fontWeights: FONT_WEIGHTS };
-	}
-
-	fontFamilyFaces.forEach( ( face ) => {
-		const fontStyle = formatFontStyle( face.fontStyle );
+	fontFamilyFaces?.forEach( ( face ) => {
 		const fontWeight = formatFontWeight( face.fontWeight );
+		const fontStyle = formatFontStyle( face.fontStyle );
 
 		// Check if font weight includes a space that is not at the start or end of the string. If so, it must be a variable font. e.g. "100 900"
 		if ( /\s/.test( fontWeight.value.trim() ) ) {
@@ -87,20 +83,7 @@ export function getFontStylesAndWeights( fontFamilyFaces ) {
 			fontWeight.value = fontWeight.value.replace( /\s+/g, '-' );
 		}
 
-		const optionName =
-			fontStyle.value === 'normal'
-				? fontWeight.name
-				: `${ fontWeight.name } ${ fontStyle.name }`;
-
-		allStylesAndWeights.push( {
-			key: `${ fontStyle.value }-${ fontWeight.value }`,
-			name: optionName,
-			style: {
-				fontStyle: fontStyle.value,
-				fontWeight: fontWeight.value,
-			},
-		} );
-
+		// Create font style and font weight lists without duplicates.
 		if ( fontStyle ) {
 			if (
 				! fontStyles.some(
@@ -119,12 +102,67 @@ export function getFontStylesAndWeights( fontFamilyFaces ) {
 				fontWeights.push( fontWeight );
 			}
 		}
+
+		if ( isVariableFont ) {
+			// If the font is a variable font, we don't need to generate the list of font styles and weights.
+			return;
+		}
+
+		// Generate combined font style and weight options for available fonts.
+		const optionName =
+			fontStyle.value === 'normal'
+				? fontWeight.name
+				: `${ fontWeight.name } ${ fontStyle.name }`;
+
+		combinedStyleAndWeightOptions.push( {
+			key: `${ fontStyle.value }-${ fontWeight.value }`,
+			name: optionName,
+			style: {
+				fontStyle: fontStyle.value,
+				fontWeight: fontWeight.value,
+			},
+		} );
 	} );
 
-	fontStyles =
-		fontStyles.length === 0 || isVariableFont ? FONT_STYLES : fontStyles;
-	fontWeights =
-		fontWeights.length === 0 || isVariableFont ? FONT_WEIGHTS : fontWeights;
+	// Generate combined default options for system fonts and variable fonts.
+	if ( isSystemFont || isVariableFont ) {
+		FONT_STYLES.forEach( ( { name: styleName, value: styleValue } ) => {
+			FONT_WEIGHTS.forEach(
+				( { name: weightName, value: weightValue } ) => {
+					const optionName =
+						styleValue === 'normal'
+							? weightName
+							: sprintf(
+									/* translators: 1: Font weight name. 2: Font style name. */
+									__( '%1$s %2$s' ),
+									weightName,
+									styleName
+							  );
 
-	return { allStylesAndWeights, fontStyles, fontWeights, isVariableFont };
+					combinedStyleAndWeightOptions.push( {
+						key: `${ styleValue }-${ weightValue }`,
+						name: optionName,
+						style: {
+							fontStyle: styleValue,
+							fontWeight: weightValue,
+						},
+					} );
+				}
+			);
+		} );
+
+		// Use default font styles and weights for system and variable fonts.
+		fontStyles = FONT_STYLES;
+		fontWeights = FONT_WEIGHTS;
+	}
+
+	// Use default font styles and weights if no font family faces are provided.
+	fontStyles = fontStyles.length === 0 ? FONT_STYLES : fontStyles;
+	fontWeights = fontWeights.length === 0 ? FONT_WEIGHTS : fontWeights;
+
+	return {
+		fontStyles,
+		fontWeights,
+		combinedStyleAndWeightOptions,
+	};
 }

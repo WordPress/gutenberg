@@ -53,48 +53,16 @@ export default function FontAppearanceControl( props ) {
 		name: __( 'Default' ),
 		style: { fontStyle: undefined, fontWeight: undefined },
 	};
-	const isSystemFont = ! fontFamilyFaces;
-	const { allStylesAndWeights, fontStyles, fontWeights, isVariableFont } =
+	const { fontStyles, fontWeights, combinedStyleAndWeightOptions } =
 		getFontStylesAndWeights( fontFamilyFaces );
 
-	// Combines both font style and weight options into a single dropdown.
+	// Generates select options for combined font styles and weights.
 	const combineOptions = () => {
 		const combinedOptions = [ defaultOption ];
-
-		fontStyles.forEach( ( { name: styleName, value: styleValue } ) => {
-			fontWeights.forEach(
-				( { name: weightName, value: weightValue } ) => {
-					const optionName =
-						styleValue === 'normal'
-							? weightName
-							: sprintf(
-									/* translators: 1: Font weight name. 2: Font style name. */
-									__( '%1$s %2$s' ),
-									weightName,
-									styleName
-							  );
-
-					combinedOptions.push( {
-						key: `${ styleValue }-${ weightValue }`,
-						name: optionName,
-						style: {
-							fontStyle: styleValue,
-							fontWeight: weightValue,
-						},
-					} );
-				}
-			);
-		} );
-
-		return combinedOptions;
-	};
-
-	const allOptions = () => {
-		const allFontOptions = [ defaultOption ];
-		if ( allStylesAndWeights ) {
-			allFontOptions.push( ...allStylesAndWeights );
+		if ( combinedStyleAndWeightOptions ) {
+			combinedOptions.push( ...combinedStyleAndWeightOptions );
 		}
-		return allFontOptions;
+		return combinedOptions;
 	};
 
 	// Generates select options for font styles only.
@@ -125,15 +93,9 @@ export default function FontAppearanceControl( props ) {
 
 	// Map font styles and weights to select options.
 	const selectOptions = useMemo( () => {
-		// Display combined font style and weight options if font family
-		// is a system font or a variable font.
-		if ( isSystemFont || isVariableFont ) {
-			return combineOptions();
-		}
-
-		// Display all available font style and weight options.
+		// Display combined available font style and weight options.
 		if ( hasFontStyles && hasFontWeights ) {
-			return allOptions();
+			return combineOptions();
 		}
 
 		// Display only font style options or font weight options.
@@ -142,8 +104,7 @@ export default function FontAppearanceControl( props ) {
 		props.options,
 		fontStyles,
 		fontWeights,
-		isSystemFont,
-		isVariableFont,
+		combinedStyleAndWeightOptions,
 	] );
 
 	// Find current selection by comparing font style & weight against options,

@@ -54,20 +54,103 @@ describe( 'getFontStylesAndWeights', () => {
 					value: '900',
 				},
 			],
-		} );
-	} );
-
-	it( 'should return correct font styles and weights based on available options', () => {
-		const fontFamilyFaces = [
-			{
-				fontFamily: 'ABeeZee',
-				fontStyle: 'italic',
-				fontWeight: '400',
-				src: 'http://www.wordpress.org/wp-content/uploads/fonts/esDT31xSG-6AGleN2tCkkJUCGpG-GQ.woff2',
-			},
-		];
-		expect( getFontStylesAndWeights( fontFamilyFaces ) ).toEqual( {
-			allStylesAndWeights: [
+			combinedStyleAndWeightOptions: [
+				{
+					key: 'normal-100',
+					name: 'Thin',
+					style: {
+						fontStyle: 'normal',
+						fontWeight: '100',
+					},
+				},
+				{
+					key: 'normal-200',
+					name: 'Extra Light',
+					style: {
+						fontStyle: 'normal',
+						fontWeight: '200',
+					},
+				},
+				{
+					key: 'normal-300',
+					name: 'Light',
+					style: {
+						fontStyle: 'normal',
+						fontWeight: '300',
+					},
+				},
+				{
+					key: 'normal-400',
+					name: 'Regular',
+					style: {
+						fontStyle: 'normal',
+						fontWeight: '400',
+					},
+				},
+				{
+					key: 'normal-500',
+					name: 'Medium',
+					style: {
+						fontStyle: 'normal',
+						fontWeight: '500',
+					},
+				},
+				{
+					key: 'normal-600',
+					name: 'Semi Bold',
+					style: {
+						fontStyle: 'normal',
+						fontWeight: '600',
+					},
+				},
+				{
+					key: 'normal-700',
+					name: 'Bold',
+					style: {
+						fontStyle: 'normal',
+						fontWeight: '700',
+					},
+				},
+				{
+					key: 'normal-800',
+					name: 'Extra Bold',
+					style: {
+						fontStyle: 'normal',
+						fontWeight: '800',
+					},
+				},
+				{
+					key: 'normal-900',
+					name: 'Black',
+					style: {
+						fontStyle: 'normal',
+						fontWeight: '900',
+					},
+				},
+				{
+					key: 'italic-100',
+					name: 'Thin Italic',
+					style: {
+						fontStyle: 'italic',
+						fontWeight: '100',
+					},
+				},
+				{
+					key: 'italic-200',
+					name: 'Extra Light Italic',
+					style: {
+						fontStyle: 'italic',
+						fontWeight: '200',
+					},
+				},
+				{
+					key: 'italic-300',
+					name: 'Light Italic',
+					style: {
+						fontStyle: 'italic',
+						fontWeight: '300',
+					},
+				},
 				{
 					key: 'italic-400',
 					name: 'Regular Italic',
@@ -76,24 +159,51 @@ describe( 'getFontStylesAndWeights', () => {
 						fontWeight: '400',
 					},
 				},
-			],
-			fontStyles: [
 				{
-					name: 'Italic',
-					value: 'italic',
+					key: 'italic-500',
+					name: 'Medium Italic',
+					style: {
+						fontStyle: 'italic',
+						fontWeight: '500',
+					},
+				},
+				{
+					key: 'italic-600',
+					name: 'Semi Bold Italic',
+					style: {
+						fontStyle: 'italic',
+						fontWeight: '600',
+					},
+				},
+				{
+					key: 'italic-700',
+					name: 'Bold Italic',
+					style: {
+						fontStyle: 'italic',
+						fontWeight: '700',
+					},
+				},
+				{
+					key: 'italic-800',
+					name: 'Extra Bold Italic',
+					style: {
+						fontStyle: 'italic',
+						fontWeight: '800',
+					},
+				},
+				{
+					key: 'italic-900',
+					name: 'Black Italic',
+					style: {
+						fontStyle: 'italic',
+						fontWeight: '900',
+					},
 				},
 			],
-			fontWeights: [
-				{
-					name: 'Regular',
-					value: '400',
-				},
-			],
-			isVariableFont: false,
 		} );
 	} );
 
-	it( 'should return all available style and weight options if `fontWeight` includes a space', () => {
+	it( 'should return default styles and weights if fontWeight includes a space', () => {
 		const fontFamilyFaces = [
 			{
 				fontFamily: 'Inter',
@@ -104,16 +214,6 @@ describe( 'getFontStylesAndWeights', () => {
 		];
 
 		expect( getFontStylesAndWeights( fontFamilyFaces ) ).toEqual( {
-			allStylesAndWeights: [
-				{
-					key: 'normal-100-900',
-					name: '100 900',
-					style: {
-						fontStyle: 'normal',
-						fontWeight: '100-900',
-					},
-				},
-			],
 			fontStyles: [
 				{
 					name: 'Regular',
@@ -162,7 +262,187 @@ describe( 'getFontStylesAndWeights', () => {
 					value: '900',
 				},
 			],
-			isVariableFont: true,
+			combinedStyleAndWeightOptions: [
+				{
+					key: 'normal-100',
+					name: 'Thin',
+					style: {
+						fontStyle: 'normal',
+						fontWeight: '100',
+					},
+				},
+				{
+					key: 'normal-200',
+					name: 'Extra Light',
+					style: {
+						fontStyle: 'normal',
+						fontWeight: '200',
+					},
+				},
+				{
+					key: 'normal-300',
+					name: 'Light',
+					style: {
+						fontStyle: 'normal',
+						fontWeight: '300',
+					},
+				},
+				{
+					key: 'normal-400',
+					name: 'Regular',
+					style: {
+						fontStyle: 'normal',
+						fontWeight: '400',
+					},
+				},
+				{
+					key: 'normal-500',
+					name: 'Medium',
+					style: {
+						fontStyle: 'normal',
+						fontWeight: '500',
+					},
+				},
+				{
+					key: 'normal-600',
+					name: 'Semi Bold',
+					style: {
+						fontStyle: 'normal',
+						fontWeight: '600',
+					},
+				},
+				{
+					key: 'normal-700',
+					name: 'Bold',
+					style: {
+						fontStyle: 'normal',
+						fontWeight: '700',
+					},
+				},
+				{
+					key: 'normal-800',
+					name: 'Extra Bold',
+					style: {
+						fontStyle: 'normal',
+						fontWeight: '800',
+					},
+				},
+				{
+					key: 'normal-900',
+					name: 'Black',
+					style: {
+						fontStyle: 'normal',
+						fontWeight: '900',
+					},
+				},
+				{
+					key: 'italic-100',
+					name: 'Thin Italic',
+					style: {
+						fontStyle: 'italic',
+						fontWeight: '100',
+					},
+				},
+				{
+					key: 'italic-200',
+					name: 'Extra Light Italic',
+					style: {
+						fontStyle: 'italic',
+						fontWeight: '200',
+					},
+				},
+				{
+					key: 'italic-300',
+					name: 'Light Italic',
+					style: {
+						fontStyle: 'italic',
+						fontWeight: '300',
+					},
+				},
+				{
+					key: 'italic-400',
+					name: 'Regular Italic',
+					style: {
+						fontStyle: 'italic',
+						fontWeight: '400',
+					},
+				},
+				{
+					key: 'italic-500',
+					name: 'Medium Italic',
+					style: {
+						fontStyle: 'italic',
+						fontWeight: '500',
+					},
+				},
+				{
+					key: 'italic-600',
+					name: 'Semi Bold Italic',
+					style: {
+						fontStyle: 'italic',
+						fontWeight: '600',
+					},
+				},
+				{
+					key: 'italic-700',
+					name: 'Bold Italic',
+					style: {
+						fontStyle: 'italic',
+						fontWeight: '700',
+					},
+				},
+				{
+					key: 'italic-800',
+					name: 'Extra Bold Italic',
+					style: {
+						fontStyle: 'italic',
+						fontWeight: '800',
+					},
+				},
+				{
+					key: 'italic-900',
+					name: 'Black Italic',
+					style: {
+						fontStyle: 'italic',
+						fontWeight: '900',
+					},
+				},
+			],
+		} );
+	} );
+
+	it( 'should return correct font styles and weights based on available options', () => {
+		const fontFamilyFaces = [
+			{
+				fontFamily: 'ABeeZee',
+				fontStyle: 'italic',
+				fontWeight: '400',
+				src: 'http://www.wordpress.org/wp-content/uploads/fonts/esDT31xSG-6AGleN2tCkkJUCGpG-GQ.woff2',
+			},
+		];
+		expect( getFontStylesAndWeights( fontFamilyFaces ) ).toEqual( {
+			combinedStyleAndWeightOptions: [
+				{
+					key: 'italic-400',
+					name: 'Regular Italic',
+					style: {
+						fontStyle: 'italic',
+						fontWeight: '400',
+					},
+				},
+			],
+			fontStyles: [
+				{
+					name: 'Italic',
+					value: 'italic',
+				},
+			],
+			fontWeights: [
+				{
+					name: 'Regular',
+					value: '400',
+				},
+			],
 		} );
 	} );
 } );
