@@ -262,16 +262,16 @@ export function getActiveBlockVariation( state, blockName, attributes, scope ) {
 				continue;
 			}
 			const isMatch = definedAttributes.every( ( attribute ) => {
-				const attributeValue = getValueFromObjectPath(
-					attributes,
+				const variationAttributeValue = getValueFromObjectPath(
+					variation.attributes,
 					attribute
 				);
-				if ( attributeValue === undefined ) {
+				if ( variationAttributeValue === undefined ) {
 					return false;
 				}
 				return (
-					attributeValue ===
-					getValueFromObjectPath( variation.attributes, attribute )
+					variationAttributeValue ===
+					getValueFromObjectPath( attributes, attribute )
 				);
 			} );
 			if ( isMatch && definedAttributesLength > maxMatchedAttributes ) {
