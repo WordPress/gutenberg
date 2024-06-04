@@ -3630,6 +3630,13 @@ class WP_Theme_JSON_Gutenberg {
 			$theme_settings['settings']['spacing']['padding'] = $settings['enableCustomSpacing'];
 		}
 
+		if ( isset( $settings['spacingSizes'] ) ) {
+			if ( ! isset( $theme_settings['settings']['spacing'] ) ) {
+				$theme_settings['settings']['spacing'] = array();
+			}
+			$theme_settings['settings']['spacing']['spacingSizes'] = $settings['spacingSizes'];
+		}
+
 		return $theme_settings;
 	}
 

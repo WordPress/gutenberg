@@ -220,6 +220,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @since 5.8.0
 	 * @since 5.9.0 Theme supports have been inlined and the `$theme_support_data` argument removed.
 	 * @since 6.0.0 Added an `$options` parameter to allow the theme data to be returned without theme supports.
+	 * @since 6.6.0 Add support for 'default-font-sizes' and 'default-spacing-sizes' theme supports.
 	 *
 	 * @param array $deprecated Deprecated. Not used.
 	 * @param array $options {
@@ -291,7 +292,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		 * So we take theme supports, transform it to theme.json shape
 		 * and merge the static::$theme upon that.
 		 */
-		$theme_support_data = WP_Theme_JSON_Gutenberg::get_from_editor_settings( get_classic_theme_supports_block_editor_settings() );
+		$theme_support_data = WP_Theme_JSON_Gutenberg::get_from_editor_settings( gutenberg_get_classic_theme_supports_block_editor_settings() );
 		if ( ! wp_theme_has_theme_json() ) {
 			if ( ! isset( $theme_support_data['settings']['color'] ) ) {
 				$theme_support_data['settings']['color'] = array();
@@ -316,6 +317,32 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				$default_gradients = true;
 			}
 			$theme_support_data['settings']['color']['defaultGradients'] = $default_gradients;
+
+			if ( ! isset( $theme_support_data['settings']['typography'] ) ) {
+				$theme_support_data['settings']['typography'] = array();
+			}
+			$default_font_sizes = false;
+			if ( current_theme_supports( 'default-font-sizes' ) ) {
+				$default_font_sizes = true;
+			}
+			if ( ! isset( $theme_support_data['settings']['typography']['fontSizes'] ) ) {
+				// If the theme does not have any font sizes, we still want to show the core one.
+				$default_font_sizes = true;
+			}
+			$theme_support_data['settings']['typography']['defaultFontSizes'] = $default_font_sizes;
+
+			if ( ! isset( $theme_support_data['settings']['spacing'] ) ) {
+				$theme_support_data['settings']['spacing'] = array();
+			}
+			$default_spacing_sizes = false;
+			if ( current_theme_supports( 'default-spacing-sizes' ) ) {
+				$default_spacing_sizes = true;
+			}
+			if ( ! isset( $theme_support_data['settings']['spacing']['spacingSizes'] ) ) {
+				// If the theme does not have any spacing sizes, we still want to show the core one.
+				$default_spacing_sizes = true;
+			}
+			$theme_support_data['settings']['spacing']['defaultSpacingSizes'] = $default_spacing_sizes;
 
 			if ( ! isset( $theme_support_data['settings']['shadow'] ) ) {
 				$theme_support_data['settings']['shadow'] = array();
