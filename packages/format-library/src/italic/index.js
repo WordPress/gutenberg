@@ -20,7 +20,9 @@ export const italic = {
 	className: null,
 	__unstableInputRule( value ) {
 		const ASTERISK = '*';
+		const DOUBLE_ASTERISK = '**';
 		const UNDERSCORE = '_';
+		const DOUBLE_UNDERSCORE = '__';
 		const { start, text } = value;
 		const characterBefore = text[ start - 1 ];
 
@@ -35,6 +37,20 @@ export const italic = {
 
 		const indexBefore = text.lastIndexOf( characterBefore, start - 2 );
 		if ( indexBefore === -1 ) {
+			return value;
+		}
+
+		// Check if the character before is a double asterisk or double underscore (see bold).
+		const charactersBefore = text[ indexBefore ] + text[ indexBefore + 1 ];
+		const charactersOffsetBefore =
+			text[ indexBefore - 1 ] + text[ indexBefore ];
+
+		if (
+			charactersBefore === DOUBLE_ASTERISK ||
+			charactersBefore === DOUBLE_UNDERSCORE ||
+			charactersOffsetBefore === DOUBLE_ASTERISK ||
+			charactersOffsetBefore === DOUBLE_UNDERSCORE
+		) {
 			return value;
 		}
 
