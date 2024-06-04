@@ -129,10 +129,10 @@ export function DropZoneComponent( {
 			setIsDraggingOverElement( false );
 		},
 	} );
-	const isDragging = isDraggingOverDocument || isDraggingOverElement;
+
 	const classes = clsx( 'components-drop-zone', className, {
 		'is-active':
-			isDragging &&
+			( isDraggingOverDocument || isDraggingOverElement ) &&
 			( ( type === 'file' && onFilesDrop ) ||
 				( type === 'html' && onHTMLDrop ) ||
 				( type === 'default' && onDrop ) ),
