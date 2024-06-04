@@ -2,61 +2,22 @@
  * External dependencies
  */
 import clsx from 'clsx';
-import type { ReactNode } from 'react';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useState, useEffect } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { upload, Icon } from '@wordpress/icons';
 import { getFilesFromDataTransfer } from '@wordpress/dom';
-import {
-	__experimentalUseDropZone as useDropZone,
-	useReducedMotion,
-} from '@wordpress/compose';
+import { __experimentalUseDropZone as useDropZone } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import type { DropType, DropZoneProps } from './types';
 import type { WordPressComponentProps } from '../context';
-
-/**
- * Handles fade-in/fade-out animation for its children if `reducedMotion` is disabled,
- * if not, just shows/hides the children without any animation.
- *
- * Relies on the animations being defined in CSS styles.
- */
-const MaybeFade: React.FC< {
-	show: boolean;
-	children: ReactNode;
-	duration?: number;
-} > = ( { show, children } ) => {
-	const [ shouldRender, setRender ] = useState( show );
-	const reducedMotion = useReducedMotion();
-
-	useEffect( () => {
-		if ( show ) {
-			setRender( true );
-		} else if ( reducedMotion ) {
-			setRender( false );
-		}
-	}, [ show, reducedMotion ] );
-
-	const props = ! reducedMotion
-		? {
-				className: show ? 'fade-enter' : 'fade-exit',
-				onAnimationEnd: () => {
-					if ( ! show ) {
-						setRender( false );
-					}
-				},
-		  }
-		: {};
-
-	return shouldRender && <div { ...props }>{ children }</div>;
-};
+import { MaybeFade } from './animators';
 
 function DropIndicator( { label }: { label?: string } ) {
 	return (
