@@ -29,17 +29,15 @@ function render_block_core_media_text( $attributes, $content ) {
 		return $content;
 	}
 
-	$has_media_on_right    = isset( $attributes['mediaPosition'] ) && 'right' === $attributes['mediaPosition'];
-	$image_fill            = isset( $attributes['imageFill'] ) && $attributes['imageFill'];
-	$focal_point           = isset( $attributes['focalPoint'] ) ? round( $attributes['focalPoint']['x'] * 100 ) . '% ' . round( $attributes['focalPoint']['y'] * 100 ) . '%' : '50% 50%';
-	$media_size_slug       = isset( $attributes['mediaSizeSlug'] ) ? $attributes['mediaSizeSlug'] : 'full';
-	$unique_id             = 'wp-block-media-text__media-' . wp_unique_id();
-	$image_tag             = '<img class="wp-block-media-text__featured_image">';
 	$media_tag_processor   = new WP_HTML_Tag_Processor( $content );
 	$wrapping_figure_query = array(
 		'tag_name'   => 'figure',
 		'class_name' => 'wp-block-media-text__media',
 	);
+	$has_media_on_right = isset( $attributes['mediaPosition'] ) && 'right' === $attributes['mediaPosition'];
+	$image_fill         = isset( $attributes['imageFill'] ) && $attributes['imageFill'];
+	$focal_point        = isset( $attributes['focalPoint'] ) ? round( $attributes['focalPoint']['x'] * 100 ) . '% ' . round( $attributes['focalPoint']['y'] * 100 ) . '%' : '50% 50%';
+	$unique_id          = 'wp-block-media-text__media-' . wp_unique_id();
 
 	if ( $has_media_on_right ) {
 		// Loop through all the figure tags and set a bookmark on the last figure tag.
@@ -71,7 +69,9 @@ function render_block_core_media_text( $attributes, $content ) {
 	// If the image is not set to fill, add the image tag inside the figure tag,
 	// and update the image attributes in order to display the featured image.
 	if ( ! $image_fill ) {
-		$content = preg_replace(
+		$media_size_slug = isset( $attributes['mediaSizeSlug'] ) ? $attributes['mediaSizeSlug'] : 'full';
+		$image_tag       = '<img class="wp-block-media-text__featured_image">';
+		$content         = preg_replace(
 			'/(<figure\s+id="' . preg_quote( $unique_id, '/' ) . '"\s+class="wp-block-media-text__media"\s*>)/',
 			'$1' . $image_tag,
 			$content
