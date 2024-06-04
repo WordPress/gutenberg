@@ -1,4 +1,4 @@
-@keyframes fadeIn {
+@keyframes components-drop-zone__fadeIn {
 	0% {
 		opacity: 0;
 	}
@@ -7,7 +7,7 @@
 	}
 }
 
-@keyframes fadeOut {
+@keyframes components-drop-zone__fadeOut {
 	0% {
 		opacity: 1;
 	}
@@ -16,7 +16,7 @@
 	}
 }
 
-@keyframes scaleIn {
+@keyframes components-drop-zone__scaleIn {
 	0% {
 		opacity: 0;
 		transform: scale(0.9);
@@ -31,7 +31,7 @@
 	}
 }
 
-@keyframes scaleOut {
+@keyframes wp-components-drop-zone__scaleOut {
 	0% {
 		opacity: 1;
 		transform: scale(1);
@@ -46,21 +46,20 @@
 	}
 }
 
-.fade-enter {
-	animation: fadeIn 0.2s forwards;
+.components-drop-zone__fade-enter {
+	animation: components-drop-zone__fadeIn 0.2s forwards;
 }
 
-.fade-exit {
-	animation: fadeOut 0.2s forwards;
+.components-drop-zone__fade-exit {
+	animation: components-drop-zone__fadeOut 0.2s forwards;
 }
 
-/* Ensure the inner animation starts after a delay, matching the outer animation length */
-.fade-enter .components-drop-zone__content-inner {
-	animation: scaleIn 0.2s forwards;
+.components-drop-zone__fade-enter .components-drop-zone__content-inner {
+	animation: components-drop-zone__scaleIn 0.2s forwards;
 }
 
-.fade-exit .components-drop-zone__content-inner {
-	animation: scaleOut 0.2s forwards;
+.components-drop-zone__fade-exit .components-drop-zone__content-inner {
+	animation: components-drop-zone__scaleOut 0.2s forwards;
 }
 
 .components-drop-zone {

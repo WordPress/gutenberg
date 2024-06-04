@@ -7,7 +7,7 @@ import type { ReactNode } from 'react';
  * WordPress dependencies
  */
 import { useState, useEffect } from '@wordpress/element';
-import { useReducedMotion } from '@wordpress/compose';
+//import { useReducedMotion } from '@wordpress/compose';
 
 /**
  * Handles fade-in/fade-out animation for its children if `reducedMotion` is disabled,
@@ -21,7 +21,7 @@ export const MaybeFade: React.FC< {
 	duration?: number;
 } > = ( { show, children } ) => {
 	const [ shouldRender, setRender ] = useState( show );
-	const reducedMotion = useReducedMotion();
+	const reducedMotion = false; // useReducedMotion();
 
 	useEffect( () => {
 		if ( show ) {
@@ -33,7 +33,9 @@ export const MaybeFade: React.FC< {
 
 	const props = ! reducedMotion
 		? {
-				className: show ? 'fade-enter' : 'fade-exit',
+				className: show
+					? 'components-drop-zone__fade-enter'
+					: 'components-drop-zone__fade-exit',
 				onAnimationEnd: () => {
 					if ( ! show ) {
 						setRender( false );
