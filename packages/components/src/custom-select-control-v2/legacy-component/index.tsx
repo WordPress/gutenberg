@@ -57,7 +57,6 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 	} );
 
 	useEffect( () => {
-		// This is a workaround for selecting the right item upon mount
 		if ( value ) {
 			store.setValue( value.name );
 		}

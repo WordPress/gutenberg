@@ -507,4 +507,22 @@ describe.each( [
 			} )
 		);
 	} );
+
+	it( 'Should display the initial value passed as the selected value', async () => {
+		const initialSelectedItem = legacyProps.options[ 5 ];
+
+		const testProps = {
+			...legacyProps,
+			value: initialSelectedItem,
+		};
+
+		render( <Component { ...testProps } /> );
+
+		const currentSelectedItem = await screen.findByRole( 'combobox', {
+			expanded: false,
+		} );
+
+		// Verify the initial selected value
+		expect( currentSelectedItem ).toHaveTextContent( 'aquarela' );
+	} );
 } );
