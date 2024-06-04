@@ -70,14 +70,15 @@ describe( 'block parser', () => {
 
 			const block = parseRawBlock( {
 				blockName: 'core/test-block',
-				innerHTML: '<div class="custom-class">Bananas</div>',
+				innerHTML:
+					'<div class="custom-class another-custom-class">Bananas</div>',
 				attrs: { fruit: 'Bananas' },
 			} );
 
 			expect( block.name ).toEqual( 'core/test-block' );
 			expect( block.attributes ).toEqual( {
 				fruit: 'Bananas',
-				className: 'custom-class',
+				className: 'custom-class another-custom-class',
 			} );
 		} );
 
