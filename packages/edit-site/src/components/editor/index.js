@@ -191,7 +191,7 @@ export default function EditSiteEditor( { isLoading } ) {
 						postWithTemplate ? contextPostType : editedPostType
 					}
 					postId={ postWithTemplate ? contextPostId : editedPostId }
-					templateId={ postWithTemplate ? contextPostId : undefined }
+					templateId={ postWithTemplate ? editedPostId : undefined }
 					settings={ settings }
 					className={ clsx( 'edit-site-editor__editor-interface', {
 						'show-icon-labels': showIconLabels,
