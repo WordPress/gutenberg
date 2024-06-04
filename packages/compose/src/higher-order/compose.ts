@@ -9,7 +9,7 @@ import { basePipe } from './pipe';
  *
  * This is inspired by `lodash`'s `flowRight` function.
  *
- * @see https://docs-lodash.com/v4/flow-right/
+ * @see https://lodash.com/docs/4#flow-right
  */
 const compose = basePipe( true );
 

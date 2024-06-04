@@ -113,7 +113,8 @@ export function PatternsFilter( {
 				popoverProps={ {
 					placement: 'right-end',
 				} }
-				label="Filter patterns"
+				label={ __( 'Filter patterns' ) }
+				toggleProps={ { size: 'compact' } }
 				icon={
 					<Icon
 						icon={
@@ -126,7 +127,7 @@ export function PatternsFilter( {
 							>
 								<Path
 									d="M10 17.5H14V16H10V17.5ZM6 6V7.5H18V6H6ZM8 12.5H16V11H8V12.5Z"
-									fill="#1E1E1E"
+									fill="currentColor"
 								/>
 							</SVG>
 						}

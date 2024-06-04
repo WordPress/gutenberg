@@ -191,9 +191,7 @@ const inserterMediaCategories = [
 				per_page: 'page_size',
 				search: 'q',
 			};
-			const url = new URL(
-				'https://api.openverse.engineering/v1/images/'
-			);
+			const url = new URL( 'https://api.openverse.org/v1/images/' );
 			Object.entries( finalQuery ).forEach( ( [ key, value ] ) => {
 				const queryKey = mapFromInserterMediaRequest[ key ] || key;
 				url.searchParams.set( queryKey, value );

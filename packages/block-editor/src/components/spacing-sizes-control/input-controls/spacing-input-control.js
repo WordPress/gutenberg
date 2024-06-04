@@ -23,6 +23,7 @@ import { settings } from '@wordpress/icons';
 import { useSettings } from '../../use-settings';
 import { store as blockEditorStore } from '../../../store';
 import {
+	RANGE_CONTROL_MAX_SIZE,
 	ALL_SIDES,
 	LABELS,
 	getSliderValueFromPreset,
@@ -79,7 +80,7 @@ export default function SpacingInputControl( {
 	value = getPresetValueFromCustomValue( value, spacingSizes );
 
 	let selectListSizes = spacingSizes;
-	const showRangeControl = spacingSizes.length <= 8;
+	const showRangeControl = spacingSizes.length <= RANGE_CONTROL_MAX_SIZE;
 
 	const disableCustomSpacingSizes = useSelect( ( select ) => {
 		const editorSettings = select( blockEditorStore ).getSettings();

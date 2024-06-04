@@ -149,6 +149,7 @@ export default function LinkPreview( {
 						isEmptyURL || showIconLabels ? '' : ': ' + value.url
 					) }
 					ref={ ref }
+					__experimentalIsFocusable
 					disabled={ isEmptyURL }
 					size="compact"
 				/>

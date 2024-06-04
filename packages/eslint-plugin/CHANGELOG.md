@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 19.0.0 (2024-05-31)
+
 ### Breaking Changes
 
 -   `@wordpress/is-gutenberg-plugin` rule has been replaced by `@wordpress/wp-global-usage` ([#61486](https://github.com/WordPress/gutenberg/pull/61486)).
