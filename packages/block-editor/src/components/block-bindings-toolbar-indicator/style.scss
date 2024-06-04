@@ -1,11 +1,10 @@
-.block-editor-block-bindings-toolbar-indicator {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	padding: 6px;
-	svg {
-		fill: var(--wp-block-synced-color);
-	}
+.block-editor-block-bindings-toolbar-indicator__popover .components-popover__content {
+	min-width: 260px;
+	padding: $grid-unit-20;
+}
+
+.block-editor-block-bindings-toolbar-indicator .block-editor-block-bindings-toolbar-indicator-icon.has-colors svg {
+	fill: var(--wp-block-synced-color);
 }
 
 .editor-collapsible-block-toolbar .block-editor-block-bindings-toolbar-indicator {
