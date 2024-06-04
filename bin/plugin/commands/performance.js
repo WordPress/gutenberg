@@ -159,7 +159,8 @@ function printStats( m, s ) {
  */
 async function runTestSuite( testSuite, testRunnerDir, runKey ) {
 	await runShellScript(
-		`npm run test:performance -- ${ testSuite }`,
+		'npm',
+		[ 'run', 'test:performance', '--', testSuite ],
 		testRunnerDir,
 		{
 			...process.env,
@@ -329,7 +330,7 @@ async function runPerformanceTests( branches, options ) {
 	const testRunnerDir = path.join( baseDir + '/tests' );
 
 	logAtIndent( 2, 'Copying source to:', formats.success( testRunnerDir ) );
-	await runShellScript( `cp -R  ${ sourceDir } ${ testRunnerDir }` );
+	await runShellScript( 'cp', [ '-R', sourceDir, testRunnerDir ] );
 
 	logAtIndent(
 		2,
@@ -341,7 +342,11 @@ async function runPerformanceTests( branches, options ) {
 
 	logAtIndent( 2, 'Installing dependencies and building' );
 	await runShellScript(
-		`bash -c "source $HOME/.nvm/nvm.sh && nvm install && npm ci && npx playwright install chromium --with-deps && npm run build:packages"`,
+		'bash',
+		[
+			'-c',
+			'"source $HOME/.nvm/nvm.sh && nvm install && npm ci && npx playwright install chromium --with-deps && npm run build:packages"',
+		],
 		testRunnerDir
 	);
 
@@ -376,7 +381,7 @@ async function runPerformanceTests( branches, options ) {
 		const buildDir = path.join( envDir, 'plugin' );
 
 		logAtIndent( 3, 'Copying source to:', formats.success( buildDir ) );
-		await runShellScript( `cp -R ${ sourceDir } ${ buildDir }` );
+		await runShellScript( 'cp', [ '-R', sourceDir, buildDir ] );
 
 		logAtIndent( 3, 'Checking out:', formats.success( branch ) );
 		// @ts-ignore
@@ -384,7 +389,11 @@ async function runPerformanceTests( branches, options ) {
 
 		logAtIndent( 3, 'Installing dependencies and building' );
 		await runShellScript(
-			`bash -c "source $HOME/.nvm/nvm.sh && nvm install && npm ci && npm run build"`,
+			'bash',
+			[
+				'-c',
+				'"source $HOME/.nvm/nvm.sh && nvm install && npm ci && npm run build"',
+			],
 			buildDir
 		);
 
@@ -479,13 +488,13 @@ async function runPerformanceTests( branches, options ) {
 				const envDir = branchDirs[ branch ];
 
 				logAtIndent( 3, 'Starting environment' );
-				await runShellScript( `${ wpEnvPath } start`, envDir );
+				await runShellScript( wpEnvPath, [ 'start' ], envDir );
 
 				logAtIndent( 3, 'Running tests' );
 				await runTestSuite( testSuite, testRunnerDir, runKey );
 
 				logAtIndent( 3, 'Stopping environment' );
-				await runShellScript( `${ wpEnvPath } stop`, envDir );
+				await runShellScript( wpEnvPath, [ 'stop' ], envDir );
 			}
 		}
 	}

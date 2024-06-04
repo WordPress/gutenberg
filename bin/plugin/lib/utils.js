@@ -4,8 +4,7 @@
 // @ts-ignore
 const inquirer = require( 'inquirer' );
 const fs = require( 'fs' );
-const { promisify } = require( 'util' );
-const childProcess = require( 'child_process' );
+const { spawn } = require( 'child_process' );
 const { v4: uuid } = require( 'uuid' );
 const path = require( 'path' );
 const os = require( 'os' );
@@ -20,22 +19,65 @@ const { log, formats } = require( './logger' );
  *
  * @typedef {NodeJS.ProcessEnv} Env
  *
- * @param {string}  script Script to run.
- * @param {string=} cwd    Working directory.
- * @param {Env=}    env    Additional environment variables to pass to the script.
+ * @param {string}   command
+ * @param {string[]} args
+ * @param {string=}  cwd     Current working directory.
+ * @param {Env=}     env     Environment variables.
+ * @param {boolean=} shell   Use shell.
  */
-async function runShellScript( script, cwd, env = {} ) {
-	const execPromisified = promisify( childProcess.exec );
+async function runShellScript( command, args, cwd, env = {}, shell = false ) {
+	if ( ! command ) {
+		throw new Error( 'No command provided' );
+	}
 
-	return await execPromisified( script, {
-		cwd,
-		env: {
-			NO_CHECKS: 'true',
-			PATH: process.env.PATH,
-			HOME: process.env.HOME,
-			USER: process.env.USER,
-			...env,
-		},
+	return new Promise( ( resolve, reject ) => {
+		const child = spawn( command, args, {
+			cwd,
+			env: {
+				NO_CHECKS: 'true',
+				PATH: process.env.PATH,
+				HOME: process.env.HOME,
+				USER: process.env.USER,
+				...env,
+			},
+			shell: /cp|bash/.test( command ) ? true : shell,
+			stdio: 'inherit',
+		} );
+
+		let stdout = '';
+		let stderr = '';
+
+		if ( child.stdout ) {
+			child.stdout.on( 'data', ( data ) => {
+				const dataStr = data.toString();
+				stdout += dataStr;
+				process.stdout.write( dataStr ); // Print to console in real-time
+			} );
+		}
+
+		if ( child.stderr ) {
+			child.stderr.on( 'data', ( data ) => {
+				const dataStr = data.toString();
+				stderr += dataStr;
+				process.stderr.write( dataStr ); // Print to console in real-time
+			} );
+		}
+
+		child.on( 'close', ( code ) => {
+			if ( code === 0 ) {
+				resolve( { stdout, stderr } );
+			} else {
+				reject(
+					new Error(
+						`Process exited with code ${ code }: ${ stderr }`
+					)
+				);
+			}
+		} );
+
+		child.on( 'error', ( error ) => {
+			reject( error );
+		} );
 	} );
 }
 
