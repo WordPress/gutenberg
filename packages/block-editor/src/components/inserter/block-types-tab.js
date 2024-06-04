@@ -21,6 +21,9 @@ const getBlockNamespace = ( item ) => item.name.split( '/' )[ 0 ];
 
 const MAX_SUGGESTED_ITEMS = 6;
 
+const INSERTABLE_BLOCKS_AT_SELECTION_CATEGORY =
+	'insertable-blocks-at-selection';
+
 /**
  * Shared reference to an empty array for cases where it is important to avoid
  * returning a new array reference on every invocation and rerendering the component.
@@ -121,6 +124,10 @@ export function BlockTypesTabPanel( {
 							onHover={ onHover }
 							label={ category.title }
 						/>
+						{ category.slug ===
+							INSERTABLE_BLOCKS_AT_SELECTION_CATEGORY && (
+							<div className="block-editor-inserter__category-panel-divider" />
+						) }
 					</InserterPanel>
 				);
 			} ) }
@@ -181,16 +188,16 @@ export function BlockTypesTab(
 		return <InserterNoResults />;
 	}
 
-	const currentlySelectedBlockType = getBlockType(
-		getBlockName( rootClientId )
-	);
-
 	let allCategories = [];
 
 	if ( rootClientId && categories.length ) {
+		const currentlySelectedBlockType = getBlockType(
+			getBlockName( rootClientId )
+		);
+
 		allCategories = [
 			{
-				slug: currentlySelectedBlockType.name,
+				slug: INSERTABLE_BLOCKS_AT_SELECTION_CATEGORY,
 				title: currentlySelectedBlockType.title,
 				icon: null,
 			},
@@ -211,7 +218,7 @@ export function BlockTypesTab(
 		if ( rootClientId && item.rootClientId === rootClientId ) {
 			allItems.push( {
 				...item,
-				category: currentlySelectedBlockType.name,
+				category: INSERTABLE_BLOCKS_AT_SELECTION_CATEGORY,
 			} );
 		} else {
 			allItems.push( { ...item } );
