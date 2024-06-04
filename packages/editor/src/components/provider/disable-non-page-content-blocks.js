@@ -6,18 +6,18 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 
-const CONTENT_ONLY_BLOCKS = applyFilters( 'editor.postContentBlockTypes', [
-	'core/post-title',
-	'core/post-featured-image',
-	'core/post-content',
-	'core/template-part',
-] );
-
 /**
  * Component that when rendered, makes it so that the site editor allows only
  * page content to be edited.
  */
 export default function DisableNonPageContentBlocks() {
+	const CONTENT_ONLY_BLOCKS = applyFilters( 'editor.postContentBlockTypes', [
+		'core/post-title',
+		'core/post-featured-image',
+		'core/post-content',
+		'core/template-part',
+	] );
+
 	// Note that there are two separate subscription because the result for each
 	// returns a new array.
 	const contentOnlyIds = useSelect( ( select ) => {
