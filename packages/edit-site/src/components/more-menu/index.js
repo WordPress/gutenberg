@@ -10,7 +10,7 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
  */
 import SiteExport from './site-export';
 import WelcomeGuideMenuItem from './welcome-guide-menu-item';
-import { unlock } from '../../../lock-unlock';
+import { unlock } from '../../lock-unlock';
 
 const { ToolsMoreMenuGroup, PreferencesModal } = unlock( editorPrivateApis );
 

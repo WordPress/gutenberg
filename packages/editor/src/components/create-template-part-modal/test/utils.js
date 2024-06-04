@@ -1,10 +1,7 @@
 /**
  * Internal dependencies
  */
-import {
-	getUniqueTemplatePartTitle,
-	getCleanTemplatePartSlug,
-} from '../template-part-create';
+import { getUniqueTemplatePartTitle, getCleanTemplatePartSlug } from '../utils';
 
 describe( 'getUniqueTemplatePartTitle', () => {
 	it( 'should return the title if it is unique', () => {
