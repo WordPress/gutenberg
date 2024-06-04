@@ -4,16 +4,20 @@
 import { createInterpolateElement } from '@wordpress/element';
 import { addQueryArgs } from '@wordpress/url';
 import { store as coreStore } from '@wordpress/core-data';
-import { select } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 
-const CreateNewPostLink = ( postType ) => {
+const CreateNewPostLink = ( { postType } ) => {
 	const newPostUrl = addQueryArgs( 'post-new.php', {
 		post_type: postType,
 	} );
 
-	const addNewItemLabel =
-		select( coreStore ).getPostType( postType )?.labels?.add_new_item;
-
+	const addNewItemLabel = useSelect(
+		( select ) => {
+			const { getPostType } = select( coreStore );
+			return getPostType( postType )?.labels?.add_new_item;
+		},
+		[ postType ]
+	);
 	return (
 		<div className="wp-block-query__create-new-link">
 			{ createInterpolateElement(
