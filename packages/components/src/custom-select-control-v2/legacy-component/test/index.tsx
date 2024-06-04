@@ -51,6 +51,8 @@ const legacyProps = {
 			name: 'aquarela',
 			className,
 			style,
+			customPropFoo: 'foo',
+			customPropBar: 30,
 		},
 	],
 };
@@ -469,14 +471,11 @@ describe.each( [
 	} );
 
 	// V1 styles items via a `style` or `className` metadata property in the option item object. Some consumers still expect it, e.g:
-	//
 	// - https://github.com/WordPress/gutenberg/blob/trunk/packages/block-editor/src/components/font-appearance-control/index.js#L216
-	//
-	// Returning these properties as part of the item object was not tested as part of the V1 test. Possibly this was an accidental API?
-	// or was it intentional? If intentional, we might need to implement something similar in V2, too? The alternative is to rely on the
-	// `key` attriute for the item and get the actual data from some dictionary in a store somewhere, which would require refactoring
-	// consumers that rely on the self-contained `style` and `className` attributes.
-	it( 'Should return style metadata as part of the selected option from onChange', async () => {
+	// Besides that, the `option` prop is documented as havin the type:
+	// - `Array<{ key: String, name: String, style: ?{}, className: ?String, ...rest }>`
+	// Notice the `...test` there. We should keep supporting the arbitrary props like this.
+	it( 'Should return style and custom metadata as part of the selected option from onChange', async () => {
 		const mockOnChange = jest.fn();
 
 		render( <Component { ...legacyProps } onChange={ mockOnChange } /> );
@@ -487,17 +486,23 @@ describe.each( [
 			} )
 		);
 
-		await click(
-			screen.getByRole( 'option', {
-				name: 'aquarela',
-			} )
-		);
+		const optionElement = screen.getByRole( 'option', {
+			name: 'aquarela',
+		} );
+
+		// Assert that the option element does not have the custom attributes
+		expect( optionElement ).not.toHaveAttribute( 'customPropFoo' );
+		expect( optionElement ).not.toHaveAttribute( 'customPropBar' );
+
+		await click( optionElement );
 
 		expect( mockOnChange ).toHaveBeenCalledWith(
 			expect.objectContaining( {
 				selectedItem: expect.objectContaining( {
 					className,
 					style,
+					customPropFoo: 'foo',
+					customPropBar: 30,
 				} ),
 			} )
 		);
