@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { _x, __ } from '@wordpress/i18n';
-import { dateI18n } from '@wordpress/date';
+import { dateI18n, humanTimeDiff } from '@wordpress/date';
 import { useState, createInterpolateElement } from '@wordpress/element';
 import {
 	TextControl,
@@ -92,13 +92,17 @@ function NonDefaultControls( { format, onChange } ) {
 			_x( 'F j, Y', 'long date format' ),
 			/* translators: See https://www.php.net/manual/datetime.format.php */
 			_x( 'M j', 'short date format without the year' ),
+			__( 'Time Ago' ),
 		] ),
 	];
 
 	const suggestedOptions = suggestedFormats.map(
 		( suggestedFormat, index ) => ( {
 			key: `suggested-${ index }`,
-			name: dateI18n( suggestedFormat, EXAMPLE_DATE ),
+			name:
+				suggestedFormat === 'Time Ago'
+					? humanTimeDiff( EXAMPLE_DATE, new Date() )
+					: dateI18n( suggestedFormat, EXAMPLE_DATE ),
 			format: suggestedFormat,
 		} )
 	);
