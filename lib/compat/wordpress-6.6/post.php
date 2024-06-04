@@ -23,7 +23,8 @@ add_action( 'init', 'gutenberg_add_excerpt_support_to_wp_block' );
 function gutenberg_post_type_default_rendering_mode( $args ) {
 	if (
 		( isset( $args['show_in_rest'] ) && $args['show_in_rest'] ) &&
-		( isset( $args['supports'] ) && in_array( 'editor', $args['supports'], true ) )
+		( isset( $args['supports'] ) && in_array( 'editor', $args['supports'], true ) ) &&
+		( ! isset( $args['rendering_mode'] ) )
 	) {
 		$args['rendering_mode'] = 'post-only';
 	}
