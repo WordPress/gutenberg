@@ -134,12 +134,6 @@ class WP_Theme_JSON_Schema_Gutenberg {
 		 * when the theme did not provide any.
 		 */
 		if ( isset( $old['settings']['typography']['fontSizes'] ) ) {
-			if ( ! isset( $new['settings'] ) ) {
-				$new['settings'] = array();
-			}
-			if ( ! isset( $new['settings']['typography'] ) ) {
-				$new['settings']['typography'] = array();
-			}
 			$new['settings']['typography']['defaultFontSizes'] = false;
 		}
 
@@ -153,12 +147,6 @@ class WP_Theme_JSON_Schema_Gutenberg {
 			isset( $old['settings']['spacing']['spacingSizes'] ) ||
 			isset( $old['settings']['spacing']['spacingScale'] )
 		) {
-			if ( ! isset( $new['settings'] ) ) {
-				$new['settings'] = array();
-			}
-			if ( ! isset( $new['settings']['spacing'] ) ) {
-				$new['settings']['spacing'] = array();
-			}
 			$new['settings']['spacing']['defaultSpacingSizes'] = false;
 		}
 
