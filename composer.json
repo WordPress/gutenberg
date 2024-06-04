@@ -46,7 +46,7 @@
 		"composer/installers": "~1.0"
 	},
 	"scripts": {
-		"format": "phpcbf --standard=phpcs.xml.dist --report-summary --report-source",
+		"format": "bash ./scripts/format-php.sh",
 		"lint": "bash ./scripts/lint-php.sh",
 		"test": "phpunit",
 		"test:watch": "phpunit-watcher watch < /dev/tty"

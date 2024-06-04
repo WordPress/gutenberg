@@ -21,7 +21,7 @@
 	"main": "build/index.js",
 	"dependencies": {
 		"@wordpress/block-editor": "file:../../packages/block-editor",
-		"@wordpress/blocks": "^12.33.0",
+		"@wordpress/blocks": "file:../../packages/blocks",
 		"@wordpress/components": "file:../../packages/components",
 		"@wordpress/core-data": "file:../../packages/core-data",
 		"@wordpress/element": "file:../../packages/element",
@@ -34,10 +34,6 @@
 	},
 	"scripts": {
 		"build": "wp-scripts build",
-		"format": "wp-scripts format",
-		"lint:css": "wp-scripts lint-style",
-		"lint:js": "wp-scripts lint-js",
-		"packages-update": "wp-scripts packages-update",
 		"plugin-zip": "wp-scripts plugin-zip",
 		"start": "wp-scripts start"
 	}
