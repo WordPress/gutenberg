@@ -76,6 +76,8 @@ const EMPTY_ARRAY = [];
  */
 const EMPTY_SET = new Set();
 
+const EMPTY_OBJECT = {};
+
 /**
  * Returns a block's name given its client ID, or null if no block exists with
  * the client ID.
@@ -1996,7 +1998,7 @@ const buildBlockTypeItem =
  */
 export const getInserterItems = createRegistrySelector( ( select ) =>
 	createSelector(
-		( state, rootClientId = null, options = {} ) => {
+		( state, rootClientId = null, options = EMPTY_OBJECT ) => {
 			const buildReusableBlockInserterItem = ( reusableBlock ) => {
 				const icon = ! reusableBlock.wp_pattern_sync_status
 					? {
