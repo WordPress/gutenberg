@@ -2,6 +2,11 @@
 	background: $white;
 }
 
+// Spacing for checkbox.
+.css-yj91it-StyledField {
+	margin-bottom: calc(4px * 2);
+}
+
 .editor-post-publish-panel__content {
 	// Ensure the post-publish panel accounts for the header and footer height.
 	min-height: calc(100% - #{$header-height + 84px});

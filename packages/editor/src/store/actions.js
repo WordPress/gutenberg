@@ -421,6 +421,50 @@ export const disablePublishSidebar =
 	};
 
 /**
+ * Enables the pre-publish panel.
+ */
+export const enablePrePublishPanel =
+	() =>
+	( { registry } ) => {
+		registry
+			.dispatch( preferencesStore )
+			.set( 'core/edit-post', 'showPrePublishPanel', true );
+	};
+
+/**
+ * Disable the pre-publish panel.
+ */
+export const disablePrePublishPanel =
+	() =>
+	( { registry } ) => {
+		registry
+			.dispatch( preferencesStore )
+			.set( 'core/edit-post', 'showPrePublishPanel', false );
+	};
+
+/**
+ * Enable the post publish panel.
+ */
+export const enablePostPublishPanel =
+	() =>
+	( { registry } ) => {
+		registry
+			.dispatch( preferencesStore )
+			.set( 'core/edit-post', 'showPostPublishPanel', true );
+	};
+
+/**
+ * Disables the post publish panel.
+ */
+export const disablePostPublishPanel =
+	() =>
+	( { registry } ) => {
+		registry
+			.dispatch( preferencesStore )
+			.set( 'core/edit-post', 'showPostPublishPanel', false );
+	};
+
+/**
  * Action that locks post saving.
  *
  * @param {string} lockName The lock name.

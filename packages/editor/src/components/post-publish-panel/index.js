@@ -39,6 +39,15 @@ export class PostPublishPanel extends Component {
 		) {
 			this.props.onClose();
 		}
+
+		// Automatically close the publish sidebar when showPostPublishPanel is unchecked and post is published.
+		if (
+			prevProps.isPublished &&
+			! this.props.isSaving &&
+			! prevProps.showPostPublishPanel
+		) {
+			this.props.onClose();
+		}
 	}
 
 	onSubmit() {
@@ -53,14 +62,23 @@ export class PostPublishPanel extends Component {
 			forceIsDirty,
 			isBeingScheduled,
 			isPublished,
+
 			isPublishSidebarEnabled,
+			showPrePublishPanel,
+			showPostPublishPanel,
+
 			isScheduled,
 			isSaving,
 			isSavingNonPostEntityChanges,
 			onClose,
+
 			onTogglePublishSidebar,
 			PostPublishExtension,
 			PrePublishExtension,
+
+			handleTogglePrePublishPanel,
+			handleTogglePostPublishPanel,
+
 			...additionalProps
 		} = this.props;
 		const {
@@ -71,8 +89,12 @@ export class PostPublishPanel extends Component {
 		} = additionalProps;
 		const isPublishedOrScheduled =
 			isPublished || ( isScheduled && isBeingScheduled );
-		const isPrePublish = ! isPublishedOrScheduled && ! isSaving;
-		const isPostPublish = isPublishedOrScheduled && ! isSaving;
+
+		const isPrePublish =
+			! isPublishedOrScheduled && ! isSaving && showPrePublishPanel;
+		const isPostPublish =
+			isPublishedOrScheduled && ! isSaving && showPostPublishPanel;
+
 		return (
 			<div className="editor-post-publish-panel" { ...propsForPanel }>
 				<div className="editor-post-publish-panel__header">
@@ -125,6 +147,16 @@ export class PostPublishPanel extends Component {
 						checked={ isPublishSidebarEnabled }
 						onChange={ onTogglePublishSidebar }
 					/>
+					<CheckboxControl
+						label={ 'Show Pre-Publish Panel' }
+						checked={ showPrePublishPanel }
+						onChange={ handleTogglePrePublishPanel }
+					/>
+					<CheckboxControl
+						label={ 'Show Post-Publish Panel' }
+						checked={ showPostPublishPanel }
+						onChange={ handleTogglePostPublishPanel }
+					/>
 				</div>
 			</div>
 		);
@@ -145,7 +177,11 @@ export default compose( [
 			isSavingPost,
 			isSavingNonPostEntityChanges,
 		} = select( editorStore );
-		const { isPublishSidebarEnabled } = select( editorStore );
+		const {
+			isPublishSidebarEnabled,
+			showPrePublishPanel,
+			showPostPublishPanel,
+		} = select( editorStore );
 		const postType = getPostType( getEditedPostAttribute( 'type' ) );
 
 		return {
@@ -156,24 +192,55 @@ export default compose( [
 			isDirty: isEditedPostDirty(),
 			isPublished: isCurrentPostPublished(),
 			isPublishSidebarEnabled: isPublishSidebarEnabled(),
+			showPrePublishPanel: showPrePublishPanel(),
+			showPostPublishPanel: showPostPublishPanel(),
 			isSaving: isSavingPost() && ! isAutosavingPost(),
 			isSavingNonPostEntityChanges: isSavingNonPostEntityChanges(),
 			isScheduled: isCurrentPostScheduled(),
 		};
 	} ),
-	withDispatch( ( dispatch, { isPublishSidebarEnabled } ) => {
-		const { disablePublishSidebar, enablePublishSidebar } =
-			dispatch( editorStore );
-		return {
-			onTogglePublishSidebar: () => {
-				if ( isPublishSidebarEnabled ) {
-					disablePublishSidebar();
-				} else {
-					enablePublishSidebar();
-				}
-			},
-		};
-	} ),
+	withDispatch(
+		(
+			dispatch,
+			{
+				isPublishSidebarEnabled,
+				showPrePublishPanel,
+				showPostPublishPanel,
+			}
+		) => {
+			const {
+				disablePublishSidebar,
+				enablePublishSidebar,
+				disablePrePublishPanel,
+				enablePrePublishPanel,
+				disablePostPublishPanel,
+				enablePostPublishPanel,
+			} = dispatch( editorStore );
+			return {
+				onTogglePublishSidebar: () => {
+					if ( isPublishSidebarEnabled ) {
+						disablePublishSidebar();
+					} else {
+						enablePublishSidebar();
+					}
+				},
+				handleTogglePrePublishPanel: () => {
+					if ( showPrePublishPanel ) {
+						disablePrePublishPanel();
+					} else {
+						enablePrePublishPanel();
+					}
+				},
+				handleTogglePostPublishPanel: () => {
+					if ( showPostPublishPanel ) {
+						disablePostPublishPanel();
+					} else {
+						enablePostPublishPanel();
+					}
+				},
+			};
+		}
+	),
 	withFocusReturn,
 	withConstrainedTabbing,
 ] )( PostPublishPanel );
