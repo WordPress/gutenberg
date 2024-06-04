@@ -4,7 +4,7 @@
 // @ts-ignore
 const inquirer = require( 'inquirer' );
 const fs = require( 'fs' );
-const { spawn } = require( 'child_process' );
+const childProcess = require( 'child_process' );
 const { v4: uuid } = require( 'uuid' );
 const path = require( 'path' );
 const os = require( 'os' );
@@ -19,29 +19,23 @@ const { log, formats } = require( './logger' );
  *
  * @typedef {NodeJS.ProcessEnv} Env
  *
- * @param {string}   command
- * @param {string[]} args
- * @param {string=}  cwd     Current working directory.
- * @param {Env=}     env     Environment variables.
- * @param {boolean=} shell   Use shell.
+ * @param {string}                               command
+ * @param {string[]}                             args
+ * @param {import('child_process').SpawnOptions} options
  */
-async function runShellScript( command, args, cwd, env = {}, shell = false ) {
-	if ( ! command ) {
-		throw new Error( 'No command provided' );
-	}
-
+async function spawn( command, args, options ) {
 	return new Promise( ( resolve, reject ) => {
-		const child = spawn( command, args, {
-			cwd,
+		const child = childProcess.spawn( command, args, {
 			env: {
 				NO_CHECKS: 'true',
 				PATH: process.env.PATH,
 				HOME: process.env.HOME,
 				USER: process.env.USER,
-				...env,
+				...options.env,
 			},
-			shell: /cp|bash/.test( command ) ? true : shell,
+			shell: false,
 			stdio: 'inherit',
+			...options,
 		} );
 
 		let stdout = '';
@@ -175,7 +169,7 @@ module.exports = {
 	askForConfirmation,
 	runStep,
 	readJSONFile,
-	runShellScript,
+	spawn,
 	getRandomTemporaryPath,
 	getFilesFromDir,
 };

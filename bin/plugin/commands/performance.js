@@ -11,7 +11,7 @@ const SimpleGit = require( 'simple-git' );
  */
 const { formats, log } = require( '../lib/logger' );
 const {
-	runShellScript,
+	spawn,
 	readJSONFile,
 	askForConfirmation,
 	getFilesFromDir,
@@ -158,15 +158,22 @@ function printStats( m, s ) {
  * @param {string} runKey        Unique identifier for the test run.
  */
 async function runTestSuite( testSuite, testRunnerDir, runKey ) {
-	await runShellScript(
-		'npm',
-		[ 'run', 'test:performance', '--', testSuite ],
-		testRunnerDir,
+	await spawn(
+		'node',
+		[
+			'./packages/scripts/scripts/test-playwright.js',
+			'--config',
+			'test/performance/playwright.config.ts',
+			testSuite,
+		],
 		{
-			...process.env,
-			PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1',
-			WP_ARTIFACTS_PATH: ARTIFACTS_PATH,
-			RESULTS_ID: runKey,
+			cwd: testRunnerDir,
+			env: {
+				...process.env,
+				PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1',
+				WP_ARTIFACTS_PATH: ARTIFACTS_PATH,
+				RESULTS_ID: runKey,
+			},
 		}
 	);
 }
@@ -330,7 +337,10 @@ async function runPerformanceTests( branches, options ) {
 	const testRunnerDir = path.join( baseDir + '/tests' );
 
 	logAtIndent( 2, 'Copying source to:', formats.success( testRunnerDir ) );
-	await runShellScript( 'cp', [ '-R', sourceDir, testRunnerDir ] );
+	await spawn( 'cp', [ '-R', sourceDir, testRunnerDir ], {
+		shell: true,
+		stdio: 'ignore',
+	} );
 
 	logAtIndent(
 		2,
@@ -341,13 +351,13 @@ async function runPerformanceTests( branches, options ) {
 	await SimpleGit( testRunnerDir ).raw( 'checkout', testRunnerBranch );
 
 	logAtIndent( 2, 'Installing dependencies and building' );
-	await runShellScript(
+	await spawn(
 		'bash',
 		[
 			'-c',
 			'"source $HOME/.nvm/nvm.sh && nvm install && npm ci && npx playwright install chromium --with-deps && npm run build:packages"',
 		],
-		testRunnerDir
+		{ cwd: testRunnerDir, shell: true, stdio: 'ignore' }
 	);
 
 	logAtIndent( 1, 'Setting up test environments' );
@@ -381,20 +391,23 @@ async function runPerformanceTests( branches, options ) {
 		const buildDir = path.join( envDir, 'plugin' );
 
 		logAtIndent( 3, 'Copying source to:', formats.success( buildDir ) );
-		await runShellScript( 'cp', [ '-R', sourceDir, buildDir ] );
+		await spawn( 'cp', [ '-R', sourceDir, buildDir ], {
+			shell: true,
+			stdio: 'ignore',
+		} );
 
 		logAtIndent( 3, 'Checking out:', formats.success( branch ) );
 		// @ts-ignore
 		await SimpleGit( buildDir ).raw( 'checkout', branch );
 
 		logAtIndent( 3, 'Installing dependencies and building' );
-		await runShellScript(
+		await spawn(
 			'bash',
 			[
 				'-c',
 				'"source $HOME/.nvm/nvm.sh && nvm install && npm ci && npm run build"',
 			],
-			buildDir
+			{ cwd: buildDir, shell: true, stdio: 'ignore' }
 		);
 
 		const wpEnvConfigPath = path.join( envDir, '.wp-env.json' );
@@ -488,13 +501,13 @@ async function runPerformanceTests( branches, options ) {
 				const envDir = branchDirs[ branch ];
 
 				logAtIndent( 3, 'Starting environment' );
-				await runShellScript( wpEnvPath, [ 'start' ], envDir );
+				await spawn( wpEnvPath, [ 'start' ], envDir );
 
 				logAtIndent( 3, 'Running tests' );
 				await runTestSuite( testSuite, testRunnerDir, runKey );
 
 				logAtIndent( 3, 'Stopping environment' );
-				await runShellScript( wpEnvPath, [ 'stop' ], envDir );
+				await spawn( wpEnvPath, [ 'stop' ], envDir );
 			}
 		}
 	}
