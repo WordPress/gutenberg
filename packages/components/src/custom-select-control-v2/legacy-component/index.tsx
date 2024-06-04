@@ -5,6 +5,11 @@
 import * as Ariakit from '@ariakit/react';
 
 /**
+ * WordPress dependencies
+ */
+import { useEffect } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import _CustomSelect from '../custom-select';
@@ -50,6 +55,14 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 			onChange( changeObject );
 		},
 	} );
+
+	useEffect( () => {
+		// This is a workaround for selecting the right item upon mount
+		if ( value ) {
+			store.setValue( value.name );
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [] );
 
 	const children = options.map(
 		( { name, key, __experimentalHint, style, className } ) => {
