@@ -50,6 +50,37 @@ describe( 'block parser', () => {
 	} );
 
 	describe( 'parseRawBlock', () => {
+		it( 'should apply className block validation fixes', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: {
+					fruit: {
+						type: 'string',
+						source: 'text',
+						selector: 'div',
+					},
+				},
+				save: ( { attributes } ) => (
+					// eslint-disable-next-line react/no-unknown-property
+					<div class={ attributes.className }>
+						{ attributes.fruit }
+					</div>
+				),
+			} );
+
+			const block = parseRawBlock( {
+				blockName: 'core/test-block',
+				innerHTML: '<div class="custom-class">Bananas</div>',
+				attrs: { fruit: 'Bananas' },
+			} );
+
+			expect( block.name ).toEqual( 'core/test-block' );
+			expect( block.attributes ).toEqual( {
+				fruit: 'Bananas',
+				className: 'custom-class',
+			} );
+		} );
+
 		it( 'should create the requested block if it exists', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
