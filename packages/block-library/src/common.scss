@@ -32,16 +32,17 @@
 }
 
 // Text alignments.
-.has-text-align-center {
+// Increase specificity so that styles applied via the global styles can be overridden in block instances.
+:root .has-text-align-center {
 	text-align: center;
 }
 
-.has-text-align-left {
+:root .has-text-align-left {
 	/*rtl:ignore*/
 	text-align: left;
 }
 
-.has-text-align-right {
+:root .has-text-align-right {
 	/*rtl:ignore*/
 	text-align: right;
 }
