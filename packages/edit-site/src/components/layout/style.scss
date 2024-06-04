@@ -133,10 +133,8 @@
 }
 
 /* stylelint-disable -- Disable reason: View Transitions not supported properly by stylelint. */
-html:active-view-transition-type(canvas-mode-edit) {
-	&::view-transition-group(toggle) {
-		animation-delay: 255ms;
-	}
+html.canvas-mode-edit-transition::view-transition-group(toggle) {
+	animation-delay: 255ms;
 }
 /* stylelint-enable  */
 

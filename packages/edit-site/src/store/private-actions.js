@@ -56,11 +56,16 @@ export const setCanvasMode =
 		if ( ! document.startViewTransition ) {
 			switchCanvasMode();
 		} else {
-			document.startViewTransition( {
-				update: () => {
-					switchCanvasMode();
-				},
-				types: [ 'canvas-mode-' + mode ],
+			document.documentElement.classList.add(
+				`canvas-mode-${ mode }-transition`
+			);
+			const transition = document.startViewTransition( () =>
+				switchCanvasMode()
+			);
+			transition.finished.finally( () => {
+				document.documentElement.classList.remove(
+					`canvas-mode-${ mode }-transition`
+				);
 			} );
 		}
 	};
