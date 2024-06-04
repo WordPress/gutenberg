@@ -37,14 +37,14 @@ export type TimeInputProps = {
 	is12Hour?: boolean;
 
 	/**
-	 * The 24-hours format value.
+	 * The time value with hours and minutes props
+	 * - hours: 24-hours format value
+	 * - minutes: minutes value
 	 */
-	hours?: number;
-
-	/**
-	 * The minutes value.
-	 */
-	minutes?: number;
+	value?: {
+		hours: number;
+		minutes: number;
+	};
 
 	/**
 	 * The minutes control props.

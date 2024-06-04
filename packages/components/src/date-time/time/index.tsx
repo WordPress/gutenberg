@@ -180,8 +180,10 @@ export function TimePicker( {
 					className="components-datetime__time-wrapper" // Unused, for backwards compatibility.
 				>
 					<TimeInput
-						hours={ Number( hours ) }
-						minutes={ Number( minutes ) }
+						value={ {
+							hours: Number( hours ),
+							minutes: Number( minutes ),
+						} }
 						is12Hour={ is12Hour }
 						onChange={ onTimeInputChangeCallback }
 					/>

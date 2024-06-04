@@ -13,10 +13,11 @@ describe( 'TimePicker', () => {
 	it( 'should call onChange with updated values | 24-hours format', async () => {
 		const user = userEvent.setup();
 
+		const timeInputValue = { hours: 0, minutes: 0 };
 		const onChangeSpy = jest.fn();
 
 		render(
-			<TimeInput hours={ 0 } minutes={ 0 } onChange={ onChangeSpy } />
+			<TimeInput value={ timeInputValue } onChange={ onChangeSpy } />
 		);
 
 		const hoursInput = screen.getByRole( 'spinbutton', { name: 'Hours' } );
@@ -61,13 +62,13 @@ describe( 'TimePicker', () => {
 	it( 'should call onChange with updated values | 12-hours format', async () => {
 		const user = userEvent.setup();
 
+		const timeInputValue = { hours: 0, minutes: 0 };
 		const onChangeSpy = jest.fn();
 
 		render(
 			<TimeInput
 				is12Hour
-				hours={ 0 }
-				minutes={ 0 }
+				value={ timeInputValue }
 				onChange={ onChangeSpy }
 			/>
 		);
@@ -109,12 +110,12 @@ describe( 'TimePicker', () => {
 	it( 'should call onChange with defined minutes steps', async () => {
 		const user = userEvent.setup();
 
+		const timeInputValue = { hours: 0, minutes: 0 };
 		const onChangeSpy = jest.fn();
 
 		render(
 			<TimeInput
-				hours={ 0 }
-				minutes={ 0 }
+				value={ timeInputValue }
 				minutesProps={ { step: 5 } }
 				onChange={ onChangeSpy }
 			/>

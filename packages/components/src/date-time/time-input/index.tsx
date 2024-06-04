@@ -1,8 +1,11 @@
 /**
  * WordPress dependencies
  */
+/**
+ * External dependencies
+ */
 import { __ } from '@wordpress/i18n';
-import { useState, useEffect, useRef } from '@wordpress/element';
+import { useState, useEffect, useRef, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -27,34 +30,41 @@ import type { TimeInputProps } from '../types';
 import type { InputChangeCallback } from '../../input-control/types';
 
 export function TimeInput( {
+	value: entryValue,
 	is12Hour,
-	hours: entryHours = new Date().getHours(),
-	minutes: entryMinutes = new Date().getMinutes(),
 	minutesProps: entryMinutesProps = DEFAULT_MINUTES_PROPS,
 	onChange,
 }: TimeInputProps ) {
-	const [ hours, setHours ] = useState( entryHours );
-	const [ hours12Format, setHours12Format ] = useState(
-		from24hTo12h( entryHours )
+	const value = useMemo(
+		() =>
+			entryValue || {
+				hours: new Date().getHours(),
+				minutes: new Date().getMinutes(),
+			},
+		[ entryValue ]
 	);
-	const [ minutes, setMinutes ] = useState( entryMinutes );
+	const [ hours, setHours ] = useState( value.hours );
+	const [ hours12Format, setHours12Format ] = useState(
+		from24hTo12h( value.hours )
+	);
+	const [ minutes, setMinutes ] = useState( value.minutes );
 	const [ minutesProps, setMinutesProps ] = useState( entryMinutesProps );
 	const [ dayPeriod, setDayPeriod ] = useState(
-		parseDayPeriod( entryHours )
+		parseDayPeriod( value.hours )
 	);
 
-	const prevValues = useRef( { hours: entryHours, minutes: entryMinutes } );
+	const prevValues = useRef( value );
 
 	const buildNumberControlChangeCallback = (
 		method: 'hours' | 'minutes'
 	) => {
-		const callback: InputChangeCallback = ( value, { event } ) => {
+		const callback: InputChangeCallback = ( _value, { event } ) => {
 			if ( ! validateInputElementTarget( event ) ) {
 				return;
 			}
 
 			// We can safely assume value is a number if target is valid.
-			const numberValue = Number( value );
+			const numberValue = Number( _value );
 
 			switch ( method ) {
 				case 'hours':
@@ -79,14 +89,14 @@ export function TimeInput( {
 		return callback;
 	};
 
-	const buildAmPmChangeCallback = ( value: 'AM' | 'PM' ) => {
+	const buildAmPmChangeCallback = ( _value: 'AM' | 'PM' ) => {
 		return () => {
-			if ( dayPeriod === value ) {
+			if ( dayPeriod === _value ) {
 				return;
 			}
 
-			setDayPeriod( value );
-			setHours( from12hTo24h( hours12Format, value === 'PM' ) );
+			setDayPeriod( _value );
+			setHours( from12hTo24h( hours12Format, _value === 'PM' ) );
 		};
 	};
 
@@ -95,12 +105,12 @@ export function TimeInput( {
 	}
 
 	useEffect( () => {
-		setHours( entryHours );
-		setMinutes( entryMinutes );
+		setHours( value.hours );
+		setMinutes( value.minutes );
 
-		setDayPeriod( parseDayPeriod( entryHours ) );
-		setHours12Format( from24hTo12h( entryHours ) );
-	}, [ entryHours, entryMinutes ] );
+		setDayPeriod( parseDayPeriod( value.hours ) );
+		setHours12Format( from24hTo12h( value.hours ) );
+	}, [ value ] );
 
 	useEffect( () => {
 		if (
