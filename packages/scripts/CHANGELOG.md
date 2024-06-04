@@ -6,7 +6,7 @@
 
 ### Breaking Changes
 
-**Note** If you're using @wordpress/scripts for building JS scripts to target WordPress 6.5 or anterior, you should not upgrade to this version and continue using @wordpress/scripts@27.
+**Note** If you're using @wordpress/scripts for building JS scripts to target WordPress 6.5 or earlier, you should not upgrade to this version and continue using @wordpress/scripts@27.
 
 -   Use React's automatic runtime to transform JSX ([#61692](https://github.com/WordPress/gutenberg/pull/61692)). 
 -   Variables like `process.env.IS_GUTENBERG_PLUGIN` have been replaced by `globalThis.IS_GUTENBERG_PLUGIN`. Build systems using `process.env` should be updated ([#61486](https://github.com/WordPress/gutenberg/pull/61486)).
