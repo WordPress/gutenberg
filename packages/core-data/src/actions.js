@@ -798,7 +798,6 @@ export const saveEditedEntityRecord =
 			name,
 			recordId
 		);
-
 		const record = { [ entityIdKey ]: recordId, ...edits };
 		return await {
 			values: dispatch.saveEntityRecord( kind, name, record, options ),
