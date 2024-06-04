@@ -74,7 +74,6 @@ export function DropZoneComponent( {
 	const [ isDraggingOverElement, setIsDraggingOverElement ] =
 		useState< boolean >();
 	const [ type, setType ] = useState< DropType >();
-	//const disableMotion = true;
 	const ref = useDropZone( {
 		onDrop( event ) {
 			const files = event.dataTransfer
