@@ -12,8 +12,9 @@ import { EntitiesSavedStatesExtensible } from './components/entities-saved-state
 import EditorContentSlotFill from './components/editor-interface/content-slot-fill';
 import useBlockEditorSettings from './components/provider/use-block-editor-settings';
 import BackButton from './components/header/back-button';
-import EditorInterface from './components/editor-interface';
 import CreateTemplatePartModal from './components/create-template-part-modal';
+import Editor from './components/editor';
+import EditorInterface from './components/editor-interface';
 import PluginPostExcerpt from './components/post-excerpt/plugin';
 import PreferencesModal from './components/preferences-modal';
 import { usePostActions } from './components/post-actions/actions';
@@ -34,6 +35,7 @@ lock( privateApis, {
 	BackButton,
 	ExperimentalEditorProvider,
 	EntitiesSavedStatesExtensible,
+	Editor,
 	EditorInterface,
 	EditorContentSlotFill,
 	GlobalStylesProvider,
