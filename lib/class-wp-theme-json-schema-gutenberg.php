@@ -96,7 +96,10 @@ class WP_Theme_JSON_Schema_Gutenberg {
 	/**
 	 * Migrates from v2 to v3.
 	 *
-	 * - Sets settings.typography.defaultFontSizes to false.
+	 * - Sets settings.typography.defaultFontSizes to false if settings.typography.fontSizes are defined.
+	 * - Sets settings.spacing.defaultSpacingSizes to false if settings.spacing.spacingSizes are defined.
+	 * - Prevents settings.spacing.spacingSizes from merging with settings.spacing.spacingScale by
+	 *   unsetting spacingScale when spacingSizes are defined.
 	 *
 	 * @since 6.6.0
 	 *
