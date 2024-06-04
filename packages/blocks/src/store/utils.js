@@ -18,3 +18,27 @@ export const getValueFromObjectPath = ( object, path, defaultValue ) => {
 	} );
 	return value ?? defaultValue;
 };
+
+/**
+ * Determine whether a set of object properties matches a given object.
+ *
+ * Given an object of block attributes and an object of variation attributes,
+ * this function checks recursively whether all the variation attributes are
+ * present in the block attributes object.
+ *
+ * @param {Object} blockAttributes     The object to inspect.
+ * @param {Object} variationAttributes The object of property values to match.
+ * @return {boolean} Whether the block attributes match the variation attributes.
+ */
+export function matchesAttributes( blockAttributes, variationAttributes ) {
+	return Object.entries( variationAttributes ).every( ( [ key, value ] ) => {
+		if (
+			typeof value === 'object' &&
+			value !== null &&
+			typeof blockAttributes[ key ] === 'object'
+		) {
+			return matchesAttributes( blockAttributes[ key ], value );
+		}
+		return blockAttributes[ key ] === value;
+	} );
+}
