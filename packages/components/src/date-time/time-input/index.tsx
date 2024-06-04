@@ -16,6 +16,7 @@ import {
 import { HStack } from '../../h-stack';
 import Button from '../../button';
 import ButtonGroup from '../../button-group';
+import { DEFAULT_MINUTES_PROPS } from '../constants';
 import {
 	from12hTo24h,
 	from24hTo12h,
@@ -29,7 +30,7 @@ export function TimeInput( {
 	is12Hour,
 	hours: entryHours = new Date().getHours(),
 	minutes: entryMinutes = new Date().getMinutes(),
-	minutesStep = 1,
+	minutesProps: entryMinutesProps = DEFAULT_MINUTES_PROPS,
 	onChange,
 }: TimeInputProps ) {
 	const [ hours, setHours ] = useState( entryHours );
@@ -37,6 +38,7 @@ export function TimeInput( {
 		from24hTo12h( entryHours )
 	);
 	const [ minutes, setMinutes ] = useState( entryMinutes );
+	const [ minutesProps, setMinutesProps ] = useState( entryMinutesProps );
 	const [ dayPeriod, setDayPeriod ] = useState(
 		parseDayPeriod( entryHours )
 	);
@@ -112,6 +114,12 @@ export function TimeInput( {
 		prevValues.current.minutes = minutes;
 	}, [ onChange, hours, minutes ] );
 
+	useEffect( () => {
+		setMinutesProps(
+			Object.assign( { ...DEFAULT_MINUTES_PROPS }, entryMinutesProps )
+		);
+	}, [ entryMinutesProps ] );
+
 	return (
 		<HStack alignment="left">
 			<TimeWrapper
@@ -149,7 +157,7 @@ export function TimeInput( {
 					hideLabelFromVision
 					__next40pxDefaultSize
 					value={ String( minutes ).padStart( 2, '0' ) }
-					step={ minutesStep }
+					step={ minutesProps.step }
 					min={ 0 }
 					max={ 59 }
 					required

@@ -47,9 +47,11 @@ export type TimeInputProps = {
 	minutes?: number;
 
 	/**
-	 * The minutes control step value.
+	 * The minutes control props.
 	 */
-	minutesStep?: number;
+	minutesProps?: {
+		step?: number;
+	};
 
 	/**
 	 * The function is called when a new time has been selected.

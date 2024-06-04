@@ -115,7 +115,7 @@ describe( 'TimePicker', () => {
 			<TimeInput
 				hours={ 0 }
 				minutes={ 0 }
-				minutesStep={ 5 }
+				minutesProps={ { step: 5 } }
 				onChange={ onChangeSpy }
 			/>
 		);
