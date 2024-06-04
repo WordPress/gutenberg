@@ -203,7 +203,7 @@ export const saveDirtyEntities =
 					registry
 						.dispatch( noticesStore )
 						.createErrorNotice( __( 'Saving failed.' ) );
-				} else {
+				} else if ( ! values.every( ( value ) => value.metaChange ) ) {
 					registry
 						.dispatch( noticesStore )
 						.createSuccessNotice( __( 'Site updated.' ), {

@@ -798,8 +798,12 @@ export const saveEditedEntityRecord =
 			name,
 			recordId
 		);
+
 		const record = { [ entityIdKey ]: recordId, ...edits };
-		return await dispatch.saveEntityRecord( kind, name, record, options );
+		return await {
+			values: dispatch.saveEntityRecord( kind, name, record, options ),
+			metaChange: !! edits?.meta,
+		};
 	};
 
 /**
