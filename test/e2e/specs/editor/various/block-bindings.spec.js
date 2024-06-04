@@ -2044,7 +2044,7 @@ test.describe( 'Block bindings', () => {
 					.getByRole( 'button', { name: 'Edit link', exact: true } )
 					.click();
 				await page
-					.getByPlaceholder( 'Search or type url' )
+					.getByPlaceholder( 'Search or type URL' )
 					.fill( '#url-custom-field-modified' );
 				await pageUtils.pressKeys( 'Enter' );
 
@@ -2103,7 +2103,7 @@ test.describe( 'Block bindings', () => {
 					.getByRole( 'button', { name: 'Edit link', exact: true } )
 					.click();
 				await page
-					.getByPlaceholder( 'Search or type url' )
+					.getByPlaceholder( 'Search or type URL' )
 					.fill( imageCustomFieldSrc );
 				await pageUtils.pressKeys( 'Enter' );
 
