@@ -3,11 +3,5 @@ iframe[name="editor-canvas"] {
 	width: 100%;
 	height: 100%;
 	display: block;
-
-	// Show a dark background in "frame" mode to avoid edge artifacts.
-	// Show a gray background in all other contexts, such as zoom.
-	background-color: $gray-900;
-	.is-full-canvas & {
-		background-color: $gray-300;
-	}
+	background-color: transparent;
 }
