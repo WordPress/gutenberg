@@ -39,26 +39,15 @@ function render_block_core_button( $attributes, $content ) {
 		return $content;
 	}
 
-	// Build a string of the inner text.
-	$text = '';
-	while ( $p->next_token() ) {
-		$token_name = $p->get_token_name();
-		// Stop when encountering the closing tag.
-		if ( $tag === $token_name ) {
-			break;
-		}
-
-		if ( '#text' === $token_name ) {
-			$text .= $p->get_modifiable_text();
-			continue;
-		}
-	}
+	// If the next token is the closing tag, the button is empty.
+	$p->next_token();
+	$is_empty = $p->get_token_name() === $tag;
 
 	/*
 	 * When there's no text, render nothing for the block.
 	 * See https://github.com/WordPress/gutenberg/issues/17221.
 	 */
-	if ( '' === trim( $text ) ) {
+	if ( $is_empty ) {
 		return '';
 	}
 
