@@ -3771,12 +3771,10 @@ class WP_Theme_JSON_Gutenberg {
 	/**
 	 * Sets the spacingSizes array based on the spacingScale values from theme.json.
 	 *
-	 * No longer used since theme.json version 3 as the spacingSizes are now
-	 * automatically generated during construction and merge instead of manually
-	 * set in the resolver.
-	 *
 	 * @since 6.1.0
-	 * @deprecated 6.6.0
+	 * @deprecated 6.6.0 No longer used as the spacingSizes are automatically
+	 *                   generated in the constructor and merge methods instead
+	 *                   of manually after instantiation.
 	 *
 	 * @return null|void
 	 */
