@@ -24,7 +24,6 @@ export type ToolbarProps = {
 	variant?: 'unstyled' | undefined;
 	/**
 	 * Orientation of the toolbar keyboard interactions.
-	 * horizontal or vertical
 	 *
 	 * @default 'horizontal'
 	 */
