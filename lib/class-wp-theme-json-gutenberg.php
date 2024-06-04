@@ -3859,6 +3859,10 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return array The merged set of spacing sizes.
 	 */
 	private static function merge_spacing_sizes( $base, $incoming ) {
+		// Preserve the order if there are no base (spacingScale) values.
+		if ( empty( $base ) ) {
+			return $incoming;
+		}
 		$merged = array();
 		foreach ( $base as $item ) {
 			$merged[ $item['slug'] ] = $item;
@@ -3866,6 +3870,7 @@ class WP_Theme_JSON_Gutenberg {
 		foreach ( $incoming as $item ) {
 			$merged[ $item['slug'] ] = $item;
 		}
+		ksort( $merged, SORT_NUMERIC );
 		return array_values( $merged );
 	}
 
