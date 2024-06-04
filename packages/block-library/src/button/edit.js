@@ -17,12 +17,11 @@ import { unlock } from '../lock-unlock';
 import { __ } from '@wordpress/i18n';
 import { useEffect, useState, useRef, useMemo } from '@wordpress/element';
 import {
-	Button,
-	ButtonGroup,
 	PanelBody,
 	TextControl,
 	ToolbarButton,
 	Popover,
+	FontSizePicker,
 } from '@wordpress/components';
 import {
 	AlignmentControl,
@@ -125,24 +124,34 @@ function WidthPanel( { selectedWidth, setAttributes } ) {
 
 	return (
 		<PanelBody title={ __( 'Settings' ) }>
-			<ButtonGroup aria-label={ __( 'Button width' ) }>
-				{ [ 25, 50, 75, 100 ].map( ( widthValue ) => {
-					return (
-						<Button
-							key={ widthValue }
-							size="small"
-							variant={
-								widthValue === selectedWidth
-									? 'primary'
-									: undefined
-							}
-							onClick={ () => handleChange( widthValue ) }
-						>
-							{ widthValue }%
-						</Button>
-					);
-				} ) }
-			</ButtonGroup>
+			<FontSizePicker
+				fontSizes={ [
+					{
+						name: '25%',
+						size: '25%',
+						slug: '25',
+					},
+					{
+						name: '50%',
+						size: '50%',
+						slug: '50',
+					},
+					{
+						name: '75%',
+						size: '75%',
+						slug: '75',
+					},
+					{
+						name: '100%',
+						size: '100%',
+						slug: '100',
+					},
+				] }
+				withSlider
+				units={ [ '%', 'px', 'rem' ] }
+				onChange={ ( widthValue ) => handleChange( widthValue ) }
+				value={ selectedWidth }
+			/>
 		</PanelBody>
 	);
 }
@@ -262,10 +271,10 @@ function ButtonEdit( props ) {
 			<div
 				{ ...blockProps }
 				className={ clsx( blockProps.className, {
-					[ `has-custom-width wp-block-button__width-${ width }` ]:
-						width,
+					[ `has-custom-width` ]: width,
 					[ `has-custom-font-size` ]: blockProps.style.fontSize,
 				} ) }
+				style={ { width } }
 			>
 				<RichText
 					ref={ mergedRef }
