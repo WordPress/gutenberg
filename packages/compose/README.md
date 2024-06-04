@@ -69,7 +69,7 @@ This is inspired by `lodash`'s `flowRight` function.
 
 _Related_
 
--   <https://docs-lodash.com/v4/flow-right/>
+-   <https://lodash.com/docs/4#flow-right>
 
 ### createHigherOrderComponent
 
@@ -145,7 +145,7 @@ This is inspired by `lodash`'s `flow` function.
 
 _Related_
 
--   <https://docs-lodash.com/v4/flow/>
+-   <https://lodash.com/docs/4#flow>
 
 ### pure
 
@@ -247,7 +247,7 @@ Debounces a function similar to Lodash's `debounce`. A new debounced function wi
 
 _Related_
 
--   <https://docs-lodash.com/v4/debounce/>
+-   <https://lodash.com/docs/4#debounce>
 
 _Parameters_
 
@@ -535,7 +535,7 @@ Throttles a function similar to Lodash's `throttle`. A new throttled function wi
 
 _Related_
 
--   <https://docs-lodash.com/v4/throttle/>
+-   <https://lodash.com/docs/4#throttle>
 
 _Parameters_
 

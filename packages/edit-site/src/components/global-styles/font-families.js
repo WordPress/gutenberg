@@ -7,8 +7,8 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 	Button,
-	Tooltip,
 } from '@wordpress/components';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { settings } from '@wordpress/icons';
 import { useContext } from '@wordpress/element';
 
@@ -21,18 +21,31 @@ import FontLibraryProvider, {
 import FontLibraryModal from './font-library-modal';
 import FontFamilyItem from './font-family-item';
 import Subtitle from './subtitle';
+import { setUIValuesNeeded } from './font-library-modal/utils';
+import { unlock } from '../../lock-unlock';
+
+const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 
 function FontFamilies() {
-	const { modalTabOpen, toggleModal, themeFonts, customFonts } =
-		useContext( FontLibraryContext );
-
+	const { modalTabOpen, setModalTabOpen } = useContext( FontLibraryContext );
+	const [ fontFamilies ] = useGlobalSetting( 'typography.fontFamilies' );
+	const themeFonts = fontFamilies?.theme
+		? fontFamilies.theme
+				.map( ( f ) => setUIValuesNeeded( f, { source: 'theme' } ) )
+				.sort( ( a, b ) => a.name.localeCompare( b.name ) )
+		: [];
+	const customFonts = fontFamilies?.custom
+		? fontFamilies.custom
+				.map( ( f ) => setUIValuesNeeded( f, { source: 'custom' } ) )
+				.sort( ( a, b ) => a.name.localeCompare( b.name ) )
+		: [];
 	const hasFonts = 0 < customFonts.length || 0 < themeFonts.length;
 
 	return (
 		<>
 			{ !! modalTabOpen && (
 				<FontLibraryModal
-					onRequestClose={ () => toggleModal() }
+					onRequestClose={ () => setModalTabOpen( null ) }
 					defaultTabId={ modalTabOpen }
 				/>
 			) }
@@ -40,18 +53,12 @@ function FontFamilies() {
 			<VStack spacing={ 2 }>
 				<HStack justify="space-between">
 					<Subtitle level={ 3 }>{ __( 'Fonts' ) }</Subtitle>
-					<HStack justify="flex-end">
-						<Tooltip text={ __( 'Manage fonts' ) }>
-							<Button
-								onClick={ () =>
-									toggleModal( 'installed-fonts' )
-								}
-								aria-label={ __( 'Manage fonts' ) }
-								icon={ settings }
-								size={ 'small' }
-							/>
-						</Tooltip>
-					</HStack>
+					<Button
+						onClick={ () => setModalTabOpen( 'installed-fonts' ) }
+						label={ __( 'Manage fonts' ) }
+						icon={ settings }
+						size="small"
+					/>
 				</HStack>
 				{ hasFonts ? (
 					<ItemGroup isBordered isSeparated>
@@ -68,7 +75,7 @@ function FontFamilies() {
 						<Button
 							className="edit-site-global-styles-font-families__add-fonts"
 							variant="secondary"
-							onClick={ () => toggleModal( 'upload-fonts' ) }
+							onClick={ () => setModalTabOpen( 'upload-fonts' ) }
 						>
 							{ __( 'Add fonts' ) }
 						</Button>
