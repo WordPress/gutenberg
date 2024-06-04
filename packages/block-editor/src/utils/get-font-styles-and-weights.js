@@ -80,13 +80,20 @@ export function getFontStylesAndWeights( fontFamilyFaces ) {
 	fontFamilyFaces.forEach( ( face ) => {
 		const fontStyle = formatFontStyle( face.fontStyle );
 		const fontWeight = formatFontWeight( face.fontWeight );
+
+		// Check if font weight includes a space that is not at the start or end of the string. If so, it must be a variable font. e.g. "100 900"
+		if ( /\s/.test( fontWeight.value.trim() ) ) {
+			isVariableFont = true;
+			fontWeight.value = fontWeight.value.replace( /\s+/g, '-' );
+		}
+
 		const optionName =
 			fontStyle.value === 'normal'
 				? fontWeight.name
 				: `${ fontWeight.name } ${ fontStyle.name }`;
 
 		allStylesAndWeights.push( {
-			key: `${ fontWeight.value }-${ fontStyle.value }`,
+			key: `${ fontStyle.value }-${ fontWeight.value }`,
 			name: optionName,
 			style: {
 				fontStyle: fontStyle.value,
@@ -109,11 +116,6 @@ export function getFontStylesAndWeights( fontFamilyFaces ) {
 					( weight ) => weight.value === fontWeight.value
 				)
 			) {
-				// Check if font weight includes a space that is not at the start or end of the string. If so, it must be a variable font. e.g. "100 900"
-				if ( /\s/.test( face.fontWeight.trim() ) ) {
-					isVariableFont = true;
-				}
-
 				fontWeights.push( fontWeight );
 			}
 		}

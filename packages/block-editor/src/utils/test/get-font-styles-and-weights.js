@@ -69,7 +69,7 @@ describe( 'getFontStylesAndWeights', () => {
 		expect( getFontStylesAndWeights( fontFamilyFaces ) ).toEqual( {
 			allStylesAndWeights: [
 				{
-					key: '400-italic',
+					key: 'italic-400',
 					name: 'Regular Italic',
 					style: {
 						fontStyle: 'italic',
@@ -93,7 +93,7 @@ describe( 'getFontStylesAndWeights', () => {
 		} );
 	} );
 
-	it( 'should return all available style and weight options if font weights string includes a space', () => {
+	it( 'should return all available style and weight options if `fontWeight` includes a space', () => {
 		const fontFamilyFaces = [
 			{
 				fontFamily: 'Inter',
@@ -106,11 +106,11 @@ describe( 'getFontStylesAndWeights', () => {
 		expect( getFontStylesAndWeights( fontFamilyFaces ) ).toEqual( {
 			allStylesAndWeights: [
 				{
-					key: '100 900-normal',
-					name: '100 900 Regular',
+					key: 'normal-100-900',
+					name: '100 900',
 					style: {
 						fontStyle: 'normal',
-						fontWeight: '100 900',
+						fontWeight: '100-900',
 					},
 				},
 			],
