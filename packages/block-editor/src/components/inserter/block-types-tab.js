@@ -4,10 +4,12 @@
 import { __, _x } from '@wordpress/i18n';
 import { useMemo, useEffect, forwardRef } from '@wordpress/element';
 import { useAsyncList } from '@wordpress/compose';
-
+import { getBlockType } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
+import { store as blockEditorStore } from '../../store';
 import BlockTypesList from '../block-types-list';
 import InserterPanel from './panel';
 import useBlockTypesState from './hooks/use-block-types-state';
@@ -173,12 +175,32 @@ export function BlockTypesTab(
 		onInsert
 	);
 
+	const { getBlockName } = useSelect( blockEditorStore );
+
 	if ( ! items.length ) {
 		return <InserterNoResults />;
 	}
 
-	const itemsForCurrentRoot = [];
-	const itemsRemaining = [];
+	const currentlySelectedBlockType = getBlockType(
+		getBlockName( rootClientId )
+	);
+
+	let allCategories = [];
+
+	if ( rootClientId && categories.length ) {
+		allCategories = [
+			{
+				slug: currentlySelectedBlockType.name,
+				title: currentlySelectedBlockType.title,
+				icon: null,
+			},
+			...categories,
+		];
+	} else {
+		allCategories = [ ...categories ];
+	}
+
+	const allItems = [];
 
 	for ( const item of items ) {
 		// Skip reusable blocks, they moved to the patterns tab.
@@ -187,36 +209,26 @@ export function BlockTypesTab(
 		}
 
 		if ( rootClientId && item.rootClientId === rootClientId ) {
-			itemsForCurrentRoot.push( item );
+			allItems.push( {
+				...item,
+				category: currentlySelectedBlockType.name,
+			} );
 		} else {
-			itemsRemaining.push( item );
+			allItems.push( { ...item } );
 		}
 	}
 
 	return (
 		<InserterListbox>
 			<div ref={ ref }>
-				{ !! itemsForCurrentRoot.length && (
-					<>
-						<BlockTypesTabPanel
-							items={ itemsForCurrentRoot }
-							categories={ categories }
-							collections={ collections }
-							onSelectItem={ onSelectItem }
-							onHover={ onHover }
-							showMostUsedBlocks={ showMostUsedBlocks }
-							className="block-editor-inserter__insertable-blocks-at-selection"
-						/>
-					</>
-				) }
 				<BlockTypesTabPanel
-					items={ itemsRemaining }
-					categories={ categories }
+					items={ allItems }
+					categories={ allCategories }
 					collections={ collections }
 					onSelectItem={ onSelectItem }
 					onHover={ onHover }
 					showMostUsedBlocks={ showMostUsedBlocks }
-					className="block-editor-inserter__all-blocks"
+					className="block-editor-inserter"
 				/>
 			</div>
 		</InserterListbox>
