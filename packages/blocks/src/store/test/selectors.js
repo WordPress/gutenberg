@@ -494,6 +494,51 @@ describe( 'selectors', () => {
 					} )
 				).toEqual( variations[ 1 ] );
 			} );
+			it( 'should compare object attributes in the isActive array based on given properties', () => {
+				const variations = [
+					{
+						name: 'variation-1',
+						attributes: {
+							testAttribute: {
+								nestedProperty: 1,
+								secondNestedProperty: 10,
+							},
+						},
+						isActive: [ 'testAttribute' ],
+					},
+					{
+						name: 'variation-2',
+						attributes: {
+							testAttribute: {
+								nestedProperty: 2,
+								secondNestedProperty: 20,
+							},
+						},
+						isActive: [ 'testAttribute' ],
+					},
+				];
+				const state =
+					createBlockVariationsStateWithTestBlockType( variations );
+
+				expect(
+					getActiveBlockVariation( state, blockName, {
+						testAttribute: {
+							nestedProperty: 1,
+							secondNestedProperty: 10,
+							otherNestedProperty: 5555,
+						},
+					} )
+				).toEqual( variations[ 0 ] );
+				expect(
+					getActiveBlockVariation( state, blockName, {
+						testAttribute: {
+							nestedProperty: 2,
+							secondNestedProperty: 20,
+							otherNestedProperty: 5555,
+						},
+					} )
+				).toEqual( variations[ 1 ] );
+			} );
 			it( 'should return the active variation based on the given isActive array (multiple values)', () => {
 				const variations = [
 					{
