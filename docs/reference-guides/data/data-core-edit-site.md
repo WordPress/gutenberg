@@ -58,7 +58,7 @@ _Parameters_
 
 _Returns_
 
--   `string?`: Post ID.
+-   `?string`: Post ID.
 
 ### getEditedPostType
 
@@ -70,7 +70,7 @@ _Parameters_
 
 _Returns_
 
--   `TemplateType?`: Template type.
+-   `?TemplateType`: Template type.
 
 ### getEditorMode
 

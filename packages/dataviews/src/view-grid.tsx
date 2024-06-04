@@ -22,16 +22,7 @@ import { __ } from '@wordpress/i18n';
 import ItemActions from './item-actions';
 import SingleSelectionCheckbox from './single-selection-checkbox';
 import { useHasAPossibleBulkAction } from './bulk-actions';
-import type {
-	Action,
-	AnyItem,
-	NormalizedField,
-	ViewGrid as ViewGridType,
-	ViewProps,
-} from './types';
-
-interface ViewGridProps< Item extends AnyItem >
-	extends ViewProps< Item, ViewGridType > {}
+import type { Action, AnyItem, NormalizedField, ViewGridProps } from './types';
 
 interface GridItemProps< Item extends AnyItem > {
 	selection: string[];
@@ -44,7 +35,7 @@ interface GridItemProps< Item extends AnyItem > {
 	primaryField?: NormalizedField< Item >;
 	visibleFields: NormalizedField< Item >[];
 	badgeFields: NormalizedField< Item >[];
-	columnFields: string[];
+	columnFields?: string[];
 }
 
 function GridItem< Item extends AnyItem >( {
@@ -140,7 +131,7 @@ function GridItem< Item extends AnyItem >( {
 						return (
 							<FlexItem
 								key={ field.id }
-								className={ 'dataviews-view-grid__field-value' }
+								className="dataviews-view-grid__field-value"
 							>
 								{ renderedValue }
 							</FlexItem>
@@ -237,7 +228,7 @@ export default function ViewGrid< Item extends AnyItem >( {
 		<>
 			{ hasData && (
 				<Grid
-					gap={ 6 }
+					gap={ 8 }
 					columns={ 2 }
 					alignment="top"
 					className="dataviews-view-grid"

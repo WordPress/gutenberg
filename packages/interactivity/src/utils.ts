@@ -50,6 +50,18 @@ const afterNextFrame = ( callback: () => void ) => {
 };
 
 /**
+ * Returns a promise that resolves after yielding to main.
+ *
+ * @return Promise
+ */
+export const yieldToMain = () => {
+	return new Promise( ( resolve ) => {
+		// TODO: Use scheduler.yield() when available.
+		setTimeout( resolve, 0 );
+	} );
+};
+
+/**
  * Creates a Flusher object that can be used to flush computed values and notify listeners.
  *
  * Using the mangled properties:
@@ -316,8 +328,7 @@ const logged: Set< string > = new Set();
  * @param message Message to show in the warning.
  */
 export const warn = ( message: string ): void => {
-	// @ts-expect-error
-	if ( typeof SCRIPT_DEBUG !== 'undefined' && SCRIPT_DEBUG === true ) {
+	if ( globalThis.SCRIPT_DEBUG ) {
 		if ( logged.has( message ) ) {
 			return;
 		}

@@ -3,7 +3,9 @@
 @import "./components/autocompleters/style.scss";
 @import "./components/block-manager/style.scss";
 @import "./components/collapsible-block-toolbar/style.scss";
+@import "./components/create-template-part-modal/style.scss";
 @import "./components/block-settings-menu/style.scss";
+@import "./components/blog-title/style.scss";
 @import "./components/document-bar/style.scss";
 @import "./components/document-outline/style.scss";
 @import "./components/document-tools/style.scss";
@@ -14,6 +16,7 @@
 @import "./components/inserter-sidebar/style.scss";
 @import "./components/keyboard-shortcut-help-modal/style.scss";
 @import "./components/list-view-sidebar/style.scss";
+@import "./components/page-attributes/style.scss";
 @import "./components/post-author/style.scss";
 @import "./components/post-actions/style.scss";
 @import "./components/post-card-panel/style.scss";
@@ -32,6 +35,7 @@
 @import "./components/post-schedule/style.scss";
 @import "./components/post-slug/style.scss";
 @import "./components/post-status/style.scss";
+@import "./components/post-sticky/style.scss";
 @import "./components/post-sync-status/style.scss";
 @import "./components/post-taxonomies/style.scss";
 @import "./components/post-template/style.scss";
@@ -39,11 +43,16 @@
 @import "./components/post-title/style.scss";
 @import "./components/post-url/style.scss";
 @import "./components/post-visibility/style.scss";
+@import "./components/posts-per-page/style.scss";
 @import "./components/post-trash/style.scss";
 @import "./components/preview-dropdown/style.scss";
+@import "./components/resizable-editor/style.scss";
 @import "./components/save-publish-panels/style.scss";
 @import "./components/start-page-options/style.scss";
 @import "./components/start-template-options/style.scss";
 @import "./components/sidebar/style.scss";
+@import "./components/site-discussion/style.scss";
 @import "./components/table-of-contents/style.scss";
 @import "./components/template-areas/style.scss";
+@import "./components/text-editor/style.scss";
+@import "./components/visual-editor/style.scss";

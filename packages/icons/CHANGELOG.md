@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 10.0.0 (2024-05-31)
+
+### Breaking Changes
+
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
 ## 9.49.0 (2024-05-16)
 
 ## 9.48.0 (2024-05-02)
@@ -10,7 +16,7 @@
 
 ## 9.46.0 (2024-04-03)
 
-- Add new `chevronDownSmall` icon.
+-   Add new `chevronDownSmall` icon.
 
 ## 9.45.0 (2024-03-21)
 
@@ -32,7 +38,7 @@
 
 ### New features
 
-- Add new `funnel` icon.
+-   Add new `funnel` icon.
 
 ## 9.36.0 (2023-11-02)
 
@@ -123,14 +129,17 @@
 ## 9.0.0 (2022-05-18)
 
 ### Breaking Changes
+
 -   Removed icons no longer used by the UI: `commentTitle`, `postTitle`, `queryTitle`, `archiveTitle`.
 
 ### Enhancement
+
 -   Update the `title` icon to match g2 design language. ([#40596](https://github.com/WordPress/gutenberg/pull/40596))
 
 ## 8.4.0 (2022-05-04)
 
 ## 8.3.0 (2022-04-21)
+
 ### New Features
 
 -   Add new `filter` icon. ([#40435](https://github.com/WordPress/gutenberg/pull/40435))

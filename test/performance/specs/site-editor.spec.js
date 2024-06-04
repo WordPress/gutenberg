@@ -81,6 +81,7 @@ test.describe( 'Site Editor Performance', () => {
 				await admin.visitSiteEditor( {
 					postId: draftId,
 					postType: 'page',
+					canvas: 'edit',
 				} );
 
 				// Wait for the first block.
@@ -131,11 +132,11 @@ test.describe( 'Site Editor Performance', () => {
 			await admin.visitSiteEditor( {
 				postId: draftId,
 				postType: 'page',
+				canvas: 'edit',
 			} );
 
 			// Enter edit mode (second click is needed for the legacy edit mode).
 			const canvas = await perfUtils.getCanvas();
-			await canvas.locator( 'body' ).click();
 
 			// Run the test with the sidebar closed
 			const toggleSidebarButton = page
@@ -211,6 +212,7 @@ test.describe( 'Site Editor Performance', () => {
 				metrics,
 			} ) => {
 				await admin.visitSiteEditor( {
+					// The old URL is supported in both previous versions and new versions.
 					path: '/wp_template',
 				} );
 
@@ -331,7 +333,7 @@ test.describe( 'Site Editor Performance', () => {
 						.click();
 				} else {
 					await page
-						.getByRole( 'button', { name: 'Transform into:' } )
+						.getByRole( 'button', { name: 'Design' } )
 						.click();
 				}
 

@@ -33,7 +33,6 @@ import {
 	ColorPicker,
 	BottomSheetConsumer,
 	useConvertUnitToMobile,
-	useMobileGlobalStylesColors,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -47,6 +46,8 @@ import {
 	getColorObjectByAttributeValues,
 	getGradientValueBySlug,
 	store as blockEditorStore,
+	useGlobalStyles,
+	useMobileGlobalStylesColors,
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { useDispatch, withSelect, withDispatch } from '@wordpress/data';
@@ -156,9 +157,11 @@ const Cover = ( {
 		mediaUploadSync();
 	}, [] );
 
+	const globalStyles = useGlobalStyles();
 	const convertedMinHeight = useConvertUnitToMobile(
 		minHeight || COVER_DEFAULT_HEIGHT,
-		minHeightUnit
+		minHeightUnit,
+		globalStyles
 	);
 
 	const isImage = backgroundType === MEDIA_TYPE_IMAGE;
@@ -509,7 +512,7 @@ const Cover = ( {
 						muted
 						disableFocus
 						repeat
-						resizeMode={ 'cover' }
+						resizeMode="cover"
 						source={ { uri: url } }
 						onLoad={ onVideoLoad }
 						onLoadStart={ onVideoLoadStart }

@@ -2,25 +2,39 @@
 	color: $gray-800;
 	background: $white;
 	height: 100%;
+	/* stylelint-disable-next-line property-no-unknown -- '@container' not globally permitted */
+	container: edit-site-page / inline-size;
+	transition: width ease-out 0.2s;
+	@include reduce-motion("transition");
 }
 
 .edit-site-page-header {
-	padding: $grid-unit-20 $grid-unit-40;
-	min-height: $grid-unit * 9;
+	padding: $grid-unit-20 $grid-unit-60;
 	border-bottom: 1px solid $gray-100;
 	background: $white;
 	position: sticky;
 	top: 0;
 	z-index: z-index(".edit-site-page-header");
-	.components-text {
-		color: $gray-800;
-	}
+	transition: padding ease-out 0.1s;
+	@include reduce-motion("transition");
+
 	.components-heading {
 		color: $gray-900;
 	}
+
+	.edit-site-page-header__page-title {
+		min-height: $grid-unit-50;
+	}
+
 	.edit-site-page-header__sub-title {
-		margin-top: $grid-unit-10;
-		color: $gray-700;
+		margin-bottom: $grid-unit-10;
+	}
+}
+
+/* stylelint-disable-next-line scss/at-rule-no-unknown -- '@container' not globally permitted */
+@container (max-width: 430px) {
+	.edit-site-page-header {
+		padding: $grid-unit-20 $grid-unit-30;
 	}
 }
 

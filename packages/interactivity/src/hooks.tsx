@@ -1,5 +1,3 @@
-/* @jsx createElement */
-
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable react-hooks/exhaustive-deps */
 
@@ -21,7 +19,7 @@ import type { VNode, Context, RefObject } from 'preact';
  */
 import { store, stores, universalUnlock } from './store';
 import { warn } from './utils';
-interface DirectiveEntry {
+export interface DirectiveEntry {
 	value: string | object;
 	namespace: string;
 	suffix: string;
@@ -352,17 +350,15 @@ const Directives = ( {
 
 	// Recursively render the wrapper for the next priority level.
 	const children =
-		nextPriorityLevels.length > 0 ? (
-			<Directives
-				directives={ directives }
-				priorityLevels={ nextPriorityLevels }
-				element={ element }
-				originalProps={ originalProps }
-				previousScope={ scope }
-			/>
-		) : (
-			element
-		);
+		nextPriorityLevels.length > 0
+			? createElement( Directives, {
+					directives,
+					priorityLevels: nextPriorityLevels,
+					element,
+					originalProps,
+					previousScope: scope,
+			  } )
+			: element;
 
 	const props = { ...originalProps, children };
 	const directiveArgs = {

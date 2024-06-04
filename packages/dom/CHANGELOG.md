@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 4.0.0 (2024-05-31)
+
+### Breaking Changes
+
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
 ## 3.58.0 (2024-05-16)
 
 ## 3.57.0 (2024-05-02)
@@ -10,7 +16,7 @@
 
 ## 3.55.0 (2024-04-03)
 
-- fix return types of `focus.tabbable` methods to be `HTMLElement` instead of `Element`.
+-   fix return types of `focus.tabbable` methods to be `HTMLElement` instead of `Element`.
 
 ## 3.54.0 (2024-03-21)
 
@@ -94,7 +100,7 @@
 
 ## 3.14.0 (2022-07-27)
 
-- `getRectangleFromRange` may now return `null`.
+-   `getRectangleFromRange` may now return `null`.
 
 ## 3.13.0 (2022-07-13)
 
@@ -108,7 +114,7 @@
 
 ### Deprecation
 
-- Deprecate `isNumberInput`, as it is no longer used internally ([#40896](https://github.com/WordPress/gutenberg/pull/40896)).
+-   Deprecate `isNumberInput`, as it is no longer used internally ([#40896](https://github.com/WordPress/gutenberg/pull/40896)).
 
 ## 3.8.0 (2022-05-04)
 

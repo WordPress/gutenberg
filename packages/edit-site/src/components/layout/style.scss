@@ -162,15 +162,13 @@
 	position: relative;
 	color: $white;
 	border-radius: 0;
-	height: $header-height +  $border-width;
+	height: $header-height;
 	width: $header-height;
-	margin-bottom: -  $border-width;
 	overflow: hidden;
 	padding: 0;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	border-bottom: 1px solid transparent;
 
 	&:hover,
 	&:active {
@@ -276,4 +274,12 @@
 		border-radius: 8px;
 		margin: $canvas-padding $canvas-padding $canvas-padding 0;
 	}
+}
+
+.edit-site .components-editor-notices__snackbar {
+	position: fixed;
+	right: 0;
+	bottom: 16px;
+	padding-left: 16px;
+	padding-right: 16px;
 }

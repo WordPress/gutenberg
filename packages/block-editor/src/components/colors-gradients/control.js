@@ -21,6 +21,7 @@ import {
 import { useSettings } from '../use-settings';
 import { unlock } from '../../lock-unlock';
 
+const { Tabs } = unlock( componentsPrivateApis );
 const colorsAndGradientKeys = [
 	'colors',
 	'disableCustomColors',
@@ -106,11 +107,6 @@ function ColorGradientControlInner( {
 		</div>
 	);
 
-	// Unlocking `Tabs` too early causes the `unlock` method to receive an empty
-	// object, due to circular dependencies.
-	// See https://github.com/WordPress/gutenberg/issues/52692
-	const { Tabs } = unlock( componentsPrivateApis );
-
 	return (
 		<BaseControl
 			__nextHasNoMarginBottom
@@ -149,18 +145,14 @@ function ColorGradientControlInner( {
 								</Tabs.TabList>
 								<Tabs.TabPanel
 									tabId={ TAB_IDS.color }
-									className={
-										'block-editor-color-gradient-control__panel'
-									}
+									className="block-editor-color-gradient-control__panel"
 									focusable={ false }
 								>
 									{ tabPanels.color }
 								</Tabs.TabPanel>
 								<Tabs.TabPanel
 									tabId={ TAB_IDS.gradient }
-									className={
-										'block-editor-color-gradient-control__panel'
-									}
+									className="block-editor-color-gradient-control__panel"
 									focusable={ false }
 								>
 									{ tabPanels.gradient }

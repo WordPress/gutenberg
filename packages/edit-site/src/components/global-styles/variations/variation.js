@@ -30,6 +30,7 @@ export default function Variation( { variation, children, isPill } ) {
 			user: {
 				settings: variation.settings ?? {},
 				styles: variation.styles ?? {},
+				_links: variation._links ?? {},
 			},
 			base,
 			merged: mergeBaseAndUserConfigs( base, variation ),
@@ -42,6 +43,7 @@ export default function Variation( { variation, children, isPill } ) {
 		setUserConfig( () => ( {
 			settings: variation.settings,
 			styles: variation.styles,
+			_links: variation._links,
 		} ) );
 	};
 

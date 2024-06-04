@@ -3,6 +3,11 @@
  */
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import type { Operator } from './types';
+
 // Filter operators.
 export const OPERATOR_IS = 'is';
 export const OPERATOR_IS_NOT = 'isNot';
@@ -19,7 +24,7 @@ export const ALL_OPERATORS = [
 	OPERATOR_IS_ALL,
 	OPERATOR_IS_NOT_ALL,
 ];
-export const OPERATORS = {
+export const OPERATORS: Record< Operator, { key: string; label: string } > = {
 	[ OPERATOR_IS ]: {
 		key: 'is-filter',
 		label: __( 'Is' ),

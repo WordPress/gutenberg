@@ -6,10 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import {
-	EditorSnackbars,
-	privateApis as editorPrivateApis,
-} from '@wordpress/editor';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -41,7 +38,6 @@ export default function Page( {
 				) }
 				{ children }
 			</div>
-			<EditorSnackbars />
 		</NavigableRegion>
 	);
 }
