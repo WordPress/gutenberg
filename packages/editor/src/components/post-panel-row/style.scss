@@ -25,6 +25,7 @@
 	.components-button {
 		max-width: 100%;
 		text-align: left;
+		text-wrap: balance; // Fallback for Safari.
 		text-wrap: pretty;
 		height: auto;
 		min-height: $button-size-compact;

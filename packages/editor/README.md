@@ -1592,7 +1592,11 @@ Undocumented declaration.
 
 ### WordCount
 
-Undocumented declaration.
+Renders the word count of the post content.
+
+_Returns_
+
+-   `JSX.Element|null`: The rendered WordCount component.
 
 ### WritingFlow
 
