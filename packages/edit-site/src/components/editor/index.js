@@ -234,7 +234,7 @@ export default function Editor( { isLoading } ) {
 					<SiteEditorMoreMenu />
 					<EditorInterface
 						className={ clsx(
-							'edit-site-editor__interface-skeleton',
+							'edit-site-editor__editor-interface',
 							{
 								'show-icon-labels': showIconLabels,
 							}

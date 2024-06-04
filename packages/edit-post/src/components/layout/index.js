@@ -20,7 +20,6 @@ import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
 import { __, sprintf } from '@wordpress/i18n';
 import { useCallback, useMemo } from '@wordpress/element';
@@ -144,19 +143,16 @@ function useEditorStyles() {
 function Layout( { initialPost } ) {
 	useCommands();
 	useEditPostCommands();
-	const isWideViewport = useViewportMatch( 'large' );
 	const paddingAppenderRef = usePaddingAppender();
 	const shouldIframe = useShouldIframe();
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const {
 		mode,
 		isFullscreenActive,
-		sidebarIsOpened,
 		hasActiveMetaboxes,
 		hasBlockSelected,
 		showIconLabels,
 		isDistractionFree,
-		showBlockBreadcrumbs,
 		showMetaBoxes,
 		hasHistory,
 		isEditingTemplate,
@@ -175,7 +171,6 @@ function Layout( { initialPost } ) {
 				!! select( blockEditorStore ).getBlockSelectionStart(),
 			showIconLabels: get( 'core', 'showIconLabels' ),
 			isDistractionFree: get( 'core', 'distractionFree' ),
-			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
 			showMetaBoxes:
 				select( editorStore ).getRenderingMode() === 'post-only',
 			hasHistory: !! getEditorSettings().onNavigateToPreviousEntityRecord,
@@ -201,11 +196,7 @@ function Layout( { initialPost } ) {
 	}
 
 	const className = clsx( 'edit-post-layout', 'is-mode-' + mode, {
-		'is-sidebar-opened': sidebarIsOpened,
 		'has-metaboxes': hasActiveMetaboxes,
-		'is-distraction-free': isDistractionFree && isWideViewport,
-		'has-block-breadcrumbs':
-			showBlockBreadcrumbs && ! isDistractionFree && isWideViewport,
 	} );
 
 	function onPluginAreaError( name ) {
