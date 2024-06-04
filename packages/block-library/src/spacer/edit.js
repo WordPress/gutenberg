@@ -8,10 +8,10 @@ import clsx from 'clsx';
  */
 import {
 	useBlockProps,
-	useSettings,
 	getCustomValueFromPreset,
 	getSpacingPresetCssVar,
 	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { ResizableBox } from '@wordpress/components';
 import { useState, useEffect } from '@wordpress/element';
@@ -21,8 +21,11 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
+import { unlock } from '../lock-unlock';
 import SpacerControls from './controls';
 import { MIN_SPACER_SIZE } from './constants';
+
+const { useSpacingSizes } = unlock( blockEditorPrivateApis );
 
 const ResizableSpacer = ( {
 	orientation,
@@ -112,7 +115,7 @@ const SpacerEdit = ( {
 	const { layout = {} } = blockStyle;
 	const { selfStretch, flexSize } = layout;
 
-	const [ spacingSizes ] = useSettings( 'spacing.spacingSizes' );
+	const spacingSizes = useSpacingSizes();
 
 	const [ isResizing, setIsResizing ] = useState( false );
 	const [ temporaryHeight, setTemporaryHeight ] = useState( null );

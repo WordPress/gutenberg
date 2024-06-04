@@ -31,7 +31,7 @@ function PatternsListHeader( { filterValue, filteredBlockPatternsLength } ) {
 	return (
 		<Heading
 			level={ 2 }
-			lineHeight={ '48px' }
+			lineHeight="48px"
 			className="block-editor-block-patterns-explorer__search-results-count"
 		>
 			{ sprintf(

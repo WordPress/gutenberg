@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/postcss-plugins-preset",
-	"version": "4.42.0",
+	"version": "5.0.0",
 	"description": "PostCSS sharable plugins preset for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -22,7 +22,8 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=14"
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
 	},
 	"files": [
 		"lib"

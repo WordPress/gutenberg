@@ -58,10 +58,6 @@
 	row-gap: calc(#{$grid-unit-05} * 3);
 }
 
-.edit-site-global-styles-screen-colors__palette-count {
-	color: $gray-700;
-}
-
 .edit-site-global-styles-header__description {
 	padding: 0 $grid-unit-20;
 }
@@ -88,8 +84,7 @@
 	color: $gray-800;
 	font-weight: 600;
 	line-height: 1.2;
-	padding: $grid-unit-20;
-	padding-bottom: 0;
+	padding: $grid-unit-20 $grid-unit-20 0;
 	margin: 0;
 }
 

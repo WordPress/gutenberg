@@ -46,10 +46,6 @@ import {
 	PATTERN_DEFAULT_CATEGORY,
 	OPERATOR_IS,
 } from '../../utils/constants';
-import {
-	duplicatePatternAction,
-	duplicateTemplatePartAction,
-} from './dataviews-pattern-actions';
 import usePatternSettings from './use-pattern-settings';
 import { unlock } from '../../lock-unlock';
 import usePatterns from './use-patterns';
@@ -336,7 +332,7 @@ export default function DataviewsPatterns() {
 		}
 
 		return _fields;
-	}, [ view.type, categoryId, type, authors ] );
+	}, [ view.type, type, authors ] );
 
 	// Reset the page number when the category changes.
 	useEffect( () => {
@@ -361,15 +357,9 @@ export default function DataviewsPatterns() {
 
 	const actions = useMemo( () => {
 		if ( type === TEMPLATE_PART_POST_TYPE ) {
-			return [
-				editAction,
-				duplicateTemplatePartAction,
-				...templatePartActions,
-			].filter( Boolean );
+			return [ editAction, ...templatePartActions ].filter( Boolean );
 		}
-		return [ editAction, duplicatePatternAction, ...patternActions ].filter(
-			Boolean
-		);
+		return [ editAction, ...patternActions ].filter( Boolean );
 	}, [ editAction, type, templatePartActions, patternActions ] );
 	const onChangeView = useCallback(
 		( newView ) => {

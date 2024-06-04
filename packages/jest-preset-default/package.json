@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/jest-preset-default",
-	"version": "11.29.0",
+	"version": "12.0.0",
 	"description": "Default Jest preset for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -21,7 +21,8 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=14"
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
 	},
 	"files": [
 		"scripts",

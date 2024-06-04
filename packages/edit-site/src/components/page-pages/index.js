@@ -498,7 +498,11 @@ export default function PagePages() {
 			actions={
 				addNewLabel && (
 					<>
-						<Button variant="primary" onClick={ openModal }>
+						<Button
+							variant="primary"
+							onClick={ openModal }
+							__next40pxDefaultSize
+						>
 							{ addNewLabel }
 						</Button>
 						{ showAddPageModal && (

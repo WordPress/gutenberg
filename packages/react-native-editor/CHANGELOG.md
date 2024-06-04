@@ -10,6 +10,8 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Prevent deleting content when backspacing in the first Paragraph block [#62069]
+-   [internal] Adds new bridge functionality for updating content  [#61796]
 
 ## 1.119.1
 -   [*] Image corrector - Check the path extension is a valid one [#62190]

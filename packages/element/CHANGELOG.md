@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 6.0.0 (2024-05-31)
+
+### Breaking Changes
+
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
 ## 5.35.0 (2024-05-16)
 
 ## 5.34.0 (2024-05-02)
@@ -136,7 +142,7 @@
 
 ### Bug Fix
 
-- Serialize will now keep correct casing for SVG attributes ([#38936](https://github.com/WordPress/gutenberg/pull/38936)).
+-   Serialize will now keep correct casing for SVG attributes ([#38936](https://github.com/WordPress/gutenberg/pull/38936)).
 
 ## 4.1.0 (2022-01-27)
 

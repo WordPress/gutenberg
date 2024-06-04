@@ -403,12 +403,12 @@ function OrientationControl( { layout, onChange } ) {
 		>
 			<ToggleGroupControlOptionIcon
 				icon={ arrowRight }
-				value={ 'horizontal' }
+				value="horizontal"
 				label={ __( 'Horizontal' ) }
 			/>
 			<ToggleGroupControlOptionIcon
 				icon={ arrowDown }
-				value={ 'vertical' }
+				value="vertical"
 				label={ __( 'Vertical' ) }
 			/>
 		</ToggleGroupControl>
