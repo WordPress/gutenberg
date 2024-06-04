@@ -27,6 +27,20 @@ import { ViewerSlot } from './viewer-slot';
 
 import useRichUrlData from './use-rich-url-data';
 
+/**
+ * Filters the title for display. Removes the protocol and www prefix.
+ *
+ * @param {string} title The title to be filtered.
+ *
+ * @return {string} The filtered title.
+ */
+function filterTitleForDisplay( title ) {
+	// Dervied from `filterURLForDisplay` in `@wordpress/url`.
+	return title
+		.replace( /^[a-z\-.\+]+[0-9]*:(\/\/)?/i, '' )
+		.replace( /^www\./i, '' );
+}
+
 export default function LinkPreview( {
 	value,
 	onEditClick,
@@ -58,19 +72,6 @@ export default function LinkPreview( {
 	const displayTitle =
 		! isEmptyURL &&
 		stripHTML( richData?.title || value?.title || displayURL );
-
-	/**
-	 * Filters the title for display. Removes the protocol and www prefix.
-	 *
-	 * @param {string} title - The title to be filtered.
-	 *
-	 * @return {string} The filtered title.
-	 */
-	function filterTitleForDisplay( title ) {
-		return title
-			.replace( /^[a-z\-.\+]+[0-9]*:(\/\/)?/i, '' )
-			.replace( /^www\./i, '' );
-	}
 
 	const isUrlRedundant =
 		value?.url && filterTitleForDisplay( displayTitle ) === displayURL;
