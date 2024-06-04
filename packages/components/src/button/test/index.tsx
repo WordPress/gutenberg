@@ -242,7 +242,7 @@ describe( 'Button', () => {
 		} );
 
 		it( 'should add only aria-disabled attribute when disabled and isFocusable are true', () => {
-			render( <Button disabled __experimentalIsFocusable /> );
+			render( <Button disabled accessibleWhenDisabled /> );
 			const button = screen.getByRole( 'button' );
 
 			expect( button ).toBeEnabled();
@@ -619,6 +619,14 @@ describe( 'Button', () => {
 				'mixed'
 			);
 		} );
+
+		it( 'should not break when the legacy __experimentalIsFocusable prop is passed', () => {
+			render( <Button disabled __experimentalIsFocusable /> );
+			const button = screen.getByRole( 'button' );
+
+			expect( button ).toBeEnabled();
+			expect( button ).toHaveAttribute( 'aria-disabled' );
+		} );
 	} );
 
 	describe( 'static typing', () => {
@@ -638,7 +646,7 @@ describe( 'Button', () => {
 			{ /* @ts-expect-error */ }
 			<Button type="invalidtype" />
 			{ /* @ts-expect-error - although the runtime behavior will allow this to be an anchor, this is probably a mistake. */ }
-			<Button disabled __experimentalIsFocusable href="foo" />
+			<Button disabled accessibleWhenDisabled href="foo" />
 		</>;
 	} );
 } );
