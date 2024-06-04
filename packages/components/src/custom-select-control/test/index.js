@@ -48,13 +48,23 @@ const props = {
 	],
 };
 
-const ControlledCustomSelectControl = ( { options, ...restProps } ) => {
+const ControlledCustomSelectControl = ( {
+	options,
+	onChange: onChangeMock,
+	...restProps
+} ) => {
 	const [ value, setValue ] = useState( options[ 0 ] );
+	const onChange = ( changeObject ) => {
+		if ( onChangeMock ) {
+			onChangeMock( changeObject );
+		}
+		setValue( changeObject.selectedItem );
+	};
 	return (
 		<UncontrolledCustomSelectControl
 			{ ...restProps }
 			options={ options }
-			onChange={ ( { selectedItem } ) => setValue( selectedItem ) }
+			onChange={ onChange }
 			value={ options.find( ( option ) => option.key === value.key ) }
 		/>
 	);
@@ -238,28 +248,56 @@ describe.each( [
 		).toHaveTextContent( 'Hint' );
 	} );
 
-	it( 'shows selected hint in list of options when added, regardless of __experimentalShowSelectedHint prop', async () => {
+	it( 'Should accept and pass arbitrary properties to the selectedItem object in the onChange callback', async () => {
 		const user = userEvent.setup();
+		const onChangeMock = jest.fn();
 
 		render(
 			<Component
 				{ ...props }
-				label="Custom select"
 				options={ [
+					...props.options,
 					{
-						key: 'one',
-						name: 'One',
-						__experimentalHint: 'Hint',
+						key: 'custom',
+						name: 'Custom Option',
+						className: 'custom-class-name',
+						customProp1: 'value1',
+						customProp2: 42,
+						style: {
+							backgroundColor: 'rgb(127, 255, 212)',
+							rotate: '13deg',
+						},
 					},
 				] }
+				onChange={ onChangeMock }
 			/>
 		);
 
+		const currentSelectedItem = screen.getByRole( 'button', {
+			expanded: false,
+		} );
+
+		await user.click( currentSelectedItem );
 		await user.click(
-			screen.getByRole( 'button', { name: 'Custom select' } )
+			screen.getByRole( 'option', { name: 'Custom Option' } )
 		);
 
-		expect( screen.getByRole( 'option', { name: /hint/i } ) ).toBeVisible();
+		expect( onChangeMock ).toHaveBeenCalledTimes( 1 );
+		expect( onChangeMock ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				selectedItem: expect.objectContaining( {
+					key: 'custom',
+					name: 'Custom Option',
+					className: 'custom-class-name',
+					customProp1: 'value1',
+					customProp2: 42,
+					style: {
+						backgroundColor: 'rgb(127, 255, 212)',
+						rotate: '13deg',
+					},
+				} ),
+			} )
+		);
 	} );
 
 	describe( 'Keyboard behavior and accessibility', () => {
