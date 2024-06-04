@@ -160,7 +160,7 @@ export default function EditorInterface( {
 
 					<EditorContentSlotFill.Slot>
 						{ ( [ editorCanvasView ] ) =>
-							! isPreviewMode && editorCanvasView ? (
+							editorCanvasView ? (
 								editorCanvasView
 							) : (
 								<>
