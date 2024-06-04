@@ -18,7 +18,7 @@ class Render_Block_MediaText_Test extends WP_UnitTestCase {
 	/**
 	 * Post object.
 	 *
-	 * @var object
+	 * @var WP_Post
 	 */
 	protected static $post;
 
