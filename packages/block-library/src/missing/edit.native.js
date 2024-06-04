@@ -67,12 +67,14 @@ export class UnsupportedBlockEdit extends Component {
 	canEditUnsupportedBlock() {
 		const {
 			canEnableUnsupportedBlockEditor,
+			isEditableInUnsupportedBlockEditor,
 			isUnsupportedBlockEditorSupported,
 		} = this.props;
 
 		return (
 			! canEnableUnsupportedBlockEditor &&
-			isUnsupportedBlockEditorSupported
+			isUnsupportedBlockEditorSupported &&
+			isEditableInUnsupportedBlockEditor
 		);
 	}
 
@@ -194,7 +196,8 @@ export class UnsupportedBlockEdit extends Component {
 
 	render() {
 		const { originalName } = this.props.attributes;
-		const { getStylesFromColorScheme, preferredColorScheme } = this.props;
+		const { isSelected, getStylesFromColorScheme, preferredColorScheme } =
+			this.props;
 		const blockType = coreBlocks[ originalName ];
 
 		const title = this.getTitle();
@@ -226,6 +229,7 @@ export class UnsupportedBlockEdit extends Component {
 		const iconClassName = 'unsupported-icon' + '-' + preferredColorScheme;
 		return (
 			<TouchableOpacity
+				disabled={ ! isSelected }
 				activeOpacity={ 0.5 }
 				accessibilityLabel={ __( 'Help button' ) }
 				accessibilityRole="button"
