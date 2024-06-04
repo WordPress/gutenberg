@@ -122,6 +122,7 @@
 
 	.components-panel__body-title .components-button {
 		align-items: flex-start;
+		text-wrap: balance; // Fallback for Safari.
 		text-wrap: pretty;
 	}
 }
