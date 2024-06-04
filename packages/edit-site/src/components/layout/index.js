@@ -80,7 +80,6 @@ export default function Layout() {
 		canvasMode,
 		previousShortcut,
 		nextShortcut,
-		hasBlockBreadcrumbs,
 	} = useSelect( ( select ) => {
 		const { getAllShortcutKeyCombinations } = select(
 			keyboardShortcutsStore
@@ -101,10 +100,6 @@ export default function Layout() {
 			isDistractionFree: select( preferencesStore ).get(
 				'core',
 				'distractionFree'
-			),
-			hasBlockBreadcrumbs: select( preferencesStore ).get(
-				'core',
-				'showBlockBreadcrumbs'
 			),
 			hasBlockSelected:
 				select( blockEditorStore ).getBlockSelectionStart(),
@@ -185,10 +180,6 @@ export default function Layout() {
 						'is-full-canvas': canvasMode === 'edit',
 						'has-fixed-toolbar': hasFixedToolbar,
 						'is-block-toolbar-visible': hasBlockSelected,
-						'has-block-breadcrumbs':
-							hasBlockBreadcrumbs &&
-							! isDistractionFree &&
-							canvasMode === 'edit',
 					}
 				) }
 			>
