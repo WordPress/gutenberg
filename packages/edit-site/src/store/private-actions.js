@@ -14,43 +14,49 @@ export const setCanvasMode =
 	( mode ) =>
 	( { registry, dispatch } ) => {
 		const switchCanvasMode = () => {
-			const isMediumOrBigger =
-				window.matchMedia( '(min-width: 782px)' ).matches;
-			registry.dispatch( blockEditorStore ).clearSelectedBlock();
-			registry.dispatch( editorStore ).setDeviceType( 'Desktop' );
-			registry
-				.dispatch( blockEditorStore )
-				.__unstableSetEditorMode( 'edit' );
-			const isPublishSidebarOpened = registry
-				.select( editorStore )
-				.isPublishSidebarOpened();
-			dispatch( {
-				type: 'SET_CANVAS_MODE',
-				mode,
-			} );
-			const isEditMode = mode === 'edit';
-			if ( isPublishSidebarOpened && ! isEditMode ) {
-				registry.dispatch( editorStore ).closePublishSidebar();
-			}
-
-			// Check if the block list view should be open by default.
-			// If `distractionFree` mode is enabled, the block list view should not be open.
-			// This behavior is disabled for small viewports.
-			if (
-				isMediumOrBigger &&
-				isEditMode &&
+			registry.batch( () => {
+				const isMediumOrBigger =
+					window.matchMedia( '(min-width: 782px)' ).matches;
+				registry.dispatch( blockEditorStore ).clearSelectedBlock();
+				registry.dispatch( editorStore ).setDeviceType( 'Desktop' );
 				registry
-					.select( preferencesStore )
-					.get( 'core', 'showListViewByDefault' ) &&
-				! registry
-					.select( preferencesStore )
-					.get( 'core', 'distractionFree' )
-			) {
-				registry.dispatch( editorStore ).setIsListViewOpened( true );
-			} else {
-				registry.dispatch( editorStore ).setIsListViewOpened( false );
-			}
-			registry.dispatch( editorStore ).setIsInserterOpened( false );
+					.dispatch( blockEditorStore )
+					.__unstableSetEditorMode( 'edit' );
+				const isPublishSidebarOpened = registry
+					.select( editorStore )
+					.isPublishSidebarOpened();
+				dispatch( {
+					type: 'SET_CANVAS_MODE',
+					mode,
+				} );
+				const isEditMode = mode === 'edit';
+				if ( isPublishSidebarOpened && ! isEditMode ) {
+					registry.dispatch( editorStore ).closePublishSidebar();
+				}
+
+				// Check if the block list view should be open by default.
+				// If `distractionFree` mode is enabled, the block list view should not be open.
+				// This behavior is disabled for small viewports.
+				if (
+					isMediumOrBigger &&
+					isEditMode &&
+					registry
+						.select( preferencesStore )
+						.get( 'core', 'showListViewByDefault' ) &&
+					! registry
+						.select( preferencesStore )
+						.get( 'core', 'distractionFree' )
+				) {
+					registry
+						.dispatch( editorStore )
+						.setIsListViewOpened( true );
+				} else {
+					registry
+						.dispatch( editorStore )
+						.setIsListViewOpened( false );
+				}
+				registry.dispatch( editorStore ).setIsInserterOpened( false );
+			} );
 		};
 
 		if ( ! document.startViewTransition ) {
