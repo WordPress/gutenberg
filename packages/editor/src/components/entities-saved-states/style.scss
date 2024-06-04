@@ -31,13 +31,6 @@
 	}
 }
 
-.edit-post-layout,
-.edit-site-editor__interface-skeleton {
-	.entities-saved-states__panel-header {
-		height: $header-height + $border-width;
-	}
-}
-
 .entities-saved-states__post-meta {
 	margin-left: $grid-unit-30;
 	align-items: center;
