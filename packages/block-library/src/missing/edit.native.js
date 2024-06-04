@@ -194,11 +194,7 @@ export class UnsupportedBlockEdit extends Component {
 
 	render() {
 		const { originalName } = this.props.attributes;
-		const {
-			isUnsupportedBlockEditorSupported,
-			getStylesFromColorScheme,
-			preferredColorScheme,
-		} = this.props;
+		const { getStylesFromColorScheme, preferredColorScheme } = this.props;
 		const blockType = coreBlocks[ originalName ];
 
 		const title = this.getTitle();
@@ -242,7 +238,7 @@ export class UnsupportedBlockEdit extends Component {
 						styles.unsupportedBlockDark
 					) }
 				>
-					{ ! isUnsupportedBlockEditorSupported &&
+					{ ! this.canEditUnsupportedBlock() &&
 						this.renderHelpIcon() }
 					<View style={ styles.unsupportedBlockHeader }>
 						<Icon
