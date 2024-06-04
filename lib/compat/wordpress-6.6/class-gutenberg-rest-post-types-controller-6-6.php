@@ -23,7 +23,19 @@ class Gutenberg_REST_Post_Types_Controller_6_6 extends WP_REST_Post_Types_Contro
 		$response = parent::prepare_item_for_response( $item, $request );
 		$context  = ! empty( $request['context'] ) ? $request['context'] : 'view';
 
-		if ( 'edit' === $context ) {
+		if ( 'edit' === $context && post_type_supports( $item->name, 'editor' ) ) {
+			/**
+			 * Filters the block editor rendering mode for a specific post type.
+			 *
+			 * The dynamic portion of the hook name, `$item->name`, refers to the post type slug.
+			 *
+			 * @since 6.6.0
+			 * @param string $default_rendering_mode Default rendering mode for the post type.
+			 * @param string $post_type              Post type name.
+			 * @return string Default rendering mode for the post type.
+			 */
+			$response->data['rendering_mode'] = apply_filters( "{$item->name}_default_rendering_mode", $item->rendering_mode, $item->name );
+
 			/**
 			 * Filters the block editor rendering mode for a post type.
 			 *
@@ -32,9 +44,9 @@ class Gutenberg_REST_Post_Types_Controller_6_6 extends WP_REST_Post_Types_Contro
 			 * @param string $post_type              Post type name.
 			 * @return string Default rendering mode for the post type.
 			 */
-			$response->data['rendering_mode'] = apply_filters( 'post_type_default_rendering_mode', 'post-only', $item->name );
+			$response->data['rendering_mode'] = apply_filters( 'post_type_default_rendering_mode', $item->rendering_mode, $item->name );
 		}
 
-		return $response;
+		return rest_ensure_response( $response );
 	}
 }
