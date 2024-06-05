@@ -322,9 +322,21 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 
 		emitter.pause();
 		Object.values( stores ).forEach( ( store ) => store.emitter.pause() );
-		callback();
-		emitter.resume();
-		Object.values( stores ).forEach( ( store ) => store.emitter.resume() );
+		try {
+			callback();
+			emitter.resume();
+			Object.values( stores ).forEach( ( store ) =>
+				store.emitter.resume()
+			);
+		} catch ( error ) {
+			emitter.resume();
+			Object.values( stores ).forEach( ( store ) =>
+				store.emitter.resume()
+			);
+
+			// Re-throw the error after resuming the work for debugging.
+			throw error;
+		}
 	}
 
 	let registry = {
