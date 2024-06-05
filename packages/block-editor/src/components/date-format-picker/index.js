@@ -84,7 +84,7 @@ function NonDefaultControls( { format, onChange } ) {
 	// formats.
 	const editorSettings = select( blockEditorStore ).getSettings();
 	const suggestedFormats =
-		editorSettings?.__experimentalFeatures?.date?.formats ?? [];
+		editorSettings?.__experimentalFeatures?.date?.formatOptions ?? [];
 
 	const suggestedOptions = suggestedFormats.map(
 		( suggestedFormat, index ) => ( {

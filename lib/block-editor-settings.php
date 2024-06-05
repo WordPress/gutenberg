@@ -156,8 +156,8 @@ function gutenberg_get_block_editor_settings( $settings ) {
 		_x( 'F j, Y', 'long date format' ),
 		_x( 'M j', 'short date format without the year' ),
 	];
-	if ( ! isset( $settings['__experimentalFeatures']['date']['formats'] ) ) {
-		$settings['__experimentalFeatures']['date']['formats'] = $post_date_formats;
+	if ( ! isset( $settings['__experimentalFeatures']['date']['formatOptions'] ) ) {
+		$settings['__experimentalFeatures']['date']['formatOptions'] = $post_date_formats;
 	}
 
 	return $settings;
