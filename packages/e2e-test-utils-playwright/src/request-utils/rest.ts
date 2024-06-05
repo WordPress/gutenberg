@@ -45,7 +45,7 @@ async function getAPIRootURL( request: APIRequestContext ) {
 				timeout: 60_000, // 1 minute.
 			}
 		)
-		.not.toBeFalsy();
+		.not.toBeNull();
 
 	const [ , rootURL ] = restLink as RegExpMatchArray;
 
