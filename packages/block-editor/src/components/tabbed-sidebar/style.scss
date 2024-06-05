@@ -37,13 +37,14 @@
 	display: flex;
 	flex-grow: 1;
 	flex-direction: column;
-	//overflow-y: auto;
+	overflow-y: auto;
 
 	//height: calc(100% - #{$grid-unit-60 - $border-width});
 
 	// Include custom scrollbars, invisible until hovered.
-	@include custom-scrollbars-on-hover(transparent, $gray-600);
-	//overflow: auto;
+
+	// TODO - this breaks the absolute positioning of the patterns panel but we need it for list view
+	//@include custom-scrollbars-on-hover(transparent, $gray-600);
 
 	// Only reserve space for scrollbars when there is content to scroll.
 	// This allows items in the list view to have equidistant padding left and right
