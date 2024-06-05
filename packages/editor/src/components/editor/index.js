@@ -11,7 +11,7 @@ import { __ } from '@wordpress/i18n';
  */
 import { TEMPLATE_POST_TYPE } from '../../store/constants';
 import EditorInterface from '../editor-interface';
-import EditorProvider from '../provider';
+import { ExperimentalEditorProvider } from '../provider';
 import Sidebar from '../sidebar';
 
 function Editor( {
@@ -59,7 +59,7 @@ function Editor( {
 	);
 
 	return (
-		<EditorProvider
+		<ExperimentalEditorProvider
 			post={ post }
 			__unstableTemplate={ template }
 			settings={ settings }
@@ -86,7 +86,7 @@ function Editor( {
 				extraPanels={ extraSidebarPanels }
 			/>
 			{ children }
-		</EditorProvider>
+		</ExperimentalEditorProvider>
 	);
 }
 
