@@ -269,10 +269,11 @@ export function getActiveBlockVariation( state, blockName, attributes, scope ) {
 				if ( variationAttributeValue === undefined ) {
 					return false;
 				}
-				return (
-					variationAttributeValue ===
-					getValueFromObjectPath( attributes, attribute )
+				const blockAttributeValue = getValueFromObjectPath(
+					attributes,
+					attribute
 				);
+				return variationAttributeValue === blockAttributeValue;
 			} );
 			if ( isMatch && definedAttributesLength > maxMatchedAttributes ) {
 				match = variation;
