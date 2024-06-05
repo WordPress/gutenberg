@@ -370,10 +370,17 @@ if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 		document.addEventListener(
 			'click',
 			function ( event ) {
-				const ref = ( event.target as Element ).closest( 'a' );
-				if ( isValidLink( ref ) && isValidEvent( event ) ) {
+				const target = event.target as Element;
+				const ref = target.closest( 'a' );
+				if (
+					isValidLink( ref ) &&
+					isValidEvent( event ) &&
+					! target.hasAttribute( 'data-wp-on--click' ) // Don't override other click directives.
+				) {
 					event.preventDefault();
 					actions.navigate( ref.href );
+					// Scroll to the top of the page by default.
+					window.scrollTo( 0, 0 );
 				}
 			},
 			true
