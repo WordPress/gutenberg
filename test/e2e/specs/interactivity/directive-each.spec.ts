@@ -492,4 +492,16 @@ test.describe( 'data-wp-each', () => {
 		await expect( avocado ).toHaveAttribute( 'data-tag', '0' );
 		await expect( banana ).toHaveAttribute( 'data-tag', '1' );
 	} );
+
+	test( 'directives inside each element should work', async ( { page } ) => {
+		const element = page
+			.getByTestId( 'elements with directives' )
+			.getByTestId( 'item' );
+		await expect( element ).toHaveText( 'beta' );
+		const didRun = await page.evaluate( () => {
+			/* @ts-ignore */
+			return window.didThisRun;
+		} );
+		expect( didRun ).toBe( true );
+	} );
 } );

@@ -234,3 +234,14 @@
 	<p data-testid="item" data-wp-each-child>gamma</p>
 	<p data-testid="item" data-wp-each-child>delta</p>
 </div>
+
+<div
+	data-wp-interactive="directive-each"
+	data-wp-context='{ "list": [ "beta"] }'
+	data-testid="elements with directives"
+>
+	<template data-wp-each="context.list">
+		<div data-wp-text="context.item" data-testid="item" data-wp-run="callbacks.shouldRun"></div>
+	</template>
+	<div data-testid="item" data-wp-each-child data-wp-run="callbacks.shouldNotRun"></div>
+</div>

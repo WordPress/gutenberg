@@ -190,3 +190,14 @@ store( 'directive-each', {
 	}
 } );
 
+store('directive-each', {
+    callbacks: {
+		shouldRun() {
+			window.didThisRun = true;
+		},
+        shouldNotRun() {
+            window.didThisRun = false;
+        },
+    },
+});
+
