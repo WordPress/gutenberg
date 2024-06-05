@@ -618,11 +618,7 @@ const renamePostAction = {
 	id: 'rename-post',
 	label: __( 'Rename' ),
 	isEligible( post ) {
-		if (
-			post.status === 'trash' ||
-			post.status === 'auto-draft' ||
-			! ( 'title' in post )
-		) {
+		if ( post.status === 'trash' ) {
 			return false;
 		}
 		// Templates, template parts and patterns have special checks for renaming.
