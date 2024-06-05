@@ -110,7 +110,7 @@ export default function PreviewIframe( {
 	}, [ styles ] );
 	const isReady = !! width;
 
-	const calculatedStyles = {
+	const computedStyles = {
 		height: normalizedHeight * ratio,
 		width: '100%',
 		background: gradientValue ?? backgroundColor,
@@ -136,7 +136,7 @@ export default function PreviewIframe( {
 				>
 					<EditorStyles styles={ editorStyles } />
 					<motion.div
-						style={ calculatedStyles }
+						style={ computedStyles }
 						initial="start"
 						animate={
 							( isHovered || isFocused ) &&
