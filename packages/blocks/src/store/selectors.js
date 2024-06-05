@@ -277,18 +277,10 @@ export function getActiveBlockVariation( state, blockName, attributes, scope ) {
 				if ( blockAttributeValue instanceof RichTextData ) {
 					blockAttributeValue = blockAttributeValue.toHTMLString();
 				}
-				// If the attribute value is an object, we need to compare its properties.
-				if (
-					variationAttributeValue !== null &&
-					typeof variationAttributeValue === 'object' &&
-					variationAttributeValue.constructor === Object
-				) {
-					return matchesAttributes(
-						blockAttributeValue,
-						variationAttributeValue
-					);
-				}
-				return variationAttributeValue === blockAttributeValue;
+				return matchesAttributes(
+					blockAttributeValue,
+					variationAttributeValue
+				);
 			} );
 			if ( isMatch && definedAttributesLength > maxMatchedAttributes ) {
 				match = variation;
