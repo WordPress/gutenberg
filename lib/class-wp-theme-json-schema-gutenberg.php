@@ -105,10 +105,9 @@ class WP_Theme_JSON_Schema_Gutenberg {
 	 *
 	 * @since 6.6.0
 	 *
-	 * @param array $old Data to migrate.
-	 * @param string $origin     What source of data this object represents.
-	 *                           One of 'default', 'theme', or 'custom'.
-	 *
+	 * @param array $old     Data to migrate.
+	 * @param string $origin What source of data this object represents.
+	 *                       One of 'blocks', 'default', 'theme', or 'custom'.
 	 * @return array Data with defaultFontSizes set to false.
 	 */
 	private static function migrate_v2_to_v3( $old, $origin ) {
