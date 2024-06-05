@@ -19,6 +19,10 @@ import { store as editorStore } from '../../store';
  * @return {Component} The component to be rendered.
  */
 function PostLastRevision() {
+	return <PrivatePostLastRevision isLink={ false } />;
+}
+
+export function PrivatePostLastRevision( { isLink } ) {
 	const { lastRevisionId, revisionsCount } = useSelect( ( select ) => {
 		const { getCurrentPostLastRevisionId, getCurrentPostRevisionsCount } =
 			select( editorStore );
@@ -35,13 +39,14 @@ function PostLastRevision() {
 					revision: lastRevisionId,
 				} ) }
 				className="editor-post-last-revision__title"
-				icon={ backup }
+				icon={ isLink ? undefined : backup }
 				iconPosition="right"
 				text={ sprintf(
 					/* translators: %s: number of revisions */
 					__( 'Revisions (%s)' ),
 					revisionsCount
 				) }
+				variant={ isLink ? 'link' : undefined }
 			/>
 		</PostLastRevisionCheck>
 	);

@@ -1,6 +1,11 @@
 .editor-post-last-revision__title {
 	width: 100%;
 	font-weight: 500;
+
+	&.is-link {
+		width: fit-content;
+		font-weight: unset;
+	}
 }
 
 .editor-post-last-revision__title.components-button.has-icon {
