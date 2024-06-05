@@ -55,10 +55,9 @@ class WP_Theme_JSON_Schema_Gutenberg {
 		switch ( $theme_json['version'] ) {
 			case 1:
 				$theme_json = self::migrate_v1_to_v2( $theme_json );
-				// no break
+				// Deliberate fall through. Once migrated to v2, also migrate to v3.
 			case 2:
 				$theme_json = self::migrate_v2_to_v3( $theme_json );
-				// no break
 		}
 
 		return $theme_json;
@@ -97,7 +96,10 @@ class WP_Theme_JSON_Schema_Gutenberg {
 	/**
 	 * Migrates from v2 to v3.
 	 *
-	 * - Sets settings.typography.defaultFontSizes to false.
+	 * - Sets settings.typography.defaultFontSizes to false if settings.typography.fontSizes are defined.
+	 * - Sets settings.spacing.defaultSpacingSizes to false if settings.spacing.spacingSizes are defined.
+	 * - Prevents settings.spacing.spacingSizes from merging with settings.spacing.spacingScale by
+	 *   unsetting spacingScale when spacingSizes are defined.
 	 *
 	 * @since 6.6.0
 	 *
@@ -132,12 +134,6 @@ class WP_Theme_JSON_Schema_Gutenberg {
 		 * when the theme did not provide any.
 		 */
 		if ( isset( $old['settings']['typography']['fontSizes'] ) ) {
-			if ( ! isset( $new['settings'] ) ) {
-				$new['settings'] = array();
-			}
-			if ( ! isset( $new['settings']['typography'] ) ) {
-				$new['settings']['typography'] = array();
-			}
 			$new['settings']['typography']['defaultFontSizes'] = false;
 		}
 
@@ -151,12 +147,6 @@ class WP_Theme_JSON_Schema_Gutenberg {
 			isset( $old['settings']['spacing']['spacingSizes'] ) ||
 			isset( $old['settings']['spacing']['spacingScale'] )
 		) {
-			if ( ! isset( $new['settings'] ) ) {
-				$new['settings'] = array();
-			}
-			if ( ! isset( $new['settings']['spacing'] ) ) {
-				$new['settings']['spacing'] = array();
-			}
 			$new['settings']['spacing']['defaultSpacingSizes'] = false;
 		}
 

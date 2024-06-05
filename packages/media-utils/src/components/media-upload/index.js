@@ -400,6 +400,8 @@ class MediaUpload extends Component {
 		if ( onClose ) {
 			onClose();
 		}
+
+		this.frame.detach();
 	}
 
 	updateCollection() {

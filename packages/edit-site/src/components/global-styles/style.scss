@@ -23,11 +23,6 @@
 	overflow: hidden;
 }
 
-.edit-site-typography-panel__full-width-control {
-	grid-column: 1 / -1;
-	max-width: 100%;
-}
-
 .edit-site-global-styles-screen {
 	margin: $grid-unit-15 $grid-unit-20 $grid-unit-20;
 }
@@ -84,8 +79,7 @@
 	color: $gray-800;
 	font-weight: 600;
 	line-height: 1.2;
-	padding: $grid-unit-20;
-	padding-bottom: 0;
+	padding: $grid-unit-20 $grid-unit-20 0;
 	margin: 0;
 }
 
