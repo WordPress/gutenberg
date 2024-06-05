@@ -110,7 +110,11 @@ export function items( state = {}, action ) {
 				[ context ]: {
 					...state[ context ],
 					...action.items.reduce( ( accumulator, value ) => {
-						const itemId = value[ key ];
+						const itemId = value?.[ key ];
+						if ( ! itemId ) {
+							return accumulator;
+						}
+
 						accumulator[ itemId ] = conservativeMapItem(
 							state?.[ context ]?.[ itemId ],
 							value
@@ -164,7 +168,10 @@ export function itemIsComplete( state = {}, action ) {
 				[ context ]: {
 					...state[ context ],
 					...action.items.reduce( ( result, item ) => {
-						const itemId = item[ key ];
+						const itemId = item?.[ key ];
+						if ( ! itemId ) {
+							return result;
+						}
 
 						// Defer to completeness if already assigned. Technically the
 						// data may be outdated if receiving items for a field subset.
@@ -232,7 +239,7 @@ const receiveQueries = compose( [
 	return {
 		itemIds: getMergedItemIds(
 			state?.itemIds || [],
-			action.items.map( ( item ) => item[ key ] ),
+			action.items.flatMap( ( item ) => item?.[ key ] ?? [] ),
 			page,
 			perPage
 		),
