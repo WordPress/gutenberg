@@ -42,7 +42,7 @@ async function getAPIRootURL( request: APIRequestContext ) {
 			},
 			{
 				message: 'Failed to discover REST API endpoint.',
-				timeout: 60_000, // 1 minute.
+				timeout: 120_000, // 2 minutes.
 			}
 		)
 		.not.toBeNull();
