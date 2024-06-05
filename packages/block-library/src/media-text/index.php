@@ -34,10 +34,10 @@ function render_block_core_media_text( $attributes, $content ) {
 		'tag_name'   => 'figure',
 		'class_name' => 'wp-block-media-text__media',
 	);
-	$has_media_on_right = isset( $attributes['mediaPosition'] ) && 'right' === $attributes['mediaPosition'];
-	$image_fill         = isset( $attributes['imageFill'] ) && $attributes['imageFill'];
-	$focal_point        = isset( $attributes['focalPoint'] ) ? round( $attributes['focalPoint']['x'] * 100 ) . '% ' . round( $attributes['focalPoint']['y'] * 100 ) . '%' : '50% 50%';
-	$unique_id          = 'wp-block-media-text__media-' . wp_unique_id();
+	$has_media_on_right    = isset( $attributes['mediaPosition'] ) && 'right' === $attributes['mediaPosition'];
+	$image_fill            = isset( $attributes['imageFill'] ) && $attributes['imageFill'];
+	$focal_point           = isset( $attributes['focalPoint'] ) ? round( $attributes['focalPoint']['x'] * 100 ) . '% ' . round( $attributes['focalPoint']['y'] * 100 ) . '%' : '50% 50%';
+	$unique_id             = 'wp-block-media-text__media-' . wp_unique_id();
 
 	if ( $has_media_on_right ) {
 		// Loop through all the figure tags and set a bookmark on the last figure tag.
