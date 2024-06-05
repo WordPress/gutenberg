@@ -63,14 +63,14 @@ async function spawn( command, args, options ) {
 			} else {
 				reject(
 					new Error(
-						`Process exited with code ${ code }: ${ stderr }`
+						`Process ${ command } exited with code ${ code }: ${ stderr }`
 					)
 				);
 			}
 		} );
 
 		child.on( 'error', ( error ) => {
-			reject( error );
+			reject( `Process ${ command } ended with error: ${ error }` );
 		} );
 	} );
 }

@@ -42,7 +42,6 @@ test.describe( 'Front End Performance', () => {
 			// Go to the base URL.
 			// eslint-disable-next-line playwright/no-networkidle
 			await page.goto( '/', { waitUntil: 'networkidle' } );
-			await page.locator( '.oopsie' ).waitFor( { timeout: 1000 } );
 
 			// Take the measurements.
 			const ttfb = await metrics.getTimeToFirstByte();
