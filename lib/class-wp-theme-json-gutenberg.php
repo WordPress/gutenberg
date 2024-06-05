@@ -3278,7 +3278,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * Removes insecure data from theme.json.
 	 *
 	 * @since 5.9.0
-	 * @since 6.6.0 Added support for block style variation element styles.
+	 * @since 6.6.0 Added support for block style variation element styles and $origin parameter.
 	 *
 	 * @param array $theme_json Structure to sanitize.
 	 * @param string $origin    Optional. What source of data this object represents.
