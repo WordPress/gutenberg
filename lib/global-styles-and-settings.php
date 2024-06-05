@@ -258,8 +258,8 @@ function gutenberg_add_global_styles_block_custom_css() {
 function gutenberg_add_global_styles_for_blocks() {
 	global $wp_styles;
 	$tree        = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
-    $tree        = WP_Theme_JSON_Resolver_Gutenberg::resolve_theme_file_uris( $tree );
-    $block_nodes = $tree->get_styles_block_nodes();
+	$tree        = WP_Theme_JSON_Resolver_Gutenberg::resolve_theme_file_uris( $tree );
+	$block_nodes = $tree->get_styles_block_nodes();
 	foreach ( $block_nodes as $metadata ) {
 		$block_css = $tree->get_styles_for_block( $metadata );
 
