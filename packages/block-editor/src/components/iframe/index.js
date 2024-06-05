@@ -428,6 +428,7 @@ function Iframe( {
 						/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */
 						<body
 							ref={ bodyRef }
+							aria-label="Block Editor"
 							className={ clsx(
 								'block-editor-iframe__body',
 								'editor-styles-wrapper',
