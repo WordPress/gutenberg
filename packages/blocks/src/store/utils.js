@@ -19,6 +19,14 @@ export const getValueFromObjectPath = ( object, path, defaultValue ) => {
 	return value ?? defaultValue;
 };
 
+function isObject( candidate ) {
+	return (
+		typeof candidate === 'object' &&
+		candidate.constructor === Object &&
+		candidate !== null
+	);
+}
+
 /**
  * Determine whether a set of object properties matches a given object.
  *
@@ -31,17 +39,12 @@ export const getValueFromObjectPath = ( object, path, defaultValue ) => {
  * @return {boolean} Whether the block attributes match the variation attributes.
  */
 export function matchesAttributes( blockAttributes, variationAttributes ) {
-	if ( ! blockAttributes ) {
-		return false;
+	if ( isObject( blockAttributes ) && isObject( variationAttributes ) ) {
+		return Object.entries( variationAttributes ).every(
+			( [ key, value ] ) =>
+				matchesAttributes( blockAttributes?.[ key ], value )
+		);
 	}
-	return Object.entries( variationAttributes ).every( ( [ key, value ] ) => {
-		if (
-			typeof value === 'object' &&
-			value !== null &&
-			typeof blockAttributes[ key ] === 'object'
-		) {
-			return matchesAttributes( blockAttributes[ key ], value );
-		}
-		return blockAttributes[ key ] === value;
-	} );
+
+	return blockAttributes === variationAttributes;
 }
