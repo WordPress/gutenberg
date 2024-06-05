@@ -11,4 +11,13 @@
 	.comment-board__comment {
 		border-bottom: 1px solid $gray-300;
 	}
+
+	&__resolved {
+		align-self: end;
+	}
+}
+
+/* Targeting class starting with .block-editor-collab__ */
+[class*="block-editor-collab__"] {
+	border: 2px solid #ffea00;
 }
