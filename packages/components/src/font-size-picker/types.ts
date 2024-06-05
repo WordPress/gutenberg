@@ -1,8 +1,3 @@
-/**
- * Internal dependencies
- */
-import type { WPUnitControlUnit } from '../unit-control/types';
-
 export type FontSizePickerProps = {
 	/**
 	 * If `true`, it will not be possible to choose a custom fontSize. The user
@@ -89,23 +84,8 @@ export type FontSizePickerCustomControlProps = Pick<
 	| 'withReset'
 	| 'onChange'
 	| 'fallbackFontSize'
+	| 'units'
 > & {
-	/**
-	 * The units available for selection.
-	 */
-	units: WPUnitControlUnit[];
-	/**
-	 * The numeric representation of the font size value.
-	 */
-	valueQuantity: number | undefined;
-	/**
-	 * The unit of the font size value (e.g., "px", "em", "rem").
-	 */
-	valueUnit: string | undefined;
-	/**
-	 * Whether the valueUnit is relative to another element's size (e.g., "em", "rem").
-	 */
-	isValueUnitRelative: boolean;
 	/**
 	 * Disables interaction with the control.
 	 */

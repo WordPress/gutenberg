@@ -13,10 +13,6 @@ import { useState, useMemo, forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import {
-	parseQuantityAndUnitFromRawValue,
-	useCustomUnits,
-} from '../unit-control';
 import { VisuallyHidden } from '../visually-hidden';
 import { getCommonSizeUnit } from './utils';
 import type { FontSizePickerProps } from './types';
@@ -30,10 +26,10 @@ import {
 import { Spacer } from '../spacer';
 import FontSizePickerSelect from './font-size-picker-select';
 import FontSizePickerToggleGroup from './font-size-picker-toggle-group';
-import FontSizePickerCustomControl from './font-size-picker-custom-control';
+import FontSizePickerCustomControl, {
+	DEFAULT_UNITS,
+} from './font-size-picker-custom-control';
 import { T_SHIRT_NAMES } from './constants';
-
-const DEFAULT_UNITS = [ 'px', 'em', 'rem', 'vw', 'vh' ];
 
 const UnforwardedFontSizePicker = (
 	props: FontSizePickerProps,
@@ -46,15 +42,11 @@ const UnforwardedFontSizePicker = (
 		disableCustomFontSizes = false,
 		onChange,
 		size = 'default',
-		units: unitsProp = DEFAULT_UNITS,
+		units = DEFAULT_UNITS,
 		value,
 		withSlider = false,
 		withReset = true,
 	} = props;
-
-	const units = useCustomUnits( {
-		availableUnits: unitsProp,
-	} );
 
 	const shouldUseSelectControl = fontSizes.length > 5;
 	const selectedFontSize = fontSizes.find(
@@ -104,12 +96,6 @@ const UnforwardedFontSizePicker = (
 	const hasUnits =
 		typeof value === 'string' || typeof fontSizes[ 0 ]?.size === 'string';
 
-	const [ valueQuantity, valueUnit ] = parseQuantityAndUnitFromRawValue(
-		value,
-		units
-	);
-	const isValueUnitRelative =
-		!! valueUnit && [ 'em', 'rem', 'vw', 'vh' ].includes( valueUnit );
 	const isDisabled = value === undefined;
 
 	return (
@@ -201,9 +187,6 @@ const UnforwardedFontSizePicker = (
 					<FontSizePickerCustomControl
 						__next40pxDefaultSize={ __next40pxDefaultSize }
 						value={ value }
-						valueQuantity={ valueQuantity }
-						valueUnit={ valueUnit }
-						isValueUnitRelative={ isValueUnitRelative }
 						isDisabled={ isDisabled }
 						hasUnits={ hasUnits }
 						units={ units }

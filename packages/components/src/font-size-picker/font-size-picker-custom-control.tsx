@@ -9,10 +9,16 @@ import { __ } from '@wordpress/i18n';
 import { Button } from '../button';
 import RangeControl from '../range-control';
 import { Flex, FlexItem } from '../flex';
-import { default as UnitControl } from '../unit-control';
 import type { FontSizePickerCustomControlProps } from './types';
+import {
+	default as UnitControl,
+	parseQuantityAndUnitFromRawValue,
+	useCustomUnits,
+} from '../unit-control';
 
 import { Spacer } from '../spacer';
+
+export const DEFAULT_UNITS = [ 'px', 'em', 'rem', 'vw', 'vh' ];
 
 function FontSizePickerCustomControl(
 	props: FontSizePickerCustomControlProps
@@ -20,18 +26,27 @@ function FontSizePickerCustomControl(
 	const {
 		__next40pxDefaultSize,
 		value,
-		valueQuantity,
-		valueUnit,
-		isValueUnitRelative,
 		isDisabled,
 		size = 'default',
-		units,
+		units: unitsProp = DEFAULT_UNITS,
 		withSlider = false,
 		withReset = true,
 		onChange,
 		hasUnits,
 		fallbackFontSize,
 	} = props;
+
+	const units = useCustomUnits( {
+		availableUnits: unitsProp,
+	} );
+
+	const [ valueQuantity, valueUnit ] = parseQuantityAndUnitFromRawValue(
+		value,
+		units
+	);
+
+	const isValueUnitRelative =
+		!! valueUnit && [ 'em', 'rem', 'vw', 'vh' ].includes( valueUnit );
 
 	return (
 		<Flex className="components-font-size-picker__custom-size-control">

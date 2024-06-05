@@ -26,6 +26,7 @@ import {
 	DropdownMenuItemLabel as DropdownMenuItemLabelV2,
 	DropdownMenuItemHelpText as DropdownMenuItemHelpTextV2,
 } from './dropdown-menu-v2';
+import FontSizePickerCustomControl from './font-size-picker/font-size-picker-custom-control';
 import { ComponentsContext } from './context/context-system-provider';
 import Theme from './theme';
 import Tabs from './tabs';
@@ -53,5 +54,6 @@ lock( privateApis, {
 	DropdownMenuSeparatorV2,
 	DropdownMenuItemLabelV2,
 	DropdownMenuItemHelpTextV2,
+	FontSizePickerCustomControl,
 	kebabCase,
 } );
