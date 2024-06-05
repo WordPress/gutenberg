@@ -29,6 +29,7 @@ import { privateApis as commandsPrivateApis } from '@wordpress/commands';
 import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
 import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
 import { addQueryArgs } from '@wordpress/url';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -236,7 +237,7 @@ function Layout( { initialPost } ) {
 							sprintf(
 								// translators: %s: Title of the created post e.g: "Post 1".
 								__( '"%s" successfully created.' ),
-								title
+								decodeEntities( title )
 							),
 							{
 								type: 'snackbar',
