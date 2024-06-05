@@ -36,8 +36,8 @@ function Editor( {
 		( select ) => {
 			const postTypeObject =
 				select( coreStore ).getPostType( initialPostType );
-			if ( postTypeObject && postTypeObject?.rendering_mode ) {
-				return postTypeObject.rendering_mode;
+			if ( postTypeObject && postTypeObject?.default_rendering_mode ) {
+				return postTypeObject.default_rendering_mode;
 			}
 
 			return 'post-only';

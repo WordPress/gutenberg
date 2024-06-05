@@ -1,17 +1,17 @@
 <?php
 /**
- * REST API: Gutenberg_REST_Post_Types_Controller_6_6 class
+ * REST API: Gutenberg_REST_Post_Types_Controller_6_7 class
  *
  * @package gutenberg
  */
 
 /**
- * Gutenberg_REST_Post_Types_Controller_6_6 class
+ * Gutenberg_REST_Post_Types_Controller_6_7 class
  *
  * Add Block Editor default rendering mode to the post type response
  * to allow enabling/disabling at the post type level.
  */
-class Gutenberg_REST_Post_Types_Controller_6_6 extends WP_REST_Post_Types_Controller {
+class Gutenberg_REST_Post_Types_Controller_6_7 extends WP_REST_Post_Types_Controller {
 	/**
 	 * Add Block Editor default rendering mode setting to the response.
 	 *
@@ -24,7 +24,7 @@ class Gutenberg_REST_Post_Types_Controller_6_6 extends WP_REST_Post_Types_Contro
 		$context  = ! empty( $request['context'] ) ? $request['context'] : 'view';
 
 		// Property will only exist if the post type supports the block editor.
-		if ( 'edit' === $context && property_exists( $item, 'rendering_mode' ) ) {
+		if ( 'edit' === $context && property_exists( $item, 'default_rendering_mode' ) ) {
 			/**
 			 * Filters the block editor rendering mode for a specific post type.
 			 *
@@ -35,7 +35,7 @@ class Gutenberg_REST_Post_Types_Controller_6_6 extends WP_REST_Post_Types_Contro
 			 * @param WP_Post_Type $post_type              Post type object.
 			 * @return string Default rendering mode for the post type.
 			 */
-			$rendering_mode = apply_filters( "{$item->name}_default_rendering_mode", $item->rendering_mode, $item );
+			$rendering_mode = apply_filters( "{$item->name}_default_rendering_mode", $item->default_rendering_mode, $item );
 
 			/**
 			 * Filters the block editor rendering mode for a post type.
@@ -45,7 +45,7 @@ class Gutenberg_REST_Post_Types_Controller_6_6 extends WP_REST_Post_Types_Contro
 			 * @param string $post_type              Post type name.
 			 * @return string Default rendering mode for the post type.
 			 */
-			$response->data['rendering_mode'] = apply_filters( 'post_type_default_rendering_mode', $rendering_mode, $item->name );
+			$response->data['default_rendering_mode'] = apply_filters( 'post_type_default_rendering_mode', $rendering_mode, $item->name );
 		}
 
 		return rest_ensure_response( $response );
