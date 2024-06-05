@@ -28,6 +28,22 @@ async function getAPIRootURL( request: APIRequestContext ) {
 	const links = response.headers().link;
 	const restLink = links?.match( /<([^>]+)>; rel="https:\/\/api\.w\.org\/"/ );
 
+	console.log( response.headers() ); // eslint-disable-line no-console
+
+	try {
+		const html = await response.text();
+		console.log( html ); // eslint-disable-line no-console
+	} catch ( error ) {
+		// noop
+	}
+
+	try {
+		const json = await response.json();
+		console.log( json ); // eslint-disable-line no-console
+	} catch ( error ) {
+		// noop
+	}
+
 	if ( ! restLink ) {
 		throw new Error( `Failed to discover REST API endpoint.
  Link header: ${ links }` );
