@@ -358,6 +358,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 	 * @since 5.9.0
 	 * @since 6.2.0 Handling of style.css was added to WP_Theme_JSON.
 	 * @since 6.6.0 Added custom relative theme file URIs to `_links`.
+	 * @since 6.6.0 Added registration of custom block style variations to prevent them being stripped in response.
 	 *
 	 * @param WP_Post         $post    Global Styles post object.
 	 * @param WP_REST_Request $request Request object.
@@ -369,6 +370,29 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 		$config                           = array();
 		$theme_json                       = null;
 		if ( $is_global_styles_user_theme_json ) {
+			if ( isset( $raw_config['styles']['blocks'] ) && is_array( $raw_config['styles']['blocks'] ) ) {
+				// Ensure custom block style variations are registered so their data isn't stripped during sanitization in WP_Theme_JSON.
+				$registry = WP_Block_Styles_Registry::get_instance();
+				foreach ( $raw_config['styles']['blocks'] as $block_name => $block_data ) {
+					if ( isset( $block_data['variations'] ) && is_array( $block_data['variations'] ) ) {
+						$registered_styles = $registry->get_registered_styles_for_block( $block_name );
+
+						foreach ( $block_data['variations'] as $variation_name => $variation_data ) {
+							// Register block style variation only if it hasn't already been registered.
+							if ( ! array_key_exists( $variation_name, $registered_styles ) ) {
+								register_block_style(
+									$block_name,
+									array(
+										'name'  => $variation_name,
+										'label' => $variation_name,
+									)
+								);
+							}
+						}
+					}
+				}
+			}
+
 			$theme_json = new WP_Theme_JSON_Gutenberg( $raw_config, 'custom' );
 			$config     = $theme_json->get_raw_data();
 		}
