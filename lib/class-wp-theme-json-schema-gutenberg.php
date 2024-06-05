@@ -42,7 +42,7 @@ class WP_Theme_JSON_Schema_Gutenberg {
 	 *
 	 * @param array  $theme_json The structure to migrate.
 	 * @param string $origin     Optional. What source of data this object represents.
-	 *                           One of 'default', 'theme', or 'custom'. Default 'theme'.
+	 *                           One of 'blocks', 'default', 'theme', or 'custom'. Default 'theme'.
 	 *
 	 * @return array The structure in the last version.
 	 */
