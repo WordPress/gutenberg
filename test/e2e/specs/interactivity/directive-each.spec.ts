@@ -493,15 +493,16 @@ test.describe( 'data-wp-each', () => {
 		await expect( banana ).toHaveAttribute( 'data-tag', '1' );
 	} );
 
-	test( 'directives inside each element should work', async ( { page } ) => {
+	test( 'directives inside elements with `wp-each-child` should not run', async ( {
+		page,
+	} ) => {
 		const element = page
 			.getByTestId( 'elements with directives' )
 			.getByTestId( 'item' );
+		const callbackRunCount = page
+			.getByTestId( 'elements with directives' )
+			.getByTestId( 'callbackRunCount' );
 		await expect( element ).toHaveText( 'beta' );
-		const didRun = await page.evaluate( () => {
-			/* @ts-ignore */
-			return window.didThisRun;
-		} );
-		expect( didRun ).toBe( true );
+		await expect( callbackRunCount ).toHaveText( '1' );
 	} );
 } );

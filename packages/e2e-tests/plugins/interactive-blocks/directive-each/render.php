@@ -235,13 +235,28 @@
 	<p data-testid="item" data-wp-each-child>delta</p>
 </div>
 
+<hr>
+
 <div
 	data-wp-interactive="directive-each"
-	data-wp-context='{ "list": [ "beta"] }'
+	data-wp-context='{ "list": [ "beta" ], "callbackRunCount": 0 }'
 	data-testid="elements with directives"
 >
 	<template data-wp-each="context.list">
-		<div data-wp-text="context.item" data-testid="item" data-wp-run="callbacks.shouldRun"></div>
+		<div
+			data-testid="item"
+			data-wp-text="context.item"
+			data-wp-priority-2-init="callbacks.updateCallbackRunCount"
+		></div>
 	</template>
-	<div data-testid="item" data-wp-each-child data-wp-run="callbacks.shouldNotRun"></div>
+	<div
+		data-wp-each-child
+		data-testid="item"
+		data-wp-text="context.item"
+		data-wp-priority-2-init="callbacks.updateCallbackRunCount"
+	></div>
+	<data
+		data-testid="callbackRunCount"
+		data-wp-text="context.callbackRunCount"
+	></data>
 </div>
