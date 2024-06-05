@@ -1,0 +1,38 @@
+.editor-tabbed-sidebar {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+
+	@include break-medium() {
+		// Same width as the Inserter.
+		// @see packages/block-editor/src/components/inserter/style.scss
+		width: 350px;
+	}
+}
+
+.editor-tabbed-sidebar__tablist-and-close-button {
+	display: flex;
+	border-bottom: $border-width solid $gray-300;
+}
+
+.editor-tabbed-sidebar__close-button {
+	background: $white;
+	/* stylelint-disable-next-line property-disallowed-list -- This should be removed when https://github.com/WordPress/gutenberg/issues/59013 is fixed. */
+	order: 1;
+	align-self: center;
+	margin-right: $grid-unit-15;
+}
+
+.editor-tabbed-sidebar__tablist {
+	box-sizing: border-box;
+	flex-grow: 1;
+}
+
+.editor-tabbed-sidebar__tab {
+	flex-grow: 1;
+	margin-bottom: -$border-width;
+}
+
+.editor-tabbed-sidebar__tabpanel {
+	height: calc(100% - #{$grid-unit-60 - $border-width});
+}
