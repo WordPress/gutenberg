@@ -494,6 +494,83 @@ describe( 'selectors', () => {
 					} )
 				).toEqual( variations[ 1 ] );
 			} );
+			it( 'should compare object attributes in the isActive array based on given properties', () => {
+				const variations = [
+					{
+						name: 'variation-1',
+						attributes: {
+							firstTestAttribute: {
+								nestedProperty: 1,
+								secondNestedProperty: 10,
+							},
+							secondTestAttribute: {
+								nestedProperty: {
+									firstDeeplyNestedProperty: 'a1',
+									secondDeeplyNestedProperty: 'a2',
+								},
+							},
+						},
+						isActive: [
+							'firstTestAttribute',
+							'secondTestAttribute.nestedProperty',
+						],
+					},
+					{
+						name: 'variation-2',
+						attributes: {
+							firstTestAttribute: {
+								nestedProperty: 2,
+								secondNestedProperty: 20,
+							},
+							secondTestAttribute: {
+								nestedProperty: {
+									firstDeeplyNestedProperty: 'b1',
+									secondDeeplyNestedProperty: 'b2',
+								},
+							},
+						},
+						isActive: [
+							'firstTestAttribute',
+							'secondTestAttribute.nestedProperty',
+						],
+					},
+				];
+				const state =
+					createBlockVariationsStateWithTestBlockType( variations );
+
+				expect(
+					getActiveBlockVariation( state, blockName, {
+						firstTestAttribute: {
+							nestedProperty: 1,
+							secondNestedProperty: 10,
+							otherNestedProperty: 5555,
+						},
+						secondTestAttribute: {
+							nestedProperty: {
+								firstDeeplyNestedProperty: 'a1',
+								secondDeeplyNestedProperty: 'a2',
+								otherDeeplyNestedProperty: 'ffff',
+							},
+						},
+					} )
+				).toEqual( variations[ 0 ] );
+				expect(
+					getActiveBlockVariation( state, blockName, {
+						firstTestAttribute: {
+							nestedProperty: 2,
+							secondNestedProperty: 20,
+							otherNestedProperty: 5555,
+						},
+						secondTestAttribute: {
+							nestedProperty: {
+								firstDeeplyNestedProperty: 'b1',
+								secondDeeplyNestedProperty: 'b2',
+								otherDeeplyNestedProperty: 'ffff',
+							},
+						},
+					} )
+				).toEqual( variations[ 1 ] );
+			} );
 			it( 'should return the active variation based on the given isActive array (multiple values)', () => {
 				const variations = [
 					{
