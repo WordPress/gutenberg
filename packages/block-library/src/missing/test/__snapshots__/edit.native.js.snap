@@ -9,7 +9,7 @@ exports[`Missing block renders without crashing 1`] = `
     {
       "busy": undefined,
       "checked": undefined,
-      "disabled": undefined,
+      "disabled": true,
       "expanded": undefined,
       "selected": undefined,
     }
