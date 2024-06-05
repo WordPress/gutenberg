@@ -31,6 +31,9 @@ export const getValueFromObjectPath = ( object, path, defaultValue ) => {
  * @return {boolean} Whether the block attributes match the variation attributes.
  */
 export function matchesAttributes( blockAttributes, variationAttributes ) {
+	if ( ! blockAttributes ) {
+		return false;
+	}
 	return Object.entries( variationAttributes ).every( ( [ key, value ] ) => {
 		if (
 			typeof value === 'object' &&
