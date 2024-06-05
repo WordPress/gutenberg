@@ -18,7 +18,10 @@ const DEFAULT_CONTENT_ONLY_BLOCKS = [
  * page content to be edited.
  */
 export default function DisableNonPageContentBlocks() {
-	const contentOnlyBlocks = applyFilters( 'editor.postContentBlockTypes', DEFAULT_CONTENT_ONLY_BLOCKS );
+	const contentOnlyBlocks = applyFilters(
+		'editor.postContentBlockTypes',
+		DEFAULT_CONTENT_ONLY_BLOCKS
+	);
 
 	// Note that there are two separate subscription because the result for each
 	// returns a new array.
