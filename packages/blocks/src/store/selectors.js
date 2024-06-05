@@ -12,7 +12,7 @@ import { RichTextData } from '@wordpress/rich-text';
 /**
  * Internal dependencies
  */
-import { getValueFromObjectPath } from './utils';
+import { getValueFromObjectPath, matchesAttributes } from './utils';
 
 /** @typedef {import('../api/registration').WPBlockVariation} WPBlockVariation */
 /** @typedef {import('../api/registration').WPBlockVariationScope} WPBlockVariationScope */
@@ -277,7 +277,10 @@ export function getActiveBlockVariation( state, blockName, attributes, scope ) {
 				if ( blockAttributeValue instanceof RichTextData ) {
 					blockAttributeValue = blockAttributeValue.toHTMLString();
 				}
-				return variationAttributeValue === blockAttributeValue;
+				return matchesAttributes(
+					blockAttributeValue,
+					variationAttributeValue
+				);
 			} );
 			if ( isMatch && definedAttributesLength > maxMatchedAttributes ) {
 				match = variation;
