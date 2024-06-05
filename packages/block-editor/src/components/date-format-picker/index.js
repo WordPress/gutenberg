@@ -1,9 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { _x, __ } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { dateI18n } from '@wordpress/date';
 import { useState, createInterpolateElement } from '@wordpress/element';
+import { select } from '@wordpress/data';
 import {
 	TextControl,
 	ExternalLink,
@@ -12,6 +13,11 @@ import {
 	ToggleControl,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
+
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
 
 // So that we can illustrate the different formats in the dropdown properly,
 // show a date that has a day greater than 12 and a month with more than three
@@ -76,24 +82,9 @@ function NonDefaultControls( { format, onChange } ) {
 	// 2022) in German (de). The resultant array is de-duplicated as some
 	// languages will use the same format string for short, medium, and long
 	// formats.
-	const suggestedFormats = [
-		...new Set( [
-			/* translators: See https://www.php.net/manual/datetime.format.php */
-			'Y-m-d',
-			/* translators: See https://www.php.net/manual/datetime.format.php */
-			_x( 'n/j/Y', 'short date format' ),
-			/* translators: See https://www.php.net/manual/datetime.format.php */
-			_x( 'n/j/Y g:i A', 'short date format with time' ),
-			/* translators: See https://www.php.net/manual/datetime.format.php */
-			_x( 'M j, Y', 'medium date format' ),
-			/* translators: See https://www.php.net/manual/datetime.format.php */
-			_x( 'M j, Y g:i A', 'medium date format with time' ),
-			/* translators: See https://www.php.net/manual/datetime.format.php */
-			_x( 'F j, Y', 'long date format' ),
-			/* translators: See https://www.php.net/manual/datetime.format.php */
-			_x( 'M j', 'short date format without the year' ),
-		] ),
-	];
+	const editorSettings = select( blockEditorStore ).getSettings();
+	const suggestedFormats =
+		editorSettings?.__experimentalFeatures?.date?.formats ?? [];
 
 	const suggestedOptions = suggestedFormats.map(
 		( suggestedFormat, index ) => ( {

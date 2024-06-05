@@ -146,6 +146,20 @@ function gutenberg_get_block_editor_settings( $settings ) {
 			);
 	}
 
+	// Suggested formats for the Post Date Block.
+	$post_date_formats = [
+		'Y-m-d',
+		_x( 'n/j/Y', 'short date format' ),
+		_x( 'n/j/Y g:i A', 'short date format with time' ),
+		_x( 'M j, Y', 'medium date format' ),
+		_x( 'M j, Y g:i A', 'medium date format with time' ),
+		_x( 'F j, Y', 'long date format' ),
+		_x( 'M j', 'short date format without the year' ),
+	];
+	if ( ! isset( $settings['__experimentalFeatures']['date']['formats'] ) ) {
+		$settings['__experimentalFeatures']['date']['formats'] = $post_date_formats;
+	}
+
 	return $settings;
 }
 add_filter( 'block_editor_settings_all', 'gutenberg_get_block_editor_settings', 0 );
