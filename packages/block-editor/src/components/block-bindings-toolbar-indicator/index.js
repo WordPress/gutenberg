@@ -57,7 +57,9 @@ export default function BlockBindingsToolbarIndicator( { clientIds } ) {
 				isConnectedToPatternOverrides: getBlocksByClientId(
 					clientIds
 				).some( ( block ) =>
-					Object.values( block?.attributes.metadata?.bindings ).some(
+					Object.values(
+						block?.attributes?.metadata?.bindings || {}
+					).some(
 						( binding ) =>
 							binding.source === 'core/pattern-overrides'
 					)
