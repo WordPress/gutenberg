@@ -30,6 +30,7 @@ const config = defineConfig( {
 		actionTimeout: 120_000, // 2 minutes.
 		video: 'off',
 	},
+	webServer: null, // We're starting the server from the runner script.
 } );
 
 export default config;
