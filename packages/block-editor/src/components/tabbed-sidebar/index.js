@@ -21,16 +21,16 @@ function TabbedSidebar(
 	ref
 ) {
 	return (
-		<div className="editor-tabbed-sidebar">
+		<div className="block-editor-tabbed-sidebar">
 			<Tabs
 				selectOnMove={ false }
 				defaultTabId={ defaultTabId }
 				onSelect={ onSelect }
 				selectedTabId={ selectedTab }
 			>
-				<div className="editor-tabbed-sidebar__tablist-and-close-button">
+				<div className="block-editor-tabbed-sidebar__tablist-and-close-button">
 					<Button
-						className="editor-tabbed-sidebar__close-button"
+						className="block-editor-tabbed-sidebar__close-button"
 						icon={ closeSmall }
 						label={ __( 'Close block inserter' ) }
 						onClick={ () => onClose() }
@@ -38,14 +38,14 @@ function TabbedSidebar(
 					/>
 
 					<Tabs.TabList
-						className="editor-tabbed-sidebar__tablist"
+						className="block-editor-tabbed-sidebar__tablist"
 						ref={ ref }
 					>
 						{ tabs.map( ( tab ) => (
 							<Tabs.Tab
 								key={ tab.name }
 								tabId={ tab.name }
-								className="editor-tabbed-sidebar__tab"
+								className="block-editor-tabbed-sidebar__tab"
 							>
 								{ tab.title }
 							</Tabs.Tab>
@@ -57,7 +57,7 @@ function TabbedSidebar(
 						key={ tab.name }
 						tabId={ tab.name }
 						focusable={ false }
-						className="editor-tabbed-sidebar__tabpanel"
+						className="block-editor-tabbed-sidebar__tabpanel"
 						ref={ tab.panelRef }
 					>
 						{ tab.panel }
