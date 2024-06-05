@@ -218,12 +218,18 @@ export default function EditSiteEditor( { isLoading } ) {
 				>
 					{ isEditMode && (
 						<BackButton>
-							<Button
-								className="edit-site-layout__view-mode-toggle"
-								onClick={ () => setCanvasMode( 'view' ) }
-							>
-								<SiteIcon className="edit-site-layout__view-mode-toggle-icon" />
-							</Button>
+							{ ( { length } ) =>
+								length <= 1 && (
+									<Button
+										className="edit-site-layout__view-mode-toggle"
+										onClick={ () =>
+											setCanvasMode( 'view' )
+										}
+									>
+										<SiteIcon className="edit-site-layout__view-mode-toggle-icon" />
+									</Button>
+								)
+							}
 						</BackButton>
 					) }
 					<SiteEditorMoreMenu />
