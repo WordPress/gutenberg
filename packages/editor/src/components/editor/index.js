@@ -32,6 +32,7 @@ function Editor( {
 	forceDisableBlockTools,
 	title,
 	iframeProps,
+	extraContent,
 	extraSidebarPanels,
 	enableRegionNavigation = true,
 } ) {
@@ -59,12 +60,7 @@ function Editor( {
 	);
 
 	return (
-		<ExperimentalEditorProvider
-			post={ post }
-			__unstableTemplate={ template }
-			settings={ settings }
-			useSubRegistry={ false }
-		>
+		<>
 			{ hasLoadedPost && ! post && (
 				<Notice status="warning" isDismissible={ false }>
 					{ __(
@@ -72,21 +68,32 @@ function Editor( {
 					) }
 				</Notice>
 			) }
-			<EditorInterface
-				className={ className }
-				styles={ styles }
-				enableRegionNavigation={ enableRegionNavigation }
-				customSaveButton={ customSaveButton }
-				forceDisableBlockTools={ forceDisableBlockTools }
-				title={ title }
-				iframeProps={ iframeProps }
-			/>
-			<Sidebar
-				onActionPerformed={ onActionPerformed }
-				extraPanels={ extraSidebarPanels }
-			/>
-			{ children }
-		</ExperimentalEditorProvider>
+			{ !! post && (
+				<ExperimentalEditorProvider
+					post={ post }
+					__unstableTemplate={ template }
+					settings={ settings }
+					useSubRegistry={ false }
+				>
+					<EditorInterface
+						className={ className }
+						styles={ styles }
+						enableRegionNavigation={ enableRegionNavigation }
+						customSaveButton={ customSaveButton }
+						forceDisableBlockTools={ forceDisableBlockTools }
+						title={ title }
+						iframeProps={ iframeProps }
+					>
+						{ extraContent }
+					</EditorInterface>
+					<Sidebar
+						onActionPerformed={ onActionPerformed }
+						extraPanels={ extraSidebarPanels }
+					/>
+					{ children }
+				</ExperimentalEditorProvider>
+			) }
+		</>
 	);
 }
 
