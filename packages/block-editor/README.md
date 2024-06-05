@@ -388,7 +388,7 @@ Undocumented declaration.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/font-sizes/README.md>
+-   <https://github.com/WordPress/gutenberg/tree/trunk/packages/block-editor/src/components/font-sizes#readme>
 
 ### getColorClassName
 
