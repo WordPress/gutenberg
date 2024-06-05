@@ -3,7 +3,6 @@
  */
 import * as fs from 'fs/promises';
 import { dirname } from 'path';
-import { expect } from '@playwright/test';
 import type { APIRequestContext } from '@playwright/test';
 
 /**
@@ -23,31 +22,18 @@ function splitRequestsToChunks( requests: BatchRequest[], chunkSize: number ) {
 }
 
 async function getAPIRootURL( request: APIRequestContext ) {
-	let restLink: unknown = null;
+	// Discover the API root url using link header.
+	// See https://developer.wordpress.org/rest-api/using-the-rest-api/discovery/#link-header
+	const response = await request.head( WP_BASE_URL );
+	const links = response.headers().link;
+	const restLink = links?.match( /<([^>]+)>; rel="https:\/\/api\.w\.org\/"/ );
 
-	// Retry until the REST API root URL is discovered.
-	// See https://github.com/WordPress/gutenberg/issues/61627
-	await expect
-		.poll(
-			async () => {
-				// Discover the API root url using link header.
-				// See https://developer.wordpress.org/rest-api/using-the-rest-api/discovery/#link-header
-				const response = await request.head( WP_BASE_URL );
-				const links = response.headers().link;
-				restLink = links?.match(
-					/<([^>]+)>; rel="https:\/\/api\.w\.org\/"/
-				);
+	if ( ! restLink ) {
+		throw new Error( `Failed to discover REST API endpoint.
+ Link header: ${ links }` );
+	}
 
-				return restLink;
-			},
-			{
-				message: 'Failed to discover REST API endpoint.',
-				timeout: 60_000, // 1 minute.
-			}
-		)
-		.not.toBeFalsy();
-
-	const [ , rootURL ] = restLink as RegExpMatchArray;
+	const [ , rootURL ] = restLink;
 
 	return rootURL;
 }
