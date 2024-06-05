@@ -892,7 +892,7 @@
 }
 
 .dataviews-bulk-actions {
-	position: absolute;
+	position: sticky;
 	display: flex;
 	flex-direction: column;
 	align-content: center;
