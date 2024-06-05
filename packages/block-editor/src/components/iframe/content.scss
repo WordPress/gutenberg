@@ -1,12 +1,5 @@
 .block-editor-iframe__body {
 	position: relative;
-
-	// Float an outline on the top of the iframe to show focus on the canvas when pressing
-	// escape while in select mode.
-	&:focus::after {
-		@include selectedOutline();
-		position: fixed;
-	}
 }
 
 .block-editor-iframe__container {
