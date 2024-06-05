@@ -783,7 +783,7 @@ const duplicatePostAction = {
 					sprintf(
 						// translators: %s: Title of the created template e.g: "Category".
 						__( '"%s" successfully created.' ),
-						newItem.title?.rendered || title
+						decodeEntities( newItem.title?.rendered || title )
 					),
 					{
 						id: 'duplicate-post-action',
