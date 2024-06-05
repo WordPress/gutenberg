@@ -21,12 +21,19 @@ const slideX = {
 function BackButton( { initialPost } ) {
 	return (
 		<BackButtonFill>
-			<motion.div
-				variants={ slideX }
-				transition={ { type: 'tween', delay: 0.8 } }
-			>
-				<FullscreenModeClose showTooltip initialPost={ initialPost } />
-			</motion.div>
+			{ ( { length } ) =>
+				length <= 1 && (
+					<motion.div
+						variants={ slideX }
+						transition={ { type: 'tween', delay: 0.8 } }
+					>
+						<FullscreenModeClose
+							showTooltip
+							initialPost={ initialPost }
+						/>
+					</motion.div>
+				)
+			}
 		</BackButtonFill>
 	);
 }
