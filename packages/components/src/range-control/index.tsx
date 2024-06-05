@@ -326,7 +326,8 @@ function UnforwardedRangeControl(
 					<ActionRightWrapper>
 						<Button
 							className="components-range-control__reset"
-							disabled={ disabled || value === undefined }
+							__experimentalIsFocusable={ ! disabled }
+							disabled={ disabled || value === null }
 							variant="secondary"
 							size="small"
 							onClick={ handleOnReset }
