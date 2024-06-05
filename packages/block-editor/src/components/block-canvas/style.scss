@@ -1,11 +1,12 @@
 // Float an outline on the top of the canvas when it is focused
-.editor-styles-wrapper:focus::after {
+
+.editor-styles-wrapper:not(.has-multi-selection):not(:has(.is-selected)):focus::after {
 	@include selected-block-outline();
 	position: fixed;
 }
 
 // For non-iframed versions of the editor, we need additional styles to define the focus area
-div.editor-styles-wrapper:focus::after {
+div.editor-styles-wrapper:not(.has-multi-selection):not(:has(.is-selected)):focus::after {
 	top: $header-height;
 	@include break-medium() {
 		bottom: $button-size-small + $border-width;
