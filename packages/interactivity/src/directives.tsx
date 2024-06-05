@@ -632,5 +632,5 @@ export default () => {
 		{ priority: 20 }
 	);
 
-	directive( 'each-child', () => null, { priority: 4 } );
+	directive( 'each-child', () => null, { priority: 1 } );
 };
