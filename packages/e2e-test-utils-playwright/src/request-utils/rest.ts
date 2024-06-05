@@ -43,6 +43,8 @@ async function setupRest( this: RequestUtils ): Promise< StorageState > {
 	let nonce = '';
 	let rootURL = '';
 
+	// Poll until the REST API is discovered.
+	// See https://github.com/WordPress/gutenberg/issues/61627
 	await expect
 		.poll(
 			async () => {
