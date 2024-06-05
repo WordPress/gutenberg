@@ -17,6 +17,11 @@ import {
 	getActiveBlockVariation,
 } from '../selectors';
 
+/**
+ * WordPress dependencies
+ */
+import { RichTextData } from '@wordpress/rich-text';
+
 const keyBlocksByName = ( blocks ) =>
 	blocks.reduce(
 		( result, block ) => ( { ...result, [ block.name ]: block } ),
@@ -449,6 +454,43 @@ describe( 'selectors', () => {
 						firstTestAttribute: {
 							nestedProperty: 2,
 						},
+					} )
+				).toEqual( variations[ 1 ] );
+			} );
+			it( 'should support RichText attributes in the isActive array', () => {
+				const variations = [
+					{
+						name: 'variation-1',
+						attributes: {
+							firstTestAttribute:
+								'This is a <strong>RichText</strong> attribute.',
+						},
+						isActive: [ 'firstTestAttribute' ],
+					},
+					{
+						name: 'variation-2',
+						attributes: {
+							firstTestAttribute:
+								'This is a <em>RichText</em> attribute.',
+						},
+						isActive: [ 'firstTestAttribute' ],
+					},
+				];
+				const state =
+					createBlockVariationsStateWithTestBlockType( variations );
+
+				expect(
+					getActiveBlockVariation( state, blockName, {
+						firstTestAttribute: RichTextData.fromHTMLString(
+							'This is a <strong>RichText</strong> attribute.'
+						),
+					} )
+				).toEqual( variations[ 0 ] );
+				expect(
+					getActiveBlockVariation( state, blockName, {
+						firstTestAttribute: RichTextData.fromHTMLString(
+							'This is a <em>RichText</em> attribute.'
+						),
 					} )
 				).toEqual( variations[ 1 ] );
 			} );
