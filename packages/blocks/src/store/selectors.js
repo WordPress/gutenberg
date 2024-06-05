@@ -7,6 +7,7 @@ import removeAccents from 'remove-accents';
  * WordPress dependencies
  */
 import { createSelector } from '@wordpress/data';
+import { RichTextData } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -269,10 +270,13 @@ export function getActiveBlockVariation( state, blockName, attributes, scope ) {
 				if ( variationAttributeValue === undefined ) {
 					return false;
 				}
-				const blockAttributeValue = getValueFromObjectPath(
+				let blockAttributeValue = getValueFromObjectPath(
 					attributes,
 					attribute
 				);
+				if ( blockAttributeValue instanceof RichTextData ) {
+					blockAttributeValue = blockAttributeValue.toHTMLString();
+				}
 				return variationAttributeValue === blockAttributeValue;
 			} );
 			if ( isMatch && definedAttributesLength > maxMatchedAttributes ) {
