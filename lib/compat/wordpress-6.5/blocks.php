@@ -85,7 +85,9 @@ function gutenberg_block_bindings_replace_html( $block_content, $block_name, str
 				return $block_content;
 			}
 			$pattern = '/(<' . $selector . '[^>]*>).*?(<\/' . $selector . '>)/i';
-			return preg_replace( $pattern, '$1' . wp_kses_post( $source_value ) . '$2', $block_content );
+			return preg_replace_callback( $pattern, function ( $matches ) use ( $source_value ) {
+				return $matches[1] . wp_kses_post( $source_value ) . $matches[2];
+			}, $block_content );
 
 		case 'attribute':
 			$amended_content = new WP_HTML_Tag_Processor( $block_content );
