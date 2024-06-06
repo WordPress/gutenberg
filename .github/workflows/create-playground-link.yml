@@ -13,11 +13,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+        uses: actions/checkout@v3
+
+      # We need to wait for the release artifcat to be created and uploaded
+      # before creating the URL for the playground, as the playground relies
+      # on the artifact, which is the actual plugin zip it ends up installing.
+      - name: Wait for Build Gutenberg Plugin Zip workflow
+        uses: lewagon/wait-on-check-action@v1.2.0
+        with:
+          ref: ${{ github.ref }}
+          check-name: 'Build Release Artifact'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          wait-interval: 20
+          allowed-conclusions: success
 
       - name: Create WordPress Playground link comment
         uses: actions/github-script@v7
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const { run } = require('./.github/workflows/scripts/generate-playground-blueprint.js');
             run({ github, context });
