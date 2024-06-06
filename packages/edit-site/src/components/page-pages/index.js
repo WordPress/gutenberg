@@ -206,6 +206,18 @@ export default function PagePages() {
 	const [ view, setView ] = useView( postType );
 	const history = useHistory();
 
+	const [ selection, setSelection ] = useState( [] );
+
+	const {
+		params: { postId },
+	} = useLocation();
+	const [ postIdToSelect, setPostIdToSelect ] = useState();
+	useEffect( () => {
+		if ( postId ) {
+			setPostIdToSelect( postId );
+		}
+	}, [ postId ] );
+
 	const onSelectionChange = useCallback(
 		( items ) => {
 			const { params } = history.getLocationWithParams();
@@ -265,6 +277,20 @@ export default function PagePages() {
 		totalItems,
 		totalPages,
 	} = useEntityRecords( 'postType', postType, queryArgs );
+
+	useEffect( () => {
+		if ( ! postIdToSelect ) {
+			return;
+		}
+		// Only try to select an item if the loading is complete and we have items.
+		if ( ! isLoadingPages && pages && pages.length ) {
+			// If the item is not in the current selection, select it.
+			if ( selection.length !== 1 || selection[ 0 ] !== postIdToSelect ) {
+				setSelection( [ postIdToSelect ] );
+			}
+			setPostIdToSelect( undefined );
+		}
+	}, [ postIdToSelect, selection, isLoadingPages, pages ] );
 
 	const { records: authors, isResolving: isLoadingAuthors } =
 		useEntityRecords( 'root', 'user', { per_page: -1 } );
@@ -523,6 +549,8 @@ export default function PagePages() {
 				isLoading={ isLoadingPages || isLoadingAuthors }
 				view={ view }
 				onChangeView={ onChangeView }
+				selection={ selection }
+				setSelection={ setSelection }
 				onSelectionChange={ onSelectionChange }
 			/>
 		</Page>
