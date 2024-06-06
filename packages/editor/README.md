@@ -1187,7 +1187,11 @@ Renders the publish button.
 
 ### PostPublishButtonLabel
 
-Undocumented declaration.
+Renders the label for the publish button.
+
+_Returns_
+
+-   `string`: The label for the publish button.
 
 ### PostPublishPanel
 
