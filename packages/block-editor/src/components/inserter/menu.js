@@ -32,6 +32,14 @@ import InserterSearchResults from './search-results';
 import useInsertionPoint from './hooks/use-insertion-point';
 import InserterTabs from './tabs';
 import { store as blockEditorStore } from '../../store';
+import { useZoomOut } from '../../hooks/use-zoom-out';
+
+const ZoomOutHandler = ( { children, showPatternPanel } ) => {
+	// When the pattern panel is showing, we want to use zoom out mode
+	useZoomOut( showPatternPanel );
+
+	return <>{ children }</>;
+};
 
 const NOOP = () => {};
 function InserterMenu(
@@ -306,7 +314,7 @@ function InserterMenu(
 		}
 	}, [] );
 
-	return (
+	const menuContent = (
 		<div
 			className={ clsx( 'block-editor-inserter__menu', {
 				'show-panel': showPatternPanel || showMediaPanel,
@@ -343,6 +351,18 @@ function InserterMenu(
 				</Popover>
 			) }
 		</div>
+	);
+
+	return (
+		<>
+			{ window.__experimentalEnableZoomedOutPatternsTab ? (
+				<ZoomOutHandler showPatternPanel={ showPatternPanel }>
+					{ menuContent }
+				</ZoomOutHandler>
+			) : (
+				menuContent
+			) }
+		</>
 	);
 }
 
