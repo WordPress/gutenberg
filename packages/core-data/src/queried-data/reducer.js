@@ -233,7 +233,7 @@ const receiveQueries = compose( [
 	return {
 		itemIds: getMergedItemIds(
 			state?.itemIds || [],
-			action.items.flatMap( ( item ) => item?.[ key ] ?? [] ),
+			action.items.map( ( item ) => item?.[ key ] ).filter( Boolean ),
 			page,
 			perPage
 		),
