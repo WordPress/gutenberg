@@ -16,10 +16,9 @@ import {
 	useReducedMotion,
 	useViewportMatch,
 	useResizeObserver,
-	usePrevious,
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { useState, useRef, useEffect } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { CommandMenu } from '@wordpress/commands';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
@@ -56,7 +55,6 @@ export default function Layout( { route } ) {
 	useSyncCanvasModeWithURL();
 	useCommands();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const toggleRef = useRef();
 	const { canvasMode, previousShortcut, nextShortcut } = useSelect(
 		( select ) => {
 			const { getAllShortcutKeyCombinations } = select(
@@ -79,7 +77,7 @@ export default function Layout( { route } ) {
 		previous: previousShortcut,
 		next: nextShortcut,
 	} );
-	const disableMotion = useReducedMotion();
+	const reduceMotion = useReducedMotion();
 	const [ canvasResizer, canvasSize ] = useResizeObserver();
 	const [ fullResizer ] = useResizeObserver();
 	const isEditorLoading = useIsSiteEditorLoading();
@@ -92,14 +90,6 @@ export default function Layout( { route } ) {
 
 	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
 	const [ gradientValue ] = useGlobalStyle( 'color.gradient' );
-	const previousCanvaMode = usePrevious( canvasMode );
-	useEffect( () => {
-		if ( previousCanvaMode === 'edit' ) {
-			toggleRef.current?.focus();
-		}
-		// Should not depend on the previous canvas mode value but the next.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ canvasMode ] );
 
 	// Synchronizing the URL with the store value of canvasMode happens in an effect
 	// This condition ensures the component is only rendered after the synchronization happens
@@ -135,6 +125,10 @@ export default function Layout( { route } ) {
 							ariaLabel={ __( 'Navigation' ) }
 							className="edit-site-layout__sidebar-region"
 						>
+							<SiteHub
+								isTransparent={ isResizableFrameOversized }
+								canvasMode={ canvasMode }
+							/>
 							<AnimatePresence>
 								{ canvasMode === 'view' && (
 									<motion.div
@@ -145,20 +139,15 @@ export default function Layout( { route } ) {
 											type: 'tween',
 											duration:
 												// Disable transition in mobile to emulate a full page transition.
-												disableMotion ||
-												isMobileViewport
+												reduceMotion || isMobileViewport
 													? 0
 													: ANIMATION_DURATION,
-											ease: 'easeOut',
+											ease: 'linear',
+											delay:
+												canvasMode === 'view' ? 0.2 : 0,
 										} }
 										className="edit-site-layout__sidebar"
 									>
-										<SiteHub
-											ref={ toggleRef }
-											isTransparent={
-												isResizableFrameOversized
-											}
-										/>
 										<SidebarContent routeKey={ routeKey }>
 											{ areas.sidebar }
 										</SidebarContent>

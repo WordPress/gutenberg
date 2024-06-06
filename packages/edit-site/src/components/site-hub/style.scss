@@ -3,20 +3,39 @@
 	align-items: center;
 	justify-content: space-between;
 	gap: $grid-unit-10;
-	margin-right: $grid-unit-15;
+	padding-right: $grid-unit-15;
 }
 
 .edit-site-site-hub__actions {
-	flex-shrink: 0;
+	flex: 0 0 min-content;
+	margin-inline: auto 0;
 }
 
 .edit-site-site-hub__view-mode-toggle-container {
+	z-index: 3; // TODO: add and use: z-index(".edit-site-site-hub__view-mode-toggle-container");
+	background: $gray-900;
 	height: $header-height;
 	width: $header-height;
 	flex-shrink: 0;
 
 	&.has-transparent-background .edit-site-layout__view-mode-toggle-icon {
 		background: transparent;
+	}
+}
+
+.edit-site-layout__view-mode-toggle-icon {
+	transition: transform 0.3s ease-out;
+	@include reduce-motion("transition");
+
+	transform: scale(1);
+
+	.is-exit > & {
+		// Scales so the svg path inside the default WP icon is 20px.
+		transform: scale(0.6667);
+	}
+
+	:not(.is-exit):hover > & {
+		transform: scale(0.96);
 	}
 }
 
