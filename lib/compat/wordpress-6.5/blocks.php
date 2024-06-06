@@ -56,6 +56,7 @@ add_filter( 'register_block_type_args', 'gutenberg_register_metadata_attribute' 
  * @return string The modified block content.
  */
 function gutenberg_block_bindings_replace_html( $block_content, $block_name, string $attribute_name, $source_value ) {
+	var_dump( 'replace gutenberg' );
 	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
 	if ( ! isset( $block_type->attributes[ $attribute_name ]['source'] ) ) {
 		return $block_content;
@@ -147,7 +148,7 @@ function gutenberg_block_bindings_replace_html( $block_content, $block_name, str
 }
 
 // Only process block bindings if they are not processed in core.
-if ( class_exists( 'WP_Block_Bindings_Registry' ) ) {
+if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 	/**
 	 * Process the block bindings attribute.
 	 *
