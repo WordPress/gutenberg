@@ -39,3 +39,11 @@ jobs:
             - uses: ./packages/project-management-automation
               with:
                   github_token: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Create WordPress Playground link comment
+              uses: actions/github-script@v6
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+                  script: |
+                      const script = require('./.github/workflows/scripts/generate-playground-blueprint.js');
+                      await script({ github, context });
