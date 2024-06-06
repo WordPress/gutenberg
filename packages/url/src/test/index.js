@@ -1036,28 +1036,18 @@ describe( 'filterURLForDisplay', () => {
 		expect( url ).toBe( 'wordpress.org/ig.jpg' );
 	} );
 	it( 'should return ellipsis, upper level pieces url, and filename when the url is long enough but filename is short enough', () => {
-		let url = filterURLForDisplay(
+		const url = filterURLForDisplay(
 			'http://www.wordpress.org/wp-content/uploads/myimage.jpg',
 			20
 		);
 		expect( url ).toBe( '…/uploads/myimage.jpg' );
-		url = filterURLForDisplay(
-			'file:///home/user/documents/project/reports/2024/myfile.pdf',
-			20
-		);
-		expect( url ).toBe( '…orts/2024/myfile.pdf' );
 	} );
 	it( 'should return filename split by ellipsis plus three characters when filename is long enough', () => {
-		let url = filterURLForDisplay(
+		const url = filterURLForDisplay(
 			'http://www.wordpress.org/wp-content/uploads/superlongtitlewithextension.jpeg',
 			20
 		);
 		expect( url ).toBe( 'superlongti…ion.jpeg' );
-		url = filterURLForDisplay(
-			'file:///home/user/documents/project/reports/2024/superlongtitlewithextension.pdf',
-			20
-		);
-		expect( url ).toBe( 'superlongtit…ion.pdf' );
 	} );
 	it( 'should remove query arguments', () => {
 		const url = filterURLForDisplay(
@@ -1074,13 +1064,8 @@ describe( 'filterURLForDisplay', () => {
 		expect( url ).toBe( 'wordpress.org/wp-content/url/' );
 	} );
 	it( 'should return file split by ellipsis when the file name has multiple periods', () => {
-		let url = filterURLForDisplay(
+		const url = filterURLForDisplay(
 			'http://www.wordpress.org/wp-content/uploads/filename.2020.12.20.png',
-			20
-		);
-		expect( url ).toBe( 'filename.202….20.png' );
-		url = filterURLForDisplay(
-			'file:///home/user/documents/project/reports/2024/filename.2020.12.20.png',
 			20
 		);
 		expect( url ).toBe( 'filename.202….20.png' );

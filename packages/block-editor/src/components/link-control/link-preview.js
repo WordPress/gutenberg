@@ -35,7 +35,7 @@ import useRichUrlData from './use-rich-url-data';
  * @return {string} The filtered title.
  */
 function filterTitleForDisplay( title ) {
-	// Dervied from `filterURLForDisplay` in `@wordpress/url`.
+	// Derived from `filterURLForDisplay` in `@wordpress/url`.
 	return title
 		.replace( /^[a-z\-.\+]+[0-9]*:(\/\/)?/i, '' )
 		.replace( /^www\./i, '' );
