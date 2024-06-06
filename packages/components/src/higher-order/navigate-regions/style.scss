@@ -1,10 +1,8 @@
 // Allow the position to be easily overridden to e.g. fixed.
 [role="region"] {
 	position: relative;
-}
 
-.is-focusing-regions {
-	[role="region"]:focus::after {
+	&:focus::after {
 		position: absolute;
 		top: 0;
 		left: 0;
@@ -16,7 +14,9 @@
 		outline-offset: -4px;
 		z-index: z-index(".is-focusing-regions {region} :focus::after");
 	}
+}
 
+.is-focusing-regions {
 	// Fixes for edge cases.
 	// Some of the regions are currently used for layout purposes as 'interface skeleton'
 	// items. When they're absolutely positioned or when they contain absolutely

@@ -156,7 +156,12 @@ export default function BlockTools( {
 			} else if ( clientIds.length === 1 ) {
 				event.preventDefault();
 				clearSelectedBlock();
-				__unstableContentRef?.current.focus();
+				// This is temporary code to see if this works with NVDA. I'm not sure the best way to find the region that contains the block editor.
+				document
+					.querySelector(
+						'[role="region"][aria-label="Editor content"]'
+					)
+					.focus();
 			}
 		} else if ( isMatch( 'core/block-editor/collapse-list-view', event ) ) {
 			// If focus is currently within a text field, such as a rich text block or other editable field,
