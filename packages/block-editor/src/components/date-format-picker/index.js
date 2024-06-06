@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { dateI18n } from '@wordpress/date';
 import { useState, createInterpolateElement } from '@wordpress/element';
-import { select } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import {
 	TextControl,
 	ExternalLink,
@@ -82,7 +82,9 @@ function NonDefaultControls( { format, onChange } ) {
 	// 2022) in German (de). The resultant array is de-duplicated as some
 	// languages will use the same format string for short, medium, and long
 	// formats.
-	const editorSettings = select( blockEditorStore ).getSettings();
+	const editorSettings = useSelect( ( select ) =>
+		select( blockEditorStore ).getSettings()
+	);
 	const suggestedFormats =
 		editorSettings?.__experimentalFeatures?.date?.formatOptions ?? [];
 
