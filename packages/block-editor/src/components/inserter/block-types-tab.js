@@ -204,7 +204,7 @@ export function BlockTypesTab(
 							collections={ collections }
 							onSelectItem={ onSelectItem }
 							onHover={ onHover }
-							showMostUsedBlocks={ showMostUsedBlocks }
+							showMostUsedBlocks={ false }
 							className="block-editor-inserter__insertable-blocks-at-selection"
 						/>
 					</>
