@@ -31,8 +31,14 @@ function ContentOnlySettingsMenuItems( { clientId, onClose } ) {
 				} = select( blockEditorStore );
 				const contentOnly =
 					getBlockEditingMode( clientId ) === 'contentOnly';
+				const _canEditTemplateParts = select( coreStore ).canUser(
+					'create',
+					'templates'
+				);
 				if ( ! contentOnly ) {
-					return {};
+					return {
+						canEditTemplateParts: _canEditTemplateParts,
+					};
 				}
 				const patternParent = getBlockParentsByBlockName(
 					clientId,
@@ -41,10 +47,6 @@ function ContentOnlySettingsMenuItems( { clientId, onClose } ) {
 				)[ 0 ];
 
 				let record;
-				const _canEditTemplateParts = select( coreStore ).canUser(
-					'create',
-					'templates'
-				);
 				if ( patternParent ) {
 					record = select( coreStore ).getEntityRecord(
 						'postType',
@@ -54,7 +56,7 @@ function ContentOnlySettingsMenuItems( { clientId, onClose } ) {
 				} else {
 					const { getCurrentTemplateId } = select( editorStore );
 					const templateId = getCurrentTemplateId();
-					if ( templateId && _canEditTemplateParts ) {
+					if ( templateId ) {
 						record = select( coreStore ).getEntityRecord(
 							'postType',
 							'wp_template',
@@ -72,7 +74,8 @@ function ContentOnlySettingsMenuItems( { clientId, onClose } ) {
 			[ clientId ]
 		);
 
-	if ( ! canEditTemplateParts ) {
+	// The post has a parent template part, but the user does not have the capability to edit template parts.
+	if ( ! canEditTemplateParts && entity ) {
 		return (
 			<>
 				<BlockSettingsMenuFirstItem>
