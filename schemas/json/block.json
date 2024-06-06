@@ -640,6 +640,11 @@
 							}
 						}
 					]
+				},
+				"splitting": {
+					"type": "boolean",
+					"description": "This property indicates whether the block can split when the Enter key is pressed or when blocks are pasted.",
+					"default": false
 				}
 			},
 			"additionalProperties": true

@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Enhancements
+
+- Add `text-wrap: balance` fallback to all instances of `text-wrap: pretty` for greater cross browser compatibility. ([#62233](https://github.com/WordPress/gutenberg/pull/62233))
+
+### Bug Fixes
+
+-   `Tabs`: Prevent accidental overflow in indicator ([#61979](https://github.com/WordPress/gutenberg/pull/61979)).
+
 ## 28.0.0 (2024-05-31)
 
 ### Breaking Changes
