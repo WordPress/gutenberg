@@ -11,7 +11,6 @@ import { store as coreStore } from '@wordpress/core-data';
 import { __experimentalText as Text, MenuItem } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { lockSmall as lock } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -80,32 +79,20 @@ function ContentOnlySettingsMenuItems( { clientId, onClose } ) {
 		);
 	}
 
-	// The post has a parent template part, but the user does not have the capability to edit template parts.
+	const isPattern = entity.type === 'wp_block';
+	let helpText = isPattern
+		? __(
+				'Edit the pattern to move, delete, or make further changes to this block.'
+		  )
+		: __(
+				'Edit the template to move, delete, or make further changes to this block.'
+		  );
+
 	if ( ! canEditTemplates ) {
-		return (
-			<>
-				<BlockSettingsMenuFirstItem>
-					<MenuItem
-						icon={ lock }
-						iconPosition="left"
-						role="none"
-						disabled
-					>
-						{ __( 'Locked' ) }
-					</MenuItem>
-				</BlockSettingsMenuFirstItem>
-				<Text
-					variant="muted"
-					as="p"
-					className="editor-content-only-settings-menu__description"
-				>
-					{ __( 'Sorry, you cannot edit this block.' ) }
-				</Text>
-			</>
+		helpText = __(
+			'Only users with permissions to edit the template can move or delete this block'
 		);
 	}
-
-	const isPattern = entity.type === 'wp_block';
 
 	return (
 		<>
@@ -117,6 +104,7 @@ function ContentOnlySettingsMenuItems( { clientId, onClose } ) {
 							postType: entity.type,
 						} );
 					} }
+					disabled={ ! canEditTemplates }
 				>
 					{ isPattern ? __( 'Edit pattern' ) : __( 'Edit template' ) }
 				</MenuItem>
@@ -126,13 +114,7 @@ function ContentOnlySettingsMenuItems( { clientId, onClose } ) {
 				as="p"
 				className="editor-content-only-settings-menu__description"
 			>
-				{ isPattern
-					? __(
-							'Edit the pattern to move, delete, or make further changes to this block.'
-					  )
-					: __(
-							'Edit the template to move, delete, or make further changes to this block.'
-					  ) }
+				{ helpText }
 			</Text>
 		</>
 	);
