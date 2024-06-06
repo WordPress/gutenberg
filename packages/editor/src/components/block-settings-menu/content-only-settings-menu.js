@@ -20,62 +20,68 @@ import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 function ContentOnlySettingsMenuItems( { clientId, onClose } ) {
-	const { entity, onNavigateToEntityRecord, canEditTemplateParts } =
-		useSelect(
-			( select ) => {
-				const {
-					getBlockEditingMode,
-					getBlockParentsByBlockName,
-					getSettings,
-					getBlockAttributes,
-				} = select( blockEditorStore );
-				const contentOnly =
-					getBlockEditingMode( clientId ) === 'contentOnly';
-				const _canEditTemplateParts = select( coreStore ).canUser(
-					'create',
-					'templates'
-				);
-				if ( ! contentOnly ) {
-					return {
-						canEditTemplateParts: _canEditTemplateParts,
-					};
-				}
-				const patternParent = getBlockParentsByBlockName(
-					clientId,
-					'core/block',
-					true
-				)[ 0 ];
+	const { entity, onNavigateToEntityRecord, canEditTemplates } = useSelect(
+		( select ) => {
+			const {
+				getBlockEditingMode,
+				getBlockParentsByBlockName,
+				getSettings,
+				getBlockAttributes,
+			} = select( blockEditorStore );
+			const contentOnly =
+				getBlockEditingMode( clientId ) === 'contentOnly';
+			if ( ! contentOnly ) {
+				return {};
+			}
+			const patternParent = getBlockParentsByBlockName(
+				clientId,
+				'core/block',
+				true
+			)[ 0 ];
 
-				let record;
-				if ( patternParent ) {
+			let record;
+			if ( patternParent ) {
+				record = select( coreStore ).getEntityRecord(
+					'postType',
+					'wp_block',
+					getBlockAttributes( patternParent ).ref
+				);
+			} else {
+				const { getCurrentTemplateId } = select( editorStore );
+				const templateId = getCurrentTemplateId();
+				if ( templateId ) {
 					record = select( coreStore ).getEntityRecord(
 						'postType',
-						'wp_block',
-						getBlockAttributes( patternParent ).ref
+						'wp_template',
+						templateId
 					);
-				} else {
-					const { getCurrentTemplateId } = select( editorStore );
-					const templateId = getCurrentTemplateId();
-					if ( templateId ) {
-						record = select( coreStore ).getEntityRecord(
-							'postType',
-							'wp_template',
-							templateId
-						);
-					}
 				}
-				return {
-					canEditTemplateParts: _canEditTemplateParts,
-					entity: record,
-					onNavigateToEntityRecord:
-						getSettings().onNavigateToEntityRecord,
-				};
-			},
-			[ clientId ]
+			}
+			const _canEditTemplates = select( coreStore ).canUser(
+				'create',
+				'templates'
+			);
+			return {
+				canEditTemplates: _canEditTemplates,
+				entity: record,
+				onNavigateToEntityRecord:
+					getSettings().onNavigateToEntityRecord,
+			};
+		},
+		[ clientId ]
+	);
+
+	if ( ! entity ) {
+		return (
+			<TemplateLockContentOnlyMenuItems
+				clientId={ clientId }
+				onClose={ onClose }
+			/>
 		);
+	}
 
 	// The post has a parent template part, but the user does not have the capability to edit template parts.
-	if ( ! canEditTemplateParts && entity ) {
+	if ( ! canEditTemplates ) {
 		return (
 			<>
 				<BlockSettingsMenuFirstItem>
@@ -96,15 +102,6 @@ function ContentOnlySettingsMenuItems( { clientId, onClose } ) {
 					{ __( 'Sorry, you cannot edit this block.' ) }
 				</Text>
 			</>
-		);
-	}
-
-	if ( ! entity ) {
-		return (
-			<TemplateLockContentOnlyMenuItems
-				clientId={ clientId }
-				onClose={ onClose }
-			/>
 		);
 	}
 
