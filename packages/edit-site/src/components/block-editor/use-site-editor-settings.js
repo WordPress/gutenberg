@@ -114,37 +114,28 @@ function useNavigateToPreviousEntityRecord() {
 
 export function useSpecificEditorSettings() {
 	const onNavigateToEntityRecord = useNavigateToEntityRecord();
-	const { templateSlug, canvasMode, settings, postWithTemplate } = useSelect(
-		( select ) => {
-			const {
-				getEditedPostType,
-				getEditedPostId,
-				getEditedPostContext,
-				getCanvasMode,
-				getSettings,
-			} = unlock( select( editSiteStore ) );
-			const { getEditedEntityRecord } = select( coreStore );
-			const usedPostType = getEditedPostType();
-			const usedPostId = getEditedPostId();
-			const _record = getEditedEntityRecord(
-				'postType',
-				usedPostType,
-				usedPostId
-			);
-			const _context = getEditedPostContext();
-			return {
-				templateSlug: _record.slug,
-				canvasMode: getCanvasMode(),
-				settings: getSettings(),
-				postWithTemplate: _context?.postId,
-			};
-		},
-		[]
-	);
+	const { templateSlug, canvasMode, settings } = useSelect( ( select ) => {
+		const {
+			getEditedPostType,
+			getEditedPostId,
+			getCanvasMode,
+			getSettings,
+		} = unlock( select( editSiteStore ) );
+		const { getEditedEntityRecord } = select( coreStore );
+		const usedPostType = getEditedPostType();
+		const usedPostId = getEditedPostId();
+		const _record = getEditedEntityRecord(
+			'postType',
+			usedPostType,
+			usedPostId
+		);
+		return {
+			templateSlug: _record.slug,
+			canvasMode: getCanvasMode(),
+			settings: getSettings(),
+		};
+	}, [] );
 	const archiveLabels = useArchiveLabel( templateSlug );
-	const defaultRenderingMode = postWithTemplate
-		? 'template-locked'
-		: 'post-only';
 	const onNavigateToPreviousEntityRecord =
 		useNavigateToPreviousEntityRecord();
 	const defaultEditorSettings = useMemo( () => {
@@ -154,7 +145,6 @@ export function useSpecificEditorSettings() {
 			richEditingEnabled: true,
 			supportsTemplateMode: true,
 			focusMode: canvasMode !== 'view',
-			defaultRenderingMode,
 			onNavigateToEntityRecord,
 			onNavigateToPreviousEntityRecord,
 			// I wonder if they should be set in the post editor too
@@ -165,7 +155,6 @@ export function useSpecificEditorSettings() {
 	}, [
 		settings,
 		canvasMode,
-		defaultRenderingMode,
 		onNavigateToEntityRecord,
 		onNavigateToPreviousEntityRecord,
 		archiveLabels.archiveTypeLabel,

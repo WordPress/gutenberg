@@ -4,7 +4,11 @@
 import { useEffect, useLayoutEffect, useMemo } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { EntityProvider, useEntityBlockEditor } from '@wordpress/core-data';
+import {
+	EntityProvider,
+	useEntityBlockEditor,
+	store as coreStore,
+} from '@wordpress/core-data';
 import {
 	BlockEditorProvider,
 	BlockContextProvider,
@@ -161,8 +165,17 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		__unstableTemplate: template,
 	} ) => {
 		const mode = useSelect(
-			( select ) => select( editorStore ).getRenderingMode(),
-			[]
+			( select ) => {
+				const postTypeObject = select( coreStore ).getPostType(
+					post.type
+				);
+				return (
+					postTypeObject?.default_rendering_mode ??
+					settings.defaultRenderingMode ??
+					'post-only'
+				);
+			},
+			[ post, coreStore, settings ]
 		);
 		const shouldRenderTemplate = !! template && mode !== 'post-only';
 		const rootLevelPost = shouldRenderTemplate ? template : post;
@@ -250,7 +263,15 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					}
 				);
 			}
-		}, [] );
+		}, [
+			createWarningNotice,
+			initialEdits,
+			settings,
+			post,
+			recovery,
+			setupEditor,
+			updatePostLock,
+		] );
 
 		// Synchronizes the active post with the state
 		useEffect( () => {
@@ -269,8 +290,8 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 
 		// Sets the right rendering mode when loading the editor.
 		useEffect( () => {
-			setRenderingMode( settings.defaultRenderingMode ?? 'post-only' );
-		}, [ settings.defaultRenderingMode, setRenderingMode ] );
+			setRenderingMode( mode );
+		}, [ mode ] );
 
 		useHideBlocksFromInserter( post.type, mode );
 

@@ -31,29 +31,11 @@ function Editor( {
 	initialEdits,
 	...props
 } ) {
-	// Get the rendering mode for the post type.
-	const postTypeRenderingMode = useSelect(
-		( select ) => {
-			const postTypeObject =
-				select( coreStore ).getPostType( initialPostType );
-			if ( postTypeObject && postTypeObject?.default_rendering_mode ) {
-				return postTypeObject.default_rendering_mode;
-			}
-
-			return 'post-only';
-		},
-		[ initialPostType ]
-	);
-
 	const {
 		currentPost,
 		onNavigateToEntityRecord,
 		onNavigateToPreviousEntityRecord,
-	} = useNavigateToEntityRecord(
-		initialPostId,
-		initialPostType,
-		postTypeRenderingMode
-	);
+	} = useNavigateToEntityRecord( initialPostId, initialPostType );
 
 	const { post, template } = useSelect(
 		( select ) => {
@@ -92,7 +74,6 @@ function Editor( {
 			...settings,
 			onNavigateToEntityRecord,
 			onNavigateToPreviousEntityRecord,
-			defaultRenderingMode: postTypeRenderingMode,
 		} ),
 		[ settings, onNavigateToEntityRecord, onNavigateToPreviousEntityRecord ]
 	);
