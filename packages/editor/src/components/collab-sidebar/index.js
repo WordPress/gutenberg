@@ -19,7 +19,6 @@ import { dateI18n, format, getSettings } from '@wordpress/date';
 /**
  * Internal dependencies
  */
-import PluginSidebarMoreMenuItem from '../plugin-sidebar-more-menu-item';
 import PluginSidebar from '../plugin-sidebar';
 import { store as editorStore } from '../../store';
 
@@ -50,133 +49,116 @@ export default function CollabSidebar() {
 	const dateTimeFormat = getSettings().formats.datetime;
 
 	return (
-		<>
-			<PluginSidebarMoreMenuItem
-				target="collab-activities"
-				icon={ commentIcon }
-			>
-				{ __( 'Collab' ) }
-			</PluginSidebarMoreMenuItem>
-			<PluginSidebar
-				name="collab-activities"
-				title={ __( 'Collab Activities' ) }
-			>
-				<div className="editor-collab-sidebar__activities">
-					{ Object.values( threads )
-						.reverse()
-						.map( ( thread, index ) => (
-							<VStack
-								key={ index }
-								className="editor-collab-sidebar__thread"
+		<PluginSidebar
+			name="collab-activities"
+			title={ __( 'Collab Activities' ) }
+			icon={ commentIcon }
+		>
+			<div className="editor-collab-sidebar__activities">
+				{ Object.values( threads )
+					.reverse()
+					.map( ( thread, index ) => (
+						<VStack
+							key={ index }
+							className="editor-collab-sidebar__thread"
+						>
+							<HStack
+								alignment="left"
+								spacing="1"
+								justify="flex-start"
 							>
-								<HStack
-									alignment="left"
-									spacing="1"
-									justify="flex-start"
-								>
-									<Icon icon={ userIcon } size={ 35 } />
-									<VStack spacing="1">
-										<span>{ thread.createdBy }</span>
-										<time
-											dateTime={ format(
-												'c',
-												thread.createdAt
-											) }
-										>
-											{ dateI18n(
-												dateTimeFormat,
-												thread.createdAt
-											) }
-										</time>
-									</VStack>
-								</HStack>
-								{ thread.comments.map( ( comment ) => (
-									<VStack
-										key={ comment.commentId }
-										className="editor-collab-sidebar__comment"
+								<Icon icon={ userIcon } size={ 35 } />
+								<VStack spacing="1">
+									<span>{ thread.createdBy }</span>
+									<time
+										dateTime={ format(
+											'c',
+											thread.createdAt
+										) }
 									>
-										<HStack
-											alignment="center"
-											spacing="1"
-											justify="flex-start"
-										>
-											<Icon
-												icon={ userIcon }
-												size={ 35 }
-											/>
-											<VStack spacing="1">
-												<span>
-													{ comment.createdBy }
-												</span>
-												<time
-													dateTime={ format(
-														'c',
-														comment.createdAt
-													) }
-												>
-													{ dateI18n(
-														dateTimeFormat,
-														comment.createdAt
-													) }
-												</time>
-											</VStack>
-										</HStack>
-										<HStack
-											alignment="center"
-											spacing="1"
-											justify="flex-start"
-										>
-											{ comment.comment }
-										</HStack>
-									</VStack>
-								) ) }
-								{ thread.isResolved && (
-									<VStack className="editor-collab-sidebar__resolved">
-										<HStack
-											alignment="center"
-											spacing="1"
-											justify="flex-start"
-										>
-											<Icon
-												icon={ userIcon }
-												size={ 35 }
-											/>
-											<VStack spacing="1">
-												<span>
-													{ thread.resolvedBy }
-												</span>
-												<time
-													dateTime={ format(
-														'c',
-														thread.resolvedAt
-													) }
-												>
-													{ dateI18n(
-														dateTimeFormat,
-														thread.resolvedAt
-													) }
-												</time>
-											</VStack>
-										</HStack>
-										<HStack
-											alignment="center"
-											spacing="1"
-											justify="flex-start"
-										>
-											<Icon
-												icon={ resolvedIcon }
-												size={ 20 }
-											/>
-											<Text>
-												{ __( 'Marked as resolved' ) }
-											</Text>
-										</HStack>
-									</VStack>
-								) }
-							</VStack>
-						) ) }
-				</div>
-			</PluginSidebar>
-		</>
+										{ dateI18n(
+											dateTimeFormat,
+											thread.createdAt
+										) }
+									</time>
+								</VStack>
+							</HStack>
+							{ thread.comments.map( ( comment ) => (
+								<VStack
+									key={ comment.commentId }
+									className="editor-collab-sidebar__comment"
+								>
+									<HStack
+										alignment="center"
+										spacing="1"
+										justify="flex-start"
+									>
+										<Icon icon={ userIcon } size={ 35 } />
+										<VStack spacing="1">
+											<span>{ comment.createdBy }</span>
+											<time
+												dateTime={ format(
+													'c',
+													comment.createdAt
+												) }
+											>
+												{ dateI18n(
+													dateTimeFormat,
+													comment.createdAt
+												) }
+											</time>
+										</VStack>
+									</HStack>
+									<HStack
+										alignment="center"
+										spacing="1"
+										justify="flex-start"
+									>
+										{ comment.comment }
+									</HStack>
+								</VStack>
+							) ) }
+							{ thread.isResolved && (
+								<VStack className="editor-collab-sidebar__resolved">
+									<HStack
+										alignment="center"
+										spacing="1"
+										justify="flex-start"
+									>
+										<Icon icon={ userIcon } size={ 35 } />
+										<VStack spacing="1">
+											<span>{ thread.resolvedBy }</span>
+											<time
+												dateTime={ format(
+													'c',
+													thread.resolvedAt
+												) }
+											>
+												{ dateI18n(
+													dateTimeFormat,
+													thread.resolvedAt
+												) }
+											</time>
+										</VStack>
+									</HStack>
+									<HStack
+										alignment="center"
+										spacing="1"
+										justify="flex-start"
+									>
+										<Icon
+											icon={ resolvedIcon }
+											size={ 20 }
+										/>
+										<Text>
+											{ __( 'Marked as resolved' ) }
+										</Text>
+									</HStack>
+								</VStack>
+							) }
+						</VStack>
+					) ) }
+			</div>
+		</PluginSidebar>
 	);
 }
