@@ -1,11 +1,6 @@
 .editor-post-last-revision__title {
 	width: 100%;
 	font-weight: 500;
-
-	&.is-link {
-		width: fit-content;
-		font-weight: unset;
-	}
 }
 
 .editor-post-last-revision__title.components-button.has-icon {
@@ -32,4 +27,8 @@
 	.editor-post-last-revision__title.components-button.components-button {
 		padding: $grid-unit-20;
 	}
+}
+
+.editor-private-post-last-revision__button {
+	display: inline-block;
 }

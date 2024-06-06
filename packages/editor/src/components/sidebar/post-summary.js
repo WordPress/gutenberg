@@ -67,7 +67,6 @@ export default function PostSummary( { onActionPerformed } ) {
 							<VStack spacing={ 1 }>
 								<PostContentInformation />
 								<PostLastEditedPanel />
-								<PrivatePostLastRevision isLink />
 							</VStack>
 							{ ! isRemovedPostStatusPanel && (
 								<VStack spacing={ 2 }>
@@ -78,6 +77,7 @@ export default function PostSummary( { onActionPerformed } ) {
 										<PostAuthorPanel />
 										<PostTemplatePanel />
 										<PostDiscussionPanel />
+										<PrivatePostLastRevision />
 										<PageAttributesPanel />
 										<PostSyncStatus />
 										<BlogTitle />
