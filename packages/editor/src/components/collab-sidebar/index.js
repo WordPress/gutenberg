@@ -27,9 +27,7 @@ const isBlockCommentExperimentEnabled =
 	window?.__experimentalEnableBlockComment;
 
 /**
- * Renders the character count of the post content.
- *
- * @return {number} The character count.
+ * Renders the Collab sidebar.
  */
 export default function CollabSidebar() {
 	const { threads } = useSelect( ( select ) => {
