@@ -26,6 +26,15 @@ function identity( values ) {
 	return values;
 }
 
+/**
+ * Renders the component for managing saved states of entities.
+ *
+ * @param {Object}   props              The component props.
+ * @param {Function} props.close        The function to close the dialog.
+ * @param {Function} props.renderDialog The function to render the dialog.
+ *
+ * @return {JSX.Element} The rendered component.
+ */
 export default function EntitiesSavedStates( {
 	close,
 	renderDialog = undefined,
