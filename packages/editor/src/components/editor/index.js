@@ -20,6 +20,7 @@ function Editor( {
 	templateId,
 	settings,
 	children,
+	initialEdits,
 
 	// This could be part of the settings.
 	onActionPerformed,
@@ -67,6 +68,7 @@ function Editor( {
 					post={ post }
 					__unstableTemplate={ template }
 					settings={ settings }
+					initialEdits={ initialEdits }
 					useSubRegistry={ false }
 				>
 					<EditorInterface { ...props }>
