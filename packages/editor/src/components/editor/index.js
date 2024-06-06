@@ -26,15 +26,9 @@ function Editor( {
 
 	// The following abstractions are not ideal but necessary
 	// to account for site editor and post editor differences for now.
-	className,
-	styles,
-	customSaveButton,
-	forceDisableBlockTools,
-	title,
-	iframeProps,
 	extraContent,
 	extraSidebarPanels,
-	enableRegionNavigation = true,
+	...props
 } ) {
 	const { post, template, hasLoadedPost } = useSelect(
 		( select ) => {
@@ -75,15 +69,7 @@ function Editor( {
 					settings={ settings }
 					useSubRegistry={ false }
 				>
-					<EditorInterface
-						className={ className }
-						styles={ styles }
-						enableRegionNavigation={ enableRegionNavigation }
-						customSaveButton={ customSaveButton }
-						forceDisableBlockTools={ forceDisableBlockTools }
-						title={ title }
-						iframeProps={ iframeProps }
-					>
+					<EditorInterface { ...props }>
 						{ extraContent }
 					</EditorInterface>
 					<Sidebar

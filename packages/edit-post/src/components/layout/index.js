@@ -321,6 +321,7 @@ function Layout( {
 		<SlotFillProvider>
 			<ErrorBoundary>
 				<CommandMenu />
+				<WelcomeGuide postType={ currentPost.postType } />
 				<Editor
 					settings={ editorSettings }
 					initialEdits={ initialEdits }
@@ -359,7 +360,6 @@ function Layout( {
 					<EditPostKeyboardShortcuts />
 					<EditorKeyboardShortcutsRegister />
 					<BlockKeyboardShortcuts />
-					<WelcomeGuide />
 					<InitPatternModal />
 					<PluginArea onError={ onPluginAreaError } />
 					<PostEditorMoreMenu />
