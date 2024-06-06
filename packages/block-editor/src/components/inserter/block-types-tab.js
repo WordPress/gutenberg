@@ -21,9 +21,6 @@ const getBlockNamespace = ( item ) => item.name.split( '/' )[ 0 ];
 
 const MAX_SUGGESTED_ITEMS = 6;
 
-const INSERTABLE_BLOCKS_AT_SELECTION_CATEGORY =
-	'insertable-blocks-at-selection';
-
 /**
  * Shared reference to an empty array for cases where it is important to avoid
  * returning a new array reference on every invocation and rerendering the component.
@@ -33,6 +30,8 @@ const INSERTABLE_BLOCKS_AT_SELECTION_CATEGORY =
 const EMPTY_ARRAY = [];
 
 export function BlockTypesTabPanel( {
+	selectedBlockItems,
+	selectedBlockCategories,
 	items,
 	collections,
 	categories,
@@ -76,6 +75,9 @@ export function BlockTypesTabPanel( {
 	 * of the "opening" action, these lazy lists allow us to render the inserter category per category,
 	 * once all the categories are rendered, we start rendering the collections and the uncategorized block types.
 	 */
+	const currentlyRenderedSelectedBlockCategories = useAsyncList(
+		selectedBlockCategories
+	);
 	const currentlyRenderedCategories = useAsyncList( categories );
 	const didRenderAllCategories =
 		categories.length === currentlyRenderedCategories.length;
@@ -90,6 +92,35 @@ export function BlockTypesTabPanel( {
 
 	return (
 		<div className={ className }>
+			{ selectedBlockItems &&
+				currentlyRenderedSelectedBlockCategories.map( ( category ) => {
+					const selectedCategoryItems = selectedBlockItems.filter(
+						( item ) => item.category === category.slug
+					);
+					if (
+						! selectedCategoryItems ||
+						! selectedCategoryItems.length
+					) {
+						return null;
+					}
+					return (
+						<InserterPanel
+							key={ category.slug }
+							title={ category.title }
+							icon={ category.icon }
+						>
+							<BlockTypesList
+								items={ selectedCategoryItems }
+								onSelect={ onSelectItem }
+								onHover={ onHover }
+								label={ category.title }
+							/>
+						</InserterPanel>
+					);
+				} ) }
+			{ selectedBlockItems.length > 0 && (
+				<div className="block-editor-inserter__category-panel-divider" />
+			) }
 			{ showMostUsedBlocks &&
 				// Only show the most used blocks if the total amount of block
 				// is larger than 1 row, otherwise it is not so useful.
@@ -124,10 +155,6 @@ export function BlockTypesTabPanel( {
 							onHover={ onHover }
 							label={ category.title }
 						/>
-						{ category.slug ===
-							INSERTABLE_BLOCKS_AT_SELECTION_CATEGORY && (
-							<div className="block-editor-inserter__category-panel-divider" />
-						) }
 					</InserterPanel>
 				);
 			} ) }
@@ -188,40 +215,38 @@ export function BlockTypesTab(
 		return <InserterNoResults />;
 	}
 
-	let allCategories = [];
-
-	if ( rootClientId && categories.length ) {
-		const currentlySelectedBlockType = getBlockType(
-			getBlockName( rootClientId )
-		);
-
-		allCategories = [
-			{
-				slug: INSERTABLE_BLOCKS_AT_SELECTION_CATEGORY,
-				title: currentlySelectedBlockType.title,
-				icon: null,
-			},
-			...categories,
-		];
-	} else {
-		allCategories = [ ...categories ];
-	}
-
+	const selectedBlockItems = [];
+	const selectedBlockCategories = [];
 	const allItems = [];
 
-	for ( const item of items ) {
-		// Skip reusable blocks, they moved to the patterns tab.
-		if ( item.category === 'reusable' ) {
-			continue;
+	if ( rootClientId ) {
+		for ( const item of items ) {
+			// Skip reusable blocks, they moved to the patterns tab.
+			if ( item.category === 'reusable' ) {
+				continue;
+			}
+
+			if ( rootClientId && item.rootClientId === rootClientId ) {
+				selectedBlockItems.push( { ...item } );
+			} else {
+				allItems.push( { ...item } );
+			}
 		}
 
-		if ( rootClientId && item.rootClientId === rootClientId ) {
-			allItems.push( {
-				...item,
-				category: INSERTABLE_BLOCKS_AT_SELECTION_CATEGORY,
-			} );
-		} else {
-			allItems.push( { ...item } );
+		for ( const category of categories ) {
+			const hasItem = selectedBlockItems.some(
+				( item ) => item.category === category.slug
+			);
+			if ( hasItem ) {
+				selectedBlockCategories.push( { ...category } );
+			}
+		}
+
+		// If we only have one category, replace the category title with the selected block title.
+		if ( selectedBlockCategories.length === 1 ) {
+			selectedBlockCategories[ 0 ].title = getBlockType(
+				getBlockName( rootClientId )
+			).title;
 		}
 	}
 
@@ -229,8 +254,10 @@ export function BlockTypesTab(
 		<InserterListbox>
 			<div ref={ ref }>
 				<BlockTypesTabPanel
-					items={ allItems }
-					categories={ allCategories }
+					selectedBlockItems={ selectedBlockItems }
+					selectedBlockCategories={ selectedBlockCategories }
+					items={ rootClientId ? allItems : items }
+					categories={ categories }
 					collections={ collections }
 					onSelectItem={ onSelectItem }
 					onHover={ onHover }

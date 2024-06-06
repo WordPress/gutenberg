@@ -256,7 +256,7 @@ $block-inserter-tabs-height: 44px;
 .block-editor-inserter__category-panel-divider {
 	width: calc(100% + #{ $grid-unit-20 * 2});
 	margin-left: -$grid-unit-20;
-	padding-top: $grid-unit-20;
+	margin-bottom: $grid-unit-20;
 	border-bottom: $border-width solid $gray-200;
 }
 
