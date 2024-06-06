@@ -26,9 +26,12 @@ import MostUsedTerms from './most-used-terms';
 const EMPTY_ARRAY = [];
 
 /**
- * Module constants
+ * How the max suggestions limit was chosen:
+ *  - Matches the `per_page` range set by the REST API.
+ *  - Can't use "unbound" query. The `FormTokenField` needs a fixed number.
+ *  - Matches default for `FormTokenField`.
  */
-const MAX_TERMS_SUGGESTIONS = 20;
+const MAX_TERMS_SUGGESTIONS = 100;
 const DEFAULT_QUERY = {
 	per_page: MAX_TERMS_SUGGESTIONS,
 	_fields: 'id,name',
