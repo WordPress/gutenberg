@@ -76,6 +76,7 @@ export default function Layout() {
 	const toggleRef = useRef();
 	const {
 		isDistractionFree,
+		hasFixedToolbar,
 		hasBlockSelected,
 		canvasMode,
 		previousShortcut,
@@ -92,6 +93,10 @@ export default function Layout() {
 			),
 			nextShortcut: getAllShortcutKeyCombinations(
 				'core/editor/next-region'
+			),
+			hasFixedToolbar: select( preferencesStore ).get(
+				'core',
+				'fixedToolbar'
 			),
 			isDistractionFree: select( preferencesStore ).get(
 				'core',
@@ -161,6 +166,7 @@ export default function Layout() {
 						'is-distraction-free':
 							isDistractionFree && canvasMode === 'edit',
 						'is-full-canvas': canvasMode === 'edit',
+						'has-fixed-toolbar': hasFixedToolbar,
 						'is-block-toolbar-visible': hasBlockSelected,
 					}
 				) }
