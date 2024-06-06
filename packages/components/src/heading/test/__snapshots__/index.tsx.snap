@@ -5,6 +5,7 @@ exports[`props should render correctly 1`] = `
   color: #1e1e1e;
   line-height: 1.4;
   margin: 0;
+  text-wrap: balance;
   text-wrap: pretty;
   color: #1e1e1e;
   font-size: calc(1.95 * 13px);
