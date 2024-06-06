@@ -20,20 +20,16 @@ function Editor( {
 	templateId,
 	settings,
 	children,
+	initialEdits,
 
 	// This could be part of the settings.
 	onActionPerformed,
 
 	// The following abstractions are not ideal but necessary
 	// to account for site editor and post editor differences for now.
-	className,
-	styles,
-	customSaveButton,
-	forceDisableBlockTools,
-	title,
-	iframeProps,
+	extraContent,
 	extraSidebarPanels,
-	enableRegionNavigation = true,
+	...props
 } ) {
 	const { post, template, hasLoadedPost } = useSelect(
 		( select ) => {
@@ -59,12 +55,7 @@ function Editor( {
 	);
 
 	return (
-		<ExperimentalEditorProvider
-			post={ post }
-			__unstableTemplate={ template }
-			settings={ settings }
-			useSubRegistry={ false }
-		>
+		<>
 			{ hasLoadedPost && ! post && (
 				<Notice status="warning" isDismissible={ false }>
 					{ __(
@@ -72,21 +63,25 @@ function Editor( {
 					) }
 				</Notice>
 			) }
-			<EditorInterface
-				className={ className }
-				styles={ styles }
-				enableRegionNavigation={ enableRegionNavigation }
-				customSaveButton={ customSaveButton }
-				forceDisableBlockTools={ forceDisableBlockTools }
-				title={ title }
-				iframeProps={ iframeProps }
-			/>
-			<Sidebar
-				onActionPerformed={ onActionPerformed }
-				extraPanels={ extraSidebarPanels }
-			/>
-			{ children }
-		</ExperimentalEditorProvider>
+			{ !! post && (
+				<ExperimentalEditorProvider
+					post={ post }
+					__unstableTemplate={ template }
+					settings={ settings }
+					initialEdits={ initialEdits }
+					useSubRegistry={ false }
+				>
+					<EditorInterface { ...props }>
+						{ extraContent }
+					</EditorInterface>
+					<Sidebar
+						onActionPerformed={ onActionPerformed }
+						extraPanels={ extraSidebarPanels }
+					/>
+					{ children }
+				</ExperimentalEditorProvider>
+			) }
+		</>
 	);
 }
 
