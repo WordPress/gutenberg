@@ -45,6 +45,7 @@ const generateWordpressPlaygroundBlueprint = (prNumber) => {
     ],
     plugins: [],
   };
+
   return defaultSchema;
 };
 
@@ -69,13 +70,15 @@ async function run({ github, context }) {
   }
 
   const defaultSchema = generateWordpressPlaygroundBlueprint(context.issue.number);
-  const url = `https://playground.wordpress.net/#${JSON.stringify(defaultSchema)}`;
+  const url = `https://playground.wordpress.net/#${ JSON.stringify(
+    defaultSchema
+  ) }`;
 
-  const body = `## Test using WordPress Playground
+  const body = `
+## Test using WordPress Playground
+The changes in this pull request can be previewed and tested using a [Wordpress Playground app](https://playground.wordpress.net/playground/) instance.
 
-The changes in this pull request can be previewed and tested using the [Gutenberg Playground app](https://playground.wordpress.net/gutenberg.html).
-
-[Test this pull request with Gutenberg Playground](${url}).
+[Test this pull request with Wordpress Playground](${url}).
 
 Note that this URL is valid for 30 days from when this comment was last updated. You can update it by closing/reopening the PR or pushing a new commit.`;
 
