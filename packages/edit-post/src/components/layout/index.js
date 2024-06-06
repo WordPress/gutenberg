@@ -59,6 +59,10 @@ const DESIGN_POST_TYPES = [
 	'wp_navigation',
 ];
 
+const TYPEWRITER_STYLE = {
+	css: 'body{padding-bottom: 40vh}',
+};
+
 function useEditorStyles() {
 	const {
 		hasThemeStyleSupport,
@@ -114,11 +118,11 @@ function useEditorStyles() {
 			} );
 		}
 
-		const baseStyles = hasThemeStyles
+		let baseStyles = hasThemeStyles
 			? editorSettings.styles ?? []
 			: defaultEditorStyles;
 
-		// Add a constant padding for the typewritter effect. When typing at the
+		// Add a constant padding for the typewriter effect. When typing at the
 		// bottom, there needs to be room to scroll up.
 		if (
 			! isZoomedOutView &&
@@ -126,9 +130,11 @@ function useEditorStyles() {
 			renderingMode === 'post-only' &&
 			! DESIGN_POST_TYPES.includes( postType )
 		) {
-			baseStyles.push( {
-				css: 'body{padding-bottom: 40vh}',
-			} );
+			baseStyles.push( TYPEWRITER_STYLE );
+		} else if ( baseStyles.includes( TYPEWRITER_STYLE ) ) {
+			baseStyles = baseStyles.filter(
+				( style ) => style !== TYPEWRITER_STYLE
+			);
 		}
 
 		return baseStyles;
@@ -137,6 +143,7 @@ function useEditorStyles() {
 		editorSettings.disableLayoutStyles,
 		editorSettings.styles,
 		hasThemeStyleSupport,
+		postType,
 	] );
 }
 
