@@ -22,7 +22,7 @@ import {
 /**
  * Internal dependencies
  */
-import Editor from './editor';
+import Layout from './components/layout';
 import { unlock } from './lock-unlock';
 
 const { BackButton: __experimentalMainDashboardButton } =
@@ -138,7 +138,7 @@ export function initializeEditor(
 
 	root.render(
 		<StrictMode>
-			<Editor
+			<Layout
 				settings={ settings }
 				postId={ postId }
 				postType={ postType }

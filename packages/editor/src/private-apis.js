@@ -6,7 +6,6 @@ import * as interfaceApis from '@wordpress/interface';
 /**
  * Internal dependencies
  */
-import { ExperimentalEditorProvider } from './components/provider';
 import { lock } from './lock-unlock';
 import { EntitiesSavedStatesExtensible } from './components/entities-saved-states';
 import EditorContentSlotFill from './components/editor-interface/content-slot-fill';
@@ -14,14 +13,12 @@ import useBlockEditorSettings from './components/provider/use-block-editor-setti
 import BackButton from './components/header/back-button';
 import CreateTemplatePartModal from './components/create-template-part-modal';
 import Editor from './components/editor';
-import EditorInterface from './components/editor-interface';
 import PluginPostExcerpt from './components/post-excerpt/plugin';
 import PreferencesModal from './components/preferences-modal';
 import { usePostActions } from './components/post-actions/actions';
 import ToolsMoreMenuGroup from './components/more-menu/tools-more-menu-group';
 import ViewMoreMenuGroup from './components/more-menu/view-more-menu-group';
 import ResizableEditor from './components/resizable-editor';
-import Sidebar from './components/sidebar';
 import {
 	mergeBaseAndUserConfigs,
 	GlobalStylesProvider,
@@ -33,10 +30,8 @@ export const privateApis = {};
 lock( privateApis, {
 	CreateTemplatePartModal,
 	BackButton,
-	ExperimentalEditorProvider,
 	EntitiesSavedStatesExtensible,
 	Editor,
-	EditorInterface,
 	EditorContentSlotFill,
 	GlobalStylesProvider,
 	mergeBaseAndUserConfigs,
@@ -46,7 +41,6 @@ lock( privateApis, {
 	ToolsMoreMenuGroup,
 	ViewMoreMenuGroup,
 	ResizableEditor,
-	Sidebar,
 
 	// This is a temporary private API while we're updating the site editor to use EditorProvider.
 	useBlockEditorSettings,
