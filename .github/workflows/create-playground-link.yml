@@ -19,18 +19,20 @@ jobs:
       # before creating the URL for the playground, as the playground relies
       # on the artifact, which is the actual plugin zip it ends up installing.
       - name: Wait for Build Gutenberg Plugin Zip workflow
-        uses: lewagon/wait-on-check-action@v1.2.0
+        uses: kamilchodola/wait-for-workflow-action@1.1.0
         with:
-          ref: ${{ github.ref }}
-          check-name: 'Build Release Artifact'
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          wait-interval: 20
-          allowed-conclusions: success
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          workflow_id: 'build-plugin-zip.yml'
+          max_wait_minutes: '3'
+          interval: '5'
+          timeout: '60'
+          org_name: 'fullofcaffeine' # @todo change this
+          repo_name: 'gutenberg' # @odo change this
+          ref: '${{ github.ref }}'
 
       - name: Create WordPress Playground link comment
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const { run } = require('./.github/workflows/scripts/generate-playground-blueprint.js');
             run({ github, context });
