@@ -1278,15 +1278,42 @@ Undocumented declaration.
 
 ### PostTaxonomies
 
-Undocumented declaration.
+Renders the taxonomies associated with a post.
+
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.taxonomyWrapper_ `Function`: The wrapper function for each taxonomy component.
+
+_Returns_
+
+-   `Array`: An array of JSX elements representing the visible taxonomies.
 
 ### PostTaxonomiesCheck
 
-Undocumented declaration.
+Renders the children components only if the current post type has taxonomies.
+
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.children_ `Element`: The children components to render.
+
+_Returns_
+
+-   `Component|null`: The rendered children components or null if the current post type has no taxonomies.
 
 ### PostTaxonomiesFlatTermSelector
 
-Undocumented declaration.
+Renders a flat term selector component.
+
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.slug_ `string`: The slug of the taxonomy.
+
+_Returns_
+
+-   `JSX.Element`: The rendered flat term selector component.
 
 ### PostTaxonomiesHierarchicalTermSelector
 
@@ -1303,7 +1330,17 @@ _Returns_
 
 ### PostTaxonomiesPanel
 
-Undocumented declaration.
+Renders a panel for a specific taxonomy.
+
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.taxonomy_ `Object`: The taxonomy object.
+-   _props.children_ `Element`: The child components.
+
+_Returns_
+
+-   `Component`: The rendered taxonomy panel.
 
 ### PostTemplatePanel
 
