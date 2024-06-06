@@ -1049,6 +1049,7 @@ export function usePostActions( postType, onActionPerformed ) {
 	const isPattern = postType === PATTERN_POST_TYPE;
 	const isLoaded = !! postTypeObject;
 	const supportsRevisions = !! postTypeObject?.supports?.revisions;
+	const supportsTitle = !! postTypeObject?.supports?.title;
 	return useMemo( () => {
 		if ( ! isLoaded ) {
 			return [];
@@ -1064,7 +1065,7 @@ export function usePostActions( postType, onActionPerformed ) {
 				: false,
 			isTemplateOrTemplatePart && duplicateTemplatePartAction,
 			isPattern && duplicatePatternAction,
-			renamePostAction,
+			supportsTitle && renamePostAction,
 			isPattern && exportPatternAsJSONAction,
 			isTemplateOrTemplatePart ? resetTemplateAction : restorePostAction,
 			isTemplateOrTemplatePart || isPattern
@@ -1124,5 +1125,6 @@ export function usePostActions( postType, onActionPerformed ) {
 		onActionPerformed,
 		isLoaded,
 		supportsRevisions,
+		supportsTitle,
 	] );
 }
