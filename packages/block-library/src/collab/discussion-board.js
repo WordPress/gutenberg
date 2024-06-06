@@ -229,20 +229,10 @@ const DiscussionBoard = ( { contentRef, onClose } ) => {
 				anchor={ popoverAnchor }
 			>
 				<VStack spacing="3">
-					{ 0 < currentThread.length && (
-						<div
-							className="block-editor-format-toolbar__comment-board__resolved"
-							title={ __( 'Mark as resolved' ) }
-						>
-							<CheckboxControl
-								checked={ isResolved }
-								onChange={ () => showConfirmationOverlay() }
-							/>
-						</div>
-					) }
+					
 					{ 0 < currentThread.length &&
 						currentThread.map(
-							( { userName, comment, timestamp, commentId } ) => (
+							( { userName, comment, timestamp, commentId }, index ) => (
 								<VStack
 									spacing="2"
 									key={ timestamp }
@@ -253,44 +243,73 @@ const DiscussionBoard = ( { contentRef, onClose } ) => {
 										spacing="1"
 										justify="space-between"
 									>
-										<Icon icon={ userIcon } size={ 35 } />
-										<VStack spacing="1">
-											<span>{ userName }</span>
-											<time
-												dateTime={ format(
-													'c',
-													timestamp
-												) }
-											>
-												{ dateI18n(
-													dateTimeFormat,
-													timestamp
-												) }
-											</time>
-										</VStack>
-										<Button
-											icon={ deleteIcon }
-											label={ __( 'Delete comment' ) }
-											onClick={ () =>
-												deleteComment( commentId )
-											}
-										/>
+										<HStack
+											alignment="left"
+											spacing="3"
+											justify="start"
+										>
+											<Icon icon={ userIcon } className='comment-board__userIcon' size={ 45 } />
+											<VStack spacing="1">
+												<span className='comment-board__userName'>{ userName }</span>
+												<time
+													dateTime={ format(
+														'c',
+														timestamp
+													) }
+												>
+													{ dateI18n(
+														dateTimeFormat,
+														timestamp
+													) }
+												</time>
+											</VStack>
+										</HStack>
+										<HStack
+											alignment="right"
+											spacing="1"
+											justify="end"
+											className='comment-board__actions'
+										>
+											{ index === 0 && (
+												<div
+													className="block-editor-format-toolbar__comment-board__resolved"
+													title={ __( 'Mark as resolved' ) }
+												>
+													<CheckboxControl
+														checked={ isResolved }
+														onChange={ () => showConfirmationOverlay() }
+														label= { __( 'Resolve' ) }
+													/>
+												</div>
+											) }
+											<Button
+												icon={ deleteIcon }
+												label={ __( 'Delete comment' ) }
+												onClick={ () =>
+													deleteComment( commentId )
+												}
+											/>
+										</HStack>
 									</HStack>
-									<p>{ comment }</p>
+									<p className='comment-board__commentText'>{ comment }</p>
 								</VStack>
 							)
 						) }
 					<VStack spacing="2">
 						{ 0 === currentThread.length && (
-							<HStack alignment="left" spacing="1">
-								<Icon icon={ userIcon } size={ 35 } />
-								<span>{ currentUser }</span>
+							<HStack 
+								alignment="left"
+								spacing="3"
+								justify="start">
+								<Icon icon={ userIcon } className='comment-board__userIcon' size={ 45 } />
+								<span className='comment-board__userName'>{ currentUser }</span>
 							</HStack>
 						) }
 						<TextControl
 							value={ inputComment }
 							onChange={ ( val ) => setInputComment( val ) }
 							placeholder={ __( 'Comment or add others with @' ) }
+							className='block-editor-format-toolbar__comment-input'
 						/>
 						<HStack alignment="right" spacing="1">
 							<Button
