@@ -1,0 +1,23 @@
+name: Create Playground Link
+
+on:
+  pull_request:
+    paths-ignore:
+      - 'docs/**'
+      - '**/changelog/**'
+      - '**/tests/**'
+      - '**/*.md'
+
+jobs:
+  create-playground-link:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+
+      - name: Create WordPress Playground link comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { run } = require('./.github/workflows/scripts/generate-playground-blueprint.js');
+            run({ github, context });
