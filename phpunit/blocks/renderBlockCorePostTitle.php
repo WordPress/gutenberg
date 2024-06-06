@@ -12,21 +12,21 @@ class Tests_Blocks_RenderBlockCorePostTitle extends WP_UnitTestCase {
 	/**
 	 * Post object.
 	 *
-	 * @var array
+	 * @var WP_Post
 	 */
 	protected static $post;
 
 	/**
 	 * Array of attributes.
 	 *
-	 * @var int
+	 * @var array
 	 */
 	protected static $attributes;
 
 	/**
 	 * Block object.
 	 *
-	 * @var object
+	 * @var WP_Block
 	 */
 	protected static $block;
 
@@ -70,21 +70,35 @@ class Tests_Blocks_RenderBlockCorePostTitle extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test gutenberg_render_block_core_post_title() method.
+	 * Test if the function returns an empty string when the post title is empty.
+	 *
+	 * @param mixed  $context         Block context.
+	 * @param string $failure_message Failure message.
+	 *
+	 * @dataProvider data_should_render_empty_string_when_title_is_empty
 	 */
-	public function test_should_render_empty_string_when_title_is_empty() {
-
-		// call render method with block context.
+	public function test_should_render_empty_string_when_title_is_empty( $context, $failure_message ) {
+		if ( $context ) {
+			self::$block->context = $context;
+		}
 		$rendered = gutenberg_render_block_core_post_title( self::$attributes, '', self::$block );
-		$this->assertEmpty( $rendered );
-
-		self::$block->context = array( 'postId' => 0 );
-		$rendered             = gutenberg_render_block_core_post_title( self::$attributes, '', self::$block );
-		$this->assertEmpty( $rendered );
+		$this->assertSame( '', $rendered, $failure_message );
 	}
 
 	/**
-	 * Test gutenberg_render_block_core_post_title() method.
+	 * Data provider.
+	 *
+	 * @return array
+	 */
+	public function data_should_render_empty_string_when_title_is_empty() {
+		return array(
+			'empty block context' => array( null, 'Failed asserting that rendering result is an empty string when block context is not set.' ),
+			'incorrect post ID'   => array( array( 'postId' => 0 ), 'Failed asserting that rendering result is an empty string when post ID is incorrect.' ),
+		);
+	}
+
+	/**
+	 * Test if the function returns correct titles.
 	 */
 	public function test_should_render_correct_title() {
 
