@@ -74,7 +74,7 @@ export default function LinkPreview( {
 		stripHTML( richData?.title || value?.title || displayURL );
 
 	const isUrlRedundant =
-		value?.url && filterTitleForDisplay( displayTitle ) === displayURL;
+		! value?.url || filterTitleForDisplay( displayTitle ) === displayURL;
 
 	let icon;
 
