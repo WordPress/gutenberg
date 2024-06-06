@@ -298,13 +298,19 @@ export default function DataviewsPatterns() {
 						<span
 							className={ `edit-site-patterns__field-sync-status-${ item.syncStatus }` }
 						>
-							{ SYNC_FILTERS.find(
-								( { value } ) => value === item.syncStatus
-							)?.label ||
-								SYNC_FILTERS.find(
-									( { value } ) =>
-										value === PATTERN_SYNC_TYPES.unsynced
-								).label }
+							{
+								(
+									SYNC_FILTERS.find(
+										( { value } ) =>
+											value === item.syncStatus
+									) ||
+									SYNC_FILTERS.find(
+										( { value } ) =>
+											value ===
+											PATTERN_SYNC_TYPES.unsynced
+									)
+								).label
+							}
 						</span>
 					);
 				},
