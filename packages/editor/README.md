@@ -1191,7 +1191,7 @@ Undocumented declaration.
 
 ### PostPublishPanel
 
-Undocumented declaration.
+Renders a panel for publishing a post.
 
 ### PostSavedState
 
