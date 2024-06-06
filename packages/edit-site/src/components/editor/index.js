@@ -29,7 +29,6 @@ import { store as editSiteStore } from '../../store';
 import { GlobalStylesRenderer } from '../global-styles-renderer';
 import CanvasLoader from '../canvas-loader';
 import { unlock } from '../../lock-unlock';
-import TemplatePartConverter from '../template-part-converter';
 import { useSpecificEditorSettings } from '../block-editor/use-site-editor-settings';
 import PluginTemplateSettingPanel from '../plugin-template-setting-panel';
 import GlobalStylesSidebar from '../global-styles-sidebar';
@@ -53,7 +52,6 @@ export default function EditSiteEditor( { isLoading } ) {
 		editedPostId,
 		contextPostType,
 		contextPostId,
-		editorMode,
 		canvasMode,
 		isEditingPage,
 		supportsGlobalStyles,
@@ -70,7 +68,6 @@ export default function EditSiteEditor( { isLoading } ) {
 		} = unlock( select( editSiteStore ) );
 		const { get } = select( preferencesStore );
 		const { getCurrentTheme } = select( coreDataStore );
-		const { getEditorMode } = select( editorStore );
 		const _context = getEditedPostContext();
 
 		// The currently selected entity to display.
@@ -80,7 +77,6 @@ export default function EditSiteEditor( { isLoading } ) {
 			editedPostId: getEditedPostId(),
 			contextPostType: _context?.postId ? _context.postType : undefined,
 			contextPostId: _context?.postId ? _context.postId : undefined,
-			editorMode: getEditorMode(),
 			canvasMode: getCanvasMode(),
 			isEditingPage: isPage(),
 			supportsGlobalStyles: getCurrentTheme()?.is_block_theme,
@@ -97,9 +93,7 @@ export default function EditSiteEditor( { isLoading } ) {
 	const _isPreviewingTheme = isPreviewingTheme();
 	const hasDefaultEditorCanvasView = ! useHasEditorCanvasContainer();
 	const iframeProps = useEditorIframeProps();
-	const isViewMode = canvasMode === 'view';
 	const isEditMode = canvasMode === 'edit';
-	const showVisualEditor = isViewMode || editorMode === 'visual';
 	const postWithTemplate = !! contextPostId;
 	const loadingProgressId = useInstanceId(
 		CanvasLoader,
@@ -182,7 +176,6 @@ export default function EditSiteEditor( { isLoading } ) {
 			<GlobalStylesRenderer />
 			<EditorKeyboardShortcutsRegister />
 			{ isEditMode && <BlockKeyboardShortcuts /> }
-			{ showVisualEditor && <TemplatePartConverter /> }
 			{ ! isReady ? <CanvasLoader id={ loadingProgressId } /> : null }
 			{ isEditMode && <WelcomeGuide /> }
 			{ isReady && (
