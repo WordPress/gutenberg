@@ -88,7 +88,3 @@ svg.components-checkbox-control__indeterminate {
 	display: inline-block;
 	margin-inline-start: calc(var(--checkbox-input-size) + var(--checkbox-input-margin));
 }
-
-p.components-base-control__help:has(.components-checkbox-control__help) {
-	margin-top: $grid-unit-05;
-}

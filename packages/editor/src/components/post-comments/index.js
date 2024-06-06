@@ -31,12 +31,10 @@ const COMMENT_OPTIONS = [
 			<>
 				{ __( 'Closed' ) }
 				<Text variant="muted" size={ 12 }>
-					<Text variant="muted" size={ 12 }>
-						{ __( 'Visitors cannot add new comments or replies.' ) }
-					</Text>
-					<Text variant="muted" size={ 12 }>
-						{ __( 'Existing comments remain visible.' ) }
-					</Text>
+					{ __( 'Visitors cannot add new comments or replies.' ) }
+				</Text>
+				<Text variant="muted" size={ 12 }>
+					{ __( 'Existing comments remain visible.' ) }
 				</Text>
 			</>
 		),
