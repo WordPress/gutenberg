@@ -10,6 +10,8 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+
+## 1.120.0
 -   [*] Prevent deleting content when backspacing in the first Paragraph block [#62069]
 -   [internal] Adds new bridge functionality for updating content  [#61796]
 
