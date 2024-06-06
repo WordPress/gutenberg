@@ -1,7 +1,6 @@
 == Changelog ==
 
-= 18.5.0-rc.1 =
-
+= 18.5.0 =
 
 ## Changelog
 
@@ -111,6 +110,7 @@
 - Lock binding editing with functions. ([61734](https://github.com/WordPress/gutenberg/pull/61734))
 
 #### Block Variations
+- Detect active variation correctly based on RichText attribute. ([62325](https://github.com/WordPress/gutenberg/pull/62325))
 - Have `getActiveBlockVariation` return variation with highest specificity. ([62031](https://github.com/WordPress/gutenberg/pull/62031))
 - Support dot notation in `isActive` string array. ([62088](https://github.com/WordPress/gutenberg/pull/62088))
 
@@ -137,6 +137,8 @@
 
 ### Bug Fixes
 
+- Editor: Only render the site logo once if there's a fill. ([62320](https://github.com/WordPress/gutenberg/pull/62320))
+- Interactivity API: Increase directive `wp-each-child` priority. ([62293](https://github.com/WordPress/gutenberg/pull/62293))w
 - Compose: Fix 'useFocusOnMount' cleanup callback. ([62053](https://github.com/WordPress/gutenberg/pull/62053))
 - Do not auto save post status changes. ([62171](https://github.com/WordPress/gutenberg/pull/62171))
 - Editor: Fix canvas padding in post editor. ([61893](https://github.com/WordPress/gutenberg/pull/61893))
@@ -167,6 +169,7 @@
 - Post Actions: Hide the trash action for auto-drafts. ([61865](https://github.com/WordPress/gutenberg/pull/61865))
 
 #### Block Editor
+- Inserter: Update Openverse API URLs. ([62241](https://github.com/WordPress/gutenberg/pull/62241))
 - Fix being unable to switch modes while inserter is open. ([61563](https://github.com/WordPress/gutenberg/pull/61563))
 - Fix editor inserter tabs indicator. ([61973](https://github.com/WordPress/gutenberg/pull/61973))
 - Fix positioning of close icons in panels to be consistent. ([61832](https://github.com/WordPress/gutenberg/pull/61832))
@@ -465,6 +468,8 @@ The following PRs were merged by first time contributors:
 The following contributors merged PRs in this release:
 
 @aaronrobertshaw @abhi3315 @afercia @ajlende @akashdhawade2005 @akasunil @Aljullu @amitraj2203 @andrewserong @anton-vlasenko @anver @artemiomorales @carolinan @cbravobernal @colorful-tones @creativecoder @DaniGuardiola @DAreRodz @dbrian @draganescu @ellatrix @fabiankaegy @fullofcaffeine @gemkev @geriux @glendaviesnz @gziolo @jameskoster @jasmussen @jeryj @jorgefilipecosta @jsnajdr @kellenmace @kevin940726 @kt-12 @madhusudhand @Mamaduka @mattsherman @mcsf @michalczaplinski @mirka @narenin @nateinaction @ndiego @ntsekouras @oandregal @ockham @paolopiaggio @ramonjd @retrofox @richtabor @sanjucta @SantosGuillamot @scruffian @senadir @shail-mehta @sirreal @stokesman @t-hamano @talldan @taylorgorman @tellthemachines @tjcafferkey @twstokes @tyxla @vcanales @vipul0425 @westonruter @WunderBart @youknowriad
+
+
 
 
 = 18.4.1 =

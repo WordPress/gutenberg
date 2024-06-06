@@ -25,7 +25,6 @@ import MoreMenu from '../more-menu';
 import PostPreviewButton from '../post-preview-button';
 import PostPublishButtonOrToggle from '../post-publish-button/post-publish-button-or-toggle';
 import PostSavedState from '../post-saved-state';
-import PostTypeSupportCheck from '../post-type-support-check';
 import PostViewLink from '../post-view-link';
 import PreviewDropdown from '../preview-dropdown';
 import { store as editorStore } from '../../store';
@@ -117,13 +116,7 @@ function Header( {
 							! isBlockToolsCollapsed && hasTopToolbar,
 					} ) }
 				>
-					{ ! title ? (
-						<PostTypeSupportCheck supportKeys="title">
-							<DocumentBar />
-						</PostTypeSupportCheck>
-					) : (
-						title
-					) }
+					{ ! title ? <DocumentBar /> : title }
 				</div>
 			</motion.div>
 			<motion.div
