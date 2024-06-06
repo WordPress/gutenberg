@@ -86,15 +86,12 @@ const DEFAULT_VIEW = {
 const SYNC_FILTERS = [
 	{
 		value: PATTERN_SYNC_TYPES.full,
-		label: _x( 'Synced', 'Option that shows all synchronized patterns' ),
+		label: _x( 'Synced', 'pattern (singular)' ),
 		description: __( 'Patterns that are kept in sync across the site.' ),
 	},
 	{
 		value: PATTERN_SYNC_TYPES.unsynced,
-		label: _x(
-			'Not synced',
-			'Option that shows all patterns that are not synchronized'
-		),
+		label: _x( 'Not synced', 'pattern (singular)' ),
 		description: __(
 			'Patterns that can be changed freely without affecting the site.'
 		),
