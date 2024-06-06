@@ -11,6 +11,9 @@ import {
 	LocalAutosaveMonitor,
 	UnsavedChangesWarning,
 	EditorKeyboardShortcutsRegister,
+	EditorSnackbars,
+	ErrorBoundary,
+	PostLockedModal,
 	store as editorStore,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
@@ -19,21 +22,26 @@ import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
 import { __, sprintf } from '@wordpress/i18n';
 import { useCallback, useMemo } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { privateApis as commandsPrivateApis } from '@wordpress/commands';
+import {
+	CommandMenu,
+	privateApis as commandsPrivateApis,
+} from '@wordpress/commands';
 import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
 import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
 import { addQueryArgs } from '@wordpress/url';
+import { store as coreStore } from '@wordpress/core-data';
+import { SlotFillProvider } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import BackButton from '../back-button';
+import EditorInitialization from '../editor-initialization';
 import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 import InitPatternModal from '../init-pattern-modal';
 import BrowserURL from '../browser-url';
@@ -45,12 +53,12 @@ import { unlock } from '../../lock-unlock';
 import useEditPostCommands from '../../commands/use-commands';
 import { usePaddingAppender } from './use-padding-appender';
 import { useShouldIframe } from './use-should-iframe';
+import useNavigateToEntityRecord from '../../hooks/use-navigate-to-entity-record';
 
 const { getLayoutStyles } = unlock( blockEditorPrivateApis );
 const { useCommands } = unlock( coreCommandsPrivateApis );
 const { useCommandContext } = unlock( commandsPrivateApis );
-const { EditorInterface, FullscreenMode, Sidebar } =
-	unlock( editorPrivateApis );
+const { Editor, FullscreenMode } = unlock( editorPrivateApis );
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 const DESIGN_POST_TYPES = [
 	'wp_template',
@@ -91,7 +99,7 @@ function useEditorStyles() {
 			) ?? [];
 
 		const defaultEditorStyles = [
-			...editorSettings.defaultEditorStyles,
+			...( editorSettings?.defaultEditorStyles ?? [] ),
 			...presetStyles,
 		];
 
@@ -140,56 +148,92 @@ function useEditorStyles() {
 	] );
 }
 
-function Layout( { initialPost } ) {
+function Layout( {
+	postId: initialPostId,
+	postType: initialPostType,
+	settings,
+	initialEdits,
+} ) {
 	useCommands();
 	useEditPostCommands();
-	const isWideViewport = useViewportMatch( 'large' );
 	const paddingAppenderRef = usePaddingAppender();
 	const shouldIframe = useShouldIframe();
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const {
+		currentPost,
+		onNavigateToEntityRecord,
+		onNavigateToPreviousEntityRecord,
+	} = useNavigateToEntityRecord(
+		initialPostId,
+		initialPostType,
+		'post-only'
+	);
+	const {
 		mode,
 		isFullscreenActive,
-		sidebarIsOpened,
 		hasActiveMetaboxes,
 		hasBlockSelected,
 		showIconLabels,
 		isDistractionFree,
-		showBlockBreadcrumbs,
 		showMetaBoxes,
 		hasHistory,
 		isEditingTemplate,
 		isWelcomeGuideVisible,
-	} = useSelect( ( select ) => {
-		const { get } = select( preferencesStore );
-		const { getEditorSettings } = select( editorStore );
-		const { isFeatureActive } = select( editPostStore );
+		templateId,
+	} = useSelect(
+		( select ) => {
+			const { get } = select( preferencesStore );
+			const { isFeatureActive, getEditedPostTemplateId } = unlock(
+				select( editPostStore )
+			);
+			const { canUser, getPostType } = select( coreStore );
 
-		return {
-			mode: select( editorStore ).getEditorMode(),
-			isFullscreenActive:
-				select( editPostStore ).isFeatureActive( 'fullscreenMode' ),
-			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
-			hasBlockSelected:
-				!! select( blockEditorStore ).getBlockSelectionStart(),
-			showIconLabels: get( 'core', 'showIconLabels' ),
-			isDistractionFree: get( 'core', 'distractionFree' ),
-			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
-			showMetaBoxes:
-				select( editorStore ).getRenderingMode() === 'post-only',
-			hasHistory: !! getEditorSettings().onNavigateToPreviousEntityRecord,
-			isEditingTemplate:
-				select( editorStore ).getCurrentPostType() === 'wp_template',
-			isWelcomeGuideVisible: isFeatureActive( 'welcomeGuide' ),
-		};
-	}, [] );
+			const supportsTemplateMode = settings.supportsTemplateMode;
+			const isViewable =
+				getPostType( currentPost.postType )?.viewable ?? false;
+			const canViewTemplate = canUser( 'read', 'templates' );
+
+			return {
+				mode: select( editorStore ).getEditorMode(),
+				isFullscreenActive:
+					select( editPostStore ).isFeatureActive( 'fullscreenMode' ),
+				hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
+				hasBlockSelected:
+					!! select( blockEditorStore ).getBlockSelectionStart(),
+				showIconLabels: get( 'core', 'showIconLabels' ),
+				isDistractionFree: get( 'core', 'distractionFree' ),
+				showMetaBoxes:
+					select( editorStore ).getRenderingMode() === 'post-only',
+				isEditingTemplate:
+					select( editorStore ).getCurrentPostType() ===
+					'wp_template',
+				isWelcomeGuideVisible: isFeatureActive( 'welcomeGuide' ),
+				templateId:
+					supportsTemplateMode &&
+					isViewable &&
+					canViewTemplate &&
+					currentPost.postType !== 'wp_template'
+						? getEditedPostTemplateId()
+						: null,
+			};
+		},
+		[ settings.supportsTemplateMode, currentPost.postType ]
+	);
 
 	// Set the right context for the command palette
 	const commandContext = hasBlockSelected
 		? 'block-selection-edit'
 		: 'entity-edit';
 	useCommandContext( commandContext );
-
+	const editorSettings = useMemo(
+		() => ( {
+			...settings,
+			onNavigateToEntityRecord,
+			onNavigateToPreviousEntityRecord,
+			defaultRenderingMode: 'post-only',
+		} ),
+		[ settings, onNavigateToEntityRecord, onNavigateToPreviousEntityRecord ]
+	);
 	const styles = useEditorStyles();
 
 	// We need to add the show-icon-labels class to the body element so it is applied to modals.
@@ -200,11 +244,7 @@ function Layout( { initialPost } ) {
 	}
 
 	const className = clsx( 'edit-post-layout', 'is-mode-' + mode, {
-		'is-sidebar-opened': sidebarIsOpened,
 		'has-metaboxes': hasActiveMetaboxes,
-		'is-distraction-free': isDistractionFree && isWideViewport,
-		'has-block-breadcrumbs':
-			showBlockBreadcrumbs && ! isDistractionFree && isWideViewport,
 	} );
 
 	function onPluginAreaError( name ) {
@@ -271,47 +311,63 @@ function Layout( { initialPost } ) {
 		[ createSuccessNotice ]
 	);
 
+	const initialPost = useMemo( () => {
+		return {
+			type: initialPostType,
+			id: initialPostId,
+		};
+	}, [ initialPostType, initialPostId ] );
 	return (
-		<>
-			<FullscreenMode isActive={ isFullscreenActive } />
-			<BrowserURL hasHistory={ hasHistory } />
-			<UnsavedChangesWarning />
-			<AutosaveMonitor />
-			<LocalAutosaveMonitor />
-			<EditPostKeyboardShortcuts />
-			<EditorKeyboardShortcutsRegister />
-			<BlockKeyboardShortcuts />
-			<WelcomeGuide />
-			<InitPatternModal />
-			<PluginArea onError={ onPluginAreaError } />
-			{ ! isDistractionFree && (
-				<Sidebar
+		<SlotFillProvider>
+			<ErrorBoundary>
+				<CommandMenu />
+				<WelcomeGuide postType={ currentPost.postType } />
+				<Editor
+					settings={ editorSettings }
+					initialEdits={ initialEdits }
+					postType={ currentPost.postType }
+					postId={ currentPost.postId }
+					templateId={ templateId }
+					className={ className }
+					styles={ styles }
+					forceIsDirty={ hasActiveMetaboxes }
+					contentRef={ paddingAppenderRef }
+					disableIframe={ ! shouldIframe }
+					// We should auto-focus the canvas (title) on load.
+					// eslint-disable-next-line jsx-a11y/no-autofocus
+					autoFocus={ ! isWelcomeGuideVisible }
 					onActionPerformed={ onActionPerformed }
-					extraPanels={
+					extraSidebarPanels={
 						! isEditingTemplate && <MetaBoxes location="side" />
 					}
-				/>
-			) }
-			<PostEditorMoreMenu />
-			<BackButton initialPost={ initialPost } />
-			<EditorInterface
-				className={ className }
-				styles={ styles }
-				forceIsDirty={ hasActiveMetaboxes }
-				contentRef={ paddingAppenderRef }
-				disableIframe={ ! shouldIframe }
-				// We should auto-focus the canvas (title) on load.
-				// eslint-disable-next-line jsx-a11y/no-autofocus
-				autoFocus={ ! isWelcomeGuideVisible }
-			>
-				{ ! isDistractionFree && showMetaBoxes && (
-					<div className="edit-post-layout__metaboxes">
-						<MetaBoxes location="normal" />
-						<MetaBoxes location="advanced" />
-					</div>
-				) }
-			</EditorInterface>
-		</>
+					extraContent={
+						! isDistractionFree &&
+						showMetaBoxes && (
+							<div className="edit-post-layout__metaboxes">
+								<MetaBoxes location="normal" />
+								<MetaBoxes location="advanced" />
+							</div>
+						)
+					}
+				>
+					<PostLockedModal />
+					<EditorInitialization />
+					<FullscreenMode isActive={ isFullscreenActive } />
+					<BrowserURL hasHistory={ hasHistory } />
+					<UnsavedChangesWarning />
+					<AutosaveMonitor />
+					<LocalAutosaveMonitor />
+					<EditPostKeyboardShortcuts />
+					<EditorKeyboardShortcutsRegister />
+					<BlockKeyboardShortcuts />
+					<InitPatternModal />
+					<PluginArea onError={ onPluginAreaError } />
+					<PostEditorMoreMenu />
+					<BackButton initialPost={ initialPost } />
+					<EditorSnackbars />
+				</Editor>
+			</ErrorBoundary>
+		</SlotFillProvider>
 	);
 }
 

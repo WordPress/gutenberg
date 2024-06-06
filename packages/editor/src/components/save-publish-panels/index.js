@@ -14,6 +14,7 @@ import PostPublishPanel from '../post-publish-panel';
 import PluginPrePublishPanel from '../plugin-pre-publish-panel';
 import PluginPostPublishPanel from '../plugin-post-publish-panel';
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 const { Fill, Slot } = createSlotFill( 'ActionsPanel' );
 
@@ -27,12 +28,19 @@ export default function SavePublishPanels( {
 } ) {
 	const { closePublishSidebar, togglePublishSidebar } =
 		useDispatch( editorStore );
-	const { publishSidebarOpened, hasNonPostEntityChanges } = useSelect(
+	const {
+		publishSidebarOpened,
+		hasNonPostEntityChanges,
+		hasPostMetaChanges,
+	} = useSelect(
 		( select ) => ( {
 			publishSidebarOpened:
 				select( editorStore ).isPublishSidebarOpened(),
 			hasNonPostEntityChanges:
 				select( editorStore ).hasNonPostEntityChanges(),
+			hasPostMetaChanges: unlock(
+				select( editorStore )
+			).hasPostMetaChanges(),
 		} ),
 		[]
 	);
@@ -54,7 +62,7 @@ export default function SavePublishPanels( {
 				PostPublishExtension={ PluginPostPublishPanel.Slot }
 			/>
 		);
-	} else if ( hasNonPostEntityChanges ) {
+	} else if ( hasNonPostEntityChanges || hasPostMetaChanges ) {
 		unmountableContent = (
 			<div className="editor-layout__toggle-entities-saved-states-panel">
 				<Button

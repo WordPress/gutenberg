@@ -27,8 +27,9 @@
 	scroll-margin-bottom: ($grid-unit-40 + $grid-unit-30);
 
 	.block-editor-block-patterns-list__item-title {
-		text-align: left;
 		flex-grow: 1;
+		font-size: $helptext-font-size;
+		text-align: left;
 	}
 
 	.block-editor-block-preview__container {
@@ -59,7 +60,7 @@
 	.block-editor-patterns__pattern-details:not(:empty) {
 		align-items: center;
 		margin-top: $grid-unit-10;
-		margin-bottom: $grid-unit-05; // Add more space as there is a visual label on user-created patterns.
+		padding-bottom: $grid-unit-05; // Add more space for labels on user-created patterns.
 	}
 
 	.block-editor-patterns__pattern-icon-wrapper {

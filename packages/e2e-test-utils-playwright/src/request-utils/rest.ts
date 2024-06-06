@@ -3,6 +3,7 @@
  */
 import * as fs from 'fs/promises';
 import { dirname } from 'path';
+import { expect } from '@playwright/test';
 import type { APIRequestContext } from '@playwright/test';
 
 /**
@@ -39,10 +40,32 @@ async function getAPIRootURL( request: APIRequestContext ) {
 }
 
 async function setupRest( this: RequestUtils ): Promise< StorageState > {
-	const [ nonce, rootURL ] = await Promise.all( [
-		this.login(),
-		getAPIRootURL( this.request ),
-	] );
+	let nonce = '';
+	let rootURL = '';
+
+	// Poll until the REST API is discovered.
+	// See https://github.com/WordPress/gutenberg/issues/61627
+	await expect
+		.poll(
+			async () => {
+				try {
+					[ nonce, rootURL ] = await Promise.all( [
+						this.login(),
+						getAPIRootURL( this.request ),
+					] );
+				} catch ( error ) {
+					// Prints the error if the timeout is reached.
+					return error;
+				}
+
+				return nonce && rootURL ? true : false;
+			},
+			{
+				message: 'Failed to setup REST API.',
+				timeout: 60_000, // 1 minute.
+			}
+		)
+		.toBe( true );
 
 	const { cookies } = await this.request.storageState();
 
