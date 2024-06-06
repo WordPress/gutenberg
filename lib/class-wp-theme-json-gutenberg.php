@@ -1355,6 +1355,12 @@ class WP_Theme_JSON_Gutenberg {
 			$stylesheet .= $this->get_preset_classes( $setting_nodes, $origins );
 		}
 
+		// Load the custom CSS last so it has the highest specificity.
+		if ( in_array( 'custom-css', $types, true ) ) {
+			// Add the global styles root CSS.
+			$stylesheet .= _wp_array_get( $this->theme_json, array( 'styles', 'css' ) );
+		}
+
 		return $stylesheet;
 	}
 
@@ -2646,6 +2652,7 @@ class WP_Theme_JSON_Gutenberg {
 				'selectors'  => $feature_selectors,
 				'duotone'    => $duotone_selector,
 				'variations' => $variation_selectors,
+				'css'        => $selector,
 			);
 
 			if ( isset( $theme_json['styles']['blocks'][ $name ]['elements'] ) ) {
@@ -2853,6 +2860,11 @@ class WP_Theme_JSON_Gutenberg {
 		// 6. Generate and append the style variation rulesets.
 		foreach ( $style_variation_declarations as $style_variation_selector => $individual_style_variation_declarations ) {
 			$block_rules .= static::to_ruleset( ":root :where($style_variation_selector)", $individual_style_variation_declarations );
+		}
+
+		// 7. Generate and append any custom CSS rules.
+		if ( isset( $node['css'] ) ) {
+			$block_rules .= $this->process_blocks_custom_css( $node['css'], $selector );
 		}
 
 		return $block_rules;
