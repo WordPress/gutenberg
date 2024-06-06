@@ -221,6 +221,7 @@ export default function EditSiteEditor( { isLoading } ) {
 							{ ( { length } ) =>
 								length <= 1 && (
 									<Button
+										label={ __( 'Open Navigation' ) }
 										className="edit-site-layout__view-mode-toggle"
 										onClick={ () =>
 											setCanvasMode( 'view' )
