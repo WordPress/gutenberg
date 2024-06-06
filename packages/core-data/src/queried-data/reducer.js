@@ -111,9 +111,6 @@ export function items( state = {}, action ) {
 					...state[ context ],
 					...action.items.reduce( ( accumulator, value ) => {
 						const itemId = value?.[ key ];
-						if ( ! itemId ) {
-							return accumulator;
-						}
 
 						accumulator[ itemId ] = conservativeMapItem(
 							state?.[ context ]?.[ itemId ],
@@ -169,9 +166,6 @@ export function itemIsComplete( state = {}, action ) {
 					...state[ context ],
 					...action.items.reduce( ( result, item ) => {
 						const itemId = item?.[ key ];
-						if ( ! itemId ) {
-							return result;
-						}
 
 						// Defer to completeness if already assigned. Technically the
 						// data may be outdated if receiving items for a field subset.
