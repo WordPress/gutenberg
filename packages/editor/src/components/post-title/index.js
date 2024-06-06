@@ -30,12 +30,14 @@ import usePostTitle from './use-post-title';
 import PostTypeSupportCheck from '../post-type-support-check';
 
 function PostTitle( _, forwardedRef ) {
-	const { placeholder } = useSelect( ( select ) => {
+	const { placeholder, hasFixedToolbar } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
-		const { titlePlaceholder } = getSettings();
+		const { titlePlaceholder, hasFixedToolbar: _hasFixedToolbar } =
+			getSettings();
 
 		return {
 			placeholder: titlePlaceholder,
+			hasFixedToolbar: _hasFixedToolbar,
 		};
 	}, [] );
 
@@ -184,6 +186,7 @@ function PostTitle( _, forwardedRef ) {
 	// This same block is used in both the visual and the code editor.
 	const className = clsx( DEFAULT_CLASSNAMES, {
 		'is-selected': isSelected,
+		'has-fixed-toolbar': hasFixedToolbar,
 	} );
 
 	return (
