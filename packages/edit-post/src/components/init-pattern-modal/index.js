@@ -85,8 +85,9 @@ export default function InitPatternModal() {
 							<ReusableBlocksRenameHint />
 							<ToggleControl
 								label={ _x( 'Synced', 'pattern (singular)' ) }
-								help={ __(
-									'Sync this pattern across multiple locations.'
+								help={ _x(
+									'Sync this pattern across multiple locations.',
+									'user action'
 								) }
 								checked={ ! syncType }
 								onChange={ () => {
