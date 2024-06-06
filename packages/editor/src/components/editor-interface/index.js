@@ -121,8 +121,10 @@ export default function EditorInterface( {
 		<InterfaceSkeleton
 			enableRegionNavigation={ enableRegionNavigation }
 			isDistractionFree={ isDistractionFree && isWideViewport }
-			className={ clsx( className, {
+			className={ clsx( 'editor-editor-interface', className, {
 				'is-entity-save-view-open': !! entitiesSavedStatesCallback,
+				'is-distraction-free':
+					isDistractionFree && isWideViewport && ! isPreviewMode,
 			} ) }
 			labels={ {
 				...interfaceLabels,
@@ -206,9 +208,7 @@ export default function EditorInterface( {
 				isRichEditingEnabled &&
 				blockEditorMode !== 'zoom-out' &&
 				mode === 'visual' && (
-					<div className="edit-post-layout__footer">
-						<BlockBreadcrumb rootLabelText={ documentLabel } />
-					</div>
+					<BlockBreadcrumb rootLabelText={ documentLabel } />
 				)
 			}
 			actions={

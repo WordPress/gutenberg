@@ -4,37 +4,11 @@
 	color: $gray-400;
 	display: flex;
 	flex-direction: column;
-}
 
-.edit-site-layout__hub {
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: calc(100vw - #{$canvas-padding * 2});
-	height: $header-height;
-	z-index: z-index(".edit-site-layout__hub");
-
-	@include break-medium {
-		width: calc(#{$nav-sidebar-width} - #{$grid-unit-15});
+	// Show a dark background in "frame" mode to avoid edge artifacts.
+	&:not(.is-full-canvas) .editor-visual-editor {
+		background: $gray-900;
 	}
-
-	.edit-site-layout.is-full-canvas & {
-		padding-right: 0;
-		border-radius: 0;
-		width: $header-height;
-		box-shadow: none;
-	}
-}
-
-.edit-site-layout__header-container:has(+ .edit-site-layout__content > .edit-site-layout__mobile>.edit-site-page) {
-	margin-bottom: $header-height;
-	@include break-medium {
-		margin-bottom: 0;
-	}
-}
-
-.edit-site-layout__header-container {
-	z-index: z-index(".edit-site-layout__header-container");
 }
 
 .edit-site-layout__content {
@@ -158,10 +132,22 @@
 	height: 100%;
 }
 
+/* stylelint-disable -- Disable reason: View Transitions not supported properly by stylelint. */
+html.canvas-mode-edit-transition::view-transition-group(toggle) {
+	animation-delay: 255ms;
+}
+/* stylelint-enable  */
+
+.edit-site-layout.is-full-canvas .edit-site-layout__sidebar-region .edit-site-layout__view-mode-toggle {
+	display: none;
+}
+
 .edit-site-layout__view-mode-toggle.components-button {
+	/* stylelint-disable -- Disable reason: View Transitions not supported properly by stylelint. */
+	view-transition-name: toggle;
+	/* stylelint-enable  */
 	position: relative;
 	color: $white;
-	border-radius: 0;
 	height: $header-height;
 	width: $header-height;
 	overflow: hidden;
@@ -169,6 +155,8 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	background: $gray-900;
+	border-radius: 0;
 
 	&:hover,
 	&:active {
@@ -202,7 +190,6 @@
 
 	.edit-site-layout__view-mode-toggle-icon {
 		display: flex;
-		border-radius: $radius-block-ui;
 		height: $grid-unit-80;
 		width: $grid-unit-80;
 		justify-content: center;
@@ -236,33 +223,6 @@
 
 	@include break-medium {
 		border-left: $border-width solid $gray-300;
-	}
-}
-
-.edit-site-layout.is-distraction-free {
-	.edit-site-layout__header-container {
-		height: $header-height;
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-		z-index: z-index(".edit-site-layout__header-container");
-		width: 100%;
-
-		// We need ! important because we override inline styles
-		// set by the motion component.
-		&:focus-within {
-			opacity: 1 !important;
-			div {
-				transform: translateX(0) translateY(0) translateZ(0) !important;
-			}
-		}
-	}
-
-	.edit-site-site-hub {
-		position: absolute;
-		top: 0;
-		z-index: z-index(".edit-site-layout__hub");
 	}
 }
 
