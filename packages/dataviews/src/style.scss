@@ -886,12 +886,14 @@
 }
 
 .dataviews-bulk-actions {
-	position: absolute;
+	position: sticky;
 	display: flex;
 	flex-direction: column;
 	align-content: center;
 	flex-wrap: wrap;
-	width: 100%;
+	width: fit-content;
+	margin-left: auto;
+	margin-right: auto;
 	bottom: $grid-unit-30;
 	z-index: z-index(".dataviews-bulk-actions");
 
