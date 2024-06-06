@@ -128,7 +128,8 @@ function useEditorStyles() {
 			! isZoomedOutView &&
 			! hasMetaBoxes &&
 			renderingMode === 'post-only' &&
-			! DESIGN_POST_TYPES.includes( postType )
+			! DESIGN_POST_TYPES.includes( postType ) &&
+			! baseStyles.includes( TYPEWRITER_STYLE )
 		) {
 			baseStyles.push( TYPEWRITER_STYLE );
 		} else if ( baseStyles.includes( TYPEWRITER_STYLE ) ) {
