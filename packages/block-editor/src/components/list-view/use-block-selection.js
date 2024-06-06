@@ -5,7 +5,15 @@ import { speak } from '@wordpress/a11y';
 import { __, sprintf } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
-import { UP, DOWN, HOME, END, ESCAPE } from '@wordpress/keycodes';
+import {
+	UP,
+	DOWN,
+	HOME,
+	END,
+	ESCAPE,
+	PAGEUP,
+	PAGEDOWN,
+} from '@wordpress/keycodes';
 import { store as blocksStore } from '@wordpress/blocks';
 
 /**
@@ -46,7 +54,9 @@ export default function useBlockSelection() {
 				( event.keyCode === UP ||
 					event.keyCode === DOWN ||
 					event.keyCode === HOME ||
-					event.keyCode === END );
+					event.keyCode === END ||
+					event.keyCode === PAGEUP ||
+					event.keyCode === PAGEDOWN );
 
 			// Handle clicking on a block when no blocks are selected, and return early.
 			if (
