@@ -1531,7 +1531,11 @@ _Returns_
 
 ### useEntitiesSavedStatesIsDirty
 
-Undocumented declaration.
+Custom hook that determines if any entities are dirty (edited) and provides a way to manage selected/unselected entities.
+
+_Returns_
+
+-   `Object`: An object containing the following properties: - dirtyEntityRecords: An array of dirty entity records. - isDirty: A boolean indicating if there are any dirty entity records. - setUnselectedEntities: A function to set the unselected entities. - unselectedEntities: An array of unselected entities.
 
 ### usePostScheduleLabel
 
