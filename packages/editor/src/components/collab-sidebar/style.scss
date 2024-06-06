@@ -1,0 +1,20 @@
+.editor-collab-sidebar {
+	&__activities {
+		background-color: #f3f5f6;
+	}
+
+	&__thread {
+		padding: 20px;
+		&:not(:last-child) {
+			border-bottom: 1px solid $gray-300;
+		}
+	}
+
+	&__comment,
+	&__resolved {
+		border: 1px solid $gray-300;
+		border-radius: 5px;
+		padding: 10px 15px;
+		background-color: #fff;
+	}
+}
