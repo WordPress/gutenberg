@@ -7,6 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
+import { Button } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import {
 	EditorKeyboardShortcutsRegister,
@@ -40,10 +41,11 @@ import {
 } from '../editor-canvas-container';
 import SaveButton from '../save-button';
 import SiteEditorMoreMenu from '../more-menu';
+import SiteIcon from '../site-icon';
 import useEditorIframeProps from '../block-editor/use-editor-iframe-props';
 import useEditorTitle from './use-editor-title';
 
-const { Editor } = unlock( editorPrivateApis );
+const { Editor, BackButton } = unlock( editorPrivateApis );
 const { useHistory } = unlock( routerPrivateApis );
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 
@@ -125,6 +127,7 @@ export default function EditSiteEditor( { isLoading } ) {
 		],
 		[ settings.styles, canvasMode, currentPostIsTrashed ]
 	);
+	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const history = useHistory();
 	const onActionPerformed = useCallback(
@@ -213,6 +216,23 @@ export default function EditSiteEditor( { isLoading } ) {
 						! isEditingPage && <PluginTemplateSettingPanel.Slot />
 					}
 				>
+					{ isEditMode && (
+						<BackButton>
+							{ ( { length } ) =>
+								length <= 1 && (
+									<Button
+										label={ __( 'Open Navigation' ) }
+										className="edit-site-layout__view-mode-toggle"
+										onClick={ () =>
+											setCanvasMode( 'view' )
+										}
+									>
+										<SiteIcon className="edit-site-layout__view-mode-toggle-icon" />
+									</Button>
+								)
+							}
+						</BackButton>
+					) }
 					<SiteEditorMoreMenu />
 					{ supportsGlobalStyles && <GlobalStylesSidebar /> }
 				</Editor>
