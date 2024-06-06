@@ -69,7 +69,7 @@ async function run({ github, context }) {
   }
 
   const defaultSchema = generateWordpressPlaygroundBlueprint(context.issue.number);
-  const url = `https://playground.wordpress.net/gutenberg.html#${JSON.stringify(defaultSchema)}`;
+  const url = `https://playground.wordpress.net/#${JSON.stringify(defaultSchema)}`;
 
   const body = `## Test using WordPress Playground
 
