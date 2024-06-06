@@ -1,85 +1,18 @@
 name: Create Playground Link
 
 on:
-  pull_request:
-    paths-ignore:
-    - 'docs/**'
-    - '**/changelog/**'
-    - '**/tests/**'
-    - '**/*.md'
+  workflow_run:
+    workflows: ["Build Gutenberg Plugin Zip"]
+    types:
+    - completed
 
 jobs:
   create-playground-link:
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
-
-    # We need to wait for the release artifact to be created and uploaded
-    # before creating the URL for the playground, as the playground relies
-    # on the artifact, which is the actual plugin zip it ends up installing.
-    - name: Wait for Build Gutenberg Plugin Zip workflow
-      shell: bash
-      run: |
-        #!/bin/bash
-        interval="5"
-
-        # Extract the pull request number from GITHUB_REF
-        REF="${GITHUB_REF#refs/pull/}"
-        REF="${REF%/merge}"
-
-        echo "Waiting for workflow run for pull request #$REF..."
-
-        while true; do
-          response=$(curl -s -H "Accept: application/vnd.github+json" -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            "https://api.github.com/repos/fullofcaffeine/gutenberg/actions/workflows/build-plugin-zip.yml/runs")
-
-          if echo "$response" | grep -q "API rate limit exceeded"; then
-            echo "API rate limit exceeded. Exiting."
-            exit 1
-          elif echo "$response" | grep -q "Not Found"; then
-            echo "Workflow not found. Exiting."
-            exit 1
-          fi
-
-          run_id=$(echo "$response" | jq -r --arg ref "$REF" '.workflow_runs[] | select(.event == "pull_request" and .pull_requests[].number == ($ref|tonumber)) | .id')
-
-          echo "Run ID: $run_id"
-
-          if [ -n "$run_id" ]; then
-            echo "Found matching workflow run."
-            break
-          fi
-
-          echo "No matching workflow run found. Waiting..."
-          sleep $interval
-        done
-
-        echo "Waiting for workflow run to complete..."
-
-        while true; do
-          run_data=$(curl -s -H "Accept: application/vnd.github+json" -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            "https://api.github.com/repos/fullofcaffeine/gutenberg/actions/runs/$run_id")
-
-          status=$(echo "$run_data" | jq -r '.status')
-          conclusion=$(echo "$run_data" | jq -r '.conclusion')
-
-          echo "Workflow run status: $status"
-          echo "Workflow run conclusion: $conclusion"
-
-          if [ "$status" = "completed" ]; then
-            if [ "$conclusion" = "success" ]; then
-              echo "Workflow run completed successfully."
-              break
-            else
-              echo "Workflow run failed with conclusion: $conclusion. Exiting."
-              exit 1
-            fi
-          fi
-
-          echo "Workflow run not completed. Waiting..."
-          sleep $interval
-        done
 
     - name: Create WordPress Playground link comment
       uses: actions/github-script@v7
