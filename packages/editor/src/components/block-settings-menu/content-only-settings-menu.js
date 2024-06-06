@@ -11,6 +11,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { __experimentalText as Text, MenuItem } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import { lockSmall as lock } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -19,53 +20,81 @@ import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 function ContentOnlySettingsMenuItems( { clientId, onClose } ) {
-	const { entity, onNavigateToEntityRecord } = useSelect(
-		( select ) => {
-			const {
-				getBlockEditingMode,
-				getBlockParentsByBlockName,
-				getSettings,
-				getBlockAttributes,
-			} = select( blockEditorStore );
-			const contentOnly =
-				getBlockEditingMode( clientId ) === 'contentOnly';
-			if ( ! contentOnly ) {
-				return {};
-			}
-			const patternParent = getBlockParentsByBlockName(
-				clientId,
-				'core/block',
-				true
-			)[ 0 ];
+	const { entity, onNavigateToEntityRecord, canEditTemplateParts } =
+		useSelect(
+			( select ) => {
+				const {
+					getBlockEditingMode,
+					getBlockParentsByBlockName,
+					getSettings,
+					getBlockAttributes,
+				} = select( blockEditorStore );
+				const contentOnly =
+					getBlockEditingMode( clientId ) === 'contentOnly';
+				if ( ! contentOnly ) {
+					return {};
+				}
+				const patternParent = getBlockParentsByBlockName(
+					clientId,
+					'core/block',
+					true
+				)[ 0 ];
 
-			let record;
-			if ( patternParent ) {
-				record = select( coreStore ).getEntityRecord(
-					'postType',
-					'wp_block',
-					getBlockAttributes( patternParent ).ref
+				let record;
+				const _canEditTemplateParts = select( coreStore ).canUser(
+					'create',
+					'templates'
 				);
-			} else {
-				const { getCurrentPostType, getCurrentTemplateId } =
-					select( editorStore );
-				const currentPostType = getCurrentPostType();
-				const templateId = getCurrentTemplateId();
-				if ( currentPostType === 'page' && templateId ) {
+				if ( patternParent ) {
 					record = select( coreStore ).getEntityRecord(
 						'postType',
-						'wp_template',
-						templateId
+						'wp_block',
+						getBlockAttributes( patternParent ).ref
 					);
+				} else {
+					const { getCurrentTemplateId } = select( editorStore );
+					const templateId = getCurrentTemplateId();
+					if ( templateId && _canEditTemplateParts ) {
+						record = select( coreStore ).getEntityRecord(
+							'postType',
+							'wp_template',
+							templateId
+						);
+					}
 				}
-			}
-			return {
-				entity: record,
-				onNavigateToEntityRecord:
-					getSettings().onNavigateToEntityRecord,
-			};
-		},
-		[ clientId ]
-	);
+				return {
+					canEditTemplateParts: _canEditTemplateParts,
+					entity: record,
+					onNavigateToEntityRecord:
+						getSettings().onNavigateToEntityRecord,
+				};
+			},
+			[ clientId ]
+		);
+
+	if ( ! canEditTemplateParts ) {
+		return (
+			<>
+				<BlockSettingsMenuFirstItem>
+					<MenuItem
+						icon={ lock }
+						iconPosition="left"
+						role="none"
+						disabled
+					>
+						{ __( 'Locked' ) }
+					</MenuItem>
+				</BlockSettingsMenuFirstItem>
+				<Text
+					variant="muted"
+					as="p"
+					className="editor-content-only-settings-menu__description"
+				>
+					{ __( 'Sorry, you cannot edit this block.' ) }
+				</Text>
+			</>
+		);
+	}
 
 	if ( ! entity ) {
 		return (
