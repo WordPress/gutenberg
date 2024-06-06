@@ -185,6 +185,12 @@ export default function ReusableBlockConvertButton( {
 							/>
 							<ToggleControl
 								label={ _x( 'Synced', 'pattern (singular)' ) }
+								/*
+								 * FIXME: See my other FIXME for
+								 * ReusableBlocksMenuItems. If we can get
+								 * rid of that one, can we get rid of this
+								 * one?
+								 */
 								help={ __(
 									'Sync this pattern across multiple locations.'
 								) }

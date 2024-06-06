@@ -9,6 +9,10 @@ import { BlockSettingsMenuControls } from '@wordpress/block-editor';
 import ReusableBlockConvertButton from './reusable-block-convert-button';
 import ReusableBlocksManageButton from './reusable-blocks-manage-button';
 
+/*
+ * FIXME: CAN WE GET RID OF THIS COMPONENT? AS FAR AS I CAN SEE, IT'S EXPORTED
+ * BUT NEVER USED, ONLY MENTIONED IN DOCUMENTATION.
+ */
 export default function ReusableBlocksMenuItems( { rootClientId } ) {
 	return (
 		<BlockSettingsMenuControls>
