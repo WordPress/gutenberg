@@ -12,6 +12,7 @@ import {
 	Button,
 } from '@wordpress/components';
 import { __, _x, _n, sprintf } from '@wordpress/i18n';
+import { previous, chevronLeft, chevronRight, next } from '@wordpress/icons';
 
 export default function Pagination( {
 	currentPage,
@@ -49,20 +50,16 @@ export default function Pagination( {
 					__experimentalIsFocusable
 					disabled={ disabled || currentPage === 1 }
 					label={ __( 'First page' ) }
-					showTooltip
-				>
-					«
-				</Button>
+					icon={ previous }
+				/>
 				<Button
 					variant={ buttonVariant }
 					onClick={ () => changePage( currentPage - 1 ) }
 					__experimentalIsFocusable
 					disabled={ disabled || currentPage === 1 }
 					label={ __( 'Previous page' ) }
-					showTooltip
-				>
-					‹
-				</Button>
+					icon={ chevronLeft }
+				/>
 			</HStack>
 			<Text variant="muted">
 				{ sprintf(
@@ -79,20 +76,16 @@ export default function Pagination( {
 					__experimentalIsFocusable
 					disabled={ disabled || currentPage === numPages }
 					label={ __( 'Next page' ) }
-					showTooltip
-				>
-					›
-				</Button>
+					icon={ chevronRight }
+				/>
 				<Button
 					variant={ buttonVariant }
 					onClick={ () => changePage( numPages ) }
 					__experimentalIsFocusable
 					disabled={ disabled || currentPage === numPages }
 					label={ __( 'Last page' ) }
-					showTooltip
-				>
-					»
-				</Button>
+					icon={ next }
+				/>
 			</HStack>
 		</HStack>
 	);
