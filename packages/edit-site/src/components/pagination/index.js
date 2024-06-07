@@ -51,6 +51,7 @@ export default function Pagination( {
 					disabled={ disabled || currentPage === 1 }
 					label={ __( 'First page' ) }
 					icon={ previous }
+					size="compact"
 				/>
 				<Button
 					variant={ buttonVariant }
@@ -59,6 +60,7 @@ export default function Pagination( {
 					disabled={ disabled || currentPage === 1 }
 					label={ __( 'Previous page' ) }
 					icon={ chevronLeft }
+					size="compact"
 				/>
 			</HStack>
 			<Text variant="muted">
@@ -77,6 +79,7 @@ export default function Pagination( {
 					disabled={ disabled || currentPage === numPages }
 					label={ __( 'Next page' ) }
 					icon={ chevronRight }
+					size="compact"
 				/>
 				<Button
 					variant={ buttonVariant }
@@ -85,6 +88,7 @@ export default function Pagination( {
 					disabled={ disabled || currentPage === numPages }
 					label={ __( 'Last page' ) }
 					icon={ next }
+					size="compact"
 				/>
 			</HStack>
 		</HStack>
