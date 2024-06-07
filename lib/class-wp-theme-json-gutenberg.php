@@ -1409,6 +1409,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return string The global styles custom CSS.
 	 */
 	public function get_custom_css() {
+		_deprecated_function( __METHOD__, '6.7.0', 'get_stylesheet' );
 		$block_custom_css = '';
 		$block_nodes      = $this->get_block_custom_css_nodes();
 		foreach ( $block_nodes as $node ) {
@@ -1427,6 +1428,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return string The global styles base custom CSS.
 	 */
 	public function get_base_custom_css() {
+		_deprecated_function( __METHOD__, 'Gutenberg 18.6.0', 'get_stylesheet' );
 		return isset( $this->theme_json['styles']['css'] ) ? $this->theme_json['styles']['css'] : '';
 	}
 
@@ -1438,6 +1440,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return array The block nodes.
 	 */
 	public function get_block_custom_css_nodes() {
+		_deprecated_function( __METHOD__, 'Gutenberg 18.6.0', 'get_block_nodes' );
 		$block_nodes = array();
 
 		// Add the global styles block CSS.
@@ -1470,6 +1473,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return string The global styles custom CSS for the block.
 	 */
 	public function get_block_custom_css( $css, $selector ) {
+		_deprecated_function( __METHOD__, 'Gutenberg 18.6.0', 'get_styles_for_block' );
 		return $this->process_blocks_custom_css( $css, $selector );
 	}
 
