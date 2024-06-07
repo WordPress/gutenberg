@@ -745,8 +745,7 @@ class WP_Theme_JSON_Gutenberg {
 		$registry            = WP_Block_Type_Registry::get_instance();
 		$valid_block_names   = array_keys( $registry->get_all_registered() );
 		$valid_element_names = array_keys( static::ELEMENTS );
-		$valid_variations    = static::get_valid_block_style_variations();
-		$this->theme_json    = static::sanitize( $this->theme_json, $valid_block_names, $valid_element_names, $valid_variations );
+		$this->theme_json    = static::sanitize( $this->theme_json, $valid_block_names, $valid_element_names );
 		$this->theme_json    = static::maybe_opt_in_into_settings( $this->theme_json );
 
 		// Internally, presets are keyed by origin.
@@ -847,10 +846,9 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param array $input               Structure to sanitize.
 	 * @param array $valid_block_names   List of valid block names.
 	 * @param array $valid_element_names List of valid element names.
-	 * @param array $valid_variations    List of valid variations per block.
 	 * @return array The sanitized output.
 	 */
-	protected static function sanitize( $input, $valid_block_names, $valid_element_names, $valid_variations ) {
+	protected static function sanitize( $input, $valid_block_names, $valid_element_names ) {
 
 		$output = array();
 
@@ -927,13 +925,9 @@ class WP_Theme_JSON_Gutenberg {
 			$style_variation_names = array();
 			if (
 				! empty( $input['styles']['blocks'][ $block ]['variations'] ) &&
-				is_array( $input['styles']['blocks'][ $block ]['variations'] ) &&
-				isset( $valid_variations[ $block ] )
+				is_array( $input['styles']['blocks'][ $block ]['variations'] )
 			) {
-				$style_variation_names = array_intersect(
-					array_keys( $input['styles']['blocks'][ $block ]['variations'] ),
-					$valid_variations[ $block ]
-				);
+				$style_variation_names = array_keys( $input['styles']['blocks'][ $block ]['variations'] );
 			}
 
 			$schema_styles_variations = array();
@@ -2632,10 +2626,14 @@ class WP_Theme_JSON_Gutenberg {
 			$variation_selectors = array();
 			if ( isset( $node['variations'] ) ) {
 				foreach ( $node['variations'] as $variation => $node ) {
-					$variation_selectors[] = array(
-						'path'     => array( 'styles', 'blocks', $name, 'variations', $variation ),
-						'selector' => $selectors[ $name ]['styleVariations'][ $variation ],
-					);
+					// Only add registered variations to this node's variations to
+					// avoid CSS generated without a selector.
+					if ( isset( $selectors[ $name ]['styleVariations'][ $variation ] ) ) {
+						$variation_selectors[] = array(
+							'path'     => array( 'styles', 'blocks', $name, 'variations', $variation ),
+							'selector' => $selectors[ $name ]['styleVariations'][ $variation ],
+						);
+					}
 				}
 			}
 
@@ -3280,7 +3278,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 5.9.0
 	 * @since 6.6.0 Added support for block style variation element styles and $origin parameter.
 	 *
-	 * @param array $theme_json Structure to sanitize.
+	 * @param array  $theme_json Structure to sanitize.
 	 * @param string $origin    Optional. What source of data this object represents.
 	 *                          One of 'blocks', 'default', 'theme', or 'custom'. Default 'theme'.
 	 * @return array Sanitized structure.
@@ -3296,9 +3294,7 @@ class WP_Theme_JSON_Gutenberg {
 
 		$valid_block_names   = array_keys( static::get_blocks_metadata() );
 		$valid_element_names = array_keys( static::ELEMENTS );
-		$valid_variations    = static::get_valid_block_style_variations();
-
-		$theme_json = static::sanitize( $theme_json, $valid_block_names, $valid_element_names, $valid_variations );
+		$theme_json          = static::sanitize( $theme_json, $valid_block_names, $valid_element_names );
 
 		$blocks_metadata = static::get_blocks_metadata();
 		$style_nodes     = static::get_style_nodes( $theme_json, $blocks_metadata );
@@ -4293,22 +4289,5 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		return implode( ',', $result );
-	}
-
-	/**
-	 * Collects valid block style variations keyed by block type.
-	 *
-	 * @return array Valid block style variations by block type.
-	 */
-	protected static function get_valid_block_style_variations() {
-		$valid_variations = array();
-		foreach ( self::get_blocks_metadata() as $block_name => $block_meta ) {
-			if ( ! isset( $block_meta['styleVariations'] ) ) {
-				continue;
-			}
-			$valid_variations[ $block_name ] = array_keys( $block_meta['styleVariations'] );
-		}
-
-		return $valid_variations;
 	}
 }

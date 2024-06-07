@@ -1463,12 +1463,14 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			'default'
 		);
 
+		$stylesheet = $theme_json->get_stylesheet();
+
 		unregister_block_type( 'test/clamp-me' );
 
 		// Results also include root site blocks styles.
 		$this->assertSame(
 			':root{--wp--preset--font-size--pickles: clamp(14px, 0.875rem + ((1vw - 3.2px) * 0.156), 16px);--wp--preset--font-size--toast: clamp(14.642px, 0.915rem + ((1vw - 3.2px) * 0.575), 22px);}:where(body) { margin: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}.is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}.is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}.is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}.is-layout-constrained > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}.is-layout-constrained > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}.is-layout-constrained > .aligncenter{margin-left: auto !important;margin-right: auto !important;}.is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)){margin-left: auto !important;margin-right: auto !important;}body .is-layout-flex{display: flex;}.is-layout-flex{flex-wrap: wrap;align-items: center;}.is-layout-flex > :is(*, div){margin: 0;}body .is-layout-grid{display: grid;}.is-layout-grid > :is(*, div){margin: 0;}:root :where(body){font-size: clamp(0.875em, 0.875rem + ((1vw - 0.2em) * 0.156), 1em);}:root :where(h1){font-size: clamp(50.171px, 3.136rem + ((1vw - 3.2px) * 3.893), 100px);}:root :where(.wp-block-test-clamp-me){font-size: clamp(27.894px, 1.743rem + ((1vw - 3.2px) * 1.571), 48px);}.has-pickles-font-size{font-size: var(--wp--preset--font-size--pickles) !important;}.has-toast-font-size{font-size: var(--wp--preset--font-size--toast) !important;}',
-			$theme_json->get_stylesheet()
+			$stylesheet
 		);
 	}
 
@@ -3807,39 +3809,19 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEqualSetsWithIndex( $expected, $actual );
 	}
 
-	public function test_sanitize_for_unregistered_style_variations() {
-		$theme_json = new WP_Theme_JSON_Gutenberg(
-			array(
-				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-				'styles'  => array(
-					'blocks' => array(
-						'core/quote' => array(
-							'variations' => array(
-								'unregisteredVariation' => array(
-									'color' => array(
-										'background' => 'hotpink',
-									),
-								),
-								'plain'                 => array(
-									'color' => array(
-										'background' => 'hotpink',
-									),
-								),
-							),
-						),
-					),
-				),
-			)
-		);
-
-		$sanitized_theme_json = $theme_json->get_raw_data();
-		$expected             = array(
+	public function test_unregistered_style_variations_are_omitted_from_block_style_nodes() {
+		$theme_json_data = array(
 			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 			'styles'  => array(
 				'blocks' => array(
 					'core/quote' => array(
 						'variations' => array(
-							'plain' => array(
+							'unregistered-variation' => array(
+								'color' => array(
+									'background' => 'hotpink',
+								),
+							),
+							'plain'                  => array(
 								'color' => array(
 									'background' => 'hotpink',
 								),
@@ -3849,7 +3831,21 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 			),
 		);
-		$this->assertSameSetsWithIndex( $expected, $sanitized_theme_json, 'Sanitized theme.json styles does not match' );
+
+		$theme_json = new ReflectionClass( 'WP_Theme_JSON_Gutenberg' );
+
+		$func = $theme_json->getMethod( 'get_block_nodes' );
+		$func->setAccessible( true );
+
+		$nodes    = $func->invoke( null, $theme_json_data );
+		$actual   = $nodes[0]['variations'];
+		$expected = array(
+			array(
+				'path'     => array( 'styles', 'blocks', 'core/quote', 'variations', 'plain' ),
+				'selector' => '.wp-block-quote.is-style-plain',
+			),
+		);
+		$this->assertSameSetsWithIndex( $expected, $actual, 'Unregistered block style variations should not be included in block node data' );
 	}
 
 	/**
