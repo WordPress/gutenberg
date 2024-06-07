@@ -514,6 +514,39 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 	}
 
 	/**
+	 * @covers WP_REST_Global_Styles_Controller_Gutenberg::update_item
+	 */
+	public function test_update_item_with_custom_block_style_variations() {
+		wp_set_current_user( self::$admin_id );
+		if ( is_multisite() ) {
+			grant_super_admin( self::$admin_id );
+		}
+		$variations = array(
+			'dark' => array(
+				'color' => array(
+					'background' => '#000000',
+					'text'       => '#ffffff',
+				),
+			),
+		);
+		$request    = new WP_REST_Request( 'PUT', '/wp/v2/global-styles/' . self::$global_styles_id );
+		$request->set_body_params(
+			array(
+				'styles' => array(
+					'blocks' => array(
+						'core/group' => array(
+							'variations' => $variations,
+						),
+					),
+				),
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$this->assertSame( $variations, $data['styles']['blocks']['core/group']['variations'] );
+	}
+
+	/**
 	 * @doesNotPerformAssertions
 	 */
 	public function test_delete_item() {

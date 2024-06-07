@@ -31,6 +31,29 @@ function gutenberg_filter_global_styles_post( $data ) {
 	) {
 		unset( $decoded_data['isGlobalStylesUserThemeJSON'] );
 
+		// Ensure block style variations are automatically registered so they will not
+		// be omitted during theme.json sanitization.
+		if ( isset( $decoded_data['styles']['blocks'] ) && is_array( $decoded_data['styles']['blocks'] ) ) {
+			$registry = WP_Block_Styles_Registry::get_instance();
+			foreach ( $decoded_data['styles']['blocks'] as $block_name => $block_data ) {
+				if ( isset( $block_data['variations'] ) && is_array( $block_data['variations'] ) ) {
+					$registered_styles = $registry->get_registered_styles_for_block( $block_name );
+
+					foreach ( $block_data['variations'] as $variation_name => $variation_data ) {
+						// Register block style variation only if it hasn't already been registered.
+						if ( ! array_key_exists( $variation_name, $registered_styles ) ) {
+							register_block_style(
+								$block_name,
+								array(
+									'name'  => $variation_name,
+									'label' => $variation_name,
+								)
+							);
+						}
+					}
+				}
+			}
+		}
 		$data_to_encode = WP_Theme_JSON_Gutenberg::remove_insecure_properties( $decoded_data );
 
 		$data_to_encode['isGlobalStylesUserThemeJSON'] = true;
