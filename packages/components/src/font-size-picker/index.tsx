@@ -26,9 +26,7 @@ import {
 import { Spacer } from '../spacer';
 import FontSizePickerSelect from './font-size-picker-select';
 import FontSizePickerToggleGroup from './font-size-picker-toggle-group';
-import FontSizePickerCustomControl, {
-	DEFAULT_UNITS,
-} from './font-size-picker-custom-control';
+import SizeControl, { DEFAULT_UNITS } from '../size-control';
 import { T_SHIRT_NAMES } from './constants';
 
 const UnforwardedFontSizePicker = (
@@ -184,7 +182,7 @@ const UnforwardedFontSizePicker = (
 					/>
 				) }
 				{ ! disableCustomFontSizes && showCustomValueControl && (
-					<FontSizePickerCustomControl
+					<SizeControl
 						__next40pxDefaultSize={ __next40pxDefaultSize }
 						value={ value }
 						isDisabled={ isDisabled }
@@ -192,7 +190,7 @@ const UnforwardedFontSizePicker = (
 						units={ units }
 						withSlider={ withSlider }
 						withReset={ withReset }
-						fallbackFontSize={ fallbackFontSize }
+						fallbackValue={ fallbackFontSize }
 						onChange={ onChange }
 					/>
 				) }

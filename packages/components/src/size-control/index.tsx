@@ -9,7 +9,7 @@ import { __ } from '@wordpress/i18n';
 import { Button } from '../button';
 import RangeControl from '../range-control';
 import { Flex, FlexItem } from '../flex';
-import type { FontSizePickerCustomControlProps } from './types';
+import type { SizeControlProps } from './types';
 import {
 	default as UnitControl,
 	parseQuantityAndUnitFromRawValue,
@@ -20,9 +20,7 @@ import { Spacer } from '../spacer';
 
 export const DEFAULT_UNITS = [ 'px', 'em', 'rem', 'vw', 'vh' ];
 
-function FontSizePickerCustomControl(
-	props: FontSizePickerCustomControlProps
-) {
+function SizeControl( props: SizeControlProps ) {
 	const {
 		__next40pxDefaultSize,
 		value,
@@ -33,7 +31,7 @@ function FontSizePickerCustomControl(
 		withReset = true,
 		onChange,
 		hasUnits,
-		fallbackFontSize,
+		fallbackValue,
 	} = props;
 
 	const units = useCustomUnits( {
@@ -81,7 +79,7 @@ function FontSizePickerCustomControl(
 							label={ __( 'Custom Size' ) }
 							hideLabelFromVision
 							value={ valueQuantity }
-							initialPosition={ fallbackFontSize }
+							initialPosition={ fallbackValue }
 							withInputField={ false }
 							onChange={ ( newValue ) => {
 								if ( newValue === undefined ) {
@@ -126,4 +124,4 @@ function FontSizePickerCustomControl(
 	);
 }
 
-export default FontSizePickerCustomControl;
+export default SizeControl;

@@ -8,7 +8,7 @@ import userEvent from '@testing-library/user-event';
  * Internal dependencies
  */
 import FontSizePicker from '../';
-import type { FontSize } from '../types';
+import type { Size } from '../../size-control/types';
 
 describe( 'FontSizePicker', () => {
 	test.each( [
@@ -474,7 +474,7 @@ describe( 'FontSizePicker', () => {
 		commonTests( fontSizes );
 	} );
 
-	function commonToggleGroupTests( fontSizes: FontSize[] ) {
+	function commonToggleGroupTests( fontSizes: Size[] ) {
 		it( 'defaults to M when value is 16px', () => {
 			render(
 				<FontSizePicker
@@ -501,7 +501,7 @@ describe( 'FontSizePicker', () => {
 		);
 	}
 
-	function commonSelectTests( fontSizes: FontSize[] ) {
+	function commonSelectTests( fontSizes: Size[] ) {
 		it( 'shows custom input when Custom is selected', async () => {
 			const user = userEvent.setup();
 			const onChange = jest.fn();
@@ -519,7 +519,7 @@ describe( 'FontSizePicker', () => {
 		} );
 	}
 
-	function commonTests( fontSizes: FontSize[] ) {
+	function commonTests( fontSizes: Size[] ) {
 		it( 'shows custom input when value is unknown', () => {
 			render( <FontSizePicker fontSizes={ fontSizes } value="3px" /> );
 			expect( screen.getByLabelText( 'Custom' ) ).toBeInTheDocument();
