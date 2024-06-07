@@ -92,7 +92,7 @@ function _CustomSelect(
 	} = props;
 
 	return (
-		<>
+		<Styled.SelectWrapper>
 			{ hideLabelFromVision ? ( // TODO: Replace with BaseControl
 				<VisuallyHidden as="label">{ label }</VisuallyHidden>
 			) : (
@@ -116,7 +116,7 @@ function _CustomSelect(
 					</CustomSelectContext.Provider>
 				</Styled.SelectPopover>
 			</InputBase>
-		</>
+		</Styled.SelectWrapper>
 	);
 }
 
