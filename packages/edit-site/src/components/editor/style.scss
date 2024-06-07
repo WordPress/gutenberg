@@ -1,4 +1,4 @@
-.edit-site-editor__interface-skeleton {
+.edit-site-editor__editor-interface {
 	opacity: 1;
 	transition: opacity 0.1s ease-out;
 	@include reduce-motion("transition");
@@ -16,8 +16,4 @@
 	padding: $grid-unit-30;
 	display: flex;
 	justify-content: center;
-}
-
-.editor-header {
-	padding-left: $header-height;
 }

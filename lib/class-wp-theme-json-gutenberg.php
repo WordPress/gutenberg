@@ -734,14 +734,14 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @param array  $theme_json A structure that follows the theme.json schema.
 	 * @param string $origin     Optional. What source of data this object represents.
-	 *                           One of 'default', 'theme', or 'custom'. Default 'theme'.
+	 *                           One of 'blocks', 'default', 'theme', or 'custom'. Default 'theme'.
 	 */
 	public function __construct( $theme_json = array( 'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA ), $origin = 'theme' ) {
 		if ( ! in_array( $origin, static::VALID_ORIGINS, true ) ) {
 			$origin = 'theme';
 		}
 
-		$this->theme_json    = WP_Theme_JSON_Schema_Gutenberg::migrate( $theme_json );
+		$this->theme_json    = WP_Theme_JSON_Schema_Gutenberg::migrate( $theme_json, $origin );
 		$registry            = WP_Block_Type_Registry::get_instance();
 		$valid_block_names   = array_keys( $registry->get_all_registered() );
 		$valid_element_names = array_keys( static::ELEMENTS );
@@ -3278,15 +3278,21 @@ class WP_Theme_JSON_Gutenberg {
 	 * Removes insecure data from theme.json.
 	 *
 	 * @since 5.9.0
-	 * @since 6.6.0 Added support for block style variation element styles.
+	 * @since 6.6.0 Added support for block style variation element styles and $origin parameter.
 	 *
 	 * @param array $theme_json Structure to sanitize.
+	 * @param string $origin    Optional. What source of data this object represents.
+	 *                          One of 'blocks', 'default', 'theme', or 'custom'. Default 'theme'.
 	 * @return array Sanitized structure.
 	 */
-	public static function remove_insecure_properties( $theme_json ) {
+	public static function remove_insecure_properties( $theme_json, $origin = 'theme' ) {
+		if ( ! in_array( $origin, static::VALID_ORIGINS, true ) ) {
+			$origin = 'theme';
+		}
+
 		$sanitized = array();
 
-		$theme_json = WP_Theme_JSON_Schema_Gutenberg::migrate( $theme_json );
+		$theme_json = WP_Theme_JSON_Schema_Gutenberg::migrate( $theme_json, $origin );
 
 		$valid_block_names   = array_keys( static::get_blocks_metadata() );
 		$valid_element_names = array_keys( static::ELEMENTS );
@@ -3559,53 +3565,32 @@ class WP_Theme_JSON_Gutenberg {
 
 		// Deprecated theme supports.
 		if ( isset( $settings['disableCustomColors'] ) ) {
-			if ( ! isset( $theme_settings['settings']['color'] ) ) {
-				$theme_settings['settings']['color'] = array();
-			}
 			$theme_settings['settings']['color']['custom'] = ! $settings['disableCustomColors'];
 		}
 
 		if ( isset( $settings['disableCustomGradients'] ) ) {
-			if ( ! isset( $theme_settings['settings']['color'] ) ) {
-				$theme_settings['settings']['color'] = array();
-			}
 			$theme_settings['settings']['color']['customGradient'] = ! $settings['disableCustomGradients'];
 		}
 
 		if ( isset( $settings['disableCustomFontSizes'] ) ) {
-			if ( ! isset( $theme_settings['settings']['typography'] ) ) {
-				$theme_settings['settings']['typography'] = array();
-			}
 			$theme_settings['settings']['typography']['customFontSize'] = ! $settings['disableCustomFontSizes'];
 		}
 
 		if ( isset( $settings['enableCustomLineHeight'] ) ) {
-			if ( ! isset( $theme_settings['settings']['typography'] ) ) {
-				$theme_settings['settings']['typography'] = array();
-			}
 			$theme_settings['settings']['typography']['lineHeight'] = $settings['enableCustomLineHeight'];
 		}
 
 		if ( isset( $settings['enableCustomUnits'] ) ) {
-			if ( ! isset( $theme_settings['settings']['spacing'] ) ) {
-				$theme_settings['settings']['spacing'] = array();
-			}
 			$theme_settings['settings']['spacing']['units'] = ( true === $settings['enableCustomUnits'] ) ?
 				array( 'px', 'em', 'rem', 'vh', 'vw', '%' ) :
 				$settings['enableCustomUnits'];
 		}
 
 		if ( isset( $settings['colors'] ) ) {
-			if ( ! isset( $theme_settings['settings']['color'] ) ) {
-				$theme_settings['settings']['color'] = array();
-			}
 			$theme_settings['settings']['color']['palette'] = $settings['colors'];
 		}
 
 		if ( isset( $settings['gradients'] ) ) {
-			if ( ! isset( $theme_settings['settings']['color'] ) ) {
-				$theme_settings['settings']['color'] = array();
-			}
 			$theme_settings['settings']['color']['gradients'] = $settings['gradients'];
 		}
 
@@ -3617,17 +3602,15 @@ class WP_Theme_JSON_Gutenberg {
 					$font_sizes[ $key ]['size'] = $font_size['size'] . 'px';
 				}
 			}
-			if ( ! isset( $theme_settings['settings']['typography'] ) ) {
-				$theme_settings['settings']['typography'] = array();
-			}
 			$theme_settings['settings']['typography']['fontSizes'] = $font_sizes;
 		}
 
 		if ( isset( $settings['enableCustomSpacing'] ) ) {
-			if ( ! isset( $theme_settings['settings']['spacing'] ) ) {
-				$theme_settings['settings']['spacing'] = array();
-			}
 			$theme_settings['settings']['spacing']['padding'] = $settings['enableCustomSpacing'];
+		}
+
+		if ( isset( $settings['spacingSizes'] ) ) {
+			$theme_settings['settings']['spacing']['spacingSizes'] = $settings['spacingSizes'];
 		}
 
 		return $theme_settings;
@@ -3794,12 +3777,10 @@ class WP_Theme_JSON_Gutenberg {
 	/**
 	 * Sets the spacingSizes array based on the spacingScale values from theme.json.
 	 *
-	 * No longer used since theme.json version 3 as the spacingSizes are now
-	 * automatically generated during construction and merge instead of manually
-	 * set in the resolver.
-	 *
 	 * @since 6.1.0
-	 * @deprecated 6.6.0
+	 * @deprecated 6.6.0 No longer used as the spacingSizes are automatically
+	 *                   generated in the constructor and merge methods instead
+	 *                   of manually after instantiation.
 	 *
 	 * @return null|void
 	 */
@@ -3852,6 +3833,10 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return array The merged set of spacing sizes.
 	 */
 	private static function merge_spacing_sizes( $base, $incoming ) {
+		// Preserve the order if there are no base (spacingScale) values.
+		if ( empty( $base ) ) {
+			return $incoming;
+		}
 		$merged = array();
 		foreach ( $base as $item ) {
 			$merged[ $item['slug'] ] = $item;
@@ -3859,6 +3844,7 @@ class WP_Theme_JSON_Gutenberg {
 		foreach ( $incoming as $item ) {
 			$merged[ $item['slug'] ] = $item;
 		}
+		ksort( $merged, SORT_NUMERIC );
 		return array_values( $merged );
 	}
 

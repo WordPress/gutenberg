@@ -9,8 +9,10 @@ import {
 	getEditorHtml,
 	getEditorTitle,
 	initializeEditor,
+	pasteIntoRichText,
 	screen,
 	setupCoreBlocks,
+	within,
 } from 'test/helpers';
 import { BackHandler } from 'react-native';
 
@@ -96,6 +98,38 @@ describe( 'Editor', () => {
 		act( () => {
 			toggleModeCallback();
 		} );
+	} );
+
+	it( 'adds empty image block when pasting unsupported HTML local image path', async () => {
+		await initializeEditor();
+		await addBlock( screen, 'Paragraph' );
+
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+
+		pasteIntoRichText( paragraphTextInput, {
+			text: '<div><img src="file:LOW-RES.png"></div>',
+		} );
+
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'adds image block when pasting HTML local image path', async () => {
+		await initializeEditor();
+		await addBlock( screen, 'Paragraph' );
+
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+
+		pasteIntoRichText( paragraphTextInput, {
+			files: [ 'file:///path/to/file.png' ],
+		} );
+
+		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
 	it( 'appends media correctly for allowed types', async () => {

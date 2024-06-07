@@ -59,7 +59,7 @@
 	position: sticky;
 	top: 0;
 	background: $gray-900;
-	padding-top: $grid-unit-60 + $header-height;
+	padding-top: $grid-unit-60;
 	margin-bottom: $grid-unit-10;
 	padding-bottom: $grid-unit-10;
 	z-index: z-index(".edit-site-sidebar-navigation-screen__title-icon");
@@ -67,8 +67,8 @@
 
 .edit-site-sidebar-navigation-screen__title {
 	flex-grow: 1;
-	padding: $grid-unit-15 * 0.5 0 0 0;
 	overflow-wrap: break-word;
+	padding: $grid-unit-05 * 0.5 0 0 0;
 }
 
 .edit-site-sidebar-navigation-screen__actions {

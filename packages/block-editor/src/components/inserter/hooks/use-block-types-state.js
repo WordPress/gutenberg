@@ -8,7 +8,7 @@ import {
 	parse,
 } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-import { useCallback } from '@wordpress/element';
+import { useCallback, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -25,13 +25,18 @@ import { withRootClientIdOptionKey } from '../../../store/utils';
  * @return {Array} Returns the block types state. (block types, categories, collections, onSelect handler)
  */
 const useBlockTypesState = ( rootClientId, onInsert, isQuick ) => {
+	const options = useMemo(
+		() => ( { [ withRootClientIdOptionKey ]: ! isQuick } ),
+		[ isQuick ]
+	);
 	const [ items ] = useSelect(
 		( select ) => [
-			select( blockEditorStore ).getInserterItems( rootClientId, {
-				[ withRootClientIdOptionKey ]: ! isQuick,
-			} ),
+			select( blockEditorStore ).getInserterItems(
+				rootClientId,
+				options
+			),
 		],
-		[ rootClientId, isQuick ]
+		[ rootClientId, options ]
 	);
 
 	const [ categories, collections ] = useSelect( ( select ) => {
