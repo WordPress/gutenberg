@@ -58,7 +58,7 @@ else
 fi
 
 CONFIG_FILE="$(pwd)/__device-tests__/helpers/device-config.json"
-IOS_PLATFORM_VERSION=$(jq -r '.ios.buildkite.platformVersion' "$CONFIG_FILE")
+IOS_PLATFORM_VERSION=$(jq -r '.ios.buildkite.wdaPlatformVersion' "$CONFIG_FILE")
 
 # Throw an error if the required iOS runtime is not installed
 IOS_RUNTIME_INSTALLED=$(xcrun simctl list runtimes -j | jq -r --arg version "$IOS_PLATFORM_VERSION" '.runtimes | to_entries[] | select(.value.version == $version) | .value.identifier')
