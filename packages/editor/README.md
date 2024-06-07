@@ -1270,7 +1270,11 @@ Undocumented declaration.
 
 ### PostSwitchToDraftButton
 
-Undocumented declaration.
+Renders a button component that allows the user to switch a post to draft status.
+
+_Returns_
+
+-   `JSX.Element`: The rendered component.
 
 ### PostSyncStatus
 

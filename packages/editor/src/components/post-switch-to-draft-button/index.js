@@ -14,7 +14,11 @@ import { useState } from '@wordpress/element';
  */
 import { store as editorStore } from '../../store';
 
-// TODO: deprecate..
+/**
+ * Renders a button component that allows the user to switch a post to draft status.
+ *
+ * @return {JSX.Element} The rendered component.
+ */
 export default function PostSwitchToDraftButton() {
 	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
 
