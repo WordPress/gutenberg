@@ -67,7 +67,7 @@ export function PrivateBlockToolbar( {
 		shouldShowVisualToolbar,
 		showParentSelector,
 		isUsingBindings,
-		isNotInPatternOverridesContext,
+		hasParentPattern,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockName,
@@ -103,12 +103,6 @@ export function PrivateBlockToolbar( {
 			'core/block',
 			true
 		)[ 0 ];
-		const _isNotInPatternOverridesContext =
-			!! bindings &&
-			Object.values( bindings ).some(
-				( binding ) => binding.source === 'core/pattern-overrides'
-			) &&
-			! parentPatternClientId;
 		return {
 			blockClientId: selectedBlockClientId,
 			blockClientIds: selectedBlockClientIds,
@@ -129,7 +123,7 @@ export function PrivateBlockToolbar( {
 				selectedBlockClientIds.length === 1 &&
 				_isDefaultEditingMode,
 			isUsingBindings: !! bindings,
-			isNotInPatternOverridesContext: _isNotInPatternOverridesContext,
+			hasParentPattern: !! parentPatternClientId,
 		};
 	}, [] );
 
@@ -160,6 +154,7 @@ export function PrivateBlockToolbar( {
 
 	const innerClasses = clsx( 'block-editor-block-toolbar', {
 		'is-synced': isSynced,
+		'is-connected': isUsingBindings,
 	} );
 
 	return (
@@ -182,8 +177,7 @@ export function PrivateBlockToolbar( {
 					isLargeViewport &&
 					isDefaultEditingMode && <BlockParentSelector /> }
 				{ isUsingBindings &&
-					// Don't show the indicator if the block connected to pattern overrides but not inside a pattern instance.
-					! isNotInPatternOverridesContext &&
+					hasParentPattern &&
 					canBindBlock( blockName ) && (
 						<BlockBindingsIndicator clientIds={ blockClientIds } />
 					) }
@@ -197,6 +191,7 @@ export function PrivateBlockToolbar( {
 								<BlockSwitcher
 									clientIds={ blockClientIds }
 									disabled={ ! isDefaultEditingMode }
+									isUsingBindings={ isUsingBindings }
 								/>
 								{ isDefaultEditingMode && (
 									<>

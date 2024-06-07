@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useId } from '@wordpress/element';
-import { __, sprintf, _x } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	DropdownMenu,
 	ToolbarGroup,
@@ -22,13 +22,10 @@ import useBlockDisplayTitle from '../block-title/use-block-display-title';
 
 export default function BlockBindingsToolbarIndicator( { clientIds } ) {
 	const isSingleBlockSelected = clientIds.length === 1;
-	const { icon, firstBlockName, isConnectedToPatternOverrides } = useSelect(
+	const { icon, firstBlockName } = useSelect(
 		( select ) => {
-			const {
-				getBlockAttributes,
-				getBlockNamesByClientId,
-				getBlocksByClientId,
-			} = select( blockEditorStore );
+			const { getBlockAttributes, getBlockNamesByClientId } =
+				select( blockEditorStore );
 			const { getBlockType, getActiveBlockVariation } =
 				select( blocksStore );
 			const blockTypeNames = getBlockNamesByClientId( clientIds );
@@ -54,16 +51,6 @@ export default function BlockBindingsToolbarIndicator( { clientIds } ) {
 				icon: _icon,
 				firstBlockName: getBlockAttributes( clientIds[ 0 ] ).metadata
 					.name,
-				isConnectedToPatternOverrides: getBlocksByClientId(
-					clientIds
-				).some( ( block ) =>
-					Object.values(
-						block?.attributes?.metadata?.bindings || {}
-					).some(
-						( binding ) =>
-							binding.source === 'core/pattern-overrides'
-					)
-				),
 			};
 		},
 		[ clientIds, isSingleBlockSelected ]
@@ -73,25 +60,15 @@ export default function BlockBindingsToolbarIndicator( { clientIds } ) {
 		maximumLength: 35,
 	} );
 
-	let blockDescription = isSingleBlockSelected
-		? _x(
-				'This block is connected.',
-				'block toolbar button label and description'
+	const blockDescription = isSingleBlockSelected
+		? sprintf(
+				/* translators: %1s: The block type's name; %2s: The block's user-provided name (the same as the override name). */
+				__( 'This %1$s is editable using the "%2$s" override.' ),
+				firstBlockTitle.toLowerCase(),
+				firstBlockName
 		  )
-		: _x(
-				'These blocks are connected.',
-				'block toolbar button label and description'
-		  );
-	if ( isConnectedToPatternOverrides && firstBlockName ) {
-		blockDescription = isSingleBlockSelected
-			? sprintf(
-					/* translators: %1s: The block type's name; %2s: The block's user-provided name (the same as the override name). */
-					__( 'This %1$s is editable using the "%2$s" override.' ),
-					firstBlockTitle.toLowerCase(),
-					firstBlockName
-			  )
-			: __( 'These blocks are editable using overrides.' );
-	}
+		: __( 'These blocks are editable using overrides.' );
+
 	const descriptionId = useId();
 
 	return (
