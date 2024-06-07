@@ -112,6 +112,7 @@ export function UnforwardedButton(
 		text,
 		variant,
 		description,
+		showDescription,
 		...buttonOrAnchorProps
 	} = useDeprecatedProps( props );
 
@@ -276,13 +277,15 @@ export function UnforwardedButton(
 		  }
 		: {};
 
+	const DescriptionComponent = showDescription ? 'span' : VisuallyHidden;
+
 	return (
 		<>
 			<Tooltip { ...tooltipProps }>{ element }</Tooltip>
 			{ description && (
-				<VisuallyHidden>
+				<DescriptionComponent className="components-button__description">
 					<span id={ descriptionId }>{ description }</span>
-				</VisuallyHidden>
+				</DescriptionComponent>
 			) }
 		</>
 	);

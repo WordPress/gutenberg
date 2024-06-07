@@ -47,6 +47,12 @@ type BaseButtonProps = {
 	 */
 	description?: string;
 	/**
+	 * Whether to show the accessible description.
+	 *
+	 * @default false
+	 */
+	showDescription?: boolean;
+	/**
 	 * If provided, renders an Icon component inside the button.
 	 */
 	icon?: IconProps[ 'icon' ];

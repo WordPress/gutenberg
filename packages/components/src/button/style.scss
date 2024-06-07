@@ -234,7 +234,6 @@
 	/**
 	 * Link buttons.
 	 */
-
 	&.is-link {
 		margin: 0;
 		padding: 0;
@@ -402,6 +401,16 @@
 	.components-visually-hidden {
 		height: auto;
 	}
+}
+
+.components-button__description {
+	display: block;
+	margin-top: $grid-unit-10;
+	margin-bottom: 0;
+	font-family: inherit;
+	font-weight: normal;
+	font-size: $default-font-size;
+	color: $gray-700;
 }
 
 @keyframes components-button__busy-animation {

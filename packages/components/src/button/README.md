@@ -140,9 +140,16 @@ An optional additional class name to apply to the rendered button.
 
 #### `description`: `string`
 
-An accessible description for the button.
+A visually hidden accessible description for the button.
 
 -   Required: No
+
+#### `showDescription`: `boolean`
+
+Whether to show the accessible description.
+
+-   Required: No
+-   Default: `false`
 
 #### `disabled`: `boolean`
 
