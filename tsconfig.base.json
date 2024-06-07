@@ -41,6 +41,7 @@
 		"packages/*/build-*/**",
 		"packages/*/build/**",
 		"**/test/**",
+		"**/test-types/**",
 		"packages/**/react-native-*/**"
 	]
 }

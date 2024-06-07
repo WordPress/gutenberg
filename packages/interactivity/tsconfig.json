@@ -4,9 +4,7 @@
 	"compilerOptions": {
 		"rootDir": "src",
 		"declarationDir": "build-types",
-		"noImplicitAny": false,
-		"noUnusedLocals": false
+		"noImplicitAny": false
 	},
-	"files": [ "src/test/types.ts" ],
 	"include": [ "src/**/*" ]
 }
