@@ -249,22 +249,16 @@ const DiscussionBoard = ( { contentRef, onClose } ) => {
 				<VStack spacing="3">
 					{ 0 < commentsCount && ! isCurrentThreadResolved && (
 						<>
-							<div
-								className="block-editor-format-toolbar__comment-board__resolved"
-								title={ __( 'Mark as resolved' ) }
-							>
-								<CheckboxControl
-									checked={ isResolved }
-									onChange={ () => showConfirmationOverlay() }
-								/>
-							</div>
 							{ currentThread.comments.map(
-								( {
-									createdBy,
-									comment,
-									timestamp,
-									commentId,
-								} ) => (
+								(
+									{
+										createdBy,
+										comment,
+										timestamp,
+										commentId,
+									},
+									index
+								) => (
 									<VStack
 										spacing="2"
 										key={ timestamp }
@@ -275,33 +269,75 @@ const DiscussionBoard = ( { contentRef, onClose } ) => {
 											spacing="1"
 											justify="space-between"
 										>
-											<Icon
-												icon={ userIcon }
-												size={ 35 }
-											/>
-											<VStack spacing="1">
-												<span>{ createdBy }</span>
-												<time
-													dateTime={ format(
-														'c',
-														timestamp
+											<HStack
+												alignment="left"
+												spacing="3"
+												justify="start"
+											>
+												<Icon
+													icon={ userIcon }
+													className="comment-board__userIcon"
+													size={ 45 }
+												/>
+												<VStack spacing="1">
+													<span className="comment-board__userName">
+														{ createdBy }
+													</span>
+													<time
+														dateTime={ format(
+															'c',
+															timestamp
+														) }
+													>
+														{ dateI18n(
+															dateTimeFormat,
+															timestamp
+														) }
+													</time>
+												</VStack>
+											</HStack>
+											<HStack
+												alignment="right"
+												spacing="1"
+												justify="end"
+												className="comment-board__actions"
+											>
+												{ index === 0 && (
+													<div
+														className="block-editor-format-toolbar__comment-board__resolved"
+														title={ __(
+															'Mark as resolved'
+														) }
+													>
+														<CheckboxControl
+															checked={
+																isResolved
+															}
+															onChange={ () =>
+																showConfirmationOverlay()
+															}
+															label={ __(
+																'Resolve'
+															) }
+														/>
+													</div>
+												) }
+												<Button
+													icon={ deleteIcon }
+													label={ __(
+														'Delete comment'
 													) }
-												>
-													{ dateI18n(
-														dateTimeFormat,
-														timestamp
-													) }
-												</time>
-											</VStack>
-											<Button
-												icon={ deleteIcon }
-												label={ __( 'Delete comment' ) }
-												onClick={ () =>
-													deleteComment( commentId )
-												}
-											/>
+													onClick={ () =>
+														deleteComment(
+															commentId
+														)
+													}
+												/>
+											</HStack>
 										</HStack>
-										<p>{ comment }</p>
+										<p className="comment-board__commentText">
+											{ comment }
+										</p>
 									</VStack>
 								)
 							) }
@@ -310,14 +346,21 @@ const DiscussionBoard = ( { contentRef, onClose } ) => {
 					<VStack spacing="2">
 						{ 0 === commentsCount && (
 							<HStack alignment="left" spacing="1">
-								<Icon icon={ userIcon } size={ 35 } />
-								<span>{ currentUser }</span>
+								<Icon
+									icon={ userIcon }
+									className="comment-board__userIcon"
+									size={ 45 }
+								/>
+								<span className="comment-board__userName">
+									{ currentUser }
+								</span>
 							</HStack>
 						) }
 						<TextControl
 							value={ inputComment }
 							onChange={ ( val ) => setInputComment( val ) }
 							placeholder={ __( 'Comment or add others with @' ) }
+							className="block-editor-format-toolbar__comment-input"
 						/>
 						<HStack alignment="right" spacing="1">
 							<Button
