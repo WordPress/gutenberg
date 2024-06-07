@@ -208,18 +208,18 @@ interface StoreOptions {
 }
 
 // Utility type to check if a function is a generator function.
-type IsGenerator< T > = T extends (
+type ConvertGenerator< T > = T extends (
 	...args: infer A
-) => Generator< infer R, any, any >
+) => Generator< any, infer R, any >
 	? ( ...args: A ) => Promise< R >
 	: never;
 
 // Utility type to convert all generator functions in an object to async functions.
 type ConvertGenerators< T > = {
 	[ K in keyof T ]: T[ K ] extends ( ...args: any[] ) => any
-		? IsGenerator< T[ K ] > extends never
+		? ConvertGenerator< T[ K ] > extends never
 			? T[ K ]
-			: IsGenerator< T[ K ] >
+			: ConvertGenerator< T[ K ] >
 		: T[ K ] extends object
 		? ConvertGenerators< T[ K ] >
 		: T[ K ];
