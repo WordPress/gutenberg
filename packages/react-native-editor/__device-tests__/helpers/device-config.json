@@ -1,9 +1,9 @@
 {
 	"ios": {
 		"local": {
-			"deviceName": "iPhone 14",
+			"deviceName": "iPhone 15",
 			"deviceTabletName": "iPad (10th generation)",
-			"platformVersion": "16.2"
+			"platformVersion": "17.0"
 		},
 		"saucelabs": {
 			"deviceName": "iPhone 14 Simulator",
