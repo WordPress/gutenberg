@@ -70,9 +70,7 @@ async function run({ github, context }) {
 ## Test using WordPress Playground
 The changes in this pull request can be previewed and tested using a [Wordpress Playground](https://playground.wordpress.net/playground/) instance.
 
-[Test this pull request with Wordpress Playground](${url}).
-
-Note that this URL is valid for 30 days from when this comment was last updated. You can update it by closing/reopening the PR or pushing a new commit.`;
+[Test this pull request with Wordpress Playground](${url}).`
 
 	if (existingCommentId) {
 		await github.rest.issues.updateComment({
