@@ -22,6 +22,7 @@ export const WithHintWrapper = styled.div`
 	display: flex;
 	justify-content: space-between;
 	flex: 1;
+	flex-wrap: wrap;
 `;
 
 export const SelectedExperimentalHintItem = styled.span`
