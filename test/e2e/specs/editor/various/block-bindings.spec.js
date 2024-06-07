@@ -1975,6 +1975,41 @@ test.describe( 'Block bindings', () => {
 				).toHaveText( 'new value' );
 			} );
 
+			// Related issue: https://github.com/WordPress/gutenberg/issues/62347
+			test( 'should be possible to use symbols and numbers as the custom field value', async ( {
+				editor,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						anchor: 'paragraph-binding',
+						content: 'paragraph default content',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/post-meta',
+									args: { key: 'text_custom_field' },
+								},
+							},
+						},
+					},
+				} );
+				const paragraphBlock = editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} );
+
+				await expect( paragraphBlock ).toHaveAttribute(
+					'contenteditable',
+					'true'
+				);
+				await paragraphBlock.fill( '$10.00' );
+				// Check the value of the custom field is being updated by visiting the frontend.
+				const previewPage = await editor.openPreviewPage();
+				await expect(
+					previewPage.locator( '#paragraph-binding' )
+				).toHaveText( '$10.00' );
+			} );
+
 			test( 'should be possible to edit the value of the url custom field from the button', async ( {
 				editor,
 				page,
