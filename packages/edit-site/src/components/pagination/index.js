@@ -49,6 +49,8 @@ export default function Pagination( {
 					__experimentalIsFocusable
 					disabled={ disabled || currentPage === 1 }
 					aria-label={ __( 'First page' ) }
+					label={ __( 'First page' ) }
+					showTooltip
 				>
 					«
 				</Button>
@@ -58,6 +60,8 @@ export default function Pagination( {
 					__experimentalIsFocusable
 					disabled={ disabled || currentPage === 1 }
 					aria-label={ __( 'Previous page' ) }
+					label={ __( 'Previous page' ) }
+					showTooltip
 				>
 					‹
 				</Button>
@@ -77,6 +81,8 @@ export default function Pagination( {
 					__experimentalIsFocusable
 					disabled={ disabled || currentPage === numPages }
 					aria-label={ __( 'Next page' ) }
+					label={ __( 'Next page' ) }
+					showTooltip
 				>
 					›
 				</Button>
@@ -86,6 +92,8 @@ export default function Pagination( {
 					__experimentalIsFocusable
 					disabled={ disabled || currentPage === numPages }
 					aria-label={ __( 'Last page' ) }
+					label={ __( 'Last page' ) }
+					showTooltip
 				>
 					»
 				</Button>
