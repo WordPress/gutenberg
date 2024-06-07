@@ -3,6 +3,7 @@
 	align-items: center;
 	justify-content: space-between;
 	gap: $grid-unit-10;
+	margin-right: $grid-unit-15;
 }
 
 .edit-site-site-hub__actions {
@@ -13,10 +14,6 @@
 	height: $header-height;
 	width: $header-height;
 	flex-shrink: 0;
-
-	.edit-site-layout__view-mode-toggle-icon {
-		background: $gray-900;
-	}
 
 	&.has-transparent-background .edit-site-layout__view-mode-toggle-icon {
 		background: transparent;
