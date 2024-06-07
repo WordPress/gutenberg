@@ -17,26 +17,6 @@ import { __experimentalUseDropZone as useDropZone } from '@wordpress/compose';
  */
 import type { DropType, DropZoneProps } from './types';
 import type { WordPressComponentProps } from '../context';
-import { MaybeFade } from './animators';
-
-function DropIndicator( { label }: { label?: string } ) {
-	return (
-		<div
-			className="components-drop-zone__content"
-			style={ { pointerEvents: 'none' } }
-		>
-			<div className="components-drop-zone__content-inner">
-				<Icon
-					icon={ upload }
-					className="components-drop-zone__content-icon"
-				/>
-				<span className="components-drop-zone__content-text">
-					{ label ? label : __( 'Drop files to upload' ) }
-				</span>
-			</div>
-		</div>
-	);
-}
 
 /**
  * `DropZone` is a component creating a drop zone area taking the full size of its parent element. It supports dropping files, HTML content or any other HTML drop event.
@@ -130,22 +110,30 @@ export function DropZoneComponent( {
 		},
 	} );
 
+	const shouldActivate =
+		( isDraggingOverDocument || isDraggingOverElement ) &&
+		( ( type === 'file' && onFilesDrop ) ||
+			( type === 'html' && onHTMLDrop ) ||
+			( type === 'default' && onDrop ) );
+
 	const classes = clsx( 'components-drop-zone', className, {
-		'is-active':
-			( isDraggingOverDocument || isDraggingOverElement ) &&
-			( ( type === 'file' && onFilesDrop ) ||
-				( type === 'html' && onHTMLDrop ) ||
-				( type === 'default' && onDrop ) ),
-		'is-dragging-over-document': isDraggingOverDocument,
-		'is-dragging-over-element': isDraggingOverElement,
-		[ `is-dragging-${ type }` ]: !! type,
+		'is-active': shouldActivate,
+		inactive: ! isDraggingOverElement,
 	} );
 
 	return (
 		<div { ...restProps } ref={ ref } className={ classes }>
-			<MaybeFade show={ isDraggingOverElement || false }>
-				<DropIndicator label={ label } />
-			</MaybeFade>
+			<div className="components-drop-zone__content">
+				<div className="components-drop-zone__content-inner">
+					<Icon
+						icon={ upload }
+						className="components-drop-zone__content-icon"
+					/>
+					<span className="components-drop-zone__content-text">
+						{ label ? label : __( 'Drop files to upload' ) }
+					</span>
+				</div>
+			</div>
 		</div>
 	);
 }
