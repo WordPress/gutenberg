@@ -10,6 +10,11 @@ import { __, _x } from '@wordpress/i18n';
 import PostPanelRow from '../post-panel-row';
 import { store as editorStore } from '../../store';
 
+/**
+ * Renders the sync status of a post.
+ *
+ * @return {JSX.Element|null} The rendered sync status component.
+ */
 export default function PostSyncStatus() {
 	const { syncStatus, postType } = useSelect( ( select ) => {
 		const { getEditedPostAttribute } = select( editorStore );
