@@ -1491,7 +1491,18 @@ _Type_
 
 ### TableOfContents
 
-Undocumented declaration.
+Renders a table of contents component.
+
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.hasOutlineItemsDisabled_ `boolean`: Whether outline items are disabled.
+-   _props.repositionDropdown_ `boolean`: Whether to reposition the dropdown.
+-   _ref_ `Element.ref`: The component's ref.
+
+_Returns_
+
+-   `JSX.Element`: The rendered table of contents component.
 
 ### TextEditorGlobalKeyboardShortcuts
 
