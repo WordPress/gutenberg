@@ -3,7 +3,8 @@
 		"local": {
 			"deviceName": "iPhone 15",
 			"deviceTabletName": "iPad (10th generation)",
-			"platformVersion": "17.0.1"
+			"platformVersion": "17.0",
+			"wdaPlatformVersion": "17.0.1"
 		},
 		"saucelabs": {
 			"deviceName": "iPhone 14 Simulator",
@@ -12,7 +13,8 @@
 		"buildkite": {
 			"deviceName": "iPhone 15",
 			"deviceTabletName": "iPad (10th generation)",
-			"platformVersion": "17.0.1"
+			"platformVersion": "17.0",
+			"wdaPlatformVersion": "17.0.1"
 		},
 		"pixelRatio": {
 			"iPhone": 3,
