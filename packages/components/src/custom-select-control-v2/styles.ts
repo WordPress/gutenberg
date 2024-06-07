@@ -104,6 +104,7 @@ export const SelectPopover = styled( Ariakit.SelectPopover )`
 	position: absolute !important;
 	max-height: 400px;
 	overflow: auto;
+	min-width: 100%;
 
 	&[data-focus-visible] {
 		outline: none; // outline will be on the trigger, rather than the popover
