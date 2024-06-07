@@ -992,6 +992,12 @@ describe( 'safeDecodeURI', () => {
 } );
 
 describe( 'filterURLForDisplay', () => {
+	it( 'should return an empty string if the url is empty or falsy', () => {
+		let url = filterURLForDisplay( '' );
+		expect( url ).toBe( '' );
+		url = filterURLForDisplay( null );
+		expect( url ).toBe( '' );
+	} );
 	it( 'should remove protocol', () => {
 		let url = filterURLForDisplay( 'http://wordpress.org' );
 		expect( url ).toBe( 'wordpress.org' );
