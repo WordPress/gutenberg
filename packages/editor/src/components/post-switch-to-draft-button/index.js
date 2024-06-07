@@ -8,6 +8,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -20,6 +21,10 @@ import { store as editorStore } from '../../store';
  * @return {JSX.Element} The rendered component.
  */
 export default function PostSwitchToDraftButton() {
+	deprecated( 'wp.editor.PostSwitchToDraftButton', {
+		since: '6.7',
+		version: '6.9',
+	} );
 	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
 
 	const { editPost, savePost } = useDispatch( editorStore );
