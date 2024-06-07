@@ -211,7 +211,7 @@ export default function PagePages() {
 	const {
 		params: { postId },
 	} = useLocation();
-	const [ postIdToSelect, setPostIdToSelect ] = useState();
+	const [ postIdToSelect, setPostIdToSelect ] = useState( postId );
 	useEffect( () => {
 		if ( postId ) {
 			setPostIdToSelect( postId );
