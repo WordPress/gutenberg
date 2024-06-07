@@ -25,6 +25,10 @@ The `slug` provided (`todo-list`) defines the folder name for the scaffolded plu
 
 Navigate to the Plugins page of our local WordPress installation and activate the "Todo List" plugin. The example block will then be available in the Editor. 
 
+<div class="callout callout-info">
+    If you can't find your block inside the Editor please read more <a hre="https://github.com/WordPress/gutenberg/issues/62202">here</a>. Currently there is a known issue with @wordpress/scripts@28 and you will need to use @wordpress/scripts@27.9.0 in your package.json file
+</div>
+
 ### Basic usage
 
 The `create-block` assumes you will use modern JavaScript (ESNext and JSX) to build your block. This requires a build step to compile the code into a format that browsers can understand. Luckily, the `wp-scripts` package handles this process for you. Refer to the [Get started with wp-scripts](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-scripts) for an introduction to this package. 
