@@ -17,6 +17,7 @@ import { __ } from '@wordpress/i18n';
  */
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import { CONTENT_ONLY_BLOCKS } from '../provider/disable-non-page-content-blocks';
 
 function ContentOnlySettingsMenuItems( { clientId, onClose } ) {
 	const { entity, onNavigateToEntityRecord, canEditTemplates } = useSelect(
@@ -26,6 +27,7 @@ function ContentOnlySettingsMenuItems( { clientId, onClose } ) {
 				getBlockParentsByBlockName,
 				getSettings,
 				getBlockAttributes,
+				getBlockName,
 			} = select( blockEditorStore );
 			const contentOnly =
 				getBlockEditingMode( clientId ) === 'contentOnly';
@@ -48,7 +50,10 @@ function ContentOnlySettingsMenuItems( { clientId, onClose } ) {
 			} else {
 				const { getCurrentTemplateId } = select( editorStore );
 				const templateId = getCurrentTemplateId();
-				if ( templateId ) {
+				if (
+					CONTENT_ONLY_BLOCKS.includes( getBlockName( clientId ) ) &&
+					templateId
+				) {
 					record = select( coreStore ).getEntityRecord(
 						'postType',
 						'wp_template',
