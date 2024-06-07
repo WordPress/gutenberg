@@ -3,7 +3,6 @@
  */
 import { pasteHandler } from '@wordpress/blocks';
 import { isEmpty, insert, create } from '@wordpress/rich-text';
-import { isURL } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -22,7 +21,6 @@ export default ( props ) => ( element ) => {
 			formatTypes,
 			tagName,
 			onReplace,
-			__unstableEmbedURLOnPaste,
 			preserveWhiteSpace,
 			pastePlainText,
 		} = props.current;
@@ -92,15 +90,7 @@ export default ( props ) => ( element ) => {
 
 		let mode = 'INLINE';
 
-		const trimmedPlainText = plainText.trim();
-
-		if (
-			__unstableEmbedURLOnPaste &&
-			isEmpty( value ) &&
-			isURL( trimmedPlainText ) &&
-			// For the link pasting feature, allow only http(s) protocols.
-			/^https?:/.test( trimmedPlainText )
-		) {
+		if ( isEmpty( value ) ) {
 			mode = 'BLOCKS';
 		}
 
