@@ -18,9 +18,9 @@ const ios = {
 exports.iosLocal = ( { iPadDevice = false } ) => ( {
 	...ios,
 	deviceName: ! iPadDevice
-		? iOSConfig.local.deviceName
-		: iOSConfig.local.deviceTabletName,
-	platformVersion: iOSConfig.local.platformVersion,
+		? iOSConfig.buildkite.deviceName
+		: iOSConfig.buildkite.deviceTabletName,
+	platformVersion: iOSConfig.buildkite.platformVersion,
 	pixelRatio: ! iPadDevice
 		? iOSConfig.pixelRatio.iPhone
 		: iOSConfig.pixelRatio.iPad,

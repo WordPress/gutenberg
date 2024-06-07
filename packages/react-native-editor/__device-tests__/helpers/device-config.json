@@ -10,7 +10,9 @@
 			"deviceTabletName": "iPad (10th generation) Simulator"
 		},
 		"buildkite": {
-			"platformVersion": "16.4"
+			"deviceName": "iPhone 15",
+			"deviceTabletName": "iPad (10th generation)",
+			"platformVersion": "17.0"
 		},
 		"pixelRatio": {
 			"iPhone": 3,
