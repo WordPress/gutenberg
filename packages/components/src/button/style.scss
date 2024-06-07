@@ -343,6 +343,18 @@
 			padding-left: $grid-unit-10;
 			gap: $grid-unit-05;
 		}
+
+		&.has-icon-position-top {
+			flex-direction: column;
+			height: auto;
+			padding-left: $grid-unit-10;
+			padding-right: $grid-unit-10;
+			white-space: normal;
+
+			&.is-small {
+				line-height: normal;
+			}
+		}
 	}
 
 	// Toggled style.
@@ -376,6 +388,7 @@
 	svg {
 		fill: currentColor;
 		outline: none;
+		flex-shrink: 0;
 
 		// Optimizate for high contrast modes.
 		// See also https://blogs.windows.com/msedgedev/2020/09/17/styling-for-windows-high-contrast-with-new-standards-for-forced-colors/.

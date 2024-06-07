@@ -161,6 +161,7 @@ export function UnforwardedButton(
 		'is-destructive': isDestructive,
 		'has-text': !! icon && ( hasChildren || text ),
 		'has-icon': !! icon,
+		'has-icon-position-top': iconPosition === 'top',
 	} );
 
 	const trulyDisabled = disabled && ! accessibleWhenDisabled;
@@ -224,7 +225,7 @@ export function UnforwardedButton(
 
 	const elementChildren = (
 		<>
-			{ icon && iconPosition === 'left' && (
+			{ icon && ( iconPosition === 'left' || iconPosition === 'top' ) && (
 				<Icon icon={ icon } size={ iconSize } />
 			) }
 			{ text && <>{ text }</> }

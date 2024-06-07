@@ -164,7 +164,7 @@ If provided, renders an [Icon](/packages/components/src/icon/README.md) componen
 
 -   Required: No
 
-#### `iconPosition`: `'left' | 'right'`
+#### `iconPosition`: `'left' | 'right' | 'top'`
 
 If provided with `icon`, sets the position of icon relative to the `text`. Available options are `left|right`.
 

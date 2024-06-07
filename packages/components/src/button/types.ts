@@ -55,7 +55,7 @@ type BaseButtonProps = {
 	 *
 	 * @default 'left'
 	 */
-	iconPosition?: 'left' | 'right';
+	iconPosition?: 'left' | 'right' | 'top';
 	/**
 	 * If provided with `icon`, sets the icon size.
 	 * Please refer to the Icon component for more details regarding
