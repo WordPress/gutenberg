@@ -301,7 +301,7 @@
 	&:disabled {
 		background: $gray-100;
 		border-color: $gray-300;
-		cursor: default;
+		cursor: not-allowed;
 
 		// Override style inherited from wp-admin. Required to avoid degraded appearance on different backgrounds.
 		opacity: 1;
