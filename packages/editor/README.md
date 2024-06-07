@@ -1274,7 +1274,11 @@ Undocumented declaration.
 
 ### PostSyncStatus
 
-Undocumented declaration.
+Renders the sync status of a post.
+
+_Returns_
+
+-   `JSX.Element|null`: The rendered sync status component.
 
 ### PostTaxonomies
 
