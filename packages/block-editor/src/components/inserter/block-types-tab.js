@@ -30,8 +30,8 @@ const MAX_SUGGESTED_ITEMS = 6;
 const EMPTY_ARRAY = [];
 
 export function BlockTypesTabPanel( {
-	selectedBlockItems,
-	selectedBlockCategories,
+	selectedBlockItems = EMPTY_ARRAY,
+	selectedBlockCategories = EMPTY_ARRAY,
 	items,
 	collections,
 	categories,
@@ -92,32 +92,31 @@ export function BlockTypesTabPanel( {
 
 	return (
 		<div className={ className }>
-			{ selectedBlockItems &&
-				currentlyRenderedSelectedBlockCategories.map( ( category ) => {
-					const selectedCategoryItems = selectedBlockItems.filter(
-						( item ) => item.category === category.slug
-					);
-					if (
-						! selectedCategoryItems ||
-						! selectedCategoryItems.length
-					) {
-						return null;
-					}
-					return (
-						<InserterPanel
-							key={ category.slug }
-							title={ category.title }
-							icon={ category.icon }
-						>
-							<BlockTypesList
-								items={ selectedCategoryItems }
-								onSelect={ onSelectItem }
-								onHover={ onHover }
-								label={ category.title }
-							/>
-						</InserterPanel>
-					);
-				} ) }
+			{ currentlyRenderedSelectedBlockCategories.map( ( category ) => {
+				const selectedCategoryItems = selectedBlockItems.filter(
+					( item ) => item.category === category.slug
+				);
+				if (
+					! selectedCategoryItems ||
+					! selectedCategoryItems.length
+				) {
+					return null;
+				}
+				return (
+					<InserterPanel
+						key={ category.slug }
+						title={ category.title }
+						icon={ category.icon }
+					>
+						<BlockTypesList
+							items={ selectedCategoryItems }
+							onSelect={ onSelectItem }
+							onHover={ onHover }
+							label={ category.title }
+						/>
+					</InserterPanel>
+				);
+			} ) }
 			{ selectedBlockItems.length > 0 && (
 				<div className="block-editor-inserter__category-panel-divider" />
 			) }
@@ -135,7 +134,6 @@ export function BlockTypesTabPanel( {
 						/>
 					</InserterPanel>
 				) }
-
 			{ currentlyRenderedCategories.map( ( category ) => {
 				const categoryItems = items.filter(
 					( item ) => item.category === category.slug
@@ -217,7 +215,7 @@ export function BlockTypesTab(
 
 	const selectedBlockItems = [];
 	const selectedBlockCategories = [];
-	const allItems = [];
+	const nonSelectedBlockItems = [];
 
 	if ( rootClientId ) {
 		for ( const item of items ) {
@@ -229,7 +227,7 @@ export function BlockTypesTab(
 			if ( rootClientId && item.rootClientId === rootClientId ) {
 				selectedBlockItems.push( { ...item } );
 			} else {
-				allItems.push( { ...item } );
+				nonSelectedBlockItems.push( { ...item } );
 			}
 		}
 
@@ -243,6 +241,7 @@ export function BlockTypesTab(
 		}
 
 		// If we only have one category, replace the category title with the selected block title.
+		// This avoids showing the "Text" category followed by another "Text" category. See the List Block for an example.
 		if ( selectedBlockCategories.length === 1 ) {
 			selectedBlockCategories[ 0 ].title = getBlockType(
 				getBlockName( rootClientId )
@@ -250,13 +249,29 @@ export function BlockTypesTab(
 		}
 	}
 
+	// We want to filter by the selected items unless over 80% of the items are allowed within this block. This avoids situations
+	// where a block has almost every block as a "filtered item" with one or two available at the end, such as the group block
+	// where every block except "Page Break" is allowed.
+	const outputFilteredItems =
+		rootClientId &&
+		selectedBlockItems.length / items.length < 0.8 &&
+		items.length > 30;
+
 	return (
 		<InserterListbox>
 			<div ref={ ref }>
 				<BlockTypesTabPanel
-					selectedBlockItems={ selectedBlockItems }
-					selectedBlockCategories={ selectedBlockCategories }
-					items={ rootClientId ? allItems : items }
+					selectedBlockItems={
+						outputFilteredItems ? selectedBlockItems : EMPTY_ARRAY
+					}
+					selectedBlockCategories={
+						outputFilteredItems
+							? selectedBlockCategories
+							: EMPTY_ARRAY
+					}
+					items={
+						outputFilteredItems ? nonSelectedBlockItems : items
+					}
 					categories={ categories }
 					collections={ collections }
 					onSelectItem={ onSelectItem }
