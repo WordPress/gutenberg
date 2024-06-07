@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/lazy-import",
-	"version": "1.44.0",
+	"version": "2.0.0",
 	"description": "Lazily import a module, installing it automatically if missing.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -19,7 +19,8 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"npm": ">=6.9.0"
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
 	},
 	"main": "lib/index.js",
 	"types": "build-types",

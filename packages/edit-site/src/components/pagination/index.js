@@ -46,6 +46,7 @@ export default function Pagination( {
 				<Button
 					variant={ buttonVariant }
 					onClick={ () => changePage( 1 ) }
+					__experimentalIsFocusable
 					disabled={ disabled || currentPage === 1 }
 					aria-label={ __( 'First page' ) }
 				>
@@ -54,6 +55,7 @@ export default function Pagination( {
 				<Button
 					variant={ buttonVariant }
 					onClick={ () => changePage( currentPage - 1 ) }
+					__experimentalIsFocusable
 					disabled={ disabled || currentPage === 1 }
 					aria-label={ __( 'Previous page' ) }
 				>
@@ -72,6 +74,7 @@ export default function Pagination( {
 				<Button
 					variant={ buttonVariant }
 					onClick={ () => changePage( currentPage + 1 ) }
+					__experimentalIsFocusable
 					disabled={ disabled || currentPage === numPages }
 					aria-label={ __( 'Next page' ) }
 				>
@@ -80,6 +83,7 @@ export default function Pagination( {
 				<Button
 					variant={ buttonVariant }
 					onClick={ () => changePage( numPages ) }
+					__experimentalIsFocusable
 					disabled={ disabled || currentPage === numPages }
 					aria-label={ __( 'Last page' ) }
 				>

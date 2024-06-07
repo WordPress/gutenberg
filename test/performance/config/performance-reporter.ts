@@ -212,6 +212,18 @@ class PerformanceReporter implements Reporter {
 			console.table( printableResults );
 		}
 	}
+
+	printsToStdio() {
+		return true;
+	}
+
+	onStdOut( chunk: string | Buffer ) {
+		process.stdout.write( chunk );
+	}
+
+	onStdErr( chunk: string | Buffer ) {
+		process.stderr.write( chunk );
+	}
 }
 
 export default PerformanceReporter;

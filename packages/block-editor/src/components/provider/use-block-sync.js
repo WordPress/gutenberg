@@ -9,7 +9,6 @@ import { cloneBlock } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import { undoIgnoreBlocks } from '../../store/undo-ignore';
 
 const noop = () => {};
 
@@ -274,10 +273,6 @@ export default function useBlockSync( {
 				const updateParent = isPersistent
 					? onChangeRef.current
 					: onInputRef.current;
-				const undoIgnore = undoIgnoreBlocks.has( blocks );
-				if ( undoIgnore ) {
-					undoIgnoreBlocks.delete( blocks );
-				}
 				updateParent( blocks, {
 					selection: {
 						selectionStart: getSelectionStart(),
@@ -285,7 +280,6 @@ export default function useBlockSync( {
 						initialPosition:
 							getSelectedBlocksInitialCaretPosition(),
 					},
-					undoIgnore,
 				} );
 			}
 			previousAreBlocksDifferent = areBlocksDifferent;

@@ -19,7 +19,6 @@ import { __ } from '@wordpress/i18n';
 import BorderRadiusControl from '../border-radius-control';
 import { useColorsPerOrigin } from './hooks';
 import { getValueFromVariable, TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
-import { overrideOrigins } from '../../store/get-block-settings';
 import { setImmutably } from '../../utils/object';
 import { useBorderPanelLabel } from '../../hooks/border';
 import { ShadowPopover, useShadowPresets } from './shadow-panel-components';
@@ -91,7 +90,7 @@ const DEFAULT_CONTROLS = {
 	radius: true,
 	color: true,
 	width: true,
-	shadow: false,
+	shadow: true,
 };
 
 export default function BorderPanel( {
@@ -161,9 +160,13 @@ export default function BorderPanel( {
 	// Shadow
 	const shadow = decodeValue( inheritedValue?.shadow );
 	const shadowPresets = settings?.shadow?.presets ?? {};
-	const overriddenShadowPresets = overrideOrigins( shadowPresets ) ?? [];
+	const mergedShadowPresets =
+		shadowPresets.custom ??
+		shadowPresets.theme ??
+		shadowPresets.default ??
+		[];
 	const setShadow = ( newValue ) => {
-		const slug = overriddenShadowPresets?.find(
+		const slug = mergedShadowPresets?.find(
 			( { shadow: shadowName } ) => shadowName === newValue
 		)?.slug;
 
@@ -258,7 +261,7 @@ export default function BorderPanel( {
 						popoverPlacement="left-start"
 						value={ border }
 						__experimentalIsRenderedInSidebar
-						size={ '__unstable-large' }
+						size="__unstable-large"
 						hideLabelFromVision={ ! hasShadowControl }
 						label={ __( 'Border' ) }
 					/>

@@ -1,4 +1,5 @@
-/* @jsx createElement */
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable react-hooks/exhaustive-deps */
 
 /**
  * External dependencies
@@ -8,6 +9,7 @@ import {
 	options,
 	createContext,
 	cloneElement,
+	type ComponentChildren,
 } from 'preact';
 import { useRef, useCallback, useContext } from 'preact/hooks';
 import type { VNode, Context, RefObject } from 'preact';
@@ -16,9 +18,9 @@ import type { VNode, Context, RefObject } from 'preact';
  * Internal dependencies
  */
 import { store, stores, universalUnlock } from './store';
-import { warn } from './utils/warn';
-interface DirectiveEntry {
-	value: string | Object;
+import { warn } from './utils';
+export interface DirectiveEntry {
+	value: string | object;
 	namespace: string;
 	suffix: string;
 }
@@ -33,11 +35,15 @@ interface DirectiveArgs {
 	/**
 	 * Props present in the current element.
 	 */
-	props: Object;
+	props: { children?: ComponentChildren };
 	/**
 	 * Virtual node representing the element.
 	 */
-	element: VNode;
+	element: VNode< {
+		class?: string;
+		style?: string | Record< string, string | number >;
+		content?: ComponentChildren;
+	} >;
 	/**
 	 * The inherited context.
 	 */
@@ -50,7 +56,7 @@ interface DirectiveArgs {
 }
 
 interface DirectiveCallback {
-	( args: DirectiveArgs ): VNode | void;
+	( args: DirectiveArgs ): VNode | null | void;
 }
 
 interface DirectiveOptions {
@@ -65,7 +71,7 @@ interface DirectiveOptions {
 
 interface Scope {
 	evaluate: Evaluate;
-	context: Context< any >;
+	context: object;
 	ref: RefObject< HTMLElement >;
 	attributes: createElement.JSX.HTMLAttributes;
 }
@@ -102,7 +108,7 @@ const immutableError = () => {
 		'Please use `data-wp-bind` to modify the attributes of an element.'
 	);
 };
-const immutableHandlers = {
+const immutableHandlers: ProxyHandler< object > = {
 	get( target, key, receiver ) {
 		const value = Reflect.get( target, key, receiver );
 		return !! value && typeof value === 'object'
@@ -112,7 +118,7 @@ const immutableHandlers = {
 	set: immutableError,
 	deleteProperty: immutableError,
 };
-const deepImmutable = < T extends Object = {} >( target: T ): T => {
+const deepImmutable = < T extends object = {} >( target: T ): T => {
 	if ( ! immutableMap.has( target ) ) {
 		immutableMap.set( target, new Proxy( target, immutableHandlers ) );
 	}
@@ -260,10 +266,10 @@ export const directive = (
 };
 
 // Resolve the path to some property of the store object.
-const resolve = ( path, namespace ) => {
+const resolve = ( path: string, namespace: string ) => {
 	if ( ! namespace ) {
 		warn(
-			`The "namespace" cannot be "{}", "null" or an empty string. Path: ${ path }`
+			`Namespace missing for "${ path }". The value for that path won't be resolved.`
 		);
 		return;
 	}
@@ -344,17 +350,15 @@ const Directives = ( {
 
 	// Recursively render the wrapper for the next priority level.
 	const children =
-		nextPriorityLevels.length > 0 ? (
-			<Directives
-				directives={ directives }
-				priorityLevels={ nextPriorityLevels }
-				element={ element }
-				originalProps={ originalProps }
-				previousScope={ scope }
-			/>
-		) : (
-			element
-		);
+		nextPriorityLevels.length > 0
+			? createElement( Directives, {
+					directives,
+					priorityLevels: nextPriorityLevels,
+					element,
+					originalProps,
+					previousScope: scope,
+			  } )
+			: element;
 
 	const props = { ...originalProps, children };
 	const directiveArgs = {

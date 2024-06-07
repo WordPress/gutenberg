@@ -2,17 +2,25 @@
 
 ## Unreleased
 
+## 10.0.0 (2024-05-31)
+
+### Breaking Changes
+
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 9.28.0 (2024-05-16)
+
 ## 9.27.0 (2024-05-02)
 
 ## 9.26.0 (2024-04-19)
 
-- Add new `createSelector` function for creating memoized store selectors ([#60370](https://github.com/WordPress/gutenberg/pull/60370)).
+-   Add new `createSelector` function for creating memoized store selectors ([#60370](https://github.com/WordPress/gutenberg/pull/60370)).
 
 ## 9.25.0 (2024-04-03)
 
 ## 9.24.0 (2024-03-21)
 
--  Deprecate the `getIsResolved` meta-selector ([#59679](https://github.com/WordPress/gutenberg/pull/59679)).
+-   Deprecate the `getIsResolved` meta-selector ([#59679](https://github.com/WordPress/gutenberg/pull/59679)).
 
 ## 9.23.0 (2024-03-06)
 
@@ -38,13 +46,13 @@
 
 ### Bug Fix
 
--  Fix `combineReducers()` types ([#55321](https://github.com/WordPress/gutenberg/pull/55321)).
+-   Fix `combineReducers()` types ([#55321](https://github.com/WordPress/gutenberg/pull/55321)).
 
 ## 9.13.0 (2023-10-05)
 
 ### Enhancements
 
--  Change implementation of `combineReducers` so that it doesn't use `eval` internally, and can run with a CSP policy that doesn't allow `unsafe-eval` ([#54606](https://github.com/WordPress/gutenberg/pull/54606)).
+-   Change implementation of `combineReducers` so that it doesn't use `eval` internally, and can run with a CSP policy that doesn't allow `unsafe-eval` ([#54606](https://github.com/WordPress/gutenberg/pull/54606)).
 
 ## 9.12.0 (2023-09-20)
 
@@ -54,7 +62,7 @@
 
 ### Enhancements
 
--  Warn if the `useSelect` hook returns different values when called with the same state and parameters ([#53666](https://github.com/WordPress/gutenberg/pull/53666)).
+-   Warn if the `useSelect` hook returns different values when called with the same state and parameters ([#53666](https://github.com/WordPress/gutenberg/pull/53666)).
 
 ## 9.9.0 (2023-08-10)
 

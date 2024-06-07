@@ -9,7 +9,7 @@ import {
 } from '@wordpress/block-library';
 import { dispatch } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
-import { createRoot } from '@wordpress/element';
+import { createRoot, StrictMode } from '@wordpress/element';
 import { store as editorStore } from '@wordpress/editor';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
@@ -42,7 +42,7 @@ export function initializeEditor( id, settings ) {
 	dispatch( blocksStore ).setFreeformFallbackBlockName( 'core/html' );
 	registerLegacyWidgetBlock( { inserter: false } );
 	registerWidgetGroupBlock( { inserter: false } );
-	if ( process.env.IS_GUTENBERG_PLUGIN ) {
+	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 		__experimentalRegisterExperimentalCoreBlocks( {
 			enableFSEBlocks: true,
 		} );
@@ -85,7 +85,11 @@ export function initializeEditor( id, settings ) {
 	window.addEventListener( 'dragover', ( e ) => e.preventDefault(), false );
 	window.addEventListener( 'drop', ( e ) => e.preventDefault(), false );
 
-	root.render( <App /> );
+	root.render(
+		<StrictMode>
+			<App />
+		</StrictMode>
+	);
 
 	return root;
 }

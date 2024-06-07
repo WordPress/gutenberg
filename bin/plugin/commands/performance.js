@@ -20,7 +20,8 @@ const config = require( '../config' );
 
 const ARTIFACTS_PATH =
 	process.env.WP_ARTIFACTS_PATH || path.join( process.cwd(), 'artifacts' );
-const RESULTS_FILE_SUFFIX = '.performance-results.raw.json';
+const RAW_RESULTS_FILE_SUFFIX = '.performance-results.raw.json';
+const RESULTS_FILE_SUFFIX = '.performance-results.json';
 
 /**
  * @typedef WPPerformanceCommandOptions
@@ -492,7 +493,7 @@ async function runPerformanceTests( branches, options ) {
 	logAtIndent( 0, 'Calculating results' );
 
 	const resultFiles = getFilesFromDir( ARTIFACTS_PATH ).filter( ( file ) =>
-		file.endsWith( RESULTS_FILE_SUFFIX )
+		file.endsWith( RAW_RESULTS_FILE_SUFFIX )
 	);
 	/** @type {Record<string,Record<string, Record<string, Record<string, number>>>>} */
 	const results = {};

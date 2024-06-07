@@ -30,14 +30,11 @@ const {
 	kebabCase,
 } = unlock( componentsPrivateApis );
 
-interface ButtonTriggerProps< Item extends AnyItem > {
+export interface ActionTriggerProps< Item extends AnyItem > {
 	action: Action< Item >;
 	onClick: MouseEventHandler;
-}
-
-interface DropdownMenuItemTriggerProps< Item extends AnyItem > {
-	action: Action< Item >;
-	onClick: MouseEventHandler;
+	isBusy?: boolean;
+	items: Item[];
 }
 
 interface ActionModalProps< Item extends AnyItem > {
@@ -48,9 +45,7 @@ interface ActionModalProps< Item extends AnyItem > {
 
 interface ActionWithModalProps< Item extends AnyItem >
 	extends ActionModalProps< Item > {
-	ActionTrigger: (
-		props: ButtonTriggerProps< Item > | DropdownMenuItemTriggerProps< Item >
-	) => ReactElement;
+	ActionTrigger: ( props: ActionTriggerProps< Item > ) => ReactElement;
 	isBusy?: boolean;
 }
 
@@ -62,7 +57,7 @@ interface ActionsDropdownMenuGroupProps< Item extends AnyItem > {
 interface ItemActionsProps< Item extends AnyItem > {
 	item: Item;
 	actions: Action< Item >[];
-	isCompact: boolean;
+	isCompact?: boolean;
 }
 
 interface CompactItemActionsProps< Item extends AnyItem > {
@@ -73,10 +68,13 @@ interface CompactItemActionsProps< Item extends AnyItem > {
 function ButtonTrigger< Item extends AnyItem >( {
 	action,
 	onClick,
-}: ButtonTriggerProps< Item > ) {
+	items,
+}: ActionTriggerProps< Item > ) {
+	const label =
+		typeof action.label === 'string' ? action.label : action.label( items );
 	return (
 		<Button
-			label={ action.label }
+			label={ label }
 			icon={ action.icon }
 			isDestructive={ action.isDestructive }
 			size="compact"
@@ -88,13 +86,16 @@ function ButtonTrigger< Item extends AnyItem >( {
 function DropdownMenuItemTrigger< Item extends AnyItem >( {
 	action,
 	onClick,
-}: DropdownMenuItemTriggerProps< Item > ) {
+	items,
+}: ActionTriggerProps< Item > ) {
+	const label =
+		typeof action.label === 'string' ? action.label : action.label( items );
 	return (
 		<DropdownMenuItem
 			onClick={ onClick }
 			hideOnClick={ ! ( 'RenderModal' in action ) }
 		>
-			<DropdownMenuItemLabel>{ action.label }</DropdownMenuItemLabel>
+			<DropdownMenuItemLabel>{ label }</DropdownMenuItemLabel>
 		</DropdownMenuItem>
 	);
 }
@@ -104,9 +105,11 @@ export function ActionModal< Item extends AnyItem >( {
 	items,
 	closeModal,
 }: ActionModalProps< Item > ) {
+	const label =
+		typeof action.label === 'string' ? action.label : action.label( items );
 	return (
 		<Modal
-			title={ action.modalHeader || action.label }
+			title={ action.modalHeader || label }
 			__experimentalHideHeader={ !! action.hideModalHeader }
 			onRequestClose={ closeModal ?? ( () => {} ) }
 			overlayClassName={ `dataviews-action-modal dataviews-action-modal__${ kebabCase(
@@ -174,6 +177,7 @@ export function ActionsDropdownMenuGroup< Item extends AnyItem >( {
 						key={ action.id }
 						action={ action }
 						onClick={ () => action.callback( [ item ] ) }
+						items={ [ item ] }
 					/>
 				);
 			} ) }
@@ -230,6 +234,7 @@ export default function ItemActions< Item extends AnyItem >( {
 							key={ action.id }
 							action={ action }
 							onClick={ () => action.callback( [ item ] ) }
+							items={ [ item ] }
 						/>
 					);
 				} ) }
@@ -249,6 +254,7 @@ function CompactItemActions< Item extends AnyItem >( {
 					size="compact"
 					icon={ moreVertical }
 					label={ __( 'Actions' ) }
+					__experimentalIsFocusable
 					disabled={ ! actions.length }
 					className="dataviews-all-actions-button"
 				/>

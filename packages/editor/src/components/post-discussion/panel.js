@@ -6,7 +6,6 @@ import {
 	Dropdown,
 	Button,
 	__experimentalVStack as VStack,
-	__experimentalText as Text,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useState, useMemo } from '@wordpress/element';
@@ -81,11 +80,19 @@ function PostDiscussionToggle( { isOpen, onClick } ) {
 			aria-expanded={ isOpen }
 			onClick={ onClick }
 		>
-			<Text>{ label }</Text>
+			{ label }
 		</Button>
 	);
 }
 
+/**
+ * This component allows to update comment and pingback
+ * settings for the current post. Internally there are
+ * checks whether the current post has support for the
+ * above and if the `discussion-panel` panel is enabled.
+ *
+ * @return {JSX.Element|null} The rendered PostDiscussionPanel component.
+ */
 export default function PostDiscussionPanel() {
 	const { isEnabled } = useSelect( ( select ) => {
 		const { isEditorPanelEnabled } = select( editorStore );
