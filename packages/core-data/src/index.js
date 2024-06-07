@@ -86,3 +86,4 @@ export * from './entity-provider';
 export * from './entity-types';
 export * from './fetch';
 export * from './hooks';
+export * from './deprecated';

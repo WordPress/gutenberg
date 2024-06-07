@@ -1,7 +1,10 @@
 /**
  * Internal dependencies
  */
-import fetchLinkSuggestions from '../__experimental-fetch-link-suggestions';
+import {
+	default as fetchLinkSuggestions,
+	sortResults,
+} from '../fetch-link-suggestions';
 
 jest.mock( '@wordpress/api-fetch', () =>
 	jest.fn( ( { path } ) => {
@@ -315,5 +318,58 @@ describe( 'fetchLinkSuggestions', () => {
 				},
 			] )
 		);
+	} );
+} );
+
+describe( 'sortResults', () => {
+	it( 'orders results', () => {
+		const results = [
+			{
+				id: 1,
+				title: 'How to get from Stockholm to Helsinki by boat',
+				url: 'http://wordpress.local/stockholm-helsinki-boat/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 2,
+				title: 'A day trip from Stockholm to Swedish countryside towns',
+				url: 'http://wordpress.local/day-trip-stockholm/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 3,
+				title: 'The art of packing lightly: How to travel with just a cabin bag',
+				url: 'http://wordpress.local/packing-lightly/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 4,
+				title: 'City Guides',
+				url: 'http://wordpress.local/city-guides/',
+				type: 'category',
+				kind: 'taxonomy',
+			},
+			{
+				id: 5,
+				title: 'Travel Tips',
+				url: 'http://wordpress.local/travel-tips/',
+				type: 'category',
+				kind: 'taxonomy',
+			},
+		];
+		const order = sortResults( results, 'travel tips' ).map(
+			( result ) => result.id
+		);
+		expect( order ).toEqual( [
+			5, // contains: travel, tips
+			3, // contains: travel
+			// same order as input:
+			1,
+			2,
+			4,
+		] );
 	} );
 } );
