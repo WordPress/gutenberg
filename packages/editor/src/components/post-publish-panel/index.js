@@ -93,9 +93,11 @@ export class PostPublishPanel extends Component {
 							</div>
 							<div className="editor-post-publish-panel__header-cancel-button">
 								<Button
+									__experimentalIsFocusable
 									disabled={ isSavingNonPostEntityChanges }
 									onClick={ onClose }
 									variant="secondary"
+									size="compact"
 								>
 									{ __( 'Cancel' ) }
 								</Button>

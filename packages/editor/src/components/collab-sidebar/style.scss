@@ -1,0 +1,46 @@
+.editor-collab-sidebar {
+	&__activities {
+		background-color: #f3f5f6;
+	}
+
+	&__thread {
+		padding: 20px;
+		&:not(:last-child) {
+			border-bottom: 1px solid $gray-300;
+		}
+	}
+
+	&__comment,
+	&__resolved {
+		border: 1px solid $gray-300;
+		border-radius: 5px;
+		padding: 10px 15px;
+		background-color: #fff;
+	}
+
+	&__userName {
+		font-size: 14px;
+		text-transform: capitalize;
+	}
+
+	&__userIcon {
+		border: 1px solid #c5c5c5;
+	}
+
+	&__resolvedIcon {
+		fill: green;
+		border-radius: 50%;
+		width: 18px;
+		height: 18px;
+		border: 1px solid green;
+		margin-right: 2px;
+		margin-top: 5px;
+	}
+
+	&__resolvedText {
+		font-style: italic;
+		font-weight: 500 !important;
+		color: gray !important;
+		margin-top: 5px !important;
+	}
+}

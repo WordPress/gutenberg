@@ -5,6 +5,7 @@ import {
 	AmazonIcon,
 	BandcampIcon,
 	BehanceIcon,
+	BlueskyIcon,
 	ChainIcon,
 	CodepenIcon,
 	DeviantArtIcon,
@@ -82,6 +83,12 @@ const variations = [
 		attributes: { service: 'behance' },
 		title: 'Behance',
 		icon: BehanceIcon,
+	},
+	{
+		name: 'bluesky',
+		attributes: { service: 'bluesky' },
+		title: 'Bluesky',
+		icon: BlueskyIcon,
 	},
 	{
 		name: 'chain',

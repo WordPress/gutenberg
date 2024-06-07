@@ -4,7 +4,7 @@
 import { DropdownMenu } from '@wordpress/components';
 import { useState, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { plus, symbol, symbolFilled, upload } from '@wordpress/icons';
+import { symbol, symbolFilled, upload } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import {
@@ -13,12 +13,11 @@ import {
 } from '@wordpress/patterns';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import CreateTemplatePartModal from '../create-template-part-modal';
-import SidebarButton from '../sidebar-button';
 import { unlock } from '../../lock-unlock';
 import {
 	PATTERN_TYPES,
@@ -26,14 +25,14 @@ import {
 	TEMPLATE_PART_POST_TYPE,
 } from '../../utils/constants';
 
-const { useHistory, useLocation } = unlock( routerPrivateApis );
+const { useHistory } = unlock( routerPrivateApis );
 const { CreatePatternModal, useAddPatternCategory } = unlock(
 	editPatternsPrivateApis
 );
+const { CreateTemplatePartModal } = unlock( editorPrivateApis );
 
 export default function AddNewPattern() {
 	const history = useHistory();
-	const { params } = useLocation();
 	const [ showPatternModal, setShowPatternModal ] = useState( false );
 	const [ showTemplatePartModal, setShowTemplatePartModal ] =
 		useState( false );
@@ -41,19 +40,24 @@ export default function AddNewPattern() {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 	const patternUploadInputRef = useRef();
-	const isBlockBasedTheme = useSelect(
-		( select ) => select( coreStore ).getCurrentTheme()?.is_block_theme,
-		[]
-	);
+	const { isBlockBasedTheme, addNewPatternLabel, addNewTemplatePartLabel } =
+		useSelect( ( select ) => {
+			const { getCurrentTheme, getPostType } = select( coreStore );
+			return {
+				isBlockBasedTheme: getCurrentTheme()?.is_block_theme,
+				addNewPatternLabel: getPostType( PATTERN_TYPES.user )?.labels
+					?.add_new_item,
+				addNewTemplatePartLabel: getPostType( TEMPLATE_PART_POST_TYPE )
+					?.labels?.add_new_item,
+			};
+		}, [] );
 
-	function handleCreatePattern( { pattern, categoryId } ) {
+	function handleCreatePattern( { pattern } ) {
 		setShowPatternModal( false );
 
 		history.push( {
 			postId: pattern.id,
 			postType: PATTERN_TYPES.user,
-			categoryType: PATTERN_TYPES.theme,
-			categoryId,
 			canvas: 'edit',
 		} );
 	}
@@ -74,19 +78,19 @@ export default function AddNewPattern() {
 		setShowTemplatePartModal( false );
 	}
 
-	const controls = [];
-
-	controls.push( {
-		icon: symbol,
-		onClick: () => setShowPatternModal( true ),
-		title: __( 'Create pattern' ),
-	} );
+	const controls = [
+		{
+			icon: symbol,
+			onClick: () => setShowPatternModal( true ),
+			title: addNewPatternLabel,
+		},
+	];
 
 	if ( isBlockBasedTheme ) {
 		controls.push( {
 			icon: symbolFilled,
 			onClick: () => setShowTemplatePartModal( true ),
-			title: __( 'Create template part' ),
+			title: addNewTemplatePartLabel,
 		} );
 	}
 
@@ -101,14 +105,19 @@ export default function AddNewPattern() {
 	const { categoryMap, findOrCreateTerm } = useAddPatternCategory();
 	return (
 		<>
-			<DropdownMenu
-				controls={ controls }
-				toggleProps={ {
-					as: SidebarButton,
-				} }
-				icon={ plus }
-				label={ __( 'Create pattern' ) }
-			/>
+			{ addNewPatternLabel && (
+				<DropdownMenu
+					controls={ controls }
+					icon={ null }
+					toggleProps={ {
+						variant: 'primary',
+						showTooltip: false,
+						__next40pxDefaultSize: true,
+					} }
+					text={ addNewPatternLabel }
+					label={ addNewPatternLabel }
+				/>
+			) }
 			{ showPatternModal && (
 				<CreatePatternModal
 					onClose={ () => setShowPatternModal( false ) }
@@ -136,16 +145,17 @@ export default function AddNewPattern() {
 						return;
 					}
 					try {
+						const {
+							params: { postType, categoryId },
+						} = history.getLocationWithParams();
 						let currentCategoryId;
 						// When we're not handling template parts, we should
 						// add or create the proper pattern category.
-						if ( params.categoryType !== TEMPLATE_PART_POST_TYPE ) {
+						if ( postType !== TEMPLATE_PART_POST_TYPE ) {
 							const currentCategory = categoryMap
 								.values()
-								.find(
-									( term ) => term.name === params.categoryId
-								);
-							if ( !! currentCategory ) {
+								.find( ( term ) => term.name === categoryId );
+							if ( currentCategory ) {
 								currentCategoryId =
 									currentCategory.id ||
 									( await findOrCreateTerm(
@@ -165,11 +175,10 @@ export default function AddNewPattern() {
 						// category.
 						if (
 							! currentCategoryId &&
-							params.categoryId !== 'my-patterns'
+							categoryId !== 'my-patterns'
 						) {
 							history.push( {
-								path: `/patterns`,
-								categoryType: PATTERN_TYPES.theme,
+								postType: PATTERN_TYPES.user,
 								categoryId: PATTERN_DEFAULT_CATEGORY,
 							} );
 						}

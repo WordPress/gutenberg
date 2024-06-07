@@ -15,29 +15,31 @@ import {
 	__experimentalVStack as VStack,
 	Flex,
 	Notice,
-	privateApis as componentsPrivateApis,
+	ProgressBar,
 } from '@wordpress/components';
-import { store as coreStore } from '@wordpress/core-data';
+import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useContext, useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { chevronLeft } from '@wordpress/icons';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../../../lock-unlock';
 import { FontLibraryContext } from './context';
 import FontCard from './font-card';
 import LibraryFontVariant from './library-font-variant';
 import { sortFontFaces } from './utils/sort-font-faces';
-const { ProgressBar } = unlock( componentsPrivateApis );
+import { setUIValuesNeeded } from './utils';
+import { unlock } from '../../../lock-unlock';
+
+const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 
 function InstalledFonts() {
 	const {
 		baseCustomFonts,
 		libraryFontSelected,
-		baseThemeFonts,
 		handleSetLibraryFontSelected,
 		refreshLibrary,
 		uninstallFontFamily,
@@ -45,12 +47,44 @@ function InstalledFonts() {
 		isInstalling,
 		saveFontFamilies,
 		getFontFacesActivated,
-		fontFamiliesHasChanges,
 		notice,
 		setNotice,
 		fontFamilies,
 	} = useContext( FontLibraryContext );
 	const [ isConfirmDeleteOpen, setIsConfirmDeleteOpen ] = useState( false );
+	const [ baseFontFamilies ] = useGlobalSetting(
+		'typography.fontFamilies',
+		undefined,
+		'base'
+	);
+	const globalStylesId = useSelect( ( select ) => {
+		const { __experimentalGetCurrentGlobalStylesId } = select( coreStore );
+		return __experimentalGetCurrentGlobalStylesId();
+	} );
+
+	const globalStyles = useEntityRecord(
+		'root',
+		'globalStyles',
+		globalStylesId
+	);
+	const fontFamiliesHasChanges =
+		!! globalStyles?.edits?.settings?.typography?.fontFamilies;
+
+	const themeFonts = fontFamilies?.theme
+		? fontFamilies.theme
+				.map( ( f ) => setUIValuesNeeded( f, { source: 'theme' } ) )
+				.sort( ( a, b ) => a.name.localeCompare( b.name ) )
+		: [];
+	const themeFontsSlugs = new Set( themeFonts.map( ( f ) => f.slug ) );
+	const baseThemeFonts = baseFontFamilies?.theme
+		? themeFonts.concat(
+				baseFontFamilies.theme
+					.filter( ( f ) => ! themeFontsSlugs.has( f.slug ) )
+					.map( ( f ) => setUIValuesNeeded( f, { source: 'theme' } ) )
+					.sort( ( a, b ) => a.name.localeCompare( b.name ) )
+		  )
+		: [];
+
 	const customFontFamilyId =
 		libraryFontSelected?.source === 'custom' && libraryFontSelected?.id;
 
@@ -156,9 +190,7 @@ function InstalledFonts() {
 												>
 													<FontCard
 														font={ font }
-														navigatorPath={
-															'/fontFamily'
-														}
+														navigatorPath="/fontFamily"
 														variantsText={ getFontCardVariantsText(
 															font
 														) }
@@ -195,9 +227,7 @@ function InstalledFonts() {
 												>
 													<FontCard
 														font={ font }
-														navigatorPath={
-															'/fontFamily'
-														}
+														navigatorPath="/fontFamily"
 														variantsText={ getFontCardVariantsText(
 															font
 														) }

@@ -156,6 +156,7 @@ function ButtonEdit( props ) {
 		onReplace,
 		mergeBlocks,
 		clientId,
+		context,
 	} = props;
 	const {
 		tagName,
@@ -246,11 +247,14 @@ function ButtonEdit( props ) {
 			return {
 				lockUrlControls:
 					!! metadata?.bindings?.url &&
-					( ! blockBindingsSource ||
-						blockBindingsSource?.lockAttributesEditing ),
+					! blockBindingsSource?.canUserEditValue( {
+						select,
+						context,
+						args: metadata?.bindings?.url?.args,
+					} ),
 			};
 		},
-		[ isSelected ]
+		[ isSelected, metadata?.bindings?.url ]
 	);
 
 	return (
@@ -339,7 +343,7 @@ function ButtonEdit( props ) {
 						} }
 						anchor={ popoverAnchor }
 						focusOnMount={ isEditingURL ? 'firstElement' : false }
-						__unstableSlotName={ '__unstable-block-tools-after' }
+						__unstableSlotName="__unstable-block-tools-after"
 						shift
 					>
 						<LinkControl

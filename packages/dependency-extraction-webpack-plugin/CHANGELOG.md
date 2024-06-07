@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+## 6.0.0 (2024-05-31)
+
+### Breaking Changes
+
+**Note** If you're using @wordpress/scripts for building JS scripts to target WordPress 6.5 or earlier, you should not upgrade to this version and continue using @wordpress/dependency-extraction-webpack-plugin@5.
+
+-   Use React's automatic runtime to transform JSX ([#61692](https://github.com/WordPress/gutenberg/pull/61692)).
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 5.9.0 (2024-05-16)
+
 ## 5.8.0 (2024-05-02)
 
 ## 5.7.0 (2024-04-19)

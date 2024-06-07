@@ -88,6 +88,9 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__experimentalArchiveTitleNameLabel',
 ];
 
+const { globalStylesDataKey, selectBlockPatternsKey, reusableBlocksSelectKey } =
+	unlock( privateApis );
+
 /**
  * React hook used to compute the block editor settings to use for the post editor.
  *
@@ -256,8 +259,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 	}, [ settings.allowedBlockTypes, hiddenBlockTypes, blockTypes ] );
 
 	const forceDisableFocusMode = settings.focusMode === false;
-	const { globalStylesDataKey, selectBlockPatternsKey } =
-		unlock( privateApis );
 
 	return useMemo( () => {
 		const blockEditorSettings = {
@@ -283,8 +284,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					? patterns
 					: undefined;
 			},
-			[ unlock( privateApis ).reusableBlocksSelectKey ]:
-				__experimentalReusableBlocksSelect,
+			[ reusableBlocksSelectKey ]: __experimentalReusableBlocksSelect,
 			__experimentalBlockPatternCategories: blockPatternCategories,
 			__experimentalUserPatternCategories: userPatternCategories,
 			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
@@ -340,8 +340,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		setIsInserterOpened,
 		sectionRootClientId,
 		globalStylesData,
-		globalStylesDataKey,
-		selectBlockPatternsKey,
 	] );
 }
 

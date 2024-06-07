@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import fastDeepEqual from 'fast-deep-equal';
+
+/**
  * WordPress dependencies
  */
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -17,6 +22,7 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import {
 	getRenderingMode,
+	getCurrentPost,
 	__experimentalGetDefaultTemplatePartAreas,
 } from './selectors';
 import { TEMPLATE_PART_POST_TYPE } from './constants';
@@ -133,5 +139,44 @@ export const getCurrentTemplateTemplateParts = createRegistrySelector(
 			select( blockEditorStore ).getBlocksByClientId( clientIds );
 
 		return getFilteredTemplatePartBlocks( blocks, templateParts );
+	}
+);
+
+/**
+ * Returns true if there are unsaved changes to the
+ * post's meta fields, and false otherwise.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} postType The post type of the post.
+ * @param {number} postId   The ID of the post.
+ *
+ * @return {boolean} Whether there are edits or not in the meta fields of the relevant post.
+ */
+export const hasPostMetaChanges = createRegistrySelector(
+	( select ) => ( state, postType, postId ) => {
+		const { type: currentPostType, id: currentPostId } =
+			getCurrentPost( state );
+		// If no postType or postId is passed, use the current post.
+		const edits = select( coreStore ).getEntityRecordNonTransientEdits(
+			'postType',
+			postType || currentPostType,
+			postId || currentPostId
+		);
+
+		if ( ! edits?.meta ) {
+			return false;
+		}
+
+		// Compare if anything apart from `footnotes` has changed.
+		const originalPostMeta = select( coreStore ).getEntityRecord(
+			'postType',
+			postType || currentPostType,
+			postId || currentPostId
+		)?.meta;
+
+		return ! fastDeepEqual(
+			{ ...originalPostMeta, footnotes: undefined },
+			{ ...edits.meta, footnotes: undefined }
+		);
 	}
 );

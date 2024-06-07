@@ -29,17 +29,21 @@ export default function DataViewItem( {
 	suffix,
 } ) {
 	const {
-		params: { path, layout },
+		params: { postType, layout },
 	} = useLocation();
 
 	const iconToUse =
 		icon || VIEW_LAYOUTS.find( ( v ) => v.type === type ).icon;
 
+	let activeView = isCustom ? customViewId : slug;
+	if ( activeView === 'all' ) {
+		activeView = undefined;
+	}
 	const linkInfo = useLink( {
-		path,
+		postType,
 		layout,
-		activeView: isCustom ? customViewId : slug,
-		isCustom: isCustom ? 'true' : 'false',
+		activeView,
+		isCustom: isCustom ? 'true' : undefined,
 	} );
 	return (
 		<HStack

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { _n, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
@@ -12,6 +12,34 @@ import { useCallback } from '@wordpress/element';
  */
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
+
+function getIndex( {
+	destinationRootClientId,
+	destinationIndex,
+	rootClientId,
+	registry,
+} ) {
+	if ( rootClientId === destinationRootClientId ) {
+		return destinationIndex;
+	}
+	const parents = [
+		'',
+		...registry
+			.select( blockEditorStore )
+			.getBlockParents( destinationRootClientId ),
+		destinationRootClientId,
+	];
+	const parentIndex = parents.indexOf( rootClientId );
+	if ( parentIndex !== -1 ) {
+		return (
+			registry
+				.select( blockEditorStore )
+				.getBlockIndex( parents[ parentIndex + 1 ] ) + 1
+		);
+	}
+	return registry.select( blockEditorStore ).getBlockOrder( rootClientId )
+		.length;
+}
 
 /**
  * @typedef WPInserterConfig
@@ -42,6 +70,7 @@ function useInsertionPoint( {
 	shouldFocusBlock = true,
 	selectBlockOnInsert = true,
 } ) {
+	const registry = useRegistry();
 	const { getSelectedBlock } = useSelect( blockEditorStore );
 	const { destinationRootClientId, destinationIndex } = useSelect(
 		( select ) => {
@@ -91,7 +120,7 @@ function useInsertionPoint( {
 	} = unlock( useDispatch( blockEditorStore ) );
 
 	const onInsertBlocks = useCallback(
-		( blocks, meta, shouldForceFocusBlock = false ) => {
+		( blocks, meta, shouldForceFocusBlock = false, _rootClientId ) => {
 			// When we are trying to move focus or select a new block on insert, we also
 			// need to clear the last focus to avoid the focus being set to the wrong block
 			// when tabbing back into the canvas if the block was added from outside the
@@ -121,8 +150,17 @@ function useInsertionPoint( {
 			} else {
 				insertBlocks(
 					blocks,
-					destinationIndex,
-					destinationRootClientId,
+					isAppender || _rootClientId === undefined
+						? destinationIndex
+						: getIndex( {
+								destinationRootClientId,
+								destinationIndex,
+								rootClientId: _rootClientId,
+								registry,
+						  } ),
+					isAppender || _rootClientId === undefined
+						? destinationRootClientId
+						: _rootClientId,
 					selectBlockOnInsert,
 					shouldFocusBlock || shouldForceFocusBlock ? 0 : null,
 					meta
@@ -154,9 +192,17 @@ function useInsertionPoint( {
 	);
 
 	const onToggleInsertionPoint = useCallback(
-		( show ) => {
-			if ( show ) {
-				showInsertionPoint( destinationRootClientId, destinationIndex );
+		( item ) => {
+			if ( item?.hasOwnProperty( 'rootClientId' ) ) {
+				showInsertionPoint(
+					item.rootClientId,
+					getIndex( {
+						destinationRootClientId,
+						destinationIndex,
+						rootClientId: item.rootClientId,
+						registry,
+					} )
+				);
 			} else {
 				hideInsertionPoint();
 			}

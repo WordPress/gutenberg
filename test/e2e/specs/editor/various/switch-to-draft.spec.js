@@ -46,11 +46,9 @@ test.describe( 'Clicking "Switch to draft" on a published/scheduled post/page', 
 					);
 
 					await editor.openDocumentSettingsSidebar();
-
-					const postStatusButton = page.locator(
-						'.editor-post-status-trigger'
-					);
-					await postStatusButton.click();
+					await page
+						.getByRole( 'button', { name: 'Change post status:' } )
+						.click();
 					await page.getByRole( 'radio', { name: 'Draft' } ).click();
 
 					if ( viewport === 'small' ) {

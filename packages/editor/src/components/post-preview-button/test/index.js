@@ -139,12 +139,16 @@ describe( 'PostPreviewButton', () => {
 		).toBeInTheDocument();
 	} );
 
-	it( 'should be disabled if post is not saveable.', () => {
+	it( 'should be accessibly disabled if post is not saveable.', () => {
 		mockUseSelect( { isEditedPostSaveable: () => false } );
 
 		render( <PostPreviewButton /> );
 
-		expect( screen.getByRole( 'button' ) ).toBeDisabled();
+		expect( screen.getByRole( 'button' ) ).toBeEnabled();
+		expect( screen.getByRole( 'button' ) ).toHaveAttribute(
+			'aria-disabled',
+			'true'
+		);
 	} );
 
 	it( 'should not be disabled if post is saveable.', () => {
@@ -153,6 +157,10 @@ describe( 'PostPreviewButton', () => {
 		render( <PostPreviewButton /> );
 
 		expect( screen.getByRole( 'button' ) ).toBeEnabled();
+		expect( screen.getByRole( 'button' ) ).not.toHaveAttribute(
+			'aria-disabled',
+			'true'
+		);
 	} );
 
 	it( 'should set `href` to edited post preview link if specified.', () => {

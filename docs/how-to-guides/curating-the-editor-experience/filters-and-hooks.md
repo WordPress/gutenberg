@@ -136,6 +136,43 @@ addFilter(
 );
 ```
 
+## Block Filters
+
+Beyond curating the Editor itself, there are many ways that you can modify individual blocks. Perhaps you want to disable particular block supports like background color or define which settings should be displayed by default on specific blocks.
+
+One of the most commonly used filters is [`block_type_metadata`](https://developer.wordpress.org/reference/hooks/block_type_metadata/). It allows you to filter the raw metadata loaded from a block's `block.json` file when a block type is registered on the server with PHP. 
+
+The filter takes one parameter:
+
+- `$metadata` (`array`) – metadata loaded from `block.json` for registering a block type.
+
+The `$metadata` array contains everything you might want to know about a block, from its description and [attributes](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/) to block [supports](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/). 
+
+In the following example, background color and gradient support are disabled for Heading blocks.
+
+```php
+function example_disable_heading_background_color_and_gradients( $metadata ) {
+
+    // Only apply the filter to Heading blocks.
+    if ( ! isset( $metadata['name'] ) || 'core/heading' !== $metadata['name'] ) {
+        return $metadata;
+    }
+
+    // Check if 'supports' key exists.
+    if ( isset( $metadata['supports'] ) && isset( $metadata['supports']['color'] ) ) {
+
+        // Remove Background color and Gradients support.
+        $metadata['supports']['color']['background'] = false;
+        $metadata['supports']['color']['gradients']  = false;
+    }
+
+    return $metadata;
+}
+add_filter( 'block_type_metadata', 'example_disable_heading_background_color_and_gradients' );
+```
+
+You can learn more about the available block filters in the [Block Filters](https://developer.wordpress.org/block-editor/reference-guides/filters/block-filters/) documentation.
+
 ## Additional resources
 
 - [How to modify theme.json data using server-side filters](https://developer.wordpress.org/news/2023/07/05/how-to-modify-theme-json-data-using-server-side-filters/) (WordPress Developer Blog)

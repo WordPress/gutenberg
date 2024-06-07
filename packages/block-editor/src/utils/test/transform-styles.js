@@ -52,8 +52,8 @@ describe( 'transformStyles', () => {
 			);
 		} );
 
-		it( 'should handle multiple instances of `:where(body)`', () => {
-			const input = `:where(body) { color: pink; } :where(body) { color: orange; }`;
+		it( 'should handle multiple instances of `:root :where(body)`', () => {
+			const input = `:root :where(body) { color: pink; } :root :where(body) { color: orange; }`;
 			const output = transformStyles(
 				[
 					{

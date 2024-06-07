@@ -45,7 +45,7 @@ test.describe( 'Editing Navigation Menus', () => {
 
 			const listView = page
 				.getByRole( 'region', {
-					name: 'List View',
+					name: 'Document Overview',
 				} )
 				.getByRole( 'treegrid', {
 					name: 'Block navigation structure',
@@ -99,7 +99,7 @@ test.describe( 'Editing Navigation Menus', () => {
 
 			// Check the standard tabs are not present.
 			await expect(
-				sidebar.getByRole( 'tab', { name: 'List View' } )
+				sidebar.getByRole( 'tab', { name: 'Document Overview' } )
 			).toBeHidden();
 			await expect(
 				sidebar.getByRole( 'tab', { name: 'Settings' } )
