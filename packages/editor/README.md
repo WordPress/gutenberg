@@ -390,7 +390,17 @@ _Returns_
 
 ### EntitiesSavedStates
 
-Undocumented declaration.
+Renders the component for managing saved states of entities.
+
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.close_ `Function`: The function to close the dialog.
+-   _props.renderDialog_ `Function`: The function to render the dialog.
+
+_Returns_
+
+-   `JSX.Element`: The rendered component.
 
 ### ErrorBoundary
 
@@ -1191,7 +1201,7 @@ Undocumented declaration.
 
 ### PostPublishPanel
 
-Undocumented declaration.
+Renders a panel for publishing a post.
 
 ### PostSavedState
 
@@ -1270,23 +1280,58 @@ Undocumented declaration.
 
 ### PostSwitchToDraftButton
 
-Undocumented declaration.
+Renders a button component that allows the user to switch a post to draft status.
+
+_Returns_
+
+-   `JSX.Element`: The rendered component.
 
 ### PostSyncStatus
 
-Undocumented declaration.
+Renders the sync status of a post.
+
+_Returns_
+
+-   `JSX.Element|null`: The rendered sync status component.
 
 ### PostTaxonomies
 
-Undocumented declaration.
+Renders the taxonomies associated with a post.
+
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.taxonomyWrapper_ `Function`: The wrapper function for each taxonomy component.
+
+_Returns_
+
+-   `Array`: An array of JSX elements representing the visible taxonomies.
 
 ### PostTaxonomiesCheck
 
-Undocumented declaration.
+Renders the children components only if the current post type has taxonomies.
+
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.children_ `Element`: The children components to render.
+
+_Returns_
+
+-   `Component|null`: The rendered children components or null if the current post type has no taxonomies.
 
 ### PostTaxonomiesFlatTermSelector
 
-Undocumented declaration.
+Renders a flat term selector component.
+
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.slug_ `string`: The slug of the taxonomy.
+
+_Returns_
+
+-   `JSX.Element`: The rendered flat term selector component.
 
 ### PostTaxonomiesHierarchicalTermSelector
 
@@ -1303,7 +1348,17 @@ _Returns_
 
 ### PostTaxonomiesPanel
 
-Undocumented declaration.
+Renders a panel for a specific taxonomy.
+
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.taxonomy_ `Object`: The taxonomy object.
+-   _props.children_ `Element`: The child components.
+
+_Returns_
+
+-   `Component`: The rendered taxonomy panel.
 
 ### PostTemplatePanel
 
@@ -1491,7 +1546,18 @@ _Type_
 
 ### TableOfContents
 
-Undocumented declaration.
+Renders a table of contents component.
+
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.hasOutlineItemsDisabled_ `boolean`: Whether outline items are disabled.
+-   _props.repositionDropdown_ `boolean`: Whether to reposition the dropdown.
+-   _ref_ `Element.ref`: The component's ref.
+
+_Returns_
+
+-   `JSX.Element`: The rendered table of contents component.
 
 ### TextEditorGlobalKeyboardShortcuts
 

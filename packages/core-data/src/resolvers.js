@@ -278,7 +278,7 @@ export const getEntityRecords =
 				if ( ! query?._fields && ! query.context ) {
 					const key = entityConfig.key || DEFAULT_ENTITY_KEY;
 					const resolutionsArgs = records
-						.filter( ( record ) => record[ key ] )
+						.filter( ( record ) => record?.[ key ] )
 						.map( ( record ) => [ kind, name, record[ key ] ] );
 
 					dispatch( {
