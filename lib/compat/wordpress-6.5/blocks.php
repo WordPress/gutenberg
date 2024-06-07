@@ -148,7 +148,6 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 		}
 	}
 
-
 	/**
 	 * Process the block bindings attribute.
 	 *
