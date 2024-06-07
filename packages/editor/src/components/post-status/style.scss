@@ -41,4 +41,9 @@
 		padding: 0;
 		margin-bottom: $grid-unit-10;
 	}
+
+	p.components-base-control__help:has(.components-checkbox-control__help) {
+		margin-top: $grid-unit-05;
+	}
+
 }
