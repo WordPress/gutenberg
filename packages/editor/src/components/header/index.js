@@ -17,6 +17,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
+import CollabSidebar from '../collab-sidebar';
 import CollapsableBlockToolbar from '../collapsible-block-toolbar';
 import DocumentBar from '../document-bar';
 import DocumentTools from '../document-tools';
@@ -141,6 +142,7 @@ function Header( {
 						}
 					/>
 				) }
+				<CollabSidebar />
 				{ customSaveButton }
 				{ ( isWideViewport || ! showIconLabels ) && (
 					<PinnedItems.Slot scope="core" />

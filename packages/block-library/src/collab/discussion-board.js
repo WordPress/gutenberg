@@ -50,48 +50,66 @@ const DiscussionBoard = ( { contentRef, onClose } ) => {
 	// Set the threadId if exists, from the currently selected block classList.
 	useEffect( () => {
 		const classList = contentRef.current?.classList?.value
-		.split(' ')
-		.find(className => className.startsWith('block-editor-collab__'));
+			.split( ' ' )
+			.find( ( className ) =>
+				className.startsWith( 'block-editor-collab__' )
+			);
 
-		setThreadId(classList 
-		? classList.slice('block-editor-collab__'.length) 
-		: uuid());
+		setThreadId(
+			classList
+				? classList.slice( 'block-editor-collab__'.length )
+				: uuid()
+		);
 	}, [ contentRef ] );
 
 	// Add border to the block if threadId exists.
 	useEffect( () => {
-		addBorder();
+		if ( threadId ) {
+			addBorder();
+		}
 	}, [ threadId ] );
 
 	// Fetch the current post, current user, and the selected block clientId.
-	const { postId, allThreads, currentThread, currentUser, clientId } =
-		useSelect(
-			( select ) => {
-				const post = select( editorStore ).getCurrentPost();
-				const collabData = post?.meta?.collab
-					? JSON.parse( post.meta.collab )
-					: [];
+	const {
+		postId,
+		allThreads,
+		currentThread,
+		currentUser,
+		clientId,
+		commentsCount,
+		isCurrentThreadResolved,
+	} = useSelect(
+		( select ) => {
+			const post = select( editorStore ).getCurrentPost();
+			const collabData = post?.meta?.collab
+				? JSON.parse( post.meta.collab )
+				: [];
 
-				return {
-					postId: post?.id,
-					allThreads: collabData,
-					currentThread: collabData[ threadId ]?.comments || [],
-					currentUser:
-						select( coreStore ).getCurrentUser()?.name || null,
-					clientId:
-						select( blockEditorStore ).getSelectedBlockClientId() ||
-						null,
-				};
-			},
-			[ threadId ]
-		);
+			const thread = collabData[ threadId ] ?? {};
+			const threadIsResolved = thread.threadIsResolved || false;
+			const count = threadIsResolved ? 0 : thread.comments?.length || 0;
+
+			return {
+				postId: post?.id,
+				allThreads: collabData,
+				currentThread: thread,
+				commentsCount: count,
+				isCurrentThreadResolved: threadIsResolved,
+				currentUser: select( coreStore ).getCurrentUser()?.name || null,
+				clientId:
+					select( blockEditorStore ).getSelectedBlockClientId() ||
+					null,
+			};
+		},
+		[ threadId ]
+	);
 
 	// Helper function to generate a new comment.
 	const generateNewComment = () => ( {
 		commentId: uuid(),
-		userName: currentUser,
+		createdBy: currentUser,
 		comment: inputComment,
-		date: new Date().toISOString(),
+		createdAt: new Date().toISOString(),
 	} );
 
 	// Helper function to get updated comments structure
@@ -99,6 +117,9 @@ const DiscussionBoard = ( { contentRef, onClose } ) => {
 		...allThreads,
 		[ threadKey ]: {
 			isResolved,
+			createdAt:
+				allThreads?.threadKey?.createdAt || new Date().toISOString(),
+			createdBy: currentUser,
 			comments: [
 				...( allThreads[ threadKey ]?.comments || [] ),
 				newComment,
@@ -108,7 +129,7 @@ const DiscussionBoard = ( { contentRef, onClose } ) => {
 
 	// Function to save the comment.
 	const saveComment = async () => {
-		const newComment      = generateNewComment();
+		const newComment = generateNewComment();
 		const updatedComments = getUpdatedComments( newComment, threadId );
 
 		await saveEntityRecord( 'postType', 'post', {
@@ -122,21 +143,17 @@ const DiscussionBoard = ( { contentRef, onClose } ) => {
 	};
 
 	// Function to mark thread as resolved
-	const markThreadAsResolved = async ( resolved ) => {
-		setIsResolved( resolved );
+	const markThreadAsResolved = async () => {
+		setIsResolved( true );
 
 		const updatedComments = { ...allThreads };
 
-		// If resolved, delete the thread from the comments.
-		if ( resolved ) {
-			delete updatedComments[ threadId ];
-			removeBorder();
-		} else {
-			updatedComments[ threadId ] = {
-				...updatedComments[ threadId ],
-				isResolved: resolved,
-			};
-		}
+		updatedComments[ threadId ] = {
+			...updatedComments[ threadId ],
+			isResolved: true,
+			resolvedBy: currentUser,
+			resolvedAt: new Date().toISOString(),
+		};
 
 		// Save the updated comments.
 		await saveEntityRecord( 'postType', 'post', {
@@ -144,6 +161,7 @@ const DiscussionBoard = ( { contentRef, onClose } ) => {
 			meta: { collab: JSON.stringify( updatedComments ) },
 		} );
 
+		removeBorder();
 		setThreadId( null );
 		onClose();
 	};
@@ -186,7 +204,7 @@ const DiscussionBoard = ( { contentRef, onClose } ) => {
 
 	// Function to confirm and mark thread as resolved.
 	const confirmAndMarkThreadAsResolved = () => {
-		markThreadAsResolved( true );
+		markThreadAsResolved();
 		hideConfirmationOverlay();
 	};
 
@@ -213,11 +231,11 @@ const DiscussionBoard = ( { contentRef, onClose } ) => {
 
 	// On cancel, remove the border if no comments are present.
 	const handleCancel = () => {
-		if ( 0 === currentThread.length ) {
+		if ( 0 === commentsCount ) {
 			removeBorder();
 		}
 		onClose();
-	}
+	};
 
 	// Get the date time format from WordPress settings.
 	const dateTimeFormat = getSettings().formats.datetime;
@@ -229,59 +247,68 @@ const DiscussionBoard = ( { contentRef, onClose } ) => {
 				anchor={ popoverAnchor }
 			>
 				<VStack spacing="3">
-					{ 0 < currentThread.length && (
-						<div
-							className="block-editor-format-toolbar__comment-board__resolved"
-							title={ __( 'Mark as resolved' ) }
-						>
-							<CheckboxControl
-								checked={ isResolved }
-								onChange={ () => showConfirmationOverlay() }
-							/>
-						</div>
-					) }
-					{ 0 < currentThread.length &&
-						currentThread.map(
-							( { userName, comment, timestamp, commentId } ) => (
-								<VStack
-									spacing="2"
-									key={ timestamp }
-									className="comment-board__comment"
-								>
-									<HStack
-										alignment="left"
-										spacing="1"
-										justify="space-between"
+					{ 0 < commentsCount && ! isCurrentThreadResolved && (
+						<>
+							<div
+								className="block-editor-format-toolbar__comment-board__resolved"
+								title={ __( 'Mark as resolved' ) }
+							>
+								<CheckboxControl
+									checked={ isResolved }
+									onChange={ () => showConfirmationOverlay() }
+								/>
+							</div>
+							{ currentThread.comments.map(
+								( {
+									createdBy,
+									comment,
+									timestamp,
+									commentId,
+								} ) => (
+									<VStack
+										spacing="2"
+										key={ timestamp }
+										className="comment-board__comment"
 									>
-										<Icon icon={ userIcon } size={ 35 } />
-										<VStack spacing="1">
-											<span>{ userName }</span>
-											<time
-												dateTime={ format(
-													'c',
-													timestamp
-												) }
-											>
-												{ dateI18n(
-													dateTimeFormat,
-													timestamp
-												) }
-											</time>
-										</VStack>
-										<Button
-											icon={ deleteIcon }
-											label={ __( 'Delete comment' ) }
-											onClick={ () =>
-												deleteComment( commentId )
-											}
-										/>
-									</HStack>
-									<p>{ comment }</p>
-								</VStack>
-							)
-						) }
+										<HStack
+											alignment="left"
+											spacing="1"
+											justify="space-between"
+										>
+											<Icon
+												icon={ userIcon }
+												size={ 35 }
+											/>
+											<VStack spacing="1">
+												<span>{ createdBy }</span>
+												<time
+													dateTime={ format(
+														'c',
+														timestamp
+													) }
+												>
+													{ dateI18n(
+														dateTimeFormat,
+														timestamp
+													) }
+												</time>
+											</VStack>
+											<Button
+												icon={ deleteIcon }
+												label={ __( 'Delete comment' ) }
+												onClick={ () =>
+													deleteComment( commentId )
+												}
+											/>
+										</HStack>
+										<p>{ comment }</p>
+									</VStack>
+								)
+							) }
+						</>
+					) }
 					<VStack spacing="2">
-						{ 0 === currentThread.length && (
+						{ 0 === commentsCount && (
 							<HStack alignment="left" spacing="1">
 								<Icon icon={ userIcon } size={ 35 } />
 								<span>{ currentUser }</span>
@@ -303,7 +330,7 @@ const DiscussionBoard = ( { contentRef, onClose } ) => {
 								className="block-editor-format-toolbar__comment-button"
 								variant="primary"
 								text={
-									0 === currentThread.length
+									0 === commentsCount
 										? __( 'Comment' )
 										: __( 'Reply' )
 								}
