@@ -48,7 +48,6 @@ export default function Pagination( {
 					onClick={ () => changePage( 1 ) }
 					__experimentalIsFocusable
 					disabled={ disabled || currentPage === 1 }
-					aria-label={ __( 'First page' ) }
 					label={ __( 'First page' ) }
 					showTooltip
 				>
@@ -59,7 +58,6 @@ export default function Pagination( {
 					onClick={ () => changePage( currentPage - 1 ) }
 					__experimentalIsFocusable
 					disabled={ disabled || currentPage === 1 }
-					aria-label={ __( 'Previous page' ) }
 					label={ __( 'Previous page' ) }
 					showTooltip
 				>
@@ -80,7 +78,6 @@ export default function Pagination( {
 					onClick={ () => changePage( currentPage + 1 ) }
 					__experimentalIsFocusable
 					disabled={ disabled || currentPage === numPages }
-					aria-label={ __( 'Next page' ) }
 					label={ __( 'Next page' ) }
 					showTooltip
 				>
@@ -91,7 +88,6 @@ export default function Pagination( {
 					onClick={ () => changePage( numPages ) }
 					__experimentalIsFocusable
 					disabled={ disabled || currentPage === numPages }
-					aria-label={ __( 'Last page' ) }
 					label={ __( 'Last page' ) }
 					showTooltip
 				>
