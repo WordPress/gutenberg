@@ -370,17 +370,18 @@ if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 		document.addEventListener(
 			'click',
 			async function ( event ) {
-				const target = event.target as Element;
-				const ref = target.closest( 'a' );
-				if (
-					isValidLink( ref ) &&
-					isValidEvent( event ) &&
-					! target.hasAttribute( 'data-wp-on--click' ) // Don't override other click directives.
-				) {
-					event.preventDefault();
-					await actions.navigate( ref.href );
-					// Scroll to the top of the page by default.
-					window.scrollTo( 0, 0 );
+				if ( event.target && event.target instanceof HTMLElement ) {
+					const ref = event.target.closest( 'a' );
+					if (
+						isValidLink( ref ) &&
+						isValidEvent( event ) &&
+						! event.target.hasAttribute( 'data-wp-on--click' ) // Don't override other click directives.
+					) {
+						event.preventDefault();
+						await actions.navigate( ref.href );
+						// Scroll to the top of the page by default.
+						window.scrollTo( 0, 0 );
+					}
 				}
 			},
 			true
