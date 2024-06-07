@@ -12,6 +12,7 @@
 
 ### Enhancements
 
+-   `Button`: Add Button support for iconPosition top and showDescription. ([#62412](https://github.com/WordPress/gutenberg/pull/62412))
 -   `PaletteEdit`: use `Item` internally instead of custom styles ([#66164](https://github.com/WordPress/gutenberg/pull/66164)).
 
 ## 28.10.0 (2024-10-16)
