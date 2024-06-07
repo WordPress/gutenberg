@@ -207,6 +207,24 @@ interface StoreOptions {
 	lock?: boolean | string;
 }
 
+// Utility type to check if a function is a generator function.
+type IsGenerator< T > = T extends (
+	...args: infer A
+) => Generator< infer R, any, any >
+	? ( ...args: A ) => Promise< R >
+	: never;
+
+// Utility type to convert all generator functions in an object to async functions.
+type ConvertGenerators< T > = {
+	[ K in keyof T ]: T[ K ] extends ( ...args: any[] ) => any
+		? IsGenerator< T[ K ] > extends never
+			? T[ K ]
+			: IsGenerator< T[ K ] >
+		: T[ K ] extends object
+		? ConvertGenerators< T[ K ] >
+		: T[ K ];
+};
+
 export const universalUnlock =
 	'I acknowledge that using a private store means my plugin will inevitably break on the next store release.';
 
@@ -259,13 +277,13 @@ export function store< S extends object = {} >(
 	namespace: string,
 	storePart?: S,
 	options?: StoreOptions
-): S;
+): ConvertGenerators< S >;
 
 export function store< T extends object >(
 	namespace: string,
 	storePart?: T,
 	options?: StoreOptions
-): T;
+): ConvertGenerators< T >;
 
 export function store(
 	namespace: string,
