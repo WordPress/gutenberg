@@ -47,14 +47,14 @@ module.exports.run = async function run( { github, context } ) {
 
 	const comments = ( await github.rest.issues.listComments( commentInfo ) )
 		.data;
-	let existingCommentId = null;
+	let foundComment = false;
 
 	for ( const currentComment of comments ) {
 		if (
 			currentComment.user.type === 'Bot' &&
 			currentComment.body.includes( 'Test using WordPress Playground' )
 		) {
-			existingCommentId = currentComment.id;
+			foundComment = true;
 			break;
 		}
 	}
@@ -67,14 +67,7 @@ module.exports.run = async function run( { github, context } ) {
 
 	const body = `[Test this PR in the WordPress Playground](${ url }) ([learn more](https://playground.wordpress.net/playground/)).`;
 
-	if ( existingCommentId ) {
-		await github.rest.issues.updateComment( {
-			owner: commentInfo.owner,
-			repo: commentInfo.repo,
-			comment_id: existingCommentId,
-			body: body,
-		} );
-	} else {
+	if ( ! foundComment ) {
 		commentInfo.body = body;
 		await github.rest.issues.createComment( commentInfo );
 	}
