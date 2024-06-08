@@ -40,7 +40,12 @@ function isTmceEmpty( editor ) {
 export default function FreeformEdit( props ) {
 	const { clientId } = props;
 	const canRemove = useSelect(
-		( select ) => select( blockEditorStore ).canRemoveBlock( clientId ),
+		( select ) => {
+			const { canRemoveBlock, getBlockRootClientId } =
+				select( blockEditorStore );
+			const rootClientId = getBlockRootClientId( clientId );
+			return canRemoveBlock( clientId, rootClientId );
+		},
 		[ clientId ]
 	);
 	const [ isIframed, setIsIframed ] = useState( false );
