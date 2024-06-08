@@ -3344,7 +3344,7 @@ The following contributors merged PRs in this release:
 - Docs: Copy and formatting edits for the "Static or Dynamic rendering" guide. ([58681](https://github.com/WordPress/gutenberg/pull/58681))
 - Docs: Copy and formatting edits for the "The block in the Editor" guide. ([58697](https://github.com/WordPress/gutenberg/pull/58697))
 - Docs: Copy and formatting edits for the "The block wrapper" guide. ([58704](https://github.com/WordPress/gutenberg/pull/58704))
-- Docs: Copy and formatting edits for the "Working with Javascript for the Block Editor" guide. ([58651](https://github.com/WordPress/gutenberg/pull/58651))
+- Docs: Copy and formatting edits for the "Working with JavaScript for the Block Editor" guide. ([58651](https://github.com/WordPress/gutenberg/pull/58651))
 - Docs: Copy and formatting edits for the "block.json" guide. ([58732](https://github.com/WordPress/gutenberg/pull/58732))
 - Docs: Copy edits and list formatting for main Block Editor Handbook readme. ([58652](https://github.com/WordPress/gutenberg/pull/58652))
 - Docs: Fix list formatting and some grammar in the Entities explanation doc. ([58655](https://github.com/WordPress/gutenberg/pull/58655))
@@ -3918,7 +3918,7 @@ The following contributors merged PRs in this release:
 - Docs: Copy and formatting edits for the "Static or Dynamic rendering" guide. ([58681](https://github.com/WordPress/gutenberg/pull/58681))
 - Docs: Copy and formatting edits for the "The block in the Editor" guide. ([58697](https://github.com/WordPress/gutenberg/pull/58697))
 - Docs: Copy and formatting edits for the "The block wrapper" guide. ([58704](https://github.com/WordPress/gutenberg/pull/58704))
-- Docs: Copy and formatting edits for the "Working with Javascript for the Block Editor" guide. ([58651](https://github.com/WordPress/gutenberg/pull/58651))
+- Docs: Copy and formatting edits for the "Working with JavaScript for the Block Editor" guide. ([58651](https://github.com/WordPress/gutenberg/pull/58651))
 - Docs: Copy and formatting edits for the "block.json" guide. ([58732](https://github.com/WordPress/gutenberg/pull/58732))
 - Docs: Copy edits and list formatting for main Block Editor Handbook readme. ([58652](https://github.com/WordPress/gutenberg/pull/58652))
 - Docs: Fix list formatting and some grammar in the Entities explanation doc. ([58655](https://github.com/WordPress/gutenberg/pull/58655))
@@ -6662,7 +6662,7 @@ The following contributors merged PRs in this release:
 - Docs: Fundamentals of Block Development - File structure of a block. ([56551](https://github.com/WordPress/gutenberg/pull/56551))
 - Docs: Fundamentals of Block Development - Registration of a block. ([56334](https://github.com/WordPress/gutenberg/pull/56334))
 - Docs: Fundamentals of Block Development - The block wrapper. ([56596](https://github.com/WordPress/gutenberg/pull/56596))
-- Docs: Fundamentals of Block Development - Working with Javascript in the Block Editor. ([56553](https://github.com/WordPress/gutenberg/pull/56553))
+- Docs: Fundamentals of Block Development - Working with JavaScript in the Block Editor. ([56553](https://github.com/WordPress/gutenberg/pull/56553))
 - Docs: Fundamentals of Block Development - block.json. ([56435](https://github.com/WordPress/gutenberg/pull/56435))
 - Docs: Improve downloadBlob example. ([56225](https://github.com/WordPress/gutenberg/pull/56225))
 - Documentation - Block Editor Handbook - Add end user documentation about Block Editor as a resource on the Landing Page of the Block Editor Handbook. ([49854](https://github.com/WordPress/gutenberg/pull/49854))
@@ -6991,7 +6991,7 @@ The following contributors merged PRs in this release:
 - Docs: Fundamentals of Block Development - File structure of a block. ([56551](https://github.com/WordPress/gutenberg/pull/56551))
 - Docs: Fundamentals of Block Development - Registration of a block. ([56334](https://github.com/WordPress/gutenberg/pull/56334))
 - Docs: Fundamentals of Block Development - The block wrapper. ([56596](https://github.com/WordPress/gutenberg/pull/56596))
-- Docs: Fundamentals of Block Development - Working with Javascript in the Block Editor. ([56553](https://github.com/WordPress/gutenberg/pull/56553))
+- Docs: Fundamentals of Block Development - Working with JavaScript in the Block Editor. ([56553](https://github.com/WordPress/gutenberg/pull/56553))
 - Docs: Fundamentals of Block Development - block.json. ([56435](https://github.com/WordPress/gutenberg/pull/56435))
 - Docs: Improve downloadBlob example. ([56225](https://github.com/WordPress/gutenberg/pull/56225))
 - Documentation - Block Editor Handbook - Add end user documentation about Block Editor as a resource on the Landing Page of the Block Editor Handbook. ([49854](https://github.com/WordPress/gutenberg/pull/49854))
@@ -39722,7 +39722,7 @@ Add knobs to the [ColorIndicator Story](https://github.com/WordPress/gutenberg/p
 * `is_gutenberg_page` incorrectly assumes `get_current_screen` exists, add check.
 * Brings code inline with CSS standards by switching font weight to numeric values.
 * Wrapped component would not the most up-to-date store values if it incurred a store state change during its own mount (e.g. dispatching during its own constructor), resolved by rerunning selection.
-* Display an error message if Javascript is disabled.
+* Display an error message if JavaScript is disabled.
 * Update to React 16.6.3.
 * Adds missing components dependency for RichText.
 * Refactors list block to remove previously exposed RichText/TinyMCE logic.
