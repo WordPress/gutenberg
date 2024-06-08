@@ -16,7 +16,6 @@ const ios = {
 	simulatorStartupTimeout: 240,
 	reduceMotion: true,
 	maxTypingFrequency: 80,
-	isHeadless: true,
 };
 
 exports.iosLocal = ( { iPadDevice = false } ) => ( {
