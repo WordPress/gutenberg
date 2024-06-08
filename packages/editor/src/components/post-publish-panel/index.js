@@ -131,6 +131,9 @@ export class PostPublishPanel extends Component {
 	}
 }
 
+/**
+ * Renders a panel for publishing a post.
+ */
 export default compose( [
 	withSelect( ( select ) => {
 		const { getPostType } = select( coreStore );

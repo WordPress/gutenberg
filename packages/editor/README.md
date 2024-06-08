@@ -390,7 +390,17 @@ _Returns_
 
 ### EntitiesSavedStates
 
-Undocumented declaration.
+Renders the component for managing saved states of entities.
+
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.close_ `Function`: The function to close the dialog.
+-   _props.renderDialog_ `Function`: The function to render the dialog.
+
+_Returns_
+
+-   `JSX.Element`: The rendered component.
 
 ### ErrorBoundary
 
@@ -1191,7 +1201,7 @@ Undocumented declaration.
 
 ### PostPublishPanel
 
-Undocumented declaration.
+Renders a panel for publishing a post.
 
 ### PostSavedState
 
@@ -1283,23 +1293,58 @@ _Returns_
 
 ### PostSwitchToDraftButton
 
-Undocumented declaration.
+Renders a button component that allows the user to switch a post to draft status.
+
+_Returns_
+
+-   `JSX.Element`: The rendered component.
 
 ### PostSyncStatus
 
-Undocumented declaration.
+Renders the sync status of a post.
+
+_Returns_
+
+-   `JSX.Element|null`: The rendered sync status component.
 
 ### PostTaxonomies
 
-Undocumented declaration.
+Renders the taxonomies associated with a post.
+
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.taxonomyWrapper_ `Function`: The wrapper function for each taxonomy component.
+
+_Returns_
+
+-   `Array`: An array of JSX elements representing the visible taxonomies.
 
 ### PostTaxonomiesCheck
 
-Undocumented declaration.
+Renders the children components only if the current post type has taxonomies.
+
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.children_ `Element`: The children components to render.
+
+_Returns_
+
+-   `Component|null`: The rendered children components or null if the current post type has no taxonomies.
 
 ### PostTaxonomiesFlatTermSelector
 
-Undocumented declaration.
+Renders a flat term selector component.
+
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.slug_ `string`: The slug of the taxonomy.
+
+_Returns_
+
+-   `JSX.Element`: The rendered flat term selector component.
 
 ### PostTaxonomiesHierarchicalTermSelector
 
@@ -1316,7 +1361,17 @@ _Returns_
 
 ### PostTaxonomiesPanel
 
-Undocumented declaration.
+Renders a panel for a specific taxonomy.
+
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.taxonomy_ `Object`: The taxonomy object.
+-   _props.children_ `Element`: The child components.
+
+_Returns_
+
+-   `Component`: The rendered taxonomy panel.
 
 ### PostTemplatePanel
 
@@ -1504,7 +1559,18 @@ _Type_
 
 ### TableOfContents
 
-Undocumented declaration.
+Renders a table of contents component.
+
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.hasOutlineItemsDisabled_ `boolean`: Whether outline items are disabled.
+-   _props.repositionDropdown_ `boolean`: Whether to reposition the dropdown.
+-   _ref_ `Element.ref`: The component's ref.
+
+_Returns_
+
+-   `JSX.Element`: The rendered table of contents component.
 
 ### TextEditorGlobalKeyboardShortcuts
 
@@ -1512,7 +1578,17 @@ Undocumented declaration.
 
 ### ThemeSupportCheck
 
-Undocumented declaration.
+Checks if the current theme supports specific features and renders the children if supported.
+
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.children_ `Element`: The children to render if the theme supports the specified features.
+-   _props.supportKeys_ `string|string[]`: The key(s) of the theme support(s) to check.
+
+_Returns_
+
+-   `JSX.Element|null`: The rendered children if the theme supports the specified features, otherwise null.
 
 ### TimeToRead
 
@@ -1544,7 +1620,11 @@ _Returns_
 
 ### useEntitiesSavedStatesIsDirty
 
-Undocumented declaration.
+Custom hook that determines if any entities are dirty (edited) and provides a way to manage selected/unselected entities.
+
+_Returns_
+
+-   `Object`: An object containing the following properties: - dirtyEntityRecords: An array of dirty entity records. - isDirty: A boolean indicating if there are any dirty entity records. - setUnselectedEntities: A function to set the unselected entities. - unselectedEntities: An array of unselected entities.
 
 ### usePostScheduleLabel
 

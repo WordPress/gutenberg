@@ -7,6 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
+import { Button } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import {
 	EditorKeyboardShortcutsRegister,
@@ -29,7 +30,6 @@ import { store as editSiteStore } from '../../store';
 import { GlobalStylesRenderer } from '../global-styles-renderer';
 import CanvasLoader from '../canvas-loader';
 import { unlock } from '../../lock-unlock';
-import TemplatePartConverter from '../template-part-converter';
 import { useSpecificEditorSettings } from '../block-editor/use-site-editor-settings';
 import PluginTemplateSettingPanel from '../plugin-template-setting-panel';
 import GlobalStylesSidebar from '../global-styles-sidebar';
@@ -40,10 +40,11 @@ import {
 } from '../editor-canvas-container';
 import SaveButton from '../save-button';
 import SiteEditorMoreMenu from '../more-menu';
+import SiteIcon from '../site-icon';
 import useEditorIframeProps from '../block-editor/use-editor-iframe-props';
 import useEditorTitle from './use-editor-title';
 
-const { Editor } = unlock( editorPrivateApis );
+const { Editor, BackButton } = unlock( editorPrivateApis );
 const { useHistory } = unlock( routerPrivateApis );
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 
@@ -53,7 +54,6 @@ export default function EditSiteEditor( { isLoading } ) {
 		editedPostId,
 		contextPostType,
 		contextPostId,
-		editorMode,
 		canvasMode,
 		isEditingPage,
 		supportsGlobalStyles,
@@ -70,7 +70,6 @@ export default function EditSiteEditor( { isLoading } ) {
 		} = unlock( select( editSiteStore ) );
 		const { get } = select( preferencesStore );
 		const { getCurrentTheme } = select( coreDataStore );
-		const { getEditorMode } = select( editorStore );
 		const _context = getEditedPostContext();
 
 		// The currently selected entity to display.
@@ -80,7 +79,6 @@ export default function EditSiteEditor( { isLoading } ) {
 			editedPostId: getEditedPostId(),
 			contextPostType: _context?.postId ? _context.postType : undefined,
 			contextPostId: _context?.postId ? _context.postId : undefined,
-			editorMode: getEditorMode(),
 			canvasMode: getCanvasMode(),
 			isEditingPage: isPage(),
 			supportsGlobalStyles: getCurrentTheme()?.is_block_theme,
@@ -97,9 +95,7 @@ export default function EditSiteEditor( { isLoading } ) {
 	const _isPreviewingTheme = isPreviewingTheme();
 	const hasDefaultEditorCanvasView = ! useHasEditorCanvasContainer();
 	const iframeProps = useEditorIframeProps();
-	const isViewMode = canvasMode === 'view';
 	const isEditMode = canvasMode === 'edit';
-	const showVisualEditor = isViewMode || editorMode === 'visual';
 	const postWithTemplate = !! contextPostId;
 	const loadingProgressId = useInstanceId(
 		CanvasLoader,
@@ -125,6 +121,7 @@ export default function EditSiteEditor( { isLoading } ) {
 		],
 		[ settings.styles, canvasMode, currentPostIsTrashed ]
 	);
+	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const history = useHistory();
 	const onActionPerformed = useCallback(
@@ -182,7 +179,6 @@ export default function EditSiteEditor( { isLoading } ) {
 			<GlobalStylesRenderer />
 			<EditorKeyboardShortcutsRegister />
 			{ isEditMode && <BlockKeyboardShortcuts /> }
-			{ showVisualEditor && <TemplatePartConverter /> }
 			{ ! isReady ? <CanvasLoader id={ loadingProgressId } /> : null }
 			{ isEditMode && <WelcomeGuide /> }
 			{ isReady && (
@@ -213,6 +209,23 @@ export default function EditSiteEditor( { isLoading } ) {
 						! isEditingPage && <PluginTemplateSettingPanel.Slot />
 					}
 				>
+					{ isEditMode && (
+						<BackButton>
+							{ ( { length } ) =>
+								length <= 1 && (
+									<Button
+										label={ __( 'Open Navigation' ) }
+										className="edit-site-layout__view-mode-toggle"
+										onClick={ () =>
+											setCanvasMode( 'view' )
+										}
+									>
+										<SiteIcon className="edit-site-layout__view-mode-toggle-icon" />
+									</Button>
+								)
+							}
+						</BackButton>
+					) }
 					<SiteEditorMoreMenu />
 					{ supportsGlobalStyles && <GlobalStylesSidebar /> }
 				</Editor>
