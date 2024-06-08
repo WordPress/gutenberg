@@ -299,6 +299,7 @@ export function useSettingsForBlockElement(
 			'fontStyle',
 			'fontWeight',
 			'letterSpacing',
+			'textAlign',
 			'textTransform',
 			'textDecoration',
 			'writingMode',
