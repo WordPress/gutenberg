@@ -6,6 +6,7 @@ import {
 	findTransform,
 	getBlockTransforms,
 	hasBlockSupport,
+	switchToBlockType,
 } from '@wordpress/blocks';
 import {
 	documentHasSelection,
@@ -208,15 +209,31 @@ export default function useClipboardHandler() {
 					firstSelectedClientId
 				);
 
-				if (
-					! blocks.every( ( block ) =>
-						canInsertBlockType( block.name, rootClientId )
-					)
-				) {
-					return;
+				const newBlocks = [];
+
+				for ( const block of blocks ) {
+					if ( canInsertBlockType( block.name, rootClientId ) ) {
+						newBlocks.push( block );
+					} else {
+						const rootBlockName = getBlockName( rootClientId );
+						const switchedBlocks =
+							block.name !== rootBlockName
+								? switchToBlockType( block, rootBlockName )
+								: [ block ];
+
+						if ( ! switchedBlocks ) {
+							return;
+						}
+
+						for ( const switchedBlock of switchedBlocks ) {
+							for ( const innerBlock of switchedBlock.innerBlocks ) {
+								newBlocks.push( innerBlock );
+							}
+						}
+					}
 				}
 
-				__unstableSplitSelection( blocks );
+				__unstableSplitSelection( newBlocks );
 				event.preventDefault();
 			}
 		}
