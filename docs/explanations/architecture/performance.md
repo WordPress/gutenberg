@@ -69,7 +69,7 @@ The performance results for each commit are pushed to codevitals and can be seen
 
 It's thus very important to ensure that the metric being computed is stable. Meaning, if you run the same test twice with the same code and environment, you'll get results that are close.
 
-Our performance job runs Github CI which means that we can't trust the consistency of the numbers that we get between two similar job runs. Github CI may allocate different CPU and memory resources for us over time for instance. To alleviate this problem, each time we run the performance job on the trunk branch, we compare the current commit's performance to a fixed reference commit hash, which allows us to track the relative difference between the current commit and the reference commit consistently regardless of environment changes.
+Our performance job runs GitHub CI which means that we can't trust the consistency of the numbers that we get between two similar job runs. GitHub CI may allocate different CPU and memory resources for us over time for instance. To alleviate this problem, each time we run the performance job on the trunk branch, we compare the current commit's performance to a fixed reference commit hash, which allows us to track the relative difference between the current commit and the reference commit consistently regardless of environment changes.
 
 ### Update the reference commit
 
@@ -77,7 +77,7 @@ Gutenberg supports only two WP versions, this impacts the performance job in two
 
  - The base WP version used to run the performance job needs to be updated, when the minimum version supported by Gutenberg changes. In order to do that, we rely on the `Tested up to` flag of the plugin's `readme.txt` file. So each time that flag is changed, the version used for the performance job is changed as well.
 
- - Updating the WP version used for performance jobs means that there's a high chance that the reference commit used for performance test stability becomes incompatible with the WP version that is used. So every time, the `Tested up to` flag is updated in the `readme.txt` is changed, we also have to update the reference commit that is used in `.github/workflows/performance.yml`. 
+ - Updating the WP version used for performance jobs means that there's a high chance that the reference commit used for performance test stability becomes incompatible with the WP version that is used. So every time, the `Tested up to` flag is updated in the `readme.txt` is changed, we also have to update the reference commit that is used in `.github/workflows/performance.yml`.
 
 The new reference commit hash that is chosen needs to meet the following requirements:
 
