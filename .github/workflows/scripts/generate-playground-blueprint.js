@@ -65,11 +65,7 @@ module.exports.run = async function run( { github, context } ) {
 	const encodedJson = encodeURI( JSON.stringify( defaultSchema ) );
 	const url = `https://playground.wordpress.net/#${ encodedJson }`;
 
-	const body = `
-## Test using WordPress Playground
-The changes in this pull request can be previewed and tested using a [Wordpress Playground](https://playground.wordpress.net/playground/) instance.
-
-[Test this pull request with Wordpress Playground](${ url }).`;
+	const body = `[Test this PR in the WordPress Playground](${ url }) ([learn more](https://playground.wordpress.net/playground/)).`;
 
 	if ( existingCommentId ) {
 		await github.rest.issues.updateComment( {
