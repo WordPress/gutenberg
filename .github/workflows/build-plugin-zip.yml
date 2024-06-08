@@ -229,9 +229,7 @@ jobs:
               uses: actions/github-script@v7
               with:
                   script: |
-                      const { run } = require('./.github/workflows/scripts/generate-playground-blueprint.js');
-                      run({ github, context });
-
+                      require('./.github/workflows/scripts/generate-playground-blueprint.js').run({ github, context });
 
     revert-version-bump:
         name: Revert version bump if build failed
