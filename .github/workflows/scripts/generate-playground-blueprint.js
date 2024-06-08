@@ -52,7 +52,9 @@ module.exports.run = async function run( { github, context } ) {
 	for ( const currentComment of comments ) {
 		if (
 			currentComment.user.type === 'Bot' &&
-			currentComment.body.includes( 'Test using WordPress Playground' )
+			currentComment.body.includes(
+				'Test this PR in the WordPress Playground'
+			)
 		) {
 			foundComment = true;
 			break;
