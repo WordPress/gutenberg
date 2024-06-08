@@ -589,7 +589,7 @@ const toggleDarkMode = ( driver, darkMode = true ) => {
 const isEditorVisible = async ( driver ) => {
 	const postTitleLocator = isAndroid()
 		? `//android.widget.EditText[contains(@content-desc, "Post title")]`
-		: `(//XCUIElementTypeScrollView/XCUIElementTypeOther/XCUIElementTypeOther[contains(@name, "Post title")])`;
+		: `~post-title`;
 
 	await driver.$( postTitleLocator ).waitForDisplayed( { timeout: 30000 } );
 };

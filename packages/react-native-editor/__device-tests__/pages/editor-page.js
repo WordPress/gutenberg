@@ -93,14 +93,17 @@ class EditorPage {
 		if ( ! isAndroid() && ! skipWrapperClick ) {
 			const textBlockLocator = `(//XCUIElementTypeButton[contains(@name, "${ blockName } Block. Row ${ position }")])`;
 
-			await clickIfClickable( this.driver, textBlockLocator );
+			await this.driver.$( textBlockLocator ).click();
+			// await clickIfClickable( this.driver, textBlockLocator );
 		}
 
 		const blockLocator = isAndroid()
 			? `//android.widget.Button[contains(@content-desc, "${ blockName } Block. Row ${ position }.")]//android.widget.EditText`
 			: `//XCUIElementTypeButton[contains(@name, "${ blockName } Block. Row ${ position }.")]//XCUIElementTypeTextView`;
+		const blockLocatorElement = this.driver.$( blockLocator );
+		await blockLocatorElement.waitForDisplayed( { timeout: 2000 } );
 
-		return await waitForVisible( this.driver, blockLocator );
+		return blockLocatorElement;
 	}
 
 	async typeTextToTextBlock( block, text, clear ) {
