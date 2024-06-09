@@ -124,7 +124,6 @@ const animate = ( element, config, target = 1, callback ) => {
 		delay,
 		duration: resolvedDuration,
 		easing: 'linear', // The actual easing was baked into the keyframes.
-		fill: 'forwards',
 	} );
 
 	animation.finished
