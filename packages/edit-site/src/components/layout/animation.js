@@ -96,28 +96,26 @@ function asKeyframes( css ) {
 	return keyframe;
 }
 
-/** @typedef {import('#client').AnimationConfig | ((opts: { direction: 'in' | 'out' }) => import('#client').AnimationConfig)} Options */
-
 /**
- * Animates an element, according to the provided configuration
+ * Animates an element, according to the provided configuration.
  * @param {Element}                  element
- * @param {AnimationConfig}          options
- * @param {number}                   t2       The target `t` value — `1` for intro, `0` for outro
+ * @param {AnimationConfig}          config
+ * @param {number}                   target   The target progression — `1` is end, `0` is beginning.
  * @param {(() => void) | undefined} callback
  */
-const animate = ( element, options, t2 = 1, callback ) => {
-	const { delay = 0, duration, css, easing = linear } = options;
+const animate = ( element, config, target = 1, callback ) => {
+	const { delay = 0, duration = 300, css, easing = linear } = config;
 
-	const t1 = 1 - t2;
-	const delta = t2 - t1;
+	const origin = 1 - target;
+	const delta = target - origin;
 	const resolvedDuration = duration * Math.abs( delta );
 
 	const keyframes = [];
-	// `n` must be an integer to ensure a finish accurate to the `t2` value.
+	// `n` must be an integer to ensure a finish accurate to the `target` value.
 	const n = Math.ceil( resolvedDuration / ( 1000 / 60 ) );
 
 	for ( let i = 0; i <= n; i += 1 ) {
-		const t = t1 + delta * easing( i / n );
+		const t = origin + delta * easing( i / n );
 		const styles = css( t, 1 - t );
 		keyframes.push( asKeyframes( styles ) );
 	}
@@ -133,7 +131,7 @@ const animate = ( element, options, t2 = 1, callback ) => {
 		.then( () => {
 			callback?.();
 
-			if ( t2 === 1 ) {
+			if ( target === 1 ) {
 				animation.cancel();
 			}
 		} )
@@ -160,7 +158,7 @@ const animate = ( element, options, t2 = 1, callback ) => {
  * @property {number}                           [delay]    Time before the animation begins in milliseconds.
  * @property {number}                           [duration] Time between the animation’s beginning and end in milliseconds.
  * @property {(t: number) => number}            [easing]   Function to modify the acceleration curve of the animation.
- * @property {(t: number, u: number) => string} [css]      Function to compute the CSS rules at a point in the animation’s progression.
+ * @property {(t: number, u: number) => string} css        Function to compute the CSS rules at a point in the animation’s progression.
  */
 
 /**
