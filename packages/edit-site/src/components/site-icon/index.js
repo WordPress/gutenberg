@@ -23,10 +23,6 @@ function SiteIcon( { className } ) {
 		};
 	}, [] );
 
-	if ( isRequestingSite && ! siteIconUrl ) {
-		return <div className="edit-site-site-icon__image" />;
-	}
-
 	const icon = siteIconUrl ? (
 		<img
 			className="edit-site-site-icon__image"
@@ -43,7 +39,7 @@ function SiteIcon( { className } ) {
 
 	return (
 		<div className={ clsx( className, 'edit-site-site-icon' ) }>
-			{ icon }
+			{ isRequestingSite ? null : icon }
 		</div>
 	);
 }
