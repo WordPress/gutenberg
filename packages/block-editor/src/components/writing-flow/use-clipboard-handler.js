@@ -215,6 +215,11 @@ export default function useClipboardHandler() {
 					if ( canInsertBlockType( block.name, rootClientId ) ) {
 						newBlocks.push( block );
 					} else {
+						// If a block cannot be inserted in a root block, try
+						// converting it to that root block type and insert the
+						// inner blocks.
+						// Example: paragraphs cannot be inserted into a list,
+						// so convert the paragraphs to a list for list items.
 						const rootBlockName = getBlockName( rootClientId );
 						const switchedBlocks =
 							block.name !== rootBlockName
