@@ -19,13 +19,7 @@ import {
 } from './utils';
 import type { DirectiveEntry } from './hooks';
 import { directive, getScope, getEvaluate } from './hooks';
-import {
-	deepSignal,
-	peek,
-	objectHandlers,
-	objToProxy,
-	type DeepSignal,
-} from './deepsignal';
+import { deepSignal, peek, objectHandlers, objToProxy } from './deepsignal';
 
 // Store the fallback proxy for each context proxy.
 const proxyToFallback = new WeakMap();
