@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Prevent hiding the keyboard when creating new list items [#62446]
 
 ## 1.120.0
 -   [*] Prevent deleting content when backspacing in the first Paragraph block [#62069]
