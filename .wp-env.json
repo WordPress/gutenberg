@@ -1,6 +1,6 @@
 {
 	"core": "WordPress/WordPress",
-	"plugins": [ "." ],
+	"plugins": [ ".", "./plugins/time-to-read-block" ],
 	"themes": [ "./test/emptytheme" ],
 	"env": {
 		"tests": {
