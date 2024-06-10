@@ -526,7 +526,7 @@ function BackgroundSizeToolsPanelItem( {
 		>
 			<FocalPointPicker
 				__next40pxDefaultSize
-				label={ __( 'Position' ) }
+				label={ __( 'Focal point' ) }
 				url={ getResolvedThemeFilePath( imageValue, themeFileURIs ) }
 				value={ backgroundPositionToCoords( positionValue ) }
 				onChange={ updateBackgroundPosition }
