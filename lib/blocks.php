@@ -50,7 +50,6 @@ function gutenberg_reregister_core_block_types() {
 				'block.php'                        => 'core/block',
 				'calendar.php'                     => 'core/calendar',
 				'categories.php'                   => 'core/categories',
-				'collab.php'                       => 'core/collab',
 				'cover.php'                        => 'core/cover',
 				'comment-author-avatar.php'        => 'core/comment-author-avatar',
 				'comment-author-name.php'          => 'core/comment-author-name',

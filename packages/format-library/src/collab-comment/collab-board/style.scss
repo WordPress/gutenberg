@@ -1,5 +1,5 @@
 .block-editor-format-toolbar__comment-board {
-	max-width: 350px;
+	max-width: 380px;
 	min-width: auto;
 	width: 90vw;
 
@@ -36,7 +36,9 @@
 		font-size: 14px;
 		margin-top: 5px;
 	}
-
+	.comment-board__dateTime {
+		font-size: 12px;
+	}
 	.block-editor-format-toolbar__comment-input {
 		.components-text-control__input {
 			border: 1px solid #ccc;
@@ -62,6 +64,9 @@
 				color: rgb(0, 124, 186);
 			}
 		}
+	}
+	.block-editor-format-toolbar__comment-board__edit {
+		margin-right: -8px;
 	}
 }
 
