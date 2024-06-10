@@ -33,6 +33,7 @@ import {
 import ScreenBlock from './screen-block';
 import ScreenTypography from './screen-typography';
 import ScreenTypographyElement from './screen-typography-element';
+import FontSize from './font-size';
 import ScreenColors from './screen-colors';
 import ScreenColorPalette from './screen-color-palette';
 import { ScreenShadows, ScreenShadowsEdit } from './screen-shadows';
@@ -231,7 +232,12 @@ function GlobalStylesBlockLink() {
 		if ( newPath !== currentPath ) {
 			navigator.goTo( newPath, { skipFocus: true } );
 		}
-	}, [ selectedBlockClientId, selectedBlockName, blockHasGlobalStyles ] );
+	}, [
+		selectedBlockClientId,
+		selectedBlockName,
+		blockHasGlobalStyles,
+		navigator,
+	] );
 }
 
 function GlobalStylesEditorCanvasContainerLink() {
@@ -282,7 +288,7 @@ function GlobalStylesEditorCanvasContainerLink() {
 				goTo( '/' );
 				break;
 		}
-	}, [ editorCanvasContainerView, isRevisionsOpen, goTo ] );
+	}, [ editorCanvasContainerView, isRevisionsOpen, goTo, path ] );
 }
 
 function GlobalStylesUI() {
@@ -311,6 +317,10 @@ function GlobalStylesUI() {
 
 			<GlobalStylesNavigationScreen path="/typography">
 				<ScreenTypography />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen path="/typography/font-sizes/:slug">
+				<FontSize />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path="/typography/text">
