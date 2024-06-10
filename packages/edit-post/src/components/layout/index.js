@@ -126,7 +126,7 @@ function useEditorStyles() {
 			? editorSettings.styles ?? []
 			: defaultEditorStyles;
 
-		// Add a constant padding for the typewritter effect. When typing at the
+		// Add a constant padding for the typewriter effect. When typing at the
 		// bottom, there needs to be room to scroll up.
 		if (
 			! isZoomedOutView &&
@@ -134,9 +134,12 @@ function useEditorStyles() {
 			renderingMode === 'post-only' &&
 			! DESIGN_POST_TYPES.includes( postType )
 		) {
-			baseStyles.push( {
-				css: 'body{padding-bottom: 40vh}',
-			} );
+			return [
+				...baseStyles,
+				{
+					css: 'body{padding-bottom: 40vh}',
+				},
+			];
 		}
 
 		return baseStyles;
@@ -145,6 +148,7 @@ function useEditorStyles() {
 		editorSettings.disableLayoutStyles,
 		editorSettings.styles,
 		hasThemeStyleSupport,
+		postType,
 	] );
 }
 
