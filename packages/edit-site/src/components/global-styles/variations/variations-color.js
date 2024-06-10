@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalVStack as VStack } from '@wordpress/components';
+import {
+	__experimentalVStack as VStack,
+	__experimentalGrid as Grid,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -22,13 +25,13 @@ export default function ColorVariations( { title, gap = 2 } ) {
 	return (
 		<VStack spacing={ 3 }>
 			{ title && <Subtitle level={ 3 }>{ title }</Subtitle> }
-			<VStack spacing={ gap }>
+			<Grid spacing={ gap }>
 				{ colorVariations.map( ( variation, index ) => (
 					<Variation key={ index } variation={ variation } isPill>
 						{ () => <StylesPreviewColors /> }
 					</Variation>
 				) ) }
-			</VStack>
+			</Grid>
 		</VStack>
 	);
 }
