@@ -33,7 +33,7 @@ registerPlugin( 'post-status-info-test', { render: PluginPostStatusInfoTest } );
 
 SlotFills are created using `createSlotFill`. This creates two components, `Slot` and `Fill` which are then used to create a new component that is exported on the `wp.plugins` global.
 
-**Definition of the `PluginPostStatusInfo` SlotFill** ([see core code](https://github.com/WordPress/gutenberg/blob/HEAD/packages/edit-post/src/components/sidebar/plugin-post-status-info/index.js#L54))
+**Definition of the `PluginPostStatusInfo` SlotFill** ([see core code](https://github.com/WordPress/gutenberg/blob/HEAD/packages/editor/src/components/plugin-post-status-info/index.js#L55))
 
 ```js
 /**
@@ -61,34 +61,70 @@ export default PluginPostStatusInfo;
 This new Slot is then exposed in the editor. The example below is from core and represents the Summary panel.
 
 As we can see, the `<PluginPostStatusInfo.Slot>` is wrapping all of the items that will appear in the panel.
-Any items that have been added via the SlotFill ( see the example above ), will be included in the `fills` parameter and be displayed between the `<PostAuthor/>` and `<PostTrash/>` components.
+Any items that have been added via the SlotFill ( see the example above ), will be included in the `fills` parameter and be displayed in the end of the component.
 
-See [core code](https://github.com/WordPress/gutenberg/tree/HEAD/packages/edit-post/src/components/sidebar/post-status/index.js#L26).
+See [core code](https://github.com/WordPress/gutenberg/tree/HEAD/packages/editor/src/components/sidebar/post-summary.js#L39).
 
 ```js
-const PostStatus = ( { isOpened, onTogglePanel } ) => (
-	<PanelBody
-		className="edit-post-post-status"
-		title={ __( 'Summary' ) }
-		opened={ isOpened }
-		onToggle={ onTogglePanel }
-	>
-		<PluginPostStatusInfo.Slot>
-			{ ( fills ) => (
-				<>
-					<PostVisibility />
-					<PostSchedule />
-					<PostFormat />
-					<PostSticky />
-					<PostPendingStatus />
-					<PostAuthor />
-					{ fills }
-					<PostTrash />
-				</>
-			) }
-		</PluginPostStatusInfo.Slot>
-	</PanelBody>
-);
+export default function PostSummary( { onActionPerformed } ) {
+	const { isRemovedPostStatusPanel } = useSelect( ( select ) => {
+		// We use isEditorPanelRemoved to hide the panel if it was programmatically removed. We do
+		// not use isEditorPanelEnabled since this panel should not be disabled through the UI.
+		const { isEditorPanelRemoved, getCurrentPostType } =
+			select( editorStore );
+		return {
+			isRemovedPostStatusPanel: isEditorPanelRemoved( PANEL_NAME ),
+			postType: getCurrentPostType(),
+		};
+	}, [] );
+
+	return (
+		<PostPanelSection className="editor-post-summary">
+			<PluginPostStatusInfo.Slot>
+				{ ( fills ) => (
+					<>
+						<VStack spacing={ 4 }>
+							<PostCardPanel
+								actions={
+									<PostActions
+										onActionPerformed={ onActionPerformed }
+									/>
+								}
+							/>
+							<PostFeaturedImagePanel withPanelBody={ false } />
+							<PostExcerptPanel />
+							<VStack spacing={ 1 }>
+								<PostContentInformation />
+								<PostLastEditedPanel />
+							</VStack>
+							{ ! isRemovedPostStatusPanel && (
+								<VStack spacing={ 2 }>
+									<VStack spacing={ 1 }>
+										<PostStatusPanel />
+										<PostSchedulePanel />
+										<PostURLPanel />
+										<PostAuthorPanel />
+										<PostTemplatePanel />
+										<PostDiscussionPanel />
+										<PageAttributesPanel />
+										<PostSyncStatus />
+										<BlogTitle />
+										<PostsPerPage />
+										<SiteDiscussion />
+										<PostFormatPanel />
+										<PostStickyPanel />
+									</VStack>
+									<TemplateAreas />
+									{ fills }
+								</VStack>
+							) }
+						</VStack>
+					</>
+				) }
+			</PluginPostStatusInfo.Slot>
+		</PostPanelSection>
+	);
+}
 ```
 
 ## Currently available SlotFills and examples

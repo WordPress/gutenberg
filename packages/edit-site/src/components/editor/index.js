@@ -7,7 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
-import { Notice } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import {
 	EditorKeyboardShortcutsRegister,
@@ -28,12 +28,8 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import WelcomeGuide from '../welcome-guide';
 import { store as editSiteStore } from '../../store';
 import { GlobalStylesRenderer } from '../global-styles-renderer';
-import useTitle from '../routes/use-title';
 import CanvasLoader from '../canvas-loader';
 import { unlock } from '../../lock-unlock';
-import useEditedEntityRecord from '../use-edited-entity-record';
-import { POST_TYPE_LABELS, TEMPLATE_POST_TYPE } from '../../utils/constants';
-import TemplatePartConverter from '../template-part-converter';
 import { useSpecificEditorSettings } from '../block-editor/use-site-editor-settings';
 import PluginTemplateSettingPanel from '../plugin-template-setting-panel';
 import GlobalStylesSidebar from '../global-styles-sidebar';
@@ -44,27 +40,20 @@ import {
 } from '../editor-canvas-container';
 import SaveButton from '../save-button';
 import SiteEditorMoreMenu from '../more-menu';
+import SiteIcon from '../site-icon';
 import useEditorIframeProps from '../block-editor/use-editor-iframe-props';
+import useEditorTitle from './use-editor-title';
 
-const {
-	EditorInterface,
-	ExperimentalEditorProvider: EditorProvider,
-	Sidebar,
-} = unlock( editorPrivateApis );
+const { Editor, BackButton } = unlock( editorPrivateApis );
 const { useHistory } = unlock( routerPrivateApis );
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 
-export default function Editor( { isLoading } ) {
+export default function EditSiteEditor( { isLoading } ) {
 	const {
-		record: editedPost,
-		getTitle,
-		isLoaded: hasLoadedPost,
-	} = useEditedEntityRecord();
-	const { type: editedPostType } = editedPost;
-	const {
-		context,
-		contextPost,
-		editorMode,
+		editedPostType,
+		editedPostId,
+		contextPostType,
+		contextPostId,
 		canvasMode,
 		isEditingPage,
 		supportsGlobalStyles,
@@ -72,26 +61,24 @@ export default function Editor( { isLoading } ) {
 		editorCanvasView,
 		currentPostIsTrashed,
 	} = useSelect( ( select ) => {
-		const { getEditedPostContext, getCanvasMode, isPage } = unlock(
-			select( editSiteStore )
-		);
+		const {
+			getEditedPostContext,
+			getCanvasMode,
+			isPage,
+			getEditedPostType,
+			getEditedPostId,
+		} = unlock( select( editSiteStore ) );
 		const { get } = select( preferencesStore );
-		const { getEntityRecord, getCurrentTheme } = select( coreDataStore );
-		const { getEditorMode } = select( editorStore );
+		const { getCurrentTheme } = select( coreDataStore );
 		const _context = getEditedPostContext();
 
 		// The currently selected entity to display.
 		// Typically template or template part in the site editor.
 		return {
-			context: _context,
-			contextPost: _context?.postId
-				? getEntityRecord(
-						'postType',
-						_context.postType,
-						_context.postId
-				  )
-				: undefined,
-			editorMode: getEditorMode(),
+			editedPostType: getEditedPostType(),
+			editedPostId: getEditedPostId(),
+			contextPostType: _context?.postId ? _context.postType : undefined,
+			contextPostId: _context?.postId ? _context.postId : undefined,
 			canvasMode: getCanvasMode(),
 			isEditingPage: isPage(),
 			supportsGlobalStyles: getCurrentTheme()?.is_block_theme,
@@ -104,30 +91,12 @@ export default function Editor( { isLoading } ) {
 				'trash',
 		};
 	}, [] );
+	useEditorTitle();
 	const _isPreviewingTheme = isPreviewingTheme();
 	const hasDefaultEditorCanvasView = ! useHasEditorCanvasContainer();
 	const iframeProps = useEditorIframeProps();
-
-	const isViewMode = canvasMode === 'view';
 	const isEditMode = canvasMode === 'edit';
-	const showVisualEditor = isViewMode || editorMode === 'visual';
-	const postWithTemplate = !! context?.postId;
-
-	let title;
-	if ( hasLoadedPost ) {
-		title = sprintf(
-			// translators: A breadcrumb trail for the Admin document title. %1$s: title of template being edited, %2$s: type of template (Template or Template Part).
-			__( '%1$s ‹ %2$s' ),
-			getTitle(),
-			POST_TYPE_LABELS[ editedPostType ] ??
-				POST_TYPE_LABELS[ TEMPLATE_POST_TYPE ]
-		);
-	}
-
-	// Only announce the title once the editor is ready to prevent "Replace"
-	// action in <URLQueryController> from double-announcing.
-	useTitle( hasLoadedPost && title );
-
+	const postWithTemplate = !! contextPostId;
 	const loadingProgressId = useInstanceId(
 		CanvasLoader,
 		'edit-site-editor__loading-progress'
@@ -152,6 +121,7 @@ export default function Editor( { isLoading } ) {
 		],
 		[ settings.styles, canvasMode, currentPostIsTrashed ]
 	);
+	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const history = useHistory();
 	const onActionPerformed = useCallback(
@@ -202,68 +172,63 @@ export default function Editor( { isLoading } ) {
 		[ history, createSuccessNotice ]
 	);
 
-	const isReady =
-		! isLoading &&
-		( ( postWithTemplate && !! contextPost && !! editedPost ) ||
-			( ! postWithTemplate && !! editedPost ) );
+	const isReady = ! isLoading;
 
 	return (
 		<>
 			<GlobalStylesRenderer />
 			<EditorKeyboardShortcutsRegister />
 			{ isEditMode && <BlockKeyboardShortcuts /> }
-			{ showVisualEditor && <TemplatePartConverter /> }
 			{ ! isReady ? <CanvasLoader id={ loadingProgressId } /> : null }
 			{ isEditMode && <WelcomeGuide /> }
-			{ hasLoadedPost && ! editedPost && (
-				<Notice status="warning" isDismissible={ false }>
-					{ __(
-						"You attempted to edit an item that doesn't exist. Perhaps it was deleted?"
-					) }
-				</Notice>
-			) }
 			{ isReady && (
-				<EditorProvider
-					post={ postWithTemplate ? contextPost : editedPost }
-					__unstableTemplate={
-						postWithTemplate ? editedPost : undefined
+				<Editor
+					postType={
+						postWithTemplate ? contextPostType : editedPostType
 					}
+					postId={ postWithTemplate ? contextPostId : editedPostId }
+					templateId={ postWithTemplate ? editedPostId : undefined }
 					settings={ settings }
-					useSubRegistry={ false }
+					className={ clsx( 'edit-site-editor__editor-interface', {
+						'show-icon-labels': showIconLabels,
+					} ) }
+					styles={ styles }
+					enableRegionNavigation={ false }
+					customSaveButton={
+						_isPreviewingTheme && <SaveButton size="compact" />
+					}
+					forceDisableBlockTools={ ! hasDefaultEditorCanvasView }
+					title={
+						! hasDefaultEditorCanvasView
+							? getEditorCanvasContainerTitle( editorCanvasView )
+							: undefined
+					}
+					iframeProps={ iframeProps }
+					onActionPerformed={ onActionPerformed }
+					extraSidebarPanels={
+						! isEditingPage && <PluginTemplateSettingPanel.Slot />
+					}
 				>
-					<SiteEditorMoreMenu />
-					<EditorInterface
-						className={ clsx(
-							'edit-site-editor__interface-skeleton',
-							{
-								'show-icon-labels': showIconLabels,
+					{ isEditMode && (
+						<BackButton>
+							{ ( { length } ) =>
+								length <= 1 && (
+									<Button
+										label={ __( 'Open Navigation' ) }
+										className="edit-site-layout__view-mode-toggle"
+										onClick={ () =>
+											setCanvasMode( 'view' )
+										}
+									>
+										<SiteIcon className="edit-site-layout__view-mode-toggle-icon" />
+									</Button>
+								)
 							}
-						) }
-						styles={ styles }
-						enableRegionNavigation={ false }
-						customSaveButton={
-							_isPreviewingTheme && <SaveButton size="compact" />
-						}
-						forceDisableBlockTools={ ! hasDefaultEditorCanvasView }
-						title={
-							! hasDefaultEditorCanvasView
-								? getEditorCanvasContainerTitle(
-										editorCanvasView
-								  )
-								: undefined
-						}
-						iframeProps={ iframeProps }
-					/>
-					<Sidebar
-						onActionPerformed={ onActionPerformed }
-						extraPanels={
-							! isEditingPage && (
-								<PluginTemplateSettingPanel.Slot />
-							)
-						}
-					/>
+						</BackButton>
+					) }
+					<SiteEditorMoreMenu />
 					{ supportsGlobalStyles && <GlobalStylesSidebar /> }
-				</EditorProvider>
+				</Editor>
 			) }
 		</>
 	);

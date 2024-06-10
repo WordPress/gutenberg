@@ -1,12 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	View,
-	Text,
-	TouchableWithoutFeedback,
-	TouchableOpacity,
-} from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -25,6 +20,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
+import { requestUnsupportedBlockFallback } from '@wordpress/react-native-bridge';
 
 /**
  * Internal dependencies
@@ -48,9 +44,38 @@ export class UnsupportedBlockEdit extends Component {
 	}
 
 	toggleSheet() {
+		const { attributes, block, clientId } = this.props;
+		const { originalName } = attributes;
+		const title = this.getTitle();
+		const blockContent = serialize( block ? [ block ] : [] );
+
+		if ( this.canEditUnsupportedBlock() ) {
+			requestUnsupportedBlockFallback(
+				blockContent,
+				clientId,
+				originalName,
+				title
+			);
+			return;
+		}
+
 		this.setState( {
 			showHelp: ! this.state.showHelp,
 		} );
+	}
+
+	canEditUnsupportedBlock() {
+		const {
+			canEnableUnsupportedBlockEditor,
+			isEditableInUnsupportedBlockEditor,
+			isUnsupportedBlockEditorSupported,
+		} = this.props;
+
+		return (
+			! canEnableUnsupportedBlockEditor &&
+			isUnsupportedBlockEditorSupported &&
+			isEditableInUnsupportedBlockEditor
+		);
 	}
 
 	closeSheet() {
@@ -171,7 +196,8 @@ export class UnsupportedBlockEdit extends Component {
 
 	render() {
 		const { originalName } = this.props.attributes;
-		const { getStylesFromColorScheme, preferredColorScheme } = this.props;
+		const { isSelected, getStylesFromColorScheme, preferredColorScheme } =
+			this.props;
 		const blockType = coreBlocks[ originalName ];
 
 		const title = this.getTitle();
@@ -186,7 +212,11 @@ export class UnsupportedBlockEdit extends Component {
 		);
 
 		const subtitle = (
-			<Text style={ subTitleStyle }>{ __( 'Unsupported' ) }</Text>
+			<Text style={ subTitleStyle }>
+				{ this.canEditUnsupportedBlock()
+					? __( 'Tap to edit' )
+					: __( 'Unsupported' ) }
+			</Text>
 		);
 
 		const icon = blockType
@@ -198,8 +228,9 @@ export class UnsupportedBlockEdit extends Component {
 		);
 		const iconClassName = 'unsupported-icon' + '-' + preferredColorScheme;
 		return (
-			<TouchableWithoutFeedback
-				disabled={ ! this.props.isSelected }
+			<TouchableOpacity
+				disabled={ ! isSelected }
+				activeOpacity={ 0.5 }
 				accessibilityLabel={ __( 'Help button' ) }
 				accessibilityRole="button"
 				accessibilityHint={ __( 'Tap here to show help' ) }
@@ -211,7 +242,8 @@ export class UnsupportedBlockEdit extends Component {
 						styles.unsupportedBlockDark
 					) }
 				>
-					{ this.renderHelpIcon() }
+					{ ! this.canEditUnsupportedBlock() &&
+						this.renderHelpIcon() }
 					<View style={ styles.unsupportedBlockHeader }>
 						<Icon
 							className={ iconClassName }
@@ -223,7 +255,7 @@ export class UnsupportedBlockEdit extends Component {
 					{ subtitle }
 					{ this.renderSheet( title, originalName ) }
 				</View>
-			</TouchableWithoutFeedback>
+			</TouchableOpacity>
 		);
 	}
 }

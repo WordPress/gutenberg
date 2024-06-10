@@ -106,8 +106,12 @@ export default function SidebarNavigationScreenPatterns( { backPath } ) {
 	const {
 		params: { postType, categoryId },
 	} = useLocation();
-	const currentCategory = categoryId || PATTERN_DEFAULT_CATEGORY;
 	const currentType = postType || PATTERN_TYPES.user;
+	const currentCategory =
+		categoryId ||
+		( currentType === PATTERN_TYPES.user
+			? PATTERN_DEFAULT_CATEGORY
+			: TEMPLATE_PART_ALL_AREAS_CATEGORY );
 
 	const { templatePartAreas, hasTemplateParts, isLoading } =
 		useTemplatePartAreas();
