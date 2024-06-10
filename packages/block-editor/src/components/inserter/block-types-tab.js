@@ -207,7 +207,6 @@ export function BlockTypesTab(
 							showMostUsedBlocks={ showMostUsedBlocks }
 							className="block-editor-inserter__insertable-blocks-at-selection"
 						/>
-						<hr />
 					</>
 				) }
 				<BlockTypesTabPanel

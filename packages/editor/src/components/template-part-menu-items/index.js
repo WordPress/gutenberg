@@ -13,7 +13,7 @@ import {
 import ConvertToRegularBlocks from './convert-to-regular';
 import ConvertToTemplatePart from './convert-to-template-part';
 
-export default function TemplatePartConverter() {
+export default function TemplatePartMenuItems() {
 	return (
 		<BlockSettingsMenuControls>
 			{ ( { selectedClientIds, onClose } ) => (
