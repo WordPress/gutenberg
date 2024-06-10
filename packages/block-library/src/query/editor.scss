@@ -39,7 +39,8 @@
 		position: sticky;
 		top: 0;
 		padding: $grid-unit-20 0;
-		margin-bottom: 2px;
+		transform: translateY(- $grid-unit-05); // Offsets the top padding on the modal content container
+		margin-bottom: - $grid-unit-05;
 		z-index: z-index(".block-library-query-pattern__selection-search");
 	}
 }
