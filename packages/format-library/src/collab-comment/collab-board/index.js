@@ -16,6 +16,7 @@ import {
 	commentAuthorAvatar as userIcon,
 	Icon,
 	trash as deleteIcon,
+	edit as editIcon,
 } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -27,11 +28,15 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as editorStore } from '@wordpress/editor';
 
 /**
- * External dependencies
+ * CollabBoard component.
+ *
+ * @param {Object}   props            Component props.
+ * @param {Object}   props.contentRef Reference to the content.
+ * @param {Function} props.onClose    Function to close the popover.
+ *
+ * @return {Object} CollabBoard component.
  */
-import { v4 as uuid } from 'uuid';
-
-const DiscussionBoard = ( { contentRef, onClose } ) => {
+const CollabBoard = ( { contentRef, onClose } ) => {
 	// Get the anchor for the popover.
 	const popoverAnchor = useAnchor( {
 		editableContentElement: contentRef.current,
@@ -40,6 +45,7 @@ const DiscussionBoard = ( { contentRef, onClose } ) => {
 	// State to manage the comment thread.
 	const [ inputComment, setInputComment ] = useState( '' );
 	const [ isResolved, setIsResolved ] = useState( false );
+	const [ isEditing, setIsEditing ] = useState( null );
 	const [ showConfirmation, setShowConfirmation ] = useState( false );
 	const [ threadId, setThreadId ] = useState( null );
 
@@ -58,7 +64,7 @@ const DiscussionBoard = ( { contentRef, onClose } ) => {
 		setThreadId(
 			classList
 				? classList.slice( 'block-editor-collab__'.length )
-				: uuid()
+				: Date.now()
 		);
 	}, [ contentRef ] );
 
@@ -106,7 +112,7 @@ const DiscussionBoard = ( { contentRef, onClose } ) => {
 
 	// Helper function to generate a new comment.
 	const generateNewComment = () => ( {
-		commentId: uuid(),
+		commentId: Date.now(),
 		createdBy: currentUser,
 		comment: inputComment,
 		createdAt: new Date().toISOString(),
@@ -140,6 +146,34 @@ const DiscussionBoard = ( { contentRef, onClose } ) => {
 		} );
 
 		setInputComment( '' );
+	};
+
+	// Function to edit the comment.
+	const editComment = async ( commentId ) => {
+		const editedComments = { ...allThreads };
+
+		if (
+			editedComments[ threadId ] &&
+			editedComments[ threadId ].comments
+		) {
+			editedComments[ threadId ].comments.map( ( comment ) => {
+				if ( comment.commentId === commentId ) {
+					comment.comment = inputComment;
+					comment.date = new Date().toISOString();
+				}
+				return comment;
+			} );
+		}
+
+		await saveEntityRecord( 'postType', 'post', {
+			id: postId,
+			meta: {
+				collab: JSON.stringify( editedComments ),
+			},
+		} );
+
+		setInputComment( '' );
+		setIsEditing( null );
 	};
 
 	// Function to mark thread as resolved
@@ -259,129 +293,216 @@ const DiscussionBoard = ( { contentRef, onClose } ) => {
 									},
 									index
 								) => (
-									<VStack
-										spacing="2"
-										key={ timestamp }
-										className="comment-board__comment"
-									>
-										<HStack
-											alignment="left"
-											spacing="1"
-											justify="space-between"
-										>
-											<HStack
-												alignment="left"
-												spacing="3"
-												justify="start"
-											>
-												<Icon
-													icon={ userIcon }
-													className="comment-board__userIcon"
-													size={ 45 }
-												/>
-												<VStack spacing="1">
+									<>
+										{ isEditing === commentId && (
+											<VStack spacing="2">
+												<HStack
+													alignment="left"
+													spacing="1"
+												>
+													<Icon
+														icon={ userIcon }
+														className="comment-board__userIcon"
+														size={ 45 }
+													/>
 													<span className="comment-board__userName">
-														{ createdBy }
+														{ currentUser }
 													</span>
-													<time
-														dateTime={ format(
-															'c',
-															timestamp
-														) }
-													>
-														{ dateI18n(
-															dateTimeFormat,
-															timestamp
-														) }
-													</time>
-												</VStack>
-											</HStack>
-											<HStack
-												alignment="right"
-												spacing="1"
-												justify="end"
-												className="comment-board__actions"
-											>
-												{ index === 0 && (
-													<div
-														className="block-editor-format-toolbar__comment-board__resolved"
-														title={ __(
-															'Mark as resolved'
-														) }
-													>
-														<CheckboxControl
-															checked={
-																isResolved
-															}
-															onChange={ () =>
-																showConfirmationOverlay()
-															}
-															label={ __(
-																'Resolve'
-															) }
-														/>
-													</div>
-												) }
-												<Button
-													icon={ deleteIcon }
-													label={ __(
-														'Delete comment'
-													) }
-													onClick={ () =>
-														deleteComment(
-															commentId
-														)
+												</HStack>
+												<TextControl
+													value={ inputComment }
+													onChange={ ( val ) =>
+														setInputComment( val )
 													}
+													placeholder={ __(
+														'Comment or add others with @'
+													) }
+													className="block-editor-format-toolbar__comment-input"
 												/>
-											</HStack>
-										</HStack>
-										<p className="comment-board__commentText">
-											{ comment }
-										</p>
-									</VStack>
+												<HStack
+													alignment="right"
+													spacing="1"
+												>
+													<Button
+														className="block-editor-format-toolbar__cancel-button"
+														variant="secondary"
+														text={ __( 'Cancel' ) }
+														onClick={ () => {
+															setIsEditing(
+																false
+															);
+															setInputComment(
+																''
+															);
+														} }
+													/>
+													<Button
+														className="block-editor-format-toolbar__comment-button"
+														variant="primary"
+														text={
+															0 === commentsCount
+																? __(
+																		'Comment'
+																  )
+																: __( 'Reply' )
+														}
+														disabled={
+															0 ===
+															inputComment.length
+														}
+														onClick={ () =>
+															editComment(
+																commentId
+															)
+														}
+													/>
+												</HStack>
+											</VStack>
+										) }
+										{ isEditing !== commentId && (
+											<VStack
+												spacing="2"
+												key={ timestamp }
+												className="comment-board__comment"
+											>
+												<HStack
+													alignment="left"
+													spacing="1"
+													justify="space-between"
+												>
+													<HStack
+														alignment="left"
+														spacing="3"
+														justify="start"
+													>
+														<Icon
+															icon={ userIcon }
+															className="comment-board__userIcon"
+															size={ 45 }
+														/>
+														<VStack spacing="1">
+															<span className="comment-board__userName">
+																{ createdBy }
+															</span>
+															<time
+																dateTime={ format(
+																	'c',
+																	timestamp
+																) }
+															>
+																{ dateI18n(
+																	dateTimeFormat,
+																	timestamp
+																) }
+															</time>
+														</VStack>
+													</HStack>
+													<HStack
+														alignment="right"
+														spacing="1"
+														justify="end"
+														className="comment-board__actions"
+													>
+														{ index === 0 && (
+															<div
+																className="block-editor-format-toolbar__comment-board__resolved"
+																title={ __(
+																	'Mark as resolved'
+																) }
+															>
+																<CheckboxControl
+																	checked={
+																		isResolved
+																	}
+																	onChange={ () =>
+																		showConfirmationOverlay()
+																	}
+																	label={ __(
+																		'Resolve'
+																	) }
+																/>
+															</div>
+														) }
+														<Button
+															icon={ editIcon }
+															label={ __(
+																'Edit comment'
+															) }
+															onClick={ () => {
+																setIsEditing(
+																	commentId
+																);
+																setInputComment(
+																	comment
+																);
+															} }
+														/>
+														<Button
+															icon={ deleteIcon }
+															label={ __(
+																'Delete comment'
+															) }
+															onClick={ () =>
+																deleteComment(
+																	commentId
+																)
+															}
+														/>
+													</HStack>
+												</HStack>
+												<p className="comment-board__commentText">
+													{ comment }
+												</p>
+											</VStack>
+										) }
+									</>
 								)
 							) }
 						</>
 					) }
-					<VStack spacing="2">
-						{ 0 === commentsCount && (
-							<HStack alignment="left" spacing="1">
-								<Icon
-									icon={ userIcon }
-									className="comment-board__userIcon"
-									size={ 45 }
+					{ ! isEditing && (
+						<VStack spacing="2">
+							{ 0 === commentsCount && (
+								<HStack alignment="left" spacing="1">
+									<Icon
+										icon={ userIcon }
+										className="comment-board__userIcon"
+										size={ 45 }
+									/>
+									<span className="comment-board__userName">
+										{ currentUser }
+									</span>
+								</HStack>
+							) }
+							<TextControl
+								value={ inputComment }
+								onChange={ ( val ) => setInputComment( val ) }
+								placeholder={ __(
+									'Comment or add others with @'
+								) }
+								className="block-editor-format-toolbar__comment-input"
+							/>
+							<HStack alignment="right" spacing="1">
+								<Button
+									className="block-editor-format-toolbar__cancel-button"
+									variant="secondary"
+									text={ __( 'Cancel' ) }
+									onClick={ () => handleCancel() }
 								/>
-								<span className="comment-board__userName">
-									{ currentUser }
-								</span>
+								<Button
+									className="block-editor-format-toolbar__comment-button"
+									variant="primary"
+									text={
+										0 === commentsCount
+											? __( 'Comment' )
+											: __( 'Reply' )
+									}
+									disabled={ 0 === inputComment.length }
+									onClick={ () => saveComment() }
+								/>
 							</HStack>
-						) }
-						<TextControl
-							value={ inputComment }
-							onChange={ ( val ) => setInputComment( val ) }
-							placeholder={ __( 'Comment or add others with @' ) }
-							className="block-editor-format-toolbar__comment-input"
-						/>
-						<HStack alignment="right" spacing="1">
-							<Button
-								className="block-editor-format-toolbar__cancel-button"
-								variant="secondary"
-								text={ __( 'Cancel' ) }
-								onClick={ () => handleCancel() }
-							/>
-							<Button
-								className="block-editor-format-toolbar__comment-button"
-								variant="primary"
-								text={
-									0 === commentsCount
-										? __( 'Comment' )
-										: __( 'Reply' )
-								}
-								disabled={ 0 === inputComment.length }
-								onClick={ () => saveComment() }
-							/>
-						</HStack>
-					</VStack>
+						</VStack>
+					) }
 				</VStack>
 			</Popover>
 			{ showConfirmation && (
@@ -410,4 +531,4 @@ const DiscussionBoard = ( { contentRef, onClose } ) => {
 	);
 };
 
-export default DiscussionBoard;
+export default CollabBoard;
