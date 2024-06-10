@@ -253,6 +253,10 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
+.block-editor-inserter__insertable-blocks-at-selection {
+	border-bottom: $border-width solid $gray-200;
+}
+
 .block-editor-inserter__media-tabs-container,
 .block-editor-inserter__block-patterns-tabs-container {
 	padding: $grid-unit-20;

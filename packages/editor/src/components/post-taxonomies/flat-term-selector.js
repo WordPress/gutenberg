@@ -52,6 +52,14 @@ const termNamesToIds = ( names, terms ) => {
 		.filter( ( id ) => id !== undefined );
 };
 
+/**
+ * Renders a flat term selector component.
+ *
+ * @param {Object} props      The component props.
+ * @param {string} props.slug The slug of the taxonomy.
+ *
+ * @return {JSX.Element} The rendered flat term selector component.
+ */
 export function FlatTermSelector( { slug } ) {
 	const [ values, setValues ] = useState( [] );
 	const [ search, setSearch ] = useState( '' );

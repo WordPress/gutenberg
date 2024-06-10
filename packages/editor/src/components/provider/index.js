@@ -37,6 +37,7 @@ import StartTemplateOptions from '../start-template-options';
 import EditorKeyboardShortcuts from '../global-keyboard-shortcuts';
 import PatternRenameModal from '../pattern-rename-modal';
 import PatternDuplicateModal from '../pattern-duplicate-modal';
+import TemplatePartMenuItems from '../template-part-menu-items';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
@@ -175,7 +176,23 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					'post-only'
 				);
 			},
-			[ post, coreStore, settings ]
+			[ post, settings ]
+		);
+
+		const { editorSettings, selection, isReady } = useSelect(
+			( select ) => {
+				const {
+					getEditorSettings,
+					getEditorSelection,
+					__unstableIsEditorReady,
+				} = select( editorStore );
+				return {
+					editorSettings: getEditorSettings(),
+					isReady: __unstableIsEditorReady(),
+					selection: getEditorSelection(),
+				};
+			},
+			[]
 		);
 		const shouldRenderTemplate = !! template && mode !== 'post-only';
 		const rootLevelPost = shouldRenderTemplate ? template : post;
@@ -200,21 +217,6 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			rootLevelPost.type,
 			rootLevelPost.slug,
 		] );
-		const { editorSettings, selection, isReady } = useSelect(
-			( select ) => {
-				const {
-					getEditorSettings,
-					getEditorSelection,
-					__unstableIsEditorReady,
-				} = select( editorStore );
-				return {
-					editorSettings: getEditorSettings(),
-					isReady: __unstableIsEditorReady(),
-					selection: getEditorSelection(),
-				};
-			},
-			[]
-		);
 		const { id, type } = rootLevelPost;
 		const blockEditorSettings = useBlockEditorSettings(
 			editorSettings,
@@ -291,7 +293,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		// Sets the right rendering mode when loading the editor.
 		useEffect( () => {
 			setRenderingMode( mode );
-		}, [ mode ] );
+		}, [ mode, setRenderingMode ] );
 
 		useHideBlocksFromInserter( post.type, mode );
 
@@ -322,6 +324,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 							{ ! settings.__unstableIsPreviewMode && (
 								<>
 									<PatternsMenuItems />
+									<TemplatePartMenuItems />
 									<ContentOnlySettingsMenu />
 									{ mode === 'template-locked' && (
 										<DisableNonPageContentBlocks />
