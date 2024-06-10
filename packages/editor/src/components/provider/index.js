@@ -300,7 +300,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		// Register the editor commands.
 		useCommands();
 
-		if ( ! isReady ) {
+		if ( ! isReady || ! mode ) {
 			return null;
 		}
 
