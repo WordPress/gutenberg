@@ -21,7 +21,9 @@ import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';
 
 const BUTTONS_HTML = `<!-- wp:buttons -->
-<div class="wp-block-buttons"><!-- wp:button /--></div>
+<div class="wp-block-buttons"><!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button"></a></div>
+<!-- /wp:button --></div>
 <!-- /wp:buttons -->`;
 
 beforeAll( () => {
@@ -248,10 +250,9 @@ describe( 'Buttons block', () => {
 			'Justify items right',
 		].forEach( ( justificationOption ) =>
 			it( `sets ${ justificationOption } option`, async () => {
-				const initialHtml = `<!-- wp:buttons -->
-				<div class="wp-block-buttons"><!-- wp:button /--></div>
-				<!-- /wp:buttons -->`;
-				const screen = await initializeEditor( { initialHtml } );
+				const screen = await initializeEditor( {
+					initialHtml: BUTTONS_HTML,
+				} );
 
 				const [ block ] = await screen.findAllByLabelText(
 					/Buttons Block\. Row 1/
