@@ -23,7 +23,7 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
 } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { getFilename } from '@wordpress/url';
 import { useCallback, Platform, useRef } from '@wordpress/element';
@@ -544,7 +544,7 @@ function BackgroundSizeToolsPanelItem( {
 				<ToggleGroupControlOption
 					key="cover"
 					value="cover"
-					label={ __( 'Cover' ) }
+					label={ _x( 'Cover', 'Scale option for dimensions control' ) }
 				/>
 				<ToggleGroupControlOption
 					key="contain"
