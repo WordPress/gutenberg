@@ -105,6 +105,9 @@ jobs:
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+
             - name: Run the types tests
               run: npm run test:types
 
