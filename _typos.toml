@@ -1,0 +1,12 @@
+[files]
+ignore-files = true
+
+[default.extend-identifiers]
+wordPress = "WordPress"
+Wordpress = "WordPress"
+WordPres  = "WordPress"
+
+
+
+
+
