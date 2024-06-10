@@ -92,6 +92,22 @@ jobs:
             - name: Run the date tests
               run: npm run test:unit:date -- --ci --maxWorkers=${{ steps.cpu-cores.outputs.count }} --cacheDirectory="$HOME/.jest-cache"
 
+    types:
+        name: TypeScript Tests
+        runs-on: ubuntu-latest
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        strategy:
+            fail-fast: false
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+
+            - name: Run the types tests
+              run: npm run test:types
+
     compute-previous-wordpress-version:
         name: Compute previous WordPress version
         runs-on: ubuntu-latest
