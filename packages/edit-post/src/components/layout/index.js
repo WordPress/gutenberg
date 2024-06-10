@@ -137,6 +137,7 @@ function useEditorStyles() {
 		editorSettings.disableLayoutStyles,
 		editorSettings.styles,
 		hasThemeStyleSupport,
+		postType,
 	] );
 }
 
