@@ -40,12 +40,22 @@ function render_block_core_button( $attributes, $content ) {
 	}
 
 	// If the next token is the closing tag, the button is empty.
-	$p->next_token();
-	$is_empty = $p->get_token_name() === $tag;
+	$is_empty = true;
+	while ( $p->next_token() && $tag !== $p->get_token_name() && $is_empty ) {
+		if ( '#comment' !== $p->get_token_type() ) {
+			/**
+			 * Anything else implies this is not empty.
+			 * This might include any text content (including a space),
+			 * inline images or other HTML.
+			 */
+			$is_empty = false;
+		}
+	}
 
 	/*
 	 * When there's no text, render nothing for the block.
-	 * See https://github.com/WordPress/gutenberg/issues/17221.
+	 * See https://github.com/WordPress/gutenberg/issues/17221 for the
+	 * reasoning behind this.
 	 */
 	if ( $is_empty ) {
 		return '';
