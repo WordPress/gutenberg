@@ -44,6 +44,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__experimentalGlobalStylesBaseStyles',
 	'__unstableGalleryWithImageBlocks',
 	'alignWide',
+	'autoConvertFreeform',
 	'blockInspectorTabs',
 	'allowedMimeTypes',
 	'bodyPlaceholder',
