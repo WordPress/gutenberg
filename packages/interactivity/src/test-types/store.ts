@@ -22,10 +22,8 @@ const { actions } = store( 'test', {
 }
 
 {
-	// This is intentionally included to ensure that this test fails on GitHub
-	// before replacing it with @ts-expect-error.
+	// @ts-expect-error
 	const var1: string = actions.sync();
-
 	// @ts-expect-error
 	const var2: Promise< string > = actions.async();
 	// @ts-expect-error
