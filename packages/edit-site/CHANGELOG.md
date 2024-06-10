@@ -2,10 +2,6 @@
 
 ## Unreleased
 
-### Enhancements
-
--   Add ´@wordpress/html-entities´ package to the list of dependencies in package.json. ([#62313](https://github.com/WordPress/gutenberg/pull/62313))
-
 ## 6.0.0 (2024-05-31)
 
 ### Breaking Changes
