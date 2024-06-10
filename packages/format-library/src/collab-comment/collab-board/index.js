@@ -298,7 +298,7 @@ const CollabBoard = ( { contentRef, onClose } ) => {
 											<VStack spacing="2">
 												<HStack
 													alignment="left"
-													spacing="1"
+													spacing="3"
 												>
 													<Icon
 														icon={ userIcon }
@@ -366,7 +366,7 @@ const CollabBoard = ( { contentRef, onClose } ) => {
 												className="comment-board__comment"
 											>
 												<HStack
-													alignment="left"
+													alignment="top"
 													spacing="1"
 													justify="space-between"
 												>
@@ -385,6 +385,7 @@ const CollabBoard = ( { contentRef, onClose } ) => {
 																{ createdBy }
 															</span>
 															<time
+																className="comment-board__dateTime"
 																dateTime={ format(
 																	'c',
 																	timestamp
@@ -425,6 +426,7 @@ const CollabBoard = ( { contentRef, onClose } ) => {
 														) }
 														<Button
 															icon={ editIcon }
+															className="block-editor-format-toolbar__comment-board__edit"
 															label={ __(
 																'Edit comment'
 															) }
@@ -463,7 +465,7 @@ const CollabBoard = ( { contentRef, onClose } ) => {
 					{ ! isEditing && (
 						<VStack spacing="2">
 							{ 0 === commentsCount && (
-								<HStack alignment="left" spacing="1">
+								<HStack alignment="left" spacing="3">
 									<Icon
 										icon={ userIcon }
 										className="comment-board__userIcon"
