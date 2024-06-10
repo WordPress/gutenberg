@@ -65,7 +65,7 @@ export default function InserterSidebar() {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
 		onClose: () => setIsInserterOpened( false ),
-		focusOnMount: true,
+		focusOnMount: false,
 	} );
 	const libraryRef = useRef();
 
