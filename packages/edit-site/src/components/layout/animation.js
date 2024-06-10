@@ -114,6 +114,10 @@ const animate = ( element, config, target = 1, callback ) => {
 	// `n` must be an integer to ensure a finish accurate to the `target` value.
 	const n = Math.ceil( resolvedDuration / ( 1000 / 60 ) );
 
+	// Generates keyframes ahead of time. Doing so supports custom easing functions.
+	// Otherwise, if using standard easing functions the plaform’s animate would need
+	// only the final keyframe. (Well, to avoid an error on some older browsers the
+	// first keyframe is required too.)
 	for ( let i = 0; i <= n; i += 1 ) {
 		const t = origin + delta * easing( i / n );
 		const styles = css( t, 1 - t );
