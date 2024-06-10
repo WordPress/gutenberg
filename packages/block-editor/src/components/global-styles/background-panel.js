@@ -549,12 +549,12 @@ function BackgroundSizeToolsPanelItem( {
 				<ToggleGroupControlOption
 					key="contain"
 					value="contain"
-					label={ __( 'Contain' ) }
+					label={ _x( 'Contain', 'Scale option for dimensions control' ) }
 				/>
 				<ToggleGroupControlOption
 					key="tile"
 					value="auto"
-					label={ __( 'Tile' ) }
+					label={ _x( 'Tile', 'Scale option for dimensions control' ) }
 				/>
 			</ToggleGroupControl>
 			<HStack justify="flex-start" spacing={ 2 } as="span">
