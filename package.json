@@ -350,6 +350,7 @@
 		"test:unit:php:multisite:debug": "npm-run-all test:unit:php:setup:debug test:unit:php:multisite:base",
 		"test:unit:update": "npm run test:unit -- --updateSnapshot",
 		"test:unit:watch": "npm run test:unit -- --watch",
+		"test:types": "node bin/run-test-types.js",
 		"wp-env": "wp-env"
 	},
 	"lint-staged": {
