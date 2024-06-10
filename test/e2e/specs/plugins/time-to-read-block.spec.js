@@ -5,18 +5,14 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Time to Read Block Plugin', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
-		await Promise.all( [
-			requestUtils.activatePlugin( 'time-to-read-block' ),
-			requestUtils.deactivatePlugin( 'gutenberg' ),
-		] );
+		await requestUtils.activatePlugin( 'time-to-read-block' );
+		await requestUtils.deactivatePlugin( 'gutenberg' );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
-		await Promise.all( [
-			await requestUtils.deleteAllPosts(),
-			await requestUtils.deactivatePlugin( 'time-to-read-block' ),
-			await requestUtils.activatePlugin( 'gutenberg' ),
-		] );
+		await requestUtils.deleteAllPosts();
+		await requestUtils.deactivatePlugin( 'time-to-read-block' );
+		await requestUtils.activatePlugin( 'gutenberg' );
 	} );
 
 	test.beforeEach( async ( { admin } ) => {
@@ -38,16 +34,28 @@ test.describe( 'Time to Read Block Plugin', () => {
 		const timeToReadBlock = editor.canvas.locator(
 			'role=document [name="Block: Time to Read"i]'
 		);
-		await expect( timeToReadBlock ).toBeVisible();
-		await expect( timeToReadBlock ).toHaveText( '3 minutes' );
+		await expect(
+			timeToReadBlock,
+			'should be visible in the editor'
+		).toBeVisible();
+		await expect(
+			timeToReadBlock,
+			'should display the estimated time to read the post in the editor'
+		).toHaveText( '3 minutes' );
 
 		// Viewing block in the front end.
 		const postId = await editor.publishPost();
 		await page.goto( `/?p=${ postId }` );
 
 		const timeToRead = page.locator( '.wp-block-gutenberg-time-to-read' );
-		await expect( timeToRead ).toBeVisible();
-		await expect( timeToRead ).toHaveText( '3 minutes' );
+		await expect(
+			timeToRead,
+			'should be visible on the front end'
+		).toBeVisible();
+		await expect(
+			timeToRead,
+			'should display the estimated time to read on the front end'
+		).toHaveText( '3 minutes' );
 	} );
 } );
 
