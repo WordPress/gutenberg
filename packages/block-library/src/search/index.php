@@ -196,12 +196,41 @@ function render_block_core_search( $attributes ) {
 		';
 	}
 
+	$post_type_input = '';
+	$taxonomy_inputs = '';
+
+	if ( $attributes['limitResults'] ) {
+		$post_type  = ! empty( $attributes['postType'] ) ? $attributes['postType'] : '';
+		$taxonomies = ! empty( $attributes['categories'] ) ? $attributes['categories'] : array();
+
+		foreach ( $taxonomies as $taxonomy => $terms ) {
+			if ( ! empty( $terms ) ) {
+				$taxonomy_terms = array_map(
+					function ( $term_id ) use ( $taxonomy ) {
+						$term = get_term_by( 'id', $term_id, $taxonomy );
+						return $term ? $term->slug : '';
+					},
+					$terms
+				);
+
+				$input_name       = ( 'category' === $taxonomy ) ? 'category_name' : ( ( 'post_tag' === $taxonomy ) ? 'tag' : $taxonomy );
+				$taxonomy_input   = sprintf( '<input type="hidden" name="%s" value="%s" />', esc_attr( $input_name ), esc_attr( implode( ',', $taxonomy_terms ) ) );
+				$taxonomy_inputs .= $taxonomy_input;
+			}
+		}
+
+		if ( ! empty( $post_type ) ) {
+			$post_type_input = sprintf( '<input type="hidden" name="post_type" value="%s" />', esc_attr( $post_type ) );
+		}
+	}
+
 	return sprintf(
-		'<form role="search" method="get" action="%1s" %2s %3s>%4s</form>',
+		'<form role="search" method="get" action="%1s" %2s %3s>%4s %5$s</form>',
 		esc_url( home_url( '/' ) ),
 		$wrapper_attributes,
 		$form_directives,
-		$label . $field_markup
+		$label . $field_markup,
+		$post_type_input . $taxonomy_inputs
 	);
 }
 
