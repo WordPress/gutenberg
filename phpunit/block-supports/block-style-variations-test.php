@@ -63,6 +63,11 @@ class WP_Block_Supports_Block_Style_Variations_Test extends WP_UnitTestCase {
 	public function test_add_registered_block_styles_to_theme_data() {
 		switch_theme( 'block-theme' );
 
+		// Trigger block style registration that occurs on `init` action.
+		// do_action( 'init' ) could be used here however this direct call
+		// means only the updates being tested are performed.
+		gutenberg_register_block_style_variations_from_theme();
+
 		$variation_styles_data = array(
 			'color'    => array(
 				'background' => 'darkslateblue',
