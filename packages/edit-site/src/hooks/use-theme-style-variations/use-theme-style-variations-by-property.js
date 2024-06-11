@@ -164,33 +164,15 @@ export default function useThemeStyleVariationsByProperty( {
 					return accumulator;
 				}
 
-				const variationFilteredByProperty = filterObjectByProperty(
-					cloneDeep( variation ),
-					property
-				);
-
-				// Remove variations that are empty once the property is filtered out.
-				if (
-					variation.title !== __( 'Default' ) &&
-					Object.keys( variationFilteredByProperty ).length === 0
-				) {
-					return accumulator;
-				}
-
-				let result = {
-					...variationFilteredByProperty,
-					title: variation?.title,
-					description: variation?.description,
-				};
-
+				/*
+				 * Overwrites all baseVariation object `styleProperty` properties
+				 * with the theme variation `styleProperty` properties.
+				 */
+				let result = variation;
 				if ( clonedBaseVariation ) {
-					/*
-					 * Overwrites all baseVariation object `styleProperty` properties
-					 * with the theme variation `styleProperty` properties.
-					 */
 					result = mergeBaseAndUserConfigs(
 						clonedBaseVariation,
-						result
+						variation
 					);
 				}
 
