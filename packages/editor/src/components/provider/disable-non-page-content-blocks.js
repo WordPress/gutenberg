@@ -6,7 +6,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 
-export const DEFAULT_CONTENT_ONLY_BLOCKS = [
+const DEFAULT_CONTENT_ONLY_BLOCKS = [
 	'core/post-title',
 	'core/post-featured-image',
 	'core/post-content',
