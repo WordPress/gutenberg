@@ -383,6 +383,31 @@ function gutenberg_enqueue_block_style_variation_styles() {
 // Register the block support.
 WP_Block_Supports::get_instance()->register( 'block-style-variation', array() );
 
+// Remove core filters and action.
+if ( function_exists( 'wp_render_block_style_variation_support_styles' ) ) {
+	remove_filter( 'render_block_data', 'wp_render_block_style_variation_support_styles' );
+}
+if ( function_exists( 'wp_render_block_style_variation_class_name' ) ) {
+	remove_filter( 'render_block', 'wp_render_block_style_variation_class_name' );
+}
+if ( function_exists( 'wp_enqueue_block_style_variation_styles' ) ) {
+	remove_action( 'wp_enqueue_scripts', 'wp_enqueue_block_style_variation_styles' );
+}
+
+if ( function_exists( 'wp_resolve_block_style_variations_from_primary_theme_json' ) ) {
+	remove_filter( 'wp_theme_json_data_theme', 'wp_resolve_block_style_variations_from_primary_theme_json' );
+}
+if ( function_exists( 'wp_resolve_block_style_variations_from_theme_json_partials' ) ) {
+	remove_filter( 'wp_theme_json_data_theme', 'wp_resolve_block_style_variations_from_theme_json_partials' );
+}
+if ( function_exists( 'wp_resolve_block_style_variations_from_styles_registry' ) ) {
+	remove_filter( 'wp_theme_json_data_theme', 'wp_resolve_block_style_variations_from_styles_registry' );
+}
+if ( function_exists( 'wp_resolve_block_style_variations_from_theme_style_variation' ) ) {
+	remove_filter( 'wp_theme_json_data_user', 'wp_resolve_block_style_variations_from_theme_style_variation' );
+}
+
+// Add Gutenberg filters and action.
 add_filter( 'render_block_data', 'gutenberg_render_block_style_variation_support_styles', 10, 2 );
 add_filter( 'render_block', 'gutenberg_render_block_style_variation_class_name', 10, 2 );
 add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_block_style_variation_styles', 1 );
