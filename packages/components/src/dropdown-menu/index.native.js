@@ -6,7 +6,6 @@ import { Platform } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { BottomSheet, PanelBody } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { menu } from '@wordpress/icons';
 
@@ -15,6 +14,8 @@ import { menu } from '@wordpress/icons';
  */
 import Button from '../button';
 import Dropdown from '../dropdown';
+import BottomSheet from '../mobile/bottom-sheet';
+import PanelBody from '../panel/body';
 
 function mergeProps( defaultProps = {}, props = {} ) {
 	const mergedProps = {

@@ -39,7 +39,7 @@ const backgroundImage = {
 };
 
 const backgroundPosition = {
-	name: 'backgroundRepeat',
+	name: 'backgroundPosition',
 	generate: ( style: Style, options: StyleOptions ) => {
 		return generateRule(
 			style,

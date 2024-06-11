@@ -50,6 +50,18 @@ const afterNextFrame = ( callback: () => void ) => {
 };
 
 /**
+ * Returns a promise that resolves after yielding to main.
+ *
+ * @return Promise
+ */
+export const yieldToMain = () => {
+	return new Promise( ( resolve ) => {
+		// TODO: Use scheduler.yield() when available.
+		setTimeout( resolve, 0 );
+	} );
+};
+
+/**
  * Creates a Flusher object that can be used to flush computed values and notify listeners.
  *
  * Using the mangled properties:
@@ -62,8 +74,8 @@ const afterNextFrame = ( callback: () => void ) => {
  * @return The Flusher object with `flush` and `dispose` properties.
  */
 function createFlusher( compute: () => unknown, notify: () => void ): Flusher {
-	let flush: () => void;
-	const dispose = effect( function () {
+	let flush: () => void = () => undefined;
+	const dispose = effect( function ( this: any ) {
 		flush = this.c.bind( this );
 		this.x = compute;
 		this.c = notify;
@@ -82,7 +94,7 @@ function createFlusher( compute: () => unknown, notify: () => void ): Flusher {
  */
 export function useSignalEffect( callback: () => unknown ) {
 	_useEffect( () => {
-		let eff = null;
+		let eff: Flusher | null = null;
 		let isExecuting = false;
 
 		const notify = async () => {
@@ -273,7 +285,7 @@ export const createRootFragment = (
 	parent: Element,
 	replaceNode: Node | Node[]
 ) => {
-	replaceNode = [].concat( replaceNode );
+	replaceNode = ( [] as Node[] ).concat( replaceNode );
 	const sibling = replaceNode[ replaceNode.length - 1 ].nextSibling;
 	function insert( child: any, root: any ) {
 		parent.insertBefore( child, root || sibling );
@@ -289,4 +301,48 @@ export const createRootFragment = (
 			parent.removeChild( c );
 		},
 	} );
+};
+
+/**
+ * Transforms a kebab-case string to camelCase.
+ *
+ * @param str The kebab-case string to transform to camelCase.
+ * @return The transformed camelCase string.
+ */
+export function kebabToCamelCase( str: string ): string {
+	return str
+		.replace( /^-+|-+$/g, '' )
+		.toLowerCase()
+		.replace( /-([a-z])/g, function ( _match, group1: string ) {
+			return group1.toUpperCase();
+		} );
+}
+
+const logged: Set< string > = new Set();
+
+/**
+ * Shows a warning with `message` if environment is not `production`.
+ *
+ * Based on the `@wordpress/warning` package.
+ *
+ * @param message Message to show in the warning.
+ */
+export const warn = ( message: string ): void => {
+	if ( globalThis.SCRIPT_DEBUG ) {
+		if ( logged.has( message ) ) {
+			return;
+		}
+
+		// eslint-disable-next-line no-console
+		console.warn( message );
+
+		// Throwing an error and catching it immediately to improve debugging
+		// A consumer can use 'pause on caught exceptions'
+		try {
+			throw Error( message );
+		} catch ( e ) {
+			// Do nothing.
+		}
+		logged.add( message );
+	}
 };

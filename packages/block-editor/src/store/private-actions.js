@@ -6,7 +6,6 @@ import { Platform } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { undoIgnoreBlocks } from './undo-ignore';
 import { store as blockEditorStore } from './index';
 import { unlock } from '../lock-unlock';
 
@@ -293,34 +292,6 @@ export function deleteStyleOverride( id ) {
 }
 
 /**
- * A higher-order action that mark every change inside a callback as "non-persistent"
- * and ignore pushing to the undo history stack. It's primarily used for synchronized
- * derived updates from the block editor without affecting the undo history.
- *
- * @param {() => void} callback The synchronous callback to derive updates.
- */
-export function syncDerivedUpdates( callback ) {
-	return ( { dispatch, select, registry } ) => {
-		registry.batch( () => {
-			// Mark every change in the `callback` as non-persistent.
-			dispatch( {
-				type: 'SET_EXPLICIT_PERSISTENT',
-				isPersistentChange: false,
-			} );
-			callback();
-			dispatch( {
-				type: 'SET_EXPLICIT_PERSISTENT',
-				isPersistentChange: undefined,
-			} );
-
-			// Ignore pushing undo stack for the updated blocks.
-			const updatedBlocks = select.getBlocks();
-			undoIgnoreBlocks.add( updatedBlocks );
-		} );
-	};
-}
-
-/**
  * Action that sets the element that had focus when focus leaves the editor canvas.
  *
  * @param {Object} lastFocus The last focused element.
@@ -391,3 +362,27 @@ export function expandBlock( clientId ) {
 		clientId,
 	};
 }
+
+/**
+ * Temporarily modify/unlock the content-only block for editions.
+ *
+ * @param {string} clientId The client id of the block.
+ */
+export const modifyContentLockBlock =
+	( clientId ) =>
+	( { select, dispatch } ) => {
+		dispatch.__unstableMarkNextChangeAsNotPersistent();
+		dispatch.updateBlockAttributes( clientId, {
+			templateLock: undefined,
+		} );
+		dispatch.updateBlockListSettings( clientId, {
+			...select.getBlockListSettings( clientId ),
+			templateLock: false,
+		} );
+		const focusModeToRevert = select.getSettings().focusMode;
+		dispatch.updateSettings( { focusMode: true } );
+		dispatch.__unstableSetTemporarilyEditingAsBlocks(
+			clientId,
+			focusModeToRevert
+		);
+	};

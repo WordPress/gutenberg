@@ -18,6 +18,7 @@ import {
 } from '@wordpress/blocks';
 import { speak } from '@wordpress/a11y';
 import { __, _n, sprintf } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
 import { create, insert, remove, toHTMLString } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
 
@@ -872,6 +873,30 @@ export const __unstableSplitSelection =
 			typeof selectionB.attributeKey === 'string'
 				? selectionB.attributeKey
 				: findRichTextAttributeKey( blockBType );
+		const blockAttributes = select.getBlockAttributes(
+			selectionA.clientId
+		);
+		const bindings = blockAttributes?.metadata?.bindings;
+
+		// If the attribute is bound, don't split the selection and insert a new block instead.
+		if ( bindings?.[ attributeKeyA ] ) {
+			// Show warning if user tries to insert a block into another block with bindings.
+			if ( blocks.length ) {
+				const { createWarningNotice } =
+					registry.dispatch( noticesStore );
+				createWarningNotice(
+					__(
+						"Blocks can't be inserted into other blocks with bindings"
+					),
+					{
+						type: 'snackbar',
+					}
+				);
+				return;
+			}
+			dispatch.insertAfterBlock( selectionA.clientId );
+			return;
+		}
 
 		// Can't split if the selection is not set.
 		if (
@@ -918,9 +943,7 @@ export const __unstableSplitSelection =
 						  );
 				}
 
-				const length = select.getBlockAttributes( selectionA.clientId )[
-					attributeKeyA
-				].length;
+				const length = blockAttributes[ attributeKeyA ].length;
 
 				if ( selectionA.offset === 0 && length ) {
 					dispatch.insertBlocks(
@@ -1000,7 +1023,10 @@ export const __unstableSplitSelection =
 			const first = firstBlocks.shift();
 			head = {
 				...head,
-				attributes: headType.merge( head.attributes, first.attributes ),
+				attributes: {
+					...head.attributes,
+					...headType.merge( head.attributes, first.attributes ),
+				},
 			};
 			output.push( head );
 			selection = {
@@ -1034,10 +1060,10 @@ export const __unstableSplitSelection =
 				const last = lastBlocks.pop();
 				output.push( {
 					...tail,
-					attributes: tailType.merge(
-						last.attributes,
-						tail.attributes
-					),
+					attributes: {
+						...tail.attributes,
+						...tailType.merge( last.attributes, tail.attributes ),
+					},
 				} );
 				output.push( ...lastBlocks );
 				selection = {
@@ -1506,11 +1532,18 @@ export const insertDefaultBlock =
 	};
 
 /**
- * Action that changes the nested settings of a given block.
+ * @typedef {Object< string, Object >} SettingsByClientId
+ */
+
+/**
+ * Action that changes the nested settings of the given block(s).
  *
- * @param {string} clientId Client ID of the block whose nested setting are
- *                          being received.
- * @param {Object} settings Object with the new settings for the nested block.
+ * @param {string | SettingsByClientId} clientId Client ID of the block whose
+ *                                               nested setting are being
+ *                                               received, or object of settings
+ *                                               by client ID.
+ * @param {Object}                      settings Object with the new settings
+ *                                               for the nested block.
  *
  * @return {Object} Action object
  */
@@ -1612,42 +1645,31 @@ export const __unstableSetEditorMode =
 		// When switching to zoom-out mode, we need to select the parent section
 		if ( mode === 'zoom-out' ) {
 			const firstSelectedClientId = select.getBlockSelectionStart();
-			const allBlocks = select.getBlocks();
-
 			const { sectionRootClientId } = unlock(
 				registry.select( STORE_NAME ).getSettings()
 			);
-			if ( sectionRootClientId ) {
-				const sectionClientIds =
-					select.getBlockOrder( sectionRootClientId );
-				const lastSectionClientId =
-					sectionClientIds[ sectionClientIds.length - 1 ];
-				if ( sectionClientIds ) {
-					if ( firstSelectedClientId ) {
-						const parents = select.getBlockParents(
-							firstSelectedClientId
-						);
-						const firstSectionClientId = parents.find( ( parent ) =>
+			if ( firstSelectedClientId ) {
+				let sectionClientId;
+
+				if ( sectionRootClientId ) {
+					const sectionClientIds =
+						select.getBlockOrder( sectionRootClientId );
+					sectionClientId = select
+						.getBlockParents( firstSelectedClientId )
+						.find( ( parent ) =>
 							sectionClientIds.includes( parent )
 						);
-						if ( firstSectionClientId ) {
-							dispatch.selectBlock( firstSectionClientId );
-						} else {
-							dispatch.selectBlock( lastSectionClientId );
-						}
-					} else {
-						dispatch.selectBlock( lastSectionClientId );
-					}
+				} else {
+					sectionClientId = select.getBlockHierarchyRootClientId(
+						firstSelectedClientId
+					);
 				}
-			} else if ( firstSelectedClientId ) {
-				const rootClientId = select.getBlockHierarchyRootClientId(
-					firstSelectedClientId
-				);
-				dispatch.selectBlock( rootClientId );
-			} else {
-				// If there's no block selected and no sectionRootClientId, select the last root block.
-				const lastRootBlock = allBlocks[ allBlocks.length - 1 ];
-				dispatch.selectBlock( lastRootBlock?.clientId );
+
+				if ( sectionClientId ) {
+					dispatch.selectBlock( sectionClientId );
+				} else {
+					dispatch.clearSelectedBlock();
+				}
 			}
 		}
 
@@ -1988,7 +2010,7 @@ export function __unstableSetTemporarilyEditingAsBlocks(
  * 	 		per_page: 'page_size',
  * 	 		search: 'q',
  * 	 	};
- * 	 	const url = new URL( 'https://api.openverse.engineering/v1/images/' );
+ * 	 	const url = new URL( 'https://api.openverse.org/v1/images/' );
  * 	 	Object.entries( finalQuery ).forEach( ( [ key, value ] ) => {
  * 	 		const queryKey = mapFromInserterMediaRequest[ key ] || key;
  * 	 		url.searchParams.set( queryKey, value );

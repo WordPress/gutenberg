@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/scripts",
-	"version": "27.8.0",
+	"version": "28.0.0",
 	"description": "Collection of reusable scripts for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -19,8 +19,8 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=18",
-		"npm": ">=6.14.4"
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
 	},
 	"files": [
 		"bin",
@@ -79,6 +79,7 @@
 		"react-refresh": "^0.14.0",
 		"read-pkg-up": "^7.0.1",
 		"resolve-bin": "^0.4.0",
+		"rtlcss-webpack-plugin": "^4.0.7",
 		"sass": "^1.35.2",
 		"sass-loader": "^12.1.0",
 		"source-map-loader": "^3.0.0",

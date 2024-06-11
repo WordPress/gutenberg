@@ -580,11 +580,11 @@ function GalleryEdit( props ) {
 						/>
 					) }
 					{ Platform.isWeb && ! imageSizeOptions && hasImageIds && (
-						<BaseControl className={ 'gallery-image-sizes' }>
+						<BaseControl className="gallery-image-sizes">
 							<BaseControl.VisualLabel>
 								{ __( 'Resolution' ) }
 							</BaseControl.VisualLabel>
-							<View className={ 'gallery-image-sizes__loading' }>
+							<View className="gallery-image-sizes__loading">
 								<Spinner />
 								{ __( 'Loading options…' ) }
 							</View>

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import clsx from 'clsx';
-
 /**
  * WordPress dependencies
  */
@@ -31,14 +30,12 @@ import usePostTitle from './use-post-title';
 import PostTypeSupportCheck from '../post-type-support-check';
 
 function PostTitle( _, forwardedRef ) {
-	const { placeholder, hasFixedToolbar } = useSelect( ( select ) => {
+	const { placeholder } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
-		const { titlePlaceholder, hasFixedToolbar: _hasFixedToolbar } =
-			getSettings();
+		const { titlePlaceholder } = getSettings();
 
 		return {
 			placeholder: titlePlaceholder,
-			hasFixedToolbar: _hasFixedToolbar,
 		};
 	}, [] );
 
@@ -187,7 +184,6 @@ function PostTitle( _, forwardedRef ) {
 	// This same block is used in both the visual and the code editor.
 	const className = clsx( DEFAULT_CLASSNAMES, {
 		'is-selected': isSelected,
-		'has-fixed-toolbar': hasFixedToolbar,
 	} );
 
 	return (
@@ -211,4 +207,12 @@ function PostTitle( _, forwardedRef ) {
 	);
 }
 
+/**
+ * Renders the `PostTitle` component.
+ *
+ * @param {Object}  _            Unused parameter.
+ * @param {Element} forwardedRef Forwarded ref for the component.
+ *
+ * @return {Component} The rendered PostTitle component.
+ */
 export default forwardRef( PostTitle );

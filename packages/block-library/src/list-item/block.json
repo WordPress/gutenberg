@@ -21,8 +21,8 @@
 	},
 	"supports": {
 		"className": false,
+		"__experimentalSelector": ".wp-block-list > li",
 		"splitting": true,
-		"__experimentalSelector": "li",
 		"spacing": {
 			"margin": true,
 			"padding": true,

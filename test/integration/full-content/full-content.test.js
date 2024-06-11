@@ -82,7 +82,7 @@ describe( 'full post content fixture', () => {
 			formSubmissionNotification,
 		] );
 
-		if ( process.env.IS_GUTENBERG_PLUGIN ) {
+		if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 			__experimentalRegisterExperimentalCoreBlocks( {
 				enableFSEBlocks: true,
 			} );

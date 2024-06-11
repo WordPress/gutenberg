@@ -337,7 +337,9 @@ function PushChangesToGlobalStylesControl( {
 				{ __( 'Styles' ) }
 			</BaseControl.VisualLabel>
 			<Button
-				variant="primary"
+				__next40pxDefaultSize
+				variant="secondary"
+				__experimentalIsFocusable
 				disabled={ changes.length === 0 }
 				onClick={ pushChanges }
 			>

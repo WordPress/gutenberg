@@ -11,13 +11,18 @@ import {
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
-import { PATTERN_DEFAULT_CATEGORY, PATTERN_SYNC_TYPES } from '../constants';
+import {
+	PATTERN_DEFAULT_CATEGORY,
+	PATTERN_SYNC_TYPES,
+	PATTERN_TYPES,
+} from '../constants';
 import { store as patternsStore } from '../store';
 import CategorySelector from './category-selector';
 import { useAddPatternCategory } from '../private-hooks';
@@ -25,12 +30,18 @@ import { unlock } from '../lock-unlock';
 
 export default function CreatePatternModal( {
 	className = 'patterns-menu-items__convert-modal',
-	modalTitle = __( 'Create pattern' ),
+	modalTitle,
 	...restProps
 } ) {
+	const defaultModalTitle = useSelect(
+		( select ) =>
+			select( coreStore ).getPostType( PATTERN_TYPES.user )?.labels
+				?.add_new_item,
+		[]
+	);
 	return (
 		<Modal
-			title={ modalTitle }
+			title={ modalTitle || defaultModalTitle }
 			onRequestClose={ restProps.onClose }
 			overlayClassName={ className }
 		>
@@ -40,7 +51,7 @@ export default function CreatePatternModal( {
 }
 
 export function CreatePatternModalContents( {
-	confirmLabel = __( 'Create' ),
+	confirmLabel = __( 'Add' ),
 	defaultCategories = [],
 	content,
 	onClose,
@@ -118,10 +129,7 @@ export function CreatePatternModalContents( {
 					categoryMap={ categoryMap }
 				/>
 				<ToggleControl
-					label={ _x(
-						'Synced',
-						'Option that makes an individual pattern synchronized'
-					) }
+					label={ _x( 'Synced', 'pattern (singular)' ) }
 					help={ __(
 						'Sync this pattern across multiple locations.'
 					) }

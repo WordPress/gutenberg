@@ -4,8 +4,8 @@
 	"compilerOptions": {
 		"rootDir": "src",
 		"declarationDir": "build-types",
-		"checkJs": false,
-		"strict": false
+
+		"noImplicitAny": false
 	},
 	"include": [ "src/**/*" ]
 }

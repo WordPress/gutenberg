@@ -9,10 +9,7 @@
 			"gutenberg-test-env",
 			"jest",
 			"@testing-library/jest-dom"
-		],
-		// TODO: Remove `skipLibCheck` after resolving duplicate declaration of the `process` variable
-		// between `@types/webpack-env` (from @storybook packages) and `gutenberg-env`.
-		"skipLibCheck": true
+		]
 	},
 	"references": [
 		{ "path": "../a11y" },

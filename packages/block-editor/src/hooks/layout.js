@@ -32,6 +32,7 @@ import { useBlockSettings, useStyleOverride } from './utils';
 import { unlock } from '../lock-unlock';
 
 const layoutBlockSupportKey = 'layout';
+const { kebabCase } = unlock( componentsPrivateApis );
 
 function hasLayoutBlockSupport( blockName ) {
 	return (
@@ -49,7 +50,6 @@ function hasLayoutBlockSupport( blockName ) {
  * @return { Array } Array of CSS classname strings.
  */
 export function useLayoutClasses( blockAttributes = {}, blockName = '' ) {
-	const { kebabCase } = unlock( componentsPrivateApis );
 	const { layout } = blockAttributes;
 	const { default: defaultBlockLayout } =
 		getBlockSupport( blockName, layoutBlockSupportKey ) || {};
@@ -371,7 +371,6 @@ function BlockWithLayoutStyles( {
 			? { ...layout, type: 'constrained' }
 			: layout || defaultBlockLayout || {};
 
-	const { kebabCase } = unlock( componentsPrivateApis );
 	const selectorPrefix = `wp-container-${ kebabCase( name ) }-is-layout-`;
 	// Higher specificity to override defaults from theme.json.
 	const selector = `.${ selectorPrefix }${ id }`;

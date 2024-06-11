@@ -201,13 +201,14 @@ export function blockStyles( state = {}, action ) {
 				),
 			};
 		case 'ADD_BLOCK_STYLES':
-			return {
-				...state,
-				[ action.blockName ]: getUniqueItemsByName( [
-					...( state[ action.blockName ] ?? [] ),
+			const updatedStyles = {};
+			action.blockNames.forEach( ( blockName ) => {
+				updatedStyles[ blockName ] = getUniqueItemsByName( [
+					...( state[ blockName ] ?? [] ),
 					...action.styles,
-				] ),
-			};
+				] );
+			} );
+			return { ...state, ...updatedStyles };
 		case 'REMOVE_BLOCK_STYLES':
 			return {
 				...state,
@@ -378,8 +379,9 @@ export function blockBindingsSources( state = {}, action ) {
 				label: action.sourceLabel,
 				getValue: action.getValue,
 				setValue: action.setValue,
+				setValues: action.setValues,
 				getPlaceholder: action.getPlaceholder,
-				lockAttributesEditing: action.lockAttributesEditing ?? true,
+				canUserEditValue: action.canUserEditValue || ( () => false ),
 			},
 		};
 	}
