@@ -23,7 +23,7 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
 } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { getFilename } from '@wordpress/url';
 import { useCallback, Platform, useRef } from '@wordpress/element';
@@ -544,17 +544,26 @@ function BackgroundSizeToolsPanelItem( {
 				<ToggleGroupControlOption
 					key="cover"
 					value="cover"
-					label={ __( 'Cover' ) }
+					label={ _x(
+						'Cover',
+						'Size option for background image control'
+					) }
 				/>
 				<ToggleGroupControlOption
 					key="contain"
 					value="contain"
-					label={ __( 'Contain' ) }
+					label={ _x(
+						'Contain',
+						'Size option for background image control'
+					) }
 				/>
 				<ToggleGroupControlOption
 					key="tile"
 					value="auto"
-					label={ __( 'Tile' ) }
+					label={ _x(
+						'Tile',
+						'Size option for background image control'
+					) }
 				/>
 			</ToggleGroupControl>
 			<HStack justify="flex-start" spacing={ 2 } as="span">
