@@ -4,6 +4,11 @@
 import { createRoot, StrictMode } from '@wordpress/element';
 
 /**
+ * Internal dependencies
+ */
+import PostsApp from './components/posts-app';
+
+/**
  * Initializes the "Posts Dashboard"
  * @param {string} id DOM element id.
  */
@@ -14,7 +19,11 @@ export function initializePostsDashboard( id ) {
 	const target = document.getElementById( id );
 	const root = createRoot( target );
 
-	root.render( <StrictMode>Welcome To Posts</StrictMode> );
+	root.render(
+		<StrictMode>
+			<PostsApp />
+		</StrictMode>
+	);
 
 	return root;
 }
