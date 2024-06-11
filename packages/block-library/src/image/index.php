@@ -258,12 +258,8 @@ function block_core_image_print_lightbox_overlay() {
 			data-wp-class--show-closing-animation="state.showClosingAnimation"
 			data-wp-watch="callbacks.setOverlayFocus"
 			data-wp-on--keydown="actions.handleKeydown"
-			data-wp-on-async--touchstart="actions.handleTouchStart"
-			data-wp-on--touchmove="actions.handleTouchMove"
-			data-wp-on-async--touchend="actions.handleTouchEnd"
 			data-wp-on-async--click="actions.hideLightbox"
 			data-wp-on-async-window--resize="callbacks.setOverlayStyles"
-			data-wp-on-async-window--scroll="actions.handleScroll"
 			tabindex="-1"
 			>
 				<button type="button" aria-label="$close_button_label" style="fill: $close_button_color" class="close-button">

@@ -4,22 +4,6 @@
 import { store, getContext, getElement } from '@wordpress/interactivity';
 
 /**
- * Tracks whether user is touching screen; used to differentiate behavior for
- * touch and mouse input.
- *
- * @type {boolean}
- */
-let isTouching = false;
-
-/**
- * Tracks the last time the screen was touched; used to differentiate behavior
- * for touch and mouse input.
- *
- * @type {number}
- */
-let lastTouchTime = 0;
-
-/**
  * Stores the image reference of the currently opened lightbox.
  *
  * @type {HTMLElement}
@@ -77,7 +61,11 @@ const { state, actions, callbacks } = store(
 				state.scrollTopReset = document.documentElement.scrollTop;
 				state.scrollLeftReset = document.documentElement.scrollLeft;
 
-				// Moves the information of the expaned image to the state.
+				// store the overflow state of the document to restore it later
+				state.documentOverflow = document.body.style.overflow;
+				document.body.style.overflow = 'hidden';
+
+				// Moves the information of the expanded image to the state.
 				ctx.currentSrc = ctx.imageRef.currentSrc;
 				imageRef = ctx.imageRef;
 				buttonRef = ctx.buttonRef;
@@ -106,6 +94,9 @@ const { state, actions, callbacks } = store(
 						state.currentImage = {};
 						imageRef = null;
 						buttonRef = null;
+
+						// Restore document overflow
+						document.body.style.overflow = state.documentOverflow;
 					}, 450 );
 
 					// Starts the overlay closing animation. The showClosingAnimation
@@ -125,49 +116,6 @@ const { state, actions, callbacks } = store(
 					// Closes the lightbox when the user presses the escape key.
 					if ( event.key === 'Escape' ) {
 						actions.hideLightbox();
-					}
-				}
-			},
-			handleTouchMove( event ) {
-				// On mobile devices, prevents triggering the scroll event because
-				// otherwise the page jumps around when it resets the scroll position.
-				// This also means that closing the lightbox requires that a user
-				// perform a simple tap. This may be changed in the future if there is a
-				// better alternative to override or reset the scroll position during
-				// swipe actions.
-				if ( state.overlayEnabled ) {
-					event.preventDefault();
-				}
-			},
-			handleTouchStart() {
-				isTouching = true;
-			},
-			handleTouchEnd() {
-				// Waits a few milliseconds before resetting to ensure that pinch to
-				// zoom works consistently on mobile devices when the lightbox is open.
-				lastTouchTime = Date.now();
-				isTouching = false;
-			},
-			handleScroll() {
-				// Prevents scrolling behaviors that trigger content shift while the
-				// lightbox is open. It would be better to accomplish through CSS alone,
-				// but using overflow: hidden is currently the only way to do so and
-				// that causes a layout to shift and prevents the zoom animation from
-				// working in some cases because it's not possible to account for the
-				// layout shift when doing the animation calculations. Instead, it uses
-				// JavaScript to prevent and reset the scrolling behavior.
-				if ( state.overlayOpened ) {
-					// Avoids overriding the scroll behavior on mobile devices because
-					// doing so breaks the pinch to zoom functionality, and users should
-					// be able to zoom in further on the high-res image.
-					if ( ! isTouching && Date.now() - lastTouchTime > 450 ) {
-						// It doesn't rely on `event.preventDefault()` to prevent scrolling
-						// because the scroll event can't be canceled, so it resets the
-						// position instead.
-						window.scrollTo(
-							state.scrollLeftReset,
-							state.scrollTopReset
-						);
 					}
 				}
 			},
