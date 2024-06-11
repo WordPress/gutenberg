@@ -42,6 +42,7 @@ function useEditorCommandLoader() {
 		isViewable,
 		isCodeEditingEnabled,
 		isRichEditingEnabled,
+		isBlockTheme,
 		isPublishSidebarEnabled,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
@@ -61,6 +62,7 @@ function useEditorCommandLoader() {
 			isViewable: getPostType( getCurrentPostType() )?.viewable ?? false,
 			isCodeEditingEnabled: getEditorSettings().codeEditingEnabled,
 			isRichEditingEnabled: getEditorSettings().richEditingEnabled,
+			isBlockTheme: getEditorSettings().__unstableIsBlockBasedTheme,
 			isPublishSidebarEnabled:
 				select( editorStore ).isPublishSidebarEnabled(),
 		};
@@ -112,6 +114,17 @@ function useEditorCommandLoader() {
 			openModal( 'editor/preferences' );
 		},
 	} );
+	
+	if ( isBlockTheme ) {
+		commands.push( {
+			name: 'core/toggle-font-library',
+			label: __( 'Font Library' ),
+			callback: () => {
+				console.log('open font library');
+				openModal( 'editor/font-library' );
+			},
+		} );
+	}
 
 	commands.push( {
 		name: 'core/toggle-spotlight-mode',

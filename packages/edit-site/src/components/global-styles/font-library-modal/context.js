@@ -110,7 +110,7 @@ function FontLibraryProvider( { children } ) {
 	};
 
 	// Library Fonts
-	const [ modalTabOpen, setModalTabOpen ] = useState( false );
+	const [ activeTab, setActiveTab ] = useState( false );
 	const [ libraryFontSelected, setLibraryFontSelected ] = useState( null );
 
 	// Themes Fonts are the fonts defined in the global styles (database persisted theme.json data).
@@ -133,10 +133,10 @@ function FontLibraryProvider( { children } ) {
 		: [];
 
 	useEffect( () => {
-		if ( ! modalTabOpen ) {
+		if ( ! activeTab ) {
 			setLibraryFontSelected( null );
 		}
-	}, [ modalTabOpen ] );
+	}, [ activeTab ] );
 
 	const handleSetLibraryFontSelected = ( font ) => {
 		setNotice( null );
@@ -524,8 +524,8 @@ function FontLibraryProvider( { children } ) {
 				uninstallFontFamily,
 				toggleActivateFont,
 				getAvailableFontsOutline,
-				modalTabOpen,
-				setModalTabOpen,
+				activeTab,
+				setActiveTab,
 				refreshLibrary,
 				notice,
 				setNotice,
