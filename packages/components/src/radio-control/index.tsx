@@ -73,7 +73,7 @@ export function RadioControl(
 			help={ help }
 			className={ clsx( className, 'components-radio-control' ) }
 		>
-			<VStack spacing={ 1 }>
+			<VStack spacing={ 3 }>
 				{ options.map( ( option, index ) => (
 					<div
 						key={ `${ id }-${ index }` }

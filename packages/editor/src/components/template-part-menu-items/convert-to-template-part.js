@@ -9,15 +9,11 @@ import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { symbolFilled } from '@wordpress/icons';
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../../lock-unlock';
-import { store as editSiteStore } from '../../store';
-
-const { CreateTemplatePartModal } = unlock( editorPrivateApis );
+import CreateTemplatePartModal from '../create-template-part-modal';
 
 export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
@@ -25,10 +21,11 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
 	const { canCreate } = useSelect( ( select ) => {
-		const { supportsTemplatePartsMode } =
-			select( editSiteStore ).getSettings();
 		return {
-			canCreate: ! supportsTemplatePartsMode,
+			canCreate:
+				select( blockEditorStore ).canInsertBlockType(
+					'core/template-part'
+				),
 		};
 	}, [] );
 

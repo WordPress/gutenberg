@@ -260,14 +260,6 @@ const variations = [
 		attributes: { providerNameSlug: 'scribd', responsive: true },
 	},
 	{
-		name: 'slideshare',
-		title: 'Slideshare',
-		icon: embedContentIcon,
-		description: __( 'Embed Slideshare content.' ),
-		patterns: [ /^https?:\/\/(.+?\.)?slideshare\.net\/.+/i ],
-		attributes: { providerNameSlug: 'slideshare', responsive: true },
-	},
-	{
 		name: 'smugmug',
 		title: 'SmugMug',
 		icon: embedPhotoIcon,
