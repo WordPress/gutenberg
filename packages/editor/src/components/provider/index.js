@@ -165,34 +165,25 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		BlockEditorProviderComponent = ExperimentalBlockEditorProvider,
 		__unstableTemplate: template,
 	} ) => {
-		const mode = useSelect(
-			( select ) => {
-				const postTypeObject = select( coreStore ).getPostType(
-					post.type
-				);
-				return (
-					postTypeObject?.default_rendering_mode ??
-					settings.defaultRenderingMode ??
-					'post-only'
-				);
-			},
-			[ post, settings ]
-		);
-
-		const { editorSettings, selection, isReady } = useSelect(
+		const { editorSettings, selection, isReady, mode } = useSelect(
 			( select ) => {
 				const {
 					getEditorSettings,
 					getEditorSelection,
 					__unstableIsEditorReady,
 				} = select( editorStore );
+
+				const postTypeObject = select( coreStore ).getPostType(
+					post.type
+				);
 				return {
 					editorSettings: getEditorSettings(),
 					isReady: __unstableIsEditorReady(),
 					selection: getEditorSelection(),
+					mode: postTypeObject?.default_rendering_mode ?? 'post-only',
 				};
 			},
-			[]
+			[ post ]
 		);
 		const shouldRenderTemplate = !! template && mode !== 'post-only';
 		const rootLevelPost = shouldRenderTemplate ? template : post;
