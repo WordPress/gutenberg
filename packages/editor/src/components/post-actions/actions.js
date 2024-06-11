@@ -1030,11 +1030,13 @@ export const duplicateTemplatePartAction = {
 };
 
 export function usePostActions( postType, onActionPerformed ) {
-	const { postTypeObject } = useSelect(
+	const { defaultActions, postTypeObject } = useSelect(
 		( select ) => {
 			const { getPostType } = select( coreStore );
+			const { getEntityActions } = unlock( select( editorStore ) );
 			return {
 				postTypeObject: getPostType( postType ),
+				defaultActions: getEntityActions( 'postType', postType ),
 			};
 		},
 		[ postType ]
@@ -1072,6 +1074,7 @@ export function usePostActions( postType, onActionPerformed ) {
 				? deletePostAction
 				: trashPostAction,
 			! isTemplateOrTemplatePart && permanentlyDeletePostAction,
+			...defaultActions,
 		].filter( Boolean );
 
 		if ( onActionPerformed ) {
@@ -1117,6 +1120,7 @@ export function usePostActions( postType, onActionPerformed ) {
 
 		return actions;
 	}, [
+		defaultActions,
 		isTemplateOrTemplatePart,
 		isPattern,
 		postTypeObject?.viewable,
