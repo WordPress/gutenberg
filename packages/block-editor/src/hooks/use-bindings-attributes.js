@@ -97,6 +97,8 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 			unlock( select( blocksStore ) ).getAllBlockBindingsSources()
 		);
 		const { name, clientId, context } = props;
+		const hasDefaultBinding =
+			props.attributes.metadata?.bindings?.[ DEFAULT_ATTRIBUTE ];
 		const bindings = useMemo(
 			() =>
 				replacePatternOverrideDefaultBindings(
@@ -213,7 +215,10 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 						}
 					}
 
-					if ( Object.keys( keptAttributes ).length ) {
+					if (
+						! hasDefaultBinding &&
+						Object.keys( keptAttributes ).length
+					) {
 						setAttributes( keptAttributes );
 					}
 				} );
@@ -226,6 +231,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 				context,
 				setAttributes,
 				sources,
+				hasDefaultBinding,
 			]
 		);
 
