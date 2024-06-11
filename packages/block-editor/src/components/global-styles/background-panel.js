@@ -544,17 +544,26 @@ function BackgroundSizeToolsPanelItem( {
 				<ToggleGroupControlOption
 					key="cover"
 					value="cover"
-					label={ _x( 'Cover', 'Scale option for dimensions control' ) }
+					label={ _x(
+						'Cover',
+						'Size option for background image control'
+					) }
 				/>
 				<ToggleGroupControlOption
 					key="contain"
 					value="contain"
-					label={ _x( 'Contain', 'Scale option for dimensions control' ) }
+					label={ _x(
+						'Contain',
+						'Size option for background image control'
+					) }
 				/>
 				<ToggleGroupControlOption
 					key="tile"
 					value="auto"
-					label={ _x( 'Tile', 'Scale option for dimensions control' ) }
+					label={ _x(
+						'Tile',
+						'Size option for background image control'
+					) }
 				/>
 			</ToggleGroupControl>
 			<HStack justify="flex-start" spacing={ 2 } as="span">
