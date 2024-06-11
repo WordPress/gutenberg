@@ -29,10 +29,11 @@ function gutenberg_rendering_modes() {
  * This property can be overwritten by using the post_type_default_rendering_mode filter.
  *
  * @param array  $args      Array of post type arguments.
+ * @param string $post_type Post type key.
  * @return array Updated array of post type arguments.
  */
-function gutenberg_post_type_default_rendering_mode( $args ) {
-	$rendering_mode  = 'post-only';
+function gutenberg_post_type_default_rendering_mode( $args, $post_type ) {
+	$rendering_mode  = 'page' === $post_type ? 'template-locked' : 'post-only';
 	$rendering_modes = gutenberg_rendering_modes();
 
 	// Make sure the post type supports the block editor.
@@ -53,4 +54,4 @@ function gutenberg_post_type_default_rendering_mode( $args ) {
 
 	return $args;
 }
-add_filter( 'register_post_type_args', 'gutenberg_post_type_default_rendering_mode', 10, 1 );
+add_filter( 'register_post_type_args', 'gutenberg_post_type_default_rendering_mode', 10, 2 );
