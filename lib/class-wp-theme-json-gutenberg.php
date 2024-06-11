@@ -2867,7 +2867,7 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		// 7. Generate and append any custom CSS rules.
-		if ( isset( $node['css'] ) ) {
+		if ( isset( $node['css'] ) && ! $is_root_selector ) {
 			$block_rules .= $this->process_blocks_custom_css( $node['css'], $selector );
 		}
 
