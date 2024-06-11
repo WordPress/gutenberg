@@ -13,6 +13,7 @@ import { useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
+import { decodeEntities } from '@wordpress/html-entities';
 
 export default function AddNewPageModal( { onSave, onClose } ) {
 	const [ isCreatingPage, setIsCreatingPage ] = useState( false );
@@ -47,7 +48,7 @@ export default function AddNewPageModal( { onSave, onClose } ) {
 				sprintf(
 					// translators: %s: Title of the created template e.g: "Category".
 					__( '"%s" successfully created.' ),
-					newPage.title?.rendered || title
+					decodeEntities( newPage.title?.rendered || title )
 				),
 				{
 					type: 'snackbar',

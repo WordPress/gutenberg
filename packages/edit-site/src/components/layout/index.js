@@ -21,91 +21,60 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useState, useRef, useEffect } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
-import {
-	CommandMenu,
-	privateApis as commandsPrivateApis,
-} from '@wordpress/commands';
-import { store as preferencesStore } from '@wordpress/preferences';
-import {
-	privateApis as blockEditorPrivateApis,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
-import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
+import { CommandMenu } from '@wordpress/commands';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import {
 	EditorSnackbars,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
+import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
 
 /**
  * Internal dependencies
  */
 import ErrorBoundary from '../error-boundary';
 import { store as editSiteStore } from '../../store';
-import useInitEditedEntityFromURL from '../sync-state-with-url/use-init-edited-entity-from-url';
 import SiteHub from '../site-hub';
 import ResizableFrame from '../resizable-frame';
-import useSyncCanvasModeWithURL from '../sync-state-with-url/use-sync-canvas-mode-with-url';
 import { unlock } from '../../lock-unlock';
 import SavePanel from '../save-panel';
 import KeyboardShortcutsRegister from '../keyboard-shortcuts/register';
 import KeyboardShortcutsGlobal from '../keyboard-shortcuts/global';
-import { useCommonCommands } from '../../hooks/commands/use-common-commands';
-import { useEditModeCommands } from '../../hooks/commands/use-edit-mode-commands';
 import { useIsSiteEditorLoading } from './hooks';
-import useLayoutAreas from './router';
 import useMovingAnimation from './animation';
 import SidebarContent from '../sidebar';
 import SaveHub from '../save-hub';
+import useSyncCanvasModeWithURL from '../sync-state-with-url/use-sync-canvas-mode-with-url';
 
 const { useCommands } = unlock( coreCommandsPrivateApis );
-const { useCommandContext } = unlock( commandsPrivateApis );
 const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 const { NavigableRegion } = unlock( editorPrivateApis );
 
 const ANIMATION_DURATION = 0.3;
 
-export default function Layout() {
-	// This ensures the edited entity id and type are initialized properly.
-	useInitEditedEntityFromURL();
+export default function Layout( { route } ) {
 	useSyncCanvasModeWithURL();
 	useCommands();
-	useEditModeCommands();
-	useCommonCommands();
-
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const toggleRef = useRef();
-	const {
-		isDistractionFree,
-		hasFixedToolbar,
-		hasBlockSelected,
-		canvasMode,
-		previousShortcut,
-		nextShortcut,
-	} = useSelect( ( select ) => {
-		const { getAllShortcutKeyCombinations } = select(
-			keyboardShortcutsStore
-		);
-		const { getCanvasMode } = unlock( select( editSiteStore ) );
-		return {
-			canvasMode: getCanvasMode(),
-			previousShortcut: getAllShortcutKeyCombinations(
-				'core/editor/previous-region'
-			),
-			nextShortcut: getAllShortcutKeyCombinations(
-				'core/editor/next-region'
-			),
-			hasFixedToolbar: select( preferencesStore ).get(
-				'core',
-				'fixedToolbar'
-			),
-			isDistractionFree: select( preferencesStore ).get(
-				'core',
-				'distractionFree'
-			),
-			hasBlockSelected:
-				select( blockEditorStore ).getBlockSelectionStart(),
-		};
-	}, [] );
+	const { canvasMode, previousShortcut, nextShortcut } = useSelect(
+		( select ) => {
+			const { getAllShortcutKeyCombinations } = select(
+				keyboardShortcutsStore
+			);
+			const { getCanvasMode } = unlock( select( editSiteStore ) );
+			return {
+				canvasMode: getCanvasMode(),
+				previousShortcut: getAllShortcutKeyCombinations(
+					'core/editor/previous-region'
+				),
+				nextShortcut: getAllShortcutKeyCombinations(
+					'core/editor/next-region'
+				),
+			};
+		},
+		[]
+	);
 	const navigateRegionsProps = useNavigateRegions( {
 		previous: previousShortcut,
 		next: nextShortcut,
@@ -116,21 +85,10 @@ export default function Layout() {
 	const isEditorLoading = useIsSiteEditorLoading();
 	const [ isResizableFrameOversized, setIsResizableFrameOversized ] =
 		useState( false );
-	const { key: routeKey, areas, widths } = useLayoutAreas();
+	const { key: routeKey, areas, widths } = route;
 	const animationRef = useMovingAnimation( {
 		triggerAnimationOnChange: canvasMode + '__' + routeKey,
 	} );
-
-	// Sets the right context for the command palette
-	let commandContext = 'site-editor';
-
-	if ( canvasMode === 'edit' ) {
-		commandContext = 'entity-edit';
-	}
-	if ( hasBlockSelected ) {
-		commandContext = 'block-selection-edit';
-	}
-	useCommandContext( commandContext );
 
 	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
 	const [ gradientValue ] = useGlobalStyle( 'color.gradient' );
@@ -163,11 +121,7 @@ export default function Layout() {
 					'edit-site-layout',
 					navigateRegionsProps.className,
 					{
-						'is-distraction-free':
-							isDistractionFree && canvasMode === 'edit',
 						'is-full-canvas': canvasMode === 'edit',
-						'has-fixed-toolbar': hasFixedToolbar,
-						'is-block-toolbar-visible': hasBlockSelected,
 					}
 				) }
 			>
