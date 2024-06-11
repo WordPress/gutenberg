@@ -24,7 +24,7 @@ import {
 	ToggleControl,
 	PanelBody,
 } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { edit } from '@wordpress/icons';
 import { DOWN } from '@wordpress/keycodes';
 import { useSelect } from '@wordpress/data';
@@ -99,6 +99,8 @@ export default function PostDateEdit( {
 		);
 	}
 
+	const is12Hour = is12HourFormat( siteTimeFormat );
+
 	return (
 		<>
 			<BlockControls group="block">
@@ -118,10 +120,15 @@ export default function PostDateEdit( {
 									<PublishDateTimePicker
 										currentDate={ date }
 										onChange={ setDate }
-										is12Hour={ is12HourFormat(
-											siteTimeFormat
-										) }
+										is12Hour={ is12Hour }
 										onClose={ onClose }
+										dateOrder={
+											is12Hour
+												? /* translators: Order of day, month and year when the 12-hour clock is enabled. Available formats are 'dmy', 'mdy', 'ymd'. */
+												  _x( 'mdy', 'date order' )
+												: /* translators: Order of day, month and year when the 12-hour clock is disabled. Available formats are 'dmy', 'mdy', 'ymd'. */
+												  _x( 'dmy', 'date order' )
+										}
 									/>
 								) }
 								renderToggle={ ( { isOpen, onToggle } ) => {

@@ -25,6 +25,7 @@ function UnforwardedDateTimePicker(
 	{
 		currentDate,
 		is12Hour,
+		dateOrder = 'dmy',
 		isInvalidDate,
 		onMonthPreviewed = noop,
 		onChange,
@@ -40,6 +41,7 @@ function UnforwardedDateTimePicker(
 					currentTime={ currentDate }
 					onChange={ onChange }
 					is12Hour={ is12Hour }
+					dateOrder={ dateOrder }
 				/>
 				<DatePicker
 					currentDate={ currentDate }

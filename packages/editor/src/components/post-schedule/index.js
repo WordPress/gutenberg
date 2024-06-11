@@ -6,6 +6,7 @@ import { parseISO, endOfMonth, startOfMonth } from 'date-fns';
 /**
  * WordPress dependencies
  */
+import { _x } from '@wordpress/i18n';
 import { getSettings } from '@wordpress/date';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
@@ -98,6 +99,13 @@ export function PrivatePostSchedule( {
 			currentDate={ postDate }
 			onChange={ onUpdateDate }
 			is12Hour={ is12HourTime }
+			dateOrder={
+				is12HourTime
+					? /* translators: Order of day, month and year when the 12-hour clock is enabled. Available formats are 'dmy', 'mdy', 'ymd'. */
+					  _x( 'mdy', 'date order' )
+					: /* translators: Order of day, month and year when the 12-hour clock is disabled. Available formats are 'dmy', 'mdy', 'ymd'. */
+					  _x( 'dmy', 'date order' )
+			}
 			events={ events }
 			onMonthPreviewed={ ( date ) =>
 				setPreviewedMonth( parseISO( date ) )

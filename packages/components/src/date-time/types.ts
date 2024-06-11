@@ -12,6 +12,13 @@ export type TimePickerProps = {
 	is12Hour?: boolean;
 
 	/**
+	 * The order of day, month, year.
+	 *
+	 * @default 'dmy'
+	 */
+	dateOrder?: 'dmy' | 'mdy' | 'ymd';
+
+	/**
 	 * The function called when a new time has been selected. It is passed the
 	 * time as an argument.
 	 */

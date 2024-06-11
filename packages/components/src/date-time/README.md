@@ -50,11 +50,19 @@ The function called when a new date or time has been selected. It is passed the 
 
 ### `is12Hour`: `boolean`
 
-Whether we use a 12-hour clock. With a 12-hour clock, an AM/PM widget is displayed and the time format is assumed to be `MM-DD-YYYY` (as opposed to the default format `DD-MM-YYYY`).
+Whether we use a 12-hour clock. With a 12-hour clock, an AM/PM widget is displayed.
 
 -   Type: `bool`
 -   Required: No
 -   Default: false
+
+### `dateOrder`: `'dmy' | 'mdy' | 'ymd'`
+
+The order of day, month, year.
+
+-   Type: `string`
+-   Required: No
+-   Default: `dmy`
 
 ### `isInvalidDate`: `( date: Date ) => boolean`
 
