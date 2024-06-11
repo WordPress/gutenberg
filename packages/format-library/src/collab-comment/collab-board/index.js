@@ -350,6 +350,7 @@ const CollabBoard = ( { contentRef, onClose } ) => {
 															0 ===
 															inputComment.length
 														}
+														__experimentalIsFocusable
 														onClick={ () =>
 															editComment(
 																commentId
@@ -500,6 +501,7 @@ const CollabBoard = ( { contentRef, onClose } ) => {
 											: __( 'Reply' )
 									}
 									disabled={ 0 === inputComment.length }
+									__experimentalIsFocusable
 									onClick={ () => saveComment() }
 								/>
 							</HStack>

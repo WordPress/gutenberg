@@ -28,11 +28,11 @@
 	}
 
 	&__resolvedIcon {
-		fill: green;
+		fill: #008000;
 		border-radius: 50%;
 		width: 18px;
 		height: 18px;
-		border: 1px solid green;
+		border: 1px solid #008000;
 		margin-right: 2px;
 		margin-top: 5px;
 	}
@@ -40,7 +40,7 @@
 	&__resolvedText {
 		font-style: italic;
 		font-weight: 500 !important;
-		color: gray !important;
+		color: #808080 !important;
 		margin-top: 5px !important;
 	}
 }
