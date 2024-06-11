@@ -51,14 +51,12 @@ export function removePropertyFromObject( object, property ) {
  * A convenience wrapper for `useThemeStyleVariationsByProperty()` that fetches the current theme style variations,
  * and user-defined global style/settings object.
  *
- * @param {Object}   props          Object of hook args.
- * @param {string}   props.property The property to filter by.
- * @param {Function} props.filter   Optional. The filter function to apply to the variations.
+ * @param {Object} props          Object of hook args.
+ * @param {string} props.property The property to filter by.
  * @return {Object[]|*} The merged object.
  */
 export function useCurrentMergeThemeStyleVariationsWithUserConfig( {
 	property,
-	filter,
 } ) {
 	const { variationsFromTheme } = useSelect( ( select ) => {
 		const _variationsFromTheme =
@@ -71,27 +69,26 @@ export function useCurrentMergeThemeStyleVariationsWithUserConfig( {
 		};
 	}, [] );
 	const { user: baseVariation } = useContext( GlobalStylesContext );
+	const clondedBaseVariation = cloneDeep( baseVariation );
 
-	const variations = useMemo( () => {
+	const variationsWithSinglePropertyAndBase = variationsFromTheme
+		.filter( ( variation ) => {
+			return isVariationWithSingleProperty( variation, property );
+		} )
+		.map( ( variation ) => {
+			return mergeBaseAndUserConfigs( clondedBaseVariation, variation );
+		} );
+
+	return useMemo( () => {
 		return [
 			{
 				title: __( 'Default' ),
 				settings: {},
 				styles: {},
 			},
-			...variationsFromTheme,
+			...variationsWithSinglePropertyAndBase,
 		];
-	}, [ variationsFromTheme ] );
-
-	return useThemeStyleVariationsByProperty( {
-		variations,
-		property,
-		filter,
-		baseVariation: removePropertyFromObject(
-			cloneDeep( baseVariation ),
-			property
-		),
-	} );
+	}, [ variationsWithSinglePropertyAndBase ] );
 }
 
 /**
@@ -156,23 +153,33 @@ export default function useThemeStyleVariationsByProperty( {
 
 		let processedStyleVariations = variations.reduce(
 			( accumulator, variation ) => {
-				// Include only variations contain nothing but the property.
+				const variationFilteredByProperty = filterObjectByProperty(
+					cloneDeep( variation ),
+					property
+				);
+
+				// Remove variations that are empty once the property is filtered out.
 				if (
-					! isVariationWithSingleProperty( variation, property ) &&
-					variation.title !== __( 'Default' )
+					variation.title !== __( 'Default' ) &&
+					Object.keys( variationFilteredByProperty ).length === 0
 				) {
 					return accumulator;
 				}
 
-				/*
-				 * Overwrites all baseVariation object `styleProperty` properties
-				 * with the theme variation `styleProperty` properties.
-				 */
-				let result = variation;
+				let result = {
+					...variationFilteredByProperty,
+					title: variation?.title,
+					description: variation?.description,
+				};
+
 				if ( clonedBaseVariation ) {
+					/*
+					 * Overwrites all baseVariation object `styleProperty` properties
+					 * with the theme variation `styleProperty` properties.
+					 */
 					result = mergeBaseAndUserConfigs(
 						clonedBaseVariation,
-						variation
+						result
 					);
 				}
 
