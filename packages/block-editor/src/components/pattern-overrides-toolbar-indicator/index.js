@@ -20,7 +20,13 @@ import { store as blockEditorStore } from '../../store';
 import BlockIcon from '../block-icon';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
 
-export default function BlockBindingsToolbarIndicator( { clientIds } ) {
+/**
+ * This component is currently only for pattern overrides, which is a WP-only feature.
+ * Ideally, this should be moved to the `patterns` package once ready.
+ * @param {Object} props           The component props.
+ * @param {Array}  props.clientIds The client IDs of the selected blocks.
+ */
+export default function PatternOverridesToolbarIndicator( { clientIds } ) {
 	const isSingleBlockSelected = clientIds.length === 1;
 	const { icon, firstBlockName } = useSelect(
 		( select ) => {
@@ -76,18 +82,18 @@ export default function BlockBindingsToolbarIndicator( { clientIds } ) {
 			<ToolbarItem>
 				{ ( toggleProps ) => (
 					<DropdownMenu
-						className="block-editor-block-bindings-toolbar-indicator"
+						className="block-editor-pattern-overrides-toolbar-indicator"
 						label={ firstBlockTitle }
 						popoverProps={ {
 							placement: 'bottom-start',
 							className:
-								'block-editor-block-bindings-toolbar-indicator__popover',
+								'block-editor-pattern-overrides-toolbar-indicator__popover',
 						} }
 						icon={
 							<>
 								<BlockIcon
 									icon={ icon }
-									className="block-editor-block-bindings-toolbar-indicator-icon"
+									className="block-editor-pattern-overrides-toolbar-indicator-icon"
 									showColors
 								/>
 							</>

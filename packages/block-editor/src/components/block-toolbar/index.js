@@ -35,7 +35,7 @@ import { store as blockEditorStore } from '../../store';
 import __unstableBlockNameContext from './block-name-context';
 import NavigableToolbar from '../navigable-toolbar';
 import Shuffle from './shuffle';
-import BlockBindingsIndicator from '../block-bindings-toolbar-indicator';
+import PatternOverridesToolbarIndicator from '../pattern-overrides-toolbar-indicator';
 import { useHasBlockToolbar } from './use-has-block-toolbar';
 import { canBindBlock } from '../../hooks/use-bindings-attributes';
 /**
@@ -179,7 +179,9 @@ export function PrivateBlockToolbar( {
 				{ isUsingBindings &&
 					hasParentPattern &&
 					canBindBlock( blockName ) && (
-						<BlockBindingsIndicator clientIds={ blockClientIds } />
+						<PatternOverridesToolbarIndicator
+							clientIds={ blockClientIds }
+						/>
 					) }
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) &&
 					( isDefaultEditingMode || isSynced ) && (
