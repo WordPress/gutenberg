@@ -186,8 +186,7 @@ async function GitHubFetch( path ) {
  * @return {string} The GitHub authentication token.
  */
 function getGitHubAuthToken() {
-	const result = cli( 'gh', [ 'auth', 'token' ] );
-	return result.trim();
+	return cli( 'gh', [ 'auth', 'token' ] );
 }
 
 /**
