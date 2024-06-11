@@ -43,7 +43,7 @@ interface DataViewsProps< Item extends AnyItem > {
 	onSelectionChange?: ( items: Item[] ) => void;
 }
 
-const defaultGetItemId = ( item: AnyItem ) => item.id + '';
+const defaultGetItemId = ( item: AnyItem ) => item.id;
 const defaultOnSelectionChange = () => {};
 
 function useSomeItemHasAPossibleBulkAction< Item extends AnyItem >(
