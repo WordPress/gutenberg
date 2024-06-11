@@ -156,6 +156,14 @@ export default function useThemeStyleVariationsByProperty( {
 
 		let processedStyleVariations = variations.reduce(
 			( accumulator, variation ) => {
+				// Include only variations contain nothing but the property.
+				if (
+					! isVariationWithSingleProperty( variation, property ) &&
+					variation.title !== __( 'Default' )
+				) {
+					return accumulator;
+				}
+
 				const variationFilteredByProperty = filterObjectByProperty(
 					cloneDeep( variation ),
 					property
