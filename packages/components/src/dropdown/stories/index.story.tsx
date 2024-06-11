@@ -8,6 +8,8 @@ import type { Meta, StoryFn } from '@storybook/react';
  */
 import Dropdown from '..';
 import Button from '../../button';
+import MenuGroup from '../../menu-group';
+import MenuItem from '../../menu-item';
 import { DropdownContentWrapper } from '../dropdown-content-wrapper';
 
 const meta: Meta< typeof Dropdown > = {
@@ -64,7 +66,9 @@ WithMorePadding.args = {
 	...Default.args,
 	renderContent: () => (
 		<DropdownContentWrapper paddingSize="medium">
-			Content wrapped with <code>{ `paddingSize="medium"` }</code>.
+			{ /* eslint-disable react/no-unescaped-entities */ }
+			Content wrapped with <code>paddingSize="medium"</code>.
+			{ /* eslint-enable react/no-unescaped-entities */ }
 		</DropdownContentWrapper>
 	),
 };
@@ -79,7 +83,26 @@ WithNoPadding.args = {
 	...Default.args,
 	renderContent: () => (
 		<DropdownContentWrapper paddingSize="none">
-			Content wrapped with <code>{ `paddingSize="none"` }</code>.
+			{ /* eslint-disable react/no-unescaped-entities */ }
+			Content wrapped with <code>paddingSize="none"</code>.
+			{ /* eslint-enable react/no-unescaped-entities */ }
 		</DropdownContentWrapper>
+	),
+};
+
+export const WithMenuItems = Template.bind( {} );
+WithMenuItems.args = {
+	...Default.args,
+	renderContent: () => (
+		<>
+			<MenuGroup label="Group 1">
+				<MenuItem>Item 1</MenuItem>
+				<MenuItem>Item 2</MenuItem>
+			</MenuGroup>
+			<MenuGroup label="Group 2">
+				<MenuItem>Item 1</MenuItem>
+				<MenuItem>Item 2</MenuItem>
+			</MenuGroup>
+		</>
 	),
 };

@@ -7,7 +7,7 @@ import { forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import InserterMenu from './menu';
+import { PrivateInserterMenu } from './menu';
 import { store as blockEditorStore } from '../../store';
 
 const noop = () => {};
@@ -20,9 +20,13 @@ function InserterLibrary(
 		showInserterHelpPanel,
 		showMostUsedBlocks = false,
 		__experimentalInsertionIndex,
+		__experimentalInitialTab,
+		__experimentalInitialCategory,
 		__experimentalFilterValue,
+		onPatternCategorySelection,
 		onSelect = noop,
 		shouldFocusBlock = false,
+		onClose,
 	},
 	ref
 ) {
@@ -39,7 +43,7 @@ function InserterLibrary(
 	);
 
 	return (
-		<InserterMenu
+		<PrivateInserterMenu
 			onSelect={ onSelect }
 			rootClientId={ destinationRootClientId }
 			clientId={ clientId }
@@ -48,10 +52,26 @@ function InserterLibrary(
 			showMostUsedBlocks={ showMostUsedBlocks }
 			__experimentalInsertionIndex={ __experimentalInsertionIndex }
 			__experimentalFilterValue={ __experimentalFilterValue }
+			onPatternCategorySelection={ onPatternCategorySelection }
+			__experimentalInitialTab={ __experimentalInitialTab }
+			__experimentalInitialCategory={ __experimentalInitialCategory }
 			shouldFocusBlock={ shouldFocusBlock }
+			ref={ ref }
+			onClose={ onClose }
+		/>
+	);
+}
+
+export const PrivateInserterLibrary = forwardRef( InserterLibrary );
+
+function PublicInserterLibrary( props, ref ) {
+	return (
+		<PrivateInserterLibrary
+			{ ...props }
+			onPatternCategorySelection={ undefined }
 			ref={ ref }
 		/>
 	);
 }
 
-export default forwardRef( InserterLibrary );
+export default forwardRef( PublicInserterLibrary );

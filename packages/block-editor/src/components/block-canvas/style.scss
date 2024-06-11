@@ -1,13 +1,7 @@
 iframe[name="editor-canvas"] {
+	box-sizing: border-box;
 	width: 100%;
 	height: 100%;
 	display: block;
-}
-
-iframe[name="editor-canvas"]:not(.has-editor-padding) {
-	background-color: $white;
-}
-
-iframe[name="editor-canvas"].has-editor-padding {
-	padding: $grid-unit-30 $grid-unit-30 0;
+	background-color: transparent;
 }

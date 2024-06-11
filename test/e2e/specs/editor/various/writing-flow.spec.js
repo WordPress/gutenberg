@@ -356,7 +356,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await page.keyboard.type( 'a' );
 		await page.keyboard.press( 'Backspace' );
 		await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li></li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->` );
@@ -591,6 +591,37 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 			{
 				name: 'core/paragraph',
 				attributes: { content: '>' },
+			},
+		] );
+	} );
+
+	test( 'should remove first empty paragraph on Backspace', async ( {
+		editor,
+		page,
+	} ) => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
+		await page.keyboard.press( 'ArrowUp' );
+
+		// Ensure setup is correct.
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: '' },
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: '2' },
+			},
+		] );
+
+		await page.keyboard.press( 'Backspace' );
+
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: '2' },
 			},
 		] );
 	} );
@@ -923,7 +954,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		// Confirm correct setup.
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:table -->
-<figure class="wp-block-table"><table><tbody><tr><td></td><td>2</td></tr><tr><td></td><td></td></tr></tbody></table></figure>
+<figure class="wp-block-table"><table class="has-fixed-layout"><tbody><tr><td></td><td>2</td></tr><tr><td></td><td></td></tr></tbody></table></figure>
 <!-- /wp:table -->` );
 	} );
 
@@ -1173,7 +1204,7 @@ class WritingFlowUtils {
 			.locator( 'role=button[name="Two columns; equal split"i]' )
 			.click();
 		await this.editor.canvas
-			.locator( 'role=button[name="Add block"i]' )
+			.locator( '.is-selected >> role=button[name="Add block"i]' )
 			.click();
 		await this.page.click(
 			'role=listbox[name="Blocks"i] >> role=option[name="Paragraph"i]'

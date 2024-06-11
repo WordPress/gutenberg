@@ -79,7 +79,7 @@ function CoverHeightInput( {
 			min={ min }
 			onChange={ handleOnChange }
 			onUnitChange={ onUnitChange }
-			__unstableInputWidth={ '80px' }
+			__unstableInputWidth="80px"
 			units={ units }
 			value={ computedValue }
 		/>
@@ -211,7 +211,14 @@ export default function CoverInspectorControls( {
 								}
 								help={
 									<>
-										<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+										<ExternalLink
+											href={
+												// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
+												__(
+													'https://www.w3.org/WAI/tutorials/images/decision-tree/'
+												)
+											}
+										>
 											{ __(
 												'Describe the purpose of the image.'
 											) }
@@ -304,11 +311,15 @@ export default function CoverInspectorControls( {
 						minHeight: undefined,
 						minHeightUnit: undefined,
 					} ) }
-					isShownByDefault={ true }
+					isShownByDefault
 					panelId={ clientId }
 				>
 					<CoverHeightInput
-						value={ minHeight }
+						value={
+							attributes?.style?.dimensions?.aspectRatio
+								? ''
+								: minHeight
+						}
 						unit={ minHeightUnit }
 						onChange={ ( newMinHeight ) =>
 							setAttributes( {

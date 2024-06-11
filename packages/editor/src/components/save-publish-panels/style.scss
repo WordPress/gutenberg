@@ -1,0 +1,28 @@
+
+.editor-layout__toggle-publish-panel,
+.editor-layout__toggle-sidebar-panel,
+.editor-layout__toggle-entities-saved-states-panel {
+	z-index: z-index(".editor-layout__toggle-sidebar-panel");
+	position: fixed !important; // Need to override the default relative positionning
+	top: -9999em;
+	bottom: auto;
+	left: auto;
+	right: 0;
+	box-sizing: border-box;
+	width: $sidebar-width;
+	background-color: $white;
+	border: 1px dotted $gray-300;
+	height: auto !important; // Need to override the default sidebar positionnings
+	padding: $grid-unit-30;
+	display: flex;
+	justify-content: center;
+}
+
+.editor-layout__toggle-entities-saved-states-panel,
+.editor-layout__toggle-publish-panel {
+	.interface-interface-skeleton__actions:focus &,
+	.interface-interface-skeleton__actions:focus-within & {
+		top: auto;
+		bottom: 0;
+	}
+}

@@ -429,7 +429,7 @@ $color-control-label-height: 20px;
 // These needs extra specificity in the editor.
 .wp-block-navigation__responsive-container:not(.is-menu-open) {
 	.components-button.wp-block-navigation__responsive-container-close {
-		.is-collapsed & {
+		@include break-small {
 			display: none;
 		}
 	}
@@ -457,19 +457,9 @@ $color-control-label-height: 20px;
 	}
 }
 
-.has-fixed-toolbar .wp-block-navigation__responsive-container.is-menu-open {
-	@include break-medium() {
-		top: $admin-bar-height + $header-height + $block-toolbar-height + $border-width;
-	}
-}
-
 .is-mobile-preview .wp-block-navigation__responsive-container.is-menu-open,
 .is-tablet-preview .wp-block-navigation__responsive-container.is-menu-open {
 	top: $admin-bar-height + $header-height + $block-toolbar-height + $border-width;
-}
-
-.is-sidebar-opened .wp-block-navigation__responsive-container.is-menu-open {
-	right: $sidebar-width;
 }
 
 // When fullscreen.
@@ -480,12 +470,6 @@ $color-control-label-height: 20px;
 
 		@include break-medium() {
 			top: $header-height + $border-width;
-		}
-	}
-
-	.has-fixed-toolbar .wp-block-navigation__responsive-container.is-menu-open {
-		@include break-medium() {
-			top: $header-height + $block-toolbar-height + $border-width;
 		}
 	}
 

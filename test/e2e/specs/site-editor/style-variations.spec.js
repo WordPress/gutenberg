@@ -33,13 +33,12 @@ test.describe( 'Global styles variations', () => {
 		admin,
 		page,
 		siteEditorStyleVariations,
-		editor,
 	} ) => {
 		await admin.visitSiteEditor( {
 			postId: 'gutenberg-test-themes/style-variations//index',
 			postType: 'wp_template',
+			canvas: 'edit',
 		} );
-		await editor.canvas.locator( 'body' ).click();
 
 		await siteEditorStyleVariations.browseStyles();
 
@@ -70,18 +69,15 @@ test.describe( 'Global styles variations', () => {
 		admin,
 		page,
 		siteEditorStyleVariations,
-		editor,
 	} ) => {
 		await admin.visitSiteEditor( {
 			postId: 'gutenberg-test-themes/style-variations//index',
 			postType: 'wp_template',
+			canvas: 'edit',
 		} );
-		await editor.canvas.locator( 'body' ).click();
 		await siteEditorStyleVariations.browseStyles();
 		await page.click( 'role=button[name="pink"i]' );
-		await page.click(
-			'role=button[name="Navigate to the previous view"i]'
-		);
+		await page.click( 'role=button[name="Back"i]' );
 		await page.click( 'role=button[name="Colors styles"i]' );
 
 		await expect(
@@ -96,9 +92,7 @@ test.describe( 'Global styles variations', () => {
 			)
 		).toHaveCSS( 'background', /rgb\(74, 7, 74\)/ );
 
-		await page.click(
-			'role=button[name="Navigate to the previous view"i]'
-		);
+		await page.click( 'role=button[name="Back"i]' );
 		await page.click( 'role=button[name="Typography styles"i]' );
 		await page.click( 'role=button[name="Typography Text styles"i]' );
 
@@ -111,18 +105,15 @@ test.describe( 'Global styles variations', () => {
 		admin,
 		page,
 		siteEditorStyleVariations,
-		editor,
 	} ) => {
 		await admin.visitSiteEditor( {
 			postId: 'gutenberg-test-themes/style-variations//index',
 			postType: 'wp_template',
+			canvas: 'edit',
 		} );
-		await editor.canvas.locator( 'body' ).click();
 		await siteEditorStyleVariations.browseStyles();
 		await page.click( 'role=button[name="yellow"i]' );
-		await page.click(
-			'role=button[name="Navigate to the previous view"i]'
-		);
+		await page.click( 'role=button[name="Back"i]' );
 		await page.click( 'role=button[name="Colors styles"i]' );
 
 		await expect(
@@ -137,9 +128,7 @@ test.describe( 'Global styles variations', () => {
 			)
 		).toHaveCSS( 'background', /rgb\(25, 25, 17\)/ );
 
-		await page.click(
-			'role=button[name="Navigate to the previous view"i]'
-		);
+		await page.click( 'role=button[name="Back"i]' );
 		await page.click( 'role=button[name="Typography styles"i]' );
 		await page.click( 'role=button[name="Typography Text styles"i]' );
 
@@ -158,20 +147,17 @@ test.describe( 'Global styles variations', () => {
 		admin,
 		page,
 		siteEditorStyleVariations,
-		editor,
 	} ) => {
 		await admin.visitSiteEditor( {
 			postId: 'gutenberg-test-themes/style-variations//index',
 			postType: 'wp_template',
+			canvas: 'edit',
 		} );
-		await editor.canvas.locator( 'body' ).click();
 		await siteEditorStyleVariations.browseStyles();
 		await page.click( 'role=button[name="pink"i]' );
-		await page.click(
-			'role=button[name="Navigate to the previous view"i]'
-		);
+		await page.click( 'role=button[name="Back"i]' );
 		await page.click( 'role=button[name="Colors styles"i]' );
-		await page.click( 'role=button[name="Color palettes"i]' );
+		await page.click( 'role=button[name="Edit palette"i]' );
 
 		await expect(
 			page.locator( 'role=option[name="Color: Foreground"i]' )
@@ -195,8 +181,8 @@ test.describe( 'Global styles variations', () => {
 		await admin.visitSiteEditor( {
 			postId: 'gutenberg-test-themes/style-variations//index',
 			postType: 'wp_template',
+			canvas: 'edit',
 		} );
-		await editor.canvas.locator( 'body' ).click();
 		await siteEditorStyleVariations.browseStyles();
 		await page.click( 'role=button[name="yellow"i]' );
 

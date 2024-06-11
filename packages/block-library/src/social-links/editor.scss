@@ -4,13 +4,6 @@
 		display: inline-block;
 		margin-left: $grid-unit-10;
 	}
-
-	// Unset background colors that can be inherited from Global Styles.
-	// This is a duplicate of a rule in style.scss, as it needs higher specificity in the editor.
-	// The rule can be removed if editor styles get lowered in specificity.
-	&.wp-block-social-links {
-		background: none;
-	}
 }
 
 // Prevent toolbar from jumping when selecting / hovering a link.
@@ -18,8 +11,18 @@
 	transform: none;
 }
 
-.editor-styles-wrapper .wp-block-social-links {
+// Specificity for the following styles are fixed at 0-1-0 to match and be
+// overridable by global styles.
+:root :where(.wp-block-social-links),
+:root :where(.wp-block-social-links.is-style-logos-only .wp-block-social-links__social-placeholder .wp-social-link) {
 	padding: 0;
+}
+:root :where(.wp-block-social-links__social-placeholder .wp-social-link) {
+	padding: 0.25em;
+}
+:root :where(.wp-block-social-links.is-style-pill-shape .wp-block-social-links__social-placeholder .wp-social-link) {
+	padding-left: calc((2/3) * 1em);
+	padding-right: calc((2/3) * 1em);
 }
 
 // Placeholder/setup state.
@@ -44,19 +47,6 @@
 		display: flex;
 	}
 
-	.wp-social-link {
-		padding: 0.25em;
-
-		.is-style-pill-shape & {
-			padding-left: calc((2/3) * 1em);
-			padding-right: calc((2/3) * 1em);
-		}
-
-		.is-style-logos-only & {
-			padding: 0;
-		}
-	}
-
 	.wp-social-link::before {
 		content: "";
 		display: block;
@@ -74,7 +64,6 @@
 .wp-block-social-links .wp-block-social-links__social-prompt {
 	min-height: $button-size-small;
 	list-style: none;
-	order: 2; // Move after the appender button. Because this element is non-interactive, it does not affect tab order.
 
 	// Show as block UI.
 	font-family: $default-font;
@@ -93,7 +82,7 @@
 }
 
 // Improve the preview, ensure buttons are fully opaque despite being disabled.
-// @todo: Look at improving the preview component to make this unnecessary.
+// @todo Look at improving the preview component to make this unnecessary.
 .block-editor-block-preview__content .components-button:disabled {
 	opacity: 1;
 }

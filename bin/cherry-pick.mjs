@@ -7,6 +7,7 @@ import readline from 'readline';
 import { spawnSync } from 'node:child_process';
 
 const LABEL = process.argv[ 2 ] || 'Backport to WP Beta/RC';
+const BACKPORT_COMPLETED_LABEL = 'Backported to WP Core';
 const BRANCH = getCurrentBranch();
 const GITHUB_CLI_AVAILABLE = spawnSync( 'gh', [ 'auth', 'status' ] )
 	?.stdout?.toString()
@@ -112,15 +113,18 @@ function cli( command, args, pipe = false ) {
  */
 async function fetchPRs() {
 	const { items } = await GitHubFetch(
-		`/search/issues?q=is:pr state:closed sort:updated label:"${ LABEL }" repo:WordPress/gutenberg`
+		`/search/issues?per_page=100&q=is:pr state:closed sort:updated label:"${ LABEL }" repo:WordPress/gutenberg`
 	);
 	const PRs = items
-		.map( ( { id, number, title, pull_request, closed_at } ) => ( {
+		// eslint-disable-next-line camelcase
+		.map( ( { id, number, title, pull_request } ) => ( {
 			id,
 			number,
 			title,
+			// eslint-disable-next-line camelcase
 			pull_request,
 		} ) )
+		// eslint-disable-next-line camelcase
 		.filter( ( { pull_request } ) => !! pull_request?.merged_at )
 		.sort(
 			( a, b ) =>
@@ -334,6 +338,11 @@ function reportSummaryNextSteps( successes, failures ) {
 		nextSteps.push( 'Push this branch' );
 		nextSteps.push( 'Go to each of the cherry-picked Pull Requests' );
 		nextSteps.push( `Remove the ${ LABEL } label` );
+
+		if ( LABEL === 'Backport to WP Beta/RC' ) {
+			nextSteps.push( `Add the "${ BACKPORT_COMPLETED_LABEL }" label` );
+		}
+
 		nextSteps.push( 'Request a backport to wordpress-develop if required' );
 		nextSteps.push( 'Comment, say that PR just got cherry-picked' );
 	}
@@ -363,6 +372,17 @@ function GHcommentAndRemoveLabel( pr ) {
 	try {
 		cli( 'gh', [ 'pr', 'comment', number, '--body', comment ] );
 		cli( 'gh', [ 'pr', 'edit', number, '--remove-label', LABEL ] );
+
+		if ( LABEL === 'Backport to WP Beta/RC' ) {
+			cli( 'gh', [
+				'pr',
+				'edit',
+				number,
+				'--add-label',
+				BACKPORT_COMPLETED_LABEL,
+			] );
+		}
+
 		console.log( `✅ ${ number }: ${ comment }` );
 	} catch ( e ) {
 		console.log( `❌ ${ number }. ${ comment } ` );

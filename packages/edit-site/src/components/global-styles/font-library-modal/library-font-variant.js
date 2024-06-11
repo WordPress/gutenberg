@@ -13,8 +13,10 @@ import {
  */
 import { getFontFaceVariantName } from './utils';
 import { FontLibraryContext } from './context';
-import FontFaceDemo from './font-demo';
+import FontDemo from './font-demo';
 import { unlock } from '../../../lock-unlock';
+
+const { kebabCase } = unlock( componentsPrivateApis );
 
 function LibraryFontVariant( { face, font } ) {
 	const { isFontActivated, toggleActivateFont } =
@@ -39,23 +41,22 @@ function LibraryFontVariant( { face, font } ) {
 	};
 
 	const displayName = font.name + ' ' + getFontFaceVariantName( face );
-	const { kebabCase } = unlock( componentsPrivateApis );
 	const checkboxId = kebabCase(
 		`${ font.slug }-${ getFontFaceVariantName( face ) }`
 	);
 
 	return (
-		<div className="font-library-modal__library-font-variant">
+		<div className="font-library-modal__font-card">
 			<Flex justify="flex-start" align="center" gap="1rem">
 				<CheckboxControl
 					checked={ isInstalled }
 					onChange={ handleToggleActivation }
-					__nextHasNoMarginBottom={ true }
+					__nextHasNoMarginBottom
 					id={ checkboxId }
 				/>
 				<label htmlFor={ checkboxId }>
-					<FontFaceDemo
-						fontFace={ face }
+					<FontDemo
+						font={ face }
 						text={ displayName }
 						onClick={ handleToggleActivation }
 					/>

@@ -1,4 +1,4 @@
-.wp-block-image figcaption {
+:root :where(.wp-block-image figcaption) {
 	@include caption-style-theme();
 }
 

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -37,6 +37,7 @@ import ListViewDropIndicatorPreview from './drop-indicator';
 import useBlockSelection from './use-block-selection';
 import useListViewBlockIndexes from './use-list-view-block-indexes';
 import useListViewClientIds from './use-list-view-client-ids';
+import useListViewCollapseItems from './use-list-view-collapse-items';
 import useListViewDropZone from './use-list-view-drop-zone';
 import useListViewExpandSelectedItem from './use-list-view-expand-selected-item';
 import { store as blockEditorStore } from '../../store';
@@ -45,6 +46,9 @@ import { focusListItem } from './utils';
 import useClipboardHandler from './use-clipboard-handler';
 
 const expanded = ( state, action ) => {
+	if ( action.type === 'clear' ) {
+		return {};
+	}
 	if ( Array.isArray( action.clientIds ) ) {
 		return {
 			...state,
@@ -60,7 +64,7 @@ const expanded = ( state, action ) => {
 	return state;
 };
 
-export const BLOCK_LIST_ITEM_HEIGHT = 36;
+export const BLOCK_LIST_ITEM_HEIGHT = 32;
 
 /** @typedef {import('react').ComponentType} ComponentType */
 /** @typedef {import('react').Ref<HTMLElement>} Ref */
@@ -194,7 +198,10 @@ function ListViewComponent(
 			if ( ! clientId ) {
 				return;
 			}
-			setExpandedState( { type: 'expand', clientIds: [ clientId ] } );
+			const clientIds = Array.isArray( clientId )
+				? clientId
+				: [ clientId ];
+			setExpandedState( { type: 'expand', clientIds } );
 		},
 		[ setExpandedState ]
 	);
@@ -207,6 +214,9 @@ function ListViewComponent(
 		},
 		[ setExpandedState ]
 	);
+	const collapseAll = useCallback( () => {
+		setExpandedState( { type: 'clear' } );
+	}, [ setExpandedState ] );
 	const expandRow = useCallback(
 		( row ) => {
 			expand( row?.dataset?.block );
@@ -231,6 +241,11 @@ function ListViewComponent(
 		},
 		[ updateBlockSelection ]
 	);
+
+	useListViewCollapseItems( {
+		collapseAll,
+		expand,
+	} );
 
 	const firstDraggedBlockClientId = draggedClientIds?.[ 0 ];
 
@@ -282,6 +297,7 @@ function ListViewComponent(
 			expand,
 			firstDraggedBlockIndex,
 			collapse,
+			collapseAll,
 			BlockSettingsMenu,
 			listViewInstanceId: instanceId,
 			AdditionalBlockContent,
@@ -299,6 +315,7 @@ function ListViewComponent(
 			expand,
 			firstDraggedBlockIndex,
 			collapse,
+			collapseAll,
 			BlockSettingsMenu,
 			instanceId,
 			AdditionalBlockContent,
@@ -336,7 +353,7 @@ function ListViewComponent(
 		description && `block-editor-list-view-description-${ instanceId }`;
 
 	return (
-		<AsyncModeProvider value={ true }>
+		<AsyncModeProvider value>
 			<ListViewDropIndicatorPreview
 				draggedBlockClientId={ firstDraggedBlockClientId }
 				listViewRef={ elementRef }
@@ -349,7 +366,7 @@ function ListViewComponent(
 			) }
 			<TreeGrid
 				id={ id }
-				className={ classnames( 'block-editor-list-view-tree', {
+				className={ clsx( 'block-editor-list-view-tree', {
 					'is-dragging':
 						draggedClientIds?.length > 0 &&
 						blockDropTargetIndex !== undefined,

@@ -8,7 +8,7 @@ import {
 	Button,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { __, _n } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -17,10 +17,9 @@ import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 export function BlockRemovalWarningModal( { rules } ) {
-	const { clientIds, selectPrevious, blockNamesForPrompt, messageType } =
-		useSelect( ( select ) =>
-			unlock( select( blockEditorStore ) ).getRemovalPromptData()
-		);
+	const { clientIds, selectPrevious, message } = useSelect( ( select ) =>
+		unlock( select( blockEditorStore ) ).getRemovalPromptData()
+	);
 
 	const {
 		clearBlockRemovalPrompt,
@@ -37,22 +36,9 @@ export function BlockRemovalWarningModal( { rules } ) {
 		};
 	}, [ rules, setBlockRemovalRules ] );
 
-	if ( ! blockNamesForPrompt ) {
+	if ( ! message ) {
 		return;
 	}
-
-	const message =
-		messageType === 'templates'
-			? _n(
-					'Deleting this block will stop your post or page content from displaying on this template. It is not recommended.',
-					'Deleting these blocks will stop your post or page content from displaying on this template. It is not recommended.',
-					blockNamesForPrompt.length
-			  )
-			: _n(
-					'Deleting this block could break patterns on your site that have content linked to it. Are you sure you want to delete it?',
-					'Deleting these blocks could break patterns on your site that have content linked to them. Are you sure you want to delete them?',
-					blockNamesForPrompt.length
-			  );
 
 	const onConfirmRemoval = () => {
 		privateRemoveBlocks( clientIds, selectPrevious, /* force */ true );

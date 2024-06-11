@@ -90,11 +90,6 @@
 		}
 	}
 
-	.block-editor-block-toolbar .components-toolbar-group,
-	.block-editor-block-toolbar .components-toolbar {
-		border-right-color: $gray-200;
-	}
-
 	& > .block-editor-block-toolbar {
 		flex-grow: initial;
 		width: initial;
@@ -109,14 +104,16 @@
 
 		// Parent selector dot divider
 		&::after {
-			content: "\00B7";
-			position: absolute;
-			font-size: 16px;
-			right: 0;
-			height: $button-size-compact;
-			top: 0;
-			display: inline-flex;
 			align-items: center;
+			background-color: $gray-900;
+			border-radius: 100%;
+			content: "";
+			display: inline-flex;
+			height: 2px;
+			position: absolute;
+			right: 0;
+			top: $grid-unit-20 - $border-width;
+			width: 2px;
 		}
 	}
 }
@@ -133,7 +130,7 @@
 		}
 	}
 
-	// @todo: override toolbar group inherited paddings from components/block-tools/style.scss.
+	// @todo override toolbar group inherited paddings from components/block-tools/style.scss.
 	// This is best fixed by making the mover control area a proper single toolbar group.
 	.components-toolbar-group {
 		padding: 0;
@@ -207,17 +204,18 @@
 		}
 	}
 
-	.block-editor-block-mover .block-editor-block-mover__move-button-container {
-		width: auto;
-
-		@include break-small() {
+	.block-editor-block-mover {
+		.block-editor-block-mover__move-button-container {
+			width: auto;
 			position: relative;
+		}
 
-			&::before {
+		&:not(.is-horizontal) .block-editor-block-mover__move-button-container::before {
+			@include break-small() {
 				content: "";
 				height: $border-width;
 				width: 100%;
-				background: $gray-900;
+				background: $gray-200;
 				position: absolute;
 				top: 50%;
 				left: 50%;
@@ -225,6 +223,10 @@
 				// X axis allows to make the separator always centered regardless of its width.
 				transform: translate(-50%, 0);
 				margin-top: -$border-width * 0.5;
+			}
+
+			@include break-medium {
+				background: $gray-900;
 			}
 		}
 	}

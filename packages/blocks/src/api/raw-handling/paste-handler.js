@@ -191,7 +191,7 @@ export function pasteHandler( {
 				commentRemover,
 				iframeRemover,
 				figureContentReducer,
-				blockquoteNormaliser,
+				blockquoteNormaliser(),
 				divNormaliser,
 			];
 

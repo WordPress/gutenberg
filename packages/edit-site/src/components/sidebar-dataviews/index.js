@@ -14,23 +14,19 @@ const { useLocation } = unlock( routerPrivateApis );
 import DataViewItem from './dataview-item';
 import CustomDataViewsList from './custom-dataviews-list';
 
-const PATH_TO_TYPE = {
-	'/pages': 'page',
-};
-
 export default function DataViewsSidebarContent() {
 	const {
-		params: { path, activeView = 'all', isCustom = 'false' },
+		params: { postType, activeView = 'all', isCustom = 'false' },
 	} = useLocation();
-	if ( ! path || ! PATH_TO_TYPE[ path ] ) {
+	if ( ! postType ) {
 		return null;
 	}
-	const type = PATH_TO_TYPE[ path ];
+	const isCustomBoolean = isCustom === 'true';
 
 	return (
 		<>
 			<ItemGroup>
-				{ DEFAULT_VIEWS[ type ].map( ( dataview ) => {
+				{ DEFAULT_VIEWS[ postType ].map( ( dataview ) => {
 					return (
 						<DataViewItem
 							key={ dataview.slug }
@@ -39,19 +35,19 @@ export default function DataViewsSidebarContent() {
 							icon={ dataview.icon }
 							type={ dataview.view.type }
 							isActive={
-								isCustom === 'false' &&
+								! isCustomBoolean &&
 								dataview.slug === activeView
 							}
-							isCustom="false"
+							isCustom={ false }
 						/>
 					);
 				} ) }
 			</ItemGroup>
-			{ window?.__experimentalAdminViews && (
+			{ window?.__experimentalCustomViews && (
 				<CustomDataViewsList
 					activeView={ activeView }
-					type={ type }
-					isCustom="true"
+					type={ postType }
+					isCustom
 				/>
 			) }
 		</>

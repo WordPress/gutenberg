@@ -62,7 +62,7 @@ export default function ImageSettingsPanel( {
 					hasValue={ () => !! value?.lightbox }
 					label={ __( 'Expand on click' ) }
 					onDeselect={ resetLightbox }
-					isShownByDefault={ true }
+					isShownByDefault
 					panelId={ panelId }
 				>
 					<ToggleControl

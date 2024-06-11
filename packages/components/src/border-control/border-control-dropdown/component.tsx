@@ -179,7 +179,7 @@ const BorderControlDropdown = (
 			aria-label={ toggleAriaLabel }
 			tooltipPosition={ dropdownPosition }
 			label={ __( 'Border color and style picker' ) }
-			showTooltip={ true }
+			showTooltip
 			__next40pxDefaultSize={ size === '__unstable-large' ? true : false }
 		>
 			<span className={ indicatorWrapperClassName }>

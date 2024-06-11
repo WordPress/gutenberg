@@ -30,6 +30,7 @@ function SaveButton() {
 			isBusy={ isSaving }
 			aria-disabled={ isDisabled }
 			onClick={ isDisabled ? undefined : saveEditedWidgetAreas }
+			size="compact"
 		>
 			{ isSaving ? __( 'Saving…' ) : __( 'Update' ) }
 		</Button>

@@ -4,8 +4,6 @@
  *
  * @package gutenberg-test-interactive-blocks
  */
-
-wp_enqueue_script_module( 'directive-each-view' );
 ?>
 
 <div data-wp-interactive="directive-each">
@@ -235,4 +233,30 @@ wp_enqueue_script_module( 'directive-each-view' );
 	<p data-testid="item" data-wp-each-child>beta</p>
 	<p data-testid="item" data-wp-each-child>gamma</p>
 	<p data-testid="item" data-wp-each-child>delta</p>
+</div>
+
+<hr>
+
+<div
+	data-wp-interactive="directive-each"
+	data-wp-context='{ "list": [ "beta" ], "callbackRunCount": 0 }'
+	data-testid="elements with directives"
+>
+	<template data-wp-each="context.list">
+		<div
+			data-testid="item"
+			data-wp-text="context.item"
+			data-wp-priority-2-init="callbacks.updateCallbackRunCount"
+		></div>
+	</template>
+	<div
+		data-wp-each-child
+		data-testid="item"
+		data-wp-text="context.item"
+		data-wp-priority-2-init="callbacks.updateCallbackRunCount"
+	></div>
+	<data
+		data-testid="callbackRunCount"
+		data-wp-text="context.callbackRunCount"
+	></data>
 </div>

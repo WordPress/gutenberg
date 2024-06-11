@@ -87,6 +87,10 @@ export function formatFontFamily( input ) {
  * formatFontFaceName(", 'Open Sans', 'Helvetica Neue', sans-serif") => "Open Sans"
  */
 export function formatFontFaceName( input ) {
+	if ( ! input ) {
+		return '';
+	}
+
 	let output = input.trim();
 	if ( output.includes( ',' ) ) {
 		output = output
@@ -117,7 +121,8 @@ export function getFamilyPreviewStyle( family ) {
 	if ( family.fontFace ) {
 		//get all the font faces with normal style
 		const normalFaces = family.fontFace.filter(
-			( face ) => face.fontStyle.toLowerCase() === 'normal'
+			( face ) =>
+				face?.fontStyle && face.fontStyle.toLowerCase() === 'normal'
 		);
 		if ( normalFaces.length > 0 ) {
 			style.fontStyle = 'normal';

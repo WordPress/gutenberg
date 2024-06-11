@@ -30,7 +30,9 @@ const isDeepEqual = ( x, y, shouldSkip ) => {
 		y !== null &&
 		y !== undefined
 	) {
-		if ( Object.keys( x ).length !== Object.keys( y ).length ) return false;
+		if ( Object.keys( x ).length !== Object.keys( y ).length ) {
+			return false;
+		}
 
 		for ( const prop in x ) {
 			if ( y.hasOwnProperty( prop ) ) {
@@ -39,9 +41,12 @@ const isDeepEqual = ( x, y, shouldSkip ) => {
 					return true;
 				}
 
-				if ( ! isDeepEqual( x[ prop ], y[ prop ], shouldSkip ) )
+				if ( ! isDeepEqual( x[ prop ], y[ prop ], shouldSkip ) ) {
 					return false;
-			} else return false;
+				}
+			} else {
+				return false;
+			}
 		}
 
 		return true;

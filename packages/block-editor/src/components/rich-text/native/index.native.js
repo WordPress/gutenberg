@@ -402,7 +402,8 @@ export class RichText extends Component {
 		this.comesFromAztec = true;
 		this.firedAfterTextChanged = event.nativeEvent.firedAfterTextChanged;
 		const value = this.createRecord();
-		const { start, end, text } = value;
+		const { start, end, text, activeFormats } = value;
+		const hasActiveFormats = activeFormats && !! activeFormats.length;
 		let newValue;
 
 		// Always handle full content deletion ourselves.
@@ -415,8 +416,8 @@ export class RichText extends Component {
 
 		// Only process delete if the key press occurs at an uncollapsed edge.
 		if (
-			! onDelete ||
 			! isCollapsed( value ) ||
+			hasActiveFormats ||
 			( isReverse && start !== 0 ) ||
 			( ! isReverse && end !== text.length )
 		) {
@@ -873,6 +874,17 @@ export class RichText extends Component {
 		}
 	}
 
+	componentWillUnmount() {
+		const { clearCurrentSelectionOnUnmount } = this.props;
+
+		// There are cases when the component is unmounted e.g. scrolling in a
+		// long post due to virtualization, so the block selection needs to be cleared
+		// so it doesn't auto-focus when it's added back.
+		if ( this._editor?.isFocused() ) {
+			clearCurrentSelectionOnUnmount?.();
+		}
+	}
+
 	getHtmlToRender( record, tagName ) {
 		// Save back to HTML from React tree.
 		let value = this.valueToFormat( record );
@@ -1222,8 +1234,8 @@ export class RichText extends Component {
 					ref={ ( ref ) => {
 						this._editor = ref;
 
-						if ( this.props.setRef ) {
-							this.props.setRef( ref );
+						if ( this.props.nativeEditorRef ) {
+							this.props.nativeEditorRef( ref );
 						}
 					} }
 					style={ {

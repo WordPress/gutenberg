@@ -24,8 +24,6 @@ export const INDETERMINATE_TRACK_WIDTH = 50;
 export const Track = styled.div`
 	position: relative;
 	overflow: hidden;
-	width: 100%;
-	max-width: 160px;
 	height: ${ CONFIG.borderWidthFocus };
 	/* Text color at 10% opacity */
 	background-color: color-mix(
@@ -38,11 +36,14 @@ export const Track = styled.div`
 	// Windows high contrast mode.
 	outline: 2px solid transparent;
 	outline-offset: 2px;
+
+	:where( & ) {
+		width: 160px;
+	}
 `;
 
 export const Indicator = styled.div< {
 	isIndeterminate: boolean;
-	value?: number;
 } >`
 	display: inline-block;
 	position: absolute;
@@ -60,7 +61,7 @@ export const Indicator = styled.div< {
 	outline: 2px solid transparent;
 	outline-offset: -2px;
 
-	${ ( { isIndeterminate, value } ) =>
+	${ ( { isIndeterminate } ) =>
 		isIndeterminate
 			? css( {
 					animationDuration: '1.5s',
@@ -70,7 +71,7 @@ export const Indicator = styled.div< {
 					width: `${ INDETERMINATE_TRACK_WIDTH }%`,
 			  } )
 			: css( {
-					width: `${ value }%`,
+					width: 'var(--indicator-width)',
 					transition: 'width 0.4s ease-in-out',
 			  } ) };
 `;

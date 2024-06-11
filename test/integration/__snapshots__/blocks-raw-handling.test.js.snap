@@ -135,7 +135,7 @@ exports[`rawHandler should convert HTML post to blocks with minimal content chan
 <!-- /wp:html -->
 
 <!-- wp:list {"ordered":true} -->
-<ol><!-- wp:list-item -->
+<ol class="wp-block-list"><!-- wp:list-item -->
 <li>Item</li>
 <!-- /wp:list-item --></ol>
 <!-- /wp:list -->
@@ -177,9 +177,9 @@ exports[`rawHandler should convert a caption shortcode with link 1`] = `
 
 exports[`rawHandler should convert a list with attributes 1`] = `
 "<!-- wp:list {"ordered":true,"type":"lower-roman","start":2,"reversed":true} -->
-<ol reversed start="2" style="list-style-type:lower-roman"><!-- wp:list-item -->
+<ol reversed start="2" style="list-style-type:lower-roman" class="wp-block-list"><!-- wp:list-item -->
 <li>1<!-- wp:list {"ordered":true,"type":"lower-roman","start":2,"reversed":true} -->
-<ol reversed start="2" style="list-style-type:lower-roman"><!-- wp:list-item -->
+<ol reversed start="2" style="list-style-type:lower-roman" class="wp-block-list"><!-- wp:list-item -->
 <li>1</li>
 <!-- /wp:list-item --></ol>
 <!-- /wp:list --></li>
@@ -196,5 +196,23 @@ exports[`rawHandler should not strip any text-level elements 1`] = `
 exports[`rawHandler should preserve alignment 1`] = `
 "<!-- wp:paragraph {"align":"center"} -->
 <p class="has-text-align-center">center</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`rawHandler should preserve all paragraphs 1`] = `
+"<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>&nbsp;&nbsp;</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"className":"p"} -->
+<p class="p"></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p></p>
 <!-- /wp:paragraph -->"
 `;

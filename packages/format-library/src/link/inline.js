@@ -46,6 +46,7 @@ function InlineLinkUI( {
 	onFocusOutside,
 	stopAddingLink,
 	contentRef,
+	focusOnMount,
 } ) {
 	const richLinkTextValue = getRichTextValueFromSelection( value, isActive );
 
@@ -216,7 +217,10 @@ function InlineLinkUI( {
 
 	const popoverAnchor = useAnchor( {
 		editableContentElement: contentRef.current,
-		settings: { ...settings, isActive },
+		settings: {
+			...settings,
+			isActive,
+		},
 	} );
 
 	async function handleCreate( pageTitle ) {
@@ -248,11 +252,14 @@ function InlineLinkUI( {
 	return (
 		<Popover
 			anchor={ popoverAnchor }
+			animate={ false }
 			onClose={ stopAddingLink }
 			onFocusOutside={ onFocusOutside }
 			placement="bottom"
-			offset={ 10 }
+			offset={ 8 }
 			shift
+			focusOnMount={ focusOnMount }
+			constrainTabbing
 		>
 			<LinkControl
 				value={ linkValue }
@@ -264,7 +271,7 @@ function InlineLinkUI( {
 				createSuggestionButtonText={ createButtonText }
 				hasTextControl
 				settings={ LINK_SETTINGS }
-				showInitialSuggestions={ true }
+				showInitialSuggestions
 				suggestionsQuery={ {
 					// always show Pages as initial suggestions
 					initialSuggestionsSearchOptions: {

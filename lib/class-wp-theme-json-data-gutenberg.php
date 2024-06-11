@@ -38,7 +38,7 @@ class WP_Theme_JSON_Data_Gutenberg {
 	 * @param array  $data   Array following the theme.json specification.
 	 * @param string $origin The origin of the data: default, theme, user.
 	 */
-	public function __construct( $data = array(), $origin = 'theme' ) {
+	public function __construct( $data = array( 'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA ), $origin = 'theme' ) {
 		$this->origin     = $origin;
 		$this->theme_json = new WP_Theme_JSON_Gutenberg( $data, $this->origin );
 	}
@@ -67,5 +67,16 @@ class WP_Theme_JSON_Data_Gutenberg {
 	 */
 	public function get_data() {
 		return $this->theme_json->get_raw_data();
+	}
+
+	/**
+	 * Return theme JSON object.
+	 *
+	 * @since 18.3.0
+	 *
+	 * @return WP_Theme_JSON
+	 */
+	public function get_theme_json() {
+		return $this->theme_json;
 	}
 }

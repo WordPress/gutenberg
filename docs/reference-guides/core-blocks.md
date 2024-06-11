@@ -51,7 +51,7 @@ Prompt visitors to take action with a button-style link. ([Source](https://githu
 -	**Name:** core/button
 -	**Category:** design
 -	**Parent:** core/buttons
--	**Supports:** anchor, color (background, gradients, text), interactivity (clientNavigation), shadow (), spacing (padding), typography (fontSize, lineHeight), ~~alignWide~~, ~~align~~, ~~reusable~~
+-	**Supports:** anchor, color (background, gradients, text), interactivity (clientNavigation), shadow (), spacing (padding), splitting, typography (fontSize, lineHeight), ~~alignWide~~, ~~align~~, ~~reusable~~
 -	**Attributes:** backgroundColor, gradient, linkTarget, placeholder, rel, tagName, text, textAlign, textColor, title, type, url, width
 
 ## Buttons
@@ -60,8 +60,8 @@ Prompt visitors to take action with a group of button-style links. ([Source](htt
 
 -	**Name:** core/buttons
 -	**Category:** design
+-	**Allowed Blocks:** core/button
 -	**Supports:** align (full, wide), anchor, interactivity (clientNavigation), layout (default, ~~allowInheriting~~, ~~allowSwitching~~), spacing (blockGap, margin), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** 
 
 ## Calendar
 
@@ -106,6 +106,7 @@ Display content in multiple columns, with blocks added to each column. ([Source]
 
 -	**Name:** core/columns
 -	**Category:** design
+-	**Allowed Blocks:** core/column
 -	**Supports:** align (full, wide), anchor, color (background, button, gradients, heading, link, text), interactivity (clientNavigation), layout (default, ~~allowEditing~~, ~~allowInheriting~~, ~~allowSwitching~~), shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** isStackedOnMobile, templateLock, verticalAlignment
 
@@ -116,6 +117,7 @@ This block is deprecated. Please use the Avatar block instead. ([Source](https:/
 -	**Name:** core/comment-author-avatar
 -	**Experimental:** fse
 -	**Category:** theme
+-	**Ancestor:** core/comment-template
 -	**Supports:** color (background, ~~text~~), interactivity (clientNavigation), spacing (margin, padding), ~~html~~, ~~inserter~~
 -	**Attributes:** height, width
 
@@ -125,6 +127,7 @@ Displays the name of the author of the comment. ([Source](https://github.com/Wor
 
 -	**Name:** core/comment-author-name
 -	**Category:** theme
+-	**Ancestor:** core/comment-template
 -	**Supports:** color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** isLink, linkTarget, textAlign
 
@@ -134,6 +137,7 @@ Displays the contents of a comment. ([Source](https://github.com/WordPress/guten
 
 -	**Name:** core/comment-content
 -	**Category:** theme
+-	**Ancestor:** core/comment-template
 -	**Supports:** color (background, gradients, link, text), spacing (padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** textAlign
 
@@ -143,6 +147,7 @@ Displays the date on which the comment was posted. ([Source](https://github.com/
 
 -	**Name:** core/comment-date
 -	**Category:** theme
+-	**Ancestor:** core/comment-template
 -	**Supports:** color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** format, isLink
 
@@ -152,6 +157,7 @@ Displays a link to edit the comment in the WordPress Dashboard. This link is onl
 
 -	**Name:** core/comment-edit-link
 -	**Category:** theme
+-	**Ancestor:** core/comment-template
 -	**Supports:** color (background, gradients, link, ~~text~~), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** linkTarget, textAlign
 
@@ -161,6 +167,7 @@ Displays a link to reply to a comment. ([Source](https://github.com/WordPress/gu
 
 -	**Name:** core/comment-reply-link
 -	**Category:** theme
+-	**Ancestor:** core/comment-template
 -	**Supports:** color (background, gradients, link, ~~text~~), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** textAlign
 
@@ -172,7 +179,6 @@ Contains the block elements used to display a comment, like the title, date, aut
 -	**Category:** design
 -	**Parent:** core/comments
 -	**Supports:** align, interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
--	**Attributes:** 
 
 ## Comments
 
@@ -190,6 +196,7 @@ Displays a paginated navigation to next/previous set of comments, when applicabl
 -	**Name:** core/comments-pagination
 -	**Category:** theme
 -	**Parent:** core/comments
+-	**Allowed Blocks:** core/comments-pagination-previous, core/comments-pagination-numbers, core/comments-pagination-next
 -	**Supports:** align, color (background, gradients, link, text), interactivity (clientNavigation), layout (default, ~~allowInheriting~~, ~~allowSwitching~~), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** paginationArrow
 
@@ -211,7 +218,6 @@ Displays a list of page numbers for comments pagination. ([Source](https://githu
 -	**Category:** theme
 -	**Parent:** core/comments-pagination
 -	**Supports:** color (background, gradients, ~~text~~), interactivity (clientNavigation), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
--	**Attributes:** 
 
 ## Comments Previous Page
 
@@ -229,6 +235,7 @@ Displays a title with the number of comments. ([Source](https://github.com/WordP
 
 -	**Name:** core/comments-title
 -	**Category:** theme
+-	**Ancestor:** core/comments
 -	**Supports:** align, color (background, gradients, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~anchor~~, ~~html~~
 -	**Attributes:** level, showCommentsCount, showPostTitle, textAlign
 
@@ -238,7 +245,7 @@ Add an image or video with a text overlay. ([Source](https://github.com/WordPres
 
 -	**Name:** core/cover
 -	**Category:** media
--	**Supports:** align, anchor, color (heading, text, ~~background~~, ~~enableContrastChecker~~), dimensions (aspectRatio), interactivity (clientNavigation), layout (~~allowJustification~~), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align, anchor, color (heading, text, ~~background~~, ~~enableContrastChecker~~), dimensions (aspectRatio), interactivity (clientNavigation), layout (~~allowJustification~~), shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** allowedBlocks, alt, backgroundType, contentPosition, customGradient, customOverlayColor, dimRatio, focalPoint, gradient, hasParallax, id, isDark, isRepeated, isUserOverlayColor, minHeight, minHeightUnit, overlayColor, tagName, templateLock, url, useFeaturedImage
 
 ## Details
@@ -275,7 +282,6 @@ Display footnotes added to the page. ([Source](https://github.com/WordPress/gute
 -	**Name:** core/footnotes
 -	**Category:** text
 -	**Supports:** color (background, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~inserter~~, ~~multiple~~, ~~reusable~~
--	**Attributes:** 
 
 ## Form
 
@@ -284,6 +290,7 @@ A form. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/blo
 -	**Name:** core/form
 -	**Experimental:** true
 -	**Category:** common
+-	**Allowed Blocks:** core/paragraph, core/heading, core/form-input, core/form-submit-button, core/form-submission-notification, core/group, core/columns
 -	**Supports:** anchor, color (background, gradients, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~className~~
 -	**Attributes:** action, email, method, submissionMethod
 
@@ -294,6 +301,7 @@ The basic building block for forms. ([Source](https://github.com/WordPress/guten
 -	**Name:** core/form-input
 -	**Experimental:** true
 -	**Category:** common
+-	**Ancestor:** core/form
 -	**Supports:** anchor, spacing (margin), ~~reusable~~
 -	**Attributes:** inlineLabel, label, name, placeholder, required, type, value, visibilityPermissions
 
@@ -304,7 +312,7 @@ Provide a notification message after the form has been submitted. ([Source](http
 -	**Name:** core/form-submission-notification
 -	**Experimental:** true
 -	**Category:** common
--	**Supports:** 
+-	**Ancestor:** core/form
 -	**Attributes:** type
 
 ## Form Submit Button
@@ -314,8 +322,8 @@ A submission button for forms. ([Source](https://github.com/WordPress/gutenberg/
 -	**Name:** core/form-submit-button
 -	**Experimental:** true
 -	**Category:** common
--	**Supports:** 
--	**Attributes:** 
+-	**Ancestor:** core/form
+-	**Allowed Blocks:** core/buttons, core/button
 
 ## Classic
 
@@ -332,6 +340,7 @@ Display multiple images in a rich gallery. ([Source](https://github.com/WordPres
 
 -	**Name:** core/gallery
 -	**Category:** media
+-	**Allowed Blocks:** core/image
 -	**Supports:** align, anchor, color (background, gradients, ~~text~~), interactivity (clientNavigation), layout (default, ~~allowEditing~~, ~~allowInheriting~~, ~~allowSwitching~~), spacing (blockGap, margin, padding), units (em, px, rem, vh, vw), ~~html~~
 -	**Attributes:** allowResize, caption, columns, fixedHeight, ids, imageCrop, images, linkTarget, linkTo, randomOrder, shortCodeTransforms, sizeSlug
 
@@ -350,7 +359,7 @@ Introduce new sections and organize content to help visitors (and search engines
 
 -	**Name:** core/heading
 -	**Category:** text
--	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, className, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight)
+-	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, className, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fontSize, lineHeight)
 -	**Attributes:** content, level, placeholder, textAlign
 
 ## Home Link
@@ -405,7 +414,8 @@ Create a bulleted or numbered list. ([Source](https://github.com/WordPress/guten
 
 -	**Name:** core/list
 -	**Category:** text
--	**Supports:** __unstablePasteTextInline, anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~className~~
+-	**Allowed Blocks:** core/list-item
+-	**Supports:** __unstablePasteTextInline, anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** ordered, placeholder, reversed, start, type, values
 
 ## List item
@@ -415,7 +425,8 @@ Create a list item. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/
 -	**Name:** core/list-item
 -	**Category:** text
 -	**Parent:** core/list
--	**Supports:** interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~className~~
+-	**Allowed Blocks:** core/list
+-	**Supports:** interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fontSize, lineHeight), ~~className~~
 -	**Attributes:** content, placeholder
 
 ## Login/out
@@ -434,7 +445,7 @@ Set media and words side-by-side for a richer layout. ([Source](https://github.c
 -	**Name:** core/media-text
 -	**Category:** media
 -	**Supports:** align (full, wide), anchor, color (background, gradients, heading, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** align, allowedBlocks, focalPoint, href, imageFill, isStackedOnMobile, linkClass, linkDestination, linkTarget, mediaAlt, mediaId, mediaLink, mediaPosition, mediaSizeSlug, mediaType, mediaUrl, mediaWidth, rel, verticalAlignment
+-	**Attributes:** align, allowedBlocks, focalPoint, href, imageFill, isStackedOnMobile, linkClass, linkDestination, linkTarget, mediaAlt, mediaId, mediaLink, mediaPosition, mediaSizeSlug, mediaType, mediaUrl, mediaWidth, rel, useFeaturedImage, verticalAlignment
 
 ## Unsupported
 
@@ -460,6 +471,7 @@ A collection of blocks that allow visitors to get around your site. ([Source](ht
 
 -	**Name:** core/navigation
 -	**Category:** theme
+-	**Allowed Blocks:** core/navigation-link, core/search, core/social-links, core/page-list, core/spacer, core/home-link, core/site-title, core/site-logo, core/navigation-submenu, core/loginout, core/buttons
 -	**Supports:** align (full, wide), ariaLabel, inserter, interactivity, layout (allowSizingOnChildren, default, ~~allowInheriting~~, ~~allowSwitching~~, ~~allowVerticalAlignment~~), spacing (blockGap, units), typography (fontSize, lineHeight), ~~html~~, ~~renaming~~
 -	**Attributes:** __unstableLocation, backgroundColor, customBackgroundColor, customOverlayBackgroundColor, customOverlayTextColor, customTextColor, hasIcon, icon, maxNestingLevel, openSubmenusOnClick, overlayBackgroundColor, overlayMenu, overlayTextColor, ref, rgbBackgroundColor, rgbTextColor, showSubmenuIcon, templateLock, textColor
 
@@ -470,6 +482,7 @@ Add a page, link, or another item to your navigation. ([Source](https://github.c
 -	**Name:** core/navigation-link
 -	**Category:** design
 -	**Parent:** core/navigation
+-	**Allowed Blocks:** core/navigation-link, core/navigation-submenu, core/page-list
 -	**Supports:** interactivity (clientNavigation), typography (fontSize, lineHeight), ~~html~~, ~~renaming~~, ~~reusable~~
 -	**Attributes:** description, id, isTopLevelLink, kind, label, opensInNewTab, rel, title, type, url
 
@@ -491,7 +504,6 @@ Separate your content into a multi-page experience. ([Source](https://github.com
 -	**Category:** design
 -	**Parent:** core/post-content
 -	**Supports:** interactivity (clientNavigation), ~~className~~, ~~customClassName~~, ~~html~~
--	**Attributes:** 
 
 ## Page List
 
@@ -499,6 +511,7 @@ Display a list of all pages. ([Source](https://github.com/WordPress/gutenberg/tr
 
 -	**Name:** core/page-list
 -	**Category:** widgets
+-	**Allowed Blocks:** core/page-list-item
 -	**Supports:** interactivity (clientNavigation), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** isNested, parentPageID
 
@@ -518,7 +531,7 @@ Start with the basic building block of all narrative. ([Source](https://github.c
 
 -	**Name:** core/paragraph
 -	**Category:** text
--	**Supports:** __unstablePasteTextInline, anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~className~~
+-	**Supports:** __unstablePasteTextInline, anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fontSize, lineHeight), ~~className~~
 -	**Attributes:** align, content, direction, dropCap, placeholder
 
 ## Pattern placeholder
@@ -564,6 +577,7 @@ This block is deprecated. Please use the Comments block instead. ([Source](https
 -	**Name:** core/post-comment
 -	**Experimental:** fse
 -	**Category:** theme
+-	**Allowed Blocks:** core/avatar, core/comment-author-name, core/comment-content, core/comment-date, core/comment-edit-link, core/comment-reply-link
 -	**Supports:** interactivity (clientNavigation), ~~html~~, ~~inserter~~
 -	**Attributes:** commentId
 
@@ -603,7 +617,6 @@ Displays the contents of a post or page. ([Source](https://github.com/WordPress/
 -	**Name:** core/post-content
 -	**Category:** theme
 -	**Supports:** align (full, wide), color (background, gradients, link, text), dimensions (minHeight), layout, spacing (blockGap), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** 
 
 ## Date
 
@@ -629,7 +642,7 @@ Display a post's featured image. ([Source](https://github.com/WordPress/gutenber
 
 -	**Name:** core/post-featured-image
 -	**Category:** theme
--	**Supports:** align (center, full, left, right, wide), color (~~background~~, ~~text~~), interactivity (clientNavigation), spacing (margin, padding), ~~html~~
+-	**Supports:** align (center, full, left, right, wide), color (~~background~~, ~~text~~), filter (duotone), interactivity (clientNavigation), shadow (), spacing (margin, padding), ~~html~~
 -	**Attributes:** aspectRatio, customGradient, customOverlayColor, dimRatio, gradient, height, isLink, linkTarget, overlayColor, rel, scale, sizeSlug, useFirstImageFromPost, width
 
 ## Post Navigation Link
@@ -649,7 +662,6 @@ Contains the block elements used to render a post, like the title, date, feature
 -	**Category:** theme
 -	**Parent:** core/query
 -	**Supports:** align (full, wide), color (background, gradients, link, text), interactivity (clientNavigation), layout, spacing (blockGap), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
--	**Attributes:** 
 
 ## Post Terms
 
@@ -714,7 +726,6 @@ Contains the block elements used to render content when no query results are fou
 -	**Category:** theme
 -	**Parent:** core/query
 -	**Supports:** align, color (background, gradients, link, text), interactivity (clientNavigation), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
--	**Attributes:** 
 
 ## Pagination
 
@@ -722,6 +733,8 @@ Displays a paginated navigation to next/previous set of posts, when applicable. 
 
 -	**Name:** core/query-pagination
 -	**Category:** theme
+-	**Ancestor:** core/query
+-	**Allowed Blocks:** core/query-pagination-previous, core/query-pagination-numbers, core/query-pagination-next
 -	**Supports:** align, color (background, gradients, link, text), interactivity (clientNavigation), layout (default, ~~allowInheriting~~, ~~allowSwitching~~), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** paginationArrow, showLabel
 
@@ -771,7 +784,7 @@ Give quoted text visual emphasis. "In quoting others, we cite ourselves." — Ju
 -	**Name:** core/quote
 -	**Category:** text
 -	**Supports:** anchor, color (background, gradients, heading, link, text), interactivity (clientNavigation), layout (~~allowEditing~~), spacing (blockGap), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** align, citation, value
+-	**Attributes:** citation, textAlign, value
 
 ## Read More
 
@@ -834,7 +847,7 @@ Describe in a few words what the site is about. The tagline can be used in searc
 -	**Name:** core/site-tagline
 -	**Category:** theme
 -	**Supports:** align (full, wide), color (background, gradients, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** textAlign
+-	**Attributes:** level, textAlign
 
 ## Site Title
 
@@ -847,7 +860,7 @@ Displays the name of this site. Update the block, and the changes apply everywhe
 
 ## Social Icon
 
-Display an icon linking to a social media profile or site. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/social-link))
+Display an icon linking to a social profile or site. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/social-link))
 
 -	**Name:** core/social-link
 -	**Category:** widgets
@@ -857,10 +870,11 @@ Display an icon linking to a social media profile or site. ([Source](https://git
 
 ## Social Icons
 
-Display icons linking to your social media profiles or sites. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/social-links))
+Display icons linking to your social profiles or sites. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/social-links))
 
 -	**Name:** core/social-links
 -	**Category:** widgets
+-	**Allowed Blocks:** core/social-link
 -	**Supports:** align (center, left, right), anchor, color (background, gradients, ~~enableContrastChecker~~, ~~text~~), interactivity (clientNavigation), layout (default, ~~allowInheriting~~, ~~allowSwitching~~, ~~allowVerticalAlignment~~), spacing (blockGap, margin, padding, units)
 -	**Attributes:** customIconBackgroundColor, customIconColor, iconBackgroundColor, iconBackgroundColorValue, iconColor, iconColorValue, openInNewTab, showLabels, size
 

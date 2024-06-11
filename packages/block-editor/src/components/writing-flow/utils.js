@@ -8,36 +8,51 @@ import {
 	pasteHandler,
 	findTransform,
 	getBlockTransforms,
+	store as blocksStore,
 } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { getPasteEventData } from '../../utils/pasting';
+import { store as blockEditorStore } from '../../store';
+
+export const requiresWrapperOnCopy = Symbol( 'requiresWrapperOnCopy' );
 
 /**
  * Sets the clipboard data for the provided blocks, with both HTML and plain
  * text representations.
  *
- * @param {ClipboardEvent} event  Clipboard event.
- * @param {WPBlock[]}      blocks Blocks to set as clipboard data.
+ * @param {ClipboardEvent} event    Clipboard event.
+ * @param {WPBlock[]}      blocks   Blocks to set as clipboard data.
+ * @param {Object}         registry The registry to select from.
  */
-export function setClipboardBlocks( event, blocks ) {
+export function setClipboardBlocks( event, blocks, registry ) {
 	let _blocks = blocks;
-	const wrapperBlockName = event.clipboardData.getData(
-		'__unstableWrapperBlockName'
-	);
 
-	if ( wrapperBlockName ) {
-		_blocks = createBlock(
-			wrapperBlockName,
-			JSON.parse(
-				event.clipboardData.getData(
-					'__unstableWrapperBlockAttributes'
-				)
-			),
-			_blocks
-		);
+	const [ firstBlock ] = blocks;
+
+	if ( firstBlock ) {
+		const firstBlockType = registry
+			.select( blocksStore )
+			.getBlockType( firstBlock.name );
+
+		if ( firstBlockType[ requiresWrapperOnCopy ] ) {
+			const { getBlockRootClientId, getBlockName, getBlockAttributes } =
+				registry.select( blockEditorStore );
+			const wrapperBlockClientId = getBlockRootClientId(
+				firstBlock.clientId
+			);
+			const wrapperBlockName = getBlockName( wrapperBlockClientId );
+
+			if ( wrapperBlockName ) {
+				_blocks = createBlock(
+					wrapperBlockName,
+					getBlockAttributes( wrapperBlockClientId ),
+					_blocks
+				);
+			}
+		}
 	}
 
 	const serialized = serialize( _blocks );

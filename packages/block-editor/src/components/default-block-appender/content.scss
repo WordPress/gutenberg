@@ -29,12 +29,15 @@
 	// In "constrained" layout containers, the first and last paragraphs have their margins zeroed out.
 	// In the case of this appender, it needs to apply those same rules to avoid layout shifts.
 	// Such shifts happen when the bottom margin of the Title block has been set to less than the default 1em margin of paragraphs.
-	:where(body .is-layout-constrained) & {
-		> :first-child:first-child {
+	:where(body .is-layout-constrained) &,
+	:where(.wp-site-blocks) & {
+		> :first-child {
 			margin-block-start: 0;
+			margin-block-end: 0;
 		}
 
-		// Since this particular appender will only ever appear on an entirely empty document, we don't account for last-child.
+		// Since this appender will only ever appear on an entirely empty document, we don't account for last-child.
+		// This is also because it will never be the last child, the block inserter that sits in this appender is the last child.
 	}
 
 	// Dropzone.
@@ -98,7 +101,7 @@
 		height: $button-size-small;
 	}
 
-	// @todo: these are currently two separate components. Since we're now
+	// @todo these are currently two separate components. Since we're now
 	// treating them the same, one or both can be retired.
 	.block-editor-inserter__toggle.components-button.has-icon,
 	.block-list-appender__toggle {
@@ -131,7 +134,7 @@
 
 	// These could be avoided by employing a :not(:only-child) on the parent,
 	// but this should be more performant.
-	// @todo: These styles can almost certainly be refactored away we refactor
+	// @todo These styles can almost certainly be refactored away we refactor
 	// the markup and classes of the component itself. The rules provide some
 	// baseline styles for when the block is the only one inside.
 	&:only-child {

@@ -66,7 +66,7 @@ export default function PreferencesModalTabs( { sections } ) {
 		modalContent = (
 			<div className="preferences__tabs">
 				<Tabs
-					initialTabId={
+					defaultTabId={
 						activeMenu !== PREFERENCES_MENU ? activeMenu : undefined
 					}
 					onSelect={ setActiveMenu }
@@ -157,9 +157,7 @@ export default function PreferencesModalTabs( { sections } ) {
 													? chevronRight
 													: chevronLeft
 											}
-											aria-label={ __(
-												'Navigate to the previous view'
-											) }
+											label={ __( 'Back' ) }
 										/>
 										<Text size="16">
 											{ section.tabLabel }

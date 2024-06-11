@@ -23,5 +23,3 @@ export const SELECT_NAVIGATION_MENUS_ARGS = [
 	'wp_navigation',
 	PRELOADED_NAVIGATION_MENUS_QUERY,
 ];
-
-export const NAVIGATION_MOBILE_COLLAPSE = '600px';

@@ -1,5 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Paragraph block should prevent deleting the first Paragraph block when pressing backspace at the start 1`] = `
+"<!-- wp:paragraph -->
+<p>A quick brown fox jumps over the lazy dog.</p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`Paragraph block should render without crashing and match snapshot 1`] = `
 <View
   style={

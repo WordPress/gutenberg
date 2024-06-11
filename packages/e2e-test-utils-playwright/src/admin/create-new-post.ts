@@ -9,6 +9,7 @@ interface NewPostOptions {
 	content?: string;
 	excerpt?: string;
 	showWelcomeGuide?: boolean;
+	fullscreenMode?: boolean;
 }
 
 /**
@@ -24,15 +25,23 @@ export async function createNewPost(
 	const query = new URLSearchParams();
 	const { postType, title, content, excerpt } = options;
 
-	if ( postType ) query.set( 'post_type', postType );
-	if ( title ) query.set( 'post_title', title );
-	if ( content ) query.set( 'content', content );
-	if ( excerpt ) query.set( 'excerpt', excerpt );
+	if ( postType ) {
+		query.set( 'post_type', postType );
+	}
+	if ( title ) {
+		query.set( 'post_title', title );
+	}
+	if ( content ) {
+		query.set( 'content', content );
+	}
+	if ( excerpt ) {
+		query.set( 'excerpt', excerpt );
+	}
 
 	await this.visitAdminPage( 'post-new.php', query.toString() );
 
 	await this.editor.setPreferences( 'core/edit-post', {
 		welcomeGuide: options.showWelcomeGuide ?? false,
-		fullscreenMode: false,
+		fullscreenMode: options.fullscreenMode ?? false,
 	} );
 }

@@ -188,7 +188,8 @@ module.exports = [
 												// other core prefix (e.g. "wp_").
 												return result.replace(
 													new RegExp(
-														functionName,
+														functionName +
+															'(?![a-zA-Z0-9_])',
 														'g'
 													),
 													( match ) =>

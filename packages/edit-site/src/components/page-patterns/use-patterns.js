@@ -1,13 +1,8 @@
 /**
- * External dependencies
- */
-import createSelector from 'rememo';
-
-/**
  * WordPress dependencies
  */
 import { parse } from '@wordpress/blocks';
-import { useSelect } from '@wordpress/data';
+import { useSelect, createSelector } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -45,12 +40,14 @@ const templatePartToPattern = ( templatePart ) => ( {
 	name: createTemplatePartId( templatePart.theme, templatePart.slug ),
 	title: decodeEntities( templatePart.title.rendered ),
 	type: templatePart.type,
+	_links: templatePart._links,
 	templatePart,
 } );
 
 const selectTemplatePartsAsPatterns = createSelector(
 	( select, categoryId, search = '' ) => {
-		const { getEntityRecords, getIsResolving } = select( coreStore );
+		const { getEntityRecords, isResolving: isResolvingSelector } =
+			select( coreStore );
 		const { __experimentalGetDefaultTemplatePartAreas } =
 			select( editorStore );
 		const query = { per_page: -1 };
@@ -78,7 +75,7 @@ const selectTemplatePartsAsPatterns = createSelector(
 			);
 		};
 
-		const isResolving = getIsResolving( 'getEntityRecords', [
+		const isResolving = isResolvingSelector( 'getEntityRecords', [
 			'postType',
 			TEMPLATE_PART_POST_TYPE,
 			query,
@@ -99,7 +96,7 @@ const selectTemplatePartsAsPatterns = createSelector(
 				per_page: -1,
 			}
 		),
-		select( coreStore ).getIsResolving( 'getEntityRecords', [
+		select( coreStore ).isResolving( 'getEntityRecords', [
 			'postType',
 			TEMPLATE_PART_POST_TYPE,
 			{ per_page: -1 },
@@ -111,7 +108,7 @@ const selectTemplatePartsAsPatterns = createSelector(
 const selectThemePatterns = createSelector(
 	( select ) => {
 		const { getSettings } = unlock( select( editSiteStore ) );
-		const { getIsResolving } = select( coreStore );
+		const { isResolving: isResolvingSelector } = select( coreStore );
 		const settings = getSettings();
 		const blockPatterns =
 			settings.__experimentalAdditionalBlockPatterns ??
@@ -137,11 +134,14 @@ const selectThemePatterns = createSelector(
 					__unstableSkipMigrationLogs: true,
 				} ),
 			} ) );
-		return { patterns, isResolving: getIsResolving( 'getBlockPatterns' ) };
+		return {
+			patterns,
+			isResolving: isResolvingSelector( 'getBlockPatterns' ),
+		};
 	},
 	( select ) => [
 		select( coreStore ).getBlockPatterns(),
-		select( coreStore ).getIsResolving( 'getBlockPatterns' ),
+		select( coreStore ).isResolving( 'getBlockPatterns' ),
 		unlock( select( editSiteStore ) ).getSettings(),
 	]
 );
@@ -223,13 +223,17 @@ const convertPatternPostToItem = ( patternPost, categories ) => ( {
 	syncStatus: patternPost.wp_pattern_sync_status || PATTERN_SYNC_TYPES.full,
 	title: patternPost.title.raw,
 	type: patternPost.type,
+	description: patternPost.excerpt.raw,
 	patternPost,
 } );
 
 const selectUserPatterns = createSelector(
 	( select, syncStatus, search = '' ) => {
-		const { getEntityRecords, getIsResolving, getUserPatternCategories } =
-			select( coreStore );
+		const {
+			getEntityRecords,
+			isResolving: isResolvingSelector,
+			getUserPatternCategories,
+		} = select( coreStore );
 
 		const query = { per_page: -1 };
 		const patternPosts = getEntityRecords(
@@ -248,7 +252,7 @@ const selectUserPatterns = createSelector(
 			  )
 			: EMPTY_PATTERN_LIST;
 
-		const isResolving = getIsResolving( 'getEntityRecords', [
+		const isResolving = isResolvingSelector( 'getEntityRecords', [
 			'postType',
 			PATTERN_TYPES.user,
 			query,
@@ -277,7 +281,7 @@ const selectUserPatterns = createSelector(
 		select( coreStore ).getEntityRecords( 'postType', PATTERN_TYPES.user, {
 			per_page: -1,
 		} ),
-		select( coreStore ).getIsResolving( 'getEntityRecords', [
+		select( coreStore ).isResolving( 'getEntityRecords', [
 			'postType',
 			PATTERN_TYPES.user,
 			{ per_page: -1 },
@@ -287,21 +291,28 @@ const selectUserPatterns = createSelector(
 );
 
 export const usePatterns = (
-	categoryType,
+	postType,
 	categoryId,
 	{ search = '', syncStatus } = {}
 ) => {
 	return useSelect(
 		( select ) => {
-			if ( categoryType === TEMPLATE_PART_POST_TYPE ) {
+			if ( postType === TEMPLATE_PART_POST_TYPE ) {
 				return selectTemplatePartsAsPatterns(
 					select,
 					categoryId,
 					search
 				);
-			} else if ( categoryType === PATTERN_TYPES.theme ) {
-				return selectPatterns( select, categoryId, syncStatus, search );
-			} else if ( categoryType === PATTERN_TYPES.user ) {
+			} else if ( postType === PATTERN_TYPES.user && !! categoryId ) {
+				const appliedCategory =
+					categoryId === 'uncategorized' ? '' : categoryId;
+				return selectPatterns(
+					select,
+					appliedCategory,
+					syncStatus,
+					search
+				);
+			} else if ( postType === PATTERN_TYPES.user ) {
 				return selectUserPatterns( select, syncStatus, search );
 			}
 			return {
@@ -309,7 +320,7 @@ export const usePatterns = (
 				isResolving: false,
 			};
 		},
-		[ categoryId, categoryType, search, syncStatus ]
+		[ categoryId, postType, search, syncStatus ]
 	);
 };
 

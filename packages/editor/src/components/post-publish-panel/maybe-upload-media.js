@@ -131,7 +131,7 @@ export default function PostFormatPanel() {
 	}
 
 	return (
-		<PanelBody initialOpen={ true } title={ panelBodyTitle }>
+		<PanelBody initialOpen title={ panelBodyTitle }>
 			<p>
 				{ __(
 					'Upload external images to the Media Library. Images from different domains may load slowly, display incorrectly, or be removed unexpectedly.'

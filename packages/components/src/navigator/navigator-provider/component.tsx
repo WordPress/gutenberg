@@ -6,14 +6,7 @@ import type { ForwardedRef } from 'react';
 /**
  * WordPress dependencies
  */
-import {
-	useMemo,
-	useState,
-	useCallback,
-	useReducer,
-	useRef,
-	useEffect,
-} from '@wordpress/element';
+import { useMemo, useReducer } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
@@ -30,26 +23,184 @@ import type {
 	NavigatorProviderProps,
 	NavigatorLocation,
 	NavigatorContext as NavigatorContextType,
+	NavigateOptions,
 	Screen,
+	NavigateToParentOptions,
 } from '../types';
 
 type MatchedPath = ReturnType< typeof patternMatch >;
-type ScreenAction = { type: string; screen: Screen };
+
+type RouterAction =
+	| { type: 'add' | 'remove'; screen: Screen }
+	| { type: 'goback' }
+	| { type: 'goto'; path: string; options?: NavigateOptions }
+	| { type: 'gotoparent'; options?: NavigateToParentOptions };
+
+type RouterState = {
+	screens: Screen[];
+	locationHistory: NavigatorLocation[];
+	matchedPath: MatchedPath;
+};
 
 const MAX_HISTORY_LENGTH = 50;
 
-function screensReducer(
-	state: Screen[] = [],
-	action: ScreenAction
-): Screen[] {
-	switch ( action.type ) {
-		case 'add':
-			return [ ...state, action.screen ];
-		case 'remove':
-			return state.filter( ( s: Screen ) => s.id !== action.screen.id );
+function addScreen( { screens }: RouterState, screen: Screen ) {
+	return [ ...screens, screen ];
+}
+
+function removeScreen( { screens }: RouterState, screen: Screen ) {
+	return screens.filter( ( s ) => s.id !== screen.id );
+}
+
+function goBack( { locationHistory }: RouterState ) {
+	if ( locationHistory.length <= 1 ) {
+		return locationHistory;
+	}
+	return [
+		...locationHistory.slice( 0, -2 ),
+		{
+			...locationHistory[ locationHistory.length - 2 ],
+			isBack: true,
+			hasRestoredFocus: false,
+		},
+	];
+}
+
+function goTo(
+	state: RouterState,
+	path: string,
+	options: NavigateOptions = {}
+) {
+	const { locationHistory } = state;
+	const {
+		focusTargetSelector,
+		isBack = false,
+		skipFocus = false,
+		replace = false,
+		...restOptions
+	} = options;
+
+	const isNavigatingToSamePath =
+		locationHistory.length > 0 &&
+		locationHistory[ locationHistory.length - 1 ].path === path;
+	if ( isNavigatingToSamePath ) {
+		return locationHistory;
 	}
 
-	return state;
+	const isNavigatingToPreviousPath =
+		isBack &&
+		locationHistory.length > 1 &&
+		locationHistory[ locationHistory.length - 2 ].path === path;
+
+	if ( isNavigatingToPreviousPath ) {
+		return goBack( state );
+	}
+
+	const newLocation = {
+		...restOptions,
+		path,
+		isBack,
+		hasRestoredFocus: false,
+		skipFocus,
+	};
+
+	if ( locationHistory.length === 0 ) {
+		return replace ? [] : [ newLocation ];
+	}
+
+	const newLocationHistory = locationHistory.slice(
+		locationHistory.length > MAX_HISTORY_LENGTH - 1 ? 1 : 0,
+		-1
+	);
+
+	if ( ! replace ) {
+		newLocationHistory.push(
+			// Assign `focusTargetSelector` to the previous location in history
+			// (the one we just navigated from).
+			{
+				...locationHistory[ locationHistory.length - 1 ],
+				focusTargetSelector,
+			}
+		);
+	}
+
+	newLocationHistory.push( newLocation );
+
+	return newLocationHistory;
+}
+
+function goToParent(
+	state: RouterState,
+	options: NavigateToParentOptions = {}
+) {
+	const { locationHistory, screens } = state;
+	const currentPath = locationHistory[ locationHistory.length - 1 ].path;
+	if ( currentPath === undefined ) {
+		return locationHistory;
+	}
+	const parentPath = findParent( currentPath, screens );
+	if ( parentPath === undefined ) {
+		return locationHistory;
+	}
+	return goTo( state, parentPath, {
+		...options,
+		isBack: true,
+	} );
+}
+
+function routerReducer(
+	state: RouterState,
+	action: RouterAction
+): RouterState {
+	let { screens, locationHistory, matchedPath } = state;
+	switch ( action.type ) {
+		case 'add':
+			screens = addScreen( state, action.screen );
+			break;
+		case 'remove':
+			screens = removeScreen( state, action.screen );
+			break;
+		case 'goback':
+			locationHistory = goBack( state );
+			break;
+		case 'goto':
+			locationHistory = goTo( state, action.path, action.options );
+			break;
+		case 'gotoparent':
+			locationHistory = goToParent( state, action.options );
+			break;
+	}
+
+	// Return early in case there is no change
+	if (
+		screens === state.screens &&
+		locationHistory === state.locationHistory
+	) {
+		return state;
+	}
+
+	// Compute the matchedPath
+	const currentPath =
+		locationHistory.length > 0
+			? locationHistory[ locationHistory.length - 1 ].path
+			: undefined;
+	matchedPath =
+		currentPath !== undefined
+			? patternMatch( currentPath, screens )
+			: undefined;
+
+	// If the new match is the same as the previous match,
+	// return the previous one to keep immutability.
+	if (
+		matchedPath &&
+		state.matchedPath &&
+		matchedPath.id === state.matchedPath.id &&
+		isShallowEqual( matchedPath.params, state.matchedPath.params )
+	) {
+		matchedPath = state.matchedPath;
+	}
+
+	return { screens, locationHistory, matchedPath };
 }
 
 function UnconnectedNavigatorProvider(
@@ -59,167 +210,33 @@ function UnconnectedNavigatorProvider(
 	const { initialPath, children, className, ...otherProps } =
 		useContextSystem( props, 'NavigatorProvider' );
 
-	const [ locationHistory, setLocationHistory ] = useState<
-		NavigatorLocation[]
-	>( [
-		{
-			path: initialPath,
-		},
-	] );
-	const currentLocationHistory = useRef< NavigatorLocation[] >( [] );
-	const [ screens, dispatch ] = useReducer( screensReducer, [] );
-	const currentScreens = useRef< Screen[] >( [] );
-	useEffect( () => {
-		currentScreens.current = screens;
-	}, [ screens ] );
-	useEffect( () => {
-		currentLocationHistory.current = locationHistory;
-	}, [ locationHistory ] );
-	const currentMatch = useRef< MatchedPath >();
-	const matchedPath = useMemo( () => {
-		let currentPath: string | undefined;
-		if (
-			locationHistory.length === 0 ||
-			( currentPath =
-				locationHistory[ locationHistory.length - 1 ].path ) ===
-				undefined
-		) {
-			currentMatch.current = undefined;
-			return undefined;
-		}
+	const [ routerState, dispatch ] = useReducer(
+		routerReducer,
+		initialPath,
+		( path ) => ( {
+			screens: [],
+			locationHistory: [ { path } ],
+			matchedPath: undefined,
+		} )
+	);
 
-		const resolvePath = ( path: string ) => {
-			const newMatch = patternMatch( path, screens );
-
-			// If the new match is the same as the current match,
-			// return the previous one for performance reasons.
-			if (
-				currentMatch.current &&
-				newMatch &&
-				isShallowEqual(
-					newMatch.params,
-					currentMatch.current.params
-				) &&
-				newMatch.id === currentMatch.current.id
-			) {
-				return currentMatch.current;
-			}
-
-			return newMatch;
-		};
-
-		const newMatch = resolvePath( currentPath );
-		currentMatch.current = newMatch;
-		return newMatch;
-	}, [ screens, locationHistory ] );
-
-	const addScreen = useCallback(
-		( screen: Screen ) => dispatch( { type: 'add', screen } ),
+	// The methods are constant forever, create stable references to them.
+	const methods = useMemo(
+		() => ( {
+			goBack: () => dispatch( { type: 'goback' } ),
+			goTo: ( path: string, options?: NavigateOptions ) =>
+				dispatch( { type: 'goto', path, options } ),
+			goToParent: ( options: NavigateToParentOptions | undefined ) =>
+				dispatch( { type: 'gotoparent', options } ),
+			addScreen: ( screen: Screen ) =>
+				dispatch( { type: 'add', screen } ),
+			removeScreen: ( screen: Screen ) =>
+				dispatch( { type: 'remove', screen } ),
+		} ),
 		[]
 	);
 
-	const removeScreen = useCallback(
-		( screen: Screen ) => dispatch( { type: 'remove', screen } ),
-		[]
-	);
-
-	const goBack: NavigatorContextType[ 'goBack' ] = useCallback( () => {
-		setLocationHistory( ( prevLocationHistory ) => {
-			if ( prevLocationHistory.length <= 1 ) {
-				return prevLocationHistory;
-			}
-			return [
-				...prevLocationHistory.slice( 0, -2 ),
-				{
-					...prevLocationHistory[ prevLocationHistory.length - 2 ],
-					isBack: true,
-					hasRestoredFocus: false,
-				},
-			];
-		} );
-	}, [] );
-
-	const goTo: NavigatorContextType[ 'goTo' ] = useCallback(
-		( path, options = {} ) => {
-			const {
-				focusTargetSelector,
-				isBack = false,
-				skipFocus = false,
-				replace = false,
-				...restOptions
-			} = options;
-
-			const isNavigatingToPreviousPath =
-				isBack &&
-				currentLocationHistory.current.length > 1 &&
-				currentLocationHistory.current[
-					currentLocationHistory.current.length - 2
-				].path === path;
-
-			if ( isNavigatingToPreviousPath ) {
-				goBack();
-				return;
-			}
-
-			setLocationHistory( ( prevLocationHistory ) => {
-				const newLocation = {
-					...restOptions,
-					path,
-					isBack,
-					hasRestoredFocus: false,
-					skipFocus,
-				};
-
-				if ( prevLocationHistory.length === 0 ) {
-					return replace ? [] : [ newLocation ];
-				}
-
-				const newLocationHistory = prevLocationHistory.slice(
-					prevLocationHistory.length > MAX_HISTORY_LENGTH - 1 ? 1 : 0,
-					-1
-				);
-
-				if ( ! replace ) {
-					newLocationHistory.push(
-						// Assign `focusTargetSelector` to the previous location in history
-						// (the one we just navigated from).
-						{
-							...prevLocationHistory[
-								prevLocationHistory.length - 1
-							],
-							focusTargetSelector,
-						}
-					);
-				}
-
-				newLocationHistory.push( newLocation );
-
-				return newLocationHistory;
-			} );
-		},
-		[ goBack ]
-	);
-
-	const goToParent: NavigatorContextType[ 'goToParent' ] = useCallback(
-		( options = {} ) => {
-			const currentPath =
-				currentLocationHistory.current[
-					currentLocationHistory.current.length - 1
-				].path;
-			if ( currentPath === undefined ) {
-				return;
-			}
-			const parentPath = findParent(
-				currentPath,
-				currentScreens.current
-			);
-			if ( parentPath === undefined ) {
-				return;
-			}
-			goTo( parentPath, { ...options, isBack: true } );
-		},
-		[ goTo ]
-	);
+	const { locationHistory, matchedPath } = routerState;
 
 	const navigatorContextValue: NavigatorContextType = useMemo(
 		() => ( {
@@ -227,23 +244,11 @@ function UnconnectedNavigatorProvider(
 				...locationHistory[ locationHistory.length - 1 ],
 				isInitial: locationHistory.length === 1,
 			},
-			params: matchedPath ? matchedPath.params : {},
-			match: matchedPath ? matchedPath.id : undefined,
-			goTo,
-			goBack,
-			goToParent,
-			addScreen,
-			removeScreen,
+			params: matchedPath?.params ?? {},
+			match: matchedPath?.id,
+			...methods,
 		} ),
-		[
-			locationHistory,
-			matchedPath,
-			goTo,
-			goBack,
-			goToParent,
-			addScreen,
-			removeScreen,
-		]
+		[ locationHistory, matchedPath, methods ]
 	);
 
 	const cx = useCx();

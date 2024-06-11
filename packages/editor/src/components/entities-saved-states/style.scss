@@ -20,7 +20,26 @@
 	font-size: $default-font-size;
 }
 
-.entities-saved-states__change-summary {
+.entities-saved-states__changes {
 	color: $gray-700;
 	font-size: $helptext-font-size;
+	margin: $grid-unit-10 $grid-unit-20 0 $grid-unit-20;
+	list-style: disc;
+
+	li {
+		margin-bottom: $grid-unit-05;
+	}
+}
+
+.entities-saved-states__post-meta {
+	margin-left: $grid-unit-30;
+	align-items: center;
+}
+
+.entities-saved-states__connections-icon {
+	flex-grow: 0;
+}
+
+.entities-saved-states__bindings-text {
+	flex-grow: 1;
 }

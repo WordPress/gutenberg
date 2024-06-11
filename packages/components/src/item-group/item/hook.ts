@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import type { ElementType } from 'react';
-
-/**
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
@@ -32,11 +27,7 @@ export function useItem( props: WordPressComponentProps< ItemProps, 'div' > ) {
 
 	const size = sizeProp || contextSize;
 
-	const as =
-		asProp ||
-		( ( typeof onClick !== 'undefined'
-			? 'button'
-			: 'div' ) as ElementType );
+	const as = asProp || ( typeof onClick !== 'undefined' ? 'button' : 'div' );
 
 	const cx = useCx();
 

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * Internal dependencies
@@ -45,6 +45,7 @@ import {
 	createBlock,
 	cloneBlock,
 	getDefaultBlockName,
+	store as blocksStore,
 } from '@wordpress/blocks';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -123,7 +124,7 @@ function WidthPanel( { selectedWidth, setAttributes } ) {
 	}
 
 	return (
-		<PanelBody title={ __( 'Width settings' ) }>
+		<PanelBody title={ __( 'Settings' ) }>
 			<ButtonGroup aria-label={ __( 'Button width' ) }>
 				{ [ 25, 50, 75, 100 ].map( ( widthValue ) => {
 					return (
@@ -155,6 +156,7 @@ function ButtonEdit( props ) {
 		onReplace,
 		mergeBlocks,
 		clientId,
+		context,
 	} = props;
 	const {
 		tagName,
@@ -239,24 +241,27 @@ function ButtonEdit( props ) {
 			}
 
 			const blockBindingsSource = unlock(
-				select( blockEditorStore )
+				select( blocksStore )
 			).getBlockBindingsSource( metadata?.bindings?.url?.source );
 
 			return {
 				lockUrlControls:
 					!! metadata?.bindings?.url &&
-					( ! blockBindingsSource ||
-						blockBindingsSource?.lockAttributesEditing ),
+					! blockBindingsSource?.canUserEditValue( {
+						select,
+						context,
+						args: metadata?.bindings?.url?.args,
+					} ),
 			};
 		},
-		[ isSelected ]
+		[ isSelected, metadata?.bindings?.url ]
 	);
 
 	return (
 		<>
 			<div
 				{ ...blockProps }
-				className={ classnames( blockProps.className, {
+				className={ clsx( blockProps.className, {
 					[ `has-custom-width wp-block-button__width-${ width }` ]:
 						width,
 					[ `has-custom-font-size` ]: blockProps.style.fontSize,
@@ -273,7 +278,7 @@ function ButtonEdit( props ) {
 						} )
 					}
 					withoutInteractiveFormatting
-					className={ classnames(
+					className={ clsx(
 						className,
 						'wp-block-button__link',
 						colorProps.className,
@@ -292,12 +297,6 @@ function ButtonEdit( props ) {
 						...spacingProps.style,
 						...shadowProps.style,
 					} }
-					onSplit={ ( value ) =>
-						createBlock( 'core/button', {
-							...attributes,
-							text: value,
-						} )
-					}
 					onReplace={ onReplace }
 					onMerge={ mergeBlocks }
 					identifier="text"
@@ -328,7 +327,7 @@ function ButtonEdit( props ) {
 						title={ __( 'Unlink' ) }
 						shortcut={ displayShortcut.primaryShift( 'k' ) }
 						onClick={ unlink }
-						isActive={ true }
+						isActive
 					/>
 				) }
 			</BlockControls>
@@ -344,7 +343,7 @@ function ButtonEdit( props ) {
 						} }
 						anchor={ popoverAnchor }
 						focusOnMount={ isEditingURL ? 'firstElement' : false }
-						__unstableSlotName={ '__unstable-block-tools-after' }
+						__unstableSlotName="__unstable-block-tools-after"
 						shift
 					>
 						<LinkControl

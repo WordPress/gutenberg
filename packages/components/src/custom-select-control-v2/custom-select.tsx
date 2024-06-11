@@ -3,7 +3,6 @@
  */
 import { createContext, useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { Icon, chevronDown } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -14,13 +13,12 @@ import type {
 	CustomSelectContext as CustomSelectContextType,
 	CustomSelectStore,
 	CustomSelectButtonProps,
+	CustomSelectButtonSize,
 	_CustomSelectProps,
 } from './types';
-import {
-	contextConnectWithoutRef,
-	useContextSystem,
-	type WordPressComponentProps,
-} from '../context';
+import type { WordPressComponentProps } from '../context';
+import InputBase from '../input-control/input-base';
+import SelectControlChevronDown from '../select-control/chevron-down';
 
 export const CustomSelectContext =
 	createContext< CustomSelectContextType >( undefined );
@@ -46,23 +44,19 @@ function defaultRenderSelectedValue(
 	return value;
 }
 
-const UnconnectedCustomSelectButton = (
-	props: Omit<
-		WordPressComponentProps<
-			CustomSelectButtonProps & CustomSelectStore,
-			'button',
-			false
-		>,
-		'onChange'
-	>
-) => {
-	const {
-		renderSelectedValue,
-		size = 'default',
-		store,
-		...restProps
-	} = useContextSystem( props, 'CustomSelectControlButton' );
-
+const CustomSelectButton = ( {
+	renderSelectedValue,
+	size = 'default',
+	store,
+	...restProps
+}: Omit<
+	WordPressComponentProps<
+		CustomSelectButtonProps & CustomSelectButtonSize & CustomSelectStore,
+		'button',
+		false
+	>,
+	'onChange'
+> ) => {
 	const { value: currentValue } = store.useState();
 
 	const computedRenderSelectedValue = useMemo(
@@ -81,21 +75,18 @@ const UnconnectedCustomSelectButton = (
 			showOnKeyDown={ false }
 		>
 			<div>{ computedRenderSelectedValue( currentValue ) }</div>
-			<Icon icon={ chevronDown } size={ 18 } />
 		</Styled.Select>
 	);
 };
 
-const CustomSelectButton = contextConnectWithoutRef(
-	UnconnectedCustomSelectButton,
-	'CustomSelectControlButton'
-);
-
-function _CustomSelect( props: _CustomSelectProps & CustomSelectStore ) {
+function _CustomSelect(
+	props: _CustomSelectProps & CustomSelectStore & CustomSelectButtonSize
+) {
 	const {
 		children,
 		hideLabelFromVision = false,
 		label,
+		size,
 		store,
 		...restProps
 	} = props;
@@ -109,12 +100,22 @@ function _CustomSelect( props: _CustomSelectProps & CustomSelectStore ) {
 					{ label }
 				</Styled.SelectLabel>
 			) }
-			<CustomSelectButton { ...restProps } store={ store } />
-			<Styled.SelectPopover gutter={ 12 } store={ store } sameWidth>
-				<CustomSelectContext.Provider value={ { store } }>
-					{ children }
-				</CustomSelectContext.Provider>
-			</Styled.SelectPopover>
+			<InputBase
+				__next40pxDefaultSize
+				size={ size }
+				suffix={ <SelectControlChevronDown /> }
+			>
+				<CustomSelectButton
+					{ ...restProps }
+					size={ size }
+					store={ store }
+				/>
+				<Styled.SelectPopover gutter={ 12 } store={ store } sameWidth>
+					<CustomSelectContext.Provider value={ { store } }>
+						{ children }
+					</CustomSelectContext.Provider>
+				</Styled.SelectPopover>
+			</InputBase>
 		</>
 	);
 }

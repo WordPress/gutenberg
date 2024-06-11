@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -40,8 +40,15 @@ import {
 	toWidthPrecision,
 } from './utils';
 
-function ColumnsEditContainer( { attributes, setAttributes, clientId } ) {
-	const { isStackedOnMobile, verticalAlignment, templateLock } = attributes;
+const DEFAULT_BLOCK = {
+	name: 'core/column',
+};
+
+function ColumnInspectorControls( {
+	clientId,
+	setAttributes,
+	isStackedOnMobile,
+} ) {
 	const { count, canInsertColumnBlock, minCount } = useSelect(
 		( select ) => {
 			const {
@@ -75,45 +82,8 @@ function ColumnsEditContainer( { attributes, setAttributes, clientId } ) {
 		},
 		[ clientId ]
 	);
-
-	const registry = useRegistry();
-	const { getBlocks, getBlockOrder } = useSelect( blockEditorStore );
-	const { updateBlockAttributes, replaceInnerBlocks } =
-		useDispatch( blockEditorStore );
-
-	const classes = classnames( {
-		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
-		[ `is-not-stacked-on-mobile` ]: ! isStackedOnMobile,
-	} );
-
-	const blockProps = useBlockProps( {
-		className: classes,
-	} );
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		orientation: 'horizontal',
-		renderAppender: false,
-		templateLock,
-	} );
-
-	/**
-	 * Update all child Column blocks with a new vertical alignment setting
-	 * based on whatever alignment is passed in. This allows change to parent
-	 * to overide anything set on a individual column basis.
-	 *
-	 * @param {string} newVerticalAlignment The vertical alignment setting.
-	 */
-	function updateAlignment( newVerticalAlignment ) {
-		const innerBlockClientIds = getBlockOrder( clientId );
-
-		// Update own and child Column block vertical alignments.
-		// This is a single action; the batching prevents creating multiple history records.
-		registry.batch( () => {
-			setAttributes( { verticalAlignment: newVerticalAlignment } );
-			updateBlockAttributes( innerBlockClientIds, {
-				verticalAlignment: newVerticalAlignment,
-			} );
-		} );
-	}
+	const { getBlocks } = useSelect( blockEditorStore );
+	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 
 	/**
 	 * Updates the column count, including necessary revisions to child Column
@@ -133,18 +103,19 @@ function ColumnsEditContainer( { attributes, setAttributes, clientId } ) {
 			// If adding a new column, assign width to the new column equal to
 			// as if it were `1 / columns` of the total available space.
 			const newColumnWidth = toWidthPrecision( 100 / newColumns );
+			const newlyAddedColumns = newColumns - previousColumns;
 
 			// Redistribute in consideration of pending block insertion as
 			// constraining the available working width.
 			const widths = getRedistributedColumnWidths(
 				innerBlocks,
-				100 - newColumnWidth
+				100 - newColumnWidth * newlyAddedColumns
 			);
 
 			innerBlocks = [
 				...getMappedColumnWidths( innerBlocks, widths ),
 				...Array.from( {
-					length: newColumns - previousColumns,
+					length: newlyAddedColumns,
 				} ).map( () => {
 					return createBlock( 'core/column', {
 						width: `${ newColumnWidth }%`,
@@ -178,6 +149,86 @@ function ColumnsEditContainer( { attributes, setAttributes, clientId } ) {
 	}
 
 	return (
+		<PanelBody title={ __( 'Settings' ) }>
+			{ canInsertColumnBlock && (
+				<>
+					<RangeControl
+						__nextHasNoMarginBottom
+						__next40pxDefaultSize
+						label={ __( 'Columns' ) }
+						value={ count }
+						onChange={ ( value ) =>
+							updateColumns( count, Math.max( minCount, value ) )
+						}
+						min={ Math.max( 1, minCount ) }
+						max={ Math.max( 6, count ) }
+					/>
+					{ count > 6 && (
+						<Notice status="warning" isDismissible={ false }>
+							{ __(
+								'This column count exceeds the recommended amount and may cause visual breakage.'
+							) }
+						</Notice>
+					) }
+				</>
+			) }
+			<ToggleControl
+				__nextHasNoMarginBottom
+				label={ __( 'Stack on mobile' ) }
+				checked={ isStackedOnMobile }
+				onChange={ () =>
+					setAttributes( {
+						isStackedOnMobile: ! isStackedOnMobile,
+					} )
+				}
+			/>
+		</PanelBody>
+	);
+}
+
+function ColumnsEditContainer( { attributes, setAttributes, clientId } ) {
+	const { isStackedOnMobile, verticalAlignment, templateLock } = attributes;
+	const registry = useRegistry();
+	const { getBlockOrder } = useSelect( blockEditorStore );
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+
+	const classes = clsx( {
+		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
+		[ `is-not-stacked-on-mobile` ]: ! isStackedOnMobile,
+	} );
+
+	const blockProps = useBlockProps( {
+		className: classes,
+	} );
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		defaultBlock: DEFAULT_BLOCK,
+		directInsert: true,
+		orientation: 'horizontal',
+		renderAppender: false,
+		templateLock,
+	} );
+
+	/**
+	 * Update all child Column blocks with a new vertical alignment setting
+	 * based on whatever alignment is passed in. This allows change to parent
+	 * to overide anything set on a individual column basis.
+	 *
+	 * @param {string} newVerticalAlignment The vertical alignment setting.
+	 */
+	function updateAlignment( newVerticalAlignment ) {
+		const innerBlockClientIds = getBlockOrder( clientId );
+
+		// Update own and child Column block vertical alignments.
+		// This is a single action; the batching prevents creating multiple history records.
+		registry.batch( () => {
+			setAttributes( { verticalAlignment: newVerticalAlignment } );
+			updateBlockAttributes( innerBlockClientIds, {
+				verticalAlignment: newVerticalAlignment,
+			} );
+		} );
+	}
+
+	return (
 		<>
 			<BlockControls>
 				<BlockVerticalAlignmentToolbar
@@ -186,46 +237,11 @@ function ColumnsEditContainer( { attributes, setAttributes, clientId } ) {
 				/>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Settings' ) }>
-					{ canInsertColumnBlock && (
-						<>
-							<RangeControl
-								__nextHasNoMarginBottom
-								__next40pxDefaultSize
-								label={ __( 'Columns' ) }
-								value={ count }
-								onChange={ ( value ) =>
-									updateColumns(
-										count,
-										Math.max( minCount, value )
-									)
-								}
-								min={ Math.max( 1, minCount ) }
-								max={ Math.max( 6, count ) }
-							/>
-							{ count > 6 && (
-								<Notice
-									status="warning"
-									isDismissible={ false }
-								>
-									{ __(
-										'This column count exceeds the recommended amount and may cause visual breakage.'
-									) }
-								</Notice>
-							) }
-						</>
-					) }
-					<ToggleControl
-						__nextHasNoMarginBottom
-						label={ __( 'Stack on mobile' ) }
-						checked={ isStackedOnMobile }
-						onChange={ () =>
-							setAttributes( {
-								isStackedOnMobile: ! isStackedOnMobile,
-							} )
-						}
-					/>
-				</PanelBody>
+				<ColumnInspectorControls
+					clientId={ clientId }
+					setAttributes={ setAttributes }
+					isStackedOnMobile={ isStackedOnMobile }
+				/>
 			</InspectorControls>
 			<div { ...innerBlocksProps } />
 		</>
@@ -258,6 +274,7 @@ function Placeholder( { clientId, name, setAttributes } ) {
 				icon={ blockType?.icon?.src }
 				label={ blockType?.title }
 				variations={ variations }
+				instructions={ __( 'Divide into columns. Select a layout:' ) }
 				onSelect={ ( nextVariation = defaultVariation ) => {
 					if ( nextVariation.attributes ) {
 						setAttributes( nextVariation.attributes );

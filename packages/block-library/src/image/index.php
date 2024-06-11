@@ -9,6 +9,8 @@
  * Renders the `core/image` block on the server,
  * adding a data-id attribute to the element if core/gallery has added on pre-render.
  *
+ * @since 5.9.0
+ *
  * @param array    $attributes The block attributes.
  * @param string   $content    The block content.
  * @param WP_Block $block      The block object.
@@ -85,6 +87,8 @@ function render_block_core_image( $attributes, $content, $block ) {
  *
  * This is used to determine whether the lightbox should be rendered or not.
  *
+ * @since 6.4.0
+ *
  * @param array $block Block data.
  *
  * @return array Filtered block data.
@@ -114,6 +118,8 @@ function block_core_image_get_lightbox_settings( $block ) {
 
 /**
  * Adds the directives and layout needed for the lightbox behavior.
+ *
+ * @since 6.4.0
  *
  * @param string $block_content Rendered block content.
  * @param array  $block         Block object.
@@ -182,12 +188,12 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	// Image.
 	$p->next_tag( 'img' );
 	$p->set_attribute( 'data-wp-init', 'callbacks.setButtonStyles' );
-	$p->set_attribute( 'data-wp-on--load', 'callbacks.setButtonStyles' );
-	$p->set_attribute( 'data-wp-on-window--resize', 'callbacks.setButtonStyles' );
+	$p->set_attribute( 'data-wp-on-async--load', 'callbacks.setButtonStyles' );
+	$p->set_attribute( 'data-wp-on-async-window--resize', 'callbacks.setButtonStyles' );
 	// Sets an event callback on the `img` because the `figure` element can also
 	// contain a caption, and we don't want to trigger the lightbox when the
 	// caption is clicked.
-	$p->set_attribute( 'data-wp-on--click', 'actions.showLightbox' );
+	$p->set_attribute( 'data-wp-on-async--click', 'actions.showLightbox' );
 
 	$body_content = $p->get_updated_html();
 
@@ -203,7 +209,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 			aria-haspopup="dialog"
 			aria-label="' . esc_attr( $aria_label ) . '"
 			data-wp-init="callbacks.initTriggerButton"
-			data-wp-on--click="actions.showLightbox"
+			data-wp-on-async--click="actions.showLightbox"
 			data-wp-style--right="context.imageButtonRight"
 			data-wp-style--top="context.imageButtonTop"
 		>
@@ -219,6 +225,9 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	return $body_content;
 }
 
+/**
+ * @since 6.5.0
+ */
 function block_core_image_print_lightbox_overlay() {
 	$close_button_label = esc_attr__( 'Close' );
 
@@ -238,7 +247,7 @@ function block_core_image_print_lightbox_overlay() {
 	}
 
 	echo <<<HTML
-		<div 
+		<div
 			class="wp-lightbox-overlay zoom"
 			data-wp-interactive="core/image"
 			data-wp-context='{}'
@@ -249,12 +258,12 @@ function block_core_image_print_lightbox_overlay() {
 			data-wp-class--show-closing-animation="state.showClosingAnimation"
 			data-wp-watch="callbacks.setOverlayFocus"
 			data-wp-on--keydown="actions.handleKeydown"
-			data-wp-on--touchstart="actions.handleTouchStart"
+			data-wp-on-async--touchstart="actions.handleTouchStart"
 			data-wp-on--touchmove="actions.handleTouchMove"
-			data-wp-on--touchend="actions.handleTouchEnd"
-			data-wp-on--click="actions.hideLightbox"
-			data-wp-on-window--resize="callbacks.setOverlayStyles"
-			data-wp-on-window--scroll="actions.handleScroll"
+			data-wp-on-async--touchend="actions.handleTouchEnd"
+			data-wp-on-async--click="actions.hideLightbox"
+			data-wp-on-async-window--resize="callbacks.setOverlayStyles"
+			data-wp-on-async-window--scroll="actions.handleScroll"
 			tabindex="-1"
 			>
 				<button type="button" aria-label="$close_button_label" style="fill: $close_button_color" class="close-button">
@@ -278,6 +287,8 @@ HTML;
 
 /**
  * Registers the `core/image` block on server.
+ *
+ * @since 5.9.0
  */
 function register_block_core_image() {
 	register_block_type_from_metadata(

@@ -131,9 +131,11 @@ export default function QueryInspectorControls( props ) {
 
 	return (
 		<>
-			<BlockInfo>
-				<CreateNewPostLink { ...props } />
-			</BlockInfo>
+			{ !! postType && (
+				<BlockInfo>
+					<CreateNewPostLink postType={ postType } />
+				</BlockInfo>
+			) }
 			{ showSettingsPanel && (
 				<PanelBody title={ __( 'Settings' ) }>
 					{ showInheritControl && (
