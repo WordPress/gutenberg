@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] RichText - Fix undefined onDelete callback [#62486]
 
 ## 1.120.0
 -   [*] Prevent deleting content when backspacing in the first Paragraph block [#62069]
