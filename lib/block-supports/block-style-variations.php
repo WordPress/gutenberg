@@ -486,4 +486,8 @@ function gutenberg_register_block_style_variations_from_theme() {
 	gutenberg_register_block_style_variations_from_theme_json_data( $variations_user );
 }
 
-add_filter( 'init', 'gutenberg_register_block_style_variations_from_theme' );
+// Remove core init action registering variations.
+if ( function_exists( 'wp_register_block_style_variations_from_theme' ) ) {
+	remove_action( 'init', 'wp_register_block_style_variations_from_theme' );
+}
+add_action( 'init', 'gutenberg_register_block_style_variations_from_theme' );
