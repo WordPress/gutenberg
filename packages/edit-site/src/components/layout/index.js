@@ -25,7 +25,6 @@ import {
 	CommandMenu,
 	privateApis as commandsPrivateApis,
 } from '@wordpress/commands';
-import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
@@ -74,38 +73,24 @@ export default function Layout() {
 
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const toggleRef = useRef();
-	const {
-		isDistractionFree,
-		hasFixedToolbar,
-		hasBlockSelected,
-		canvasMode,
-		previousShortcut,
-		nextShortcut,
-	} = useSelect( ( select ) => {
-		const { getAllShortcutKeyCombinations } = select(
-			keyboardShortcutsStore
-		);
-		const { getCanvasMode } = unlock( select( editSiteStore ) );
-		return {
-			canvasMode: getCanvasMode(),
-			previousShortcut: getAllShortcutKeyCombinations(
-				'core/editor/previous-region'
-			),
-			nextShortcut: getAllShortcutKeyCombinations(
-				'core/editor/next-region'
-			),
-			hasFixedToolbar: select( preferencesStore ).get(
-				'core',
-				'fixedToolbar'
-			),
-			isDistractionFree: select( preferencesStore ).get(
-				'core',
-				'distractionFree'
-			),
-			hasBlockSelected:
-				select( blockEditorStore ).getBlockSelectionStart(),
-		};
-	}, [] );
+	const { hasBlockSelected, canvasMode, previousShortcut, nextShortcut } =
+		useSelect( ( select ) => {
+			const { getAllShortcutKeyCombinations } = select(
+				keyboardShortcutsStore
+			);
+			const { getCanvasMode } = unlock( select( editSiteStore ) );
+			return {
+				canvasMode: getCanvasMode(),
+				previousShortcut: getAllShortcutKeyCombinations(
+					'core/editor/previous-region'
+				),
+				nextShortcut: getAllShortcutKeyCombinations(
+					'core/editor/next-region'
+				),
+				hasBlockSelected:
+					select( blockEditorStore ).getBlockSelectionStart(),
+			};
+		}, [] );
 	const navigateRegionsProps = useNavigateRegions( {
 		previous: previousShortcut,
 		next: nextShortcut,
@@ -163,11 +148,7 @@ export default function Layout() {
 					'edit-site-layout',
 					navigateRegionsProps.className,
 					{
-						'is-distraction-free':
-							isDistractionFree && canvasMode === 'edit',
 						'is-full-canvas': canvasMode === 'edit',
-						'has-fixed-toolbar': hasFixedToolbar,
-						'is-block-toolbar-visible': hasBlockSelected,
 					}
 				) }
 			>
