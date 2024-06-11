@@ -133,6 +133,7 @@ function gutenberg_render_block_style_variation_support_styles( $parsed_block ) 
 		array( 'styles' ),
 		array( 'custom' ),
 		array(
+			'block_style_variations'  => true,
 			'skip_root_layout_styles' => true,
 			'scope'                   => ".$class_name",
 		)
