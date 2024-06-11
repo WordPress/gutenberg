@@ -129,6 +129,7 @@
 
 ### Bug Fixes
 
+-   `Button`: Improve the aria-disabled focus style ([#62480](https://github.com/WordPress/gutenberg/pull/62480)).
 -   `Tabs`: Prevent accidental overflow in indicator ([#61979](https://github.com/WordPress/gutenberg/pull/61979)).
 
 ## 28.0.0 (2024-05-31)
