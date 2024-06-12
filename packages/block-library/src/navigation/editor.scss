@@ -457,12 +457,6 @@ $color-control-label-height: 20px;
 	}
 }
 
-.has-fixed-toolbar .wp-block-navigation__responsive-container.is-menu-open {
-	@include break-medium() {
-		top: $admin-bar-height + $header-height + $block-toolbar-height + $border-width;
-	}
-}
-
 .is-mobile-preview .wp-block-navigation__responsive-container.is-menu-open,
 .is-tablet-preview .wp-block-navigation__responsive-container.is-menu-open {
 	top: $admin-bar-height + $header-height + $block-toolbar-height + $border-width;
@@ -476,12 +470,6 @@ $color-control-label-height: 20px;
 
 		@include break-medium() {
 			top: $header-height + $border-width;
-		}
-	}
-
-	.has-fixed-toolbar .wp-block-navigation__responsive-container.is-menu-open {
-		@include break-medium() {
-			top: $header-height + $block-toolbar-height + $border-width;
 		}
 	}
 
