@@ -1,0 +1,46 @@
+@import "../../dataviews/src/style.scss";
+@import "./components/layout/style.scss";
+@import "./components/page/style.scss";
+@import "./components/save-hub/style.scss";
+@import "./components/save-panel/style.scss";
+@import "./components/sidebar/style.scss";
+@import "./components/site-hub/style.scss";
+@import "./components/site-icon/style.scss";
+@import "./components/editor-canvas-container/style.scss";
+@import "./components/resizable-frame/style.scss";
+
+@include wordpress-admin-schemes();
+
+#wpadminbar,
+#adminmenumain {
+	display: none;
+}
+#wpcontent {
+	margin-left: 0;
+}
+body.js #wpbody {
+	padding-top: 0;
+}
+body {
+	@include wp-admin-reset("#gutenberg-posts-dashboard");
+}
+#gutenberg-posts-dashboard {
+	@include reset;
+	height: 100vh;
+
+	// On mobile the main content area has to scroll, otherwise you can invoke
+	// the over-scroll bounce on the non-scrolling container, for a bad experience.
+	@include break-small {
+		bottom: 0;
+		left: 0;
+		min-height: 100vh;
+		position: fixed;
+		right: 0;
+		top: 0;
+	}
+
+	.no-js & {
+		min-height: 0;
+		position: static;
+	}
+}
