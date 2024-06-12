@@ -93,7 +93,7 @@ export type SearchResult = {
  *
  * @example
  * ```js
- * import { __experimentalFetchLinkSuggestions as fetchLinkSuggestions } from '@wordpress/core-data';
+ * import { fetchLinkSuggestions } from '@wordpress/core-data';
  *
  * //...
  *

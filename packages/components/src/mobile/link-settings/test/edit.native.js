@@ -26,7 +26,7 @@ jest.mock( '@wordpress/compose/src/utils/debounce', () => ( {
 // Mock link suggestions that are fetched by the link picker
 // when typing a search query.
 jest.mock( '@wordpress/core-data/src/fetch', () => ( {
-	__experimentalFetchLinkSuggestions: jest.fn().mockResolvedValue( [ {} ] ),
+	fetchLinkSuggestions: jest.fn().mockResolvedValue( [ {} ] ),
 } ) );
 
 /**
