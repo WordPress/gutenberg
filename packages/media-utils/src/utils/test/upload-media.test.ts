@@ -169,8 +169,8 @@ describe( 'uploadMedia', () => {
 		const onError = jest.fn();
 		const onFileChange = jest.fn();
 		await uploadMedia( {
-			allowedTypes: [ 'image' ],
 			filesList: [ imageFile ],
+			allowedTypes: [ 'image' ],
 			onError,
 			wpAllowedMimeTypes: { aac: 'audio/aac' },
 		} );
