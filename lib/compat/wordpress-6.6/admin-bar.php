@@ -25,7 +25,7 @@ function gutenberg_admin_bar_edit_site_menu( $wp_admin_bar ) {
 	}
 
 	// Don't show for users who can't edit theme options or when in the admin.
-	if ( ! current_user_can( 'edit_theme_options' ) || is_admin() ) {
+	if ( ! current_user_can( 'edit_theme_options' ) || is_admin() || ( is_blog_admin() && is_multisite() && current_user_can( 'manage_sites' ) ) ) {
 		return;
 	}
 
@@ -43,18 +43,6 @@ function gutenberg_admin_bar_edit_site_menu( $wp_admin_bar ) {
 			),
 		)
 	);
-
-	if ( is_blog_admin() && is_multisite() && current_user_can( 'manage_sites' ) ) {
-		$wp_admin_bar->add_node(
-			array(
-				'parent' => 'site-name',
-				'id'     => 'edit-site',
-				'title'  => __( 'Manage Site' ),
-				'href'   => network_admin_url( 'site-info.php?id=' . get_current_blog_id() ),
-			)
-		);
-	}
-
 }
 remove_action( 'admin_bar_menu', 'wp_admin_bar_edit_site_menu', 40 );
 add_action( 'admin_bar_menu', 'gutenberg_admin_bar_edit_site_menu', 41 );
