@@ -86,8 +86,8 @@ export default function PostDateEdit( {
 
 	let postDate = date ? (
 		<time dateTime={ dateI18n( 'c', date ) } ref={ setPopoverAnchor }>
-			{ format === 'Time Ago'
-				? humanTimeDiff( date, new Date() )
+			{ format === 'human-diff'
+				? humanTimeDiff( date )
 				: dateI18n( format || siteFormat, date ) }
 		</time>
 	) : (

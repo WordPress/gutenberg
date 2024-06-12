@@ -92,20 +92,22 @@ function NonDefaultControls( { format, onChange } ) {
 			_x( 'F j, Y', 'long date format' ),
 			/* translators: See https://www.php.net/manual/datetime.format.php */
 			_x( 'M j', 'short date format without the year' ),
-			__( 'Time Ago' ),
 		] ),
 	];
 
-	const suggestedOptions = suggestedFormats.map(
-		( suggestedFormat, index ) => ( {
+	const suggestedOptions = [
+		...suggestedFormats.map( ( suggestedFormat, index ) => ( {
 			key: `suggested-${ index }`,
-			name:
-				suggestedFormat === 'Time Ago'
-					? humanTimeDiff( EXAMPLE_DATE, new Date() )
-					: dateI18n( suggestedFormat, EXAMPLE_DATE ),
+			name: dateI18n( suggestedFormat, EXAMPLE_DATE ),
 			format: suggestedFormat,
-		} )
-	);
+		} ) ),
+		{
+			key: 'human-diff',
+			name: humanTimeDiff( EXAMPLE_DATE ),
+			format: 'human-diff',
+		},
+	];
+
 	const customOption = {
 		key: 'custom',
 		name: __( 'Custom' ),
@@ -115,7 +117,9 @@ function NonDefaultControls( { format, onChange } ) {
 	};
 
 	const [ isCustom, setIsCustom ] = useState(
-		() => !! format && ! suggestedFormats.includes( format )
+		() =>
+			!! format &&
+			! suggestedOptions.some( ( option ) => option.format === format )
 	);
 
 	return (

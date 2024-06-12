@@ -22,8 +22,9 @@ function render_block_core_post_date( $attributes, $content, $block ) {
 
 	$post_ID = $block->context['postId'];
 
-	if ( 'Time Ago' === $attributes['format'] ) {
-		$formatted_date = human_time_diff( get_post_timestamp( $post_ID, 'date' ) ) . ' ' . __( 'ago' );
+	if ( isset( $attributes['format'] ) && 'human-diff' === $attributes['format'] ) {
+		// translators: %s: human-readable time difference.
+		$formatted_date = sprintf( __( '%s ago', 'gutenberg' ), human_time_diff( get_post_timestamp( $post_ID ) ) );
 	} else {
 		$formatted_date = get_the_date( empty( $attributes['format'] ) ? '' : $attributes['format'], $post_ID );
 	}
@@ -43,8 +44,9 @@ function render_block_core_post_date( $attributes, $content, $block ) {
 	 */
 	if ( isset( $attributes['displayType'] ) && 'modified' === $attributes['displayType'] ) {
 		if ( get_the_modified_date( 'Ymdhi', $post_ID ) > get_the_date( 'Ymdhi', $post_ID ) ) {
-			if ( 'Time Ago' === $attributes['format'] ) {
-				$formatted_date = human_time_diff( get_post_timestamp( $post_ID, 'modified' ) ) . ' ' . __( 'ago' );
+			if ( 'human-diff' === $attributes['format'] ) {
+				// translators: %s: human-readable time difference.
+				$formatted_date = sprintf( __( '%s ago', 'gutenberg' ), human_time_diff( get_post_timestamp( $post_ID, 'modified' ) ) );
 			} else {
 				$formatted_date = get_the_modified_date( empty( $attributes['format'] ) ? '' : $attributes['format'], $post_ID );
 			}
