@@ -8,6 +8,7 @@ import {
 } from '@wordpress/components';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { useMemo, useState, useCallback, useEffect } from '@wordpress/element';
+import { useRegistry } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -119,6 +120,7 @@ function BulkActionItem< Item extends AnyItem >( {
 	selectedItems,
 	setActionWithModal,
 }: BulkActionsItemProps< Item > ) {
+	const registry = useRegistry();
 	const eligibleItems = useMemo( () => {
 		return selectedItems.filter(
 			( item ) => ! action.isEligible || action.isEligible( item )
@@ -136,7 +138,10 @@ function BulkActionItem< Item extends AnyItem >( {
 				if ( shouldShowModal ) {
 					setActionWithModal( action );
 				} else {
-					await action.callback( eligibleItems );
+					const maybeThunk = action.callback( eligibleItems );
+					if ( typeof maybeThunk === 'function' ) {
+						maybeThunk( { registry } );
+					}
 				}
 			} }
 			suffix={

@@ -368,7 +368,9 @@ export interface ActionButton< Item extends AnyItem >
 	/**
 	 * The callback to execute when the action is triggered.
 	 */
-	callback: ( items: Item[] ) => void;
+	callback: (
+		items: Item[]
+	) => void | ( ( { registry }: { registry: any } ) => void );
 }
 
 export type Action< Item extends AnyItem > =
