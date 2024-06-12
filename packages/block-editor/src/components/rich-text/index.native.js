@@ -80,6 +80,7 @@ export function RichTextWrapper(
 		unstableOnFocus,
 		__unstableAllowPrefixTransformations,
 		// Native props.
+		__unstableUseSplitSelection,
 		__unstableMobileNoFocusOnMount,
 		deleteEnter,
 		placeholderTextColor,
@@ -178,6 +179,7 @@ export function RichTextWrapper(
 		exitFormattedText,
 		selectionChange,
 		__unstableMarkAutomaticChange,
+		__unstableSplitSelection,
 		clearSelectedBlock,
 	} = useDispatch( blockEditorStore );
 	const adjustedAllowedFormats = getAllowedFormats( {
@@ -345,6 +347,8 @@ export function RichTextWrapper(
 				}
 			} else if ( canSplit ) {
 				splitValue( value );
+			} else if ( __unstableUseSplitSelection ) {
+				__unstableSplitSelection();
 			} else if ( canSplitAtEnd ) {
 				onSplitAtEnd();
 			} else if (
