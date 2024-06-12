@@ -32,7 +32,7 @@ function gutenberg_admin_bar_edit_site_menu( $wp_admin_bar ) {
 	$wp_admin_bar->add_node(
 		array(
 			'id'    => 'site-editor',
-			'title' => __( 'Site Editor' ),
+			'title' => __( 'Edit site' ),
 			'href'  => add_query_arg(
 				array(
 					'postType' => 'wp_template',
