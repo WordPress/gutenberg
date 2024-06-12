@@ -60,7 +60,7 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 			>
 				<BaseControl
 					help={ __(
-						'Block attributes connected to different sources.'
+						'Connected attributes connected to different sources.'
 					) }
 				>
 					<ItemGroup isBordered isSeparated size="large">
