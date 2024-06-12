@@ -40,7 +40,7 @@ export function useInBetweenInserter() {
 			}
 
 			function onMouseMove( event ) {
-				if ( openRef.current ) {
+				if ( openRef === undefined || openRef.current ) {
 					return;
 				}
 
