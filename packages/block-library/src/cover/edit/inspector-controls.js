@@ -58,13 +58,11 @@ function CoverHeightInput( {
 	}, [ unit, value ] );
 
 	return (
-		<>
-			<HeightControl
-				label={ __( 'Minimum height of cover' ) }
-				value={ computedValue }
-				onChange={ handleOnChange }
-			/>
-		</>
+		<HeightControl
+			label={ __( 'Minimum height of cover' ) }
+			value={ computedValue }
+			onChange={ handleOnChange }
+		/>
 	);
 }
 export default function CoverInspectorControls( {
