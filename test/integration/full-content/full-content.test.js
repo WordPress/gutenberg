@@ -10,6 +10,7 @@ import { format } from 'util';
 import {
 	getBlockTypes,
 	parse,
+	registerBlockType,
 	serialize,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 } from '@wordpress/blocks';
@@ -60,16 +61,16 @@ const normalizeParsedBlocks = ( blocks ) =>
 
 describe( 'full post content fixture', () => {
 	beforeAll( () => {
-		const blockMetadataFiles = glob.sync(
+		const coreBlockMetadataFiles = glob.sync(
 			'packages/block-library/src/*/block.json'
 		);
-		const blockDefinitions = Object.fromEntries(
-			blockMetadataFiles.map( ( file ) => {
+		const coreBlockDefinitions = Object.fromEntries(
+			coreBlockMetadataFiles.map( ( file ) => {
 				const { name, ...metadata } = require( file );
 				return [ name, metadata ];
 			} )
 		);
-		unstable__bootstrapServerSideBlockDefinitions( blockDefinitions );
+		unstable__bootstrapServerSideBlockDefinitions( coreBlockDefinitions );
 		registerCoreBlocks();
 
 		// Form-related blocks will not be registered unless they are opted
@@ -87,6 +88,19 @@ describe( 'full post content fixture', () => {
 				enableFSEBlocks: true,
 			} );
 		}
+
+		// Bootstrap and register block plugins.
+		const blockPluginMetadataFiles = glob.sync(
+			'plugins/*/src/block.json'
+		);
+		const blockPluginDefinitions = Object.fromEntries(
+			blockPluginMetadataFiles.map( ( file ) => {
+				const metadata = require( file );
+				registerBlockType( metadata );
+				return [ metadata.ame, metadata ];
+			} )
+		);
+		unstable__bootstrapServerSideBlockDefinitions( blockPluginDefinitions );
 	} );
 
 	let spacer = 4;
