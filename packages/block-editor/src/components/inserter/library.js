@@ -27,6 +27,7 @@ function InserterLibrary(
 		onSelect = noop,
 		shouldFocusBlock = false,
 		onClose,
+		isInserterOpened,
 	},
 	ref
 ) {
@@ -58,6 +59,7 @@ function InserterLibrary(
 			shouldFocusBlock={ shouldFocusBlock }
 			ref={ ref }
 			onClose={ onClose }
+			isInserterOpened={ isInserterOpened }
 		/>
 	);
 }

@@ -30,6 +30,7 @@ export default function InserterSidebar() {
 		insertionPoint,
 		showMostUsedBlocks,
 		sidebarIsOpened,
+		isInserterOpened,
 	} = useSelect( ( select ) => {
 		const {
 			getInserterSidebarToggleRef,
@@ -57,6 +58,7 @@ export default function InserterSidebar() {
 			sidebarIsOpened: !! (
 				getActiveComplementaryArea( 'core' ) || isPublishSidebarOpened()
 			),
+			isInserterOpened: select( editorStore ).isInserterOpened(),
 		};
 	}, [] );
 	const { setIsInserterOpened } = useDispatch( editorStore );
@@ -105,6 +107,7 @@ export default function InserterSidebar() {
 				}
 				ref={ libraryRef }
 				onClose={ closeInserterSidebar }
+				isInserterOpened={ isInserterOpened }
 			/>
 		</div>
 	);
@@ -120,11 +123,13 @@ export default function InserterSidebar() {
 			</div>
 		);
 	}
+
 	return (
 		<div
 			ref={ inserterDialogRef }
 			{ ...inserterDialogProps }
 			className="editor-inserter-sidebar"
+			style={ { display: isInserterOpened ? 'block' : 'none' } }
 		>
 			{ inserterContents }
 		</div>

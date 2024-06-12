@@ -6,7 +6,12 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { forwardRef } from '@wordpress/element';
+import {
+	forwardRef,
+	useEffect,
+	useLayoutEffect,
+	useRef,
+} from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
 
 /**
@@ -33,13 +38,36 @@ const mediaTab = {
 	title: __( 'Media' ),
 };
 
-function InserterTabs( { onSelect, children, onClose, selectedTab }, ref ) {
+function InserterTabs(
+	{ onSelect, children, onClose, selectedTab, isInserterOpened },
+	ref
+) {
 	const tabs = [ blocksTab, patternsTab, mediaTab ];
+	console.log( 'isInserterOpened', isInserterOpened );
+	// Focus first active tab, if any
+	const tabsRef = useRef();
+	useEffect( () => {
+		console.log( tabsRef );
+		if ( tabsRef?.current ) {
+			//window.requestAnimationFrame( () => {
+			console.log( 'focus' );
+			console.log( document.activeElement );
+			console.log( tabsRef?.current.innerHTML );
+			console.log( selectedTab );
+			console.log( tabsRef?.current?.querySelector( '[role="tab"]' ) );
+
+			tabsRef?.current?.querySelector( '[role="tab"]' )?.focus();
+			//} );
+		}
+	}, [ isInserterOpened ] );
 
 	return (
 		<div className="block-editor-inserter__tabs" ref={ ref }>
 			<Tabs onSelect={ onSelect } selectedTabId={ selectedTab }>
-				<div className="block-editor-inserter__tablist-and-close-button">
+				<div
+					className="block-editor-inserter__tablist-and-close-button"
+					ref={ tabsRef }
+				>
 					<Button
 						className="block-editor-inserter__close-button"
 						icon={ closeSmall }

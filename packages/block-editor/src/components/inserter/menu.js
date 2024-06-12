@@ -12,7 +12,6 @@ import {
 	useCallback,
 	useMemo,
 	useRef,
-	useLayoutEffect,
 } from '@wordpress/element';
 import { VisuallyHidden, SearchControl, Popover } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -49,6 +48,7 @@ function InserterMenu(
 		onClose,
 		__experimentalInitialTab,
 		__experimentalInitialCategory,
+		isInserterOpened,
 	},
 	ref
 ) {
@@ -294,18 +294,6 @@ function InserterMenu(
 		setSelectedTab( value );
 	};
 
-	// Focus first active tab, if any
-	const tabsRef = useRef();
-	useLayoutEffect( () => {
-		if ( tabsRef.current ) {
-			window.requestAnimationFrame( () => {
-				tabsRef.current
-					.querySelector( '[role="tab"][aria-selected="true"]' )
-					?.focus();
-			} );
-		}
-	}, [] );
-
 	return (
 		<div
 			className={ clsx( 'block-editor-inserter__menu', {
@@ -316,10 +304,10 @@ function InserterMenu(
 		>
 			<div className="block-editor-inserter__main-area">
 				<InserterTabs
-					ref={ tabsRef }
 					onSelect={ handleSetSelectedTab }
 					onClose={ onClose }
 					selectedTab={ selectedTab }
+					isInserterOpened={ isInserterOpened }
 				>
 					{ inserterSearch }
 					{ selectedTab === 'blocks' &&

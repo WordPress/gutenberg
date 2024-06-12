@@ -150,7 +150,10 @@ class PrivateInserter extends Component {
 			prioritizePatterns,
 			onSelectOrClose,
 			selectBlockOnInsert,
+			isInserterOpened,
 		} = this.props;
+
+		console.log( 'index', 'isInsertOpened', isInserterOpened );
 
 		if ( isQuick ) {
 			return (
@@ -186,6 +189,7 @@ class PrivateInserter extends Component {
 				clientId={ clientId }
 				isAppender={ isAppender }
 				showInserterHelpPanel={ showInserterHelpPanel }
+				isInserterOpened={ isInserterOpened }
 			/>
 		);
 	}
@@ -421,6 +425,7 @@ export const ComposedPrivateInserter = compose( [
 ] )( PrivateInserter );
 
 const Inserter = forwardRef( ( props, ref ) => {
+	console.log( 'InserterProps', props );
 	return <ComposedPrivateInserter ref={ ref } { ...props } />;
 } );
 

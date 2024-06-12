@@ -146,9 +146,11 @@ export default function EditorInterface( {
 			editorNotices={ <EditorNotices /> }
 			secondarySidebar={
 				! isPreviewMode &&
-				mode === 'visual' &&
-				( ( isInserterOpened && <InserterSidebar /> ) ||
-					( isListViewOpened && <ListViewSidebar /> ) )
+				mode === 'visual' && (
+					<>
+						<InserterSidebar /> <ListViewSidebar />{ ' ' }
+					</>
+				)
 			}
 			sidebar={
 				! isPreviewMode &&
