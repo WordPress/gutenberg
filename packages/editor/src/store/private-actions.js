@@ -370,6 +370,13 @@ export const revertTemplate =
 export const removeTemplates =
 	( items ) =>
 	async ( { registry } ) => {
+		const isResetting = items.every(
+			( item ) =>
+				!! item &&
+				( item.has_theme_file ||
+					( item.templatePart && item.templatePart.has_theme_file ) )
+		);
+
 		const promiseResult = await Promise.allSettled(
 			items.map( ( item ) => {
 				return registry
@@ -395,13 +402,21 @@ export const removeTemplates =
 					typeof items[ 0 ].title === 'string'
 						? items[ 0 ].title
 						: items[ 0 ].title?.rendered;
-				successMessage = sprintf(
-					/* translators: The template/part's name. */
-					__( '"%s" deleted.' ),
-					decodeEntities( title )
-				);
+				successMessage = isResetting
+					? sprintf(
+							/* translators: The template/part's name. */
+							__( '"%s" reset.' ),
+							decodeEntities( title )
+					  )
+					: sprintf(
+							/* translators: The template/part's name. */
+							__( '"%s" deleted.' ),
+							decodeEntities( title )
+					  );
 			} else {
-				successMessage = __( 'Items deleted.' );
+				successMessage = isResetting
+					? __( 'Items reset.' )
+					: __( 'Items deleted.' );
 			}
 
 			registry
@@ -418,9 +433,9 @@ export const removeTemplates =
 				if ( promiseResult[ 0 ].reason?.message ) {
 					errorMessage = promiseResult[ 0 ].reason.message;
 				} else {
-					errorMessage = __(
-						'An error occurred while deleting the item.'
-					);
+					errorMessage = isResetting
+						? __( 'An error occurred while reverting the item.' )
+						: __( 'An error occurred while deleting the item.' );
 				}
 				// If we were trying to delete a multiple templates
 			} else {
@@ -438,19 +453,37 @@ export const removeTemplates =
 						'An error occurred while deleting the items.'
 					);
 				} else if ( errorMessages.size === 1 ) {
-					errorMessage = sprintf(
-						/* translators: %s: an error message */
-						__( 'An error occurred while deleting the items: %s' ),
-						[ ...errorMessages ][ 0 ]
-					);
+					errorMessage = isResetting
+						? sprintf(
+								/* translators: %s: an error message */
+								__(
+									'An error occurred while reverting the items: %s'
+								),
+								[ ...errorMessages ][ 0 ]
+						  )
+						: sprintf(
+								/* translators: %s: an error message */
+								__(
+									'An error occurred while deleting the items: %s'
+								),
+								[ ...errorMessages ][ 0 ]
+						  );
 				} else {
-					sprintf(
-						/* translators: %s: a list of comma separated error messages */
-						__(
-							'Some errors occurred while deleting the items: %s'
-						),
-						[ ...errorMessages ].join( ',' )
-					);
+					errorMessage = isResetting
+						? sprintf(
+								/* translators: %s: a list of comma separated error messages */
+								__(
+									'Some errors occurred while reverting the items: %s'
+								),
+								[ ...errorMessages ].join( ',' )
+						  )
+						: sprintf(
+								/* translators: %s: a list of comma separated error messages */
+								__(
+									'Some errors occurred while deleting the items: %s'
+								),
+								[ ...errorMessages ].join( ',' )
+						  );
 				}
 			}
 			registry
