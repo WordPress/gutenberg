@@ -72,7 +72,7 @@ class WP_Theme_JSON_Data_Gutenberg {
 	/**
 	 * Return theme JSON object.
 	 *
-	 * @since 18.3.0
+	 * @since 18.5.0
 	 *
 	 * @return WP_Theme_JSON
 	 */
