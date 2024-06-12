@@ -2270,7 +2270,7 @@ class WP_Theme_JSON_Gutenberg {
 			}
 
 			$is_root_style = str_starts_with( $css_property, '--wp--style--root--' );
-			if (  $is_root_style && ( static::ROOT_BLOCK_SELECTOR !== $selector || ! $use_root_padding ) ) {
+			if ( $is_root_style && ( static::ROOT_BLOCK_SELECTOR !== $selector || ! $use_root_padding ) ) {
 				continue;
 			}
 
