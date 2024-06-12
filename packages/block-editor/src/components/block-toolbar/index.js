@@ -35,7 +35,7 @@ import { store as blockEditorStore } from '../../store';
 import __unstableBlockNameContext from './block-name-context';
 import NavigableToolbar from '../navigable-toolbar';
 import Shuffle from './shuffle';
-import BlockBindingsIndicator from '../block-bindings-toolbar-indicator';
+import PatternOverridesToolbarIndicator from '../pattern-overrides-toolbar-indicator';
 import { useHasBlockToolbar } from './use-has-block-toolbar';
 import { canBindBlock } from '../../hooks/use-bindings-attributes';
 /**
@@ -67,11 +67,13 @@ export function PrivateBlockToolbar( {
 		shouldShowVisualToolbar,
 		showParentSelector,
 		isUsingBindings,
+		hasParentPattern,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockName,
 			getBlockMode,
 			getBlockParents,
+			getBlockParentsByBlockName,
 			getSelectedBlockClientIds,
 			isBlockValid,
 			getBlockRootClientId,
@@ -94,8 +96,13 @@ export function PrivateBlockToolbar( {
 		const isVisual = selectedBlockClientIds.every(
 			( id ) => getBlockMode( id ) === 'visual'
 		);
-		const _isUsingBindings = !! getBlockAttributes( selectedBlockClientId )
-			?.metadata?.bindings;
+		const bindings = getBlockAttributes( selectedBlockClientId )?.metadata
+			?.bindings;
+		const parentPatternClientId = getBlockParentsByBlockName(
+			selectedBlockClientId,
+			'core/block',
+			true
+		)[ 0 ];
 		return {
 			blockClientId: selectedBlockClientId,
 			blockClientIds: selectedBlockClientIds,
@@ -115,7 +122,8 @@ export function PrivateBlockToolbar( {
 				) &&
 				selectedBlockClientIds.length === 1 &&
 				_isDefaultEditingMode,
-			isUsingBindings: _isUsingBindings,
+			isUsingBindings: !! bindings,
+			hasParentPattern: !! parentPatternClientId,
 		};
 	}, [] );
 
@@ -146,6 +154,7 @@ export function PrivateBlockToolbar( {
 
 	const innerClasses = clsx( 'block-editor-block-toolbar', {
 		'is-synced': isSynced,
+		'is-connected': isUsingBindings,
 	} );
 
 	return (
@@ -167,9 +176,13 @@ export function PrivateBlockToolbar( {
 				{ ! isMultiToolbar &&
 					isLargeViewport &&
 					isDefaultEditingMode && <BlockParentSelector /> }
-				{ isUsingBindings && canBindBlock( blockName ) && (
-					<BlockBindingsIndicator clientIds={ blockClientIds } />
-				) }
+				{ isUsingBindings &&
+					hasParentPattern &&
+					canBindBlock( blockName ) && (
+						<PatternOverridesToolbarIndicator
+							clientIds={ blockClientIds }
+						/>
+					) }
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) &&
 					( isDefaultEditingMode || isSynced ) && (
 						<div
@@ -180,6 +193,7 @@ export function PrivateBlockToolbar( {
 								<BlockSwitcher
 									clientIds={ blockClientIds }
 									disabled={ ! isDefaultEditingMode }
+									isUsingBindings={ isUsingBindings }
 								/>
 								{ isDefaultEditingMode && (
 									<>
