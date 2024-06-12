@@ -299,7 +299,7 @@ function gutenberg_merge_block_style_variations_data( $variations_data, $theme_j
  *
  * @return WP_Theme_JSON_Data_Gutenberg
  */
-function gutenberg_resolve_block_style_variations_from_theme_style_variation( $theme_json ) {
+function gutenberg_resolve_block_style_variations_from_theme_json_user( $theme_json ) {
 	$theme_json_data   = $theme_json->get_data();
 	$shared_variations = $theme_json_data['styles']['blocks']['variations'] ?? array();
 	$variations_data   = gutenberg_resolve_block_style_variations( $shared_variations );
@@ -334,7 +334,25 @@ function gutenberg_resolve_block_style_variations_from_theme_json_partials( $the
  *
  * @return WP_Theme_JSON_Data_Gutenberg
  */
-function gutenberg_resolve_block_style_variations_from_primary_theme_json( $theme_json ) {
+function gutenberg_resolve_block_style_variations_from_theme_json_default( $theme_json ) {
+	$theme_json_data        = $theme_json->get_data();
+	$block_style_variations = $theme_json_data['styles']['blocks']['variations'] ?? array();
+	$variations_data        = gutenberg_resolve_block_style_variations( $block_style_variations );
+
+	return gutenberg_merge_block_style_variations_data( $variations_data, $theme_json, 'default' );
+}
+
+/**
+ * Merges shared block style variations registered within the
+ * `styles.blocks.variations` property of the primary theme.json file.
+ *
+ * @since 6.6.0
+ *
+ * @param WP_Theme_JSON_Data_Gutenberg $theme_json Current theme.json data.
+ *
+ * @return WP_Theme_JSON_Data_Gutenberg
+ */
+function gutenberg_resolve_block_style_variations_from_theme_json_theme( $theme_json ) {
 	$theme_json_data        = $theme_json->get_data();
 	$block_style_variations = $theme_json_data['styles']['blocks']['variations'] ?? array();
 	$variations_data        = gutenberg_resolve_block_style_variations( $block_style_variations );
@@ -394,8 +412,8 @@ if ( function_exists( 'wp_enqueue_block_style_variation_styles' ) ) {
 	remove_action( 'wp_enqueue_scripts', 'wp_enqueue_block_style_variation_styles' );
 }
 
-if ( function_exists( 'wp_resolve_block_style_variations_from_primary_theme_json' ) ) {
-	remove_filter( 'wp_theme_json_data_theme', 'wp_resolve_block_style_variations_from_primary_theme_json' );
+if ( function_exists( 'wp_resolve_block_style_variations_from_theme_json_default' ) ) {
+	remove_filter( 'wp_theme_json_data_theme', 'wp_resolve_block_style_variations_from_theme_json_default' );
 }
 if ( function_exists( 'wp_resolve_block_style_variations_from_theme_json_partials' ) ) {
 	remove_filter( 'wp_theme_json_data_theme', 'wp_resolve_block_style_variations_from_theme_json_partials' );
@@ -403,8 +421,8 @@ if ( function_exists( 'wp_resolve_block_style_variations_from_theme_json_partial
 if ( function_exists( 'wp_resolve_block_style_variations_from_styles_registry' ) ) {
 	remove_filter( 'wp_theme_json_data_theme', 'wp_resolve_block_style_variations_from_styles_registry' );
 }
-if ( function_exists( 'wp_resolve_block_style_variations_from_theme_style_variation' ) ) {
-	remove_filter( 'wp_theme_json_data_user', 'wp_resolve_block_style_variations_from_theme_style_variation' );
+if ( function_exists( 'wp_resolve_block_style_variations_from_theme_json_user' ) ) {
+	remove_filter( 'wp_theme_json_data_user', 'wp_resolve_block_style_variations_from_theme_json_user' );
 }
 
 // Add Gutenberg filters and action.
@@ -413,11 +431,13 @@ add_filter( 'render_block', 'gutenberg_render_block_style_variation_class_name',
 add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_block_style_variation_styles', 1 );
 
 // Resolve block style variations from all their potential sources. The order here is deliberate.
-add_filter( 'wp_theme_json_data_theme', 'gutenberg_resolve_block_style_variations_from_primary_theme_json', 10, 1 );
+add_filter( 'wp_theme_json_data_default', 'gutenberg_resolve_block_style_variations_from_theme_json_default', 10, 1 );
+
+add_filter( 'wp_theme_json_data_theme', 'gutenberg_resolve_block_style_variations_from_theme_json_theme', 10, 1 );
 add_filter( 'wp_theme_json_data_theme', 'gutenberg_resolve_block_style_variations_from_theme_json_partials', 10, 1 );
 add_filter( 'wp_theme_json_data_theme', 'gutenberg_resolve_block_style_variations_from_styles_registry', 10, 1 );
 
-add_filter( 'wp_theme_json_data_user', 'gutenberg_resolve_block_style_variations_from_theme_style_variation', 10, 1 );
+add_filter( 'wp_theme_json_data_user', 'gutenberg_resolve_block_style_variations_from_theme_json_user', 10, 1 );
 
 
 /**
@@ -490,25 +510,9 @@ function gutenberg_register_block_style_variations_from_theme() {
 	$variations_partials = WP_Theme_JSON_Resolver_Gutenberg::get_style_variations( 'block' );
 	gutenberg_register_block_style_variations_from_theme_json_data( $variations_partials );
 
-	/*
-	 * Pull the data from the specific origin instead of the merged data.
-	 * This is because, for 6.6, we only support registering block style variations
-	 * for the 'theme' and 'custom' origins but not for 'default' (core theme.json)
-	 * or 'custom' (theme.json in a block).
-	 *
-	 * When/If we add support for every origin, we should switch to using the public API
-	 * instead, e.g.: wp_get_global_styles( array( 'blocks', 'variations' ) ).
-	 */
-
-	// theme.json of the theme.
-	$theme_json_theme = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data();
-	$variations_theme = $theme_json_theme->get_data()['styles']['blocks']['variations'] ?? array();
-	gutenberg_register_block_style_variations_from_theme_json_data( $variations_theme );
-
-	// User data linked for this theme.
-	$theme_json_user = WP_Theme_JSON_Resolver_Gutenberg::get_user_data();
-	$variations_user = $theme_json_user->get_data()['styles']['blocks']['variations'] ?? array();
-	gutenberg_register_block_style_variations_from_theme_json_data( $variations_user );
+	// theme.json (default, theme, user).
+	$variations = gutenberg_get_global_styles( array( 'blocks', 'variations' ) );
+	gutenberg_register_block_style_variations_from_theme_json_data( $variations );
 }
 
 // Remove core init action registering variations.
