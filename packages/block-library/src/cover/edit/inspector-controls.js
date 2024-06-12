@@ -158,6 +158,9 @@ export default function CoverInspectorControls( {
 		aside: __(
 			"The <aside> element should represent a portion of a document whose content is only indirectly related to the document's main content."
 		),
+		address: __(
+			'The <address> element should contain contact information for its nearest <article> or <body> ancestor.).'
+		),
 		footer: __(
 			'The <footer> element should represent a footer for its nearest sectioning element (e.g.: <section>, <article>, <main> etc.).'
 		),
@@ -353,6 +356,7 @@ export default function CoverInspectorControls( {
 						{ label: '<section>', value: 'section' },
 						{ label: '<article>', value: 'article' },
 						{ label: '<aside>', value: 'aside' },
+						{ label: '<address>', value: 'address' },
 						{ label: '<footer>', value: 'footer' },
 					] }
 					value={ tagName }
