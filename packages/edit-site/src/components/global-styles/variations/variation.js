@@ -35,7 +35,7 @@ export default function Variation( { variation, children, isPill } ) {
 		[ variation, base ]
 	);
 
-	const selectVariation = () => setUserConfig( () => variation );
+	const selectVariation = () => setUserConfig( variation );
 
 	const selectOnEnter = ( event ) => {
 		if ( event.keyCode === ENTER ) {
