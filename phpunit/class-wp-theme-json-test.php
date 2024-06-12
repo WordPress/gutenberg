@@ -992,21 +992,14 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * This test relies on a block having already been registered prior to
-	 * theme.json generating block metadata. Until a core block, such as Image,
-	 * opts into feature level selectors, we need to register a test block.
-	 * This is achieved via `tests_add_filter()` in Gutenberg's phpunit
-	 * bootstrap. After a core block adopts feature level selectors we could
-	 * remove that filter and instead use the core block for the following test.
+	 * This test checks that feature selectors defined as `__experimentalSelector` inside
+	 * the `supports` property are correctly output in the stylesheet.
 	 */
 	public function test_get_stylesheet_with_deprecated_feature_level_selectors() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'settings' => array(
-					'border'     => array(
-						'radius' => true,
-					),
 					'color'      => array(
 						'custom'  => false,
 						'palette' => array(
@@ -1016,24 +1009,15 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 							),
 						),
 					),
-					'spacing'    => array(
-						'padding' => true,
-					),
 					'typography' => array(
 						'fontSize' => true,
 					),
 				),
 				'styles'   => array(
 					'blocks' => array(
-						'test/test' => array(
-							'border'     => array(
-								'radius' => '9999px',
-							),
+						'core/calendar' => array(
 							'color'      => array(
 								'text' => 'green',
-							),
-							'spacing'    => array(
-								'padding' => '20px',
 							),
 							'typography' => array(
 								'fontSize' => '3em',
@@ -1045,60 +1029,32 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$base_styles   = ':root{--wp--preset--color--green: green;}';
-		$block_styles  = ':root :where(.wp-block-test, .wp-block-test__wrapper){color: green;}:root :where(.wp-block-test .inner, .wp-block-test__wrapper .inner){border-radius: 9999px;padding: 20px;}:root :where(.wp-block-test .sub-heading, .wp-block-test__wrapper .sub-heading){font-size: 3em;}';
+		$block_styles  = ':root :where(.wp-block-calendar){font-size: 3em;}:root :where(.wp-block-calendar table, .wp-block-calendar th){color: green;}';
 		$preset_styles = '.has-green-color{color: var(--wp--preset--color--green) !important;}.has-green-background-color{background-color: var(--wp--preset--color--green) !important;}.has-green-border-color{border-color: var(--wp--preset--color--green) !important;}';
 		$expected      = $base_styles . $block_styles . $preset_styles;
 
 		$this->assertSame( $expected, $theme_json->get_stylesheet( array( 'styles', 'presets', 'variables' ), null, array( 'skip_root_layout_styles' => true ) ) );
 	}
 
+
 	/**
-	 * This test relies on a block having already been registered prior to
-	 * theme.json generating block metadata. Until a core block adopts the
-	 * new selectors API, we need to register a test block.
-	 * This is achieved via `tests_add_filter()` in Gutenberg's phpunit
-	 * bootstrap. After a core block adopts feature level selectors we could
-	 * remove that filter and instead use the core block for the following test.
+	 * This test checks that feature selectors defined in the stable `selectors`
+	 * property are correctly output in the stylesheet.
 	 */
 	public function test_get_stylesheet_with_block_json_selectors() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'settings' => array(
-					'border'     => array(
+					'border' => array(
 						'radius' => true,
-					),
-					'color'      => array(
-						'custom'  => false,
-						'palette' => array(
-							array(
-								'slug'  => 'green',
-								'color' => 'green',
-							),
-						),
-					),
-					'spacing'    => array(
-						'padding' => true,
-					),
-					'typography' => array(
-						'fontSize' => true,
 					),
 				),
 				'styles'   => array(
 					'blocks' => array(
-						'my/block-with-selectors' => array(
-							'border'     => array(
-								'radius' => '9999px',
-							),
-							'color'      => array(
-								'background' => 'grey',
-								'text'       => 'navy',
-							),
-							'spacing'    => array(
-								'padding' => '20px',
-							),
-							'typography' => array(
-								'fontSize' => '3em',
+						'core/image' => array(
+							'border' => array(
+								'radius' => '374px',
 							),
 						),
 					),
@@ -1106,10 +1062,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$base_styles   = ':root{--wp--preset--color--green: green;}';
-		$block_styles  = ':root :where(.custom-root-selector){background-color: grey;padding: 20px;}:root :where(.custom-root-selector img){border-radius: 9999px;}:root :where(.custom-root-selector > figcaption){color: navy;font-size: 3em;}';
-		$preset_styles = '.has-green-color{color: var(--wp--preset--color--green) !important;}.has-green-background-color{background-color: var(--wp--preset--color--green) !important;}.has-green-border-color{border-color: var(--wp--preset--color--green) !important;}';
-		$expected      = $base_styles . $block_styles . $preset_styles;
+		$expected = ':root :where(.wp-block-image img, .wp-block-image .wp-block-image__crop-area, .wp-block-image .components-placeholder){border-radius: 374px;}';
 
 		$this->assertSame( $expected, $theme_json->get_stylesheet( array( 'styles', 'presets', 'variables' ), null, array( 'skip_root_layout_styles' => true ) ) );
 	}
