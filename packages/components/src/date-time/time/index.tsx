@@ -85,6 +85,7 @@ function buildPadInputStateReducer( pad: number ) {
  *     <TimePicker
  *       currentTime={ date }
  *       onChange={ ( newTime ) => setTime( newTime ) }
+ *       showDatePicker={ true }
  *       is12Hour
  *     />
  *   );
@@ -94,6 +95,7 @@ function buildPadInputStateReducer( pad: number ) {
 export function TimePicker( {
 	is12Hour,
 	currentTime,
+	showDatePicker = true,
 	onChange,
 }: TimePickerProps ) {
 	const [ date, setDate ] = useState( () =>
@@ -323,48 +325,52 @@ export function TimePicker( {
 					<TimeZone />
 				</HStack>
 			</Fieldset>
-			<Fieldset>
-				<BaseControl.VisualLabel
-					as="legend"
-					className="components-datetime__time-legend" // Unused, for backwards compatibility.
-				>
-					{ __( 'Date' ) }
-				</BaseControl.VisualLabel>
-				<HStack
-					className="components-datetime__time-wrapper" // Unused, for backwards compatibility.
-				>
-					{ is12Hour ? (
-						<>
-							{ monthField }
-							{ dayField }
-						</>
-					) : (
-						<>
-							{ dayField }
-							{ monthField }
-						</>
-					) }
-					<YearInput
-						className="components-datetime__time-field components-datetime__time-field-year" // Unused, for backwards compatibility.
-						label={ __( 'Year' ) }
-						hideLabelFromVision
-						__next40pxDefaultSize
-						value={ year }
-						step={ 1 }
-						min={ 1 }
-						max={ 9999 }
-						required
-						spinControls="none"
-						isPressEnterToChange
-						isDragEnabled={ false }
-						isShiftStepEnabled={ false }
-						onChange={ buildNumberControlChangeCallback( 'year' ) }
-						__unstableStateReducer={ buildPadInputStateReducer(
-							4
+			{ showDatePicker && (
+				<Fieldset>
+					<BaseControl.VisualLabel
+						as="legend"
+						className="components-datetime__time-legend" // Unused, for backwards compatibility.
+					>
+						{ __( 'Date' ) }
+					</BaseControl.VisualLabel>
+					<HStack
+						className="components-datetime__time-wrapper" // Unused, for backwards compatibility.
+					>
+						{ is12Hour ? (
+							<>
+								{ monthField }
+								{ dayField }
+							</>
+						) : (
+							<>
+								{ dayField }
+								{ monthField }
+							</>
 						) }
-					/>
-				</HStack>
-			</Fieldset>
+						<YearInput
+							className="components-datetime__time-field components-datetime__time-field-year" // Unused, for backwards compatibility.
+							label={ __( 'Year' ) }
+							hideLabelFromVision
+							__next40pxDefaultSize
+							value={ year }
+							step={ 1 }
+							min={ 1 }
+							max={ 9999 }
+							required
+							spinControls="none"
+							isPressEnterToChange
+							isDragEnabled={ false }
+							isShiftStepEnabled={ false }
+							onChange={ buildNumberControlChangeCallback(
+								'year'
+							) }
+							__unstableStateReducer={ buildPadInputStateReducer(
+								4
+							) }
+						/>
+					</HStack>
+				</Fieldset>
+			) }
 		</Wrapper>
 	);
 }
