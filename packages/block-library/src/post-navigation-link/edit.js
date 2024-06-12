@@ -49,8 +49,12 @@ export default function PostNavigationLinkEdit( {
 	const displayArrow = arrowMap[ arrow ];
 
 	if ( showTitle ) {
-		/* translators: Label before for next and previous post. There is a space after the colon. */
-		placeholder = isNext ? __( 'Next: ' ) : __( 'Previous: ' );
+		if ( linkLabel ) {
+			/* translators: Label before for next and previous post. There is a space after the colon. */
+			placeholder = isNext ? __( 'Next: ' ) : __( 'Previous: ' );
+		} else {
+			placeholder = '';
+		}
 	}
 
 	const ariaLabel = isNext ? __( 'Next post' ) : __( 'Previous post' );
