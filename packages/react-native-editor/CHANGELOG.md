@@ -10,6 +10,8 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [internal] Fix Inserter items list filtering [#62334]
+-   [*] Prevent hiding the keyboard when creating new list items [#62446]
 -   [*] RichText - Fix undefined onDelete callback [#62486]
 
 ## 1.120.0

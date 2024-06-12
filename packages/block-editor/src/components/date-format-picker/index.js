@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { _x, __ } from '@wordpress/i18n';
-import { dateI18n } from '@wordpress/date';
+import { dateI18n, humanTimeDiff } from '@wordpress/date';
 import { useState, createInterpolateElement } from '@wordpress/element';
 import {
 	TextControl,
@@ -13,11 +13,15 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 
-// So that we can illustrate the different formats in the dropdown properly,
-// show a date that has a day greater than 12 and a month with more than three
-// letters. Here we're using 2022-01-25 which is when WordPress 5.9 was
-// released.
-const EXAMPLE_DATE = new Date( 2022, 0, 25 );
+// So that we illustrate the different formats in the dropdown properly, show a date that is
+// somwhat recent, has a day greater than 12, and a month with more than three letters.
+const exampleDate = new Date();
+exampleDate.setDate( 20 );
+exampleDate.setMonth( exampleDate.getMonth() - 3 );
+if ( exampleDate.getMonth() === 4 ) {
+	// May has three letters, so use March.
+	exampleDate.setMonth( 3 );
+}
 
 /**
  * The `DateFormatPicker` component renders controls that let the user choose a
@@ -54,7 +58,7 @@ export default function DateFormatPicker( {
 				label={ __( 'Default format' ) }
 				help={ `${ __( 'Example:' ) }  ${ dateI18n(
 					defaultFormat,
-					EXAMPLE_DATE
+					exampleDate
 				) }` }
 				checked={ ! format }
 				onChange={ ( checked ) =>
@@ -95,13 +99,19 @@ function NonDefaultControls( { format, onChange } ) {
 		] ),
 	];
 
-	const suggestedOptions = suggestedFormats.map(
-		( suggestedFormat, index ) => ( {
+	const suggestedOptions = [
+		...suggestedFormats.map( ( suggestedFormat, index ) => ( {
 			key: `suggested-${ index }`,
-			name: dateI18n( suggestedFormat, EXAMPLE_DATE ),
+			name: dateI18n( suggestedFormat, exampleDate ),
 			format: suggestedFormat,
-		} )
-	);
+		} ) ),
+		{
+			key: 'human-diff',
+			name: humanTimeDiff( exampleDate ),
+			format: 'human-diff',
+		},
+	];
+
 	const customOption = {
 		key: 'custom',
 		name: __( 'Custom' ),
@@ -111,7 +121,9 @@ function NonDefaultControls( { format, onChange } ) {
 	};
 
 	const [ isCustom, setIsCustom ] = useState(
-		() => !! format && ! suggestedFormats.includes( format )
+		() =>
+			!! format &&
+			! suggestedOptions.some( ( option ) => option.format === format )
 	);
 
 	return (
