@@ -68,9 +68,15 @@ export default function CollabSidebar() {
 								spacing="3"
 								justify="flex-start"
 							>
-								<Icon icon={ userIcon } className='editor-collab-sidebar__userIcon' size={ 35 } />
+								<Icon
+									icon={ userIcon }
+									className="editor-collab-sidebar__userIcon"
+									size={ 35 }
+								/>
 								<VStack spacing="1">
-									<span className='editor-collab-sidebar__userName'>{ thread.createdBy }</span>
+									<span className="editor-collab-sidebar__userName">
+										{ thread.createdBy }
+									</span>
 									<time
 										dateTime={ format(
 											'c',
@@ -94,9 +100,15 @@ export default function CollabSidebar() {
 										spacing="3"
 										justify="flex-start"
 									>
-										<Icon icon={ userIcon } className='editor-collab-sidebar__userIcon' size={ 35 } />
+										<Icon
+											icon={ userIcon }
+											className="editor-collab-sidebar__userIcon"
+											size={ 35 }
+										/>
 										<VStack spacing="1">
-											<span className='editor-collab-sidebar__userName'>{ comment.createdBy }</span>
+											<span className="editor-collab-sidebar__userName">
+												{ comment.createdBy }
+											</span>
 											<time
 												dateTime={ format(
 													'c',
@@ -126,9 +138,15 @@ export default function CollabSidebar() {
 										spacing="3"
 										justify="flex-start"
 									>
-										<Icon icon={ userIcon } className='editor-collab-sidebar__userIcon' size={ 35 } />
+										<Icon
+											icon={ userIcon }
+											className="editor-collab-sidebar__userIcon"
+											size={ 35 }
+										/>
 										<VStack spacing="1">
-											<span className='editor-collab-sidebar__userName'>{ thread.resolvedBy }</span>
+											<span className="editor-collab-sidebar__userName">
+												{ thread.resolvedBy }
+											</span>
 											<time
 												dateTime={ format(
 													'c',
@@ -150,11 +168,9 @@ export default function CollabSidebar() {
 										<Icon
 											icon={ resolvedIcon }
 											size={ 20 }
-											className='editor-collab-sidebar__resolvedIcon'
+											className="editor-collab-sidebar__resolvedIcon"
 										/>
-										<Text
-										className='editor-collab-sidebar__resolvedText'
-										>
+										<Text className="editor-collab-sidebar__resolvedText">
 											{ __( 'Marked as resolved' ) }
 										</Text>
 									</HStack>

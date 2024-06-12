@@ -232,6 +232,10 @@ _Returns_
 
 -   `string`: Processed string
 
+### CollabSidebar
+
+Renders the Collab sidebar.
+
 ### ColorPalette
 
 > **Deprecated** since 5.3, use `wp.blockEditor.ColorPalette` instead.
