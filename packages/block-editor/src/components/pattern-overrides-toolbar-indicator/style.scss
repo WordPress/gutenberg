@@ -1,0 +1,12 @@
+.block-editor-pattern-overrides-toolbar-indicator__popover .components-popover__content {
+	min-width: 260px;
+	padding: $grid-unit-20;
+}
+
+.block-editor-pattern-overrides-toolbar-indicator .block-editor-pattern-overrides-toolbar-indicator-icon.has-colors svg {
+	fill: var(--wp-block-synced-color);
+}
+
+.editor-collapsible-block-toolbar .block-editor-pattern-overrides-toolbar-indicator {
+	height: 32px;
+}

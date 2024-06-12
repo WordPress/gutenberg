@@ -10,7 +10,7 @@ import {
 	Platform,
 } from 'react-native';
 import Video from 'react-native-video';
-import classnames from 'classnames/dedupe';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -33,7 +33,6 @@ import {
 	ColorPicker,
 	BottomSheetConsumer,
 	useConvertUnitToMobile,
-	useMobileGlobalStylesColors,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -47,6 +46,8 @@ import {
 	getColorObjectByAttributeValues,
 	getGradientValueBySlug,
 	store as blockEditorStore,
+	useGlobalStyles,
+	useMobileGlobalStylesColors,
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { useDispatch, withSelect, withDispatch } from '@wordpress/data';
@@ -156,9 +157,11 @@ const Cover = ( {
 		mediaUploadSync();
 	}, [] );
 
+	const globalStyles = useGlobalStyles();
 	const convertedMinHeight = useConvertUnitToMobile(
 		minHeight || COVER_DEFAULT_HEIGHT,
-		minHeightUnit
+		minHeightUnit,
+		globalStyles
 	);
 
 	const isImage = backgroundType === MEDIA_TYPE_IMAGE;
@@ -218,6 +221,21 @@ const Cover = ( {
 		} );
 	};
 
+	const onUpdateMediaProgress = useCallback(
+		( payload ) => {
+			const { mediaUrl, state } = payload;
+
+			setIsUploadInProgress( true );
+
+			if ( isUploadInProgress && isImage && mediaUrl && ! state ) {
+				setAttributes( {
+					url: mediaUrl,
+				} );
+			}
+		},
+		[ isImage, isUploadInProgress, setAttributes ]
+	);
+
 	const onMediaPressed = () => {
 		if ( isUploadInProgress ) {
 			requestImageUploadCancelDialog( id );
@@ -247,6 +265,12 @@ const Cover = ( {
 		} );
 		closeSettingsBottomSheet();
 	}, [ closeSettingsBottomSheet ] );
+
+	const onAddMediaButtonPress = useCallback( () => {
+		if ( openMediaOptionsRef?.current ) {
+			openMediaOptionsRef.current();
+		}
+	}, [] );
 
 	function setColor( color ) {
 		const colorValue = getColorObjectByColorValue( colorsDefault, color );
@@ -292,7 +316,7 @@ const Cover = ( {
 
 		// Ensure that "is-light" is removed from "className" attribute if cover background is dark.
 		if ( isCoverDark && attributes.className?.includes( 'is-light' ) ) {
-			const className = classnames( attributes.className, {
+			const className = clsx( attributes.className, {
 				'is-light': false,
 			} );
 			setAttributes( {
@@ -352,7 +376,7 @@ const Cover = ( {
 			accessibilityHint={ accessibilityHint }
 			accessibilityLabel={ __( 'Add image or video' ) }
 			accessibilityRole="button"
-			onPress={ openMediaOptionsRef.current }
+			onPress={ onAddMediaButtonPress }
 		>
 			<View style={ styles.selectImageContainer }>
 				<View style={ styles.selectImage }>
@@ -441,9 +465,7 @@ const Cover = ( {
 					toolbarControls( openMediaOptionsRef.current ) }
 				<MediaUploadProgress
 					mediaId={ id }
-					onUpdateMediaProgress={ () => {
-						setIsUploadInProgress( true );
-					} }
+					onUpdateMediaProgress={ onUpdateMediaProgress }
 					onFinishMediaUploadWithSuccess={ ( {
 						mediaServerId,
 						mediaUrl,
@@ -490,7 +512,7 @@ const Cover = ( {
 						muted
 						disableFocus
 						repeat
-						resizeMode={ 'cover' }
+						resizeMode="cover"
 						source={ { uri: url } }
 						onLoad={ onVideoLoad }
 						onLoadStart={ onVideoLoadStart }

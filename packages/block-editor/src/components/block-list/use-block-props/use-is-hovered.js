@@ -18,22 +18,17 @@ function listener( event ) {
  * Adds `is-hovered` class when the block is hovered and in navigation or
  * outline mode.
  */
-export function useIsHovered( { isEnabled } ) {
-	return useRefEffect(
-		( node ) => {
-			if ( isEnabled ) {
-				node.addEventListener( 'mouseout', listener );
-				node.addEventListener( 'mouseover', listener );
+export function useIsHovered() {
+	return useRefEffect( ( node ) => {
+		node.addEventListener( 'mouseout', listener );
+		node.addEventListener( 'mouseover', listener );
 
-				return () => {
-					node.removeEventListener( 'mouseout', listener );
-					node.removeEventListener( 'mouseover', listener );
+		return () => {
+			node.removeEventListener( 'mouseout', listener );
+			node.removeEventListener( 'mouseover', listener );
 
-					// Remove class in case it lingers.
-					node.classList.remove( 'is-hovered' );
-				};
-			}
-		},
-		[ isEnabled ]
-	);
+			// Remove class in case it lingers.
+			node.classList.remove( 'is-hovered' );
+		};
+	}, [] );
 }

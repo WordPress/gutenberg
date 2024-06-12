@@ -27,6 +27,30 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
   padding: 0;
 }
 
+.emotion-10 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: flex-start;
+  -webkit-box-align: flex-start;
+  -ms-flex-align: flex-start;
+  align-items: flex-start;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  gap: 0;
+  -webkit-box-pack: start;
+  -ms-flex-pack: start;
+  -webkit-justify-content: start;
+  justify-content: start;
+  width: 100%;
+}
+
+.emotion-10>* {
+  min-width: 0;
+}
+
 <div>
   <div
     class="editor-post-publish-panel"
@@ -139,22 +163,28 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
         <div
           class="components-base-control__field emotion-2 emotion-3"
         >
-          <span
-            class="components-checkbox-control__input-container"
+          <div
+            class="components-flex components-h-stack emotion-10 emotion-11"
+            data-wp-c16t="true"
+            data-wp-component="HStack"
           >
-            <input
-              class="components-checkbox-control__input"
-              id="inspector-checkbox-control-3"
-              type="checkbox"
-              value="1"
-            />
-          </span>
-          <label
-            class="components-checkbox-control__label"
-            for="inspector-checkbox-control-3"
-          >
-            Always show pre-publish checks.
-          </label>
+            <span
+              class="components-checkbox-control__input-container"
+            >
+              <input
+                class="components-checkbox-control__input"
+                id="inspector-checkbox-control-3"
+                type="checkbox"
+                value="1"
+              />
+            </span>
+            <label
+              class="components-checkbox-control__label"
+              for="inspector-checkbox-control-3"
+            >
+              Always show pre-publish checks.
+            </label>
+          </div>
         </div>
       </div>
     </div>
@@ -187,6 +217,30 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
   display: inline-block;
   margin-bottom: calc(4px * 2);
   padding: 0;
+}
+
+.emotion-10 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: flex-start;
+  -webkit-box-align: flex-start;
+  -ms-flex-align: flex-start;
+  align-items: flex-start;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  gap: 0;
+  -webkit-box-pack: start;
+  -ms-flex-pack: start;
+  -webkit-justify-content: start;
+  justify-content: start;
+  width: 100%;
+}
+
+.emotion-10>* {
+  min-width: 0;
 }
 
 <div>
@@ -301,22 +355,28 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
         <div
           class="components-base-control__field emotion-2 emotion-3"
         >
-          <span
-            class="components-checkbox-control__input-container"
+          <div
+            class="components-flex components-h-stack emotion-10 emotion-11"
+            data-wp-c16t="true"
+            data-wp-component="HStack"
           >
-            <input
-              class="components-checkbox-control__input"
-              id="inspector-checkbox-control-4"
-              type="checkbox"
-              value="1"
-            />
-          </span>
-          <label
-            class="components-checkbox-control__label"
-            for="inspector-checkbox-control-4"
-          >
-            Always show pre-publish checks.
-          </label>
+            <span
+              class="components-checkbox-control__input-container"
+            >
+              <input
+                class="components-checkbox-control__input"
+                id="inspector-checkbox-control-4"
+                type="checkbox"
+                value="1"
+              />
+            </span>
+            <label
+              class="components-checkbox-control__label"
+              for="inspector-checkbox-control-4"
+            >
+              Always show pre-publish checks.
+            </label>
+          </div>
         </div>
       </div>
     </div>
@@ -341,6 +401,30 @@ exports[`PostPublishPanel should render the pre-publish panel if post status is 
   margin-bottom: inherit;
 }
 
+.emotion-4 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: flex-start;
+  -webkit-box-align: flex-start;
+  -ms-flex-align: flex-start;
+  align-items: flex-start;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  gap: 0;
+  -webkit-box-pack: start;
+  -ms-flex-pack: start;
+  -webkit-justify-content: start;
+  justify-content: start;
+  width: 100%;
+}
+
+.emotion-4>* {
+  min-width: 0;
+}
+
 <div>
   <div
     class="editor-post-publish-panel"
@@ -363,7 +447,7 @@ exports[`PostPublishPanel should render the pre-publish panel if post status is 
         class="editor-post-publish-panel__header-cancel-button"
       >
         <button
-          class="components-button is-secondary"
+          class="components-button is-secondary is-compact"
           type="button"
         >
           Cancel
@@ -424,22 +508,28 @@ exports[`PostPublishPanel should render the pre-publish panel if post status is 
         <div
           class="components-base-control__field emotion-2 emotion-3"
         >
-          <span
-            class="components-checkbox-control__input-container"
+          <div
+            class="components-flex components-h-stack emotion-4 emotion-5"
+            data-wp-c16t="true"
+            data-wp-component="HStack"
           >
-            <input
-              class="components-checkbox-control__input"
-              id="inspector-checkbox-control-1"
-              type="checkbox"
-              value="1"
-            />
-          </span>
-          <label
-            class="components-checkbox-control__label"
-            for="inspector-checkbox-control-1"
-          >
-            Always show pre-publish checks.
-          </label>
+            <span
+              class="components-checkbox-control__input-container"
+            >
+              <input
+                class="components-checkbox-control__input"
+                id="inspector-checkbox-control-1"
+                type="checkbox"
+                value="1"
+              />
+            </span>
+            <label
+              class="components-checkbox-control__label"
+              for="inspector-checkbox-control-1"
+            >
+              Always show pre-publish checks.
+            </label>
+          </div>
         </div>
       </div>
     </div>
@@ -464,6 +554,30 @@ exports[`PostPublishPanel should render the pre-publish panel if the post is not
   margin-bottom: inherit;
 }
 
+.emotion-4 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: flex-start;
+  -webkit-box-align: flex-start;
+  -ms-flex-align: flex-start;
+  align-items: flex-start;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  gap: 0;
+  -webkit-box-pack: start;
+  -ms-flex-pack: start;
+  -webkit-justify-content: start;
+  justify-content: start;
+  width: 100%;
+}
+
+.emotion-4>* {
+  min-width: 0;
+}
+
 <div>
   <div
     class="editor-post-publish-panel"
@@ -486,7 +600,7 @@ exports[`PostPublishPanel should render the pre-publish panel if the post is not
         class="editor-post-publish-panel__header-cancel-button"
       >
         <button
-          class="components-button is-secondary"
+          class="components-button is-secondary is-compact"
           type="button"
         >
           Cancel
@@ -547,22 +661,28 @@ exports[`PostPublishPanel should render the pre-publish panel if the post is not
         <div
           class="components-base-control__field emotion-2 emotion-3"
         >
-          <span
-            class="components-checkbox-control__input-container"
+          <div
+            class="components-flex components-h-stack emotion-4 emotion-5"
+            data-wp-c16t="true"
+            data-wp-component="HStack"
           >
-            <input
-              class="components-checkbox-control__input"
-              id="inspector-checkbox-control-0"
-              type="checkbox"
-              value="1"
-            />
-          </span>
-          <label
-            class="components-checkbox-control__label"
-            for="inspector-checkbox-control-0"
-          >
-            Always show pre-publish checks.
-          </label>
+            <span
+              class="components-checkbox-control__input-container"
+            >
+              <input
+                class="components-checkbox-control__input"
+                id="inspector-checkbox-control-0"
+                type="checkbox"
+                value="1"
+              />
+            </span>
+            <label
+              class="components-checkbox-control__label"
+              for="inspector-checkbox-control-0"
+            >
+              Always show pre-publish checks.
+            </label>
+          </div>
         </div>
       </div>
     </div>
@@ -631,6 +751,30 @@ exports[`PostPublishPanel should render the spinner if the post is being saved 1
   margin-bottom: inherit;
 }
 
+.emotion-10 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: flex-start;
+  -webkit-box-align: flex-start;
+  -ms-flex-align: flex-start;
+  align-items: flex-start;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  gap: 0;
+  -webkit-box-pack: start;
+  -ms-flex-pack: start;
+  -webkit-justify-content: start;
+  justify-content: start;
+  width: 100%;
+}
+
+.emotion-10>* {
+  min-width: 0;
+}
+
 <div>
   <div
     class="editor-post-publish-panel"
@@ -653,7 +797,7 @@ exports[`PostPublishPanel should render the spinner if the post is being saved 1
         class="editor-post-publish-panel__header-cancel-button"
       >
         <button
-          class="components-button is-secondary"
+          class="components-button is-secondary is-compact"
           type="button"
         >
           Cancel
@@ -695,22 +839,28 @@ exports[`PostPublishPanel should render the spinner if the post is being saved 1
         <div
           class="components-base-control__field emotion-8 emotion-9"
         >
-          <span
-            class="components-checkbox-control__input-container"
+          <div
+            class="components-flex components-h-stack emotion-10 emotion-11"
+            data-wp-c16t="true"
+            data-wp-component="HStack"
           >
-            <input
-              class="components-checkbox-control__input"
-              id="inspector-checkbox-control-2"
-              type="checkbox"
-              value="1"
-            />
-          </span>
-          <label
-            class="components-checkbox-control__label"
-            for="inspector-checkbox-control-2"
-          >
-            Always show pre-publish checks.
-          </label>
+            <span
+              class="components-checkbox-control__input-container"
+            >
+              <input
+                class="components-checkbox-control__input"
+                id="inspector-checkbox-control-2"
+                type="checkbox"
+                value="1"
+              />
+            </span>
+            <label
+              class="components-checkbox-control__label"
+              for="inspector-checkbox-control-2"
+            >
+              Always show pre-publish checks.
+            </label>
+          </div>
         </div>
       </div>
     </div>

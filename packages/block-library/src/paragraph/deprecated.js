@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -110,7 +110,7 @@ const deprecated = [
 		},
 		save( { attributes } ) {
 			const { align, content, dropCap, direction } = attributes;
-			const className = classnames( {
+			const className = clsx( {
 				'has-drop-cap':
 					align === ( isRTL() ? 'left' : 'right' ) ||
 					align === 'center'
@@ -162,7 +162,7 @@ const deprecated = [
 			);
 			const fontSizeClass = getFontSizeClass( fontSize );
 
-			const className = classnames( {
+			const className = clsx( {
 				'has-text-color': textColor || customTextColor,
 				'has-background': backgroundColor || customBackgroundColor,
 				'has-drop-cap': dropCap,
@@ -227,7 +227,7 @@ const deprecated = [
 			);
 			const fontSizeClass = getFontSizeClass( fontSize );
 
-			const className = classnames( {
+			const className = clsx( {
 				'has-text-color': textColor || customTextColor,
 				'has-background': backgroundColor || customBackgroundColor,
 				'has-drop-cap': dropCap,
@@ -295,7 +295,7 @@ const deprecated = [
 			);
 			const fontSizeClass = fontSize && `is-${ fontSize }-text`;
 
-			const className = classnames( {
+			const className = clsx( {
 				[ `align${ width }` ]: width,
 				'has-background': backgroundColor || customBackgroundColor,
 				'has-drop-cap': dropCap,
@@ -341,7 +341,7 @@ const deprecated = [
 				textColor,
 				fontSize,
 			} = attributes;
-			const className = classnames( {
+			const className = clsx( {
 				[ `align${ width }` ]: width,
 				'has-background': backgroundColor,
 				'has-drop-cap': dropCap,

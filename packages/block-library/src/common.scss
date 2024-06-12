@@ -165,8 +165,8 @@ html :where(img[class*="wp-image-"]) {
 // Set the admin bar offset for sticky positioned blocks to the height of the admin bar.
 // This allows sticky positioned blocks to be positioned correctly when the admin bar is visible.
 html :where(.is-position-sticky) {
-	/* stylelint-disable length-zero-no-unit */
-	--wp-admin--admin-bar--position-offset: var(--wp-admin--admin-bar--height, 0px); // 0px is set explicitly so that it can be used in a calc value.
+	/* stylelint-disable length-zero-no-unit -- 0px is set explicitly so that it can be used in a calc value. */
+	--wp-admin--admin-bar--position-offset: var(--wp-admin--admin-bar--height, 0px);
 	/* stylelint-enable length-zero-no-unit */
 }
 
@@ -175,8 +175,8 @@ html :where(.is-position-sticky) {
 // is not fixed to the top on mobile devices, but is fixed on viewports larger than 600px.
 @media screen and (max-width: 600px) {
 	html :where(.is-position-sticky) {
-		/* stylelint-disable length-zero-no-unit */
-		--wp-admin--admin-bar--position-offset: 0px; // 0px is set explicitly so that it can be used in a calc value.
+		/* stylelint-disable length-zero-no-unit -- 0px is set explicitly so that it can be used in a calc value. */
+		--wp-admin--admin-bar--position-offset: 0px;
 		/* stylelint-enable length-zero-no-unit */
 	}
 }

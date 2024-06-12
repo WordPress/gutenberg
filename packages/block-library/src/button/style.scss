@@ -86,69 +86,37 @@ $blocks-block__margin: 0.5em;
 	}
 }
 
-// the first selector is required for old buttons markup
+// The follow block style selectors are required for old buttons markup
+// and do not use the `:root :where()` format to match specificity at
+// the time they were deprecated.
 .wp-block-button.is-style-squared,
 .wp-block-button__link.wp-block-button.is-style-squared {
 	border-radius: 0;
 }
-
-// the first selector is required for old buttons markup
 .wp-block-button.no-border-radius,
 .wp-block-button__link.no-border-radius {
 	border-radius: 0 !important;
 }
 
-.wp-block-button:where(.is-style-outline) > .wp-block-button__link,
-.wp-block-button .wp-block-button__link:where(.is-style-outline) {
-	border: 2px solid currentColor;
-	padding: 0.667em 1.333em;
-}
-
-.wp-block-button:where(.is-style-outline) > .wp-block-button__link:not(.has-text-color),
-.wp-block-button .wp-block-button__link:where(.is-style-outline):not(.has-text-color) {
-	color: currentColor;
-}
-
-.wp-block-button:where(.is-style-outline) > .wp-block-button__link:not(.has-background),
-.wp-block-button .wp-block-button__link:where(.is-style-outline):not(.has-background) {
-	background-color: transparent;
-	// background-image is required to overwrite a gradient background
-	background-image: none;
-}
-
-.wp-block-button .wp-block-button__link {
-	// The following styles ensure a default border is applied when the user
-	// selects only a border color or style. This overcomes the zero border
-	// width applied by core's theme.json via the elements API.
-	&:where(.has-border-color) {
-		border-width: initial;
-	}
-	&:where([style*="border-top-color"]) {
-		border-top-width: initial;
-	}
-	&:where([style*="border-right-color"]) {
-		border-right-width: initial;
-	}
-	&:where([style*="border-bottom-color"]) {
-		border-bottom-width: initial;
-	}
-	&:where([style*="border-left-color"]) {
-		border-left-width: initial;
+// Selectors here use the `:root :where()` format for maintaining compatibility
+// with global styles and nested block style variations.
+:root {
+	// Outline Block Style Variation.
+	:where(.wp-block-button.is-style-outline > .wp-block-button__link),
+	:where(.wp-block-button .wp-block-button__link.is-style-outline) {
+		border: 2px solid currentColor;
+		padding: 0.667em 1.333em;
 	}
 
-	&:where([style*="border-style"]) {
-		border-width: initial;
+	:where(.wp-block-button.is-style-outline > .wp-block-button__link:not(.has-text-color)),
+	:where(.wp-block-button .wp-block-button__link.is-style-outline:not(.has-text-color)) {
+		color: currentColor;
 	}
-	&:where([style*="border-top-style"]) {
-		border-top-width: initial;
-	}
-	&:where([style*="border-right-style"]) {
-		border-right-width: initial;
-	}
-	&:where([style*="border-bottom-style"]) {
-		border-bottom-width: initial;
-	}
-	&:where([style*="border-left-style"]) {
-		border-left-width: initial;
+
+	:where(.wp-block-button.is-style-outline > .wp-block-button__link:not(.has-background)),
+	:where(.wp-block-button .wp-block-button__link.is-style-outline:not(.has-background)) {
+		background-color: transparent;
+		// background-image is required to overwrite a gradient background
+		background-image: none;
 	}
 }

@@ -124,7 +124,9 @@ function TaxonomyItem( { taxonomy, termIds, onChange } ) {
 	// and to sanitize the provided `termIds`, by setting only the ones that exist.
 	const existingTerms = useSelect(
 		( select ) => {
-			if ( ! termIds?.length ) return EMPTY_ARRAY;
+			if ( ! termIds?.length ) {
+				return EMPTY_ARRAY;
+			}
 			const { getEntityRecords } = select( coreStore );
 			return getEntityRecords( 'taxonomy', taxonomy.slug, {
 				...BASE_QUERY,
@@ -140,7 +142,9 @@ function TaxonomyItem( { taxonomy, termIds, onChange } ) {
 		if ( ! termIds?.length ) {
 			setValue( EMPTY_ARRAY );
 		}
-		if ( ! existingTerms?.length ) return;
+		if ( ! existingTerms?.length ) {
+			return;
+		}
 		// Returns only the existing entity ids. This prevents the component
 		// from crashing in the editor, when non existing ids are provided.
 		const sanitizedValue = termIds.reduce( ( accumulator, id ) => {
@@ -157,7 +161,9 @@ function TaxonomyItem( { taxonomy, termIds, onChange } ) {
 	}, [ termIds, existingTerms ] );
 	// Update suggestions only when the query has resolved.
 	useEffect( () => {
-		if ( ! searchHasResolved ) return;
+		if ( ! searchHasResolved ) {
+			return;
+		}
 		setSuggestions( searchResults.map( ( result ) => result.name ) );
 	}, [ searchResults, searchHasResolved ] );
 	const onTermsChange = ( newTermValues ) => {

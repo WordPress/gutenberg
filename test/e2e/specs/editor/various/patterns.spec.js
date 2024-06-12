@@ -37,7 +37,7 @@ test.describe( 'Unsynced pattern', () => {
 		await page.getByRole( 'menuitem', { name: 'Create pattern' } ).click();
 
 		const createPatternDialog = page.getByRole( 'dialog', {
-			name: 'Create pattern',
+			name: 'add new pattern',
 		} );
 		await createPatternDialog
 			.getByRole( 'textbox', { name: 'Name' } )
@@ -70,7 +70,7 @@ test.describe( 'Unsynced pattern', () => {
 			} )
 			.click();
 		await page
-			.getByRole( 'button', {
+			.getByRole( 'tab', {
 				name: newCategory,
 			} )
 			.click();
@@ -110,6 +110,7 @@ test.describe( 'Synced pattern', () => {
 	} );
 
 	test.afterEach( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllPosts();
 		await requestUtils.deleteAllBlocks();
 		await requestUtils.deleteAllPatternCategories();
 	} );
@@ -120,7 +121,10 @@ test.describe( 'Synced pattern', () => {
 	} ) => {
 		await editor.insertBlock( {
 			name: 'core/paragraph',
-			attributes: { content: 'A useful paragraph to reuse' },
+			attributes: {
+				anchor: 'reused-paragraph',
+				content: 'A useful paragraph to reuse',
+			},
 		} );
 
 		// Create a synced pattern from the paragraph block.
@@ -132,7 +136,7 @@ test.describe( 'Synced pattern', () => {
 		await page.getByRole( 'menuitem', { name: 'Create pattern' } ).click();
 
 		const createPatternDialog = page.getByRole( 'dialog', {
-			name: 'Create pattern',
+			name: 'add new pattern',
 		} );
 		await createPatternDialog
 			.getByRole( 'textbox', { name: 'Name' } )
@@ -146,36 +150,20 @@ test.describe( 'Synced pattern', () => {
 			.setChecked( true );
 
 		await createPatternDialog
-			.getByRole( 'button', { name: 'Create' } )
+			.getByRole( 'button', { name: 'Add' } )
 			.click();
 
-		await expect
-			.poll(
-				editor.getBlocks,
-				'The block content should be wrapped by a pattern block wrapper'
-			)
-			.toEqual( [
-				{
-					name: 'core/block',
-					attributes: { ref: expect.any( Number ) },
-					innerBlocks: [
-						{
-							attributes: {
-								content: 'A useful paragraph to reuse',
-								dropCap: false,
-							},
-							innerBlocks: [],
-							name: 'core/paragraph',
-						},
-					],
-				},
-			] );
-		const after = await editor.getBlocks();
-
+		// Check the pattern is focused.
 		const patternBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Pattern',
 		} );
 		await expect( patternBlock ).toBeFocused();
+
+		// Check that only the pattern block is present.
+		const existingBlocks = await editor.getBlocks();
+		expect(
+			existingBlocks.every( ( block ) => block.name === 'core/block' )
+		).toBe( true );
 
 		// Check that the new pattern is available in the inserter.
 		await page.getByLabel( 'Toggle block inserter' ).click();
@@ -185,13 +173,35 @@ test.describe( 'Synced pattern', () => {
 			} )
 			.click();
 		await page
-			.getByRole( 'button', {
+			.getByRole( 'tab', {
 				name: newCategory,
 			} )
 			.click();
 		await page.getByRole( 'option', { name: 'My synced pattern' } ).click();
 
-		await expect.poll( editor.getBlocks ).toEqual( [ ...after, ...after ] );
+		const [ firstSyncedPattern, secondSyncedPattern ] =
+			await editor.getBlocks();
+		// Check they are both patterns.
+		expect( firstSyncedPattern.name ).toBe( 'core/block' );
+		expect( secondSyncedPattern.name ).toBe( 'core/block' );
+		// Check they have the same ref.
+		expect( firstSyncedPattern.attributes.ref ).toEqual(
+			secondSyncedPattern.attributes.ref
+		);
+
+		// Check that the frontend shows the content of the pattern.
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+		const [ firstParagraph, secondParagraph ] = await page
+			.locator( '#reused-paragraph' )
+			.all();
+
+		await expect( firstParagraph ).toHaveText(
+			'A useful paragraph to reuse'
+		);
+		await expect( secondParagraph ).toHaveText(
+			'A useful paragraph to reuse'
+		);
 	} );
 
 	// Check for regressions of https://github.com/WordPress/gutenberg/issues/33072.
@@ -203,7 +213,7 @@ test.describe( 'Synced pattern', () => {
 		const { id } = await requestUtils.createBlock( {
 			title: 'Alternative greeting block',
 			content:
-				'<!-- wp:paragraph -->\n<p>Guten Tag!</p>\n<!-- /wp:paragraph -->',
+				'<!-- wp:paragraph -->\n<p id="reused-paragraph">Guten Tag!</p>\n<!-- /wp:paragraph -->',
 			status: 'publish',
 		} );
 
@@ -212,7 +222,7 @@ test.describe( 'Synced pattern', () => {
 			attributes: { ref: id },
 		} );
 
-		await editor.publishPost();
+		const postId = await editor.publishPost();
 
 		await editor.selectBlocks(
 			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
@@ -245,31 +255,17 @@ test.describe( 'Synced pattern', () => {
 		await page.keyboard.type( 'Einen ' );
 
 		// Save the reusable block and update the post.
-		await editorTopBar.getByRole( 'button', { name: 'Update' } ).click();
+		await editorTopBar.getByRole( 'button', { name: 'Save' } ).click();
 		await page
 			.getByRole( 'button', { name: 'Dismiss this notice' } )
 			.filter( { hasText: 'Pattern updated.' } )
 			.click();
 
-		// Go back to the post.
-		await editorTopBar.getByRole( 'button', { name: 'Back' } ).click();
-
-		await expect.poll( editor.getBlocks ).toEqual( [
-			{
-				name: 'core/block',
-				attributes: { ref: id },
-				innerBlocks: [
-					{
-						name: 'core/paragraph',
-						attributes: {
-							content: 'Einen Guten Tag!',
-							dropCap: false,
-						},
-						innerBlocks: [],
-					},
-				],
-			},
-		] );
+		// Check that the frontend shows the updated content.
+		await page.goto( `/?p=${ postId }` );
+		await expect( page.locator( '#reused-paragraph' ) ).toHaveText(
+			'Einen Guten Tag!'
+		);
 	} );
 
 	// Check for regressions of https://github.com/WordPress/gutenberg/issues/26421.
@@ -320,27 +316,17 @@ test.describe( 'Synced pattern', () => {
 		// Go back to the post.
 		await editorTopBar.getByRole( 'button', { name: 'Back' } ).click();
 
-		const expectedParagraphBlock = {
-			name: 'core/paragraph',
-			attributes: { content: 'After Edit' },
-		};
-
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{
-				name: 'core/block',
-				attributes: { ref: id },
-				innerBlocks: [ expectedParagraphBlock ],
-			},
-		] );
-
 		await editor.selectBlocks(
 			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
 		);
 		await editor.clickBlockOptionsMenuItem( 'Detach' );
 
-		await expect
-			.poll( editor.getBlocks )
-			.toMatchObject( [ expectedParagraphBlock ] );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'After Edit' },
+			},
+		] );
 	} );
 
 	test( 'can be created, inserted, and converted to a regular block', async ( {
@@ -359,27 +345,23 @@ test.describe( 'Synced pattern', () => {
 			attributes: { ref: id },
 		} );
 
-		const expectedParagraphBlock = {
-			name: 'core/paragraph',
-			attributes: { content: 'Hello there!' },
-		};
-
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{
-				name: 'core/block',
-				attributes: { ref: id },
-				innerBlocks: [ expectedParagraphBlock ],
-			},
-		] );
+		// Check that only the pattern block is present.
+		const existingBlocks = await editor.getBlocks();
+		expect(
+			existingBlocks.every( ( block ) => block.name === 'core/block' )
+		).toBe( true );
 
 		await editor.selectBlocks(
 			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
 		);
 		await editor.clickBlockOptionsMenuItem( 'Detach' );
 
-		await expect
-			.poll( editor.getBlocks )
-			.toMatchObject( [ expectedParagraphBlock ] );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'Hello there!' },
+			},
+		] );
 	} );
 
 	test( 'can be inserted after refresh', async ( {
@@ -394,7 +376,7 @@ test.describe( 'Synced pattern', () => {
 		await editor.clickBlockOptionsMenuItem( 'Create pattern' );
 
 		const createPatternDialog = page.getByRole( 'dialog', {
-			name: 'Create pattern',
+			name: 'add new pattern',
 		} );
 		await createPatternDialog
 			.getByRole( 'textbox', { name: 'Name' } )
@@ -403,8 +385,15 @@ test.describe( 'Synced pattern', () => {
 			.getByRole( 'checkbox', { name: 'Synced' } )
 			.setChecked( true );
 		await createPatternDialog
-			.getByRole( 'button', { name: 'Create' } )
+			.getByRole( 'button', { name: 'Add' } )
 			.click();
+
+		// Wait until the pattern is created.
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: Pattern',
+			} )
+		).toBeVisible();
 
 		await admin.createNewPost();
 		await editor.canvas
@@ -413,18 +402,11 @@ test.describe( 'Synced pattern', () => {
 		await page.keyboard.type( '/Awesome block' );
 		await page.getByRole( 'option', { name: 'Awesome block' } ).click();
 
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{
-				name: 'core/block',
-				attributes: { ref: expect.any( Number ) },
-				innerBlocks: [
-					{
-						name: 'core/paragraph',
-						attributes: { content: 'Awesome Paragraph' },
-					},
-				],
-			},
-		] );
+		// Check that the pattern block is present.
+		const existingBlocks = await editor.getBlocks();
+		expect(
+			existingBlocks.every( ( block ) => block.name === 'core/block' )
+		).toBe( true );
 	} );
 
 	test( 'can be created from multiselection and converted back to regular blocks', async ( {
@@ -444,7 +426,7 @@ test.describe( 'Synced pattern', () => {
 		await editor.clickBlockOptionsMenuItem( 'Create pattern' );
 
 		const createPatternDialog = editor.page.getByRole( 'dialog', {
-			name: 'Create pattern',
+			name: 'add new pattern',
 		} );
 		await createPatternDialog
 			.getByRole( 'textbox', { name: 'Name' } )
@@ -453,10 +435,29 @@ test.describe( 'Synced pattern', () => {
 			.getByRole( 'checkbox', { name: 'Synced' } )
 			.setChecked( true );
 		await createPatternDialog
-			.getByRole( 'button', { name: 'Create' } )
+			.getByRole( 'button', { name: 'Add' } )
 			.click();
 
-		const expectedParagraphBlocks = [
+		// Wait until the pattern is created.
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: Pattern',
+			} )
+		).toBeVisible();
+
+		// Check that only the pattern block is present.
+		const existingBlocks = await editor.getBlocks();
+		expect(
+			existingBlocks.every( ( block ) => block.name === 'core/block' )
+		).toBe( true );
+
+		// Convert the pattern back to regular blocks.
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
+		);
+		await editor.clickBlockOptionsMenuItem( 'Detach' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: { content: 'Hello there!' },
@@ -465,24 +466,7 @@ test.describe( 'Synced pattern', () => {
 				name: 'core/paragraph',
 				attributes: { content: 'Second paragraph' },
 			},
-		];
-
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{
-				name: 'core/block',
-				attributes: { ref: expect.any( Number ) },
-				innerBlocks: expectedParagraphBlocks,
-			},
 		] );
-
-		await editor.selectBlocks(
-			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
-		);
-		await editor.clickBlockOptionsMenuItem( 'Detach' );
-
-		await expect
-			.poll( editor.getBlocks )
-			.toMatchObject( expectedParagraphBlocks );
 	} );
 
 	// Check for regressions of https://github.com/WordPress/gutenberg/pull/26484.
@@ -499,7 +483,9 @@ test.describe( 'Synced pattern', () => {
 
 		let hasError = false;
 		page.on( 'console', ( msg ) => {
-			if ( msg.type() === 'error' ) hasError = true;
+			if ( msg.type() === 'error' ) {
+				hasError = true;
+			}
 		} );
 
 		// Need to reload the page to make pattern available in the store.
@@ -586,7 +572,7 @@ test.describe( 'Synced pattern', () => {
 			name: 'Editor top bar',
 		} );
 
-		await editorTopBar.getByRole( 'button', { name: 'Update' } ).click();
+		await editorTopBar.getByRole( 'button', { name: 'Save' } ).click();
 		await page
 			.getByRole( 'button', { name: 'Dismiss this notice' } )
 			.filter( { hasText: 'Pattern updated.' } )
@@ -624,7 +610,7 @@ test.describe( 'Synced pattern', () => {
 		await editor.clickBlockOptionsMenuItem( 'Create pattern' );
 
 		const createPatternDialog = editor.page.getByRole( 'dialog', {
-			name: 'Create pattern',
+			name: 'add new pattern',
 		} );
 		await createPatternDialog
 			.getByRole( 'textbox', { name: 'Name' } )
@@ -633,7 +619,7 @@ test.describe( 'Synced pattern', () => {
 			.getByRole( 'checkbox', { name: 'Synced' } )
 			.setChecked( true );
 		await createPatternDialog
-			.getByRole( 'button', { name: 'Create' } )
+			.getByRole( 'button', { name: 'Add' } )
 			.click();
 
 		await expect(

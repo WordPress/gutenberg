@@ -12,29 +12,49 @@ test.describe( 'Hybrid theme', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test( 'can access template parts list page', async ( { admin, page } ) => {
-		await admin.visitAdminPage(
-			'site-editor.php',
-			'postType=wp_template_part&path=/wp_template_part/all'
-		);
+	test( 'can access Patterns page', async ( { admin, page } ) => {
+		await admin.visitAdminPage( 'site-editor.php', 'path=/patterns' );
 
 		await expect(
-			page.getByRole( 'table' ).getByRole( 'link', { name: 'header' } )
+			page.getByRole( 'heading', { level: 1, text: 'Patterns' } )
+		).toBeVisible();
+		await expect(
+			page.getByRole( 'heading', { level: 2, text: 'All patterns' } )
 		).toBeVisible();
 	} );
 
-	test( 'can view a template part', async ( { admin, editor, page } ) => {
+	test( 'should redirect to Patterns page when accessing template parts list page', async ( {
+		admin,
+		page,
+	} ) => {
 		await admin.visitAdminPage(
 			'site-editor.php',
-			'postType=wp_template_part&path=/wp_template_part/all'
+			'path=/wp_template_part/all'
 		);
 
-		const templatePart = page
-			.getByRole( 'table' )
-			.getByRole( 'link', { name: 'header' } );
+		await expect( page ).toHaveURL(
+			'/wp-admin/site-editor.php?postType=wp_template_part'
+		);
 
-		await expect( templatePart ).toBeVisible();
-		await templatePart.click();
+		await expect(
+			page.getByRole( 'heading', { level: 1, text: 'Patterns' } )
+		).toBeVisible();
+		await expect(
+			page.getByRole( 'heading', { level: 2, text: 'All patterns' } )
+		).toBeVisible();
+	} );
+
+	test( 'can view a template part list', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.visitAdminPage( 'site-editor.php', 'path=/patterns' );
+
+		await page
+			.getByRole( 'button', { name: 'All template parts' } )
+			.click();
+		await page.getByText( 'header', { exact: true } ).click();
 
 		await expect(
 			page.getByRole( 'region', { name: 'Editor content' } )
@@ -55,7 +75,7 @@ test.describe( 'Hybrid theme', () => {
 
 	test( 'can not export Site Editor Templates', async ( { admin, page } ) => {
 		await admin.visitSiteEditor( {
-			postId: 'emptyhybrid//header',
+			postId: 'gutenberg-test-themes/emptyhybrid//header',
 			postType: 'wp_template_part',
 			canvas: 'edit',
 		} );

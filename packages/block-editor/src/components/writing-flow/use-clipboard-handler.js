@@ -2,6 +2,13 @@
  * WordPress dependencies
  */
 import {
+	pasteHandler,
+	findTransform,
+	getBlockTransforms,
+	hasBlockSupport,
+	switchToBlockType,
+} from '@wordpress/blocks';
+import {
 	documentHasSelection,
 	documentHasUncollapsedSelection,
 } from '@wordpress/dom';
@@ -13,7 +20,8 @@ import { useRefEffect } from '@wordpress/compose';
  */
 import { store as blockEditorStore } from '../../store';
 import { useNotifyCopy } from '../../utils/use-notify-copy';
-import { getPasteBlocks, setClipboardBlocks } from './utils';
+import { setClipboardBlocks } from './utils';
+import { getPasteEventData } from '../../utils/pasting';
 
 export default function useClipboardHandler() {
 	const registry = useRegistry();
@@ -22,11 +30,13 @@ export default function useClipboardHandler() {
 		getSelectedBlockClientIds,
 		hasMultiSelection,
 		getSettings,
+		getBlockName,
 		__unstableIsFullySelected,
 		__unstableIsSelectionCollapsed,
 		__unstableIsSelectionMergeable,
 		__unstableGetSelectedBlocksWithPartialSelection,
 		canInsertBlockType,
+		getBlockRootClientId,
 	} = useSelect( blockEditorStore );
 	const {
 		flashBlock,
@@ -34,7 +44,7 @@ export default function useClipboardHandler() {
 		replaceBlocks,
 		__unstableDeleteSelection,
 		__unstableExpandSelection,
-		insertBlocks,
+		__unstableSplitSelection,
 	} = useDispatch( blockEditorStore );
 	const notifyCopy = useNotifyCopy();
 
@@ -51,7 +61,8 @@ export default function useClipboardHandler() {
 				return;
 			}
 
-			// Always handle multiple selected blocks.
+			// Let native copy/paste behaviour take over in input fields.
+			// But always handle multiple selected blocks.
 			if ( ! hasMultiSelection() ) {
 				const { target } = event;
 				const { ownerDocument } = target;
@@ -60,7 +71,8 @@ export default function useClipboardHandler() {
 				const hasSelection =
 					event.type === 'copy' || event.type === 'cut'
 						? documentHasUncollapsedSelection( ownerDocument )
-						: documentHasSelection( ownerDocument );
+						: documentHasSelection( ownerDocument ) &&
+						  ! ownerDocument.activeElement.isContentEditable;
 
 				// Let native copy behaviour take over in input fields.
 				if ( hasSelection ) {
@@ -68,11 +80,11 @@ export default function useClipboardHandler() {
 				}
 			}
 
-			if ( ! node.contains( event.target.ownerDocument.activeElement ) ) {
+			const { activeElement } = event.target.ownerDocument;
+
+			if ( ! node.contains( activeElement ) ) {
 				return;
 			}
-
-			event.preventDefault();
 
 			const isSelectionMergeable = __unstableIsSelectionMergeable();
 			const shouldHandleWholeBlocks =
@@ -80,6 +92,8 @@ export default function useClipboardHandler() {
 			const expandSelectionIsNeeded =
 				! shouldHandleWholeBlocks && ! isSelectionMergeable;
 			if ( event.type === 'copy' || event.type === 'cut' ) {
+				event.preventDefault();
+
 				if ( selectedBlockClientIds.length === 1 ) {
 					flashBlock( selectedBlockClientIds[ 0 ] );
 				}
@@ -124,37 +138,108 @@ export default function useClipboardHandler() {
 					__experimentalCanUserUseUnfilteredHTML:
 						canUserUseUnfilteredHTML,
 				} = getSettings();
-				const blocks = getPasteBlocks(
-					event,
-					canUserUseUnfilteredHTML
+				const isInternal =
+					event.clipboardData.getData( 'rich-text' ) === 'true';
+				if ( isInternal ) {
+					return;
+				}
+				const { plainText, html, files } = getPasteEventData( event );
+				const isFullySelected = __unstableIsFullySelected();
+				let blocks = [];
+
+				if ( files.length ) {
+					const fromTransforms = getBlockTransforms( 'from' );
+					blocks = files
+						.reduce( ( accumulator, file ) => {
+							const transformation = findTransform(
+								fromTransforms,
+								( transform ) =>
+									transform.type === 'files' &&
+									transform.isMatch( [ file ] )
+							);
+							if ( transformation ) {
+								accumulator.push(
+									transformation.transform( [ file ] )
+								);
+							}
+							return accumulator;
+						}, [] )
+						.flat();
+				} else {
+					blocks = pasteHandler( {
+						HTML: html,
+						plainText,
+						mode: isFullySelected ? 'BLOCKS' : 'AUTO',
+						canUserUseUnfilteredHTML,
+					} );
+				}
+
+				// Inline paste: let rich text handle it.
+				if ( typeof blocks === 'string' ) {
+					return;
+				}
+
+				if ( isFullySelected ) {
+					replaceBlocks(
+						selectedBlockClientIds,
+						blocks,
+						blocks.length - 1,
+						-1
+					);
+					event.preventDefault();
+					return;
+				}
+
+				// If a block doesn't support splitting, let rich text paste
+				// inline.
+				if (
+					! hasMultiSelection() &&
+					! hasBlockSupport(
+						getBlockName( selectedBlockClientIds[ 0 ] ),
+						'splitting',
+						false
+					) &&
+					! event.__deprecatedOnSplit
+				) {
+					return;
+				}
+
+				const [ firstSelectedClientId ] = selectedBlockClientIds;
+				const rootClientId = getBlockRootClientId(
+					firstSelectedClientId
 				);
 
-				if ( selectedBlockClientIds.length === 1 ) {
-					const [ selectedBlockClientId ] = selectedBlockClientIds;
+				const newBlocks = [];
 
-					if (
-						blocks.every( ( block ) =>
-							canInsertBlockType(
-								block.name,
-								selectedBlockClientId
-							)
-						)
-					) {
-						insertBlocks(
-							blocks,
-							undefined,
-							selectedBlockClientId
-						);
-						return;
+				for ( const block of blocks ) {
+					if ( canInsertBlockType( block.name, rootClientId ) ) {
+						newBlocks.push( block );
+					} else {
+						// If a block cannot be inserted in a root block, try
+						// converting it to that root block type and insert the
+						// inner blocks.
+						// Example: paragraphs cannot be inserted into a list,
+						// so convert the paragraphs to a list for list items.
+						const rootBlockName = getBlockName( rootClientId );
+						const switchedBlocks =
+							block.name !== rootBlockName
+								? switchToBlockType( block, rootBlockName )
+								: [ block ];
+
+						if ( ! switchedBlocks ) {
+							return;
+						}
+
+						for ( const switchedBlock of switchedBlocks ) {
+							for ( const innerBlock of switchedBlock.innerBlocks ) {
+								newBlocks.push( innerBlock );
+							}
+						}
 					}
 				}
 
-				replaceBlocks(
-					selectedBlockClientIds,
-					blocks,
-					blocks.length - 1,
-					-1
-				);
+				__unstableSplitSelection( newBlocks );
+				event.preventDefault();
 			}
 		}
 

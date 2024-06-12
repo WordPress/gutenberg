@@ -38,6 +38,13 @@
 				}
 			]
 		},
+		"dimensions": {
+			"aspectRatios": [
+				{
+					"name": "Aspect ratio name"
+				}
+			]
+		},
 		"blocks": {
 			"*": {
 				"typography": {

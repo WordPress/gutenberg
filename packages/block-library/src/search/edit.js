@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -112,13 +112,19 @@ export default function SearchEdit( {
 	] );
 
 	const borderRadius = style?.border?.radius;
-	const borderProps = useBorderProps( attributes );
+	let borderProps = useBorderProps( attributes );
 
 	// Check for old deprecated numerical border radius. Done as a separate
 	// check so that a borderRadius style won't overwrite the longhand
 	// per-corner styles.
 	if ( typeof borderRadius === 'number' ) {
-		borderProps.style.borderRadius = `${ borderRadius }px`;
+		borderProps = {
+			...borderProps,
+			style: {
+				...borderProps.style,
+				borderRadius: `${ borderRadius }px`,
+			},
+		};
 	}
 
 	const colorProps = useColorProps( attributes );
@@ -168,7 +174,7 @@ export default function SearchEdit( {
 	}, [ hasOnlyButton, isSelected, setAttributes, width ] );
 
 	const getBlockClassNames = () => {
-		return classnames(
+		return clsx(
 			className,
 			isButtonPositionInside
 				? 'wp-block-search__button-inside'
@@ -267,7 +273,7 @@ export default function SearchEdit( {
 
 	const renderTextField = () => {
 		// If the input is inside the wrapper, the wrapper gets the border color styles/classes, not the input control.
-		const textFieldClasses = classnames(
+		const textFieldClasses = clsx(
 			'wp-block-search__input',
 			isButtonPositionInside ? undefined : borderProps.className,
 			typographyProps.className
@@ -303,7 +309,7 @@ export default function SearchEdit( {
 
 	const renderButton = () => {
 		// If the button is inside the wrapper, the wrapper gets the border color styles/classes, not the button.
-		const buttonClasses = classnames(
+		const buttonClasses = clsx(
 			'wp-block-search__button',
 			colorProps.className,
 			typographyProps.className,
@@ -435,7 +441,7 @@ export default function SearchEdit( {
 									widthUnit: newUnit,
 								} );
 							} }
-							__unstableInputWidth={ '80px' }
+							__unstableInputWidth="80px"
 							value={ `${ width }${ widthUnit }` }
 							units={ units }
 						/>
@@ -536,7 +542,7 @@ export default function SearchEdit( {
 		},
 	} );
 
-	const labelClassnames = classnames(
+	const labelClassnames = clsx(
 		'wp-block-search__label',
 		typographyProps.className
 	);
@@ -562,7 +568,7 @@ export default function SearchEdit( {
 				size={ {
 					width: `${ width }${ widthUnit }`,
 				} }
-				className={ classnames(
+				className={ clsx(
 					'wp-block-search__inside-wrapper',
 					isButtonPositionInside ? borderProps.className : undefined
 				) }

@@ -43,7 +43,6 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { unlock } from '../lock-unlock';
 import { createUpgradedEmbedBlock } from '../embed/util';
-import useClientWidth from './use-client-width';
 import { isExternalImage } from './edit';
 import { Caption } from '../utils/caption';
 
@@ -83,7 +82,8 @@ const ImageWrapper = ( { href, children } ) => {
 				// When the Image block is linked,
 				// it's wrapped with a disabled <a /> tag.
 				// Restore cursor style so it doesn't appear 'clickable'
-				// Safari needs the display property.
+				// and remove pointer events. Safari needs the display property.
+				pointerEvents: 'none',
 				cursor: 'default',
 				display: 'inline',
 			} }
@@ -103,10 +103,10 @@ export default function Image( {
 	onSelectImage,
 	onSelectURL,
 	onUploadError,
-	containerRef,
 	context,
 	clientId,
 	blockEditingMode,
+	parentLayoutType,
 } ) {
 	const {
 		url = '',
@@ -176,14 +176,14 @@ export default function Image( {
 	] = useState( {} );
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
 	const [ externalBlob, setExternalBlob ] = useState();
-	const clientWidth = useClientWidth( containerRef, [ align ] );
 	const hasNonContentControls = blockEditingMode === 'default';
 	const isContentOnlyMode = blockEditingMode === 'contentOnly';
 	const isResizable =
 		allowResize &&
 		hasNonContentControls &&
 		! isWideAligned &&
-		isLargeViewport;
+		isLargeViewport &&
+		parentLayoutType !== 'grid';
 	const imageSizeOptions = imageSizes
 		.filter(
 			( { slug } ) => image?.media_details?.sizes?.[ slug ]?.source_url
@@ -203,7 +203,9 @@ export default function Image( {
 			return;
 		}
 
-		if ( externalBlob ) return;
+		if ( externalBlob ) {
+			return;
+		}
 
 		window
 			// Avoid cache, which seems to help avoid CORS problems.
@@ -460,8 +462,11 @@ export default function Image( {
 			return {
 				lockUrlControls:
 					!! urlBinding &&
-					( ! urlBindingSource ||
-						urlBindingSource?.lockAttributesEditing ),
+					! urlBindingSource?.canUserEditValue( {
+						select,
+						context,
+						args: urlBinding?.args,
+					} ),
 				lockHrefControls:
 					// Disable editing the link of the URL if the image is inside a pattern instance.
 					// This is a temporary solution until we support overriding the link on the frontend.
@@ -472,8 +477,11 @@ export default function Image( {
 					hasParentPattern,
 				lockAltControls:
 					!! altBinding &&
-					( ! altBindingSource ||
-						altBindingSource?.lockAttributesEditing ),
+					! altBindingSource?.canUserEditValue( {
+						select,
+						context,
+						args: altBinding?.args,
+					} ),
 				lockAltControlsMessage: altBindingSource?.label
 					? sprintf(
 							/* translators: %s: Label of the bindings source. */
@@ -483,8 +491,11 @@ export default function Image( {
 					: __( 'Connected to dynamic data' ),
 				lockTitleControls:
 					!! titleBinding &&
-					( ! titleBindingSource ||
-						titleBindingSource?.lockAttributesEditing ),
+					! titleBindingSource?.canUserEditValue( {
+						select,
+						context,
+						args: titleBinding?.args,
+					} ),
 				lockTitleControlsMessage: titleBindingSource?.label
 					? sprintf(
 							/* translators: %s: Label of the bindings source. */
@@ -497,13 +508,21 @@ export default function Image( {
 		[ clientId, isSingleSelected, metadata?.bindings ]
 	);
 
+	const showUrlInput =
+		isSingleSelected &&
+		! isEditingImage &&
+		! lockHrefControls &&
+		! lockUrlControls;
+
+	const showCoverControls = isSingleSelected && canInsertCover;
+
+	const showBlockControls = showUrlInput || allowCrop || showCoverControls;
+
 	const controls = (
 		<>
-			<BlockControls group="block">
-				{ isSingleSelected &&
-					! isEditingImage &&
-					! lockHrefControls &&
-					! lockUrlControls && (
+			{ showBlockControls && (
+				<BlockControls group="block">
+					{ showUrlInput && (
 						<ImageURLInputUI
 							url={ href || '' }
 							onChangeUrl={ onSetHref }
@@ -519,21 +538,22 @@ export default function Image( {
 							resetLightbox={ resetLightbox }
 						/>
 					) }
-				{ allowCrop && (
-					<ToolbarButton
-						onClick={ () => setIsEditingImage( true ) }
-						icon={ crop }
-						label={ __( 'Crop' ) }
-					/>
-				) }
-				{ isSingleSelected && canInsertCover && (
-					<ToolbarButton
-						icon={ overlayText }
-						label={ __( 'Add text over image' ) }
-						onClick={ switchToCover }
-					/>
-				) }
-			</BlockControls>
+					{ allowCrop && (
+						<ToolbarButton
+							onClick={ () => setIsEditingImage( true ) }
+							icon={ crop }
+							label={ __( 'Crop' ) }
+						/>
+					) }
+					{ showCoverControls && (
+						<ToolbarButton
+							icon={ overlayText }
+							label={ __( 'Add text over image' ) }
+							onClick={ switchToCover }
+						/>
+					) }
+				</BlockControls>
+			) }
 			{ isSingleSelected && ! isEditingImage && ! lockUrlControls && (
 				<BlockControls group="other">
 					<MediaReplaceFlow
@@ -595,7 +615,14 @@ export default function Image( {
 										<>{ lockAltControlsMessage }</>
 									) : (
 										<>
-											<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+											<ExternalLink
+												href={
+													// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
+													__(
+														'https://www.w3.org/WAI/tutorials/images/decision-tree/'
+													)
+												}
+											>
 												{ __(
 													'Describe the purpose of the image.'
 												) }
@@ -682,7 +709,14 @@ export default function Image( {
 										<>{ lockAltControlsMessage }</>
 									) : (
 										<>
-											<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+											<ExternalLink
+												href={
+													// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
+													__(
+														'https://www.w3.org/WAI/tutorials/images/decision-tree/'
+													)
+												}
+											>
 												{ __(
 													'Describe the purpose of the image.'
 												) }
@@ -788,10 +822,6 @@ export default function Image( {
 		/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 	);
 
-	// clientWidth needs to be a number for the image Cropper to work, but sometimes it's 0
-	// So we try using the imageRef width first and fallback to clientWidth.
-	const fallbackClientWidth = imageRef.current?.width || clientWidth;
-
 	if ( canEditImage && isEditingImage ) {
 		img = (
 			<ImageWrapper href={ href }>
@@ -800,7 +830,6 @@ export default function Image( {
 					url={ url }
 					width={ numericWidth }
 					height={ numericHeight }
-					clientWidth={ fallbackClientWidth }
 					naturalHeight={ naturalHeight }
 					naturalWidth={ naturalWidth }
 					onSaveImage={ ( imageAttributes ) =>

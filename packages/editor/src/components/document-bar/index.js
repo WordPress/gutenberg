@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -21,10 +21,12 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as commandsStore } from '@wordpress/commands';
 import { useRef, useEffect } from '@wordpress/element';
 import { useReducedMotion } from '@wordpress/compose';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
  */
+import { TEMPLATE_POST_TYPES, GLOBAL_POST_TYPES } from '../../store/constants';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
@@ -39,21 +41,26 @@ const TYPE_LABELS = {
 	wp_template_part: __( 'Editing template part: %s' ),
 };
 
-const TEMPLATE_POST_TYPES = [ 'wp_template', 'wp_template_part' ];
-
-const GLOBAL_POST_TYPES = [
-	...TEMPLATE_POST_TYPES,
-	'wp_block',
-	'wp_navigation',
-];
-
 const MotionButton = motion( Button );
 
+/**
+ * This component renders a navigation bar at the top of the editor. It displays the title of the current document,
+ * a back button (if applicable), and a command center button. It also handles different states of the document,
+ * such as "not found" or "unsynced".
+ *
+ * @example
+ * ```jsx
+ * <DocumentBar />
+ * ```
+ *
+ * @return {JSX.Element} The rendered DocumentBar component.
+ */
 export default function DocumentBar() {
 	const {
 		postType,
-		document,
-		isResolving,
+		documentTitle,
+		isNotFound,
+		isUnsyncedPattern,
 		templateIcon,
 		templateTitle,
 		onNavigateToPreviousEntityRecord,
@@ -76,13 +83,16 @@ export default function DocumentBar() {
 		const _templateInfo = getTemplateInfo( _document );
 		return {
 			postType: _postType,
-			document: _document,
-			isResolving: isResolvingSelector(
-				'getEditedEntityRecord',
-				'postType',
-				_postType,
-				_postId
-			),
+			documentTitle: _document.title,
+			isNotFound:
+				! _document &&
+				! isResolvingSelector(
+					'getEditedEntityRecord',
+					'postType',
+					_postType,
+					_postId
+				),
+			isUnsyncedPattern: _document?.wp_pattern_sync_status === 'unsynced',
 			templateIcon: unlock( select( editorStore ) ).getPostIcon(
 				_postType,
 				{
@@ -98,11 +108,10 @@ export default function DocumentBar() {
 	const { open: openCommandCenter } = useDispatch( commandsStore );
 	const isReducedMotion = useReducedMotion();
 
-	const isNotFound = ! document && ! isResolving;
 	const isTemplate = TEMPLATE_POST_TYPES.includes( postType );
 	const isGlobalEntity = GLOBAL_POST_TYPES.includes( postType );
 	const hasBackButton = !! onNavigateToPreviousEntityRecord;
-	const title = isTemplate ? templateTitle : document.title;
+	const title = isTemplate ? templateTitle : documentTitle;
 
 	const mounted = useRef( false );
 	useEffect( () => {
@@ -111,9 +120,9 @@ export default function DocumentBar() {
 
 	return (
 		<div
-			className={ classnames( 'editor-document-bar', {
+			className={ clsx( 'editor-document-bar', {
 				'has-back-button': hasBackButton,
-				'is-global': isGlobalEntity,
+				'is-global': isGlobalEntity && ! isUnsyncedPattern,
 			} ) }
 		>
 			<AnimatePresence>
@@ -182,7 +191,9 @@ export default function DocumentBar() {
 									: undefined
 							}
 						>
-							{ title }
+							{ title
+								? decodeEntities( title )
+								: __( 'No Title' ) }
 						</Text>
 					</motion.div>
 					<span className="editor-document-bar__shortcut">

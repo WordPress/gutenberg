@@ -1,27 +1,18 @@
-@import "../../interface/src/style.scss";
 @import "../../dataviews/src/style.scss";
 
 @import "./components/add-new-template/style.scss";
 @import "./components/block-editor/style.scss";
 @import "./components/canvas-loader/style.scss";
-@import "./components/code-editor/style.scss";
 @import "./components/global-styles/style.scss";
 @import "./components/global-styles/screen-revisions/style.scss";
-@import "./components/header-edit-mode/style.scss";
+@import "./components/global-styles-sidebar/style.scss";
 @import "./components/page/style.scss";
 @import "./components/page-pages/style.scss";
 @import "./components/page-patterns/style.scss";
-@import "./components/page-templates-template-parts/style.scss";
+@import "./components/page-templates/style.scss";
 @import "./components/table/style.scss";
-@import "./components/sidebar-edit-mode/style.scss";
-@import "./components/sidebar-edit-mode/page-panels/style.scss";
-@import "./components/sidebar-edit-mode/settings-header/style.scss";
-@import "./components/sidebar-edit-mode/template-panel/style.scss";
 @import "./components/editor/style.scss";
-@import "./components/create-template-part-modal/style.scss";
 @import "./components/welcome-guide/style.scss";
-@import "./components/start-template-options/style.scss";
-@import "./components/keyboard-shortcut-help-modal/style.scss";
 @import "./components/layout/style.scss";
 @import "./components/save-hub/style.scss";
 @import "./components/save-panel/style.scss";
@@ -31,11 +22,8 @@
 @import "./components/sidebar-navigation-screen/style.scss";
 @import "./components/sidebar-navigation-screen-details-footer/style.scss";
 @import "./components/sidebar-navigation-screen-navigation-menu/style.scss";
-@import "./components/sidebar-navigation-screen-page/style.scss";
 @import "components/sidebar-navigation-screen-details-panel/style.scss";
-@import "./components/sidebar-navigation-screen-pattern/style.scss";
 @import "./components/sidebar-navigation-screen-patterns/style.scss";
-@import "./components/sidebar-navigation-screen-template/style.scss";
 @import "./components/sidebar-dataviews/style.scss";
 @import "./components/site-hub/style.scss";
 @import "./components/sidebar-navigation-screen-navigation-menus/style.scss";
@@ -87,16 +75,6 @@ body.js.site-editor-php {
 
 	.interface-interface-skeleton {
 		top: 0;
-	}
-
-	// Todo: Remove this rule when edit site gets support
-	// for opening unpinned sidebar items.
-	.interface-complementary-area__pin-unpin-item.components-button {
-		display: none;
-	}
-
-	.interface-interface-skeleton__content {
-		background-color: $gray-300;
 	}
 }
 

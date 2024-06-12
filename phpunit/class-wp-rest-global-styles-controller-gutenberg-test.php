@@ -122,7 +122,24 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 		$data     = $response->get_data();
 		$expected = array(
 			array(
-				'version'  => 2,
+				'_links'   => array(
+					'curies'        => array(
+						array(
+							'name'      => 'wp',
+							'href'      => 'https://api.w.org/{rel}',
+							'templated' => true,
+						),
+					),
+					'wp:theme-file' => array(
+						array(
+							'href'   => 'http://localhost:8889/wp-content/themes/emptytheme/img/1024x768_emptytheme_test_image.jpg',
+							'name'   => 'file:./img/1024x768_emptytheme_test_image.jpg',
+							'target' => 'styles.background.backgroundImage.url',
+							'type'   => 'image/jpeg',
+						),
+					),
+				),
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'settings' => array(
 					'color' => array(
 						'palette' => array(
@@ -137,7 +154,12 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 					),
 				),
 				'styles'   => array(
-					'blocks' => array(
+					'background' => array(
+						'backgroundImage' => array(
+							'url' => 'file:./img/1024x768_emptytheme_test_image.jpg',
+						),
+					),
+					'blocks'     => array(
 						'core/post-title' => array(
 							'typography' => array(
 								'fontWeight' => '700',
@@ -152,7 +174,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 		wp_recursive_ksort( $data );
 		wp_recursive_ksort( $expected );
 
-		$this->assertSameSets( $expected, $data );
+		$this->assertSameSets( $expected, $data, 'Theme item should match expected schema' );
 	}
 
 	/**
@@ -489,6 +511,56 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 		);
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertErrorResponse( 'rest_custom_css_illegal_markup', $response, 400 );
+	}
+
+	/**
+	 * Tests the submission of a custom block style variation that was defined
+	 * within a theme style variation and wouldn't be registered at the time
+	 * of saving via the API.
+	 *
+	 * @since 6.6.0
+	 *
+	 * @covers WP_REST_Global_Styles_Controller_Gutenberg::update_item
+	 */
+	public function test_update_item_with_custom_block_style_variations() {
+		wp_set_current_user( self::$admin_id );
+		if ( is_multisite() ) {
+			grant_super_admin( self::$admin_id );
+		}
+
+		$group_variations = array(
+			'fromThemeStyleVariation' => array(
+				'color' => array(
+					'background' => '#ffffff',
+					'text'       => '#000000',
+				),
+			),
+		);
+
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/global-styles/' . self::$global_styles_id );
+		$request->set_body_params(
+			array(
+				'styles' => array(
+					'blocks' => array(
+						'variations' => array(
+							'fromThemeStyleVariation' => array(
+								'blockTypes' => array( 'core/group', 'core/columns' ),
+								'color'      => array(
+									'background' => '#000000',
+									'text'       => '#ffffff',
+								),
+							),
+						),
+						'core/group' => array(
+							'variations' => $group_variations,
+						),
+					),
+				),
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$this->assertSame( $group_variations, $data['styles']['blocks']['core/group']['variations'] );
 	}
 
 	/**

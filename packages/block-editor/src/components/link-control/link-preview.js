@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -26,6 +26,20 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import { ViewerSlot } from './viewer-slot';
 
 import useRichUrlData from './use-rich-url-data';
+
+/**
+ * Filters the title for display. Removes the protocol and www prefix.
+ *
+ * @param {string} title The title to be filtered.
+ *
+ * @return {string} The filtered title.
+ */
+function filterTitleForDisplay( title ) {
+	// Derived from `filterURLForDisplay` in `@wordpress/url`.
+	return title
+		.replace( /^[a-z\-.\+]+[0-9]*:(\/\/)?/i, '' )
+		.replace( /^www\./i, '' );
+}
 
 export default function LinkPreview( {
 	value,
@@ -59,6 +73,9 @@ export default function LinkPreview( {
 		! isEmptyURL &&
 		stripHTML( richData?.title || value?.title || displayURL );
 
+	const isUrlRedundant =
+		! value?.url || filterTitleForDisplay( displayTitle ) === displayURL;
+
 	let icon;
 
 	if ( richData?.icon ) {
@@ -80,7 +97,7 @@ export default function LinkPreview( {
 	return (
 		<div
 			aria-label={ __( 'Currently selected' ) }
-			className={ classnames( 'block-editor-link-control__search-item', {
+			className={ clsx( 'block-editor-link-control__search-item', {
 				'is-current': true,
 				'is-rich': hasRichData,
 				'is-fetching': !! isFetching,
@@ -92,7 +109,7 @@ export default function LinkPreview( {
 			<div className="block-editor-link-control__search-item-top">
 				<span className="block-editor-link-control__search-item-header">
 					<span
-						className={ classnames(
+						className={ clsx(
 							'block-editor-link-control__search-item-icon',
 							{
 								'is-image': richData?.icon,
@@ -112,7 +129,7 @@ export default function LinkPreview( {
 										{ displayTitle }
 									</Truncate>
 								</ExternalLink>
-								{ value?.url && displayTitle !== displayURL && (
+								{ ! isUrlRedundant && (
 									<span className="block-editor-link-control__search-item-info">
 										<Truncate numberOfLines={ 1 }>
 											{ displayURL }
@@ -149,6 +166,7 @@ export default function LinkPreview( {
 						isEmptyURL || showIconLabels ? '' : ': ' + value.url
 					) }
 					ref={ ref }
+					__experimentalIsFocusable
 					disabled={ isEmptyURL }
 					size="compact"
 				/>

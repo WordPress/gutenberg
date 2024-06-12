@@ -11,11 +11,11 @@ import {
 	default as DuplicatePatternModal,
 	useDuplicatePatternProps,
 } from './components/duplicate-pattern-modal';
-import { isOverridableBlock } from './api';
+import { isOverridableBlock, hasOverridableBlocks } from './api';
 import RenamePatternModal from './components/rename-pattern-modal';
 import PatternsMenuItems from './components';
 import RenamePatternCategoryModal from './components/rename-pattern-category-modal';
-import useSetPatternBindings from './components/use-set-pattern-bindings';
+import PatternOverridesControls from './components/pattern-overrides-controls';
 import ResetOverridesControl from './components/reset-overrides-control';
 import { useAddPatternCategory } from './private-hooks';
 import {
@@ -34,11 +34,12 @@ lock( privateApis, {
 	CreatePatternModalContents,
 	DuplicatePatternModal,
 	isOverridableBlock,
+	hasOverridableBlocks,
 	useDuplicatePatternProps,
 	RenamePatternModal,
 	PatternsMenuItems,
 	RenamePatternCategoryModal,
-	useSetPatternBindings,
+	PatternOverridesControls,
 	ResetOverridesControl,
 	useAddPatternCategory,
 	PATTERN_TYPES,

@@ -1,6 +1,6 @@
 @import "./autocompleters/style.scss";
 @import "./components/block-alignment-control/style.scss";
-@import "./components/block-bindings-toolbar-indicator/style.scss";
+@import "./components/pattern-overrides-toolbar-indicator/style.scss";
 @import "./components/block-canvas/style.scss";
 @import "./components/block-icon/style.scss";
 @import "./components/block-inspector/style.scss";
@@ -41,12 +41,12 @@
 @import "./components/multi-selection-inspector/style.scss";
 @import "./components/responsive-block-control/style.scss";
 @import "./components/rich-text/style.scss";
+@import "./components/segmented-text-control/style.scss";
 @import "./components/skip-to-selected-block/style.scss";
-@import "./components/text-decoration-control/style.scss";
-@import "./components/text-transform-control/style.scss";
 @import "./components/tool-selector/style.scss";
 @import "./components/url-input/style.scss";
 @import "./components/url-popover/style.scss";
+@import "./hooks/block-bindings.scss";
 @import "./hooks/block-hooks.scss";
 @import "./hooks/border.scss";
 @import "./hooks/color.scss";

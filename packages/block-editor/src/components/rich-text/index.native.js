@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -80,6 +80,7 @@ export function RichTextWrapper(
 		unstableOnFocus,
 		__unstableAllowPrefixTransformations,
 		// Native props.
+		__unstableUseSplitSelection,
 		__unstableMobileNoFocusOnMount,
 		deleteEnter,
 		placeholderTextColor,
@@ -118,6 +119,7 @@ export function RichTextWrapper(
 			getBlock,
 			isMultiSelecting,
 			hasMultiSelection,
+			getSelectedBlockClientId,
 		} = select( blockEditorStore );
 
 		const selectionStart = getSelectionStart();
@@ -154,6 +156,7 @@ export function RichTextWrapper(
 			didAutomaticChange: didAutomaticChange(),
 			disabled: isMultiSelecting() || hasMultiSelection(),
 			undo,
+			getSelectedBlockClientId,
 			...extraProps,
 		};
 	};
@@ -164,6 +167,7 @@ export function RichTextWrapper(
 		selectionStart,
 		selectionEnd,
 		isSelected,
+		getSelectedBlockClientId,
 		didAutomaticChange,
 		disabled,
 		undo,
@@ -175,6 +179,8 @@ export function RichTextWrapper(
 		exitFormattedText,
 		selectionChange,
 		__unstableMarkAutomaticChange,
+		__unstableSplitSelection,
+		clearSelectedBlock,
 	} = useDispatch( blockEditorStore );
 	const adjustedAllowedFormats = getAllowedFormats( {
 		allowedFormats,
@@ -208,6 +214,12 @@ export function RichTextWrapper(
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[ clientId, identifier ]
 	);
+
+	const clearCurrentSelectionOnUnmount = useCallback( () => {
+		if ( getSelectedBlockClientId() === clientId ) {
+			clearSelectedBlock();
+		}
+	}, [ clearSelectedBlock, clientId, getSelectedBlockClientId ] );
 
 	const onDelete = useCallback(
 		( { value, isReverse } ) => {
@@ -335,6 +347,8 @@ export function RichTextWrapper(
 				}
 			} else if ( canSplit ) {
 				splitValue( value );
+			} else if ( __unstableUseSplitSelection ) {
+				__unstableSplitSelection();
 			} else if ( canSplitAtEnd ) {
 				onSplitAtEnd();
 			} else if (
@@ -462,7 +476,9 @@ export function RichTextWrapper(
 						}
 						return;
 					}
-					onReplace( content, content.length - 1, -1 );
+					onReplace( content, content.length - 1, -1, {
+						source: 'clipboard',
+					} );
 				} else {
 					if ( canPasteEmbed ) {
 						onChange(
@@ -588,6 +604,7 @@ export function RichTextWrapper(
 			disableSuggestions={ disableSuggestions }
 			disableAutocorrection={ disableAutocorrection }
 			containerWidth={ containerWidth }
+			clearCurrentSelectionOnUnmount={ clearCurrentSelectionOnUnmount }
 			// Props to be set on the editable container are destructured on the
 			// element itself for web (see below), but passed through rich text
 			// for native.
@@ -631,7 +648,7 @@ export function RichTextWrapper(
 										  }
 										: editableProps.style
 								}
-								className={ classnames(
+								className={ clsx(
 									classes,
 									props.className,
 									editableProps.className

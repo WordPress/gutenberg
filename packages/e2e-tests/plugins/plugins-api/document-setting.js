@@ -2,7 +2,7 @@
 	const el = wp.element.createElement;
 	const __ = wp.i18n.__;
 	const registerPlugin = wp.plugins.registerPlugin;
-	const PluginDocumentSettingPanel = wp.editPost.PluginDocumentSettingPanel;
+	const PluginDocumentSettingPanel = wp.editor.PluginDocumentSettingPanel;
 
 	function MyDocumentSettingPlugin() {
 		return el(

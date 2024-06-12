@@ -173,18 +173,14 @@
 		// Safari from rendering the page / total text.
 		will-change: opacity;
 	}
+
 	.components-button.is-tertiary {
-		font-size: 28px;
-		font-weight: 200;
 		color: $gray-900;
-		margin-bottom: $grid-unit-05;
-		line-height: 1.2;
 	}
-	.components-button.is-tertiary:disabled {
+
+	.components-button.is-tertiary:disabled,
+	.components-button.is-tertiary[aria-disabled="true"] {
 		color: $gray-600;
-	}
-	.components-button.is-tertiary:hover {
-		background: transparent;
 	}
 }
 

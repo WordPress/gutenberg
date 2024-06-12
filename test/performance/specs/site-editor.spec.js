@@ -81,6 +81,7 @@ test.describe( 'Site Editor Performance', () => {
 				await admin.visitSiteEditor( {
 					postId: draftId,
 					postType: 'page',
+					canvas: 'edit',
 				} );
 
 				// Wait for the first block.
@@ -101,6 +102,15 @@ test.describe( 'Site Editor Performance', () => {
 							}
 						}
 					);
+
+					const serverTiming = await metrics.getServerTiming();
+
+					for ( const [ key, value ] of Object.entries(
+						serverTiming
+					) ) {
+						results[ key ] ??= [];
+						results[ key ].push( value );
+					}
 				}
 			} );
 		}
@@ -117,16 +127,32 @@ test.describe( 'Site Editor Performance', () => {
 			draftId = await perfUtils.saveDraft();
 		} );
 
-		test( 'Run the test', async ( { admin, perfUtils, metrics } ) => {
+		test( 'Run the test', async ( { admin, perfUtils, metrics, page } ) => {
 			// Go to the test draft.
 			await admin.visitSiteEditor( {
 				postId: draftId,
 				postType: 'page',
+				canvas: 'edit',
 			} );
 
 			// Enter edit mode (second click is needed for the legacy edit mode).
 			const canvas = await perfUtils.getCanvas();
-			await canvas.locator( 'body' ).click();
+
+			// Run the test with the sidebar closed
+			const toggleSidebarButton = page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', {
+					name: 'Settings',
+					disabled: false,
+				} );
+			const isClosed =
+				( await toggleSidebarButton.getAttribute(
+					'aria-expanded'
+				) ) === 'false';
+			if ( ! isClosed ) {
+				await toggleSidebarButton.click();
+			}
+
 			await canvas
 				.getByRole( 'document', { name: /Block:( Post)? Content/ } )
 				.click();
@@ -186,6 +212,7 @@ test.describe( 'Site Editor Performance', () => {
 				metrics,
 			} ) => {
 				await admin.visitSiteEditor( {
+					// The old URL is supported in both previous versions and new versions.
 					path: '/wp_template',
 				} );
 
@@ -232,7 +259,31 @@ test.describe( 'Site Editor Performance', () => {
 			await requestUtils.activateTheme( 'twentytwentyfour' );
 		} );
 
-		test( 'Run the test', async ( { page, admin, perfUtils, editor } ) => {
+		test( 'Run the test', async ( {
+			page,
+			admin,
+			perfUtils,
+			editor,
+			requestUtils,
+		} ) => {
+			await Promise.all(
+				Array.from( { length: 10 }, async () => {
+					const { id } = await requestUtils.createPost( {
+						status: 'publish',
+						title: 'A post',
+						content: `
+<!-- wp:heading -->
+<p>Hello</p>
+<!-- /wp:heading -->
+<!-- wp:paragraph -->
+<p>Post content</p>
+<!-- /wp:paragraph -->`,
+					} );
+
+					return id;
+				} )
+			);
+
 			const samples = 10;
 			for ( let i = 1; i <= samples; i++ ) {
 				// We want to start from a fresh state each time, without
@@ -244,47 +295,22 @@ test.describe( 'Site Editor Performance', () => {
 				} );
 				await editor.openDocumentSettingsSidebar();
 
-				/*
-				 * https://github.com/WordPress/gutenberg/pull/55091 updated the HTML by
-				 * removing the replace template button in sidebar-edit-mode/template-panel/replace-template-button.js
-				 * with a "transform into" list. https://github.com/WordPress/gutenberg/pull/59259 made these tests
-				 * compatible with the new UI, however, the performance tests compare previous versions of the UI.
-				 *
-				 * The following code is a workaround to test the performance of the new UI.
-				 * `actionsButtonElement` is used to check if the old UI is present.
-				 * If there is a Replace template button (old UI), click it, otherwise, click the "transform into" button.
-				 * Once the performance tests are updated to compare compatible versions this code can be removed.
-				 */
-				// eslint-disable-next-line no-restricted-syntax
-				const isActionsButtonVisible = await page
-					.locator(
-						'.edit-site-template-card__actions button[aria-label="Actions"]'
-					)
-					.isVisible();
-
-				if ( isActionsButtonVisible ) {
-					await page
-						.getByRole( 'button', {
-							name: 'Actions',
-						} )
-						.click();
-				}
-
 				// Wait for the browser to be idle before starting the monitoring.
-				// eslint-disable-next-line no-restricted-syntax
+				// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
 				await page.waitForTimeout( BROWSER_IDLE_WAIT );
 
 				const startTime = performance.now();
 
-				if ( isActionsButtonVisible ) {
-					await page
-						.getByRole( 'menuitem', { name: 'Replace template' } )
-						.click();
-				} else {
-					await page
-						.getByRole( 'button', { name: 'Transform into:' } )
-						.click();
-				}
+				await page
+					.getByRole( 'button', { name: 'Design' } )
+					.or(
+						// Locator for backward compatibility with the old UI.
+						// The label was updated in https://github.com/WordPress/gutenberg/pull/62161.
+						page.getByRole( 'button', {
+							name: 'Transform into:',
+						} )
+					)
+					.click();
 
 				const patterns = [
 					'Blogging home template',

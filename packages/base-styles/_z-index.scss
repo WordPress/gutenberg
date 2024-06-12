@@ -4,13 +4,13 @@
 
 $z-layers: (
 	".block-editor-block-list__block::before": 0,
+	".block-editor-block-list__block.is-selected": 20,
 	".block-editor-block-switcher__arrow": 1,
 	".block-editor-block-list__block {core/image aligned wide or fullwide}": 20,
 	".block-library-classic__toolbar": 31, // When scrolled to top this toolbar needs to sit over block-editor-block-toolbar
 	".block-editor-block-list__block-selection-button": 22,
 	".components-form-toggle__input": 1,
-	".edit-post-text-editor__toolbar": 1,
-	".edit-site-code-editor__toolbar": 1,
+	".editor-text-editor__toolbar": 1,
 
 	// These next three share a stacking context
 	".block-library-template-part__selection-search": 2, // higher sticky element
@@ -86,12 +86,12 @@ $z-layers: (
 	// Show sidebar above wp-admin navigation bar for mobile viewports:
 	// #wpadminbar { z-index: 99999 }
 	".interface-interface-skeleton__sidebar": 100000,
-	".edit-post-layout__toggle-sidebar-panel": 100000,
+	".editor-layout__toggle-sidebar-panel": 100000,
 	".edit-widgets-sidebar": 100000,
-	".edit-post-layout .edit-post-post-publish-panel": 100001,
+	".editor-post-publish-panel": 100001,
 	// For larger views, the wp-admin navbar dropdown should be at top of
 	// the Publish Post sidebar.
-	".edit-post-layout .edit-post-post-publish-panel {greater than small}": 99998,
+	".editor-post-publish-panel {greater than small}": 99998,
 
 	// For larger views, the wp-admin navbar dropdown should be on top of
 	// the multi-entity saving sidebar.
@@ -124,12 +124,13 @@ $z-layers: (
 	// Should be above the popover (dropdown)
 	".reusable-blocks-menu-items__convert-modal": 1000001,
 	".patterns-menu-items__convert-modal": 1000001,
-	".edit-site-create-template-part-modal": 1000001,
+	".editor-create-template-part-modal": 1000001,
 	".block-editor-block-lock-modal": 1000001,
 	".block-editor-template-part__selection-modal": 1000001,
 	".block-editor-block-rename-modal": 1000001,
 	".edit-site-list__rename-modal": 1000001,
 	".dataviews-action-modal": 1000001,
+	".editor-action-modal": 1000001,
 	".editor-post-template__swap-template-modal": 1000001,
 	".edit-site-template-panel__replace-template-modal": 1000001,
 
@@ -188,12 +189,8 @@ $z-layers: (
 	".customize-widgets__block-toolbar": 7,
 
 	// Site editor layout
-	".edit-site-layout__header-container": 4,
-	".edit-site-layout__hub": 3,
-	".edit-site-layout__header": 2,
 	".edit-site-page-header": 2,
 	".edit-site-page-content": 1,
-	".edit-site-patterns__header": 2,
 	".edit-site-patterns__dataviews-list-pagination": 2,
 	".edit-site-templates__dataviews-list-pagination": 2,
 	".edit-site-layout__canvas-container": 2,
@@ -203,10 +200,13 @@ $z-layers: (
 	".edit-site-sidebar-navigation-screen__title-icon": 1,
 
 	// Ensure modal footer actions appear above modal contents
-	".edit-site-start-template-options__modal__actions": 1,
+	".editor-start-template-options__modal__actions": 1,
 
 	// Ensure checkbox + actions don't overlap table header
 	".dataviews-view-table thead": 1,
+
+	// Ensure quick actions toolbar appear above pagination
+	".dataviews-bulk-actions": 2,
 );
 
 @function z-index( $key ) {

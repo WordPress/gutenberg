@@ -173,8 +173,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
 		 */
 		$theme_json   = apply_filters( 'wp_theme_json_data_default', new WP_Theme_JSON_Data_Gutenberg( $config, 'default' ) );
-		$config       = $theme_json->get_data();
-		static::$core = new WP_Theme_JSON_Gutenberg( $config, 'default' );
+		static::$core = $theme_json->get_theme_json();
 
 		return static::$core;
 	}
@@ -221,6 +220,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @since 5.8.0
 	 * @since 5.9.0 Theme supports have been inlined and the `$theme_support_data` argument removed.
 	 * @since 6.0.0 Added an `$options` parameter to allow the theme data to be returned without theme supports.
+	 * @since 6.6.0 Add support for 'default-font-sizes' and 'default-spacing-sizes' theme supports.
 	 *
 	 * @param array $deprecated Deprecated. Not used.
 	 * @param array $options {
@@ -244,7 +244,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				$theme_json_data = static::read_json_file( $theme_json_file );
 				$theme_json_data = static::translate( $theme_json_data, $wp_theme->get( 'TextDomain' ) );
 			} else {
-				$theme_json_data = array();
+				$theme_json_data = array( 'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA );
 			}
 
 			/**
@@ -254,9 +254,8 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			 *
 			 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
 			 */
-			$theme_json      = apply_filters( 'wp_theme_json_data_theme', new WP_Theme_JSON_Data_Gutenberg( $theme_json_data, 'theme' ) );
-			$theme_json_data = $theme_json->get_data();
-			static::$theme   = new WP_Theme_JSON_Gutenberg( $theme_json_data );
+			$theme_json    = apply_filters( 'wp_theme_json_data_theme', new WP_Theme_JSON_Data_Gutenberg( $theme_json_data, 'theme' ) );
+			static::$theme = $theme_json->get_theme_json();
 
 			if ( $wp_theme->parent() ) {
 				// Get parent theme.json.
@@ -293,35 +292,27 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		 * So we take theme supports, transform it to theme.json shape
 		 * and merge the static::$theme upon that.
 		 */
-		$theme_support_data = WP_Theme_JSON_Gutenberg::get_from_editor_settings( get_classic_theme_supports_block_editor_settings() );
+		$theme_support_data = WP_Theme_JSON_Gutenberg::get_from_editor_settings( gutenberg_get_classic_theme_supports_block_editor_settings() );
 		if ( ! wp_theme_has_theme_json() ) {
-			if ( ! isset( $theme_support_data['settings']['color'] ) ) {
-				$theme_support_data['settings']['color'] = array();
-			}
+			/*
+			 * Unlike block themes, classic themes without a theme.json disable
+			 * default presets when custom preset theme support is added. This
+			 * behavior can be overridden by using the corresponding default
+			 * preset theme support.
+			 */
+			$theme_support_data['settings']['color']['defaultPalette']        =
+				! isset( $theme_support_data['settings']['color']['palette'] ) ||
+				current_theme_supports( 'default-color-palette' );
+			$theme_support_data['settings']['color']['defaultGradients']      =
+				! isset( $theme_support_data['settings']['color']['gradients'] ) ||
+				current_theme_supports( 'default-gradient-presets' );
+			$theme_support_data['settings']['typography']['defaultFontSizes'] =
+				! isset( $theme_support_data['settings']['typography']['fontSizes'] ) ||
+				current_theme_supports( 'default-font-sizes' );
+			$theme_support_data['settings']['spacing']['defaultSpacingSizes'] =
+				! isset( $theme_support_data['settings']['spacing']['spacingSizes'] ) ||
+				current_theme_supports( 'default-spacing-sizes' );
 
-			$default_palette = false;
-			if ( current_theme_supports( 'default-color-palette' ) ) {
-				$default_palette = true;
-			}
-			if ( ! isset( $theme_support_data['settings']['color']['palette'] ) ) {
-				// If the theme does not have any palette, we still want to show the core one.
-				$default_palette = true;
-			}
-			$theme_support_data['settings']['color']['defaultPalette'] = $default_palette;
-
-			$default_gradients = false;
-			if ( current_theme_supports( 'default-gradient-presets' ) ) {
-				$default_gradients = true;
-			}
-			if ( ! isset( $theme_support_data['settings']['color']['gradients'] ) ) {
-				// If the theme does not have any gradients, we still want to show the core ones.
-				$default_gradients = true;
-			}
-			$theme_support_data['settings']['color']['defaultGradients'] = $default_gradients;
-
-			if ( ! isset( $theme_support_data['settings']['shadow'] ) ) {
-				$theme_support_data['settings']['shadow'] = array();
-			}
 			/*
 			 * Shadow presets are explicitly disabled for classic themes until a
 			 * decision is made for whether the default presets should match the
@@ -350,15 +341,10 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				);
 			}
 
-			// BEGIN EXPERIMENTAL.
 			// Allow themes to enable appearance tools via theme_support.
-			// This feature was backported for WordPress 6.2 as of https://core.trac.wordpress.org/ticket/56487
-			// and then reverted as of https://core.trac.wordpress.org/ticket/57649
-			// Not to backport until the issues are resolved.
 			if ( current_theme_supports( 'appearance-tools' ) ) {
 				$theme_support_data['settings']['appearanceTools'] = true;
 			}
-			// END EXPERIMENTAL.
 		}
 		$with_theme_supports = new WP_Theme_JSON_Gutenberg( $theme_support_data );
 		$with_theme_supports->merge( static::$theme );
@@ -380,7 +366,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			return static::$blocks;
 		}
 
-		$config = array( 'version' => 2 );
+		$config = array( 'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA );
 		foreach ( $blocks as $block_name => $block_type ) {
 			if ( isset( $block_type->supports['__experimentalStyle'] ) ) {
 				$config['styles']['blocks'][ $block_name ] = static::remove_json_comments( $block_type->supports['__experimentalStyle'] );
@@ -403,10 +389,9 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		 *
 		 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
 		 */
-		$theme_json = apply_filters( 'wp_theme_json_data_blocks', new WP_Theme_JSON_Data_Gutenberg( $config, 'blocks' ) );
-		$config     = $theme_json->get_data();
+		$theme_json     = apply_filters( 'wp_theme_json_data_blocks', new WP_Theme_JSON_Data_Gutenberg( $config, 'blocks' ) );
+		static::$blocks = $theme_json->get_theme_json();
 
-		static::$blocks = new WP_Theme_JSON_Gutenberg( $config, 'blocks' );
 		return static::$blocks;
 	}
 
@@ -538,8 +523,8 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
 				 */
 				$theme_json = apply_filters( 'wp_theme_json_data_user', new WP_Theme_JSON_Data_Gutenberg( $config, 'custom' ) );
-				$config     = $theme_json->get_data();
-				return new WP_Theme_JSON_Gutenberg( $config, 'custom' );
+
+				return $theme_json->get_theme_json();
 			}
 
 			// Very important to verify that the flag isGlobalStylesUserThemeJSON is true.
@@ -556,8 +541,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 
 		/** This filter is documented in wp-includes/class-wp-theme-json-resolver.php */
 		$theme_json   = apply_filters( 'wp_theme_json_data_user', new WP_Theme_JSON_Data_Gutenberg( $config, 'custom' ) );
-		$config       = $theme_json->get_data();
-		static::$user = new WP_Theme_JSON_Gutenberg( $config, 'custom' );
+		static::$user = $theme_json->get_theme_json();
 
 		return static::$user;
 	}
@@ -605,7 +589,6 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		$result = new WP_Theme_JSON_Gutenberg();
 		$result->merge( static::get_core_data() );
 		if ( 'default' === $origin ) {
-			$result->set_spacing_sizes();
 			return $result;
 		}
 
@@ -616,12 +599,10 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 
 		$result->merge( static::get_theme_data() );
 		if ( 'theme' === $origin ) {
-			$result->set_spacing_sizes();
 			return $result;
 		}
 
 		$result->merge( static::get_user_data() );
-		$result->set_spacing_sizes();
 		return $result;
 	}
 
@@ -722,13 +703,43 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	}
 
 	/**
+	 * Determines if a supplied style variation matches the provided scope.
+	 *
+	 * For backwards compatibility, if a variation does not define any scope
+	 * related property, e.g. `blockTypes`, it is assumed to be a theme style
+	 * variation.
+	 *
+	 * @since 6.6.0
+	 *
+	 * @param array  $variation Theme.json shaped style variation object.
+	 * @param string $scope     Scope to check e.g. theme, block etc.
+	 *
+	 * @return boolean
+	 */
+	private static function style_variation_has_scope( $variation, $scope ) {
+		if ( 'block' === $scope ) {
+			return isset( $variation['blockTypes'] );
+		}
+
+		if ( 'theme' === $scope ) {
+			return ! isset( $variation['blockTypes'] );
+		}
+
+		return false;
+	}
+
+	/**
 	 * Returns the style variations defined by the theme (parent and child).
 	 *
 	 * @since 6.2.0 Returns parent theme variations if theme is a child.
+	 * @since 6.6.0 Added configurable scope parameter to allow filtering
+	 *              theme.json partial files by the scope to which they
+	 *              can be applied e.g. theme vs block etc.
 	 *
+	 * @param string $scope The scope or type of style variation to retrieve e.g. theme, block etc.
 	 * @return array
 	 */
-	public static function get_style_variations() {
+	public static function get_style_variations( $scope = 'theme' ) {
 		$variation_files    = array();
 		$variations         = array();
 		$base_directory     = get_stylesheet_directory() . '/styles';
@@ -751,7 +762,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		ksort( $variation_files );
 		foreach ( $variation_files as $path => $file ) {
 			$decoded_file = wp_json_file_decode( $path, array( 'associative' => true ) );
-			if ( is_array( $decoded_file ) ) {
+			if ( is_array( $decoded_file ) && static::style_variation_has_scope( $decoded_file, $scope ) ) {
 				$translated = static::translate( $decoded_file, wp_get_theme()->get( 'TextDomain' ) );
 				$variation  = ( new WP_Theme_JSON_Gutenberg( $translated ) )->get_raw_data();
 				if ( empty( $variation['title'] ) ) {
@@ -761,5 +772,79 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			}
 		}
 		return $variations;
+	}
+
+
+	/**
+	 * Resolves relative paths in theme.json styles to theme absolute paths
+	 * and returns them in an array that can be embedded
+	 * as the value of `_link` object in REST API responses.
+	 *
+	 * @since 6.6.0
+	 *
+	 * @param WP_Theme_JSON_Gutenberg $theme_json A theme json instance.
+	 * @return array An array of resolved paths.
+	 */
+	public static function get_resolved_theme_uris( $theme_json ) {
+		$resolved_theme_uris = array();
+
+		if ( ! $theme_json instanceof WP_Theme_JSON_Gutenberg ) {
+			return $resolved_theme_uris;
+		}
+
+		$theme_json_data = $theme_json->get_raw_data();
+
+		// Top level styles.
+		$background_image_url = $theme_json_data['styles']['background']['backgroundImage']['url'] ?? null;
+		// Using the same file convention when registering web fonts. See: WP_Font_Face_Resolver:: to_theme_file_uri.
+		$placeholder = 'file:./';
+		if (
+			isset( $background_image_url ) &&
+			is_string( $background_image_url ) &&
+			// Skip if the src doesn't start with the placeholder, as there's nothing to replace.
+			str_starts_with( $background_image_url, $placeholder ) ) {
+				$file_type          = wp_check_filetype( $background_image_url );
+				$src_url            = str_replace( $placeholder, '', $background_image_url );
+				$resolved_theme_uri = array(
+					'name'   => $background_image_url,
+					'href'   => sanitize_url( get_theme_file_uri( $src_url ) ),
+					'target' => 'styles.background.backgroundImage.url',
+				);
+				if ( isset( $file_type['type'] ) ) {
+					$resolved_theme_uri['type'] = $file_type['type'];
+				}
+				$resolved_theme_uris[] = $resolved_theme_uri;
+		}
+
+		return $resolved_theme_uris;
+	}
+
+	/**
+	 * Resolves relative paths in theme.json styles to theme absolute paths
+	 * and merges them with incoming theme JSON.
+	 *
+	 * @since 6.6.0
+	 *
+	 * @param WP_Theme_JSON_Gutenberg $theme_json A theme json instance.
+	 * @return WP_Theme_JSON_Gutenberg Theme merged with resolved paths, if any found.
+	 */
+	public static function resolve_theme_file_uris( $theme_json ) {
+		$resolved_urls = static::get_resolved_theme_uris( $theme_json );
+		if ( empty( $resolved_urls ) ) {
+			return $theme_json;
+		}
+
+		$resolved_theme_json_data = array(
+			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+		);
+
+		foreach ( $resolved_urls as $resolved_url ) {
+			$path = explode( '.', $resolved_url['target'] );
+			_wp_array_set( $resolved_theme_json_data, $path, $resolved_url['href'] );
+		}
+
+		$theme_json->merge( new WP_Theme_JSON_Gutenberg( $resolved_theme_json_data ) );
+
+		return $theme_json;
 	}
 }

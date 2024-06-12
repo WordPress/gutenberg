@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -18,12 +18,8 @@ import {
 import { ToggleControl, TextControl, PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
-import { useEntityProp } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
-import { useCanEditEntity } from '../utils/hooks';
+import { useEntityProp, store as coreStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 
 export default function PostTitleEdit( {
 	attributes: { level, textAlign, isLink, rel, linkTarget },
@@ -31,18 +27,28 @@ export default function PostTitleEdit( {
 	context: { postType, postId, queryId },
 	insertBlocksAfter,
 } ) {
-	const TagName = 'h' + level;
+	const TagName = level === 0 ? 'p' : `h${ level }`;
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
-	/**
-	 * Hack: useCanEditEntity may trigger an OPTIONS request to the REST API via the canUser resolver.
-	 * However, when the Post Title is a descendant of a Query Loop block, the title cannot be edited.
-	 * In order to avoid these unnecessary requests, we call the hook without
-	 * the proper data, resulting in returning early without making them.
-	 */
-	const userCanEdit = useCanEditEntity(
-		'postType',
-		! isDescendentOfQueryLoop && postType,
-		postId
+	const userCanEdit = useSelect(
+		( select ) => {
+			/**
+			 * useCanEditEntity may trigger an OPTIONS request to the REST API
+			 * via the canUser resolver. However, when the Post Title is a
+			 * descendant of a Query Loop block, the title cannot be edited. In
+			 * order to avoid these unnecessary requests, we call the hook
+			 * without the proper data, resulting in returning early without
+			 * making them.
+			 */
+			if ( isDescendentOfQueryLoop ) {
+				return false;
+			}
+			return select( coreStore ).canUserEditEntityRecord(
+				'postType',
+				postType,
+				postId
+			);
+		},
+		[ isDescendentOfQueryLoop, postType, postId ]
 	);
 	const [ rawTitle = '', setTitle, fullTitle ] = useEntityProp(
 		'postType',
@@ -55,7 +61,7 @@ export default function PostTitleEdit( {
 		insertBlocksAfter( createBlock( getDefaultBlockName() ) );
 	};
 	const blockProps = useBlockProps( {
-		className: classnames( {
+		className: clsx( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );

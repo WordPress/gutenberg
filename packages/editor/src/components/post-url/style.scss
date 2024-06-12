@@ -2,34 +2,27 @@
 	width: 100%;
 }
 
-.components-button.editor-post-url__panel-toggle {
-	display: block;
-	max-width: 100%;
-	overflow: hidden;
-	text-align: left;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-}
-
 .editor-post-url__panel-dialog .editor-post-url {
 	// sidebar width - popover padding - form margin
 	min-width: $sidebar-width - $grid-unit-20 - $grid-unit-20;
 	margin: $grid-unit-10;
 }
 
-.editor-post-url__link-label {
-	font-size: $default-font-size;
-	font-weight: 400;
-	margin: 0;
-}
-
 /* rtl:begin:ignore */
 .editor-post-url__link {
 	direction: ltr;
 	word-break: break-word;
+	margin-top: $grid-unit-05;
+	color: $gray-700;
 }
 /* rtl:end:ignore */
 
 .editor-post-url__link-slug {
 	font-weight: 600;
+}
+
+// TODO: This might indicate a need to update the InputControl itself, as
+// there is no way currently to control the padding when adding prefix/suffix.
+.editor-post-url__input input.components-input-control__input {
+	padding-inline-start: 0 !important;
 }

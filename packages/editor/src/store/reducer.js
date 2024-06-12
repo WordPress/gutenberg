@@ -7,6 +7,7 @@ import { combineReducers } from '@wordpress/data';
  * Internal dependencies
  */
 import { EDITOR_SETTINGS_DEFAULTS } from './defaults';
+import dataviewsReducer from '../dataviews/store/reducer';
 
 /**
  * Returns a post attribute value, flattening nested rendered content using its
@@ -360,6 +361,17 @@ export function listViewToggleRef( state = { current: null } ) {
 	return state;
 }
 
+/**
+ * This reducer does nothing aside initializing a ref to the inserter sidebar toggle.
+ * We will have a unique ref per "editor" instance.
+ *
+ * @param {Object} state
+ * @return {Object} Reference to the inserter sidebar toggle button.
+ */
+export function inserterSidebarToggleRef( state = { current: null } ) {
+	return state;
+}
+
 export function publishSidebarActive( state = false, action ) {
 	switch ( action.type ) {
 		case 'OPEN_PUBLISH_SIDEBAR':
@@ -387,7 +399,9 @@ export default combineReducers( {
 	deviceType,
 	removedPanels,
 	blockInserterPanel,
+	inserterSidebarToggleRef,
 	listViewPanel,
 	listViewToggleRef,
 	publishSidebarActive,
+	dataviews: dataviewsReducer,
 } );

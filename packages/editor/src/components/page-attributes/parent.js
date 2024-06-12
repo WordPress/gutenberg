@@ -6,17 +6,24 @@ import removeAccents from 'remove-accents';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { ComboboxControl } from '@wordpress/components';
+import { __, sprintf } from '@wordpress/i18n';
+import {
+	Button,
+	Dropdown,
+	ComboboxControl,
+	ExternalLink,
+} from '@wordpress/components';
 import { debounce } from '@wordpress/compose';
 import { useState, useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
+import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
+import PostPanelRow from '../post-panel-row';
 import { buildTermsTree } from '../../utils/terms';
 import { store as editorStore } from '../../store';
 
@@ -40,6 +47,12 @@ export const getItemPriority = ( name, searchValue ) => {
 	return Infinity;
 };
 
+/**
+ * Renders the Page Attributes Parent component. A dropdown menu in an editor interface
+ * for selecting the parent page of a given page.
+ *
+ * @return {Component|null} The component to be rendered. Return null if post type is not hierarchical.
+ */
 export function PageAttributesParent() {
 	const { editPost } = useDispatch( editorStore );
 	const [ fieldValue, setFieldValue ] = useState( false );
@@ -163,11 +176,100 @@ export function PageAttributesParent() {
 			__next40pxDefaultSize
 			className="editor-page-attributes__parent"
 			label={ __( 'Parent' ) }
+			help={ __( 'Choose a parent page.' ) }
 			value={ parentPostId }
 			options={ parentOptions }
 			onFilterValueChange={ debounce( handleKeydown, 300 ) }
 			onChange={ handleChange }
+			hideLabelFromVision
 		/>
+	);
+}
+
+function PostParentToggle( { isOpen, onClick } ) {
+	const parentPost = useSelect( ( select ) => {
+		const { getEditedPostAttribute } = select( editorStore );
+		const parentPostId = getEditedPostAttribute( 'parent' );
+		if ( ! parentPostId ) {
+			return null;
+		}
+		const { getEntityRecord } = select( coreStore );
+		const postTypeSlug = getEditedPostAttribute( 'type' );
+		return getEntityRecord( 'postType', postTypeSlug, parentPostId );
+	}, [] );
+	const parentTitle = useMemo(
+		() => ( ! parentPost ? __( 'None' ) : getTitle( parentPost ) ),
+		[ parentPost ]
+	);
+	return (
+		<Button
+			size="compact"
+			className="editor-post-parent__panel-toggle"
+			variant="tertiary"
+			aria-expanded={ isOpen }
+			// translators: %s: Current post parent.
+			aria-label={ sprintf( __( 'Change parent: %s' ), parentTitle ) }
+			onClick={ onClick }
+		>
+			{ parentTitle }
+		</Button>
+	);
+}
+
+export function ParentRow() {
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when the popover's anchor updates.
+	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+	// Memoize popoverProps to avoid returning a new object every time.
+	const popoverProps = useMemo(
+		() => ( {
+			// Anchor the popover to the middle of the entire row so that it doesn't
+			// move around when the label changes.
+			anchor: popoverAnchor,
+			placement: 'left-start',
+			offset: 36,
+			shift: true,
+		} ),
+		[ popoverAnchor ]
+	);
+	return (
+		<PostPanelRow label={ __( 'Parent' ) } ref={ setPopoverAnchor }>
+			<Dropdown
+				popoverProps={ popoverProps }
+				className="editor-post-parent__panel-dropdown"
+				contentClassName="editor-post-parent__panel-dialog"
+				focusOnMount
+				renderToggle={ ( { isOpen, onToggle } ) => (
+					<PostParentToggle isOpen={ isOpen } onClick={ onToggle } />
+				) }
+				renderContent={ ( { onClose } ) => (
+					<div className="editor-post-parent">
+						<InspectorPopoverHeader
+							title={ __( 'Parent' ) }
+							onClose={ onClose }
+						/>
+						<div>
+							{ __(
+								"Child pages inherit characteristics from their parent, such as URL structure. For instance, if 'Web Design' is a child of 'Services,' its URL would be mysite.com/services/web-design."
+							) }
+							<p>
+								{ __(
+									'They also show up as sub-items in the default navigation menu. '
+								) }
+								<ExternalLink
+									href={ __(
+										'https://wordpress.org/documentation/article/page-post-settings-sidebar/#page-attributes'
+									) }
+								>
+									{ __( 'Learn more' ) }
+								</ExternalLink>
+							</p>
+						</div>
+						<PageAttributesParent />
+					</div>
+				) }
+			/>
+		</PostPanelRow>
 	);
 }
 

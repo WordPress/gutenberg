@@ -11,7 +11,7 @@ buildscript {
         espressoVersion = '3.0.1'
 
         // libs
-        aztecVersion = 'v2.1.1'
+        aztecVersion = 'v2.1.2'
         wordpressUtilsVersion = '3.3.0'
 
         // main
@@ -53,7 +53,7 @@ android {
 
     defaultConfig {
         minSdkVersion 24
-        targetSdkVersion 33
+        targetSdkVersion 34
     }
 
     compileOptions {

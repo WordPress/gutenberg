@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * Internal dependencies
@@ -156,6 +156,7 @@ function ButtonEdit( props ) {
 		onReplace,
 		mergeBlocks,
 		clientId,
+		context,
 	} = props;
 	const {
 		tagName,
@@ -246,18 +247,21 @@ function ButtonEdit( props ) {
 			return {
 				lockUrlControls:
 					!! metadata?.bindings?.url &&
-					( ! blockBindingsSource ||
-						blockBindingsSource?.lockAttributesEditing ),
+					! blockBindingsSource?.canUserEditValue( {
+						select,
+						context,
+						args: metadata?.bindings?.url?.args,
+					} ),
 			};
 		},
-		[ isSelected ]
+		[ isSelected, metadata?.bindings?.url ]
 	);
 
 	return (
 		<>
 			<div
 				{ ...blockProps }
-				className={ classnames( blockProps.className, {
+				className={ clsx( blockProps.className, {
 					[ `has-custom-width wp-block-button__width-${ width }` ]:
 						width,
 					[ `has-custom-font-size` ]: blockProps.style.fontSize,
@@ -274,7 +278,7 @@ function ButtonEdit( props ) {
 						} )
 					}
 					withoutInteractiveFormatting
-					className={ classnames(
+					className={ clsx(
 						className,
 						'wp-block-button__link',
 						colorProps.className,
@@ -293,12 +297,6 @@ function ButtonEdit( props ) {
 						...spacingProps.style,
 						...shadowProps.style,
 					} }
-					onSplit={ ( value ) =>
-						createBlock( 'core/button', {
-							...attributes,
-							text: value,
-						} )
-					}
 					onReplace={ onReplace }
 					onMerge={ mergeBlocks }
 					identifier="text"
@@ -345,7 +343,7 @@ function ButtonEdit( props ) {
 						} }
 						anchor={ popoverAnchor }
 						focusOnMount={ isEditingURL ? 'firstElement' : false }
-						__unstableSlotName={ '__unstable-block-tools-after' }
+						__unstableSlotName="__unstable-block-tools-after"
 						shift
 					>
 						<LinkControl

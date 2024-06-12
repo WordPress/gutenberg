@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -24,6 +24,7 @@ import {
 	__unstableEditorStyles as EditorStyles,
 	__unstableIframe as Iframe,
 } from '@wordpress/block-editor';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { useSelect } from '@wordpress/data';
 import { useResizeObserver } from '@wordpress/compose';
 import { useMemo, useState, memo, useContext } from '@wordpress/element';
@@ -34,7 +35,6 @@ import { ENTER, SPACE } from '@wordpress/keycodes';
  */
 import { unlock } from '../../lock-unlock';
 import EditorCanvasContainer from '../editor-canvas-container';
-import { mergeBaseAndUserConfigs } from '../global-styles/global-styles-provider';
 
 const {
 	ExperimentalBlockEditorProvider,
@@ -42,6 +42,7 @@ const {
 	GlobalStylesContext,
 	useGlobalStylesOutputWithConfig,
 } = unlock( blockEditorPrivateApis );
+const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
 
 const {
 	CompositeV2: Composite,
@@ -189,7 +190,7 @@ function StyleBook( {
 	const [ resizeObserver, sizes ] = useResizeObserver();
 	const [ textColor ] = useGlobalStyle( 'color.text' );
 	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
-	const examples = useMemo( getExamples, [] );
+	const [ examples ] = useState( getExamples );
 	const tabs = useMemo(
 		() =>
 			getCategories()
@@ -240,7 +241,7 @@ function StyleBook( {
 			closeButtonLabel={ showCloseButton ? __( 'Close' ) : null }
 		>
 			<div
-				className={ classnames( 'edit-site-style-book', {
+				className={ clsx( 'edit-site-style-book', {
 					'is-wide': sizes.width > 600,
 					'is-button': !! onClick,
 				} ) }
@@ -343,7 +344,7 @@ const StyleBookBody = ( {
 
 	return (
 		<Iframe
-			className={ classnames( 'edit-site-style-book__iframe', {
+			className={ clsx( 'edit-site-style-book__iframe', {
 				'is-focused': isFocused && !! onClick,
 				'is-button': !! onClick,
 			} ) }
@@ -363,7 +364,7 @@ const StyleBookBody = ( {
 				}
 			</style>
 			<Examples
-				className={ classnames( 'edit-site-style-book__examples', {
+				className={ clsx( 'edit-site-style-book__examples', {
 					'is-wide': sizes.width > 600,
 				} ) }
 				examples={ examples }
@@ -441,7 +442,7 @@ const Example = ( { id, title, blocks, isSelected, onClick } ) => {
 		<div role="row">
 			<div role="gridcell">
 				<CompositeItem
-					className={ classnames( 'edit-site-style-book__example', {
+					className={ clsx( 'edit-site-style-book__example', {
 						'is-selected': isSelected,
 					} ) }
 					id={ id }

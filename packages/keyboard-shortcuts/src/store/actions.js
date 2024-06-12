@@ -100,13 +100,13 @@ export function registerShortcut( {
  *     const { unregisterShortcut } = useDispatch( keyboardShortcutsStore );
  *
  *     useEffect( () => {
- *         unregisterShortcut( 'core/edit-post/next-region' );
+ *         unregisterShortcut( 'core/editor/next-region' );
  *     }, [] );
  *
  *     const shortcut = useSelect(
  *         ( select ) =>
  *             select( keyboardShortcutsStore ).getShortcutKeyCombination(
- *                 'core/edit-post/next-region'
+ *                 'core/editor/next-region'
  *             ),
  *         []
  *     );

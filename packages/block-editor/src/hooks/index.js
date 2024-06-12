@@ -21,19 +21,24 @@ import dimensions from './dimensions';
 import duotone from './duotone';
 import fontFamily from './font-family';
 import fontSize from './font-size';
+import textAlign from './text-align';
 import border from './border';
 import position from './position';
+import blockStyleVariation from './block-style-variation';
 import layout from './layout';
 import childLayout from './layout-child';
 import contentLockUI from './content-lock-ui';
 import './metadata';
 import blockHooks from './block-hooks';
-import blockRenaming from './block-renaming';
+import blockBindingsPanel from './block-bindings';
+import './block-renaming';
 import './use-bindings-attributes';
 
 createBlockEditFilter(
 	[
+		blockBindingsPanel,
 		align,
+		textAlign,
 		anchor,
 		customClassName,
 		style,
@@ -42,12 +47,12 @@ createBlockEditFilter(
 		layout,
 		contentLockUI,
 		blockHooks,
-		blockRenaming,
 		childLayout,
 	].filter( Boolean )
 );
 createBlockListBlockFilter( [
 	align,
+	textAlign,
 	background,
 	style,
 	color,
@@ -57,10 +62,12 @@ createBlockListBlockFilter( [
 	fontSize,
 	border,
 	position,
+	blockStyleVariation,
 	childLayout,
 ] );
 createBlockSaveFilter( [
 	align,
+	textAlign,
 	anchor,
 	ariaLabel,
 	customClassName,

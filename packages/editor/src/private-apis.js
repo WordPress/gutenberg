@@ -1,42 +1,49 @@
 /**
+ * WordPress dependencies
+ */
+import * as interfaceApis from '@wordpress/interface';
+
+/**
  * Internal dependencies
  */
-import EditorCanvas from './components/editor-canvas';
-import { ExperimentalEditorProvider } from './components/provider';
 import { lock } from './lock-unlock';
 import { EntitiesSavedStatesExtensible } from './components/entities-saved-states';
+import EditorContentSlotFill from './components/editor-interface/content-slot-fill';
 import useBlockEditorSettings from './components/provider/use-block-editor-settings';
-import DocumentTools from './components/document-tools';
-import InserterSidebar from './components/inserter-sidebar';
-import ListViewSidebar from './components/list-view-sidebar';
-import ModeSwitcher from './components/mode-switcher';
-import PatternOverridesPanel from './components/pattern-overrides-panel';
+import BackButton from './components/header/back-button';
+import CreateTemplatePartModal from './components/create-template-part-modal';
+import Editor from './components/editor';
 import PluginPostExcerpt from './components/post-excerpt/plugin';
-import PostPanelRow from './components/post-panel-row';
-import PostViewLink from './components/post-view-link';
-import PreviewDropdown from './components/preview-dropdown';
 import PreferencesModal from './components/preferences-modal';
 import { usePostActions } from './components/post-actions/actions';
-import PostCardPanel from './components/post-card-panel';
+import ToolsMoreMenuGroup from './components/more-menu/tools-more-menu-group';
+import ViewMoreMenuGroup from './components/more-menu/view-more-menu-group';
+import ResizableEditor from './components/resizable-editor';
+import {
+	mergeBaseAndUserConfigs,
+	GlobalStylesProvider,
+} from './components/global-styles-provider';
+
+const { store: interfaceStore, ...remainingInterfaceApis } = interfaceApis;
 
 export const privateApis = {};
 lock( privateApis, {
-	DocumentTools,
-	EditorCanvas,
-	ExperimentalEditorProvider,
+	CreateTemplatePartModal,
+	BackButton,
 	EntitiesSavedStatesExtensible,
-	InserterSidebar,
-	ListViewSidebar,
-	ModeSwitcher,
-	PatternOverridesPanel,
+	Editor,
+	EditorContentSlotFill,
+	GlobalStylesProvider,
+	mergeBaseAndUserConfigs,
 	PluginPostExcerpt,
-	PostPanelRow,
-	PostViewLink,
-	PreviewDropdown,
 	PreferencesModal,
 	usePostActions,
-	PostCardPanel,
+	ToolsMoreMenuGroup,
+	ViewMoreMenuGroup,
+	ResizableEditor,
 
 	// This is a temporary private API while we're updating the site editor to use EditorProvider.
 	useBlockEditorSettings,
+	interfaceStore,
+	...remainingInterfaceApis,
 } );

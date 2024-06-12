@@ -7,7 +7,13 @@
 		width: 100%;
 
 		&.editor-post-card-panel__title {
-			margin: 3px 0 0 0;
+			margin: 0;
+			padding: 2px 0;
+			display: flex;
+			align-items: center;
+			flex-wrap: wrap;
+			column-gap: $grid-unit-10;
+			row-gap: $grid-unit-05;
 		}
 	}
 
@@ -20,13 +26,25 @@
 	&__header {
 		display: flex;
 		justify-content: space-between;
-		margin: 0 0 $grid-unit-10;
 	}
 
-	&__description {
-		color: $gray-700;
-		& .components-text {
-			color: inherit;
-		}
+	&.has-description &__header {
+		margin-bottom: $grid-unit-10;
 	}
+}
+
+.editor-post-card-panel__icon.is-sync {
+	fill: var(--wp-block-synced-color);
+}
+
+.editor-post-card-panel__title-badge {
+	background: $gray-100;
+	color: $gray-700;
+	padding: 0 $grid-unit-05;
+	border-radius: $radius-block-ui;
+	font-size: 12px;
+	font-weight: 400;
+	flex-shrink: 0;
+	line-height: $grid-unit-05 * 5;
+	display: inline-block;
 }

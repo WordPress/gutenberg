@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { store, getContext } from '@wordpress/interactivity';
+import { store, getContext, useInit, privateApis } from '@wordpress/interactivity';
 
 const { state } = store( 'directive-each' );
 
@@ -147,9 +147,9 @@ store( 'directive-each', {
 			state
 				.animalBreeds
 				.forEach( ( { name, breeds } ) => {
-					if ( name === 'Dog') breeds.unshift( 'german shepherd' );
-					if ( name === 'Cat') breeds.unshift( 'maine coon' );
-					if ( name === 'Rat') breeds.unshift( 'satin' );
+					if ( name === 'Dog') {breeds.unshift( 'german shepherd' );}
+					if ( name === 'Cat') {breeds.unshift( 'maine coon' );}
+					if ( name === 'Rat') {breeds.unshift( 'satin' );}
 				} );
 		}
 	}
@@ -189,4 +189,31 @@ store( 'directive-each', {
 		},
 	}
 } );
+
+const { directive } = privateApis(
+	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
+);
+
+/*
+ * This is a high-priority version of the wp-init directive, to test directives
+ * with such priority or lower don't run in elements with wp-each-child.
+ */
+directive(
+	'priority-2-init',
+	( { directives: { 'priority-2-init': init }, evaluate } ) => {
+		init.forEach( ( entry ) => {
+			useInit( () => evaluate( entry ) );
+		} );
+	},
+	{ priority: 2 }
+);
+
+store('directive-each', {
+    callbacks: {
+		updateCallbackRunCount() {
+			const ctx = getContext();
+			ctx.callbackRunCount += 1;
+		}
+    },
+});
 

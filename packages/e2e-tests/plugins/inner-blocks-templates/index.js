@@ -92,7 +92,7 @@
 
 		edit: function InnerBlocksUpdateLockedTemplateEdit( props ) {
 			const hasUpdatedTemplated = props.attributes.hasUpdatedTemplate;
-			return el( 'div', null, [
+			return el( 'div', null,
 				el(
 					'button',
 					{
@@ -108,7 +108,7 @@
 						: TEMPLATE,
 					templateLock: 'all',
 				} ) ),
-			] );
+			);
 		},
 
 		save,

@@ -17,13 +17,26 @@
 	}
 }
 
+@mixin selectedOutline() {
+	content: "";
+	position: absolute;
+	pointer-events: none;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	outline-color: var(--wp-admin-theme-color);
+	outline-style: solid;
+	outline-width: calc(var(--wp-admin-border-width-focus) / var(--wp-block-editor-iframe-zoom-out-scale, 1));
+	outline-offset: calc((-1 * var(--wp-admin-border-width-focus)) / var(--wp-block-editor-iframe-zoom-out-scale, 1));
+}
 
 // Hide selections on this element, otherwise Safari will include it stacked
 // under your actual selection.
 // This uses a CSS hack to show the rules to Safari only. Failing here is okay,
 // it just makes the selection indication slightly less precise. That makes this
-// hack a progressive enhancement. Stylelint is disabled to allow the hack to work.
-/* stylelint-disable */
+// hack a progressive enhancement.
+/* stylelint-disable -- Stylelint is disabled to allow the hack to work. */
 _::-webkit-full-page-media, _:future, :root .block-editor-block-list__layout::selection,
 _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-block-list__layout::selection {
 	background-color: transparent;
@@ -39,12 +52,6 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 	position: relative;
 
 	// Block multi selection
-	// Apply a rounded radius to the entire block when multi selected, but with low specificity
-	// so explicit radii set by tools are preserved.
-	&:where(.block-editor-block-list__block.is-multi-selected:not(.is-partially-selected)) {
-		border-radius: $radius-block-ui;
-	}
-
 	.block-editor-block-list__block.is-multi-selected:not(.is-partially-selected) {
 		// Hide the native selection indicator, for the selection, and children.
 		&::selection,
@@ -64,7 +71,6 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 			left: 0;
 			background: var(--wp-admin-theme-color);
 			opacity: 0.4;
-			border-radius: $radius-block-ui;
 
 			// Animate.
 			animation: selection-overlay__fade-in-animation 0.1s ease-out;
@@ -77,7 +83,7 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 
 		// Don't show the highlight focus style when multi selected.
 		&.is-highlighted::after {
-			box-shadow: none;
+			outline-color: transparent;
 		}
 	}
 
@@ -95,21 +101,12 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 		// We're using a pseudo element to overflow placeholder borders
 		// and any border inside the block itself.
 		&::after {
-			content: "";
-			position: absolute;
+			@include selectedOutline();
 			z-index: 1;
-			pointer-events: none;
-			top: $border-width;
-			right: $border-width;
-			bottom: $border-width;
-			left: $border-width;
-			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-			border-radius: $radius-block-ui - $border-width; // Border is outset, so subtract the width to achieve correct radius.
-			outline: 2px solid transparent; // This shows up in Windows High Contrast Mode.
 
 			// Show a light color for dark themes.
 			.is-dark-theme & {
-				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $dark-theme-focus;
+				outline-color: $dark-theme-focus;
 			}
 		}
 	}
@@ -181,6 +178,14 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 	&.is-editing-disabled {
 		pointer-events: none;
 		user-select: none;
+	}
+
+	&.has-negative-margin {
+		&.is-selected,
+		&.has-child-selected {
+			// Bring the selected block forward so we can see it.
+			z-index: z-index(".block-editor-block-list__block.is-selected");
+		}
 	}
 
 	.reusable-block-edit-panel * {
@@ -263,21 +268,6 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 }
 
 .is-outline-mode .block-editor-block-list__block:not(.remove-outline) {
-	&.is-hovered {
-		cursor: default;
-
-		&::after {
-			content: "";
-			position: absolute;
-			pointer-events: none;
-			top: $border-width;
-			left: $border-width;
-			right: $border-width;
-			bottom: $border-width;
-			box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color);
-			border-radius: $radius-block-ui - $border-width;
-		}
-	}
 
 	&.is-selected {
 		cursor: default;
@@ -285,45 +275,79 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 		&.rich-text {
 			cursor: unset;
 		}
+	}
+
+	&.is-hovered:not(.is-selected),
+	&:not(.rich-text):not([contenteditable="true"]).is-selected {
 
 		&::after {
-			content: "";
-			position: absolute;
-			pointer-events: none;
-			top: $border-width;
-			left: $border-width;
-			right: $border-width;
-			bottom: $border-width;
-			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-			border-radius: $radius-block-ui;
+			@include selectedOutline();
 		}
 	}
 }
 
-@keyframes block-editor-has-editable-outline__fade-out-animation {
-	from {
-		border-color: rgba(var(--wp-admin-theme-color--rgb), 1);
+// Colorize outlines for template parts and synced patterns (.is-reusable).
+.is-outline-mode .block-editor-block-list__block:not(.remove-outline).wp-block-template-part,
+.is-outline-mode .block-editor-block-list__block:not(.remove-outline).is-reusable {
+
+	&.is-hovered::after,
+	&.is-selected::after,
+	&.is-highlighted::after {
+		outline-color: var(--wp-block-synced-color);
 	}
-	to {
-		border-color: rgba(var(--wp-admin-theme-color--rgb), 0);
+
+	&.block-editor-block-list__block:not([contenteditable]):focus {
+		&::after {
+			outline-color: var(--wp-block-synced-color);
+
+			// Show a light color for dark themes.
+			.is-dark-theme & {
+				outline-color: $dark-theme-focus;
+			}
+		}
 	}
 }
 
-.is-root-container:not([inert]) .block-editor-block-list__block.has-editable-outline {
-	&::after {
-		content: "";
-		position: absolute;
-		pointer-events: none;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		border: 1px dotted rgba(var(--wp-admin-theme-color--rgb), 1);
-		border-radius: $radius-block-ui;
-		animation: block-editor-has-editable-outline__fade-out-animation 0.3s ease-out;
-		animation-delay: 1s;
-		animation-fill-mode: forwards;
-		@include reduce-motion("animation");
+// Add fade in/out background for editable blocks in synced patterns.
+@keyframes block-editor-is-editable__animation {
+	from {
+		background-color: rgba(var(--wp-admin-theme-color--rgb), 0.1);
+	}
+	to {
+		background-color: rgba(var(--wp-admin-theme-color--rgb), 0);
+	}
+}
+
+@keyframes block-editor-is-editable__animation_reduce-motion {
+	0% {
+		background-color: rgba(var(--wp-admin-theme-color--rgb), 0.1);
+	}
+	99% {
+		background-color: rgba(var(--wp-admin-theme-color--rgb), 0.1);
+	}
+	100% {
+		background-color: rgba(var(--wp-admin-theme-color--rgb), 0);
+	}
+}
+
+.is-root-container:not([inert]) .block-editor-block-list__block.is-reusable.is-selected .block-editor-block-list__block.has-editable-outline::after {
+	animation-name: block-editor-is-editable__animation;
+	animation-duration: 0.8s;
+	animation-timing-function: ease-out;
+	animation-delay: 0.1s;
+	animation-fill-mode: backwards;
+	bottom: 0;
+	content: "";
+	left: 0;
+	pointer-events: none;
+	position: absolute;
+	right: 0;
+	top: 0;
+
+	// Unique reduced-motion affordance to ensure the effect is still visible when reduce motion is enabled.
+	@media (prefers-reduced-motion: reduce) {
+		animation-name: block-editor-is-editable__animation_reduce-motion;
+		animation-delay: 0s;
 	}
 }
 
@@ -358,22 +382,6 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 .wp-block.alignright {
 	// Without z-index, won't be clickable as "above" adjacent content.
 	z-index: z-index("{core/image aligned left or right} .wp-block");
-}
-
-body.is-zoomed-out {
-	display: flex;
-	flex-direction: column;
-
-	> .is-root-container {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		height: 100%;
-
-		> main {
-			flex: 1;
-		}
-	}
 }
 
 .wp-site-blocks > [data-align="left"] {
@@ -467,13 +475,4 @@ body.is-zoomed-out {
 		// solves this.
 		margin-bottom: auto;
 	}
-}
-
-.block-editor-iframe__html {
-	transition: all 0.3s;
-	transform-origin: top center;
-}
-
-.block-editor-iframe__html[style*="scale"] {
-	background-color: $gray-300;
 }

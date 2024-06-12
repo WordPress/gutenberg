@@ -27,7 +27,7 @@ jobs:
                 totalParts: [8]
 
         steps:
-            - uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
+            - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
@@ -49,39 +49,65 @@ jobs:
               env:
                   PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
               run: |
-                  xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run test:e2e:playwright -- --shard=${{ matrix.part }}/${{ matrix.totalParts }}
+                  xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run test:e2e -- --shard=${{ matrix.part }}/${{ matrix.totalParts }}
 
             - name: Archive debug artifacts (screenshots, traces)
-              uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
-              if: always()
+              uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
+              if: ${{ !cancelled() }}
               with:
-                  name: failures-artifacts
+                  name: failures-artifacts--${{ matrix.part }}
                   path: artifacts/test-results
                   if-no-files-found: ignore
 
             - name: Archive flaky tests report
-              uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
-              if: always()
+              uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
+              if: ${{ !cancelled() }}
               with:
-                  name: flaky-tests-report
+                  name: flaky-tests-report--${{ matrix.part }}
                   path: flaky-tests
                   if-no-files-found: ignore
 
+    merge-artifacts:
+        name: Merge Artifacts
+        if: ${{ !cancelled() }}
+        needs: [e2e-playwright]
+        runs-on: ubuntu-latest
+        outputs:
+            has-flaky-test-report: ${{ !!steps.merge-flaky-tests-reports.outputs.artifact-id }}
+        steps:
+            - name: Merge failures artifacts
+              uses: actions/upload-artifact/merge@v4
+              # Don't fail the job if there aren't any artifacts to merge.
+              continue-on-error: true
+              with:
+                  name: failures-artifacts
+                  # Retain the merged artifacts in case of a rerun.
+                  pattern: failures-artifacts*
+                  delete-merged: true
+
+            - name: Merge flaky tests reports
+              id: merge-flaky-tests-reports
+              uses: actions/upload-artifact/merge@v4
+              continue-on-error: true
+              with:
+                  name: flaky-tests-report
+                  pattern: flaky-tests-report*
+                  delete-merged: true
+
     report-to-issues:
         name: Report to GitHub
-        needs: [e2e-playwright]
-        if: ${{ always() }}
+        needs: [merge-artifacts]
+        if: ${{ needs.merge-artifacts.outputs.has-flaky-test-report == 'true' }}
         runs-on: ubuntu-latest
         steps:
             # Checkout defaults to using the branch which triggered the event, which
             # isn't necessarily `trunk` (e.g. in the case of a merge).
-            - uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
+            - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
               with:
                   ref: trunk
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
-            - uses: actions/download-artifact@v4.1.4
-              id: download_artifact
+            - uses: actions/download-artifact@v4.1.7
               # Don't fail the job if there isn't any flaky tests report.
               continue-on-error: true
               with:
@@ -89,16 +115,13 @@ jobs:
                   path: flaky-tests
 
             - name: Setup Node.js and install dependencies
-              if: ${{ steps.download_artifact.outcome == 'success' }}
               uses: ./.github/setup-node
 
             - name: Npm build
-              if: ${{ steps.download_artifact.outcome == 'success' }}
               # TODO: We don't have to build the entire project, just the action itself.
               run: npm run build:packages
 
             - name: Report flaky tests
-              if: ${{ steps.download_artifact.outcome == 'success' }}
               uses: ./packages/report-flaky-tests
               with:
                   repo-token: '${{ secrets.GITHUB_TOKEN }}'

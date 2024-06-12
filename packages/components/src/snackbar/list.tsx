@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -68,7 +68,7 @@ export function SnackbarList( {
 }: WordPressComponentProps< SnackbarListProps, 'div' > ) {
 	const listRef = useRef< HTMLDivElement | null >( null );
 	const isReducedMotion = useReducedMotion();
-	className = classnames( 'components-snackbar-list', className );
+	className = clsx( 'components-snackbar-list', className );
 	const removeNotice =
 		( notice: SnackbarListProps[ 'notices' ][ number ] ) => () =>
 			onRemove?.( notice.id );
@@ -87,9 +87,9 @@ export function SnackbarList( {
 					return (
 						<motion.div
 							layout={ ! isReducedMotion } // See https://www.framer.com/docs/animation/#layout-animations
-							initial={ 'init' }
-							animate={ 'open' }
-							exit={ 'exit' }
+							initial="init"
+							animate="open"
+							exit="exit"
 							key={ notice.id }
 							variants={
 								isReducedMotion ? undefined : SNACKBAR_VARIANTS

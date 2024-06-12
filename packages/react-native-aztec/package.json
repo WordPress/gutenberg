@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/react-native-aztec",
-	"version": "1.116.0",
+	"version": "1.120.0",
 	"description": "Aztec view for react-native.",
 	"private": true,
 	"author": "The WordPress Contributors",
@@ -17,6 +17,10 @@
 	},
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
 	},
 	"dependencies": {
 		"@wordpress/element": "file:../element",

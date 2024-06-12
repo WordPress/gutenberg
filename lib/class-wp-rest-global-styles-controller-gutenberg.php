@@ -1,6 +1,6 @@
 <?php
 /**
- * REST API: Try: bundle WP_Theme_JSON class instead of inheriting per WordPress version class
+ * REST API: Bundle WP_Theme_JSON class instead of inheriting per WordPress version class
  *
  * Changes to this class should be synced to the corresponding class
  * in WordPress core: src/wp-includes/rest-api/endpoints/class-wp-rest-global-styles-controller.php.
@@ -330,6 +330,25 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 			} elseif ( isset( $existing_config['styles'] ) ) {
 				$config['styles'] = $existing_config['styles'];
 			}
+
+			/*
+			 * If the incoming request is going to create a new variation
+			 * that is not yet registered, we register it here.
+			 * This is because the variations are registered on init,
+			 * but we want this endpoint to return the new variation immediately:
+			 * if we don't register it, it'll be stripped out of the response
+			 * just in this request (subsequent ones will be ok).
+			 * Take the variations defined in styles.blocks.variations from the incoming request
+			 * that are not part of the $existing_config.
+			 */
+			if ( isset( $request['styles']['blocks']['variations'] ) ) {
+				$existing_variations = isset( $existing_config['styles']['blocks']['variations'] ) ? $existing_config['styles']['blocks']['variations'] : array();
+				$new_variations      = array_diff_key( $request['styles']['blocks']['variations'], $existing_variations );
+				if ( ! empty( $new_variations ) ) {
+					gutenberg_register_block_style_variations_from_theme_json_data( $new_variations );
+				}
+			}
+
 			if ( isset( $request['settings'] ) ) {
 				$config['settings'] = $request['settings'];
 			} elseif ( isset( $existing_config['settings'] ) ) {
@@ -357,6 +376,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 	 *
 	 * @since 5.9.0
 	 * @since 6.2.0 Handling of style.css was added to WP_Theme_JSON.
+	 * @since 6.6.0 Added custom relative theme file URIs to `_links`.
 	 *
 	 * @param WP_Post         $post    Global Styles post object.
 	 * @param WP_REST_Request $request Request object.
@@ -366,8 +386,10 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 		$raw_config                       = json_decode( $post->post_content, true );
 		$is_global_styles_user_theme_json = isset( $raw_config['isGlobalStylesUserThemeJSON'] ) && true === $raw_config['isGlobalStylesUserThemeJSON'];
 		$config                           = array();
+		$theme_json                       = null;
 		if ( $is_global_styles_user_theme_json ) {
-			$config = ( new WP_Theme_JSON_Gutenberg( $raw_config, 'custom' ) )->get_raw_data();
+			$theme_json = new WP_Theme_JSON_Gutenberg( $raw_config, 'custom' );
+			$config     = $theme_json->get_raw_data();
 		}
 
 		// Base fields for every post.
@@ -409,6 +431,13 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 
 		if ( rest_is_field_included( '_links', $fields ) || rest_is_field_included( '_embedded', $fields ) ) {
 			$links = $this->prepare_links( $post->ID );
+			// Only return resolved URIs for get requests to user theme JSON.
+			if ( $theme_json ) {
+				$resolved_theme_uris = WP_Theme_JSON_Resolver_Gutenberg::get_resolved_theme_uris( $theme_json );
+				if ( ! empty( $resolved_theme_uris ) ) {
+					$links['https://api.w.org/theme-file'] = $resolved_theme_uris;
+				}
+			}
 			$response->add_links( $links );
 			if ( ! empty( $links['self']['href'] ) ) {
 				$actions = $this->get_available_actions();
@@ -620,18 +649,22 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 			$data['styles'] = isset( $raw_data['styles'] ) ? $raw_data['styles'] : array();
 		}
 
-		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
-		$data    = $this->add_additional_fields_to_object( $data, $request );
-		$data    = $this->filter_response_by_context( $data, $context );
-
+		$context  = ! empty( $request['context'] ) ? $request['context'] : 'view';
+		$data     = $this->add_additional_fields_to_object( $data, $request );
+		$data     = $this->filter_response_by_context( $data, $context );
 		$response = rest_ensure_response( $data );
 
 		if ( rest_is_field_included( '_links', $fields ) || rest_is_field_included( '_embedded', $fields ) ) {
-			$links = array(
+			$links               = array(
 				'self' => array(
 					'href' => rest_url( sprintf( '%s/%s/themes/%s', $this->namespace, $this->rest_base, $request['stylesheet'] ) ),
 				),
 			);
+			$resolved_theme_uris = WP_Theme_JSON_Resolver_Gutenberg::get_resolved_theme_uris( $theme );
+			if ( ! empty( $resolved_theme_uris ) ) {
+				$links['https://api.w.org/theme-file'] = $resolved_theme_uris;
+			}
+
 			$response->add_links( $links );
 		}
 
@@ -671,6 +704,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 	 * @since 6.0.0
 	 * @since 6.2.0 Returns parent theme variations, if they exist.
 	 * @since 6.4.0 Removed unnecessary local variable.
+	 * @since 6.6.0 Added custom relative theme file URIs to `_links` for each item.
 	 *
 	 * @param WP_REST_Request $request The request instance.
 	 *
@@ -686,9 +720,25 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 			);
 		}
 
+		$response   = array();
 		$variations = WP_Theme_JSON_Resolver_Gutenberg::get_style_variations();
 
-		return rest_ensure_response( $variations );
+		// Add resolved theme asset links.
+		foreach ( $variations as $variation ) {
+			$variation_theme_json = new WP_Theme_JSON_Gutenberg( $variation );
+			$resolved_theme_uris  = WP_Theme_JSON_Resolver_Gutenberg::get_resolved_theme_uris( $variation_theme_json );
+			$data                 = rest_ensure_response( $variation );
+			if ( ! empty( $resolved_theme_uris ) ) {
+				$data->add_links(
+					array(
+						'https://api.w.org/theme-file' => $resolved_theme_uris,
+					)
+				);
+			}
+			$response[] = $this->prepare_response_for_collection( $data );
+		}
+
+		return rest_ensure_response( $response );
 	}
 
 	/**

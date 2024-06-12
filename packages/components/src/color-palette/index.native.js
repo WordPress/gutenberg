@@ -61,6 +61,7 @@ function ColorPalette( {
 
 	const scale = useRef( new Animated.Value( 1 ) ).current;
 	const opacity = useRef( new Animated.Value( 1 ) ).current;
+	const delayedScrollRef = useRef();
 
 	const mergedColors = [
 		...new Set(
@@ -216,11 +217,11 @@ function ColorPalette( {
 	}
 
 	function scrollToEndWithDelay() {
-		const delayedScroll = setTimeout( () => {
-			scrollViewRef.current.scrollToEnd();
+		delayedScrollRef.current = setTimeout( () => {
+			scrollViewRef?.current.scrollToEnd();
 		}, ANIMATION_DURATION );
 		return () => {
-			clearTimeout( delayedScroll );
+			clearTimeout( delayedScrollRef.current );
 		};
 	}
 
@@ -284,7 +285,7 @@ function ColorPalette( {
 						<View key={ `${ color }-${ isSelected( color ) }` }>
 							<TouchableWithoutFeedback
 								onPress={ () => onColorPress( color ) }
-								accessibilityRole={ 'button' }
+								accessibilityRole="button"
 								accessibilityState={ {
 									selected: isSelected( color ),
 								} }
@@ -325,7 +326,7 @@ function ColorPalette( {
 						) }
 						<TouchableWithoutFeedback
 							onPress={ onCustomPress }
-							accessibilityRole={ 'button' }
+							accessibilityRole="button"
 							accessibilityState={ {
 								selected: isSelectedCustom(),
 							} }

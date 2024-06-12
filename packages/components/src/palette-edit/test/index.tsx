@@ -154,7 +154,7 @@ describe( 'PaletteEdit', () => {
 		render(
 			<PaletteEdit
 				{ ...defaultProps }
-				emptyMessage={ 'Test empty message' }
+				emptyMessage="Test empty message"
 			/>
 		);
 
@@ -170,11 +170,13 @@ describe( 'PaletteEdit', () => {
 			} )
 		);
 
-		expect(
-			screen.getByRole( 'button', {
-				name: 'Remove all colors',
-			} )
-		).toBeVisible();
+		await waitFor( () => {
+			expect(
+				screen.getByRole( 'button', {
+					name: 'Remove all colors',
+				} )
+			).toBeVisible();
+		} );
 	} );
 
 	it( 'shows a reset option when the `canReset` prop is enabled', async () => {
@@ -187,11 +189,13 @@ describe( 'PaletteEdit', () => {
 				name: 'Color options',
 			} )
 		);
-		expect(
-			screen.getByRole( 'button', {
-				name: 'Reset colors',
-			} )
-		).toBeVisible();
+		await waitFor( () => {
+			expect(
+				screen.getByRole( 'button', {
+					name: 'Reset colors',
+				} )
+			).toBeVisible();
+		} );
 	} );
 
 	it( 'does not show a reset colors option when `canReset` is disabled', async () => {
