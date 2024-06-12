@@ -76,6 +76,7 @@ test.describe( 'Site Editor Performance', () => {
 				admin,
 				perfUtils,
 				metrics,
+				page,
 			} ) => {
 				// Go to the test draft.
 				await admin.visitSiteEditor( {
@@ -86,7 +87,20 @@ test.describe( 'Site Editor Performance', () => {
 
 				// Wait for the first block.
 				const canvas = await perfUtils.getCanvas();
-				await canvas.locator( '.wp-block' ).first().waitFor();
+				// Wait until the post content block is rendered AND all
+				// patterns are replaced.
+				await Promise.all( [
+					canvas
+						.locator( '.wp-block-post-content .wp-block' )
+						.first()
+						.waitFor(),
+					page.waitForFunction(
+						() =>
+							document.querySelectorAll(
+								'[data-type="core/pattern"]'
+							).length === 0
+					),
+				] );
 
 				// Get the durations.
 				const loadingDurations = await metrics.getLoadingDurations();
