@@ -6,7 +6,7 @@ import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 
-type SearchOptions = {
+export type SearchOptions = {
 	/**
 	 * Displays initial search suggestions, when true.
 	 */
@@ -36,7 +36,7 @@ type SearchOptions = {
 	perPage?: number;
 };
 
-type EditorSettings = {
+export type EditorSettings = {
 	/**
 	 * Disables post formats, when true.
 	 */
@@ -58,7 +58,7 @@ type MediaAPIResult = {
 	type: string;
 };
 
-type SearchResult = {
+export type SearchResult = {
 	/**
 	 * Post or term id.
 	 */
