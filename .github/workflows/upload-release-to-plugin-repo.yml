@@ -51,7 +51,7 @@ jobs:
                     return $?
                   }
 
-                  # Only update trunk *if* the published release's version in Github is GREATER
+                  # Only update trunk *if* the published release's version in GitHub is GREATER
                   # than the version currently published in the WP plugins repo. If not, then it
                   # will upload it as a new tag.
                   shouldUpdateTrunk=false
