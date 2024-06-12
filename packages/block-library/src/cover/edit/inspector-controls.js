@@ -20,8 +20,8 @@ import {
 	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
 	__experimentalUseGradient,
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
-	privateApis as blockEditorPrivateApis,
 	HeightControl,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
@@ -59,7 +59,7 @@ function CoverHeightInput( {
 
 	return (
 		<HeightControl
-			label={ __( 'Minimum height of cover' ) }
+			label={ __( 'Minimum height' ) }
 			value={ computedValue }
 			onChange={ handleOnChange }
 		/>
