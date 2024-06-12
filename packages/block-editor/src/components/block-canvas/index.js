@@ -16,6 +16,18 @@ import { useMouseMoveTypingReset } from '../observe-typing';
 import { useBlockSelectionClearer } from '../block-selection-clearer';
 import { useBlockCommands } from '../use-block-commands';
 
+function FocusableWrapper( { children } ) {
+	return (
+		<div
+			className="block-editor-accessible-wrapper"
+			tabIndex="-1"
+			aria-label="Block canvas"
+		>
+			{ children }
+		</div>
+	);
+}
+
 export function ExperimentalBlockCanvas( {
 	shouldIframe = true,
 	height = '300px',
@@ -49,7 +61,7 @@ export function ExperimentalBlockCanvas( {
 						width: '100%',
 					} }
 				>
-					{ children }
+					<FocusableWrapper>{ children }</FocusableWrapper>
 				</WritingFlow>
 			</BlockTools>
 		);
@@ -70,7 +82,7 @@ export function ExperimentalBlockCanvas( {
 				name="editor-canvas"
 			>
 				<EditorStyles styles={ styles } />
-				{ children }
+				<FocusableWrapper>{ children }</FocusableWrapper>
 			</Iframe>
 		</BlockTools>
 	);

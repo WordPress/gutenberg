@@ -65,3 +65,13 @@
 		}
 	}
 }
+
+.block-editor-accessible-wrapper:focus-visible {
+	outline: none;
+
+	&::after {
+		content: "";
+		@include selected-block-outline();
+		position: fixed;
+	}
+}
