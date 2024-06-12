@@ -238,18 +238,10 @@ function ListItem< Item extends AnyItem >( {
 												}
 												size="compact"
 												onClick={ () => {
-													const maybeThunk =
-														primaryAction.callback(
-															[ item ]
-														);
-													if (
-														typeof maybeThunk ===
-														'function'
-													) {
-														maybeThunk( {
-															registry,
-														} );
-													}
+													primaryAction.callback(
+														[ item ],
+														{ registry }
+													);
 												} }
 											/>
 										}

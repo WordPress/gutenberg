@@ -138,10 +138,7 @@ function BulkActionItem< Item extends AnyItem >( {
 				if ( shouldShowModal ) {
 					setActionWithModal( action );
 				} else {
-					const maybeThunk = action.callback( eligibleItems );
-					if ( typeof maybeThunk === 'function' ) {
-						maybeThunk( { registry } );
-					}
+					action.callback( eligibleItems, { registry } );
 				}
 			} }
 			suffix={

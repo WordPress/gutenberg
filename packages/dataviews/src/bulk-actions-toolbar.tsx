@@ -115,10 +115,9 @@ function ActionButton< Item extends AnyItem >( {
 			action={ action }
 			onClick={ () => {
 				setActionInProgress( action.id );
-				const maybeThunk = action.callback( selectedItems );
-				if ( typeof maybeThunk === 'function' ) {
-					maybeThunk( { registry } );
-				}
+				action.callback( selectedItems, {
+					registry,
+				} );
 			} }
 			items={ selectedEligibleItems }
 			isBusy={ actionInProgress === action.id }

@@ -117,12 +117,7 @@ export function ActionModal< Item extends AnyItem >( {
 				action.id
 			) }` }
 		>
-			<action.RenderModal
-				items={ items }
-				closeModal={ closeModal }
-				onActionStart={ action.onActionStart }
-				onActionPerformed={ action.onActionPerformed }
-			/>
+			<action.RenderModal items={ items } closeModal={ closeModal } />
 		</Modal>
 	);
 }
@@ -179,10 +174,7 @@ export function ActionsDropdownMenuGroup< Item extends AnyItem >( {
 						key={ action.id }
 						action={ action }
 						onClick={ () => {
-							const maybeThunk = action.callback( [ item ] );
-							if ( typeof maybeThunk === 'function' ) {
-								maybeThunk( { registry } );
-							}
+							action.callback( [ item ], { registry } );
 						} }
 						items={ [ item ] }
 					/>
@@ -242,10 +234,7 @@ export default function ItemActions< Item extends AnyItem >( {
 							key={ action.id }
 							action={ action }
 							onClick={ () => {
-								const maybeThunk = action.callback( [ item ] );
-								if ( typeof maybeThunk === 'function' ) {
-									maybeThunk( { registry } );
-								}
+								action.callback( [ item ], { registry } );
 							} }
 							items={ [ item ] }
 						/>

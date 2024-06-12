@@ -93,12 +93,7 @@ const deletePostAction = {
 	},
 	supportsBulk: true,
 	hideModalHeader: true,
-	RenderModal: ( {
-		items,
-		closeModal,
-		onActionStart,
-		onActionPerformed,
-	} ) => {
+	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ isBusy, setIsBusy ] = useState( false );
 		const { removeTemplates } = unlock( useDispatch( editorStore ) );
 		return (
@@ -133,9 +128,6 @@ const deletePostAction = {
 						variant="primary"
 						onClick={ async () => {
 							setIsBusy( true );
-							if ( onActionStart ) {
-								onActionStart( items );
-							}
 							await removeTemplates( items, {
 								allowUndo: false,
 							} );
@@ -165,12 +157,7 @@ const trashPostAction = {
 	},
 	supportsBulk: true,
 	hideModalHeader: true,
-	RenderModal: ( {
-		items,
-		closeModal,
-		onActionStart,
-		onActionPerformed,
-	} ) => {
+	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ isBusy, setIsBusy ] = useState( false );
 		const { createSuccessNotice, createErrorNotice } =
 			useDispatch( noticesStore );
@@ -209,9 +196,6 @@ const trashPostAction = {
 						variant="primary"
 						onClick={ async () => {
 							setIsBusy( true );
-							if ( onActionStart ) {
-								onActionStart( items );
-							}
 							const promiseResult = await Promise.allSettled(
 								items.map( ( item ) =>
 									deleteEntityRecord(
@@ -330,96 +314,87 @@ const permanentlyDeletePostAction = {
 	isEligible( { status } ) {
 		return status === 'trash';
 	},
-	callback:
-		( posts, onActionPerformed ) =>
-		async ( { registry } ) => {
-			const { createSuccessNotice, createErrorNotice } =
-				registry.dispatch( noticesStore );
-			const { deleteEntityRecord } = registry.dispatch( coreStore );
-			const promiseResult = await Promise.allSettled(
-				posts.map( ( post ) => {
-					return deleteEntityRecord(
-						'postType',
-						post.type,
-						post.id,
-						{ force: true },
-						{ throwOnError: true }
-					);
-				} )
-			);
-			// If all the promises were fulfilled with success.
-			if (
-				promiseResult.every( ( { status } ) => status === 'fulfilled' )
-			) {
-				let successMessage;
-				if ( promiseResult.length === 1 ) {
-					successMessage = sprintf(
-						/* translators: The posts's title. */
-						__( '"%s" permanently deleted.' ),
-						getItemTitle( posts[ 0 ] )
-					);
-				} else {
-					successMessage = __(
-						'The posts were permanently deleted.'
-					);
-				}
-				createSuccessNotice( successMessage, {
-					type: 'snackbar',
-					id: 'permanently-delete-post-action',
-				} );
-				if ( onActionPerformed ) {
-					onActionPerformed( posts );
-				}
+	async callback( posts, { registry } ) {
+		const { createSuccessNotice, createErrorNotice } =
+			registry.dispatch( noticesStore );
+		const { deleteEntityRecord } = registry.dispatch( coreStore );
+		const promiseResult = await Promise.allSettled(
+			posts.map( ( post ) => {
+				return deleteEntityRecord(
+					'postType',
+					post.type,
+					post.id,
+					{ force: true },
+					{ throwOnError: true }
+				);
+			} )
+		);
+		// If all the promises were fulfilled with success.
+		if ( promiseResult.every( ( { status } ) => status === 'fulfilled' ) ) {
+			let successMessage;
+			if ( promiseResult.length === 1 ) {
+				successMessage = sprintf(
+					/* translators: The posts's title. */
+					__( '"%s" permanently deleted.' ),
+					getItemTitle( posts[ 0 ] )
+				);
 			} else {
-				// If there was at lease one failure.
-				let errorMessage;
-				// If we were trying to permanently delete a single post.
-				if ( promiseResult.length === 1 ) {
-					if ( promiseResult[ 0 ].reason?.message ) {
-						errorMessage = promiseResult[ 0 ].reason.message;
-					} else {
-						errorMessage = __(
-							'An error occurred while permanently deleting the post.'
-						);
-					}
-					// If we were trying to permanently delete multiple posts
+				successMessage = __( 'The posts were permanently deleted.' );
+			}
+			createSuccessNotice( successMessage, {
+				type: 'snackbar',
+				id: 'permanently-delete-post-action',
+			} );
+		} else {
+			// If there was at lease one failure.
+			let errorMessage;
+			// If we were trying to permanently delete a single post.
+			if ( promiseResult.length === 1 ) {
+				if ( promiseResult[ 0 ].reason?.message ) {
+					errorMessage = promiseResult[ 0 ].reason.message;
 				} else {
-					const errorMessages = new Set();
-					const failedPromises = promiseResult.filter(
-						( { status } ) => status === 'rejected'
+					errorMessage = __(
+						'An error occurred while permanently deleting the post.'
 					);
-					for ( const failedPromise of failedPromises ) {
-						if ( failedPromise.reason?.message ) {
-							errorMessages.add( failedPromise.reason.message );
-						}
-					}
-					if ( errorMessages.size === 0 ) {
-						errorMessage = __(
-							'An error occurred while permanently deleting the posts.'
-						);
-					} else if ( errorMessages.size === 1 ) {
-						errorMessage = sprintf(
-							/* translators: %s: an error message */
-							__(
-								'An error occurred while permanently deleting the posts: %s'
-							),
-							[ ...errorMessages ][ 0 ]
-						);
-					} else {
-						errorMessage = sprintf(
-							/* translators: %s: a list of comma separated error messages */
-							__(
-								'Some errors occurred while permanently deleting the posts: %s'
-							),
-							[ ...errorMessages ].join( ',' )
-						);
+				}
+				// If we were trying to permanently delete multiple posts
+			} else {
+				const errorMessages = new Set();
+				const failedPromises = promiseResult.filter(
+					( { status } ) => status === 'rejected'
+				);
+				for ( const failedPromise of failedPromises ) {
+					if ( failedPromise.reason?.message ) {
+						errorMessages.add( failedPromise.reason.message );
 					}
 				}
-				createErrorNotice( errorMessage, {
-					type: 'snackbar',
-				} );
+				if ( errorMessages.size === 0 ) {
+					errorMessage = __(
+						'An error occurred while permanently deleting the posts.'
+					);
+				} else if ( errorMessages.size === 1 ) {
+					errorMessage = sprintf(
+						/* translators: %s: an error message */
+						__(
+							'An error occurred while permanently deleting the posts: %s'
+						),
+						[ ...errorMessages ][ 0 ]
+					);
+				} else {
+					errorMessage = sprintf(
+						/* translators: %s: a list of comma separated error messages */
+						__(
+							'Some errors occurred while permanently deleting the posts: %s'
+						),
+						[ ...errorMessages ].join( ',' )
+					);
+				}
 			}
-		},
+			createErrorNotice( errorMessage, {
+				type: 'snackbar',
+			} );
+		}
+	},
 };
 
 const restorePostAction = {
@@ -431,111 +406,102 @@ const restorePostAction = {
 	isEligible( { status } ) {
 		return status === 'trash';
 	},
-	callback:
-		( posts, onActionPerformed ) =>
-		async ( { registry } ) => {
-			const { createSuccessNotice, createErrorNotice } =
-				registry.dispatch( noticesStore );
-			const { editEntityRecord, saveEditedEntityRecord } =
-				registry.dispatch( coreStore );
-			await Promise.allSettled(
-				posts.map( ( post ) => {
-					return editEntityRecord( 'postType', post.type, post.id, {
-						status: 'draft',
-					} );
-				} )
-			);
-			const promiseResult = await Promise.allSettled(
-				posts.map( ( post ) => {
-					return saveEditedEntityRecord(
-						'postType',
-						post.type,
-						post.id,
-						{ throwOnError: true }
-					);
-				} )
-			);
+	async callback( posts, { registry, onActionPerformed } ) {
+		const { createSuccessNotice, createErrorNotice } =
+			registry.dispatch( noticesStore );
+		const { editEntityRecord, saveEditedEntityRecord } =
+			registry.dispatch( coreStore );
+		await Promise.allSettled(
+			posts.map( ( post ) => {
+				return editEntityRecord( 'postType', post.type, post.id, {
+					status: 'draft',
+				} );
+			} )
+		);
+		const promiseResult = await Promise.allSettled(
+			posts.map( ( post ) => {
+				return saveEditedEntityRecord( 'postType', post.type, post.id, {
+					throwOnError: true,
+				} );
+			} )
+		);
 
-			if (
-				promiseResult.every( ( { status } ) => status === 'fulfilled' )
-			) {
-				let successMessage;
-				if ( posts.length === 1 ) {
-					successMessage = sprintf(
-						/* translators: The number of posts. */
-						__( '"%s" has been restored.' ),
-						getItemTitle( posts[ 0 ] )
-					);
-				} else if ( posts[ 0 ].type === 'page' ) {
-					successMessage = sprintf(
-						/* translators: The number of posts. */
-						__( '%d pages have been restored.' ),
-						posts.length
-					);
-				} else {
-					successMessage = sprintf(
-						/* translators: The number of posts. */
-						__( '%d posts have been restored.' ),
-						posts.length
-					);
-				}
-				createSuccessNotice( successMessage, {
-					type: 'snackbar',
-					id: 'restore-post-action',
-				} );
-				if ( onActionPerformed ) {
-					onActionPerformed( posts );
-				}
+		if ( promiseResult.every( ( { status } ) => status === 'fulfilled' ) ) {
+			let successMessage;
+			if ( posts.length === 1 ) {
+				successMessage = sprintf(
+					/* translators: The number of posts. */
+					__( '"%s" has been restored.' ),
+					getItemTitle( posts[ 0 ] )
+				);
+			} else if ( posts[ 0 ].type === 'page' ) {
+				successMessage = sprintf(
+					/* translators: The number of posts. */
+					__( '%d pages have been restored.' ),
+					posts.length
+				);
 			} else {
-				// If there was at lease one failure.
-				let errorMessage;
-				// If we were trying to move a single post to the trash.
-				if ( promiseResult.length === 1 ) {
-					if ( promiseResult[ 0 ].reason?.message ) {
-						errorMessage = promiseResult[ 0 ].reason.message;
-					} else {
-						errorMessage = __(
-							'An error occurred while restoring the post.'
-						);
-					}
-					// If we were trying to move multiple posts to the trash
+				successMessage = sprintf(
+					/* translators: The number of posts. */
+					__( '%d posts have been restored.' ),
+					posts.length
+				);
+			}
+			createSuccessNotice( successMessage, {
+				type: 'snackbar',
+				id: 'restore-post-action',
+			} );
+			if ( onActionPerformed ) {
+				onActionPerformed( posts );
+			}
+		} else {
+			// If there was at lease one failure.
+			let errorMessage;
+			// If we were trying to move a single post to the trash.
+			if ( promiseResult.length === 1 ) {
+				if ( promiseResult[ 0 ].reason?.message ) {
+					errorMessage = promiseResult[ 0 ].reason.message;
 				} else {
-					const errorMessages = new Set();
-					const failedPromises = promiseResult.filter(
-						( { status } ) => status === 'rejected'
+					errorMessage = __(
+						'An error occurred while restoring the post.'
 					);
-					for ( const failedPromise of failedPromises ) {
-						if ( failedPromise.reason?.message ) {
-							errorMessages.add( failedPromise.reason.message );
-						}
-					}
-					if ( errorMessages.size === 0 ) {
-						errorMessage = __(
-							'An error occurred while restoring the posts.'
-						);
-					} else if ( errorMessages.size === 1 ) {
-						errorMessage = sprintf(
-							/* translators: %s: an error message */
-							__(
-								'An error occurred while restoring the posts: %s'
-							),
-							[ ...errorMessages ][ 0 ]
-						);
-					} else {
-						errorMessage = sprintf(
-							/* translators: %s: a list of comma separated error messages */
-							__(
-								'Some errors occurred while restoring the posts: %s'
-							),
-							[ ...errorMessages ].join( ',' )
-						);
+				}
+				// If we were trying to move multiple posts to the trash
+			} else {
+				const errorMessages = new Set();
+				const failedPromises = promiseResult.filter(
+					( { status } ) => status === 'rejected'
+				);
+				for ( const failedPromise of failedPromises ) {
+					if ( failedPromise.reason?.message ) {
+						errorMessages.add( failedPromise.reason.message );
 					}
 				}
-				createErrorNotice( errorMessage, {
-					type: 'snackbar',
-				} );
+				if ( errorMessages.size === 0 ) {
+					errorMessage = __(
+						'An error occurred while restoring the posts.'
+					);
+				} else if ( errorMessages.size === 1 ) {
+					errorMessage = sprintf(
+						/* translators: %s: an error message */
+						__( 'An error occurred while restoring the posts: %s' ),
+						[ ...errorMessages ][ 0 ]
+					);
+				} else {
+					errorMessage = sprintf(
+						/* translators: %s: a list of comma separated error messages */
+						__(
+							'Some errors occurred while restoring the posts: %s'
+						),
+						[ ...errorMessages ].join( ',' )
+					);
+				}
 			}
-		},
+			createErrorNotice( errorMessage, {
+				type: 'snackbar',
+			} );
+		}
+	},
 };
 
 const viewPostAction = {
@@ -546,7 +512,7 @@ const viewPostAction = {
 	isEligible( post ) {
 		return post.status !== 'trash';
 	},
-	callback( posts, onActionPerformed ) {
+	callback( posts, { onActionPerformed } ) {
 		const post = posts[ 0 ];
 		window.open( post.link, '_blank' );
 		if ( onActionPerformed ) {
@@ -577,7 +543,7 @@ const postRevisionsAction = {
 			post?._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0;
 		return lastRevisionId && revisionsCount > 1;
 	},
-	callback( posts, onActionPerformed ) {
+	callback( posts, { onActionPerformed } ) {
 		const post = posts[ 0 ];
 		const href = addQueryArgs( 'revision.php', {
 			revision: post?._links?.[ 'predecessor-version' ]?.[ 0 ]?.id,
@@ -874,12 +840,7 @@ const resetTemplateAction = {
 	icon: backup,
 	supportsBulk: true,
 	hideModalHeader: true,
-	RenderModal: ( {
-		items,
-		closeModal,
-		onActionStart,
-		onActionPerformed,
-	} ) => {
+	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ isBusy, setIsBusy ] = useState( false );
 		const { revertTemplate, removeTemplates } = unlock(
 			useDispatch( editorStore )
@@ -969,9 +930,6 @@ const resetTemplateAction = {
 						variant="primary"
 						onClick={ async () => {
 							setIsBusy( true );
-							if ( onActionStart ) {
-								onActionStart( items );
-							}
 							await onConfirm( items );
 							onActionPerformed?.( items );
 							setIsBusy( false );
@@ -1113,7 +1071,7 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 					const existingCallback = actions[ i ].callback;
 					actions[ i ] = {
 						...actions[ i ],
-						callback: ( items, _onActionPerformed ) => {
+						callback: ( items, { _onActionPerformed } ) => {
 							existingCallback( items, ( _items ) => {
 								if ( _onActionPerformed ) {
 									_onActionPerformed( _items );
