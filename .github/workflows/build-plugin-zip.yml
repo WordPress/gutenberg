@@ -279,6 +279,12 @@ jobs:
               with:
                   name: release-notes
 
+            - name: Spell check release notes
+              uses: crate-ci/typos@v1.21.0
+              with:
+                  files: release-notes.txt
+                  write_changes: true
+
             - name: Create Release Draft
               id: create_release
               uses: actions/create-release@0cb9c9b65d5d1901c1f53e5e66eaf4afd303e70e # v1.1.4

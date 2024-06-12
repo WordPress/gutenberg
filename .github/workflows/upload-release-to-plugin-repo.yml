@@ -134,6 +134,12 @@ jobs:
                   git config user.name "Gutenberg Repository Automation"
                   git config user.email gutenberg@wordpress.org
 
+            - name: Spell check change log
+              uses: crate-ci/typos@v1.21.0
+              with:
+                  files: changelog.txt
+                  write_changes: true
+
             - name: Commit the Changelog update
               run: |
                   git add changelog.txt
