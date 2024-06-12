@@ -183,7 +183,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					mode: postTypeObject?.default_rendering_mode ?? 'post-only',
 				};
 			},
-			[ post ]
+			[ post.type ]
 		);
 		const shouldRenderTemplate = !! template && mode !== 'post-only';
 		const rootLevelPost = shouldRenderTemplate ? template : post;
