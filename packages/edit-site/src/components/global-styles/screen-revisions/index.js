@@ -86,19 +86,6 @@ function ScreenRevisions() {
 		onCloseRevisions();
 	};
 
-	const selectRevision = ( revision ) => {
-		setCurrentlySelectedRevision( {
-			/*
-			 * The default must be an empty object so that
-			 * `mergeBaseAndUserConfigs()` can merge them correctly.
-			 */
-			styles: revision?.styles || {},
-			settings: revision?.settings || {},
-			_links: revision?._links || {},
-			id: revision?.id,
-		} );
-	};
-
 	useEffect( () => {
 		if (
 			! editorCanvasContainerView ||
@@ -178,7 +165,7 @@ function ScreenRevisions() {
 					/>
 				) ) }
 			<RevisionsButtons
-				onChange={ selectRevision }
+				onChange={ setCurrentlySelectedRevision }
 				selectedRevisionId={ currentlySelectedRevisionId }
 				userRevisions={ currentRevisions }
 				canApplyRevision={ isLoadButtonEnabled }
