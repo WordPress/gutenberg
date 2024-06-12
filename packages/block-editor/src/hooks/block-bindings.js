@@ -59,9 +59,7 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 				className="components-panel__block-bindings-panel"
 			>
 				<BaseControl
-					help={ __(
-						'Connected attributes connected to different sources.'
-					) }
+					help={ __( 'Attributes connected to various sources.' ) }
 				>
 					<ItemGroup isBordered isSeparated size="large">
 						{ Object.keys( filteredBindings ).map( ( key ) => {
