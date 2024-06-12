@@ -127,7 +127,7 @@ export default function PatternOverridesBlockControls() {
 			const _hasPatternOverrides = selectedClientIds.every(
 				( clientId ) =>
 					Object.values(
-						getBlockAttributes( clientId ).metadata?.bindings ?? {}
+						getBlockAttributes( clientId )?.metadata?.bindings ?? {}
 					).some(
 						( binding ) =>
 							binding?.source === PATTERN_OVERRIDES_BINDING_SOURCE
