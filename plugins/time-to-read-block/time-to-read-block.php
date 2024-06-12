@@ -22,7 +22,7 @@
  * @param  WP_Block $block      Block instance.
  * @return string Returns the rendered post author name block.
  */
-function gutenberg_render_time_to_read_block( $attributes, $content, $block ) {
+function gutenberg_render_block_time_to_read( $attributes, $content, $block ) {
 	if ( ! isset( $block->context['postId'] ) ) {
 		return '';
 	}
@@ -170,7 +170,7 @@ function gutenberg_register_time_to_read_block() {
 	register_block_type(
 		__DIR__ . '/build',
 		array(
-			'render_callback' => 'gutenberg_render_time_to_read_block',
+			'render_callback' => 'gutenberg_render_block_time_to_read',
 		)
 	);
 }

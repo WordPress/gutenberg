@@ -64,10 +64,17 @@ define( 'GUTENBERG_LOAD_VENDOR_SCRIPTS', false );
 /**
  * Manually load the plugin being tested.
  */
-function _manually_load_plugin() {
+function _manually_load_plugins() {
 	require dirname( __DIR__ ) . '/lib/load.php';
+
+	$plugin_dirs = glob( dirname( __DIR__ ) . '/plugins/*', GLOB_ONLYDIR );
+	foreach ( $plugin_dirs as $dir ) {
+		$plugin_name = basename( $dir );
+		require "$dir/$plugin_name.php";
+		var_dump( "$dir/$plugin_name.php" );
+	}
 }
-tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
+tests_add_filter( 'muplugins_loaded', '_manually_load_plugins' );
 
 /**
  * Adds a wp_die handler for use during tests.

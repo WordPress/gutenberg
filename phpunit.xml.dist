@@ -15,6 +15,7 @@
 			<directory suffix="-test.php">./phpunit/</directory>
 			<directory suffix=".php">./phpunit/tests/</directory>
 			<directory suffix=".php">./phpunit/blocks/</directory>
+			<directory suffix=".php">./phpunit/plugins/</directory>
 		</testsuite>
 	</testsuites>
 	<groups>
