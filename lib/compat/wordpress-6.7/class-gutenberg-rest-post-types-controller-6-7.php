@@ -48,7 +48,7 @@ class Gutenberg_REST_Post_Types_Controller_6_7 extends WP_REST_Post_Types_Contro
 			$rendering_mode = apply_filters( 'post_type_default_rendering_mode', $rendering_mode, $item );
 
 			// Validate the filtered rendering mode.
-			if ( ! in_array( $rendering_mode, gutenberg_rendering_modes(), true ) ) {
+			if ( ! in_array( $rendering_mode, gutenberg_post_type_rendering_modes(), true ) ) {
 				$rendering_mode = 'post-only';
 			}
 
