@@ -20,15 +20,7 @@ import { unlock } from '../../lock-unlock';
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 import Subtitle from './subtitle';
 import { NavigationButtonAsItem } from './navigation-button';
-
-function getAvailableIndex( sizes ) {
-	// Filter the slug field that ends with custom-{number}.
-	const indexes = sizes.map( ( size ) => {
-		const match = size.slug.match( /custom-(\d+)$/ );
-		return match ? parseInt( match[ 1 ], 10 ) : 0;
-	} );
-	return Math.max( ...indexes ) + 1;
-}
+import { getNewIndexFromPresets } from './utils';
 
 function FontSizes() {
 	const [ fontSizes, setFontSizes ] = useGlobalSetting(
@@ -39,7 +31,7 @@ function FontSizes() {
 	const sizes = fontSizes.theme ?? fontSizes.default;
 
 	const handleAddFontSize = () => {
-		const index = getAvailableIndex( sizes );
+		const index = getNewIndexFromPresets( sizes, 'custom-' );
 		const newFontSize = {
 			/* translators: %d: font size index */
 			name: sprintf( __( 'New Font Size %d' ), index ),
