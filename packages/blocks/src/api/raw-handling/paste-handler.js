@@ -100,7 +100,13 @@ export function pasteHandler( {
 		const content = HTML ? HTML : plainText;
 
 		if ( content.indexOf( '<!-- wp:' ) !== -1 ) {
-			return parse( content );
+			const parseResult = parse( content );
+			const isSingleFreeFormBlock =
+				parseResult.length === 1 &&
+				parseResult[ 0 ].name === 'core/freeform';
+			if ( ! isSingleFreeFormBlock ) {
+				return parseResult;
+			}
 		}
 	}
 
