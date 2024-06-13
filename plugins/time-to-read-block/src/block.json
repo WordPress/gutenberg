@@ -7,11 +7,7 @@
 	"description": "Show minutes required to finish reading a post.",
 	"textdomain": "time-to-read-block",
 	"usesContext": [ "postId", "postType" ],
-	"attributes": {
-		"textAlign": {
-			"type": "string"
-		}
-	},
+	"attributes": {},
 	"supports": {
 		"color": {
 			"gradients": true,
@@ -32,6 +28,7 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,

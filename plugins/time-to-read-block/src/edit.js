@@ -1,18 +1,9 @@
 /**
- * External dependencies
- */
-import classnames from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import { _x, _n, sprintf } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
-import {
-	AlignmentControl,
-	BlockControls,
-	useBlockProps,
-} from '@wordpress/block-editor';
+import { useBlockProps } from '@wordpress/block-editor';
 import { __unstableSerializeAndClean } from '@wordpress/blocks';
 import { useEntityProp, useEntityBlockEditor } from '@wordpress/core-data';
 import { count as wordCount } from '@wordpress/wordcount';
@@ -24,8 +15,7 @@ import { count as wordCount } from '@wordpress/wordcount';
  */
 const AVERAGE_READING_RATE = 189;
 
-function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
-	const { textAlign } = attributes;
+function TimeToReadEdit( { context } ) {
 	const { postId, postType } = context;
 
 	const [ contentStructure ] = useEntityProp(
@@ -83,25 +73,9 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 		);
 	}, [ contentStructure, blocks ] );
 
-	const blockProps = useBlockProps( {
-		className: classnames( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-		} ),
-	} );
+	const blockProps = useBlockProps();
 
-	return (
-		<>
-			<BlockControls group="block">
-				<AlignmentControl
-					value={ textAlign }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
-					} }
-				/>
-			</BlockControls>
-			<div { ...blockProps }>{ minutesToReadString }</div>
-		</>
-	);
+	return <div { ...blockProps }>{ minutesToReadString }</div>;
 }
 
-export default PostTimeToReadEdit;
+export default TimeToReadEdit;
