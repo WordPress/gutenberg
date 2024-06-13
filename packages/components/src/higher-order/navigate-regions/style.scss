@@ -2,7 +2,7 @@
 [role="region"] {
 	position: relative;
 
-	&:focus::after {
+	&:focus-visible::after {
 		position: absolute;
 		top: 0;
 		left: 0;
