@@ -10,7 +10,6 @@ import {
 	ExternalLink,
 	Button,
 	__experimentalInputControl as InputControl,
-	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { store as noticesStore } from '@wordpress/notices';
@@ -83,7 +82,9 @@ export default function PostURL( { onClose } ) {
 			<VStack spacing={ 3 }>
 				{ isEditable && (
 					<div>
-						{ __( 'Customize the last part of the URL. ' ) }
+						{ __(
+							'Customize the post name in the URL (in bold below). '
+						) }
 						<ExternalLink
 							href={ __(
 								'https://wordpress.org/documentation/article/page-post-settings-sidebar/#permalink'
@@ -97,16 +98,11 @@ export default function PostURL( { onClose } ) {
 					{ isEditable && (
 						<InputControl
 							__next40pxDefaultSize
-							prefix={
-								<InputControlPrefixWrapper>
-									/
-								</InputControlPrefixWrapper>
-							}
 							suffix={
 								<Button
 									icon={ copySmall }
 									ref={ copyButtonRef }
-									label={ __( 'Copy' ) }
+									label={ __( 'Copy Link' ) }
 								/>
 							}
 							label={ __( 'Link' ) }

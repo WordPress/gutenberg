@@ -5,7 +5,7 @@ import { useMemo, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { Dropdown, Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { safeDecodeURIComponent } from '@wordpress/url';
+import { safeDecodeURI } from '@wordpress/url';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -59,18 +59,21 @@ export default function PostURLPanel() {
 }
 
 function PostURLToggle( { isOpen, onClick } ) {
-	const { slug, isFrontPage, postLink } = useSelect( ( select ) => {
-		const { getCurrentPostId, getCurrentPost } = select( editorStore );
+	const { isFrontPage, postLink, permalink } = useSelect( ( select ) => {
+		const { getCurrentPostId, getCurrentPost, getPermalink } =
+			select( editorStore );
 		const { getEditedEntityRecord } = select( coreStore );
 		const siteSettings = getEditedEntityRecord( 'root', 'site' );
 		const _id = getCurrentPostId();
+
 		return {
-			slug: select( editorStore ).getEditedPostSlug(),
 			isFrontPage: siteSettings?.page_on_front === _id,
 			postLink: getCurrentPost()?.link,
+			permalink: getPermalink(),
 		};
 	}, [] );
-	const decodedSlug = safeDecodeURIComponent( slug );
+
+	const decodedLink = safeDecodeURI( permalink );
 	return (
 		<Button
 			size="compact"
@@ -78,10 +81,10 @@ function PostURLToggle( { isOpen, onClick } ) {
 			variant="tertiary"
 			aria-expanded={ isOpen }
 			// translators: %s: Current post link.
-			aria-label={ sprintf( __( 'Change link: %s' ), decodedSlug ) }
+			aria-label={ sprintf( __( 'Change link: %s' ), decodedLink ) }
 			onClick={ onClick }
 		>
-			{ isFrontPage ? postLink : <>/{ decodedSlug }</> }
+			{ isFrontPage ? postLink : <>{ decodedLink }</> }
 		</Button>
 	);
 }
