@@ -2,6 +2,11 @@
 	width: 100%;
 }
 
+.editor-post-url__panel-toggle {
+	display: block;
+	overflow-wrap: break-word;
+}
+
 .editor-post-url__panel-dialog .editor-post-url {
 	// sidebar width - popover padding - form margin
 	min-width: $sidebar-width - $grid-unit-20 - $grid-unit-20;
