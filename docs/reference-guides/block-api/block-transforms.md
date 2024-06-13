@@ -221,7 +221,7 @@ transforms: {
 }
 ```
 
-<h4 id="schemas-and-content-models">Schemas and Content Models</h4>
+#### Schemas and Content Models
 
 When pasting content it's possible to define a [content model](https://html.spec.whatwg.org/multipage/dom.html#content-models) that will be used to validate and process pasted content. It's often the case that HTML pasted into the editor will contain a mixture of elements that _should_ transfer as well as elements that _shouldn't_. For example, consider pasting `<span class="time">12:04 pm</span>` into the editor. We want to copy `12:04 pm` and omit the `<span>` and its `class` attribute because those won't carry the same meaning or structure as they originally did from where they were copied.
 
