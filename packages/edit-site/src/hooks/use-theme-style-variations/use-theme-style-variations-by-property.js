@@ -69,14 +69,14 @@ export function useCurrentMergeThemeStyleVariationsWithUserConfig( {
 		};
 	}, [] );
 	const { user: baseVariation } = useContext( GlobalStylesContext );
-	const clondedBaseVariation = cloneDeep( baseVariation );
+	const clonedBaseVariation = cloneDeep( baseVariation );
 
 	const variationsWithSinglePropertyAndBase = variationsFromTheme
 		.filter( ( variation ) => {
 			return isVariationWithSingleProperty( variation, property );
 		} )
 		.map( ( variation ) => {
-			return mergeBaseAndUserConfigs( clondedBaseVariation, variation );
+			return mergeBaseAndUserConfigs( clonedBaseVariation, variation );
 		} );
 
 	return useMemo( () => {
