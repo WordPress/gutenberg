@@ -742,6 +742,59 @@ test.describe( 'Pattern Overrides', () => {
 		).toBeHidden();
 	} );
 
+	test( 'overridden images should not have unsupported attributes set', async ( {
+		admin,
+		requestUtils,
+		editor,
+	} ) => {
+		const imageName = 'Editable image';
+		const TEST_IMAGE_FILE_PATH = path.resolve(
+			__dirname,
+			'../../../assets/10x10_e2e_test_image_z9T8jK.png'
+		);
+		const { id } = await requestUtils.createBlock( {
+			title: 'Pattern',
+			content: `<!-- wp:image {"metadata":{"name":"${ imageName }","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
+<figure class="wp-block-image"><img alt=""/></figure>
+<!-- /wp:image -->`,
+			status: 'publish',
+		} );
+
+		await admin.createNewPost();
+
+		await editor.insertBlock( {
+			name: 'core/block',
+			attributes: { ref: id },
+		} );
+
+		const imageBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Image',
+		} );
+		await editor.selectBlocks( imageBlock );
+		await imageBlock
+			.getByTestId( 'form-file-upload-input' )
+			.setInputFiles( TEST_IMAGE_FILE_PATH );
+		await expect( imageBlock.getByRole( 'img' ) ).toHaveCount( 1 );
+		await expect( imageBlock.getByRole( 'img' ) ).toHaveAttribute(
+			'src',
+			/\/wp-content\/uploads\//
+		);
+
+		// Because the image is an inner block of a controlled pattern block,
+		// `getBlocks` has to be called using the pattern block's client id.
+		const patternBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Pattern',
+		} );
+		const patternClientId = await patternBlock.getAttribute( 'data-block' );
+		const patternInnerBlocks = await editor.getBlocks( {
+			clientId: patternClientId,
+		} );
+
+		// Link is an unsupported attribute, so should be undefined, even though
+		// the image block tries to set its attribute.
+		expect( patternInnerBlocks[ 0 ].attributes.link ).toBe( undefined );
+	} );
+
 	test( 'blocks with the same name should be synced', async ( {
 		page,
 		admin,
