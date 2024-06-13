@@ -372,10 +372,10 @@ describe( 'Cover block', () => {
 					} )
 				);
 				await userEvent.clear(
-					screen.getByLabelText( 'Minimum height' )
+					screen.getByLabelText( 'Minimum height of cover' )
 				);
 				await userEvent.type(
-					screen.getByLabelText( 'Minimum height' ),
+					screen.getByLabelText( 'Minimum height of cover' ),
 					'300'
 				);
 

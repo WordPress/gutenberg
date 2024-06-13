@@ -59,7 +59,7 @@ function CoverHeightInput( {
 
 	return (
 		<HeightControl
-			label={ __( 'Minimum height' ) }
+			label={ __( 'Minimum height of cover' ) }
 			value={ computedValue }
 			onChange={ handleOnChange }
 		/>
