@@ -110,14 +110,15 @@ function Header( {
 						onToggle={ setIsBlockToolsCollapsed }
 					/>
 				) }
-				<div
+				<motion.div
+					layout
 					className={ clsx( 'editor-header__center', {
 						'is-collapsed':
 							! isBlockToolsCollapsed && hasTopToolbar,
 					} ) }
 				>
 					{ ! title ? <DocumentBar /> : title }
-				</div>
+				</motion.div>
 			</motion.div>
 			<motion.div
 				variants={ toolbarVariations }
