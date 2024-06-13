@@ -133,6 +133,7 @@ export default function PostVisibility( { onClose } ) {
 				onConfirm={ confirmPrivate }
 				onCancel={ handleDialogCancel }
 				confirmButtonText={ __( 'Publish' ) }
+				size="medium"
 			>
 				{ __( 'Would you like to privately publish this post now?' ) }
 			</ConfirmDialog>
