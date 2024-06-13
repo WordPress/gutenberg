@@ -2288,6 +2288,10 @@
 				},
 				{
 					"properties": {
+						"title": {
+							"type": "string",
+							"description": "Title of the global styles variation."
+						},
 						"blockTypes": {
 							"type": "array",
 							"items": {
