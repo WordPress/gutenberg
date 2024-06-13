@@ -15,6 +15,9 @@ import CollabBoard from './collab-board';
 const name = 'core/collab-comment';
 const title = __( 'Add Comment' );
 
+const isBlockCommentExperimentEnabled =
+	window?.__experimentalEnableBlockComment;
+
 function Edit( { isActive, value, onChange, onFocus, contentRef } ) {
 	function onClick() {
 		onChange(
@@ -55,14 +58,16 @@ function Edit( { isActive, value, onChange, onFocus, contentRef } ) {
 	}, [ contentRef ] );
 	return (
 		<>
-			<RichTextToolbarButton
-				icon={ commentIcon }
-				title={ title }
-				onClick={ onClick }
-				isActive={ isActive }
-			/>
+			{ isBlockCommentExperimentEnabled && (
+				<RichTextToolbarButton
+					icon={ commentIcon }
+					title={ title }
+					onClick={ onClick }
+					isActive={ isActive }
+				/>
+			) }
 
-			{ isDiscussionBoardVisible && (
+			{ isBlockCommentExperimentEnabled && isDiscussionBoardVisible && (
 				<CollabBoard
 					contentRef={ contentRef }
 					onClose={ toggleDiscussionBoardVisibility }
