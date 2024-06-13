@@ -110,22 +110,21 @@ export default async function fetchLinkSuggestions(
 	searchOptions: SearchOptions = {},
 	editorSettings: EditorSettings = {}
 ): Promise< SearchResult[] > {
-	if (
+	const searchOptionsToUse =
 		searchOptions.isInitialSuggestions &&
 		searchOptions.initialSuggestionsSearchOptions
-	) {
-		searchOptions = {
-			...searchOptions,
-			...searchOptions.initialSuggestionsSearchOptions,
-		};
-	}
+			? {
+					...searchOptions,
+					...searchOptions.initialSuggestionsSearchOptions,
+			  }
+			: searchOptions;
 
 	const {
 		type,
 		subtype,
 		page,
 		perPage = searchOptions.isInitialSuggestions ? 3 : 20,
-	} = searchOptions;
+	} = searchOptionsToUse;
 
 	const { disablePostFormats = false } = editorSettings;
 
