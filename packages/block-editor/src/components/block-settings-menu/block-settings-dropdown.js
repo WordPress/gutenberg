@@ -64,7 +64,6 @@ export function BlockSettingsDropdown( {
 		selectedBlockClientIds,
 		openedBlockSettingsMenu,
 		isContentOnly,
-		hasPatternParent,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -76,7 +75,6 @@ export function BlockSettingsDropdown( {
 				getBlockAttributes,
 				getOpenedBlockSettingsMenu,
 				getBlockEditingMode,
-				getBlockParentsByBlockName,
 			} = unlock( select( blockEditorStore ) );
 
 			const { getActiveBlockVariation } = select( blocksStore );
@@ -102,11 +100,6 @@ export function BlockSettingsDropdown( {
 				openedBlockSettingsMenu: getOpenedBlockSettingsMenu(),
 				isContentOnly:
 					getBlockEditingMode( firstBlockClientId ) === 'contentOnly',
-				hasPatternParent: !! getBlockParentsByBlockName(
-					firstBlockClientId,
-					'core/block',
-					true
-				),
 			};
 		},
 		[ firstBlockClientId ]
@@ -263,34 +256,28 @@ export function BlockSettingsDropdown( {
 										{ __( 'Duplicate' ) }
 									</MenuItem>
 								) }
-								{ canInsertBlock &&
-									// Don't show "insert before/after" for pattern overrides blocks.
-									! ( isContentOnly && hasPatternParent ) && (
-										<>
-											<MenuItem
-												onClick={ pipe(
-													onClose,
-													onInsertBefore
-												) }
-												shortcut={
-													shortcuts.insertBefore
-												}
-											>
-												{ __( 'Add before' ) }
-											</MenuItem>
-											<MenuItem
-												onClick={ pipe(
-													onClose,
-													onInsertAfter
-												) }
-												shortcut={
-													shortcuts.insertAfter
-												}
-											>
-												{ __( 'Add after' ) }
-											</MenuItem>
-										</>
-									) }
+								{ canInsertBlock && ! isContentOnly && (
+									<>
+										<MenuItem
+											onClick={ pipe(
+												onClose,
+												onInsertBefore
+											) }
+											shortcut={ shortcuts.insertBefore }
+										>
+											{ __( 'Add before' ) }
+										</MenuItem>
+										<MenuItem
+											onClick={ pipe(
+												onClose,
+												onInsertAfter
+											) }
+											shortcut={ shortcuts.insertAfter }
+										>
+											{ __( 'Add after' ) }
+										</MenuItem>
+									</>
+								) }
 							</MenuGroup>
 							{ canCopyStyles && ! isContentOnly && (
 								<MenuGroup>
