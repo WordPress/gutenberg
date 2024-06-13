@@ -1355,6 +1355,12 @@ class WP_Theme_JSON_Gutenberg {
 			$stylesheet .= $this->get_preset_classes( $setting_nodes, $origins );
 		}
 
+		// Load the custom CSS last so it has the highest specificity.
+		if ( in_array( 'custom-css', $types, true ) ) {
+			// Add the global styles root CSS.
+			$stylesheet .= _wp_array_get( $this->theme_json, array( 'styles', 'css' ) );
+		}
+
 		return $stylesheet;
 	}
 
@@ -1399,10 +1405,12 @@ class WP_Theme_JSON_Gutenberg {
 	 * Returns the global styles custom css.
 	 *
 	 * @since 6.2.0
+	 * @deprecated 6.7.0 Use {@see 'get_stylesheet'} instead.
 	 *
 	 * @return string The global styles custom CSS.
 	 */
 	public function get_custom_css() {
+		_deprecated_function( __METHOD__, '6.7.0', 'get_stylesheet' );
 		$block_custom_css = '';
 		$block_nodes      = $this->get_block_custom_css_nodes();
 		foreach ( $block_nodes as $node ) {
@@ -1415,23 +1423,23 @@ class WP_Theme_JSON_Gutenberg {
 
 	/**
 	 * Returns the global styles base custom CSS.
-	 *
-	 * @since 6.6.0
+	 * This function is deprecated; please do not sync to core.
 	 *
 	 * @return string The global styles base custom CSS.
 	 */
 	public function get_base_custom_css() {
+		_deprecated_function( __METHOD__, 'Gutenberg 18.6.0', 'get_stylesheet' );
 		return isset( $this->theme_json['styles']['css'] ) ? $this->theme_json['styles']['css'] : '';
 	}
 
 	/**
 	 * Returns the block nodes with custom CSS.
-	 *
-	 * @since 6.6.0
+	 * This function is deprecated; please do not sync to core.
 	 *
 	 * @return array The block nodes.
 	 */
 	public function get_block_custom_css_nodes() {
+		_deprecated_function( __METHOD__, 'Gutenberg 18.6.0', 'get_block_nodes' );
 		$block_nodes = array();
 
 		// Add the global styles block CSS.
@@ -1455,8 +1463,7 @@ class WP_Theme_JSON_Gutenberg {
 
 	/**
 	 * Returns the global styles custom CSS for a single block.
-	 *
-	 * @since 6.6.0
+	 * This function is deprecated; please do not sync to core.
 	 *
 	 * @param array  $css The block css node.
 	 * @param string $selector The block selector.
@@ -1464,6 +1471,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return string The global styles custom CSS for the block.
 	 */
 	public function get_block_custom_css( $css, $selector ) {
+		_deprecated_function( __METHOD__, 'Gutenberg 18.6.0', 'get_styles_for_block' );
 		return $this->process_blocks_custom_css( $css, $selector );
 	}
 
@@ -2646,6 +2654,7 @@ class WP_Theme_JSON_Gutenberg {
 				'selectors'  => $feature_selectors,
 				'duotone'    => $duotone_selector,
 				'variations' => $variation_selectors,
+				'css'        => $selector,
 			);
 
 			if ( isset( $theme_json['styles']['blocks'][ $name ]['elements'] ) ) {
@@ -2853,6 +2862,11 @@ class WP_Theme_JSON_Gutenberg {
 		// 6. Generate and append the style variation rulesets.
 		foreach ( $style_variation_declarations as $style_variation_selector => $individual_style_variation_declarations ) {
 			$block_rules .= static::to_ruleset( ":root :where($style_variation_selector)", $individual_style_variation_declarations );
+		}
+
+		// 7. Generate and append any custom CSS rules.
+		if ( isset( $node['css'] ) && ! $is_root_selector ) {
+			$block_rules .= $this->process_blocks_custom_css( $node['css'], $selector );
 		}
 
 		return $block_rules;
