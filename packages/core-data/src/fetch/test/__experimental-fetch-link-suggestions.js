@@ -15,6 +15,7 @@ jest.mock( '@wordpress/api-fetch', () =>
 						url: 'http://wordpress.local/contact-page/',
 						type: 'post',
 						subtype: 'page',
+						label: 'Page',
 					},
 				] );
 			case '/wp/v2/search?search=&per_page=20&type=term':
@@ -25,12 +26,14 @@ jest.mock( '@wordpress/api-fetch', () =>
 						title: 'Cats',
 						url: 'http://wordpress.local/category/cats/',
 						type: 'category',
+						label: 'Category',
 					},
 					{
 						id: 1,
 						title: 'Uncategorized',
 						url: 'http://wordpress.local/category/uncategorized/',
 						type: 'category',
+						label: 'Category',
 					},
 				] );
 			case '/wp/v2/search?search=&per_page=20&type=post-format':
@@ -41,6 +44,7 @@ jest.mock( '@wordpress/api-fetch', () =>
 						url: 'http://wordpress.local/type/gallery/',
 						type: 'post-format',
 						kind: 'taxonomy',
+						label: 'Gallery',
 					},
 					{
 						id: 'quote',
@@ -48,6 +52,7 @@ jest.mock( '@wordpress/api-fetch', () =>
 						url: 'http://wordpress.local/type/quote/',
 						type: 'post-format',
 						kind: 'taxonomy',
+						label: 'Quote',
 					},
 				] );
 			case '/wp/v2/search?search=&per_page=3&type=post&subtype=page':
@@ -58,6 +63,7 @@ jest.mock( '@wordpress/api-fetch', () =>
 						url: 'http://wordpress.local/limit-case/',
 						type: 'post',
 						subtype: 'page',
+						label: 'Page',
 					},
 				] );
 			case '/wp/v2/search?search=&page=11&per_page=20&type=post&subtype=page':
@@ -68,9 +74,10 @@ jest.mock( '@wordpress/api-fetch', () =>
 						url: 'http://wordpress.local/page-case/',
 						type: 'post',
 						subtype: 'page',
+						label: 'Page',
 					},
 				] );
-			case '/wp/v2/media?search=&per_page=20':
+			case '/wp/v2/search?search=&per_page=20&type=media':
 				return Promise.resolve( [
 					{
 						id: 54,
@@ -80,6 +87,7 @@ jest.mock( '@wordpress/api-fetch', () =>
 						type: 'attachment',
 						source_url:
 							'http://localhost:8888/wp-content/uploads/2022/03/test-pdf.pdf',
+						label: 'Attachment',
 					},
 				] );
 			default:
@@ -108,6 +116,7 @@ describe( 'fetchLinkSuggestions', () => {
 					type: 'page',
 					url: 'http://wordpress.local/contact-page/',
 					kind: 'post-type',
+					label: 'Page',
 				},
 			] )
 		);
@@ -124,6 +133,7 @@ describe( 'fetchLinkSuggestions', () => {
 					url: 'http://wordpress.local/category/cats/',
 					type: 'category',
 					kind: 'taxonomy',
+					label: 'Category',
 				},
 				{
 					id: 1,
@@ -131,6 +141,7 @@ describe( 'fetchLinkSuggestions', () => {
 					url: 'http://wordpress.local/category/uncategorized/',
 					type: 'category',
 					kind: 'taxonomy',
+					label: 'Category',
 				},
 			] )
 		);
@@ -146,6 +157,7 @@ describe( 'fetchLinkSuggestions', () => {
 					url: 'http://wordpress.local/type/gallery/',
 					type: 'post-format',
 					kind: 'taxonomy',
+					label: 'Gallery',
 				},
 				{
 					id: 'quote',
@@ -153,6 +165,7 @@ describe( 'fetchLinkSuggestions', () => {
 					url: 'http://wordpress.local/type/quote/',
 					type: 'post-format',
 					kind: 'taxonomy',
+					label: 'Quote',
 				},
 			] )
 		);
@@ -178,6 +191,7 @@ describe( 'fetchLinkSuggestions', () => {
 					url: 'http://localhost:8888/wp-content/uploads/2022/03/test-pdf.pdf',
 					type: 'attachment',
 					kind: 'media',
+					label: 'Attachment',
 				},
 			] )
 		);
@@ -192,6 +206,7 @@ describe( 'fetchLinkSuggestions', () => {
 					url: 'http://wordpress.local/contact-page/',
 					type: 'page',
 					kind: 'post-type',
+					label: 'Page',
 				},
 				{
 					id: 9,
@@ -199,6 +214,7 @@ describe( 'fetchLinkSuggestions', () => {
 					url: 'http://wordpress.local/category/cats/',
 					type: 'category',
 					kind: 'taxonomy',
+					label: 'Category',
 				},
 				{
 					id: 1,
@@ -206,6 +222,7 @@ describe( 'fetchLinkSuggestions', () => {
 					url: 'http://wordpress.local/category/uncategorized/',
 					type: 'category',
 					kind: 'taxonomy',
+					label: 'Category',
 				},
 				{
 					id: 'gallery',
@@ -213,6 +230,7 @@ describe( 'fetchLinkSuggestions', () => {
 					url: 'http://wordpress.local/type/gallery/',
 					type: 'post-format',
 					kind: 'taxonomy',
+					label: 'Gallery',
 				},
 				{
 					id: 'quote',
@@ -220,6 +238,7 @@ describe( 'fetchLinkSuggestions', () => {
 					url: 'http://wordpress.local/type/quote/',
 					type: 'post-format',
 					kind: 'taxonomy',
+					label: 'Quote',
 				},
 				{
 					id: 54,
@@ -227,6 +246,7 @@ describe( 'fetchLinkSuggestions', () => {
 					url: 'http://localhost:8888/wp-content/uploads/2022/03/test-pdf.pdf',
 					type: 'attachment',
 					kind: 'media',
+					label: 'Attachment',
 				},
 			] )
 		);
@@ -245,6 +265,7 @@ describe( 'fetchLinkSuggestions', () => {
 						url: 'http://wordpress.local/limit-case/',
 						type: 'page',
 						kind: 'post-type',
+						label: 'Page',
 					},
 				] )
 			);
@@ -270,6 +291,7 @@ describe( 'fetchLinkSuggestions', () => {
 						url: 'http://wordpress.local/page-case/',
 						type: 'page',
 						kind: 'post-type',
+						label: 'Page',
 					},
 				] )
 			);
@@ -294,6 +316,7 @@ describe( 'fetchLinkSuggestions', () => {
 						url: 'http://wordpress.local/page-case/',
 						type: 'page',
 						kind: 'post-type',
+						label: 'Page',
 					},
 				] )
 			);
@@ -312,6 +335,7 @@ describe( 'fetchLinkSuggestions', () => {
 					url: 'http://wordpress.local/page-case/',
 					type: 'page',
 					kind: 'post-type',
+					label: 'Page',
 				},
 			] )
 		);

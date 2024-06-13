@@ -13,6 +13,7 @@ import {
 	file,
 	home,
 	verse,
+	media,
 } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { safeDecodeURI, filterURLForDisplay, getPath } from '@wordpress/url';
@@ -24,6 +25,7 @@ const ICONS_MAP = {
 	post_tag: tag,
 	category,
 	attachment: file,
+	media,
 };
 
 function SearchItemIcon( { isURL, suggestion } ) {
@@ -155,7 +157,15 @@ function getVisualTypeName( suggestion ) {
 		return 'blog home';
 	}
 
-	// Rename 'post_tag' to 'tag'. Ideally, the API would return the localised CPT or taxonomy label.
+	if ( suggestion.label && '' !== suggestion.label ) {
+		return suggestion.label;
+	}
+
+	/**
+	 * Rename 'post_tag' to 'tag'.
+	 *
+	 * Original behavior kept for back-compat.
+	 */
 	return suggestion.type === 'post_tag' ? 'tag' : suggestion.type;
 }
 
