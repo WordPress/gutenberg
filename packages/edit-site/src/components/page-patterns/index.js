@@ -46,10 +46,6 @@ import {
 	PATTERN_DEFAULT_CATEGORY,
 	OPERATOR_IS,
 } from '../../utils/constants';
-import {
-	duplicatePatternAction,
-	duplicateTemplatePartAction,
-} from './dataviews-pattern-actions';
 import usePatternSettings from './use-pattern-settings';
 import { unlock } from '../../lock-unlock';
 import usePatterns from './use-patterns';
@@ -90,15 +86,12 @@ const DEFAULT_VIEW = {
 const SYNC_FILTERS = [
 	{
 		value: PATTERN_SYNC_TYPES.full,
-		label: _x( 'Synced', 'Option that shows all synchronized patterns' ),
+		label: _x( 'Synced', 'pattern (singular)' ),
 		description: __( 'Patterns that are kept in sync across the site.' ),
 	},
 	{
 		value: PATTERN_SYNC_TYPES.unsynced,
-		label: _x(
-			'Not synced',
-			'Option that shows all patterns that are not synchronized'
-		),
+		label: _x( 'Not synced', 'pattern (singular)' ),
 		description: __(
 			'Patterns that can be changed freely without affecting the site.'
 		),
@@ -302,13 +295,19 @@ export default function DataviewsPatterns() {
 						<span
 							className={ `edit-site-patterns__field-sync-status-${ item.syncStatus }` }
 						>
-							{ SYNC_FILTERS.find(
-								( { value } ) => value === item.syncStatus
-							)?.label ||
-								SYNC_FILTERS.find(
-									( { value } ) =>
-										value === PATTERN_SYNC_TYPES.unsynced
-								).label }
+							{
+								(
+									SYNC_FILTERS.find(
+										( { value } ) =>
+											value === item.syncStatus
+									) ||
+									SYNC_FILTERS.find(
+										( { value } ) =>
+											value ===
+											PATTERN_SYNC_TYPES.unsynced
+									)
+								).label
+							}
 						</span>
 					);
 				},
@@ -361,15 +360,9 @@ export default function DataviewsPatterns() {
 
 	const actions = useMemo( () => {
 		if ( type === TEMPLATE_PART_POST_TYPE ) {
-			return [
-				editAction,
-				duplicateTemplatePartAction,
-				...templatePartActions,
-			].filter( Boolean );
+			return [ editAction, ...templatePartActions ].filter( Boolean );
 		}
-		return [ editAction, duplicatePatternAction, ...patternActions ].filter(
-			Boolean
-		);
+		return [ editAction, ...patternActions ].filter( Boolean );
 	}, [ editAction, type, templatePartActions, patternActions ] );
 	const onChangeView = useCallback(
 		( newView ) => {

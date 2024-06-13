@@ -21,8 +21,7 @@ import { useState, useCallback, useRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useSplit, useMerge, useEnter } from './hooks';
-import { convertToListItems } from './utils';
+import { useMerge, useEnter } from './hooks';
 import { IndentUI } from './edit.js';
 import styles from './style.scss';
 import ListStyleType from './list-style-type';
@@ -32,7 +31,6 @@ const OPACITY = '9e';
 export default function ListItemEdit( {
 	attributes,
 	setAttributes,
-	onReplace,
 	clientId,
 	style,
 	mergeBlocks,
@@ -118,24 +116,7 @@ export default function ListItemEdit( {
 
 	const preventDefault = useRef( false );
 	const { onEnter } = useEnter( { content, clientId }, preventDefault );
-	const onSplit = useSplit( clientId );
 	const onMerge = useMerge( clientId, mergeBlocks );
-	const onSplitList = useCallback(
-		( value ) => {
-			if ( ! preventDefault.current ) {
-				return onSplit( value );
-			}
-		},
-		[ clientId, onSplit ]
-	);
-	const onReplaceList = useCallback(
-		( blocks, ...args ) => {
-			if ( ! preventDefault.current ) {
-				onReplace( convertToListItems( blocks ), ...args );
-			}
-		},
-		[ clientId, onReplace, convertToListItems ]
-	);
 	const onLayout = useCallback( ( { nativeEvent } ) => {
 		setContentWidth( ( prevState ) => {
 			const { width } = nativeEvent.layout;
@@ -166,6 +147,7 @@ export default function ListItemEdit( {
 					onLayout={ onLayout }
 				>
 					<RichText
+						__unstableUseSplitSelection
 						identifier="content"
 						tagName="p"
 						onChange={ ( nextContent ) =>
@@ -176,9 +158,7 @@ export default function ListItemEdit( {
 						placeholderTextColor={
 							defaultPlaceholderTextColorWithOpacity
 						}
-						onSplit={ onSplitList }
 						onMerge={ onMerge }
-						onReplace={ onReplaceList }
 						onEnter={ onEnter }
 						style={ styleWithPlaceholderOpacity }
 						deleteEnter

@@ -173,7 +173,7 @@ const SegmentedControls = ( {
 							accessibilityState={ {
 								selected: activeSegmentIndex === index,
 							} }
-							accessibilityRole={ 'button' }
+							accessibilityRole="button"
 							accessibilityLabel={ segment }
 							accessibilityHint={ `${ index + 1 } on ${
 								segments.length

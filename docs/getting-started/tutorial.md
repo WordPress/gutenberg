@@ -156,7 +156,7 @@ Save the file and select the block in the Editor. You will now see both Color an
 
 #### Removing unnecessary code
 
-For simplicity, the styling for the Copyright Date Block will be controlled entirely by the color and typography block supports. This block also does not have any front-end Javascript. Therefore, you don't need to specify stylesheets or a `viewScript` in the `block.json` file.
+For simplicity, the styling for the Copyright Date Block will be controlled entirely by the color and typography block supports. This block also does not have any front-end JavaScript. Therefore, you don't need to specify stylesheets or a `viewScript` in the `block.json` file.
 
 1. Remove the line for `editorStyle`
 2. Remove the line for `style`

@@ -10,6 +10,17 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [internal] Fix Inserter items list filtering [#62334]
+-   [*] Prevent hiding the keyboard when creating new list items [#62446]
+-   [*] RichText - Fix undefined onDelete callback [#62486]
+
+## 1.120.0
+-   [*] Prevent deleting content when backspacing in the first Paragraph block [#62069]
+-   [internal] Adds new bridge functionality for updating content  [#61796]
+
+## 1.119.1
+-   [*] Image corrector - Check the path extension is a valid one [#62190]
+-   [*] Unsupported block - UI improvements [#62240]
 
 ## 1.119.0
 -   [internal] Remove circular dependencies within the components package [#61102]

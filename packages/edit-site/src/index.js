@@ -9,7 +9,7 @@ import {
 } from '@wordpress/block-library';
 import { dispatch } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
-import { createRoot } from '@wordpress/element';
+import { createRoot, StrictMode } from '@wordpress/element';
 import { store as editorStore } from '@wordpress/editor';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
@@ -85,7 +85,11 @@ export function initializeEditor( id, settings ) {
 	window.addEventListener( 'dragover', ( e ) => e.preventDefault(), false );
 	window.addEventListener( 'drop', ( e ) => e.preventDefault(), false );
 
-	root.render( <App /> );
+	root.render(
+		<StrictMode>
+			<App />
+		</StrictMode>
+	);
 
 	return root;
 }
@@ -100,3 +104,7 @@ export function reinitializeEditor() {
 export { default as PluginTemplateSettingPanel } from './components/plugin-template-setting-panel';
 export { store } from './store';
 export * from './deprecated';
+
+// Temporary: While the posts dashboard is being iterated on
+// it's being built in the same package as the site editor.
+export { initializePostsDashboard } from './posts';

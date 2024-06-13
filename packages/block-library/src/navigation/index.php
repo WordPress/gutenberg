@@ -495,7 +495,7 @@ class WP_Navigation_Block_Renderer {
 		$close_button_directives         = '';
 		if ( $is_interactive ) {
 			$open_button_directives                  = '
-				data-wp-on--click="actions.openMenuOnClick"
+				data-wp-on-async--click="actions.openMenuOnClick"
 				data-wp-on--keydown="actions.handleMenuKeydown"
 			';
 			$responsive_container_directives         = '
@@ -503,7 +503,7 @@ class WP_Navigation_Block_Renderer {
 				data-wp-class--is-menu-open="state.isMenuOpen"
 				data-wp-watch="callbacks.initMenu"
 				data-wp-on--keydown="actions.handleMenuKeydown"
-				data-wp-on--focusout="actions.handleMenuFocusout"
+				data-wp-on-async--focusout="actions.handleMenuFocusout"
 				tabindex="-1"
 			';
 			$responsive_dialog_directives            = '
@@ -512,7 +512,7 @@ class WP_Navigation_Block_Renderer {
 				data-wp-bind--role="state.roleAttribute"
 			';
 			$close_button_directives                 = '
-				data-wp-on--click="actions.closeMenuOnClick"
+				data-wp-on-async--click="actions.closeMenuOnClick"
 			';
 			$responsive_container_content_directives = '
 				data-wp-watch="callbacks.focusFirstElement"
@@ -826,7 +826,7 @@ function block_core_navigation_add_directives_to_submenu( $tags, $block_attribut
 		$tags->set_attribute( 'data-wp-interactive', 'core/navigation' );
 		$tags->set_attribute( 'data-wp-context', '{ "submenuOpenedBy": { "click": false, "hover": false, "focus": false }, "type": "submenu" }' );
 		$tags->set_attribute( 'data-wp-watch', 'callbacks.initMenu' );
-		$tags->set_attribute( 'data-wp-on--focusout', 'actions.handleMenuFocusout' );
+		$tags->set_attribute( 'data-wp-on-async--focusout', 'actions.handleMenuFocusout' );
 		$tags->set_attribute( 'data-wp-on--keydown', 'actions.handleMenuKeydown' );
 
 		// This is a fix for Safari. Without it, Safari doesn't change the active
@@ -836,8 +836,8 @@ function block_core_navigation_add_directives_to_submenu( $tags, $block_attribut
 		$tags->set_attribute( 'tabindex', '-1' );
 
 		if ( ! isset( $block_attributes['openSubmenusOnClick'] ) || false === $block_attributes['openSubmenusOnClick'] ) {
-			$tags->set_attribute( 'data-wp-on--mouseenter', 'actions.openMenuOnHover' );
-			$tags->set_attribute( 'data-wp-on--mouseleave', 'actions.closeMenuOnHover' );
+			$tags->set_attribute( 'data-wp-on-async--mouseenter', 'actions.openMenuOnHover' );
+			$tags->set_attribute( 'data-wp-on-async--mouseleave', 'actions.closeMenuOnHover' );
 		}
 
 		// Add directives to the toggle submenu button.
@@ -847,7 +847,7 @@ function block_core_navigation_add_directives_to_submenu( $tags, $block_attribut
 				'class_name' => 'wp-block-navigation-submenu__toggle',
 			)
 		) ) {
-			$tags->set_attribute( 'data-wp-on--click', 'actions.toggleMenuOnClick' );
+			$tags->set_attribute( 'data-wp-on-async--click', 'actions.toggleMenuOnClick' );
 			$tags->set_attribute( 'data-wp-bind--aria-expanded', 'state.isMenuOpen' );
 			// The `aria-expanded` attribute for SSR is already added in the submenu block.
 		}
@@ -858,7 +858,7 @@ function block_core_navigation_add_directives_to_submenu( $tags, $block_attribut
 				'class_name' => 'wp-block-navigation__submenu-container',
 			)
 		) ) {
-			$tags->set_attribute( 'data-wp-on--focus', 'actions.openMenuOnFocus' );
+			$tags->set_attribute( 'data-wp-on-async--focus', 'actions.openMenuOnFocus' );
 		}
 
 		// Iterate through subitems if exist.
@@ -1674,9 +1674,15 @@ function block_core_navigation_insert_hooked_blocks_into_rest_response( $respons
 $rest_prepare_wp_navigation_core_callback = 'block_core_navigation_' . 'insert_hooked_blocks_into_rest_response';
 
 /*
- * Injection of hooked blocks into the Navigation block relies on some functions present in WP >= 6.5
- * that are not present in Gutenberg's WP 6.5 compatibility layer.
+ * Do not add the `block_core_navigation_insert_hooked_blocks_into_rest_response` filter in the following cases:
+ * - If Core has added the `insert_hooked_blocks_into_rest_response` filter already (WP >= 6.6);
+ * - or if the `set_ignored_hooked_blocks_metadata` function is unavailable (which is required for the filter to work. It was introduced by WP 6.5 but is not present in Gutenberg's WP 6.5 compatibility layer);
+ * - or if the `$rest_prepare_wp_navigation_core_callback` filter has already been added.
  */
-if ( function_exists( 'set_ignored_hooked_blocks_metadata' ) && ! has_filter( 'rest_prepare_wp_navigation', $rest_prepare_wp_navigation_core_callback ) ) {
+if (
+	! has_filter( 'rest_prepare_wp_navigation', 'insert_hooked_blocks_into_rest_response' ) &&
+	function_exists( 'set_ignored_hooked_blocks_metadata' ) &&
+	! has_filter( 'rest_prepare_wp_navigation', $rest_prepare_wp_navigation_core_callback )
+) {
 	add_filter( 'rest_prepare_wp_navigation', 'block_core_navigation_insert_hooked_blocks_into_rest_response', 10, 3 );
 }

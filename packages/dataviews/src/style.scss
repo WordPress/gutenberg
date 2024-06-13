@@ -119,7 +119,8 @@
 		th:first-child {
 			padding-left: $grid-unit-60;
 
-			.dataviews-view-table-header-button {
+			.dataviews-view-table-header-button,
+			.dataviews-view-table-header {
 				margin-left: - #{$grid-unit-10};
 			}
 		}
@@ -233,6 +234,10 @@
 				display: none;
 			}
 		}
+	}
+
+	.dataviews-view-table-header {
+		padding-left: $grid-unit-05;
 	}
 
 	.dataviews-view-table__actions-column {
@@ -365,8 +370,7 @@
 		line-height: 16px;
 
 		&:not(:empty) {
-			padding: $grid-unit-15 0;
-			padding-top: 0;
+			padding: 0 0 $grid-unit-15;
 		}
 
 		.dataviews-view-grid__field {
@@ -432,6 +436,7 @@
 			.components-button {
 				opacity: 0;
 				position: fixed;
+				right: 0;
 			}
 		}
 
@@ -596,11 +601,6 @@
 	.components-checkbox-control__input-container {
 		margin: 0;
 	}
-}
-
-.dataviews-filters__custom-menu-radio-item-prefix {
-	display: block;
-	width: 24px;
 }
 
 .dataviews-bulk-edit-button.components-button {
@@ -887,12 +887,14 @@
 }
 
 .dataviews-bulk-actions {
-	position: absolute;
+	position: sticky;
 	display: flex;
 	flex-direction: column;
 	align-content: center;
 	flex-wrap: wrap;
-	width: 100%;
+	width: fit-content;
+	margin-left: auto;
+	margin-right: auto;
 	bottom: $grid-unit-30;
 	z-index: z-index(".dataviews-bulk-actions");
 

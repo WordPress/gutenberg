@@ -178,7 +178,7 @@ function applyBlockValidation( unvalidatedBlock, blockType ) {
 	);
 	// Attempt to validate the block once again after the built-in fixes.
 	const [ isFixedValid, validationIssues ] = validateBlock(
-		unvalidatedBlock,
+		fixedBlock,
 		blockType
 	);
 

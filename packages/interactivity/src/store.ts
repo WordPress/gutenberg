@@ -319,15 +319,17 @@ export function store(
 }
 
 export const parseInitialData = ( dom = document ) => {
-	const storeTag = dom.querySelector(
-		`script[type="application/json"]#wp-interactivity-data`
-	);
-	if ( storeTag?.textContent ) {
+	const jsonDataScriptTag =
+		// Preferred Script Module data passing form
+		dom.getElementById(
+			'wp-script-module-data-@wordpress/interactivity'
+		) ??
+		// Legacy form
+		dom.getElementById( 'wp-interactivity-data' );
+	if ( jsonDataScriptTag?.textContent ) {
 		try {
-			return JSON.parse( storeTag.textContent );
-		} catch ( e ) {
-			// Do nothing.
-		}
+			return JSON.parse( jsonDataScriptTag.textContent );
+		} catch {}
 	}
 	return {};
 };

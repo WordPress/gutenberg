@@ -285,7 +285,7 @@ const ImageComponent = ( {
 				disabled={ ! isSelected }
 				accessibilityLabel={ alt }
 				accessibilityHint={ __( 'Double tap and hold to edit' ) }
-				accessibilityRole={ 'imagebutton' }
+				accessibilityRole="imagebutton"
 				key={ url }
 				style={ imageContainerStyles }
 			>
