@@ -69,26 +69,27 @@ export function useCurrentMergeThemeStyleVariationsWithUserConfig( {
 		};
 	}, [] );
 	const { user: baseVariation } = useContext( GlobalStylesContext );
-	const clonedBaseVariation = cloneDeep( baseVariation );
-
-	const variationsWithSinglePropertyAndBase = variationsFromTheme
-		.filter( ( variation ) => {
-			return isVariationWithSingleProperty( variation, property );
-		} )
-		.map( ( variation ) => {
-			return mergeBaseAndUserConfigs( clonedBaseVariation, variation );
-		} );
 
 	return useMemo( () => {
-		return [
-			{
-				title: __( 'Default' ),
-				settings: {},
-				styles: {},
-			},
-			...variationsWithSinglePropertyAndBase,
-		];
-	}, [ variationsWithSinglePropertyAndBase ] );
+		const clonedBaseVariation = cloneDeep( baseVariation );
+
+		// Get user variation and remove the color settings.
+		const userVariation = removePropertyFromObject(
+			clonedBaseVariation,
+			property
+		);
+		userVariation.title = __( 'Default' );
+
+		const variationsWithSinglePropertyAndBase = variationsFromTheme
+			.filter( ( variation ) => {
+				return isVariationWithSingleProperty( variation, property );
+			} )
+			.map( ( variation ) => {
+				return mergeBaseAndUserConfigs( baseVariation, variation );
+			} );
+
+		return [ userVariation, ...variationsWithSinglePropertyAndBase ];
+	}, [ baseVariation, variationsFromTheme ] );
 }
 
 /**
