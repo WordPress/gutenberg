@@ -156,12 +156,24 @@ export default function BlockTools( {
 			} else if ( clientIds.length === 1 ) {
 				event.preventDefault();
 				clearSelectedBlock();
-				// This is temporary code to see if this works with NVDA. I'm not sure the best way to find the region that contains the block editor.
-				document
-					.querySelector(
-						'[role="region"][aria-label="Editor content"]'
-					)
-					.focus();
+
+				// If we're iframed, we need to use the iframe instead of the contentRef
+				const editorCanvas =
+					__unstableContentRef.current.ownerDocument !== document
+						? document.querySelector(
+								'iframe[name="editor-canvas"]'
+						  )
+						: __unstableContentRef.current;
+
+				// The region is provivided by the editor, not the block-editor.
+				// We should send focus to the region if one is available to reuse the
+				// same interface for navigating landmarks.
+				const editorRegion = editorCanvas?.closest( '[role="region"]' );
+
+				// If no region is available, use the canvas instead.
+				const focusableWrapper = editorRegion || editorCanvas;
+
+				focusableWrapper.focus();
 			}
 		} else if ( isMatch( 'core/block-editor/collapse-list-view', event ) ) {
 			// If focus is currently within a text field, such as a rich text block or other editable field,
