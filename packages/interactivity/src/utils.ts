@@ -145,18 +145,26 @@ export function withScope( func: ( ...args: unknown[] ) => unknown ) {
 				try {
 					it = gen.next( value );
 				} finally {
-					resetNamespace();
 					resetScope();
+					resetNamespace();
 				}
+
 				try {
 					value = await it.value;
 				} catch ( e ) {
+					setNamespace( ns );
+					setScope( scope );
 					gen.throw( e );
+				} finally {
+					resetScope();
+					resetNamespace();
 				}
+
 				if ( it.done ) {
 					break;
 				}
 			}
+
 			return value;
 		};
 	}

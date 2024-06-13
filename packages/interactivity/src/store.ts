@@ -7,14 +7,9 @@ import { computed } from '@preact/signals';
 /**
  * Internal dependencies
  */
-import {
-	getScope,
-	setScope,
-	resetScope,
-	getNamespace,
-	setNamespace,
-	resetNamespace,
-} from './hooks';
+import { getScope, getNamespace, setNamespace, resetNamespace } from './hooks';
+import { withScope } from './utils';
+
 const isObject = ( item: unknown ): item is Record< string, unknown > =>
 	Boolean( item && typeof item === 'object' && item.constructor === Object );
 
@@ -74,19 +69,14 @@ const handlers = {
 					scopeToGetters.get( scope ) ||
 					scopeToGetters.set( scope, new Map() ).get( scope );
 				if ( ! getters.has( getter ) ) {
+					setNamespace( ns );
+
 					getters.set(
 						getter,
-						computed( () => {
-							setNamespace( ns );
-							setScope( scope );
-							try {
-								return getter.call( target );
-							} finally {
-								resetScope();
-								resetNamespace();
-							}
-						} )
+						computed( withScope( () => getter.call( target ) ) )
 					);
+
+					resetNamespace();
 				}
 				return getters.get( getter ).value;
 			}
@@ -102,59 +92,15 @@ const handlers = {
 			return proxify( obj, ns );
 		}
 
-		// Check if the property is a generator. If it is, we turn it into an
-		// asynchronous function where we restore the default namespace and scope
-		// each time it awaits/yields.
-		if ( result?.constructor?.name === 'GeneratorFunction' ) {
-			return async ( ...args: unknown[] ) => {
-				const scope = getScope();
-				const gen: Generator< any > = result( ...args );
-
-				let value: unknown;
-				let it: IteratorResult< any >;
-
-				while ( true ) {
-					setNamespace( ns );
-					setScope( scope );
-					try {
-						it = gen.next( value );
-					} finally {
-						resetScope();
-						resetNamespace();
-					}
-
-					try {
-						value = await it.value;
-					} catch ( e ) {
-						setNamespace( ns );
-						setScope( scope );
-						gen.throw( e );
-					} finally {
-						resetScope();
-						resetNamespace();
-					}
-
-					if ( it.done ) {
-						break;
-					}
-				}
-
-				return value;
-			};
-		}
-
-		// Check if the property is a synchronous function. If it is, set the
-		// default namespace. Synchronous functions always run in the proper scope,
-		// which is set by the Directives component.
+		// Check if the property is a function. If it is, add the store
+		// namespace to the stack and wrap the function with the current scope.
+		// The `withScope` util handles both synchronous functions and generator
+		// functions.
 		if ( typeof result === 'function' ) {
-			return ( ...args: unknown[] ) => {
-				setNamespace( ns );
-				try {
-					return result( ...args );
-				} finally {
-					resetNamespace();
-				}
-			};
+			setNamespace( ns );
+			const scoped = withScope( result );
+			resetNamespace();
+			return scoped;
 		}
 
 		// Check if the property is an object. If it is, proxyify it.
