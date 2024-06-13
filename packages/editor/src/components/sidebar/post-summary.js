@@ -69,7 +69,7 @@ export default function PostSummary( { onActionPerformed } ) {
 								<PostLastEditedPanel />
 							</VStack>
 							{ ! isRemovedPostStatusPanel && (
-								<VStack spacing={ 2 }>
+								<VStack spacing={ 4 }>
 									<VStack spacing={ 1 }>
 										<PostStatusPanel />
 										<PostSchedulePanel />
