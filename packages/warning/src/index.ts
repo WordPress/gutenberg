@@ -4,12 +4,18 @@
 import { logged } from './utils';
 
 function isDev(): boolean {
-	return typeof SCRIPT_DEBUG !== 'undefined' && SCRIPT_DEBUG === true;
+	return (
+		// eslint-disable-next-line @wordpress/wp-global-usage
+		typeof globalThis.SCRIPT_DEBUG !== 'undefined' &&
+		// eslint-disable-next-line @wordpress/wp-global-usage
+		globalThis.SCRIPT_DEBUG === true
+	);
 }
 
 /**
  * Shows a warning with `message` if environment is not `production`.
  *
+ * @param message
  * @example
  * ```js
  * import warning from '@wordpress/warning';
