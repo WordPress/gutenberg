@@ -284,16 +284,14 @@ export function sortResults( results: SearchResult[], search: string ) {
 /**
  * Turns text into an array of tokens.
  *
- * For example, `"I'm having a ball"` becomes `[ "im", "having", "a", "ball" ]`.
+ * For example, `"I'm having a ball."` becomes `[ "im", "having", "a", "ball" ]`.
  *
  * @param text
  */
-function tokenize( text: string ) {
-	return text
-		.toLowerCase()
-		.split( /\s+/ )
-		.map( ( word ) => word.replace( /\W/g, '' ) )
-		.filter( ( word ) => !! word );
+function tokenize( text: string ): string[] {
+	// \p{L} matches any kind of letter from any language.
+	// \p{N} matches any kind of numeric character.
+	return text.toLowerCase().match( /[\p{L}\p{N}]+/gu ) || [];
 }
 
 /**
