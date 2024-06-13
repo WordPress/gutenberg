@@ -126,9 +126,10 @@ async function buildCSS( file ) {
 		data: ''.concat( '@use "sass:math";', importLists, contents ),
 	} );
 
-	const result = await postcss(
-		require( '@wordpress/postcss-plugins-preset' )
-	).process( builtSass.css, {
+	const result = await postcss( [
+		require( 'postcss-local-keyframes' ),
+		...require( '@wordpress/postcss-plugins-preset' ),
+	] ).process( builtSass.css, {
 		from: 'src/app.css',
 		to: 'dest/app.css',
 	} );
