@@ -13,6 +13,8 @@ const postcss = require( 'postcss' );
  */
 const getBabelConfig = require( './get-babel-config' );
 
+const isDev = process.env.NODE_ENV === 'development';
+
 /**
  * Path to packages directory.
  *
@@ -27,10 +29,12 @@ const PACKAGES_DIR = path
  *
  * @type {Object}
  */
-const JS_ENVIRONMENTS = {
-	main: 'build',
-	module: 'build-module',
-};
+const JS_ENVIRONMENTS = isDev
+	? { module: 'build-module' }
+	: {
+			main: 'build',
+			module: 'build-module',
+	  };
 
 /**
  * Promisified fs.readFile.

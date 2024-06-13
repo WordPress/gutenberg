@@ -18,7 +18,7 @@ There are different hooks to use depending on the answers to these questions, an
 
 Whenever you need to enqueue assets for the Editor itself (i.e. not the user-generated content), you should use the [`enqueue_block_editor_assets`](https://developer.wordpress.org/reference/hooks/enqueue_block_editor_assets/) hook coupled with the standard [`wp_enqueue_script`](https://developer.wordpress.org/reference/functions/wp_enqueue_script/) and [`wp_enqueue_style`](https://developer.wordpress.org/reference/functions/wp_enqueue_style/) functions.
 
-Examples might be adding custom inspector or toolbar controls, registering block styles and variations in Javascript, registering Editor plugins, etc.
+Examples might be adding custom inspector or toolbar controls, registering block styles and variations in JavaScript, registering Editor plugins, etc.
 
 ```php
 /**
@@ -31,7 +31,7 @@ function example_enqueue_editor_assets() {
     );
     wp_enqueue_style(
         'example-editor-styles',
-        plugins_url( 'editor-styles.css', __FILE__ ) 
+        plugins_url( 'editor-styles.css', __FILE__ )
     );
 }
 add_action( 'enqueue_block_editor_assets', 'example_enqueue_editor_assets' );
