@@ -42,7 +42,7 @@ export default function PostActions( { onActionPerformed, buttonProps } ) {
 			postType: _postType,
 		};
 	}, [] );
-	const allActions = usePostActions( postType, onActionPerformed );
+	const allActions = usePostActions( { postType, onActionPerformed } );
 
 	const actions = useMemo( () => {
 		return allActions.filter( ( action ) => {

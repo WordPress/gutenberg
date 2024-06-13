@@ -583,6 +583,7 @@ const viewPostAction = {
 
 const postRevisionsAction = {
 	id: 'view-post-revisions',
+	context: 'list',
 	label( items ) {
 		const revisionsCount =
 			items[ 0 ]._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0;
@@ -1029,7 +1030,7 @@ export const duplicateTemplatePartAction = {
 	},
 };
 
-export function usePostActions( postType, onActionPerformed ) {
+export function usePostActions( { postType, onActionPerformed, context } ) {
 	const { defaultActions, postTypeObject } = useSelect(
 		( select ) => {
 			const { getPostType } = select( coreStore );
@@ -1057,7 +1058,7 @@ export function usePostActions( postType, onActionPerformed ) {
 			return [];
 		}
 
-		const actions = [
+		let actions = [
 			postTypeObject?.viewable && viewPostAction,
 			supportsRevisions && postRevisionsAction,
 			globalThis.IS_GUTENBERG_PLUGIN
@@ -1076,6 +1077,18 @@ export function usePostActions( postType, onActionPerformed ) {
 			! isTemplateOrTemplatePart && permanentlyDeletePostAction,
 			...defaultActions,
 		].filter( Boolean );
+		// Filter actions based on provided context. If not provided
+		// all actions are returned. We'll have a single entry for getting the actions
+		// and the consumer should provide the context to filter the actions, if needed.
+		// Actions should also provide the `context` they support, if it's specific, to
+		// compare with the provided context to get all the actions.
+		// Right now the only supported context is `list`.
+		actions = actions.filter( ( action ) => {
+			if ( ! action.context ) {
+				return true;
+			}
+			return action.context === context;
+		} );
 
 		if ( onActionPerformed ) {
 			for ( let i = 0; i < actions.length; ++i ) {
@@ -1130,5 +1143,6 @@ export function usePostActions( postType, onActionPerformed ) {
 		isLoaded,
 		supportsRevisions,
 		supportsTitle,
+		context,
 	] );
 }
