@@ -15,7 +15,8 @@ function isDev(): boolean {
 /**
  * Shows a warning with `message` if environment is not `production`.
  *
- * @param message
+ * @param message - Message to show in the warning.
+ *
  * @example
  * ```js
  * import warning from '@wordpress/warning';

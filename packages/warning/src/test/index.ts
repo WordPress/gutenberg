@@ -1,9 +1,6 @@
 /**
  * Internal dependencies
  */
-/**
- * Internal dependencies
- */
 import warning from '..';
 import { logged } from '../utils';
 
