@@ -1716,6 +1716,27 @@ export function canInsertBlocks( state, clientIds, rootClientId = null ) {
  * @param {string}  clientId     The block client Id.
  * @param {?string} rootClientId Optional root client ID of block list.
  *
+ * @example
+ * ```js
+ * import { store as blockEditorStore } from '@wordpress/block-editor';
+ * import { useSelect } from '@wordpress/data';
+ * const ExampleComponent = () => {
+ *    const { canRemoveBlock, getBlocks } = useSelect(
+ *        ( select ) => select( blockEditorStore ),
+ *        []
+ *    );
+ *
+ *    // Get all the blocks in the editor.
+ *    const availableBlocks = getBlocks();
+ *
+ *    return canRemoveBlock( availableBlocks[ 0 ]?.clientId ) ? (
+ *        <p>{ __( 'Blocks is removable.' ) }</p>
+ *    ) : (
+ *        <p>{ __( 'Blocks is NOT removable.' ) }</p>
+ *    );
+ * };
+ * ```
+ *
  * @return {boolean} Whether the given block is allowed to be removed.
  */
 export function canRemoveBlock( state, clientId, rootClientId = null ) {
@@ -1737,8 +1758,33 @@ export function canRemoveBlock( state, clientId, rootClientId = null ) {
  * Determines if the given blocks are allowed to be removed.
  *
  * @param {Object}  state        Editor state.
- * @param {string}  clientIds    The block client IDs to be removed.
+ * @param {Array}   clientIds    The block client IDs to be removed.
  * @param {?string} rootClientId Optional root client ID of block list.
+ *
+ * @example
+ * ```js
+ * const ExampleComponent = () => {
+ *    const { canRemoveBlocks, getBlocks } = useSelect(
+ *        ( select ) => select( blockEditorStore ),
+ *        []
+ *    );
+ *
+ *    // Get all the blocks in the editor.
+ *    const availableBlocks = getBlocks();
+ *
+ *    // Define the list of blocks to check.
+ *    const blocksToCheck = [
+ *        availableBlocks[ 0 ]?.clientId,
+ *        availableBlocks[ 1 ]?.clientId,
+ *    ];
+ *
+ *    return canRemoveBlocks( blocksToCheck ) ? (
+ *        <p>{ __( 'Blocks are removable.' ) }</p>
+ *    ) : (
+ *        <p>{ __( 'Blocks are NOT removable.' ) }</p>
+ *    );
+ * };
+ * ```
  *
  * @return {boolean} Whether the given blocks are allowed to be removed.
  */
@@ -1754,6 +1800,29 @@ export function canRemoveBlocks( state, clientIds, rootClientId = null ) {
  * @param {Object}  state        Editor state.
  * @param {string}  clientId     The block client Id.
  * @param {?string} rootClientId Optional root client ID of block list.
+ *
+ * @example
+ * ```js
+ * import { store as blockEditorStore } from '@wordpress/block-editor';
+ * import { useSelect } from '@wordpress/data';
+ *
+ * const ExampleComponent = () => {
+ *     const { canMoveBlock, getBlocks } = useSelect(
+ *        ( select ) => select( blockEditorStore ),
+ *        []
+ *     );
+ *
+ *     // Retrieve the clientId of the block to check.
+ *     const blockToCheck = getBlocks()[ 0 ]?.clientId;
+ *
+ *     return canMoveBlock( blockToCheck ) ? (
+ *         <p>{ __( 'Block is movable.' ) }</p>
+ *     ) : (
+ *         <p>{ __( 'Block is NOT moveable.' ) }</p>
+ *     );
+ * };
+ *
+ * ```
  *
  * @return {boolean | undefined} Whether the given block is allowed to be moved.
  */
@@ -1775,8 +1844,33 @@ export function canMoveBlock( state, clientId, rootClientId = null ) {
  * Determines if the given blocks are allowed to be moved.
  *
  * @param {Object}  state        Editor state.
- * @param {string}  clientIds    The block client IDs to be moved.
+ * @param {Array}   clientIds    The block client IDs to be moved.
  * @param {?string} rootClientId Optional root client ID of block list.
+ *
+ * @example
+ * ```js
+ * const ExampleComponent = () => {
+ *    const { canMoveBlocks, getBlocks } = useSelect(
+ *        ( select ) => select( blockEditorStore ),
+ *        []
+ *    );
+ *
+ *    // Get all the blocks in the editor.
+ *    const availableBlocks = getBlocks();
+ *
+ *    // Define the list of blocks to check.
+ *    const blocksToCheck = [
+ *        availableBlocks[ 0 ]?.clientId,
+ *        availableBlocks[ 1 ]?.clientId,
+ *    ];
+ *
+ *    return canMoveBlocks( blocksToCheck ) ? (
+ *        <p>{ __( 'Blocks are movable.' ) }</p>
+ *    ) : (
+ *        <p>{ __( 'Blocks are NOT moveable.' ) }</p>
+ *    );
+ * };
+ * ```
  *
  * @return {boolean} Whether the given blocks are allowed to be moved.
  */
@@ -1791,6 +1885,28 @@ export function canMoveBlocks( state, clientIds, rootClientId = null ) {
  *
  * @param {Object} state    Editor state.
  * @param {string} clientId The block client Id.
+ *
+ * @example
+ * ```js
+ * import { store as blockEditorStore } from '@wordpress/block-editor';
+ * import { useSelect } from '@wordpress/data';
+ *
+ * const ExampleComponent = () => {
+ *     const { canEditBlock, getBlocks } = useSelect(
+ *         ( select ) => select( blockEditorStore ),
+ *         []
+ *     );
+ *
+ *     // Retrieve the clientId of the block to check.
+ *     const blockToCheck = getBlocks()[ 0 ]?.clientId;
+ *
+ *     return canEditBlock( blockToCheck?.clientId ) ? (
+ *         <p>{ __( 'Block is editable.' ) }</p>
+ *     ) : (
+ *         <p>{ __( 'Block is NOT editable.' ) }</p>
+ *     );
+ * };
+ * ```
  *
  * @return {boolean} Whether the given block is allowed to be edited.
  */
@@ -2732,8 +2848,33 @@ export function isBlockHighlighted( state, clientId ) {
 /**
  * Checks if a given block has controlled inner blocks.
  *
+ * An example of an inner block controller is a template part block, which provides
+ * its own blocks from the template part entity data source.
+ *
  * @param {Object} state    Global application state.
  * @param {string} clientId The block to check.
+ *
+ * @example
+ * ```js
+ * import { store as blockEditorStore } from '@wordpress/block-editor';
+ * import { useSelect } from '@wordpress/data';
+ *
+ * const ExampleComponent = () => {
+ *     const { areInnerBlocksControlled, getBlocks } = useSelect(
+ *         ( select ) => select( blockEditorStore ),
+ *         []
+ *     );
+ *
+ *    // Retrieve the clientId of the block to check.
+ *    const blockToCheck = getBlocks()[ 0 ]?.clientId;
+ *
+ *    return areInnerBlocksControlled( blockToCheck ) ? (
+ *        <p>{ __( 'Inner blocks are controlled' ) }</p>
+ *    ) : (
+ *        <p>{ __( 'Inner blocks are NOT controlled' ) }</p>
+ *    );
+ * };
+ * ```
  *
  * @return {boolean} True if the block has controlled inner blocks.
  */
