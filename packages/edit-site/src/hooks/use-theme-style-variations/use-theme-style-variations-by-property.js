@@ -48,8 +48,8 @@ export function removePropertyFromObject( object, property ) {
 }
 
 /**
- * A convenience wrapper for `useThemeStyleVariationsByProperty()` that fetches the current theme style variations,
- * and user-defined global style/settings object.
+ * Fetches the current theme style variations that contain only the specified property
+ * and merges them with the user config.
  *
  * @param {Object} props          Object of hook args.
  * @param {string} props.property The property to filter by.
