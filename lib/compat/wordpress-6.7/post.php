@@ -17,11 +17,11 @@
  * @return array Array of available rendering modes.
  */
 function gutenberg_rendering_modes() {
-	return [
+	return array(
 		'post-only',
 		'template-lock',
 		'template-locked',
-	];
+	);
 }
 
 /**
