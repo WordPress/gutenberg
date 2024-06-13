@@ -35,9 +35,8 @@ import { store as blockEditorStore } from '../../store';
 import __unstableBlockNameContext from './block-name-context';
 import NavigableToolbar from '../navigable-toolbar';
 import Shuffle from './shuffle';
-import PatternOverridesToolbarIndicator from '../pattern-overrides-toolbar-indicator';
 import { useHasBlockToolbar } from './use-has-block-toolbar';
-import { canBindBlock } from '../../hooks/use-bindings-attributes';
+
 /**
  * Renders the block toolbar.
  *
@@ -62,18 +61,15 @@ export function PrivateBlockToolbar( {
 		blockClientIds,
 		isDefaultEditingMode,
 		blockType,
-		blockName,
 		toolbarKey,
 		shouldShowVisualToolbar,
 		showParentSelector,
 		isUsingBindings,
-		hasParentPattern,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockName,
 			getBlockMode,
 			getBlockParents,
-			getBlockParentsByBlockName,
 			getSelectedBlockClientIds,
 			isBlockValid,
 			getBlockRootClientId,
@@ -96,18 +92,14 @@ export function PrivateBlockToolbar( {
 		const isVisual = selectedBlockClientIds.every(
 			( id ) => getBlockMode( id ) === 'visual'
 		);
-		const bindings = getBlockAttributes( selectedBlockClientId )?.metadata
-			?.bindings;
-		const parentPatternClientId = getBlockParentsByBlockName(
-			selectedBlockClientId,
-			'core/block',
-			true
-		)[ 0 ];
+		const _isUsingBindings = selectedBlockClientIds.every(
+			( clientId ) =>
+				!! getBlockAttributes( clientId )?.metadata?.bindings
+		);
 		return {
 			blockClientId: selectedBlockClientId,
 			blockClientIds: selectedBlockClientIds,
 			isDefaultEditingMode: _isDefaultEditingMode,
-			blockName: _blockName,
 			blockType: selectedBlockClientId && getBlockType( _blockName ),
 			shouldShowVisualToolbar: isValid && isVisual,
 			rootClientId: blockRootClientId,
@@ -122,8 +114,7 @@ export function PrivateBlockToolbar( {
 				) &&
 				selectedBlockClientIds.length === 1 &&
 				_isDefaultEditingMode,
-			isUsingBindings: !! bindings,
-			hasParentPattern: !! parentPatternClientId,
+			isUsingBindings: _isUsingBindings,
 		};
 	}, [] );
 
@@ -176,13 +167,6 @@ export function PrivateBlockToolbar( {
 				{ ! isMultiToolbar &&
 					isLargeViewport &&
 					isDefaultEditingMode && <BlockParentSelector /> }
-				{ isUsingBindings &&
-					hasParentPattern &&
-					canBindBlock( blockName ) && (
-						<PatternOverridesToolbarIndicator
-							clientIds={ blockClientIds }
-						/>
-					) }
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) &&
 					( isDefaultEditingMode || isSynced ) && (
 						<div
