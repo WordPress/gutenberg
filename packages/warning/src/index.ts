@@ -15,7 +15,7 @@ function isDev(): boolean {
 /**
  * Shows a warning with `message` if environment is not `production`.
  *
- * @param message - Message to show in the warning.
+ * @param message Message to show in the warning.
  *
  * @example
  * ```js
