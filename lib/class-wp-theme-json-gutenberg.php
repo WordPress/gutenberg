@@ -1405,6 +1405,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * Returns the global styles custom css.
 	 *
 	 * @since 6.2.0
+	 * @deprecated 6.7.0 Use {@see 'get_stylesheet'} instead.
 	 *
 	 * @return string The global styles custom CSS.
 	 */
@@ -1422,8 +1423,7 @@ class WP_Theme_JSON_Gutenberg {
 
 	/**
 	 * Returns the global styles base custom CSS.
-	 *
-	 * @since 6.6.0
+	 * This function is deprecated; please do not sync to core.
 	 *
 	 * @return string The global styles base custom CSS.
 	 */
@@ -1434,8 +1434,7 @@ class WP_Theme_JSON_Gutenberg {
 
 	/**
 	 * Returns the block nodes with custom CSS.
-	 *
-	 * @since 6.6.0
+	 * This function is deprecated; please do not sync to core.
 	 *
 	 * @return array The block nodes.
 	 */
@@ -1464,8 +1463,7 @@ class WP_Theme_JSON_Gutenberg {
 
 	/**
 	 * Returns the global styles custom CSS for a single block.
-	 *
-	 * @since 6.6.0
+	 * This function is deprecated; please do not sync to core.
 	 *
 	 * @param array  $css The block css node.
 	 * @param string $selector The block selector.
