@@ -7,3 +7,7 @@
 		width: 100%;
 	}
 }
+
+.components-palette-edit__remove-button {
+	z-index: z-index(".components-palette-edit__remove-button");
+}

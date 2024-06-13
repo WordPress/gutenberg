@@ -201,7 +201,6 @@ function Option< T extends Color | Gradient >( {
 		<PaletteItem
 			className={ isEditing ? 'is-selected' : undefined }
 			as={ isEditing ? 'div' : 'button' }
-			onClick={ isEditing ? undefined : onStartEditing }
 			aria-label={
 				isEditing
 					? undefined
@@ -212,7 +211,9 @@ function Option< T extends Color | Gradient >( {
 					  )
 			}
 			ref={ setPopoverAnchor }
-			{ ...( isEditing ? { ...focusOutsideProps } : {} ) }
+			{ ...( isEditing
+				? { ...focusOutsideProps }
+				: { onClick: onStartEditing } ) }
 		>
 			<HStack justify="flex-start">
 				<IndicatorStyled colorValue={ value } />
@@ -245,14 +246,13 @@ function Option< T extends Color | Gradient >( {
 					) }
 				</FlexItem>
 				{ isEditing && ! canOnlyChangeValues && (
-					<FlexItem>
-						<RemoveButton
-							size="small"
-							icon={ lineSolid }
-							label={ __( 'Remove color' ) }
-							onClick={ onRemove }
-						/>
-					</FlexItem>
+					<RemoveButton
+						className="components-palette-edit__remove-button"
+						size="small"
+						icon={ lineSolid }
+						label={ __( 'Remove color' ) }
+						onClick={ onRemove }
+					/>
 				) }
 			</HStack>
 			{ isEditing && (
@@ -311,7 +311,10 @@ function PaletteEditListView< T extends Color | Gradient >( {
 								)
 							);
 						} }
-						onRemove={ () => {
+						onRemove={ ( event ) => {
+							event.preventDefault();
+							event.stopPropagation();
+							setEditingElement( null );
 							const newElements = elements.filter(
 								( _currentElement, currentIndex ) => {
 									if ( currentIndex === index ) {
@@ -323,7 +326,6 @@ function PaletteEditListView< T extends Color | Gradient >( {
 							onChange(
 								newElements.length ? newElements : undefined
 							);
-							setEditingElement( null );
 						} }
 						isEditing={ index === editingElement }
 						onStopEditing={ () => {

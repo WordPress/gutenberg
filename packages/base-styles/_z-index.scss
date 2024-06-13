@@ -92,6 +92,8 @@ $z-layers: (
 	// For larger views, the wp-admin navbar dropdown should be at top of
 	// the Publish Post sidebar.
 	".editor-post-publish-panel {greater than small}": 99998,
+	// above the sidebar
+	".components-palette-edit__remove-button": 100010,
 
 	// For larger views, the wp-admin navbar dropdown should be on top of
 	// the multi-entity saving sidebar.
