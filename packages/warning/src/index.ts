@@ -49,6 +49,5 @@ export default function warning( message: string ): void {
 	} catch ( x ) {
 		// Do nothing.
 	}
-
 	logged.add( message );
 }
