@@ -363,14 +363,12 @@ test.describe( 'Footnotes', () => {
 
 		// Open revisions.
 		await editor.openDocumentSettingsSidebar();
-		const editorSettings = page.getByRole( 'region', {
-			name: 'Editor settings',
-		} );
-		await editorSettings.getByRole( 'tab', { name: 'Post' } ).click();
-		await editorSettings.getByRole( 'button', { name: 'Actions' } ).click();
 		await page
-			.getByRole( 'menu' )
-			.getByRole( 'menuitem', { name: 'View revisions' } )
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'tab', { name: 'Post' } )
+			.click();
+		await page
+			.locator( '.editor-private-post-last-revision__button' )
 			.click();
 		await page.locator( '.revisions-controls .ui-slider-handle' ).focus();
 		await page.keyboard.press( 'ArrowLeft' );
