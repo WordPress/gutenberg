@@ -201,7 +201,7 @@ function Option< T extends Color | Gradient >( {
 		<PaletteItem
 			className={ isEditing ? 'is-selected' : undefined }
 			as={ isEditing ? 'div' : 'button' }
-			onClick={ onStartEditing }
+			onClick={ isEditing ? undefined : onStartEditing }
 			aria-label={
 				isEditing
 					? undefined
@@ -312,7 +312,6 @@ function PaletteEditListView< T extends Color | Gradient >( {
 							);
 						} }
 						onRemove={ () => {
-							setEditingElement( null );
 							const newElements = elements.filter(
 								( _currentElement, currentIndex ) => {
 									if ( currentIndex === index ) {
@@ -324,6 +323,7 @@ function PaletteEditListView< T extends Color | Gradient >( {
 							onChange(
 								newElements.length ? newElements : undefined
 							);
+							setEditingElement( null );
 						} }
 						isEditing={ index === editingElement }
 						onStopEditing={ () => {
