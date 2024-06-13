@@ -158,6 +158,7 @@
 	&.hide-header {
 		margin-top: 0;
 		padding-top: $grid-unit-40;
+		max-width: $modal-width-medium;
 	}
 
 	&.is-scrollable:focus-visible {
