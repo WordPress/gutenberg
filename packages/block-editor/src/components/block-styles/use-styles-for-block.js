@@ -15,6 +15,7 @@ import { useMemo } from '@wordpress/element';
  */
 import { getActiveStyle, getRenderedStyles, replaceActiveStyle } from './utils';
 import { store as blockEditorStore } from '../../store';
+import { globalStylesDataKey } from '../../store/private-keys';
 
 /**
  *
@@ -53,7 +54,7 @@ function useGenericPreviewBlock( block, type ) {
  */
 export default function useStylesForBlocks( { clientId, onSwitch } ) {
 	const selector = ( select ) => {
-		const { getBlock } = select( blockEditorStore );
+		const { getBlock, getSettings } = select( blockEditorStore );
 		const block = getBlock( clientId );
 
 		if ( ! block ) {
@@ -61,19 +62,33 @@ export default function useStylesForBlocks( { clientId, onSwitch } ) {
 		}
 		const blockType = getBlockType( block.name );
 		const { getBlockStyles } = select( blocksStore );
+		const settings = getSettings();
+		const variations =
+			settings[ globalStylesDataKey ]?.blocks?.[ block.name ]?.variations;
 
 		return {
 			block,
 			blockType,
 			styles: getBlockStyles( block.name ),
 			className: block.attributes.className || '',
+			variations: Object.keys( variations ?? {} ),
 		};
 	};
-	const { styles, block, blockType, className } = useSelect( selector, [
-		clientId,
-	] );
+	const { styles, block, blockType, className, variations } = useSelect(
+		selector,
+		[ clientId ]
+	);
+
+	// Filter out any stale block style registrations e.g. when a block style
+	// variation was registered by a theme style variation and then the theme
+	// style variation is deregistered.
+	const filteredStyles = styles?.filter(
+		( style ) =>
+			style.source === 'block' || variations.includes( style.name )
+	);
+
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-	const stylesToRender = getRenderedStyles( styles );
+	const stylesToRender = getRenderedStyles( filteredStyles );
 	const activeStyle = getActiveStyle( stylesToRender, className );
 	const genericPreviewBlock = useGenericPreviewBlock( block, blockType );
 
