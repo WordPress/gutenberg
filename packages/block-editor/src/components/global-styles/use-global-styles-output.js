@@ -651,7 +651,9 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 					( [ variationName, variation ] ) => {
 						variations[ variationName ] =
 							pickStyleKeys( variation );
-
+						if ( variation?.css ) {
+							variations[ variationName ].css = variation.css;
+						}
 						const variationSelector =
 							blockSelectors[ blockName ]
 								.styleVariationSelectors?.[ variationName ];
@@ -1040,6 +1042,12 @@ export const toStyles = (
 									ruleset += `:root :where(${ styleVariationSelector }){${ styleVariationDeclarations.join(
 										';'
 									) };}`;
+								}
+								if ( styleVariations?.css ) {
+									ruleset += processCSSNesting(
+										styleVariations.css,
+										`:root :where(${ styleVariationSelector })`
+									);
 								}
 							}
 						}
