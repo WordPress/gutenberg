@@ -311,7 +311,7 @@ test( 'that_autop_treats_block_level_elements_as_blocks', () => {
 	];
 
 	// Check whitespace normalization.
-	let content = [];
+	let content: string[] = [];
 
 	blocks.forEach( ( block ) => {
 		content.push( `<${ block }>foo</${ block }>` );
@@ -388,18 +388,18 @@ test( 'that autop treats inline elements as inline', () => {
 		'select',
 	];
 
-	let content = [];
-	let expected = [];
+	const content: string[] = [];
+	const expected: string[] = [];
 
 	inlines.forEach( ( inline ) => {
 		content.push( `<${ inline }>foo</${ inline }>` );
 		expected.push( `<p><${ inline }>foo</${ inline }></p>` );
 	} );
 
-	content = content.join( '\n\n' );
-	expected = expected.join( '\n' );
+	const contentString = content.join( '\n\n' );
+	const expectedString = expected.join( '\n' );
 
-	expect( autop( content ).trim() ).toBe( expected );
+	expect( autop( contentString ).trim() ).toBe( expectedString );
 } );
 
 test( 'element sanity', () => {
