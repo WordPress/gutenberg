@@ -78,7 +78,7 @@ export function useCurrentMergeThemeStyleVariationsWithUserConfig( {
 			clonedUserVariation,
 			property
 		);
-		userVariation.title = __( 'Default' );
+		userVariationWithoutProperty.title = __( 'Default' );
 
 		const variationsWithSinglePropertyAndBase = variationsFromTheme
 			.filter( ( variation ) => {
