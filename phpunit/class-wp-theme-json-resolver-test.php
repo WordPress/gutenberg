@@ -1118,6 +1118,18 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 							),
 						),
 					),
+					array(
+						'blockTypes' => array( 'core/group', 'core/columns' ),
+						'version'    => 3,
+						'slug'       => 'WithSlug',
+						'title'      => 'With Slug',
+						'styles'     => array(
+							'color' => array(
+								'background' => 'aliceblue',
+								'text'       => 'midnightblue',
+							),
+						),
+					),
 				),
 			),
 		);

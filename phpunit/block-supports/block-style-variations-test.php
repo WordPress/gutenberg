@@ -94,6 +94,22 @@ class WP_Block_Supports_Block_Style_Variations_Test extends WP_UnitTestCase {
 			),
 		);
 
+		/*
+		 * This style is to be deliberately overwritten by the theme.json partial
+		 * See `phpunit/data/themedir1/block-theme/styles/block-style-variation-with-slug.json`.
+		 */
+		register_block_style(
+			'core/group',
+			array(
+				'name'       => 'WithSlug',
+				'style_data' => array(
+					'color' => array(
+						'background' => 'whitesmoke',
+						'text'       => 'black',
+					),
+				),
+			)
+		);
 		register_block_style(
 			'core/group',
 			array(
@@ -106,6 +122,12 @@ class WP_Block_Supports_Block_Style_Variations_Test extends WP_UnitTestCase {
 		$group_styles = $theme_json['styles']['blocks']['core/group'] ?? array();
 		$expected     = array(
 			'variations' => array(
+				'WithSlug'                => array(
+					'color' => array(
+						'background' => 'aliceblue',
+						'text'       => 'midnightblue',
+					),
+				),
 				'my-variation'            => $variation_styles_data,
 
 				/*
