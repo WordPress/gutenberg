@@ -2290,7 +2290,7 @@
 					"properties": {
 						"title": {
 							"type": "string",
-							"description": "Title of the global styles variation."
+							"description": "Style variation name."
 						},
 						"blockTypes": {
 							"type": "array",
