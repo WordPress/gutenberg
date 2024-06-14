@@ -9,7 +9,7 @@ import clsx from 'clsx';
 import { dragHandle, trash } from '@wordpress/icons';
 import { Button, Flex, FlexItem, ToolbarButton } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect, useRef } from '@wordpress/element';
+import { forwardRef, useEffect } from '@wordpress/element';
 import {
 	BACKSPACE,
 	DELETE,
@@ -48,10 +48,11 @@ import Shuffle from '../block-toolbar/shuffle';
  *
  * @param {string} props          Component props.
  * @param {string} props.clientId Client ID of block.
+ * @param {Object} ref            Reference to the component.
  *
  * @return {Component} The component to be rendered.
  */
-function BlockSelectionButton( { clientId, rootClientId } ) {
+function BlockSelectionButton( { clientId, rootClientId }, ref ) {
 	const selected = useSelect(
 		( select ) => {
 			const {
@@ -125,7 +126,6 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 		canMove,
 	} = selected;
 	const { setNavigationMode, removeBlock } = useDispatch( blockEditorStore );
-	const ref = useRef();
 
 	// Focus the breadcrumb in navigation mode.
 	useEffect( () => {
@@ -363,4 +363,4 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 	);
 }
 
-export default BlockSelectionButton;
+export default forwardRef( BlockSelectionButton );

@@ -3,7 +3,7 @@
 	position: relative;
 
 	// Handles the focus when we programatically send focus to this region
-	&:focus-visible::after {
+	&.interface-interface-skeleton__content:focus-visible::after {
 		position: absolute;
 		top: 0;
 		left: 0;

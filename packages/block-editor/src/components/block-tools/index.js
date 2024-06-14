@@ -93,6 +93,8 @@ export default function BlockTools( {
 		expandBlock,
 	} = unlock( useDispatch( blockEditorStore ) );
 
+	const blockSelectionButtonRef = useRef();
+
 	function onKeyDown( event ) {
 		if ( event.defaultPrevented ) {
 			return;
@@ -153,7 +155,10 @@ export default function BlockTools( {
 				// block so that focus is directed back to the beginning of the selection.
 				// In effect, to the user this feels like deselecting the multi-selection.
 				selectBlock( clientIds[ 0 ] );
-			} else if ( clientIds.length === 1 ) {
+			} else if (
+				clientIds.length === 1 &&
+				event.target === blockSelectionButtonRef?.current
+			) {
 				event.preventDefault();
 				clearSelectedBlock();
 
@@ -204,7 +209,6 @@ export default function BlockTools( {
 			}
 		}
 	}
-
 	const blockToolbarRef = usePopoverScroll( __unstableContentRef );
 	const blockToolbarAfterRef = usePopoverScroll( __unstableContentRef );
 
@@ -235,6 +239,7 @@ export default function BlockTools( {
 
 				{ showBreadcrumb && (
 					<BlockToolbarBreadcrumb
+						ref={ blockSelectionButtonRef }
 						__unstableContentRef={ __unstableContentRef }
 						clientId={ clientId }
 					/>
