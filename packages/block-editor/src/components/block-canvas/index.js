@@ -41,7 +41,6 @@ export function ExperimentalBlockCanvas( {
 					scope=".editor-styles-wrapper"
 				/>
 				<WritingFlow
-					aria-label="Block Editor"
 					ref={ contentRef }
 					className="editor-styles-wrapper"
 					tabIndex={ -1 }
