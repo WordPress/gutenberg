@@ -42,7 +42,7 @@ export function GridVisualizer( { clientId, contentRef, parentLayout } ) {
 			ref={ contentRef }
 		/>
 	);
-}
+} );
 
 const GridVisualizerGrid = forwardRef(
 	( { clientId, gridElement, isManualGrid }, ref ) => {
