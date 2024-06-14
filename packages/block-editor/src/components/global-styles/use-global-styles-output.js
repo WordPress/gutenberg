@@ -699,6 +699,14 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 											.featureSelectors
 									);
 
+								const variationBlockStyleNodes =
+									pickStyleKeys( variationBlockStyles );
+
+								if ( variationBlockStyles?.css ) {
+									variationBlockStyleNodes.css =
+										variationBlockStyles.css;
+								}
+
 								nodes.push( {
 									selector: variationBlockSelector,
 									duotoneSelector: variationDuotoneSelector,
@@ -709,9 +717,7 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 									hasLayoutSupport:
 										blockSelectors[ variationBlockName ]
 											.hasLayoutSupport,
-									styles: pickStyleKeys(
-										variationBlockStyles
-									),
+									styles: variationBlockStyleNodes,
 								} );
 
 								// Process element styles for the inner blocks
@@ -996,6 +1002,12 @@ export const toStyles = (
 					ruleset += `:root :where(${ selector }){${ styleDeclarations.join(
 						';'
 					) };}`;
+				}
+				if ( styles?.css ) {
+					ruleset += processCSSNesting(
+						styles.css,
+						`:root :where(${ selector })`
+					);
 				}
 
 				if ( styleVariationSelectors ) {
