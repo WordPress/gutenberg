@@ -1,6 +1,6 @@
 {
 	"version": 3,
-	"blockTypes": [ "core/group", "core/columns" ],
+	"blockTypes": [ "core/group" ],
 	"slug": "WithSlug",
 	"title": "With Slug",
 	"styles": {
