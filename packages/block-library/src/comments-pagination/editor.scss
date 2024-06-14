@@ -13,22 +13,3 @@ $pagination-margin: 0.5em;
 		}
 	}
 }
-
-.wp-block-comments-pagination {
-	> .wp-block-comments-pagination-next,
-	> .wp-block-comments-pagination-previous,
-	> .wp-block-comments-pagination-numbers {
-		// Override editor auto block margins.
-		margin-left: 0;
-		margin-top: $pagination-margin;
-
-		/*rtl:ignore*/
-		margin-right: $pagination-margin;
-		margin-bottom: $pagination-margin;
-
-		&:last-child {
-			/*rtl:ignore*/
-			margin-right: 0;
-		}
-	}
-}
