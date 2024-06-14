@@ -357,6 +357,7 @@ class WP_Theme_JSON_Gutenberg {
 		'styles',
 		'templateParts',
 		'title',
+		'slug',
 		'version',
 	);
 
