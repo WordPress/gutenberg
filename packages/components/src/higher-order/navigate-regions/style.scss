@@ -2,6 +2,7 @@
 [role="region"] {
 	position: relative;
 
+	// Handles the focus when we programatically send focus to this region
 	&:focus-visible::after {
 		position: absolute;
 		top: 0;
@@ -17,6 +18,18 @@
 }
 
 .is-focusing-regions {
+	&:focus::after {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		content: "";
+		pointer-events: none;
+		outline: 4px solid $components-color-accent;
+		outline-offset: -4px;
+		z-index: z-index(".is-focusing-regions {region} :focus::after");
+	}
 	// Fixes for edge cases.
 	// Some of the regions are currently used for layout purposes as 'interface skeleton'
 	// items. When they're absolutely positioned or when they contain absolutely
