@@ -13,21 +13,23 @@ describe( 'isBlobURL', () => {
 	} );
 
 	it( 'returns false if the url is not defined', () => {
-		// calling isBlobURL without a URL is not type compliant, so ignore it
-		// @ts-ignore
-		expect( isBlobURL() ).toBe( false );
+		expect(
+			// @ts-expect-error This is not a valid call according to types.
+			isBlobURL()
+		).toBe( false );
 	} );
 } );
 
 describe( 'getBlobTypeByURL', () => {
 	it( 'returns undefined if the blob is not found', () => {
-		expect( getBlobTypeByURL( 'blob:notexisting' ) ).toBe( undefined );
+		expect( getBlobTypeByURL( 'blob:notexisting' ) ).toBeUndefined();
 	} );
 
 	it( 'returns undefined if the url is not defined', () => {
-		// calling getBlobTypeByURL without a URL is not type compliant, so ignore it
-		// @ts-ignore
-		expect( getBlobTypeByURL() ).toBe( undefined );
+		expect(
+			// @ts-expect-error This is not a valid call according to types.
+			getBlobTypeByURL()
+		).toBeUndefined();
 	} );
 } );
 
