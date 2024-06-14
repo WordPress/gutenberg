@@ -2262,7 +2262,7 @@ class WP_Theme_JSON_Gutenberg {
 		}
 		$declarations             = array();
 		$root_variable_duplicates = array();
-		$string_length            = strlen( '--wp--style--root--' );
+		$root_style_length        = strlen( '--wp--style--root--' );
 
 		foreach ( $properties as $css_property => $value_path ) {
 			if ( ! is_array( $value_path ) ) {
@@ -2283,7 +2283,7 @@ class WP_Theme_JSON_Gutenberg {
 			}
 
 			if ( $is_root_style && $use_root_padding ) {
-				$root_variable_duplicates[] = substr( $css_property, $string_length );
+				$root_variable_duplicates[] = substr( $css_property, $root_style_length );
 			}
 
 			// Processes background styles.
