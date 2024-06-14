@@ -52,8 +52,11 @@ describe( 'downloadBlob', () => {
 	beforeEach( () => {
 		// Can't seem to spy on these static methods. They are `undefined`.
 		// Possibly overwritten: https://github.com/WordPress/gutenberg/blob/trunk/packages/jest-preset-default/scripts/setup-globals.js#L5
-		window.URL.createObjectURL = createObjectURL;
-		window.URL.revokeObjectURL = revokeObjectURL;
+		// @ts-expect-error This is not a valid URL object.
+		window.URL = {
+			createObjectURL,
+			revokeObjectURL,
+		};
 	} );
 
 	afterAll( () => {
