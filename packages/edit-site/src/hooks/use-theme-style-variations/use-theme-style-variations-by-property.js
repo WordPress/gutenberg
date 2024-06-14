@@ -73,7 +73,7 @@ export function useCurrentMergeThemeStyleVariationsWithUserConfig( {
 	return useMemo( () => {
 		const clonedBaseVariation = cloneDeep( baseVariation );
 
-		// Get user variation and remove the color settings.
+		// Get user variation and remove the settings for the given property.
 		const userVariation = removePropertyFromObject(
 			clonedBaseVariation,
 			property
