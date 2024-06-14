@@ -172,11 +172,10 @@ export default function BlockTools( {
 
 				// The region is provivided by the editor, not the block-editor.
 				// We should send focus to the region if one is available to reuse the
-				// same interface for navigating landmarks.
-				const editorRegion = editorCanvas?.closest( '[role="region"]' );
-
-				// If no region is available, use the canvas instead.
-				const focusableWrapper = editorRegion || editorCanvas;
+				// same interface for navigating landmarks. If no region is available,
+				// use the canvas instead.
+				const focusableWrapper =
+					editorCanvas?.closest( '[role="region"]' ) ?? editorCanvas;
 
 				focusableWrapper.focus();
 			}
