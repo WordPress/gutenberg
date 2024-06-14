@@ -7,7 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { Platform, useRef, useCallback, forwardRef } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import {
 	pasteHandler,
 	children as childrenSource,
@@ -24,7 +24,6 @@ import {
 	create,
 	split,
 	toHTMLString,
-	slice,
 } from '@wordpress/rich-text';
 import { isURL } from '@wordpress/url';
 
@@ -46,6 +45,8 @@ import EmbedHandlerPicker from './embed-handler-picker';
 import { Content } from './content';
 import RichText from './native';
 import { withDeprecations } from './with-deprecations';
+import { findSelection } from './event-listeners/input-rules';
+import { START_OF_SELECTED_AREA } from '../../utils/selection';
 
 const classes = 'block-editor-rich-text__editable';
 
@@ -104,6 +105,7 @@ export function RichTextWrapper(
 	providedRef
 ) {
 	const instanceId = useInstanceId( RichTextWrapper );
+	const registry = useRegistry();
 
 	identifier = identifier || instanceId;
 
@@ -502,7 +504,7 @@ export function RichTextWrapper(
 	);
 
 	const inputRule = useCallback(
-		( value, valueToFormat ) => {
+		( value ) => {
 			if ( ! onReplace ) {
 				return;
 			}
@@ -518,7 +520,7 @@ export function RichTextWrapper(
 				return;
 			}
 
-			const trimmedTextBefore = text.slice( 0, startPosition ).trim();
+			const trimmedTextBefore = text.slice( 0, start ).trim();
 			const prefixTransforms = getBlockTransforms( 'from' ).filter(
 				( { type } ) => type === 'prefix'
 			);
@@ -533,15 +535,18 @@ export function RichTextWrapper(
 				return;
 			}
 
-			const content = valueToFormat(
-				slice( value, startPosition, text.length )
-			);
+			const content = toHTMLString( {
+				value: insert( value, START_OF_SELECTED_AREA, 0, start ),
+			} );
 			const block = transformation.transform( content );
-
+			const currentSelection = findSelection( [ block ] );
 			onReplace( [ block ] );
-			__unstableMarkAutomaticChange();
+			selectionChange( ...currentSelection );
+			registry
+				.dispatch( blockEditorStore )
+				.__unstableMarkAutomaticChange();
 		},
-		[ onReplace, __unstableMarkAutomaticChange ]
+		[ onReplace, start, selectionChange, registry ]
 	);
 
 	const mergedRef = useMergeRefs( [ providedRef, fallbackRef ] );
