@@ -1,7 +1,6 @@
-/**
- * @type {Record<string, File|undefined>}
- */
-const cache = {};
+type BlobPart = BufferSource | Blob | string;
+
+const cache: Record< string, File > = {};
 
 /**
  * Create a blob URL from a file.
@@ -10,7 +9,7 @@ const cache = {};
  *
  * @return {string} The blob URL.
  */
-export function createBlobURL( file ) {
+export function createBlobURL( file: File ): string {
 	const url = window.URL.createObjectURL( file );
 
 	cache[ url ] = file;
@@ -27,7 +26,7 @@ export function createBlobURL( file ) {
  *
  * @return {File|undefined} The file for the blob URL.
  */
-export function getBlobByURL( url ) {
+export function getBlobByURL( url: string ): File | undefined {
 	return cache[ url ];
 }
 
@@ -40,7 +39,7 @@ export function getBlobByURL( url ) {
  *
  * @return {string|undefined} The blob type.
  */
-export function getBlobTypeByURL( url ) {
+export function getBlobTypeByURL( url: string ): string | undefined {
 	return getBlobByURL( url )?.type.split( '/' )[ 0 ]; // 0: media type , 1: file extension eg ( type: 'image/jpeg' ).
 }
 
@@ -49,7 +48,7 @@ export function getBlobTypeByURL( url ) {
  *
  * @param {string} url The blob URL.
  */
-export function revokeBlobURL( url ) {
+export function revokeBlobURL( url: string ): void {
 	if ( cache[ url ] ) {
 		window.URL.revokeObjectURL( url );
 	}
@@ -64,7 +63,7 @@ export function revokeBlobURL( url ) {
  *
  * @return {boolean} Is the url a blob url?
  */
-export function isBlobURL( url ) {
+export function isBlobURL( url: string | undefined ): boolean {
 	if ( ! url || ! url.indexOf ) {
 		return false;
 	}
@@ -94,7 +93,11 @@ export function isBlobURL( url ) {
  * @param {BlobPart} content     File content (BufferSource | Blob | string).
  * @param {string}   contentType (Optional) File mime type. Default is `''`.
  */
-export function downloadBlob( filename, content, contentType = '' ) {
+export function downloadBlob(
+	filename: string,
+	content: BlobPart,
+	contentType: string = ''
+): void {
 	if ( ! filename || ! content ) {
 		return;
 	}
