@@ -245,6 +245,7 @@ function useDropZoneWithValidation( {
 	onDragEnter,
 	onDragLeave,
 	onDrop,
+	color,
 } ) {
 	const { getDraggedBlockClientIds } = useSelect( blockEditorStore );
 	return useDropZone( {
