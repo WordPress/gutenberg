@@ -15,8 +15,8 @@ import PostPanelRow from '../post-panel-row';
 import { useAuthorsQuery } from './hook';
 
 function PostAuthorToggle( { isOpen, onClick } ) {
-	const { postAuthor } = useAuthorsQuery();
-	const authorName = postAuthor?.name || '';
+	const { firstAuthor, postAuthor } = useAuthorsQuery();
+	const authorName = postAuthor?.name || firstAuthor.name;
 	return (
 		<Button
 			size="compact"

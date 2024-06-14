@@ -59,5 +59,7 @@ export function useAuthorsQuery( search ) {
 		return fetchedAuthors;
 	}, [ authors, postAuthor ] );
 
-	return { authorId, authorOptions, postAuthor };
+	const firstAuthor = authors && authors.length > 0 ? authors[ 0 ] : '';
+
+	return { firstAuthor, authorId, authorOptions, postAuthor };
 }
