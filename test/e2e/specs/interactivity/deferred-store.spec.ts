@@ -21,7 +21,9 @@ test.describe( 'deferred store', () => {
 	} ) => {
 		const resultInput = page.getByTestId( 'result' );
 		await expect( resultInput ).toHaveText( '' );
-		window.dispatchEvent( new Event( '_test_proceed_' ) );
+		await page.evaluate( () => {
+			window.dispatchEvent( new Event( '_test_proceed_' ) );
+		} );
 		await expect( resultInput ).toHaveText( 'Hello, world!' );
 	} );
 
@@ -32,7 +34,9 @@ test.describe( 'deferred store', () => {
 	} ) => {
 		const resultInput = page.getByTestId( 'result-getter' );
 		await expect( resultInput ).toHaveText( '' );
-		window.dispatchEvent( new Event( '_test_proceed_' ) );
+		await page.evaluate( () => {
+			window.dispatchEvent( new Event( '_test_proceed_' ) );
+		} );
 		await expect( resultInput ).toHaveText( 'Hello, world!' );
 	} );
 } );
