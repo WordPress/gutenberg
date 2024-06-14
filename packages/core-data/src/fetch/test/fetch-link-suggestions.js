@@ -5,8 +5,6 @@ import {
 	default as fetchLinkSuggestions,
 	sortResults,
 	tokenize,
-	getTermFrequencies,
-	getCosineSimilarity,
 } from '../fetch-link-suggestions';
 
 jest.mock( '@wordpress/api-fetch', () =>
@@ -354,13 +352,27 @@ describe( 'sortResults', () => {
 			},
 			{
 				id: 4,
+				title: 'Tips for travel with a young baby',
+				url: 'http://wordpress.local/young-baby-tips/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 5,
+				title: '', // Test that empty titles don't cause an error.
+				url: 'http://wordpress.local/420/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 6,
 				title: 'City Guides',
 				url: 'http://wordpress.local/city-guides/',
 				type: 'category',
 				kind: 'taxonomy',
 			},
 			{
-				id: 5,
+				id: 7,
 				title: 'Travel Tips',
 				url: 'http://wordpress.local/travel-tips/',
 				type: 'category',
@@ -371,12 +383,14 @@ describe( 'sortResults', () => {
 			( result ) => result.id
 		);
 		expect( order ).toEqual( [
-			5, // contains: travel, tips
+			7, // exact match
+			4, // contains: travel, tips
 			3, // contains: travel
 			// same order as input:
 			1,
 			2,
-			4,
+			5,
+			6,
 		] );
 	} );
 } );
@@ -395,51 +409,5 @@ describe( 'tokenize', () => {
 			'こんにちは',
 			'世界',
 		] );
-	} );
-} );
-
-describe( 'getTermFrequencies', () => {
-	it( 'returns empty object for empty terms', () => {
-		expect( getTermFrequencies( [] ) ).toEqual( {} );
-	} );
-
-	it( 'counts term frequencies', () => {
-		const terms = [ 'hello', 'world', 'hello', 'world', 'world' ];
-		expect( getTermFrequencies( terms ) ).toEqual( {
-			hello: 2,
-			world: 3,
-		} );
-	} );
-} );
-
-describe( 'getCosineSimilarity', () => {
-	it( 'returns 0 for empty vectors', () => {
-		const a = {};
-		const b = {};
-		expect( getCosineSimilarity( a, b ) ).toBe( 0 );
-	} );
-
-	test( 'identical vectors', () => {
-		const a = { hello: 2, world: 3 };
-		const b = { hello: 2, world: 3 };
-		expect( getCosineSimilarity( a, b ) ).toBeCloseTo( 1, 2 );
-	} );
-
-	test( 'unrelated vectors', () => {
-		const a = { hello: 2, world: 3 };
-		const b = { goodbye: 1 };
-		expect( getCosineSimilarity( a, b ) ).toBeCloseTo( 0, 2 );
-	} );
-
-	test( 'similar vectors', () => {
-		const a = { hello: 2, world: 3 };
-		const b = { hello: 1, world: 1 };
-		expect( getCosineSimilarity( a, b ) ).toBeCloseTo( 0.98, 2 );
-	} );
-
-	test( 'dissimilar vectors', () => {
-		const a = { hello: 2, world: 3 };
-		const b = { goodbye: 1, world: 1 };
-		expect( getCosineSimilarity( a, b ) ).toBeCloseTo( 0.59, 2 );
 	} );
 } );

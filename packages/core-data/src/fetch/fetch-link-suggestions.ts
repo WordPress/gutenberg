@@ -256,32 +256,34 @@ export default async function fetchLinkSuggestions(
  * a taxonomy title might be more relevant than a post title, but by default taxonomy results will
  * be ordered after all the (potentially irrelevant) post results.
  *
- * We use cosine similarity to determine relevance. This is a common technique used in information
- * retrieval to determine how similar two documents are. In this case, we're treating the search
- * query as a document and the title of the search result as another document.
+ * We sort by scoring each result, where the score is the number of tokens in the title that are
+ * also in the search query, divided by the total number of tokens in the title. This gives us a
+ * score between 0 and 1, where 1 is a perfect match.
  *
  * @param results
  * @param search
  */
 export function sortResults( results: SearchResult[], search: string ) {
-	const searchTerms = tokenize( search );
-	const searchTermFrequencies = getTermFrequencies( searchTerms );
+	const searchTokens = new Set( tokenize( search ) );
 
 	const scores = {};
 	for ( const result of results ) {
-		const titleTerms = tokenize( result.title );
-		const titleTermFrequencies = getTermFrequencies( titleTerms );
-		scores[ result.id ] = getCosineSimilarity(
-			searchTermFrequencies,
-			titleTermFrequencies
-		);
+		if ( result.title ) {
+			const titleTokens = tokenize( result.title );
+			const matchingTokens = titleTokens.filter( ( token ) =>
+				searchTokens.has( token )
+			);
+			scores[ result.id ] = matchingTokens.length / titleTokens.length;
+		} else {
+			scores[ result.id ] = 0;
+		}
 	}
 
 	return results.sort( ( a, b ) => scores[ b.id ] - scores[ a.id ] );
 }
 
 /**
- * Turns text into an array of tokens.
+ * Turns text into an array of tokens, with whitespace and punctuation removed.
  *
  * For example, `"I'm having a ball."` becomes `[ "im", "having", "a", "ball" ]`.
  *
@@ -291,69 +293,4 @@ export function tokenize( text: string ): string[] {
 	// \p{L} matches any kind of letter from any language.
 	// \p{N} matches any kind of numeric character.
 	return text.toLowerCase().match( /[\p{L}\p{N}]+/gu ) || [];
-}
-
-/**
- * Returns a map of term frequencies.
- *
- * For example "the cat in the hat" becomes `{ the: 2, cat: 1, in: 1, hat: 1 }`.
- *
- * The map can be interpreted as a vector in a multi-dimensional space, where
- * each dimension corresponds to a unique word, and the value of the dimension
- * is the frequency of that word.
- *
- * @param terms
- */
-export function getTermFrequencies( terms: string[] ) {
-	const frequencies = {};
-	for ( const term of terms ) {
-		frequencies[ term ] = ( frequencies[ term ] ?? 0 ) + 1;
-	}
-	return frequencies;
-}
-
-/**
- * Returns the cosine similarity between two vectors.
- *
- * Cosine similarity measures the cosine of the angle between two vectors, which gives an
- * indication of how similar the two vectors are.
- *
- * See https://en.wikipedia.org/wiki/Cosine_similarity for the mathematical definition.
- *
- * Cosine similarity ranges from -1 to 1:
- *
- * - A cosine similarity of 1 indicates that the two vectors are identical.
- * - A cosine similarity of 0 indicates that the two vectors are orthogonal (no similarity).
- * - A cosine similarity of -1 indicates that the two vectors are diametrically opposed.
- *
- * In the context of text similarity, a higher cosine similarity indicates that the documents share
- * more common terms and are therefore more similar in content.
- *
- * @param vector1
- * @param vector2
- */
-export function getCosineSimilarity(
-	vector1: Record< string, number >,
-	vector2: Record< string, number >
-) {
-	if (
-		Object.keys( vector1 ).length === 0 ||
-		Object.keys( vector2 ).length === 0
-	) {
-		return 0;
-	}
-	const dotProduct = Object.keys( vector1 ).reduce( ( sum, term ) => {
-		return sum + vector1[ term ] * ( vector2[ term ] ?? 0 );
-	}, 0 );
-	const magnitute1 = Math.sqrt(
-		Object.values( vector1 ).reduce( ( sum, value ) => {
-			return sum + value ** 2;
-		}, 0 )
-	);
-	const magnitute2 = Math.sqrt(
-		Object.values( vector2 ).reduce( ( sum, value ) => {
-			return sum + value ** 2;
-		}, 0 )
-	);
-	return dotProduct / ( magnitute1 * magnitute2 );
 }
