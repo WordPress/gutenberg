@@ -201,6 +201,7 @@ export default function ShadowsEditPanel() {
 						setIsConfirmDialogVisible( false );
 					} }
 					confirmButtonText={ __( 'Delete' ) }
+					size="medium"
 				>
 					{ sprintf(
 						// translators: %s: name of the shadow
