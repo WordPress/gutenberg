@@ -37,7 +37,7 @@ export default function CollabSidebar() {
 		};
 	}, [] );
 
-	// Check if the experimental flag is enabled and thread count is greater than zero.
+	// Check if the experimental flag is enabled.
 	if ( ! isBlockCommentExperimentEnabled ) {
 		return null; // or maybe return some message indicating no threads are available.
 	}
