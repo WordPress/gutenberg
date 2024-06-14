@@ -7,7 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { Platform, useRef, useCallback, forwardRef } from '@wordpress/element';
-import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	pasteHandler,
 	children as childrenSource,
@@ -105,7 +105,6 @@ export function RichTextWrapper(
 	providedRef
 ) {
 	const instanceId = useInstanceId( RichTextWrapper );
-	const registry = useRegistry();
 
 	identifier = identifier || instanceId;
 
@@ -542,11 +541,9 @@ export function RichTextWrapper(
 			const currentSelection = findSelection( [ block ] );
 			onReplace( [ block ] );
 			selectionChange( ...currentSelection );
-			registry
-				.dispatch( blockEditorStore )
-				.__unstableMarkAutomaticChange();
+			__unstableMarkAutomaticChange();
 		},
-		[ onReplace, start, selectionChange, registry ]
+		[ onReplace, start, selectionChange, __unstableMarkAutomaticChange ]
 	);
 
 	const mergedRef = useMergeRefs( [ providedRef, fallbackRef ] );
