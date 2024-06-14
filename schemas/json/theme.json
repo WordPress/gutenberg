@@ -2288,6 +2288,10 @@
 				},
 				{
 					"properties": {
+						"title": {
+							"type": "string",
+							"description": "Style variation name."
+						},
 						"blockTypes": {
 							"type": "array",
 							"items": {
