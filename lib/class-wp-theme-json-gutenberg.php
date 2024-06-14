@@ -3331,7 +3331,8 @@ class WP_Theme_JSON_Gutenberg {
 		$theme_json = static::sanitize( $theme_json, $valid_block_names, $valid_element_names, $valid_variations );
 
 		$blocks_metadata = static::get_blocks_metadata();
-		$style_nodes     = static::get_style_nodes( $theme_json, $blocks_metadata );
+		$style_options   = array( 'block_style_variations' => true ); // Allow variations data.
+		$style_nodes     = static::get_style_nodes( $theme_json, $blocks_metadata, $style_options );
 
 		foreach ( $style_nodes as $metadata ) {
 			$input = _wp_array_get( $theme_json, $metadata['path'], array() );
