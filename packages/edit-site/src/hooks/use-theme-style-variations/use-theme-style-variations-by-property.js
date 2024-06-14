@@ -89,7 +89,7 @@ export function useCurrentMergeThemeStyleVariationsWithUserConfig( {
 			} );
 
 		return [ userVariation, ...variationsWithSinglePropertyAndBase ];
-	}, [ baseVariation, variationsFromTheme ] );
+	}, [ property, baseVariation, variationsFromTheme ] );
 }
 
 /**
