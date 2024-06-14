@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -96,7 +96,7 @@ function GridVisualizerGrid( { clientId, gridElement } ) {
 
 	return (
 		<BlockPopoverCover
-			className={ classnames( 'block-editor-grid-visualizer', {
+			className={ clsx( 'block-editor-grid-visualizer', {
 				'is-dropping-allowed': isDroppingAllowed,
 			} ) }
 			clientId={ clientId }
@@ -229,12 +229,9 @@ function GridVisualizerCell( {
 		<div className="block-editor-grid-visualizer__cell">
 			<div
 				ref={ ref }
-				className={ classnames(
-					'block-editor-grid-visualizer__drop-zone',
-					{
-						'is-highlighted': isHighlighted,
-					}
-				) }
+				className={ clsx( 'block-editor-grid-visualizer__drop-zone', {
+					'is-highlighted': isHighlighted,
+				} ) }
 			/>
 		</div>
 	);
