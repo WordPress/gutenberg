@@ -164,7 +164,7 @@ test.describe( 'Post publish panel', () => {
 		await expect( publishPanel ).toBeVisible();
 
 		const postMetaPanel = publishPanel.locator(
-			'.entities-saved-states__post-meta'
+			'.entities-saved-states__changes'
 		);
 
 		await expect( postMetaPanel ).toBeVisible();
