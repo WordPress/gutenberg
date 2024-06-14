@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-### Internal
+###Internal
 
 -   Refactor to TypeScript ([#62586](https://github.com/WordPress/gutenberg/pull/62586)).
 
