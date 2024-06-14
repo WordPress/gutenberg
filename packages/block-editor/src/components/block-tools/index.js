@@ -161,14 +161,23 @@ export default function BlockTools( {
 			) {
 				event.preventDefault();
 				clearSelectedBlock();
-
-				// If we're iframed, we need to use the iframe instead of the contentRef
+				// If there are multiple editors, we need to find the iframe that contains our contentRef to make sure
+				// we're focusing the region that contains this editor.
 				const editorCanvas =
-					__unstableContentRef.current.ownerDocument !== document
-						? document.querySelector(
-								'iframe[name="editor-canvas"]'
-						  )
-						: __unstableContentRef.current;
+					document
+						.querySelectorAll( 'iframe[name="editor-canvas"]' )
+						.values()
+						.find( ( iframe ) => {
+							// Find the iframe that contains our contentRef
+							const iframeDocument =
+								iframe.contentDocument ||
+								iframe.contentWindow.document;
+
+							return (
+								iframeDocument ===
+								__unstableContentRef.current.ownerDocument
+							);
+						} ) ?? __unstableContentRef.current;
 
 				// The region is provivided by the editor, not the block-editor.
 				// We should send focus to the region if one is available to reuse the
