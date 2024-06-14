@@ -1712,7 +1712,11 @@ _Type_
 
 ### VisualEditorGlobalKeyboardShortcuts
 
-Undocumented declaration.
+Represents the VisualEditorGlobalKeyboardShortcuts component. This component is responsible for handling global keyboard shortcuts in the editor.
+
+_Type_
+
+-   `EditorKeyboardShortcuts`
 
 ### Warning
 

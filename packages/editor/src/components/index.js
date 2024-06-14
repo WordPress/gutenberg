@@ -105,6 +105,13 @@ export { default as CharacterCount } from './character-count';
 export { default as EditorProvider } from './provider';
 
 export * from './deprecated';
+
+/**
+ * Represents the VisualEditorGlobalKeyboardShortcuts component.
+ * This component is responsible for handling global keyboard shortcuts in the editor.
+ *
+ * @type {EditorKeyboardShortcuts}
+ */
 export const VisualEditorGlobalKeyboardShortcuts = EditorKeyboardShortcuts;
 
 /**
