@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Refactor to TypeScript ([#62557](https://github.com/WordPress/gutenberg/pull/62557)).
+
 ## 3.0.0 (2024-05-31)
 
 ### Breaking Changes
@@ -147,3 +151,4 @@
 ## 1.0.0 (2020-02-04)
 
 Initial release.
+

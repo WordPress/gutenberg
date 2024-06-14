@@ -35,6 +35,10 @@
 
 .editor-post-card-panel__icon.is-sync {
 	fill: var(--wp-block-synced-color);
+
+	& + .editor-post-card-panel__title {
+		color: var(--wp-block-synced-color);
+	}
 }
 
 .editor-post-card-panel__title-badge {

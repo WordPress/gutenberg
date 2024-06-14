@@ -466,7 +466,7 @@ function getCurrentBranch() {
  */
 async function reportGhUnavailable() {
 	console.log(
-		'Github CLI is not setup. This script will not be able to automatically'
+		'GitHub CLI is not setup. This script will not be able to automatically'
 	);
 	console.log(
 		'comment on the processed PRs and remove the backport label from them.'
