@@ -3,18 +3,16 @@
  */
 import { store, getContext } from '@wordpress/interactivity';
 
-document.addEventListener( 'DOMContentLoaded', () => {
-	setTimeout( () => {
-		store( 'test/deferred-store', {
-			state: {
-				reversedText() {
-					return [ ...getContext().text ].reverse().join( '' );
-				},
-
-				get reversedTextGetter() {
-					return [ ...getContext().text ].reverse().join( '' );
-				},
+globalThis.addEventListener( '_test_proceed_', () => {
+	store( 'test/deferred-store', {
+		state: {
+			reversedText() {
+				return [ ...getContext().text ].reverse().join( '' );
 			},
-		} );
-	}, 100 );
+
+			get reversedTextGetter() {
+				return [ ...getContext().text ].reverse().join( '' );
+			},
+		},
+	} );
 } );
