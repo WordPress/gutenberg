@@ -18,7 +18,7 @@
 }
 
 .is-focusing-regions {
-	&:focus::after {
+	[role="region"]:focus::after {
 		position: absolute;
 		top: 0;
 		left: 0;
