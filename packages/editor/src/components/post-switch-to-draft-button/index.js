@@ -77,7 +77,6 @@ export default function PostSwitchToDraftButton() {
 				onConfirm={ handleConfirm }
 				onCancel={ () => setShowConfirmDialog( false ) }
 				confirmButtonText={ confirmButtonText }
-				size="medium"
 			>
 				{ alertMessage }
 			</ConfirmDialog>
