@@ -287,7 +287,7 @@ export function sortResults( results: SearchResult[], search: string ) {
  *
  * @param text
  */
-function tokenize( text: string ): string[] {
+export function tokenize( text: string ): string[] {
 	// \p{L} matches any kind of letter from any language.
 	// \p{N} matches any kind of numeric character.
 	return text.toLowerCase().match( /[\p{L}\p{N}]+/gu ) || [];
@@ -304,7 +304,7 @@ function tokenize( text: string ): string[] {
  *
  * @param terms
  */
-function getTermFrequencies( terms: string[] ) {
+export function getTermFrequencies( terms: string[] ) {
 	const frequencies = {};
 	for ( const term of terms ) {
 		frequencies[ term ] = ( frequencies[ term ] ?? 0 ) + 1;
@@ -332,10 +332,16 @@ function getTermFrequencies( terms: string[] ) {
  * @param vector1
  * @param vector2
  */
-function getCosineSimilarity(
+export function getCosineSimilarity(
 	vector1: Record< string, number >,
 	vector2: Record< string, number >
 ) {
+	if (
+		Object.keys( vector1 ).length === 0 ||
+		Object.keys( vector2 ).length === 0
+	) {
+		return 0;
+	}
 	const dotProduct = Object.keys( vector1 ).reduce( ( sum, term ) => {
 		return sum + vector1[ term ] * ( vector2[ term ] ?? 0 );
 	}, 0 );

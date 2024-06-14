@@ -4,6 +4,9 @@
 import {
 	default as fetchLinkSuggestions,
 	sortResults,
+	tokenize,
+	getTermFrequencies,
+	getCosineSimilarity,
 } from '../fetch-link-suggestions';
 
 jest.mock( '@wordpress/api-fetch', () =>
@@ -322,6 +325,10 @@ describe( 'fetchLinkSuggestions', () => {
 } );
 
 describe( 'sortResults', () => {
+	it( 'returns empty array for empty results', () => {
+		expect( sortResults( [], '' ) ).toEqual( [] );
+	} );
+
 	it( 'orders results', () => {
 		const results = [
 			{
@@ -371,5 +378,68 @@ describe( 'sortResults', () => {
 			2,
 			4,
 		] );
+	} );
+} );
+
+describe( 'tokenize', () => {
+	it( 'returns empty array for empty string', () => {
+		expect( tokenize( '' ) ).toEqual( [] );
+	} );
+
+	it( 'tokenizes a string', () => {
+		expect( tokenize( 'Hello, world!' ) ).toEqual( [ 'hello', 'world' ] );
+	} );
+
+	it( 'tokenizes non latin languages', () => {
+		expect( tokenize( 'こんにちは、世界！' ) ).toEqual( [
+			'こんにちは',
+			'世界',
+		] );
+	} );
+} );
+
+describe( 'getTermFrequencies', () => {
+	it( 'returns empty object for empty terms', () => {
+		expect( getTermFrequencies( [] ) ).toEqual( {} );
+	} );
+
+	it( 'counts term frequencies', () => {
+		const terms = [ 'hello', 'world', 'hello', 'world', 'world' ];
+		expect( getTermFrequencies( terms ) ).toEqual( {
+			hello: 2,
+			world: 3,
+		} );
+	} );
+} );
+
+describe( 'getCosineSimilarity', () => {
+	it( 'returns 0 for empty vectors', () => {
+		const a = {};
+		const b = {};
+		expect( getCosineSimilarity( a, b ) ).toBe( 0 );
+	} );
+
+	test( 'identical vectors', () => {
+		const a = { hello: 2, world: 3 };
+		const b = { hello: 2, world: 3 };
+		expect( getCosineSimilarity( a, b ) ).toBeCloseTo( 1, 2 );
+	} );
+
+	test( 'unrelated vectors', () => {
+		const a = { hello: 2, world: 3 };
+		const b = { goodbye: 1 };
+		expect( getCosineSimilarity( a, b ) ).toBeCloseTo( 0, 2 );
+	} );
+
+	test( 'similar vectors', () => {
+		const a = { hello: 2, world: 3 };
+		const b = { hello: 1, world: 1 };
+		expect( getCosineSimilarity( a, b ) ).toBeCloseTo( 0.98, 2 );
+	} );
+
+	test( 'dissimilar vectors', () => {
+		const a = { hello: 2, world: 3 };
+		const b = { goodbye: 1, world: 1 };
+		expect( getCosineSimilarity( a, b ) ).toBeCloseTo( 0.59, 2 );
 	} );
 } );
