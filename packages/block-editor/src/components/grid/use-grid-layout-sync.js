@@ -40,7 +40,7 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 			for ( const clientId of blockOrder ) {
 				const attributes = getBlockAttributes( clientId );
 				const { columnStart, rowStart, columnSpan, rowSpan } =
-					attributes.style?.layout;
+					attributes.style?.layout || {};
 				if ( ! columnStart || ! rowStart ) {
 					continue;
 				}
@@ -58,7 +58,7 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 			for ( const clientId of blockOrder ) {
 				const attributes = getBlockAttributes( clientId );
 				const { columnStart, rowStart, columnSpan, rowSpan } =
-					attributes.style?.layout;
+					attributes.style?.layout || {};
 				if ( columnStart && rowStart ) {
 					continue;
 				}
