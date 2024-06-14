@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, forwardRef } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __experimentalUseDropZone as useDropZone } from '@wordpress/compose';
 
@@ -18,13 +18,17 @@ import BlockPopoverCover from '../block-popover/cover';
 import { getComputedCSS, range, GridRect, getGridItemRect } from './utils';
 import { store as blockEditorStore } from '../../store';
 
-export function GridVisualizer( { clientId } ) {
+export function GridVisualizer( { clientId, contentRef } ) {
 	const gridElement = useBlockElement( clientId );
 	if ( ! gridElement ) {
 		return null;
 	}
 	return (
-		<GridVisualizerGrid clientId={ clientId } gridElement={ gridElement } />
+		<GridVisualizerGrid
+			clientId={ clientId }
+			gridElement={ gridElement }
+			ref={ contentRef }
+		/>
 	);
 }
 
@@ -53,7 +57,7 @@ function getGridInfo( gridElement ) {
 	};
 }
 
-function GridVisualizerGrid( { clientId, gridElement } ) {
+const GridVisualizerGrid = forwardRef( ( { clientId, gridElement }, ref ) => {
 	const [ gridInfo, setGridInfo ] = useState( () =>
 		getGridInfo( gridElement )
 	);
@@ -103,6 +107,7 @@ function GridVisualizerGrid( { clientId, gridElement } ) {
 			__unstablePopoverSlot="block-toolbar"
 		>
 			<div
+				ref={ ref }
 				className="block-editor-grid-visualizer__grid"
 				style={ gridInfo.style }
 			>
@@ -196,7 +201,7 @@ function GridVisualizerGrid( { clientId, gridElement } ) {
 			</div>
 		</BlockPopoverCover>
 	);
-}
+} );
 
 function GridVisualizerCell( {
 	isHighlighted,

@@ -65,7 +65,20 @@ export function getComputedCSS( element, property ) {
 		.getPropertyValue( property );
 }
 
-function getGridTracks( template, gap ) {
+/**
+ * Given a grid-template-columns or grid-template-rows CSS property value, gets the start and end
+ * position in pixels of each grid track.
+ *
+ * https://css-tricks.com/snippets/css/complete-guide-grid/#aa-grid-track
+ *
+ * @param {string} template The grid-template-columns or grid-template-rows CSS property value.
+ *                          Only supports fixed sizes in pixels.
+ * @param {number} gap      The gap between grid tracks in pixels.
+ *
+ * @return {Array<{start: number, end: number}>} An array of objects with the start and end
+ *                                               position in pixels of each grid track.
+ */
+export function getGridTracks( template, gap ) {
 	const tracks = [];
 	for ( const size of template.split( ' ' ) ) {
 		const previousTrack = tracks[ tracks.length - 1 ];
@@ -76,7 +89,22 @@ function getGridTracks( template, gap ) {
 	return tracks;
 }
 
-function getClosestTrack( tracks, position, edge = 'start' ) {
+/**
+ * Given an array of grid tracks and a position in pixels, gets the index of the closest track to
+ * that position.
+ *
+ * https://css-tricks.com/snippets/css/complete-guide-grid/#aa-grid-track
+ *
+ * @param {Array<{start: number, end: number}>} tracks   An array of objects with the start and end
+ *                                                       position in pixels of each grid track.
+ * @param {number}                              position The position in pixels.
+ * @param {string}                              edge     The edge of the track to compare the
+ *                                                       position to. Either 'start' or 'end'.
+ *
+ * @return {number} The index of the closest track to the position. 0-based, unlike CSS grid which
+ *                  is 1-based.
+ */
+export function getClosestTrack( tracks, position, edge = 'start' ) {
 	return tracks.reduce(
 		( closest, track, index ) =>
 			Math.abs( track[ edge ] - position ) <
