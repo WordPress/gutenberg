@@ -210,7 +210,7 @@ function ListViewBlock( {
 			} = getBlocksToUpdate();
 
 			// Don't update the selection if the blocks cannot be deleted.
-			if ( ! canRemoveBlocks( blocksToDelete, firstBlockRootClientId ) ) {
+			if ( ! canRemoveBlocks( blocksToDelete ) ) {
 				return;
 			}
 
