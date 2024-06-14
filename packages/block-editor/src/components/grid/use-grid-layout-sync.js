@@ -93,13 +93,16 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 			for ( const clientId of blockOrder ) {
 				const attributes = getBlockAttributes( clientId );
 				const { columnStart, rowStart, ...layout } =
-					attributes.style?.layout;
-				updates[ clientId ] = {
-					style: {
-						...attributes.style,
-						layout,
-					},
-				};
+					attributes.style?.layout || {};
+				// Only update attributes if columnStart or rowStart are set.
+				if ( columnStart || rowStart ) {
+					updates[ clientId ] = {
+						style: {
+							...attributes.style,
+							layout,
+						},
+					};
+				}
 			}
 		}
 

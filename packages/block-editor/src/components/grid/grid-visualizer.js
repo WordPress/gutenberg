@@ -48,6 +48,7 @@ function getGridInfo( gridElement ) {
 		numColumns,
 		numRows,
 		numItems,
+		currentColor: getComputedCSS( gridElement, 'color' ),
 		style: {
 			gridTemplateColumns,
 			gridTemplateRows,
@@ -195,6 +196,7 @@ const GridVisualizerGrid = forwardRef( ( { clientId, gridElement }, ref ) => {
 								} );
 								setHighlightedRect( null );
 							} }
+							color={ gridInfo.currentColor }
 						/>
 					) )
 				) }
@@ -209,9 +211,9 @@ function GridVisualizerCell( {
 	onDragEnter,
 	onDragLeave,
 	onDrop,
+	color,
 } ) {
 	const { getDraggedBlockClientIds } = useSelect( blockEditorStore );
-
 	const ref = useDropZone( {
 		onDragEnter() {
 			const [ srcClientId ] = getDraggedBlockClientIds();
@@ -231,7 +233,12 @@ function GridVisualizerCell( {
 	} );
 
 	return (
-		<div className="block-editor-grid-visualizer__cell">
+		<div
+			className="block-editor-grid-visualizer__cell"
+			style={ {
+				boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${ color } 20%, #0000)`,
+			} }
+		>
 			<div
 				ref={ ref }
 				className={ clsx( 'block-editor-grid-visualizer__drop-zone', {
