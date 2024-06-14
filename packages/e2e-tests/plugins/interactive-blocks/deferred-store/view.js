@@ -3,8 +3,9 @@
  */
 import { store, getContext } from '@wordpress/interactivity';
 
-document.addEventListener( 'DOMContentLoaded', () => {
-	setTimeout( () => {
+window.addEventListener(
+	'_test_proceed_',
+	() => {
 		store( 'test/deferred-store', {
 			state: {
 				reversedText() {
@@ -16,5 +17,6 @@ document.addEventListener( 'DOMContentLoaded', () => {
 				},
 			},
 		} );
-	}, 100 );
-} );
+	},
+	{ once: true }
+);
