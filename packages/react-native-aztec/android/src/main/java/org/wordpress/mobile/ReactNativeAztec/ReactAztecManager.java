@@ -760,7 +760,9 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
                                 mEditText.getId(),
                                 mEditText.toHtml(mEditText.getText(), false),
                                 currentEventCount,
-                                singleCharacterHasBeenAdded ? s.charAt(start + before) : null));
+                                singleCharacterHasBeenAdded ? s.charAt(start + before) : null,
+                                mEditText.getSelectionStart(),
+                                mEditText.getSelectionStart()));
 
                 mEventDispatcher.dispatchEvent(
                         new ReactTextInputEvent(

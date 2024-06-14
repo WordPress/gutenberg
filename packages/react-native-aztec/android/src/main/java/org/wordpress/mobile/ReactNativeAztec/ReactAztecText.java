@@ -105,6 +105,8 @@ public class ReactAztecText extends AztecText {
 
         setGutenbergMode(true);
 
+        removeEndOfBufferMarkerAdder();
+
         // don't auto-focus when Aztec becomes visible.
         // Needed on rotation and multiple Aztec instances to avoid losing the exact care position.
         setFocusOnVisible(false);
