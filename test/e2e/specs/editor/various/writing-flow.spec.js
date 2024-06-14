@@ -959,7 +959,6 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 	} );
 
 	test( 'escape should set select mode and then focus the canvas', async ( {
-		editor,
 		page,
 		writingFlowUtils,
 	} ) => {
@@ -980,7 +979,9 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await page.keyboard.press( 'Escape' );
 		// The navigation button should be hidden.
 		await expect( navigationButton ).toBeHidden();
-		await expect( editor.canvas.locator( 'body' ) ).toBeFocused();
+		await expect(
+			page.getByRole( 'region', { name: 'Editor content' } )
+		).toBeFocused();
 	} );
 
 	// Checks for regressions of https://github.com/WordPress/gutenberg/issues/40091.
