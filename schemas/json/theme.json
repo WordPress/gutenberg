@@ -2700,6 +2700,10 @@
 			"type": "string",
 			"description": "Title of the global styles variation. If not defined, the file name will be used."
 		},
+		"slug": {
+			"type": "string",
+			"description": "Slug of the global styles variation. If not defined, the kebab-case title will be used."
+		},
 		"description": {
 			"type": "string",
 			"description": "Description of the global styles variation."
