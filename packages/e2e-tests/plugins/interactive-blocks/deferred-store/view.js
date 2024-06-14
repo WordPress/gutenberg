@@ -3,7 +3,7 @@
  */
 import { store, getContext } from '@wordpress/interactivity';
 
-globalThis.addEventListener(
+window.addEventListener(
 	'_test_proceed_',
 	() => {
 		store( 'test/deferred-store', {
