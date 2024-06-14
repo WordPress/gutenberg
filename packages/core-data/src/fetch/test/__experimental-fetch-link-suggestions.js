@@ -5,7 +5,7 @@ import {
 	default as fetchLinkSuggestions,
 	sortResults,
 	tokenize,
-} from '../fetch-link-suggestions';
+} from '../__experimental-fetch-link-suggestions';
 
 jest.mock( '@wordpress/api-fetch', () =>
 	jest.fn( ( { path } ) => {

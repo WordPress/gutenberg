@@ -15,7 +15,7 @@ import {
 	__experimentalGetCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
-import { fetchLinkSuggestions } from '@wordpress/core-data';
+import { __experimentalFetchLinkSuggestions as fetchLinkSuggestions } from '@wordpress/core-data';
 import {
 	registerLegacyWidgetBlock,
 	registerLegacyWidgetVariations,
