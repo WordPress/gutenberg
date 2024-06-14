@@ -198,6 +198,7 @@ function ScreenRevisions() {
 					onCancel={ () =>
 						setIsLoadingRevisionWithUnsavedChanges( false )
 					}
+					size="medium"
 				>
 					{ __(
 						'Are you sure you want to apply this revision? Any unsaved changes will be lost.'

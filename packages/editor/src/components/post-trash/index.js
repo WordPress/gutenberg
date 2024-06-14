@@ -55,6 +55,7 @@ export default function PostTrash() {
 				onConfirm={ handleConfirm }
 				onCancel={ () => setShowConfirmDialog( false ) }
 				confirmButtonText={ __( 'Move to trash' ) }
+				size="medium"
 			>
 				{ __(
 					'Are you sure you want to move this post to the trash?'
