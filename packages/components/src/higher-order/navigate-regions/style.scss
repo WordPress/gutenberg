@@ -1,34 +1,34 @@
 // Allow the position to be easily overridden to e.g. fixed.
+
+@mixin region-selection-outline {
+	outline: 4px solid $components-color-accent;
+	outline-offset: -4px;
+}
+
+@mixin region-selection-focus {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	content: "";
+	pointer-events: none;
+	@include region-selection-outline;
+	z-index: z-index(".is-focusing-regions {region} :focus::after");
+}
+
 [role="region"] {
 	position: relative;
 
 	// Handles the focus when we programatically send focus to this region
 	&.interface-interface-skeleton__content:focus-visible::after {
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		content: "";
-		pointer-events: none;
-		outline: 4px solid $components-color-accent;
-		outline-offset: -4px;
-		z-index: z-index(".is-focusing-regions {region} :focus::after");
+		@include region-selection-focus;
 	}
 }
 
 .is-focusing-regions {
 	[role="region"]:focus::after {
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		content: "";
-		pointer-events: none;
-		outline: 4px solid $components-color-accent;
-		outline-offset: -4px;
-		z-index: z-index(".is-focusing-regions {region} :focus::after");
+		@include region-selection-focus;
 	}
 	// Fixes for edge cases.
 	// Some of the regions are currently used for layout purposes as 'interface skeleton'
@@ -46,7 +46,6 @@
 	.interface-interface-skeleton__actions .editor-layout__toggle-publish-panel,
 	.interface-interface-skeleton__actions .editor-layout__toggle-entities-saved-states-panel,
 	.editor-post-publish-panel {
-		outline: 4px solid $components-color-accent;
-		outline-offset: -4px;
+		@include region-selection-outline;
 	}
 }
