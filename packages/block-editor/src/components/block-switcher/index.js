@@ -191,21 +191,14 @@ export const BlockSwitcher = ( { clientIds, disabled, isUsingBindings } ) => {
 		isTemplate,
 	} = useSelect(
 		( select ) => {
-			const {
-				getBlockRootClientId,
-				getBlocksByClientId,
-				getBlockAttributes,
-				canRemoveBlocks,
-			} = select( blockEditorStore );
+			const { getBlocksByClientId, getBlockAttributes, canRemoveBlocks } =
+				select( blockEditorStore );
 			const { getBlockStyles, getBlockType, getActiveBlockVariation } =
 				select( blocksStore );
 			const _blocks = getBlocksByClientId( clientIds );
 			if ( ! _blocks.length || _blocks.some( ( block ) => ! block ) ) {
 				return { invalidBlocks: true };
 			}
-			const rootClientId = getBlockRootClientId(
-				Array.isArray( clientIds ) ? clientIds[ 0 ] : clientIds
-			);
 			const [ { name: firstBlockName } ] = _blocks;
 			const _isSingleBlockSelected = _blocks.length === 1;
 			const blockType = getBlockType( firstBlockName );
@@ -227,7 +220,7 @@ export const BlockSwitcher = ( { clientIds, disabled, isUsingBindings } ) => {
 			}
 
 			return {
-				canRemove: canRemoveBlocks( clientIds, rootClientId ),
+				canRemove: canRemoveBlocks( clientIds ),
 				hasBlockStyles:
 					_isSingleBlockSelected &&
 					!! getBlockStyles( firstBlockName )?.length,
