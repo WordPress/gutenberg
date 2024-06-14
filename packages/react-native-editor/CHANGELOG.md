@@ -13,6 +13,7 @@ For each user feature we should also add a importance categorization label  to i
 -   [internal] Fix Inserter items list filtering [#62334]
 -   [*] Prevent hiding the keyboard when creating new list items [#62446]
 -   [*] RichText - Fix undefined onDelete callback [#62486]
+-   [**] Add support prefix transforms [#62576]
 
 ## 1.120.0
 -   [*] Prevent deleting content when backspacing in the first Paragraph block [#62069]
