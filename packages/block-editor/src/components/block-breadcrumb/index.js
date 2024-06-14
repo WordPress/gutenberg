@@ -12,6 +12,7 @@ import { chevronRightSmall, Icon } from '@wordpress/icons';
 import BlockTitle from '../block-title';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import { __unstableUseBlockRef as useBlockRef } from '../block-list/use-block-props/use-block-refs';
 
 /**
  * Block breadcrumb component, displaying the hierarchy of the current block selection as a breadcrumb.
@@ -37,6 +38,10 @@ function BlockBreadcrumb( { rootLabelText } ) {
 	}, [] );
 	const rootLabel = rootLabelText || __( 'Document' );
 
+	// We don't care about this specific ref, but this is a way
+	// to get a ref within the editor canvas so we can focus it later.
+	const blockRef = useBlockRef( clientId );
+
 	/*
 	 * Disable reason: The `list` ARIA role is redundant but
 	 * Safari+VoiceOver won't announce the list otherwise.
@@ -60,7 +65,42 @@ function BlockBreadcrumb( { rootLabelText } ) {
 					<Button
 						className="block-editor-block-breadcrumb__button"
 						variant="tertiary"
-						onClick={ clearSelectedBlock }
+						onClick={ () => {
+							// Find the block editor wrapper for the selected block
+							const blockEditor = blockRef.current?.closest(
+								'.editor-styles-wrapper'
+							);
+
+							const editorCanvas =
+								document
+									.querySelectorAll(
+										'iframe[name="editor-canvas"]'
+									)
+									.values()
+									.find( ( iframe ) => {
+										// Find the iframe that contains our contentRef
+										const iframeDocument =
+											iframe.contentDocument ||
+											iframe.contentWindow.document;
+
+										return (
+											iframeDocument ===
+											blockEditor.ownerDocument
+										);
+									} ) ?? blockEditor;
+
+							// The region is provivided by the editor, not the block-editor.
+							// We should send focus to the region if one is available to reuse the
+							// same interface for navigating landmarks. If no region is available,
+							// use the canvas instead.
+							const focusableWrapper =
+								editorCanvas?.closest( '[role="region"]' ) ??
+								editorCanvas;
+
+							clearSelectedBlock();
+
+							focusableWrapper.focus();
+						} }
 					>
 						{ rootLabel }
 					</Button>
