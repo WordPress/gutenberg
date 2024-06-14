@@ -61,7 +61,7 @@ _Parameters_
 
 _Returns_
 
--   `File|undefined`: The file for the blob URL.
+-   `File | undefined`: The file for the blob URL.
 
 ### getBlobTypeByURL
 
@@ -73,7 +73,7 @@ _Parameters_
 
 _Returns_
 
--   `string|undefined`: The blob type.
+-   `string | undefined`: The blob type.
 
 ### isBlobURL
 
@@ -81,7 +81,7 @@ Check whether a url is a blob url.
 
 _Parameters_
 
--   _url_ `string|undefined`: The URL.
+-   _url_ `string | undefined`: The URL.
 
 _Returns_
 
