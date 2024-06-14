@@ -12,5 +12,9 @@
 	"textdomain": "iframed-multiple-stylesheets",
 	"editorScript": "iframed-multiple-stylesheets-editor-script",
 	"editorStyle": "file:./editor.css",
-	"style": [ "iframed-multiple-stylesheets-style", "iframed-multiple-stylesheets-style2", "file:./style3.css" ]
+	"style": [
+		"iframed-multiple-stylesheets-style",
+		"iframed-multiple-stylesheets-style2",
+		"file:./style3.css"
+	]
 }

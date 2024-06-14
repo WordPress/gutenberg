@@ -46,6 +46,6 @@ const { state } = store( 'directive-on-document', {
 		},
 		keydownSecondHandler: () => {
 			state.keydownSecondHandler = 'yes';
-		}
-	}
+		},
+	},
 } );

@@ -34,7 +34,7 @@ const { state } = store( 'directive-on-window', {
 		},
 		init() {
 			state.isEventAttached = 'yes';
-		}
+		},
 	},
 	actions: {
 		visibilityHandler: () => {
@@ -46,6 +46,6 @@ const { state } = store( 'directive-on-window', {
 		},
 		resizeSecondHandler: () => {
 			state.resizeSecondHandler = 'yes';
-		}
-	}
+		},
+	},
 } );

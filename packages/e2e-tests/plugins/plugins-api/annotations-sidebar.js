@@ -48,15 +48,16 @@
 				el(
 					Button,
 					{
-						variant: "primary",
+						variant: 'primary',
 						onClick: () => {
 							dispatch(
 								'core/annotations'
 							).__experimentalAddAnnotation( {
 								source: 'e2e-tests',
-								blockClientId: select(
-									'core/block-editor'
-								).getBlockOrder()[ 0 ],
+								blockClientId:
+									select(
+										'core/block-editor'
+									).getBlockOrder()[ 0 ],
 								richTextIdentifier: 'content',
 								range: {
 									start: parseInt( this.state.start, 10 ),
@@ -70,7 +71,7 @@
 				el(
 					Button,
 					{
-						variant: "primary",
+						variant: 'primary',
 						onClick: () => {
 							dispatch(
 								'core/annotations'
