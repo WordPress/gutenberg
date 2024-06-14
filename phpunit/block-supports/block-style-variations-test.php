@@ -151,6 +151,7 @@ class WP_Block_Supports_Block_Style_Variations_Test extends WP_UnitTestCase {
 		);
 
 		unregister_block_style( 'core/group', 'my-variation' );
+		unregister_block_style( 'core/group', 'WithSlug' );
 
 		$this->assertSameSetsWithIndex( $group_styles, $expected );
 	}
