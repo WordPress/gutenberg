@@ -1,5 +1,35 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Paragraph block should be able to use a prefix to create a Heading block 1`] = `
+"<!-- wp:heading {"level":1} -->
+<h1 class="wp-block-heading"></h1>
+<!-- /wp:heading -->"
+`;
+
+exports[`Paragraph block should be able to use a prefix to create a List block 1`] = `
+"<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`Paragraph block should be able to use a prefix to create a Quote block 1`] = `
+"<!-- wp:quote -->
+<blockquote class="wp-block-quote"><!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph --></blockquote>
+<!-- /wp:quote -->"
+`;
+
+exports[`Paragraph block should be able to use a prefix to create a numbered List block 1`] = `
+"<!-- wp:list {"ordered":true} -->
+<ol class="wp-block-list"><!-- wp:list-item -->
+<li></li>
+<!-- /wp:list-item --></ol>
+<!-- /wp:list -->"
+`;
+
 exports[`Paragraph block should prevent deleting the first Paragraph block when pressing backspace at the start 1`] = `
 "<!-- wp:paragraph -->
 <p>A quick brown fox jumps over the lazy dog.</p>
