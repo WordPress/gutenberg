@@ -1,7 +1,7 @@
 iframe[name="editor-canvas"] {
+	box-sizing: border-box;
 	width: 100%;
 	height: 100%;
 	display: block;
-	background-color: $gray-300;
-	box-sizing: border-box;
+	background-color: transparent;
 }

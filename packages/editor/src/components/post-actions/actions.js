@@ -783,7 +783,7 @@ const duplicatePostAction = {
 					sprintf(
 						// translators: %s: Title of the created template e.g: "Category".
 						__( '"%s" successfully created.' ),
-						newItem.title?.rendered || title
+						decodeEntities( newItem.title?.rendered || title )
 					),
 					{
 						id: 'duplicate-post-action',
@@ -1030,11 +1030,13 @@ export const duplicateTemplatePartAction = {
 };
 
 export function usePostActions( postType, onActionPerformed ) {
-	const { postTypeObject } = useSelect(
+	const { defaultActions, postTypeObject } = useSelect(
 		( select ) => {
 			const { getPostType } = select( coreStore );
+			const { getEntityActions } = unlock( select( editorStore ) );
 			return {
 				postTypeObject: getPostType( postType ),
+				defaultActions: getEntityActions( 'postType', postType ),
 			};
 		},
 		[ postType ]
@@ -1049,6 +1051,7 @@ export function usePostActions( postType, onActionPerformed ) {
 	const isPattern = postType === PATTERN_POST_TYPE;
 	const isLoaded = !! postTypeObject;
 	const supportsRevisions = !! postTypeObject?.supports?.revisions;
+	const supportsTitle = !! postTypeObject?.supports?.title;
 	return useMemo( () => {
 		if ( ! isLoaded ) {
 			return [];
@@ -1064,13 +1067,14 @@ export function usePostActions( postType, onActionPerformed ) {
 				: false,
 			isTemplateOrTemplatePart && duplicateTemplatePartAction,
 			isPattern && duplicatePatternAction,
-			renamePostAction,
+			supportsTitle && renamePostAction,
 			isPattern && exportPatternAsJSONAction,
 			isTemplateOrTemplatePart ? resetTemplateAction : restorePostAction,
 			isTemplateOrTemplatePart || isPattern
 				? deletePostAction
 				: trashPostAction,
 			! isTemplateOrTemplatePart && permanentlyDeletePostAction,
+			...defaultActions,
 		].filter( Boolean );
 
 		if ( onActionPerformed ) {
@@ -1116,6 +1120,7 @@ export function usePostActions( postType, onActionPerformed ) {
 
 		return actions;
 	}, [
+		defaultActions,
 		isTemplateOrTemplatePart,
 		isPattern,
 		postTypeObject?.viewable,
@@ -1124,5 +1129,6 @@ export function usePostActions( postType, onActionPerformed ) {
 		onActionPerformed,
 		isLoaded,
 		supportsRevisions,
+		supportsTitle,
 	] );
 }

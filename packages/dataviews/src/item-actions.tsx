@@ -254,6 +254,7 @@ function CompactItemActions< Item extends AnyItem >( {
 					size="compact"
 					icon={ moreVertical }
 					label={ __( 'Actions' ) }
+					__experimentalIsFocusable
 					disabled={ ! actions.length }
 					className="dataviews-all-actions-button"
 				/>

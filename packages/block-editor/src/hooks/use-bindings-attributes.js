@@ -97,6 +97,9 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 			unlock( select( blocksStore ) ).getAllBlockBindingsSources()
 		);
 		const { name, clientId, context } = props;
+		const hasPatternOverridesDefaultBinding =
+			props.attributes.metadata?.bindings?.[ DEFAULT_ATTRIBUTE ]
+				?.source === 'core/pattern-overrides';
 		const bindings = useMemo(
 			() =>
 				replacePatternOverrideDefaultBindings(
@@ -213,7 +216,13 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 						}
 					}
 
-					if ( Object.keys( keptAttributes ).length ) {
+					// Only apply normal attribute updates to blocks
+					// that have partial bindings. Currently this is
+					// only skipped for pattern overrides sources.
+					if (
+						! hasPatternOverridesDefaultBinding &&
+						Object.keys( keptAttributes ).length
+					) {
 						setAttributes( keptAttributes );
 					}
 				} );
@@ -226,6 +235,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 				context,
 				setAttributes,
 				sources,
+				hasPatternOverridesDefaultBinding,
 			]
 		);
 

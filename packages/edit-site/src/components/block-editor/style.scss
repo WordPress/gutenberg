@@ -1,4 +1,15 @@
+/* stylelint-disable -- Disable reason: View Transitions not supported properly by stylelint. */
+::view-transition-old(frame),
+::view-transition-new(frame) {
+  animation-duration: 0;
+}
+/* stylelint-enable */
+
 .edit-site-visual-editor__editor-canvas {
+	/* stylelint-disable -- Disable reason: View Transitions not supported properly by stylelint. */
+	view-transition-name: frame;
+	/* stylelint-enable */
+
 	&.is-focused {
 		outline: calc(2 * var(--wp-admin-border-width-focus)) solid var(--wp-admin-theme-color);
 		outline-offset: calc(-2 * var(--wp-admin-border-width-focus));

@@ -3161,7 +3161,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 	public function test_get_editor_settings_custom_units_can_be_disabled() {
 		add_theme_support( 'custom-units', array() );
-		$actual = WP_Theme_JSON_Gutenberg::get_from_editor_settings( get_classic_theme_supports_block_editor_settings() );
+		$actual = WP_Theme_JSON_Gutenberg::get_from_editor_settings( gutenberg_get_classic_theme_supports_block_editor_settings() );
 		remove_theme_support( 'custom-units' );
 
 		$expected = array(
@@ -3174,7 +3174,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 	public function test_get_editor_settings_custom_units_can_be_enabled() {
 		add_theme_support( 'custom-units' );
-		$actual = WP_Theme_JSON_Gutenberg::get_from_editor_settings( get_classic_theme_supports_block_editor_settings() );
+		$actual = WP_Theme_JSON_Gutenberg::get_from_editor_settings( gutenberg_get_classic_theme_supports_block_editor_settings() );
 		remove_theme_support( 'custom-units' );
 
 		$expected = array(
@@ -3187,7 +3187,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 	public function test_get_editor_settings_custom_units_can_be_filtered() {
 		add_theme_support( 'custom-units', 'rem', 'em' );
-		$actual = WP_Theme_JSON_Gutenberg::get_from_editor_settings( get_classic_theme_supports_block_editor_settings() );
+		$actual = WP_Theme_JSON_Gutenberg::get_from_editor_settings( gutenberg_get_classic_theme_supports_block_editor_settings() );
 		remove_theme_support( 'custom-units' );
 
 		$expected = array(
@@ -4850,12 +4850,31 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSame( $expected_styles, $theme_json->get_stylesheet(), 'Styles returned from "::get_stylesheet()" with top-level background image as string type does not match expectations' );
 	}
 
-	public function test_get_custom_css_handles_global_custom_css() {
+	/**
+	 * Tests that base custom CSS is generated correctly.
+	 */
+	public function test_get_stylesheet_handles_base_custom_css() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'styles'  => array(
-					'css'    => 'body {color:purple;}',
+					'css' => 'body {color:purple;}',
+				),
+			)
+		);
+
+		$custom_css = 'body {color:purple;}';
+		$this->assertSame( $custom_css, $theme_json->get_stylesheet( array( 'custom-css' ) ) );
+	}
+
+	/**
+	 * Tests that block custom CSS is generated correctly.
+	 */
+	public function test_get_styles_for_block_handles_block_custom_css() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
 					'blocks' => array(
 						'core/paragraph' => array(
 							'css' => 'color:red;',
@@ -4865,8 +4884,17 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$custom_css = 'body {color:purple;}:root :where(p){color:red;}';
-		$this->assertSame( $custom_css, $theme_json->get_custom_css() );
+		$paragraph_node = array(
+			'name'      => 'core/paragraph',
+			'path'      => array( 'styles', 'blocks', 'core/paragraph' ),
+			'selector'  => 'p',
+			'selectors' => array(
+				'root' => 'p',
+			),
+		);
+
+		$custom_css = ':root :where(p){color:red;}';
+		$this->assertSame( $custom_css, $theme_json->get_styles_for_block( $paragraph_node ) );
 	}
 
 	/**

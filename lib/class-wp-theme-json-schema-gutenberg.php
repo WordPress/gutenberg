@@ -40,11 +40,13 @@ class WP_Theme_JSON_Schema_Gutenberg {
 	 * @since 5.9.0
 	 * @since 6.6.0 Migrate up to v3.
 	 *
-	 * @param array $theme_json The structure to migrate.
+	 * @param array  $theme_json The structure to migrate.
+	 * @param string $origin     Optional. What source of data this object represents.
+	 *                           One of 'blocks', 'default', 'theme', or 'custom'. Default 'theme'.
 	 *
 	 * @return array The structure in the last version.
 	 */
-	public static function migrate( $theme_json ) {
+	public static function migrate( $theme_json, $origin = 'theme' ) {
 		if ( ! isset( $theme_json['version'] ) ) {
 			$theme_json = array(
 				'version' => WP_Theme_JSON::LATEST_SCHEMA,
@@ -55,10 +57,9 @@ class WP_Theme_JSON_Schema_Gutenberg {
 		switch ( $theme_json['version'] ) {
 			case 1:
 				$theme_json = self::migrate_v1_to_v2( $theme_json );
-				// no break
+				// Deliberate fall through. Once migrated to v2, also migrate to v3.
 			case 2:
-				$theme_json = self::migrate_v2_to_v3( $theme_json );
-				// no break
+				$theme_json = self::migrate_v2_to_v3( $theme_json, $origin );
 		}
 
 		return $theme_json;
@@ -97,15 +98,19 @@ class WP_Theme_JSON_Schema_Gutenberg {
 	/**
 	 * Migrates from v2 to v3.
 	 *
-	 * - Sets settings.typography.defaultFontSizes to false.
+	 * - Sets settings.typography.defaultFontSizes to false if settings.typography.fontSizes are defined.
+	 * - Sets settings.spacing.defaultSpacingSizes to false if settings.spacing.spacingSizes are defined.
+	 * - Prevents settings.spacing.spacingSizes from merging with settings.spacing.spacingScale by
+	 *   unsetting spacingScale when spacingSizes are defined.
 	 *
 	 * @since 6.6.0
 	 *
-	 * @param array $old Data to migrate.
-	 *
+	 * @param array $old     Data to migrate.
+	 * @param string $origin What source of data this object represents.
+	 *                       One of 'blocks', 'default', 'theme', or 'custom'.
 	 * @return array Data with defaultFontSizes set to false.
 	 */
-	private static function migrate_v2_to_v3( $old ) {
+	private static function migrate_v2_to_v3( $old, $origin ) {
 		// Copy everything.
 		$new = $old;
 
@@ -116,10 +121,7 @@ class WP_Theme_JSON_Schema_Gutenberg {
 		 * Remaining changes do not need to be applied to the custom origin,
 		 * as they should take on the value of the theme origin.
 		 */
-		if (
-			isset( $new['isGlobalStylesUserThemeJSON'] ) &&
-			true === $new['isGlobalStylesUserThemeJSON']
-		) {
+		if ( 'custom' === $origin ) {
 			return $new;
 		}
 
@@ -132,12 +134,6 @@ class WP_Theme_JSON_Schema_Gutenberg {
 		 * when the theme did not provide any.
 		 */
 		if ( isset( $old['settings']['typography']['fontSizes'] ) ) {
-			if ( ! isset( $new['settings'] ) ) {
-				$new['settings'] = array();
-			}
-			if ( ! isset( $new['settings']['typography'] ) ) {
-				$new['settings']['typography'] = array();
-			}
 			$new['settings']['typography']['defaultFontSizes'] = false;
 		}
 
@@ -151,12 +147,6 @@ class WP_Theme_JSON_Schema_Gutenberg {
 			isset( $old['settings']['spacing']['spacingSizes'] ) ||
 			isset( $old['settings']['spacing']['spacingScale'] )
 		) {
-			if ( ! isset( $new['settings'] ) ) {
-				$new['settings'] = array();
-			}
-			if ( ! isset( $new['settings']['spacing'] ) ) {
-				$new['settings']['spacing'] = array();
-			}
 			$new['settings']['spacing']['defaultSpacingSizes'] = false;
 		}
 
