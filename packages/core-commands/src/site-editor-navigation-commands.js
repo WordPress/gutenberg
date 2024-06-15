@@ -16,7 +16,7 @@ import {
 	navigation,
 } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { getQueryArg, addQueryArgs, getPath } from '@wordpress/url';
+import { addQueryArgs, getPath } from '@wordpress/url';
 import { useDebounce } from '@wordpress/compose';
 
 /**
@@ -119,14 +119,6 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 				const isSiteEditor = getPath( window.location.href )?.includes(
 					'site-editor.php'
 				);
-				const extraArgs = isSiteEditor
-					? {
-							canvas: getQueryArg(
-								window.location.href,
-								'canvas'
-							),
-					  }
-					: {};
 
 				return {
 					...command,
@@ -134,7 +126,7 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 						const args = {
 							postType,
 							postId: record.id,
-							...extraArgs,
+							canvas: 'edit',
 						};
 						const targetUrl = addQueryArgs(
 							'site-editor.php',
@@ -195,15 +187,6 @@ const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
 			const result = [];
 			result.push(
 				...orderedRecords.map( ( record ) => {
-					const extraArgs = isSiteEditor
-						? {
-								canvas: getQueryArg(
-									window.location.href,
-									'canvas'
-								),
-						  }
-						: {};
-
 					return {
 						name: templateType + '-' + record.id,
 						searchLabel: record.title?.rendered + ' ' + record.id,
@@ -215,7 +198,7 @@ const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
 							const args = {
 								postType: templateType,
 								postId: record.id,
-								...extraArgs,
+								canvas: 'edit',
 							};
 							const targetUrl = addQueryArgs(
 								'site-editor.php',
@@ -242,8 +225,7 @@ const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
 					icon: symbolFilled,
 					callback: ( { close } ) => {
 						const args = {
-							path: '/patterns',
-							categoryType: 'wp_template_part',
+							postType: 'wp_template_part',
 							categoryId: 'all-parts',
 						};
 						const targetUrl = addQueryArgs(
@@ -296,7 +278,7 @@ function useSiteEditorBasicNavigationCommands() {
 				icon: navigation,
 				callback: ( { close } ) => {
 					const args = {
-						path: '/navigation',
+						postType: 'wp_navigation',
 					};
 					const targetUrl = addQueryArgs( 'site-editor.php', args );
 					if ( isSiteEditor ) {
@@ -332,7 +314,7 @@ function useSiteEditorBasicNavigationCommands() {
 				icon: page,
 				callback: ( { close } ) => {
 					const args = {
-						path: '/page',
+						post_type: 'page',
 					};
 					const targetUrl = addQueryArgs( 'site-editor.php', args );
 					if ( isSiteEditor ) {
@@ -350,7 +332,7 @@ function useSiteEditorBasicNavigationCommands() {
 				icon: layout,
 				callback: ( { close } ) => {
 					const args = {
-						path: '/wp_template',
+						postType: 'wp_template',
 					};
 					const targetUrl = addQueryArgs( 'site-editor.php', args );
 					if ( isSiteEditor ) {
@@ -370,7 +352,7 @@ function useSiteEditorBasicNavigationCommands() {
 			callback: ( { close } ) => {
 				if ( canCreateTemplate ) {
 					const args = {
-						path: '/patterns',
+						postType: 'wp_block',
 					};
 					const targetUrl = addQueryArgs( 'site-editor.php', args );
 					if ( isSiteEditor ) {

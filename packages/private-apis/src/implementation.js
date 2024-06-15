@@ -66,7 +66,7 @@ let allowReRegistration;
 // Let's default to true, then. Try/catch will fall back to "true" even if the
 // environment variable is not explicitly defined.
 try {
-	allowReRegistration = process.env.IS_WORDPRESS_CORE ? false : true;
+	allowReRegistration = globalThis.IS_WORDPRESS_CORE ? false : true;
 } catch ( error ) {
 	allowReRegistration = true;
 }

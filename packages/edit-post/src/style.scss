@@ -1,9 +1,6 @@
-@import "./components/header/style.scss";
-@import "./components/header/fullscreen-mode-close/style.scss";
+@import "./components/back-button/style.scss";
 @import "./components/layout/style.scss";
 @import "./components/meta-boxes/meta-boxes-area/style.scss";
-@import "./components/text-editor/style.scss";
-@import "./components/visual-editor/style.scss";
 @import "./components/welcome-guide/style.scss";
 
 /**
@@ -36,7 +33,7 @@ body.js.block-editor-page {
 
 // Target the editor UI excluding the visual editor contents, metaboxes and custom fields areas.
 .editor-header,
-.edit-post-text-editor,
+.editor-text-editor,
 .editor-sidebar,
 .editor-post-publish-panel {
 	@include reset;

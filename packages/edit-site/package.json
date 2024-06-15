@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-site",
-	"version": "5.35.0",
+	"version": "6.0.0",
 	"description": "Edit Site Page module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -20,7 +20,8 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=12"
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
@@ -53,7 +54,6 @@
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
 		"@wordpress/keycodes": "file:../keycodes",
-		"@wordpress/media-utils": "file:../media-utils",
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/patterns": "file:../patterns",
 		"@wordpress/plugins": "file:../plugins",

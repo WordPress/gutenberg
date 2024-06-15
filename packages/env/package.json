@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/env",
-	"version": "9.10.0",
+	"version": "10.0.0",
 	"description": "A zero-config, self contained local WordPress environment for development and testing.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -18,6 +18,10 @@
 	},
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
 	},
 	"directories": {
 		"lib": "lib",

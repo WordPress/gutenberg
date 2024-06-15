@@ -480,7 +480,7 @@ You can customize the WordPress installation, plugins and themes that the develo
 `.wp-env.json` supports fields for options applicable to both the tests and development instances.
 
 | Field          | Type           | Default                                | Description                                                                                                                      |
-| -------------- | -------------- | -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+|----------------|----------------|----------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
 | `"core"`       | `string\|null` | `null`                                 | The WordPress installation to use. If `null` is specified, `wp-env` will use the latest production release of WordPress.         |
 | `"phpVersion"` | `string\|null` | `null`                                 | The PHP version to use. If `null` is specified, `wp-env` will use the default version used with production release of WordPress. |
 | `"plugins"`    | `string[]`     | `[]`                                   | A list of plugins to install and activate in the environment.                                                                    |
@@ -489,6 +489,7 @@ You can customize the WordPress installation, plugins and themes that the develo
 | `"testsPort"`  | `integer`      | `8889`                                 | The port number for the test site. You'll access the instance through the port: 'http://localhost:8889'.                         |
 | `"config"`     | `Object`       | See below.                             | Mapping of wp-config.php constants to their desired values.                                                                      |
 | `"mappings"`   | `Object`       | `"{}"`                                 | Mapping of WordPress directories to local directories to be mounted in the WordPress instance.                                   |
+| `"mysqlPort"`  | `integer`      | `null` (randomly assigned)             | The MySQL port number to expose. The setting is only available in the `env.development` and `env.tests` objects.                 |
 
 _Note: the port number environment variables (`WP_ENV_PORT` and `WP_ENV_TESTS_PORT`) take precedent over the .wp-env.json values._
 
@@ -521,7 +522,8 @@ Additionally, the key `env` is available to override any of the above options on
 			"config": {
 				"KEY_1": false
 			},
-			"port": 3000
+			"port": 3000,
+			"mysqlPort": 13306
 		}
 	}
 }
@@ -685,6 +687,8 @@ You can tell `wp-env` to use a custom port number so that your instance does not
 	}
 }
 ```
+
+These can also be set via the environment variables `WP_ENV_PORT`, `WP_ENV_TESTS_PORT`, `WP_ENV_MYSQL_PORT` and `WP_ENV_TESTS_MYSQL_PORT`.
 
 ### Specific PHP Version
 

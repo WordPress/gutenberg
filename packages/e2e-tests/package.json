@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/e2e-tests",
-	"version": "7.29.0",
+	"version": "8.0.0",
 	"description": "End-To-End (E2E) tests for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -20,7 +20,8 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=14"
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
 	},
 	"dependencies": {
 		"@wordpress/e2e-test-utils": "file:../e2e-test-utils",

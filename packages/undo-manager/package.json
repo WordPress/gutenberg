@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/undo-manager",
-	"version": "0.18.0",
+	"version": "1.0.0",
 	"description": "A small package to manage undo/redo.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -20,7 +20,8 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=12"
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",

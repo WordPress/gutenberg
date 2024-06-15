@@ -51,8 +51,9 @@ const getFormattedDate = ( dateToDisplay ) =>
 	);
 
 function useView( postType ) {
-	const { params } = useLocation();
-	const { activeView = 'all', isCustom = 'false', layout } = params;
+	const {
+		params: { activeView = 'all', isCustom = 'false', layout },
+	} = useLocation();
 	const history = useHistory();
 	const selectedDefaultView = useMemo( () => {
 		const defaultView =
@@ -128,6 +129,7 @@ function useView( postType ) {
 	const setDefaultViewAndUpdateUrl = useCallback(
 		( viewToSet ) => {
 			if ( viewToSet.type !== view?.type ) {
+				const { params } = history.getLocationWithParams();
 				history.push( {
 					...params,
 					layout: viewToSet.type,
@@ -135,7 +137,7 @@ function useView( postType ) {
 			}
 			setView( viewToSet );
 		},
-		[ params, view?.type, history ]
+		[ history, view?.type ]
 	);
 
 	if ( isCustom === 'false' ) {
@@ -203,19 +205,21 @@ export default function PagePages() {
 	const postType = 'page';
 	const [ view, setView ] = useView( postType );
 	const history = useHistory();
-	const { params } = useLocation();
-	const { isCustom = 'false' } = params;
 
 	const onSelectionChange = useCallback(
 		( items ) => {
-			if ( isCustom === 'false' && view?.type === LAYOUT_LIST ) {
+			const { params } = history.getLocationWithParams();
+			if (
+				( params.isCustom ?? 'false' ) === 'false' &&
+				view?.type === LAYOUT_LIST
+			) {
 				history.push( {
 					...params,
 					postId: items.length === 1 ? items[ 0 ].id : undefined,
 				} );
 			}
 		},
-		[ history, params, view?.type, isCustom ]
+		[ history, view?.type ]
 	);
 
 	const queryArgs = useMemo( () => {
@@ -273,13 +277,13 @@ export default function PagePages() {
 		[ totalItems, totalPages ]
 	);
 
-	const { frontPageId, postsPageId } = useSelect( ( select ) => {
-		const { getEntityRecord } = select( coreStore );
+	const { frontPageId, postsPageId, addNewLabel } = useSelect( ( select ) => {
+		const { getEntityRecord, getPostType } = select( coreStore );
 		const siteSettings = getEntityRecord( 'root', 'site' );
-
 		return {
 			frontPageId: siteSettings?.page_on_front,
 			postsPageId: siteSettings?.page_for_posts,
+			addNewLabel: getPostType( 'page' )?.labels?.add_new_item,
 		};
 	} );
 
@@ -488,22 +492,27 @@ export default function PagePages() {
 		closeModal();
 	};
 
-	// TODO: we need to handle properly `data={ data || EMPTY_ARRAY }` for when `isLoading`.
 	return (
 		<Page
 			title={ __( 'Pages' ) }
 			actions={
-				<>
-					<Button variant="primary" onClick={ openModal }>
-						{ __( 'Add new page' ) }
-					</Button>
-					{ showAddPageModal && (
-						<AddNewPageModal
-							onSave={ handleNewPage }
-							onClose={ closeModal }
-						/>
-					) }
-				</>
+				addNewLabel && (
+					<>
+						<Button
+							variant="primary"
+							onClick={ openModal }
+							__next40pxDefaultSize
+						>
+							{ addNewLabel }
+						</Button>
+						{ showAddPageModal && (
+							<AddNewPageModal
+								onSave={ handleNewPage }
+								onClose={ closeModal }
+							/>
+						) }
+					</>
+				)
 			}
 		>
 			<DataViews

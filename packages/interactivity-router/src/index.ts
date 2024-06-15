@@ -85,8 +85,7 @@ const fetchPage = async ( url: string, { html }: { html: string } ) => {
 const regionsToVdom: RegionsToVdom = async ( dom, { vdom } = {} ) => {
 	const regions = { body: undefined };
 	let head: HTMLElement[];
-	// @ts-ignore
-	if ( process.env.IS_GUTENBERG_PLUGIN ) {
+	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 		if ( navigationMode === 'fullPage' ) {
 			head = await fetchHeadAssets( dom, headElements );
 			regions.body = vdom
@@ -111,8 +110,7 @@ const regionsToVdom: RegionsToVdom = async ( dom, { vdom } = {} ) => {
 // Render all interactive regions contained in the given page.
 const renderRegions = ( page: Page ) => {
 	batch( () => {
-		// @ts-ignore
-		if ( process.env.IS_GUTENBERG_PLUGIN ) {
+		if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 			if ( navigationMode === 'fullPage' ) {
 				// Once this code is tested and more mature, the head should be updated for region based navigation as well.
 				updateHead( page.head );
@@ -169,8 +167,7 @@ window.addEventListener( 'popstate', async () => {
 // Initialize the router and cache the initial page using the initial vDOM.
 // Once this code is tested and more mature, the head should be updated for
 // region based navigation as well.
-// @ts-ignore
-if ( process.env.IS_GUTENBERG_PLUGIN ) {
+if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 	if ( navigationMode === 'fullPage' ) {
 		// Cache the scripts. Has to be called before fetching the assets.
 		[].map.call( document.querySelectorAll( 'script[src]' ), ( script ) => {
@@ -367,8 +364,7 @@ export const { state, actions } = store( 'core/router', {
 } );
 
 // Add click and prefetch to all links.
-// @ts-ignore
-if ( process.env.IS_GUTENBERG_PLUGIN ) {
+if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 	if ( navigationMode === 'fullPage' ) {
 		// Navigate on click.
 		document.addEventListener(

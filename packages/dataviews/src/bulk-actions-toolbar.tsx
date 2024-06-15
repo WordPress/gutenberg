@@ -31,14 +31,14 @@ interface ToolbarContentProps< Item extends AnyItem > {
 	selection: string[];
 	actionsToShow: Action< Item >[];
 	selectedItems: Item[];
-	setSelection: ( selection: Item[] ) => void;
+	onSelectionChange: ( selection: Item[] ) => void;
 }
 
 interface BulkActionsToolbarProps< Item extends AnyItem > {
 	data: Item[];
 	selection: string[];
 	actions: Action< Item >[];
-	setSelection: ( selection: Item[] ) => void;
+	onSelectionChange: ( selection: Item[] ) => void;
 	getItemId: ( item: Item ) => string;
 }
 
@@ -65,11 +65,14 @@ function ActionTrigger< Item extends AnyItem >( {
 	action,
 	onClick,
 	isBusy,
+	items,
 }: ActionTriggerProps< Item > ) {
+	const label =
+		typeof action.label === 'string' ? action.label : action.label( items );
 	return (
 		<ToolbarButton
 			disabled={ isBusy }
-			label={ action.label }
+			label={ label }
 			icon={ action.icon }
 			isDestructive={ action.isDestructive }
 			size="compact"
@@ -112,6 +115,7 @@ function ActionButton< Item extends AnyItem >( {
 				setActionInProgress( action.id );
 				action.callback( selectedItems );
 			} }
+			items={ selectedEligibleItems }
 			isBusy={ actionInProgress === action.id }
 		/>
 	);
@@ -123,7 +127,7 @@ function renderToolbarContent< Item extends AnyItem >(
 	selectedItems: Item[],
 	actionInProgress: string | null,
 	setActionInProgress: ( actionId: string | null ) => void,
-	setSelection: ( selection: Item[] ) => void
+	onSelectionChange: ( selection: Item[] ) => void
 ) {
 	return (
 		<>
@@ -163,7 +167,7 @@ function renderToolbarContent< Item extends AnyItem >(
 					label={ __( 'Cancel' ) }
 					disabled={ !! actionInProgress }
 					onClick={ () => {
-						setSelection( EMPTY_ARRAY );
+						onSelectionChange( EMPTY_ARRAY );
 					} }
 				/>
 			</ToolbarGroup>
@@ -175,7 +179,7 @@ function ToolbarContent< Item extends AnyItem >( {
 	selection,
 	actionsToShow,
 	selectedItems,
-	setSelection,
+	onSelectionChange,
 }: ToolbarContentProps< Item > ) {
 	const [ actionInProgress, setActionInProgress ] = useState< string | null >(
 		null
@@ -191,7 +195,7 @@ function ToolbarContent< Item extends AnyItem >( {
 			selectedItems,
 			actionInProgress,
 			setActionInProgress,
-			setSelection
+			onSelectionChange
 		);
 	} else if ( ! buttons.current ) {
 		buttons.current = renderToolbarContent(
@@ -200,7 +204,7 @@ function ToolbarContent< Item extends AnyItem >( {
 			selectedItems,
 			actionInProgress,
 			setActionInProgress,
-			setSelection
+			onSelectionChange
 		);
 	}
 	return buttons.current;
@@ -210,7 +214,7 @@ export default function BulkActionsToolbar< Item extends AnyItem >( {
 	data,
 	selection,
 	actions = EMPTY_ARRAY,
-	setSelection,
+	onSelectionChange,
 	getItemId,
 }: BulkActionsToolbarProps< Item > ) {
 	const isReducedMotion = useReducedMotion();
@@ -246,9 +250,9 @@ export default function BulkActionsToolbar< Item extends AnyItem >( {
 		<AnimatePresence>
 			<motion.div
 				layout={ ! isReducedMotion } // See https://www.framer.com/docs/animation/#layout-animations
-				initial={ 'init' }
-				animate={ 'open' }
-				exit={ 'exit' }
+				initial="init"
+				animate="open"
+				exit="exit"
 				variants={ isReducedMotion ? undefined : SNACKBAR_VARIANTS }
 				className="dataviews-bulk-actions"
 			>
@@ -258,7 +262,7 @@ export default function BulkActionsToolbar< Item extends AnyItem >( {
 							selection={ selection }
 							actionsToShow={ actionsToShow }
 							selectedItems={ selectedItems }
-							setSelection={ setSelection }
+							onSelectionChange={ onSelectionChange }
 						/>
 					</div>
 				</Toolbar>

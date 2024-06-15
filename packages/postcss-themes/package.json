@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/postcss-themes",
-	"version": "5.41.0",
+	"version": "6.0.0",
 	"description": "PostCSS plugin to generate theme colors.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -24,7 +24,8 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=14"
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
 	},
 	"files": [
 		"index.js"

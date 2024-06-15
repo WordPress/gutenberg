@@ -7,6 +7,7 @@
 	.block-editor-block-contextual-toolbar {
 		border-bottom: 0;
 		height: 100%;
+		background: transparent;
 	}
 
 	// These rules ensure that icons are always positioned in a way that lines up with the rest of the icons in the toolbar.
@@ -64,8 +65,9 @@
 		// Move up a little to prevent the toolbar shift when focus is on the vertical movers.
 		@include break-small() {
 			&:not(.is-horizontal) .block-editor-block-mover__move-button-container {
+				height: $grid-unit-50;
 				position: relative;
-				top: -10px;
+				top: -5px; // Should be -4px, but that causes scrolling when focus lands on the movers, in a 60px header.
 			}
 		}
 	}

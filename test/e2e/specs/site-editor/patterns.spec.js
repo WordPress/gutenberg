@@ -33,7 +33,7 @@ test.describe( 'Patterns', () => {
 		admin,
 		patterns,
 	} ) => {
-		await admin.visitSiteEditor( { path: '/patterns' } );
+		await admin.visitSiteEditor( { postType: 'wp_block' } );
 		await expect(
 			patterns.navigation.getByRole( 'heading', {
 				name: 'Patterns',
@@ -42,24 +42,22 @@ test.describe( 'Patterns', () => {
 		).toBeVisible();
 		await expect( patterns.content ).toContainText( 'No results' );
 
-		await patterns.navigation
-			.getByRole( 'button', { name: 'Create pattern' } )
+		await patterns.content
+			.getByRole( 'button', { name: 'add new pattern' } )
 			.click();
 
-		const createPatternMenu = page.getByRole( 'menu', {
-			name: 'Create pattern',
-		} );
-		await expect(
-			createPatternMenu.getByRole( 'menuitem', {
-				name: 'Create pattern',
+		const addNewMenuItem = page
+			.getByRole( 'menu', {
+				name: 'add new pattern',
 			} )
-		).toBeFocused();
-		await createPatternMenu
-			.getByRole( 'menuitem', { name: 'Create pattern' } )
-			.click();
+			.getByRole( 'menuitem', {
+				name: 'add new pattern',
+			} );
+		await expect( addNewMenuItem ).toBeFocused();
+		await addNewMenuItem.click();
 
 		const createPatternDialog = page.getByRole( 'dialog', {
-			name: 'Create pattern',
+			name: 'add new pattern',
 		} );
 		await createPatternDialog
 			.getByRole( 'textbox', { name: 'Name' } )
@@ -87,9 +85,6 @@ test.describe( 'Patterns', () => {
 		).toContainText( 'Pattern updated' );
 
 		await page.getByRole( 'button', { name: 'Open navigation' } ).click();
-		await patterns.navigation
-			.getByRole( 'button', { name: 'Back' } )
-			.click();
 
 		await expect(
 			patterns.navigation.getByRole( 'button', {
@@ -150,7 +145,7 @@ test.describe( 'Patterns', () => {
 			} ),
 		] );
 
-		await admin.visitSiteEditor( { path: '/patterns' } );
+		await admin.visitSiteEditor( { postType: 'wp_block' } );
 
 		await expect( patterns.item ).toHaveCount( 3 );
 		const searchBox = patterns.content.getByRole( 'searchbox', {
@@ -168,7 +163,7 @@ test.describe( 'Patterns', () => {
 		await expect( patterns.content ).toContainText( 'No results' );
 
 		await patterns.content
-			.getByRole( 'button', { name: 'Reset', exact: true } )
+			.getByRole( 'button', { name: 'Reset search', exact: true } )
 			.click();
 		await expect( searchBox ).toHaveValue( '' );
 		await expect( patterns.item ).toHaveCount( 3 );

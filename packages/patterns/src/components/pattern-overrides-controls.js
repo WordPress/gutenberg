@@ -9,66 +9,48 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import {
-	PARTIAL_SYNCING_SUPPORTED_BLOCKS,
-	PATTERN_OVERRIDES_BINDING_SOURCE,
-} from '../constants';
+import { PATTERN_OVERRIDES_BINDING_SOURCE } from '../constants';
 import {
 	AllowOverridesModal,
 	DisallowOverridesModal,
 } from './allow-overrides-modal';
 
-function removeBindings( bindings, syncedAttributes ) {
-	let updatedBindings = {};
-	for ( const attributeName of syncedAttributes ) {
-		// Omit any bindings that's not the same source from the `updatedBindings` object.
-		if (
-			bindings?.[ attributeName ]?.source !==
-				PATTERN_OVERRIDES_BINDING_SOURCE &&
-			bindings?.[ attributeName ]?.source !== undefined
-		) {
-			updatedBindings[ attributeName ] = bindings[ attributeName ];
-		}
-	}
+function removeBindings( bindings ) {
+	let updatedBindings = { ...bindings };
+	delete updatedBindings.__default;
 	if ( ! Object.keys( updatedBindings ).length ) {
 		updatedBindings = undefined;
 	}
 	return updatedBindings;
 }
 
-function addBindings( bindings, syncedAttributes ) {
-	const updatedBindings = { ...bindings };
-	for ( const attributeName of syncedAttributes ) {
-		if ( ! bindings?.[ attributeName ] ) {
-			updatedBindings[ attributeName ] = {
-				source: PATTERN_OVERRIDES_BINDING_SOURCE,
-			};
-		}
-	}
-	return updatedBindings;
+function addBindings( bindings ) {
+	return {
+		...bindings,
+		__default: { source: PATTERN_OVERRIDES_BINDING_SOURCE },
+	};
 }
 
-function PatternOverridesControls( { attributes, name, setAttributes } ) {
+function PatternOverridesControls( { attributes, setAttributes } ) {
 	const controlId = useId();
 	const [ showAllowOverridesModal, setShowAllowOverridesModal ] =
 		useState( false );
 	const [ showDisallowOverridesModal, setShowDisallowOverridesModal ] =
 		useState( false );
 
-	const syncedAttributes = PARTIAL_SYNCING_SUPPORTED_BLOCKS[ name ];
-	const attributeSources = syncedAttributes.map(
-		( attributeName ) =>
-			attributes.metadata?.bindings?.[ attributeName ]?.source
-	);
-	const isConnectedToOtherSources = attributeSources.every(
-		( source ) => source && source !== 'core/pattern-overrides'
-	);
+	const hasName = !! attributes.metadata?.name;
+	const defaultBindings = attributes.metadata?.bindings?.__default;
+	const allowOverrides =
+		hasName && defaultBindings?.source === PATTERN_OVERRIDES_BINDING_SOURCE;
+	const isConnectedToOtherSources =
+		defaultBindings?.source &&
+		defaultBindings.source !== PATTERN_OVERRIDES_BINDING_SOURCE;
 
 	function updateBindings( isChecked, customName ) {
 		const prevBindings = attributes?.metadata?.bindings;
 		const updatedBindings = isChecked
-			? addBindings( prevBindings, syncedAttributes )
-			: removeBindings( prevBindings, syncedAttributes );
+			? addBindings( prevBindings )
+			: removeBindings( prevBindings );
 
 		const updatedMetadata = {
 			...attributes.metadata,
@@ -88,13 +70,6 @@ function PatternOverridesControls( { attributes, name, setAttributes } ) {
 	if ( isConnectedToOtherSources ) {
 		return null;
 	}
-
-	const hasName = !! attributes.metadata?.name;
-	const allowOverrides =
-		hasName &&
-		attributeSources.some(
-			( source ) => source === PATTERN_OVERRIDES_BINDING_SOURCE
-		);
 
 	return (
 		<>

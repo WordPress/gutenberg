@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 11.0.0 (2024-05-31)
+
+### Breaking Changes
+
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
 ## 10.29.0 (2024-05-16)
 
 ## 10.28.0 (2024-05-02)
@@ -38,9 +44,9 @@
 
 ### Enhancement
 
--    Update promise order in `loginUser` to avoid any flakiness in the tests.
--    Update `activateTheme` to redirect to `themes.php` after theme activation, if theme redirects to some other page.
--    Update `activatePlugin` to redirect to `plugins.php` after plugin activation, if plugin redirects to some other page.
+-   Update promise order in `loginUser` to avoid any flakiness in the tests.
+-   Update `activateTheme` to redirect to `themes.php` after theme activation, if theme redirects to some other page.
+-   Update `activatePlugin` to redirect to `plugins.php` after plugin activation, if plugin redirects to some other page.
 
 ## 10.12.0 (2023-08-31)
 
@@ -70,7 +76,7 @@
 
 ### Breaking Changes
 
--  Started requiring Jest v29 instead of v27 as a peer dependency. See [breaking changes in Jest 28](https://jestjs.io/blog/2022/04/25/jest-28) and [in jest 29](https://jestjs.io/blog/2022/08/25/jest-29) ([#47388](https://github.com/WordPress/gutenberg/pull/47388))
+-   Started requiring Jest v29 instead of v27 as a peer dependency. See [breaking changes in Jest 28](https://jestjs.io/blog/2022/04/25/jest-28) and [in jest 29](https://jestjs.io/blog/2022/08/25/jest-29) ([#47388](https://github.com/WordPress/gutenberg/pull/47388))
 
 ## 9.5.0 (2023-03-01)
 

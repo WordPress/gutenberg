@@ -36,7 +36,7 @@ import FontSizePickerSelect from './font-size-picker-select';
 import FontSizePickerToggleGroup from './font-size-picker-toggle-group';
 import { T_SHIRT_NAMES } from './constants';
 
-const DEFAULT_UNITS = [ 'px', 'em', 'rem' ];
+const DEFAULT_UNITS = [ 'px', 'em', 'rem', 'vw', 'vh' ];
 
 const UnforwardedFontSizePicker = (
 	props: FontSizePickerProps,
@@ -112,7 +112,7 @@ const UnforwardedFontSizePicker = (
 		units
 	);
 	const isValueUnitRelative =
-		!! valueUnit && [ 'em', 'rem' ].includes( valueUnit );
+		!! valueUnit && [ 'em', 'rem', 'vw', 'vh' ].includes( valueUnit );
 	const isDisabled = value === undefined;
 
 	return (

@@ -3,10 +3,7 @@
  */
 // eslint-disable-next-line no-restricted-imports
 import * as Ariakit from '@ariakit/react';
-/**
- * WordPress dependencies
- */
-import { useMemo } from '@wordpress/element';
+
 /**
  * Internal dependencies
  */
@@ -14,12 +11,12 @@ import _CustomSelect from '../custom-select';
 import CustomSelectItem from '../item';
 import type { LegacyCustomSelectProps } from '../types';
 import * as Styled from '../styles';
-import { ContextSystemProvider } from '../../context';
 
 function CustomSelectControl( props: LegacyCustomSelectProps ) {
 	const {
 		__experimentalShowSelectedHint,
 		__next40pxDefaultSize = false,
+		describedBy,
 		options,
 		onChange,
 		size = 'default',
@@ -94,39 +91,33 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 		);
 	};
 
-	// translate legacy button sizing
-	const contextSystemValue = useMemo( () => {
-		let selectedSize;
-
+	const translatedSize = ( () => {
 		if (
 			( __next40pxDefaultSize && size === 'default' ) ||
 			size === '__unstable-large'
 		) {
-			selectedSize = 'default';
-		} else if ( ! __next40pxDefaultSize && size === 'default' ) {
-			selectedSize = 'compact';
-		} else {
-			selectedSize = size;
+			return 'default';
 		}
-
-		return {
-			CustomSelectControlButton: { _overrides: { size: selectedSize } },
-		};
-	}, [ __next40pxDefaultSize, size ] );
-
-	const translatedProps = {
-		'aria-describedby': props.describedBy,
-		children,
-		renderSelectedValue: __experimentalShowSelectedHint
-			? renderSelectedValueHint
-			: undefined,
-		...restProps,
-	};
+		if ( ! __next40pxDefaultSize && size === 'default' ) {
+			return 'compact';
+		}
+		return size;
+	} )();
 
 	return (
-		<ContextSystemProvider value={ contextSystemValue }>
-			<_CustomSelect { ...translatedProps } store={ store } />
-		</ContextSystemProvider>
+		<_CustomSelect
+			aria-describedby={ describedBy }
+			renderSelectedValue={
+				__experimentalShowSelectedHint
+					? renderSelectedValueHint
+					: undefined
+			}
+			size={ translatedSize }
+			store={ store }
+			{ ...restProps }
+		>
+			{ children }
+		</_CustomSelect>
 	);
 }
 

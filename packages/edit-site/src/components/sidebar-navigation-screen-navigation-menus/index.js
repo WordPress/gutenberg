@@ -156,7 +156,7 @@ export function SidebarNavigationScreenWrapper( {
 const NavMenuItem = ( { postId, ...props } ) => {
 	const linkInfo = useLink( {
 		postId,
-		path: '/navigation',
+		postType: 'wp_navigation',
 	} );
 	return <SidebarNavigationItem { ...linkInfo } { ...props } />;
 };

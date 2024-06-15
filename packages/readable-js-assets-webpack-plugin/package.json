@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/readable-js-assets-webpack-plugin",
-	"version": "2.41.0",
+	"version": "3.0.0",
 	"description": "Generate a readable JS file for each JS asset.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -21,7 +21,8 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=14.0"
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
 	},
 	"files": [
 		"index.js"

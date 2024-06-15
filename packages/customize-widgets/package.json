@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/customize-widgets",
-	"version": "4.35.0",
+	"version": "5.0.0",
 	"description": "Widgets blocks in Customizer Module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -17,7 +17,8 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=12"
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",

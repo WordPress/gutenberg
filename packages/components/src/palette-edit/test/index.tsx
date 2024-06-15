@@ -154,7 +154,7 @@ describe( 'PaletteEdit', () => {
 		render(
 			<PaletteEdit
 				{ ...defaultProps }
-				emptyMessage={ 'Test empty message' }
+				emptyMessage="Test empty message"
 			/>
 		);
 
