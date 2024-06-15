@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 8.1.0 (2024-06-15)
+
 ### Bug Fixes
 
 -   Add ´@wordpress/html-entities´ package to the list of dependencies in package.json. ([#62313](https://github.com/WordPress/gutenberg/pull/62313))
