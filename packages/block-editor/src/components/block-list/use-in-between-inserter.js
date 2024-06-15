@@ -40,7 +40,9 @@ export function useInBetweenInserter() {
 			}
 
 			function onMouseMove( event ) {
-				if ( openRef.current ) {
+				// openRef is the reference to the insertion point between blocks.
+				// If the reference is not set or the insertion point is already open, return.
+				if ( openRef === undefined || openRef.current ) {
 					return;
 				}
 

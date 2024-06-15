@@ -409,7 +409,7 @@ const createOnMove =
 	( clientIds, rootClientId ) =>
 	( { select, dispatch } ) => {
 		// If one of the blocks is locked or the parent is locked, we cannot move any block.
-		const canMoveBlocks = select.canMoveBlocks( clientIds, rootClientId );
+		const canMoveBlocks = select.canMoveBlocks( clientIds );
 		if ( ! canMoveBlocks ) {
 			return;
 		}
@@ -431,10 +431,7 @@ export const moveBlocksUp = createOnMove( 'MOVE_BLOCKS_UP' );
 export const moveBlocksToPosition =
 	( clientIds, fromRootClientId = '', toRootClientId = '', index ) =>
 	( { select, dispatch } ) => {
-		const canMoveBlocks = select.canMoveBlocks(
-			clientIds,
-			fromRootClientId
-		);
+		const canMoveBlocks = select.canMoveBlocks( clientIds );
 
 		// If one of the blocks is locked or the parent is locked, we cannot move any block.
 		if ( ! canMoveBlocks ) {
@@ -443,10 +440,7 @@ export const moveBlocksToPosition =
 
 		// If moving inside the same root block the move is always possible.
 		if ( fromRootClientId !== toRootClientId ) {
-			const canRemoveBlocks = select.canRemoveBlocks(
-				clientIds,
-				fromRootClientId
-			);
+			const canRemoveBlocks = select.canRemoveBlocks( clientIds );
 
 			// If we're moving to another block, it means we're deleting blocks from
 			// the original block, so we need to check if removing is possible.
