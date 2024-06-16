@@ -61,6 +61,7 @@ function Header( {
 } ) {
 	const isWideViewport = useViewportMatch( 'large' );
 	const isLargeViewport = useViewportMatch( 'medium' );
+	const isMobileViewport = useViewportMatch( 'mobile' );
 	const {
 		isTextEditor,
 		isPublishSidebarOpened,
@@ -106,7 +107,7 @@ function Header( {
 	return (
 		<div
 			className={ clsx( 'editor-header edit-post-header', {
-				'has-center': showDocumentBar,
+				'has-center': isMobileViewport && showDocumentBar,
 			} ) }
 		>
 			<motion.div
@@ -125,7 +126,7 @@ function Header( {
 				/>
 				{ blockToolbar }
 			</motion.div>
-			{ ( title || showDocumentBar ) && (
+			{ isMobileViewport && ( title || showDocumentBar ) && (
 				<motion.div
 					className="editor-header__center"
 					variants={ toolbarVariations }
