@@ -5,7 +5,11 @@
 .block-editor-iframe__container {
 	width: 100%;
 	height: 100%;
-	overflow-x: hidden;
+	overflow: auto;
+
+	&.is-zoomed-out {
+		overflow-x: hidden;
+	}
 }
 
 .block-editor-iframe__scale-container {
@@ -13,7 +17,7 @@
 	height: 100%;
 }
 
-.block-editor-iframe__scale-container.is-zoomed-out {
+.is-zoomed-out.block-editor-iframe__container .block-editor-iframe__scale-container {
 	$container-width: var(--wp-block-editor-iframe-zoom-out-container-width, 100vw);
 	$prev-container-width: var(--wp-block-editor-iframe-zoom-out-prev-container-width, 100vw);
 	width: $prev-container-width;

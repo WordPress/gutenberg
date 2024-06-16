@@ -447,13 +447,16 @@ function Iframe( {
 	);
 
 	return (
-		<div className="block-editor-iframe__container" ref={ windowResizeRef }>
+		<div
+			className={ clsx(
+				'block-editor-iframe__container',
+				isZoomedOut && 'is-zoomed-out'
+			) }
+			ref={ windowResizeRef }
+		>
 			{ containerResizeListener }
 			<div
-				className={ clsx(
-					'block-editor-iframe__scale-container',
-					isZoomedOut && 'is-zoomed-out'
-				) }
+				className="block-editor-iframe__scale-container"
 				style={ {
 					'--wp-block-editor-iframe-zoom-out-container-width':
 						isZoomedOut && `${ containerWidth }px`,

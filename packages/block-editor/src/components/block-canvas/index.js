@@ -58,7 +58,12 @@ export function ExperimentalBlockCanvas( {
 	return (
 		<BlockTools
 			__unstableContentRef={ localRef }
-			style={ { height, display: 'flex' } }
+			style={ {
+				height,
+				display: 'flex',
+				overflow: 'hidden',
+				position: 'relative',
+			} }
 		>
 			<Iframe
 				{ ...iframeProps }
