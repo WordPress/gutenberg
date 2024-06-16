@@ -25,14 +25,14 @@ function gutenberg_admin_bar_edit_site_menu( $wp_admin_bar ) {
 	}
 
 	// Don't show for users who can't edit theme options or when in the admin.
-	if ( ! current_user_can( 'edit_theme_options' ) || is_admin() ) {
+	if ( ! current_user_can( 'edit_theme_options' ) || is_admin() || ( is_blog_admin() && is_multisite() && current_user_can( 'manage_sites' ) ) ) {
 		return;
 	}
 
 	$wp_admin_bar->add_node(
 		array(
 			'id'    => 'site-editor',
-			'title' => __( 'Site Editor' ),
+			'title' => __( 'Edit site' ),
 			'href'  => add_query_arg(
 				array(
 					'postType' => 'wp_template',

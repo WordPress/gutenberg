@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 3.1.0 (2024-06-15)
+
+### Internal
+
+-   Refactor to TypeScript ([#62557](https://github.com/WordPress/gutenberg/pull/62557)).
+
+## 3.0.0 (2024-05-31)
+
 ### Breaking Changes
 
 -   Variables like `process.env.IS_GUTENBERG_PLUGIN` have been replaced by `globalThis.IS_GUTENBERG_PLUGIN`. Build systems using `process.env` should be updated ([#61486](https://github.com/WordPress/gutenberg/pull/61486)).
@@ -145,3 +153,4 @@
 ## 1.0.0 (2020-02-04)
 
 Initial release.
+

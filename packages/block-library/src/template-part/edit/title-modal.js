@@ -43,8 +43,8 @@ export default function TitleModal( { areaLabel, onClose, onSubmit } ) {
 						<Button
 							variant="primary"
 							type="submit"
+							__experimentalIsFocusable
 							disabled={ ! title.length }
-							aria-disabled={ ! title.length }
 						>
 							{ __( 'Create' ) }
 						</Button>

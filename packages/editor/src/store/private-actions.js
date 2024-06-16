@@ -15,6 +15,7 @@ import { decodeEntities } from '@wordpress/html-entities';
  * Internal dependencies
  */
 import isTemplateRevertable from './utils/is-template-revertable';
+export * from '../dataviews/store/private-actions';
 
 /**
  * Returns an action object used to set which template is currently being used/edited.
