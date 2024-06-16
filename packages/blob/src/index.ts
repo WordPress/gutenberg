@@ -1,16 +1,13 @@
-/**
- * @type {Record<string, File|undefined>}
- */
-const cache = {};
+const cache: Record< string, File > = {};
 
 /**
  * Create a blob URL from a file.
  *
- * @param {File} file The file to create a blob URL for.
+ * @param file The file to create a blob URL for.
  *
- * @return {string} The blob URL.
+ * @return The blob URL.
  */
-export function createBlobURL( file ) {
+export function createBlobURL( file: File ): string {
 	const url = window.URL.createObjectURL( file );
 
 	cache[ url ] = file;
@@ -23,11 +20,11 @@ export function createBlobURL( file ) {
  * `createBlobURL` and not removed by `revokeBlobURL`, otherwise it will return
  * `undefined`.
  *
- * @param {string} url The blob URL.
+ * @param url The blob URL.
  *
- * @return {File|undefined} The file for the blob URL.
+ * @return The file for the blob URL.
  */
-export function getBlobByURL( url ) {
+export function getBlobByURL( url: string ): File | undefined {
 	return cache[ url ];
 }
 
@@ -36,20 +33,20 @@ export function getBlobByURL( url ) {
  * `createBlobURL` and not removed by `revokeBlobURL`, otherwise it will return
  * `undefined`.
  *
- * @param {string} url The blob URL.
+ * @param url The blob URL.
  *
- * @return {string|undefined} The blob type.
+ * @return The blob type.
  */
-export function getBlobTypeByURL( url ) {
+export function getBlobTypeByURL( url: string ): string | undefined {
 	return getBlobByURL( url )?.type.split( '/' )[ 0 ]; // 0: media type , 1: file extension eg ( type: 'image/jpeg' ).
 }
 
 /**
  * Remove the resource and file cache from memory.
  *
- * @param {string} url The blob URL.
+ * @param url The blob URL.
  */
-export function revokeBlobURL( url ) {
+export function revokeBlobURL( url: string ): void {
 	if ( cache[ url ] ) {
 		window.URL.revokeObjectURL( url );
 	}
@@ -60,11 +57,11 @@ export function revokeBlobURL( url ) {
 /**
  * Check whether a url is a blob url.
  *
- * @param {string|undefined} url The URL.
+ * @param url The URL.
  *
- * @return {boolean} Is the url a blob url?
+ * @return Is the url a blob url?
  */
-export function isBlobURL( url ) {
+export function isBlobURL( url: string | undefined ): boolean {
 	if ( ! url || ! url.indexOf ) {
 		return false;
 	}
@@ -90,11 +87,15 @@ export function isBlobURL( url ) {
  * 	downloadBlob( filename, fileContent, 'application/json' );
  * ```
  *
- * @param {string}   filename    File name.
- * @param {BlobPart} content     File content (BufferSource | Blob | string).
- * @param {string}   contentType (Optional) File mime type. Default is `''`.
+ * @param filename    File name.
+ * @param content     File content (BufferSource | Blob | string).
+ * @param contentType (Optional) File mime type. Default is `''`.
  */
-export function downloadBlob( filename, content, contentType = '' ) {
+export function downloadBlob(
+	filename: string,
+	content: BlobPart,
+	contentType: string = ''
+): void {
 	if ( ! filename || ! content ) {
 		return;
 	}

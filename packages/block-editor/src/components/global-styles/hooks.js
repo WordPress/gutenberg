@@ -89,10 +89,7 @@ export const useGlobalStylesReset = () => {
 	const canReset = !! config && ! fastDeepEqual( config, EMPTY_CONFIG );
 	return [
 		canReset,
-		useCallback(
-			() => setUserConfig( () => EMPTY_CONFIG ),
-			[ setUserConfig ]
-		),
+		useCallback( () => setUserConfig( EMPTY_CONFIG ), [ setUserConfig ] ),
 	];
 };
 
@@ -299,6 +296,7 @@ export function useSettingsForBlockElement(
 			'fontStyle',
 			'fontWeight',
 			'letterSpacing',
+			'textAlign',
 			'textTransform',
 			'textDecoration',
 			'writingMode',

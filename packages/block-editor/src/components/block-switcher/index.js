@@ -1,12 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { __, _n, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf, _x } from '@wordpress/i18n';
 import {
 	DropdownMenu,
 	ToolbarButton,
 	ToolbarGroup,
 	ToolbarItem,
+	__experimentalText as Text,
+	MenuGroup,
 } from '@wordpress/components';
 import {
 	switchToBlockType,
@@ -33,6 +35,7 @@ function BlockSwitcherDropdownMenuContents( {
 	clientIds,
 	hasBlockStyles,
 	canRemove,
+	isUsingBindings,
 } ) {
 	const { replaceBlocks, multiSelect, updateBlockAttributes } =
 		useDispatch( blockEditorStore );
@@ -118,6 +121,17 @@ function BlockSwitcherDropdownMenuContents( {
 			</p>
 		);
 	}
+
+	const connectedBlockDescription = isSingleBlock
+		? _x(
+				'This block is connected.',
+				'block toolbar button label and description'
+		  )
+		: _x(
+				'These blocks are connected.',
+				'block toolbar button label and description'
+		  );
+
 	return (
 		<div className="block-editor-block-switcher__container">
 			{ hasPatternTransformation && (
@@ -156,11 +170,18 @@ function BlockSwitcherDropdownMenuContents( {
 					onSwitch={ onClose }
 				/>
 			) }
+			{ isUsingBindings && (
+				<MenuGroup>
+					<Text className="block-editor-block-switcher__binding-indicator">
+						{ connectedBlockDescription }
+					</Text>
+				</MenuGroup>
+			) }
 		</div>
 	);
 }
 
-export const BlockSwitcher = ( { clientIds, disabled } ) => {
+export const BlockSwitcher = ( { clientIds, disabled, isUsingBindings } ) => {
 	const {
 		canRemove,
 		hasBlockStyles,
@@ -170,21 +191,14 @@ export const BlockSwitcher = ( { clientIds, disabled } ) => {
 		isTemplate,
 	} = useSelect(
 		( select ) => {
-			const {
-				getBlockRootClientId,
-				getBlocksByClientId,
-				getBlockAttributes,
-				canRemoveBlocks,
-			} = select( blockEditorStore );
+			const { getBlocksByClientId, getBlockAttributes, canRemoveBlocks } =
+				select( blockEditorStore );
 			const { getBlockStyles, getBlockType, getActiveBlockVariation } =
 				select( blocksStore );
 			const _blocks = getBlocksByClientId( clientIds );
 			if ( ! _blocks.length || _blocks.some( ( block ) => ! block ) ) {
 				return { invalidBlocks: true };
 			}
-			const rootClientId = getBlockRootClientId(
-				Array.isArray( clientIds ) ? clientIds[ 0 ] : clientIds
-			);
 			const [ { name: firstBlockName } ] = _blocks;
 			const _isSingleBlockSelected = _blocks.length === 1;
 			const blockType = getBlockType( firstBlockName );
@@ -206,7 +220,7 @@ export const BlockSwitcher = ( { clientIds, disabled } ) => {
 			}
 
 			return {
-				canRemove: canRemoveBlocks( clientIds, rootClientId ),
+				canRemove: canRemoveBlocks( clientIds ),
 				hasBlockStyles:
 					_isSingleBlockSelected &&
 					!! getBlockStyles( firstBlockName )?.length,
@@ -303,6 +317,7 @@ export const BlockSwitcher = ( { clientIds, disabled } ) => {
 								clientIds={ clientIds }
 								hasBlockStyles={ hasBlockStyles }
 								canRemove={ canRemove }
+								isUsingBindings={ isUsingBindings }
 							/>
 						) }
 					</DropdownMenu>

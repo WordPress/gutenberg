@@ -9,17 +9,19 @@ import {
 	escapeHTML,
 	isValidAttributeName,
 	escapeEditableHTML,
-} from '../';
+} from '..';
 import __unstableEscapeGreaterThan from '../escape-greater';
 
-function testUnstableEscapeGreaterThan( implementation ) {
+type Implementation = ( str: string ) => string;
+
+function testUnstableEscapeGreaterThan( implementation: Implementation ) {
 	it( 'should escape greater than', () => {
 		const result = implementation( 'Chicken > Ribs' );
 		expect( result ).toBe( 'Chicken &gt; Ribs' );
 	} );
 }
 
-function testEscapeAmpersand( implementation ) {
+function testEscapeAmpersand( implementation: Implementation ) {
 	it( 'should escape ampersand', () => {
 		const result = implementation(
 			'foo & bar &amp; &AMP; baz &#931; &#bad; &#x3A3; &#X3a3; &#xevil;'
@@ -31,7 +33,7 @@ function testEscapeAmpersand( implementation ) {
 	} );
 }
 
-function testEscapeQuotationMark( implementation ) {
+function testEscapeQuotationMark( implementation: Implementation ) {
 	it( 'should escape quotation mark', () => {
 		const result = implementation( '"Be gone!"' );
 
@@ -39,7 +41,7 @@ function testEscapeQuotationMark( implementation ) {
 	} );
 }
 
-function testEscapeLessThan( implementation ) {
+function testEscapeLessThan( implementation: Implementation ) {
 	it( 'should escape less than', () => {
 		const result = implementation( 'Chicken < Ribs' );
 

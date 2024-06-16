@@ -6,10 +6,10 @@
  *
  * See: https://core.trac.wordpress.org/ticket/45387
  *
- * @param {string} value Original string.
+ * @param value Original string.
  *
- * @return {string} Escaped string.
+ * @return Escaped string.
  */
-export default function __unstableEscapeGreaterThan( value ) {
+export default function __unstableEscapeGreaterThan( value: string ): string {
 	return value.replace( />/g, '&gt;' );
 }

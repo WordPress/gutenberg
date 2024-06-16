@@ -27,7 +27,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                node: ['20', '21']
+                node: ['20', '22']
                 shard: ['1/4', '2/4', '3/4', '4/4']
 
         steps:
@@ -66,7 +66,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                node: ['20', '21']
+                node: ['20', '22']
 
         steps:
             - name: Checkout repository

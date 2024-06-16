@@ -54,7 +54,7 @@ jobs:
                       <!-- pr-contains-php-changes -->
                       This pull request has changed or added PHP files. Please confirm whether these changes need to be synced to WordPress Core, and therefore featured in the next release of WordPress.
 
-                      If so, it is recommended to create a [new Trac ticket](https://core.trac.wordpress.org/newticket) and submit a pull request to the [WordPress Core Github repository](https://github.com/WordPress/wordpress-develop) soon after this pull request is merged.
+                      If so, it is recommended to create a [new Trac ticket](https://core.trac.wordpress.org/newticket) and submit a pull request to the [WordPress Core GitHub repository](https://github.com/WordPress/wordpress-develop) soon after this pull request is merged.
 
                       If you're unsure, you can always ask for help in the #core-editor channel in  [WordPress Slack](https://make.wordpress.org/chat/).
 
@@ -76,7 +76,7 @@ jobs:
                       <!-- pr-contains-php-changes -->
                       This pull request has changed or added PHP files. Please confirm whether these changes need to be synced to WordPress Core, and therefore featured in the next release of WordPress.
 
-                      If so, it is recommended to create a [new Trac ticket](https://core.trac.wordpress.org/newticket) and submit a pull request to the [WordPress Core Github repository](https://github.com/WordPress/wordpress-develop) soon after this pull request is merged.
+                      If so, it is recommended to create a [new Trac ticket](https://core.trac.wordpress.org/newticket) and submit a pull request to the [WordPress Core GitHub repository](https://github.com/WordPress/wordpress-develop) soon after this pull request is merged.
 
                       If you're unsure, you can always ask for help in the #core-editor channel in  [WordPress Slack](https://make.wordpress.org/chat/).
 
