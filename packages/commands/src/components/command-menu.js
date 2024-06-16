@@ -26,6 +26,7 @@ import {
 	useShortcut,
 } from '@wordpress/keyboard-shortcuts';
 import { Icon, search as inputIcon } from '@wordpress/icons';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -62,7 +63,7 @@ function CommandMenuLoader( { name, search, hook, setLoader, close } ) {
 						{ command.icon && <Icon icon={ command.icon } /> }
 						<span>
 							<TextHighlight
-								text={ command.label }
+								text={ decodeEntities( command.label ) }
 								highlight={ search }
 							/>
 						</span>
