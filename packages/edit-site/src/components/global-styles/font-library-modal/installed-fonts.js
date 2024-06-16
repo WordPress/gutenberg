@@ -38,29 +38,29 @@ import {
 	unloadFontFaceInBrowser,
 	getDisplaySrcFromFontFace,
 } from './utils';
+import { getAvailableFontsOutline } from './utils/fonts-outline';
 import { unlock } from '../../../lock-unlock';
 
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 
 function InstalledFonts() {
 	const {
+		activeModalContent,
+		setActiveModalContent,
 		baseCustomFonts,
-		libraryFontSelected,
-		handleSetLibraryFontSelected,
 		refreshLibrary,
 		uninstallFontFamily,
 		isResolvingLibrary,
 		isInstalling,
 		saveFontFamilies,
-		getFontFacesActivated,
 		notice,
 		setNotice,
 	} = useContext( FontLibraryContext );
 
+	const [ isConfirmDeleteOpen, setIsConfirmDeleteOpen ] = useState( false );
 	const [ fontFamilies, setFontFamilies ] = useGlobalSetting(
 		'typography.fontFamilies'
 	);
-	const [ isConfirmDeleteOpen, setIsConfirmDeleteOpen ] = useState( false );
 	const [ baseFontFamilies ] = useGlobalSetting(
 		'typography.fontFamilies',
 		undefined,
@@ -84,6 +84,11 @@ function InstalledFonts() {
 				.sort( ( a, b ) => a.name.localeCompare( b.name ) )
 		: [];
 	const themeFontsSlugs = new Set( themeFonts.map( ( f ) => f.slug ) );
+	const customFonts = fontFamilies?.custom
+		? fontFamilies.custom
+				.map( ( f ) => setUIValuesNeeded( f, { source: 'custom' } ) )
+				.sort( ( a, b ) => a.name.localeCompare( b.name ) )
+		: [];
 	const baseThemeFonts = baseFontFamilies?.theme
 		? themeFonts.concat(
 				baseFontFamilies.theme
@@ -93,6 +98,7 @@ function InstalledFonts() {
 		  )
 		: [];
 
+	const libraryFontSelected = activeModalContent?.selectedFont;
 	const customFontFamilyId =
 		libraryFontSelected?.source === 'custom' && libraryFontSelected?.id;
 
@@ -116,8 +122,39 @@ function InstalledFonts() {
 		libraryFontSelected?.source !== 'theme' &&
 		canUserDelete;
 
+	const handleSetLibraryFontSelected = ( font ) => {
+		setNotice( null );
+
+		// If font is null, reset the selected font
+		if ( ! font ) {
+			setActiveModalContent( {
+				...activeModalContent,
+				selectedFont: null,
+			} );
+			return;
+		}
+
+		const fonts = font.source === 'theme' ? themeFonts : baseCustomFonts;
+
+		// Tries to find the font in the installed fonts
+		const fontSelected = fonts.find( ( f ) => f.slug === font.slug );
+		// If the font is not found (it is only defined in custom styles), use the font from custom styles
+		setActiveModalContent( {
+			...activeModalContent,
+			selectedFont: {
+				...( fontSelected || font ),
+				source: font.source,
+			},
+		} );
+	};
+
 	const handleUninstallClick = () => {
 		setIsConfirmDeleteOpen( true );
+	};
+
+	const getFontFacesActivated = ( slug, source ) => {
+		const sourceFonts = source === 'theme' ? themeFonts : customFonts;
+		return getAvailableFontsOutline( sourceFonts )[ slug ] || [];
 	};
 
 	const getFontFacesToDisplay = ( font ) => {

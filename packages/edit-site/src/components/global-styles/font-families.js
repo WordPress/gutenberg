@@ -26,8 +26,12 @@ import { unlock } from '../../lock-unlock';
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 
 function FontFamilies() {
-	const { baseCustomFonts, modalTabOpen, setModalTabOpen, setNotice } =
-		useContext( FontLibraryContext );
+	const {
+		baseCustomFonts,
+		setNotice,
+		activeModalContent,
+		setActiveModalContent,
+	} = useContext( FontLibraryContext );
 	const [ fontFamilies ] = useGlobalSetting( 'typography.fontFamilies' );
 	const [ baseFontFamilies ] = useGlobalSetting(
 		'typography.fontFamilies',
@@ -53,10 +57,10 @@ function FontFamilies() {
 
 	return (
 		<>
-			{ !! modalTabOpen && (
+			{ !! activeModalContent && (
 				<FontLibraryModal
-					onRequestClose={ () => setModalTabOpen( null ) }
-					defaultTabId={ modalTabOpen }
+					onRequestClose={ () => setActiveModalContent( null ) }
+					defaultTabId={ activeModalContent?.tab }
 				/>
 			) }
 
@@ -114,11 +118,11 @@ function FontFamilies() {
 					onClick={ () => {
 						// Reset notice when opening the modal.
 						setNotice( null );
-						setModalTabOpen(
-							hasInstalledFonts
+						setActiveModalContent( {
+							tab: hasInstalledFonts
 								? 'installed-fonts'
-								: 'upload-fonts'
-						);
+								: 'upload-fonts',
+						} );
 					} }
 				>
 					{ hasInstalledFonts
