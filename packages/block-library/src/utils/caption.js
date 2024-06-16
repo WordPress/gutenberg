@@ -32,7 +32,7 @@ export function Caption( {
 	placeholder = __( 'Add caption' ),
 	label = __( 'Caption text' ),
 	showToolbarButton = true,
-	excludeMainElementClassName,
+	excludeElementClassName,
 	className,
 	readOnly,
 	tagName = 'figcaption',
@@ -98,7 +98,7 @@ export function Caption( {
 						tagName={ tagName }
 						className={ clsx(
 							className,
-							excludeMainElementClassName
+							excludeElementClassName
 								? ''
 								: __experimentalGetElementClassName( 'caption' )
 						) }

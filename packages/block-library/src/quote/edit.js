@@ -121,7 +121,7 @@ export default function QuoteEdit( {
 					}
 					addLabel={ __( 'Add citation' ) }
 					removeLabel={ __( 'Remove citation' ) }
-					excludeMainElementClassName
+					excludeElementClassName
 					className="wp-block-quote__citation"
 					insertBlocksAfter={ insertBlocksAfter }
 					{ ...( ! isWebPlatform ? { textAlign } : {} ) }
