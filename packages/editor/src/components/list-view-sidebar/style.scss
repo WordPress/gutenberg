@@ -1,3 +1,7 @@
+.editor-list-view-sidebar {
+	height: 100%;
+}
+
 .editor-list-view-sidebar__tabs-tabpanel {
 	height: calc(100% - #{$grid-unit-60 - $border-width});
 }
