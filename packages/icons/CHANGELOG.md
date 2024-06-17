@@ -50,7 +50,7 @@
 
 ## 9.33.0 (2023-09-20)
 
-### Enhancement
+### Enhancements
 
 -   `<Icon>` now forwards ref to the underlying child component ([#54492](https://github.com/WordPress/gutenberg/pull/54492)).
 
@@ -134,7 +134,7 @@
 
 -   Removed icons no longer used by the UI: `commentTitle`, `postTitle`, `queryTitle`, `archiveTitle`.
 
-### Enhancement
+### Enhancements
 
 -   Update the `title` icon to match g2 design language. ([#40596](https://github.com/WordPress/gutenberg/pull/40596))
 
