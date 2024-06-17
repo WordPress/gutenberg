@@ -15,7 +15,7 @@
 				"name": "core/button",
 				"isValid": true,
 				"attributes": {
-					"text": "My button 1"
+					"content": "My button 1"
 				},
 				"innerBlocks": []
 			},
@@ -23,7 +23,7 @@
 				"name": "core/button",
 				"isValid": true,
 				"attributes": {
-					"text": "My button 2"
+					"content": "My button 2"
 				},
 				"innerBlocks": []
 			}

@@ -99,6 +99,22 @@ const migrateCustomColorsAndGradients = ( attributes ) => {
 	};
 };
 
+function migrateAttributeNames( attributes ) {
+	// `url` has changed name to `href`.
+	if ( attributes.url ) {
+		attributes.href = attributes.url;
+		delete attributes.url;
+	}
+
+	// `text` has changed name to `content`.
+	if ( attributes.text ) {
+		attributes.content = attributes.text;
+		delete attributes.text;
+	}
+
+	return attributes;
+}
+
 const oldColorsMigration = ( attributes ) => {
 	const { color, textColor, ...restAttributes } = {
 		...attributes,
@@ -114,30 +130,11 @@ const oldColorsMigration = ( attributes ) => {
 	return migrateCustomColorsAndGradients( restAttributes );
 };
 
-const blockAttributes = {
-	url: {
-		type: 'string',
-		source: 'attribute',
-		selector: 'a',
-		attribute: 'href',
-	},
-	title: {
-		type: 'string',
-		source: 'attribute',
-		selector: 'a',
-		attribute: 'title',
-	},
-	text: {
-		type: 'string',
-		source: 'html',
-		selector: 'a',
-	},
-};
-
 // v12: Some attributes were renamed.
 // - `url` attribute was renamed to `href`.
 // - `title` attribute was renamed to `content`.
 const v12 = {
+	migrate: migrateAttributeNames,
 	attributes: {
 		tagName: {
 			type: 'string',
@@ -256,21 +253,7 @@ const v12 = {
 			clientNavigation: true,
 		},
 	},
-	migrate( attributes ) {
-		// `url` has changed name to `href`.
-		if ( attributes.url ) {
-			attributes.href = attributes.url;
-			delete attributes.url;
-		}
 
-		// `text` has changed name to `content`.
-		if ( attributes.text ) {
-			attributes.content = attributes.text;
-			delete attributes.text;
-		}
-
-		return attributes;
-	},
 	save( { attributes, className } ) {
 		const {
 			tagName,
@@ -340,6 +323,7 @@ const v12 = {
 };
 
 const v11 = {
+	migrate: migrateAttributeNames,
 	attributes: {
 		url: {
 			type: 'string',
@@ -599,7 +583,7 @@ const v10 = {
 			</div>
 		);
 	},
-	migrate: migrateFontFamily,
+	migrate: compose( migrateFontFamily, migrateAttributeNames ),
 	isEligible( { style } ) {
 		return style?.typography?.fontFamily;
 	},
@@ -626,7 +610,23 @@ const deprecated = [
 			__experimentalSelector: '.wp-block-button__link',
 		},
 		attributes: {
-			...blockAttributes,
+			url: {
+				type: 'string',
+				source: 'attribute',
+				selector: 'a',
+				attribute: 'href',
+			},
+			title: {
+				type: 'string',
+				source: 'attribute',
+				selector: 'a',
+				attribute: 'title',
+			},
+			text: {
+				type: 'string',
+				source: 'html',
+				selector: 'a',
+			},
 			linkTarget: {
 				type: 'string',
 				source: 'attribute',
@@ -713,7 +713,11 @@ const deprecated = [
 				</div>
 			);
 		},
-		migrate: compose( migrateFontFamily, migrateBorderRadius ),
+		migrate: compose(
+			migrateFontFamily,
+			migrateBorderRadius,
+			migrateAttributeNames
+		),
 	},
 	{
 		supports: {
@@ -727,7 +731,23 @@ const deprecated = [
 			__experimentalSelector: '.wp-block-button__link',
 		},
 		attributes: {
-			...blockAttributes,
+			url: {
+				type: 'string',
+				source: 'attribute',
+				selector: 'a',
+				attribute: 'href',
+			},
+			title: {
+				type: 'string',
+				source: 'attribute',
+				selector: 'a',
+				attribute: 'title',
+			},
+			text: {
+				type: 'string',
+				source: 'html',
+				selector: 'a',
+			},
 			linkTarget: {
 				type: 'string',
 				source: 'attribute',
@@ -801,7 +821,11 @@ const deprecated = [
 				</div>
 			);
 		},
-		migrate: compose( migrateFontFamily, migrateBorderRadius ),
+		migrate: compose(
+			migrateFontFamily,
+			migrateBorderRadius,
+			migrateAttributeNames
+		),
 	},
 	{
 		supports: {
@@ -815,7 +839,23 @@ const deprecated = [
 			__experimentalSelector: '.wp-block-button__link',
 		},
 		attributes: {
-			...blockAttributes,
+			url: {
+				type: 'string',
+				source: 'attribute',
+				selector: 'a',
+				attribute: 'href',
+			},
+			title: {
+				type: 'string',
+				source: 'attribute',
+				selector: 'a',
+				attribute: 'title',
+			},
+			text: {
+				type: 'string',
+				source: 'html',
+				selector: 'a',
+			},
 			linkTarget: {
 				type: 'string',
 				source: 'attribute',
@@ -889,7 +929,11 @@ const deprecated = [
 				</div>
 			);
 		},
-		migrate: compose( migrateFontFamily, migrateBorderRadius ),
+		migrate: compose(
+			migrateFontFamily,
+			migrateBorderRadius,
+			migrateAttributeNames
+		),
 	},
 	{
 		supports: {
@@ -898,7 +942,23 @@ const deprecated = [
 			color: { gradients: true },
 		},
 		attributes: {
-			...blockAttributes,
+			url: {
+				type: 'string',
+				source: 'attribute',
+				selector: 'a',
+				attribute: 'href',
+			},
+			title: {
+				type: 'string',
+				source: 'attribute',
+				selector: 'a',
+				attribute: 'title',
+			},
+			text: {
+				type: 'string',
+				source: 'html',
+				selector: 'a',
+			},
 			linkTarget: {
 				type: 'string',
 				source: 'attribute',
@@ -953,7 +1013,7 @@ const deprecated = [
 				/>
 			);
 		},
-		migrate: migrateBorderRadius,
+		migrate: compose( migrateBorderRadius, migrateAttributeNames ),
 	},
 	{
 		supports: {
@@ -961,7 +1021,23 @@ const deprecated = [
 			alignWide: false,
 		},
 		attributes: {
-			...blockAttributes,
+			url: {
+				type: 'string',
+				source: 'attribute',
+				selector: 'a',
+				attribute: 'href',
+			},
+			title: {
+				type: 'string',
+				source: 'attribute',
+				selector: 'a',
+				attribute: 'title',
+			},
+			text: {
+				type: 'string',
+				source: 'html',
+				selector: 'a',
+			},
 			linkTarget: {
 				type: 'string',
 				source: 'attribute',
@@ -1007,7 +1083,8 @@ const deprecated = [
 		migrate: compose(
 			migrateBorderRadius,
 			migrateCustomColorsAndGradients,
-			migrateAlign
+			migrateAlign,
+			migrateAttributeNames
 		),
 		save( { attributes } ) {
 			const {
@@ -1076,7 +1153,23 @@ const deprecated = [
 	},
 	{
 		attributes: {
-			...blockAttributes,
+			url: {
+				type: 'string',
+				source: 'attribute',
+				selector: 'a',
+				attribute: 'href',
+			},
+			title: {
+				type: 'string',
+				source: 'attribute',
+				selector: 'a',
+				attribute: 'title',
+			},
+			text: {
+				type: 'string',
+				source: 'html',
+				selector: 'a',
+			},
 			align: {
 				type: 'string',
 				default: 'none',
@@ -1122,13 +1215,15 @@ const deprecated = [
 					.replace( /is-style-squared[\s]?/, '' )
 					.trim();
 			}
-			return migrateBorderRadius(
-				migrateCustomColorsAndGradients( {
-					...attributes,
-					className: newClassName ? newClassName : undefined,
-					borderRadius: 0,
-				} )
-			);
+			return compose(
+				migrateBorderRadius,
+				migrateCustomColorsAndGradients,
+				migrateAttributeNames
+			)( {
+				...attributes,
+				className: newClassName ? newClassName : undefined,
+				borderRadius: 0,
+			} );
 		},
 		save( { attributes } ) {
 			const {
@@ -1181,7 +1276,23 @@ const deprecated = [
 	},
 	{
 		attributes: {
-			...blockAttributes,
+			url: {
+				type: 'string',
+				source: 'attribute',
+				selector: 'a',
+				attribute: 'href',
+			},
+			title: {
+				type: 'string',
+				source: 'attribute',
+				selector: 'a',
+				attribute: 'title',
+			},
+			text: {
+				type: 'string',
+				source: 'html',
+				selector: 'a',
+			},
 			align: {
 				type: 'string',
 				default: 'none',
@@ -1199,7 +1310,7 @@ const deprecated = [
 				type: 'string',
 			},
 		},
-		migrate: oldColorsMigration,
+		migrate: compose( oldColorsMigration, migrateAttributeNames ),
 		save( { attributes } ) {
 			const {
 				url,
@@ -1247,7 +1358,23 @@ const deprecated = [
 	},
 	{
 		attributes: {
-			...blockAttributes,
+			url: {
+				type: 'string',
+				source: 'attribute',
+				selector: 'a',
+				attribute: 'href',
+			},
+			title: {
+				type: 'string',
+				source: 'attribute',
+				selector: 'a',
+				attribute: 'title',
+			},
+			text: {
+				type: 'string',
+				source: 'html',
+				selector: 'a',
+			},
 			color: {
 				type: 'string',
 			},
@@ -1282,11 +1409,27 @@ const deprecated = [
 				</div>
 			);
 		},
-		migrate: oldColorsMigration,
+		migrate: compose( oldColorsMigration, migrateAttributeNames ),
 	},
 	{
 		attributes: {
-			...blockAttributes,
+			url: {
+				type: 'string',
+				source: 'attribute',
+				selector: 'a',
+				attribute: 'href',
+			},
+			title: {
+				type: 'string',
+				source: 'attribute',
+				selector: 'a',
+				attribute: 'title',
+			},
+			text: {
+				type: 'string',
+				source: 'html',
+				selector: 'a',
+			},
 			color: {
 				type: 'string',
 			},
@@ -1316,7 +1459,7 @@ const deprecated = [
 				</div>
 			);
 		},
-		migrate: oldColorsMigration,
+		migrate: compose( oldColorsMigration, migrateAttributeNames ),
 	},
 ];
 

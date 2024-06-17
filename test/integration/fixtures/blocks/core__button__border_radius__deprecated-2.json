@@ -3,7 +3,6 @@
 		"name": "core/button",
 		"isValid": true,
 		"attributes": {
-			"text": "Where We Are",
 			"className": "is-style-outline",
 			"style": {
 				"border": {
@@ -12,7 +11,8 @@
 				"color": {
 					"text": "#1b9b6c"
 				}
-			}
+			},
+			"content": "Where We Are"
 		},
 		"innerBlocks": []
 	}

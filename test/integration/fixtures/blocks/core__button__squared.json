@@ -5,7 +5,7 @@
 		"attributes": {
 			"tagName": "a",
 			"type": "button",
-			"text": "My button",
+			"content": "My button",
 			"style": {
 				"border": {
 					"radius": 0

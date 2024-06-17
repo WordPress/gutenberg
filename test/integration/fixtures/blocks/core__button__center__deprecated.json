@@ -3,9 +3,9 @@
 		"name": "core/button",
 		"isValid": true,
 		"attributes": {
-			"url": "https://github.com/WordPress/gutenberg",
-			"text": "Help build Gutenberg",
-			"className": "aligncenter"
+			"className": "aligncenter",
+			"href": "https://github.com/WordPress/gutenberg",
+			"content": "Help build Gutenberg"
 		},
 		"innerBlocks": []
 	}

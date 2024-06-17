@@ -75,7 +75,7 @@
 								"attributes": {
 									"tagName": "button",
 									"type": "submit",
-									"text": "Submit"
+									"content": "Submit"
 								},
 								"innerBlocks": []
 							}
