@@ -749,33 +749,47 @@ const duplicatePostAction = {
 			if ( isCreatingPage ) {
 				return;
 			}
+
+			const newItemOject = {
+				status: 'draft',
+				title,
+				slug: title || __( 'No title' ),
+				comment_status: item.comment_status,
+				content:
+					typeof item.content === 'string'
+						? item.content
+						: item.content.raw,
+				excerpt: item.excerpt.raw,
+				meta: item.meta,
+				parent: item.parent,
+				password: item.password,
+				template: item.template,
+				format: item.format,
+				featured_media: item.featured_media,
+				menu_order: item.menu_order,
+				ping_status: item.ping_status,
+			};
+			const assignablePropertiesPrefix = 'wp:action-assign-';
+			// Get all the properties that the current user is able to assign normally author, categories, tags,
+			// and custom taxonomies.
+			const assignableProperties = Object.keys( item?._links || {} )
+				.filter( ( property ) =>
+					property.startsWith( assignablePropertiesPrefix )
+				)
+				.map( ( property ) =>
+					property.slice( assignablePropertiesPrefix.length )
+				);
+			assignableProperties.forEach( ( property ) => {
+				if ( item[ property ] ) {
+					newItemOject[ property ] = item[ property ];
+				}
+			} );
 			setIsCreatingPage( true );
 			try {
 				const newItem = await saveEntityRecord(
 					'postType',
 					item.type,
-					{
-						status: 'draft',
-						title,
-						slug: title || __( 'No title' ),
-						author: item.author,
-						comment_status: item.comment_status,
-						content:
-							typeof item.content === 'string'
-								? item.content
-								: item.content.raw,
-						excerpt: item.excerpt.raw,
-						meta: item.meta,
-						parent: item.parent,
-						password: item.password,
-						template: item.template,
-						format: item.format,
-						featured_media: item.featured_media,
-						menu_order: item.menu_order,
-						ping_status: item.ping_status,
-						categories: item.categories,
-						tags: item.tags,
-					},
+					newItemOject,
 					{ throwOnError: true }
 				);
 
