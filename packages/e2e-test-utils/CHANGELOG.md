@@ -207,7 +207,7 @@
 
 ## 2.0.0 (2019-05-21)
 
-### Requirements
+### Breaking Changes
 
 -   The minimum version of Gutenberg `5.6.0` or the minimum version of WordPress `5.2.0`.
 
@@ -224,7 +224,7 @@
 -   New Function: `openAllBlockInserterCategories` - Opens all block inserter categories.
 -   New Function: `getAllBlockInserterItemTitles` - Opens the global block inserter.
 
-### Requirements
+### Breaking Changes
 
 -   The minimum version of Gutenberg `5.3.0` or the minimum version of WordPress `5.2.0`.
 
@@ -232,8 +232,4 @@
 
 ### New Features
 
--   Initial release.
-
-### Requirements
-
--   The minimum version of Gutenberg `5.2.0` or the minimum version of WordPress `5.2.0`.
+-   Initial release. The minimum version of Gutenberg `5.2.0` or the minimum version of WordPress `5.2.0`.
