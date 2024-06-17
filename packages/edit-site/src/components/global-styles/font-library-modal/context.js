@@ -450,7 +450,7 @@ function FontLibraryProvider( { children } ) {
 			font.source
 		);
 
-		if ( isFaceActivated ) {
+		if ( ! isFaceActivated ) {
 			loadFontFaceInBrowser(
 				face,
 				getDisplaySrcFromFontFace( face?.src ),
