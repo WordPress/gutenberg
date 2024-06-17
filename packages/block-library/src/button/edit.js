@@ -227,7 +227,7 @@ function ButtonEdit( props ) {
 	// Memoize link value to avoid overriding the LinkControl's internal state.
 	// This is a temporary fix. See https://github.com/WordPress/gutenberg/issues/51256.
 	const linkValue = useMemo(
-		() => ( { href, opensInNewTab, nofollow } ),
+		() => ( { url: href, opensInNewTab, nofollow } ),
 		[ href, opensInNewTab, nofollow ]
 	);
 
@@ -349,7 +349,7 @@ function ButtonEdit( props ) {
 						<LinkControl
 							value={ linkValue }
 							onChange={ ( {
-								href: newHref,
+								url: newHref,
 								opensInNewTab: newOpensInNewTab,
 								nofollow: newNofollow,
 							} ) =>
