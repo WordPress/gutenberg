@@ -46,9 +46,9 @@ function FontSizes() {
 		<VStack spacing={ 2 }>
 			<HStack justify="space-between">
 				<Subtitle level={ 3 }>{ __( 'Font Sizes' ) }</Subtitle>
-				<Tooltip text={ __( 'Manage font sizes' ) }>
+				<Tooltip text={ __( 'Add font size' ) }>
 					<Button
-						aria-label={ __( 'Add font size ' ) }
+						aria-label={ __( 'Add font size' ) }
 						icon={ plus }
 						size="small"
 						onClick={ handleAddFontSize }
