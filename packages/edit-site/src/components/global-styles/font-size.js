@@ -9,11 +9,13 @@ import {
 	__experimentalSpacer as Spacer,
 	__experimentalUseNavigator as useNavigator,
 	__experimentalInputControl as InputControl,
-	ToggleControl,
-	privateApis as componentsPrivateApis,
+	__experimentalView as View,
 	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
+	privateApis as componentsPrivateApis,
 	Button,
 	FlexItem,
+	ToggleControl,
 } from '@wordpress/components';
 import { useRef } from '@wordpress/element';
 import { moreVertical } from '@wordpress/icons';
@@ -140,7 +142,7 @@ function FontSize() {
 	};
 
 	return (
-		<>
+		<VStack spacing={ 4 }>
 			<HStack justify="space-between" align="flex-start">
 				<ScreenHeader
 					title={ fontSize.name }
@@ -171,86 +173,77 @@ function FontSize() {
 				</FlexItem>
 			</HStack>
 
-			<Spacer marginX={ 4 }>
-				<FontSizePreview fontSize={ fontSize } />
-			</Spacer>
+			<View>
+				<Spacer paddingX={ 4 }>
+					<VStack spacing={ 4 }>
+						<FlexItem>
+							<FontSizePreview fontSize={ fontSize } />
+						</FlexItem>
 
-			<Spacer marginX={ 4 }>
-				<Spacer marginY={ 4 }>
-					<InputControl
-						label={ __( 'Name' ) }
-						value={ fontSize.name }
-						onChange={ handleNameChange }
-					/>
-				</Spacer>
-
-				<Spacer marginY={ 4 }>
-					<SizeControl
-						label={ __( 'Size' ) }
-						value={ fontSize.size }
-						withSlider
-						onChange={ handleFontSizeChange }
-						hasUnits={ hasUnits }
-					/>
-				</Spacer>
-
-				<Spacer marginY={ 4 }>
-					<ToggleGroupControl
-						__nextHasNoMarginBottom
-						isBlock
-						label={ __( 'Fluid' ) }
-						value={ String( isFluid ) }
-						onChange={ handleFluidChange }
-					>
-						<ToggleGroupControlOption
-							label={ __( 'Yes' ) }
-							value="true"
+						<InputControl
+							label={ __( 'Name' ) }
+							value={ fontSize.name }
+							onChange={ handleNameChange }
 						/>
-						<ToggleGroupControlOption
-							label={ __( 'No' ) }
-							value="false"
-						/>
-					</ToggleGroupControl>
-				</Spacer>
 
-				{ isFluid && (
-					<Spacer marginY={ 4 }>
-						<ToggleControl
-							label={ __( 'Custom fluid values' ) }
-							help={ __(
-								'Set custom min and max values for the fluid font size.'
-							) }
-							checked={ isCustomFluid }
-							onChange={ handleCustomFluidValues }
+						<SizeControl
+							label={ __( 'Size' ) }
+							value={ fontSize.size }
+							withSlider
+							onChange={ handleFontSizeChange }
+							hasUnits={ hasUnits }
 						/>
-					</Spacer>
-				) }
 
-				{ isCustomFluid && (
-					<>
-						<Spacer marginY={ 4 }>
-							<SizeControl
-								label={ __( 'Min' ) }
-								value={ fontSize.fluid?.min }
-								withSlider
-								onChange={ handleMinChange }
-								hasUnits={ hasUnits }
+						<ToggleGroupControl
+							__nextHasNoMarginBottom
+							isBlock
+							label={ __( 'Fluid' ) }
+							value={ String( isFluid ) }
+							onChange={ handleFluidChange }
+						>
+							<ToggleGroupControlOption
+								label={ __( 'Yes' ) }
+								value="true"
 							/>
-						</Spacer>
-
-						<Spacer marginY={ 4 }>
-							<SizeControl
-								label={ __( 'Max' ) }
-								value={ fontSize.fluid?.max }
-								withSlider
-								onChange={ handleMaxChange }
-								hasUnits={ hasUnits }
+							<ToggleGroupControlOption
+								label={ __( 'No' ) }
+								value="false"
 							/>
-						</Spacer>
-					</>
-				) }
-			</Spacer>
-		</>
+						</ToggleGroupControl>
+
+						{ isFluid && (
+							<ToggleControl
+								label={ __( 'Custom fluid values' ) }
+								help={ __(
+									'Set custom min and max values for the fluid font size.'
+								) }
+								checked={ isCustomFluid }
+								onChange={ handleCustomFluidValues }
+							/>
+						) }
+
+						{ isCustomFluid && (
+							<>
+								<SizeControl
+									label={ __( 'Min' ) }
+									value={ fontSize.fluid?.min }
+									withSlider
+									onChange={ handleMinChange }
+									hasUnits={ hasUnits }
+								/>
+								<SizeControl
+									label={ __( 'Max' ) }
+									value={ fontSize.fluid?.max }
+									withSlider
+									onChange={ handleMaxChange }
+									hasUnits={ hasUnits }
+								/>
+							</>
+						) }
+					</VStack>
+				</Spacer>
+			</View>
+		</VStack>
 	);
 }
 
