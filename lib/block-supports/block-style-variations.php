@@ -461,6 +461,23 @@ function gutenberg_register_block_style_variations_from_theme_json_data( $variat
  * @access private
  */
 function gutenberg_register_block_style_variations_from_theme() {
+	/*
+	 * Skip any registration of styles if no theme.json or variation partials are present.
+	 *
+	 * Given the possibility of hybrid themes, this check can't rely on if the theme
+	 * is a block theme or not. Instead:
+	 *   - If there is a primary theme.json, continue.
+	 *   - If there is a partials directory, continue.
+	 *   - The only variations to be registered from the global styles user origin,
+	 *     are those that have been copied in from the selected theme style variation.
+	 *     For a theme style variation to be selected it would have to have a partial
+	 *     theme.json file covered by the previous check.
+	 */
+	$has_partials_directory = is_dir( get_stylesheet_directory() . '/styles' ) || is_dir( get_template_directory() . '/styles' );
+	if ( ! wp_theme_has_theme_json() && ! $has_partials_directory ) {
+		return;
+	}
+
 	// Partials from `/styles`.
 	$variations_partials = WP_Theme_JSON_Resolver_Gutenberg::get_style_variations( 'block' );
 	gutenberg_register_block_style_variations_from_theme_json_data( $variations_partials );
