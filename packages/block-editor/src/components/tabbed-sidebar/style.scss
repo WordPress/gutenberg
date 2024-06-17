@@ -6,21 +6,23 @@
 	@include break-medium() {
 		// Same width as the Inserter.
 		// @see packages/block-editor/src/components/inserter/style.scss
-		//width: 350px;
+		width: 350px;
 	}
 }
 
 .block-editor-tabbed-sidebar__tablist-and-close-button {
-	display: flex;
 	border-bottom: $border-width solid $gray-300;
+	display: flex;
+	justify-content: space-between;
+	padding-right: $grid-unit-15;
 }
+
 
 .block-editor-tabbed-sidebar__close-button {
 	background: $white;
 	/* stylelint-disable-next-line property-disallowed-list -- This should be removed when https://github.com/WordPress/gutenberg/issues/59013 is fixed. */
 	order: 1;
 	align-self: center;
-	margin-right: $grid-unit-15;
 }
 
 .block-editor-tabbed-sidebar__tablist {
@@ -31,6 +33,13 @@
 .block-editor-tabbed-sidebar__tab {
 	flex-grow: 1;
 	margin-bottom: -$border-width;
+
+	&[id$="reusable"] {
+		flex-grow: inherit;
+		// These are to align the `reusable` icon with the search icon.
+		padding-left: $grid-unit-20;
+		padding-right: $grid-unit-20;
+	}
 }
 
 .block-editor-tabbed-sidebar__tabpanel {
