@@ -192,6 +192,7 @@ function FontSize() {
 							withSlider
 							onChange={ handleFontSizeChange }
 							hasUnits={ hasUnits }
+							withReset={ false }
 						/>
 
 						<ToggleGroupControl
@@ -230,6 +231,7 @@ function FontSize() {
 									withSlider
 									onChange={ handleMinChange }
 									hasUnits={ hasUnits }
+									withReset={ false }
 								/>
 								<SizeControl
 									label={ __( 'Max' ) }
@@ -237,6 +239,7 @@ function FontSize() {
 									withSlider
 									onChange={ handleMaxChange }
 									hasUnits={ hasUnits }
+									withReset={ false }
 								/>
 							</>
 						) }
