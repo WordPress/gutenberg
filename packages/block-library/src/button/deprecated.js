@@ -139,7 +139,7 @@ const oldColorsMigration = ( attributes ) => {
 	return migrateCustomColorsAndGradients( restAttributes );
 };
 
-// v12: Some attributes were renamed.
+// v12: Attributes were renamed.
 // - `url` attribute was renamed to `href`.
 // - `title` attribute was renamed to `content`.
 const v12 = {
