@@ -372,9 +372,8 @@ describe( 'Cover block', () => {
 					} )
 				);
 
-				const [ heightControl ] = screen.getAllByLabelText(
-					/Minimum height of cover/
-				);
+				const [ heightControl ] =
+					screen.getAllByLabelText( /Minimum height/ );
 
 				await userEvent.clear( heightControl );
 				await userEvent.type( heightControl, '300' );
