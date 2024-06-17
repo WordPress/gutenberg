@@ -32,6 +32,9 @@ type FocusNormalizedButton =
 function isFocusNormalizedButton(
 	eventTarget: EventTarget
 ): eventTarget is FocusNormalizedButton {
+	if ( eventTarget instanceof window.SVGElement ) {
+		return !! eventTarget.closest( 'button' );
+	}
 	if ( ! ( eventTarget instanceof window.HTMLElement ) ) {
 		return false;
 	}
