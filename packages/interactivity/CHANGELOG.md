@@ -15,7 +15,7 @@
 -   Variables like `process.env.IS_GUTENBERG_PLUGIN` have been replaced by `globalThis.IS_GUTENBERG_PLUGIN`. Build systems using `process.env` should be updated ([#61486](https://github.com/WordPress/gutenberg/pull/61486)).
 -   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
 
-### Bug fixes
+### Bug Fixes
 
 -	Fix null and number strings as namespaces runtime error. ([#61960](https://github.com/WordPress/gutenberg/pull/61960/))
 
@@ -87,7 +87,7 @@
 
 -   Avoid initializing private stores as public when they have initial state. ([#58754](https://github.com/WordPress/gutenberg/pull/58754))
 
-### Bug fixes
+### Bug Fixes
 
 -   Interactivity API: Remove non default suffix data wp context processing. ([#58664](https://github.com/WordPress/gutenberg/pull/58664))
 
