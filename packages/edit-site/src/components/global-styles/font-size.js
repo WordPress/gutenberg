@@ -163,7 +163,7 @@ function FontSize() {
 						>
 							<DropdownMenuItem onClick={ handleRemoveFontSize }>
 								<DropdownMenuItemLabel>
-									{ __( 'Remove font size' ) }
+									{ __( 'Delete' ) }
 								</DropdownMenuItemLabel>
 							</DropdownMenuItem>
 						</DropdownMenu>
