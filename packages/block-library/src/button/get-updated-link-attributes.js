@@ -47,7 +47,7 @@ export function getUpdatedLinkAttributes( {
 	}
 
 	return {
-		url: prependHTTP( href ),
+		href: prependHTTP( href ),
 		linkTarget: newLinkTarget,
 		rel: updatedRel || undefined,
 	};

@@ -3,7 +3,7 @@
  */
 import { getUpdatedLinkAttributes } from '../get-updated-link-attributes';
 
-describe( 'getUpdatedLinkAttributes method', () => {
+describe( 'getUpdatedLinkAttributes function', () => {
 	it( 'should correctly handle unassigned rel', () => {
 		const options = {
 			href: 'example.com',
