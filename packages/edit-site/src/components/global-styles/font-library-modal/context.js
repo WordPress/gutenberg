@@ -450,14 +450,14 @@ function FontLibraryProvider( { children } ) {
 			font.source
 		);
 
-		if ( ! isFaceActivated ) {
+		if ( isFaceActivated ) {
+			unloadFontFaceInBrowser( face, 'all' );
+		} else {
 			loadFontFaceInBrowser(
 				face,
 				getDisplaySrcFromFontFace( face?.src ),
 				'all'
 			);
-		} else {
-			unloadFontFaceInBrowser( face, 'all' );
 		}
 	};
 
