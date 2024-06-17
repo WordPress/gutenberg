@@ -132,7 +132,7 @@ function useBlockProps( { name, className, clientId } ) {
 		const hasBlockGapSupport = false;
 		const hasFallbackGapSupport = true;
 		const disableLayoutStyles = true;
-		const isTemplate = true;
+		const disableRootPadding = true;
 
 		return toStyles(
 			variationConfig,
@@ -140,7 +140,7 @@ function useBlockProps( { name, className, clientId } ) {
 			hasBlockGapSupport,
 			hasFallbackGapSupport,
 			disableLayoutStyles,
-			isTemplate,
+			disableRootPadding,
 			{
 				blockGap: false,
 				blockStyles: true,
@@ -148,6 +148,7 @@ function useBlockProps( { name, className, clientId } ) {
 				marginReset: false,
 				presets: false,
 				rootPadding: false,
+				variationStyles: true,
 			}
 		);
 	}, [ variation, settings, styles, getBlockStyles, clientId ] );
