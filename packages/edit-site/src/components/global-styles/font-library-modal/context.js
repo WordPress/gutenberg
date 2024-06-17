@@ -451,13 +451,13 @@ function FontLibraryProvider( { children } ) {
 		);
 
 		if ( isFaceActivated ) {
+			unloadFontFaceInBrowser( face, 'all' );
+		} else {
 			loadFontFaceInBrowser(
 				face,
 				getDisplaySrcFromFontFace( face?.src ),
 				'all'
 			);
-		} else {
-			unloadFontFaceInBrowser( face, 'all' );
 		}
 	};
 
