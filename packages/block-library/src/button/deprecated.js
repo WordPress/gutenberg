@@ -105,11 +105,20 @@ function migrateAttributeNames( attributes ) {
 		attributes.href = attributes.url;
 		delete attributes.url;
 	}
+	if ( attributes.metadata?.bindings?.url ) {
+		attributes.metadata.bindings.href = attributes.metadata.bindings.url;
+		delete attributes.metadata.bindings.url;
+	}
 
 	// `text` has changed name to `content`.
 	if ( attributes.text ) {
 		attributes.content = attributes.text;
 		delete attributes.text;
+	}
+	if ( attributes.metadata?.bindings?.text ) {
+		attributes.metadata.bindings.content =
+			attributes.metadata.bindings.text;
+		delete attributes.metadata.bindings.text;
 	}
 
 	return attributes;
