@@ -873,7 +873,7 @@
 
 ## 2.3.0 (2018-09-30)
 
-### Improvements
+### Enhancements
 
 -   New flag `--ignore` for `check-licenses` script
 -   Try deferring to LICENSE file for `license` fields which include filename

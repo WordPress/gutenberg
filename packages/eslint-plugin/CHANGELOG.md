@@ -348,7 +348,7 @@
 
 -   The severity of the rule, `jsdoc/no-undefined-types`, has been increased from `warn` to `error`. In addition, `JSX` has been added to the default list of defined types.
 
-### Improvements
+### Enhancements
 
 -   `'AsyncIterableIterator'` is now allowed as a valid TypeScript utility type.
 
@@ -448,7 +448,7 @@
 
 -   [`@wordpress/no-unused-vars-before-return`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-unused-vars-before-return.md) now supports an `excludePattern` option to exempt function calls by name.
 
-### Improvements
+### Enhancements
 
 -   The recommended `react` configuration specifies an option to [`@wordpress/no-unused-vars-before-return`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-unused-vars-before-return.md) to exempt React hooks usage, by convention of hooks beginning with "use" prefix.
 -   The plugin now uses [`eslint-plugin-jsdoc`](https://github.com/gajus/eslint-plugin-jsdoc), rather than the `valid-jsdoc` rule, for more reliable linting of JSDoc blocks.

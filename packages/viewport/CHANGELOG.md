@@ -153,7 +153,7 @@
 
 ## 2.1.0 (2019-01-03)
 
-### Improvements
+### Enhancements
 
 -   The initial viewport state is assigned synchronously, rather than on the next process tick. This should have an impact of fewer callbacks made to data subscribers.
 

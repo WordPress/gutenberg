@@ -2203,7 +2203,7 @@
 -   Added a new `preview` prop to the `Placeholder` component which allows to display a preview, for example a media preview when the Placeholder is used in media editing contexts.
 -   Added a new `anchorRect` prop to `Popover` which enables a developer to provide a custom `DOMRect` object at which to position the popover.
 
-### Improvements
+### Enhancements
 
 -   Limit `Base Control Label` to the width of its content.
 
@@ -2213,7 +2213,7 @@
 
 ## 7.2.0 (2019-03-20)
 
-### Improvements
+### Enhancements
 
 -   Make `RangeControl` validation rely on the `checkValidity` provided by the browsers instead of using our own validation.
 
@@ -2227,7 +2227,7 @@
 
 -   Added a new `Animate` component.
 
-### Improvements
+### Enhancements
 
 -   `withFilters` has been optimized to avoid binding hook handlers for each mounted instance of the component, instead using a single centralized hook delegator.
 -   `withFilters` has been optimized to reuse a single shared component definition for all filtered instances of the component.
