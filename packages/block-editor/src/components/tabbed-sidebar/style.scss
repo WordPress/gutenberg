@@ -38,19 +38,5 @@
 	flex-grow: 1;
 	flex-direction: column;
 	overflow-y: auto;
-
-	//height: calc(100% - #{$grid-unit-60 - $border-width});
-
-	// Include custom scrollbars, invisible until hovered.
-
-	// TODO - this breaks the absolute positioning of the patterns panel but we need it for list view
-	//@include custom-scrollbars-on-hover(transparent, $gray-600);
-
-	// Only reserve space for scrollbars when there is content to scroll.
-	// This allows items in the list view to have equidistant padding left and right
-	// right up until a scrollbar is present.
 	scrollbar-gutter: auto;
-
-	// The table cells use an extra pixels of space left and right. We compensate for that here.
-	//padding: $grid-unit-05;
 }
