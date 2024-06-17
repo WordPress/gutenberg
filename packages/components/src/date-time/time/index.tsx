@@ -312,13 +312,11 @@ export function TimePicker( {
 						>
 							<ToggleGroupControlOption
 								className="components-datetime__time-am-button" // Unused, for backwards compatibility.
-								aria-label="AM"
 								value="AM"
 								label={ __( 'AM' ) }
 							/>
 							<ToggleGroupControlOption
 								className="components-datetime__time-pm-button" // Unused, for backwards compatibility.
-								aria-label="PM"
 								value="PM"
 								label={ __( 'PM' ) }
 							/>
