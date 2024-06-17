@@ -145,7 +145,7 @@ test.describe( 'Copy/cut/paste', () => {
 			innerBlocks: [
 				{
 					name: 'core/button',
-					attributes: { text: 'Click' },
+					attributes: { content: 'Click' },
 				},
 			],
 		} );
@@ -199,7 +199,7 @@ test.describe( 'Copy/cut/paste', () => {
 			innerBlocks: [
 				{
 					name: 'core/button',
-					attributes: { text: 'Click' },
+					attributes: { content: 'Click' },
 				},
 			],
 		} );

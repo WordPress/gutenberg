@@ -19,7 +19,7 @@ export const PATTERN_SYNC_TYPES = {
 export const PARTIAL_SYNCING_SUPPORTED_BLOCKS = {
 	'core/paragraph': [ 'content' ],
 	'core/heading': [ 'content' ],
-	'core/button': [ 'text', 'url', 'linkTarget', 'rel' ],
+	'core/button': [ 'content', 'href', 'linkTarget', 'rel' ],
 	'core/image': [ 'id', 'url', 'title', 'alt' ],
 };
 

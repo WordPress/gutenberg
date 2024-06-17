@@ -161,7 +161,7 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 			'core/paragraph' => array( 'content' ),
 			'core/heading'   => array( 'content' ),
 			'core/image'     => array( 'id', 'url', 'title', 'alt' ),
-			'core/button'    => array( 'url', 'text', 'linkTarget', 'rel' ),
+			'core/button'    => array( 'href', 'content', 'linkTarget', 'rel' ),
 		);
 
 		// If the block doesn't have the bindings property or isn't one of the supported block types, return.

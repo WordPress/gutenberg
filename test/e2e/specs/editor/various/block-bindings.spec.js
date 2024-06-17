@@ -286,11 +286,11 @@ test.describe( 'Block bindings', () => {
 						{
 							name: 'core/button',
 							attributes: {
-								text: 'button default text',
-								url: '#default-url',
+								content: 'button default text',
+								href: '#default-url',
 								metadata: {
 									bindings: {
-										text: {
+										content: {
 											source: 'core/post-meta',
 											args: { key: 'text_custom_field' },
 										},
@@ -317,11 +317,11 @@ test.describe( 'Block bindings', () => {
 						{
 							name: 'core/button',
 							attributes: {
-								text: 'button default text',
-								url: '#default-url',
+								content: 'button default text',
+								href: '#default-url',
 								metadata: {
 									bindings: {
-										text: {
+										content: {
 											source: 'core/post-meta',
 											args: { key: 'text_custom_field' },
 										},
@@ -379,11 +379,11 @@ test.describe( 'Block bindings', () => {
 						{
 							name: 'core/button',
 							attributes: {
-								text: 'button default text',
-								url: '#default-url',
+								content: 'button default text',
+								href: '#default-url',
 								metadata: {
 									bindings: {
-										text: {
+										content: {
 											source: 'plugin/undefined-source',
 											args: { key: 'text_custom_field' },
 										},
@@ -441,11 +441,11 @@ test.describe( 'Block bindings', () => {
 						{
 							name: 'core/button',
 							attributes: {
-								text: 'button default text',
-								url: '#default-url',
+								content: 'button default text',
+								href: '#default-url',
 								metadata: {
 									bindings: {
-										url: {
+										href: {
 											source: 'core/post-meta',
 											args: { key: 'url_custom_field' },
 										},
@@ -501,11 +501,11 @@ test.describe( 'Block bindings', () => {
 						{
 							name: 'core/button',
 							attributes: {
-								text: 'button default text',
-								url: '#default-url',
+								content: 'button default text',
+								href: '#default-url',
 								metadata: {
 									bindings: {
-										url: {
+										href: {
 											source: 'plugin/undefined-source',
 											args: { key: 'url_custom_field' },
 										},
@@ -561,15 +561,15 @@ test.describe( 'Block bindings', () => {
 						{
 							name: 'core/button',
 							attributes: {
-								text: 'button default text',
-								url: '#default-url',
+								content: 'button default text',
+								href: '#default-url',
 								metadata: {
 									bindings: {
-										text: {
+										content: {
 											source: 'core/post-meta',
 											args: { key: 'text_custom_field' },
 										},
-										url: {
+										href: {
 											source: 'core/post-meta',
 											args: { key: 'url_custom_field' },
 										},
@@ -1484,11 +1484,11 @@ test.describe( 'Block bindings', () => {
 							name: 'core/button',
 							attributes: {
 								anchor: 'button-text-binding',
-								text: 'button default text',
-								url: '#default-url',
+								content: 'button default text',
+								href: '#default-url',
 								metadata: {
 									bindings: {
-										text: {
+										content: {
 											source: 'core/post-meta',
 											args: { key: 'text_custom_field' },
 										},
@@ -1533,11 +1533,11 @@ test.describe( 'Block bindings', () => {
 							name: 'core/button',
 							attributes: {
 								anchor: 'button-url-binding',
-								text: 'button default text',
-								url: '#default-url',
+								content: 'button default text',
+								href: '#default-url',
 								metadata: {
 									bindings: {
-										url: {
+										href: {
 											source: 'core/post-meta',
 											args: { key: 'url_custom_field' },
 										},
@@ -1570,15 +1570,15 @@ test.describe( 'Block bindings', () => {
 							name: 'core/button',
 							attributes: {
 								anchor: 'button-multiple-bindings',
-								text: 'button default text',
-								url: '#default-url',
+								content: 'button default text',
+								href: '#default-url',
 								metadata: {
 									bindings: {
-										text: {
+										content: {
 											source: 'core/post-meta',
 											args: { key: 'text_custom_field' },
 										},
-										url: {
+										href: {
 											source: 'core/post-meta',
 											args: { key: 'url_custom_field' },
 										},
@@ -1614,11 +1614,11 @@ test.describe( 'Block bindings', () => {
 							name: 'core/button',
 							attributes: {
 								anchor: 'button-text-binding',
-								text: 'button default text',
-								url: '#default-url',
+								content: 'button default text',
+								href: '#default-url',
 								metadata: {
 									bindings: {
-										text: {
+										content: {
 											source: 'core/post-meta',
 											args: { key: 'text_custom_field' },
 										},
@@ -2022,11 +2022,11 @@ test.describe( 'Block bindings', () => {
 							name: 'core/button',
 							attributes: {
 								anchor: 'button-url-binding',
-								text: 'button default text',
-								url: '#default-url',
+								content: 'button default text',
+								href: '#default-url',
 								metadata: {
 									bindings: {
-										url: {
+										href: {
 											source: 'core/post-meta',
 											args: { key: 'url_custom_field' },
 										},

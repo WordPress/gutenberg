@@ -18,7 +18,7 @@ function gutenberg_replace_pattern_override_default_binding( $parsed_block ) {
 		'core/paragraph' => array( 'content' ),
 		'core/heading'   => array( 'content' ),
 		'core/image'     => array( 'id', 'url', 'title', 'alt' ),
-		'core/button'    => array( 'url', 'text', 'linkTarget', 'rel' ),
+		'core/button'    => array( 'href', 'content', 'linkTarget', 'rel' ),
 	);
 
 	$bindings = $parsed_block['attrs']['metadata']['bindings'] ?? array();

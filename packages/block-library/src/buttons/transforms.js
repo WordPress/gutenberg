@@ -41,19 +41,19 @@ const transforms = {
 						const { content, metadata } = attributes;
 						const element = createElement( document, content );
 						// Remove any HTML tags.
-						const text = element.innerText || '';
+						const innerText = element.innerText || '';
 						// Get first url.
 						const link = element.querySelector( 'a' );
-						const url = link?.getAttribute( 'href' );
+						const href = link?.getAttribute( 'href' );
 						// Create singular button in the buttons block.
 						return createBlock( 'core/button', {
-							text,
-							url,
+							content: innerText,
+							href,
 							metadata: getTransformedMetadata(
 								metadata,
 								'core/button',
 								( { content: contentBinding } ) => ( {
-									text: contentBinding,
+									content: contentBinding,
 								} )
 							),
 						} );

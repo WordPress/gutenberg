@@ -118,8 +118,8 @@ const transforms = {
 			transform: ( { label, url, rel, title, opensInNewTab } ) => {
 				return createBlock( 'core/buttons', {}, [
 					createBlock( 'core/button', {
-						text: label,
-						url,
+						content: label,
+						href: url,
 						rel,
 						title,
 						linkTarget: opensInNewTab ? '_blank' : undefined,
