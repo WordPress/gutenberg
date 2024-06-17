@@ -320,7 +320,7 @@
 
 ## 2.2.2 (2018-11-12)
 
-### Polish
+### Internal
 
 -   Columns Block: Improve usability while editing columns.
 
@@ -334,7 +334,7 @@
 
 ## 2.1.8 (2018-11-03)
 
-### Polish
+### Internal
 
 -   File Block: Create file blocks when dropping multiple files at once.
 

@@ -2268,7 +2268,7 @@
 
 -   Avoid constantly recomputing the popover position.
 
-### Polish
+### Internal
 
 -   Remove `<DateTimePicker />` obsolete `locale` prop (and pass-through to child components) and obsolete `is12Hour` prop pass through to `<DateTime />` [#11649](https://github.com/WordPress/gutenberg/pull/11649)
 
@@ -2293,7 +2293,7 @@
 
 ## 5.0.2 (2018-11-03)
 
-### Polish
+### Internal
 
 -   Forward `ref` in the `PanelBody` component.
 -   Tooltip are no longer removed when Button becomes disabled, it's left to the component rendering the Tooltip.

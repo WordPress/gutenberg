@@ -885,7 +885,7 @@
 
 -   Resolves an issue where npm package lint script did not work in Windows environments ([#9321](https://github.com/WordPress/gutenberg/pull/9321)
 
-### Polish
+### Internal
 
 -   Updated dependencies: `jest`, `npm-package-json-lint` and `read-pkg-up`
 
@@ -907,6 +907,6 @@
 
 ## 1.1.5 (2018-05-18)
 
-### Polish
+### Internal
 
 -   Fix: Standardized `package.json` format ([#119](https://github.com/WordPress/packages/pull/119))

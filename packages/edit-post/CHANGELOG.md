@@ -206,7 +206,7 @@
 
 ## 3.2.0 (2019-03-06)
 
-### Polish
+### Internal
 
 -   Expose the `className` property to style the `PluginSidebar` component.
 
@@ -276,7 +276,7 @@
 -   `getMetaBoxes` selector (`core/edit-post`) has been removed. Use `getActiveMetaBoxLocations` selector (`core/edit-post`) instead.
 -   `getMetaBox` selector (`core/edit-post`) has been removed. Use `isMetaBoxLocationActive` selector (`core/edit-post`) instead.
 
-### Polish
+### Internal
 
 -   Add the editor styles support's wrapper className.
 

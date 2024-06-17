@@ -141,7 +141,7 @@
 
 ## 2.0.3 (2018-10-29)
 
-### Polish
+### Internal
 
 -   Fix: `count` returns 0 for empty strings ([#10602](https://github.com/WordPress/gutenberg/pull/10602))
 
@@ -157,13 +157,13 @@
 
 -   Updated build to work with Babel 7 ([#7832](https://github.com/WordPress/gutenberg/pull/7832))
 
-### Polish
+### Internal
 
 -   Moved `@WordPress/packages` repository to `@WordPress/gutenberg` ([#7805](https://github.com/WordPress/gutenberg/pull/7805))
 
 ## 1.0.3 (2018-05-18)
 
-### Polish
+### Internal
 
 -   Fix: Standardized `package.json` format ([#119](https://github.com/WordPress/packages/pull/119))
 
@@ -175,7 +175,7 @@
 
 ## 1.0.1 (2018-05-01)
 
-### Polish
+### Internal
 
 -   Internal: Include `publishConfig` configuration in `package.json`. ([#114](https://github.com/WordPress/packages/pull/114))
 

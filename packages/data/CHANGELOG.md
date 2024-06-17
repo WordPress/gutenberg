@@ -349,7 +349,7 @@
 
 -   Adding support for using controls in resolvers using the controls plugin.
 
-### Polish
+### Internal
 
 -   Updated `redux` dependency to the latest version.
 

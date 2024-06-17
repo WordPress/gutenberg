@@ -417,7 +417,7 @@
 
 ## 7.0.1 (2018-11-12)
 
-### Polish
+### Internal
 
 -   Remove unnecessary `locale` prop usage [#11649](https://github.com/WordPress/gutenberg/pull/11649)
 
@@ -449,7 +449,7 @@
 
 -   `PostPublishPanelToggle` has been deprecated in favor of `PostPublishButton`.
 
-### Polish
+### Internal
 
 -   Reactive block styles.
 
@@ -461,7 +461,7 @@
 
 ## 6.1.1 (2018-11-03)
 
-### Polish
+### Internal
 
 -   Remove `findDOMNode` usage from the `Inserter` component.
 -   Remove `findDOMNode` usage from the `Block` component.
@@ -494,7 +494,7 @@
 -   New actions `lockPostSaving` and `unlockPostSaving` were introduced ([#10649](https://github.com/WordPress/gutenberg/pull/10649)).
 -   New selector `isPostSavingLocked` was introduced ([#10649](https://github.com/WordPress/gutenberg/pull/10649)).
 
-### Polish
+### Internal
 
 -   Add animated logo to preview interstitial screen.
 -   Tweak the editor styles support.

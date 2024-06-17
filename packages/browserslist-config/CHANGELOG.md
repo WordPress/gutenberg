@@ -119,25 +119,25 @@
 
 ## 2.1.4 (2018-05-18)
 
-### Polish
+### Internal
 
 -   Fix: Standardized `package.json` format ([#119](https://github.com/WordPress/packages/pull/119))
 
 ## 2.1.3 (2018-05-18)
 
-### Polish
+### Internal
 
 -   Docs update of the Browserslist example repo URL ([#98](https://github.com/WordPress/packages/pull/98))
 
 ## 2.1.2 (2018-02-28)
 
-### Polish
+### Internal
 
 -   Removed `package-lock.json` file, lockfiles for apps, not packages ([#88](https://github.com/WordPress/packages/pull/88))
 
 ## 2.1.1 (2018-02-21)
 
-### Polish
+### Internal
 
 -   Added "Code is Poetry" footer to README.md ([#82](https://github.com/WordPress/packages/pull/82))
 
@@ -163,7 +163,7 @@
 
 ## 1.0.1
 
-### Polish
+### Internal
 
 -   Update installation documentation.
 
