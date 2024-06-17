@@ -786,7 +786,13 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	public static function get_style_variations( $scope = 'theme' ) {
 		$theme_dir = get_stylesheet_directory();
 		$locale    = get_locale();
-		if ( isset( static::$style_variations_cache[ $theme_dir ][ $locale ][ $scope ] ) ) {
+
+		if (
+			isset( static::$style_variations_cache[ $theme_dir ][ $locale ][ $scope ] ) &&
+			// Variations depend on registered blocks.
+			null !== static::$blocks &&
+			static::has_same_registered_blocks( 'theme' )
+		) {
 			return static::$style_variations_cache[ $theme_dir ][ $locale ][ $scope ];
 		}
 
