@@ -160,7 +160,7 @@ test.describe( 'Cover', () => {
 		const defaultHeightValue = await coverBlockEditorSettings
 			.getByRole( 'slider', { name: 'Minimum height' } )
 			.inputValue();
-		expect( defaultHeightValue ).toBeFalsy();
+		expect( defaultHeightValue ).toEqual( '0' );
 
 		// There is no accessible locator for the draggable block resize edge,
 		// which is he bottom edge of the Cover block.
