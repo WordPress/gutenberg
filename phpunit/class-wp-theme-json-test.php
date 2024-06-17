@@ -5473,7 +5473,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			),
 		);
 		$selectors  = array();
-		$options    = array( 'block_style_variations' => true );
+		$options    = array( 'include_block_style_variations' => true );
 
 		$block_nodes       = $func->invoke( null, $theme_json, $selectors, $options );
 		$button_variations = $block_nodes[0]['variations'] ?? array();

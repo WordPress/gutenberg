@@ -1260,7 +1260,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *                       - 'scope' that makes sure all style are scoped to a given selector
 	 *                       - `root_selector` which overwrites and forces a given selector to be used on the root node
 	 *                       - `skip_root_layout_styles` which omits root layout styles from the generated stylesheet.
-	 *                       - `block_style_variations` which includes CSS for block style variations.
+	 *                       - `include_block_style_variations` which includes CSS for block style variations.
 	 * @return string The resulting stylesheet.
 	 */
 	public function get_stylesheet( $types = array( 'variables', 'styles', 'presets' ), $origins = null, $options = array() ) {
@@ -2490,7 +2490,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param array $selectors  List of selectors per block.
 	 * @param array $options    An array of options to facilitate filtering style node generation
 	 *                          The options currently supported are:
-	 *                            - `block_style_variations` which includes CSS for block style variations.
+	 *                            - `include_block_style_variations` which includes CSS for block style variations.
 	 * @return array An array of style nodes metadata.
 	 */
 	protected static function get_style_nodes( $theme_json, $selectors = array(), $options = array() ) {
@@ -2614,7 +2614,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param array $selectors  Optional list of selectors per block.
 	 * @param array $options    An array of options to facilitate filtering node generation
 	 *                          The options currently supported are:
-	 *                            - `block_style_variations` which includes CSS for block style variations.
+	 *                            - `include_block_style_variations` which includes CSS for block style variations.
 	 * @return array The block nodes in theme.json.
 	 */
 	private static function get_block_nodes( $theme_json, $selectors = array(), $options = array() ) {
@@ -2646,7 +2646,7 @@ class WP_Theme_JSON_Gutenberg {
 			}
 
 			$variation_selectors = array();
-			$include_variations  = $options['block_style_variations'] ?? false;
+			$include_variations  = $options['include_block_style_variations'] ?? false;
 			if ( $include_variations && isset( $node['variations'] ) ) {
 				foreach ( $node['variations'] as $variation => $node ) {
 					$variation_selectors[] = array(
@@ -3331,7 +3331,7 @@ class WP_Theme_JSON_Gutenberg {
 		$theme_json = static::sanitize( $theme_json, $valid_block_names, $valid_element_names, $valid_variations );
 
 		$blocks_metadata = static::get_blocks_metadata();
-		$style_options   = array( 'block_style_variations' => true ); // Allow variations data.
+		$style_options   = array( 'include_block_style_variations' => true ); // Allow variations data.
 		$style_nodes     = static::get_style_nodes( $theme_json, $blocks_metadata, $style_options );
 
 		foreach ( $style_nodes as $metadata ) {
