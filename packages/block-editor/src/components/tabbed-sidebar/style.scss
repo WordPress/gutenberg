@@ -26,6 +26,8 @@
 .block-editor-tabbed-sidebar__tablist {
 	box-sizing: border-box;
 	flex-grow: 1;
+	margin-bottom: -$border-width;
+	width: 100%;
 }
 
 .block-editor-tabbed-sidebar__tab {

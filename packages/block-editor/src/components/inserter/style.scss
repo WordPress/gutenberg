@@ -107,11 +107,6 @@ $block-inserter-tabs-height: 44px;
 	display: flex;
 	flex-direction: column;
 	overflow: hidden;
-
-	.block-editor-inserter__tablist {
-		width: 100%;
-		margin-bottom: -$border-width;
-	}
 }
 
 .block-editor-inserter__no-tab-container {
