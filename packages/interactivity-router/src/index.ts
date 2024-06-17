@@ -324,12 +324,6 @@ export const { state, actions } = store( 'core/router', {
 							? '\u00A0'
 							: '' );
 				}
-
-				// Scroll to the anchor if exits in the link.
-				const { hash } = new URL( href, window.location.href );
-				if ( hash ) {
-					document.querySelector( hash )?.scrollIntoView();
-				}
 			} else {
 				yield forcePageReload( href );
 			}
@@ -379,8 +373,18 @@ if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 					) {
 						event.preventDefault();
 						await actions.navigate( ref.href );
-						// Scroll to the top of the page by default.
-						window.scrollTo( 0, 0 );
+
+						// Scroll to the anchor if it exists in the link.
+						const { hash } = new URL(
+							ref.href,
+							window.location.href
+						);
+						if ( !! hash ) {
+							document.querySelector( hash )?.scrollIntoView();
+						} else {
+							// Scroll to the top of the page by default.
+							window.scrollTo( 0, 0 );
+						}
 					}
 				}
 			},
