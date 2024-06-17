@@ -2,10 +2,6 @@
 	height: 100%;
 }
 
-.editor-list-view-sidebar__tabs-tabpanel {
-	height: calc(100% - #{$grid-unit-60 - $border-width});
-}
-
 .editor-list-view-sidebar__list-view-panel-content,
 .editor-list-view-sidebar__list-view-container > .document-outline {
 	height: 100%;
