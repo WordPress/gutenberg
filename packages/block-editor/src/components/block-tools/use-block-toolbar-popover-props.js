@@ -17,6 +17,7 @@ import {
 import { store as blockEditorStore } from '../../store';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import { hasStickyOrFixedPositionValue } from '../../hooks/position';
+import { getVisibleBoundingRect } from '../../utils/dom';
 
 const COMMON_PROPS = {
 	placement: 'top-start',
@@ -67,7 +68,7 @@ function getProps(
 	// Get how far the content area has been scrolled.
 	const scrollTop = scrollContainer?.scrollTop || 0;
 
-	const blockRect = selectedBlockElement.getBoundingClientRect();
+	const blockRect = getVisibleBoundingRect( selectedBlockElement );
 	const contentRect = contentElement.getBoundingClientRect();
 
 	// Get the vertical position of top of the visible content area.

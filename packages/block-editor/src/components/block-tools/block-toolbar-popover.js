@@ -49,7 +49,7 @@ export default function BlockToolbarPopover( {
 
 	const popoverProps = useBlockToolbarPopoverProps( {
 		contentElement: __unstableContentRef?.current,
-		clientId,
+		clientId: capturingClientId || clientId,
 	} );
 
 	return (
