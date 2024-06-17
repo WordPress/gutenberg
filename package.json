@@ -182,7 +182,7 @@
 		"babel-plugin-transform-remove-console": "6.9.4",
 		"benchmark": "2.1.4",
 		"browserslist": "4.22.2",
-		"caniuse-lite": "1.0.30001579",
+		"caniuse-lite": "1.0.30001636",
 		"chalk": "4.1.1",
 		"change-case": "4.1.2",
 		"client-zip": "^2.4.5",
