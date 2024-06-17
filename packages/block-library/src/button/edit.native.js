@@ -241,9 +241,9 @@ function ButtonEdit( props ) {
 		);
 	}
 
-	function onChangeText( value ) {
+	function onChangeContent( value ) {
 		const { setAttributes } = props;
-		setAttributes( { text: value } );
+		setAttributes( { content: value } );
 	}
 
 	function onChangeBorderRadius( newRadius ) {
@@ -293,7 +293,7 @@ function ButtonEdit( props ) {
 		const { setAttributes } = props;
 
 		setAttributes( {
-			url: '',
+			href: '',
 			rel: '',
 			linkTarget: '',
 		} );
@@ -368,11 +368,13 @@ function ButtonEdit( props ) {
 		return (
 			<LinkSettingsNavigation
 				isVisible={ isLinkSheetVisible }
-				url={ attributes.url }
+				url={ attributes.href }
 				rel={ attributes.rel }
 				linkTarget={ attributes.linkTarget }
 				onClose={ dismissSheet }
-				setAttributes={ setAttributes }
+				setAttributes={ ( { url, ...restAttrs } ) =>
+					setAttributes( { href: url, ...restAttrs } )
+				}
 				withBottomSheet={ ! isCompatibleWithSettings }
 				hasPicker
 				actions={ linkSettingsActions }
@@ -417,9 +419,9 @@ function ButtonEdit( props ) {
 	} = props;
 	const {
 		placeholder,
-		text,
+		content,
 		style: buttonStyle,
-		url,
+		href,
 		align = 'center',
 		width,
 	} = attributes;
@@ -448,7 +450,7 @@ function ButtonEdit( props ) {
 	// value at least on 1 when `RichText` is focused or when is not focused, but `RichText` value is
 	// different than empty string.
 	let minWidth =
-		isButtonFocused || ( ! isButtonFocused && text && text !== '' )
+		isButtonFocused || ( ! isButtonFocused && content && content !== '' )
 			? MIN_WIDTH
 			: placeholderTextWidth;
 	if ( width ) {
@@ -461,7 +463,7 @@ function ButtonEdit( props ) {
 	// a `placeholder` as an empty string when `RichText` is focused,
 	// because `AztecView` is calculating a `minWidth` based on placeholder text.
 	const placeholderText =
-		isButtonFocused || ( ! isButtonFocused && text && text !== '' )
+		isButtonFocused || ( ! isButtonFocused && content && content !== '' )
 			? ''
 			: placeholder || __( 'Add text…' );
 
@@ -496,14 +498,14 @@ function ButtonEdit( props ) {
 				<RichText
 					ref={ onSetRef }
 					placeholder={ placeholderText }
-					value={ text }
-					onChange={ onChangeText }
+					value={ content }
+					onChange={ onChangeContent }
 					style={ textStyles }
 					textAlign={ align }
 					placeholderTextColor={
 						style?.color || styles.placeholderTextColor.color
 					}
-					identifier="text"
+					identifier="content"
 					tagName="p"
 					minWidth={ minWidth } // The minimum Button size.
 					maxWidth={ isFixedWidth ? minWidth : maxWidth } // The width of the screen.
@@ -529,7 +531,7 @@ function ButtonEdit( props ) {
 								title={ __( 'Edit link' ) }
 								icon={ link }
 								onClick={ onShowLinkSettings }
-								isActive={ url }
+								isActive={ href }
 							/>
 						</ToolbarGroup>
 					</BlockControls>

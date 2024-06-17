@@ -13,13 +13,13 @@ import { prependHTTP } from '@wordpress/url';
  *
  * @param {Object}  attributes               The current block attributes.
  * @param {string}  attributes.rel           The current link rel attribute.
- * @param {string}  attributes.url           The current link url.
+ * @param {string}  attributes.href          The current link href.
  * @param {boolean} attributes.opensInNewTab Whether the link should open in a new window.
  * @param {boolean} attributes.nofollow      Whether the link should be marked as nofollow.
  */
 export function getUpdatedLinkAttributes( {
 	rel = '',
-	url = '',
+	href = '',
 	opensInNewTab,
 	nofollow,
 } ) {
@@ -47,7 +47,7 @@ export function getUpdatedLinkAttributes( {
 	}
 
 	return {
-		url: prependHTTP( url ),
+		url: prependHTTP( href ),
 		linkTarget: newLinkTarget,
 		rel: updatedRel || undefined,
 	};

@@ -165,8 +165,8 @@ function ButtonEdit( props ) {
 		placeholder,
 		rel,
 		style,
-		text,
-		url,
+		content,
+		href,
 		width,
 		metadata,
 	} = attributes;
@@ -198,43 +198,43 @@ function ButtonEdit( props ) {
 	} );
 	const blockEditingMode = useBlockEditingMode();
 
-	const [ isEditingURL, setIsEditingURL ] = useState( false );
-	const isURLSet = !! url;
+	const [ isEditingHref, setIsEditingHref ] = useState( false );
+	const isHrefSet = !! href;
 	const opensInNewTab = linkTarget === NEW_TAB_TARGET;
 	const nofollow = !! rel?.includes( NOFOLLOW_REL );
 	const isLinkTag = 'a' === TagName;
 
 	function startEditing( event ) {
 		event.preventDefault();
-		setIsEditingURL( true );
+		setIsEditingHref( true );
 	}
 
 	function unlink() {
 		setAttributes( {
-			url: undefined,
+			href: undefined,
 			linkTarget: undefined,
 			rel: undefined,
 		} );
-		setIsEditingURL( false );
+		setIsEditingHref( false );
 	}
 
 	useEffect( () => {
 		if ( ! isSelected ) {
-			setIsEditingURL( false );
+			setIsEditingHref( false );
 		}
 	}, [ isSelected ] );
 
 	// Memoize link value to avoid overriding the LinkControl's internal state.
 	// This is a temporary fix. See https://github.com/WordPress/gutenberg/issues/51256.
 	const linkValue = useMemo(
-		() => ( { url, opensInNewTab, nofollow } ),
-		[ url, opensInNewTab, nofollow ]
+		() => ( { href, opensInNewTab, nofollow } ),
+		[ href, opensInNewTab, nofollow ]
 	);
 
-	const useEnterRef = useEnter( { content: text, clientId } );
+	const useEnterRef = useEnter( { content, clientId } );
 	const mergedRef = useMergeRefs( [ useEnterRef, richTextRef ] );
 
-	const { lockUrlControls = false } = useSelect(
+	const { lockHrefControls = false } = useSelect(
 		( select ) => {
 			if ( ! isSelected ) {
 				return {};
@@ -242,19 +242,19 @@ function ButtonEdit( props ) {
 
 			const blockBindingsSource = unlock(
 				select( blocksStore )
-			).getBlockBindingsSource( metadata?.bindings?.url?.source );
+			).getBlockBindingsSource( metadata?.bindings?.href?.source );
 
 			return {
-				lockUrlControls:
-					!! metadata?.bindings?.url &&
+				lockHrefControls:
+					!! metadata?.bindings?.href &&
 					! blockBindingsSource?.canUserEditValue( {
 						select,
 						context,
-						args: metadata?.bindings?.url?.args,
+						args: metadata?.bindings?.href?.args,
 					} ),
 			};
 		},
-		[ isSelected, metadata?.bindings?.url ]
+		[ isSelected, metadata?.bindings?.href ]
 	);
 
 	return (
@@ -271,10 +271,10 @@ function ButtonEdit( props ) {
 					ref={ mergedRef }
 					aria-label={ __( 'Button text' ) }
 					placeholder={ placeholder || __( 'Add text…' ) }
-					value={ text }
+					value={ content }
 					onChange={ ( value ) =>
 						setAttributes( {
-							text: removeAnchorTag( value ),
+							content: removeAnchorTag( value ),
 						} )
 					}
 					withoutInteractiveFormatting
@@ -311,7 +311,7 @@ function ButtonEdit( props ) {
 						} }
 					/>
 				) }
-				{ ! isURLSet && isLinkTag && ! lockUrlControls && (
+				{ ! isHrefSet && isLinkTag && ! lockHrefControls && (
 					<ToolbarButton
 						name="link"
 						icon={ link }
@@ -320,7 +320,7 @@ function ButtonEdit( props ) {
 						onClick={ startEditing }
 					/>
 				) }
-				{ isURLSet && isLinkTag && ! lockUrlControls && (
+				{ isHrefSet && isLinkTag && ! lockHrefControls && (
 					<ToolbarButton
 						name="link"
 						icon={ linkOff }
@@ -333,30 +333,30 @@ function ButtonEdit( props ) {
 			</BlockControls>
 			{ isLinkTag &&
 				isSelected &&
-				( isEditingURL || isURLSet ) &&
-				! lockUrlControls && (
+				( isEditingHref || isHrefSet ) &&
+				! lockHrefControls && (
 					<Popover
 						placement="bottom"
 						onClose={ () => {
-							setIsEditingURL( false );
+							setIsEditingHref( false );
 							richTextRef.current?.focus();
 						} }
 						anchor={ popoverAnchor }
-						focusOnMount={ isEditingURL ? 'firstElement' : false }
+						focusOnMount={ isEditingHref ? 'firstElement' : false }
 						__unstableSlotName="__unstable-block-tools-after"
 						shift
 					>
 						<LinkControl
 							value={ linkValue }
 							onChange={ ( {
-								url: newURL,
+								href: newHref,
 								opensInNewTab: newOpensInNewTab,
 								nofollow: newNofollow,
 							} ) =>
 								setAttributes(
 									getUpdatedLinkAttributes( {
 										rel,
-										url: newURL,
+										href: newHref,
 										opensInNewTab: newOpensInNewTab,
 										nofollow: newNofollow,
 									} )
@@ -366,7 +366,7 @@ function ButtonEdit( props ) {
 								unlink();
 								richTextRef.current?.focus();
 							} }
-							forceIsEditingLink={ isEditingURL }
+							forceIsEditingLink={ isEditingHref }
 							settings={ LINK_SETTINGS }
 						/>
 					</Popover>

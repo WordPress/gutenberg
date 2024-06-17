@@ -22,15 +22,15 @@ export const settings = {
 	example: {
 		attributes: {
 			className: 'is-style-fill',
-			text: __( 'Call to Action' ),
+			content: __( 'Call to Action' ),
 		},
 	},
 	edit,
 	save,
 	deprecated,
-	merge: ( a, { text = '' } ) => ( {
+	merge: ( a, { content = '' } ) => ( {
 		...a,
-		text: ( a.text || '' ) + text,
+		content: ( a.content || '' ) + content,
 	} ),
 };
 

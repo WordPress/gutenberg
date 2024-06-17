@@ -21,7 +21,7 @@
 		"textAlign": {
 			"type": "string"
 		},
-		"url": {
+		"href": {
 			"type": "string",
 			"source": "attribute",
 			"selector": "a",
@@ -35,7 +35,7 @@
 			"attribute": "title",
 			"__experimentalRole": "content"
 		},
-		"text": {
+		"content": {
 			"type": "rich-text",
 			"source": "rich-text",
 			"selector": "a,button",

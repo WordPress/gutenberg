@@ -25,9 +25,9 @@ export default function save( { attributes, className } ) {
 		linkTarget,
 		rel,
 		style,
-		text,
+		content,
 		title,
-		url,
+		href,
 		width,
 	} = attributes;
 
@@ -72,10 +72,10 @@ export default function save( { attributes, className } ) {
 				tagName={ TagName }
 				type={ isButtonTag ? buttonType : null }
 				className={ buttonClasses }
-				href={ isButtonTag ? null : url }
+				href={ isButtonTag ? null : href }
 				title={ title }
 				style={ buttonStyle }
-				value={ text }
+				value={ content }
 				target={ isButtonTag ? null : linkTarget }
 				rel={ isButtonTag ? null : rel }
 			/>
