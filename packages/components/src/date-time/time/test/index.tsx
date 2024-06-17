@@ -165,7 +165,7 @@ describe( 'TimePicker', () => {
 			/>
 		);
 
-		const pmButton = screen.getByLabelText( 'PM', { selector: 'button' } );
+		const pmButton = screen.getByRole( 'radio', { name: 'PM' } );
 
 		await user.click( pmButton );
 
@@ -185,7 +185,7 @@ describe( 'TimePicker', () => {
 			/>
 		);
 
-		const amButton = screen.getByLabelText( 'AM', { selector: 'button' } );
+		const amButton = screen.getByRole( 'radio', { name: 'AM' } );
 
 		await user.click( amButton );
 
@@ -205,7 +205,7 @@ describe( 'TimePicker', () => {
 			/>
 		);
 
-		const pmButton = screen.getByLabelText( 'PM', { selector: 'button' } );
+		const pmButton = screen.getByRole( 'radio', { name: 'PM' } );
 		await user.click( pmButton );
 
 		const hoursInput = screen.getByLabelText( 'Hours' );
@@ -281,16 +281,9 @@ describe( 'TimePicker', () => {
 		expect(
 			( screen.getByLabelText( 'Minutes' ) as HTMLInputElement ).value
 		).toBe( '00' );
-		/**
-		 * This is not ideal, but best of we can do for now until we refactor
-		 * AM/PM into accessible elements, like radio buttons.
-		 */
-		expect(
-			screen.getByLabelText( 'AM', { selector: 'button' } )
-		).not.toBeChecked();
-		expect(
-			screen.getByLabelText( 'PM', { selector: 'button' } )
-		).toBeChecked();
+
+		expect( screen.getByRole( 'radio', { name: 'AM' } ) ).not.toBeChecked();
+		expect( screen.getByRole( 'radio', { name: 'PM' } ) ).toBeChecked();
 	} );
 
 	it( 'should have different layouts/orders for 12/24 hour formats', () => {
