@@ -121,13 +121,25 @@ export default function ListViewSidebar() {
 					{
 						name: 'list-view',
 						title: _x( 'List View', 'Post overview' ),
-						panel: <ListView dropZoneElement={ dropZoneElement } />,
+						panel: (
+							<div className="editor-list-view-sidebar__list-view-container">
+								<div className="editor-list-view-sidebar__list-view-panel-content">
+									<ListView
+										dropZoneElement={ dropZoneElement }
+									/>
+								</div>
+							</div>
+						),
 						panelRef: listViewContainerRef,
 					},
 					{
 						name: 'outline',
 						title: _x( 'Outline', 'Post overview' ),
-						panel: <ListViewOutline />,
+						panel: (
+							<div className="editor-list-view-sidebar__list-view-container">
+								<ListViewOutline />
+							</div>
+						),
 					},
 				] }
 				onClose={ closeListView }
