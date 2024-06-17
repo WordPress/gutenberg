@@ -1248,7 +1248,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @since 5.8.0
 	 * @since 5.9.0 Removed the `$type` parameter`, added the `$types` and `$origins` parameters.
-	 * @since 6.6.0 Added option to skip root layout styles.
+	 * @since 6.6.0 Added option to skip root layout or block style variation styles.
 	 *
 	 * @param array $types   Types of styles to load. Will load all by default. It accepts:
 	 *                       - `variables`: only the CSS Custom Properties for presets & custom ones.
