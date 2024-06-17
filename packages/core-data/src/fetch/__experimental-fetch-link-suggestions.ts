@@ -264,14 +264,16 @@ export default async function fetchLinkSuggestions(
  * @param search
  */
 export function sortResults( results: SearchResult[], search: string ) {
-	const searchTokens = new Set( tokenize( search ) );
+	const searchTokens = tokenize( search );
 
 	const scores = {};
 	for ( const result of results ) {
 		if ( result.title ) {
 			const titleTokens = tokenize( result.title );
-			const matchingTokens = titleTokens.filter( ( token ) =>
-				searchTokens.has( token )
+			const matchingTokens = titleTokens.filter( ( titleToken ) =>
+				searchTokens.some( ( searchToken ) =>
+					titleToken.includes( searchToken )
+				)
 			);
 			scores[ result.id ] = matchingTokens.length / titleTokens.length;
 		} else {
