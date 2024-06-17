@@ -300,7 +300,11 @@ export function TimePicker( {
 							className="components-datetime__time-field components-datetime__time-field-am-pm" // Unused, for backwards compatibility.
 							label={ __( 'Select AM or PM' ) }
 							hideLabelFromVision
-							onChange={ function noRefCheck() {} }
+							onChange={ ( period ) => {
+								if ( period === 'AM' || period === 'PM' ) {
+									buildAmPmChangeCallback( period )();
+								}
+							} }
 							__next40pxDefaultSize
 							__nextHasNoMarginBottom
 							isBlock
@@ -309,14 +313,12 @@ export function TimePicker( {
 							<ToggleGroupControlOption
 								className="components-datetime__time-am-button" // Unused, for backwards compatibility.
 								aria-label="AM"
-								onClick={ buildAmPmChangeCallback( 'AM' ) }
 								value="AM"
 								label={ __( 'AM' ) }
 							/>
 							<ToggleGroupControlOption
 								className="components-datetime__time-pm-button" // Unused, for backwards compatibility.
 								aria-label="PM"
-								onClick={ buildAmPmChangeCallback( 'PM' ) }
 								value="PM"
 								label={ __( 'PM' ) }
 							/>
