@@ -30,12 +30,16 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 	useEffect( () => {
 		const updates = {};
 
-		const { columnCount, rowCount } = gridLayout;
+		const { columnCount, rowCount = 2 } = gridLayout;
+
 		const isManualGrid = !! columnCount;
 
 		if ( isManualGrid ) {
 			const rects = [];
-
+			const minimumNeededRows = Math.max(
+				Math.ceil( blockOrder.length / columnCount ),
+				rowCount
+			);
 			// Respect the position of blocks that already have a columnStart and rowStart value.
 			for ( const clientId of blockOrder ) {
 				const attributes = getBlockAttributes( clientId );
@@ -65,7 +69,7 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 				const [ newColumnStart, newRowStart ] = getFirstEmptyCell(
 					rects,
 					columnCount,
-					rowCount,
+					minimumNeededRows,
 					columnSpan,
 					rowSpan
 				);
