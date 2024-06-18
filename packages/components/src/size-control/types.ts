@@ -73,6 +73,10 @@ export type SizeControlBaseProps = {
 
 export type SizeControlProps = SizeControlBaseProps & {
 	/**
+	 * Fallback value for the control.
+	 */
+	id?: string;
+	/**
 	 * Disables interaction with the control.
 	 */
 	isDisabled?: boolean;
@@ -80,4 +84,12 @@ export type SizeControlProps = SizeControlBaseProps & {
 	 * Whether the font size has units.
 	 */
 	hasUnits: boolean;
+	/**
+	 * Label for the element
+	 */
+	label?: string;
+	/**
+	 * Whether the label should be hidden from vision.
+	 */
+	hideLabelFromVision?: boolean;
 };

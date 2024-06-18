@@ -1,11 +1,20 @@
 /**
+ * External dependencies
+ */
+import type { ForwardedRef } from 'react';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { forwardRef } from '@wordpress/element';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
+import { BaseControl } from '../base-control';
+import type { WordPressComponentProps } from '../context/wordpress-component';
 import { Button } from '../button';
 import RangeControl from '../range-control';
 import { Flex, FlexItem } from '../flex';
@@ -20,8 +29,12 @@ import { Spacer } from '../spacer';
 
 export const DEFAULT_UNITS = [ 'px', 'em', 'rem', 'vw', 'vh' ];
 
-function SizeControl( props: SizeControlProps ) {
+function UnforwardedBaseSizeControl(
+	props: SizeControlProps,
+	ref: ForwardedRef< HTMLInputElement >
+) {
 	const {
+		id,
 		__next40pxDefaultSize,
 		value,
 		isDisabled,
@@ -73,6 +86,7 @@ function SizeControl( props: SizeControlProps ) {
 				<FlexItem isBlock>
 					<Spacer marginX={ 2 } marginBottom={ 0 }>
 						<RangeControl
+							id={ id }
 							__nextHasNoMarginBottom
 							__next40pxDefaultSize={ __next40pxDefaultSize }
 							className="components-font-size-picker__custom-input"
@@ -95,6 +109,7 @@ function SizeControl( props: SizeControlProps ) {
 							min={ 0 }
 							max={ isValueUnitRelative ? 10 : 100 }
 							step={ isValueUnitRelative ? 0.1 : 1 }
+							ref={ ref }
 						/>
 					</Spacer>
 				</FlexItem>
@@ -124,4 +139,30 @@ function SizeControl( props: SizeControlProps ) {
 	);
 }
 
-export default SizeControl;
+const BaseSizeControl = forwardRef( UnforwardedBaseSizeControl );
+
+function SizeControl(
+	{
+		className,
+		label,
+		hideLabelFromVision = false,
+		...props
+	}: WordPressComponentProps< SizeControlProps, 'input', true >,
+	ref: ForwardedRef< HTMLInputElement >
+) {
+	const instanceId = useInstanceId( SizeControl );
+	const id = `size-control-${ instanceId }`;
+
+	return (
+		<BaseControl
+			id={ id }
+			className={ className }
+			label={ label }
+			hideLabelFromVision={ hideLabelFromVision }
+		>
+			<BaseSizeControl id={ id } ref={ ref } { ...props } />
+		</BaseControl>
+	);
+}
+
+export default forwardRef( SizeControl );
