@@ -419,7 +419,9 @@ test.describe( 'Buttons', () => {
 				const buttonBlock = ( await editor.getBlocks() )[ 0 ]
 					.innerBlocks[ 0 ];
 				expect( buttonBlock.name ).toBe( 'core/button' );
-				expect( buttonBlock.attributes.text ).toBe( 'initial content' );
+				expect( buttonBlock.attributes.content ).toBe(
+					'initial content'
+				);
 			} );
 
 			test( 'should preserve the metadata attribute', async ( {
@@ -471,7 +473,7 @@ test.describe( 'Buttons', () => {
 				expect(
 					buttonBlock.attributes.metadata.bindings
 				).toMatchObject( {
-					text: {
+					content: {
 						source: 'core/post-meta',
 						args: {
 							key: 'custom_field',
