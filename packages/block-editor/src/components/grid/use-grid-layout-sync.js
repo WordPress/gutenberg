@@ -40,6 +40,14 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 				Math.ceil( blockOrder.length / columnCount ),
 				rowCount
 			);
+			if ( rowCount !== minimumNeededRows ) {
+				updates[ gridClientId ] = {
+					layout: {
+						...gridLayout,
+						rowCount: minimumNeededRows,
+					},
+				};
+			}
 			// Respect the position of blocks that already have a columnStart and rowStart value.
 			for ( const clientId of blockOrder ) {
 				const attributes = getBlockAttributes( clientId );
