@@ -218,3 +218,9 @@ exports[`rawHandler should preserve all paragraphs 1`] = `
 <p></p>
 <!-- /wp:paragraph -->"
 `;
+
+exports[`rawHandler should remove convertable spans 1`] = `
+"<!-- wp:paragraph -->
+<p>a</p>
+<!-- /wp:paragraph -->"
+`;

@@ -14,6 +14,8 @@ import specialCommentConverter from './special-comment-converter';
 import listReducer from './list-reducer';
 import blockquoteNormaliser from './blockquote-normaliser';
 import figureContentReducer from './figure-content-reducer';
+import phrasingContentReducer from './phrasing-content-reducer';
+import emptySpanRemover from './empty-span-remover';
 import shortcodeConverter from './shortcode-converter';
 import { deepFilterHTML, getBlockContentSchema } from './utils';
 
@@ -69,9 +71,11 @@ export function rawHandler( { HTML = '' } ) {
 				specialCommentConverter,
 				// Needed to create media blocks.
 				figureContentReducer,
+				phrasingContentReducer,
 				// Needed to create the quote block, which cannot handle text
 				// without wrapper paragraphs.
 				blockquoteNormaliser( { raw: true } ),
+				emptySpanRemover,
 			];
 
 			piece = deepFilterHTML( piece, filters, blockContentSchema );

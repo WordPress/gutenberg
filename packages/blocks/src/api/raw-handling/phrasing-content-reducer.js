@@ -3,6 +3,13 @@
  */
 import { wrap, replaceTag } from '@wordpress/dom';
 
+function removeStyle( node, property ) {
+	node.style[ property ] = '';
+	if ( ! node.style.length ) {
+		node.removeAttribute( 'style' );
+	}
+}
+
 export default function phrasingContentReducer( node, doc ) {
 	// In jsdom-jscore, 'node.style' can be null.
 	// TODO: Explore fixing this by patching jsdom-jscore.
@@ -15,11 +22,17 @@ export default function phrasingContentReducer( node, doc ) {
 			verticalAlign,
 		} = node.style;
 
+		if ( fontWeight === 'normal' || fontWeight === '400' ) {
+			removeStyle( node, 'fontWeight' );
+		}
+
 		if ( fontWeight === 'bold' || fontWeight === '700' ) {
+			removeStyle( node, 'fontWeight' );
 			wrap( doc.createElement( 'strong' ), node );
 		}
 
 		if ( fontStyle === 'italic' ) {
+			removeStyle( node, 'fontStyle' );
 			wrap( doc.createElement( 'em' ), node );
 		}
 
@@ -30,39 +43,20 @@ export default function phrasingContentReducer( node, doc ) {
 			textDecorationLine === 'line-through' ||
 			textDecoration.includes( 'line-through' )
 		) {
+			removeStyle( node, 'textDecoration' );
 			wrap( doc.createElement( 's' ), node );
 		}
 
 		if ( verticalAlign === 'super' ) {
+			removeStyle( node, 'verticalAlign' );
 			wrap( doc.createElement( 'sup' ), node );
 		} else if ( verticalAlign === 'sub' ) {
+			removeStyle( node, 'verticalAlign' );
 			wrap( doc.createElement( 'sub' ), node );
 		}
 	} else if ( node.nodeName === 'B' ) {
 		node = replaceTag( node, 'strong' );
 	} else if ( node.nodeName === 'I' ) {
 		node = replaceTag( node, 'em' );
-	} else if ( node.nodeName === 'A' ) {
-		// In jsdom-jscore, 'node.target' can be null.
-		// TODO: Explore fixing this by patching jsdom-jscore.
-		if ( node.target && node.target.toLowerCase() === '_blank' ) {
-			node.rel = 'noreferrer noopener';
-		} else {
-			node.removeAttribute( 'target' );
-			node.removeAttribute( 'rel' );
-		}
-
-		// Saves anchor elements name attribute as id
-		if ( node.name && ! node.id ) {
-			node.id = node.name;
-		}
-
-		// Keeps id only if there is an internal link pointing to it
-		if (
-			node.id &&
-			! node.ownerDocument.querySelector( `[href="#${ node.id }"]` )
-		) {
-			node.removeAttribute( 'id' );
-		}
 	}
 }
