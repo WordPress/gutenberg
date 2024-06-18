@@ -6,7 +6,7 @@
  */
 
 /**
- * Gutenberg's Menu
+ * Gutenberg's Menu.
  *
  * Adds a new wp-admin menu page for the Gutenberg editor.
  *
