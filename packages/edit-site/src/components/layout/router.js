@@ -1,9 +1,13 @@
 /**
  * WordPress dependencies
  */
+import { applyFilters, addFilter } from '@wordpress/hooks';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { cog } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
+import { registerPlugin } from '@wordpress/plugins';
+
 /**
  * Internal dependencies
  */
@@ -13,9 +17,11 @@ import Editor from '../editor';
 import PagePages from '../page-pages';
 import PagePatterns from '../page-patterns';
 import PageTemplates from '../page-templates';
+import SidebarNavigationItem from '../sidebar-navigation-item';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import SidebarNavigationScreenGlobalStyles from '../sidebar-navigation-screen-global-styles';
 import SidebarNavigationScreenMain from '../sidebar-navigation-screen-main';
+import SidebarNavigationScreenMainPlugins from '../sidebar-navigation-screen-main/plugins';
 import SidebarNavigationScreenNavigationMenus from '../sidebar-navigation-screen-navigation-menus';
 import SidebarNavigationScreenTemplatesBrowse from '../sidebar-navigation-screen-templates-browse';
 import SidebarNavigationScreenPatterns from '../sidebar-navigation-screen-patterns';
@@ -73,10 +79,52 @@ function useRedirectOldPaths() {
 	}, [ history, params ] );
 }
 
+addFilter( 'siteEditor.routes', 'testPlugin/route', ( routes ) => {
+	return [
+		...routes,
+		{
+			name: 'test',
+			areas: {
+				sidebar: (
+					<SidebarNavigationScreen
+						isRoot={ false }
+						title="Test Plugin"
+						description="Plugin description."
+						backPath={ {} }
+						content={ <div>This is the sidebar content.</div> }
+					/>
+				),
+				content: <div>Plugin content</div>,
+				mobile: <div>Mobile</div>,
+			},
+		},
+	];
+} );
+
+registerPlugin( 'test-plugin', {
+	icon: 'text',
+	render: () => {
+		return (
+			<>
+				<SidebarNavigationScreenMainPlugins>
+					<SidebarNavigationItem
+						uid="test-plugin-navigation-item"
+						params={ { plugin: 'test' } }
+						withChevron
+						icon={ cog }
+					>
+						{ __( 'Test Plugin' ) }
+					</SidebarNavigationItem>
+				</SidebarNavigationScreenMainPlugins>
+			</>
+		);
+	},
+} );
+
 export default function useLayoutAreas() {
 	const isSiteEditorLoading = useIsSiteEditorLoading();
 	const { params } = useLocation();
-	const { postType, postId, path, layout, isCustom, canvas } = params;
+	const { postType, postId, path, layout, isCustom, canvas, plugin } = params;
 	useRedirectOldPaths();
 
 	// Page list
@@ -193,6 +241,21 @@ export default function useLayoutAreas() {
 				),
 			},
 		};
+	}
+
+	const pluginRoutes = applyFilters( 'siteEditor.routes', [] );
+	const currentPluginRoute = pluginRoutes.find( ( pluginRoute ) => {
+		if ( plugin === pluginRoute.name ) {
+			return {
+				key: 'plugin-' + pluginRoute.name,
+				areas: pluginRoute.areas,
+			};
+		}
+		return undefined;
+	} );
+
+	if ( currentPluginRoute ) {
+		return currentPluginRoute;
 	}
 
 	// Fallback shows the home page preview
