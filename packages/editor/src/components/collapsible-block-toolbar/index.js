@@ -16,7 +16,7 @@ import { __ } from '@wordpress/i18n';
 import { next, previous } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 
-function CollapsableBlockToolbar( { isCollapsed, onToggle } ) {
+export default function CollapsibleBlockToolbar( { isCollapsed, onToggle } ) {
 	const { blockSelectionStart } = useSelect( ( select ) => {
 		return {
 			blockSelectionStart:
@@ -60,5 +60,3 @@ function CollapsableBlockToolbar( { isCollapsed, onToggle } ) {
 		</>
 	);
 }
-
-export default CollapsableBlockToolbar;

@@ -21,7 +21,7 @@ import {
  * Internal dependencies
  */
 import BackButton from './back-button';
-import CollapsableBlockToolbar from '../collapsible-block-toolbar';
+import CollapsibleBlockToolbar from '../collapsible-block-toolbar';
 import DocumentBar from '../document-bar';
 import DocumentTools from '../document-tools';
 import MoreMenu from '../more-menu';
@@ -94,7 +94,7 @@ function Header( {
 
 	const blockToolbar =
 		useHasBlockToolbar() && hasFixedToolbar && isLargeViewport ? (
-			<CollapsableBlockToolbar
+			<CollapsibleBlockToolbar
 				isCollapsed={ isBlockToolsCollapsed }
 				onToggle={ setIsBlockToolsCollapsed }
 			/>
