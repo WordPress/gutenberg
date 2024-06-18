@@ -427,7 +427,7 @@ See the [Example documentation](/docs/reference-guides/block-api/block-registrat
 
 ### Variations
 
--   Type: `object[]`
+-   Type: `object[]|string`
 -   Optional
 -   Localized: Yes (`title`, `description`, and `keywords` of each variation only)
 -   Property: `variations`
@@ -453,6 +453,14 @@ See the [Example documentation](/docs/reference-guides/block-api/block-registrat
 Block Variations is the API that allows a block to have similar versions of it, but all these versions share some common functionality. Each block variation is differentiated from the others by setting some initial attributes or inner blocks. Then at the time when a block is inserted these attributes and/or inner blocks are applied.
 
 _Note: In JavaScript you can provide a function for the `isActive` property, and a React element for the `icon`. In the `block.json` file both only support strings_
+
+_Note: Starting with version 6.7, it is possible to specify a PHP file that generates the list of block variations on the server side:_
+
+```json
+{
+	"variations": "file:./variations.php"
+}
+```
 
 See [the variations documentation](/docs/reference-guides/block-api/block-variations.md) for more details.
 

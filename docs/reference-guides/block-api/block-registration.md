@@ -233,10 +233,12 @@ example: {
 
 #### variations (optional)
 
--   **Type:** `Object[]`
+-   **Type:** `Object[]|string`
 -   **Since**: `WordPress 5.9.0`
 
 Similarly to how the block's styles can be declared, a block type can define block variations that the user can pick from. The difference is that, rather than changing only the visual appearance, this field provides a way to apply initial custom attributes and inner blocks at the time when a block is inserted. See the [Block Variations API](/docs/reference-guides/block-api/block-variations.md) for more details.
+
+_Note:_ Starting with WordPress 6.7, it is possible to specify a PHP file that generates the list of block variations on the server side.
 
 #### supports (optional)
 
