@@ -212,7 +212,7 @@ function FontSize() {
 						{ isCustomFluid && (
 							<>
 								<SizeControl
-									label={ __( 'Min' ) }
+									label={ __( 'Minimun' ) }
 									value={ fontSize.fluid?.min }
 									withSlider
 									onChange={ handleMinChange }
@@ -220,7 +220,7 @@ function FontSize() {
 									withReset={ false }
 								/>
 								<SizeControl
-									label={ __( 'Max' ) }
+									label={ __( 'Maximun' ) }
 									value={ fontSize.fluid?.max }
 									withSlider
 									onChange={ handleMaxChange }
