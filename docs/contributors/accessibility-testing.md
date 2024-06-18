@@ -2,6 +2,13 @@
 
 This is a guide on how to test accessibility on Gutenberg. This is a living document that can be improved over time with new approaches and techniques.
 
+This is a new paragraph in the Accessibility testing section.
+
+| Column 1               | Column 2            |
+| ---------------------- | ------------------- |
+| This is a table        | That's a cell       |
+| Let's see what happens | When we export a PR |
+
 ## Getting started
 
 Make sure you have set up your local environment following the instructions on [Getting Started](/docs/contributors/code/getting-started-with-code-contribution.md).
@@ -10,9 +17,10 @@ Make sure you have set up your local environment following the instructions on [
 
 In addition to mouse, make sure the interface is fully accessible for keyboard-only users. Try to interact with your changes using only the keyboard:
 
--   Make sure interactive elements can receive focus using <kbd>Tab</kbd>, <kbd>Shift+Tab</kbd> or arrow keys.
--   Buttons should be activable by pressing <kbd>Enter</kbd> and <kbd>Space</kbd>.
--   Radio buttons and checkboxes should be checked by pressing <kbd>Space</kbd>, but not <kbd>Enter</kbd>.
+- Make sure interactive elements can receive focus using <kbd>Tab</kbd>, <kbd>Shift+Tab</kbd> or arrow keys.
+- Buttons should be activable by pressing <kbd>Enter</kbd> and <kbd>Space</kbd>.
+- Radio buttons and checkboxes should be checked by pressing <kbd>Space</kbd>, but not <kbd>Enter</kbd>.
+
 
 If the elements can be focused using arrow keys, but not <kbd>Tab</kbd> or <kbd>Shift+Tab</kbd>, consider grouping them using one of the [WAI-ARIA composite subclass roles](https://www.w3.org/TR/wai-aria-1.1/#composite), such as [`toolbar`](https://www.w3.org/TR/wai-aria-1.1/#toolbar), [`menu`](https://www.w3.org/TR/wai-aria-1.1/#menu) and [`listbox`](https://www.w3.org/TR/wai-aria-1.1/#listbox).
 
@@ -63,3 +71,4 @@ While in the Gutenberg editor, with VoiceOver activated, you can press <kbd>Cont
 Prefer to select a region or another larger area to begin with instead of individual elements on the Rotor so you can better test the navigation within that region.
 
 Once you find the region you want to interact with, you can use <kbd>Control+Option</kbd> plus right or left arrow keys to move to the next or previous elements on the page. Then, follow the instructions that VoiceOver will announce.
+
