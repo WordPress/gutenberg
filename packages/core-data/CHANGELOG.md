@@ -41,7 +41,7 @@
 
 ## 6.21.0 (2023-10-18)
 
-## Enhancements
+### Enhancements
 
 -   Add `getEntityRecordsTotalItems` and `getEntityRecordsTotalPages` selectors. [#55164](https://github.com/WordPress/gutenberg/pull/55164).
 -   Revisions: add new selectors, `getRevisions` and `getRevision`, to fetch entity revisions. [#54046](https://github.com/WordPress/gutenberg/pull/54046).
@@ -161,7 +161,7 @@
 
 ## 4.0.0 (2021-07-29)
 
-### Breaking Change
+### Breaking Changes
 
 -   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
 
@@ -184,13 +184,13 @@
 
 ## 2.25.0 (2020-12-17)
 
-### New Feature
+### New Features
 
 -   Added a store definition `store` for the core data namespace to use with `@wordpress/data` API ([#26655](https://github.com/WordPress/gutenberg/pull/26655)).
 
 ## 2.21.0 (2020-09-03)
 
-### New Feature
+### New Features
 
 -   The `deleteEntityRecord` and `removeItems` actions have been added.
 -   The `isDeletingEntityRecord` and `getLastEntityDeleteError` selectors have been added.
@@ -198,7 +198,7 @@
 
 ## 2.3.0 (2019-05-21)
 
-### New features
+### New Features
 
 -   The `getAutosave`, `getAutosaves` and `getCurrentUser` selectors have been added.
 -   The `receiveAutosaves` and `receiveCurrentUser` actions have been added.
@@ -233,7 +233,7 @@
 
 ## 2.0.0 (2018-09-05)
 
-### Breaking Change
+### Breaking Changes
 
 -   `dispatch("core").receiveTerms` has been deprecated. Please use `dispatch("core").receiveEntityRecords` instead.
 -   `getCategories` resolvers has been deprecated. Please use `getEntityRecords` resolver instead.
