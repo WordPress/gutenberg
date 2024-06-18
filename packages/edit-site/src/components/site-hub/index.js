@@ -77,7 +77,7 @@ const SiteHub = memo(
 								variant="link"
 								href={ homeUrl }
 								target="_blank"
-								label={ __( 'View site (opens in a new tab)' ) }
+								label={ decodeEntities( siteTitle ) }
 							>
 								{ decodeEntities( siteTitle ) }
 							</Button>
