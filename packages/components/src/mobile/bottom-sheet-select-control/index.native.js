@@ -10,11 +10,16 @@ import { useNavigation } from '@react-navigation/native';
 import { useState } from '@wordpress/element';
 import { Icon, chevronRight, check } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
-import { BottomSheet } from '@wordpress/components';
+
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
+import BottomSheet from '../bottom-sheet';
+
+const EMPTY_OPTION = {
+	label: '',
+};
 
 const BottomSheetSelectControl = ( {
 	label,
@@ -22,6 +27,7 @@ const BottomSheetSelectControl = ( {
 	options: items,
 	onChange,
 	value: selectedValue,
+	disabled,
 } ) => {
 	const [ showSubSheet, setShowSubSheet ] = useState( false );
 	const navigation = useNavigation();
@@ -33,9 +39,9 @@ const BottomSheetSelectControl = ( {
 		};
 	};
 
-	const selectedOption = items.find(
-		( option ) => option.value === selectedValue
-	);
+	const selectedOption =
+		items.find( ( option ) => option.value === selectedValue ) ??
+		EMPTY_OPTION;
 
 	const goBack = () => {
 		setShowSubSheet( false );
@@ -56,7 +62,7 @@ const BottomSheetSelectControl = ( {
 					icon={ icon }
 					value={ selectedOption.label }
 					onPress={ openSubSheet }
-					accessibilityRole={ 'button' }
+					accessibilityRole="button"
 					accessibilityLabel={ sprintf(
 						// translators:  %1$s: Select control button label e.g. "Button width". %2$s: Select control option value e.g: "Auto, 25%".
 						__( '%1$s. Currently selected: %2$s' ),
@@ -68,8 +74,9 @@ const BottomSheetSelectControl = ( {
 						__( 'Navigates to select %s' ),
 						label
 					) }
+					disabled={ disabled }
 				>
-					<Icon icon={ chevronRight }></Icon>
+					{ disabled ? null : <Icon icon={ chevronRight } /> }
 				</BottomSheet.Cell>
 			}
 			showSheet={ showSubSheet }
@@ -89,9 +96,9 @@ const BottomSheetSelectControl = ( {
 							label={ item.label }
 							icon={ item.icon }
 							onPress={ onChangeValue( item.value ) }
-							leftAlign={ true }
+							leftAlign
 							key={ index }
-							accessibilityRole={ 'button' }
+							accessibilityRole="button"
 							accessibilityLabel={
 								item.value === selectedValue
 									? sprintf(

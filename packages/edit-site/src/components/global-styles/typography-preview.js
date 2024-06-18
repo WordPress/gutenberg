@@ -6,7 +6,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 
 const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 
@@ -27,6 +27,7 @@ export default function TypographyPreview( { name, element, headingLevel } ) {
 		prefix + 'color.background',
 		name
 	);
+	const [ fallbackBackgroundColor ] = useGlobalStyle( 'color.background' );
 	const [ color ] = useGlobalStyle( prefix + 'color.text', name );
 	const [ fontSize ] = useGlobalStyle( prefix + 'typography.fontSize', name );
 	const [ fontStyle ] = useGlobalStyle(
@@ -53,7 +54,8 @@ export default function TypographyPreview( { name, element, headingLevel } ) {
 			className="edit-site-typography-preview"
 			style={ {
 				fontFamily: fontFamily ?? 'serif',
-				background: gradientValue ?? backgroundColor,
+				background:
+					gradientValue ?? backgroundColor ?? fallbackBackgroundColor,
 				color,
 				fontSize,
 				fontStyle,

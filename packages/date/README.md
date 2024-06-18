@@ -115,6 +115,19 @@ _Returns_
 
 -   `string`: Formatted date.
 
+### humanTimeDiff
+
+Returns a human-readable time difference between two dates, like human_time_diff() in PHP.
+
+_Parameters_
+
+-   _from_ `Moment | Date | string`: From date, in the WP timezone.
+-   _to_ `Moment | Date | string | undefined`: To date, formatted in the WP timezone.
+
+_Returns_
+
+-   `string`: Human-readable time difference.
+
 ### isInTheFuture
 
 Check whether a date is considered in the future according to the WordPress settings.

@@ -10,7 +10,6 @@
 		padding: 0 !important;
 		display: flex;
 		align-items: stretch;
-		overflow: visible;
 		min-height: 240px;
 
 		.components-placeholder {
@@ -31,9 +30,18 @@
 	}
 
 	// Applied while media is being uploaded
-	&.is-transient::before {
-		background-color: #fff;
-		opacity: 0.3;
+	&.is-transient {
+		position: relative;
+
+		&::before {
+			background-color: #fff;
+			content: "";
+			height: 100%;
+			opacity: 0.3;
+			position: absolute;
+			width: 100%;
+			z-index: 1;
+		}
 	}
 
 	// Shown while media is being uploaded
@@ -97,6 +105,7 @@
 		// The inner drag handle will still have `pointer-events: all` allowing
 		// it to continue to be interacted with.
 		pointer-events: none;
+		overflow: visible;
 	}
 }
 
@@ -113,11 +122,4 @@
 
 .color-block-support-panel__inner-wrapper > :not(.block-editor-tools-panel-color-gradient-settings__item) {
 	margin-top: $grid-unit-30;
-}
-
-
-// The frontend style.scss includes a min-height as an IE11 fix.
-// This fix causes extra spacing for the focus style in the editor, so we omit it here.
-.wp-block-cover::after {
-	min-height: auto;
 }

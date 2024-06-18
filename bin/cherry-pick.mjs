@@ -7,10 +7,11 @@ import readline from 'readline';
 import { spawnSync } from 'node:child_process';
 
 const LABEL = process.argv[ 2 ] || 'Backport to WP Beta/RC';
+const BACKPORT_COMPLETED_LABEL = 'Backported to WP Core';
 const BRANCH = getCurrentBranch();
 const GITHUB_CLI_AVAILABLE = spawnSync( 'gh', [ 'auth', 'status' ] )
-	?.stderr?.toString()
-	.includes( '✓ Logged in to github.com as' );
+	?.stdout?.toString()
+	.includes( '✓ Logged in to github.com' );
 
 const AUTO_PROPAGATE_RESULTS_TO_GITHUB = GITHUB_CLI_AVAILABLE;
 
@@ -112,14 +113,28 @@ function cli( command, args, pipe = false ) {
  */
 async function fetchPRs() {
 	const { items } = await GitHubFetch(
-		`/search/issues?q=is:pr state:closed sort:updated label:"${ LABEL }" repo:WordPress/gutenberg`
+		`/search/issues?per_page=100&q=is:pr state:closed sort:updated label:"${ LABEL }" repo:WordPress/gutenberg`
 	);
-	const PRs = items.map( ( { id, number, title } ) => ( {
-		id,
-		number,
-		title,
-	} ) );
-	console.log( 'Found the following PRs to cherry-pick: ' );
+	const PRs = items
+		// eslint-disable-next-line camelcase
+		.map( ( { id, number, title, pull_request } ) => ( {
+			id,
+			number,
+			title,
+			// eslint-disable-next-line camelcase
+			pull_request,
+		} ) )
+		// eslint-disable-next-line camelcase
+		.filter( ( { pull_request } ) => !! pull_request?.merged_at )
+		.sort(
+			( a, b ) =>
+				new Date( a?.pull_request?.merged_at ) -
+				new Date( b?.pull_request?.merged_at )
+		);
+
+	console.log(
+		'Found the following PRs to cherry-pick (sorted by closed date in ascending order): '
+	);
 	PRs.forEach( ( { number, title } ) =>
 		console.log( indent( `#${ number } – ${ title }` ) )
 	);
@@ -155,12 +170,23 @@ async function fetchPRs() {
  * @return {Promise<Object>} Parsed response JSON.
  */
 async function GitHubFetch( path ) {
+	const token = getGitHubAuthToken();
 	const response = await fetch( 'https://api.github.com' + path, {
 		headers: {
 			Accept: 'application/vnd.github.v3+json',
+			Authorization: `Bearer ${ token }`,
 		},
 	} );
 	return await response.json();
+}
+
+/**
+ * Retrieves the GitHub authentication token using `gh auth token`.
+ *
+ * @return {string} The GitHub authentication token.
+ */
+function getGitHubAuthToken() {
+	return cli( 'gh', [ 'auth', 'token' ] );
 }
 
 /**
@@ -323,6 +349,11 @@ function reportSummaryNextSteps( successes, failures ) {
 		nextSteps.push( 'Push this branch' );
 		nextSteps.push( 'Go to each of the cherry-picked Pull Requests' );
 		nextSteps.push( `Remove the ${ LABEL } label` );
+
+		if ( LABEL === 'Backport to WP Beta/RC' ) {
+			nextSteps.push( `Add the "${ BACKPORT_COMPLETED_LABEL }" label` );
+		}
+
 		nextSteps.push( 'Request a backport to wordpress-develop if required' );
 		nextSteps.push( 'Comment, say that PR just got cherry-picked' );
 	}
@@ -352,6 +383,17 @@ function GHcommentAndRemoveLabel( pr ) {
 	try {
 		cli( 'gh', [ 'pr', 'comment', number, '--body', comment ] );
 		cli( 'gh', [ 'pr', 'edit', number, '--remove-label', LABEL ] );
+
+		if ( LABEL === 'Backport to WP Beta/RC' ) {
+			cli( 'gh', [
+				'pr',
+				'edit',
+				number,
+				'--add-label',
+				BACKPORT_COMPLETED_LABEL,
+			] );
+		}
+
 		console.log( `✅ ${ number }: ${ comment }` );
 	} catch ( e ) {
 		console.log( `❌ ${ number }. ${ comment } ` );
@@ -435,7 +477,7 @@ function getCurrentBranch() {
  */
 async function reportGhUnavailable() {
 	console.log(
-		'Github CLI is not setup. This script will not be able to automatically'
+		'GitHub CLI is not setup. This script will not be able to automatically'
 	);
 	console.log(
 		'comment on the processed PRs and remove the backport label from them.'

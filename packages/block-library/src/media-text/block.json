@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/media-text",
 	"title": "Media & Text",
 	"category": "media",
@@ -89,14 +89,23 @@
 		},
 		"focalPoint": {
 			"type": "object"
+		},
+		"allowedBlocks": {
+			"type": "array"
+		},
+		"useFeaturedImage": {
+			"type": "boolean",
+			"default": false
 		}
 	},
+	"usesContext": [ "postId", "postType" ],
 	"supports": {
 		"anchor": true,
 		"align": [ "wide", "full" ],
 		"html": false,
 		"color": {
 			"gradients": true,
+			"heading": true,
 			"link": true,
 			"__experimentalDefaultControls": {
 				"background": true,
@@ -119,6 +128,9 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	},
 	"editorStyle": "wp-block-media-text-editor",

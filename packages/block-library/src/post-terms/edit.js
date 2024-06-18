@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -49,7 +49,9 @@ export default function PostTermsEdit( {
 
 	const selectedTerm = useSelect(
 		( select ) => {
-			if ( ! term ) return {};
+			if ( ! term ) {
+				return {};
+			}
 			const { getTaxonomy } = select( coreStore );
 			const taxonomy = getTaxonomy( term );
 			return taxonomy?.visibility?.publicly_queryable ? taxonomy : {};
@@ -63,15 +65,11 @@ export default function PostTermsEdit( {
 	const hasPost = postId && postType;
 	const blockInformation = useBlockDisplayInformation( clientId );
 	const blockProps = useBlockProps( {
-		className: classnames( {
+		className: clsx( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 			[ `taxonomy-${ term }` ]: term,
 		} ),
 	} );
-
-	if ( ! hasPost || ! term ) {
-		return <div { ...blockProps }>{ blockInformation.title }</div>;
-	}
 
 	return (
 		<>
@@ -96,12 +94,12 @@ export default function PostTermsEdit( {
 				/>
 			</InspectorControls>
 			<div { ...blockProps }>
-				{ isLoading && <Spinner /> }
-				{ ! isLoading && hasPostTerms && ( isSelected || prefix ) && (
+				{ isLoading && hasPost && <Spinner /> }
+				{ ! isLoading && ( isSelected || prefix ) && (
 					<RichText
+						identifier="prefix"
 						allowedFormats={ ALLOWED_FORMATS }
 						className="wp-block-post-terms__prefix"
-						multiline={ false }
 						aria-label={ __( 'Prefix' ) }
 						placeholder={ __( 'Prefix' ) + ' ' }
 						value={ prefix }
@@ -111,7 +109,11 @@ export default function PostTermsEdit( {
 						tagName="span"
 					/>
 				) }
-				{ ! isLoading &&
+				{ ( ! hasPost || ! term ) && (
+					<span>{ blockInformation.title }</span>
+				) }
+				{ hasPost &&
+					! isLoading &&
 					hasPostTerms &&
 					postTerms
 						.map( ( postTerm ) => (
@@ -132,15 +134,16 @@ export default function PostTermsEdit( {
 								{ curr }
 							</>
 						) ) }
-				{ ! isLoading &&
+				{ hasPost &&
+					! isLoading &&
 					! hasPostTerms &&
 					( selectedTerm?.labels?.no_terms ||
 						__( 'Term items not found.' ) ) }
-				{ ! isLoading && hasPostTerms && ( isSelected || suffix ) && (
+				{ ! isLoading && ( isSelected || suffix ) && (
 					<RichText
+						identifier="suffix"
 						allowedFormats={ ALLOWED_FORMATS }
 						className="wp-block-post-terms__suffix"
-						multiline={ false }
 						aria-label={ __( 'Suffix' ) }
 						placeholder={ ' ' + __( 'Suffix' ) }
 						value={ suffix }

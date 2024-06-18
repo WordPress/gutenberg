@@ -21,6 +21,14 @@ if ( ! defined( 'LOCAL_SCRIPT_DEBUG' ) ) {
 if ( ! defined( 'LOCAL_WP_ENVIRONMENT_TYPE' ) ) {
 	define( 'LOCAL_WP_ENVIRONMENT_TYPE', 'local' );
 }
+define( 'GUTENBERG_DIR_TESTDATA', __DIR__ . '/data/' );
+define( 'GUTENBERG_DIR_TESTFIXTURES', __DIR__ . '/fixtures/' );
+
+// Pretend that these are Core unit tests. This is needed so that
+// wp_theme_has_theme_json() does not cache its return value between each test.
+if ( ! defined( 'WP_RUN_CORE_TESTS' ) ) {
+	define( 'WP_RUN_CORE_TESTS', true );
+}
 
 // Require composer dependencies.
 require_once dirname( __DIR__ ) . '/vendor/autoload.php';
@@ -86,96 +94,12 @@ $GLOBALS['wp_tests_options'] = array(
 	'gutenberg-experiments' => array(
 		'gutenberg-widget-experiments' => '1',
 		'gutenberg-full-site-editing'  => 1,
+		'gutenberg-form-blocks'        => 1,
 	),
 );
 
 // Enable the widget block editor.
 tests_add_filter( 'gutenberg_use_widgets_block_editor', '__return_true' );
-
-/**
- * Register test block prior to theme.json generating metadata.
- *
- * This new block is used to test experimental selectors. It is registered
- * via `tests_add_filter()` here during bootstrapping so that it occurs prior
- * to theme.json generating block metadata. Once a core block, such as Image,
- * uses feature level selectors we could remove this in favour of testing via
- * the core block.
- */
-function gutenberg_register_test_block_for_feature_selectors() {
-	WP_Block_Type_Registry::get_instance()->register(
-		'test/test',
-		array(
-			'api_version' => 2,
-			'attributes'  => array(
-				'textColor' => array(
-					'type' => 'string',
-				),
-				'style'     => array(
-					'type' => 'object',
-				),
-			),
-			'supports'    => array(
-				'__experimentalBorder'   => array(
-					'radius'                 => true,
-					'__experimentalSelector' => '.inner',
-				),
-				'color'                  => array(
-					'text' => true,
-				),
-				'spacing'                => array(
-					'padding'                => true,
-					'__experimentalSelector' => '.inner',
-				),
-				'typography'             => array(
-					'fontSize'               => true,
-					'__experimentalSelector' => '.sub-heading',
-				),
-				'__experimentalSelector' => '.wp-block-test, .wp-block-test__wrapper',
-			),
-		)
-	);
-
-	WP_Block_Type_Registry::get_instance()->register(
-		'my/block-with-selectors',
-		array(
-			'api_version' => 2,
-			'attributes'  => array(
-				'textColor' => array(
-					'type' => 'string',
-				),
-				'style'     => array(
-					'type' => 'object',
-				),
-			),
-			'supports'    => array(
-				'__experimentalBorder' => array(
-					'radius' => true,
-				),
-				'color'                => array(
-					'background' => true,
-					'text'       => true,
-				),
-				'spacing'              => array(
-					'padding' => true,
-				),
-				'typography'           => array(
-					'fontSize' => true,
-				),
-			),
-			'selectors'   => array(
-				'root'       => '.custom-root-selector',
-				'border'     => array(
-					'root' => '.custom-root-selector img',
-				),
-				'color'      => array(
-					'text' => '.custom-root-selector > figcaption',
-				),
-				'typography' => '.custom-root-selector > figcaption',
-			),
-		)
-	);
-}
-tests_add_filter( 'init', 'gutenberg_register_test_block_for_feature_selectors' );
 
 // Start up the WP testing environment.
 require $_tests_dir . '/includes/bootstrap.php';

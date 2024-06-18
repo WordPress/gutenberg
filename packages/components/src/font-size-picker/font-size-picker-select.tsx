@@ -27,6 +27,7 @@ const CUSTOM_OPTION: FontSizePickerSelectOption = {
 
 const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
 	const {
+		__next40pxDefaultSize,
 		fontSizes,
 		value,
 		disableCustomFontSizes,
@@ -67,7 +68,7 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
 
 	return (
 		<CustomSelectControl
-			__nextUnconstrainedWidth
+			__next40pxDefaultSize={ __next40pxDefaultSize }
 			className="components-font-size-picker__select"
 			label={ __( 'Font size' ) }
 			hideLabelFromVision

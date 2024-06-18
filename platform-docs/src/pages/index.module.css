@@ -1,0 +1,31 @@
+.heroLogo {
+	padding-bottom: 3rem;
+}
+
+.heroTitle {
+	font-weight: 400;
+	font-size: 80px;
+}
+
+[data-theme="dark"] .heroTitle {
+	color: #fff;
+}
+
+.heroBanner {
+	position: relative;
+	overflow: hidden;
+}
+
+.container {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+	max-width: 800px;
+	padding: 5rem 0;
+}
+
+.buttons {
+	--ifm-button-border-radius: 50px;
+	--ifm-button-size-multiplier: 1.5;
+	--ifm-button-font-weight: 500;
+}

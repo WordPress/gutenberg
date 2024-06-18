@@ -1,47 +1,9 @@
 /**
- * External dependencies
- */
-import deepFreeze from 'deep-freeze';
-
-/**
  * Internal dependencies
  */
-import {
-	activeModal,
-	isSavingMetaBoxes,
-	metaBoxLocations,
-	removedPanels,
-	blockInserterPanel,
-	listViewPanel,
-} from '../reducer';
-
-import { setIsInserterOpened, setIsListViewOpened } from '../actions';
+import { isSavingMetaBoxes, metaBoxLocations } from '../reducer';
 
 describe( 'state', () => {
-	describe( 'activeModal', () => {
-		it( 'should default to null', () => {
-			const state = activeModal( undefined, {} );
-			expect( state ).toBeNull();
-		} );
-
-		it( 'should set the activeModal to the provided name', () => {
-			const state = activeModal( null, {
-				type: 'OPEN_MODAL',
-				name: 'test-modal',
-			} );
-
-			expect( state ).toEqual( 'test-modal' );
-		} );
-
-		it( 'should set the activeModal to null', () => {
-			const state = activeModal( 'test-modal', {
-				type: 'CLOSE_MODAL',
-			} );
-
-			expect( state ).toBeNull();
-		} );
-	} );
-
 	describe( 'isSavingMetaBoxes', () => {
 		it( 'should return default state', () => {
 			const actual = isSavingMetaBoxes( undefined, {} );
@@ -117,88 +79,6 @@ describe( 'state', () => {
 				advanced: [ { id: 'd', title: 'D' } ],
 				side: [ { id: 's', title: 'S' } ],
 			} );
-		} );
-	} );
-
-	describe( 'removedPanels', () => {
-		it( 'should remove panel', () => {
-			const original = deepFreeze( [] );
-			const state = removedPanels( original, {
-				type: 'REMOVE_PANEL',
-				panelName: 'post-status',
-			} );
-			expect( state ).toEqual( [ 'post-status' ] );
-		} );
-
-		it( 'should not remove already removed panel', () => {
-			const original = deepFreeze( [ 'post-status' ] );
-			const state = removedPanels( original, {
-				type: 'REMOVE_PANEL',
-				panelName: 'post-status',
-			} );
-			expect( state ).toBe( original );
-		} );
-	} );
-
-	describe( 'blockInserterPanel()', () => {
-		it( 'should apply default state', () => {
-			expect( blockInserterPanel( undefined, {} ) ).toEqual( false );
-		} );
-
-		it( 'should default to returning the same state', () => {
-			expect( blockInserterPanel( true, {} ) ).toBe( true );
-		} );
-
-		it( 'should set the open state of the inserter panel', () => {
-			expect(
-				blockInserterPanel( false, setIsInserterOpened( true ) )
-			).toBe( true );
-			expect(
-				blockInserterPanel( true, setIsInserterOpened( false ) )
-			).toBe( false );
-		} );
-
-		it( 'should close the inserter when opening the list view panel', () => {
-			expect(
-				blockInserterPanel( true, setIsListViewOpened( true ) )
-			).toBe( false );
-		} );
-
-		it( 'should not change the state when closing the list view panel', () => {
-			expect(
-				blockInserterPanel( true, setIsListViewOpened( false ) )
-			).toBe( true );
-		} );
-	} );
-
-	describe( 'listViewPanel()', () => {
-		it( 'should apply default state', () => {
-			expect( listViewPanel( undefined, {} ) ).toEqual( false );
-		} );
-
-		it( 'should default to returning the same state', () => {
-			expect( listViewPanel( true, {} ) ).toBe( true );
-		} );
-
-		it( 'should set the open state of the list view panel', () => {
-			expect( listViewPanel( false, setIsListViewOpened( true ) ) ).toBe(
-				true
-			);
-			expect( listViewPanel( true, setIsListViewOpened( false ) ) ).toBe(
-				false
-			);
-		} );
-
-		it( 'should close the list view when opening the inserter panel', () => {
-			expect( listViewPanel( true, setIsInserterOpened( true ) ) ).toBe(
-				false
-			);
-		} );
-
-		it( 'should not change the state when closing the inserter panel', () => {
-			expect( listViewPanel( true, setIsInserterOpened( false ) ) ).toBe(
-				true
-			);
 		} );
 	} );
 } );

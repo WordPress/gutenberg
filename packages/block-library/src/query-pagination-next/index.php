@@ -8,6 +8,10 @@
 /**
  * Renders the `core/query-pagination-next` block on the server.
  *
+ * @since 5.8.0
+ *
+ * @global WP_Query $wp_query WordPress Query object.
+ *
  * @param array    $attributes Block attributes.
  * @param string   $content    Block default content.
  * @param WP_Block $block      Block instance.
@@ -15,15 +19,21 @@
  * @return string Returns the next posts link for the query pagination.
  */
 function render_block_core_query_pagination_next( $attributes, $content, $block ) {
-	$page_key = isset( $block->context['queryId'] ) ? 'query-' . $block->context['queryId'] . '-page' : 'query-page';
-	$page     = empty( $_GET[ $page_key ] ) ? 1 : (int) $_GET[ $page_key ];
-	$max_page = isset( $block->context['query']['pages'] ) ? (int) $block->context['query']['pages'] : 0;
+	$page_key            = isset( $block->context['queryId'] ) ? 'query-' . $block->context['queryId'] . '-page' : 'query-page';
+	$enhanced_pagination = isset( $block->context['enhancedPagination'] ) && $block->context['enhancedPagination'];
+	$page                = empty( $_GET[ $page_key ] ) ? 1 : (int) $_GET[ $page_key ];
+	$max_page            = isset( $block->context['query']['pages'] ) ? (int) $block->context['query']['pages'] : 0;
 
 	$wrapper_attributes = get_block_wrapper_attributes();
+	$show_label         = isset( $block->context['showLabel'] ) ? (bool) $block->context['showLabel'] : true;
 	$default_label      = __( 'Next Page' );
-	$label              = isset( $attributes['label'] ) && ! empty( $attributes['label'] ) ? esc_html( $attributes['label'] ) : $default_label;
+	$label_text         = isset( $attributes['label'] ) && ! empty( $attributes['label'] ) ? esc_html( $attributes['label'] ) : $default_label;
+	$label              = $show_label ? $label_text : '';
 	$pagination_arrow   = get_query_pagination_arrow( $block, true );
 
+	if ( ! $label ) {
+		$wrapper_attributes .= ' aria-label="' . $label_text . '"';
+	}
 	if ( $pagination_arrow ) {
 		$label .= $pagination_arrow;
 	}
@@ -31,7 +41,7 @@ function render_block_core_query_pagination_next( $attributes, $content, $block 
 
 	// Check if the pagination is for Query that inherits the global context.
 	if ( isset( $block->context['query']['inherit'] ) && $block->context['query']['inherit'] ) {
-		$filter_link_attributes = function() use ( $wrapper_attributes ) {
+		$filter_link_attributes = static function () use ( $wrapper_attributes ) {
 			return $wrapper_attributes;
 		};
 		add_filter( 'next_posts_link_attributes', $filter_link_attributes );
@@ -56,11 +66,30 @@ function render_block_core_query_pagination_next( $attributes, $content, $block 
 		}
 		wp_reset_postdata(); // Restore original Post Data.
 	}
+
+	if ( $enhanced_pagination && isset( $content ) ) {
+		$p = new WP_HTML_Tag_Processor( $content );
+		if ( $p->next_tag(
+			array(
+				'tag_name'   => 'a',
+				'class_name' => 'wp-block-query-pagination-next',
+			)
+		) ) {
+			$p->set_attribute( 'data-wp-key', 'query-pagination-next' );
+			$p->set_attribute( 'data-wp-on--click', 'core/query::actions.navigate' );
+			$p->set_attribute( 'data-wp-on-async--mouseenter', 'core/query::actions.prefetch' );
+			$p->set_attribute( 'data-wp-watch', 'core/query::callbacks.prefetch' );
+			$content = $p->get_updated_html();
+		}
+	}
+
 	return $content;
 }
 
 /**
  * Registers the `core/query-pagination-next` block on the server.
+ *
+ * @since 5.8.0
  */
 function register_block_core_query_pagination_next() {
 	register_block_type_from_metadata(

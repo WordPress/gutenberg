@@ -10,9 +10,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
  */
 import ScreenHeader from './header';
 import Palette from './palette';
-import BlockPreviewPanel from './block-preview-panel';
-import { getVariationClassName } from './utils';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 
 const {
 	useGlobalStyle,
@@ -21,37 +19,27 @@ const {
 	ColorPanel: StylesColorPanel,
 } = unlock( blockEditorPrivateApis );
 
-function ScreenColors( { name, variation = '' } ) {
-	const variationClassName = getVariationClassName( variation );
-
-	let prefixParts = [];
-	if ( variation ) {
-		prefixParts = [ 'variations', variation ].concat( prefixParts );
-	}
-	const prefix = prefixParts.join( '.' );
-
-	const [ style ] = useGlobalStyle( prefix, name, 'user', false );
-	const [ inheritedStyle, setStyle ] = useGlobalStyle( prefix, name, 'all', {
+function ScreenColors() {
+	const [ style ] = useGlobalStyle( '', undefined, 'user', {
 		shouldDecodeEncode: false,
 	} );
-	const [ rawSettings ] = useGlobalSetting( '', name );
-	const settings = useSettingsForBlockElement( rawSettings, name );
+	const [ inheritedStyle, setStyle ] = useGlobalStyle( '', undefined, 'all', {
+		shouldDecodeEncode: false,
+	} );
+	const [ rawSettings ] = useGlobalSetting( '' );
+	const settings = useSettingsForBlockElement( rawSettings );
 
 	return (
 		<>
 			<ScreenHeader
 				title={ __( 'Colors' ) }
 				description={ __(
-					'Manage palettes and the default color of different global elements on the site.'
+					'Palette colors and the application of those colors on site elements.'
 				) }
 			/>
-
-			<BlockPreviewPanel name={ name } variation={ variationClassName } />
-
-			<div className="edit-site-global-styles-screen-colors">
-				<VStack spacing={ 10 }>
-					<Palette name={ name } />
-
+			<div className="edit-site-global-styles-screen">
+				<VStack spacing={ 7 }>
+					<Palette />
 					<StylesColorPanel
 						inheritedValue={ inheritedStyle }
 						value={ style }

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -12,23 +12,23 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalBoxControl as BoxControl,
 	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalView as View,
 } from '@wordpress/components';
 import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
-import { useCallback, Platform } from '@wordpress/element';
+import { useCallback, useState, Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { getValueFromVariable } from './utils';
+import { getValueFromVariable, TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
 import SpacingSizesControl from '../spacing-sizes-control';
 import HeightControl from '../height-control';
 import ChildLayoutControl from '../child-layout-control';
+import AspectRatioTool from '../dimensions-tool/aspect-ratio-tool';
 import { cleanEmptyObject } from '../../hooks/utils';
-import { immutableSet } from '../../utils/object';
+import { setImmutably } from '../../utils/object';
 
 const AXIAL_SIDES = [ 'horizontal', 'vertical' ];
 
@@ -39,6 +39,7 @@ export function useHasDimensionsPanel( settings ) {
 	const hasMargin = useHasMargin( settings );
 	const hasGap = useHasGap( settings );
 	const hasMinHeight = useHasMinHeight( settings );
+	const hasAspectRatio = useHasAspectRatio( settings );
 	const hasChildLayout = useHasChildLayout( settings );
 
 	return (
@@ -49,6 +50,7 @@ export function useHasDimensionsPanel( settings ) {
 			hasMargin ||
 			hasGap ||
 			hasMinHeight ||
+			hasAspectRatio ||
 			hasChildLayout )
 	);
 }
@@ -77,6 +79,10 @@ function useHasMinHeight( settings ) {
 	return settings?.dimensions?.minHeight;
 }
 
+function useHasAspectRatio( settings ) {
+	return settings?.dimensions?.aspectRatio;
+}
+
 function useHasChildLayout( settings ) {
 	const {
 		type: parentLayoutType = 'default',
@@ -85,26 +91,28 @@ function useHasChildLayout( settings ) {
 	} = settings?.parentLayout ?? {};
 
 	const support =
-		( defaultParentLayoutType === 'flex' || parentLayoutType === 'flex' ) &&
+		( defaultParentLayoutType === 'flex' ||
+			parentLayoutType === 'flex' ||
+			defaultParentLayoutType === 'grid' ||
+			parentLayoutType === 'grid' ) &&
 		allowSizingOnChildren;
-
 	return !! settings?.layout && support;
 }
 
 function useHasSpacingPresets( settings ) {
-	const {
-		custom,
-		theme,
-		default: defaultPresets,
-	} = settings?.spacing?.spacingSizes || {};
-	const presets = custom ?? theme ?? defaultPresets ?? [];
-
-	return presets.length > 0;
+	const { defaultSpacingSizes, spacingSizes } = settings?.spacing || {};
+	return (
+		( defaultSpacingSizes !== false &&
+			spacingSizes?.default?.length > 0 ) ||
+		spacingSizes?.theme?.length > 0 ||
+		spacingSizes?.custom?.length > 0
+	);
 }
 
 function filterValuesBySides( values, sides ) {
-	if ( ! sides ) {
-		// If no custom side configuration all sides are opted into by default.
+	// If no custom side configuration, all sides are opted into by default.
+	// Without any values, we have nothing to filter either.
+	if ( ! sides || ! values ) {
 		return values;
 	}
 
@@ -177,6 +185,7 @@ function DimensionsToolsPanel( {
 			label={ __( 'Dimensions' ) }
 			resetAll={ resetAll }
 			panelId={ panelId }
+			dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
 		>
 			{ children }
 		</ToolsPanel>
@@ -184,12 +193,13 @@ function DimensionsToolsPanel( {
 }
 
 const DEFAULT_CONTROLS = {
-	contentSize: false,
-	wideSize: false,
-	padding: false,
-	margin: false,
-	blockGap: false,
-	minHeight: false,
+	contentSize: true,
+	wideSize: true,
+	padding: true,
+	margin: true,
+	blockGap: true,
+	minHeight: true,
+	aspectRatio: true,
 	childLayout: true,
 };
 
@@ -206,8 +216,25 @@ export default function DimensionsPanel( {
 	// in global styles but not in block inspector.
 	includeLayoutControls = false,
 } ) {
-	const decodeValue = ( rawValue ) =>
-		getValueFromVariable( { settings }, '', rawValue );
+	const { dimensions, spacing } = settings;
+
+	const decodeValue = ( rawValue ) => {
+		if ( rawValue && typeof rawValue === 'object' ) {
+			return Object.keys( rawValue ).reduce( ( acc, key ) => {
+				acc[ key ] = getValueFromVariable(
+					{ settings: { dimensions, spacing } },
+					'',
+					rawValue[ key ]
+				);
+				return acc;
+			}, {} );
+		}
+		return getValueFromVariable(
+			{ settings: { dimensions, spacing } },
+			'',
+			rawValue
+		);
+	};
 
 	const showSpacingPresetsControl = useHasSpacingPresets( settings );
 	const units = useCustomUnits( {
@@ -220,13 +247,21 @@ export default function DimensionsPanel( {
 		],
 	} );
 
+	//Minimum Margin Value
+	const minimumMargin = -Infinity;
+	const [ minMarginValue, setMinMarginValue ] = useState( minimumMargin );
+
 	// Content Size
 	const showContentSizeControl =
 		useHasContentSize( settings ) && includeLayoutControls;
 	const contentSizeValue = decodeValue( inheritedValue?.layout?.contentSize );
 	const setContentSizeValue = ( newValue ) => {
 		onChange(
-			immutableSet( value, [ 'layout', 'contentSize' ], newValue )
+			setImmutably(
+				value,
+				[ 'layout', 'contentSize' ],
+				newValue || undefined
+			)
 		);
 	};
 	const hasUserSetContentSizeValue = () => !! value?.layout?.contentSize;
@@ -237,7 +272,13 @@ export default function DimensionsPanel( {
 		useHasWideSize( settings ) && includeLayoutControls;
 	const wideSizeValue = decodeValue( inheritedValue?.layout?.wideSize );
 	const setWideSizeValue = ( newValue ) => {
-		onChange( immutableSet( value, [ 'layout', 'wideSize' ], newValue ) );
+		onChange(
+			setImmutably(
+				value,
+				[ 'layout', 'wideSize' ],
+				newValue || undefined
+			)
+		);
 	};
 	const hasUserSetWideSizeValue = () => !! value?.layout?.wideSize;
 	const resetWideSizeValue = () => setWideSizeValue( undefined );
@@ -254,7 +295,7 @@ export default function DimensionsPanel( {
 		paddingSides.some( ( side ) => AXIAL_SIDES.includes( side ) );
 	const setPaddingValues = ( newPaddingValues ) => {
 		const padding = filterValuesBySides( newPaddingValues, paddingSides );
-		onChange( immutableSet( value, [ 'spacing', 'padding' ], padding ) );
+		onChange( setImmutably( value, [ 'spacing', 'padding' ], padding ) );
 	};
 	const hasPaddingValue = () =>
 		!! value?.spacing?.padding &&
@@ -274,7 +315,7 @@ export default function DimensionsPanel( {
 		marginSides.some( ( side ) => AXIAL_SIDES.includes( side ) );
 	const setMarginValues = ( newMarginValues ) => {
 		const margin = filterValuesBySides( newMarginValues, marginSides );
-		onChange( immutableSet( value, [ 'spacing', 'margin' ], margin ) );
+		onChange( setImmutably( value, [ 'spacing', 'margin' ], margin ) );
 	};
 	const hasMarginValue = () =>
 		!! value?.spacing?.margin &&
@@ -293,7 +334,7 @@ export default function DimensionsPanel( {
 		gapSides && gapSides.some( ( side ) => AXIAL_SIDES.includes( side ) );
 	const setGapValue = ( newGapValue ) => {
 		onChange(
-			immutableSet( value, [ 'spacing', 'blockGap' ], newGapValue )
+			setImmutably( value, [ 'spacing', 'blockGap' ], newGapValue )
 		);
 	};
 	const setGapValues = ( nextBoxGapValue ) => {
@@ -317,8 +358,18 @@ export default function DimensionsPanel( {
 	const showMinHeightControl = useHasMinHeight( settings );
 	const minHeightValue = decodeValue( inheritedValue?.dimensions?.minHeight );
 	const setMinHeightValue = ( newValue ) => {
+		const tempValue = setImmutably(
+			value,
+			[ 'dimensions', 'minHeight' ],
+			newValue
+		);
+		// Apply min-height, while removing any applied aspect ratio.
 		onChange(
-			immutableSet( value, [ 'dimensions', 'minHeight' ], newValue )
+			setImmutably(
+				tempValue,
+				[ 'dimensions', 'aspectRatio' ],
+				undefined
+			)
 		);
 	};
 	const resetMinHeightValue = () => {
@@ -326,28 +377,36 @@ export default function DimensionsPanel( {
 	};
 	const hasMinHeightValue = () => !! value?.dimensions?.minHeight;
 
+	// Aspect Ratio
+	const showAspectRatioControl = useHasAspectRatio( settings );
+	const aspectRatioValue = decodeValue(
+		inheritedValue?.dimensions?.aspectRatio
+	);
+	const setAspectRatioValue = ( newValue ) => {
+		const tempValue = setImmutably(
+			value,
+			[ 'dimensions', 'aspectRatio' ],
+			newValue
+		);
+		// Apply aspect-ratio, while removing any applied min-height.
+		onChange(
+			setImmutably( tempValue, [ 'dimensions', 'minHeight' ], undefined )
+		);
+	};
+	const hasAspectRatioValue = () => !! value?.dimensions?.aspectRatio;
+
 	// Child Layout
 	const showChildLayoutControl = useHasChildLayout( settings );
 	const childLayout = inheritedValue?.layout;
-	const { orientation = 'horizontal' } = settings?.parentLayout ?? {};
-	const childLayoutOrientationLabel =
-		orientation === 'horizontal' ? __( 'Width' ) : __( 'Height' );
+
 	const setChildLayout = ( newChildLayout ) => {
 		onChange( {
 			...value,
 			layout: {
-				...value?.layout,
 				...newChildLayout,
 			},
 		} );
 	};
-	const resetChildLayoutValue = () => {
-		setChildLayout( {
-			selfStretch: undefined,
-			flexSize: undefined,
-		} );
-	};
-	const hasChildLayoutValue = () => !! value?.layout;
 
 	const resetAllFilter = useCallback( ( previousValue ) => {
 		return {
@@ -358,6 +417,10 @@ export default function DimensionsPanel( {
 				wideSize: undefined,
 				selfStretch: undefined,
 				flexSize: undefined,
+				columnStart: undefined,
+				rowStart: undefined,
+				columnSpan: undefined,
+				rowSpan: undefined,
 			} ),
 			spacing: {
 				...previousValue?.spacing,
@@ -368,11 +431,23 @@ export default function DimensionsPanel( {
 			dimensions: {
 				...previousValue?.dimensions,
 				minHeight: undefined,
+				aspectRatio: undefined,
 			},
 		};
 	}, [] );
 
 	const onMouseLeaveControls = () => onVisualize( false );
+
+	const inputProps = {
+		min: minMarginValue,
+		onDragStart: () => {
+			//Reset to 0 in case the value was negative.
+			setMinMarginValue( 0 );
+		},
+		onDragEnd: () => {
+			setMinMarginValue( minimumMargin );
+		},
+	};
 
 	return (
 		<Wrapper
@@ -451,7 +526,7 @@ export default function DimensionsPanel( {
 					isShownByDefault={
 						defaultControls.padding ?? DEFAULT_CONTROLS.padding
 					}
-					className={ classnames( {
+					className={ clsx( {
 						'tools-panel-item-spacing': showSpacingPresetsControl,
 					} ) }
 					panelId={ panelId }
@@ -477,7 +552,6 @@ export default function DimensionsPanel( {
 							sides={ paddingSides }
 							units={ units }
 							allowReset={ false }
-							splitOnAxis={ isAxialPadding }
 							onMouseOver={ onMouseOverPadding }
 							onMouseOut={ onMouseLeaveControls }
 						/>
@@ -492,7 +566,7 @@ export default function DimensionsPanel( {
 					isShownByDefault={
 						defaultControls.margin ?? DEFAULT_CONTROLS.margin
 					}
-					className={ classnames( {
+					className={ clsx( {
 						'tools-panel-item-spacing': showSpacingPresetsControl,
 					} ) }
 					panelId={ panelId }
@@ -501,6 +575,7 @@ export default function DimensionsPanel( {
 						<BoxControl
 							values={ marginValues }
 							onChange={ setMarginValues }
+							inputProps={ inputProps }
 							label={ __( 'Margin' ) }
 							sides={ marginSides }
 							units={ units }
@@ -514,11 +589,11 @@ export default function DimensionsPanel( {
 						<SpacingSizesControl
 							values={ marginValues }
 							onChange={ setMarginValues }
+							minimumCustomValue={ -Infinity }
 							label={ __( 'Margin' ) }
 							sides={ marginSides }
 							units={ units }
 							allowReset={ false }
-							splitOnAxis={ isAxialMargin }
 							onMouseOver={ onMouseOverMargin }
 							onMouseOut={ onMouseLeaveControls }
 						/>
@@ -533,7 +608,7 @@ export default function DimensionsPanel( {
 					isShownByDefault={
 						defaultControls.blockGap ?? DEFAULT_CONTROLS.blockGap
 					}
-					className={ classnames( {
+					className={ clsx( {
 						'tools-panel-item-spacing': showSpacingPresetsControl,
 					} ) }
 					panelId={ panelId }
@@ -565,18 +640,30 @@ export default function DimensionsPanel( {
 							label={ __( 'Block spacing' ) }
 							min={ 0 }
 							onChange={ setGapValues }
+							showSideInLabel={ false }
 							sides={ isAxialGap ? gapSides : [ 'top' ] } // Use 'top' as the shorthand property in non-axial configurations.
 							values={ gapValues }
 							allowReset={ false }
-							splitOnAxis={ isAxialGap }
 						/>
 					) }
 				</ToolsPanelItem>
 			) }
+			{ showChildLayoutControl && (
+				<ChildLayoutControl
+					value={ childLayout }
+					onChange={ setChildLayout }
+					parentLayout={ settings?.parentLayout }
+					panelId={ panelId }
+					isShownByDefault={
+						defaultControls.childLayout ??
+						DEFAULT_CONTROLS.childLayout
+					}
+				/>
+			) }
 			{ showMinHeightControl && (
 				<ToolsPanelItem
 					hasValue={ hasMinHeightValue }
-					label={ __( 'Min. height' ) }
+					label={ __( 'Minimum height' ) }
 					onDeselect={ resetMinHeightValue }
 					isShownByDefault={
 						defaultControls.minHeight ?? DEFAULT_CONTROLS.minHeight
@@ -584,31 +671,23 @@ export default function DimensionsPanel( {
 					panelId={ panelId }
 				>
 					<HeightControl
-						label={ __( 'Min. height' ) }
+						label={ __( 'Minimum height' ) }
 						value={ minHeightValue }
 						onChange={ setMinHeightValue }
 					/>
 				</ToolsPanelItem>
 			) }
-			{ showChildLayoutControl && (
-				<VStack
-					as={ ToolsPanelItem }
-					spacing={ 2 }
-					hasValue={ hasChildLayoutValue }
-					label={ childLayoutOrientationLabel }
-					onDeselect={ resetChildLayoutValue }
-					isShownByDefault={
-						defaultControls.childLayout ??
-						DEFAULT_CONTROLS.childLayout
-					}
+			{ showAspectRatioControl && (
+				<AspectRatioTool
+					hasValue={ hasAspectRatioValue }
+					value={ aspectRatioValue }
+					onChange={ setAspectRatioValue }
 					panelId={ panelId }
-				>
-					<ChildLayoutControl
-						value={ childLayout }
-						onChange={ setChildLayout }
-						parentLayout={ settings?.parentLayout }
-					/>
-				</VStack>
+					isShownByDefault={
+						defaultControls.aspectRatio ??
+						DEFAULT_CONTROLS.aspectRatio
+					}
+				/>
 			) }
 		</Wrapper>
 	);

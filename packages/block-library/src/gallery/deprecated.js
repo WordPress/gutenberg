@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -228,7 +228,7 @@ const v7 = {
 	save( { attributes } ) {
 		const { caption, columns, imageCrop } = attributes;
 
-		const className = classnames( 'has-nested-images', {
+		const className = clsx( 'has-nested-images', {
 			[ `columns-${ columns }` ]: columns !== undefined,
 			[ `columns-default` ]: columns === undefined,
 			'is-cropped': imageCrop,
@@ -1061,7 +1061,7 @@ const v1 = {
 			imageCrop,
 			linkTo,
 		} = attributes;
-		const className = classnames( `columns-${ columns }`, {
+		const className = clsx( `columns-${ columns }`, {
 			alignnone: align === 'none',
 			'is-cropped': imageCrop,
 		} );

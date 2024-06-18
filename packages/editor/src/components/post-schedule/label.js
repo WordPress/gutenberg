@@ -10,10 +10,25 @@ import { useSelect } from '@wordpress/data';
  */
 import { store as editorStore } from '../../store';
 
+/**
+ * Renders the PostScheduleLabel component.
+ *
+ * @param {Object} props Props.
+ *
+ * @return {Component} The component to be rendered.
+ */
 export default function PostScheduleLabel( props ) {
 	return usePostScheduleLabel( props );
 }
 
+/**
+ * Custom hook to get the label for post schedule.
+ *
+ * @param {Object}  options      Options for the hook.
+ * @param {boolean} options.full Whether to get the full label or not. Default is false.
+ *
+ * @return {string} The label for post schedule.
+ */
 export function usePostScheduleLabel( { full = false } = {} ) {
 	const { date, isFloating } = useSelect(
 		( select ) => ( {
@@ -33,7 +48,7 @@ export function getFullPostScheduleLabel( dateAttribute ) {
 
 	const timezoneAbbreviation = getTimezoneAbbreviation();
 	const formattedDate = dateI18n(
-		// translators: If using a space between 'g:i' and 'a', use a non-breaking sapce.
+		// translators: If using a space between 'g:i' and 'a', use a non-breaking space.
 		_x( 'F j, Y g:i\xa0a', 'post schedule full date format' ),
 		date
 	);
@@ -62,7 +77,7 @@ export function getPostScheduleLabel(
 		return sprintf(
 			// translators: %s: Time of day the post is scheduled for.
 			__( 'Today at %s' ),
-			// translators: If using a space between 'g:i' and 'a', use a non-breaking sapce.
+			// translators: If using a space between 'g:i' and 'a', use a non-breaking space.
 			dateI18n( _x( 'g:i\xa0a', 'post schedule time format' ), date )
 		);
 	}
@@ -74,14 +89,14 @@ export function getPostScheduleLabel(
 		return sprintf(
 			// translators: %s: Time of day the post is scheduled for.
 			__( 'Tomorrow at %s' ),
-			// translators: If using a space between 'g:i' and 'a', use a non-breaking sapce.
+			// translators: If using a space between 'g:i' and 'a', use a non-breaking space.
 			dateI18n( _x( 'g:i\xa0a', 'post schedule time format' ), date )
 		);
 	}
 
 	if ( date.getFullYear() === now.getFullYear() ) {
 		return dateI18n(
-			// translators: If using a space between 'g:i' and 'a', use a non-breaking sapce.
+			// translators: If using a space between 'g:i' and 'a', use a non-breaking space.
 			_x( 'F j g:i\xa0a', 'post schedule date format without year' ),
 			date
 		);
@@ -102,7 +117,7 @@ function getTimezoneAbbreviation() {
 	}
 
 	const symbol = timezone.offset < 0 ? '' : '+';
-	return `UTC${ symbol }${ timezone.offset }`;
+	return `UTC${ symbol }${ timezone.offsetFormatted }`;
 }
 
 function isTimezoneSameAsSiteTimezone( date ) {

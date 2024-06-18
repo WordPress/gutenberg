@@ -13,7 +13,9 @@ test.describe( 'Copy/cut/paste', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'Copy - collapsed selection' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );
@@ -31,7 +33,10 @@ test.describe( 'Copy/cut/paste', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		// To do: run with iframe.
+		await editor.switchToLegacyCanvas();
+
+		await page.locator( 'role=button[name="Add default block"i]' ).click();
 		await page.keyboard.type( 'Cut - collapsed selection' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );
@@ -59,7 +64,7 @@ test.describe( 'Copy/cut/paste', () => {
 		await page.evaluate( () => {
 			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock();
 		} );
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.insertBlock( { name: 'core/paragraph' } );
 		await pageUtils.pressKeys( 'primary+v' );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -78,7 +83,7 @@ test.describe( 'Copy/cut/paste', () => {
 		await page.evaluate( () => {
 			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock();
 		} );
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.insertBlock( { name: 'core/paragraph' } );
 		await pageUtils.pressKeys( 'primary+v' );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -88,7 +93,9 @@ test.describe( 'Copy/cut/paste', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 
 		await page.keyboard.type( 'First block' );
 		await page.keyboard.press( 'Enter' );
@@ -240,7 +247,9 @@ test.describe( 'Copy/cut/paste', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'A block' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'B block' );
@@ -252,9 +261,13 @@ test.describe( 'Copy/cut/paste', () => {
 		await pageUtils.pressKeys( 'primary+ArrowLeft' );
 		// Sometimes the caret has not moved to the correct position before pressing Enter.
 		// @see https://github.com/WordPress/gutenberg/issues/40303#issuecomment-1109434887
-		await page.waitForFunction(
-			() => window.getSelection().type === 'Caret'
-		);
+		await expect
+			.poll( async () =>
+				editor.canvas
+					.locator( ':root' )
+					.evaluate( () => window.getSelection().type )
+			)
+			.toBe( 'Caret' );
 		// Create a new block at the top of the document to paste there.
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'ArrowUp' );
@@ -267,7 +280,9 @@ test.describe( 'Copy/cut/paste', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'A block' );
 		await editor.insertBlock( { name: 'core/spacer' } );
 		await page.keyboard.press( 'Enter' );
@@ -280,9 +295,13 @@ test.describe( 'Copy/cut/paste', () => {
 		await pageUtils.pressKeys( 'primary+ArrowLeft' );
 		// Sometimes the caret has not moved to the correct position before pressing Enter.
 		// @see https://github.com/WordPress/gutenberg/issues/40303#issuecomment-1109434887
-		await page.waitForFunction(
-			() => window.getSelection().type === 'Caret'
-		);
+		await expect
+			.poll( async () =>
+				editor.canvas
+					.locator( ':root' )
+					.evaluate( () => window.getSelection().type )
+			)
+			.toBe( 'Caret' );
 		// Create a new block at the top of the document to paste there.
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'ArrowUp' );
@@ -295,7 +314,9 @@ test.describe( 'Copy/cut/paste', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'A block' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'B block' );
@@ -307,9 +328,13 @@ test.describe( 'Copy/cut/paste', () => {
 		await pageUtils.pressKeys( 'primary+ArrowLeft' );
 		// Sometimes the caret has not moved to the correct position before pressing Enter.
 		// @see https://github.com/WordPress/gutenberg/issues/40303#issuecomment-1109434887
-		await page.waitForFunction(
-			() => window.getSelection().type === 'Caret'
-		);
+		await expect
+			.poll( async () =>
+				editor.canvas
+					.locator( ':root' )
+					.evaluate( () => window.getSelection().type )
+			)
+			.toBe( 'Caret' );
 		// Create a new block at the top of the document to paste there.
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'ArrowUp' );
@@ -322,7 +347,9 @@ test.describe( 'Copy/cut/paste', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await page.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'A block' );
 		await editor.insertBlock( { name: 'core/spacer' } );
 		await page.keyboard.press( 'Enter' );
@@ -335,9 +362,13 @@ test.describe( 'Copy/cut/paste', () => {
 		await pageUtils.pressKeys( 'primary+ArrowLeft' );
 		// Sometimes the caret has not moved to the correct position before pressing Enter.
 		// @see https://github.com/WordPress/gutenberg/issues/40303#issuecomment-1109434887
-		await page.waitForFunction(
-			() => window.getSelection().type === 'Caret'
-		);
+		await expect
+			.poll( async () =>
+				editor.canvas
+					.locator( ':root' )
+					.evaluate( () => window.getSelection().type )
+			)
+			.toBe( 'Caret' );
 		// Create a new block at the top of the document to paste there.
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'ArrowUp' );
@@ -362,9 +393,13 @@ test.describe( 'Copy/cut/paste', () => {
 		await pageUtils.pressKeys( 'primary+ArrowLeft' );
 		// Sometimes the caret has not moved to the correct position before pressing Enter.
 		// @see https://github.com/WordPress/gutenberg/issues/40303#issuecomment-1109434887
-		await page.waitForFunction(
-			() => window.getSelection().type === 'Caret'
-		);
+		await expect
+			.poll( async () =>
+				editor.canvas
+					.locator( ':root' )
+					.evaluate( () => window.getSelection().type )
+			)
+			.toBe( 'Caret' );
 		// Create a new block at the top of the document to paste there.
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'ArrowUp' );
@@ -389,9 +424,13 @@ test.describe( 'Copy/cut/paste', () => {
 		await pageUtils.pressKeys( 'primary+ArrowLeft' );
 		// Sometimes the caret has not moved to the correct position before pressing Enter.
 		// @see https://github.com/WordPress/gutenberg/issues/40303#issuecomment-1109434887
-		await page.waitForFunction(
-			() => window.getSelection().type === 'Caret'
-		);
+		await expect
+			.poll( async () =>
+				editor.canvas
+					.locator( ':root' )
+					.evaluate( () => window.getSelection().type )
+			)
+			.toBe( 'Caret' );
 		// Create a new code block to paste there.
 		await editor.insertBlock( { name: 'core/code' } );
 		await pageUtils.pressKeys( 'primary+v' );
@@ -399,8 +438,8 @@ test.describe( 'Copy/cut/paste', () => {
 	} );
 
 	test( 'should paste single line in post title', async ( {
-		page,
 		pageUtils,
+		editor,
 	} ) => {
 		// This test checks whether we are correctly handling single line
 		// pasting in the post title. Previously we were accidentally falling
@@ -413,13 +452,16 @@ test.describe( 'Copy/cut/paste', () => {
 		await pageUtils.pressKeys( 'primary+v' );
 		// Expect the span to be filtered out.
 		expect(
-			await page.evaluate( () => document.activeElement.innerHTML )
+			await editor.canvas
+				.locator( ':root' )
+				.evaluate( () => document.activeElement.innerHTML )
 		).toMatchSnapshot();
 	} );
 
 	test( 'should paste single line in post title with existing content', async ( {
 		page,
 		pageUtils,
+		editor,
 	} ) => {
 		await page.keyboard.type( 'ab' );
 		await page.keyboard.press( 'ArrowLeft' );
@@ -430,7 +472,9 @@ test.describe( 'Copy/cut/paste', () => {
 		// Ensure the selection is correct.
 		await page.keyboard.type( 'y' );
 		expect(
-			await page.evaluate( () => document.activeElement.innerHTML )
+			await editor.canvas
+				.locator( ':root' )
+				.evaluate( () => document.activeElement.innerHTML )
 		).toBe( 'axyb' );
 	} );
 
@@ -441,11 +485,221 @@ test.describe( 'Copy/cut/paste', () => {
 	} ) => {
 		pageUtils.setClipboardData( {
 			html: '<pre>x</pre>',
+			plainText: 'x',
 		} );
 		await editor.insertBlock( { name: 'core/list' } );
 		await pageUtils.pressKeys( 'primary+v' );
 		// Ensure the selection is correct.
 		await page.keyboard.type( 'y' );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	test( 'should paste list in list', async ( {
+		page,
+		pageUtils,
+		editor,
+	} ) => {
+		pageUtils.setClipboardData( { html: '<ul><li>x</li><li>y</li></ul>' } );
+		await editor.insertBlock( { name: 'core/list' } );
+		await pageUtils.pressKeys( 'primary+v' );
+		// Ensure the selection is correct.
+		await page.keyboard.type( '‸' );
+		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	test( 'should paste paragraphs in list', async ( {
+		page,
+		pageUtils,
+		editor,
+	} ) => {
+		pageUtils.setClipboardData( { html: '<p>x</p><p>y</p>' } );
+		await editor.insertBlock( { name: 'core/list' } );
+		await pageUtils.pressKeys( 'primary+v' );
+		// Ensure the selection is correct.
+		await page.keyboard.type( '‸' );
+		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	test( 'should link selection', async ( { pageUtils, editor } ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'a' },
+		} );
+		await pageUtils.pressKeys( 'primary+a' );
+		pageUtils.setClipboardData( {
+			plainText: 'https://wordpress.org/gutenberg',
+			html: '<a href="https://wordpress.org/gutenberg">https://wordpress.org/gutenberg</a>',
+		} );
+		await pageUtils.pressKeys( 'primary+v' );
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: '<a href="https://wordpress.org/gutenberg">a</a>',
+				},
+			},
+		] );
+	} );
+
+	test( 'should link selection on internal paste', async ( {
+		pageUtils,
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'https://w.org' },
+		} );
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+x' );
+		await page.keyboard.type( 'a' );
+		await pageUtils.pressKeys( 'shift+ArrowLeft' );
+		await pageUtils.pressKeys( 'primary+v' );
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: '<a href="https://w.org">a</a>',
+				},
+			},
+		] );
+	} );
+
+	test( 'should auto-link', async ( { pageUtils, editor } ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'a' },
+		} );
+		pageUtils.setClipboardData( {
+			plainText: 'https://wordpress.org/gutenberg',
+			html: 'https://wordpress.org/gutenberg',
+		} );
+		await pageUtils.pressKeys( 'primary+v' );
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content:
+						'<a href="https://wordpress.org/gutenberg">https://wordpress.org/gutenberg</a>a',
+				},
+			},
+		] );
+	} );
+
+	test( 'should embed on paste', async ( { pageUtils, editor } ) => {
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		pageUtils.setClipboardData( {
+			plainText: 'https://www.youtube.com/watch?v=FcTLMTyD2DU',
+			html: 'https://www.youtube.com/watch?v=FcTLMTyD2DU',
+		} );
+		await pageUtils.pressKeys( 'primary+v' );
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{ name: 'core/embed' },
+		] );
+	} );
+
+	test( 'should not link selection for non http(s) protocol', async ( {
+		pageUtils,
+		editor,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content: 'a',
+			},
+		} );
+		await pageUtils.pressKeys( 'primary+a' );
+		pageUtils.setClipboardData( {
+			plainText: 'movie: b',
+			html: 'movie: b',
+		} );
+		await pageUtils.pressKeys( 'primary+v' );
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'movie: b',
+				},
+			},
+		] );
+	} );
+
+	test( 'should inherit existing block type on paste', async ( {
+		pageUtils,
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/heading',
+			attributes: {
+				content: 'A',
+			},
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content: 'b',
+			},
+		} );
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+c' );
+
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.type( '[]' );
+		await page.keyboard.press( 'ArrowLeft' );
+
+		await pageUtils.pressKeys( 'primary+v' );
+
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: '[A',
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'b]',
+				},
+			},
+		] );
+	} );
+
+	// See https://github.com/WordPress/gutenberg/pull/61900
+	test( 'should inherit heading attributes on paste split', async ( {
+		pageUtils,
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/heading',
+			attributes: {
+				content: 'AB',
+			},
+		} );
+		await page.keyboard.press( 'ArrowRight' );
+
+		pageUtils.setClipboardData( {
+			html: '<p>a</p><p>b</p>',
+		} );
+		await pageUtils.pressKeys( 'primary+v' );
+
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/heading',
+				attributes: {
+					content: 'Aa',
+					level: 2,
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'bB',
+				},
+			},
+		] );
 	} );
 } );

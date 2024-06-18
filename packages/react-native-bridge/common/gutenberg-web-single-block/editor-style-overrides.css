@@ -3,17 +3,43 @@
     display: none;
 }
 
-/* Remove default block appender at the end of the post */
-.block-list-appender {
+/* Remove header toolbar */
+.editor-header__toolbar {
     display: none;
 }
 
-.edit-post-visual-editor__post-title-wrapper {
+/* Hide all children of editor-header__settings */
+.editor-header__settings > * {
+    display: none;
+}
+
+/* Show only the interface-pinned-items container */
+.editor-header__settings > .interface-pinned-items {
+    display: block;
+}
+
+.components-button.editor-post-publish-panel__toggle.is-primary{
+    display: none;
+}
+
+/* Remove default block appender at the end of the post */
+.block-list-appender, .block-list-appender__toggle,
+.block-editor-inserter, .components-autocomplete__popover {
+    display: none;
+}
+
+.edit-post-visual-editor__post-title-wrapper,
+.editor-editor-canvas__post-title-wrapper {
     display: none;
 }
 
 /* Remove default block appender at the end of the post (WP v5.0~v5.1) */
 .editor-default-block-appender {
+    display: none;
+}
+
+/* Remove block inserter popover */
+.block-editor-block-popover {
     display: none;
 }
 
@@ -63,17 +89,17 @@
 }
 
 /* Remove tabs from sidebar panel, leaving the \'x\' button */
-.edit-post-sidebar__panel-tabs {
+.editor-sidebar__panel-tabs {
     display: none;
 }
 
 /* Remove \'(no-title)\' string from sidebar header */
-.edit-post-sidebar-header__title {
+.editor-sidebar-header__title {
     display: none;
 }
 
 /* Move \'x\' close button to the end on sidebar header */
-.edit-post-sidebar-header__small {
+.editor-sidebar-header__small {
     justify-content: flex-end;
 }
 

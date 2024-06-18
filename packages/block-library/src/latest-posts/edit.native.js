@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { TouchableWithoutFeedback, View, Text } from 'react-native';
-import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -63,9 +62,7 @@ class LatestPostsEdit extends Component {
 			.then( ( categoriesList ) => {
 				if ( this.isStillMounted ) {
 					this.setState( {
-						categoriesList: isEmpty( categoriesList )
-							? []
-							: categoriesList,
+						categoriesList,
 					} );
 				}
 			} )
@@ -204,13 +201,13 @@ class LatestPostsEdit extends Component {
 								value={ featuredImageAlign }
 								onChange={ this.onSetFeaturedImageAlign }
 								controls={ [ 'left', 'center', 'right' ] }
-								isBottomSheetControl={ true }
+								isBottomSheetControl
 							/>
 							<ToggleControl
 								label={ __( 'Add link to featured image' ) }
 								checked={ addLinkToFeaturedImage }
 								onChange={ this.onSetAddLinkToFeaturedImage }
-								separatorType={ 'topFullWidth' }
+								separatorType="topFullWidth"
 							/>
 						</>
 					) }

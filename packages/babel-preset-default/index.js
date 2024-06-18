@@ -22,6 +22,7 @@ module.exports = ( api ) => {
 
 	const getPresetEnv = () => {
 		const opts = {
+			bugfixes: true,
 			include: [
 				'proposal-nullish-coalescing-operator',
 				'proposal-logical-assignment-operators',
@@ -75,19 +76,9 @@ module.exports = ( api ) => {
 		plugins: [
 			require.resolve( '@wordpress/warning/babel-plugin' ),
 			[
-				require.resolve( '@wordpress/babel-plugin-import-jsx-pragma' ),
-				{
-					scopeVariable: 'createElement',
-					scopeVariableFrag: 'Fragment',
-					source: '@wordpress/element',
-					isDefault: false,
-				},
-			],
-			[
 				require.resolve( '@babel/plugin-transform-react-jsx' ),
 				{
-					pragma: 'createElement',
-					pragmaFrag: 'Fragment',
+					runtime: 'automatic',
 				},
 			],
 			maybeGetPluginTransformRuntime(),

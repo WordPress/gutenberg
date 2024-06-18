@@ -7,7 +7,7 @@ import { Platform } from 'react-native';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Picker, ToolbarButton } from '@wordpress/components';
+import { Picker, ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
@@ -90,7 +90,9 @@ export const BlockMover = ( {
 		const option = blockPageMoverOptions.find(
 			( el ) => el.value === value
 		);
-		if ( option && option.onSelect ) option.onSelect();
+		if ( option && option.onSelect ) {
+			option.onSelect();
+		}
 	};
 
 	const onLongPressMoveUp = useCallback(
@@ -107,7 +109,7 @@ export const BlockMover = ( {
 	}
 
 	return (
-		<>
+		<ToolbarGroup>
 			<ToolbarButton
 				title={ ! isFirst ? backwardButtonTitle : firstBlockTitle }
 				isDisabled={ isFirst }
@@ -133,10 +135,10 @@ export const BlockMover = ( {
 				options={ blockPageMoverOptions }
 				onChange={ onPickerSelect }
 				title={ __( 'Change block position' ) }
-				leftAlign={ true }
+				leftAlign
 				hideCancelButton={ Platform.OS !== 'ios' }
 			/>
-		</>
+		</ToolbarGroup>
 	);
 };
 
@@ -164,7 +166,7 @@ export default compose(
 			numberOfBlocks: blockOrder.length - 1,
 			isFirst: firstIndex === 0,
 			isLast: lastIndex === blockOrder.length - 1,
-			canMove: canMoveBlocks( clientIds, rootClientId ),
+			canMove: canMoveBlocks( clientIds ),
 			rootClientId,
 		};
 	} ),

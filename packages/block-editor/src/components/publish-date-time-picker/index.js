@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { DateTimePicker } from '@wordpress/components';
+import { DateTimePicker, TimePicker } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { forwardRef } from '@wordpress/element';
 import { getSettings } from '@wordpress/date';
@@ -11,31 +11,57 @@ import { getSettings } from '@wordpress/date';
  */
 import InspectorPopoverHeader from '../inspector-popover-header';
 
-function PublishDateTimePicker(
-	{ onClose, onChange, ...additionalProps },
+export function PublishDateTimePicker(
+	{
+		onClose,
+		onChange,
+		showPopoverHeaderActions,
+		isCompact,
+		currentDate,
+		...additionalProps
+	},
 	ref
 ) {
+	const datePickerProps = {
+		startOfWeek: getSettings().l10n.startOfWeek,
+		onChange,
+		currentDate: isCompact ? undefined : currentDate,
+		currentTime: isCompact ? currentDate : undefined,
+		...additionalProps,
+	};
+	const DatePickerComponent = isCompact ? TimePicker : DateTimePicker;
 	return (
 		<div ref={ ref } className="block-editor-publish-date-time-picker">
 			<InspectorPopoverHeader
 				title={ __( 'Publish' ) }
-				actions={ [
-					{
-						label: __( 'Now' ),
-						onClick: () => onChange?.( null ),
-					},
-				] }
+				actions={
+					showPopoverHeaderActions
+						? [
+								{
+									label: __( 'Now' ),
+									onClick: () => onChange?.( null ),
+								},
+						  ]
+						: undefined
+				}
 				onClose={ onClose }
 			/>
-			<DateTimePicker
-				startOfWeek={ getSettings().l10n.startOfWeek }
-				__nextRemoveHelpButton
-				__nextRemoveResetButton
-				onChange={ onChange }
-				{ ...additionalProps }
-			/>
+			<DatePickerComponent { ...datePickerProps } />
 		</div>
 	);
 }
 
-export default forwardRef( PublishDateTimePicker );
+export const PrivatePublishDateTimePicker = forwardRef( PublishDateTimePicker );
+
+function PublicPublishDateTimePicker( props, ref ) {
+	return (
+		<PrivatePublishDateTimePicker
+			{ ...props }
+			showPopoverHeaderActions
+			isCompact={ false }
+			ref={ ref }
+		/>
+	);
+}
+
+export default forwardRef( PublicPublishDateTimePicker );

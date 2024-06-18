@@ -1,13 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useCallback, memo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { RangeControl, SelectControl } from '../';
+import RangeControl from '../range-control';
+import SelectControl from '../select-control';
 import CategorySelect from './category-select';
 
 const DEFAULT_MIN_ITEMS = 1;
@@ -23,12 +24,12 @@ const options = [
 		value: 'date/asc',
 	},
 	{
-		/* translators: label for ordering posts by title in ascending order */
+		/* translators: Label for ordering posts by title in ascending order. */
 		label: __( 'A → Z' ),
 		value: 'title/asc',
 	},
 	{
-		/* translators: label for ordering posts by title in descending order */
+		/* translators: Label for ordering posts by title in descending order. */
 		label: __( 'Z → A' ),
 		value: 'title/desc',
 	},
@@ -69,21 +70,22 @@ const QueryControls = memo(
 						value={ `${ orderBy }/${ order }` }
 						options={ options }
 						onChange={ onChange }
-						hideCancelButton={ true }
+						hideCancelButton
 					/>
 				) }
 				{ onCategoryChange && (
 					<CategorySelect
 						categoriesList={ categoriesList }
 						label={ __( 'Category' ) }
-						noOptionLabel={ __( 'All' ) }
+						noOptionLabel={ _x( 'All', 'categories' ) }
 						selectedCategoryId={ selectedCategoryId }
 						onChange={ onCategoryChange }
-						hideCancelButton={ true }
+						hideCancelButton
 					/>
 				) }
 				{ onNumberOfItemsChange && (
 					<RangeControl
+						__next40pxDefaultSize
 						label={ __( 'Number of items' ) }
 						value={ numberOfItems }
 						onChange={ onNumberOfItemsChange }

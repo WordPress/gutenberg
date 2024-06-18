@@ -1,5 +1,6 @@
 {
 	"title": "Style variation name",
+	"description": "Style variation description",
 	"settings": {
 		"typography": {
 			"fontSizes": [
@@ -37,6 +38,13 @@
 				}
 			]
 		},
+		"dimensions": {
+			"aspectRatios": [
+				{
+					"name": "Aspect ratio name"
+				}
+			]
+		},
 		"blocks": {
 			"*": {
 				"typography": {
@@ -69,6 +77,15 @@
 							"name": "Space size name"
 						}
 					]
+				}
+			}
+		}
+	},
+	"styles": {
+		"blocks": {
+			"variations": {
+				"*": {
+					"title": "Style variation name"
 				}
 			}
 		}

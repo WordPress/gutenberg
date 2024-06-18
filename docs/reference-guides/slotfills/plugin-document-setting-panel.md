@@ -13,7 +13,7 @@ This SlotFill allows registering a UI to edit Document settings.
 
 ```js
 import { registerPlugin } from '@wordpress/plugins';
-import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
+import { PluginDocumentSettingPanel } from '@wordpress/editor';
 
 const PluginDocumentSettingPanelDemo = () => (
 	<PluginDocumentSettingPanel
@@ -33,7 +33,7 @@ registerPlugin( 'plugin-document-setting-panel-demo', {
 
 ## Accessing a panel programmatically
 
-Core and custom panels can be access programmatically using their panel name. The core panel names are:
+Core and custom panels can be accessed programmatically using their panel name. The core panel names are:
 
 -   Summary Panel: `post-status`
 -   Categories Panel: `taxonomy-panel-category`
@@ -49,10 +49,10 @@ To programmatically toggle panels, use the following:
 
 ```js
 import { useDispatch } from '@wordpress/data';
-import { store as editPostStore } from '@wordpress/edit-post';
+import { store as editorStore } from '@wordpress/editor';
 
 const Example = () => {
-	const { toggleEditorPanelOpened } = useDispatch( editPostStore );
+	const { toggleEditorPanelOpened } = useDispatch( editorStore );
 	return (
 		<Button
 			variant="primary"
@@ -76,10 +76,10 @@ It is also possible to remove panels from the admin using the `removeEditorPanel
 
 ```js
 import { useDispatch } from '@wordpress/data';
-import { store as editPostStore } from '@wordpress/edit-post';
+import { store as editorStore } from '@wordpress/editor';
 
 const Example = () => {
-	const { removeEditorPanel } = useDispatch( editPostStore );
+	const { removeEditorPanel } = useDispatch( editorStore );
 	return (
 		<Button
 			variant="primary"

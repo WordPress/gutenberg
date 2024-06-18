@@ -11,7 +11,6 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 	__experimentalBlockVariationPicker,
-	__experimentalGetMatchingVariation as getMatchingVariation,
 } from '@wordpress/block-editor';
 import { Button, Placeholder } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -34,31 +33,32 @@ export default function QueryPlaceholder( {
 		clientId,
 		attributes
 	);
-
-	const { blockType, allVariations, hasPatterns } = useSelect(
+	const { blockType, activeBlockVariation, hasPatterns } = useSelect(
 		( select ) => {
-			const { getBlockVariations, getBlockType } = select( blocksStore );
+			const { getActiveBlockVariation, getBlockType } =
+				select( blocksStore );
 			const { getBlockRootClientId, getPatternsByBlockTypes } =
 				select( blockEditorStore );
 			const rootClientId = getBlockRootClientId( clientId );
 			return {
 				blockType: getBlockType( name ),
-				allVariations: getBlockVariations( name ),
+				activeBlockVariation: getActiveBlockVariation(
+					name,
+					attributes
+				),
 				hasPatterns: !! getPatternsByBlockTypes(
 					blockNameForPatterns,
 					rootClientId
 				).length,
 			};
 		},
-		[ name, blockNameForPatterns, clientId ]
+		[ name, blockNameForPatterns, clientId, attributes ]
 	);
-
-	const matchingVariation = getMatchingVariation( attributes, allVariations );
 	const icon =
-		matchingVariation?.icon?.src ||
-		matchingVariation?.icon ||
+		activeBlockVariation?.icon?.src ||
+		activeBlockVariation?.icon ||
 		blockType?.icon?.src;
-	const label = matchingVariation?.title || blockType?.title;
+	const label = activeBlockVariation?.title || blockType?.title;
 	if ( isStartingBlank ) {
 		return (
 			<QueryVariationPicker

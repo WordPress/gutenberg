@@ -18,7 +18,9 @@ import { store as blockEditorStore } from '../../store';
 function setContentEditableWrapper( node, value ) {
 	node.contentEditable = value;
 	// Firefox doesn't automatically move focus.
-	if ( value ) node.focus();
+	if ( value ) {
+		node.focus();
+	}
 }
 
 /**
@@ -27,8 +29,12 @@ function setContentEditableWrapper( node, value ) {
 export default function useDragSelection() {
 	const { startMultiSelect, stopMultiSelect } =
 		useDispatch( blockEditorStore );
-	const { isSelectionEnabled, hasMultiSelection, isDraggingBlocks } =
-		useSelect( blockEditorStore );
+	const {
+		isSelectionEnabled,
+		hasSelectedBlock,
+		isDraggingBlocks,
+		isMultiSelecting,
+	} = useSelect( blockEditorStore );
 	return useRefEffect(
 		( node ) => {
 			const { ownerDocument } = node;
@@ -45,7 +51,7 @@ export default function useDragSelection() {
 				// so wait until the next animation frame to get the browser
 				// selection.
 				rafId = defaultView.requestAnimationFrame( () => {
-					if ( hasMultiSelection() ) {
+					if ( ! hasSelectedBlock() ) {
 						return;
 					}
 
@@ -59,19 +65,28 @@ export default function useDragSelection() {
 					const selection = defaultView.getSelection();
 
 					if ( selection.rangeCount ) {
-						const { commonAncestorContainer } =
-							selection.getRangeAt( 0 );
+						const range = selection.getRangeAt( 0 );
+						const { commonAncestorContainer } = range;
+						const clonedRange = range.cloneRange();
 
 						if (
 							anchorElement.contains( commonAncestorContainer )
 						) {
 							anchorElement.focus();
+							selection.removeAllRanges();
+							selection.addRange( clonedRange );
 						}
 					}
 				} );
 			}
 
-			function onMouseLeave( { buttons, target } ) {
+			function onMouseLeave( { buttons, target, relatedTarget } ) {
+				// If we're moving into a child element, ignore. We're tracking
+				// the mouse leaving the element to a parent, no a child.
+				if ( target.contains( relatedTarget ) ) {
+					return;
+				}
+
 				// Avoid triggering a multi-selection if the user is already
 				// dragging blocks.
 				if ( isDraggingBlocks() ) {
@@ -84,11 +99,21 @@ export default function useDragSelection() {
 					return;
 				}
 
+				// Abort if we are already multi-selecting.
+				if ( isMultiSelecting() ) {
+					return;
+				}
+
+				// Abort if selection is leaving writing flow.
+				if ( node === target ) {
+					return;
+				}
+
 				// Check the attribute, not the contentEditable attribute. All
 				// child elements of the content editable wrapper are editable
 				// and return true for this property. We only want to start
 				// multi selecting when the mouse leaves the wrapper.
-				if ( ! target.getAttribute( 'contenteditable' ) ) {
+				if ( target.getAttribute( 'contenteditable' ) !== 'true' ) {
 					return;
 				}
 
@@ -96,7 +121,11 @@ export default function useDragSelection() {
 					return;
 				}
 
-				anchorElement = ownerDocument.activeElement;
+				// Do not rely on the active element because it may change after
+				// the mouse leaves for the first time. See
+				// https://github.com/WordPress/gutenberg/issues/48747.
+				anchorElement = target;
+
 				startMultiSelect();
 
 				// `onSelectionStart` is called after `mousedown` and
@@ -123,7 +152,7 @@ export default function useDragSelection() {
 			startMultiSelect,
 			stopMultiSelect,
 			isSelectionEnabled,
-			hasMultiSelection,
+			hasSelectedBlock,
 		]
 	);
 }

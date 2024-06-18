@@ -20,7 +20,7 @@ exports[`Group block transforms to Columns block 1`] = `
 <!-- /wp:columns -->"
 `;
 
-exports[`Group block transforms unwraps content 1`] = `
+exports[`Group block transforms ungroups block 1`] = `
 "<!-- wp:paragraph -->
 <p>One.</p>
 <!-- /wp:paragraph -->

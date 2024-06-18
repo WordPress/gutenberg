@@ -1,20 +1,18 @@
 # Edit and Save
 
-When registering a block, the `edit` and `save` functions provide the interface for how a block is going to be rendered within the editor, how it will operate and be manipulated, and how it will be saved.
+When registering a block with JavaScript on the client, the `edit` and `save` functions provide the interface for how a block is going to be rendered within the editor, how it will operate and be manipulated, and how it will be saved.
 
 ## Edit
 
 The `edit` function describes the structure of your block in the context of the editor. This represents what the editor will render when the block is used.
 
-{% codetabs %}
-{% JSX %}
 
 ```jsx
 import { useBlockProps } from '@wordpress/block-editor';
 
 // ...
 const blockSettings = {
-	apiVersion: 2,
+	apiVersion: 3,
 
 	// ...
 
@@ -26,39 +24,19 @@ const blockSettings = {
 };
 ```
 
-{% Plain %}
-
-```js
-var blockSettings = {
-	apiVersion: 2,
-
-	// ...
-
-	edit: function () {
-		var blockProps = wp.blockEditor.useBlockProps();
-
-		return wp.element.createElement( 'div', blockProps, 'Your block.' );
-	},
-};
-```
-
-{% end %}
-
-### block wrapper props
+### Block wrapper props
 
 The first thing to notice here is the use of the `useBlockProps` React hook on the block wrapper element. In the example above, the block wrapper renders a "div" in the editor, but in order for the Gutenberg editor to know how to manipulate the block, add any extra classNames that are needed for the block... the block wrapper element should apply props retrieved from the `useBlockProps` react hook call. The block wrapper element should be a native DOM element, like `<div>` and `<table>`, or a React component that forwards any additional props to native DOM elements. Using a `<Fragment>` or `<ServerSideRender>` component, for instance, would be invalid.
 
 If the element wrapper needs any extra custom HTML attributes, these need to be passed as an argument to the `useBlockProps` hook. For example to add a `my-random-classname` className to the wrapper, you can use the following code:
 
-{% codetabs %}
-{% JSX %}
 
 ```jsx
 import { useBlockProps } from '@wordpress/block-editor';
 
 // ...
 const blockSettings = {
-	apiVersion: 2,
+	apiVersion: 3,
 
 	// ...
 
@@ -72,25 +50,6 @@ const blockSettings = {
 };
 ```
 
-{% Plain %}
-
-```js
-var blockSettings = {
-	apiVersion: 2,
-
-	// ...
-
-	edit: function () {
-		var blockProps = wp.blockEditor.useBlockProps( {
-			className: 'my-random-classname',
-		} );
-
-		return wp.element.createElement( 'div', blockProps, 'Your block.' );
-	},
-};
-```
-
-{% end %}
 
 ### attributes
 
@@ -100,8 +59,6 @@ The `attributes` property surfaces all the available attributes and their corres
 
 In this case, assuming we had defined an attribute of `content` during block registration, we would receive and use that value in our edit function:
 
-{% codetabs %}
-{% JSX %}
 
 ```js
 edit: ( { attributes } ) => {
@@ -111,30 +68,13 @@ edit: ( { attributes } ) => {
 };
 ```
 
-{% Plain %}
-
-```js
-edit: function( props ) {
-	var blockProps = wp.blockEditor.useBlockProps();
-
-	return wp.element.createElement(
-		'div',
-		blockProps,
-		props.attributes.content
-	);
-}
-```
-
-{% end %}
 
 The value of `attributes.content` will be displayed inside the `div` when inserting the block in the editor.
 
 ### isSelected
 
-The isSelected property is an boolean that communicates whether the block is currently selected.
+The isSelected property is a boolean that communicates whether the block is currently selected.
 
-{% codetabs %}
-{% JSX %}
 
 ```jsx
 edit: ( { attributes, isSelected } ) => {
@@ -151,35 +91,10 @@ edit: ( { attributes, isSelected } ) => {
 };
 ```
 
-{% Plain %}
-
-```js
-edit: function( props ) {
-	var blockProps = wp.blockEditor.useBlockProps();
-
-	return wp.element.createElement(
-		'div',
-		blockProps,
-		[
-			'Your block.',
-			props.isSelected ? wp.element.createElement(
-				'span',
-				null,
-				'Shows only when the block is selected.'
-			)
-		]
-	);
-}
-```
-
-{% end %}
-
 ### setAttributes
 
 This function allows the block to update individual attributes based on user interactions.
 
-{% codetabs %}
-{% JSX %}
 
 ```jsx
 edit: ( { attributes, setAttributes, isSelected } ) => {
@@ -201,39 +116,7 @@ edit: ( { attributes, setAttributes, isSelected } ) => {
 };
 ```
 
-{% Plain %}
-
-```js
-edit: function( props ) {
-	var blockProps = wp.blockEditor.useBlockProps();
-
-	// Simplify access to attributes
-	let content = props.attributes.content;
-	let mySetting = props.attributes.mySetting;
-
-	// Toggle a setting when the user clicks the button
-	let toggleSetting = () => props.setAttributes( { mySetting: ! mySetting } );
-	return wp.element.createElement(
-		'div',
-		blockProps,
-		[
-			content,
-			props.isSelected ? wp.element.createElement(
-				'button',
-				{ onClick: toggleSetting },
-				'Toggle setting'
-			) : null
-		]
-	);
-},
-```
-
-{% end %}
-
 When using attributes that are objects or arrays it's a good idea to copy or clone the attribute prior to updating it:
-
-{% codetabs %}
-{% JSX %}
 
 ```js
 // Good - a new array is created from the old list attribute and a new list item:
@@ -249,25 +132,6 @@ const addListItem = ( newListItem ) => {
 };
 ```
 
-{% Plain %}
-
-```js
-// Good - cloning the old list
-var newList = attributes.list.slice();
-
-var addListItem = function ( newListItem ) {
-	setAttributes( { list: newList.concat( [ newListItem ] ) } );
-};
-
-// Bad - the list from the existing attribute is modified directly to add the new list item:
-var list = attributes.list;
-var addListItem = function ( newListItem ) {
-	list.push( newListItem );
-	setAttributes( { list: list } );
-};
-```
-
-{% end %}
 
 Why do this? In JavaScript, arrays and objects are passed by reference, so this practice ensures changes won't affect other code that might hold references to the same data. Furthermore, the Gutenberg project follows the philosophy of the Redux library that [state should be immutable](https://redux.js.org/faq/immutable-data#what-are-the-benefits-of-immutability)—data should not be changed directly, but instead a new version of the data created containing the changes.
 
@@ -275,8 +139,6 @@ Why do this? In JavaScript, arrays and objects are passed by reference, so this 
 
 The `save` function defines the way in which the different attributes should be combined into the final markup, which is then serialized into `post_content`.
 
-{% codetabs %}
-{% JSX %}
 
 ```jsx
 save: () => {
@@ -286,21 +148,6 @@ save: () => {
 };
 ```
 
-{% Plain %}
-
-```js
-save: function() {
-	var blockProps = wp.blockEditor.useBlockProps.save();
-
-	return wp.element.createElement(
-		'div',
-		blockProps,
-		'Your block.'
-	);
-}
-```
-
-{% end %}
 
 For most blocks, the return value of `save` should be an [instance of WordPress Element](/packages/element/README.md) representing how the block is to appear on the front of the site.
 
@@ -326,8 +173,6 @@ Like the `edit` function, when rendering static blocks, it's important to add th
 
 As with `edit`, the `save` function also receives an object argument including attributes which can be inserted into the markup.
 
-{% codetabs %}
-{% JSX %}
 
 ```jsx
 save: ( { attributes } ) => {
@@ -337,32 +182,16 @@ save: ( { attributes } ) => {
 };
 ```
 
-{% Plain %}
 
-```js
-save: function( props ) {
-	var blockProps = wp.blockEditor.useBlockProps.save();
-
-	return wp.element.createElement(
-		'div',
-		blockProps,
-		props.attributes.content
-	);
-}
-```
-
-{% end %}
 
 When saving your block, you want to save the attributes in the same format specified by the attribute source definition. If no attribute source is specified, the attribute will be saved to the block's comment delimiter. See the [Block Attributes documentation](/docs/reference-guides/block-api/block-attributes.md) for more details.
 
 ## Examples
 
-Here are a couple examples of using attributes, edit, and save all together. For a full working example, see the [Introducing Attributes and Editable Fields](/docs/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields.md) section of the Block Tutorial.
+Here are a couple examples of using attributes, edit, and save all together.
 
 ### Saving Attributes to Child Elements
 
-{% codetabs %}
-{% JSX %}
 
 ```jsx
 attributes: {
@@ -385,7 +214,7 @@ edit: ( { attributes, setAttributes } ) => {
 				value={ attributes.content }
 				onChange={ updateFieldValue }
 			/>
-		</p>
+		</div>
 	);
 },
 
@@ -396,46 +225,6 @@ save: ( { attributes } ) => {
 },
 ```
 
-{% Plain %}
-
-```js
-attributes: {
-	content: {
-		type: 'string',
-		source: 'html',
-		selector: 'p'
-	}
-},
-
-edit: function( props ) {
-	var blockProps = wp.blockEditor.useBlockProps();
-	var updateFieldValue = function( val ) {
-		props.setAttributes( { content: val } );
-	}
-
-	return wp.element.createElement(
-		'div',
-		blockProps,
-		wp.element.createElement(
-			wp.components.TextControl,
-			{
-				label: 'My Text Field',
-				value: props.attributes.content,
-				onChange: updateFieldValue,
-
-			}
-		)
-	);
-},
-
-save: function( props ) {
-	var blockProps = wp.blockEditor.useBlockProps.save();
-
-	return wp.element.createElement( 'div', blockProps, props.attributes.content );
-},
-```
-
-{% end %}
 
 ### Saving Attributes via Serialization
 
@@ -443,8 +232,6 @@ Ideally, the attributes saved should be included in the markup. However, there a
 
 This example could be for a dynamic block, such as the [Latest Posts block](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-library/src/latest-posts/index.js), which renders the markup server-side. The save function is still required, however in this case it simply returns null since the block is not saving content from the editor.
 
-{% codetabs %}
-{% JSX %}
 
 ```jsx
 attributes: {
@@ -465,7 +252,7 @@ edit: ( { attributes, setAttributes } ) => {
 					setAttributes( { postsToShow: parseInt( val ) } );
 				}}
 			/>
-		</p>
+		</div>
 	);
 },
 
@@ -473,41 +260,6 @@ save: () => {
 	return null;
 }
 ```
-
-{% Plain %}
-
-```js
-attributes: {
-	postsToShow: {
-		type: 'number',
-	}
-},
-
-edit: function( props ) {
-	var blockProps = wp.blockEditor.useBlockProps();
-
-	return wp.element.createEleement(
-		'div',
-		blockProps,
-		wp.element.createElement(
-			wp.components.TextControl,
-			{
-				label: 'Number Posts to Show',
-				value: props.attributes.postsToShow,
-				onChange: function( val ) {
-					props.setAttributes( { postsToShow: parseInt( val ) } );
-				},
-			}
-		)
-	);
-},
-
-save: function() {
-	return null;
-}
-```
-
-{% end %}
 
 ## Validation
 
@@ -517,14 +269,14 @@ If a block is detected to be invalid, the user will be prompted to choose how to
 
 ![Invalid block prompt](https://user-images.githubusercontent.com/7753001/88754471-4cf7e900-d191-11ea-9123-3cee20719d10.png)
 
-Clicking **Attempt Block Recovery** button will attempt recovery action as much as possible.
+Clicking the **Attempt Block Recovery** button will attempt a recovery action as much as possible.
 
 Clicking the "3-dot" menu on the side of the block displays three options:
 
 -   **Resolve**: Open Resolve Block dialog box with two buttons:
-    -   **Convert to HTML**: Protects the original markup from the saved post content and convert the block from its original type to the HTML block type, enabling the user to modify the HTML markup directly.
-    -   **Convert to Blocks**: Protects the original markup from the saved post content and convert the block from its original type to the validated block type.
--   **Convert to HTML**: Protects the original markup from the saved post content and convert the block from its original type to the HTML block type, enabling the user to modify the HTML markup directly.
+    -   **Convert to HTML**: Protects the original markup from the saved post content and converts the block from its original type to the HTML block type, enabling the user to modify the HTML markup directly.
+    -   **Convert to Blocks**: Protects the original markup from the saved post content and converts the block from its original type to the validated block type.
+-   **Convert to HTML**: Protects the original markup from the saved post content and converts the block from its original type to the HTML block type, enabling the user to modify the HTML markup directly.
 -   **Convert to Classic Block**: Protects the original markup from the saved post content as correct. Since the block will be converted from its original type to the Classic block type, it will no longer be possible to edit the content using controls available for the original block type.
 
 ### Validation FAQ

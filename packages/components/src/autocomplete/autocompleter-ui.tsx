@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -12,10 +12,10 @@ import {
 	useEffect,
 	useState,
 } from '@wordpress/element';
-// Error expected because `@wordpress/rich-text` is not yet fully typed.
-// @ts-expect-error
 import { useAnchor } from '@wordpress/rich-text';
-import { useMergeRefs, useRefEffect } from '@wordpress/compose';
+import { useDebounce, useMergeRefs, useRefEffect } from '@wordpress/compose';
+import { speak } from '@wordpress/a11y';
+import { __, _n, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -25,12 +25,59 @@ import Button from '../button';
 import Popover from '../popover';
 import { VisuallyHidden } from '../visually-hidden';
 import { createPortal } from 'react-dom';
-import type { AutocompleterUIProps, WPCompleter } from './types';
+import type { AutocompleterUIProps, KeyedOption, WPCompleter } from './types';
+
+type ListBoxProps = {
+	items: KeyedOption[];
+	onSelect: ( option: KeyedOption ) => void;
+	selectedIndex: number;
+	instanceId: number;
+	listBoxId: string | undefined;
+	className?: string;
+	Component?: React.ElementType;
+};
+
+function ListBox( {
+	items,
+	onSelect,
+	selectedIndex,
+	instanceId,
+	listBoxId,
+	className,
+	Component = 'div',
+}: ListBoxProps ) {
+	return (
+		<Component
+			id={ listBoxId }
+			role="listbox"
+			className="components-autocomplete__results"
+		>
+			{ items.map( ( option, index ) => (
+				<Button
+					key={ option.key }
+					id={ `components-autocomplete-item-${ instanceId }-${ option.key }` }
+					role="option"
+					aria-selected={ index === selectedIndex }
+					disabled={ option.isDisabled }
+					className={ clsx(
+						'components-autocomplete__result',
+						className,
+						{
+							'is-selected': index === selectedIndex,
+						}
+					) }
+					onClick={ () => onSelect( option ) }
+				>
+					{ option.label }
+				</Button>
+			) ) }
+		</Component>
+	);
+}
 
 export function getAutoCompleterUI( autocompleter: WPCompleter ) {
-	const useItems = autocompleter.useItems
-		? autocompleter.useItems
-		: getDefaultUseItems( autocompleter );
+	const useItems =
+		autocompleter.useItems ?? getDefaultUseItems( autocompleter );
 
 	function AutocompleterUI( {
 		filterValue,
@@ -55,12 +102,14 @@ export function getAutoCompleterUI( autocompleter: WPCompleter ) {
 			popoverRef,
 			useRefEffect(
 				( node ) => {
-					if ( ! contentRef.current ) return;
+					if ( ! contentRef.current ) {
+						return;
+					}
 
 					// If the popover is rendered in a different document than
 					// the content, we need to duplicate the options list in the
 					// content document so that it's available to the screen
-					// readers, which check the DOM ID based aira-* attributes.
+					// readers, which check the DOM ID based aria-* attributes.
 					setNeedsA11yCompat(
 						node.ownerDocument !== contentRef.current.ownerDocument
 					);
@@ -71,8 +120,48 @@ export function getAutoCompleterUI( autocompleter: WPCompleter ) {
 
 		useOnClickOutside( popoverRef, reset );
 
+		const debouncedSpeak = useDebounce( speak, 500 );
+
+		function announce( options: Array< KeyedOption > ) {
+			if ( ! debouncedSpeak ) {
+				return;
+			}
+			if ( !! options.length ) {
+				if ( filterValue ) {
+					debouncedSpeak(
+						sprintf(
+							/* translators: %d: number of results. */
+							_n(
+								'%d result found, use up and down arrow keys to navigate.',
+								'%d results found, use up and down arrow keys to navigate.',
+								options.length
+							),
+							options.length
+						),
+						'assertive'
+					);
+				} else {
+					debouncedSpeak(
+						sprintf(
+							/* translators: %d: number of results. */
+							_n(
+								'Initial %d result loaded. Type to filter all available results. Use up and down arrow keys to navigate.',
+								'Initial %d results loaded. Type to filter all available results. Use up and down arrow keys to navigate.',
+								options.length
+							),
+							options.length
+						),
+						'assertive'
+					);
+				}
+			} else {
+				debouncedSpeak( __( 'No results.' ), 'assertive' );
+			}
+		}
+
 		useLayoutEffect( () => {
 			onChangeOptions( items );
+			announce( items );
 			// Temporarily disabling exhaustive-deps to avoid introducing unexpected side effecst.
 			// See https://github.com/WordPress/gutenberg/pull/41820
 			// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -81,38 +170,6 @@ export function getAutoCompleterUI( autocompleter: WPCompleter ) {
 		if ( items.length === 0 ) {
 			return null;
 		}
-
-		const ListBox = ( {
-			Component = 'div',
-		}: {
-			Component?: React.ElementType;
-		} ) => (
-			<Component
-				id={ listBoxId }
-				role="listbox"
-				className="components-autocomplete__results"
-			>
-				{ items.map( ( option, index ) => (
-					<Button
-						key={ option.key }
-						id={ `components-autocomplete-item-${ instanceId }-${ option.key }` }
-						role="option"
-						aria-selected={ index === selectedIndex }
-						disabled={ option.isDisabled }
-						className={ classnames(
-							'components-autocomplete__result',
-							className,
-							{
-								'is-selected': index === selectedIndex,
-							}
-						) }
-						onClick={ () => onSelect( option ) }
-					>
-						{ option.label }
-					</Button>
-				) ) }
-			</Component>
-		);
 
 		return (
 			<>
@@ -124,12 +181,27 @@ export function getAutoCompleterUI( autocompleter: WPCompleter ) {
 					anchor={ popoverAnchor }
 					ref={ popoverRefs }
 				>
-					<ListBox />
+					<ListBox
+						items={ items }
+						onSelect={ onSelect }
+						selectedIndex={ selectedIndex }
+						instanceId={ instanceId }
+						listBoxId={ listBoxId }
+						className={ className }
+					/>
 				</Popover>
 				{ contentRef.current &&
 					needsA11yCompat &&
 					createPortal(
-						<ListBox Component={ VisuallyHidden } />,
+						<ListBox
+							items={ items }
+							onSelect={ onSelect }
+							selectedIndex={ selectedIndex }
+							instanceId={ instanceId }
+							listBoxId={ listBoxId }
+							className={ className }
+							Component={ VisuallyHidden }
+						/>,
 						contentRef.current.ownerDocument.body
 					) }
 			</>

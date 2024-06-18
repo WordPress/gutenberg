@@ -1,0 +1,71 @@
+.edit-site-resizable-frame__inner {
+	position: relative;
+
+	&.is-resizing {
+		@at-root {
+			body:has(&) {
+				cursor: col-resize;
+				user-select: none;
+				-webkit-user-select: none;
+			}
+		}
+
+		&::before {
+			// This covers the whole content which ensures mouse up triggers
+			// even if the content is "inert".
+			position: absolute;
+			z-index: 1;
+			inset: 0;
+			content: "";
+		}
+	}
+}
+
+.edit-site-resizable-frame__inner-content {
+	position: absolute;
+	z-index: 0;
+	inset: 0;
+}
+
+.edit-site-resizable-frame__handle {
+	align-items: center;
+	background-color: rgba($gray-700, 0.4);
+	border: 0;
+	border-radius: $grid-unit-05;
+	cursor: col-resize;
+	display: flex;
+	height: $grid-unit-80;
+	justify-content: flex-end;
+	padding: 0;
+	position: absolute;
+	top: calc(50% - #{$grid-unit-40});
+	width: $grid-unit-05;
+	z-index: 100;
+
+	&::before {
+		content: "";
+		height: 100%;
+		left: 100%;
+		position: absolute;
+		width: $grid-unit-40;
+	}
+
+	&::after {
+		content: "";
+		height: 100%;
+		position: absolute;
+		right: 100%;
+		width: $grid-unit-40;
+	}
+
+	&:focus-visible {
+		// Works with Windows high contrast mode while also hiding weird outline in Safari.
+		outline: 2px solid transparent;
+	}
+
+	&:hover,
+	&:focus,
+	&.is-resizing {
+		background-color: var(--wp-admin-theme-color);
+	}
+}

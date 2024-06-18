@@ -2,7 +2,6 @@
  * External dependencies
  */
 import fastDeepEqual from 'fast-deep-equal/es6';
-import { get, set } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,6 +15,7 @@ import { _x } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { getValueFromVariable, getPresetVariableFromValue } from './utils';
+import { getValueFromObjectPath, setImmutably } from '../../utils/object';
 import { GlobalStylesContext } from './context';
 import { unlock } from '../../lock-unlock';
 
@@ -24,6 +24,10 @@ const EMPTY_CONFIG = { settings: {}, styles: {} };
 const VALID_SETTINGS = [
 	'appearanceTools',
 	'useRootPaddingAwareAlignments',
+	'background.backgroundImage',
+	'background.backgroundRepeat',
+	'background.backgroundSize',
+	'background.backgroundPosition',
 	'border.color',
 	'border.radius',
 	'border.style',
@@ -46,13 +50,17 @@ const VALID_SETTINGS = [
 	'color.palette',
 	'color.text',
 	'custom',
+	'dimensions.aspectRatio',
 	'dimensions.minHeight',
 	'layout.contentSize',
 	'layout.definitions',
 	'layout.wideSize',
+	'lightbox.enabled',
+	'lightbox.allowEditing',
 	'position.fixed',
 	'position.sticky',
 	'spacing.customSpacingSize',
+	'spacing.defaultSpacingSizes',
 	'spacing.spacingSizes',
 	'spacing.spacingScale',
 	'spacing.blockGap',
@@ -61,6 +69,7 @@ const VALID_SETTINGS = [
 	'spacing.units',
 	'typography.fluid',
 	'typography.customFontSize',
+	'typography.defaultFontSizes',
 	'typography.dropCap',
 	'typography.fontFamilies',
 	'typography.fontSizes',
@@ -68,9 +77,11 @@ const VALID_SETTINGS = [
 	'typography.fontWeight',
 	'typography.letterSpacing',
 	'typography.lineHeight',
+	'typography.textAlign',
 	'typography.textColumns',
 	'typography.textDecoration',
 	'typography.textTransform',
+	'typography.writingMode',
 ];
 
 export const useGlobalStylesReset = () => {
@@ -78,16 +89,12 @@ export const useGlobalStylesReset = () => {
 	const canReset = !! config && ! fastDeepEqual( config, EMPTY_CONFIG );
 	return [
 		canReset,
-		useCallback(
-			() => setUserConfig( () => EMPTY_CONFIG ),
-			[ setUserConfig ]
-		),
+		useCallback( () => setUserConfig( EMPTY_CONFIG ), [ setUserConfig ] ),
 	];
 };
 
 export function useGlobalSetting( propertyPath, blockName, source = 'all' ) {
 	const { setUserConfig, ...configs } = useContext( GlobalStylesContext );
-
 	const appendedBlockPath = blockName ? '.blocks.' + blockName : '';
 	const appendedPropertyPath = propertyPath ? '.' + propertyPath : '';
 	const contextualPath = `settings${ appendedBlockPath }${ appendedPropertyPath }`;
@@ -102,20 +109,21 @@ export function useGlobalSetting( propertyPath, blockName, source = 'all' ) {
 
 		if ( propertyPath ) {
 			return (
-				get( configToUse, contextualPath ) ??
-				get( configToUse, globalPath )
+				getValueFromObjectPath( configToUse, contextualPath ) ??
+				getValueFromObjectPath( configToUse, globalPath )
 			);
 		}
 
-		const result = {};
+		let result = {};
 		VALID_SETTINGS.forEach( ( setting ) => {
 			const value =
-				get(
+				getValueFromObjectPath(
 					configToUse,
 					`settings${ appendedBlockPath }.${ setting }`
-				) ?? get( configToUse, `settings.${ setting }` );
-			if ( value ) {
-				set( result, setting, value );
+				) ??
+				getValueFromObjectPath( configToUse, `settings.${ setting }` );
+			if ( value !== undefined ) {
+				result = setImmutably( result, setting.split( '.' ), value );
 			}
 		} );
 		return result;
@@ -129,15 +137,10 @@ export function useGlobalSetting( propertyPath, blockName, source = 'all' ) {
 	] );
 
 	const setSetting = ( newValue ) => {
-		setUserConfig( ( currentConfig ) => {
-			// Deep clone `currentConfig` to avoid mutating it later.
-			const newUserConfig = JSON.parse( JSON.stringify( currentConfig ) );
-			set( newUserConfig, contextualPath, newValue );
-
-			return newUserConfig;
-		} );
+		setUserConfig( ( currentConfig ) =>
+			setImmutably( currentConfig, contextualPath.split( '.' ), newValue )
+		);
 	};
-
 	return [ settingValue, setSetting ];
 }
 
@@ -159,12 +162,10 @@ export function useGlobalStyle(
 		: `styles.blocks.${ blockName }${ appendedPath }`;
 
 	const setStyle = ( newValue ) => {
-		setUserConfig( ( currentConfig ) => {
-			// Deep clone `currentConfig` to avoid mutating it later.
-			const newUserConfig = JSON.parse( JSON.stringify( currentConfig ) );
-			set(
-				newUserConfig,
-				finalPath,
+		setUserConfig( ( currentConfig ) =>
+			setImmutably(
+				currentConfig,
+				finalPath.split( '.' ),
 				shouldDecodeEncode
 					? getPresetVariableFromValue(
 							mergedConfig.settings,
@@ -173,31 +174,26 @@ export function useGlobalStyle(
 							newValue
 					  )
 					: newValue
-			);
-			return newUserConfig;
-		} );
+			)
+		);
 	};
 
 	let rawResult, result;
 	switch ( source ) {
 		case 'all':
-			rawResult =
-				// The styles.css path is allowed to be empty, so don't revert to base if undefined.
-				finalPath === 'styles.css'
-					? get( userConfig, finalPath )
-					: get( mergedConfig, finalPath );
+			rawResult = getValueFromObjectPath( mergedConfig, finalPath );
 			result = shouldDecodeEncode
 				? getValueFromVariable( mergedConfig, blockName, rawResult )
 				: rawResult;
 			break;
 		case 'user':
-			rawResult = get( userConfig, finalPath );
+			rawResult = getValueFromObjectPath( userConfig, finalPath );
 			result = shouldDecodeEncode
 				? getValueFromVariable( mergedConfig, blockName, rawResult )
 				: rawResult;
 			break;
 		case 'base':
-			rawResult = get( baseConfig, finalPath );
+			rawResult = getValueFromObjectPath( baseConfig, finalPath );
 			result = shouldDecodeEncode
 				? getValueFromVariable( baseConfig, blockName, rawResult )
 				: rawResult;
@@ -207,6 +203,11 @@ export function useGlobalStyle(
 	}
 
 	return [ result, setStyle ];
+}
+
+export function useGlobalStyleLinks() {
+	const { merged: mergedConfig } = useContext( GlobalStylesContext );
+	return mergedConfig?._links;
 }
 
 /**
@@ -244,6 +245,7 @@ export function useSettingsForBlockElement(
 				...updatedSettings.typography,
 				fontSizes: {},
 				customFontSize: false,
+				defaultFontSizes: false,
 			};
 		}
 
@@ -294,8 +296,10 @@ export function useSettingsForBlockElement(
 			'fontStyle',
 			'fontWeight',
 			'letterSpacing',
+			'textAlign',
 			'textTransform',
 			'textDecoration',
+			'writingMode',
 		].forEach( ( key ) => {
 			if ( ! supportedStyles.includes( key ) ) {
 				updatedSettings.typography = {
@@ -335,7 +339,8 @@ export function useSettingsForBlockElement(
 			const sides = Array.isArray( supports?.spacing?.[ key ] )
 				? supports?.spacing?.[ key ]
 				: supports?.spacing?.[ key ]?.sides;
-			if ( sides?.length ) {
+			// Check if spacing type is supported before adding sides.
+			if ( sides?.length && updatedSettings.spacing?.[ key ] ) {
 				updatedSettings.spacing = {
 					...updatedSettings.spacing,
 					[ key ]: {
@@ -346,12 +351,14 @@ export function useSettingsForBlockElement(
 			}
 		} );
 
-		if ( ! supportedStyles.includes( 'minHeight' ) ) {
-			updatedSettings.dimensions = {
-				...updatedSettings.dimensions,
-				minHeight: false,
-			};
-		}
+		[ 'aspectRatio', 'minHeight' ].forEach( ( key ) => {
+			if ( ! supportedStyles.includes( key ) ) {
+				updatedSettings.dimensions = {
+					...updatedSettings.dimensions,
+					[ key ]: false,
+				};
+			}
+		} );
 
 		[ 'radius', 'color', 'style', 'width' ].forEach( ( key ) => {
 			if (
@@ -370,8 +377,13 @@ export function useSettingsForBlockElement(
 			? updatedSettings.shadow
 			: false;
 
+		// Text alignment is only available for blocks.
+		if ( element ) {
+			updatedSettings.typography.textAlign = false;
+		}
+
 		return updatedSettings;
-	}, [ parentSettings, supportedStyles, supports ] );
+	}, [ parentSettings, supportedStyles, supports, element ] );
 }
 
 export function useColorsPerOrigin( settings ) {

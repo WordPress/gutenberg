@@ -7,6 +7,7 @@ export interface Post {
 	id: number;
 	content: string;
 	status: 'publish' | 'future' | 'draft' | 'pending' | 'private';
+	link: string;
 }
 
 export interface CreatePostPayload {
@@ -63,7 +64,7 @@ export async function createPost(
 	const post = await this.rest< Post >( {
 		method: 'POST',
 		path: `/wp/v2/posts`,
-		params: { ...payload },
+		data: { ...payload },
 	} );
 
 	return post;

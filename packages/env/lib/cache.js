@@ -1,3 +1,4 @@
+'use strict';
 /**
  * External dependencies
  */
@@ -39,6 +40,9 @@ async function didCacheChange( key, value, options ) {
  * @param {WPEnvCacheOptions} options Parsing options
  */
 async function setCache( key, value, options ) {
+	// Make sure the cache directory exists.
+	await fs.mkdir( options.workDirectoryPath, { recursive: true } );
+
 	const existingCache = await getCacheFile( options );
 	existingCache[ key ] = value;
 

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -16,8 +16,7 @@ import { chevronDown } from '@wordpress/icons';
 import { orderBy } from '../../../utils/sorting';
 
 const POPOVER_PROPS = {
-	position: 'bottom right',
-	variant: 'toolbar',
+	placement: 'bottom-start',
 };
 
 const FormatToolbar = () => {
@@ -49,7 +48,7 @@ const FormatToolbar = () => {
 									label={ __( 'More' ) }
 									toggleProps={ {
 										...toggleProps,
-										className: classnames(
+										className: clsx(
 											toggleProps.className,
 											{ 'is-pressed': hasActive }
 										),

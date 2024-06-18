@@ -9,13 +9,9 @@ import {
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { moreVertical } from '@wordpress/icons';
-import {
-	Children,
-	cloneElement,
-	useCallback,
-	useRef,
-} from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { Children, cloneElement } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+import { displayShortcut } from '@wordpress/keycodes';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { pipe, useCopyToClipboard } from '@wordpress/compose';
 
@@ -23,49 +19,51 @@ import { pipe, useCopyToClipboard } from '@wordpress/compose';
  * Internal dependencies
  */
 import BlockActions from '../block-actions';
-import BlockIcon from '../block-icon';
-import BlockModeToggle from './block-mode-toggle';
 import BlockHTMLConvertButton from './block-html-convert-button';
 import __unstableBlockSettingsMenuFirstItem from './block-settings-menu-first-item';
 import BlockSettingsMenuControls from '../block-settings-menu-controls';
+import BlockParentSelectorMenuItem from './block-parent-selector-menu-item';
 import { store as blockEditorStore } from '../../store';
-import { useShowMoversGestures } from '../block-toolbar/utils';
+import { unlock } from '../../lock-unlock';
 
-const noop = () => {};
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
-	position: 'bottom right',
-	variant: 'toolbar',
+	placement: 'bottom-start',
 };
 
-function CopyMenuItem( { blocks, onCopy, label } ) {
-	const ref = useCopyToClipboard( () => serialize( blocks ), onCopy );
-	const copyMenuItemBlocksLabel =
-		blocks.length > 1 ? __( 'Copy blocks' ) : __( 'Copy block' );
-	const copyMenuItemLabel = label ? label : copyMenuItemBlocksLabel;
-	return <MenuItem ref={ ref }>{ copyMenuItemLabel }</MenuItem>;
+function CopyMenuItem( { clientIds, onCopy, label, shortcut } ) {
+	const { getBlocksByClientId } = useSelect( blockEditorStore );
+	const ref = useCopyToClipboard(
+		() => serialize( getBlocksByClientId( clientIds ) ),
+		onCopy
+	);
+	const copyMenuItemLabel = label ? label : __( 'Copy' );
+	return (
+		<MenuItem ref={ ref } shortcut={ shortcut }>
+			{ copyMenuItemLabel }
+		</MenuItem>
+	);
 }
 
 export function BlockSettingsDropdown( {
+	block,
 	clientIds,
-	__experimentalSelectBlock,
 	children,
-	__unstableDisplayLocation,
+	__experimentalSelectBlock,
 	...props
 } ) {
-	const blockClientIds = Array.isArray( clientIds )
-		? clientIds
-		: [ clientIds ];
-	const count = blockClientIds.length;
-	const firstBlockClientId = blockClientIds[ 0 ];
+	// Get the client id of the current block for this menu, if one is set.
+	const currentClientId = block?.clientId;
+	const count = clientIds.length;
+	const firstBlockClientId = clientIds[ 0 ];
 	const {
 		firstParentClientId,
-		isDistractionFree,
 		onlyBlock,
 		parentBlockType,
 		previousBlockClientId,
-		nextBlockClientId,
 		selectedBlockClientIds,
+		openedBlockSettingsMenu,
+		isContentOnly,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -73,11 +71,11 @@ export function BlockSettingsDropdown( {
 				getBlockName,
 				getBlockRootClientId,
 				getPreviousBlockClientId,
-				getNextBlockClientId,
 				getSelectedBlockClientIds,
-				getSettings,
 				getBlockAttributes,
-			} = select( blockEditorStore );
+				getOpenedBlockSettingsMenu,
+				getBlockEditingMode,
+			} = unlock( select( blockEditorStore ) );
 
 			const { getActiveBlockVariation } = select( blocksStore );
 
@@ -88,7 +86,6 @@ export function BlockSettingsDropdown( {
 
 			return {
 				firstParentClientId: _firstParentClientId,
-				isDistractionFree: getSettings().isDistractionFree,
 				onlyBlock: 1 === getBlockCount( _firstParentClientId ),
 				parentBlockType:
 					_firstParentClientId &&
@@ -99,11 +96,19 @@ export function BlockSettingsDropdown( {
 						getBlockType( parentBlockName ) ),
 				previousBlockClientId:
 					getPreviousBlockClientId( firstBlockClientId ),
-				nextBlockClientId: getNextBlockClientId( firstBlockClientId ),
 				selectedBlockClientIds: getSelectedBlockClientIds(),
+				openedBlockSettingsMenu: getOpenedBlockSettingsMenu(),
+				isContentOnly:
+					getBlockEditingMode( firstBlockClientId ) === 'contentOnly',
 			};
 		},
 		[ firstBlockClientId ]
+	);
+	const { getBlockOrder, getSelectedBlockClientIds } =
+		useSelect( blockEditorStore );
+
+	const { setOpenedBlockSettingsMenu } = unlock(
+		useDispatch( blockEditorStore )
 	);
 
 	const shortcuts = useSelect( ( select ) => {
@@ -121,72 +126,65 @@ export function BlockSettingsDropdown( {
 			),
 		};
 	}, [] );
+	const hasSelectedBlocks = selectedBlockClientIds.length > 0;
 
-	const { selectBlock, toggleBlockHighlight } =
-		useDispatch( blockEditorStore );
+	async function updateSelectionAfterDuplicate( clientIdsPromise ) {
+		if ( ! __experimentalSelectBlock ) {
+			return;
+		}
 
-	const updateSelectionAfterDuplicate = useCallback(
-		__experimentalSelectBlock
-			? async ( clientIdsPromise ) => {
-					const ids = await clientIdsPromise;
-					if ( ids && ids[ 0 ] ) {
-						__experimentalSelectBlock( ids[ 0 ] );
-					}
-			  }
-			: noop,
-		[ __experimentalSelectBlock ]
-	);
+		const ids = await clientIdsPromise;
+		if ( ids && ids[ 0 ] ) {
+			__experimentalSelectBlock( ids[ 0 ], false );
+		}
+	}
 
-	const updateSelectionAfterRemove = useCallback(
-		__experimentalSelectBlock
-			? () => {
-					const blockToSelect =
-						previousBlockClientId ||
-						nextBlockClientId ||
-						firstParentClientId;
+	function updateSelectionAfterRemove() {
+		if ( ! __experimentalSelectBlock ) {
+			return;
+		}
 
-					if (
-						blockToSelect &&
-						// From the block options dropdown, it's possible to remove a block that is not selected,
-						// in this case, it's not necessary to update the selection since the selected block wasn't removed.
-						selectedBlockClientIds.includes( firstBlockClientId ) &&
-						// Don't update selection when next/prev block also is in the selection ( and gets removed ),
-						// In case someone selects all blocks and removes them at once.
-						! selectedBlockClientIds.includes( blockToSelect )
-					) {
-						__experimentalSelectBlock( blockToSelect );
-					}
-			  }
-			: noop,
-		[
-			__experimentalSelectBlock,
-			previousBlockClientId,
-			nextBlockClientId,
-			firstParentClientId,
-			selectedBlockClientIds,
-		]
-	);
+		let blockToFocus = previousBlockClientId || firstParentClientId;
 
-	const removeBlockLabel =
-		count === 1 ? __( 'Delete' ) : __( 'Delete blocks' );
+		// Focus the first block if there's no previous block nor parent block.
+		if ( ! blockToFocus ) {
+			blockToFocus = getBlockOrder()[ 0 ];
+		}
 
-	// Allows highlighting the parent block outline when focusing or hovering
-	// the parent block selector within the child.
-	const selectParentButtonRef = useRef();
-	const { gestures: showParentOutlineGestures } = useShowMoversGestures( {
-		ref: selectParentButtonRef,
-		onChange( isFocused ) {
-			if ( isFocused && isDistractionFree ) {
-				return;
-			}
-			toggleBlockHighlight( firstParentClientId, isFocused );
-		},
-	} );
+		// Only update the selection if the original selection is removed.
+		const shouldUpdateSelection =
+			hasSelectedBlocks && getSelectedBlockClientIds().length === 0;
+
+		__experimentalSelectBlock( blockToFocus, shouldUpdateSelection );
+	}
 
 	// This can occur when the selected block (the parent)
 	// displays child blocks within a List View.
 	const parentBlockIsSelected =
 		selectedBlockClientIds?.includes( firstParentClientId );
+
+	// When a currentClientId is in use, treat the menu as a controlled component.
+	// This ensures that only one block settings menu is open at a time.
+	// This is a temporary solution to work around an issue with `onFocusOutside`
+	// where it does not allow a dropdown to be closed if focus was never within
+	// the dropdown to begin with. Examples include a user either CMD+Clicking or
+	// right clicking into an inactive window.
+	// See: https://github.com/WordPress/gutenberg/pull/54083
+	const open = ! currentClientId
+		? undefined
+		: openedBlockSettingsMenu === currentClientId || false;
+
+	function onToggle( localOpen ) {
+		if ( localOpen && openedBlockSettingsMenu !== currentClientId ) {
+			setOpenedBlockSettingsMenu( currentClientId );
+		} else if (
+			! localOpen &&
+			openedBlockSettingsMenu &&
+			openedBlockSettingsMenu === currentClientId
+		) {
+			setOpenedBlockSettingsMenu( undefined );
+		}
+	}
 
 	return (
 		<BlockActions
@@ -194,8 +192,9 @@ export function BlockSettingsDropdown( {
 			__experimentalUpdateSelection={ ! __experimentalSelectBlock }
 		>
 			{ ( {
+				canCopyStyles,
 				canDuplicate,
-				canInsertDefaultBlock,
+				canInsertBlock,
 				canMove,
 				canRemove,
 				onDuplicate,
@@ -205,13 +204,14 @@ export function BlockSettingsDropdown( {
 				onCopy,
 				onPasteStyles,
 				onMoveTo,
-				blocks,
 			} ) => (
 				<DropdownMenu
 					icon={ moreVertical }
 					label={ __( 'Options' ) }
 					className="block-editor-block-settings-menu"
 					popoverProps={ POPOVER_PROPS }
+					open={ open }
+					onToggle={ onToggle }
 					noIcons
 					{ ...props }
 				>
@@ -223,40 +223,27 @@ export function BlockSettingsDropdown( {
 								/>
 								{ ! parentBlockIsSelected &&
 									!! firstParentClientId && (
-										<MenuItem
-											{ ...showParentOutlineGestures }
-											ref={ selectParentButtonRef }
-											icon={
-												<BlockIcon
-													icon={
-														parentBlockType.icon
-													}
-												/>
+										<BlockParentSelectorMenuItem
+											parentClientId={
+												firstParentClientId
 											}
-											onClick={ () =>
-												selectBlock(
-													firstParentClientId
-												)
-											}
-										>
-											{ sprintf(
-												/* translators: %s: Name of the block's parent. */
-												__(
-													'Select parent block (%s)'
-												),
-												parentBlockType.title
-											) }
-										</MenuItem>
+											parentBlockType={ parentBlockType }
+										/>
 									) }
 								{ count === 1 && (
 									<BlockHTMLConvertButton
 										clientId={ firstBlockClientId }
 									/>
 								) }
-								<CopyMenuItem
-									blocks={ blocks }
-									onCopy={ onCopy }
-								/>
+								{ ! isContentOnly && (
+									<CopyMenuItem
+										clientIds={ clientIds }
+										onCopy={ onCopy }
+										shortcut={ displayShortcut.primary(
+											'c'
+										) }
+									/>
+								) }
 								{ canDuplicate && (
 									<MenuItem
 										onClick={ pipe(
@@ -269,7 +256,7 @@ export function BlockSettingsDropdown( {
 										{ __( 'Duplicate' ) }
 									</MenuItem>
 								) }
-								{ canInsertDefaultBlock && (
+								{ canInsertBlock && ! isContentOnly && (
 									<>
 										<MenuItem
 											onClick={ pipe(
@@ -278,7 +265,7 @@ export function BlockSettingsDropdown( {
 											) }
 											shortcut={ shortcuts.insertBefore }
 										>
-											{ __( 'Insert before' ) }
+											{ __( 'Add before' ) }
 										</MenuItem>
 										<MenuItem
 											onClick={ pipe(
@@ -287,40 +274,33 @@ export function BlockSettingsDropdown( {
 											) }
 											shortcut={ shortcuts.insertAfter }
 										>
-											{ __( 'Insert after' ) }
+											{ __( 'Add after' ) }
 										</MenuItem>
 									</>
 								) }
-								{ canMove && ! onlyBlock && (
-									<MenuItem
-										onClick={ pipe( onClose, onMoveTo ) }
-									>
-										{ __( 'Move to' ) }
-									</MenuItem>
-								) }
-								{ count === 1 && (
-									<BlockModeToggle
-										clientId={ firstBlockClientId }
-										onToggle={ onClose }
+							</MenuGroup>
+							{ canCopyStyles && ! isContentOnly && (
+								<MenuGroup>
+									<CopyMenuItem
+										clientIds={ clientIds }
+										onCopy={ onCopy }
+										label={ __( 'Copy styles' ) }
 									/>
-								) }
-							</MenuGroup>
-							<MenuGroup>
-								<CopyMenuItem
-									blocks={ blocks }
-									onCopy={ onCopy }
-									label={ __( 'Copy styles' ) }
-								/>
-								<MenuItem onClick={ onPasteStyles }>
-									{ __( 'Paste styles' ) }
-								</MenuItem>
-							</MenuGroup>
+									<MenuItem onClick={ onPasteStyles }>
+										{ __( 'Paste styles' ) }
+									</MenuItem>
+								</MenuGroup>
+							) }
 							<BlockSettingsMenuControls.Slot
-								fillProps={ { onClose } }
+								fillProps={ {
+									onClose,
+									canMove,
+									onMoveTo,
+									onlyBlock,
+									count,
+									firstBlockClientId,
+								} }
 								clientIds={ clientIds }
-								__unstableDisplayLocation={
-									__unstableDisplayLocation
-								}
 							/>
 							{ typeof children === 'function'
 								? children( { onClose } )
@@ -337,7 +317,7 @@ export function BlockSettingsDropdown( {
 										) }
 										shortcut={ shortcuts.remove }
 									>
-										{ removeBlockLabel }
+										{ __( 'Delete' ) }
 									</MenuItem>
 								</MenuGroup>
 							) }

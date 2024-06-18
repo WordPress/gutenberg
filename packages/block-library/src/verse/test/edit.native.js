@@ -6,7 +6,7 @@ import {
 	getEditorHtml,
 	initializeEditor,
 	getBlock,
-	changeAndSelectTextOfRichText,
+	typeInRichText,
 	fireEvent,
 } from 'test/helpers';
 
@@ -61,26 +61,58 @@ describe( 'Verse block', () => {
 		await addBlock( screen, 'Verse' );
 
 		// Act
-		const verseTextInput = await screen.findByPlaceholderText(
-			'Write verse…'
-		);
-		const string = 'A great statement.';
-		changeAndSelectTextOfRichText( verseTextInput, string, {
-			selectionStart: string.length,
-			selectionEnd: string.length,
-		} );
+		const verseTextInput =
+			await screen.findByPlaceholderText( 'Write verse…' );
+		typeInRichText( verseTextInput, 'A great statement.' );
 		fireEvent( verseTextInput, 'onKeyDown', {
 			nativeEvent: {},
 			preventDefault() {},
 			keyCode: ENTER,
 		} );
-		changeAndSelectTextOfRichText( verseTextInput, 'Again' );
+		typeInRichText( verseTextInput, 'Again' );
 
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:verse -->
 		<pre class="wp-block-verse">A great statement.<br>Again</pre>
 		<!-- /wp:verse -->"
+	` );
+	} );
+
+	it( 'should split on triple Enter', async () => {
+		// Arrange
+		const screen = await initializeEditor();
+		await addBlock( screen, 'Verse' );
+
+		// Act
+		const verseTextInput =
+			await screen.findByPlaceholderText( 'Write verse…' );
+		typeInRichText( verseTextInput, 'Hello' );
+		fireEvent( verseTextInput, 'onKeyDown', {
+			nativeEvent: {},
+			preventDefault() {},
+			keyCode: ENTER,
+		} );
+		fireEvent( verseTextInput, 'onKeyDown', {
+			nativeEvent: {},
+			preventDefault() {},
+			keyCode: ENTER,
+		} );
+		fireEvent( verseTextInput, 'onKeyDown', {
+			nativeEvent: {},
+			preventDefault() {},
+			keyCode: ENTER,
+		} );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchInlineSnapshot( `
+		"<!-- wp:verse -->
+		<pre class="wp-block-verse">Hello</pre>
+		<!-- /wp:verse -->
+
+		<!-- wp:paragraph -->
+		<p></p>
+		<!-- /wp:paragraph -->"
 	` );
 	} );
 } );

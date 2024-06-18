@@ -8,8 +8,7 @@ import FastImage from 'react-native-fast-image';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Icon } from '@wordpress/components';
-import { image as icon } from '@wordpress/icons';
+import { image, offline } from '@wordpress/icons';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { useEffect, useState, Platform } from '@wordpress/element';
 
@@ -20,14 +19,14 @@ import { getImageWithFocalPointStyles } from './utils';
 import styles from './style.scss';
 import SvgIconRetry from './icon-retry';
 import ImageEditingButton from './image-editing-button';
+import Icon from '../../icon';
 
 const ICON_TYPE = {
+	OFFLINE: 'offline',
 	PLACEHOLDER: 'placeholder',
 	RETRY: 'retry',
 	UPLOAD: 'upload',
 };
-
-export const IMAGE_DEFAULT_FOCAL_POINT = { x: 0.5, y: 0.5 };
 
 const ImageComponent = ( {
 	align,
@@ -39,6 +38,7 @@ const ImageComponent = ( {
 	isSelected,
 	shouldUseFastImage,
 	isUploadFailed,
+	isUploadPaused,
 	isUploadInProgress,
 	mediaPickerOptions,
 	onImageDataLoad,
@@ -54,6 +54,9 @@ const ImageComponent = ( {
 } ) => {
 	const [ imageData, setImageData ] = useState( null );
 	const [ containerSize, setContainerSize ] = useState( null );
+	const [ localURL, setLocalURL ] = useState( null );
+	const [ networkURL, setNetworkURL ] = useState( null );
+	const [ networkImageLoaded, setNetworkImageLoaded ] = useState( false );
 
 	// Disabled for Android due to https://github.com/WordPress/gutenberg/issues/43149
 	const Image =
@@ -80,6 +83,33 @@ const ImageComponent = ( {
 					onImageDataLoad( metaData );
 				}
 			} );
+
+			if ( url.startsWith( 'file:///' ) ) {
+				setLocalURL( url );
+				setNetworkURL( null );
+				setNetworkImageLoaded( false );
+			} else if ( url.startsWith( 'https://' ) ) {
+				if ( Platform.isIOS ) {
+					setNetworkURL( url );
+				} else if ( Platform.isAndroid ) {
+					RNImage.prefetch( url ).then(
+						() => {
+							if ( ! isCurrent ) {
+								return;
+							}
+							setNetworkURL( url );
+							setNetworkImageLoaded( true );
+						},
+						() => {
+							// This callback is called when the image fails to load,
+							// but these events are handled by `isUploadFailed`
+							// and `isUploadPaused` events instead.
+							//
+							// Ignoring the error event will persist the local image URI.
+						}
+					);
+				}
+			}
 		}
 		return () => ( isCurrent = false );
 		// Disable reason: deferring this refactor to the native team.
@@ -101,19 +131,23 @@ const ImageComponent = ( {
 	};
 
 	const getIcon = ( iconType ) => {
+		let icon;
 		let iconStyle;
 		switch ( iconType ) {
 			case ICON_TYPE.RETRY:
-				return (
-					<Icon
-						icon={ retryIcon || SvgIconRetry }
-						{ ...styles.iconRetry }
-					/>
-				);
+				icon = retryIcon || SvgIconRetry;
+				iconStyle = iconRetryStyles;
+				break;
+			case ICON_TYPE.OFFLINE:
+				icon = offline;
+				iconStyle = iconOfflineStyles;
+				break;
 			case ICON_TYPE.PLACEHOLDER:
+				icon = image;
 				iconStyle = iconPlaceholderStyles;
 				break;
 			case ICON_TYPE.UPLOAD:
+				icon = image;
 				iconStyle = iconUploadStyles;
 				break;
 		}
@@ -128,6 +162,31 @@ const ImageComponent = ( {
 	const iconUploadStyles = usePreferredColorSchemeStyle(
 		styles.iconUpload,
 		styles.iconUploadDark
+	);
+
+	const iconOfflineStyles = usePreferredColorSchemeStyle(
+		styles.iconOffline,
+		styles.iconOfflineDark
+	);
+
+	const retryIconStyles = usePreferredColorSchemeStyle(
+		styles.retryIcon,
+		styles.retryIconDark
+	);
+
+	const iconRetryStyles = usePreferredColorSchemeStyle(
+		styles.iconRetry,
+		styles.iconRetryDark
+	);
+
+	const retryContainerStyles = usePreferredColorSchemeStyle(
+		styles.retryContainer,
+		styles.retryContainerDark
+	);
+
+	const uploadFailedTextStyles = usePreferredColorSchemeStyle(
+		styles.uploadFailedText,
+		styles.uploadFailedTextDark
 	);
 
 	const placeholderStyles = [
@@ -161,7 +220,6 @@ const ImageComponent = ( {
 
 	const imageStyles = [
 		{
-			opacity: isUploadInProgress ? 0.3 : 1,
 			height: containerSize?.height,
 		},
 		! resizeMode && {
@@ -178,12 +236,36 @@ const ImageComponent = ( {
 			imageData &&
 			containerSize && {
 				height:
-					imageData?.width > containerSize?.width
+					imageData?.width > containerSize?.width && ! imageWidth
 						? containerSize?.width / imageData?.aspectRatio
 						: undefined,
 			},
 		imageHeight && { height: imageHeight },
 		shapeStyle,
+	];
+
+	// On iOS, add 1 to height to account for the 1px non-visible image
+	// that is used to determine when the network image has loaded
+	// We also must verify that it is not NaN, as it can be NaN when the image is loading.
+	// This is not necessary on Android as the non-visible image is not used.
+	let calculatedSelectedHeight;
+	if ( Platform.isIOS ) {
+		calculatedSelectedHeight =
+			containerSize && ! isNaN( containerSize.height )
+				? containerSize.height + 1
+				: 0;
+	} else {
+		calculatedSelectedHeight = containerSize?.height;
+	}
+
+	const imageSelectedStyles = [
+		usePreferredColorSchemeStyle(
+			styles.imageBorder,
+			styles.imageBorderDark
+		),
+		{
+			height: calculatedSelectedHeight,
+		},
 	];
 
 	return (
@@ -203,20 +285,13 @@ const ImageComponent = ( {
 				disabled={ ! isSelected }
 				accessibilityLabel={ alt }
 				accessibilityHint={ __( 'Double tap and hold to edit' ) }
-				accessibilityRole={ 'imagebutton' }
+				accessibilityRole="imagebutton"
 				key={ url }
 				style={ imageContainerStyles }
 			>
-				{ isSelected &&
-					highlightSelected &&
-					! ( isUploadInProgress || isUploadFailed ) && (
-						<View
-							style={ [
-								styles.imageBorder,
-								{ height: containerSize?.height },
-							] }
-						/>
-					) }
+				{ isSelected && highlightSelected && (
+					<View style={ imageSelectedStyles } />
+				) }
 
 				{ ! imageData ? (
 					<View style={ placeholderStyles }>
@@ -226,33 +301,83 @@ const ImageComponent = ( {
 					</View>
 				) : (
 					<View style={ focalPoint && styles.focalPointContent }>
-						<Image
-							style={ imageStyles }
-							source={ { uri: url } }
-							{ ...( ! focalPoint && {
-								resizeMethod: 'scale',
-							} ) }
-							resizeMode={ imageResizeMode }
-						/>
+						{ Platform.isAndroid && (
+							<>
+								{ networkImageLoaded && networkURL && (
+									<Image
+										style={ imageStyles }
+										fadeDuration={ 0 }
+										source={ { uri: networkURL } }
+										{ ...( ! focalPoint && {
+											resizeMethod: 'scale',
+										} ) }
+										resizeMode={ imageResizeMode }
+										testID={ `network-image-${ url }` }
+									/>
+								) }
+								{ ! networkImageLoaded && ! networkURL && (
+									<Image
+										style={ imageStyles }
+										fadeDuration={ 0 }
+										source={ { uri: localURL } }
+										{ ...( ! focalPoint && {
+											resizeMethod: 'scale',
+										} ) }
+										resizeMode={ imageResizeMode }
+									/>
+								) }
+							</>
+						) }
+						{ Platform.isIOS && (
+							<>
+								<Image
+									style={ imageStyles }
+									source={ {
+										uri:
+											networkURL && networkImageLoaded
+												? networkURL
+												: localURL || url,
+									} }
+									{ ...( ! focalPoint && {
+										resizeMethod: 'scale',
+									} ) }
+									resizeMode={ imageResizeMode }
+									testID={ `network-image-${
+										networkURL && networkImageLoaded
+											? networkURL
+											: localURL || url
+									}` }
+								/>
+								<Image
+									source={ { uri: networkURL } }
+									style={ styles.nonVisibleImage }
+									onLoad={ () => {
+										setNetworkImageLoaded( true );
+									} }
+								/>
+							</>
+						) }
 					</View>
 				) }
 
-				{ isUploadFailed && retryMessage && (
+				{ ( isUploadFailed || isUploadPaused ) && retryMessage && (
 					<View
 						style={ [
 							styles.imageContainer,
-							styles.retryContainer,
+							retryContainerStyles,
 						] }
 					>
 						<View
 							style={ [
-								styles.retryIcon,
+								retryIconStyles,
 								retryIcon && styles.customRetryIcon,
 							] }
 						>
-							{ getIcon( ICON_TYPE.RETRY ) }
+							{ isUploadPaused
+								? getIcon( ICON_TYPE.OFFLINE )
+								: getIcon( ICON_TYPE.RETRY ) }
 						</View>
-						<Text style={ styles.uploadFailedText }>
+						<Text style={ uploadFailedTextStyles }>
 							{ retryMessage }
 						</Text>
 					</View>
@@ -263,7 +388,11 @@ const ImageComponent = ( {
 				<ImageEditingButton
 					onSelectMediaUploadOption={ onSelectMediaUploadOption }
 					openMediaOptions={ openMediaOptions }
-					url={ ! isUploadFailed && imageData && url }
+					url={
+						! ( isUploadFailed || isUploadPaused ) &&
+						imageData &&
+						url
+					}
 					pickerOptions={ mediaPickerOptions }
 				/>
 			) }

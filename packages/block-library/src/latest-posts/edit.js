@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -17,7 +17,7 @@ import {
 	ToggleControl,
 	ToolbarGroup,
 } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { dateI18n, format, getSettings } from '@wordpress/date';
 import {
 	InspectorControls,
@@ -32,6 +32,7 @@ import { pin, list, grid } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticeStore } from '@wordpress/notices';
 import { useInstanceId } from '@wordpress/compose';
+import { createInterpolateElement } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -229,6 +230,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 					displayPostContentRadio === 'excerpt' && (
 						<RangeControl
 							__nextHasNoMarginBottom
+							__next40pxDefaultSize
 							label={ __( 'Max number of words' ) }
 							value={ excerptLength }
 							onChange={ ( value ) =>
@@ -358,6 +360,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 				{ postLayout === 'grid' && (
 					<RangeControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						label={ __( 'Columns' ) }
 						value={ columns }
 						onChange={ ( value ) =>
@@ -380,7 +383,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 	);
 
 	const blockProps = useBlockProps( {
-		className: classnames( {
+		className: clsx( {
 			'wp-block-latest-posts__list': true,
 			'is-grid': postLayout === 'grid',
 			'has-dates': displayPostDate,
@@ -413,13 +416,13 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 	const layoutControls = [
 		{
 			icon: list,
-			title: __( 'List view' ),
+			title: _x( 'List view', 'Latest posts block display setting' ),
 			onClick: () => setAttributes( { postLayout: 'list' } ),
 			isActive: postLayout === 'list',
 		},
 		{
 			icon: grid,
-			title: __( 'Grid view' ),
+			title: _x( 'Grid view', 'Latest posts block display setting' ),
 			onClick: () => setAttributes( { postLayout: 'grid' } ),
 			isActive: postLayout === 'grid',
 		},
@@ -428,7 +431,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 	const dateFormat = getSettings().formats.date;
 
 	return (
-		<div>
+		<>
 			{ inspectorControls }
 			<BlockControls>
 				<ToolbarGroup controls={ layoutControls } />
@@ -451,7 +454,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 
 					const { url: imageSourceUrl, alt: featuredImageAlt } =
 						getFeaturedImageDetails( post, featuredImageSizeSlug );
-					const imageClasses = classnames( {
+					const imageClasses = clsx( {
 						'wp-block-latest-posts__featured-image': true,
 						[ `align${ featuredImageAlign }` ]:
 							!! featuredImageAlign,
@@ -479,15 +482,31 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 								.trim()
 								.split( ' ', excerptLength )
 								.join( ' ' ) }
-							{ /* translators: excerpt truncation character, default …  */ }
-							{ __( ' … ' ) }
-							<a
-								href={ post.link }
-								rel="noopener noreferrer"
-								onClick={ showRedirectionPreventedNotice }
-							>
-								{ __( 'Read more' ) }
-							</a>
+							{ createInterpolateElement(
+								sprintf(
+									/* translators: 1: Hidden accessibility text: Post title */
+									__(
+										'… <a>Read more<span>: %1$s</span></a>'
+									),
+									titleTrimmed || __( '(no title)' )
+								),
+								{
+									a: (
+										// eslint-disable-next-line jsx-a11y/anchor-has-content
+										<a
+											className="wp-block-latest-posts__read-more"
+											href={ post.link }
+											rel="noopener noreferrer"
+											onClick={
+												showRedirectionPreventedNotice
+											}
+										/>
+									),
+									span: (
+										<span className="screen-reader-text" />
+									),
+								}
+							) }
 						</>
 					) : (
 						excerpt
@@ -499,7 +518,6 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 								<div className={ imageClasses }>
 									{ addLinkToFeaturedImage ? (
 										<a
-											className="wp-block-latest-posts__post-title"
 											href={ post.link }
 											rel="noreferrer noopener"
 											onClick={
@@ -514,6 +532,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 								</div>
 							) }
 							<a
+								className="wp-block-latest-posts__post-title"
 								href={ post.link }
 								rel="noreferrer noopener"
 								dangerouslySetInnerHTML={
@@ -563,6 +582,6 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 					);
 				} ) }
 			</ul>
-		</div>
+		</>
 	);
 }

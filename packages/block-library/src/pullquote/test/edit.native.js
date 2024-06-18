@@ -5,12 +5,13 @@ import {
 	addBlock,
 	getBlock,
 	initializeEditor,
+	selectRangeInRichText,
 	setupCoreBlocks,
 	getEditorHtml,
 	fireEvent,
 	within,
 	waitFor,
-	changeAndSelectTextOfRichText,
+	typeInRichText,
 } from 'test/helpers';
 
 /**
@@ -35,24 +36,23 @@ describe( 'Pullquote', () => {
 		fireEvent.press( pullquoteBlock );
 		const pullquoteTextInput =
 			within( pullquoteBlock ).getByPlaceholderText( 'Add quote' );
-		const string = 'A great statement.';
-		changeAndSelectTextOfRichText( pullquoteTextInput, string, {
-			selectionStart: string.length,
-			selectionEnd: string.length,
-		} );
+		typeInRichText( pullquoteTextInput, 'A great statement.' );
 		fireEvent( pullquoteTextInput, 'onKeyDown', {
 			nativeEvent: {},
 			preventDefault() {},
 			keyCode: ENTER,
 		} );
-		changeAndSelectTextOfRichText( pullquoteTextInput, 'Again' );
+		typeInRichText( pullquoteTextInput, 'Again' );
 
 		const citationTextInput =
 			within( citationBlock ).getByPlaceholderText( 'Add citation' );
-		changeAndSelectTextOfRichText( citationTextInput, 'A person', {
-			selectionStart: 2,
-			selectionEnd: 2,
+		typeInRichText( citationTextInput, 'A person' );
+		fireEvent( citationTextInput, 'onKeyDown', {
+			nativeEvent: {},
+			preventDefault() {},
+			keyCode: ENTER,
 		} );
+		selectRangeInRichText( citationTextInput, 2 );
 		fireEvent( citationTextInput, 'onKeyDown', {
 			nativeEvent: {},
 			preventDefault() {},
@@ -63,7 +63,11 @@ describe( 'Pullquote', () => {
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:pullquote -->
 		<figure class="wp-block-pullquote"><blockquote><p>A great statement.<br>Again</p><cite>A <br>person</cite></blockquote></figure>
-		<!-- /wp:pullquote -->"
+		<!-- /wp:pullquote -->
+
+		<!-- wp:paragraph -->
+		<p></p>
+		<!-- /wp:paragraph -->"
 	` );
 	} );
 } );

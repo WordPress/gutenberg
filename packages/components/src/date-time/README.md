@@ -15,8 +15,8 @@ Date pickers should:
 Render a DateTimePicker.
 
 ```jsx
+import { useState } from 'react';
 import { DateTimePicker } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const MyDateTimePicker = () => {
 	const [ date, setDate ] = useState( new Date() );
@@ -26,8 +26,6 @@ const MyDateTimePicker = () => {
 			currentDate={ date }
 			onChange={ ( newDate ) => setDate( newDate ) }
 			is12Hour={ true }
-			__nextRemoveHelpButton
-			__nextRemoveResetButton
 		/>
 	);
 };
@@ -83,17 +81,3 @@ The day that the week should start on. 0 for Sunday, 1 for Monday, etc.
 
 - Required: No
 - Default: 0
-
-### `__nextRemoveHelpButton`: `boolean`
-
-Start opting in to not displaying a Help button which will become the default in a future version.
-
-- Required: No
-- Default: `false`
-
-### `__nextRemoveResetButton`: `boolean`
-
-Start opting in to not displaying a Reset button which will become the default in a future version.
-
-- Required: No
-- Default: `false`

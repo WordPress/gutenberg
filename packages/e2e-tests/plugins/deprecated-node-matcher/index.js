@@ -1,9 +1,10 @@
 ( function () {
 	const registerBlockType = wp.blocks.registerBlockType;
-	const RichText = wp.blockEditor.RichText;
+	const { useBlockProps, RichText } = wp.blockEditor;
 	const el = wp.element.createElement;
 
 	registerBlockType( 'core/deprecated-children-matcher', {
+		apiVersion: 3,
 		title: 'Deprecated Children Matcher',
 		attributes: {
 			value: {
@@ -13,40 +14,35 @@
 			},
 		},
 		category: 'text',
-		edit( { attributes, setAttributes } ) {
+		edit: function EditChildrenMatcher( { attributes, setAttributes } ) {
 			return el( RichText, {
 				tagName: 'p',
 				value: attributes.value,
 				onChange( nextValue ) {
 					setAttributes( { value: nextValue } );
 				},
+				...useBlockProps(),
 			} );
 		},
 		save( { attributes } ) {
 			return el( RichText.Content, {
 				tagName: 'p',
 				value: attributes.value,
+				...useBlockProps.save(),
 			} );
 		},
 	} );
 
 	function toRichTextValue( value ) {
-		// eslint-disable-next-line no-undef
-		return _.map( value, function ( subValue ) {
-			return subValue.children;
-		} );
+		return value?.map( ( { children } ) => children ) ?? [];
 	}
 
 	function fromRichTextValue( value ) {
-		// eslint-disable-next-line no-undef
-		return _.map( value, function ( subValue ) {
-			return {
-				children: subValue,
-			};
-		} );
+		return value.map( ( subValue ) => ( { children: subValue } ) );
 	}
 
 	registerBlockType( 'core/deprecated-node-matcher', {
+		apiVersion: 3,
 		title: 'Deprecated Node Matcher',
 		attributes: {
 			value: {
@@ -61,10 +57,10 @@
 			},
 		},
 		category: 'text',
-		edit( { attributes, setAttributes } ) {
+		edit: function EditNodeMatcher( { attributes, setAttributes } ) {
 			return el(
 				'blockquote',
-				{},
+				useBlockProps(),
 				el( RichText, {
 					multiline: 'p',
 					value: toRichTextValue( attributes.value ),
@@ -79,7 +75,7 @@
 		save( { attributes } ) {
 			return el(
 				'blockquote',
-				{},
+				useBlockProps.save(),
 				el( RichText.Content, {
 					value: toRichTextValue( attributes.value ),
 				} )

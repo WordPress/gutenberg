@@ -1,20 +1,14 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
 import {
-	Button,
-	__unstableComposite as Composite,
-	__unstableUseCompositeState as useCompositeState,
-	__unstableCompositeItem as CompositeItem,
 	Disabled,
-	TabPanel,
-	createSlotFill,
-	__experimentalUseSlotFills as useSlotFills,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import {
@@ -30,29 +24,32 @@ import {
 	__unstableEditorStyles as EditorStyles,
 	__unstableIframe as Iframe,
 } from '@wordpress/block-editor';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { useSelect } from '@wordpress/data';
-import { closeSmall } from '@wordpress/icons';
-import {
-	useResizeObserver,
-	useFocusOnMount,
-	useFocusReturn,
-	useMergeRefs,
-} from '@wordpress/compose';
-import { useMemo, memo } from '@wordpress/element';
-import { ESCAPE } from '@wordpress/keycodes';
+import { useResizeObserver } from '@wordpress/compose';
+import { useMemo, useState, memo, useContext } from '@wordpress/element';
+import { ENTER, SPACE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
+import EditorCanvasContainer from '../editor-canvas-container';
 
-const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
-	blockEditorPrivateApis
-);
+const {
+	ExperimentalBlockEditorProvider,
+	useGlobalStyle,
+	GlobalStylesContext,
+	useGlobalStylesOutputWithConfig,
+} = unlock( blockEditorPrivateApis );
+const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
 
-const SLOT_FILL_NAME = 'EditSiteStyleBook';
-const { Slot: StyleBookSlot, Fill: StyleBookFill } =
-	createSlotFill( SLOT_FILL_NAME );
+const {
+	CompositeV2: Composite,
+	CompositeItemV2: CompositeItem,
+	useCompositeStoreV2: useCompositeStore,
+	Tabs,
+} = unlock( componentsPrivateApis );
 
 // The content area of the Style Book is rendered within an iframe so that global styles
 // are applied to elements within the entire content area. To support elements that are
@@ -77,6 +74,8 @@ const STYLE_BOOK_IFRAME_STYLES = `
 		padding: 16px;
 		width: 100%;
 		box-sizing: border-box;
+		scroll-margin-top: 32px;
+		scroll-margin-bottom: 32px;
 	}
 
 	.edit-site-style-book__example.is-selected {
@@ -123,6 +122,10 @@ const STYLE_BOOK_IFRAME_STYLES = `
 		margin-bottom: 0;
 	}
 `;
+
+function isObjectEmpty( object ) {
+	return ! object || Object.keys( object ).length === 0;
+}
 
 function getExamples() {
 	// Use our own example for the Heading block so that we can show multiple
@@ -174,14 +177,20 @@ function getExamples() {
 	return [ headingsExample, ...otherExamples ];
 }
 
-function StyleBook( { isSelected, onSelect, onClose } ) {
+function StyleBook( {
+	enableResizing = true,
+	isSelected,
+	onClick,
+	onSelect,
+	showCloseButton = true,
+	onClose,
+	showTabs = true,
+	userConfig = {},
+} ) {
 	const [ resizeObserver, sizes ] = useResizeObserver();
-	const focusOnMountRef = useFocusOnMount( 'firstElement' );
-	const sectionFocusReturnRef = useFocusReturn();
-
 	const [ textColor ] = useGlobalStyle( 'color.text' );
 	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
-	const examples = useMemo( getExamples, [] );
+	const [ examples ] = useState( getExamples );
 	const tabs = useMemo(
 		() =>
 			getCategories()
@@ -197,117 +206,210 @@ function StyleBook( { isSelected, onSelect, onClose } ) {
 				} ) ),
 		[ examples ]
 	);
+	const { base: baseConfig } = useContext( GlobalStylesContext );
 
+	const mergedConfig = useMemo( () => {
+		if ( ! isObjectEmpty( userConfig ) && ! isObjectEmpty( baseConfig ) ) {
+			return mergeBaseAndUserConfigs( baseConfig, userConfig );
+		}
+		return {};
+	}, [ baseConfig, userConfig ] );
+
+	// Copied from packages/edit-site/src/components/revisions/index.js
+	// could we create a shared hook?
 	const originalSettings = useSelect(
 		( select ) => select( blockEditorStore ).getSettings(),
 		[]
 	);
+
 	const settings = useMemo(
 		() => ( { ...originalSettings, __unstableIsPreviewMode: true } ),
 		[ originalSettings ]
 	);
 
-	function closeOnEscape( event ) {
-		if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
-			event.preventDefault();
-			onClose();
-		}
-	}
+	const [ globalStyles ] = useGlobalStylesOutputWithConfig( mergedConfig );
+
+	settings.styles =
+		! isObjectEmpty( globalStyles ) && ! isObjectEmpty( userConfig )
+			? globalStyles
+			: settings.styles;
 
 	return (
-		<StyleBookFill>
-			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
-			<section
-				className={ classnames( 'edit-site-style-book', {
+		<EditorCanvasContainer
+			onClose={ onClose }
+			enableResizing={ enableResizing }
+			closeButtonLabel={ showCloseButton ? __( 'Close' ) : null }
+		>
+			<div
+				className={ clsx( 'edit-site-style-book', {
 					'is-wide': sizes.width > 600,
+					'is-button': !! onClick,
 				} ) }
 				style={ {
 					color: textColor,
 					background: backgroundColor,
 				} }
-				aria-label={ __( 'Style Book' ) }
-				onKeyDown={ closeOnEscape }
-				ref={ useMergeRefs( [
-					sectionFocusReturnRef,
-					focusOnMountRef,
-				] ) }
 			>
 				{ resizeObserver }
-				<Button
-					className="edit-site-style-book__close-button"
-					icon={ closeSmall }
-					label={ __( 'Close Style Book' ) }
-					onClick={ onClose }
-					showTooltip={ false }
-				/>
-				<TabPanel
-					className="edit-site-style-book__tab-panel"
-					tabs={ tabs }
-				>
-					{ ( tab ) => (
-						<Iframe
-							className="edit-site-style-book__iframe"
-							name="style-book-canvas"
-							tabIndex={ 0 }
-						>
-							<EditorStyles styles={ settings.styles } />
-							<style>
-								{
-									// Forming a "block formatting context" to prevent margin collapsing.
-									// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
-									`.is-root-container { display: flow-root; }
-											body { position: relative; padding: 32px !important; }` +
-										STYLE_BOOK_IFRAME_STYLES
-								}
-							</style>
-							<Examples
-								className={ classnames(
-									'edit-site-style-book__examples',
-									{
-										'is-wide': sizes.width > 600,
-									}
-								) }
-								examples={ examples }
-								category={ tab.name }
-								label={ sprintf(
-									// translators: %s: Category of blocks, e.g. Text.
-									__(
-										'Examples of blocks in the %s category'
-									),
-									tab.title
-								) }
-								isSelected={ isSelected }
-								onSelect={ onSelect }
-							/>
-						</Iframe>
-					) }
-				</TabPanel>
-			</section>
-		</StyleBookFill>
+				{ showTabs ? (
+					<div className="edit-site-style-book__tabs">
+						<Tabs>
+							<Tabs.TabList>
+								{ tabs.map( ( tab ) => (
+									<Tabs.Tab
+										tabId={ tab.name }
+										key={ tab.name }
+									>
+										{ tab.title }
+									</Tabs.Tab>
+								) ) }
+							</Tabs.TabList>
+							{ tabs.map( ( tab ) => (
+								<Tabs.TabPanel
+									key={ tab.name }
+									tabId={ tab.name }
+									focusable={ false }
+								>
+									<StyleBookBody
+										category={ tab.name }
+										examples={ examples }
+										isSelected={ isSelected }
+										onSelect={ onSelect }
+										settings={ settings }
+										sizes={ sizes }
+										title={ tab.title }
+									/>
+								</Tabs.TabPanel>
+							) ) }
+						</Tabs>
+					</div>
+				) : (
+					<StyleBookBody
+						examples={ examples }
+						isSelected={ isSelected }
+						onClick={ onClick }
+						onSelect={ onSelect }
+						settings={ settings }
+						sizes={ sizes }
+					/>
+				) }
+			</div>
+		</EditorCanvasContainer>
 	);
 }
 
+const StyleBookBody = ( {
+	category,
+	examples,
+	isSelected,
+	onClick,
+	onSelect,
+	settings,
+	sizes,
+	title,
+} ) => {
+	const [ isFocused, setIsFocused ] = useState( false );
+
+	// The presence of an `onClick` prop indicates that the Style Book is being used as a button.
+	// In this case, add additional props to the iframe to make it behave like a button.
+	const buttonModeProps = {
+		role: 'button',
+		onFocus: () => setIsFocused( true ),
+		onBlur: () => setIsFocused( false ),
+		onKeyDown: ( event ) => {
+			if ( event.defaultPrevented ) {
+				return;
+			}
+			const { keyCode } = event;
+			if ( onClick && ( keyCode === ENTER || keyCode === SPACE ) ) {
+				event.preventDefault();
+				onClick( event );
+			}
+		},
+		onClick: ( event ) => {
+			if ( event.defaultPrevented ) {
+				return;
+			}
+			if ( onClick ) {
+				event.preventDefault();
+				onClick( event );
+			}
+		},
+		readonly: true,
+	};
+
+	const buttonModeStyles = onClick
+		? 'body { cursor: pointer; } body * { pointer-events: none; }'
+		: '';
+
+	return (
+		<Iframe
+			className={ clsx( 'edit-site-style-book__iframe', {
+				'is-focused': isFocused && !! onClick,
+				'is-button': !! onClick,
+			} ) }
+			name="style-book-canvas"
+			tabIndex={ 0 }
+			{ ...( onClick ? buttonModeProps : {} ) }
+		>
+			<EditorStyles styles={ settings.styles } />
+			<style>
+				{
+					// Forming a "block formatting context" to prevent margin collapsing.
+					// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
+					`.is-root-container { display: flow-root; }
+						body { position: relative; padding: 32px !important; }` +
+						STYLE_BOOK_IFRAME_STYLES +
+						buttonModeStyles
+				}
+			</style>
+			<Examples
+				className={ clsx( 'edit-site-style-book__examples', {
+					'is-wide': sizes.width > 600,
+				} ) }
+				examples={ examples }
+				category={ category }
+				label={
+					title
+						? sprintf(
+								// translators: %s: Category of blocks, e.g. Text.
+								__( 'Examples of blocks in the %s category' ),
+								title
+						  )
+						: __( 'Examples of blocks' )
+				}
+				isSelected={ isSelected }
+				onSelect={ onSelect }
+				key={ category }
+			/>
+		</Iframe>
+	);
+};
+
 const Examples = memo(
 	( { className, examples, category, label, isSelected, onSelect } ) => {
-		const composite = useCompositeState( { orientation: 'vertical' } );
+		const compositeStore = useCompositeStore( { orientation: 'vertical' } );
+
 		return (
 			<Composite
-				{ ...composite }
+				store={ compositeStore }
 				className={ className }
 				aria-label={ label }
+				role="grid"
 			>
 				{ examples
-					.filter( ( example ) => example.category === category )
+					.filter( ( example ) =>
+						category ? example.category === category : true
+					)
 					.map( ( example ) => (
 						<Example
 							key={ example.name }
 							id={ `example-${ example.name }` }
-							composite={ composite }
 							title={ example.title }
 							blocks={ example.blocks }
 							isSelected={ isSelected( example.name ) }
 							onClick={ () => {
-								onSelect( example.name );
+								onSelect?.( example.name );
 							} }
 						/>
 					) ) }
@@ -316,13 +418,17 @@ const Examples = memo(
 	}
 );
 
-const Example = ( { composite, id, title, blocks, isSelected, onClick } ) => {
+const Example = ( { id, title, blocks, isSelected, onClick } ) => {
 	const originalSettings = useSelect(
 		( select ) => select( blockEditorStore ).getSettings(),
 		[]
 	);
 	const settings = useMemo(
-		() => ( { ...originalSettings, __unstableIsPreviewMode: true } ),
+		() => ( {
+			...originalSettings,
+			focusMode: false, // Disable "Spotlight mode".
+			__unstableIsPreviewMode: true,
+		} ),
 		[ originalSettings ]
 	);
 
@@ -333,43 +439,42 @@ const Example = ( { composite, id, title, blocks, isSelected, onClick } ) => {
 	);
 
 	return (
-		<CompositeItem
-			{ ...composite }
-			className={ classnames( 'edit-site-style-book__example', {
-				'is-selected': isSelected,
-			} ) }
-			id={ id }
-			aria-label={ sprintf(
-				// translators: %s: Title of a block, e.g. Heading.
-				__( 'Open %s styles in Styles panel' ),
-				title
-			) }
-			onClick={ onClick }
-			role="button"
-			as="div"
-		>
-			<span className="edit-site-style-book__example-title">
-				{ title }
-			</span>
-			<div className="edit-site-style-book__example-preview" aria-hidden>
-				<Disabled className="edit-site-style-book__example-preview__content">
-					<ExperimentalBlockEditorProvider
-						value={ renderedBlocks }
-						settings={ settings }
+		<div role="row">
+			<div role="gridcell">
+				<CompositeItem
+					className={ clsx( 'edit-site-style-book__example', {
+						'is-selected': isSelected,
+					} ) }
+					id={ id }
+					aria-label={ sprintf(
+						// translators: %s: Title of a block, e.g. Heading.
+						__( 'Open %s styles in Styles panel' ),
+						title
+					) }
+					render={ <div /> }
+					role="button"
+					onClick={ onClick }
+				>
+					<span className="edit-site-style-book__example-title">
+						{ title }
+					</span>
+					<div
+						className="edit-site-style-book__example-preview"
+						aria-hidden
 					>
-						<BlockList renderAppender={ false } />
-					</ExperimentalBlockEditorProvider>
-				</Disabled>
+						<Disabled className="edit-site-style-book__example-preview__content">
+							<ExperimentalBlockEditorProvider
+								value={ renderedBlocks }
+								settings={ settings }
+							>
+								<BlockList renderAppender={ false } />
+							</ExperimentalBlockEditorProvider>
+						</Disabled>
+					</div>
+				</CompositeItem>
 			</div>
-		</CompositeItem>
+		</div>
 	);
 };
 
-function useHasStyleBook() {
-	const fills = useSlotFills( SLOT_FILL_NAME );
-	return !! fills?.length;
-}
-
-StyleBook.Slot = StyleBookSlot;
 export default StyleBook;
-export { useHasStyleBook };

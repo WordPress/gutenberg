@@ -152,14 +152,7 @@ describe( 'Report flaky tests', () => {
 			'Updated existing flaky issue'
 		);
 
-		expect( mockAPI.createIssue ).toHaveBeenCalledWith(
-			expect.objectContaining( {
-				title: `[Flaky Test] ${ newFlakyTest.title }`,
-			} )
-		);
-		expect( mockAPI.createIssue.mock.calls[ 0 ][ 0 ].body ).toMatchSnapshot(
-			'Created new flaky issue'
-		);
+		expect( mockAPI.createIssue ).not.toHaveBeenCalled();
 
 		expect( mockAPI.createCommentOnPR ).toHaveBeenCalledTimes( 1 );
 		expect( mockAPI.createCommentOnPR.mock.calls[ 0 ][ 0 ] ).toBe( 10 );
@@ -171,8 +164,7 @@ describe( 'Report flaky tests', () => {
 
 		🔍  Workflow run URL: https://github.com/WordPress/gutenberg/actions/runs/100
 		📝  Reported issues:
-		- #1 in \`/test/e2e/specs/editor/various/copy-cut-paste.spec.js\`
-		- #2 in \`specs/site-editor/template-part.test.js\`"
+		- #1 in \`/test/e2e/specs/editor/various/copy-cut-paste.spec.js\`"
 	` );
 	} );
 

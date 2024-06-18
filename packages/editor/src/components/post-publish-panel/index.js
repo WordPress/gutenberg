@@ -51,7 +51,6 @@ export class PostPublishPanel extends Component {
 	render() {
 		const {
 			forceIsDirty,
-			forceIsSaving,
 			isBeingScheduled,
 			isPublished,
 			isPublishSidebarEnabled,
@@ -87,17 +86,18 @@ export class PostPublishPanel extends Component {
 						<>
 							<div className="editor-post-publish-panel__header-publish-button">
 								<PostPublishButton
-									focusOnMount={ true }
+									focusOnMount
 									onSubmit={ this.onSubmit }
 									forceIsDirty={ forceIsDirty }
-									forceIsSaving={ forceIsSaving }
 								/>
 							</div>
 							<div className="editor-post-publish-panel__header-cancel-button">
 								<Button
+									__experimentalIsFocusable
 									disabled={ isSavingNonPostEntityChanges }
 									onClick={ onClose }
 									variant="secondary"
+									size="compact"
 								>
 									{ __( 'Cancel' ) }
 								</Button>
@@ -112,7 +112,7 @@ export class PostPublishPanel extends Component {
 						</PostPublishPanelPrepublish>
 					) }
 					{ isPostPublish && (
-						<PostPublishPanelPostpublish focusOnMount={ true }>
+						<PostPublishPanelPostpublish focusOnMount>
 							{ PostPublishExtension && <PostPublishExtension /> }
 						</PostPublishPanelPostpublish>
 					) }
@@ -131,6 +131,9 @@ export class PostPublishPanel extends Component {
 	}
 }
 
+/**
+ * Renders a panel for publishing a post.
+ */
 export default compose( [
 	withSelect( ( select ) => {
 		const { getPostType } = select( coreStore );
@@ -141,6 +144,7 @@ export default compose( [
 			isCurrentPostScheduled,
 			isEditedPostBeingScheduled,
 			isEditedPostDirty,
+			isAutosavingPost,
 			isSavingPost,
 			isSavingNonPostEntityChanges,
 		} = select( editorStore );
@@ -155,7 +159,7 @@ export default compose( [
 			isDirty: isEditedPostDirty(),
 			isPublished: isCurrentPostPublished(),
 			isPublishSidebarEnabled: isPublishSidebarEnabled(),
-			isSaving: isSavingPost(),
+			isSaving: isSavingPost() && ! isAutosavingPost(),
 			isSavingNonPostEntityChanges: isSavingNonPostEntityChanges(),
 			isScheduled: isCurrentPostScheduled(),
 		};

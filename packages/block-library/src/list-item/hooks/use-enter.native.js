@@ -17,13 +17,11 @@ import useOutdentListItem from './use-outdent-list-item';
 
 export default function useEnter( props, preventDefault ) {
 	const { replaceBlocks, selectionChange } = useDispatch( blockEditorStore );
-	const { getBlock, getBlockRootClientId, getBlockIndex } =
+	const { getBlock, getBlockRootClientId, getBlockIndex, getBlockName } =
 		useSelect( blockEditorStore );
 	const propsRef = useRef( props );
 	propsRef.current = props;
-	const [ canOutdent, outdentListItem ] = useOutdentListItem(
-		propsRef.current.clientId
-	);
+	const outdentListItem = useOutdentListItem();
 
 	return {
 		onEnter() {
@@ -32,7 +30,13 @@ export default function useEnter( props, preventDefault ) {
 				return;
 			}
 			preventDefault.current = true;
-			if ( canOutdent ) {
+			if (
+				getBlockName(
+					getBlockRootClientId(
+						getBlockRootClientId( propsRef.current.clientId )
+					)
+				) === 'core/list-item'
+			) {
 				outdentListItem();
 				return;
 			}

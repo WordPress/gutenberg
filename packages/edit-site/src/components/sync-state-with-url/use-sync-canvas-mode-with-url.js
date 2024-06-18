@@ -3,13 +3,15 @@
  */
 import { useEffect, useRef } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
-import { useLocation, useHistory } from '../routes';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
+
+const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 export default function useSyncCanvasModeWithURL() {
 	const history = useHistory();
@@ -56,10 +58,7 @@ export default function useSyncCanvasModeWithURL() {
 
 	useEffect( () => {
 		currentCanvasInUrl.current = canvasInUrl;
-		if (
-			canvasInUrl === undefined &&
-			currentCanvasMode.current !== 'view'
-		) {
+		if ( canvasInUrl !== 'edit' && currentCanvasMode.current !== 'view' ) {
 			setCanvasMode( 'view' );
 		} else if (
 			canvasInUrl === 'edit' &&

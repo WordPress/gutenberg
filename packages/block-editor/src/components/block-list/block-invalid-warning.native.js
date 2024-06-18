@@ -8,7 +8,7 @@ import { TouchableWithoutFeedback } from 'react-native';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -16,22 +16,30 @@ import { createBlock } from '@wordpress/blocks';
 import Warning from '../warning';
 import { store as blockEditorStore } from '../../store';
 
-export default function BlockInvalidWarning( { blockTitle, icon, clientId } ) {
+export default function BlockInvalidWarning( { clientId } ) {
+	const selector = ( select ) => {
+		const { getBlock } = select( blockEditorStore );
+		const block = getBlock( clientId );
+		const { name } = block || {};
+
+		const blockType = getBlockType( name || 'core/missing' );
+		const title = blockType?.title;
+		const blockIcon = blockType?.icon;
+
+		return {
+			block,
+			blockTitle: title,
+			icon: blockIcon,
+		};
+	};
+
+	const { block, blockTitle, icon } = useSelect( selector, [ clientId ] );
+
 	const accessibilityLabel = sprintf(
 		/* translators: accessibility text for blocks with invalid content. %d: localized block title */
 		__( '%s block. This block has invalid content' ),
 		blockTitle
 	);
-
-	const selector = ( select ) => {
-		const { getBlock } = select( blockEditorStore );
-		const block = getBlock( clientId );
-		return {
-			block,
-		};
-	};
-
-	const { block } = useSelect( selector, [ clientId ] );
 
 	const { replaceBlock } = useDispatch( blockEditorStore );
 
@@ -45,8 +53,8 @@ export default function BlockInvalidWarning( { blockTitle, icon, clientId } ) {
 	return (
 		<TouchableWithoutFeedback
 			onPress={ attemptBlockRecovery }
-			accessible={ true }
-			accessibilityRole={ 'button' }
+			accessible
+			accessibilityRole="button"
 		>
 			<Warning
 				title={ blockTitle }

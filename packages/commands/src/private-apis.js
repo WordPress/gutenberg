@@ -1,22 +1,13 @@
 /**
- * WordPress dependencies
- */
-import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
-
-/**
  * Internal dependencies
  */
-import { default as useCommand } from './hooks/use-command';
-import { default as useCommandLoader } from './hooks/use-command-loader';
+import { default as useCommandContext } from './hooks/use-command-context';
+import { lock } from './lock-unlock';
 
-export const { lock, unlock } =
-	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
-		'I know using unstable features means my plugin or theme will inevitably break on the next WordPress release.',
-		'@wordpress/commands'
-	);
-
+/**
+ * @private
+ */
 export const privateApis = {};
 lock( privateApis, {
-	useCommand,
-	useCommandLoader,
+	useCommandContext,
 } );

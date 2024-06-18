@@ -1,12 +1,13 @@
 /**
  * External dependencies
  */
-import type { ChangeEvent } from 'react';
+import type { ChangeEvent, ForwardedRef } from 'react';
 import { css } from '@emotion/react';
 
 /**
  * WordPress dependencies
  */
+import { forwardRef } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 
 /**
@@ -15,11 +16,11 @@ import { useInstanceId } from '@wordpress/compose';
 import { FlexBlock } from '../flex';
 import FormToggle from '../form-toggle';
 import BaseControl from '../base-control';
-import type { WordPressComponentProps } from '../ui/context/wordpress-component';
+import type { WordPressComponentProps } from '../context/wordpress-component';
 import type { ToggleControlProps } from './types';
 import { HStack } from '../h-stack';
 import { useCx } from '../utils';
-import { space } from '../ui/utils/space';
+import { space } from '../utils/space';
 
 /**
  * ToggleControl is used to generate a toggle user interface.
@@ -41,15 +42,18 @@ import { space } from '../ui/utils/space';
  * };
  * ```
  */
-export function ToggleControl( {
-	__nextHasNoMarginBottom,
-	label,
-	checked,
-	help,
-	className,
-	onChange,
-	disabled,
-}: WordPressComponentProps< ToggleControlProps, 'input', false > ) {
+export function ToggleControl(
+	{
+		__nextHasNoMarginBottom,
+		label,
+		checked,
+		help,
+		className,
+		onChange,
+		disabled,
+	}: WordPressComponentProps< ToggleControlProps, 'input', false >,
+	ref: ForwardedRef< HTMLInputElement >
+) {
 	function onChangeToggle( event: ChangeEvent< HTMLInputElement > ) {
 		onChange( event.target.checked );
 	}
@@ -94,6 +98,7 @@ export function ToggleControl( {
 					onChange={ onChangeToggle }
 					aria-describedby={ describedBy }
 					disabled={ disabled }
+					ref={ ref }
 				/>
 				<FlexBlock
 					as="label"
@@ -107,4 +112,4 @@ export function ToggleControl( {
 	);
 }
 
-export default ToggleControl;
+export default forwardRef( ToggleControl );

@@ -157,6 +157,13 @@ wrapper element allowing the panel to lay them out accordingly.
 - Required: No
 - Default: `false`
 
+### `dropdownMenuProps`: `{}`
+
+The popover props to configure panel's `DropdownMenu`.
+
+-   Type: `DropdownMenuProps`
+-   Required: No
+
 ### `headingLevel`: `1 | 2 | 3 | 4 | 5 | 6 | '1' | '2' | '3' | '4' | '5' | '6'`
 
 The heading level of the panel's header.
@@ -190,6 +197,9 @@ A function to call when the `Reset all` menu option is selected. As an argument,
 
 Advises the `ToolsPanel` that all of its `ToolsPanelItem` children should render
 placeholder content (instead of `null`) when they are toggled off and hidden.
+
+Note that placeholder items won't apply the `className` that would be
+normally applied to a visible `ToolsPanelItem` via the `className` prop.
 
 - Required: No
 - Default: `false`

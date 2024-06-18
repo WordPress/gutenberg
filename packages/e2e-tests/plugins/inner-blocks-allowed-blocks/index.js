@@ -1,87 +1,57 @@
 ( function () {
-	const { withSelect } = wp.data;
+	const { useSelect } = wp.data;
 	const { registerBlockType } = wp.blocks;
 	const { createElement: el } = wp.element;
-	const { InnerBlocks } = wp.blockEditor;
-	const __ = wp.i18n.__;
+	const { InnerBlocks, useBlockProps } = wp.blockEditor;
 	const divProps = {
 		className: 'product',
 		style: { outline: '1px solid gray', padding: 5 },
 	};
-	const template = [
-		[ 'core/image' ],
-		[ 'core/paragraph', { placeholder: __( 'Add a description' ) } ],
-		[ 'core/quote' ],
-	];
+
 	const allowedBlocksWhenSingleEmptyChild = [ 'core/image', 'core/list' ];
-	const allowedBlocksWhenMultipleChildren = [ 'core/gallery', 'core/video' ];
-
-	const save = function () {
-		return el( 'div', divProps, el( InnerBlocks.Content ) );
-	};
-	registerBlockType( 'test/allowed-blocks-unset', {
-		title: 'Allowed Blocks Unset',
-		icon: 'carrot',
-		category: 'text',
-
-		edit() {
-			return el( 'div', divProps, el( InnerBlocks, { template } ) );
-		},
-
-		save,
-	} );
-
-	registerBlockType( 'test/allowed-blocks-set', {
-		title: 'Allowed Blocks Set',
-		icon: 'carrot',
-		category: 'text',
-
-		edit() {
-			return el(
-				'div',
-				divProps,
-				el( InnerBlocks, {
-					template,
-					allowedBlocks: [
-						'core/button',
-						'core/gallery',
-						'core/list',
-						'core/media-text',
-						'core/quote',
-					],
-				} )
-			);
-		},
-
-		save,
-	} );
+	const allowedBlocksWhenTwoChildren = [ 'core/gallery', 'core/video' ];
+	const allowedBlocksWhenTreeOrMoreChildren = [
+		'core/gallery',
+		'core/video',
+		'core/list',
+	];
 
 	registerBlockType( 'test/allowed-blocks-dynamic', {
+		apiVersion: 3,
 		title: 'Allowed Blocks Dynamic',
 		icon: 'carrot',
 		category: 'text',
 
-		edit: withSelect( function ( select, ownProps ) {
-			const getBlockOrder = select( 'core/block-editor' ).getBlockOrder;
-			return {
-				numberOfChildren: getBlockOrder( ownProps.clientId ).length,
-			};
-		} )( function ( props ) {
+		edit: function Edit( props ) {
+			const numberOfChildren = useSelect(
+				( select ) => {
+					const { getBlockCount } = select( 'core/block-editor' );
+					return getBlockCount( props.clientId );
+				},
+				[ props.clientId ]
+			);
+			const blockProps = useBlockProps( {
+				...divProps,
+				'data-number-of-children': numberOfChildren,
+			} );
+
+			let allowedBlocks = allowedBlocksWhenSingleEmptyChild;
+			if ( numberOfChildren === 2 ) {
+				allowedBlocks = allowedBlocksWhenTwoChildren;
+			} else if ( numberOfChildren > 2 ) {
+				allowedBlocks = allowedBlocksWhenTreeOrMoreChildren;
+			}
+
 			return el(
 				'div',
-				{
-					...divProps,
-					'data-number-of-children': props.numberOfChildren,
-				},
+				blockProps,
 				el( InnerBlocks, {
-					allowedBlocks:
-						props.numberOfChildren < 2
-							? allowedBlocksWhenSingleEmptyChild
-							: allowedBlocksWhenMultipleChildren,
+					allowedBlocks,
 				} )
 			);
-		} ),
-
-		save,
+		},
+		save() {
+			return el( 'div', divProps, el( InnerBlocks.Content ) );
+		},
 	} );
 } )();

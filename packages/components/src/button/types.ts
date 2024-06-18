@@ -8,7 +8,7 @@ import type { ReactNode } from 'react';
  */
 import type { Props as IconProps } from '../icon';
 import type { PopoverProps } from '../popover/types';
-import type { WordPressComponentProps } from '../ui/context/wordpress-component';
+import type { WordPressComponentProps } from '../context/wordpress-component';
 
 export type ButtonProps =
 	| WordPressComponentProps< ButtonAsButtonProps, 'button', false >
@@ -19,6 +19,13 @@ export type ButtonAsAnchorProps = BaseButtonProps & AnchorProps;
 
 type BaseButtonProps = {
 	/**
+	 * Start opting into the larger default height that will become the
+	 * default size in a future version.
+	 *
+	 * @default false
+	 */
+	__next40pxDefaultSize?: boolean;
+	/**
 	 * The button's children.
 	 */
 	children?: ReactNode;
@@ -26,10 +33,6 @@ type BaseButtonProps = {
 	 * An accessible description for the button.
 	 */
 	describedBy?: string;
-	/**
-	 * Whether the button is focused.
-	 */
-	focus?: boolean;
 	/**
 	 * If provided, renders an Icon component inside the button.
 	 */
@@ -59,10 +62,6 @@ type BaseButtonProps = {
 	 */
 	isPressed?: boolean;
 	/**
-	 * Decreases the size of the button.
-	 */
-	isSmall?: boolean;
-	/**
 	 * Sets the `aria-label` of the component, if none is provided.
 	 * Sets the Tooltip content if `showTooltip` is provided.
 	 */
@@ -76,6 +75,18 @@ type BaseButtonProps = {
 	 * If provided, renders a Tooltip component for the button.
 	 */
 	showTooltip?: boolean;
+	/**
+	 * The size of the button.
+	 *
+	 * - `'default'`: For normal text-label buttons, unless it is a toggle button.
+	 * - `'compact'`: For toggle buttons, icon buttons, and buttons when used in context of either.
+	 * - `'small'`: For icon buttons associated with more advanced or auxiliary features.
+	 *
+	 * If the deprecated `isSmall` prop is also defined, this prop will take precedence.
+	 *
+	 * @default 'default'
+	 */
+	size?: 'default' | 'compact' | 'small';
 	/**
 	 * If provided, displays the given text inside the button. If the button contains children elements, the text is displayed before them.
 	 */
@@ -95,7 +106,9 @@ type BaseButtonProps = {
 	 */
 	variant?: 'primary' | 'secondary' | 'tertiary' | 'link';
 	/**
-	 * Whether this is focusable.
+	 * Whether to keep the button focusable when disabled.
+	 *
+	 * @default false
 	 */
 	__experimentalIsFocusable?: boolean;
 };
@@ -103,7 +116,8 @@ type BaseButtonProps = {
 type _ButtonProps = {
 	/**
 	 * Whether the button is disabled.
-	 * If `true`, this will force a `button` element to be rendered.
+	 *
+	 * If `true`, this will force a `button` element to be rendered, even when an `href` is given.
 	 */
 	disabled?: boolean;
 };
@@ -111,7 +125,8 @@ type _ButtonProps = {
 type AnchorProps = {
 	/**
 	 * Whether the button is disabled.
-	 * If `true`, this will force a `button` element to be rendered.
+	 *
+	 * If `true`, this will force a `button` element to be rendered, even when an `href` is given.
 	 */
 	disabled?: false;
 	/**
@@ -125,11 +140,48 @@ type AnchorProps = {
 };
 
 export type DeprecatedButtonProps = {
+	/**
+	 * Gives the button a default style.
+	 *
+	 * @deprecated Use the `'secondary'` value on the `variant` prop instead.
+	 * @ignore
+	 */
 	isDefault?: boolean;
+	/**
+	 * Gives the button a link style.
+	 *
+	 * @deprecated Use the `'link'` value on the `variant` prop instead.
+	 * @ignore
+	 */
 	isLink?: boolean;
+	/**
+	 * Gives the button a primary style.
+	 *
+	 * @deprecated Use the `'primary'` value on the `variant` prop instead.
+	 * @ignore
+	 */
 	isPrimary?: boolean;
+	/**
+	 * Gives the button a default style.
+	 *
+	 * @deprecated Use the `'secondary'` value on the `variant` prop instead.
+	 * @ignore
+	 */
 	isSecondary?: boolean;
+	/**
+	 * Gives the button a text-based style.
+	 *
+	 * @deprecated Use the `'tertiary'` value on the `variant` prop instead.
+	 * @ignore
+	 */
 	isTertiary?: boolean;
+	/**
+	 * Decreases the size of the button.
+	 *
+	 * @deprecated Use the `'small'` value on the `size` prop instead.
+	 * @ignore
+	 */
+	isSmall?: boolean;
 };
 
 export type DeprecatedIconButtonProps = {

@@ -1,0 +1,48 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`HTMLTextInput HTMLTextInput renders and matches snapshot 1`] = `
+<View
+  onLayout={[Function]}
+>
+  <RCTScrollView>
+    <View>
+      <TextInput
+        accessibilityLabel="html-view-title"
+        autoCorrect={false}
+        numberOfLines={1}
+        placeholder="Add title"
+        placeholderTextColor="white"
+        style={
+          [
+            {
+              "color": "white",
+            },
+            undefined,
+          ]
+        }
+        textAlignVertical="center"
+      />
+      <TextInput
+        accessibilityLabel="html-view-content"
+        autoCorrect={false}
+        multiline={true}
+        onBlur={[Function]}
+        onChangeText={[Function]}
+        placeholder="Start writing…"
+        placeholderTextColor="white"
+        rejectResponderTermination={false}
+        scrollEnabled={false}
+        style={
+          [
+            {
+              "color": "white",
+            },
+            undefined,
+          ]
+        }
+        textAlignVertical="top"
+      />
+    </View>
+  </RCTScrollView>
+</View>
+`;

@@ -8,8 +8,8 @@
 	const Component = wp.element.Component;
 	const __ = wp.i18n.__;
 	const registerPlugin = wp.plugins.registerPlugin;
-	const PluginSidebar = wp.editPost.PluginSidebar;
-	const PluginSidebarMoreMenuItem = wp.editPost.PluginSidebarMoreMenuItem;
+	const PluginSidebar = wp.editor.PluginSidebar;
+	const PluginSidebarMoreMenuItem = wp.editor.PluginSidebarMoreMenuItem;
 
 	class SidebarContents extends Component {
 		constructor( props ) {
@@ -48,15 +48,16 @@
 				el(
 					Button,
 					{
-						variant: "primary",
+						variant: 'primary',
 						onClick: () => {
 							dispatch(
 								'core/annotations'
 							).__experimentalAddAnnotation( {
 								source: 'e2e-tests',
-								blockClientId: select(
-									'core/block-editor'
-								).getBlockOrder()[ 0 ],
+								blockClientId:
+									select(
+										'core/block-editor'
+									).getBlockOrder()[ 0 ],
 								richTextIdentifier: 'content',
 								range: {
 									start: parseInt( this.state.start, 10 ),
@@ -70,7 +71,7 @@
 				el(
 					Button,
 					{
-						variant: "primary",
+						variant: 'primary',
 						onClick: () => {
 							dispatch(
 								'core/annotations'
@@ -94,7 +95,7 @@
 				PluginSidebar,
 				{
 					name: 'annotations-sidebar',
-					title: __( 'Annotations Sidebar' ),
+					title: __( 'Annotations' ),
 				},
 				el( SidebarContents, {} )
 			),
@@ -103,7 +104,7 @@
 				{
 					target: 'annotations-sidebar',
 				},
-				__( 'Annotations Sidebar' )
+				__( 'Annotations' )
 			)
 		);
 	}

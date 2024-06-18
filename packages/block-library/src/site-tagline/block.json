@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/site-tagline",
 	"title": "Site Tagline",
 	"category": "theme",
@@ -10,11 +10,14 @@
 	"attributes": {
 		"textAlign": {
 			"type": "string"
+		},
+		"level": {
+			"type": "number",
+			"default": 0
 		}
 	},
 	"example": {},
 	"supports": {
-		"anchor": true,
 		"align": [ "wide", "full" ],
 		"html": false,
 		"color": {
@@ -26,7 +29,11 @@
 		},
 		"spacing": {
 			"margin": true,
-			"padding": true
+			"padding": true,
+			"__experimentalDefaultControls": {
+				"margin": false,
+				"padding": false
+			}
 		},
 		"typography": {
 			"fontSize": true,
@@ -40,6 +47,9 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	},
 	"editorStyle": "wp-block-site-tagline-editor"

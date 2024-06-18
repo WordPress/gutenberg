@@ -58,6 +58,7 @@ export default function FileBlockInspector( {
 						{ displayPreview && (
 							<RangeControl
 								__nextHasNoMarginBottom
+								__next40pxDefaultSize
 								label={ __( 'Height in pixels' ) }
 								min={ MIN_PREVIEW_HEIGHT }
 								max={ Math.max(

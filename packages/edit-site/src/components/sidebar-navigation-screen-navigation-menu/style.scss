@@ -1,0 +1,10 @@
+.sidebar-navigation__more-menu {
+	.components-button {
+		color: $gray-200;
+		&:hover,
+		&:focus,
+		&[aria-current] {
+			color: $gray-100;
+		}
+	}
+}

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { View, AccessibilityInfo } from 'react-native';
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -133,7 +133,7 @@ export default function SearchEdit( {
 	};
 
 	const getBlockClassNames = () => {
-		return classnames(
+		return clsx(
 			className,
 			'button-inside' === buttonPosition
 				? 'wp-block-search__button-inside'
@@ -192,7 +192,7 @@ export default function SearchEdit( {
 						} );
 					} }
 					options={ BUTTON_OPTIONS }
-					hideCancelButton={ true }
+					hideCancelButton
 				/>
 				{ buttonPosition !== 'no-button' && (
 					<ToggleControl
@@ -294,7 +294,7 @@ export default function SearchEdit( {
 		return (
 			<View
 				style={ styles.searchInputContainer }
-				accessible={ true }
+				accessible
 				accessibilityRole="none"
 				accessibilityHint={
 					isScreenReaderEnabled
@@ -383,7 +383,7 @@ export default function SearchEdit( {
 
 				{ ! buttonUseIcon && (
 					<View
-						accessible={ true }
+						accessible
 						accessibilityRole="none"
 						accessibilityHint={
 							isScreenReaderEnabled
@@ -395,7 +395,7 @@ export default function SearchEdit( {
 					>
 						<RichText
 							className="wp-block-search__button"
-							identifier="text"
+							identifier="buttonText"
 							tagName="p"
 							style={ richTextButtonStyle }
 							placeholder={ buttonPlaceholderText }
@@ -438,7 +438,7 @@ export default function SearchEdit( {
 
 			{ showLabel && (
 				<View
-					accessible={ true }
+					accessible
 					accessibilityRole="none"
 					accessibilityHint={
 						isScreenReaderEnabled
@@ -449,7 +449,7 @@ export default function SearchEdit( {
 				>
 					<RichText
 						className="wp-block-search__label"
-						identifier="text"
+						identifier="label"
 						tagName="p"
 						style={ styles.richTextLabel }
 						placeholder={ __( 'Add label…' ) }

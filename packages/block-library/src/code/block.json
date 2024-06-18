@@ -1,6 +1,6 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/code",
 	"title": "Code",
 	"category": "text",
@@ -8,12 +8,14 @@
 	"textdomain": "default",
 	"attributes": {
 		"content": {
-			"type": "string",
-			"source": "html",
-			"selector": "code"
+			"type": "rich-text",
+			"source": "rich-text",
+			"selector": "code",
+			"__unstablePreserveWhiteSpace": true
 		}
 	},
 	"supports": {
+		"align": [ "wide" ],
 		"anchor": true,
 		"typography": {
 			"fontSize": true,
@@ -30,7 +32,11 @@
 		},
 		"spacing": {
 			"margin": [ "top", "bottom" ],
-			"padding": true
+			"padding": true,
+			"__experimentalDefaultControls": {
+				"margin": false,
+				"padding": false
+			}
 		},
 		"__experimentalBorder": {
 			"radius": true,
@@ -50,6 +56,9 @@
 				"background": true,
 				"text": true
 			}
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	},
 	"style": "wp-block-code"

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -14,22 +14,17 @@ import { store as coreDataStore } from '@wordpress/core-data';
 
 function SiteIcon( { className } ) {
 	const { isRequestingSite, siteIconUrl } = useSelect( ( select ) => {
-		const { getEntityRecord, isResolving } = select( coreDataStore );
-		const siteData =
-			getEntityRecord( 'root', '__unstableBase', undefined ) || {};
+		const { getEntityRecord } = select( coreDataStore );
+		const siteData = getEntityRecord( 'root', '__unstableBase', undefined );
 
 		return {
-			isRequestingSite: isResolving( 'core', 'getEntityRecord', [
-				'root',
-				'__unstableBase',
-				undefined,
-			] ),
-			siteIconUrl: siteData.site_icon_url,
+			isRequestingSite: ! siteData,
+			siteIconUrl: siteData?.site_icon_url,
 		};
 	}, [] );
 
 	if ( isRequestingSite && ! siteIconUrl ) {
-		return null;
+		return <div className="edit-site-site-icon__image" />;
 	}
 
 	const icon = siteIconUrl ? (
@@ -41,13 +36,13 @@ function SiteIcon( { className } ) {
 	) : (
 		<Icon
 			className="edit-site-site-icon__icon"
-			size="32px"
 			icon={ wordpress }
+			size={ 48 }
 		/>
 	);
 
 	return (
-		<div className={ classnames( className, 'edit-site-site-icon' ) }>
+		<div className={ clsx( className, 'edit-site-site-icon' ) }>
 			{ icon }
 		</div>
 	);

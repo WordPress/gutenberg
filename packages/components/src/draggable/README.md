@@ -8,9 +8,16 @@ Note that the drag handle needs to declare the `draggable="true"` property and b
 
 The component accepts the following props:
 
+### `appendToOwnerDocument`: `boolean`
+
+Whether to append the cloned element to the `ownerDocument` body. By default, elements sourced by id are appended to the element's wrapper.
+
+-   Required: No
+-   Default: `false`
+
 ### `elementId`: `string`
 
-The HTML id of the element to clone on drag
+The HTML id of the element to clone on drag.
 
 -   Required: Yes
 

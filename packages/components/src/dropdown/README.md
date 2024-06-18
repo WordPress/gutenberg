@@ -44,6 +44,12 @@ If you want to target the dropdown menu for styling purposes, you need to provid
 
 -   Required: No
 
+### `defaultOpen`: `boolean`
+
+The open state of the dropdown when initially rendered. Use when you do not need to control its open state. It will be overridden by the `open` prop if it is specified on the component's first render.
+
+-   Required: No
+
 ### `expandOnMobile`: `boolean`
 
 Opt-in prop to show popovers fullscreen on mobile.
@@ -74,11 +80,15 @@ A callback invoked when the popover should be closed.
 
 -   Required: No
 
+### `open`: `boolean`
+
+The controlled open state of the dropdown. Must be used in conjunction with `onToggle`.
+
+-   Required: No
+
 ### `onToggle`: `( willOpen: boolean ) => void`
 
-A callback invoked when the state of the popover changes from open to closed and vice versa.
-
-The callback receives a boolean as a parameter. If `true`, the popover will open. If `false`, the popover will close.
+A callback invoked when the state of the dropdown changes from open to closed and vice versa.
 
 -   Required: No
 

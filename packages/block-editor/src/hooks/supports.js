@@ -22,6 +22,11 @@ const FONT_STYLE_SUPPORT_KEY = 'typography.__experimentalFontStyle';
 const FONT_WEIGHT_SUPPORT_KEY = 'typography.__experimentalFontWeight';
 /**
  * Key within block settings' supports array indicating support for text
+ * align e.g. settings found in `block.json`.
+ */
+const TEXT_ALIGN_SUPPORT_KEY = 'typography.textAlign';
+/**
+ * Key within block settings' supports array indicating support for text
  * columns e.g. settings found in `block.json`.
  */
 const TEXT_COLUMNS_SUPPORT_KEY = 'typography.textColumns';
@@ -31,29 +36,39 @@ const TEXT_COLUMNS_SUPPORT_KEY = 'typography.textColumns';
  */
 const TEXT_DECORATION_SUPPORT_KEY = 'typography.__experimentalTextDecoration';
 /**
+ * Key within block settings' supports array indicating support for writing mode
+ * e.g. settings found in `block.json`.
+ */
+const WRITING_MODE_SUPPORT_KEY = 'typography.__experimentalWritingMode';
+/**
  * Key within block settings' supports array indicating support for text
  * transforms e.g. settings found in `block.json`.
  */
 const TEXT_TRANSFORM_SUPPORT_KEY = 'typography.__experimentalTextTransform';
+
 /**
  * Key within block settings' supports array indicating support for letter-spacing
  * e.g. settings found in `block.json`.
  */
 const LETTER_SPACING_SUPPORT_KEY = 'typography.__experimentalLetterSpacing';
-const LAYOUT_SUPPORT_KEY = '__experimentalLayout';
+const LAYOUT_SUPPORT_KEY = 'layout';
 const TYPOGRAPHY_SUPPORT_KEYS = [
 	LINE_HEIGHT_SUPPORT_KEY,
 	FONT_SIZE_SUPPORT_KEY,
 	FONT_STYLE_SUPPORT_KEY,
 	FONT_WEIGHT_SUPPORT_KEY,
 	FONT_FAMILY_SUPPORT_KEY,
+	TEXT_ALIGN_SUPPORT_KEY,
 	TEXT_COLUMNS_SUPPORT_KEY,
 	TEXT_DECORATION_SUPPORT_KEY,
 	TEXT_TRANSFORM_SUPPORT_KEY,
+	WRITING_MODE_SUPPORT_KEY,
 	LETTER_SPACING_SUPPORT_KEY,
 ];
+const EFFECTS_SUPPORT_KEYS = [ 'shadow' ];
 const SPACING_SUPPORT_KEY = 'spacing';
 const styleSupportKeys = [
+	...EFFECTS_SUPPORT_KEYS,
 	...TYPOGRAPHY_SUPPORT_KEYS,
 	BORDER_SUPPORT_KEY,
 	COLOR_SUPPORT_KEY,
@@ -202,6 +217,24 @@ export const hasBackgroundColorSupport = ( nameOrType ) => {
 
 	return colorSupport && colorSupport.background !== false;
 };
+
+/**
+ * Returns true if the block defines support for text-align.
+ *
+ * @param {string|Object} nameOrType Block name or type object.
+ * @return {boolean} Whether the block supports the feature.
+ */
+export const hasTextAlignSupport = ( nameOrType ) =>
+	hasBlockSupport( nameOrType, TEXT_ALIGN_SUPPORT_KEY );
+
+/**
+ * Returns the block support value for text-align, if defined.
+ *
+ * @param {string|Object} nameOrType Block name or type object.
+ * @return {unknown} The block support value.
+ */
+export const getTextAlignSupport = ( nameOrType ) =>
+	getBlockSupport( nameOrType, TEXT_ALIGN_SUPPORT_KEY );
 
 /**
  * Returns true if the block defines support for background color.

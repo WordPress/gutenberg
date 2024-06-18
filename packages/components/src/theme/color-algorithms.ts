@@ -48,7 +48,7 @@ export function checkContrasts(
 	outputs: ThemeOutputValues[ 'colors' ]
 ) {
 	const background = inputs.background || COLORS.white;
-	const accent = inputs.accent || '#007cba';
+	const accent = inputs.accent || '#3858e9';
 	const foreground = outputs.foreground || COLORS.gray[ 900 ];
 	const gray = outputs.gray || COLORS.gray;
 
@@ -76,7 +76,9 @@ function warnContrastIssues( issues: ReturnType< typeof checkContrasts > ) {
 }
 
 function generateAccentDependentColors( accent?: string ) {
-	if ( ! accent ) return {};
+	if ( ! accent ) {
+		return {};
+	}
 
 	return {
 		accent,
@@ -87,7 +89,9 @@ function generateAccentDependentColors( accent?: string ) {
 }
 
 function generateBackgroundDependentColors( background?: string ) {
-	if ( ! background ) return {};
+	if ( ! background ) {
+		return {};
+	}
 
 	const foreground = getForegroundForColor( background );
 

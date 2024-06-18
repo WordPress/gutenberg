@@ -4,8 +4,8 @@
 
 import { normaliseFormats } from './normalise-formats';
 
-/** @typedef {import('./create').RichTextValue} RichTextValue */
-/** @typedef {import('./create').RichTextFormat} RichTextFormat */
+/** @typedef {import('./types').RichTextValue} RichTextValue */
+/** @typedef {import('./types').RichTextFormat} RichTextFormat */
 
 function replace( array, index, value ) {
 	array = array.slice();

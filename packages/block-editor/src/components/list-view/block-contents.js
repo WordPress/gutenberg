@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -15,6 +15,7 @@ import { forwardRef } from '@wordpress/element';
 import ListViewBlockSelectButton from './block-select-button';
 import BlockDraggable from '../block-draggable';
 import { store as blockEditorStore } from '../../store';
+import { useListViewContext } from './context';
 
 const ListViewBlockContents = forwardRef(
 	(
@@ -43,13 +44,16 @@ const ListViewBlockContents = forwardRef(
 					selectedBlockInBlockEditor: getSelectedBlockClientId(),
 				};
 			},
-			[ clientId ]
+			[]
 		);
+
+		const { AdditionalBlockContent, insertedBlock, setInsertedBlock } =
+			useListViewContext();
 
 		const isBlockMoveTarget =
 			blockMovingClientId && selectedBlockInBlockEditor === clientId;
 
-		const className = classnames( 'block-editor-list-view-block-contents', {
+		const className = clsx( 'block-editor-list-view-block-contents', {
 			'is-dropping-before': isBlockMoveTarget,
 		} );
 
@@ -62,26 +66,39 @@ const ListViewBlockContents = forwardRef(
 			: [ clientId ];
 
 		return (
-			<BlockDraggable clientIds={ draggableClientIds }>
-				{ ( { draggable, onDragStart, onDragEnd } ) => (
-					<ListViewBlockSelectButton
-						ref={ ref }
-						className={ className }
+			<>
+				{ AdditionalBlockContent && (
+					<AdditionalBlockContent
 						block={ block }
-						onClick={ onClick }
-						onToggleExpanded={ onToggleExpanded }
-						isSelected={ isSelected }
-						position={ position }
-						siblingBlockCount={ siblingBlockCount }
-						level={ level }
-						draggable={ draggable }
-						onDragStart={ onDragStart }
-						onDragEnd={ onDragEnd }
-						isExpanded={ isExpanded }
-						{ ...props }
+						insertedBlock={ insertedBlock }
+						setInsertedBlock={ setInsertedBlock }
 					/>
 				) }
-			</BlockDraggable>
+				<BlockDraggable
+					appendToOwnerDocument
+					clientIds={ draggableClientIds }
+					cloneClassname="block-editor-list-view-draggable-chip"
+				>
+					{ ( { draggable, onDragStart, onDragEnd } ) => (
+						<ListViewBlockSelectButton
+							ref={ ref }
+							className={ className }
+							block={ block }
+							onClick={ onClick }
+							onToggleExpanded={ onToggleExpanded }
+							isSelected={ isSelected }
+							position={ position }
+							siblingBlockCount={ siblingBlockCount }
+							level={ level }
+							draggable={ draggable }
+							onDragStart={ onDragStart }
+							onDragEnd={ onDragEnd }
+							isExpanded={ isExpanded }
+							{ ...props }
+						/>
+					) }
+				</BlockDraggable>
+			</>
 		);
 	}
 );

@@ -17,7 +17,10 @@ const SUPPORTED_ENDPOINTS = {
 };
 
 // [ONLY ON ANDROID] The requests made to these endpoints won't be cached.
-const DISABLED_CACHING_ENDPOINTS = [ /wp\/v2\/(blocks)\/?\d*?.*/i ];
+const DISABLED_CACHING_ENDPOINTS = [
+	/wp\/v2\/(blocks)\/?\d*?.*/i,
+	/oembed\/1\.0\/proxy\?.*/i,
+];
 
 const setTimeoutPromise = ( delay ) =>
 	new Promise( ( resolve ) => setTimeout( resolve, delay ) );
@@ -81,8 +84,14 @@ export const isPathSupported = ( path, method ) => {
 	);
 };
 
-export const shouldEnableCaching = ( path ) =>
-	! DISABLED_CACHING_ENDPOINTS.some( ( pattern ) => pattern.test( path ) );
+export const shouldEnableCaching = ( path ) => {
+	const disabledEndpoints = applyFilters(
+		'native.disabled_caching_endpoints',
+		DISABLED_CACHING_ENDPOINTS
+	);
+
+	return ! disabledEndpoints.some( ( pattern ) => pattern.test( path ) );
+};
 
 export default () => {
 	apiFetch.setFetchHandler( ( options ) => fetchHandler( options ) );

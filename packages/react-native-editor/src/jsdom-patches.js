@@ -29,23 +29,25 @@ const { NO_MODIFICATION_ALLOWED_ERR, HIERARCHY_REQUEST_ERR, NOT_FOUND_ERR } =
 	core;
 
 /**
- * Simple recursive implementation of Node.contains method
+ * Copy of Node.contains polyfill from polyfill-library package (https://t.ly/mehjW).
+ * This polyfill was originally used in WordPress Core (https://t.ly/4o7wQ).
  *
- * @param {number} otherNode Another node (may be the same node).
- * @return {boolean} true if otherNode is a descendant of this node, or is this
- * node, false otherwise.
+ * @param {number} node Node to check.
+ * @return {boolean} true if passed node is a descendant of this node, or the
+ * same node, false otherwise.
  *
  * This function is necessary in the mobile environment, because there are code
  * paths that make use of functions in the Gutenberg (web) project, which has
  * expectation that this is implemented (as it is in the browser environment).
  */
-Node.prototype.contains = function ( otherNode ) {
-	return (
-		this === otherNode ||
-		Array.prototype.some.call( this._childNodes, ( childNode ) => {
-			return childNode.contains( otherNode );
-		} )
-	);
+Node.prototype.contains = function ( node ) {
+	do {
+		if ( this === node ) {
+			return true;
+		}
+	} while ( ( node = node && node.parentNode ) );
+
+	return false;
 };
 
 /**
@@ -170,6 +172,18 @@ Element.prototype.closest = function ( selector ) {
 };
 
 /**
+ * Implementation of Element.prototype.remove based on polyfills:
+ * - https://github.com/chenzhenxi/element-remove/blob/master/index.js
+ * (referenced in https://developer.mozilla.org/en-US/docs/Web/API/Element/remove#see_also)
+ * - https://github.com/JakeChampion/polyfill-library/blob/master/polyfills/Element/prototype/remove/polyfill.js
+ */
+Element.prototype.remove = function () {
+	if ( this.parentNode ) {
+		this.parentNode.removeChild( this );
+	}
+};
+
+/**
  * Helper function to check if a node implements the NonDocumentTypeChildNode
  * interface
  *
@@ -242,6 +256,37 @@ Object.defineProperties( Node.prototype, {
 
 			return sibling;
 		},
+	},
+	dataset: {
+		get() {
+			const node = this;
+
+			// Helper function to convert property name to data-* attribute name
+			function toDataAttributeName( property ) {
+				return (
+					'data-' +
+					property.replace(
+						/[A-Z]/g,
+						( match ) => '-' + match.toLowerCase()
+					)
+				);
+			}
+			return new Proxy(
+				{},
+				{
+					set( _target, property, value ) {
+						const attributeName = toDataAttributeName( property );
+						node.setAttribute( attributeName, value );
+						return true;
+					},
+					get( _target, property ) {
+						const attributeName = toDataAttributeName( property );
+						return node.getAttribute( attributeName );
+					},
+				}
+			);
+		},
+		set() {},
 	},
 } );
 

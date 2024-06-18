@@ -3,7 +3,8 @@
  */
 import { createRegistry } from '../registry';
 import createReduxStore from '../redux-store';
-import { unlock } from '../private-apis';
+import { unlock } from '../lock-unlock';
+import { createRegistrySelector } from '../factory';
 
 describe( 'Private data APIs', () => {
 	let registry;
@@ -32,23 +33,19 @@ describe( 'Private data APIs', () => {
 			getState: ( state ) => state,
 		},
 		actions: { setPublicPrice },
-		reducer: ( state, action ) => {
-			if ( action?.type === 'SET_PRIVATE_PRICE' ) {
+		reducer: ( state = { price: 1000, secretDiscount: 800 }, action ) => {
+			if ( action.type === 'SET_PRIVATE_PRICE' ) {
 				return {
 					...state,
-					secretDiscount: action?.price,
+					secretDiscount: action.price,
 				};
-			} else if ( action?.type === 'SET_PUBLIC_PRICE' ) {
+			} else if ( action.type === 'SET_PUBLIC_PRICE' ) {
 				return {
 					...state,
-					price: action?.price,
+					price: action.price,
 				};
 			}
-			return {
-				price: 1000,
-				secretDiscount: 800,
-				...( state || {} ),
-			};
+			return state;
 		},
 	};
 	function createStore() {
@@ -96,6 +93,37 @@ describe( 'Private data APIs', () => {
 			);
 		} );
 
+		it( 'should support combination of private selectors and resolvers', async () => {
+			const testStore = createReduxStore( 'test', {
+				reducer: ( state = {}, action ) => {
+					if ( action.type === 'RECEIVE' ) {
+						return { ...state, [ action.key ]: action.value };
+					}
+					return state;
+				},
+				selectors: {
+					get: ( state, key ) => state[ key ],
+				},
+				resolvers: {
+					get:
+						( key ) =>
+						async ( { dispatch } ) => {
+							const value = await ( 'resolved-' + key );
+							dispatch( { type: 'RECEIVE', key, value } );
+						},
+				},
+			} );
+			unlock( testStore ).registerPrivateSelectors( {
+				peek: ( state, key ) => state[ key ],
+			} );
+			registry.register( testStore );
+
+			await registry.resolveSelect( testStore ).get( 'x' );
+			expect( unlock( registry.select( testStore ) ).peek( 'x' ) ).toBe(
+				'resolved-x'
+			);
+		} );
+
 		it( 'should give private selectors access to the state', () => {
 			const groceryStore = createStore();
 			unlock( groceryStore ).registerPrivateSelectors( {
@@ -114,6 +142,16 @@ describe( 'Private data APIs', () => {
 
 			const unlockedSelectors = unlock( registry.select( groceryStore ) );
 			expect( unlockedSelectors.getPublicPrice() ).toEqual( 1000 );
+		} );
+
+		it( 'should return stable references to selectors', () => {
+			const groceryStore = createStore();
+			unlock( groceryStore ).registerPrivateSelectors( {
+				getSecretDiscount,
+			} );
+			const select = unlock( registry.select( groceryStore ) );
+			expect( select.getPublicPrice ).toBe( select.getPublicPrice );
+			expect( select.getSecretDiscount ).toBe( select.getSecretDiscount );
 		} );
 
 		it( 'should support registerStore', () => {
@@ -163,6 +201,42 @@ describe( 'Private data APIs', () => {
 				subRegistry.select( storeName )
 			);
 			expect( subPrivateSelectors.getSecretDiscount() ).toEqual( 800 );
+		} );
+
+		it( 'should support private registry selectors', () => {
+			const groceryStore = createStore();
+			const otherStore = createReduxStore( 'other', {
+				reducer: ( state = {} ) => state,
+			} );
+			unlock( otherStore ).registerPrivateSelectors( {
+				getPrice: createRegistrySelector(
+					( select ) => () => select( groceryStore ).getPublicPrice()
+				),
+			} );
+			registry.register( otherStore );
+			const privateSelectors = unlock( registry.select( otherStore ) );
+			expect( privateSelectors.getPrice() ).toEqual( 1000 );
+		} );
+
+		it( 'should support calling a private registry selector from a public selector', () => {
+			const groceryStore = createStore();
+			const getPriceWithShipping = createRegistrySelector(
+				( select ) => () => select( groceryStore ).getPublicPrice() + 5
+			);
+			const store = createReduxStore( 'a', {
+				reducer: ( state = {} ) => state,
+				selectors: {
+					getPriceWithShippingAndTax: ( state ) =>
+						getPriceWithShipping( state ) * 1.1,
+				},
+			} );
+			unlock( store ).registerPrivateSelectors( {
+				getPriceWithShipping,
+			} );
+			registry.register( store );
+			expect(
+				registry.select( store ).getPriceWithShippingAndTax()
+			).toEqual( 1105.5 );
 		} );
 	} );
 
@@ -232,6 +306,16 @@ describe( 'Private data APIs', () => {
 			).toEqual( 400 );
 		} );
 
+		it( 'should return stable references to actions', () => {
+			const groceryStore = createStore();
+			unlock( groceryStore ).registerPrivateActions( {
+				setSecretDiscount,
+			} );
+			const disp = unlock( registry.dispatch( groceryStore ) );
+			expect( disp.setPublicPrice ).toBe( disp.setPublicPrice );
+			expect( disp.setSecretDiscount ).toBe( disp.setSecretDiscount );
+		} );
+
 		it( 'should dispatch public actions on the unlocked store', () => {
 			const groceryStore = createStore();
 			unlock( groceryStore ).registerPrivateActions( {
@@ -261,6 +345,29 @@ describe( 'Private data APIs', () => {
 			expect(
 				unlock( registry.select( groceryStore ) ).getSecretDiscount()
 			).toEqual( 100 );
+		} );
+
+		it( 'should expose unlocked private selectors and actions to thunks', () => {
+			const groceryStore = createStore();
+			unlock( groceryStore ).registerPrivateSelectors( {
+				getSecretDiscount,
+			} );
+			unlock( groceryStore ).registerPrivateActions( {
+				setSecretDiscount,
+				doubleSecretDiscount() {
+					return ( { dispatch, select } ) => {
+						dispatch.setSecretDiscount(
+							select.getSecretDiscount() * 2
+						);
+					};
+				},
+			} );
+			const privateActions = unlock( registry.dispatch( groceryStore ) );
+			privateActions.setSecretDiscount( 100 );
+			privateActions.doubleSecretDiscount();
+			expect(
+				unlock( registry.select( groceryStore ) ).getSecretDiscount()
+			).toEqual( 200 );
 		} );
 
 		it( 'should support registerStore', () => {

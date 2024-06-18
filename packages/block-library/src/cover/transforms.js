@@ -2,12 +2,15 @@
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { IMAGE_BACKGROUND_TYPE, VIDEO_BACKGROUND_TYPE } from './shared';
-import cleanEmptyObject from '../utils/clean-empty-object';
+import { unlock } from '../lock-unlock';
+
+const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
 const transforms = {
 	from: [

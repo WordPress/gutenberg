@@ -27,12 +27,14 @@ test.describe( 'Template Part', () => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//header',
 			postType: 'wp_template_part',
+			canvas: 'edit',
 		} );
-		await editor.canvas.click( 'body' );
 
 		// Insert a new template block and 'start blank'.
 		await editor.insertBlock( { name: 'core/template-part' } );
-		await editor.canvas.click( 'role=button[name="Start blank"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Start blank"i]' )
+			.click();
 
 		// Fill in a name in the dialog that pops up.
 		await page.type( 'role=dialog >> role=textbox[name="Name"i]', 'New' );
@@ -55,8 +57,7 @@ test.describe( 'Template Part', () => {
 		page,
 	} ) => {
 		// Visit the index.
-		await admin.visitSiteEditor();
-		await editor.canvas.click( 'body' );
+		await admin.visitSiteEditor( { canvas: 'edit' } );
 		const headerTemplateParts = editor.canvas.locator(
 			'[data-type="core/template-part"]'
 		);
@@ -66,7 +67,7 @@ test.describe( 'Template Part', () => {
 
 		// Insert a new template block and choose an existing header pattern.
 		await editor.insertBlock( { name: 'core/template-part' } );
-		await editor.canvas.click( 'role=button[name="Choose"i]' );
+		await editor.canvas.locator( 'role=button[name="Choose"i]' ).click();
 		await page.click(
 			'role=listbox[name="Block Patterns"i] >> role=option[name="header"i]'
 		);
@@ -82,8 +83,7 @@ test.describe( 'Template Part', () => {
 	} ) => {
 		const paragraphText = 'Test 2';
 
-		await admin.visitSiteEditor();
-		await editor.canvas.click( 'body' );
+		await admin.visitSiteEditor( { canvas: 'edit' } );
 		// Add a block and select it.
 		await editor.insertBlock( {
 			name: 'core/paragraph',
@@ -108,7 +108,7 @@ test.describe( 'Template Part', () => {
 		// Check that the header contains the paragraph added earlier.
 		const templatePartWithParagraph = editor.canvas.locator(
 			'[data-type="core/template-part"]',
-			{ has: paragraphBlock }
+			{ hasText: paragraphText }
 		);
 
 		await expect( templatePartWithParagraph ).toBeVisible();
@@ -122,8 +122,7 @@ test.describe( 'Template Part', () => {
 		const paragraphText1 = 'Test 3';
 		const paragraphText2 = 'Test 4';
 
-		await admin.visitSiteEditor();
-		await editor.canvas.click( 'body' );
+		await admin.visitSiteEditor( { canvas: 'edit' } );
 		// Add a block and select it.
 		await editor.insertBlock( {
 			name: 'core/paragraph',
@@ -147,7 +146,7 @@ test.describe( 'Template Part', () => {
 		await editor.selectBlocks( paragraphBlock1, paragraphBlock2 );
 
 		// Convert block to a template part.
-		await editor.clickBlockOptionsMenuItem( 'Create Template part' );
+		await editor.clickBlockOptionsMenuItem( 'Create template part' );
 		await page.type( 'role=dialog >> role=textbox[name="Name"i]', 'Test' );
 		await page.keyboard.press( 'Enter' );
 
@@ -158,11 +157,11 @@ test.describe( 'Template Part', () => {
 		// Check that the header contains the paragraph added earlier.
 		const templatePartWithParagraph1 = editor.canvas.locator(
 			'[data-type="core/template-part"]',
-			{ has: paragraphBlock1 }
+			{ hasText: paragraphText1 }
 		);
 		const templatePartWithParagraph2 = editor.canvas.locator(
 			'[data-type="core/template-part"]',
-			{ has: paragraphBlock2 }
+			{ hasText: paragraphText2 }
 		);
 
 		// TODO: I couldn't find an easy way to assert that the same template
@@ -184,38 +183,37 @@ test.describe( 'Template Part', () => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//header',
 			postType: 'wp_template_part',
+			canvas: 'edit',
 		} );
-		await editor.canvas.click( 'body' );
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: {
 				content: paragraphText,
 			},
 		} );
-		await editor.saveSiteEditorEntities();
+		await editor.saveSiteEditorEntities( {
+			isOnlyCurrentEntityDirty: true,
+		} );
 
 		// Visit the index.
-		await admin.visitSiteEditor();
-		await editor.canvas.click( 'body' );
+		await admin.visitSiteEditor( { canvas: 'edit' } );
 		// Check that the header contains the paragraph added earlier.
 		const paragraph = editor.canvas.locator(
 			`p >> text="${ paragraphText }"`
 		);
 		const templatePartWithParagraph = editor.canvas.locator(
 			'[data-type="core/template-part"]',
-			{ has: paragraph }
+			{ hasText: paragraphText }
 		);
 		await expect( templatePartWithParagraph ).toBeVisible();
 
 		// Detach the paragraph from the header template part.
 		await editor.selectBlocks( templatePartWithParagraph );
-		await editor.clickBlockOptionsMenuItem(
-			'Detach blocks from template part'
-		);
+		await editor.clickBlockOptionsMenuItem( 'Detach' );
 
 		// There should be a paragraph but no header template part.
 		await expect( paragraph ).toBeVisible();
-		await expect( templatePartWithParagraph ).not.toBeVisible();
+		await expect( templatePartWithParagraph ).toBeHidden();
 	} );
 
 	test( 'shows changes in a template when a template part it contains is modified', async ( {
@@ -227,8 +225,8 @@ test.describe( 'Template Part', () => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//header',
 			postType: 'wp_template_part',
+			canvas: 'edit',
 		} );
-		await editor.canvas.click( 'body' );
 		// Edit the header.
 		await editor.insertBlock( {
 			name: 'core/paragraph',
@@ -237,11 +235,13 @@ test.describe( 'Template Part', () => {
 			},
 		} );
 
-		await editor.saveSiteEditorEntities();
+		await editor.saveSiteEditorEntities( {
+			isOnlyCurrentEntityDirty: true,
+		} );
 
 		// Visit the index.
 		await admin.visitSiteEditor();
-		await editor.canvas.click( 'body' );
+		await editor.canvas.locator( 'body' ).click();
 		const paragraph = editor.canvas.locator(
 			`p >> text="${ paragraphText }"`
 		);
@@ -260,8 +260,8 @@ test.describe( 'Template Part', () => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//header',
 			postType: 'wp_template_part',
+			canvas: 'edit',
 		} );
-		await editor.canvas.click( 'body' );
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: {
@@ -293,13 +293,13 @@ test.describe( 'Template Part', () => {
 		await expect( paragraph ).toBeVisible();
 	} );
 
-	test( 'can import a widget area into an empty template part', async ( {
+	// Reason: https://github.com/WordPress/gutenberg/issues/47003.
+	test.skip( 'can import a widget area into an empty template part', async ( {
 		admin,
 		editor,
 		page,
 	} ) => {
-		await admin.visitSiteEditor();
-		await editor.canvas.click( 'body' );
+		await admin.visitSiteEditor( { canvas: 'edit' } );
 
 		// Add a block and select it.
 		await editor.insertBlock( {
@@ -339,8 +339,7 @@ test.describe( 'Template Part', () => {
 		editor,
 		page,
 	} ) => {
-		await admin.visitSiteEditor();
-		await editor.canvas.click( 'body' );
+		await admin.visitSiteEditor( { canvas: 'edit' } );
 
 		// Select existing header template part.
 		await editor.selectBlocks(
@@ -354,7 +353,7 @@ test.describe( 'Template Part', () => {
 		// Verify that the widget area import button is not there.
 		await expect(
 			page.getByRole( 'combobox', { name: 'Import widget area' } )
-		).not.toBeVisible();
+		).toBeHidden();
 	} );
 
 	test( 'Keeps focus in place on undo in template parts', async ( {
@@ -366,8 +365,8 @@ test.describe( 'Template Part', () => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//header',
 			postType: 'wp_template_part',
+			canvas: 'edit',
 		} );
-		await editor.canvas.click( 'body' );
 
 		// Select the site title block.
 		const siteTitle = editor.canvas.getByRole( 'document', {
@@ -381,8 +380,18 @@ test.describe( 'Template Part', () => {
 		// Insert a group block with a Site Title block inside.
 		await editor.insertBlock( {
 			name: 'core/group',
-			innerBlocks: [ { name: 'core/site-title' } ],
+			innerBlocks: [
+				{ name: 'core/paragraph', attributes: { content: 'Hello' } },
+				{ name: 'core/site-title' },
+			],
 		} );
+
+		// Type within a first block.
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Paragraph',
+		} );
+		await editor.selectBlocks( paragraph );
+		await page.keyboard.type( 'Modify' );
 
 		// Select the Site Title block inside the group.
 		const siteTitleInGroup = editor.canvas.getByRole( 'document', {
@@ -391,7 +400,7 @@ test.describe( 'Template Part', () => {
 		await editor.selectBlocks( siteTitleInGroup );
 
 		// Change heading level of the Site Title block.
-		await editor.clickBlockToolbarButton( 'Change heading level' );
+		await editor.clickBlockToolbarButton( 'Change level' );
 		const Heading3Button = page.getByRole( 'menuitemradio', {
 			name: 'Heading 3',
 		} );
@@ -400,8 +409,6 @@ test.describe( 'Template Part', () => {
 		// Undo the change.
 		await pageUtils.pressKeys( 'primary+z' );
 
-		await expect(
-			page.locator( 'role=button[name="Change heading level"i]' )
-		).toBeFocused();
+		await expect( paragraph ).toBeFocused();
 	} );
 } );

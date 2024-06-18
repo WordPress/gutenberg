@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { loop as icon } from '@wordpress/icons';
-import { addFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -13,7 +12,6 @@ import edit from './edit';
 import save from './save';
 import variations from './variations';
 import deprecated from './deprecated';
-import queryInspectorControls from './hooks';
 
 const { name } = metadata;
 export { metadata, name };
@@ -26,8 +24,4 @@ export const settings = {
 	deprecated,
 };
 
-export const init = () => {
-	addFilter( 'editor.BlockEdit', 'core/query', queryInspectorControls );
-
-	return initBlock( { name, metadata, settings } );
-};
+export const init = () => initBlock( { name, metadata, settings } );

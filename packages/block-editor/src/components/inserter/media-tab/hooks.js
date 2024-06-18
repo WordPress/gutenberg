@@ -1,36 +1,17 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useState, useRef, useMemo } from '@wordpress/element';
+import { useEffect, useState, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
 
-/**
- * Interface for inserter media requests.
- *
- * @typedef {Object} InserterMediaRequest
- * @property {number} per_page How many items to fetch per page.
- * @property {string} search   The search term to use for filtering the results.
- */
-
-/**
- * Interface for inserter media responses. Any media resource should
- * map their response to this interface, in order to create the core
- * WordPress media blocks (image, video, audio).
- *
- * @typedef {Object} InserterMediaItem
- * @property {string}        title        The title of the media item.
- * @property {string}        url          The source url of the media item.
- * @property {string}        [previewUrl] The preview source url of the media item to display in the media list.
- * @property {number}        [id]         The WordPress id of the media item.
- * @property {number|string} [sourceId]   The id of the media item from external source.
- * @property {string}        [alt]        The alt text of the media item.
- * @property {string}        [caption]    The caption of the media item.
- */
+/** @typedef {import('../../../store/actions').InserterMediaRequest} InserterMediaRequest */
+/** @typedef {import('../../../store/actions').InserterMediaItem} InserterMediaItem */
 
 /**
  * Fetches media items based on the provided category.
@@ -70,48 +51,14 @@ export function useMediaResults( category, query = {} ) {
 	return { mediaList, isLoading };
 }
 
-function useInserterMediaCategories() {
-	const {
-		inserterMediaCategories,
-		allowedMimeTypes,
-		enableOpenverseMediaCategory,
-	} = useSelect( ( select ) => {
-		const settings = select( blockEditorStore ).getSettings();
-		return {
-			inserterMediaCategories: settings.inserterMediaCategories,
-			allowedMimeTypes: settings.allowedMimeTypes,
-			enableOpenverseMediaCategory: settings.enableOpenverseMediaCategory,
-		};
-	}, [] );
-	// The allowed `mime_types` can be altered by `upload_mimes` filter and restrict
-	// some of them. In this case we shouldn't add the category to the available media
-	// categories list in the inserter.
-	const allowedCategories = useMemo( () => {
-		if ( ! inserterMediaCategories || ! allowedMimeTypes ) {
-			return;
-		}
-		return inserterMediaCategories.filter( ( category ) => {
-			// Check if Openverse category is enabled.
-			if (
-				! enableOpenverseMediaCategory &&
-				category.name === 'openverse'
-			) {
-				return false;
-			}
-			return Object.values( allowedMimeTypes ).some( ( mimeType ) =>
-				mimeType.startsWith( `${ category.mediaType }/` )
-			);
-		} );
-	}, [
-		inserterMediaCategories,
-		allowedMimeTypes,
-		enableOpenverseMediaCategory,
-	] );
-	return allowedCategories;
-}
-
 export function useMediaCategories( rootClientId ) {
 	const [ categories, setCategories ] = useState( [] );
+
+	const inserterMediaCategories = useSelect(
+		( select ) =>
+			unlock( select( blockEditorStore ) ).getInserterMediaCategories(),
+		[]
+	);
 	const { canInsertImage, canInsertVideo, canInsertAudio } = useSelect(
 		( select ) => {
 			const { canInsertBlockType } = select( blockEditorStore );
@@ -132,7 +79,6 @@ export function useMediaCategories( rootClientId ) {
 		},
 		[ rootClientId ]
 	);
-	const inserterMediaCategories = useInserterMediaCategories();
 	useEffect( () => {
 		( async () => {
 			const _categories = [];

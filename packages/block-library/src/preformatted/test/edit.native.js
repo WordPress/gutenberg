@@ -3,7 +3,7 @@
  */
 import {
 	addBlock,
-	changeAndSelectTextOfRichText,
+	typeInRichText,
 	fireEvent,
 	getEditorHtml,
 	initializeEditor,
@@ -24,24 +24,12 @@ import PreformattedEdit from '../edit';
 setupCoreBlocks();
 
 describe( 'Preformatted', () => {
-	it( 'renders without crashing', () => {
-		const screen = render(
-			<PreformattedEdit
-				attributes={ {} }
-				setAttributes={ jest.fn() }
-				getStylesFromColorScheme={ jest.fn() }
-			/>
-		);
-
-		expect( screen.container ).toBeDefined();
-	} );
-
 	it( 'should match snapshot when content is empty', () => {
 		const screen = render(
 			<PreformattedEdit
 				attributes={ {} }
 				setAttributes={ jest.fn() }
-				getStylesFromColorScheme={ ( styles1 ) => styles1 }
+				getStylesFromColorScheme={ jest.fn() }
 			/>
 		);
 		expect( screen.toJSON() ).toMatchSnapshot();
@@ -67,23 +55,57 @@ describe( 'Preformatted', () => {
 		const preformattedTextInput = await screen.findByPlaceholderText(
 			'Write preformatted text…'
 		);
-		const string = 'A great statement.';
-		changeAndSelectTextOfRichText( preformattedTextInput, string, {
-			selectionStart: string.length,
-			selectionEnd: string.length,
-		} );
+		typeInRichText( preformattedTextInput, 'A great statement.' );
 		fireEvent( preformattedTextInput, 'onKeyDown', {
 			nativeEvent: {},
 			preventDefault() {},
 			keyCode: ENTER,
 		} );
-		changeAndSelectTextOfRichText( preformattedTextInput, 'Again' );
+		typeInRichText( preformattedTextInput, 'Again' );
 
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:preformatted -->
 		<pre class="wp-block-preformatted">A great statement.<br>Again</pre>
 		<!-- /wp:preformatted -->"
+	` );
+	} );
+
+	it( 'should split on triple Enter', async () => {
+		// Arrange
+		const screen = await initializeEditor();
+
+		// Act
+		await addBlock( screen, 'Preformatted' );
+		const preformattedTextInput = await screen.findByPlaceholderText(
+			'Write preformatted text…'
+		);
+		typeInRichText( preformattedTextInput, 'Hello' );
+		fireEvent( preformattedTextInput, 'onKeyDown', {
+			nativeEvent: {},
+			preventDefault() {},
+			keyCode: ENTER,
+		} );
+		fireEvent( preformattedTextInput, 'onKeyDown', {
+			nativeEvent: {},
+			preventDefault() {},
+			keyCode: ENTER,
+		} );
+		fireEvent( preformattedTextInput, 'onKeyDown', {
+			nativeEvent: {},
+			preventDefault() {},
+			keyCode: ENTER,
+		} );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchInlineSnapshot( `
+		"<!-- wp:preformatted -->
+		<pre class="wp-block-preformatted">Hello</pre>
+		<!-- /wp:preformatted -->
+
+		<!-- wp:paragraph -->
+		<p></p>
+		<!-- /wp:paragraph -->"
 	` );
 	} );
 } );

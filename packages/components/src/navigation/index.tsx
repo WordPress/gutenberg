@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -28,7 +28,8 @@ const noop = () => {};
 /**
  * Render a navigation list with optional groupings and hierarchy.
  *
- * @example
+ * @deprecated Use `Navigator` instead.
+ *
  * ```jsx
  * import {
  *   __experimentalNavigation as Navigation,
@@ -115,7 +116,7 @@ export function Navigation( {
 		navigationTree,
 	};
 
-	const classes = classnames( 'components-navigation', className );
+	const classes = clsx( 'components-navigation', className );
 	const animateClassName = getAnimateClassName( {
 		type: 'slide-in',
 		origin: slideOrigin,
@@ -127,7 +128,7 @@ export function Navigation( {
 				key={ menu }
 				className={
 					animateClassName
-						? classnames( {
+						? clsx( {
 								[ animateClassName ]:
 									isMounted.current && slideOrigin,
 						  } )

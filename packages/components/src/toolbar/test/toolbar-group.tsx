@@ -8,6 +8,11 @@ import { fireEvent, render, screen } from '@testing-library/react';
  */
 import { ToolbarGroup } from '..';
 
+/**
+ * WordPress dependencies
+ */
+import { wordpress } from '@wordpress/icons';
+
 describe( 'ToolbarGroup', () => {
 	describe( 'basic rendering', () => {
 		it( 'should render an empty node, when controls are not passed', () => {
@@ -23,10 +28,11 @@ describe( 'ToolbarGroup', () => {
 		} );
 
 		it( 'should render a list of controls with buttons', () => {
-			const clickHandler = ( event: Event ) => event;
+			const clickHandler = ( event?: React.MouseEvent ) => event;
+
 			const controls = [
 				{
-					icon: 'wordpress',
+					icon: wordpress,
 					title: 'WordPress',
 					onClick: clickHandler,
 					isActive: false,
@@ -41,10 +47,10 @@ describe( 'ToolbarGroup', () => {
 		} );
 
 		it( 'should render a list of controls with buttons and active control', () => {
-			const clickHandler = ( event: Event ) => event;
+			const clickHandler = ( event?: React.MouseEvent ) => event;
 			const controls = [
 				{
-					icon: 'wordpress',
+					icon: wordpress,
 					title: 'WordPress',
 					onClick: clickHandler,
 					isActive: true,
@@ -63,14 +69,14 @@ describe( 'ToolbarGroup', () => {
 				[
 					// First set.
 					{
-						icon: 'wordpress',
+						icon: wordpress,
 						title: 'WordPress',
 					},
 				],
 				[
 					// Second set.
 					{
-						icon: 'wordpress',
+						icon: wordpress,
 						title: 'WordPress',
 					},
 				],
@@ -95,7 +101,7 @@ describe( 'ToolbarGroup', () => {
 			const clickHandler = jest.fn();
 			const controls = [
 				{
-					icon: 'wordpress',
+					icon: wordpress,
 					title: 'WordPress',
 					onClick: clickHandler,
 					isActive: true,

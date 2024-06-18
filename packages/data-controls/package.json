@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/data-controls",
-	"version": "3.0.0",
+	"version": "4.1.0",
 	"description": "A set of common controls for the @wordpress/data api.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -20,7 +20,8 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=12"
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
@@ -31,6 +32,9 @@
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/data": "file:../data",
 		"@wordpress/deprecated": "file:../deprecated"
+	},
+	"peerDependencies": {
+		"react": "^18.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

@@ -13,6 +13,8 @@ const postcss = require( 'postcss' );
  */
 const getBabelConfig = require( './get-babel-config' );
 
+const isDev = process.env.NODE_ENV === 'development';
+
 /**
  * Path to packages directory.
  *
@@ -27,10 +29,12 @@ const PACKAGES_DIR = path
  *
  * @type {Object}
  */
-const JS_ENVIRONMENTS = {
-	main: 'build',
-	module: 'build-module',
-};
+const JS_ENVIRONMENTS = isDev
+	? { module: 'build-module' }
+	: {
+			main: 'build',
+			module: 'build-module',
+	  };
 
 /**
  * Promisified fs.readFile.
@@ -103,9 +107,13 @@ async function buildCSS( file ) {
 		'animations',
 		'z-index',
 	]
-		// Editor styles should be excluded from the default CSS vars output.
+		// Editor and component styles should be excluded from the default CSS vars output.
 		.concat(
-			file.includes( 'common.scss' ) || ! file.includes( 'block-library' )
+			file.includes( 'common.scss' ) ||
+				! (
+					file.includes( 'block-library' ) ||
+					file.includes( 'components' )
+				)
 				? [ 'default-custom-properties' ]
 				: []
 		)
@@ -118,9 +126,10 @@ async function buildCSS( file ) {
 		data: ''.concat( '@use "sass:math";', importLists, contents ),
 	} );
 
-	const result = await postcss(
-		require( '@wordpress/postcss-plugins-preset' )
-	).process( builtSass.css, {
+	const result = await postcss( [
+		require( 'postcss-local-keyframes' ),
+		...require( '@wordpress/postcss-plugins-preset' ),
+	] ).process( builtSass.css, {
 		from: 'src/app.css',
 		to: 'dest/app.css',
 	} );

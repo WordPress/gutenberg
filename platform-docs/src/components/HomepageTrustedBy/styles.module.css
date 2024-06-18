@@ -1,0 +1,27 @@
+.container {
+	padding: 5rem 0 4rem;
+	background: #fff;
+	color: var(--ifm-color-gray-800);
+}
+
+.container > div {
+	margin: auto;
+	max-width: var(--ifm-container-width);
+}
+
+.title {
+	text-align: center;
+	margin-bottom: 0;
+	flex-shrink: 0;
+}
+
+.row {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 2rem;
+}
+
+.col > img {
+	filter: grayscale(1);
+}

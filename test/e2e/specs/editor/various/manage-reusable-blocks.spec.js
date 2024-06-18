@@ -35,7 +35,7 @@ test.describe( 'Managing reusable blocks', () => {
 
 		// Wait for the success notice.
 		await expect(
-			page.locator( 'text=Reusable block imported successfully!' )
+			page.locator( 'text=Pattern imported successfully!' )
 		).toBeVisible();
 
 		// Refresh the page.

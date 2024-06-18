@@ -1,3 +1,9 @@
+// Include the default WP Components color variables.
+// TODO: Remove this once all admin-scheme variables are accounted for in the wp-components fallback values.
+:root {
+	@include admin-scheme(#3858e9);
+}
+
 // Variables
 @import "./utils/theme-variables.scss";
 
@@ -21,6 +27,7 @@
 @import "./dropdown-menu/style.scss";
 @import "./duotone-picker/style.scss";
 @import "./duotone-picker/color-list-picker/style.scss";
+@import "./external-link/style.scss";
 @import "./form-toggle/style.scss";
 @import "./form-token-field/style.scss";
 @import "./guide/style.scss";
@@ -38,7 +45,6 @@
 @import "./responsive-wrapper/style.scss";
 @import "./sandbox/style.scss";
 @import "./scroll-lock/style.scss";
-@import "./search-control/style.scss";
 @import "./select-control/style.scss";
 @import "./snackbar/style.scss";
 @import "./tab-panel/style.scss";

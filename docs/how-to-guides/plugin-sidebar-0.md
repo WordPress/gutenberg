@@ -6,25 +6,25 @@ How to add a sidebar to your plugin. A sidebar is the region to the far right of
 
 ![Example sidebar](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/sidebar-up-and-running.png)
 
-_Note: this tutorial covers a custom sidebar, if you are looking to add controls to the sidebar see the [Block Toolbar and Settings Sidebar](/docs/how-to-guides/block-tutorial/block-controls-toolbar-and-sidebar.md)_
+_Note: this tutorial covers a custom sidebar, if you are looking to add controls to the sidebar see the [Block Toolbar and Settings Sidebar](/docs/getting-started/fundamentals/block-in-the-editor.md)_
 
 ## Before you start
 
-The tutorial assumes you have an existing plugin setup and are ready to add PHP and JavaScript code. Please, refer to [Getting started with JavaScript](/docs/how-to-guides/javascript/README.md) tutorial for an introduction to WordPress plugins and how to use JavaScript to extend the block editor.
+The tutorial assumes you have an existing plugin setup and are ready to add PHP and JavaScript code. Please, refer to [Getting started with JavaScript](/docs/getting-started/fundamentals/javascript-in-the-block-editor.md) tutorial for an introduction to WordPress plugins and how to use JavaScript to extend the block editor.
 
 ## Step-by-step guide
 
-### Step 1: Get a Sidebar up and Running
+### Step 1: Get a sidebar up and running
 
-The first step is to tell the editor that there is a new plugin that will have its own sidebar. Use the [registerPlugin](/packages/plugins/README.md), [PluginSidebar](/packages/edit-post/README.md#pluginsidebar), and [createElement](/packages/element/README.md) utilities provided by the `@wordpress/plugins`, `@wordpress/edit-post`, and `@wordpress/element` packages, respectively.
+The first step is to tell the editor that there is a new plugin that will have its own sidebar. Use the [registerPlugin](/packages/plugins/README.md), [PluginSidebar](/packages/editor/README.md#pluginsidebar), and [createElement](/packages/element/README.md) utilities provided by the `@wordpress/plugins`, `@wordpress/editor`, and `react` packages, respectively.
 
 Add the following code to a JavaScript file called `plugin-sidebar.js` and save it within your plugin's directory:
 
 ```js
-( function ( wp ) {
+( function ( wp, React ) {
+	var el = React.createElement;
 	var registerPlugin = wp.plugins.registerPlugin;
-	var PluginSidebar = wp.editPost.PluginSidebar;
-	var el = wp.element.createElement;
+	var PluginSidebar = wp.editor.PluginSidebar;
 
 	registerPlugin( 'my-plugin-sidebar', {
 		render: function () {
@@ -39,10 +39,10 @@ Add the following code to a JavaScript file called `plugin-sidebar.js` and save 
 			);
 		},
 	} );
-} )( window.wp );
+} )( window.wp, window.React );
 ```
 
-For this code to work, those utilities need to be available in the browser, so you must specify `wp-plugins`, `wp-edit-post`, and `wp-element` as dependencies of your script.
+For this code to work, those utilities need to be available in the browser, so you must specify `wp-plugins`, `wp-edit-post`, and `react` as dependencies of your script.
 
 Here is the PHP code to register your script and specify the dependencies:
 
@@ -57,7 +57,7 @@ function sidebar_plugin_register() {
 	wp_register_script(
 		'plugin-sidebar-js',
 		plugins_url( 'plugin-sidebar.js', __FILE__ ),
-		array( 'wp-plugins', 'wp-edit-post', 'wp-element' )
+		array( 'wp-plugins', 'wp-editor', 'react' )
 	);
 }
 add_action( 'init', 'sidebar_plugin_register' );
@@ -80,9 +80,9 @@ To visualize and edit the meta field value you'll use an input component. The `@
 
 ```js
 ( function ( wp ) {
+	var el = React.createElement;
 	var registerPlugin = wp.plugins.registerPlugin;
-	var PluginSidebar = wp.editPost.PluginSidebar;
-	var el = wp.element.createElement;
+	var PluginSidebar = wp.editor.PluginSidebar;
 	var TextControl = wp.components.TextControl;
 
 	registerPlugin( 'my-plugin-sidebar', {
@@ -142,9 +142,9 @@ function sidebar_plugin_register() {
 		'plugin-sidebar-js',
 		plugins_url( 'plugin-sidebar.js', __FILE__ ),
 		array(
+			'react',
 			'wp-plugins',
-			'wp-edit-post',
-			'wp-element',
+			'wp-editor',
 			'wp-components'
 		)
 	);
@@ -168,7 +168,7 @@ Reload the editor and open the sidebar:
 
 This code doesn't let users store or retrieve data just yet, so the next steps will focus on how to connect it to the meta block field.
 
-### Step 3: Register the Meta Field
+### Step 3: Register the meta field
 
 To work with fields in the `post_meta` table, use the [register_post_meta](https://developer.wordpress.org/reference/functions/register_post_meta/). function to create a new field called `sidebar_plugin_meta_block_field`.
 
@@ -194,15 +194,15 @@ The function will return an object containing the registered meta field you regi
 
 If the code returns `undefined` make sure your post type supports `custom-fields`. Either when [registering the post](https://developer.wordpress.org/reference/functions/register_post_type/#supports) or with [add_post_type_support function](https://developer.wordpress.org/reference/functions/add_post_type_support/).
 
-### Step 4: Initialize the Input Control
+### Step 4: Initialize the input control
 
 With the field available in the editor store, it can now be surfaced to the UI. We extract the input control to a function to keep the code clean as we add functionality.
 
 ```js
 ( function ( wp ) {
+	var el = React.createElement;
 	var registerPlugin = wp.plugins.registerPlugin;
-	var PluginSidebar = wp.editPost.PluginSidebar;
-	var el = wp.element.createElement;
+	var PluginSidebar = wp.editor.PluginSidebar;
 	var TextControl = wp.components.TextControl;
 
 	var MetaBlockField = function () {
@@ -241,9 +241,9 @@ The `useSelect` function is used to fetch data when the component loads and will
 
 ```js
 ( function ( wp ) {
+	var el = React.createElement;
 	var registerPlugin = wp.plugins.registerPlugin;
-	var PluginSidebar = wp.editPost.PluginSidebar;
-	var el = wp.element.createElement;
+	var PluginSidebar = wp.editor.PluginSidebar;
 	var Text = wp.components.TextControl;
 	var useSelect = wp.data.useSelect;
 
@@ -297,16 +297,16 @@ wp.data
 
 You can observe the content changing in the input component.
 
-### Step 5: Update the Meta Field When the Input's Content Changes
+### Step 5: Update the meta field when the input's content changes
 
 The last step is to update the meta field when the input content changes.
 The `useDispatch` function takes a store name as its only argument and returns methods that you can use to update the store, in this case we'll use `editPost`
 
 ```js
 ( function ( wp ) {
+	var el = React.createElement;
 	var registerPlugin = wp.plugins.registerPlugin;
-	var PluginSidebar = wp.editPost.PluginSidebar;
-	var el = wp.element.createElement;
+	var PluginSidebar = wp.editor.PluginSidebar;
 	var TextControl = wp.components.TextControl;
 	var useSelect = wp.data.useSelect;
 	var useDispatch = wp.data.useDispatch;
@@ -379,4 +379,32 @@ Functions used in this guide:
 
 You now have a custom sidebar that you can use to update `post_meta` content.
 
-A complete example is available, download the [plugin-sidebar example](https://github.com/WordPress/gutenberg-examples/tree/trunk/blocks-non-jsx/plugin-sidebar) from the [gutenberg-examples](https://github.com/WordPress/gutenberg-examples) repository.
+A complete example is available, download the [plugin-sidebar example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/plugin-sidebar-9ee4a6) from the [block-development-examples](https://github.com/WordPress/block-development-examples) repository.
+
+### Note
+
+If you have enabled Custom Fields in the 'Panels' page of the Editor 'Preferences' (via the three dots in top right), a field with the same name as the TextControl, in this case `sidebar_plugin_meta_block_field`, will also appear in the custom fields panel at the bottom of the editor window. These two fields have access to the same meta property.
+
+![Text Control and Custom Field](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/plugin-sidebar-text-control-custom-field.png)
+
+On saving the post the value in the TextControl will be saved first and the value in the custom field will be saved second, so that is the one that ends up persisting in the database. So if you change the value in the TextControl it is still the one in the custom field that ends up getting saved.
+
+This problem does not exist if Custom Fields is not enabled.
+
+If you need to have Custom Fields enabled and also have post meta in the sidebar there are two possible solutions:
+
+1. Precede the name of the meta field with an underscore, so the name in the above example would be `_sidebar_plugin_meta_block_field`. This indicates that the post meta should be treated as private so it will not be visible in the Custom Fields section of a post. With this solution an error will be generated when you save the post unless you add an `auth_callback` property to the `args` array passed to `register_post_meta` with a function that ultimately returns `true`.  See the `args` documentation in the [post_meta](https://developer.wordpress.org/reference/functions/register_meta/#parameters) page for more info.
+2. In the TextControl's `onChange` function, target the Value field textarea and set the value there to be the same as the value in the TextControl meta field. The value will then be identical in both places and so you can be assured that if the value is changed in the TextControl then it will still be saved to the database.
+
+```js
+return el( TextControl, {
+  label: 'Meta Block Field',
+  value: metaFieldValue,
+  onChange: function ( content ) {
+    editPost( {
+      meta: { sidebar_plugin_meta_block_field: content }
+    })
+    document.querySelector( {the-value-textarea} ).innerHTML = content;
+  },
+} );
+```

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classNames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -18,11 +18,7 @@ import {
  * Internal dependencies
  */
 import useAvailableAlignments from './use-available-alignments';
-import {
-	BLOCK_ALIGNMENTS_CONTROLS,
-	DEFAULT_CONTROL,
-	POPOVER_PROPS,
-} from './constants';
+import { BLOCK_ALIGNMENTS_CONTROLS, DEFAULT_CONTROL } from './constants';
 
 function BlockAlignmentUI( {
 	value,
@@ -69,7 +65,6 @@ function BlockAlignmentUI( {
 		  }
 		: {
 				toggleProps: { describedBy: __( 'Change alignment' ) },
-				popoverProps: POPOVER_PROPS,
 				children: ( { onClose } ) => {
 					return (
 						<>
@@ -90,7 +85,7 @@ function BlockAlignmentUI( {
 												key={ controlName }
 												icon={ icon }
 												iconPosition="left"
-												className={ classNames(
+												className={ clsx(
 													'components-dropdown-menu__menu-item',
 													{
 														'is-active': isSelected,

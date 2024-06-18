@@ -26,19 +26,21 @@ test.describe( 'new editor state', () => {
 		await expect( page ).toHaveURL( /post-new.php/ );
 
 		// Should display the blank title.
-		const title = page.locator( 'role=textbox[name="Add title"i]' );
+		const title = editor.canvas.locator(
+			'role=textbox[name="Add title"i]'
+		);
 		await expect( title ).toBeEditable();
 		await expect( title ).toHaveText( '' );
 
-		// Should display the Preview button.
+		// Should display the View button.
 		await expect(
-			page.locator( 'role=button[name="Preview"i]' )
+			page.locator( 'role=button[name="View"i]' )
 		).toBeVisible();
 
 		// Should display the Post Formats UI.
 		await editor.openDocumentSettingsSidebar();
 		await expect(
-			page.locator( 'role=combobox[name="Post Format"i]' )
+			page.locator( 'role=button[name="Change Format: Standard"i]' )
 		).toBeVisible();
 	} );
 
@@ -55,31 +57,28 @@ test.describe( 'new editor state', () => {
 
 	test( 'should focus the title if the title is empty', async ( {
 		admin,
-		page,
+		editor,
 	} ) => {
 		await admin.createNewPost();
 
 		await expect(
-			page.locator( 'role=textbox[name="Add title"i]' )
+			editor.canvas.locator( 'role=textbox[name="Add title"i]' )
 		).toBeFocused();
 	} );
 
 	test( 'should not focus the title if the title exists', async ( {
 		admin,
 		page,
+		editor,
 	} ) => {
 		await admin.createNewPost();
 
 		// Enter a title for this post.
-		await page.type(
-			'role=textbox[name="Add title"i]',
-			'Here is the title'
-		);
+		await editor.canvas
+			.locator( 'role=textbox[name="Add title"i]' )
+			.type( 'Here is the title' );
 		// Save the post as a draft.
-		await page.click( 'role=button[name="Save draft"i]' );
-		await page.waitForSelector(
-			'role=button[name="Dismiss this notice"] >> text=Draft saved'
-		);
+		await editor.saveDraft();
 
 		// Reload the browser so a post is loaded with a title.
 		await page.reload();

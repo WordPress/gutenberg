@@ -36,7 +36,7 @@ type Props = {
  */
 export default createHigherOrderComponent(
 	// @ts-expect-error TODO: Reconcile with intended `createHigherOrderComponent` types
-	( options: WPComponent | Record< string, unknown > ) => {
+	( options: React.ComponentType | Record< string, unknown > ) => {
 		const HoC =
 			( { onFocusReturn }: Props = {} ) =>
 			( WrappedComponent: React.ComponentType ) => {

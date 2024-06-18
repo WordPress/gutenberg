@@ -4,12 +4,6 @@ SelectControl allow users to select from a single or multiple option menu. It fu
 
 ![A “Link To” select with “none” selected.](https://wordpress.org/gutenberg/files/2018/12/select.png)
 
-## Table of contents
-
-1. [Design guidelines](#design-guidelines)
-2. [Development guidelines](#development-guidelines)
-3. [Related components](#related-components)
-
 ## Design guidelines
 
 ### Usage
@@ -82,8 +76,8 @@ Use sentences in your menu.
 Render a user interface to select the size of an image.
 
 ```jsx
+import { useState } from 'react';
 import { SelectControl } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const MySelectControl = () => {
 	const [ size, setSize ] = useState( '50%' );
@@ -182,7 +176,7 @@ If true, the label will only be visible to screen readers.
 
 If this property is added, a help text will be generated using help property as the content.
 
--   Type: `String|WPElement`
+-   Type: `String|Element`
 -   Required: No
 
 #### multiple

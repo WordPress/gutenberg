@@ -13,7 +13,7 @@ const arrowMap = {
 export default function QueryPaginationNextEdit( {
 	attributes: { label },
 	setAttributes,
-	context: { paginationArrow },
+	context: { paginationArrow, showLabel },
 } ) {
 	const displayArrow = arrowMap[ paginationArrow ];
 	return (
@@ -22,20 +22,22 @@ export default function QueryPaginationNextEdit( {
 			onClick={ ( event ) => event.preventDefault() }
 			{ ...useBlockProps() }
 		>
-			<PlainText
-				__experimentalVersion={ 2 }
-				tagName="span"
-				aria-label={ __( 'Next page link' ) }
-				placeholder={ __( 'Next Page' ) }
-				value={ label }
-				onChange={ ( newLabel ) =>
-					setAttributes( { label: newLabel } )
-				}
-			/>
+			{ showLabel && (
+				<PlainText
+					__experimentalVersion={ 2 }
+					tagName="span"
+					aria-label={ __( 'Next page link' ) }
+					placeholder={ __( 'Next Page' ) }
+					value={ label }
+					onChange={ ( newLabel ) =>
+						setAttributes( { label: newLabel } )
+					}
+				/>
+			) }
 			{ displayArrow && (
 				<span
 					className={ `wp-block-query-pagination-next-arrow is-arrow-${ paginationArrow }` }
-					aria-hidden={ true }
+					aria-hidden
 				>
 					{ displayArrow }
 				</span>

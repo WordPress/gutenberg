@@ -17,3 +17,5 @@ function Example() {
 The spinner component should:
 
 -   Signal to users that the processing of their request is underway and will soon complete.
+
+Check out the [Storybook page](https://wordpress.github.io/gutenberg/?path=/docs/components-spinner--docs) for a visual exploration of this component.

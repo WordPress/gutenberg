@@ -23,7 +23,7 @@ function gutenberg_get_block_editor_settings_mobile( $settings ) {
 		'mobile' === $_GET['context']
 	) {
 		if ( wp_theme_has_theme_json() ) {
-			$settings['__experimentalStyles'] = wp_get_global_styles();
+			$settings['__experimentalStyles'] = gutenberg_get_global_styles();
 		}
 
 		// To tell mobile that the site uses quote v2 (inner blocks).

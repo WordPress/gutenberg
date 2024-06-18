@@ -27,8 +27,12 @@
  * Update URI:        {{{updateURI}}}
 {{/updateURI}}
  *
- * @package           {{namespace}}
+ * @package {{namespacePascalCase}}
  */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
 
 /**
  * Registers the block using the metadata loaded from the `block.json` file.

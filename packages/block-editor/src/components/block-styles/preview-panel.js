@@ -33,7 +33,5 @@ export default function BlockStylesPreviewPanel( {
 		};
 	}, [ genericPreviewBlock, styleClassName ] );
 
-	return (
-		<InserterPreviewPanel item={ previewBlocks } isStylePreview={ true } />
-	);
+	return <InserterPreviewPanel item={ previewBlocks } />;
 }

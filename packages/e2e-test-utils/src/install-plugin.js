@@ -20,6 +20,8 @@ export async function installPlugin( slug, searchTerm ) {
 			'&tab=search&type=term'
 	);
 	await page.click( `.install-now[data-slug="${ slug }"]` );
-	await page.waitForSelector( `.activate-now[data-slug="${ slug }"]` );
+	await page.waitForSelector( `.activate-now[data-slug="${ slug }"]`, {
+		timeout: 60000,
+	} );
 	await switchUserToTest();
 }

@@ -4,6 +4,9 @@
 		// Stop file block from collapsing when floated.
 		height: auto;
 	}
+	.wp-block[data-align="center"] > & {
+		text-align: center;
+	}
 
 	display: flex;
 	flex-wrap: wrap;
@@ -35,6 +38,10 @@
 
 	a {
 		min-width: 1em;
+
+		&:not(.wp-block-file__button) {
+			display: inline-block;
+		}
 	}
 
 	.wp-block-file__button-richtext-wrapper {

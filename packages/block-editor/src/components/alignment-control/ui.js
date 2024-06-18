@@ -24,8 +24,7 @@ const DEFAULT_ALIGNMENT_CONTROLS = [
 ];
 
 const POPOVER_PROPS = {
-	position: 'bottom right',
-	variant: 'toolbar',
+	placement: 'bottom-start',
 };
 
 function AlignmentUI( {
@@ -46,7 +45,9 @@ function AlignmentUI( {
 	);
 
 	function setIcon() {
-		if ( activeAlignment ) return activeAlignment.icon;
+		if ( activeAlignment ) {
+			return activeAlignment.icon;
+		}
 		return isRTL() ? alignRight : alignLeft;
 	}
 

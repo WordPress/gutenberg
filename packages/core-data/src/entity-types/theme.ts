@@ -86,6 +86,10 @@ declare module './base-entity-records' {
 			 */
 			'automatic-feed-links': boolean;
 			/**
+			 * Whether border settings are enabled.
+			 */
+			border: boolean;
+			/**
 			 * Custom background if defined by the theme.
 			 */
 			'custom-background': boolean | CustomBackground;
@@ -126,6 +130,10 @@ declare module './base-entity-records' {
 			 */
 			'editor-font-sizes': boolean | FontSize[];
 			/**
+			 * Custom spacing sizes if defined by the theme.
+			 */
+			'editor-spacing-sizes': boolean | SpacingSize[];
+			/**
 			 * Custom gradient presets if defined by the theme.
 			 */
 			'editor-gradient-presets': boolean | GradientPreset[];
@@ -141,6 +149,10 @@ declare module './base-entity-records' {
 			 * Post formats supported.
 			 */
 			formats: PostFormat[];
+			/**
+			 * Whether link colors are enabled.
+			 */
+			'link-color': boolean;
 			/**
 			 * The post types that support thumbnails or true if all post types are supported.
 			 */
@@ -199,6 +211,12 @@ declare module './base-entity-records' {
 		}
 
 		export interface FontSize {
+			name: string;
+			size: number;
+			slug: string;
+		}
+
+		export interface SpacingSize {
 			name: string;
 			size: number;
 			slug: string;

@@ -2,36 +2,35 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { __experimentalUseNavigator as useNavigator } from '@wordpress/components';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
+import { unlock } from '../../lock-unlock';
+import DataviewsTemplatesSidebarContent from './content';
 
-const config = {
-	wp_template: {
-		title: __( 'All templates' ),
-		description: __(
-			'Create new templates, or reset any customizations made to the templates supplied by your theme.'
-		),
-	},
-	wp_template_part: {
-		title: __( 'All template parts' ),
-		description: __(
-			'Create new template parts, or reset any customizations made to the template parts supplied by your theme.'
-		),
-	},
-};
+const { useLocation } = unlock( routerPrivateApis );
 
-export default function SidebarNavigationScreenTemplatesBrowse() {
+export default function SidebarNavigationScreenTemplatesBrowse( { backPath } ) {
 	const {
-		params: { postType },
-	} = useNavigator();
+		params: { activeView = 'all' },
+	} = useLocation();
+
 	return (
 		<SidebarNavigationScreen
-			title={ config[ postType ].title }
-			description={ config[ postType ].description }
+			title={ __( 'Templates' ) }
+			description={ __(
+				'Create new templates, or reset any customizations made to the templates supplied by your theme.'
+			) }
+			backPath={ backPath }
+			content={
+				<DataviewsTemplatesSidebarContent
+					activeView={ activeView }
+					title={ __( 'All templates' ) }
+				/>
+			}
 		/>
 	);
 }

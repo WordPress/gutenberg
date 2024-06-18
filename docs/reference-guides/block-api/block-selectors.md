@@ -1,19 +1,12 @@
 # Selectors
 
-<div class="callout callout-alert">
-	This API was stabilized in Gutenberg 15.5 and is planned for core release
-	in WordPress 6.3. To use this prior to WordPress 6.3, you will need to
-	install and activate Gutenberg >= 15.5.
-</div>
-<br />
-
 Block Selectors is the API that allows blocks to customize the CSS selector used
 when their styles are generated.
 
 A block may customize its CSS selectors at three levels: root, feature, and
 subfeature.
 
-## Root Selector
+## Root selector
 
 The root selector is the block's primary CSS selector.
 
@@ -22,6 +15,7 @@ included under. If one is not provided through the Block Selectors API, a
 default is generated in the form of `.wp-block-<name>`.
 
 ### Example
+
 ```json
 {
 	...
@@ -31,7 +25,7 @@ default is generated in the form of `.wp-block-<name>`.
 }
 ```
 
-## Feature Selectors
+## Feature selectors
 
 Feature selectors relate to styles for a block support, e.g. border, color,
 typography, etc.
@@ -41,6 +35,7 @@ elements within a block. An example might be using colors on the block's wrapper
 but applying the typography styles to an inner heading only.
 
 ### Example
+
 ```json
 {
 	...
@@ -52,7 +47,7 @@ but applying the typography styles to an inner heading only.
 }
 ```
 
-## Subfeature Selectors
+## Subfeature selectors
 
 These selectors relate to individual styles provided by a block support e.g.
 `background-color`
@@ -67,6 +62,7 @@ assigning `text-decoration` a custom selector, its style can target only the
 elements to which it should be applied.
 
 ### Example
+
 ```json
 {
 	...
@@ -98,6 +94,7 @@ common selector as the parent feature's `root` selector and only define the
 unique selectors for the subfeatures that differ.
 
 ### Example
+
 ```json
 {
 	...

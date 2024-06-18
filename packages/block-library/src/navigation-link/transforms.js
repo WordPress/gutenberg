@@ -47,6 +47,13 @@ const transforms = {
 				return createBlock( 'core/navigation-link' );
 			},
 		},
+		{
+			type: 'block',
+			blocks: [ 'core/buttons' ],
+			transform: () => {
+				return createBlock( 'core/navigation-link' );
+			},
+		},
 	],
 	to: [
 		{
@@ -103,6 +110,21 @@ const transforms = {
 			blocks: [ 'core/page-list' ],
 			transform: () => {
 				return createBlock( 'core/page-list' );
+			},
+		},
+		{
+			type: 'block',
+			blocks: [ 'core/buttons' ],
+			transform: ( { label, url, rel, title, opensInNewTab } ) => {
+				return createBlock( 'core/buttons', {}, [
+					createBlock( 'core/button', {
+						text: label,
+						url,
+						rel,
+						title,
+						linkTarget: opensInNewTab ? '_blank' : undefined,
+					} ),
+				] );
 			},
 		},
 	],

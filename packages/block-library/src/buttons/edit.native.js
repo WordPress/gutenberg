@@ -21,12 +21,13 @@ import { alignmentHelpers } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { name as buttonBlockName } from '../button/';
 import styles from './editor.scss';
 
-const ALLOWED_BLOCKS = [ buttonBlockName ];
-
 const layoutProp = { type: 'default', alignments: [] };
+
+const POPOVER_PROPS = {
+	placement: 'bottom-start',
+};
 
 export default function ButtonsEdit( {
 	attributes: { layout, align },
@@ -41,7 +42,7 @@ export default function ButtonsEdit( {
 	const { marginLeft: spacing } = styles.spacing;
 
 	// Extract attributes from block layout
-	const layoutBlockSupport = getBlockSupport( name, '__experimentalLayout' );
+	const layoutBlockSupport = getBlockSupport( name, 'layout' );
 	const defaultBlockLayout = layoutBlockSupport?.default;
 	const usedLayout = layout || defaultBlockLayout || {};
 	const { justifyContent } = usedLayout;
@@ -67,13 +68,6 @@ export default function ButtonsEdit( {
 		},
 		[ clientId ]
 	);
-
-	const preferredStyle = useSelect( ( select ) => {
-		const preferredStyleVariations =
-			select( blockEditorStore ).getSettings()
-				.__experimentalPreferredStyleVariations;
-		return preferredStyleVariations?.value?.[ buttonBlockName ];
-	}, [] );
 
 	const { getBlockOrder } = useSelect( blockEditorStore );
 	const { insertBlock, removeBlock, selectBlock } =
@@ -112,7 +106,7 @@ export default function ButtonsEdit( {
 	const renderFooterAppender = useRef( () => (
 		<View style={ styles.appenderContainer }>
 			<InnerBlocks.ButtonBlockAppender
-				isFloating={ true }
+				isFloating
 				onAddBlock={ onAddNextButton }
 			/>
 		</View>
@@ -137,26 +131,13 @@ export default function ButtonsEdit( {
 								},
 							} )
 						}
-						popoverProps={ {
-							position: 'bottom right',
-							variant: 'toolbar',
-						} }
+						popoverProps={ POPOVER_PROPS }
 					/>
 				</BlockControls>
 			) }
 			{ resizeObserver }
 			<InnerBlocks
-				allowedBlocks={ ALLOWED_BLOCKS }
-				template={ [
-					[
-						buttonBlockName,
-						{
-							className:
-								preferredStyle &&
-								`is-style-${ preferredStyle }`,
-						},
-					],
-				] }
+				template={ [ [ 'core/button' ] ] }
 				renderFooterAppender={
 					shouldRenderFooterAppender && renderFooterAppender.current
 				}
@@ -167,7 +148,7 @@ export default function ButtonsEdit( {
 				parentWidth={ maxWidth } // This value controls the width of that the buttons are able to expand to.
 				marginHorizontal={ spacing }
 				marginVertical={ spacing }
-				__experimentalLayout={ layoutProp }
+				layout={ layoutProp }
 				templateInsertUpdatesSelection
 				blockWidth={ blockWidth }
 			/>

@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { useViewportMatch } from '@wordpress/compose';
 import {
 	__experimentalVStack as VStack,
 	__experimentalPaletteEdit as PaletteEdit,
@@ -14,9 +15,10 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import Subtitle from './subtitle';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
+const mobilePopoverProps = { placement: 'bottom-start', offset: 8 };
 
 const noop = () => {};
 
@@ -63,10 +65,13 @@ export default function GradientPalettePanel( { name } ) {
 		...( defaultDuotone && defaultDuotoneEnabled ? defaultDuotone : [] ),
 	];
 
+	const isMobileViewport = useViewportMatch( 'small', '<' );
+	const popoverProps = isMobileViewport ? mobilePopoverProps : undefined;
+
 	return (
 		<VStack
 			className="edit-site-global-styles-gradient-palette-panel"
-			spacing={ 10 }
+			spacing={ 8 }
 		>
 			{ !! themeGradients && !! themeGradients.length && (
 				<PaletteEdit
@@ -76,6 +81,7 @@ export default function GradientPalettePanel( { name } ) {
 					onChange={ setThemeGradients }
 					paletteLabel={ __( 'Theme' ) }
 					paletteLabelHeadingLevel={ 3 }
+					popoverProps={ popoverProps }
 				/>
 			) }
 			{ !! defaultGradients &&
@@ -88,6 +94,7 @@ export default function GradientPalettePanel( { name } ) {
 						onChange={ setDefaultGradients }
 						paletteLabel={ __( 'Default' ) }
 						paletteLabelLevel={ 3 }
+						popoverProps={ popoverProps }
 					/>
 				) }
 			<PaletteEdit
@@ -95,10 +102,8 @@ export default function GradientPalettePanel( { name } ) {
 				onChange={ setCustomGradients }
 				paletteLabel={ __( 'Custom' ) }
 				paletteLabelLevel={ 3 }
-				emptyMessage={ __(
-					'Custom gradients are empty! Add some gradients to create your own palette.'
-				) }
 				slugPrefix="custom-"
+				popoverProps={ popoverProps }
 			/>
 			{ !! duotonePalette && !! duotonePalette.length && (
 				<div>
@@ -106,8 +111,8 @@ export default function GradientPalettePanel( { name } ) {
 					<Spacer margin={ 3 } />
 					<DuotonePicker
 						duotonePalette={ duotonePalette }
-						disableCustomDuotone={ true }
-						disableCustomColors={ true }
+						disableCustomDuotone
+						disableCustomColors
 						clearable={ false }
 						onChange={ noop }
 					/>

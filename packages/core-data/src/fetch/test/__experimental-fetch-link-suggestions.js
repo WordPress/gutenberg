@@ -1,7 +1,11 @@
 /**
  * Internal dependencies
  */
-import fetchLinkSuggestions from '../__experimental-fetch-link-suggestions';
+import {
+	default as fetchLinkSuggestions,
+	sortResults,
+	tokenize,
+} from '../__experimental-fetch-link-suggestions';
 
 jest.mock( '@wordpress/api-fetch', () =>
 	jest.fn( ( { path } ) => {
@@ -231,22 +235,73 @@ describe( 'fetchLinkSuggestions', () => {
 			] )
 		);
 	} );
-	it( 'initial search suggestions limits results', () => {
-		return fetchLinkSuggestions( '', {
-			type: 'post',
-			subtype: 'page',
-			isInitialSuggestions: true,
-		} ).then( ( suggestions ) =>
-			expect( suggestions ).toEqual( [
-				{
-					id: 11,
-					title: 'Limit Case',
-					url: 'http://wordpress.local/limit-case/',
-					type: 'page',
-					kind: 'post-type',
+	describe( 'Initial search suggestions', () => {
+		it( 'initial search suggestions limits results', () => {
+			return fetchLinkSuggestions( '', {
+				type: 'post',
+				subtype: 'page',
+				isInitialSuggestions: true,
+			} ).then( ( suggestions ) =>
+				expect( suggestions ).toEqual( [
+					{
+						id: 11,
+						title: 'Limit Case',
+						url: 'http://wordpress.local/limit-case/',
+						type: 'page',
+						kind: 'post-type',
+					},
+				] )
+			);
+		} );
+
+		it( 'should allow custom search options for initial suggestions', () => {
+			return fetchLinkSuggestions( '', {
+				type: 'term',
+				subtype: 'category',
+				page: 11,
+				isInitialSuggestions: true,
+				initialSuggestionsSearchOptions: {
+					type: 'post',
+					subtype: 'page',
+					perPage: 20,
+					page: 11,
 				},
-			] )
-		);
+			} ).then( ( suggestions ) =>
+				expect( suggestions ).toEqual( [
+					{
+						id: 22,
+						title: 'Page Case',
+						url: 'http://wordpress.local/page-case/',
+						type: 'page',
+						kind: 'post-type',
+					},
+				] )
+			);
+		} );
+
+		it( 'should default any missing initial search options to those from the main search options', () => {
+			return fetchLinkSuggestions( '', {
+				type: 'post',
+				subtype: 'page',
+				page: 11,
+				perPage: 20,
+				isInitialSuggestions: true,
+				initialSuggestionsSearchOptions: {
+					// intentionally missing.
+					// expected to default to those from the main search options.
+				},
+			} ).then( ( suggestions ) =>
+				expect( suggestions ).toEqual( [
+					{
+						id: 22,
+						title: 'Page Case',
+						url: 'http://wordpress.local/page-case/',
+						type: 'page',
+						kind: 'post-type',
+					},
+				] )
+			);
+		} );
 	} );
 	it( 'allows searching from a page', () => {
 		return fetchLinkSuggestions( '', {
@@ -264,5 +319,95 @@ describe( 'fetchLinkSuggestions', () => {
 				},
 			] )
 		);
+	} );
+} );
+
+describe( 'sortResults', () => {
+	it( 'returns empty array for empty results', () => {
+		expect( sortResults( [], '' ) ).toEqual( [] );
+	} );
+
+	it( 'orders results', () => {
+		const results = [
+			{
+				id: 1,
+				title: 'How to get from Stockholm to Helsinki by boat',
+				url: 'http://wordpress.local/stockholm-helsinki-boat/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 2,
+				title: 'A day trip from Stockholm to Swedish countryside towns',
+				url: 'http://wordpress.local/day-trip-stockholm/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 3,
+				title: 'The art of packing lightly: How to travel with just a cabin bag',
+				url: 'http://wordpress.local/packing-lightly/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 4,
+				title: 'Tips for travel with a young baby',
+				url: 'http://wordpress.local/young-baby-tips/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 5,
+				title: '', // Test that empty titles don't cause an error.
+				url: 'http://wordpress.local/420/',
+				type: 'page',
+				kind: 'post-type',
+			},
+			{
+				id: 6,
+				title: 'City Guides',
+				url: 'http://wordpress.local/city-guides/',
+				type: 'category',
+				kind: 'taxonomy',
+			},
+			{
+				id: 7,
+				title: 'Travel Tips',
+				url: 'http://wordpress.local/travel-tips/',
+				type: 'category',
+				kind: 'taxonomy',
+			},
+		];
+		const order = sortResults( results, 'travel tips' ).map(
+			( result ) => result.id
+		);
+		expect( order ).toEqual( [
+			7, // exact match
+			4, // contains: travel, tips
+			3, // contains: travel
+			// same order as input:
+			1,
+			2,
+			5,
+			6,
+		] );
+	} );
+} );
+
+describe( 'tokenize', () => {
+	it( 'returns empty array for empty string', () => {
+		expect( tokenize( '' ) ).toEqual( [] );
+	} );
+
+	it( 'tokenizes a string', () => {
+		expect( tokenize( 'Hello, world!' ) ).toEqual( [ 'hello', 'world' ] );
+	} );
+
+	it( 'tokenizes non latin languages', () => {
+		expect( tokenize( 'こんにちは、世界！' ) ).toEqual( [
+			'こんにちは',
+			'世界',
+		] );
 	} );
 } );

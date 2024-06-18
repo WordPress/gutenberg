@@ -11,8 +11,9 @@
 	overflow: hidden;
 
 	.block-editor-block-preview__content {
-		// This element receives inline styles for width, height, and transform-scale.
+		// This element receives inline styles for transform-scale and aspect-ratio.
 		// Those inline styles are calculated to fit a perfect thumbnail.
+		width: 100%;
 
 		// Vertical alignment. It works with the transform: translate(-50%, -50%)`,
 		top: 0;

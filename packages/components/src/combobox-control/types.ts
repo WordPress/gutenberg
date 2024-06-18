@@ -6,6 +6,7 @@ import type { BaseControlProps } from '../base-control/types';
 export type ComboboxControlOption = {
 	label: string;
 	value: string;
+	disabled?: boolean;
 	[ key: string ]: any;
 };
 
@@ -26,17 +27,31 @@ export type ComboboxControlProps = Pick<
 		item: ComboboxControlOption;
 	} ) => React.ReactNode;
 	/**
+	 * Deprecated. Use `__next40pxDefaultSize` instead.
+	 *
+	 * @default false
+	 * @deprecated
+	 */
+	__next36pxDefaultSize?: boolean;
+	/**
 	 * Start opting into the larger default height that will become the default size in a future version.
 	 *
 	 * @default false
 	 */
-	__next36pxDefaultSize?: boolean;
+	__next40pxDefaultSize?: boolean;
 	/**
 	 * Show a reset button to clear the input.
 	 *
 	 * @default true
 	 */
 	allowReset?: boolean;
+	/**
+	 * Automatically expand the dropdown when the control is focused.
+	 * If the control is clicked, the dropdown will expand regardless of this prop.
+	 *
+	 * @default true
+	 */
+	expandOnFocus?: boolean;
 	/**
 	 * Customizable UI messages.
 	 */

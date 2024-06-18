@@ -18,7 +18,7 @@ test.describe( 'Site Editor Inserter', () => {
 
 	test.beforeEach( async ( { admin, editor } ) => {
 		await admin.visitSiteEditor();
-		await editor.canvas.click( 'body' );
+		await editor.canvas.locator( 'body' ).click();
 	} );
 
 	test( 'inserter toggle button should toggle global inserter', async ( {

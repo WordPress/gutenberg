@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -13,8 +13,6 @@ import {
 	__experimentalTruncate as Truncate,
 	Popover,
 } from '@wordpress/components';
-import deprecated from '@wordpress/deprecated';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -65,13 +63,12 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 		<div className="block-editor-block-styles">
 			<div className="block-editor-block-styles__variants">
 				{ stylesToRender.map( ( style ) => {
-					const buttonText = style.isDefault
-						? __( 'Default' )
-						: style.label || style.name;
+					const buttonText = style.label || style.name;
 
 					return (
 						<Button
-							className={ classnames(
+							__next40pxDefaultSize
+							className={ clsx(
 								'block-editor-block-styles__item',
 								{
 									'is-active':
@@ -101,7 +98,7 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 			{ hoveredStyle && ! isMobileViewport && (
 				<Popover
 					placement="left-start"
-					offset={ 20 }
+					offset={ 34 }
 					focusOnMount={ false }
 				>
 					<div
@@ -122,12 +119,3 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 }
 
 export default BlockStyles;
-
-BlockStyles.Slot = () => {
-	deprecated( 'BlockStyles.Slot', {
-		version: '6.4',
-		since: '6.2',
-	} );
-
-	return null;
-};

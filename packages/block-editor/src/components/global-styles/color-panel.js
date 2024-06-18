@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -12,30 +12,31 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalZStack as ZStack,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
-	TabPanel,
 	ColorIndicator,
 	Flex,
 	FlexItem,
 	Dropdown,
 	Button,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import ColorGradientControl from '../colors-gradients/control';
 import { useColorsPerOrigin, useGradientsPerOrigin } from './hooks';
-import { getValueFromVariable } from './utils';
-import { immutableSet } from '../../utils/object';
+import { getValueFromVariable, TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
+import { setImmutably } from '../../utils/object';
+import { unlock } from '../../lock-unlock';
 
 export function useHasColorPanel( settings ) {
 	const hasTextPanel = useHasTextPanel( settings );
 	const hasBackgroundPanel = useHasBackgroundPanel( settings );
 	const hasLinkPanel = useHasLinkPanel( settings );
 	const hasHeadingPanel = useHasHeadingPanel( settings );
-	const hasButtonPanel = useHasHeadingPanel( settings );
+	const hasButtonPanel = useHasButtonPanel( settings );
 	const hasCaptionPanel = useHasCaptionPanel( settings );
 
 	return (
@@ -122,13 +123,15 @@ function ColorToolsPanel( {
 
 	return (
 		<ToolsPanel
-			label={ __( 'Color' ) }
+			label={ __( 'Elements' ) }
 			resetAll={ resetAll }
 			panelId={ panelId }
 			hasInnerWrapper
+			headingLevel={ 3 }
 			className="color-block-support-panel"
 			__experimentalFirstVisibleItemClass="first"
 			__experimentalLastVisibleItemClass="last"
+			dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
 		>
 			<div className="color-block-support-panel__inner-wrapper">
 				{ children }
@@ -151,6 +154,8 @@ const popoverProps = {
 	offset: 36,
 	shift: true,
 };
+
+const { Tabs } = unlock( componentsPrivateApis );
 
 const LabeledColorIndicators = ( { indicators, label } ) => (
 	<HStack justify="flex-start">
@@ -203,13 +208,8 @@ function ColorPanelDropdown( {
 	colorGradientControlSettings,
 	panelId,
 } ) {
-	const tabConfigs = tabs.map( ( { key, label: tabLabel } ) => {
-		return {
-			name: key,
-			title: tabLabel,
-		};
-	} );
-
+	const currentTab = tabs.find( ( tab ) => tab.userValue !== undefined );
+	const { key: firstTabKey, ...firstTab } = tabs[ 0 ] ?? {};
 	return (
 		<ToolsPanelItem
 			className="block-editor-tools-panel-color-gradient-settings__item"
@@ -225,11 +225,16 @@ function ColorPanelDropdown( {
 				renderToggle={ ( { onToggle, isOpen } ) => {
 					const toggleProps = {
 						onClick: onToggle,
-						className: classnames(
+						className: clsx(
 							'block-editor-panel-color-gradient-settings__dropdown',
 							{ 'is-open': isOpen }
 						),
 						'aria-expanded': isOpen,
+						'aria-label': sprintf(
+							/* translators: %s is the type of color property, e.g., "background" */
+							__( 'Color %s styles' ),
+							label
+						),
 					};
 
 					return (
@@ -246,33 +251,46 @@ function ColorPanelDropdown( {
 						<div className="block-editor-panel-color-gradient-settings__dropdown-content">
 							{ tabs.length === 1 && (
 								<ColorPanelTab
-									{ ...tabs[ 0 ] }
+									key={ firstTabKey }
+									{ ...firstTab }
 									colorGradientControlSettings={
 										colorGradientControlSettings
 									}
 								/>
 							) }
 							{ tabs.length > 1 && (
-								<TabPanel tabs={ tabConfigs }>
-									{ ( tab ) => {
-										const selectedTab = tabs.find(
-											( t ) => t.key === tab.name
-										);
+								<Tabs defaultTabId={ currentTab?.key }>
+									<Tabs.TabList>
+										{ tabs.map( ( tab ) => (
+											<Tabs.Tab
+												key={ tab.key }
+												tabId={ tab.key }
+											>
+												{ tab.label }
+											</Tabs.Tab>
+										) ) }
+									</Tabs.TabList>
 
-										if ( ! selectedTab ) {
-											return null;
-										}
-
+									{ tabs.map( ( tab ) => {
+										const { key: tabKey, ...restTabProps } =
+											tab;
 										return (
-											<ColorPanelTab
-												{ ...selectedTab }
-												colorGradientControlSettings={
-													colorGradientControlSettings
-												}
-											/>
+											<Tabs.TabPanel
+												key={ tabKey }
+												tabId={ tabKey }
+												focusable={ false }
+											>
+												<ColorPanelTab
+													key={ tabKey }
+													{ ...restTabProps }
+													colorGradientControlSettings={
+														colorGradientControlSettings
+													}
+												/>
+											</Tabs.TabPanel>
 										);
-									} }
-								</TabPanel>
+									} ) }
+								</Tabs>
 							) }
 						</div>
 					</DropdownContentWrapper>
@@ -323,22 +341,6 @@ export default function ColorPanel( {
 			: gradientValue;
 	};
 
-	// Text Color
-	const showTextPanel = useHasTextPanel( settings );
-	const textColor = decodeValue( inheritedValue?.color?.text );
-	const userTextColor = decodeValue( value?.color?.text );
-	const hasTextColor = () => !! userTextColor;
-	const setTextColor = ( newColor ) => {
-		onChange(
-			immutableSet(
-				value,
-				[ 'color', 'text' ],
-				encodeColorValue( newColor )
-			)
-		);
-	};
-	const resetTextColor = () => setTextColor( undefined );
-
 	// BackgroundColor
 	const showBackgroundPanel = useHasBackgroundPanel( settings );
 	const backgroundColor = decodeValue( inheritedValue?.color?.background );
@@ -347,7 +349,7 @@ export default function ColorPanel( {
 	const userGradient = decodeValue( value?.color?.gradient );
 	const hasBackground = () => !! userBackgroundColor || !! userGradient;
 	const setBackgroundColor = ( newColor ) => {
-		const newValue = immutableSet(
+		const newValue = setImmutably(
 			value,
 			[ 'color', 'background' ],
 			encodeColorValue( newColor )
@@ -356,7 +358,7 @@ export default function ColorPanel( {
 		onChange( newValue );
 	};
 	const setGradient = ( newGradient ) => {
-		const newValue = immutableSet(
+		const newValue = setImmutably(
 			value,
 			[ 'color', 'gradient' ],
 			encodeGradientValue( newGradient )
@@ -365,7 +367,7 @@ export default function ColorPanel( {
 		onChange( newValue );
 	};
 	const resetBackground = () => {
-		const newValue = immutableSet(
+		const newValue = setImmutably(
 			value,
 			[ 'color', 'background' ],
 			undefined
@@ -382,7 +384,7 @@ export default function ColorPanel( {
 	const userLinkColor = decodeValue( value?.elements?.link?.color?.text );
 	const setLinkColor = ( newColor ) => {
 		onChange(
-			immutableSet(
+			setImmutably(
 				value,
 				[ 'elements', 'link', 'color', 'text' ],
 				encodeColorValue( newColor )
@@ -397,7 +399,7 @@ export default function ColorPanel( {
 	);
 	const setHoverLinkColor = ( newColor ) => {
 		onChange(
-			immutableSet(
+			setImmutably(
 				value,
 				[ 'elements', 'link', ':hover', 'color', 'text' ],
 				encodeColorValue( newColor )
@@ -406,18 +408,41 @@ export default function ColorPanel( {
 	};
 	const hasLink = () => !! userLinkColor || !! userHoverLinkColor;
 	const resetLink = () => {
-		let newValue = immutableSet(
+		let newValue = setImmutably(
 			value,
 			[ 'elements', 'link', ':hover', 'color', 'text' ],
 			undefined
 		);
-		newValue = immutableSet(
+		newValue = setImmutably(
 			newValue,
 			[ 'elements', 'link', 'color', 'text' ],
 			undefined
 		);
 		onChange( newValue );
 	};
+
+	// Text Color
+	const showTextPanel = useHasTextPanel( settings );
+	const textColor = decodeValue( inheritedValue?.color?.text );
+	const userTextColor = decodeValue( value?.color?.text );
+	const hasTextColor = () => !! userTextColor;
+	const setTextColor = ( newColor ) => {
+		let changedObject = setImmutably(
+			value,
+			[ 'color', 'text' ],
+			encodeColorValue( newColor )
+		);
+		if ( textColor === linkColor ) {
+			changedObject = setImmutably(
+				changedObject,
+				[ 'elements', 'link', 'color', 'text' ],
+				encodeColorValue( newColor )
+			);
+		}
+
+		onChange( changedObject );
+	};
+	const resetTextColor = () => setTextColor( undefined );
 
 	// Elements
 	const elements = [
@@ -520,14 +545,14 @@ export default function ColorPanel( {
 			isShownByDefault: defaultControls.background,
 			indicators: [ gradient ?? backgroundColor ],
 			tabs: [
-				{
+				hasSolidColors && {
 					key: 'background',
-					label: __( 'Solid' ),
+					label: __( 'Color' ),
 					inheritedValue: backgroundColor,
 					setValue: setBackgroundColor,
 					userValue: userBackgroundColor,
 				},
-				{
+				hasGradientColors && {
 					key: 'gradient',
 					label: __( 'Gradient' ),
 					inheritedValue: gradient,
@@ -535,7 +560,7 @@ export default function ColorPanel( {
 					userValue: userGradient,
 					isGradient: true,
 				},
-			],
+			].filter( Boolean ),
 		},
 		showLinkPanel && {
 			key: 'link',
@@ -564,7 +589,9 @@ export default function ColorPanel( {
 	].filter( Boolean );
 
 	elements.forEach( ( { name, label, showPanel } ) => {
-		if ( ! showPanel ) return;
+		if ( ! showPanel ) {
+			return;
+		}
 
 		const elementBackgroundColor = decodeValue(
 			inheritedValue?.elements?.[ name ]?.color?.background
@@ -591,7 +618,7 @@ export default function ColorPanel( {
 				elementGradientUserColor
 			);
 		const resetElement = () => {
-			const newValue = immutableSet(
+			const newValue = setImmutably(
 				value,
 				[ 'elements', name, 'color', 'background' ],
 				undefined
@@ -603,7 +630,7 @@ export default function ColorPanel( {
 
 		const setElementTextColor = ( newTextColor ) => {
 			onChange(
-				immutableSet(
+				setImmutably(
 					value,
 					[ 'elements', name, 'color', 'text' ],
 					encodeColorValue( newTextColor )
@@ -611,7 +638,7 @@ export default function ColorPanel( {
 			);
 		};
 		const setElementBackgroundColor = ( newBackgroundColor ) => {
-			const newValue = immutableSet(
+			const newValue = setImmutably(
 				value,
 				[ 'elements', name, 'color', 'background' ],
 				encodeColorValue( newBackgroundColor )
@@ -620,7 +647,7 @@ export default function ColorPanel( {
 			onChange( newValue );
 		};
 		const setElementGradient = ( newGradient ) => {
-			const newValue = immutableSet(
+			const newValue = setImmutably(
 				value,
 				[ 'elements', name, 'color', 'gradient' ],
 				encodeGradientValue( newGradient )
@@ -687,19 +714,22 @@ export default function ColorPanel( {
 			onChange={ onChange }
 			panelId={ panelId }
 		>
-			{ items.map( ( item ) => (
-				<ColorPanelDropdown
-					key={ item.key }
-					{ ...item }
-					colorGradientControlSettings={ {
-						colors,
-						disableCustomColors: ! areCustomSolidsEnabled,
-						gradients,
-						disableCustomGradients: ! areCustomGradientsEnabled,
-					} }
-					panelId={ panelId }
-				/>
-			) ) }
+			{ items.map( ( item ) => {
+				const { key, ...restItem } = item;
+				return (
+					<ColorPanelDropdown
+						key={ key }
+						{ ...restItem }
+						colorGradientControlSettings={ {
+							colors,
+							disableCustomColors: ! areCustomSolidsEnabled,
+							gradients,
+							disableCustomGradients: ! areCustomGradientsEnabled,
+						} }
+						panelId={ panelId }
+					/>
+				);
+			} ) }
 			{ children }
 		</Wrapper>
 	);

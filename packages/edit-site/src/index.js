@@ -9,13 +9,8 @@ import {
 } from '@wordpress/block-library';
 import { dispatch } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
-import { createRoot } from '@wordpress/element';
-import {
-	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
-	__experimentalFetchUrlData as fetchUrlData,
-} from '@wordpress/core-data';
+import { createRoot, StrictMode } from '@wordpress/element';
 import { store as editorStore } from '@wordpress/editor';
-import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	registerLegacyWidgetBlock,
@@ -39,11 +34,7 @@ export function initializeEditor( id, settings ) {
 	const target = document.getElementById( id );
 	const root = createRoot( target );
 
-	settings.__experimentalFetchLinkSuggestions = ( search, searchOptions ) =>
-		fetchLinkSuggestions( search, searchOptions, settings );
-	settings.__experimentalFetchRichUrlData = fetchUrlData;
-
-	dispatch( blocksStore ).__experimentalReapplyBlockTypeFilters();
+	dispatch( blocksStore ).reapplyBlockTypeFilters();
 	const coreBlocks = __experimentalGetCoreBlocks().filter(
 		( { name } ) => name !== 'core/freeform'
 	);
@@ -51,7 +42,7 @@ export function initializeEditor( id, settings ) {
 	dispatch( blocksStore ).setFreeformFallbackBlockName( 'core/html' );
 	registerLegacyWidgetBlock( { inserter: false } );
 	registerWidgetGroupBlock( { inserter: false } );
-	if ( process.env.IS_GUTENBERG_PLUGIN ) {
+	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 		__experimentalRegisterExperimentalCoreBlocks( {
 			enableFSEBlocks: true,
 		} );
@@ -60,20 +51,24 @@ export function initializeEditor( id, settings ) {
 	// We dispatch actions and update the store synchronously before rendering
 	// so that we won't trigger unnecessary re-renders with useEffect.
 	dispatch( preferencesStore ).setDefaults( 'core/edit-site', {
+		welcomeGuide: true,
+		welcomeGuideStyles: true,
+		welcomeGuidePage: true,
+		welcomeGuideTemplate: true,
+	} );
+
+	dispatch( preferencesStore ).setDefaults( 'core', {
+		allowRightClickOverrides: true,
+		distractionFree: false,
 		editorMode: 'visual',
 		fixedToolbar: false,
 		focusMode: false,
+		inactivePanels: [],
 		keepCaretInsideBlock: false,
-		welcomeGuide: true,
-		welcomeGuideStyles: true,
-		showListViewByDefault: false,
+		openPanels: [ 'post-status' ],
 		showBlockBreadcrumbs: true,
+		showListViewByDefault: false,
 	} );
-
-	dispatch( interfaceStore ).setDefaultComplementaryArea(
-		'core/edit-site',
-		'edit-site/template'
-	);
 
 	dispatch( editSiteStore ).updateSettings( settings );
 
@@ -90,7 +85,11 @@ export function initializeEditor( id, settings ) {
 	window.addEventListener( 'dragover', ( e ) => e.preventDefault(), false );
 	window.addEventListener( 'drop', ( e ) => e.preventDefault(), false );
 
-	root.render( <App /> );
+	root.render(
+		<StrictMode>
+			<App />
+		</StrictMode>
+	);
 
 	return root;
 }
@@ -102,6 +101,10 @@ export function reinitializeEditor() {
 	} );
 }
 
-export { default as PluginSidebar } from './components/sidebar-edit-mode/plugin-sidebar';
-export { default as PluginSidebarMoreMenuItem } from './components/header-edit-mode/plugin-sidebar-more-menu-item';
-export { default as PluginMoreMenuItem } from './components/header-edit-mode/plugin-more-menu-item';
+export { default as PluginTemplateSettingPanel } from './components/plugin-template-setting-panel';
+export { store } from './store';
+export * from './deprecated';
+
+// Temporary: While the posts dashboard is being iterated on
+// it's being built in the same package as the site editor.
+export { initializePostsDashboard } from './posts';

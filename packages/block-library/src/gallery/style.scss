@@ -57,6 +57,7 @@ figure.wp-block-gallery.has-nested-images {
 			text-align: center;
 			width: 100%;
 			box-sizing: border-box;
+			@include custom-scrollbars-on-hover(transparent, rgba($white, 0.8));
 
 			img {
 				display: inline;

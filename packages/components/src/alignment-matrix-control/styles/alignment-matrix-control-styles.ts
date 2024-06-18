@@ -7,7 +7,7 @@ import { css } from '@emotion/react';
 /**
  * Internal dependencies
  */
-import { COLORS, reduceMotion } from '../../utils';
+import { COLORS } from '../../utils';
 import type {
 	AlignmentMatrixControlProps,
 	AlignmentMatrixControlCellProps,
@@ -54,7 +54,7 @@ const pointActive = ( {
 }: Pick< AlignmentMatrixControlCellProps, 'isActive' > ) => {
 	const boxShadow = isActive ? `0 0 0 2px ${ COLORS.gray[ 900 ] }` : null;
 	const pointColor = isActive ? COLORS.gray[ 900 ] : COLORS.gray[ 400 ];
-	const pointColorHover = isActive ? COLORS.gray[ 900 ] : COLORS.ui.theme;
+	const pointColorHover = isActive ? COLORS.gray[ 900 ] : COLORS.theme.accent;
 
 	return css`
 		box-shadow: ${ boxShadow };
@@ -74,9 +74,10 @@ export const pointBase = (
 		box-sizing: border-box;
 		display: grid;
 		margin: auto;
-		transition: all 120ms linear;
+		@media not ( prefers-reduced-motion ) {
+			transition: all 120ms linear;
+		}
 
-		${ reduceMotion( 'transition' ) }
 		${ pointActive( props ) }
 	`;
 };

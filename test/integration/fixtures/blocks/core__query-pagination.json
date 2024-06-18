@@ -3,7 +3,8 @@
 		"name": "core/query-pagination",
 		"isValid": true,
 		"attributes": {
-			"paginationArrow": "none"
+			"paginationArrow": "none",
+			"showLabel": true
 		},
 		"innerBlocks": []
 	}

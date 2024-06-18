@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -28,8 +28,6 @@ function BlockPopover(
 		clientId,
 		bottomClientId,
 		children,
-		__unstableRefreshSize,
-		__unstableCoverTarget = false,
 		__unstablePopoverSlot,
 		__unstableContentRef,
 		shift = true,
@@ -75,30 +73,6 @@ function BlockPopover(
 		};
 	}, [ selectedElement ] );
 
-	const style = useMemo( () => {
-		if (
-			// popoverDimensionsRecomputeCounter is by definition always equal or greater
-			// than 0. This check is only there to satisfy the correctness of the
-			// exhaustive-deps rule for the `useMemo` hook.
-			popoverDimensionsRecomputeCounter < 0 ||
-			! selectedElement ||
-			lastSelectedElement !== selectedElement
-		) {
-			return {};
-		}
-
-		return {
-			position: 'absolute',
-			width: selectedElement.offsetWidth,
-			height: selectedElement.offsetHeight,
-		};
-	}, [
-		selectedElement,
-		lastSelectedElement,
-		__unstableRefreshSize,
-		popoverDimensionsRecomputeCounter,
-	] );
-
 	const popoverAnchor = useMemo( () => {
 		if (
 			// popoverDimensionsRecomputeCounter is by definition always equal or greater
@@ -142,7 +116,7 @@ function BlockPopover(
 
 				return new window.DOMRect( left, top, width, height );
 			},
-			ownerDocument: selectedElement.ownerDocument,
+			contextElement: selectedElement,
 		};
 	}, [
 		bottomClientId,
@@ -163,22 +137,40 @@ function BlockPopover(
 			anchor={ popoverAnchor }
 			// Render in the old slot if needed for backward compatibility,
 			// otherwise render in place (not in the default popover slot).
-			__unstableSlotName={ __unstablePopoverSlot || null }
+			__unstableSlotName={ __unstablePopoverSlot }
+			inline={ ! __unstablePopoverSlot }
 			placement="top-start"
 			resize={ false }
 			flip={ false }
 			shift={ shift }
 			{ ...props }
-			className={ classnames(
-				'block-editor-block-popover',
-				props.className
-			) }
+			className={ clsx( 'block-editor-block-popover', props.className ) }
 			variant="unstyled"
 		>
-			{ __unstableCoverTarget && <div style={ style }>{ children }</div> }
-			{ ! __unstableCoverTarget && children }
+			{ children }
 		</Popover>
 	);
 }
 
-export default forwardRef( BlockPopover );
+export const PrivateBlockPopover = forwardRef( BlockPopover );
+
+const PublicBlockPopover = (
+	{ clientId, bottomClientId, children, ...props },
+	ref
+) => (
+	<PrivateBlockPopover
+		{ ...props }
+		bottomClientId={ bottomClientId }
+		clientId={ clientId }
+		__unstableContentRef={ undefined }
+		__unstablePopoverSlot={ undefined }
+		ref={ ref }
+	>
+		{ children }
+	</PrivateBlockPopover>
+);
+
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-popover/README.md
+ */
+export default forwardRef( PublicBlockPopover );

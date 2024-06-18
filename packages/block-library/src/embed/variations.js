@@ -27,6 +27,7 @@ import {
 	embedPinterestIcon,
 	embedWolframIcon,
 	embedPocketCastsIcon,
+	embedBlueskyIcon,
 } from './icons';
 
 /** @typedef {import('@wordpress/blocks').WPBlockVariation} WPBlockVariation */
@@ -218,13 +219,13 @@ const variations = [
 		attributes: { providerNameSlug: 'mixcloud', responsive: true },
 	},
 	{
-		name: 'pocketcasts',
+		name: 'pocket-casts',
 		title: 'Pocket Casts',
 		icon: embedPocketCastsIcon,
 		keywords: [ __( 'podcast' ), __( 'audio' ) ],
 		description: __( 'Embed a podcast player from Pocket Casts.' ),
 		patterns: [ /^https:\/\/pca.st\/\w+/i ],
-		attributes: { providerNameSlug: 'pocketcasts', responsive: true },
+		attributes: { providerNameSlug: 'pocket-casts', responsive: true },
 	},
 	{
 		name: 'reddit',
@@ -257,14 +258,6 @@ const variations = [
 		description: __( 'Embed Scribd content.' ),
 		patterns: [ /^https?:\/\/(www\.)?scribd\.com\/.+/i ],
 		attributes: { providerNameSlug: 'scribd', responsive: true },
-	},
-	{
-		name: 'slideshare',
-		title: 'Slideshare',
-		icon: embedContentIcon,
-		description: __( 'Embed Slideshare content.' ),
-		patterns: [ /^https?:\/\/(.+?\.)?slideshare\.net\/.+/i ],
-		attributes: { providerNameSlug: 'slideshare', responsive: true },
 	},
 	{
 		name: 'smugmug',
@@ -360,6 +353,14 @@ const variations = [
 		patterns: [ /^https?:\/\/(www\.)?wolframcloud\.com\/obj\/.+/i ],
 		attributes: { providerNameSlug: 'wolfram-cloud', responsive: true },
 	},
+	{
+		name: 'bluesky',
+		title: 'Bluesky',
+		icon: embedBlueskyIcon,
+		description: __( 'Embed a Bluesky post.' ),
+		patterns: [ /^https?:\/\/bsky\.app\/profile\/.+\/post\/.+/i ],
+		attributes: { providerNameSlug: 'bluesky' },
+	},
 ];
 
 /**
@@ -368,7 +369,9 @@ const variations = [
  *  Block by providing its attributes.
  */
 variations.forEach( ( variation ) => {
-	if ( variation.isActive ) return;
+	if ( variation.isActive ) {
+		return;
+	}
 	variation.isActive = ( blockAttributes, variationAttributes ) =>
 		blockAttributes.providerNameSlug ===
 		variationAttributes.providerNameSlug;

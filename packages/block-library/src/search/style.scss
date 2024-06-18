@@ -12,6 +12,8 @@ $button-spacing-y: math.div($grid-unit-15, 2); // 6px
 	svg {
 		min-width: $grid-unit-30;
 		min-height: $grid-unit-30;
+		width: 1.25em;
+		height: 1.25em;
 		fill: currentColor;
 		vertical-align: text-bottom;
 	}
@@ -45,12 +47,65 @@ $button-spacing-y: math.div($grid-unit-15, 2); // 6px
 	// !important used to forcibly prevent undesired application of
 	// text-decoration styles on the input field.
 	text-decoration: unset !important;
+
+	// Hides a redundant extra search icon on Mobile Safari.
+	appearance: initial;
 }
 
 .wp-block-search.wp-block-search__button-only {
 	.wp-block-search__button {
 		margin-left: 0;
+		// Prevent unintended text wrapping.
+		flex-shrink: 0;
+		max-width: 100%;
 	}
+
+	// Ensure minimum input field width in small viewports.
+	.wp-block-search__button[aria-expanded="true"] {
+		max-width: calc(100% - 100px);
+	}
+
+	.wp-block-search__inside-wrapper {
+		transition-property: width;
+		min-width: 0 !important;
+	}
+
+	.wp-block-search__input {
+		transition-duration: 300ms;
+		flex-basis: 100%;
+	}
+
+	// !important here to override inline styles on button only deselected view.
+	&.wp-block-search__searchfield-hidden {
+		overflow: hidden;
+
+		.wp-block-search__inside-wrapper {
+			overflow: hidden;
+		}
+
+		.wp-block-search__input {
+			width: 0 !important;
+			min-width: 0 !important;
+			padding-left: 0 !important;
+			padding-right: 0 !important;
+			border-left-width: 0 !important;
+			border-right-width: 0 !important;
+			flex-grow: 0;
+			margin: 0;
+			flex-basis: 0;
+		}
+	}
+}
+
+// We are lowering the specificity so that the input element can override the rule for the input element inside the search block.
+:where(.wp-block-search__input) {
+	font-family: inherit;
+	font-weight: inherit;
+	font-size: inherit;
+	line-height: inherit;
+	letter-spacing: inherit;
+	text-transform: inherit;
+	font-style: inherit;
 }
 
 // We are lowering the specificity so that the button element can override the rule for the button inside the search block.
@@ -77,4 +132,10 @@ $button-spacing-y: math.div($grid-unit-15, 2); // 6px
 
 .wp-block-search.aligncenter .wp-block-search__inside-wrapper {
 	margin: auto;
+}
+
+.wp-block[data-align="right"] .wp-block-search.wp-block-search__button-only {
+	.wp-block-search__inside-wrapper {
+		float: right;
+	}
 }

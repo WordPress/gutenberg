@@ -109,6 +109,10 @@
 		align-self: flex-end;
 	}
 
+	&.is-vertically-aligned-stretch {
+		align-self: stretch;
+	}
+
 	&.is-vertically-aligned-top,
 	&.is-vertically-aligned-center,
 	&.is-vertically-aligned-bottom {

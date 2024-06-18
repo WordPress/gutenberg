@@ -1,9 +1,11 @@
 {
+	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"incremental": false,
 		"composite": false,
-		"module": "CommonJS",
+		"module": "Node16",
+		"moduleResolution": "node16",
 		"types": [ "node" ],
 		"rootDir": "src",
 		"noEmit": false,

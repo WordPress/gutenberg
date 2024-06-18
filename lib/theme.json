@@ -1,5 +1,6 @@
 {
-	"version": 2,
+	"$schema": "../schemas/json/theme.json",
+	"version": 3,
 	"settings": {
 		"appearanceTools": false,
 		"useRootPaddingAwareAlignments": false,
@@ -189,6 +190,46 @@
 			],
 			"text": true
 		},
+		"dimensions": {
+			"defaultAspectRatios": true,
+			"aspectRatios": [
+				{
+					"name": "Square - 1:1",
+					"slug": "square",
+					"ratio": "1"
+				},
+				{
+					"name": "Standard - 4:3",
+					"slug": "4-3",
+					"ratio": "4/3"
+				},
+				{
+					"name": "Portrait - 3:4",
+					"slug": "3-4",
+					"ratio": "3/4"
+				},
+				{
+					"name": "Classic - 3:2",
+					"slug": "3-2",
+					"ratio": "3/2"
+				},
+				{
+					"name": "Classic Portrait - 2:3",
+					"slug": "2-3",
+					"ratio": "2/3"
+				},
+				{
+					"name": "Wide - 16:9",
+					"slug": "16-9",
+					"ratio": "16/9"
+				},
+				{
+					"name": "Tall - 9:16",
+					"slug": "9-16",
+					"ratio": "9/16"
+				}
+			]
+		},
 		"shadow": {
 			"defaultPresets": true,
 			"presets": [
@@ -219,182 +260,12 @@
 				}
 			]
 		},
-		"layout": {
-			"definitions": {
-				"default": {
-					"name": "default",
-					"slug": "flow",
-					"className": "is-layout-flow",
-					"baseStyles": [
-						{
-							"selector": " > .alignleft",
-							"rules": {
-								"float": "left",
-								"margin-inline-start": "0",
-								"margin-inline-end": "2em"
-							}
-						},
-						{
-							"selector": " > .alignright",
-							"rules": {
-								"float": "right",
-								"margin-inline-start": "2em",
-								"margin-inline-end": "0"
-							}
-						},
-						{
-							"selector": " > .aligncenter",
-							"rules": {
-								"margin-left": "auto !important",
-								"margin-right": "auto !important"
-							}
-						}
-					],
-					"spacingStyles": [
-						{
-							"selector": " > :first-child:first-child",
-							"rules": {
-								"margin-block-start": "0"
-							}
-						},
-						{
-							"selector": " > :last-child:last-child",
-							"rules": {
-								"margin-block-end": "0"
-							}
-						},
-						{
-							"selector": " > *",
-							"rules": {
-								"margin-block-start": null,
-								"margin-block-end": "0"
-							}
-						}
-					]
-				},
-				"constrained": {
-					"name": "constrained",
-					"slug": "constrained",
-					"className": "is-layout-constrained",
-					"baseStyles": [
-						{
-							"selector": " > .alignleft",
-							"rules": {
-								"float": "left",
-								"margin-inline-start": "0",
-								"margin-inline-end": "2em"
-							}
-						},
-						{
-							"selector": " > .alignright",
-							"rules": {
-								"float": "right",
-								"margin-inline-start": "2em",
-								"margin-inline-end": "0"
-							}
-						},
-						{
-							"selector": " > .aligncenter",
-							"rules": {
-								"margin-left": "auto !important",
-								"margin-right": "auto !important"
-							}
-						},
-						{
-							"selector": " > :where(:not(.alignleft):not(.alignright):not(.alignfull))",
-							"rules": {
-								"max-width": "var(--wp--style--global--content-size)",
-								"margin-left": "auto !important",
-								"margin-right": "auto !important"
-							}
-						},
-						{
-							"selector": " > .alignwide",
-							"rules": {
-								"max-width": "var(--wp--style--global--wide-size)"
-							}
-						}
-					],
-					"spacingStyles": [
-						{
-							"selector": " > :first-child:first-child",
-							"rules": {
-								"margin-block-start": "0"
-							}
-						},
-						{
-							"selector": " > :last-child:last-child",
-							"rules": {
-								"margin-block-end": "0"
-							}
-						},
-						{
-							"selector": " > *",
-							"rules": {
-								"margin-block-start": null,
-								"margin-block-end": "0"
-							}
-						}
-					]
-				},
-				"flex": {
-					"name": "flex",
-					"slug": "flex",
-					"className": "is-layout-flex",
-					"displayMode": "flex",
-					"baseStyles": [
-						{
-							"selector": "",
-							"rules": {
-								"flex-wrap": "wrap",
-								"align-items": "center"
-							}
-						},
-						{
-							"selector": " > *",
-							"rules": {
-								"margin": "0"
-							}
-						}
-					],
-					"spacingStyles": [
-						{
-							"selector": "",
-							"rules": {
-								"gap": null
-							}
-						}
-					]
-				},
-				"grid": {
-					"name": "grid",
-					"slug": "grid",
-					"className": "is-layout-grid",
-					"displayMode": "grid",
-					"baseStyles": [
-						{
-							"selector": " > *",
-							"rules": {
-								"margin": "0"
-							}
-						}
-					],
-					"spacingStyles": [
-						{
-							"selector": "",
-							"rules": {
-								"gap": null
-							}
-						}
-					]
-				}
-			}
-		},
 		"spacing": {
 			"blockGap": null,
 			"margin": false,
 			"padding": false,
 			"customSpacingSize": true,
+			"defaultSpacingSizes": true,
 			"units": [ "px", "em", "rem", "vh", "vw", "%" ],
 			"spacingScale": {
 				"operator": "*",
@@ -406,6 +277,7 @@
 		},
 		"typography": {
 			"customFontSize": true,
+			"defaultFontSizes": true,
 			"dropCap": true,
 			"fontSizes": [
 				{
@@ -433,14 +305,21 @@
 			"fontWeight": true,
 			"letterSpacing": true,
 			"lineHeight": false,
+			"textAlign": true,
 			"textColumns": false,
 			"textDecoration": true,
-			"textTransform": true
+			"textTransform": true,
+			"writingMode": false
 		},
 		"blocks": {
 			"core/button": {
 				"border": {
 					"radius": true
+				}
+			},
+			"core/image": {
+				"lightbox": {
+					"allowEditing": true
 				}
 			},
 			"core/pullquote": {
@@ -461,7 +340,12 @@
 					"background": "#32373c"
 				},
 				"spacing": {
-					"padding": "calc(0.667em + 2px) calc(1.333em + 2px)"
+					"padding": {
+						"top": "calc(0.667em + 2px)",
+						"right": "calc(1.333em + 2px)",
+						"bottom": "calc(0.667em + 2px)",
+						"left": "calc(1.333em + 2px)"
+					}
 				},
 				"typography": {
 					"fontSize": "inherit",
@@ -486,6 +370,40 @@
 				"right": "0px",
 				"bottom": "0px",
 				"left": "0px"
+			}
+		},
+		"blocks": {
+			"core/button": {
+				"variations": {
+					"outline": {
+						"border": {
+							"width": "2px",
+							"style": "solid",
+							"color": "currentColor"
+						},
+						"color": {
+							"text": "currentColor",
+							"gradient": "transparent none"
+						},
+						"spacing": {
+							"padding": {
+								"top": "0.667em",
+								"right": "1.33em",
+								"bottom": "0.667em",
+								"left": "1.33em"
+							}
+						}
+					}
+				}
+			},
+			"core/site-logo": {
+				"variations": {
+					"rounded": {
+						"border": {
+							"radius": "9999px"
+						}
+					}
+				}
 			}
 		}
 	}

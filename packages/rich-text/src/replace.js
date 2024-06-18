@@ -4,7 +4,7 @@
 
 import { normaliseFormats } from './normalise-formats';
 
-/** @typedef {import('./create').RichTextValue} RichTextValue */
+/** @typedef {import('./types').RichTextValue} RichTextValue */
 
 /**
  * Search a Rich Text value and replace the match(es) with `replacement`. This

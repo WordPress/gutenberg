@@ -18,13 +18,18 @@ export { metadata, name };
 export const settings = {
 	icon,
 	example: {
+		attributes: {
+			summary: 'La Mancha',
+			showContent: true,
+		},
 		innerBlocks: [
 			{
-				name: 'core/details-summary',
-				attributes: { summary: __( 'Details' ) },
-			},
-			{
-				name: 'core/details-content',
+				name: 'core/paragraph',
+				attributes: {
+					content: __(
+						'In a village of La Mancha, the name of which I have no desire to call to mind, there lived not long since one of those gentlemen that keep a lance in the lance-rack, an old buckler, a lean hack, and a greyhound for coursing.'
+					),
+				},
 			},
 		],
 	},

@@ -7,6 +7,7 @@ import { Text, View } from 'react-native';
  * WordPress dependencies
  */
 import { Icon } from '@wordpress/components';
+import { useGlobalStyles } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { help, lock } from '@wordpress/icons';
@@ -17,18 +18,21 @@ import { help, lock } from '@wordpress/icons';
 import styles from './editor.scss';
 
 function EditTitle( { getStylesFromColorScheme, title } ) {
-	const lockIconStyle = getStylesFromColorScheme(
-		styles.lockIcon,
-		styles.lockIconDark
-	);
-	const titleStyle = getStylesFromColorScheme(
-		styles.title,
-		styles.titleDark
-	);
-	const infoIconStyle = getStylesFromColorScheme(
-		styles.infoIcon,
-		styles.infoIconDark
-	);
+	const globalStyles = useGlobalStyles();
+	const baseColors = globalStyles?.baseColors?.color;
+
+	const lockIconStyle = [
+		getStylesFromColorScheme( styles.lockIcon, styles.lockIconDark ),
+		baseColors && { color: baseColors.text },
+	];
+	const titleStyle = [
+		getStylesFromColorScheme( styles.title, styles.titleDark ),
+		baseColors && { color: baseColors.text },
+	];
+	const infoIconStyle = [
+		getStylesFromColorScheme( styles.infoIcon, styles.infoIconDark ),
+		baseColors && { color: baseColors.text },
+	];
 	const separatorStyle = getStylesFromColorScheme(
 		styles.separator,
 		styles.separatorDark

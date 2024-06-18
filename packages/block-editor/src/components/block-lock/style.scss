@@ -52,10 +52,17 @@
 .block-editor-block-lock-toolbar {
 	.components-button.has-icon {
 		min-width: $button-size-small + $grid-unit-15 !important;
-		padding-left: 0 !important;
+	}
+}
 
-		&:focus::before {
-			right: $grid-unit-10 !important;
-		}
+.block-editor-block-toolbar__block-controls .block-editor-block-lock-toolbar {
+	margin-left: -$grid-unit-15 * 0.5 !important;
+}
+
+.show-icon-labels {
+	.block-editor-block-toolbar__block-controls .block-editor-block-lock-toolbar {
+		border-left: 1px solid $gray-900;
+		margin-left: $grid-unit-15 * 0.5 !important;
+		margin-right: -$grid-unit-15 * 0.5;
 	}
 }

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { compose } from '@wordpress/compose';
@@ -385,7 +380,7 @@ function GalleryEdit( props ) {
 	}
 
 	const imageSizeOptions = getImagesSizeOptions();
-	const shouldShowSizeOptions = hasImages && ! isEmpty( imageSizeOptions );
+	const shouldShowSizeOptions = hasImages && imageSizeOptions.length > 0;
 
 	return (
 		<>
@@ -416,7 +411,7 @@ function GalleryEdit( props ) {
 						value={ linkTo }
 						onChange={ setLinkTo }
 						options={ linkOptions }
-						hideCancelButton={ true }
+						hideCancelButton
 					/>
 					{ shouldShowSizeOptions && (
 						<SelectControl
@@ -425,7 +420,7 @@ function GalleryEdit( props ) {
 							value={ sizeSlug }
 							options={ imageSizeOptions }
 							onChange={ updateImagesSize }
-							hideCancelButton={ true }
+							hideCancelButton
 						/>
 					) }
 				</PanelBody>

@@ -14,6 +14,12 @@
 	margin-left: 10px;
 }
 
+.components-custom-select-control__menu-wrapper {
+	position: absolute;
+	min-width: 100%;
+	bottom: 0;
+}
+
 .components-custom-select-control__menu {
 	// Hide when collapsed.
 	&[aria-hidden="true"] {
@@ -44,7 +50,7 @@
 	cursor: default;
 	line-height: $icon-size + $grid-unit-05;
 
-	&:not(.is-next-36px-default-size) {
+	&:not(.is-next-40px-default-size) {
 		padding: $grid-unit-10;
 	}
 

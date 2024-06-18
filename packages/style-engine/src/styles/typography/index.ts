@@ -112,6 +112,18 @@ const textTransform = {
 	},
 };
 
+const writingMode = {
+	name: 'writingMode',
+	generate: ( style: Style, options: StyleOptions ) => {
+		return generateRule(
+			style,
+			options,
+			[ 'typography', 'writingMode' ],
+			'writingMode'
+		);
+	},
+};
+
 export default [
 	fontFamily,
 	fontSize,
@@ -122,4 +134,5 @@ export default [
 	textColumns,
 	textDecoration,
 	textTransform,
+	writingMode,
 ];

@@ -5,7 +5,6 @@
 .wp-block-navigation {
 	// This wraps just the innermost text for custom menu items.
 	.wp-block-navigation-item__label {
-		word-break: normal;
 		overflow-wrap: break-word;
 	}
 
@@ -14,4 +13,18 @@
 	.wp-block-navigation-item__description {
 		display: none;
 	}
+}
+
+.link-ui-tools {
+	border-top: 1px solid $gray-100;
+	padding: $grid-unit-10;
+}
+
+.link-ui-block-inserter {
+	padding-top: $grid-unit-10;
+}
+
+.link-ui-block-inserter__back {
+	margin-left: $grid-unit-10;
+	text-transform: uppercase;
 }

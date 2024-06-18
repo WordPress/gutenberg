@@ -29,18 +29,21 @@ describe( 'BlockEditorProvider', () => {
 	beforeEach( () => {
 		registry = undefined;
 	} );
-	it( 'should strip experimental settings', async () => {
+	it( 'should not allow updating experimental settings', async () => {
 		render(
 			<BlockEditorProvider
 				settings={ {
-					inserterMediaCategories: true,
+					blockInspectorAnimation: true,
 				} }
 			>
 				<HasEditorSetting setRegistry={ setRegistry } />
 			</BlockEditorProvider>
 		);
 		const settings = registry.select( blockEditorStore ).getSettings();
-		expect( settings ).not.toHaveProperty( 'inserterMediaCategories' );
+		// `blockInspectorAnimation` setting is one of the block editor's
+		// default settings, so it has a value. We're testing that its
+		// value was not updated.
+		expect( settings.blockInspectorAnimation ).not.toBe( true );
 	} );
 	it( 'should preserve stable settings', async () => {
 		render(
@@ -65,18 +68,18 @@ describe( 'ExperimentalBlockEditorProvider', () => {
 	beforeEach( () => {
 		registry = undefined;
 	} );
-	it( 'should preserve experimental settings', async () => {
+	it( 'should allow updating/adding experimental settings', async () => {
 		render(
 			<ExperimentalBlockEditorProvider
 				settings={ {
-					inserterMediaCategories: true,
+					blockInspectorAnimation: true,
 				} }
 			>
 				<HasEditorSetting setRegistry={ setRegistry } />
 			</ExperimentalBlockEditorProvider>
 		);
 		const settings = registry.select( blockEditorStore ).getSettings();
-		expect( settings ).toHaveProperty( 'inserterMediaCategories' );
+		expect( settings.blockInspectorAnimation ).toBe( true );
 	} );
 	it( 'should preserve stable settings', async () => {
 		render(

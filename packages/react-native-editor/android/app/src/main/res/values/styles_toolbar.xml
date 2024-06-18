@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Gutenberg.ToolBar" parent="Widget.MaterialComponents.Toolbar.Surface">
+        <item name="titleTextColor">?attr/colorOnSurface</item>
+        <item name="android:elevation">0dp</item>
+        <item name="colorControlNormal">?attr/colorOnSurface</item>
+        <item name="android:background">?attr/colorOnSurface</item>
+    </style>
+
+</resources>

@@ -2,17 +2,23 @@
  * WordPress dependencies
  */
 import { addQueryArgs, getQueryArgs, removeQueryArgs } from '@wordpress/url';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
-import { useHistory } from './index';
+import { unlock } from '../../lock-unlock';
+import {
+	isPreviewingTheme,
+	currentlyPreviewingTheme,
+} from '../../utils/is-previewing-theme';
 
-export function useLink( params = {}, state, shouldReplace = false ) {
+const { useHistory } = unlock( routerPrivateApis );
+
+export function useLink( params, state, shouldReplace = false ) {
 	const history = useHistory();
-
 	function onClick( event ) {
-		event.preventDefault();
+		event?.preventDefault();
 
 		if ( shouldReplace ) {
 			history.replace( params, state );
@@ -26,6 +32,14 @@ export function useLink( params = {}, state, shouldReplace = false ) {
 		window.location.href,
 		...Object.keys( currentArgs )
 	);
+
+	if ( isPreviewingTheme() ) {
+		params = {
+			...params,
+			wp_theme_preview: currentlyPreviewingTheme(),
+		};
+	}
+
 	const newUrl = addQueryArgs( currentUrlWithoutArgs, params );
 
 	return {

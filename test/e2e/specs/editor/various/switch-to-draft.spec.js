@@ -35,6 +35,7 @@ test.describe( 'Clicking "Switch to draft" on a published/scheduled post/page', 
 					page,
 					switchToDraftUtils,
 					pageUtils,
+					editor,
 				} ) => {
 					await pageUtils.setBrowserViewport( viewport );
 
@@ -44,29 +45,19 @@ test.describe( 'Clicking "Switch to draft" on a published/scheduled post/page', 
 						postStatus === 'schedule'
 					);
 
-					await switchToDraftUtils.switchToDraftButton.click();
-
+					await editor.openDocumentSettingsSidebar();
 					await page
-						.getByRole( 'dialog' )
-						.getByRole( 'button', { name: 'Cancel' } )
+						.getByRole( 'button', { name: 'Change post status:' } )
 						.click();
+					await page.getByRole( 'radio', { name: 'Draft' } ).click();
 
-					await expect
-						.poll(
-							switchToDraftUtils.getPostStatus,
-							`should leave a ${ postStatus }-ed ${ postType } ${ postStatus }-ed if canceled`
-						)
-						.toBe(
-							postStatus === 'schedule' ? 'future' : postStatus
-						);
-
-					await switchToDraftUtils.switchToDraftButton.click();
-
-					await page
-						.getByRole( 'dialog' )
-						.getByRole( 'button', { name: 'OK' } )
-						.click();
-
+					if ( viewport === 'small' ) {
+						await page
+							.getByRole( 'region', { name: 'Editor settings' } )
+							.getByRole( 'button', { name: 'Close Settings' } )
+							.click();
+					}
+					await page.getByRole( 'button', { name: 'Save' } ).click();
 					await expect(
 						page.getByRole( 'button', {
 							name: 'Dismiss this notice',
@@ -99,10 +90,6 @@ class SwitchToDraftUtils {
 		this.#page = page;
 		this.#admin = admin;
 		this.#requestUtils = requestUtils;
-
-		this.switchToDraftButton = page
-			.getByRole( 'region', { name: 'Editor top bar' } )
-			.getByRole( 'button', { name: 'draft' } );
 	}
 
 	/**
@@ -136,24 +123,11 @@ class SwitchToDraftUtils {
 			id = page.id;
 		}
 
-		await this.#admin.visitAdminPage(
-			'post.php',
-			`post=${ id }&action=edit`
-		);
-
-		// Disable welcome guide and full screen mode.
-		await this.#page.evaluate( () => {
-			window.wp.data
-				.dispatch( 'core/preferences' )
-				.set( 'core/edit-post', 'welcomeGuide', false );
-			window.wp.data
-				.dispatch( 'core/preferences' )
-				.set( 'core/edit-post', 'fullscreenMode', false );
-		} );
+		await this.#admin.editPost( id );
 	};
 
 	getPostStatus = async () => {
-		return await this.#page.evaluate( () =>
+		return this.#page.evaluate( () =>
 			window.wp.data
 				.select( 'core/editor' )
 				.getEditedPostAttribute( 'status' )

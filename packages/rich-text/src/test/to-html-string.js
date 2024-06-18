@@ -97,21 +97,6 @@ describe( 'toHTMLString', () => {
 		);
 	} );
 
-	it( 'should extract recreate HTML 6', () => {
-		const HTML = '<li>one<ul><li>two</li></ul></li><li>three</li>';
-		const element = createNode( `<ul>${ HTML }</ul>` );
-		const multilineTag = 'li';
-		const multilineWrapperTags = [ 'ul', 'ol' ];
-		const value = create( { element, multilineTag, multilineWrapperTags } );
-		const result = toHTMLString( {
-			value,
-			multilineTag,
-			multilineWrapperTags,
-		} );
-
-		expect( result ).toEqual( HTML );
-	} );
-
 	it( 'should serialize neighbouring formats of same type', () => {
 		const HTML = '<a href="a">a</a><a href="b">a</a>';
 		const element = createNode( `<p>${ HTML }</p>` );

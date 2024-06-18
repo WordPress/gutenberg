@@ -1,6 +1,6 @@
 {
-	"$schema": "https://schemas.wp.org/trunk/theme.json",
-	"version": 2,
+	"$schema": "../../schemas/json/theme.json",
+	"version": 3,
 	"settings": {
 		"appearanceTools": true,
 		"layout": {
@@ -8,5 +8,12 @@
 			"wideSize": "1100px"
 		}
 	},
+	"customTemplates": [
+		{
+			"name": "custom-template",
+			"title": "Custom",
+			"postTypes": [ "post" ]
+		}
+	],
 	"patterns": [ "short-text-surrounded-by-round-images", "partner-logos" ]
 }

@@ -8,26 +8,27 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import DimensionsPanel from './dimensions-panel';
+import BackgroundPanel from './background-panel';
 import ScreenHeader from './header';
-import BlockPreviewPanel from './block-preview-panel';
-import { getVariationClassName } from './utils';
-import { unlock } from '../../private-apis';
+import { unlock } from '../../lock-unlock';
 
-const { useHasDimensionsPanel, useGlobalSetting, useSettingsForBlockElement } =
-	unlock( blockEditorPrivateApis );
+const {
+	useHasBackgroundPanel,
+	useHasDimensionsPanel,
+	useGlobalSetting,
+	useSettingsForBlockElement,
+} = unlock( blockEditorPrivateApis );
 
-function ScreenLayout( { name, variation = '' } ) {
-	const [ rawSettings ] = useGlobalSetting( '', name );
-	const settings = useSettingsForBlockElement( rawSettings, name );
+function ScreenLayout() {
+	const [ rawSettings ] = useGlobalSetting( '' );
+	const settings = useSettingsForBlockElement( rawSettings );
 	const hasDimensionsPanel = useHasDimensionsPanel( settings );
-	const variationClassName = getVariationClassName( variation );
+	const hasBackgroundPanel = useHasBackgroundPanel( settings );
 	return (
 		<>
 			<ScreenHeader title={ __( 'Layout' ) } />
-			<BlockPreviewPanel name={ name } variation={ variationClassName } />
-			{ hasDimensionsPanel && (
-				<DimensionsPanel name={ name } variation={ variation } />
-			) }
+			{ hasDimensionsPanel && <DimensionsPanel /> }
+			{ hasBackgroundPanel && <BackgroundPanel /> }
 		</>
 	);
 }

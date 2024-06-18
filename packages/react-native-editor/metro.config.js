@@ -3,6 +3,11 @@
  */
 const path = require( 'path' );
 const fs = require( 'fs' );
+const {
+	getDefaultConfig,
+	mergeConfig,
+	// eslint-disable-next-line import/no-extraneous-dependencies
+} = require( '@react-native/metro-config' );
 
 const PACKAGES_DIR = path.resolve( __dirname, '..' );
 const packageNames = fs.readdirSync( PACKAGES_DIR ).filter( ( file ) => {
@@ -10,10 +15,16 @@ const packageNames = fs.readdirSync( PACKAGES_DIR ).filter( ( file ) => {
 	return stats.isDirectory();
 } );
 
-module.exports = {
+/**
+ * Metro configuration
+ * https://facebook.github.io/metro/docs/configuration
+ *
+ * @type {import('metro-config').MetroConfig}
+ */
+const config = {
 	watchFolders: [ path.resolve( __dirname, '../..' ) ],
 	resolver: {
-		sourceExts: [ 'js', 'json', 'scss', 'sass', 'ts', 'tsx' ],
+		sourceExts: [ 'js', 'cjs', 'json', 'scss', 'sass', 'ts', 'tsx' ],
 		platforms: [ 'native', 'android', 'ios' ],
 	},
 	transformer: {
@@ -27,6 +38,7 @@ module.exports = {
 				inlineRequires: false,
 			},
 		} ),
+		unstable_allowRequireContext: true, // Used for optional setup configuration.
 	},
 	server: {
 		enhanceMiddleware: ( middleware ) => ( req, res, next ) => {
@@ -51,3 +63,5 @@ module.exports = {
 		},
 	},
 };
+
+module.exports = mergeConfig( getDefaultConfig( __dirname ), config );

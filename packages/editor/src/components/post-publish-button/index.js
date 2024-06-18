@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
@@ -11,13 +6,13 @@ import { Component, createRef } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { applyFilters } from '@wordpress/hooks';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import PublishButtonLabel from './label';
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 const noop = () => {};
 
@@ -52,14 +47,24 @@ export class PostPublishButton extends Component {
 
 	createOnClick( callback ) {
 		return ( ...args ) => {
-			const { hasNonPostEntityChanges, setEntitiesSavedStatesCallback } =
-				this.props;
+			const {
+				hasNonPostEntityChanges,
+				hasPostMetaChanges,
+				setEntitiesSavedStatesCallback,
+				isPublished,
+			} = this.props;
 			// If a post with non-post entities is published, but the user
 			// elects to not save changes to the non-post entities, those
 			// entities will still be dirty when the Publish button is clicked.
 			// We also need to check that the `setEntitiesSavedStatesCallback`
 			// prop was passed. See https://github.com/WordPress/gutenberg/pull/37383
-			if ( hasNonPostEntityChanges && setEntitiesSavedStatesCallback ) {
+			//
+			// TODO: Explore how to manage `hasPostMetaChanges` and pre-publish workflow properly.
+			if (
+				( hasNonPostEntityChanges ||
+					( hasPostMetaChanges && isPublished ) ) &&
+				setEntitiesSavedStatesCallback
+			) {
 				// The modal for multiple entity saving will open,
 				// hold the callback for saving/publishing the post
 				// so that we can call it if the post entity is checked.
@@ -103,7 +108,6 @@ export class PostPublishButton extends Component {
 	render() {
 		const {
 			forceIsDirty,
-			forceIsSaving,
 			hasPublishAction,
 			isBeingScheduled,
 			isOpen,
@@ -114,18 +118,18 @@ export class PostPublishButton extends Component {
 			isSaving,
 			isAutoSaving,
 			isToggle,
-			onSave,
-			onStatusChange,
+			savePostStatus,
 			onSubmit = noop,
 			onToggle,
 			visibility,
 			hasNonPostEntityChanges,
 			isSavingNonPostEntityChanges,
+			postStatus,
+			postStatusHasChanged,
 		} = this.props;
 
 		const isButtonDisabled =
 			( isSaving ||
-				forceIsSaving ||
 				! isSaveable ||
 				isPostSavingLocked ||
 				( ! isPublishable && ! forceIsDirty ) ) &&
@@ -134,20 +138,23 @@ export class PostPublishButton extends Component {
 		const isToggleDisabled =
 			( isPublished ||
 				isSaving ||
-				forceIsSaving ||
 				! isSaveable ||
 				( ! isPublishable && ! forceIsDirty ) ) &&
 			( ! hasNonPostEntityChanges || isSavingNonPostEntityChanges );
 
-		let publishStatus;
-		if ( ! hasPublishAction ) {
+		// If the new status has not changed explicitely, we derive it from
+		// other factors, like having a publish action, etc.. We need to preserve
+		// this because it affects when to show the pre and post publish panels.
+		// If it has changed though explicitely, we need to respect that.
+		let publishStatus = 'publish';
+		if ( postStatusHasChanged ) {
+			publishStatus = postStatus;
+		} else if ( ! hasPublishAction ) {
 			publishStatus = 'pending';
 		} else if ( visibility === 'private' ) {
 			publishStatus = 'private';
 		} else if ( isBeingScheduled ) {
 			publishStatus = 'future';
-		} else {
-			publishStatus = 'publish';
 		}
 
 		const onClickButton = () => {
@@ -161,10 +168,10 @@ export class PostPublishButton extends Component {
 			}
 			
 			onSubmit();
-			onStatusChange( publishStatus );
-			onSave();
+			savePostStatus( publishStatus );
 		};
 
+		// Callback to open the publish panel.
 		const onClickToggle = () => {
 			if ( isToggleDisabled ) {
 				return;
@@ -186,41 +193,28 @@ export class PostPublishButton extends Component {
 			className: 'editor-post-publish-panel__toggle',
 			isBusy: isSaving && isPublished,
 			variant: 'primary',
+			size: 'compact',
 			onClick: this.createOnClick( onClickToggle ),
 		};
-
-		const toggleChildren = isBeingScheduled
-			? __( 'Schedule…' )
-			: __( 'Publish' );
-		const buttonChildren = (
-			<PublishButtonLabel
-				forceIsSaving={ forceIsSaving }
-				hasNonPostEntityChanges={ hasNonPostEntityChanges }
-			/>
-		);
-
 		const componentProps = isToggle ? toggleProps : buttonProps;
-		const componentChildren = isToggle ? toggleChildren : buttonChildren;
 		return (
 			<>
 				<Button
 					ref={ this.buttonNode }
 					{ ...componentProps }
-					className={ classnames(
-						componentProps.className,
-						'editor-post-publish-button__button',
-						{
-							'has-changes-dot': hasNonPostEntityChanges,
-						}
-					) }
+					className={ `${ componentProps.className } editor-post-publish-button__button` }
+					size="compact"
 				>
-					{ componentChildren }
+					<PublishButtonLabel />
 				</Button>
 			</>
 		);
 	}
 }
 
+/**
+ * Renders the publish button.
+ */
 export default compose( [
 	withSelect( ( select ) => {
 		const {
@@ -237,11 +231,13 @@ export default compose( [
 			getCurrentPostId,
 			hasNonPostEntityChanges,
 			isSavingNonPostEntityChanges,
-		} = select( editorStore );
-		const _isAutoSaving = isAutosavingPost();
+			getEditedPostAttribute,
+			getPostEdits,
+			hasPostMetaChanges,
+		} = unlock( select( editorStore ) );
 		return {
-			isSaving: isSavingPost() || _isAutoSaving,
-			isAutoSaving: _isAutoSaving,
+			isSaving: isSavingPost(),
+			isAutoSaving: isAutosavingPost(),
 			isBeingScheduled: isEditedPostBeingScheduled(),
 			visibility: getEditedPostVisibility(),
 			isSaveable: isEditedPostSaveable(),
@@ -252,16 +248,20 @@ export default compose( [
 				getCurrentPost()._links?.[ 'wp:action-publish' ] ?? false,
 			postType: getCurrentPostType(),
 			postId: getCurrentPostId(),
+			postStatus: getEditedPostAttribute( 'status' ),
+			postStatusHasChanged: getPostEdits()?.status,
 			hasNonPostEntityChanges: hasNonPostEntityChanges(),
+			hasPostMetaChanges: hasPostMetaChanges(),
 			isSavingNonPostEntityChanges: isSavingNonPostEntityChanges(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
 		const { editPost, savePost } = dispatch( editorStore );
 		return {
-			onStatusChange: ( status ) =>
-				editPost( { status }, { undoIgnore: true } ),
-			onSave: savePost,
+			savePostStatus: ( status ) => {
+				editPost( { status }, { undoIgnore: true } );
+				savePost();
+			},
 		};
 	} ),
 ] )( PostPublishButton );

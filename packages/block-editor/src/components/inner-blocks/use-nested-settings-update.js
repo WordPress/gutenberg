@@ -1,8 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { useLayoutEffect, useMemo } from '@wordpress/element';
-import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+import { useLayoutEffect, useMemo, useState } from '@wordpress/element';
+import { useRegistry } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
@@ -15,6 +16,14 @@ import { getLayoutType } from '../../layouts';
 
 const pendingSettingsUpdates = new WeakMap();
 
+function useShallowMemo( value ) {
+	const [ prevValue, setPrevValue ] = useState( value );
+	if ( ! isShallowEqual( prevValue, value ) ) {
+		setPrevValue( value );
+	}
+	return prevValue;
+}
+
 /**
  * This hook is a side effect which updates the block-editor store when changes
  * happen to inner block settings. The given props are transformed into a
@@ -23,11 +32,17 @@ const pendingSettingsUpdates = new WeakMap();
  * came from props.
  *
  * @param {string}               clientId                   The client ID of the block to update.
+ * @param {string}               parentLock
  * @param {string[]}             allowedBlocks              An array of block names which are permitted
  *                                                          in inner blocks.
- * @param {?WPDirectInsertBlock} __experimentalDefaultBlock The default block to insert: [ blockName, { blockAttributes } ].
- * @param {?Function|boolean}    __experimentalDirectInsert If a default block should be inserted directly by the
- *                                                          appender.
+ * @param {string[]}             prioritizedInserterBlocks  Block names and/or block variations to be prioritized in the inserter, in the format {blockName}/{variationName}.
+ * @param {?WPDirectInsertBlock} defaultBlock               The default block to insert: [ blockName, { blockAttributes } ].
+ * @param {?boolean}             directInsert               If a default block should be inserted directly by the appender.
+ *
+ * @param {?WPDirectInsertBlock} __experimentalDefaultBlock A deprecated prop for the default block to insert: [ blockName, { blockAttributes } ]. Use `defaultBlock` instead.
+ *
+ * @param {?boolean}             __experimentalDirectInsert A deprecated prop for whether a default block should be inserted directly by the appender. Use `directInsert` instead.
+ *
  * @param {string}               [templateLock]             The template lock specified for the inner
  *                                                          blocks component. (e.g. "all")
  * @param {boolean}              captureToolbars            Whether or children toolbars should be shown
@@ -39,7 +54,11 @@ const pendingSettingsUpdates = new WeakMap();
  */
 export default function useNestedSettingsUpdate(
 	clientId,
+	parentLock,
 	allowedBlocks,
+	prioritizedInserterBlocks,
+	defaultBlock,
+	directInsert,
 	__experimentalDefaultBlock,
 	__experimentalDirectInsert,
 	templateLock,
@@ -47,34 +66,34 @@ export default function useNestedSettingsUpdate(
 	orientation,
 	layout
 ) {
-	const { updateBlockListSettings } = useDispatch( blockEditorStore );
+	// Instead of adding a useSelect mapping here, please add to the useSelect
+	// mapping in InnerBlocks! Every subscription impacts performance.
+
 	const registry = useRegistry();
 
-	const { blockListSettings, parentLock } = useSelect(
-		( select ) => {
-			const rootClientId =
-				select( blockEditorStore ).getBlockRootClientId( clientId );
-			return {
-				blockListSettings:
-					select( blockEditorStore ).getBlockListSettings( clientId ),
-				parentLock:
-					select( blockEditorStore ).getTemplateLock( rootClientId ),
-			};
-		},
-		[ clientId ]
+	// Implementors often pass a new array on every render,
+	// and the contents of the arrays are just strings, so the entire array
+	// can be passed as dependencies but We need to include the length of the array,
+	// otherwise if the arrays change length but the first elements are equal the comparison,
+	// does not works as expected.
+	const _allowedBlocks = useShallowMemo( allowedBlocks );
+
+	const _prioritizedInserterBlocks = useMemo(
+		() => prioritizedInserterBlocks,
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		prioritizedInserterBlocks
 	);
 
-	// Memoize as inner blocks implementors often pass a new array on every
-	// render.
-	const _allowedBlocks = useMemo( () => allowedBlocks, allowedBlocks );
+	const _templateLock =
+		templateLock === undefined || parentLock === 'contentOnly'
+			? parentLock
+			: templateLock;
 
 	useLayoutEffect( () => {
 		const newSettings = {
 			allowedBlocks: _allowedBlocks,
-			templateLock:
-				templateLock === undefined || parentLock === 'contentOnly'
-					? parentLock
-					: templateLock,
+			prioritizedInserterBlocks: _prioritizedInserterBlocks,
+			templateLock: _templateLock,
 		};
 
 		// These values are not defined for RN, so only include them if they
@@ -93,50 +112,71 @@ export default function useNestedSettingsUpdate(
 		}
 
 		if ( __experimentalDefaultBlock !== undefined ) {
-			newSettings.__experimentalDefaultBlock = __experimentalDefaultBlock;
+			deprecated( '__experimentalDefaultBlock', {
+				alternative: 'defaultBlock',
+				since: '6.3',
+				version: '6.4',
+			} );
+			newSettings.defaultBlock = __experimentalDefaultBlock;
+		}
+
+		if ( defaultBlock !== undefined ) {
+			newSettings.defaultBlock = defaultBlock;
 		}
 
 		if ( __experimentalDirectInsert !== undefined ) {
-			newSettings.__experimentalDirectInsert = __experimentalDirectInsert;
+			deprecated( '__experimentalDirectInsert', {
+				alternative: 'directInsert',
+				since: '6.3',
+				version: '6.4',
+			} );
+			newSettings.directInsert = __experimentalDirectInsert;
 		}
 
-		if ( ! isShallowEqual( blockListSettings, newSettings ) ) {
-			// Batch updates to block list settings to avoid triggering cascading renders
-			// for each container block included in a tree and optimize initial render.
-			// To avoid triggering updateBlockListSettings for each container block
-			// causing X re-renderings for X container blocks,
-			// we batch all the updatedBlockListSettings in a single "data" batch
-			// which results in a single re-render.
-			if ( ! pendingSettingsUpdates.get( registry ) ) {
-				pendingSettingsUpdates.set( registry, [] );
-			}
-			pendingSettingsUpdates
-				.get( registry )
-				.push( [ clientId, newSettings ] );
-			window.queueMicrotask( () => {
-				if ( pendingSettingsUpdates.get( registry )?.length ) {
-					registry.batch( () => {
-						pendingSettingsUpdates
-							.get( registry )
-							.forEach( ( args ) => {
-								updateBlockListSettings( ...args );
-							} );
-						pendingSettingsUpdates.set( registry, [] );
-					} );
-				}
+		if ( directInsert !== undefined ) {
+			newSettings.directInsert = directInsert;
+		}
+
+		if (
+			newSettings.directInsert !== undefined &&
+			typeof newSettings.directInsert !== 'boolean'
+		) {
+			deprecated( 'Using `Function` as a `directInsert` argument', {
+				alternative: '`boolean` values',
+				since: '6.5',
 			} );
 		}
+
+		// Batch updates to block list settings to avoid triggering cascading renders
+		// for each container block included in a tree and optimize initial render.
+		// To avoid triggering updateBlockListSettings for each container block
+		// causing X re-renderings for X container blocks,
+		// we batch all the updatedBlockListSettings in a single "data" batch
+		// which results in a single re-render.
+		if ( ! pendingSettingsUpdates.get( registry ) ) {
+			pendingSettingsUpdates.set( registry, {} );
+		}
+		pendingSettingsUpdates.get( registry )[ clientId ] = newSettings;
+		window.queueMicrotask( () => {
+			const settings = pendingSettingsUpdates.get( registry );
+			if ( Object.keys( settings ).length ) {
+				const { updateBlockListSettings } =
+					registry.dispatch( blockEditorStore );
+				updateBlockListSettings( settings );
+				pendingSettingsUpdates.set( registry, {} );
+			}
+		} );
 	}, [
 		clientId,
-		blockListSettings,
 		_allowedBlocks,
+		_prioritizedInserterBlocks,
+		_templateLock,
+		defaultBlock,
+		directInsert,
 		__experimentalDefaultBlock,
 		__experimentalDirectInsert,
-		templateLock,
-		parentLock,
 		captureToolbars,
 		orientation,
-		updateBlockListSettings,
 		layout,
 		registry,
 	] );

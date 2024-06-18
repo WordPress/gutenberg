@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -37,7 +37,7 @@ export default function Edit( {
 	setAttributes,
 } ) {
 	const blockProps = useBlockProps( {
-		className: classnames( {
+		className: clsx( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
@@ -70,7 +70,7 @@ export default function Edit( {
 
 	const inspectorControls = (
 		<InspectorControls>
-			<PanelBody title={ __( 'Link settings' ) }>
+			<PanelBody title={ __( 'Settings' ) }>
 				<ToggleControl
 					__nextHasNoMarginBottom
 					label={ __( 'Link to authors URL' ) }

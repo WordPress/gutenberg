@@ -1,10 +1,10 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "core/cover",
 	"title": "Cover",
 	"category": "media",
-	"description": "Add an image or video with a text overlay — great for headers.",
+	"description": "Add an image or video with a text overlay.",
 	"textdomain": "default",
 	"attributes": {
 		"url": {
@@ -19,9 +19,6 @@
 		},
 		"alt": {
 			"type": "string",
-			"source": "attribute",
-			"selector": "img",
-			"attribute": "alt",
 			"default": ""
 		},
 		"hasParallax": {
@@ -41,6 +38,9 @@
 		},
 		"customOverlayColor": {
 			"type": "string"
+		},
+		"isUserOverlayColor": {
+			"type": "boolean"
 		},
 		"backgroundType": {
 			"type": "string",
@@ -85,6 +85,7 @@
 		"anchor": true,
 		"align": true,
 		"html": false,
+		"shadow": true,
 		"spacing": {
 			"padding": true,
 			"margin": [ "top", "bottom" ],
@@ -108,9 +109,14 @@
 		},
 		"color": {
 			"__experimentalDuotone": "> .wp-block-cover__image-background, > .wp-block-cover__video-background",
+			"heading": true,
 			"text": true,
 			"background": false,
-			"__experimentalSkipSerialization": [ "gradients" ]
+			"__experimentalSkipSerialization": [ "gradients" ],
+			"enableContrastChecker": false
+		},
+		"dimensions": {
+			"aspectRatio": true
 		},
 		"typography": {
 			"fontSize": true,
@@ -125,8 +131,11 @@
 				"fontSize": true
 			}
 		},
-		"__experimentalLayout": {
+		"layout": {
 			"allowJustification": false
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	},
 	"editorStyle": "wp-block-cover-editor",
