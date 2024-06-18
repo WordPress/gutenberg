@@ -58,31 +58,6 @@ class WP_Block_Supports_Block_Style_Variations_Test extends WP_UnitTestCase {
 	 */
 	private $orig_theme_dir;
 
-	public static function set_up_before_class() {
-		parent::set_up_before_class();
-
-		self::$administrator_id = self::factory()->user->create(
-			array(
-				'role'       => 'administrator',
-				'user_email' => 'administrator@example.com',
-			)
-		);
-
-		static::$property_blocks_cache = new ReflectionProperty( WP_Theme_JSON_Resolver_Gutenberg::class, 'blocks_cache' );
-		static::$property_blocks_cache->setAccessible( true );
-		static::$property_blocks_cache_orig_value = static::$property_blocks_cache->getValue();
-
-		static::$property_core = new ReflectionProperty( WP_Theme_JSON_Resolver_Gutenberg::class, 'core' );
-		static::$property_core->setAccessible( true );
-		static::$property_core_orig_value = static::$property_core->getValue();
-	}
-
-	public static function tear_down_after_class() {
-		static::$property_blocks_cache->setValue( null, static::$property_blocks_cache_orig_value );
-		static::$property_core->setValue( null, static::$property_core_orig_value );
-		parent::tear_down_after_class();
-	}
-
 	public function set_up() {
 		parent::set_up();
 		$this->theme_root = realpath( dirname( __DIR__ ) . '/data/themedir1' );
