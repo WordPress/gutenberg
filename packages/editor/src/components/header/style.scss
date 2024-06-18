@@ -60,12 +60,10 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	// Grid items will, by default, refuse to shrink below a minimum intrinsic
-	// width. To enable shrinking and thereby truncate child text, hide the
-	// overflow.
-	overflow: hidden;
-	// Make room for the focus ring.
-	padding: 2px;
+	// To enable shrinking and truncating of child text, apply an explicit min-width.
+	min-width: 0;
+	// Clip the box while leaving room for focus rings.
+	clip-path: inset(-2px);
 }
 
 /**
