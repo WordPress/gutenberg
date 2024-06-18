@@ -9,20 +9,12 @@ import clsx from 'clsx';
 import {
 	BlockToolbar,
 	store as blockEditorStore,
-	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
 import { Button, Popover } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { next, previous } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../../lock-unlock';
-
-const { useHasBlockToolbar } = unlock( blockEditorPrivateApis );
 
 function CollapsableBlockToolbar( { isCollapsed, onToggle } ) {
 	const { blockSelectionStart } = useSelect( ( select ) => {
@@ -31,7 +23,6 @@ function CollapsableBlockToolbar( { isCollapsed, onToggle } ) {
 				select( blockEditorStore ).getBlockSelectionStart(),
 		};
 	}, [] );
-	const hasBlockToolbar = useHasBlockToolbar();
 
 	const hasBlockSelection = !! blockSelectionStart;
 
@@ -41,10 +32,6 @@ function CollapsableBlockToolbar( { isCollapsed, onToggle } ) {
 			onToggle( false );
 		}
 	}, [ blockSelectionStart, onToggle ] );
-
-	if ( ! hasBlockToolbar ) {
-		return null;
-	}
 
 	return (
 		<>

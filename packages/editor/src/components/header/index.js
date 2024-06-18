@@ -12,7 +12,10 @@ import { __unstableMotion as motion } from '@wordpress/components';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { useState } from '@wordpress/element';
 import { PinnedItems } from '@wordpress/interface';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import {
+	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -28,6 +31,9 @@ import PostSavedState from '../post-saved-state';
 import PostViewLink from '../post-view-link';
 import PreviewDropdown from '../preview-dropdown';
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const { useHasBlockToolbar } = unlock( blockEditorPrivateApis );
 
 const toolbarVariations = {
 	distractionFreeDisabled: { y: '-50px' },
@@ -82,15 +88,27 @@ function Header( {
 		};
 	}, [] );
 
-	const hasTopToolbar = isLargeViewport && hasFixedToolbar;
-
 	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
 		useState( true );
+
+	const blockToolbar =
+		useHasBlockToolbar() && hasFixedToolbar && isLargeViewport ? (
+			<CollapsableBlockToolbar
+				isCollapsed={ isBlockToolsCollapsed }
+				onToggle={ setIsBlockToolsCollapsed }
+			/>
+		) : null;
+
+	const showDocumentBar = ! blockToolbar || isBlockToolsCollapsed;
 
 	// The edit-post-header classname is only kept for backward compatibilty
 	// as some plugins might be relying on its presence.
 	return (
-		<div className="editor-header edit-post-header">
+		<div
+			className={ clsx( 'editor-header edit-post-header', {
+				'has-center': showDocumentBar,
+			} ) }
+		>
 			<motion.div
 				variants={ backButtonVariations }
 				transition={ { type: 'tween' } }
@@ -105,21 +123,17 @@ function Header( {
 				<DocumentTools
 					disableBlockTools={ forceDisableBlockTools || isTextEditor }
 				/>
-				{ hasTopToolbar && (
-					<CollapsableBlockToolbar
-						isCollapsed={ isBlockToolsCollapsed }
-						onToggle={ setIsBlockToolsCollapsed }
-					/>
-				) }
-				<div
-					className={ clsx( 'editor-header__center', {
-						'is-collapsed':
-							! isBlockToolsCollapsed && hasTopToolbar,
-					} ) }
+				{ blockToolbar }
+			</motion.div>
+			{ ( title || showDocumentBar ) && (
+				<motion.div
+					className="editor-header__center"
+					variants={ toolbarVariations }
+					transition={ { type: 'tween' } }
 				>
 					<DocumentBar title={ title } icon={ icon } />
-				</div>
-			</motion.div>
+				</motion.div>
+			) }
 			<motion.div
 				variants={ toolbarVariations }
 				transition={ { type: 'tween' } }
