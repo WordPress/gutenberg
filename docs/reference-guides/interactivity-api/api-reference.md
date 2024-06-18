@@ -328,7 +328,7 @@ The callback passed as the reference receives [the event](https://developer.mozi
 ### `wp-on-async`
 
 This directive is a more performant approach of `wp-on`. The action will be yielded to the main thread to not block it, allowing other interactions that otherwise would be waiting on the main thread
-to run sooner. Use this directive for any `wp-on` that doesn't need the `event` object (`event.preventDefault()`, `event.stopPropagation()`, etc.)
+to run sooner. Use this directive for any `wp-on` that doesn't need synchronous access to the `event` object, in particular the methods `event.preventDefault()`, `event.stopPropagation()`, and `event.stopImmediatePropagation()`.
 
 ### `wp-on-window`
 
@@ -361,7 +361,7 @@ The callback passed as the reference receives [the event](https://developer.mozi
 
 ### `wp-on-window-async`
 
-Similar to `wp-on-async`. An optimized version of `wp-on-window` that prevents blocking the main thread on long tasks. Use this directive for any `wp-on-window` that doesn't need the `event` object (`event.preventDefault()`, `event.stopPropagation()`, etc.)
+Similar to `wp-on-async`. An optimized version of `wp-on-window` that prevents blocking the main thread on long tasks. Use this directive for any `wp-on` that doesn't need synchronous access to the `event` object, in particular the methods `event.preventDefault()`, `event.stopPropagation()`, and `event.stopImmediatePropagation()`. This event listener is also added as `passive`.
 
 ### `wp-on-document`
 
@@ -394,7 +394,7 @@ The callback passed as the reference receives [the event](https://developer.mozi
 
 ### `wp-on-document-async`
 
-Similar to `wp-on-async`. An optimized version of `wp-on-document` that prevents blocking the main thread on long tasks. Use this directive for any `wp-on-document` that doesn't need the `event` object (`event.preventDefault()`, `event.stopPropagation()`, etc.)
+Similar to `wp-on-async`. An optimized version of `wp-on-document` that prevents blocking the main thread on long tasks. Use this directive for any `wp-on` that doesn't need synchronous access to the `event` object, in particular the methods `event.preventDefault()`, `event.stopPropagation()`, and `event.stopImmediatePropagation()`. This event listener is also added as `passive`.
 
 ### `wp-watch`
 
