@@ -307,7 +307,7 @@ For each user feature we should also add a importance categorization label  to i
 
 ## 1.89.0
 
--   No User facing changes \*
+-   No user facing changes.
 
 ## 1.88.0
 
