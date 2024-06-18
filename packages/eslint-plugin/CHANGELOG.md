@@ -152,7 +152,7 @@
 
 ## 12.8.0 (2022-07-27)
 
-### Code Quality
+### Internal
 
 -   Remove deprecated rules `no-negated-in-lhs` replaced with `no-unsafe-negation`, and `jsx-a11y/label-has-for` replaced with `jsx-a11/label-has-associated-control` ([#42654](https://github.com/WordPress/gutenberg/pull/42654)).
 
