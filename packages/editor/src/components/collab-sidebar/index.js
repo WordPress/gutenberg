@@ -30,10 +30,9 @@ const isBlockCommentExperimentEnabled =
  */
 export default function CollabSidebar() {
 	const { threads } = useSelect( ( select ) => {
-		const post = select( editorStore ).getCurrentPost();
-
+		const meta = select( editorStore ).getEditedPostAttribute( 'meta' );
 		return {
-			threads: post?.meta?.collab ? JSON.parse( post.meta.collab ) : false,
+			threads: meta?.collab ? JSON.parse( meta.collab ) : false,
 		};
 	}, [] );
 
