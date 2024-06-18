@@ -380,34 +380,17 @@ function reportSummaryNextSteps( successes, failures ) {
 function GHcommentAndRemoveLabel( pr ) {
 	const { number, cherryPickHash } = pr;
 	const comment = prComment( cherryPickHash );
-	const repo = 'WordPress/gutenberg';
+	const repo = [ '--repo', 'WordPress/gutenberg' ];
 	try {
-		cli( 'gh', [
-			'pr',
-			'comment',
-			number,
-			'--repo',
-			repo,
-			'--body',
-			comment,
-		] );
-		cli( 'gh', [
-			'pr',
-			'edit',
-			number,
-			'--repo',
-			repo,
-			'--remove-label',
-			LABEL,
-		] );
+		cli( 'gh', [ 'pr', 'comment', number, ...repo, '--body', comment ] );
+		cli( 'gh', [ 'pr', 'edit', number, ...repo, '--remove-label', LABEL ] );
 
 		if ( LABEL === 'Backport to WP Beta/RC' ) {
 			cli( 'gh', [
 				'pr',
 				'edit',
 				number,
-				'--repo',
-				repo,
+				...repo,
 				'--add-label',
 				BACKPORT_COMPLETED_LABEL,
 			] );
