@@ -491,3 +491,10 @@ export const removeTemplates =
 				.createErrorNotice( errorMessage, { type: 'snackbar' } );
 		}
 	};
+
+export function setCanvasOverlayTitle( title ) {
+	return {
+		type: 'SET_CANVAS_OVERLAY_TITLE',
+		title,
+	};
+}

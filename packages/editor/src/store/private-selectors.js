@@ -185,3 +185,7 @@ export const hasPostMetaChanges = createRegistrySelector(
 export function getEntityActions( state, ...args ) {
 	return _getEntityActions( state.dataviews, ...args );
 }
+
+export function getCanvasOverlayTitle( state ) {
+	return state.canvasOverlayTitle;
+}

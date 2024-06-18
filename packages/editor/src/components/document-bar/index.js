@@ -61,16 +61,18 @@ export default function DocumentBar() {
 		documentTitle,
 		isNotFound,
 		isUnsyncedPattern,
+		overlayTitle,
 		templateIcon,
 		templateTitle,
 		onNavigateToPreviousEntityRecord,
 	} = useSelect( ( select ) => {
 		const {
+			getCanvasOverlayTitle,
 			getCurrentPostType,
 			getCurrentPostId,
 			getEditorSettings,
 			__experimentalGetTemplateInfo: getTemplateInfo,
-		} = select( editorStore );
+		} = unlock( select( editorStore ) );
 		const { getEditedEntityRecord, isResolving: isResolvingSelector } =
 			select( coreStore );
 		const _postType = getCurrentPostType();
@@ -93,6 +95,7 @@ export default function DocumentBar() {
 					_postId
 				),
 			isUnsyncedPattern: _document?.wp_pattern_sync_status === 'unsynced',
+			overlayTitle: getCanvasOverlayTitle(),
 			templateIcon: unlock( select( editorStore ) ).getPostIcon(
 				_postType,
 				{
@@ -111,7 +114,8 @@ export default function DocumentBar() {
 	const isTemplate = TEMPLATE_POST_TYPES.includes( postType );
 	const isGlobalEntity = GLOBAL_POST_TYPES.includes( postType );
 	const hasBackButton = !! onNavigateToPreviousEntityRecord;
-	const title = isTemplate ? templateTitle : documentTitle;
+	const entitytitle = isTemplate ? templateTitle : documentTitle;
+	const title = overlayTitle || entitytitle;
 
 	const mounted = useRef( false );
 	useEffect( () => {

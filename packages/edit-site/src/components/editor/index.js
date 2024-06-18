@@ -17,7 +17,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
-import { useCallback, useMemo } from '@wordpress/element';
+import { useCallback, useEffect, useMemo } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -32,10 +32,10 @@ import { GlobalStylesRenderer } from '../global-styles-renderer';
 import CanvasLoader from '../canvas-loader';
 import { unlock } from '../../lock-unlock';
 import { useSpecificEditorSettings } from '../block-editor/use-site-editor-settings';
+import { getEditorCanvasContainerTitle } from '../editor-canvas-container';
 import PluginTemplateSettingPanel from '../plugin-template-setting-panel';
 import GlobalStylesSidebar from '../global-styles-sidebar';
 import { isPreviewingTheme } from '../../utils/is-previewing-theme';
-import { getEditorCanvasContainerTitle } from '../editor-canvas-container';
 import SaveButton from '../save-button';
 import SiteEditorMoreMenu from '../more-menu';
 import SiteIcon from '../site-icon';
@@ -55,16 +55,17 @@ export default function EditSiteEditor( { isLoading } ) {
 	const {
 		editedPostType,
 		editedPostId,
+		editorCanvasContainerTitle,
 		contextPostType,
 		contextPostId,
 		canvasMode,
 		isEditingPage,
 		supportsGlobalStyles,
 		showIconLabels,
-		editorCanvasView,
 		currentPostIsTrashed,
 	} = useSelect( ( select ) => {
 		const {
+			getEditorCanvasContainerView,
 			getEditedPostContext,
 			getCanvasMode,
 			isPage,
@@ -74,21 +75,22 @@ export default function EditSiteEditor( { isLoading } ) {
 		const { get } = select( preferencesStore );
 		const { getCurrentTheme } = select( coreDataStore );
 		const _context = getEditedPostContext();
+		const editorCanvasContainerView = getEditorCanvasContainerView();
 
 		// The currently selected entity to display.
 		// Typically template or template part in the site editor.
 		return {
 			editedPostType: getEditedPostType(),
 			editedPostId: getEditedPostId(),
+			editorCanvasContainerTitle: getEditorCanvasContainerTitle(
+				editorCanvasContainerView
+			),
 			contextPostType: _context?.postId ? _context.postType : undefined,
 			contextPostId: _context?.postId ? _context.postId : undefined,
 			canvasMode: getCanvasMode(),
 			isEditingPage: isPage(),
 			supportsGlobalStyles: getCurrentTheme()?.is_block_theme,
 			showIconLabels: get( 'core', 'showIconLabels' ),
-			editorCanvasView: unlock(
-				select( editSiteStore )
-			).getEditorCanvasContainerView(),
 			currentPostIsTrashed:
 				select( editorStore ).getCurrentPostAttribute( 'status' ) ===
 				'trash',
@@ -175,6 +177,11 @@ export default function EditSiteEditor( { isLoading } ) {
 		[ history, createSuccessNotice ]
 	);
 
+	const { setCanvasOverlayTitle } = unlock( useDispatch( editorStore ) );
+	useEffect( () => {
+		setCanvasOverlayTitle( editorCanvasContainerTitle );
+	}, [ editorCanvasContainerTitle, setCanvasOverlayTitle ] );
+
 	const isReady = ! isLoading;
 
 	return (
@@ -201,11 +208,6 @@ export default function EditSiteEditor( { isLoading } ) {
 						_isPreviewingTheme && <SaveButton size="compact" />
 					}
 					forceDisableBlockTools={ ! hasDefaultEditorCanvasView }
-					title={
-						! hasDefaultEditorCanvasView
-							? getEditorCanvasContainerTitle( editorCanvasView )
-							: undefined
-					}
 					iframeProps={ iframeProps }
 					onActionPerformed={ onActionPerformed }
 					extraSidebarPanels={
