@@ -1512,13 +1512,20 @@ function block_core_navigation_mock_parsed_block( $inner_blocks, $post ) {
  */
 function block_core_navigation_insert_hooked_blocks( $inner_blocks, $post ) {
 	$mock_navigation_block = block_core_navigation_mock_parsed_block( $inner_blocks, $post );
-	$hooked_blocks         = get_hooked_blocks();
 	$before_block_visitor  = null;
 	$after_block_visitor   = null;
 
-	if ( ! empty( $hooked_blocks ) || has_filter( 'hooked_block_types' ) ) {
-		$before_block_visitor = make_before_block_visitor( $hooked_blocks, $post, 'insert_hooked_blocks' );
-		$after_block_visitor  = make_after_block_visitor( $hooked_blocks, $post, 'insert_hooked_blocks' );
+	if ( function_exists('get_hooked_blocks_by_anchor_block') ) {
+		if ( maybe_has_hooked_blocks() ) {
+			$before_block_visitor = make_before_block_visitor( $post, 'insert_hooked_blocks' );
+			$after_block_visitor  = make_after_block_visitor( $post, 'insert_hooked_blocks' );
+		}
+	} else {
+		$hooked_blocks         = get_hooked_blocks();
+		if ( ! empty( $hooked_blocks ) || has_filter( 'hooked_block_types' ) ) {
+			$before_block_visitor = make_before_block_visitor( $hooked_blocks, $post, 'insert_hooked_blocks' );
+			$after_block_visitor  = make_after_block_visitor( $hooked_blocks, $post, 'insert_hooked_blocks' );
+		}
 	}
 
 	return traverse_and_serialize_block( $mock_navigation_block, $before_block_visitor, $after_block_visitor );
@@ -1539,13 +1546,20 @@ function block_core_navigation_insert_hooked_blocks( $inner_blocks, $post ) {
  */
 function block_core_navigation_set_ignored_hooked_blocks_metadata( $inner_blocks, $post ) {
 	$mock_navigation_block = block_core_navigation_mock_parsed_block( $inner_blocks, $post );
-	$hooked_blocks         = get_hooked_blocks();
 	$before_block_visitor  = null;
 	$after_block_visitor   = null;
 
-	if ( ! empty( $hooked_blocks ) || has_filter( 'hooked_block_types' ) ) {
-		$before_block_visitor = make_before_block_visitor( $hooked_blocks, $post, 'set_ignored_hooked_blocks_metadata' );
-		$after_block_visitor  = make_after_block_visitor( $hooked_blocks, $post, 'set_ignored_hooked_blocks_metadata' );
+	if ( function_exists('get_hooked_blocks_by_anchor_block') ) {
+		if ( maybe_has_hooked_blocks() ) {
+			$before_block_visitor = make_before_block_visitor( $post, 'set_ignored_hooked_blocks_metadata' );
+			$after_block_visitor  = make_after_block_visitor( $post, 'set_ignored_hooked_blocks_metadata' );
+		}
+	} else {
+		$hooked_blocks         = get_hooked_blocks();
+		if ( ! empty( $hooked_blocks ) || has_filter( 'hooked_block_types' ) ) {
+			$before_block_visitor = make_before_block_visitor( $hooked_blocks, $post, 'set_ignored_hooked_blocks_metadata' );
+			$after_block_visitor  = make_after_block_visitor( $hooked_blocks, $post, 'set_ignored_hooked_blocks_metadata' );
+		}
 	}
 
 	return traverse_and_serialize_block( $mock_navigation_block, $before_block_visitor, $after_block_visitor );
