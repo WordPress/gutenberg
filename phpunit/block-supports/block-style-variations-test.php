@@ -59,8 +59,8 @@ class WP_Block_Supports_Block_Style_Variations_Test extends WP_UnitTestCase {
 	private $orig_theme_dir;
 
 	public static function tear_down_after_class() {
-        // Reset data after test suite.
-        _gutenberg_clean_theme_json_caches();
+		// Reset data after test suite.
+		_gutenberg_clean_theme_json_caches();
 		parent::tear_down_after_class();
 	}
 
