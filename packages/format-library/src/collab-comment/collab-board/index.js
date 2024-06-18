@@ -21,10 +21,8 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useState, useEffect } from '@wordpress/element';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { dateI18n, format, getSettings } from '@wordpress/date';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { store as editorStore } from '@wordpress/editor';
 
 /**
@@ -132,19 +130,21 @@ const CollabBoard = ( { contentRef, onClose } ) => {
 			],
 		},
 	} );
-
-	// Function to save the comment.
-	const saveComment = async () => {
-		const newComment = generateNewComment();
-		const updatedComments = getUpdatedComments( newComment, threadId );
-
+	const updateCommentMeta = async ( updatedComments ) => {
 		await saveEntityRecord( 'postType', 'post', {
 			id: postId,
 			meta: {
 				collab: JSON.stringify( updatedComments ),
 			},
 		} );
+	}
 
+	// Function to save the comment.
+	const saveComment = async () => {
+		const newComment = generateNewComment();
+		const updatedComments = getUpdatedComments( newComment, threadId );
+
+		await updateCommentMeta ( updatedComments );
 		setInputComment( '' );
 	};
 
@@ -165,13 +165,7 @@ const CollabBoard = ( { contentRef, onClose } ) => {
 			} );
 		}
 
-		await saveEntityRecord( 'postType', 'post', {
-			id: postId,
-			meta: {
-				collab: JSON.stringify( editedComments ),
-			},
-		} );
-
+		await updateCommentMeta ( editedComments );
 		setInputComment( '' );
 		setIsEditing( null );
 	};
@@ -190,11 +184,7 @@ const CollabBoard = ( { contentRef, onClose } ) => {
 		};
 
 		// Save the updated comments.
-		await saveEntityRecord( 'postType', 'post', {
-			id: postId,
-			meta: { collab: JSON.stringify( updatedComments ) },
-		} );
-
+		await updateCommentMeta ( updatedComments );
 		removeBorder();
 		setThreadId( null );
 		onClose();
@@ -224,10 +214,7 @@ const CollabBoard = ( { contentRef, onClose } ) => {
 		}
 
 		// Save the updated comments.
-		await saveEntityRecord( 'postType', 'post', {
-			id: postId,
-			meta: { collab: JSON.stringify( updatedComments ) },
-		} );
+		await updateCommentMeta ( updatedComments );
 	};
 
 	// Function to show the confirmation overlay.

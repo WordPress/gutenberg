@@ -33,7 +33,7 @@ export default function CollabSidebar() {
 		const post = select( editorStore ).getCurrentPost();
 
 		return {
-			threads: post?.meta?.collab ? JSON.parse( post.meta.collab ) : [],
+			threads: post?.meta?.collab ? JSON.parse( post.meta.collab ) : false,
 		};
 	}, [] );
 
@@ -54,7 +54,7 @@ export default function CollabSidebar() {
 			<div className="editor-collab-sidebar__activities">
 				{
 					// If there are no threads, show a message indicating no threads are available.
-					Object.keys( threads ).length === 0 && (
+					! threads && (
 						<VStack
 							className="editor-collab-sidebar__thread"
 							spacing="3"
