@@ -29,9 +29,7 @@ import { store as editorStore } from '../../store';
 import { PATTERN_POST_TYPE } from '../../store/constants';
 import { modalName as patternRenameModalName } from '../pattern-rename-modal';
 import { modalName as patternDuplicateModalName } from '../pattern-duplicate-modal';
-import EditorContentSlotFill, {
-	useHasEditorContentSlotFill,
-} from '../editor-interface/content-slot-fill';
+import { useHasEditorContentSlotFill } from '../editor-interface/content-slot-fill';
 
 function useEditorCommandLoader() {
 	const {
@@ -302,9 +300,7 @@ function useEditedEntityContextualCommands() {
 		};
 	}, [] );
 	const { openModal } = useDispatch( interfaceStore );
-	const hasDefaultEditorCanvasView = ! useHasEditorContentSlotFill(
-		EditorContentSlotFill.privateKey
-	);
+	const hasDefaultEditorCanvasView = ! useHasEditorContentSlotFill();
 	const commands = [];
 
 	if ( hasDefaultEditorCanvasView && postType === PATTERN_POST_TYPE ) {

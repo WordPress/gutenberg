@@ -42,12 +42,8 @@ import SiteIcon from '../site-icon';
 import useEditorIframeProps from '../block-editor/use-editor-iframe-props';
 import useEditorTitle from './use-editor-title';
 
-const {
-	Editor,
-	BackButton,
-	EditorContentSlotFill,
-	useHasEditorContentSlotFill,
-} = unlock( editorPrivateApis );
+const { Editor, BackButton, useHasEditorContentSlotFill } =
+	unlock( editorPrivateApis );
 const { useHistory } = unlock( routerPrivateApis );
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 
@@ -98,9 +94,7 @@ export default function EditSiteEditor( { isLoading } ) {
 	}, [] );
 	useEditorTitle();
 	const _isPreviewingTheme = isPreviewingTheme();
-	const hasDefaultEditorCanvasView = ! useHasEditorContentSlotFill(
-		EditorContentSlotFill.privateKey
-	);
+	const hasDefaultEditorCanvasView = ! useHasEditorContentSlotFill();
 	const iframeProps = useEditorIframeProps();
 	const isEditMode = canvasMode === 'edit';
 	const postWithTemplate = !! contextPostId;

@@ -15,8 +15,8 @@ const { createPrivateSlotFill } = unlock( componentsPrivateApis );
 const SLOT_FILL_NAME = 'EditCanvasContainerSlot';
 const EditorContentSlotFill = createPrivateSlotFill( SLOT_FILL_NAME );
 
-export function useHasEditorContentSlotFill( privateKey ) {
-	const fills = useSlotFills( privateKey );
+export function useHasEditorContentSlotFill() {
+	const fills = useSlotFills( EditorContentSlotFill.privateKey );
 	return !! fills?.length;
 }
 
