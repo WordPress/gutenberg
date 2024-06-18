@@ -17,6 +17,23 @@ import { useStyleOverride } from './utils';
 import { store as blockEditorStore } from '../store';
 import { globalStylesDataKey } from '../store/private-keys';
 
+const VARIATION_PREFIX = 'is-style-';
+
+function getVariationMatches( className ) {
+	if ( ! className ) {
+		return [];
+	}
+	return className.split( /\s+/ ).reduce( ( matches, name ) => {
+		if ( name.startsWith( VARIATION_PREFIX ) ) {
+			const match = name.slice( VARIATION_PREFIX.length );
+			if ( match !== 'default' ) {
+				matches.push( match );
+			}
+		}
+		return matches;
+	}, [] );
+}
+
 /**
  * Get the first block style variation that has been registered from the class string.
  *
@@ -28,14 +45,13 @@ import { globalStylesDataKey } from '../store/private-keys';
 function getVariationNameFromClass( className, registeredStyles = [] ) {
 	// The global flag affects how capturing groups work in JS. So the regex
 	// below will only return full CSS classes not just the variation name.
-	const matches = className?.match( /\bis-style-(?!default)(\S+)\b/g );
+	const matches = getVariationMatches( className );
 
 	if ( ! matches ) {
 		return null;
 	}
 
-	for ( const variationClass of matches ) {
-		const variation = variationClass.substring( 9 ); // Remove 'is-style-' prefix.
+	for ( const variation of matches ) {
 		if ( registeredStyles.some( ( style ) => style.name === variation ) ) {
 			return variation;
 		}
@@ -94,7 +110,7 @@ function useBlockProps( { name, className, clientId } ) {
 
 	const registeredStyles = getBlockStyles( name );
 	const variation = getVariationNameFromClass( className, registeredStyles );
-	const variationClass = `is-style-${ variation }-${ clientId }`;
+	const variationClass = `${ VARIATION_PREFIX }${ variation }-${ clientId }`;
 
 	const { settings, styles } = useBlockStyleVariation(
 		name,
@@ -153,5 +169,6 @@ function useBlockProps( { name, className, clientId } ) {
 export default {
 	hasSupport: () => true,
 	attributeKeys: [ 'className' ],
+	isMatch: ( { className } ) => getVariationMatches( className ).length > 0,
 	useBlockProps,
 };
