@@ -141,6 +141,9 @@ require __DIR__ . '/compat/wordpress-6.6/block-template-utils.php';
 require __DIR__ . '/compat/wordpress-6.6/option.php';
 require __DIR__ . '/compat/wordpress-6.6/post.php';
 
+// WordPress 6.7 compat.
+require __DIR__ . '/compat/wordpress-6.7/blocks.php';
+
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
 require __DIR__ . '/experimental/blocks.php';
