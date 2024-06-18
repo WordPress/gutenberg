@@ -115,6 +115,11 @@ export default function DocumentBar() {
 	const isGlobalEntity = GLOBAL_POST_TYPES.includes( postType );
 	const hasBackButton = !! onNavigateToPreviousEntityRecord;
 	const entitytitle = isTemplate ? templateTitle : documentTitle;
+	/*
+	 * The editor canvas overlay is used by the edit-site package, but has plans to be refactored.
+	 * We use a private selector and action to get and set the overlay title, for now.
+	 * @see https://github.com/WordPress/gutenberg/issues/62216
+	 */
 	const title = overlayTitle || entitytitle;
 
 	const mounted = useRef( false );
