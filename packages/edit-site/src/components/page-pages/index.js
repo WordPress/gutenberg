@@ -456,7 +456,10 @@ export default function PagePages() {
 		[ authors, view.type, frontPageId, postsPageId ]
 	);
 
-	const postTypeActions = usePostActions( 'page' );
+	const postTypeActions = usePostActions( {
+		postType: 'page',
+		context: 'list',
+	} );
 	const editAction = useEditPostAction();
 	const actions = useMemo(
 		() => [ editAction, ...postTypeActions ],
