@@ -94,7 +94,7 @@
 
 ## 4.17.0 (2022-09-13)
 
-## Deprecations
+### Deprecations
 
 -   `__experimentalGetSettings` has been renamed to `getSettings`.
 

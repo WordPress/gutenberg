@@ -34,7 +34,7 @@
 
 ## 0.20.0 (2024-01-10)
 
-## Enhancements
+### Enhancements
 
 -   Support conditional commands and commands loaders using the "disabled" config.
 

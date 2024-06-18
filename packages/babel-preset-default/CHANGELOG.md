@@ -49,7 +49,7 @@
 
 -   The bundled `browserslist` dependency has been updated from requiring `^4.21.9` to requiring `^4.21.10` ([#54657](https://github.com/WordPress/gutenberg/pull/54657)).
 
-## Enhancements
+### Enhancements
 
 -   Use `react` as the default scope variable for JSX pragma instead of `@wordpress/element`.
 

@@ -184,7 +184,7 @@
 
 ## 1.2.0 (2018-11-12)
 
-## New Feature
+### New Features
 
 -   Add URL validation to links.
 
