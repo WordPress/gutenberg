@@ -13,7 +13,7 @@ import { useInstanceId } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { BaseControl } from '../base-control';
+import { BaseControl, useBaseControlProps } from '../base-control';
 import type { WordPressComponentProps } from '../context/wordpress-component';
 import { Button } from '../button';
 import RangeControl from '../range-control';
@@ -142,24 +142,14 @@ function UnforwardedBaseSizeControl(
 const BaseSizeControl = forwardRef( UnforwardedBaseSizeControl );
 
 function SizeControl(
-	{
-		className,
-		label,
-		hideLabelFromVision = false,
-		...props
-	}: WordPressComponentProps< SizeControlProps, 'input', true >,
+	props: WordPressComponentProps< SizeControlProps, 'input', true >,
 	ref: ForwardedRef< HTMLInputElement >
 ) {
+	const { baseControlProps } = useBaseControlProps( props );
 	const instanceId = useInstanceId( SizeControl );
 	const id = `size-control-${ instanceId }`;
-
 	return (
-		<BaseControl
-			id={ id }
-			className={ className }
-			label={ label }
-			hideLabelFromVision={ hideLabelFromVision }
-		>
+		<BaseControl { ...baseControlProps }>
 			<BaseSizeControl id={ id } ref={ ref } { ...props } />
 		</BaseControl>
 	);
