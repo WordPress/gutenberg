@@ -722,118 +722,162 @@ const renamePostAction = {
 	},
 };
 
-const duplicatePostAction = {
-	id: 'duplicate-post',
-	label: _x( 'Duplicate', 'action label' ),
-	isEligible( { status } ) {
-		return status !== 'trash';
-	},
-	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
-		const [ item ] = items;
-		const [ isCreatingPage, setIsCreatingPage ] = useState( false );
-		const [ title, setTitle ] = useState(
-			sprintf(
-				/* translators: %s: Existing item title */
-				__( '%s (Copy)' ),
-				getItemTitle( item )
-			)
-		);
+const useDuplicatePostAction = ( postType ) => {
+	const { userCanCreatePost } = useSelect(
+		( select ) => {
+			const { getPostType, canUser } = select( coreStore );
+			const resource = getPostType( postType )?.rest_base || '';
+			return {
+				userCanCreatePost: canUser( 'create', resource ),
+			};
+		},
+		[ postType ]
+	);
+	return useMemo(
+		() =>
+			userCanCreatePost && {
+				id: 'duplicate-post',
+				label: _x( 'Duplicate', 'action label' ),
+				isEligible( { status } ) {
+					return status !== 'trash';
+				},
+				RenderModal: ( { items, closeModal, onActionPerformed } ) => {
+					const [ item ] = items;
+					const [ isCreatingPage, setIsCreatingPage ] =
+						useState( false );
+					const [ title, setTitle ] = useState(
+						sprintf(
+							/* translators: %s: Existing item title */
+							__( '%s (Copy)' ),
+							getItemTitle( item )
+						)
+					);
 
-		const { saveEntityRecord } = useDispatch( coreStore );
-		const { createSuccessNotice, createErrorNotice } =
-			useDispatch( noticesStore );
+					const { saveEntityRecord } = useDispatch( coreStore );
+					const { createSuccessNotice, createErrorNotice } =
+						useDispatch( noticesStore );
 
-		async function createPage( event ) {
-			event.preventDefault();
+					async function createPage( event ) {
+						event.preventDefault();
 
-			if ( isCreatingPage ) {
-				return;
-			}
-			setIsCreatingPage( true );
-			try {
-				const newItem = await saveEntityRecord(
-					'postType',
-					item.type,
-					{
-						status: 'draft',
-						title,
-						slug: title || __( 'No title' ),
-						author: item.author,
-						comment_status: item.comment_status,
-						content:
-							typeof item.content === 'string'
-								? item.content
-								: item.content.raw,
-						excerpt: item.excerpt.raw,
-						meta: item.meta,
-						parent: item.parent,
-						password: item.password,
-						template: item.template,
-						format: item.format,
-						featured_media: item.featured_media,
-						menu_order: item.menu_order,
-						ping_status: item.ping_status,
-						categories: item.categories,
-						tags: item.tags,
-					},
-					{ throwOnError: true }
-				);
+						if ( isCreatingPage ) {
+							return;
+						}
 
-				createSuccessNotice(
-					sprintf(
-						// translators: %s: Title of the created template e.g: "Category".
-						__( '"%s" successfully created.' ),
-						decodeEntities( newItem.title?.rendered || title )
-					),
-					{
-						id: 'duplicate-post-action',
-						type: 'snackbar',
+						const newItemOject = {
+							status: 'draft',
+							title,
+							slug: title || __( 'No title' ),
+							comment_status: item.comment_status,
+							content:
+								typeof item.content === 'string'
+									? item.content
+									: item.content.raw,
+							excerpt: item.excerpt.raw,
+							meta: item.meta,
+							parent: item.parent,
+							password: item.password,
+							template: item.template,
+							format: item.format,
+							featured_media: item.featured_media,
+							menu_order: item.menu_order,
+							ping_status: item.ping_status,
+						};
+						const assignablePropertiesPrefix = 'wp:action-assign-';
+						// Get all the properties that the current user is able to assign normally author, categories, tags,
+						// and custom taxonomies.
+						const assignableProperties = Object.keys(
+							item?._links || {}
+						)
+							.filter( ( property ) =>
+								property.startsWith(
+									assignablePropertiesPrefix
+								)
+							)
+							.map( ( property ) =>
+								property.slice(
+									assignablePropertiesPrefix.length
+								)
+							);
+						assignableProperties.forEach( ( property ) => {
+							if ( item[ property ] ) {
+								newItemOject[ property ] = item[ property ];
+							}
+						} );
+						setIsCreatingPage( true );
+						try {
+							const newItem = await saveEntityRecord(
+								'postType',
+								item.type,
+								newItemOject,
+								{ throwOnError: true }
+							);
+
+							createSuccessNotice(
+								sprintf(
+									// translators: %s: Title of the created template e.g: "Category".
+									__( '"%s" successfully created.' ),
+									decodeEntities(
+										newItem.title?.rendered || title
+									)
+								),
+								{
+									id: 'duplicate-post-action',
+									type: 'snackbar',
+								}
+							);
+
+							if ( onActionPerformed ) {
+								onActionPerformed( [ newItem ] );
+							}
+						} catch ( error ) {
+							const errorMessage =
+								error.message && error.code !== 'unknown_error'
+									? error.message
+									: __(
+											'An error occurred while duplicating the page.'
+									  );
+
+							createErrorNotice( errorMessage, {
+								type: 'snackbar',
+							} );
+						} finally {
+							setIsCreatingPage( false );
+							closeModal();
+						}
 					}
-				);
-
-				if ( onActionPerformed ) {
-					onActionPerformed( [ newItem ] );
-				}
-			} catch ( error ) {
-				const errorMessage =
-					error.message && error.code !== 'unknown_error'
-						? error.message
-						: __( 'An error occurred while duplicating the page.' );
-
-				createErrorNotice( errorMessage, {
-					type: 'snackbar',
-				} );
-			} finally {
-				setIsCreatingPage( false );
-				closeModal();
-			}
-		}
-		return (
-			<form onSubmit={ createPage }>
-				<VStack spacing={ 3 }>
-					<TextControl
-						label={ __( 'Title' ) }
-						onChange={ setTitle }
-						placeholder={ __( 'No title' ) }
-						value={ title }
-					/>
-					<HStack spacing={ 2 } justify="end">
-						<Button variant="tertiary" onClick={ closeModal }>
-							{ __( 'Cancel' ) }
-						</Button>
-						<Button
-							variant="primary"
-							type="submit"
-							isBusy={ isCreatingPage }
-							aria-disabled={ isCreatingPage }
-						>
-							{ _x( 'Duplicate', 'action label' ) }
-						</Button>
-					</HStack>
-				</VStack>
-			</form>
-		);
-	},
+					return (
+						<form onSubmit={ createPage }>
+							<VStack spacing={ 3 }>
+								<TextControl
+									label={ __( 'Title' ) }
+									onChange={ setTitle }
+									placeholder={ __( 'No title' ) }
+									value={ title }
+								/>
+								<HStack spacing={ 2 } justify="end">
+									<Button
+										variant="tertiary"
+										onClick={ closeModal }
+									>
+										{ __( 'Cancel' ) }
+									</Button>
+									<Button
+										variant="primary"
+										type="submit"
+										isBusy={ isCreatingPage }
+										aria-disabled={ isCreatingPage }
+									>
+										{ _x( 'Duplicate', 'action label' ) }
+									</Button>
+								</HStack>
+							</VStack>
+						</form>
+					);
+				},
+			},
+		[ userCanCreatePost ]
+	);
 };
 
 const isTemplatePartRevertable = ( item ) => {
@@ -1044,6 +1088,7 @@ export function usePostActions( postType, onActionPerformed ) {
 
 	const permanentlyDeletePostAction = usePermanentlyDeletePostAction();
 	const restorePostAction = useRestorePostAction();
+	const duplicatePostAction = useDuplicatePostAction( postType );
 	const isTemplateOrTemplatePart = [
 		TEMPLATE_POST_TYPE,
 		TEMPLATE_PART_POST_TYPE,
@@ -1126,6 +1171,7 @@ export function usePostActions( postType, onActionPerformed ) {
 		postTypeObject?.viewable,
 		permanentlyDeletePostAction,
 		restorePostAction,
+		duplicatePostAction,
 		onActionPerformed,
 		isLoaded,
 		supportsRevisions,

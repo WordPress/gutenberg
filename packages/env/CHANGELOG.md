@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancement
+
+-   Ignore `$schema` key in environment config parsing ([#62626](https://github.com/WordPress/gutenberg/pull/62626)).
+
 ## 10.1.0 (2024-06-15)
 
 ## 10.0.0 (2024-05-31)
