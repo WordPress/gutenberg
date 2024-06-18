@@ -22,17 +22,19 @@
 
 .edit-site-site-hub__title .components-button {
 	color: $gray-200;
-	display: block;
 	flex-grow: 1;
 	font-size: 15px;
 	font-weight: 500;
 	overflow: hidden;
 	// Add space for the ↗ to render.
-	padding-right: 20px;
+	padding-right: $grid-unit-20;
 	position: relative;
 	text-decoration: none;
 	text-overflow: ellipsis;
 	white-space: nowrap;
+	display: flex;
+	flex-direction: row-reverse;
+	align-items: center;
 
 	&:hover,
 	&:focus,
@@ -55,18 +57,18 @@
 		outline-offset: 2px;
 	}
 
-	&::after {
-		content: "";
-		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24' aria-hidden='true' fill='%23E0E0E0' focusable='false'%3E%3Cpath d='M19.5 4.5h-7V6h4.44l-5.97 5.97 1.06 1.06L18 7.06v4.44h1.5v-7Zm-13 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3H17v3a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h3V5.5h-3Z'%3E%3C/path%3E%3C/svg%3E");
-		width: 20px;
-		height: 20px;
-		font-weight: 400;
+	svg {
 		opacity: 0;
-		position: absolute;
-		right: 0;
-		background-size: 20px 20px;
-		transition: opacity 0.1s linear;
+		transition: opacity 0.1s ease-in-out;
 		@include reduce-motion("transition");
+	}
+
+	&:hover {
+		svg {
+			opacity: 1;
+			transition: opacity 0.1s ease-in-out;
+			@include reduce-motion("transition");
+		}
 	}
 
 	&:hover::after,
