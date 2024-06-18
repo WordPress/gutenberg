@@ -35,17 +35,19 @@ import { useSpecificEditorSettings } from '../block-editor/use-site-editor-setti
 import PluginTemplateSettingPanel from '../plugin-template-setting-panel';
 import GlobalStylesSidebar from '../global-styles-sidebar';
 import { isPreviewingTheme } from '../../utils/is-previewing-theme';
-import {
-	getEditorCanvasContainerTitle,
-	useHasEditorCanvasContainer,
-} from '../editor-canvas-container';
+import { getEditorCanvasContainerTitle } from '../editor-canvas-container';
 import SaveButton from '../save-button';
 import SiteEditorMoreMenu from '../more-menu';
 import SiteIcon from '../site-icon';
 import useEditorIframeProps from '../block-editor/use-editor-iframe-props';
 import useEditorTitle from './use-editor-title';
 
-const { Editor, BackButton } = unlock( editorPrivateApis );
+const {
+	Editor,
+	BackButton,
+	EditorContentSlotFill,
+	useHasEditorContentSlotFill,
+} = unlock( editorPrivateApis );
 const { useHistory } = unlock( routerPrivateApis );
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 
@@ -94,7 +96,9 @@ export default function EditSiteEditor( { isLoading } ) {
 	}, [] );
 	useEditorTitle();
 	const _isPreviewingTheme = isPreviewingTheme();
-	const hasDefaultEditorCanvasView = ! useHasEditorCanvasContainer();
+	const hasDefaultEditorCanvasView = ! useHasEditorContentSlotFill(
+		EditorContentSlotFill.privateKey
+	);
 	const iframeProps = useEditorIframeProps();
 	const isEditMode = canvasMode === 'edit';
 	const postWithTemplate = !! contextPostId;

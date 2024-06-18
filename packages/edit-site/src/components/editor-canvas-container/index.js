@@ -2,10 +2,7 @@
  * WordPress dependencies
  */
 import { Children, cloneElement, useState } from '@wordpress/element';
-import {
-	Button,
-	__experimentalUseSlotFills as useSlotFills,
-} from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { ESCAPE } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -138,10 +135,6 @@ function EditorCanvasContainer( {
 		</EditorContentSlotFill.Fill>
 	);
 }
-function useHasEditorCanvasContainer() {
-	const fills = useSlotFills( EditorContentSlotFill.privateKey );
-	return !! fills?.length;
-}
 
 export default EditorCanvasContainer;
-export { useHasEditorCanvasContainer, getEditorCanvasContainerTitle };
+export { getEditorCanvasContainerTitle };
