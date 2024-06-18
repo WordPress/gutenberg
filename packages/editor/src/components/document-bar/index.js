@@ -19,7 +19,7 @@ import { chevronLeftSmall, chevronRightSmall } from '@wordpress/icons';
 import { displayShortcut } from '@wordpress/keycodes';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as commandsStore } from '@wordpress/commands';
-import { useRef, useEffect } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
 import { useReducedMotion } from '@wordpress/compose';
 import { decodeEntities } from '@wordpress/html-entities';
 
@@ -42,6 +42,32 @@ const TYPE_LABELS = {
 };
 
 const MotionButton = motion( Button );
+
+// A fixed (pixel) value creates equal movement of the back button and title as
+// opposed to a % value that ends up based on the width of the individual items.
+const X_TRAVEL = 60;
+const TRANSITION = { type: 'tween', ease: 'easeOut', duration: 0.144 };
+const TITLE_VARIANTS = {
+	enterExit: ( isTemplate ) => {
+		return {
+			x: isTemplate ? X_TRAVEL : `-${ X_TRAVEL }`,
+			opacity: 0,
+		};
+	},
+	rest: { opacity: 1, x: 0 },
+};
+const BACK_BUTTON_VARIANTS = {
+	enterExit: { opacity: 0, x: X_TRAVEL },
+	rest: ( isReducedMotion ) => ( {
+		opacity: 1,
+		x: 0,
+		transition: {
+			...TRANSITION,
+			// After the exiting title (unless reduced motion).
+			delay: isReducedMotion ? 0 : TRANSITION.duration,
+		},
+	} ),
+};
 
 /**
  * This component renders a navigation bar at the top of the editor. It displays the title of the current document,
@@ -113,21 +139,35 @@ export default function DocumentBar() {
 	const hasBackButton = !! onNavigateToPreviousEntityRecord;
 	const title = isTemplate ? templateTitle : documentTitle;
 
-	const mounted = useRef( false );
-	useEffect( () => {
-		mounted.current = true;
-	}, [] );
+	const refBackButtonWidth = useRef();
+	const readBackButtonWidth = ( button ) => {
+		if ( button && ! refBackButtonWidth.current ) {
+			refBackButtonWidth.current = button.getBoundingClientRect().width;
+		}
+	};
+	const applyBackButtonWidthStyle = ( element ) => {
+		if ( refBackButtonWidth.current ) {
+			element?.style?.setProperty(
+				'--back-button-width',
+				`${ refBackButtonWidth.current }px`
+			);
+		}
+	};
+	const transition = {
+		...TRANSITION,
+		duration: isReducedMotion ? 0 : TRANSITION.duration,
+	};
 
 	return (
 		<div
 			className={ clsx( 'editor-document-bar', {
 				'has-back-button': hasBackButton,
-				'is-global': isGlobalEntity && ! isUnsyncedPattern,
 			} ) }
 		>
 			<AnimatePresence>
 				{ hasBackButton && (
 					<MotionButton
+						ref={ readBackButtonWidth }
 						className="editor-document-bar__back"
 						icon={ isRTL() ? chevronRightSmall : chevronLeftSmall }
 						onClick={ ( event ) => {
@@ -135,16 +175,13 @@ export default function DocumentBar() {
 							onNavigateToPreviousEntityRecord();
 						} }
 						size="compact"
-						initial={
-							mounted.current
-								? { opacity: 0, transform: 'translateX(15%)' }
-								: false // Don't show entry animation when DocumentBar mounts.
-						}
-						animate={ { opacity: 1, transform: 'translateX(0%)' } }
-						exit={ { opacity: 0, transform: 'translateX(15%)' } }
-						transition={
-							isReducedMotion ? { duration: 0 } : undefined
-						}
+						variant="tertiary"
+						custom={ isReducedMotion }
+						variants={ BACK_BUTTON_VARIANTS }
+						initial="enterExit"
+						animate="rest"
+						exit="enterExit"
+						transition={ transition }
 					>
 						{ __( 'Back' ) }
 					</MotionButton>
@@ -153,53 +190,56 @@ export default function DocumentBar() {
 			{ isNotFound ? (
 				<Text>{ __( 'Document not found' ) }</Text>
 			) : (
-				<Button
-					className="editor-document-bar__command"
-					onClick={ () => openCommandCenter() }
-					size="compact"
+				<div
+					className="editor-document-bar__core"
+					ref={ applyBackButtonWidthStyle }
 				>
-					<motion.div
-						className="editor-document-bar__title"
-						// Force entry animation when the back button is added or removed.
-						key={ hasBackButton }
-						initial={
-							mounted.current
-								? {
-										opacity: 0,
-										transform: hasBackButton
-											? 'translateX(15%)'
-											: 'translateX(-15%)',
-								  }
-								: false // Don't show entry animation when DocumentBar mounts.
-						}
-						animate={ {
-							opacity: 1,
-							transform: 'translateX(0%)',
-						} }
-						transition={
-							isReducedMotion ? { duration: 0 } : undefined
-						}
+					<Button
+						onClick={ () => openCommandCenter() }
+						size="compact"
+						variant="tertiary"
+						label={ __( 'Open the command palette' ) }
+						aria-haspopup="true"
 					>
-						<BlockIcon icon={ templateIcon } />
-						<Text
-							size="body"
-							as="h1"
-							aria-label={
-								TYPE_LABELS[ postType ]
-									? // eslint-disable-next-line @wordpress/valid-sprintf
-									  sprintf( TYPE_LABELS[ postType ], title )
-									: undefined
-							}
+						<span className="editor-document-bar__shortcut">
+							{ displayShortcut.primary( 'k' ) }
+						</span>
+					</Button>
+					<AnimatePresence initial={ false } mode="wait">
+						<motion.div
+							key={ isTemplate }
+							className={ clsx( 'editor-document-bar__title', {
+								'is-global':
+									isGlobalEntity && ! isUnsyncedPattern,
+							} ) }
+							custom={ isTemplate }
+							variants={ TITLE_VARIANTS }
+							animate="rest"
+							initial="enterExit"
+							exit="enterExit"
+							transition={ transition }
 						>
-							{ title
-								? decodeEntities( title )
-								: __( 'No Title' ) }
-						</Text>
-					</motion.div>
-					<span className="editor-document-bar__shortcut">
-						{ displayShortcut.primary( 'k' ) }
-					</span>
-				</Button>
+							<BlockIcon icon={ templateIcon } />
+							<Text
+								size="body"
+								as="h1"
+								aria-label={
+									TYPE_LABELS[ postType ]
+										? // eslint-disable-next-line @wordpress/valid-sprintf
+										  sprintf(
+												TYPE_LABELS[ postType ],
+												title
+										  )
+										: undefined
+								}
+							>
+								{ title
+									? decodeEntities( title )
+									: __( 'No Title' ) }
+							</Text>
+						</motion.div>
+					</AnimatePresence>
+				</div>
 			) }
 		</div>
 	);
