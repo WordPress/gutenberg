@@ -60,7 +60,7 @@ function UnforwardedBaseSizeControl(
 		!! valueUnit && [ 'em', 'rem', 'vw', 'vh' ].includes( valueUnit );
 
 	return (
-		<Flex className="components-font-size-picker__custom-size-control">
+		<Flex className="components-size-control__custom-size-control">
 			<FlexItem isBlock>
 				<UnitControl
 					__next40pxDefaultSize={ __next40pxDefaultSize }
@@ -89,7 +89,7 @@ function UnforwardedBaseSizeControl(
 							id={ id }
 							__nextHasNoMarginBottom
 							__next40pxDefaultSize={ __next40pxDefaultSize }
-							className="components-font-size-picker__custom-input"
+							className="components-size-control__custom-input"
 							label={ __( 'Custom Size' ) }
 							hideLabelFromVision
 							value={ valueQuantity }
