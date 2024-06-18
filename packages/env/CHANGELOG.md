@@ -147,6 +147,11 @@
 -   Automatically add the environment's port to `WP_TESTS_DOMAIN`.
 -   `run` command now has a `--env-cwd` option to set the working directory in the container for the command to execute from.
 
+### Bug Fix
+
+-   `wp-env` is better at fetching git sources which use tags.
+-   `wp-env` now pulls branches of git sources -- previously it only fetched them. This restores the intended behavior.
+
 ## 5.16.0 (2023-04-12)
 
 ## 5.15.0 (2023-03-29)
