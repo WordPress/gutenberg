@@ -61,9 +61,9 @@ class Render_Block_MediaText_Test extends WP_UnitTestCase {
 	public static function setup_query() {
 		global $wp_query;
 		$wp_query->in_the_loop = true;
-		$wp_query->post = self::$post;
-		$wp_query->posts = array( self::$post );
-		$GLOBALS['post'] = self::$post;
+		$wp_query->post        = self::$post;
+		$wp_query->posts       = array( self::$post );
+		$GLOBALS['post']       = self::$post;
 	}
 
 	/**
