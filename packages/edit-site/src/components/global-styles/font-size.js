@@ -4,8 +4,6 @@
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import {
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalSpacer as Spacer,
 	__experimentalUseNavigator as useNavigator,
 	__experimentalInputControl as InputControl,
@@ -87,8 +85,7 @@ function FontSize() {
 	};
 
 	const handleFluidChange = ( value ) => {
-		const newValue = value === 'false' ? false : true;
-		updateFontSize( 'fluid', newValue );
+		updateFontSize( 'fluid', value );
 	};
 
 	const handleCustomFluidValues = ( value ) => {
@@ -195,22 +192,11 @@ function FontSize() {
 							withReset={ false }
 						/>
 
-						<ToggleGroupControl
-							__nextHasNoMarginBottom
-							isBlock
-							label={ __( 'Fluid' ) }
-							value={ String( isFluid ) }
+						<ToggleControl
+							label={ __( 'Fluid typography' ) }
+							checked={ isFluid }
 							onChange={ handleFluidChange }
-						>
-							<ToggleGroupControlOption
-								label={ __( 'Yes' ) }
-								value="true"
-							/>
-							<ToggleGroupControlOption
-								label={ __( 'No' ) }
-								value="false"
-							/>
-						</ToggleGroupControl>
+						/>
 
 						{ isFluid && (
 							<ToggleControl
