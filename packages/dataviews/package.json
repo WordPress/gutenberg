@@ -32,6 +32,7 @@
 		"@babel/runtime": "^7.16.0",
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",
+		"@wordpress/data": "file:../data",
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
