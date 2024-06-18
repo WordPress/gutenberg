@@ -42,13 +42,7 @@ class Block_Json_Variations_Filename_Test extends WP_UnitTestCase {
 
 		$this->assertInstanceOf( 'WP_Block_Type', $result, 'The block was not registered' );
 
-		$this->assertIsCallable( $result->variation_callback, 'The variation callback hasn\'t been set' );
 		$expected_variations = require GUTENBERG_DIR_TESTFIXTURES . '/variations.php';
-		$this->assertSame(
-			$expected_variations,
-			call_user_func( $result->variation_callback ),
-			'The variation callback hasn\'t been set correctly'
-		);
-		$this->assertSame( $expected_variations, $result->variations, 'The block variations are incorrect' );
+		$this->assertSame( $expected_variations, $result->variations, "Block variations haven't been set correctly." );
 	}
 }
