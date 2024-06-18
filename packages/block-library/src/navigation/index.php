@@ -539,7 +539,7 @@ class WP_Navigation_Block_Renderer {
 			$toggle_aria_label_close,
 			esc_attr( implode( ' ', $responsive_container_classes ) ),
 			esc_attr( implode( ' ', $open_button_classes ) ),
-			( ! empty( $overlay_inline_styles ) ) ? "style=$overlay_inline_styles" : '',
+			( ! empty( $overlay_inline_styles ) ) ? "style=\"$overlay_inline_styles\"" : '',
 			$toggle_button_content,
 			$toggle_close_button_content,
 			$open_button_directives,
