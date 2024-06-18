@@ -826,7 +826,7 @@
 
 ## 3.1.0 (2019-03-20)
 
-### New features
+### New Features
 
 -   The `build` and `start` commands will use a default webpack config if none is provided.
 
