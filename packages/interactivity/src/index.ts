@@ -25,6 +25,7 @@ export {
 	useLayoutEffect,
 	useCallback,
 	useMemo,
+	yieldToMain,
 } from './utils';
 
 export { useState, useRef } from 'preact/hooks';
