@@ -325,6 +325,11 @@ The `wp-on` directive is executed each time the associated event is triggered.
 
 The callback passed as the reference receives [the event](https://developer.mozilla.org/en-US/docs/Web/API/Event) (`event`), and the returned value by this callback is ignored.
 
+### `wp-on-async`
+
+This directive is a more performant approach of `wp-on`. The action will be yielded to the main thread to not block it, allowing other interactions that otherwise would be waiting on the main thread
+to run sooner. Use this directive for any `wp-on` that doesn't need the `event` object (`event.preventDefault()`, `event.stopPropagation()`, etc.)
+
 ### `wp-on-window`
 
 This directive allows you to attach global window events like `resize`, `copy`, and `focus` and then execute a defined callback when those happen.
@@ -354,6 +359,10 @@ store( "myPlugin", {
 
 The callback passed as the reference receives [the event](https://developer.mozilla.org/en-US/docs/Web/API/Event) (`event`), and the returned value by this callback is ignored. When the element is removed from the DOM, the event listener is also removed.
 
+### `wp-on-window-async`
+
+Similar to `wp-on-async`. An optimized version of `wp-on-window` that prevents blocking the main thread on long tasks. Use this directive for any `wp-on-window` that doesn't need the `event` object (`event.preventDefault()`, `event.stopPropagation()`, etc.)
+
 ### `wp-on-document`
 
 This directive allows you to attach global document events like `scroll`, `mousemove`, and `keydown` and then execute a defined callback when those happen.
@@ -382,6 +391,10 @@ store( "myPlugin", {
 </details>
 
 The callback passed as the reference receives [the event](https://developer.mozilla.org/en-US/docs/Web/API/Event) (`event`), and the returned value by this callback is ignored. When the element is removed from the DOM, the event listener is also removed.
+
+### `wp-on-document-async`
+
+Similar to `wp-on-async`. An optimized version of `wp-on-document` that prevents blocking the main thread on long tasks. Use this directive for any `wp-on-document` that doesn't need the `event` object (`event.preventDefault()`, `event.stopPropagation()`, etc.)
 
 ### `wp-watch`
 
