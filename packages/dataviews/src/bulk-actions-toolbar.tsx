@@ -12,6 +12,7 @@ import { useMemo, useState, useRef } from '@wordpress/element';
 import { _n, sprintf, __ } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
 import { useReducedMotion } from '@wordpress/compose';
+import { useRegistry } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -92,6 +93,7 @@ function ActionButton< Item extends AnyItem >( {
 	actionInProgress,
 	setActionInProgress,
 }: ActionButtonProps< Item > ) {
+	const registry = useRegistry();
 	const selectedEligibleItems = useMemo( () => {
 		return selectedItems.filter( ( item ) => {
 			return ! action.isEligible || action.isEligible( item );
@@ -113,7 +115,9 @@ function ActionButton< Item extends AnyItem >( {
 			action={ action }
 			onClick={ () => {
 				setActionInProgress( action.id );
-				action.callback( selectedItems );
+				action.callback( selectedItems, {
+					registry,
+				} );
 			} }
 			items={ selectedEligibleItems }
 			isBusy={ actionInProgress === action.id }

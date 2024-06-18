@@ -323,7 +323,10 @@ export default function PageTemplates() {
 		return filterSortAndPaginate( records, view, fields );
 	}, [ records, view, fields ] );
 
-	const postTypeActions = usePostActions( TEMPLATE_POST_TYPE );
+	const postTypeActions = usePostActions( {
+		postType: TEMPLATE_POST_TYPE,
+		context: 'list',
+	} );
 	const editAction = useEditPostAction();
 	const actions = useMemo(
 		() => [ editAction, ...postTypeActions ],

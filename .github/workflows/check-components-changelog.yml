@@ -3,6 +3,8 @@ name: OPTIONAL - Verify @wordpress/components CHANGELOG update
 on:
     pull_request:
         types: [opened, synchronize]
+        branches:
+            - trunk
         paths:
             - 'packages/components/**'
             - '!packages/components/src/**/stories/**'

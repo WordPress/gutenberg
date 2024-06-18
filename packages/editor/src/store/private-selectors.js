@@ -27,6 +27,7 @@ import {
 } from './selectors';
 import { TEMPLATE_PART_POST_TYPE } from './constants';
 import { getFilteredTemplatePartBlocks } from './utils/get-filtered-template-parts';
+import { getEntityActions as _getEntityActions } from '../dataviews/store/private-selectors';
 
 const EMPTY_INSERTION_POINT = {
 	rootClientId: undefined,
@@ -180,3 +181,7 @@ export const hasPostMetaChanges = createRegistrySelector(
 		);
 	}
 );
+
+export function getEntityActions( state, ...args ) {
+	return _getEntityActions( state.dataviews, ...args );
+}
