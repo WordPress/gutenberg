@@ -4,7 +4,7 @@ on:
     pull_request:
         types: [opened, synchronize]
         branches:
-            - main
+            - trunk
         paths:
             - 'packages/components/**'
             - '!packages/components/src/**/stories/**'
