@@ -11,6 +11,10 @@
 		"content": {
 			"type": "string",
 			"source": "raw"
+		},
+		"isPreview": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"supports": {
