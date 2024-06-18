@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-### Enhancement
+### Enhancements
 
 -   Ignore `$schema` key in environment config parsing ([#62626](https://github.com/WordPress/gutenberg/pull/62626)).
 
