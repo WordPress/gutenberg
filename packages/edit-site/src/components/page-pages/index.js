@@ -277,15 +277,19 @@ export default function PagePages() {
 		[ totalItems, totalPages ]
 	);
 
-	const { frontPageId, postsPageId, addNewLabel } = useSelect( ( select ) => {
-		const { getEntityRecord, getPostType } = select( coreStore );
-		const siteSettings = getEntityRecord( 'root', 'site' );
-		return {
-			frontPageId: siteSettings?.page_on_front,
-			postsPageId: siteSettings?.page_for_posts,
-			addNewLabel: getPostType( 'page' )?.labels?.add_new_item,
-		};
-	} );
+	const { frontPageId, postsPageId, addNewLabel, canCreatePage } = useSelect(
+		( select ) => {
+			const { getEntityRecord, getPostType, canUser } =
+				select( coreStore );
+			const siteSettings = getEntityRecord( 'root', 'site' );
+			return {
+				frontPageId: siteSettings?.page_on_front,
+				postsPageId: siteSettings?.page_for_posts,
+				addNewLabel: getPostType( 'page' )?.labels?.add_new_item,
+				canCreatePage: canUser( 'create', 'pages' ),
+			};
+		}
+	);
 
 	const fields = useMemo(
 		() => [
@@ -499,7 +503,8 @@ export default function PagePages() {
 		<Page
 			title={ __( 'Pages' ) }
 			actions={
-				addNewLabel && (
+				addNewLabel &&
+				canCreatePage && (
 					<>
 						<Button
 							variant="primary"
