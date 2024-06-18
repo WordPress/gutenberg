@@ -71,7 +71,6 @@ function _manually_load_plugins() {
 	foreach ( $plugin_dirs as $dir ) {
 		$plugin_name = basename( $dir );
 		require "$dir/$plugin_name.php";
-		var_dump( "$dir/$plugin_name.php" );
 	}
 }
 tests_add_filter( 'muplugins_loaded', '_manually_load_plugins' );
