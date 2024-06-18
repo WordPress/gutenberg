@@ -761,7 +761,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		}
 		ksort( $variation_files );
 		foreach ( $variation_files as $path => $file ) {
-			$decoded_file = wp_json_file_decode( $path, array( 'associative' => true ) );
+			$decoded_file = self::read_json_file( $path );
 			if ( is_array( $decoded_file ) && static::style_variation_has_scope( $decoded_file, $scope ) ) {
 				$translated = static::translate( $decoded_file, wp_get_theme()->get( 'TextDomain' ) );
 				$variation  = ( new WP_Theme_JSON_Gutenberg( $translated ) )->get_raw_data();
