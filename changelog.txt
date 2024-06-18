@@ -17346,7 +17346,7 @@ Fixes compatibility with WordPress 6.0.x. This includes the following PRs:
 -   #46806
 -   #46809
 
-Broadly, this needed to include the two refactors of the Theme*JSON compatibility files, along with two fixes switching `wp*_`and`gutenberg\__` function variants as needed.
+Broadly, this needed to include the two refactors of the Theme*JSON compatibility files, along with two fixes switching `wp*\_`and`gutenberg\_\_` function variants as needed.
 
 ## Contributors
 
