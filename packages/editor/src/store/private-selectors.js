@@ -187,7 +187,7 @@ export function getEntityActions( state, ...args ) {
 }
 
 /**
- * Gets the title of the current canvas overlay, or an empty string when no title is set.
+ * Gets the title of the editor content overlay.
  *
  * The overlay is only used in the edit-site package, with plans to be removed, so generally
  * you should not use this action.
@@ -195,8 +195,8 @@ export function getEntityActions( state, ...args ) {
  * @see https://github.com/WordPress/gutenberg/issues/62216
  *
  * @param {Object} state Global state.
- * @return {string} Title of the current canvas overlay.
+ * @return {string} Title of the current overlay, or an empty string when no title is set.
  */
-export function getCanvasOverlayTitle( state ) {
-	return state.canvasOverlayTitle || '';
+export function getEditorContentOverlayTitle( state ) {
+	return state.editorContentOverlayTitle || '';
 }

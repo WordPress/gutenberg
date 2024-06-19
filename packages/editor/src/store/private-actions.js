@@ -493,17 +493,17 @@ export const removeTemplates =
 	};
 
 /**
- * Sets the title of the current canvas overlay.
+ * Sets the title of the editor content overlay.
  *
  * The overlay is only used in the edit-site package, with plans to be removed, so you probably shouldn't
  * use this action.
  *
  * @see https://github.com/WordPress/gutenberg/issues/62216
  *
- * @param {string} title Title of the current canvas overlay, or an empty string when no overlay is present.
+ * @param {string} title Title of the current overlay, or an empty string when no overlay is present.
  * @return {Object} Action object.
  */
-export function setCanvasOverlayTitle( title ) {
+export function setEditorContentOverlayTitle( title ) {
 	return {
 		type: 'SET_CANVAS_OVERLAY_TITLE',
 		title,

@@ -67,7 +67,7 @@ export default function DocumentBar() {
 		onNavigateToPreviousEntityRecord,
 	} = useSelect( ( select ) => {
 		const {
-			getCanvasOverlayTitle,
+			getEditorContentOverlayTitle,
 			getCurrentPostType,
 			getCurrentPostId,
 			getEditorSettings,
@@ -95,7 +95,7 @@ export default function DocumentBar() {
 					_postId
 				),
 			isUnsyncedPattern: _document?.wp_pattern_sync_status === 'unsynced',
-			overlayTitle: getCanvasOverlayTitle(),
+			overlayTitle: getEditorContentOverlayTitle(),
 			templateIcon: unlock( select( editorStore ) ).getPostIcon(
 				_postType,
 				{
@@ -116,8 +116,9 @@ export default function DocumentBar() {
 	const hasBackButton = !! onNavigateToPreviousEntityRecord;
 	const entitytitle = isTemplate ? templateTitle : documentTitle;
 	/*
-	 * The editor canvas overlay is used by the edit-site package, but has plans to be refactored.
-	 * We use a private selector and action to get and set the overlay title, for now.
+	 * The editor content overlay is used only by the edit-site package and has plans to be removed or refactored.
+	 * For now we use a private selector and action to get and set the overlay title, but this will likely be removed
+	 * in the future.
 	 * @see https://github.com/WordPress/gutenberg/issues/62216
 	 */
 	const title = overlayTitle || entitytitle;

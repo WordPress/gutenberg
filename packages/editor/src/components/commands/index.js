@@ -29,7 +29,7 @@ import { store as editorStore } from '../../store';
 import { PATTERN_POST_TYPE } from '../../store/constants';
 import { modalName as patternRenameModalName } from '../pattern-rename-modal';
 import { modalName as patternDuplicateModalName } from '../pattern-duplicate-modal';
-import { useHasEditorContentSlotFill } from '../editor-interface/content-slot-fill';
+import { useHasEditorContentOverlay } from '../editor-interface/content-slot-fill';
 
 function useEditorCommandLoader() {
 	const {
@@ -300,10 +300,10 @@ function useEditedEntityContextualCommands() {
 		};
 	}, [] );
 	const { openModal } = useDispatch( interfaceStore );
-	const hasDefaultEditorCanvasView = ! useHasEditorContentSlotFill();
+	const hasEditorContentOverlay = useHasEditorContentOverlay();
 	const commands = [];
 
-	if ( hasDefaultEditorCanvasView && postType === PATTERN_POST_TYPE ) {
+	if ( ! hasEditorContentOverlay && postType === PATTERN_POST_TYPE ) {
 		commands.push( {
 			name: 'core/rename-pattern',
 			label: __( 'Rename pattern' ),

@@ -42,7 +42,7 @@ import SiteIcon from '../site-icon';
 import useEditorIframeProps from '../block-editor/use-editor-iframe-props';
 import useEditorTitle from './use-editor-title';
 
-const { Editor, BackButton, useHasEditorContentSlotFill } =
+const { Editor, BackButton, useHasEditorContentOverlay } =
 	unlock( editorPrivateApis );
 const { useHistory } = unlock( routerPrivateApis );
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
@@ -51,13 +51,13 @@ export default function EditSiteEditor( { isLoading } ) {
 	const {
 		editedPostType,
 		editedPostId,
-		editorCanvasContainerTitle,
 		contextPostType,
 		contextPostId,
 		canvasMode,
 		isEditingPage,
 		supportsGlobalStyles,
 		showIconLabels,
+		editorCanvasContainerTitle,
 		currentPostIsTrashed,
 	} = useSelect( ( select ) => {
 		const {
@@ -78,15 +78,15 @@ export default function EditSiteEditor( { isLoading } ) {
 		return {
 			editedPostType: getEditedPostType(),
 			editedPostId: getEditedPostId(),
-			editorCanvasContainerTitle: getEditorCanvasContainerTitle(
-				editorCanvasContainerView
-			),
 			contextPostType: _context?.postId ? _context.postType : undefined,
 			contextPostId: _context?.postId ? _context.postId : undefined,
 			canvasMode: getCanvasMode(),
 			isEditingPage: isPage(),
 			supportsGlobalStyles: getCurrentTheme()?.is_block_theme,
 			showIconLabels: get( 'core', 'showIconLabels' ),
+			editorCanvasContainerTitle: getEditorCanvasContainerTitle(
+				editorCanvasContainerView
+			),
 			currentPostIsTrashed:
 				select( editorStore ).getCurrentPostAttribute( 'status' ) ===
 				'trash',
@@ -94,7 +94,7 @@ export default function EditSiteEditor( { isLoading } ) {
 	}, [] );
 	useEditorTitle();
 	const _isPreviewingTheme = isPreviewingTheme();
-	const hasDefaultEditorCanvasView = ! useHasEditorContentSlotFill();
+	const hasDefaultEditorCanvasView = ! useHasEditorContentOverlay();
 	const iframeProps = useEditorIframeProps();
 	const isEditMode = canvasMode === 'edit';
 	const postWithTemplate = !! contextPostId;
@@ -171,10 +171,13 @@ export default function EditSiteEditor( { isLoading } ) {
 		[ history, createSuccessNotice ]
 	);
 
-	const { setCanvasOverlayTitle } = unlock( useDispatch( editorStore ) );
+	// Replace the title displayed in the DocumentBar when there's an overlay visible.
+	const { setEditorContentOverlayTitle } = unlock(
+		useDispatch( editorStore )
+	);
 	useEffect( () => {
-		setCanvasOverlayTitle( editorCanvasContainerTitle );
-	}, [ editorCanvasContainerTitle, setCanvasOverlayTitle ] );
+		setEditorContentOverlayTitle( editorCanvasContainerTitle );
+	}, [ editorCanvasContainerTitle, setEditorContentOverlayTitle ] );
 
 	const isReady = ! isLoading;
 

@@ -384,7 +384,7 @@ export function publishSidebarActive( state = false, action ) {
 	return state;
 }
 
-export function canvasOverlayTitle( state = '', action ) {
+export function editorContentOverlayTitle( state = '', action ) {
 	switch ( action.type ) {
 		case 'SET_CANVAS_OVERLAY_TITLE':
 			return action.title;
@@ -412,5 +412,5 @@ export default combineReducers( {
 	listViewToggleRef,
 	publishSidebarActive,
 	dataviews: dataviewsReducer,
-	canvasOverlayTitle,
+	editorContentOverlayTitle,
 } );
