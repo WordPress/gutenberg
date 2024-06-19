@@ -68,7 +68,7 @@ if ( ! function_exists( 'gutenberg_register_wp_rest_post_types_controller_fields
 				},
 				'schema'       => array(
 					'type'        => 'string',
-					'emum'        => array( 'all', 'insert', 'contentOnly' ),
+					'enum'        => array( 'all', 'insert', 'contentOnly' ),
 					'description' => __( 'The template_lock specified for the post type.', 'gutenberg' ),
 					'readonly'    => true,
 					'context'     => array( 'view', 'edit', 'embed' ),
