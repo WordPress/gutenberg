@@ -35,7 +35,7 @@ import { useSpecificEditorSettings } from '../block-editor/use-site-editor-setti
 import PluginTemplateSettingPanel from '../plugin-template-setting-panel';
 import GlobalStylesSidebar from '../global-styles-sidebar';
 import { isPreviewingTheme } from '../../utils/is-previewing-theme';
-import { getEditorCanvasContainerTitle } from '../editor-canvas-container';
+import { getEditorCanvasContainerTitleAndIcon } from '../editor-canvas-container';
 import SaveButton from '../save-button';
 import SiteEditorMoreMenu from '../more-menu';
 import SiteIcon from '../site-icon';
@@ -57,7 +57,7 @@ export default function EditSiteEditor( { isLoading } ) {
 		isEditingPage,
 		supportsGlobalStyles,
 		showIconLabels,
-		editorCanvasContainerTitle,
+		editorCanvasContainerView,
 		currentPostIsTrashed,
 	} = useSelect( ( select ) => {
 		const {
@@ -71,7 +71,6 @@ export default function EditSiteEditor( { isLoading } ) {
 		const { get } = select( preferencesStore );
 		const { getCurrentTheme } = select( coreDataStore );
 		const _context = getEditedPostContext();
-		const editorCanvasContainerView = getEditorCanvasContainerView();
 
 		// The currently selected entity to display.
 		// Typically template or template part in the site editor.
@@ -84,9 +83,7 @@ export default function EditSiteEditor( { isLoading } ) {
 			isEditingPage: isPage(),
 			supportsGlobalStyles: getCurrentTheme()?.is_block_theme,
 			showIconLabels: get( 'core', 'showIconLabels' ),
-			editorCanvasContainerTitle: getEditorCanvasContainerTitle(
-				editorCanvasContainerView
-			),
+			editorCanvasContainerView: getEditorCanvasContainerView(),
 			currentPostIsTrashed:
 				select( editorStore ).getCurrentPostAttribute( 'status' ) ===
 				'trash',
@@ -171,13 +168,16 @@ export default function EditSiteEditor( { isLoading } ) {
 		[ history, createSuccessNotice ]
 	);
 
-	// Replace the title displayed in the DocumentBar when there's an overlay visible.
-	const { setEditorContentOverlayTitle } = unlock(
+	// Replace the title and icon displayed in the DocumentBar when there's an overlay visible.
+	const { setEditorContentOverlayTitleAndIcon } = unlock(
 		useDispatch( editorStore )
 	);
+	const { title, icon } = getEditorCanvasContainerTitleAndIcon(
+		editorCanvasContainerView
+	);
 	useEffect( () => {
-		setEditorContentOverlayTitle( editorCanvasContainerTitle );
-	}, [ editorCanvasContainerTitle, setEditorContentOverlayTitle ] );
+		setEditorContentOverlayTitleAndIcon( title, icon );
+	}, [ title, icon, setEditorContentOverlayTitleAndIcon ] );
 
 	const isReady = ! isLoading;
 

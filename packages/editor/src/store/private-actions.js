@@ -493,7 +493,7 @@ export const removeTemplates =
 	};
 
 /**
- * Sets the title of the editor content overlay.
+ * Sets the title icon of the editor content overlay.
  *
  * The overlay is only used in the edit-site package, with plans to be removed, so you probably shouldn't
  * use this action.
@@ -501,11 +501,13 @@ export const removeTemplates =
  * @see https://github.com/WordPress/gutenberg/issues/62216
  *
  * @param {string} title Title of the current overlay, or an empty string when no overlay is present.
+ * @param {string} icon  Icon for the current overlay, or an empty string when no overlay is present.
  * @return {Object} Action object.
  */
-export function setEditorContentOverlayTitle( title ) {
+export function setEditorContentOverlayTitleAndIcon( title, icon ) {
 	return {
-		type: 'SET_CANVAS_OVERLAY_TITLE',
+		type: 'SET_CANVAS_OVERLAY_TITLE_AND_ICON',
 		title,
+		icon,
 	};
 }
