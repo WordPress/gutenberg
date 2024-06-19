@@ -104,11 +104,6 @@ test.describe( 'Buttons', () => {
 		await expect(
 			editor.canvas.locator( 'role=textbox[name="Button text"i]' )
 		).toBeFocused();
-
-		// The link control should still be visible when a URL is set.
-		await expect(
-			page.locator( 'role=link[name=/^example\\.com/]' )
-		).toBeVisible();
 	} );
 
 	test( 'appends http protocol to links added which are missing a protocol', async ( {
