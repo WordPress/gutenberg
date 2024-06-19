@@ -23,10 +23,9 @@ import { getFontFamilies } from './utils';
 import { NavigationButtonAsItem } from './navigation-button';
 import Subtitle from './subtitle';
 import { unlock } from '../../lock-unlock';
+import { filterObjectByProperty } from '../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
 
-const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
-	blockEditorPrivateApis
-);
+const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
 const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
 
 function TypesetButton() {
@@ -41,21 +40,27 @@ function TypesetButton() {
 			coreStore
 		).__experimentalGetCurrentThemeGlobalStylesVariations();
 	}, [] );
-
-	const activeVariation = useMemo(
-		() =>
-			variations.find( ( variation ) =>
-				areGlobalStyleConfigsEqual( userConfig, variation )
-			),
-		[ userConfig, variations ]
+	const userTypographyConfig = filterObjectByProperty(
+		userConfig,
+		'typography'
 	);
 
-	let title;
-	if ( activeVariation ) {
-		title = activeVariation.title;
-	} else {
-		title = allFontFamilies.map( ( font ) => font?.name ).join( ', ' );
-	}
+	const title = useMemo( () => {
+		if ( Object.keys( userTypographyConfig ).length === 0 ) {
+			return __( 'Default' );
+		}
+		const activeVariation = variations.find( ( variation ) => {
+			return (
+				JSON.stringify(
+					filterObjectByProperty( variation, 'typography' )
+				) === JSON.stringify( userTypographyConfig )
+			);
+		} );
+		if ( activeVariation ) {
+			return activeVariation.title;
+		}
+		return allFontFamilies.map( ( font ) => font?.name ).join( ', ' );
+	}, [ userTypographyConfig, variations ] );
 
 	return (
 		hasFonts && (
