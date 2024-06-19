@@ -1,6 +1,7 @@
 .components-toolbar-group {
 	min-height: $block-toolbar-height;
 	border-right: $border-width solid $gray-900;
+	background: $white;
 	display: inline-flex;
 	flex-shrink: 0;
 	flex-wrap: wrap;
@@ -11,10 +12,6 @@
 	& .components-toolbar-group.components-toolbar-group {
 		border-width: 0;
 		margin: 0;
-	}
-
-	.components-accessible-toolbar:not(.zoom-out-toolbar) & {
-		background: $white;
 	}
 
 	line-height: 0;
