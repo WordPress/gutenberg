@@ -1,7 +1,7 @@
 .wp-block-image {
 
 	> a {
-		display: block;
+		display: inline-block;
 	}
 
 	img {
@@ -9,6 +9,11 @@
 		max-width: 100%;
 		vertical-align: bottom;
 		box-sizing: border-box;
+	}
+
+	&.alignfull a,
+	&.alignwide a {
+		width: 100%;
 	}
 
 	// The following style maintains border radius application for deprecated
