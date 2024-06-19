@@ -28,7 +28,7 @@ const TagsPanel = () => {
 					'Tags help users and search engines navigate your site and find your content. Add a few keywords to describe your post.'
 				) }
 			</p>
-			<FlatTermSelector slug={ 'post_tag' } />
+			<FlatTermSelector slug="post_tag" />
 		</PanelBody>
 	);
 };

@@ -79,7 +79,7 @@ export function convertLegacyBlockNameAndAttributes( name, attributes ) {
 
 	// The following code is only relevant for the Gutenberg plugin.
 	// It's a stand-alone if statement for dead-code elimination.
-	if ( process.env.IS_GUTENBERG_PLUGIN ) {
+	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 		// Convert pattern overrides added during experimental phase.
 		// Only four blocks were supported initially.
 		// These checks can be removed in WordPress 6.6.
@@ -88,25 +88,41 @@ export function convertLegacyBlockNameAndAttributes( name, attributes ) {
 			( name === 'core/paragraph' ||
 				name === 'core/heading' ||
 				name === 'core/image' ||
-				name === 'core/button' )
+				name === 'core/button' ) &&
+			newAttributes.metadata.bindings.__default?.source !==
+				'core/pattern-overrides'
 		) {
 			const bindings = [
 				'content',
 				'url',
 				'title',
+				'id',
 				'alt',
 				'text',
 				'linkTarget',
 			];
+			// Delete any existing individual bindings and add a default binding.
+			// It was only possible to add all the default attributes through the UI,
+			// So as soon as we find an attribute, we can assume all default attributes are overridable.
+			let hasPatternOverrides = false;
 			bindings.forEach( ( binding ) => {
 				if (
-					newAttributes.metadata.bindings[ binding ]?.source?.name ===
-					'pattern_attributes'
+					newAttributes.metadata.bindings[ binding ]?.source ===
+					'core/pattern-overrides'
 				) {
-					newAttributes.metadata.bindings[ binding ].source =
-						'core/pattern-overrides';
+					hasPatternOverrides = true;
+					newAttributes.metadata = {
+						...newAttributes.metadata,
+						bindings: { ...newAttributes.metadata.bindings },
+					};
+					delete newAttributes.metadata.bindings[ binding ];
 				}
 			} );
+			if ( hasPatternOverrides ) {
+				newAttributes.metadata.bindings.__default = {
+					source: 'core/pattern-overrides',
+				};
+			}
 		}
 	}
 	return [ name, newAttributes ];

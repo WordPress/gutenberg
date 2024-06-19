@@ -203,7 +203,7 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 			<Flex gap={ 4 }>
 				<FlexItem isBlock>
 					<UnitControl
-						size={ '__unstable-large' }
+						size="__unstable-large"
 						onChange={ ( newValue ) => {
 							onChange( {
 								...layout,
@@ -251,7 +251,7 @@ function GridLayoutColumnsAndRowsControl( {
 				<Flex gap={ 4 }>
 					<FlexItem isBlock>
 						<NumberControl
-							size={ '__unstable-large' }
+							size="__unstable-large"
 							onChange={ ( value ) => {
 								/**
 								 * If the input is cleared, avoid switching
@@ -296,7 +296,7 @@ function GridLayoutColumnsAndRowsControl( {
 						<Flex gap={ 4 }>
 							<FlexItem isBlock>
 								<NumberControl
-									size={ '__unstable-large' }
+									size="__unstable-large"
 									onChange={ ( value ) => {
 										onChange( {
 											...layout,
@@ -372,12 +372,12 @@ function GridLayoutTypeControl( { layout, onChange } ) {
 			isBlock
 		>
 			<ToggleGroupControlOption
-				key={ 'auto' }
+				key="auto"
 				value="auto"
 				label={ __( 'Auto' ) }
 			/>
 			<ToggleGroupControlOption
-				key={ 'manual' }
+				key="manual"
 				value="manual"
 				label={ __( 'Manual' ) }
 			/>

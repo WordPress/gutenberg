@@ -55,6 +55,14 @@ function PostTemplateToggle( { isOpen, onClick } ) {
 	);
 }
 
+/**
+ * Renders the dropdown content for selecting a post template.
+ *
+ * @param {Object}   props         The component props.
+ * @param {Function} props.onClose The function to close the dropdown.
+ *
+ * @return {JSX.Element} The rendered dropdown content.
+ */
 function PostTemplateDropdownContent( { onClose } ) {
 	const allowSwitchingTemplate = useAllowSwitchingTemplates();
 	const {
@@ -216,4 +224,11 @@ function ClassicThemeControl() {
 	);
 }
 
+/**
+ * Provides a dropdown menu for selecting and managing post templates.
+ *
+ * The dropdown menu includes a button for toggling the menu, a list of available templates, and options for creating and editing templates.
+ *
+ * @return {JSX.Element} The rendered ClassicThemeControl component.
+ */
 export default ClassicThemeControl;

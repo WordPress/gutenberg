@@ -402,7 +402,8 @@ export class RichText extends Component {
 		this.comesFromAztec = true;
 		this.firedAfterTextChanged = event.nativeEvent.firedAfterTextChanged;
 		const value = this.createRecord();
-		const { start, end, text } = value;
+		const { start, end, text, activeFormats } = value;
+		const hasActiveFormats = activeFormats && !! activeFormats.length;
 		let newValue;
 
 		// Always handle full content deletion ourselves.
@@ -415,15 +416,17 @@ export class RichText extends Component {
 
 		// Only process delete if the key press occurs at an uncollapsed edge.
 		if (
-			! onDelete ||
 			! isCollapsed( value ) ||
+			hasActiveFormats ||
 			( isReverse && start !== 0 ) ||
 			( ! isReverse && end !== text.length )
 		) {
 			return;
 		}
 
-		onDelete( { isReverse, value } );
+		if ( onDelete ) {
+			onDelete( { isReverse, value } );
+		}
 
 		event.preventDefault();
 		this.lastAztecEventType = 'input';

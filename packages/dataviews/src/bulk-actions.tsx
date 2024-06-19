@@ -8,6 +8,7 @@ import {
 } from '@wordpress/components';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { useMemo, useState, useCallback, useEffect } from '@wordpress/element';
+import { useRegistry } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -94,9 +95,13 @@ function ActionWithModal< Item extends AnyItem >( {
 	const onCloseModal = useCallback( () => {
 		setActionWithModal( undefined );
 	}, [ setActionWithModal ] );
+	const label =
+		typeof action.label === 'string'
+			? action.label
+			: action.label( selectedItems );
 	return (
 		<Modal
-			title={ ! hideModalHeader ? action.label : undefined }
+			title={ ! hideModalHeader ? label : undefined }
 			__experimentalHideHeader={ !! hideModalHeader }
 			onRequestClose={ onCloseModal }
 			overlayClassName="dataviews-action-modal"
@@ -115,6 +120,7 @@ function BulkActionItem< Item extends AnyItem >( {
 	selectedItems,
 	setActionWithModal,
 }: BulkActionsItemProps< Item > ) {
+	const registry = useRegistry();
 	const eligibleItems = useMemo( () => {
 		return selectedItems.filter(
 			( item ) => ! action.isEligible || action.isEligible( item )
@@ -132,7 +138,7 @@ function BulkActionItem< Item extends AnyItem >( {
 				if ( shouldShowModal ) {
 					setActionWithModal( action );
 				} else {
-					await action.callback( eligibleItems );
+					action.callback( eligibleItems, { registry } );
 				}
 			} }
 			suffix={

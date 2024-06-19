@@ -43,6 +43,7 @@ export default function RenameModal( { menuTitle, onClose, onSave } ) {
 
 						<Button
 							__next40pxDefaultSize
+							__experimentalIsFocusable
 							disabled={ ! isEditedMenuTitleValid }
 							variant="primary"
 							type="submit"

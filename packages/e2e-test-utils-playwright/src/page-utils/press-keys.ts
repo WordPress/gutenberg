@@ -8,16 +8,7 @@ import type { Page } from '@playwright/test';
  * Internal dependencies
  */
 import type { PageUtils } from './';
-
-/**
- * WordPress dependencies
- */
-import {
-	modifiers as baseModifiers,
-	SHIFT,
-	ALT,
-	CTRL,
-} from '@wordpress/keycodes';
+import { modifiers as baseModifiers, SHIFT, ALT, CTRL } from './keycodes';
 
 let clipboardDataHolder: {
 	'text/plain': string;
@@ -50,7 +41,7 @@ export function setClipboardData(
 }
 
 async function emulateClipboard( page: Page, type: 'copy' | 'cut' | 'paste' ) {
-	clipboardDataHolder = await page.evaluate(
+	const output = await page.evaluate(
 		( [ _type, _clipboardData ] ) => {
 			const canvasDoc =
 				// @ts-ignore
@@ -99,6 +90,10 @@ async function emulateClipboard( page: Page, type: 'copy' | 'cut' | 'paste' ) {
 
 			canvasDoc.activeElement.dispatchEvent( event );
 
+			if ( _type === 'paste' ) {
+				return event.defaultPrevented;
+			}
+
 			return {
 				'text/plain': event.clipboardData.getData( 'text/plain' ),
 				'text/html': event.clipboardData.getData( 'text/html' ),
@@ -107,6 +102,17 @@ async function emulateClipboard( page: Page, type: 'copy' | 'cut' | 'paste' ) {
 		},
 		[ type, clipboardDataHolder ] as const
 	);
+
+	if ( typeof output === 'object' ) {
+		clipboardDataHolder = output;
+	}
+
+	if ( output === false ) {
+		// Emulate paste by typing the clipboard content, which works across all
+		// elements and documents (keyboard.type does uses the nested active
+		// element automatically).
+		await page.keyboard.type( clipboardDataHolder[ 'text/plain' ] );
+	}
 }
 
 const isAppleOS = () => process.platform === 'darwin';

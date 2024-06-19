@@ -287,7 +287,7 @@ function PushChangesToGlobalStylesControl( {
 			// notification.
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( newBlockAttributes );
-			setUserConfig( () => newUserConfig, { undoIgnore: true } );
+			setUserConfig( newUserConfig, { undoIgnore: true } );
 			createSuccessNotice(
 				sprintf(
 					// translators: %s: Title of the block e.g. 'Heading'.
@@ -302,7 +302,7 @@ function PushChangesToGlobalStylesControl( {
 							onClick() {
 								__unstableMarkNextChangeAsNotPersistent();
 								setAttributes( attributes );
-								setUserConfig( () => userConfig, {
+								setUserConfig( userConfig, {
 									undoIgnore: true,
 								} );
 							},
@@ -337,7 +337,9 @@ function PushChangesToGlobalStylesControl( {
 				{ __( 'Styles' ) }
 			</BaseControl.VisualLabel>
 			<Button
-				variant="primary"
+				__next40pxDefaultSize
+				variant="secondary"
+				__experimentalIsFocusable
 				disabled={ changes.length === 0 }
 				onClick={ pushChanges }
 			>

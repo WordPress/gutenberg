@@ -90,7 +90,7 @@ const DEFAULT_CONTROLS = {
 	radius: true,
 	color: true,
 	width: true,
-	shadow: false,
+	shadow: true,
 };
 
 export default function BorderPanel( {
@@ -261,7 +261,7 @@ export default function BorderPanel( {
 						popoverPlacement="left-start"
 						value={ border }
 						__experimentalIsRenderedInSidebar
-						size={ '__unstable-large' }
+						size="__unstable-large"
 						hideLabelFromVision={ ! hasShadowControl }
 						label={ __( 'Border' ) }
 					/>

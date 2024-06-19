@@ -54,9 +54,7 @@ const variations = [
 			},
 		},
 		scope: [ 'inserter' ],
-		isActive: ( { namespace, query } ) => {
-			return namespace === 'core/posts-list' && query.postType === 'post';
-		},
+		isActive: [ 'namespace', 'query.postType' ],
 	},
 	{
 		name: 'title-date',

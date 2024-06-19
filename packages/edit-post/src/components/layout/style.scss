@@ -1,28 +1,20 @@
+.editor-visual-editor {
+	flex: 1 0 auto;
+	height: auto;
+}
+
 .edit-post-layout__metaboxes {
 	flex-shrink: 0;
 	clear: both;
 }
 
 // Adjust the position of the notices
-.edit-post-layout .components-editor-notices__snackbar {
+.components-editor-notices__snackbar {
 	position: fixed;
 	right: 0;
-	bottom: 16px;
-	padding-left: 16px;
-	padding-right: 16px;
-}
-
-.is-distraction-free {
-	.components-editor-notices__snackbar {
-		bottom: 16px;
-	}
-}
-
-// Adjust the position of the notices when breadcrumbs are present
-.has-block-breadcrumbs {
-	.components-editor-notices__snackbar {
-		bottom: 40px;
-	}
+	bottom: 24px;
+	padding-left: 24px;
+	padding-right: 24px;
 }
 
 @include editor-left(".edit-post-layout .components-editor-notices__snackbar");

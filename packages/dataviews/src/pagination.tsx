@@ -74,7 +74,7 @@ const Pagination = memo( function Pagination( {
 											page: +newValue,
 										} );
 									} }
-									size={ 'compact' }
+									size="compact"
 									__nextHasNoMarginBottom
 								/>
 							),

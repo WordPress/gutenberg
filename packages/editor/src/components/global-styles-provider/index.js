@@ -7,15 +7,17 @@ import { isPlainObject } from 'is-plain-object';
 /**
  * WordPress dependencies
  */
+import { registerBlockStyle, store as blocksStore } from '@wordpress/blocks';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useMemo, useCallback } from '@wordpress/element';
+import { useEffect, useMemo, useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
+import setNestedValue from '../../utils/set-nested-value';
 
 const { GlobalStylesContext, cleanEmptyObject } = unlock(
 	blockEditorPrivateApis
@@ -28,6 +30,85 @@ export function mergeBaseAndUserConfigs( base, user ) {
 		// to override the old array (no merging).
 		isMergeableObject: isPlainObject,
 	} );
+}
+
+/**
+ * Resolves shared block style variation definitions from the user origin
+ * under their respective block types and registers the block style if required.
+ *
+ * @param {Object} userConfig Current user origin global styles data.
+ * @return {Object} Updated global styles data.
+ */
+function useResolvedBlockStyleVariationsConfig( userConfig ) {
+	const { getBlockStyles } = useSelect( blocksStore );
+	const sharedVariations = userConfig?.styles?.blocks?.variations;
+
+	// Collect block style variation definitions to merge and unregistered
+	// block styles for automatic registration.
+	const [ userConfigToMerge, unregisteredStyles ] = useMemo( () => {
+		if ( ! sharedVariations ) {
+			return [];
+		}
+
+		const variationsConfigToMerge = {};
+		const unregisteredBlockStyles = [];
+
+		Object.entries( sharedVariations ).forEach(
+			( [ variationName, variation ] ) => {
+				if ( ! variation?.blockTypes?.length ) {
+					return;
+				}
+
+				variation.blockTypes.forEach( ( blockName ) => {
+					const blockStyles = getBlockStyles( blockName );
+					const registeredBlockStyle = blockStyles.find(
+						( { name } ) => name === variationName
+					);
+
+					if ( ! registeredBlockStyle ) {
+						unregisteredBlockStyles.push( [
+							blockName,
+							{
+								name: variationName,
+								label: variationName,
+							},
+						] );
+					}
+
+					const path = [
+						'styles',
+						'blocks',
+						blockName,
+						'variations',
+						variationName,
+					];
+					setNestedValue( variationsConfigToMerge, path, variation );
+				} );
+			}
+		);
+
+		return [ variationsConfigToMerge, unregisteredBlockStyles ];
+	}, [ sharedVariations, getBlockStyles ] );
+
+	// Automatically register missing block styles from variations.
+	useEffect(
+		() =>
+			unregisteredStyles?.forEach( ( unregisteredStyle ) =>
+				registerBlockStyle( ...unregisteredStyle )
+			),
+		[ unregisteredStyles ]
+	);
+
+	// Merge shared block style variation definitions into overall user config.
+	const updatedConfig = useMemo( () => {
+		if ( ! userConfigToMerge ) {
+			return userConfig;
+		}
+
+		return deepmerge( userConfigToMerge, userConfig );
+	}, [ userConfigToMerge, userConfig ] );
+
+	return updatedConfig;
 }
 
 function useGlobalStylesUserConfig() {
@@ -82,7 +163,13 @@ function useGlobalStylesUserConfig() {
 	}, [ settings, styles, _links ] );
 
 	const setConfig = useCallback(
-		( callback, options = {} ) => {
+		/**
+		 * Set the global styles config.
+		 * @param {Function|Object} callbackOrObject If the callbackOrObject is a function, pass the current config to the callback so the consumer can merge values.
+		 *                                           Otherwise, overwrite the current config with the incoming object.
+		 * @param {Object}          options          Options for editEntityRecord Core selector.
+		 */
+		( callbackOrObject, options = {} ) => {
 			const record = getEditedEntityRecord(
 				'root',
 				'globalStyles',
@@ -94,7 +181,11 @@ function useGlobalStylesUserConfig() {
 				settings: record?.settings ?? {},
 				_links: record?._links ?? {},
 			};
-			const updatedConfig = callback( currentConfig );
+
+			const updatedConfig =
+				typeof callbackOrObject === 'function'
+					? callbackOrObject( currentConfig )
+					: callbackOrObject;
 
 			editEntityRecord(
 				'root',
@@ -128,24 +219,28 @@ export function useGlobalStylesContext() {
 	const [ isUserConfigReady, userConfig, setUserConfig ] =
 		useGlobalStylesUserConfig();
 	const [ isBaseConfigReady, baseConfig ] = useGlobalStylesBaseConfig();
+	const userConfigWithVariations =
+		useResolvedBlockStyleVariationsConfig( userConfig );
+
 	const mergedConfig = useMemo( () => {
-		if ( ! baseConfig || ! userConfig ) {
+		if ( ! baseConfig || ! userConfigWithVariations ) {
 			return {};
 		}
-		return mergeBaseAndUserConfigs( baseConfig, userConfig );
-	}, [ userConfig, baseConfig ] );
+
+		return mergeBaseAndUserConfigs( baseConfig, userConfigWithVariations );
+	}, [ userConfigWithVariations, baseConfig ] );
 
 	const context = useMemo( () => {
 		return {
 			isReady: isUserConfigReady && isBaseConfigReady,
-			user: userConfig,
+			user: userConfigWithVariations,
 			base: baseConfig,
 			merged: mergedConfig,
 			setUserConfig,
 		};
 	}, [
 		mergedConfig,
-		userConfig,
+		userConfigWithVariations,
 		baseConfig,
 		setUserConfig,
 		isUserConfigReady,
