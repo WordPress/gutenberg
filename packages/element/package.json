@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/element",
-	"version": "6.0.0",
+	"version": "6.1.0",
 	"description": "Element React module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

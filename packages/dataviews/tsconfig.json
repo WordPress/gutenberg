@@ -9,6 +9,7 @@
 	"references": [
 		{ "path": "../components" },
 		{ "path": "../compose" },
+		{ "path": "../data" },
 		{ "path": "../element" },
 		{ "path": "../i18n" },
 		{ "path": "../icons" },

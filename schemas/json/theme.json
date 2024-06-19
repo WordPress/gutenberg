@@ -444,9 +444,8 @@
 										"type": "string"
 									},
 									"slug": {
-										"description": "Unique identifier for the space size preset. Will be sorted numerically. For best cross theme compatibility these should be in the form '10','20','30','40','50','60', etc. with '50' representing the 'Medium' size step.",
-										"type": "string",
-										"pattern": "^[0-9].*$"
+										"description": "Unique identifier for the space size preset. For best cross theme compatibility these should be in the form '10','20','30','40','50','60', etc. with '50' representing the 'Medium' size step. If all slugs begin with a number they will be merged with default and user slugs and sorted numerically.",
+										"type": "string"
 									},
 									"size": {
 										"description": "CSS space-size value, including units.",
@@ -2288,6 +2287,10 @@
 				},
 				{
 					"properties": {
+						"title": {
+							"type": "string",
+							"description": "Style variation name."
+						},
 						"blockTypes": {
 							"type": "array",
 							"items": {
@@ -2695,6 +2698,10 @@
 		"title": {
 			"type": "string",
 			"description": "Title of the global styles variation. If not defined, the file name will be used."
+		},
+		"slug": {
+			"type": "string",
+			"description": "Slug of the global styles variation. If not defined, the kebab-case title will be used."
 		},
 		"description": {
 			"type": "string",

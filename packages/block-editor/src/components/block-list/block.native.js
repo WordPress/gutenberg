@@ -432,8 +432,8 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId } ) => {
 	const attributes = getBlockAttributes( clientId );
 	const isSelected = isBlockSelected( clientId );
 	const templateLock = getTemplateLock( rootClientId );
-	const canRemove = canRemoveBlock( clientId, rootClientId );
-	const canMove = canMoveBlock( clientId, rootClientId );
+	const canRemove = canRemoveBlock( clientId );
+	const canMove = canMoveBlock( clientId );
 
 	// The fallback to `{}` is a temporary fix.
 	// This function should never be called when a block is not present in

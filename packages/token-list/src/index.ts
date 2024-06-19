@@ -4,49 +4,33 @@
  * @see https://dom.spec.whatwg.org/#domtokenlist
  */
 export default class TokenList {
+	private _currentValue: string;
+	private _valueAsArray: string[];
+
 	/**
 	 * Constructs a new instance of TokenList.
 	 *
-	 * @param {string} initialValue Initial value to assign.
+	 * @param initialValue Initial value to assign.
 	 */
-	constructor( initialValue = '' ) {
+	constructor( initialValue: string = '' ) {
+		this._currentValue = '';
+		this._valueAsArray = [];
 		this.value = initialValue;
-
-		// Disable reason: These are type hints on the class.
-		/* eslint-disable no-unused-expressions */
-		/** @type {string} */
-		this._currentValue;
-
-		/** @type {string[]} */
-		this._valueAsArray;
-		/* eslint-enable no-unused-expressions */
 	}
 
-	/**
-	 * @param {Parameters<Array<string>['entries']>} args
-	 */
-	entries( ...args ) {
+	entries( ...args: Parameters< Array< string >[ 'entries' ] > ) {
 		return this._valueAsArray.entries( ...args );
 	}
 
-	/**
-	 * @param {Parameters<Array<string>['forEach']>} args
-	 */
-	forEach( ...args ) {
+	forEach( ...args: Parameters< Array< string >[ 'forEach' ] > ) {
 		return this._valueAsArray.forEach( ...args );
 	}
 
-	/**
-	 * @param {Parameters<Array<string>['keys']>} args
-	 */
-	keys( ...args ) {
+	keys( ...args: Parameters< Array< string >[ 'keys' ] > ) {
 		return this._valueAsArray.keys( ...args );
 	}
 
-	/**
-	 * @param {Parameters<Array<string>['values']>} args
-	 */
-	values( ...args ) {
+	values( ...args: Parameters< Array< string >[ 'values' ] > ) {
 		return this._valueAsArray.values( ...args );
 	}
 
@@ -55,9 +39,9 @@ export default class TokenList {
 	 *
 	 * @see https://dom.spec.whatwg.org/#dom-domtokenlist-value
 	 *
-	 * @return {string} Token set as string.
+	 * @return Token set as string.
 	 */
-	get value() {
+	get value(): string {
 		return this._currentValue;
 	}
 
@@ -66,9 +50,9 @@ export default class TokenList {
 	 *
 	 * @see https://dom.spec.whatwg.org/#dom-domtokenlist-value
 	 *
-	 * @param {string} value New token set as string.
+	 * @param value New token set as string.
 	 */
-	set value( value ) {
+	set value( value: string ) {
 		value = String( value );
 		this._valueAsArray = [
 			...new Set( value.split( /\s+/g ).filter( Boolean ) ),
@@ -81,9 +65,9 @@ export default class TokenList {
 	 *
 	 * @see https://dom.spec.whatwg.org/#dom-domtokenlist-length
 	 *
-	 * @return {number} Number of tokens.
+	 * @return Number of tokens.
 	 */
-	get length() {
+	get length(): number {
 		return this._valueAsArray.length;
 	}
 
@@ -93,9 +77,9 @@ export default class TokenList {
 	 * @see https://dom.spec.whatwg.org/#DOMTokenList-stringification-behavior
 	 * @see https://www.ecma-international.org/ecma-262/9.0/index.html#sec-tostring
 	 *
-	 * @return {string} Token set as string.
+	 * @return Token set as string.
 	 */
-	toString() {
+	toString(): string {
 		return this.value;
 	}
 
@@ -104,9 +88,9 @@ export default class TokenList {
 	 *
 	 * @see https://dom.spec.whatwg.org/#domtokenlist
 	 *
-	 * @return {IterableIterator<string>} TokenList iterator.
+	 * @return TokenList iterator.
 	 */
-	*[ Symbol.iterator ]() {
+	*[ Symbol.iterator ](): IterableIterator< string > {
 		return yield* this._valueAsArray;
 	}
 
@@ -115,11 +99,11 @@ export default class TokenList {
 	 *
 	 * @see https://dom.spec.whatwg.org/#dom-domtokenlist-item
 	 *
-	 * @param {number} index Index at which to return token.
+	 * @param index Index at which to return token.
 	 *
-	 * @return {string|undefined} Token at index.
+	 * @return Token at index.
 	 */
-	item( index ) {
+	item( index: number ): string | undefined {
 		return this._valueAsArray[ index ];
 	}
 
@@ -128,11 +112,11 @@ export default class TokenList {
 	 *
 	 * @see https://dom.spec.whatwg.org/#dom-domtokenlist-contains
 	 *
-	 * @param {string} item Token to test.
+	 * @param item Token to test.
 	 *
-	 * @return {boolean} Whether token is present.
+	 * @return Whether token is present.
 	 */
-	contains( item ) {
+	contains( item: string ): boolean {
 		return this._valueAsArray.indexOf( item ) !== -1;
 	}
 
@@ -141,9 +125,9 @@ export default class TokenList {
 	 *
 	 * @see https://dom.spec.whatwg.org/#dom-domtokenlist-add
 	 *
-	 * @param {...string} items Items to add.
+	 * @param items Items to add.
 	 */
-	add( ...items ) {
+	add( ...items: string[] ): void {
 		this.value += ' ' + items.join( ' ' );
 	}
 
@@ -152,9 +136,9 @@ export default class TokenList {
 	 *
 	 * @see https://dom.spec.whatwg.org/#dom-domtokenlist-remove
 	 *
-	 * @param {...string} items Items to remove.
+	 * @param items Items to remove.
 	 */
-	remove( ...items ) {
+	remove( ...items: string[] ): void {
 		this.value = this._valueAsArray
 			.filter( ( val ) => ! items.includes( val ) )
 			.join( ' ' );
@@ -168,12 +152,12 @@ export default class TokenList {
 	 *
 	 * @see https://dom.spec.whatwg.org/#dom-domtokenlist-toggle
 	 *
-	 * @param {string}  token   Token to toggle.
-	 * @param {boolean} [force] Presence to force.
+	 * @param token   Token to toggle.
+	 * @param [force] Presence to force.
 	 *
-	 * @return {boolean} Whether token is present after toggle.
+	 * @return Whether token is present after toggle.
 	 */
-	toggle( token, force ) {
+	toggle( token: string, force?: boolean ): boolean {
 		if ( undefined === force ) {
 			force = ! this.contains( token );
 		}
@@ -193,12 +177,12 @@ export default class TokenList {
 	 *
 	 * @see https://dom.spec.whatwg.org/#dom-domtokenlist-replace
 	 *
-	 * @param {string} token    Token to replace with `newToken`.
-	 * @param {string} newToken Token to use in place of `token`.
+	 * @param token    Token to replace with `newToken`.
+	 * @param newToken Token to use in place of `token`.
 	 *
-	 * @return {boolean} Whether replacement occurred.
+	 * @return Whether replacement occurred.
 	 */
-	replace( token, newToken ) {
+	replace( token: string, newToken: string ): boolean {
 		if ( ! this.contains( token ) ) {
 			return false;
 		}
@@ -215,11 +199,12 @@ export default class TokenList {
 	 *
 	 * Always returns `true` in this implementation.
 	 *
+	 * @param _token
 	 * @see https://dom.spec.whatwg.org/#dom-domtokenlist-supports
 	 *
-	 * @return {boolean} Whether token is supported.
+	 * @return Whether token is supported.
 	 */
-	supports() {
+	supports( _token: string ): boolean {
 		return true;
 	}
 }
