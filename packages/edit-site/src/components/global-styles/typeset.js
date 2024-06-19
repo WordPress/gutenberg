@@ -47,12 +47,18 @@ function Typesets() {
 
 				<VStack spacing={ 2 }>
 					<HStack justify="space-between">
-						<Subtitle level={ 3 }>{ __( 'Typeset' ) }</Subtitle>
+						<Subtitle level={ 3 }>{ __( 'Fonts' ) }</Subtitle>
 					</HStack>
 					<ItemGroup isBordered isSeparated>
-						{ allFontFamilies.map( ( font ) => (
-							<FontFamilyItem key={ font.slug } font={ font } />
-						) ) }
+						{ allFontFamilies.map(
+							( font ) =>
+								font && (
+									<FontFamilyItem
+										key={ font.slug }
+										font={ font }
+									/>
+								)
+						) }
 					</ItemGroup>
 				</VStack>
 			</>

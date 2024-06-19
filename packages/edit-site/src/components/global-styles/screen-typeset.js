@@ -2,6 +2,8 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
+import { store as editorStore } from '@wordpress/editor';
 import { __experimentalVStack as VStack } from '@wordpress/components';
 
 /**
@@ -9,21 +11,29 @@ import { __experimentalVStack as VStack } from '@wordpress/components';
  */
 import TypographyVariations from './variations/variations-typography';
 import ScreenHeader from './header';
-import Typeset from './typeset';
+import FontFamilies from './font-families';
 
 function ScreenTypeset() {
+	const fontLibraryEnabled = useSelect(
+		( select ) =>
+			select( editorStore ).getEditorSettings().fontLibraryEnabled,
+		[]
+	);
+
 	return (
 		<>
 			<ScreenHeader
 				title={ __( 'Typesets' ) }
 				description={ __(
-					'Font pairings and typographic styling applied across the site.'
+					'Fonts and typographic styling applied across the site.'
 				) }
 			/>
 			<div className="edit-site-global-styles-screen">
 				<VStack spacing={ 7 }>
-					<Typeset />
-					<TypographyVariations title={ __( 'Presets' ) } />
+					<TypographyVariations />
+
+					{ ! window.__experimentalDisableFontLibrary &&
+						fontLibraryEnabled && <FontFamilies /> }
 				</VStack>
 			</div>
 		</>

@@ -47,7 +47,7 @@ function TypesetButton() {
 						<HStack direction="row">
 							<FlexItem>
 								{ allFontFamilies
-									.map( ( font ) => font.name )
+									.map( ( font ) => font?.name )
 									.join( ', ' ) }
 							</FlexItem>
 							<Icon
