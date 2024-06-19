@@ -30,7 +30,7 @@
 		transform: scale(0.9);
 	}
 
-	&.is-active {
+	&.is-active:not(.has-dragged-out) {
 		.components-drop-zone__content {
 			opacity: 1;
 
@@ -51,21 +51,6 @@
 			@media (prefers-reduced-motion: reduce) {
 				transition: none;
 			}
-		}
-	}
-
-	&.inactive {
-		.components-drop-zone__content {
-			opacity: 0;
-
-			transition: none;
-		}
-
-		.components-drop-zone__content-inner {
-			opacity: 0;
-			transform: scale(0.9);
-
-			transition: none;
 		}
 	}
 }
