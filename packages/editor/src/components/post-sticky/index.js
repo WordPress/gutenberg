@@ -12,6 +12,11 @@ import PostStickyCheck from './check';
 import { store as editorStore } from '../../store';
 import PostPanelRow from '../post-panel-row';
 
+/**
+ * Renders the PostSticky component. It provide toggle control for the sticky post feature.
+ *
+ * @return {Component} The component to be rendered.
+ */
 export default function PostSticky() {
 	const postSticky = useSelect( ( select ) => {
 		return (

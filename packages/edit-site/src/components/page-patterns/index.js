@@ -354,8 +354,14 @@ export default function DataviewsPatterns() {
 		return filterSortAndPaginate( patterns, viewWithoutFilters, fields );
 	}, [ patterns, view, fields, type ] );
 
-	const templatePartActions = usePostActions( TEMPLATE_PART_POST_TYPE );
-	const patternActions = usePostActions( PATTERN_TYPES.user );
+	const templatePartActions = usePostActions( {
+		postType: TEMPLATE_PART_POST_TYPE,
+		context: 'list',
+	} );
+	const patternActions = usePostActions( {
+		postType: PATTERN_TYPES.user,
+		context: 'list',
+	} );
 	const editAction = useEditPostAction();
 
 	const actions = useMemo( () => {

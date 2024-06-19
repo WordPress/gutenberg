@@ -107,4 +107,11 @@ export { default as EditorProvider } from './provider';
 
 export * from './deprecated';
 export const VisualEditorGlobalKeyboardShortcuts = EditorKeyboardShortcuts;
+
+/**
+ * Component handles the global keyboard shortcuts for the Text editor.
+ *
+ * It provides functionality for various keyboard shortcuts such as toggling editor mode,
+ * toggling distraction-free mode, undo/redo.
+ */
 export const TextEditorGlobalKeyboardShortcuts = EditorKeyboardShortcuts;

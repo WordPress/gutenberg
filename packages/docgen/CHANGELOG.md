@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.1.0 (2024-06-15)
+
 ## 2.0.0 (2024-05-31)
 
 ### Breaking Changes
@@ -123,7 +125,7 @@
 
 ## 1.2.0 (2019-05-21)
 
-### Enhancement
+### Enhancements
 
 -   Docblocks including a `@private` tag will be omitted from the generated result.
 

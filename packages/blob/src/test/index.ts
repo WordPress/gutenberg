@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { isBlobURL, getBlobTypeByURL, downloadBlob } from '../';
+import { isBlobURL, getBlobTypeByURL, downloadBlob } from '..';
 
 describe( 'isBlobURL', () => {
 	it( 'returns true if the url starts with "blob:"', () => {
@@ -13,17 +13,23 @@ describe( 'isBlobURL', () => {
 	} );
 
 	it( 'returns false if the url is not defined', () => {
-		expect( isBlobURL() ).toBe( false );
+		expect(
+			// @ts-expect-error This is not a valid call according to types.
+			isBlobURL()
+		).toBe( false );
 	} );
 } );
 
 describe( 'getBlobTypeByURL', () => {
 	it( 'returns undefined if the blob is not found', () => {
-		expect( getBlobTypeByURL( 'blob:notexisting' ) ).toBe( undefined );
+		expect( getBlobTypeByURL( 'blob:notexisting' ) ).toBeUndefined();
 	} );
 
 	it( 'returns undefined if the url is not defined', () => {
-		expect( getBlobTypeByURL() ).toBe( undefined );
+		expect(
+			// @ts-expect-error This is not a valid call according to types.
+			getBlobTypeByURL()
+		).toBeUndefined();
 	} );
 } );
 
@@ -36,13 +42,17 @@ describe( 'downloadBlob', () => {
 	const createElementSpy = jest
 		.spyOn( global.document, 'createElement' )
 		.mockReturnValue( mockAnchorElement );
+
 	const mockBlob = jest.fn();
-	const blobSpy = jest.spyOn( window, 'Blob' ).mockReturnValue( mockBlob );
+	const blobSpy = jest
+		.spyOn( window, 'Blob' )
+		.mockReturnValue( mockBlob as unknown as Blob );
 	jest.spyOn( document.body, 'appendChild' );
 	jest.spyOn( document.body, 'removeChild' );
 	beforeEach( () => {
 		// Can't seem to spy on these static methods. They are `undefined`.
 		// Possibly overwritten: https://github.com/WordPress/gutenberg/blob/trunk/packages/jest-preset-default/scripts/setup-globals.js#L5
+		// @ts-expect-error This is not a valid URL object.
 		window.URL = {
 			createObjectURL,
 			revokeObjectURL,

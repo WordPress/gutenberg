@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { store, getContext, useInit, privateApis } from '@wordpress/interactivity';
+import {
+	store,
+	getContext,
+	useInit,
+	privateApis,
+} from '@wordpress/interactivity';
 
 const { state } = store( 'directive-each' );
 
@@ -16,8 +21,8 @@ store( 'directive-each', {
 		fruits: [ 'avocado', 'banana', 'cherimoya' ],
 		get fruitId() {
 			const { idPrefix, fruit } = getContext();
-			return `${idPrefix}${fruit}`;
-		}
+			return `${ idPrefix }${ fruit }`;
+		},
 	},
 	actions: {
 		removeFruit() {
@@ -43,17 +48,17 @@ store( 'directive-each', {
 			{
 				title: 'A Game of Thrones',
 				author: 'George R.R. Martin',
-				isbn: "9780553588484",
+				isbn: '9780553588484',
 			},
 			{
 				title: 'A Clash of Kings',
 				author: 'George R.R. Martin',
-				isbn: "9780553381696",
+				isbn: '9780553381696',
 			},
 			{
 				title: 'A Storm of Swords',
 				author: 'George R.R. Martin',
-				isbn: "9780553573428",
+				isbn: '9780553573428',
 			},
 		],
 	},
@@ -70,7 +75,7 @@ store( 'directive-each', {
 			const book = {
 				title: 'A Feast for Crows',
 				author: 'George R.R. Martin',
-				isbn: "9780553582024",
+				isbn: '9780553582024',
 			};
 			state.books.splice( 0, 0, book );
 		},
@@ -78,7 +83,7 @@ store( 'directive-each', {
 			const book = {
 				title: 'A Feast for Crows',
 				author: 'George R.R. Martin',
-				isbn: "9780553582024",
+				isbn: '9780553582024',
 			};
 			state.books.splice( 0, 1, book );
 		},
@@ -101,58 +106,63 @@ store( 'directive-each', {
 			if ( state.numbers.length > 0 ) {
 				state.numbers.unshift( state.numbers[ 0 ] - 1 );
 			}
-		}
+		},
 	},
 } );
 
 store( 'directive-each', {
 	state: {
-		emptyList: []
+		emptyList: [],
 	},
 	actions: {
 		addItem() {
 			state.emptyList.push( `item ${ state.emptyList.length }` );
-		}
+		},
 	},
 } );
 
 store( 'directive-each', {
 	state: {
 		numbersAndNames: [
-			{ name: "two", value: 2 },
-			{ name: "three", value: 3 },
+			{ name: 'two', value: 2 },
+			{ name: 'three', value: 3 },
 		],
 	},
 	actions: {
 		unshiftNumberAndName() {
-			state.numbersAndNames.unshift( { name: "one", value: 1 } );
-		}
+			state.numbersAndNames.unshift( { name: 'one', value: 1 } );
+		},
 	},
 } );
 
 store( 'directive-each', {
 	state: {
 		animalBreeds: [
-			{ name: "Dog", breeds: [ 'chihuahua', 'rottweiler' ] },
-			{ name: "Cat", breeds: [ 'sphynx', 'siamese' ] },
+			{ name: 'Dog', breeds: [ 'chihuahua', 'rottweiler' ] },
+			{ name: 'Cat', breeds: [ 'sphynx', 'siamese' ] },
 		],
 	},
 	actions: {
 		addAnimal() {
 			state.animalBreeds.unshift( {
-				name: "Rat", breeds: [ 'dumbo', 'rex' ]
+				name: 'Rat',
+				breeds: [ 'dumbo', 'rex' ],
 			} );
 		},
 		addBreeds() {
-			state
-				.animalBreeds
-				.forEach( ( { name, breeds } ) => {
-					if ( name === 'Dog') {breeds.unshift( 'german shepherd' );}
-					if ( name === 'Cat') {breeds.unshift( 'maine coon' );}
-					if ( name === 'Rat') {breeds.unshift( 'satin' );}
-				} );
-		}
-	}
+			state.animalBreeds.forEach( ( { name, breeds } ) => {
+				if ( name === 'Dog' ) {
+					breeds.unshift( 'german shepherd' );
+				}
+				if ( name === 'Cat' ) {
+					breeds.unshift( 'maine coon' );
+				}
+				if ( name === 'Rat' ) {
+					breeds.unshift( 'satin' );
+				}
+			} );
+		},
+	},
 } );
 
 const html = `
@@ -180,14 +190,14 @@ store( 'directive-each', {
 	actions: {
 		*navigate() {
 			const { actions } = yield import(
-				"@wordpress/interactivity-router"
+				'@wordpress/interactivity-router'
 			);
 			return actions.navigate( window.location, {
 				force: true,
 				html,
 			} );
 		},
-	}
+	},
 } );
 
 const { directive } = privateApis(
@@ -208,12 +218,11 @@ directive(
 	{ priority: 2 }
 );
 
-store('directive-each', {
-    callbacks: {
+store( 'directive-each', {
+	callbacks: {
 		updateCallbackRunCount() {
 			const ctx = getContext();
 			ctx.callbackRunCount += 1;
-		}
-    },
-});
-
+		},
+	},
+} );

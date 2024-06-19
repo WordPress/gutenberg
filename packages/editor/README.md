@@ -1272,19 +1272,45 @@ _Returns_
 
 ### PostSlug
 
-Undocumented declaration.
+Renders the PostSlug component. It provide a control for editing the post slug.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### PostSlugCheck
 
-Undocumented declaration.
+Wrapper component that renders its children only if the post type supports the slug.
+
+_Parameters_
+
+-   _props_ `Object`: Props.
+-   _props.children_ `Element`: Children to be rendered.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### PostSticky
 
-Undocumented declaration.
+Renders the PostSticky component. It provide toggle control for the sticky post feature.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### PostStickyCheck
 
-Undocumented declaration.
+Wrapper component that renders its children only if post has a sticky action.
+
+_Parameters_
+
+-   _props_ `Object`: Props.
+-   _props.children_ `Element`: Children to be rendered.
+
+_Returns_
+
+-   `Component`: The component to be rendered or null if post type is not 'post' or hasStickyAction is false.
 
 ### PostSwitchToDraftButton
 
@@ -1403,11 +1429,24 @@ Undocumented declaration.
 
 ### PostTrash
 
-Undocumented declaration.
+Displays the Post Trash Button and Confirm Dialog in the Editor.
+
+_Returns_
+
+-   `JSX.Element|null`: The rendered PostTrash component.
 
 ### PostTrashCheck
 
-Undocumented declaration.
+Wrapper component that renders its children only if the post can trashed.
+
+_Parameters_
+
+-   _props_ `Object`: - The component props.
+-   _props.children_ `Element`: - The child components to render.
+
+_Returns_
+
+-   `Component|null`: The rendered child components or null if the post can not trashed.
 
 ### PostTypeSupportCheck
 
@@ -1508,6 +1547,18 @@ _Returns_
 
 Undocumented declaration.
 
+### registerEntityAction
+
+Registers a new DataViews action.
+
+This is an experimental API and is subject to change. it's only available in the Gutenberg plugin for now.
+
+_Parameters_
+
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _config_ `Action`: Action configuration.
+
 ### RichText
 
 > **Deprecated** since 5.3, use `wp.blockEditor.RichText` instead.
@@ -1569,7 +1620,9 @@ _Returns_
 
 ### TextEditorGlobalKeyboardShortcuts
 
-Undocumented declaration.
+Component handles the global keyboard shortcuts for the Text editor.
+
+It provides functionality for various keyboard shortcuts such as toggling editor mode, toggling distraction-free mode, undo/redo.
 
 ### ThemeSupportCheck
 
@@ -1587,11 +1640,27 @@ _Returns_
 
 ### TimeToRead
 
-Undocumented declaration.
+Component for showing Time To Read in Content.
+
+_Returns_
+
+-   `JSX.Element`: The rendered TimeToRead component.
 
 ### transformStyles
 
 Undocumented declaration.
+
+### unregisterEntityAction
+
+Unregisters a DataViews action.
+
+This is an experimental API and is subject to change. it's only available in the Gutenberg plugin for now.
+
+_Parameters_
+
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _actionId_ `string`: Action ID.
 
 ### UnsavedChangesWarning
 

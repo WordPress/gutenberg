@@ -494,6 +494,32 @@ test.describe( 'Copy/cut/paste', () => {
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	test( 'should paste list in list', async ( {
+		page,
+		pageUtils,
+		editor,
+	} ) => {
+		pageUtils.setClipboardData( { html: '<ul><li>x</li><li>y</li></ul>' } );
+		await editor.insertBlock( { name: 'core/list' } );
+		await pageUtils.pressKeys( 'primary+v' );
+		// Ensure the selection is correct.
+		await page.keyboard.type( '‸' );
+		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	test( 'should paste paragraphs in list', async ( {
+		page,
+		pageUtils,
+		editor,
+	} ) => {
+		pageUtils.setClipboardData( { html: '<p>x</p><p>y</p>' } );
+		await editor.insertBlock( { name: 'core/list' } );
+		await pageUtils.pressKeys( 'primary+v' );
+		// Ensure the selection is correct.
+		await page.keyboard.type( '‸' );
+		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+	} );
+
 	test( 'should link selection', async ( { pageUtils, editor } ) => {
 		await editor.insertBlock( {
 			name: 'core/paragraph',
@@ -669,10 +695,9 @@ test.describe( 'Copy/cut/paste', () => {
 				},
 			},
 			{
-				name: 'core/heading',
+				name: 'core/paragraph',
 				attributes: {
 					content: 'bB',
-					level: 2,
 				},
 			},
 		] );
