@@ -23,6 +23,11 @@
 		text-align: center;
 		color: $white;
 		opacity: 0;
+
+		// Without this, when this div is shown,
+		// Safari calls a onDropZoneLeave causing a loop because of this bug
+		// https://bugs.webkit.org/show_bug.cgi?id=66547
+		pointer-events: none;
 	}
 
 	.components-drop-zone__content-inner {
