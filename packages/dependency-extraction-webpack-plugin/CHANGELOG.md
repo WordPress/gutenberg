@@ -29,7 +29,7 @@
 
 ## 5.2.0 (2024-02-09)
 
-### Bug fixes
+### Bug Fixes
 
 -   Fix import type field in script module asset files ([#58770](https://github.com/WordPress/gutenberg/pull/58770)).
 
@@ -90,7 +90,7 @@
 
 ## 4.10.0 (2023-02-15)
 
-### Bug Fix
+### Bug Fixes
 
 -   The bundled `json2php` dependency has been upgraded from requiring `^0.0.5` to `^0.0.7` ([#47831](https://github.com/WordPress/gutenberg/pull/47831)).
 
@@ -118,7 +118,7 @@
 
 ## 4.0.0 (2022-08-24)
 
-### Breaking Change
+### Breaking Changes
 
 -   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
 
@@ -130,7 +130,7 @@
 
 ## 3.5.0 (2022-05-18)
 
-### Bug Fix
+### Bug Fixes
 
 -   Use OpenSSL provider supported in Node 17+ when calling `crypto.createHash` ([#40503](https://github.com/WordPress/gutenberg/pull/40503)).
 -   Add new line at the end of generated `*.asset.php` files ([#40753](https://github.com/WordPress/gutenberg/pull/40753)).
@@ -148,13 +148,13 @@
 
 ## 2.9.0 (2020-12-17)
 
-### New feature
+### New Features
 
 -   Make the plugin compatible with webpack 5.
 
 ## 2.7.0 (2020-06-15)
 
-### New feature
+### New Features
 
 -   Include TypeScript type declarations ([#22498](https://github.com/WordPress/gutenberg/pull/22498))
 

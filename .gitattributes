@@ -11,3 +11,6 @@
 *.jpg binary
 *.png binary
 *.ttf binary
+
+# Directories with vendored code.
+packages/edit-site/lib/** linguist-vendored

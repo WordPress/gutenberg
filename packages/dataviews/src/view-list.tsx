@@ -27,6 +27,7 @@ import {
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
+import { useRegistry } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -67,6 +68,7 @@ function ListItem< Item extends AnyItem >( {
 	store,
 	visibleFields,
 }: ListViewItemProps< Item > ) {
+	const registry = useRegistry();
 	const itemRef = useRef< HTMLElement >( null );
 	const labelId = `${ id }-label`;
 	const descriptionId = `${ id }-description`;
@@ -235,11 +237,12 @@ function ListItem< Item extends AnyItem >( {
 													primaryAction.isDestructive
 												}
 												size="compact"
-												onClick={ () =>
-													primaryAction.callback( [
-														item,
-													] )
-												}
+												onClick={ () => {
+													primaryAction.callback(
+														[ item ],
+														{ registry }
+													);
+												} }
 											/>
 										}
 									/>

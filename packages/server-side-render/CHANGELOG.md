@@ -92,7 +92,7 @@
 
 ## 3.18.0 (2022-10-19)
 
-### Feature
+### New Features
 
 -   Add `skipBlockSupportAttributes` props to prevent duplication of styles in the block wrapper and the `ServerSideRender` components. [#44491](https://github.com/WordPress/gutenberg/pull/44491)
 
@@ -132,7 +132,7 @@
 
 ## 3.0.0 (2021-07-29)
 
-### Breaking Change
+### Breaking Changes
 
 -   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
 
@@ -151,19 +151,19 @@
 
 ## 1.17.0 (2020-09-03)
 
-### Feature
+### New Features
 
 -   Add an optional prop `httpMethod`, which can be 'POST' or the default 'GET'. Requires WP 5.5 or later. When 'POST', this sends the attributes in the request body, not in the URL. This can allow a bigger attributes object. [#21068](https://github.com/WordPress/gutenberg/pull/21068)
 
 ## 1.7.0 (2020-02-04)
 
-### Bug
+### Bug Fixes
 
 -   Fix errant `className` being output on default empty placeholder. [#19555](https://github.com/WordPress/gutenberg/pull/19555)
 
 ## 1.2.0 (2019-08-29)
 
-### Feature
+### New Features
 
 -   Add `EmptyResponsePlaceholder`, `ErrorResponsePlaceholder` and `LoadingResponsePlaceholder` render props for parent components to swap out alternate placeholders for the various states (see https://github.com/WordPress/gutenberg/pull/16512).
 

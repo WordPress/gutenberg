@@ -141,7 +141,7 @@
 
 ## 1.18.0 (2020-10-06)
 
-### New Feature
+### New Features
 
 -   Expose the `syncSelect` control for synchronous calls of registry selectors
 
