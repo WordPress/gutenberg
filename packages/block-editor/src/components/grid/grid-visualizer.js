@@ -15,8 +15,9 @@ import { __experimentalUseDropZone as useDropZone } from '@wordpress/compose';
  */
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockPopoverCover from '../block-popover/cover';
-import { getComputedCSS, range, GridRect, getGridItemRect } from './utils';
+import { range, GridRect, getGridItemRect, getGridInfo } from './utils';
 import { store as blockEditorStore } from '../../store';
+import { useGetBlocksBeforeCurrentCell } from './use-get-blocks-before-current-cell';
 
 export function GridVisualizer( { clientId, contentRef } ) {
 	const gridElement = useBlockElement( clientId );
@@ -32,32 +33,6 @@ export function GridVisualizer( { clientId, contentRef } ) {
 	);
 }
 
-function getGridInfo( gridElement ) {
-	const gridTemplateColumns = getComputedCSS(
-		gridElement,
-		'grid-template-columns'
-	);
-	const gridTemplateRows = getComputedCSS(
-		gridElement,
-		'grid-template-rows'
-	);
-	const numColumns = gridTemplateColumns.split( ' ' ).length;
-	const numRows = gridTemplateRows.split( ' ' ).length;
-	const numItems = numColumns * numRows;
-	return {
-		numColumns,
-		numRows,
-		numItems,
-		currentColor: getComputedCSS( gridElement, 'color' ),
-		style: {
-			gridTemplateColumns,
-			gridTemplateRows,
-			gap: getComputedCSS( gridElement, 'gap' ),
-			padding: getComputedCSS( gridElement, 'padding' ),
-		},
-	};
-}
-
 const GridVisualizerGrid = forwardRef( ( { clientId, gridElement }, ref ) => {
 	const [ gridInfo, setGridInfo ] = useState( () =>
 		getGridInfo( gridElement )
@@ -65,7 +40,7 @@ const GridVisualizerGrid = forwardRef( ( { clientId, gridElement }, ref ) => {
 	const [ isDroppingAllowed, setIsDroppingAllowed ] = useState( false );
 	const [ highlightedRect, setHighlightedRect ] = useState( null );
 
-	const { getBlockAttributes, getBlockOrder } = useSelect( blockEditorStore );
+	const { getBlockAttributes } = useSelect( blockEditorStore );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	useEffect( () => {
@@ -99,21 +74,11 @@ const GridVisualizerGrid = forwardRef( ( { clientId, gridElement }, ref ) => {
 		};
 	}, [] );
 
-	const gridBlockOrder = getBlockOrder( clientId );
+	const getBlocksBeforeCurrentCell = useGetBlocksBeforeCurrentCell(
+		clientId,
+		gridInfo
+	);
 
-	const getBlockPositions = gridBlockOrder.map( ( blockClientId ) => {
-		const attributes = getBlockAttributes( blockClientId );
-		const { columnStart, rowStart } = attributes.style?.layout || {};
-		// If flow direction ever becomes settable this will have to change.
-		return ( rowStart - 1 ) * gridInfo.numColumns + columnStart - 1;
-	} );
-
-	const getBlocksBeforeCurrentCell = ( targetIndex ) => {
-		const blocksBefore = getBlockPositions.filter(
-			( position ) => position < targetIndex
-		);
-		return blocksBefore.length;
-	};
 	let index = 0;
 
 	return (

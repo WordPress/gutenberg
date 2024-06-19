@@ -193,6 +193,8 @@ function ChildLayoutControlsPure( { clientId, style, setAttributes } ) {
 					layout={ style?.layout }
 					parentLayout={ parentLayout }
 					onChange={ updateLayout }
+					gridClientId={ rootClientId }
+					blockClientId={ clientId }
 				/>
 			) }
 		</>

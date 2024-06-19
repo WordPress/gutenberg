@@ -150,3 +150,29 @@ export function getGridItemRect( gridItemElement ) {
 		)
 	);
 }
+
+export function getGridInfo( gridElement ) {
+	const gridTemplateColumns = getComputedCSS(
+		gridElement,
+		'grid-template-columns'
+	);
+	const gridTemplateRows = getComputedCSS(
+		gridElement,
+		'grid-template-rows'
+	);
+	const numColumns = gridTemplateColumns.split( ' ' ).length;
+	const numRows = gridTemplateRows.split( ' ' ).length;
+	const numItems = numColumns * numRows;
+	return {
+		numColumns,
+		numRows,
+		numItems,
+		currentColor: getComputedCSS( gridElement, 'color' ),
+		style: {
+			gridTemplateColumns,
+			gridTemplateRows,
+			gap: getComputedCSS( gridElement, 'gap' ),
+			padding: getComputedCSS( gridElement, 'padding' ),
+		},
+	};
+}
