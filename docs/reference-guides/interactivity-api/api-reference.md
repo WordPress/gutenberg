@@ -299,6 +299,9 @@ The returned value is used to change the inner content of the element: `<div>val
 
 ### `wp-on`
 
+> [!NOTE]  
+> Consider using the more performant `wp-on-async` instead (below) if your directive code does not need synchronous access to the event object.
+
 This directive runs code on dispatched DOM events like `click` or `keyup`. The syntax is `data-wp-on--[event]` (like `data-wp-on--click` or `data-wp-on--keyup`).
 
 ```php
@@ -327,10 +330,13 @@ The callback passed as the reference receives [the event](https://developer.mozi
 
 ### `wp-on-async`
 
-This directive is a more performant approach of `wp-on`. The action will be yielded to the main thread to not block it, allowing other interactions that otherwise would be waiting on the main thread
-to run sooner. Use this directive for any `wp-on` that doesn't need synchronous access to the `event` object, in particular the methods `event.preventDefault()`, `event.stopPropagation()`, and `event.stopImmediatePropagation()`.
+This directive is a more performant approach for `wp-on`. It immediately yields to main to avoid contributing to a long task, allowing other interactions that otherwise would be waiting on the main thread
+to run sooner. Use this async version whenever there is no need for synchronous access to the `event` object, in particular the methods `event.preventDefault()`, `event.stopPropagation()`, and `event.stopImmediatePropagation()`.
 
 ### `wp-on-window`
+
+> [!NOTE]  
+> Consider using the more performant `wp-on-window-async` instead (below) if your directive code does not need synchronous access to the event object.
 
 This directive allows you to attach global window events like `resize`, `copy`, and `focus` and then execute a defined callback when those happen.
 
@@ -361,9 +367,12 @@ The callback passed as the reference receives [the event](https://developer.mozi
 
 ### `wp-on-window-async`
 
-Similar to `wp-on-async`. An optimized version of `wp-on-window` that prevents blocking the main thread on long tasks. Use this directive for any `wp-on` that doesn't need synchronous access to the `event` object, in particular the methods `event.preventDefault()`, `event.stopPropagation()`, and `event.stopImmediatePropagation()`. This event listener is also added as `passive`.
+Similar to `wp-on-async`, this is an optimized version of `wp-on-window` that immediately yields to main to avoid contributing to a long task. Use this async version whenever there is no need for synchronous access to the `event` object, in particular the methods `event.preventDefault()`, `event.stopPropagation()`, and `event.stopImmediatePropagation()`. This event listener is also added as [`passive`](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#passive).
 
 ### `wp-on-document`
+
+> [!NOTE]  
+> Consider using the more performant `wp-on-document-async` instead (below) if your directive code does not need synchronous access to the event object.
 
 This directive allows you to attach global document events like `scroll`, `mousemove`, and `keydown` and then execute a defined callback when those happen.
 
@@ -394,7 +403,7 @@ The callback passed as the reference receives [the event](https://developer.mozi
 
 ### `wp-on-document-async`
 
-Similar to `wp-on-async`. An optimized version of `wp-on-document` that prevents blocking the main thread on long tasks. Use this directive for any `wp-on` that doesn't need synchronous access to the `event` object, in particular the methods `event.preventDefault()`, `event.stopPropagation()`, and `event.stopImmediatePropagation()`. This event listener is also added as `passive`.
+Similar to `wp-on-async`, this is an optimized version of `wp-on-document` that immediately yields to main to avoid contributing to a long task. Use this async version whenever there is no need for synchronous access to the `event` object, in particular the methods `event.preventDefault()`, `event.stopPropagation()`, and `event.stopImmediatePropagation()`. This event listener is also added as [`passive`](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#passive).
 
 ### `wp-watch`
 
