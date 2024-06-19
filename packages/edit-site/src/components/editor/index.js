@@ -17,7 +17,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
-import { useCallback, useEffect, useMemo } from '@wordpress/element';
+import { useCallback, useMemo } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -57,7 +57,7 @@ export default function EditSiteEditor( { isLoading } ) {
 		isEditingPage,
 		supportsGlobalStyles,
 		showIconLabels,
-		editorCanvasContainerView,
+		editorCanvasView,
 		currentPostIsTrashed,
 	} = useSelect( ( select ) => {
 		const {
@@ -83,7 +83,7 @@ export default function EditSiteEditor( { isLoading } ) {
 			isEditingPage: isPage(),
 			supportsGlobalStyles: getCurrentTheme()?.is_block_theme,
 			showIconLabels: get( 'core', 'showIconLabels' ),
-			editorCanvasContainerView: getEditorCanvasContainerView(),
+			editorCanvasView: getEditorCanvasContainerView(),
 			currentPostIsTrashed:
 				select( editorStore ).getCurrentPostAttribute( 'status' ) ===
 				'trash',
@@ -169,15 +169,8 @@ export default function EditSiteEditor( { isLoading } ) {
 	);
 
 	// Replace the title and icon displayed in the DocumentBar when there's an overlay visible.
-	const { setEditorContentOverlayTitleAndIcon } = unlock(
-		useDispatch( editorStore )
-	);
-	const { title, icon } = getEditorCanvasContainerTitleAndIcon(
-		editorCanvasContainerView
-	);
-	useEffect( () => {
-		setEditorContentOverlayTitleAndIcon( title, icon );
-	}, [ title, icon, setEditorContentOverlayTitleAndIcon ] );
+	const { title, icon } =
+		getEditorCanvasContainerTitleAndIcon( editorCanvasView );
 
 	const isReady = ! isLoading;
 
@@ -205,6 +198,8 @@ export default function EditSiteEditor( { isLoading } ) {
 						_isPreviewingTheme && <SaveButton size="compact" />
 					}
 					forceDisableBlockTools={ ! hasDefaultEditorCanvasView }
+					title={ title }
+					icon={ icon }
 					iframeProps={ iframeProps }
 					onActionPerformed={ onActionPerformed }
 					extraSidebarPanels={

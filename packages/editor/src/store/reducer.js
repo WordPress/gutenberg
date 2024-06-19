@@ -384,20 +384,6 @@ export function publishSidebarActive( state = false, action ) {
 	return state;
 }
 
-export function editorContentOverlay(
-	state = { title: '', icon: '' },
-	action
-) {
-	switch ( action.type ) {
-		case 'SET_CANVAS_OVERLAY_TITLE_AND_ICON':
-			return {
-				title: action.title || '',
-				icon: action.icon || '',
-			};
-	}
-	return state;
-}
-
 export default combineReducers( {
 	postId,
 	postType,
@@ -418,5 +404,4 @@ export default combineReducers( {
 	listViewToggleRef,
 	publishSidebarActive,
 	dataviews: dataviewsReducer,
-	editorContentOverlay,
 } );
