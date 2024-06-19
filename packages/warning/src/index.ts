@@ -3,7 +3,7 @@
  */
 import { logged } from './utils';
 
-function isDev() {
+function isDev(): boolean {
 	// eslint-disable-next-line @wordpress/wp-global-usage
 	return globalThis.SCRIPT_DEBUG === true;
 }
@@ -11,7 +11,7 @@ function isDev() {
 /**
  * Shows a warning with `message` if environment is not `production`.
  *
- * @param {string} message Message to show in the warning.
+ * @param message Message to show in the warning.
  *
  * @example
  * ```js
@@ -25,7 +25,7 @@ function isDev() {
  * }
  * ```
  */
-export default function warning( message ) {
+export default function warning( message: string ): void {
 	if ( ! isDev() ) {
 		return;
 	}
@@ -46,6 +46,5 @@ export default function warning( message ) {
 	} catch ( x ) {
 		// Do nothing.
 	}
-
 	logged.add( message );
 }

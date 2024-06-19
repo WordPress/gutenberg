@@ -81,7 +81,6 @@ _Parameters_
 
 -   _state_ `Object`: Editor state.
 -   _clientId_ `string`: The block client Id.
--   _rootClientId_ `?string`: Optional root client ID of block list.
 
 _Returns_
 
@@ -95,7 +94,6 @@ _Parameters_
 
 -   _state_ `Object`: Editor state.
 -   _clientIds_ `string`: The block client IDs to be moved.
--   _rootClientId_ `?string`: Optional root client ID of block list.
 
 _Returns_
 
@@ -109,7 +107,6 @@ _Parameters_
 
 -   _state_ `Object`: Editor state.
 -   _clientId_ `string`: The block client Id.
--   _rootClientId_ `?string`: Optional root client ID of block list.
 
 _Returns_
 
@@ -123,7 +120,6 @@ _Parameters_
 
 -   _state_ `Object`: Editor state.
 -   _clientIds_ `string`: The block client IDs to be removed.
--   _rootClientId_ `?string`: Optional root client ID of block list.
 
 _Returns_
 
