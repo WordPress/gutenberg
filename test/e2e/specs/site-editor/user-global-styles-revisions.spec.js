@@ -155,11 +155,14 @@ test.describe( 'Style Revisions', () => {
 	} ) => {
 		await editor.canvas.locator( 'body' ).click();
 		await userGlobalStylesRevisions.openStylesPanel();
+		// Search for exact names to avoid selecting the command bar button in the header.
 		const revisionsButton = page.getByRole( 'button', {
 			name: 'Revisions',
+			exact: true,
 		} );
 		const styleBookButton = page.getByRole( 'button', {
 			name: 'Style Book',
+			exact: true,
 		} );
 		await revisionsButton.click();
 		// We can see the Revisions list.
