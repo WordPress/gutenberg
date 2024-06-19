@@ -9,6 +9,11 @@
 	opacity: 0;
 	border-radius: $radius-block-ui;
 
+	&.is-active {
+		opacity: 1;
+		visibility: visible;
+	}
+
 	.components-drop-zone__content {
 		position: absolute;
 		top: 0;
