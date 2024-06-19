@@ -38,6 +38,8 @@ interface DataViewsProps< Item extends AnyItem > {
 		totalPages: number;
 	};
 	supportedLayouts: string[];
+	selection?: string[];
+	setSelection?: ( selection: string[] ) => void;
 	onSelectionChange?: ( items: Item[] ) => void;
 }
 
@@ -72,9 +74,22 @@ export default function DataViews< Item extends AnyItem >( {
 	isLoading = false,
 	paginationInfo,
 	supportedLayouts,
+	selection: selectionProperty,
+	setSelection: setSelectionProperty,
 	onSelectionChange = defaultOnSelectionChange,
 }: DataViewsProps< Item > ) {
-	const [ selection, setSelection ] = useState< string[] >( [] );
+	const [ selectionState, setSelectionState ] = useState< string[] >( [] );
+	let selection, setSelection;
+	if (
+		selectionProperty !== undefined &&
+		setSelectionProperty !== undefined
+	) {
+		selection = selectionProperty;
+		setSelection = setSelectionProperty;
+	} else {
+		selection = selectionState;
+		setSelection = setSelectionState;
+	}
 	const [ openedFilter, setOpenedFilter ] = useState< string | null >( null );
 
 	useEffect( () => {
