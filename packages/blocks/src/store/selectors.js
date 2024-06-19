@@ -7,11 +7,12 @@ import removeAccents from 'remove-accents';
  * WordPress dependencies
  */
 import { createSelector } from '@wordpress/data';
+import { RichTextData } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
  */
-import { getValueFromObjectPath } from './utils';
+import { getValueFromObjectPath, matchesAttributes } from './utils';
 
 /** @typedef {import('../api/registration').WPBlockVariation} WPBlockVariation */
 /** @typedef {import('../api/registration').WPBlockVariationScope} WPBlockVariationScope */
@@ -237,10 +238,17 @@ export const getBlockVariations = createSelector(
 export function getActiveBlockVariation( state, blockName, attributes, scope ) {
 	const variations = getBlockVariations( state, blockName, scope );
 
-	const match = variations?.find( ( variation ) => {
+	if ( ! variations ) {
+		return variations;
+	}
+
+	const blockType = getBlockType( state, blockName );
+	const attributeKeys = Object.keys( blockType?.attributes || {} );
+	let match;
+	let maxMatchedAttributes = 0;
+
+	for ( const variation of variations ) {
 		if ( Array.isArray( variation.isActive ) ) {
-			const blockType = getBlockType( state, blockName );
-			const attributeKeys = Object.keys( blockType?.attributes || {} );
 			const definedAttributes = variation.isActive.filter(
 				( attribute ) => {
 					// We support nested attribute paths, e.g. `layout.type`.
@@ -250,27 +258,41 @@ export function getActiveBlockVariation( state, blockName, attributes, scope ) {
 					return attributeKeys.includes( topLevelAttribute );
 				}
 			);
-			if ( definedAttributes.length === 0 ) {
-				return false;
+			const definedAttributesLength = definedAttributes.length;
+			if ( definedAttributesLength === 0 ) {
+				continue;
 			}
-			return definedAttributes.every( ( attribute ) => {
-				const attributeValue = getValueFromObjectPath(
+			const isMatch = definedAttributes.every( ( attribute ) => {
+				const variationAttributeValue = getValueFromObjectPath(
+					variation.attributes,
+					attribute
+				);
+				if ( variationAttributeValue === undefined ) {
+					return false;
+				}
+				let blockAttributeValue = getValueFromObjectPath(
 					attributes,
 					attribute
 				);
-				if ( attributeValue === undefined ) {
-					return false;
+				if ( blockAttributeValue instanceof RichTextData ) {
+					blockAttributeValue = blockAttributeValue.toHTMLString();
 				}
-				return (
-					attributeValue ===
-					getValueFromObjectPath( variation.attributes, attribute )
+				return matchesAttributes(
+					blockAttributeValue,
+					variationAttributeValue
 				);
 			} );
+			if ( isMatch && definedAttributesLength > maxMatchedAttributes ) {
+				match = variation;
+				maxMatchedAttributes = definedAttributesLength;
+			}
+		} else if ( variation.isActive?.( attributes, variation.attributes ) ) {
+			// If isActive is a function, we cannot know how many attributes it matches.
+			// This means that we cannot compare the specificity of our matches,
+			// and simply return the best match we have found.
+			return match || variation;
 		}
-
-		return variation.isActive?.( attributes, variation.attributes );
-	} );
-
+	}
 	return match;
 }
 

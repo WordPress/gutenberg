@@ -81,8 +81,13 @@ function InserterMenu(
 	const blockTypesTabRef = useRef();
 
 	const onInsert = useCallback(
-		( blocks, meta, shouldForceFocusBlock ) => {
-			onInsertBlocks( blocks, meta, shouldForceFocusBlock );
+		( blocks, meta, shouldForceFocusBlock, _rootClientId ) => {
+			onInsertBlocks(
+				blocks,
+				meta,
+				shouldForceFocusBlock,
+				_rootClientId
+			);
 			onSelect();
 
 			// Check for focus loss due to filtering blocks by selected block type
@@ -111,7 +116,7 @@ function InserterMenu(
 
 	const onHover = useCallback(
 		( item ) => {
-			onToggleInsertionPoint( !! item );
+			onToggleInsertionPoint( item );
 			setHoveredItem( item );
 		},
 		[ onToggleInsertionPoint, setHoveredItem ]

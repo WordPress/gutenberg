@@ -2,15 +2,6 @@
 	width: 100%;
 }
 
-.components-button.editor-post-url__panel-toggle {
-	display: block;
-	max-width: 100%;
-	overflow: hidden;
-	text-align: left;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-}
-
 .editor-post-url__panel-dialog .editor-post-url {
 	// sidebar width - popover padding - form margin
 	min-width: $sidebar-width - $grid-unit-20 - $grid-unit-20;

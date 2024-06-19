@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 3.1.0 (2024-06-15)
+
+### Internal
+
+-   Refactor to TypeScript ([#62557](https://github.com/WordPress/gutenberg/pull/62557)).
+
+## 3.0.0 (2024-05-31)
+
 ### Breaking Changes
 
 -   Variables like `process.env.IS_GUTENBERG_PLUGIN` have been replaced by `globalThis.IS_GUTENBERG_PLUGIN`. Build systems using `process.env` should be updated ([#61486](https://github.com/WordPress/gutenberg/pull/61486)).
@@ -121,7 +129,7 @@
 
 ## 2.2.0 (2021-07-21)
 
-### Enhancement
+### Enhancements
 
 -   Ensure that the warning for a given message is logged only once.
 
@@ -138,10 +146,11 @@
 
 ## 1.1.0 (2020-04-15)
 
-### New feature
+### New Features
 
 -   Include TypeScript type declarations ([#18942](https://github.com/WordPress/gutenberg/pull/18942))
 
 ## 1.0.0 (2020-02-04)
 
 Initial release.
+

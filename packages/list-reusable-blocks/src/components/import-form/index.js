@@ -86,6 +86,7 @@ function ImportForm( { instanceId, onUpload } ) {
 			<Button
 				type="submit"
 				isBusy={ isLoading }
+				__experimentalIsFocusable
 				disabled={ ! file || isLoading }
 				variant="secondary"
 				className="list-reusable-blocks-import-form__button"

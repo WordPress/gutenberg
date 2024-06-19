@@ -6,7 +6,6 @@ import {
 	Dropdown,
 	Button,
 	__experimentalVStack as VStack,
-	__experimentalText as Text,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useState, useMemo } from '@wordpress/element';
@@ -81,7 +80,7 @@ function PostDiscussionToggle( { isOpen, onClick } ) {
 			aria-expanded={ isOpen }
 			onClick={ onClick }
 		>
-			<Text>{ label }</Text>
+			{ label }
 		</Button>
 	);
 }
