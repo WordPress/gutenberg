@@ -47,7 +47,7 @@ function TypesetButton() {
 			variations.find( ( variation ) =>
 				areGlobalStyleConfigsEqual( userConfig, variation )
 			),
-		[ ( userConfig, variations ) ]
+		[ userConfig, variations ]
 	);
 
 	let title;
