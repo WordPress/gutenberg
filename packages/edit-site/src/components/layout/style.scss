@@ -164,7 +164,9 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 	}
 
 	&:focus {
-		box-shadow: none;
+		box-shadow:
+			inset 0 0 0 var(--wp-admin-border-width-focus) rgba($white, 0.1),
+			inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 	}
 
 	&::before {
@@ -179,13 +181,6 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 		left: 9px;
 		border-radius: $radius-block-ui + $border-width + $border-width;
 		box-shadow: none;
-	}
-
-	// Lightened spot color focus.
-	&:focus::before {
-		box-shadow:
-			inset 0 0 0 var(--wp-admin-border-width-focus) rgba($white, 0.1),
-			inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 	}
 
 	.edit-site-layout__view-mode-toggle-icon {
