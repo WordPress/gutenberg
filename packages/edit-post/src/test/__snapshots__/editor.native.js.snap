@@ -1,5 +1,17 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Editor adds empty image block when pasting unsupported HTML local image path 1`] = `
+"<!-- wp:image -->
+<figure class="wp-block-image"><img src="" alt=""/></figure>
+<!-- /wp:image -->"
+`;
+
+exports[`Editor adds image block when pasting HTML local image path 1`] = `
+"<!-- wp:image -->
+<figure class="wp-block-image"><img src="file:///path/to/file.png" alt=""/></figure>
+<!-- /wp:image -->"
+`;
+
 exports[`Editor appends media correctly for allowed types 1`] = `
 "<!-- wp:image -->
 <figure class="wp-block-image"><img src="https://test-site.files.wordpress.com/local-image-1.jpeg" alt=""/></figure>

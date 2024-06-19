@@ -54,7 +54,9 @@ test.describe( 'Dataviews List Layout', () => {
 		// Make sure the items have loaded before reaching for the 1st item in the list.
 		await expect( page.getByRole( 'grid' ) ).toBeVisible();
 		await page.keyboard.press( 'Tab' );
-		await expect( page.getByLabel( 'Privacy Policy' ) ).toBeFocused();
+		await expect(
+			page.getByRole( 'grid' ).getByRole( 'button' ).first()
+		).toBeFocused();
 	} );
 
 	test( 'Navigates from items list to preview via TAB, and vice versa', async ( {

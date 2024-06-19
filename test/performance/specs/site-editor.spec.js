@@ -295,47 +295,22 @@ test.describe( 'Site Editor Performance', () => {
 				} );
 				await editor.openDocumentSettingsSidebar();
 
-				/*
-				 * https://github.com/WordPress/gutenberg/pull/55091 updated the HTML by
-				 * removing the replace template button in sidebar-edit-mode/template-panel/replace-template-button.js
-				 * with a "transform into" list. https://github.com/WordPress/gutenberg/pull/59259 made these tests
-				 * compatible with the new UI, however, the performance tests compare previous versions of the UI.
-				 *
-				 * The following code is a workaround to test the performance of the new UI.
-				 * `actionsButtonElement` is used to check if the old UI is present.
-				 * If there is a Replace template button (old UI), click it, otherwise, click the "transform into" button.
-				 * Once the performance tests are updated to compare compatible versions this code can be removed.
-				 */
-				// eslint-disable-next-line no-restricted-syntax
-				const isActionsButtonVisible = await page
-					.locator(
-						'.edit-site-template-card__actions button[aria-label="Actions"]'
-					)
-					.isVisible();
-
-				if ( isActionsButtonVisible ) {
-					await page
-						.getByRole( 'button', {
-							name: 'Actions',
-						} )
-						.click();
-				}
-
 				// Wait for the browser to be idle before starting the monitoring.
 				// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
 				await page.waitForTimeout( BROWSER_IDLE_WAIT );
 
 				const startTime = performance.now();
 
-				if ( isActionsButtonVisible ) {
-					await page
-						.getByRole( 'menuitem', { name: 'Replace template' } )
-						.click();
-				} else {
-					await page
-						.getByRole( 'button', { name: 'Design' } )
-						.click();
-				}
+				await page
+					.getByRole( 'button', { name: 'Design' } )
+					.or(
+						// Locator for backward compatibility with the old UI.
+						// The label was updated in https://github.com/WordPress/gutenberg/pull/62161.
+						page.getByRole( 'button', {
+							name: 'Transform into:',
+						} )
+					)
+					.click();
 
 				const patterns = [
 					'Blogging home template',

@@ -59,6 +59,19 @@ test.describe( 'Test Custom Post Types', () => {
 		await expect( parentPageLocator ).toHaveValue( parentPage );
 	} );
 
+	test( 'should not be able to rename a post that lacks title support', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost( { postType: 'hierar-no-title' } );
+		await editor.openDocumentSettingsSidebar();
+		await page.getByRole( 'button', { name: 'Actions' } ).click();
+		await expect(
+			page.getByRole( 'menuitem', { name: 'Rename' } )
+		).toHaveCount( 0 );
+	} );
+
 	test( 'should create a cpt with a legacy block in its template without WSOD', async ( {
 		admin,
 		editor,

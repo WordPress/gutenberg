@@ -424,7 +424,9 @@ export class RichText extends Component {
 			return;
 		}
 
-		onDelete( { isReverse, value } );
+		if ( onDelete ) {
+			onDelete( { isReverse, value } );
+		}
 
 		event.preventDefault();
 		this.lastAztecEventType = 'input';

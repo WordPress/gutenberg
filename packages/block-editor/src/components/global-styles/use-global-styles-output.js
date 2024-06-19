@@ -651,7 +651,9 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 					( [ variationName, variation ] ) => {
 						variations[ variationName ] =
 							pickStyleKeys( variation );
-
+						if ( variation?.css ) {
+							variations[ variationName ].css = variation.css;
+						}
 						const variationSelector =
 							blockSelectors[ blockName ]
 								.styleVariationSelectors?.[ variationName ];
@@ -697,6 +699,14 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 											.featureSelectors
 									);
 
+								const variationBlockStyleNodes =
+									pickStyleKeys( variationBlockStyles );
+
+								if ( variationBlockStyles?.css ) {
+									variationBlockStyleNodes.css =
+										variationBlockStyles.css;
+								}
+
 								nodes.push( {
 									selector: variationBlockSelector,
 									duotoneSelector: variationDuotoneSelector,
@@ -707,9 +717,7 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 									hasLayoutSupport:
 										blockSelectors[ variationBlockName ]
 											.hasLayoutSupport,
-									styles: pickStyleKeys(
-										variationBlockStyles
-									),
+									styles: variationBlockStyleNodes,
 								} );
 
 								// Process element styles for the inner blocks
@@ -873,6 +881,7 @@ export const toStyles = (
 		marginReset: true,
 		presets: true,
 		rootPadding: true,
+		variationStyles: false,
 		...styleOptions,
 	};
 	const nodesWithStyles = getNodesWithStyles( tree, blockSelectors );
@@ -995,8 +1004,14 @@ export const toStyles = (
 						';'
 					) };}`;
 				}
+				if ( styles?.css ) {
+					ruleset += processCSSNesting(
+						styles.css,
+						`:root :where(${ selector })`
+					);
+				}
 
-				if ( styleVariationSelectors ) {
+				if ( options.variationStyles && styleVariationSelectors ) {
 					Object.entries( styleVariationSelectors ).forEach(
 						( [ styleVariationName, styleVariationSelector ] ) => {
 							const styleVariations =
@@ -1040,6 +1055,12 @@ export const toStyles = (
 									ruleset += `:root :where(${ styleVariationSelector }){${ styleVariationDeclarations.join(
 										';'
 									) };}`;
+								}
+								if ( styleVariations?.css ) {
+									ruleset += processCSSNesting(
+										styleVariations.css,
+										`:root :where(${ styleVariationSelector })`
+									);
 								}
 							}
 						}

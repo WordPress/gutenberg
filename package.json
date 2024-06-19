@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "18.5.0-rc.1",
+	"version": "18.6.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -92,7 +92,8 @@
 		"@wordpress/warning": "file:packages/warning",
 		"@wordpress/widgets": "file:packages/widgets",
 		"@wordpress/wordcount": "file:packages/wordcount",
-		"es-module-shims": "^1.8.2"
+		"es-module-shims": "^1.8.2",
+		"postcss-local-keyframes": "^0.0.2"
 	},
 	"devDependencies": {
 		"@actions/core": "1.9.1",
@@ -181,7 +182,7 @@
 		"babel-plugin-transform-remove-console": "6.9.4",
 		"benchmark": "2.1.4",
 		"browserslist": "4.22.2",
-		"caniuse-lite": "1.0.30001579",
+		"caniuse-lite": "1.0.30001636",
 		"chalk": "4.1.1",
 		"change-case": "4.1.2",
 		"client-zip": "^2.4.5",
@@ -229,6 +230,7 @@
 		"patch-package": "8.0.0",
 		"postcss": "8.4.16",
 		"postcss-loader": "6.2.1",
+		"postcss-local-keyframes": "^0.0.2",
 		"prettier": "npm:wp-prettier@3.0.3",
 		"progress": "2.0.3",
 		"react": "18.3.1",
@@ -274,8 +276,8 @@
 		"build:plugin-zip": "bash ./bin/build-plugin-zip.sh",
 		"clean:package-types": "tsc --build --clean && rimraf \"./packages/*/build-types\"",
 		"clean:packages": "rimraf \"./packages/*/@(build|build-module|build-style)\"",
-		"dev": "npm run build:packages && concurrently \"wp-scripts start\" \"npm run dev:packages\"",
-		"dev:packages": "concurrently \"node ./bin/packages/watch.js\" \"tsc --build --watch\"",
+		"dev": "cross-env NODE_ENV=development npm run build:packages && concurrently \"wp-scripts start\" \"npm run dev:packages\"",
+		"dev:packages": "cross-env NODE_ENV=development concurrently \"node ./bin/packages/watch.js\" \"tsc --build --watch\"",
 		"distclean": "git clean --force -d -X",
 		"docs:api-ref": "node ./bin/api-docs/update-api-docs.js",
 		"docs:blocks": "node ./bin/api-docs/gen-block-lib-list.js",

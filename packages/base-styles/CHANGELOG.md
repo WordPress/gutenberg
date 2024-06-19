@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.1.0 (2024-06-15)
+
 ## 5.0.0 (2024-05-31)
 
 ### Breaking Changes
@@ -96,7 +98,7 @@
 
 ## 4.0.0 (2021-09-09)
 
-### Breaking Change
+### Breaking Changes
 
 -   Remove the background-colors, foreground-colors, and gradient-colors mixins.
 
@@ -109,6 +111,6 @@
 
 ## 1.2.0 (2020-01-13)
 
-### Bug Fix
+### Bug Fixes
 
 -   Import `colors` into `variables` since the latter depends on the former.
