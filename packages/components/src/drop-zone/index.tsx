@@ -119,6 +119,10 @@ export function DropZoneComponent( {
 	const classes = clsx( 'components-drop-zone', className, {
 		'is-active': shouldActivate,
 		'has-dragged-out': ! isDraggingOverElement,
+		// Keeping the following classnames for legacy purposes
+		'is-dragging-over-document': isDraggingOverDocument,
+		'is-dragging-over-element': isDraggingOverElement,
+		[ `is-dragging-${ type }` ]: !! type,
 	} );
 
 	return (
