@@ -180,3 +180,8 @@ html :where(.is-position-sticky) {
 		/* stylelint-enable length-zero-no-unit */
 	}
 }
+
+/* Targeting class starting with .block-editor-collab__ */
+[class*="block-editor-collab__"] {
+	border: 2px solid #ffea00;
+}
