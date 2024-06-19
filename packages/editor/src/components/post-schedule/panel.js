@@ -28,6 +28,11 @@ const DESIGN_POST_TYPES = [
 	NAVIGATION_POST_TYPE,
 ];
 
+/**
+ * Renders the Post Schedule Panel component.
+ *
+ * @return {Component} The component to be rendered.
+ */
 export default function PostSchedulePanel() {
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
 	const postType = useSelect(
@@ -41,7 +46,9 @@ export default function PostSchedulePanel() {
 			// move around when the label changes.
 			anchor: popoverAnchor,
 			'aria-label': __( 'Change publish date' ),
-			placement: 'bottom-end',
+			placement: 'left-start',
+			offset: 36,
+			shift: true,
 		} ),
 		[ popoverAnchor ]
 	);
@@ -62,9 +69,10 @@ export default function PostSchedulePanel() {
 					contentClassName="editor-post-schedule__dialog"
 					renderToggle={ ( { onToggle, isOpen } ) => (
 						<Button
-							__next40pxDefaultSize
+							size="compact"
 							className="editor-post-schedule__dialog-toggle"
 							variant="tertiary"
+							tooltipPosition="middle left"
 							onClick={ onToggle }
 							aria-label={ sprintf(
 								// translators: %s: Current post date.

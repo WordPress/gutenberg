@@ -37,38 +37,3 @@ div[data-type="core/button"] {
 	text-decoration: inherit;
 }
 
-.editor-styles-wrapper .wp-block-button .wp-block-button__link {
-	// The following styles ensure a default border is applied when the user selects only a border color or style in the editor,
-	// but no width. They override the `border-width: 0;` applied by core's theme.json via the Elements API button.
-	&:where(.has-border-color) {
-		border-width: initial;
-	}
-	&:where([style*="border-top-color"]) {
-		border-top-width: initial;
-	}
-	&:where([style*="border-right-color"]) {
-		border-right-width: initial;
-	}
-	&:where([style*="border-bottom-color"]) {
-		border-bottom-width: initial;
-	}
-	&:where([style*="border-left-color"]) {
-		border-left-width: initial;
-	}
-
-	&:where([style*="border-style"]) {
-		border-width: initial;
-	}
-	&:where([style*="border-top-style"]) {
-		border-top-width: initial;
-	}
-	&:where([style*="border-right-style"]) {
-		border-right-width: initial;
-	}
-	&:where([style*="border-bottom-style"]) {
-		border-bottom-width: initial;
-	}
-	&:where([style*="border-left-style"]) {
-		border-left-width: initial;
-	}
-}

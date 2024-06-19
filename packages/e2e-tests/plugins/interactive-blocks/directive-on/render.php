@@ -6,7 +6,8 @@
  */
 ?>
 
-<div data-wp-interactive="directive-on">
+<?php // A wrong directive name like "data-wp-on--" should not kill the interactivity. ?>
+<div data-wp-interactive="directive-on" data-wp-on--="">
 	<div>
 		<p data-wp-text="state.counter" data-testid="counter">0</p>
 		<button

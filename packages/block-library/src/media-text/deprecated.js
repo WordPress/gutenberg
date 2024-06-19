@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -263,7 +263,7 @@ const v6 = {
 			attributes.mediaSizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
 		const newRel = ! rel ? undefined : rel;
 
-		const imageClasses = classnames( {
+		const imageClasses = clsx( {
 			[ `wp-image-${ mediaId }` ]: mediaId && mediaType === 'image',
 			[ `size-${ mediaSizeSlug }` ]: mediaId && mediaType === 'image',
 		} );
@@ -293,7 +293,7 @@ const v6 = {
 			image: () => image,
 			video: () => <video controls src={ mediaUrl } />,
 		};
-		const className = classnames( {
+		const className = clsx( {
 			'has-media-on-the-right': 'right' === mediaPosition,
 			'is-stacked-on-mobile': isStackedOnMobile,
 			[ `is-vertically-aligned-${ verticalAlignment }` ]:
@@ -392,7 +392,7 @@ const v5 = {
 			attributes.mediaSizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
 		const newRel = ! rel ? undefined : rel;
 
-		const imageClasses = classnames( {
+		const imageClasses = clsx( {
 			[ `wp-image-${ mediaId }` ]: mediaId && mediaType === 'image',
 			[ `size-${ mediaSizeSlug }` ]: mediaId && mediaType === 'image',
 		} );
@@ -422,7 +422,7 @@ const v5 = {
 			image: () => image,
 			video: () => <video controls src={ mediaUrl } />,
 		};
-		const className = classnames( {
+		const className = clsx( {
 			'has-media-on-the-right': 'right' === mediaPosition,
 			'is-stacked-on-mobile': isStackedOnMobile,
 			[ `is-vertically-aligned-${ verticalAlignment }` ]:
@@ -506,7 +506,7 @@ const v4 = {
 			attributes.mediaSizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
 		const newRel = ! rel ? undefined : rel;
 
-		const imageClasses = classnames( {
+		const imageClasses = clsx( {
 			[ `wp-image-${ mediaId }` ]: mediaId && mediaType === 'image',
 			[ `size-${ mediaSizeSlug }` ]: mediaId && mediaType === 'image',
 		} );
@@ -537,7 +537,7 @@ const v4 = {
 			video: () => <video controls src={ mediaUrl } />,
 		};
 
-		const className = classnames( {
+		const className = clsx( {
 			'has-media-on-the-right': 'right' === mediaPosition,
 			'is-stacked-on-mobile': isStackedOnMobile,
 			[ `is-vertically-aligned-${ verticalAlignment }` ]:
@@ -688,7 +688,7 @@ const v3 = {
 			'background-color',
 			backgroundColor
 		);
-		const className = classnames( {
+		const className = clsx( {
 			'has-media-on-the-right': 'right' === mediaPosition,
 			'has-background': backgroundClass || customBackgroundColor,
 			[ backgroundClass ]: backgroundClass,
@@ -791,7 +791,7 @@ const v2 = {
 			'background-color',
 			backgroundColor
 		);
-		const className = classnames( {
+		const className = clsx( {
 			'has-media-on-the-right': 'right' === mediaPosition,
 			[ backgroundClass ]: backgroundClass,
 			'is-stacked-on-mobile': isStackedOnMobile,
@@ -870,7 +870,7 @@ const v1 = {
 			'background-color',
 			backgroundColor
 		);
-		const className = classnames( {
+		const className = clsx( {
 			'has-media-on-the-right': 'right' === mediaPosition,
 			[ backgroundClass ]: backgroundClass,
 			'is-stacked-on-mobile': isStackedOnMobile,

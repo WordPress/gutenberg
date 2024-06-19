@@ -1,14 +1,18 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useMemo, useState } from '@wordpress/element';
-import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
+import {
+	dateI18n,
+	humanTimeDiff,
+	getSettings as getDateSettings,
+} from '@wordpress/date';
 import {
 	AlignmentControl,
 	BlockControls,
@@ -35,7 +39,7 @@ export default function PostDateEdit( {
 	setAttributes,
 } ) {
 	const blockProps = useBlockProps( {
-		className: classnames( {
+		className: clsx( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 			[ `wp-block-post-date__modified-date` ]: displayType === 'modified',
 		} ),
@@ -82,7 +86,9 @@ export default function PostDateEdit( {
 
 	let postDate = date ? (
 		<time dateTime={ dateI18n( 'c', date ) } ref={ setPopoverAnchor }>
-			{ dateI18n( format || siteFormat, date ) }
+			{ format === 'human-diff'
+				? humanTimeDiff( date )
+				: dateI18n( format || siteFormat, date ) }
 		</time>
 	) : (
 		dateLabel

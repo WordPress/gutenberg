@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -182,7 +182,7 @@ export default function FiltersPanel( {
 						renderToggle={ ( { onToggle, isOpen } ) => {
 							const toggleProps = {
 								onClick: onToggle,
-								className: classnames( { 'is-open': isOpen } ),
+								className: clsx( { 'is-open': isOpen } ),
 								'aria-expanded': isOpen,
 							};
 

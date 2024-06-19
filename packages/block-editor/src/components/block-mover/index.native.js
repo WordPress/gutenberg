@@ -90,7 +90,9 @@ export const BlockMover = ( {
 		const option = blockPageMoverOptions.find(
 			( el ) => el.value === value
 		);
-		if ( option && option.onSelect ) option.onSelect();
+		if ( option && option.onSelect ) {
+			option.onSelect();
+		}
 	};
 
 	const onLongPressMoveUp = useCallback(
@@ -164,7 +166,7 @@ export default compose(
 			numberOfBlocks: blockOrder.length - 1,
 			isFirst: firstIndex === 0,
 			isLast: lastIndex === blockOrder.length - 1,
-			canMove: canMoveBlocks( clientIds, rootClientId ),
+			canMove: canMoveBlocks( clientIds ),
 			rootClientId,
 		};
 	} ),

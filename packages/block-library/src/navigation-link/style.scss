@@ -28,15 +28,3 @@
 	margin-left: $grid-unit-10;
 	text-transform: uppercase;
 }
-
-// Ensure Popover `onClose` is fired for clicks on the canvas iframe.
-// See https: //github.com/WordPress/gutenberg/pull/57756#discussion_r1475852009.
-.components-popover-pointer-events-trap {
-	// Same z-index as popover, but rendered before the popover element
-	// in DOM order = it will display just under the popover
-	z-index: z-index(".components-popover");
-	position: fixed;
-	inset: 0;
-	background-color: transparent;
-	cursor: pointer;
-}

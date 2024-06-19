@@ -77,7 +77,7 @@ If this property is added, a help text will be generated using help property as 
 
 The options that can be chosen from.
 
--   Type: `Array<{ value: string, label: string }>`
+-   Type: `Array<{ value: string, label: string, disabled?: boolean }>`
 -   Required: Yes
 
 #### onFilterValueChange
@@ -100,6 +100,15 @@ The current value of the control.
 
 -   Type: `string | null`
 -   Required: No
+
+#### expandOnFocus
+
+Automatically expand the dropdown when the control is focused.
+If the control is clicked, the dropdown will expand regardless of this prop.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `true`
 
 #### __experimentalRenderItem
 

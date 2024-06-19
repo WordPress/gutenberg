@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -488,7 +488,7 @@ function GalleryEdit( props ) {
 	);
 
 	const blockProps = useBlockProps( {
-		className: classnames( className, 'has-nested-images' ),
+		className: clsx( className, 'has-nested-images' ),
 	} );
 
 	const nativeInnerBlockProps = Platform.isNative && {
@@ -580,11 +580,11 @@ function GalleryEdit( props ) {
 						/>
 					) }
 					{ Platform.isWeb && ! imageSizeOptions && hasImageIds && (
-						<BaseControl className={ 'gallery-image-sizes' }>
+						<BaseControl className="gallery-image-sizes">
 							<BaseControl.VisualLabel>
 								{ __( 'Resolution' ) }
 							</BaseControl.VisualLabel>
-							<View className={ 'gallery-image-sizes__loading' }>
+							<View className="gallery-image-sizes__loading">
 								<Spinner />
 								{ __( 'Loading options…' ) }
 							</View>

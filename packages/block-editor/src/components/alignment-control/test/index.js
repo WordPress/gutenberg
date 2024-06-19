@@ -133,7 +133,7 @@ describe( 'AlignmentUI', () => {
 		const { container } = render(
 			<AlignmentUI
 				isToolbar
-				value={ 'custom-right' }
+				value="custom-right"
 				onChange={ onChangeSpy }
 				isCollapsed={ false }
 				alignmentControls={ [

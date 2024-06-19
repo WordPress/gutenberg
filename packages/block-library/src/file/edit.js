@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -165,7 +165,7 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 	const attachmentPage = media && media.link;
 
 	const blockProps = useBlockProps( {
-		className: classnames(
+		className: clsx(
 			isBlobURL( href ) && getAnimateClassName( { type: 'loading' } ),
 			{
 				'is-transient': isBlobURL( href ),
@@ -258,7 +258,7 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 						) }
 					</ResizableBox>
 				) }
-				<div className={ 'wp-block-file__content-wrapper' }>
+				<div className="wp-block-file__content-wrapper">
 					<RichText
 						identifier="fileName"
 						tagName="a"
@@ -273,17 +273,13 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 						href={ textLinkHref }
 					/>
 					{ showDownloadButton && (
-						<div
-							className={
-								'wp-block-file__button-richtext-wrapper'
-							}
-						>
+						<div className="wp-block-file__button-richtext-wrapper">
 							{ /* Using RichText here instead of PlainText so that it can be styled like a button. */ }
 							<RichText
 								identifier="downloadButtonText"
 								tagName="div" // Must be block-level or else cursor disappears.
 								aria-label={ __( 'Download button text' ) }
-								className={ classnames(
+								className={ clsx(
 									'wp-block-file__button',
 									__experimentalGetElementClassName(
 										'button'

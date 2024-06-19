@@ -36,6 +36,8 @@ import FontSizePickerSelect from './font-size-picker-select';
 import FontSizePickerToggleGroup from './font-size-picker-toggle-group';
 import { T_SHIRT_NAMES } from './constants';
 
+const DEFAULT_UNITS = [ 'px', 'em', 'rem', 'vw', 'vh' ];
+
 const UnforwardedFontSizePicker = (
 	props: FontSizePickerProps,
 	ref: ForwardedRef< any >
@@ -47,14 +49,14 @@ const UnforwardedFontSizePicker = (
 		disableCustomFontSizes = false,
 		onChange,
 		size = 'default',
-		units: unitsProp,
+		units: unitsProp = DEFAULT_UNITS,
 		value,
 		withSlider = false,
 		withReset = true,
 	} = props;
 
 	const units = useCustomUnits( {
-		availableUnits: unitsProp || [ 'px', 'em', 'rem' ],
+		availableUnits: unitsProp,
 	} );
 
 	const shouldUseSelectControl = fontSizes.length > 5;
@@ -110,7 +112,7 @@ const UnforwardedFontSizePicker = (
 		units
 	);
 	const isValueUnitRelative =
-		!! valueUnit && [ 'em', 'rem' ].includes( valueUnit );
+		!! valueUnit && [ 'em', 'rem', 'vw', 'vh' ].includes( valueUnit );
 	const isDisabled = value === undefined;
 
 	return (

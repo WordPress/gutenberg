@@ -205,18 +205,21 @@ export function useToolsPanel(
 		} );
 	}, [ panelItems, setMenuItems, menuItemOrder ] );
 
-	// Force a menu item to be checked.
-	// This is intended for use with default panel items. They are displayed
-	// separately to optional items and have different display states,
-	// we need to update that when their value is customized.
+	// Updates the status of the panel’s menu items. For default items the
+	// value represents whether it differs from the default and for optional
+	// items whether the item is shown.
 	const flagItemCustomization = useCallback(
-		( label: string, group: ToolsPanelMenuItemKey = 'default' ) => {
+		(
+			value: boolean,
+			label: string,
+			group: ToolsPanelMenuItemKey = 'default'
+		) => {
 			setMenuItems( ( items ) => {
 				const newState = {
 					...items,
 					[ group ]: {
 						...items[ group ],
-						[ label ]: true,
+						[ label ]: value,
 					},
 				};
 				return newState;

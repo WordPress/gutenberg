@@ -18,7 +18,7 @@ function ActionButton( {
 	return (
 		<TouchableWithoutFeedback
 			onPress={ onPress }
-			accessibilityRole={ 'button' }
+			accessibilityRole="button"
 			accessibilityLabel={ accessibilityLabel }
 			accessibilityHint={ accessibilityHint }
 		>

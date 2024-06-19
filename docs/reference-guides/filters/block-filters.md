@@ -1,61 +1,76 @@
 # Block Filters
 
-To modify the behavior of existing blocks, WordPress exposes several APIs.
+WordPress exposes several APIs that allow you to modify the behavior of existing blocks.
 
 ## Registration
 
-The following filters are available to extend the settings for blocks during their registration.
+The following filters are available to extend block settings during their registration.
 
 ### `block_type_metadata`
 
-Filters the raw metadata loaded from the `block.json` file when registering a block type on the server with PHP. It allows applying modifications before the metadata gets processed.
+Filters the raw metadata loaded from the `block.json` file when registering a block type on the server with PHP. It allows modifications to be applied before the metadata gets processed.
 
-The filter takes one param:
+The filter takes one parameter:
 
--   `$metadata` (`array`) – metadata loaded from `block.json` for registering a block type.
+- `$metadata` (`array`) – metadata loaded from `block.json` for registering a block type.
 
-_Example_:
+The following example sets the `apiVersion` of all blocks to `2`.
 
 ```php
-<?php
-
-function wpdocs_filter_metadata_registration( $metadata ) {
-	$metadata['apiVersion'] = 1;
+function example_filter_metadata_registration( $metadata ) {
+	$metadata['apiVersion'] = 2;
 	return $metadata;
 };
-add_filter( 'block_type_metadata', 'wpdocs_filter_metadata_registration' );
+add_filter( 'block_type_metadata', 'example_filter_metadata_registration' );
+```
 
-register_block_type( __DIR__ );
+Here's a more robust example that disables background color and gradient support for Heading blocks. The `block_type_metadata` filter is excellent for [curating the Editor experience](https://developer.wordpress.org/block-editor/how-to-guides/curating-the-editor-experience/). 
+
+```php
+function example_disable_heading_background_color_and_gradients( $metadata ) {
+    
+    // Only apply the filter to Heading blocks.
+    if ( ! isset( $metadata['name'] ) || 'core/heading' !== $metadata['name'] ) {
+        return $metadata;
+    }
+
+    // Check if 'supports' key exists.
+    if ( isset( $metadata['supports'] ) && isset( $metadata['supports']['color'] ) ) {
+        
+        // Remove Background color and Gradients support.
+        $metadata['supports']['color']['background'] = false;
+        $metadata['supports']['color']['gradients']  = false;
+    }
+
+    return $metadata;
+}
+add_filter( 'block_type_metadata', 'example_disable_heading_background_color_and_gradients' );
 ```
 
 ### `block_type_metadata_settings`
 
 Filters the settings determined from the processed block type metadata. It makes it possible to apply custom modifications using the block metadata that isn’t handled by default.
 
-The filter takes two params:
+The filter takes two parameters:
 
 -   `$settings` (`array`) – Array of determined settings for registering a block type.
 -   `$metadata` (`array`) – Metadata loaded from the `block.json` file.
 
-_Example:_
+The following example increases the `apiVersion` for all blocks by `1`.
 
 ```php
-function wpdocs_filter_metadata_registration( $settings, $metadata ) {
+function example_filter_metadata_registration( $settings, $metadata ) {
 	$settings['api_version'] = $metadata['apiVersion'] + 1;
 	return $settings;
 };
-add_filter( 'block_type_metadata_settings', 'wpdocs_filter_metadata_registration', 10, 2 );
-
-register_block_type( __DIR__ );
+add_filter( 'block_type_metadata_settings', 'example_filter_metadata_registration', 10, 2 );
 ```
 
 ### `blocks.registerBlockType`
 
 Used to filter the block settings when registering the block on the client with JavaScript. It receives the block settings, the name of the registered block, and either null or the deprecated block settings (when applied to a registered deprecation) as arguments. This filter is also applied to each of a block's deprecated settings.
 
-_Example:_
-
-Ensure that List blocks are saved with the canonical generated class name (`wp-block-list`):
+The following example ensures that List blocks are saved with the canonical generated class name (`wp-block-list`):
 
 ```js
 function addListBlockClassName( settings, name ) {
@@ -87,11 +102,9 @@ The following filters are available to change the behavior of blocks while editi
 
 A filter that applies to the result of a block's `save` function. This filter is used to replace or extend the element, for example using `React.cloneElement` to modify the element's props or replace its children, or returning an entirely new element.
 
-The filter's callback receives an element, a block type definition object and the block attributes as arguments. It should return an element.
+The filter's callback receives an element, a block-type definition object, and the block attributes as arguments. It should return an element.
 
-_Example:_
-
-Wraps a cover block into an outer container.
+The following example wraps a Cover block in an outer container div.
 
 ```js
 function wrapCoverBlockInContainer( element, blockType, attributes ) {
@@ -120,11 +133,9 @@ wp.hooks.addFilter(
 
 A filter that applies to all blocks returning a WP Element in the `save` function. This filter is used to add extra props to the root element of the `save` function. For example: to add a className, an id, or any valid prop for this element.
 
-The filter receives the current `save` element's props, a block type and the block attributes as arguments. It should return a props object.
+The filter receives the current `save` element's props, a block type, and the block attributes as arguments. It should return a props object.
 
-_Example:_
-
-Adding a background by default to all blocks.
+The following example adds a red background by default to all blocks.
 
 ```js
 function addBackgroundColorStyle( props ) {
@@ -206,11 +217,11 @@ wp.hooks.addFilter(
 ```
 
 
-Note that as this hook is run for _all blocks_, consuming it has potential for performance regressions particularly around block selection metrics.
+Note that as this hook is run for _all blocks_, consuming it has the potential for performance regressions, particularly around block selection metrics.
 
 To mitigate this, consider whether any work you perform can be altered to run only under certain conditions.
 
-For example, if you are adding components that only need to render when the block is _selected_, then you can use the block's "selected" state (`props.isSelected`) to conditionalize your rendering.
+For example, suppose you are adding components that only need to render when the block is _selected_. In that case, you can use the block's "selected" state (`props.isSelected`) to conditionalize your rendering.
 
 ```js
 const withMyPluginControls = createHigherOrderComponent( ( BlockEdit ) => {
@@ -233,7 +244,7 @@ const withMyPluginControls = createHigherOrderComponent( ( BlockEdit ) => {
 
 Used to modify the block's wrapper component containing the block's `edit` component and all toolbars. It receives the original `BlockListBlock` component and returns a new wrapped component.
 
-_Example:_
+The following example adds a unique class name.
 
 ```js
 const { createHigherOrderComponent } = wp.compose;
@@ -259,10 +270,7 @@ wp.hooks.addFilter(
 );
 ```
 
-Adding new properties to the block's wrapper component can be achieved by adding them to the `wrapperProps` property of the returned component.
-
-_Example:_
-
+You can add new properties to the block's wrapper component using the `wrapperProps` property of the returned component as shown in the following example.
 
 ```js
 const { createHigherOrderComponent } = wp.compose;
@@ -275,6 +283,7 @@ const withMyWrapperProp = createHigherOrderComponent( ( BlockListBlock ) => {
 		return <BlockListBlock { ...props } wrapperProps={ wrapperProps } />;
 	};
 }, 'withMyWrapperProp' );
+
 wp.hooks.addFilter(
 	'editor.BlockListBlock',
 	'my-plugin/with-my-wrapper-prop',
@@ -282,12 +291,11 @@ wp.hooks.addFilter(
 );
 ```
 
-
 ### `editor.postContentBlockTypes`
 
-Used to modify the list of blocks that should be enabled even when used inside a locked template. Any block that saves data to a post should be added here. Examples of this are the post featured image block. Which often gets used in templates but should still allow selecting the image even when the template is locked.
+Used to modify the list of blocks that should be enabled even when used inside a locked template. Any block that saves data to a post should be added here. An example of this is the Post Featured Image block. Often used in templates, this block should still allow selecting the image even when the template is locked.
 
-_Example:_
+The following example enables the fictitious block `namespace/example`.
 
 ```js
 const addExampleBlockToPostContentBlockTypes = ( blockTypes ) => {
@@ -305,8 +313,9 @@ wp.hooks.addFilter(
 
 ### Using a deny list
 
-Adding blocks is easy enough, removing them is as easy. Plugin or theme authors have the possibility to "unregister" blocks.
+Adding blocks is easy enough, and removing them is as easy. Plugin or theme authors can "unregister" blocks using a deny list in JavaScript.
 
+Place the following code in a `my-plugin.js` file.
 
 ```js
 // my-plugin.js
@@ -318,8 +327,7 @@ domReady( function () {
 } );
 ```
 
-
-and load this script in the Editor
+Then, load this script in the Editor using the following function.
 
 ```php
 <?php
@@ -335,7 +343,9 @@ function my_plugin_deny_list_blocks() {
 add_action( 'enqueue_block_editor_assets', 'my_plugin_deny_list_blocks' );
 ```
 
-**Important:** When unregistering a block, there can be a [race condition](https://en.wikipedia.org/wiki/Race_condition) on which code runs first: registering the block, or unregistering the block. You want your unregister code to run last. The way to do that is specify the component that is registering the block as a dependency, in this case `wp-edit-post`. Additionally, using `wp.domReady()` ensures the unregister code runs once the dom is loaded.
+<div class="callout callout-warning">
+	When unregistering a block, there can be a <a href="https://en.wikipedia.org/wiki/Race_condition">race condition</a> on which code runs first: registering the block or unregistering the block. You want your unregister code to run last. To do this, you must specify the component that is registering the block as a dependency, in this case, <code>wp-edit-post</code>. Additionally, using <code>wp.domReady()</code> ensures the unregister code runs once the dom is loaded.
+</div>
 
 ### Using an allow list
 
@@ -362,37 +372,37 @@ wp.blocks.getBlockTypes().forEach( function ( blockType ) {
 
 ### `allowed_block_types_all`
 
-_**Note:** Before WordPress 5.8 known as `allowed_block_types`. In the case when you want to support older versions of WordPress you might need a way to detect which filter should be used – the deprecated one vs the new one. The recommended way to proceed is to check if the `WP_Block_Editor_Context` class exists._
+<div class="callout callout-warning">
+	Before WordPress 5.8, this hook was known as <code>allowed_block_types</code>, which is now deprecated. If you need to support older versions of WordPress, you might need a way to detect which filter should be used. You can check if <code>allowed_block_types</code> is safe to use by seeing if the <code>WP_Block_Editor_Context</code> class exists, which was introduced in 5.8.
+</div>
 
-On the server, you can filter the list of blocks shown in the inserter using the `allowed_block_types_all` filter. You can return either true (all block types supported), false (no block types supported), or an array of block type names to allow. You can also use the second provided param `$editor_context` to filter block types based on its content.
+On the server, you can filter the list of blocks shown in the inserter using the `allowed_block_types_all` filter. You can return either true (all block types supported), false (no block types supported), or an array of block type names to allow. You can also use the second provided parameter `$editor_context` to filter block types based on their content.
 
 ```php
 <?php
 // my-plugin.php
-
-function wpdocs_filter_allowed_block_types_when_post_provided( $allowed_block_types, $editor_context ) {
+function example_filter_allowed_block_types_when_post_provided( $allowed_block_types, $editor_context ) {
 	if ( ! empty( $editor_context->post ) ) {
 		return array( 'core/paragraph', 'core/heading' );
 	}
 	return $allowed_block_types;
 }
-
-add_filter( 'allowed_block_types_all', 'wpdocs_filter_allowed_block_types_when_post_provided', 10, 2 );
+add_filter( 'allowed_block_types_all', 'example_filter_allowed_block_types_when_post_provided', 10, 2 );
 ```
 
 ## Managing block categories
 
 ### `block_categories_all`
 
-_**Note:** Before WordPress 5.8 known as `block_categories`. In the case when you want to support older versions of WordPress you might need a way to detect which filter should be used – the deprecated one vs the new one. The recommended way to proceed is to check if the `WP_Block_Editor_Context` class exists._
+<div class="callout callout-warning">
+	Before WordPress 5.8, this hook was known as <code>block_categories</code>, which is now deprecated. If you need to support older versions of WordPress, you might need a way to detect which filter should be used. You can check if <code>block_categories</code> is safe to use by seeing if the <code>WP_Block_Editor_Context</code> class exists, which was introduced in 5.8.
+</div>
 
-It is possible to filter the list of default block categories using the `block_categories_all` filter. You can do it on the server by implementing a function which returns a list of categories. It is going to be used during blocks registration and to group blocks in the inserter. You can also use the second provided param `$editor_context` to filter the based on its content.
+It is possible to filter the list of default block categories using the `block_categories_all` filter. You can do it on the server by implementing a function which returns a list of categories. It is going to be used during block registration and to group blocks in the inserter. You can also use the second provided parameter `$editor_context` to filter the based on its content.
 
 ```php
-<?php
 // my-plugin.php
-
-function wpdocs_filter_block_categories_when_post_provided( $block_categories, $editor_context ) {
+function example_filter_block_categories_when_post_provided( $block_categories, $editor_context ) {
 	if ( ! empty( $editor_context->post ) ) {
 		array_push(
 			$block_categories,
@@ -405,8 +415,7 @@ function wpdocs_filter_block_categories_when_post_provided( $block_categories, $
 	}
 	return $block_categories;
 }
-
-add_filter( 'block_categories_all', 'wpdocs_filter_block_categories_when_post_provided', 10, 2 );
+add_filter( 'block_categories_all', 'example_filter_block_categories_when_post_provided', 10, 2 );
 ```
 
 ### `wp.blocks.updateCategory`

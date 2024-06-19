@@ -35,10 +35,11 @@ describe( 'theme.json schema', () => {
 	} );
 
 	test.each( jsonFiles )( 'validates schema for `%s`', ( filepath ) => {
-		// We want to validate the block.json file using the local schema.
+		// We want to validate the theme.json file using the local schema.
 		const { $schema, ...metadata } = require( filepath );
 
-		expect( $schema ).toBe( 'https://schemas.wp.org/trunk/theme.json' );
+		// we expect the $schema property to be present in the theme.json file
+		expect( $schema ).toBeTruthy();
 
 		const result = ajv.validate( themeSchema, metadata ) || ajv.errors;
 

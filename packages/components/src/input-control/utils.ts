@@ -86,10 +86,11 @@ export function useDraft( props: {
 	useLayoutEffect( () => {
 		const { current: previousValue } = refPreviousValue;
 		refPreviousValue.current = props.value;
-		if ( draft.value !== undefined && ! draft.isStale )
+		if ( draft.value !== undefined && ! draft.isStale ) {
 			setDraft( { ...draft, isStale: true } );
-		else if ( draft.isStale && props.value !== previousValue )
+		} else if ( draft.isStale && props.value !== previousValue ) {
 			setDraft( {} );
+		}
 	}, [ props.value, draft ] );
 
 	const onChange: InputChangeCallback = ( nextValue, extra ) => {

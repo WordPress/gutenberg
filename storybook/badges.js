@@ -1,6 +1,12 @@
 /**
  * Provides badge configuration options.
- * See https://github.com/geometricpanda/storybook-addon-badges
+ *
+ * To apply a badge to a story, add a badge identifier prefixed by "status-" to
+ * the `tags` array in the story's metadata. For example, to apply the "private"
+ * badge, add "status-private" to the `tags` array.
+ *
+ * @see https://github.com/geometricpanda/storybook-addon-badges
+ * @see './webpack/copy-tags-to-badges.js' - Webpack loader that processes the tags
  */
 
 export default {

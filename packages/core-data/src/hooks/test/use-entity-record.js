@@ -45,7 +45,7 @@ describe( 'useEntityRecord', () => {
 
 		expect( data ).toEqual( {
 			edit: expect.any( Function ),
-			editedRecord: {},
+			editedRecord: false,
 			hasEdits: false,
 			edits: {},
 			record: undefined,

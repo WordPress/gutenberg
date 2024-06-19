@@ -16,8 +16,12 @@ function getNumericFontWeight( value ) {
 export function sortFontFaces( faces ) {
 	return faces.sort( ( a, b ) => {
 		// Ensure 'normal' fontStyle is always first
-		if ( a.fontStyle === 'normal' && b.fontStyle !== 'normal' ) return -1;
-		if ( b.fontStyle === 'normal' && a.fontStyle !== 'normal' ) return 1;
+		if ( a.fontStyle === 'normal' && b.fontStyle !== 'normal' ) {
+			return -1;
+		}
+		if ( b.fontStyle === 'normal' && a.fontStyle !== 'normal' ) {
+			return 1;
+		}
 
 		// If both fontStyles are the same, sort by fontWeight
 		if ( a.fontStyle === b.fontStyle ) {

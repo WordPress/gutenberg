@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -139,23 +139,21 @@ export default function SavePanel() {
 	const disabled = isSaving || ! activateSaveEnabled;
 	return (
 		<NavigableRegion
-			className={ classnames( 'edit-site-layout__actions', {
+			className={ clsx( 'edit-site-layout__actions', {
 				'is-entity-save-view-open': isSaveViewOpen,
 			} ) }
 			ariaLabel={ __( 'Save panel' ) }
 		>
 			<div
-				className={ classnames( 'edit-site-editor__toggle-save-panel', {
+				className={ clsx( 'edit-site-editor__toggle-save-panel', {
 					'screen-reader-text': isSaveViewOpen,
 				} ) }
 			>
 				<Button
 					variant="secondary"
-					className={ classnames(
-						'edit-site-editor__toggle-save-panel-button'
-					) }
+					className="edit-site-editor__toggle-save-panel-button"
 					onClick={ () => setIsSaveViewOpened( true ) }
-					aria-haspopup={ 'dialog' }
+					aria-haspopup="dialog"
 					disabled={ disabled }
 					__experimentalIsFocusable
 				>

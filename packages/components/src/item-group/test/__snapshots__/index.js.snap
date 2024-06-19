@@ -11,8 +11,8 @@ Snapshot Diff:
         role="listitem"
       >
         <div
--         class="components-item css-1n28wmo-View-medium-item-spacedAround e19lxcc00"
-+         class="components-item css-gg7ygh-View-large-item-spacedAround e19lxcc00"
+-         class="components-item css-au4yox-PolymorphicDiv-medium-item-spacedAround e19lxcc00"
++         class="components-item css-1h3jinl-PolymorphicDiv-large-item-spacedAround e19lxcc00"
           data-wp-c16t="true"
           data-wp-component="Item"
         >
@@ -24,8 +24,8 @@ Snapshot Diff:
         role="listitem"
       >
         <div
--         class="components-item css-1n28wmo-View-medium-item-spacedAround e19lxcc00"
-+         class="components-item css-gg7ygh-View-large-item-spacedAround e19lxcc00"
+-         class="components-item css-au4yox-PolymorphicDiv-medium-item-spacedAround e19lxcc00"
++         class="components-item css-1h3jinl-PolymorphicDiv-large-item-spacedAround e19lxcc00"
           data-wp-c16t="true"
           data-wp-component="Item"
         >
@@ -44,8 +44,8 @@ Snapshot Diff:
       role="listitem"
     >
       <div
--       class="components-item css-1lf4kzd-View-medium-item e19lxcc00"
-+       class="components-item css-1vv4aem-View-large-item e19lxcc00"
+-       class="components-item css-tpom78-PolymorphicDiv-medium-item e19lxcc00"
++       class="components-item css-vss65r-PolymorphicDiv-large-item e19lxcc00"
         data-wp-c16t="true"
         data-wp-component="Item"
       >
@@ -114,8 +114,8 @@ Snapshot Diff:
 @@ -1,18 +1,18 @@
   <div>
     <div
--     class="components-item-group css-kj8mvb-View-rounded e19lxcc00"
-+     class="components-item-group css-18qvw1m-View-separated-rounded e19lxcc00"
+-     class="components-item-group css-1iattls-PolymorphicDiv-rounded e19lxcc00"
++     class="components-item-group css-zgfros-PolymorphicDiv-separated-rounded e19lxcc00"
       data-wp-c16t="true"
       data-wp-component="ItemGroup"
       role="list"
@@ -125,8 +125,8 @@ Snapshot Diff:
         role="listitem"
       >
         <div
--         class="components-item css-1n28wmo-View-medium-item-spacedAround e19lxcc00"
-+         class="components-item css-1lf4kzd-View-medium-item e19lxcc00"
+-         class="components-item css-au4yox-PolymorphicDiv-medium-item-spacedAround e19lxcc00"
++         class="components-item css-tpom78-PolymorphicDiv-medium-item e19lxcc00"
           data-wp-c16t="true"
           data-wp-component="Item"
         >
@@ -142,8 +142,8 @@ Snapshot Diff:
 @@ -1,18 +1,18 @@
   <div>
     <div
--     class="components-item-group css-kj8mvb-View-rounded e19lxcc00"
-+     class="components-item-group css-acyoj6-View-bordered-rounded e19lxcc00"
+-     class="components-item-group css-1iattls-PolymorphicDiv-rounded e19lxcc00"
++     class="components-item-group css-1ibn92o-PolymorphicDiv-bordered-rounded e19lxcc00"
       data-wp-c16t="true"
       data-wp-component="ItemGroup"
       role="list"
@@ -153,8 +153,8 @@ Snapshot Diff:
         role="listitem"
       >
         <div
--         class="components-item css-1n28wmo-View-medium-item-spacedAround e19lxcc00"
-+         class="components-item css-1lf4kzd-View-medium-item e19lxcc00"
+-         class="components-item css-au4yox-PolymorphicDiv-medium-item-spacedAround e19lxcc00"
++         class="components-item css-tpom78-PolymorphicDiv-medium-item e19lxcc00"
           data-wp-c16t="true"
           data-wp-component="Item"
         >
@@ -170,8 +170,8 @@ Snapshot Diff:
 @@ -1,8 +1,8 @@
   <div>
     <div
--     class="components-item-group css-kj8mvb-View-rounded e19lxcc00"
-+     class="components-item-group css-1mm2cvy-View e19lxcc00"
+-     class="components-item-group css-1iattls-PolymorphicDiv-rounded e19lxcc00"
++     class="components-item-group css-161q9d5-PolymorphicDiv e19lxcc00"
       data-wp-c16t="true"
       data-wp-component="ItemGroup"
       role="list"

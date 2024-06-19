@@ -31,8 +31,7 @@
 	box-shadow: 0 0 0 0 var(--wp-admin-theme-color);
 	overflow: hidden; // Ensure the focus style properly encapsulates the image.
 	outline-offset: -#{$border-width};
-	min-height: $grid-unit-50 * 2;
-	margin-bottom: $grid-unit-20;
+	min-height: $grid-unit-50;
 
 	display: flex;
 	justify-content: center;
@@ -52,16 +51,11 @@
 
 .editor-post-featured-image__toggle {
 	border-radius: $radius-block-ui;
-	background-color: $gray-100;
 	height: 100%;
 	line-height: 20px;
 	padding: $grid-unit-10 0;
 	text-align: center;
-
-	&:hover {
-		background: $gray-300;
-		color: $gray-900;
-	}
+	box-shadow: inset 0 0 0 $border-width $gray-400;
 }
 
 .editor-post-featured-image__actions {

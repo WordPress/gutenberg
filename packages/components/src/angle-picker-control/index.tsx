@@ -2,7 +2,7 @@
  * External dependencies
  */
 import type { ForwardedRef } from 'react';
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -46,7 +46,7 @@ function UnforwardedAnglePickerControl(
 		onChange( inputValue );
 	};
 
-	const classes = classnames( 'components-angle-picker-control', className );
+	const classes = clsx( 'components-angle-picker-control', className );
 
 	const unitText = <UnitText>°</UnitText>;
 	const [ prefixedUnitText, suffixedUnitText ] = isRTL()

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -18,7 +18,7 @@ function UnforwardedPanel(
 	{ header, className, children }: PanelProps,
 	ref: React.ForwardedRef< HTMLDivElement >
 ) {
-	const classNames = classnames( className, 'components-panel' );
+	const classNames = clsx( className, 'components-panel' );
 	return (
 		<div className={ classNames } ref={ ref }>
 			{ header && <PanelHeader label={ header } /> }

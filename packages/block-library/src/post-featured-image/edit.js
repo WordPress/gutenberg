@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -133,7 +133,7 @@ export default function PostFeaturedImageEdit( {
 
 	const blockProps = useBlockProps( {
 		style: { width, height, aspectRatio },
-		className: classnames( {
+		className: clsx( {
 			'is-transient': temporaryURL,
 		} ),
 	} );
@@ -144,7 +144,7 @@ export default function PostFeaturedImageEdit( {
 	const placeholder = ( content ) => {
 		return (
 			<Placeholder
-				className={ classnames(
+				className={ clsx(
 					'block-editor-media-placeholder',
 					borderProps.className
 				) }

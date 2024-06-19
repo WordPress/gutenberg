@@ -755,7 +755,7 @@ export function renderAttributes( props ) {
 
 		let value = getNormalAttributeValue( key, props[ key ] );
 
-		// If value is not of serializeable type, skip.
+		// If value is not of serializable type, skip.
 		if ( ! ATTRIBUTES_TYPES.has( typeof value ) ) {
 			continue;
 		}

@@ -40,7 +40,9 @@ export function useAnchorRef( { ref, value, settings = {} } ) {
 	const activeFormat = name ? getActiveFormat( value, name ) : undefined;
 
 	return useMemo( () => {
-		if ( ! ref.current ) return;
+		if ( ! ref.current ) {
+			return;
+		}
 		const {
 			ownerDocument: { defaultView },
 		} = ref.current;

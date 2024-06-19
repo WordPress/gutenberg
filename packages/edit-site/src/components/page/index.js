@@ -1,15 +1,12 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import {
-	EditorSnackbars,
-	privateApis as editorPrivateApis,
-} from '@wordpress/editor';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -27,7 +24,7 @@ export default function Page( {
 	className,
 	hideTitleFromUI = false,
 } ) {
-	const classes = classnames( 'edit-site-page', className );
+	const classes = clsx( 'edit-site-page', className );
 
 	return (
 		<NavigableRegion className={ classes } ariaLabel={ title }>
@@ -41,7 +38,6 @@ export default function Page( {
 				) }
 				{ children }
 			</div>
-			<EditorSnackbars />
 		</NavigableRegion>
 	);
 }

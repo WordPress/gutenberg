@@ -11,6 +11,13 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  */
 import { store as editorStore } from '../../store';
 
+/**
+ * Component handles the keyboard shortcuts for the editor.
+ *
+ * It provides functionality for various keyboard shortcuts such as toggling editor mode,
+ * toggling distraction-free mode, undo/redo, saving the post, toggling list view,
+ * and toggling the sidebar.
+ */
 export default function EditorKeyboardShortcuts() {
 	const isModeToggleDisabled = useSelect( ( select ) => {
 		const { richEditingEnabled, codeEditingEnabled } =

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -46,7 +46,7 @@ function BlockMover( {
 			const blockOrder = getBlockOrder( _rootClientId );
 
 			return {
-				canMove: canMoveBlocks( clientIds, _rootClientId ),
+				canMove: canMoveBlocks( clientIds ),
 				rootClientId: _rootClientId,
 				isFirst: firstIndex === 0,
 				isLast: lastIndex === blockOrder.length - 1,
@@ -64,7 +64,7 @@ function BlockMover( {
 
 	return (
 		<ToolbarGroup
-			className={ classnames( 'block-editor-block-mover', {
+			className={ clsx( 'block-editor-block-mover', {
 				'is-horizontal': orientation === 'horizontal',
 			} ) }
 		>

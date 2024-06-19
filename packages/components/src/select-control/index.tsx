@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classNames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -55,7 +55,9 @@ function UnforwardedSelectControl(
 	const helpId = help ? `${ id }__help` : undefined;
 
 	// Disable reason: A select with an onchange throws a warning.
-	if ( ! options?.length && ! children ) return null;
+	if ( ! options?.length && ! children ) {
+		return null;
+	}
 
 	const handleOnChange = (
 		event: React.ChangeEvent< HTMLSelectElement >
@@ -72,7 +74,7 @@ function UnforwardedSelectControl(
 		props.onChange?.( event.target.value, { event } );
 	};
 
-	const classes = classNames( 'components-select-control', className );
+	const classes = clsx( 'components-select-control', className );
 
 	return (
 		<BaseControl

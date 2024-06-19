@@ -128,7 +128,9 @@ export function getSaveElement(
 ) {
 	const blockType = normalizeBlockType( blockTypeOrName );
 
-	if ( ! blockType?.save ) return null;
+	if ( ! blockType?.save ) {
+		return null;
+	}
 
 	let { save } = blockType;
 

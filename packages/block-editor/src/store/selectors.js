@@ -22,6 +22,7 @@ import { createSelector, createRegistrySelector } from '@wordpress/data';
  * Internal dependencies
  */
 import {
+	withRootClientIdOptionKey,
 	checkAllowListRecursive,
 	checkAllowList,
 	getAllPatternsDependants,
@@ -74,6 +75,8 @@ const EMPTY_ARRAY = [];
  * @type {Set}
  */
 const EMPTY_SET = new Set();
+
+const EMPTY_OBJECT = {};
 
 /**
  * Returns a block's name given its client ID, or null if no block exists with
@@ -1030,7 +1033,9 @@ export function __unstableIsSelectionMergeable( state, isForward ) {
 	const selectionFocus = getSelectionEnd( state );
 
 	// It's not mergeable if the start and end are within the same block.
-	if ( selectionAnchor.clientId === selectionFocus.clientId ) return false;
+	if ( selectionAnchor.clientId === selectionFocus.clientId ) {
+		return false;
+	}
 
 	// It's not mergeable if there's no rich text selection.
 	if (
@@ -1038,8 +1043,9 @@ export function __unstableIsSelectionMergeable( state, isForward ) {
 		! selectionFocus.attributeKey ||
 		typeof selectionAnchor.offset === 'undefined' ||
 		typeof selectionFocus.offset === 'undefined'
-	)
+	) {
 		return false;
+	}
 
 	const anchorRootClientId = getBlockRootClientId(
 		state,
@@ -1081,12 +1087,16 @@ export function __unstableIsSelectionMergeable( state, isForward ) {
 	const targetBlockName = getBlockName( state, targetBlockClientId );
 	const targetBlockType = getBlockType( targetBlockName );
 
-	if ( ! targetBlockType.merge ) return false;
+	if ( ! targetBlockType.merge ) {
+		return false;
+	}
 
 	const blockToMerge = getBlock( state, blockToMergeClientId );
 
 	// It's mergeable if the blocks are of the same type.
-	if ( blockToMerge.name === targetBlockName ) return true;
+	if ( blockToMerge.name === targetBlockName ) {
+		return true;
+	}
 
 	// If the blocks are of a different type, try to transform the block being
 	// merged into the same type of block.
@@ -1702,13 +1712,12 @@ export function canInsertBlocks( state, clientIds, rootClientId = null ) {
 /**
  * Determines if the given block is allowed to be deleted.
  *
- * @param {Object}  state        Editor state.
- * @param {string}  clientId     The block client Id.
- * @param {?string} rootClientId Optional root client ID of block list.
+ * @param {Object} state    Editor state.
+ * @param {string} clientId The block client Id.
  *
  * @return {boolean} Whether the given block is allowed to be removed.
  */
-export function canRemoveBlock( state, clientId, rootClientId = null ) {
+export function canRemoveBlock( state, clientId ) {
 	const attributes = getBlockAttributes( state, clientId );
 	if ( attributes === null ) {
 		return true;
@@ -1716,6 +1725,8 @@ export function canRemoveBlock( state, clientId, rootClientId = null ) {
 	if ( attributes.lock?.remove !== undefined ) {
 		return ! attributes.lock.remove;
 	}
+
+	const rootClientId = getBlockRootClientId( state, clientId );
 	if ( getTemplateLock( state, rootClientId ) ) {
 		return false;
 	}
@@ -1726,28 +1737,24 @@ export function canRemoveBlock( state, clientId, rootClientId = null ) {
 /**
  * Determines if the given blocks are allowed to be removed.
  *
- * @param {Object}  state        Editor state.
- * @param {string}  clientIds    The block client IDs to be removed.
- * @param {?string} rootClientId Optional root client ID of block list.
+ * @param {Object} state     Editor state.
+ * @param {string} clientIds The block client IDs to be removed.
  *
  * @return {boolean} Whether the given blocks are allowed to be removed.
  */
-export function canRemoveBlocks( state, clientIds, rootClientId = null ) {
-	return clientIds.every( ( clientId ) =>
-		canRemoveBlock( state, clientId, rootClientId )
-	);
+export function canRemoveBlocks( state, clientIds ) {
+	return clientIds.every( ( clientId ) => canRemoveBlock( state, clientId ) );
 }
 
 /**
  * Determines if the given block is allowed to be moved.
  *
- * @param {Object}  state        Editor state.
- * @param {string}  clientId     The block client Id.
- * @param {?string} rootClientId Optional root client ID of block list.
+ * @param {Object} state    Editor state.
+ * @param {string} clientId The block client Id.
  *
  * @return {boolean | undefined} Whether the given block is allowed to be moved.
  */
-export function canMoveBlock( state, clientId, rootClientId = null ) {
+export function canMoveBlock( state, clientId ) {
 	const attributes = getBlockAttributes( state, clientId );
 	if ( attributes === null ) {
 		return true;
@@ -1755,26 +1762,24 @@ export function canMoveBlock( state, clientId, rootClientId = null ) {
 	if ( attributes.lock?.move !== undefined ) {
 		return ! attributes.lock.move;
 	}
+
+	const rootClientId = getBlockRootClientId( state, clientId );
 	if ( getTemplateLock( state, rootClientId ) === 'all' ) {
 		return false;
 	}
-
 	return getBlockEditingMode( state, rootClientId ) !== 'disabled';
 }
 
 /**
  * Determines if the given blocks are allowed to be moved.
  *
- * @param {Object}  state        Editor state.
- * @param {string}  clientIds    The block client IDs to be moved.
- * @param {?string} rootClientId Optional root client ID of block list.
+ * @param {Object} state     Editor state.
+ * @param {string} clientIds The block client IDs to be moved.
  *
  * @return {boolean} Whether the given blocks are allowed to be moved.
  */
-export function canMoveBlocks( state, clientIds, rootClientId = null ) {
-	return clientIds.every( ( clientId ) =>
-		canMoveBlock( state, clientId, rootClientId )
-	);
+export function canMoveBlocks( state, clientIds ) {
+	return clientIds.every( ( clientId ) => canMoveBlock( state, clientId ) );
 }
 
 /**
@@ -1938,7 +1943,9 @@ const buildBlockTypeItem =
 			isDisabled,
 			frecency: calculateFrecency( time, count ),
 		};
-		if ( buildScope === 'transform' ) return blockItemBase;
+		if ( buildScope === 'transform' ) {
+			return blockItemBase;
+		}
 
 		const inserterVariations = getBlockVariations(
 			blockType.name,
@@ -1987,7 +1994,7 @@ const buildBlockTypeItem =
  */
 export const getInserterItems = createRegistrySelector( ( select ) =>
 	createSelector(
-		( state, rootClientId = null ) => {
+		( state, rootClientId = null, options = EMPTY_OBJECT ) => {
 			const buildReusableBlockInserterItem = ( reusableBlock ) => {
 				const icon = ! reusableBlock.wp_pattern_sync_status
 					? {
@@ -2029,15 +2036,72 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 				buildScope: 'inserter',
 			} );
 
-			const blockTypeInserterItems = getBlockTypes()
+			let blockTypeInserterItems = getBlockTypes()
 				.filter( ( blockType ) =>
-					canIncludeBlockTypeInInserter(
-						state,
-						blockType,
-						rootClientId
-					)
+					hasBlockSupport( blockType, 'inserter', true )
 				)
 				.map( buildBlockTypeInserterItem );
+
+			if ( options[ withRootClientIdOptionKey ] ) {
+				blockTypeInserterItems = blockTypeInserterItems.reduce(
+					( accumulator, item ) => {
+						item.rootClientId = rootClientId ?? '';
+
+						while (
+							! canInsertBlockTypeUnmemoized(
+								state,
+								item.name,
+								item.rootClientId
+							)
+						) {
+							if ( ! item.rootClientId ) {
+								let sectionRootClientId;
+								try {
+									sectionRootClientId = unlock(
+										getSettings( state )
+									).sectionRootClientId;
+								} catch ( e ) {}
+								if (
+									sectionRootClientId &&
+									canInsertBlockTypeUnmemoized(
+										state,
+										item.name,
+										sectionRootClientId
+									)
+								) {
+									item.rootClientId = sectionRootClientId;
+								} else {
+									delete item.rootClientId;
+								}
+								break;
+							} else {
+								const parentClientId = getBlockRootClientId(
+									state,
+									item.rootClientId
+								);
+								item.rootClientId = parentClientId;
+							}
+						}
+
+						// We could also add non insertable items and gray them out.
+						if ( item.hasOwnProperty( 'rootClientId' ) ) {
+							accumulator.push( item );
+						}
+
+						return accumulator;
+					},
+					[]
+				);
+			} else {
+				blockTypeInserterItems = blockTypeInserterItems.filter(
+					( blockType ) =>
+						canIncludeBlockTypeInInserter(
+							state,
+							blockType,
+							rootClientId
+						)
+				);
+			}
 
 			const items = blockTypeInserterItems.reduce(
 				( accumulator, item ) => {
@@ -2379,7 +2443,9 @@ export const __experimentalGetAllowedPatterns = createRegistrySelector(
 export const getPatternsByBlockTypes = createRegistrySelector( ( select ) =>
 	createSelector(
 		( state, blockNames, rootClientId = null ) => {
-			if ( ! blockNames ) return EMPTY_ARRAY;
+			if ( ! blockNames ) {
+				return EMPTY_ARRAY;
+			}
 			const patterns =
 				select( STORE_NAME ).__experimentalGetAllowedPatterns(
 					rootClientId
@@ -2438,7 +2504,9 @@ export const __experimentalGetPatternTransformItems = createRegistrySelector(
 	( select ) =>
 		createSelector(
 			( state, blocks, rootClientId = null ) => {
-				if ( ! blocks ) return EMPTY_ARRAY;
+				if ( ! blocks ) {
+					return EMPTY_ARRAY;
+				}
 				/**
 				 * For now we only handle blocks without InnerBlocks and take into account
 				 * the `__experimentalRole` property of blocks' attributes for the transformation.
@@ -2969,10 +3037,7 @@ export const isGroupable = createRegistrySelector(
 				rootClientId
 			);
 			const _isGroupable = groupingBlockAvailable && _clientIds.length;
-			return (
-				_isGroupable &&
-				canRemoveBlocks( state, _clientIds, rootClientId )
-			);
+			return _isGroupable && canRemoveBlocks( state, _clientIds );
 		}
 );
 

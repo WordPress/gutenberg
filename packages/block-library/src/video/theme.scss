@@ -2,6 +2,6 @@
 	@include caption-style-theme();
 }
 
-:where(.wp-block-video) {
+.wp-block-video {
 	margin: 0 0 1em 0;
 }

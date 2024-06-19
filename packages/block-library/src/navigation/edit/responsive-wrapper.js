@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -32,7 +32,7 @@ export default function ResponsiveWrapper( {
 		return children;
 	}
 
-	const responsiveContainerClasses = classnames(
+	const responsiveContainerClasses = clsx(
 		'wp-block-navigation__responsive-container',
 		{
 			'has-text-color':
@@ -59,7 +59,7 @@ export default function ResponsiveWrapper( {
 			overlayBackgroundColor.color,
 	};
 
-	const openButtonClasses = classnames(
+	const openButtonClasses = clsx(
 		'wp-block-navigation__responsive-container-open',
 		{ 'always-shown': isHiddenByDefault }
 	);

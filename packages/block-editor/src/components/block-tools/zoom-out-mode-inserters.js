@@ -2,24 +2,56 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
+import { Button } from '@wordpress/components';
+import { plus } from '@wordpress/icons';
+import { _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import BlockPopoverInbetween from '../block-popover/inbetween';
 import { store as blockEditorStore } from '../../store';
-import Inserter from '../inserter';
 import { unlock } from '../../lock-unlock';
 
-function ZoomOutModeInserters( { __unstableContentRef } ) {
+function ZoomOutModeInserters() {
 	const [ isReady, setIsReady ] = useState( false );
-	const blockOrder = useSelect( ( select ) => {
-		const { sectionRootClientId } = unlock(
-			select( blockEditorStore ).getSettings()
-		);
-		return select( blockEditorStore ).getBlockOrder( sectionRootClientId );
+	const {
+		blockOrder,
+		sectionRootClientId,
+		insertionPoint,
+		setInserterIsOpened,
+		selectedSection,
+	} = useSelect( ( select ) => {
+		const { getSettings, getBlockOrder } = select( blockEditorStore );
+		const { sectionRootClientId: root } = unlock( getSettings() );
+		// To do: move ZoomOutModeInserters to core/editor.
+		// Or we perhaps we should move the insertion point state to the
+		// block-editor store. I'm not sure what it was ever moved to the editor
+		// store, because all the inserter components all live in the
+		// block-editor package.
+		// eslint-disable-next-line @wordpress/data-no-store-string-literals
+		const editor = select( 'core/editor' );
+		return {
+			selectedSection: editor.getSelectedBlock(),
+			blockOrder: getBlockOrder( root ),
+			insertionPoint: unlock( editor ).getInsertionPoint(),
+			sectionRootClientId: root,
+			setInserterIsOpened:
+				getSettings().__experimentalSetIsInserterOpened,
+		};
 	}, [] );
+
+	const isMounted = useRef( false );
+
+	useEffect( () => {
+		if ( ! isMounted.current ) {
+			isMounted.current = true;
+			return;
+		}
+		// reset insertion point when the block order changes
+		setInserterIsOpened( true );
+	}, [ blockOrder, setInserterIsOpened ] );
 
 	// Defer the initial rendering to avoid the jumps due to the animation.
 	useEffect( () => {
@@ -31,28 +63,49 @@ function ZoomOutModeInserters( { __unstableContentRef } ) {
 		};
 	}, [] );
 
-	if ( ! isReady ) {
+	if ( ! isReady || ! selectedSection ) {
 		return null;
 	}
 
-	return blockOrder.map( ( clientId, index ) => {
-		if ( index === blockOrder.length - 1 ) {
-			return null;
-		}
+	return [ undefined, ...blockOrder ].map( ( clientId, index ) => {
 		return (
 			<BlockPopoverInbetween
-				key={ clientId }
+				key={ index }
 				previousClientId={ clientId }
-				nextClientId={ blockOrder[ index + 1 ] }
-				__unstableContentRef={ __unstableContentRef }
+				nextClientId={ blockOrder[ index ] }
 			>
-				<div className="block-editor-block-list__insertion-point-inserter is-with-inserter">
-					<Inserter
-						position="bottom center"
-						clientId={ blockOrder[ index + 1 ] }
-						__experimentalIsQuick
+				{ insertionPoint.insertionIndex === index && (
+					<div
+						style={ {
+							borderRadius: '0',
+							height: '12px',
+							opacity: 1,
+							transform: 'translateY(-50%)',
+							width: '100%',
+						} }
+						className="block-editor-block-list__insertion-point-indicator"
 					/>
-				</div>
+				) }
+				{ insertionPoint.insertionIndex !== index && (
+					<Button
+						variant="primary"
+						icon={ plus }
+						size="compact"
+						className="block-editor-button-pattern-inserter__button"
+						onClick={ () => {
+							setInserterIsOpened( {
+								rootClientId: sectionRootClientId,
+								insertionIndex: index,
+								tab: 'patterns',
+								category: 'all',
+							} );
+						} }
+						label={ _x(
+							'Add pattern',
+							'Generic label for pattern inserter button'
+						) }
+					/>
+				) }
 			</BlockPopoverInbetween>
 		);
 	} );

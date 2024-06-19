@@ -19,7 +19,7 @@ import EmbedLinkSettings from './embed-link-settings';
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -246,7 +246,7 @@ const EmbedEdit = ( props ) => {
 		allowResponsive,
 		className: classFromPreview,
 	} = getMergedAttributes();
-	const className = classnames( classFromPreview, props.className );
+	const className = clsx( classFromPreview, props.className );
 
 	const isProviderPreviewable =
 		PREVIEWABLE_PROVIDERS.includes( providerNameSlug ) ||
