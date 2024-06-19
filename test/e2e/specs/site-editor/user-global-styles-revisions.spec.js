@@ -227,6 +227,32 @@ test.describe( 'Style Revisions', () => {
 		).toBeVisible();
 	} );
 
+	test( 'should allow opening the command menu from the header when open', async ( {
+		page,
+		editor,
+		userGlobalStylesRevisions,
+	} ) => {
+		await editor.canvas.locator( 'body' ).click();
+		await userGlobalStylesRevisions.openStylesPanel();
+		await page
+			.getByRole( 'button', {
+				name: 'Revisions',
+				exact: true,
+			} )
+			.click();
+
+		// Open the command menu from the header.
+		await page
+			.getByRole( 'heading', {
+				name: 'Style Revisions',
+			} )
+			.click();
+
+		await expect(
+			page.getByLabel( 'Search commands and settings' )
+		).toBeVisible();
+	} );
+
 	test( 'should paginate', async ( {
 		page,
 		editor,
