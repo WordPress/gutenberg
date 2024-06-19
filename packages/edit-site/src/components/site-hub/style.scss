@@ -22,6 +22,7 @@
 
 .edit-site-site-hub__title .components-button {
 	color: $gray-200;
+	display: block;
 	flex-grow: 1;
 	font-size: 15px;
 	font-weight: 500;
@@ -32,14 +33,20 @@
 	text-decoration: none;
 	text-overflow: ellipsis;
 	white-space: nowrap;
-	display: flex;
-	flex-direction: row-reverse;
-	align-items: center;
 
 	&:hover,
 	&:focus,
-	&:active {
-		color: $gray-200;
+	&:active,
+	&:focus-visible {
+		svg {
+			opacity: 1;
+			transition: opacity 0.1s ease-in-out;
+		}
+	}
+
+	svg {
+		opacity: 0;
+		vertical-align: middle;
 	}
 
 	&:focus {
@@ -57,25 +64,6 @@
 		outline-offset: 2px;
 	}
 
-	svg {
-		opacity: 0;
-		transition: opacity 0.1s ease-in-out;
-		@include reduce-motion("transition");
-	}
-
-	&:hover {
-		svg {
-			opacity: 1;
-			transition: opacity 0.1s ease-in-out;
-			@include reduce-motion("transition");
-		}
-	}
-
-	&:hover::after,
-	&:focus::after,
-	&:active::after {
-		opacity: 1;
-	}
 }
 
 .edit-site-site-hub_toggle-command-center {
