@@ -75,7 +75,7 @@ export default function DocumentBar( props ) {
 			getCurrentPostId,
 			getEditorSettings,
 			__experimentalGetTemplateInfo: getTemplateInfo,
-		} = unlock( select( editorStore ) );
+		} = select( editorStore );
 		const { getEditedEntityRecord, isResolving: isResolvingSelector } =
 			select( coreStore );
 		const _postType = getCurrentPostType();
@@ -117,12 +117,6 @@ export default function DocumentBar( props ) {
 	const isGlobalEntity = GLOBAL_POST_TYPES.includes( postType );
 	const hasBackButton = !! onNavigateToPreviousEntityRecord;
 	const entityTitle = isTemplate ? templateTitle : documentTitle;
-	/*
-	 * The editor content overlay is used only by the edit-site package and has plans to be removed or refactored.
-	 * For now we use a private selector and action to get and set the overlay title and icon, but this will likely be removed
-	 * in the future.
-	 * @see https://github.com/WordPress/gutenberg/issues/62216
-	 */
 	const title = props.title || entityTitle;
 	const icon = props.icon || templateIcon;
 
