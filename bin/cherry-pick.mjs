@@ -6,6 +6,7 @@ import readline from 'readline';
 
 import { spawnSync } from 'node:child_process';
 
+const REPO = 'WordPress/gutenberg';
 const LABEL = process.argv[ 2 ] || 'Backport to WP Beta/RC';
 const BACKPORT_COMPLETED_LABEL = 'Backported to WP Core';
 const BRANCH = getCurrentBranch();
@@ -113,7 +114,7 @@ function cli( command, args, pipe = false ) {
  */
 async function fetchPRs() {
 	const { items } = await GitHubFetch(
-		`/search/issues?per_page=100&q=is:pr state:closed sort:updated label:"${ LABEL }" repo:WordPress/gutenberg`
+		`/search/issues?per_page=100&q=is:pr state:closed sort:updated label:"${ LABEL }" repo:${ REPO }`
 	);
 	const PRs = items
 		// eslint-disable-next-line camelcase
@@ -143,7 +144,7 @@ async function fetchPRs() {
 	const PRsWithMergeCommit = [];
 	for ( const PR of PRs ) {
 		const { merge_commit_sha: mergeCommitHash } = await GitHubFetch(
-			'/repos/WordPress/Gutenberg/pulls/' + PR.number
+			`/repos/${ REPO }/pulls/` + PR.number
 		);
 		PRsWithMergeCommit.push( {
 			...PR,
@@ -380,15 +381,17 @@ function reportSummaryNextSteps( successes, failures ) {
 function GHcommentAndRemoveLabel( pr ) {
 	const { number, cherryPickHash } = pr;
 	const comment = prComment( cherryPickHash );
+	const repo = [ '--repo', REPO ];
 	try {
-		cli( 'gh', [ 'pr', 'comment', number, '--body', comment ] );
-		cli( 'gh', [ 'pr', 'edit', number, '--remove-label', LABEL ] );
+		cli( 'gh', [ 'pr', 'comment', number, ...repo, '--body', comment ] );
+		cli( 'gh', [ 'pr', 'edit', number, ...repo, '--remove-label', LABEL ] );
 
 		if ( LABEL === 'Backport to WP Beta/RC' ) {
 			cli( 'gh', [
 				'pr',
 				'edit',
 				number,
+				...repo,
 				'--add-label',
 				BACKPORT_COMPLETED_LABEL,
 			] );
@@ -444,7 +447,7 @@ function reportFailure( { number, title, error, mergeCommitHash } ) {
  * @return {string} PR URL.
  */
 function prUrl( number ) {
-	return `https://github.com/WordPress/gutenberg/pull/${ number } `;
+	return `https://github.com/${ REPO }/pull/${ number } `;
 }
 
 /**
