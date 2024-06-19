@@ -63,7 +63,7 @@ export function DropZoneComponent( {
 
 			/**
 			 * From Windows Chrome 96, the `event.dataTransfer` returns both file object and HTML.
-			 * The order of the checks is important to recognise the HTML drop.
+			 * The order of the checks is important to recognize the HTML drop.
 			 */
 			if ( html && onHTMLDrop ) {
 				onHTMLDrop( html );
@@ -80,7 +80,7 @@ export function DropZoneComponent( {
 
 			/**
 			 * From Windows Chrome 96, the `event.dataTransfer` returns both file object and HTML.
-			 * The order of the checks is important to recognise the HTML drop.
+			 * The order of the checks is important to recognize the HTML drop.
 			 */
 			if ( event.dataTransfer?.types.includes( 'text/html' ) ) {
 				_type = 'html';
