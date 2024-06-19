@@ -15,6 +15,11 @@ import SidebarNavigationItem from '../sidebar-navigation-item';
 import { SidebarNavigationItemGlobalStyles } from '../sidebar-navigation-screen-global-styles';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
+import {
+	NAVIGATION_POST_TYPE,
+	TEMPLATE_POST_TYPE,
+	PATTERN_TYPES,
+} from '../../utils/constants';
 
 export default function SidebarNavigationScreenMain() {
 	const { setEditorCanvasContainerView } = unlock(
@@ -37,34 +42,39 @@ export default function SidebarNavigationScreenMain() {
 				<>
 					<ItemGroup>
 						<SidebarNavigationItem
-							path="/navigation"
+							uid="navigation-navigation-item"
+							params={ { postType: NAVIGATION_POST_TYPE } }
 							withChevron
 							icon={ navigation }
 						>
 							{ __( 'Navigation' ) }
 						</SidebarNavigationItem>
 						<SidebarNavigationItemGlobalStyles
+							uid="styles-navigation-item"
 							withChevron
 							icon={ styles }
 						>
 							{ __( 'Styles' ) }
 						</SidebarNavigationItemGlobalStyles>
 						<SidebarNavigationItem
-							path="/page"
+							uid="page-navigation-item"
+							params={ { postType: 'page' } }
 							withChevron
 							icon={ page }
 						>
 							{ __( 'Pages' ) }
 						</SidebarNavigationItem>
 						<SidebarNavigationItem
-							path="/wp_template"
+							uid="template-navigation-item"
+							params={ { postType: TEMPLATE_POST_TYPE } }
 							withChevron
 							icon={ layout }
 						>
 							{ __( 'Templates' ) }
 						</SidebarNavigationItem>
 						<SidebarNavigationItem
-							path="/patterns"
+							uid="patterns-navigation-item"
+							params={ { postType: PATTERN_TYPES.user } }
 							withChevron
 							icon={ symbol }
 						>

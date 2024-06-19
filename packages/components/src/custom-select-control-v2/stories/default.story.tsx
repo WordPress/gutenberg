@@ -26,7 +26,6 @@ const meta: Meta< typeof CustomSelectControlV2 > = {
 	},
 	tags: [ 'status-wip' ],
 	parameters: {
-		badges: [ 'wip' ],
 		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: {

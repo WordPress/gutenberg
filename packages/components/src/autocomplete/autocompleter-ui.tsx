@@ -27,10 +27,57 @@ import { VisuallyHidden } from '../visually-hidden';
 import { createPortal } from 'react-dom';
 import type { AutocompleterUIProps, KeyedOption, WPCompleter } from './types';
 
+type ListBoxProps = {
+	items: KeyedOption[];
+	onSelect: ( option: KeyedOption ) => void;
+	selectedIndex: number;
+	instanceId: number;
+	listBoxId: string | undefined;
+	className?: string;
+	Component?: React.ElementType;
+};
+
+function ListBox( {
+	items,
+	onSelect,
+	selectedIndex,
+	instanceId,
+	listBoxId,
+	className,
+	Component = 'div',
+}: ListBoxProps ) {
+	return (
+		<Component
+			id={ listBoxId }
+			role="listbox"
+			className="components-autocomplete__results"
+		>
+			{ items.map( ( option, index ) => (
+				<Button
+					key={ option.key }
+					id={ `components-autocomplete-item-${ instanceId }-${ option.key }` }
+					role="option"
+					aria-selected={ index === selectedIndex }
+					disabled={ option.isDisabled }
+					className={ clsx(
+						'components-autocomplete__result',
+						className,
+						{
+							'is-selected': index === selectedIndex,
+						}
+					) }
+					onClick={ () => onSelect( option ) }
+				>
+					{ option.label }
+				</Button>
+			) ) }
+		</Component>
+	);
+}
+
 export function getAutoCompleterUI( autocompleter: WPCompleter ) {
-	const useItems = autocompleter.useItems
-		? autocompleter.useItems
-		: getDefaultUseItems( autocompleter );
+	const useItems =
+		autocompleter.useItems ?? getDefaultUseItems( autocompleter );
 
 	function AutocompleterUI( {
 		filterValue,
@@ -62,7 +109,7 @@ export function getAutoCompleterUI( autocompleter: WPCompleter ) {
 					// If the popover is rendered in a different document than
 					// the content, we need to duplicate the options list in the
 					// content document so that it's available to the screen
-					// readers, which check the DOM ID based aira-* attributes.
+					// readers, which check the DOM ID based aria-* attributes.
 					setNeedsA11yCompat(
 						node.ownerDocument !== contentRef.current.ownerDocument
 					);
@@ -124,38 +171,6 @@ export function getAutoCompleterUI( autocompleter: WPCompleter ) {
 			return null;
 		}
 
-		const ListBox = ( {
-			Component = 'div',
-		}: {
-			Component?: React.ElementType;
-		} ) => (
-			<Component
-				id={ listBoxId }
-				role="listbox"
-				className="components-autocomplete__results"
-			>
-				{ items.map( ( option, index ) => (
-					<Button
-						key={ option.key }
-						id={ `components-autocomplete-item-${ instanceId }-${ option.key }` }
-						role="option"
-						aria-selected={ index === selectedIndex }
-						disabled={ option.isDisabled }
-						className={ clsx(
-							'components-autocomplete__result',
-							className,
-							{
-								'is-selected': index === selectedIndex,
-							}
-						) }
-						onClick={ () => onSelect( option ) }
-					>
-						{ option.label }
-					</Button>
-				) ) }
-			</Component>
-		);
-
 		return (
 			<>
 				<Popover
@@ -166,12 +181,27 @@ export function getAutoCompleterUI( autocompleter: WPCompleter ) {
 					anchor={ popoverAnchor }
 					ref={ popoverRefs }
 				>
-					<ListBox />
+					<ListBox
+						items={ items }
+						onSelect={ onSelect }
+						selectedIndex={ selectedIndex }
+						instanceId={ instanceId }
+						listBoxId={ listBoxId }
+						className={ className }
+					/>
 				</Popover>
 				{ contentRef.current &&
 					needsA11yCompat &&
 					createPortal(
-						<ListBox Component={ VisuallyHidden } />,
+						<ListBox
+							items={ items }
+							onSelect={ onSelect }
+							selectedIndex={ selectedIndex }
+							instanceId={ instanceId }
+							listBoxId={ listBoxId }
+							className={ className }
+							Component={ VisuallyHidden }
+						/>,
 						contentRef.current.ownerDocument.body
 					) }
 			</>

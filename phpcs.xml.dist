@@ -42,6 +42,9 @@
 	<!-- Cache the scan results and re-use those for unchanged files on the next scan. -->
 	<arg name="cache" value=".cache/phpcs.json"/>
 
+	<!-- Check up to 20 files simultaneously. -->
+	<arg name="parallel" value="20"/>
+
 	<file>./bin</file>
 	<file>./gutenberg.php</file>
 	<file>./lib</file>

@@ -178,7 +178,7 @@ As of Gutenberg version 14.2, the following controls are available:
 -   `sticky` - Shows a dropdown to select how to handle sticky posts.
 -   `taxQuery` - Shows available taxonomies filters for the currently selected post type.
 -   `author` - Shows an input field to filter the query by author.
--   `search` - Shows an input filed to filter the query by keywords.
+-   `search` - Shows an input field to filter the query by keywords.
 
 In our case, the property would look like this:
 

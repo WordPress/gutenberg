@@ -6,13 +6,15 @@ import { h, type ComponentChild, type JSX } from 'preact';
  * Internal dependencies
  */
 import { directivePrefix as p } from './constants';
-import { warn } from './utils/warn';
+import { warn } from './utils';
 
 const ignoreAttr = `data-${ p }-ignore`;
 const islandAttr = `data-${ p }-interactive`;
 const fullPrefix = `data-${ p }-`;
 const namespaces: Array< string | null > = [];
 const currentNamespace = () => namespaces[ namespaces.length - 1 ] ?? null;
+const isObject = ( item: unknown ): item is Record< string, unknown > =>
+	Boolean( item && typeof item === 'object' && item.constructor === Object );
 
 // Regular expression for directive parsing.
 const directiveParser = new RegExp(
@@ -32,7 +34,7 @@ const directiveParser = new RegExp(
 // the reference, separated by `::`, like `some-namespace::state.somePath`.
 // Namespaces can contain any alphanumeric characters, hyphens, underscores or
 // forward slashes. References don't have any restrictions.
-const nsPathRegExp = /^(?<namespace>[\w_\/-]+)::(?<value>.+)$/;
+const nsPathRegExp = /^([\w_\/-]+)::(.+)$/;
 
 export const hydratedIslands = new WeakSet();
 
@@ -88,6 +90,7 @@ export function toVdom( root: Node ): Array< ComponentChild > {
 
 		for ( let i = 0; i < attributes.length; i++ ) {
 			const attributeName = attributes[ i ].name;
+			const attributeValue = attributes[ i ].value;
 			if (
 				attributeName[ fullPrefix.length ] &&
 				attributeName.slice( 0, fullPrefix.length ) === fullPrefix
@@ -95,15 +98,13 @@ export function toVdom( root: Node ): Array< ComponentChild > {
 				if ( attributeName === ignoreAttr ) {
 					ignore = true;
 				} else {
-					const regexCaptureGroups = nsPathRegExp.exec(
-						attributes[ i ].value
-					)?.groups;
-					const namespace = regexCaptureGroups?.namespace ?? null;
-					let value: any =
-						regexCaptureGroups?.value ?? attributes[ i ].value;
+					const regexResult = nsPathRegExp.exec( attributeValue );
+					const namespace = regexResult?.[ 1 ] ?? null;
+					let value: any = regexResult?.[ 2 ] ?? attributeValue;
 					try {
-						value = value && JSON.parse( value );
-					} catch ( e ) {}
+						const parsedValue = JSON.parse( value );
+						value = isObject( parsedValue ) ? parsedValue : value;
+					} catch {}
 					if ( attributeName === islandAttr ) {
 						island = true;
 						const islandNamespace =
@@ -121,7 +122,7 @@ export function toVdom( root: Node ): Array< ComponentChild > {
 			} else if ( attributeName === 'ref' ) {
 				continue;
 			}
-			props[ attributeName ] = attributes[ i ].value;
+			props[ attributeName ] = attributeValue;
 		}
 
 		if ( ignore && ! island ) {
@@ -142,7 +143,7 @@ export function toVdom( root: Node ): Array< ComponentChild > {
 				( obj, [ name, ns, value ] ) => {
 					const directiveMatch = directiveParser.exec( name );
 					if ( directiveMatch === null ) {
-						warn( `Invalid directive: ${ name }.` );
+						warn( `Found malformed directive name: ${ name }.` );
 						return obj;
 					}
 					const prefix = directiveMatch[ 1 ] || '';

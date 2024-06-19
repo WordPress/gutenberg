@@ -27,31 +27,15 @@ import {
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
+import { useRegistry } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { unlock } from './lock-unlock';
-import type {
-	Action,
-	AnyItem,
-	NormalizedField,
-	ViewList as ViewListType,
-} from './types';
+import type { Action, AnyItem, NormalizedField, ViewListProps } from './types';
 
 import { ActionsDropdownMenuGroup, ActionModal } from './item-actions';
-
-interface ListViewProps< Item extends AnyItem > {
-	actions: Action< Item >[];
-	data: Item[];
-	fields: NormalizedField< Item >[];
-	getItemId: ( item: Item ) => string;
-	id: string;
-	isLoading: boolean;
-	onSelectionChange: ( selection: Item[] ) => void;
-	selection: string[];
-	view: ViewListType;
-}
 
 interface ListViewItemProps< Item extends AnyItem > {
 	actions: Action< Item >[];
@@ -84,6 +68,7 @@ function ListItem< Item extends AnyItem >( {
 	store,
 	visibleFields,
 }: ListViewItemProps< Item > ) {
+	const registry = useRegistry();
 	const itemRef = useRef< HTMLElement >( null );
 	const labelId = `${ id }-label`;
 	const descriptionId = `${ id }-description`;
@@ -122,6 +107,11 @@ function ListItem< Item extends AnyItem >( {
 	}, [ actions, item ] );
 
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
+	const primaryActionLabel =
+		primaryAction &&
+		( typeof primaryAction.label === 'string'
+			? primaryAction.label
+			: primaryAction.label( [ item ] ) );
 
 	return (
 		<CompositeRow
@@ -137,7 +127,8 @@ function ListItem< Item extends AnyItem >( {
 		>
 			<HStack
 				className="dataviews-view-list__item-wrapper"
-				alignment="top"
+				alignment="center"
+				spacing={ 0 }
 			>
 				<div role="gridcell">
 					<CompositeItem
@@ -161,7 +152,7 @@ function ListItem< Item extends AnyItem >( {
 									<div className="dataviews-view-list__media-placeholder"></div>
 								) }
 							</div>
-							<VStack spacing={ 1 }>
+							<VStack spacing={ 0 }>
 								<span
 									className="dataviews-view-list__primary-field"
 									id={ labelId }
@@ -209,7 +200,7 @@ function ListItem< Item extends AnyItem >( {
 									store={ store }
 									render={
 										<Button
-											label={ primaryAction.label }
+											label={ primaryActionLabel }
 											icon={ primaryAction.icon }
 											isDestructive={
 												primaryAction.isDestructive
@@ -240,17 +231,18 @@ function ListItem< Item extends AnyItem >( {
 										store={ store }
 										render={
 											<Button
-												label={ primaryAction.label }
+												label={ primaryActionLabel }
 												icon={ primaryAction.icon }
 												isDestructive={
 													primaryAction.isDestructive
 												}
 												size="compact"
-												onClick={ () =>
-													primaryAction.callback( [
-														item,
-													] )
-												}
+												onClick={ () => {
+													primaryAction.callback(
+														[ item ],
+														{ registry }
+													);
+												} }
 											/>
 										}
 									/>
@@ -266,6 +258,7 @@ function ListItem< Item extends AnyItem >( {
 												size="compact"
 												icon={ moreVertical }
 												label={ __( 'Actions' ) }
+												__experimentalIsFocusable
 												disabled={ ! actions.length }
 												onKeyDown={ ( event: {
 													key: string;
@@ -311,7 +304,7 @@ function ListItem< Item extends AnyItem >( {
 }
 
 export default function ViewList< Item extends AnyItem >(
-	props: ListViewProps< Item >
+	props: ViewListProps< Item >
 ) {
 	const {
 		actions,

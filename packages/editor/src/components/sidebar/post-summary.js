@@ -12,6 +12,7 @@ import PostActions from '../post-actions';
 import PostAuthorPanel from '../post-author/panel';
 import PostCardPanel from '../post-card-panel';
 import PostContentInformation from '../post-content-information';
+import PageAttributesPanel from '../page-attributes/panel';
 import PostDiscussionPanel from '../post-discussion/panel';
 import { PrivatePostExcerptPanel as PostExcerptPanel } from '../post-excerpt/panel';
 import PostFeaturedImagePanel from '../post-featured-image/panel';
@@ -23,16 +24,13 @@ import PostStatusPanel from '../post-status';
 import PostStickyPanel from '../post-sticky';
 import PostSyncStatus from '../post-sync-status';
 import PostTemplatePanel from '../post-template/panel';
-import PostTrashPanel from '../post-trash/panel';
 import PostURLPanel from '../post-url/panel';
+import BlogTitle from '../blog-title';
+import PostsPerPage from '../posts-per-page';
+import SiteDiscussion from '../site-discussion';
 import { store as editorStore } from '../../store';
-import {
-	NAVIGATION_POST_TYPE,
-	PATTERN_POST_TYPE,
-	TEMPLATE_PART_POST_TYPE,
-	TEMPLATE_POST_TYPE,
-} from '../../store/constants';
 import TemplateAreas from '../template-areas';
+import { PrivatePostLastRevision } from '../post-last-revision';
 
 /**
  * Module Constants
@@ -40,7 +38,7 @@ import TemplateAreas from '../template-areas';
 const PANEL_NAME = 'post-status';
 
 export default function PostSummary( { onActionPerformed } ) {
-	const { isRemovedPostStatusPanel, postType } = useSelect( ( select ) => {
+	const { isRemovedPostStatusPanel } = useSelect( ( select ) => {
 		// We use isEditorPanelRemoved to hide the panel if it was programatically removed. We do
 		// not use isEditorPanelEnabled since this panel should not be disabled through the UI.
 		const { isEditorPanelRemoved, getCurrentPostType } =
@@ -50,10 +48,6 @@ export default function PostSummary( { onActionPerformed } ) {
 			postType: getCurrentPostType(),
 		};
 	}, [] );
-	const isPattern = postType === PATTERN_POST_TYPE;
-	const isTemplate = postType === TEMPLATE_POST_TYPE;
-	const isTemplatePart = postType === TEMPLATE_PART_POST_TYPE;
-	const isNavigation = postType === NAVIGATION_POST_TYPE;
 
 	return (
 		<PostPanelSection className="editor-post-summary">
@@ -75,24 +69,25 @@ export default function PostSummary( { onActionPerformed } ) {
 								<PostLastEditedPanel />
 							</VStack>
 							{ ! isRemovedPostStatusPanel && (
-								<VStack spacing={ 2 }>
+								<VStack spacing={ 4 }>
 									<VStack spacing={ 1 }>
 										<PostStatusPanel />
 										<PostSchedulePanel />
-										<PostTemplatePanel />
 										<PostURLPanel />
+										<PostAuthorPanel />
+										<PostTemplatePanel />
 										<PostDiscussionPanel />
+										<PrivatePostLastRevision />
+										<PageAttributesPanel />
 										<PostSyncStatus />
+										<BlogTitle />
+										<PostsPerPage />
+										<SiteDiscussion />
+										<PostFormatPanel />
+										<PostStickyPanel />
 									</VStack>
-									<PostStickyPanel />
-									<PostFormatPanel />
-									<PostAuthorPanel />
-									{ isTemplate && <TemplateAreas /> }
+									<TemplateAreas />
 									{ fills }
-									{ ! isPattern &&
-										! isTemplate &&
-										! isTemplatePart &&
-										! isNavigation && <PostTrashPanel /> }
 								</VStack>
 							) }
 						</VStack>

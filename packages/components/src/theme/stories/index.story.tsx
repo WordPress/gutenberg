@@ -20,7 +20,6 @@ const meta: Meta< typeof Theme > = {
 	},
 	tags: [ 'status-private' ],
 	parameters: {
-		badges: [ 'private' ],
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},

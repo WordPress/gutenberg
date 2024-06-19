@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { Button, Modal } from '@wordpress/components';
+import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
 export const convertDescription = __(
@@ -13,12 +14,20 @@ export function ConvertToLinksModal( { onClick, onClose, disabled } ) {
 		<Modal
 			onRequestClose={ onClose }
 			title={ __( 'Edit Page List' ) }
-			className={ 'wp-block-page-list-modal' }
+			className="wp-block-page-list-modal"
 			aria={ {
-				describedby: 'wp-block-page-list-modal__description',
+				describedby: useInstanceId(
+					ConvertToLinksModal,
+					'wp-block-page-list-modal__description'
+				),
 			} }
 		>
-			<p id={ 'wp-block-page-list-modal__description' }>
+			<p
+				id={ useInstanceId(
+					ConvertToLinksModal,
+					'wp-block-page-list-modal__description'
+				) }
+			>
 				{ convertDescription }
 			</p>
 			<div className="wp-block-page-list-modal-buttons">
@@ -27,6 +36,7 @@ export function ConvertToLinksModal( { onClick, onClose, disabled } ) {
 				</Button>
 				<Button
 					variant="primary"
+					__experimentalIsFocusable
 					disabled={ disabled }
 					onClick={ onClick }
 				>

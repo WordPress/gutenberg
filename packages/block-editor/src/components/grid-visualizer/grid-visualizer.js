@@ -64,7 +64,13 @@ const GridVisualizerGrid = forwardRef( ( { blockElement }, ref ) => {
 			style={ gridInfo.style }
 		>
 			{ Array.from( { length: gridInfo.numItems }, ( _, i ) => (
-				<div key={ i } className="block-editor-grid-visualizer__item" />
+				<div
+					key={ i }
+					className="block-editor-grid-visualizer__item"
+					style={ {
+						boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${ gridInfo.currentColor } 20%, #0000)`,
+					} }
+				/>
 			) ) }
 		</div>
 	);
@@ -84,6 +90,7 @@ function getGridInfo( blockElement ) {
 	const numItems = numColumns * numRows;
 	return {
 		numItems,
+		currentColor: getComputedCSS( blockElement, 'color' ),
 		style: {
 			gridTemplateColumns,
 			gridTemplateRows,

@@ -2,7 +2,15 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { trash, pages, drafts } from '@wordpress/icons';
+import {
+	trash,
+	pages,
+	drafts,
+	published,
+	scheduled,
+	pending,
+	notAllowed,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -55,6 +63,36 @@ export const DEFAULT_VIEWS = {
 			view: DEFAULT_PAGE_BASE,
 		},
 		{
+			title: __( 'Published' ),
+			slug: 'published',
+			icon: published,
+			view: {
+				...DEFAULT_PAGE_BASE,
+				filters: [
+					{
+						field: 'status',
+						operator: OPERATOR_IS_ANY,
+						value: 'publish',
+					},
+				],
+			},
+		},
+		{
+			title: __( 'Scheduled' ),
+			slug: 'future',
+			icon: scheduled,
+			view: {
+				...DEFAULT_PAGE_BASE,
+				filters: [
+					{
+						field: 'status',
+						operator: OPERATOR_IS_ANY,
+						value: 'future',
+					},
+				],
+			},
+		},
+		{
 			title: __( 'Drafts' ),
 			slug: 'drafts',
 			icon: drafts,
@@ -65,6 +103,36 @@ export const DEFAULT_VIEWS = {
 						field: 'status',
 						operator: OPERATOR_IS_ANY,
 						value: 'draft',
+					},
+				],
+			},
+		},
+		{
+			title: __( 'Pending' ),
+			slug: 'pending',
+			icon: pending,
+			view: {
+				...DEFAULT_PAGE_BASE,
+				filters: [
+					{
+						field: 'status',
+						operator: OPERATOR_IS_ANY,
+						value: 'pending',
+					},
+				],
+			},
+		},
+		{
+			title: __( 'Private' ),
+			slug: 'private',
+			icon: notAllowed,
+			view: {
+				...DEFAULT_PAGE_BASE,
+				filters: [
+					{
+						field: 'status',
+						operator: OPERATOR_IS_ANY,
+						value: 'private',
 					},
 				],
 			},

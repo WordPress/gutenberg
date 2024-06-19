@@ -20,7 +20,7 @@ const { state } = store( 'router-regions', {
 			*navigate( e ) {
 				e.preventDefault();
 				const { actions } = yield import(
-					"@wordpress/interactivity-router"
+					'@wordpress/interactivity-router'
 				);
 				yield actions.navigate( e.target.href );
 			},

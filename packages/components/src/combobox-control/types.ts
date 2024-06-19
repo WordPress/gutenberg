@@ -46,6 +46,13 @@ export type ComboboxControlProps = Pick<
 	 */
 	allowReset?: boolean;
 	/**
+	 * Automatically expand the dropdown when the control is focused.
+	 * If the control is clicked, the dropdown will expand regardless of this prop.
+	 *
+	 * @default true
+	 */
+	expandOnFocus?: boolean;
+	/**
 	 * Customizable UI messages.
 	 */
 	messages?: {
