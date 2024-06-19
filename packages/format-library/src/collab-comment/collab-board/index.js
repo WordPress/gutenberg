@@ -39,31 +39,23 @@ const CollabBoard = ( { contentRef, onClose } ) => {
 	const popoverAnchor = useAnchor( {
 		editableContentElement: contentRef.current,
 	} );
+	const classList = contentRef.current?.classList?.value
+		.split( ' ' )
+		.find( ( className ) =>
+			className.startsWith( 'block-editor-collab__' )
+		);
 
 	// State to manage the comment thread.
 	const [ inputComment, setInputComment ] = useState( '' );
 	const [ isResolved, setIsResolved ] = useState( false );
 	const [ isEditing, setIsEditing ] = useState( null );
 	const [ showConfirmation, setShowConfirmation ] = useState( false );
-	const [ threadId, setThreadId ] = useState( null );
+	const [ threadId, setThreadId ] = useState( classList
+		? classList.slice( 'block-editor-collab__'.length )
+		: Date.now() );
 
 	// Get the dispatch functions to save the comment and update the block attributes.
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-
-	// Set the threadId if exists, from the currently selected block classList.
-	useEffect( () => {
-		const classList = contentRef.current?.classList?.value
-			.split( ' ' )
-			.find( ( className ) =>
-				className.startsWith( 'block-editor-collab__' )
-			);
-
-		setThreadId(
-			classList
-				? classList.slice( 'block-editor-collab__'.length )
-				: Date.now()
-		);
-	}, [ contentRef ] );
 
 	// Add border to the block if threadId exists.
 	useEffect( () => {
