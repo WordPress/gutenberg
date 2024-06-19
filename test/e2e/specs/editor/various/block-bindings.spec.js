@@ -2045,6 +2045,7 @@ test.describe( 'Block bindings', () => {
 					} )
 					.getByRole( 'textbox' );
 				await buttonBlock.click();
+				await pageUtils.pressKeys( 'Meta+k' );
 				await page
 					.getByRole( 'button', { name: 'Edit link', exact: true } )
 					.click();
