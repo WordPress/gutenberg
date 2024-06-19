@@ -300,7 +300,7 @@ The returned value is used to change the inner content of the element: `<div>val
 ### `wp-on`
 
 > [!NOTE]  
-> Consider using the more performant `wp-on-async` instead (below) if your directive code does not need synchronous access to the event object.
+> Consider using the more performant [`wp-on-async`](#wp-on-async) instead if your directive code does not need synchronous access to the event object. If synchronous access is required, consider implementing an [async action](#async-actions) which yields to the main thread after calling the synchronous API.
 
 This directive runs code on dispatched DOM events like `click` or `keyup`. The syntax is `data-wp-on--[event]` (like `data-wp-on--click` or `data-wp-on--keyup`).
 
@@ -336,7 +336,7 @@ to run sooner. Use this async version whenever there is no need for synchronous 
 ### `wp-on-window`
 
 > [!NOTE]  
-> Consider using the more performant `wp-on-window-async` instead (below) if your directive code does not need synchronous access to the event object.
+> Consider using the more performant [`wp-on-window-async`](#wp-on-window-async) instead if your directive code does not need synchronous access to the event object. If synchronous access is required, consider implementing an [async action](#async-actions) which yields to the main thread after calling the synchronous API.
 
 This directive allows you to attach global window events like `resize`, `copy`, and `focus` and then execute a defined callback when those happen.
 
@@ -372,7 +372,7 @@ Similar to `wp-on-async`, this is an optimized version of `wp-on-window` that im
 ### `wp-on-document`
 
 > [!NOTE]  
-> Consider using the more performant `wp-on-document-async` instead (below) if your directive code does not need synchronous access to the event object.
+> Consider using the more performant [`wp-on-document-async`](#wp-on-document-async) instead if your directive code does not need synchronous access to the event object. If synchronous access is required, consider implementing an [async action](#async-actions) which yields to the main thread after calling the synchronous API.
 
 This directive allows you to attach global document events like `scroll`, `mousemove`, and `keydown` and then execute a defined callback when those happen.
 
@@ -794,7 +794,7 @@ We need to be able to know when async actions start awaiting and resume operatio
 
 The store will work fine if it is written like this:
 ```js
-store("myPlugin", {
+const { state } = store("myPlugin", {
   state: {
     get isOpen() {
       return getContext().isOpen;
