@@ -94,13 +94,13 @@ HTML;
 		$p->next_tag( array( 'class_name' => 'wp-block-query-pagination-previous' ) );
 		$this->assertSame( 'query-pagination-previous', $p->get_attribute( 'data-wp-key' ) );
 		$this->assertSame( 'core/query::actions.navigate', $p->get_attribute( 'data-wp-on--click' ) );
-		$this->assertSame( 'core/query::actions.prefetch', $p->get_attribute( 'data-wp-on--mouseenter' ) );
+		$this->assertSame( 'core/query::actions.prefetch', $p->get_attribute( 'data-wp-on-async--mouseenter' ) );
 		$this->assertSame( 'core/query::callbacks.prefetch', $p->get_attribute( 'data-wp-watch' ) );
 
 		$p->next_tag( array( 'class_name' => 'wp-block-query-pagination-next' ) );
 		$this->assertSame( 'query-pagination-next', $p->get_attribute( 'data-wp-key' ) );
 		$this->assertSame( 'core/query::actions.navigate', $p->get_attribute( 'data-wp-on--click' ) );
-		$this->assertSame( 'core/query::actions.prefetch', $p->get_attribute( 'data-wp-on--mouseenter' ) );
+		$this->assertSame( 'core/query::actions.prefetch', $p->get_attribute( 'data-wp-on-async--mouseenter' ) );
 		$this->assertSame( 'core/query::callbacks.prefetch', $p->get_attribute( 'data-wp-watch' ) );
 
 		$router_config = wp_interactivity_config( 'core/router' );

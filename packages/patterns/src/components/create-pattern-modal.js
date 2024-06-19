@@ -129,10 +129,7 @@ export function CreatePatternModalContents( {
 					categoryMap={ categoryMap }
 				/>
 				<ToggleControl
-					label={ _x(
-						'Synced',
-						'Option that makes an individual pattern synchronized'
-					) }
+					label={ _x( 'Synced', 'pattern (singular)' ) }
 					help={ __(
 						'Sync this pattern across multiple locations.'
 					) }

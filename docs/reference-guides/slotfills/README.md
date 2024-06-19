@@ -68,7 +68,7 @@ See [core code](https://github.com/WordPress/gutenberg/tree/HEAD/packages/editor
 ```js
 export default function PostSummary( { onActionPerformed } ) {
 	const { isRemovedPostStatusPanel } = useSelect( ( select ) => {
-		// We use isEditorPanelRemoved to hide the panel if it was programatically removed. We do
+		// We use isEditorPanelRemoved to hide the panel if it was programmatically removed. We do
 		// not use isEditorPanelEnabled since this panel should not be disabled through the UI.
 		const { isEditorPanelRemoved, getCurrentPostType } =
 			select( editorStore );

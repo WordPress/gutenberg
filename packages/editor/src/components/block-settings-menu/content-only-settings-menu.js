@@ -19,7 +19,7 @@ import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 function ContentOnlySettingsMenuItems( { clientId, onClose } ) {
-	const { entity, onNavigateToEntityRecord } = useSelect(
+	const { entity, onNavigateToEntityRecord, canEditTemplates } = useSelect(
 		( select ) => {
 			const {
 				getBlockEditingMode,
@@ -46,11 +46,12 @@ function ContentOnlySettingsMenuItems( { clientId, onClose } ) {
 					getBlockAttributes( patternParent ).ref
 				);
 			} else {
-				const { getCurrentPostType, getCurrentTemplateId } =
-					select( editorStore );
-				const currentPostType = getCurrentPostType();
+				const { getCurrentTemplateId } = select( editorStore );
 				const templateId = getCurrentTemplateId();
-				if ( currentPostType === 'page' && templateId ) {
+				const { getContentLockingParent } = unlock(
+					select( blockEditorStore )
+				);
+				if ( ! getContentLockingParent( clientId ) && templateId ) {
 					record = select( coreStore ).getEntityRecord(
 						'postType',
 						'wp_template',
@@ -58,7 +59,12 @@ function ContentOnlySettingsMenuItems( { clientId, onClose } ) {
 					);
 				}
 			}
+			const _canEditTemplates = select( coreStore ).canUser(
+				'create',
+				'templates'
+			);
 			return {
+				canEditTemplates: _canEditTemplates,
 				entity: record,
 				onNavigateToEntityRecord:
 					getSettings().onNavigateToEntityRecord,
@@ -77,6 +83,19 @@ function ContentOnlySettingsMenuItems( { clientId, onClose } ) {
 	}
 
 	const isPattern = entity.type === 'wp_block';
+	let helpText = isPattern
+		? __(
+				'Edit the pattern to move, delete, or make further changes to this block.'
+		  )
+		: __(
+				'Edit the template to move, delete, or make further changes to this block.'
+		  );
+
+	if ( ! canEditTemplates ) {
+		helpText = __(
+			'Only users with permissions to edit the template can move or delete this block'
+		);
+	}
 
 	return (
 		<>
@@ -88,6 +107,7 @@ function ContentOnlySettingsMenuItems( { clientId, onClose } ) {
 							postType: entity.type,
 						} );
 					} }
+					disabled={ ! canEditTemplates }
 				>
 					{ isPattern ? __( 'Edit pattern' ) : __( 'Edit template' ) }
 				</MenuItem>
@@ -97,13 +117,7 @@ function ContentOnlySettingsMenuItems( { clientId, onClose } ) {
 				as="p"
 				className="editor-content-only-settings-menu__description"
 			>
-				{ isPattern
-					? __(
-							'Edit the pattern to move, delete, or make further changes to this block.'
-					  )
-					: __(
-							'Edit the template to move, delete, or make further changes to this block.'
-					  ) }
+				{ helpText }
 			</Text>
 		</>
 	);

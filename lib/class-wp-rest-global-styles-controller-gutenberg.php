@@ -330,6 +330,15 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 			} elseif ( isset( $existing_config['styles'] ) ) {
 				$config['styles'] = $existing_config['styles'];
 			}
+
+			// Register theme-defined variations.
+			WP_Theme_JSON_Resolver_Gutenberg::get_theme_data();
+
+			// Register user-defined variations.
+			if ( isset( $request['styles']['blocks']['variations'] ) && ! empty( $config['styles']['blocks']['variations'] ) ) {
+				gutenberg_register_block_style_variations_from_theme_json_data( $config['styles']['blocks']['variations'] );
+			}
+
 			if ( isset( $request['settings'] ) ) {
 				$config['settings'] = $request['settings'];
 			} elseif ( isset( $existing_config['settings'] ) ) {

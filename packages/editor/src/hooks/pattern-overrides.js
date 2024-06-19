@@ -17,6 +17,7 @@ import { unlock } from '../lock-unlock';
 const {
 	PatternOverridesControls,
 	ResetOverridesControl,
+	PatternOverridesBlockControls,
 	PATTERN_TYPES,
 	PARTIAL_SYNCING_SUPPORTED_BLOCKS,
 	PATTERN_SYNC_TYPES,
@@ -43,6 +44,7 @@ const withPatternOverrideControls = createHigherOrderComponent(
 				{ props.isSelected && isSupportedBlock && (
 					<ControlsWithStoreSubscription { ...props } />
 				) }
+				{ isSupportedBlock && <PatternOverridesBlockControls /> }
 			</>
 		);
 	}
