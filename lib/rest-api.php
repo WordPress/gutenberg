@@ -45,7 +45,6 @@ if ( ! function_exists( 'gutenberg_register_wp_rest_post_types_controller_fields
 					if ( ! empty( $post_type ) && ! empty( $post_type->template ) ) {
 						return $post_type->template;
 					}
-					return null;
 				},
 				'schema'       => array(
 					'type'        => 'array',
@@ -61,10 +60,9 @@ if ( ! function_exists( 'gutenberg_register_wp_rest_post_types_controller_fields
 			array(
 				'get_callback' => function ( $item ) {
 					$post_type = get_post_type_object( $item['slug'] );
-					if ( ! empty( $post_type ) && ! empty( $post_type->template_lock ) ) {
+					if ( ! empty( $post_type ) && ! empty( $post_type->template_lock ) && false !== $post_type->template_lock ) {
 						return $post_type->template_lock;
 					}
-					return null;
 				},
 				'schema'       => array(
 					'type'        => 'string',
