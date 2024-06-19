@@ -39,31 +39,25 @@ const CollabBoard = ( { contentRef, onClose } ) => {
 	const popoverAnchor = useAnchor( {
 		editableContentElement: contentRef.current,
 	} );
+	const classList = contentRef.current?.classList?.value
+		.split( ' ' )
+		.find( ( className ) =>
+			className.startsWith( 'block-editor-collab__' )
+		);
 
 	// State to manage the comment thread.
 	const [ inputComment, setInputComment ] = useState( '' );
 	const [ isResolved, setIsResolved ] = useState( false );
 	const [ isEditing, setIsEditing ] = useState( null );
 	const [ showConfirmation, setShowConfirmation ] = useState( false );
-	const [ threadId, setThreadId ] = useState( null );
+	const [ threadId, setThreadId ] = useState(
+		classList
+			? classList.slice( 'block-editor-collab__'.length )
+			: Date.now()
+	);
 
 	// Get the dispatch functions to save the comment and update the block attributes.
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-
-	// Set the threadId if exists, from the currently selected block classList.
-	useEffect( () => {
-		const classList = contentRef.current?.classList?.value
-			.split( ' ' )
-			.find( ( className ) =>
-				className.startsWith( 'block-editor-collab__' )
-			);
-
-		setThreadId(
-			classList
-				? classList.slice( 'block-editor-collab__'.length )
-				: Date.now()
-		);
-	}, [ contentRef ] );
 
 	// Add border to the block if threadId exists.
 	useEffect( () => {
@@ -73,15 +67,11 @@ const CollabBoard = ( { contentRef, onClose } ) => {
 	}, [ threadId ] );
 
 	// Fetch the current post, current user, and the selected block clientId.
-	const {
-		postType,
-		currentUser,
-		clientId
-	} = useSelect(
+	const { postType, currentUser, clientId } = useSelect(
 		( select ) => {
 			return {
 				postType: select( editorStore ).getCurrentPostType(),
- 				currentUser: select( coreStore ).getCurrentUser()?.name || null,
+				currentUser: select( coreStore ).getCurrentUser()?.name || null,
 				clientId:
 					select( blockEditorStore ).getSelectedBlockClientId() ||
 					null,
@@ -90,16 +80,14 @@ const CollabBoard = ( { contentRef, onClose } ) => {
 		[ threadId ]
 	);
 
-	const [ meta, setMeta ] = useEntityProp(
-		'postType',
-		postType,
-		'meta',
-	);
+	const [ meta, setMeta ] = useEntityProp( 'postType', postType, 'meta' );
 
 	const allThreads = meta?.collab ? JSON.parse( meta.collab ) : [];
 	const currentThread = allThreads[ threadId ] ?? {};
 	const isCurrentThreadResolved = currentThread.threadIsResolved || false;
-	const commentsCount = isCurrentThreadResolved ? 0 : currentThread.comments?.length || 0;
+	const commentsCount = isCurrentThreadResolved
+		? 0
+		: currentThread.comments?.length || 0;
 
 	// Helper function to generate a new comment.
 	const generateNewComment = () => ( {
@@ -126,14 +114,14 @@ const CollabBoard = ( { contentRef, onClose } ) => {
 
 	const updateCommentMeta = ( updatedComments ) => {
 		setMeta( { ...meta, collab: JSON.stringify( updatedComments ) } );
-	}
+	};
 
 	// Function to save the comment.
 	const saveComment = () => {
 		const newComment = generateNewComment();
 		const updatedComments = getUpdatedComments( newComment, threadId );
 
-		updateCommentMeta ( updatedComments );
+		updateCommentMeta( updatedComments );
 		setInputComment( '' );
 	};
 
@@ -154,7 +142,7 @@ const CollabBoard = ( { contentRef, onClose } ) => {
 			} );
 		}
 
-		updateCommentMeta ( editedComments );
+		updateCommentMeta( editedComments );
 		setInputComment( '' );
 		setIsEditing( null );
 	};
@@ -173,7 +161,7 @@ const CollabBoard = ( { contentRef, onClose } ) => {
 		};
 
 		// Save the updated comments.
-		updateCommentMeta ( updatedComments );
+		updateCommentMeta( updatedComments );
 		removeBorder();
 		setThreadId( null );
 		onClose();
@@ -203,7 +191,7 @@ const CollabBoard = ( { contentRef, onClose } ) => {
 		}
 
 		// Save the updated comments.
-		updateCommentMeta ( updatedComments );
+		updateCommentMeta( updatedComments );
 	};
 
 	// Function to show the confirmation overlay.
