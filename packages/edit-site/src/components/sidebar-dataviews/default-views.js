@@ -2,7 +2,15 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { trash, pages, drafts, unseen, inbox } from '@wordpress/icons';
+import {
+	trash,
+	pages,
+	drafts,
+	published,
+	scheduled,
+	pending,
+	notAllowed,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -57,7 +65,7 @@ export const DEFAULT_VIEWS = {
 		{
 			title: __( 'Published' ),
 			slug: 'published',
-			icon: pages,
+			icon: published,
 			view: {
 				...DEFAULT_PAGE_BASE,
 				filters: [
@@ -72,7 +80,7 @@ export const DEFAULT_VIEWS = {
 		{
 			title: __( 'Scheduled' ),
 			slug: 'future',
-			icon: pages,
+			icon: scheduled,
 			view: {
 				...DEFAULT_PAGE_BASE,
 				filters: [
@@ -102,7 +110,7 @@ export const DEFAULT_VIEWS = {
 		{
 			title: __( 'Pending' ),
 			slug: 'pending',
-			icon: inbox,
+			icon: pending,
 			view: {
 				...DEFAULT_PAGE_BASE,
 				filters: [
@@ -117,7 +125,7 @@ export const DEFAULT_VIEWS = {
 		{
 			title: __( 'Private' ),
 			slug: 'private',
-			icon: unseen,
+			icon: notAllowed,
 			view: {
 				...DEFAULT_PAGE_BASE,
 				filters: [
