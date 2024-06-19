@@ -19,12 +19,10 @@ import {
 	edit as editIcon,
 } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
+import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useState, useEffect } from '@wordpress/element';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { dateI18n, format, getSettings } from '@wordpress/date';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { store as editorStore } from '@wordpress/editor';
 
 /**
@@ -50,7 +48,6 @@ const CollabBoard = ( { contentRef, onClose } ) => {
 	const [ threadId, setThreadId ] = useState( null );
 
 	// Get the dispatch functions to save the comment and update the block attributes.
-	const { saveEntityRecord } = useDispatch( coreStore );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	// Set the threadId if exists, from the currently selected block classList.
@@ -77,31 +74,14 @@ const CollabBoard = ( { contentRef, onClose } ) => {
 
 	// Fetch the current post, current user, and the selected block clientId.
 	const {
-		postId,
-		allThreads,
-		currentThread,
+		postType,
 		currentUser,
-		clientId,
-		commentsCount,
-		isCurrentThreadResolved,
+		clientId
 	} = useSelect(
 		( select ) => {
-			const post = select( editorStore ).getCurrentPost();
-			const collabData = post?.meta?.collab
-				? JSON.parse( post.meta.collab )
-				: [];
-
-			const thread = collabData[ threadId ] ?? {};
-			const threadIsResolved = thread.threadIsResolved || false;
-			const count = threadIsResolved ? 0 : thread.comments?.length || 0;
-
 			return {
-				postId: post?.id,
-				allThreads: collabData,
-				currentThread: thread,
-				commentsCount: count,
-				isCurrentThreadResolved: threadIsResolved,
-				currentUser: select( coreStore ).getCurrentUser()?.name || null,
+				postType: select( editorStore ).getCurrentPostType(),
+ 				currentUser: select( coreStore ).getCurrentUser()?.name || null,
 				clientId:
 					select( blockEditorStore ).getSelectedBlockClientId() ||
 					null,
@@ -109,6 +89,17 @@ const CollabBoard = ( { contentRef, onClose } ) => {
 		},
 		[ threadId ]
 	);
+
+	const [ meta, setMeta ] = useEntityProp(
+		'postType',
+		postType,
+		'meta',
+	);
+
+	const allThreads = meta?.collab ? JSON.parse( meta.collab ) : [];
+	const currentThread = allThreads[ threadId ] ?? {};
+	const isCurrentThreadResolved = currentThread.threadIsResolved || false;
+	const commentsCount = isCurrentThreadResolved ? 0 : currentThread.comments?.length || 0;
 
 	// Helper function to generate a new comment.
 	const generateNewComment = () => ( {
@@ -133,23 +124,21 @@ const CollabBoard = ( { contentRef, onClose } ) => {
 		},
 	} );
 
+	const updateCommentMeta = ( updatedComments ) => {
+		setMeta( { ...meta, collab: JSON.stringify( updatedComments ) } );
+	}
+
 	// Function to save the comment.
-	const saveComment = async () => {
+	const saveComment = () => {
 		const newComment = generateNewComment();
 		const updatedComments = getUpdatedComments( newComment, threadId );
 
-		await saveEntityRecord( 'postType', 'post', {
-			id: postId,
-			meta: {
-				collab: JSON.stringify( updatedComments ),
-			},
-		} );
-
+		updateCommentMeta ( updatedComments );
 		setInputComment( '' );
 	};
 
 	// Function to edit the comment.
-	const editComment = async ( commentId ) => {
+	const editComment = ( commentId ) => {
 		const editedComments = { ...allThreads };
 
 		if (
@@ -165,19 +154,13 @@ const CollabBoard = ( { contentRef, onClose } ) => {
 			} );
 		}
 
-		await saveEntityRecord( 'postType', 'post', {
-			id: postId,
-			meta: {
-				collab: JSON.stringify( editedComments ),
-			},
-		} );
-
+		updateCommentMeta ( editedComments );
 		setInputComment( '' );
 		setIsEditing( null );
 	};
 
 	// Function to mark thread as resolved
-	const markThreadAsResolved = async () => {
+	const markThreadAsResolved = () => {
 		setIsResolved( true );
 
 		const updatedComments = { ...allThreads };
@@ -190,18 +173,14 @@ const CollabBoard = ( { contentRef, onClose } ) => {
 		};
 
 		// Save the updated comments.
-		await saveEntityRecord( 'postType', 'post', {
-			id: postId,
-			meta: { collab: JSON.stringify( updatedComments ) },
-		} );
-
+		updateCommentMeta ( updatedComments );
 		removeBorder();
 		setThreadId( null );
 		onClose();
 	};
 
 	// Function to delete a comment.
-	const deleteComment = async ( commentId ) => {
+	const deleteComment = ( commentId ) => {
 		// Filter out the comment to be deleted.
 		const currentComments = allThreads[ threadId ].comments.filter(
 			( comment ) => comment.commentId !== commentId
@@ -224,10 +203,7 @@ const CollabBoard = ( { contentRef, onClose } ) => {
 		}
 
 		// Save the updated comments.
-		await saveEntityRecord( 'postType', 'post', {
-			id: postId,
-			meta: { collab: JSON.stringify( updatedComments ) },
-		} );
+		updateCommentMeta ( updatedComments );
 	};
 
 	// Function to show the confirmation overlay.

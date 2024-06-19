@@ -30,10 +30,9 @@ const isBlockCommentExperimentEnabled =
  */
 export default function CollabSidebar() {
 	const { threads } = useSelect( ( select ) => {
-		const post = select( editorStore ).getCurrentPost();
-
+		const meta = select( editorStore ).getEditedPostAttribute( 'meta' );
 		return {
-			threads: post?.meta?.collab ? JSON.parse( post.meta.collab ) : [],
+			threads: meta?.collab ? JSON.parse( meta.collab ) : false,
 		};
 	}, [] );
 
@@ -54,7 +53,7 @@ export default function CollabSidebar() {
 			<div className="editor-collab-sidebar__activities">
 				{
 					// If there are no threads, show a message indicating no threads are available.
-					Object.keys( threads ).length === 0 && (
+					! threads && (
 						<VStack
 							className="editor-collab-sidebar__thread"
 							spacing="3"
