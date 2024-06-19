@@ -53,6 +53,15 @@
 			display: block;
 		}
 	}
+
+	// Add a gap before the block toolbar or its toggle button when collapsed.
+	.editor-collapsible-block-toolbar {
+		margin-inline: $grid-unit 0;
+
+		&.is-collapsed ~ .editor-collapsible-block-toolbar__toggle {
+			margin-inline: $grid-unit 0;
+		}
+	}
 }
 
 .editor-header__center {

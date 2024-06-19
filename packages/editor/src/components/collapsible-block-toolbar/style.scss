@@ -74,10 +74,6 @@
 
 	&.is-collapsed {
 		display: none;
-
-		~ .editor-collapsible-block-toolbar__toggle {
-			margin-left: $grid-unit-10;
-		}
 	}
 }
 
