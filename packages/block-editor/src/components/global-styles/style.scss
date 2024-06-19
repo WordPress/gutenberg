@@ -75,11 +75,14 @@
 	position: relative;
 	border: 1px solid $gray-300;
 	border-radius: 2px;
-	display: flex;
 	justify-content: center;
 	align-items: stretch;
 	// Full width. ToolsPanel lays out children in a grid.
 	grid-column: 1 / -1;
+
+	&.has-image {
+		display: flex;
+	}
 
 	&.is-open {
 		background-color: $gray-100;
@@ -87,6 +90,15 @@
 
 	.block-editor-global-styles-background-panel__inspector-preview-inner {
 		height: 100%;
+	}
+
+	.block-editor-global-styles-background-panel__image-tools-panel-item {
+		&.is-wide {
+			width: 100%;
+			.block-editor-global-styles-background-panel__inspector-preview-inner {
+				justify-content: center;
+			}
+		}
 	}
 
 	.block-editor-global-styles-background-panel__image-preview,
@@ -115,7 +127,7 @@
 
 	button.components-button {
 		color: $gray-900;
-		box-shadow: inset 0 0 0 $border-width $gray-400;
+		//box-shadow: inset 0 0 0 $border-width $gray-400;
 		width: 100%;
 		display: block;
 
@@ -180,7 +192,7 @@
 }
 
 .block-editor-global-styles-background-panel__hidden-tools-panel-item {
-	height: 0px;
+	height: 0;
+	width: 0;
 	position: absolute;
-	width: 0px;
 }

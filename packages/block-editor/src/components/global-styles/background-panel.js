@@ -28,7 +28,13 @@ import {
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { getFilename } from '@wordpress/url';
-import { useCallback, Platform, useRef, useState } from '@wordpress/element';
+import {
+	useCallback,
+	Platform,
+	useRef,
+	useState,
+	useEffect,
+} from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { focus } from '@wordpress/dom';
 import { isBlobURL } from '@wordpress/blob';
@@ -53,6 +59,7 @@ const BACKGROUND_POPOVER_PROPS = {
 	offset: 36,
 	shift: true,
 };
+const noop = () => {};
 
 /**
  * Checks site settings to see if the background panel may be used.
@@ -156,7 +163,13 @@ function InspectorImagePreviewItem( {
 	filename,
 	label,
 	className,
+	onToggleCallback = noop,
 } ) {
+	useEffect( () => {
+		if ( typeof toggleProps?.isOpen !== 'undefined' ) {
+			onToggleCallback( toggleProps?.isOpen );
+		}
+	}, [ toggleProps?.isOpen ] );
 	return (
 		<ItemGroup as={ as } className={ className } { ...toggleProps }>
 			<HStack
@@ -164,25 +177,25 @@ function InspectorImagePreviewItem( {
 				as="span"
 				className="block-editor-global-styles-background-panel__inspector-preview-inner"
 			>
-				<span
-					className={ clsx(
-						'block-editor-global-styles-background-panel__inspector-image-indicator-wrapper',
-						{
-							'has-image': imgUrl,
-						}
-					) }
-					aria-hidden
-				>
-					{ imgUrl && (
+				{ imgUrl && (
+					<span
+						className={ clsx(
+							'block-editor-global-styles-background-panel__inspector-image-indicator-wrapper',
+							{
+								'has-image': imgUrl,
+							}
+						) }
+						aria-hidden
+					>
 						<span
 							className="block-editor-global-styles-background-panel__inspector-image-indicator"
 							style={ {
 								backgroundImage: `url(${ imgUrl })`,
 							} }
 						/>
-					) }
-				</span>
-				<FlexItem as="span">
+					</span>
+				) }
+				<FlexItem as="span" style={ { flexGrow: 1 } }>
 					<Truncate
 						numberOfLines={ 1 }
 						className="block-editor-global-styles-background-panel__inspector-media-replace-title"
@@ -204,14 +217,11 @@ function InspectorImagePreviewItem( {
 	);
 }
 
-const noop = () => {};
-
 function InspectorImagePreviewToggle( {
 	label,
 	filename,
 	url: imgUrl,
 	children,
-	allowPopover = false,
 	onToggle: onToggleCallback = noop,
 	hasImageValue,
 } ) {
@@ -222,16 +232,6 @@ function InspectorImagePreviewToggle( {
 	const imgLabel =
 		label || getFilename( imgUrl ) || __( 'Add background image' );
 
-	if ( ! allowPopover ) {
-		return (
-			<InspectorImagePreviewItem
-				className="block-editor-global-styles-background-panel__image-preview"
-				imgUrl={ imgUrl }
-				filename={ filename }
-				label={ imgLabel }
-			/>
-		);
-	}
 	return (
 		<Dropdown
 			popoverProps={ BACKGROUND_POPOVER_PROPS }
@@ -245,8 +245,8 @@ function InspectorImagePreviewToggle( {
 					'aria-label': __(
 						'Background size, position and repeat options.'
 					),
+					isOpen,
 				};
-				onToggleCallback( isOpen );
 				return (
 					<InspectorImagePreviewItem
 						imgUrl={ imgUrl }
@@ -254,6 +254,7 @@ function InspectorImagePreviewToggle( {
 						label={ imgLabel }
 						toggleProps={ toggleProps }
 						as="button"
+						onToggleCallback={ onToggleCallback }
 					/>
 				);
 			} }
@@ -275,6 +276,7 @@ function BackgroundImageToolsPanelItem( {
 	onChange,
 	style,
 	inheritedValue,
+	shouldShowBackgroundImageControls,
 } ) {
 	const mediaUpload = useSelect(
 		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
@@ -390,16 +392,23 @@ function BackgroundImageToolsPanelItem( {
 	const canRemove = ! hasValue && hasBackgroundImageValue( inheritedValue );
 	const imgLabel =
 		title || getFilename( url ) || __( 'Add background image' );
+
 	return (
 		<ToolsPanelItem
-			className="single-column"
+			className={ clsx(
+				'single-column',
+				'block-editor-global-styles-background-panel__image-tools-panel-item',
+				{
+					'is-wide':
+						hasImageValue && ! shouldShowBackgroundImageControls,
+				}
+			) }
 			hasValue={ () => hasValue }
 			label={ __( 'Background image' ) }
 			onDeselect={ resetBackgroundImage }
 			isShownByDefault={ isShownByDefault }
 			resetAllFilter={ resetAllFilter }
 			panelId={ panelId }
-			style={ hasImageValue ? {} : { width: '100%' } }
 		>
 			<div ref={ replaceContainerRef }>
 				<MediaReplaceFlow
@@ -409,10 +418,11 @@ function BackgroundImageToolsPanelItem( {
 					accept="image/*"
 					onSelect={ onSelectMedia }
 					name={
-						hasImageValue ? (
+						hasImageValue && shouldShowBackgroundImageControls ? (
 							<Icon icon={ reusableBlock } />
 						) : (
 							<InspectorImagePreviewItem
+								className="block-editor-global-styles-background-panel__image-preview"
 								imgUrl={ url }
 								filename={ title }
 								label={ imgLabel }
@@ -707,7 +717,6 @@ export default function BackgroundPanel( {
 				backgroundSize: undefined,
 			} )
 		);
-	//@TODO This causes "Cannot update a component while rendering a different component (`Dropdown`)" error
 	const [ isDropDownOpen, setIsDropDownOpen ] = useState( false );
 
 	return (
@@ -721,27 +730,28 @@ export default function BackgroundPanel( {
 			<div
 				className={ clsx(
 					'block-editor-global-styles-background-panel__inspector-media-replace-container',
-					{ 'is-open': isDropDownOpen }
+					{ 'is-open': isDropDownOpen, 'has-image': hasImageValue }
 				) }
 			>
-				<InspectorImagePreviewToggle
-					label={ __( 'Background image' ) }
-					filename={ title }
-					url={ getResolvedThemeFilePath( url, themeFileURIs ) }
-					allowPopover={ shouldShowBackgroundImageControls }
-					onToggle={ ( isOpen ) => setIsDropDownOpen( isOpen ) }
-					hasImageValue={ hasImageValue }
-				>
-					<BackgroundSizeToolsPanelItem
-						onChange={ onChange }
-						panelId={ panelId }
-						isShownByDefault={ defaultControls.backgroundImage }
-						style={ value }
-						defaultValues={ defaultValues }
-						inheritedValue={ inheritedValue }
-						themeFileURIs={ themeFileURIs }
-					/>
-				</InspectorImagePreviewToggle>
+				{ shouldShowBackgroundImageControls && (
+					<InspectorImagePreviewToggle
+						label={ title }
+						filename={ title }
+						url={ getResolvedThemeFilePath( url, themeFileURIs ) }
+						onToggle={ setIsDropDownOpen }
+						hasImageValue={ hasImageValue }
+					>
+						<BackgroundSizeToolsPanelItem
+							onChange={ onChange }
+							panelId={ panelId }
+							isShownByDefault={ defaultControls.backgroundImage }
+							style={ value }
+							defaultValues={ defaultValues }
+							inheritedValue={ inheritedValue }
+							themeFileURIs={ themeFileURIs }
+						/>
+					</InspectorImagePreviewToggle>
+				) }
 				<BackgroundImageToolsPanelItem
 					onChange={ onChange }
 					panelId={ panelId }
@@ -749,6 +759,9 @@ export default function BackgroundPanel( {
 					inheritedValue={ inheritedValue }
 					settings={ settings }
 					isShownByDefault={ defaultControls.backgroundImage }
+					shouldShowBackgroundImageControls={
+						shouldShowBackgroundImageControls
+					}
 				/>
 			</div>
 
