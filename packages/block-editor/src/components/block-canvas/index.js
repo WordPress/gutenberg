@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useMergeRefs } from '@wordpress/compose';
-import { useRef } from '@wordpress/element';
+import { useRef, forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -16,17 +16,18 @@ import { useMouseMoveTypingReset } from '../observe-typing';
 import { useBlockSelectionClearer } from '../block-selection-clearer';
 import { useBlockCommands } from '../use-block-commands';
 
-function FocusableWrapper( { children } ) {
+const FocusableWrapper = forwardRef( ( { children }, ref ) => {
 	return (
 		<div
 			className="block-editor-accessible-wrapper"
 			tabIndex="-1"
 			aria-label="Block canvas"
+			ref={ ref }
 		>
 			{ children }
 		</div>
 	);
-}
+} );
 
 export function ExperimentalBlockCanvas( {
 	shouldIframe = true,
@@ -35,6 +36,7 @@ export function ExperimentalBlockCanvas( {
 	styles,
 	contentRef: contentRefProp,
 	iframeProps,
+	focusableWrapperRef,
 } ) {
 	useBlockCommands();
 	const resetTypingRef = useMouseMoveTypingReset();
@@ -61,7 +63,9 @@ export function ExperimentalBlockCanvas( {
 						width: '100%',
 					} }
 				>
-					<FocusableWrapper>{ children }</FocusableWrapper>
+					<FocusableWrapper ref={ focusableWrapperRef }>
+						{ children }
+					</FocusableWrapper>
 				</WritingFlow>
 			</BlockTools>
 		);
@@ -82,7 +86,9 @@ export function ExperimentalBlockCanvas( {
 				name="editor-canvas"
 			>
 				<EditorStyles styles={ styles } />
-				<FocusableWrapper>{ children }</FocusableWrapper>
+				<FocusableWrapper ref={ focusableWrapperRef }>
+					{ children }
+				</FocusableWrapper>
 			</Iframe>
 		</BlockTools>
 	);

@@ -108,6 +108,7 @@ _Parameters_
 
 -   _props_ `Object`: Component props.
 -   _props.rootLabelText_ `string`: Translated label for the root element of the breadcrumb trail.
+-   _props.focusableWrapperRef_ `Object`: Ref of the element to focus when the breadcrumb is clicked.
 
 _Returns_
 

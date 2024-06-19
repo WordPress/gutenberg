@@ -12,16 +12,16 @@ import { chevronRightSmall, Icon } from '@wordpress/icons';
 import BlockTitle from '../block-title';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import { __unstableUseBlockRef as useBlockRef } from '../block-list/use-block-props/use-block-refs';
 
 /**
  * Block breadcrumb component, displaying the hierarchy of the current block selection as a breadcrumb.
  *
- * @param {Object} props               Component props.
- * @param {string} props.rootLabelText Translated label for the root element of the breadcrumb trail.
- * @return {Element}                   Block Breadcrumb.
+ * @param {Object} props                     Component props.
+ * @param {string} props.rootLabelText       Translated label for the root element of the breadcrumb trail.
+ * @param {Object} props.focusableWrapperRef Ref of the element to focus when the breadcrumb is clicked.
+ * @return {Element}                         Block Breadcrumb.
  */
-function BlockBreadcrumb( { rootLabelText } ) {
+function BlockBreadcrumb( { rootLabelText, focusableWrapperRef } ) {
 	const { selectBlock, clearSelectedBlock } = useDispatch( blockEditorStore );
 	const { clientId, parents, hasSelection } = useSelect( ( select ) => {
 		const {
@@ -37,10 +37,6 @@ function BlockBreadcrumb( { rootLabelText } ) {
 		};
 	}, [] );
 	const rootLabel = rootLabelText || __( 'Document' );
-
-	// We don't care about this specific ref, but this is a way
-	// to get a ref within the editor canvas so we can focus it later.
-	const blockRef = useBlockRef( clientId );
 
 	/*
 	 * Disable reason: The `list` ARIA role is redundant but
@@ -67,10 +63,9 @@ function BlockBreadcrumb( { rootLabelText } ) {
 						variant="tertiary"
 						onClick={ () => {
 							clearSelectedBlock();
+
 							// Focus the editor iframe.
-							blockRef.current
-								?.closest( '[aria-label="Block canvas"]' )
-								?.focus();
+							focusableWrapperRef.current?.focus();
 						} }
 					>
 						{ rootLabel }

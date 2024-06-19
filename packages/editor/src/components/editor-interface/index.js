@@ -17,7 +17,7 @@ import {
 } from '@wordpress/block-editor';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { useViewportMatch } from '@wordpress/compose';
-import { useState, useCallback } from '@wordpress/element';
+import { useState, useCallback, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -116,6 +116,7 @@ export default function EditorInterface( {
 		},
 		[ entitiesSavedStatesCallback ]
 	);
+	const focusableWrapperRef = useRef();
 
 	return (
 		<InterfaceSkeleton
@@ -191,6 +192,9 @@ export default function EditorInterface( {
 											// eslint-disable-next-line jsx-a11y/no-autofocus
 											autoFocus={ autoFocus }
 											iframeProps={ iframeProps }
+											focusableWrapperRef={
+												focusableWrapperRef
+											}
 										/>
 									) }
 									{ children }
@@ -208,7 +212,10 @@ export default function EditorInterface( {
 				isRichEditingEnabled &&
 				blockEditorMode !== 'zoom-out' &&
 				mode === 'visual' && (
-					<BlockBreadcrumb rootLabelText={ documentLabel } />
+					<BlockBreadcrumb
+						rootLabelText={ documentLabel }
+						focusableWrapperRef={ focusableWrapperRef }
+					/>
 				)
 			}
 			actions={

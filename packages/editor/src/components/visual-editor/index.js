@@ -104,6 +104,7 @@ function VisualEditor( {
 	iframeProps,
 	contentRef,
 	className,
+	focusableWrapperRef,
 } ) {
 	const [ resizeObserver, sizes ] = useResizeObserver();
 	const isMobileViewport = useViewportMatch( 'small', '<' );
@@ -407,6 +408,7 @@ function VisualEditor( {
 							...deviceStyles,
 						},
 					} }
+					focusableWrapperRef={ focusableWrapperRef }
 				>
 					{ themeSupportsLayout &&
 						! themeHasDisabledLayoutStyles &&
