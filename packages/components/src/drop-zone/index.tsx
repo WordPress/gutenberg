@@ -110,14 +110,12 @@ export function DropZoneComponent( {
 		},
 	} );
 
-	const shouldActivate =
-		( isDraggingOverDocument || isDraggingOverElement ) &&
-		( ( type === 'file' && onFilesDrop ) ||
-			( type === 'html' && onHTMLDrop ) ||
-			( type === 'default' && onDrop ) );
-
 	const classes = clsx( 'components-drop-zone', className, {
-		'is-active': shouldActivate,
+		'is-active':
+			( isDraggingOverDocument || isDraggingOverElement ) &&
+			( ( type === 'file' && onFilesDrop ) ||
+				( type === 'html' && onHTMLDrop ) ||
+				( type === 'default' && onDrop ) ),
 		'has-dragged-out': ! isDraggingOverElement,
 		// Keeping the following classnames for legacy purposes
 		'is-dragging-over-document': isDraggingOverDocument,
