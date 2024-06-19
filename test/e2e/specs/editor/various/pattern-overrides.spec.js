@@ -320,6 +320,7 @@ test.describe( 'Pattern Overrides', () => {
 		requestUtils,
 		editor,
 		context,
+		pageUtils,
 	} ) => {
 		const buttonName = 'Editable button';
 		const { id } = await requestUtils.createBlock( {
@@ -339,11 +340,12 @@ test.describe( 'Pattern Overrides', () => {
 			attributes: { ref: id },
 		} );
 
-		// Focus the button, open the link popup.
-		await editor.canvas
+		const button = editor.canvas
 			.getByRole( 'document', { name: 'Block: Button' } )
-			.getByRole( 'textbox', { name: 'Button text' } )
-			.focus();
+			.getByRole( 'textbox', { name: 'Button text' } );
+		// Focus the button, open the link popup.
+		await button.focus();
+		await pageUtils.pressKeys( 'Meta+k' );
 		await expect(
 			page.getByRole( 'link', { name: 'wp.org' } ).getByText( '↗' )
 		).toHaveAttribute( 'aria-label', '(opens in a new tab)' );
@@ -395,6 +397,10 @@ test.describe( 'Pattern Overrides', () => {
 			'noreferrer noopener'
 		);
 
+		// Reopen the link popup.
+		await button.focus();
+		await pageUtils.pressKeys( 'Meta+k' );
+
 		// Uncheck both checkboxes.
 		await editLinkButton.click();
 		await openInNewTabCheckbox.setChecked( false );
@@ -410,6 +416,10 @@ test.describe( 'Pattern Overrides', () => {
 		await previewPage.reload();
 		await expect( buttonLink ).toHaveAttribute( 'target', '' );
 		await expect( buttonLink ).toHaveAttribute( 'rel', '' );
+
+		// Reopen the link popup.
+		await button.focus();
+		await pageUtils.pressKeys( 'Meta+k' );
 
 		// Check only the "mark as nofollow" checkbox.
 		await editLinkButton.click();
