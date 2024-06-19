@@ -1268,11 +1268,24 @@ _Returns_
 
 ### PostSlug
 
-Undocumented declaration.
+Renders the PostSlug component. It provide a control for editing the post slug.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### PostSlugCheck
 
-Undocumented declaration.
+Wrapper component that renders its children only if the post type supports the slug.
+
+_Parameters_
+
+-   _props_ `Object`: Props.
+-   _props.children_ `Element`: Children to be rendered.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### PostSticky
 

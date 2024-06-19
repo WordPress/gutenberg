@@ -48,7 +48,7 @@
 
 ## 4.25.0 (2023-08-16)
 
-### Enhancement
+### Enhancements
 
 -   Updated `npm-package-json-lint` peer dependency to require v6.0.0 [#53636](https://github.com/WordPress/gutenberg/pull/53636)
 
@@ -98,13 +98,13 @@
 
 ## 4.2.0 (2022-08-24)
 
-### Bug Fix
+### Bug Fixes
 
 -   Packages: Replace `is-plain-obj` with native functionality ([#43511](https://github.com/WordPress/gutenberg/pull/43511)).
 
 ## 4.0.0 (2021-01-21)
 
-### Breaking Change
+### Breaking Changes
 
 -   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
 
@@ -114,13 +114,13 @@
 
 ## 3.0.0 (2020-04-15)
 
-### Breaking Change
+### Breaking Changes
 
 -   Add `types` to the order of preferred properties. ([#18942](https://github.com/WordPress/gutenberg/pull/18942))
 
 ## 2.0.0 (2019-06-12)
 
-### Breaking Change
+### Breaking Changes
 
 -   Added `type` and `react-native` to the order of preferred properties.
 
@@ -132,13 +132,13 @@
 
 ## 1.1.3 (2018-09-05)
 
-### Bug Fix
+### Bug Fixes
 
 -   Resolves an issue where npm package lint script did not work in Windows environments ([#9321](https://github.com/WordPress/gutenberg/pull/9321)
 
 ## 1.1.0 (2018-07-12)
 
-### New Feature
+### New Features
 
 -   Updated build to work with Babel 7 ([#7832](https://github.com/WordPress/gutenberg/pull/7832))
 
@@ -148,6 +148,6 @@
 
 ## 1.0.0 (2018-05-18)
 
-### New Feature
+### New Features
 
 -   Initial release `@wordpress/npm-package-json-lint-config` ([#119](https://github.com/WordPress/packages/pull/119))

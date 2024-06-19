@@ -137,11 +137,11 @@
 
 ## 3.0.0 (2019-03-06)
 
-## Breaking Change
+### Breaking Changes
 
 -   A `parser.js` file generated from the PEGJS grammar is now outputted in commonjs format.
 
-## New Feature
+### New Features
 
 -   A `parser.php` file generated from the PEGJS grammar is now added upon installation.
 
@@ -151,7 +151,7 @@
 
 ## 2.0.0 (2018-11-12)
 
-### Breaking Change
+### Breaking Changes
 
 -   JS and PHP parsers now behave consistently when parsing empty attributes.
 

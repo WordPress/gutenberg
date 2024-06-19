@@ -881,6 +881,7 @@ export const toStyles = (
 		marginReset: true,
 		presets: true,
 		rootPadding: true,
+		variationStyles: false,
 		...styleOptions,
 	};
 	const nodesWithStyles = getNodesWithStyles( tree, blockSelectors );
@@ -1010,7 +1011,7 @@ export const toStyles = (
 					);
 				}
 
-				if ( styleVariationSelectors ) {
+				if ( options.variationStyles && styleVariationSelectors ) {
 					Object.entries( styleVariationSelectors ).forEach(
 						( [ styleVariationName, styleVariationSelector ] ) => {
 							const styleVariations =

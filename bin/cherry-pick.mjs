@@ -170,12 +170,23 @@ async function fetchPRs() {
  * @return {Promise<Object>} Parsed response JSON.
  */
 async function GitHubFetch( path ) {
+	const token = getGitHubAuthToken();
 	const response = await fetch( 'https://api.github.com' + path, {
 		headers: {
 			Accept: 'application/vnd.github.v3+json',
+			Authorization: `Bearer ${ token }`,
 		},
 	} );
 	return await response.json();
+}
+
+/**
+ * Retrieves the GitHub authentication token using `gh auth token`.
+ *
+ * @return {string} The GitHub authentication token.
+ */
+function getGitHubAuthToken() {
+	return cli( 'gh', [ 'auth', 'token' ] );
 }
 
 /**
