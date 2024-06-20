@@ -14,6 +14,13 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import { useGetBlocksBeforeCurrentCell } from '../grid/use-get-blocks-before-current-cell';
+import { store as blockEditorStore } from '../../store';
 
 function helpText( selfStretch, parentLayout ) {
 	const { orientation = 'horizontal' } = parentLayout;
@@ -60,9 +67,19 @@ export default function ChildLayoutControl( {
 		type: parentType,
 		default: { type: defaultParentType = 'default' } = {},
 		orientation = 'horizontal',
+		columnCount,
 	} = parentLayout ?? {};
 	const parentLayoutType = parentType || defaultParentType;
-
+	const gridColumnNumber = parseInt( columnCount, 10 ) || 3;
+	const rootClientId = useSelect( ( select ) =>
+		select( blockEditorStore ).getBlockRootClientId( panelId )
+	);
+	const { moveBlocksToPosition } = useDispatch( blockEditorStore );
+	const getBlocksBeforeCurrentCell = useGetBlocksBeforeCurrentCell(
+		rootClientId,
+		gridColumnNumber,
+		parentLayoutType === 'grid'
+	);
 	const hasFlexValue = () => !! selfStretch;
 	const flexResetLabel =
 		orientation === 'horizontal' ? __( 'Width' ) : __( 'Height' );
@@ -220,6 +237,19 @@ export default function ChildLayoutControl( {
 											columnSpan,
 											rowSpan,
 										} );
+										const currentBlockIndex =
+											( parseInt( rowStart, 10 ) - 1 ) *
+												gridColumnNumber +
+											parseInt( value, 10 ) -
+											1;
+										moveBlocksToPosition(
+											[ panelId ],
+											rootClientId,
+											rootClientId,
+											getBlocksBeforeCurrentCell(
+												currentBlockIndex
+											)
+										);
 									} }
 									value={ columnStart }
 									min={ 1 }
@@ -244,6 +274,19 @@ export default function ChildLayoutControl( {
 											columnSpan,
 											rowSpan,
 										} );
+										const currentBlockIndex =
+											( parseInt( value, 10 ) - 1 ) *
+												gridColumnNumber +
+											parseInt( columnStart, 10 ) -
+											1;
+										moveBlocksToPosition(
+											[ panelId ],
+											rootClientId,
+											rootClientId,
+											getBlocksBeforeCurrentCell(
+												currentBlockIndex
+											)
+										);
 									} }
 									value={ rowStart }
 									min={ 1 }

@@ -76,7 +76,7 @@ const GridVisualizerGrid = forwardRef( ( { clientId, gridElement }, ref ) => {
 
 	const getBlocksBeforeCurrentCell = useGetBlocksBeforeCurrentCell(
 		clientId,
-		gridInfo
+		gridInfo.numColumns
 	);
 
 	let index = 0;

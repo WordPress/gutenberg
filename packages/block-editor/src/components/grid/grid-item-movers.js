@@ -10,8 +10,6 @@ import { useDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import BlockControls from '../block-controls';
-import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
-import { getGridInfo } from './utils';
 import { useGetBlocksBeforeCurrentCell } from './use-get-blocks-before-current-cell';
 import { store as blockEditorStore } from '../../store';
 
@@ -24,12 +22,6 @@ export function GridItemMovers( {
 } ) {
 	const { moveBlocksToPosition } = useDispatch( blockEditorStore );
 
-	const gridInfo = getGridInfo( useBlockElement( gridClientId ) );
-	const getBlocksBeforeCurrentCell = useGetBlocksBeforeCurrentCell(
-		gridClientId,
-		gridInfo
-	);
-
 	const columnStart = layout?.columnStart ?? 1;
 	const rowStart = layout?.rowStart ?? 1;
 	const columnSpan = layout?.columnSpan ?? 1;
@@ -39,8 +31,12 @@ export function GridItemMovers( {
 	const columnCount = parentLayout?.columnCount;
 	const rowCount = parentLayout?.rowCount;
 
-	const currentBlockIndex =
-		( rowStart - 1 ) * gridInfo.numColumns + columnStart - 1;
+	const getBlocksBeforeCurrentCell = useGetBlocksBeforeCurrentCell(
+		gridClientId,
+		columnCount
+	);
+
+	const currentBlockIndex = ( rowStart - 1 ) * columnCount + columnStart - 1;
 
 	return (
 		<BlockControls group="parent">
@@ -57,7 +53,7 @@ export function GridItemMovers( {
 						gridClientId,
 						gridClientId,
 						getBlocksBeforeCurrentCell(
-							currentBlockIndex - gridInfo.numColumns
+							currentBlockIndex - columnCount
 						)
 					);
 				} }
@@ -75,7 +71,7 @@ export function GridItemMovers( {
 						gridClientId,
 						gridClientId,
 						getBlocksBeforeCurrentCell(
-							currentBlockIndex + gridInfo.numColumns
+							currentBlockIndex + columnCount
 						)
 					);
 				} }
