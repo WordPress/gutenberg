@@ -282,6 +282,8 @@ describe.each( [
 			} )
 		);
 
+		// NOTE: legacy CustomSelectControl doesn't fire onChange
+		// at this point in time.
 		expect( mockOnChange ).toHaveBeenNthCalledWith(
 			1,
 			expect.objectContaining( {
@@ -351,6 +353,33 @@ describe.each( [
 	} );
 
 	describe( 'Keyboard behavior and accessibility', () => {
+		// skip reason: legacy v2 doesn't currently implement this behavior
+		it.skip( 'Captures the keypress event and does not let it propagate', async () => {
+			const onKeyDown = jest.fn();
+
+			render(
+				<div
+					// This role="none" is required to prevent an eslint warning about accessibility.
+					role="none"
+					onKeyDown={ onKeyDown }
+				>
+					<Component { ...legacyProps } />
+				</div>
+			);
+			const currentSelectedItem = screen.getByRole( 'combobox', {
+				expanded: false,
+			} );
+			await click( currentSelectedItem );
+
+			const customSelect = screen.getByRole( 'listbox', {
+				name: 'label!',
+			} );
+			expect( customSelect ).toHaveFocus();
+			await press.Enter();
+
+			expect( onKeyDown ).toHaveBeenCalledTimes( 0 );
+		} );
+
 		it( 'Should be able to change selection using keyboard', async () => {
 			render( <Component { ...legacyProps } /> );
 
