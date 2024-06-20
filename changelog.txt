@@ -1,17 +1,10 @@
 == Changelog ==
 
-= 18.6.0-rc.1 =
-
+= 18.6.0 =
 
 ## Changelog
 
 ### Enhancements
-
-- Add JSON Schema for `.wp-env.json` files. ([36276](https://github.com/WordPress/gutenberg/pull/36276))
-- Add `WP_ENV_TESTS_MYSQL_PORT` / `.wp-env.json` `.env.tests.mysqlPort` option etc. ([61057](https://github.com/WordPress/gutenberg/pull/61057))
-- MediaUpload: Remove dialog markup on close. ([62168](https://github.com/WordPress/gutenberg/pull/62168))
-- Move the template part menu items to the editor package. ([62366](https://github.com/WordPress/gutenberg/pull/62366))
-- Template inspector: Small visual adjustments. ([62537](https://github.com/WordPress/gutenberg/pull/62537))
 
 #### Design Tools
 - Post content block: Add background image and padding support. ([62499](https://github.com/WordPress/gutenberg/pull/62499))
@@ -30,6 +23,7 @@
 - Change bindings panel title, add description. ([62489](https://github.com/WordPress/gutenberg/pull/62489))
 
 #### Site Editor
+- Template inspector: Small visual adjustments. ([62537](https://github.com/WordPress/gutenberg/pull/62537))
 - Unify DataViews Header Title & Subtitle. ([62429](https://github.com/WordPress/gutenberg/pull/62429))
 
 #### Document Settings
@@ -56,6 +50,7 @@
 - Fix: Show homepage link on frontpage instead of the slug. ([62279](https://github.com/WordPress/gutenberg/pull/62279))
 - Fix: Unquoted file argument in declaration check script. ([62482](https://github.com/WordPress/gutenberg/pull/62482))
 - List: Fix pasting. ([62428](https://github.com/WordPress/gutenberg/pull/62428))
+- MediaUpload: Remove dialog markup on close. ([62168](https://github.com/WordPress/gutenberg/pull/62168))
 - Revert CSS removal for interface footer breadcrumbs. ([62309](https://github.com/WordPress/gutenberg/pull/62309))
 - Revert test data for `WithSlug` variation. ([62579](https://github.com/WordPress/gutenberg/pull/62579))
 - Scripts: Pin the @wordpress/scripts version to a version supported by 6.5. ([62234](https://github.com/WordPress/gutenberg/pull/62234))
@@ -218,6 +213,7 @@
 - Fix: Remove unused code from dataviews styles. ([62275](https://github.com/WordPress/gutenberg/pull/62275))
 - Fix: Remove unused typography panel styles. ([62295](https://github.com/WordPress/gutenberg/pull/62295))
 - Fixed : Disambiguate "Cover" translatable string in the context of background-panel.js. ([62440](https://github.com/WordPress/gutenberg/pull/62440))
+- Move the template part menu items to the editor package. ([62366](https://github.com/WordPress/gutenberg/pull/62366))
 - Shortcut Help modal: Remove CSS hack for Internet Explorer 11. ([62564](https://github.com/WordPress/gutenberg/pull/62564))
 - Use stable reference for `getEntityActions` action. ([62536](https://github.com/WordPress/gutenberg/pull/62536))
 
@@ -268,6 +264,10 @@
 - Build JS module only in development mode. ([62398](https://github.com/WordPress/gutenberg/pull/62398))
 - Speed up check-build-type-declaration-files. ([62538](https://github.com/WordPress/gutenberg/pull/62538))
 
+#### wp-env
+- Add JSON Schema for `.wp-env.json` files. ([36276](https://github.com/WordPress/gutenberg/pull/36276))
+- Add `WP_ENV_TESTS_MYSQL_PORT` / `.wp-env.json` `.env.tests.mysqlPort` option etc. ([61057](https://github.com/WordPress/gutenberg/pull/61057))
+
 
 ### Various
 
@@ -292,6 +292,8 @@ The following PRs were merged by first time contributors:
 The following contributors merged PRs in this release:
 
 @aaronrobertshaw @aaronware @afercia @ajlende @akasunil @amitraj2203 @andrewserong @BrianHenryIE @carolinan @carstingaxion @cbravobernal @colorful-tones @DaniGuardiola @desrosj @ellatrix @fabiankaegy @geriux @gigitux @gziolo @jameskoster @jasmussen @jeryj @joemcgill @jorgefilipecosta @jsnajdr @juanmaguitar @kevin940726 @Mamaduka @mcsf @mirka @narenin @noisysocks @ntsekouras @oandregal @ockham @ramonjd @richtabor @SantosGuillamot @scruffian @shail-mehta @sirreal @stokesman @t-hamano @talldan @tellthemachines @tjcafferkey @up1512001 @vipul0425 @westonruter @WunderBart @youknowriad
+
+
 
 
 = 18.5.0 =
