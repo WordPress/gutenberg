@@ -90,7 +90,7 @@ function FontSize() {
 
 	const handleCustomFluidValues = ( value ) => {
 		if ( value ) {
-			// If custom values are use init the values with the current ones.
+			// If custom values are used, init the values with the current ones.
 			updateFontSize( 'fluid', {
 				min: fontSize.size,
 				max: fontSize.size,
