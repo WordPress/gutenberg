@@ -14,7 +14,11 @@ import { useState } from '@wordpress/element';
  */
 import UncontrolledCustomSelectControl from '..';
 
-const customClass = 'amber-skies';
+const customClassName = 'amber-skies';
+const customStyles = {
+	backgroundColor: 'rgb(127, 255, 212)',
+	rotate: '13deg',
+};
 
 const props = {
 	label: 'label!',
@@ -26,7 +30,7 @@ const props = {
 		{
 			key: 'flower2',
 			name: 'crimson clover',
-			className: customClass,
+			className: customClassName,
 		},
 		{
 			key: 'flower3',
@@ -35,15 +39,12 @@ const props = {
 		{
 			key: 'color1',
 			name: 'amber',
-			className: customClass,
+			className: customClassName,
 		},
 		{
 			key: 'color2',
 			name: 'aquamarine',
-			style: {
-				backgroundColor: 'rgb(127, 255, 212)',
-				rotate: '13deg',
-			},
+			style: customStyles,
 		},
 	],
 };
@@ -144,7 +145,7 @@ describe.each( [
 		// assert against filtered array
 		itemsWithClass.map( ( { name } ) =>
 			expect( screen.getByRole( 'option', { name } ) ).toHaveClass(
-				customClass
+				customClassName
 			)
 		);
 
@@ -156,15 +157,13 @@ describe.each( [
 		// assert against filtered array
 		itemsWithoutClass.map( ( { name } ) =>
 			expect( screen.getByRole( 'option', { name } ) ).not.toHaveClass(
-				customClass
+				customClassName
 			)
 		);
 	} );
 
 	it( 'Should apply styles only to options that have styles defined', async () => {
 		const user = userEvent.setup();
-		const customStyles =
-			'background-color: rgb(127, 255, 212); rotate: 13deg;';
 
 		render( <Component { ...props } /> );
 
