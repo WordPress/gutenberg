@@ -11,6 +11,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
 import { useMergeRefs, useDisabled } from '@wordpress/compose';
 import warning from '@wordpress/warning';
+import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -31,6 +32,7 @@ import { useIntersectionObserver } from './use-intersection-observer';
 import { useScrollIntoView } from './use-scroll-into-view';
 import { useFlashEditableBlocks } from '../../use-flash-editable-blocks';
 import { canBindBlock } from '../../../hooks/use-bindings-attributes';
+import { store as blockEditorStore } from '../../../store';
 
 /**
  * This hook is used to lightly mark an element as a block element. The element
@@ -74,6 +76,7 @@ import { canBindBlock } from '../../../hooks/use-bindings-attributes';
  *
  * @return {Object} Props to pass to the element to mark as a block.
  */
+
 export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const {
 		clientId,
@@ -105,6 +108,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		templateLock,
 	} = useContext( PrivateBlockContext );
 
+	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
 	// translators: %s: Type of block (i.e. Text, Image etc)
 	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
 	const htmlSuffix = mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
@@ -154,7 +158,8 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		hasNegativeMargin = true;
 	}
 
-	return {
+	let clickedBlock;
+	const blockProps = {
 		tabIndex: blockEditingMode === 'disabled' ? -1 : 0,
 		...wrapperProps,
 		...props,
@@ -194,6 +199,16 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		),
 		style: { ...wrapperProps.style, ...props.style, ...bindingsStyle },
 	};
+
+	if ( hasOverlay ) {
+		blockProps.onClick = () => {
+			if ( clickedBlock === clientId ) {
+				__unstableSetEditorMode( 'edit' );
+			}
+			clickedBlock = clientId;
+		};
+	}
+	return blockProps;
 }
 
 /**
