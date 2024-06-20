@@ -46,6 +46,16 @@ const props = {
 			name: 'aquamarine',
 			style: customStyles,
 		},
+		{
+			key: 'color3',
+			name: 'tomato (with custom props)',
+			className: customClassName,
+			style: customStyles,
+			// try passing a valid HTML attribute
+			'aria-label': 'test label',
+			// try adding a custom prop
+			customPropFoo: 'foo',
+		},
 	],
 };
 
@@ -247,56 +257,28 @@ describe.each( [
 		).toHaveTextContent( 'Hint' );
 	} );
 
-	it( 'Should accept and pass arbitrary properties to the selectedItem object in the onChange callback', async () => {
+	it( 'shows selected hint in list of options when added, regardless of __experimentalShowSelectedHint prop', async () => {
 		const user = userEvent.setup();
-		const onChangeMock = jest.fn();
 
 		render(
 			<Component
 				{ ...props }
+				label="Custom select"
 				options={ [
-					...props.options,
 					{
-						key: 'custom',
-						name: 'Custom Option',
-						className: 'custom-class-name',
-						customProp1: 'value1',
-						customProp2: 42,
-						style: {
-							backgroundColor: 'rgb(127, 255, 212)',
-							rotate: '13deg',
-						},
+						key: 'one',
+						name: 'One',
+						__experimentalHint: 'Hint',
 					},
 				] }
-				onChange={ onChangeMock }
 			/>
 		);
 
-		const currentSelectedItem = screen.getByRole( 'button', {
-			expanded: false,
-		} );
-
-		await user.click( currentSelectedItem );
 		await user.click(
-			screen.getByRole( 'option', { name: 'Custom Option' } )
+			screen.getByRole( 'button', { name: 'Custom select' } )
 		);
 
-		expect( onChangeMock ).toHaveBeenCalledTimes( 1 );
-		expect( onChangeMock ).toHaveBeenCalledWith(
-			expect.objectContaining( {
-				selectedItem: expect.objectContaining( {
-					key: 'custom',
-					name: 'Custom Option',
-					className: 'custom-class-name',
-					customProp1: 'value1',
-					customProp2: 42,
-					style: {
-						backgroundColor: 'rgb(127, 255, 212)',
-						rotate: '13deg',
-					},
-				} ),
-			} )
-		);
+		expect( screen.getByRole( 'option', { name: /hint/i } ) ).toBeVisible();
 	} );
 
 	it( 'Should return object onChange', async () => {
@@ -369,6 +351,47 @@ describe.each( [
 				selectedItem: expect.objectContaining( {
 					key: 'flower3',
 					name: 'poppy',
+				} ),
+			} )
+		);
+	} );
+
+	it( 'Should accept and pass arbitrary properties to the selectedItem object in the onChange callback, but without applying them to the DOM elements apart from style and classname', async () => {
+		const user = userEvent.setup();
+		const onChangeMock = jest.fn();
+
+		render( <Component { ...props } onChange={ onChangeMock } /> );
+
+		const currentSelectedItem = screen.getByRole( 'button', {
+			expanded: false,
+		} );
+
+		await user.click( currentSelectedItem );
+
+		const optionWithCustomAttributes = screen.getByRole( 'option', {
+			name: 'tomato (with custom props)',
+		} );
+
+		// Assert that the option element does not have the custom attributes
+		expect( optionWithCustomAttributes ).not.toHaveAttribute(
+			'customPropFoo'
+		);
+		expect( optionWithCustomAttributes ).not.toHaveAttribute(
+			'aria-label'
+		);
+
+		await user.click( optionWithCustomAttributes );
+
+		expect( onChangeMock ).toHaveBeenCalledTimes( 1 );
+		expect( onChangeMock ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				selectedItem: expect.objectContaining( {
+					key: 'color3',
+					name: 'tomato (with custom props)',
+					className: customClassName,
+					style: customStyles,
+					'aria-label': 'test label',
+					customPropFoo: 'foo',
 				} ),
 			} )
 		);
