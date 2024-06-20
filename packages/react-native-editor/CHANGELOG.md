@@ -17,6 +17,7 @@ For each user feature we should also add a importance categorization label  to i
 -   [**] Add support prefix transforms [#62576]
 
 ## 1.120.1
+
 -   [*] RichText - Fix undefined onDelete callback [#62486]
 
 ## 1.120.0
