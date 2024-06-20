@@ -56,7 +56,8 @@ export default function Shuffle( { clientId, as = Container } ) {
 		return patterns.filter( ( pattern ) => {
 			const isCorePattern =
 				pattern.source === 'core' ||
-				( pattern.source?.startsWith( 'pattern-directory' ) && pattern.source !== 'pattern-directory/theme' );
+				( pattern.source?.startsWith( 'pattern-directory' ) &&
+					pattern.source !== 'pattern-directory/theme' );
 			return (
 				// Check if the pattern has only one top level block,
 				// otherwise we may shuffle to pattern that will not allow to continue shuffling.
