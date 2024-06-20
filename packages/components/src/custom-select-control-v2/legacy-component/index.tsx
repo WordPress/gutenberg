@@ -27,7 +27,11 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 	// Forward props + store from v2 implementation
 	const store = Ariakit.useSelectStore( {
 		async setValue( nextValue ) {
-			if ( ! onChange ) {
+			const nextOption = options.find(
+				( item ) => item.name === nextValue
+			);
+
+			if ( ! onChange || ! nextOption ) {
 				return;
 			}
 
@@ -36,15 +40,13 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 			await Promise.resolve();
 			const state = store.getState();
 
-			const option = options.find( ( item ) => item.name === nextValue );
-
 			const changeObject = {
 				highlightedIndex: state.renderedItems.findIndex(
 					( item ) => item.value === nextValue
 				),
 				inputValue: '',
 				isOpen: state.open,
-				selectedItem: option!,
+				selectedItem: nextOption,
 				type: '',
 			};
 			onChange( changeObject );
