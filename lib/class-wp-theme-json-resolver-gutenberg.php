@@ -172,8 +172,8 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		 *
 		 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
 		 */
-		$theme_json   = apply_filters( 'wp_theme_json_data_default', new WP_Theme_JSON_Data_Gutenberg( $config, 'default' ) );
-		if( 'default' === $theme_json->get_origin() ) {
+		$theme_json = apply_filters( 'wp_theme_json_data_default', new WP_Theme_JSON_Data_Gutenberg( $config, 'default' ) );
+		if ( 'default' === $theme_json->get_origin() ) {
 			_doing_it_wrong(
 				__METHOD__,
 				__( 'Origin should be `default` here.', 'gutenberg' ),
@@ -269,8 +269,8 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			 *
 			 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
 			 */
-			$theme_json    = apply_filters( 'wp_theme_json_data_theme', new WP_Theme_JSON_Data_Gutenberg( $theme_json_data, 'theme' ) );
-			if( 'theme' === $theme_json->get_origin() ) {
+			$theme_json = apply_filters( 'wp_theme_json_data_theme', new WP_Theme_JSON_Data_Gutenberg( $theme_json_data, 'theme' ) );
+			if ( 'theme' === $theme_json->get_origin() ) {
 				_doing_it_wrong(
 					__METHOD__,
 					__( 'Origin should be `theme` here.', 'gutenberg' ),
@@ -411,8 +411,8 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		 *
 		 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
 		 */
-		$theme_json     = apply_filters( 'wp_theme_json_data_blocks', new WP_Theme_JSON_Data_Gutenberg( $config, 'blocks' ) );
-		if( 'blocks' === $theme_json->get_origin() ) {
+		$theme_json = apply_filters( 'wp_theme_json_data_blocks', new WP_Theme_JSON_Data_Gutenberg( $config, 'blocks' ) );
+		if ( 'blocks' === $theme_json->get_origin() ) {
 			_doing_it_wrong(
 				__METHOD__,
 				__( 'Origin should be `blocks` here.', 'gutenberg' ),
@@ -552,7 +552,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
 				 */
 				$theme_json = apply_filters( 'wp_theme_json_data_user', new WP_Theme_JSON_Data_Gutenberg( $config, 'custom' ) );
-				if( 'custom' === $theme_json->get_origin() ) {
+				if ( 'custom' === $theme_json->get_origin() ) {
 					_doing_it_wrong(
 						__METHOD__,
 						__( 'Origin should be `custom` here.', 'gutenberg' ),
@@ -580,8 +580,8 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		gutenberg_register_block_style_variations_from_theme_json_data( $variations );
 
 		/** This filter is documented in wp-includes/class-wp-theme-json-resolver.php */
-		$theme_json   = apply_filters( 'wp_theme_json_data_user', new WP_Theme_JSON_Data_Gutenberg( $config, 'custom' ) );
-		if( 'custom' === $theme_json->get_origin() ) {
+		$theme_json = apply_filters( 'wp_theme_json_data_user', new WP_Theme_JSON_Data_Gutenberg( $config, 'custom' ) );
+		if ( 'custom' === $theme_json->get_origin() ) {
 			_doing_it_wrong(
 				__METHOD__,
 				__( 'Origin should be `custom` here.', 'gutenberg' ),
