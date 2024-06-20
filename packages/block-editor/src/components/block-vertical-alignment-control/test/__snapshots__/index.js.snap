@@ -16,6 +16,7 @@ exports[`BlockVerticalAlignmentUI should match snapshot when controls are hidden
     >
       <svg
         aria-hidden="true"
+        disabled=""
         focusable="false"
         height="24"
         viewBox="0 0 24 24"
@@ -48,6 +49,7 @@ exports[`BlockVerticalAlignmentUI should match snapshot when controls are visibl
       >
         <svg
           aria-hidden="true"
+          disabled=""
           focusable="false"
           height="24"
           viewBox="0 0 24 24"
@@ -70,6 +72,7 @@ exports[`BlockVerticalAlignmentUI should match snapshot when controls are visibl
       >
         <svg
           aria-hidden="true"
+          disabled=""
           focusable="false"
           height="24"
           viewBox="0 0 24 24"
@@ -92,6 +95,7 @@ exports[`BlockVerticalAlignmentUI should match snapshot when controls are visibl
       >
         <svg
           aria-hidden="true"
+          disabled=""
           focusable="false"
           height="24"
           viewBox="0 0 24 24"
