@@ -79,12 +79,11 @@ With WordPress 6.0 themes can register patterns from [Pattern Directory](https:/
 
 ```json
 {
-    "version": 2,
     "patterns": [ "short-text-surrounded-by-round-images", "partner-logos" ]
 }
 ```
 
-Note that this field requires using [version 2 of theme.json](/docs/reference-guides/theme-json-reference/theme-json-living.md). The content creator will then find the respective Pattern in the inserter “Patterns” tab in the categories that match the categories from the Pattern Directory.
+The content creator will then find the respective Pattern in the inserter “Patterns” tab in the categories that match the categories from the Pattern Directory.
 
 ## Additional resources
 

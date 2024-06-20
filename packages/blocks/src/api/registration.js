@@ -611,13 +611,13 @@ export const hasChildBlocksWithInserterSupport = ( blockName ) => {
 };
 
 /**
- * Registers a new block style for the given block.
+ * Registers a new block style for the given block types.
  *
  * For more information on connecting the styles with CSS
  * [the official documentation](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-styles/#styles).
  *
- * @param {string} blockName      Name of block (example: “core/latest-posts”).
- * @param {Object} styleVariation Object containing `name` which is the class name applied to the block and `label` which identifies the variation to the user.
+ * @param {string|Array} blockNames     Name of blocks e.g. “core/latest-posts” or `["core/group", "core/columns"]`.
+ * @param {Object}       styleVariation Object containing `name` which is the class name applied to the block and `label` which identifies the variation to the user.
  *
  * @example
  * ```js
@@ -642,8 +642,8 @@ export const hasChildBlocksWithInserterSupport = ( blockName ) => {
  * };
  * ```
  */
-export const registerBlockStyle = ( blockName, styleVariation ) => {
-	dispatch( blocksStore ).addBlockStyles( blockName, styleVariation );
+export const registerBlockStyle = ( blockNames, styleVariation ) => {
+	dispatch( blocksStore ).addBlockStyles( blockNames, styleVariation );
 };
 
 /**
@@ -723,6 +723,10 @@ export const getBlockVariations = ( blockName, scope ) => {
  * ```
  */
 export const registerBlockVariation = ( blockName, variation ) => {
+	if ( typeof variation.name !== 'string' ) {
+		console.warn( 'Variation names must be unique strings.' );
+	}
+
 	dispatch( blocksStore ).addBlockVariations( blockName, variation );
 };
 

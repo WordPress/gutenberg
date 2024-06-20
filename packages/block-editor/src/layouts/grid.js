@@ -68,7 +68,6 @@ export default {
 	inspectorControls: function GridLayoutInspectorControls( {
 		layout = {},
 		onChange,
-		clientId,
 		layoutBlockSupport = {},
 	} ) {
 		const { allowSizingOnChildren = false } = layoutBlockSupport;
@@ -90,14 +89,11 @@ export default {
 						onChange={ onChange }
 					/>
 				) }
-				{ window.__experimentalEnableGridInteractivity && (
-					<GridVisualizer clientId={ clientId } />
-				) }
 			</>
 		);
 	},
-	toolBarControls: function GridLayoutToolbarControls() {
-		return null;
+	toolBarControls: function GridLayoutToolbarControls( { clientId } ) {
+		return <GridVisualizer clientId={ clientId } />;
 	},
 	getLayoutStyle: function getLayoutStyle( {
 		selector,
@@ -136,7 +132,7 @@ export default {
 		} else if ( minimumColumnWidth ) {
 			rules.push(
 				`grid-template-columns: repeat(auto-fill, minmax(min(${ minimumColumnWidth }, 100%), 1fr))`,
-				`container-type: inline-size`
+				'container-type: inline-size'
 			);
 		}
 
@@ -207,7 +203,7 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 			<Flex gap={ 4 }>
 				<FlexItem isBlock>
 					<UnitControl
-						size={ '__unstable-large' }
+						size="__unstable-large"
 						onChange={ ( newValue ) => {
 							onChange( {
 								...layout,
@@ -255,7 +251,7 @@ function GridLayoutColumnsAndRowsControl( {
 				<Flex gap={ 4 }>
 					<FlexItem isBlock>
 						<NumberControl
-							size={ '__unstable-large' }
+							size="__unstable-large"
 							onChange={ ( value ) => {
 								/**
 								 * If the input is cleared, avoid switching
@@ -300,7 +296,7 @@ function GridLayoutColumnsAndRowsControl( {
 						<Flex gap={ 4 }>
 							<FlexItem isBlock>
 								<NumberControl
-									size={ '__unstable-large' }
+									size="__unstable-large"
 									onChange={ ( value ) => {
 										onChange( {
 											...layout,
@@ -376,12 +372,12 @@ function GridLayoutTypeControl( { layout, onChange } ) {
 			isBlock
 		>
 			<ToggleGroupControlOption
-				key={ 'auto' }
+				key="auto"
 				value="auto"
 				label={ __( 'Auto' ) }
 			/>
 			<ToggleGroupControlOption
-				key={ 'manual' }
+				key="manual"
 				value="manual"
 				label={ __( 'Manual' ) }
 			/>

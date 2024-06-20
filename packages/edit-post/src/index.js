@@ -7,7 +7,7 @@ import {
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
 import deprecated from '@wordpress/deprecated';
-import { createRoot } from '@wordpress/element';
+import { createRoot, StrictMode } from '@wordpress/element';
 import { dispatch, select } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
@@ -15,21 +15,17 @@ import {
 	registerWidgetGroupBlock,
 } from '@wordpress/widgets';
 import {
-	PluginBlockSettingsMenuItem,
-	PluginDocumentSettingPanel,
-	privateApis as editorPrivateApis,
 	store as editorStore,
+	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import './hooks';
-import './plugins';
-import Editor from './editor';
+import Layout from './components/layout';
 import { unlock } from './lock-unlock';
 
-const { PluginPostExcerpt: __experimentalPluginPostExcerpt } =
+const { BackButton: __experimentalMainDashboardButton } =
 	unlock( editorPrivateApis );
 
 /**
@@ -90,7 +86,7 @@ export function initializeEditor(
 	registerCoreBlocks();
 	registerLegacyWidgetBlock( { inserter: false } );
 	registerWidgetGroupBlock( { inserter: false } );
-	if ( process.env.IS_GUTENBERG_PLUGIN ) {
+	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 		__experimentalRegisterExperimentalCoreBlocks( {
 			enableFSEBlocks: settings.__unstableEnableFullSiteEditingBlocks,
 		} );
@@ -141,12 +137,14 @@ export function initializeEditor(
 	window.addEventListener( 'drop', ( e ) => e.preventDefault(), false );
 
 	root.render(
-		<Editor
-			settings={ settings }
-			postId={ postId }
-			postType={ postType }
-			initialEdits={ initialEdits }
-		/>
+		<StrictMode>
+			<Layout
+				settings={ settings }
+				postId={ postId }
+				postType={ postType }
+				initialEdits={ initialEdits }
+			/>
+		</StrictMode>
 	);
 
 	return root;
@@ -162,15 +160,7 @@ export function reinitializeEditor() {
 	} );
 }
 
-export { PluginBlockSettingsMenuItem };
-export { PluginDocumentSettingPanel };
-export { default as PluginMoreMenuItem } from './components/header/plugin-more-menu-item';
-export { default as PluginPostPublishPanel } from './components/sidebar/plugin-post-publish-panel';
-export { default as PluginPostStatusInfo } from './components/sidebar/plugin-post-status-info';
-export { default as PluginPrePublishPanel } from './components/sidebar/plugin-pre-publish-panel';
-export { default as PluginSidebar } from './components/sidebar/plugin-sidebar';
-export { default as PluginSidebarMoreMenuItem } from './components/header/plugin-sidebar-more-menu-item';
-export { default as __experimentalFullscreenModeClose } from './components/header/fullscreen-mode-close';
-export { default as __experimentalMainDashboardButton } from './components/header/main-dashboard-button';
-export { __experimentalPluginPostExcerpt };
+export { default as __experimentalFullscreenModeClose } from './components/back-button/fullscreen-mode-close';
+export { __experimentalMainDashboardButton };
 export { store } from './store';
+export * from './deprecated';

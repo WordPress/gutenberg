@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -17,7 +17,7 @@ import {
 	__experimentalView as View,
 } from '@wordpress/components';
 import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
-import { useCallback, Platform } from '@wordpress/element';
+import { useCallback, useState, Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -100,14 +100,13 @@ function useHasChildLayout( settings ) {
 }
 
 function useHasSpacingPresets( settings ) {
-	const {
-		custom,
-		theme,
-		default: defaultPresets,
-	} = settings?.spacing?.spacingSizes || {};
-	const presets = custom ?? theme ?? defaultPresets ?? [];
-
-	return presets.length > 0;
+	const { defaultSpacingSizes, spacingSizes } = settings?.spacing || {};
+	return (
+		( defaultSpacingSizes !== false &&
+			spacingSizes?.default?.length > 0 ) ||
+		spacingSizes?.theme?.length > 0 ||
+		spacingSizes?.custom?.length > 0
+	);
 }
 
 function filterValuesBySides( values, sides ) {
@@ -247,6 +246,10 @@ export default function DimensionsPanel( {
 			'vw',
 		],
 	} );
+
+	//Minimum Margin Value
+	const minimumMargin = -Infinity;
+	const [ minMarginValue, setMinMarginValue ] = useState( minimumMargin );
 
 	// Content Size
 	const showContentSizeControl =
@@ -435,6 +438,17 @@ export default function DimensionsPanel( {
 
 	const onMouseLeaveControls = () => onVisualize( false );
 
+	const inputProps = {
+		min: minMarginValue,
+		onDragStart: () => {
+			//Reset to 0 in case the value was negative.
+			setMinMarginValue( 0 );
+		},
+		onDragEnd: () => {
+			setMinMarginValue( minimumMargin );
+		},
+	};
+
 	return (
 		<Wrapper
 			resetAllFilter={ resetAllFilter }
@@ -512,7 +526,7 @@ export default function DimensionsPanel( {
 					isShownByDefault={
 						defaultControls.padding ?? DEFAULT_CONTROLS.padding
 					}
-					className={ classnames( {
+					className={ clsx( {
 						'tools-panel-item-spacing': showSpacingPresetsControl,
 					} ) }
 					panelId={ panelId }
@@ -552,7 +566,7 @@ export default function DimensionsPanel( {
 					isShownByDefault={
 						defaultControls.margin ?? DEFAULT_CONTROLS.margin
 					}
-					className={ classnames( {
+					className={ clsx( {
 						'tools-panel-item-spacing': showSpacingPresetsControl,
 					} ) }
 					panelId={ panelId }
@@ -561,6 +575,7 @@ export default function DimensionsPanel( {
 						<BoxControl
 							values={ marginValues }
 							onChange={ setMarginValues }
+							inputProps={ inputProps }
 							label={ __( 'Margin' ) }
 							sides={ marginSides }
 							units={ units }
@@ -574,6 +589,7 @@ export default function DimensionsPanel( {
 						<SpacingSizesControl
 							values={ marginValues }
 							onChange={ setMarginValues }
+							minimumCustomValue={ -Infinity }
 							label={ __( 'Margin' ) }
 							sides={ marginSides }
 							units={ units }
@@ -592,7 +608,7 @@ export default function DimensionsPanel( {
 					isShownByDefault={
 						defaultControls.blockGap ?? DEFAULT_CONTROLS.blockGap
 					}
-					className={ classnames( {
+					className={ clsx( {
 						'tools-panel-item-spacing': showSpacingPresetsControl,
 					} ) }
 					panelId={ panelId }

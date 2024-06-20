@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classNames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -83,7 +83,7 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 				{ controls }
 				<input
 					type="hidden"
-					className={ classNames(
+					className={ clsx(
 						className,
 						'wp-block-form-input__input',
 						colorProps.className,
@@ -103,7 +103,7 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 		<div { ...blockProps }>
 			{ controls }
 			<span
-				className={ classNames( 'wp-block-form-input__label', {
+				className={ clsx( 'wp-block-form-input__label', {
 					'is-label-inline': inlineLabel || 'checkbox' === type,
 				} ) }
 			>
@@ -120,7 +120,7 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 				/>
 				<TagName
 					type={ 'textarea' === type ? undefined : type }
-					className={ classNames(
+					className={ clsx(
 						className,
 						'wp-block-form-input__input',
 						colorProps.className,

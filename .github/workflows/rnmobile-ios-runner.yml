@@ -23,11 +23,11 @@ jobs:
                 native-test-name: [gutenberg-editor-rendering]
 
         steps:
-            - uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
+            - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
-            - uses: ruby/setup-ruby@5f19ec79cedfadb78ab837f95b87734d0003c899 # v1.173.0
+            - uses: ruby/setup-ruby@d5fb7a202fc07872cb44f00ba8e6197b70cb0c55 # v1.179.0
               with:
                   # `.ruby-version` file location
                   working-directory: packages/react-native-editor/ios
@@ -89,13 +89,13 @@ jobs:
                   rm packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app/main.jsbundle
                   rm -rf packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app/assets
 
-            - uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
+            - uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
               if: always()
               with:
                   name: ios-screen-recordings
                   path: packages/react-native-editor/ios-screen-recordings
 
-            - uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
+            - uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
               if: always()
               with:
                   name: appium-logs

@@ -141,13 +141,19 @@ figure.wp-block-image:not(.wp-block) {
 	width: 100%;
 	overflow: hidden;
 
-	// This removes the border from the img within the image cropper so it
-	// can be applied to the cropper itself. This then allows the image to be
-	// cropped within the visual border providing more accurate editing and
-	// smoother UX.
-	.reactEasyCrop_Container .reactEasyCrop_Image {
-		border: none;
-		border-radius: 0; // Prevent's theme.json radius bleeding into cropper.
+	.reactEasyCrop_Container {
+		// The linked Image block has `pointer-events: none` applied. Override it
+		// here to enable the crop action.
+		pointer-events: auto;
+
+		// This removes the border from the img within the image cropper so it
+		// can be applied to the cropper itself. This then allows the image to be
+		// cropped within the visual border providing more accurate editing and
+		// smoother UX.
+		.reactEasyCrop_Image {
+			border: none;
+			border-radius: 0; // Prevent's theme.json radius bleeding into cropper.
+		}
 	}
 }
 

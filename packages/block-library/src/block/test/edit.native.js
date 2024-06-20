@@ -45,6 +45,7 @@ const getMockedReusableBlock = ( id ) => ( {
 	title: { raw: `Reusable block - ${ id }` },
 	type: 'wp_block',
 	meta: { footnotes: '' },
+	wp_pattern_category: [],
 } );
 
 beforeAll( () => {

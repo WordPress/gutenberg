@@ -76,6 +76,77 @@ const restrictedImports = [
 		message:
 			"edit-widgets is a WordPress top level package that shouldn't be imported into other packages",
 	},
+	{
+		name: 'classnames',
+		message:
+			"Please use `clsx` instead. It's a lighter and faster drop-in replacement for `classnames`.",
+	},
+];
+
+const restrictedSyntax = [
+	// NOTE: We can't include the forward slash in our regex or
+	// we'll get a `SyntaxError` (Invalid regular expression: \ at end of pattern)
+	// here. That's why we use \\u002F in the regexes below.
+	{
+		selector:
+			'ImportDeclaration[source.value=/^@wordpress\\u002F.+\\u002F/]',
+		message: 'Path access on WordPress dependencies is not allowed.',
+	},
+	{
+		selector:
+			'CallExpression[callee.name="deprecated"] Property[key.name="version"][value.value=/' +
+			majorMinorRegExp +
+			'/]',
+		message:
+			'Deprecated functions must be removed before releasing this version.',
+	},
+	{
+		selector:
+			'CallExpression[callee.object.name="page"][callee.property.name="waitFor"]',
+		message:
+			'This method is deprecated. You should use the more explicit API methods available.',
+	},
+	{
+		selector:
+			'CallExpression[callee.object.name="page"][callee.property.name="waitForTimeout"]',
+		message: 'Prefer page.waitForSelector instead.',
+	},
+	{
+		selector: 'JSXAttribute[name.name="id"][value.type="Literal"]',
+		message:
+			'Do not use string literals for IDs; use withInstanceId instead.',
+	},
+	{
+		// Discourage the usage of `Math.random()` as it's a code smell
+		// for UUID generation, for which we already have a higher-order
+		// component: `withInstanceId`.
+		selector:
+			'CallExpression[callee.object.name="Math"][callee.property.name="random"]',
+		message:
+			'Do not use Math.random() to generate unique IDs; use withInstanceId instead. (If you’re not generating unique IDs: ignore this message.)',
+	},
+	{
+		selector:
+			'CallExpression[callee.name="withDispatch"] > :function > BlockStatement > :not(VariableDeclaration,ReturnStatement)',
+		message:
+			'withDispatch must return an object with consistent keys. Avoid performing logic in `mapDispatchToProps`.',
+	},
+	{
+		selector:
+			'LogicalExpression[operator="&&"][left.property.name="length"][right.type="JSXElement"]',
+		message:
+			'Avoid truthy checks on length property rendering, as zero length is rendered verbatim.',
+	},
+];
+
+/** `no-restricted-syntax` rules for components. */
+const restrictedSyntaxComponents = [
+	{
+		selector:
+			'JSXOpeningElement[name.name="Button"]:not(:has(JSXAttribute[name.name="__experimentalIsFocusable"])) JSXAttribute[name.name="disabled"]',
+		message:
+			'`disabled` used without the `__experimentalIsFocusable` prop. Disabling a control without maintaining focusability can cause accessibility issues, by hiding their presence from screen reader users, or preventing focus from returning to a trigger element. (Ignore this error if you truly mean to disable.)',
+	},
 ];
 
 module.exports = {
@@ -87,6 +158,7 @@ module.exports = {
 	],
 	globals: {
 		wp: 'off',
+		globalThis: 'readonly',
 	},
 	settings: {
 		jsdoc: {
@@ -98,8 +170,12 @@ module.exports = {
 	rules: {
 		'jest/expect-expect': 'off',
 		'react/jsx-boolean-value': 'error',
+		'react/jsx-curly-brace-presence': [
+			'error',
+			{ props: 'never', children: 'never' },
+		],
 		'@wordpress/dependency-group': 'error',
-		'@wordpress/is-gutenberg-plugin': 'error',
+		'@wordpress/wp-global-usage': 'error',
 		'@wordpress/react-no-unsafe-timeout': 'error',
 		'@wordpress/i18n-text-domain': [
 			'error',
@@ -137,63 +213,7 @@ module.exports = {
 				disallowTypeAnnotations: false,
 			},
 		],
-		'no-restricted-syntax': [
-			'error',
-			// NOTE: We can't include the forward slash in our regex or
-			// we'll get a `SyntaxError` (Invalid regular expression: \ at end of pattern)
-			// here. That's why we use \\u002F in the regexes below.
-			{
-				selector:
-					'ImportDeclaration[source.value=/^@wordpress\\u002F.+\\u002F/]',
-				message:
-					'Path access on WordPress dependencies is not allowed.',
-			},
-			{
-				selector:
-					'CallExpression[callee.name="deprecated"] Property[key.name="version"][value.value=/' +
-					majorMinorRegExp +
-					'/]',
-				message:
-					'Deprecated functions must be removed before releasing this version.',
-			},
-			{
-				selector:
-					'CallExpression[callee.object.name="page"][callee.property.name="waitFor"]',
-				message:
-					'This method is deprecated. You should use the more explicit API methods available.',
-			},
-			{
-				selector:
-					'CallExpression[callee.object.name="page"][callee.property.name="waitForTimeout"]',
-				message: 'Prefer page.waitForSelector instead.',
-			},
-			{
-				selector: 'JSXAttribute[name.name="id"][value.type="Literal"]',
-				message:
-					'Do not use string literals for IDs; use withInstanceId instead.',
-			},
-			{
-				// Discourage the usage of `Math.random()` as it's a code smell
-				// for UUID generation, for which we already have a higher-order
-				// component: `withInstanceId`.
-				selector:
-					'CallExpression[callee.object.name="Math"][callee.property.name="random"]',
-				message:
-					'Do not use Math.random() to generate unique IDs; use withInstanceId instead. (If you’re not generating unique IDs: ignore this message.)',
-			},
-			{
-				selector:
-					'CallExpression[callee.name="withDispatch"] > :function > BlockStatement > :not(VariableDeclaration,ReturnStatement)',
-				message:
-					'withDispatch must return an object with consistent keys. Avoid performing logic in `mapDispatchToProps`.',
-			},
-			{
-				selector:
-					'LogicalExpression[operator="&&"][left.property.name="length"][right.type="JSXElement"]',
-				message:
-					'Avoid truthy checks on length property rendering, as zero length is rendered verbatim.',
-			},
-		],
+		'no-restricted-syntax': [ 'error', ...restrictedSyntax ],
 	},
 	overrides: [
 		{
@@ -240,6 +260,20 @@ module.exports = {
 							};
 						} ),
 					},
+				],
+			},
+		},
+		{
+			files: [
+				'packages/*/src/**/*.[tj]s?(x)',
+				'storybook/stories/**/*.[tj]s?(x)',
+			],
+			excludedFiles: [ '**/*.native.js' ],
+			rules: {
+				'no-restricted-syntax': [
+					'error',
+					...restrictedSyntax,
+					...restrictedSyntaxComponents,
 				],
 			},
 		},
@@ -362,6 +396,7 @@ module.exports = {
 			rules: {
 				'no-restricted-syntax': [
 					'error',
+					...restrictedSyntax,
 					{
 						selector:
 							':matches(Literal[value=/--wp-admin-theme-/],TemplateElement[value.cooked=/--wp-admin-theme-/])',
@@ -401,6 +436,24 @@ module.exports = {
 								name: '@wordpress/core-data',
 								message:
 									"block-editor is a generic package that doesn't depend on a server or WordPress backend. To provide WordPress integration, consider passing settings to the BlockEditorProvider components.",
+							},
+						],
+					},
+				],
+			},
+		},
+		{
+			files: [ 'packages/edit-post/**', 'packages/edit-site/**' ],
+			rules: {
+				'no-restricted-imports': [
+					'error',
+					{
+						paths: [
+							...restrictedImports,
+							{
+								name: '@wordpress/interface',
+								message:
+									'The edit-post and edit-site package should not directly import the interface package. They should import them from the private APIs of the editor package instead.',
 							},
 						],
 					},

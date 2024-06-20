@@ -54,7 +54,7 @@ const MultiGroupsTemplate: StoryFn< typeof MenuGroup > = ( args ) => {
 
 	return (
 		<>
-			<MenuGroup label={ 'View' }>
+			<MenuGroup label="View">
 				<MenuItem>Top Toolbar</MenuItem>
 				<MenuItem>Spotlight Mode</MenuItem>
 				<MenuItem>Distraction Free</MenuItem>

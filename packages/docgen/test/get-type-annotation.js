@@ -100,6 +100,26 @@ describe( 'Type annotations', () => {
 		} );
 	} );
 
+	describe( 'qualified types', () => {
+		const node = parse( `
+			function fn( foo: My.Foo< string >, bar: My.Bar ) {
+				return 0;
+			}
+		` );
+
+		it( 'should get the qualified param type with type parameters', () => {
+			expect(
+				getTypeAnnotation( { tag: 'param', name: 'foo' }, node, 0 )
+			).toBe( 'My.Foo< string >' );
+		} );
+
+		it( 'should get the qualified param type without type parameters', () => {
+			expect(
+				getTypeAnnotation( { tag: 'param', name: 'bar' }, node, 1 )
+			).toBe( 'My.Bar' );
+		} );
+	} );
+
 	describe( 'literal values', () => {
 		it.each( [ "'a-string-literal'", '1000n', 'true', '1000' ] )(
 			'should handle %s',

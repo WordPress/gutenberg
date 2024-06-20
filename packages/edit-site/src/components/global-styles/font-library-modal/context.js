@@ -51,8 +51,6 @@ function FontLibraryProvider( { children } ) {
 		'globalStyles',
 		globalStylesId
 	);
-	const fontFamiliesHasChanges =
-		!! globalStyles?.edits?.settings?.typography?.fontFamilies;
 
 	const [ isInstalling, setIsInstalling ] = useState( false );
 	const [ refreshKey, setRefreshKey ] = useState( 0 );
@@ -62,14 +60,11 @@ function FontLibraryProvider( { children } ) {
 		setRefreshKey( Date.now() );
 	};
 
-	const {
-		records: libraryPosts = [],
-		isResolving: isResolvingLibrary,
-		hasResolved: hasResolvedLibrary,
-	} = useEntityRecords( 'postType', 'wp_font_family', {
-		refreshKey,
-		_embed: true,
-	} );
+	const { records: libraryPosts = [], isResolving: isResolvingLibrary } =
+		useEntityRecords( 'postType', 'wp_font_family', {
+			refreshKey,
+			_embed: true,
+		} );
 
 	const libraryFonts =
 		( libraryPosts || [] ).map( ( fontFamilyPost ) => {
@@ -87,12 +82,6 @@ function FontLibraryProvider( { children } ) {
 	const [ fontFamilies, setFontFamilies ] = useGlobalSetting(
 		'typography.fontFamilies'
 	);
-	// theme.json file font families
-	const [ baseFontFamilies ] = useGlobalSetting(
-		'typography.fontFamilies',
-		undefined,
-		'base'
-	);
 
 	/*
 	 * Save the font families to the database.
@@ -100,9 +89,9 @@ function FontLibraryProvider( { children } ) {
 	 * This function is called when the user activates or deactivates a font family.
 	 * It only updates the global styles post content in the database for new font families.
 	 * This avoids saving other styles/settings changed by the user using other parts of the editor.
-	 * 
+	 *
 	 * It uses the font families from the param to avoid using the font families from an outdated state.
-	 * 
+	 *
 	 * @param {Array} fonts - The font families that will be saved to the database.
 	 */
 	const saveFontFamilies = async ( fonts ) => {
@@ -129,24 +118,6 @@ function FontLibraryProvider( { children } ) {
 		? fontFamilies.theme
 				.map( ( f ) => setUIValuesNeeded( f, { source: 'theme' } ) )
 				.sort( ( a, b ) => a.name.localeCompare( b.name ) )
-		: [];
-
-	const themeFontsSlugs = new Set( themeFonts.map( ( f ) => f.slug ) );
-
-	/*
-	 * Base Theme Fonts are the fonts defined in the theme.json *file*.
-	 *
-	 * Uses the fonts from global styles + the ones from the theme.json file that hasn't repeated slugs.
-	 * Avoids incosistencies with the fonts listed in the font library modal as base (unactivated).
-	 * These inconsistencies can happen when the active theme fonts in global styles aren't defined in theme.json file as when a theme style variation is applied.
-	 */
-	const baseThemeFonts = baseFontFamilies?.theme
-		? themeFonts.concat(
-				baseFontFamilies.theme
-					.filter( ( f ) => ! themeFontsSlugs.has( f.slug ) )
-					.map( ( f ) => setUIValuesNeeded( f, { source: 'theme' } ) )
-					.sort( ( a, b ) => a.name.localeCompare( b.name ) )
-		  )
 		: [];
 
 	const customFonts = fontFamilies?.custom
@@ -185,10 +156,6 @@ function FontLibraryProvider( { children } ) {
 			...( fontSelected || font ),
 			source: font.source,
 		} );
-	};
-
-	const toggleModal = ( tabName ) => {
-		setModalTabOpen( tabName || null );
 	};
 
 	// Demo
@@ -283,27 +250,27 @@ function FontLibraryProvider( { children } ) {
 				}
 
 				// Install the fonts (upload the font files to the server and create the post in the database).
-				let sucessfullyInstalledFontFaces = [];
-				let unsucessfullyInstalledFontFaces = [];
+				let successfullyInstalledFontFaces = [];
+				let unsuccessfullyInstalledFontFaces = [];
 				if ( fontFamilyToInstall?.fontFace?.length > 0 ) {
 					const response = await batchInstallFontFaces(
 						installedFontFamily.id,
 						makeFontFacesFormData( fontFamilyToInstall )
 					);
-					sucessfullyInstalledFontFaces = response?.successes;
-					unsucessfullyInstalledFontFaces = response?.errors;
+					successfullyInstalledFontFaces = response?.successes;
+					unsuccessfullyInstalledFontFaces = response?.errors;
 				}
 
-				// Use the sucessfully installed font faces
+				// Use the successfully installed font faces
 				// As well as any font faces that were already installed (those will be activated)
 				if (
-					sucessfullyInstalledFontFaces?.length > 0 ||
+					successfullyInstalledFontFaces?.length > 0 ||
 					alreadyInstalledFontFaces?.length > 0
 				) {
 					// Use font data from REST API not from client to ensure
 					// correct font information is used.
 					installedFontFamily.fontFace = [
-						...sucessfullyInstalledFontFaces,
+						...successfullyInstalledFontFaces,
 					];
 
 					fontFamiliesToActivate.push( installedFontFamily );
@@ -321,13 +288,13 @@ function FontLibraryProvider( { children } ) {
 				if (
 					isANewFontFamily &&
 					fontFamilyToInstall?.fontFace?.length > 0 &&
-					sucessfullyInstalledFontFaces?.length === 0
+					successfullyInstalledFontFaces?.length === 0
 				) {
 					await fetchUninstallFontFamily( installedFontFamily.id );
 				}
 
 				installationErrors = installationErrors.concat(
-					unsucessfullyInstalledFontFaces
+					unsuccessfullyInstalledFontFaces
 				);
 			}
 
@@ -484,23 +451,27 @@ function FontLibraryProvider( { children } ) {
 		);
 
 		if ( isFaceActivated ) {
+			unloadFontFaceInBrowser( face, 'all' );
+		} else {
 			loadFontFaceInBrowser(
 				face,
 				getDisplaySrcFromFontFace( face?.src ),
 				'all'
 			);
-		} else {
-			unloadFontFaceInBrowser( face, 'all' );
 		}
 	};
 
 	const loadFontFaceAsset = async ( fontFace ) => {
 		// If the font doesn't have a src, don't load it.
-		if ( ! fontFace.src ) return;
+		if ( ! fontFace.src ) {
+			return;
+		}
 		// Get the src of the font.
 		const src = getDisplaySrcFromFontFace( fontFace.src );
 		// If the font is already loaded, don't load it again.
-		if ( ! src || loadedFontUrls.has( src ) ) return;
+		if ( ! src || loadedFontUrls.has( src ) ) {
+			return;
+		}
 		// Load the font in the browser.
 		loadFontFaceInBrowser( fontFace, src, 'document' );
 		// Add the font to the loaded fonts list.
@@ -518,7 +489,9 @@ function FontLibraryProvider( { children } ) {
 			const hasData = !! collections.find(
 				( collection ) => collection.slug === slug
 			)?.font_families;
-			if ( hasData ) return;
+			if ( hasData ) {
+				return;
+			}
 			const response = await fetchFontCollection( slug );
 			const updatedCollections = collections.map( ( collection ) =>
 				collection.slug === slug
@@ -543,9 +516,6 @@ function FontLibraryProvider( { children } ) {
 				libraryFontSelected,
 				handleSetLibraryFontSelected,
 				fontFamilies,
-				themeFonts,
-				baseThemeFonts,
-				customFonts,
 				baseCustomFonts,
 				isFontActivated,
 				getFontFacesActivated,
@@ -555,14 +525,12 @@ function FontLibraryProvider( { children } ) {
 				toggleActivateFont,
 				getAvailableFontsOutline,
 				modalTabOpen,
-				toggleModal,
+				setModalTabOpen,
 				refreshLibrary,
 				notice,
 				setNotice,
 				saveFontFamilies,
-				fontFamiliesHasChanges,
 				isResolvingLibrary,
-				hasResolvedLibrary,
 				isInstalling,
 				collections,
 				getFontCollection,

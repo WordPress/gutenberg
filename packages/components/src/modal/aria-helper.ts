@@ -25,7 +25,9 @@ export function modalize( modalElement?: HTMLDivElement ) {
 	const hiddenElements: Element[] = [];
 	hiddenElementsByDepth.push( hiddenElements );
 	for ( const element of elements ) {
-		if ( element === modalElement ) continue;
+		if ( element === modalElement ) {
+			continue;
+		}
 
 		if ( elementShouldBeHidden( element ) ) {
 			element.setAttribute( 'aria-hidden', 'true' );
@@ -56,8 +58,11 @@ export function elementShouldBeHidden( element: Element ) {
  */
 export function unmodalize() {
 	const hiddenElements = hiddenElementsByDepth.pop();
-	if ( ! hiddenElements ) return;
+	if ( ! hiddenElements ) {
+		return;
+	}
 
-	for ( const element of hiddenElements )
+	for ( const element of hiddenElements ) {
 		element.removeAttribute( 'aria-hidden' );
+	}
 }

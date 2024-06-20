@@ -10,6 +10,29 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [internal] Fix Inserter items list filtering [#62334]
+-   [*] Prevent hiding the keyboard when creating new list items [#62446]
+-   [*] Fix issue when pasting HTML content [#62588]
+
+## 1.120.1
+-   [*] RichText - Fix undefined onDelete callback [#62486]
+
+## 1.120.0
+-   [*] Prevent deleting content when backspacing in the first Paragraph block [#62069]
+-   [internal] Adds new bridge functionality for updating content  [#61796]
+
+## 1.119.1
+-   [*] Image corrector - Check the path extension is a valid one [#62190]
+-   [*] Unsupported block - UI improvements [#62240]
+
+## 1.119.0
+-   [internal] Remove circular dependencies within the components package [#61102]
+-   [internal] Upgrade target sdk version to Android API 34 [#61727]
+
+## 1.118.0
+-   [*] Fix a crash when pasting file images and special comment markup [#60476]
+-   [*] Update Aztec to v2.1.2 [#61007]
+-   [*] KeyboardAwareFlatList - Enable FlatList virtualization for iOS [#59833]
 
 ## 1.117.0
 -   [*] Add empty fallback option for the BottomSheetSelectControl component [#60333]

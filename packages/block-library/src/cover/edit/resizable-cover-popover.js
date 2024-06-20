@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -42,7 +42,7 @@ export default function ResizableCoverPopover( {
 	const [ isResizing, setIsResizing ] = useState( false );
 
 	const resizableBoxProps = {
-		className: classnames( className, { 'is-resizing': isResizing } ),
+		className: clsx( className, { 'is-resizing': isResizing } ),
 		enable: RESIZABLE_BOX_ENABLE_OPTION,
 		onResizeStart: ( _event, _direction, elt ) => {
 			onResizeStart( elt.clientHeight );

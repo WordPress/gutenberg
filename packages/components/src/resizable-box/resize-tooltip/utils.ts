@@ -90,7 +90,9 @@ export function useResizeLabel( {
 			 * If axis is controlled, we will avoid resetting the moveX and moveY values.
 			 * This will allow for the preferred axis values to persist in the label.
 			 */
-			if ( isAxisControlled ) return;
+			if ( isAxisControlled ) {
+				return;
+			}
 			setMoveX( false );
 			setMoveY( false );
 		};
@@ -109,12 +111,16 @@ export function useResizeLabel( {
 		 */
 		const isRendered = width !== null || height !== null;
 
-		if ( ! isRendered ) return;
+		if ( ! isRendered ) {
+			return;
+		}
 
 		const didWidthChange = width !== widthRef.current;
 		const didHeightChange = height !== heightRef.current;
 
-		if ( ! didWidthChange && ! didHeightChange ) return;
+		if ( ! didWidthChange && ! didHeightChange ) {
+			return;
+		}
 
 		/*
 		 * After the initial render, the useResizeAware will set the first
@@ -194,7 +200,9 @@ function getSizeLabel( {
 	showPx = false,
 	width,
 }: GetSizeLabelArgs ): string | undefined {
-	if ( ! moveX && ! moveY ) return undefined;
+	if ( ! moveX && ! moveY ) {
+		return undefined;
+	}
 
 	/*
 	 * Corner position...

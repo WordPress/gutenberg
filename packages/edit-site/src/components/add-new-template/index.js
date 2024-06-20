@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -128,6 +128,7 @@ function TemplateListItem( {
 					spacing={ 0 }
 				>
 					<Text
+						align="center"
 						weight={ 500 }
 						lineHeight={ 1.53846153846 } // 20px
 					>
@@ -250,7 +251,7 @@ function NewTemplateModal( { onClose } ) {
 	return (
 		<Modal
 			title={ modalTitle }
-			className={ classnames( 'edit-site-add-new-template__modal', {
+			className={ clsx( 'edit-site-add-new-template__modal', {
 				'edit-site-add-new-template__modal_template_list':
 					modalContent === modalContentMap.templatesList,
 				'edit-site-custom-template-modal':
@@ -354,6 +355,7 @@ function NewTemplate() {
 				variant="primary"
 				onClick={ () => setShowModal( true ) }
 				label={ postType.labels.add_new_item }
+				__next40pxDefaultSize
 			>
 				{ postType.labels.add_new_item }
 			</Button>

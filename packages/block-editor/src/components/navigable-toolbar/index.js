@@ -165,7 +165,9 @@ function useToolbarFocus( {
 		}
 		return () => {
 			window.cancelAnimationFrame( raf );
-			if ( ! onIndexChange || ! navigableToolbarRef ) return;
+			if ( ! onIndexChange || ! navigableToolbarRef ) {
+				return;
+			}
 			// When the toolbar element is unmounted and onIndexChange is passed, we
 			// pass the focused toolbar item index so it can be hydrated later.
 			const items = getAllFocusableToolbarItemsIn( navigableToolbarRef );

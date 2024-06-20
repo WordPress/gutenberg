@@ -198,6 +198,13 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 	$kind        = empty( $attributes['kind'] ) ? 'post_type' : str_replace( '-', '_', $attributes['kind'] );
 	$is_active   = ! empty( $attributes['id'] ) && get_queried_object_id() === (int) $attributes['id'] && ! empty( get_queried_object()->$kind );
 
+	if ( is_post_type_archive() ) {
+		$queried_archive_link = get_post_type_archive_link( get_queried_object()->name );
+		if ( $attributes['url'] === $queried_archive_link ) {
+			$is_active = true;
+		}
+	}
+
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
 			'class' => $css_classes . ' wp-block-navigation-item' . ( $has_submenu ? ' has-child' : '' ) .

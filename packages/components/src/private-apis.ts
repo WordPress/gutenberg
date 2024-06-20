@@ -15,7 +15,6 @@ import {
 } from './composite/v2';
 import { default as CustomSelectControl } from './custom-select-control';
 import { positionToPlacement as __experimentalPopoverLegacyPositionToPlacement } from './popover/utils';
-import { default as ProgressBar } from './progress-bar';
 import { createPrivateSlotFill } from './slot-fill';
 import {
 	DropdownMenu as DropdownMenuV2,
@@ -44,7 +43,6 @@ lock( privateApis, {
 	__experimentalPopoverLegacyPositionToPlacement,
 	createPrivateSlotFill,
 	ComponentsContext,
-	ProgressBar,
 	Tabs,
 	Theme,
 	DropdownMenuV2,

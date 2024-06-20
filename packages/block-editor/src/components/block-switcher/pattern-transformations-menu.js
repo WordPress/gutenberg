@@ -34,7 +34,9 @@ function PatternTransformationsMenu( {
 } ) {
 	const [ showTransforms, setShowTransforms ] = useState( false );
 	const patterns = useTransformedPatterns( statePatterns, blocks );
-	if ( ! patterns.length ) return null;
+	if ( ! patterns.length ) {
+		return null;
+	}
 
 	return (
 		<MenuGroup className="block-editor-block-switcher__pattern__transforms__menugroup">

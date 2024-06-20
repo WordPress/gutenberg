@@ -21,6 +21,7 @@ import RNReactNativeGutenbergBridge, {
 	subscribeUpdateCapabilities,
 	subscribeShowNotice,
 	subscribeShowEditorHelp,
+	subscribeToContentUpdate,
 } from '@wordpress/react-native-bridge';
 import { Component } from '@wordpress/element';
 import { count as wordCount } from '@wordpress/wordcount';
@@ -30,12 +31,16 @@ import {
 	getUnregisteredTypeHandlerName,
 	getBlockType,
 	createBlock,
+	pasteHandler,
 } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { applyFilters } from '@wordpress/hooks';
-import { store as blockEditorStore } from '@wordpress/block-editor';
-import { getGlobalStyles, getColorsAndGradients } from '@wordpress/components';
+import {
+	store as blockEditorStore,
+	getGlobalStyles,
+	getColorsAndGradients,
+} from '@wordpress/block-editor';
 import { NEW_BLOCK_TYPES } from '@wordpress/block-library';
 import { __ } from '@wordpress/i18n';
 
@@ -64,6 +69,7 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import EditorProvider from './index.js';
+import { insertContentWithTitle } from '../post-title';
 
 class NativeEditorProvider extends Component {
 	constructor() {
@@ -79,6 +85,7 @@ class NativeEditorProvider extends Component {
 		);
 
 		this.onHardwareBackPress = this.onHardwareBackPress.bind( this );
+		this.onContentUpdate = this.onContentUpdate.bind( this );
 
 		this.getEditorSettings = memize(
 			( settings, capabilities ) => ( {
@@ -197,6 +204,12 @@ class NativeEditorProvider extends Component {
 			this.onHardwareBackPress
 		);
 
+		this.subscriptionOnContentUpdate = subscribeToContentUpdate(
+			( data ) => {
+				this.onContentUpdate( data );
+			}
+		);
+
 		// Request current block impressions from native app.
 		requestBlockTypeImpressions( ( storedImpressions ) => {
 			const impressions = { ...NEW_BLOCK_TYPES, ...storedImpressions };
@@ -260,6 +273,10 @@ class NativeEditorProvider extends Component {
 		if ( this.hardwareBackPressListener ) {
 			this.hardwareBackPressListener.remove();
 		}
+
+		if ( this.subscriptionOnContentUpdate ) {
+			this.subscriptionOnContentUpdate.remove();
+		}
 	}
 
 	getThemeColors( { rawStyles, rawFeatures } ) {
@@ -298,6 +315,21 @@ class NativeEditorProvider extends Component {
 			return true;
 		}
 		return false;
+	}
+
+	onContentUpdate( { content: rawContent } ) {
+		const {
+			editTitle,
+			onClearPostTitleSelection,
+			onInsertBlockAfter: onInsertBlocks,
+			title,
+		} = this.props;
+		const content = pasteHandler( {
+			plainText: rawContent,
+		} );
+
+		insertContentWithTitle( title, content, editTitle, onInsertBlocks );
+		onClearPostTitleSelection();
 	}
 
 	serializeToNativeAction() {
@@ -420,11 +452,13 @@ const ComposedNativeProvider = compose( [
 			resetEditorBlocks,
 			updateEditorSettings,
 			switchEditorMode,
+			togglePostTitleSelection,
 		} = dispatch( editorStore );
 		const {
 			clearSelectedBlock,
 			updateSettings,
 			insertBlock,
+			insertBlocks,
 			replaceBlock,
 		} = dispatch( blockEditorStore );
 		const { addEntities, receiveEntityRecords } = dispatch( coreStore );
@@ -436,6 +470,7 @@ const ComposedNativeProvider = compose( [
 			updateEditorSettings,
 			addEntities,
 			insertBlock,
+			insertBlocks,
 			createSuccessNotice,
 			createErrorNotice,
 			clearSelectedBlock,
@@ -450,6 +485,12 @@ const ComposedNativeProvider = compose( [
 			},
 			switchMode( mode ) {
 				switchEditorMode( mode );
+			},
+			onInsertBlockAfter( blocks ) {
+				insertBlocks( blocks, undefined, undefined, false );
+			},
+			onClearPostTitleSelection() {
+				togglePostTitleSelection( false );
 			},
 			replaceBlock,
 		};

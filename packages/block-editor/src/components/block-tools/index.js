@@ -6,6 +6,9 @@ import { isTextField } from '@wordpress/dom';
 import { Popover } from '@wordpress/components';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
 import { useRef } from '@wordpress/element';
+import { switchToBlockType, store as blocksStore } from '@wordpress/blocks';
+import { speak } from '@wordpress/a11y';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -64,9 +67,13 @@ export default function BlockTools( {
 		[]
 	);
 	const isMatch = useShortcutEventMatch();
-	const { getSelectedBlockClientIds, getBlockRootClientId } =
-		useSelect( blockEditorStore );
-
+	const {
+		getBlocksByClientId,
+		getSelectedBlockClientIds,
+		getBlockRootClientId,
+		isGroupable,
+	} = useSelect( blockEditorStore );
+	const { getGroupingBlockName } = useSelect( blocksStore );
 	const {
 		showEmptyBlockSideInserter,
 		showBreadcrumb,
@@ -76,6 +83,7 @@ export default function BlockTools( {
 	const {
 		duplicateBlocks,
 		removeBlocks,
+		replaceBlocks,
 		insertAfterBlock,
 		insertBeforeBlock,
 		selectBlock,
@@ -85,7 +93,9 @@ export default function BlockTools( {
 	} = unlock( useDispatch( blockEditorStore ) );
 
 	function onKeyDown( event ) {
-		if ( event.defaultPrevented ) return;
+		if ( event.defaultPrevented ) {
+			return;
+		}
 
 		if ( isMatch( 'core/block-editor/move-up', event ) ) {
 			const clientIds = getSelectedBlockClientIds();
@@ -157,6 +167,19 @@ export default function BlockTools( {
 			}
 			event.preventDefault();
 			expandBlock( clientId );
+		} else if ( isMatch( 'core/block-editor/group', event ) ) {
+			const clientIds = getSelectedBlockClientIds();
+			if ( clientIds.length > 1 && isGroupable( clientIds ) ) {
+				event.preventDefault();
+				const blocks = getBlocksByClientId( clientIds );
+				const groupingBlockName = getGroupingBlockName();
+				const newBlocks = switchToBlockType(
+					blocks,
+					groupingBlockName
+				);
+				replaceBlocks( clientIds, newBlocks );
+				speak( __( 'Selected blocks are grouped.' ) );
+			}
 		}
 	}
 
@@ -208,11 +231,12 @@ export default function BlockTools( {
 					name="__unstable-block-tools-after"
 					ref={ blockToolbarAfterRef }
 				/>
-				{ isZoomOutMode && (
-					<ZoomOutModeInserters
-						__unstableContentRef={ __unstableContentRef }
-					/>
-				) }
+				{ window.__experimentalEnableZoomedOutPatternsTab &&
+					isZoomOutMode && (
+						<ZoomOutModeInserters
+							__unstableContentRef={ __unstableContentRef }
+						/>
+					) }
 			</InsertionPointOpenRef.Provider>
 		</div>
 	);

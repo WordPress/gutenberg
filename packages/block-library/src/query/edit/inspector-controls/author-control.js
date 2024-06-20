@@ -52,14 +52,18 @@ function AuthorControl( { value, onChange } ) {
 
 	const getIdByValue = ( entitiesMappedByName, authorValue ) => {
 		const id = authorValue?.id || entitiesMappedByName[ authorValue ]?.id;
-		if ( id ) return id;
+		if ( id ) {
+			return id;
+		}
 	};
 	const onAuthorChange = ( newValue ) => {
 		const ids = Array.from(
 			newValue.reduce( ( accumulator, author ) => {
 				// Verify that new values point to existing entities.
 				const id = getIdByValue( authorsInfo.mapByName, author );
-				if ( id ) accumulator.add( id );
+				if ( id ) {
+					accumulator.add( id );
+				}
 				return accumulator;
 			}, new Set() )
 		);

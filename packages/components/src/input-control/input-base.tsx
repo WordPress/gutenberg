@@ -64,7 +64,7 @@ function getUIFlexProps( labelPosition?: LabelPosition ) {
 	return props;
 }
 
-export function InputBase(
+function InputBase(
 	props: WordPressComponentProps< InputBaseProps, 'div' >,
 	ref: ForwardedRef< HTMLDivElement >
 ) {
@@ -78,7 +78,6 @@ export function InputBase(
 		labelPosition,
 		id: idProp,
 		isBorderless = false,
-		isFocused = false,
 		label,
 		prefix,
 		size = 'default',
@@ -109,8 +108,6 @@ export function InputBase(
 			{ ...getUIFlexProps( labelPosition ) }
 			className={ className }
 			gap={ 2 }
-			isFocused={ isFocused }
-			labelPosition={ labelPosition }
 			ref={ ref }
 		>
 			<Label
@@ -141,14 +138,14 @@ export function InputBase(
 						</Suffix>
 					) }
 				</ContextSystemProvider>
-				<Backdrop
-					disabled={ disabled }
-					isBorderless={ isBorderless }
-					isFocused={ isFocused }
-				/>
+				<Backdrop disabled={ disabled } isBorderless={ isBorderless } />
 			</Container>
 		</Root>
 	);
 }
 
+/**
+ * `InputBase` is an internal component used to style the standard borders for an input,
+ * as well as handle the layout for prefix/suffix elements.
+ */
 export default contextConnect( InputBase, 'InputBase' );

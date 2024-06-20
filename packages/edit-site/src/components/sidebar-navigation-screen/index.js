@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -9,7 +9,6 @@ import classnames from 'classnames';
 import {
 	__experimentalHStack as HStack,
 	__experimentalHeading as Heading,
-	__experimentalUseNavigator as useNavigator,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { isRTL, __, sprintf } from '@wordpress/i18n';
@@ -17,6 +16,7 @@ import { chevronRight, chevronLeft } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -28,8 +28,9 @@ import {
 	isPreviewingTheme,
 	currentlyPreviewingTheme,
 } from '../../utils/is-previewing-theme';
+import { SidebarNavigationContext } from '../sidebar';
 
-const { useLocation } = unlock( routerPrivateApis );
+const { useHistory, useLocation } = unlock( routerPrivateApis );
 
 export default function SidebarNavigationScreen( {
 	isRoot,
@@ -60,38 +61,30 @@ export default function SidebarNavigationScreen( {
 		[]
 	);
 	const location = useLocation();
-	const navigator = useNavigator();
+	const history = useHistory();
+	const { navigate } = useContext( SidebarNavigationContext );
+	const backPath = backPathProp ?? location.state?.backPath;
 	const icon = isRTL() ? chevronRight : chevronLeft;
 
 	return (
 		<>
 			<VStack
-				className={ classnames(
-					'edit-site-sidebar-navigation-screen__main',
-					{
-						'has-footer': !! footer,
-					}
-				) }
+				className={ clsx( 'edit-site-sidebar-navigation-screen__main', {
+					'has-footer': !! footer,
+				} ) }
 				spacing={ 0 }
 				justify="flex-start"
 			>
 				<HStack
-					spacing={ 4 }
+					spacing={ 3 }
 					alignment="flex-start"
 					className="edit-site-sidebar-navigation-screen__title-icon"
 				>
 					{ ! isRoot && (
 						<SidebarButton
 							onClick={ () => {
-								const backPath =
-									backPathProp ?? location.state?.backPath;
-								if ( backPath ) {
-									navigator.goTo( backPath, {
-										isBack: true,
-									} );
-								} else {
-									navigator.goToParent();
-								}
+								history.push( backPath );
+								navigate( 'back' );
 							} }
 							icon={ icon }
 							label={ __( 'Back' ) }

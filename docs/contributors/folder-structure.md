@@ -75,8 +75,18 @@ The following snippet explains how the Gutenberg repository is structured omitti
     ├── docs/*.md
     │   Set of documentation pages composing the [Block editor handbook](https://developer.wordpress.org/block-editor/).
     │
+    ├── platform-docs
+    │   Documentation website targeted to non WordPress developers 
+    │   using Gutenberg in their own applications. 
+    │   Deployed on [https://wordpress.org/gutenberg-framework/](https://wordpress.org/gutenberg-framework/).
+    │
+    │
     ├── lib
     │   PHP Source code of the Gutenberg plugin.
+    │
+    ├── lib/compact/wordpress-x.x
+    │   PHP code that was include in WordPress ont the WordPrexx X.X version.
+    │   It is kept to ensure plugin compatibility with older WordPress versions.
     │
     ├── packages
     │   Source code of the WordPress packages.
@@ -107,10 +117,6 @@ The following snippet explains how the Gutenberg repository is structured omitti
     ├── packages/{packageName}/src/**/{ComponentName}/stories/*.js
     │   Component Stories to load on the Gutenberg storybook.
     │
-    ├── packages/e2e-tests
-    │   End-2-end tests of the Gutenberg plugin.
-    │   Distributed as a package for potential reuse in Core and other plugins.
-    │
     ├── phpunit
     │   Unit tests for the PHP code of the Gutenberg plugin.
     │
@@ -123,11 +129,17 @@ The following snippet explains how the Gutenberg repository is structured omitti
     ├── test/native
     │   Configuration for the Gutenberg Mobile unit tests.
     │
-    └── test/unit
+    ├── test/unit
     │   Configuration for the Packages unit tests.
     │
-    └── tools/eslint
+    ├── test/e2e
+    │   End-2-end tests of the Gutenberg plugin.
+    │
+    ├── test/performance
+    │   Performance metrics. Results are tracked on the [Gutenberg performance dashboard](https://codevitals.run/project/gutenberg).
+    │
+    ├── tools/eslint
     │   Configuration files for the ESLint linter.
     │
-    └── tools/webpack
+    ├── tools/webpack
     │   Configuration files for the webpack build.

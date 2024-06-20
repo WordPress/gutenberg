@@ -52,6 +52,13 @@ test.describe( 'Front End Performance', () => {
 				results.largestContentfulPaint.push( lcp );
 				results.timeToFirstByte.push( ttfb );
 				results.lcpMinusTtfb.push( lcp - ttfb );
+
+				const serverTiming = await metrics.getServerTiming();
+
+				for ( const [ key, value ] of Object.entries( serverTiming ) ) {
+					results[ key ] ??= [];
+					results[ key ].push( value );
+				}
 			}
 		} );
 	}

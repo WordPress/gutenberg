@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -293,7 +293,7 @@ export default function NavigationSubmenuEdit( {
 
 	const blockProps = useBlockProps( {
 		ref: useMergeRefs( [ setPopoverAnchor, listItemRef ] ),
-		className: classnames( 'wp-block-navigation-item', {
+		className: clsx( 'wp-block-navigation-item', {
 			'is-editing': isSelected || isParentOfSelectedBlock,
 			'is-dragging-within': isDraggingWithin,
 			'has-link': !! url,
@@ -459,34 +459,32 @@ export default function NavigationSubmenuEdit( {
 				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
 				<ParentElement className="wp-block-navigation-item__content">
 					{ /* eslint-enable */ }
-					{
-						<RichText
-							ref={ ref }
-							identifier="label"
-							className="wp-block-navigation-item__label"
-							value={ label }
-							onChange={ ( labelValue ) =>
-								setAttributes( { label: labelValue } )
+					<RichText
+						ref={ ref }
+						identifier="label"
+						className="wp-block-navigation-item__label"
+						value={ label }
+						onChange={ ( labelValue ) =>
+							setAttributes( { label: labelValue } )
+						}
+						onMerge={ mergeBlocks }
+						onReplace={ onReplace }
+						aria-label={ __( 'Navigation link text' ) }
+						placeholder={ itemLabelPlaceholder }
+						withoutInteractiveFormatting
+						allowedFormats={ [
+							'core/bold',
+							'core/italic',
+							'core/image',
+							'core/strikethrough',
+						] }
+						onClick={ () => {
+							if ( ! openSubmenusOnClick && ! url ) {
+								setIsLinkOpen( true );
+								setOpenedBy( ref.current );
 							}
-							onMerge={ mergeBlocks }
-							onReplace={ onReplace }
-							aria-label={ __( 'Navigation link text' ) }
-							placeholder={ itemLabelPlaceholder }
-							withoutInteractiveFormatting
-							allowedFormats={ [
-								'core/bold',
-								'core/italic',
-								'core/image',
-								'core/strikethrough',
-							] }
-							onClick={ () => {
-								if ( ! openSubmenusOnClick && ! url ) {
-									setIsLinkOpen( true );
-									setOpenedBy( ref.current );
-								}
-							} }
-						/>
-					}
+						} }
+					/>
 					{ ! openSubmenusOnClick && isLinkOpen && (
 						<LinkUI
 							clientId={ clientId }

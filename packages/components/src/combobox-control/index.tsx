@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -78,10 +78,12 @@ const getIndexOfMatchingSuggestion = (
  * 	{
  * 		value: 'normal',
  * 		label: 'Normal',
+ * 		disabled: true,
  * 	},
  * 	{
  * 		value: 'large',
  * 		label: 'Large',
+ * 		disabled: false,
  * 	},
  * ];
  *
@@ -125,6 +127,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
 			selected: __( 'Item selected.' ),
 		},
 		__experimentalRenderItem,
+		expandOnFocus = true,
 	} = useDeprecated36pxDefaultSizeProp( props );
 
 	const [ value, setValue ] = useControlledValue( {
@@ -165,6 +168,10 @@ function ComboboxControl( props: ComboboxControlProps ) {
 	const onSuggestionSelected = (
 		newSelectedSuggestion: ComboboxControlOption
 	) => {
+		if ( newSelectedSuggestion.disabled ) {
+			return;
+		}
+
 		setValue( newSelectedSuggestion.value );
 		speak( messages.selected, 'assertive' );
 		setSelectedSuggestion( newSelectedSuggestion );
@@ -230,9 +237,16 @@ function ComboboxControl( props: ComboboxControlProps ) {
 
 	const onFocus = () => {
 		setInputHasFocus( true );
-		setIsExpanded( true );
+		if ( expandOnFocus ) {
+			setIsExpanded( true );
+		}
+
 		onFilterValueChange( '' );
 		setInputValue( '' );
+	};
+
+	const onClick = () => {
+		setIsExpanded( true );
 	};
 
 	const onFocusOutside = () => {
@@ -296,10 +310,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
 		<DetectOutside onFocusOutside={ onFocusOutside }>
 			<BaseControl
 				__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
-				className={ classnames(
-					className,
-					'components-combobox-control'
-				) }
+				className={ clsx( className, 'components-combobox-control' ) }
 				label={ label }
 				id={ `components-form-token-input-${ instanceId }` }
 				hideLabelFromVision={ hideLabelFromVision }
@@ -321,6 +332,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
 								value={ isExpanded ? inputValue : currentLabel }
 								onFocus={ onFocus }
 								onBlur={ onBlur }
+								onClick={ onClick }
 								isExpanded={ isExpanded }
 								selectedSuggestionIndex={ getIndexOfMatchingSuggestion(
 									selectedSuggestion,

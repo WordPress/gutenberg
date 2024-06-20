@@ -62,7 +62,9 @@ export const getPatternTransformedBlocks = (
 				selectedBlock.name,
 				consumedBlocks
 			);
-			if ( ! match ) continue;
+			if ( ! match ) {
+				continue;
+			}
 			isMatch = true;
 			consumedBlocks.add( match.clientId );
 			// We update (mutate) the matching pattern block.
@@ -71,7 +73,9 @@ export const getPatternTransformedBlocks = (
 			break;
 		}
 		// Bail eary if a selected block has not been matched.
-		if ( ! isMatch ) return;
+		if ( ! isMatch ) {
+			return;
+		}
 	}
 	return _patternBlocks;
 };

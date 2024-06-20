@@ -28,8 +28,12 @@ export { default as PageAttributesParent } from './page-attributes/parent';
 export { default as PageTemplate } from './post-template/classic-theme';
 export { default as PluginDocumentSettingPanel } from './plugin-document-setting-panel';
 export { default as PluginBlockSettingsMenuItem } from './block-settings-menu/plugin-block-settings-menu-item';
+export { default as PluginMoreMenuItem } from './plugin-more-menu-item';
 export { default as PluginPostPublishPanel } from './plugin-post-publish-panel';
+export { default as PluginPostStatusInfo } from './plugin-post-status-info';
 export { default as PluginPrePublishPanel } from './plugin-pre-publish-panel';
+export { default as PluginSidebar } from './plugin-sidebar';
+export { default as PluginSidebarMoreMenuItem } from './plugin-sidebar-more-menu-item';
 export { default as PostTemplatePanel } from './post-template/panel';
 export { default as PostAuthor } from './post-author';
 export { default as PostAuthorCheck } from './post-author/check';
@@ -102,4 +106,11 @@ export { default as EditorProvider } from './provider';
 
 export * from './deprecated';
 export const VisualEditorGlobalKeyboardShortcuts = EditorKeyboardShortcuts;
+
+/**
+ * Component handles the global keyboard shortcuts for the Text editor.
+ *
+ * It provides functionality for various keyboard shortcuts such as toggling editor mode,
+ * toggling distraction-free mode, undo/redo.
+ */
 export const TextEditorGlobalKeyboardShortcuts = EditorKeyboardShortcuts;

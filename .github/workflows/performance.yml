@@ -25,6 +25,7 @@ concurrency:
 
 jobs:
     performance:
+        timeout-minutes: 60
         name: Run performance tests
         runs-on: ubuntu-latest
         if: ${{ github.repository == 'WordPress/gutenberg' }}
@@ -32,7 +33,7 @@ jobs:
             WP_ARTIFACTS_PATH: ${{ github.workspace }}/artifacts
 
         steps:
-            - uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
+            - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
@@ -68,13 +69,13 @@ jobs:
             - name: Compare performance with base branch
               if: github.event_name == 'push'
               # The base hash used here need to be a commit that is compatible with the current WP version
-              # The current one is 9bb75b35ec0daa46e8cd60c46619f522c7edd453 and it needs to be updated every WP major release.
+              # The current one is 9725060a5b18904c6cc5fdbe4b06fbde7419e02c and it needs to be updated every WP major release.
               # It is used as a base comparison point to avoid fluctuation in the performance metrics.
               run: |
                   WP_VERSION=$(awk -F ': ' '/^Tested up to/{print $2}' readme.txt)
                   IFS=. read -ra WP_VERSION_ARRAY <<< "$WP_VERSION"
                   WP_MAJOR="${WP_VERSION_ARRAY[0]}.${WP_VERSION_ARRAY[1]}"
-                  ./bin/plugin/cli.js perf $GITHUB_SHA 9bb75b35ec0daa46e8cd60c46619f522c7edd453 --tests-branch $GITHUB_SHA --wp-version "$WP_MAJOR"
+                  ./bin/plugin/cli.js perf $GITHUB_SHA 9725060a5b18904c6cc5fdbe4b06fbde7419e02c --tests-branch $GITHUB_SHA --wp-version "$WP_MAJOR"
 
             - name: Compare performance with custom branches
               if: github.event_name == 'workflow_dispatch'
@@ -84,9 +85,12 @@ jobs:
               run: |
                   ./bin/plugin/cli.js perf $(echo $BRANCHES | tr ',' ' ') --tests-branch $GITHUB_SHA --wp-version "$WP_VERSION"
 
+            - name: Add workflow summary
+              run: cat ${{ env.WP_ARTIFACTS_PATH }}/summary.md >> $GITHUB_STEP_SUMMARY
+
             - name: Archive performance results
               if: success()
-              uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
+              uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
               with:
                   name: performance-results
                   path: ${{ env.WP_ARTIFACTS_PATH }}/*.performance-results*.json
@@ -97,10 +101,10 @@ jobs:
                   CODEHEALTH_PROJECT_TOKEN: ${{ secrets.CODEHEALTH_PROJECT_TOKEN }}
               run: |
                   COMMITTED_AT=$(git show -s $GITHUB_SHA --format="%cI")
-                  ./bin/log-performance-results.js $CODEHEALTH_PROJECT_TOKEN trunk $GITHUB_SHA 9bb75b35ec0daa46e8cd60c46619f522c7edd453 $COMMITTED_AT
+                  ./bin/log-performance-results.js $CODEHEALTH_PROJECT_TOKEN trunk $GITHUB_SHA 9725060a5b18904c6cc5fdbe4b06fbde7419e02c $COMMITTED_AT
 
             - name: Archive debug artifacts (screenshots, HTML snapshots)
-              uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
+              uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
               if: failure()
               with:
                   name: failures-artifacts

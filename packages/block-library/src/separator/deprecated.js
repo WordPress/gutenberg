@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -27,7 +27,7 @@ const v1 = {
 		// using color, not backgroundColor
 		const colorClass = getColorClassName( 'color', color );
 
-		const className = classnames( {
+		const className = clsx( {
 			'has-text-color has-background': color || customColor,
 			[ backgroundClass ]: backgroundClass,
 			[ colorClass ]: colorClass,

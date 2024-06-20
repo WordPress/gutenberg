@@ -36,6 +36,7 @@ xvfb-run npm run test:e2e
 # Only run webkit tests.
 xvfb-run -- npm run test:e2e -- --project=webkit
 ```
+If you're already editing in VS Code, you may find the [Playwright extension](https://playwright.dev/docs/getting-started-vscode) helpful for running, writing and debugging tests.
 
 ## Best practices
 

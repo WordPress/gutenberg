@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -51,7 +51,7 @@ export function getColorClassesAndStyles( attributes ) {
 	const hasGradient = gradientClass || style?.color?.gradient;
 
 	// Determine color CSS class name list.
-	const className = classnames( textClass, gradientClass, {
+	const className = clsx( textClass, gradientClass, {
 		// Don't apply the background class if there's a gradient.
 		[ backgroundClass ]: ! hasGradient && !! backgroundClass,
 		'has-text-color': textColor || style?.color?.text,

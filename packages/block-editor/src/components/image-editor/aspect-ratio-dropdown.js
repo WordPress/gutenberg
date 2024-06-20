@@ -8,33 +8,69 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import { useSettings } from '../use-settings';
 import { POPOVER_PROPS } from './constants';
 import { useImageEditingContext } from './context';
 
-function AspectGroup( { aspectRatios, isDisabled, label, onClick, value } ) {
+function AspectRatioGroup( {
+	aspectRatios,
+	isDisabled,
+	label,
+	onClick,
+	value,
+} ) {
 	return (
 		<MenuGroup label={ label }>
-			{ aspectRatios.map( ( { title, aspect } ) => (
+			{ aspectRatios.map( ( { name, slug, ratio } ) => (
 				<MenuItem
-					key={ aspect }
+					key={ slug }
 					disabled={ isDisabled }
 					onClick={ () => {
-						onClick( aspect );
+						onClick( ratio );
 					} }
 					role="menuitemradio"
-					isSelected={ aspect === value }
-					icon={ aspect === value ? check : undefined }
+					isSelected={ ratio === value }
+					icon={ ratio === value ? check : undefined }
 				>
-					{ title }
+					{ name }
 				</MenuItem>
 			) ) }
 		</MenuGroup>
 	);
 }
 
+export function ratioToNumber( str ) {
+	// TODO: support two-value aspect ratio?
+	// https://css-tricks.com/almanac/properties/a/aspect-ratio/#aa-it-can-take-two-values
+	const [ a, b, ...rest ] = str.split( '/' ).map( Number );
+	if (
+		a <= 0 ||
+		b <= 0 ||
+		Number.isNaN( a ) ||
+		Number.isNaN( b ) ||
+		rest.length
+	) {
+		return NaN;
+	}
+	return b ? a / b : a;
+}
+
+function presetRatioAsNumber( { ratio, ...rest } ) {
+	return {
+		ratio: ratioToNumber( ratio ),
+		...rest,
+	};
+}
+
 export default function AspectRatioDropdown( { toggleProps } ) {
 	const { isInProgress, aspect, setAspect, defaultAspect } =
 		useImageEditingContext();
+
+	const [ defaultRatios, themeRatios, showDefaultRatios ] = useSettings(
+		'dimensions.aspectRatios.default',
+		'dimensions.aspectRatios.theme',
+		'dimensions.defaultAspectRatios'
+	);
 
 	return (
 		<DropdownMenu
@@ -46,7 +82,7 @@ export default function AspectRatioDropdown( { toggleProps } ) {
 		>
 			{ ( { onClose } ) => (
 				<>
-					<AspectGroup
+					<AspectRatioGroup
 						isDisabled={ isInProgress }
 						onClick={ ( newAspect ) => {
 							setAspect( newAspect );
@@ -56,61 +92,57 @@ export default function AspectRatioDropdown( { toggleProps } ) {
 						aspectRatios={ [
 							// All ratios should be mirrored in AspectRatioTool in @wordpress/block-editor.
 							{
-								title: __( 'Original' ),
+								slug: 'original',
+								name: __( 'Original' ),
 								aspect: defaultAspect,
 							},
-							{
-								title: __( 'Square' ),
-								aspect: 1,
-							},
+							...( showDefaultRatios
+								? defaultRatios
+										.map( presetRatioAsNumber )
+										.filter( ( { ratio } ) => ratio === 1 )
+								: [] ),
 						] }
 					/>
-					<AspectGroup
-						label={ __( 'Landscape' ) }
-						isDisabled={ isInProgress }
-						onClick={ ( newAspect ) => {
-							setAspect( newAspect );
-							onClose();
-						} }
-						value={ aspect }
-						aspectRatios={ [
-							{
-								title: __( '16:9' ),
-								aspect: 16 / 9,
-							},
-							{
-								title: __( '4:3' ),
-								aspect: 4 / 3,
-							},
-							{
-								title: __( '3:2' ),
-								aspect: 3 / 2,
-							},
-						] }
-					/>
-					<AspectGroup
-						label={ __( 'Portrait' ) }
-						isDisabled={ isInProgress }
-						onClick={ ( newAspect ) => {
-							setAspect( newAspect );
-							onClose();
-						} }
-						value={ aspect }
-						aspectRatios={ [
-							{
-								title: __( '9:16' ),
-								aspect: 9 / 16,
-							},
-							{
-								title: __( '3:4' ),
-								aspect: 3 / 4,
-							},
-							{
-								title: __( '2:3' ),
-								aspect: 2 / 3,
-							},
-						] }
-					/>
+					{ themeRatios?.length > 0 && (
+						<AspectRatioGroup
+							label={ __( 'Theme' ) }
+							isDisabled={ isInProgress }
+							onClick={ ( newAspect ) => {
+								setAspect( newAspect );
+								onClose();
+							} }
+							value={ aspect }
+							aspectRatios={ themeRatios }
+						/>
+					) }
+					{ showDefaultRatios && (
+						<AspectRatioGroup
+							label={ __( 'Landscape' ) }
+							isDisabled={ isInProgress }
+							onClick={ ( newAspect ) => {
+								setAspect( newAspect );
+								onClose();
+							} }
+							value={ aspect }
+							aspectRatios={ defaultRatios
+								.map( presetRatioAsNumber )
+								.filter( ( { ratio } ) => ratio > 1 ) }
+						/>
+					) }
+					{ showDefaultRatios && (
+						<AspectRatioGroup
+							label={ __( 'Portrait' ) }
+							isDisabled={ isInProgress }
+							onClick={ ( newAspect ) => {
+								setAspect( newAspect );
+								onClose();
+							} }
+							value={ aspect }
+							aspectRatios={ defaultRatios
+								.map( presetRatioAsNumber )
+								.filter( ( { ratio } ) => ratio < 1 ) }
+						/>
+					) }
 				</>
 			) }
 		</DropdownMenu>

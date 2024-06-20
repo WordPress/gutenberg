@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -28,6 +28,7 @@ import { useEventHandlers } from './use-selected-block-event-handlers';
 import { useNavModeExit } from './use-nav-mode-exit';
 import { useBlockRefProvider } from './use-block-refs';
 import { useIntersectionObserver } from './use-intersection-observer';
+import { useScrollIntoView } from './use-scroll-into-view';
 import { useFlashEditableBlocks } from '../../use-flash-editable-blocks';
 import { canBindBlock } from '../../../hooks/use-bindings-attributes';
 
@@ -86,7 +87,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		blockTitle,
 		isSelected,
 		isSubtreeDisabled,
-		isOutlineEnabled,
 		hasOverlay,
 		initialPosition,
 		blockEditingMode,
@@ -96,7 +96,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		isReusable,
 		isDragging,
 		hasChildSelected,
-		removeOutline,
 		isBlockMovingMode,
 		canInsertMovingBlock,
 		isEditingDisabled,
@@ -116,7 +115,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		useFocusHandler( clientId ),
 		useEventHandlers( { clientId, isSelected } ),
 		useNavModeExit( clientId ),
-		useIsHovered( { isEnabled: isOutlineEnabled } ),
+		useIsHovered(),
 		useIntersectionObserver(),
 		useMovingAnimation( { triggerAnimationOnChange: index, clientId } ),
 		useDisabled( { isDisabled: ! hasOverlay } ),
@@ -124,6 +123,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			clientId,
 			isEnabled: name === 'core/block' || templateLock === 'contentOnly',
 		} ),
+		useScrollIntoView( { isSelected } ),
 	] );
 
 	const blockEditContext = useBlockEditContext();
@@ -144,6 +144,16 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		);
 	}
 
+	let hasNegativeMargin = false;
+	if (
+		wrapperProps?.style?.marginTop?.charAt( 0 ) === '-' ||
+		wrapperProps?.style?.marginBottom?.charAt( 0 ) === '-' ||
+		wrapperProps?.style?.marginLeft?.charAt( 0 ) === '-' ||
+		wrapperProps?.style?.marginRight?.charAt( 0 ) === '-'
+	) {
+		hasNegativeMargin = true;
+	}
+
 	return {
 		tabIndex: blockEditingMode === 'disabled' ? -1 : 0,
 		...wrapperProps,
@@ -156,7 +166,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		'data-type': name,
 		'data-title': blockTitle,
 		inert: isSubtreeDisabled ? 'true' : undefined,
-		className: classnames(
+		className: clsx(
 			'block-editor-block-list__block',
 			{
 				// The wp-block className is important for editor styles.
@@ -169,11 +179,11 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				'is-reusable': isReusable,
 				'is-dragging': isDragging,
 				'has-child-selected': hasChildSelected,
-				'remove-outline': removeOutline,
 				'is-block-moving-mode': isBlockMovingMode,
 				'can-insert-moving-block': canInsertMovingBlock,
 				'is-editing-disabled': isEditingDisabled,
 				'has-editable-outline': hasEditableOutline,
+				'has-negative-margin': hasNegativeMargin,
 				'is-content-locked-temporarily-editing-as-blocks':
 					isTemporarilyEditingAsBlocks,
 			},

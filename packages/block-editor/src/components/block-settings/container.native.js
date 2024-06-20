@@ -16,6 +16,7 @@ import styles from './container.native.scss';
 import InspectorControls from '../inspector-controls';
 import ImageLinkDestinationsScreen from '../image-link-destinations';
 import useMultipleOriginColorsAndGradients from '../colors-gradients/use-multiple-origin-colors-and-gradients';
+import { useMobileGlobalStylesColors } from '../global-styles/use-global-styles-context';
 import AdvancedControls from '../inspector-controls-tabs/advanced-controls-panel';
 
 export const blockSettingsScreens = {
@@ -28,6 +29,7 @@ export const blockSettingsScreens = {
 
 export default function BottomSheetSettings( props ) {
 	const colorSettings = useMultipleOriginColorsAndGradients();
+	colorSettings.allAvailableColors = useMobileGlobalStylesColors();
 	const { closeGeneralSidebar } = useDispatch( 'core/edit-post' );
 	const editorSidebarOpened = useSelect( ( select ) =>
 		select( 'core/edit-post' ).isEditorSidebarOpened()

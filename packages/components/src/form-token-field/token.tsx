@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -34,7 +34,7 @@ export default function Token( {
 	termsCount,
 }: TokenProps ) {
 	const instanceId = useInstanceId( Token );
-	const tokenClasses = classnames( 'components-form-token-field__token', {
+	const tokenClasses = clsx( 'components-form-token-field__token', {
 		'is-error': 'error' === status,
 		'is-success': 'success' === status,
 		'is-validating': 'validating' === status,

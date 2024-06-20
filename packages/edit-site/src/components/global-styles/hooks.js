@@ -9,21 +9,16 @@ import a11yPlugin from 'colord/plugins/a11y';
  */
 import { store as blocksStore } from '@wordpress/blocks';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-import { useContext } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { mergeBaseAndUserConfigs } from './global-styles-provider';
 import { useCurrentMergeThemeStyleVariationsWithUserConfig } from '../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
-import { getFontFamilies } from './utils';
 import { unlock } from '../../lock-unlock';
 import { useSelect } from '@wordpress/data';
 
-const { useGlobalSetting, useGlobalStyle, GlobalStylesContext } = unlock(
-	blockEditorPrivateApis
-);
+const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorPrivateApis );
 
 // Enable colord's a11y plugin.
 extend( [ a11yPlugin ] );
@@ -141,38 +136,17 @@ export function useTypographyVariations() {
 		useCurrentMergeThemeStyleVariationsWithUserConfig( {
 			property: 'typography',
 		} );
-
-	const { base } = useContext( GlobalStylesContext );
 	/*
-	 * Filter duplicate variations based on whether the variaitons
-	 * have different heading and body font families.
+	 * Filter out variations with no settings or styles.
 	 */
 	return typographyVariations?.length
-		? Object.values(
-				typographyVariations.reduce( ( acc, variation ) => {
-					const [ bodyFontFamily, headingFontFamily ] =
-						getFontFamilies(
-							mergeBaseAndUserConfigs( base, variation )
-						);
-
-					// Always preseve the default variation.
-					if ( variation?.title === 'Default' ) {
-						acc[
-							`${ headingFontFamily?.name }:${ bodyFontFamily?.name }`
-						] = variation;
-					} else if (
-						headingFontFamily?.name &&
-						bodyFontFamily?.name &&
-						! acc[
-							`${ headingFontFamily?.name }:${ bodyFontFamily?.name }`
-						]
-					) {
-						acc[
-							`${ headingFontFamily?.name }:${ bodyFontFamily?.name }`
-						] = variation;
-					}
-					return acc;
-				}, {} )
-		  )
+		? typographyVariations.filter( ( variation ) => {
+				const { settings, styles, title } = variation;
+				return (
+					title === __( 'Default' ) || // Always preseve the default variation.
+					Object.keys( settings ).length > 0 ||
+					Object.keys( styles ).length > 0
+				);
+		  } )
 		: [];
 }

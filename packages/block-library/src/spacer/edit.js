@@ -1,17 +1,17 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
 import {
 	useBlockProps,
-	useSettings,
 	getCustomValueFromPreset,
 	getSpacingPresetCssVar,
 	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { ResizableBox } from '@wordpress/components';
 import { useState, useEffect } from '@wordpress/element';
@@ -21,8 +21,11 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
+import { unlock } from '../lock-unlock';
 import SpacerControls from './controls';
 import { MIN_SPACER_SIZE } from './constants';
+
+const { useSpacingSizes } = unlock( blockEditorPrivateApis );
 
 const ResizableSpacer = ( {
 	orientation,
@@ -46,7 +49,7 @@ const ResizableSpacer = ( {
 
 	return (
 		<ResizableBox
-			className={ classnames( 'block-library-spacer__resize-container', {
+			className={ clsx( 'block-library-spacer__resize-container', {
 				'resize-horizontal': orientation === 'horizontal',
 				'is-resizing': isResizing,
 				'is-selected': isSelected,
@@ -112,7 +115,7 @@ const SpacerEdit = ( {
 	const { layout = {} } = blockStyle;
 	const { selfStretch, flexSize } = layout;
 
-	const [ spacingSizes ] = useSettings( 'spacing.spacingSizes' );
+	const spacingSizes = useSpacingSizes();
 
 	const [ isResizing, setIsResizing ] = useState( false );
 	const [ temporaryHeight, setTemporaryHeight ] = useState( null );
@@ -346,7 +349,7 @@ const SpacerEdit = ( {
 			<View
 				{ ...useBlockProps( {
 					style,
-					className: classnames( className, {
+					className: clsx( className, {
 						'custom-sizes-disabled': disableCustomSpacingSizes,
 					} ),
 				} ) }

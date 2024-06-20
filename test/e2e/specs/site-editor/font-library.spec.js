@@ -61,7 +61,7 @@ test.describe( 'Font Library', () => {
 				.click();
 			await expect( page.getByRole( 'dialog' ) ).toBeVisible();
 			await expect(
-				page.getByRole( 'heading', { name: 'Fonts' } )
+				page.getByRole( 'heading', { name: 'Fonts', exact: true } )
 			).toBeVisible();
 		} );
 

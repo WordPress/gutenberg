@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -12,7 +12,7 @@ import { forwardRef } from '@wordpress/element';
 const PostPanelRow = forwardRef( ( { className, label, children }, ref ) => {
 	return (
 		<HStack
-			className={ classnames( 'editor-post-panel__row', className ) }
+			className={ clsx( 'editor-post-panel__row', className ) }
 			ref={ ref }
 		>
 			{ label && (
