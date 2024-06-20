@@ -31,7 +31,7 @@ export default function ColorVariations( { title, gap = 2 } ) {
 						key={ index }
 						variation={ variation }
 						isPill
-						property="color"
+						properties={ [ 'color' ] }
 					>
 						{ () => <StylesPreviewColors /> }
 					</Variation>

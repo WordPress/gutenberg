@@ -114,7 +114,7 @@ export function useSupportedStyles( name, element ) {
 
 export function useColorVariations() {
 	const colorVariations = useCurrentMergeThemeStyleVariationsWithUserConfig( {
-		property: 'color',
+		properties: [ 'color' ],
 	} );
 	/*
 	 * Filter out variations with no settings or styles.
@@ -134,7 +134,7 @@ export function useColorVariations() {
 export function useTypographyVariations() {
 	const typographyVariations =
 		useCurrentMergeThemeStyleVariationsWithUserConfig( {
-			property: 'typography',
+			properties: [ 'typography', 'spacing' ],
 		} );
 	/*
 	 * Filter out variations with no settings or styles.

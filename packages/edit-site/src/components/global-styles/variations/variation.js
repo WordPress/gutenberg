@@ -15,7 +15,7 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
 /**
  * Internal dependencies
  */
-import { filterObjectByProperty } from '../../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
+import { filterObjectByProperties } from '../../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
 import { unlock } from '../../../lock-unlock';
 
 const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
@@ -23,14 +23,19 @@ const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
 	blockEditorPrivateApis
 );
 
-export default function Variation( { variation, children, isPill, property } ) {
+export default function Variation( {
+	variation,
+	children,
+	isPill,
+	properties,
+} ) {
 	const [ isFocused, setIsFocused ] = useState( false );
 	const { base, user, setUserConfig } = useContext( GlobalStylesContext );
 
 	const context = useMemo( () => {
 		let merged = mergeBaseAndUserConfigs( base, variation );
-		if ( property ) {
-			merged = filterObjectByProperty( merged, property );
+		if ( properties ) {
+			merged = filterObjectByProperties( merged, properties );
 		}
 		return {
 			user: variation,
@@ -38,7 +43,7 @@ export default function Variation( { variation, children, isPill, property } ) {
 			merged,
 			setUserConfig: () => {},
 		};
-	}, [ variation, base, property ] );
+	}, [ variation, base, properties ] );
 
 	const selectVariation = () => setUserConfig( variation );
 

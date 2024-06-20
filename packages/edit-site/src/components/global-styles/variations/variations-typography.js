@@ -38,7 +38,7 @@ export default function TypographyVariations( { title, gap = 2 } ) {
 						<Variation
 							key={ index }
 							variation={ variation }
-							property="typography"
+							properties={ [ 'typography', 'spacing' ] }
 						>
 							{ ( isFocused ) => (
 								<PreviewIframe
