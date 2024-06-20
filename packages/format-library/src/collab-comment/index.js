@@ -2,8 +2,8 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useState, useEffect } from '@wordpress/element';
-import { toggleFormat } from '@wordpress/rich-text';
+import { useState, useEffect, useLayoutEffect } from '@wordpress/element';
+import { toggleFormat, removeFormat } from '@wordpress/rich-text';
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 import { comment as commentIcon } from '@wordpress/icons';
 
@@ -19,43 +19,70 @@ const isBlockCommentExperimentEnabled =
 	window?.__experimentalEnableBlockComment;
 
 function Edit( { isActive, value, onChange, onFocus, contentRef } ) {
+	// State to manage the visibility of the discussion board.
+	const [ isDiscussionBoardVisible, setIsDiscussionBoardVisible ] =
+		useState( false );
+	const [ threadId, setThreadId ] = useState(null);
+
 	function onClick() {
+		const instanceId = Date.now().toString();
+
 		onChange(
 			toggleFormat( value, {
 				type: name,
+				attributes: {
+					id: instanceId,
+				},
 				title,
-				attributes: { cid: Date.now() },
 			} )
 		);
+
+		setThreadId( instanceId );
 		onFocus();
 		setIsDiscussionBoardVisible( true );
 	}
 
-	// State to manage the visibility of the discussion board.
-	const [ isDiscussionBoardVisible, setIsDiscussionBoardVisible ] =
-		useState( false );
-
 	// Function to toggle the visibility of the discussion board.
 	const toggleDiscussionBoardVisibility = () => {
+			console.log('toggleDiscussionBoardVisibility');
+		onChange( removeFormat( value, name ) );
 		setIsDiscussionBoardVisible( ( state ) => ! state );
 	};
 
-	// Set the threadId if exists, from the currently selected block classList.
+	// close comment board if the comment is not active.
 	useEffect( () => {
-		const classList = contentRef.current?.classList?.value
-			.split( ' ' )
-			.find( ( className ) =>
-				className.startsWith( 'block-editor-collab__' )
-			);
-
-		const threadID = classList
-			? classList.slice( 'block-editor-collab__'.length )
-			: '';
-
-		if ( threadID ) {
-			setIsDiscussionBoardVisible( true );
+		if ( ! isActive ) {
+			setIsDiscussionBoardVisible( false );
 		}
-	}, [ contentRef ] );
+	}, [ isActive ] );
+
+	useLayoutEffect( () => {
+		const editableContentElement = contentRef.current;
+		if ( ! editableContentElement ) {
+			return;
+		}
+
+		function handleClick( event ) {
+			const comment = event.target.closest( '[contenteditable] span' );
+			if (
+				! comment ||
+				! isActive
+			) {
+				return;
+			}
+
+			setIsDiscussionBoardVisible( true );
+			const threadID = comment.getAttribute('id');
+			setThreadId( threadID );
+		}
+
+		editableContentElement.addEventListener( 'click', handleClick );
+
+		return () => {
+			editableContentElement.removeEventListener( 'click', handleClick );
+		};
+	}, [ contentRef, isActive ] );
+
 	return (
 		<>
 			{ isBlockCommentExperimentEnabled && (
@@ -69,6 +96,8 @@ function Edit( { isActive, value, onChange, onFocus, contentRef } ) {
 
 			{ isBlockCommentExperimentEnabled && isDiscussionBoardVisible && (
 				<CollabBoard
+					threadId={ threadId }
+					setThreadId={ setThreadId }
 					contentRef={ contentRef }
 					onClose={ toggleDiscussionBoardVisibility }
 				/>
@@ -83,7 +112,7 @@ export const collabComment = {
 	tagName: 'span',
 	className: 'has-collab-comment',
 	attributes: {
-		cid: 'cid',
+		id: 'id',
 	},
 	edit: Edit,
 };

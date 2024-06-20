@@ -34,27 +34,28 @@ import { store as editorStore } from '@wordpress/editor';
  *
  * @return {Object} CollabBoard component.
  */
-const CollabBoard = ( { contentRef, onClose } ) => {
+const CollabBoard = ( { threadId, setThreadId, contentRef, onClose } ) => {
+	console.log( 'CollabBoard' ,threadId);
 	// Get the anchor for the popover.
 	const popoverAnchor = useAnchor( {
 		editableContentElement: contentRef.current,
 	} );
-	const classList = contentRef.current?.classList?.value
-		.split( ' ' )
-		.find( ( className ) =>
-			className.startsWith( 'block-editor-collab__' )
-		);
+	// const classList = contentRef.current?.classList?.value
+	// 	.split( ' ' )
+	// 	.find( ( className ) =>
+	// 		className.startsWith( 'block-editor-collab__' )
+	// 	);
 
 	// State to manage the comment thread.
 	const [ inputComment, setInputComment ] = useState( '' );
 	const [ isResolved, setIsResolved ] = useState( false );
 	const [ isEditing, setIsEditing ] = useState( null );
 	const [ showConfirmation, setShowConfirmation ] = useState( false );
-	const [ threadId, setThreadId ] = useState(
-		classList
-			? classList.slice( 'block-editor-collab__'.length )
-			: Date.now()
-	);
+	// const [ threadId, setThreadId ] = useState(
+	// 	classList
+	// 		? classList.slice( 'block-editor-collab__'.length )
+	// 		: Date.now()
+	// );
 
 	// Get the dispatch functions to save the comment and update the block attributes.
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
