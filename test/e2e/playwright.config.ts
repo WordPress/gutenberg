@@ -16,9 +16,8 @@ const config = defineConfig( {
 		? [ [ 'github' ], [ './config/flaky-tests-reporter.ts' ] ]
 		: 'list',
 	workers: 1,
-	globalSetup: fileURLToPath(
-		new URL( './config/global-setup.ts', 'file:' + __filename ).href
-	),
+	webServer: undefined,
+	globalSetup: undefined,
 	projects: [
 		{
 			name: 'chromium',
