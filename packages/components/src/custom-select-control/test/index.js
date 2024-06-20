@@ -431,11 +431,14 @@ describe.each( [
 			const onBlurMock = jest.fn();
 
 			render(
-				<Component
-					{ ...props }
-					onFocus={ onFocusMock }
-					onBlur={ onBlurMock }
-				/>
+				<>
+					<Component
+						{ ...props }
+						onFocus={ onFocusMock }
+						onBlur={ onBlurMock }
+					/>
+					<button>Focus stop</button>
+				</>
 			);
 
 			const currentSelectedItem = screen.getByRole( 'button', {

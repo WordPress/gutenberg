@@ -457,5 +457,34 @@ describe.each( [
 				} )
 			).toBeVisible();
 		} );
+
+		it( 'Should call custom event handlers', async () => {
+			const onFocusMock = jest.fn();
+			const onBlurMock = jest.fn();
+
+			render(
+				<>
+					<Component
+						{ ...legacyProps }
+						onFocus={ onFocusMock }
+						onBlur={ onBlurMock }
+					/>
+					<button>Focus stop</button>
+				</>
+			);
+
+			const currentSelectedItem = screen.getByRole( 'combobox', {
+				expanded: false,
+			} );
+
+			await press.Tab();
+
+			expect( currentSelectedItem ).toHaveFocus();
+			expect( onFocusMock ).toHaveBeenCalledTimes( 1 );
+
+			await press.Tab();
+			expect( currentSelectedItem ).not.toHaveFocus();
+			expect( onBlurMock ).toHaveBeenCalledTimes( 1 );
+		} );
 	} );
 } );
