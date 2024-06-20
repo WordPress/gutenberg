@@ -58,6 +58,7 @@ jobs:
 
             - name: Start the server
               run: |
+                  cd playground
                   ~/.bun/bin/bun packages/playground/cli/src/cli.ts server \
                       --wp=6.5 \
                       --mount=../:/wordpress/wp-content/plugins/gutenberg \
