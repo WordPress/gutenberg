@@ -10,9 +10,9 @@ exports[`FullscreenModeClose when in full screen mode should display a default s
     >
       <svg
         aria-hidden="true"
-        disabled=""
         focusable="false"
         height="36px"
+        style="pointer-events: none;"
         viewBox="-2 -2 24 24"
         width="36px"
         xmlns="http://www.w3.org/2000/svg"
