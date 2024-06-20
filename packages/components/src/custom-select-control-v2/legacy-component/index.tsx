@@ -14,7 +14,7 @@ import * as Styled from '../styles';
 
 function CustomSelectControl( props: LegacyCustomSelectProps ) {
 	const {
-		__experimentalShowSelectedHint,
+		__experimentalShowSelectedHint = false,
 		__next40pxDefaultSize = false,
 		describedBy,
 		options,
@@ -123,15 +123,4 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 	);
 }
 
-export function ClassicCustomSelectControlV2Adapter(
-	props: LegacyCustomSelectProps
-) {
-	return (
-		<CustomSelectControl
-			__experimentalShowSelectedHint={ false }
-			{ ...props }
-		/>
-	);
-}
-
-export default ClassicCustomSelectControlV2Adapter;
+export default CustomSelectControl;
