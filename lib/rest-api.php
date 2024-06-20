@@ -48,7 +48,7 @@ if ( ! function_exists( 'gutenberg_register_wp_rest_post_types_controller_fields
 				},
 				'schema'       => array(
 					'type'        => 'array',
-					'description' => __( 'The template associated with the post type.', 'gutenberg' ),
+					'description' => __( 'The block template associated with the post type, if it exists.', 'gutenberg' ),
 					'readonly'    => true,
 					'context'     => array( 'view', 'edit', 'embed' ),
 				),
@@ -67,7 +67,7 @@ if ( ! function_exists( 'gutenberg_register_wp_rest_post_types_controller_fields
 				'schema'       => array(
 					'type'        => 'string',
 					'enum'        => array( 'all', 'insert', 'contentOnly' ),
-					'description' => __( 'The template_lock specified for the post type.', 'gutenberg' ),
+					'description' => __( 'The template_lock associated with the post type, if any.', 'gutenberg' ),
 					'readonly'    => true,
 					'context'     => array( 'view', 'edit', 'embed' ),
 				),
