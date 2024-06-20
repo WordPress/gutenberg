@@ -309,12 +309,12 @@ const trashPostAction = {
 
 function useTrashPostAction( postType ) {
 	const registry = useRegistry();
-	const { resource, canUserResolvers } = useSelect(
+	const { resource, cachedCanUserResolvers } = useSelect(
 		( select ) => {
 			const { getPostType, getCachedResolvers } = select( coreStore );
 			return {
 				resource: getPostType( postType )?.rest_base || '',
-				canUserResolvers: getCachedResolvers().canUser,
+				cachedCanUserResolvers: getCachedResolvers().canUser,
 			};
 		},
 		[ postType ]
@@ -331,8 +331,10 @@ function useTrashPostAction( postType ) {
 				);
 			},
 		} ),
+		// We are making this use memo depend on cachedCanUserResolvers as a way to make the component using this hook re-render
+		// when user capabilities are resolved. This makes sure the isEligible function is re-evaluated.
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[ registry, resource, canUserResolvers ]
+		[ registry, resource, cachedCanUserResolvers ]
 	);
 }
 
@@ -1143,9 +1145,7 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 		isPattern,
 		postTypeObject?.viewable,
 		duplicatePostAction,
-		permanentlyDeletePostAction,
 		trashPostActionForPostType,
-		restorePostAction,
 		onActionPerformed,
 		isLoaded,
 		supportsRevisions,
