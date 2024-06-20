@@ -13,7 +13,7 @@ const baseConfig = require( '@wordpress/scripts/config/playwright.config' );
 const config = defineConfig( {
 	...baseConfig,
 	reporter: process.env.CI
-		? [ [ 'github' ], [ './config/flaky-tests-reporter.ts' ] ]
+		? [ [ 'github' ], [ 'list' ], [ './config/flaky-tests-reporter.ts' ] ]
 		: 'list',
 	workers: 1,
 	webServer: undefined,
