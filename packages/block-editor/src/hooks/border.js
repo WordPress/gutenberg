@@ -397,6 +397,7 @@ export default {
 	useBlockProps,
 	addSaveProps,
 	attributeKeys: [ 'borderColor', 'style' ],
+	isMatch: ( { style, borderColor } ) => !! ( style?.border || borderColor ),
 	hasSupport( name ) {
 		return hasBorderSupport( name, 'color' );
 	},

@@ -79,14 +79,7 @@ export function setBackgroundStyleDefaults( backgroundStyle ) {
 	return backgroundStylesWithDefaults;
 }
 
-function useBlockProps( { name, style } ) {
-	if (
-		! hasBackgroundSupport( name ) ||
-		! style?.background?.backgroundImage
-	) {
-		return;
-	}
-
+function useBlockProps( { style } ) {
 	const backgroundStyles = setBackgroundStyleDefaults( style?.background );
 
 	if ( ! backgroundStyles ) {
@@ -184,5 +177,6 @@ export function BackgroundImagePanel( {
 export default {
 	useBlockProps,
 	attributeKeys: [ 'style' ],
+	isMatch: ( { style } ) => !! style?.background?.backgroundImage,
 	hasSupport: hasBackgroundSupport,
 };

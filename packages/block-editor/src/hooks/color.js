@@ -404,6 +404,14 @@ export default {
 	useBlockProps,
 	addSaveProps,
 	attributeKeys: [ 'backgroundColor', 'textColor', 'gradient', 'style' ],
+	isMatch: ( { style, backgroundColor, textColor, gradient } ) =>
+		!! (
+			backgroundColor ||
+			textColor ||
+			gradient ||
+			style?.color ||
+			style?.elements
+		),
 	hasSupport: hasColorSupport,
 };
 

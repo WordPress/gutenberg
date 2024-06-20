@@ -92,6 +92,7 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 export default {
 	edit: BlockBindingsPanel,
 	attributeKeys: [ 'metadata' ],
+	isMatch: ( { metadata } ) => !! metadata?.bindings,
 	hasSupport() {
 		return true;
 	},

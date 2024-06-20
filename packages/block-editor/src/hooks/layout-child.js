@@ -187,6 +187,7 @@ export default {
 	useBlockProps: useBlockPropsChildLayoutStyles,
 	edit: ChildLayoutControlsPure,
 	attributeKeys: [ 'style' ],
+	isMatch: ( { style } ) => !! style?.layout,
 	hasSupport() {
 		return true;
 	},

@@ -157,6 +157,7 @@ export function hasDimensionsSupport( blockName, feature = 'any' ) {
 export default {
 	useBlockProps,
 	attributeKeys: [ 'minHeight', 'style' ],
+	isMatch: ( { style, minHeight } ) => !! ( minHeight || style?.dimensions ),
 	hasSupport( name ) {
 		return hasDimensionsSupport( name, 'aspectRatio' );
 	},

@@ -361,6 +361,7 @@ export default {
 	hasSupport: hasStyleSupport,
 	addSaveProps,
 	attributeKeys: [ 'style' ],
+	isMatch: ( { style } ) => !! style?.elements,
 	useBlockProps,
 };
 
