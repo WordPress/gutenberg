@@ -318,7 +318,7 @@ export default function ViewList< Item extends AnyItem >(
 	} = props;
 	const baseId = useInstanceId( ViewList, 'view-list' );
 	const selectedItem = data?.findLast( ( item ) =>
-		selection.includes( item.id )
+		selection.includes( getItemId( item ) )
 	);
 
 	const mediaField = fields.find(

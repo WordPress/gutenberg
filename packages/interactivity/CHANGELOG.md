@@ -17,7 +17,7 @@
 
 ### Bug Fixes
 
--	Fix null and number strings as namespaces runtime error. ([#61960](https://github.com/WordPress/gutenberg/pull/61960/))
+-   Fix null and number strings as namespaces runtime error. ([#61960](https://github.com/WordPress/gutenberg/pull/61960/))
 
 ## 5.7.0 (2024-05-16)
 
