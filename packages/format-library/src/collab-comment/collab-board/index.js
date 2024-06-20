@@ -26,13 +26,15 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as editorStore } from '@wordpress/editor';
 
 /**
- * CollabBoard component.
+ * Represents a collaborative comment board component.
  *
- * @param {Object}   props            Component props.
- * @param {Object}   props.contentRef Reference to the content.
- * @param {Function} props.onClose    Function to close the popover.
- *
- * @return {Object} CollabBoard component.
+ * @param {Object} props - The component props.
+ * @param {string} props.threadId - The ID of the comment thread.
+ * @param {function} props.setThreadId - The function to set the comment thread ID.
+ * @param {Object} props.contentRef - The reference to the content element.
+ * @param {function} props.onClose - The function to close the comment board.
+ * 
+ * @return {Component} CollabBoard component.
  */
 const CollabBoard = ( { threadId, setThreadId, contentRef, onClose } ) => {
 	console.log( 'CollabBoard' ,threadId);
