@@ -312,9 +312,7 @@ describe.each( [
 	} );
 
 	it( 'Should return selectedItem object when specified onChange', async () => {
-		const mockOnChange = jest.fn(
-			( { selectedItem } ) => selectedItem.key
-		);
+		const mockOnChange = jest.fn();
 
 		render( <Component { ...legacyProps } onChange={ mockOnChange } /> );
 
@@ -326,10 +324,30 @@ describe.each( [
 			} )
 		).toHaveFocus();
 
+		// NOTE: legacy CustomSelectControl doesn't fire onChange
+		// at this point in time.
+		expect( mockOnChange ).toHaveBeenNthCalledWith(
+			1,
+			expect.objectContaining( {
+				selectedItem: expect.objectContaining( {
+					key: 'flower1',
+					name: 'violets',
+				} ),
+			} )
+		);
+
 		await type( 'p' );
 		await press.Enter();
 
-		expect( mockOnChange ).toHaveReturnedWith( 'poppy' );
+		expect( mockOnChange ).toHaveBeenNthCalledWith(
+			2,
+			expect.objectContaining( {
+				selectedItem: expect.objectContaining( {
+					key: 'flower3',
+					name: 'poppy',
+				} ),
+			} )
+		);
 	} );
 
 	describe( 'Keyboard behavior and accessibility', () => {

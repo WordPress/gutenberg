@@ -271,6 +271,33 @@ describe.each( [
 		expect( screen.getByRole( 'option', { name: /hint/i } ) ).toBeVisible();
 	} );
 
+	it( 'Should return selectedItem object when specified onChange', async () => {
+		const user = userEvent.setup();
+		const mockOnChange = jest.fn();
+
+		render( <Component { ...props } onChange={ mockOnChange } /> );
+
+		await user.tab();
+		expect(
+			screen.getByRole( 'button', {
+				expanded: false,
+			} )
+		).toHaveFocus();
+
+		await user.keyboard( 'p' );
+		await user.keyboard( '{enter}' );
+
+		expect( mockOnChange ).toHaveBeenNthCalledWith(
+			1,
+			expect.objectContaining( {
+				selectedItem: expect.objectContaining( {
+					key: 'flower3',
+					name: 'poppy',
+				} ),
+			} )
+		);
+	} );
+
 	describe( 'Keyboard behavior and accessibility', () => {
 		it( 'Captures the keypress event and does not let it propagate', async () => {
 			const user = userEvent.setup();
