@@ -560,7 +560,7 @@ describe.each( [
 
 		// Assert that the option element does not have the custom attributes
 		expect( optionElement ).not.toHaveAttribute( 'customPropFoo' );
-		expect( optionElement ).not.toHaveAttribute( 'customPropBar' );
+		expect( optionElement ).not.toHaveAttribute( 'aria-label' );
 
 		await click( optionElement );
 
