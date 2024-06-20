@@ -306,7 +306,6 @@ describe.each( [
 			expect.objectContaining( {
 				inputValue: '',
 				isOpen: false,
-
 				selectedItem: expect.objectContaining( {
 					name: 'aquamarine',
 				} ),
