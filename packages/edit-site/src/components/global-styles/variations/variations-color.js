@@ -29,6 +29,7 @@ export default function ColorVariations( { title, gap = 2 } ) {
 			<Grid spacing={ gap }>
 				{ colorVariations.map( ( variation, index ) => (
 					<Tooltip key={ index } text={ variation?.title }>
+						{ /* This div is needed for Tooltips to work */ }
 						<div>
 							<Variation
 								variation={ variation }
