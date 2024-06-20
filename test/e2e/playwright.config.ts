@@ -17,7 +17,9 @@ const config = defineConfig( {
 		: 'list',
 	workers: 1,
 	webServer: undefined,
-	globalSetup: undefined,
+	globalSetup: fileURLToPath(
+		new URL( './config/global-setup.ts', 'file:' + __filename ).href
+	),
 	projects: [
 		{
 			name: 'chromium',
