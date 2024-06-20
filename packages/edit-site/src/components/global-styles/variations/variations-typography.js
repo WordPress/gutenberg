@@ -37,6 +37,7 @@ export default function TypographyVariations( { title, gap = 2 } ) {
 					typographyVariations.length &&
 					typographyVariations.map( ( variation, index ) => (
 						<Tooltip key={ index } text={ variation?.title }>
+							{ /* This div is needed for Tooltips to work */ }
 							<div>
 								<Variation
 									variation={ variation }
