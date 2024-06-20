@@ -20,7 +20,7 @@ import {
 /**
  * Internal dependencies
  */
-import BackButton from './back-button';
+import BackButton, { useHasBackButton } from './back-button';
 import CollapsibleBlockToolbar from '../collapsible-block-toolbar';
 import DocumentBar from '../document-bar';
 import DocumentTools from '../document-tools';
@@ -101,21 +101,25 @@ function Header( {
 		) : null;
 
 	const showDocumentBar = ! blockToolbar || isBlockToolsCollapsed;
+	const hasBackButton = useHasBackButton();
 
 	// The edit-post-header classname is only kept for backward compatibilty
 	// as some plugins might be relying on its presence.
 	return (
 		<div
 			className={ clsx( 'editor-header edit-post-header', {
+				'has-back-button': hasBackButton,
 				'has-center': isMobileViewport && showDocumentBar,
 			} ) }
 		>
-			<motion.div
-				variants={ backButtonVariations }
-				transition={ { type: 'tween' } }
-			>
-				<BackButton.Slot />
-			</motion.div>
+			{ hasBackButton && (
+				<motion.div
+					variants={ backButtonVariations }
+					transition={ { type: 'tween' } }
+				>
+					<BackButton.Slot />
+				</motion.div>
+			) }
 			<motion.div
 				variants={ toolbarVariations }
 				className="editor-header__toolbar"
