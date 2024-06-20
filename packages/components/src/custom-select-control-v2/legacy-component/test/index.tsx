@@ -245,7 +245,7 @@ describe.each( [
 				screen.getByRole( 'combobox', {
 					expanded: false,
 				} )
-			).toHaveTextContent( /hint/i )
+			).toHaveTextContent( 'Hint' )
 		);
 	} );
 
