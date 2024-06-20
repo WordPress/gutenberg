@@ -97,6 +97,8 @@ export const SVG = forwardRef(
 				clsx( className, { 'is-pressed': isPressed } ) || undefined,
 			'aria-hidden': true,
 			focusable: false,
+			// Safari does not obey `focusable`, but it does obey `disabled`.
+			disabled: true,
 		};
 
 		// Disable reason: We need to have a way to render HTML tag for web.
