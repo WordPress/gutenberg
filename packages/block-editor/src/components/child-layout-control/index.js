@@ -213,94 +213,96 @@ export default function ChildLayoutControl( {
 							min={ 1 }
 						/>
 					</HStack>
-					{ window.__experimentalEnableGridInteractivity && (
-						// Use Flex with an explicit width on the FlexItem instead of HStack to
-						// work around an issue in webkit where inputs with a max attribute are
-						// sized incorrectly.
-						<Flex
-							as={ ToolsPanelItem }
-							hasValue={ hasStartValue }
-							label={ __( 'Grid placement' ) }
-							onDeselect={ resetGridStarts }
-							isShownByDefault={ false }
-							panelId={ panelId }
-						>
-							<FlexItem style={ { width: '50%' } }>
-								<InputControl
-									size="__unstable-large"
-									label={ __( 'Column' ) }
-									type="number"
-									onChange={ ( value ) => {
-										onChange( {
-											columnStart: value,
-											rowStart,
-											columnSpan,
-											rowSpan,
-										} );
-										const currentBlockIndex =
-											( parseInt( rowStart, 10 ) - 1 ) *
-												gridColumnNumber +
-											parseInt( value, 10 ) -
-											1;
-										moveBlocksToPosition(
-											[ panelId ],
-											rootClientId,
-											rootClientId,
-											getBlocksBeforeCurrentCell(
-												currentBlockIndex
-											)
-										);
-									} }
-									value={ columnStart }
-									min={ 1 }
-									max={
-										parentLayout?.columnCount
-											? parentLayout.columnCount -
-											  ( columnSpan ?? 1 ) +
-											  1
-											: undefined
-									}
-								/>
-							</FlexItem>
-							<FlexItem style={ { width: '50%' } }>
-								<InputControl
-									size="__unstable-large"
-									label={ __( 'Row' ) }
-									type="number"
-									onChange={ ( value ) => {
-										onChange( {
-											columnStart,
-											rowStart: value,
-											columnSpan,
-											rowSpan,
-										} );
-										const currentBlockIndex =
-											( parseInt( value, 10 ) - 1 ) *
-												gridColumnNumber +
-											parseInt( columnStart, 10 ) -
-											1;
-										moveBlocksToPosition(
-											[ panelId ],
-											rootClientId,
-											rootClientId,
-											getBlocksBeforeCurrentCell(
-												currentBlockIndex
-											)
-										);
-									} }
-									value={ rowStart }
-									min={ 1 }
-									max={
-										parentLayout?.rowCount
-											? parentLayout.rowCount -
-											  ( rowSpan ?? 1 ) +
-											  1
-											: undefined
-									}
-								/>
-							</FlexItem>
-						</Flex>
-					) }
+					{ window.__experimentalEnableGridInteractivity &&
+						columnCount && (
+							// Use Flex with an explicit width on the FlexItem instead of HStack to
+							// work around an issue in webkit where inputs with a max attribute are
+							// sized incorrectly.
+							<Flex
+								as={ ToolsPanelItem }
+								hasValue={ hasStartValue }
+								label={ __( 'Grid placement' ) }
+								onDeselect={ resetGridStarts }
+								isShownByDefault={ false }
+								panelId={ panelId }
+							>
+								<FlexItem style={ { width: '50%' } }>
+									<InputControl
+										size="__unstable-large"
+										label={ __( 'Column' ) }
+										type="number"
+										onChange={ ( value ) => {
+											onChange( {
+												columnStart: value,
+												rowStart,
+												columnSpan,
+												rowSpan,
+											} );
+											const currentBlockIndex =
+												( parseInt( rowStart, 10 ) -
+													1 ) *
+													gridColumnNumber +
+												parseInt( value, 10 ) -
+												1;
+											moveBlocksToPosition(
+												[ panelId ],
+												rootClientId,
+												rootClientId,
+												getBlocksBeforeCurrentCell(
+													currentBlockIndex
+												)
+											);
+										} }
+										value={ columnStart }
+										min={ 1 }
+										max={
+											gridColumnNumber
+												? gridColumnNumber -
+												  ( columnSpan ?? 1 ) +
+												  1
+												: undefined
+										}
+									/>
+								</FlexItem>
+								<FlexItem style={ { width: '50%' } }>
+									<InputControl
+										size="__unstable-large"
+										label={ __( 'Row' ) }
+										type="number"
+										onChange={ ( value ) => {
+											onChange( {
+												columnStart,
+												rowStart: value,
+												columnSpan,
+												rowSpan,
+											} );
+											const currentBlockIndex =
+												( parseInt( value, 10 ) - 1 ) *
+													gridColumnNumber +
+												parseInt( columnStart, 10 ) -
+												1;
+											moveBlocksToPosition(
+												[ panelId ],
+												rootClientId,
+												rootClientId,
+												getBlocksBeforeCurrentCell(
+													currentBlockIndex
+												)
+											);
+										} }
+										value={ rowStart }
+										min={ 1 }
+										max={
+											parentLayout?.rowCount
+												? parentLayout.rowCount -
+												  ( rowSpan ?? 1 ) +
+												  1
+												: undefined
+										}
+									/>
+								</FlexItem>
+							</Flex>
+						) }
 				</>
 			) }
 		</>
