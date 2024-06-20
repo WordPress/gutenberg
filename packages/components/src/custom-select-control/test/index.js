@@ -14,7 +14,11 @@ import { useState } from '@wordpress/element';
  */
 import UncontrolledCustomSelectControl from '..';
 
-const customClass = 'amber-skies';
+const customClassName = 'amber-skies';
+const customStyles = {
+	backgroundColor: 'rgb(127, 255, 212)',
+	rotate: '13deg',
+};
 
 const props = {
 	label: 'label!',
@@ -26,7 +30,7 @@ const props = {
 		{
 			key: 'flower2',
 			name: 'crimson clover',
-			className: customClass,
+			className: customClassName,
 		},
 		{
 			key: 'flower3',
@@ -35,26 +39,33 @@ const props = {
 		{
 			key: 'color1',
 			name: 'amber',
-			className: customClass,
+			className: customClassName,
 		},
 		{
 			key: 'color2',
 			name: 'aquamarine',
-			style: {
-				backgroundColor: 'rgb(127, 255, 212)',
-				rotate: '13deg',
-			},
+			style: customStyles,
 		},
 	],
 };
 
-const ControlledCustomSelectControl = ( { options, ...restProps } ) => {
+const ControlledCustomSelectControl = ( {
+	options,
+	onChange: onChangeProp,
+	...restProps
+} ) => {
 	const [ value, setValue ] = useState( options[ 0 ] );
+
+	const onChange = ( changeObject ) => {
+		onChangeProp?.( changeObject );
+		setValue( changeObject.selectedItem );
+	};
+
 	return (
 		<UncontrolledCustomSelectControl
 			{ ...restProps }
 			options={ options }
-			onChange={ ( { selectedItem } ) => setValue( selectedItem ) }
+			onChange={ onChange }
 			value={ options.find( ( option ) => option.key === value.key ) }
 		/>
 	);
@@ -144,7 +155,7 @@ describe.each( [
 		// assert against filtered array
 		itemsWithClass.map( ( { name } ) =>
 			expect( screen.getByRole( 'option', { name } ) ).toHaveClass(
-				customClass
+				customClassName
 			)
 		);
 
@@ -156,15 +167,13 @@ describe.each( [
 		// assert against filtered array
 		itemsWithoutClass.map( ( { name } ) =>
 			expect( screen.getByRole( 'option', { name } ) ).not.toHaveClass(
-				customClass
+				customClassName
 			)
 		);
 	} );
 
 	it( 'Should apply styles only to options that have styles defined', async () => {
 		const user = userEvent.setup();
-		const customStyles =
-			'background-color: rgb(127, 255, 212); rotate: 13deg;';
 
 		render( <Component { ...props } /> );
 
@@ -260,6 +269,81 @@ describe.each( [
 		);
 
 		expect( screen.getByRole( 'option', { name: /hint/i } ) ).toBeVisible();
+	} );
+
+	it( 'Should return object onChange', async () => {
+		const user = userEvent.setup();
+		const mockOnChange = jest.fn();
+
+		render(
+			<Component
+				{ ...props }
+				value={ props.options[ 0 ] }
+				onChange={ mockOnChange }
+			/>
+		);
+
+		await user.click(
+			screen.getByRole( 'button', {
+				expanded: false,
+			} )
+		);
+
+		// DIFFERENCE WITH V2: NOT CALLED
+		// expect( mockOnChange ).toHaveBeenNthCalledWith(
+		// 	1,
+		// 	expect.objectContaining( {
+		// 		inputValue: '',
+		// 		isOpen: false,
+		// 		selectedItem: { key: 'flower1', name: 'violets' },
+		// 		type: '',
+		// 	} )
+		// );
+
+		await user.click(
+			screen.getByRole( 'option', {
+				name: 'aquamarine',
+			} )
+		);
+
+		expect( mockOnChange ).toHaveBeenNthCalledWith(
+			1,
+			expect.objectContaining( {
+				inputValue: '',
+				isOpen: false,
+				selectedItem: expect.objectContaining( {
+					name: 'aquamarine',
+				} ),
+				type: '__item_click__',
+			} )
+		);
+	} );
+
+	it( 'Should return selectedItem object when specified onChange', async () => {
+		const user = userEvent.setup();
+		const mockOnChange = jest.fn();
+
+		render( <Component { ...props } onChange={ mockOnChange } /> );
+
+		await user.tab();
+		expect(
+			screen.getByRole( 'button', {
+				expanded: false,
+			} )
+		).toHaveFocus();
+
+		await user.keyboard( 'p' );
+		await user.keyboard( '{enter}' );
+
+		expect( mockOnChange ).toHaveBeenNthCalledWith(
+			1,
+			expect.objectContaining( {
+				selectedItem: expect.objectContaining( {
+					key: 'flower3',
+					name: 'poppy',
+				} ),
+			} )
+		);
 	} );
 
 	describe( 'Keyboard behavior and accessibility', () => {
@@ -422,11 +506,14 @@ describe.each( [
 			const onBlurMock = jest.fn();
 
 			render(
-				<Component
-					{ ...props }
-					onFocus={ onFocusMock }
-					onBlur={ onBlurMock }
-				/>
+				<>
+					<Component
+						{ ...props }
+						onFocus={ onFocusMock }
+						onBlur={ onBlurMock }
+					/>
+					<button>Focus stop</button>
+				</>
 			);
 
 			const currentSelectedItem = screen.getByRole( 'button', {
