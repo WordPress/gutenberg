@@ -31,12 +31,17 @@ export function GridItemMovers( {
 	const columnCount = parentLayout?.columnCount;
 	const rowCount = parentLayout?.rowCount;
 
+	const columnCountNumber = parseInt( columnCount, 10 );
+	const rowStartNumber = parseInt( rowStart, 10 );
+	const columnStartNumber = parseInt( columnStart, 10 );
+
 	const getBlocksBeforeCurrentCell = useGetBlocksBeforeCurrentCell(
 		gridClientId,
-		columnCount
+		columnCountNumber
 	);
 
-	const currentBlockIndex = ( rowStart - 1 ) * columnCount + columnStart - 1;
+	const currentBlockIndex =
+		( rowStartNumber - 1 ) * columnCountNumber + columnStartNumber - 1;
 
 	return (
 		<BlockControls group="parent">
@@ -53,7 +58,7 @@ export function GridItemMovers( {
 						gridClientId,
 						gridClientId,
 						getBlocksBeforeCurrentCell(
-							currentBlockIndex - columnCount
+							currentBlockIndex - columnCountNumber
 						)
 					);
 				} }
@@ -71,7 +76,7 @@ export function GridItemMovers( {
 						gridClientId,
 						gridClientId,
 						getBlocksBeforeCurrentCell(
-							currentBlockIndex + columnCount
+							currentBlockIndex + columnCountNumber
 						)
 					);
 				} }
@@ -82,7 +87,7 @@ export function GridItemMovers( {
 				isDisabled={ columnStart <= 1 }
 				onClick={ () => {
 					onChange( {
-						columnStart: columnStart - 1,
+						columnStart: columnStartNumber - 1,
 					} );
 					moveBlocksToPosition(
 						[ blockClientId ],
@@ -98,7 +103,7 @@ export function GridItemMovers( {
 				isDisabled={ columnCount && columnEnd >= columnCount }
 				onClick={ () => {
 					onChange( {
-						columnStart: columnStart + 1,
+						columnStart: columnStartNumber + 1,
 					} );
 					moveBlocksToPosition(
 						[ blockClientId ],

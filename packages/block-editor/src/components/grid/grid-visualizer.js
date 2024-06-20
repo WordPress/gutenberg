@@ -188,9 +188,10 @@ const GridVisualizerGrid = forwardRef( ( { clientId, gridElement }, ref ) => {
 								} }
 								color={ gridInfo.currentColor }
 								gridClientId={ clientId }
-								targetIndex={ getBlocksBeforeCurrentCell(
-									index
-								) }
+								index={ index }
+								getBlocksBeforeCurrentCell={
+									getBlocksBeforeCurrentCell
+								}
 							/>
 						);
 					} )
@@ -208,7 +209,8 @@ function GridVisualizerCell( {
 	onDrop,
 	color,
 	gridClientId,
-	targetIndex,
+	index,
+	getBlocksBeforeCurrentCell,
 } ) {
 	const { getDraggedBlockClientIds } = useSelect( blockEditorStore );
 	const { moveBlocksToPosition } = useDispatch( blockEditorStore );
@@ -231,7 +233,7 @@ function GridVisualizerCell( {
 					[ srcClientId ],
 					gridClientId,
 					gridClientId,
-					targetIndex
+					getBlocksBeforeCurrentCell( index )
 				);
 			}
 		},
