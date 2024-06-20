@@ -147,6 +147,166 @@ const deletePostAction = {
 	},
 };
 
+const trashPostAction = {
+	id: 'move-to-trash',
+	label: __( 'Move to Trash' ),
+	isPrimary: true,
+	icon: trash,
+	isEligible( item ) {
+		return ! [ 'auto-draft', 'trash' ].includes( item.status );
+	},
+	supportsBulk: true,
+	hideModalHeader: true,
+	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
+		const [ isBusy, setIsBusy ] = useState( false );
+		const { createSuccessNotice, createErrorNotice } =
+			useDispatch( noticesStore );
+		const { deleteEntityRecord } = useDispatch( coreStore );
+		return (
+			<VStack spacing="5">
+				<Text>
+					{ items.length === 1
+						? sprintf(
+								// translators: %s: The item's title.
+								__(
+									'Are you sure you want to move to trash "%s"?'
+								),
+								getItemTitle( items[ 0 ] )
+						  )
+						: sprintf(
+								// translators: %d: The number of items (2 or more).
+								_n(
+									'Are you sure you want to move to trash %d item?',
+									'Are you sure you want to move to trash %d items?',
+									items.length
+								),
+								items.length
+						  ) }
+				</Text>
+				<HStack justify="right">
+					<Button
+						variant="tertiary"
+						onClick={ closeModal }
+						disabled={ isBusy }
+						__experimentalIsFocusable
+					>
+						{ __( 'Cancel' ) }
+					</Button>
+					<Button
+						variant="primary"
+						onClick={ async () => {
+							setIsBusy( true );
+							const promiseResult = await Promise.allSettled(
+								items.map( ( item ) =>
+									deleteEntityRecord(
+										'postType',
+										item.type,
+										item.id,
+										{},
+										{ throwOnError: true }
+									)
+								)
+							);
+							// If all the promises were fulfilled with success.
+							if (
+								promiseResult.every(
+									( { status } ) => status === 'fulfilled'
+								)
+							) {
+								let successMessage;
+								if ( promiseResult.length === 1 ) {
+									successMessage = sprintf(
+										/* translators: The item's title. */
+										__( '"%s" moved to trash.' ),
+										getItemTitle( items[ 0 ] )
+									);
+								} else if ( items[ 0 ].type === 'page' ) {
+									successMessage = sprintf(
+										/* translators: The number of items. */
+										__( '%s items moved to trash.' ),
+										items.length
+									);
+								} else {
+									successMessage = sprintf(
+										/* translators: The number of posts. */
+										__( '%s items move to trash.' ),
+										items.length
+									);
+								}
+								createSuccessNotice( successMessage, {
+									type: 'snackbar',
+									id: 'move-to-trash-action',
+								} );
+							} else {
+								// If there was at least one failure.
+								let errorMessage;
+								// If we were trying to delete a single item.
+								if ( promiseResult.length === 1 ) {
+									if ( promiseResult[ 0 ].reason?.message ) {
+										errorMessage =
+											promiseResult[ 0 ].reason.message;
+									} else {
+										errorMessage = __(
+											'An error occurred while moving to trash the item.'
+										);
+									}
+									// If we were trying to delete multiple items.
+								} else {
+									const errorMessages = new Set();
+									const failedPromises = promiseResult.filter(
+										( { status } ) => status === 'rejected'
+									);
+									for ( const failedPromise of failedPromises ) {
+										if ( failedPromise.reason?.message ) {
+											errorMessages.add(
+												failedPromise.reason.message
+											);
+										}
+									}
+									if ( errorMessages.size === 0 ) {
+										errorMessage = __(
+											'An error occurred while moving to trash the items.'
+										);
+									} else if ( errorMessages.size === 1 ) {
+										errorMessage = sprintf(
+											/* translators: %s: an error message */
+											__(
+												'An error occurred while moving to trash the item: %s'
+											),
+											[ ...errorMessages ][ 0 ]
+										);
+									} else {
+										errorMessage = sprintf(
+											/* translators: %s: a list of comma separated error messages */
+											__(
+												'Some errors occurred while moving to trash the items: %s'
+											),
+											[ ...errorMessages ].join( ',' )
+										);
+									}
+								}
+								createErrorNotice( errorMessage, {
+									type: 'snackbar',
+								} );
+							}
+							if ( onActionPerformed ) {
+								onActionPerformed( items );
+							}
+							setIsBusy( false );
+							closeModal();
+						} }
+						isBusy={ isBusy }
+						disabled={ isBusy }
+						__experimentalIsFocusable
+					>
+						{ __( 'Trash' ) }
+					</Button>
+				</HStack>
+			</VStack>
+		);
+	},
+};
+
 function useTrashPostAction( postType ) {
 	const registry = useRegistry();
 	const { resource, canUserResolvers } = useSelect(
@@ -161,186 +321,13 @@ function useTrashPostAction( postType ) {
 	);
 	return useMemo(
 		() => ( {
-			id: 'move-to-trash',
-			label: __( 'Move to Trash' ),
-			isPrimary: true,
-			icon: trash,
+			...trashPostAction,
 			isEligible( item ) {
 				return (
+					trashPostAction.isEligible( item ) &&
 					registry
 						.select( coreStore )
-						.canUser( 'delete', resource, item.id ) &&
-					! [ 'auto-draft', 'trash' ].includes( item.status )
-				);
-			},
-			supportsBulk: true,
-			hideModalHeader: true,
-			RenderModal: ( { items, closeModal, onActionPerformed } ) => {
-				const [ isBusy, setIsBusy ] = useState( false );
-				const { createSuccessNotice, createErrorNotice } =
-					useDispatch( noticesStore );
-				const { deleteEntityRecord } = useDispatch( coreStore );
-				return (
-					<VStack spacing="5">
-						<Text>
-							{ items.length === 1
-								? sprintf(
-										// translators: %s: The item's title.
-										__(
-											'Are you sure you want to move to trash "%s"?'
-										),
-										getItemTitle( items[ 0 ] )
-								  )
-								: sprintf(
-										// translators: %d: The number of items (2 or more).
-										_n(
-											'Are you sure you want to move to trash %d item?',
-											'Are you sure you want to move to trash %d items?',
-											items.length
-										),
-										items.length
-								  ) }
-						</Text>
-						<HStack justify="right">
-							<Button
-								variant="tertiary"
-								onClick={ closeModal }
-								disabled={ isBusy }
-								__experimentalIsFocusable
-							>
-								{ __( 'Cancel' ) }
-							</Button>
-							<Button
-								variant="primary"
-								onClick={ async () => {
-									setIsBusy( true );
-									const promiseResult =
-										await Promise.allSettled(
-											items.map( ( item ) =>
-												deleteEntityRecord(
-													'postType',
-													item.type,
-													item.id,
-													{},
-													{ throwOnError: true }
-												)
-											)
-										);
-									// If all the promises were fulfilled with success.
-									if (
-										promiseResult.every(
-											( { status } ) =>
-												status === 'fulfilled'
-										)
-									) {
-										let successMessage;
-										if ( promiseResult.length === 1 ) {
-											successMessage = sprintf(
-												/* translators: The item's title. */
-												__( '"%s" moved to trash.' ),
-												getItemTitle( items[ 0 ] )
-											);
-										} else if (
-											items[ 0 ].type === 'page'
-										) {
-											successMessage = sprintf(
-												/* translators: The number of items. */
-												__(
-													'%s items moved to trash.'
-												),
-												items.length
-											);
-										} else {
-											successMessage = sprintf(
-												/* translators: The number of posts. */
-												__( '%s items move to trash.' ),
-												items.length
-											);
-										}
-										createSuccessNotice( successMessage, {
-											type: 'snackbar',
-											id: 'move-to-trash-action',
-										} );
-									} else {
-										// If there was at least one failure.
-										let errorMessage;
-										// If we were trying to delete a single item.
-										if ( promiseResult.length === 1 ) {
-											if (
-												promiseResult[ 0 ].reason
-													?.message
-											) {
-												errorMessage =
-													promiseResult[ 0 ].reason
-														.message;
-											} else {
-												errorMessage = __(
-													'An error occurred while moving to trash the item.'
-												);
-											}
-											// If we were trying to delete multiple items.
-										} else {
-											const errorMessages = new Set();
-											const failedPromises =
-												promiseResult.filter(
-													( { status } ) =>
-														status === 'rejected'
-												);
-											for ( const failedPromise of failedPromises ) {
-												if (
-													failedPromise.reason
-														?.message
-												) {
-													errorMessages.add(
-														failedPromise.reason
-															.message
-													);
-												}
-											}
-											if ( errorMessages.size === 0 ) {
-												errorMessage = __(
-													'An error occurred while moving to trash the items.'
-												);
-											} else if (
-												errorMessages.size === 1
-											) {
-												errorMessage = sprintf(
-													/* translators: %s: an error message */
-													__(
-														'An error occurred while moving to trash the item: %s'
-													),
-													[ ...errorMessages ][ 0 ]
-												);
-											} else {
-												errorMessage = sprintf(
-													/* translators: %s: a list of comma separated error messages */
-													__(
-														'Some errors occurred while moving to trash the items: %s'
-													),
-													[ ...errorMessages ].join(
-														','
-													)
-												);
-											}
-										}
-										createErrorNotice( errorMessage, {
-											type: 'snackbar',
-										} );
-									}
-									if ( onActionPerformed ) {
-										onActionPerformed( items );
-									}
-									setIsBusy( false );
-									closeModal();
-								} }
-								isBusy={ isBusy }
-								disabled={ isBusy }
-								__experimentalIsFocusable
-							>
-								{ __( 'Trash' ) }
-							</Button>
-						</HStack>
-					</VStack>
+						.canUser( 'delete', resource, item.id )
 				);
 			},
 		} ),
@@ -1062,7 +1049,7 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 	);
 
 	const duplicatePostAction = useDuplicatePostAction( postType );
-	const trashPostAction = useTrashPostAction( postType );
+	const trashPostActionForPostType = useTrashPostAction( postType );
 	const isTemplateOrTemplatePart = [
 		TEMPLATE_POST_TYPE,
 		TEMPLATE_PART_POST_TYPE,
@@ -1091,7 +1078,7 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 			isTemplateOrTemplatePart ? resetTemplateAction : restorePostAction,
 			isTemplateOrTemplatePart || isPattern
 				? deletePostAction
-				: trashPostAction,
+				: trashPostActionForPostType,
 			! isTemplateOrTemplatePart && permanentlyDeletePostAction,
 			...defaultActions,
 		].filter( Boolean );
@@ -1157,7 +1144,7 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 		postTypeObject?.viewable,
 		duplicatePostAction,
 		permanentlyDeletePostAction,
-		trashPostAction,
+		trashPostActionForPostType,
 		restorePostAction,
 		onActionPerformed,
 		isLoaded,
