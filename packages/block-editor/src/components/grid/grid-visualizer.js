@@ -247,7 +247,8 @@ function useDropZoneWithValidation( {
 	onDrop,
 	color,
 	gridClientId,
-	targetIndex,
+	index,
+	getBlocksBeforeCurrentCell,
 } ) {
 	const { getDraggedBlockClientIds } = useSelect( blockEditorStore );
 	return useDropZone( {
@@ -268,7 +269,7 @@ function useDropZoneWithValidation( {
 					[ srcClientId ],
 					gridClientId,
 					gridClientId,
-					targetIndex
+					getBlocksBeforeCurrentCell( index )
 				);
 			}
 		},
