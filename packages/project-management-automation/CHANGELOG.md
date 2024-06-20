@@ -7,6 +7,7 @@
 ### Internal
 
 -   Upgrade `@octokit/webhooks` dependency ([#62666](https://github.com/WordPress/gutenberg/pull/62666)).
+-   Update action to run on node20 ([#62695](https://github.com/WordPress/gutenberg/pull/62695)).
 
 ## 2.1.0 (2024-06-15)
 
