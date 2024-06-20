@@ -12,10 +12,6 @@
 	&.has-media-on-the-right {
 		grid-template-columns: 1fr 50%;
 	}
-
-	&__media > a {
-		display: inline-block;
-	}
 }
 
 .wp-block-media-text.is-vertically-aligned-top {
@@ -70,6 +66,10 @@
 	grid-column: 1;
 	grid-row: 1;
 	/*!rtl:end:ignore*/
+}
+
+.wp-block-media-text__media a {
+	display: inline-block;
 }
 
 .wp-block-media-text__media img,
