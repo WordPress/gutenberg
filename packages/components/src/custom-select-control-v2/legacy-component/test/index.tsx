@@ -51,18 +51,21 @@ const legacyProps = {
 
 const ControlledCustomSelectControl = ( {
 	options,
-	onChange,
+	onChange: onChangeProp,
 	...restProps
 }: React.ComponentProps< typeof UncontrolledCustomSelectControl > ) => {
 	const [ value, setValue ] = useState( options[ 0 ] );
+
+	const onChange: typeof onChangeProp = ( changeObject ) => {
+		onChangeProp?.( changeObject );
+		setValue( changeObject.selectedItem );
+	};
+
 	return (
 		<UncontrolledCustomSelectControl
 			{ ...restProps }
 			options={ options }
-			onChange={ ( args: any ) => {
-				onChange?.( args );
-				setValue( args.selectedItem );
-			} }
+			onChange={ onChange }
 			value={ options.find(
 				( option: any ) => option.key === value.key
 			) }
