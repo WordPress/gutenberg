@@ -15,7 +15,6 @@ import {
 	FlexItem,
 	ToggleControl,
 } from '@wordpress/components';
-import { useRef } from '@wordpress/element';
 import { moreVertical } from '@wordpress/icons';
 
 /**
@@ -68,20 +67,12 @@ function FontSize() {
 	// Whether custom fluid values are used.
 	const isCustomFluid = typeof fontSize.fluid === 'object';
 
-	// Initialize the ref with the prop value on the first render
-	const initialFontSizeRef = useRef( fontSize.size );
-
-	// Memoized initial value of fontSize
-	const initialFontSize = initialFontSizeRef.current;
-
 	const handleNameChange = ( value ) => {
 		updateFontSize( 'name', value );
 	};
 
 	const handleFontSizeChange = ( value ) => {
-		// If the user is resetting the value, use the initial value.
-		const newValue = value ?? initialFontSize;
-		updateFontSize( 'size', newValue );
+		updateFontSize( 'size', value );
 	};
 
 	const handleFluidChange = ( value ) => {
@@ -102,15 +93,11 @@ function FontSize() {
 	};
 
 	const handleMinChange = ( value ) => {
-		// If the user is resetting the value, use the initial value.
-		const newValue = value ?? fontSize.size;
-		updateFontSize( 'fluid', { ...fontSize.fluid, min: newValue } );
+		updateFontSize( 'fluid', { ...fontSize.fluid, min: value } );
 	};
 
 	const handleMaxChange = ( value ) => {
-		// If the user is resetting the value, use the initial value.
-		const newValue = value ?? fontSize.size;
-		updateFontSize( 'fluid', { ...fontSize.fluid, max: newValue } );
+		updateFontSize( 'fluid', { ...fontSize.fluid, max: value } );
 	};
 
 	const updateFontSize = ( key, value ) => {
