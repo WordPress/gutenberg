@@ -90,6 +90,7 @@
 
 	.block-editor-global-styles-background-panel__inspector-preview-inner {
 		height: 100%;
+
 	}
 
 	.block-editor-global-styles-background-panel__image-tools-panel-item {
@@ -158,6 +159,7 @@
 .block-editor-global-styles-background-panel__inspector-image-indicator-wrapper {
 	width: 20px;
 	height: 20px;
+	margin-right: $grid-unit-10;
 }
 
 .block-editor-global-styles-background-panel__inspector-image-indicator {
@@ -195,4 +197,13 @@
 	height: 0;
 	width: 0;
 	position: absolute;
+}
+
+.block-editor-global-styles-background-panel__tab-panel {
+	padding: $grid-unit-20;
+	width: 260px;
+}
+
+.block-editor-global-styles-background-panel__size-controls .components-base-control {
+	width: 100%;
 }

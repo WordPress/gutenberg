@@ -10,8 +10,6 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	ToggleControl,
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalUnitControl as UnitControl,
 	__experimentalVStack as VStack,
 	DropZone,
@@ -24,6 +22,8 @@ import {
 	__experimentalTruncate as Truncate,
 	Dropdown,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
+	privateApis as componentsPrivateApis,
+	SelectControl,
 } from '@wordpress/components';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
@@ -48,6 +48,7 @@ import { setImmutably } from '../../utils/object';
 import MediaReplaceFlow from '../media-replace-flow';
 import { store as blockEditorStore } from '../../store';
 import { getResolvedThemeFilePath } from './theme-file-uri-utils';
+import { unlock } from '../../lock-unlock';
 
 const IMAGE_BACKGROUND_TYPE = 'image';
 const DEFAULT_CONTROLS = {
@@ -105,22 +106,6 @@ export function hasBackgroundImageValue( style ) {
 }
 
 /**
- * Get the help text for the background size control.
- *
- * @param {string} value backgroundSize value.
- * @return {string}      Translated help text.
- */
-function backgroundSizeHelpText( value ) {
-	if ( value === 'cover' || value === undefined ) {
-		return __( 'Image covers the space evenly.' );
-	}
-	if ( value === 'contain' ) {
-		return __( 'Image is contained without distortion.' );
-	}
-	return __( 'Image has a fixed width.' );
-}
-
-/**
  * Converts decimal x and y coords from FocalPointPicker to percentage-based values
  * to use as backgroundPosition value.
  *
@@ -169,7 +154,7 @@ function InspectorImagePreviewItem( {
 		if ( typeof toggleProps?.isOpen !== 'undefined' ) {
 			onToggleCallback( toggleProps?.isOpen );
 		}
-	}, [ toggleProps?.isOpen ] );
+	}, [ toggleProps?.isOpen, onToggleCallback ] );
 	return (
 		<ItemGroup as={ as } className={ className } { ...toggleProps }>
 			<HStack
@@ -261,7 +246,7 @@ function InspectorImagePreviewToggle( {
 			renderContent={ () => (
 				<DropdownContentWrapper
 					className="block-editor-global-styles-background-panel__dropdown-content-wrapper"
-					paddingSize="medium"
+					paddingSize="none"
 				>
 					{ children }
 				</DropdownContentWrapper>
@@ -575,74 +560,97 @@ function BackgroundSizeToolsPanelItem( {
 			)
 		);
 
+	const { Tabs } = unlock( componentsPrivateApis );
+
 	return (
-		<VStack spacing={ 3 } className="single-column">
-			<FocalPointPicker
-				__next40pxDefaultSize
-				__nextHasNoMarginBottom
-				label={ __( 'Position' ) }
-				url={ getResolvedThemeFilePath( imageValue, themeFileURIs ) }
-				value={ backgroundPositionToCoords( positionValue ) }
-				onChange={ updateBackgroundPosition }
-			/>
-			<ToggleGroupControl
-				size="__unstable-large"
-				label={ __( 'Size' ) }
-				value={ currentValueForToggle }
-				onChange={ updateBackgroundSize }
-				isBlock
-				help={ backgroundSizeHelpText(
-					sizeValue || defaultValues?.backgroundSize
-				) }
+		<Tabs>
+			<Tabs.TabList>
+				<Tabs.Tab tabId="size">{ __( 'Style' ) }</Tabs.Tab>
+				<Tabs.Tab tabId="position">{ __( 'Position' ) }</Tabs.Tab>
+			</Tabs.TabList>
+			<Tabs.TabPanel
+				tabId="size"
+				focusable={ false }
+				className="block-editor-global-styles-background-panel__tab-panel"
 			>
-				<ToggleGroupControlOption
-					key="cover"
-					value="cover"
-					label={ _x(
-						'Cover',
-						'Size option for background image control'
+				<VStack spacing={ 3 } className="single-column">
+					<HStack
+						className="block-editor-global-styles-background-panel__size-controls"
+						spacing={ 4 }
+						justify="space-between"
+						alignment="top"
+					>
+						<SelectControl
+							__nextHasNoMarginBottom
+							__next40pxDefaultSize
+							label={ __( 'Size' ) }
+							options={ [
+								{
+									label: _x(
+										'Cover',
+										'Size option for background image control'
+									),
+									value: 'cover',
+								},
+								{
+									label: _x(
+										'Contain',
+										'Size option for background image control'
+									),
+									value: 'contain',
+								},
+								{
+									label: _x(
+										'Tile',
+										'Size option for background image control'
+									),
+									value: 'auto',
+								},
+							] }
+							value={ currentValueForToggle }
+							onChange={ updateBackgroundSize }
+						/>
+
+						{ currentValueForToggle === 'auto' && (
+							<UnitControl
+								label={ __( 'Width' ) }
+								aria-label={ __( 'Background image width' ) }
+								onChange={ updateBackgroundSize }
+								value={ sizeValue }
+								size="__unstable-large"
+								__unstableInputWidth="100px"
+								min={ 0 }
+								placeholder={ __( 'Auto' ) }
+							/>
+						) }
+					</HStack>
+					{ currentValueForToggle !== 'cover' && (
+						<ToggleControl
+							label={ __( 'Repeat' ) }
+							checked={ repeatCheckedValue }
+							onChange={ toggleIsRepeated }
+						/>
 					) }
-				/>
-				<ToggleGroupControlOption
-					key="contain"
-					value="contain"
-					label={ _x(
-						'Contain',
-						'Size option for background image control'
+				</VStack>
+			</Tabs.TabPanel>
+			<Tabs.TabPanel
+				tabId="position"
+				focusable={ false }
+				className="block-editor-global-styles-background-panel__tab-panel"
+			>
+				<FocalPointPicker
+					__next40pxDefaultSize
+					__nextHasNoMarginBottom
+					label={ __( 'Position' ) }
+					url={ getResolvedThemeFilePath(
+						imageValue,
+						themeFileURIs
 					) }
+					value={ backgroundPositionToCoords( positionValue ) }
+					onChange={ updateBackgroundPosition }
 				/>
-				<ToggleGroupControlOption
-					key="tile"
-					value="auto"
-					label={ _x(
-						'Tile',
-						'Size option for background image control'
-					) }
-				/>
-			</ToggleGroupControl>
-			<HStack justify="flex-start" spacing={ 2 } as="span">
-				{ currentValueForToggle !== undefined &&
-				currentValueForToggle !== 'cover' &&
-				currentValueForToggle !== 'contain' ? (
-					<UnitControl
-						aria-label={ __( 'Background image width' ) }
-						onChange={ updateBackgroundSize }
-						value={ sizeValue }
-						size="__unstable-large"
-						__unstableInputWidth="100px"
-						min={ 0 }
-						placeholder={ __( 'Auto' ) }
-					/>
-				) : null }
-				{ currentValueForToggle !== 'cover' && (
-					<ToggleControl
-						label={ __( 'Repeat' ) }
-						checked={ repeatCheckedValue }
-						onChange={ toggleIsRepeated }
-					/>
-				) }
-			</HStack>
-		</VStack>
+			</Tabs.TabPanel>
+		</Tabs>
 	);
 }
 
