@@ -190,6 +190,8 @@ function FontSize() {
 							onChange={ handleFontSizeChange }
 							hasUnits={ hasUnits }
 							withReset={ false }
+							__nextHasNoMarginBottom
+							__next40pxDefaultSize
 						/>
 
 						<ToggleControl
@@ -218,6 +220,8 @@ function FontSize() {
 									onChange={ handleMinChange }
 									hasUnits={ hasUnits }
 									withReset={ false }
+									__nextHasNoMarginBottom
+									__next40pxDefaultSize
 								/>
 								<SizeControl
 									label={ __( 'Maximum' ) }
@@ -226,6 +230,8 @@ function FontSize() {
 									onChange={ handleMaxChange }
 									hasUnits={ hasUnits }
 									withReset={ false }
+									__nextHasNoMarginBottom
+									__next40pxDefaultSize
 								/>
 							</>
 						) }
