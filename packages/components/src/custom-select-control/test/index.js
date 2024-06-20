@@ -271,6 +271,54 @@ describe.each( [
 		expect( screen.getByRole( 'option', { name: /hint/i } ) ).toBeVisible();
 	} );
 
+	it( 'Should return object onChange', async () => {
+		const user = userEvent.setup();
+		const mockOnChange = jest.fn();
+
+		render(
+			<Component
+				{ ...props }
+				value={ props.options[ 0 ] }
+				onChange={ mockOnChange }
+			/>
+		);
+
+		await user.click(
+			screen.getByRole( 'button', {
+				expanded: false,
+			} )
+		);
+
+		// DIFFERENCE WITH V2: NOT CALLED
+		// expect( mockOnChange ).toHaveBeenNthCalledWith(
+		// 	1,
+		// 	expect.objectContaining( {
+		// 		inputValue: '',
+		// 		isOpen: false,
+		// 		selectedItem: { key: 'flower1', name: 'violets' },
+		// 		type: '',
+		// 	} )
+		// );
+
+		await user.click(
+			screen.getByRole( 'option', {
+				name: 'aquamarine',
+			} )
+		);
+
+		expect( mockOnChange ).toHaveBeenNthCalledWith(
+			1,
+			expect.objectContaining( {
+				inputValue: '',
+				isOpen: false,
+				selectedItem: expect.objectContaining( {
+					name: 'aquamarine',
+				} ),
+				type: '__item_click__',
+			} )
+		);
+	} );
+
 	it( 'Should return selectedItem object when specified onChange', async () => {
 		const user = userEvent.setup();
 		const mockOnChange = jest.fn();
