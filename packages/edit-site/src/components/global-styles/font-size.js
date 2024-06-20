@@ -55,7 +55,7 @@ function FontSize() {
 		'typography.fontSizes'
 	);
 	// Get the font sizes from the theme or use the default ones.
-	const sizes = fontSizes.theme ?? fontSizes.default;
+	const sizes = fontSizes.theme ?? fontSizes.default ?? [];
 
 	// Get the font size by slug.
 	const fontSize = sizes.find( ( size ) => size.slug === slug );
