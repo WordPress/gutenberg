@@ -42,7 +42,12 @@ export default function useSpacingSizes() {
 			...customSizes,
 			...themeSizes,
 			...defaultSizes,
-		].sort( ( a, b ) => compare( a.slug, b.slug ) );
+		];
+
+		// Using numeric slugs opts-in to sorting by slug.
+		if ( sizes.every( ( { slug } ) => /^[0-9]/.test( slug ) ) ) {
+			sizes.sort( ( a, b ) => compare( a.slug, b.slug ) );
+		}
 
 		return sizes.length > RANGE_CONTROL_MAX_SIZE
 			? [
@@ -53,8 +58,6 @@ export default function useSpacingSizes() {
 					},
 					...sizes,
 			  ]
-			: // See https://github.com/WordPress/gutenberg/pull/44247 for reasoning
-			  // to use the index as the name in the range control.
-			  sizes.map( ( { slug, size }, i ) => ( { name: i, slug, size } ) );
+			: sizes;
 	}, [ customSizes, themeSizes, defaultSizes ] );
 }

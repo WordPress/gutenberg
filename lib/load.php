@@ -133,6 +133,7 @@ require __DIR__ . '/compat/wordpress-6.5/script-loader.php';
 // WordPress 6.6 compat.
 require __DIR__ . '/compat/wordpress-6.6/admin-bar.php';
 require __DIR__ . '/compat/wordpress-6.6/blocks.php';
+require __DIR__ . '/compat/wordpress-6.6/block-editor.php';
 require __DIR__ . '/compat/wordpress-6.6/compat.php';
 require __DIR__ . '/compat/wordpress-6.6/resolve-patterns.php';
 require __DIR__ . '/compat/wordpress-6.6/block-bindings/pattern-overrides.php';
@@ -148,6 +149,7 @@ require __DIR__ . '/experimental/kses.php';
 require __DIR__ . '/experimental/l10n.php';
 require __DIR__ . '/experimental/synchronization.php';
 require __DIR__ . '/experimental/script-modules.php';
+require __DIR__ . '/experimental/posts/load.php';
 
 if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {
 	require __DIR__ . '/experimental/disable-tinymce.php';

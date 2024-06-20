@@ -26,11 +26,3 @@
 		bottom: 0;
 	}
 }
-
-.edit-post-layout__toggle-sidebar-panel {
-	.interface-interface-skeleton__sidebar:focus &,
-	.interface-interface-skeleton__sidebar:focus-within & {
-		top: auto;
-		bottom: 0;
-	}
-}

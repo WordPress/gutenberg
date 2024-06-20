@@ -27,7 +27,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                node: ['20', '21']
+                node: ['20', '22']
                 shard: ['1/4', '2/4', '3/4', '4/4']
 
         steps:
@@ -66,7 +66,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                node: ['20', '21']
+                node: ['20', '22']
 
         steps:
             - name: Checkout repository
@@ -185,7 +185,7 @@ jobs:
             # dependency versions are installed and cached.
             ##
             - name: Set up PHP
-              uses: shivammathur/setup-php@c665c7a15b5295c2488ac8a87af9cb806cd72198 # v2.30.4
+              uses: shivammathur/setup-php@fc14643b0a99ee9db10a3c025a33d76544fa3761 # v2.30.5
               with:
                   php-version: '${{ matrix.php }}'
                   ini-file: development
@@ -286,7 +286,7 @@ jobs:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Set up PHP
-              uses: shivammathur/setup-php@c665c7a15b5295c2488ac8a87af9cb806cd72198 # v2.30.4
+              uses: shivammathur/setup-php@fc14643b0a99ee9db10a3c025a33d76544fa3761 # v2.30.5
               with:
                   php-version: '7.4'
                   coverage: none

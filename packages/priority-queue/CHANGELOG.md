@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 3.1.0 (2024-06-15)
+
 ## 3.0.0 (2024-05-31)
 
 ### Breaking Changes
@@ -112,7 +114,7 @@
 
 ## 2.7.0 (2022-04-21)
 
-### New features
+### New Features
 
 -   Add a new `cancel` method that removes scheduled callbacks without executing them.
 
@@ -139,7 +141,7 @@
 
 ## 1.6.0 (2020-04-15)
 
-### New feature
+### New Features
 
 -   Include TypeScript type declarations ([#18942](https://github.com/WordPress/gutenberg/pull/18942))
 

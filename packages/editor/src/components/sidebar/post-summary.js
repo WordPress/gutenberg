@@ -30,6 +30,7 @@ import PostsPerPage from '../posts-per-page';
 import SiteDiscussion from '../site-discussion';
 import { store as editorStore } from '../../store';
 import TemplateAreas from '../template-areas';
+import { PrivatePostLastRevision } from '../post-last-revision';
 
 /**
  * Module Constants
@@ -68,7 +69,7 @@ export default function PostSummary( { onActionPerformed } ) {
 								<PostLastEditedPanel />
 							</VStack>
 							{ ! isRemovedPostStatusPanel && (
-								<VStack spacing={ 2 }>
+								<VStack spacing={ 4 }>
 									<VStack spacing={ 1 }>
 										<PostStatusPanel />
 										<PostSchedulePanel />
@@ -76,6 +77,7 @@ export default function PostSummary( { onActionPerformed } ) {
 										<PostAuthorPanel />
 										<PostTemplatePanel />
 										<PostDiscussionPanel />
+										<PrivatePostLastRevision />
 										<PageAttributesPanel />
 										<PostSyncStatus />
 										<BlogTitle />

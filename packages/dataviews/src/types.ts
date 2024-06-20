@@ -328,27 +328,15 @@ interface ActionBase< Item extends AnyItem > {
 export interface ActionModal< Item extends AnyItem >
 	extends ActionBase< Item > {
 	/**
-	 * The callback to execute when the action has finished.
-	 */
-	onActionPerformed: ( ( items: Item[] ) => void ) | undefined;
-
-	/**
-	 * The callback to execute when the action is triggered.
-	 */
-	onActionStart: ( ( items: Item[] ) => void ) | undefined;
-
-	/**
 	 * Modal to render when the action is triggered.
 	 */
 	RenderModal: ( {
 		items,
 		closeModal,
-		onActionStart,
 		onActionPerformed,
 	}: {
 		items: Item[];
 		closeModal?: () => void;
-		onActionStart?: ( items: Item[] ) => void;
 		onActionPerformed?: ( items: Item[] ) => void;
 	} ) => ReactElement;
 
@@ -368,7 +356,13 @@ export interface ActionButton< Item extends AnyItem >
 	/**
 	 * The callback to execute when the action is triggered.
 	 */
-	callback: ( items: Item[] ) => void;
+	callback: (
+		items: Item[],
+		context: {
+			registry: any;
+			onActionPerformed?: ( items: Item[] ) => void;
+		}
+	) => void;
 }
 
 export type Action< Item extends AnyItem > =
