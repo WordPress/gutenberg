@@ -16,7 +16,10 @@ import { store as noticesStore } from '@wordpress/notices';
 import { decodeEntities } from '@wordpress/html-entities';
 import { serialize, synchronizeBlocksWithTemplate } from '@wordpress/blocks';
 
-export default function AddNewPageModal( { onSave, onClose } ) {
+// TODO: check how/if to reuse this and make it work for other post types.
+// Currently this creates drafts, so we should look into that..
+// Also lot's of labels need to be updated properly..
+export default function AddNewPostModal( { postType, onSave, onClose } ) {
 	const [ isCreatingPage, setIsCreatingPage ] = useState( false );
 	const [ title, setTitle ] = useState( '' );
 
@@ -33,11 +36,12 @@ export default function AddNewPageModal( { onSave, onClose } ) {
 		}
 		setIsCreatingPage( true );
 		try {
+			// TODO: also check this change.. It was merged(https://github.com/WordPress/gutenberg/pull/62488/) as I was coding this..
 			const pagePostType =
-				await resolveSelect( coreStore ).getPostType( 'page' );
+				await resolveSelect( coreStore ).getPostType( postType );
 			const newPage = await saveEntityRecord(
 				'postType',
-				'page',
+				postType,
 				{
 					status: 'draft',
 					title,
@@ -71,7 +75,7 @@ export default function AddNewPageModal( { onSave, onClose } ) {
 			const errorMessage =
 				error.message && error.code !== 'unknown_error'
 					? error.message
-					: __( 'An error occurred while creating the page.' );
+					: __( 'An error occurred while creating the item.' );
 
 			createErrorNotice( errorMessage, {
 				type: 'snackbar',

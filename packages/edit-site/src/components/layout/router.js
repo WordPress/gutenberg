@@ -10,7 +10,7 @@ import { useEffect } from '@wordpress/element';
 import { unlock } from '../../lock-unlock';
 import { useIsSiteEditorLoading } from './hooks';
 import Editor from '../editor';
-import PagePages from '../page-pages';
+import PostsList from '../posts-app/posts-list';
 import PagePatterns from '../page-patterns';
 import PageTemplates from '../page-templates';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
@@ -92,7 +92,7 @@ export default function useLayoutAreas() {
 						content={ <DataViewsSidebarContent /> }
 					/>
 				),
-				content: <PagePages />,
+				content: <PostsList postType={ postType } />,
 				preview: ( isListLayout || canvas === 'edit' ) && (
 					<Editor isLoading={ isSiteEditorLoading } />
 				),
@@ -100,7 +100,7 @@ export default function useLayoutAreas() {
 					canvas === 'edit' ? (
 						<Editor isLoading={ isSiteEditorLoading } />
 					) : (
-						<PagePages />
+						<PostsList postType={ postType } />
 					),
 			},
 			widths: {

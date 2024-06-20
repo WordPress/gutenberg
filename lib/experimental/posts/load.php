@@ -24,6 +24,19 @@ function gutenberg_posts_dashboard() {
 }
 
 /**
+ * Redirects to the new posts dashboard page and adds the postType query arg.
+ * TODO: there should be a better way to do this..
+ */
+function gutenberg_add_post_type_arg() {
+    global $pagenow;
+    if ( $pagenow == 'admin.php' && isset( $_GET['page'] ) && $_GET['page'] == 'gutenberg-posts-dashboard' && empty( $_GET['postType'] ) ) {
+        wp_redirect( admin_url( '/admin.php?page=gutenberg-posts-dashboard&postType=post' ) );
+        exit;
+    }
+}
+add_action( 'admin_init', 'gutenberg_add_post_type_arg' );
+
+/**
  * Replaces the default posts menu item with the new posts dashboard.
  */
 function gutenberg_replace_posts_dashboard() {

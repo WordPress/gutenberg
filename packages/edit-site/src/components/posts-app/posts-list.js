@@ -24,7 +24,7 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import Page from '../page';
 import { default as Link, useLink } from '../routes/link';
 import {
-	DEFAULT_VIEWS,
+	useDefaultViews,
 	DEFAULT_CONFIG_PER_VIEW_TYPE,
 } from '../sidebar-dataviews/default-views';
 import {
@@ -35,7 +35,7 @@ import {
 	OPERATOR_IS_NONE,
 } from '../../utils/constants';
 
-import AddNewPageModal from '../add-new-page';
+import AddNewPostModal from '../add-new-post';
 import Media from '../media';
 import { unlock } from '../../lock-unlock';
 import { useEditPostAction } from '../dataviews-actions';
@@ -56,6 +56,7 @@ function useView( postType ) {
 		params: { activeView = 'all', isCustom = 'false', layout },
 	} = useLocation();
 	const history = useHistory();
+	const DEFAULT_VIEWS = useDefaultViews( { postType } );
 	const selectedDefaultView = useMemo( () => {
 		const defaultView =
 			isCustom === 'false' &&
@@ -72,7 +73,7 @@ function useView( postType ) {
 			};
 		}
 		return defaultView;
-	}, [ isCustom, activeView, layout, postType ] );
+	}, [ isCustom, activeView, layout, postType, DEFAULT_VIEWS ] );
 	const [ view, setView ] = useState( selectedDefaultView );
 
 	useEffect( () => {
@@ -206,15 +207,13 @@ function getItemId( item ) {
 	return item.id.toString();
 }
 
-export default function PagePages() {
-	const postType = 'page';
+export default function PostsList( { postType } ) {
 	const [ view, setView ] = useView( postType );
 	const history = useHistory();
 	const {
 		params: { postId },
 	} = useLocation();
 	const [ selection, setSelection ] = useState( [ postId ] );
-
 	const onSelectionChange = useCallback(
 		( items ) => {
 			const { params } = history.getLocationWithParams();
@@ -269,13 +268,13 @@ export default function PagePages() {
 		};
 	}, [ view ] );
 	const {
-		records: pages,
-		isResolving: isLoadingPages,
+		records,
+		isResolving: isLoadingMainEntities,
 		totalItems,
 		totalPages,
 	} = useEntityRecords( 'postType', postType, queryArgs );
 
-	const ids = pages?.map( ( page ) => getItemId( page ) ) ?? [];
+	const ids = records?.map( ( record ) => getItemId( record ) ) ?? [];
 	const prevIds = usePrevious( ids ) ?? [];
 	const deletedIds = prevIds.filter( ( id ) => ! ids.includes( id ) );
 	const postIdWasDeleted = deletedIds.includes( postId );
@@ -300,7 +299,7 @@ export default function PagePages() {
 		[ totalItems, totalPages ]
 	);
 
-	const { frontPageId, postsPageId, addNewLabel, canCreatePage } = useSelect(
+	const { frontPageId, postsPageId, labels, canCreateRecord } = useSelect(
 		( select ) => {
 			const { getEntityRecord, getPostType, canUser } =
 				select( coreStore );
@@ -308,12 +307,18 @@ export default function PagePages() {
 			return {
 				frontPageId: siteSettings?.page_on_front,
 				postsPageId: siteSettings?.page_for_posts,
-				addNewLabel: getPostType( 'page' )?.labels?.add_new_item,
-				canCreatePage: canUser( 'create', 'pages' ),
+				labels: getPostType( postType )?.labels,
+				// TODO: check what is the proper way to make this work for any post type..
+				canCreateRecord: canUser(
+					'create',
+					postType === 'page' ? 'pages' : 'posts'
+				),
 			};
-		}
+		},
+		[ postType ]
 	);
 
+	// TODO: this should be abstracted into a hook similar to `usePostActions`.
 	const fields = useMemo(
 		() => [
 			{
@@ -483,7 +488,7 @@ export default function PagePages() {
 		[ authors, view.type, frontPageId, postsPageId ]
 	);
 	const postTypeActions = usePostActions( {
-		postType: 'page',
+		postType,
 		context: 'list',
 	} );
 	const editAction = useEditPostAction();
@@ -508,10 +513,10 @@ export default function PagePages() {
 		[ view.type, setView ]
 	);
 
-	const [ showAddPageModal, setShowAddPageModal ] = useState( false );
+	const [ showAddPostModal, setShowAddPostModal ] = useState( false );
 
-	const openModal = () => setShowAddPageModal( true );
-	const closeModal = () => setShowAddPageModal( false );
+	const openModal = () => setShowAddPostModal( true );
+	const closeModal = () => setShowAddPostModal( false );
 	const handleNewPage = ( { type, id } ) => {
 		history.push( {
 			postId: id,
@@ -523,20 +528,21 @@ export default function PagePages() {
 
 	return (
 		<Page
-			title={ __( 'Pages' ) }
+			title={ labels?.name }
 			actions={
-				addNewLabel &&
-				canCreatePage && (
+				labels?.add_new_item &&
+				canCreateRecord && (
 					<>
 						<Button
 							variant="primary"
 							onClick={ openModal }
 							__next40pxDefaultSize
 						>
-							{ addNewLabel }
+							{ labels.add_new_item }
 						</Button>
-						{ showAddPageModal && (
-							<AddNewPageModal
+						{ showAddPostModal && (
+							<AddNewPostModal
+								postType={ postType }
 								onSave={ handleNewPage }
 								onClose={ closeModal }
 							/>
@@ -549,8 +555,8 @@ export default function PagePages() {
 				paginationInfo={ paginationInfo }
 				fields={ fields }
 				actions={ actions }
-				data={ pages || EMPTY_ARRAY }
-				isLoading={ isLoadingPages || isLoadingAuthors }
+				data={ records || EMPTY_ARRAY }
+				isLoading={ isLoadingMainEntities || isLoadingAuthors }
 				view={ view }
 				onChangeView={ onChangeView }
 				selection={ selection }
