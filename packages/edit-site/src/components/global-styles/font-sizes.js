@@ -83,14 +83,12 @@ function FontSizes() {
 		<VStack spacing={ 2 }>
 			<HStack justify="space-between">
 				<Subtitle level={ 3 }>{ __( 'Font Sizes' ) }</Subtitle>
-				<Tooltip text={ __( 'Add font size' ) }>
-					<Button
-						aria-label={ __( 'Add font size' ) }
-						icon={ plus }
-						size="small"
-						onClick={ handleAddFontSize }
-					/>
-				</Tooltip>
+				<Button
+					label={ __( 'Add font size' ) }
+					icon={ plus }
+					size="small"
+					onClick={ handleAddFontSize }
+				/>
 			</HStack>
 			<ItemGroup isBordered isSeparated>
 				{ normalizedSizes.map( ( size ) => (
