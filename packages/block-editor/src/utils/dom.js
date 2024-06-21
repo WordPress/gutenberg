@@ -105,14 +105,22 @@ function isElementVisible( element ) {
 	}
 
 	const bounds = element.getBoundingClientRect();
-	return (
-		bounds.width > 0 &&
-		bounds.height > 0 &&
-		bounds.right >= 0 &&
-		bounds.bottom >= 0 &&
-		bounds.left <= window.innerWidth &&
-		bounds.top <= window.innerHeight
-	);
+
+	if ( bounds.width === 0 || bounds.height === 0 ) {
+		return false;
+	}
+
+	// wp-components visually hides elements by setting their width and
+	// height to 1px and positioning them off-screen.
+	if (
+		bounds.width === 1 &&
+		bounds.height === 1 &&
+		( bounds.left < 0 || bounds.top < 0 )
+	) {
+		return false;
+	}
+
+	return true;
 }
 
 /**
