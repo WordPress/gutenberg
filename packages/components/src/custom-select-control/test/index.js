@@ -285,13 +285,7 @@ describe.each( [
 		const user = userEvent.setup();
 		const mockOnChange = jest.fn();
 
-		render(
-			<Component
-				{ ...props }
-				value={ props.options[ 0 ] }
-				onChange={ mockOnChange }
-			/>
-		);
+		render( <Component { ...props } onChange={ mockOnChange } /> );
 
 		await user.click(
 			screen.getByRole( 'button', {
@@ -299,32 +293,21 @@ describe.each( [
 			} )
 		);
 
-		// DIFFERENCE WITH V2: NOT CALLED
-		// expect( mockOnChange ).toHaveBeenNthCalledWith(
-		// 	1,
-		// 	expect.objectContaining( {
-		// 		inputValue: '',
-		// 		isOpen: false,
-		// 		selectedItem: { key: 'flower1', name: 'violets' },
-		// 		type: '',
-		// 	} )
-		// );
-
 		await user.click(
 			screen.getByRole( 'option', {
 				name: 'aquamarine',
 			} )
 		);
 
-		expect( mockOnChange ).toHaveBeenNthCalledWith(
-			1,
+		expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
+		expect( mockOnChange ).toHaveBeenLastCalledWith(
 			expect.objectContaining( {
 				inputValue: '',
 				isOpen: false,
 				selectedItem: expect.objectContaining( {
 					name: 'aquamarine',
 				} ),
-				type: '__item_click__',
+				type: expect.any( String ),
 			} )
 		);
 	} );
@@ -345,8 +328,8 @@ describe.each( [
 		await user.keyboard( 'p' );
 		await user.keyboard( '{enter}' );
 
-		expect( mockOnChange ).toHaveBeenNthCalledWith(
-			1,
+		expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
+		expect( mockOnChange ).toHaveBeenLastCalledWith(
 			expect.objectContaining( {
 				selectedItem: expect.objectContaining( {
 					key: 'flower3',

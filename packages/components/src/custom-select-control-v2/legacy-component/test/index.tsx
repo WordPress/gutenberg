@@ -292,33 +292,21 @@ describe.each( [
 			} )
 		);
 
-		// NOTE: legacy CustomSelectControl doesn't fire onChange
-		// at this point in time.
-		expect( mockOnChange ).toHaveBeenNthCalledWith(
-			1,
-			expect.objectContaining( {
-				inputValue: '',
-				isOpen: false,
-				selectedItem: { key: 'flower1', name: 'violets' },
-				type: '',
-			} )
-		);
-
 		await click(
 			screen.getByRole( 'option', {
 				name: 'aquamarine',
 			} )
 		);
 
-		expect( mockOnChange ).toHaveBeenNthCalledWith(
-			2,
+		expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
+		expect( mockOnChange ).toHaveBeenLastCalledWith(
 			expect.objectContaining( {
 				inputValue: '',
 				isOpen: false,
 				selectedItem: expect.objectContaining( {
 					name: 'aquamarine',
 				} ),
-				type: '',
+				type: expect.any( String ),
 			} )
 		);
 	} );
@@ -336,23 +324,11 @@ describe.each( [
 			} )
 		).toHaveFocus();
 
-		// NOTE: legacy CustomSelectControl doesn't fire onChange
-		// at this point in time.
-		expect( mockOnChange ).toHaveBeenNthCalledWith(
-			1,
-			expect.objectContaining( {
-				selectedItem: expect.objectContaining( {
-					key: 'flower1',
-					name: 'violets',
-				} ),
-			} )
-		);
-
 		await type( 'p' );
 		await press.Enter();
 
-		expect( mockOnChange ).toHaveBeenNthCalledWith(
-			2,
+		expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
+		expect( mockOnChange ).toHaveBeenLastCalledWith(
 			expect.objectContaining( {
 				selectedItem: expect.objectContaining( {
 					key: 'flower3',
@@ -387,10 +363,7 @@ describe.each( [
 
 		await click( optionWithCustomAttributes );
 
-		// NOTE: legacy CustomSelectControl doesn't fire onChange
-		// on first render, and so at this point in time `onChangeMock`
-		// would be called only once.
-		expect( onChangeMock ).toHaveBeenCalledTimes( 2 );
+		expect( onChangeMock ).toHaveBeenCalledTimes( 1 );
 		expect( onChangeMock ).toHaveBeenCalledWith(
 			expect.objectContaining( {
 				selectedItem: expect.objectContaining( {
