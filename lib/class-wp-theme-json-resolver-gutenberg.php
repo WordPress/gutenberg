@@ -898,7 +898,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 
 		// Merge shared variation definitions with theme.json file taking precedence
 		// over those sourced from partial theme.json files.
-		$current_variations = $theme_json_data['styles']['variations'] ?? array();
+		$current_variations = $data['styles']['variations'] ?? array();
 		$merged_variations  = array_replace_recursive( $new_variations, $current_variations );
 		_wp_array_set( $data, array( 'styles', 'variations' ), $merged_variations );
 
