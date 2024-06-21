@@ -6,6 +6,11 @@ on:
         branches:
             - try/cherry-pick-automation-trunk # To be replaced with "trunk".
 
+# Ensure that new jobs wait for the previous job to finish.
+concurrency:
+    group: ${{ github.workflow }}
+    cancel-in-progress: false
+
 jobs:
     cherry-pick:
         runs-on: ubuntu-latest
