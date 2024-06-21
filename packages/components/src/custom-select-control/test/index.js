@@ -64,7 +64,7 @@ const ControlledCustomSelectControl = ( {
 	onChange: onChangeProp,
 	...restProps
 } ) => {
-	const [ value, setValue ] = useState( options[ 0 ] );
+	const [ value, setValue ] = useState( restProps.value ?? options[ 0 ] );
 
 	const onChange = ( changeObject ) => {
 		onChangeProp?.( changeObject );
@@ -81,11 +81,71 @@ const ControlledCustomSelectControl = ( {
 	);
 };
 
+it( 'Should apply external controlled updates', async () => {
+	const mockOnChange = jest.fn();
+	const { rerender } = render(
+		<UncontrolledCustomSelectControl
+			{ ...props }
+			value={ props.options[ 0 ] }
+			onChange={ mockOnChange }
+		/>
+	);
+
+	const currentSelectedItem = screen.getByRole( 'button', {
+		expanded: false,
+	} );
+
+	expect( currentSelectedItem ).toHaveTextContent( props.options[ 0 ].name );
+
+	rerender(
+		<UncontrolledCustomSelectControl
+			{ ...props }
+			value={ props.options[ 1 ] }
+		/>
+	);
+
+	expect( currentSelectedItem ).toHaveTextContent( props.options[ 1 ].name );
+
+	expect( mockOnChange ).not.toHaveBeenCalled();
+} );
+
 describe.each( [
-	[ 'uncontrolled', UncontrolledCustomSelectControl ],
-	[ 'controlled', ControlledCustomSelectControl ],
+	[ 'Uncontrolled', UncontrolledCustomSelectControl ],
+	[ 'Controlled', ControlledCustomSelectControl ],
 ] )( 'CustomSelectControl %s', ( ...modeAndComponent ) => {
 	const [ , Component ] = modeAndComponent;
+
+	it( 'Should select the first option when no explicit initial value is passed without firing onChange', () => {
+		const mockOnChange = jest.fn();
+		render( <Component { ...props } onChange={ mockOnChange } /> );
+
+		expect(
+			screen.getByRole( 'button', {
+				expanded: false,
+			} )
+		).toHaveTextContent( props.options[ 0 ].name );
+
+		expect( mockOnChange ).not.toHaveBeenCalled();
+	} );
+
+	it( 'Should pick the initially selected option if the value prop is passed without firing onChange', async () => {
+		const mockOnChange = jest.fn();
+		render(
+			<Component
+				{ ...props }
+				onChange={ mockOnChange }
+				value={ props.options[ 3 ] }
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'button', {
+				expanded: false,
+			} )
+		).toHaveTextContent( props.options[ 3 ].name );
+
+		expect( mockOnChange ).not.toHaveBeenCalled();
+	} );
 
 	it( 'Should replace the initial selection when a new item is selected', async () => {
 		const user = userEvent.setup();
@@ -285,13 +345,7 @@ describe.each( [
 		const user = userEvent.setup();
 		const mockOnChange = jest.fn();
 
-		render(
-			<Component
-				{ ...props }
-				value={ props.options[ 0 ] }
-				onChange={ mockOnChange }
-			/>
-		);
+		render( <Component { ...props } onChange={ mockOnChange } /> );
 
 		await user.click(
 			screen.getByRole( 'button', {
@@ -299,32 +353,21 @@ describe.each( [
 			} )
 		);
 
-		// DIFFERENCE WITH V2: NOT CALLED
-		// expect( mockOnChange ).toHaveBeenNthCalledWith(
-		// 	1,
-		// 	expect.objectContaining( {
-		// 		inputValue: '',
-		// 		isOpen: false,
-		// 		selectedItem: { key: 'flower1', name: 'violets' },
-		// 		type: '',
-		// 	} )
-		// );
-
 		await user.click(
 			screen.getByRole( 'option', {
 				name: 'aquamarine',
 			} )
 		);
 
-		expect( mockOnChange ).toHaveBeenNthCalledWith(
-			1,
+		expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
+		expect( mockOnChange ).toHaveBeenLastCalledWith(
 			expect.objectContaining( {
 				inputValue: '',
 				isOpen: false,
 				selectedItem: expect.objectContaining( {
 					name: 'aquamarine',
 				} ),
-				type: '__item_click__',
+				type: expect.any( String ),
 			} )
 		);
 	} );
@@ -345,8 +388,8 @@ describe.each( [
 		await user.keyboard( 'p' );
 		await user.keyboard( '{enter}' );
 
-		expect( mockOnChange ).toHaveBeenNthCalledWith(
-			1,
+		expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
+		expect( mockOnChange ).toHaveBeenLastCalledWith(
 			expect.objectContaining( {
 				selectedItem: expect.objectContaining( {
 					key: 'flower3',
@@ -446,7 +489,9 @@ describe.each( [
 			await user.keyboard( '{arrowdown}' );
 			await user.keyboard( '{enter}' );
 
-			expect( currentSelectedItem ).toHaveTextContent( 'crimson clover' );
+			expect( currentSelectedItem ).toHaveTextContent(
+				props.options[ 1 ].name
+			);
 		} );
 
 		it( 'Should be able to type characters to select matching options', async () => {
