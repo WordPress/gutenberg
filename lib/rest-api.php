@@ -42,13 +42,13 @@ if ( ! function_exists( 'gutenberg_register_wp_rest_post_types_controller_fields
 			array(
 				'get_callback' => function ( $item ) {
 					$post_type = get_post_type_object( $item['slug'] );
-					if ( ! empty( $post_type ) && ! empty( $post_type->template ) ) {
-						return $post_type->template;
+					if ( ! empty( $post_type ) ) {
+						return $post_type->template ?? array();
 					}
 				},
 				'schema'       => array(
 					'type'        => 'array',
-					'description' => __( 'The block template associated with the post type, if it exists.', 'gutenberg' ),
+					'description' => __( 'The block template associated with the post type.', 'gutenberg' ),
 					'readonly'    => true,
 					'context'     => array( 'view', 'edit', 'embed' ),
 				),
@@ -60,14 +60,14 @@ if ( ! function_exists( 'gutenberg_register_wp_rest_post_types_controller_fields
 			array(
 				'get_callback' => function ( $item ) {
 					$post_type = get_post_type_object( $item['slug'] );
-					if ( ! empty( $post_type ) && ! empty( $post_type->template_lock ) && false !== $post_type->template_lock ) {
-						return $post_type->template_lock;
+					if ( ! empty( $post_type ) ) {
+						return ! empty( $post_type->template_lock ) ? $post_type->template_lock : false;
 					}
 				},
 				'schema'       => array(
-					'type'        => 'string',
-					'enum'        => array( 'all', 'insert', 'contentOnly' ),
-					'description' => __( 'The template_lock associated with the post type, if any.', 'gutenberg' ),
+					'type'        => array( 'string', 'boolean' ),
+					'enum'        => array( 'all', 'insert', 'contentOnly', false ),
+					'description' => __( 'The template_lock associated with the post type, or false if none.', 'gutenberg' ),
 					'readonly'    => true,
 					'context'     => array( 'view', 'edit', 'embed' ),
 				),
