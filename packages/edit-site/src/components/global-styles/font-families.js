@@ -69,6 +69,7 @@ function FontFamilies() {
 						<Button
 							className="edit-site-global-styles-font-families__manage-fonts"
 							variant="secondary"
+							__next40pxDefaultSize
 							onClick={ () =>
 								setModalTabOpen( 'installed-fonts' )
 							}
@@ -82,6 +83,7 @@ function FontFamilies() {
 						<Button
 							className="edit-site-global-styles-font-families__add-fonts"
 							variant="secondary"
+							__next40pxDefaultSize
 							onClick={ () => setModalTabOpen( 'upload-fonts' ) }
 						>
 							{ __( 'Add fonts' ) }
