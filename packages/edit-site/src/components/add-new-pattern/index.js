@@ -55,6 +55,7 @@ export default function AddNewPattern() {
 				?.add_new_item,
 			addNewTemplatePartLabel: getPostType( TEMPLATE_PART_POST_TYPE )
 				?.labels?.add_new_item,
+			// Blocks refers to the wp_block post type, this checks the ability to create a post of that type.
 			canCreatePattern: canUser( 'create', 'blocks' ),
 			canCreateTemplatePart: canUser( 'create', 'template-parts' ),
 		};
