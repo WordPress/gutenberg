@@ -3748,7 +3748,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$input    = new WP_Theme_JSON_Gutenberg(
+		$input = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'styles'  => array(
@@ -3756,18 +3756,18 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 						'myVariation' => array(
 							'color'      => array(
 								'background' => 'topLevel',
-								'gradient'   => 'topLevel'
+								'gradient'   => 'topLevel',
 							),
 							'typography' => array(
 								'fontFamily' => 'topLevel',
 							),
 						),
 					),
-					'blocks' => array(
+					'blocks'     => array(
 						'core/paragraph' => array(
 							'variations' => array(
 								'myVariation' => array(
-									'color' => array(
+									'color'   => array(
 										'background' => 'blockLevel',
 										'text'       => 'blockLevel',
 									),
@@ -3781,6 +3781,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 			)
 		);
+
 		$expected = array(
 			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 			'styles'  => array(
@@ -3788,15 +3789,15 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'core/paragraph' => array(
 						'variations' => array(
 							'myVariation' => array(
-								'color' => array(
+								'color'      => array(
 									'background' => 'blockLevel',
 									'gradient'   => 'topLevel',
 									'text'       => 'blockLevel',
 								),
 								'typography' => array(
-									'fontFamily' => 'topLevel'
+									'fontFamily' => 'topLevel',
 								),
-								'outline' => array(
+								'outline'    => array(
 									'offset' => 'blockLevel',
 								),
 							),
@@ -3805,7 +3806,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'core/group'     => array(
 						'variations' => array(
 							'myVariation' => array(
-								'color' => array(
+								'color'      => array(
 									'background' => 'topLevel',
 									'gradient'   => 'topLevel',
 								),

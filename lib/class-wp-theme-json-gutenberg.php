@@ -847,7 +847,7 @@ class WP_Theme_JSON_Gutenberg {
 
 		foreach ( $registered_styles as $block_type => $registered_variations ) {
 			foreach ( $registered_variations as $variation_name => $variation_data ) {
-				$block_level_data = $new_theme_json['styles']['blocks'][ $block_type]['variations'][ $variation_name ] ?? array();
+				$block_level_data = $new_theme_json['styles']['blocks'][ $block_type ]['variations'][ $variation_name ] ?? array();
 				$top_level_data   = $variations[ $variation_name ] ?? array();
 				$merged_data      = array_replace_recursive( $top_level_data, $block_level_data );
 				if ( ! empty( $merged_data ) ) {
