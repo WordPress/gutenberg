@@ -251,6 +251,15 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			$variations = static::get_style_variations( 'block' );
 			gutenberg_register_block_style_variations_from_theme_json_partials( $variations );
 
+			/*
+			 * Merge theme.json defined variations with partial definitions.
+			 *
+			 * When the resulting data is passed to `WP_Theme_JSON_Data_Gutenberg`
+			 * it will create a `WP_Theme_JSON_Gutenberg` instance which in turn
+			 * unwraps shared variations into their respective block types.
+			 */
+			$theme_json_data = static::inject_shared_variations_from_theme_json_partials( $theme_json_data, $variations );
+
 			/**
 			 * Filters the data provided by the theme for global styles and settings.
 			 *
@@ -850,5 +859,45 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		$theme_json->merge( new WP_Theme_JSON_Gutenberg( $resolved_theme_json_data ) );
 
 		return $theme_json;
+	}
+
+	/**
+	 * Adds shared block style variation definitions sourced from theme.json partials
+	 * to the supplied theme.json data.
+	 *
+	 * @param array $data   Array following the theme.json specification.
+	 * @param array $variations Shared block style variations.
+	 * @return array Theme json data including shared block style variation definitions.
+	 */
+	private static function inject_shared_variations_from_theme_json_partials( $data, $variations ) {
+		$new_variations = array();
+
+		if ( empty( $variations ) ) {
+			return $data;
+		}
+
+		foreach ( $variations as $variation ) {
+			if ( empty( $variation['styles'] ) || empty( $variation['blockTypes'] ) ) {
+				continue;
+			}
+
+			$variation_name = $variation['slug'] ?? _wp_to_kebab_case( $variation['title'] );
+			unset( $variation['slug'] );
+			unset( $variation['title'] );
+
+			$new_variations[ $variation_name ] = $variation;
+		}
+
+		if ( empty( $new_variations ) ) {
+			return $data;
+		}
+
+		// Merge shared variation definitions with theme.json file taking precedence
+		// over those sourced from partial theme.json files.
+		$current_variations = $theme_json_data['styles']['variations'] ?? array();
+		$merged_variations  = array_replace_recursive( $new_variations, $current_variations );
+		_wp_array_set( $data, array( 'styles', 'variations' ), $merged_variations );
+
+		return $data;
 	}
 }
