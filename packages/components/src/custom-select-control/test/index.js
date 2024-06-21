@@ -64,7 +64,7 @@ const ControlledCustomSelectControl = ( {
 	onChange: onChangeProp,
 	...restProps
 } ) => {
-	const [ value, setValue ] = useState( options[ 0 ] );
+	const [ value, setValue ] = useState( restProps.value ?? options[ 0 ] );
 
 	const onChange = ( changeObject ) => {
 		onChangeProp?.( changeObject );
@@ -82,10 +82,62 @@ const ControlledCustomSelectControl = ( {
 };
 
 describe.each( [
-	[ 'uncontrolled', UncontrolledCustomSelectControl ],
-	[ 'controlled', ControlledCustomSelectControl ],
+	[ 'Uncontrolled', UncontrolledCustomSelectControl ],
+	[ 'Controlled', ControlledCustomSelectControl ],
 ] )( 'CustomSelectControl %s', ( ...modeAndComponent ) => {
-	const [ , Component ] = modeAndComponent;
+	const [ mode, Component ] = modeAndComponent;
+
+	it( 'Should select the first option when no explicit initial value is passed without firing onChange', () => {
+		const mockOnChange = jest.fn();
+		render( <Component { ...props } onChange={ mockOnChange } /> );
+
+		expect(
+			screen.getByRole( 'button', {
+				expanded: false,
+			} )
+		).toHaveTextContent( 'violets' );
+
+		expect( mockOnChange ).not.toHaveBeenCalled();
+	} );
+
+	it( 'Should pick the initially selected option if the value prop is passed without firing onChange', async () => {
+		const mockOnChange = jest.fn();
+		render(
+			<Component
+				{ ...props }
+				onChange={ mockOnChange }
+				value={ props.options[ 3 ] }
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'button', {
+				expanded: false,
+			} )
+		).toHaveTextContent( 'amber' );
+
+		expect( mockOnChange ).not.toHaveBeenCalled();
+	} );
+
+	// Using the "Uncontrolled" version of the component
+	// in order to apply controlled logic directly in the test
+	if ( mode === 'Uncontrolled' ) {
+		it( 'Should apply external controlled updates', async () => {
+			const { rerender } = render(
+				<Component { ...props } value={ props.options[ 0 ] } />
+			);
+
+			const currentSelectedItem = screen.getByRole( 'button', {
+				expanded: false,
+			} );
+
+			expect( currentSelectedItem ).toHaveTextContent( 'violets' );
+
+			rerender( <Component { ...props } value={ props.options[ 1 ] } /> );
+
+			expect( currentSelectedItem ).toHaveTextContent( 'crimson clover' );
+		} );
+	}
 
 	it( 'Should replace the initial selection when a new item is selected', async () => {
 		const user = userEvent.setup();

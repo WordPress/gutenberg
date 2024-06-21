@@ -64,7 +64,7 @@ const ControlledCustomSelectControl = ( {
 	onChange: onChangeProp,
 	...restProps
 }: React.ComponentProps< typeof UncontrolledCustomSelectControl > ) => {
-	const [ value, setValue ] = useState( options[ 0 ] );
+	const [ value, setValue ] = useState( restProps.value ?? options[ 0 ] );
 
 	const onChange: typeof onChangeProp = ( changeObject ) => {
 		onChangeProp?.( changeObject );
@@ -87,7 +87,73 @@ describe.each( [
 	[ 'Uncontrolled', UncontrolledCustomSelectControl ],
 	[ 'Controlled', ControlledCustomSelectControl ],
 ] )( 'CustomSelectControl (%s)', ( ...modeAndComponent ) => {
-	const [ , Component ] = modeAndComponent;
+	const [ mode, Component ] = modeAndComponent;
+
+	it( 'Should select the first option when no explicit initial value is passed without firing onChange', async () => {
+		const mockOnChange = jest.fn();
+		render( <Component { ...legacyProps } onChange={ mockOnChange } /> );
+
+		expect(
+			screen.getByRole( 'combobox', {
+				expanded: false,
+			} )
+		).toHaveTextContent( 'violets' );
+
+		// Necessary to wait for onChange to potentially fire
+		await sleep();
+
+		expect( mockOnChange ).not.toHaveBeenCalled();
+	} );
+
+	it( 'Should pick the initially selected option if the value prop is passed without firing onChange', async () => {
+		const mockOnChange = jest.fn();
+		render(
+			<Component
+				{ ...legacyProps }
+				onChange={ mockOnChange }
+				value={ legacyProps.options[ 3 ] }
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'combobox', {
+				expanded: false,
+			} )
+		).toHaveTextContent( 'amber' );
+
+		// Necessary to wait for onChange to potentially fire
+		await sleep();
+
+		expect( mockOnChange ).not.toHaveBeenCalled();
+	} );
+
+	// Using the "Uncontrolled" version of the component
+	// in order to apply controlled logic directly in the test
+	if ( mode === 'Uncontrolled' ) {
+		it( 'Should apply external controlled updates', async () => {
+			const { rerender } = render(
+				<Component
+					{ ...legacyProps }
+					value={ legacyProps.options[ 0 ] }
+				/>
+			);
+
+			const currentSelectedItem = screen.getByRole( 'combobox', {
+				expanded: false,
+			} );
+
+			expect( currentSelectedItem ).toHaveTextContent( 'violets' );
+
+			rerender(
+				<Component
+					{ ...legacyProps }
+					value={ legacyProps.options[ 1 ] }
+				/>
+			);
+
+			expect( currentSelectedItem ).toHaveTextContent( 'crimson clover' );
+		} );
+	}
 
 	it( 'Should replace the initial selection when a new item is selected', async () => {
 		render( <Component { ...legacyProps } /> );
