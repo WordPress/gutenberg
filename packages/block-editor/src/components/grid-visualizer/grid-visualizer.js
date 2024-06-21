@@ -15,7 +15,7 @@ import { __experimentalUseDropZone as useDropZone } from '@wordpress/compose';
  */
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockPopoverCover from '../block-popover/cover';
-import { range, GridRect, getGridItemRect, getGridInfo } from './utils';
+import { range, GridRect, getGridInfo } from './utils';
 import { store as blockEditorStore } from '../../store';
 import { useGetBlocksBeforeCurrentCell } from './use-get-blocks-before-current-cell';
 
@@ -131,20 +131,6 @@ const GridVisualizerGrid = forwardRef(
 												rowSpan: gridInfo.numRows,
 											} ).containsRect( rect );
 											if ( ! isInBounds ) {
-												return false;
-											}
-
-											const isOverlapping = Array.from(
-												gridElement.children
-											).some(
-												( child ) =>
-													child.dataset.block !==
-														srcClientId &&
-													rect.intersectsRect(
-														getGridItemRect( child )
-													)
-											);
-											if ( isOverlapping ) {
 												return false;
 											}
 
