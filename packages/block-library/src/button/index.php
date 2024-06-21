@@ -17,6 +17,7 @@
  * @return string The block content.
  */
 function render_block_core_button( $attributes, $content ) {
+	// TODO: Remove this line when 6.6 releases.
 	if ( ! is_wp_version_compatible( '6.5' ) ) {
 		return $content;
 	}
