@@ -847,11 +847,11 @@ class WP_Theme_JSON_Gutenberg {
 
 		foreach ( $registered_styles as $block_type => $registered_variations ) {
 			foreach ( $registered_variations as $variation_name => $variation_data ) {
-				$registered_data       = $variation_data['style_data'] ?? array();
-				$shared_variation_data = $variations[ $variation_name ] ?? array();
-				$merged_variation_data = array_replace_recursive( $registered_data, $shared_variation_data );
-				if ( ! empty( $merged_variation_data ) ) {
-					_wp_array_set( $new_theme_json, array( 'styles', 'blocks', $block_type, 'variations', $variation_name ), $merged_variation_data );
+				$block_level_data = $new_theme_json['styles']['blocks'][ $block_type]['variations'][ $variation_name ] ?? array();
+				$top_level_data   = $variations[ $variation_name ] ?? array();
+				$merged_data      = array_replace_recursive( $top_level_data, $block_level_data );
+				if ( ! empty( $merged_data ) ) {
+					_wp_array_set( $new_theme_json, array( 'styles', 'blocks', $block_type, 'variations', $variation_name ), $merged_data );
 				}
 			}
 		}
