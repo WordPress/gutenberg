@@ -81,11 +81,39 @@ const ControlledCustomSelectControl = ( {
 	);
 };
 
+it( 'Should apply external controlled updates', async () => {
+	const mockOnChange = jest.fn();
+	const { rerender } = render(
+		<UncontrolledCustomSelectControl
+			{ ...props }
+			value={ props.options[ 0 ] }
+			onChange={ mockOnChange }
+		/>
+	);
+
+	const currentSelectedItem = screen.getByRole( 'button', {
+		expanded: false,
+	} );
+
+	expect( currentSelectedItem ).toHaveTextContent( props.options[ 0 ].name );
+
+	rerender(
+		<UncontrolledCustomSelectControl
+			{ ...props }
+			value={ props.options[ 1 ] }
+		/>
+	);
+
+	expect( currentSelectedItem ).toHaveTextContent( props.options[ 1 ].name );
+
+	expect( mockOnChange ).not.toHaveBeenCalled();
+} );
+
 describe.each( [
 	[ 'Uncontrolled', UncontrolledCustomSelectControl ],
 	[ 'Controlled', ControlledCustomSelectControl ],
 ] )( 'CustomSelectControl %s', ( ...modeAndComponent ) => {
-	const [ mode, Component ] = modeAndComponent;
+	const [ , Component ] = modeAndComponent;
 
 	it( 'Should select the first option when no explicit initial value is passed without firing onChange', () => {
 		const mockOnChange = jest.fn();
@@ -118,26 +146,6 @@ describe.each( [
 
 		expect( mockOnChange ).not.toHaveBeenCalled();
 	} );
-
-	// Using the "Uncontrolled" version of the component
-	// in order to apply controlled logic directly in the test
-	if ( mode === 'Uncontrolled' ) {
-		it( 'Should apply external controlled updates', async () => {
-			const { rerender } = render(
-				<Component { ...props } value={ props.options[ 0 ] } />
-			);
-
-			const currentSelectedItem = screen.getByRole( 'button', {
-				expanded: false,
-			} );
-
-			expect( currentSelectedItem ).toHaveTextContent( 'violets' );
-
-			rerender( <Component { ...props } value={ props.options[ 1 ] } /> );
-
-			expect( currentSelectedItem ).toHaveTextContent( 'crimson clover' );
-		} );
-	}
 
 	it( 'Should replace the initial selection when a new item is selected', async () => {
 		const user = userEvent.setup();
