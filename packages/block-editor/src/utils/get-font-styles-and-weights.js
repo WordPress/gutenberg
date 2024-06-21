@@ -70,7 +70,7 @@ export function getFontStylesAndWeights( fontFamilyFaces ) {
 	let fontStyles = [];
 	let fontWeights = [];
 	const combinedStyleAndWeightOptions = [];
-	const isSystemFont = fontFamilyFaces.length === 0 || ! fontFamilyFaces;
+	const isSystemFont = ! fontFamilyFaces || fontFamilyFaces?.length === 0;
 	let isVariableFont = false;
 
 	fontFamilyFaces?.forEach( ( face ) => {
