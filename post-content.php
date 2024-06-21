@@ -2,7 +2,7 @@
 /**
  * Default content of the demo page
  *
- * @package gutenberg
+ * @package gutenberg!
  */
 
 ?>
