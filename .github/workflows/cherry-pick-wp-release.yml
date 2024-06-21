@@ -1,0 +1,95 @@
+name: Auto Cherry-Pick
+
+on:
+    pull_request:
+        types: [closed, labeled]
+        branches:
+            - try/cherry-pick-automation-trunk # To be replaced with "trunk".
+
+jobs:
+    cherry-pick:
+        runs-on: ubuntu-latest
+        if: github.event.pull_request.merged == true
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v2
+              with:
+                  fetch-depth: 0
+
+            - name: Set up Git
+              run: |
+                  git config --global user.name "Gutenberg Repository Automation"
+                  git config --global user.email "gutenberg@wordpress.org"
+
+            - name: Determine if label should trigger cherry-pick
+              id: label-check
+              run: |
+                  LABELS=$(jq -r '.pull_request.labels[].name' "$GITHUB_EVENT_PATH")
+                  for LABEL in $LABELS; do
+                    if [[ "$LABEL" =~ ^Backport\ to\ WP\ ([0-9]+\.[0-9]+)\ Beta/RC$ ]]; then
+                      VERSION=${BASH_REMATCH[1]}
+                      echo "::set-output name=cherry_pick::true"
+                      echo "::set-output name=version::$VERSION"
+                      exit 0
+                    fi
+                  done
+                  echo "::set-output name=cherry_pick::false"
+
+            - name: Cherry-pick the commit
+              id: cherry-pick
+              if: steps.label-check.outputs.cherry_pick == 'true'
+              run: |
+                  TARGET_BRANCH="wp/${{ steps.label-check.outputs.version }}"
+                  COMMIT_SHA=$(jq -r '.pull_request.merge_commit_sha' "$GITHUB_EVENT_PATH")
+                  git checkout $TARGET_BRANCH
+                  git cherry-pick $COMMIT_SHA || echo "cherry-pick-failed" > result
+                  if [ -f result ] && grep -q "cherry-pick-failed" result; then
+                    echo "::set-output name=conflict::true"
+                    git cherry-pick --abort
+                  else
+                    git push origin $TARGET_BRANCH
+                    echo "::set-output name=conflict::false"
+                  fi
+
+            - name: Remove cherry-pick label
+              if: steps.label-check.outputs.cherry_pick == 'true' && steps.cherry-pick.outputs.conflict == 'false'
+              uses: actions/github-script@v6
+              with:
+                  script: |
+                      const prNumber = ${{ github.event.pull_request.number }};
+                      const label = `Backport to WP ${{ steps.label-check.outputs.version }} Beta/RC`;
+                      await github.issues.removeLabel({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number: prNumber,
+                        name: label
+                      });
+
+            - name: Comment on the PR
+              if: steps.label-check.outputs.cherry_pick == 'true' && steps.cherry-pick.outputs.conflict == 'false'
+              uses: actions/github-script@v6
+              with:
+                  script: |
+                      const prNumber = ${{ github.event.pull_request.number }};
+                      const commitSha = '${{ steps.cherry-pick.outputs.commit_sha }}';
+                      const targetBranch = `wp/${{ steps.label-check.outputs.version }}`;
+                      await github.issues.createComment({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number: prNumber,
+                        body: `I just cherry-picked this PR to the ${targetBranch} branch to get it included in the next release: ${commitSha}`
+                      });
+
+            - name: Comment on the PR about conflict
+              if: steps.label-check.outputs.cherry_pick == 'true' && steps.cherry-pick.outputs.conflict == 'true'
+              uses: actions/github-script@v6
+              with:
+                  script: |
+                      const prNumber = ${{ github.event.pull_request.number }};
+                      const targetBranch = `wp/${{ steps.label-check.outputs.version }}`;
+                      await github.issues.createComment({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number: prNumber,
+                        body: `There was a conflict while trying to cherry-pick the commit to the ${targetBranch} branch. Please resolve the conflict manually and create a PR to the ${targetBranch} branch.`
+                      });
