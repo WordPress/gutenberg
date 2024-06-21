@@ -798,8 +798,8 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * {
 	 *   "styles": {
-	 *     "blocks": {
-	 *       "variations": {
+	 *     "variations": {
+	 *       "section-a": {
 	 *         "blockTypes": [ "core/paragraph", "core/group" ],
 	 *         "color": { "background": "backgroundColor" }
 	 *       }
@@ -813,8 +813,16 @@ class WP_Theme_JSON_Gutenberg {
 	 *   "styles": {
 	 *     "blocks": {
 	 *       "variations": {
-	 *         "core/paragraph": { "color": { "background": "backgroundColor" } },
-	 *         "core/group": { "color": { "background": "backgroundColor" } }
+	 *         "core/paragraph": {
+	 *           "variations": {
+	 *             "section-a": { "color": { "background": "backgroundColor" } }
+	 *           }
+	 *         },
+	 *         "core/group": {
+	 *           "variations": {
+	 *             "section-a": { "color": { "background": "backgroundColor" } }
+	 *           }
+	 *         }
 	 *       }
 	 *     }
 	 *   }
