@@ -73,15 +73,16 @@ function CoverHeightInput( {
 
 	return (
 		<UnitControl
-			label={ __( 'Minimum height of cover' ) }
+			label={ __( 'Minimum height' ) }
 			id={ inputId }
 			isResetValueOnUnitChange
 			min={ min }
 			onChange={ handleOnChange }
 			onUnitChange={ onUnitChange }
-			__unstableInputWidth="80px"
+			__unstableInputWidth="calc(50% - 4px)"
 			units={ units }
 			value={ computedValue }
+			size="__unstable-large"
 		/>
 	);
 }
