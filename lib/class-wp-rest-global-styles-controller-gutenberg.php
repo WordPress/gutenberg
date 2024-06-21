@@ -332,7 +332,8 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 			}
 
 			// Register theme-defined variations e.g. from block style variation partials under `/styles`.
-			WP_Theme_JSON_Resolver_Gutenberg::get_theme_data();
+			$variations = WP_Theme_JSON_Resolver_Gutenberg::get_style_variations( 'block' );
+			gutenberg_register_block_style_variations_from_theme_json_partials( $variations );
 
 			if ( isset( $request['settings'] ) ) {
 				$config['settings'] = $request['settings'];
