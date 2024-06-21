@@ -887,9 +887,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			}
 
 			$variation_name                    = $variation['slug'] ?? _wp_to_kebab_case( $variation['title'] );
-			$variation_data                    = $variation['styles'];
-			$variation_data['blockTypes']      = $variation['blockTypes'];
-			$new_variations[ $variation_name ] = $variation_data;
+			$new_variations[ $variation_name ] = $variation['styles'];
 		}
 
 		if ( empty( $new_variations ) ) {

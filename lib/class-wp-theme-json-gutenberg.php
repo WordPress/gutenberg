@@ -737,7 +737,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param string $origin     Optional. What source of data this object represents.
 	 *                           One of 'blocks', 'default', 'theme', or 'custom'. Default 'theme'.
 	 */
-	public function __construct( $theme_json = array( 'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA ), $origin = 'theme' ) {
+	public function __construct( $theme_json = array( 'version' => self::LATEST_SCHEMA ), $origin = 'theme' ) {
 		if ( ! in_array( $origin, static::VALID_ORIGINS, true ) ) {
 			$origin = 'theme';
 		}
@@ -836,24 +836,23 @@ class WP_Theme_JSON_Gutenberg {
 			return $theme_json;
 		}
 
+		$registered_styles = WP_Block_Styles_Registry::get_instance()->get_all_registered();
+
+		if ( empty( $registered_styles ) ) {
+			return $theme_json;
+		}
+
 		$new_theme_json = $theme_json;
 		$variations     = $new_theme_json['styles']['variations'];
 
-		foreach ( $variations as $variation_name => $data ) {
-			if ( ! isset( $data['blockTypes'] ) ) {
-				// Skip shared variations that do not declare blockTypes.
-				continue;
-			}
-
-			$block_names = $data['blockTypes'];
-			unset( $data['blockTypes'] );
-			unset( $data['title'] );
-
-			foreach ( $block_names as $block_name ) {
-				// Existing per-block-type variation styles should take precedence over shared definition values.
-				$block_type_variation_data = $new_theme_json['styles']['blocks'][ $block_name ]['variations'][ $variation_name ] ?? array();
-				$merged_variation_data     = array_replace_recursive( $data, $block_type_variation_data );
-				_wp_array_set( $new_theme_json, array( 'styles', 'blocks', $block_name, 'variations', $variation_name ), $merged_variation_data );
+		foreach ( $registered_styles as $block_type => $registered_variations ) {
+			foreach ( $registered_variations as $variation_name => $variation_data ) {
+				$registered_data       = $variation_data['style_data'] ?? array();
+				$shared_variation_data = $variations[ $variation_name ] ?? array();
+				$merged_variation_data = array_replace_recursive( $registered_data, $shared_variation_data );
+				if ( ! empty( $merged_variation_data ) ) {
+					_wp_array_set( $new_theme_json, array( 'styles', 'blocks', $block_type, 'variations', $variation_name ), $merged_variation_data );
+				}
 			}
 		}
 
@@ -3376,7 +3375,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 5.9.0
 	 * @since 6.6.0 Added support for block style variation element styles and $origin parameter.
 	 *
-	 * @param array $theme_json Structure to sanitize.
+	 * @param array  $theme_json Structure to sanitize.
 	 * @param string $origin    Optional. What source of data this object represents.
 	 *                          One of 'blocks', 'default', 'theme', or 'custom'. Default 'theme'.
 	 * @return array Sanitized structure.
