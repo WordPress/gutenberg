@@ -307,7 +307,7 @@ const trashPostAction = {
 	},
 };
 
-function useTrashPostAction( postType ) {
+function useCanUserEligibilityCheckPostType( postType, capability, action ) {
 	const registry = useRegistry();
 	const { resource, cachedCanUserResolvers } = useSelect(
 		( select ) => {
@@ -321,20 +321,28 @@ function useTrashPostAction( postType ) {
 	);
 	return useMemo(
 		() => ( {
-			...trashPostAction,
+			...action,
 			isEligible( item ) {
 				return (
-					trashPostAction.isEligible( item ) &&
+					action.isEligible( item ) &&
 					registry
 						.select( coreStore )
-						.canUser( 'delete', resource, item.id )
+						.canUser( capability, resource, item.id )
 				);
 			},
 		} ),
 		// We are making this use memo depend on cachedCanUserResolvers as a way to make the component using this hook re-render
 		// when user capabilities are resolved. This makes sure the isEligible function is re-evaluated.
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[ registry, resource, cachedCanUserResolvers ]
+		[ action, registry, capability, resource, cachedCanUserResolvers ]
+	);
+}
+
+function useTrashPostAction( postType ) {
+	return useCanUserEligibilityCheckPostType(
+		postType,
+		'delete',
+		trashPostAction
 	);
 }
 
@@ -427,6 +435,14 @@ const permanentlyDeletePostAction = {
 		}
 	},
 };
+
+function usePermanentlyDeletePostAction( postType ) {
+	return useCanUserEligibilityCheckPostType(
+		postType,
+		'delete',
+		permanentlyDeletePostAction
+	);
+}
 
 const restorePostAction = {
 	id: 'restore',
@@ -534,6 +550,14 @@ const restorePostAction = {
 		}
 	},
 };
+
+function useRestorePostAction( postType ) {
+	return useCanUserEligibilityCheckPostType(
+		postType,
+		'update',
+		restorePostAction
+	);
+}
 
 const viewPostAction = {
 	id: 'view-post',
@@ -693,6 +717,14 @@ const renamePostAction = {
 		);
 	},
 };
+
+function useRenamePostAction( postType ) {
+	return useCanUserEligibilityCheckPostType(
+		postType,
+		'update',
+		renamePostAction
+	);
+}
 
 const useDuplicatePostAction = ( postType ) => {
 	const { userCanCreatePost } = useSelect(
@@ -1055,6 +1087,10 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 
 	const duplicatePostAction = useDuplicatePostAction( postType );
 	const trashPostActionForPostType = useTrashPostAction( postType );
+	const permanentlyDeletePostActionForPostType =
+		usePermanentlyDeletePostAction( postType );
+	const renamePostActionForPostType = useRenamePostAction( postType );
+	const restorePostActionForPostType = useRestorePostAction( postType );
 	const isTemplateOrTemplatePart = [
 		TEMPLATE_POST_TYPE,
 		TEMPLATE_PART_POST_TYPE,
@@ -1080,13 +1116,16 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 				userCanCreatePostType &&
 				duplicateTemplatePartAction,
 			isPattern && userCanCreatePostType && duplicatePatternAction,
-			supportsTitle && renamePostAction,
+			supportsTitle && renamePostActionForPostType,
 			isPattern && exportPatternAsJSONAction,
-			isTemplateOrTemplatePart ? resetTemplateAction : restorePostAction,
+			isTemplateOrTemplatePart
+				? resetTemplateAction
+				: restorePostActionForPostType,
 			isTemplateOrTemplatePart || isPattern
 				? deletePostAction
 				: trashPostActionForPostType,
-			! isTemplateOrTemplatePart && permanentlyDeletePostAction,
+			! isTemplateOrTemplatePart &&
+				permanentlyDeletePostActionForPostType,
 			...defaultActions,
 		].filter( Boolean );
 		// Filter actions based on provided context. If not provided
@@ -1152,6 +1191,9 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 		postTypeObject?.viewable,
 		duplicatePostAction,
 		trashPostActionForPostType,
+		restorePostActionForPostType,
+		renamePostActionForPostType,
+		permanentlyDeletePostActionForPostType,
 		onActionPerformed,
 		isLoaded,
 		supportsRevisions,
