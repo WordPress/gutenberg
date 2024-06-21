@@ -101,9 +101,6 @@ class WP_Block_Supports_Block_Style_Variations_Test extends WP_UnitTestCase {
 		// Register theme-defined variations.
 		WP_Theme_JSON_Resolver_Gutenberg::get_theme_data();
 
-		// Register user-defined variations.
-		WP_Theme_JSON_Resolver_Gutenberg::get_user_data();
-
 		$variation_styles_data = array(
 			'color'    => array(
 				'background' => 'darkslateblue',
