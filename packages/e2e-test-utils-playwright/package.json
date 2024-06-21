@@ -31,9 +31,6 @@
 	"main": "./build/index.js",
 	"types": "./build-types",
 	"dependencies": {
-		"@wordpress/api-fetch": "file:../api-fetch",
-		"@wordpress/keycodes": "file:../keycodes",
-		"@wordpress/url": "file:../url",
 		"change-case": "^4.1.2",
 		"form-data": "^4.0.0",
 		"get-port": "^5.1.1",

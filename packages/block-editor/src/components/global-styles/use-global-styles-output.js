@@ -881,6 +881,7 @@ export const toStyles = (
 		marginReset: true,
 		presets: true,
 		rootPadding: true,
+		variationStyles: false,
 		...styleOptions,
 	};
 	const nodesWithStyles = getNodesWithStyles( tree, blockSelectors );
@@ -923,8 +924,8 @@ export const toStyles = (
 			ruleset += `padding-right: 0; padding-left: 0; padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom) }
 				.has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }
 				.has-global-padding > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); }
-				.has-global-padding :where(.has-global-padding:not(.wp-block-block, .alignfull, .alignwide)) { padding-right: 0; padding-left: 0; }
-				.has-global-padding :where(.has-global-padding:not(.wp-block-block, .alignfull, .alignwide)) > .alignfull { margin-left: 0; margin-right: 0;
+				.has-global-padding :where(:not(.alignfull.is-layout-flow) > .has-global-padding:not(.wp-block-block, .alignfull, .alignwide)) { padding-right: 0; padding-left: 0; }
+				.has-global-padding :where(:not(.alignfull.is-layout-flow) > .has-global-padding:not(.wp-block-block, .alignfull, .alignwide)) > .alignfull { margin-left: 0; margin-right: 0;
 				`;
 		}
 
@@ -1010,7 +1011,7 @@ export const toStyles = (
 					);
 				}
 
-				if ( styleVariationSelectors ) {
+				if ( options.variationStyles && styleVariationSelectors ) {
 					Object.entries( styleVariationSelectors ).forEach(
 						( [ styleVariationName, styleVariationSelector ] ) => {
 							const styleVariations =

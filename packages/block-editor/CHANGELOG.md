@@ -80,7 +80,7 @@
 
 -   Add `HeadingLevelDropdown` component for selecting H1-H6 and paragraph HTML tags from the block toolbar.
 
-### Bug Fix
+### Bug Fixes
 
 -   Fluid typography: custom font-sizes should use max viewport width ([#51516](https://github.com/WordPress/gutenberg/pull/51516)).
 
@@ -108,13 +108,13 @@
 
 ## 11.5.0 (2023-03-01)
 
-### Bug Fix
+### Bug Fixes
 
 -   `SpacingSizesControl`: fix white dot on thumb ([#48574](https://github.com/WordPress/gutenberg/pull/48574)).
 
 ## 11.4.0 (2023-02-15)
 
-### Bug Fix
+### Bug Fixes
 
 -   `LinkControl`: fix scrollbar displayed on toggle link settings ([#47986](https://github.com/WordPress/gutenberg/pull/47986)).
 
@@ -122,7 +122,7 @@
 
 ## 11.2.0 (2023-01-11)
 
-### Bug Fix
+### Bug Fixes
 
 -   `BlockInspector`: Fix browser warning error when block is not selected ([#46875](https://github.com/WordPress/gutenberg/pull/46875)).
 -   Move component styles needed for iframes to content styles ([#47103](https://github.com/WordPress/gutenberg/pull/47103)).
@@ -143,33 +143,33 @@
 -   Fluid typography: add configurable fluid typography settings for minimum font size to theme.json ([#42489](https://github.com/WordPress/gutenberg/pull/42489)).
 -   `URLInput`: Add `__nextHasNoMarginBottom` prop for opting into the new margin-free styles ([46692](https://github.com/WordPress/gutenberg/pull/46692)).
 
-### Bug Fix
+### Bug Fixes
 
 -   `SpacingSizesControl`: Change ARIA role from `region` to `group` to avoid unwanted ARIA landmark regions ([#46530](https://github.com/WordPress/gutenberg/pull/46530)).
 -   `FocalPointPicker`: Fix layout misalignment when placed in the `BlockInspector` ([#46631](https://github.com/WordPress/gutenberg/pull/46631)).
 
 ## 10.5.0 (2022-11-16)
 
-### Enhancement
+### Enhancements
 
 -   `BlockLockModal`: Move Icon component out of CheckboxControl label ([#45535](https://github.com/WordPress/gutenberg/pull/45535))
 -   Fluid typography: adjust font size min and max rules ([#45536](https://github.com/WordPress/gutenberg/pull/45536)).
 
 ## 10.4.0 (2022-11-02)
 
-### Bug Fix
+### Bug Fixes
 
 -   `InserterListItem`: Fix dragging and dropping in Firefox. ([#44631](https://github.com/WordPress/gutenberg/pull/44631))
 
 ## 10.3.0 (2022-10-19)
 
-### Bug Fix
+### Bug Fixes
 
 -   `FontSizePicker`: Update fluid utils so that only string, floats and integers are treated as valid font sizes for the purposes of fluid typography ([#44847](https://github.com/WordPress/gutenberg/pull/44847))
 -   `getTypographyClassesAndStyles()`: Ensure that font sizes are transformed into fluid values if fluid typography is activated ([#44852](https://github.com/WordPress/gutenberg/pull/44852))
 -   `BlockPopover`: Ensure that padding and margin visualizers display in correct position even when scrolling past block. ([#44998](https://github.com/WordPress/gutenberg/pull/44998))
 
-### New features
+### New Features
 
 -   You can now drop files/blocks/HTML on unmodified default blocks to transform them into corresponding blocks ([#44647](https://github.com/WordPress/gutenberg/pull/44647)).
 
@@ -179,7 +179,7 @@
 
 ## 10.0.0 (2022-09-13)
 
-### Breaking change
+### Breaking Changes
 
 -   `FontSizePicker`: Deprecate bottom margin style. Add a `__nextHasNoMarginBottom` prop to start opting into the margin-free styles that will become the default in a future version, currently scheduled to be WordPress 6.4 ([#43870](https://github.com/WordPress/gutenberg/pull/43870)).
 
@@ -195,7 +195,7 @@
 
 ## 9.3.0 (2022-06-15)
 
-### Bug fix
+### Bug Fixes
 
 -   Fix focus trap on certain `input` elements when navigating within a block with the left/right arrow keys ([#41538](https://github.com/WordPress/gutenberg/pull/41538)).
 
@@ -205,7 +205,7 @@
 
 ## 9.0.0 (2022-05-04)
 
-### Breaking change
+### Breaking Changes
 
 -   `BlockNavigationDropdown` is now deprecated. Use the `Dropdown` component from the `@wordpress/components` package and the `ListView` component from this package ([#40777](https://github.com/WordPress/gutenberg/pull/40777)).
 -   `ListView` no longer accepts the `__experimentalFeatures`, `__experimentalPersistentListViewFeatures`, `__experimentalHideContainerBlockActions`, and `showNestedBlocks` props. Passing additional undocumented props through to `ListView` is also now disallowed. ([#40777](https://github.com/WordPress/gutenberg/pull/40777)).
@@ -226,7 +226,7 @@
 
 ## 8.1.1 (2022-02-10)
 
-### Bug Fix
+### Bug Fixes
 
 -   Removed unused `@wordpress/block-serialization-default-parser`, `css-mediaquery`, `memize` and `redux-multi` dependencies ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
 
@@ -243,13 +243,13 @@
 -   Avoid re-rendering all List View items on block focus [#35706](https://github.com/WordPress/gutenberg/pull/35706). When List View is open Block focus time is 4 times faster in large posts.
 -   Render fixed number of items in List View [#35706](https://github.com/WordPress/gutenberg/pull/35230). Opening List View is 13 times faster in large posts.
 
-### Breaking change
+### Breaking Changes
 
 -   List View no longer supports the `showOnlyCurrentHierarchy` flag [#35706](https://github.com/WordPress/gutenberg/pull/35706). To display a subset of blocks, use the `blocks` parameter instead.
 
 ## 7.0.0 (2021-07-29)
 
-### Breaking Change
+### Breaking Changes
 
 -   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
 
@@ -274,7 +274,7 @@
 
 ## 5.2.0 (2020-12-17)
 
-### New Feature
+### New Features
 
 -   Added a store definition `store` for the block editor namespace to use with `@wordpress/data` API ([#26655](https://github.com/WordPress/gutenberg/pull/26655)).
 
@@ -303,7 +303,7 @@
 
 -   Added a `label` prop to `URLInput`. This allows the label to be set without needing to wrap the `URLInput` in a `BaseControl`.
 
-### Deprecation
+### Deprecations
 
 -   `dropZoneUIOnly` prop in `MediaPlaceholder` component has been deprecated in favor of `disableMediaButtons` prop.
 

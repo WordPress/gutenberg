@@ -95,7 +95,7 @@
 
 ## 10.0.0 (2022-10-05)
 
-### Breaking Change
+### Breaking Changes
 
 -   Testing: Remove enzyme completely ([#44494](https://github.com/WordPress/gutenberg/pull/44494)). See the [example in the README](./README.md#using-enzyme) for instructions on how to continue using `enzyme` in your project.
 
@@ -103,23 +103,23 @@
 
 ## 9.0.0 (2022-08-24)
 
-### Breaking Change
+### Breaking Changes
 
 -   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
 
-### Bug Fix
+### Bug Fixes
 
 -   Packages: Replace `is-plain-obj` with `is-plain-object` ([#43511](https://github.com/WordPress/gutenberg/pull/43511)).
 
 ## 8.5.2 (2022-08-17)
 
-### Bug Fix
+### Bug Fixes
 
 -   Jest Preset: Improve `is-plain-obj` transformation ignore ([#43271](https://github.com/WordPress/gutenberg/pull/43271)).
 
 ## 8.5.1 (2022-08-12)
 
-### Bug Fix
+### Bug Fixes
 
 -   Jest Preset: Ignore `is-plain-obj` transformation ([#43179](https://github.com/WordPress/gutenberg/pull/43179)).
 
@@ -136,13 +136,13 @@
 
 ## 7.1.2 (2021-10-22)
 
-### Bug Fix
+### Bug Fixes
 
 -   Provide more complete mocks of browser timing functions. ([#35368](https://github.com/WordPress/gutenberg/pull/35368))
 
 ## 7.1.1 (2021-09-09)
 
-### Bug Fix
+### Bug Fixes
 
 -   Restore the default setting for the `verbose` option. In effect, each test won't get reported during the run ([#34327](https://github.com/WordPress/gutenberg/pull/34327)).
 
@@ -221,13 +221,13 @@
 
 ## 3.0.0 (2018-11-03)
 
-### Breaking Change
+### Breaking Changes
 
 -   Remove coverage support.
 
 ## 2.0.0 (2018-07-12)
 
-### Breaking Change
+### Breaking Changes
 
 -   Updated code to work with Babel 7 ([#7832](https://github.com/WordPress/gutenberg/pull/7832))
 
@@ -237,13 +237,13 @@
 
 ## 1.0.6 (2018-05-18)
 
-### Polish
+### Internal
 
 -   Fix: Standardized `package.json` format ([#119](https://github.com/WordPress/packages/pull/119))
 
 ## 1.0.5 (2018-03-22)
 
-### Polish
+### Internal
 
 -   Docs: Wrap filename in backticks ([#89](https://github.com/WordPress/packages/pull/89))
 -   Add `jest-preset` keyword to `jest-preset-default` package ([#92](https://github.com/WordPress/packages/pull/92))

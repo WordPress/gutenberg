@@ -100,7 +100,7 @@
 
 ## 4.16.0 (2022-08-24)
 
-### Bug Fix
+### Bug Fixes
 
 -   Packages: Replace `is-plain-obj` with `is-plain-object` ([#43511](https://github.com/WordPress/gutenberg/pull/43511)).
 
@@ -149,7 +149,7 @@
 
 ## 3.7.0 (2020-02-04)
 
-### Bug Fix
+### Bug Fixes
 
 -   Change the `isGenerator` check for better compatibility with generator helper libraries ([#19666](https://github.com/WordPress/gutenberg/pull/19666)).
 
@@ -166,23 +166,23 @@
 
 ## 3.0.2 (2018-10-18)
 
-### Bug Fix
+### Bug Fixes
 
 -   Account for null value in redux-routine createRuntime (introduces `isAction` and `isActionOfType` methods to assist with that).
 
 ## 3.0.0 (2018-09-30)
 
-### Breaking change
+### Breaking Changes
 
 -   The middleware returns a promise resolving once the runtime finishes iterating over the generator.
 -   It's not possible to kill the execution of the runtime anymore by returning `undefined`
 
-## Bug Fixes
+### Bug Fixes
 
 -   Fix running routines in Firefox.
 
 ## 2.0.0 (2018-09-05)
 
-### Breaking Change
+### Breaking Changes
 
 -   Change how required built-ins are polyfilled with Babel 7 ([#9171](https://github.com/WordPress/gutenberg/pull/9171)). If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods.

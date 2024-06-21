@@ -16,9 +16,10 @@
 
 -   Remove some unused dependencies ([#62010](https://github.com/WordPress/gutenberg/pull/62010)).
 
-### Enhancement
+### Enhancements
 
 -   `label` prop in Actions API can be either a `string` value or a `function`, in case we want to use information from the selected items. ([#61942](https://github.com/WordPress/gutenberg/pull/61942)).
+-   Add `registry` argument to the callback of the actions API. ([#62505](https://github.com/WordPress/gutenberg/pull/62505)).
 
 ## 1.2.0 (2024-05-16)
 
@@ -30,24 +31,24 @@
 
 ## 1.0.0 (2024-04-19)
 
-### Breaking changes
+### Breaking Changes
 
 -   Removed the `onDetailsChange` event only available for the list layout. We are looking into adding actions to the list layout, including primary ones.
 
 ## 0.9.0 (2024-04-03)
 
-### Enhancement
+### Enhancements
 
 -   The `enumeration` type has been removed and we'll introduce new field types soon. The existing filters will still work as before given they checked for field.elements, which is still a condition filters should have.
 
 ## 0.8.0 (2024-03-21)
 
-### Enhancement
+### Enhancements
 
 -   Two new operators have been added: `isAll` and `isNotAll`. These are meant to represent `AND` operations. For example, `Category is all: Book, Review, Science Fiction` would represent all items that have all three categories selected.
 -   DataViews now supports multi-selection. A new set of filter operators has been introduced: `is`, `isNot`, `isAny`, `isNone`. Single-selection operators are `is` and `isNot`, and multi-selection operators are `isAny` and `isNone`. If no operators are declared for a filter, it will support multi-selection. Additionally, the old filter operators `in` and `notIn` operators have been deprecated and will work as `is` and `isNot` respectively. Please, migrate to the new operators as they'll be removed soon.
 
-### Breaking changes
+### Breaking Changes
 
 -   Removed the `getPaginationResults` and `sortByTextFields` utils and replaced them with a unique `filterSortAndPaginate` function.
 

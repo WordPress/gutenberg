@@ -36,21 +36,30 @@ export default function AddNewPattern() {
 	const [ showPatternModal, setShowPatternModal ] = useState( false );
 	const [ showTemplatePartModal, setShowTemplatePartModal ] =
 		useState( false );
+	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
 	const { createPatternFromFile } = unlock( useDispatch( patternsStore ) );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 	const patternUploadInputRef = useRef();
-	const { isBlockBasedTheme, addNewPatternLabel, addNewTemplatePartLabel } =
-		useSelect( ( select ) => {
-			const { getCurrentTheme, getPostType } = select( coreStore );
-			return {
-				isBlockBasedTheme: getCurrentTheme()?.is_block_theme,
-				addNewPatternLabel: getPostType( PATTERN_TYPES.user )?.labels
-					?.add_new_item,
-				addNewTemplatePartLabel: getPostType( TEMPLATE_PART_POST_TYPE )
-					?.labels?.add_new_item,
-			};
-		}, [] );
+	const {
+		isBlockBasedTheme,
+		addNewPatternLabel,
+		addNewTemplatePartLabel,
+		canCreatePattern,
+		canCreateTemplatePart,
+	} = useSelect( ( select ) => {
+		const { getCurrentTheme, getPostType, canUser } = select( coreStore );
+		return {
+			isBlockBasedTheme: getCurrentTheme()?.is_block_theme,
+			addNewPatternLabel: getPostType( PATTERN_TYPES.user )?.labels
+				?.add_new_item,
+			addNewTemplatePartLabel: getPostType( TEMPLATE_PART_POST_TYPE )
+				?.labels?.add_new_item,
+			// Blocks refers to the wp_block post type, this checks the ability to create a post of that type.
+			canCreatePattern: canUser( 'create', 'blocks' ),
+			canCreateTemplatePart: canUser( 'create', 'template-parts' ),
+		};
+	}, [] );
 
 	function handleCreatePattern( { pattern } ) {
 		setShowPatternModal( false );
@@ -78,15 +87,16 @@ export default function AddNewPattern() {
 		setShowTemplatePartModal( false );
 	}
 
-	const controls = [
-		{
+	const controls = [];
+	if ( canCreatePattern ) {
+		controls.push( {
 			icon: symbol,
 			onClick: () => setShowPatternModal( true ),
 			title: addNewPatternLabel,
-		},
-	];
+		} );
+	}
 
-	if ( isBlockBasedTheme ) {
+	if ( isBlockBasedTheme && canCreateTemplatePart ) {
 		controls.push( {
 			icon: symbolFilled,
 			onClick: () => setShowTemplatePartModal( true ),
@@ -94,15 +104,20 @@ export default function AddNewPattern() {
 		} );
 	}
 
-	controls.push( {
-		icon: upload,
-		onClick: () => {
-			patternUploadInputRef.current.click();
-		},
-		title: __( 'Import pattern from JSON' ),
-	} );
+	if ( canCreatePattern ) {
+		controls.push( {
+			icon: upload,
+			onClick: () => {
+				patternUploadInputRef.current.click();
+			},
+			title: __( 'Import pattern from JSON' ),
+		} );
+	}
 
 	const { categoryMap, findOrCreateTerm } = useAddPatternCategory();
+	if ( controls.length === 0 ) {
+		return null;
+	}
 	return (
 		<>
 			{ addNewPatternLabel && (

@@ -94,7 +94,7 @@
 
 ## 5.0.0 (2022-08-24)
 
-### Breaking Change
+### Breaking Changes
 
 -   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
 
@@ -112,6 +112,6 @@
 
 ## 2.0.0 (2019-03-06)
 
-### Breaking change
+### Breaking Changes
 
 -   Stop using Babel transpilation internally and set node 8 as a minimal version required ([#13540](https://github.com/WordPress/gutenberg/pull/13540)).

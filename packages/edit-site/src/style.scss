@@ -36,6 +36,19 @@
 @import "./components/pagination/style.scss";
 @import "./components/global-styles/variations/style.scss";
 
+/* stylelint-disable -- Disable reason: View Transitions not supported properly by stylelint. */
+::view-transition-image-pair(root) {
+	isolation: auto;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+	animation: none;
+	mix-blend-mode: normal;
+	display: block;
+}
+/* stylelint-enable */
+
 body.js #wpadminbar {
 	display: none;
 }

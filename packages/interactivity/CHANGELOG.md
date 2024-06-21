@@ -15,9 +15,9 @@
 -   Variables like `process.env.IS_GUTENBERG_PLUGIN` have been replaced by `globalThis.IS_GUTENBERG_PLUGIN`. Build systems using `process.env` should be updated ([#61486](https://github.com/WordPress/gutenberg/pull/61486)).
 -   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
 
-### Bug fixes
+### Bug Fixes
 
--	Fix null and number strings as namespaces runtime error. ([#61960](https://github.com/WordPress/gutenberg/pull/61960/))
+-   Fix null and number strings as namespaces runtime error. ([#61960](https://github.com/WordPress/gutenberg/pull/61960/))
 
 ## 5.7.0 (2024-05-16)
 
@@ -73,7 +73,7 @@
 
 -   Export `getConfig()` to retrieve the server-defined configuration for the passed namespace. ([58749](https://github.com/WordPress/gutenberg/pull/58749))
 
-### Breaking changes
+### Breaking Changes
 
 -   Remove the style prop (`key`) and class name arguments the `data-wp-style` and `data-wp-class` directives. ([#58835](https://github.com/WordPress/gutenberg/pull/58835)).
 -   Remove the `data-wp-body` directive. ([#58835](https://github.com/WordPress/gutenberg/pull/58835))
@@ -87,7 +87,7 @@
 
 -   Avoid initializing private stores as public when they have initial state. ([#58754](https://github.com/WordPress/gutenberg/pull/58754))
 
-### Bug fixes
+### Bug Fixes
 
 -   Interactivity API: Remove non default suffix data wp context processing. ([#58664](https://github.com/WordPress/gutenberg/pull/58664))
 
@@ -119,13 +119,13 @@
 -   Remove unused `state` and rename `props` to `attributes` in `getElement()`. ([#57974](https://github.com/WordPress/gutenberg/pull/57974))
 -   Convert `navigate` and `prefetch` function to actions of the new `core/router` store, available when importing the `@wordpress/interactivity-router` module. ([#57924](https://github.com/WordPress/gutenberg/pull/57924))
 
-### Bug Fix
+### Bug Fixes
 
 -   Prevent `wp-data-on=""` from creating `onDefault` handlers. ([#57925](https://github.com/WordPress/gutenberg/pull/57925))
 
 ## 3.2.0 (2024-01-10)
 
-### Bug Fix
+### Bug Fixes
 
 -   Fix namespaces when there are nested interactive regions. ([#57029](https://github.com/WordPress/gutenberg/pull/57029))
 
@@ -133,7 +133,7 @@
 
 ## 3.0.0 (2023-11-29)
 
-### Breaking Change
+### Breaking Changes
 
 -   Implement the new `store()` API as specified in the [proposal](https://github.com/WordPress/gutenberg/discussions/53586). ([#55459](https://github.com/WordPress/gutenberg/pull/55459))
 
@@ -141,7 +141,7 @@
 
 ## 2.6.0 (2023-11-02)
 
-### Bug Fix
+### Bug Fixes
 
 -   Update the title when using enhanced pagination. ([#55446](https://github.com/WordPress/gutenberg/pull/55446))
 
@@ -155,7 +155,7 @@
 
 -   Improve `navigate()` to render only the result of the last call when multiple happen simultaneously. ([#54201](https://github.com/WordPress/gutenberg/pull/54201))
 
-### Bug Fix
+### Bug Fixes
 
 -   Remove `role` attribute when set to `null` in `data-wp-bind`. ([#54608](https://github.com/WordPress/gutenberg/pull/54608))
 -   Add `timeout` option to `navigate()`, with a default value of `10000` milliseconds. ([#54474](https://github.com/WordPress/gutenberg/pull/54474))
@@ -179,7 +179,7 @@
 
 -   Allow passing optional `afterLoad` callbacks to `store` calls. ([#53363](https://github.com/WordPress/gutenberg/pull/53363))
 
-### Bug Fix
+### Bug Fixes
 
 -   Add support for underscores and leading dashes in the suffix part of the directive. ([#53337](https://github.com/WordPress/gutenberg/pull/53337))
 -   Add an asynchronous short circuit to `useSignalEffect` to avoid infinite loops. ([#53358](https://github.com/WordPress/gutenberg/pull/53358))
@@ -190,7 +190,7 @@
 
 ## 2.0.0 (2023-08-10)
 
-### Breaking Change
+### Breaking Changes
 
 -   Remove the `wp-show` directive until we figure out its final implementation. ([#53240](https://github.com/WordPress/gutenberg/pull/53240))
 
