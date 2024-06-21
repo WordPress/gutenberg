@@ -6,7 +6,6 @@ import { __, sprintf } from '@wordpress/i18n';
 import {
 	__experimentalSpacer as Spacer,
 	__experimentalUseNavigator as useNavigator,
-	__experimentalInputControl as InputControl,
 	__experimentalView as View,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
@@ -32,9 +31,11 @@ const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 import ScreenHeader from '../header';
 import FontSizePreview from './font-size-preview';
 import ConfirmDeleteFontSizeDialog from './confirm-delete-font-size-dialog';
+import RenameFontSizeDialog from './rename-font-size-dialog';
 
 function FontSize() {
 	const [ isDeleteConfirmOpen, setIsDeleteConfirmOpen ] = useState( false );
+	const [ isRenameDialogOpen, setIsRenameDialogOpen ] = useState( false );
 
 	const {
 		params: { slug },
@@ -119,6 +120,10 @@ function FontSize() {
 		setIsDeleteConfirmOpen( ! isDeleteConfirmOpen );
 	};
 
+	const toggleRenameDialog = () => {
+		setIsRenameDialogOpen( ! isRenameDialogOpen );
+	};
+
 	return (
 		<>
 			<ConfirmDeleteFontSizeDialog
@@ -127,6 +132,16 @@ function FontSize() {
 				toggleOpen={ toggleDeleteConfirm }
 				handleRemoveFontSize={ handleRemoveFontSize }
 			/>
+
+			{ isRenameDialogOpen && (
+				<RenameFontSizeDialog
+					fontSize={ fontSize }
+					isOpen={ isRenameDialogOpen }
+					toggleOpen={ toggleRenameDialog }
+					handleRename={ handleNameChange }
+				/>
+			) }
+
 			<VStack spacing={ 4 }>
 				<HStack justify="space-between" align="flex-start">
 					<ScreenHeader
@@ -153,6 +168,13 @@ function FontSize() {
 								}
 							>
 								<DropdownMenuItem
+									onClick={ toggleRenameDialog }
+								>
+									<DropdownMenuItemLabel>
+										{ __( 'Rename' ) }
+									</DropdownMenuItemLabel>
+								</DropdownMenuItem>
+								<DropdownMenuItem
 									onClick={ toggleDeleteConfirm }
 								>
 									<DropdownMenuItemLabel>
@@ -170,12 +192,6 @@ function FontSize() {
 							<FlexItem>
 								<FontSizePreview fontSize={ fontSize } />
 							</FlexItem>
-
-							<InputControl
-								label={ __( 'Name' ) }
-								value={ fontSize.name }
-								onChange={ handleNameChange }
-							/>
 
 							<SizeControl
 								label={ __( 'Size' ) }
