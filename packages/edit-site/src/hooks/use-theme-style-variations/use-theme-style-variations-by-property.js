@@ -141,7 +141,7 @@ export const filterObjectByProperties = ( object, properties ) => {
 export function isVariationWithProperties( variation, properties ) {
 	const variationWithProperties = filterObjectByProperties(
 		cloneDeep( variation ),
-		properties
+		[ ...properties, 'title', 'blockTypes' ] // Always include title and blockTypes as they are needed for block variations.
 	);
 
 	return (

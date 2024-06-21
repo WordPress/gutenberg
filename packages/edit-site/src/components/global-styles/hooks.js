@@ -134,7 +134,7 @@ export function useColorVariations() {
 export function useTypographyVariations() {
 	const typographyVariations =
 		useCurrentMergeThemeStyleVariationsWithUserConfig( {
-			properties: [ 'typography', 'spacing' ],
+			properties: [ 'typography' ],
 		} );
 	/*
 	 * Filter out variations with no settings or styles.
