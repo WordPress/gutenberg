@@ -14,7 +14,11 @@ import { useState } from '@wordpress/element';
  */
 import UncontrolledCustomSelectControl from '..';
 
-const customClass = 'amber-skies';
+const customClassName = 'amber-skies';
+const customStyles = {
+	backgroundColor: 'rgb(127, 255, 212)',
+	rotate: '13deg',
+};
 
 const legacyProps = {
 	label: 'label!',
@@ -26,7 +30,7 @@ const legacyProps = {
 		{
 			key: 'flower2',
 			name: 'crimson clover',
-			className: customClass,
+			className: customClassName,
 		},
 		{
 			key: 'flower3',
@@ -35,33 +39,33 @@ const legacyProps = {
 		{
 			key: 'color1',
 			name: 'amber',
-			className: customClass,
+			className: customClassName,
 		},
 		{
 			key: 'color2',
 			name: 'aquamarine',
-			style: {
-				backgroundColor: 'rgb(127, 255, 212)',
-				rotate: '13deg',
-			},
+			style: customStyles,
 		},
 	],
 };
 
 const ControlledCustomSelectControl = ( {
 	options,
-	onChange,
+	onChange: onChangeProp,
 	...restProps
 }: React.ComponentProps< typeof UncontrolledCustomSelectControl > ) => {
 	const [ value, setValue ] = useState( options[ 0 ] );
+
+	const onChange: typeof onChangeProp = ( changeObject ) => {
+		onChangeProp?.( changeObject );
+		setValue( changeObject.selectedItem );
+	};
+
 	return (
 		<UncontrolledCustomSelectControl
 			{ ...restProps }
 			options={ options }
-			onChange={ ( args: any ) => {
-				onChange?.( args );
-				setValue( args.selectedItem );
-			} }
+			onChange={ onChange }
 			value={ options.find(
 				( option: any ) => option.key === value.key
 			) }
@@ -148,7 +152,7 @@ describe.each( [
 		// assert against filtered array
 		itemsWithClass.map( ( { name } ) =>
 			expect( screen.getByRole( 'option', { name } ) ).toHaveClass(
-				customClass
+				customClassName
 			)
 		);
 
@@ -160,15 +164,12 @@ describe.each( [
 		// assert against filtered array
 		itemsWithoutClass.map( ( { name } ) =>
 			expect( screen.getByRole( 'option', { name } ) ).not.toHaveClass(
-				customClass
+				customClassName
 			)
 		);
 	} );
 
 	it( 'Should apply styles only to options that have styles defined', async () => {
-		const customStyles =
-			'background-color: rgb(127, 255, 212); rotate: 13deg;';
-
 		render( <Component { ...legacyProps } /> );
 
 		await click(
@@ -244,7 +245,7 @@ describe.each( [
 				screen.getByRole( 'combobox', {
 					expanded: false,
 				} )
-			).toHaveTextContent( /hint/i )
+			).toHaveTextContent( 'Hint' )
 		);
 	} );
 
@@ -281,11 +282,14 @@ describe.each( [
 			} )
 		);
 
+		// NOTE: legacy CustomSelectControl doesn't fire onChange
+		// at this point in time.
 		expect( mockOnChange ).toHaveBeenNthCalledWith(
 			1,
 			expect.objectContaining( {
 				inputValue: '',
 				isOpen: false,
+				// TODO: key should be different — this is a known bug and will be fixed
 				selectedItem: { key: 'violets', name: 'violets' },
 				type: '',
 			} )
@@ -311,9 +315,7 @@ describe.each( [
 	} );
 
 	it( 'Should return selectedItem object when specified onChange', async () => {
-		const mockOnChange = jest.fn(
-			( { selectedItem } ) => selectedItem.key
-		);
+		const mockOnChange = jest.fn();
 
 		render( <Component { ...legacyProps } onChange={ mockOnChange } /> );
 
@@ -325,13 +327,62 @@ describe.each( [
 			} )
 		).toHaveFocus();
 
+		// NOTE: legacy CustomSelectControl doesn't fire onChange
+		// at this point in time.
+		expect( mockOnChange ).toHaveBeenNthCalledWith(
+			1,
+			expect.objectContaining( {
+				selectedItem: expect.objectContaining( {
+					// TODO: key should be different — this is a known bug and will be fixed
+					key: 'violets',
+					name: 'violets',
+				} ),
+			} )
+		);
+
 		await type( 'p' );
 		await press.Enter();
 
-		expect( mockOnChange ).toHaveReturnedWith( 'poppy' );
+		expect( mockOnChange ).toHaveBeenNthCalledWith(
+			2,
+			expect.objectContaining( {
+				selectedItem: expect.objectContaining( {
+					// TODO: key should be different — this is a known bug and will be fixed
+					key: 'poppy',
+					name: 'poppy',
+				} ),
+			} )
+		);
 	} );
 
 	describe( 'Keyboard behavior and accessibility', () => {
+		// skip reason: legacy v2 doesn't currently implement this behavior
+		it.skip( 'Captures the keypress event and does not let it propagate', async () => {
+			const onKeyDown = jest.fn();
+
+			render(
+				<div
+					// This role="none" is required to prevent an eslint warning about accessibility.
+					role="none"
+					onKeyDown={ onKeyDown }
+				>
+					<Component { ...legacyProps } />
+				</div>
+			);
+			const currentSelectedItem = screen.getByRole( 'combobox', {
+				expanded: false,
+			} );
+			await click( currentSelectedItem );
+
+			const customSelect = screen.getByRole( 'listbox', {
+				name: 'label!',
+			} );
+			expect( customSelect ).toHaveFocus();
+			await press.Enter();
+
+			expect( onKeyDown ).toHaveBeenCalledTimes( 0 );
+		} );
+
 		it( 'Should be able to change selection using keyboard', async () => {
 			render( <Component { ...legacyProps } /> );
 
@@ -455,6 +506,35 @@ describe.each( [
 					selected: true,
 				} )
 			).toBeVisible();
+		} );
+
+		it( 'Should call custom event handlers', async () => {
+			const onFocusMock = jest.fn();
+			const onBlurMock = jest.fn();
+
+			render(
+				<>
+					<Component
+						{ ...legacyProps }
+						onFocus={ onFocusMock }
+						onBlur={ onBlurMock }
+					/>
+					<button>Focus stop</button>
+				</>
+			);
+
+			const currentSelectedItem = screen.getByRole( 'combobox', {
+				expanded: false,
+			} );
+
+			await press.Tab();
+
+			expect( currentSelectedItem ).toHaveFocus();
+			expect( onFocusMock ).toHaveBeenCalledTimes( 1 );
+
+			await press.Tab();
+			expect( currentSelectedItem ).not.toHaveFocus();
+			expect( onBlurMock ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
 } );
