@@ -95,7 +95,12 @@ function rectIntersect( rect1, rect2 ) {
  * @return {boolean} Whether the element is visible.
  */
 function isElementVisible( element ) {
-	const style = window.getComputedStyle( element );
+	const viewport = element.ownerDocument.defaultView;
+	if ( ! viewport ) {
+		return false;
+	}
+
+	const style = viewport.getComputedStyle( element );
 	if (
 		style.display === 'none' ||
 		style.visibility === 'hidden' ||
@@ -140,6 +145,11 @@ function isElementVisible( element ) {
  * @return {DOMRect} Bounding client rect.
  */
 export function getVisibleBoundingRect( element ) {
+	const viewport = element.ownerDocument.defaultView;
+	if ( ! viewport ) {
+		return new window.DOMRect();
+	}
+
 	let bounds = element.getBoundingClientRect();
 
 	const stack = [ element ];
@@ -158,8 +168,8 @@ export function getVisibleBoundingRect( element ) {
 	const viewportRect = new window.DOMRect(
 		0,
 		0,
-		window.innerWidth,
-		window.innerHeight
+		viewport.innerWidth,
+		viewport.innerHeight
 	);
 	return rectIntersect( bounds, viewportRect );
 }
