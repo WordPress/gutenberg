@@ -51,6 +51,12 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-6.6/class-gutenberg-rest-templates-controller-6-6.php';
 	require __DIR__ . '/compat/wordpress-6.6/rest-api.php';
 
+	// WordPress 6.7 compat.
+	require __DIR__ . '/compat/wordpress-6.7/class-gutenberg-rest-templates-controller-6-7.php';
+	require __DIR__ . '/compat/wordpress-6.7/rest-api.php';
+	require __DIR__ . '/compat/wordpress-6.7/blocks.php';
+	require __DIR__ . '/compat/wordpress-6.7/block-template-utils.php';
+
 	// Plugin specific code.
 	require_once __DIR__ . '/class-wp-rest-global-styles-controller-gutenberg.php';
 	require_once __DIR__ . '/class-wp-rest-edit-site-export-controller-gutenberg.php';

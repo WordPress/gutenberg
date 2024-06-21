@@ -109,6 +109,8 @@ function render_block_core_template_part( $attributes ) {
 		}
 	}
 
+	$content = insert_first_last_child_block_hooks_core_template_part( $block_template, $content );
+
 	// WP_DEBUG_DISPLAY must only be honored when WP_DEBUG. This precedent
 	// is set in `wp_debug_mode()`.
 	$is_debug = WP_DEBUG && WP_DEBUG_DISPLAY;
@@ -283,6 +285,56 @@ function build_template_part_block_variations() {
 	$area_variations     = build_template_part_block_area_variations( $instance_variations );
 	return array_merge( $area_variations, $instance_variations );
 }
+
+/**
+ * Inserts first_child and last_child hooked blocks into the block content.
+ *
+ * @param WP_Block_Template $block_template
+ * @param string $content
+ * @return string
+ */
+function insert_first_last_child_block_hooks_core_template_part( $block_template, $content ) {
+	$attributes = array();
+	$existing_ignored_hooked_blocks = $block_template->wp_id ? get_post_meta( $block_template->wp_id, '_wp_ignored_hooked_blocks', true ) : array();
+	if ( ! empty( $existing_ignored_hooked_blocks ) ) {
+		$existing_ignored_hooked_blocks  = json_decode( $existing_ignored_hooked_blocks, true );
+		$attributes['metadata'] = array(
+			'ignoredHookedBlocks' => $existing_ignored_hooked_blocks,
+		);
+	}
+	$serialized_block = get_comment_delimited_block_content(
+		'core/template-part',
+		$attributes,
+		$content
+	);
+
+	/**
+	 * _build_block_template utils will have already added ignoredHookedBlocks metadata,
+	 * so already hooked blocks won't be duplicated.
+	 */
+	$serialized_block = apply_block_hooks_to_content( $serialized_block, $block_template );
+	return remove_serialized_parent_block( $serialized_block );
+}
+
+/**
+ * Hooks into the REST API response for the core/template-part block and adds the first_child and last_child inner blocks.
+ *
+ * @param WP_REST_Response  $response The response object.
+ * @param WP_Block_Template $template Post object.
+ * @return WP_REST_Response The response object.
+ */
+function block_core_template_part_insert_hooked_blocks_into_rest_response( $response, $template, $request ) {
+	if ( 'wp_template_part' !== $template->type ) {
+		return $response;
+	}
+
+	$template->content = insert_first_last_child_block_hooks_core_template_part( $template, $template->content );
+
+	$response->data['content']['raw'] = $template->content;
+	return $response;
+}
+
+add_filter( 'rest_prepare_wp_template_part', 'block_core_template_part_insert_hooked_blocks_into_rest_response', 10, 3 );
 
 /**
  * Registers the `core/template-part` block on the server.
