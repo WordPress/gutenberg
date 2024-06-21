@@ -1,4 +1,4 @@
-name: Props Bot
+name: Props Bot (edited)
 
 on:
     # This event runs anytime a PR is (re)opened, updated, marked ready for review, or labeled.
