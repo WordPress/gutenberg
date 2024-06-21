@@ -134,7 +134,7 @@ describe.each( [
 			screen.getByRole( 'combobox', {
 				expanded: false,
 			} )
-		).toHaveTextContent( 'violets' );
+		).toHaveTextContent( legacyProps.options[ 0 ].name );
 
 		// Necessary to wait for onChange to potentially fire
 		await sleep();
@@ -156,7 +156,7 @@ describe.each( [
 			screen.getByRole( 'combobox', {
 				expanded: false,
 			} )
-		).toHaveTextContent( 'amber' );
+		).toHaveTextContent( legacyProps.options[ 3 ].name );
 
 		// Necessary to wait for onChange to potentially fire
 		await sleep();
@@ -502,7 +502,9 @@ describe.each( [
 			await press.ArrowDown();
 			await press.Enter();
 
-			expect( currentSelectedItem ).toHaveTextContent( 'crimson clover' );
+			expect( currentSelectedItem ).toHaveTextContent(
+				legacyProps.options[ 1 ].name
+			);
 		} );
 
 		it( 'Should be able to type characters to select matching options', async () => {
@@ -536,7 +538,9 @@ describe.each( [
 			await sleep();
 			await press.Tab();
 			expect( currentSelectedItem ).toHaveFocus();
-			expect( currentSelectedItem ).toHaveTextContent( 'violets' );
+			expect( currentSelectedItem ).toHaveTextContent(
+				legacyProps.options[ 0 ].name
+			);
 
 			// Ideally we would test a multi-character typeahead, but anything more than a single character is flaky
 			await type( 'a' );

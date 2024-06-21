@@ -123,7 +123,7 @@ describe.each( [
 			screen.getByRole( 'button', {
 				expanded: false,
 			} )
-		).toHaveTextContent( 'violets' );
+		).toHaveTextContent( props.options[ 0 ].name );
 
 		expect( mockOnChange ).not.toHaveBeenCalled();
 	} );
@@ -142,7 +142,7 @@ describe.each( [
 			screen.getByRole( 'button', {
 				expanded: false,
 			} )
-		).toHaveTextContent( 'amber' );
+		).toHaveTextContent( props.options[ 3 ].name );
 
 		expect( mockOnChange ).not.toHaveBeenCalled();
 	} );
@@ -489,7 +489,9 @@ describe.each( [
 			await user.keyboard( '{arrowdown}' );
 			await user.keyboard( '{enter}' );
 
-			expect( currentSelectedItem ).toHaveTextContent( 'crimson clover' );
+			expect( currentSelectedItem ).toHaveTextContent(
+				props.options[ 1 ].name
+			);
 		} );
 
 		it( 'Should be able to type characters to select matching options', async () => {
