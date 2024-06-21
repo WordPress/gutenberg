@@ -116,11 +116,8 @@ export type OptionProps< T extends Color | Gradient > = {
 	onChange: ( newElement: T ) => void;
 	isGradient: T extends Gradient ? true : false;
 	canOnlyChangeValues: PaletteEditProps[ 'canOnlyChangeValues' ];
-	isEditing: boolean;
 	key: Key;
 	onRemove: MouseEventHandler< HTMLButtonElement >;
-	onStartEditing: () => void;
-	onStopEditing: () => void;
 	popoverProps?: PaletteEditProps[ 'popoverProps' ];
 	slugPrefix: string;
 };

@@ -15,10 +15,7 @@ import {
 } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { lineSolid, moreVertical, plus } from '@wordpress/icons';
-import {
-	__experimentalUseFocusOutside as useFocusOutside,
-	useDebounce,
-} from '@wordpress/compose';
+import { useDebounce } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -174,16 +171,13 @@ function Option< T extends Color | Gradient >( {
 	canOnlyChangeValues,
 	element,
 	onChange,
-	isEditing,
-	onStartEditing,
 	onRemove,
-	onStopEditing,
 	popoverProps: receivedPopoverProps,
 	slugPrefix,
 	isGradient,
 }: OptionProps< T > ) {
-	const focusOutsideProps = useFocusOutside( onStopEditing );
 	const value = isGradient ? element.gradient : element.color;
+	const [ isEditingColor, setIsEditingColor ] = useState( false );
 
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
@@ -198,26 +192,23 @@ function Option< T extends Color | Gradient >( {
 	);
 
 	return (
-		<PaletteItem
-			className={ isEditing ? 'is-selected' : undefined }
-			as={ isEditing ? 'div' : 'button' }
-			onClick={ onStartEditing }
-			aria-label={
-				isEditing
-					? undefined
-					: sprintf(
-							// translators: %s is a color or gradient name, e.g. "Red".
-							__( 'Edit: %s' ),
-							element.name.trim().length ? element.name : value
-					  )
-			}
-			ref={ setPopoverAnchor }
-			{ ...( isEditing ? { ...focusOutsideProps } : {} ) }
-		>
+		<PaletteItem ref={ setPopoverAnchor } as="div">
 			<HStack justify="flex-start">
-				<IndicatorStyled colorValue={ value } />
+				<Button
+					onClick={ () => {
+						setIsEditingColor( true );
+					} }
+					aria-label={ sprintf(
+						// translators: %s is a color or gradient name, e.g. "Red".
+						__( 'Edit: %s' ),
+						element.name.trim().length ? element.name : value
+					) }
+					style={ { padding: 0 } }
+				>
+					<IndicatorStyled colorValue={ value } />
+				</Button>
 				<FlexItem>
-					{ isEditing && ! canOnlyChangeValues ? (
+					{ ! canOnlyChangeValues ? (
 						<NameInput
 							label={
 								isGradient
@@ -244,7 +235,7 @@ function Option< T extends Color | Gradient >( {
 						</NameContainer>
 					) }
 				</FlexItem>
-				{ isEditing && ! canOnlyChangeValues && (
+				{ ! canOnlyChangeValues && (
 					<FlexItem>
 						<RemoveButton
 							size="small"
@@ -255,12 +246,13 @@ function Option< T extends Color | Gradient >( {
 					</FlexItem>
 				) }
 			</HStack>
-			{ isEditing && (
+			{ isEditingColor && (
 				<ColorPickerPopover
 					isGradient={ isGradient }
 					onChange={ onChange }
 					element={ element }
 					popoverProps={ popoverProps }
+					onClose={ () => setIsEditingColor( false ) }
 				/>
 			) }
 		</PaletteItem>
@@ -270,8 +262,6 @@ function Option< T extends Color | Gradient >( {
 function PaletteEditListView< T extends Color | Gradient >( {
 	elements,
 	onChange,
-	editingElement,
-	setEditingElement,
 	canOnlyChangeValues,
 	slugPrefix,
 	isGradient,
@@ -294,11 +284,6 @@ function PaletteEditListView< T extends Color | Gradient >( {
 						canOnlyChangeValues={ canOnlyChangeValues }
 						key={ index }
 						element={ element }
-						onStartEditing={ () => {
-							if ( editingElement !== index ) {
-								setEditingElement( index );
-							}
-						} }
 						onChange={ ( newElement ) => {
 							debounceOnChange(
 								elements.map(
@@ -312,7 +297,6 @@ function PaletteEditListView< T extends Color | Gradient >( {
 							);
 						} }
 						onRemove={ () => {
-							setEditingElement( null );
 							const newElements = elements.filter(
 								( _currentElement, currentIndex ) => {
 									if ( currentIndex === index ) {
@@ -324,12 +308,6 @@ function PaletteEditListView< T extends Color | Gradient >( {
 							onChange(
 								newElements.length ? newElements : undefined
 							);
-						} }
-						isEditing={ index === editingElement }
-						onStopEditing={ () => {
-							if ( index === editingElement ) {
-								setEditingElement( null );
-							}
 						} }
 						slugPrefix={ slugPrefix }
 						popoverProps={ popoverProps }
@@ -551,8 +529,6 @@ export function PaletteEdit( {
 							elements={ elements }
 							// @ts-expect-error TODO: Don't know how to resolve
 							onChange={ onChange }
-							editingElement={ editingElement }
-							setEditingElement={ setEditingElement }
 							slugPrefix={ slugPrefix }
 							isGradient={ isGradient }
 							popoverProps={ popoverProps }
