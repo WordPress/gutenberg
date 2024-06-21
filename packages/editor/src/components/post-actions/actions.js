@@ -3,7 +3,7 @@
  */
 import { external, trash, backup } from '@wordpress/icons';
 import { addQueryArgs } from '@wordpress/url';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, _n, sprintf, _x } from '@wordpress/i18n';
@@ -306,6 +306,37 @@ const trashPostAction = {
 		);
 	},
 };
+
+function useTrashPostAction( postType ) {
+	const registry = useRegistry();
+	const { resource, cachedCanUserResolvers } = useSelect(
+		( select ) => {
+			const { getPostType, getCachedResolvers } = select( coreStore );
+			return {
+				resource: getPostType( postType )?.rest_base || '',
+				cachedCanUserResolvers: getCachedResolvers().canUser,
+			};
+		},
+		[ postType ]
+	);
+	return useMemo(
+		() => ( {
+			...trashPostAction,
+			isEligible( item ) {
+				return (
+					trashPostAction.isEligible( item ) &&
+					registry
+						.select( coreStore )
+						.canUser( 'delete', resource, item.id )
+				);
+			},
+		} ),
+		// We are making this use memo depend on cachedCanUserResolvers as a way to make the component using this hook re-render
+		// when user capabilities are resolved. This makes sure the isEligible function is re-evaluated.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[ registry, resource, cachedCanUserResolvers ]
+	);
+}
 
 const permanentlyDeletePostAction = {
 	id: 'permanently-delete',
@@ -1020,6 +1051,7 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 	);
 
 	const duplicatePostAction = useDuplicatePostAction( postType );
+	const trashPostActionForPostType = useTrashPostAction( postType );
 	const isTemplateOrTemplatePart = [
 		TEMPLATE_POST_TYPE,
 		TEMPLATE_PART_POST_TYPE,
@@ -1048,7 +1080,7 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 			isTemplateOrTemplatePart ? resetTemplateAction : restorePostAction,
 			isTemplateOrTemplatePart || isPattern
 				? deletePostAction
-				: trashPostAction,
+				: trashPostActionForPostType,
 			! isTemplateOrTemplatePart && permanentlyDeletePostAction,
 			...defaultActions,
 		].filter( Boolean );
@@ -1113,6 +1145,7 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 		isPattern,
 		postTypeObject?.viewable,
 		duplicatePostAction,
+		trashPostActionForPostType,
 		onActionPerformed,
 		isLoaded,
 		supportsRevisions,
