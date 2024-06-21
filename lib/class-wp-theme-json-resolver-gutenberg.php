@@ -249,7 +249,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 
 			// Register variations defined by theme partials (theme.json files in the styles directory).
 			$variations = static::get_style_variations( 'block' );
-			gutenberg_register_block_style_variations_from_theme_json_data( $variations );
+			gutenberg_register_block_style_variations_from_theme_json_partials( $variations );
 
 			/**
 			 * Filters the data provided by the theme for global styles and settings.
