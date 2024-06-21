@@ -881,11 +881,10 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				continue;
 			}
 
-			$variation_name = $variation['slug'] ?? _wp_to_kebab_case( $variation['title'] );
-			unset( $variation['slug'] );
-			unset( $variation['title'] );
-
-			$new_variations[ $variation_name ] = $variation;
+			$variation_name                    = $variation['slug'] ?? _wp_to_kebab_case( $variation['title'] );
+			$variation_data                    = $variation['styles'];
+			$variation_data['blockTypes']      = $variation['blockTypes'];
+			$new_variations[ $variation_name ] = $variation_data;
 		}
 
 		if ( empty( $new_variations ) ) {
