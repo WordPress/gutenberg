@@ -46,6 +46,16 @@ const props = {
 			name: 'aquamarine',
 			style: customStyles,
 		},
+		{
+			key: 'color3',
+			name: 'tomato (with custom props)',
+			className: customClassName,
+			style: customStyles,
+			// try passing a valid HTML attribute
+			'aria-label': 'test label',
+			// try adding a custom prop
+			customPropFoo: 'foo',
+		},
 	],
 };
 
@@ -341,6 +351,47 @@ describe.each( [
 				selectedItem: expect.objectContaining( {
 					key: 'flower3',
 					name: 'poppy',
+				} ),
+			} )
+		);
+	} );
+
+	it( "Should pass arbitrary props to onChange's selectedItem, but apply only style and className to DOM elements", async () => {
+		const user = userEvent.setup();
+		const onChangeMock = jest.fn();
+
+		render( <Component { ...props } onChange={ onChangeMock } /> );
+
+		const currentSelectedItem = screen.getByRole( 'button', {
+			expanded: false,
+		} );
+
+		await user.click( currentSelectedItem );
+
+		const optionWithCustomAttributes = screen.getByRole( 'option', {
+			name: 'tomato (with custom props)',
+		} );
+
+		// Assert that the option element does not have the custom attributes
+		expect( optionWithCustomAttributes ).not.toHaveAttribute(
+			'customPropFoo'
+		);
+		expect( optionWithCustomAttributes ).not.toHaveAttribute(
+			'aria-label'
+		);
+
+		await user.click( optionWithCustomAttributes );
+
+		expect( onChangeMock ).toHaveBeenCalledTimes( 1 );
+		expect( onChangeMock ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				selectedItem: expect.objectContaining( {
+					key: 'color3',
+					name: 'tomato (with custom props)',
+					className: customClassName,
+					style: customStyles,
+					'aria-label': 'test label',
+					customPropFoo: 'foo',
 				} ),
 			} )
 		);

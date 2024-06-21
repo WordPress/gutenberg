@@ -14,7 +14,7 @@ import * as Styled from '../styles';
 
 function CustomSelectControl( props: LegacyCustomSelectProps ) {
 	const {
-		__experimentalShowSelectedHint,
+		__experimentalShowSelectedHint = false,
 		__next40pxDefaultSize = false,
 		describedBy,
 		options,
@@ -27,7 +27,11 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 	// Forward props + store from v2 implementation
 	const store = Ariakit.useSelectStore( {
 		async setValue( nextValue ) {
-			if ( ! onChange ) {
+			const nextOption = options.find(
+				( item ) => item.name === nextValue
+			);
+
+			if ( ! onChange || ! nextOption ) {
 				return;
 			}
 
@@ -42,10 +46,7 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 				),
 				inputValue: '',
 				isOpen: state.open,
-				selectedItem: {
-					name: nextValue as string,
-					key: nextValue as string,
-				},
+				selectedItem: nextOption,
 				type: '',
 			};
 			onChange( changeObject );
@@ -53,7 +54,7 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 	} );
 
 	const children = options.map(
-		( { name, key, __experimentalHint, ...rest } ) => {
+		( { name, key, __experimentalHint, style, className } ) => {
 			const withHint = (
 				<Styled.WithHintWrapper>
 					<span>{ name }</span>
@@ -68,7 +69,8 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 					key={ key }
 					value={ name }
 					children={ __experimentalHint ? withHint : name }
-					{ ...rest }
+					style={ style }
+					className={ className }
 				/>
 			);
 		}

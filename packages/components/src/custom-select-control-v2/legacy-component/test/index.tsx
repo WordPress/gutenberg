@@ -46,6 +46,16 @@ const legacyProps = {
 			name: 'aquamarine',
 			style: customStyles,
 		},
+		{
+			key: 'color3',
+			name: 'tomato (with custom props)',
+			className: customClassName,
+			style: customStyles,
+			// try passing a valid HTML attribute
+			'aria-label': 'test label',
+			// try adding a custom prop
+			customPropFoo: 'foo',
+		},
 	],
 };
 
@@ -289,8 +299,7 @@ describe.each( [
 			expect.objectContaining( {
 				inputValue: '',
 				isOpen: false,
-				// TODO: key should be different — this is a known bug and will be fixed
-				selectedItem: { key: 'violets', name: 'violets' },
+				selectedItem: { key: 'flower1', name: 'violets' },
 				type: '',
 			} )
 		);
@@ -333,8 +342,7 @@ describe.each( [
 			1,
 			expect.objectContaining( {
 				selectedItem: expect.objectContaining( {
-					// TODO: key should be different — this is a known bug and will be fixed
-					key: 'violets',
+					key: 'flower1',
 					name: 'violets',
 				} ),
 			} )
@@ -347,9 +355,51 @@ describe.each( [
 			2,
 			expect.objectContaining( {
 				selectedItem: expect.objectContaining( {
-					// TODO: key should be different — this is a known bug and will be fixed
-					key: 'poppy',
+					key: 'flower3',
 					name: 'poppy',
+				} ),
+			} )
+		);
+	} );
+
+	it( "Should pass arbitrary props to onChange's selectedItem, but apply only style and className to DOM elements", async () => {
+		const onChangeMock = jest.fn();
+
+		render( <Component { ...legacyProps } onChange={ onChangeMock } /> );
+
+		const currentSelectedItem = screen.getByRole( 'combobox', {
+			expanded: false,
+		} );
+
+		await click( currentSelectedItem );
+
+		const optionWithCustomAttributes = screen.getByRole( 'option', {
+			name: 'tomato (with custom props)',
+		} );
+
+		// Assert that the option element does not have the custom attributes
+		expect( optionWithCustomAttributes ).not.toHaveAttribute(
+			'customPropFoo'
+		);
+		expect( optionWithCustomAttributes ).not.toHaveAttribute(
+			'aria-label'
+		);
+
+		await click( optionWithCustomAttributes );
+
+		// NOTE: legacy CustomSelectControl doesn't fire onChange
+		// on first render, and so at this point in time `onChangeMock`
+		// would be called only once.
+		expect( onChangeMock ).toHaveBeenCalledTimes( 2 );
+		expect( onChangeMock ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				selectedItem: expect.objectContaining( {
+					key: 'color3',
+					name: 'tomato (with custom props)',
+					className: customClassName,
+					style: customStyles,
+					'aria-label': 'test label',
+					customPropFoo: 'foo',
 				} ),
 			} )
 		);
