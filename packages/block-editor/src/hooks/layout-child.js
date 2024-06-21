@@ -15,7 +15,7 @@ import {
 	GridVisualizer,
 	GridItemResizer,
 	GridItemMovers,
-} from '../components/grid';
+} from '../components/grid-visualizer';
 
 function useBlockPropsChildLayoutStyles( { style } ) {
 	const shouldRenderChildLayoutStyles = useSelect( ( select ) => {
