@@ -179,6 +179,7 @@ function ChildLayoutControlsPure( { clientId, style, setAttributes } ) {
 			<GridVisualizer
 				clientId={ rootClientId }
 				contentRef={ setResizerBounds }
+				parentLayout={ parentLayout }
 			/>
 			{ allowSizingOnChildren && (
 				<GridItemResizer

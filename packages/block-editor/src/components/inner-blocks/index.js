@@ -267,7 +267,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 
 	const ref = useMergeRefs( [
 		props.ref,
-		__unstableDisableDropZone || isDropZoneDisabled
+		__unstableDisableDropZone || isDropZoneDisabled || layout?.columnCount
 			? null
 			: blockDropZoneRef,
 	] );

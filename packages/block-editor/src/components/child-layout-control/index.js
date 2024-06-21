@@ -19,7 +19,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { useGetBlocksBeforeCurrentCell } from '../grid/use-get-blocks-before-current-cell';
+import { useGetBlocksBeforeCurrentCell } from '../grid-visualizer/use-get-blocks-before-current-cell';
 import { store as blockEditorStore } from '../../store';
 
 function helpText( selfStretch, parentLayout ) {
