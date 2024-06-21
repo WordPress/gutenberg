@@ -917,8 +917,8 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @return array Theme json data including shared block style variation definitions.
 	 */
 	private static function inject_variations_from_block_styles_registry( $data ) {
-		$registry    = WP_Block_Styles_Registry::get_instance();
-		$styles      = $registry->get_all_registered();
+		$registry = WP_Block_Styles_Registry::get_instance();
+		$styles   = $registry->get_all_registered();
 
 		foreach ( $styles as $block_type => $variations ) {
 			foreach ( $variations as $variation_name => $variation ) {
