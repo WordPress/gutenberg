@@ -352,7 +352,7 @@ export interface ActionModal< Item extends AnyItem >
 }
 
 export interface ActionButton< Item extends AnyItem >
-	extends ActionBase< AnyItem > {
+	extends ActionBase< Item > {
 	/**
 	 * The callback to execute when the action is triggered.
 	 */

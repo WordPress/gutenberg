@@ -13,5 +13,5 @@ type PostStatus =
 	| 'trash';
 
 export interface Post extends AnyItem {
-	status?: PostStatus;
+	status: PostStatus;
 }
