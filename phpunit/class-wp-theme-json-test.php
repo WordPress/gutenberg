@@ -3750,13 +3750,32 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$input    = new WP_Theme_JSON_Gutenberg(
 			array(
-				'version' => 3,
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'styles'  => array(
 					'variations' => array(
 						'myVariation' => array(
-							'title'      => 'My variation',
-							'blockTypes' => array( 'core/paragraph', 'core/group' ),
-							'color'      => array( 'background' => 'backgroundColor' ),
+							'color'      => array(
+								'background' => 'topLevel',
+								'gradient'   => 'topLevel'
+							),
+							'typography' => array(
+								'fontFamily' => 'topLevel',
+							),
+						),
+					),
+					'blocks' => array(
+						'core/paragraph' => array(
+							'variations' => array(
+								'myVariation' => array(
+									'color' => array(
+										'background' => 'blockLevel',
+										'text'       => 'blockLevel',
+									),
+									'outline' => array(
+										'offset' => 'blockLevel',
+									),
+								),
+							),
 						),
 					),
 				),
@@ -3769,14 +3788,30 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'core/paragraph' => array(
 						'variations' => array(
 							'myVariation' => array(
-								'color' => array( 'background' => 'backgroundColor' ),
+								'color' => array(
+									'background' => 'blockLevel',
+									'gradient'   => 'topLevel',
+									'text'       => 'blockLevel',
+								),
+								'typography' => array(
+									'fontFamily' => 'topLevel'
+								),
+								'outline' => array(
+									'offset' => 'blockLevel',
+								),
 							),
 						),
 					),
 					'core/group'     => array(
 						'variations' => array(
 							'myVariation' => array(
-								'color' => array( 'background' => 'backgroundColor' ),
+								'color' => array(
+									'background' => 'topLevel',
+									'gradient'   => 'topLevel',
+								),
+								'typography' => array(
+									'fontFamily' => 'topLevel',
+								),
 							),
 						),
 					),
