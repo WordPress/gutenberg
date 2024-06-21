@@ -78,12 +78,19 @@ jobs:
                       const version = process.env.version;
                       console.log(`prNumber: ${prNumber}`);
                       console.log(`version: ${version}`);
-                      const label = `Backport to WP ${version} Beta/RC`;
+                      const oldLabel = `Backport to WP ${version} Beta/RC`;
+                      const newLabel = `Backported to WP Core`;
                       await github.rest.issues.removeLabel({
                         owner: context.repo.owner,
                         repo: context.repo.repo,
                         issue_number: prNumber,
-                        name: label
+                        name: oldLabel
+                      });
+                      await github.rest.issues.addLabels({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number: prNumber,
+                        labels: [newLabel]
                       });
 
             - name: Comment on the PR
