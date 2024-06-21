@@ -12,8 +12,8 @@ import { VStack } from '../../v-stack';
 import Dropdown from '../../dropdown';
 import { Navigator, useNavigator } from '..';
 
-const meta: Meta< typeof Navigator > = {
-	component: Navigator,
+const meta: Meta< typeof Navigator.Root > = {
+	component: Navigator.Root,
 	subcomponents: {
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Navigator.Screen': Navigator.Screen,
@@ -35,8 +35,8 @@ const meta: Meta< typeof Navigator > = {
 };
 export default meta;
 
-const Template: StoryFn< typeof Navigator > = ( { style, ...props } ) => (
-	<Navigator
+const Template: StoryFn< typeof Navigator.Root > = ( { style, ...props } ) => (
+	<Navigator.Root
 		style={ { ...style, height: '100vh', maxHeight: '450px' } }
 		{ ...props }
 	>
@@ -173,10 +173,10 @@ const Template: StoryFn< typeof Navigator > = ( { style, ...props } ) => (
 		<Navigator.Screen path="/product/:id">
 			<ProductDetails />
 		</Navigator.Screen>
-	</Navigator>
+	</Navigator.Root>
 );
 
-export const Default: StoryFn< typeof Navigator > = Template.bind( {} );
+export const Default: StoryFn< typeof Navigator.Root > = Template.bind( {} );
 Default.args = {
 	initialPath: '/',
 };
@@ -230,11 +230,11 @@ function ProductDetails() {
 	);
 }
 
-const NestedNavigatorTemplate: StoryFn< typeof Navigator > = ( {
+const NestedNavigatorTemplate: StoryFn< typeof Navigator.Root > = ( {
 	style,
 	...props
 } ) => (
-	<Navigator
+	<Navigator.Root
 		style={ { ...style, height: '100vh', maxHeight: '450px' } }
 		{ ...props }
 	>
@@ -286,10 +286,10 @@ const NestedNavigatorTemplate: StoryFn< typeof Navigator > = ( {
 				</CardBody>
 			</Card>
 		</Navigator.Screen>
-	</Navigator>
+	</Navigator.Root>
 );
 
-export const NestedNavigator: StoryFn< typeof Navigator > =
+export const NestedNavigator: StoryFn< typeof Navigator.Root > =
 	NestedNavigatorTemplate.bind( {} );
 NestedNavigator.args = {
 	initialPath: '/child2/grandchild',
@@ -313,8 +313,8 @@ const NavigatorButtonWithSkipFocus = ( {
 	);
 };
 
-export const SkipFocus: StoryFn< typeof Navigator > = ( args ) => {
-	return <Navigator { ...args } />;
+export const SkipFocus: StoryFn< typeof Navigator.Root > = ( args ) => {
+	return <Navigator.Root { ...args } />;
 };
 SkipFocus.args = {
 	initialPath: '/',

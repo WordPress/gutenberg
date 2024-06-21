@@ -117,11 +117,11 @@ export { default as __experimentalNavigationItem } from './navigation/item';
 export { default as __experimentalNavigationMenu } from './navigation/menu';
 export {
 	/**
-	 * @deprecated Import `Navigator` instead.
+	 * @deprecated Import `Navigator` and use `Navigator.Root` instead..
 	 */
 	NavigatorProvider as __experimentalNavigatorProvider,
 	/**
-	 * @deprecated Import `Navigator` and use `Navigator.Screen instead.
+	 * @deprecated Import `Navigator` and use `Navigator.Screen` instead.
 	 */
 	NavigatorScreen as __experimentalNavigatorScreen,
 	/**
@@ -140,8 +140,7 @@ export {
 	 * @deprecated Import `useNavigator` instead.
 	 */
 	useNavigator as __experimentalUseNavigator,
-	NavigatorProvider,
-	Navigator, // alias for `NavigatorProvider`
+	Navigator,
 	useNavigator,
 } from './navigator';
 export { default as Notice } from './notice';

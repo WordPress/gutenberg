@@ -271,9 +271,9 @@ function UnconnectedNavigatorProvider(
 }
 
 /**
- * The `NavigatorProvider` component (also aliased as `Navigator`) allows rendering
- * nested views/panels/menus (via the `Navigator.Screen` component and navigate
- * between these different view (via the `Navigator.Button` and `Navigator.BackButton`
+ * The `Navigator.Root` allows rendering nested views/panels/menus
+ * (via the `Navigator.Screen` component) and navigate between these
+ * different views (via the `Navigator.Button` and `Navigator.BackButton`
  * components or the `useNavigator` hook).
  *
  * ```jsx
@@ -282,7 +282,7 @@ function UnconnectedNavigatorProvider(
  * } from '@wordpress/components';
  *
  * const MyNavigation = () => (
- *   <Navigator initialPath="/">
+ *   <Navigator.Root> initialPath="/">
  *     <Navigator.Screen path="/">
  *       <p>This is the home screen.</p>
  *        <Navigator.Button path="/child">
@@ -296,32 +296,12 @@ function UnconnectedNavigatorProvider(
  *         Go back
  *       </Navigator.BackButton>
  *     </Navigator.Screen>
- *   </Navigator>
+ *   </Navigator.Root>
  * );
  * ```
  */
-
-type NavigatorProviderComponent< C > = C & {
-	// Define the function signature with props and a ref
-	Screen: typeof NavigatorScreen;
-	Button: typeof NavigatorButton;
-	BackButton: typeof NavigatorBackButton;
-	ToParentButton: typeof NavigatorToParentButton;
-};
-
-const Provider = contextConnect(
+export const NavigatorProvider = contextConnect(
 	UnconnectedNavigatorProvider,
 	'NavigatorProvider'
 );
-
-const NavigatorProvider = Provider as NavigatorProviderComponent<
-	typeof Provider
->;
-
-NavigatorProvider.Screen = NavigatorScreen;
-NavigatorProvider.Button = NavigatorButton;
-NavigatorProvider.BackButton = NavigatorBackButton;
-NavigatorProvider.ToParentButton = NavigatorToParentButton;
-
-export { NavigatorProvider };
 export default NavigatorProvider;

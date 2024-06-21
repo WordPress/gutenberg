@@ -5,36 +5,34 @@ The `NavigatorProvider` (also aliased as `Navigator`) component allows rendering
 ## Usage
 
 ```jsx
-import {
-  Navigator,
-} from '@wordpress/components';
+import { Navigator } from '@wordpress/components';
 
 const MyNavigation = () => (
-  <Navigator initialPath="/">
-    <Navigator.Screen path="/">
-      <p>This is the home screen.</p>
-       <Navigator.Button path="/child">
-         Navigate to child screen.
-      </Navigator.Button>
-    </Navigator.Screen>
+	<Navigator.Root initialPath="/">
+		<Navigator.Screen path="/">
+			<p>This is the home screen.</p>
+			<Navigator.Button path="/child">
+				Navigate to child screen.
+			</Navigator.Button>
+		</Navigator.Screen>
 
-    <Navigator.Screen path="/child">
-      <p>This is the child screen.</p>
-      <Navigator.ToParentButton>
-        Go back
-      </Navigator.ToParentButton>
-    </Navigator.Screen>
-  </Navigator>
+		<Navigator.Screen path="/child">
+			<p>This is the child screen.</p>
+			<Navigator.ToParentButton>Go back</Navigator.ToParentButton>
+		</Navigator.Screen>
+	</Navigator.Root>
 );
 ```
+
 **Important note**
 
 Parent/child navigation only works if the path you define are hierarchical, following a URL-like scheme where each path segment is separated by the `/` character.
 For example:
-- `/` is the root of all paths. There should always be a screen with `path="/"`.
-- `/parent/child` is a child of `/parent`.
-- `/parent/child/grand-child` is a child of `/parent/child`.
-- `/parent/:param` is a child of `/parent` as well.
+
+-   `/` is the root of all paths. There should always be a screen with `path="/"`.
+-   `/parent/child` is a child of `/parent`.
+-   `/parent/child/grand-child` is a child of `/parent/child`.
+-   `/parent/:param` is a child of `/parent` as well.
 
 ## Props
 
@@ -58,8 +56,8 @@ The `goTo` function allows navigating to a given path. The second argument can a
 
 The available options are:
 
-- `focusTargetSelector`: `string`. An optional property used to specify the CSS selector used to restore focus on the matching element when navigating back.
-- `isBack`: `boolean`. An optional property used to specify whether the navigation should be considered as backwards (thus enabling focus restoration when possible, and causing the animation to be backwards too)
+-   `focusTargetSelector`: `string`. An optional property used to specify the CSS selector used to restore focus on the matching element when navigating back.
+-   `isBack`: `boolean`. An optional property used to specify whether the navigation should be considered as backwards (thus enabling focus restoration when possible, and causing the animation to be backwards too)
 
 ### `goToParent`: `() => void;`
 
@@ -77,9 +75,9 @@ The `goBack` function allows navigating to the previous path.
 
 The `location` object represent the current location, and has a few properties:
 
-- `path`: `string`. The path associated to the location.
-- `isBack`: `boolean`. A flag that is `true` when the current location was reached by navigating backwards in the location stack.
-- `isInitial`: `boolean`. A flag that is `true` only for the first (root) location in the location stack.
+-   `path`: `string`. The path associated to the location.
+-   `isBack`: `boolean`. A flag that is `true` when the current location was reached by navigating backwards in the location stack.
+-   `isInitial`: `boolean`. A flag that is `true` only for the first (root) location in the location stack.
 
 ### `params`: `Record< string, string | string[] >`
 

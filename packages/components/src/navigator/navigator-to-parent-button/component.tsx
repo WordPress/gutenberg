@@ -37,7 +37,7 @@ function UnconnectedNavigatorToParentButton(
  * } from '@wordpress/components';
  *
  * const MyNavigation = () => (
- *   <Navigator initialPath="/">
+ *   <Navigator.Root initialPath="/">
  *     <Navigator.Screen path="/">
  *       <p>This is the home screen.</p>
  *        <Navigator.Button path="/child">
@@ -51,7 +51,7 @@ function UnconnectedNavigatorToParentButton(
  *         Go to parent
  *       </Navigator.ToParentButton>
  *     </Navigator.Screen>
- *   </Navigator>
+ *   </Navigator.Root>
  * );
  * ```
  */

@@ -193,7 +193,7 @@ const MyNavigation = ( {
 	const [ outerInputValue, setOuterInputValue ] = useState( '' );
 	return (
 		<>
-			<Navigator initialPath={ initialPath }>
+			<Navigator.Root initialPath={ initialPath }>
 				<Navigator.Screen path={ PATHS.HOME }>
 					<p>{ SCREEN_TEXT.home }</p>
 					{ /*
@@ -287,7 +287,7 @@ const MyNavigation = ( {
 				</Navigator.Screen>
 
 				{ /* A `Navigator.Screen` with `path={ PATHS.NOT_FOUND }` is purposefully not included. */ }
-			</Navigator>
+			</Navigator.Root>
 
 			<label htmlFor="test-input-outer">Outer input</label>
 			<input
@@ -312,7 +312,7 @@ const MyHierarchicalNavigation = ( {
 } ) => {
 	return (
 		<>
-			<Navigator initialPath={ initialPath }>
+			<Navigator.Root initialPath={ initialPath }>
 				<Navigator.Screen path={ PATHS.HOME }>
 					<p>{ SCREEN_TEXT.home }</p>
 					{ /*
@@ -370,7 +370,7 @@ const MyHierarchicalNavigation = ( {
 				>
 					{ BUTTON_TEXT.goToWithSkipFocus }
 				</CustomNavigatorGoToSkipFocusButton>
-			</Navigator>
+			</Navigator.Root>
 		</>
 	);
 };

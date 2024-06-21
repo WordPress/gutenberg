@@ -34,7 +34,7 @@ function UnconnectedNavigatorBackButton(
  * } from '@wordpress/components';
  *
  * const MyNavigation = () => (
- *   <Navigator initialPath="/">
+ *   <Navigator.Root initialPath="/">
  *     <Navigator.Screen path="/">
  *       <p>This is the home screen.</p>
  *        <Navigator.Button path="/child">
@@ -48,7 +48,7 @@ function UnconnectedNavigatorBackButton(
  *         Go back
  *       </Navigator.BackButton>
  *     </Navigator.Screen>
- *   </Navigator>
+ *   </Navigator.Root>
  * );
  * ```
  */
