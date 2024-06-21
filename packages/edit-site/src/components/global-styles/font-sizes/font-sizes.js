@@ -10,18 +10,17 @@ import {
 	__experimentalHStack as HStack,
 	FlexItem,
 	Button,
-	Tooltip,
 } from '@wordpress/components';
 import { plus } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../../lock-unlock';
+import { unlock } from '../../../lock-unlock';
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
-import Subtitle from './subtitle';
-import { NavigationButtonAsItem } from './navigation-button';
-import { getNewIndexFromPresets } from './utils';
+import Subtitle from '../subtitle';
+import { NavigationButtonAsItem } from '../navigation-button';
+import { getNewIndexFromPresets } from '../utils';
 
 /**
  * Coefficients to normalize font sizes to pixels.

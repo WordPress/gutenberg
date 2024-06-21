@@ -33,7 +33,7 @@ import {
 import ScreenBlock from './screen-block';
 import ScreenTypography from './screen-typography';
 import ScreenTypographyElement from './screen-typography-element';
-import FontSize from './font-size';
+import FontSize from './font-sizes/font-size';
 import ScreenColors from './screen-colors';
 import ScreenColorPalette from './screen-color-palette';
 import { ScreenShadows, ScreenShadowsEdit } from './screen-shadows';

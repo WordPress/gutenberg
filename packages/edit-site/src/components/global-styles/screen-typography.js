@@ -13,7 +13,7 @@ import TypographyElements from './typography-elements';
 import TypographyVariations from './variations/variations-typography';
 import FontFamilies from './font-families';
 import ScreenHeader from './header';
-import FontSizes from './font-sizes';
+import FontSizes from './font-sizes/font-sizes';
 
 function ScreenTypography() {
 	const fontLibraryEnabled = useSelect(
