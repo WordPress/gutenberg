@@ -17,7 +17,9 @@
  * @return string The block content.
  */
 function render_block_core_button( $attributes, $content ) {
-	$p = new Gutenberg_HTML_Tag_Processor_6_5( $content );
+	// TODO: Remove conditional when 6.6 is released.
+	$p = ( ! is_wp_version_compatible( '6.5' ) && defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN )
+		? new Gutenberg_HTML_Tag_Processor_6_5( $content ) : new WP_HTML_Tag_Processor( $content );
 
 	/*
 	 * The button block can render an `<a>` or `<button>` and also has a
