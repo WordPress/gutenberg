@@ -813,7 +813,8 @@ const { state } = store("myPlugin", {
 As mentioned above with [`wp-on`](#wp-on), [`wp-on-window`](#wp-on-window), and [`wp-on-document`](#wp-on-document), an async action should be used whenever the `async` versions of the aforementioned directives cannot be used due to the action requiring synchronous access to the `event` object. Synchronous access is reqired whenever the action needs to call `event.preventDefault()`, `event.stopPropagation()`, or `event.stopImmediatePropagation()`. To ensure that the action code does not contribute to a long task, you may manually yield to the main thread after calling the synchronous event API. For example:
 
 ```js
-function toMainThread() {
+// Note: In WordPress 6.6 this splitTask function is exported by @wordpress/interactivity.
+function splitTask() {
   return new Promise(resolve => {
     setTimeout(resolve, 0);
   });
@@ -823,7 +824,7 @@ store("myPlugin", {
   actions: {
     handleClick: function* (event) {
       event.preventDefault();
-      yield toMainThread();
+      yield splitTask();
       doTheWork();
     },
   },
