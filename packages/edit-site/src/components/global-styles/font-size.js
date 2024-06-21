@@ -185,6 +185,7 @@ function FontSize() {
 							label={ __( 'Fluid typography' ) }
 							checked={ isFluid }
 							onChange={ handleFluidChange }
+							__nextHasNoMarginBottom
 						/>
 
 						{ isFluid && (
@@ -195,6 +196,7 @@ function FontSize() {
 								) }
 								checked={ isCustomFluid }
 								onChange={ handleCustomFluidValues }
+								__nextHasNoMarginBottom
 							/>
 						) }
 
