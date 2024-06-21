@@ -17,6 +17,9 @@
  * @return string The block content.
  */
 function render_block_core_button( $attributes, $content ) {
+	if ( ! is_wp_version_compatible( '6.5' ) ) {
+		return $content;
+	}
 	$p = new WP_HTML_Tag_Processor( $content );
 
 	/*
