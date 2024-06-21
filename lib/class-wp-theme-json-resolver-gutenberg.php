@@ -257,14 +257,11 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			 * When the resulting data is passed to `WP_Theme_JSON_Data_Gutenberg`
 			 * it will create a `WP_Theme_JSON_Gutenberg` instance which in turn
 			 * unwraps shared variations into their respective block types.
+			 *
+			 * Note: WP_Block_Styles_Registry defined are still merged via
+			 * wp_theme_json_data_theme filter so partials etc can take precedence.
 			 */
 			$theme_json_data = static::inject_shared_variations_from_theme_json_partials( $theme_json_data, $variations );
-
-			/*
-			 * Merge any block style variations registered through the WP_Block_Styles_Registry
-			 * with a style object.
-			 */
-			$theme_json_data = static::inject_shared_variations_from_style_registry( $theme_json_data );
 
 			/**
 			 * Filters the data provided by the theme for global styles and settings.
@@ -904,37 +901,6 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		$current_variations = $theme_json_data['styles']['variations'] ?? array();
 		$merged_variations  = array_replace_recursive( $new_variations, $current_variations );
 		_wp_array_set( $data, array( 'styles', 'variations' ), $merged_variations );
-
-		return $data;
-	}
-
-	/**
-	 * Adds shared block style variation definitions sourced from the WP_Block_Styles_Registry.
-	 *
-	 * @since 6.6.0
-	 *
-	 * @param array $data   Array following the theme.json specification.
-	 * @return array Theme json data including shared block style variation definitions.
-	 */
-	private static function inject_shared_variations_from_style_registry( $data ) {
-		$registry        = WP_Block_Styles_Registry::get_instance();
-		$styles          = $registry->get_all_registered();
-		$variations_data = array();
-
-		/*
-		 * As the block style registry stores the styles per block type we don't have
-		 * a shared variation to inject. It will go directly into the block type's variations.
-		 */
-		foreach ( $styles as $block_type => $variations ) {
-			foreach ( $variations as $variation_name => $variation ) {
-				if ( ! empty( $variation['style_data'] ) ) {
-					$current_variation = $theme_json_data['styles']['blocks'][ $block_type ]['variations'][ $variation_name ] ?? array();
-					$merged_variation  = array_replace_recursive( $variation['style_data'], $current_variation );
-					$path              = array( 'styles', 'blocks', $block_type, 'variations', $variation_name );
-					_wp_array_set( $data, $path, $merged_variation );
-				}
-			}
-		}
 
 		return $data;
 	}
