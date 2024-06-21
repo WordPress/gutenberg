@@ -8,7 +8,7 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useCallback, useMemo } from '@wordpress/element';
+import { useCallback, useMemo, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -249,6 +249,25 @@ export default function TypographyPanel( {
 	const resetFontAppearance = () => {
 		setFontAppearance( {} );
 	};
+
+	// Check if previous font style and weight values are available in the new font family
+	useEffect( () => {
+		const isSystemFont = fontFamilyFaces.length === 0;
+		const hasFontStyle = fontFamilyFaces?.some(
+			( { fontStyle: fs } ) => fs === fontStyle
+		);
+		const hasFontWeight = fontFamilyFaces?.some(
+			( { fontWeight: fw } ) => fw === fontWeight
+		);
+		if ( isSystemFont || ( hasFontStyle && hasFontWeight ) ) {
+			setFontAppearance( {
+				fontStyle,
+				fontWeight,
+			} );
+		} else {
+			resetFontAppearance();
+		}
+	}, [ fontFamily ] );
 
 	// Line Height
 	const hasLineHeightEnabled = useHasLineHeightControl( settings );
