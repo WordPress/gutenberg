@@ -17,12 +17,7 @@
  * @return string The block content.
  */
 function render_block_core_button( $attributes, $content ) {
-	// TODO: Remove this line when 6.6 releases.
-	if ( ! is_wp_version_compatible( '6.5' ) ) {
-		return $content;
-	}
-	$p = new WP_HTML_Tag_Processor( $content );
-
+	$p = new Gutenberg_HTML_Tag_Processor_6_5( $content );
 	/*
 	 * The button block can render an `<a>` or `<button>` and also has a
 	 * `<div>` wrapper. Find the a or button tag.

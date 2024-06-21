@@ -2447,4 +2447,5 @@ class Gutenberg_HTML_Tag_Processor_6_4 {
 
 		return true;
 	}
+
 }
