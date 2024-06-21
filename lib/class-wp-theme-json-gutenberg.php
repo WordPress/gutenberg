@@ -743,6 +743,7 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		$this->theme_json    = WP_Theme_JSON_Schema_Gutenberg::migrate( $theme_json, $origin );
+		$this->theme_json    = static::unwrap_shared_block_style_variations( $this->theme_json );
 		$registry            = WP_Block_Type_Registry::get_instance();
 		$valid_block_names   = array_keys( $registry->get_all_registered() );
 		$valid_element_names = array_keys( static::ELEMENTS );
@@ -788,6 +789,69 @@ class WP_Theme_JSON_Gutenberg {
 			$merged_spacing_sizes = static::merge_spacing_sizes( $spacing_scale_sizes, $spacing_sizes );
 			_wp_array_set( $this->theme_json, $sizes_path, $merged_spacing_sizes );
 		}
+	}
+
+	/**
+	 * Unwraps shared block style variations.
+	 *
+	 * @since 6.6.0
+	 *
+	 * {
+	 *   "styles": {
+	 *     "blocks": {
+	 *       "variations": {
+	 *         "blockTypes": [ "core/paragraph", "core/group" ],
+	 *         "color": { "background": "backgroundColor" }
+	 *       }
+	 *     }
+	 *   }
+	 * }
+	 *
+	 * It returns the following output:
+	 *
+	 * {
+	 *   "styles": {
+	 *     "blocks": {
+	 *       "variations": {
+	 *         "core/paragraph": { "color": { "background": "backgroundColor" } },
+	 *         "core/group": { "color": { "background": "backgroundColor" } }
+	 *       }
+	 *     }
+	 *   }
+	 * }
+	 *
+	 * @param array $theme_json A structure that follows the theme.json schema.
+	 * @return array Theme json data with shared variation definitions unwrapped under appropriate block types.
+	 */
+	private static function unwrap_shared_block_style_variations( $theme_json ) {
+		if ( ! isset( $theme_json['styles']['variations'] ) ) {
+			return $theme_json;
+		}
+
+		$new_theme_json = $theme_json;
+		$variations     = $new_theme_json['styles']['variations'];
+
+		foreach ( $variations as $variation_name => $data ) {
+			if ( ! isset( $data['blockTypes'] ) ) {
+				// Skip shared variations that do not declare blockTypes.
+				continue;
+			}
+
+			$block_names = $data['blockTypes'];
+			unset( $data['blockTypes'] );
+			unset( $data['title'] );
+
+			foreach ( $block_names as $block_name ) {
+				// Existing per-block-type variation styles should take precedence over shared definition values.
+				$block_type_variation_data = $new_theme_json['styles']['blocks'][ $block_name ]['variations'][ $variation_name ] ?? array();
+				$merged_variation_data     = array_replace_recursive( $data, $block_type_variation_data );
+				_wp_array_set( $new_theme_json, array( 'styles', 'blocks', $block_name, 'variations', $variation_name ), $merged_variation_data );
+			}
+		}
+
+		unset( $new_theme_json['styles']['variations'] );
+
+		return $new_theme_json;
 	}
 
 	/**
