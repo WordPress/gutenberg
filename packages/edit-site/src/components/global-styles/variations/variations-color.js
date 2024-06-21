@@ -4,7 +4,6 @@
 import {
 	__experimentalVStack as VStack,
 	__experimentalGrid as Grid,
-	Tooltip,
 } from '@wordpress/components';
 
 /**
@@ -28,18 +27,15 @@ export default function ColorVariations( { title, gap = 2 } ) {
 			{ title && <Subtitle level={ 3 }>{ title }</Subtitle> }
 			<Grid spacing={ gap }>
 				{ colorVariations.map( ( variation, index ) => (
-					<Tooltip key={ index } text={ variation?.title }>
-						{ /* This div is needed for Tooltips to work */ }
-						<div>
-							<Variation
-								variation={ variation }
-								isPill
-								property="color"
-							>
-								{ () => <StylesPreviewColors /> }
-							</Variation>
-						</div>
-					</Tooltip>
+					<Variation
+						key={ index }
+						variation={ variation }
+						isPill
+						property="color"
+						showTooltip
+					>
+						{ () => <StylesPreviewColors /> }
+					</Variation>
 				) ) }
 			</Grid>
 		</VStack>
