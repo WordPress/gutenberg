@@ -356,7 +356,7 @@ describe.each( [
 		);
 	} );
 
-	it( 'Should accept and pass arbitrary properties to the selectedItem object in the onChange callback, but without applying them to the DOM elements apart from style and classname', async () => {
+	it( "Should pass arbitrary props to onChange's selectedItem, but apply only style and className to DOM elements", async () => {
 		const user = userEvent.setup();
 		const onChangeMock = jest.fn();
 
