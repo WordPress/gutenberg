@@ -794,15 +794,18 @@ class WP_Theme_JSON_Gutenberg {
 	/**
 	 * Unwraps shared block style variations.
 	 *
-	 * @since 6.6.0
+	 * It takes the shared variations (styles.variations.variationName)
+	 * and applies them to all the blocks that have the given variation registered
+	 * (styles.blocks.blockType.variations.variationName).
+	 *
+	 * For example, given the core/paragraph and core/group blocks have register the section-a
+	 * style variation, and given the following input:
+	 *
 	 *
 	 * {
 	 *   "styles": {
 	 *     "variations": {
-	 *       "section-a": {
-	 *         "blockTypes": [ "core/paragraph", "core/group" ],
-	 *         "color": { "background": "backgroundColor" }
-	 *       }
+	 *       "section-a": { "color": { "background": "backgroundColor" } }
 	 *     }
 	 *   }
 	 * }
@@ -812,21 +815,21 @@ class WP_Theme_JSON_Gutenberg {
 	 * {
 	 *   "styles": {
 	 *     "blocks": {
-	 *       "variations": {
-	 *         "core/paragraph": {
-	 *           "variations": {
+	 *       "core/paragraph": {
+	 *         "variations": {
 	 *             "section-a": { "color": { "background": "backgroundColor" } }
-	 *           }
 	 *         },
-	 *         "core/group": {
-	 *           "variations": {
-	 *             "section-a": { "color": { "background": "backgroundColor" } }
-	 *           }
+	 *       },
+	 *       "core/group": {
+	 *         "variations": {
+	 *           "section-a": { "color": { "background": "backgroundColor" } }
 	 *         }
 	 *       }
 	 *     }
 	 *   }
 	 * }
+	 *
+	 * @since 6.6.0
 	 *
 	 * @param array $theme_json A structure that follows the theme.json schema.
 	 * @return array Theme json data with shared variation definitions unwrapped under appropriate block types.
