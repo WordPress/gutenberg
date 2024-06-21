@@ -158,6 +158,7 @@ class WP_Block_Supports_Block_Style_Variations_Test extends WP_UnitTestCase {
 						'text'       => 'midnightblue',
 					),
 				),
+
 				'my-variation'            => $variation_styles_data,
 
 				/*
@@ -177,6 +178,7 @@ class WP_Block_Supports_Block_Style_Variations_Test extends WP_UnitTestCase {
 						'text'       => 'lightblue',
 					),
 				),
+
 			),
 		);
 

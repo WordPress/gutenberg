@@ -252,16 +252,21 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			gutenberg_register_block_style_variations_from_theme_json_partials( $variations );
 
 			/*
-			 * Merge theme.json defined variations with partial definitions.
+			 * Source variations from the block registry and block style variation files. Then, merge them into the existing theme.json data.
 			 *
-			 * When the resulting data is passed to `WP_Theme_JSON_Data_Gutenberg`
-			 * it will create a `WP_Theme_JSON_Gutenberg` instance which in turn
-			 * unwraps shared variations into their respective block types.
+			 * In case the same style properties are defined in several sources, this is how we should resolve the values,
+			 * from higher to lower priority:
 			 *
-			 * Note: WP_Block_Styles_Registry defined are still merged via
-			 * wp_theme_json_data_theme filter so partials etc can take precedence.
+			 * - styles.blocks.blockType.variations from theme.json
+			 * - styles.variations from theme.json
+			 * - variations from block style variation files
+			 * - variations from block styles registry
+			 *
+			 * See test_add_registered_block_styles_to_theme_data and test_unwraps_block_style_variations.
+			 *
 			 */
-			$theme_json_data = static::inject_shared_variations_from_theme_json_partials( $theme_json_data, $variations );
+			$theme_json_data = static::inject_variations_from_block_style_variation_files( $theme_json_data, $variations );
+			$theme_json_data = static::inject_variations_from_block_styles_registry( $theme_json_data );
 
 			/**
 			 * Filters the data provided by the theme for global styles and settings.
@@ -865,8 +870,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	}
 
 	/**
-	 * Adds shared block style variation definitions sourced from theme.json partials
-	 * to the supplied theme.json data.
+	 * Adds variations sourced from block style variations files to the supplied theme.json data.
 	 *
 	 * @since 6.6.0
 	 *
@@ -874,7 +878,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @param array $variations Shared block style variations.
 	 * @return array Theme json data including shared block style variation definitions.
 	 */
-	private static function inject_shared_variations_from_theme_json_partials( $data, $variations ) {
+	private static function inject_variations_from_block_style_variation_files( $data, $variations ) {
 		$new_variations = array();
 
 		if ( empty( $variations ) ) {
@@ -899,6 +903,43 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		$current_variations = $data['styles']['variations'] ?? array();
 		$merged_variations  = array_replace_recursive( $new_variations, $current_variations );
 		_wp_array_set( $data, array( 'styles', 'variations' ), $merged_variations );
+
+		return $data;
+	}
+
+	/**
+	 * Adds variations sourced from the block styles registry to the supplied theme.json data.
+	 *
+	 * @since 6.6.0
+	 *
+	 * @param array $data   Array following the theme.json specification.
+	 * @param array $variations Shared block style variations.
+	 * @return array Theme json data including shared block style variation definitions.
+	 */
+	private static function inject_variations_from_block_styles_registry( $data ) {
+		$registry    = WP_Block_Styles_Registry::get_instance();
+		$styles      = $registry->get_all_registered();
+
+		foreach ( $styles as $block_type => $variations ) {
+			foreach ( $variations as $variation_name => $variation ) {
+				if ( empty( $variation['style_data'] ) ) {
+					continue;
+				}
+
+				// First, override registry styles with any top-level styles.
+				if ( ! empty( $data['styles']['variations'][ $variation_name ] ) ) {
+					$variation['style_data'] = array_replace_recursive( $variation['style_data'], $data['styles']['variations'][ $variation_name ] ?? array() );
+				}
+
+				// Then, override registry styles with any block-level styles.
+				if ( ! empty( $data['styles']['blocks'][ $block_type ]['variations'][ $variation_name ] ) ) {
+					$variation['style_data'] = array_replace_recursive( $variation['style_data'], $data['styles']['blocks'][ $block_type ]['variations'][ $variation_name ] );
+				}
+
+				$path = array( 'styles', 'blocks', $block_type, 'variations', $variation_name );
+				_wp_array_set( $data, $path, $variation['style_data'] );
+			}
+		}
 
 		return $data;
 	}
