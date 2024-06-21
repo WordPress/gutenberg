@@ -23,18 +23,28 @@ jobs:
 
             - name: Determine if label should trigger cherry-pick
               id: label-check
-              run: |
-                  LABELS=$(jq -r '.pull_request.labels[].name' "$GITHUB_EVENT_PATH")
-                  echo "$LABELS"
-                  for LABEL in $LABELS; do
-                    if [[ "$LABEL" =~ ^Backport\ to\ WP\ ([0-9]+\.[0-9]+)\ Beta/RC$ ]]; then
-                      VERSION=${BASH_REMATCH[1]}
-                      echo "cherry_pick=true" >> $GITHUB_ENV
-                      echo "version=$VERSION" >> $GITHUB_ENV
-                      exit 0
-                    fi
-                  done
-                  echo "cherry_pick=false" >> $GITHUB_ENV
+              uses: actions/github-script@v6
+              with:
+                  script: |
+                      const labels = context.payload.pull_request.labels.map(label => label.name);
+                      console.log(`Labels: ${labels}`);
+                      const regex = /^Backport to WP ([0-9]+\.[0-9]+) Beta\/RC$/;
+                      let matched = false;
+                      for (const label of labels) {
+                        const match = label.match(regex);
+                        if (match) {
+                          const version = match[1];
+                          console.log(`Matched label: ${label}`);
+                          console.log(`Extracted version: ${version}`);
+                          core.exportVariable('cherry_pick', 'true');
+                          core.exportVariable('version', version);
+                          matched = true;
+                          break;
+                        }
+                      }
+                      if (!matched) {
+                        core.exportVariable('cherry_pick', 'false');
+                      }
 
             - name: Cherry-pick the commit
               id: cherry-pick
@@ -42,6 +52,8 @@ jobs:
               run: |
                   TARGET_BRANCH="wp/${{ env.version }}"
                   COMMIT_SHA=$(jq -r '.pull_request.merge_commit_sha' "$GITHUB_EVENT_PATH")
+                  echo "Target branch: $TARGET_BRANCH"
+                  echo "Commit SHA: $COMMIT_SHA"
                   git checkout $TARGET_BRANCH
                   git cherry-pick $COMMIT_SHA || echo "cherry-pick-failed" > result
                   if [ -f result ] && grep -q "cherry-pick-failed" result; then
@@ -57,8 +69,11 @@ jobs:
               uses: actions/github-script@v6
               with:
                   script: |
-                      const prNumber = ${{ github.event.pull_request.number }};
-                      const label = `Backport to WP ${{ env.version }} Beta/RC`;
+                      const prNumber = context.issue.number;
+                      const version = process.env.version;
+                      console.log(`prNumber: ${prNumber}`);
+                      console.log(`version: ${version}`);
+                      const label = `Backport to WP ${version} Beta/RC`;
                       await github.issues.removeLabel({
                         owner: context.repo.owner,
                         repo: context.repo.repo,
@@ -71,9 +86,12 @@ jobs:
               uses: actions/github-script@v6
               with:
                   script: |
-                      const prNumber = ${{ github.event.pull_request.number }};
-                      const commitSha = '${{ steps.cherry-pick.outputs.commit_sha }}';
-                      const targetBranch = `wp/${{ env.version }}`;
+                      const prNumber = context.issue.number;
+                      const commitSha = process.env.commit_sha;
+                      const targetBranch = `wp/${process.env.version}`;
+                      console.log(`prNumber: ${prNumber}`);
+                      console.log(`commitSha: ${commitSha}`);
+                      console.log(`targetBranch: ${targetBranch}`);
                       await github.issues.createComment({
                         owner: context.repo.owner,
                         repo: context.repo.repo,
@@ -86,8 +104,10 @@ jobs:
               uses: actions/github-script@v6
               with:
                   script: |
-                      const prNumber = ${{ github.event.pull_request.number }};
-                      const targetBranch = `wp/${{ env.version }}`;
+                      const prNumber = context.issue.number;
+                      const targetBranch = `wp/${process.env.version}`;
+                      console.log(`prNumber: ${prNumber}`);
+                      console.log(`targetBranch: ${targetBranch}`);
                       await github.issues.createComment({
                         owner: context.repo.owner,
                         repo: context.repo.repo,
