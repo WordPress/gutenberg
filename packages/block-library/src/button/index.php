@@ -18,6 +18,7 @@
  */
 function render_block_core_button( $attributes, $content ) {
 	$p = new Gutenberg_HTML_Tag_Processor_6_5( $content );
+
 	/*
 	 * The button block can render an `<a>` or `<button>` and also has a
 	 * `<div>` wrapper. Find the a or button tag.
