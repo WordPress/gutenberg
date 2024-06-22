@@ -152,13 +152,6 @@ class WP_Block_Supports_Block_Style_Variations_Test extends WP_UnitTestCase {
 		$group_styles = $theme_json['styles']['blocks']['core/group'] ?? array();
 		$expected     = array(
 			'variations' => array(
-				'WithSlug'                => array(
-					'color' => array(
-						'background' => 'aliceblue',
-						'text'       => 'midnightblue',
-					),
-				),
-				'my-variation'            => $variation_styles_data,
 
 				/*
 				 * The following block style variations are registered
@@ -177,6 +170,17 @@ class WP_Block_Supports_Block_Style_Variations_Test extends WP_UnitTestCase {
 						'text'       => 'lightblue',
 					),
 				),
+
+				/*
+				 * Manually registered variations.
+				 */
+				'WithSlug'                => array(
+					'color' => array(
+						'background' => 'aliceblue',
+						'text'       => 'midnightblue',
+					),
+				),
+				'my-variation'            => $variation_styles_data,
 			),
 		);
 
