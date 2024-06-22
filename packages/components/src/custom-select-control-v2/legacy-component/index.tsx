@@ -51,6 +51,12 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 			};
 			onChange( changeObject );
 		},
+		value: value?.name,
+		// Setting the first option as a default value when no value is provided
+		// is already done natively by the underlying Ariakit component,
+		// but doing this explicitly avoids the `onChange` callback from firing
+		// on initial render, thus making this implementation closer to the v1.
+		defaultValue: options[ 0 ]?.name,
 	} );
 
 	const children = options.map(
