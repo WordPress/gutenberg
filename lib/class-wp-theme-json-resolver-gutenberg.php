@@ -882,8 +882,6 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @return array Theme json data including shared block style variation definitions.
 	 */
 	private static function inject_variations_from_block_style_variation_files( $data, $variations ) {
-		$new_variations = array();
-
 		if ( empty( $variations ) ) {
 			return $data;
 		}
@@ -893,19 +891,25 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				continue;
 			}
 
-			$variation_name                    = $variation['slug'] ?? _wp_to_kebab_case( $variation['title'] );
-			$new_variations[ $variation_name ] = $variation['styles'];
-		}
+			$variation_name = $variation['slug'] ?? _wp_to_kebab_case( $variation['title'] );
 
-		if ( empty( $new_variations ) ) {
-			return $data;
-		}
+			foreach ( $variation['blockTypes'] as $block_type ) {
+				// First, override partial styles with any top-level styles.
+				$top_level_data = $data['styles']['variations'][ $variation_name ] ?? array();
+				if ( ! empty( $top_level_data ) ) {
+					$variation['styles'] = array_replace_recursive( $variation['styles'], $top_level_data );
+				}
 
-		// Merge shared variation definitions with theme.json file taking precedence
-		// over those sourced from partial theme.json files.
-		$current_variations = $data['styles']['variations'] ?? array();
-		$merged_variations  = array_replace_recursive( $new_variations, $current_variations );
-		_wp_array_set( $data, array( 'styles', 'variations' ), $merged_variations );
+				// The, override styles so far with any block-level styles.
+				$block_level_data = $data['styles']['blocks'][ $block_type ]['variations'][ $variation_name ] ?? array();
+				if ( ! empty( $block_level_data ) ) {
+					$variation['styles'] = array_replace_recursive( $variation['styles'], $block_level_data );
+				}
+
+				$path = array( 'styles', 'blocks', $block_type, 'variations', $variation_name );
+				_wp_array_set( $data, $path, $variation['styles'] );
+			}
+		}
 
 		return $data;
 	}
@@ -929,13 +933,15 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				}
 
 				// First, override registry styles with any top-level styles.
-				if ( ! empty( $data['styles']['variations'][ $variation_name ] ) ) {
-					$variation['style_data'] = array_replace_recursive( $variation['style_data'], $data['styles']['variations'][ $variation_name ] ?? array() );
+				$top_level_data = $data['styles']['variations'][ $variation_name ] ?? array();
+				if ( ! empty( $top_level_data ) ) {
+					$variation['style_data'] = array_replace_recursive( $variation['style_data'], $top_level_data );
 				}
 
-				// Then, override registry styles with any block-level styles.
-				if ( ! empty( $data['styles']['blocks'][ $block_type ]['variations'][ $variation_name ] ) ) {
-					$variation['style_data'] = array_replace_recursive( $variation['style_data'], $data['styles']['blocks'][ $block_type ]['variations'][ $variation_name ] );
+				// Then, override styles so far with any block-level styles.
+				$block_level_data = $data['styles']['blocks'][ $block_type ]['variations'][ $variation_name ] ?? array();
+				if ( ! empty( $block_level_data ) ) {
+					$variation['style_data'] = array_replace_recursive( $variation['style_data'], $block_level_data );
 				}
 
 				$path = array( 'styles', 'blocks', $block_type, 'variations', $variation_name );
