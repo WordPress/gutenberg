@@ -14,6 +14,10 @@ import {
 	ToggleControl,
 	RangeControl,
 	Spinner,
+	DropdownMenu,
+	MenuGroup,
+	MenuItem,
+	ToolbarGroup,
 } from '@wordpress/components';
 import {
 	store as blockEditorStore,
@@ -32,6 +36,12 @@ import { View } from '@wordpress/primitives';
 import { createBlock } from '@wordpress/blocks';
 import { createBlobURL } from '@wordpress/blob';
 import { store as noticesStore } from '@wordpress/notices';
+import {
+	link as linkIcon,
+	customLink,
+	image as imageIcon,
+	linkOff,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -56,11 +66,20 @@ import GapStyles from './gap-styles';
 
 const MAX_COLUMNS = 8;
 const linkOptions = [
-	{ value: LINK_DESTINATION_ATTACHMENT, label: __( 'Attachment Page' ) },
-	{ value: LINK_DESTINATION_MEDIA, label: __( 'Media File' ) },
 	{
-		value: LINK_DESTINATION_NONE,
+		icon: customLink,
+		label: __( 'Link images to attachment pages' ),
+		value: LINK_DESTINATION_ATTACHMENT,
+	},
+	{
+		icon: imageIcon,
+		label: __( 'Link images to media files' ),
+		value: LINK_DESTINATION_MEDIA,
+	},
+	{
+		icon: linkOff,
 		label: _x( 'None', 'Media item link option' ),
+		value: LINK_DESTINATION_NONE,
 	},
 ];
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
@@ -550,15 +569,6 @@ function GalleryEdit( props ) {
 							size="__unstable-large"
 						/>
 					) }
-					<SelectControl
-						__nextHasNoMarginBottom
-						label={ __( 'Link to' ) }
-						value={ linkTo }
-						onChange={ setLinkTo }
-						options={ linkOptions }
-						hideCancelButton
-						size="__unstable-large"
-					/>
 					<ToggleControl
 						__nextHasNoMarginBottom
 						label={ __( 'Crop images to fit' ) }
@@ -592,6 +602,42 @@ function GalleryEdit( props ) {
 					) }
 				</PanelBody>
 			</InspectorControls>
+			<BlockControls group="block">
+				<ToolbarGroup>
+					<DropdownMenu icon={ linkIcon } label={ __( 'Link To' ) }>
+						{ ( { onClose } ) => (
+							<MenuGroup>
+								{ linkOptions.map( ( linkItem ) => {
+									const isOptionSelected =
+										linkTo === linkItem.value;
+									return (
+										<MenuItem
+											key={ linkItem.value }
+											isSelected={ isOptionSelected }
+											className={ clsx(
+												'components-dropdown-menu__menu-item',
+												{
+													'is-active':
+														isOptionSelected,
+												}
+											) }
+											iconPosition="left"
+											icon={ linkItem.icon }
+											onClick={ () => {
+												setLinkTo( linkItem.value );
+												onClose();
+											} }
+											role="menuitemradio"
+										>
+											{ linkItem.label }
+										</MenuItem>
+									);
+								} ) }
+							</MenuGroup>
+						) }
+					</DropdownMenu>
+				</ToolbarGroup>
+			</BlockControls>
 			{ Platform.isWeb && (
 				<>
 					{ ! multiGallerySelection && (
