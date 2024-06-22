@@ -737,7 +737,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param string $origin     Optional. What source of data this object represents.
 	 *                           One of 'blocks', 'default', 'theme', or 'custom'. Default 'theme'.
 	 */
-	public function __construct( $theme_json = array( 'version' => self::LATEST_SCHEMA ), $origin = 'theme' ) {
+	public function __construct( $theme_json = array( 'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA ), $origin = 'theme' ) {
 		if ( ! in_array( $origin, static::VALID_ORIGINS, true ) ) {
 			$origin = 'theme';
 		}
@@ -794,13 +794,12 @@ class WP_Theme_JSON_Gutenberg {
 	/**
 	 * Unwraps shared block style variations.
 	 *
-	 * It takes the shared variations (styles.variations.variationName)
-	 * and applies them to all the blocks that have the given variation registered
+	 * It takes the shared variations (styles.variations.variationName) and
+	 * applies them to all the blocks that have the given variation registered
 	 * (styles.blocks.blockType.variations.variationName).
 	 *
-	 * For example, given the core/paragraph and core/group blocks have register the section-a
-	 * style variation, and given the following input:
-	 *
+	 * For example, given the `core/paragraph` and `core/group` blocks have
+	 * registered the `section-a` style variation, and given the following input:
 	 *
 	 * {
 	 *   "styles": {
