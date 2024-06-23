@@ -900,7 +900,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 					$variation['styles'] = array_replace_recursive( $variation['styles'], $top_level_data );
 				}
 
-				// The, override styles so far with any block-level styles.
+				// Then, override styles so far with any block-level styles.
 				$block_level_data = $data['styles']['blocks'][ $block_type ]['variations'][ $variation_name ] ?? array();
 				if ( ! empty( $block_level_data ) ) {
 					$variation['styles'] = array_replace_recursive( $variation['styles'], $block_level_data );
