@@ -8,14 +8,14 @@ import { select, dispatch } from '@wordpress/data';
  */
 import { store as richTextStore } from './store';
 
-/** @typedef {import('./register-format-type').WPFormat} WPFormat */
+/** @typedef {import('./types').RichTextFormatFull} RichTextFormatFull */
 
 /**
  * Unregisters a format.
  *
  * @param {string} name Format name.
  *
- * @return {WPFormat|undefined} The previous format value, if it has
+ * @return {RichTextFormatFull|undefined} The previous format value, if it has
  *                                        been successfully unregistered;
  *                                        otherwise `undefined`.
  */
