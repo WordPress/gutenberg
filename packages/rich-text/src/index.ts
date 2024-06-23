@@ -36,3 +36,11 @@ export {
  * documentation for more information.
  */
 export type { RichTextValue } from './types';
+/**
+ * An object which stores the properties for a Rich Text Format.
+ */
+export type { RichTextFormatFull as RichTextFormat } from './types';
+/**
+ * An array of Rich Text Formats.
+ */
+export type { RichTextFormatList } from './types';

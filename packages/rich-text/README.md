@@ -305,12 +305,12 @@ Registers a new format provided a unique name and an object defining its behavio
 
 _Parameters_
 
--   _name_ `string`: Format name.
--   _settings_ `WPFormat`: Format settings.
+-   _name_ `Name`: Format name.
+-   _settings_ `Settings`: Format settings.
 
 _Returns_
 
--   `WPFormat|undefined`: The format, if it has been successfully registered; otherwise `undefined`.
+-   `( { name: Name; } & Settings ) | undefined`: The format, if it has been successfully registered; otherwise `undefined`.
 
 ### remove
 
@@ -368,6 +368,14 @@ document.querySelector( 'p' ) )`.
 -   Create one from a rich text value: `new RichTextData( { text: '...',
 formats: [ ... ] } )`.
 
+### RichTextFormat
+
+An object which stores the properties for a Rich Text Format.
+
+### RichTextFormatList
+
+An array of Rich Text Formats.
+
 ### RichTextValue
 
 An object which represents a formatted string. See main `@wordpress/rich-text` documentation for more information.
@@ -406,10 +414,6 @@ Store definition for the rich-text namespace.
 _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore>
-
-_Type_
-
--   `Object`
 
 ### toggleFormat
 

@@ -2,11 +2,15 @@
  * WordPress dependencies
  */
 import { createSelector } from '@wordpress/data';
+/**
+ * Internal dependencies
+ */
+import type { State } from '../types';
 
 /**
  * Returns all the available format types.
  *
- * @param {Object} state Data state.
+ * @param {State} state Data state.
  *
  * @example
  * ```js
@@ -34,18 +38,18 @@ import { createSelector } from '@wordpress/data';
  * };
  * ```
  *
- * @return {Array} Format types.
+ * @return Format types.
  */
 export const getFormatTypes = createSelector(
-	( state ) => Object.values( state.formatTypes ),
-	( state ) => [ state.formatTypes ]
+	( state: State ) => Object.values( state.formatTypes ),
+	( state: State ) => [ state.formatTypes ]
 );
 
 /**
  * Returns a format type by name.
  *
- * @param {Object} state Data state.
- * @param {string} name  Format type name.
+ * @param state Data state.
+ * @param name  Format type name.
  *
  * @example
  * ```js
@@ -75,9 +79,9 @@ export const getFormatTypes = createSelector(
  * };
  * ```
  *
- * @return {Object?} Format type.
+ * @return Format type.
  */
-export function getFormatType( state, name ) {
+export function getFormatType( state: State, name: string ) {
 	return state.formatTypes[ name ];
 }
 
@@ -85,9 +89,9 @@ export function getFormatType( state, name ) {
  * Gets the format type, if any, that can handle a bare element (without a
  * data-format-type attribute), given the tag name of this element.
  *
- * @param {Object} state              Data state.
- * @param {string} bareElementTagName The tag name of the element to find a
- *                                    format type for.
+ * @param state              Data state.
+ * @param bareElementTagName The tag name of the element to find a
+ *                           format type for.
  *
  * @example
  * ```js
@@ -107,9 +111,12 @@ export function getFormatType( state, name ) {
  * }
  * ```
  *
- * @return {?Object} Format type.
+ * @return Format type.
  */
-export function getFormatTypeForBareElement( state, bareElementTagName ) {
+export function getFormatTypeForBareElement(
+	state: State,
+	bareElementTagName: string
+) {
 	const formatTypes = getFormatTypes( state );
 	return (
 		formatTypes.find( ( { className, tagName } ) => {
@@ -124,9 +131,9 @@ export function getFormatTypeForBareElement( state, bareElementTagName ) {
 /**
  * Gets the format type, if any, that can handle an element, given its classes.
  *
- * @param {Object} state            Data state.
- * @param {string} elementClassName The classes of the element to find a format
- *                                  type for.
+ * @param state            Data state.
+ * @param elementClassName The classes of the element to find a format
+ *                         type for.
  *
  * @example
  * ```js
@@ -146,9 +153,12 @@ export function getFormatTypeForBareElement( state, bareElementTagName ) {
  * };
  * ```
  *
- * @return {?Object} Format type.
+ * @return Format type.
  */
-export function getFormatTypeForClassName( state, elementClassName ) {
+export function getFormatTypeForClassName(
+	state: State,
+	elementClassName: string
+) {
 	return getFormatTypes( state ).find( ( { className } ) => {
 		if ( className === null ) {
 			return false;

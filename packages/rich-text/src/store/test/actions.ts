@@ -1,12 +1,15 @@
 /**
  * Internal dependencies
  */
+import type { RichTextFormatFull } from '../../types';
 import { addFormatTypes, removeFormatTypes } from '../actions';
 
 describe( 'actions', () => {
 	describe( 'addFormatTypes', () => {
 		it( 'should cast format types as an array', () => {
-			const formatTypes = { name: 'core/test-format' };
+			const formatTypes = {
+				name: 'core/test-format',
+			} as RichTextFormatFull;
 			const expected = {
 				type: 'ADD_FORMAT_TYPES',
 				formatTypes: [ formatTypes ],
