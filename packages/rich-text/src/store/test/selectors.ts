@@ -12,23 +12,24 @@ import {
 	getFormatTypeForBareElement,
 	getFormatTypeForClassName,
 } from '../selectors';
+import type { State, RichTextFormatFull } from '../../types';
 
 describe( 'selectors', () => {
 	const formatType = {
 		name: 'core/test-format',
 		className: null,
 		tagName: 'format',
-	};
+	} as RichTextFormatFull;
 	const formatTypeClassName = {
 		name: 'core/test-format-class-name',
 		className: 'class-name',
 		tagName: 'strong',
-	};
+	} as RichTextFormatFull;
 	const formatTypeBareTag = {
 		name: 'core/test-format-bare-tag',
 		className: null,
 		tagName: 'strong',
-	};
+	} as RichTextFormatFull;
 	const defaultState = deepFreeze( {
 		formatTypes: {
 			'core/test-format': formatType,
@@ -37,7 +38,7 @@ describe( 'selectors', () => {
 			// `core/test-format-class-name` is not considered bare.
 			'core/test-format-bare-tag': formatTypeBareTag,
 		},
-	} );
+	} ) as State;
 
 	describe( 'getFormatTypes', () => {
 		it( 'should get format types', () => {
