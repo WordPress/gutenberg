@@ -9,7 +9,6 @@ import {
 	getEditorHtml,
 	initializeEditor,
 	openBlockSettings,
-	openBlockActionsMenu,
 	setupCoreBlocks,
 	setupMediaPicker,
 	setupMediaUpload,
@@ -611,13 +610,11 @@ describe( 'Gallery block', () => {
 		<!-- /wp:gallery -->`,
 			numberOfItems: 2,
 		} );
-		const { getByText } = screen;
+		const { getByLabelText } = screen;
 
-		// Set "Link to" setting via Gallery block settings
-		await openBlockActionsMenu( screen );
-
-		fireEvent.press( getByText( 'Link to' ) );
-		fireEvent.press( getByText( 'Link images to media files' ) );
+		fireEvent.press( getBlock( screen, 'Gallery' ) );
+		fireEvent.press( getByLabelText( 'Link To' ) );
+		fireEvent.press( getByLabelText( 'Link images to media files' ) );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
