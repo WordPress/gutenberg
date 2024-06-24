@@ -218,8 +218,9 @@
 }
 
 .editor-header__post-preview-button {
+	display: none;
 	@include break-small {
-		display: none;
+		display: initial;
 	}
 }
 
