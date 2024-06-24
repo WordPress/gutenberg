@@ -763,7 +763,7 @@ const { state, actions } = store("myPlugin", {
 });
 ```
 
-##### Async actions
+<h5 id="async-actions">Async actions</h5>
 
 Async actions should use generators instead of async/await.
 
