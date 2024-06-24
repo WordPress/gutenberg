@@ -31,7 +31,11 @@ function addBindings( bindings ) {
 	};
 }
 
-function PatternOverridesControls( { attributes, setAttributes } ) {
+function PatternOverridesControls( {
+	attributes,
+	setAttributes,
+	name: blockName,
+} ) {
 	const controlId = useId();
 	const [ showAllowOverridesModal, setShowAllowOverridesModal ] =
 		useState( false );
@@ -71,15 +75,25 @@ function PatternOverridesControls( { attributes, setAttributes } ) {
 		return null;
 	}
 
+	const hasUnsupportedImageAttributes =
+		blockName === 'core/image' &&
+		( !! attributes.caption?.length || !! attributes.href?.length );
+
+	const helpText = hasUnsupportedImageAttributes
+		? __(
+				`Overrides currently don't support image captions or links. Remove the caption or link first before enabling overrides.`
+		  )
+		: __(
+				'Allow changes to this block throughout instances of this pattern.'
+		  );
+
 	return (
 		<>
 			<InspectorControls group="advanced">
 				<BaseControl
 					id={ controlId }
 					label={ __( 'Overrides' ) }
-					help={ __(
-						'Allow changes to this block throughout instances of this pattern.'
-					) }
+					help={ helpText }
 				>
 					<Button
 						__next40pxDefaultSize
@@ -93,6 +107,8 @@ function PatternOverridesControls( { attributes, setAttributes } ) {
 								setShowAllowOverridesModal( true );
 							}
 						} }
+						disabled={ hasUnsupportedImageAttributes }
+						__experimentalIsFocusable
 					>
 						{ allowOverrides
 							? __( 'Disable overrides' )
