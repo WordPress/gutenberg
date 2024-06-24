@@ -13,7 +13,6 @@ import {
 	ToggleControl,
 } from '@wordpress/components';
 import { lock as lockIcon, unlock as unlockIcon } from '@wordpress/icons';
-import { useInstanceId } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { getBlockType } from '@wordpress/blocks';
 
@@ -64,10 +63,6 @@ export default function BlockLockModal( { clientId, onClose } ) {
 	);
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const blockInformation = useBlockDisplayInformation( clientId );
-	const instanceId = useInstanceId(
-		BlockLockModal,
-		'block-editor-block-lock-modal__options-title'
-	);
 
 	useEffect( () => {
 		setLock( {
@@ -90,11 +85,6 @@ export default function BlockLockModal( { clientId, onClose } ) {
 			overlayClassName="block-editor-block-lock-modal"
 			onRequestClose={ onClose }
 		>
-			<p>
-				{ __(
-					'Choose specific attributes to restrict or lock all available options.'
-				) }
-			</p>
 			<form
 				onSubmit={ ( event ) => {
 					event.preventDefault();
@@ -107,17 +97,16 @@ export default function BlockLockModal( { clientId, onClose } ) {
 					onClose();
 				} }
 			>
-				<div
-					role="group"
-					aria-labelledby={ instanceId }
-					className="block-editor-block-lock-modal__options"
-				>
+				<fieldset className="block-editor-block-lock-modal__options">
+					<legend>
+						{ __(
+							'Choose specific attributes to restrict or lock all available options.'
+						) }
+					</legend>
 					<CheckboxControl
 						__nextHasNoMarginBottom
-						className="block-editor-block-lock-modal__options-title"
-						label={
-							<span id={ instanceId }>{ __( 'Lock all' ) }</span>
-						}
+						className="block-editor-block-lock-modal__options-all"
+						label={ __( 'Lock all' ) }
 						checked={ isAllChecked }
 						indeterminate={ isMixed }
 						onChange={ ( newValue ) =>
@@ -197,7 +186,7 @@ export default function BlockLockModal( { clientId, onClose } ) {
 							}
 						/>
 					) }
-				</div>
+				</fieldset>
 				<Flex
 					className="block-editor-block-lock-modal__actions"
 					justify="flex-end"
