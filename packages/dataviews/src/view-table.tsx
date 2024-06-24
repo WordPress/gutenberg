@@ -75,6 +75,7 @@ interface BulkSelectionCheckboxProps< Item extends AnyItem > {
 	onSelectionChange: ( items: Item[] ) => void;
 	data: Item[];
 	actions: Action< Item >[];
+	getItemId: ( item: Item ) => string;
 }
 
 interface TableRowProps< Item extends AnyItem > {
@@ -249,6 +250,7 @@ function BulkSelectionCheckbox< Item extends AnyItem >( {
 	onSelectionChange,
 	data,
 	actions,
+	getItemId,
 }: BulkSelectionCheckboxProps< Item > ) {
 	const selectableItems = useMemo( () => {
 		return data.filter( ( item ) => {
@@ -259,13 +261,16 @@ function BulkSelectionCheckbox< Item extends AnyItem >( {
 			);
 		} );
 	}, [ data, actions ] );
-	const areAllSelected = selection.length === selectableItems.length;
+	const selectedItems = data.filter( ( item ) =>
+		selection.includes( getItemId( item ) )
+	);
+	const areAllSelected = selectedItems.length === selectableItems.length;
 	return (
 		<CheckboxControl
 			className="dataviews-view-table-selection-checkbox"
 			__nextHasNoMarginBottom
 			checked={ areAllSelected }
-			indeterminate={ ! areAllSelected && !! selection.length }
+			indeterminate={ ! areAllSelected && !! selectedItems.length }
 			onChange={ () => {
 				if ( areAllSelected ) {
 					onSelectionChange( [] );
@@ -495,6 +500,7 @@ function ViewTable< Item extends AnyItem >( {
 									onSelectionChange={ onSelectionChange }
 									data={ data }
 									actions={ actions }
+									getItemId={ getItemId }
 								/>
 							</th>
 						) }
