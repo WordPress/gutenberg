@@ -101,10 +101,6 @@ function PatternOverridesControls( {
 						variant="secondary"
 						aria-haspopup="dialog"
 						onClick={ () => {
-							if ( hasUnsupportedImageAttributes ) {
-								return;
-							}
-
 							if ( allowOverrides ) {
 								setShowDisallowOverridesModal( true );
 							} else {
