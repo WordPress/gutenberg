@@ -1,3 +1,8 @@
+/**
+ * Internal dependencies
+ */
+import type { BaseControlProps } from '../base-control/types';
+
 export type Size = {
 	/**
 	 * The property `size` contains a number with the font size value, in `px` or
@@ -52,7 +57,6 @@ export type SizeControlBaseProps = {
 	/**
 	 * If `true`, a reset button will be displayed alongside the input field
 	 * when a custom font size is active. Has no effect when
-	 * `disableCustomFontSizes` or `withSlider` is `true`.
 	 *
 	 * @default true
 	 */
@@ -71,25 +75,5 @@ export type SizeControlBaseProps = {
 	size?: 'default' | '__unstable-large';
 };
 
-export type SizeControlProps = SizeControlBaseProps & {
-	/**
-	 * Fallback value for the control.
-	 */
-	id?: string;
-	/**
-	 * Disables interaction with the control.
-	 */
-	isDisabled?: boolean;
-	/**
-	 * Whether the font size has units.
-	 */
-	hasUnits: boolean;
-	/**
-	 * Label for the element
-	 */
-	label?: string;
-	/**
-	 * Whether the label should be hidden from vision.
-	 */
-	hideLabelFromVision?: boolean;
-};
+export type SizeControlProps = SizeControlBaseProps &
+	Omit< BaseControlProps, 'children' >;

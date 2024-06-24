@@ -30,20 +30,20 @@ import { Spacer } from '../spacer';
 export const DEFAULT_UNITS = [ 'px', 'em', 'rem', 'vw', 'vh' ];
 
 function UnforwardedBaseSizeControl(
-	props: SizeControlProps,
+	props: WordPressComponentProps< SizeControlProps, 'input', true >,
 	ref: ForwardedRef< HTMLInputElement >
 ) {
 	const {
 		id,
-		__next40pxDefaultSize,
+		__next40pxDefaultSize = true,
+		__nextHasNoMarginBottom = true,
 		value,
-		isDisabled,
+		disabled,
 		size = 'default',
 		units: unitsProp = DEFAULT_UNITS,
 		withSlider = false,
 		withReset = true,
 		onChange,
-		hasUnits,
 		fallbackValue,
 	} = props;
 
@@ -59,26 +59,35 @@ function UnforwardedBaseSizeControl(
 	const isValueUnitRelative =
 		!! valueUnit && [ 'em', 'rem', 'vw', 'vh' ].includes( valueUnit );
 
+	const handleRangeChange = ( newValue: number | undefined ) => {
+		if ( newValue === undefined ) {
+			onChange?.( undefined );
+			return;
+		}
+		onChange?.( newValue + ( valueUnit ?? 'px' ) );
+	};
+
+	const handleUnitChange = ( newValue: string | undefined ) => {
+		if ( newValue === undefined ) {
+			onChange?.( undefined );
+		} else {
+			onChange?.( valueUnit ? newValue : parseInt( newValue, 10 ) );
+		}
+	};
+
 	return (
 		<Flex className="components-size-control__custom-size-control">
 			<FlexItem isBlock>
 				<UnitControl
 					__next40pxDefaultSize={ __next40pxDefaultSize }
+					disabled={ disabled }
 					label={ __( 'Custom' ) }
 					labelPosition="top"
 					hideLabelFromVision
 					value={ value }
-					onChange={ ( newValue ) => {
-						if ( newValue === undefined ) {
-							onChange?.( undefined );
-						} else {
-							onChange?.(
-								hasUnits ? newValue : parseInt( newValue, 10 )
-							);
-						}
-					} }
+					onChange={ handleUnitChange }
 					size={ size }
-					units={ hasUnits ? units : [] }
+					units={ units }
 					min={ 0 }
 				/>
 			</FlexItem>
@@ -87,25 +96,16 @@ function UnforwardedBaseSizeControl(
 					<Spacer marginX={ 2 } marginBottom={ 0 }>
 						<RangeControl
 							id={ id }
-							__nextHasNoMarginBottom
+							disabled={ disabled }
 							__next40pxDefaultSize={ __next40pxDefaultSize }
+							__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 							className="components-size-control__custom-input"
 							label={ __( 'Custom Size' ) }
 							hideLabelFromVision
 							value={ valueQuantity }
 							initialPosition={ fallbackValue }
 							withInputField={ false }
-							onChange={ ( newValue ) => {
-								if ( newValue === undefined ) {
-									onChange?.( undefined );
-								} else if ( hasUnits ) {
-									onChange?.(
-										newValue + ( valueUnit ?? 'px' )
-									);
-								} else {
-									onChange?.( newValue );
-								}
-							} }
+							onChange={ handleRangeChange }
 							min={ 0 }
 							max={ isValueUnitRelative ? 10 : 100 }
 							step={ isValueUnitRelative ? 0.1 : 1 }
@@ -117,16 +117,15 @@ function UnforwardedBaseSizeControl(
 			{ withReset && (
 				<FlexItem>
 					<Button
-						disabled={ isDisabled }
+						disabled={ disabled }
 						__experimentalIsFocusable
+						__next40pxDefaultSize={ __next40pxDefaultSize }
 						onClick={ () => {
 							onChange?.( undefined );
 						} }
 						variant="secondary"
-						__next40pxDefaultSize
 						size={
-							size === '__unstable-large' ||
-							props.__next40pxDefaultSize
+							size === '__unstable-large' || __next40pxDefaultSize
 								? 'default'
 								: 'small'
 						}

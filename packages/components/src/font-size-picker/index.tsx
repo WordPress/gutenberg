@@ -185,8 +185,7 @@ const UnforwardedFontSizePicker = (
 					<SizeControl
 						__next40pxDefaultSize={ __next40pxDefaultSize }
 						value={ value }
-						isDisabled={ isDisabled }
-						hasUnits={ hasUnits }
+						disabled={ isDisabled }
 						units={ units }
 						withSlider={ withSlider }
 						withReset={ withReset }
