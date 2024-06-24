@@ -201,6 +201,10 @@ function FeaturedImage( { item, viewType } ) {
 	);
 }
 
+function getItemId( item ) {
+	return item.id.toString();
+}
+
 export default function PagePages() {
 	const postType = 'page';
 	const [ view, setView ] = useView( postType );
@@ -464,9 +468,27 @@ export default function PagePages() {
 		[ authors, view.type, frontPageId, postsPageId ]
 	);
 
+	const onActionPerformed = useCallback(
+		( actionId, items ) => {
+			if (
+				actionId === 'move-to-trash' ||
+				actionId === 'permanently-delete'
+			) {
+				setSelection(
+					selection.filter(
+						( id ) =>
+							! items.some( ( item ) => getItemId( item ) === id )
+					)
+				);
+			}
+		},
+		[ selection, setSelection ]
+	);
+
 	const postTypeActions = usePostActions( {
 		postType: 'page',
 		context: 'list',
+		onActionPerformed,
 	} );
 	const editAction = useEditPostAction();
 	const actions = useMemo(
@@ -538,7 +560,7 @@ export default function PagePages() {
 				selection={ selection }
 				setSelection={ setSelection }
 				onSelectionChange={ onSelectionChange }
-				getItemId={ ( item ) => item.id.toString() }
+				getItemId={ getItemId }
 			/>
 		</Page>
 	);
