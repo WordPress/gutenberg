@@ -4,6 +4,11 @@
 import type { StoryFn } from '@storybook/react';
 
 /**
+ * WordPress dependencies
+ */
+import { useState } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import CustomSelectControl from '..';
@@ -20,10 +25,34 @@ export default {
 				type: 'radio',
 			},
 		},
+		onChange: { control: { type: null } },
+		value: { control: { type: null } },
+	},
+	parameters: {
+		actions: { argTypesRegex: '^on.*' },
 	},
 };
 
-export const Default: StoryFn = CustomSelectControl.bind( {} );
+const Template: StoryFn< typeof CustomSelectControl > = ( props ) => {
+	const [ value, setValue ] = useState( props.options[ 0 ] );
+
+	const onChange: React.ComponentProps<
+		typeof CustomSelectControl
+	>[ 'onChange' ] = ( changeObject: { selectedItem: any } ) => {
+		setValue( changeObject.selectedItem );
+		props.onChange?.( changeObject );
+	};
+
+	return (
+		<CustomSelectControl
+			{ ...props }
+			onChange={ onChange }
+			value={ value }
+		/>
+	);
+};
+
+export const Default: StoryFn = Template.bind( {} );
 Default.args = {
 	label: 'Label',
 	options: [
@@ -51,7 +80,7 @@ Default.args = {
 	],
 };
 
-export const WithLongLabels: StoryFn = CustomSelectControl.bind( {} );
+export const WithLongLabels: StoryFn = Template.bind( {} );
 WithLongLabels.args = {
 	...Default.args,
 	options: [
@@ -70,7 +99,7 @@ WithLongLabels.args = {
 	],
 };
 
-export const WithHints: StoryFn = CustomSelectControl.bind( {} );
+export const WithHints: StoryFn = Template.bind( {} );
 WithHints.args = {
 	...Default.args,
 	options: [

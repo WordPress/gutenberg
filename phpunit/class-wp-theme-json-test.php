@@ -3579,7 +3579,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			'selector' => 'body',
 		);
 
-		$expected    = ':where(body) { margin: 0; }.wp-site-blocks { padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom); }.has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }.has-global-padding > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); }.has-global-padding :where(.has-global-padding:not(.wp-block-block, .alignfull, .alignwide)) { padding-right: 0; padding-left: 0; }.has-global-padding :where(.has-global-padding:not(.wp-block-block, .alignfull, .alignwide)) > .alignfull { margin-left: 0; margin-right: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}.is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}.is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}.is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}.is-layout-constrained > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}.is-layout-constrained > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}.is-layout-constrained > .aligncenter{margin-left: auto !important;margin-right: auto !important;}.is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)){margin-left: auto !important;margin-right: auto !important;}body .is-layout-flex{display: flex;}.is-layout-flex{flex-wrap: wrap;align-items: center;}.is-layout-flex > :is(*, div){margin: 0;}body .is-layout-grid{display: grid;}.is-layout-grid > :is(*, div){margin: 0;}:root :where(body){--wp--style--root--padding-top: 10px;--wp--style--root--padding-right: 12px;--wp--style--root--padding-bottom: 10px;--wp--style--root--padding-left: 12px;}';
+		$expected    = ':where(body) { margin: 0; }.wp-site-blocks { padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom); }.has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }.has-global-padding > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); }.has-global-padding :where(:not(.alignfull.is-layout-flow) > .has-global-padding:not(.wp-block-block, .alignfull, .alignwide)) { padding-right: 0; padding-left: 0; }.has-global-padding :where(:not(.alignfull.is-layout-flow) > .has-global-padding:not(.wp-block-block, .alignfull, .alignwide)) > .alignfull { margin-left: 0; margin-right: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}.is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}.is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}.is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}.is-layout-constrained > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}.is-layout-constrained > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}.is-layout-constrained > .aligncenter{margin-left: auto !important;margin-right: auto !important;}.is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)){margin-left: auto !important;margin-right: auto !important;}body .is-layout-flex{display: flex;}.is-layout-flex{flex-wrap: wrap;align-items: center;}.is-layout-flex > :is(*, div){margin: 0;}body .is-layout-grid{display: grid;}.is-layout-grid > :is(*, div){margin: 0;}:root :where(body){--wp--style--root--padding-top: 10px;--wp--style--root--padding-right: 12px;--wp--style--root--padding-bottom: 10px;--wp--style--root--padding-left: 12px;}';
 		$root_rules  = $theme_json->get_root_layout_rules( WP_Theme_JSON_Gutenberg::ROOT_BLOCK_SELECTOR, $metadata );
 		$style_rules = $theme_json->get_styles_for_block( $metadata );
 		$this->assertSame( $expected, $root_rules . $style_rules );
@@ -3737,6 +3737,89 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			),
 		);
 		$this->assertSameSetsWithIndex( $expected, $sanitized_theme_json, 'Sanitized theme.json styles does not match' );
+	}
+
+	public function test_unwraps_block_style_variations() {
+		gutenberg_register_block_style(
+			array( 'core/paragraph', 'core/group' ),
+			array(
+				'name'  => 'myVariation',
+				'label' => 'My variation',
+			)
+		);
+
+		$input = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'variations' => array(
+						'myVariation' => array(
+							'color'      => array(
+								'background' => 'topLevel',
+								'gradient'   => 'topLevel',
+							),
+							'typography' => array(
+								'fontFamily' => 'topLevel',
+							),
+						),
+					),
+					'blocks'     => array(
+						'core/paragraph' => array(
+							'variations' => array(
+								'myVariation' => array(
+									'color'   => array(
+										'background' => 'blockLevel',
+										'text'       => 'blockLevel',
+									),
+									'outline' => array(
+										'offset' => 'blockLevel',
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected = array(
+			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'styles'  => array(
+				'blocks' => array(
+					'core/paragraph' => array(
+						'variations' => array(
+							'myVariation' => array(
+								'color'      => array(
+									'background' => 'blockLevel',
+									'gradient'   => 'topLevel',
+									'text'       => 'blockLevel',
+								),
+								'typography' => array(
+									'fontFamily' => 'topLevel',
+								),
+								'outline'    => array(
+									'offset' => 'blockLevel',
+								),
+							),
+						),
+					),
+					'core/group'     => array(
+						'variations' => array(
+							'myVariation' => array(
+								'color'      => array(
+									'background' => 'topLevel',
+									'gradient'   => 'topLevel',
+								),
+								'typography' => array(
+									'fontFamily' => 'topLevel',
+								),
+							),
+						),
+					),
+				),
+			),
+		);
+		$this->assertSameSetsWithIndex( $expected, $input->get_raw_data(), 'Unwrapped block style variations do not match' );
 	}
 
 	/**

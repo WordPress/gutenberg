@@ -201,10 +201,43 @@ function FeaturedImage( { item, viewType } ) {
 	);
 }
 
+function usePostIdLinkInSelection(
+	selection,
+	setSelection,
+	isLoadingItems,
+	items
+) {
+	const {
+		params: { postId },
+	} = useLocation();
+	const [ postIdToSelect, setPostIdToSelect ] = useState( postId );
+	useEffect( () => {
+		if ( postId ) {
+			setPostIdToSelect( postId );
+		}
+	}, [ postId ] );
+
+	useEffect( () => {
+		if ( ! postIdToSelect ) {
+			return;
+		}
+		// Only try to select an item if the loading is complete and we have items.
+		if ( ! isLoadingItems && items && items.length ) {
+			// If the item is not in the current selection, select it.
+			if ( selection.length !== 1 || selection[ 0 ] !== postIdToSelect ) {
+				setSelection( [ postIdToSelect ] );
+			}
+			setPostIdToSelect( undefined );
+		}
+	}, [ postIdToSelect, selection, setSelection, isLoadingItems, items ] );
+}
+
 export default function PagePages() {
 	const postType = 'page';
 	const [ view, setView ] = useView( postType );
 	const history = useHistory();
+
+	const [ selection, setSelection ] = useState( [] );
 
 	const onSelectionChange = useCallback(
 		( items ) => {
@@ -265,6 +298,8 @@ export default function PagePages() {
 		totalItems,
 		totalPages,
 	} = useEntityRecords( 'postType', postType, queryArgs );
+
+	usePostIdLinkInSelection( selection, setSelection, isLoadingPages, pages );
 
 	const { records: authors, isResolving: isLoadingAuthors } =
 		useEntityRecords( 'root', 'user', { per_page: -1 } );
@@ -531,7 +566,10 @@ export default function PagePages() {
 				isLoading={ isLoadingPages || isLoadingAuthors }
 				view={ view }
 				onChangeView={ onChangeView }
+				selection={ selection }
+				setSelection={ setSelection }
 				onSelectionChange={ onSelectionChange }
+				getItemId={ ( item ) => item.id.toString() }
 			/>
 		</Page>
 	);

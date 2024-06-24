@@ -2,12 +2,22 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `DropZone`: rewrite animation without depending on framer-motion. ([#62044](https://github.com/WordPress/gutenberg/pull/62044))
+
+### Internal
+
+-   `CustomSelectControl`: align unit tests for v1 and legacy v2 versions. ([#62706](https://github.com/WordPress/gutenberg/pull/62706))
+-   `CustomSelectControlV2`: fix handling of extra option attributes in the `onChange` callbacks and when forwarding them to the option DOM elements. ([#62255](https://github.com/WordPress/gutenberg/pull/62255))
+-   `CustomSelectControlV2`: fix setting initial value and reacting to external controlled updates. ([#62733](https://github.com/WordPress/gutenberg/pull/62733))
+
 ## 28.1.0 (2024-06-15)
 
 ### Enhancements
 
-- Add `text-wrap: balance` fallback to all instances of `text-wrap: pretty` for greater cross browser compatibility. ([#62233](https://github.com/WordPress/gutenberg/pull/62233))
-- Updates the space between input + label to `8px` in CheckboxControl and RadioControl. Also increased the space between RadioControl components to `12px` to make it consistent with CheckboxControl. ([#61696](https://github.com/WordPress/gutenberg/pull/61696))
+-   Add `text-wrap: balance` fallback to all instances of `text-wrap: pretty` for greater cross browser compatibility. ([#62233](https://github.com/WordPress/gutenberg/pull/62233))
+-   Updates the space between input + label to `8px` in CheckboxControl and RadioControl. Also increased the space between RadioControl components to `12px` to make it consistent with CheckboxControl. ([#61696](https://github.com/WordPress/gutenberg/pull/61696))
 
 ### Bug Fixes
 
