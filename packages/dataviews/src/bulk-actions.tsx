@@ -200,10 +200,12 @@ export default function BulkActions< Item extends AnyItem >( {
 	const numberSelectableItems = selectableItems.length;
 
 	const selectedItems = useMemo( () => {
-		return data.filter( ( item ) =>
-			selection.includes( getItemId( item ) )
+		return data.filter(
+			( item ) =>
+				selection.includes( getItemId( item ) ) &&
+				selectableItems.includes( item )
 		);
-	}, [ selection, data, getItemId ] );
+	}, [ selection, data, getItemId, selectableItems ] );
 
 	const areAllSelected = selectedItems.length === numberSelectableItems;
 
