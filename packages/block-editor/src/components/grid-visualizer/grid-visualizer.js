@@ -227,7 +227,8 @@ function GridVisualizerCell( {
 	getBlocksBeforeCurrentCell,
 } ) {
 	const { getDraggedBlockClientIds } = useSelect( blockEditorStore );
-	const { moveBlocksToPosition } = useDispatch( blockEditorStore );
+	const { moveBlocksToPosition, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 
 	const ref = useDropZone( {
 		onDragEnter() {
@@ -243,6 +244,7 @@ function GridVisualizerCell( {
 			const [ srcClientId ] = getDraggedBlockClientIds();
 			if ( srcClientId && validateDrag( srcClientId ) ) {
 				onDrop( srcClientId );
+				__unstableMarkNextChangeAsNotPersistent();
 				moveBlocksToPosition(
 					[ srcClientId ],
 					gridClientId,

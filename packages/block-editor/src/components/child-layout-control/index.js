@@ -74,7 +74,8 @@ export default function ChildLayoutControl( {
 	const rootClientId = useSelect( ( select ) =>
 		select( blockEditorStore ).getBlockRootClientId( panelId )
 	);
-	const { moveBlocksToPosition } = useDispatch( blockEditorStore );
+	const { moveBlocksToPosition, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 	const getBlocksBeforeCurrentCell = useGetBlocksBeforeCurrentCell(
 		rootClientId,
 		gridColumnNumber,
@@ -244,6 +245,7 @@ export default function ChildLayoutControl( {
 													gridColumnNumber +
 												parseInt( value, 10 ) -
 												1;
+											__unstableMarkNextChangeAsNotPersistent();
 											moveBlocksToPosition(
 												[ panelId ],
 												rootClientId,
@@ -281,6 +283,7 @@ export default function ChildLayoutControl( {
 													gridColumnNumber +
 												parseInt( columnStart, 10 ) -
 												1;
+											__unstableMarkNextChangeAsNotPersistent();
 											moveBlocksToPosition(
 												[ panelId ],
 												rootClientId,

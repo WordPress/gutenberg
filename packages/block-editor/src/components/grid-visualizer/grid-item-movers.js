@@ -20,7 +20,8 @@ export function GridItemMovers( {
 	gridClientId,
 	blockClientId,
 } ) {
-	const { moveBlocksToPosition } = useDispatch( blockEditorStore );
+	const { moveBlocksToPosition, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 
 	const columnStart = layout?.columnStart ?? 1;
 	const rowStart = layout?.rowStart ?? 1;
@@ -53,6 +54,7 @@ export function GridItemMovers( {
 					onChange( {
 						rowStart: rowStart - 1,
 					} );
+					__unstableMarkNextChangeAsNotPersistent();
 					moveBlocksToPosition(
 						[ blockClientId ],
 						gridClientId,
@@ -71,6 +73,7 @@ export function GridItemMovers( {
 					onChange( {
 						rowStart: rowStart + 1,
 					} );
+					__unstableMarkNextChangeAsNotPersistent();
 					moveBlocksToPosition(
 						[ blockClientId ],
 						gridClientId,
@@ -89,6 +92,7 @@ export function GridItemMovers( {
 					onChange( {
 						columnStart: columnStartNumber - 1,
 					} );
+					__unstableMarkNextChangeAsNotPersistent();
 					moveBlocksToPosition(
 						[ blockClientId ],
 						gridClientId,
@@ -105,6 +109,7 @@ export function GridItemMovers( {
 					onChange( {
 						columnStart: columnStartNumber + 1,
 					} );
+					__unstableMarkNextChangeAsNotPersistent();
 					moveBlocksToPosition(
 						[ blockClientId ],
 						gridClientId,
