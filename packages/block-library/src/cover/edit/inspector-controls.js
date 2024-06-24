@@ -79,7 +79,6 @@ function CoverHeightInput( {
 			min={ min }
 			onChange={ handleOnChange }
 			onUnitChange={ onUnitChange }
-			__unstableInputWidth="calc(50% - 4px)"
 			units={ units }
 			value={ computedValue }
 			size="__unstable-large"
@@ -300,6 +299,7 @@ export default function CoverInspectorControls( {
 			) }
 			<InspectorControls group="dimensions">
 				<ToolsPanelItem
+					className="single-column"
 					hasValue={ () => !! minHeight }
 					label={ __( 'Minimum height' ) }
 					onDeselect={ () =>
