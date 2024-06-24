@@ -474,15 +474,15 @@ export default function PagePages() {
 				actionId === 'move-to-trash' ||
 				actionId === 'permanently-delete'
 			) {
-				setSelection(
-					selection.filter(
+				setSelection( ( _selection ) =>
+					_selection.filter(
 						( id ) =>
 							! items.some( ( item ) => getItemId( item ) === id )
 					)
 				);
 			}
 		},
-		[ selection, setSelection ]
+		[ setSelection ]
 	);
 
 	const postTypeActions = usePostActions( {
