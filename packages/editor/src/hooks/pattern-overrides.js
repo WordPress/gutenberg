@@ -23,10 +23,6 @@ const {
 	PATTERN_SYNC_TYPES,
 } = unlock( patternsPrivateApis );
 
-const UNSUPPORTED_ATTRIBUTES = {
-	'core/image': [ 'caption', 'href' ],
-};
-
 /**
  * Override the default edit UI to include a new block inspector control for
  * assigning a partial syncing controls to supported blocks in the pattern editor.
@@ -38,16 +34,8 @@ const UNSUPPORTED_ATTRIBUTES = {
  */
 const withPatternOverrideControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		let isSupportedBlock =
+		const isSupportedBlock =
 			!! PARTIAL_SYNCING_SUPPORTED_BLOCKS[ props.name ];
-
-		if ( isSupportedBlock ) {
-			const unsupportedAttributes =
-				UNSUPPORTED_ATTRIBUTES[ props.name ] || [];
-			isSupportedBlock = ! unsupportedAttributes.some(
-				( attribute ) => props.attributes[ attribute ]?.length
-			);
-		}
 
 		return (
 			<>
