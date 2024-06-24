@@ -164,5 +164,7 @@ export function getFontStylesAndWeights( fontFamilyFaces ) {
 		fontStyles,
 		fontWeights,
 		combinedStyleAndWeightOptions,
+		isSystemFont,
+		isVariableFont,
 	};
 }

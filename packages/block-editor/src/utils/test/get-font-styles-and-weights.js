@@ -200,6 +200,8 @@ describe( 'getFontStylesAndWeights', () => {
 					},
 				},
 			],
+			isSystemFont: true,
+			isVariableFont: false,
 		} );
 	} );
 
@@ -408,6 +410,8 @@ describe( 'getFontStylesAndWeights', () => {
 					},
 				},
 			],
+			isSystemFont: false,
+			isVariableFont: true,
 		} );
 	} );
 
@@ -497,6 +501,8 @@ describe( 'getFontStylesAndWeights', () => {
 					},
 				},
 			],
+			isSystemFont: false,
+			isVariableFont: false,
 		} );
 	} );
 } );
