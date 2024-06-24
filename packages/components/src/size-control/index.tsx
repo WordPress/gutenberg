@@ -29,13 +29,13 @@ import { Spacer } from '../spacer';
 
 export const DEFAULT_UNITS = [ 'px', 'em', 'rem', 'vw', 'vh' ];
 
-function UnforwardedBaseSizeControl(
+function UnforwardedSizeControl(
 	props: WordPressComponentProps< SizeControlProps, 'input', true >,
 	ref: ForwardedRef< HTMLInputElement >
 ) {
 	const { baseControlProps } = useBaseControlProps( props );
 
-	const instanceId = useInstanceId( UnforwardedBaseSizeControl );
+	const instanceId = useInstanceId( UnforwardedSizeControl );
 	const id = `size-control-${ instanceId }`;
 
 	const {
@@ -147,6 +147,6 @@ function UnforwardedBaseSizeControl(
 	);
 }
 
-const SizeControl = forwardRef( UnforwardedBaseSizeControl );
+const SizeControl = forwardRef( UnforwardedSizeControl );
 
 export default SizeControl;
