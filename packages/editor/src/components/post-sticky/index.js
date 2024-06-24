@@ -12,7 +12,7 @@ import PostStickyCheck from './check';
 import { store as editorStore } from '../../store';
 
 /**
- * Renders the PostSticky component. It provide toggle control for the sticky post feature.
+ * Renders the PostSticky component. It provides a checkbox control for the sticky post feature.
  *
  * @return {Component} The component to be rendered.
  */
@@ -27,7 +27,7 @@ export default function PostSticky() {
 	return (
 		<PostStickyCheck>
 			<CheckboxControl
-				className="editor-post-sticky__toggle-control"
+				className="editor-post-sticky__checkbox-control"
 				label={ __( 'Sticky' ) }
 				help={ __( 'Pin this post to the top of the blog' ) }
 				checked={ postSticky }

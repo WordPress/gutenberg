@@ -13,7 +13,6 @@ import {
 /**
  * Internal dependencies
  */
-import PostStickyPanel from '../post-sticky';
 import { __, sprintf } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useState, useMemo } from '@wordpress/element';
@@ -31,6 +30,7 @@ import {
 	NAVIGATION_POST_TYPE,
 } from '../../store/constants';
 import PostPanelRow from '../post-panel-row';
+import PostSticky from '../post-sticky';
 import { PrivatePostSchedule } from '../post-schedule';
 import { store as editorStore } from '../../store';
 
@@ -285,7 +285,7 @@ export default function PostStatus() {
 											) }
 										</VStack>
 									) }
-									<PostStickyPanel />
+									<PostSticky />
 								</VStack>
 							</form>
 						</>
