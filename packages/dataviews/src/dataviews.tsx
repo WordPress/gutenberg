@@ -7,7 +7,7 @@ import type { ComponentType } from 'react';
  * WordPress dependencies
  */
 import { __experimentalHStack as HStack } from '@wordpress/components';
-import { useMemo, useState, useCallback, useEffect } from '@wordpress/element';
+import { useMemo, useState, useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -91,25 +91,6 @@ export default function DataViews< Item extends AnyItem >( {
 		setSelection = setSelectionState;
 	}
 	const [ openedFilter, setOpenedFilter ] = useState< string | null >( null );
-
-	useEffect( () => {
-		if (
-			selection.length > 0 &&
-			selection.some(
-				( id ) => ! data.some( ( item ) => getItemId( item ) === id )
-			)
-		) {
-			const newSelection = selection.filter( ( id ) =>
-				data.some( ( item ) => getItemId( item ) === id )
-			);
-			setSelection( newSelection );
-			onSelectionChange(
-				data.filter( ( item ) =>
-					newSelection.includes( getItemId( item ) )
-				)
-			);
-		}
-	}, [ selection, data, getItemId, onSelectionChange ] );
 
 	const onSetSelection = useCallback(
 		( items: Item[] ) => {
