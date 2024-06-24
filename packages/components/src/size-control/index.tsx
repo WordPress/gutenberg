@@ -33,8 +33,12 @@ function UnforwardedBaseSizeControl(
 	props: WordPressComponentProps< SizeControlProps, 'input', true >,
 	ref: ForwardedRef< HTMLInputElement >
 ) {
+	const { baseControlProps } = useBaseControlProps( props );
+
+	const instanceId = useInstanceId( UnforwardedBaseSizeControl );
+	const id = `size-control-${ instanceId }`;
+
 	const {
-		id,
 		__next40pxDefaultSize = true,
 		__nextHasNoMarginBottom = true,
 		value,
@@ -76,82 +80,71 @@ function UnforwardedBaseSizeControl(
 	};
 
 	return (
-		<Flex className="components-size-control__custom-size-control">
-			<FlexItem isBlock>
-				<UnitControl
-					__next40pxDefaultSize={ __next40pxDefaultSize }
-					disabled={ disabled }
-					label={ __( 'Custom' ) }
-					labelPosition="top"
-					hideLabelFromVision
-					value={ value }
-					onChange={ handleUnitChange }
-					size={ size }
-					units={ units }
-					min={ 0 }
-				/>
-			</FlexItem>
-			{ withSlider && (
+		<BaseControl { ...baseControlProps } id={ id }>
+			<Flex className="components-size-control__custom-size-control">
 				<FlexItem isBlock>
-					<Spacer marginX={ 2 } marginBottom={ 0 }>
-						<RangeControl
-							id={ id }
-							disabled={ disabled }
-							__next40pxDefaultSize={ __next40pxDefaultSize }
-							__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
-							className="components-size-control__custom-input"
-							label={ __( 'Custom Size' ) }
-							hideLabelFromVision
-							value={ valueQuantity }
-							initialPosition={ fallbackValue }
-							withInputField={ false }
-							onChange={ handleRangeChange }
-							min={ 0 }
-							max={ isValueUnitRelative ? 10 : 100 }
-							step={ isValueUnitRelative ? 0.1 : 1 }
-							ref={ ref }
-						/>
-					</Spacer>
-				</FlexItem>
-			) }
-			{ withReset && (
-				<FlexItem>
-					<Button
-						disabled={ disabled }
-						__experimentalIsFocusable
+					<UnitControl
+						id={ id }
 						__next40pxDefaultSize={ __next40pxDefaultSize }
-						onClick={ () => {
-							onChange?.( undefined );
-						} }
-						variant="secondary"
-						size={
-							size === '__unstable-large' || __next40pxDefaultSize
-								? 'default'
-								: 'small'
-						}
-					>
-						{ __( 'Reset' ) }
-					</Button>
+						disabled={ disabled }
+						label={ __( 'Custom' ) }
+						labelPosition="top"
+						hideLabelFromVision
+						value={ value }
+						onChange={ handleUnitChange }
+						size={ size }
+						units={ units }
+						min={ 0 }
+					/>
 				</FlexItem>
-			) }
-		</Flex>
-	);
-}
-
-const BaseSizeControl = forwardRef( UnforwardedBaseSizeControl );
-
-function SizeControl(
-	props: WordPressComponentProps< SizeControlProps, 'input', true >,
-	ref: ForwardedRef< HTMLInputElement >
-) {
-	const { baseControlProps } = useBaseControlProps( props );
-	const instanceId = useInstanceId( SizeControl );
-	const id = `size-control-${ instanceId }`;
-	return (
-		<BaseControl { ...baseControlProps }>
-			<BaseSizeControl id={ id } ref={ ref } { ...props } />
+				{ withSlider && (
+					<FlexItem isBlock>
+						<Spacer marginX={ 2 } marginBottom={ 0 }>
+							<RangeControl
+								disabled={ disabled }
+								__next40pxDefaultSize={ __next40pxDefaultSize }
+								__nextHasNoMarginBottom={
+									__nextHasNoMarginBottom
+								}
+								className="components-size-control__custom-input"
+								label={ __( 'Custom Size' ) }
+								hideLabelFromVision
+								value={ valueQuantity }
+								initialPosition={ fallbackValue }
+								withInputField={ false }
+								onChange={ handleRangeChange }
+								min={ 0 }
+								max={ isValueUnitRelative ? 10 : 100 }
+								step={ isValueUnitRelative ? 0.1 : 1 }
+								ref={ ref }
+							/>
+						</Spacer>
+					</FlexItem>
+				) }
+				{ withReset && (
+					<FlexItem>
+						<Button
+							disabled={ disabled }
+							__experimentalIsFocusable
+							__next40pxDefaultSize={ __next40pxDefaultSize }
+							onClick={ () => {
+								onChange?.( undefined );
+							} }
+							variant="secondary"
+							size={
+								size === '__unstable-large' ||
+								__next40pxDefaultSize
+									? 'default'
+									: 'small'
+							}
+						>
+							{ __( 'Reset' ) }
+						</Button>
+					</FlexItem>
+				) }
+			</Flex>
 		</BaseControl>
 	);
 }
 
-export default forwardRef( SizeControl );
+export default forwardRef( UnforwardedBaseSizeControl );
