@@ -322,7 +322,7 @@ _Returns_
 
 ### EditorKeyboardShortcuts
 
-Component handles the keyboard shortcuts for the editor.
+Handles the keyboard shortcuts for the editor.
 
 It provides functionality for various keyboard shortcuts such as toggling editor mode, toggling distraction-free mode, undo/redo, saving the post, toggling list view, and toggling the sidebar.
 
@@ -1616,9 +1616,9 @@ _Returns_
 
 ### TextEditorGlobalKeyboardShortcuts
 
-Component handles the global keyboard shortcuts for the Text editor.
+Handles the keyboard shortcuts for the editor.
 
-It provides functionality for various keyboard shortcuts such as toggling editor mode, toggling distraction-free mode, undo/redo.
+It provides functionality for various keyboard shortcuts such as toggling editor mode, toggling distraction-free mode, undo/redo, saving the post, toggling list view, and toggling the sidebar.
 
 ### ThemeSupportCheck
 
@@ -1725,7 +1725,9 @@ _Type_
 
 ### VisualEditorGlobalKeyboardShortcuts
 
-Undocumented declaration.
+Handles the keyboard shortcuts for the editor.
+
+It provides functionality for various keyboard shortcuts such as toggling editor mode, toggling distraction-free mode, undo/redo, saving the post, toggling list view, and toggling the sidebar.
 
 ### Warning
 
