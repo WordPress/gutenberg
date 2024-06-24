@@ -7,7 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useViewportMatch } from '@wordpress/compose';
+import { useMediaQuery, useViewportMatch } from '@wordpress/compose';
 import { __unstableMotion as motion } from '@wordpress/components';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { useState } from '@wordpress/element';
@@ -61,7 +61,7 @@ function Header( {
 } ) {
 	const isWideViewport = useViewportMatch( 'large' );
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const isMobileViewport = useViewportMatch( 'mobile' );
+	const isTooNarrowForDocumentBar = useMediaQuery( '(max-width: 382px)' );
 	const {
 		isTextEditor,
 		isPublishSidebarOpened,
@@ -100,7 +100,9 @@ function Header( {
 			/>
 		) : null;
 
-	const showDocumentBar = ! blockToolbar || isBlockToolsCollapsed;
+	const showDocumentBar =
+		( ! blockToolbar || isBlockToolsCollapsed ) &&
+		! isTooNarrowForDocumentBar;
 	const hasBackButton = useHasBackButton();
 
 	// The edit-post-header classname is only kept for backward compatibilty
@@ -109,7 +111,7 @@ function Header( {
 		<div
 			className={ clsx( 'editor-header edit-post-header', {
 				'has-back-button': hasBackButton,
-				'has-center': isMobileViewport && showDocumentBar,
+				'has-center': showDocumentBar,
 			} ) }
 		>
 			{ hasBackButton && (
@@ -130,7 +132,7 @@ function Header( {
 				/>
 				{ blockToolbar }
 			</motion.div>
-			{ isMobileViewport && ( title || showDocumentBar ) && (
+			{ ( title || showDocumentBar ) && (
 				<motion.div
 					className="editor-header__center"
 					variants={ toolbarVariations }
