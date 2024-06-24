@@ -274,6 +274,16 @@ export default function PagePages() {
 		totalPages,
 	} = useEntityRecords( 'postType', postType, queryArgs );
 
+	useEffect( () => {
+		if ( pages && ! pages.find( ( page ) => page.id === +postId ) ) {
+			// remove the post id from the url in case it was deleted.
+			history.push( {
+				...history.getLocationWithParams().params,
+				postId: undefined,
+			} );
+		}
+	}, [ pages, postId, history ] );
+
 	const { records: authors, isResolving: isLoadingAuthors } =
 		useEntityRecords( 'root', 'user', { per_page: -1 } );
 
@@ -468,33 +478,9 @@ export default function PagePages() {
 		[ authors, view.type, frontPageId, postsPageId ]
 	);
 
-	const onActionPerformed = useCallback(
-		( actionId, items ) => {
-			if (
-				actionId === 'move-to-trash' ||
-				actionId === 'permanently-delete'
-			) {
-				const { params } = history.getLocationWithParams();
-				if (
-					items.some(
-						( item ) => getItemId( item ) === params.postId
-					)
-				) {
-					// remove the post id from the url in case it was deleted.
-					history.push( {
-						...params,
-						postId: undefined,
-					} );
-				}
-			}
-		},
-		[ history ]
-	);
-
 	const postTypeActions = usePostActions( {
 		postType: 'page',
 		context: 'list',
-		onActionPerformed,
 	} );
 	const editAction = useEditPostAction();
 	const actions = useMemo(
