@@ -34,15 +34,8 @@ function isObjectEmpty( object ) {
 }
 
 function RevisionStyles( { styles, config } ) {
-	const variationOverrides = useSelect(
-		( select ) => unlock( select( blockEditorStore ) ).getStyleOverrides(),
-		[]
-	);
-
-	const mergedOverrides = useUpdateBlockVariationOverridesWithConfig(
-		config,
-		variationOverrides
-	);
+	const mergedOverrides =
+		useUpdateBlockVariationOverridesWithConfig( config );
 
 	return <EditorStyles styles={ styles } overrides={ mergedOverrides } />;
 }
@@ -102,6 +95,11 @@ function Revisions( { userConfig, blocks } ) {
 						settings={ settings }
 					>
 						<BlockList renderAppender={ false } />
+						{ /*
+						 * Styles are printed at the end of the document,
+						 * so they can access any registered style overrides,
+						 * which are only stored after the block list is rendered.
+						 */ }
 						<RevisionStyles
 							styles={ editorStyles }
 							config={ mergedConfig }

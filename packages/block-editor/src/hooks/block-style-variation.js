@@ -16,6 +16,7 @@ import {
 import { useStyleOverride } from './utils';
 import { store as blockEditorStore } from '../store';
 import { globalStylesDataKey } from '../store/private-keys';
+import { unlock } from '../lock-unlock';
 
 const VARIATION_PREFIX = 'is-style-';
 
@@ -64,20 +65,20 @@ function getVariationNameFromClass( className, registeredStyles = [] ) {
  * based on an incoming theme config. If a matching style is found in the config,
  * a new override is created and returned.
  *
- * @param {Object}               config             A global styles object, containing settings and styles.
- * @param {Array<Array, Object>} variationOverrides An array of existing block variation overrides.
+ * @param {Object} config A global styles object, containing settings and styles.
  * @return {Array} An array of new block variation overrides.
  */
-export function useUpdateBlockVariationOverridesWithConfig(
-	config,
-	variationOverrides = []
-) {
+export function useUpdateBlockVariationOverridesWithConfig( config ) {
+	const overrides = useSelect(
+		( select ) => unlock( select( blockEditorStore ) ).getStyleOverrides(),
+		[]
+	);
 	const { getBlockStyles } = useSelect( blocksStore );
 	const { getBlockName } = useSelect( blockEditorStore );
 
 	return useMemo( () => {
 		const newOverrides = [];
-		for ( const [ id, override ] of variationOverrides ) {
+		for ( const [ id, override ] of overrides ) {
 			if ( override?.variation && override?.clientId ) {
 				const blockName = getBlockName( override.clientId );
 				const configStyles =
@@ -135,7 +136,7 @@ export function useUpdateBlockVariationOverridesWithConfig(
 			}
 		}
 		return newOverrides;
-	}, [ config, variationOverrides ] );
+	}, [ config, overrides ] );
 }
 
 function useBlockStyleVariation( name, variation, clientId ) {
