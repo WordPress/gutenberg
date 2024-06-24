@@ -474,15 +474,17 @@ export default function PagePages() {
 				actionId === 'move-to-trash' ||
 				actionId === 'permanently-delete'
 			) {
-				setSelection(
-					selection.filter(
-						( id ) =>
-							! items.some( ( item ) => getItemId( item ) === id )
-					)
-				);
+				if ( items.some( ( item ) => getItemId( item ) === postId ) ) {
+					const { params } = history.getLocationWithParams();
+					// remove the post id from the url in case it was deleted.
+					history.push( {
+						...params,
+						postId: undefined,
+					} );
+				}
 			}
 		},
-		[ selection, setSelection ]
+		[ history, postId ]
 	);
 
 	const postTypeActions = usePostActions( {
