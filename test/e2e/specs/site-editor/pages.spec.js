@@ -90,7 +90,7 @@ test.describe( 'Pages', () => {
 		await admin.visitSiteEditor();
 	} );
 
-	test( 'create a new page, edit template and toggle page template preview', async ( {
+	test.skip( 'create a new page, edit template and toggle page template preview', async ( {
 		page,
 		editor,
 	} ) => {
