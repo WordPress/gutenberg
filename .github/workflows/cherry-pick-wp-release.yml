@@ -4,7 +4,7 @@ on:
     pull_request:
         types: [closed, labeled]
         branches:
-            - try/cherry-pick-automation-trunk # To be replaced with "trunk".
+            - trunk
 
 # Ensure that new jobs wait for the previous job to finish.
 concurrency:
