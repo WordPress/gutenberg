@@ -20,10 +20,17 @@ import { store as blockEditorStore } from '../../store';
 import { useGetBlocksBeforeCurrentCell } from './use-get-blocks-before-current-cell';
 
 export function GridVisualizer( { clientId, contentRef, parentLayout } ) {
+	const isDistractionFree = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings().isDistractionFree,
+		[]
+	);
 	const gridElement = useBlockElement( clientId );
-	if ( ! gridElement ) {
+
+	if ( isDistractionFree || ! gridElement ) {
 		return null;
 	}
+
 	const isManualGrid = parentLayout?.columnCount;
 	return (
 		<GridVisualizerGrid
