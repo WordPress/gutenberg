@@ -280,7 +280,8 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 					$theme_json    = apply_filters( 'wp_theme_json_data_theme', $cache_value );
 					static::$theme = $theme_json->get_theme_json();
 
-					$wp_theme = wp_get_theme();
+					$wp_theme        = wp_get_theme();
+					$theme_json_file = $wp_theme->get_file_path( 'theme.json' );
 					if ( $wp_theme->parent() ) {
 						$parent_theme_json_file = $wp_theme->parent()->get_file_path( 'theme.json' );
 						if ( $theme_json_file !== $parent_theme_json_file && is_readable( $parent_theme_json_file ) ) {
@@ -1058,7 +1059,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @return bool True if block cache is empty, false otherwise.
 	 */
 	private static function is_block_cache_empty() {
-		foreach ( static::$blocks_cache as $origin => $blocks ) {
+		foreach ( static::$blocks_cache as $blocks ) {
 			if ( ! empty( $blocks ) ) {
 				return false;
 			}
