@@ -62,7 +62,10 @@ function BlockMover( {
 				orientation: getBlockListSettings( _rootClientId )?.orientation,
 				// TODO: Doesn't feel great to couple BlockMover and grid layouts.
 				// TODO: Can we use useLayout() instead?
-				isManualGrid: layout.type === 'grid' && !! layout.columnCount,
+				isManualGrid:
+					layout.type === 'grid' &&
+					!! layout.columnCount &&
+					window.__experimentalEnableGridInteractivity,
 			};
 		},
 		[ clientIds ]
