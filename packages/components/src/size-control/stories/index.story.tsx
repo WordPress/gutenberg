@@ -51,8 +51,6 @@ const Template: StoryFn< typeof SizeControl > = ( args: SizeControlProps ) => {
 export const Default = Template.bind( {} );
 Default.args = {
 	value: '16px',
-	withSlider: true,
-	withReset: true,
 	size: 'default',
 	units: [ 'px', 'em', 'rem', 'vw', 'vh' ],
 	label: 'Size Control Label',
@@ -61,11 +59,18 @@ Default.args = {
 export const Disabled = Template.bind( {} );
 Disabled.args = {
 	value: '16px',
-	withSlider: true,
+	size: 'default',
+	units: [ 'px', 'em', 'rem', 'vw', 'vh' ],
+	label: 'Size Control Label',
+	disabled: true,
+};
+
+export const WithReset = Template.bind( {} );
+WithReset.args = {
+	value: '16px',
 	withReset: true,
 	size: 'default',
 	units: [ 'px', 'em', 'rem', 'vw', 'vh' ],
-	disabled: true,
 	label: 'Size Control Label',
 };
 
@@ -73,7 +78,6 @@ export const WithoutSlider = Template.bind( {} );
 WithoutSlider.args = {
 	value: '16px',
 	withSlider: false,
-	withReset: true,
 	size: 'default',
 	units: [ 'px', 'em', 'rem', 'vw', 'vh' ],
 	label: 'Size Control Label',
@@ -82,8 +86,6 @@ WithoutSlider.args = {
 export const CustomUnits = Template.bind( {} );
 CustomUnits.args = {
 	value: '16%',
-	withSlider: true,
-	withReset: true,
 	size: 'default',
 	units: [ '%', 'em' ],
 	label: 'Size Control Label',

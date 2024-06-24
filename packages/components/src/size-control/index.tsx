@@ -147,6 +147,6 @@ function UnforwardedSizeControl(
 	);
 }
 
-const SizeControl = forwardRef( UnforwardedSizeControl );
+export const SizeControl = forwardRef( UnforwardedSizeControl );
 
 export default SizeControl;
