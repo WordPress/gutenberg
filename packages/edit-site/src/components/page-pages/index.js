@@ -39,6 +39,7 @@ import AddNewPageModal from '../add-new-page';
 import Media from '../media';
 import { unlock } from '../../lock-unlock';
 import { useEditPostAction } from '../dataviews-actions';
+import { usePostIdLinkInSelection } from './utils';
 
 const { usePostActions } = unlock( editorPrivateApis );
 const { useLocation, useHistory } = unlock( routerPrivateApis );
@@ -199,37 +200,6 @@ function FeaturedImage( { item, viewType } ) {
 			) }
 		</div>
 	);
-}
-
-function usePostIdLinkInSelection(
-	selection,
-	setSelection,
-	isLoadingItems,
-	items
-) {
-	const {
-		params: { postId },
-	} = useLocation();
-	const [ postIdToSelect, setPostIdToSelect ] = useState( postId );
-	useEffect( () => {
-		if ( postId ) {
-			setPostIdToSelect( postId );
-		}
-	}, [ postId ] );
-
-	useEffect( () => {
-		if ( ! postIdToSelect ) {
-			return;
-		}
-		// Only try to select an item if the loading is complete and we have items.
-		if ( ! isLoadingItems && items && items.length ) {
-			// If the item is not in the current selection, select it.
-			if ( selection.length !== 1 || selection[ 0 ] !== postIdToSelect ) {
-				setSelection( [ postIdToSelect ] );
-			}
-			setPostIdToSelect( undefined );
-		}
-	}, [ postIdToSelect, selection, setSelection, isLoadingItems, items ] );
 }
 
 export default function PagePages() {

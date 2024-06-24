@@ -44,6 +44,7 @@ import {
 import usePatternSettings from '../page-patterns/use-pattern-settings';
 import { unlock } from '../../lock-unlock';
 import { useEditPostAction } from '../dataviews-actions';
+import { usePostIdLinkInSelection } from '../page-pages/utils';
 
 const { usePostActions } = unlock( editorPrivateApis );
 
@@ -222,6 +223,8 @@ export default function PageTemplates() {
 		} ) );
 	}, [ activeView ] );
 
+	const [ selection, setSelection ] = useState( [] );
+
 	const { records, isResolving: isLoadingData } = useEntityRecords(
 		'postType',
 		TEMPLATE_POST_TYPE,
@@ -229,6 +232,9 @@ export default function PageTemplates() {
 			per_page: -1,
 		}
 	);
+
+	usePostIdLinkInSelection( selection, setSelection, isLoadingData, records );
+
 	const history = useHistory();
 	const onSelectionChange = useCallback(
 		( items ) => {
@@ -369,6 +375,8 @@ export default function PageTemplates() {
 				view={ view }
 				onChangeView={ onChangeView }
 				onSelectionChange={ onSelectionChange }
+				selection={ selection }
+				setSelection={ setSelection }
 			/>
 		</Page>
 	);
