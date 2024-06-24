@@ -265,6 +265,7 @@ function useDropZoneWithValidation( {
 			const [ srcClientId ] = getDraggedBlockClientIds();
 			if ( srcClientId && validateDrag( srcClientId ) ) {
 				onDrop( srcClientId );
+				__unstableMarkNextChangeAsNotPersistent();
 				moveBlocksToPosition(
 					[ srcClientId ],
 					gridClientId,
