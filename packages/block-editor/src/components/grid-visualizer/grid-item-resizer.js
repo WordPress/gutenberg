@@ -32,7 +32,9 @@ export function GridItemResizer( {
 			blockElement={ blockElement }
 			rootBlockElement={ rootBlockElement }
 			onChange={ onChange }
-			isManualGrid={ !! columnCount }
+			isManualGrid={
+				!! columnCount && window.__experimentalEnableGridInteractivity
+			}
 		/>
 	);
 }

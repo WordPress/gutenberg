@@ -31,7 +31,9 @@ export function GridVisualizer( { clientId, contentRef, parentLayout } ) {
 		return null;
 	}
 
-	const isManualGrid = parentLayout?.columnCount;
+	const isManualGrid =
+		parentLayout?.columnCount &&
+		window.__experimentalEnableGridInteractivity;
 	return (
 		<GridVisualizerGrid
 			clientId={ clientId }
