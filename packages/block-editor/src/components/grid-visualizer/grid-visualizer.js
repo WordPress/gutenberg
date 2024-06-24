@@ -104,118 +104,140 @@ const GridVisualizerGrid = forwardRef(
 					className="block-editor-grid-visualizer__grid"
 					style={ gridInfo.style }
 				>
-					{ isManualGrid &&
-						range( 1, gridInfo.numRows ).map( ( row ) =>
-							range( 1, gridInfo.numColumns ).map( ( column ) => {
-								index++;
-								return (
-									<GridVisualizerCell
-										key={ `${ row }-${ column }` }
-										isHighlighted={
-											highlightedRect?.contains(
-												column,
-												row
-											) ?? false
-										}
-										validateDrag={ ( srcClientId ) => {
-											const attributes =
-												getBlockAttributes(
-													srcClientId
-												);
-											const rect = new GridRect( {
-												columnStart: column,
-												rowStart: row,
-												columnSpan:
-													attributes.style?.layout
-														?.columnSpan,
-												rowSpan:
-													attributes.style?.layout
-														?.rowSpan,
-											} );
-
-											const isInBounds = new GridRect( {
-												columnSpan: gridInfo.numColumns,
-												rowSpan: gridInfo.numRows,
-											} ).containsRect( rect );
-											if ( ! isInBounds ) {
-												return false;
-											}
-
-											return true;
-										} }
-										onDragEnter={ ( srcClientId ) => {
-											const attributes =
-												getBlockAttributes(
-													srcClientId
-												);
-											setHighlightedRect(
-												new GridRect( {
-													columnStart: column,
-													rowStart: row,
-													columnSpan:
-														attributes.style?.layout
-															?.columnSpan,
-													rowSpan:
-														attributes.style?.layout
-															?.rowSpan,
-												} )
-											);
-										} }
-										onDragLeave={ () => {
-											// onDragEnter can be called before onDragLeave if the user moves
-											// their mouse quickly, so only clear the highlight if it was set
-											// by this cell.
-											setHighlightedRect(
-												( prevHighlightedRect ) =>
-													prevHighlightedRect?.columnStart ===
-														column &&
-													prevHighlightedRect?.rowStart ===
+					{ isManualGrid
+						? range( 1, gridInfo.numRows ).map( ( row ) =>
+								range( 1, gridInfo.numColumns ).map(
+									( column ) => {
+										index++;
+										return (
+											<GridVisualizerCell
+												key={ `${ row }-${ column }` }
+												isHighlighted={
+													highlightedRect?.contains(
+														column,
 														row
-														? null
-														: prevHighlightedRect
-											);
-										} }
-										onDrop={ ( srcClientId ) => {
-											const attributes =
-												getBlockAttributes(
+													) ?? false
+												}
+												validateDrag={ (
 													srcClientId
-												);
-											updateBlockAttributes(
-												srcClientId,
-												{
-													style: {
-														...attributes.style,
-														layout: {
-															...attributes.style
-																?.layout,
+												) => {
+													const attributes =
+														getBlockAttributes(
+															srcClientId
+														);
+													const rect = new GridRect( {
+														columnStart: column,
+														rowStart: row,
+														columnSpan:
+															attributes.style
+																?.layout
+																?.columnSpan,
+														rowSpan:
+															attributes.style
+																?.layout
+																?.rowSpan,
+													} );
+
+													const isInBounds =
+														new GridRect( {
+															columnSpan:
+																gridInfo.numColumns,
+															rowSpan:
+																gridInfo.numRows,
+														} ).containsRect(
+															rect
+														);
+													if ( ! isInBounds ) {
+														return false;
+													}
+
+													return true;
+												} }
+												onDragEnter={ (
+													srcClientId
+												) => {
+													const attributes =
+														getBlockAttributes(
+															srcClientId
+														);
+													setHighlightedRect(
+														new GridRect( {
 															columnStart: column,
 															rowStart: row,
-														},
-													},
+															columnSpan:
+																attributes.style
+																	?.layout
+																	?.columnSpan,
+															rowSpan:
+																attributes.style
+																	?.layout
+																	?.rowSpan,
+														} )
+													);
+												} }
+												onDragLeave={ () => {
+													// onDragEnter can be called before onDragLeave if the user moves
+													// their mouse quickly, so only clear the highlight if it was set
+													// by this cell.
+													setHighlightedRect(
+														(
+															prevHighlightedRect
+														) =>
+															prevHighlightedRect?.columnStart ===
+																column &&
+															prevHighlightedRect?.rowStart ===
+																row
+																? null
+																: prevHighlightedRect
+													);
+												} }
+												onDrop={ ( srcClientId ) => {
+													const attributes =
+														getBlockAttributes(
+															srcClientId
+														);
+													updateBlockAttributes(
+														srcClientId,
+														{
+															style: {
+																...attributes.style,
+																layout: {
+																	...attributes
+																		.style
+																		?.layout,
+																	columnStart:
+																		column,
+																	rowStart:
+																		row,
+																},
+															},
+														}
+													);
+													setHighlightedRect( null );
+												} }
+												color={ gridInfo.currentColor }
+												gridClientId={ clientId }
+												index={ index }
+												getBlocksBeforeCurrentCell={
+													getBlocksBeforeCurrentCell
 												}
-											);
-											setHighlightedRect( null );
+											/>
+										);
+									}
+								)
+						  )
+						: Array.from(
+								{ length: gridInfo.numItems },
+								( _, i ) => (
+									<div
+										key={ i }
+										className="block-editor-grid-visualizer__item"
+										style={ {
+											boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${ gridInfo.currentColor } 20%, #0000)`,
 										} }
-										color={ gridInfo.currentColor }
-										gridClientId={ clientId }
-										index={ index }
-										getBlocksBeforeCurrentCell={
-											getBlocksBeforeCurrentCell
-										}
 									/>
-								);
-							} )
-						) }
-					{ ! isManualGrid &&
-						Array.from( { length: gridInfo.numItems }, ( _, i ) => (
-							<div
-								key={ i }
-								className="block-editor-grid-visualizer__item"
-								style={ {
-									boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${ gridInfo.currentColor } 20%, #0000)`,
-								} }
-							/>
-						) ) }
+								)
+						  ) }
 				</div>
 			</BlockPopoverCover>
 		);
