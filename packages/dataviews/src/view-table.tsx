@@ -261,8 +261,10 @@ function BulkSelectionCheckbox< Item extends AnyItem >( {
 			);
 		} );
 	}, [ data, actions ] );
-	const selectedItems = data.filter( ( item ) =>
-		selection.includes( getItemId( item ) )
+	const selectedItems = data.filter(
+		( item ) =>
+			selection.includes( getItemId( item ) ) &&
+			selectableItems.includes( item )
 	);
 	const areAllSelected = selectedItems.length === selectableItems.length;
 	return (
