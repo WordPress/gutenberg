@@ -474,8 +474,12 @@ export default function PagePages() {
 				actionId === 'move-to-trash' ||
 				actionId === 'permanently-delete'
 			) {
-				if ( items.some( ( item ) => getItemId( item ) === postId ) ) {
-					const { params } = history.getLocationWithParams();
+				const { params } = history.getLocationWithParams();
+				if (
+					items.some(
+						( item ) => getItemId( item ) === params.postId
+					)
+				) {
 					// remove the post id from the url in case it was deleted.
 					history.push( {
 						...params,
@@ -484,7 +488,7 @@ export default function PagePages() {
 				}
 			}
 		},
-		[ history, postId ]
+		[ history ]
 	);
 
 	const postTypeActions = usePostActions( {
