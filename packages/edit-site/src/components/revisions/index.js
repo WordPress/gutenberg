@@ -74,7 +74,6 @@ function Revisions( { userConfig, blocks } ) {
 				name="revisions"
 				tabIndex={ 0 }
 			>
-				<EditorStyles styles={ editorStyles } />
 				<style>
 					{
 						// Forming a "block formatting context" to prevent margin collapsing.
@@ -88,6 +87,7 @@ function Revisions( { userConfig, blocks } ) {
 						settings={ settings }
 					>
 						<BlockList renderAppender={ false } />
+						<EditorStyles styles={ editorStyles } />
 					</ExperimentalBlockEditorProvider>
 				</Disabled>
 			</Iframe>
