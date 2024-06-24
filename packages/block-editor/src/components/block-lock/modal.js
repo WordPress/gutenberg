@@ -103,77 +103,101 @@ export default function BlockLockModal( { clientId, onClose } ) {
 							'Choose specific attributes to restrict or lock all available options.'
 						) }
 					</legend>
-					<CheckboxControl
-						__nextHasNoMarginBottom
-						className="block-editor-block-lock-modal__options-all"
-						label={ __( 'Lock all' ) }
-						checked={ isAllChecked }
-						indeterminate={ isMixed }
-						onChange={ ( newValue ) =>
-							setLock( {
-								move: newValue,
-								remove: newValue,
-								...( allowsEditLocking
-									? { edit: newValue }
-									: {} ),
-							} )
-						}
-					/>
-					<ul className="block-editor-block-lock-modal__checklist">
-						{ allowsEditLocking && (
-							<li className="block-editor-block-lock-modal__checklist-item">
-								<CheckboxControl
-									__nextHasNoMarginBottom
-									label={ __( 'Restrict editing' ) }
-									checked={ !! lock.edit }
-									onChange={ ( edit ) =>
-										setLock( ( prevLock ) => ( {
-											...prevLock,
-											edit,
-										} ) )
-									}
-								/>
-								<Icon
-									className="block-editor-block-lock-modal__lock-icon"
-									icon={ lock.edit ? lockIcon : unlockIcon }
-								/>
-							</li>
-						) }
-						<li className="block-editor-block-lock-modal__checklist-item">
+					{ /*
+					 * Disable reason: The `list` ARIA role is redundant but
+					 * Safari+VoiceOver won't announce the list otherwise.
+					 */
+					/* eslint-disable jsx-a11y/no-redundant-roles */ }
+					<ul
+						role="list"
+						className="block-editor-block-lock-modal__checklist"
+					>
+						<li>
 							<CheckboxControl
 								__nextHasNoMarginBottom
-								label={ __( 'Disable movement' ) }
-								checked={ lock.move }
-								onChange={ ( move ) =>
-									setLock( ( prevLock ) => ( {
-										...prevLock,
-										move,
-									} ) )
+								className="block-editor-block-lock-modal__options-all"
+								label={ __( 'Lock all' ) }
+								checked={ isAllChecked }
+								indeterminate={ isMixed }
+								onChange={ ( newValue ) =>
+									setLock( {
+										move: newValue,
+										remove: newValue,
+										...( allowsEditLocking
+											? { edit: newValue }
+											: {} ),
+									} )
 								}
 							/>
-							<Icon
-								className="block-editor-block-lock-modal__lock-icon"
-								icon={ lock.move ? lockIcon : unlockIcon }
-							/>
-						</li>
-						<li className="block-editor-block-lock-modal__checklist-item">
-							<CheckboxControl
-								__nextHasNoMarginBottom
-								label={ __( 'Prevent removal' ) }
-								checked={ lock.remove }
-								onChange={ ( remove ) =>
-									setLock( ( prevLock ) => ( {
-										...prevLock,
-										remove,
-									} ) )
-								}
-							/>
-							<Icon
-								className="block-editor-block-lock-modal__lock-icon"
-								icon={ lock.remove ? lockIcon : unlockIcon }
-							/>
+							<ul
+								role="list"
+								className="block-editor-block-lock-modal__checklist"
+							>
+								{ allowsEditLocking && (
+									<li className="block-editor-block-lock-modal__checklist-item">
+										<CheckboxControl
+											__nextHasNoMarginBottom
+											label={ __( 'Restrict editing' ) }
+											checked={ !! lock.edit }
+											onChange={ ( edit ) =>
+												setLock( ( prevLock ) => ( {
+													...prevLock,
+													edit,
+												} ) )
+											}
+										/>
+										<Icon
+											className="block-editor-block-lock-modal__lock-icon"
+											icon={
+												lock.edit
+													? lockIcon
+													: unlockIcon
+											}
+										/>
+									</li>
+								) }
+								<li className="block-editor-block-lock-modal__checklist-item">
+									<CheckboxControl
+										__nextHasNoMarginBottom
+										label={ __( 'Disable movement' ) }
+										checked={ lock.move }
+										onChange={ ( move ) =>
+											setLock( ( prevLock ) => ( {
+												...prevLock,
+												move,
+											} ) )
+										}
+									/>
+									<Icon
+										className="block-editor-block-lock-modal__lock-icon"
+										icon={
+											lock.move ? lockIcon : unlockIcon
+										}
+									/>
+								</li>
+								<li className="block-editor-block-lock-modal__checklist-item">
+									<CheckboxControl
+										__nextHasNoMarginBottom
+										label={ __( 'Prevent removal' ) }
+										checked={ lock.remove }
+										onChange={ ( remove ) =>
+											setLock( ( prevLock ) => ( {
+												...prevLock,
+												remove,
+											} ) )
+										}
+									/>
+									<Icon
+										className="block-editor-block-lock-modal__lock-icon"
+										icon={
+											lock.remove ? lockIcon : unlockIcon
+										}
+									/>
+								</li>
+							</ul>
 						</li>
 					</ul>
+					{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
 					{ hasTemplateLock && (
 						<ToggleControl
 							__nextHasNoMarginBottom
