@@ -94,8 +94,6 @@ const UnforwardedFontSizePicker = (
 	const hasUnits =
 		typeof value === 'string' || typeof fontSizes[ 0 ]?.size === 'string';
 
-	const isDisabled = value === undefined;
-
 	return (
 		<Container ref={ ref } className="components-font-size-picker">
 			<VisuallyHidden as="legend">{ __( 'Font size' ) }</VisuallyHidden>
@@ -185,7 +183,6 @@ const UnforwardedFontSizePicker = (
 					<SizeControl
 						__next40pxDefaultSize={ __next40pxDefaultSize }
 						value={ value }
-						disabled={ isDisabled }
 						units={ units }
 						withSlider={ withSlider }
 						withReset={ withReset }
