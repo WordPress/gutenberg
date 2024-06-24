@@ -73,8 +73,9 @@ The `wp-interactive` directive "activates" the interactivity for the DOM element
 </div>
 ```
 
-> **Note**
-> The use of `data-wp-interactive` is a requirement for the Interactivity API "engine" to work. In the following examples the `data-wp-interactive` has not been added for the sake of simplicity. Also, the `data-wp-interactive` directive will be injected automatically in the future.
+<div class="callout callout-info">
+  The use of <code>data-wp-interactive</code> is a requirement for the Interactivity API "engine" to work. In the following examples the <code>data-wp-interactive</code> has not been added for the sake of simplicity. Also, the <code>data-wp-interactive</code> directive will be injected automatically in the future.
+</div>
 
 ### `wp-context`
 
@@ -892,9 +893,9 @@ const { state } = store( "myPlugin", {
   }
 } );
 ```
-
-> **Note**
-> All `store()` calls with the same namespace return the same references, i.e., the same `state`, `actions`, etc., containing the result of merging all the store parts passed.
+<div class="callout callout-info">
+  All <code>store()</code> calls with the same namespace return the same references, i.e., the same <code>state</code>, <code>actions</code>, etc., containing the result of merging all the store parts passed.
+</div>
 
 - To access the context inside an action, derived state, or side effect, you can use the `getContext` function.
 - To access the reference, you can use the `getElement` function.
