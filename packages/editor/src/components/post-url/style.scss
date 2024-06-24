@@ -2,6 +2,11 @@
 	width: 100%;
 }
 
+.editor-post-url__panel-toggle {
+	display: block;
+	overflow-wrap: break-word;
+}
+
 .editor-post-url__panel-dialog .editor-post-url {
 	// sidebar width - popover padding - form margin
 	min-width: $sidebar-width - $grid-unit-20 - $grid-unit-20;
@@ -19,10 +24,4 @@
 
 .editor-post-url__link-slug {
 	font-weight: 600;
-}
-
-// TODO: This might indicate a need to update the InputControl itself, as
-// there is no way currently to control the padding when adding prefix/suffix.
-.editor-post-url__input input.components-input-control__input {
-	padding-inline-start: 0 !important;
 }
