@@ -31,6 +31,7 @@ export default function save( { attributes } ) {
 		linkTarget,
 		sizeSlug,
 		title,
+		metadata,
 	} = attributes;
 
 	const newRel = ! rel ? undefined : rel;
@@ -70,9 +71,13 @@ export default function save( { attributes } ) {
 		/>
 	);
 
+	const isPatternOverridesEnabled =
+		metadata?.bindings?.__default?.source === 'core/pattern-overrides';
+
 	const figure = (
 		<>
-			{ href ? (
+			{ /* Don't add links in images with pattern overrides until they are supported. */ }
+			{ href && ! isPatternOverridesEnabled ? (
 				<a
 					className={ linkClass }
 					href={ href }
@@ -84,7 +89,8 @@ export default function save( { attributes } ) {
 			) : (
 				image
 			) }
-			{ ! RichText.isEmpty( caption ) && (
+			{ /* Don't add caption in images with pattern overrides until it is supported. */ }
+			{ ! RichText.isEmpty( caption ) && ! isPatternOverridesEnabled && (
 				<RichText.Content
 					className={ __experimentalGetElementClassName( 'caption' ) }
 					tagName="figcaption"

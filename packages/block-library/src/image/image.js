@@ -426,6 +426,9 @@ export default function Image( {
 		</InspectorControls>
 	);
 
+	const isPatternOverridesEnabled =
+		metadata?.bindings?.__default?.source === 'core/pattern-overrides';
+
 	const {
 		lockUrlControls = false,
 		lockHrefControls = false,
@@ -470,11 +473,11 @@ export default function Image( {
 				lockHrefControls:
 					// Disable editing the link of the URL if the image is inside a pattern instance.
 					// This is a temporary solution until we support overriding the link on the frontend.
-					hasParentPattern,
+					hasParentPattern || isPatternOverridesEnabled,
 				lockCaption:
 					// Disable editing the caption if the image is inside a pattern instance.
 					// This is a temporary solution until we support overriding the caption on the frontend.
-					hasParentPattern,
+					hasParentPattern || isPatternOverridesEnabled,
 				lockAltControls:
 					!! altBinding &&
 					! altBindingSource?.canUserEditValue( {
@@ -965,15 +968,20 @@ export default function Image( {
 			{ controls }
 			{ img }
 
-			<Caption
-				attributes={ attributes }
-				setAttributes={ setAttributes }
-				isSelected={ isSingleSelected }
-				insertBlocksAfter={ insertBlocksAfter }
-				label={ __( 'Image caption text' ) }
-				showToolbarButton={ isSingleSelected && hasNonContentControls }
-				readOnly={ lockCaption }
-			/>
+			{ /* Don't add caption in images with pattern overrides until it is supported. */ }
+			{ ! isPatternOverridesEnabled && (
+				<Caption
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					isSelected={ isSingleSelected }
+					insertBlocksAfter={ insertBlocksAfter }
+					label={ __( 'Image caption text' ) }
+					showToolbarButton={
+						isSingleSelected && hasNonContentControls
+					}
+					readOnly={ lockCaption }
+				/>
+			) }
 		</>
 	);
 }
