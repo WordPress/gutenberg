@@ -67,15 +67,18 @@ function useDarkThemeBodyClassName( styles, scope ) {
 	);
 }
 
-function EditorStyles( { styles, scope } ) {
-	const overrides = useSelect(
-		( select ) => unlock( select( blockEditorStore ) ).getStyleOverrides(),
-		[]
+function EditorStyles( { styles, scope, overrides } ) {
+	const styleOverrides = useSelect(
+		( select ) =>
+			! overrides
+				? unlock( select( blockEditorStore ) ).getStyleOverrides()
+				: overrides,
+		[ overrides ]
 	);
 	const [ transformedStyles, transformedSvgs ] = useMemo( () => {
 		const _styles = Object.values( styles ?? [] );
 
-		for ( const [ id, override ] of overrides ) {
+		for ( const [ id, override ] of styleOverrides ) {
 			const index = _styles.findIndex( ( { id: _id } ) => id === _id );
 			const overrideWithId = { ...override, id };
 			if ( index === -1 ) {
@@ -95,7 +98,7 @@ function EditorStyles( { styles, scope } ) {
 				.map( ( style ) => style.assets )
 				.join( '' ),
 		];
-	}, [ styles, overrides, scope ] );
+	}, [ styles, styleOverrides, scope ] );
 
 	return (
 		<>

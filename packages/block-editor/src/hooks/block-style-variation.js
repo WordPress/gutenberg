@@ -59,6 +59,72 @@ function getVariationNameFromClass( className, registeredStyles = [] ) {
 	return null;
 }
 
+export function useGetBlockVariationStylesWithConfig(
+	config,
+	variationOverrides = []
+) {
+	const { getBlockStyles } = useSelect( blocksStore );
+	const { getBlockName } = useSelect( blockEditorStore );
+
+	return useMemo( () => {
+		for ( const [ , override ] of variationOverrides ) {
+			if ( override?.variation && override?.clientId ) {
+				const blockName = getBlockName( override.clientId );
+				const configStyles =
+					config?.styles?.blocks?.[ blockName ]?.variations?.[
+						override.variation
+					];
+				if ( configStyles ) {
+					const variationConfig = {
+						settings: config?.settings,
+						// The variation style data is all that is needed to generate
+						// the styles for the current application to a block. The variation
+						// name is updated to match the instance specific class name.
+						styles: {
+							blocks: {
+								[ blockName ]: {
+									variations: {
+										[ `${ override.variation }-${ override.clientId }` ]:
+											configStyles,
+									},
+								},
+							},
+						},
+					};
+					const blockSelectors = getBlockSelectors(
+						getBlockTypes(),
+						getBlockStyles,
+						override.clientId
+					);
+					const hasBlockGapSupport = false;
+					const hasFallbackGapSupport = true;
+					const disableLayoutStyles = true;
+					const disableRootPadding = true;
+					const variationStyles = toStyles(
+						variationConfig,
+						blockSelectors,
+						hasBlockGapSupport,
+						hasFallbackGapSupport,
+						disableLayoutStyles,
+						disableRootPadding,
+						{
+							blockGap: false,
+							blockStyles: true,
+							layoutStyles: false,
+							marginReset: false,
+							presets: false,
+							rootPadding: false,
+							variationStyles: true,
+						}
+					);
+					override.css = variationStyles;
+				}
+			}
+		}
+		return variationOverrides;
+	}, [ config, variationOverrides ] );
+}
+
 function useBlockStyleVariation( name, variation, clientId ) {
 	// Prefer global styles data in GlobalStylesContext, which are available
 	// if in the site editor. Otherwise fall back to whatever is in the
@@ -157,6 +223,7 @@ function useBlockProps( { name, className, clientId } ) {
 		id: `variation-${ clientId }`,
 		css: variationStyles,
 		__unstableType: 'variation',
+		variation,
 		// The clientId will be stored with the override and used to ensure
 		// the order of overrides matches the order of blocks so that the
 		// correct CSS cascade is maintained.
