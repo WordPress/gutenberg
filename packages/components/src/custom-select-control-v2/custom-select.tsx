@@ -88,11 +88,13 @@ function _CustomSelect(
 		label,
 		size,
 		store,
+		className,
 		...restProps
 	} = props;
 
 	return (
-		<div>
+		// Where should `restProps` be forwarded to?
+		<div className={ className }>
 			{ hideLabelFromVision ? ( // TODO: Replace with BaseControl
 				<VisuallyHidden as="label">{ label }</VisuallyHidden>
 			) : (
