@@ -172,12 +172,10 @@ function ActionsMenuGroup< Item extends AnyItem >( {
 	);
 }
 
-const EMPTY_SELECTION: string[] = [];
-
 export default function BulkActions< Item extends AnyItem >( {
 	data,
 	actions,
-	selection = EMPTY_SELECTION,
+	selection,
 	onSelectionChange,
 	getItemId,
 }: BulkActionsProps< Item > ) {
