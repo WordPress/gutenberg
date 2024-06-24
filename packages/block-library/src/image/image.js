@@ -967,6 +967,7 @@ export default function Image( {
 		<>
 			{ controls }
 			{ img }
+
 			<Caption
 				attributes={ attributes }
 				setAttributes={ setAttributes }
