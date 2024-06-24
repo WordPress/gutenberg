@@ -199,15 +199,6 @@ function ChildLayoutControlsPure( { clientId, style, setAttributes } ) {
 					blockClientId={ clientId }
 				/>
 			) }
-			{ isManualGrid && window.__experimentalEnableGridInteractivity && (
-				<GridItemMovers
-					layout={ style?.layout }
-					parentLayout={ parentLayout }
-					onChange={ updateLayout }
-					gridClientId={ rootClientId }
-					blockClientId={ clientId }
-				/>
-			) }
 		</>
 	);
 }
