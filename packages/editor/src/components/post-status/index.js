@@ -10,6 +10,10 @@ import {
 	TextControl,
 	RadioControl,
 } from '@wordpress/components';
+/**
+ * Internal dependencies
+ */
+import PostStickyPanel from '../post-sticky';
 import { __, sprintf } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useState, useMemo } from '@wordpress/element';
@@ -281,6 +285,7 @@ export default function PostStatus() {
 											) }
 										</VStack>
 									) }
+									<PostStickyPanel />
 								</VStack>
 							</form>
 						</>
