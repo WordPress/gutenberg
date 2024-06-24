@@ -245,10 +245,6 @@ function useDropZoneWithValidation( {
 	onDragEnter,
 	onDragLeave,
 	onDrop,
-	color,
-	gridClientId,
-	index,
-	getBlocksBeforeCurrentCell,
 } ) {
 	const { getDraggedBlockClientIds } = useSelect( blockEditorStore );
 	return useDropZone( {
@@ -265,13 +261,6 @@ function useDropZoneWithValidation( {
 			const [ srcClientId ] = getDraggedBlockClientIds();
 			if ( srcClientId && validateDrag( srcClientId ) ) {
 				onDrop( srcClientId );
-				__unstableMarkNextChangeAsNotPersistent();
-				moveBlocksToPosition(
-					[ srcClientId ],
-					gridClientId,
-					gridClientId,
-					getBlocksBeforeCurrentCell( index )
-				);
 			}
 		},
 	} );
