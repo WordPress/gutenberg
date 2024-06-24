@@ -468,8 +468,7 @@
 								"increment": {
 									"description": "The amount to increment each step by.",
 									"type": "number",
-									"exclusiveMinimum": true,
-									"minimum": 0,
+									"exclusiveMinimum": 0,
 									"default": 1.5
 								},
 								"steps": {
@@ -482,8 +481,7 @@
 								"mediumStep": {
 									"description": "The value to medium setting in the scale.",
 									"type": "number",
-									"exclusiveMinimum": true,
-									"minimum": 0,
+									"exclusiveMinimum": 0,
 									"default": 1.5
 								},
 								"unit": {
