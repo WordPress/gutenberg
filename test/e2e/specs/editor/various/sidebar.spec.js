@@ -125,8 +125,8 @@ test.describe( 'Sidebar', () => {
 		const postDiscussionPanel = page.getByRole( 'button', {
 			name: 'Change discussion options',
 		} );
-		const postSummarySection = page.getByRole( 'checkbox', {
-			name: 'Sticky',
+		const postSummarySection = page.getByRole( 'button', {
+			name: 'admin',
 		} );
 
 		await expect( postExcerptPanel ).toBeVisible();
