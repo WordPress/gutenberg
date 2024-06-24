@@ -14,7 +14,7 @@
 			flex-wrap: wrap;
 			column-gap: $grid-unit-10;
 			row-gap: $grid-unit-05;
-			hyphens: auto;
+			word-break: break-word;
 		}
 	}
 
