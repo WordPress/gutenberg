@@ -110,14 +110,12 @@ export default function EditSiteEditor( { isLoading } ) {
 			{
 				// Forming a "block formatting context" to prevent margin collapsing.
 				// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
-
-				css: `body{${
+				css:
 					canvasMode === 'view'
-						? `min-height: 100vh; ${
+						? `body{min-height: 100vh; ${
 								currentPostIsTrashed ? '' : 'cursor: pointer;'
-						  }`
-						: ''
-				}}}`,
+						  }}`
+						: undefined,
 			},
 		],
 		[ settings.styles, canvasMode, currentPostIsTrashed ]

@@ -1038,13 +1038,16 @@ export const duplicateTemplatePartAction = {
 };
 
 export function usePostActions( { postType, onActionPerformed, context } ) {
-	const { defaultActions, postTypeObject } = useSelect(
+	const { defaultActions, postTypeObject, userCanCreatePostType } = useSelect(
 		( select ) => {
-			const { getPostType } = select( coreStore );
+			const { getPostType, canUser } = select( coreStore );
 			const { getEntityActions } = unlock( select( editorStore ) );
+			const _postTypeObject = getPostType( postType );
+			const resource = _postTypeObject?.rest_base || '';
 			return {
-				postTypeObject: getPostType( postType ),
+				postTypeObject: _postTypeObject,
 				defaultActions: getEntityActions( 'postType', postType ),
+				userCanCreatePostType: canUser( 'create', resource ),
 			};
 		},
 		[ postType ]
@@ -1073,8 +1076,10 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 				  ! isPattern &&
 				  duplicatePostAction
 				: false,
-			isTemplateOrTemplatePart && duplicateTemplatePartAction,
-			isPattern && duplicatePatternAction,
+			isTemplateOrTemplatePart &&
+				userCanCreatePostType &&
+				duplicateTemplatePartAction,
+			isPattern && userCanCreatePostType && duplicatePatternAction,
 			supportsTitle && renamePostAction,
 			isPattern && exportPatternAsJSONAction,
 			isTemplateOrTemplatePart ? resetTemplateAction : restorePostAction,
@@ -1141,6 +1146,7 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 		return actions;
 	}, [
 		defaultActions,
+		userCanCreatePostType,
 		isTemplateOrTemplatePart,
 		isPattern,
 		postTypeObject?.viewable,

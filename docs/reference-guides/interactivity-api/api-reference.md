@@ -336,7 +336,7 @@ to run sooner. Use this async version whenever there is no need for synchronous 
 ### `wp-on-window`
 
 > [!NOTE]  
-> Consider using the more performant [`wp-on-window-async`](#wp-on-window-async) instead if your directive code does not need synchronous access to the event object. If synchronous access is required, consider implementing an [async action](#async-actions) which yields to the main thread after calling the synchronous API.
+> Consider using the more performant [`wp-on-async-window`](#wp-on-async-window) instead if your directive code does not need synchronous access to the event object. If synchronous access is required, consider implementing an [async action](#async-actions) which yields to the main thread after calling the synchronous API.
 
 This directive allows you to attach global window events like `resize`, `copy`, and `focus` and then execute a defined callback when those happen.
 
@@ -365,14 +365,14 @@ store( "myPlugin", {
 
 The callback passed as the reference receives [the event](https://developer.mozilla.org/en-US/docs/Web/API/Event) (`event`), and the returned value by this callback is ignored. When the element is removed from the DOM, the event listener is also removed.
 
-### `wp-on-window-async`
+### `wp-on-async-window`
 
 Similar to `wp-on-async`, this is an optimized version of `wp-on-window` that immediately yields to main to avoid contributing to a long task. Use this async version whenever there is no need for synchronous access to the `event` object, in particular the methods `event.preventDefault()`, `event.stopPropagation()`, and `event.stopImmediatePropagation()`. This event listener is also added as [`passive`](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#passive).
 
 ### `wp-on-document`
 
 > [!NOTE]  
-> Consider using the more performant [`wp-on-document-async`](#wp-on-document-async) instead if your directive code does not need synchronous access to the event object. If synchronous access is required, consider implementing an [async action](#async-actions) which yields to the main thread after calling the synchronous API.
+> Consider using the more performant [`wp-on-async-document`](#wp-on-async-document) instead if your directive code does not need synchronous access to the event object. If synchronous access is required, consider implementing an [async action](#async-actions) which yields to the main thread after calling the synchronous API.
 
 This directive allows you to attach global document events like `scroll`, `mousemove`, and `keydown` and then execute a defined callback when those happen.
 
@@ -401,7 +401,7 @@ store( "myPlugin", {
 
 The callback passed as the reference receives [the event](https://developer.mozilla.org/en-US/docs/Web/API/Event) (`event`), and the returned value by this callback is ignored. When the element is removed from the DOM, the event listener is also removed.
 
-### `wp-on-document-async`
+### `wp-on-async-document`
 
 Similar to `wp-on-async`, this is an optimized version of `wp-on-document` that immediately yields to main to avoid contributing to a long task. Use this async version whenever there is no need for synchronous access to the `event` object, in particular the methods `event.preventDefault()`, `event.stopPropagation()`, and `event.stopImmediatePropagation()`. This event listener is also added as [`passive`](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#passive).
 
