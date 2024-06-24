@@ -147,7 +147,7 @@ function FlexControls( {
 				<ToggleGroupControlOption
 					key="fill"
 					value="fill"
-					label={ __( 'Fill' ) }
+					label={ __( 'Grow' ) }
 				/>
 				<ToggleGroupControlOption
 					key="fixed"
