@@ -423,18 +423,18 @@ function PagesList( { hasResolved, pages } ) {
 	);
 }
 
-const root = createRoot(
-	document.querySelector( '#my-first-gutenberg-app' )
-);
-window.addEventListener(
-	'load',
-	function () {
-		root.render(
-			<MyFirstApp />
-		);
-	},
-	false
-);
+document.addEventListener( 'DOMContentLoaded', function() {
+	const root = createRoot( document.querySelector( '#my-first-gutenberg-app' ) );
+	window.addEventListener(
+		'load',
+		function () {
+			root.render(
+				<MyFirstApp />
+			);
+		},
+		false
+	);
+});
 ```
 
 All that’s left is to refresh the page and enjoy the brand new status indicator:
