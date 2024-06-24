@@ -24,6 +24,7 @@ import WritingModeControl from '../writing-mode-control';
 import { getValueFromVariable, TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
 import { setImmutably } from '../../utils/object';
 import { getMergedFontFamiliesAndFontFamilyFaces } from './typography-utils';
+import { getFontStylesAndWeights } from '../../utils/get-font-styles-and-weights';
 
 const MIN_TEXT_COLUMNS = 1;
 const MAX_TEXT_COLUMNS = 6;
@@ -252,13 +253,15 @@ export default function TypographyPanel( {
 
 	// Check if previous font style and weight values are available in the new font family
 	useEffect( () => {
-		const isSystemFont = fontFamilyFaces.length === 0;
-		const hasFontStyle = fontFamilyFaces?.some(
-			( { fontStyle: fs } ) => fs === fontStyle
+		const { fontStyles, fontWeights, isSystemFont } =
+			getFontStylesAndWeights( fontFamilyFaces );
+		const hasFontStyle = fontStyles?.some(
+			( { value: fs } ) => fs === fontStyle
 		);
-		const hasFontWeight = fontFamilyFaces?.some(
-			( { fontWeight: fw } ) => fw === fontWeight
+		const hasFontWeight = fontWeights?.some(
+			( { value: fw } ) => fw === fontWeight
 		);
+
 		if ( isSystemFont || ( hasFontStyle && hasFontWeight ) ) {
 			setFontAppearance( {
 				fontStyle,
