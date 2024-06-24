@@ -967,20 +967,19 @@ export default function Image( {
 		<>
 			{ controls }
 			{ img }
-			{ /* Don't add caption component and controls in images with pattern overrides */ }
-			{ ! arePatternOverridesEnabled && (
-				<Caption
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-					isSelected={ isSingleSelected }
-					insertBlocksAfter={ insertBlocksAfter }
-					label={ __( 'Image caption text' ) }
-					showToolbarButton={
-						isSingleSelected && hasNonContentControls
-					}
-					readOnly={ lockCaption }
-				/>
-			) }
+			<Caption
+				attributes={ attributes }
+				setAttributes={ setAttributes }
+				isSelected={ isSingleSelected }
+				insertBlocksAfter={ insertBlocksAfter }
+				label={ __( 'Image caption text' ) }
+				showToolbarButton={
+					isSingleSelected &&
+					hasNonContentControls &&
+					! arePatternOverridesEnabled
+				}
+				readOnly={ lockCaption }
+			/>
 		</>
 	);
 }
