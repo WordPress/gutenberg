@@ -240,7 +240,13 @@ function Option< T extends Color | Gradient >( {
 						<RemoveButton
 							size="small"
 							icon={ lineSolid }
-							label={ __( 'Remove color' ) }
+							label={ sprintf(
+								// translators: %s is a color or gradient name, e.g. "Red".
+								__( 'Remove color: %s' ),
+								element.name.trim().length
+									? element.name
+									: value
+							) }
 							onClick={ onRemove }
 						/>
 					</FlexItem>
