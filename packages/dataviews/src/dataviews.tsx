@@ -108,6 +108,11 @@ export default function DataViews< Item extends AnyItem >( {
 		actions,
 		data
 	);
+	const _selection = useMemo( () => {
+		return selection.filter( ( id ) =>
+			data.some( ( item ) => getItemId( item ) === id )
+		);
+	}, [ selection, data, getItemId ] );
 	return (
 		<div className="dataviews-wrapper">
 			<HStack
@@ -141,7 +146,7 @@ export default function DataViews< Item extends AnyItem >( {
 							actions={ actions }
 							data={ data }
 							onSelectionChange={ onSetSelection }
-							selection={ selection }
+							selection={ _selection }
 							getItemId={ getItemId }
 						/>
 					) }
@@ -160,7 +165,7 @@ export default function DataViews< Item extends AnyItem >( {
 				isLoading={ isLoading }
 				onChangeView={ onChangeView }
 				onSelectionChange={ onSetSelection }
-				selection={ selection }
+				selection={ _selection }
 				setOpenedFilter={ setOpenedFilter }
 				view={ view }
 			/>
@@ -174,7 +179,7 @@ export default function DataViews< Item extends AnyItem >( {
 					<BulkActionsToolbar
 						data={ data }
 						actions={ actions }
-						selection={ selection }
+						selection={ _selection }
 						onSelectionChange={ onSetSelection }
 						getItemId={ getItemId }
 					/>

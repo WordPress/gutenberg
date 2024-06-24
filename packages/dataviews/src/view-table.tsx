@@ -298,7 +298,7 @@ function TableRow< Item extends AnyItem >( {
 	data,
 }: TableRowProps< Item > ) {
 	const hasPossibleBulkAction = useHasAPossibleBulkAction( actions, item );
-	const isSelected = selection.includes( id );
+	const isSelected = hasPossibleBulkAction && selection.includes( id );
 
 	const [ isHovered, setIsHovered ] = useState( false );
 
@@ -328,6 +328,9 @@ function TableRow< Item extends AnyItem >( {
 				isTouchDevice.current = true;
 			} }
 			onClick={ () => {
+				if ( ! hasPossibleBulkAction ) {
+					return;
+				}
 				if (
 					! isTouchDevice.current &&
 					document.getSelection()?.type !== 'Range'
