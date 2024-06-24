@@ -88,7 +88,7 @@ const SiteHub = memo(
 								<VisuallyHidden as="span">
 									{
 										/* translators: accessibility text */
-										__( 'View site (opens in a new tab)' )
+										__( '(opens in a new tab)' )
 									}
 								</VisuallyHidden>
 							</Button>
