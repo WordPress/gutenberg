@@ -183,7 +183,7 @@ function Player( {
 				{ ! isDisabled && (
 					<TouchableWithoutFeedback
 						accessibilityLabel={ __( 'Audio Player' ) }
-						accessibilityRole={ 'button' }
+						accessibilityRole="button"
 						accessibilityHint={ __(
 							'Double tap to listen the audio file'
 						) }
@@ -204,7 +204,7 @@ function Player( {
 							this.player = ref;
 						} }
 						controls={ false }
-						ignoreSilentSwitch={ 'ignore' }
+						ignoreSilentSwitch="ignore"
 						onFullscreenPlayerWillPresent={ () => {
 							setPaused( false );
 						} }

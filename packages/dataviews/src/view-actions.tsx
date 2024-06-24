@@ -303,7 +303,7 @@ function SortMenu< Item extends AnyItem >( {
 	);
 }
 
-const ViewActions = memo( function ViewActions< Item extends AnyItem >( {
+function _ViewActions< Item extends AnyItem >( {
 	fields,
 	view,
 	onChangeView,
@@ -339,6 +339,9 @@ const ViewActions = memo( function ViewActions< Item extends AnyItem >( {
 			</DropdownMenuGroup>
 		</DropdownMenu>
 	);
-} );
+}
+
+// A type assertion is used here to keep the type argument.
+const ViewActions = memo( _ViewActions ) as typeof _ViewActions;
 
 export default ViewActions;
