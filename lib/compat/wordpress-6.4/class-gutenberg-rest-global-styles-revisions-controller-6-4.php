@@ -93,7 +93,7 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_6_4 extends WP_REST_Glob
 		}
 
 		$schema = array(
-			'$schema'    => 'http://json-schema.org/draft-04/schema#',
+			'$schema'    => 'http://json-schema.org/draft-07/schema#',
 			'title'      => "{$this->parent_post_type}-revision",
 			'type'       => 'object',
 			// Base properties for every Revision.

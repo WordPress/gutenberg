@@ -221,7 +221,7 @@ if ( ! class_exists( 'WP_REST_Font_Collections_Controller' ) ) {
 			}
 
 			$schema = array(
-				'$schema'    => 'http://json-schema.org/draft-04/schema#',
+				'$schema'    => 'http://json-schema.org/draft-07/schema#',
 				'title'      => 'font-collection',
 				'type'       => 'object',
 				'properties' => array(

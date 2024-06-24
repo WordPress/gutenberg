@@ -286,7 +286,7 @@ if ( ! class_exists( 'WP_REST_Font_Families_Controller' ) ) {
 			}
 
 			$schema = array(
-				'$schema'    => 'http://json-schema.org/draft-04/schema#',
+				'$schema'    => 'http://json-schema.org/draft-07/schema#',
 				'title'      => $this->post_type,
 				'type'       => 'object',
 				// Base properties for every Post.

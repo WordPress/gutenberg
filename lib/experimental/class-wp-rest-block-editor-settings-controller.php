@@ -112,7 +112,7 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 			}
 
 			$schema = array(
-				'$schema'    => 'http://json-schema.org/draft-04/schema#',
+				'$schema'    => 'http://json-schema.org/draft-07/schema#',
 				'title'      => 'block-editor-settings-item',
 				'type'       => 'object',
 				'properties' => array(

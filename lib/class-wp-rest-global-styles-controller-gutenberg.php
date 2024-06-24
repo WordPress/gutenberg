@@ -530,7 +530,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 		}
 
 		$schema = array(
-			'$schema'    => 'http://json-schema.org/draft-04/schema#',
+			'$schema'    => 'http://json-schema.org/draft-07/schema#',
 			'title'      => $this->post_type,
 			'type'       => 'object',
 			'properties' => array(
