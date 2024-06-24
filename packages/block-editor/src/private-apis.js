@@ -23,7 +23,7 @@ import { BlockRemovalWarningModal } from './components/block-removal-warning-mod
 import {
 	useLayoutClasses,
 	useLayoutStyles,
-	useGetBlockVariationStylesWithConfig,
+	useUpdateBlockVariationOverridesWithConfig,
 } from './hooks';
 import DimensionsTool from './components/dimensions-tool';
 import ResolutionTool from './components/resolution-tool';
@@ -92,5 +92,5 @@ lock( privateApis, {
 	PrivatePublishDateTimePicker,
 	useSpacingSizes,
 	useBlockDisplayTitle,
-	useGetBlockVariationStylesWithConfig,
+	useUpdateBlockVariationOverridesWithConfig,
 } );

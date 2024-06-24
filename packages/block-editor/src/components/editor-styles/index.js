@@ -67,20 +67,35 @@ function useDarkThemeBodyClassName( styles, scope ) {
 	);
 }
 
+function getStyleOverrideById( overrides, id ) {
+	if ( ! overrides?.length || ! id ) {
+		return [];
+	}
+
+	return overrides.find( ( [ _id ] ) => _id === id ) || [];
+}
+
 function EditorStyles( { styles, scope, overrides } ) {
 	const styleOverrides = useSelect(
-		( select ) =>
-			! overrides
-				? unlock( select( blockEditorStore ) ).getStyleOverrides()
-				: overrides,
-		[ overrides ]
+		( select ) => unlock( select( blockEditorStore ) ).getStyleOverrides(),
+		[]
 	);
 	const [ transformedStyles, transformedSvgs ] = useMemo( () => {
 		const _styles = Object.values( styles ?? [] );
 
 		for ( const [ id, override ] of styleOverrides ) {
 			const index = _styles.findIndex( ( { id: _id } ) => id === _id );
-			const overrideWithId = { ...override, id };
+			/*
+			 * The `overrides` prop	in EditorStyles,
+			 * allows consumers to override any existing overrides.
+			 */
+			const [ incomingId, incomingOverride ] = getStyleOverrideById(
+				overrides,
+				id
+			);
+			const overrideWithId = incomingId
+				? { ...incomingOverride, id: incomingId }
+				: { ...override, id };
 			if ( index === -1 ) {
 				_styles.push( overrideWithId );
 			} else {

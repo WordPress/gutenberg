@@ -88,4 +88,4 @@ export { getTypographyClassesAndStyles } from './use-typography-props';
 export { getGapCSSValue } from './gap';
 export { useCachedTruthy } from './use-cached-truthy';
 export { useZoomOut } from './use-zoom-out';
-export { useGetBlockVariationStylesWithConfig } from './block-style-variation';
+export { useUpdateBlockVariationOverridesWithConfig } from './block-style-variation';

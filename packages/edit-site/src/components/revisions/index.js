@@ -25,7 +25,7 @@ const {
 	ExperimentalBlockEditorProvider,
 	GlobalStylesContext,
 	useGlobalStylesOutputWithConfig,
-	useGetBlockVariationStylesWithConfig,
+	useUpdateBlockVariationOverridesWithConfig,
 } = unlock( blockEditorPrivateApis );
 const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
 
@@ -33,16 +33,15 @@ function isObjectEmpty( object ) {
 	return ! object || Object.keys( object ).length === 0;
 }
 
-const cloneObject = ( obj ) => JSON.parse( JSON.stringify( obj ) );
 function RevisionStyles( { styles, config } ) {
 	const variationOverrides = useSelect(
 		( select ) => unlock( select( blockEditorStore ) ).getStyleOverrides(),
-		[ config ]
+		[]
 	);
 
-	const mergedOverrides = useGetBlockVariationStylesWithConfig(
+	const mergedOverrides = useUpdateBlockVariationOverridesWithConfig(
 		config,
-		cloneObject( variationOverrides )
+		variationOverrides
 	);
 
 	return <EditorStyles styles={ styles } overrides={ mergedOverrides } />;

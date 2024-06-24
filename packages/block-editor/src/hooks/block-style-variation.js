@@ -59,7 +59,16 @@ function getVariationNameFromClass( className, registeredStyles = [] ) {
 	return null;
 }
 
-export function useGetBlockVariationStylesWithConfig(
+/**
+ * This hook is used to generate new block style variation overrides
+ * based on an incoming theme config. If a matching style is found in the config,
+ * a new override is created and returned.
+ *
+ * @param {Object}               config             A global styles object, containing settings and styles.
+ * @param {Array<Array, Object>} variationOverrides An array of existing block variation overrides.
+ * @return {Array} An array of new block variation overrides.
+ */
+export function useUpdateBlockVariationOverridesWithConfig(
 	config,
 	variationOverrides = []
 ) {
@@ -67,7 +76,8 @@ export function useGetBlockVariationStylesWithConfig(
 	const { getBlockName } = useSelect( blockEditorStore );
 
 	return useMemo( () => {
-		for ( const [ , override ] of variationOverrides ) {
+		const newOverrides = [];
+		for ( const [ id, override ] of variationOverrides ) {
 			if ( override?.variation && override?.clientId ) {
 				const blockName = getBlockName( override.clientId );
 				const configStyles =
@@ -117,11 +127,14 @@ export function useGetBlockVariationStylesWithConfig(
 							variationStyles: true,
 						}
 					);
-					override.css = variationStyles;
+					newOverrides.push( [
+						id,
+						{ ...override, css: variationStyles },
+					] );
 				}
 			}
 		}
-		return variationOverrides;
+		return newOverrides;
 	}, [ config, variationOverrides ] );
 }
 
