@@ -38,15 +38,18 @@
 	&:focus,
 	&:active,
 	&:focus-visible {
+		color: $gray-100;
 		svg {
 			opacity: 1;
-			transition: opacity 0.1s ease-in-out;
 		}
 	}
 
 	svg {
 		opacity: 0;
 		vertical-align: middle;
+		padding-left: 4px;
+		transition: opacity 0.1s ease-in-out;
+		@include reduce-motion("transition");
 	}
 
 	&:focus {
