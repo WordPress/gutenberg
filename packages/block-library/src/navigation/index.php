@@ -160,6 +160,67 @@ class WP_Navigation_Block_Renderer {
 	}
 
 	/**
+	 * Returns the inner container attributes.
+	 *
+	 * @since 6.6.0
+	 *
+	 * @param array $extra_attributes The extra attributes to add.
+	 * @param string $exclude_class The class to exclude.
+	 * @return string Returns the inner container attributes.
+	 */
+	private static function get_inner_container_attributes( $extra_attributes = array(), $exclude_class = '' ) {
+		$new_attributes = WP_Block_Supports::get_instance()->apply_block_supports();
+
+		if ( empty( $new_attributes ) && empty( $extra_attributes ) ) {
+			return '';
+		}
+
+		// This is hardcoded on purpose.
+		// We only support a fixed list of attributes.
+		$attributes_to_merge = array( 'style', 'class', 'id' );
+		$attributes          = array();
+		foreach ( $attributes_to_merge as $attribute_name ) {
+			if ( empty( $new_attributes[ $attribute_name ] ) && empty( $extra_attributes[ $attribute_name ] ) ) {
+				continue;
+			}
+
+			if ( empty( $new_attributes[ $attribute_name ] ) ) {
+				$attributes[ $attribute_name ] = $extra_attributes[ $attribute_name ];
+				continue;
+			}
+
+			if ( empty( $extra_attributes[ $attribute_name ] ) ) {
+				$attributes[ $attribute_name ] = $new_attributes[ $attribute_name ];
+				continue;
+			}
+
+			$attributes[ $attribute_name ] = $extra_attributes[ $attribute_name ] . ' ' . $new_attributes[ $attribute_name ];
+		}
+
+		foreach ( $extra_attributes as $attribute_name => $value ) {
+			if ( ! in_array( $attribute_name, $attributes_to_merge, true ) ) {
+				$attributes[ $attribute_name ] = $value;
+			}
+		}
+
+		if ( ! empty( $exclude_class ) && isset( $attributes['class'] ) ) {
+			$preg_operation      = "/\b$exclude_class\b/";
+			$attributes['class'] = preg_replace( $preg_operation, '', $attributes['class'] );
+		}
+
+		if ( empty( $attributes ) ) {
+			return '';
+		}
+
+		$normalized_attributes = array();
+		foreach ( $attributes as $key => $value ) {
+			$normalized_attributes[] = $key . '="' . esc_attr( $value ) . '"';
+		}
+
+		return implode( ' ', $normalized_attributes );
+	}
+
+	/**
 	 * Returns the html for the inner blocks of the navigation block.
 	 *
 	 * @since 6.5.0
@@ -174,11 +235,12 @@ class WP_Navigation_Block_Renderer {
 
 		$style                = static::get_styles( $attributes );
 		$class                = static::get_classes( $attributes );
-		$container_attributes = get_block_wrapper_attributes(
+		$container_attributes = static::get_inner_container_attributes(
 			array(
 				'class' => 'wp-block-navigation__container ' . $class,
 				'style' => $style,
-			)
+			),
+			'wp-block-navigation'
 		);
 
 		$inner_blocks_html = '';
