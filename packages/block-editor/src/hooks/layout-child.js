@@ -187,6 +187,7 @@ function ChildLayoutControlsPure( { clientId, style, setAttributes } ) {
 					// Don't allow resizing beyond the grid visualizer.
 					bounds={ resizerBounds }
 					onChange={ updateLayout }
+					parentLayout={ parentLayout }
 				/>
 			) }
 			{ isManualGrid && window.__experimentalEnableGridInteractivity && (

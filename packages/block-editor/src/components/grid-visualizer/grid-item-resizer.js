@@ -11,9 +11,15 @@ import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-
 import BlockPopoverCover from '../block-popover/cover';
 import { getComputedCSS, getGridTracks, getClosestTrack } from './utils';
 
-export function GridItemResizer( { clientId, bounds, onChange } ) {
+export function GridItemResizer( {
+	clientId,
+	bounds,
+	onChange,
+	parentLayout,
+} ) {
 	const blockElement = useBlockElement( clientId );
 	const rootBlockElement = blockElement?.parentElement;
+	const { columnCount } = parentLayout;
 
 	if ( ! blockElement || ! rootBlockElement ) {
 		return null;
@@ -26,6 +32,7 @@ export function GridItemResizer( { clientId, bounds, onChange } ) {
 			blockElement={ blockElement }
 			rootBlockElement={ rootBlockElement }
 			onChange={ onChange }
+			isManualGrid={ !! columnCount }
 		/>
 	);
 }
@@ -36,6 +43,7 @@ function GridItemResizerInner( {
 	blockElement,
 	rootBlockElement,
 	onChange,
+	isManualGrid,
 } ) {
 	const [ resizeDirection, setResizeDirection ] = useState( null );
 	const [ enableSide, setEnableSide ] = useState( {
@@ -171,6 +179,8 @@ function GridItemResizerInner( {
 					onChange( {
 						columnSpan: columnEnd - columnStart + 1,
 						rowSpan: rowEnd - rowStart + 1,
+						columnStart: isManualGrid ? columnStart : undefined,
+						rowStart: isManualGrid ? rowStart : undefined,
 					} );
 				} }
 			/>
