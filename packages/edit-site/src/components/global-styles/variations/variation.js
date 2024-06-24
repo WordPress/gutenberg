@@ -18,7 +18,8 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { filterObjectByProperty } from '../../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
 import { unlock } from '../../../lock-unlock';
 
-const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
+const { mergeBaseAndUserConfigs, useResolvedBlockStyleVariationsConfig } =
+	unlock( editorPrivateApis );
 const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
 	blockEditorPrivateApis
 );
@@ -49,9 +50,15 @@ export default function Variation( { variation, children, isPill, property } ) {
 		}
 	};
 
+	const varitationWithBlockStyleVariation =
+		useResolvedBlockStyleVariationsConfig( variation );
 	const isActive = useMemo(
-		() => areGlobalStyleConfigsEqual( user, variation ),
-		[ user, variation ]
+		() =>
+			areGlobalStyleConfigsEqual(
+				user,
+				varitationWithBlockStyleVariation
+			),
+		[ user, varitationWithBlockStyleVariation ]
 	);
 
 	let label = variation?.title;

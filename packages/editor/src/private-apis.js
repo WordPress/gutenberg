@@ -22,6 +22,7 @@ import ResizableEditor from './components/resizable-editor';
 import {
 	mergeBaseAndUserConfigs,
 	GlobalStylesProvider,
+	useResolvedBlockStyleVariationsConfig,
 } from './components/global-styles-provider';
 
 const { store: interfaceStore, ...remainingInterfaceApis } = interfaceApis;
@@ -41,7 +42,7 @@ lock( privateApis, {
 	ToolsMoreMenuGroup,
 	ViewMoreMenuGroup,
 	ResizableEditor,
-
+	useResolvedBlockStyleVariationsConfig,
 	// This is a temporary private API while we're updating the site editor to use EditorProvider.
 	useBlockEditorSettings,
 	interfaceStore,
