@@ -7,7 +7,13 @@ import type { ComponentType } from 'react';
  * WordPress dependencies
  */
 import { __experimentalHStack as HStack } from '@wordpress/components';
-import { useMemo, useState, useCallback, useEffect } from '@wordpress/element';
+import {
+	useMemo,
+	useState,
+	useCallback,
+	useEffect,
+	useRef,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -92,8 +98,13 @@ export default function DataViews< Item extends AnyItem >( {
 	}
 	const [ openedFilter, setOpenedFilter ] = useState< string | null >( null );
 
+	const lastUpdatedSelectionBecauseOfItemRemoval = useRef< string[] >( [] );
+
 	useEffect( () => {
+		// We compare against lastUpdatedSelectionBecauseOfItemRemoval to make sure we don't trigger
+		// multiple set selection calls in loop for the same selection array that needs a change.
 		if (
+			selection !== lastUpdatedSelectionBecauseOfItemRemoval.current &&
 			selection.length > 0 &&
 			selection.some(
 				( id ) => ! data.some( ( item ) => getItemId( item ) === id )
@@ -108,8 +119,9 @@ export default function DataViews< Item extends AnyItem >( {
 					newSelection.includes( getItemId( item ) )
 				)
 			);
+			lastUpdatedSelectionBecauseOfItemRemoval.current = selection;
 		}
-	}, [ selection, data, getItemId, onSelectionChange ] );
+	}, [ selection, data, getItemId, onSelectionChange, setSelection ] );
 
 	const onSetSelection = useCallback(
 		( items: Item[] ) => {
