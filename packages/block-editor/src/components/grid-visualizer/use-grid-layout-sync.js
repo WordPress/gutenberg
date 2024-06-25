@@ -31,16 +31,14 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 		const updates = {};
 
 		const { columnCount, rowCount = 2 } = gridLayout;
-
 		const isManualGrid = !! columnCount;
 
 		if ( isManualGrid ) {
-			const rects = [];
-			const minimumNeededRows = Math.max(
-				Math.ceil( blockOrder.length / columnCount ),
-				rowCount
+			// Ensure there's enough rows to fit all blocks.
+			const minimumNeededRows = Math.ceil(
+				blockOrder.length / columnCount
 			);
-			if ( rowCount !== minimumNeededRows ) {
+			if ( rowCount < minimumNeededRows ) {
 				updates[ gridClientId ] = {
 					layout: {
 						...gridLayout,
@@ -48,6 +46,9 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 					},
 				};
 			}
+
+			const rects = [];
+
 			// Respect the position of blocks that already have a columnStart and rowStart value.
 			for ( const clientId of blockOrder ) {
 				const attributes = getBlockAttributes( clientId );
@@ -119,9 +120,6 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 		}
 
 		if ( Object.keys( updates ).length ) {
-			// TODO: remove this console log
-			// eslint-disable-next-line no-console
-			console.log( 'useGridLayoutSync updates', updates );
 			__unstableMarkNextChangeAsNotPersistent();
 			updateBlockAttributes(
 				Object.keys( updates ),
@@ -130,10 +128,13 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 			);
 		}
 	}, [
-		__unstableMarkNextChangeAsNotPersistent,
-		blockOrder,
-		getBlockAttributes,
+		// Actual deps to sync:
+		gridClientId,
 		gridLayout,
+		blockOrder,
+		// Needed for linter:
+		__unstableMarkNextChangeAsNotPersistent,
+		getBlockAttributes,
 		updateBlockAttributes,
 	] );
 }
