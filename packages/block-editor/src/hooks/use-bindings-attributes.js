@@ -177,20 +177,6 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 
 					const keptAttributes = { ...nextAttributes };
 
-					// Don't run bindings logic when a block is using pattern overrides but
-					// the user is editing the original pattern.
-					if (
-						! hasParentPattern &&
-						hasPatternOverridesDefaultBinding
-					) {
-						// Don't update caption and href in pattern overrides until they are supported.
-						delete keptAttributes?.caption;
-						delete keptAttributes?.href;
-
-						setAttributes( keptAttributes );
-						return;
-					}
-
 					const updatesBySource = new Map();
 
 					// Loop only over the updated attributes to avoid modifying the bound ones that haven't changed.
@@ -247,13 +233,20 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 						}
 					}
 
-					// Only apply normal attribute updates to blocks
-					// that have partial bindings. Currently this is
-					// only skipped for pattern overrides sources.
 					if (
-						! hasPatternOverridesDefaultBinding &&
+						// Don't update non-connected attributes if the block is using pattern overrides
+						// and the editing is happening while overriding the pattern (not editing the original).
+						! (
+							hasPatternOverridesDefaultBinding &&
+							hasParentPattern
+						) &&
 						Object.keys( keptAttributes ).length
 					) {
+						// Don't update caption and href until they are supported.
+						if ( hasPatternOverridesDefaultBinding ) {
+							delete keptAttributes?.caption;
+							delete keptAttributes?.href;
+						}
 						setAttributes( keptAttributes );
 					}
 				} );
