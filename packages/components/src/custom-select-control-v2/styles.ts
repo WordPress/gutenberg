@@ -136,6 +136,11 @@ export const SelectItem = styled( Ariakit.SelectItem )`
 	// Legacy line height is 28px.
 	// TODO: reassess for non-legacy v2
 	line-height: calc( 28px / ${ CONFIG.fontSize } );
+
+	&[aria-disabled='true'] {
+		opacity: 0.5;
+	}
+
 	&[data-active-item] {
 		background-color: ${ COLORS.theme.gray[ 300 ] };
 	}
