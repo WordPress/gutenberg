@@ -275,23 +275,39 @@ function GridLayoutColumnsAndRowsControl( {
 							label={ __( 'Columns' ) }
 						/>
 					</FlexItem>
-					{ allowSizingOnChildren &&
-						window.__experimentalEnableGridInteractivity && (
-							<FlexItem isBlock>
-								<NumberControl
-									size="__unstable-large"
-									onChange={ ( value ) => {
-										onChange( {
-											...layout,
-											rowCount: value,
-										} );
-									} }
-									value={ rowCount }
-									min={ 1 }
-									label={ __( 'Rows' ) }
-								/>
-							</FlexItem>
+
+					<FlexItem isBlock>
+						{ window.__experimentalEnableGridInteractivity &&
+						allowSizingOnChildren ? (
+							<NumberControl
+								size="__unstable-large"
+								onChange={ ( value ) => {
+									onChange( {
+										...layout,
+										rowCount: value,
+									} );
+								} }
+								value={ rowCount }
+								min={ 1 }
+								label={ __( 'Rows' ) }
+							/>
+						) : (
+							<RangeControl
+								value={ parseInt( columnCount, 10 ) } // RangeControl can't deal with strings.
+								onChange={ ( value ) =>
+									onChange( {
+										...layout,
+										columnCount: value,
+									} )
+								}
+								min={ 1 }
+								max={ 16 }
+								withInputField={ false }
+								label={ __( 'Columns' ) }
+								hideLabelFromVision
+							/>
 						) }
+					</FlexItem>
 				</Flex>
 			</fieldset>
 		</>
