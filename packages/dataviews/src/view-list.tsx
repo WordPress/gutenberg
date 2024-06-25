@@ -182,7 +182,7 @@ function ListItem< Item extends AnyItem >( {
 						</HStack>
 					</CompositeItem>
 				</div>
-				{ actions?.length > 0 && (
+				{ eligibleActions?.length > 0 && (
 					<HStack
 						spacing={ 1 }
 						justify="flex-end"
