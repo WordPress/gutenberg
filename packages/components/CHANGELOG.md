@@ -5,6 +5,7 @@
 ### Enhancements
 
 - Add `text-wrap: balance` fallback to all instances of `text-wrap: pretty` for greater cross browser compatibility. ([#62233](https://github.com/WordPress/gutenberg/pull/62233))
+- `__experimentalPaletteEdit`: improve the accessibility. ([#62753](https://github.com/WordPress/gutenberg/pull/62753))
 
 ### Bug Fixes
 
