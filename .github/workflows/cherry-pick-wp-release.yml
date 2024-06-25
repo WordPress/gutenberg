@@ -66,6 +66,7 @@ jobs:
                   git cherry-pick $COMMIT_SHA || echo "cherry-pick-failed" > result
                   if [ -f result ] && grep -q "cherry-pick-failed" result; then
                     echo "conflict=true" >> $GITHUB_ENV
+                    echo "commit_sha=$COMMIT_SHA" >> $GITHUB_ENV
                     git cherry-pick --abort
                   else
                     NEW_COMMIT_SHA=$(git rev-parse HEAD)
@@ -122,6 +123,7 @@ jobs:
               with:
                   script: |
                       const prNumber = context.issue.number;
+                      const commitSha = process.env.commit_sha;
                       const targetBranch = `wp/${process.env.version}`;
                       console.log(`prNumber: ${prNumber}`);
                       console.log(`targetBranch: ${targetBranch}`);
@@ -129,5 +131,24 @@ jobs:
                         owner: context.repo.owner,
                         repo: context.repo.repo,
                         issue_number: prNumber,
-                        body: `There was a conflict while trying to cherry-pick the commit to the ${targetBranch} branch. Please resolve the conflict manually and create a PR to the ${targetBranch} branch.`
+                        body: `There was a conflict while trying to cherry-pick the commit to the ${targetBranch} branch. Please resolve the conflict manually and create a PR to the ${targetBranch} branch.
+
+                        PRs to ${targetBranch} are similar to PRs to trunk, but you should base your PR on the ${targetBranch} branch instead of trunk.
+
+                        \`\`\`
+                        # Checkout the ${targetBranch} branch instead of trunk.
+                        git checkout ${targetBranch}
+                        # Create a new branch for your PR.
+                        git checkout -b my-branch
+                        # Cherry-pick the commit.
+                        git cherry-pick ${commitSha}
+                        # Resolve the conflict...
+                        git add .
+                        git cherry-pick --continue
+                        # Push the branch to the repository
+                        git push origin my-branch
+                        # Create a PR and set the base to the ${targetBranch} branch.
+                        # See https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/changing-the-base-branch-of-a-pull-request.
+                        \`\`\`
+                        `
                       });
