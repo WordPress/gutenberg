@@ -200,8 +200,7 @@
 	position: absolute;
 }
 
-// Hack to push into background when the media modal is open.
-// @TODO how to target the background panel specifically?
-.modal-open .components-dropdown__content {
-	z-index: 100000;
+// Push control panel into the background when the media modal is open.
+.modal-open .block-editor-global-styles-background-panel__popover {
+	z-index: z-index(".block-editor-global-styles-background-panel__popover");
 }

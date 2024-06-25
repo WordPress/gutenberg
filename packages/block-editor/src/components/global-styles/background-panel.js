@@ -57,6 +57,7 @@ const BACKGROUND_POPOVER_PROPS = {
 	placement: 'left-start',
 	offset: 36,
 	shift: true,
+	className: 'block-editor-global-styles-background-panel__popover',
 };
 const noop = () => {};
 
