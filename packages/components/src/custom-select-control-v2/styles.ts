@@ -21,10 +21,11 @@ const truncateStyles = css`
 	white-space: nowrap;
 `;
 
-export const WithHintWrapper = styled.div`
+export const ItemHintWrapper = styled.div`
 	display: flex;
 	justify-content: space-between;
 	flex: 1;
+	flex-wrap: wrap;
 `;
 
 export const SelectedExperimentalHintWrapper = styled.div`
@@ -36,7 +37,11 @@ export const SelectedExperimentalHintItem = styled.span`
 	margin-inline-start: ${ space( 2 ) };
 `;
 
-export const ExperimentalHintItem = styled.span`
+export const ItemHintContent = styled.span`
+	padding-inline-end: ${ space( 4 ) };
+`;
+
+export const ItemHint = styled.span`
 	color: ${ COLORS.theme.gray[ 600 ] };
 	text-align: right;
 	margin-inline-end: ${ space( 1 ) };
