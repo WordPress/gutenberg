@@ -13,6 +13,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { omit } from '../api/utils';
+import { isBindingSourceActiveKey } from './constants';
 
 /**
  * @typedef {Object} WPBlockCategory
@@ -373,15 +374,18 @@ export function collections( state = {}, action ) {
 
 export function blockBindingsSources( state = {}, action ) {
 	if ( action.type === 'REGISTER_BLOCK_BINDINGS_SOURCE' ) {
+		const { source } = action;
 		return {
 			...state,
-			[ action.sourceName ]: {
-				label: action.sourceLabel,
-				getValue: action.getValue,
-				setValue: action.setValue,
-				setValues: action.setValues,
-				getPlaceholder: action.getPlaceholder,
-				canUserEditValue: action.canUserEditValue || ( () => false ),
+			[ source.name ]: {
+				label: source.label,
+				getValue: source.getValue,
+				setValue: source.setValue,
+				setValues: source.setValues,
+				getPlaceholder: source.getPlaceholder,
+				canUserEditValue: source.canUserEditValue || ( () => false ),
+				[ isBindingSourceActiveKey ]:
+					source[ isBindingSourceActiveKey ],
 			},
 		};
 	}

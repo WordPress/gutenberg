@@ -3,15 +3,27 @@
  */
 import { _x } from '@wordpress/i18n';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../lock-unlock';
+
+const { isBindingSourceActiveKey } = unlock( blocksPrivateApis );
 
 const CONTENT = 'content';
 
 export default {
 	name: 'core/pattern-overrides',
 	label: _x( 'Pattern Overrides', 'block bindings source' ),
+	[ isBindingSourceActiveKey ]: ( { context } ) => {
+		return !! context[ 'pattern/overrides' ];
+	},
 	getValue( { registry, clientId, context, attributeName } ) {
 		const patternOverridesContent = context[ 'pattern/overrides' ];
 		const { getBlockAttributes } = registry.select( blockEditorStore );
+
 		const currentBlockAttributes = getBlockAttributes( clientId );
 
 		if ( ! patternOverridesContent ) {
@@ -31,7 +43,7 @@ export default {
 		return overridableValue === '' ? undefined : overridableValue;
 	},
 	setValues( { registry, clientId, attributes } ) {
-		const { getBlockAttributes, getBlockParentsByBlockName, getBlocks } =
+		const { getBlockAttributes, getBlockParentsByBlockName } =
 			registry.select( blockEditorStore );
 		const currentBlockAttributes = getBlockAttributes( clientId );
 		const blockName = currentBlockAttributes?.metadata?.name;
@@ -45,25 +57,6 @@ export default {
 			true
 		);
 
-		// If there is no pattern client ID, sync blocks with the same name and same attributes.
-		if ( ! patternClientId ) {
-			const syncBlocksWithSameName = ( blocks ) => {
-				for ( const block of blocks ) {
-					if ( block.attributes?.metadata?.name === blockName ) {
-						registry
-							.dispatch( blockEditorStore )
-							.updateBlockAttributes(
-								block.clientId,
-								attributes
-							);
-					}
-					syncBlocksWithSameName( block.innerBlocks );
-				}
-			};
-
-			syncBlocksWithSameName( getBlocks() );
-			return;
-		}
 		const currentBindingValue =
 			getBlockAttributes( patternClientId )?.[ CONTENT ];
 		registry

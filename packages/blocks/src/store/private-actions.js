@@ -49,12 +49,6 @@ export function addUnprocessedBlockType( name, blockType ) {
 export function registerBlockBindingsSource( source ) {
 	return {
 		type: 'REGISTER_BLOCK_BINDINGS_SOURCE',
-		sourceName: source.name,
-		sourceLabel: source.label,
-		getValue: source.getValue,
-		setValue: source.setValue,
-		setValues: source.setValues,
-		getPlaceholder: source.getPlaceholder,
-		canUserEditValue: source.canUserEditValue,
+		source,
 	};
 }
