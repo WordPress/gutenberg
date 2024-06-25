@@ -71,64 +71,56 @@
 	direction: ltr;
 }
 
+
 .block-editor-global-styles-background-panel__inspector-media-replace-container {
-	position: relative;
+	//position: relative;
 	border: 1px solid $gray-300;
 	border-radius: 2px;
-	justify-content: center;
-	align-items: stretch;
+	//justify-content: center;
+	//align-items: stretch;
 	// Full width. ToolsPanel lays out children in a grid.
 	grid-column: 1 / -1;
-
-	&.has-image {
-		display: flex;
-	}
 
 	&.is-open {
 		background-color: $gray-100;
 	}
 
-	.block-editor-global-styles-background-panel__inspector-preview-inner {
-		height: 100%;
-
-	}
-
 	.block-editor-global-styles-background-panel__image-tools-panel-item {
-		&.is-wide {
-			width: 100%;
-			.block-editor-global-styles-background-panel__inspector-preview-inner {
-				justify-content: center;
-			}
+		flex-grow: 1;
+		border: 0;
+		.components-dropdown {
+			display: block;
 		}
 	}
 
-	.block-editor-global-styles-background-panel__image-preview,
-	.block-editor-global-styles-background-panel__inspector-media-replace {
-		flex-grow: 1;
-	}
-
-	.block-editor-global-styles-background-panel__image-preview-content,
-	.block-editor-global-styles-background-panel__dropdown-toggle {
+	.block-editor-global-styles-background-panel__inspector-preview-inner {
 		height: 100%;
-		width: 100%;
-		padding-left: $grid-unit-15;
 	}
 
-	.block-editor-global-styles-background-panel__dropdown-toggle {
-		cursor: pointer;
-		background: transparent;
-		border: none;
+	.components-dropdown {
+		display: block;
+		height: 36px;
 	}
+}
 
+.block-editor-global-styles-background-panel__image-tools-panel-item {
+	border: 1px solid $gray-300;
+	border-radius: 2px;
+	// Full width. ToolsPanel lays out children in a grid.
+	grid-column: 1 / -1;
 	// Since there is no option to skip rendering the drag'n'drop icon in drop
 	// zone, we hide it for now.
 	.components-drop-zone__content-icon {
 		display: none;
 	}
 
+	.components-dropdown {
+		display: block;
+		height: 36px;
+	}
+
 	button.components-button {
 		color: $gray-900;
-		//box-shadow: inset 0 0 0 $border-width $gray-400;
 		width: 100%;
 		display: block;
 
@@ -140,20 +132,29 @@
 			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 		}
 	}
+}
 
-	.block-editor-global-styles-background-panel__inspector-media-replace-title {
-		word-break: break-all;
-		// The Button component is white-space: nowrap, and that won't work with line-clamp.
-		white-space: normal;
+.block-editor-global-styles-background-panel__image-preview-content,
+.block-editor-global-styles-background-panel__dropdown-toggle {
+	height: 100%;
+	width: 100%;
+	padding-left: $grid-unit-15;
+}
 
-		// Without this, the ellipsis can sometimes be partially hidden by the Button padding.
-		text-align: start;
-		text-align-last: center;
-	}
+.block-editor-global-styles-background-panel__dropdown-toggle {
+	cursor: pointer;
+	background: transparent;
+	border: none;
+}
 
-	.components-dropdown {
-		display: block;
-	}
+.block-editor-global-styles-background-panel__inspector-media-replace-title {
+	word-break: break-all;
+	// The Button component is white-space: nowrap, and that won't work with line-clamp.
+	white-space: normal;
+
+	// Without this, the ellipsis can sometimes be partially hidden by the Button padding.
+	text-align: start;
+	text-align-last: center;
 }
 
 .block-editor-global-styles-background-panel__inspector-image-indicator-wrapper {
@@ -197,13 +198,4 @@
 	height: 0;
 	width: 0;
 	position: absolute;
-}
-
-.block-editor-global-styles-background-panel__tab-panel {
-	padding: $grid-unit-20;
-	width: 260px;
-}
-
-.block-editor-global-styles-background-panel__size-controls .components-base-control {
-	width: 100%;
 }
