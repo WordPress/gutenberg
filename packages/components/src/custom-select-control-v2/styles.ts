@@ -137,6 +137,8 @@ export const SelectItem = styled( Ariakit.SelectItem )`
 	// TODO: reassess for non-legacy v2
 	line-height: calc( 28px / ${ CONFIG.fontSize } );
 
+	user-select: none;
+
 	&[aria-disabled='true'] {
 		opacity: 0.5;
 	}
