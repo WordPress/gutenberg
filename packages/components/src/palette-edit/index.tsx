@@ -272,7 +272,7 @@ function PaletteEditListView< T extends Color | Gradient >( {
 	slugPrefix,
 	isGradient,
 	popoverProps,
-	doneRef,
+	addColorRef,
 }: PaletteEditListViewProps< T > ) {
 	// When unmounting the component if there are empty elements (the user did not complete the insertion) clean them.
 	const elementsReference = useRef< typeof elements >();
@@ -315,7 +315,7 @@ function PaletteEditListView< T extends Color | Gradient >( {
 							onChange(
 								newElements.length ? newElements : undefined
 							);
-							doneRef.current?.focus();
+							addColorRef.current?.focus();
 						} }
 						slugPrefix={ slugPrefix }
 						popoverProps={ popoverProps }
@@ -394,7 +394,7 @@ export function PaletteEdit( {
 		[ isGradient, elements ]
 	);
 
-	const doneRef = useRef< HTMLButtonElement | null >( null );
+	const addColorRef = useRef< HTMLButtonElement | null >( null );
 
 	return (
 		<PaletteEditStyles>
@@ -405,7 +405,6 @@ export function PaletteEdit( {
 				<PaletteActionsContainer>
 					{ hasElements && isEditing && (
 						<DoneButton
-							ref={ doneRef }
 							size="small"
 							onClick={ () => {
 								setIsEditing( false );
@@ -417,6 +416,7 @@ export function PaletteEdit( {
 					) }
 					{ ! canOnlyChangeValues && (
 						<Button
+							ref={ addColorRef }
 							size="small"
 							isPressed={ isAdding }
 							icon={ plus }
@@ -543,7 +543,7 @@ export function PaletteEdit( {
 							slugPrefix={ slugPrefix }
 							isGradient={ isGradient }
 							popoverProps={ popoverProps }
-							doneRef={ doneRef }
+							addColorRef={ addColorRef }
 						/>
 					) }
 					{ ! isEditing && editingElement !== null && (

@@ -127,7 +127,7 @@ export type PaletteEditListViewProps< T extends Color | Gradient > = {
 	onChange: ( newElements?: T[] ) => void;
 	isGradient: T extends Gradient ? true : false;
 	canOnlyChangeValues: PaletteEditProps[ 'canOnlyChangeValues' ];
-	doneRef: React.RefObject< HTMLButtonElement >;
+	addColorRef: React.RefObject< HTMLButtonElement >;
 	editingElement?: EditingElement;
 	popoverProps?: PaletteEditProps[ 'popoverProps' ];
 	setEditingElement: ( newEditingElement?: EditingElement ) => void;
