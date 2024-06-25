@@ -109,6 +109,11 @@ export const SelectPopover = styled( Ariakit.SelectPopover )`
 	background: ${ COLORS.theme.background };
 	border: 1px solid ${ COLORS.theme.foreground };
 
+	max-height: min( var( --popover-available-height, 360px ), 360px );
+	flex-direction: column;
+	overflow: auto;
+	overscroll-behavior: contain;
+
 	&[data-focus-visible] {
 		outline: none; // outline will be on the trigger, rather than the popover
 	}
