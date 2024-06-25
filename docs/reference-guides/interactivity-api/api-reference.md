@@ -538,7 +538,7 @@ import { store, useState, useEffect } from '@wordpress/interactivity';
 const useInView = () => {
   const [ inView, setInView ] = useState( false );
   useEffect( () => {
-    const { ref } = getElement();
+    const { ref } = getElement();
     const observer = new IntersectionObserver( ( [ entry ] ) => {
       setInView( entry.isIntersecting );
     } );
@@ -564,6 +564,8 @@ store( 'myPlugin', {
 } );
 ```
 </details>
+
+It's important to note that, similar to (P)React components, the `ref` from `getElement()` is `null` during the first render. To properly access the DOM element reference, you typically need to use an effect-like hook such as `useEffect`, `useInit`, or `useWatch`. This ensures that the `getElement()` runs after the component has been mounted and the `ref` is available.
 
 ### `wp-key`
 
