@@ -9,11 +9,17 @@ import { useState, useEffect } from '@wordpress/element';
  */
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockPopoverCover from '../block-popover/cover';
-import { getComputedCSS } from './utils';
+import { getComputedCSS, getGridTracks, getClosestTrack } from './utils';
 
-export function GridItemResizer( { clientId, bounds, onChange } ) {
+export function GridItemResizer( {
+	clientId,
+	bounds,
+	onChange,
+	parentLayout,
+} ) {
 	const blockElement = useBlockElement( clientId );
 	const rootBlockElement = blockElement?.parentElement;
+	const { columnCount } = parentLayout;
 
 	if ( ! blockElement || ! rootBlockElement ) {
 		return null;
@@ -26,6 +32,9 @@ export function GridItemResizer( { clientId, bounds, onChange } ) {
 			blockElement={ blockElement }
 			rootBlockElement={ rootBlockElement }
 			onChange={ onChange }
+			isManualGrid={
+				!! columnCount && window.__experimentalEnableGridInteractivity
+			}
 		/>
 	);
 }
@@ -36,6 +45,7 @@ function GridItemResizerInner( {
 	blockElement,
 	rootBlockElement,
 	onChange,
+	isManualGrid,
 } ) {
 	const [ resizeDirection, setResizeDirection ] = useState( null );
 	const [ enableSide, setEnableSide ] = useState( {
@@ -171,59 +181,11 @@ function GridItemResizerInner( {
 					onChange( {
 						columnSpan: columnEnd - columnStart + 1,
 						rowSpan: rowEnd - rowStart + 1,
+						columnStart: isManualGrid ? columnStart : undefined,
+						rowStart: isManualGrid ? rowStart : undefined,
 					} );
 				} }
 			/>
 		</BlockPopoverCover>
-	);
-}
-
-/**
- * Given a grid-template-columns or grid-template-rows CSS property value, gets the start and end
- * position in pixels of each grid track.
- *
- * https://css-tricks.com/snippets/css/complete-guide-grid/#aa-grid-track
- *
- * @param {string} template The grid-template-columns or grid-template-rows CSS property value.
- *                          Only supports fixed sizes in pixels.
- * @param {number} gap      The gap between grid tracks in pixels.
- *
- * @return {Array<{start: number, end: number}>} An array of objects with the start and end
- *                                               position in pixels of each grid track.
- */
-function getGridTracks( template, gap ) {
-	const tracks = [];
-	for ( const size of template.split( ' ' ) ) {
-		const previousTrack = tracks[ tracks.length - 1 ];
-		const start = previousTrack ? previousTrack.end + gap : 0;
-		const end = start + parseFloat( size );
-		tracks.push( { start, end } );
-	}
-	return tracks;
-}
-
-/**
- * Given an array of grid tracks and a position in pixels, gets the index of the closest track to
- * that position.
- *
- * https://css-tricks.com/snippets/css/complete-guide-grid/#aa-grid-track
- *
- * @param {Array<{start: number, end: number}>} tracks   An array of objects with the start and end
- *                                                       position in pixels of each grid track.
- * @param {number}                              position The position in pixels.
- * @param {string}                              edge     The edge of the track to compare the
- *                                                       position to. Either 'start' or 'end'.
- *
- * @return {number} The index of the closest track to the position. 0-based, unlike CSS grid which
- *                  is 1-based.
- */
-function getClosestTrack( tracks, position, edge = 'start' ) {
-	return tracks.reduce(
-		( closest, track, index ) =>
-			Math.abs( track[ edge ] - position ) <
-			Math.abs( tracks[ closest ][ edge ] - position )
-				? index
-				: closest,
-		0
 	);
 }

@@ -82,7 +82,12 @@ export default function AddNewPageModal( { onSave, onClose } ) {
 	}
 
 	return (
-		<Modal title={ __( 'Draft a new page' ) } onRequestClose={ onClose }>
+		<Modal
+			title={ __( 'Draft a new page' ) }
+			onRequestClose={ onClose }
+			focusOnMount="firstContentElement"
+			size="small"
+		>
 			<form onSubmit={ createPage }>
 				<VStack spacing={ 3 }>
 					<TextControl
