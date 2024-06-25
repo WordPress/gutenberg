@@ -39,6 +39,7 @@ import AddNewPageModal from '../add-new-page';
 import Media from '../media';
 import { unlock } from '../../lock-unlock';
 import { useEditPostAction } from '../dataviews-actions';
+import { usePrevious } from '@wordpress/compose';
 
 const { usePostActions } = unlock( editorPrivateApis );
 const { useLocation, useHistory } = unlock( routerPrivateApis );
@@ -201,43 +202,18 @@ function FeaturedImage( { item, viewType } ) {
 	);
 }
 
-function usePostIdLinkInSelection(
-	selection,
-	setSelection,
-	isLoadingItems,
-	items
-) {
-	const {
-		params: { postId },
-	} = useLocation();
-	const [ postIdToSelect, setPostIdToSelect ] = useState( postId );
-	useEffect( () => {
-		if ( postId ) {
-			setPostIdToSelect( postId );
-		}
-	}, [ postId ] );
-
-	useEffect( () => {
-		if ( ! postIdToSelect ) {
-			return;
-		}
-		// Only try to select an item if the loading is complete and we have items.
-		if ( ! isLoadingItems && items && items.length ) {
-			// If the item is not in the current selection, select it.
-			if ( selection.length !== 1 || selection[ 0 ] !== postIdToSelect ) {
-				setSelection( [ postIdToSelect ] );
-			}
-			setPostIdToSelect( undefined );
-		}
-	}, [ postIdToSelect, selection, setSelection, isLoadingItems, items ] );
+function getItemId( item ) {
+	return item.id.toString();
 }
 
 export default function PagePages() {
 	const postType = 'page';
 	const [ view, setView ] = useView( postType );
 	const history = useHistory();
-
-	const [ selection, setSelection ] = useState( [] );
+	const {
+		params: { postId },
+	} = useLocation();
+	const [ selection, setSelection ] = useState( [ postId ] );
 
 	const onSelectionChange = useCallback(
 		( items ) => {
@@ -299,7 +275,19 @@ export default function PagePages() {
 		totalPages,
 	} = useEntityRecords( 'postType', postType, queryArgs );
 
-	usePostIdLinkInSelection( selection, setSelection, isLoadingPages, pages );
+	const ids = pages?.map( ( page ) => getItemId( page ) ) ?? [];
+	const prevIds = usePrevious( ids ) ?? [];
+	const deletedIds = prevIds.filter( ( id ) => ! ids.includes( id ) );
+	const postIdWasDeleted = deletedIds.includes( postId );
+
+	useEffect( () => {
+		if ( postIdWasDeleted ) {
+			history.push( {
+				...history.getLocationWithParams().params,
+				postId: undefined,
+			} );
+		}
+	}, [ postIdWasDeleted, history ] );
 
 	const { records: authors, isResolving: isLoadingAuthors } =
 		useEntityRecords( 'root', 'user', { per_page: -1 } );
@@ -569,7 +557,7 @@ export default function PagePages() {
 				selection={ selection }
 				setSelection={ setSelection }
 				onSelectionChange={ onSelectionChange }
-				getItemId={ ( item ) => item.id.toString() }
+				getItemId={ getItemId }
 			/>
 		</Page>
 	);

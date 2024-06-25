@@ -73,8 +73,9 @@ The `wp-interactive` directive "activates" the interactivity for the DOM element
 </div>
 ```
 
-> **Note**
-> The use of `data-wp-interactive` is a requirement for the Interactivity API "engine" to work. In the following examples the `data-wp-interactive` has not been added for the sake of simplicity. Also, the `data-wp-interactive` directive will be injected automatically in the future.
+<div class="callout callout-info">
+  The use of <code>data-wp-interactive</code> is a requirement for the Interactivity API "engine" to work. In the following examples the <code>data-wp-interactive</code> has not been added for the sake of simplicity. Also, the <code>data-wp-interactive</code> directive will be injected automatically in the future.
+</div>
 
 ### `wp-context`
 
@@ -299,8 +300,9 @@ The returned value is used to change the inner content of the element: `<div>val
 
 ### `wp-on`
 
-> [!NOTE]  
-> Consider using the more performant [`wp-on-async`](#wp-on-async) instead if your directive code does not need synchronous access to the event object. If synchronous access is required, consider implementing an [async action](#async-actions) which yields to the main thread after calling the synchronous API.
+<div class="callout callout-info">
+  Consider using the more performant <a href="#wp-on-async"><code>wp-on-async</code></a> instead if your directive code does not need synchronous access to the event object. If synchronous access is required, consider implementing an <a href="#async-actions"><code>async action</code></a> which yields to the main thread after calling the synchronous API.
+</div>
 
 This directive runs code on dispatched DOM events like `click` or `keyup`. The syntax is `data-wp-on--[event]` (like `data-wp-on--click` or `data-wp-on--keyup`).
 
@@ -335,8 +337,9 @@ to run sooner. Use this async version whenever there is no need for synchronous 
 
 ### `wp-on-window`
 
-> [!NOTE]  
-> Consider using the more performant [`wp-on-async-window`](#wp-on-async-window) instead if your directive code does not need synchronous access to the event object. If synchronous access is required, consider implementing an [async action](#async-actions) which yields to the main thread after calling the synchronous API.
+<div class="callout callout-info">
+  Consider using the more performant <a href="#wp-on-async-window"><code>wp-on-async-window</code></a> instead if your directive code does not need synchronous access to the event object. If synchronous access is required, consider implementing an <a href="#async-actions"><code>async action</code></a> which yields to the main thread after calling the synchronous API.
+</div>
 
 This directive allows you to attach global window events like `resize`, `copy`, and `focus` and then execute a defined callback when those happen.
 
@@ -371,8 +374,9 @@ Similar to `wp-on-async`, this is an optimized version of `wp-on-window` that im
 
 ### `wp-on-document`
 
-> [!NOTE]  
-> Consider using the more performant [`wp-on-async-document`](#wp-on-async-document) instead if your directive code does not need synchronous access to the event object. If synchronous access is required, consider implementing an [async action](#async-actions) which yields to the main thread after calling the synchronous API.
+<div class="callout callout-info">
+  Consider using the more performant <a href="#wp-on-async-document"><code>wp-on-async-document</code></a> instead if your directive code does not need synchronous access to the event object. If synchronous access is required, consider implementing an <a href="#async-actions"><code>async action</code></a> which yields to the main thread after calling the synchronous API.
+</div>
 
 This directive allows you to attach global document events like `scroll`, `mousemove`, and `keydown` and then execute a defined callback when those happen.
 
@@ -759,7 +763,7 @@ const { state, actions } = store("myPlugin", {
 });
 ```
 
-##### Async actions
+<h5 id="async-actions">Async actions</h5>
 
 Async actions should use generators instead of async/await.
 
@@ -889,9 +893,9 @@ const { state } = store( "myPlugin", {
   }
 } );
 ```
-
-> **Note**
-> All `store()` calls with the same namespace return the same references, i.e., the same `state`, `actions`, etc., containing the result of merging all the store parts passed.
+<div class="callout callout-info">
+  All <code>store()</code> calls with the same namespace return the same references, i.e., the same <code>state</code>, <code>actions</code>, etc., containing the result of merging all the store parts passed.
+</div>
 
 - To access the context inside an action, derived state, or side effect, you can use the `getContext` function.
 - To access the reference, you can use the `getElement` function.

@@ -1,5 +1,26 @@
 == Changelog ==
 
+= 18.6.1 =
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Block Library
+- Navigation block: Fix submenu not opening on macOS Safari. ([62800](https://github.com/WordPress/gutenberg/pull/62800))
+
+### Code Quality
+- Template Part: Improve how the tag name attribute is handled (#62785)(https://github.com/WordPress/gutenberg/pull/62785)
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@luisherranz @aaronjorbin @gziolo @westonruter @cbravobernal 
+
+
 = 18.6.0 =
 
 ## Changelog
