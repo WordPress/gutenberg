@@ -138,7 +138,7 @@ const GridVisualizerGrid = forwardRef(
 function GridVisualizerCell( { color, children } ) {
 	return (
 		<div
-			className="block-editor-grid-visualizer__item"
+			className="block-editor-grid-visualizer__cell"
 			style={ {
 				boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${ color } 20%, #0000)`,
 			} }
