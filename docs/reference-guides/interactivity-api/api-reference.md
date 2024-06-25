@@ -535,13 +535,14 @@ import { store, useState, useEffect } from '@wordpress/interactivity';
 
 // Unlike `data-wp-init` and `data-wp-watch`, you can use any hooks inside
 // `data-wp-run` callbacks.
-const useInView = ( ref ) => {
+const useInView = () => {
   const [ inView, setInView ] = useState( false );
   useEffect( () => {
+    const { ref } = getElement();
     const observer = new IntersectionObserver( ( [ entry ] ) => {
       setInView( entry.isIntersecting );
     } );
-    if ( ref ) observer.observe( ref );
+    observer.observe( ref );
     return () => ref && observer.unobserve( ref );
   }, []);
   return inView;
@@ -550,8 +551,7 @@ const useInView = ( ref ) => {
 store( 'myPlugin', {
   callbacks: {
     logInView: () => {
-      const { ref } = getElement();
-      const isInView = useInView( ref );
+      const isInView = useInView();
       useEffect( () => {
         if ( isInView ) {
           console.log( 'Inside' );
