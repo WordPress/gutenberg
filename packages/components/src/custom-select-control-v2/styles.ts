@@ -101,26 +101,53 @@ export const SelectPopover = styled( Ariakit.SelectPopover )`
 	}
 `;
 
-export const SelectItem = styled( Ariakit.SelectItem )`
-	cursor: default;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	padding: ${ ITEM_PADDING };
-	font-size: ${ CONFIG.fontSize };
-	// TODO: reassess line-height for non-legacy v2
-	line-height: 28px;
-	scroll-margin: ${ space( 1 ) };
-	user-select: none;
+export const SelectItem = styled( Ariakit.SelectItem )( ( {
+	size,
+}: {
+	size: NonNullable< CustomSelectButtonSize[ 'size' ] >;
+} ) => {
+	const getSize = () => {
+		const sizes = {
+			compact: {
+				paddingInlineStart: space( 2 ),
+				paddingInlineEnd: space( 1 ),
+			},
+			default: {
+				paddingInlineStart: space( 4 ),
+				paddingInlineEnd: space( 3 ),
+			},
+			small: {
+				paddingInlineStart: space( 2 ),
+				paddingInlineEnd: space( 1 ),
+			},
+		};
 
-	&[aria-disabled='true'] {
-		cursor: not-allowed;
-	}
+		return sizes[ size ] || sizes.default;
+	};
 
-	&[data-active-item] {
-		background-color: ${ COLORS.theme.gray[ 300 ] };
-	}
-`;
+	return css`
+		cursor: default;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: ${ ITEM_PADDING };
+		font-size: ${ CONFIG.fontSize };
+		// TODO: reassess line-height for non-legacy v2
+		line-height: 28px;
+		scroll-margin: ${ space( 1 ) };
+		user-select: none;
+
+		${ getSize() }
+
+		&[aria-disabled='true'] {
+			cursor: not-allowed;
+		}
+
+		&[data-active-item] {
+			background-color: ${ COLORS.theme.gray[ 300 ] };
+		}
+	`;
+} );
 
 export const SelectedItemCheck = styled( Ariakit.SelectItemCheck )`
 	display: flex;
