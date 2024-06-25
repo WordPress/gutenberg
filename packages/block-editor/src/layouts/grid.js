@@ -23,10 +23,7 @@ import { appendSelectors, getBlockGapCSS } from './utils';
 import { getGapCSSValue } from '../hooks/gap';
 import { shouldSkipSerialization } from '../hooks/utils';
 import { LAYOUT_DEFINITIONS } from './definitions';
-import {
-	GridVisualizer,
-	useGridLayoutSync,
-} from '../components/grid-visualizer';
+import { GridVisualizer, useGridLayoutSync } from '../components/grid';
 
 const RANGE_CONTROL_MAX_VALUES = {
 	px: 600,
