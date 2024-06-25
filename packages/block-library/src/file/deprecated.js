@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -127,7 +127,7 @@ const v3 = {
 					{ showDownloadButton && (
 						<a
 							href={ href }
-							className={ classnames(
+							className={ clsx(
 								'wp-block-file__button',
 								__experimentalGetElementClassName( 'button' )
 							) }

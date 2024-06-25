@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -103,6 +103,7 @@ export function ImageEdit( {
 	onReplace,
 	context,
 	clientId,
+	__unstableParentLayout: parentLayout,
 } ) {
 	const {
 		url = '',
@@ -144,7 +145,7 @@ export function ImageEdit( {
 				scale: undefined,
 			} );
 		}
-	}, [ align ] );
+	}, [ __unstableMarkNextChangeAsNotPersistent, align, setAttributes ] );
 
 	const { getSettings } = useSelect( blockEditorStore );
 	const blockEditingMode = useBlockEditingMode();
@@ -282,7 +283,7 @@ export function ImageEdit( {
 		<img
 			alt={ __( 'Edit image' ) }
 			title={ __( 'Edit image' ) }
-			className={ 'edit-image-preview' }
+			className="edit-image-preview"
 			src={ url }
 		/>
 	);
@@ -290,7 +291,7 @@ export function ImageEdit( {
 	const borderProps = useBorderProps( attributes );
 	const shadowProps = getShadowClassesAndStyles( attributes );
 
-	const classes = classnames( className, {
+	const classes = clsx( className, {
 		'is-transient': temporaryURL,
 		'is-resized': !! width || !! height,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
@@ -316,8 +317,11 @@ export function ImageEdit( {
 			return {
 				lockUrlControls:
 					!! metadata?.bindings?.url &&
-					( ! blockBindingsSource ||
-						blockBindingsSource?.lockAttributesEditing ),
+					! blockBindingsSource?.canUserEditValue( {
+						select,
+						context,
+						args: metadata?.bindings?.url?.args,
+					} ),
 				lockUrlControlsMessage: blockBindingsSource?.label
 					? sprintf(
 							/* translators: %s: Label of the bindings source. */
@@ -327,12 +331,12 @@ export function ImageEdit( {
 					: __( 'Connected to dynamic data' ),
 			};
 		},
-		[ isSingleSelected ]
+		[ isSingleSelected, metadata?.bindings?.url ]
 	);
 	const placeholder = ( content ) => {
 		return (
 			<Placeholder
-				className={ classnames( 'block-editor-media-placeholder', {
+				className={ clsx( 'block-editor-media-placeholder', {
 					[ borderProps.className ]:
 						!! borderProps.className && ! isSingleSelected,
 				} ) }
@@ -358,9 +362,7 @@ export function ImageEdit( {
 				} }
 			>
 				{ lockUrlControls ? (
-					<span
-						className={ 'block-bindings-media-placeholder-message' }
-					>
+					<span className="block-bindings-media-placeholder-message">
 						{ lockUrlControlsMessage }
 					</span>
 				) : (
@@ -385,6 +387,7 @@ export function ImageEdit( {
 				context={ context }
 				clientId={ clientId }
 				blockEditingMode={ blockEditingMode }
+				parentLayoutType={ parentLayout?.type }
 			/>
 			<MediaPlaceholder
 				icon={ <BlockIcon icon={ icon } /> }

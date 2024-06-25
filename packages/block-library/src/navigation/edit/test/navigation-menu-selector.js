@@ -191,7 +191,7 @@ describe( 'NavigationMenuSelector', () => {
 				expect( toolsGroup ).toBeInTheDocument();
 
 				const createMenuButton = screen.getByRole( 'menuitem', {
-					name: 'Create new menu',
+					name: 'Create new Menu',
 				} );
 
 				expect( createMenuButton ).toBeInTheDocument();
@@ -236,7 +236,7 @@ describe( 'NavigationMenuSelector', () => {
 				await user.click( toggleButton );
 
 				const createMenuButton = screen.getByRole( 'menuitem', {
-					name: 'Create new menu',
+					name: 'Create new Menu',
 				} );
 
 				await user.click( createMenuButton );
@@ -268,7 +268,7 @@ describe( 'NavigationMenuSelector', () => {
 
 				await user.click(
 					screen.getByRole( 'menuitem', {
-						name: 'Create new menu',
+						name: 'Create new Menu',
 					} )
 				);
 
@@ -293,7 +293,7 @@ describe( 'NavigationMenuSelector', () => {
 				// Check the "Create menu" button is disabled.
 				expect(
 					screen.queryByRole( 'menuitem', {
-						name: 'Create new menu',
+						name: 'Create new Menu',
 					} )
 				).toBeDisabled();
 
@@ -318,7 +318,7 @@ describe( 'NavigationMenuSelector', () => {
 				// Check the button is enabled again.
 				expect(
 					screen.queryByRole( 'menuitem', {
-						name: 'Create new menu',
+						name: 'Create new Menu',
 					} )
 				).toBeEnabled();
 			} );

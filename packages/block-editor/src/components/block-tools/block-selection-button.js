@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -107,8 +107,8 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 				isBlockTemplatePart,
 				isNextBlockTemplatePart,
 				isPrevBlockTemplatePart,
-				canRemove: canRemoveBlock( clientId, rootClientId ),
-				canMove: canMoveBlock( clientId, rootClientId ),
+				canRemove: canRemoveBlock( clientId ),
+				canMove: canMoveBlock( clientId ),
 			};
 		},
 		[ clientId, rootClientId ]
@@ -273,7 +273,7 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 		}
 	}
 
-	const classNames = classnames(
+	const classNames = clsx(
 		'block-editor-block-list__block-selection-button',
 		{
 			'is-block-moving-mode': !! blockMovingMode,

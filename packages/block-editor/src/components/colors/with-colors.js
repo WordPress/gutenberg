@@ -17,6 +17,8 @@ import {
 import { useSettings } from '../use-settings';
 import { unlock } from '../../lock-unlock';
 
+const { kebabCase } = unlock( componentsPrivateApis );
+
 /**
  * Capitalizes the first letter in a string.
  *
@@ -80,7 +82,6 @@ const withEditorColorPalette = () =>
  * @return {Component} The component that can be used as a HOC.
  */
 function createColorHOC( colorTypes, withColorPalette ) {
-	const { kebabCase } = unlock( componentsPrivateApis );
 	const colorMap = colorTypes.reduce( ( colorObject, colorType ) => {
 		return {
 			...colorObject,

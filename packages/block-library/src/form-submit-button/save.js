@@ -3,12 +3,11 @@
  */
 import { useBlockProps, InnerBlocks } from '@wordpress/block-editor';
 
-const Save = () => {
+export default function save() {
 	const blockProps = useBlockProps.save();
 	return (
 		<div className="wp-block-form-submit-wrapper" { ...blockProps }>
 			<InnerBlocks.Content />
 		</div>
 	);
-};
-export default Save;
+}

@@ -81,7 +81,7 @@ export const getEntityRecord =
 				entityConfig.syncConfig &&
 				! query
 			) {
-				if ( process.env.IS_GUTENBERG_PLUGIN ) {
+				if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 					const objectId = entityConfig.getSyncObjectId( key );
 
 					// Loads the persisted document.
@@ -278,7 +278,7 @@ export const getEntityRecords =
 				if ( ! query?._fields && ! query.context ) {
 					const key = entityConfig.key || DEFAULT_ENTITY_KEY;
 					const resolutionsArgs = records
-						.filter( ( record ) => record[ key ] )
+						.filter( ( record ) => record?.[ key ] )
 						.map( ( record ) => [ kind, name, record[ key ] ] );
 
 					dispatch( {
@@ -712,7 +712,8 @@ export const getDefaultTemplateId =
 		const template = await apiFetch( {
 			path: addQueryArgs( '/wp/v2/templates/lookup', query ),
 		} );
-		if ( template ) {
+		// Endpoint may return an empty object if no template is found.
+		if ( template?.id ) {
 			dispatch.receiveDefaultTemplateId( query, template.id );
 		}
 	};

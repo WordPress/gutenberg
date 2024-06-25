@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * Internal dependencies
@@ -22,12 +22,12 @@ export default function RangeMark(
 		...otherProps
 	} = props;
 
-	const classes = classnames(
+	const classes = clsx(
 		'components-range-control__mark',
 		isFilled && 'is-filled',
 		className
 	);
-	const labelClasses = classnames(
+	const labelClasses = clsx(
 		'components-range-control__mark-label',
 		isFilled && 'is-filled'
 	);

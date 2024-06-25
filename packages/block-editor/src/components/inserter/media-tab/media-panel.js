@@ -1,9 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect } from '@wordpress/element';
 import { Spinner, SearchControl } from '@wordpress/components';
-import { focus } from '@wordpress/dom';
 import { __ } from '@wordpress/i18n';
 import { useDebouncedInput } from '@wordpress/compose';
 
@@ -15,26 +13,6 @@ import { useMediaResults } from './hooks';
 import InserterNoResults from '../no-results';
 
 const INITIAL_MEDIA_ITEMS_PER_PAGE = 10;
-
-export function MediaCategoryDialog( { rootClientId, onInsert, category } ) {
-	const container = useRef();
-	useEffect( () => {
-		const timeout = setTimeout( () => {
-			const [ firstTabbable ] = focus.tabbable.find( container.current );
-			firstTabbable?.focus();
-		} );
-		return () => clearTimeout( timeout );
-	}, [ category ] );
-	return (
-		<div ref={ container } className="block-editor-inserter__media-dialog">
-			<MediaCategoryPanel
-				rootClientId={ rootClientId }
-				onInsert={ onInsert }
-				category={ category }
-			/>
-		</div>
-	);
-}
 
 export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 	const [ search, setSearch, debouncedSearch ] = useDebouncedInput();

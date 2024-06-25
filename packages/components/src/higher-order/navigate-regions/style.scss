@@ -29,9 +29,9 @@
 
 	// Header top bar when Distraction free mode is on.
 	&.is-distraction-free .interface-interface-skeleton__header .edit-post-header,
-	.interface-interface-skeleton__sidebar .edit-post-layout__toggle-sidebar-panel,
-	.interface-interface-skeleton__actions .edit-post-layout__toggle-publish-panel,
-	.interface-interface-skeleton__actions .edit-post-layout__toggle-entities-saved-states-panel,
+	.interface-interface-skeleton__sidebar .editor-layout__toggle-sidebar-panel,
+	.interface-interface-skeleton__actions .editor-layout__toggle-publish-panel,
+	.interface-interface-skeleton__actions .editor-layout__toggle-entities-saved-states-panel,
 	.editor-post-publish-panel {
 		outline: 4px solid $components-color-accent;
 		outline-offset: -4px;

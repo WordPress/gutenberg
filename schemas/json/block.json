@@ -597,6 +597,22 @@
 							"type": "boolean",
 							"description": "This value signals that a block supports the line-height CSS style property. When it does, the block editor will show an UI control for the user to set its value if the theme declares support.\n\nWhen the block declares support for lineHeight, its attributes definition is extended to include a new attribute style of object type with no default assigned. It stores the custom value set by the user. The block can apply a default style by specifying its own style attribute with a default",
 							"default": false
+						},
+						"textAlign": {
+							"description": "This property adds block toolbar controls which allow to change block's text alignment.",
+							"oneOf": [
+								{
+									"type": "boolean"
+								},
+								{
+									"type": "array",
+									"items": {
+										"type": "string",
+										"enum": [ "left", "center", "right" ]
+									}
+								}
+							],
+							"default": false
 						}
 					}
 				},
@@ -624,6 +640,11 @@
 							}
 						}
 					]
+				},
+				"splitting": {
+					"type": "boolean",
+					"description": "This property indicates whether the block can split when the Enter key is pressed or when blocks are pasted.",
+					"default": false
 				}
 			},
 			"additionalProperties": true

@@ -15,7 +15,7 @@ import { useMemo } from '@wordpress/element';
 import type { WordPressComponentProps } from '../context';
 import { useContextSystem } from '../context';
 import * as styles from './styles';
-import { CONFIG, reduceMotion } from '../utils';
+import { CONFIG } from '../utils';
 import { useCx } from '../utils/hooks/use-cx';
 import { isValueDefined } from '../utils/values';
 import type { ElevationProps } from './types';
@@ -76,9 +76,12 @@ export function useElevation(
 				left: offset,
 				right: offset,
 				top: offset,
-				transition,
 			},
-			reduceMotion( 'transition' )
+			css`
+				@media not ( prefers-reduced-motion ) {
+					transition: ${ transition };
+				}
+			`
 		);
 
 		if ( isValueDefined( hoverValue ) ) {

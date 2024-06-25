@@ -102,34 +102,6 @@ const exportDefaultPackages = [
 	'warning',
 ];
 
-const vendors = {
-	react: [
-		'react/umd/react.development.js',
-		'react/umd/react.production.min.js',
-	],
-	'react-dom': [
-		'react-dom/umd/react-dom.development.js',
-		'react-dom/umd/react-dom.production.min.js',
-	],
-	'inert-polyfill': [
-		'wicg-inert/dist/inert.js',
-		'wicg-inert/dist/inert.min.js',
-	],
-};
-const vendorsCopyConfig = Object.entries( vendors ).flatMap(
-	( [ key, [ devFilename, prodFilename ] ] ) => {
-		return [
-			{
-				from: `node_modules/${ devFilename }`,
-				to: `build/vendors/${ key }.js`,
-			},
-			{
-				from: `node_modules/${ prodFilename }`,
-				to: `build/vendors/${ key }.min.js`,
-			},
-		];
-	}
-);
 module.exports = {
 	...baseConfig,
 	name: 'packages',
@@ -176,8 +148,7 @@ module.exports = {
 					transform: stylesTransform,
 					noErrorOnMissing: true,
 				} ) )
-				.concat( bundledPackagesPhpConfig )
-				.concat( vendorsCopyConfig ),
+				.concat( bundledPackagesPhpConfig ),
 		} ),
 		new MomentTimezoneDataPlugin( {
 			startYear: 2000,

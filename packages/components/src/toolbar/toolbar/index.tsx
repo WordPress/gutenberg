@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
 
 /**
@@ -60,7 +60,7 @@ function UnforwardedToolbar(
 		);
 	}
 	// `ToolbarGroup` already uses components-toolbar for compatibility reasons.
-	const finalClassName = classnames(
+	const finalClassName = clsx(
 		'components-accessible-toolbar',
 		className,
 		variant && `is-${ variant }`

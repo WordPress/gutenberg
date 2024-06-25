@@ -42,14 +42,6 @@ const hoverOutside = async () => {
 };
 
 describe( 'Tooltip', () => {
-	// Wait enough time to make sure that tooltips don't show immediately, ignoring
-	// the showTimeout delay. For more context, see:
-	// - https://github.com/WordPress/gutenberg/pull/57345#discussion_r1435167187
-	// - https://ariakit.org/reference/tooltip-provider#skiptimeout
-	afterEach( async () => {
-		await sleep( 300 );
-	} );
-
 	describe( 'basic behavior', () => {
 		it( 'should not render the tooltip if multiple children are passed', async () => {
 			render(
@@ -312,6 +304,11 @@ describe( 'Tooltip', () => {
 			// Hover outside of the anchor, tooltip should hide
 			await hoverOutside();
 			await waitExpectTooltipToHide();
+
+			// Prevent this test from interfering with the next one.
+			// "Tooltips appear instantly if another tooltip has just been hidden."
+			// See: https://github.com/WordPress/gutenberg/pull/57345#discussion_r1435495655
+			await sleep( 3000 );
 		} );
 
 		it( 'should not show tooltip if the mouse leaves the tooltip anchor before set delay', async () => {

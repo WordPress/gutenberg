@@ -47,6 +47,13 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
   min-height: 0;
 }
 
+.emotion-5:focus-within:not( :has( :is( .em5sgkm7, .emotion-18 ):focus-within ) ) .emotion-25 {
+  border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+  box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+  outline: 2px solid transparent;
+  outline-offset: -2px;
+}
+
 .emotion-8 {
   display: block;
   max-height: 100%;
@@ -61,6 +68,7 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
   color: #1e1e1e;
   line-height: 1.4;
   margin: 0;
+  text-wrap: balance;
   text-wrap: pretty;
   font-size: calc((13 / 13) * 13px);
   font-weight: normal;
@@ -166,7 +174,10 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
 
 .emotion-24.emotion-24.emotion-24 {
   box-sizing: border-box;
+  border-color: var(--wp-components-color-gray-600, #949494);
   border-radius: inherit;
+  border-style: solid;
+  border-width: 1px;
   bottom: 0;
   left: 0;
   margin: 0;
@@ -175,9 +186,6 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
   position: absolute;
   right: 0;
   top: 0;
-  border-color: var(--wp-components-color-gray-600, #949494);
-  border-style: solid;
-  border-width: 1px;
   padding-left: 2px;
 }
 
@@ -319,6 +327,13 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
   min-height: 0;
 }
 
+.emotion-5:focus-within:not( :has( :is( .em5sgkm7, .emotion-18 ):focus-within ) ) .emotion-25 {
+  border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+  box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+  outline: 2px solid transparent;
+  outline-offset: -2px;
+}
+
 .emotion-8 {
   display: block;
   max-height: 100%;
@@ -333,6 +348,7 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
   color: #1e1e1e;
   line-height: 1.4;
   margin: 0;
+  text-wrap: balance;
   text-wrap: pretty;
   font-size: calc((13 / 13) * 13px);
   font-weight: normal;
@@ -438,7 +454,10 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
 
 .emotion-24.emotion-24.emotion-24 {
   box-sizing: border-box;
+  border-color: var(--wp-components-color-gray-600, #949494);
   border-radius: inherit;
+  border-style: solid;
+  border-width: 1px;
   bottom: 0;
   left: 0;
   margin: 0;
@@ -447,9 +466,6 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
   position: absolute;
   right: 0;
   top: 0;
-  border-color: var(--wp-components-color-gray-600, #949494);
-  border-style: solid;
-  border-width: 1px;
   padding-left: 2px;
 }
 
@@ -601,6 +617,13 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
   min-height: 0;
 }
 
+.emotion-5:focus-within:not( :has( :is( .em5sgkm7, .emotion-18 ):focus-within ) ) .emotion-25 {
+  border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+  box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+  outline: 2px solid transparent;
+  outline-offset: -2px;
+}
+
 .emotion-8 {
   display: block;
   max-height: 100%;
@@ -615,6 +638,7 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
   color: #1e1e1e;
   line-height: 1.4;
   margin: 0;
+  text-wrap: balance;
   text-wrap: pretty;
   font-size: calc((13 / 13) * 13px);
   font-weight: normal;
@@ -720,7 +744,10 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
 
 .emotion-24.emotion-24.emotion-24 {
   box-sizing: border-box;
+  border-color: var(--wp-components-color-gray-600, #949494);
   border-radius: inherit;
+  border-style: solid;
+  border-width: 1px;
   bottom: 0;
   left: 0;
   margin: 0;
@@ -729,9 +756,6 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
   position: absolute;
   right: 0;
   top: 0;
-  border-color: var(--wp-components-color-gray-600, #949494);
-  border-style: solid;
-  border-width: 1px;
   padding-left: 2px;
 }
 
@@ -895,6 +919,13 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
   min-height: 0;
 }
 
+.emotion-5:focus-within:not( :has( :is( .em5sgkm7, .emotion-18 ):focus-within ) ) .emotion-25 {
+  border-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+  box-shadow: 0 0 0 0.5px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+  outline: 2px solid transparent;
+  outline-offset: -2px;
+}
+
 .emotion-8 {
   display: block;
   max-height: 100%;
@@ -909,6 +940,7 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
   color: #1e1e1e;
   line-height: 1.4;
   margin: 0;
+  text-wrap: balance;
   text-wrap: pretty;
   font-size: calc((13 / 13) * 13px);
   font-weight: normal;
@@ -1014,7 +1046,10 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
 
 .emotion-24.emotion-24.emotion-24 {
   box-sizing: border-box;
+  border-color: var(--wp-components-color-gray-600, #949494);
   border-radius: inherit;
+  border-style: solid;
+  border-width: 1px;
   bottom: 0;
   left: 0;
   margin: 0;
@@ -1023,9 +1058,6 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
   position: absolute;
   right: 0;
   top: 0;
-  border-color: var(--wp-components-color-gray-600, #949494);
-  border-style: solid;
-  border-width: 1px;
   padding-left: 2px;
 }
 

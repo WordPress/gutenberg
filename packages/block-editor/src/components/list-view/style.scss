@@ -156,13 +156,13 @@
 
 	&.is-displacement-up {
 		transition: transform 0.2s;
-		transform: translateY(-36px);
+		transform: translateY(-32px);
 		@include reduce-motion("transition");
 	}
 
 	&.is-displacement-down {
 		transition: transform 0.2s;
-		transform: translateY(36px);
+		transform: translateY(32px);
 		@include reduce-motion("transition");
 	}
 
@@ -172,20 +172,20 @@
 	// worth of space for the visual indicator of where a block will be placed when dropped.
 	&.is-after-dragged-blocks {
 		transition: transform 0.2s;
-		transform: translateY(calc(var(--wp-admin--list-view-dragged-items-height, 36px) * -1));
+		transform: translateY(calc(var(--wp-admin--list-view-dragged-items-height, 32px) * -1));
 		@include reduce-motion("transition");
 	}
 
 	&.is-after-dragged-blocks.is-displacement-up {
 		transition: transform 0.2s;
-		transform: translateY(calc(-36px + var(--wp-admin--list-view-dragged-items-height, 36px) * -1));
+		transform: translateY(calc(-32px + var(--wp-admin--list-view-dragged-items-height, 32px) * -1));
 		@include reduce-motion("transition");
 	}
 
 	&.is-after-dragged-blocks.is-displacement-down {
 		transition: transform 0.2s;
 		transform:
-			translateY(calc(36px + var(--wp-admin--list-view-dragged-items-height, 36px) *
+			translateY(calc(32px + var(--wp-admin--list-view-dragged-items-height, 32px) *
 			-1));
 		@include reduce-motion("transition");
 	}
@@ -204,15 +204,15 @@
 		z-index: -9999;
 	}
 
-	// List View renders a fixed number of items and relies on each item having a fixed height of 36px.
+	// List View renders a fixed number of items and relies on each item having a fixed height of 32px.
 	// If this value changes, we should also change the itemHeight value set in useFixedWindowList.
 	// See: https://github.com/WordPress/gutenberg/pull/35230 for additional context.
 	.block-editor-list-view-block-contents {
 		display: flex;
 		align-items: center;
 		width: 100%;
-		height: auto;
-		padding: ($grid-unit-15 * 0.5) ($grid-unit-15 * 0.5) ($grid-unit-15 * 0.5) 0;
+		height: $grid-unit-40;
+		padding: ($grid-unit-15 * 0.5) $grid-unit-05 ($grid-unit-15 * 0.5) 0;
 		text-align: left;
 		border-radius: $radius-block-ui;
 		position: relative;
@@ -277,15 +277,14 @@
 	}
 
 	.block-editor-block-icon {
-		margin-right: $grid-unit-10;
+		margin-right: $grid-unit-10 * 0.5; // 6px.
 		flex: 0 0 $icon-size;
 	}
 
 	.block-editor-list-view-block__menu-cell,
 	.block-editor-list-view-block__mover-cell,
 	.block-editor-list-view-block__contents-cell {
-		padding-top: 0;
-		padding-bottom: 0;
+		padding: 0;
 	}
 
 	.block-editor-list-view-block__menu-cell,
@@ -316,7 +315,7 @@
 	}
 
 	.block-editor-list-view-block__menu-cell {
-		padding-right: $grid-unit-15 * 0.5; // 6px.
+		padding-right: $grid-unit-05;
 
 		.components-button.has-icon {
 			height: 24px;
@@ -379,8 +378,10 @@
 		}
 	}
 
-	.block-editor-list-view-block-select-button__label-wrapper {
-		min-width: 120px;
+	// Style lock and position icons in line with image previews.
+	.block-editor-list-view-block-select-button__label-wrapper svg {
+		left: $grid-unit-05 * 0.5; // 2px.
+		position: relative;
 	}
 
 	.block-editor-list-view-block-select-button__title {
@@ -464,21 +465,12 @@ $block-navigation-max-indent: 8;
 // Chevron container metrics.
 .block-editor-list-view__expander {
 	height: $icon-size;
-	margin-left: $grid-unit-05;
 	width: $icon-size;
 	cursor: pointer;
 }
 
 .block-editor-list-view-leaf[aria-level] .block-editor-list-view__expander {
-	margin-left:
-		($icon-size) * $block-navigation-max-indent + 4 *
-		($block-navigation-max-indent - 1);
-}
-
-.block-editor-list-view-leaf:not([aria-level="1"]) {
-	.block-editor-list-view__expander {
-		margin-right: 4px;
-	}
+	margin-left: ($grid-unit-30 * $block-navigation-max-indent);
 }
 
 // When updating the margin for each indentation level, the corresponding
@@ -488,9 +480,9 @@ $block-navigation-max-indent: 8;
 	.block-editor-list-view-leaf[aria-level="#{ $i + 1 }"]
 	.block-editor-list-view__expander {
 		@if $i - 1 >= 0 {
-			margin-left: ($icon-size * $i) + 4 * ($i - 1);
+			margin-left: ($grid-unit-30 * $i); // Effectivly centers the expander below the parent's icon.
 		} @else {
-			margin-left: ($icon-size * $i);
+			margin-left: 0;
 		}
 	}
 }
@@ -540,7 +532,7 @@ svg {
 
 	.block-editor-list-view-drop-indicator__line {
 		background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
-		height: 36px;
+		height: 32px;
 		border-radius: 4px;
 		overflow: hidden;
 	}
@@ -553,7 +545,7 @@ svg {
 .block-editor-list-view-placeholder {
 	padding: 0;
 	margin: 0;
-	height: 36px;
+	height: 32px;
 }
 
 .list-view-appender .block-editor-inserter__toggle {

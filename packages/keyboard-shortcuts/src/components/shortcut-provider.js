@@ -23,7 +23,9 @@ export function ShortcutProvider( props ) {
 	const [ keyboardShortcuts ] = useState( () => new Set() );
 
 	function onKeyDown( event ) {
-		if ( props.onKeyDown ) props.onKeyDown( event );
+		if ( props.onKeyDown ) {
+			props.onKeyDown( event );
+		}
 
 		for ( const keyboardShortcut of keyboardShortcuts ) {
 			keyboardShortcut( event );

@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+## 11.1.0 (2024-06-15)
+
+## 11.0.0 (2024-05-31)
+
+### Breaking Changes
+
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 10.29.0 (2024-05-16)
+
+## 10.28.0 (2024-05-02)
+
+## 10.27.0 (2024-04-19)
+
 ## 10.26.0 (2024-04-03)
 
 ## 10.25.0 (2024-03-21)
@@ -30,11 +44,11 @@
 
 ## 10.13.0 (2023-09-20)
 
-### Enhancement
+### Enhancements
 
--    Update promise order in `loginUser` to avoid any flakiness in the tests.
--    Update `activateTheme` to redirect to `themes.php` after theme activation, if theme redirects to some other page.
--    Update `activatePlugin` to redirect to `plugins.php` after plugin activation, if plugin redirects to some other page.
+-   Update promise order in `loginUser` to avoid any flakiness in the tests.
+-   Update `activateTheme` to redirect to `themes.php` after theme activation, if theme redirects to some other page.
+-   Update `activatePlugin` to redirect to `plugins.php` after plugin activation, if plugin redirects to some other page.
 
 ## 10.12.0 (2023-08-31)
 
@@ -64,7 +78,7 @@
 
 ### Breaking Changes
 
--  Started requiring Jest v29 instead of v27 as a peer dependency. See [breaking changes in Jest 28](https://jestjs.io/blog/2022/04/25/jest-28) and [in jest 29](https://jestjs.io/blog/2022/08/25/jest-29) ([#47388](https://github.com/WordPress/gutenberg/pull/47388))
+-   Started requiring Jest v29 instead of v27 as a peer dependency. See [breaking changes in Jest 28](https://jestjs.io/blog/2022/04/25/jest-28) and [in jest 29](https://jestjs.io/blog/2022/08/25/jest-29) ([#47388](https://github.com/WordPress/gutenberg/pull/47388))
 
 ## 9.5.0 (2023-03-01)
 
@@ -78,7 +92,7 @@
 
 ## 9.0.0 (2022-12-14)
 
-### Breaking changes
+### Breaking Changes
 
 -   Remove all the site editor navigation panel related utils: getSiteEditorMenuItem, isSiteEditorRoot, navigateSiteEditorBack, navigateSiteEditorBackToRoot, openSiteEditorNavigationPanel, siteEditorNavigateSequence, clickSiteEditorMenuItem, closeSiteEditorNavigationPanel.
 
@@ -98,13 +112,13 @@
 
 ## 8.0.0 (2022-08-24)
 
-### Breaking Change
+### Breaking Changes
 
 -   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
 
 ## 7.2.0 (2022-04-08)
 
-### Enhancement
+### Enhancements
 
 -   Changed `setOption` to use `options.php`, to allow setting any option (and to be more consistent with `getOption`). [#39502](https://github.com/WordPress/gutenberg/pull/39502)
 -   Changed `setOption` to return the changed setting's previous value (to make restoring it easier). [#39502](https://github.com/WordPress/gutenberg/pull/39502)
@@ -116,7 +130,7 @@
 
 -   Updated `clickMenuItem` method to use exact label matching instead of partial [#39274](https://github.com/WordPress/gutenberg/pull/39274).
 
-### Enhancement
+### Enhancements
 
 -   The `toggleMoreMenu` and `clickMoreMenuItem` utilities no longer require a second 'context' parameter.
 
@@ -181,7 +195,7 @@
 
 -   The disableNavigationMode utility was removed. By default, the editor is in edit mode now.
 
-### Improvements
+### Enhancements
 
 -   `setBrowserViewport` accepts an object of `width`, `height` values, to assign a viewport of arbitrary size.
 
@@ -193,7 +207,7 @@
 
 ## 2.0.0 (2019-05-21)
 
-### Requirements
+### Breaking Changes
 
 -   The minimum version of Gutenberg `5.6.0` or the minimum version of WordPress `5.2.0`.
 
@@ -210,7 +224,7 @@
 -   New Function: `openAllBlockInserterCategories` - Opens all block inserter categories.
 -   New Function: `getAllBlockInserterItemTitles` - Opens the global block inserter.
 
-### Requirements
+### Breaking Changes
 
 -   The minimum version of Gutenberg `5.3.0` or the minimum version of WordPress `5.2.0`.
 
@@ -218,8 +232,4 @@
 
 ### New Features
 
--   Initial release.
-
-### Requirements
-
--   The minimum version of Gutenberg `5.2.0` or the minimum version of WordPress `5.2.0`.
+-   Initial release. The minimum version of Gutenberg `5.2.0` or the minimum version of WordPress `5.2.0`.

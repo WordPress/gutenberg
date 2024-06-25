@@ -1,101 +1,20 @@
+.editor-visual-editor {
+	flex: 1 0 auto;
+	height: auto;
+}
+
 .edit-post-layout__metaboxes {
 	flex-shrink: 0;
 	clear: both;
 }
 
 // Adjust the position of the notices
-.edit-post-layout .components-editor-notices__snackbar {
+.components-editor-notices__snackbar {
 	position: fixed;
 	right: 0;
-	bottom: 40px;
-	padding-left: 16px;
-	padding-right: 16px;
-}
-
-.is-distraction-free {
-	.components-editor-notices__snackbar {
-		bottom: 20px;
-	}
+	bottom: 24px;
+	padding-left: 24px;
+	padding-right: 24px;
 }
 
 @include editor-left(".edit-post-layout .components-editor-notices__snackbar");
-
-.edit-post-layout .editor-post-publish-panel {
-	position: fixed;
-	z-index: z-index(".edit-post-layout .edit-post-post-publish-panel");
-	top: $admin-bar-height-big;
-	bottom: 0;
-	right: 0;
-	left: 0;
-	overflow: auto;
-
-	@include break-medium() {
-		z-index: z-index(".edit-post-layout .edit-post-post-publish-panel {greater than small}");
-		top: $admin-bar-height;
-		left: auto;
-		width: $sidebar-width + $border-width;
-		border-left: $border-width solid $gray-300;
-		transform: translateX(+100%);
-		animation: edit-post-post-publish-panel__slide-in-animation 0.1s forwards;
-		@include reduce-motion("animation");
-
-		body.is-fullscreen-mode & {
-			top: 0;
-		}
-
-		// Keep it open on focus to avoid conflict with navigate-regions animation.
-		[role="region"]:focus & {
-			transform: translateX(0%);
-		}
-	}
-}
-
-@keyframes edit-post-post-publish-panel__slide-in-animation {
-	100% {
-		transform: translateX(0%);
-	}
-}
-
-.edit-post-layout .editor-post-publish-panel__header-publish-button {
-	justify-content: center;
-}
-
-.edit-post-layout__toggle-publish-panel,
-.edit-post-layout__toggle-sidebar-panel,
-.edit-post-layout__toggle-entities-saved-states-panel {
-	z-index: z-index(".edit-post-layout__toggle-sidebar-panel");
-	position: fixed !important; // Need to override the default relative positionning
-	top: -9999em;
-	bottom: auto;
-	left: auto;
-	right: 0;
-	box-sizing: border-box;
-	width: $sidebar-width;
-	background-color: $white;
-	border: 1px dotted $gray-300;
-	height: auto !important; // Need to override the default sidebar positionnings
-	padding: $grid-unit-30;
-	display: flex;
-	justify-content: center;
-}
-
-.edit-post-layout__toggle-sidebar-panel {
-	.interface-interface-skeleton__sidebar:focus &,
-	.interface-interface-skeleton__sidebar:focus-within & {
-		top: auto;
-		bottom: 0;
-	}
-}
-
-.edit-post-layout__toggle-entities-saved-states-panel,
-.edit-post-layout__toggle-publish-panel {
-	.interface-interface-skeleton__actions:focus &,
-	.interface-interface-skeleton__actions:focus-within & {
-		top: auto;
-		bottom: 0;
-	}
-}
-
-.edit-post-layout .entities-saved-states__panel-header {
-	height: $header-height + $border-width;
-}

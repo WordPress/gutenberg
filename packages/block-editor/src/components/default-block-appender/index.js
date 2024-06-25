@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -58,7 +58,7 @@ export default function DefaultBlockAppender( { rootClientId } ) {
 	return (
 		<div
 			data-root-client-id={ rootClientId || '' }
-			className={ classnames( 'block-editor-default-block-appender', {
+			className={ clsx( 'block-editor-default-block-appender', {
 				'has-visible-prompt': showPrompt,
 			} ) }
 		>

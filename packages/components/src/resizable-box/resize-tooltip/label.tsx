@@ -41,7 +41,9 @@ function Label(
 	const isBottom = position === POSITIONS.bottom;
 	const isCorner = position === POSITIONS.corner;
 
-	if ( ! showLabel ) return null;
+	if ( ! showLabel ) {
+		return null;
+	}
 
 	let style: React.CSSProperties = {
 		opacity: showLabel ? 1 : undefined,

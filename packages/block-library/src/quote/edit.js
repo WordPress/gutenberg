@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classNames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -80,7 +80,7 @@ export default function QuoteEdit( {
 	useMigrateOnLoad( attributes, clientId );
 
 	const blockProps = useBlockProps( {
-		className: classNames( className, {
+		className: clsx( className, {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 		...( ! isWebPlatform && { style } ),
@@ -121,6 +121,7 @@ export default function QuoteEdit( {
 					}
 					addLabel={ __( 'Add citation' ) }
 					removeLabel={ __( 'Remove citation' ) }
+					excludeElementClassName
 					className="wp-block-quote__citation"
 					insertBlocksAfter={ insertBlocksAfter }
 					{ ...( ! isWebPlatform ? { textAlign } : {} ) }

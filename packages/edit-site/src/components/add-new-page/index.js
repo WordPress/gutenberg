@@ -9,10 +9,12 @@ import {
 	TextControl,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useRegistry } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
+import { decodeEntities } from '@wordpress/html-entities';
+import { serialize, synchronizeBlocksWithTemplate } from '@wordpress/blocks';
 
 export default function AddNewPageModal( { onSave, onClose } ) {
 	const [ isCreatingPage, setIsCreatingPage ] = useState( false );
@@ -21,6 +23,7 @@ export default function AddNewPageModal( { onSave, onClose } ) {
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
+	const { resolveSelect } = useRegistry();
 
 	async function createPage( event ) {
 		event.preventDefault();
@@ -30,6 +33,8 @@ export default function AddNewPageModal( { onSave, onClose } ) {
 		}
 		setIsCreatingPage( true );
 		try {
+			const pagePostType =
+				await resolveSelect( coreStore ).getPostType( 'page' );
 			const newPage = await saveEntityRecord(
 				'postType',
 				'page',
@@ -37,6 +42,15 @@ export default function AddNewPageModal( { onSave, onClose } ) {
 					status: 'draft',
 					title,
 					slug: title || __( 'No title' ),
+					content:
+						!! pagePostType.template && pagePostType.template.length
+							? serialize(
+									synchronizeBlocksWithTemplate(
+										[],
+										pagePostType.template
+									)
+							  )
+							: undefined,
 				},
 				{ throwOnError: true }
 			);
@@ -47,7 +61,7 @@ export default function AddNewPageModal( { onSave, onClose } ) {
 				sprintf(
 					// translators: %s: Title of the created template e.g: "Category".
 					__( '"%s" successfully created.' ),
-					newPage.title?.rendered || title
+					decodeEntities( newPage.title?.rendered || title )
 				),
 				{
 					type: 'snackbar',
@@ -72,16 +86,22 @@ export default function AddNewPageModal( { onSave, onClose } ) {
 			<form onSubmit={ createPage }>
 				<VStack spacing={ 3 }>
 					<TextControl
+						__next40pxDefaultSize
 						label={ __( 'Page title' ) }
 						onChange={ setTitle }
 						placeholder={ __( 'No title' ) }
 						value={ title }
 					/>
 					<HStack spacing={ 2 } justify="end">
-						<Button variant="tertiary" onClick={ onClose }>
+						<Button
+							__next40pxDefaultSize
+							variant="tertiary"
+							onClick={ onClose }
+						>
 							{ __( 'Cancel' ) }
 						</Button>
 						<Button
+							__next40pxDefaultSize
 							variant="primary"
 							type="submit"
 							isBusy={ isCreatingPage }

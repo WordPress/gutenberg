@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -150,7 +150,7 @@ function RevisionsButtons( {
 
 				return (
 					<li
-						className={ classnames(
+						className={ clsx(
 							'edit-site-global-styles-screen-revisions__revision-item',
 							{
 								'is-selected': isSelected,
@@ -163,6 +163,7 @@ function RevisionsButtons( {
 					>
 						<Button
 							className="edit-site-global-styles-screen-revisions__revision-button"
+							__experimentalIsFocusable
 							disabled={ isSelected }
 							onClick={ () => {
 								onChange( revision );
@@ -219,7 +220,6 @@ function RevisionsButtons( {
 								</p>
 							) : (
 								<Button
-									disabled={ areStylesEqual }
 									size="compact"
 									variant="primary"
 									className="edit-site-global-styles-screen-revisions__apply-button"

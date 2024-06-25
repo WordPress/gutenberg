@@ -67,7 +67,7 @@ For context I’ll quote [this article on WordPress.org](https://make.wordpress.
 
 ## Browser support
 
-See <https://make.wordpress.org/design/handbook/design-guide/browser-support/>
+See <https://make.wordpress.org/core/handbook/best-practices/browser-support/>
 
 ## Contributing to this package
 

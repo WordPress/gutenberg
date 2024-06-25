@@ -14,6 +14,12 @@
 	margin-left: 10px;
 }
 
+.components-custom-select-control__menu-wrapper {
+	position: absolute;
+	min-width: 100%;
+	bottom: 0;
+}
+
 .components-custom-select-control__menu {
 	// Hide when collapsed.
 	&[aria-hidden="true"] {

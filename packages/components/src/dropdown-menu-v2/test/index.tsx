@@ -54,9 +54,14 @@ describe( 'DropdownMenu', () => {
 
 		expect( toggleButton ).toHaveAttribute( 'aria-expanded', 'true' );
 
-		expect(
-			screen.getByRole( 'menu', { name: toggleButton.textContent ?? '' } )
-		).toHaveFocus();
+		await waitFor( () =>
+			expect(
+				screen.getByRole( 'menu', {
+					name: toggleButton.textContent ?? '',
+				} )
+			).toHaveFocus()
+		);
+
 		expect( screen.getByRole( 'separator' ) ).toHaveAttribute(
 			'aria-orientation',
 			'horizontal'

@@ -28,7 +28,9 @@ const LineHeightControl = ( {
 
 	const adjustNextValue = ( nextValue, wasTypedOrPasted ) => {
 		// Set the next value without modification if lineHeight has been defined.
-		if ( isDefined ) return nextValue;
+		if ( isDefined ) {
+			return nextValue;
+		}
 
 		/**
 		 * The following logic handles the initial spin up/down action
@@ -47,7 +49,9 @@ const LineHeightControl = ( {
 			case '0': {
 				// This means the user explicitly input '0', rather than using the
 				// spin down action from an undefined value state.
-				if ( wasTypedOrPasted ) return nextValue;
+				if ( wasTypedOrPasted ) {
+					return nextValue;
+				}
 				// Decrement by spin value.
 				return BASE_DEFAULT_VALUE - spin;
 			}

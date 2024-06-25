@@ -171,7 +171,6 @@ export const fields = [
 		id: 'type',
 		maxWidth: 400,
 		enableHiding: false,
-		type: 'enumeration',
 		elements: [
 			{ value: 'Not a planet', label: 'Not a planet' },
 			{ value: 'Ice giant', label: 'Ice giant' },
@@ -189,7 +188,6 @@ export const fields = [
 	{
 		header: 'Categories',
 		id: 'categories',
-		type: 'enumeration',
 		elements: [
 			{ value: 'Space', label: 'Space' },
 			{ value: 'NASA', label: 'NASA' },

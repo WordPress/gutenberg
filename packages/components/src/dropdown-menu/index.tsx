@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -30,10 +30,7 @@ function mergeProps<
 	};
 
 	if ( props.className && defaultProps.className ) {
-		mergedProps.className = classnames(
-			props.className,
-			defaultProps.className
-		);
+		mergedProps.className = clsx( props.className, defaultProps.className );
 	}
 
 	return mergedProps;
@@ -113,12 +110,9 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 
 				const mergedToggleProps = mergeProps(
 					{
-						className: classnames(
-							'components-dropdown-menu__toggle',
-							{
-								'is-opened': isOpen,
-							}
-						),
+						className: clsx( 'components-dropdown-menu__toggle', {
+							'is-opened': isOpen,
+						} ),
 					},
 					restToggleProps
 				);
@@ -157,10 +151,9 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 				const mergedMenuProps = mergeProps(
 					{
 						'aria-label': label,
-						className: classnames(
-							'components-dropdown-menu__menu',
-							{ 'no-icons': noIcons }
-						),
+						className: clsx( 'components-dropdown-menu__menu', {
+							'no-icons': noIcons,
+						} ),
 					},
 					menuProps
 				);
@@ -182,7 +175,7 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 											control.onClick();
 										}
 									} }
-									className={ classnames(
+									className={ clsx(
 										'components-dropdown-menu__menu-item',
 										{
 											'has-separator':

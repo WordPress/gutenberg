@@ -50,6 +50,9 @@ describe( 'convertPreferencesPackageData', () => {
 		    "openPanels": [
 		      "post-status",
 		    ],
+		    "pinnedItems": {
+		      "my-sidebar-plugin/title-sidebar": false,
+		    },
 		  },
 		  "core/customize-widgets": {
 		    "fixedToolbar": true,
@@ -57,13 +60,9 @@ describe( 'convertPreferencesPackageData', () => {
 		  },
 		  "core/edit-post": {
 		    "fullscreenMode": false,
-		    "pinnedItems": {
-		      "my-sidebar-plugin/title-sidebar": false,
-		    },
 		    "welcomeGuide": false,
 		  },
 		  "core/edit-site": {
-		    "isComplementaryAreaVisible": true,
 		    "welcomeGuide": false,
 		    "welcomeGuideStyles": false,
 		  },

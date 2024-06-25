@@ -6,7 +6,7 @@ import { getPhotoHtml } from './util';
 /**
  * External dependencies
  */
-import classnames from 'classnames/dedupe';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -82,7 +82,7 @@ class EmbedPreview extends Component {
 			__( 'Embedded content from %s' ),
 			parsedHostBaseUrl
 		);
-		const sandboxClassnames = classnames(
+		const sandboxClassnames = clsx(
 			type,
 			className,
 			'wp-block-embed__wrapper'
@@ -116,7 +116,7 @@ class EmbedPreview extends Component {
 
 		return (
 			<figure
-				className={ classnames( className, 'wp-block-embed', {
+				className={ clsx( className, 'wp-block-embed', {
 					'is-type-video': 'video' === type,
 				} ) }
 			>

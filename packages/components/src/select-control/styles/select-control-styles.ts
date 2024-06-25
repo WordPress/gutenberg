@@ -24,7 +24,9 @@ interface SelectProps
 }
 
 const disabledStyles = ( { disabled }: SelectProps ) => {
-	if ( ! disabled ) return '';
+	if ( ! disabled ) {
+		return '';
+	}
 
 	return css( {
 		color: COLORS.ui.textDisabled,

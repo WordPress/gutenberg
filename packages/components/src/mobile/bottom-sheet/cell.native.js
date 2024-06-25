@@ -14,7 +14,6 @@ import {
 /**
  * WordPress dependencies
  */
-import { Icon } from '@wordpress/components';
 import { check } from '@wordpress/icons';
 import { Component } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
@@ -27,6 +26,7 @@ import styles from './styles.scss';
 import platformStyles from './cellStyles.scss';
 import TouchableRipple from './ripple';
 import LockIcon from './lock-icon';
+import Icon from '../../icon';
 
 const isIOS = Platform.OS === 'ios';
 class BottomSheetCell extends Component {
@@ -272,7 +272,7 @@ class BottomSheetCell extends Component {
 				<Text
 					style={ textStyle }
 					numberOfLines={ 1 }
-					ellipsizeMode={ 'middle' }
+					ellipsizeMode="middle"
 				>
 					{ value }
 				</Text>
@@ -419,7 +419,7 @@ class BottomSheetCell extends Component {
 						{ customActionButton && (
 							<TouchableOpacity
 								onPress={ handler }
-								accessibilityRole={ 'button' }
+								accessibilityRole="button"
 							>
 								<Text style={ resetButtonStyle }>
 									{ title }

@@ -24,8 +24,10 @@ import inserterMediaCategories from '../media-categories';
 import { mediaUpload } from '../../utils';
 import { store as editorStore } from '../../store';
 import { lock, unlock } from '../../lock-unlock';
+import { useGlobalStylesContext } from '../global-styles-provider';
 
 const EMPTY_BLOCKS_LIST = [];
+const DEFAULT_STYLES = {};
 
 function __experimentalReusableBlocksSelect( select ) {
 	return (
@@ -85,6 +87,9 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__experimentalArchiveTitleTypeLabel',
 	'__experimentalArchiveTitleNameLabel',
 ];
+
+const { globalStylesDataKey, selectBlockPatternsKey, reusableBlocksSelectKey } =
+	unlock( privateApis );
 
 /**
  * React hook used to compute the block editor settings to use for the post editor.
@@ -173,6 +178,9 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		[ postType, postId, isLargeViewport, renderingMode ]
 	);
 
+	const { merged: mergedGlobalStyles } = useGlobalStylesContext();
+	const globalStylesData = mergedGlobalStyles.styles ?? DEFAULT_STYLES;
+
 	const settingsBlockPatterns =
 		settings.__experimentalAdditionalBlockPatterns ?? // WP 6.0
 		settings.__experimentalBlockPatterns; // WP 5.9
@@ -259,6 +267,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					BLOCK_EDITOR_SETTINGS.includes( key )
 				)
 			),
+			[ globalStylesDataKey ]: globalStylesData,
 			allowedBlockTypes,
 			allowRightClickOverrides,
 			focusMode: focusMode && ! forceDisableFocusMode,
@@ -267,12 +276,15 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			keepCaretInsideBlock,
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalBlockPatterns: blockPatterns,
-			[ unlock( privateApis ).selectBlockPatternsKey ]: ( select ) =>
-				unlock( select( coreStore ) ).getBlockPatternsForPostType(
-					postType
-				),
-			[ unlock( privateApis ).reusableBlocksSelectKey ]:
-				__experimentalReusableBlocksSelect,
+			[ selectBlockPatternsKey ]: ( select ) => {
+				const { hasFinishedResolution, getBlockPatternsForPostType } =
+					unlock( select( coreStore ) );
+				const patterns = getBlockPatternsForPostType( postType );
+				return hasFinishedResolution( 'getBlockPatterns' )
+					? patterns
+					: undefined;
+			},
+			[ reusableBlocksSelectKey ]: __experimentalReusableBlocksSelect,
 			__experimentalBlockPatternCategories: blockPatternCategories,
 			__experimentalUserPatternCategories: userPatternCategories,
 			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
@@ -327,6 +339,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		postType,
 		setIsInserterOpened,
 		sectionRootClientId,
+		globalStylesData,
 	] );
 }
 

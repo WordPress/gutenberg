@@ -10,7 +10,7 @@ import styled from '@emotion/styled';
  */
 import { COLORS, CONFIG } from '../utils';
 import { space } from '../utils/space';
-import type { CustomSelectButtonProps } from './types';
+import type { CustomSelectButtonSize } from './types';
 
 const ITEM_PADDING = space( 2 );
 
@@ -46,7 +46,7 @@ export const Select = styled( Ariakit.Select, {
 	size,
 	hasCustomRenderProp,
 }: {
-	size: NonNullable< CustomSelectButtonProps[ 'size' ] >;
+	size: NonNullable< CustomSelectButtonSize[ 'size' ] >;
 	hasCustomRenderProp: boolean;
 } ) => {
 	const heightProperty = hasCustomRenderProp ? 'minHeight' : 'height';
@@ -79,17 +79,15 @@ export const Select = styled( Ariakit.Select, {
 		align-items: center;
 		justify-content: space-between;
 		background-color: ${ COLORS.theme.background };
-		border: 1px solid ${ COLORS.ui.border };
-		border-radius: 2px;
+		border: none;
 		cursor: pointer;
 		font-size: ${ CONFIG.fontSize };
 		width: 100%;
+
 		&[data-focus-visible] {
-			outline-style: solid;
+			outline: none; // handled by InputBase component
 		}
-		&[aria-expanded='true'] {
-			outline: 1.5px solid ${ COLORS.theme.accent };
-		}
+
 		${ getSize() }
 	`;
 } );
@@ -98,6 +96,10 @@ export const SelectPopover = styled( Ariakit.SelectPopover )`
 	border-radius: 2px;
 	background: ${ COLORS.theme.background };
 	border: 1px solid ${ COLORS.theme.foreground };
+
+	&[data-focus-visible] {
+		outline: none; // outline will be on the trigger, rather than the popover
+	}
 `;
 
 export const SelectItem = styled( Ariakit.SelectItem )`

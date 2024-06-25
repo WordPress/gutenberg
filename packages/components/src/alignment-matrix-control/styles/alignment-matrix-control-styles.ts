@@ -7,7 +7,7 @@ import { css } from '@emotion/react';
 /**
  * Internal dependencies
  */
-import { COLORS, reduceMotion } from '../../utils';
+import { COLORS } from '../../utils';
 import type {
 	AlignmentMatrixControlProps,
 	AlignmentMatrixControlCellProps,
@@ -74,9 +74,10 @@ export const pointBase = (
 		box-sizing: border-box;
 		display: grid;
 		margin: auto;
-		transition: all 120ms linear;
+		@media not ( prefers-reduced-motion ) {
+			transition: all 120ms linear;
+		}
 
-		${ reduceMotion( 'transition' ) }
 		${ pointActive( props ) }
 	`;
 };

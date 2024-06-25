@@ -7,7 +7,6 @@ import gradientParser from 'gradient-parser';
 /**
  * WordPress dependencies
  */
-import { colorsUtils } from '@wordpress/components';
 import { RadialGradient, Stop, SVG, Defs, Rect } from '@wordpress/primitives';
 import { useResizeObserver } from '@wordpress/compose';
 import { useMemo } from '@wordpress/element';
@@ -16,6 +15,7 @@ import { useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import styles from './style.scss';
+import { colorsUtils } from '../color-settings/utils';
 
 export function getGradientAngle( gradientValue ) {
 	const angleBase = 45;
@@ -51,7 +51,9 @@ export function getGradientAngle( gradientValue ) {
 		}
 	} else if ( angleType === 'angle' ) {
 		return parseFloat( angle );
-	} else return 4 * angleBase;
+	} else {
+		return 4 * angleBase;
+	}
 }
 
 export function getGradientColorGroup( gradientValue ) {

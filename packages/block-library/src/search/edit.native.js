@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { View, AccessibilityInfo } from 'react-native';
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -133,7 +133,7 @@ export default function SearchEdit( {
 	};
 
 	const getBlockClassNames = () => {
-		return classnames(
+		return clsx(
 			className,
 			'button-inside' === buttonPosition
 				? 'wp-block-search__button-inside'

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -24,7 +24,7 @@ export default function LinkEditor( {
 } ) {
 	return (
 		<form
-			className={ classnames(
+			className={ clsx(
 				'block-editor-url-popover__link-editor',
 				className
 			) }

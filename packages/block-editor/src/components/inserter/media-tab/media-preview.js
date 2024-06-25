@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -127,23 +127,31 @@ export function MediaPreview( { media, onClick, category } ) {
 	);
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
-	const mediaUpload = useSelect(
-		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
-		[]
-	);
+	const { getSettings } = useSelect( blockEditorStore );
+
 	const onMediaInsert = useCallback(
 		( previewBlock ) => {
 			// Prevent multiple uploads when we're in the process of inserting.
 			if ( isInserting ) {
 				return;
 			}
+
+			const settings = getSettings();
 			const clonedBlock = cloneBlock( previewBlock );
 			const { id, url, caption } = clonedBlock.attributes;
+
+			// User has no permission to upload media.
+			if ( ! id && ! settings.mediaUpload ) {
+				setShowExternalUploadModal( true );
+				return;
+			}
+
 			// Media item already exists in library, so just insert it.
 			if ( !! id ) {
 				onClick( clonedBlock );
 				return;
 			}
+
 			setIsInserting( true );
 			// Media item does not exist in library, so try to upload it.
 			// Fist fetch the image data. This may fail if the image host
@@ -154,7 +162,7 @@ export function MediaPreview( { media, onClick, category } ) {
 				.fetch( url )
 				.then( ( response ) => response.blob() )
 				.then( ( blob ) => {
-					mediaUpload( {
+					settings.mediaUpload( {
 						filesList: [ blob ],
 						additionalData: { caption },
 						onFileChange( [ img ] ) {
@@ -189,10 +197,10 @@ export function MediaPreview( { media, onClick, category } ) {
 		},
 		[
 			isInserting,
+			getSettings,
 			onClick,
-			mediaUpload,
-			createErrorNotice,
 			createSuccessNotice,
+			createErrorNotice,
 		]
 	);
 
@@ -214,7 +222,7 @@ export function MediaPreview( { media, onClick, category } ) {
 			<InserterDraggableBlocks isEnabled blocks={ [ block ] }>
 				{ ( { draggable, onDragStart, onDragEnd } ) => (
 					<div
-						className={ classnames(
+						className={ clsx(
 							'block-editor-inserter__media-list__list-item',
 							{
 								'is-hovered': isHovered,

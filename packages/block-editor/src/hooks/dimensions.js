@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -170,7 +170,7 @@ function useBlockProps( { name, minHeight, style } ) {
 		return {};
 	}
 
-	const className = classnames( {
+	const className = clsx( {
 		'has-aspect-ratio': !! style?.dimensions?.aspectRatio,
 	} );
 
