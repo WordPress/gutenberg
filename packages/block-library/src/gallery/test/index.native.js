@@ -610,11 +610,11 @@ describe( 'Gallery block', () => {
 		<!-- /wp:gallery -->`,
 			numberOfItems: 2,
 		} );
-		const { getByLabelText } = screen;
+		const { getByLabelText, getByText } = screen;
 
 		fireEvent.press( getBlock( screen, 'Gallery' ) );
 		fireEvent.press( getByLabelText( 'Link To' ) );
-		fireEvent.press( getByLabelText( 'Link images to media files' ) );
+		fireEvent.press( getByText( 'Link images to media files' ) );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
