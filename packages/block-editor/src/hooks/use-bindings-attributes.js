@@ -216,13 +216,30 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 						}
 					}
 
-					// Only apply normal attribute updates to blocks
-					// that have partial bindings. Currently this is
-					// only skipped for pattern overrides sources.
-					if (
-						! hasPatternOverridesDefaultBinding &&
-						Object.keys( keptAttributes ).length
-					) {
+					// Don't update block attributes connected to pattern overrides.
+					if ( hasPatternOverridesDefaultBinding ) {
+						// Skip caption and href until they are supported.
+						const attributesToSkip = [ 'caption', 'href' ];
+						// Skip supported attributes that are not bound to other sources.
+						BLOCK_BINDINGS_ALLOWED_BLOCKS[ name ].forEach(
+							( attr ) => {
+								// Ensure it is bound to pattern overrides.
+								if (
+									bindings?.[ attr ]?.source ===
+									'core/pattern-overrides'
+								) {
+									attributesToSkip.push( attr );
+								}
+							}
+						);
+
+						// Remove attributes from the list.
+						attributesToSkip.forEach(
+							( attr ) => delete keptAttributes[ attr ]
+						);
+					}
+
+					if ( Object.keys( keptAttributes ).length ) {
 						setAttributes( keptAttributes );
 					}
 				} );
