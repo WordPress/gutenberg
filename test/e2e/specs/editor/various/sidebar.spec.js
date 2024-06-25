@@ -125,13 +125,13 @@ test.describe( 'Sidebar', () => {
 		const postDiscussionPanel = page.getByRole( 'button', {
 			name: 'Change discussion options',
 		} );
-		const postSummarySection = page.getByRole( 'button', {
+		const postAutorPanel = page.getByRole( 'button', {
 			name: 'admin',
 		} );
 
 		await expect( postExcerptPanel ).toBeVisible();
 		await expect( postFeaturedImagePanel ).toBeVisible();
-		await expect( postSummarySection ).toBeVisible();
+		await expect( postAutorPanel ).toBeVisible();
 		await expect( postDiscussionPanel ).toHaveCount( 1 );
 
 		await page.evaluate( () => {
@@ -149,7 +149,7 @@ test.describe( 'Sidebar', () => {
 		await expect( documentSettingsPanels ).toHaveCount( 1 );
 		await expect( postExcerptPanel ).toBeHidden();
 		await expect( postFeaturedImagePanel ).toBeHidden();
-		await expect( postSummarySection ).toBeHidden();
+		await expect( postAutorPanel ).toBeHidden();
 		await expect( postDiscussionPanel ).toHaveCount( 0 );
 	} );
 } );
