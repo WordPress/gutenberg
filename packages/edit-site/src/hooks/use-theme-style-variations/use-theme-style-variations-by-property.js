@@ -50,6 +50,23 @@ export function removePropertiesFromObject( object, properties ) {
 }
 
 /**
+ * Checks whether a style variation is empty.
+ *
+ * @param {Object} variation          A style variation object.
+ * @param {string} variation.title    The title of the variation.
+ * @param {Object} variation.settings The settings of the variation.
+ * @param {Object} variation.styles   The styles of the variation.
+ * @return {boolean} Whether the variation is empty.
+ */
+function isEmptyStyleVariation( { title, settings, styles } ) {
+	return (
+		title === __( 'Default' ) || // Always preseve the default variation.
+		Object.keys( settings ).length > 0 ||
+		Object.keys( styles ).length > 0
+	);
+}
+
+/**
  * Fetches the current theme style variations that contain only the specified properties
  * and merges them with the user config.
  *
@@ -72,7 +89,7 @@ export function useCurrentMergeThemeStyleVariationsWithUserConfig( {
 	}, [] );
 	const { user: userVariation } = useContext( GlobalStylesContext );
 
-	return useMemo( () => {
+	const variationsByProperty = useMemo( () => {
 		const clonedUserVariation = cloneDeep( userVariation );
 
 		// Get user variation and remove the settings for the given property.
@@ -98,6 +115,15 @@ export function useCurrentMergeThemeStyleVariationsWithUserConfig( {
 			...variationsWithPropertiesAndBase,
 		];
 	}, [ properties.toString(), userVariation, variationsFromTheme ] );
+
+	/*
+	 * Filter out variations with no settings or styles.
+	 */
+	return variationsByProperty?.length
+		? variationsByProperty.filter( ( variation ) =>
+				isEmptyStyleVariation( variation )
+		  )
+		: [];
 }
 
 /**
