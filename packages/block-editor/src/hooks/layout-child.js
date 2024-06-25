@@ -116,6 +116,10 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 			const containerQueryValue =
 				highestNumber * parentColumnValue +
 				( highestNumber - 1 ) * defaultGapValue;
+			// For blocks that only span one column, we want to remove any rowStart values as
+			// the container reduces in size, so that blocks are still arranged in markup order.
+			const minimumContainerQueryValue =
+				parentColumnValue * 2 + defaultGapValue - 1;
 			// If a span is set we want to preserve it as long as possible, otherwise we just reset the value.
 			const gridColumnValue = columnSpan ? '1/-1' : 'auto';
 
@@ -125,7 +129,10 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 					? 'auto'
 					: `span ${ rowSpan }`;
 
-			css += `@container (max-width: ${ containerQueryValue }${ parentColumnUnit }) {
+			css += `@container (max-width: ${ Math.max(
+				containerQueryValue,
+				minimumContainerQueryValue
+			) }${ parentColumnUnit }) {
 				${ selector } {
 					grid-column: ${ gridColumnValue };
 					grid-row: ${ gridRowValue };
