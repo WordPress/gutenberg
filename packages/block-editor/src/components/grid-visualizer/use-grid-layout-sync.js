@@ -30,8 +30,9 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 	useEffect( () => {
 		const updates = {};
 
-		const { columnCount, rowCount = 2 } = gridLayout;
-		const isManualGrid = !! columnCount;
+		const { columnCount, rowCount = 2, manualPlacement } = gridLayout;
+
+		const isManualGrid = !! manualPlacement;
 
 		if ( isManualGrid ) {
 			const rects = [];

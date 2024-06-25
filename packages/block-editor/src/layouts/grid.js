@@ -142,7 +142,7 @@ export default {
 		if ( minimumColumnWidth && columnCount ) {
 			const maxValue = `max(${ minimumColumnWidth }, ( 100% - (${
 				blockGapValue || '1.2rem'
-			}*${ ( columnCount || 4 ) - 1 }) ) / ${ columnCount || 4 })`;
+			}*${ columnCount - 1 }) ) / ${ columnCount })`;
 			rules.push(
 				`grid-template-columns: repeat(auto-fill, minmax(${ maxValue }, 1fr))`,
 				`container-type: inline-size`
@@ -274,7 +274,7 @@ function GridLayoutColumnsAndRowsControl( {
 	onChange,
 	allowSizingOnChildren,
 } ) {
-	const { columnCount = 3, rowCount } = layout;
+	const { columnCount = 3, rowCount, manualPlacement } = layout;
 
 	return (
 		<>
@@ -302,7 +302,8 @@ function GridLayoutColumnsAndRowsControl( {
 
 					<FlexItem isBlock>
 						{ window.__experimentalEnableGridInteractivity &&
-						allowSizingOnChildren ? (
+						allowSizingOnChildren &&
+						manualPlacement ? (
 							<NumberControl
 								size="__unstable-large"
 								onChange={ ( value ) => {
@@ -340,7 +341,8 @@ function GridLayoutColumnsAndRowsControl( {
 
 // Enables switching between grid types
 function GridLayoutTypeControl( { layout, onChange } ) {
-	const { columnCount, minimumColumnWidth, manualPlacement } = layout;
+	const { columnCount, rowCount, minimumColumnWidth, manualPlacement } =
+		layout;
 
 	/**
 	 * When switching, temporarily save any custom values set on the
@@ -349,6 +351,7 @@ function GridLayoutTypeControl( { layout, onChange } ) {
 	const [ tempColumnCount, setTempColumnCount ] = useState(
 		columnCount || 3
 	);
+	const [ tempRowCount, setTempRowCount ] = useState( rowCount || 2 );
 	const [ tempMinimumColumnWidth, setTempMinimumColumnWidth ] = useState(
 		minimumColumnWidth || '12rem'
 	);
@@ -364,10 +367,16 @@ function GridLayoutTypeControl( { layout, onChange } ) {
 			setTempMinimumColumnWidth( minimumColumnWidth || '12rem' );
 		} else {
 			setTempColumnCount( columnCount || 3 );
+			setTempRowCount( rowCount || 2 );
 		}
 		onChange( {
 			...layout,
 			columnCount: value === 'manual' ? tempColumnCount : null,
+			rowCount:
+				value === 'manual' &&
+				window.__experimentalEnableGridInteractivity
+					? tempRowCount
+					: null,
 			manualPlacement:
 				value === 'manual' &&
 				window.__experimentalEnableGridInteractivity

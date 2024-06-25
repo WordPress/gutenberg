@@ -466,7 +466,38 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			}
 		}
 	} elseif ( 'grid' === $layout_type ) {
-		if ( ! empty( $layout['columnCount'] ) ) {
+		// Deal with block gap first so it can be used for responsive computation.
+		$responsive_gap_value = '1.2rem';
+		if ( $has_block_gap_support && isset( $gap_value ) ) {
+			$combined_gap_value = '';
+			$gap_sides          = is_array( $gap_value ) ? array( 'top', 'left' ) : array( 'top' );
+
+			foreach ( $gap_sides as $gap_side ) {
+				$process_value = $gap_value;
+				if ( is_array( $gap_value ) ) {
+					$process_value = $gap_value[ $gap_side ] ?? $fallback_gap_value;
+				}
+				// Get spacing CSS variable from preset value if provided.
+				if ( is_string( $process_value ) && str_contains( $process_value, 'var:preset|spacing|' ) ) {
+					$index_to_splice = strrpos( $process_value, '|' ) + 1;
+					$slug            = _wp_to_kebab_case( substr( $process_value, $index_to_splice ) );
+					$process_value   = "var(--wp--preset--spacing--$slug)";
+				}
+				$combined_gap_value .= "$process_value ";
+			}
+			$gap_value            = trim( $combined_gap_value );
+			$responsive_gap_value = $gap_value;
+		}
+
+		if ( ! empty( $layout['columnCount'] ) && ! empty( $layout['minimumColumnWidth'] ) ) {
+			$max_value       = 'max(' . $layout['minimumColumnWidth'] . ', (100% - (' . $responsive_gap_value . ' * (' . $layout['columnCount'] . ' - 1))) /' . $layout['columnCount'] . ')';
+			$layout_styles[] = array(
+				'selector'     => $selector,
+				'declarations' => array(
+					'grid-template-columns' => 'repeat(auto-fill, minmax(' . $max_value . ', 1fr))',
+				),
+			);
+		} elseif ( ! empty( $layout['columnCount'] ) ) {
 			$layout_styles[] = array(
 				'selector'     => $selector,
 				'declarations' => array( 'grid-template-columns' => 'repeat(' . $layout['columnCount'] . ', minmax(0, 1fr))' ),
@@ -489,31 +520,11 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			);
 		}
 
-		if ( $has_block_gap_support && isset( $gap_value ) ) {
-			$combined_gap_value = '';
-			$gap_sides          = is_array( $gap_value ) ? array( 'top', 'left' ) : array( 'top' );
-
-			foreach ( $gap_sides as $gap_side ) {
-				$process_value = $gap_value;
-				if ( is_array( $gap_value ) ) {
-					$process_value = $gap_value[ $gap_side ] ?? $fallback_gap_value;
-				}
-				// Get spacing CSS variable from preset value if provided.
-				if ( is_string( $process_value ) && str_contains( $process_value, 'var:preset|spacing|' ) ) {
-					$index_to_splice = strrpos( $process_value, '|' ) + 1;
-					$slug            = _wp_to_kebab_case( substr( $process_value, $index_to_splice ) );
-					$process_value   = "var(--wp--preset--spacing--$slug)";
-				}
-				$combined_gap_value .= "$process_value ";
-			}
-			$gap_value = trim( $combined_gap_value );
-
-			if ( null !== $gap_value && ! $should_skip_gap_serialization ) {
-				$layout_styles[] = array(
-					'selector'     => $selector,
-					'declarations' => array( 'gap' => $gap_value ),
-				);
-			}
+		if ( $has_block_gap_support && null !== $gap_value && ! $should_skip_gap_serialization ) {
+			$layout_styles[] = array(
+				'selector'     => $selector,
+				'declarations' => array( 'gap' => $gap_value ),
+			);
 		}
 	}
 

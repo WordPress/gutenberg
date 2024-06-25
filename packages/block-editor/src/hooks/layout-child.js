@@ -59,6 +59,19 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 				grid-column: span ${ columnSpan };
 			}`;
 		}
+		if ( rowStart && rowSpan ) {
+			css += `${ selector } {
+				grid-row: ${ rowStart } / span ${ rowSpan };
+			}`;
+		} else if ( rowStart ) {
+			css += `${ selector } {
+				grid-row: ${ rowStart };
+			}`;
+		} else if ( rowSpan ) {
+			css += `${ selector } {
+				grid-row: span ${ rowSpan };
+			}`;
+		}
 		/**
 		 * If minimumColumnWidth is set on the parent, or if no
 		 * columnCount is set, the grid is responsive so a
@@ -106,23 +119,17 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 			// If a span is set we want to preserve it as long as possible, otherwise we just reset the value.
 			const gridColumnValue = columnSpan ? '1/-1' : 'auto';
 
+			// Unset any existing rowStart values.
+			const gridRowValue =
+				rowStart && ( ! rowSpan || rowSpan === 1 )
+					? 'auto'
+					: `span ${ rowSpan }`;
+
 			css += `@container (max-width: ${ containerQueryValue }${ parentColumnUnit }) {
 				${ selector } {
 					grid-column: ${ gridColumnValue };
+					grid-row: ${ gridRowValue };
 				}
-			}`;
-		}
-		if ( rowStart && rowSpan ) {
-			css += `${ selector } {
-				grid-row: ${ rowStart } / span ${ rowSpan };
-			}`;
-		} else if ( rowStart ) {
-			css += `${ selector } {
-				grid-row: ${ rowStart };
-			}`;
-		} else if ( rowSpan ) {
-			css += `${ selector } {
-				grid-row: span ${ rowSpan };
 			}`;
 		}
 	}
