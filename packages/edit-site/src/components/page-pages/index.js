@@ -275,8 +275,9 @@ export default function PagePages() {
 	} = useEntityRecords( 'postType', postType, queryArgs );
 
 	useEffect( () => {
-		if ( pages && ! pages.find( ( page ) => page.id === +postId ) ) {
-			// remove the post id from the url in case it was deleted.
+		const postIdWasDeleted =
+			pages && ! pages.find( ( page ) => getItemId( page ) === postId );
+		if ( postIdWasDeleted ) {
 			history.push( {
 				...history.getLocationWithParams().params,
 				postId: undefined,
