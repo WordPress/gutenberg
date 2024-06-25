@@ -196,7 +196,6 @@ function FontSize() {
 							<SizeControl
 								label={ __( 'Size' ) }
 								value={ fontSize.size }
-								withSlider
 								onChange={ handleFontSizeChange }
 								hasUnits={ hasUnits }
 								withReset={ false }
@@ -228,7 +227,6 @@ function FontSize() {
 									<SizeControl
 										label={ __( 'Minimum' ) }
 										value={ fontSize.fluid?.min }
-										withSlider
 										onChange={ handleMinChange }
 										hasUnits={ hasUnits }
 										withReset={ false }
@@ -238,7 +236,6 @@ function FontSize() {
 									<SizeControl
 										label={ __( 'Maximum' ) }
 										value={ fontSize.fluid?.max }
-										withSlider
 										onChange={ handleMaxChange }
 										hasUnits={ hasUnits }
 										withReset={ false }
