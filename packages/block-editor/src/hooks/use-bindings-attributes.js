@@ -11,6 +11,7 @@ import { addFilter } from '@wordpress/hooks';
  * Internal dependencies
  */
 import { unlock } from '../lock-unlock';
+import { store as blockEditorStore } from '../store';
 
 /** @typedef {import('@wordpress/compose').WPHigherOrderComponent} WPHigherOrderComponent */
 /** @typedef {import('@wordpress/blocks').WPBlockSettings} WPBlockSettings */
@@ -93,10 +94,25 @@ export function canBindAttribute( blockName, attributeName ) {
 export const withBlockBindingSupport = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const registry = useRegistry();
-		const sources = useSelect( ( select ) =>
-			unlock( select( blocksStore ) ).getAllBlockBindingsSources()
-		);
 		const { name, clientId, context } = props;
+		const { sources, hasParentPattern } = useSelect(
+			( select ) => {
+				const { getAllBlockBindingsSources } = unlock(
+					select( blocksStore )
+				);
+				const { getBlockParentsByBlockName } = unlock(
+					select( blockEditorStore )
+				);
+
+				return {
+					sources: getAllBlockBindingsSources(),
+					hasParentPattern:
+						getBlockParentsByBlockName( clientId, 'core/block' )
+							.length > 0,
+				};
+			},
+			[ clientId ]
+		);
 		const hasPatternOverridesDefaultBinding =
 			props.attributes.metadata?.bindings?.[ DEFAULT_ATTRIBUTE ]
 				?.source === 'core/pattern-overrides';
@@ -216,30 +232,20 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 						}
 					}
 
-					// Don't update block attributes connected to pattern overrides.
-					if ( hasPatternOverridesDefaultBinding ) {
-						// Skip caption and href until they are supported.
-						const attributesToSkip = [ 'caption', 'href' ];
-						// Skip supported attributes that are not bound to other sources.
-						BLOCK_BINDINGS_ALLOWED_BLOCKS[ name ].forEach(
-							( attr ) => {
-								// Ensure it is bound to pattern overrides.
-								if (
-									bindings?.[ attr ]?.source ===
-									'core/pattern-overrides'
-								) {
-									attributesToSkip.push( attr );
-								}
-							}
-						);
-
-						// Remove attributes from the list.
-						attributesToSkip.forEach(
-							( attr ) => delete keptAttributes[ attr ]
-						);
-					}
-
-					if ( Object.keys( keptAttributes ).length ) {
+					if (
+						// Don't update non-connected attributes when using if the block is overriden
+						// and the editing is happening while using the pattern (not editing the original).
+						! (
+							hasPatternOverridesDefaultBinding &&
+							hasParentPattern
+						) &&
+						Object.keys( keptAttributes ).length
+					) {
+						// Don't update caption and href until they are supported.
+						if ( hasPatternOverridesDefaultBinding ) {
+							delete keptAttributes?.caption;
+							delete keptAttributes?.href;
+						}
 						setAttributes( keptAttributes );
 					}
 				} );
