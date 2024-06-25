@@ -337,7 +337,7 @@ function GridLayoutTypeControl( { layout, onChange } ) {
 			onChange={ onChangeType }
 			isBlock
 			help={
-				isManual
+				isManual === 'manual'
 					? __(
 							'Grid items can be manually placed in any position on the grid.'
 					  )
