@@ -109,6 +109,10 @@ export const SelectPopover = styled( Ariakit.SelectPopover )`
 	background: ${ COLORS.theme.background };
 	border: 1px solid ${ COLORS.theme.foreground };
 
+	/* Same as popover component */
+	/* TODO: is there a way to read the sass variable? */
+	z-index: 1000000;
+
 	max-height: min( var( --popover-available-height, 360px ), 360px );
 	flex-direction: column;
 	overflow: auto;
