@@ -3,23 +3,6 @@
 	margin-bottom: 10px;
 }
 
-.editor-post-excerpt__dropdown__trigger {
-	height: auto;
-	padding: 0;
-
-	&:not(.has-excerpt) {
-		color: $gray-700;
-	}
-
-	&:hover {
-		color: $gray-900;
-	}
-}
-
-.editor-post-excerpt__dropdown {
-	display: block;
-}
-
 .editor-post-excerpt__dropdown__content {
 	.components-popover__content {
 		min-width: 320px;

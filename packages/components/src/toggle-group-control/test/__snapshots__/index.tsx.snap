@@ -278,7 +278,6 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
             <div
               class="emotion-15"
               role="presentation"
-              style="opacity: 1;"
             />
           </div>
         </div>
@@ -824,7 +823,6 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
             <div
               class="emotion-15"
               role="presentation"
-              style="opacity: 1;"
             />
           </div>
         </div>

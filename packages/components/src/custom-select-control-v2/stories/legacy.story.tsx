@@ -21,8 +21,8 @@ const meta: Meta< typeof CustomSelectControl > = {
 		onChange: { control: { type: null } },
 		value: { control: { type: null } },
 	},
+	tags: [ 'status-wip' ],
 	parameters: {
-		badges: [ 'wip' ],
 		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: {

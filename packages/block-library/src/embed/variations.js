@@ -27,6 +27,7 @@ import {
 	embedPinterestIcon,
 	embedWolframIcon,
 	embedPocketCastsIcon,
+	embedBlueskyIcon,
 } from './icons';
 
 /** @typedef {import('@wordpress/blocks').WPBlockVariation} WPBlockVariation */
@@ -259,14 +260,6 @@ const variations = [
 		attributes: { providerNameSlug: 'scribd', responsive: true },
 	},
 	{
-		name: 'slideshare',
-		title: 'Slideshare',
-		icon: embedContentIcon,
-		description: __( 'Embed Slideshare content.' ),
-		patterns: [ /^https?:\/\/(.+?\.)?slideshare\.net\/.+/i ],
-		attributes: { providerNameSlug: 'slideshare', responsive: true },
-	},
-	{
 		name: 'smugmug',
 		title: 'SmugMug',
 		icon: embedPhotoIcon,
@@ -359,6 +352,14 @@ const variations = [
 		description: __( 'Embed Wolfram notebook content.' ),
 		patterns: [ /^https?:\/\/(www\.)?wolframcloud\.com\/obj\/.+/i ],
 		attributes: { providerNameSlug: 'wolfram-cloud', responsive: true },
+	},
+	{
+		name: 'bluesky',
+		title: 'Bluesky',
+		icon: embedBlueskyIcon,
+		description: __( 'Embed a Bluesky post.' ),
+		patterns: [ /^https?:\/\/bsky\.app\/profile\/.+\/post\/.+/i ],
+		attributes: { providerNameSlug: 'bluesky' },
 	},
 ];
 

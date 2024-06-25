@@ -25,6 +25,7 @@ concurrency:
 
 jobs:
     performance:
+        timeout-minutes: 60
         name: Run performance tests
         runs-on: ubuntu-latest
         if: ${{ github.repository == 'WordPress/gutenberg' }}
@@ -32,7 +33,7 @@ jobs:
             WP_ARTIFACTS_PATH: ${{ github.workspace }}/artifacts
 
         steps:
-            - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
+            - uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
@@ -83,6 +84,9 @@ jobs:
                   WP_VERSION: ${{ github.event.inputs.wpversion }}
               run: |
                   ./bin/plugin/cli.js perf $(echo $BRANCHES | tr ',' ' ') --tests-branch $GITHUB_SHA --wp-version "$WP_VERSION"
+
+            - name: Add workflow summary
+              run: cat ${{ env.WP_ARTIFACTS_PATH }}/summary.md >> $GITHUB_STEP_SUMMARY
 
             - name: Archive performance results
               if: success()

@@ -119,6 +119,7 @@ export default function useGlobalStylesRevisions( { query } = {} ) {
 					id: 'unsaved',
 					styles: userConfig?.styles,
 					settings: userConfig?.settings,
+					_links: userConfig?._links,
 					author: {
 						name: currentUser?.name,
 						avatar_urls: currentUser?.avatar_urls,

@@ -43,6 +43,7 @@ import {
 
 import usePatternSettings from '../page-patterns/use-pattern-settings';
 import { unlock } from '../../lock-unlock';
+import { useEditPostAction } from '../dataviews-actions';
 
 const { usePostActions } = unlock( editorPrivateApis );
 
@@ -183,17 +184,11 @@ function Preview( { item, viewType } ) {
 	);
 }
 
-const TEMPLATE_ACTIONS = [
-	'edit-post',
-	'reset-template',
-	'rename-template',
-	'view-post-revisions',
-	'delete-template',
-];
-
 export default function PageTemplates() {
 	const { params } = useLocation();
-	const { activeView = 'all', layout } = params;
+	const { activeView = 'all', layout, postId } = params;
+	const [ selection, setSelection ] = useState( [ postId ] );
+
 	const defaultView = useMemo( () => {
 		const usedType = layout ?? DEFAULT_VIEW.type;
 		return {
@@ -330,21 +325,15 @@ export default function PageTemplates() {
 		return filterSortAndPaginate( records, view, fields );
 	}, [ records, view, fields ] );
 
-	const onActionPerformed = useCallback(
-		( actionId, items ) => {
-			if ( actionId === 'edit-post' ) {
-				const post = items[ 0 ];
-				history.push( {
-					postId: post.id,
-					postType: post.type,
-					canvas: 'edit',
-				} );
-			}
-		},
-		[ history ]
+	const postTypeActions = usePostActions( {
+		postType: TEMPLATE_POST_TYPE,
+		context: 'list',
+	} );
+	const editAction = useEditPostAction();
+	const actions = useMemo(
+		() => [ editAction, ...postTypeActions ],
+		[ postTypeActions, editAction ]
 	);
-
-	const actions = usePostActions( onActionPerformed, TEMPLATE_ACTIONS );
 
 	const onChangeView = useCallback(
 		( newView ) => {
@@ -382,6 +371,8 @@ export default function PageTemplates() {
 				view={ view }
 				onChangeView={ onChangeView }
 				onSelectionChange={ onSelectionChange }
+				selection={ selection }
+				setSelection={ setSelection }
 			/>
 		</Page>
 	);

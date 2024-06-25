@@ -14,6 +14,8 @@ import { getFontFaceVariantName } from './utils';
 import FontDemo from './font-demo';
 import { unlock } from '../../../lock-unlock';
 
+const { kebabCase } = unlock( componentsPrivateApis );
+
 function CollectionFontVariant( {
 	face,
 	font,
@@ -29,7 +31,6 @@ function CollectionFontVariant( {
 	};
 
 	const displayName = font.name + ' ' + getFontFaceVariantName( face );
-	const { kebabCase } = unlock( componentsPrivateApis );
 	const checkboxId = kebabCase(
 		`${ font.slug }-${ getFontFaceVariantName( face ) }`
 	);

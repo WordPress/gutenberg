@@ -6,16 +6,10 @@
 	flex-direction: column;
 }
 
-.editor-inserter-sidebar__header {
-	padding-top: $grid-unit-10;
-	padding-right: $grid-unit-10;
-	display: flex;
-	justify-content: flex-end;
-}
-
 .editor-inserter-sidebar__content {
 	// Leave space for the close button
 	height: calc(100% - #{$button-size} - #{$grid-unit-10});
+
 	@include break-medium() {
 		height: 100%;
 	}

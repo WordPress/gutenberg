@@ -22,7 +22,7 @@ const { useLocation } = unlock( routerPrivateApis );
 
 export const postType = `wp_navigation`;
 
-export default function SidebarNavigationScreenNavigationMenu() {
+export default function SidebarNavigationScreenNavigationMenu( { backPath } ) {
 	const {
 		params: { postId },
 	} = useLocation();
@@ -67,6 +67,7 @@ export default function SidebarNavigationScreenNavigationMenu() {
 				description={ __(
 					'Navigation Menus are a curated collection of blocks that allow visitors to get around your site.'
 				) }
+				backPath={ backPath }
 			>
 				<Spinner className="edit-site-sidebar-navigation-screen-navigation-menus__loading" />
 			</SidebarNavigationScreenWrapper>
@@ -77,6 +78,7 @@ export default function SidebarNavigationScreenNavigationMenu() {
 		return (
 			<SidebarNavigationScreenWrapper
 				description={ __( 'Navigation Menu missing.' ) }
+				backPath={ backPath }
 			/>
 		);
 	}
@@ -93,6 +95,7 @@ export default function SidebarNavigationScreenNavigationMenu() {
 						onDuplicate={ _handleDuplicate }
 					/>
 				}
+				backPath={ backPath }
 				title={ buildNavigationLabel(
 					navigationMenu?.title,
 					navigationMenu?.id,
@@ -106,6 +109,7 @@ export default function SidebarNavigationScreenNavigationMenu() {
 	return (
 		<SingleNavigationMenu
 			navigationMenu={ navigationMenu }
+			backPath={ backPath }
 			handleDelete={ _handleDelete }
 			handleSave={ _handleSave }
 			handleDuplicate={ _handleDuplicate }

@@ -45,7 +45,13 @@ export function SidebarNavigationItemGlobalStyles( props ) {
 		[]
 	);
 	if ( hasGlobalStyleVariations ) {
-		return <SidebarNavigationItem { ...props } path="/wp_global_styles" />;
+		return (
+			<SidebarNavigationItem
+				{ ...props }
+				params={ { path: '/wp_global_styles' } }
+				uid="global-styles-navigation-item"
+			/>
+		);
 	}
 	return (
 		<SidebarNavigationItem
@@ -90,7 +96,7 @@ function SidebarNavigationScreenGlobalStylesContent() {
 			>
 				<StyleVariationsContainer gap={ gap } />
 				{ colorVariations?.length && (
-					<ColorVariations title={ __( 'Colors' ) } gap={ gap } />
+					<ColorVariations title={ __( 'Palettes' ) } gap={ gap } />
 				) }
 				{ typographyVariations?.length && (
 					<TypographyVariations
@@ -103,7 +109,7 @@ function SidebarNavigationScreenGlobalStylesContent() {
 	);
 }
 
-export default function SidebarNavigationScreenGlobalStyles() {
+export default function SidebarNavigationScreenGlobalStyles( { backPath } ) {
 	const { revisions, isLoading: isLoadingRevisions } =
 		useGlobalStylesRevisions();
 	const { openGeneralSidebar } = useDispatch( editSiteStore );
@@ -179,6 +185,7 @@ export default function SidebarNavigationScreenGlobalStyles() {
 				description={ __(
 					'Choose a different style combination for the theme styles.'
 				) }
+				backPath={ backPath }
 				content={ <SidebarNavigationScreenGlobalStylesContent /> }
 				footer={
 					shouldShowGlobalStylesFooter && (

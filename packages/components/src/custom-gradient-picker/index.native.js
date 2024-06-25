@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { PanelBody, RadioControl, RangeControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 
@@ -16,6 +15,9 @@ import {
 	HORIZONTAL_GRADIENT_ORIENTATION,
 } from './constants';
 import styles from './style.scss';
+import PanelBody from '../panel/body';
+import RadioControl from '../radio-control';
+import RangeControl from '../range-control';
 
 function CustomGradientPicker( { setColor, currentValue, isGradientColor } ) {
 	const [ gradientOrientation, setGradientOrientation ] = useState(

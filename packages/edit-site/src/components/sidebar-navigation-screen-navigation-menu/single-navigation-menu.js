@@ -13,6 +13,7 @@ import buildNavigationLabel from '../sidebar-navigation-screen-navigation-menus/
 
 export default function SingleNavigationMenu( {
 	navigationMenu,
+	backPath,
 	handleDelete,
 	handleDuplicate,
 	handleSave,
@@ -32,6 +33,7 @@ export default function SingleNavigationMenu( {
 					/>
 				</>
 			}
+			backPath={ backPath }
 			title={ buildNavigationLabel(
 				navigationMenu?.title,
 				navigationMenu?.id,

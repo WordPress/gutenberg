@@ -10,6 +10,7 @@ import {
 	__unstableEditorStyles as EditorStyles,
 	__unstableIframe as Iframe,
 } from '@wordpress/block-editor';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { useSelect } from '@wordpress/data';
 import { useContext, useMemo } from '@wordpress/element';
 
@@ -18,7 +19,6 @@ import { useContext, useMemo } from '@wordpress/element';
  */
 
 import { unlock } from '../../lock-unlock';
-import { mergeBaseAndUserConfigs } from '../global-styles/global-styles-provider';
 import EditorCanvasContainer from '../editor-canvas-container';
 
 const {
@@ -26,6 +26,7 @@ const {
 	GlobalStylesContext,
 	useGlobalStylesOutputWithConfig,
 } = unlock( blockEditorPrivateApis );
+const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
 
 function isObjectEmpty( object ) {
 	return ! object || Object.keys( object ).length === 0;

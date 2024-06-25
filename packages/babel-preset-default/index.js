@@ -76,20 +76,9 @@ module.exports = ( api ) => {
 		plugins: [
 			require.resolve( '@wordpress/warning/babel-plugin' ),
 			[
-				require.resolve( '@wordpress/babel-plugin-import-jsx-pragma' ),
-				{
-					scopeVariable: 'createElement',
-					scopeVariableFrag: 'Fragment',
-					source: 'react',
-					isDefault: false,
-				},
-			],
-			[
 				require.resolve( '@babel/plugin-transform-react-jsx' ),
 				{
-					pragma: 'createElement',
-					pragmaFrag: 'Fragment',
-					useSpread: true,
+					runtime: 'automatic',
 				},
 			],
 			maybeGetPluginTransformRuntime(),

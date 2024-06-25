@@ -67,7 +67,7 @@
 	flex-direction: row;
 	width: 100%;
 	flex-wrap: wrap;
-	gap: $grid-unit-15;
+	gap: $grid-unit-20;
 	justify-content: flex-start;
 
 	p {
@@ -83,7 +83,6 @@
 
 .components-placeholder__input[type="url"] {
 	@include input-control;
-	margin: 0 8px 0 0;
 	flex: 1 1 auto;
 }
 

@@ -644,7 +644,6 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 			autoCapitalize,
 			autoComplete,
 			placeholder: value.length === 0 ? placeholder : '',
-			key: 'input',
 			disabled,
 			value: incompleteTokenValue,
 			onBlur,
@@ -654,6 +653,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 
 		return (
 			<TokenInput
+				key="input"
 				{ ...inputProps }
 				onChange={
 					! ( maxLength && value.length >= maxLength )
@@ -694,12 +694,14 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
 		<div { ...tokenFieldProps }>
-			<StyledLabel
-				htmlFor={ `components-form-token-input-${ instanceId }` }
-				className="components-form-token-field__label"
-			>
-				{ label }
-			</StyledLabel>
+			{ label && (
+				<StyledLabel
+					htmlFor={ `components-form-token-input-${ instanceId }` }
+					className="components-form-token-field__label"
+				>
+					{ label }
+				</StyledLabel>
+			) }
 			<div
 				ref={ tokensAndInput }
 				className={ classes }

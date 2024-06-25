@@ -226,7 +226,6 @@ describe( 'getCSSRules', () => {
 				{
 					background: {
 						backgroundImage: {
-							source: 'file',
 							url: 'https://example.com/image.jpg',
 						},
 						backgroundPosition: '50% 50%',

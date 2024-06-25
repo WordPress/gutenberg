@@ -1,0 +1,67 @@
+.block-editor-iframe__body {
+	position: relative;
+}
+
+.block-editor-iframe__container {
+	width: 100%;
+	height: 100%;
+	overflow-x: hidden;
+}
+
+.block-editor-iframe__scale-container {
+	width: 100%;
+	height: 100%;
+}
+
+.block-editor-iframe__scale-container.is-zoomed-out {
+	$container-width: var(--wp-block-editor-iframe-zoom-out-container-width, 100vw);
+	$prev-container-width: var(--wp-block-editor-iframe-zoom-out-prev-container-width, 100vw);
+	width: $prev-container-width;
+	margin-left: calc(-1 * (#{$prev-container-width} - #{$container-width}) / 2);
+}
+
+.block-editor-iframe__html {
+	transform-origin: top center;
+	transition: transform 0.3s;
+	@include reduce-motion("transition");
+}
+
+.block-editor-iframe__html.is-zoomed-out {
+	$scale: var(--wp-block-editor-iframe-zoom-out-scale);
+	$frame-size: var(--wp-block-editor-iframe-zoom-out-frame-size);
+	$inner-height: var(--wp-block-editor-iframe-zoom-out-inner-height);
+	$content-height: var(--wp-block-editor-iframe-zoom-out-content-height);
+	$prev-container-width: var(--wp-block-editor-iframe-zoom-out-prev-container-width);
+
+	transform: scale(#{$scale});
+
+	background-color: $gray-300;
+
+	// Firefox and Safari don't render margin-bottom here and margin-bottom is needed for Chrome
+	// layout, so we use border matching the background instead of margins.
+	border: calc(#{$frame-size} / #{$scale}) solid $gray-300;
+
+	// Chrome seems to respect that transform scale shouldn't affect the layout size of the element,
+	// so we need to adjust the height of the content to match the scale by using negative margins.
+	$extra-content-height: calc(#{$content-height} * (1 - #{$scale}));
+	$total-frame-height: calc(2 * #{$frame-size});
+	$total-height: calc(#{$extra-content-height} + #{$total-frame-height} + 2px);
+	margin-bottom: calc(-1 * #{$total-height});
+
+	body {
+		min-height: calc((#{$inner-height} - #{$total-frame-height}) / #{$scale});
+		display: flex;
+		flex-direction: column;
+
+		> .is-root-container {
+			flex: 1;
+			display: flex;
+			flex-direction: column;
+			height: 100%;
+
+			> main {
+				flex: 1;
+			}
+		}
+	}
+}

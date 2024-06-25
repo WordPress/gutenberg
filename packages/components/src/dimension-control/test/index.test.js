@@ -25,10 +25,7 @@ describe( 'DimensionControl', () => {
 	describe( 'rendering', () => {
 		it( 'renders with defaults', () => {
 			const { container } = render(
-				<DimensionControl
-					instanceId={ instanceId }
-					label={ 'Padding' }
-				/>
+				<DimensionControl instanceId={ instanceId } label="Padding" />
 			);
 			expect( container ).toMatchSnapshot();
 		} );
@@ -37,7 +34,7 @@ describe( 'DimensionControl', () => {
 			const { container } = render(
 				<DimensionControl
 					instanceId={ instanceId }
-					label={ 'Margin' }
+					label="Margin"
 					icon={ plus }
 				/>
 			);
@@ -48,9 +45,9 @@ describe( 'DimensionControl', () => {
 			const { container } = render(
 				<DimensionControl
 					instanceId={ instanceId }
-					label={ 'Margin' }
+					label="Margin"
 					icon={ plus }
-					iconLabel={ 'Tablet Devices' }
+					iconLabel="Tablet Devices"
 				/>
 			);
 			expect( container ).toMatchSnapshot();
@@ -78,7 +75,7 @@ describe( 'DimensionControl', () => {
 			const { container } = render(
 				<DimensionControl
 					instanceId={ instanceId }
-					label={ 'Custom Dimension' }
+					label="Custom Dimension"
 					sizes={ customSizes }
 				/>
 			);
@@ -93,7 +90,7 @@ describe( 'DimensionControl', () => {
 			render(
 				<DimensionControl
 					instanceId={ instanceId }
-					label={ 'Padding' }
+					label="Padding"
 					onChange={ onChangeHandler }
 				/>
 			);
@@ -115,7 +112,7 @@ describe( 'DimensionControl', () => {
 			render(
 				<DimensionControl
 					instanceId={ instanceId }
-					label={ 'Padding' }
+					label="Padding"
 					onChange={ onChangeHandler }
 				/>
 			);

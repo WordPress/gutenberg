@@ -1,6 +1,6 @@
 # Interactivity API Reference
 
-The Interactivity API, [introduced in WordPress 6.5](https://make.wordpress.org/core/2024/02/19/merge-announcement-interactivity-api/), provides a standard way for developers to add interactions to the front end of their blocks. The API is also used in many Core WordPress blocks, including Search, Query, Navigation, and File. 
+The Interactivity API, [introduced in WordPress 6.5](https://make.wordpress.org/core/2024/02/19/merge-announcement-interactivity-api/), provides a standard way for developers to add interactions to the front end of their blocks. The API is also used in many Core WordPress blocks, including Search, Query, Navigation, and File.
 
 This standard makes it easier for developers to create rich, interactive user experiences, from simple counters or pop-ups to more complex features like instant page navigation, instant search, shopping carts, or checkouts.
 
@@ -9,7 +9,7 @@ Blocks can share data, actions, and callbacks between them. This makes communica
 For more information about the genesis of the Interactivity API, check out the [original proposal](https://make.wordpress.org/core/2023/03/30/proposal-the-interactivity-api-a-better-developer-experience-in-building-interactive-blocks/). You can also review the [merge announcement](https://make.wordpress.org/core/2024/02/19/merge-announcement-interactivity-api/), the [status update post](https://make.wordpress.org/core/2023/08/15/status-update-on-the-interactivity-api/), and the official [Trac ticket](https://core.trac.wordpress.org/ticket/60356).
 
 <div class="callout callout-info">
-    The Interactivity API is supported by the package <code>@wordpress/interactivity</code> which is bundled in WordPress Core from v6.5
+    The Interactivity API is supported by the package <a href="https://developer.wordpress.org/block-editor/reference-guides/packages/packages-interactivity/"><code>@wordpress/interactivity</code></a> which is bundled in WordPress Core from v6.5
 </div>
 
 ## Navigating the Interactivity API docs
@@ -22,11 +22,17 @@ Use the following links to locate the topic you're interested in. If you have ne
 - **[API Reference](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/api-reference/):** To take a deep dive into how the API works internally, the list of Directives, and how the Store works.
 - **[Docs and Examples](#docs-examples):** Additional resources to learn/read more about the Interactivity API.
 
+To get a deeper understanding of what the Interactivity API is or find answers to questions you may have about this standard, check the following resources:
+
+- **[About the Interactivity API](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/iapi-about/):** To learn more about the API Goals and the reasoning behind the use of a standard to add interactivity to blocks.
+- **[Frequently Asked Questions](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/iapi-faq/):** To find responses to some frequently asked questions about the technology behind and alternatives.
+
+
 ## Requirements of the Interactivity API
 
 Interactivity API is included in Core in WordPress 6.5. For versions below, you'll need Gutenberg 17.5 or higher installed and activated in your WordPress installation.
 
-It’s also important to highlight that the block creation workflow doesn’t change, and all the [prerequisites](https://developer.wordpress.org/block-editor/getting-started/devenv/) remain the same. These include: 
+It’s also important to highlight that the block creation workflow doesn’t change, and all the [prerequisites](https://developer.wordpress.org/block-editor/getting-started/devenv/) remain the same. These include:
 
 - [Code Editor](https://developer.wordpress.org/block-editor/getting-started/devenv/#code-editor)
 - [Node.js development tools](https://developer.wordpress.org/block-editor/getting-started/devenv/#node-js-development-tools)
@@ -49,9 +55,9 @@ To indicate that the block [supports](https://developer.wordpress.org/block-edit
 
 Refer to the [`interactivity` support property docs](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity) to get a more detailed description of this property.
 
-#### Load Interactivity API Javascript code with `viewScriptModule`
+#### Load Interactivity API JavaScript code with `viewScriptModule`
 
-The Interactivity API provides the `@wordpress/interactivity` Script Module. JavaScript using the Interactivity API should be implemented as Script Modules so they can depend on `@wordpress/interactivity`. [Script Modules have been available since WordPress 6.5](https://make.wordpress.org/core/2024/03/04/script-modules-in-6-5/). Blocks can use [`viewScriptModule` [block metadata](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#view-script-module) to enqueue their Script Modules easily:
+The Interactivity API provides the `@wordpress/interactivity` Script Module. JavaScript using the Interactivity API should be implemented as Script Modules so they can depend on `@wordpress/interactivity`. [Script Modules have been available since WordPress 6.5](https://make.wordpress.org/core/2024/03/04/script-modules-in-6-5/). Blocks can use [`viewScriptModule` block metadata](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#view-script-module) to enqueue their Script Modules easily:
 
 ```json
 // block.json
@@ -61,9 +67,22 @@ The Interactivity API provides the `@wordpress/interactivity` Script Module. Jav
 }
 ```
 
+The use of `viewScriptModule` also requires the `--experimental-modules` flag for both the [`build`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/#build) and [`start`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/#start) scripts of `wp-scripts` to ensure a proper build of the Script Modules.
+
+
+```json
+// package.json
+{
+    "scripts": {
+        ...
+		"build": "wp-scripts build --experimental-modules",
+		"start": "wp-scripts start --experimental-modules"
+	}
+```
+
 #### Add `wp-interactive` directive to a DOM element
 
-To "activate" the Interactivity API in a DOM element (and its children), add the [`wp-interactive`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-interactivity/packages-interactivity-api-reference/#wp-interactive) directive to the DOM element in the block's `render.php` or `save.js` files. 
+To "activate" the Interactivity API in a DOM element (and its children), add the [`wp-interactive`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-interactivity/packages-interactivity-api-reference/#wp-interactive) directive to the DOM element in the block's `render.php` or `save.js` files.
 
 
 

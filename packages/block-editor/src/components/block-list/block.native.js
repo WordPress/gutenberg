@@ -14,13 +14,7 @@ import {
 	useRef,
 	memo,
 } from '@wordpress/element';
-import {
-	GlobalStylesContext,
-	getMergedGlobalStyles,
-	useMobileGlobalStylesColors,
-	useGlobalStyles,
-	withFilters,
-} from '@wordpress/components';
+import { withFilters } from '@wordpress/components';
 import {
 	__experimentalGetAccessibleBlockLabel as getAccessibleBlockLabel,
 	getBlockType,
@@ -51,6 +45,12 @@ import { useSettings } from '../use-settings';
 import { unlock } from '../../lock-unlock';
 import BlockCrashBoundary from './block-crash-boundary';
 import BlockCrashWarning from './block-crash-warning';
+import {
+	getMergedGlobalStyles,
+	GlobalStylesContext,
+	useGlobalStyles,
+	useMobileGlobalStylesColors,
+} from '../global-styles/use-global-styles-context';
 
 const EMPTY_ARRAY = [];
 
@@ -432,8 +432,8 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId } ) => {
 	const attributes = getBlockAttributes( clientId );
 	const isSelected = isBlockSelected( clientId );
 	const templateLock = getTemplateLock( rootClientId );
-	const canRemove = canRemoveBlock( clientId, rootClientId );
-	const canMove = canMoveBlock( clientId, rootClientId );
+	const canRemove = canRemoveBlock( clientId );
+	const canMove = canMoveBlock( clientId );
 
 	// The fallback to `{}` is a temporary fix.
 	// This function should never be called when a block is not present in
@@ -669,8 +669,16 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 					}
 
 					moveFirstItemUp( rootClientId );
-				} else {
-					removeBlock( clientId );
+				} else if (
+					getBlockName( clientId ) !== getDefaultBlockName()
+				) {
+					const replacement = switchToBlockType(
+						getBlock( clientId ),
+						getDefaultBlockName()
+					);
+					if ( replacement && replacement.length ) {
+						replaceBlocks( clientId, replacement );
+					}
 				}
 			}
 		},

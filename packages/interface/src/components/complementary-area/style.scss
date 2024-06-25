@@ -24,7 +24,7 @@
 		top: 0;
 		z-index: z-index(".interface-complementary-area .components-panel__header");
 
-		&.edit-post-sidebar__panel-tabs {
+		&.editor-sidebar__panel-tabs {
 			top: $panel-header-height;
 
 			@include break-medium() {
@@ -39,6 +39,7 @@
 
 	h2 {
 		font-size: $default-font-size;
+		font-weight: 500;
 		color: $gray-900;
 		margin-bottom: 1.5em;
 	}

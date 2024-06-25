@@ -52,6 +52,7 @@ class MediaTextEdit extends Component {
 
 		this.onSelectMedia = this.onSelectMedia.bind( this );
 		this.onMediaUpdate = this.onMediaUpdate.bind( this );
+		this.onMediaThumbnailUpdate = this.onMediaThumbnailUpdate.bind( this );
 		this.onWidthChange = this.onWidthChange.bind( this );
 		this.commitWidthChange = this.commitWidthChange.bind( this );
 		this.onLayoutChange = this.onLayoutChange.bind( this );
@@ -118,6 +119,14 @@ class MediaTextEdit extends Component {
 		setAttributes( {
 			mediaId: media.id,
 			mediaUrl: media.url,
+		} );
+	}
+
+	onMediaThumbnailUpdate( mediaUrl ) {
+		const { setAttributes } = this.props;
+
+		setAttributes( {
+			mediaUrl,
 		} );
 	}
 
@@ -221,6 +230,7 @@ class MediaTextEdit extends Component {
 				onFocus={ this.props.onFocus }
 				onMediaSelected={ this.onMediaSelected }
 				onMediaUpdate={ this.onMediaUpdate }
+				onMediaThumbnailUpdate={ this.onMediaThumbnailUpdate }
 				onSelectMedia={ this.onSelectMedia }
 				onSetOpenPickerRef={ this.onSetOpenPickerRef }
 				onWidthChange={ this.onWidthChange }

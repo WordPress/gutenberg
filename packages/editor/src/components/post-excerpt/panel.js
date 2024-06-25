@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -18,6 +13,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { useMemo, useState } from '@wordpress/element';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -84,6 +80,11 @@ function ExcerptPanel() {
 	);
 }
 
+/**
+ * Is rendered if the post type supports excerpts and allows editing the excerpt.
+ *
+ * @return {JSX.Element} The rendered PostExcerptPanel component.
+ */
 export default function PostExcerptPanel() {
 	return (
 		<PostExcerptCheck>
@@ -173,7 +174,7 @@ function PrivateExcerpt() {
 	}
 	const excerptText = !! excerpt && (
 		<Text align="left" numberOfLines={ 4 } truncate>
-			{ excerpt }
+			{ decodeEntities( excerpt ) }
 		</Text>
 	);
 	if ( ! allowEditing ) {
@@ -186,49 +187,46 @@ function PrivateExcerpt() {
 		? __( 'Edit description' )
 		: __( 'Edit excerpt' );
 	return (
-		<Dropdown
-			className="editor-post-excerpt__dropdown"
-			contentClassName="editor-post-excerpt__dropdown__content"
-			popoverProps={ popoverProps }
-			focusOnMount
-			ref={ setPopoverAnchor }
-			renderToggle={ ( { onToggle } ) => (
-				<Button
-					className={ clsx(
-						'editor-post-excerpt__dropdown__trigger',
-						{ 'has-excerpt': !! excerpt }
-					) }
-					onClick={ onToggle }
-					label={
-						!! excerptText ? triggerEditLabel : excerptPlaceholder
-					}
-					showTooltip={ !! excerptText }
-				>
-					{ excerptText || excerptPlaceholder }
-				</Button>
-			) }
-			renderContent={ ( { onClose } ) => (
-				<>
-					<InspectorPopoverHeader
-						title={ label }
-						onClose={ onClose }
-					/>
+		<VStack>
+			{ excerptText }
+			<Dropdown
+				className="editor-post-excerpt__dropdown"
+				contentClassName="editor-post-excerpt__dropdown__content"
+				popoverProps={ popoverProps }
+				focusOnMount
+				ref={ setPopoverAnchor }
+				renderToggle={ ( { onToggle } ) => (
+					<Button
+						className="editor-post-excerpt__dropdown__trigger"
+						onClick={ onToggle }
+						variant="link"
+					>
+						{ excerptText ? triggerEditLabel : excerptPlaceholder }
+					</Button>
+				) }
+				renderContent={ ( { onClose } ) => (
+					<>
+						<InspectorPopoverHeader
+							title={ label }
+							onClose={ onClose }
+						/>
 
-					<VStack spacing={ 4 }>
-						<PluginPostExcerpt.Slot>
-							{ ( fills ) => (
-								<>
-									<PostExcerptForm
-										hideLabelFromVision
-										updateOnBlur
-									/>
-									{ fills }
-								</>
-							) }
-						</PluginPostExcerpt.Slot>
-					</VStack>
-				</>
-			) }
-		/>
+						<VStack spacing={ 4 }>
+							<PluginPostExcerpt.Slot>
+								{ ( fills ) => (
+									<>
+										<PostExcerptForm
+											hideLabelFromVision
+											updateOnBlur
+										/>
+										{ fills }
+									</>
+								) }
+							</PluginPostExcerpt.Slot>
+						</VStack>
+					</>
+				) }
+			/>
+		</VStack>
 	);
 }
