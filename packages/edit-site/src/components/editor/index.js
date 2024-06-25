@@ -36,7 +36,7 @@ import PluginTemplateSettingPanel from '../plugin-template-setting-panel';
 import GlobalStylesSidebar from '../global-styles-sidebar';
 import { isPreviewingTheme } from '../../utils/is-previewing-theme';
 import {
-	getEditorCanvasContainerTitle,
+	getEditorCanvasContainerTitleAndIcon,
 	useHasEditorCanvasContainer,
 } from '../editor-canvas-container';
 import SaveButton from '../save-button';
@@ -63,6 +63,7 @@ export default function EditSiteEditor( { isLoading } ) {
 		currentPostIsTrashed,
 	} = useSelect( ( select ) => {
 		const {
+			getEditorCanvasContainerView,
 			getEditedPostContext,
 			getCanvasMode,
 			isPage,
@@ -84,9 +85,7 @@ export default function EditSiteEditor( { isLoading } ) {
 			isEditingPage: isPage(),
 			supportsGlobalStyles: getCurrentTheme()?.is_block_theme,
 			showIconLabels: get( 'core', 'showIconLabels' ),
-			editorCanvasView: unlock(
-				select( editSiteStore )
-			).getEditorCanvasContainerView(),
+			editorCanvasView: getEditorCanvasContainerView(),
 			currentPostIsTrashed:
 				select( editorStore ).getCurrentPostAttribute( 'status' ) ===
 				'trash',
@@ -171,6 +170,10 @@ export default function EditSiteEditor( { isLoading } ) {
 		[ history, createSuccessNotice ]
 	);
 
+	// Replace the title and icon displayed in the DocumentBar when there's an overlay visible.
+	const { title, icon } =
+		getEditorCanvasContainerTitleAndIcon( editorCanvasView );
+
 	const isReady = ! isLoading;
 
 	return (
@@ -197,11 +200,8 @@ export default function EditSiteEditor( { isLoading } ) {
 						_isPreviewingTheme && <SaveButton size="compact" />
 					}
 					forceDisableBlockTools={ ! hasDefaultEditorCanvasView }
-					title={
-						! hasDefaultEditorCanvasView
-							? getEditorCanvasContainerTitle( editorCanvasView )
-							: undefined
-					}
+					title={ title }
+					icon={ icon }
 					iframeProps={ iframeProps }
 					onActionPerformed={ onActionPerformed }
 					extraSidebarPanels={

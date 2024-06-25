@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   `DropZone`: rewrite animation without depending on framer-motion. ([#62044](https://github.com/WordPress/gutenberg/pull/62044))
+-   `__experimentalPaletteEdit`: improve the accessibility. ([#62753](https://github.com/WordPress/gutenberg/pull/62753))
 
 ### Internal
 

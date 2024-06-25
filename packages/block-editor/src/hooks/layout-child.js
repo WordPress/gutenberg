@@ -11,7 +11,11 @@ import { useState } from '@wordpress/element';
 import { store as blockEditorStore } from '../store';
 import { useStyleOverride } from './utils';
 import { useLayout } from '../components/block-list/layout';
-import { GridVisualizer, GridItemResizer } from '../components/grid-visualizer';
+import {
+	GridVisualizer,
+	GridItemResizer,
+	GridItemMovers,
+} from '../components/grid';
 
 function useBlockPropsChildLayoutStyles( { style } ) {
 	const shouldRenderChildLayoutStyles = useSelect( ( select ) => {
@@ -135,10 +139,12 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 }
 
 function ChildLayoutControlsPure( { clientId, style, setAttributes } ) {
+	const parentLayout = useLayout() || {};
 	const {
 		type: parentLayoutType = 'default',
 		allowSizingOnChildren = false,
-	} = useLayout() || {};
+		columnCount,
+	} = parentLayout;
 
 	const rootClientId = useSelect(
 		( select ) => {
@@ -154,29 +160,43 @@ function ChildLayoutControlsPure( { clientId, style, setAttributes } ) {
 		return null;
 	}
 
+	const isManualGrid = !! columnCount;
+
+	function updateLayout( layout ) {
+		setAttributes( {
+			style: {
+				...style,
+				layout: {
+					...style?.layout,
+					...layout,
+				},
+			},
+		} );
+	}
+
 	return (
 		<>
 			<GridVisualizer
 				clientId={ rootClientId }
 				contentRef={ setResizerBounds }
+				parentLayout={ parentLayout }
 			/>
 			{ allowSizingOnChildren && (
 				<GridItemResizer
 					clientId={ clientId }
 					// Don't allow resizing beyond the grid visualizer.
 					bounds={ resizerBounds }
-					onChange={ ( { columnSpan, rowSpan } ) => {
-						setAttributes( {
-							style: {
-								...style,
-								layout: {
-									...style?.layout,
-									columnSpan,
-									rowSpan,
-								},
-							},
-						} );
-					} }
+					onChange={ updateLayout }
+					parentLayout={ parentLayout }
+				/>
+			) }
+			{ isManualGrid && window.__experimentalEnableGridInteractivity && (
+				<GridItemMovers
+					layout={ style?.layout }
+					parentLayout={ parentLayout }
+					onChange={ updateLayout }
+					gridClientId={ rootClientId }
+					blockClientId={ clientId }
 				/>
 			) }
 		</>
