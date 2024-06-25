@@ -83,7 +83,12 @@
 	// At less than mobile the header’s `gap` is zero so margins are added to create a smaller
 	// gap around the center’s contents.
 	@media (max-width: #{$break-mobile - 1}) {
-		padding-inline: $grid-unit;
+		> :first-child {
+			margin-inline-start: $grid-unit;
+		}
+		> :last-child {
+			margin-inline-end: $grid-unit;
+		}
 	}
 }
 

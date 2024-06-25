@@ -61,7 +61,7 @@ function Header( {
 } ) {
 	const isWideViewport = useViewportMatch( 'large' );
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const isTooNarrowForDocumentBar = useMediaQuery( '(max-width: 382px)' );
+	const isTooNarrowForDocumentBar = useMediaQuery( '(max-width: 403px)' );
 	const {
 		isTextEditor,
 		isPublishSidebarOpened,
