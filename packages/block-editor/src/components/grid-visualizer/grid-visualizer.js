@@ -17,7 +17,7 @@ import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-
 import BlockPopoverCover from '../block-popover/cover';
 import { range, GridRect, getGridInfo } from './utils';
 import { store as blockEditorStore } from '../../store';
-import { useGetBlocksBeforeCurrentCell } from './use-get-blocks-before-current-cell';
+import { useGetNumberOfBlocksBeforeCell } from './use-get-number-of-blocks-before-cell';
 
 export function GridVisualizer( { clientId, contentRef, parentLayout } ) {
 	const isDistractionFree = useSelect(
@@ -163,10 +163,7 @@ function GridVisualizerDropZone( {
 		__unstableMarkNextChangeAsNotPersistent,
 	} = useDispatch( blockEditorStore );
 
-	const isHighlighted = highlightedRect?.contains( column, row ) ?? false;
-	const index = row * gridInfo.numColumns + column;
-
-	const getBlocksBeforeCurrentCell = useGetBlocksBeforeCurrentCell(
+	const getNumberOfBlocksBeforeCell = useGetNumberOfBlocksBeforeCell(
 		gridClientId,
 		gridInfo.numColumns
 	);
@@ -226,10 +223,12 @@ function GridVisualizerDropZone( {
 				[ srcClientId ],
 				gridClientId,
 				gridClientId,
-				getBlocksBeforeCurrentCell( index )
+				getNumberOfBlocksBeforeCell( column, row )
 			);
 		},
 	} );
+
+	const isHighlighted = highlightedRect?.contains( column, row ) ?? false;
 
 	return (
 		<div

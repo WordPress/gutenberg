@@ -10,7 +10,7 @@ import { useDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import BlockControls from '../block-controls';
-import { useGetBlocksBeforeCurrentCell } from './use-get-blocks-before-current-cell';
+import { useGetNumberOfBlocksBeforeCell } from './use-get-number-of-blocks-before-cell';
 import { store as blockEditorStore } from '../../store';
 
 export function GridItemMovers( {
@@ -36,13 +36,10 @@ export function GridItemMovers( {
 	const rowStartNumber = parseInt( rowStart, 10 );
 	const columnStartNumber = parseInt( columnStart, 10 );
 
-	const getBlocksBeforeCurrentCell = useGetBlocksBeforeCurrentCell(
+	const getNumberOfBlocksBeforeCell = useGetNumberOfBlocksBeforeCell(
 		gridClientId,
 		columnCountNumber
 	);
-
-	const currentBlockIndex =
-		( rowStartNumber - 1 ) * columnCountNumber + columnStartNumber - 1;
 
 	return (
 		<BlockControls group="parent">
@@ -59,8 +56,9 @@ export function GridItemMovers( {
 						[ blockClientId ],
 						gridClientId,
 						gridClientId,
-						getBlocksBeforeCurrentCell(
-							currentBlockIndex - columnCountNumber
+						getNumberOfBlocksBeforeCell(
+							columnStartNumber,
+							rowStartNumber - 1
 						)
 					);
 				} }
@@ -78,8 +76,9 @@ export function GridItemMovers( {
 						[ blockClientId ],
 						gridClientId,
 						gridClientId,
-						getBlocksBeforeCurrentCell(
-							currentBlockIndex + columnCountNumber
+						getNumberOfBlocksBeforeCell(
+							columnStartNumber,
+							rowStartNumber + 1
 						)
 					);
 				} }
@@ -97,7 +96,10 @@ export function GridItemMovers( {
 						[ blockClientId ],
 						gridClientId,
 						gridClientId,
-						getBlocksBeforeCurrentCell( currentBlockIndex - 1 )
+						getNumberOfBlocksBeforeCell(
+							columnStartNumber - 1,
+							rowStartNumber
+						)
 					);
 				} }
 			/>
@@ -114,7 +116,10 @@ export function GridItemMovers( {
 						[ blockClientId ],
 						gridClientId,
 						gridClientId,
-						getBlocksBeforeCurrentCell( currentBlockIndex + 1 )
+						getNumberOfBlocksBeforeCell(
+							columnStartNumber + 1,
+							rowStartNumber
+						)
 					);
 				} }
 			/>
