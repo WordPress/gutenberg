@@ -29,7 +29,7 @@ export default function SingleSelectionCheckbox< Item extends AnyItem >( {
 	disabled,
 }: SingleSelectionCheckboxProps< Item > ) {
 	const id = getItemId( item );
-	const isSelected = selection.includes( id );
+	const isSelected = ! disabled && selection.includes( id );
 	let selectionLabel;
 	if ( primaryField?.getValue && item ) {
 		// eslint-disable-next-line @wordpress/valid-sprintf

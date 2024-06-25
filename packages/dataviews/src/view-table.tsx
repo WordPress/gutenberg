@@ -75,6 +75,7 @@ interface BulkSelectionCheckboxProps< Item extends AnyItem > {
 	onSelectionChange: ( items: Item[] ) => void;
 	data: Item[];
 	actions: Action< Item >[];
+	getItemId: ( item: Item ) => string;
 }
 
 interface TableRowProps< Item extends AnyItem > {
@@ -249,6 +250,7 @@ function BulkSelectionCheckbox< Item extends AnyItem >( {
 	onSelectionChange,
 	data,
 	actions,
+	getItemId,
 }: BulkSelectionCheckboxProps< Item > ) {
 	const selectableItems = useMemo( () => {
 		return data.filter( ( item ) => {
@@ -259,13 +261,18 @@ function BulkSelectionCheckbox< Item extends AnyItem >( {
 			);
 		} );
 	}, [ data, actions ] );
-	const areAllSelected = selection.length === selectableItems.length;
+	const selectedItems = data.filter(
+		( item ) =>
+			selection.includes( getItemId( item ) ) &&
+			selectableItems.includes( item )
+	);
+	const areAllSelected = selectedItems.length === selectableItems.length;
 	return (
 		<CheckboxControl
 			className="dataviews-view-table-selection-checkbox"
 			__nextHasNoMarginBottom
 			checked={ areAllSelected }
-			indeterminate={ ! areAllSelected && !! selection.length }
+			indeterminate={ ! areAllSelected && !! selectedItems.length }
 			onChange={ () => {
 				if ( areAllSelected ) {
 					onSelectionChange( [] );
@@ -293,7 +300,7 @@ function TableRow< Item extends AnyItem >( {
 	data,
 }: TableRowProps< Item > ) {
 	const hasPossibleBulkAction = useHasAPossibleBulkAction( actions, item );
-	const isSelected = selection.includes( id );
+	const isSelected = hasPossibleBulkAction && selection.includes( id );
 
 	const [ isHovered, setIsHovered ] = useState( false );
 
@@ -323,6 +330,9 @@ function TableRow< Item extends AnyItem >( {
 				isTouchDevice.current = true;
 			} }
 			onClick={ () => {
+				if ( ! hasPossibleBulkAction ) {
+					return;
+				}
 				if (
 					! isTouchDevice.current &&
 					document.getSelection()?.type !== 'Range'
@@ -495,6 +505,7 @@ function ViewTable< Item extends AnyItem >( {
 									onSelectionChange={ onSelectionChange }
 									data={ data }
 									actions={ actions }
+									getItemId={ getItemId }
 								/>
 							</th>
 						) }
