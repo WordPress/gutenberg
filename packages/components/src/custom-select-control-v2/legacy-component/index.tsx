@@ -78,7 +78,14 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 					value={ name }
 					children={ __experimentalHint ? withHint : name }
 					style={ style }
-					className={ className }
+					className={ clsx(
+						// Legacy classnames
+						'components-custom-select-control__item',
+						className,
+						{
+							'has-hint': !! __experimentalHint,
+						}
+					) }
 				/>
 			);
 		}
