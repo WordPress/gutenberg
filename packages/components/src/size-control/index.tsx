@@ -41,6 +41,7 @@ function UnforwardedSizeControl(
 	const {
 		__next40pxDefaultSize = true,
 		__nextHasNoMarginBottom = true,
+		hasUnit = true,
 		value,
 		disabled,
 		size = 'default',
@@ -59,24 +60,31 @@ function UnforwardedSizeControl(
 		value,
 		units
 	);
-
 	const isValueUnitRelative =
 		!! valueUnit && [ 'em', 'rem', 'vw', 'vh' ].includes( valueUnit );
 
-	const handleRangeChange = ( newValue: number | undefined ) => {
+	const handleValueChange = ( newValue: string | number | undefined ) => {
+		// On Reset
 		if ( newValue === undefined ) {
 			onChange?.( undefined );
 			return;
 		}
-		onChange?.( newValue + ( valueUnit ?? 'px' ) );
-	};
 
-	const handleUnitChange = ( newValue: string | undefined ) => {
-		if ( newValue === undefined ) {
-			onChange?.( undefined );
-		} else {
-			onChange?.( valueUnit ? newValue : parseInt( newValue, 10 ) );
+		// If the component is initalized as a unitless value (for retrocompatibility)
+		if ( ! hasUnit ) {
+			onChange?.( parseInt( String( newValue ), 10 ) );
+			return;
 		}
+
+		// Parse the new value and unit.
+		const [ newQuantity, newUnit ] = parseQuantityAndUnitFromRawValue(
+			newValue,
+			units
+		);
+		onChange?.(
+			// If the new value is empty or couldn't be parsed, pass the raw value received.
+			newQuantity ? newQuantity + ( newUnit ?? 'px' ) : newValue
+		);
 	};
 
 	return (
@@ -91,7 +99,7 @@ function UnforwardedSizeControl(
 						labelPosition="top"
 						hideLabelFromVision
 						value={ value }
-						onChange={ handleUnitChange }
+						onChange={ handleValueChange }
 						size={ size }
 						units={ units }
 						min={ 0 }
@@ -112,7 +120,7 @@ function UnforwardedSizeControl(
 								value={ valueQuantity }
 								initialPosition={ fallbackValue }
 								withInputField={ false }
-								onChange={ handleRangeChange }
+								onChange={ handleValueChange }
 								min={ 0 }
 								max={ isValueUnitRelative ? 10 : 100 }
 								step={ isValueUnitRelative ? 0.1 : 1 }
@@ -124,7 +132,7 @@ function UnforwardedSizeControl(
 				{ withReset && (
 					<FlexItem>
 						<Button
-							disabled={ disabled }
+							disabled={ ! value || disabled }
 							__experimentalIsFocusable
 							__next40pxDefaultSize={ __next40pxDefaultSize }
 							onClick={ () => {

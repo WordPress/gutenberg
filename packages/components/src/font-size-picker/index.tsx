@@ -184,6 +184,7 @@ const UnforwardedFontSizePicker = (
 						__next40pxDefaultSize={ __next40pxDefaultSize }
 						value={ value }
 						units={ units }
+						hasUnit={ hasUnits }
 						withSlider={ withSlider }
 						withReset={ withReset }
 						fallbackValue={ fallbackFontSize }

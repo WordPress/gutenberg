@@ -5,7 +5,7 @@ import type { SizeControlBaseProps, Size } from '../size-control/types';
 
 export type FontSizePickerProps = Omit<
 	SizeControlBaseProps,
-	'fallbackValue'
+	'fallbackValue' | 'hasUnit'
 > & {
 	/**
 	 * If `true`, it will not be possible to choose a custom fontSize. The user

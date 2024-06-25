@@ -73,6 +73,12 @@ export type SizeControlBaseProps = {
 	 * @default 'default'
 	 */
 	size?: 'default' | '__unstable-large';
+	/**
+	 * If the control should handle values with units.
+	 *
+	 * @default true
+	 */
+	hasUnit?: boolean;
 };
 
 export type SizeControlProps = SizeControlBaseProps &
