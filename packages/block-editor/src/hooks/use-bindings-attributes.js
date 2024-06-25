@@ -179,7 +179,10 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 
 					// Don't run bindings logic when a block is using pattern overrides but
 					// the user is editing the original pattern.
-					if ( ! hasParentPattern ) {
+					if (
+						! hasParentPattern &&
+						hasPatternOverridesDefaultBinding
+					) {
 						// Don't update caption and href in pattern overrides until they are supported.
 						delete keptAttributes?.caption;
 						delete keptAttributes?.href;
