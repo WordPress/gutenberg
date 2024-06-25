@@ -233,7 +233,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 					}
 
 					if (
-						// Don't update non-connected attributes when using if the block is overriden
+						// Don't update non-connected attributes if the block is using pattern overrides
 						// and the editing is happening while using the pattern (not editing the original).
 						! (
 							hasPatternOverridesDefaultBinding &&
