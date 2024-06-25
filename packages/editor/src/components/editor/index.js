@@ -58,6 +58,10 @@ function Editor( {
 		[ postType, postId, templateId ]
 	);
 
+	if ( ! post ) {
+		return null;
+	}
+
 	return (
 		<ExperimentalEditorProvider
 			post={ post }
