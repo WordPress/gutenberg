@@ -5,6 +5,7 @@ import {
 	__experimentalGrid as Grid,
 	__experimentalVStack as HStack,
 	__experimentalVStack as VStack,
+	Tooltip,
 } from '@wordpress/components';
 
 /**
@@ -35,35 +36,39 @@ export default function TypographyVariations( { title, gap = 2 } ) {
 				{ typographyVariations &&
 					typographyVariations.length &&
 					typographyVariations.map( ( variation, index ) => (
-						<Variation
-							key={ index }
-							variation={ variation }
-							property="typography"
-						>
-							{ ( isFocused ) => (
-								<PreviewIframe
-									label={ variation?.title }
-									isFocused={ isFocused }
+						<Tooltip key={ index } text={ variation?.title }>
+							{ /* This div is needed for Tooltips to work */ }
+							<div>
+								<Variation
+									variation={ variation }
+									property="typography"
 								>
-									{ ( { ratio, key } ) => (
-										<HStack
-											key={ key }
-											spacing={ 10 * ratio }
-											justify="center"
-											style={ {
-												height: '100%',
-												overflow: 'hidden',
-											} }
+									{ ( isFocused ) => (
+										<PreviewIframe
+											label={ variation?.title }
+											isFocused={ isFocused }
 										>
-											<TypographyExample
-												variation={ variation }
-												fontSize={ 85 * ratio }
-											/>
-										</HStack>
+											{ ( { ratio, key } ) => (
+												<HStack
+													key={ key }
+													spacing={ 10 * ratio }
+													justify="center"
+													style={ {
+														height: '100%',
+														overflow: 'hidden',
+													} }
+												>
+													<TypographyExample
+														variation={ variation }
+														fontSize={ 85 * ratio }
+													/>
+												</HStack>
+											) }
+										</PreviewIframe>
 									) }
-								</PreviewIframe>
-							) }
-						</Variation>
+								</Variation>
+							</div>
+						</Tooltip>
 					) ) }
 			</Grid>
 		</VStack>
