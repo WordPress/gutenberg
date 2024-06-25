@@ -113,7 +113,7 @@ function EditorStyles( { styles, scope, overrides } ) {
 				.map( ( style ) => style.assets )
 				.join( '' ),
 		];
-	}, [ styles, styleOverrides, scope ] );
+	}, [ styles, styleOverrides, overrides, scope ] );
 
 	return (
 		<>

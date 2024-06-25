@@ -68,7 +68,7 @@ function getVariationNameFromClass( className, registeredStyles = [] ) {
  * @param {Object} config A global styles object, containing settings and styles.
  * @return {Array} An array of new block variation overrides.
  */
-export function useUpdateBlockVariationOverridesWithConfig( config ) {
+export function useUpdateBlockStyleVariationOverridesWithConfig( config ) {
 	const overrides = useSelect(
 		( select ) => unlock( select( blockEditorStore ) ).getStyleOverrides(),
 		[]

@@ -25,7 +25,7 @@ const {
 	ExperimentalBlockEditorProvider,
 	GlobalStylesContext,
 	useGlobalStylesOutputWithConfig,
-	useUpdateBlockVariationOverridesWithConfig,
+	useUpdateBlockStyleVariationOverridesWithConfig,
 } = unlock( blockEditorPrivateApis );
 const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
 
@@ -35,7 +35,7 @@ function isObjectEmpty( object ) {
 
 function RevisionStyles( { styles, config } ) {
 	const mergedOverrides =
-		useUpdateBlockVariationOverridesWithConfig( config );
+		useUpdateBlockStyleVariationOverridesWithConfig( config );
 
 	return <EditorStyles styles={ styles } overrides={ mergedOverrides } />;
 }
