@@ -81,7 +81,7 @@
     -   Drops `jsdoc/tag-lines` rule's `noEndLines: true` in favor of `applyToEndTag: false`.
     -   Disables the newly introduced `jsdoc/no-defaults` rule.
 
-### Enhancement
+### Enhancements
 
 -   Support Typescript 5 and 5.1 by updating both `@typescript-eslint/parser` and `@typescript-eslint/eslint-plugin` to version `^5.62.0`. ([#52621](https://github.com/WordPress/gutenberg/pull/52621)).
 
@@ -99,7 +99,7 @@
 
 ## 14.6.0 (2023-05-10)
 
-### Enhancement
+### Enhancements
 
 -   Validate dependencies in `useSelect` and `useSuspenseSelect` hooks. ([#49900](https://github.com/WordPress/gutenberg/pull/49900)).
 
@@ -123,7 +123,7 @@
 
 -   The bundled `eslint-plugin-jsdoc` dependency has been updated from requiring `^37.0.3` to requiring `^39.6.9`
 
-### Enhancement
+### Enhancements
 
 -   Bump `eslint-plugin-jest` version to 27.2.1.
 
@@ -145,14 +145,14 @@
 
 ## 13.0.0 (2022-08-24)
 
-### Breaking Change
+### Breaking Changes
 
 -   Increase the minimum Node.js version to 14 and minimum npm version to 6.14.4 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
 -   Remove all rules targeting test files from the `recommended` and `recommended-with-formatting` presets when Jest package is installed ([#43272](https://github.com/WordPress/gutenberg/pull/43272)).
 
 ## 12.8.0 (2022-07-27)
 
-### Code Quality
+### Internal
 
 -   Remove deprecated rules `no-negated-in-lhs` replaced with `no-unsafe-negation`, and `jsx-a11y/label-has-for` replaced with `jsx-a11/label-has-associated-control` ([#42654](https://github.com/WordPress/gutenberg/pull/42654)).
 
@@ -162,7 +162,7 @@
 
 ## 12.2.0 (2022-05-04)
 
-### Bug Fix
+### Bug Fixes
 
 -   Fix the `recommended` preset when Prettier is not installed ([#40634](https://github.com/WordPress/gutenberg/pull/40634)).
 
@@ -178,7 +178,7 @@
 
 -   The integration with [Prettier](https://prettier.io) is now optional and gets activated when the `prettier` package is installed in the project ([#39244](https://github.com/WordPress/gutenberg/pull/39244)).
 
-### Bug Fix
+### Bug Fixes
 
 -   Replaced no-shadow eslint rule with @typescript-eslint/no-shadow ([#38665](https://github.com/WordPress/gutenberg/pull/38665)).
 
@@ -199,11 +199,11 @@
 -   The bundled `globals` dependency has been updated from requiring `^12.0.0` to requiring `^13.12.0` ([#36283](https://github.com/WordPress/gutenberg/pull/36283)).
 -   The `gutenberg-phase` rule has been deprecated and replaced by the `is-gutenberg-plugin` rule. ([#38202](https://github.com/WordPress/gutenberg/pull/38202))
 
-### Enhancement
+### Enhancements
 
 -   Omit verification for WordPress dependencies in the import statements since they get externalized when used with WordPress ([#37639](https://github.com/WordPress/gutenberg/pull/37639)).
 
-### Bug Fix
+### Bug Fixes
 
 -   Fix Babel config resolution when a custom ESLint config present ([#37406](https://github.com/WordPress/gutenberg/pull/37406)). Warning: it won't recognize the `babel.config.json` file present in the project until the upstream bug in `cosmiconfig` is fixed.
 
@@ -216,35 +216,35 @@
 
 ## 9.2.0 (2021-10-12)
 
-### Enhancement
+### Enhancements
 
 -   The bundled `eslint-plugin-jsdoc` dependency has been updated from requiring `^34.1.0` to requiring `^36.0.8` ([#34338](https://github.com/WordPress/gutenberg/pull/34338)).
 
-### Bug Fix
+### Bug Fixes
 
 -   Use Jest related rules only when the `jest` package is installed ([#33120](https://github.com/WordPress/gutenberg/pull/33120)).
 
 ## 9.1.2 (2021-09-09)
 
-### Bug Fix
+### Bug Fixes
 
 -   The recommended configuration will now respect `type` imports in TypeScript files ([#34055](https://github.com/WordPress/gutenberg/pull/34055)).
 
 ## 9.1.1 (2021-08-23)
 
-### Bug Fix
+### Bug Fixes
 
 -   Include `.jsx` extension when linting import statements in case TypeScript not present ([#33746](https://github.com/WordPress/gutenberg/pull/33746)).
 
 ## 9.1.0 (2021-07-21)
 
-### Enhancement
+### Enhancements
 
 -   Adds JSDoc alignment check ([#25300](https://github.com/WordPress/gutenberg/pull/25300)).
 
 ## 9.0.1 (2021-03-19)
 
-### Bug Fix
+### Bug Fixes
 
 -   Adds TypeScript as a peer dependency and makes it optional when not installed ([#29942](https://github.com/WordPress/gutenberg/pull/29942)).
 
@@ -261,7 +261,7 @@
 
 ## 8.0.1 (2021-01-28)
 
-### Bug Fix
+### Bug Fixes
 
 -   Add missing `eslint-plugin-import` npm dependency ([#28545](https://github.com/WordPress/gutenberg/pull/28545)).
 
@@ -290,7 +290,7 @@
 
 ## 7.4.0 (2020-12-17)
 
-### New Feature
+### New Features
 
 -   Add `no-unsafe-wp-apis` rule to discourage usage of unsafe APIs ([#27301](https://github.com/WordPress/gutenberg/pull/27301)).
 
@@ -348,7 +348,7 @@
 
 -   The severity of the rule, `jsdoc/no-undefined-types`, has been increased from `warn` to `error`. In addition, `JSX` has been added to the default list of defined types.
 
-### Improvements
+### Enhancements
 
 -   `'AsyncIterableIterator'` is now allowed as a valid TypeScript utility type.
 
@@ -406,7 +406,7 @@
 
 ## 3.4.1 (2020-02-04)
 
-### Bug Fix
+### Bug Fixes
 
 -   Removed `plugin:prettier/recommended` from `recommended` ruleset as it introduces breaking changes.
 
@@ -448,14 +448,14 @@
 
 -   [`@wordpress/no-unused-vars-before-return`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-unused-vars-before-return.md) now supports an `excludePattern` option to exempt function calls by name.
 
-### Improvements
+### Enhancements
 
 -   The recommended `react` configuration specifies an option to [`@wordpress/no-unused-vars-before-return`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-unused-vars-before-return.md) to exempt React hooks usage, by convention of hooks beginning with "use" prefix.
 -   The plugin now uses [`eslint-plugin-jsdoc`](https://github.com/gajus/eslint-plugin-jsdoc), rather than the `valid-jsdoc` rule, for more reliable linting of JSDoc blocks.
 
 ## 2.3.0 (2019-06-12)
 
-### Bug Fix
+### Bug Fixes
 
 -   Fixed custom regular expression for the `no-restricted-syntax` rule enforcing translate function arguments. [#15839](https://github.com/WordPress/gutenberg/pull/15839).
 -   Fixed arguments checking of `_nx` for the `no-restricted-syntax` rule enforcing translate function arguments. [#15839](https://github.com/WordPress/gutenberg/pull/15839).

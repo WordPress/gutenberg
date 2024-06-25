@@ -14,7 +14,11 @@ import { useState } from '@wordpress/element';
  */
 import UncontrolledCustomSelectControl from '..';
 
-const customClass = 'amber-skies';
+const customClassName = 'amber-skies';
+const customStyles = {
+	backgroundColor: 'rgb(127, 255, 212)',
+	rotate: '13deg',
+};
 
 const props = {
 	label: 'label!',
@@ -26,7 +30,7 @@ const props = {
 		{
 			key: 'flower2',
 			name: 'crimson clover',
-			className: customClass,
+			className: customClassName,
 		},
 		{
 			key: 'flower3',
@@ -35,36 +39,113 @@ const props = {
 		{
 			key: 'color1',
 			name: 'amber',
-			className: customClass,
+			className: customClassName,
 		},
 		{
 			key: 'color2',
 			name: 'aquamarine',
-			style: {
-				backgroundColor: 'rgb(127, 255, 212)',
-				rotate: '13deg',
-			},
+			style: customStyles,
+		},
+		{
+			key: 'color3',
+			name: 'tomato (with custom props)',
+			className: customClassName,
+			style: customStyles,
+			// try passing a valid HTML attribute
+			'aria-label': 'test label',
+			// try adding a custom prop
+			customPropFoo: 'foo',
 		},
 	],
 };
 
-const ControlledCustomSelectControl = ( { options, ...restProps } ) => {
-	const [ value, setValue ] = useState( options[ 0 ] );
+const ControlledCustomSelectControl = ( {
+	options,
+	onChange: onChangeProp,
+	...restProps
+} ) => {
+	const [ value, setValue ] = useState( restProps.value ?? options[ 0 ] );
+
+	const onChange = ( changeObject ) => {
+		onChangeProp?.( changeObject );
+		setValue( changeObject.selectedItem );
+	};
+
 	return (
 		<UncontrolledCustomSelectControl
 			{ ...restProps }
 			options={ options }
-			onChange={ ( { selectedItem } ) => setValue( selectedItem ) }
+			onChange={ onChange }
 			value={ options.find( ( option ) => option.key === value.key ) }
 		/>
 	);
 };
 
+it( 'Should apply external controlled updates', async () => {
+	const mockOnChange = jest.fn();
+	const { rerender } = render(
+		<UncontrolledCustomSelectControl
+			{ ...props }
+			value={ props.options[ 0 ] }
+			onChange={ mockOnChange }
+		/>
+	);
+
+	const currentSelectedItem = screen.getByRole( 'button', {
+		expanded: false,
+	} );
+
+	expect( currentSelectedItem ).toHaveTextContent( props.options[ 0 ].name );
+
+	rerender(
+		<UncontrolledCustomSelectControl
+			{ ...props }
+			value={ props.options[ 1 ] }
+		/>
+	);
+
+	expect( currentSelectedItem ).toHaveTextContent( props.options[ 1 ].name );
+
+	expect( mockOnChange ).not.toHaveBeenCalled();
+} );
+
 describe.each( [
-	[ 'uncontrolled', UncontrolledCustomSelectControl ],
-	[ 'controlled', ControlledCustomSelectControl ],
+	[ 'Uncontrolled', UncontrolledCustomSelectControl ],
+	[ 'Controlled', ControlledCustomSelectControl ],
 ] )( 'CustomSelectControl %s', ( ...modeAndComponent ) => {
 	const [ , Component ] = modeAndComponent;
+
+	it( 'Should select the first option when no explicit initial value is passed without firing onChange', () => {
+		const mockOnChange = jest.fn();
+		render( <Component { ...props } onChange={ mockOnChange } /> );
+
+		expect(
+			screen.getByRole( 'button', {
+				expanded: false,
+			} )
+		).toHaveTextContent( props.options[ 0 ].name );
+
+		expect( mockOnChange ).not.toHaveBeenCalled();
+	} );
+
+	it( 'Should pick the initially selected option if the value prop is passed without firing onChange', async () => {
+		const mockOnChange = jest.fn();
+		render(
+			<Component
+				{ ...props }
+				onChange={ mockOnChange }
+				value={ props.options[ 3 ] }
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'button', {
+				expanded: false,
+			} )
+		).toHaveTextContent( props.options[ 3 ].name );
+
+		expect( mockOnChange ).not.toHaveBeenCalled();
+	} );
 
 	it( 'Should replace the initial selection when a new item is selected', async () => {
 		const user = userEvent.setup();
@@ -144,7 +225,7 @@ describe.each( [
 		// assert against filtered array
 		itemsWithClass.map( ( { name } ) =>
 			expect( screen.getByRole( 'option', { name } ) ).toHaveClass(
-				customClass
+				customClassName
 			)
 		);
 
@@ -156,15 +237,13 @@ describe.each( [
 		// assert against filtered array
 		itemsWithoutClass.map( ( { name } ) =>
 			expect( screen.getByRole( 'option', { name } ) ).not.toHaveClass(
-				customClass
+				customClassName
 			)
 		);
 	} );
 
 	it( 'Should apply styles only to options that have styles defined', async () => {
 		const user = userEvent.setup();
-		const customStyles =
-			'background-color: rgb(127, 255, 212); rotate: 13deg;';
 
 		render( <Component { ...props } /> );
 
@@ -262,6 +341,105 @@ describe.each( [
 		expect( screen.getByRole( 'option', { name: /hint/i } ) ).toBeVisible();
 	} );
 
+	it( 'Should return object onChange', async () => {
+		const user = userEvent.setup();
+		const mockOnChange = jest.fn();
+
+		render( <Component { ...props } onChange={ mockOnChange } /> );
+
+		await user.click(
+			screen.getByRole( 'button', {
+				expanded: false,
+			} )
+		);
+
+		await user.click(
+			screen.getByRole( 'option', {
+				name: 'aquamarine',
+			} )
+		);
+
+		expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
+		expect( mockOnChange ).toHaveBeenLastCalledWith(
+			expect.objectContaining( {
+				inputValue: '',
+				isOpen: false,
+				selectedItem: expect.objectContaining( {
+					name: 'aquamarine',
+				} ),
+				type: expect.any( String ),
+			} )
+		);
+	} );
+
+	it( 'Should return selectedItem object when specified onChange', async () => {
+		const user = userEvent.setup();
+		const mockOnChange = jest.fn();
+
+		render( <Component { ...props } onChange={ mockOnChange } /> );
+
+		await user.tab();
+		expect(
+			screen.getByRole( 'button', {
+				expanded: false,
+			} )
+		).toHaveFocus();
+
+		await user.keyboard( 'p' );
+		await user.keyboard( '{enter}' );
+
+		expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
+		expect( mockOnChange ).toHaveBeenLastCalledWith(
+			expect.objectContaining( {
+				selectedItem: expect.objectContaining( {
+					key: 'flower3',
+					name: 'poppy',
+				} ),
+			} )
+		);
+	} );
+
+	it( "Should pass arbitrary props to onChange's selectedItem, but apply only style and className to DOM elements", async () => {
+		const user = userEvent.setup();
+		const onChangeMock = jest.fn();
+
+		render( <Component { ...props } onChange={ onChangeMock } /> );
+
+		const currentSelectedItem = screen.getByRole( 'button', {
+			expanded: false,
+		} );
+
+		await user.click( currentSelectedItem );
+
+		const optionWithCustomAttributes = screen.getByRole( 'option', {
+			name: 'tomato (with custom props)',
+		} );
+
+		// Assert that the option element does not have the custom attributes
+		expect( optionWithCustomAttributes ).not.toHaveAttribute(
+			'customPropFoo'
+		);
+		expect( optionWithCustomAttributes ).not.toHaveAttribute(
+			'aria-label'
+		);
+
+		await user.click( optionWithCustomAttributes );
+
+		expect( onChangeMock ).toHaveBeenCalledTimes( 1 );
+		expect( onChangeMock ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				selectedItem: expect.objectContaining( {
+					key: 'color3',
+					name: 'tomato (with custom props)',
+					className: customClassName,
+					style: customStyles,
+					'aria-label': 'test label',
+					customPropFoo: 'foo',
+				} ),
+			} )
+		);
+	} );
+
 	describe( 'Keyboard behavior and accessibility', () => {
 		it( 'Captures the keypress event and does not let it propagate', async () => {
 			const user = userEvent.setup();
@@ -311,7 +489,9 @@ describe.each( [
 			await user.keyboard( '{arrowdown}' );
 			await user.keyboard( '{enter}' );
 
-			expect( currentSelectedItem ).toHaveTextContent( 'crimson clover' );
+			expect( currentSelectedItem ).toHaveTextContent(
+				props.options[ 1 ].name
+			);
 		} );
 
 		it( 'Should be able to type characters to select matching options', async () => {
@@ -422,11 +602,14 @@ describe.each( [
 			const onBlurMock = jest.fn();
 
 			render(
-				<Component
-					{ ...props }
-					onFocus={ onFocusMock }
-					onBlur={ onBlurMock }
-				/>
+				<>
+					<Component
+						{ ...props }
+						onFocus={ onFocusMock }
+						onBlur={ onBlurMock }
+					/>
+					<button>Focus stop</button>
+				</>
 			);
 
 			const currentSelectedItem = screen.getByRole( 'button', {

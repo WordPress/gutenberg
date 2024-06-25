@@ -124,13 +124,13 @@
 
 ## 3.3.0 (2021-11-07)
 
-### New Feature
+### New Features
 
 -   Added new `normalizePath` function ([#35992](https://github.com/WordPress/gutenberg/pull/35992)).
 
 ## 3.2.3 (2021-10-12)
 
-### Bug Fix
+### Bug Fixes
 
 -   Removed unused `react-native-url-polyfill` dependency ([#34687](https://github.com/WordPress/gutenberg/pull/34687)).
 
@@ -149,25 +149,25 @@
 
 ## 2.21.0 (2021-01-05)
 
-### New Feature
+### New Features
 
 -   Add optional argument `maxLength` for truncating URL in `filterURLForDisplay`
 
 ## 2.16.0 (2020-06-15)
 
-### New Feature
+### New Features
 
 -   Added `getPathAndQueryString`.
 
 ## 2.14.0 (2020-04-30)
 
-### Bug fix
+### Bug Fixes
 
 -   `addQueryArgs` arguments are optional ([#21926](https://github.com/WordPress/gutenberg/pull/21926))
 
 ## 2.13.0 (2020-04-15)
 
-### New feature
+### New Features
 
 -   Include TypeScript type declarations ([#18942](https://github.com/WordPress/gutenberg/pull/18942))
 
@@ -194,7 +194,7 @@
 
 ## 2.3.1 (2018-11-20)
 
-### Bug fixes
+### Bug Fixes
 
 -   The `isValidProtocol` function now correctly considers the protocol of the URL as only incoporating characters up to and including the colon (':').
 -   `getFragment` is now greedier and matches fragments from the first occurrence of the '#' symbol instead of the last.
@@ -224,18 +224,18 @@
 
 ## 2.1.0 (2018-10-16)
 
-### New Feature
+### New Features
 
 -   Added `safeDecodeURI`.
 
 ## 2.0.1 (2018-09-30)
 
-### Bug Fix
+### Bug Fixes
 
 -   Fix typo in the `qs` dependency definition in the `package.json`
 
 ## 2.0.0 (2018-09-05)
 
-### Breaking Change
+### Breaking Changes
 
 -   Change how required built-ins are polyfilled with Babel 7 ([#9171](https://github.com/WordPress/gutenberg/pull/9171)). If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods.

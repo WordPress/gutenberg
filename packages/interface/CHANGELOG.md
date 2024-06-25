@@ -26,7 +26,7 @@
 
 ## 5.30.0 (2024-03-06)
 
-## Breaking Changes
+### Breaking Changes
 
 -   Removed `MoreMenuDropdown` component ([#59095](https://github.com/WordPress/gutenberg/pull/59095)).
 
@@ -134,7 +134,7 @@
 
 ## 4.2.1 (2022-02-10)
 
-### Bug Fix
+### Bug Fixes
 
 -   Removed unused `@wordpress/deprecated` dependency ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
 
@@ -142,13 +142,13 @@
 
 ## 4.1.0 (2021-09-09)
 
-### New Feature
+### New Features
 
 -   Add support for editor 'feature' preferences. Adds an `isFeatureActive` selector, a `toggleFeature` action, a `MoreMenuDropdown` component, and a `MoreMenuFeatureToggle` component. ([#33774](https://github.com/WordPress/gutenberg/pull/33774)).
 
 ## 4.0.0 (2021-07-29)
 
-### Breaking Change
+### Breaking Changes
 
 -   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
 
@@ -183,7 +183,7 @@
 
 ## 0.11.0 (2020-12-17)
 
-### New Feature
+### New Features
 
 -   Added a store definition `store` for the interface namespace to use with `@wordpress/data` API ([#26655](https://github.com/WordPress/gutenberg/pull/26655)).
 

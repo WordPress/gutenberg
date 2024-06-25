@@ -3,7 +3,6 @@
  */
 import { store } from '@wordpress/interactivity';
 
-
 store( '', {
 	state: {
 		url: '/empty-string-url',
@@ -63,8 +62,3 @@ store( '"quoted string"', {
 		url: '/quoted-url',
 	},
 } );
-
-
-
-
-

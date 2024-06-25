@@ -34,9 +34,8 @@ const {
  */
 const withPatternOverrideControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const isSupportedBlock = Object.keys(
-			PARTIAL_SYNCING_SUPPORTED_BLOCKS
-		).includes( props.name );
+		const isSupportedBlock =
+			!! PARTIAL_SYNCING_SUPPORTED_BLOCKS[ props.name ];
 
 		return (
 			<>

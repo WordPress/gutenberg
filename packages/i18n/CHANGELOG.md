@@ -158,7 +158,7 @@
 
 ## 3.12.0 (2020-04-30)
 
-### Bug Fix
+### Bug Fixes
 
 -   Relax type of `sprintf` arguments type ([#21919](https://github.com/WordPress/gutenberg/pull/21919))
 
@@ -171,7 +171,7 @@
 
 ## 3.10.0 (2020-04-01)
 
-### New Feature
+### New Features
 
 -   Add `isRTL` function ([#20298](https://github.com/WordPress/gutenberg/pull/20298))
 
@@ -194,13 +194,13 @@
 
 ## 2.0.0 (2018-09-05)
 
-### Breaking Change
+### Breaking Changes
 
 -   Change how required built-ins are polyfilled with Babel 7 ([#9171](https://github.com/WordPress/gutenberg/pull/9171)). If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods.
 
 ## 1.2.0 (2018-07-12)
 
-### New Feature
+### New Features
 
 -   Updated build to work with Babel 7 ([#7832](https://github.com/WordPress/gutenberg/pull/7832))
 
@@ -210,6 +210,6 @@
 
 ## 1.1.1 (2018-05-18)
 
-### Polish
+### Internal
 
 -   Fix: Standardized `package.json` format ([#119](https://github.com/WordPress/packages/pull/119))

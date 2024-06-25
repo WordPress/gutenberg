@@ -1,6 +1,6 @@
 # Compose
 
-The `compose` package is a collection of handy [Hooks](https://reactjs.org/docs/hooks-intro.html) and [Higher Order Components](https://facebook.github.io/react/docs/higher-order-components.html) (HOCs) you can use to wrap your WordPress components and provide some basic features like: state, instance id, pure...
+The `compose` package is a collection of handy [Hooks](https://react.dev/reference/react/hooks) and [Higher Order Components](https://legacy.reactjs.org/docs/higher-order-components.html) (HOCs) you can use to wrap your WordPress components and provide some basic features like: state, instance id, pure...
 
 The `compose` function is inspired by [flowRight](https://lodash.com/docs/#flowRight) from Lodash and works the same way. It comes from functional programming, and allows you to compose any number of functions. You might also think of this as layering functions; `compose` will execute the last function first, then sequentially move back through the previous functions passing the result of each function upward.
 

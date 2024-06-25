@@ -101,7 +101,7 @@
 
 ## 6.19.0 (2022-11-16)
 
-### Enhancement
+### Enhancements
 
 -   ` BlockTypesChecklist`: Move BlockIcon component out of CheckboxControl label ([#45535](https://github.com/WordPress/gutenberg/pull/45535))
 
@@ -143,11 +143,11 @@
 
 ## 6.0.0 (2022-02-10)
 
-### Breaking Change
+### Breaking Changes
 
 -   The `GUTENBERG_PHASE` environment variable has been renamed to `IS_GUTENBERG_PLUGIN` and is now a boolean ([#38202](https://github.com/WordPress/gutenberg/pull/38202)).
 
-### Bug Fix
+### Bug Fixes
 
 -   Removed unused `@wordpress/api-fetch`, `@wordpress/primitives` and `uuid` dependencies ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
 
@@ -155,7 +155,7 @@
 
 ## 5.0.0 (2021-07-29)
 
-### Breaking Change
+### Breaking Changes
 
 -   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
 
@@ -190,23 +190,23 @@
 
 ## 3.6.0 (2019-08-05)
 
-### Refactor
+### Internal
 
 -   Create EditorInitializer component and implement for various things to initialize as the editor is loaded. This replaces the `__unstableInitialize` refactor done in #14740. ([#15444](https://github.com/WordPress/gutenberg/pull/15444))
 
 ## 3.4.0 (2019-05-21)
 
-### New Feature
+### New Features
 
 -   Implement the `addToGallery` option in the `MediaUpload` hook. The option allows users to open the media modal in the `gallery-library`instead of `gallery-edit` state.
 
-### Refactor
+### Internal
 
 -   convert `INIT` effect to controls & actions [#14740](https://github.com/WordPress/gutenberg/pull/14740)
 
 ## 3.2.0 (2019-03-06)
 
-### Polish
+### Internal
 
 -   Expose the `className` property to style the `PluginSidebar` component.
 
@@ -235,7 +235,7 @@
 
 ## 3.1.0 (2018-11-20)
 
-### New Feature
+### New Features
 
 -   The new `AdminNotices` component will transparently upgrade any `.notice` elements on the page to the equivalent `@wordpress/notices` module notice state.
 
@@ -245,7 +245,7 @@
 
 ## 3.0.0 (2018-11-12)
 
-### Breaking Change
+### Breaking Changes
 
 -   `isEditorSidebarPanelOpened` selector (`core/edit-post`) has been removed. Please use `isEditorPanelEnabled` instead.
 -   `toggleGeneralSidebarEditorPanel` action (`core/edit-post`) has been removed. Please use `toggleEditorPanelOpened` instead.
@@ -276,7 +276,7 @@
 -   `getMetaBoxes` selector (`core/edit-post`) has been removed. Use `getActiveMetaBoxLocations` selector (`core/edit-post`) instead.
 -   `getMetaBox` selector (`core/edit-post`) has been removed. Use `isMetaBoxLocationActive` selector (`core/edit-post`) instead.
 
-### Polish
+### Internal
 
 -   Add the editor styles support's wrapper className.
 

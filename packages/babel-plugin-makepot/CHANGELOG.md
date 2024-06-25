@@ -98,13 +98,13 @@
 
 ## 5.1.0 (2022-09-13)
 
-### Bug Fix
+### Bug Fixes
 
 -   Makepot: Fix translations object handling ([#43797](https://github.com/WordPress/gutenberg/pull/43797)).
 
 ## 5.0.0 (2022-08-24)
 
-### Breaking Change
+### Breaking Changes
 
 -   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
 
@@ -116,20 +116,20 @@
 
 ## 2.2.0 (2019-03-06)
 
-### Bug Fix
+### Bug Fixes
 
 -   Fixed Babel plugin for POT file generation to properly handle plural numbers specified in the passed header. ([#13577](https://github.com/WordPress/gutenberg/pull/13577))
 -   Fix extracted translator comments to be written as prefixed by `#.` ([#9440](https://github.com/WordPress/gutenberg/pull/9440))
 
 ## 2.1.0 (2018-09-05)
 
-### New Feature
+### New Features
 
 -   Plugin updated to work with the stable version of Babel 7 ([#9171](https://github.com/WordPress/gutenberg/pull/9171)).
 
 ## 2.0.0 (2018-07-12)
 
-### Breaking Change
+### Breaking Changes
 
 -   Updated code to work with Babel 7 ([#7832](https://github.com/WordPress/gutenberg/pull/7832))
 
@@ -139,6 +139,6 @@
 
 ## 1.0.1 (2018-05-18)
 
-### Polish
+### Internal
 
 -   Fix: Standardized `package.json` format ([#119](https://github.com/WordPress/packages/pull/119))

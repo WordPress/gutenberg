@@ -331,23 +331,9 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 				$config['styles'] = $existing_config['styles'];
 			}
 
-			/*
-			 * If the incoming request is going to create a new variation
-			 * that is not yet registered, we register it here.
-			 * This is because the variations are registered on init,
-			 * but we want this endpoint to return the new variation immediately:
-			 * if we don't register it, it'll be stripped out of the response
-			 * just in this request (subsequent ones will be ok).
-			 * Take the variations defined in styles.blocks.variations from the incoming request
-			 * that are not part of the $existing_config.
-			 */
-			if ( isset( $request['styles']['blocks']['variations'] ) ) {
-				$existing_variations = isset( $existing_config['styles']['blocks']['variations'] ) ? $existing_config['styles']['blocks']['variations'] : array();
-				$new_variations      = array_diff_key( $request['styles']['blocks']['variations'], $existing_variations );
-				if ( ! empty( $new_variations ) ) {
-					gutenberg_register_block_style_variations_from_theme_json_data( $new_variations );
-				}
-			}
+			// Register theme-defined variations e.g. from block style variation partials under `/styles`.
+			$variations = WP_Theme_JSON_Resolver_Gutenberg::get_style_variations( 'block' );
+			gutenberg_register_block_style_variations_from_theme_json_partials( $variations );
 
 			if ( isset( $request['settings'] ) ) {
 				$config['settings'] = $request['settings'];
@@ -720,7 +706,12 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 			);
 		}
 
-		$response   = array();
+		$response = array();
+
+		// Register theme-defined variations e.g. from block style variation partials under `/styles`.
+		$partials = WP_Theme_JSON_Resolver_Gutenberg::get_style_variations( 'block' );
+		gutenberg_register_block_style_variations_from_theme_json_partials( $partials );
+
 		$variations = WP_Theme_JSON_Resolver_Gutenberg::get_style_variations();
 
 		// Add resolved theme asset links.

@@ -4,9 +4,17 @@
 
 ## 4.44.0 (2024-06-15)
 
+### Bug fix
+
+-   Pin the `@wordpress/scripts` version to a version supported by WordPress 6.5 ([#62234](https://github.com/WordPress/gutenberg/pull/62234)).
+
 ## 4.43.0 (2024-05-31)
 
 ## 4.42.0 (2024-05-16)
+
+### Breaking Change
+
+-   Increase the minimum required Node.js version to v20.10.0 matching the support defined for Gutenberg and WordPress core ([#61430](https://github.com/WordPress/gutenberg/pull/61430)).
 
 ## 4.41.0 (2024-05-02)
 
@@ -14,7 +22,7 @@
 
 ## 4.39.0 (2024-04-03)
 
-### New Feature
+### New Features
 
 -   Add new `namespacePascalCase` template variable ([#60223](https://github.com/WordPress/gutenberg/pull/60223)).
 
@@ -24,7 +32,7 @@
 
 ## 4.36.0 (2024-02-21)
 
-### Bug Fix
+### Bug Fixes
 
 -   Add missing `viewScriptModule` field ([#59140](https://github.com/WordPress/gutenberg/pull/59140)).
 
@@ -38,7 +46,7 @@
 
 ## 4.33.0 (2024-01-10)
 
-### New Feature
+### New Features
 
 -   Add support for the `viewModule` property ([#57712](https://github.com/WordPress/gutenberg/pull/57712)).
 
@@ -52,7 +60,7 @@
 
 ## 4.28.0 (2023-10-18)
 
-### New Feature
+### New Features
 
 -   Add new `transformer` property to external templates to allow customization of any values being passed from cli or the template.[#55423](https://github.com/WordPress/gutenberg/pull/55423)
 
@@ -66,13 +74,13 @@
 
 ## 4.23.0 (2023-08-10)
 
-### Enhancement
+### Enhancements
 
 -   Add support for the `example` property and add it to the default template ([#52803](https://github.com/WordPress/gutenberg/pull/52803)).
 
 ## 4.22.0 (2023-07-20)
 
-### Enhancement
+### Enhancements
 
 -   Add support for the `viewScript` property ([#52612](https://github.com/WordPress/gutenberg/pull/52612)).
 
@@ -110,13 +118,13 @@
 
 ## 4.5.0 (2022-11-02)
 
-### Enhancement
+### Enhancements
 
 -   Update templates to use the `render` field in `block.json` introduced in WordPress 6.1 ([#44185](https://github.com/WordPress/gutenberg/pull/44185)).
 
 ## 4.4.0 (2022-10-19)
 
-### New Feature
+### New Features
 
 -   Add new `customPackageJSON` and `customBlockJSON` keys to allow templates to define custom keys for the resulting `package.json` and `block.json` files respectively.[#44649](https://github.com/WordPress/gutenberg/pull/44649)
 
@@ -126,30 +134,30 @@
 
 ## 4.0.0 (2022-08-24)
 
-### Breaking Change
+### Breaking Changes
 
 -   Increase the minimum Node.js version to 14 and minimum npm version to 6.14.4 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
 
-### New Feature
+### New Features
 
 -   Add `--no-plugin` flag to allow scaffolding of a block in an existing plugin ([#41642](https://github.com/WordPress/gutenberg/pull/41642))
 -   Introduce the `--variant` flag to allow selection of a variant as defined in the template ([#41289](https://github.com/WordPress/gutenberg/pull/41289), [#43481](https://github.com/WordPress/gutenberg/pull/43481)).
 
 ## 3.6.0 (2022-07-13)
 
-### Enhancement
+### Enhancements
 
 -   Added prompt to continue when minimum system requirements not met ([#42151](https://github.com/WordPress/gutenberg/pull/42151)).
 
 ## 3.3.0 (2022-06-01)
 
-### Enhancement
+### Enhancements
 
 -   Read the block name from `block.json` file in JavaScript files ([#41273](https://github.com/WordPress/gutenberg/pull/41273)).
 
 ## 3.2.0 (2022-05-18)
 
-### Bug Fix
+### Bug Fixes
 
 -   Fix the `.editorconfig` file include to work correctly with YAML files ([#40994](https://github.com/WordPress/gutenberg/pull/40994)).
 
@@ -198,7 +206,7 @@
 -   Add support for handling block templates with the `blockTemplatesPath` field in the external template configuration ([#37612](https://github.com/WordPress/gutenberg/pull/37612)).
 -   Add a new field `folderName` for setting the location for the `block.json` file and other optional block files generated from block templates included in the folder set with the `blockTemplatesPath` setting ([#37612](https://github.com/WordPress/gutenberg/pull/37612)).
 
-### Enhancement
+### Enhancements
 
 -   Speed up scaffolding process by omitting WordPress dependencies in the template ([#37639](https://github.com/WordPress/gutenberg/pull/37639)).
 -   Update link to block registration reference ([#37674](https://github.com/WordPress/gutenberg/pull/37674))
@@ -228,21 +236,21 @@
 
 ## 2.4.0 (2021-07-21)
 
-### Enhancement
+### Enhancements
 
 -   Plugin scaffolded with the `esnext` template requires WordPress 5.8 now ([#33252](https://github.com/WordPress/gutenberg/pull/33252).
 -   Block scaffolded with the `esnext` template is now registered from `block.json` with the `register_block_type` helper ([#33252](https://github.com/WordPress/gutenberg/pull/33252)).
 
 ## 2.3.0 (2021-04-29)
 
-### Enhancement
+### Enhancements
 
 -   Rename `format:js` script to `format` ([#30240](https://github.com/WordPress/gutenberg/pull/30240)).
 -   Updated `.editorconfig` template files to work with automatic file formatting ([#30794](https://github.com/WordPress/gutenberg/pull/30794)).
 
 ## 2.2.0 (2021-04-06)
 
-### Enhancement
+### Enhancements
 
 -   Scaffolded plugin requires WordPress 5.7 now ([#29757](https://github.com/WordPress/gutenberg/pull/29757)).
 
@@ -256,7 +264,7 @@
 
 -   Add a way to provide a default value in the template for `attributes` and `supports` Block API fields ([#28883](https://github.com/WordPress/gutenberg/pull/28883)).
 
-### Enhancement
+### Enhancements
 
 -   Block scaffolded with `esnext` template is now registered from `block.json` with the `register_block_type_from_metadata` helper ([#28883](https://github.com/WordPress/gutenberg/pull/28883)).
 
@@ -267,7 +275,7 @@
 
 ## 2.0.1 (2021-02-01)
 
-### Bug Fix
+### Bug Fixes
 
 -   Extract the package name from the value passed as an external template ([#28383](https://github.com/WordPress/gutenberg/pull/28383)).
 
@@ -289,24 +297,24 @@
 
 ## 1.1.0 (2021-01-05)
 
-### New Feature
+### New Features
 
 -   Adds the `npmDependencies` field to the template configuration. It allows listing remote npm dependencies that will be installed in the scaffolded project ([#27880](https://github.com/WordPress/gutenberg/pull/27880)).
 -   Installs WordPress npm dependencies used in the `esnext` template during the scaffolding process ([#27880](https://github.com/WordPress/gutenberg/pull/27880)).
 
-### Bug Fix
+### Bug Fixes
 
 -   Print the block class name in the `save` method in scaffolded templates ([#27988](https://github.com/WordPress/gutenberg/pull/27988)).
 
 ## 1.0.2 (2020-12-17)
 
-### Bug Fix
+### Bug Fixes
 
 -   Second attempt to fix support for external templates by using a temporary folder when downloading npm package.
 
 ## 1.0.1 (2020-12-17)
 
-### Bug Fix
+### Bug Fixes
 
 -   Fix support for external templates hosted on npm.
 
@@ -330,29 +338,29 @@
 
 ## 0.16.0 (2020-06-25)
 
-### New Feature
+### New Features
 
 -   Generate `block.json` file with all metadata necessary for Block Directory ([#23399](https://github.com/WordPress/gutenberg/pull/23399)).
 
-### Bug Fix
+### Bug Fixes
 
 -   Fix the error in the scaffolding process caused by the missing `scripts` section in `package.json` file ([#23443](https://github.com/WordPress/gutenberg/pull/23443)).
 
 ## 0.15.0-rc.0 (2020-06-24)
 
-### New Feature
+### New Features
 
 -   Add new CLI options: `--no-wp-scripts` and `--wp-scripts` to let users override the settings that template defines for supports for `@wordpress/scripts` package integration ([#23195](https://github.com/WordPress/gutenberg/pull/23195)).
 
 ## 0.14.2 (2020-06-16)
 
-### Bug Fix
+### Bug Fixes
 
 -   Fix errors reported by CSS linter in ESNext template by using hex colors in CSS files ([#23188](https://github.com/WordPress/gutenberg/pull/23188)).
 
 ## 0.14.1 (2020-06-15)
 
-### Bug Fix
+### Bug Fixes
 
 -   Fix an error reported by JavaScript linter by improving JSDoc comment in ESNext template in `src/edit.js` file ([#23164](https://github.com/WordPress/gutenberg/pull/23164)).
 
@@ -432,7 +440,7 @@
 
 ## 0.4.3 (2020-01-08)
 
-### Bug Fix
+### Bug Fixes
 
 -   Print available commands only for ESNext template.
 
@@ -448,7 +456,7 @@
 
 ## 0.3.2 (2019-12-16)
 
-### Bug Fix
+### Bug Fixes
 
 -   Fix the paths pointing to the JS build file listed in PHP file in the ESNext template.
 

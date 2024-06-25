@@ -33,7 +33,7 @@ If you don't have one or more of these items, the [Block Development Environment
 The first step in creating the Copyright Date Block is to scaffold the initial block structure using the [`@wordpress/create-block`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/) package.
 
 <div class="callout callout-info">
-	Review the <a href="https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-env/">Get started with create-block</a> documentation for an introduction to using this package.
+	Review the <a href="https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-create-block/">Get started with create-block</a> documentation for an introduction to using this package.
 </div>
 
 You can use `create-block` from just about any directory (folder) on your computer and then use `wp-env` to create a local WordPress development environment with your new block plugin installed and activated.

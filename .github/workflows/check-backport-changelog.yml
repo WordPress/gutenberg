@@ -3,6 +3,8 @@ name: Verify Core Backport Changlog
 on:
     pull_request:
         types: [opened, synchronize, labeled, unlabeled]
+        branches:
+            - trunk
         paths:
             - 'lib/**'
             - '!lib/load.php'

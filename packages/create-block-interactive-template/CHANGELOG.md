@@ -20,7 +20,7 @@
 
 ## 1.17.0 (2024-03-21)
 
-### Enhancement
+### Enhancements
 
 -   Update the template to use `wp_interactivity_data_wp_context` for the context attribute ([#59995](https://github.com/WordPress/gutenberg/pull/59995)).
 
@@ -34,7 +34,7 @@
 
 ## 1.12.0 (2024-01-10)
 
-### Enhancement
+### Enhancements
 
 -   Update the template to use `viewModule` in block.json ([#57712](https://github.com/WordPress/gutenberg/pull/57712)).
 
@@ -49,7 +49,7 @@
 
 ## 1.10.0 (2023-11-29)
 
-### Enhancement
+### Enhancements
 
 -   Update `view.js` and `render.php` templates to the new `store()` API ([#56613](https://github.com/WordPress/gutenberg/pull/56613)).
 
@@ -69,6 +69,6 @@
 
 ## 1.2.0 (2023-08-10)
 
-### Enhancement
+### Enhancements
 
 -   Moves the `example` property into block.json by leveraging changes to create-block to now support `example` ([#52801](https://github.com/WordPress/gutenberg/pull/52801)).
