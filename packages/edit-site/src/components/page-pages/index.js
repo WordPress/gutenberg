@@ -39,6 +39,7 @@ import AddNewPageModal from '../add-new-page';
 import Media from '../media';
 import { unlock } from '../../lock-unlock';
 import { useEditPostAction } from '../dataviews-actions';
+import { usePrevious } from '@wordpress/compose';
 
 const { usePostActions } = unlock( editorPrivateApis );
 const { useLocation, useHistory } = unlock( routerPrivateApis );
@@ -274,16 +275,19 @@ export default function PagePages() {
 		totalPages,
 	} = useEntityRecords( 'postType', postType, queryArgs );
 
+	const ids = pages?.map( ( page ) => getItemId( page ) ) ?? [];
+	const prevIds = usePrevious( ids ) ?? [];
+	const deletedIds = prevIds.filter( ( id ) => ! ids.includes( id ) );
+	const postIdWasDeleted = deletedIds.includes( postId );
+
 	useEffect( () => {
-		const postIdWasDeleted =
-			pages && ! pages.find( ( page ) => getItemId( page ) === postId );
 		if ( postIdWasDeleted ) {
 			history.push( {
 				...history.getLocationWithParams().params,
 				postId: undefined,
 			} );
 		}
-	}, [ pages, postId, history ] );
+	}, [ postIdWasDeleted, history ] );
 
 	const { records: authors, isResolving: isLoadingAuthors } =
 		useEntityRecords( 'root', 'user', { per_page: -1 } );
