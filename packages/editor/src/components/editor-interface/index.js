@@ -58,7 +58,6 @@ export default function EditorInterface( {
 	forceDisableBlockTools,
 	title,
 	iframeProps,
-	isEditMode = true,
 } ) {
 	const {
 		mode,
@@ -213,7 +212,7 @@ export default function EditorInterface( {
 				)
 			}
 			actions={
-				isEditMode ? (
+				! isPreviewMode ? (
 					<SavePublishPanels
 						closeEntitiesSavedStates={ closeEntitiesSavedStates }
 						isEntitiesSavedStatesOpen={
