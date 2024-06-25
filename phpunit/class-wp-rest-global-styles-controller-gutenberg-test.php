@@ -528,6 +528,18 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 			grant_super_admin( self::$admin_id );
 		}
 
+		/*
+		 * For variations to be resolved they have to have been registered
+		 * via either a theme.json partial or through the WP_Block_Styles_Registry.
+		 */
+		register_block_style(
+			'core/group',
+			array(
+				'name'  => 'fromThemeStyleVariation',
+				'label' => 'From Theme Style Variation',
+			)
+		);
+
 		$group_variations = array(
 			'fromThemeStyleVariation' => array(
 				'color' => array(
@@ -541,16 +553,16 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 		$request->set_body_params(
 			array(
 				'styles' => array(
-					'blocks' => array(
-						'variations' => array(
-							'fromThemeStyleVariation' => array(
-								'blockTypes' => array( 'core/group', 'core/columns' ),
-								'color'      => array(
-									'background' => '#000000',
-									'text'       => '#ffffff',
-								),
+					'variations' => array(
+						'fromThemeStyleVariation' => array(
+							'blockTypes' => array( 'core/group', 'core/columns' ),
+							'color'      => array(
+								'background' => '#000000',
+								'text'       => '#ffffff',
 							),
 						),
+					),
+					'blocks'     => array(
 						'core/group' => array(
 							'variations' => $group_variations,
 						),

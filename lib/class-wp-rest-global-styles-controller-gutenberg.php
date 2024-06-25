@@ -331,13 +331,9 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 				$config['styles'] = $existing_config['styles'];
 			}
 
-			// Register theme-defined variations.
-			WP_Theme_JSON_Resolver_Gutenberg::get_theme_data();
-
-			// Register user-defined variations.
-			if ( isset( $request['styles']['blocks']['variations'] ) && ! empty( $config['styles']['blocks']['variations'] ) ) {
-				gutenberg_register_block_style_variations_from_theme_json_data( $config['styles']['blocks']['variations'] );
-			}
+			// Register theme-defined variations e.g. from block style variation partials under `/styles`.
+			$variations = WP_Theme_JSON_Resolver_Gutenberg::get_style_variations( 'block' );
+			gutenberg_register_block_style_variations_from_theme_json_partials( $variations );
 
 			if ( isset( $request['settings'] ) ) {
 				$config['settings'] = $request['settings'];
@@ -710,7 +706,12 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 			);
 		}
 
-		$response   = array();
+		$response = array();
+
+		// Register theme-defined variations e.g. from block style variation partials under `/styles`.
+		$partials = WP_Theme_JSON_Resolver_Gutenberg::get_style_variations( 'block' );
+		gutenberg_register_block_style_variations_from_theme_json_partials( $partials );
+
 		$variations = WP_Theme_JSON_Resolver_Gutenberg::get_style_variations();
 
 		// Add resolved theme asset links.

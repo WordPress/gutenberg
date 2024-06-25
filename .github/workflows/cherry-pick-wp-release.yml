@@ -1,0 +1,133 @@
+name: Auto Cherry-Pick
+
+on:
+    pull_request:
+        types: [closed, labeled]
+        branches:
+            - trunk
+
+# Ensure that new jobs wait for the previous job to finish.
+concurrency:
+    group: ${{ github.workflow }}
+    cancel-in-progress: false
+
+jobs:
+    cherry-pick:
+        runs-on: ubuntu-latest
+        if: github.event.pull_request.merged == true
+        steps:
+            - name: Determine if label should trigger cherry-pick
+              id: label-check
+              uses: actions/github-script@v7
+              with:
+                  script: |
+                      const labels = context.payload.pull_request.labels.map(label => label.name);
+                      console.log(`Labels: ${labels}`);
+                      const regex = /^Backport to WP ([0-9]+\.[0-9]+) Beta\/RC$/;
+                      let matched = false;
+                      for (const label of labels) {
+                        const match = label.match(regex);
+                        if (match) {
+                          const version = match[1];
+                          console.log(`Matched label: ${label}`);
+                          console.log(`Extracted version: ${version}`);
+                          core.exportVariable('cherry_pick', 'true');
+                          core.exportVariable('version', version);
+                          matched = true;
+                          break;
+                        }
+                      }
+                      if (!matched) {
+                        core.exportVariable('cherry_pick', 'false');
+                      }
+
+            - name: Checkout repository
+              if: env.cherry_pick == 'true'
+              uses: actions/checkout@v2
+              with:
+                  token: ${{ secrets.GUTENBERG_TOKEN }}
+                  fetch-depth: 0
+
+            - name: Set up Git
+              if: env.cherry_pick == 'true'
+              run: |
+                  git config --global user.name "Gutenberg Repository Automation"
+                  git config --global user.email "gutenberg@wordpress.org"
+
+            - name: Cherry-pick the commit
+              id: cherry-pick
+              if: env.cherry_pick == 'true'
+              run: |
+                  TARGET_BRANCH="wp/${{ env.version }}"
+                  COMMIT_SHA=$(jq -r '.pull_request.merge_commit_sha' "$GITHUB_EVENT_PATH")
+                  echo "Target branch: $TARGET_BRANCH"
+                  echo "Commit SHA: $COMMIT_SHA"
+                  git checkout $TARGET_BRANCH
+                  git cherry-pick $COMMIT_SHA || echo "cherry-pick-failed" > result
+                  if [ -f result ] && grep -q "cherry-pick-failed" result; then
+                    echo "conflict=true" >> $GITHUB_ENV
+                    git cherry-pick --abort
+                  else
+                    NEW_COMMIT_SHA=$(git rev-parse HEAD)
+                    echo "conflict=false" >> $GITHUB_ENV
+                    echo "commit_sha=$NEW_COMMIT_SHA" >> $GITHUB_ENV
+                    git push origin $TARGET_BRANCH
+                  fi
+
+            - name: Remove cherry-pick label
+              if: env.cherry_pick == 'true' && env.conflict == 'false'
+              uses: actions/github-script@v7
+              with:
+                  script: |
+                      const prNumber = context.issue.number;
+                      const version = process.env.version;
+                      console.log(`prNumber: ${prNumber}`);
+                      console.log(`version: ${version}`);
+                      const oldLabel = `Backport to WP ${version} Beta/RC`;
+                      const newLabel = `Backported to WP Core`;
+                      await github.rest.issues.removeLabel({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number: prNumber,
+                        name: oldLabel
+                      });
+                      await github.rest.issues.addLabels({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number: prNumber,
+                        labels: [newLabel]
+                      });
+
+            - name: Comment on the PR
+              if: env.cherry_pick == 'true' && env.conflict == 'false'
+              uses: actions/github-script@v7
+              with:
+                  script: |
+                      const prNumber = context.issue.number;
+                      const commitSha = process.env.commit_sha;
+                      const targetBranch = `wp/${process.env.version}`;
+                      console.log(`prNumber: ${prNumber}`);
+                      console.log(`commitSha: ${commitSha}`);
+                      console.log(`targetBranch: ${targetBranch}`);
+                      await github.rest.issues.createComment({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number: prNumber,
+                        body: `I just cherry-picked this PR to the ${targetBranch} branch to get it included in the next release: ${commitSha}`
+                      });
+
+            - name: Comment on the PR about conflict
+              if: env.cherry_pick == 'true' && env.conflict == 'true'
+              uses: actions/github-script@v7
+              with:
+                  script: |
+                      const prNumber = context.issue.number;
+                      const targetBranch = `wp/${process.env.version}`;
+                      console.log(`prNumber: ${prNumber}`);
+                      console.log(`targetBranch: ${targetBranch}`);
+                      await github.rest.issues.createComment({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number: prNumber,
+                        body: `There was a conflict while trying to cherry-pick the commit to the ${targetBranch} branch. Please resolve the conflict manually and create a PR to the ${targetBranch} branch.`
+                      });

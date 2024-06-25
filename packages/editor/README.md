@@ -1289,7 +1289,7 @@ _Returns_
 
 ### PostSticky
 
-Renders the PostSticky component. It provide toggle control for the sticky post feature.
+Renders the PostSticky component. It provides a checkbox control for the sticky post feature.
 
 _Returns_
 
