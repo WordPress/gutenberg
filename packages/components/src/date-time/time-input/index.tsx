@@ -114,15 +114,16 @@ export function TimeInput( {
 
 	useEffect( () => {
 		if (
-			prevValues.current.hours !== hours ||
-			prevValues.current.minutes !== minutes
+			( prevValues.current.hours !== hours ||
+				prevValues.current.minutes !== minutes ) &&
+			( entryValue?.hours !== hours || entryValue?.minutes !== minutes )
 		) {
 			onChange?.( { hours, minutes } );
 		}
 
 		prevValues.current.hours = hours;
 		prevValues.current.minutes = minutes;
-	}, [ onChange, hours, minutes ] );
+	}, [ onChange, entryValue, hours, minutes ] );
 
 	useEffect( () => {
 		setMinutesProps(
