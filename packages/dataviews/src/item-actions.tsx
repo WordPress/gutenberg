@@ -15,6 +15,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
 import { moreVertical } from '@wordpress/icons';
+import { useRegistry } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -112,16 +113,13 @@ export function ActionModal< Item extends AnyItem >( {
 			title={ action.modalHeader || label }
 			__experimentalHideHeader={ !! action.hideModalHeader }
 			onRequestClose={ closeModal ?? ( () => {} ) }
+			focusOnMount="firstContentElement"
+			size="small"
 			overlayClassName={ `dataviews-action-modal dataviews-action-modal__${ kebabCase(
 				action.id
 			) }` }
 		>
-			<action.RenderModal
-				items={ items }
-				closeModal={ closeModal }
-				onActionStart={ action.onActionStart }
-				onActionPerformed={ action.onActionPerformed }
-			/>
+			<action.RenderModal items={ items } closeModal={ closeModal } />
 		</Modal>
 	);
 }
@@ -159,6 +157,7 @@ export function ActionsDropdownMenuGroup< Item extends AnyItem >( {
 	actions,
 	item,
 }: ActionsDropdownMenuGroupProps< Item > ) {
+	const registry = useRegistry();
 	return (
 		<DropdownMenuGroup>
 			{ actions.map( ( action ) => {
@@ -176,7 +175,9 @@ export function ActionsDropdownMenuGroup< Item extends AnyItem >( {
 					<DropdownMenuItemTrigger
 						key={ action.id }
 						action={ action }
-						onClick={ () => action.callback( [ item ] ) }
+						onClick={ () => {
+							action.callback( [ item ], { registry } );
+						} }
 						items={ [ item ] }
 					/>
 				);
@@ -190,6 +191,7 @@ export default function ItemActions< Item extends AnyItem >( {
 	actions,
 	isCompact,
 }: ItemActionsProps< Item > ) {
+	const registry = useRegistry();
 	const { primaryActions, eligibleActions } = useMemo( () => {
 		// If an action is eligible for all items, doesn't need
 		// to provide the `isEligible` function.
@@ -233,7 +235,9 @@ export default function ItemActions< Item extends AnyItem >( {
 						<ButtonTrigger
 							key={ action.id }
 							action={ action }
-							onClick={ () => action.callback( [ item ] ) }
+							onClick={ () => {
+								action.callback( [ item ], { registry } );
+							} }
 							items={ [ item ] }
 						/>
 					);
@@ -254,6 +258,7 @@ function CompactItemActions< Item extends AnyItem >( {
 					size="compact"
 					icon={ moreVertical }
 					label={ __( 'Actions' ) }
+					__experimentalIsFocusable
 					disabled={ ! actions.length }
 					className="dataviews-all-actions-button"
 				/>

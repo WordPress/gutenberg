@@ -57,6 +57,7 @@ export default function EditorInterface( {
 	customSaveButton,
 	forceDisableBlockTools,
 	title,
+	icon,
 	iframeProps,
 } ) {
 	const {
@@ -121,8 +122,10 @@ export default function EditorInterface( {
 		<InterfaceSkeleton
 			enableRegionNavigation={ enableRegionNavigation }
 			isDistractionFree={ isDistractionFree && isWideViewport }
-			className={ clsx( className, {
+			className={ clsx( 'editor-editor-interface', className, {
 				'is-entity-save-view-open': !! entitiesSavedStatesCallback,
+				'is-distraction-free':
+					isDistractionFree && isWideViewport && ! isPreviewMode,
 			} ) }
 			labels={ {
 				...interfaceLabels,
@@ -138,6 +141,7 @@ export default function EditorInterface( {
 						customSaveButton={ customSaveButton }
 						forceDisableBlockTools={ forceDisableBlockTools }
 						title={ title }
+						icon={ icon }
 					/>
 				)
 			}
@@ -160,7 +164,7 @@ export default function EditorInterface( {
 
 					<EditorContentSlotFill.Slot>
 						{ ( [ editorCanvasView ] ) =>
-							! isPreviewMode && editorCanvasView ? (
+							editorCanvasView ? (
 								editorCanvasView
 							) : (
 								<>
@@ -206,20 +210,22 @@ export default function EditorInterface( {
 				isRichEditingEnabled &&
 				blockEditorMode !== 'zoom-out' &&
 				mode === 'visual' && (
-					<div className="edit-post-layout__footer">
-						<BlockBreadcrumb rootLabelText={ documentLabel } />
-					</div>
+					<BlockBreadcrumb rootLabelText={ documentLabel } />
 				)
 			}
 			actions={
-				<SavePublishPanels
-					closeEntitiesSavedStates={ closeEntitiesSavedStates }
-					isEntitiesSavedStatesOpen={ entitiesSavedStatesCallback }
-					setEntitiesSavedStatesCallback={
-						setEntitiesSavedStatesCallback
-					}
-					forceIsDirtyPublishPanel={ forceIsDirty }
-				/>
+				! isPreviewMode ? (
+					<SavePublishPanels
+						closeEntitiesSavedStates={ closeEntitiesSavedStates }
+						isEntitiesSavedStatesOpen={
+							entitiesSavedStatesCallback
+						}
+						setEntitiesSavedStatesCallback={
+							setEntitiesSavedStatesCallback
+						}
+						forceIsDirtyPublishPanel={ forceIsDirty }
+					/>
+				) : undefined
 			}
 			shortcuts={ {
 				previous: previousShortcut,

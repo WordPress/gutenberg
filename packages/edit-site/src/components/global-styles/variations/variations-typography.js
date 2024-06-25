@@ -35,7 +35,12 @@ export default function TypographyVariations( { title, gap = 2 } ) {
 				{ typographyVariations &&
 					typographyVariations.length &&
 					typographyVariations.map( ( variation, index ) => (
-						<Variation key={ index } variation={ variation }>
+						<Variation
+							key={ index }
+							variation={ variation }
+							property="typography"
+							showTooltip
+						>
 							{ ( isFocused ) => (
 								<PreviewIframe
 									label={ variation?.title }

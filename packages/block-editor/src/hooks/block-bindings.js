@@ -4,6 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { store as blocksStore } from '@wordpress/blocks';
 import {
+	BaseControl,
 	PanelBody,
 	__experimentalHStack as HStack,
 	__experimentalItemGroup as ItemGroup,
@@ -54,30 +55,35 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 	return (
 		<InspectorControls>
 			<PanelBody
-				title={ __( 'Bindings' ) }
+				title={ __( 'Attributes' ) }
 				className="components-panel__block-bindings-panel"
 			>
-				<ItemGroup isBordered isSeparated size="large">
-					{ Object.keys( filteredBindings ).map( ( key ) => {
-						return (
-							<Item key={ key }>
-								<HStack>
-									<span>{ key }</span>
-									<span className="components-item__block-bindings-source">
-										{ sources[
-											filteredBindings[ key ].source
-										]
-											? sources[
-													filteredBindings[ key ]
-														.source
-											  ].label
-											: filteredBindings[ key ].source }
-									</span>
-								</HStack>
-							</Item>
-						);
-					} ) }
-				</ItemGroup>
+				<BaseControl
+					help={ __( 'Attributes connected to various sources.' ) }
+				>
+					<ItemGroup isBordered isSeparated size="large">
+						{ Object.keys( filteredBindings ).map( ( key ) => {
+							return (
+								<Item key={ key }>
+									<HStack>
+										<span>{ key }</span>
+										<span className="components-item__block-bindings-source">
+											{ sources[
+												filteredBindings[ key ].source
+											]
+												? sources[
+														filteredBindings[ key ]
+															.source
+												  ].label
+												: filteredBindings[ key ]
+														.source }
+										</span>
+									</HStack>
+								</Item>
+							);
+						} ) }
+					</ItemGroup>
+				</BaseControl>
 			</PanelBody>
 		</InspectorControls>
 	);

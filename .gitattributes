@@ -11,3 +11,9 @@
 *.jpg binary
 *.png binary
 *.ttf binary
+
+# Directories with vendored code.
+packages/edit-site/lib/** linguist-vendored
+
+# The changelog.txt file is authored as markdown.
+changelog.txt linguist-language=Markdown

@@ -107,8 +107,8 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 				isBlockTemplatePart,
 				isNextBlockTemplatePart,
 				isPrevBlockTemplatePart,
-				canRemove: canRemoveBlock( clientId, rootClientId ),
-				canMove: canMoveBlock( clientId, rootClientId ),
+				canRemove: canRemoveBlock( clientId ),
+				canMove: canMoveBlock( clientId ),
 			};
 		},
 		[ clientId, rootClientId ]

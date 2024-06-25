@@ -35,9 +35,8 @@ import { store as blockEditorStore } from '../../store';
 import __unstableBlockNameContext from './block-name-context';
 import NavigableToolbar from '../navigable-toolbar';
 import Shuffle from './shuffle';
-import BlockBindingsIndicator from '../block-bindings-toolbar-indicator';
 import { useHasBlockToolbar } from './use-has-block-toolbar';
-import { canBindBlock } from '../../hooks/use-bindings-attributes';
+
 /**
  * Renders the block toolbar.
  *
@@ -62,7 +61,6 @@ export function PrivateBlockToolbar( {
 		blockClientIds,
 		isDefaultEditingMode,
 		blockType,
-		blockName,
 		toolbarKey,
 		shouldShowVisualToolbar,
 		showParentSelector,
@@ -94,13 +92,14 @@ export function PrivateBlockToolbar( {
 		const isVisual = selectedBlockClientIds.every(
 			( id ) => getBlockMode( id ) === 'visual'
 		);
-		const _isUsingBindings = !! getBlockAttributes( selectedBlockClientId )
-			?.metadata?.bindings;
+		const _isUsingBindings = selectedBlockClientIds.every(
+			( clientId ) =>
+				!! getBlockAttributes( clientId )?.metadata?.bindings
+		);
 		return {
 			blockClientId: selectedBlockClientId,
 			blockClientIds: selectedBlockClientIds,
 			isDefaultEditingMode: _isDefaultEditingMode,
-			blockName: _blockName,
 			blockType: selectedBlockClientId && getBlockType( _blockName ),
 			shouldShowVisualToolbar: isValid && isVisual,
 			rootClientId: blockRootClientId,
@@ -146,6 +145,7 @@ export function PrivateBlockToolbar( {
 
 	const innerClasses = clsx( 'block-editor-block-toolbar', {
 		'is-synced': isSynced,
+		'is-connected': isUsingBindings,
 	} );
 
 	return (
@@ -167,9 +167,6 @@ export function PrivateBlockToolbar( {
 				{ ! isMultiToolbar &&
 					isLargeViewport &&
 					isDefaultEditingMode && <BlockParentSelector /> }
-				{ isUsingBindings && canBindBlock( blockName ) && (
-					<BlockBindingsIndicator clientIds={ blockClientIds } />
-				) }
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) &&
 					( isDefaultEditingMode || isSynced ) && (
 						<div
@@ -180,6 +177,7 @@ export function PrivateBlockToolbar( {
 								<BlockSwitcher
 									clientIds={ blockClientIds }
 									disabled={ ! isDefaultEditingMode }
+									isUsingBindings={ isUsingBindings }
 								/>
 								{ isDefaultEditingMode && (
 									<>
