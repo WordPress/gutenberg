@@ -47,7 +47,7 @@ function UnforwardedSizeControl(
 		size = 'default',
 		units: unitsProp = DEFAULT_UNITS,
 		withSlider = true,
-		withReset = false,
+		withReset = true,
 		onChange,
 		fallbackValue,
 	} = props;

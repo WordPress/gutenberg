@@ -51,7 +51,7 @@ export type SizeControlBaseProps = {
 	 * If `true`, the UI will contain a slider, instead of a numeric text input
 	 * field. If `false`, no slider will be present.
 	 *
-	 * @default false
+	 * @default true
 	 */
 	withSlider?: boolean;
 	/**
