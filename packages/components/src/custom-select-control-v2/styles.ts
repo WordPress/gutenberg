@@ -44,7 +44,7 @@ export const ItemHintContent = styled.span`
 export const ItemHint = styled.span`
 	color: ${ COLORS.theme.gray[ 600 ] };
 	text-align: right;
-	margin-inline-end: ${ space( 1 ) };
+	padding-inline-end: ${ space( 1 ) };
 `;
 
 export const SelectLabel = styled( Ariakit.SelectLabel )`
