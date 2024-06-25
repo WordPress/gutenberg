@@ -164,20 +164,21 @@ export default function BlockTools( {
 				// If there are multiple editors, we need to find the iframe that contains our contentRef to make sure
 				// we're focusing the region that contains this editor.
 				const editorCanvas =
-					document
-						.querySelectorAll( 'iframe[name="editor-canvas"]' )
-						.values()
-						.find( ( iframe ) => {
-							// Find the iframe that contains our contentRef
-							const iframeDocument =
-								iframe.contentDocument ||
-								iframe.contentWindow.document;
+					Array.from(
+						document
+							.querySelectorAll( 'iframe[name="editor-canvas"]' )
+							.values()
+					).find( ( iframe ) => {
+						// Find the iframe that contains our contentRef
+						const iframeDocument =
+							iframe.contentDocument ||
+							iframe.contentWindow.document;
 
-							return (
-								iframeDocument ===
-								__unstableContentRef.current.ownerDocument
-							);
-						} ) ?? __unstableContentRef.current;
+						return (
+							iframeDocument ===
+							__unstableContentRef.current.ownerDocument
+						);
+					} ) ?? __unstableContentRef.current;
 
 				// The region is provivided by the editor, not the block-editor.
 				// We should send focus to the region if one is available to reuse the
