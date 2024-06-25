@@ -34,26 +34,19 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 		const isManualGrid = !! columnCount;
 
 		if ( isManualGrid ) {
-			// Ensure there's enough rows to fit all blocks.
-			const minimumNeededRows = Math.ceil(
-				blockOrder.length / columnCount
-			);
-			if ( rowCount < minimumNeededRows ) {
-				updates[ gridClientId ] = {
-					layout: {
-						...gridLayout,
-						rowCount: minimumNeededRows,
-					},
-				};
-			}
-
 			const rects = [];
+			let cellsTaken = 0;
 
 			// Respect the position of blocks that already have a columnStart and rowStart value.
 			for ( const clientId of blockOrder ) {
 				const attributes = getBlockAttributes( clientId );
-				const { columnStart, rowStart, columnSpan, rowSpan } =
-					attributes.style?.layout || {};
+				const {
+					columnStart,
+					rowStart,
+					columnSpan = 1,
+					rowSpan = 1,
+				} = attributes.style?.layout || {};
+				cellsTaken += columnSpan * rowSpan;
 				if ( ! columnStart || ! rowStart ) {
 					continue;
 				}
@@ -65,6 +58,17 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 						rowSpan,
 					} )
 				);
+			}
+
+			// Ensure there's enough rows to fit all blocks.
+			const minimumNeededRows = Math.ceil( cellsTaken / columnCount );
+			if ( rowCount < minimumNeededRows ) {
+				updates[ gridClientId ] = {
+					layout: {
+						...gridLayout,
+						rowCount: minimumNeededRows,
+					},
+				};
 			}
 
 			// When in manual mode, ensure that every block has a columnStart and rowStart value.
