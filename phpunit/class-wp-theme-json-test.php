@@ -3739,6 +3739,89 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSameSetsWithIndex( $expected, $sanitized_theme_json, 'Sanitized theme.json styles does not match' );
 	}
 
+	public function test_unwraps_block_style_variations() {
+		gutenberg_register_block_style(
+			array( 'core/paragraph', 'core/group' ),
+			array(
+				'name'  => 'myVariation',
+				'label' => 'My variation',
+			)
+		);
+
+		$input = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'variations' => array(
+						'myVariation' => array(
+							'color'      => array(
+								'background' => 'topLevel',
+								'gradient'   => 'topLevel',
+							),
+							'typography' => array(
+								'fontFamily' => 'topLevel',
+							),
+						),
+					),
+					'blocks'     => array(
+						'core/paragraph' => array(
+							'variations' => array(
+								'myVariation' => array(
+									'color'   => array(
+										'background' => 'blockLevel',
+										'text'       => 'blockLevel',
+									),
+									'outline' => array(
+										'offset' => 'blockLevel',
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected = array(
+			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'styles'  => array(
+				'blocks' => array(
+					'core/paragraph' => array(
+						'variations' => array(
+							'myVariation' => array(
+								'color'      => array(
+									'background' => 'blockLevel',
+									'gradient'   => 'topLevel',
+									'text'       => 'blockLevel',
+								),
+								'typography' => array(
+									'fontFamily' => 'topLevel',
+								),
+								'outline'    => array(
+									'offset' => 'blockLevel',
+								),
+							),
+						),
+					),
+					'core/group'     => array(
+						'variations' => array(
+							'myVariation' => array(
+								'color'      => array(
+									'background' => 'topLevel',
+									'gradient'   => 'topLevel',
+								),
+								'typography' => array(
+									'fontFamily' => 'topLevel',
+								),
+							),
+						),
+					),
+				),
+			),
+		);
+		$this->assertSameSetsWithIndex( $expected, $input->get_raw_data(), 'Unwrapped block style variations do not match' );
+	}
+
 	/**
 	 * @dataProvider data_sanitize_for_block_with_style_variations
 	 *

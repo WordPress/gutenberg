@@ -42,14 +42,15 @@ export default function AddNewPageModal( { onSave, onClose } ) {
 					status: 'draft',
 					title,
 					slug: title || __( 'No title' ),
-					content: !! pagePostType.template
-						? serialize(
-								synchronizeBlocksWithTemplate(
-									[],
-									pagePostType.template
-								)
-						  )
-						: undefined,
+					content:
+						!! pagePostType.template && pagePostType.template.length
+							? serialize(
+									synchronizeBlocksWithTemplate(
+										[],
+										pagePostType.template
+									)
+							  )
+							: undefined,
 				},
 				{ throwOnError: true }
 			);
