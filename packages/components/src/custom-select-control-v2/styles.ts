@@ -113,8 +113,7 @@ export const SelectPopover = styled( Ariakit.SelectPopover )`
 	/* TODO: is there a way to read the sass variable? */
 	z-index: 1000000;
 
-	max-height: min( var( --popover-available-height, 360px ), 360px );
-	flex-direction: column;
+	max-height: min( var( --popover-available-height, 400px ), 400px );
 	overflow: auto;
 	overscroll-behavior: contain;
 
