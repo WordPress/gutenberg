@@ -1075,15 +1075,22 @@ export const duplicateTemplatePartAction = {
 };
 
 export function usePostActions( { postType, onActionPerformed, context } ) {
-	const { postTypeObject, resource, cachedCanUserResolvers } = useSelect(
+	const {
+		postTypeObject,
+		resource,
+		cachedCanUserResolvers,
+		userCanCreatePostType,
+	} = useSelect(
 		( select ) => {
-			const { getPostType, getCachedResolvers } = select( coreStore );
+			const { getPostType, getCachedResolvers, canUser } =
+				select( coreStore );
 			const _postTypeObject = getPostType( postType );
 			const _resource = _postTypeObject?.rest_base || '';
 			return {
 				postTypeObject: _postTypeObject,
 				resource: _resource,
 				cachedCanUserResolvers: getCachedResolvers()?.canUser,
+				userCanCreatePostType: canUser( 'create', _resource ),
 			};
 		},
 		[ postType ]
@@ -1115,8 +1122,10 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 				  ! isPattern &&
 				  duplicatePostAction
 				: false,
-			isTemplateOrTemplatePart && duplicateTemplatePartAction,
-			isPattern && duplicatePatternAction,
+			isTemplateOrTemplatePart &&
+				userCanCreatePostType &&
+				duplicateTemplatePartAction,
+			isPattern && userCanCreatePostType && duplicatePatternAction,
 			supportsTitle && renamePostActionForPostType,
 			isPattern && exportPatternAsJSONAction,
 			isTemplateOrTemplatePart
@@ -1199,6 +1208,7 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 		supportsRevisions,
 		supportsTitle,
 		context,
+		userCanCreatePostType,
 		cachedCanUserResolvers,
 	] );
 }
