@@ -133,7 +133,9 @@ export const SelectItem = styled( Ariakit.SelectItem )`
 	justify-content: space-between;
 	padding: ${ ITEM_PADDING };
 	font-size: ${ CONFIG.fontSize };
-	line-height: 2.15rem; // TODO: Remove this in default but keep for back-compat in legacy
+	// Legacy line height is 28px.
+	// TODO: reassess for non-legacy v2
+	line-height: calc( 28px / ${ CONFIG.fontSize } );
 	&[data-active-item] {
 		background-color: ${ COLORS.theme.gray[ 300 ] };
 	}
