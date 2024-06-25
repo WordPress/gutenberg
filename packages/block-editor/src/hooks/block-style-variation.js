@@ -69,11 +69,13 @@ function getVariationNameFromClass( className, registeredStyles = [] ) {
  * @return {Array} An array of new block variation overrides.
  */
 export function useUpdateBlockStyleVariationOverridesWithConfig( config ) {
-	const overrides = useSelect(
-		( select ) => unlock( select( blockEditorStore ) ).getStyleOverrides(),
+	const { getBlockStyles, overrides } = useSelect(
+		( select ) => ( {
+			getBlockStyles: select( blocksStore ).getBlockStyles,
+			overrides: unlock( select( blockEditorStore ) ).getStyleOverrides(),
+		} ),
 		[]
 	);
-	const { getBlockStyles } = useSelect( blocksStore );
 	const { getBlockName } = useSelect( blockEditorStore );
 
 	return useMemo( () => {
