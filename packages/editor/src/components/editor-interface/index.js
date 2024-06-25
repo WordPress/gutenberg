@@ -58,6 +58,7 @@ export default function EditorInterface( {
 	forceDisableBlockTools,
 	title,
 	iframeProps,
+	isEditMode = true,
 } ) {
 	const {
 		mode,
@@ -212,14 +213,18 @@ export default function EditorInterface( {
 				)
 			}
 			actions={
-				<SavePublishPanels
-					closeEntitiesSavedStates={ closeEntitiesSavedStates }
-					isEntitiesSavedStatesOpen={ entitiesSavedStatesCallback }
-					setEntitiesSavedStatesCallback={
-						setEntitiesSavedStatesCallback
-					}
-					forceIsDirtyPublishPanel={ forceIsDirty }
-				/>
+				isEditMode ? (
+					<SavePublishPanels
+						closeEntitiesSavedStates={ closeEntitiesSavedStates }
+						isEntitiesSavedStatesOpen={
+							entitiesSavedStatesCallback
+						}
+						setEntitiesSavedStatesCallback={
+							setEntitiesSavedStatesCallback
+						}
+						forceIsDirtyPublishPanel={ forceIsDirty }
+					/>
+				) : undefined
 			}
 			shortcuts={ {
 				previous: previousShortcut,

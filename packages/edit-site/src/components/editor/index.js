@@ -207,6 +207,7 @@ export default function EditSiteEditor( { isLoading } ) {
 					extraSidebarPanels={
 						! isEditingPage && <PluginTemplateSettingPanel.Slot />
 					}
+					isEditMode={ isEditMode }
 				>
 					{ isEditMode && (
 						<BackButton>
