@@ -3,7 +3,7 @@
  */
 import { external, trash, backup } from '@wordpress/icons';
 import { addQueryArgs } from '@wordpress/url';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, _n, sprintf, _x } from '@wordpress/i18n';
@@ -154,6 +154,24 @@ const deletePostAction = {
 		);
 	},
 };
+
+function useCanUserEligibilityCheckPostType( capability, resource, action ) {
+	const registry = useRegistry();
+	return useMemo(
+		() => ( {
+			...action,
+			isEligible( item ) {
+				return (
+					action.isEligible( item ) &&
+					registry
+						.select( coreStore )
+						.canUser( capability, resource, item.id )
+				);
+			},
+		} ),
+		[ action, registry, capability, resource ]
+	);
+}
 
 const trashPostAction = {
 	id: 'move-to-trash',
@@ -323,12 +341,20 @@ const trashPostAction = {
 	},
 };
 
-function usePermanentlyDeletePostAction() {
+function useTrashPostAction( resource ) {
+	return useCanUserEligibilityCheckPostType(
+		'delete',
+		resource,
+		trashPostAction
+	);
+}
+
+function usePermanentlyDeletePostAction( resource ) {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 	const { deleteEntityRecord } = useDispatch( coreStore );
 
-	return useMemo(
+	const permanentlyDeletePostAction = useMemo(
 		() => ( {
 			id: 'permanently-delete',
 			label: __( 'Permanently delete' ),
@@ -428,15 +454,20 @@ function usePermanentlyDeletePostAction() {
 		} ),
 		[ createSuccessNotice, createErrorNotice, deleteEntityRecord ]
 	);
+	return useCanUserEligibilityCheckPostType(
+		'delete',
+		resource,
+		permanentlyDeletePostAction
+	);
 }
 
-function useRestorePostAction() {
+function useRestorePostAction( resource ) {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 	const { editEntityRecord, saveEditedEntityRecord } =
 		useDispatch( coreStore );
 
-	return useMemo(
+	const restorePostAction = useMemo(
 		() => ( {
 			id: 'restore',
 			label: __( 'Restore' ),
@@ -561,6 +592,11 @@ function useRestorePostAction() {
 			editEntityRecord,
 			saveEditedEntityRecord,
 		]
+	);
+	return useCanUserEligibilityCheckPostType(
+		'update',
+		resource,
+		restorePostAction
 	);
 }
 
@@ -722,6 +758,14 @@ const renamePostAction = {
 		);
 	},
 };
+
+function useRenamePostAction( resource ) {
+	return useCanUserEligibilityCheckPostType(
+		'update',
+		resource,
+		renamePostAction
+	);
+}
 
 const duplicatePostAction = {
 	id: 'duplicate-post',
@@ -1031,18 +1075,25 @@ export const duplicateTemplatePartAction = {
 };
 
 export function usePostActions( { postType, onActionPerformed, context } ) {
-	const { postTypeObject } = useSelect(
+	const { postTypeObject, resource, cachedCanUserResolvers } = useSelect(
 		( select ) => {
-			const { getPostType } = select( coreStore );
+			const { getPostType, getCachedResolvers } = select( coreStore );
+			const _postTypeObject = getPostType( postType );
+			const _resource = _postTypeObject?.rest_base || '';
 			return {
-				postTypeObject: getPostType( postType ),
+				postTypeObject: _postTypeObject,
+				resource: _resource,
+				cachedCanUserResolvers: getCachedResolvers()?.canUser,
 			};
 		},
 		[ postType ]
 	);
 
-	const permanentlyDeletePostAction = usePermanentlyDeletePostAction();
-	const restorePostAction = useRestorePostAction();
+	const trashPostActionForPostType = useTrashPostAction( resource );
+	const permanentlyDeletePostActionForPostType =
+		usePermanentlyDeletePostAction( resource );
+	const renamePostActionForPostType = useRenamePostAction( resource );
+	const restorePostActionForPostType = useRestorePostAction( resource );
 	const isTemplateOrTemplatePart = [
 		TEMPLATE_POST_TYPE,
 		TEMPLATE_PART_POST_TYPE,
@@ -1066,13 +1117,16 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 				: false,
 			isTemplateOrTemplatePart && duplicateTemplatePartAction,
 			isPattern && duplicatePatternAction,
-			supportsTitle && renamePostAction,
+			supportsTitle && renamePostActionForPostType,
 			isPattern && exportPatternAsJSONAction,
-			isTemplateOrTemplatePart ? resetTemplateAction : restorePostAction,
+			isTemplateOrTemplatePart
+				? resetTemplateAction
+				: restorePostActionForPostType,
 			isTemplateOrTemplatePart || isPattern
 				? deletePostAction
-				: trashPostAction,
-			! isTemplateOrTemplatePart && permanentlyDeletePostAction,
+				: trashPostActionForPostType,
+			! isTemplateOrTemplatePart &&
+				permanentlyDeletePostActionForPostType,
 		].filter( Boolean );
 		// Filter actions based on provided context. If not provided
 		// all actions are returned. We'll have a single entry for getting the actions
@@ -1129,16 +1183,22 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 		}
 
 		return actions;
+		// We are making this use memo depend on cachedCanUserResolvers as a way to make the component using this hook re-render
+		// when user capabilities are resolved. This makes sure the isEligible functions of actions dependent on capabilities are re-evaluated.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [
 		isTemplateOrTemplatePart,
 		isPattern,
 		postTypeObject?.viewable,
-		permanentlyDeletePostAction,
-		restorePostAction,
+		permanentlyDeletePostActionForPostType,
+		restorePostActionForPostType,
+		renamePostActionForPostType,
+		trashPostActionForPostType,
 		onActionPerformed,
 		isLoaded,
 		supportsRevisions,
 		supportsTitle,
 		context,
+		cachedCanUserResolvers,
 	] );
 }
