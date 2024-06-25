@@ -23,6 +23,13 @@ export default function ZoomOutPopover( { clientId, __unstableContentRef } ) {
 		clientId,
 	} );
 
+	// Override some of the popover props for the zoom-out toolbar.
+	const props = {
+		...popoverProps,
+		placement: 'left-start',
+		flip: false,
+	};
+
 	return (
 		<BlockPopover
 			clientId={ capturingClientId || clientId }
@@ -31,8 +38,7 @@ export default function ZoomOutPopover( { clientId, __unstableContentRef } ) {
 				'is-insertion-point-visible': isInsertionPointVisible,
 			} ) }
 			resize={ false }
-			{ ...popoverProps }
-			placement="left-start"
+			{ ...props }
 		>
 			<ZoomOutToolbar
 				clientId={ clientId }
