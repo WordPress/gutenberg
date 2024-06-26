@@ -138,6 +138,7 @@ class Gutenberg_REST_Templates_Controller_6_7 extends Gutenberg_REST_Templates_C
 	 * @param WP_Block_Template $template_object Template instance.
 	 * @return string                            Human readable text for the author.
 	 */
+	// @core-merge: Nothing has changed in this function, the only reason to include it here is that it's a private function.
 	private static function get_wp_templates_author_text_field( $template_object ) {
 		$original_source = self::get_wp_templates_original_source_field( $template_object );
 		switch ( $original_source ) {
