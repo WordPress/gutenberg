@@ -37,6 +37,7 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 		if ( isManualGrid ) {
 			const rects = [];
 			let cellsTaken = 0;
+			let lowestRowEnd = 0;
 
 			// Respect the position of blocks that already have a columnStart and rowStart value.
 			for ( const clientId of blockOrder ) {
@@ -59,18 +60,11 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 						rowSpan,
 					} )
 				);
+				lowestRowEnd = Math.max( lowestRowEnd, rowStart + rowSpan - 1 );
 			}
 
 			// Ensure there's enough rows to fit all blocks.
 			const minimumNeededRows = Math.ceil( cellsTaken / columnCount );
-			if ( rowCount < minimumNeededRows ) {
-				updates[ gridClientId ] = {
-					layout: {
-						...gridLayout,
-						rowCount: minimumNeededRows,
-					},
-				};
-			}
 
 			// When in manual mode, ensure that every block has a columnStart and rowStart value.
 			for ( const clientId of blockOrder ) {
@@ -103,6 +97,15 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 							columnStart: newColumnStart,
 							rowStart: newRowStart,
 						},
+					},
+				};
+				lowestRowEnd = Math.max( lowestRowEnd, rowStart + rowSpan - 1 );
+			}
+			if ( rowCount < lowestRowEnd ) {
+				updates[ gridClientId ] = {
+					layout: {
+						...gridLayout,
+						rowCount: minimumNeededRows,
 					},
 				};
 			}
