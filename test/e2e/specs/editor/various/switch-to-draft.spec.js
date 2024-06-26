@@ -58,6 +58,7 @@ test.describe( 'Clicking "Switch to draft" on a published/scheduled post/page', 
 							.click();
 					}
 					await page
+						.getByRole( 'region', { name: 'Editor top bar' } )
 						.getByRole( 'button', { name: 'Save', exact: true } )
 						.click();
 					await expect(
