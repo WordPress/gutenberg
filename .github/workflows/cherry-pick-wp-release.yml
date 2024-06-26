@@ -142,7 +142,11 @@ jobs:
                         git checkout -b my-branch
                         # Cherry-pick the commit.
                         git cherry-pick ${commitSha}
+                        # Check which files have conflicts.
+                        git status
                         # Resolve the conflict...
+                        # Add the resolved files to the staging area.
+                        git status
                         git add .
                         git cherry-pick --continue
                         # Push the branch to the repository
