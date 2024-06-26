@@ -216,7 +216,7 @@ interface ViewBase {
 	/**
 	 * The hidden fields.
 	 */
-	hiddenFields: string[];
+	hiddenFields?: string[];
 }
 
 export interface ViewTable extends ViewBase {

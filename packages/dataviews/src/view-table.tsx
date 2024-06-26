@@ -223,9 +223,9 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item extends AnyItem >(
 							onHide( field );
 							onChangeView( {
 								...view,
-								hiddenFields: view.hiddenFields.concat(
-									field.id
-								),
+								hiddenFields: (
+									view.hiddenFields ?? []
+								).concat( field.id ),
 							} );
 						} }
 					>
@@ -473,7 +473,7 @@ function ViewTable< Item extends AnyItem >( {
 	};
 	const visibleFields = fields.filter(
 		( field ) =>
-			! view.hiddenFields.includes( field.id ) &&
+			! view.hiddenFields?.includes( field.id ) &&
 			! [ view.layout.mediaField ].includes( field.id )
 	);
 	const hasData = !! data?.length;
