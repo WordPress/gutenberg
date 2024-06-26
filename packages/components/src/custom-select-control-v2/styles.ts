@@ -15,38 +15,6 @@ import type { CustomSelectButtonSize } from './types';
 
 const ITEM_PADDING = space( 2 );
 
-const truncateStyles = css`
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-`;
-
-export const ItemHintWrapper = styled.div`
-	display: flex;
-	justify-content: space-between;
-	flex: 1;
-	flex-wrap: wrap;
-`;
-
-export const SelectedExperimentalHintWrapper = styled.div`
-	${ truncateStyles }
-`;
-
-export const SelectedExperimentalHintItem = styled.span`
-	color: ${ COLORS.theme.gray[ 600 ] };
-	margin-inline-start: ${ space( 2 ) };
-`;
-
-export const ItemHintContent = styled.span`
-	padding-inline-end: ${ space( 4 ) };
-`;
-
-export const ItemHint = styled.span`
-	color: ${ COLORS.theme.gray[ 600 ] };
-	text-align: right;
-	padding-inline-end: ${ space( 1 ) };
-`;
-
 export const SelectLabel = styled( Ariakit.SelectLabel )`
 	font-size: 11px;
 	font-weight: 500;
@@ -134,22 +102,27 @@ export const SelectPopover = styled( Ariakit.SelectPopover )`
 `;
 
 export const SelectItem = styled( Ariakit.SelectItem )`
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	padding: ${ ITEM_PADDING };
-	font-size: ${ CONFIG.fontSize };
-	// TODO: reassess line-height for non-legacy v2
-	line-height: 28px;
-	scroll-margin: ${ space( 1 ) };
-	user-select: none;
+	// Necessary to override V1 styles passed via the legacy
+	// '.components-custom-select-control__item' class
+	&& {
+		cursor: default;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: ${ ITEM_PADDING };
+		font-size: ${ CONFIG.fontSize };
+		// TODO: reassess line-height for non-legacy v2
+		line-height: 28px;
+		scroll-margin: ${ space( 1 ) };
+		user-select: none;
 
-	&[aria-disabled='true'] {
-		cursor: not-allowed;
-	}
+		&[aria-disabled='true'] {
+			cursor: not-allowed;
+		}
 
-	&[data-active-item] {
-		background-color: ${ COLORS.theme.gray[ 300 ] };
+		&[data-active-item] {
+			background-color: ${ COLORS.theme.gray[ 300 ] };
+		}
 	}
 `;
 
@@ -158,4 +131,41 @@ export const SelectedItemCheck = styled( Ariakit.SelectItemCheck )`
 	align-items: center;
 	margin-inline-start: ${ ITEM_PADDING };
 	font-size: 24px; // Size of checkmark icon
+`;
+
+const truncateStyles = css`
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+`;
+
+export const ItemHintWrapper = styled.div`
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	flex-wrap: wrap;
+	flex: 1;
+`;
+
+export const SelectedExperimentalHintWrapper = styled.div`
+	${ truncateStyles }
+`;
+
+export const SelectedExperimentalHintItem = styled.span`
+	color: ${ COLORS.theme.gray[ 600 ] };
+	margin-inline-start: ${ space( 2 ) };
+`;
+
+export const ItemHintContent = styled.span`
+	padding-inline-end: ${ space( 4 ) };
+`;
+
+export const ItemHint = styled.span`
+	// Necessary to override V1 styles passed via the legacy
+	// '.components-custom-select-control__item-hint' class
+	${ SelectItem } && {
+		color: ${ COLORS.theme.gray[ 600 ] };
+		text-align: right;
+		padding-inline-end: ${ space( 1 ) };
+	}
 `;
