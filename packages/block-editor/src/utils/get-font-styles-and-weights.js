@@ -104,7 +104,7 @@ export function getFontStylesAndWeights( fontFamilyFaces ) {
 		}
 
 		if ( isVariableFont ) {
-			// If the font is a variable font, we don't need to generate the list of font styles and weights.
+			// If the font is a variable font, use the default list of font styles and weights.
 			return;
 		}
 
@@ -156,7 +156,7 @@ export function getFontStylesAndWeights( fontFamilyFaces ) {
 		fontWeights = FONT_WEIGHTS;
 	}
 
-	// Use default font styles and weights if no font family faces are provided.
+	// Use default styles and weights if there are no available styles or weights from the provided font faces.
 	fontStyles = fontStyles.length === 0 ? FONT_STYLES : fontStyles;
 	fontWeights = fontWeights.length === 0 ? FONT_WEIGHTS : fontWeights;
 
