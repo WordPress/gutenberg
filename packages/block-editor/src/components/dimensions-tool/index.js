@@ -58,6 +58,7 @@ function DimensionsTool( {
 	scaleOptions, // Default options handled by ScaleTool.
 	defaultScale = 'fill', // Match CSS default value for object-fit.
 	unitsOptions, // Default options handled by UnitControl.
+	parentLayoutType,
 } ) {
 	// Coerce undefined and CSS default values to be null.
 	const width =
@@ -131,56 +132,61 @@ function DimensionsTool( {
 					onChange( nextValue );
 				} }
 			/>
-			<WidthHeightTool
-				panelId={ panelId }
-				units={ unitsOptions }
-				value={ { width, height } }
-				onChange={ ( { width: nextWidth, height: nextHeight } ) => {
-					const nextValue = { ...value };
+			{ parentLayoutType !== 'grid' && (
+				<WidthHeightTool
+					panelId={ panelId }
+					units={ unitsOptions }
+					value={ { width, height } }
+					onChange={ ( { width: nextWidth, height: nextHeight } ) => {
+						const nextValue = { ...value };
 
-					// 'auto' is CSS default, so it gets treated as null.
-					nextWidth = nextWidth === 'auto' ? null : nextWidth;
-					nextHeight = nextHeight === 'auto' ? null : nextHeight;
+						// 'auto' is CSS default, so it gets treated as null.
+						nextWidth = nextWidth === 'auto' ? null : nextWidth;
+						nextHeight = nextHeight === 'auto' ? null : nextHeight;
 
-					// Update width.
-					if ( ! nextWidth ) {
-						delete nextValue.width;
-					} else {
-						nextValue.width = nextWidth;
-					}
+						// Update width.
+						if ( ! nextWidth ) {
+							delete nextValue.width;
+						} else {
+							nextValue.width = nextWidth;
+						}
 
-					// Update height.
-					if ( ! nextHeight ) {
-						delete nextValue.height;
-					} else {
-						nextValue.height = nextHeight;
-					}
+						// Update height.
+						if ( ! nextHeight ) {
+							delete nextValue.height;
+						} else {
+							nextValue.height = nextHeight;
+						}
 
-					// Auto-update aspectRatio.
-					if ( nextWidth && nextHeight ) {
-						delete nextValue.aspectRatio;
-					} else if ( lastAspectRatio ) {
-						nextValue.aspectRatio = lastAspectRatio;
-					} else {
-						// No setting defaultAspectRatio here, because
-						// aspectRatio is optional in this scenario,
-						// unlike scale.
-					}
+						// Auto-update aspectRatio.
+						if ( nextWidth && nextHeight ) {
+							delete nextValue.aspectRatio;
+						} else if ( lastAspectRatio ) {
+							nextValue.aspectRatio = lastAspectRatio;
+						} else {
+							// No setting defaultAspectRatio here, because
+							// aspectRatio is optional in this scenario,
+							// unlike scale.
+						}
 
-					// Auto-update scale.
-					if ( ! lastAspectRatio && !! nextWidth !== !! nextHeight ) {
-						delete nextValue.scale;
-					} else if ( lastScale ) {
-						nextValue.scale = lastScale;
-					} else {
-						nextValue.scale = defaultScale;
-						setLastScale( defaultScale );
-					}
+						// Auto-update scale.
+						if (
+							! lastAspectRatio &&
+							!! nextWidth !== !! nextHeight
+						) {
+							delete nextValue.scale;
+						} else if ( lastScale ) {
+							nextValue.scale = lastScale;
+						} else {
+							nextValue.scale = defaultScale;
+							setLastScale( defaultScale );
+						}
 
-					onChange( nextValue );
-				} }
-			/>
-			{ showScaleControl && (
+						onChange( nextValue );
+					} }
+				/>
+			) }
+			{ showScaleControl && parentLayoutType !== 'grid' && (
 				<ScaleTool
 					panelId={ panelId }
 					options={ scaleOptions }

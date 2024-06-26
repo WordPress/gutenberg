@@ -182,8 +182,7 @@ export default function Image( {
 		allowResize &&
 		hasNonContentControls &&
 		! isWideAligned &&
-		isLargeViewport &&
-		parentLayoutType !== 'grid';
+		isLargeViewport;
 	const imageSizeOptions = imageSizes
 		.filter(
 			( { slug } ) => image?.media_details?.sizes?.[ slug ]?.source_url
@@ -400,6 +399,18 @@ export default function Image( {
 			defaultAspectRatio="auto"
 			scaleOptions={ scaleOptions }
 			unitsOptions={ dimensionsUnitsOptions }
+			parentLayoutType={ parentLayoutType }
+		/>
+	);
+
+	const aspectRatioControl = (
+		<DimensionsTool
+			value={ { aspectRatio } }
+			onChange={ ( { aspectRatio: newAspectRatio } ) => {
+				setAttributes( { aspectRatio: newAspectRatio } );
+			} }
+			defaultAspectRatio="auto"
+			parentLayoutType={ parentLayoutType }
 		/>
 	);
 
@@ -421,7 +432,10 @@ export default function Image( {
 				resetAll={ resetAll }
 				dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
 			>
-				{ isResizable && dimensionsControl }
+				{ isResizable &&
+					( parentLayoutType === 'grid'
+						? aspectRatioControl
+						: dimensionsControl ) }
 			</ToolsPanel>
 		</InspectorControls>
 	);
