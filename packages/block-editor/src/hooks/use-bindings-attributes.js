@@ -238,13 +238,13 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 			[
 				registry,
 				bindings,
+				name,
+				clientId,
+				context,
+				setAttributes,
+				sources,
 				hasPatternOverridesDefaultBinding,
 				hasParentPattern,
-				setAttributes,
-				name,
-				sources,
-				context,
-				clientId,
 			]
 		);
 
