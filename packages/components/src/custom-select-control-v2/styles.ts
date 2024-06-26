@@ -105,8 +105,11 @@ export const Select = styled( Ariakit.Select, {
 } );
 
 export const SelectPopover = styled( Ariakit.SelectPopover )`
+	display: flex;
+	flex-direction: column;
+
+	background-color: ${ COLORS.theme.background };
 	border-radius: 2px;
-	background: ${ COLORS.theme.background };
 	border: 1px solid ${ COLORS.theme.foreground };
 
 	/* Same as popover component */
