@@ -10,7 +10,7 @@ export default {
 	name: 'core/pattern-overrides',
 	label: _x( 'Pattern Overrides', 'block bindings source' ),
 	getValue( { registry, clientId, context, attributeName } ) {
-		const { patternOverridesContent } = context;
+		const patternOverridesContent = context[ 'pattern/overrides' ];
 		const { getBlockAttributes } = registry.select( blockEditorStore );
 		const currentBlockAttributes = getBlockAttributes( clientId );
 

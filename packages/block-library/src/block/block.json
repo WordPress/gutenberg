@@ -17,7 +17,7 @@
 		}
 	},
 	"providesContext": {
-		"patternOverridesContent": "content"
+		"pattern/overrides": "content"
 	},
 	"supports": {
 		"customClassName": false,

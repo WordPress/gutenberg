@@ -99,7 +99,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 				unlock( select( blocksStore ) ).getAllBlockBindingsSources(),
 			[]
 		);
-		const hasParentPattern = !! props.context.patternOverridesContent;
+		const hasParentPattern = !! props.context[ 'pattern/overrides' ];
 		const hasPatternOverridesDefaultBinding =
 			props.attributes.metadata?.bindings?.[ DEFAULT_ATTRIBUTE ]
 				?.source === 'core/pattern-overrides';
@@ -281,7 +281,7 @@ function shimAttributeSource( settings, name ) {
 		...settings,
 		edit: withBlockBindingSupport( settings.edit ),
 		// TODO - move this to be located with pattern overrides code.
-		usesContext: [ 'patternOverridesContent', ...settings?.usesContext ],
+		usesContext: [ 'pattern/overrides', ...settings?.usesContext ],
 	};
 }
 

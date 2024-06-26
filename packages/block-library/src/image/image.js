@@ -448,7 +448,7 @@ export default function Image( {
 				alt: altBinding,
 				title: titleBinding,
 			} = metadata?.bindings || {};
-			const hasParentPattern = !! context.patternOverridesContent;
+			const hasParentPattern = !! context[ 'pattern/overrides' ];
 			const urlBindingSource = getBlockBindingsSource(
 				urlBinding?.source
 			);
