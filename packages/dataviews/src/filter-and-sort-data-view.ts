@@ -15,7 +15,7 @@ import {
 	OPERATOR_IS_NOT_ALL,
 } from './constants';
 import { normalizeFields } from './normalize-fields';
-import type { Field, AnyItem, View } from './types';
+import type { Field, View } from './types';
 
 function normalizeSearchInput( input = '' ) {
 	return removeAccents( input.trim().toLowerCase() );
@@ -32,7 +32,7 @@ const EMPTY_ARRAY: [] = [];
  *
  * @return Filtered, sorted and paginated data.
  */
-export function filterSortAndPaginate< Item extends AnyItem >(
+export function filterSortAndPaginate< Item >(
 	data: Item[],
 	view: View,
 	fields: Field< Item >[]

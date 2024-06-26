@@ -14,7 +14,7 @@ import { useRegistry } from '@wordpress/data';
  * Internal dependencies
  */
 import { unlock } from './lock-unlock';
-import type { Action, ActionModal, AnyItem } from './types';
+import type { Action, ActionModal } from './types';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -23,26 +23,26 @@ const {
 	DropdownMenuSeparatorV2: DropdownMenuSeparator,
 } = unlock( componentsPrivateApis );
 
-interface ActionWithModalProps< Item extends AnyItem > {
+interface ActionWithModalProps< Item > {
 	action: ActionModal< Item >;
 	selectedItems: Item[];
 	setActionWithModal: ( action?: ActionModal< Item > ) => void;
 	onMenuOpenChange: ( isOpen: boolean ) => void;
 }
 
-interface BulkActionsItemProps< Item extends AnyItem > {
+interface BulkActionsItemProps< Item > {
 	action: Action< Item >;
 	selectedItems: Item[];
 	setActionWithModal: ( action?: ActionModal< Item > ) => void;
 }
 
-interface ActionsMenuGroupProps< Item extends AnyItem > {
+interface ActionsMenuGroupProps< Item > {
 	actions: Action< Item >[];
 	selectedItems: Item[];
 	setActionWithModal: ( action?: ActionModal< Item > ) => void;
 }
 
-interface BulkActionsProps< Item extends AnyItem > {
+interface BulkActionsProps< Item > {
 	data: Item[];
 	actions: Action< Item >[];
 	selection: string[];
@@ -50,7 +50,7 @@ interface BulkActionsProps< Item extends AnyItem > {
 	getItemId: ( item: Item ) => string;
 }
 
-export function useHasAPossibleBulkAction< Item extends AnyItem >(
+export function useHasAPossibleBulkAction< Item >(
 	actions: Action< Item >[],
 	item: Item
 ) {
@@ -64,7 +64,7 @@ export function useHasAPossibleBulkAction< Item extends AnyItem >(
 	}, [ actions, item ] );
 }
 
-export function useSomeItemHasAPossibleBulkAction< Item extends AnyItem >(
+export function useSomeItemHasAPossibleBulkAction< Item >(
 	actions: Action< Item >[],
 	data: Item[]
 ) {
@@ -80,7 +80,7 @@ export function useSomeItemHasAPossibleBulkAction< Item extends AnyItem >(
 	}, [ actions, data ] );
 }
 
-function ActionWithModal< Item extends AnyItem >( {
+function ActionWithModal< Item >( {
 	action,
 	selectedItems,
 	setActionWithModal,
@@ -115,7 +115,7 @@ function ActionWithModal< Item extends AnyItem >( {
 	);
 }
 
-function BulkActionItem< Item extends AnyItem >( {
+function BulkActionItem< Item >( {
 	action,
 	selectedItems,
 	setActionWithModal,
@@ -150,7 +150,7 @@ function BulkActionItem< Item extends AnyItem >( {
 	);
 }
 
-function ActionsMenuGroup< Item extends AnyItem >( {
+function ActionsMenuGroup< Item >( {
 	actions,
 	selectedItems,
 	setActionWithModal,
@@ -172,7 +172,7 @@ function ActionsMenuGroup< Item extends AnyItem >( {
 	);
 }
 
-export default function BulkActions< Item extends AnyItem >( {
+export default function BulkActions< Item >( {
 	data,
 	actions,
 	selection,

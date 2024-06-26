@@ -21,7 +21,7 @@ import { useRegistry } from '@wordpress/data';
  * Internal dependencies
  */
 import { unlock } from './lock-unlock';
-import type { Action, ActionModal as ActionModalType, AnyItem } from './types';
+import type { Action, ActionModal as ActionModalType } from './types';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -31,42 +31,41 @@ const {
 	kebabCase,
 } = unlock( componentsPrivateApis );
 
-export interface ActionTriggerProps< Item extends AnyItem > {
+export interface ActionTriggerProps< Item > {
 	action: Action< Item >;
 	onClick: MouseEventHandler;
 	isBusy?: boolean;
 	items: Item[];
 }
 
-interface ActionModalProps< Item extends AnyItem > {
+interface ActionModalProps< Item > {
 	action: ActionModalType< Item >;
 	items: Item[];
 	closeModal?: () => void;
 }
 
-interface ActionWithModalProps< Item extends AnyItem >
-	extends ActionModalProps< Item > {
+interface ActionWithModalProps< Item > extends ActionModalProps< Item > {
 	ActionTrigger: ( props: ActionTriggerProps< Item > ) => ReactElement;
 	isBusy?: boolean;
 }
 
-interface ActionsDropdownMenuGroupProps< Item extends AnyItem > {
+interface ActionsDropdownMenuGroupProps< Item > {
 	actions: Action< Item >[];
 	item: Item;
 }
 
-interface ItemActionsProps< Item extends AnyItem > {
+interface ItemActionsProps< Item > {
 	item: Item;
 	actions: Action< Item >[];
 	isCompact?: boolean;
 }
 
-interface CompactItemActionsProps< Item extends AnyItem > {
+interface CompactItemActionsProps< Item > {
 	item: Item;
 	actions: Action< Item >[];
 }
 
-function ButtonTrigger< Item extends AnyItem >( {
+function ButtonTrigger< Item >( {
 	action,
 	onClick,
 	items,
@@ -84,7 +83,7 @@ function ButtonTrigger< Item extends AnyItem >( {
 	);
 }
 
-function DropdownMenuItemTrigger< Item extends AnyItem >( {
+function DropdownMenuItemTrigger< Item >( {
 	action,
 	onClick,
 	items,
@@ -101,7 +100,7 @@ function DropdownMenuItemTrigger< Item extends AnyItem >( {
 	);
 }
 
-export function ActionModal< Item extends AnyItem >( {
+export function ActionModal< Item >( {
 	action,
 	items,
 	closeModal,
@@ -124,7 +123,7 @@ export function ActionModal< Item extends AnyItem >( {
 	);
 }
 
-export function ActionWithModal< Item extends AnyItem >( {
+export function ActionWithModal< Item >( {
 	action,
 	items,
 	ActionTrigger,
@@ -153,7 +152,7 @@ export function ActionWithModal< Item extends AnyItem >( {
 	);
 }
 
-export function ActionsDropdownMenuGroup< Item extends AnyItem >( {
+export function ActionsDropdownMenuGroup< Item >( {
 	actions,
 	item,
 }: ActionsDropdownMenuGroupProps< Item > ) {
@@ -186,7 +185,7 @@ export function ActionsDropdownMenuGroup< Item extends AnyItem >( {
 	);
 }
 
-export default function ItemActions< Item extends AnyItem >( {
+export default function ItemActions< Item >( {
 	item,
 	actions,
 	isCompact,
@@ -247,7 +246,7 @@ export default function ItemActions< Item extends AnyItem >( {
 	);
 }
 
-function CompactItemActions< Item extends AnyItem >( {
+function CompactItemActions< Item >( {
 	item,
 	actions,
 }: CompactItemActionsProps< Item > ) {
