@@ -12,6 +12,7 @@
 	}
 	&.wp-block-latest-posts__list {
 		list-style: none;
+		padding: 0;
 
 		li {
 			clear: both;
@@ -38,6 +39,14 @@
 					margin-right: 0;
 				}
 			}
+		}
+	}
+
+	li:last-of-type {
+		.wp-block-latest-posts__post-excerpt,
+		.wp-block-latest-posts__post-full-content,
+		.wp-block-latest-posts__post-full-content p {
+			margin-bottom: 0;
 		}
 	}
 }
