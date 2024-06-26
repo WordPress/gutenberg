@@ -60,6 +60,7 @@ function getVariationNameFromClass( className, registeredStyles = [] ) {
 	return null;
 }
 
+// A helper component to apply a style override using the useStyleOverride hook.
 function OverrideStyles( { override } ) {
 	useStyleOverride( override );
 }
@@ -69,6 +70,9 @@ function OverrideStyles( { override } ) {
  * based on an incoming theme config. If a matching style is found in the config,
  * a new override is created and returned. The overrides can be used in conjunction with
  * useStyleOverride to apply the new styles to the editor.
+ * NOTE: This component is required to load global styles revisions config. Style variation overrides are
+ * generated using the canvas's current global styles (see useBlockStyleVariation()). This component is,
+ * however, due to be refactored and therefore it's use elsewhere is not recommended.
  *
  * @param {Object} props        Props.
  * @param {Object} props.config A global styles object, containing settings and styles.
