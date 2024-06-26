@@ -25,19 +25,12 @@ const {
 	ExperimentalBlockEditorProvider,
 	GlobalStylesContext,
 	useGlobalStylesOutputWithConfig,
-	useUpdateBlockStyleVariationOverridesWithConfig,
+	ExperimentalBlockStyleVariationOverridesWithConfig,
 } = unlock( blockEditorPrivateApis );
 const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
 
 function isObjectEmpty( object ) {
 	return ! object || Object.keys( object ).length === 0;
-}
-
-function RevisionStyles( { styles, config } ) {
-	const mergedOverrides =
-		useUpdateBlockStyleVariationOverridesWithConfig( config );
-
-	return <EditorStyles styles={ styles } overrides={ mergedOverrides } />;
 }
 
 function Revisions( { userConfig, blocks } ) {
@@ -96,12 +89,11 @@ function Revisions( { userConfig, blocks } ) {
 					>
 						<BlockList renderAppender={ false } />
 						{ /*
-						 * Styles are printed at the end of the document,
-						 * so they can access any registered style overrides,
-						 * which are only stored after the block list is rendered.
+						 * Styles are printed inside the block editor provider,
+						 * so they can access any registered style overrides.
 						 */ }
-						<RevisionStyles
-							styles={ editorStyles }
+						<EditorStyles styles={ editorStyles } />
+						<ExperimentalBlockStyleVariationOverridesWithConfig
 							config={ mergedConfig }
 						/>
 					</ExperimentalBlockEditorProvider>
