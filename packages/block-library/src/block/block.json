@@ -12,8 +12,12 @@
 			"type": "number"
 		},
 		"content": {
-			"type": "object"
+			"type": "object",
+			"default": {}
 		}
+	},
+	"providesContext": {
+		"patternOverridesContent": "content"
 	},
 	"supports": {
 		"customClassName": false,

@@ -11,7 +11,6 @@ import { addFilter } from '@wordpress/hooks';
  * Internal dependencies
  */
 import { unlock } from '../lock-unlock';
-import { store as blockEditorStore } from '../store';
 
 /** @typedef {import('@wordpress/compose').WPHigherOrderComponent} WPHigherOrderComponent */
 /** @typedef {import('@wordpress/blocks').WPBlockSettings} WPBlockSettings */
@@ -95,24 +94,12 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const registry = useRegistry();
 		const { name, clientId, context } = props;
-		const { sources, hasParentPattern } = useSelect(
-			( select ) => {
-				const { getAllBlockBindingsSources } = unlock(
-					select( blocksStore )
-				);
-				const { getBlockParentsByBlockName } = unlock(
-					select( blockEditorStore )
-				);
-
-				return {
-					sources: getAllBlockBindingsSources(),
-					hasParentPattern:
-						getBlockParentsByBlockName( clientId, 'core/block' )
-							.length > 0,
-				};
-			},
-			[ clientId ]
+		const sources = useSelect(
+			( select ) =>
+				unlock( select( blocksStore ) ).getAllBlockBindingsSources(),
+			[]
 		);
+		const hasParentPattern = !! props.context.patternOverridesContent;
 		const hasPatternOverridesDefaultBinding =
 			props.attributes.metadata?.bindings?.[ DEFAULT_ATTRIBUTE ]
 				?.source === 'core/pattern-overrides';
@@ -254,12 +241,13 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 			[
 				registry,
 				bindings,
-				name,
-				clientId,
-				context,
-				setAttributes,
-				sources,
 				hasPatternOverridesDefaultBinding,
+				hasParentPattern,
+				setAttributes,
+				name,
+				sources,
+				context,
+				clientId,
 			]
 		);
 
@@ -292,6 +280,8 @@ function shimAttributeSource( settings, name ) {
 	return {
 		...settings,
 		edit: withBlockBindingSupport( settings.edit ),
+		// TODO - move this to be located with pattern overrides code.
+		usesContext: [ 'patternOverridesContent', ...settings?.usesContext ],
 	};
 }
 
