@@ -280,8 +280,6 @@ function shimAttributeSource( settings, name ) {
 	return {
 		...settings,
 		edit: withBlockBindingSupport( settings.edit ),
-		// TODO - move this to be located with pattern overrides code.
-		usesContext: [ 'pattern/overrides', ...settings?.usesContext ],
 	};
 }
 
