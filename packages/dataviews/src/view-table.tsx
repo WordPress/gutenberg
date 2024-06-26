@@ -223,9 +223,9 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item extends AnyItem >(
 							onHide( field );
 							onChangeView( {
 								...view,
-								hiddenFields: view.hiddenFields?.concat(
-									field.id
-								),
+								hiddenFields: (
+									view.hiddenFields ?? []
+								).concat( field.id ),
 							} );
 						} }
 					>
