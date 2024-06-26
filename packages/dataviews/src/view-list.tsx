@@ -329,7 +329,7 @@ export default function ViewList< Item extends AnyItem >(
 	);
 	const visibleFields = fields.filter(
 		( field ) =>
-			! view.hiddenFields.includes( field.id ) &&
+			! view.hiddenFields?.includes( field.id ) &&
 			! [ view.layout.primaryField, view.layout.mediaField ].includes(
 				field.id
 			)
