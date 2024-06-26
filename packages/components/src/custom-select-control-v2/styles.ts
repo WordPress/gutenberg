@@ -92,7 +92,7 @@ export const Select = styled( Ariakit.Select, {
 		cursor: pointer;
 		font-family: inherit;
 		font-size: ${ CONFIG.fontSize };
-		text-align: left;
+		text-align: start;
 		width: 100%;
 
 		&[data-focus-visible] {
