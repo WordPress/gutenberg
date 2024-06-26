@@ -75,6 +75,8 @@ export type _CustomSelectProps = CustomSelectButtonProps & {
 };
 
 export type CustomSelectProps = _CustomSelectProps &
+	// TODO: is it necessary to pass CustomSelectButtonProps, since
+	// they are already part of _CustomSelectProps?
 	CustomSelectButtonProps &
 	CustomSelectSize;
 
