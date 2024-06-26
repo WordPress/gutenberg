@@ -6,7 +6,8 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import type { FontSizePickerProps, FontSize } from './types';
+import type { Size } from '../size-control/types';
+import type { FontSizePickerProps } from './types';
 import { parseQuantityAndUnitFromRawValue } from '../unit-control';
 
 /**
@@ -31,7 +32,7 @@ export function isSimpleCssValue(
  * @param fontSizes List of font sizes.
  * @return The common unit, or null.
  */
-export function getCommonSizeUnit( fontSizes: FontSize[] ) {
+export function getCommonSizeUnit( fontSizes: Size[] ) {
 	const [ firstFontSize, ...otherFontSizes ] = fontSizes;
 	if ( ! firstFontSize ) {
 		return null;
