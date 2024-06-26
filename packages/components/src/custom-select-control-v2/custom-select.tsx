@@ -74,7 +74,7 @@ const CustomSelectButton = ( {
 			// move selection rather than open the popover
 			showOnKeyDown={ false }
 		>
-			<div>{ computedRenderSelectedValue( currentValue ) }</div>
+			{ computedRenderSelectedValue( currentValue ) }
 		</Styled.Select>
 	);
 };

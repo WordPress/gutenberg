@@ -18,14 +18,11 @@ export default function Pagination( {
 	return (
 		<VStack className="block-editor-patterns__grid-pagination-wrapper">
 			<Text variant="muted">
-				{
+				{ sprintf(
 					// translators: %s: Total number of patterns.
-					sprintf(
-						// translators: %s: Total number of patterns.
-						_n( '%s item', '%s items', totalItems ),
-						totalItems
-					)
-				}
+					_n( '%s item', '%s items', totalItems ),
+					totalItems
+				) }
 			</Text>
 
 			{ numPages > 1 && (
