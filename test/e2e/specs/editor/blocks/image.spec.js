@@ -293,7 +293,10 @@ test.describe( 'Image', () => {
 		).toMatchSnapshot();
 	} );
 
-	test( 'allows changing aspect ratio using the crop tools', async ( {
+	// Reason - skipped temporarily until this issue is fixed:
+	// https://github.com/WordPress/wordpress-develop/pull/6875#issuecomment-2185694119
+	// eslint-disable-next-line playwright/no-skipped-test
+	test.skip( 'allows changing aspect ratio using the crop tools', async ( {
 		editor,
 		page,
 		imageBlockUtils,
@@ -946,12 +949,12 @@ test.describe( 'Image - Site editor', () => {
 		await requestUtils.activateTheme( 'emptytheme' );
 	} );
 
-	test.beforeEach( async ( { admin, editor } ) => {
+	test.beforeEach( async ( { admin } ) => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//index',
 			postType: 'wp_template',
+			canvas: 'edit',
 		} );
-		await editor.canvas.locator( 'body' ).click();
 	} );
 
 	test.afterEach( async ( { requestUtils } ) => {

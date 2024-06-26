@@ -15,6 +15,7 @@ import { formatFontFaceName } from './preview-styles';
  * Browser dependencies
  */
 const { File } = window;
+const { kebabCase } = unlock( componentsPrivateApis );
 
 export function setUIValuesNeeded( font, extraValues = {} ) {
 	if ( ! font.name && ( font.fontFamily || font.slug ) ) {
@@ -184,7 +185,6 @@ export function getDisplaySrcFromFontFace( input ) {
 
 export function makeFontFamilyFormData( fontFamily ) {
 	const formData = new FormData();
-	const { kebabCase } = unlock( componentsPrivateApis );
 
 	const { fontFace, category, ...familyWithValidParameters } = fontFamily;
 	const fontFamilySettings = {

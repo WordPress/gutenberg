@@ -7,7 +7,8 @@ import {
 	Modal,
 } from '@wordpress/components';
 import { __, sprintf, _n } from '@wordpress/i18n';
-import { useMemo, useState, useCallback, useEffect } from '@wordpress/element';
+import { useMemo, useState, useCallback } from '@wordpress/element';
+import { useRegistry } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -94,9 +95,13 @@ function ActionWithModal< Item extends AnyItem >( {
 	const onCloseModal = useCallback( () => {
 		setActionWithModal( undefined );
 	}, [ setActionWithModal ] );
+	const label =
+		typeof action.label === 'string'
+			? action.label
+			: action.label( selectedItems );
 	return (
 		<Modal
-			title={ ! hideModalHeader ? action.label : undefined }
+			title={ ! hideModalHeader ? label : undefined }
 			__experimentalHideHeader={ !! hideModalHeader }
 			onRequestClose={ onCloseModal }
 			overlayClassName="dataviews-action-modal"
@@ -115,6 +120,7 @@ function BulkActionItem< Item extends AnyItem >( {
 	selectedItems,
 	setActionWithModal,
 }: BulkActionsItemProps< Item > ) {
+	const registry = useRegistry();
 	const eligibleItems = useMemo( () => {
 		return selectedItems.filter(
 			( item ) => ! action.isEligible || action.isEligible( item )
@@ -132,7 +138,7 @@ function BulkActionItem< Item extends AnyItem >( {
 				if ( shouldShowModal ) {
 					setActionWithModal( action );
 				} else {
-					await action.callback( eligibleItems );
+					action.callback( eligibleItems, { registry } );
 				}
 			} }
 			suffix={
@@ -190,37 +196,16 @@ export default function BulkActions< Item extends AnyItem >( {
 	}, [ data, bulkActions ] );
 
 	const numberSelectableItems = selectableItems.length;
-	const areAllSelected =
-		selection && selection.length === numberSelectableItems;
 
 	const selectedItems = useMemo( () => {
-		return data.filter( ( item ) =>
-			selection.includes( getItemId( item ) )
+		return data.filter(
+			( item ) =>
+				selection.includes( getItemId( item ) ) &&
+				selectableItems.includes( item )
 		);
-	}, [ selection, data, getItemId ] );
+	}, [ selection, data, getItemId, selectableItems ] );
 
-	const hasNonSelectableItemSelected = useMemo( () => {
-		return selectedItems.some( ( item ) => {
-			return ! selectableItems.includes( item );
-		} );
-	}, [ selectedItems, selectableItems ] );
-	useEffect( () => {
-		if ( hasNonSelectableItemSelected ) {
-			onSelectionChange(
-				selectedItems.filter( ( selectedItem ) => {
-					return selectableItems.some( ( item ) => {
-						return getItemId( selectedItem ) === getItemId( item );
-					} );
-				} )
-			);
-		}
-	}, [
-		hasNonSelectableItemSelected,
-		selectedItems,
-		selectableItems,
-		getItemId,
-		onSelectionChange,
-	] );
+	const areAllSelected = selectedItems.length === numberSelectableItems;
 
 	if ( bulkActions.length === 0 ) {
 		return null;
@@ -239,15 +224,15 @@ export default function BulkActions< Item extends AnyItem >( {
 						variant="tertiary"
 						size="compact"
 					>
-						{ selection.length
+						{ selectedItems.length
 							? sprintf(
 									/* translators: %d: Number of items. */
 									_n(
 										'Edit %d item',
 										'Edit %d items',
-										selection.length
+										selectedItems.length
 									),
-									selection.length
+									selectedItems.length
 							  )
 							: __( 'Bulk edit' ) }
 					</Button>

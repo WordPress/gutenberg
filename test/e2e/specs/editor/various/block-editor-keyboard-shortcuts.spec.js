@@ -192,7 +192,7 @@ test.describe( 'Block editor keyboard shortcuts', () => {
 				.getByRole( 'menuitem', { name: 'Create pattern' } )
 				.click();
 			await page
-				.getByRole( 'dialog', { name: 'Create pattern' } )
+				.getByRole( 'dialog', { name: 'add new pattern' } )
 				.getByRole( 'textbox', { name: 'Name' } )
 				.fill( 'hi' );
 

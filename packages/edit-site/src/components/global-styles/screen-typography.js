@@ -31,10 +31,10 @@ function ScreenTypography() {
 			/>
 			<div className="edit-site-global-styles-screen">
 				<VStack spacing={ 7 }>
-					<TypographyVariations title={ __( 'Presets' ) } />
 					{ ! window.__experimentalDisableFontLibrary &&
 						fontLibraryEnabled && <FontFamilies /> }
 					<TypographyElements />
+					<TypographyVariations title={ __( 'Presets' ) } />
 				</VStack>
 			</div>
 		</>

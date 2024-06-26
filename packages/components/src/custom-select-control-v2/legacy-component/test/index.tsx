@@ -14,7 +14,11 @@ import { useState } from '@wordpress/element';
  */
 import UncontrolledCustomSelectControl from '..';
 
-const customClass = 'amber-skies';
+const customClassName = 'amber-skies';
+const customStyles = {
+	backgroundColor: 'rgb(127, 255, 212)',
+	rotate: '13deg',
+};
 
 const legacyProps = {
 	label: 'label!',
@@ -26,7 +30,7 @@ const legacyProps = {
 		{
 			key: 'flower2',
 			name: 'crimson clover',
-			className: customClass,
+			className: customClassName,
 		},
 		{
 			key: 'flower3',
@@ -35,33 +39,43 @@ const legacyProps = {
 		{
 			key: 'color1',
 			name: 'amber',
-			className: customClass,
+			className: customClassName,
 		},
 		{
 			key: 'color2',
 			name: 'aquamarine',
-			style: {
-				backgroundColor: 'rgb(127, 255, 212)',
-				rotate: '13deg',
-			},
+			style: customStyles,
+		},
+		{
+			key: 'color3',
+			name: 'tomato (with custom props)',
+			className: customClassName,
+			style: customStyles,
+			// try passing a valid HTML attribute
+			'aria-label': 'test label',
+			// try adding a custom prop
+			customPropFoo: 'foo',
 		},
 	],
 };
 
 const ControlledCustomSelectControl = ( {
 	options,
-	onChange,
+	onChange: onChangeProp,
 	...restProps
 }: React.ComponentProps< typeof UncontrolledCustomSelectControl > ) => {
-	const [ value, setValue ] = useState( options[ 0 ] );
+	const [ value, setValue ] = useState( restProps.value ?? options[ 0 ] );
+
+	const onChange: typeof onChangeProp = ( changeObject ) => {
+		onChangeProp?.( changeObject );
+		setValue( changeObject.selectedItem );
+	};
+
 	return (
 		<UncontrolledCustomSelectControl
 			{ ...restProps }
 			options={ options }
-			onChange={ ( args: any ) => {
-				onChange?.( args );
-				setValue( args.selectedItem );
-			} }
+			onChange={ onChange }
 			value={ options.find(
 				( option: any ) => option.key === value.key
 			) }
@@ -69,11 +83,86 @@ const ControlledCustomSelectControl = ( {
 	);
 };
 
+it( 'Should apply external controlled updates', async () => {
+	const mockOnChange = jest.fn();
+	const { rerender } = render(
+		<UncontrolledCustomSelectControl
+			{ ...legacyProps }
+			value={ legacyProps.options[ 0 ] }
+			onChange={ mockOnChange }
+		/>
+	);
+
+	const currentSelectedItem = screen.getByRole( 'combobox', {
+		expanded: false,
+	} );
+
+	expect( currentSelectedItem ).toHaveTextContent(
+		legacyProps.options[ 0 ].name
+	);
+
+	expect( mockOnChange ).not.toHaveBeenCalled();
+
+	rerender(
+		<UncontrolledCustomSelectControl
+			{ ...legacyProps }
+			value={ legacyProps.options[ 1 ] }
+		/>
+	);
+
+	expect( currentSelectedItem ).toHaveTextContent(
+		legacyProps.options[ 1 ].name
+	);
+
+	// Necessary to wait for onChange to potentially fire
+	await sleep();
+
+	expect( mockOnChange ).not.toHaveBeenCalled();
+} );
+
 describe.each( [
 	[ 'Uncontrolled', UncontrolledCustomSelectControl ],
 	[ 'Controlled', ControlledCustomSelectControl ],
 ] )( 'CustomSelectControl (%s)', ( ...modeAndComponent ) => {
 	const [ , Component ] = modeAndComponent;
+
+	it( 'Should select the first option when no explicit initial value is passed without firing onChange', async () => {
+		const mockOnChange = jest.fn();
+		render( <Component { ...legacyProps } onChange={ mockOnChange } /> );
+
+		expect(
+			screen.getByRole( 'combobox', {
+				expanded: false,
+			} )
+		).toHaveTextContent( legacyProps.options[ 0 ].name );
+
+		// Necessary to wait for onChange to potentially fire
+		await sleep();
+
+		expect( mockOnChange ).not.toHaveBeenCalled();
+	} );
+
+	it( 'Should pick the initially selected option if the value prop is passed without firing onChange', async () => {
+		const mockOnChange = jest.fn();
+		render(
+			<Component
+				{ ...legacyProps }
+				onChange={ mockOnChange }
+				value={ legacyProps.options[ 3 ] }
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'combobox', {
+				expanded: false,
+			} )
+		).toHaveTextContent( legacyProps.options[ 3 ].name );
+
+		// Necessary to wait for onChange to potentially fire
+		await sleep();
+
+		expect( mockOnChange ).not.toHaveBeenCalled();
+	} );
 
 	it( 'Should replace the initial selection when a new item is selected', async () => {
 		render( <Component { ...legacyProps } /> );
@@ -148,7 +237,7 @@ describe.each( [
 		// assert against filtered array
 		itemsWithClass.map( ( { name } ) =>
 			expect( screen.getByRole( 'option', { name } ) ).toHaveClass(
-				customClass
+				customClassName
 			)
 		);
 
@@ -160,15 +249,12 @@ describe.each( [
 		// assert against filtered array
 		itemsWithoutClass.map( ( { name } ) =>
 			expect( screen.getByRole( 'option', { name } ) ).not.toHaveClass(
-				customClass
+				customClassName
 			)
 		);
 	} );
 
 	it( 'Should apply styles only to options that have styles defined', async () => {
-		const customStyles =
-			'background-color: rgb(127, 255, 212); rotate: 13deg;';
-
 		render( <Component { ...legacyProps } /> );
 
 		await click(
@@ -244,7 +330,7 @@ describe.each( [
 				screen.getByRole( 'combobox', {
 					expanded: false,
 				} )
-			).toHaveTextContent( /hint/i )
+			).toHaveTextContent( 'Hint' )
 		);
 	} );
 
@@ -281,39 +367,27 @@ describe.each( [
 			} )
 		);
 
-		expect( mockOnChange ).toHaveBeenNthCalledWith(
-			1,
-			expect.objectContaining( {
-				inputValue: '',
-				isOpen: false,
-				selectedItem: { key: 'violets', name: 'violets' },
-				type: '',
-			} )
-		);
-
 		await click(
 			screen.getByRole( 'option', {
 				name: 'aquamarine',
 			} )
 		);
 
-		expect( mockOnChange ).toHaveBeenNthCalledWith(
-			2,
+		expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
+		expect( mockOnChange ).toHaveBeenLastCalledWith(
 			expect.objectContaining( {
 				inputValue: '',
 				isOpen: false,
 				selectedItem: expect.objectContaining( {
 					name: 'aquamarine',
 				} ),
-				type: '',
+				type: expect.any( String ),
 			} )
 		);
 	} );
 
 	it( 'Should return selectedItem object when specified onChange', async () => {
-		const mockOnChange = jest.fn(
-			( { selectedItem } ) => selectedItem.key
-		);
+		const mockOnChange = jest.fn();
 
 		render( <Component { ...legacyProps } onChange={ mockOnChange } /> );
 
@@ -328,10 +402,85 @@ describe.each( [
 		await type( 'p' );
 		await press.Enter();
 
-		expect( mockOnChange ).toHaveReturnedWith( 'poppy' );
+		expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
+		expect( mockOnChange ).toHaveBeenLastCalledWith(
+			expect.objectContaining( {
+				selectedItem: expect.objectContaining( {
+					key: 'flower3',
+					name: 'poppy',
+				} ),
+			} )
+		);
+	} );
+
+	it( "Should pass arbitrary props to onChange's selectedItem, but apply only style and className to DOM elements", async () => {
+		const onChangeMock = jest.fn();
+
+		render( <Component { ...legacyProps } onChange={ onChangeMock } /> );
+
+		const currentSelectedItem = screen.getByRole( 'combobox', {
+			expanded: false,
+		} );
+
+		await click( currentSelectedItem );
+
+		const optionWithCustomAttributes = screen.getByRole( 'option', {
+			name: 'tomato (with custom props)',
+		} );
+
+		// Assert that the option element does not have the custom attributes
+		expect( optionWithCustomAttributes ).not.toHaveAttribute(
+			'customPropFoo'
+		);
+		expect( optionWithCustomAttributes ).not.toHaveAttribute(
+			'aria-label'
+		);
+
+		await click( optionWithCustomAttributes );
+
+		expect( onChangeMock ).toHaveBeenCalledTimes( 1 );
+		expect( onChangeMock ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				selectedItem: expect.objectContaining( {
+					key: 'color3',
+					name: 'tomato (with custom props)',
+					className: customClassName,
+					style: customStyles,
+					'aria-label': 'test label',
+					customPropFoo: 'foo',
+				} ),
+			} )
+		);
 	} );
 
 	describe( 'Keyboard behavior and accessibility', () => {
+		// skip reason: legacy v2 doesn't currently implement this behavior
+		it.skip( 'Captures the keypress event and does not let it propagate', async () => {
+			const onKeyDown = jest.fn();
+
+			render(
+				<div
+					// This role="none" is required to prevent an eslint warning about accessibility.
+					role="none"
+					onKeyDown={ onKeyDown }
+				>
+					<Component { ...legacyProps } />
+				</div>
+			);
+			const currentSelectedItem = screen.getByRole( 'combobox', {
+				expanded: false,
+			} );
+			await click( currentSelectedItem );
+
+			const customSelect = screen.getByRole( 'listbox', {
+				name: 'label!',
+			} );
+			expect( customSelect ).toHaveFocus();
+			await press.Enter();
+
+			expect( onKeyDown ).toHaveBeenCalledTimes( 0 );
+		} );
+
 		it( 'Should be able to change selection using keyboard', async () => {
 			render( <Component { ...legacyProps } /> );
 
@@ -353,7 +502,9 @@ describe.each( [
 			await press.ArrowDown();
 			await press.Enter();
 
-			expect( currentSelectedItem ).toHaveTextContent( 'crimson clover' );
+			expect( currentSelectedItem ).toHaveTextContent(
+				legacyProps.options[ 1 ].name
+			);
 		} );
 
 		it( 'Should be able to type characters to select matching options', async () => {
@@ -387,7 +538,9 @@ describe.each( [
 			await sleep();
 			await press.Tab();
 			expect( currentSelectedItem ).toHaveFocus();
-			expect( currentSelectedItem ).toHaveTextContent( 'violets' );
+			expect( currentSelectedItem ).toHaveTextContent(
+				legacyProps.options[ 0 ].name
+			);
 
 			// Ideally we would test a multi-character typeahead, but anything more than a single character is flaky
 			await type( 'a' );
@@ -455,6 +608,35 @@ describe.each( [
 					selected: true,
 				} )
 			).toBeVisible();
+		} );
+
+		it( 'Should call custom event handlers', async () => {
+			const onFocusMock = jest.fn();
+			const onBlurMock = jest.fn();
+
+			render(
+				<>
+					<Component
+						{ ...legacyProps }
+						onFocus={ onFocusMock }
+						onBlur={ onBlurMock }
+					/>
+					<button>Focus stop</button>
+				</>
+			);
+
+			const currentSelectedItem = screen.getByRole( 'combobox', {
+				expanded: false,
+			} );
+
+			await press.Tab();
+
+			expect( currentSelectedItem ).toHaveFocus();
+			expect( onFocusMock ).toHaveBeenCalledTimes( 1 );
+
+			await press.Tab();
+			expect( currentSelectedItem ).not.toHaveFocus();
+			expect( onBlurMock ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
 } );

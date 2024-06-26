@@ -245,12 +245,8 @@ class RCTAztecView: Aztec.TextView {
     }
 
     private func readHTML(from pasteboard: UIPasteboard) -> String? {
-
         if let data = pasteboard.data(forPasteboardType: kUTTypeHTML as String), let html = String(data: data, encoding: .utf8) {
-            // Make sure we are not getting a full HTML DOC. We only want inner content
-            if !html.hasPrefix("<!DOCTYPE html") {
-                return html
-            }
+            return html
         }
 
         if let flatRTFDString = read(from: pasteboard, uti: kUTTypeFlatRTFD, documentType: DocumentType.rtfd) {

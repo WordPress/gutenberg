@@ -459,34 +459,32 @@ export default function NavigationSubmenuEdit( {
 				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
 				<ParentElement className="wp-block-navigation-item__content">
 					{ /* eslint-enable */ }
-					{
-						<RichText
-							ref={ ref }
-							identifier="label"
-							className="wp-block-navigation-item__label"
-							value={ label }
-							onChange={ ( labelValue ) =>
-								setAttributes( { label: labelValue } )
+					<RichText
+						ref={ ref }
+						identifier="label"
+						className="wp-block-navigation-item__label"
+						value={ label }
+						onChange={ ( labelValue ) =>
+							setAttributes( { label: labelValue } )
+						}
+						onMerge={ mergeBlocks }
+						onReplace={ onReplace }
+						aria-label={ __( 'Navigation link text' ) }
+						placeholder={ itemLabelPlaceholder }
+						withoutInteractiveFormatting
+						allowedFormats={ [
+							'core/bold',
+							'core/italic',
+							'core/image',
+							'core/strikethrough',
+						] }
+						onClick={ () => {
+							if ( ! openSubmenusOnClick && ! url ) {
+								setIsLinkOpen( true );
+								setOpenedBy( ref.current );
 							}
-							onMerge={ mergeBlocks }
-							onReplace={ onReplace }
-							aria-label={ __( 'Navigation link text' ) }
-							placeholder={ itemLabelPlaceholder }
-							withoutInteractiveFormatting
-							allowedFormats={ [
-								'core/bold',
-								'core/italic',
-								'core/image',
-								'core/strikethrough',
-							] }
-							onClick={ () => {
-								if ( ! openSubmenusOnClick && ! url ) {
-									setIsLinkOpen( true );
-									setOpenedBy( ref.current );
-								}
-							} }
-						/>
-					}
+						} }
+					/>
 					{ ! openSubmenusOnClick && isLinkOpen && (
 						<LinkUI
 							clientId={ clientId }

@@ -102,7 +102,7 @@
 		"parent": "fundamentals"
 	},
 	{
-		"title": "Working with Javascript for the Block Editor",
+		"title": "Working with JavaScript for the Block Editor",
 		"slug": "javascript-in-the-block-editor",
 		"markdown_source": "../docs/getting-started/fundamentals/javascript-in-the-block-editor.md",
 		"parent": "fundamentals"
@@ -1119,6 +1119,12 @@
 		"title": "Popover",
 		"slug": "popover",
 		"markdown_source": "../packages/components/src/popover/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ProgressBar",
+		"slug": "progress-bar",
+		"markdown_source": "../packages/components/src/progress-bar/README.md",
 		"parent": "components"
 	},
 	{

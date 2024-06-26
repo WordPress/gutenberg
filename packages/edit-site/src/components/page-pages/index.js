@@ -39,6 +39,7 @@ import AddNewPageModal from '../add-new-page';
 import Media from '../media';
 import { unlock } from '../../lock-unlock';
 import { useEditPostAction } from '../dataviews-actions';
+import { usePrevious } from '@wordpress/compose';
 
 const { usePostActions } = unlock( editorPrivateApis );
 const { useLocation, useHistory } = unlock( routerPrivateApis );
@@ -51,8 +52,9 @@ const getFormattedDate = ( dateToDisplay ) =>
 	);
 
 function useView( postType ) {
-	const { params } = useLocation();
-	const { activeView = 'all', isCustom = 'false', layout } = params;
+	const {
+		params: { activeView = 'all', isCustom = 'false', layout },
+	} = useLocation();
 	const history = useHistory();
 	const selectedDefaultView = useMemo( () => {
 		const defaultView =
@@ -128,6 +130,7 @@ function useView( postType ) {
 	const setDefaultViewAndUpdateUrl = useCallback(
 		( viewToSet ) => {
 			if ( viewToSet.type !== view?.type ) {
+				const { params } = history.getLocationWithParams();
 				history.push( {
 					...params,
 					layout: viewToSet.type,
@@ -135,7 +138,7 @@ function useView( postType ) {
 			}
 			setView( viewToSet );
 		},
-		[ params, view?.type, history ]
+		[ history, view?.type ]
 	);
 
 	if ( isCustom === 'false' ) {
@@ -199,23 +202,33 @@ function FeaturedImage( { item, viewType } ) {
 	);
 }
 
+function getItemId( item ) {
+	return item.id.toString();
+}
+
 export default function PagePages() {
 	const postType = 'page';
 	const [ view, setView ] = useView( postType );
 	const history = useHistory();
-	const { params } = useLocation();
-	const { isCustom = 'false' } = params;
+	const {
+		params: { postId },
+	} = useLocation();
+	const [ selection, setSelection ] = useState( [ postId ] );
 
 	const onSelectionChange = useCallback(
 		( items ) => {
-			if ( isCustom === 'false' && view?.type === LAYOUT_LIST ) {
+			const { params } = history.getLocationWithParams();
+			if (
+				( params.isCustom ?? 'false' ) === 'false' &&
+				view?.type === LAYOUT_LIST
+			) {
 				history.push( {
 					...params,
 					postId: items.length === 1 ? items[ 0 ].id : undefined,
 				} );
 			}
 		},
-		[ history, params, view?.type, isCustom ]
+		[ history, view?.type ]
 	);
 
 	const queryArgs = useMemo( () => {
@@ -262,6 +275,20 @@ export default function PagePages() {
 		totalPages,
 	} = useEntityRecords( 'postType', postType, queryArgs );
 
+	const ids = pages?.map( ( page ) => getItemId( page ) ) ?? [];
+	const prevIds = usePrevious( ids ) ?? [];
+	const deletedIds = prevIds.filter( ( id ) => ! ids.includes( id ) );
+	const postIdWasDeleted = deletedIds.includes( postId );
+
+	useEffect( () => {
+		if ( postIdWasDeleted ) {
+			history.push( {
+				...history.getLocationWithParams().params,
+				postId: undefined,
+			} );
+		}
+	}, [ postIdWasDeleted, history ] );
+
 	const { records: authors, isResolving: isLoadingAuthors } =
 		useEntityRecords( 'root', 'user', { per_page: -1 } );
 
@@ -273,15 +300,19 @@ export default function PagePages() {
 		[ totalItems, totalPages ]
 	);
 
-	const { frontPageId, postsPageId } = useSelect( ( select ) => {
-		const { getEntityRecord } = select( coreStore );
-		const siteSettings = getEntityRecord( 'root', 'site' );
-
-		return {
-			frontPageId: siteSettings?.page_on_front,
-			postsPageId: siteSettings?.page_for_posts,
-		};
-	} );
+	const { frontPageId, postsPageId, addNewLabel, canCreatePage } = useSelect(
+		( select ) => {
+			const { getEntityRecord, getPostType, canUser } =
+				select( coreStore );
+			const siteSettings = getEntityRecord( 'root', 'site' );
+			return {
+				frontPageId: siteSettings?.page_on_front,
+				postsPageId: siteSettings?.page_for_posts,
+				addNewLabel: getPostType( 'page' )?.labels?.add_new_item,
+				canCreatePage: canUser( 'create', 'pages' ),
+			};
+		}
+	);
 
 	const fields = useMemo(
 		() => [
@@ -452,7 +483,10 @@ export default function PagePages() {
 		[ authors, view.type, frontPageId, postsPageId ]
 	);
 
-	const postTypeActions = usePostActions( 'page' );
+	const postTypeActions = usePostActions( {
+		postType: 'page',
+		context: 'list',
+	} );
 	const editAction = useEditPostAction();
 	const actions = useMemo(
 		() => [ editAction, ...postTypeActions ],
@@ -488,22 +522,28 @@ export default function PagePages() {
 		closeModal();
 	};
 
-	// TODO: we need to handle properly `data={ data || EMPTY_ARRAY }` for when `isLoading`.
 	return (
 		<Page
 			title={ __( 'Pages' ) }
 			actions={
-				<>
-					<Button variant="primary" onClick={ openModal }>
-						{ __( 'Add new page' ) }
-					</Button>
-					{ showAddPageModal && (
-						<AddNewPageModal
-							onSave={ handleNewPage }
-							onClose={ closeModal }
-						/>
-					) }
-				</>
+				addNewLabel &&
+				canCreatePage && (
+					<>
+						<Button
+							variant="primary"
+							onClick={ openModal }
+							__next40pxDefaultSize
+						>
+							{ addNewLabel }
+						</Button>
+						{ showAddPageModal && (
+							<AddNewPageModal
+								onSave={ handleNewPage }
+								onClose={ closeModal }
+							/>
+						) }
+					</>
+				)
 			}
 		>
 			<DataViews
@@ -514,7 +554,10 @@ export default function PagePages() {
 				isLoading={ isLoadingPages || isLoadingAuthors }
 				view={ view }
 				onChangeView={ onChangeView }
+				selection={ selection }
+				setSelection={ setSelection }
 				onSelectionChange={ onSelectionChange }
+				getItemId={ getItemId }
 			/>
 		</Page>
 	);

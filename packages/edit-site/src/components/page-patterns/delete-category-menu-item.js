@@ -60,8 +60,7 @@ export default function DeleteCategoryMenuItem( { category, onClose } ) {
 
 			onClose?.();
 			history.push( {
-				path: `/patterns`,
-				categoryType: PATTERN_TYPES.theme,
+				postType: PATTERN_TYPES.user,
 				categoryId: PATTERN_DEFAULT_CATEGORY,
 			} );
 		} catch ( error ) {

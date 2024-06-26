@@ -7,6 +7,7 @@ import { combineReducers } from '@wordpress/data';
  * Internal dependencies
  */
 import { EDITOR_SETTINGS_DEFAULTS } from './defaults';
+import dataviewsReducer from '../dataviews/store/reducer';
 
 /**
  * Returns a post attribute value, flattening nested rendered content using its
@@ -402,4 +403,5 @@ export default combineReducers( {
 	listViewPanel,
 	listViewToggleRef,
 	publishSidebarActive,
+	dataviews: dataviewsReducer,
 } );
