@@ -3,6 +3,7 @@
  */
 // eslint-disable-next-line no-restricted-imports
 import * as Ariakit from '@ariakit/react';
+import clsx from 'clsx';
 
 /**
  * Internal dependencies
@@ -21,6 +22,7 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 		onChange,
 		size = 'default',
 		value,
+		className: classNameProp,
 		...restProps
 	} = props;
 
@@ -122,6 +124,10 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 			}
 			size={ translatedSize }
 			store={ store }
+			className={ clsx(
+				'components-custom-select-control',
+				classNameProp
+			) }
 			{ ...restProps }
 		>
 			{ children }

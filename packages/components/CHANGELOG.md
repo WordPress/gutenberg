@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   `CustomSelectControlV2`: add root element wrapper. ([#62803](https://github.com/WordPress/gutenberg/pull/62803))
+
 ## 28.2.0 (2024-06-26)
 
 ### Enhancements
