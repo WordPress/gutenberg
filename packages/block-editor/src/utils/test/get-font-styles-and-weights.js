@@ -205,7 +205,7 @@ describe( 'getFontStylesAndWeights', () => {
 		} );
 	} );
 
-	it( 'should return default styles and weights if fontWeight includes a space', () => {
+	it( 'should return default styles and weights for a variable font', () => {
 		const fontFamilyFaces = [
 			{
 				fontFamily: 'Inter',
@@ -415,7 +415,7 @@ describe( 'getFontStylesAndWeights', () => {
 		} );
 	} );
 
-	it( 'should return only provided font styles and weights', () => {
+	it( 'should return specific font styles and weights based on provided font faces', () => {
 		const fontFamilyFaces = [
 			{
 				fontFamily: 'Piazzolla',
