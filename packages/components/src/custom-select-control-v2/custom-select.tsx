@@ -93,6 +93,16 @@ function _CustomSelect(
 		...restProps
 	} = props;
 
+	const onSelectPopoverKeyDown: React.KeyboardEventHandler< HTMLDivElement > =
+		useCallback(
+			( e ) => {
+				if ( isLegacy ) {
+					e.stopPropagation();
+				}
+			},
+			[ isLegacy ]
+		);
+
 	return (
 		// Where should `restProps` be forwarded to?
 		<div className={ className }>
@@ -118,6 +128,7 @@ function _CustomSelect(
 					store={ store }
 					sameWidth
 					slide={ false }
+					onKeyDown={ onSelectPopoverKeyDown }
 				>
 					<CustomSelectContext.Provider value={ { store } }>
 						{ children }
