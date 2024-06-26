@@ -13,7 +13,11 @@ import { space } from '../utils/space';
 import { chevronIconSize } from '../select-control/styles/select-control-styles';
 import type { CustomSelectButtonSize } from './types';
 
-const ITEM_PADDING = space( 2 );
+const INLINE_PADDING = {
+	compact: 8, // space(2)
+	small: 8, // space(2)
+	default: 16, // space(4)
+};
 
 export const SelectLabel = styled( Ariakit.SelectLabel )`
 	font-size: 11px;
@@ -39,18 +43,18 @@ export const Select = styled( Ariakit.Select, {
 		const sizes = {
 			compact: {
 				[ heightProperty ]: 32,
-				paddingInlineStart: 8,
-				paddingInlineEnd: 8 + chevronIconSize,
+				paddingInlineStart: INLINE_PADDING.compact,
+				paddingInlineEnd: INLINE_PADDING.compact + chevronIconSize,
 			},
 			default: {
 				[ heightProperty ]: 40,
-				paddingInlineStart: 16,
-				paddingInlineEnd: 16 + chevronIconSize,
+				paddingInlineStart: INLINE_PADDING.default,
+				paddingInlineEnd: INLINE_PADDING.default + chevronIconSize,
 			},
 			small: {
 				[ heightProperty ]: 24,
-				paddingInlineStart: 8,
-				paddingInlineEnd: 8 + chevronIconSize,
+				paddingInlineStart: INLINE_PADDING.small,
+				paddingInlineEnd: INLINE_PADDING.small + chevronIconSize,
 			},
 		};
 
@@ -107,18 +111,20 @@ export const SelectItem = styled( Ariakit.SelectItem )( ( {
 	size: NonNullable< CustomSelectButtonSize[ 'size' ] >;
 } ) => {
 	const getSize = () => {
+		// Used to visually align the checkmark with the chevron
+		const checkmarkCorrection = 6;
 		const sizes = {
 			compact: {
-				paddingInlineStart: space( 2 ),
-				paddingInlineEnd: space( 1 ),
+				paddingInlineStart: INLINE_PADDING.compact,
+				paddingInlineEnd: INLINE_PADDING.compact - checkmarkCorrection,
 			},
 			default: {
-				paddingInlineStart: space( 4 ),
-				paddingInlineEnd: space( 3 ),
+				paddingInlineStart: INLINE_PADDING.default,
+				paddingInlineEnd: INLINE_PADDING.default - checkmarkCorrection,
 			},
 			small: {
-				paddingInlineStart: space( 2 ),
-				paddingInlineEnd: space( 1 ),
+				paddingInlineStart: INLINE_PADDING.small,
+				paddingInlineEnd: INLINE_PADDING.small - checkmarkCorrection,
 			},
 		};
 
@@ -130,10 +136,10 @@ export const SelectItem = styled( Ariakit.SelectItem )( ( {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		padding: ${ ITEM_PADDING };
 		font-size: ${ CONFIG.fontSize };
 		// TODO: reassess line-height for non-legacy v2
 		line-height: 28px;
+		padding-block: ${ space( 2 ) };
 		scroll-margin: ${ space( 1 ) };
 		user-select: none;
 
@@ -152,7 +158,7 @@ export const SelectItem = styled( Ariakit.SelectItem )( ( {
 export const SelectedItemCheck = styled( Ariakit.SelectItemCheck )`
 	display: flex;
 	align-items: center;
-	margin-inline-start: ${ ITEM_PADDING };
+	margin-inline-start: ${ space( 2 ) };
 	font-size: 24px; // Size of checkmark icon
 `;
 
