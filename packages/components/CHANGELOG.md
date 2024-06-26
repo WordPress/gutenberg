@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 28.2.0 (2024-06-26)
+
 ### Enhancements
 
 -   `DropZone`: rewrite animation without depending on framer-motion. ([#62044](https://github.com/WordPress/gutenberg/pull/62044))
