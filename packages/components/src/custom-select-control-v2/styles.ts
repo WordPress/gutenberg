@@ -18,7 +18,7 @@ const ITEM_PADDING = space( 2 );
 export const SelectLabel = styled( Ariakit.SelectLabel )`
 	font-size: 11px;
 	font-weight: 500;
-	line-height: 1.4;
+	line-height: ${ CONFIG.fontLineHeightBase };
 	text-transform: uppercase;
 	margin-bottom: ${ space( 2 ) };
 `;
@@ -166,7 +166,7 @@ export const ItemHint = styled.span`
 	${ SelectItem } && {
 		color: ${ COLORS.theme.gray[ 600 ] };
 		text-align: initial;
-		line-height: 1.4;
+		line-height: ${ CONFIG.fontLineHeightBase };
 		padding-inline-end: ${ space( 1 ) };
 	}
 `;
