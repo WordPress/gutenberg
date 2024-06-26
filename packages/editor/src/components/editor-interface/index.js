@@ -55,6 +55,7 @@ export default function EditorInterface( {
 	disableIframe,
 	autoFocus,
 	customSaveButton,
+	customSavePanel,
 	forceDisableBlockTools,
 	title,
 	icon,
@@ -214,7 +215,7 @@ export default function EditorInterface( {
 				)
 			}
 			actions={
-				! isPreviewMode ? (
+				customSavePanel || (
 					<SavePublishPanels
 						closeEntitiesSavedStates={ closeEntitiesSavedStates }
 						isEntitiesSavedStatesOpen={
@@ -225,7 +226,7 @@ export default function EditorInterface( {
 						}
 						forceIsDirtyPublishPanel={ forceIsDirty }
 					/>
-				) : undefined
+				)
 			}
 			shortcuts={ {
 				previous: previousShortcut,

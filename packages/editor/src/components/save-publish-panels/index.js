@@ -28,20 +28,25 @@ export default function SavePublishPanels( {
 } ) {
 	const { closePublishSidebar, togglePublishSidebar } =
 		useDispatch( editorStore );
-	const {
-		publishSidebarOpened,
-		hasNonPostEntityChanges,
-		hasPostMetaChanges,
-	} = useSelect(
-		( select ) => ( {
-			publishSidebarOpened:
-				select( editorStore ).isPublishSidebarOpened(),
-			hasNonPostEntityChanges:
-				select( editorStore ).hasNonPostEntityChanges(),
-			hasPostMetaChanges: unlock(
-				select( editorStore )
-			).hasPostMetaChanges(),
-		} ),
+	const { publishSidebarOpened, isPublishable, isDirty } = useSelect(
+		( select ) => {
+			const {
+				isPublishSidebarOpened,
+				isEditedPostPublishable,
+				isCurrentPostPublished,
+				isEditedPostDirty,
+				hasNonPostEntityChanges: _hasNonPostEntityChanges,
+			} = select( editorStore );
+			return {
+				publishSidebarOpened: isPublishSidebarOpened(),
+				isPublishable:
+					! isCurrentPostPublished() && isEditedPostPublishable(),
+				isDirty:
+					_hasNonPostEntityChanges() ||
+					isEditedPostDirty() ||
+					unlock( select( editorStore ) ).hasPostMetaChanges(),
+			};
+		},
 		[]
 	);
 
@@ -62,20 +67,7 @@ export default function SavePublishPanels( {
 				PostPublishExtension={ PluginPostPublishPanel.Slot }
 			/>
 		);
-	} else if ( hasNonPostEntityChanges || hasPostMetaChanges ) {
-		unmountableContent = (
-			<div className="editor-layout__toggle-entities-saved-states-panel">
-				<Button
-					variant="secondary"
-					className="editor-layout__toggle-entities-saved-states-panel-button"
-					onClick={ openEntitiesSavedStates }
-					aria-expanded={ false }
-				>
-					{ __( 'Open save panel' ) }
-				</Button>
-			</div>
-		);
-	} else {
+	} else if ( isPublishable ) {
 		unmountableContent = (
 			<div className="editor-layout__toggle-publish-panel">
 				<Button
@@ -85,6 +77,21 @@ export default function SavePublishPanels( {
 					aria-expanded={ false }
 				>
 					{ __( 'Open publish panel' ) }
+				</Button>
+			</div>
+		);
+	} else {
+		unmountableContent = (
+			<div className="editor-layout__toggle-entities-saved-states-panel">
+				<Button
+					variant="secondary"
+					className="editor-layout__toggle-entities-saved-states-panel-button"
+					onClick={ openEntitiesSavedStates }
+					aria-expanded={ false }
+					disabled={ ! isDirty }
+					__experimentalIsFocusable
+				>
+					{ __( 'Open save panel' ) }
 				</Button>
 			</div>
 		);

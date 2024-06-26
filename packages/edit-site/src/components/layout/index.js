@@ -37,7 +37,6 @@ import { store as editSiteStore } from '../../store';
 import SiteHub from '../site-hub';
 import ResizableFrame from '../resizable-frame';
 import { unlock } from '../../lock-unlock';
-import SavePanel from '../save-panel';
 import KeyboardShortcutsRegister from '../keyboard-shortcuts/register';
 import KeyboardShortcutsGlobal from '../keyboard-shortcuts/global';
 import { useIsSiteEditorLoading } from './hooks';
@@ -236,8 +235,6 @@ export default function Layout( { route } ) {
 						</div>
 					) }
 				</div>
-
-				<SavePanel />
 			</div>
 		</>
 	);
