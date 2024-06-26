@@ -668,7 +668,10 @@ test.describe( 'Post Editor Performance', () => {
 
 				const startTime = performance.now();
 
-				await page.getByText( 'Test' ).click();
+				const oldLocator = page.getByRole( 'button', { name: 'Test' } );
+				const newLocator = page.getByRole( 'tab', { name: 'Test' } );
+
+				await oldLocator.or( newLocator ).click();
 
 				await Promise.all(
 					testPatterns.map( async ( pattern ) => {
