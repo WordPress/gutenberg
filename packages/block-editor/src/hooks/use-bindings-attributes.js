@@ -93,12 +93,10 @@ export function canBindAttribute( blockName, attributeName ) {
 export const withBlockBindingSupport = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const registry = useRegistry();
-		const { name, clientId, context } = props;
-		const sources = useSelect(
-			( select ) =>
-				unlock( select( blocksStore ) ).getAllBlockBindingsSources(),
-			[]
+		const sources = useSelect( ( select ) =>
+			unlock( select( blocksStore ) ).getAllBlockBindingsSources()
 		);
+		const { name, clientId, context } = props;
 		const hasParentPattern = !! props.context[ 'pattern/overrides' ];
 		const hasPatternOverridesDefaultBinding =
 			props.attributes.metadata?.bindings?.[ DEFAULT_ATTRIBUTE ]
@@ -163,7 +161,6 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 					}
 
 					const keptAttributes = { ...nextAttributes };
-
 					const updatesBySource = new Map();
 
 					// Loop only over the updated attributes to avoid modifying the bound ones that haven't changed.
