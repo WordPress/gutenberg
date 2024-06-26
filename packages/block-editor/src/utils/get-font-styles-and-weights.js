@@ -105,6 +105,7 @@ export function getFontStylesAndWeights( fontFamilyFaces ) {
 
 		if ( isVariableFont ) {
 			// If the font is a variable font, use the default list of font styles and weights.
+			// TODO: Handle variable weights and styles.
 			return;
 		}
 
