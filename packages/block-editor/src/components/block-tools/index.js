@@ -25,6 +25,7 @@ import usePopoverScroll from '../block-popover/use-popover-scroll';
 import ZoomOutModeInserters from './zoom-out-mode-inserters';
 import { useShowBlockTools } from './use-show-block-tools';
 import { unlock } from '../../lock-unlock';
+import getEditorRegion from '../../utils/get-editor-region';
 
 function selector( select ) {
 	const {
@@ -161,33 +162,7 @@ export default function BlockTools( {
 			) {
 				event.preventDefault();
 				clearSelectedBlock();
-				// If there are multiple editors, we need to find the iframe that contains our contentRef to make sure
-				// we're focusing the region that contains this editor.
-				const editorCanvas =
-					Array.from(
-						document
-							.querySelectorAll( 'iframe[name="editor-canvas"]' )
-							.values()
-					).find( ( iframe ) => {
-						// Find the iframe that contains our contentRef
-						const iframeDocument =
-							iframe.contentDocument ||
-							iframe.contentWindow.document;
-
-						return (
-							iframeDocument ===
-							__unstableContentRef.current.ownerDocument
-						);
-					} ) ?? __unstableContentRef.current;
-
-				// The region is provivided by the editor, not the block-editor.
-				// We should send focus to the region if one is available to reuse the
-				// same interface for navigating landmarks. If no region is available,
-				// use the canvas instead.
-				const focusableWrapper =
-					editorCanvas?.closest( '[role="region"]' ) ?? editorCanvas;
-
-				focusableWrapper.focus();
+				getEditorRegion( __unstableContentRef.current ).focus();
 			}
 		} else if ( isMatch( 'core/block-editor/collapse-list-view', event ) ) {
 			// If focus is currently within a text field, such as a rich text block or other editable field,
