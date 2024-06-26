@@ -223,7 +223,11 @@ const trashPostAction = {
 								} else if ( items[ 0 ].type === 'page' ) {
 									successMessage = sprintf(
 										/* translators: The number of items. */
-										__( '%s items moved to trash.' ),
+										_n(
+											'%s item moved to trash.',
+											'%s items moved to trash.',
+											items.length
+										),
 										items.length
 									);
 								} else {
