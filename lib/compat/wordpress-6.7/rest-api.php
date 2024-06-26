@@ -32,8 +32,8 @@ add_filter( 'block_editor_rest_api_preload_paths', 'gutenberg_block_editor_prelo
 
 if ( ! function_exists( 'wp_api_template_registry' ) ) {
 	/**
-	 * Hook in to the template and template part post types and modify the
-	 * the rest endpoint to include modifications to read templates from the
+	 * Hook in to the template and template part post types and modify the rest
+	 * endpoint to include modifications to read templates from the
 	 * BlockTemplatesRegistry.
 	 *
 	 * @param array  $args Current registered post type args.

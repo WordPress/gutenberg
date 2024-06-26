@@ -22,7 +22,7 @@ class Gutenberg_REST_Templates_Controller_6_7 extends Gutenberg_REST_Templates_C
 			// @core-merge: Add a special case for plugin templates.
 		} elseif ( isset( $request['source'] ) && 'plugin' === $request['source'] ) {
 			list( , $slug ) = explode( '//', $request['id'] );
-			$template       = WP_Block_Templates_Registry::get_instance()->get_by_slug( $this->post_type, $slug );
+			$template       = WP_Block_Templates_Registry::get_instance()->get_by_slug( $slug );
 			// @core-merge: End of changes to merge in core.
 		} else {
 			$template = get_block_template( $request['id'], $this->post_type );
@@ -93,7 +93,7 @@ class Gutenberg_REST_Templates_Controller_6_7 extends Gutenberg_REST_Templates_C
 	 * @return string                            Original source of the template one of theme, plugin, site, or user.
 	 */
 	private static function get_wp_templates_original_source_field( $template_object ) {
-		if ( 'wp_template' === $template_object->type || 'wp_template_part' === $template_object->type ) {
+		if ( 'wp_template' === $template_object->type ) {
 			// Added by theme.
 			// Template originally provided by a theme, but customized by a user.
 			// Templates originally didn't have the 'origin' field so identify
