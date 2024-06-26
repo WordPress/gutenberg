@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createContext, useMemo } from '@wordpress/element';
+import { createContext, useCallback, useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -89,6 +89,7 @@ function _CustomSelect(
 		size,
 		store,
 		className,
+		isLegacy = false,
 		...restProps
 	} = props;
 

@@ -68,6 +68,10 @@ export type _CustomSelectProps = CustomSelectButtonProps & {
 	 * Accessible label for the control.
 	 */
 	label: string;
+	/**
+	 * True if the consumer is emulating the legacy component behavior and look
+	 */
+	isLegacy?: boolean;
 };
 
 export type CustomSelectProps = _CustomSelectProps &
