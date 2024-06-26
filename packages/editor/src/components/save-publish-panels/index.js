@@ -28,27 +28,30 @@ export default function SavePublishPanels( {
 } ) {
 	const { closePublishSidebar, togglePublishSidebar } =
 		useDispatch( editorStore );
-	const { publishSidebarOpened, isPublishable, isDirty } = useSelect(
-		( select ) => {
-			const {
-				isPublishSidebarOpened,
-				isEditedPostPublishable,
-				isCurrentPostPublished,
-				isEditedPostDirty,
-				hasNonPostEntityChanges: _hasNonPostEntityChanges,
-			} = select( editorStore );
-			return {
-				publishSidebarOpened: isPublishSidebarOpened(),
-				isPublishable:
-					! isCurrentPostPublished() && isEditedPostPublishable(),
-				isDirty:
-					_hasNonPostEntityChanges() ||
-					isEditedPostDirty() ||
-					unlock( select( editorStore ) ).hasPostMetaChanges(),
-			};
-		},
-		[]
-	);
+	const {
+		publishSidebarOpened,
+		isPublishable,
+		isDirty,
+		hasOtherEntitiesChanges,
+	} = useSelect( ( select ) => {
+		const {
+			isPublishSidebarOpened,
+			isEditedPostPublishable,
+			isCurrentPostPublished,
+			isEditedPostDirty,
+			hasNonPostEntityChanges,
+		} = select( editorStore );
+		const _hasOtherEntitiesChanges =
+			hasNonPostEntityChanges() ||
+			unlock( select( editorStore ) ).hasPostMetaChanges();
+		return {
+			publishSidebarOpened: isPublishSidebarOpened(),
+			isPublishable:
+				! isCurrentPostPublished() && isEditedPostPublishable(),
+			isDirty: _hasOtherEntitiesChanges || isEditedPostDirty(),
+			hasOtherEntitiesChanges: _hasOtherEntitiesChanges,
+		};
+	}, [] );
 
 	const openEntitiesSavedStates = useCallback(
 		() => setEntitiesSavedStatesCallback( true ),
@@ -67,7 +70,7 @@ export default function SavePublishPanels( {
 				PostPublishExtension={ PluginPostPublishPanel.Slot }
 			/>
 		);
-	} else if ( isPublishable ) {
+	} else if ( isPublishable && ! hasOtherEntitiesChanges ) {
 		unmountableContent = (
 			<div className="editor-layout__toggle-publish-panel">
 				<Button
