@@ -353,7 +353,7 @@ function GridLayoutTypeControl( { layout, onChange } ) {
 		minimumColumnWidth || '12rem'
 	);
 
-	const isManual =
+	const gridPlacement =
 		manualPlacement ||
 		( !! columnCount && ! window.__experimentalEnableGridInteractivity )
 			? 'manual'
@@ -388,11 +388,11 @@ function GridLayoutTypeControl( { layout, onChange } ) {
 		<ToggleGroupControl
 			__nextHasNoMarginBottom
 			label={ __( 'Grid item position' ) }
-			value={ isManual }
+			value={ gridPlacement }
 			onChange={ onChangeType }
 			isBlock
 			help={
-				isManual === 'manual'
+				gridPlacement === 'manual'
 					? __(
 							'Grid items can be manually placed in any position on the grid.'
 					  )
