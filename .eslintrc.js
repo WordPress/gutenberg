@@ -147,6 +147,11 @@ const restrictedSyntaxComponents = [
 		message:
 			'`disabled` used without the `__experimentalIsFocusable` prop. Disabling a control without maintaining focusability can cause accessibility issues, by hiding their presence from screen reader users, or preventing focus from returning to a trigger element. (Ignore this error if you truly mean to disable.)',
 	},
+	{
+		selector:
+			'JSXOpeningElement[name.name="Button"]:not(:has(JSXAttribute[name.name="__next40pxDefaultSize"])):not(:has(JSXAttribute[name.name="size"]))',
+		message: '`Button` should default to the new 40px size.',
+	},
 ];
 
 module.exports = {
