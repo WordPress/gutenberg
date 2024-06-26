@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Upgrade `@octokit/webhooks` dependency ([#62666](https://github.com/WordPress/gutenberg/pull/62666)).
+
 ## 2.1.0 (2024-06-15)
 
 ## 2.0.0 (2024-05-31)
@@ -94,12 +98,12 @@
 
 ## 1.4.0 (2020-04-15)
 
-### New feature
+### New Features
 
 -   Include TypeScript type declarations ([#18942](https://github.com/WordPress/gutenberg/pull/18942))
 -   The "Add First Time Contributor Label" task now prompts the user to link their GitHub account to their WordPress.org profile if necessary for props credit. The task has been renamed "First Time Contributor".
 
-### Improvements
+### Enhancements
 
 -   The "Add First Time Contributor Label" task now runs retroactively on pushes to trunk, due to [permission constraints](https://help.github.com/en/actions/configuring-and-managing-workflows/authenticating-with-the-github_token#permissions-for-the-github_token) of GitHub Actions.
 

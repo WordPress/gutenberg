@@ -426,6 +426,9 @@ export default function Image( {
 		</InspectorControls>
 	);
 
+	const arePatternOverridesEnabled =
+		metadata?.bindings?.__default?.source === 'core/pattern-overrides';
+
 	const {
 		lockUrlControls = false,
 		lockHrefControls = false,
@@ -470,7 +473,7 @@ export default function Image( {
 				lockHrefControls:
 					// Disable editing the link of the URL if the image is inside a pattern instance.
 					// This is a temporary solution until we support overriding the link on the frontend.
-					hasParentPattern,
+					hasParentPattern || arePatternOverridesEnabled,
 				lockCaption:
 					// Disable editing the caption if the image is inside a pattern instance.
 					// This is a temporary solution until we support overriding the caption on the frontend.
@@ -971,7 +974,11 @@ export default function Image( {
 				isSelected={ isSingleSelected }
 				insertBlocksAfter={ insertBlocksAfter }
 				label={ __( 'Image caption text' ) }
-				showToolbarButton={ isSingleSelected && hasNonContentControls }
+				showToolbarButton={
+					isSingleSelected &&
+					hasNonContentControls &&
+					! arePatternOverridesEnabled
+				}
 				readOnly={ lockCaption }
 			/>
 		</>

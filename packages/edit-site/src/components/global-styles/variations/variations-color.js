@@ -32,6 +32,7 @@ export default function ColorVariations( { title, gap = 2 } ) {
 						variation={ variation }
 						isPill
 						property="color"
+						showTooltip
 					>
 						{ () => <StylesPreviewColors /> }
 					</Variation>

@@ -53,6 +53,8 @@ export default function CreateTemplatePartModal( {
 			title={ modalTitle || defaultModalTitle }
 			onRequestClose={ restProps.closeModal }
 			overlayClassName="editor-create-template-part-modal"
+			focusOnMount="firstContentElement"
+			size="medium"
 		>
 			<CreateTemplatePartModalContents { ...restProps } />
 		</Modal>

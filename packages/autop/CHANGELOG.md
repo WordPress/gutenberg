@@ -141,31 +141,31 @@
 
 ## 2.7.0 (2020-04-15)
 
-### New feature
+### New Features
 
 -   Include TypeScript type declarations ([#20669](https://github.com/WordPress/gutenberg/pull/20669))
 
 ## 2.3.0 (2019-05-21)
 
-### Bug Fix
+### Bug Fixes
 
 -   `removep` will correctly preserve multi-line paragraph tags where attributes are present.
 
 ## 2.1.0 (2019-03-06)
 
-### Bug Fix
+### Bug Fixes
 
 -   `autop` correctly matches whitespace preceding and following block-level elements.
 
 ## 2.0.0 (2018-09-05)
 
-### Breaking Change
+### Breaking Changes
 
 -   Change how required built-ins are polyfilled with Babel 7 ([#9171](https://github.com/WordPress/gutenberg/pull/9171)). If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods.
 
 ## 1.1.0 (2018-07-12)
 
-### New Feature
+### New Features
 
 -   Updated build to work with Babel 7 ([#7832](https://github.com/WordPress/gutenberg/pull/7832))
 
@@ -175,6 +175,6 @@
 
 ## 1.0.6 (2018-05-08)
 
-### Polish
+### Internal
 
 -   Documentation: Fix API method typo for `removep`. ([#120](https://github.com/WordPress/packages/pull/120))

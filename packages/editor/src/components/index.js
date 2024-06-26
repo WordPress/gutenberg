@@ -105,12 +105,21 @@ export { default as CharacterCount } from './character-count';
 export { default as EditorProvider } from './provider';
 
 export * from './deprecated';
+
+/**
+ * Handles the keyboard shortcuts for the editor.
+ *
+ * It provides functionality for various keyboard shortcuts such as toggling editor mode,
+ * toggling distraction-free mode, undo/redo, saving the post, toggling list view,
+ * and toggling the sidebar.
+ */
 export const VisualEditorGlobalKeyboardShortcuts = EditorKeyboardShortcuts;
 
 /**
- * Component handles the global keyboard shortcuts for the Text editor.
+ * Handles the keyboard shortcuts for the editor.
  *
  * It provides functionality for various keyboard shortcuts such as toggling editor mode,
- * toggling distraction-free mode, undo/redo.
+ * toggling distraction-free mode, undo/redo, saving the post, toggling list view,
+ * and toggling the sidebar.
  */
 export const TextEditorGlobalKeyboardShortcuts = EditorKeyboardShortcuts;
