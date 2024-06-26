@@ -7,9 +7,10 @@ import {
 	Button,
 	TextControl,
 	Modal,
+	Notice,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useState, useId } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
 
 /**
@@ -27,7 +28,6 @@ export default function BlockRenameModal( {
 	hasOverridesWarning,
 } ) {
 	const [ editedBlockName, setEditedBlockName ] = useState( blockName );
-	const descriptionId = useId();
 
 	const nameHasChanged = editedBlockName !== blockName;
 	const nameIsOriginal = editedBlockName === originalBlockName;
@@ -65,7 +65,6 @@ export default function BlockRenameModal( {
 			onRequestClose={ onClose }
 			overlayClassName="block-editor-block-rename-modal"
 			focusOnMount="firstContentElement"
-			aria={ { describedby: descriptionId } }
 			size="small"
 		>
 			<form
@@ -79,23 +78,19 @@ export default function BlockRenameModal( {
 					handleSubmit();
 				} }
 			>
-				<p id={ descriptionId }>
-					{ __( 'Enter a custom name for this block.' ) }
-				</p>
 				<VStack spacing="3">
+					{ hasOverridesWarning && (
+						<Notice isDismissible={ false } status="warning">
+							{ __(
+								'This block allows overrides. Changing the name can cause problems with content entered into instances of this pattern.'
+							) }
+						</Notice>
+					) }
 					<TextControl
 						__nextHasNoMarginBottom
 						__next40pxDefaultSize
 						value={ editedBlockName }
-						label={ __( 'Block name' ) }
-						hideLabelFromVision
-						help={
-							hasOverridesWarning
-								? __(
-										'This block allows overrides. Changing the name can cause problems with content entered into instances of this pattern.'
-								  )
-								: undefined
-						}
+						label={ __( 'Name' ) }
 						placeholder={ originalBlockName }
 						onChange={ setEditedBlockName }
 						onFocus={ autoSelectInputText }

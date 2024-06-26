@@ -160,7 +160,7 @@ function CustomDataViewItem( { dataviewId, isActive } ) {
 			/>
 			{ isRenaming && (
 				<Modal
-					title={ __( 'Rename view' ) }
+					title={ __( 'Rename' ) }
 					onRequestClose={ () => {
 						setIsRenaming( false );
 					} }
