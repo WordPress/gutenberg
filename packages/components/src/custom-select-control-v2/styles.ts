@@ -165,7 +165,8 @@ export const ItemHint = styled.span`
 	// '.components-custom-select-control__item-hint' class
 	${ SelectItem } && {
 		color: ${ COLORS.theme.gray[ 600 ] };
-		text-align: right;
+		text-align: initial;
+		line-height: 1.4;
 		padding-inline-end: ${ space( 1 ) };
 	}
 `;
