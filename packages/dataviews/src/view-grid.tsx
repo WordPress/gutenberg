@@ -206,7 +206,7 @@ export default function ViewGrid< Item extends AnyItem >( {
 	const { visibleFields, badgeFields } = fields.reduce(
 		( accumulator: Record< string, NormalizedField< Item >[] >, field ) => {
 			if (
-				view.hiddenFields.includes( field.id ) ||
+				view.hiddenFields?.includes( field.id ) ||
 				[ view.layout.mediaField, view.layout.primaryField ].includes(
 					field.id
 				)
