@@ -93,6 +93,7 @@ export const Select = styled( Ariakit.Select, {
 		font-family: inherit;
 		font-size: ${ CONFIG.fontSize };
 		text-align: start;
+		user-select: none;
 		width: 100%;
 
 		&[data-focus-visible] {
@@ -136,7 +137,7 @@ export const SelectItem = styled( Ariakit.SelectItem )`
 	// Legacy line height is 28px.
 	// TODO: reassess for non-legacy v2
 	line-height: calc( 28px / ${ CONFIG.fontSize } );
-
+	scroll-margin: ${ space( 1 ) };
 	user-select: none;
 
 	&[aria-disabled='true'] {
