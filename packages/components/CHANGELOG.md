@@ -5,6 +5,7 @@
 ### Internal
 
 -   `CustomSelectControlV2`: add root element wrapper. ([#62803](https://github.com/WordPress/gutenberg/pull/62803))
+-   `CustomSelectControlV2`: fix popover styles. ([#62821](https://github.com/WordPress/gutenberg/pull/62821))
 
 ## 28.2.0 (2024-06-26)
 
