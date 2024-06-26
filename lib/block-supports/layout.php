@@ -670,15 +670,14 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			$minimum_container_query_value = $parent_column_value * 2 + $default_gap_value - 1;
 			$container_query_value         = max( $container_query_value, $minimum_container_query_value ) . $parent_column_unit;
 			// If a span is set we want to preserve it as long as possible, otherwise we just reset the value.
-			$grid_column_value = $column_span ? '1/-1' : 'auto';
-			$grid_row_value    = $row_start && ( ! $row_span || '1' === $row_span ) ? 'auto' : 'span ' . $row_span;
+			$grid_column_value = $column_span && $column_span > 1 ? '1/-1' : 'auto';
 
 			$child_layout_styles[] = array(
 				'rules_group'  => "@container (max-width: $container_query_value )",
 				'selector'     => ".$container_content_class",
 				'declarations' => array(
 					'grid-column' => $grid_column_value,
-					'grid-row'    => $grid_row_value,
+					'grid-row'    => 'auto',
 				),
 			);
 		}

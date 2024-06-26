@@ -121,13 +121,8 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 			const minimumContainerQueryValue =
 				parentColumnValue * 2 + defaultGapValue - 1;
 			// If a span is set we want to preserve it as long as possible, otherwise we just reset the value.
-			const gridColumnValue = columnSpan ? '1/-1' : 'auto';
-
-			// Unset any existing rowStart values.
-			const gridRowValue =
-				rowStart && ( ! rowSpan || rowSpan === 1 )
-					? 'auto'
-					: `span ${ rowSpan }`;
+			const gridColumnValue =
+				columnSpan && columnSpan > 1 ? '1/-1' : 'auto';
 
 			css += `@container (max-width: ${ Math.max(
 				containerQueryValue,
@@ -135,7 +130,7 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 			) }${ parentColumnUnit }) {
 				${ selector } {
 					grid-column: ${ gridColumnValue };
-					grid-row: ${ gridRowValue };
+					grid-row: auto;
 				}
 			}`;
 		}
