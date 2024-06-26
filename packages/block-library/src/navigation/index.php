@@ -1517,8 +1517,8 @@ function block_core_navigation_insert_hooked_blocks( $inner_blocks, $post ) {
 
 	if ( function_exists( 'get_hooked_blocks_by_anchor_block' ) ) {
 		if ( maybe_has_hooked_blocks() ) {
-			$before_block_visitor = make_before_block_visitor( $post, 'insert_hooked_blocks' );
-			$after_block_visitor  = make_after_block_visitor( $post, 'insert_hooked_blocks' );
+			$before_block_visitor = make_before_block_visitor( null, $post, 'insert_hooked_blocks' );
+			$after_block_visitor  = make_after_block_visitor( null, $post, 'insert_hooked_blocks' );
 		}
 	} else {
 		$hooked_blocks = get_hooked_blocks();
@@ -1551,8 +1551,8 @@ function block_core_navigation_set_ignored_hooked_blocks_metadata( $inner_blocks
 
 	if ( function_exists( 'get_hooked_blocks_by_anchor_block' ) ) {
 		if ( maybe_has_hooked_blocks() ) {
-			$before_block_visitor = make_before_block_visitor( $post, 'set_ignored_hooked_blocks_metadata' );
-			$after_block_visitor  = make_after_block_visitor( $post, 'set_ignored_hooked_blocks_metadata' );
+			$before_block_visitor = make_before_block_visitor( null, $post, 'set_ignored_hooked_blocks_metadata' );
+			$after_block_visitor  = make_after_block_visitor( null, $post, 'set_ignored_hooked_blocks_metadata' );
 		}
 	} else {
 		$hooked_blocks = get_hooked_blocks();
