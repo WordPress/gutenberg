@@ -168,5 +168,6 @@ export const ItemHint = styled.span`
 		text-align: initial;
 		line-height: ${ CONFIG.fontLineHeightBase };
 		padding-inline-end: ${ space( 1 ) };
+		margin-block: ${ space( 1 ) };
 	}
 `;
