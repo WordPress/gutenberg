@@ -114,28 +114,3 @@ addFilter(
 	'core/editor/with-pattern-override-controls',
 	withPatternOverrideControls
 );
-
-/**
- * Adds `useContext` for pattern overrides to blocks that support it.
- *
- * @param {WPBlockSettings} settings Registered block settings.
- * @param {string}          name     Block name.
- * @return {WPBlockSettings} Filtered block settings.
- */
-function shimPatternOverridesContext( settings, name ) {
-	if ( ! PARTIAL_SYNCING_SUPPORTED_BLOCKS[ name ] ) {
-		return settings;
-	}
-
-	return {
-		...settings,
-		// TODO - move this to be located with pattern overrides code.
-		usesContext: [ 'pattern/overrides', ...settings?.usesContext ],
-	};
-}
-
-addFilter(
-	'blocks.registerBlockType',
-	'core/editor/pattern-overrides/shim-pattern-overrides-context',
-	shimPatternOverridesContext
-);
