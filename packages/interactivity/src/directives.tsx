@@ -11,13 +11,7 @@ import { deepSignal, peek, type DeepSignal } from 'deepsignal';
 /**
  * Internal dependencies
  */
-import {
-	useWatch,
-	useInit,
-	kebabToCamelCase,
-	warn,
-	yieldToMain,
-} from './utils';
+import { useWatch, useInit, kebabToCamelCase, warn, splitTask } from './utils';
 import type { DirectiveEntry } from './hooks';
 import { directive, getScope, getEvaluate } from './hooks';
 
@@ -246,7 +240,7 @@ const getGlobalAsyncEventDirective = ( type: 'window' | 'document' ) => {
 				const eventName = entry.suffix.split( '--', 1 )[ 0 ];
 				useInit( () => {
 					const cb = async ( event: Event ) => {
-						await yieldToMain();
+						await splitTask();
 						evaluate( entry, event );
 					};
 					const globalVar = type === 'window' ? window : document;
@@ -361,7 +355,7 @@ export default () => {
 						existingHandler( event );
 					}
 					entries.forEach( async ( entry ) => {
-						await yieldToMain();
+						await splitTask();
 						evaluate( entry, event );
 					} );
 				};

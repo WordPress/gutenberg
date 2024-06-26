@@ -73,8 +73,9 @@ The `wp-interactive` directive "activates" the interactivity for the DOM element
 </div>
 ```
 
-> **Note**
-> The use of `data-wp-interactive` is a requirement for the Interactivity API "engine" to work. In the following examples the `data-wp-interactive` has not been added for the sake of simplicity. Also, the `data-wp-interactive` directive will be injected automatically in the future.
+<div class="callout callout-info">
+  The use of <code>data-wp-interactive</code> is a requirement for the Interactivity API "engine" to work. In the following examples the <code>data-wp-interactive</code> has not been added for the sake of simplicity. Also, the <code>data-wp-interactive</code> directive will be injected automatically in the future.
+</div>
 
 ### `wp-context`
 
@@ -299,8 +300,9 @@ The returned value is used to change the inner content of the element: `<div>val
 
 ### `wp-on`
 
-> [!NOTE]  
-> Consider using the more performant [`wp-on-async`](#wp-on-async) instead if your directive code does not need synchronous access to the event object. If synchronous access is required, consider implementing an [async action](#async-actions) which yields to the main thread after calling the synchronous API.
+<div class="callout callout-info">
+  Consider using the more performant <a href="#wp-on-async"><code>wp-on-async</code></a> instead if your directive code does not need synchronous access to the event object. If synchronous access is required, consider implementing an <a href="#async-actions"><code>async action</code></a> which yields to the main thread after calling the synchronous API.
+</div>
 
 This directive runs code on dispatched DOM events like `click` or `keyup`. The syntax is `data-wp-on--[event]` (like `data-wp-on--click` or `data-wp-on--keyup`).
 
@@ -335,8 +337,9 @@ to run sooner. Use this async version whenever there is no need for synchronous 
 
 ### `wp-on-window`
 
-> [!NOTE]  
-> Consider using the more performant [`wp-on-window-async`](#wp-on-window-async) instead if your directive code does not need synchronous access to the event object. If synchronous access is required, consider implementing an [async action](#async-actions) which yields to the main thread after calling the synchronous API.
+<div class="callout callout-info">
+  Consider using the more performant <a href="#wp-on-async-window"><code>wp-on-async-window</code></a> instead if your directive code does not need synchronous access to the event object. If synchronous access is required, consider implementing an <a href="#async-actions"><code>async action</code></a> which yields to the main thread after calling the synchronous API.
+</div>
 
 This directive allows you to attach global window events like `resize`, `copy`, and `focus` and then execute a defined callback when those happen.
 
@@ -365,14 +368,15 @@ store( "myPlugin", {
 
 The callback passed as the reference receives [the event](https://developer.mozilla.org/en-US/docs/Web/API/Event) (`event`), and the returned value by this callback is ignored. When the element is removed from the DOM, the event listener is also removed.
 
-### `wp-on-window-async`
+### `wp-on-async-window`
 
 Similar to `wp-on-async`, this is an optimized version of `wp-on-window` that immediately yields to main to avoid contributing to a long task. Use this async version whenever there is no need for synchronous access to the `event` object, in particular the methods `event.preventDefault()`, `event.stopPropagation()`, and `event.stopImmediatePropagation()`. This event listener is also added as [`passive`](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#passive).
 
 ### `wp-on-document`
 
-> [!NOTE]  
-> Consider using the more performant [`wp-on-document-async`](#wp-on-document-async) instead if your directive code does not need synchronous access to the event object. If synchronous access is required, consider implementing an [async action](#async-actions) which yields to the main thread after calling the synchronous API.
+<div class="callout callout-info">
+  Consider using the more performant <a href="#wp-on-async-document"><code>wp-on-async-document</code></a> instead if your directive code does not need synchronous access to the event object. If synchronous access is required, consider implementing an <a href="#async-actions"><code>async action</code></a> which yields to the main thread after calling the synchronous API.
+</div>
 
 This directive allows you to attach global document events like `scroll`, `mousemove`, and `keydown` and then execute a defined callback when those happen.
 
@@ -401,7 +405,7 @@ store( "myPlugin", {
 
 The callback passed as the reference receives [the event](https://developer.mozilla.org/en-US/docs/Web/API/Event) (`event`), and the returned value by this callback is ignored. When the element is removed from the DOM, the event listener is also removed.
 
-### `wp-on-document-async`
+### `wp-on-async-document`
 
 Similar to `wp-on-async`, this is an optimized version of `wp-on-document` that immediately yields to main to avoid contributing to a long task. Use this async version whenever there is no need for synchronous access to the `event` object, in particular the methods `event.preventDefault()`, `event.stopPropagation()`, and `event.stopImmediatePropagation()`. This event listener is also added as [`passive`](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#passive).
 
@@ -531,13 +535,14 @@ import { store, useState, useEffect } from '@wordpress/interactivity';
 
 // Unlike `data-wp-init` and `data-wp-watch`, you can use any hooks inside
 // `data-wp-run` callbacks.
-const useInView = ( ref ) => {
+const useInView = () => {
   const [ inView, setInView ] = useState( false );
   useEffect( () => {
+    const { ref } = getElement();
     const observer = new IntersectionObserver( ( [ entry ] ) => {
       setInView( entry.isIntersecting );
     } );
-    if ( ref ) observer.observe( ref );
+    observer.observe( ref );
     return () => ref && observer.unobserve( ref );
   }, []);
   return inView;
@@ -546,8 +551,7 @@ const useInView = ( ref ) => {
 store( 'myPlugin', {
   callbacks: {
     logInView: () => {
-      const { ref } = getElement();
-      const isInView = useInView( ref );
+      const isInView = useInView();
       useEffect( () => {
         if ( isInView ) {
           console.log( 'Inside' );
@@ -560,6 +564,8 @@ store( 'myPlugin', {
 } );
 ```
 </details>
+
+It's important to note that, similar to (P)React components, the `ref` from `getElement()` is `null` during the first render. To properly access the DOM element reference, you typically need to use an effect-like hook such as `useEffect`, `useInit`, or `useWatch`. This ensures that the `getElement()` runs after the component has been mounted and the `ref` is available.
 
 ### `wp-key`
 
@@ -759,7 +765,7 @@ const { state, actions } = store("myPlugin", {
 });
 ```
 
-##### Async actions
+<h5 id="async-actions">Async actions</h5>
 
 Async actions should use generators instead of async/await.
 
@@ -813,7 +819,8 @@ const { state } = store("myPlugin", {
 As mentioned above with [`wp-on`](#wp-on), [`wp-on-window`](#wp-on-window), and [`wp-on-document`](#wp-on-document), an async action should be used whenever the `async` versions of the aforementioned directives cannot be used due to the action requiring synchronous access to the `event` object. Synchronous access is reqired whenever the action needs to call `event.preventDefault()`, `event.stopPropagation()`, or `event.stopImmediatePropagation()`. To ensure that the action code does not contribute to a long task, you may manually yield to the main thread after calling the synchronous event API. For example:
 
 ```js
-function toMainThread() {
+// Note: In WordPress 6.6 this splitTask function is exported by @wordpress/interactivity.
+function splitTask() {
   return new Promise(resolve => {
     setTimeout(resolve, 0);
   });
@@ -823,7 +830,7 @@ store("myPlugin", {
   actions: {
     handleClick: function* (event) {
       event.preventDefault();
-      yield toMainThread();
+      yield splitTask();
       doTheWork();
     },
   },
@@ -888,9 +895,9 @@ const { state } = store( "myPlugin", {
   }
 } );
 ```
-
-> **Note**
-> All `store()` calls with the same namespace return the same references, i.e., the same `state`, `actions`, etc., containing the result of merging all the store parts passed.
+<div class="callout callout-info">
+  All <code>store()</code> calls with the same namespace return the same references, i.e., the same <code>state</code>, <code>actions</code>, etc., containing the result of merging all the store parts passed.
+</div>
 
 - To access the context inside an action, derived state, or side effect, you can use the `getContext` function.
 - To access the reference, you can use the `getElement` function.

@@ -14,7 +14,7 @@ import * as Styled from '../styles';
 
 function CustomSelectControl( props: LegacyCustomSelectProps ) {
 	const {
-		__experimentalShowSelectedHint,
+		__experimentalShowSelectedHint = false,
 		__next40pxDefaultSize = false,
 		describedBy,
 		options,
@@ -27,7 +27,11 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 	// Forward props + store from v2 implementation
 	const store = Ariakit.useSelectStore( {
 		async setValue( nextValue ) {
-			if ( ! onChange ) {
+			const nextOption = options.find(
+				( item ) => item.name === nextValue
+			);
+
+			if ( ! onChange || ! nextOption ) {
 				return;
 			}
 
@@ -42,18 +46,21 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 				),
 				inputValue: '',
 				isOpen: state.open,
-				selectedItem: {
-					name: nextValue as string,
-					key: nextValue as string,
-				},
+				selectedItem: nextOption,
 				type: '',
 			};
 			onChange( changeObject );
 		},
+		value: value?.name,
+		// Setting the first option as a default value when no value is provided
+		// is already done natively by the underlying Ariakit component,
+		// but doing this explicitly avoids the `onChange` callback from firing
+		// on initial render, thus making this implementation closer to the v1.
+		defaultValue: options[ 0 ]?.name,
 	} );
 
 	const children = options.map(
-		( { name, key, __experimentalHint, ...rest } ) => {
+		( { name, key, __experimentalHint, style, className } ) => {
 			const withHint = (
 				<Styled.WithHintWrapper>
 					<span>{ name }</span>
@@ -68,7 +75,8 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 					key={ key }
 					value={ name }
 					children={ __experimentalHint ? withHint : name }
-					{ ...rest }
+					style={ style }
+					className={ className }
 				/>
 			);
 		}
@@ -82,12 +90,12 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 		);
 
 		return (
-			<>
+			<Styled.SelectedExperimentalHintWrapper>
 				{ currentValue }
 				<Styled.SelectedExperimentalHintItem className="components-custom-select-control__hint">
 					{ currentHint?.__experimentalHint }
 				</Styled.SelectedExperimentalHintItem>
-			</>
+			</Styled.SelectedExperimentalHintWrapper>
 		);
 	};
 

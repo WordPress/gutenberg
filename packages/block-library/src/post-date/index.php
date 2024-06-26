@@ -44,7 +44,7 @@ function render_block_core_post_date( $attributes, $content, $block ) {
 	 */
 	if ( isset( $attributes['displayType'] ) && 'modified' === $attributes['displayType'] ) {
 		if ( get_the_modified_date( 'Ymdhi', $post_ID ) > get_the_date( 'Ymdhi', $post_ID ) ) {
-			if ( 'human-diff' === $attributes['format'] ) {
+			if ( isset( $attributes['format'] ) && 'human-diff' === $attributes['format'] ) {
 				// translators: %s: human-readable time difference.
 				$formatted_date = sprintf( __( '%s ago', 'gutenberg' ), human_time_diff( get_post_timestamp( $post_ID, 'modified' ) ) );
 			} else {

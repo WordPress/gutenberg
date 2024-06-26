@@ -57,6 +57,7 @@ export default function EditorInterface( {
 	customSaveButton,
 	forceDisableBlockTools,
 	title,
+	icon,
 	iframeProps,
 } ) {
 	const {
@@ -140,6 +141,7 @@ export default function EditorInterface( {
 						customSaveButton={ customSaveButton }
 						forceDisableBlockTools={ forceDisableBlockTools }
 						title={ title }
+						icon={ icon }
 					/>
 				)
 			}
@@ -212,14 +214,18 @@ export default function EditorInterface( {
 				)
 			}
 			actions={
-				<SavePublishPanels
-					closeEntitiesSavedStates={ closeEntitiesSavedStates }
-					isEntitiesSavedStatesOpen={ entitiesSavedStatesCallback }
-					setEntitiesSavedStatesCallback={
-						setEntitiesSavedStatesCallback
-					}
-					forceIsDirtyPublishPanel={ forceIsDirty }
-				/>
+				! isPreviewMode ? (
+					<SavePublishPanels
+						closeEntitiesSavedStates={ closeEntitiesSavedStates }
+						isEntitiesSavedStatesOpen={
+							entitiesSavedStatesCallback
+						}
+						setEntitiesSavedStatesCallback={
+							setEntitiesSavedStatesCallback
+						}
+						forceIsDirtyPublishPanel={ forceIsDirty }
+					/>
+				) : undefined
 			}
 			shortcuts={ {
 				previous: previousShortcut,

@@ -42,14 +42,15 @@ export default function AddNewPageModal( { onSave, onClose } ) {
 					status: 'draft',
 					title,
 					slug: title || __( 'No title' ),
-					content: !! pagePostType.template
-						? serialize(
-								synchronizeBlocksWithTemplate(
-									[],
-									pagePostType.template
-								)
-						  )
-						: undefined,
+					content:
+						!! pagePostType.template && pagePostType.template.length
+							? serialize(
+									synchronizeBlocksWithTemplate(
+										[],
+										pagePostType.template
+									)
+							  )
+							: undefined,
 				},
 				{ throwOnError: true }
 			);
@@ -81,7 +82,12 @@ export default function AddNewPageModal( { onSave, onClose } ) {
 	}
 
 	return (
-		<Modal title={ __( 'Draft a new page' ) } onRequestClose={ onClose }>
+		<Modal
+			title={ __( 'Draft a new page' ) }
+			onRequestClose={ onClose }
+			focusOnMount="firstContentElement"
+			size="small"
+		>
 			<form onSubmit={ createPage }>
 				<VStack spacing={ 3 }>
 					<TextControl

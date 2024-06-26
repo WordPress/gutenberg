@@ -186,7 +186,9 @@ function Preview( { item, viewType } ) {
 
 export default function PageTemplates() {
 	const { params } = useLocation();
-	const { activeView = 'all', layout } = params;
+	const { activeView = 'all', layout, postId } = params;
+	const [ selection, setSelection ] = useState( [ postId ] );
+
 	const defaultView = useMemo( () => {
 		const usedType = layout ?? DEFAULT_VIEW.type;
 		return {
@@ -369,6 +371,8 @@ export default function PageTemplates() {
 				view={ view }
 				onChangeView={ onChangeView }
 				onSelectionChange={ onSelectionChange }
+				selection={ selection }
+				setSelection={ setSelection }
 			/>
 		</Page>
 	);

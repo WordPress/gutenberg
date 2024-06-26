@@ -1157,9 +1157,12 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await page.keyboard.type( 'synced' );
 
 		await editor.clickBlockOptionsMenuItem( 'Create pattern' );
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.type( 'test' );
+		const createPatternDialog = editor.page.getByRole( 'dialog', {
+			name: 'add new pattern',
+		} );
+		await createPatternDialog
+			.getByRole( 'textbox', { name: 'Name' } )
+			.fill( 'test' );
 		await page.keyboard.press( 'Enter' );
 
 		await expect(

@@ -10,14 +10,25 @@ import styled from '@emotion/styled';
  */
 import { COLORS, CONFIG } from '../utils';
 import { space } from '../utils/space';
+import { chevronIconSize } from '../select-control/styles/select-control-styles';
 import type { CustomSelectButtonSize } from './types';
 
 const ITEM_PADDING = space( 2 );
+
+const truncateStyles = css`
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+`;
 
 export const WithHintWrapper = styled.div`
 	display: flex;
 	justify-content: space-between;
 	flex: 1;
+`;
+
+export const SelectedExperimentalHintWrapper = styled.div`
+	${ truncateStyles }
 `;
 
 export const SelectedExperimentalHintItem = styled.span`
@@ -55,19 +66,18 @@ export const Select = styled( Ariakit.Select, {
 		const sizes = {
 			compact: {
 				[ heightProperty ]: 32,
-				paddingInlineStart: space( 2 ),
-				paddingInlineEnd: space( 1 ),
+				paddingInlineStart: 8,
+				paddingInlineEnd: 8 + chevronIconSize,
 			},
 			default: {
 				[ heightProperty ]: 40,
-				paddingInlineStart: space( 4 ),
-				paddingInlineEnd: space( 3 ),
+				paddingInlineStart: 16,
+				paddingInlineEnd: 16 + chevronIconSize,
 			},
 			small: {
 				[ heightProperty ]: 24,
-				paddingInlineStart: space( 2 ),
-				paddingInlineEnd: space( 1 ),
-				fontSize: 11,
+				paddingInlineStart: 8,
+				paddingInlineEnd: 8 + chevronIconSize,
 			},
 		};
 
@@ -75,13 +85,14 @@ export const Select = styled( Ariakit.Select, {
 	};
 
 	return css`
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
+		display: block;
 		background-color: ${ COLORS.theme.background };
 		border: none;
+		color: ${ COLORS.theme.foreground };
 		cursor: pointer;
+		font-family: inherit;
 		font-size: ${ CONFIG.fontSize };
+		text-align: left;
 		width: 100%;
 
 		&[data-focus-visible] {
@@ -89,6 +100,7 @@ export const Select = styled( Ariakit.Select, {
 		}
 
 		${ getSize() }
+		${ ! hasCustomRenderProp && truncateStyles }
 	`;
 } );
 
