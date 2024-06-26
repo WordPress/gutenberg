@@ -14,6 +14,8 @@ import { store as blocksStore } from '@wordpress/blocks';
 import { store as editorStore } from '../store';
 import { unlock } from '../lock-unlock';
 
+/** @typedef {import('@wordpress/blocks').WPBlockSettings} WPBlockSettings */
+
 const {
 	PatternOverridesControls,
 	ResetOverridesControl,
@@ -46,7 +48,8 @@ const withPatternOverrideControls = createHigherOrderComponent(
 				{ isSupportedBlock && <PatternOverridesBlockControls /> }
 			</>
 		);
-	}
+	},
+	'withPatternOverrideControls'
 );
 
 // Split into a separate component to avoid a store subscription
