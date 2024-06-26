@@ -81,6 +81,7 @@ export default function BlockTools( {
 	} = useShowBlockTools();
 
 	const {
+		clearSelectedBlock,
 		duplicateBlocks,
 		removeBlocks,
 		replaceBlocks,
@@ -91,6 +92,8 @@ export default function BlockTools( {
 		moveBlocksDown,
 		expandBlock,
 	} = unlock( useDispatch( blockEditorStore ) );
+
+	const blockSelectionButtonRef = useRef();
 
 	function onKeyDown( event ) {
 		if ( event.defaultPrevented ) {
@@ -152,6 +155,39 @@ export default function BlockTools( {
 				// block so that focus is directed back to the beginning of the selection.
 				// In effect, to the user this feels like deselecting the multi-selection.
 				selectBlock( clientIds[ 0 ] );
+			} else if (
+				clientIds.length === 1 &&
+				event.target === blockSelectionButtonRef?.current
+			) {
+				event.preventDefault();
+				clearSelectedBlock();
+				// If there are multiple editors, we need to find the iframe that contains our contentRef to make sure
+				// we're focusing the region that contains this editor.
+				const editorCanvas =
+					Array.from(
+						document
+							.querySelectorAll( 'iframe[name="editor-canvas"]' )
+							.values()
+					).find( ( iframe ) => {
+						// Find the iframe that contains our contentRef
+						const iframeDocument =
+							iframe.contentDocument ||
+							iframe.contentWindow.document;
+
+						return (
+							iframeDocument ===
+							__unstableContentRef.current.ownerDocument
+						);
+					} ) ?? __unstableContentRef.current;
+
+				// The region is provivided by the editor, not the block-editor.
+				// We should send focus to the region if one is available to reuse the
+				// same interface for navigating landmarks. If no region is available,
+				// use the canvas instead.
+				const focusableWrapper =
+					editorCanvas?.closest( '[role="region"]' ) ?? editorCanvas;
+
+				focusableWrapper.focus();
 			}
 		} else if ( isMatch( 'core/block-editor/collapse-list-view', event ) ) {
 			// If focus is currently within a text field, such as a rich text block or other editable field,
@@ -182,7 +218,6 @@ export default function BlockTools( {
 			}
 		}
 	}
-
 	const blockToolbarRef = usePopoverScroll( __unstableContentRef );
 	const blockToolbarAfterRef = usePopoverScroll( __unstableContentRef );
 
@@ -213,6 +248,7 @@ export default function BlockTools( {
 
 				{ showBreadcrumb && (
 					<BlockToolbarBreadcrumb
+						ref={ blockSelectionButtonRef }
 						__unstableContentRef={ __unstableContentRef }
 						clientId={ clientId }
 					/>
