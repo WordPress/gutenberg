@@ -4,6 +4,11 @@ on:
     push:
         branches:
             - trunk
+    # We also want to attempt cherry-picking when a PR is labeled after the PR
+    # is merged.
+    pull_request:
+        types:
+            - labeled
 
 # Ensure that new jobs wait for the previous job to finish.
 concurrency:
@@ -13,16 +18,20 @@ concurrency:
 jobs:
     cherry-pick:
         runs-on: ubuntu-latest
+        # When in the context of a PR, ensure the PR is merged.
+        if: github.event.pull_request == null || github.event.pull_request.merged == true
         steps:
             - name: Determine if label should trigger cherry-pick
               id: label-check
               uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
               with:
                   script: |
+                      const commit_sha = context.payload.pull_request ? context.payload.pull_request.merge_commit_sha : context.sha;
+                      console.log(`Commit SHA: ${commit_sha}`);
                       const prs = await github.rest.repos.listPullRequestsAssociatedWithCommit({
                         owner: context.repo.owner,
                         repo: context.repo.repo,
-                        commit_sha: context.sha,
+                        commit_sha,
                       });
                       if (prs.data.length === 0) {
                         console.log(`No PR found for commit ${context.sha}.`);
