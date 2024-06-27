@@ -61,7 +61,10 @@ function isTemplateRemovable( template ) {
 const canDeleteOrReset = ( item ) => {
 	const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
 	const isUserPattern = item.type === PATTERN_TYPES.user;
-	return isUserPattern || ( isTemplatePart && item.isCustom );
+	return (
+		isUserPattern ||
+		( isTemplatePart && item.source === TEMPLATE_ORIGINS.custom )
+	);
 };
 
 function getItemTitle( item ) {
@@ -629,8 +632,7 @@ const renamePostAction = {
 		// two props whether is custom or has a theme file.
 		const isCustomPattern =
 			isUserPattern ||
-			( isTemplatePart &&
-				( post.isCustom || post.source === TEMPLATE_ORIGINS.custom ) );
+			( isTemplatePart && post.source === TEMPLATE_ORIGINS.custom );
 		const hasThemeFile = post?.has_theme_file;
 		return isCustomPattern && ! hasThemeFile;
 	},
