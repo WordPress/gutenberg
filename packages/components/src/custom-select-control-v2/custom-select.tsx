@@ -12,6 +12,7 @@ import * as Styled from './styles';
 import type {
 	CustomSelectContext as CustomSelectContextType,
 	CustomSelectStore,
+	CustomSelectButtonInternalProps,
 	CustomSelectButtonProps,
 	CustomSelectButtonSize,
 	_CustomSelectInternalProps,
@@ -52,7 +53,10 @@ const CustomSelectButton = ( {
 	...restProps
 }: Omit<
 	WordPressComponentProps<
-		CustomSelectButtonProps & CustomSelectButtonSize & CustomSelectStore,
+		CustomSelectButtonInternalProps &
+			CustomSelectButtonProps &
+			CustomSelectButtonSize &
+			CustomSelectStore,
 		'button',
 		false
 	>,
@@ -71,9 +75,6 @@ const CustomSelectButton = ( {
 			size={ size }
 			hasCustomRenderProp={ !! renderSelectedValue }
 			store={ store }
-			// to match legacy behavior where using arrow keys
-			// move selection rather than open the popover
-			showOnKeyDown={ false }
 		>
 			{ computedRenderSelectedValue( currentValue ) }
 		</Styled.Select>
@@ -128,6 +129,8 @@ function _CustomSelect(
 					{ ...restProps }
 					size={ size }
 					store={ store }
+					// Match legacy behavior (move selection rather than open the popover)
+					showOnKeyDown={ ! isLegacy }
 				/>
 				<Styled.SelectPopover
 					gutter={ 12 }
