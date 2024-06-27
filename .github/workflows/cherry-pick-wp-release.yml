@@ -3,7 +3,7 @@ name: Auto Cherry-Pick
 on:
     push:
         branches:
-            - test/trunk
+            - trunk
 
 # Ensure that new jobs wait for the previous job to finish.
 concurrency:
