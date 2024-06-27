@@ -1,10 +1,9 @@
 name: Auto Cherry-Pick
 
 on:
-    pull_request:
-        types: [closed, labeled]
+    push:
         branches:
-            - trunk
+            - test/trunk
 
 # Ensure that new jobs wait for the previous job to finish.
 concurrency:
