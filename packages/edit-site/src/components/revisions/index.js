@@ -25,7 +25,7 @@ const {
 	ExperimentalBlockEditorProvider,
 	GlobalStylesContext,
 	useGlobalStylesOutputWithConfig,
-	ExperimentalBlockStyleVariationOverridesWithConfig,
+	__unstableBlockStyleVariationOverridesWithConfig,
 } = unlock( blockEditorPrivateApis );
 const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
 
@@ -93,7 +93,7 @@ function Revisions( { userConfig, blocks } ) {
 						 * so they can access any registered style overrides.
 						 */ }
 						<EditorStyles styles={ editorStyles } />
-						<ExperimentalBlockStyleVariationOverridesWithConfig
+						<__unstableBlockStyleVariationOverridesWithConfig
 							config={ mergedConfig }
 						/>
 					</ExperimentalBlockEditorProvider>

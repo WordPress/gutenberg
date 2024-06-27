@@ -69,18 +69,14 @@ function OverrideStyles( { override } ) {
  * This component is used to generate new block style variation overrides
  * based on an incoming theme config. If a matching style is found in the config,
  * a new override is created and returned. The overrides can be used in conjunction with
- * useStyleOverride to apply the new styles to the editor.
- * NOTE: This component is required to load global styles revisions config. Style variation overrides are
- * generated using the canvas's current global styles (see useBlockStyleVariation()). This component is,
- * however, due to be refactored and therefore it's use elsewhere is not recommended.
+ * useStyleOverride to apply the new styles to the editor. Its use is
+ * subject to change.
  *
  * @param {Object} props        Props.
  * @param {Object} props.config A global styles object, containing settings and styles.
- * @return {JSX.Element} An array of new block variation overrides.
+ * @return {JSX.Element|undefined} An array of new block variation overrides.
  */
-export function ExperimentalBlockStyleVariationOverridesWithConfig( {
-	config,
-} ) {
+export function __unstableBlockStyleVariationOverridesWithConfig( { config } ) {
 	const { getBlockStyles, overrides } = useSelect(
 		( select ) => ( {
 			getBlockStyles: select( blocksStore ).getBlockStyles,
@@ -91,8 +87,11 @@ export function ExperimentalBlockStyleVariationOverridesWithConfig( {
 	const { getBlockName } = useSelect( blockEditorStore );
 
 	const overridesWithConfig = useMemo( () => {
+		if ( ! overrides?.length ) {
+			return;
+		}
 		const newOverrides = [];
-		const clientIds = [];
+		const overriddenClientIds = [];
 		for ( const [ , override ] of overrides ) {
 			if (
 				override?.variation &&
@@ -101,7 +100,7 @@ export function ExperimentalBlockStyleVariationOverridesWithConfig( {
 				 * Because this component overwrites existing style overrides,
 				 * filter out any overrides that are already present in the store.
 				 */
-				! clientIds.includes( override.clientId )
+				! overriddenClientIds.includes( override.clientId )
 			) {
 				const blockName = getBlockName( override.clientId );
 				const configStyles =
@@ -161,12 +160,16 @@ export function ExperimentalBlockStyleVariationOverridesWithConfig( {
 						// correct CSS cascade is maintained.
 						clientId: override.clientId,
 					} );
-					clientIds.push( override.clientId );
+					overriddenClientIds.push( override.clientId );
 				}
 			}
 		}
 		return newOverrides;
-	}, [ config, overrides, getBlockStyles ] );
+	}, [ config, overrides, getBlockStyles, getBlockName ] );
+
+	if ( ! overridesWithConfig || ! overridesWithConfig.length ) {
+		return;
+	}
 
 	return (
 		<>

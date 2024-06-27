@@ -16,7 +16,6 @@ test.describe( 'Block Style Variations', () => {
 			requestUtils.activateTheme(
 				'gutenberg-test-themes/style-variations'
 			),
-			requestUtils.deleteAllPages(),
 		] );
 		stylesPostId = await requestUtils.getCurrentThemeGlobalStylesPostId();
 	} );
@@ -57,32 +56,43 @@ test.describe( 'Block Style Variations', () => {
 		await page.getByRole( 'tab', { name: 'Styles' } ).click();
 		await page
 			.getByRole( 'button', { name: 'Block Style Variation A' } )
-			.click( { force: true } );
+			.click();
 
-		// Check parent styles.
+		// Check parent styles have variation A styles.
 		await expect( firstGroup ).toHaveCSS( 'border-style', 'dotted' );
 		await expect( firstGroup ).toHaveCSS( 'border-width', '1px' );
 
-		// Check nested child and grandchild group block inherited styles.
+		// Check nested child and grandchild group block variation A inherited styles.
 		await expect( secondGroup ).toHaveCSS( 'border-style', 'solid' );
 		await expect( secondGroup ).toHaveCSS( 'border-width', '11px' );
 		await expect( thirdGroup ).toHaveCSS( 'border-style', 'solid' );
 		await expect( thirdGroup ).toHaveCSS( 'border-width', '11px' );
 
-		// Apply a block style to the first, nested Group block.
+		// Apply a block style to the nested child Group block.
 		await editor.selectBlocks( secondGroup );
 		await page.getByRole( 'tab', { name: 'Styles' } ).click();
 		await page
 			.getByRole( 'button', { name: 'Block Style Variation B' } )
-			.click( { force: true } );
+			.click();
 
-		// Check nested child styles.
+		// Check nested child styles have variation B styles.
 		await expect( secondGroup ).toHaveCSS( 'border-style', 'dashed' );
 		await expect( secondGroup ).toHaveCSS( 'border-width', '2px' );
 
-		// Check nested grandchild group block inherited styles.
+		// Check nested grandchild Group block variation B inherited styles.
 		await expect( thirdGroup ).toHaveCSS( 'border-style', 'groove' );
 		await expect( thirdGroup ).toHaveCSS( 'border-width', '22px' );
+
+		// Apply a block style to the nested grandchild Group block.
+		await editor.selectBlocks( thirdGroup );
+		await page.getByRole( 'tab', { name: 'Styles' } ).click();
+		await page
+			.getByRole( 'button', { name: 'Block Style Variation A' } )
+			.click();
+
+		// Check that the child's inner block styles from variation B are overridden by the grandchild's block style variation A.
+		await expect( thirdGroup ).toHaveCSS( 'border-style', 'dotted' );
+		await expect( thirdGroup ).toHaveCSS( 'border-width', '1px' );
 	} );
 
 	test( 'update block style variations in global styles and check revisions match styles', async ( {
@@ -108,16 +118,17 @@ test.describe( 'Block Style Variations', () => {
 		await page.getByRole( 'tab', { name: 'Styles' } ).click();
 		await page
 			.getByRole( 'button', { name: 'Block Style Variation A' } )
-			.click( { force: true } );
+			.click();
 
 		// Apply a block style to the first, nested Group block.
 		await editor.selectBlocks( secondGroup );
 		await page.getByRole( 'tab', { name: 'Styles' } ).click();
 		await page
 			.getByRole( 'button', { name: 'Block Style Variation B' } )
-			.click( { force: true } );
+			.click();
 
 		// Update user global styles with new block style variation values.
+		// First revision.
 		await siteEditorBlockStyleVariations.saveRevision( stylesPostId, {
 			blocks: {
 				'core/group': {
@@ -138,14 +149,41 @@ test.describe( 'Block Style Variations', () => {
 				},
 			},
 		} );
+		// The save button has been re-enabled.
+		await expect(
+			page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Save' } )
+		).toBeEnabled();
+		// Second revision (current).
+		await siteEditorBlockStyleVariations.saveRevision( stylesPostId, {
+			blocks: {
+				'core/group': {
+					variations: {
+						'block-style-variation-a': {
+							border: {
+								width: '7px',
+								style: 'dotted',
+							},
+						},
+						'block-style-variation-b': {
+							border: {
+								width: '8px',
+								style: 'dotted',
+							},
+						},
+					},
+				},
+			},
+		} );
 
 		// Check parent styles.
-		await expect( firstGroup ).toHaveCSS( 'border-style', 'outset' );
-		await expect( firstGroup ).toHaveCSS( 'border-width', '3px' );
+		await expect( firstGroup ).toHaveCSS( 'border-style', 'dotted' );
+		await expect( firstGroup ).toHaveCSS( 'border-width', '7px' );
 
 		// Check nested child styles.
-		await expect( secondGroup ).toHaveCSS( 'border-style', 'double' );
-		await expect( secondGroup ).toHaveCSS( 'border-width', '4px' );
+		await expect( secondGroup ).toHaveCSS( 'border-style', 'dotted' );
+		await expect( secondGroup ).toHaveCSS( 'border-width', '8px' );
 
 		// Check nested grandchild group block inherited styles.
 		await expect( thirdGroup ).toHaveCSS( 'border-style', 'groove' );
@@ -182,21 +220,46 @@ test.describe( 'Block Style Variations', () => {
 			.locator( '[data-type="core/group"]' )
 			.nth( 2 );
 
-		// Check parent styles.
+		// Check parent styles have current revision.
 		await expect( revisionFirstGroup ).toHaveCSS(
 			'border-style',
-			'outset'
+			'dotted'
 		);
+		await expect( revisionFirstGroup ).toHaveCSS( 'border-width', '7px' );
+
+		// Check nested child styles have current revision.
+		await expect( revisionSecondGroup ).toHaveCSS(
+			'border-style',
+			'dotted'
+		);
+		await expect( revisionSecondGroup ).toHaveCSS( 'border-width', '8px' );
+
+		// Check nested grandchild group block inherited styles from current revision.
+		await expect( revisionThirdGroup ).toHaveCSS(
+			'border-style',
+			'groove'
+		);
+		await expect( revisionThirdGroup ).toHaveCSS( 'border-width', '22px' );
+
+		// Click on previous revision.
+		await page
+			.getByRole( 'button', {
+				name: /^Changes saved by /,
+			} )
+			.nth( 1 )
+			.click();
+
+		// Check parent styles have previous revision.
 		await expect( revisionFirstGroup ).toHaveCSS( 'border-width', '3px' );
 
-		// Check nested child styles.
+		// Check nested child style have previous revision.
 		await expect( revisionSecondGroup ).toHaveCSS(
 			'border-style',
 			'double'
 		);
 		await expect( revisionSecondGroup ).toHaveCSS( 'border-width', '4px' );
 
-		// Check nested grandchild group block inherited styles.
+		// Check nested grandchild group block inherited styles from previous revision.
 		await expect( revisionThirdGroup ).toHaveCSS(
 			'border-style',
 			'groove'
