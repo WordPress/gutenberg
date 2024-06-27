@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Remove dependency on `@wordpress/i18n` ([#tbd](tbd)).
+-   Remove dependency on `@wordpress/i18n` ([#62934](https://github.com/WordPress/gutenberg/pull/62934)).
 
 ## 7.2.0 (2024-06-26)
 
