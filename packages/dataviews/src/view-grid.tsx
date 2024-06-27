@@ -22,9 +22,9 @@ import { __ } from '@wordpress/i18n';
 import ItemActions from './item-actions';
 import SingleSelectionCheckbox from './single-selection-checkbox';
 import { useHasAPossibleBulkAction } from './bulk-actions';
-import type { Action, AnyItem, NormalizedField, ViewGridProps } from './types';
+import type { Action, NormalizedField, ViewGridProps } from './types';
 
-interface GridItemProps< Item extends AnyItem > {
+interface GridItemProps< Item > {
 	selection: string[];
 	data: Item[];
 	onSelectionChange: ( items: Item[] ) => void;
@@ -38,7 +38,7 @@ interface GridItemProps< Item extends AnyItem > {
 	columnFields?: string[];
 }
 
-function GridItem< Item extends AnyItem >( {
+function GridItem< Item >( {
 	selection,
 	data,
 	onSelectionChange,
@@ -187,7 +187,7 @@ function GridItem< Item extends AnyItem >( {
 	);
 }
 
-export default function ViewGrid< Item extends AnyItem >( {
+export default function ViewGrid< Item >( {
 	actions,
 	data,
 	fields,
