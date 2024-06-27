@@ -7,7 +7,6 @@ import {
 	Button,
 	TextControl,
 	Modal,
-	Notice,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
@@ -79,18 +78,18 @@ export default function BlockRenameModal( {
 				} }
 			>
 				<VStack spacing="3">
-					{ hasOverridesWarning && (
-						<Notice isDismissible={ false } status="warning">
-							{ __(
-								'This block allows overrides. Changing the name can cause problems with content entered into instances of this pattern.'
-							) }
-						</Notice>
-					) }
 					<TextControl
 						__nextHasNoMarginBottom
 						__next40pxDefaultSize
 						value={ editedBlockName }
 						label={ __( 'Name' ) }
+						help={
+							hasOverridesWarning
+								? __(
+										'This block allows overrides. Changing the name can cause problems with content entered into instances of this pattern.'
+								  )
+								: undefined
+						}
 						placeholder={ originalBlockName }
 						onChange={ setEditedBlockName }
 						onFocus={ autoSelectInputText }
