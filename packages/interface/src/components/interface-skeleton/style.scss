@@ -82,9 +82,10 @@ html.interface-interface-skeleton__html-container {
 	display: flex;
 	flex-direction: column;
 
-	// Hide the Y overflow to avoid an extra scrollbar when an active popover
-	// extends vertically beyond the viewport.
-	overflow-y: auto;
+	// On Mobile the header is fixed to keep HTML as scrollable.
+	// Beyond the medium breakpoint, we allow the sidebar.
+	// The sidebar should scroll independently, so enable scroll here also.
+	overflow: auto;
 
 	// On Safari iOS on smaller viewports lack of a z-index causes the background
 	// to "bleed" through the header.
