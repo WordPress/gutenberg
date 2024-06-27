@@ -100,7 +100,15 @@ const usePublicTaxonomies = () => {
 	}, [ taxonomies ] );
 };
 
-function usePostTypeNeedsUniqueIdentifier( publicPostTypes ) {
+export function usePostTypeArchiveMenuItems() {
+	const publicPostTypes = usePublicPostTypes();
+	const postTypesWithArchives = useMemo(
+		() => publicPostTypes?.filter( ( postType ) => postType.has_archive ),
+		[ publicPostTypes ]
+	);
+	const existingTemplates = useExistingTemplates();
+	// We need to keep track of naming conflicts. If a conflict
+	// occurs, we need to add slug.
 	const postTypeLabels = useMemo(
 		() =>
 			publicPostTypes?.reduce( ( accumulator, { labels } ) => {
@@ -111,24 +119,12 @@ function usePostTypeNeedsUniqueIdentifier( publicPostTypes ) {
 			}, {} ),
 		[ publicPostTypes ]
 	);
-	return useCallback(
+	const needsUniqueIdentifier = useCallback(
 		( { labels, slug } ) => {
 			const singularName = labels.singular_name.toLowerCase();
 			return postTypeLabels[ singularName ] > 1 && singularName !== slug;
 		},
 		[ postTypeLabels ]
-	);
-}
-
-export function usePostTypeArchiveMenuItems() {
-	const publicPostTypes = usePublicPostTypes();
-	const postTypesWithArchives = useMemo(
-		() => publicPostTypes?.filter( ( postType ) => postType.has_archive ),
-		[ publicPostTypes ]
-	);
-	const existingTemplates = useExistingTemplates();
-	const needsUniqueIdentifier = usePostTypeNeedsUniqueIdentifier(
-		postTypesWithArchives
 	);
 	return useMemo(
 		() =>
@@ -184,8 +180,30 @@ export const usePostTypeMenuItems = ( onClickMenuItem ) => {
 	const publicPostTypes = usePublicPostTypes();
 	const existingTemplates = useExistingTemplates();
 	const defaultTemplateTypes = useDefaultTemplateTypes();
-	const needsUniqueIdentifier =
-		usePostTypeNeedsUniqueIdentifier( publicPostTypes );
+	// We need to keep track of naming conflicts. If a conflict
+	// occurs, we need to add slug.
+	const templateLabels = useMemo(
+		() =>
+			publicPostTypes?.reduce( ( accumulator, { labels } ) => {
+				const templateName = (
+					labels.template_name || labels.singular_name
+				).toLowerCase();
+				accumulator[ templateName ] =
+					( accumulator[ templateName ] || 0 ) + 1;
+				return accumulator;
+			}, {} ),
+		[ publicPostTypes ]
+	);
+	const needsUniqueIdentifier = useCallback(
+		( { labels, slug } ) => {
+			const templateName = (
+				labels.template_name || labels.singular_name
+			).toLowerCase();
+			return templateLabels[ templateName ] > 1 && templateName !== slug;
+		},
+		[ templateLabels ]
+	);
+
 	// `page`is a special case in template hierarchy.
 	const templatePrefixes = useMemo(
 		() =>
@@ -216,18 +234,27 @@ export const usePostTypeMenuItems = ( onClickMenuItem ) => {
 			const hasGeneralTemplate =
 				existingTemplateSlugs?.includes( generalTemplateSlug );
 			const _needsUniqueIdentifier = needsUniqueIdentifier( postType );
-			let menuItemTitle = sprintf(
-				// translators: %s: Name of the post type e.g: "Post".
-				__( 'Single item: %s' ),
-				labels.singular_name
-			);
-			if ( _needsUniqueIdentifier ) {
-				menuItemTitle = sprintf(
-					// translators: %1s: Name of the post type e.g: "Post"; %2s: Slug of the post type e.g: "book".
-					__( 'Single item: %1$s (%2$s)' ),
-					labels.singular_name,
-					slug
+			let menuItemTitle =
+				labels.template_name ||
+				sprintf(
+					// translators: %s: Name of the post type e.g: "Post".
+					__( 'Single item: %s' ),
+					labels.singular_name
 				);
+			if ( _needsUniqueIdentifier ) {
+				menuItemTitle = labels.template_name
+					? sprintf(
+							// translators: %1s: Name of the template e.g: "Single Item: Post"; %2s: Slug of the post type e.g: "book".
+							__( '%1$s (%2$s)' ),
+							labels.template_name,
+							slug
+					  )
+					: sprintf(
+							// translators: %1s: Name of the post type e.g: "Post"; %2s: Slug of the post type e.g: "book".
+							__( 'Single item: %1$s (%2$s)' ),
+							labels.singular_name,
+							slug
+					  );
 			}
 			const menuItem = defaultTemplateType
 				? {
@@ -337,9 +364,11 @@ export const useTaxonomiesMenuItems = ( onClickMenuItem ) => {
 	// occurs, we need to add slug.
 	const taxonomyLabels = publicTaxonomies?.reduce(
 		( accumulator, { labels } ) => {
-			const singularName = labels.singular_name.toLowerCase();
-			accumulator[ singularName ] =
-				( accumulator[ singularName ] || 0 ) + 1;
+			const templateName = (
+				labels.template_name || labels.singular_name
+			).toLowerCase();
+			accumulator[ templateName ] =
+				( accumulator[ templateName ] || 0 ) + 1;
 			return accumulator;
 		},
 		{}
@@ -348,8 +377,10 @@ export const useTaxonomiesMenuItems = ( onClickMenuItem ) => {
 		if ( [ 'category', 'post_tag' ].includes( slug ) ) {
 			return false;
 		}
-		const singularName = labels.singular_name.toLowerCase();
-		return taxonomyLabels[ singularName ] > 1 && singularName !== slug;
+		const templateName = (
+			labels.template_name || labels.singular_name
+		).toLowerCase();
+		return taxonomyLabels[ templateName ] > 1 && templateName !== slug;
 	};
 	const taxonomiesInfo = useEntitiesInfo( 'taxonomy', templatePrefixes );
 	const existingTemplateSlugs = ( existingTemplates || [] ).map(
@@ -371,14 +402,21 @@ export const useTaxonomiesMenuItems = ( onClickMenuItem ) => {
 				labels,
 				slug
 			);
-			let menuItemTitle = labels.singular_name;
+			let menuItemTitle = labels.template_name || labels.singular_name;
 			if ( _needsUniqueIdentifier ) {
-				menuItemTitle = sprintf(
-					// translators: %1s: Name of the taxonomy e.g: "Category"; %2s: Slug of the taxonomy e.g: "product_cat".
-					__( '%1$s (%2$s)' ),
-					labels.singular_name,
-					slug
-				);
+				menuItemTitle = labels.template_name
+					? sprintf(
+							// translators: %1s: Name of the template e.g: "Products by Category"; %2s: Slug of the taxonomy e.g: "product_cat".
+							__( '%1$s (%2$s)' ),
+							labels.template_name,
+							slug
+					  )
+					: sprintf(
+							// translators: %1s: Name of the taxonomy e.g: "Category"; %2s: Slug of the taxonomy e.g: "product_cat".
+							__( '%1$s (%2$s)' ),
+							labels.singular_name,
+							slug
+					  );
 			}
 			const menuItem = defaultTemplateType
 				? {

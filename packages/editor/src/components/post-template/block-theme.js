@@ -78,6 +78,7 @@ export default function BlockThemeControl( { id } ) {
 			toggleProps={ {
 				size: 'compact',
 				variant: 'tertiary',
+				tooltipPosition: 'middle left',
 			} }
 			label={ __( 'Template options' ) }
 			text={ decodeEntities( template.title ) }

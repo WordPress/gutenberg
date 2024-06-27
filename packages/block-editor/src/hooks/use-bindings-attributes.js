@@ -4,7 +4,7 @@
 import { store as blocksStore } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useRegistry, useSelect } from '@wordpress/data';
-import { useCallback } from '@wordpress/element';
+import { useCallback, useMemo } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 
 /**
@@ -28,6 +28,41 @@ const BLOCK_BINDINGS_ALLOWED_BLOCKS = {
 	'core/image': [ 'id', 'url', 'title', 'alt' ],
 	'core/button': [ 'url', 'text', 'linkTarget', 'rel' ],
 };
+
+const DEFAULT_ATTRIBUTE = '__default';
+
+/**
+ * Returns the bindings with the `__default` binding for pattern overrides
+ * replaced with the full-set of supported attributes. e.g.:
+ *
+ * bindings passed in: `{ __default: { source: 'core/pattern-overrides' } }`
+ * bindings returned: `{ content: { source: 'core/pattern-overrides' } }`
+ *
+ * @param {string} blockName The block name (e.g. 'core/paragraph').
+ * @param {Object} bindings  A block's bindings from the metadata attribute.
+ *
+ * @return {Object} The bindings with default replaced for pattern overrides.
+ */
+function replacePatternOverrideDefaultBindings( blockName, bindings ) {
+	// The `__default` binding currently only works for pattern overrides.
+	if (
+		bindings?.[ DEFAULT_ATTRIBUTE ]?.source === 'core/pattern-overrides'
+	) {
+		const supportedAttributes = BLOCK_BINDINGS_ALLOWED_BLOCKS[ blockName ];
+		const bindingsWithDefaults = {};
+		for ( const attributeName of supportedAttributes ) {
+			// If the block has mixed binding sources, retain any non pattern override bindings.
+			const bindingSource = bindings[ attributeName ]
+				? bindings[ attributeName ]
+				: { source: 'core/pattern-overrides' };
+			bindingsWithDefaults[ attributeName ] = bindingSource;
+		}
+
+		return bindingsWithDefaults;
+	}
+
+	return bindings;
+}
 
 /**
  * Based on the given block name,
@@ -61,8 +96,18 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 		const sources = useSelect( ( select ) =>
 			unlock( select( blocksStore ) ).getAllBlockBindingsSources()
 		);
-		const bindings = props.attributes.metadata?.bindings;
 		const { name, clientId, context } = props;
+		const hasPatternOverridesDefaultBinding =
+			props.attributes.metadata?.bindings?.[ DEFAULT_ATTRIBUTE ]
+				?.source === 'core/pattern-overrides';
+		const bindings = useMemo(
+			() =>
+				replacePatternOverrideDefaultBindings(
+					name,
+					props.attributes.metadata?.bindings
+				),
+			[ props.attributes.metadata?.bindings, name ]
+		);
 		const boundAttributes = useSelect( () => {
 			if ( ! bindings ) {
 				return;
@@ -128,8 +173,8 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 							continue;
 						}
 
-						const source =
-							sources[ bindings[ attributeName ].source ];
+						const binding = bindings[ attributeName ];
+						const source = sources[ binding?.source ];
 						if ( ! source?.setValue && ! source?.setValues ) {
 							continue;
 						}
@@ -157,12 +202,13 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 									attributeName,
 									value,
 								] of Object.entries( attributes ) ) {
+									const binding = bindings[ attributeName ];
 									source.setValue( {
 										registry,
 										context,
 										clientId,
 										attributeName,
-										args: bindings[ attributeName ].args,
+										args: binding.args,
 										value,
 									} );
 								}
@@ -170,7 +216,13 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 						}
 					}
 
-					if ( Object.keys( keptAttributes ).length ) {
+					// Only apply normal attribute updates to blocks
+					// that have partial bindings. Currently this is
+					// only skipped for pattern overrides sources.
+					if (
+						! hasPatternOverridesDefaultBinding &&
+						Object.keys( keptAttributes ).length
+					) {
 						setAttributes( keptAttributes );
 					}
 				} );
@@ -183,6 +235,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 				context,
 				setAttributes,
 				sources,
+				hasPatternOverridesDefaultBinding,
 			]
 		);
 

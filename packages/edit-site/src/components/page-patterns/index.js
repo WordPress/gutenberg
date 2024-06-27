@@ -46,10 +46,6 @@ import {
 	PATTERN_DEFAULT_CATEGORY,
 	OPERATOR_IS,
 } from '../../utils/constants';
-import {
-	duplicatePatternAction,
-	duplicateTemplatePartAction,
-} from './dataviews-pattern-actions';
 import usePatternSettings from './use-pattern-settings';
 import { unlock } from '../../lock-unlock';
 import usePatterns from './use-patterns';
@@ -80,7 +76,6 @@ const DEFAULT_VIEW = {
 	search: '',
 	page: 1,
 	perPage: 20,
-	hiddenFields: [],
 	layout: {
 		...defaultConfigPerViewType[ LAYOUT_GRID ],
 	},
@@ -90,15 +85,12 @@ const DEFAULT_VIEW = {
 const SYNC_FILTERS = [
 	{
 		value: PATTERN_SYNC_TYPES.full,
-		label: _x( 'Synced', 'Option that shows all synchronized patterns' ),
+		label: _x( 'Synced', 'pattern (singular)' ),
 		description: __( 'Patterns that are kept in sync across the site.' ),
 	},
 	{
 		value: PATTERN_SYNC_TYPES.unsynced,
-		label: _x(
-			'Not synced',
-			'Option that shows all patterns that are not synchronized'
-		),
+		label: _x( 'Not synced', 'pattern (singular)' ),
 		description: __(
 			'Patterns that can be changed freely without affecting the site.'
 		),
@@ -120,7 +112,7 @@ function PreviewWrapper( { item, onClick, ariaDescribedBy, children } ) {
 	);
 }
 
-function Preview( { item, categoryId, viewType } ) {
+function Preview( { item, viewType } ) {
 	const descriptionId = useId();
 	const isUserPattern = item.type === PATTERN_TYPES.user;
 	const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
@@ -130,8 +122,6 @@ function Preview( { item, categoryId, viewType } ) {
 	const { onClick } = useLink( {
 		postType: item.type,
 		postId: isUserPattern ? item.id : item.name,
-		categoryId,
-		categoryType: isTemplatePart ? item.type : PATTERN_TYPES.theme,
 		canvas: 'edit',
 	} );
 
@@ -195,14 +185,11 @@ function Author( { item, viewType } ) {
 	);
 }
 
-function Title( { item, categoryId } ) {
+function Title( { item } ) {
 	const isUserPattern = item.type === PATTERN_TYPES.user;
-	const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
 	const { onClick } = useLink( {
 		postType: item.type,
 		postId: isUserPattern ? item.id : item.name,
-		categoryId,
-		categoryType: isTemplatePart ? item.type : PATTERN_TYPES.theme,
 		canvas: 'edit',
 	} );
 	return (
@@ -245,25 +232,19 @@ function Title( { item, categoryId } ) {
 
 export default function DataviewsPatterns() {
 	const {
-		params: { categoryType, categoryId: categoryIdFromURL },
+		params: { postType, categoryId: categoryIdFromURL },
 	} = useLocation();
-	const type = categoryType || PATTERN_TYPES.theme;
+	const type = postType || PATTERN_TYPES.user;
 	const categoryId = categoryIdFromURL || PATTERN_DEFAULT_CATEGORY;
 	const [ view, setView ] = useState( DEFAULT_VIEW );
-	const isUncategorizedThemePatterns =
-		type === PATTERN_TYPES.theme && categoryId === 'uncategorized';
 	const previousCategoryId = usePrevious( categoryId );
 	const viewSyncStatus = view.filters?.find(
 		( { field } ) => field === 'sync-status'
 	)?.value;
-	const { patterns, isResolving } = usePatterns(
-		type,
-		isUncategorizedThemePatterns ? '' : categoryId,
-		{
-			search: view.search,
-			syncStatus: viewSyncStatus,
-		}
-	);
+	const { patterns, isResolving } = usePatterns( type, categoryId, {
+		search: view.search,
+		syncStatus: viewSyncStatus,
+	} );
 
 	const { records } = useEntityRecords( 'postType', TEMPLATE_PART_POST_TYPE, {
 		per_page: -1,
@@ -288,11 +269,7 @@ export default function DataviewsPatterns() {
 				header: __( 'Preview' ),
 				id: 'preview',
 				render: ( { item } ) => (
-					<Preview
-						item={ item }
-						categoryId={ categoryId }
-						viewType={ view.type }
-					/>
+					<Preview item={ item } viewType={ view.type } />
 				),
 				enableSorting: false,
 				enableHiding: false,
@@ -301,14 +278,12 @@ export default function DataviewsPatterns() {
 			{
 				header: __( 'Title' ),
 				id: 'title',
-				render: ( { item } ) => (
-					<Title item={ item } categoryId={ categoryId } />
-				),
+				render: ( { item } ) => <Title item={ item } />,
 				enableHiding: false,
 			},
 		];
 
-		if ( type === PATTERN_TYPES.theme ) {
+		if ( type === PATTERN_TYPES.user ) {
 			_fields.push( {
 				header: __( 'Sync status' ),
 				id: 'sync-status',
@@ -319,13 +294,19 @@ export default function DataviewsPatterns() {
 						<span
 							className={ `edit-site-patterns__field-sync-status-${ item.syncStatus }` }
 						>
-							{ SYNC_FILTERS.find(
-								( { value } ) => value === item.syncStatus
-							)?.label ||
-								SYNC_FILTERS.find(
-									( { value } ) =>
-										value === PATTERN_SYNC_TYPES.unsynced
-								).label }
+							{
+								(
+									SYNC_FILTERS.find(
+										( { value } ) =>
+											value === item.syncStatus
+									) ||
+									SYNC_FILTERS.find(
+										( { value } ) =>
+											value ===
+											PATTERN_SYNC_TYPES.unsynced
+									)
+								).label
+							}
 						</span>
 					);
 				},
@@ -353,7 +334,7 @@ export default function DataviewsPatterns() {
 		}
 
 		return _fields;
-	}, [ view.type, categoryId, type, authors ] );
+	}, [ view.type, type, authors ] );
 
 	// Reset the page number when the category changes.
 	useEffect( () => {
@@ -372,21 +353,21 @@ export default function DataviewsPatterns() {
 		return filterSortAndPaginate( patterns, viewWithoutFilters, fields );
 	}, [ patterns, view, fields, type ] );
 
-	const templatePartActions = usePostActions( TEMPLATE_PART_POST_TYPE );
-	const patternActions = usePostActions( PATTERN_TYPES.user );
+	const templatePartActions = usePostActions( {
+		postType: TEMPLATE_PART_POST_TYPE,
+		context: 'list',
+	} );
+	const patternActions = usePostActions( {
+		postType: PATTERN_TYPES.user,
+		context: 'list',
+	} );
 	const editAction = useEditPostAction();
 
 	const actions = useMemo( () => {
 		if ( type === TEMPLATE_PART_POST_TYPE ) {
-			return [
-				editAction,
-				duplicateTemplatePartAction,
-				...templatePartActions,
-			].filter( Boolean );
+			return [ editAction, ...templatePartActions ].filter( Boolean );
 		}
-		return [ editAction, duplicatePatternAction, ...patternActions ].filter(
-			Boolean
-		);
+		return [ editAction, ...patternActions ].filter( Boolean );
 	}, [ editAction, type, templatePartActions, patternActions ] );
 	const onChangeView = useCallback(
 		( newView ) => {

@@ -6,7 +6,7 @@ The Gutenberg plugin is continuously enhancing existing features and creating ne
 
 During a WordPress release, new features, bugfixes and other changes are "synced" between the Gutenberg plugin and WordPress Core. Consistent naming and directory structures make this process easier by preventing naming conflicts and compartmentalizing release-specific code.
 
-The following documentation is intended to act as a guide only. If you're unsure about naming or where to place new PHP files, please don't hesitate to ping other contributors on Github or ask in the #core-editor channel on [WordPress Slack](https://make.wordpress.org/chat/).
+The following documentation is intended to act as a guide only. If you're unsure about naming or where to place new PHP files, please don't hesitate to ping other contributors on GitHub or ask in the #core-editor channel on [WordPress Slack](https://make.wordpress.org/chat/).
 
 ## File structure
 
@@ -194,10 +194,10 @@ Existing comments in `lib/load.php` should act as a guide.
 
 If you've changed or added PHP files to the Gutenberg plugin, you'll need to confirm whether the changes are to be synced to WordPress Core, and therefore featured in the next release of WordPress.
 
-The Gutenberg Github pull request in question should be labeled with the `Needs PHP backport` label if the changes are to be synced to Core.
+The Gutenberg GitHub pull request in question should be labeled with the `Needs PHP backport` label if the changes are to be synced to Core.
 
-If so, it is recommended to create a [new Trac ticket](https://core.trac.wordpress.org/newticket) and submit a pull request to the [WordPress Core Github repository](https://github.com/WordPress/wordpress-develop) soon after your pull request is merged.
+If so, it is recommended to create a [new Trac ticket](https://core.trac.wordpress.org/newticket) and submit a pull request to the [WordPress Core GitHub repository](https://github.com/WordPress/wordpress-develop) soon after your pull request is merged.
 
-So too, if you've made changes in WordPress Core to code that also lives in the Gutenberg plugin, these changes will need to be synced (often called "backporting") to Gutenberg. The relevant Gutenberg Github pull request should be labeled with the `Backport from WordPress Core` label.
+So too, if you've made changes in WordPress Core to code that also lives in the Gutenberg plugin, these changes will need to be synced (often called "backporting") to Gutenberg. The relevant Gutenberg GitHub pull request should be labeled with the `Backport from WordPress Core` label.
 
 If you're unsure, you can always ask for help in the #core-editor channel in [WordPress Slack](https://make.wordpress.org/chat/).

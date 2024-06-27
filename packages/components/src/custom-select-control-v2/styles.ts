@@ -10,14 +10,25 @@ import styled from '@emotion/styled';
  */
 import { COLORS, CONFIG } from '../utils';
 import { space } from '../utils/space';
-import type { CustomSelectButtonProps } from './types';
+import { chevronIconSize } from '../select-control/styles/select-control-styles';
+import type { CustomSelectButtonSize } from './types';
 
 const ITEM_PADDING = space( 2 );
+
+const truncateStyles = css`
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+`;
 
 export const WithHintWrapper = styled.div`
 	display: flex;
 	justify-content: space-between;
 	flex: 1;
+`;
+
+export const SelectedExperimentalHintWrapper = styled.div`
+	${ truncateStyles }
 `;
 
 export const SelectedExperimentalHintItem = styled.span`
@@ -46,7 +57,7 @@ export const Select = styled( Ariakit.Select, {
 	size,
 	hasCustomRenderProp,
 }: {
-	size: NonNullable< CustomSelectButtonProps[ 'size' ] >;
+	size: NonNullable< CustomSelectButtonSize[ 'size' ] >;
 	hasCustomRenderProp: boolean;
 } ) => {
 	const heightProperty = hasCustomRenderProp ? 'minHeight' : 'height';
@@ -55,19 +66,18 @@ export const Select = styled( Ariakit.Select, {
 		const sizes = {
 			compact: {
 				[ heightProperty ]: 32,
-				paddingInlineStart: space( 2 ),
-				paddingInlineEnd: space( 1 ),
+				paddingInlineStart: 8,
+				paddingInlineEnd: 8 + chevronIconSize,
 			},
 			default: {
 				[ heightProperty ]: 40,
-				paddingInlineStart: space( 4 ),
-				paddingInlineEnd: space( 3 ),
+				paddingInlineStart: 16,
+				paddingInlineEnd: 16 + chevronIconSize,
 			},
 			small: {
 				[ heightProperty ]: 24,
-				paddingInlineStart: space( 2 ),
-				paddingInlineEnd: space( 1 ),
-				fontSize: 11,
+				paddingInlineStart: 8,
+				paddingInlineEnd: 8 + chevronIconSize,
 			},
 		};
 
@@ -75,29 +85,46 @@ export const Select = styled( Ariakit.Select, {
 	};
 
 	return css`
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
+		display: block;
 		background-color: ${ COLORS.theme.background };
-		border: 1px solid ${ COLORS.ui.border };
-		border-radius: 2px;
+		border: none;
+		color: ${ COLORS.theme.foreground };
 		cursor: pointer;
+		font-family: inherit;
 		font-size: ${ CONFIG.fontSize };
+		text-align: start;
 		width: 100%;
+
 		&[data-focus-visible] {
-			outline-style: solid;
+			outline: none; // handled by InputBase component
 		}
-		&[aria-expanded='true'] {
-			outline: 1.5px solid ${ COLORS.theme.accent };
-		}
+
 		${ getSize() }
+		${ ! hasCustomRenderProp && truncateStyles }
 	`;
 } );
 
 export const SelectPopover = styled( Ariakit.SelectPopover )`
+	display: flex;
+	flex-direction: column;
+
+	background-color: ${ COLORS.theme.background };
 	border-radius: 2px;
-	background: ${ COLORS.theme.background };
 	border: 1px solid ${ COLORS.theme.foreground };
+
+	/* z-index(".components-popover") */
+	z-index: 1000000;
+
+	max-height: min( var( --popover-available-height, 400px ), 400px );
+	overflow: auto;
+	overscroll-behavior: contain;
+
+	// The smallest size without overflowing the container.
+	min-width: min-content;
+
+	&[data-focus-visible] {
+		outline: none; // outline will be on the trigger, rather than the popover
+	}
 `;
 
 export const SelectItem = styled( Ariakit.SelectItem )`

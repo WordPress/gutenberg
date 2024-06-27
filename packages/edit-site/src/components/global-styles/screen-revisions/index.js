@@ -81,20 +81,9 @@ function ScreenRevisions() {
 	};
 
 	const restoreRevision = ( revision ) => {
-		setUserConfig( () => ( {
-			styles: revision?.styles,
-			settings: revision?.settings,
-		} ) );
+		setUserConfig( () => revision );
 		setIsLoadingRevisionWithUnsavedChanges( false );
 		onCloseRevisions();
-	};
-
-	const selectRevision = ( revision ) => {
-		setCurrentlySelectedRevision( {
-			styles: revision?.styles || {},
-			settings: revision?.settings || {},
-			id: revision?.id,
-		} );
 	};
 
 	useEffect( () => {
@@ -128,11 +117,7 @@ function ScreenRevisions() {
 		 * See: https://github.com/WordPress/gutenberg/issues/55866
 		 */
 		if ( shouldSelectFirstItem ) {
-			setCurrentlySelectedRevision( {
-				styles: firstRevision?.styles || {},
-				settings: firstRevision?.settings || {},
-				id: firstRevision?.id,
-			} );
+			setCurrentlySelectedRevision( firstRevision );
 		}
 	}, [ shouldSelectFirstItem, firstRevision ] );
 
@@ -180,7 +165,7 @@ function ScreenRevisions() {
 					/>
 				) ) }
 			<RevisionsButtons
-				onChange={ selectRevision }
+				onChange={ setCurrentlySelectedRevision }
 				selectedRevisionId={ currentlySelectedRevisionId }
 				userRevisions={ currentRevisions }
 				canApplyRevision={ isLoadButtonEnabled }
@@ -213,6 +198,7 @@ function ScreenRevisions() {
 					onCancel={ () =>
 						setIsLoadingRevisionWithUnsavedChanges( false )
 					}
+					size="medium"
 				>
 					{ __(
 						'Are you sure you want to apply this revision? Any unsaved changes will be lost.'

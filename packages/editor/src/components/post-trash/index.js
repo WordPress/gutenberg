@@ -14,6 +14,11 @@ import { useState } from '@wordpress/element';
  */
 import { store as editorStore } from '../../store';
 
+/**
+ * Displays the Post Trash Button and Confirm Dialog in the Editor.
+ *
+ * @return {JSX.Element|null} The rendered PostTrash component.
+ */
 export default function PostTrash() {
 	const { isNew, isDeleting, postId } = useSelect( ( select ) => {
 		const store = select( editorStore );
@@ -55,6 +60,7 @@ export default function PostTrash() {
 				onConfirm={ handleConfirm }
 				onCancel={ () => setShowConfirmDialog( false ) }
 				confirmButtonText={ __( 'Move to trash' ) }
+				size="medium"
 			>
 				{ __(
 					'Are you sure you want to move this post to the trash?'

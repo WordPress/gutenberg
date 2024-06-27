@@ -45,7 +45,13 @@ export function SidebarNavigationItemGlobalStyles( props ) {
 		[]
 	);
 	if ( hasGlobalStyleVariations ) {
-		return <SidebarNavigationItem { ...props } path="/wp_global_styles" />;
+		return (
+			<SidebarNavigationItem
+				{ ...props }
+				params={ { path: '/wp_global_styles' } }
+				uid="global-styles-navigation-item"
+			/>
+		);
 	}
 	return (
 		<SidebarNavigationItem
@@ -90,7 +96,7 @@ function SidebarNavigationScreenGlobalStylesContent() {
 			>
 				<StyleVariationsContainer gap={ gap } />
 				{ colorVariations?.length && (
-					<ColorVariations title={ __( 'Colors' ) } gap={ gap } />
+					<ColorVariations title={ __( 'Palettes' ) } gap={ gap } />
 				) }
 				{ typographyVariations?.length && (
 					<TypographyVariations

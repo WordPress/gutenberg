@@ -8,27 +8,14 @@ import {
 	OPERATOR_IS_ANY,
 	OPERATOR_IS_NONE,
 } from './constants';
-import type { AnyItem, NormalizedField } from './types';
+import type { NormalizedField } from './types';
 
-export function sanitizeOperators< Item extends AnyItem >(
-	field: NormalizedField< Item >
-) {
+export function sanitizeOperators< Item >( field: NormalizedField< Item > ) {
 	let operators = field.filterBy?.operators;
 
 	// Assign default values.
 	if ( ! operators || ! Array.isArray( operators ) ) {
 		operators = [ OPERATOR_IS_ANY, OPERATOR_IS_NONE ];
-	}
-
-	// Transform legacy in, notIn operators to is, isNot.
-	// To be removed in the future.
-	if ( operators.includes( 'in' ) ) {
-		operators = operators.filter( ( operator ) => operator !== 'is' );
-		operators.push( 'is' );
-	}
-	if ( operators.includes( 'notIn' ) ) {
-		operators = operators.filter( ( operator ) => operator !== 'notIn' );
-		operators.push( 'isNot' );
 	}
 
 	// Make sure only valid operators are used.

@@ -235,7 +235,7 @@ function ScreenBlock( { name, variation } ) {
 	return (
 		<>
 			<ScreenHeader
-				title={ variation ? currentBlockStyle.label : blockType.title }
+				title={ variation ? currentBlockStyle?.label : blockType.title }
 			/>
 			<BlockPreviewPanel name={ name } variation={ variation } />
 			{ hasVariationsPanel && (

@@ -8,9 +8,10 @@ export type SortDirection = 'asc' | 'desc';
 /**
  * Generic option type.
  */
-interface Option< Value extends any = any > {
+export interface Option< Value extends any = any > {
 	value: Value;
 	label: string;
+	description?: string;
 }
 
 interface FilterByConfig {
@@ -28,22 +29,20 @@ interface FilterByConfig {
 	isPrimary?: boolean;
 }
 
-type DeprecatedOperator = 'in' | 'notIn';
-type Operator =
+export type Operator =
 	| 'is'
 	| 'isNot'
 	| 'isAny'
 	| 'isNone'
 	| 'isAll'
-	| 'isNotAll'
-	| DeprecatedOperator;
+	| 'isNotAll';
 
-export type AnyItem = Record< string, any >;
+export type ItemRecord = Record< string, unknown >;
 
 /**
  * A dataview field for a specific property of a data type.
  */
-export interface Field< Item extends AnyItem > {
+export type Field< Item > = {
 	/**
 	 * The unique identifier of the field.
 	 */
@@ -53,12 +52,6 @@ export interface Field< Item extends AnyItem > {
 	 * The label of the field. Defaults to the id.
 	 */
 	header?: string;
-
-	/**
-	 * Callback used to retrieve the value of the field from the item.
-	 * Defaults to `item[ field.id ]`.
-	 */
-	getValue?: ( args: { item: Item } ) => any;
 
 	/**
 	 * Callback used to render the field. Defaults to `field.getValue`.
@@ -104,17 +97,34 @@ export interface Field< Item extends AnyItem > {
 	 * Filter config for the field.
 	 */
 	filterBy?: FilterByConfig | undefined;
-}
+} & ( Item extends ItemRecord
+	? {
+			/**
+			 * Callback used to retrieve the value of the field from the item.
+			 * Defaults to `item[ field.id ]`.
+			 */
+			getValue?: ( args: { item: Item } ) => any;
+	  }
+	: {
+			/**
+			 * Callback used to retrieve the value of the field from the item.
+			 * Defaults to `item[ field.id ]`.
+			 */
+			getValue: ( args: { item: Item } ) => any;
+	  } );
 
-export type NormalizedField< Item extends AnyItem > = Field< Item > &
-	Required< Pick< Field< Item >, 'header' | 'getValue' | 'render' > >;
+export type NormalizedField< Item > = Field< Item > & {
+	header: string;
+	getValue: ( args: { item: Item } ) => any;
+	render: ( args: { item: Item } ) => ReactNode;
+};
 
 /**
  * A collection of dataview fields for a data type.
  */
-export type Fields< Item extends AnyItem > = Field< Item >[];
+export type Fields< Item > = Field< Item >[];
 
-export type Data< Item extends AnyItem > = Item[];
+export type Data< Item > = Item[];
 
 /**
  * The filters applied to the dataset.
@@ -134,6 +144,43 @@ export interface Filter {
 	 * The value to filter by.
 	 */
 	value: any;
+}
+
+export interface NormalizedFilter {
+	/**
+	 * The field to filter by.
+	 */
+	field: string;
+
+	/**
+	 * The field name.
+	 */
+	name: string;
+
+	/**
+	 * The list of options to pick from when using the field as a filter.
+	 */
+	elements: Option[];
+
+	/**
+	 * Is a single selection filter.
+	 */
+	singleSelection: boolean;
+
+	/**
+	 * The list of operators supported by the field.
+	 */
+	operators: Operator[];
+
+	/**
+	 * Whether the filter is visible.
+	 */
+	isVisible: boolean;
+
+	/**
+	 * Whether it is a primary filter.
+	 */
+	isPrimary: boolean;
 }
 
 interface ViewBase {
@@ -180,7 +227,7 @@ interface ViewBase {
 	/**
 	 * The hidden fields.
 	 */
-	hiddenFields: string[];
+	hiddenFields?: string[];
 }
 
 export interface ViewTable extends ViewBase {
@@ -190,12 +237,12 @@ export interface ViewTable extends ViewBase {
 		/**
 		 * The field to use as the primary field.
 		 */
-		primaryField: string;
+		primaryField?: string;
 
 		/**
 		 * The field to use as the media field.
 		 */
-		mediaField: string;
+		mediaField?: string;
 	};
 }
 
@@ -206,12 +253,12 @@ export interface ViewList extends ViewBase {
 		/**
 		 * The field to use as the primary field.
 		 */
-		primaryField: string;
+		primaryField?: string;
 
 		/**
 		 * The field to use as the media field.
 		 */
-		mediaField: string;
+		mediaField?: string;
 	};
 }
 
@@ -222,28 +269,28 @@ export interface ViewGrid extends ViewBase {
 		/**
 		 * The field to use as the primary field.
 		 */
-		primaryField: string;
+		primaryField?: string;
 
 		/**
 		 * The field to use as the media field.
 		 */
-		mediaField: string;
+		mediaField?: string;
 
 		/**
 		 * The fields to use as columns.
 		 */
-		columnFields: string[];
+		columnFields?: string[];
 
 		/**
 		 * The fields to use as badge fields.
 		 */
-		badgeFields: string[];
+		badgeFields?: string[];
 	};
 }
 
 export type View = ViewList | ViewGrid | ViewTable;
 
-interface ActionBase< Item extends AnyItem > {
+interface ActionBase< Item > {
 	/**
 	 * The unique identifier of the action.
 	 */
@@ -251,8 +298,10 @@ interface ActionBase< Item extends AnyItem > {
 
 	/**
 	 * The label of the action.
+	 * In case we want to adjust the label based on the selected items,
+	 * a function can be provided.
 	 */
-	label: string;
+	label: string | ( ( items: Item[] ) => string );
 
 	/**
 	 * The icon of the action. (Either a string or an SVG element)
@@ -287,30 +336,17 @@ interface ActionBase< Item extends AnyItem > {
 	supportsBulk?: boolean;
 }
 
-export interface ActionModal< Item extends AnyItem >
-	extends ActionBase< Item > {
-	/**
-	 * The callback to execute when the action has finished.
-	 */
-	onActionPerformed: ( ( items: Item[] ) => void ) | undefined;
-
-	/**
-	 * The callback to execute when the action is triggered.
-	 */
-	onActionStart: ( ( items: Item[] ) => void ) | undefined;
-
+export interface ActionModal< Item > extends ActionBase< Item > {
 	/**
 	 * Modal to render when the action is triggered.
 	 */
 	RenderModal: ( {
 		items,
 		closeModal,
-		onActionStart,
 		onActionPerformed,
 	}: {
 		items: Item[];
 		closeModal?: () => void;
-		onActionStart?: ( items: Item[] ) => void;
 		onActionPerformed?: ( items: Item[] ) => void;
 	} ) => ReactElement;
 
@@ -325,27 +361,47 @@ export interface ActionModal< Item extends AnyItem >
 	modalHeader?: string;
 }
 
-export interface ActionButton< Item extends AnyItem >
-	extends ActionBase< AnyItem > {
+export interface ActionButton< Item > extends ActionBase< Item > {
 	/**
 	 * The callback to execute when the action is triggered.
 	 */
-	callback: ( items: Item[] ) => void;
+	callback: (
+		items: Item[],
+		context: {
+			registry: any;
+			onActionPerformed?: ( items: Item[] ) => void;
+		}
+	) => void;
 }
 
-export type Action< Item extends AnyItem > =
-	| ActionModal< Item >
-	| ActionButton< Item >;
+export type Action< Item > = ActionModal< Item > | ActionButton< Item >;
 
-export interface ViewProps< Item extends AnyItem, ViewType extends ViewBase > {
+export interface ViewBaseProps< Item > {
 	actions: Action< Item >[];
 	data: Item[];
 	fields: NormalizedField< Item >[];
 	getItemId: ( item: Item ) => string;
 	isLoading?: boolean;
-	onChangeView( view: ViewType ): void;
+	onChangeView( view: View ): void;
 	onSelectionChange: ( items: Item[] ) => void;
 	selection: string[];
 	setOpenedFilter: ( fieldId: string ) => void;
-	view: ViewType;
+	view: View;
 }
+
+export interface ViewTableProps< Item > extends ViewBaseProps< Item > {
+	view: ViewTable;
+}
+
+export interface ViewListProps< Item > extends ViewBaseProps< Item > {
+	view: ViewList;
+}
+
+export interface ViewGridProps< Item > extends ViewBaseProps< Item > {
+	view: ViewGrid;
+}
+
+export type ViewProps< Item > =
+	| ViewTableProps< Item >
+	| ViewGridProps< Item >
+	| ViewListProps< Item >;

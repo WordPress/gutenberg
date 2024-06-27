@@ -31,7 +31,7 @@ export function mergeBaseAndUserConfigs( base, user ) {
 }
 
 function useGlobalStylesUserConfig() {
-	const { globalStylesId, isReady, settings, styles } = useSelect(
+	const { globalStylesId, isReady, settings, styles, _links } = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord, hasFinishedResolution } =
 				select( coreStore );
@@ -65,6 +65,7 @@ function useGlobalStylesUserConfig() {
 				isReady: hasResolved,
 				settings: record?.settings,
 				styles: record?.styles,
+				_links: record?._links,
 			};
 		},
 		[]
@@ -76,21 +77,35 @@ function useGlobalStylesUserConfig() {
 		return {
 			settings: settings ?? {},
 			styles: styles ?? {},
+			_links: _links ?? {},
 		};
-	}, [ settings, styles ] );
+	}, [ settings, styles, _links ] );
 
 	const setConfig = useCallback(
-		( callback, options = {} ) => {
+		/**
+		 * Set the global styles config.
+		 * @param {Function|Object} callbackOrObject If the callbackOrObject is a function, pass the current config to the callback so the consumer can merge values.
+		 *                                           Otherwise, overwrite the current config with the incoming object.
+		 * @param {Object}          options          Options for editEntityRecord Core selector.
+		 */
+		( callbackOrObject, options = {} ) => {
 			const record = getEditedEntityRecord(
 				'root',
 				'globalStyles',
 				globalStylesId
 			);
+
 			const currentConfig = {
 				styles: record?.styles ?? {},
 				settings: record?.settings ?? {},
+				_links: record?._links ?? {},
 			};
-			const updatedConfig = callback( currentConfig );
+
+			const updatedConfig =
+				typeof callbackOrObject === 'function'
+					? callbackOrObject( currentConfig )
+					: callbackOrObject;
+
 			editEntityRecord(
 				'root',
 				'globalStyles',
@@ -98,11 +113,12 @@ function useGlobalStylesUserConfig() {
 				{
 					styles: cleanEmptyObject( updatedConfig.styles ) || {},
 					settings: cleanEmptyObject( updatedConfig.settings ) || {},
+					_links: cleanEmptyObject( updatedConfig._links ) || {},
 				},
 				options
 			);
 		},
-		[ globalStylesId ]
+		[ globalStylesId, editEntityRecord, getEditedEntityRecord ]
 	);
 
 	return [ isReady, config, setConfig ];
@@ -122,12 +138,15 @@ export function useGlobalStylesContext() {
 	const [ isUserConfigReady, userConfig, setUserConfig ] =
 		useGlobalStylesUserConfig();
 	const [ isBaseConfigReady, baseConfig ] = useGlobalStylesBaseConfig();
+
 	const mergedConfig = useMemo( () => {
 		if ( ! baseConfig || ! userConfig ) {
 			return {};
 		}
+
 		return mergeBaseAndUserConfigs( baseConfig, userConfig );
 	}, [ userConfig, baseConfig ] );
+
 	const context = useMemo( () => {
 		return {
 			isReady: isUserConfigReady && isBaseConfigReady,

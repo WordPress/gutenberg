@@ -291,21 +291,28 @@ const selectUserPatterns = createSelector(
 );
 
 export const usePatterns = (
-	categoryType,
+	postType,
 	categoryId,
 	{ search = '', syncStatus } = {}
 ) => {
 	return useSelect(
 		( select ) => {
-			if ( categoryType === TEMPLATE_PART_POST_TYPE ) {
+			if ( postType === TEMPLATE_PART_POST_TYPE ) {
 				return selectTemplatePartsAsPatterns(
 					select,
 					categoryId,
 					search
 				);
-			} else if ( categoryType === PATTERN_TYPES.theme ) {
-				return selectPatterns( select, categoryId, syncStatus, search );
-			} else if ( categoryType === PATTERN_TYPES.user ) {
+			} else if ( postType === PATTERN_TYPES.user && !! categoryId ) {
+				const appliedCategory =
+					categoryId === 'uncategorized' ? '' : categoryId;
+				return selectPatterns(
+					select,
+					appliedCategory,
+					syncStatus,
+					search
+				);
+			} else if ( postType === PATTERN_TYPES.user ) {
 				return selectUserPatterns( select, syncStatus, search );
 			}
 			return {
@@ -313,7 +320,7 @@ export const usePatterns = (
 				isResolving: false,
 			};
 		},
-		[ categoryId, categoryType, search, syncStatus ]
+		[ categoryId, postType, search, syncStatus ]
 	);
 };
 

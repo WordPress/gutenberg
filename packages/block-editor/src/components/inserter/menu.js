@@ -31,7 +31,6 @@ import { MediaTab, MediaCategoryPanel } from './media-tab';
 import InserterSearchResults from './search-results';
 import useInsertionPoint from './hooks/use-insertion-point';
 import InserterTabs from './tabs';
-import { useZoomOut } from '../../hooks/use-zoom-out';
 import { store as blockEditorStore } from '../../store';
 
 const NOOP = () => {};
@@ -46,7 +45,7 @@ function InserterMenu(
 		showMostUsedBlocks,
 		__experimentalFilterValue = '',
 		shouldFocusBlock = true,
-		__experimentalOnPatternCategorySelection = NOOP,
+		onPatternCategorySelection,
 		onClose,
 		__experimentalInitialTab,
 		__experimentalInitialCategory,
@@ -82,8 +81,13 @@ function InserterMenu(
 	const blockTypesTabRef = useRef();
 
 	const onInsert = useCallback(
-		( blocks, meta, shouldForceFocusBlock ) => {
-			onInsertBlocks( blocks, meta, shouldForceFocusBlock );
+		( blocks, meta, shouldForceFocusBlock, _rootClientId ) => {
+			onInsertBlocks(
+				blocks,
+				meta,
+				shouldForceFocusBlock,
+				_rootClientId
+			);
 			onSelect();
 
 			// Check for focus loss due to filtering blocks by selected block type
@@ -112,7 +116,7 @@ function InserterMenu(
 
 	const onHover = useCallback(
 		( item ) => {
-			onToggleInsertionPoint( !! item );
+			onToggleInsertionPoint( item );
 			setHoveredItem( item );
 		},
 		[ onToggleInsertionPoint, setHoveredItem ]
@@ -129,9 +133,9 @@ function InserterMenu(
 		( patternCategory, filter ) => {
 			setSelectedPatternCategory( patternCategory );
 			setPatternFilter( filter );
-			__experimentalOnPatternCategorySelection();
+			onPatternCategorySelection?.();
 		},
-		[ setSelectedPatternCategory, __experimentalOnPatternCategorySelection ]
+		[ setSelectedPatternCategory, onPatternCategorySelection ]
 	);
 
 	const showPatternPanel =
@@ -282,9 +286,6 @@ function InserterMenu(
 		showMediaPanel,
 	] );
 
-	// When the pattern panel is showing, we want to use zoom out mode
-	useZoomOut( showPatternPanel );
-
 	const handleSetSelectedTab = ( value ) => {
 		// If no longer on patterns tab remove the category setting.
 		if ( value !== 'patterns' ) {
@@ -345,4 +346,16 @@ function InserterMenu(
 	);
 }
 
-export default forwardRef( InserterMenu );
+export const PrivateInserterMenu = forwardRef( InserterMenu );
+
+function PublicInserterMenu( props, ref ) {
+	return (
+		<PrivateInserterMenu
+			{ ...props }
+			onPatternCategorySelection={ NOOP }
+			ref={ ref }
+		/>
+	);
+}
+
+export default forwardRef( PublicInserterMenu );

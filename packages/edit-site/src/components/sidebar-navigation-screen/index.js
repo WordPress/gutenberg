@@ -76,7 +76,7 @@ export default function SidebarNavigationScreen( {
 				justify="flex-start"
 			>
 				<HStack
-					spacing={ 4 }
+					spacing={ 3 }
 					alignment="flex-start"
 					className="edit-site-sidebar-navigation-screen__title-icon"
 				>

@@ -72,6 +72,7 @@ export default function PostSchedulePanel() {
 							size="compact"
 							className="editor-post-schedule__dialog-toggle"
 							variant="tertiary"
+							tooltipPosition="middle left"
 							onClick={ onToggle }
 							aria-label={ sprintf(
 								// translators: %s: Current post date.

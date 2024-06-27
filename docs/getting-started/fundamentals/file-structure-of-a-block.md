@@ -29,7 +29,7 @@ The [build process](docs/block-editor/getting-started/fundamentals/javascript-in
 
 The `block.json` file contains the [block's metadata](docs/block-editor/reference-guides/block-api/block-metadata/), streamlining its definition and registration across client-side and server-side environments. 
 
-This file includes the block name, description, [attributes](docs/block-editor/reference-guides/block-api/block-attributes.md), [supports](docs/block-editor/reference-guides/block-api/block-supports.md), and more, as well as the locations of essential files responsible for the block's functionality, appearance, and styling. 
+This file includes the block name, description, [attributes](docs/block-editor/reference-guides/block-api/block-attributes/), [supports](docs/block-editor/reference-guides/block-api/block-supports/), and more, as well as the locations of essential files responsible for the block's functionality, appearance, and styling. 
 
 When a build process is applied, the `block.json` file and the other generated files are moved to a designated folder, often the `build` folder. Consequently, the file paths specified within `block.json` point to these processed, bundled versions of the files. 
 

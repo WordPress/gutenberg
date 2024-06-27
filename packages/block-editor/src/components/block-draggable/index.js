@@ -53,7 +53,7 @@ const BlockDraggable = ( {
 
 			return {
 				srcRootClientId: rootClientId,
-				isDraggable: canMoveBlocks( clientIds, rootClientId ),
+				isDraggable: canMoveBlocks( clientIds ),
 				icon: variation?.icon || _getBlockType( blockName )?.icon,
 				visibleInserter: isBlockInsertionPointVisible(),
 				getBlockType: _getBlockType,

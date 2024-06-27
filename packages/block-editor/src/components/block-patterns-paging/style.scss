@@ -42,4 +42,22 @@
 			}
 		}
 	}
+
+	@media screen and (min-width: $break-large) {
+		.block-editor-patterns__grid-pagination {
+			flex-direction: row;
+			.block-editor-patterns__grid-pagination-previous,
+			.block-editor-patterns__grid-pagination-next {
+				flex-direction: row;
+			}
+		}
+	}
+}
+
+.block-editor-block-patterns-list .block-editor-patterns__grid-pagination {
+	flex-direction: column;
+	.block-editor-patterns__grid-pagination-previous,
+	.block-editor-patterns__grid-pagination-next {
+		flex-direction: column;
+	}
 }

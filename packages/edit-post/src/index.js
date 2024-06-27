@@ -7,20 +7,26 @@ import {
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
 import deprecated from '@wordpress/deprecated';
-import { createRoot } from '@wordpress/element';
+import { createRoot, StrictMode } from '@wordpress/element';
 import { dispatch, select } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	registerLegacyWidgetBlock,
 	registerWidgetGroupBlock,
 } from '@wordpress/widgets';
-import { store as editorStore } from '@wordpress/editor';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import './hooks';
-import Editor from './editor';
+import Layout from './components/layout';
+import { unlock } from './lock-unlock';
+
+const { BackButton: __experimentalMainDashboardButton } =
+	unlock( editorPrivateApis );
 
 /**
  * Initializes and returns an instance of Editor.
@@ -80,7 +86,7 @@ export function initializeEditor(
 	registerCoreBlocks();
 	registerLegacyWidgetBlock( { inserter: false } );
 	registerWidgetGroupBlock( { inserter: false } );
-	if ( process.env.IS_GUTENBERG_PLUGIN ) {
+	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 		__experimentalRegisterExperimentalCoreBlocks( {
 			enableFSEBlocks: settings.__unstableEnableFullSiteEditingBlocks,
 		} );
@@ -131,12 +137,14 @@ export function initializeEditor(
 	window.addEventListener( 'drop', ( e ) => e.preventDefault(), false );
 
 	root.render(
-		<Editor
-			settings={ settings }
-			postId={ postId }
-			postType={ postType }
-			initialEdits={ initialEdits }
-		/>
+		<StrictMode>
+			<Layout
+				settings={ settings }
+				postId={ postId }
+				postType={ postType }
+				initialEdits={ initialEdits }
+			/>
+		</StrictMode>
 	);
 
 	return root;
@@ -152,8 +160,7 @@ export function reinitializeEditor() {
 	} );
 }
 
-export { default as __experimentalFullscreenModeClose } from './components/header/fullscreen-mode-close';
-export { default as __experimentalMainDashboardButton } from './components/header/main-dashboard-button';
-
+export { default as __experimentalFullscreenModeClose } from './components/back-button/fullscreen-mode-close';
+export { __experimentalMainDashboardButton };
 export { store } from './store';
 export * from './deprecated';

@@ -28,6 +28,9 @@ function gutenberg_enable_experiments() {
 	if ( gutenberg_is_experiment_enabled( 'gutenberg-full-page-client-side-navigation' ) ) {
 		wp_add_inline_script( 'wp-block-library', 'window.__experimentalFullPageClientSideNavigation = true', 'before' );
 	}
+	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-zoomed-out-patterns-tab', $gutenberg_experiments ) ) {
+		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnableZoomedOutPatternsTab = true', 'before' );
+	}
 }
 
 add_action( 'admin_init', 'gutenberg_enable_experiments' );
