@@ -58,7 +58,7 @@ function DimensionsTool( {
 	scaleOptions, // Default options handled by ScaleTool.
 	defaultScale = 'fill', // Match CSS default value for object-fit.
 	unitsOptions, // Default options handled by UnitControl.
-	parentLayoutType,
+	tools = [ 'aspectRatio', 'widthHeight', 'scale' ],
 } ) {
 	// Coerce undefined and CSS default values to be null.
 	const width =
@@ -93,46 +93,48 @@ function DimensionsTool( {
 
 	return (
 		<>
-			<AspectRatioTool
-				panelId={ panelId }
-				options={ aspectRatioOptions }
-				defaultValue={ defaultAspectRatio }
-				value={ aspectRatioValue }
-				onChange={ ( nextAspectRatio ) => {
-					const nextValue = { ...value };
+			{ tools.includes( 'aspectRatio' ) && (
+				<AspectRatioTool
+					panelId={ panelId }
+					options={ aspectRatioOptions }
+					defaultValue={ defaultAspectRatio }
+					value={ aspectRatioValue }
+					onChange={ ( nextAspectRatio ) => {
+						const nextValue = { ...value };
 
-					// 'auto' is CSS default, so it gets treated as null.
-					nextAspectRatio =
-						nextAspectRatio === 'auto' ? null : nextAspectRatio;
+						// 'auto' is CSS default, so it gets treated as null.
+						nextAspectRatio =
+							nextAspectRatio === 'auto' ? null : nextAspectRatio;
 
-					setLastAspectRatio( nextAspectRatio );
+						setLastAspectRatio( nextAspectRatio );
 
-					// Update aspectRatio.
-					if ( ! nextAspectRatio ) {
-						delete nextValue.aspectRatio;
-					} else {
-						nextValue.aspectRatio = nextAspectRatio;
-					}
+						// Update aspectRatio.
+						if ( ! nextAspectRatio ) {
+							delete nextValue.aspectRatio;
+						} else {
+							nextValue.aspectRatio = nextAspectRatio;
+						}
 
-					// Auto-update scale.
-					if ( ! nextAspectRatio ) {
-						delete nextValue.scale;
-					} else if ( lastScale ) {
-						nextValue.scale = lastScale;
-					} else {
-						nextValue.scale = defaultScale;
-						setLastScale( defaultScale );
-					}
+						// Auto-update scale.
+						if ( ! nextAspectRatio ) {
+							delete nextValue.scale;
+						} else if ( lastScale ) {
+							nextValue.scale = lastScale;
+						} else {
+							nextValue.scale = defaultScale;
+							setLastScale( defaultScale );
+						}
 
-					// Auto-update width and height.
-					if ( 'custom' !== nextAspectRatio && width && height ) {
-						delete nextValue.height;
-					}
+						// Auto-update width and height.
+						if ( 'custom' !== nextAspectRatio && width && height ) {
+							delete nextValue.height;
+						}
 
-					onChange( nextValue );
-				} }
-			/>
-			{ parentLayoutType !== 'grid' && (
+						onChange( nextValue );
+					} }
+				/>
+			) }
+			{ tools.includes( 'widthHeight' ) && (
 				<WidthHeightTool
 					panelId={ panelId }
 					units={ unitsOptions }
@@ -186,7 +188,7 @@ function DimensionsTool( {
 					} }
 				/>
 			) }
-			{ showScaleControl && parentLayoutType !== 'grid' && (
+			{ tools.includes( 'scale' ) && showScaleControl && (
 				<ScaleTool
 					panelId={ panelId }
 					options={ scaleOptions }

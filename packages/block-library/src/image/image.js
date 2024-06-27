@@ -399,7 +399,6 @@ export default function Image( {
 			defaultAspectRatio="auto"
 			scaleOptions={ scaleOptions }
 			unitsOptions={ dimensionsUnitsOptions }
-			parentLayoutType={ parentLayoutType }
 		/>
 	);
 
@@ -410,7 +409,7 @@ export default function Image( {
 				setAttributes( { aspectRatio: newAspectRatio } );
 			} }
 			defaultAspectRatio="auto"
-			parentLayoutType={ parentLayoutType }
+			tools={ [ 'aspectRatio' ] }
 		/>
 	);
 
@@ -749,7 +748,10 @@ export default function Image( {
 							/>
 						</ToolsPanelItem>
 					) }
-					{ isResizable && dimensionsControl }
+					{ isResizable &&
+						( parentLayoutType === 'grid'
+							? aspectRatioControl
+							: dimensionsControl ) }
 					{ !! imageSizeOptions.length && (
 						<ResolutionTool
 							value={ sizeSlug }
