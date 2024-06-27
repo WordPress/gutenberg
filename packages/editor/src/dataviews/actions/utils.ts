@@ -6,8 +6,19 @@ import { decodeEntities } from '@wordpress/html-entities';
 /**
  * Internal dependencies
  */
-import { TEMPLATE_ORIGINS } from '../../store/constants';
+import {
+	TEMPLATE_ORIGINS,
+	TEMPLATE_PART_POST_TYPE,
+	TEMPLATE_POST_TYPE,
+} from '../../store/constants';
+
 import type { Post, TemplateOrTemplatePart } from '../types';
+
+export function isTemplateOrTemplatePart(
+	p: Post
+): p is TemplateOrTemplatePart {
+	return p.type === TEMPLATE_POST_TYPE || p.type === TEMPLATE_PART_POST_TYPE;
+}
 
 export function getItemTitle( item: Post ) {
 	if ( typeof item.title === 'string' ) {

@@ -7,21 +7,15 @@ type PostStatus =
 	| 'auto-draft'
 	| 'trash';
 
-type ReservedPostTypes = 'template' | 'template-part';
-
 export interface BasePost {
 	status?: PostStatus;
 	title: string | { rendered: string };
+	type: string;
 }
-
 export interface TemplateOrTemplatePart extends BasePost {
 	type: 'template' | 'template-part';
 	source: string;
 	has_theme_file: boolean;
 }
 
-export interface OtherPost extends BasePost {
-	type: Exclude< string, ReservedPostTypes >;
-}
-
-export type Post = TemplateOrTemplatePart | OtherPost;
+export type Post = TemplateOrTemplatePart | BasePost;

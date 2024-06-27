@@ -20,14 +20,14 @@ import type { StoreDescriptor } from '@wordpress/data';
  * Internal dependencies
  */
 import {
-	TEMPLATE_PART_POST_TYPE,
-	TEMPLATE_POST_TYPE,
-} from '../../store/constants';
-import { isTemplateRemovable, getItemTitle } from './utils';
+	isTemplateRemovable,
+	getItemTitle,
+	isTemplateOrTemplatePart,
+} from './utils';
 // @ts-ignore
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import type { Post, TemplateOrTemplatePart } from '../types';
+import type { Post } from '../types';
 
 const { PATTERN_TYPES } = unlock( patternsPrivateApis );
 
@@ -40,12 +40,8 @@ const deletePostAction: Action< Post > = {
 	isPrimary: true,
 	icon: trash,
 	isEligible( post ) {
-		if (
-			[ TEMPLATE_POST_TYPE, TEMPLATE_PART_POST_TYPE ].includes(
-				post.type
-			)
-		) {
-			return isTemplateRemovable( post as TemplateOrTemplatePart );
+		if ( isTemplateOrTemplatePart( post ) ) {
+			return isTemplateRemovable( post );
 		}
 		// We can only remove user patterns.
 		return post.type === PATTERN_TYPES.user;
