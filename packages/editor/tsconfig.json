@@ -3,7 +3,8 @@
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"rootDir": "src",
-		"declarationDir": "build-types"
+		"declarationDir": "build-types",
+		"checkJs": false
 	},
 	"references": [
 		{ "path": "../a11y" },
@@ -32,5 +33,5 @@
 		{ "path": "../warning" },
 		{ "path": "../wordcount" }
 	],
-	"include": [ "src/**/*.ts", "src/**/*.tsx" ]
+	"include": [ "src" ]
 }
