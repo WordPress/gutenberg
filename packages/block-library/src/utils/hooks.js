@@ -6,6 +6,7 @@ import { useLayoutEffect, useEffect, useRef } from '@wordpress/element';
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Returns whether the current user can edit the given entity.
@@ -33,6 +34,7 @@ export function useCanEditEntity( kind, name, recordId ) {
  */
 export function useUploadMediaFromBlobURL( args = {} ) {
 	const latestArgs = useRef( args );
+	const hasUploadStarted = useRef( false );
 	const { getSettings } = useSelect( blockEditorStore );
 
 	useLayoutEffect( () => {
@@ -40,6 +42,12 @@ export function useUploadMediaFromBlobURL( args = {} ) {
 	} );
 
 	useEffect( () => {
+		// Uploading is a special effect that can't be canceled via the cleanup method.
+		// The extra check avoids duplicate uploads in development mode (React.StrictMode).
+		if ( hasUploadStarted.current ) {
+			return;
+		}
+
 		if (
 			! latestArgs.current.url ||
 			! isBlobURL( latestArgs.current.url )
@@ -55,6 +63,8 @@ export function useUploadMediaFromBlobURL( args = {} ) {
 		const { url, allowedTypes, onChange, onError } = latestArgs.current;
 		const { mediaUpload } = getSettings();
 
+		hasUploadStarted.current = true;
+
 		mediaUpload( {
 			filesList: [ file ],
 			allowedTypes,
@@ -65,11 +75,26 @@ export function useUploadMediaFromBlobURL( args = {} ) {
 
 				revokeBlobURL( url );
 				onChange( media );
+				hasUploadStarted.current = false;
 			},
 			onError: ( message ) => {
 				revokeBlobURL( url );
 				onError( message );
+				hasUploadStarted.current = false;
 			},
 		} );
 	}, [ getSettings ] );
+}
+
+export function useToolsPanelDropdownMenuProps() {
+	const isMobile = useViewportMatch( 'medium', '<' );
+	return ! isMobile
+		? {
+				popoverProps: {
+					placement: 'left-start',
+					// For non-mobile, inner sidebar width (248px) - button width (24px) - border (1px) + padding (16px) + spacing (20px)
+					offset: 259,
+				},
+		  }
+		: {};
 }

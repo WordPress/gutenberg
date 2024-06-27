@@ -3,7 +3,7 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { PanelBody, PanelRow } from '@wordpress/components';
+import { PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useAsyncList } from '@wordpress/compose';
 import { __experimentalBlockPatternsList as BlockPatternsList } from '@wordpress/block-editor';
@@ -62,17 +62,9 @@ function PostTransform() {
 
 	return (
 		<PanelBody
-			title={ __( 'Transform into:' ) }
+			title={ __( 'Design' ) }
 			initialOpen={ record.type === TEMPLATE_PART_POST_TYPE }
 		>
-			<PanelRow>
-				<p>
-					{ __(
-						'Choose a predefined pattern to switch up the look of your template.' // TODO - make this dynamic?
-					) }
-				</p>
-			</PanelRow>
-
 			<TemplatesList
 				availableTemplates={ availablePatterns }
 				onSelect={ onTemplateSelect }

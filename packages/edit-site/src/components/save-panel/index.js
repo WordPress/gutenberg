@@ -151,11 +151,9 @@ export default function SavePanel() {
 			>
 				<Button
 					variant="secondary"
-					className={ clsx(
-						'edit-site-editor__toggle-save-panel-button'
-					) }
+					className="edit-site-editor__toggle-save-panel-button"
 					onClick={ () => setIsSaveViewOpened( true ) }
-					aria-haspopup={ 'dialog' }
+					aria-haspopup="dialog"
 					disabled={ disabled }
 					__experimentalIsFocusable
 				>

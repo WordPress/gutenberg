@@ -22,16 +22,15 @@ import { store as interfaceStore } from '@wordpress/interface';
 /**
  * Internal dependencies
  */
-import PageAttributesPanel from '../page-attributes/panel';
 import PatternOverridesPanel from '../pattern-overrides-panel';
 import PluginDocumentSettingPanel from '../plugin-document-setting-panel';
 import PluginSidebar from '../plugin-sidebar';
-import PostLastRevisionPanel from '../post-last-revision/panel';
 import PostSummary from './post-summary';
 import PostTaxonomiesPanel from '../post-taxonomies/panel';
 import PostTransformPanel from '../post-transform-panel';
 import SidebarHeader from './header';
 import TemplateContentPanel from '../template-content-panel';
+import TemplatePartContentPanel from '../template-part-content-panel';
 import useAutoSwitchEditorSidebars from '../provider/use-auto-switch-editor-sidebars';
 import { sidebars } from './constants';
 import { unlock } from '../../lock-unlock';
@@ -116,10 +115,9 @@ const SidebarContent = ( {
 					{ renderingMode !== 'post-only' && (
 						<TemplateContentPanel />
 					) }
+					<TemplatePartContentPanel />
 					<PostTransformPanel />
-					<PostLastRevisionPanel />
 					<PostTaxonomiesPanel />
-					<PageAttributesPanel />
 					<PatternOverridesPanel />
 					{ extraPanels }
 				</Tabs.TabPanel>

@@ -7,9 +7,9 @@ import { CheckboxControl } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import type { Field, AnyItem } from './types';
+import type { Field } from './types';
 
-interface SingleSelectionCheckboxProps< Item extends AnyItem > {
+interface SingleSelectionCheckboxProps< Item > {
 	selection: string[];
 	onSelectionChange: ( selection: Item[] ) => void;
 	item: Item;
@@ -19,7 +19,7 @@ interface SingleSelectionCheckboxProps< Item extends AnyItem > {
 	disabled: boolean;
 }
 
-export default function SingleSelectionCheckbox< Item extends AnyItem >( {
+export default function SingleSelectionCheckbox< Item >( {
 	selection,
 	onSelectionChange,
 	item,
@@ -29,7 +29,7 @@ export default function SingleSelectionCheckbox< Item extends AnyItem >( {
 	disabled,
 }: SingleSelectionCheckboxProps< Item > ) {
 	const id = getItemId( item );
-	const isSelected = selection.includes( id );
+	const isSelected = ! disabled && selection.includes( id );
 	let selectionLabel;
 	if ( primaryField?.getValue && item ) {
 		// eslint-disable-next-line @wordpress/valid-sprintf

@@ -12,9 +12,9 @@ import AddFilter from './add-filter';
 import ResetFilters from './reset-filters';
 import { sanitizeOperators } from './utils';
 import { ALL_OPERATORS, OPERATOR_IS, OPERATOR_IS_NOT } from './constants';
-import type { AnyItem, NormalizedField, NormalizedFilter, View } from './types';
+import type { NormalizedField, NormalizedFilter, View } from './types';
 
-interface FiltersProps< Item extends AnyItem > {
+interface FiltersProps< Item > {
 	fields: NormalizedField< Item >[];
 	view: View;
 	onChangeView: ( view: View ) => void;
@@ -22,7 +22,7 @@ interface FiltersProps< Item extends AnyItem > {
 	setOpenedFilter: ( openedFilter: string | null ) => void;
 }
 
-const Filters = memo( function Filters< Item extends AnyItem >( {
+function _Filters< Item >( {
 	fields,
 	view,
 	onChangeView,
@@ -117,6 +117,9 @@ const Filters = memo( function Filters< Item extends AnyItem >( {
 			{ filterComponents }
 		</HStack>
 	);
-} );
+}
+
+// A type assertion is used here to keep the type argument.
+const Filters = memo( _Filters ) as typeof _Filters;
 
 export default Filters;

@@ -167,6 +167,7 @@ Settings related to spacing.
 | padding | boolean | false |  |
 | units | array | px,em,rem,vh,vw,% |  |
 | customSpacingSize | boolean | true |  |
+| defaultSpacingSizes | boolean | true |  |
 | spacingSizes | array |  | name, size, slug |
 | spacingScale | object |  |  |
 

@@ -13,6 +13,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { useMemo, useState } from '@wordpress/element';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -79,6 +80,11 @@ function ExcerptPanel() {
 	);
 }
 
+/**
+ * Is rendered if the post type supports excerpts and allows editing the excerpt.
+ *
+ * @return {JSX.Element} The rendered PostExcerptPanel component.
+ */
 export default function PostExcerptPanel() {
 	return (
 		<PostExcerptCheck>
@@ -168,7 +174,7 @@ function PrivateExcerpt() {
 	}
 	const excerptText = !! excerpt && (
 		<Text align="left" numberOfLines={ 4 } truncate>
-			{ excerpt }
+			{ decodeEntities( excerpt ) }
 		</Text>
 	);
 	if ( ! allowEditing ) {

@@ -20,7 +20,7 @@ import { settings } from '@wordpress/icons';
 import { unlock } from './lock-unlock';
 import { SORTING_DIRECTIONS, sortLabels } from './constants';
 import { VIEW_LAYOUTS } from './layouts';
-import type { AnyItem, NormalizedField, View } from './types';
+import type { NormalizedField, View } from './types';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -42,19 +42,19 @@ interface PageSizeMenuProps {
 	onChangeView: ( view: View ) => void;
 }
 
-interface FieldsVisibilityMenuProps< Item extends AnyItem > {
+interface FieldsVisibilityMenuProps< Item > {
 	view: View;
 	onChangeView: ( view: View ) => void;
 	fields: NormalizedField< Item >[];
 }
 
-interface SortMenuProps< Item extends AnyItem > {
+interface SortMenuProps< Item > {
 	fields: NormalizedField< Item >[];
 	view: View;
 	onChangeView: ( view: View ) => void;
 }
 
-interface ViewActionsProps< Item extends AnyItem > {
+interface ViewActionsProps< Item > {
 	fields: NormalizedField< Item >[];
 	view: View;
 	onChangeView: ( view: View ) => void;
@@ -161,7 +161,7 @@ function PageSizeMenu( { view, onChangeView }: PageSizeMenuProps ) {
 	);
 }
 
-function FieldsVisibilityMenu< Item extends AnyItem >( {
+function FieldsVisibilityMenu< Item >( {
 	view,
 	onChangeView,
 	fields,
@@ -215,7 +215,7 @@ function FieldsVisibilityMenu< Item extends AnyItem >( {
 	);
 }
 
-function SortMenu< Item extends AnyItem >( {
+function SortMenu< Item >( {
 	fields,
 	view,
 	onChangeView,
@@ -303,7 +303,7 @@ function SortMenu< Item extends AnyItem >( {
 	);
 }
 
-const ViewActions = memo( function ViewActions< Item extends AnyItem >( {
+function _ViewActions< Item >( {
 	fields,
 	view,
 	onChangeView,
@@ -339,6 +339,9 @@ const ViewActions = memo( function ViewActions< Item extends AnyItem >( {
 			</DropdownMenuGroup>
 		</DropdownMenu>
 	);
-} );
+}
+
+// A type assertion is used here to keep the type argument.
+const ViewActions = memo( _ViewActions ) as typeof _ViewActions;
 
 export default ViewActions;

@@ -22,18 +22,9 @@ import { __ } from '@wordpress/i18n';
 import ItemActions from './item-actions';
 import SingleSelectionCheckbox from './single-selection-checkbox';
 import { useHasAPossibleBulkAction } from './bulk-actions';
-import type {
-	Action,
-	AnyItem,
-	NormalizedField,
-	ViewGrid as ViewGridType,
-	ViewProps,
-} from './types';
+import type { Action, NormalizedField, ViewGridProps } from './types';
 
-interface ViewGridProps< Item extends AnyItem >
-	extends ViewProps< Item, ViewGridType > {}
-
-interface GridItemProps< Item extends AnyItem > {
+interface GridItemProps< Item > {
 	selection: string[];
 	data: Item[];
 	onSelectionChange: ( items: Item[] ) => void;
@@ -47,7 +38,7 @@ interface GridItemProps< Item extends AnyItem > {
 	columnFields?: string[];
 }
 
-function GridItem< Item extends AnyItem >( {
+function GridItem< Item >( {
 	selection,
 	data,
 	onSelectionChange,
@@ -140,7 +131,7 @@ function GridItem< Item extends AnyItem >( {
 						return (
 							<FlexItem
 								key={ field.id }
-								className={ 'dataviews-view-grid__field-value' }
+								className="dataviews-view-grid__field-value"
 							>
 								{ renderedValue }
 							</FlexItem>
@@ -196,7 +187,7 @@ function GridItem< Item extends AnyItem >( {
 	);
 }
 
-export default function ViewGrid< Item extends AnyItem >( {
+export default function ViewGrid< Item >( {
 	actions,
 	data,
 	fields,
@@ -215,7 +206,7 @@ export default function ViewGrid< Item extends AnyItem >( {
 	const { visibleFields, badgeFields } = fields.reduce(
 		( accumulator: Record< string, NormalizedField< Item >[] >, field ) => {
 			if (
-				view.hiddenFields.includes( field.id ) ||
+				view.hiddenFields?.includes( field.id ) ||
 				[ view.layout.mediaField, view.layout.primaryField ].includes(
 					field.id
 				)

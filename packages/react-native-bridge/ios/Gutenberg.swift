@@ -221,6 +221,11 @@ public class Gutenberg: UIResponder {
         var data: [String: Any] = ["isConnected": isConnected]
         bridgeModule.sendEventIfNeeded(.connectionStatusChange, body: data)
     }
+    
+    public func onContentUpdate(content: String) {
+        var payload: [String: Any] = ["content": content]
+        bridgeModule.sendEventIfNeeded(.onContentUpdate, body: payload)
+    }
 
     private func properties(from editorSettings: GutenbergEditorSettings?) -> [String : Any] {
         var settingsUpdates = [String : Any]()

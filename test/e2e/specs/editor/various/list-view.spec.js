@@ -1120,7 +1120,7 @@ test.describe( 'List View', () => {
 				'Pressing keyboard shortcut should also work when the menu is opened and focused'
 			)
 			.toMatchObject( [
-				{ name: 'core/paragraph', selected: true, focused: false },
+				{ name: 'core/paragraph', selected: true, focused: true },
 				{ name: 'core/file', selected: false, focused: false },
 			] );
 		await expect(

@@ -30,7 +30,9 @@ test.describe( 'Site editor block removal prompt', () => {
 			.click();
 
 		// Select and try to remove Query Loop block
-		const listView = page.getByRole( 'region', { name: 'List View' } );
+		const listView = page.getByRole( 'region', {
+			name: 'Document Overview',
+		} );
 		await listView.getByRole( 'link', { name: 'Query Loop' } ).click();
 		await page.keyboard.press( 'Backspace' );
 
@@ -52,7 +54,9 @@ test.describe( 'Site editor block removal prompt', () => {
 			.click();
 
 		// Select and open child blocks of Query Loop block
-		const listView = page.getByRole( 'region', { name: 'List View' } );
+		const listView = page.getByRole( 'region', {
+			name: 'Document Overview',
+		} );
 		await listView.getByRole( 'link', { name: 'Query Loop' } ).click();
 		await page.keyboard.press( 'ArrowRight' );
 
@@ -79,7 +83,9 @@ test.describe( 'Site editor block removal prompt', () => {
 			.click();
 
 		// Select Query Loop list item
-		const listView = page.getByRole( 'region', { name: 'List View' } );
+		const listView = page.getByRole( 'region', {
+			name: 'Document Overview',
+		} );
 		await listView.getByRole( 'link', { name: 'Query Loop' } ).click();
 
 		// Reveal its inner blocks in the list view

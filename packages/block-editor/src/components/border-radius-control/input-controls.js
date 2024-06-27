@@ -80,7 +80,7 @@ export default function BoxInputControls( {
 								onUnitChange={ createHandleOnUnitChange(
 									corner
 								) }
-								size={ '__unstable-large' }
+								size="__unstable-large"
 							/>
 						</div>
 					</Tooltip>

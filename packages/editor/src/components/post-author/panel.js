@@ -58,7 +58,6 @@ export function PostAuthor() {
 			<PostPanelRow label={ __( 'Author' ) } ref={ setPopoverAnchor }>
 				<Dropdown
 					popoverProps={ popoverProps }
-					className="editor-post-author__panel-dropdown"
 					contentClassName="editor-post-author__panel-dialog"
 					focusOnMount
 					renderToggle={ ( { isOpen, onToggle } ) => (

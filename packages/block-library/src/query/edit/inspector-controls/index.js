@@ -34,7 +34,7 @@ import {
 	isControlAllowed,
 	useTaxonomies,
 } from '../../utils';
-import { TOOLSPANEL_DROPDOWNMENU_PROPS } from '../../../utils/constants';
+import { useToolsPanelDropdownMenuProps } from '../../../utils/hooks';
 
 const { BlockInfo } = unlock( blockEditorPrivateApis );
 
@@ -128,12 +128,15 @@ export default function QueryInspectorControls( props ) {
 		showAuthorControl ||
 		showSearchControl ||
 		showParentControl;
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	return (
 		<>
-			<BlockInfo>
-				<CreateNewPostLink { ...props } />
-			</BlockInfo>
+			{ !! postType && (
+				<BlockInfo>
+					<CreateNewPostLink postType={ postType } />
+				</BlockInfo>
+			) }
 			{ showSettingsPanel && (
 				<PanelBody title={ __( 'Settings' ) }>
 					{ showInheritControl && (
@@ -221,7 +224,7 @@ export default function QueryInspectorControls( props ) {
 						} );
 						setQuerySearch( '' );
 					} }
-					dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
+					dropdownMenuProps={ dropdownMenuProps }
 				>
 					{ showTaxControl && (
 						<ToolsPanelItem
