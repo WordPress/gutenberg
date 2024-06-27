@@ -21,9 +21,11 @@ import { VIEW_LAYOUTS } from './layouts';
 import BulkActions from './bulk-actions';
 import { normalizeFields } from './normalize-fields';
 import BulkActionsToolbar from './bulk-actions-toolbar';
-import type { Action, AnyItem, Field, View, ViewBaseProps } from './types';
+import type { Action, Field, View, ViewBaseProps } from './types';
 
-interface DataViewsProps< Item extends AnyItem > {
+type ItemWithId = { id: string };
+
+type DataViewsProps< Item > = {
 	view: View;
 	onChangeView: ( view: View ) => void;
 	fields: Field< Item >[];
@@ -31,7 +33,6 @@ interface DataViewsProps< Item extends AnyItem > {
 	searchLabel?: string;
 	actions?: Action< Item >[];
 	data: Item[];
-	getItemId?: ( item: Item ) => string;
 	isLoading?: boolean;
 	paginationInfo: {
 		totalItems: number;
@@ -41,12 +42,15 @@ interface DataViewsProps< Item extends AnyItem > {
 	selection?: string[];
 	setSelection?: ( selection: string[] ) => void;
 	onSelectionChange?: ( items: Item[] ) => void;
-}
+} & ( Item extends ItemWithId
+	? { getItemId?: ( item: Item ) => string }
+	: { getItemId: ( item: Item ) => string } );
 
-const defaultGetItemId = ( item: AnyItem ) => item.id;
+const defaultGetItemId = ( item: ItemWithId ) => item.id;
+
 const defaultOnSelectionChange = () => {};
 
-function useSomeItemHasAPossibleBulkAction< Item extends AnyItem >(
+function useSomeItemHasAPossibleBulkAction< Item >(
 	actions: Action< Item >[],
 	data: Item[]
 ) {
@@ -62,7 +66,7 @@ function useSomeItemHasAPossibleBulkAction< Item extends AnyItem >(
 	}, [ actions, data ] );
 }
 
-export default function DataViews< Item extends AnyItem >( {
+export default function DataViews< Item >( {
 	view,
 	onChangeView,
 	fields,

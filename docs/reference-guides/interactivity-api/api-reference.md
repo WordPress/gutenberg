@@ -531,17 +531,18 @@ The `unique-id` doesn't need to be unique globally. It just needs to be differen
   <summary><em>See store used with the directive above</em></summary>
 
 ```js
-import { store, useState, useEffect } from '@wordpress/interactivity';
+import { getElement, store, useState, useEffect } from '@wordpress/interactivity';
 
 // Unlike `data-wp-init` and `data-wp-watch`, you can use any hooks inside
 // `data-wp-run` callbacks.
-const useInView = ( ref ) => {
+const useInView = () => {
   const [ inView, setInView ] = useState( false );
   useEffect( () => {
+    const { ref } = getElement();
     const observer = new IntersectionObserver( ( [ entry ] ) => {
       setInView( entry.isIntersecting );
     } );
-    if ( ref ) observer.observe( ref );
+    observer.observe( ref );
     return () => ref && observer.unobserve( ref );
   }, []);
   return inView;
@@ -550,8 +551,7 @@ const useInView = ( ref ) => {
 store( 'myPlugin', {
   callbacks: {
     logInView: () => {
-      const { ref } = getElement();
-      const isInView = useInView( ref );
+      const isInView = useInView();
       useEffect( () => {
         if ( isInView ) {
           console.log( 'Inside' );
@@ -564,6 +564,8 @@ store( 'myPlugin', {
 } );
 ```
 </details>
+
+It's important to note that, similar to (P)React components, the `ref` from `getElement()` is `null` during the first render. To properly access the DOM element reference, you typically need to use an effect-like hook such as `useEffect`, `useInit`, or `useWatch`. This ensures that the `getElement()` runs after the component has been mounted and the `ref` is available.
 
 ### `wp-key`
 
@@ -1069,7 +1071,7 @@ Those attributes will contain the directives of that element. In the button exam
 
 ```js
 // store
-import { store, getContext } from '@wordpress/interactivity';
+import { store, getElement } from '@wordpress/interactivity';
 
 store( "myPlugin", {
   actions: {
