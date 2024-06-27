@@ -21,12 +21,15 @@ import { useInstanceId } from '@wordpress/compose';
 import {
 	InspectorControls,
 	useSettings,
+	store as blockEditorStore,
 	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
 	__experimentalUseGradient,
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -34,7 +37,7 @@ import { __ } from '@wordpress/i18n';
 import { COVER_MIN_HEIGHT, mediaPosition } from '../shared';
 import { unlock } from '../../lock-unlock';
 
-const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
+const { cleanEmptyObject, ResolutionTool } = unlock( blockEditorPrivateApis );
 
 function CoverHeightInput( {
 	onChange,
@@ -97,6 +100,7 @@ export default function CoverInspectorControls( {
 } ) {
 	const {
 		useFeaturedImage,
+		id,
 		dimRatio,
 		focalPoint,
 		hasParallax,
@@ -105,6 +109,7 @@ export default function CoverInspectorControls( {
 		minHeightUnit,
 		alt,
 		tagName,
+		sizeSlug,
 	} = attributes;
 	const {
 		isVideoBackground,
@@ -115,6 +120,23 @@ export default function CoverInspectorControls( {
 	} = currentSettings;
 
 	const { gradientValue, setGradient } = __experimentalUseGradient();
+	const { getSettings } = useSelect( blockEditorStore );
+
+	const imageSizes = getSettings().imageSizes;
+
+	const image = useSelect(
+		( select ) =>
+			id && isImageBackground
+				? select( coreStore ).getMedia( id, { context: 'view' } )
+				: null,
+		[ id, isImageBackground ]
+	);
+
+	const imageSizeOptions = imageSizes
+		.filter(
+			( { slug } ) => image?.media_details?.sizes?.[ slug ]?.source_url
+		)
+		.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
 
 	const toggleParallax = () => {
 		setAttributes( {
@@ -163,8 +185,42 @@ export default function CoverInspectorControls( {
 		),
 	};
 
+	function updateImage( newSizeSlug ) {
+		const newUrl = image?.media_details?.sizes?.[ newSizeSlug ]?.source_url;
+		if ( ! newUrl ) {
+			return null;
+		}
+
+		setAttributes( {
+			url: newUrl,
+			sizeSlug: newSizeSlug,
+		} );
+	}
+
 	return (
 		<>
+			<InspectorControls group="dimensions">
+				{ !! imageSizeOptions.length && (
+					<ToolsPanelItem
+						hasValue={ () => !! sizeSlug }
+						label={ __( 'Resolution' ) }
+						onDeselect={ () =>
+							setAttributes( { sizeSlug: undefined } )
+						}
+						resetAllFilter={ () => ( {
+							sizeSlug: undefined,
+						} ) }
+						isShownByDefault
+						panelId={ clientId }
+					>
+						<ResolutionTool
+							value={ sizeSlug }
+							onChange={ updateImage }
+							options={ imageSizeOptions }
+						/>
+					</ToolsPanelItem>
+				) }
+			</InspectorControls>
 			<InspectorControls>
 				{ !! url && (
 					<PanelBody title={ __( 'Settings' ) }>
