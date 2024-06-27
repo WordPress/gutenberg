@@ -304,14 +304,14 @@ export default function PostsList( { postType } ) {
 			const { getEntityRecord, getPostType, canUser } =
 				select( coreStore );
 			const siteSettings = getEntityRecord( 'root', 'site' );
+			const postTypeObject = getPostType( postType );
 			return {
 				frontPageId: siteSettings?.page_on_front,
 				postsPageId: siteSettings?.page_for_posts,
 				labels: getPostType( postType )?.labels,
-				// TODO: check what is the proper way to make this work for any post type..
 				canCreateRecord: canUser(
 					'create',
-					postType === 'page' ? 'pages' : 'posts'
+					postTypeObject?.rest_base || 'posts'
 				),
 			};
 		},

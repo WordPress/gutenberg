@@ -9,18 +9,19 @@ import {
 	TextControl,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useDispatch, useRegistry } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { decodeEntities } from '@wordpress/html-entities';
 import { serialize, synchronizeBlocksWithTemplate } from '@wordpress/blocks';
 
-// TODO: check how/if to reuse this and make it work for other post types.
-// Currently this creates drafts, so we should look into that..
-// Also lot's of labels need to be updated properly..
 export default function AddNewPostModal( { postType, onSave, onClose } ) {
-	const [ isCreatingPage, setIsCreatingPage ] = useState( false );
+	const labels = useSelect(
+		( select ) => select( coreStore ).getPostType( postType )?.labels,
+		[ postType ]
+	);
+	const [ isCreatingPost, setIsCreatingPost ] = useState( false );
 	const [ title, setTitle ] = useState( '' );
 
 	const { saveEntityRecord } = useDispatch( coreStore );
@@ -28,16 +29,15 @@ export default function AddNewPostModal( { postType, onSave, onClose } ) {
 		useDispatch( noticesStore );
 	const { resolveSelect } = useRegistry();
 
-	async function createPage( event ) {
+	async function createPost( event ) {
 		event.preventDefault();
 
-		if ( isCreatingPage ) {
+		if ( isCreatingPost ) {
 			return;
 		}
-		setIsCreatingPage( true );
+		setIsCreatingPost( true );
 		try {
-			// TODO: also check this change.. It was merged(https://github.com/WordPress/gutenberg/pull/62488/) as I was coding this..
-			const pagePostType =
+			const postTypeObject =
 				await resolveSelect( coreStore ).getPostType( postType );
 			const newPage = await saveEntityRecord(
 				'postType',
@@ -47,11 +47,12 @@ export default function AddNewPostModal( { postType, onSave, onClose } ) {
 					title,
 					slug: title || __( 'No title' ),
 					content:
-						!! pagePostType.template && pagePostType.template.length
+						!! postTypeObject.template &&
+						postTypeObject.template.length
 							? serialize(
 									synchronizeBlocksWithTemplate(
 										[],
-										pagePostType.template
+										postTypeObject.template
 									)
 							  )
 							: undefined,
@@ -63,13 +64,11 @@ export default function AddNewPostModal( { postType, onSave, onClose } ) {
 
 			createSuccessNotice(
 				sprintf(
-					// translators: %s: Title of the created template e.g: "Category".
+					// translators: %s: Title of the created post e.g: "Hello world".
 					__( '"%s" successfully created.' ),
 					decodeEntities( newPage.title?.rendered || title )
 				),
-				{
-					type: 'snackbar',
-				}
+				{ type: 'snackbar' }
 			);
 		} catch ( error ) {
 			const errorMessage =
@@ -81,22 +80,25 @@ export default function AddNewPostModal( { postType, onSave, onClose } ) {
 				type: 'snackbar',
 			} );
 		} finally {
-			setIsCreatingPage( false );
+			setIsCreatingPost( false );
 		}
 	}
 
 	return (
 		<Modal
-			title={ __( 'Draft a new page' ) }
+			title={
+				// translators: %s: post type singular_name label e.g: "Page".
+				sprintf( __( 'Draft new: %s' ), labels?.singular_name )
+			}
 			onRequestClose={ onClose }
 			focusOnMount="firstContentElement"
 			size="small"
 		>
-			<form onSubmit={ createPage }>
+			<form onSubmit={ createPost }>
 				<VStack spacing={ 3 }>
 					<TextControl
 						__next40pxDefaultSize
-						label={ __( 'Page title' ) }
+						label={ __( 'Title' ) }
 						onChange={ setTitle }
 						placeholder={ __( 'No title' ) }
 						value={ title }
@@ -113,8 +115,8 @@ export default function AddNewPostModal( { postType, onSave, onClose } ) {
 							__next40pxDefaultSize
 							variant="primary"
 							type="submit"
-							isBusy={ isCreatingPage }
-							aria-disabled={ isCreatingPage }
+							isBusy={ isCreatingPost }
+							aria-disabled={ isCreatingPost }
 						>
 							{ __( 'Create draft' ) }
 						</Button>
