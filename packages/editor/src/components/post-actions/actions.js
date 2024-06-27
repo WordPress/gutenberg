@@ -10,6 +10,7 @@ import { __, _n, sprintf, _x } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useMemo, useState } from '@wordpress/element';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
+import { parse } from '@wordpress/blocks';
 
 import {
 	Button,
@@ -52,11 +53,9 @@ function isTemplateRemovable( template ) {
 	// than the one returned from the endpoint. This is why we need to check for
 	// two props whether is custom or has a theme file.
 	return (
-		[ template.source, template.templatePart?.source ].includes(
-			TEMPLATE_ORIGINS.custom
-		) &&
+		[ template?.source ].includes( TEMPLATE_ORIGINS.custom ) &&
 		! template.has_theme_file &&
-		! template.templatePart?.has_theme_file
+		! template?.has_theme_file
 	);
 }
 const canDeleteOrReset = ( item ) => {
@@ -632,17 +631,12 @@ const renamePostAction = {
 			isUserPattern ||
 			( isTemplatePart &&
 				( post.isCustom || post.source === TEMPLATE_ORIGINS.custom ) );
-		const hasThemeFile =
-			isTemplatePart &&
-			( post.templatePart?.has_theme_file || post.has_theme_file );
+		const hasThemeFile = post?.has_theme_file;
 		return isCustomPattern && ! hasThemeFile;
 	},
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ item ] = items;
-		const originalTitle = decodeEntities(
-			typeof item.title === 'string' ? item.title : item.title.rendered
-		);
-		const [ title, setTitle ] = useState( () => originalTitle );
+		const [ title, setTitle ] = useState( () => getItemTitle( item ) );
 		const { editEntityRecord, saveEditedEntityRecord } =
 			useDispatch( coreStore );
 		const { createSuccessNotice, createErrorNotice } =
@@ -879,7 +873,7 @@ const isTemplatePartRevertable = ( item ) => {
 	if ( ! item ) {
 		return false;
 	}
-	const hasThemeFile = item.templatePart?.has_theme_file;
+	const hasThemeFile = item?.has_theme_file;
 	return canDeleteOrReset( item ) && hasThemeFile;
 };
 
@@ -1031,13 +1025,23 @@ export const duplicateTemplatePartAction = {
 	modalHeader: _x( 'Duplicate template part', 'action label' ),
 	RenderModal: ( { items, closeModal } ) => {
 		const [ item ] = items;
+		const blocks = useMemo( () => {
+			return (
+				item.blocks ??
+				parse( item.content.raw, {
+					__unstableSkipMigrationLogs: true,
+				} )
+			);
+		}, [ item?.content?.raw, item.blocks ] );
 		const { createSuccessNotice } = useDispatch( noticesStore );
 		function onTemplatePartSuccess() {
 			createSuccessNotice(
 				sprintf(
 					// translators: %s: The new template part's title e.g. 'Call to action (copy)'.
 					__( '"%s" duplicated.' ),
-					item.title
+					typeof item.title === 'string'
+						? item.title
+						: item.title.rendered
 				),
 				{ type: 'snackbar', id: 'edit-site-patterns-success' }
 			);
@@ -1045,8 +1049,8 @@ export const duplicateTemplatePartAction = {
 		}
 		return (
 			<CreateTemplatePartModalContents
-				blocks={ item.blocks }
-				defaultArea={ item.templatePart?.area || item.area }
+				blocks={ blocks }
+				defaultArea={ item.area }
 				defaultTitle={ sprintf(
 					/* translators: %s: Existing template part title */
 					__( '%s (Copy)' ),

@@ -371,10 +371,7 @@ export const removeTemplates =
 	( items ) =>
 	async ( { registry } ) => {
 		const isResetting = items.every(
-			( item ) =>
-				!! item &&
-				( item.has_theme_file ||
-					( item.templatePart && item.templatePart.has_theme_file ) )
+			( item ) => !! item && item.has_theme_file
 		);
 
 		const promiseResult = await Promise.allSettled(
