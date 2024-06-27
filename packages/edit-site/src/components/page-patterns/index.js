@@ -120,7 +120,7 @@ function Preview( { item, viewType } ) {
 	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
 	const { onClick } = useLink( {
 		postType: item.type,
-		postId: isUserPattern ? item.id : item.name,
+		postId: isUserPattern || isTemplatePart ? item.id : item.name,
 		canvas: 'edit',
 	} );
 	const blocks = useMemo( () => {
