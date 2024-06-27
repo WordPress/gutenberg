@@ -542,6 +542,30 @@ describe.each( [
 			expect( currentSelectedItem ).toHaveTextContent( 'aquamarine' );
 		} );
 
+		it( 'Can change selection with a focused input and closed dropdown while pressing arrow keys', async () => {
+			const user = userEvent.setup();
+
+			render( <Component { ...props } /> );
+
+			const currentSelectedItem = screen.getByRole( 'button', {
+				expanded: false,
+			} );
+
+			await user.tab();
+			expect( currentSelectedItem ).toHaveFocus();
+			expect( currentSelectedItem ).toHaveTextContent(
+				props.options[ 0 ].name
+			);
+
+			await user.keyboard( '{arrowdown}' );
+			await user.keyboard( '{arrowdown}' );
+			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+
+			expect( currentSelectedItem ).toHaveTextContent(
+				props.options[ 2 ].name
+			);
+		} );
+
 		it( 'Should have correct aria-selected value for selections', async () => {
 			const user = userEvent.setup();
 

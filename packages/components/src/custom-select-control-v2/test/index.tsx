@@ -416,4 +416,23 @@ describe.each( [
 			screen.getByRole( 'option', { name: 'july-9' } )
 		).toBeVisible();
 	} );
+
+	it( 'Should open the select popover when focussing the trigger button and pressing arrow down', async () => {
+		render( <Component { ...defaultProps } /> );
+
+		const currentSelectedItem = screen.getByRole( 'combobox', {
+			expanded: false,
+		} );
+
+		await press.Tab();
+		expect( currentSelectedItem ).toHaveFocus();
+		expect( currentSelectedItem ).toHaveTextContent( items[ 0 ].value );
+
+		await press.ArrowDown();
+		expect(
+			screen.getByRole( 'listbox', {
+				name: 'label!',
+			} )
+		).toBeVisible();
+	} );
 } );
