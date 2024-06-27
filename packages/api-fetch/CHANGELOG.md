@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Remove dependency on `@wordpress/i18n` ([#tbd](tbd)).
+
 ## 7.2.0 (2024-06-26)
 
 ## 7.1.0 (2024-06-15)
