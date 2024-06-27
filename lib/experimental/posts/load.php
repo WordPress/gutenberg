@@ -7,6 +7,14 @@
 
 add_action( 'admin_menu', 'gutenberg_replace_posts_dashboard' );
 
+// Default to is-fullscreen-mode to avoid jumps in the UI.
+add_filter(
+	'admin_body_class',
+	static function ( $classes ) {
+		return "$classes is-fullscreen-mode";
+	}
+);
+
 /**
  * Renders the new posts dashboard page.
  */
@@ -15,13 +23,13 @@ function gutenberg_posts_dashboard() {
 	// $current_screen = get_current_screen();
 	// $current_screen->is_block_editor( true );
 
-	// Default to is-fullscreen-mode to avoid jumps in the UI.
-	// add_filter(
-	// 	'admin_body_class',
-	// 	static function ( $classes ) {
-	// 		return "$classes is-fullscreen-mode";
-	// 	}
-	// );
+
+
+	// $indexed_template_types = array();
+	// foreach ( get_default_block_template_types() as $slug => $template_type ) {
+	// 	$template_type['slug']    = (string) $slug;
+	// 	$indexed_template_types[] = $template_type;
+	// }
 
 	$block_editor_context = new WP_Block_Editor_Context( array( 'name' => 'core/edit-site' ) );
 	$custom_settings      = array(
