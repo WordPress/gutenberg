@@ -15,9 +15,10 @@ import { __experimentalUseDropZone as useDropZone } from '@wordpress/compose';
  */
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockPopoverCover from '../block-popover/cover';
-import { range, GridRect, getGridInfo } from './utils';
+import { range, GridRect, getGridInfo, getComputedCSS } from './utils';
 import { store as blockEditorStore } from '../../store';
 import { useGetNumberOfBlocksBeforeCell } from './use-get-number-of-blocks-before-cell';
+import ButtonBlockAppender from '../button-block-appender';
 
 export function GridVisualizer( { clientId, contentRef, parentLayout } ) {
 	const isDistractionFree = useSelect(
@@ -43,6 +44,28 @@ export function GridVisualizer( { clientId, contentRef, parentLayout } ) {
 		/>
 	);
 }
+
+const checkIfCellOccupied = ( gridElement, column, row ) => {
+	const cell = Array.from( gridElement.children ).find( ( child ) => {
+		const [ columnStart, columnSpan ] =
+			getComputedCSS( child, 'grid-column' ).match( /\d+/g ) || [];
+		const [ rowStart, rowSpan ] =
+			getComputedCSS( child, 'grid-row' ).match( /\d+/g ) || [];
+		const columnEnd = columnSpan
+			? parseInt( columnStart, 10 ) + parseInt( columnSpan, 10 ) - 1
+			: columnStart;
+		const rowEnd = rowSpan
+			? parseInt( rowStart, 10 ) + parseInt( rowSpan, 10 ) - 1
+			: rowStart;
+		return (
+			column >= columnStart &&
+			column <= columnEnd &&
+			row >= rowStart &&
+			row <= rowEnd
+		);
+	} );
+	return cell !== undefined;
+};
 
 const GridVisualizerGrid = forwardRef(
 	( { clientId, gridElement, isManualGrid }, ref ) => {
@@ -99,25 +122,44 @@ const GridVisualizerGrid = forwardRef(
 					{ isManualGrid
 						? range( 1, gridInfo.numRows ).map( ( row ) =>
 								range( 1, gridInfo.numColumns ).map(
-									( column ) => (
-										<GridVisualizerCell
-											key={ `${ row }-${ column }` }
-											color={ gridInfo.currentColor }
-										>
-											<GridVisualizerDropZone
-												column={ column }
-												row={ row }
-												gridClientId={ clientId }
-												gridInfo={ gridInfo }
-												highlightedRect={
-													highlightedRect
-												}
-												setHighlightedRect={
-													setHighlightedRect
-												}
-											/>
-										</GridVisualizerCell>
-									)
+									( column ) => {
+										const isCellOccupied =
+											checkIfCellOccupied(
+												gridElement,
+												column,
+												row
+											);
+										return (
+											<GridVisualizerCell
+												key={ `${ row }-${ column }` }
+												color={ gridInfo.currentColor }
+											>
+												<GridVisualizerDropZone
+													column={ column }
+													row={ row }
+													gridClientId={ clientId }
+													gridInfo={ gridInfo }
+													highlightedRect={
+														highlightedRect
+													}
+													setHighlightedRect={
+														setHighlightedRect
+													}
+												/>
+												{ ! isCellOccupied && (
+													<ButtonBlockAppender
+														rootClientId={
+															clientId
+														}
+														className="grid-visualizer-appender"
+														style={ {
+															color: gridInfo.currentColor,
+														} }
+													/>
+												) }
+											</GridVisualizerCell>
+										);
+									}
 								)
 						  )
 						: Array.from(
@@ -141,6 +183,7 @@ function GridVisualizerCell( { color, children } ) {
 			className="block-editor-grid-visualizer__cell"
 			style={ {
 				boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${ color } 20%, #0000)`,
+				color,
 			} }
 		>
 			{ children }
