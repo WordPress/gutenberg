@@ -76,7 +76,6 @@ const DEFAULT_VIEW = {
 	search: '',
 	page: 1,
 	perPage: 20,
-	hiddenFields: [],
 	layout: {
 		...defaultConfigPerViewType[ LAYOUT_GRID ],
 	},

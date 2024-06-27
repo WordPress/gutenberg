@@ -97,6 +97,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 			unlock( select( blocksStore ) ).getAllBlockBindingsSources()
 		);
 		const { name, clientId, context } = props;
+		const hasParentPattern = !! props.context[ 'pattern/overrides' ];
 		const hasPatternOverridesDefaultBinding =
 			props.attributes.metadata?.bindings?.[ DEFAULT_ATTRIBUTE ]
 				?.source === 'core/pattern-overrides';
@@ -216,13 +217,20 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 						}
 					}
 
-					// Only apply normal attribute updates to blocks
-					// that have partial bindings. Currently this is
-					// only skipped for pattern overrides sources.
 					if (
-						! hasPatternOverridesDefaultBinding &&
+						// Don't update non-connected attributes if the block is using pattern overrides
+						// and the editing is happening while overriding the pattern (not editing the original).
+						! (
+							hasPatternOverridesDefaultBinding &&
+							hasParentPattern
+						) &&
 						Object.keys( keptAttributes ).length
 					) {
+						// Don't update caption and href until they are supported.
+						if ( hasPatternOverridesDefaultBinding ) {
+							delete keptAttributes?.caption;
+							delete keptAttributes?.href;
+						}
 						setAttributes( keptAttributes );
 					}
 				} );
@@ -236,6 +244,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 				setAttributes,
 				sources,
 				hasPatternOverridesDefaultBinding,
+				hasParentPattern,
 			]
 		);
 
