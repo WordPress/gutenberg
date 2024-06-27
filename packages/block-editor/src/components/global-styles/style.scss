@@ -73,11 +73,8 @@
 
 
 .block-editor-global-styles-background-panel__inspector-media-replace-container {
-	//position: relative;
 	border: 1px solid $gray-300;
 	border-radius: 2px;
-	//justify-content: center;
-	//align-items: stretch;
 	// Full width. ToolsPanel lays out children in a grid.
 	grid-column: 1 / -1;
 
@@ -160,7 +157,6 @@
 .block-editor-global-styles-background-panel__inspector-image-indicator-wrapper {
 	width: 20px;
 	height: 20px;
-	margin-right: $grid-unit-10;
 }
 
 .block-editor-global-styles-background-panel__inspector-image-indicator {
@@ -203,4 +199,17 @@
 // Push control panel into the background when the media modal is open.
 .modal-open .block-editor-global-styles-background-panel__popover {
 	z-index: z-index(".block-editor-global-styles-background-panel__popover");
+}
+
+.block-editor-global-styles-background-panel__media-replace-popover {
+	.components-popover__content {
+		// width of block-editor-global-styles-background-panel__dropdown-content-wrapper minus padding.
+		width: 226px;
+	}
+	.components-button {
+		padding: 0 $grid-unit-10;
+	}
+	.components-button .components-menu-items__item-icon.has-icon-right {
+		margin-left: $grid-unit-30 - $grid-unit-10;
+	}
 }

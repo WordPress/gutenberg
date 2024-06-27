@@ -264,7 +264,13 @@ function BackgroundControlsPanel( {
 	);
 }
 
-function BackgroundImageControls( { onChange, style, inheritedValue } ) {
+function BackgroundImageControls( {
+	onChange,
+	style,
+	inheritedValue,
+	onRemoveImage = noop,
+	displayInPanel,
+} ) {
 	const mediaUpload = useSelect(
 		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
 		[]
@@ -378,6 +384,12 @@ function BackgroundImageControls( { onChange, style, inheritedValue } ) {
 				allowedTypes={ [ IMAGE_BACKGROUND_TYPE ] }
 				accept="image/*"
 				onSelect={ onSelectMedia }
+				popoverProps={ {
+					className: clsx( {
+						'block-editor-global-styles-background-panel__media-replace-popover':
+							displayInPanel,
+					} ),
+				} }
 				name={
 					<InspectorImagePreviewItem
 						className="block-editor-global-styles-background-panel__image-preview"
@@ -403,6 +415,7 @@ function BackgroundImageControls( { onChange, style, inheritedValue } ) {
 						onClick={ () => {
 							closeAndFocus();
 							resetBackgroundImage();
+							onRemoveImage();
 						} }
 					>
 						{ __( 'Reset ' ) }
@@ -712,6 +725,10 @@ export default function BackgroundPanel( {
 								onChange={ onChange }
 								style={ value }
 								inheritedValue={ inheritedValue }
+								displayInPanel
+								onRemoveImage={ () =>
+									setIsDropDownOpen( false )
+								}
 							/>
 							<BackgroundSizeControls
 								onChange={ onChange }
