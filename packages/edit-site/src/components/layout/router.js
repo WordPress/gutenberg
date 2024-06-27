@@ -8,7 +8,6 @@ import { useEffect } from '@wordpress/element';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import { useIsSiteEditorLoading } from './hooks';
 import Editor from '../editor';
 import PostsList from '../posts-app/posts-list';
 import PagePatterns from '../page-patterns';
@@ -74,7 +73,6 @@ function useRedirectOldPaths() {
 }
 
 export default function useLayoutAreas() {
-	const isSiteEditorLoading = useIsSiteEditorLoading();
 	const { params } = useLocation();
 	const { postType, postId, path, layout, isCustom, canvas } = params;
 	useRedirectOldPaths();
@@ -93,12 +91,10 @@ export default function useLayoutAreas() {
 					/>
 				),
 				content: <PostsList postType={ postType } />,
-				preview: ( isListLayout || canvas === 'edit' ) && (
-					<Editor isLoading={ isSiteEditorLoading } />
-				),
+				preview: ( isListLayout || canvas === 'edit' ) && <Editor />,
 				mobile:
 					canvas === 'edit' ? (
-						<Editor isLoading={ isSiteEditorLoading } />
+						<Editor />
 					) : (
 						<PostsList postType={ postType } />
 					),
@@ -119,9 +115,7 @@ export default function useLayoutAreas() {
 					<SidebarNavigationScreenTemplatesBrowse backPath={ {} } />
 				),
 				content: <PageTemplates />,
-				preview: ( isListLayout || canvas === 'edit' ) && (
-					<Editor isLoading={ isSiteEditorLoading } />
-				),
+				preview: ( isListLayout || canvas === 'edit' ) && <Editor />,
 				mobile: <PageTemplates />,
 			},
 			widths: {
@@ -140,9 +134,7 @@ export default function useLayoutAreas() {
 				sidebar: <SidebarNavigationScreenPatterns backPath={ {} } />,
 				content: <PagePatterns />,
 				mobile: <PagePatterns />,
-				preview: canvas === 'edit' && (
-					<Editor isLoading={ isSiteEditorLoading } />
-				),
+				preview: canvas === 'edit' && <Editor />,
 			},
 		};
 	}
@@ -155,10 +147,8 @@ export default function useLayoutAreas() {
 				sidebar: (
 					<SidebarNavigationScreenGlobalStyles backPath={ {} } />
 				),
-				preview: <Editor isLoading={ isSiteEditorLoading } />,
-				mobile: canvas === 'edit' && (
-					<Editor isLoading={ isSiteEditorLoading } />
-				),
+				preview: <Editor />,
+				mobile: canvas === 'edit' && <Editor />,
 			},
 		};
 	}
@@ -174,10 +164,8 @@ export default function useLayoutAreas() {
 							backPath={ { postType: NAVIGATION_POST_TYPE } }
 						/>
 					),
-					preview: <Editor isLoading={ isSiteEditorLoading } />,
-					mobile: canvas === 'edit' && (
-						<Editor isLoading={ isSiteEditorLoading } />
-					),
+					preview: <Editor />,
+					mobile: canvas === 'edit' && <Editor />,
 				},
 			};
 		}
@@ -187,10 +175,8 @@ export default function useLayoutAreas() {
 				sidebar: (
 					<SidebarNavigationScreenNavigationMenus backPath={ {} } />
 				),
-				preview: <Editor isLoading={ isSiteEditorLoading } />,
-				mobile: canvas === 'edit' && (
-					<Editor isLoading={ isSiteEditorLoading } />
-				),
+				preview: <Editor />,
+				mobile: canvas === 'edit' && <Editor />,
 			},
 		};
 	}
@@ -200,10 +186,8 @@ export default function useLayoutAreas() {
 		key: 'default',
 		areas: {
 			sidebar: <SidebarNavigationScreenMain />,
-			preview: <Editor isLoading={ isSiteEditorLoading } />,
-			mobile: canvas === 'edit' && (
-				<Editor isLoading={ isSiteEditorLoading } />
-			),
+			preview: <Editor />,
+			mobile: canvas === 'edit' && <Editor />,
 		},
 	};
 }

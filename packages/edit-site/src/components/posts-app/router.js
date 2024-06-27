@@ -9,7 +9,6 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import { useIsSiteEditorLoading } from '../layout/hooks';
 import Editor from '../editor';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import SidebarNavigationScreenMain from '../sidebar-navigation-screen-main';
@@ -19,7 +18,6 @@ import PostsList from '../posts-app/posts-list';
 const { useLocation } = unlock( routerPrivateApis );
 
 export default function useLayoutAreas() {
-	const isSiteEditorLoading = useIsSiteEditorLoading();
 	const { params = {} } = useLocation();
 	const { postType, layout, canvas } = params;
 	const labels = useSelect(
@@ -30,25 +28,23 @@ export default function useLayoutAreas() {
 	);
 
 	// Posts list.
-	if ( [ 'page', 'post' ].includes( postType ) ) {
+	if ( [ 'post' ].includes( postType ) ) {
 		const isListLayout = layout === 'list' || ! layout;
 		return {
-			key: 'pages',
+			key: 'posts-list',
 			areas: {
 				sidebar: (
 					<SidebarNavigationScreen
 						title={ labels?.name }
-						backPath={ {} }
+						// backPath={ {} }
 						content={ <DataViewsSidebarContent /> }
 					/>
 				),
 				content: <PostsList postType={ postType } />,
-				preview: ( isListLayout || canvas === 'edit' ) && (
-					<Editor isLoading={ isSiteEditorLoading } />
-				),
+				preview: ( isListLayout || canvas === 'edit' ) && <Editor />,
 				mobile:
 					canvas === 'edit' ? (
-						<Editor isLoading={ isSiteEditorLoading } />
+						<Editor />
 					) : (
 						<PostsList postType={ postType } />
 					),
@@ -59,24 +55,13 @@ export default function useLayoutAreas() {
 		};
 	}
 
-	// const defaultRoute = {
-	// 	key: 'index',
-	// 	areas: {
-	// 		sidebar: 'Empty Sidebar',
-	// 		content: <PostsList />,
-	// 		preview: undefined,
-	// 		mobile: <Page>Welcome to Posts</Page>,
-	// 	},
-	// };
 	// Fallback shows the home page preview
 	return {
 		key: 'default',
 		areas: {
 			sidebar: <SidebarNavigationScreenMain />,
-			preview: <Editor isLoading={ isSiteEditorLoading } />,
-			mobile: canvas === 'edit' && (
-				<Editor isLoading={ isSiteEditorLoading } />
-			),
+			preview: <Editor />,
+			mobile: canvas === 'edit' && <Editor />,
 		},
 	};
 }

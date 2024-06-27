@@ -44,12 +44,14 @@ import SiteEditorMoreMenu from '../more-menu';
 import SiteIcon from '../site-icon';
 import useEditorIframeProps from '../block-editor/use-editor-iframe-props';
 import useEditorTitle from './use-editor-title';
+import { useIsSiteEditorLoading } from '../layout/hooks';
 
 const { Editor, BackButton } = unlock( editorPrivateApis );
 const { useHistory } = unlock( routerPrivateApis );
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 
-export default function EditSiteEditor( { isLoading } ) {
+export default function EditSiteEditor() {
+	const isLoading = useIsSiteEditorLoading();
 	const {
 		editedPostType,
 		editedPostId,
