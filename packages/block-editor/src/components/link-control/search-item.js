@@ -63,7 +63,9 @@ function SearchItemIcon( { isURL, suggestion } ) {
 function addLeadingSlash( url ) {
 	const trimmedURL = url?.trim();
 
-	if ( ! trimmedURL?.length ) return url;
+	if ( ! trimmedURL?.length ) {
+		return url;
+	}
 
 	return url?.replace( /^\/?/, '/' );
 }
@@ -71,7 +73,9 @@ function addLeadingSlash( url ) {
 function removeTrailingSlash( url ) {
 	const trimmedURL = url?.trim();
 
-	if ( ! trimmedURL?.length ) return url;
+	if ( ! trimmedURL?.length ) {
+		return url;
+	}
 
 	return url?.replace( /\/$/, '' );
 }
@@ -95,7 +99,9 @@ const defaultTo = ( d ) => ( v ) => {
  * @return {string} the processed url to display.
  */
 function getURLForDisplay( url ) {
-	if ( ! url ) return url;
+	if ( ! url ) {
+		return url;
+	}
 
 	return pipe(
 		safeDecodeURI,

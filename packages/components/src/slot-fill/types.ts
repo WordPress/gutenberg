@@ -4,9 +4,9 @@
 import type { Component, MutableRefObject, ReactNode, RefObject } from 'react';
 
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-import type { ObservableMap } from './bubbles-virtually/observable-map';
+import type { ObservableMap } from '@wordpress/compose';
 
 export type DistributiveOmit< T, K extends keyof any > = T extends any
 	? Omit< T, K >

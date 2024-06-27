@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 import type {
 	ComponentPropsWithoutRef,
 	ForwardedRef,
@@ -141,7 +141,7 @@ export function UnforwardedButton(
 		'mixed',
 	];
 
-	const classes = classnames( 'components-button', className, {
+	const classes = clsx( 'components-button', className, {
 		'is-next-40px-default-size': __next40pxDefaultSize,
 		'is-secondary': variant === 'secondary',
 		'is-primary': variant === 'primary',
@@ -174,14 +174,16 @@ export function UnforwardedButton(
 	const anchorProps: ComponentPropsWithoutRef< 'a' > =
 		Tag === 'a' ? { href, target } : {};
 
+	const disableEventProps: {
+		[ key: string ]: ( event: MouseEvent ) => void;
+	} = {};
 	if ( disabled && isFocusable ) {
 		// In this case, the button will be disabled, but still focusable and
 		// perceivable by screen reader users.
 		buttonProps[ 'aria-disabled' ] = true;
 		anchorProps[ 'aria-disabled' ] = true;
-
 		for ( const disabledEvent of disabledEventsOnDisabledButton ) {
-			additionalProps[ disabledEvent ] = ( event: MouseEvent ) => {
+			disableEventProps[ disabledEvent ] = ( event: MouseEvent ) => {
 				if ( event ) {
 					event.stopPropagation();
 					event.preventDefault();
@@ -234,6 +236,7 @@ export function UnforwardedButton(
 			<a
 				{ ...anchorProps }
 				{ ...( additionalProps as HTMLAttributes< HTMLAnchorElement > ) }
+				{ ...disableEventProps }
 				{ ...commonProps }
 			>
 				{ elementChildren }
@@ -242,6 +245,7 @@ export function UnforwardedButton(
 			<button
 				{ ...buttonProps }
 				{ ...( additionalProps as HTMLAttributes< HTMLButtonElement > ) }
+				{ ...disableEventProps }
 				{ ...commonProps }
 			>
 				{ elementChildren }

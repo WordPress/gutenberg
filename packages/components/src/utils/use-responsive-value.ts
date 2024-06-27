@@ -60,8 +60,9 @@ export function useResponsiveValue< T >(
 	const index = useBreakpointIndex( options );
 
 	// Allow calling the function with a "normal" value without having to check on the outside.
-	if ( ! Array.isArray( values ) && typeof values !== 'function' )
+	if ( ! Array.isArray( values ) && typeof values !== 'function' ) {
 		return values;
+	}
 
 	const array = values || [];
 

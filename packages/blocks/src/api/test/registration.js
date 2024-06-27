@@ -13,6 +13,7 @@ import { select, dispatch } from '@wordpress/data';
 import {
 	registerBlockType,
 	registerBlockCollection,
+	registerBlockVariation,
 	unregisterBlockCollection,
 	unregisterBlockType,
 	setFreeformContentHandlerName,
@@ -26,6 +27,7 @@ import {
 	getBlockType,
 	getBlockTypes,
 	getBlockSupport,
+	getBlockVariations,
 	hasBlockSupport,
 	isReusableBlock,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
@@ -1408,6 +1410,26 @@ describe( 'blocks', () => {
 		it( 'should return false for other blocks', () => {
 			const block = { name: 'core/paragraph' };
 			expect( isReusableBlock( block ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'registerBlockVariation', () => {
+		it( 'should warn when registering block variation without a name', () => {
+			registerBlockType( 'core/variation-block', defaultBlockSettings );
+			registerBlockVariation( 'core/variation-block', {
+				title: 'Variation Title',
+				description: 'Variation description',
+			} );
+
+			expect( console ).toHaveWarnedWith(
+				'Variation names must be unique strings.'
+			);
+			expect( getBlockVariations( 'core/variation-block' ) ).toEqual( [
+				{
+					title: 'Variation Title',
+					description: 'Variation description',
+				},
+			] );
 		} );
 	} );
 } );

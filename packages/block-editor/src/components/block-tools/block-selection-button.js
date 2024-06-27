@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { dragHandle, trash } from '@wordpress/icons';
 import { Button, Flex, FlexItem, ToolbarButton } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect, useRef } from '@wordpress/element';
+import { forwardRef, useEffect } from '@wordpress/element';
 import {
 	BACKSPACE,
 	DELETE,
@@ -48,10 +48,11 @@ import Shuffle from '../block-toolbar/shuffle';
  *
  * @param {string} props          Component props.
  * @param {string} props.clientId Client ID of block.
+ * @param {Object} ref            Reference to the component.
  *
  * @return {Component} The component to be rendered.
  */
-function BlockSelectionButton( { clientId, rootClientId } ) {
+function BlockSelectionButton( { clientId, rootClientId }, ref ) {
 	const selected = useSelect(
 		( select ) => {
 			const {
@@ -107,8 +108,8 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 				isBlockTemplatePart,
 				isNextBlockTemplatePart,
 				isPrevBlockTemplatePart,
-				canRemove: canRemoveBlock( clientId, rootClientId ),
-				canMove: canMoveBlock( clientId, rootClientId ),
+				canRemove: canRemoveBlock( clientId ),
+				canMove: canMoveBlock( clientId ),
 			};
 		},
 		[ clientId, rootClientId ]
@@ -125,7 +126,6 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 		canMove,
 	} = selected;
 	const { setNavigationMode, removeBlock } = useDispatch( blockEditorStore );
-	const ref = useRef();
 
 	// Focus the breadcrumb in navigation mode.
 	useEffect( () => {
@@ -164,11 +164,6 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 		const isEnter = keyCode === ENTER;
 		const isSpace = keyCode === SPACE;
 		const isShift = event.shiftKey;
-		if ( isEscape && editorMode === 'navigation' ) {
-			setNavigationMode( false );
-			event.preventDefault();
-			return;
-		}
 
 		if ( keyCode === BACKSPACE || keyCode === DELETE ) {
 			removeBlock( clientId );
@@ -273,7 +268,7 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 		}
 	}
 
-	const classNames = classnames(
+	const classNames = clsx(
 		'block-editor-block-list__block-selection-button',
 		{
 			'is-block-moving-mode': !! blockMovingMode,
@@ -368,4 +363,4 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 	);
 }
 
-export default BlockSelectionButton;
+export default forwardRef( BlockSelectionButton );

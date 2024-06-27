@@ -181,4 +181,13 @@
 		background: $components-color-accent;
 		color: $white;
 	}
+
+	&[aria-disabled="true"] {
+		pointer-events: none;
+		color: $gray-600;
+
+		&.is-selected {
+			background-color: $components-color-accent-transparent-40;
+		}
+	}
 }

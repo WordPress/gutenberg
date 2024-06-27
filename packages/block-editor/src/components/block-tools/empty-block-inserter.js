@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * Internal dependencies
@@ -31,7 +31,7 @@ export default function EmptyBlockInserter( {
 		<BlockPopoverCover
 			clientId={ capturingClientId || clientId }
 			bottomClientId={ lastClientId }
-			className={ classnames(
+			className={ clsx(
 				'block-editor-block-list__block-side-inserter-popover',
 				{
 					'is-insertion-point-visible': isInsertionPointVisible,

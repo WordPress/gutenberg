@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classNames from 'classnames';
+import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
 
 /**
@@ -58,7 +58,7 @@ export function UnforwardedInputControl(
 	} = useDeprecated36pxDefaultSizeProp< InputControlProps >( props );
 
 	const id = useUniqueId( idProp );
-	const classes = classNames( 'components-input-control', className );
+	const classes = clsx( 'components-input-control', className );
 
 	const draftHookProps = useDraft( {
 		value,
@@ -66,10 +66,7 @@ export function UnforwardedInputControl(
 		onChange,
 	} );
 
-	// ARIA descriptions can only contain plain text, so fall back to aria-details if not.
-	const helpPropName =
-		typeof help === 'string' ? 'aria-describedby' : 'aria-details';
-	const helpProp = !! help ? { [ helpPropName ]: `${ id }__help` } : {};
+	const helpProp = !! help ? { 'aria-describedby': `${ id }__help` } : {};
 
 	return (
 		<BaseControl

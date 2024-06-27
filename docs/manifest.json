@@ -102,7 +102,7 @@
 		"parent": "fundamentals"
 	},
 	{
-		"title": "Working with Javascript for the Block Editor",
+		"title": "Working with JavaScript for the Block Editor",
 		"slug": "javascript-in-the-block-editor",
 		"markdown_source": "../docs/getting-started/fundamentals/javascript-in-the-block-editor.md",
 		"parent": "fundamentals"
@@ -492,6 +492,36 @@
 		"parent": "filters"
 	},
 	{
+		"title": "Interactivity API Reference",
+		"slug": "interactivity-api",
+		"markdown_source": "../docs/reference-guides/interactivity-api/README.md",
+		"parent": "reference-guides"
+	},
+	{
+		"title": "Quick start guide",
+		"slug": "iapi-quick-start-guide",
+		"markdown_source": "../docs/reference-guides/interactivity-api/iapi-quick-start-guide.md",
+		"parent": "interactivity-api"
+	},
+	{
+		"title": "API Reference",
+		"slug": "api-reference",
+		"markdown_source": "../docs/reference-guides/interactivity-api/api-reference.md",
+		"parent": "interactivity-api"
+	},
+	{
+		"title": "About the Interactivity API",
+		"slug": "iapi-about",
+		"markdown_source": "../docs/reference-guides/interactivity-api/iapi-about.md",
+		"parent": "interactivity-api"
+	},
+	{
+		"title": "Frequently Asked Questions",
+		"slug": "iapi-faq",
+		"markdown_source": "../docs/reference-guides/interactivity-api/iapi-faq.md",
+		"parent": "interactivity-api"
+	},
+	{
 		"title": "SlotFills Reference",
 		"slug": "slotfills",
 		"markdown_source": "../docs/reference-guides/slotfills/README.md",
@@ -564,7 +594,7 @@
 		"parent": "reference-guides"
 	},
 	{
-		"title": "Theme.json Version 2",
+		"title": "Theme.json Version 3 Reference (latest)",
 		"slug": "theme-json-living",
 		"markdown_source": "../docs/reference-guides/theme-json-reference/theme-json-living.md",
 		"parent": "theme-json-reference"
@@ -576,7 +606,13 @@
 		"parent": "theme-json-reference"
 	},
 	{
-		"title": "Migrating to Newer Versions",
+		"title": "Theme.json Version 2 Reference",
+		"slug": "theme-json-v2",
+		"markdown_source": "../docs/reference-guides/theme-json-reference/theme-json-v2.md",
+		"parent": "theme-json-reference"
+	},
+	{
+		"title": "Migrating Theme.json to Newer Versions",
 		"slug": "theme-json-migrations",
 		"markdown_source": "../docs/reference-guides/theme-json-reference/theme-json-migrations.md",
 		"parent": "theme-json-reference"
@@ -1083,6 +1119,12 @@
 		"title": "Popover",
 		"slug": "popover",
 		"markdown_source": "../packages/components/src/popover/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ProgressBar",
+		"slug": "progress-bar",
+		"markdown_source": "../packages/components/src/progress-bar/README.md",
 		"parent": "components"
 	},
 	{
@@ -1666,12 +1708,6 @@
 		"slug": "packages-interactivity",
 		"markdown_source": "../packages/interactivity/README.md",
 		"parent": "packages"
-	},
-	{
-		"title": "API Reference",
-		"slug": "packages-interactivity-api-reference",
-		"markdown_source": "../packages/interactivity/docs/api-reference.md",
-		"parent": "packages-interactivity"
 	},
 	{
 		"title": "@wordpress/interface",

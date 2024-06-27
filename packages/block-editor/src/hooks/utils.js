@@ -23,7 +23,7 @@ import { unlock } from '../lock-unlock';
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * Removed falsy values from nested object.
@@ -135,7 +135,14 @@ export function shouldSkipSerialization(
 
 const pendingStyleOverrides = new WeakMap();
 
-export function useStyleOverride( { id, css, assets, __unstableType } = {} ) {
+export function useStyleOverride( {
+	id,
+	css,
+	assets,
+	__unstableType,
+	variation,
+	clientId,
+} = {} ) {
 	const { setStyleOverride, deleteStyleOverride } = unlock(
 		useDispatch( blockEditorStore )
 	);
@@ -143,7 +150,9 @@ export function useStyleOverride( { id, css, assets, __unstableType } = {} ) {
 	const fallbackId = useId();
 	useEffect( () => {
 		// Unmount if there is CSS and assets are empty.
-		if ( ! css && ! assets ) return;
+		if ( ! css && ! assets ) {
+			return;
+		}
 
 		const _id = id || fallbackId;
 		const override = {
@@ -151,6 +160,8 @@ export function useStyleOverride( { id, css, assets, __unstableType } = {} ) {
 			css,
 			assets,
 			__unstableType,
+			variation,
+			clientId,
 		};
 		// Batch updates to style overrides to avoid triggering cascading renders
 		// for each style override block included in a tree and optimize initial render.
@@ -187,6 +198,7 @@ export function useStyleOverride( { id, css, assets, __unstableType } = {} ) {
 	}, [
 		id,
 		css,
+		clientId,
 		assets,
 		__unstableType,
 		fallbackId,
@@ -213,6 +225,7 @@ export function useBlockSettings( name, parentLayout ) {
 		customFontFamilies,
 		defaultFontFamilies,
 		themeFontFamilies,
+		defaultFontSizesEnabled,
 		customFontSizes,
 		defaultFontSizes,
 		themeFontSizes,
@@ -229,7 +242,11 @@ export function useBlockSettings( name, parentLayout ) {
 		padding,
 		margin,
 		blockGap,
-		spacingSizes,
+		defaultSpacingSizesEnabled,
+		customSpacingSize,
+		userSpacingSizes,
+		defaultSpacingSizes,
+		themeSpacingSizes,
 		units,
 		aspectRatio,
 		minHeight,
@@ -265,6 +282,7 @@ export function useBlockSettings( name, parentLayout ) {
 		'typography.fontFamilies.custom',
 		'typography.fontFamilies.default',
 		'typography.fontFamilies.theme',
+		'typography.defaultFontSizes',
 		'typography.fontSizes.custom',
 		'typography.fontSizes.default',
 		'typography.fontSizes.theme',
@@ -281,7 +299,11 @@ export function useBlockSettings( name, parentLayout ) {
 		'spacing.padding',
 		'spacing.margin',
 		'spacing.blockGap',
-		'spacing.spacingSizes',
+		'spacing.defaultSpacingSizes',
+		'spacing.customSpacingSize',
+		'spacing.spacingSizes.custom',
+		'spacing.spacingSizes.default',
+		'spacing.spacingSizes.theme',
 		'spacing.units',
 		'dimensions.aspectRatio',
 		'dimensions.minHeight',
@@ -359,6 +381,7 @@ export function useBlockSettings( name, parentLayout ) {
 					theme: themeFontSizes,
 				},
 				customFontSize,
+				defaultFontSizes: defaultFontSizesEnabled,
 				fontStyle,
 				fontWeight,
 				lineHeight,
@@ -371,8 +394,12 @@ export function useBlockSettings( name, parentLayout ) {
 			},
 			spacing: {
 				spacingSizes: {
-					custom: spacingSizes,
+					custom: userSpacingSizes,
+					default: defaultSpacingSizes,
+					theme: themeSpacingSizes,
 				},
+				customSpacingSize,
+				defaultSpacingSizes: defaultSpacingSizesEnabled,
 				padding,
 				margin,
 				blockGap,
@@ -398,6 +425,7 @@ export function useBlockSettings( name, parentLayout ) {
 		customFontFamilies,
 		defaultFontFamilies,
 		themeFontFamilies,
+		defaultFontSizesEnabled,
 		customFontSizes,
 		defaultFontSizes,
 		themeFontSizes,
@@ -414,7 +442,11 @@ export function useBlockSettings( name, parentLayout ) {
 		padding,
 		margin,
 		blockGap,
-		spacingSizes,
+		defaultSpacingSizesEnabled,
+		customSpacingSize,
+		userSpacingSizes,
+		defaultSpacingSizes,
+		themeSpacingSizes,
 		units,
 		aspectRatio,
 		minHeight,
@@ -552,6 +584,7 @@ export function createBlockListBlockFilter( features ) {
 						hasSupport,
 						attributeKeys = [],
 						useBlockProps,
+						isMatch,
 					} = feature;
 
 					const neededProps = {};
@@ -565,7 +598,8 @@ export function createBlockListBlockFilter( features ) {
 						// Skip rendering if none of the needed attributes are
 						// set.
 						! Object.keys( neededProps ).length ||
-						! hasSupport( props.name )
+						! hasSupport( props.name ) ||
+						( isMatch && ! isMatch( neededProps ) )
 					) {
 						return null;
 					}
@@ -581,6 +615,7 @@ export function createBlockListBlockFilter( features ) {
 							// function reference.
 							setAllWrapperProps={ setAllWrapperProps }
 							name={ props.name }
+							clientId={ props.clientId }
 							// This component is pure, so only pass needed
 							// props!!!
 							{ ...neededProps }
@@ -596,7 +631,7 @@ export function createBlockListBlockFilter( features ) {
 							return {
 								...acc,
 								...wrapperProps,
-								className: classnames(
+								className: clsx(
 									acc.className,
 									wrapperProps.className
 								),

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -35,7 +35,6 @@ import AddNewTemplate from '../add-new-template';
 import { useAddedBy } from './hooks';
 import {
 	TEMPLATE_POST_TYPE,
-	ENUMERATION_TYPE,
 	OPERATOR_IS_ANY,
 	LAYOUT_GRID,
 	LAYOUT_TABLE,
@@ -44,6 +43,7 @@ import {
 
 import usePatternSettings from '../page-patterns/use-pattern-settings';
 import { unlock } from '../../lock-unlock';
+import { useEditPostAction } from '../dataviews-actions';
 
 const { usePostActions } = unlock( editorPrivateApis );
 
@@ -112,12 +112,9 @@ function AuthorField( { item, viewType } ) {
 		<HStack alignment="left" spacing={ 1 }>
 			{ withIcon && imageUrl && (
 				<div
-					className={ classnames(
-						'page-templates-author-field__avatar',
-						{
-							'is-loaded': isImageLoaded,
-						}
-					) }
+					className={ clsx( 'page-templates-author-field__avatar', {
+						'is-loaded': isImageLoaded,
+					} ) }
 				>
 					<img
 						onLoad={ () => setIsImageLoaded( true ) }
@@ -187,17 +184,11 @@ function Preview( { item, viewType } ) {
 	);
 }
 
-const TEMPLATE_ACTIONS = [
-	'edit-post',
-	'reset-template',
-	'rename-template',
-	'view-post-revisions',
-	'delete-template',
-];
-
 export default function PageTemplates() {
 	const { params } = useLocation();
-	const { activeView = 'all', layout } = params;
+	const { activeView = 'all', layout, postId } = params;
+	const [ selection, setSelection ] = useState( [ postId ] );
+
 	const defaultView = useMemo( () => {
 		const usedType = layout ?? DEFAULT_VIEW.type;
 		return {
@@ -323,7 +314,6 @@ export default function PageTemplates() {
 				render: ( { item } ) => {
 					return <AuthorField viewType={ view.type } item={ item } />;
 				},
-				type: ENUMERATION_TYPE,
 				elements: authors,
 				width: '1%',
 			},
@@ -335,21 +325,15 @@ export default function PageTemplates() {
 		return filterSortAndPaginate( records, view, fields );
 	}, [ records, view, fields ] );
 
-	const onActionPerformed = useCallback(
-		( actionId, items ) => {
-			if ( actionId === 'edit-post' ) {
-				const post = items[ 0 ];
-				history.push( {
-					postId: post.id,
-					postType: post.type,
-					canvas: 'edit',
-				} );
-			}
-		},
-		[ history ]
+	const postTypeActions = usePostActions( {
+		postType: TEMPLATE_POST_TYPE,
+		context: 'list',
+	} );
+	const editAction = useEditPostAction();
+	const actions = useMemo(
+		() => [ editAction, ...postTypeActions ],
+		[ postTypeActions, editAction ]
 	);
-
-	const actions = usePostActions( onActionPerformed, TEMPLATE_ACTIONS );
 
 	const onChangeView = useCallback(
 		( newView ) => {
@@ -387,6 +371,8 @@ export default function PageTemplates() {
 				view={ view }
 				onChangeView={ onChangeView }
 				onSelectionChange={ onSelectionChange }
+				selection={ selection }
+				setSelection={ setSelection }
 			/>
 		</Page>
 	);

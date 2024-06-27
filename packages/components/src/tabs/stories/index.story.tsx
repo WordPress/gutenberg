@@ -31,7 +31,6 @@ const meta: Meta< typeof Tabs > = {
 	tags: [ 'status-private' ],
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
-		badges: [ 'private' ],
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},
@@ -68,6 +67,20 @@ const Template: StoryFn< typeof Tabs > = ( props ) => {
 };
 
 export const Default = Template.bind( {} );
+
+const VerticalTemplate: StoryFn< typeof Tabs > = ( props ) => {
+	return (
+		<Tabs orientation="vertical" { ...props }>
+			<Tabs.TabList style={ { maxWidth: '10rem' } }>
+				<Tabs.Tab tabId="tab1">Tab 1</Tabs.Tab>
+				<Tabs.Tab tabId="tab2">Tab 2</Tabs.Tab>
+				<Tabs.Tab tabId="tab3">Tab 3</Tabs.Tab>
+			</Tabs.TabList>
+		</Tabs>
+	);
+};
+
+export const Vertical = VerticalTemplate.bind( {} );
 
 const DisabledTabTemplate: StoryFn< typeof Tabs > = ( props ) => {
 	return (
@@ -203,7 +216,7 @@ const CloseButtonTemplate: StoryFn< typeof Tabs > = ( props ) => {
 								<Tabs.Tab tabId="tab3">Tab 3</Tabs.Tab>
 							</Tabs.TabList>
 							<Button
-								variant={ 'tertiary' }
+								variant="tertiary"
 								style={ {
 									marginLeft: 'auto',
 									alignSelf: 'center',
@@ -225,10 +238,7 @@ const CloseButtonTemplate: StoryFn< typeof Tabs > = ( props ) => {
 					</Tabs>
 				</div>
 			) : (
-				<Button
-					variant={ 'tertiary' }
-					onClick={ () => setIsOpen( true ) }
-				>
+				<Button variant="tertiary" onClick={ () => setIsOpen( true ) }>
 					Open Tabs
 				</Button>
 			) }
@@ -269,31 +279,29 @@ const ControlledModeTemplate: StoryFn< typeof Tabs > = ( props ) => {
 					<p>Selected tab: Tab 3</p>
 				</Tabs.TabPanel>
 			</Tabs>
-			{
-				<div style={ { marginTop: '200px' } }>
-					<p>Select a tab:</p>
-					<DropdownMenu
-						controls={ [
-							{
-								onClick: () => setSelectedTabId( 'tab1' ),
-								title: 'Tab 1',
-								isActive: selectedTabId === 'tab1',
-							},
-							{
-								onClick: () => setSelectedTabId( 'tab2' ),
-								title: 'Tab 2',
-								isActive: selectedTabId === 'tab2',
-							},
-							{
-								onClick: () => setSelectedTabId( 'tab3' ),
-								title: 'Tab 3',
-								isActive: selectedTabId === 'tab3',
-							},
-						] }
-						label="Choose a tab. The power is yours."
-					/>
-				</div>
-			}
+			<div style={ { marginTop: '200px' } }>
+				<p>Select a tab:</p>
+				<DropdownMenu
+					controls={ [
+						{
+							onClick: () => setSelectedTabId( 'tab1' ),
+							title: 'Tab 1',
+							isActive: selectedTabId === 'tab1',
+						},
+						{
+							onClick: () => setSelectedTabId( 'tab2' ),
+							title: 'Tab 2',
+							isActive: selectedTabId === 'tab2',
+						},
+						{
+							onClick: () => setSelectedTabId( 'tab3' ),
+							title: 'Tab 3',
+							isActive: selectedTabId === 'tab3',
+						},
+					] }
+					label="Choose a tab. The power is yours."
+				/>
+			</div>
 		</>
 	);
 };

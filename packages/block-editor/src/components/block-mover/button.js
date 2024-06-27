@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -130,7 +130,7 @@ const BlockMoverButton = forwardRef(
 			<>
 				<Button
 					ref={ ref }
-					className={ classnames(
+					className={ clsx(
 						'block-editor-block-mover-button',
 						`is-${ direction }-button`
 					) }

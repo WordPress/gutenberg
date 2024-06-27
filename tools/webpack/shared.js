@@ -64,13 +64,15 @@ const plugins = [
 	process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
 	new DefinePlugin( {
 		// Inject the `IS_GUTENBERG_PLUGIN` global, used for feature flagging.
-		'process.env.IS_GUTENBERG_PLUGIN':
-			process.env.npm_package_config_IS_GUTENBERG_PLUGIN,
+		'globalThis.IS_GUTENBERG_PLUGIN': JSON.stringify(
+			Boolean( process.env.npm_package_config_IS_GUTENBERG_PLUGIN )
+		),
 		// Inject the `IS_WORDPRESS_CORE` global, used for feature flagging.
-		'process.env.IS_WORDPRESS_CORE':
-			process.env.npm_package_config_IS_WORDPRESS_CORE,
+		'globalThis.IS_WORDPRESS_CORE': JSON.stringify(
+			Boolean( process.env.npm_package_config_IS_WORDPRESS_CORE )
+		),
 		// Inject the `SCRIPT_DEBUG` global, used for dev versions of JavaScript.
-		SCRIPT_DEBUG: mode === 'development',
+		'globalThis.SCRIPT_DEBUG': JSON.stringify( mode === 'development' ),
 	} ),
 	mode === 'production' && new ReadableJsAssetsWebpackPlugin(),
 ];

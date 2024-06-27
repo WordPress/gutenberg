@@ -1,8 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
+import { observableMap } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -12,7 +13,6 @@ import type {
 	SlotFillProviderProps,
 	SlotFillBubblesVirtuallyContext,
 } from '../types';
-import { observableMap } from './observable-map';
 
 function createSlotRegistry(): SlotFillBubblesVirtuallyContext {
 	const slots: SlotFillBubblesVirtuallyContext[ 'slots' ] = observableMap();
@@ -98,7 +98,7 @@ function createSlotRegistry(): SlotFillBubblesVirtuallyContext {
 export default function SlotFillProvider( {
 	children,
 }: SlotFillProviderProps ) {
-	const registry = useMemo( createSlotRegistry, [] );
+	const [ registry ] = useState( createSlotRegistry );
 	return (
 		<SlotFillContext.Provider value={ registry }>
 			{ children }

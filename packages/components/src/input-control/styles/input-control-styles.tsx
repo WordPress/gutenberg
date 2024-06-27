@@ -83,8 +83,6 @@ export const Root = styled( Flex )`
 
 	// Focus within, excluding cases where auxiliary controls in prefix or suffix have focus.
 	&:focus-within:not( :has( :is( ${ Prefix }, ${ Suffix } ):focus-within ) ) {
-		z-index: 1;
-
 		${ BackdropUI } {
 			border-color: ${ COLORS.ui.borderFocus };
 			box-shadow: ${ CONFIG.controlBoxShadowFocus };
@@ -107,9 +105,13 @@ const containerWidthStyles = ( {
 	__unstableInputWidth,
 	labelPosition,
 }: ContainerProps ) => {
-	if ( ! __unstableInputWidth ) return css( { width: '100%' } );
+	if ( ! __unstableInputWidth ) {
+		return css( { width: '100%' } );
+	}
 
-	if ( labelPosition === 'side' ) return '';
+	if ( labelPosition === 'side' ) {
+		return '';
+	}
 
 	if ( labelPosition === 'edge' ) {
 		return css( {
@@ -143,7 +145,9 @@ type InputProps = {
 };
 
 const disabledStyles = ( { disabled }: InputProps ) => {
-	if ( ! disabled ) return '';
+	if ( ! disabled ) {
+		return '';
+	}
 
 	return css( {
 		color: COLORS.ui.textDisabled,
@@ -161,7 +165,9 @@ export const fontSizeStyles = ( { inputSize: size }: InputProps ) => {
 	const fontSize = sizes[ size as Size ] || sizes.default;
 	const fontSizeMobile = '16px';
 
-	if ( ! fontSize ) return '';
+	if ( ! fontSize ) {
+		return '';
+	}
 
 	return css`
 		font-size: ${ fontSizeMobile };

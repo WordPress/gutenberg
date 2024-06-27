@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classNames from 'classnames';
+import clsx from 'clsx';
 import type { ForwardedRef, KeyboardEvent, MouseEvent } from 'react';
 
 /**
@@ -82,7 +82,7 @@ function UnforwardedNumberControl(
 	};
 
 	const autoComplete = typeProp === 'number' ? 'off' : undefined;
-	const classes = classNames( 'components-number-control', className );
+	const classes = clsx( 'components-number-control', className );
 	const cx = useCx();
 	const spinButtonClasses = cx( size === 'small' && styles.smallSpinButtons );
 

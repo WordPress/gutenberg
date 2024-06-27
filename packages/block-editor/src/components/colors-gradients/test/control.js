@@ -43,7 +43,7 @@ describe( 'ColorPaletteControl', () => {
 
 		// Is showing the two tab buttons.
 		expect(
-			screen.getByRole( 'tab', { name: 'Solid' } )
+			screen.getByRole( 'tab', { name: 'Color' } )
 		).toBeInTheDocument();
 		expect(
 			screen.getByRole( 'tab', { name: 'Gradient' } )
@@ -72,7 +72,7 @@ describe( 'ColorPaletteControl', () => {
 
 		// Is not showing the two tab buttons.
 		expect(
-			screen.queryByRole( 'tab', { name: 'Solid' } )
+			screen.queryByRole( 'tab', { name: 'Color' } )
 		).not.toBeInTheDocument();
 		expect(
 			screen.queryByRole( 'tab', { name: 'Gradient' } )
@@ -111,7 +111,7 @@ describe( 'ColorPaletteControl', () => {
 
 		// Is not showing the two tab buttons.
 		expect(
-			screen.queryByRole( 'tab', { name: 'Solid' } )
+			screen.queryByRole( 'tab', { name: 'Color' } )
 		).not.toBeInTheDocument();
 		expect(
 			screen.queryByRole( 'tab', { name: 'Gradient' } )

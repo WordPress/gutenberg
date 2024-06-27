@@ -322,12 +322,11 @@ describe( 'renderElement()', () => {
 				<Provider value={ { value: '1st provided' } }>
 					<Consumer>{ ( context ) => context.value }</Consumer>
 				</Provider>
-				{ '|' }
+				|
 				<Provider value={ { value: '2nd provided' } }>
 					<Consumer>{ ( context ) => context.value }</Consumer>
 				</Provider>
-				{ '|' }
-				<Consumer>{ ( context ) => context.value }</Consumer>
+				|<Consumer>{ ( context ) => context.value }</Consumer>
 			</Fragment>
 		);
 
@@ -344,8 +343,7 @@ describe( 'renderElement()', () => {
 				<Provider value={ { value: 'inner provided' } }>
 					<Consumer>{ ( context ) => context.value }</Consumer>
 				</Provider>
-				{ '|' }
-				<Consumer>{ ( context ) => context.value }</Consumer>
+				|<Consumer>{ ( context ) => context.value }</Consumer>
 			</Provider>
 		);
 

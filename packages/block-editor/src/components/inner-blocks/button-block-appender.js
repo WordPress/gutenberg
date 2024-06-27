@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * Internal dependencies
@@ -18,7 +18,7 @@ export const ButtonBlockAppender = ( {
 } ) => {
 	return (
 		<BaseButtonBlockAppender
-			className={ classnames( {
+			className={ clsx( {
 				'block-list-appender__toggle': isToggle,
 			} ) }
 			rootClientId={ clientId }

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -52,7 +52,7 @@ const ShortcutList = ( { shortcuts } ) => (
 
 const ShortcutSection = ( { title, shortcuts, className } ) => (
 	<section
-		className={ classnames(
+		className={ clsx(
 			'editor-keyboard-shortcut-help-modal__section',
 			className
 		) }

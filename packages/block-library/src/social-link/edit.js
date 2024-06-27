@@ -1,20 +1,16 @@
 /**
  * External dependencies
  */
-import classNames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import { DELETE, BACKSPACE } from '@wordpress/keycodes';
-import { useDispatch } from '@wordpress/data';
-
 import {
 	InspectorControls,
 	URLPopover,
 	URLInput,
 	useBlockProps,
-	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
 import {
@@ -36,9 +32,7 @@ const SocialLinkURLPopover = ( {
 	setAttributes,
 	setPopover,
 	popoverAnchor,
-	clientId,
 } ) => {
-	const { removeBlock } = useDispatch( blockEditorStore );
 	return (
 		<URLPopover
 			anchor={ popoverAnchor }
@@ -62,18 +56,6 @@ const SocialLinkURLPopover = ( {
 						label={ __( 'Enter social link' ) }
 						hideLabelFromVision
 						disableSuggestions
-						onKeyDown={ ( event ) => {
-							if (
-								!! url ||
-								event.defaultPrevented ||
-								! [ BACKSPACE, DELETE ].includes(
-									event.keyCode
-								)
-							) {
-								return;
-							}
-							removeBlock( clientId );
-						} }
 					/>
 				</div>
 				<Button
@@ -91,7 +73,6 @@ const SocialLinkEdit = ( {
 	context,
 	isSelected,
 	setAttributes,
-	clientId,
 } ) => {
 	const { url, service, label = '', rel } = attributes;
 	const {
@@ -102,7 +83,7 @@ const SocialLinkEdit = ( {
 		iconBackgroundColorValue,
 	} = context;
 	const [ showURLPopover, setPopover ] = useState( false );
-	const classes = classNames( 'wp-social-link', 'wp-social-link-' + service, {
+	const classes = clsx( 'wp-social-link', 'wp-social-link-' + service, {
 		'wp-social-link__is-incomplete': ! url,
 		[ `has-${ iconColor }-color` ]: iconColor,
 		[ `has-${ iconBackgroundColor }-background-color` ]:
@@ -158,27 +139,26 @@ const SocialLinkEdit = ( {
 				/>
 			</InspectorControls>
 			<li { ...blockProps }>
-				<Button
+				<button
 					className="wp-block-social-link-anchor"
 					ref={ setPopoverAnchor }
 					onClick={ () => setPopover( true ) }
 				>
 					<IconComponent />
 					<span
-						className={ classNames( 'wp-block-social-link-label', {
+						className={ clsx( 'wp-block-social-link-label', {
 							'screen-reader-text': ! showLabels,
 						} ) }
 					>
 						{ socialLinkText }
 					</span>
-				</Button>
+				</button>
 				{ isSelected && showURLPopover && (
 					<SocialLinkURLPopover
 						url={ url }
 						setAttributes={ setAttributes }
 						setPopover={ setPopover }
 						popoverAnchor={ popoverAnchor }
-						clientId={ clientId }
 					/>
 				) }
 			</li>

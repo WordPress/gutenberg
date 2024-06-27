@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 import type { ChangeEvent } from 'react';
 
 /**
@@ -103,7 +103,7 @@ export function CheckboxControl(
 					</span>
 				)
 			}
-			className={ classnames( 'components-checkbox-control', className ) }
+			className={ clsx( 'components-checkbox-control', className ) }
 		>
 			<HStack spacing={ 0 } justify="start" alignment="top">
 				<span className="components-checkbox-control__input-container">

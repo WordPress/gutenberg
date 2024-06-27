@@ -210,6 +210,12 @@ test.describe( 'data-wp-bind', () => {
 					const el = container.getByTestId( testid );
 					const toggle = container.getByTestId( 'toggle value' );
 
+					// Ensure hydration has happened.
+					const checkbox = page.getByTestId(
+						'add missing checked at hydration'
+					);
+					await expect( checkbox ).toBeChecked();
+
 					const hydratedAttr = await el.getAttribute( name );
 					const hydratedProp = await el.evaluate(
 						( node, propName ) => ( node as any )[ propName ],
@@ -236,7 +242,13 @@ test.describe( 'data-wp-bind', () => {
 						return;
 					}
 
-					await toggle.click( { clickCount: 2, delay: 50 } );
+					await toggle.click( { clickCount: 2 } );
+
+					// Ensure values have been updated after toggling.
+					await expect( toggle ).toHaveAttribute(
+						'data-toggle-count',
+						'2'
+					);
 
 					// Values should be the same as before.
 					const renderedAttr = await el.getAttribute( name );

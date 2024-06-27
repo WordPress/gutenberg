@@ -8,24 +8,20 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useCallback } from '@wordpress/element';
+import { useCallback, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import {
-	mergeOrigins,
-	overrideOrigins,
-	hasOriginValue,
-} from '../../store/get-block-settings';
 import FontFamilyControl from '../font-family';
 import FontAppearanceControl from '../font-appearance-control';
 import LineHeightControl from '../line-height-control';
 import LetterSpacingControl from '../letter-spacing-control';
+import TextAlignmentControl from '../text-alignment-control';
 import TextTransformControl from '../text-transform-control';
 import TextDecorationControl from '../text-decoration-control';
 import WritingModeControl from '../writing-mode-control';
-import { getValueFromVariable, TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
+import { getValueFromVariable, useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
 
 const MIN_TEXT_COLUMNS = 1;
@@ -36,6 +32,7 @@ export function useHasTypographyPanel( settings ) {
 	const hasLineHeight = useHasLineHeightControl( settings );
 	const hasFontAppearance = useHasAppearanceControl( settings );
 	const hasLetterSpacing = useHasLetterSpacingControl( settings );
+	const hasTextAlign = useHasTextAlignmentControl( settings );
 	const hasTextTransform = useHasTextTransformControl( settings );
 	const hasTextDecoration = useHasTextDecorationControl( settings );
 	const hasWritingMode = useHasWritingModeControl( settings );
@@ -47,6 +44,7 @@ export function useHasTypographyPanel( settings ) {
 		hasLineHeight ||
 		hasFontAppearance ||
 		hasLetterSpacing ||
+		hasTextAlign ||
 		hasTextTransform ||
 		hasFontSize ||
 		hasTextDecoration ||
@@ -57,13 +55,18 @@ export function useHasTypographyPanel( settings ) {
 
 function useHasFontSizeControl( settings ) {
 	return (
-		hasOriginValue( settings?.typography?.fontSizes ) ||
+		( settings?.typography?.defaultFontSizes !== false &&
+			settings?.typography?.fontSizes?.default?.length ) ||
+		settings?.typography?.fontSizes?.theme?.length ||
+		settings?.typography?.fontSizes?.custom?.length ||
 		settings?.typography?.customFontSize
 	);
 }
 
 function useHasFontFamilyControl( settings ) {
-	return hasOriginValue( settings?.typography?.fontFamilies );
+	return [ 'default', 'theme', 'custom' ].some(
+		( key ) => settings?.typography?.fontFamilies?.[ key ]?.length
+	);
 }
 
 function useHasLineHeightControl( settings ) {
@@ -92,6 +95,10 @@ function useHasTextTransformControl( settings ) {
 	return settings?.typography?.textTransform;
 }
 
+function useHasTextAlignmentControl( settings ) {
+	return settings?.typography?.textAlign;
+}
+
 function useHasTextDecorationControl( settings ) {
 	return settings?.typography?.textDecoration;
 }
@@ -104,16 +111,21 @@ function useHasTextColumnsControl( settings ) {
 	return settings?.typography?.textColumns;
 }
 
-function getUniqueFontSizesBySlug( settings ) {
-	const fontSizes = settings?.typography?.fontSizes ?? {};
-	const overriddenFontSizes = overrideOrigins( fontSizes ) ?? [];
-	const uniqueSizes = [];
-	for ( const currentSize of overriddenFontSizes ) {
-		if ( ! uniqueSizes.some( ( { slug } ) => slug === currentSize.slug ) ) {
-			uniqueSizes.push( currentSize );
-		}
-	}
-	return uniqueSizes;
+/**
+ * Concatenate all the font sizes into a single list for the font size picker.
+ *
+ * @param {Object} settings The global styles settings.
+ *
+ * @return {Array} The merged font sizes.
+ */
+function getMergedFontSizes( settings ) {
+	const fontSizes = settings?.typography?.fontSizes;
+	const defaultFontSizesEnabled = !! settings?.typography?.defaultFontSizes;
+	return [
+		...( fontSizes?.custom ?? [] ),
+		...( fontSizes?.theme ?? [] ),
+		...( defaultFontSizesEnabled ? fontSizes?.default ?? [] : [] ),
+	];
 }
 
 function TypographyToolsPanel( {
@@ -123,6 +135,7 @@ function TypographyToolsPanel( {
 	panelId,
 	children,
 } ) {
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const resetAll = () => {
 		const updatedValue = resetAllFilter( value );
 		onChange( updatedValue );
@@ -133,7 +146,7 @@ function TypographyToolsPanel( {
 			label={ __( 'Typography' ) }
 			resetAll={ resetAll }
 			panelId={ panelId }
-			dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
+			dropdownMenuProps={ dropdownMenuProps }
 		>
 			{ children }
 		</ToolsPanel>
@@ -146,6 +159,7 @@ const DEFAULT_CONTROLS = {
 	fontAppearance: true,
 	lineHeight: true,
 	letterSpacing: true,
+	textAlign: true,
 	textTransform: true,
 	textDecoration: true,
 	writingMode: true,
@@ -166,8 +180,12 @@ export default function TypographyPanel( {
 
 	// Font Family
 	const hasFontFamilyEnabled = useHasFontFamilyControl( settings );
-	const fontFamilies = settings?.typography?.fontFamilies ?? {};
-	const mergedFontFamilies = fontFamilies ? mergeOrigins( fontFamilies ) : [];
+	const fontFamilies = settings?.typography?.fontFamilies;
+	const mergedFontFamilies = useMemo( () => {
+		return [ 'default', 'theme', 'custom' ].flatMap(
+			( key ) => fontFamilies?.[ key ] ?? []
+		);
+	}, [ fontFamilies ] );
 	const fontFamily = decodeValue( inheritedValue?.typography?.fontFamily );
 	const setFontFamily = ( newValue ) => {
 		const slug = mergedFontFamilies?.find(
@@ -189,7 +207,7 @@ export default function TypographyPanel( {
 	// Font Size
 	const hasFontSizeEnabled = useHasFontSizeControl( settings );
 	const disableCustomFontSizes = ! settings?.typography?.customFontSize;
-	const mergedFontSizes = getUniqueFontSizesBySlug( settings );
+	const mergedFontSizes = getMergedFontSizes( settings );
 
 	const fontSize = decodeValue( inheritedValue?.typography?.fontSize );
 	const setFontSize = ( newValue, metadata ) => {
@@ -329,6 +347,22 @@ export default function TypographyPanel( {
 	};
 	const hasWritingMode = () => !! value?.typography?.writingMode;
 	const resetWritingMode = () => setWritingMode( undefined );
+
+	// Text Alignment
+	const hasTextAlignmentControl = useHasTextAlignmentControl( settings );
+
+	const textAlign = decodeValue( inheritedValue?.typography?.textAlign );
+	const setTextAlign = ( newValue ) => {
+		onChange(
+			setImmutably(
+				value,
+				[ 'typography', 'textAlign' ],
+				newValue || undefined
+			)
+		);
+	};
+	const hasTextAlign = () => !! value?.typography?.textAlign;
+	const resetTextAlign = () => setTextAlign( undefined );
 
 	const resetAllFilter = useCallback( ( previousValue ) => {
 		return {
@@ -505,6 +539,22 @@ export default function TypographyPanel( {
 						onChange={ setTextTransform }
 						showNone
 						isBlock
+						size="__unstable-large"
+						__nextHasNoMarginBottom
+					/>
+				</ToolsPanelItem>
+			) }
+			{ hasTextAlignmentControl && (
+				<ToolsPanelItem
+					label={ __( 'Text alignment' ) }
+					hasValue={ hasTextAlign }
+					onDeselect={ resetTextAlign }
+					isShownByDefault={ defaultControls.textAlign }
+					panelId={ panelId }
+				>
+					<TextAlignmentControl
+						value={ textAlign }
+						onChange={ setTextAlign }
 						size="__unstable-large"
 						__nextHasNoMarginBottom
 					/>

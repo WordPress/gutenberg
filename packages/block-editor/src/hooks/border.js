@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -320,7 +320,7 @@ function addSaveProps( props, blockNameOrType, attributes ) {
 	}
 
 	const borderClasses = getBorderClasses( attributes );
-	const newClassName = classnames( props.className, borderClasses );
+	const newClassName = clsx( props.className, borderClasses );
 
 	// If we are clearing the last of the previous classes in `className`
 	// set it to `undefined` to avoid rendering empty DOM attributes.
@@ -341,7 +341,7 @@ export function getBorderClasses( attributes ) {
 	const { borderColor, style } = attributes;
 	const borderColorClass = getColorClassName( 'border-color', borderColor );
 
-	return classnames( {
+	return clsx( {
 		'has-border-color': borderColor || style?.border?.color,
 		[ borderColorClass ]: !! borderColorClass,
 	} );

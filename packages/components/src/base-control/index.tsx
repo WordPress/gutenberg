@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * Internal dependencies
@@ -124,10 +124,7 @@ export const VisualLabel = ( {
 	return (
 		<StyledVisualLabel
 			{ ...props }
-			className={ classnames(
-				'components-base-control__label',
-				className
-			) }
+			className={ clsx( 'components-base-control__label', className ) }
 		>
 			{ children }
 		</StyledVisualLabel>

@@ -20,7 +20,7 @@ const { Fill, Slot } = createSlotFill( 'PluginPostExcerpt' );
  * ```js
  * // Using ES5 syntax
  * var __ = wp.i18n.__;
- * var PluginPostExcerpt = wp.editPost.PluginPostExcerpt;
+ * var PluginPostExcerpt = wp.editPost.__experimentalPluginPostExcerpt;
  *
  * function MyPluginPostExcerpt() {
  * 	return React.createElement(
@@ -37,7 +37,7 @@ const { Fill, Slot } = createSlotFill( 'PluginPostExcerpt' );
  * ```jsx
  * // Using ESNext syntax
  * import { __ } from '@wordpress/i18n';
- * import { PluginPostExcerpt } from '@wordpress/edit-post';
+ * import { __experimentalPluginPostExcerpt as PluginPostExcerpt } from '@wordpress/edit-post';
  *
  * const MyPluginPostExcerpt = () => (
  * 	<PluginPostExcerpt className="my-plugin-post-excerpt">

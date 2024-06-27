@@ -24,24 +24,21 @@
 }
 
 // We don't use .is-outline-mode in this case so colors take effect properly in the block editor.
-// Will be a better result when outlines are not shadows, but outlines, so we can target outline-color, not redefine the entire shadow.
 .block-editor-block-list__block:not(.remove-outline).wp-block-template-part,
 .block-editor-block-list__block:not(.remove-outline).is-reusable {
+
 	&.is-highlighted::after,
 	&.is-selected::after {
-		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-block-synced-color);
-	}
-
-	&.is-hovered::after {
-		box-shadow: 0 0 0 $border-width var(--wp-block-synced-color);
+		outline-color: var(--wp-block-synced-color);
 	}
 
 	&.block-editor-block-list__block:not([contenteditable]):focus {
 		&::after {
-			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-block-synced-color);
+			outline-color: var(--wp-block-synced-color);
+
 			// Show a light color for dark themes.
 			.is-dark-theme & {
-				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $dark-theme-focus;
+				outline-color: $dark-theme-focus;
 			}
 		}
 	}
