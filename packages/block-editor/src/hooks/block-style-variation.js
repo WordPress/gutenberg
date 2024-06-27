@@ -19,7 +19,6 @@ import { globalStylesDataKey } from '../store/private-keys';
 import { unlock } from '../lock-unlock';
 
 const VARIATION_PREFIX = 'is-style-';
-const EMPTY_ARRAY = [];
 
 function getVariationMatches( className ) {
 	if ( ! className ) {
@@ -78,25 +77,13 @@ function OverrideStyles( { override } ) {
  * @return {JSX.Element|undefined} An array of new block variation overrides.
  */
 export function __unstableBlockStyleVariationOverridesWithConfig( { config } ) {
-	const { overrides, getBlockStyles } = useSelect( ( select ) => {
-		const { getBlockName, getStyleOverrides } = unlock(
-			select( blockEditorStore )
-		);
-		const _overrides = getStyleOverrides();
-		return {
-			overrides: _overrides?.length
-				? _overrides.map( ( [ id, override ] ) => [
-						id,
-						{
-							...override,
-							blockName: getBlockName( override?.clientId ),
-						},
-				  ] )
-				: EMPTY_ARRAY,
+	const { getBlockStyles, overrides } = useSelect(
+		( select ) => ( {
 			getBlockStyles: select( blocksStore ).getBlockStyles,
-		};
-	}, [] );
-
+			overrides: unlock( select( blockEditorStore ) ).getStyleOverrides(),
+		} ),
+		[]
+	);
 	const { getBlockName } = useSelect( blockEditorStore );
 
 	const overridesWithConfig = useMemo( () => {
@@ -109,16 +96,17 @@ export function __unstableBlockStyleVariationOverridesWithConfig( { config } ) {
 			if (
 				override?.variation &&
 				override?.clientId &&
-				override?.blockName &&
 				/*
 				 * Because this component overwrites existing style overrides,
 				 * filter out any overrides that are already present in the store.
 				 */
 				! overriddenClientIds.includes( override.clientId )
 			) {
+				const blockName = getBlockName( override.clientId );
 				const configStyles =
-					config?.styles?.blocks?.[ override.blockName ]
-						?.variations?.[ override.variation ];
+					config?.styles?.blocks?.[ blockName ]?.variations?.[
+						override.variation
+					];
 				if ( configStyles ) {
 					const variationConfig = {
 						settings: config?.settings,
@@ -127,7 +115,7 @@ export function __unstableBlockStyleVariationOverridesWithConfig( { config } ) {
 						// name is updated to match the instance specific class name.
 						styles: {
 							blocks: {
-								[ override.blockName ]: {
+								[ blockName ]: {
 									variations: {
 										[ `${ override.variation }-${ override.clientId }` ]:
 											configStyles,
