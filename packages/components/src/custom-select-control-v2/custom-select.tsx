@@ -14,6 +14,7 @@ import type {
 	CustomSelectStore,
 	CustomSelectButtonProps,
 	CustomSelectButtonSize,
+	_CustomSelectInternalProps,
 	_CustomSelectProps,
 } from './types';
 import type { WordPressComponentProps } from '../context';
@@ -80,7 +81,10 @@ const CustomSelectButton = ( {
 };
 
 function _CustomSelect(
-	props: _CustomSelectProps & CustomSelectStore & CustomSelectButtonSize
+	props: _CustomSelectInternalProps &
+		_CustomSelectProps &
+		CustomSelectStore &
+		CustomSelectButtonSize
 ) {
 	const {
 		children,
