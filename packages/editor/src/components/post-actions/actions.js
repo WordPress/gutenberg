@@ -34,6 +34,7 @@ import { unlock } from '../../lock-unlock';
 import isTemplateRevertable from '../../store/utils/is-template-revertable';
 import { exportPatternAsJSONAction } from './export-pattern-action';
 import { CreateTemplatePartModalContents } from '../create-template-part-modal';
+import useDefaultActions from '../../dataviews/actions';
 
 // Patterns.
 const { PATTERN_TYPES, CreatePatternModalContents, useDuplicatePatternProps } =
@@ -72,81 +73,6 @@ function getItemTitle( item ) {
 	}
 	return decodeEntities( item.title?.rendered || '' );
 }
-
-// This action is used for templates, patterns and template parts.
-// Every other post type uses the similar `trashPostAction` which
-// moves the post to trash.
-const deletePostAction = {
-	id: 'delete-post',
-	label: __( 'Delete' ),
-	isPrimary: true,
-	icon: trash,
-	isEligible( post ) {
-		if (
-			[ TEMPLATE_POST_TYPE, TEMPLATE_PART_POST_TYPE ].includes(
-				post.type
-			)
-		) {
-			return isTemplateRemovable( post );
-		}
-		// We can only remove user patterns.
-		return post.type === PATTERN_TYPES.user;
-	},
-	supportsBulk: true,
-	hideModalHeader: true,
-	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
-		const [ isBusy, setIsBusy ] = useState( false );
-		const { removeTemplates } = unlock( useDispatch( editorStore ) );
-		return (
-			<VStack spacing="5">
-				<Text>
-					{ items.length > 1
-						? sprintf(
-								// translators: %d: number of items to delete.
-								_n(
-									'Delete %d item?',
-									'Delete %d items?',
-									items.length
-								),
-								items.length
-						  )
-						: sprintf(
-								// translators: %s: The template or template part's titles
-								__( 'Delete "%s"?' ),
-								getItemTitle( items[ 0 ] )
-						  ) }
-				</Text>
-				<HStack justify="right">
-					<Button
-						variant="tertiary"
-						onClick={ closeModal }
-						disabled={ isBusy }
-						__experimentalIsFocusable
-					>
-						{ __( 'Cancel' ) }
-					</Button>
-					<Button
-						variant="primary"
-						onClick={ async () => {
-							setIsBusy( true );
-							await removeTemplates( items, {
-								allowUndo: false,
-							} );
-							onActionPerformed?.( items );
-							setIsBusy( false );
-							closeModal();
-						} }
-						isBusy={ isBusy }
-						disabled={ isBusy }
-						__experimentalIsFocusable
-					>
-						{ __( 'Delete' ) }
-					</Button>
-				</HStack>
-			</VStack>
-		);
-	},
-};
 
 const trashPostAction = {
 	id: 'move-to-trash',
@@ -1064,6 +990,7 @@ export const duplicateTemplatePartAction = {
 };
 
 export function usePostActions( { postType, onActionPerformed, context } ) {
+	useDefaultActions();
 	const {
 		defaultActions,
 		postTypeObject,
@@ -1124,9 +1051,9 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 			isTemplateOrTemplatePart
 				? resetTemplateAction
 				: restorePostActionForPostType,
-			isTemplateOrTemplatePart || isPattern
-				? deletePostAction
-				: trashPostActionForPostType,
+			! isTemplateOrTemplatePart &&
+				! isPattern &&
+				trashPostActionForPostType,
 			! isTemplateOrTemplatePart &&
 				permanentlyDeletePostActionForPostType,
 			...defaultActions,
