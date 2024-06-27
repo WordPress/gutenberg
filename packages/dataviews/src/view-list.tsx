@@ -33,11 +33,11 @@ import { useRegistry } from '@wordpress/data';
  * Internal dependencies
  */
 import { unlock } from './lock-unlock';
-import type { Action, AnyItem, NormalizedField, ViewListProps } from './types';
+import type { Action, NormalizedField, ViewListProps } from './types';
 
 import { ActionsDropdownMenuGroup, ActionModal } from './item-actions';
 
-interface ListViewItemProps< Item extends AnyItem > {
+interface ListViewItemProps< Item > {
 	actions: Action< Item >[];
 	id?: string;
 	isSelected: boolean;
@@ -57,7 +57,7 @@ const {
 	DropdownMenuV2: DropdownMenu,
 } = unlock( componentsPrivateApis );
 
-function ListItem< Item extends AnyItem >( {
+function ListItem< Item >( {
 	actions,
 	id,
 	isSelected,
@@ -303,9 +303,7 @@ function ListItem< Item extends AnyItem >( {
 	);
 }
 
-export default function ViewList< Item extends AnyItem >(
-	props: ViewListProps< Item >
-) {
+export default function ViewList< Item >( props: ViewListProps< Item > ) {
 	const {
 		actions,
 		data,
@@ -329,7 +327,7 @@ export default function ViewList< Item extends AnyItem >(
 	);
 	const visibleFields = fields.filter(
 		( field ) =>
-			! view.hiddenFields.includes( field.id ) &&
+			! view.hiddenFields?.includes( field.id ) &&
 			! [ view.layout.primaryField, view.layout.mediaField ].includes(
 				field.id
 			)

@@ -16,6 +16,7 @@ import {
 import { useStyleOverride } from './utils';
 import { store as blockEditorStore } from '../store';
 import { globalStylesDataKey } from '../store/private-keys';
+import { unlock } from '../lock-unlock';
 
 const VARIATION_PREFIX = 'is-style-';
 
@@ -57,6 +58,126 @@ function getVariationNameFromClass( className, registeredStyles = [] ) {
 		}
 	}
 	return null;
+}
+
+// A helper component to apply a style override using the useStyleOverride hook.
+function OverrideStyles( { override } ) {
+	useStyleOverride( override );
+}
+
+/**
+ * This component is used to generate new block style variation overrides
+ * based on an incoming theme config. If a matching style is found in the config,
+ * a new override is created and returned. The overrides can be used in conjunction with
+ * useStyleOverride to apply the new styles to the editor. Its use is
+ * subject to change.
+ *
+ * @param {Object} props        Props.
+ * @param {Object} props.config A global styles object, containing settings and styles.
+ * @return {JSX.Element|undefined} An array of new block variation overrides.
+ */
+export function __unstableBlockStyleVariationOverridesWithConfig( { config } ) {
+	const { getBlockStyles, overrides } = useSelect(
+		( select ) => ( {
+			getBlockStyles: select( blocksStore ).getBlockStyles,
+			overrides: unlock( select( blockEditorStore ) ).getStyleOverrides(),
+		} ),
+		[]
+	);
+	const { getBlockName } = useSelect( blockEditorStore );
+
+	const overridesWithConfig = useMemo( () => {
+		if ( ! overrides?.length ) {
+			return;
+		}
+		const newOverrides = [];
+		const overriddenClientIds = [];
+		for ( const [ , override ] of overrides ) {
+			if (
+				override?.variation &&
+				override?.clientId &&
+				/*
+				 * Because this component overwrites existing style overrides,
+				 * filter out any overrides that are already present in the store.
+				 */
+				! overriddenClientIds.includes( override.clientId )
+			) {
+				const blockName = getBlockName( override.clientId );
+				const configStyles =
+					config?.styles?.blocks?.[ blockName ]?.variations?.[
+						override.variation
+					];
+				if ( configStyles ) {
+					const variationConfig = {
+						settings: config?.settings,
+						// The variation style data is all that is needed to generate
+						// the styles for the current application to a block. The variation
+						// name is updated to match the instance specific class name.
+						styles: {
+							blocks: {
+								[ blockName ]: {
+									variations: {
+										[ `${ override.variation }-${ override.clientId }` ]:
+											configStyles,
+									},
+								},
+							},
+						},
+					};
+					const blockSelectors = getBlockSelectors(
+						getBlockTypes(),
+						getBlockStyles,
+						override.clientId
+					);
+					const hasBlockGapSupport = false;
+					const hasFallbackGapSupport = true;
+					const disableLayoutStyles = true;
+					const disableRootPadding = true;
+					const variationStyles = toStyles(
+						variationConfig,
+						blockSelectors,
+						hasBlockGapSupport,
+						hasFallbackGapSupport,
+						disableLayoutStyles,
+						disableRootPadding,
+						{
+							blockGap: false,
+							blockStyles: true,
+							layoutStyles: false,
+							marginReset: false,
+							presets: false,
+							rootPadding: false,
+							variationStyles: true,
+						}
+					);
+					newOverrides.push( {
+						id: `${ override.variation }-${ override.clientId }`,
+						css: variationStyles,
+						__unstableType: 'variation',
+						variation: override.variation,
+						// The clientId will be stored with the override and used to ensure
+						// the order of overrides matches the order of blocks so that the
+						// correct CSS cascade is maintained.
+						clientId: override.clientId,
+					} );
+					overriddenClientIds.push( override.clientId );
+				}
+			}
+		}
+		return newOverrides;
+	}, [ config, overrides, getBlockStyles, getBlockName ] );
+
+	if ( ! overridesWithConfig || ! overridesWithConfig.length ) {
+		return;
+	}
+
+	return (
+		<>
+			{ overridesWithConfig.map( ( override ) => (
+				<OverrideStyles key={ override.id } override={ override } />
+			) ) }
+		</>
+	);
 }
 
 function useBlockStyleVariation( name, variation, clientId ) {
@@ -157,6 +278,7 @@ function useBlockProps( { name, className, clientId } ) {
 		id: `variation-${ clientId }`,
 		css: variationStyles,
 		__unstableType: 'variation',
+		variation,
 		// The clientId will be stored with the override and used to ensure
 		// the order of overrides matches the order of blocks so that the
 		// correct CSS cascade is maintained.

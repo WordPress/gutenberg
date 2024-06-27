@@ -531,7 +531,7 @@ The `unique-id` doesn't need to be unique globally. It just needs to be differen
   <summary><em>See store used with the directive above</em></summary>
 
 ```js
-import { store, useState, useEffect } from '@wordpress/interactivity';
+import { getElement, store, useState, useEffect } from '@wordpress/interactivity';
 
 // Unlike `data-wp-init` and `data-wp-watch`, you can use any hooks inside
 // `data-wp-run` callbacks.
@@ -1071,7 +1071,7 @@ Those attributes will contain the directives of that element. In the button exam
 
 ```js
 // store
-import { store, getContext } from '@wordpress/interactivity';
+import { store, getElement } from '@wordpress/interactivity';
 
 store( "myPlugin", {
   actions: {
