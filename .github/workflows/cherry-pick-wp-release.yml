@@ -7,8 +7,9 @@ on:
     # We also want to attempt cherry-picking when a PR is labeled after the PR
     # is merged.
     pull_request:
-        types:
-            - labeled
+        types: [labeled]
+        branches:
+            - trunk
 
 # Ensure that new jobs wait for the previous job to finish.
 concurrency:
