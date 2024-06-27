@@ -18,24 +18,24 @@ import { useRegistry } from '@wordpress/data';
  * Internal dependencies
  */
 import { ActionWithModal } from './item-actions';
-import type { Action, AnyItem } from './types';
+import type { Action } from './types';
 import type { ActionTriggerProps } from './item-actions';
 
-interface ActionButtonProps< Item extends AnyItem > {
+interface ActionButtonProps< Item > {
 	action: Action< Item >;
 	selectedItems: Item[];
 	actionInProgress: string | null;
 	setActionInProgress: ( actionId: string | null ) => void;
 }
 
-interface ToolbarContentProps< Item extends AnyItem > {
+interface ToolbarContentProps< Item > {
 	selection: string[];
 	actionsToShow: Action< Item >[];
 	selectedItems: Item[];
 	onSelectionChange: ( selection: Item[] ) => void;
 }
 
-interface BulkActionsToolbarProps< Item extends AnyItem > {
+interface BulkActionsToolbarProps< Item > {
 	data: Item[];
 	selection: string[];
 	actions: Action< Item >[];
@@ -62,7 +62,7 @@ const SNACKBAR_VARIANTS = {
 	},
 };
 
-function ActionTrigger< Item extends AnyItem >( {
+function ActionTrigger< Item >( {
 	action,
 	onClick,
 	isBusy,
@@ -87,7 +87,7 @@ function ActionTrigger< Item extends AnyItem >( {
 
 const EMPTY_ARRAY: [] = [];
 
-function ActionButton< Item extends AnyItem >( {
+function ActionButton< Item >( {
 	action,
 	selectedItems,
 	actionInProgress,
@@ -125,7 +125,7 @@ function ActionButton< Item extends AnyItem >( {
 	);
 }
 
-function renderToolbarContent< Item extends AnyItem >(
+function renderToolbarContent< Item >(
 	selection: string[],
 	actionsToShow: Action< Item >[],
 	selectedItems: Item[],
@@ -179,7 +179,7 @@ function renderToolbarContent< Item extends AnyItem >(
 	);
 }
 
-function ToolbarContent< Item extends AnyItem >( {
+function ToolbarContent< Item >( {
 	selection,
 	actionsToShow,
 	selectedItems,
@@ -214,7 +214,7 @@ function ToolbarContent< Item extends AnyItem >( {
 	return buttons.current;
 }
 
-export default function BulkActionsToolbar< Item extends AnyItem >( {
+export default function BulkActionsToolbar< Item >( {
 	data,
 	selection,
 	actions = EMPTY_ARRAY,

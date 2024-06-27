@@ -7,7 +7,7 @@ import type { ComponentType } from 'react';
  * WordPress dependencies
  */
 import { __experimentalHStack as HStack } from '@wordpress/components';
-import { useMemo, useState, useCallback, useEffect } from '@wordpress/element';
+import { useMemo, useState, useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -21,9 +21,11 @@ import { VIEW_LAYOUTS } from './layouts';
 import BulkActions from './bulk-actions';
 import { normalizeFields } from './normalize-fields';
 import BulkActionsToolbar from './bulk-actions-toolbar';
-import type { Action, AnyItem, Field, View, ViewBaseProps } from './types';
+import type { Action, Field, View, ViewBaseProps } from './types';
 
-interface DataViewsProps< Item extends AnyItem > {
+type ItemWithId = { id: string };
+
+type DataViewsProps< Item > = {
 	view: View;
 	onChangeView: ( view: View ) => void;
 	fields: Field< Item >[];
@@ -31,20 +33,24 @@ interface DataViewsProps< Item extends AnyItem > {
 	searchLabel?: string;
 	actions?: Action< Item >[];
 	data: Item[];
-	getItemId?: ( item: Item ) => string;
 	isLoading?: boolean;
 	paginationInfo: {
 		totalItems: number;
 		totalPages: number;
 	};
 	supportedLayouts: string[];
+	selection?: string[];
+	setSelection?: ( selection: string[] ) => void;
 	onSelectionChange?: ( items: Item[] ) => void;
-}
+} & ( Item extends ItemWithId
+	? { getItemId?: ( item: Item ) => string }
+	: { getItemId: ( item: Item ) => string } );
 
-const defaultGetItemId = ( item: AnyItem ) => item.id;
+const defaultGetItemId = ( item: ItemWithId ) => item.id;
+
 const defaultOnSelectionChange = () => {};
 
-function useSomeItemHasAPossibleBulkAction< Item extends AnyItem >(
+function useSomeItemHasAPossibleBulkAction< Item >(
 	actions: Action< Item >[],
 	data: Item[]
 ) {
@@ -60,7 +66,7 @@ function useSomeItemHasAPossibleBulkAction< Item extends AnyItem >(
 	}, [ actions, data ] );
 }
 
-export default function DataViews< Item extends AnyItem >( {
+export default function DataViews< Item >( {
 	view,
 	onChangeView,
 	fields,
@@ -72,29 +78,23 @@ export default function DataViews< Item extends AnyItem >( {
 	isLoading = false,
 	paginationInfo,
 	supportedLayouts,
+	selection: selectionProperty,
+	setSelection: setSelectionProperty,
 	onSelectionChange = defaultOnSelectionChange,
 }: DataViewsProps< Item > ) {
-	const [ selection, setSelection ] = useState< string[] >( [] );
+	const [ selectionState, setSelectionState ] = useState< string[] >( [] );
+	let selection, setSelection;
+	if (
+		selectionProperty !== undefined &&
+		setSelectionProperty !== undefined
+	) {
+		selection = selectionProperty;
+		setSelection = setSelectionProperty;
+	} else {
+		selection = selectionState;
+		setSelection = setSelectionState;
+	}
 	const [ openedFilter, setOpenedFilter ] = useState< string | null >( null );
-
-	useEffect( () => {
-		if (
-			selection.length > 0 &&
-			selection.some(
-				( id ) => ! data.some( ( item ) => getItemId( item ) === id )
-			)
-		) {
-			const newSelection = selection.filter( ( id ) =>
-				data.some( ( item ) => getItemId( item ) === id )
-			);
-			setSelection( newSelection );
-			onSelectionChange(
-				data.filter( ( item ) =>
-					newSelection.includes( getItemId( item ) )
-				)
-			);
-		}
-	}, [ selection, data, getItemId, onSelectionChange ] );
 
 	const onSetSelection = useCallback(
 		( items: Item[] ) => {
@@ -112,6 +112,11 @@ export default function DataViews< Item extends AnyItem >( {
 		actions,
 		data
 	);
+	const _selection = useMemo( () => {
+		return selection.filter( ( id ) =>
+			data.some( ( item ) => getItemId( item ) === id )
+		);
+	}, [ selection, data, getItemId ] );
 	return (
 		<div className="dataviews-wrapper">
 			<HStack
@@ -145,7 +150,7 @@ export default function DataViews< Item extends AnyItem >( {
 							actions={ actions }
 							data={ data }
 							onSelectionChange={ onSetSelection }
-							selection={ selection }
+							selection={ _selection }
 							getItemId={ getItemId }
 						/>
 					) }
@@ -164,7 +169,7 @@ export default function DataViews< Item extends AnyItem >( {
 				isLoading={ isLoading }
 				onChangeView={ onChangeView }
 				onSelectionChange={ onSetSelection }
-				selection={ selection }
+				selection={ _selection }
 				setOpenedFilter={ setOpenedFilter }
 				view={ view }
 			/>
@@ -178,7 +183,7 @@ export default function DataViews< Item extends AnyItem >( {
 					<BulkActionsToolbar
 						data={ data }
 						actions={ actions }
-						selection={ selection }
+						selection={ _selection }
 						onSelectionChange={ onSetSelection }
 						getItemId={ getItemId }
 					/>

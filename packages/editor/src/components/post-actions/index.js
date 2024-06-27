@@ -123,6 +123,8 @@ function ActionWithModal( { action, item, ActionTrigger, onClose } ) {
 					overlayClassName={ `editor-action-modal editor-action-modal__${ kebabCase(
 						action.id
 					) }` }
+					focusOnMount="firstContentElement"
+					size="small"
 				>
 					<RenderModal
 						items={ [ item ] }

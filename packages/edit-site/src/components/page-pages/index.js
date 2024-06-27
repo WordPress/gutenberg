@@ -39,6 +39,7 @@ import AddNewPageModal from '../add-new-page';
 import Media from '../media';
 import { unlock } from '../../lock-unlock';
 import { useEditPostAction } from '../dataviews-actions';
+import { usePrevious } from '@wordpress/compose';
 
 const { usePostActions } = unlock( editorPrivateApis );
 const { useLocation, useHistory } = unlock( routerPrivateApis );
@@ -201,10 +202,18 @@ function FeaturedImage( { item, viewType } ) {
 	);
 }
 
+function getItemId( item ) {
+	return item.id.toString();
+}
+
 export default function PagePages() {
 	const postType = 'page';
 	const [ view, setView ] = useView( postType );
 	const history = useHistory();
+	const {
+		params: { postId },
+	} = useLocation();
+	const [ selection, setSelection ] = useState( [ postId ] );
 
 	const onSelectionChange = useCallback(
 		( items ) => {
@@ -265,6 +274,20 @@ export default function PagePages() {
 		totalItems,
 		totalPages,
 	} = useEntityRecords( 'postType', postType, queryArgs );
+
+	const ids = pages?.map( ( page ) => getItemId( page ) ) ?? [];
+	const prevIds = usePrevious( ids ) ?? [];
+	const deletedIds = prevIds.filter( ( id ) => ! ids.includes( id ) );
+	const postIdWasDeleted = deletedIds.includes( postId );
+
+	useEffect( () => {
+		if ( postIdWasDeleted ) {
+			history.push( {
+				...history.getLocationWithParams().params,
+				postId: undefined,
+			} );
+		}
+	}, [ postIdWasDeleted, history ] );
 
 	const { records: authors, isResolving: isLoadingAuthors } =
 		useEntityRecords( 'root', 'user', { per_page: -1 } );
@@ -531,7 +554,10 @@ export default function PagePages() {
 				isLoading={ isLoadingPages || isLoadingAuthors }
 				view={ view }
 				onChangeView={ onChangeView }
+				selection={ selection }
+				setSelection={ setSelection }
 				onSelectionChange={ onSelectionChange }
+				getItemId={ getItemId }
 			/>
 		</Page>
 	);

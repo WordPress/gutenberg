@@ -74,7 +74,7 @@ const CustomSelectButton = ( {
 			// move selection rather than open the popover
 			showOnKeyDown={ false }
 		>
-			<div>{ computedRenderSelectedValue( currentValue ) }</div>
+			{ computedRenderSelectedValue( currentValue ) }
 		</Styled.Select>
 	);
 };
@@ -88,11 +88,13 @@ function _CustomSelect(
 		label,
 		size,
 		store,
+		className,
 		...restProps
 	} = props;
 
 	return (
-		<>
+		// Where should `restProps` be forwarded to?
+		<div className={ className }>
 			{ hideLabelFromVision ? ( // TODO: Replace with BaseControl
 				<VisuallyHidden as="label">{ label }</VisuallyHidden>
 			) : (
@@ -116,7 +118,7 @@ function _CustomSelect(
 					</CustomSelectContext.Provider>
 				</Styled.SelectPopover>
 			</InputBase>
-		</>
+		</div>
 	);
 }
 

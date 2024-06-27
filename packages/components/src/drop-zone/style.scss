@@ -13,23 +13,58 @@
 		opacity: 1;
 		visibility: visible;
 	}
-}
 
-.components-drop-zone__content {
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	height: 100%;
-	width: 100%;
-	display: flex;
-	background-color: $components-color-accent;
-	align-items: center;
-	justify-content: center;
-	z-index: z-index(".components-drop-zone__content");
-	text-align: center;
-	color: $white;
+	.components-drop-zone__content {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		height: 100%;
+		width: 100%;
+		display: flex;
+		background-color: $components-color-accent;
+		align-items: center;
+		justify-content: center;
+		z-index: z-index(".components-drop-zone__content");
+		text-align: center;
+		color: $white;
+		opacity: 0;
+
+		// Without this, when this div is shown,
+		// Safari calls a onDropZoneLeave causing a loop because of this bug
+		// https://bugs.webkit.org/show_bug.cgi?id=66547
+		pointer-events: none;
+	}
+
+	.components-drop-zone__content-inner {
+		opacity: 0;
+		transform: scale(0.9);
+	}
+
+	&.is-active:not(.has-dragged-out) {
+		.components-drop-zone__content {
+			opacity: 1;
+
+			transition: opacity 0.2s ease-in-out;
+			@media (prefers-reduced-motion) {
+				transition: none;
+			}
+		}
+
+		.components-drop-zone__content-inner {
+			opacity: 1;
+			transform: scale(1);
+
+			transition:
+				opacity 0.1s ease-in-out 0.1s,
+				transform 0.1s ease-in-out 0.1s;
+
+			@media (prefers-reduced-motion) {
+				transition: none;
+			}
+		}
+	}
 }
 
 .components-drop-zone__content-icon,
