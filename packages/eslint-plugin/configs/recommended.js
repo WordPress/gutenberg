@@ -55,8 +55,12 @@ if ( isPackageInstalled( 'typescript' ) ) {
 				// Don't require redundant JSDoc types in TypeScript files.
 				'jsdoc/require-param-type': 'off',
 				'jsdoc/require-returns-type': 'off',
-				// Handled by TS itself.
-				'no-unused-vars': 'off',
+				// Setting "no-unused-vars" to "off" will also disable
+				// the typescript type checker. So we need to explicitly enable it,
+				// but want to ignore "unused rest siblings".
+				// @issue https://github.com/WordPress/gutenberg/issues/54305
+				'no-unused-vars': [ 'error', { ignoreRestSiblings: true } ],
+				'@typescript-eslint/no-unused-vars': [ 'error', { ignoreRestSiblings: true } ],
 				// no-shadow doesn't work correctly in TS, so let's use a TS-dedicated version instead.
 				'no-shadow': 'off',
 				'@typescript-eslint/no-shadow': 'error',
