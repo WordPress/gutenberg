@@ -136,7 +136,7 @@ export default {
 		let output = '';
 		const rules = [];
 
-		if ( minimumColumnWidth && columnCount ) {
+		if ( minimumColumnWidth && columnCount > 0 ) {
 			const maxValue = `max(${ minimumColumnWidth }, ( 100% - (${
 				blockGapValue || '1.2rem'
 			}*${ columnCount - 1 }) ) / ${ columnCount })`;
@@ -288,11 +288,14 @@ function GridLayoutColumnsAndRowsControl( {
 								const validValue = value !== '' ? value : '1';
 								onChange( {
 									...layout,
-									columnCount: validValue,
+									columnCount:
+										window.__experimentalEnableGridInteractivity
+											? parseInt( value, 10 ) || null
+											: validValue,
 								} );
 							} }
 							value={ columnCount }
-							min={ 1 }
+							min={ 0 }
 							label={ __( 'Columns' ) }
 						/>
 					</FlexItem>
@@ -310,7 +313,7 @@ function GridLayoutColumnsAndRowsControl( {
 									} );
 								} }
 								value={ rowCount }
-								min={ 1 }
+								min={ 0 }
 								label={ __( 'Rows' ) }
 							/>
 						) : (
@@ -322,7 +325,7 @@ function GridLayoutColumnsAndRowsControl( {
 										columnCount: value,
 									} )
 								}
-								min={ 1 }
+								min={ 0 }
 								max={ 16 }
 								withInputField={ false }
 								label={ __( 'Columns' ) }

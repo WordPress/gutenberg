@@ -30,7 +30,7 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 	useEffect( () => {
 		const updates = {};
 
-		const { columnCount, rowCount = 2, manualPlacement } = gridLayout;
+		const { columnCount, rowCount, manualPlacement } = gridLayout;
 
 		const isManualGrid = !! manualPlacement;
 
@@ -124,6 +124,15 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 						},
 					};
 				}
+			}
+			// Remove row styles in auto mode
+			if ( rowCount ) {
+				updates[ gridClientId ] = {
+					layout: {
+						...gridLayout,
+						rowCount: undefined,
+					},
+				};
 			}
 		}
 
