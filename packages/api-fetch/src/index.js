@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-import { __ } from '@wordpress/i18n';
-
-/**
  * Internal dependencies
  */
 import createNonceMiddleware from './middlewares/nonce';
@@ -128,7 +123,7 @@ const defaultFetchHandler = ( nextOptions ) => {
 			// Unfortunately the message might depend on the browser.
 			throw {
 				code: 'fetch_error',
-				message: __( 'You are probably offline.' ),
+				message: 'You are probably offline.',
 			};
 		}
 	);
