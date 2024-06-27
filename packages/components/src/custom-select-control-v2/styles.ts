@@ -119,6 +119,9 @@ export const SelectPopover = styled( Ariakit.SelectPopover )`
 	overflow: auto;
 	overscroll-behavior: contain;
 
+	// The smallest size without overflowing the container.
+	min-width: min-content;
+
 	&[data-focus-visible] {
 		outline: none; // outline will be on the trigger, rather than the popover
 	}

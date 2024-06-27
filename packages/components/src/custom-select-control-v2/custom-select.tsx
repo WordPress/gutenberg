@@ -112,7 +112,12 @@ function _CustomSelect(
 					size={ size }
 					store={ store }
 				/>
-				<Styled.SelectPopover gutter={ 12 } store={ store } sameWidth>
+				<Styled.SelectPopover
+					gutter={ 12 }
+					store={ store }
+					sameWidth
+					slide={ false }
+				>
 					<CustomSelectContext.Provider value={ { store } }>
 						{ children }
 					</CustomSelectContext.Provider>

@@ -19,7 +19,7 @@
 
 	// In the iframed canvas this keeps extra scrollbars from appearing (when block toolbars overflow). In the
 	// legacy (non-iframed) canvas, overflow must not be hidden in order to maintain support for sticky positioning.
-	.is-iframed {
+	&.is-iframed {
 		overflow: hidden;
 	}
 

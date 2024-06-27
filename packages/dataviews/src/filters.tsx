@@ -12,9 +12,9 @@ import AddFilter from './add-filter';
 import ResetFilters from './reset-filters';
 import { sanitizeOperators } from './utils';
 import { ALL_OPERATORS, OPERATOR_IS, OPERATOR_IS_NOT } from './constants';
-import type { AnyItem, NormalizedField, NormalizedFilter, View } from './types';
+import type { NormalizedField, NormalizedFilter, View } from './types';
 
-interface FiltersProps< Item extends AnyItem > {
+interface FiltersProps< Item > {
 	fields: NormalizedField< Item >[];
 	view: View;
 	onChangeView: ( view: View ) => void;
@@ -22,7 +22,7 @@ interface FiltersProps< Item extends AnyItem > {
 	setOpenedFilter: ( openedFilter: string | null ) => void;
 }
 
-function _Filters< Item extends AnyItem >( {
+function _Filters< Item >( {
 	fields,
 	view,
 	onChangeView,

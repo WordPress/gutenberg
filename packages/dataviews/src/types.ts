@@ -37,12 +37,12 @@ export type Operator =
 	| 'isAll'
 	| 'isNotAll';
 
-export type AnyItem = Record< string, any >;
+export type ItemRecord = Record< string, unknown >;
 
 /**
  * A dataview field for a specific property of a data type.
  */
-export interface Field< Item extends AnyItem > {
+export type Field< Item > = {
 	/**
 	 * The unique identifier of the field.
 	 */
@@ -52,12 +52,6 @@ export interface Field< Item extends AnyItem > {
 	 * The label of the field. Defaults to the id.
 	 */
 	header?: string;
-
-	/**
-	 * Callback used to retrieve the value of the field from the item.
-	 * Defaults to `item[ field.id ]`.
-	 */
-	getValue?: ( args: { item: Item } ) => any;
 
 	/**
 	 * Callback used to render the field. Defaults to `field.getValue`.
@@ -103,17 +97,34 @@ export interface Field< Item extends AnyItem > {
 	 * Filter config for the field.
 	 */
 	filterBy?: FilterByConfig | undefined;
-}
+} & ( Item extends ItemRecord
+	? {
+			/**
+			 * Callback used to retrieve the value of the field from the item.
+			 * Defaults to `item[ field.id ]`.
+			 */
+			getValue?: ( args: { item: Item } ) => any;
+	  }
+	: {
+			/**
+			 * Callback used to retrieve the value of the field from the item.
+			 * Defaults to `item[ field.id ]`.
+			 */
+			getValue: ( args: { item: Item } ) => any;
+	  } );
 
-export type NormalizedField< Item extends AnyItem > = Field< Item > &
-	Required< Pick< Field< Item >, 'header' | 'getValue' | 'render' > >;
+export type NormalizedField< Item > = Field< Item > & {
+	header: string;
+	getValue: ( args: { item: Item } ) => any;
+	render: ( args: { item: Item } ) => ReactNode;
+};
 
 /**
  * A collection of dataview fields for a data type.
  */
-export type Fields< Item extends AnyItem > = Field< Item >[];
+export type Fields< Item > = Field< Item >[];
 
-export type Data< Item extends AnyItem > = Item[];
+export type Data< Item > = Item[];
 
 /**
  * The filters applied to the dataset.
@@ -279,7 +290,7 @@ export interface ViewGrid extends ViewBase {
 
 export type View = ViewList | ViewGrid | ViewTable;
 
-interface ActionBase< Item extends AnyItem > {
+interface ActionBase< Item > {
 	/**
 	 * The unique identifier of the action.
 	 */
@@ -325,8 +336,7 @@ interface ActionBase< Item extends AnyItem > {
 	supportsBulk?: boolean;
 }
 
-export interface ActionModal< Item extends AnyItem >
-	extends ActionBase< Item > {
+export interface ActionModal< Item > extends ActionBase< Item > {
 	/**
 	 * Modal to render when the action is triggered.
 	 */
@@ -351,8 +361,7 @@ export interface ActionModal< Item extends AnyItem >
 	modalHeader?: string;
 }
 
-export interface ActionButton< Item extends AnyItem >
-	extends ActionBase< AnyItem > {
+export interface ActionButton< Item > extends ActionBase< Item > {
 	/**
 	 * The callback to execute when the action is triggered.
 	 */
@@ -365,11 +374,9 @@ export interface ActionButton< Item extends AnyItem >
 	) => void;
 }
 
-export type Action< Item extends AnyItem > =
-	| ActionModal< Item >
-	| ActionButton< Item >;
+export type Action< Item > = ActionModal< Item > | ActionButton< Item >;
 
-export interface ViewBaseProps< Item extends AnyItem > {
+export interface ViewBaseProps< Item > {
 	actions: Action< Item >[];
 	data: Item[];
 	fields: NormalizedField< Item >[];
@@ -382,22 +389,19 @@ export interface ViewBaseProps< Item extends AnyItem > {
 	view: View;
 }
 
-export interface ViewTableProps< Item extends AnyItem >
-	extends ViewBaseProps< Item > {
+export interface ViewTableProps< Item > extends ViewBaseProps< Item > {
 	view: ViewTable;
 }
 
-export interface ViewListProps< Item extends AnyItem >
-	extends ViewBaseProps< Item > {
+export interface ViewListProps< Item > extends ViewBaseProps< Item > {
 	view: ViewList;
 }
 
-export interface ViewGridProps< Item extends AnyItem >
-	extends ViewBaseProps< Item > {
+export interface ViewGridProps< Item > extends ViewBaseProps< Item > {
 	view: ViewGrid;
 }
 
-export type ViewProps< Item extends AnyItem > =
+export type ViewProps< Item > =
 	| ViewTableProps< Item >
 	| ViewGridProps< Item >
 	| ViewListProps< Item >;

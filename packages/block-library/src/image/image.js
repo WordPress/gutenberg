@@ -49,7 +49,7 @@ import { Caption } from '../utils/caption';
 /**
  * Module constants
  */
-import { TOOLSPANEL_DROPDOWNMENU_PROPS } from '../utils/constants';
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { MIN_SIZE, ALLOWED_MEDIA_TYPES } from './constants';
 import { evalAspectRatio } from './utils';
 
@@ -372,6 +372,8 @@ export default function Image( {
 	const lightboxChecked =
 		!! lightbox?.enabled || ( ! lightbox && !! lightboxSetting?.enabled );
 
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
 	const dimensionsControl = (
 		<DimensionsTool
 			value={ { width, height, scale, aspectRatio } }
@@ -429,7 +431,7 @@ export default function Image( {
 			<ToolsPanel
 				label={ __( 'Settings' ) }
 				resetAll={ resetAll }
-				dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
+				dropdownMenuProps={ dropdownMenuProps }
 			>
 				{ isResizable &&
 					( parentLayoutType === 'grid'
@@ -456,16 +458,12 @@ export default function Image( {
 				return {};
 			}
 			const { getBlockBindingsSource } = unlock( select( blocksStore ) );
-			const { getBlockParentsByBlockName } = unlock(
-				select( blockEditorStore )
-			);
 			const {
 				url: urlBinding,
 				alt: altBinding,
 				title: titleBinding,
 			} = metadata?.bindings || {};
-			const hasParentPattern =
-				getBlockParentsByBlockName( clientId, 'core/block' ).length > 0;
+			const hasParentPattern = !! context[ 'pattern/overrides' ];
 			const urlBindingSource = getBlockBindingsSource(
 				urlBinding?.source
 			);
@@ -521,7 +519,12 @@ export default function Image( {
 					: __( 'Connected to dynamic data' ),
 			};
 		},
-		[ clientId, isSingleSelected, metadata?.bindings ]
+		[
+			arePatternOverridesEnabled,
+			context,
+			isSingleSelected,
+			metadata?.bindings,
+		]
 	);
 
 	const showUrlInput =
@@ -704,7 +707,7 @@ export default function Image( {
 				<ToolsPanel
 					label={ __( 'Settings' ) }
 					resetAll={ resetAll }
-					dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
+					dropdownMenuProps={ dropdownMenuProps }
 				>
 					{ isSingleSelected && (
 						<ToolsPanelItem
