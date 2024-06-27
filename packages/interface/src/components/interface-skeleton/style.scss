@@ -84,7 +84,7 @@ html.interface-interface-skeleton__html-container {
 
 	// Hide the Y overflow to avoid an extra scrollbar when an active popover
 	// extends vertically beyond the viewport.
-	overflow-y: hidden;
+	overflow-y: auto;
 
 	// On Safari iOS on smaller viewports lack of a z-index causes the background
 	// to "bleed" through the header.
