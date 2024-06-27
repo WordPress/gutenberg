@@ -28,6 +28,7 @@ jobs:
                   script: |
                       const commit_sha = context.payload.pull_request ? context.payload.pull_request.merge_commit_sha : context.sha;
                       console.log(`Commit SHA: ${commit_sha}`);
+                      core.exportVariable('commit_sha', commit_sha);
                       const prs = await github.rest.repos.listPullRequestsAssociatedWithCommit({
                         owner: context.repo.owner,
                         repo: context.repo.repo,
@@ -84,19 +85,18 @@ jobs:
               if: env.cherry_pick == 'true'
               run: |
                   TARGET_BRANCH="wp/${{ env.version }}"
-                  COMMIT_SHA=$(jq -r '.after' "$GITHUB_EVENT_PATH")
+                  COMMIT_SHA="${{ env.commit_sha }}"
                   echo "Target branch: $TARGET_BRANCH"
                   echo "Commit SHA: $COMMIT_SHA"
                   git checkout $TARGET_BRANCH
                   git cherry-pick $COMMIT_SHA || echo "cherry-pick-failed" > result
                   if [ -f result ] && grep -q "cherry-pick-failed" result; then
                     echo "conflict=true" >> $GITHUB_ENV
-                    echo "commit_sha=$COMMIT_SHA" >> $GITHUB_ENV
                     git cherry-pick --abort
                   else
-                    NEW_COMMIT_SHA=$(git rev-parse HEAD)
+                    CHERRY_PICK_SHA=$(git rev-parse HEAD)
                     echo "conflict=false" >> $GITHUB_ENV
-                    echo "commit_sha=$NEW_COMMIT_SHA" >> $GITHUB_ENV
+                    echo "cherry_pick_sha=$CHERRY_PICK_SHA" >> $GITHUB_ENV
                     git push origin $TARGET_BRANCH
                   fi
 
@@ -130,16 +130,16 @@ jobs:
               with:
                   script: |
                       const prNumber = process.env.pr_number;
-                      const commitSha = process.env.commit_sha;
+                      const cherryPickSha = process.env.cherry_pick_sha;
                       const targetBranch = `wp/${process.env.version}`;
                       console.log(`prNumber: ${prNumber}`);
-                      console.log(`commitSha: ${commitSha}`);
+                      console.log(`cherryPickSha: ${cherryPickSha}`);
                       console.log(`targetBranch: ${targetBranch}`);
                       await github.rest.issues.createComment({
                         owner: context.repo.owner,
                         repo: context.repo.repo,
                         issue_number: prNumber,
-                        body: `I just cherry-picked this PR to the ${targetBranch} branch to get it included in the next release: ${commitSha}`
+                        body: `I just cherry-picked this PR to the ${targetBranch} branch to get it included in the next release: ${cherryPickSha}`
                       });
 
             - name: Comment on the PR about conflict
