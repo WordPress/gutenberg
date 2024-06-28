@@ -1053,7 +1053,7 @@ export const duplicateTemplatePartAction = {
 				defaultTitle={ sprintf(
 					/* translators: %s: Existing template part title */
 					__( '%s (Copy)' ),
-					item.title
+					getItemTitle( item )
 				) }
 				onCreate={ onTemplatePartSuccess }
 				onError={ closeModal }
