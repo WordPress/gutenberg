@@ -113,7 +113,7 @@ const unitSelectSizes = ( { selectSize = 'default' }: SelectProps ) => {
 			justify-content: center;
 			align-items: center;
 
-			&:not( :disabled ):hover {
+			&:where( :not( :disabled ) ):hover {
 				color: ${ COLORS.ui.borderFocus };
 				box-shadow: inset 0 0 0
 					${ CONFIG.borderWidth + ' ' + COLORS.ui.borderFocus };
