@@ -81,6 +81,7 @@ export function getFontStylesAndWeights( fontFamilyFaces ) {
 		if ( /\s/.test( fontWeight.value.trim() ) ) {
 			isVariableFont = true;
 			fontWeight.value = fontWeight.value.replace( /\s+/g, '-' );
+			// TODO: Handle variable weights and styles.
 		}
 
 		// Create font style and font weight lists without duplicates.
@@ -102,57 +103,26 @@ export function getFontStylesAndWeights( fontFamilyFaces ) {
 				fontWeights.push( fontWeight );
 			}
 		}
-
-		if ( isVariableFont ) {
-			// If the font is a variable font, use the default list of font styles and weights.
-			// TODO: Handle variable weights and styles.
-			return;
-		}
-
-		// Generate combined font style and weight options for available fonts.
-		const optionName =
-			fontStyle.value === 'normal'
-				? fontWeight.name
-				: `${ fontWeight.name } ${ fontStyle.name }`;
-
-		combinedStyleAndWeightOptions.push( {
-			key: `${ fontStyle.value }-${ fontWeight.value }`,
-			name: optionName,
-			style: {
-				fontStyle: fontStyle.value,
-				fontWeight: fontWeight.value,
-			},
-		} );
 	} );
 
-	// Generate combined default options for system fonts and variable fonts.
-	if ( isSystemFont || isVariableFont ) {
-		FONT_STYLES.forEach( ( { name: styleName, value: styleValue } ) => {
-			FONT_WEIGHTS.forEach(
-				( { name: weightName, value: weightValue } ) => {
-					const optionName =
-						styleValue === 'normal'
-							? weightName
-							: sprintf(
-									/* translators: 1: Font weight name. 2: Font style name. */
-									__( '%1$s %2$s' ),
-									weightName,
-									styleName
-							  );
-
-					combinedStyleAndWeightOptions.push( {
-						key: `${ styleValue }-${ weightValue }`,
-						name: optionName,
-						style: {
-							fontStyle: styleValue,
-							fontWeight: weightValue,
-						},
-					} );
-				}
-			);
+	// If there is no font weight of 700, then include faux bold as an option.
+	if ( ! fontWeights.some( ( weight ) => weight.value === '700' ) ) {
+		fontWeights.push( {
+			name: _x( 'Bold', 'font weight' ),
+			value: '700',
 		} );
+	}
 
-		// Use default font styles and weights for system and variable fonts.
+	// If there is no italic font style, then include faux italic as an option.
+	if ( ! fontStyles.some( ( style ) => style.value === 'italic' ) ) {
+		fontStyles.push( {
+			name: _x( 'Italic', 'font style' ),
+			value: 'italic',
+		} );
+	}
+
+	// Use default font styles and weights for system and variable fonts.
+	if ( isSystemFont || isVariableFont ) {
 		fontStyles = FONT_STYLES;
 		fontWeights = FONT_WEIGHTS;
 	}
@@ -160,6 +130,30 @@ export function getFontStylesAndWeights( fontFamilyFaces ) {
 	// Use default styles and weights if there are no available styles or weights from the provided font faces.
 	fontStyles = fontStyles.length === 0 ? FONT_STYLES : fontStyles;
 	fontWeights = fontWeights.length === 0 ? FONT_WEIGHTS : fontWeights;
+
+	// Generate combined font style and weight options for available fonts.
+	fontStyles.forEach( ( { name: styleName, value: styleValue } ) => {
+		fontWeights.forEach( ( { name: weightName, value: weightValue } ) => {
+			const optionName =
+				styleValue === 'normal'
+					? weightName
+					: sprintf(
+							/* translators: 1: Font weight name. 2: Font style name. */
+							__( '%1$s %2$s' ),
+							weightName,
+							styleName
+					  );
+
+			combinedStyleAndWeightOptions.push( {
+				key: `${ styleValue }-${ weightValue }`,
+				name: optionName,
+				style: {
+					fontStyle: styleValue,
+					fontWeight: weightValue,
+				},
+			} );
+		} );
+	} );
 
 	return {
 		fontStyles,

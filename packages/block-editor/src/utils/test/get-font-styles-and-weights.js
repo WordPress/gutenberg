@@ -466,6 +466,10 @@ describe( 'getFontStylesAndWeights', () => {
 					name: 'Light',
 					value: '300',
 				},
+				{
+					name: 'Bold',
+					value: '700',
+				},
 			],
 			combinedStyleAndWeightOptions: [
 				{
@@ -485,11 +489,27 @@ describe( 'getFontStylesAndWeights', () => {
 					},
 				},
 				{
-					key: 'italic-300',
-					name: 'Light Italic',
+					key: 'normal-300',
+					name: 'Light',
+					style: {
+						fontStyle: 'normal',
+						fontWeight: '300',
+					},
+				},
+				{
+					key: 'normal-700',
+					name: 'Bold',
+					style: {
+						fontStyle: 'normal',
+						fontWeight: '700',
+					},
+				},
+				{
+					key: 'italic-400',
+					name: 'Regular Italic',
 					style: {
 						fontStyle: 'italic',
-						fontWeight: '300',
+						fontWeight: '400',
 					},
 				},
 				{
@@ -498,6 +518,22 @@ describe( 'getFontStylesAndWeights', () => {
 					style: {
 						fontStyle: 'italic',
 						fontWeight: '900',
+					},
+				},
+				{
+					key: 'italic-300',
+					name: 'Light Italic',
+					style: {
+						fontStyle: 'italic',
+						fontWeight: '300',
+					},
+				},
+				{
+					key: 'italic-700',
+					name: 'Bold Italic',
+					style: {
+						fontStyle: 'italic',
+						fontWeight: '700',
 					},
 				},
 			],
