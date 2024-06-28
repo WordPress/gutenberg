@@ -6,17 +6,38 @@ import { signal, type Signal } from '@preact/signals';
 /**
  * Internal dependencies
  */
-import { proxify, getProxy, getProxyNs, shouldProxy, getPropSignal } from './';
-import { withScope } from '../utils';
-import { setNamespace, resetNamespace } from '../hooks';
-import { stores } from '../store';
+import { getProxy, shouldProxy } from './registry';
+import { PropSignal } from './signals';
+
+const proxyToProps: WeakMap<
+	object,
+	Map< string, PropSignal >
+> = new WeakMap();
+
+export const getPropSignal = ( proxy: object, key: string ) => {
+	if ( ! proxyToProps.has( proxy ) ) {
+		proxyToProps.set( proxy, new Map() );
+	}
+	const props = proxyToProps.get( proxy )!;
+	if ( ! props.has( key ) ) {
+		props.set( key, new PropSignal( proxy ) );
+	}
+	return props.get( key )!;
+};
+
+export const peek = ( obj: object, key: string ): unknown => {
+	const prop = getPropSignal( obj, key );
+	// TODO: what about the scope?
+	return prop.getComputed().peek();
+};
 
 const objToIterable = new WeakMap< object, Signal< number > >();
-
 const descriptor = Object.getOwnPropertyDescriptor;
 
-const isObject = ( item: unknown ): item is Record< string, unknown > =>
-	Boolean( item && typeof item === 'object' && item.constructor === Object );
+export const getStateProxy = < T extends object >(
+	obj: T,
+	namespace: string
+) => getProxy( obj, stateHandlers, namespace );
 
 export const stateHandlers: ProxyHandler< object > = {
 	get( target: object, key: string, receiver: object ): any {
@@ -36,14 +57,14 @@ export const stateHandlers: ProxyHandler< object > = {
 		 * value has changed.
 		 */
 		if ( getter ) {
-			prop.update( { get: getter } );
+			prop.setGetter( getter );
 		} else {
 			const value = Reflect.get( target, key, receiver );
-			prop.update( {
-				value: shouldProxy( value )
-					? proxify( value, stateHandlers, prop.namespace )
-					: value,
-			} );
+			prop.setValue(
+				shouldProxy( value )
+					? getStateProxy( value, prop.namespace )
+					: value
+			);
 		}
 
 		return prop.getComputed().value;
@@ -69,7 +90,7 @@ export const stateHandlers: ProxyHandler< object > = {
 
 			if ( Array.isArray( target ) ) {
 				const length = getPropSignal( receiver, 'length' );
-				length.update( { value: target.length } );
+				length.setValue( target.length );
 			}
 		}
 
@@ -85,13 +106,16 @@ export const stateHandlers: ProxyHandler< object > = {
 
 		if ( result ) {
 			const prop = getPropSignal( getProxy( target ), key );
-			const { value, get } = desc;
-			prop.update( {
-				value: shouldProxy( value )
-					? proxify( value, stateHandlers, prop.namespace )
-					: value,
-				get,
-			} );
+			const { get, value } = desc;
+			if ( get ) {
+				prop.setGetter( desc.get! );
+			} else {
+				prop.setValue(
+					shouldProxy( value )
+						? getStateProxy( value, prop.namespace )
+						: value
+				);
+			}
 		}
 		return result;
 	},
@@ -101,7 +125,7 @@ export const stateHandlers: ProxyHandler< object > = {
 
 		if ( result ) {
 			const prop = getPropSignal( getProxy( target ), key );
-			prop.update( {} );
+			prop.setValue( undefined );
 
 			if ( objToIterable.has( target ) ) {
 				objToIterable.get( target )!.value++;
@@ -117,38 +141,5 @@ export const stateHandlers: ProxyHandler< object > = {
 		}
 		( objToIterable as any )._ = objToIterable.get( target )!.value;
 		return Reflect.ownKeys( target );
-	},
-};
-
-export const storeHandlers: ProxyHandler< object > = {
-	get: ( target: any, key: string | symbol, receiver: any ) => {
-		const result = Reflect.get( target, key );
-		const ns = getProxyNs( receiver );
-
-		// Check if the proxy is the store root and no key with that name exist. In
-		// that case, return an empty object for the requested key.
-		if ( typeof result === 'undefined' && receiver === stores.get( ns ) ) {
-			const obj = {};
-			Reflect.set( target, key, obj );
-			return proxify( obj, storeHandlers, ns );
-		}
-
-		// Check if the property is a function. If it is, add the store
-		// namespace to the stack and wrap the function with the current scope.
-		// The `withScope` util handles both synchronous functions and generator
-		// functions.
-		if ( typeof result === 'function' ) {
-			setNamespace( ns );
-			const scoped = withScope( result );
-			resetNamespace();
-			return scoped;
-		}
-
-		// Check if the property is an object. If it is, proxyify it.
-		if ( isObject( result ) && shouldProxy( result ) ) {
-			return proxify( result, storeHandlers, ns );
-		}
-
-		return result;
 	},
 };

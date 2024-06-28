@@ -12,7 +12,7 @@ import {
 /**
  * Internal dependencies
  */
-import { getProxyNs } from './';
+import { getProxyNs } from './registry';
 import { getScope, setNamespace, resetNamespace } from '../hooks';
 import { withScope } from '../utils';
 
@@ -31,26 +31,12 @@ export class PropSignal {
 		this.computedsByScope = new WeakMap();
 	}
 
-	public update( {
-		get,
-		value,
-	}: {
-		get?: () => any;
-		value?: unknown;
-	} ): PropSignal {
-		if ( ! this.valueSignal ) {
-			this.valueSignal = signal( value );
-			this.getterSignal = signal( get );
-		} else if (
-			value !== this.valueSignal.peek() ||
-			get !== this.getterSignal?.peek()
-		) {
-			batch( () => {
-				this.valueSignal!.value = value;
-				this.getterSignal!.value = get;
-			} );
-		}
-		return this;
+	public setValue( value: unknown ): PropSignal {
+		return this.update( { value } );
+	}
+
+	public setGetter( getter: () => any ): PropSignal {
+		return this.update( { get: getter } );
 	}
 
 	public getComputed(): ReadonlySignal {
@@ -77,5 +63,27 @@ export class PropSignal {
 		}
 
 		return this.computedsByScope.get( scope )!;
+	}
+
+	private update( {
+		get,
+		value,
+	}: {
+		get?: () => any;
+		value?: unknown;
+	} ): PropSignal {
+		if ( ! this.valueSignal ) {
+			this.valueSignal = signal( value );
+			this.getterSignal = signal( get );
+		} else if (
+			value !== this.valueSignal.peek() ||
+			get !== this.getterSignal?.peek()
+		) {
+			batch( () => {
+				this.valueSignal!.value = value;
+				this.getterSignal!.value = get;
+			} );
+		}
+		return this;
 	}
 }
