@@ -49,7 +49,7 @@ directive(
 				},
 				namespace
 			),
-		} ;
+		};
 		return h( Provider, { value }, children );
 	},
 	{ priority: 8 }
