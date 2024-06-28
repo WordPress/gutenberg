@@ -65,6 +65,10 @@ export class PropSignal {
 		return this.computedsByScope.get( scope )!;
 	}
 
+	public peekValueSignal(): unknown {
+		return this.valueSignal?.peek();
+	}
+
 	private update( {
 		get,
 		value,

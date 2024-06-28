@@ -27,8 +27,9 @@ export const getPropSignal = ( proxy: object, key: string ) => {
 
 export const peek = ( obj: object, key: string ): unknown => {
 	const prop = getPropSignal( obj, key );
-	// TODO: what about the scope?
-	return prop.getComputed().peek();
+	// TODO: it currently returns the value of the internal `valueSignal`,
+	// getters are not considered yet.
+	return prop.peekValueSignal();
 };
 
 const objToIterable = new WeakMap< object, Signal< number > >();
