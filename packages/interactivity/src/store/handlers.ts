@@ -93,19 +93,17 @@ export const stateHandlers: ProxyHandler< object > = {
 		key: string,
 		desc: PropertyDescriptor
 	): boolean {
-		const prop = getProperty( target, key );
-		let { value } = desc;
-		if ( value && shouldProxy( value ) ) {
-			value = proxify( value, stateHandlers, prop.namespace );
-		}
-		const result = Reflect.defineProperty(
-			target,
-			key,
-			value ? { ...desc, value } : desc
-		);
+		const result = Reflect.defineProperty( target, key, desc );
 
 		if ( result ) {
-			prop.update( desc );
+			const prop = getProperty( target, key );
+			const { value, get } = desc;
+			prop.update( {
+				value: shouldProxy( value )
+					? proxify( value, stateHandlers, prop.namespace )
+					: value,
+				get,
+			} );
 		}
 		return result;
 	},

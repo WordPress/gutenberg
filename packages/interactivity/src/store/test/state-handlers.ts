@@ -229,6 +229,12 @@ describe( 'interactivity api handlers', () => {
 			expect( store.a ).toBe( 1 );
 			expect( store.nested.b ).toBe( 2 );
 		} );
+
+		it( 'should keep assigned object references internally', () => {
+			const obj = {};
+			store.nested = obj;
+			expect( state.nested ).toBe( obj );
+		} );
 	} );
 
 	describe( 'computations', () => {
