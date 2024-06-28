@@ -565,9 +565,44 @@ describe( 'global styles renderer', () => {
 				},
 			};
 
-			expect( toStyles( Object.freeze( tree ), blockSelectors ) ).toEqual(
-				':where(body) {margin: 0;}.is-layout-flow > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }.is-layout-flow > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }.is-layout-flow > .aligncenter { margin-left: auto !important; margin-right: auto !important; }.is-layout-constrained > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }.is-layout-constrained > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }.is-layout-constrained > .aligncenter { margin-left: auto !important; margin-right: auto !important; }.is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)) { max-width: var(--wp--style--global--content-size); margin-left: auto !important; margin-right: auto !important; }.is-layout-constrained > .alignwide { max-width: var(--wp--style--global--wide-size); }body .is-layout-flex { display:flex; }.is-layout-flex { flex-wrap: wrap; align-items: center; }.is-layout-flex > :is(*, div) { margin: 0; }body .is-layout-grid { display:grid; }.is-layout-grid > :is(*, div) { margin: 0; }' +
-					':root :where(.is-style-foo.wp-image.wp-image-spacing){padding-top: 2px;}:root :where(.is-style-foo.wp-image.wp-image-border-color){border-color: blue;}:root :where(.is-style-foo.wp-image){color: blue;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }'
+			const hasBlockGapSupport = false;
+			const hasFallbackGapSupport = true;
+			const disableLayoutStyles = true;
+			const disableRootPadding = true;
+			const styleOptions = {
+				blockGap: false,
+				blockStyles: true,
+				layoutStyles: false,
+				marginReset: false,
+				presets: false,
+				rootPadding: false,
+			};
+
+			// Confirm no variation styles by default.
+			const withoutVariations = toStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				hasBlockGapSupport,
+				hasFallbackGapSupport,
+				disableLayoutStyles,
+				disableRootPadding,
+				styleOptions
+			);
+			expect( withoutVariations ).toEqual( '' );
+
+			// Includes variation styles when requested.
+			styleOptions.variationStyles = true;
+			const withVariations = toStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				hasBlockGapSupport,
+				hasFallbackGapSupport,
+				disableLayoutStyles,
+				disableRootPadding,
+				styleOptions
+			);
+			expect( withVariations ).toEqual(
+				':root :where(.is-style-foo.wp-image.wp-image-spacing){padding-top: 2px;}:root :where(.is-style-foo.wp-image.wp-image-border-color){border-color: blue;}:root :where(.is-style-foo.wp-image){color: blue;}'
 			);
 		} );
 

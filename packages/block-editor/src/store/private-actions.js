@@ -104,11 +104,7 @@ export const privateRemoveBlocks =
 		}
 
 		clientIds = castArray( clientIds );
-		const rootClientId = select.getBlockRootClientId( clientIds[ 0 ] );
-		const canRemoveBlocks = select.canRemoveBlocks(
-			clientIds,
-			rootClientId
-		);
+		const canRemoveBlocks = select.canRemoveBlocks( clientIds );
 
 		if ( ! canRemoveBlocks ) {
 			return;

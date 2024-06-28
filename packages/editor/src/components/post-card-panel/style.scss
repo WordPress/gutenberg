@@ -14,6 +14,7 @@
 			flex-wrap: wrap;
 			column-gap: $grid-unit-10;
 			row-gap: $grid-unit-05;
+			word-break: break-word;
 		}
 	}
 
@@ -35,6 +36,10 @@
 
 .editor-post-card-panel__icon.is-sync {
 	fill: var(--wp-block-synced-color);
+
+	& + .editor-post-card-panel__title {
+		color: var(--wp-block-synced-color);
+	}
 }
 
 .editor-post-card-panel__title-badge {

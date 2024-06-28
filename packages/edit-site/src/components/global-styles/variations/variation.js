@@ -6,6 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
+import { Tooltip } from '@wordpress/components';
 import { useMemo, useContext, useState } from '@wordpress/element';
 import { ENTER } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
@@ -15,6 +16,7 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
 /**
  * Internal dependencies
  */
+import { filterObjectByProperty } from '../../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
 import { unlock } from '../../../lock-unlock';
 
 const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
@@ -22,18 +24,28 @@ const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
 	blockEditorPrivateApis
 );
 
-export default function Variation( { variation, children, isPill } ) {
+export default function Variation( {
+	variation,
+	children,
+	isPill,
+	property,
+	showTooltip,
+} ) {
 	const [ isFocused, setIsFocused ] = useState( false );
 	const { base, user, setUserConfig } = useContext( GlobalStylesContext );
-	const context = useMemo(
-		() => ( {
+
+	const context = useMemo( () => {
+		let merged = mergeBaseAndUserConfigs( base, variation );
+		if ( property ) {
+			merged = filterObjectByProperty( merged, property );
+		}
+		return {
 			user: variation,
 			base,
-			merged: mergeBaseAndUserConfigs( base, variation ),
+			merged,
 			setUserConfig: () => {},
-		} ),
-		[ variation, base ]
-	);
+		};
+	}, [ variation, base, property ] );
 
 	const selectVariation = () => setUserConfig( variation );
 
@@ -59,30 +71,38 @@ export default function Variation( { variation, children, isPill } ) {
 		);
 	}
 
+	const content = (
+		<div
+			className={ clsx( 'edit-site-global-styles-variations_item', {
+				'is-active': isActive,
+			} ) }
+			role="button"
+			onClick={ selectVariation }
+			onKeyDown={ selectOnEnter }
+			tabIndex="0"
+			aria-label={ label }
+			aria-current={ isActive }
+			onFocus={ () => setIsFocused( true ) }
+			onBlur={ () => setIsFocused( false ) }
+		>
+			<div
+				className={ clsx(
+					'edit-site-global-styles-variations_item-preview',
+					{ 'is-pill': isPill }
+				) }
+			>
+				{ children( isFocused ) }
+			</div>
+		</div>
+	);
+
 	return (
 		<GlobalStylesContext.Provider value={ context }>
-			<div
-				className={ clsx( 'edit-site-global-styles-variations_item', {
-					'is-active': isActive,
-				} ) }
-				role="button"
-				onClick={ selectVariation }
-				onKeyDown={ selectOnEnter }
-				tabIndex="0"
-				aria-label={ label }
-				aria-current={ isActive }
-				onFocus={ () => setIsFocused( true ) }
-				onBlur={ () => setIsFocused( false ) }
-			>
-				<div
-					className={ clsx(
-						'edit-site-global-styles-variations_item-preview',
-						{ 'is-pill': isPill }
-					) }
-				>
-					{ children( isFocused ) }
-				</div>
-			</div>
+			{ showTooltip ? (
+				<Tooltip text={ variation?.title }>{ content }</Tooltip>
+			) : (
+				content
+			) }
 		</GlobalStylesContext.Provider>
 	);
 }

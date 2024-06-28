@@ -65,7 +65,7 @@ export const useTransformCommands = () => {
 				selectedBlocks,
 				rootClientId
 			),
-			canRemove: canRemoveBlocks( selectedBlockClientIds, rootClientId ),
+			canRemove: canRemoveBlocks( selectedBlockClientIds ),
 			invalidSelection: false,
 		};
 	}, [] );
@@ -150,8 +150,7 @@ const useActionsCommands = () => {
 	const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
 
 	const canMove =
-		canMoveBlocks( clientIds, rootClientId ) &&
-		getBlockCount( rootClientId ) !== 1;
+		canMoveBlocks( clientIds ) && getBlockCount( rootClientId ) !== 1;
 
 	const commands = [];
 
@@ -260,7 +259,7 @@ const useQuickActionsCommands = () => {
 			canInsertBlockType( block.name, rootClientId )
 		);
 	} );
-	const canRemove = canRemoveBlocks( clientIds, rootClientId );
+	const canRemove = canRemoveBlocks( clientIds );
 
 	const commands = [];
 

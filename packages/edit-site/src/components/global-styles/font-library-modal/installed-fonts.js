@@ -382,6 +382,7 @@ function ConfirmDeleteDialog( {
 			confirmButtonText={ __( 'Delete' ) }
 			onCancel={ handleCancelUninstall }
 			onConfirm={ handleConfirmUninstall }
+			size="medium"
 		>
 			{ font &&
 				sprintf(

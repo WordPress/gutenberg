@@ -64,6 +64,7 @@ describe( 'token-list', () => {
 
 		it( 'sets to stringified value', () => {
 			const list = new TokenList();
+			// @ts-expect-error The value should be a string, for testing we pass a "bad" value.
 			list.value = undefined;
 
 			expect( list.value ).toBe( 'undefined' );

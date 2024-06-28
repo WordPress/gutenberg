@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 8.2.0 (2024-06-26)
+
+## 8.1.0 (2024-06-15)
+
 ## 8.0.0 (2024-05-31)
 
 ### Breaking Changes
@@ -42,7 +46,7 @@
 
 ## 7.13.0 (2023-09-20)
 
-### Enhancement
+### Enhancements
 
 -   Improved error messages and codes printed on the console ([#53743](https://github.com/WordPress/gutenberg/pull/53743)).
 
@@ -100,7 +104,7 @@
 
 ## 6.0.0 (2022-08-24)
 
-### Breaking Change
+### Breaking Changes
 
 -   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
 
@@ -150,12 +154,12 @@
 
 ## 1.0.7 (2018-05-18)
 
-### Polish
+### Internal
 
 -   Fix: Standardized `package.json` format ([#119](https://github.com/WordPress/packages/pull/119))
 
 ## 1.0.6 (2018-02-28)
 
-### Polish
+### Internal
 
 -   Removed `package-lock.json` file, lockfiles for apps, not packages ([#88](https://github.com/WordPress/packages/pull/88))

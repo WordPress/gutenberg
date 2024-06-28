@@ -1,9 +1,7 @@
 /**
  * The regular expression for an HTML element.
- *
- * @type {RegExp}
  */
-const htmlSplitRegex = ( () => {
+const htmlSplitRegex: RegExp = ( () => {
 	/* eslint-disable no-multi-spaces */
 	const comments =
 		'!' + // Start of comment, after the <.
@@ -51,11 +49,11 @@ const htmlSplitRegex = ( () => {
 /**
  * Separate HTML elements and comments from the text.
  *
- * @param {string} input The text which has to be formatted.
+ * @param input The text which has to be formatted.
  *
- * @return {string[]} The formatted text.
+ * @return The formatted text.
  */
-function htmlSplit( input ) {
+function htmlSplit( input: string ): string[] {
 	const parts = [];
 	let workingInput = input;
 
@@ -65,7 +63,7 @@ function htmlSplit( input ) {
 		// If the `g` flag is omitted, `index` is included.
 		// `htmlSplitRegex` does not have the `g` flag so we can assert it will have an index number.
 		// Assert `match.index` is a number.
-		const index = /** @type {number} */ ( match.index );
+		const index = match.index as number;
 
 		parts.push( workingInput.slice( 0, index ) );
 		parts.push( match[ 0 ] );
@@ -82,12 +80,15 @@ function htmlSplit( input ) {
 /**
  * Replace characters or phrases within HTML elements only.
  *
- * @param {string}                haystack     The text which has to be formatted.
- * @param {Record<string,string>} replacePairs In the form {from: 'to', …}.
+ * @param haystack     The text which has to be formatted.
+ * @param replacePairs In the form {from: 'to', …}.
  *
- * @return {string} The formatted text.
+ * @return The formatted text.
  */
-function replaceInHtmlTags( haystack, replacePairs ) {
+function replaceInHtmlTags(
+	haystack: string,
+	replacePairs: Record< string, string >
+): string {
 	// Find all elements.
 	const textArr = htmlSplit( haystack );
 	let changed = false;
@@ -125,9 +126,9 @@ function replaceInHtmlTags( haystack, replacePairs ) {
  * replace double line-breaks with HTML paragraph tags. The remaining line-
  * breaks after conversion become `<br />` tags, unless br is set to 'false'.
  *
- * @param {string}  text The text which has to be formatted.
- * @param {boolean} br   Optional. If set, will convert all remaining line-
- *                       breaks after paragraphing. Default true.
+ * @param text The text which has to be formatted.
+ * @param br   Optional. If set, will convert all remaining line-
+ *             breaks after paragraphing. Default true.
  *
  * @example
  *```js
@@ -135,10 +136,10 @@ function replaceInHtmlTags( haystack, replacePairs ) {
  * autop( 'my text' ); // "<p>my text</p>"
  * ```
  *
- * @return {string} Text which has been converted into paragraph tags.
+ * @return Text which has been converted into paragraph tags.
  */
-export function autop( text, br = true ) {
-	const preTags = [];
+export function autop( text: string, br: boolean = true ): string {
+	const preTags: Array< [ string, string ] > = [];
 
 	if ( text.trim() === '' ) {
 		return '';
@@ -330,7 +331,7 @@ export function autop( text, br = true ) {
  * Replaces `<p>` tags with two line breaks except where the `<p>` has attributes.
  * Unifies whitespace. Indents `<li>`, `<dt>` and `<dd>` for better readability.
  *
- * @param {string} html The content from the editor.
+ * @param html The content from the editor.
  *
  * @example
  * ```js
@@ -338,15 +339,14 @@ export function autop( text, br = true ) {
  * removep( '<p>my text</p>' ); // "my text"
  * ```
  *
- * @return {string} The content with stripped paragraph tags.
+ * @return The content with stripped paragraph tags.
  */
-export function removep( html ) {
+export function removep( html: string ): string {
 	const blocklist =
 		'blockquote|ul|ol|li|dl|dt|dd|table|thead|tbody|tfoot|tr|th|td|h[1-6]|fieldset|figure';
 	const blocklist1 = blocklist + '|div|p';
 	const blocklist2 = blocklist + '|pre';
-	/** @type {string[]} */
-	const preserve = [];
+	const preserve: string[] = [];
 	let preserveLinebreaks = false;
 	let preserveBr = false;
 
@@ -480,7 +480,7 @@ export function removep( html ) {
 	// Restore preserved tags.
 	if ( preserve.length ) {
 		html = html.replace( /<wp-preserve>/g, () => {
-			return /** @type {string} */ ( preserve.shift() );
+			return preserve.shift() as string;
 		} );
 	}
 
