@@ -177,7 +177,7 @@ function FeaturedImage( { item, viewType } ) {
 			: [ 'thumbnail', 'medium', 'large', 'full' ];
 	const media = hasMedia ? (
 		<Media
-			className="edit-site-page-pages__featured-image"
+			className="posts-list-page__featured-image"
 			id={ item.featured_media }
 			size={ size }
 		/>
@@ -185,11 +185,11 @@ function FeaturedImage( { item, viewType } ) {
 	const renderButton = viewType !== LAYOUT_LIST && ! isDisabled;
 	return (
 		<div
-			className={ `edit-site-page-pages__featured-image-wrapper is-layout-${ viewType }` }
+			className={ `posts-list-page__featured-image-wrapper is-layout-${ viewType }` }
 		>
 			{ renderButton ? (
 				<button
-					className="page-pages-preview-field__button"
+					className="posts-list-page-preview-field__button"
 					type="button"
 					onClick={ onClick }
 					aria-label={ item.title?.rendered || __( '(no title)' ) }
@@ -360,13 +360,13 @@ export default function PostsList( { postType } ) {
 					let suffix = '';
 					if ( item.id === frontPageId ) {
 						suffix = (
-							<span className="edit-site-page-pages__title-badge">
+							<span className="posts-list-page-title-badge">
 								{ __( 'Front Page' ) }
 							</span>
 						);
 					} else if ( item.id === postsPageId ) {
 						suffix = (
-							<span className="edit-site-page-pages__title-badge">
+							<span className="posts-list-page-title-badge">
 								{ __( 'Posts Page' ) }
 							</span>
 						);
@@ -374,7 +374,7 @@ export default function PostsList( { postType } ) {
 
 					return (
 						<HStack
-							className="edit-site-page-pages-title"
+							className="posts-list-page-title"
 							alignment="center"
 							justify="flex-start"
 						>

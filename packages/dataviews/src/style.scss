@@ -332,11 +332,6 @@
 			.dataviews-view-grid__fields .dataviews-view-grid__field .dataviews-view-grid__field-value {
 				color: $gray-900;
 			}
-
-			.page-pages-preview-field__button::after {
-				box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-				background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
-			}
 		}
 	}
 

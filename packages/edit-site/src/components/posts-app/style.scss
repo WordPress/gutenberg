@@ -1,19 +1,16 @@
-// TODO: we need to examine if these styles could be the default styles
-// for every post type and/or how to have different styles for different post types.
-// Example is `posts` and `pages`.
-.edit-site-page-pages__featured-image {
+.posts-list-page__featured-image {
 	height: 100%;
 	object-fit: cover;
 	width: 100%;
 }
 
-.edit-site-page-pages__featured-image-wrapper {
+.posts-list-page__featured-image-wrapper {
 	height: 100%;
 	width: 100%;
 	border-radius: $grid-unit-05;
 
-	&.is-layout-table:not(:has(.page-pages-preview-field__button)),
-	&.is-layout-table .page-pages-preview-field__button {
+	&.is-layout-table:not(:has(.posts-list-page-preview-field__button)),
+	&.is-layout-table .posts-list-page-preview-field__button {
 		width: $grid-unit-40;
 		height: $grid-unit-40;
 		display: block;
@@ -36,7 +33,7 @@
 	}
 }
 
-.page-pages-preview-field__button {
+.posts-list-page-preview-field__button {
 	box-shadow: none;
 	border: none;
 	padding: 0;
@@ -55,12 +52,19 @@
 	}
 }
 
-.edit-site-page-pages-title span {
+.dataviews-view-grid__card.is-selected {
+	.posts-list-page-preview-field__button::after {
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+	}
+}
+
+.posts-list-page-title span {
 	text-overflow: ellipsis;
 	overflow: hidden;
 }
 
-.edit-site-page-pages__title-badge {
+.posts-list-page-title-badge {
 	background: $gray-100;
 	color: $gray-700;
 	padding: 0 $grid-unit-05;
