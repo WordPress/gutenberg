@@ -162,7 +162,7 @@ export default function BlockTools( {
 			) {
 				event.preventDefault();
 				clearSelectedBlock();
-				getEditorRegion( __unstableContentRef.current ).focus();
+				getEditorRegion( __unstableContentRef.current )?.focus();
 			}
 		} else if ( isMatch( 'core/block-editor/collapse-list-view', event ) ) {
 			// If focus is currently within a text field, such as a rich text block or other editable field,
