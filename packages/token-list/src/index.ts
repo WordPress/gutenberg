@@ -204,7 +204,7 @@ export default class TokenList {
 	 *
 	 * @return Whether token is supported.
 	 */
-	supports( _token: string ): boolean {
+	supports( _token: string ): boolean { /* eslint-disable @typescript-eslint/no-unused-vars */
 		return true;
 	}
 }
