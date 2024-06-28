@@ -64,7 +64,7 @@ const proxifyContext = ( current: object, inherited: object = {} ): object => {
 				if (
 					k in target &&
 					! contextAssignedObjects.get( target )?.has( k ) &&
-					isPlainObject( peek( target, k ) )
+					isPlainObject( currentProp )
 				) {
 					return proxifyContext( currentProp, fallback[ k ] );
 				}
