@@ -23,6 +23,17 @@
 	overflow: hidden;
 }
 
+.edit-site-font-size__item {
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	line-break: anywhere;
+}
+
+.edit-site-font-size__item-value {
+	max-width: 50% !important;
+}
+
 .edit-site-global-styles-screen {
 	margin: $grid-unit-15 $grid-unit-20 $grid-unit-20;
 }
