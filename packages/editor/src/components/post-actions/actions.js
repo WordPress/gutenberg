@@ -32,6 +32,7 @@ import {
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import isTemplateRevertable from '../../store/utils/is-template-revertable';
+import isTemplatePartRevertable from '../../store/utils/is-template-part-revertable';
 import { exportPatternAsJSONAction } from './export-pattern-action';
 import { CreateTemplatePartModalContents } from '../create-template-part-modal';
 
@@ -785,22 +786,6 @@ const useDuplicatePostAction = ( postType ) => {
 			},
 		[ userCanCreatePost ]
 	);
-};
-
-const isTemplatePartRevertable = ( item ) => {
-	if ( ! item ) {
-		return false;
-	}
-	// In patterns list page we map the templates parts to a different object
-	// than the one returned from the endpoint. This is why we need to check for
-	// two props whether is custom or has a theme file.
-	const hasThemeFile =
-		item.has_theme_file || item.templatePart?.has_theme_file;
-	const isCustom = [ item.source, item.templatePart?.source ].includes(
-		TEMPLATE_ORIGINS.custom
-	);
-
-	return hasThemeFile && isCustom;
 };
 
 const resetTemplateAction = {
