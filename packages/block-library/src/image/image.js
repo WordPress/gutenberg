@@ -408,7 +408,10 @@ export default function Image( {
 		<DimensionsTool
 			value={ { aspectRatio } }
 			onChange={ ( { aspectRatio: newAspectRatio } ) => {
-				setAttributes( { aspectRatio: newAspectRatio } );
+				setAttributes( {
+					aspectRatio: newAspectRatio,
+					scale: 'cover',
+				} );
 			} }
 			defaultAspectRatio="auto"
 			tools={ [ 'aspectRatio' ] }
@@ -864,7 +867,7 @@ export default function Image( {
 				/>
 			</ImageWrapper>
 		);
-	} else if ( ! isResizable ) {
+	} else if ( ! isResizable || parentLayoutType === 'grid' ) {
 		img = (
 			<div style={ { width, height, aspectRatio } }>
 				<ImageWrapper href={ href }>{ img }</ImageWrapper>
