@@ -1,4 +1,4 @@
-name: Check Core Backport Changlog
+name: Verify Core Backport Changlog
 
 on:
     pull_request:
@@ -17,7 +17,7 @@ on:
             - '!packages/block-library/**'
             - '!packages/e2e-tests/**'
 jobs:
-    check-backport-changelog:
+    check:
         name: Check for a Core backport changelog entry
         runs-on: ubuntu-latest
         if: ${{ !contains(github.event.pull_request.labels.*.name, 'No Core Sync Required') && !contains(github.event.pull_request.labels.*.name, 'Backport from WordPress Core') }}
