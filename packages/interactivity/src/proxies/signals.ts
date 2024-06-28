@@ -16,7 +16,7 @@ import { getProxyNs } from './registry';
 import { getScope, setNamespace, resetNamespace } from '../hooks';
 import { withScope } from '../utils';
 
-const DEFAULT_SCOPE = Symbol();
+const NO_SCOPE = Symbol();
 
 export class PropSignal {
 	public readonly namespace: string;
@@ -40,7 +40,7 @@ export class PropSignal {
 	}
 
 	public getComputed(): ReadonlySignal {
-		const scope = getScope() || DEFAULT_SCOPE;
+		const scope = getScope() || NO_SCOPE;
 
 		if ( ! this.valueSignal && ! this.getterSignal ) {
 			this.update( {} );
