@@ -70,11 +70,10 @@ class Property {
 				computed( () => {
 					const getter = this.getter?.value;
 					if ( getter ) {
+						const proxy = getProxy( this.owner );
 						return wrapper
-							? wrapper( () =>
-									getter.call( getProxy( this.owner ) )
-							  )()
-							: getter.call( this.owner );
+							? wrapper( () => getter.call( proxy ) )()
+							: getter.call( proxy );
 					}
 					return this.signal?.value;
 				} )
