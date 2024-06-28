@@ -498,6 +498,12 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 					'container-type'        => 'inline-size',
 				),
 			);
+			if ( ! empty( $layout['rowCount'] ) ) {
+				$layout_styles[] = array(
+					'selector'     => $selector,
+					'declarations' => array( 'grid-template-rows' => 'repeat(' . $layout['rowCount'] . ', auto)' ),
+				);
+			}
 		} elseif ( ! empty( $layout['columnCount'] ) ) {
 			$layout_styles[] = array(
 				'selector'     => $selector,
@@ -506,7 +512,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			if ( ! empty( $layout['rowCount'] ) ) {
 				$layout_styles[] = array(
 					'selector'     => $selector,
-					'declarations' => array( 'grid-template-rows' => 'repeat(' . $layout['rowCount'] . ', minmax(0, 1fr))' ),
+					'declarations' => array( 'grid-template-rows' => 'repeat(' . $layout['rowCount'] . ', auto)' ),
 				);
 			}
 		} else {

@@ -145,18 +145,14 @@ export default {
 				`container-type: inline-size`
 			);
 			if ( rowCount ) {
-				rules.push(
-					`grid-template-rows: repeat(${ rowCount }, minmax(0, 1fr))`
-				);
+				rules.push( `grid-template-rows: repeat(${ rowCount }, auto)` );
 			}
 		} else if ( columnCount ) {
 			rules.push(
 				`grid-template-columns: repeat(${ columnCount }, minmax(0, 1fr))`
 			);
 			if ( rowCount ) {
-				rules.push(
-					`grid-template-rows: repeat(${ rowCount }, minmax(0, 1fr))`
-				);
+				rules.push( `grid-template-rows: repeat(${ rowCount }, auto)` );
 			}
 		} else {
 			rules.push(
