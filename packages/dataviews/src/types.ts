@@ -3,6 +3,11 @@
  */
 import type { ReactElement, ReactNode } from 'react';
 
+/**
+ * Internal dependencies
+ */
+import type { SetSelection } from './private-types';
+
 export type SortDirection = 'asc' | 'desc';
 
 /**
@@ -383,7 +388,7 @@ export interface ViewBaseProps< Item > {
 	getItemId: ( item: Item ) => string;
 	isLoading?: boolean;
 	onChangeView( view: View ): void;
-	onSelectionChange: ( items: Item[] ) => void;
+	onSelectionChange: SetSelection;
 	selection: string[];
 	setOpenedFilter: ( fieldId: string ) => void;
 	view: View;

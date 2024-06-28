@@ -23,11 +23,11 @@ import ItemActions from './item-actions';
 import SingleSelectionCheckbox from './single-selection-checkbox';
 import { useHasAPossibleBulkAction } from './bulk-actions';
 import type { Action, NormalizedField, ViewGridProps } from './types';
+import type { SetSelection } from './private-types';
 
 interface GridItemProps< Item > {
 	selection: string[];
-	data: Item[];
-	onSelectionChange: ( items: Item[] ) => void;
+	onSelectionChange: SetSelection;
 	getItemId: ( item: Item ) => string;
 	item: Item;
 	actions: Action< Item >[];
@@ -40,7 +40,6 @@ interface GridItemProps< Item > {
 
 function GridItem< Item >( {
 	selection,
-	data,
 	onSelectionChange,
 	getItemId,
 	item,
@@ -68,27 +67,11 @@ function GridItem< Item >( {
 					if ( ! hasBulkAction ) {
 						return;
 					}
-					if ( ! isSelected ) {
-						onSelectionChange(
-							data.filter( ( _item ) => {
-								const itemId = getItemId?.( _item );
-								return (
-									itemId === id ||
-									selection.includes( itemId )
-								);
-							} )
-						);
-					} else {
-						onSelectionChange(
-							data.filter( ( _item ) => {
-								const itemId = getItemId?.( _item );
-								return (
-									itemId !== id &&
-									selection.includes( itemId )
-								);
-							} )
-						);
-					}
+					onSelectionChange(
+						selection.includes( id )
+							? selection.filter( ( itemId ) => id !== itemId )
+							: [ ...selection, id ]
+					);
 				}
 			} }
 		>
@@ -104,7 +87,6 @@ function GridItem< Item >( {
 					selection={ selection }
 					onSelectionChange={ onSelectionChange }
 					getItemId={ getItemId }
-					data={ data }
 					primaryField={ primaryField }
 					disabled={ ! hasBulkAction }
 				/>
@@ -239,7 +221,6 @@ export default function ViewGrid< Item >( {
 							<GridItem
 								key={ getItemId( item ) }
 								selection={ selection }
-								data={ data }
 								onSelectionChange={ onSelectionChange }
 								getItemId={ getItemId }
 								item={ item }
