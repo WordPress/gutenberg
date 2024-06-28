@@ -26,7 +26,7 @@ import {
 // Default search helpers.
 const defaultGetName = ( item ) =>
 	item.type !== TEMPLATE_PART_POST_TYPE ? item.name || '' : '';
-const defaultGetTitle = ( item ) =>
+export const defaultGetTitle = ( item ) =>
 	typeof item.title === 'string' ? item.title : item.title.rendered;
 const defaultGetDescription = ( item ) => item.description || '';
 const defaultGetKeywords = ( item ) => item.keywords || [];

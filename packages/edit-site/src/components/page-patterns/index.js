@@ -31,6 +31,7 @@ import { useEntityRecords } from '@wordpress/core-data';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { parse } from '@wordpress/blocks';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -54,6 +55,7 @@ import PatternsHeader from './header';
 import { useLink } from '../routes/link';
 import { useAddedBy } from '../page-templates/hooks';
 import { useEditPostAction } from '../dataviews-actions';
+import { defaultGetTitle } from './search-items';
 
 const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
 	blockEditorPrivateApis
@@ -201,8 +203,7 @@ function Title( { item } ) {
 		postId: isUserPattern || isTemplatePart ? item.id : item.name,
 		canvas: 'edit',
 	} );
-	const title =
-		typeof item.title === 'string' ? item.title : item.title.rendered;
+	const title = decodeEntities( defaultGetTitle( item ) );
 	return (
 		<HStack alignment="center" justify="flex-start" spacing={ 2 }>
 			<Flex
