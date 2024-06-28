@@ -216,7 +216,3 @@ export const populateInitialData = ( data?: {
 		} );
 	}
 };
-
-// Parse and populate the initial state and config.
-const data = parseInitialData();
-populateInitialData( data );
