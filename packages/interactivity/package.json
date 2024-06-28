@@ -28,6 +28,7 @@
 	"types": "build-types",
 	"dependencies": {
 		"@preact/signals": "^1.2.2",
+		"@preact/signals-core": "^1.4.0",
 		"deepsignal": "^1.4.0",
 		"preact": "^10.19.3"
 	},
