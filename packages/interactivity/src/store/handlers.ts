@@ -30,11 +30,11 @@ export const stateHandlers: ProxyHandler< object > = {
 		 */
 		const getter = descriptor( target, key )?.get;
 		if ( getter && ns ) {
-			prop.updateGetter( getter );
+			prop.update( { get: getter } );
 			setNamespace( ns );
-			const result = prop.accessor( withScope ).value;
+			const value = prop.get( withScope ).value;
 			resetNamespace();
-			return result;
+			return value;
 		}
 
 		/*
@@ -43,13 +43,14 @@ export const stateHandlers: ProxyHandler< object > = {
 		 * is updated, which only triggers a re-render when the value changes.
 		 */
 		const value = Reflect.get( target, key, receiver );
-		prop.updateSignal(
-			shouldProxy( value ) && ns
-				? proxify( value, stateHandlers, ns )
-				: value
-		);
+		prop.update( {
+			value:
+				shouldProxy( value ) && ns
+					? proxify( value, stateHandlers, ns )
+					: value,
+		} );
 
-		return prop.accessor().value;
+		return prop.get().value;
 	},
 
 	set(
@@ -78,7 +79,7 @@ export const stateHandlers: ProxyHandler< object > = {
 
 			if ( Array.isArray( target ) ) {
 				const length = getProperty( target, 'length' );
-				length.updateSignal( target.length );
+				length.update( { value: target.length } );
 			}
 		}
 
@@ -94,11 +95,7 @@ export const stateHandlers: ProxyHandler< object > = {
 		const result = Reflect.defineProperty( target, key, desc );
 
 		if ( result ) {
-			if ( desc.get ) {
-				prop.updateGetter( desc.get );
-			} else if ( desc.value ) {
-				prop.updateSignal( desc.value );
-			}
+			prop.update( desc );
 		}
 		return result;
 	},
@@ -108,7 +105,7 @@ export const stateHandlers: ProxyHandler< object > = {
 
 		if ( result ) {
 			const prop = getProperty( target, key );
-			prop.updateSignal( undefined );
+			prop.update( {} );
 
 			if ( objToIterable.has( target ) ) {
 				objToIterable.get( target ).value++;

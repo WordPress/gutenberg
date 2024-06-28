@@ -15,7 +15,7 @@ import {
 import { getProxy } from './proxies';
 import { getScope } from '../hooks';
 
-const DEFAULT_SCOPE = {};
+const DEFAULT_SCOPE = Symbol();
 const objToProps: WeakMap< object, Map< string, Property > > = new WeakMap();
 
 export const getProperty = ( target: object, key: string ) => {
@@ -40,33 +40,28 @@ class Property {
 		this.accessors = new WeakMap();
 	}
 
-	updateSignal( value: unknown | undefined ) {
+	public update( {
+		get,
+		value,
+	}: {
+		get?: () => any;
+		value?: unknown;
+	} ): void {
 		if ( ! this.signal ) {
 			this.signal = signal( value );
-			this.getter = signal( undefined );
-		} else if ( value !== this.signal.peek() ) {
+			this.getter = signal( get );
+		} else if (
+			value !== this.signal.peek() ||
+			get !== this.getter?.peek()
+		) {
 			batch( () => {
 				this.signal!.value = value;
-				this.getter!.value = undefined;
+				this.getter!.value = get;
 			} );
 		}
 	}
 
-	updateGetter( getter: () => any | undefined ) {
-		if ( ! this.getter ) {
-			this.signal = signal( undefined );
-			this.getter = signal( getter );
-		} else if ( getter !== this.getter.peek() ) {
-			batch( () => {
-				this.signal!.value = undefined;
-				this.getter!.value = getter;
-			} );
-		}
-	}
-
-	accessor(
-		wrapper?: < G extends () => any >( getter: G ) => G
-	): ReadonlySignal {
+	get( wrapper?: < G extends () => any >( getter: G ) => G ): ReadonlySignal {
 		const scope = getScope() || DEFAULT_SCOPE;
 
 		if ( ! this.accessors.has( scope ) ) {
@@ -85,6 +80,7 @@ class Property {
 				} )
 			);
 		}
+
 		return this.accessors.get( scope )!;
 	}
 }
