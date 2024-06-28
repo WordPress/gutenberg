@@ -44,7 +44,7 @@ function PatternOverridesControls( {
 
 	const hasName = !! attributes.metadata?.name;
 	const defaultBindings = attributes.metadata?.bindings?.__default;
-	const allowOverrides =
+	const hasOverrides =
 		hasName && defaultBindings?.source === PATTERN_OVERRIDES_BINDING_SOURCE;
 	const isConnectedToOtherSources =
 		defaultBindings?.source &&
@@ -79,13 +79,14 @@ function PatternOverridesControls( {
 		blockName === 'core/image' &&
 		( !! attributes.caption?.length || !! attributes.href?.length );
 
-	const helpText = hasUnsupportedImageAttributes
-		? __(
-				`Overrides currently don't support image captions or links. Remove the caption or link first before enabling overrides.`
-		  )
-		: __(
-				'Allow changes to this block throughout instances of this pattern.'
-		  );
+	const helpText =
+		! hasOverrides && hasUnsupportedImageAttributes
+			? __(
+					`Overrides currently don't support image captions or links. Remove the caption or link first before enabling overrides.`
+			  )
+			: __(
+					'Allow changes to this block throughout instances of this pattern.'
+			  );
 
 	return (
 		<>
@@ -101,16 +102,18 @@ function PatternOverridesControls( {
 						variant="secondary"
 						aria-haspopup="dialog"
 						onClick={ () => {
-							if ( allowOverrides ) {
+							if ( hasOverrides ) {
 								setShowDisallowOverridesModal( true );
 							} else {
 								setShowAllowOverridesModal( true );
 							}
 						} }
-						disabled={ hasUnsupportedImageAttributes }
+						disabled={
+							! hasOverrides && hasUnsupportedImageAttributes
+						}
 						__experimentalIsFocusable
 					>
-						{ allowOverrides
+						{ hasOverrides
 							? __( 'Disable overrides' )
 							: __( 'Enable overrides' ) }
 					</Button>
