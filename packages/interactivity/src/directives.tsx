@@ -6,7 +6,10 @@
  */
 import { h as createElement, type RefObject } from 'preact';
 import { useContext, useMemo, useRef } from 'preact/hooks';
-import { deepSignal, peek, type DeepSignal } from 'deepsignal';
+/**
+ * Internal dependencies
+ */
+import { getStateProxy, peek } from './proxies';
 
 /**
  * Internal dependencies
@@ -47,7 +50,7 @@ const proxifyContext = ( current: object, inherited: object = {} ): object => {
 	contextObjectToFallback.set( current, inherited );
 	if ( ! contextObjectToProxy.has( current ) ) {
 		const proxy = new Proxy( current, {
-			get: ( target: DeepSignal< any >, k ) => {
+			get: ( target: object, k: string ) => {
 				const fallback = contextObjectToFallback.get( current );
 				// Always subscribe to prop changes in the current context.
 				const currentProp = target[ k ];
@@ -127,21 +130,18 @@ const proxifyContext = ( current: object, inherited: object = {} ): object => {
 /**
  * Recursively update values within a deepSignal object.
  *
- * @param target A deepSignal instance.
- * @param source Object with properties to update in `target`.
+ * @param proxy  A deepSignal instance.
+ * @param source Object with properties to update in `proxy`.
  */
-const updateSignals = (
-	target: DeepSignal< any >,
-	source: DeepSignal< any >
-) => {
+const updateSignals = ( proxy: object, source: object ) => {
 	for ( const k in source ) {
 		if (
-			isPlainObject( peek( target, k ) ) &&
-			isPlainObject( peek( source, k ) )
+			isPlainObject( peek( proxy, k ) ) &&
+			isPlainObject( source[ k ] )
 		) {
-			updateSignals( target[ `$${ k }` ].peek(), source[ k ] );
+			updateSignals( peek( proxy, k ) as object, source[ k ] );
 		} else {
-			target[ k ] = source[ k ];
+			proxy[ k ] = source[ k ];
 		}
 	}
 };
@@ -264,11 +264,15 @@ export default () => {
 			context: inheritedContext,
 		} ) => {
 			const { Provider } = inheritedContext;
-			const inheritedValue = useContext( inheritedContext );
-			const currentValue = useRef( deepSignal( {} ) );
 			const defaultEntry = context.find(
 				( { suffix } ) => suffix === 'default'
 			);
+			const inheritedValue = useContext( inheritedContext );
+
+			const ns = defaultEntry!.namespace;
+			const currentValue = useRef( {
+				[ ns ]: getStateProxy( {}, ns ),
+			} );
 
 			// No change should be made if `defaultEntry` does not exist.
 			const contextStack = useMemo( () => {
@@ -280,9 +284,10 @@ export default () => {
 							`The value of data-wp-context in "${ namespace }" store must be a valid stringified JSON object.`
 						);
 					}
-					updateSignals( currentValue.current, {
-						[ namespace ]: deepClone( value ),
-					} );
+					updateSignals(
+						currentValue.current[ namespace ],
+						deepClone( value ) as object
+					);
 				}
 				return proxifyContext( currentValue.current, inheritedValue );
 			}, [ defaultEntry, inheritedValue ] );
@@ -677,7 +682,9 @@ export default () => {
 			return list.map( ( item ) => {
 				const itemProp =
 					suffix === 'default' ? 'item' : kebabToCamelCase( suffix );
-				const itemContext = deepSignal( { [ namespace ]: {} } );
+				const itemContext = {
+					[ namespace ]: getStateProxy( {}, namespace ),
+				};
 				const mergedContext = proxifyContext(
 					itemContext,
 					inheritedValue

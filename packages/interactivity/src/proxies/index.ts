@@ -2,12 +2,29 @@
  * Internal dependencies
  */
 import { stateHandlers, storeHandlers } from './handlers';
+import { PropSignal } from './signals';
 
 const objToProxy = new WeakMap< object, object >();
 const proxyToNs = new WeakMap< object, string >();
 const ignore = new WeakSet< object >();
 
 const supported = new Set( [ Object, Array ] );
+
+const proxyToProps: WeakMap<
+	object,
+	Map< string, PropSignal >
+> = new WeakMap();
+
+export const getPropSignal = ( proxy: object, key: string ) => {
+	if ( ! proxyToProps.has( proxy ) ) {
+		proxyToProps.set( proxy, new Map() );
+	}
+	const props = proxyToProps.get( proxy )!;
+	if ( ! props.has( key ) ) {
+		props.set( key, new PropSignal( proxy ) );
+	}
+	return props.get( key )!;
+};
 
 export const proxify = < T extends object >(
 	obj: T,
@@ -43,3 +60,9 @@ export const getStoreProxy = < T extends object >(
 	obj: T,
 	namespace: string
 ) => proxify( obj, storeHandlers, namespace );
+
+export const peek = ( obj: object, key: string ): unknown => {
+	const prop = getPropSignal( obj, key );
+	// TODO: what about the scope?
+	return prop.getComputed().peek();
+};

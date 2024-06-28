@@ -6,29 +6,12 @@ import { signal, type Signal } from '@preact/signals';
 /**
  * Internal dependencies
  */
-import { proxify, getProxy, getProxyNs, shouldProxy } from './';
-import { PropSignal } from './signals';
+import { proxify, getProxy, getProxyNs, shouldProxy, getPropSignal } from './';
 import { withScope } from '../utils';
 import { setNamespace, resetNamespace } from '../hooks';
 import { stores } from '../store';
 
-const proxyToProps: WeakMap<
-	object,
-	Map< string, PropSignal >
-> = new WeakMap();
 const objToIterable = new WeakMap< object, Signal< number > >();
-
-const getPropSignal = ( target: object, key: string ) => {
-	const proxy = getProxy( target );
-	if ( ! proxyToProps.has( proxy ) ) {
-		proxyToProps.set( proxy, new Map() );
-	}
-	const props = proxyToProps.get( proxy )!;
-	if ( ! props.has( key ) ) {
-		props.set( key, new PropSignal( proxy ) );
-	}
-	return props.get( key )!;
-};
 
 const descriptor = Object.getOwnPropertyDescriptor;
 
@@ -41,7 +24,7 @@ export const stateHandlers: ProxyHandler< object > = {
 		 * First, we get a reference of the property we want to access. The
 		 * property object is automatically instanciated if needed.
 		 */
-		const prop = getPropSignal( target, key );
+		const prop = getPropSignal( receiver, key );
 
 		const getter = descriptor( target, key )?.get;
 
@@ -85,7 +68,7 @@ export const stateHandlers: ProxyHandler< object > = {
 			}
 
 			if ( Array.isArray( target ) ) {
-				const length = getPropSignal( target, 'length' );
+				const length = getPropSignal( receiver, 'length' );
 				length.update( { value: target.length } );
 			}
 		}
@@ -101,7 +84,7 @@ export const stateHandlers: ProxyHandler< object > = {
 		const result = Reflect.defineProperty( target, key, desc );
 
 		if ( result ) {
-			const prop = getPropSignal( target, key );
+			const prop = getPropSignal( getProxy( target ), key );
 			const { value, get } = desc;
 			prop.update( {
 				value: shouldProxy( value )
@@ -117,7 +100,7 @@ export const stateHandlers: ProxyHandler< object > = {
 		const result = Reflect.deleteProperty( target, key );
 
 		if ( result ) {
-			const prop = getPropSignal( target, key );
+			const prop = getPropSignal( getProxy( target ), key );
 			prop.update( {} );
 
 			if ( objToIterable.has( target ) ) {
