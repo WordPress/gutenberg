@@ -16,7 +16,7 @@ export const proxify = < T extends object >(
 	return objToProxy.get( obj ) as T;
 };
 
-export const getProxyNs = ( proxy: object ) => proxyToNs.get( proxy );
+export const getProxyNs = ( proxy: object ): string => proxyToNs.get( proxy )!;
 export const getProxy = < T extends object >( obj: T ) =>
 	objToProxy.get( obj ) as T;
 

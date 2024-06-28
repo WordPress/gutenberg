@@ -6,9 +6,11 @@ import { signal, type Signal } from '@preact/signals';
 /**
  * Internal dependencies
  */
-import { proxify, getProxy, shouldProxy } from './proxies';
+import { proxify, getProxy, getProxyNs, shouldProxy } from './proxies';
 import { Property } from './properties';
 import { withScope } from '../utils';
+import { setNamespace, resetNamespace } from '../hooks';
+import { stores } from '../store';
 
 const proxyToProps: WeakMap< object, Map< string, Property > > = new WeakMap();
 const objToIterable = new WeakMap< object, Signal< number > >();
@@ -26,6 +28,9 @@ const getProperty = ( target: object, key: string ) => {
 };
 
 const descriptor = Object.getOwnPropertyDescriptor;
+
+const isObject = ( item: unknown ): item is Record< string, unknown > =>
+	Boolean( item && typeof item === 'object' && item.constructor === Object );
 
 export const stateHandlers: ProxyHandler< object > = {
 	get( target: object, key: string, receiver: object ): any {
@@ -129,5 +134,38 @@ export const stateHandlers: ProxyHandler< object > = {
 		}
 		( objToIterable as any )._ = objToIterable.get( target )!.value;
 		return Reflect.ownKeys( target );
+	},
+};
+
+export const storeHandlers: ProxyHandler< object > = {
+	get: ( target: any, key: string | symbol, receiver: any ) => {
+		const result = Reflect.get( target, key );
+		const ns = getProxyNs( receiver );
+
+		// Check if the proxy is the store root and no key with that name exist. In
+		// that case, return an empty object for the requested key.
+		if ( typeof result === 'undefined' && receiver === stores.get( ns ) ) {
+			const obj = {};
+			Reflect.set( target, key, obj );
+			return proxify( obj, storeHandlers, ns );
+		}
+
+		// Check if the property is a function. If it is, add the store
+		// namespace to the stack and wrap the function with the current scope.
+		// The `withScope` util handles both synchronous functions and generator
+		// functions.
+		if ( typeof result === 'function' ) {
+			setNamespace( ns );
+			const scoped = withScope( result );
+			resetNamespace();
+			return scoped;
+		}
+
+		// Check if the property is an object. If it is, proxyify it.
+		if ( isObject( result ) && shouldProxy( result ) ) {
+			return proxify( result, storeHandlers, ns );
+		}
+
+		return result;
 	},
 };
