@@ -196,7 +196,7 @@
 			text-transform: uppercase;
 			font-weight: 500;
 
-			&:has(.dataviews-view-table-header-button) {
+			&:has(.dataviews-view-table-header-button):not(:first-child) {
 				padding-left: $grid-unit-05;
 			}
 		}
