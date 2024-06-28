@@ -3,7 +3,7 @@ name: Props Fix
 on:
     push:
         branches:
-            - trunk
+            - test/trunk-props
 
 # Ensure that new jobs wait for the previous job to finish.
 concurrency:
