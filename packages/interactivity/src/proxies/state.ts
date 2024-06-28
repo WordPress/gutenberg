@@ -114,9 +114,7 @@ export const getStateProxy = < T extends object >(
 
 export const peek = ( obj: object, key: string ): unknown => {
 	const prop = getPropSignal( obj, key );
-	// TODO: it currently returns the value of the internal `valueSignal`,
-	// getters are not considered yet.
-	return prop.peekValueSignal();
+	return prop.getComputed().peek();
 };
 
 export const getPropSignal = ( proxy: object, key: string ) => {
