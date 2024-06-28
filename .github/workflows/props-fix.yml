@@ -1,0 +1,97 @@
+name: Props Fix
+
+on:
+    push:
+        branches:
+            - trunk
+
+# Ensure that new jobs wait for the previous job to finish.
+concurrency:
+    group: ${{ github.workflow }}
+    cancel-in-progress: false
+
+jobs:
+    cherry-pick:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Check for missing props
+              uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+              with:
+                  script: |
+                      const commit_sha = context.sha;
+                      console.log(`Commit SHA: ${commit_sha}`);
+                      core.exportVariable('commit_sha', commit_sha);
+                      const prs = await github.rest.repos.listPullRequestsAssociatedWithCommit({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        commit_sha,
+                      });
+                      if (prs.data.length === 0) {
+                        console.log(`No PR found for commit ${context.sha}.`);
+                        return;
+                      }
+                      const pr_number = prs.data[0].number;
+                      console.log(`PR: ${pr_number}`);
+                      core.exportVariable('pr_number', pr_number);
+
+                      const pr = await github.rest.pulls.get({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        pull_number: pr_number,
+                      });
+
+                      // Fetch PR comments
+                      const comments = await github.rest.issues.listComments({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number: pr_number,
+                      });
+
+                      console.log(`Comments count: ${comments.data.length}`);
+
+                      // Look for github-actions comment with Co-authored-by in code block
+                      let codeBlockContent = '';
+                      for (const comment of comments.data) {
+                        if (comment.user.login === 'github-actions[bot]') {
+                          const match = comment.body.match(/```([\s\S]*?)```/);
+                          if (match && match[1].includes('Co-authored-by')) {
+                            codeBlockContent = match[1].trim();
+                            console.log(codeBlockContent);
+                            core.exportVariable('props', codeBlockContent);
+                            break;
+                          }
+                        }
+                      }
+
+                      if (!codeBlockContent) {
+                        console.log('No code block with Co-authored-by found in github-actions comments.');
+                      }
+            - name: Checkout repository
+              if: env.props
+              uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+              with:
+                  token: ${{ secrets.GUTENBERG_TOKEN }}
+            - name: Check commit message
+              if: env.props
+              env:
+                  PROPS: ${{ env.props }}
+                  SHA: ${{ env.commit_sha }}
+                  PR_NUMBER: ${{ env.pr_number }}
+              run: |
+                  git log -1 --pretty=%B $SHA
+                  if git log -1 --pretty=%B $SHA | grep -q "$PROPS"; then
+                    echo "Commit message already contains the required content."
+                    exit 0
+                  fi
+                  git config --global user.name "Gutenberg Repository Automation"
+                  git config --global user.email "gutenberg@wordpress.org"
+
+                  $MESSAGE="chore(props): add props for PR #$PR_NUMBER, missed in commit $SHA
+                  $PROPS"
+
+                  echo "$MESSAGE"
+
+                  git commit --allow-empty -m "$MESSAGE"
+                  git push
+
+                  echo "Committed and pushed."
