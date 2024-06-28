@@ -9,12 +9,7 @@ import { withScope } from '../utils';
 const isObject = ( item: unknown ): item is Record< string, unknown > =>
 	Boolean( item && typeof item === 'object' && item.constructor === Object );
 
-export const getStoreProxy = < T extends object >(
-	obj: T,
-	namespace: string
-) => getProxy( obj, storeHandlers, namespace );
-
-export const storeHandlers: ProxyHandler< object > = {
+const storeHandlers: ProxyHandler< object > = {
 	get: ( target: any, key: string | symbol, receiver: any ) => {
 		const result = Reflect.get( target, key );
 		const ns = getProxyNs( receiver );
@@ -46,3 +41,8 @@ export const storeHandlers: ProxyHandler< object > = {
 		return result;
 	},
 };
+
+export const getStoreProxy = < T extends object >(
+	obj: T,
+	namespace: string
+) => getProxy( obj, storeHandlers, namespace );

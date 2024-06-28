@@ -14,33 +14,10 @@ const proxyToProps: WeakMap<
 	Map< string, PropSignal >
 > = new WeakMap();
 
-export const getPropSignal = ( proxy: object, key: string ) => {
-	if ( ! proxyToProps.has( proxy ) ) {
-		proxyToProps.set( proxy, new Map() );
-	}
-	const props = proxyToProps.get( proxy )!;
-	if ( ! props.has( key ) ) {
-		props.set( key, new PropSignal( proxy ) );
-	}
-	return props.get( key )!;
-};
-
-export const peek = ( obj: object, key: string ): unknown => {
-	const prop = getPropSignal( obj, key );
-	// TODO: it currently returns the value of the internal `valueSignal`,
-	// getters are not considered yet.
-	return prop.peekValueSignal();
-};
-
 const objToIterable = new WeakMap< object, Signal< number > >();
 const descriptor = Object.getOwnPropertyDescriptor;
 
-export const getStateProxy = < T extends object >(
-	obj: T,
-	namespace: string
-) => getProxy( obj, stateHandlers, namespace );
-
-export const stateHandlers: ProxyHandler< object > = {
+const stateHandlers: ProxyHandler< object > = {
 	get( target: object, key: string, receiver: object ): any {
 		/*
 		 * First, we get a reference of the property we want to access. The
@@ -71,38 +48,12 @@ export const stateHandlers: ProxyHandler< object > = {
 		return prop.getComputed().value;
 	},
 
-	set(
-		target: object,
-		key: string,
-		value: unknown,
-		receiver: object
-	): boolean {
-		if ( typeof descriptor( target, key )?.set === 'function' ) {
-			return Reflect.set( target, key, value, receiver );
-		}
-
-		const isNew = ! ( key in target );
-		const result = Reflect.set( target, key, value, receiver );
-
-		if ( result ) {
-			if ( isNew && objToIterable.has( target ) ) {
-				objToIterable.get( target )!.value++;
-			}
-
-			if ( Array.isArray( target ) ) {
-				const length = getPropSignal( receiver, 'length' );
-				length.setValue( target.length );
-			}
-		}
-
-		return result;
-	},
-
 	defineProperty(
 		target: object,
 		key: string,
 		desc: PropertyDescriptor
 	): boolean {
+		const isNew = ! ( key in target );
 		const result = Reflect.defineProperty( target, key, desc );
 
 		if ( result ) {
@@ -117,7 +68,18 @@ export const stateHandlers: ProxyHandler< object > = {
 						: value
 				);
 			}
+
+			if ( isNew && objToIterable.has( target ) ) {
+				objToIterable.get( target )!.value++;
+			}
+
+			if ( Array.isArray( target ) ) {
+				const receiver = getProxy( target );
+				const length = getPropSignal( receiver, 'length' );
+				length.setValue( target.length );
+			}
 		}
+
 		return result;
 	},
 
@@ -143,4 +105,27 @@ export const stateHandlers: ProxyHandler< object > = {
 		( objToIterable as any )._ = objToIterable.get( target )!.value;
 		return Reflect.ownKeys( target );
 	},
+};
+
+export const getStateProxy = < T extends object >(
+	obj: T,
+	namespace: string
+) => getProxy( obj, stateHandlers, namespace );
+
+export const peek = ( obj: object, key: string ): unknown => {
+	const prop = getPropSignal( obj, key );
+	// TODO: it currently returns the value of the internal `valueSignal`,
+	// getters are not considered yet.
+	return prop.peekValueSignal();
+};
+
+export const getPropSignal = ( proxy: object, key: string ) => {
+	if ( ! proxyToProps.has( proxy ) ) {
+		proxyToProps.set( proxy, new Map() );
+	}
+	const props = proxyToProps.get( proxy )!;
+	if ( ! props.has( key ) ) {
+		props.set( key, new PropSignal( proxy ) );
+	}
+	return props.get( key )!;
 };
