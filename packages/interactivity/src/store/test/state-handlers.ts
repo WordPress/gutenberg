@@ -4,17 +4,33 @@
 /**
  * External dependencies
  */
-import { Signal, effect, signal } from '@preact/signals-core';
+import { effect } from '@preact/signals-core';
 /**
  * Internal dependencies
  */
 import { proxify } from '../proxies';
 import { stateHandlers } from '../handlers';
+import {
+	setScope,
+	resetScope,
+	setNamespace,
+	resetNamespace,
+	getContext,
+} from '../../hooks';
 
 type State = {
 	a?: number;
 	nested: { b?: number };
 	array: ( number | State[ 'nested' ] )[];
+};
+
+const withScopeAndNs = ( scope, ns, callback ) => () => {
+	setScope( scope );
+	setNamespace( ns );
+	const result = callback();
+	resetNamespace();
+	resetScope();
+	return result;
 };
 
 const proxifyState = < T extends object >( obj: T ) =>
@@ -722,6 +738,45 @@ describe( 'interactivity api handlers', () => {
 			expect( number ).toBe( 3 );
 			store.otherNumber = 4;
 			expect( number ).toBe( 4 );
+		} );
+
+		it( 'should support different scopes for getters', () => {
+			const store = proxifyState( {
+				number: 1,
+				get sum() {
+					const ctx = getContext();
+					return ctx
+						? this.number + ( ctx as any ).value
+						: this.number;
+				},
+			} );
+
+			const scopeA = {
+				context: { test: { value: 10 } },
+			};
+			const scopeB = {
+				context: { test: { value: 20 } },
+			};
+
+			let resultA = 0;
+			let resultB = 0;
+
+			effect(
+				withScopeAndNs( scopeA, 'test', () => {
+					resultA = store.sum;
+				} )
+			);
+			effect(
+				withScopeAndNs( scopeB, 'test', () => {
+					resultB = store.sum;
+				} )
+			);
+
+			expect( resultA ).toBe( 11 );
+			expect( resultB ).toBe( 21 );
+			store.number = 2;
+			expect( resultA ).toBe( 12 );
+			expect( resultB ).toBe( 22 );
 		} );
 	} );
 } );

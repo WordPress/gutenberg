@@ -58,18 +58,16 @@ export class Property {
 		}
 
 		if ( ! this.computedsByScope.has( scope ) ) {
+			const callback = () => {
+				const getter = this.getterSignal?.value;
+				return getter
+					? getter.call( this.owner )
+					: this.valueSignal?.value;
+			};
+
 			this.computedsByScope.set(
 				scope,
-				computed( () => {
-					const getter = this.getterSignal?.value;
-					if ( getter ) {
-						const owner = this.owner;
-						return wrapper
-							? wrapper( () => getter.call( owner ) )()
-							: getter.call( owner );
-					}
-					return this.valueSignal?.value;
-				} )
+				computed( wrapper ? wrapper( callback ) : callback )
 			);
 		}
 
