@@ -131,8 +131,8 @@ export function getFontStylesAndWeights( fontFamilyFaces ) {
 		}
 	} );
 
-	// If there is no font weight of 700, then include faux bold as an option.
-	if ( ! fontWeights.some( ( weight ) => weight.value === '700' ) ) {
+	// If there is no font weight of 600 or above, then include faux bold as an option.
+	if ( ! fontWeights.some( ( weight ) => weight.value >= '600' ) ) {
 		fontWeights.push( {
 			name: _x( 'Bold', 'font weight' ),
 			value: '700',
