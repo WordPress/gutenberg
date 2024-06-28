@@ -386,10 +386,6 @@ describe( 'getFontStylesAndWeights', () => {
 					name: 'Light',
 					value: '300',
 				},
-				{
-					name: 'Bold',
-					value: '700',
-				},
 			],
 			combinedStyleAndWeightOptions: [
 				{
@@ -417,14 +413,6 @@ describe( 'getFontStylesAndWeights', () => {
 					},
 				},
 				{
-					key: 'normal-700',
-					name: 'Bold',
-					style: {
-						fontStyle: 'normal',
-						fontWeight: '700',
-					},
-				},
-				{
 					key: 'italic-400',
 					name: 'Regular Italic',
 					style: {
@@ -446,6 +434,67 @@ describe( 'getFontStylesAndWeights', () => {
 					style: {
 						fontStyle: 'italic',
 						fontWeight: '300',
+					},
+				},
+			],
+			isSystemFont: false,
+			isVariableFont: false,
+		} );
+	} );
+
+	it( 'should return available styles and weights for a regular font with faux bold added', () => {
+		const fontFamilyFaces = [
+			{
+				fontFamily: 'Piazzolla',
+				fontStyle: 'normal',
+				fontWeight: '400',
+				src: 'http://www.wordpress.org/wp-content/uploads/fonts/N0b52SlTPu5rIkWIZjVKKtYtfxYqZ4RJBFzFfYUjkSDdlqZgy7LYxnL31AHfAAy5.woff2',
+			},
+		];
+		expect( getFontStylesAndWeights( fontFamilyFaces ) ).toEqual( {
+			fontStyles: [
+				{
+					name: 'Regular',
+					value: 'normal',
+				},
+				{
+					name: 'Italic',
+					value: 'italic',
+				},
+			],
+			fontWeights: [
+				{
+					name: 'Regular',
+					value: '400',
+				},
+				{
+					name: 'Bold',
+					value: '700',
+				},
+			],
+			combinedStyleAndWeightOptions: [
+				{
+					key: 'normal-400',
+					name: 'Regular',
+					style: {
+						fontStyle: 'normal',
+						fontWeight: '400',
+					},
+				},
+				{
+					key: 'normal-700',
+					name: 'Bold',
+					style: {
+						fontStyle: 'normal',
+						fontWeight: '700',
+					},
+				},
+				{
+					key: 'italic-400',
+					name: 'Regular Italic',
+					style: {
+						fontStyle: 'italic',
+						fontWeight: '400',
 					},
 				},
 				{
