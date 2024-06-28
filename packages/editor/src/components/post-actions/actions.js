@@ -1040,9 +1040,7 @@ export const duplicateTemplatePartAction = {
 				sprintf(
 					// translators: %s: The new template part's title e.g. 'Call to action (copy)'.
 					__( '"%s" duplicated.' ),
-					typeof item.title === 'string'
-						? item.title
-						: item.title.rendered
+					getItemTitle( item )
 				),
 				{ type: 'snackbar', id: 'edit-site-patterns-success' }
 			);
