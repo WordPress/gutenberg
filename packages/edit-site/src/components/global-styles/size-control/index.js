@@ -22,7 +22,7 @@ const DEFAULT_UNITS = [ 'px', 'em', 'rem', 'vw', 'vh' ];
 
 function SizeControl( props ) {
 	const { baseControlProps } = useBaseControlProps( props );
-	const { value, onChange, fallbackValue } = props;
+	const { value, onChange, fallbackValue, disabled } = props;
 
 	const units = useCustomUnits( {
 		availableUnits: DEFAULT_UNITS,
@@ -58,6 +58,7 @@ function SizeControl( props ) {
 						onChange={ handleUnitControlChange }
 						units={ units }
 						min={ 0 }
+						disabled={ disabled }
 					/>
 				</FlexItem>
 				<FlexItem isBlock>
@@ -75,6 +76,7 @@ function SizeControl( props ) {
 							min={ 0 }
 							max={ isValueUnitRelative ? 10 : 100 }
 							step={ isValueUnitRelative ? 0.1 : 1 }
+							disabled={ disabled }
 						/>
 					</Spacer>
 				</FlexItem>
