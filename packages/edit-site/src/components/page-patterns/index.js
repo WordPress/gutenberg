@@ -418,7 +418,7 @@ export default function DataviewsPatterns() {
 					fields={ fields }
 					actions={ actions }
 					data={ data || EMPTY_ARRAY }
-					getItemId={ ( item ) => item.name }
+					getItemId={ ( item ) => item.name ?? item.id }
 					isLoading={ isResolving }
 					view={ view }
 					onChangeView={ onChangeView }
