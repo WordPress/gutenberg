@@ -53,6 +53,10 @@ describe( 'getFontStylesAndWeights', () => {
 					name: 'Black',
 					value: '900',
 				},
+				{
+					name: 'Extra Black',
+					value: '1000',
+				},
 			],
 			combinedStyleAndWeightOptions: [
 				{
@@ -128,6 +132,14 @@ describe( 'getFontStylesAndWeights', () => {
 					},
 				},
 				{
+					key: 'normal-1000',
+					name: 'Extra Black',
+					style: {
+						fontStyle: 'normal',
+						fontWeight: '1000',
+					},
+				},
+				{
 					key: 'italic-100',
 					name: 'Thin Italic',
 					style: {
@@ -199,19 +211,27 @@ describe( 'getFontStylesAndWeights', () => {
 						fontWeight: '900',
 					},
 				},
+				{
+					key: 'italic-1000',
+					name: 'Extra Black Italic',
+					style: {
+						fontStyle: 'italic',
+						fontWeight: '1000',
+					},
+				},
 			],
 			isSystemFont: true,
 			isVariableFont: false,
 		} );
 	} );
 
-	it( 'should return default styles and weights for a variable font', () => {
+	it( 'should return available styles and weights for a variable font', () => {
 		const fontFamilyFaces = [
 			{
-				fontFamily: 'Inter',
+				fontFamily: 'AR One Sans',
 				fontStyle: 'normal',
-				fontWeight: '100 900',
-				src: 'http://www.wordpress.org/wp-content/uploads/fonts/Inter-VariableFont_slntwght.ttf',
+				fontWeight: '400 700',
+				src: 'http://www.wordpress.org/wp-content/uploads/fonts/AROneSans-VariableFont_ARRRwght.ttf',
 			},
 		];
 
@@ -228,18 +248,6 @@ describe( 'getFontStylesAndWeights', () => {
 			],
 			fontWeights: [
 				{
-					name: 'Thin',
-					value: '100',
-				},
-				{
-					name: 'Extra Light',
-					value: '200',
-				},
-				{
-					name: 'Light',
-					value: '300',
-				},
-				{
 					name: 'Regular',
 					value: '400',
 				},
@@ -255,40 +263,8 @@ describe( 'getFontStylesAndWeights', () => {
 					name: 'Bold',
 					value: '700',
 				},
-				{
-					name: 'Extra Bold',
-					value: '800',
-				},
-				{
-					name: 'Black',
-					value: '900',
-				},
 			],
 			combinedStyleAndWeightOptions: [
-				{
-					key: 'normal-100',
-					name: 'Thin',
-					style: {
-						fontStyle: 'normal',
-						fontWeight: '100',
-					},
-				},
-				{
-					key: 'normal-200',
-					name: 'Extra Light',
-					style: {
-						fontStyle: 'normal',
-						fontWeight: '200',
-					},
-				},
-				{
-					key: 'normal-300',
-					name: 'Light',
-					style: {
-						fontStyle: 'normal',
-						fontWeight: '300',
-					},
-				},
 				{
 					key: 'normal-400',
 					name: 'Regular',
@@ -319,46 +295,6 @@ describe( 'getFontStylesAndWeights', () => {
 					style: {
 						fontStyle: 'normal',
 						fontWeight: '700',
-					},
-				},
-				{
-					key: 'normal-800',
-					name: 'Extra Bold',
-					style: {
-						fontStyle: 'normal',
-						fontWeight: '800',
-					},
-				},
-				{
-					key: 'normal-900',
-					name: 'Black',
-					style: {
-						fontStyle: 'normal',
-						fontWeight: '900',
-					},
-				},
-				{
-					key: 'italic-100',
-					name: 'Thin Italic',
-					style: {
-						fontStyle: 'italic',
-						fontWeight: '100',
-					},
-				},
-				{
-					key: 'italic-200',
-					name: 'Extra Light Italic',
-					style: {
-						fontStyle: 'italic',
-						fontWeight: '200',
-					},
-				},
-				{
-					key: 'italic-300',
-					name: 'Light Italic',
-					style: {
-						fontStyle: 'italic',
-						fontWeight: '300',
 					},
 				},
 				{
@@ -393,29 +329,13 @@ describe( 'getFontStylesAndWeights', () => {
 						fontWeight: '700',
 					},
 				},
-				{
-					key: 'italic-800',
-					name: 'Extra Bold Italic',
-					style: {
-						fontStyle: 'italic',
-						fontWeight: '800',
-					},
-				},
-				{
-					key: 'italic-900',
-					name: 'Black Italic',
-					style: {
-						fontStyle: 'italic',
-						fontWeight: '900',
-					},
-				},
 			],
 			isSystemFont: false,
 			isVariableFont: true,
 		} );
 	} );
 
-	it( 'should return specific font styles and weights based on provided font faces', () => {
+	it( 'should return available styles and weights for a regular font', () => {
 		const fontFamilyFaces = [
 			{
 				fontFamily: 'Piazzolla',

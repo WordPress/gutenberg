@@ -50,6 +50,10 @@ describe( 'formatFontWeight', () => {
 			name: 'Black',
 			value: '900',
 		} );
+		expect( formatFontWeight( '1000' ) ).toEqual( {
+			name: 'Extra Black',
+			value: '1000',
+		} );
 		expect( formatFontWeight( 'normal' ) ).toEqual( {
 			name: 'Regular',
 			value: 'normal',

@@ -57,6 +57,10 @@ const FONT_WEIGHTS = [
 		name: _x( 'Black', 'font weight' ),
 		value: '900',
 	},
+	{
+		name: _x( 'Extra Black', 'font weight' ),
+		value: '1000',
+	},
 ];
 
 /**
@@ -74,15 +78,35 @@ export function getFontStylesAndWeights( fontFamilyFaces ) {
 	let isVariableFont = false;
 
 	fontFamilyFaces?.forEach( ( face ) => {
+		// Check for variable font by looking for a space in the font weight value. e.g. "100 900"
+		if ( /\s/.test( face.fontWeight.trim() ) ) {
+			isVariableFont = true;
+
+			// Find font weight start and end values.
+			let [ startValue, endValue ] = face.fontWeight.split( ' ' );
+			startValue = parseInt( startValue.slice( 0, 1 ) );
+			if ( endValue === '1000' ) {
+				endValue = 10;
+			} else {
+				endValue = parseInt( endValue.slice( 0, 1 ) );
+			}
+
+			// Create font weight options for available variable weights.
+			for ( let i = startValue; i <= endValue; i++ ) {
+				const fontWeightValue = `${ i.toString() }00`;
+				if (
+					! fontWeights.some(
+						( weight ) => weight.value === fontWeightValue
+					)
+				) {
+					fontWeights.push( formatFontWeight( fontWeightValue ) );
+				}
+			}
+		}
+
+		// Format font style and weight values.
 		const fontWeight = formatFontWeight( face.fontWeight );
 		const fontStyle = formatFontStyle( face.fontStyle );
-
-		// Check if font weight includes a space that is not at the start or end of the string. If so, it must be a variable font. e.g. "100 900"
-		if ( /\s/.test( fontWeight.value.trim() ) ) {
-			isVariableFont = true;
-			fontWeight.value = fontWeight.value.replace( /\s+/g, '-' );
-			// TODO: Handle variable weights and styles.
-		}
 
 		// Create font style and font weight lists without duplicates.
 		if ( fontStyle ) {
@@ -100,7 +124,9 @@ export function getFontStylesAndWeights( fontFamilyFaces ) {
 					( weight ) => weight.value === fontWeight.value
 				)
 			) {
-				fontWeights.push( fontWeight );
+				if ( ! isVariableFont ) {
+					fontWeights.push( fontWeight );
+				}
 			}
 		}
 	} );
@@ -121,8 +147,8 @@ export function getFontStylesAndWeights( fontFamilyFaces ) {
 		} );
 	}
 
-	// Use default font styles and weights for system and variable fonts.
-	if ( isSystemFont || isVariableFont ) {
+	// Use default font styles and weights for system fonts.
+	if ( isSystemFont ) {
 		fontStyles = FONT_STYLES;
 		fontWeights = FONT_WEIGHTS;
 	}

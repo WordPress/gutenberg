@@ -50,6 +50,9 @@ export function formatFontWeight( fontWeight ) {
 		case '900':
 			name = _x( 'Black', 'font weight' );
 			break;
+		case '1000':
+			name = _x( 'Extra Black', 'font weight' );
+			break;
 
 		default:
 			name = fontWeight;
