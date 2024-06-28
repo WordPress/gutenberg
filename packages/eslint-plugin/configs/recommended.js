@@ -59,7 +59,7 @@ if ( isPackageInstalled( 'typescript' ) ) {
 				// the typescript type checker. So we need to explicitly enable it,
 				// but want to ignore "unused rest siblings".
 				// @issue https://github.com/WordPress/gutenberg/issues/54305
-				'no-unused-vars': [ 'error', { ignoreRestSiblings: true } ],
+				'no-unused-vars': 'off',
 				'@typescript-eslint/no-unused-vars': [ 'error', { ignoreRestSiblings: true } ],
 				// no-shadow doesn't work correctly in TS, so let's use a TS-dedicated version instead.
 				'no-shadow': 'off',
