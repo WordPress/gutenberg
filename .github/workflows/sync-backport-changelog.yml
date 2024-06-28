@@ -3,7 +3,7 @@ name: Sync Core Backport Issue
 on:
     push:
         branches:
-            - try/sync-backport-changelog
+            - trunk
 
 jobs:
     sync-backport-changelog:
