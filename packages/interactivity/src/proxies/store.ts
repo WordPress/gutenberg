@@ -49,7 +49,7 @@ export const getStoreProxy = < T extends object >(
 	isRoot = false
 ) => {
 	const proxy = getProxy( obj, storeHandlers, namespace );
-	if ( isRoot ) {
+	if ( proxy && isRoot ) {
 		storeRoots.add( proxy );
 	}
 	return proxy;
