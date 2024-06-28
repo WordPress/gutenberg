@@ -151,7 +151,7 @@ export function store(
 			state: getStateProxy( isObject( state ) ? state : {}, namespace ),
 			...block,
 		};
-		const proxiedStore = getStoreProxy( rawStore, namespace );
+		const proxiedStore = getStoreProxy( rawStore, namespace, true );
 		rawStores.set( namespace, rawStore );
 		stores.set( namespace, proxiedStore );
 	} else {

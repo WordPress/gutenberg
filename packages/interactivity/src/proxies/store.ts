@@ -3,11 +3,12 @@
  */
 import { getProxy, getProxyNs, shouldProxy } from './registry';
 import { setNamespace, resetNamespace } from '../hooks';
-import { stores } from '../store';
 import { withScope } from '../utils';
 
 const isObject = ( item: unknown ): item is Record< string, unknown > =>
 	Boolean( item && typeof item === 'object' && item.constructor === Object );
+
+const storeRoots = new WeakSet();
 
 const storeHandlers: ProxyHandler< object > = {
 	get: ( target: any, key: string | symbol, receiver: any ) => {
@@ -16,7 +17,7 @@ const storeHandlers: ProxyHandler< object > = {
 
 		// Check if the proxy is the store root and no key with that name exist. In
 		// that case, return an empty object for the requested key.
-		if ( typeof result === 'undefined' && receiver === stores.get( ns ) ) {
+		if ( typeof result === 'undefined' && storeRoots.has( receiver ) ) {
 			const obj = {};
 			Reflect.set( target, key, obj );
 			return getStoreProxy( obj, ns );
@@ -44,5 +45,12 @@ const storeHandlers: ProxyHandler< object > = {
 
 export const getStoreProxy = < T extends object >(
 	obj: T,
-	namespace: string
-) => getProxy( obj, storeHandlers, namespace );
+	namespace: string,
+	isRoot = false
+) => {
+	const proxy = getProxy( obj, storeHandlers, namespace );
+	if ( isRoot ) {
+		storeRoots.add( proxy );
+	}
+	return proxy;
+};
