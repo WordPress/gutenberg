@@ -18,6 +18,7 @@ import {
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { addQueryArgs, getPath } from '@wordpress/url';
 import { useDebounce } from '@wordpress/compose';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -93,7 +94,7 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 					name: postType + '-' + record.id,
 					searchLabel: record.title?.rendered + ' ' + record.id,
 					label: record.title?.rendered
-						? record.title?.rendered
+						? decodeEntities( record.title?.rendered )
 						: __( '(no title)' ),
 					icon: icons[ postType ],
 				};

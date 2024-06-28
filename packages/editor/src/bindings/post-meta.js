@@ -16,13 +16,53 @@ export default {
 		return args.key;
 	},
 	getValue( { registry, context, args } ) {
-		const postType = context.postType
-			? context.postType
-			: registry.select( editorStore ).getCurrentPostType();
-
 		return registry
 			.select( coreDataStore )
-			.getEditedEntityRecord( 'postType', postType, context.postId )
-			.meta?.[ args.key ];
+			.getEditedEntityRecord(
+				'postType',
+				context?.postType,
+				context?.postId
+			).meta?.[ args.key ];
+	},
+	setValue( { registry, context, args, value } ) {
+		registry
+			.dispatch( coreDataStore )
+			.editEntityRecord( 'postType', context?.postType, context?.postId, {
+				meta: {
+					[ args.key ]: value,
+				},
+			} );
+	},
+	canUserEditValue( { select, context, args } ) {
+		const postType =
+			context?.postType || select( editorStore ).getCurrentPostType();
+
+		// Check that editing is happening in the post editor and not a template.
+		if ( postType === 'wp_template' ) {
+			return false;
+		}
+
+		// Check that the custom field is not protected and available in the REST API.
+		const isFieldExposed = !! select( coreDataStore ).getEntityRecord(
+			'postType',
+			postType,
+			context?.postId
+		)?.meta?.[ args.key ];
+
+		if ( ! isFieldExposed ) {
+			return false;
+		}
+
+		// Check that the user has the capability to edit post meta.
+		const canUserEdit = select( coreDataStore ).canUserEditEntityRecord(
+			'postType',
+			context?.postType,
+			context?.postId
+		);
+		if ( ! canUserEdit ) {
+			return false;
+		}
+
+		return true;
 	},
 };

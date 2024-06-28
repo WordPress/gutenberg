@@ -46,7 +46,7 @@ import {
 	TEMPLATE,
 } from './constants';
 import { unlock } from '../lock-unlock';
-import { TOOLSPANEL_DROPDOWNMENU_PROPS } from '../utils/constants';
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const { ResolutionTool } = unlock( blockEditorPrivateApis );
 
@@ -187,6 +187,12 @@ function MediaTextEdit( {
 			mediaId: undefined,
 			mediaUrl: undefined,
 			mediaAlt: undefined,
+			mediaLink: undefined,
+			linkDestination: undefined,
+			linkTarget: undefined,
+			linkClass: undefined,
+			rel: undefined,
+			href: undefined,
 			useFeaturedImage: ! useFeaturedImage,
 		} );
 	};
@@ -270,6 +276,7 @@ function MediaTextEdit( {
 			mediaSizeSlug: newMediaSizeSlug,
 		} );
 	};
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const mediaTextGeneralSettings = (
 		<ToolsPanel
@@ -284,7 +291,7 @@ function MediaTextEdit( {
 					mediaSizeSlug: undefined,
 				} );
 			} }
-			dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
+			dropdownMenuProps={ dropdownMenuProps }
 		>
 			<ToolsPanelItem
 				label={ __( 'Media width' ) }
@@ -383,7 +390,14 @@ function MediaTextEdit( {
 						onChange={ onMediaAltChange }
 						help={
 							<>
-								<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+								<ExternalLink
+									href={
+										// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
+										__(
+											'https://www.w3.org/WAI/tutorials/images/decision-tree/'
+										)
+									}
+								>
 									{ __(
 										'Describe the purpose of the image.'
 									) }
@@ -446,17 +460,13 @@ function MediaTextEdit( {
 					</>
 				) }
 
-				{ mediaType === 'image' && (
+				{ mediaType === 'image' && ! useFeaturedImage && (
 					<ImageURLInputUI
 						url={ href || '' }
 						onChangeUrl={ onSetHref }
 						linkDestination={ linkDestination }
 						mediaType={ mediaType }
-						mediaUrl={
-							useFeaturedImage && featuredImageURL
-								? featuredImageURL
-								: image && image.source_url
-						}
+						mediaUrl={ image && image.source_url }
 						mediaLink={ image && image.link }
 						linkTarget={ linkTarget }
 						linkClass={ linkClass }

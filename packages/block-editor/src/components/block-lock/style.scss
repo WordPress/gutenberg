@@ -8,17 +8,27 @@
 	}
 }
 
+.block-editor-block-lock-modal__options {
+	margin-top: $grid-unit-20;
+
+	legend {
+		margin-bottom: $grid-unit-20;
+		padding: 0;
+	}
+}
+
 .block-editor-block-lock-modal__checklist {
 	margin: 0;
 }
 
-.block-editor-block-lock-modal__options-title {
+.block-editor-block-lock-modal__options-all {
 	padding: $grid-unit-15 0;
 
 	.components-checkbox-control__label {
 		font-weight: 600;
 	}
 }
+
 .block-editor-block-lock-modal__checklist-item {
 	display: flex;
 	justify-content: space-between;

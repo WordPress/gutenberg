@@ -992,11 +992,23 @@ describe( 'safeDecodeURI', () => {
 } );
 
 describe( 'filterURLForDisplay', () => {
+	it( 'should return an empty string if the url is empty or falsy', () => {
+		let url = filterURLForDisplay( '' );
+		expect( url ).toBe( '' );
+		url = filterURLForDisplay( null );
+		expect( url ).toBe( '' );
+	} );
 	it( 'should remove protocol', () => {
 		let url = filterURLForDisplay( 'http://wordpress.org' );
 		expect( url ).toBe( 'wordpress.org' );
 		url = filterURLForDisplay( 'https://wordpress.org' );
 		expect( url ).toBe( 'wordpress.org' );
+		url = filterURLForDisplay( 'file:///folder/file.txt' );
+		expect( url ).toBe( '/folder/file.txt' );
+		url = filterURLForDisplay( 'tel:0123456789' );
+		expect( url ).toBe( '0123456789' );
+		url = filterURLForDisplay( 'blob:data' );
+		expect( url ).toBe( 'data' );
 	} );
 	it( 'should remove www subdomain', () => {
 		const url = filterURLForDisplay( 'http://www.wordpress.org' );

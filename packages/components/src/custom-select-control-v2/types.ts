@@ -51,6 +51,10 @@ export type CustomSelectButtonProps = {
 
 export type _CustomSelectProps = CustomSelectButtonProps & {
 	/**
+	 * Additional className added to the root wrapper element.
+	 */
+	className?: string;
+	/**
 	 * The child elements. This should be composed of `CustomSelectItem` components.
 	 */
 	children: React.ReactNode;
@@ -79,6 +83,7 @@ type LegacyOption = {
 	style?: React.CSSProperties;
 	className?: string;
 	__experimentalHint?: string;
+	[ key: string ]: any;
 };
 
 /**
