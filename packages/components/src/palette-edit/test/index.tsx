@@ -16,9 +16,7 @@ async function clearInput( input: HTMLInputElement ) {
 	await click( input );
 
 	// Press backspace as many times as the input's current value
-	for ( const _ of Array( input.value.length ) ) {
-		await press.Backspace();
-	}
+	[ ...Array( input.value.length ) ].forEach( async () => await press.Backspace() );
 }
 
 describe( 'getNameAndSlugForPosition', () => {
