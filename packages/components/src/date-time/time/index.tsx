@@ -15,7 +15,7 @@ import { __ } from '@wordpress/i18n';
 import BaseControl from '../../base-control';
 import SelectControl from '../../select-control';
 import TimeZone from './timezone';
-import type { TimeInputChangeArgs, TimePickerProps } from '../types';
+import type { TimeInputValue, TimePickerProps } from '../types';
 import {
 	Wrapper,
 	Fieldset,
@@ -105,7 +105,7 @@ export function TimePicker( {
 	const onTimeInputChangeCallback = ( {
 		hours: newHours,
 		minutes: newMinutes,
-	}: TimeInputChangeArgs ) => {
+	}: TimeInputValue ) => {
 		const newDate = set( date, {
 			hours: newHours,
 			minutes: newMinutes,

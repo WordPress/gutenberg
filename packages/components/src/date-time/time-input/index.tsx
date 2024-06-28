@@ -7,7 +7,6 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useState, useEffect, useRef, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -29,36 +28,33 @@ import {
 } from '../utils';
 import type { TimeInputProps } from '../types';
 import type { InputChangeCallback } from '../../input-control/types';
+import { useControlledValue } from '../../utils';
 
 export function TimeInput( {
-	value: entryValue,
+	value: valueProp,
+	defaultValue,
 	is12Hour,
 	minutesProps,
 	onChange,
 }: TimeInputProps ) {
-	const value = useMemo(
-		() =>
-			entryValue || {
-				hours: new Date().getHours(),
-				minutes: new Date().getMinutes(),
-			},
-		[ entryValue ]
-	);
-	const [ hours, setHours ] = useState( value.hours );
-	const [ hours12Format, setHours12Format ] = useState(
-		from24hTo12h( value.hours )
-	);
-	const [ minutes, setMinutes ] = useState( value.minutes );
-	const [ dayPeriod, setDayPeriod ] = useState(
-		parseDayPeriod( value.hours )
-	);
-
-	const prevValues = useRef( value );
+	const [
+		value = {
+			hours: new Date().getHours(),
+			minutes: new Date().getMinutes(),
+		},
+		setValue,
+	] = useControlledValue( {
+		value: valueProp,
+		onChange,
+		defaultValue,
+	} );
+	const dayPeriod = parseDayPeriod( value.hours );
+	const hours12Format = from24hTo12h( value.hours );
 
 	const buildNumberControlChangeCallback = (
 		method: 'hours' | 'minutes'
-	) => {
-		const callback: InputChangeCallback = ( _value, { event } ) => {
+	): InputChangeCallback => {
+		return ( _value, { event } ) => {
 			if ( ! validateInputElementTarget( event ) ) {
 				return;
 			}
@@ -66,27 +62,14 @@ export function TimeInput( {
 			// We can safely assume value is a number if target is valid.
 			const numberValue = Number( _value );
 
-			switch ( method ) {
-				case 'hours':
-					if ( is12Hour ) {
-						setHours(
-							from12hTo24h( numberValue, dayPeriod === 'PM' )
-						);
-						setHours12Format( numberValue );
-					} else {
-						setHours( numberValue );
-						setHours12Format( from24hTo12h( numberValue ) );
-						setDayPeriod( parseDayPeriod( numberValue ) );
-					}
-					break;
-
-				case 'minutes':
-					setMinutes( numberValue );
-					break;
-			}
+			setValue( {
+				...value,
+				[ method ]:
+					method === 'hours' && is12Hour
+						? from12hTo24h( numberValue, dayPeriod === 'PM' )
+						: numberValue,
+			} );
 		};
-
-		return callback;
 	};
 
 	const buildAmPmChangeCallback = ( _value: 'AM' | 'PM' ) => {
@@ -95,35 +78,16 @@ export function TimeInput( {
 				return;
 			}
 
-			setDayPeriod( _value );
-			setHours( from12hTo24h( hours12Format, _value === 'PM' ) );
+			setValue( {
+				...value,
+				hours: from12hTo24h( hours12Format, _value === 'PM' ),
+			} );
 		};
 	};
 
 	function parseDayPeriod( _hours: number ) {
 		return _hours < 12 ? 'AM' : 'PM';
 	}
-
-	useEffect( () => {
-		setHours( value.hours );
-		setMinutes( value.minutes );
-
-		setDayPeriod( parseDayPeriod( value.hours ) );
-		setHours12Format( from24hTo12h( value.hours ) );
-	}, [ value ] );
-
-	useEffect( () => {
-		if (
-			( prevValues.current.hours !== hours ||
-				prevValues.current.minutes !== minutes ) &&
-			( entryValue?.hours !== hours || entryValue?.minutes !== minutes )
-		) {
-			onChange?.( { hours, minutes } );
-		}
-
-		prevValues.current.hours = hours;
-		prevValues.current.minutes = minutes;
-	}, [ onChange, entryValue, hours, minutes ] );
 
 	return (
 		<HStack alignment="left">
@@ -135,10 +99,9 @@ export function TimeInput( {
 					label={ __( 'Hours' ) }
 					hideLabelFromVision
 					__next40pxDefaultSize
-					value={ String( is12Hour ? hours12Format : hours ).padStart(
-						2,
-						'0'
-					) }
+					value={ String(
+						is12Hour ? hours12Format : value.hours
+					).padStart( 2, '0' ) }
 					step={ 1 }
 					min={ is12Hour ? 1 : 0 }
 					max={ is12Hour ? 12 : 23 }
@@ -164,7 +127,7 @@ export function TimeInput( {
 					label={ __( 'Minutes' ) }
 					hideLabelFromVision
 					__next40pxDefaultSize
-					value={ String( minutes ).padStart( 2, '0' ) }
+					value={ String( value.minutes ).padStart( 2, '0' ) }
 					step={ 1 }
 					min={ 0 }
 					max={ 59 }

@@ -17,7 +17,10 @@ describe( 'TimePicker', () => {
 		const onChangeSpy = jest.fn();
 
 		render(
-			<TimeInput value={ timeInputValue } onChange={ onChangeSpy } />
+			<TimeInput
+				defaultValue={ timeInputValue }
+				onChange={ onChangeSpy }
+			/>
 		);
 
 		const hoursInput = screen.getByRole( 'spinbutton', { name: 'Hours' } );
@@ -68,7 +71,7 @@ describe( 'TimePicker', () => {
 		render(
 			<TimeInput
 				is12Hour
-				value={ timeInputValue }
+				defaultValue={ timeInputValue }
 				onChange={ onChangeSpy }
 			/>
 		);
@@ -115,7 +118,7 @@ describe( 'TimePicker', () => {
 
 		render(
 			<TimeInput
-				value={ timeInputValue }
+				defaultValue={ timeInputValue }
 				minutesProps={ { step: 5 } }
 				onChange={ onChangeSpy }
 			/>
@@ -150,5 +153,19 @@ describe( 'TimePicker', () => {
 		await user.keyboard( '{Tab}' );
 
 		expect( minutesInput ).toHaveValue( 50 );
+	} );
+
+	it( 'should reflect changes to the value prop', () => {
+		const { rerender } = render(
+			<TimeInput value={ { hours: 0, minutes: 0 } } />
+		);
+		rerender( <TimeInput value={ { hours: 1, minutes: 2 } } /> );
+
+		expect(
+			screen.getByRole( 'spinbutton', { name: 'Hours' } )
+		).toHaveValue( 1 );
+		expect(
+			screen.getByRole( 'spinbutton', { name: 'Minutes' } )
+		).toHaveValue( 2 );
 	} );
 } );
