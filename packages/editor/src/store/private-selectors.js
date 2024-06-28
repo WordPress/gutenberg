@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import fastDeepEqual from 'fast-deep-equal';
-
-/**
  * WordPress dependencies
  */
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -153,32 +148,38 @@ export const getCurrentTemplateTemplateParts = createRegistrySelector(
  *
  * @return {boolean} Whether there are edits or not in the meta fields of the relevant post.
  */
-export const hasPostMetaChanges = createRegistrySelector(
+export const getPostMetaChanges = createRegistrySelector(
 	( select ) => ( state, postType, postId ) => {
 		const { type: currentPostType, id: currentPostId } =
 			getCurrentPost( state );
 		// If no postType or postId is passed, use the current post.
+		const original = select( coreStore ).getEntityRecord(
+			'postType',
+			postType || currentPostType,
+			postId || currentPostId
+		);
 		const edits = select( coreStore ).getEntityRecordNonTransientEdits(
 			'postType',
 			postType || currentPostType,
 			postId || currentPostId
 		);
 
-		if ( ! edits?.meta ) {
-			return false;
+		if ( ! original?.meta || ! edits?.meta ) {
+			return {};
 		}
 
-		// Compare if anything apart from `footnotes` has changed.
-		const originalPostMeta = select( coreStore ).getEntityRecord(
-			'postType',
-			postType || currentPostType,
-			postId || currentPostId
-		)?.meta;
+		const keys = Object.keys( original.meta );
+		const differences = {};
+		for ( const key of keys ) {
+			if ( key === 'footnotes' ) {
+				continue;
+			}
+			if ( original.meta[ key ] !== edits.meta[ key ] ) {
+				differences[ key ] = edits.meta[ key ];
+			}
+		}
 
-		return ! fastDeepEqual(
-			{ ...originalPostMeta, footnotes: undefined },
-			{ ...edits.meta, footnotes: undefined }
-		);
+		return differences;
 	}
 );
 

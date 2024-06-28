@@ -17,14 +17,14 @@ export default function EntityRecordItem( { record, checked, onChange } ) {
 	const { name, kind, title, key } = record;
 
 	// Handle templates that might use default descriptive titles.
-	const { entityRecordTitle, hasPostMetaChanges } = useSelect(
+	const { entityRecordTitle, postMetaChanges } = useSelect(
 		( select ) => {
 			if ( 'postType' !== kind || 'wp_template' !== name ) {
 				return {
 					entityRecordTitle: title,
-					hasPostMetaChanges: unlock(
+					postMetaChanges: unlock(
 						select( editorStore )
-					).hasPostMetaChanges( name, key ),
+					).getPostMetaChanges( name, key ),
 				};
 			}
 
@@ -38,9 +38,9 @@ export default function EntityRecordItem( { record, checked, onChange } ) {
 					select( editorStore ).__experimentalGetTemplateInfo(
 						template
 					).title,
-				hasPostMetaChanges: unlock(
+				postMetaChanges: unlock(
 					select( editorStore )
-				).hasPostMetaChanges( name, key ),
+				).getPostMetaChanges( name, key ),
 			};
 		},
 		[ name, kind, title, key ]
@@ -58,10 +58,17 @@ export default function EntityRecordItem( { record, checked, onChange } ) {
 					onChange={ onChange }
 				/>
 			</PanelRow>
-			{ hasPostMetaChanges && (
-				<ul className="entities-saved-states__changes">
-					<li>{ __( 'Post Meta.' ) }</li>
-				</ul>
+			{ Object.keys( postMetaChanges ).length > 0 && (
+				<div className="entities-saved-states__changes">
+					<p>Post Meta</p>
+					<ul>
+						{ Object.keys( postMetaChanges ).map(
+							( postMetaKey ) => (
+								<li key={ postMetaKey }>{ postMetaKey }</li>
+							)
+						) }
+					</ul>
+				</div>
 			) }
 		</>
 	);
