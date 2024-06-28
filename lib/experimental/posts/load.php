@@ -77,7 +77,6 @@ function gutenberg_posts_dashboard() {
 		)
 	);
 	wp_enqueue_script( 'wp-edit-site' );
-	// wp_enqueue_style( 'wp-edit-site' );
 
 	wp_enqueue_media();
 
