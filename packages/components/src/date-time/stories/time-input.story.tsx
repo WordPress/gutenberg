@@ -15,6 +15,7 @@ const meta: Meta< typeof TimeInput > = {
 	argTypes: {
 		onChange: { action: 'onChange', control: { type: null } },
 	},
+	tags: [ 'status-wip' ],
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
