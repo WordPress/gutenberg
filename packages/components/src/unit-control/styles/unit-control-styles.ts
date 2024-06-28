@@ -114,7 +114,6 @@ const unitSelectSizes = ( { selectSize = 'default' }: SelectProps ) => {
 			align-items: center;
 
 			&:where( :not( :disabled ) ):hover {
-				color: ${ COLORS.ui.borderFocus };
 				box-shadow: inset 0 0 0
 					${ CONFIG.borderWidth + ' ' + COLORS.ui.borderFocus };
 				outline: ${ CONFIG.borderWidth } solid transparent; // For High Contrast Mode
