@@ -8,8 +8,7 @@ import { effect } from '@preact/signals-core';
 /**
  * Internal dependencies
  */
-import { proxify } from '../proxies';
-import { stateHandlers } from '../handlers';
+import { getStateProxy } from '../';
 import {
 	setScope,
 	resetScope,
@@ -34,7 +33,7 @@ const withScopeAndNs = ( scope, ns, callback ) => () => {
 };
 
 const proxifyState = < T extends object >( obj: T ) =>
-	proxify( obj, stateHandlers, 'test' ) as T;
+	getStateProxy( obj, 'test' ) as T;
 
 describe( 'interactivity api handlers', () => {
 	let nested = { b: 2 };

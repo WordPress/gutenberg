@@ -12,8 +12,8 @@ import {
 /**
  * Internal dependencies
  */
+import { getProxyNs } from './';
 import { getScope, setNamespace, resetNamespace } from '../hooks';
-import { getProxyNs } from './proxies';
 import { withScope } from '../utils';
 
 const DEFAULT_SCOPE = Symbol();

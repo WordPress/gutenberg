@@ -6,7 +6,7 @@ import { signal, type Signal } from '@preact/signals';
 /**
  * Internal dependencies
  */
-import { proxify, getProxy, getProxyNs, shouldProxy } from './proxies';
+import { proxify, getProxy, getProxyNs, shouldProxy } from './';
 import { PropSignal } from './signals';
 import { withScope } from '../utils';
 import { setNamespace, resetNamespace } from '../hooks';

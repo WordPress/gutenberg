@@ -1,6 +1,13 @@
+/**
+ * Internal dependencies
+ */
+import { stateHandlers, storeHandlers } from './handlers';
+
 const objToProxy = new WeakMap< object, object >();
 const proxyToNs = new WeakMap< object, string >();
 const ignore = new WeakSet< object >();
+
+const supported = new Set( [ Object, Array ] );
 
 export const proxify = < T extends object >(
 	obj: T,
@@ -27,4 +34,12 @@ export const shouldProxy = ( val: any ): val is Object | Array< unknown > => {
 	return ! ignore.has( val ) && supported.has( val.constructor );
 };
 
-const supported = new Set( [ Object, Array ] );
+export const getStateProxy = < T extends object >(
+	obj: T,
+	namespace: string
+) => proxify( obj, stateHandlers, namespace );
+
+export const getStoreProxy = < T extends object >(
+	obj: T,
+	namespace: string
+) => proxify( obj, storeHandlers, namespace );
