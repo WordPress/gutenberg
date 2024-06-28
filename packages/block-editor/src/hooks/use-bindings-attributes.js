@@ -109,7 +109,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 				),
 			[ props.attributes.metadata?.bindings, name ]
 		);
-		const boundAttributes = useSelect( () => {
+		const boundAttributes = useMemo( () => {
 			if ( ! bindings ) {
 				return;
 			}
