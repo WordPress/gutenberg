@@ -1,8 +1,10 @@
 /**
- * WordPress dependencies
- */
-/**
  * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
+ * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { useState, useEffect, useRef, useMemo } from '@wordpress/element';
@@ -19,7 +21,6 @@ import {
 import { HStack } from '../../h-stack';
 import Button from '../../button';
 import ButtonGroup from '../../button-group';
-import { DEFAULT_MINUTES_PROPS } from '../constants';
 import {
 	from12hTo24h,
 	from24hTo12h,
@@ -32,7 +33,7 @@ import type { InputChangeCallback } from '../../input-control/types';
 export function TimeInput( {
 	value: entryValue,
 	is12Hour,
-	minutesProps: entryMinutesProps = DEFAULT_MINUTES_PROPS,
+	minutesProps,
 	onChange,
 }: TimeInputProps ) {
 	const value = useMemo(
@@ -48,7 +49,6 @@ export function TimeInput( {
 		from24hTo12h( value.hours )
 	);
 	const [ minutes, setMinutes ] = useState( value.minutes );
-	const [ minutesProps, setMinutesProps ] = useState( entryMinutesProps );
 	const [ dayPeriod, setDayPeriod ] = useState(
 		parseDayPeriod( value.hours )
 	);
@@ -125,12 +125,6 @@ export function TimeInput( {
 		prevValues.current.minutes = minutes;
 	}, [ onChange, entryValue, hours, minutes ] );
 
-	useEffect( () => {
-		setMinutesProps(
-			Object.assign( { ...DEFAULT_MINUTES_PROPS }, entryMinutesProps )
-		);
-	}, [ entryMinutesProps ] );
-
 	return (
 		<HStack alignment="left">
 			<TimeWrapper
@@ -163,12 +157,15 @@ export function TimeInput( {
 					:
 				</TimeSeparator>
 				<MinutesInput
-					className="components-datetime__time-field-minutes-input" // Unused, for backwards compatibility.
+					className={ clsx(
+						'components-datetime__time-field-minutes-input', // Unused, for backwards compatibility.
+						minutesProps?.className
+					) }
 					label={ __( 'Minutes' ) }
 					hideLabelFromVision
 					__next40pxDefaultSize
 					value={ String( minutes ).padStart( 2, '0' ) }
-					step={ minutesProps.step }
+					step={ 1 }
 					min={ 0 }
 					max={ 59 }
 					required
@@ -176,8 +173,14 @@ export function TimeInput( {
 					isPressEnterToChange
 					isDragEnabled={ false }
 					isShiftStepEnabled={ false }
-					onChange={ buildNumberControlChangeCallback( 'minutes' ) }
+					onChange={ ( ...args ) => {
+						buildNumberControlChangeCallback( 'minutes' )(
+							...args
+						);
+						minutesProps?.onChange?.( ...args );
+					} }
 					__unstableStateReducer={ buildPadInputStateReducer( 2 ) }
+					{ ...minutesProps }
 				/>
 			</TimeWrapper>
 			{ is12Hour && (

@@ -1,3 +1,8 @@
+/**
+ * Internal dependencies
+ */
+import type { MinutesInput } from './time/styles';
+
 export type TimePickerProps = {
 	/**
 	 * The initial current time the time picker should render.
@@ -47,11 +52,9 @@ export type TimeInputProps = {
 	};
 
 	/**
-	 * The minutes control props.
+	 * The props to pass down to the minutes input.
 	 */
-	minutesProps?: {
-		step?: number;
-	};
+	minutesProps?: React.ComponentProps< typeof MinutesInput >;
 
 	/**
 	 * The function is called when a new time has been selected.
