@@ -8,6 +8,7 @@ import { signal, type Signal } from '@preact/signals';
  */
 import { getProxy, shouldProxy } from './registry';
 import { PropSignal } from './signals';
+import { setNamespace, resetNamespace } from '../hooks';
 
 const proxyToProps: WeakMap<
 	object,
@@ -19,13 +20,21 @@ const descriptor = Object.getOwnPropertyDescriptor;
 
 const stateHandlers: ProxyHandler< object > = {
 	get( target: object, key: string, receiver: object ): any {
+		const desc = descriptor( target, key );
+
+		/*
+		 * This property comes from the Object prototype and should not
+		 * be processed.
+		 */
+		if ( ! desc && key in target ) {
+			return Reflect.get( target, key, receiver );
+		}
+
 		/*
 		 * First, we get a reference of the property we want to access. The
 		 * property object is automatically instanciated if needed.
 		 */
 		const prop = getPropSignal( receiver, key );
-
-		const getter = descriptor( target, key )?.get;
 
 		/*
 		 * When the value is a getter, it updates the internal getter value. If
@@ -34,6 +43,7 @@ const stateHandlers: ProxyHandler< object > = {
 		 * These updates only triggers a re-render when either the getter or the
 		 * value has changed.
 		 */
+		const getter = desc?.get;
 		if ( getter ) {
 			prop.setGetter( getter );
 		} else {
@@ -45,7 +55,25 @@ const stateHandlers: ProxyHandler< object > = {
 			);
 		}
 
-		return prop.getComputed().value;
+		const result = prop.getComputed().value;
+
+		/*
+		 * Check if the property is a synchronous function. If it is, set the
+		 * default namespace. Synchronous functions always run in the proper scope,
+		 * which is set by the Directives component.
+		 */
+		if ( typeof result === 'function' ) {
+			return ( ...args: unknown[] ) => {
+				setNamespace( prop.namespace );
+				try {
+					return result( ...args );
+				} finally {
+					resetNamespace();
+				}
+			};
+		}
+
+		return result;
 	},
 
 	defineProperty(
