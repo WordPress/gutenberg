@@ -37,9 +37,9 @@ describe( 'interactivity api handlers', () => {
 
 	describe( 'get - plain', () => {
 		it( 'should return plain objects/arrays', () => {
-			expect( store.nested ).equals( { b: 2 } );
-			expect( store.array ).equals( [ 3, { b: 2 } ] );
-			expect( store.array[ 1 ] ).equals( { b: 2 } );
+			expect( store.nested ).toEqual( { b: 2 } );
+			expect( store.array ).toEqual( [ 3, { b: 2 } ] );
+			expect( store.array[ 1 ] ).toEqual( { b: 2 } );
 		} );
 
 		it( 'should return plain primitives', () => {
@@ -89,7 +89,7 @@ describe( 'interactivity api handlers', () => {
 				},
 			} );
 
-			expect( state.y ).equals( [ 1, 2 ] );
+			expect( state.y ).toEqual( [ 1, 2 ] );
 		} );
 
 		it( 'should work with normal functions', () => {
