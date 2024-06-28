@@ -12,11 +12,13 @@ import {
 /**
  * Internal dependencies
  */
-import { getScope } from '../hooks';
+import { getScope, setNamespace, resetNamespace } from '../hooks';
+import { getProxyNs } from './proxies';
 
 const DEFAULT_SCOPE = Symbol();
 
 export class Property {
+	public readonly namespace: string;
 	private owner: object;
 	private computedsByScope: WeakMap< WeakKey, ReadonlySignal >;
 	private valueSignal?: Signal;
@@ -24,6 +26,7 @@ export class Property {
 
 	constructor( owner: object ) {
 		this.owner = owner;
+		this.namespace = getProxyNs( owner )!;
 		this.computedsByScope = new WeakMap();
 	}
 
@@ -33,7 +36,7 @@ export class Property {
 	}: {
 		get?: () => any;
 		value?: unknown;
-	} ): void {
+	} ): Property {
 		if ( ! this.valueSignal ) {
 			this.valueSignal = signal( value );
 			this.getterSignal = signal( get );
@@ -46,6 +49,7 @@ export class Property {
 				this.getterSignal!.value = get;
 			} );
 		}
+		return this;
 	}
 
 	public getComputed(
@@ -65,10 +69,12 @@ export class Property {
 					: this.valueSignal?.value;
 			};
 
+			setNamespace( this.namespace );
 			this.computedsByScope.set(
 				scope,
 				computed( wrapper ? wrapper( callback ) : callback )
 			);
+			resetNamespace();
 		}
 
 		return this.computedsByScope.get( scope )!;

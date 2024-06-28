@@ -6,9 +6,8 @@ import { signal, type Signal } from '@preact/signals';
 /**
  * Internal dependencies
  */
-import { proxify, getProxy, getProxyNs, shouldProxy } from './proxies';
+import { proxify, getProxy, shouldProxy } from './proxies';
 import { Property } from './properties';
-import { resetNamespace, setNamespace } from '../hooks';
 import { withScope } from '../utils';
 
 const proxyToProps: WeakMap< object, Map< string, Property > > = new WeakMap();
@@ -30,8 +29,6 @@ const descriptor = Object.getOwnPropertyDescriptor;
 
 export const stateHandlers: ProxyHandler< object > = {
 	get( target: object, key: string, receiver: object ): any {
-		const ns = getProxyNs( receiver );
-
 		/*
 		 * First, we get a reference of the property we want to access. The
 		 * property object is automatically instanciated if needed.
@@ -43,11 +40,9 @@ export const stateHandlers: ProxyHandler< object > = {
 		 * This change triggers the signal only when the getter value changes.
 		 */
 		const getter = descriptor( target, key )?.get;
-		if ( getter && ns ) {
+		if ( getter ) {
 			prop.update( { get: getter } );
-			setNamespace( ns );
 			const value = prop.getComputed( withScope ).value;
-			resetNamespace();
 			return value;
 		}
 
@@ -58,10 +53,9 @@ export const stateHandlers: ProxyHandler< object > = {
 		 */
 		const value = Reflect.get( target, key, receiver );
 		prop.update( {
-			value:
-				shouldProxy( value ) && ns
-					? proxify( value, stateHandlers, ns )
-					: value,
+			value: shouldProxy( value )
+				? proxify( value, stateHandlers, prop.namespace )
+				: value,
 		} );
 
 		return prop.getComputed().value;
@@ -75,11 +69,6 @@ export const stateHandlers: ProxyHandler< object > = {
 	): boolean {
 		if ( typeof descriptor( target, key )?.set === 'function' ) {
 			return Reflect.set( target, key, value, receiver );
-		}
-
-		const ns = getProxyNs( receiver );
-		if ( shouldProxy( value ) && ns ) {
-			value = proxify( value, stateHandlers, ns );
 		}
 
 		const isNew = ! ( key in target );
@@ -105,7 +94,15 @@ export const stateHandlers: ProxyHandler< object > = {
 		desc: PropertyDescriptor
 	): boolean {
 		const prop = getProperty( target, key );
-		const result = Reflect.defineProperty( target, key, desc );
+		let { value } = desc;
+		if ( value && shouldProxy( value ) ) {
+			value = proxify( value, stateHandlers, prop.namespace );
+		}
+		const result = Reflect.defineProperty(
+			target,
+			key,
+			value ? { ...desc, value } : desc
+		);
 
 		if ( result ) {
 			prop.update( desc );
