@@ -142,6 +142,7 @@ export const getStateProxy = < T extends object >(
 
 export const peek = ( obj: object, key: string ): unknown => {
 	const prop = getPropSignal( obj, key );
+	// TODO: handle values for properties that have not been accessed yet.
 	return prop.getComputed().peek();
 };
 
