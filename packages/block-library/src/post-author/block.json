@@ -34,6 +34,13 @@
 		}
 	},
 	"usesContext": [ "postType", "postId", "queryId" ],
+	"example": {
+		"viewportWidth": 350,
+		"attributes": {
+			"showBio": true,
+			"byline": "Posted by"
+		}
+	},
 	"supports": {
 		"html": false,
 		"spacing": {
