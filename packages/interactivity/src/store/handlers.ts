@@ -43,28 +43,25 @@ export const stateHandlers: ProxyHandler< object > = {
 		 */
 		const prop = getPropSignal( target, key );
 
-		/*
-		 * When the value is a getter, it updates the internal getter value.
-		 * This change triggers the signal only when the getter value changes.
-		 */
 		const getter = descriptor( target, key )?.get;
-		if ( getter ) {
-			prop.update( { get: getter } );
-			const value = prop.getComputed( withScope ).value;
-			return value;
-		}
 
 		/*
-		 * When it is not a getter, we get the actual value an apply different
-		 * logic depending on the type of value. As before, the internal signal
-		 * is updated, which only triggers a re-render when the value changes.
+		 * When the value is a getter, it updates the internal getter value. If
+		 * not, we get the actual value an wrap it with a proxy if needed.
+		 *
+		 * These updates only triggers a re-render when either the getter or the
+		 * value has changed.
 		 */
-		const value = Reflect.get( target, key, receiver );
-		prop.update( {
-			value: shouldProxy( value )
-				? proxify( value, stateHandlers, prop.namespace )
-				: value,
-		} );
+		if ( getter ) {
+			prop.update( { get: getter } );
+		} else {
+			const value = Reflect.get( target, key, receiver );
+			prop.update( {
+				value: shouldProxy( value )
+					? proxify( value, stateHandlers, prop.namespace )
+					: value,
+			} );
+		}
 
 		return prop.getComputed().value;
 	},

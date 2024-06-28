@@ -14,6 +14,7 @@ import {
  */
 import { getScope, setNamespace, resetNamespace } from '../hooks';
 import { getProxyNs } from './proxies';
+import { withScope } from '../utils';
 
 const DEFAULT_SCOPE = Symbol();
 
@@ -52,9 +53,7 @@ export class PropSignal {
 		return this;
 	}
 
-	public getComputed(
-		wrapper?: < G extends () => any >( getter: G ) => G
-	): ReadonlySignal {
+	public getComputed(): ReadonlySignal {
 		const scope = getScope() || DEFAULT_SCOPE;
 
 		if ( ! this.valueSignal && ! this.getterSignal ) {
@@ -72,7 +71,7 @@ export class PropSignal {
 			setNamespace( this.namespace );
 			this.computedsByScope.set(
 				scope,
-				computed( wrapper ? wrapper( callback ) : callback )
+				computed( withScope( callback ) )
 			);
 			resetNamespace();
 		}
