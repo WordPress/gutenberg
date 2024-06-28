@@ -330,6 +330,87 @@
 					"width": true
 				}
 			}
+		},
+		"custom": {
+			"transition": {
+				"type": "object",
+				"description": "Custom settings for CSS transitions",
+				"properties": {
+					"duration": {
+						"type": "object",
+						"description": "Duration of transitions",
+						"properties": {
+							"fast": {
+								"type": "string",
+								"description": "Fast transition duration",
+								"default": "0.2s"
+							},
+							"medium": {
+								"type": "string",
+								"description": "Medium transition duration",
+								"default": "0.4s"
+							},
+							"slow": {
+								"type": "string",
+								"description": "Slow transition duration",
+								"default": "0.6s"
+							}
+						}
+					},
+					"timing": {
+						"type": "object",
+						"description": "Timing functions for transitions",
+						"properties": {
+							"ease-in": {
+								"type": "string",
+								"description": "Ease-in timing function",
+								"default": "ease-in"
+							},
+							"ease-out": {
+								"type": "string",
+								"description": "Ease-out timing function",
+								"default": "ease-out"
+							},
+							"ease-in-out": {
+								"type": "string",
+								"description": "Ease-in-out timing function",
+								"default": "ease-in-out"
+							},
+							"linear": {
+								"type": "string",
+								"description": "Linear timing function",
+								"default": "linear"
+							}
+						}
+					},
+					"delay": {
+						"type": "object",
+						"description": "Delays for transitions",
+						"properties": {
+							"none": {
+								"type": "string",
+								"description": "No delay",
+								"default": "0s"
+							},
+							"short": {
+								"type": "string",
+								"description": "Short delay",
+								"default": "0.1s"
+							},
+							"medium": {
+								"type": "string",
+								"description": "Medium delay",
+								"default": "0.2s"
+							},
+							"long": {
+								"type": "string",
+								"description": "Long delay",
+								"default": "0.3s"
+							}
+						}
+					}
+				}
+			}
 		}
 	},
 	"styles": {
