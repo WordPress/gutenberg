@@ -1,18 +1,32 @@
 /**
  * External dependencies
  */
-import { signal } from '@preact/signals';
+import { signal, type Signal } from '@preact/signals';
 
 /**
  * Internal dependencies
  */
-import { proxify, getProxyNs, shouldProxy } from './proxies';
-import { getProperty } from './properties';
+import { proxify, getProxy, getProxyNs, shouldProxy } from './proxies';
+import { Property } from './properties';
 import { resetNamespace, setNamespace } from '../hooks';
 import { withScope } from '../utils';
 
+const proxyToProps: WeakMap< object, Map< string, Property > > = new WeakMap();
+const objToIterable = new WeakMap< object, Signal< number > >();
+
+const getProperty = ( target: object, key: string ) => {
+	const proxy = getProxy( target );
+	if ( ! proxyToProps.has( proxy ) ) {
+		proxyToProps.set( proxy, new Map() );
+	}
+	const props = proxyToProps.get( proxy )!;
+	if ( ! props.has( key ) ) {
+		props.set( key, new Property( proxy ) );
+	}
+	return props.get( key )!;
+};
+
 const descriptor = Object.getOwnPropertyDescriptor;
-const objToIterable = new WeakMap();
 
 export const stateHandlers: ProxyHandler< object > = {
 	get( target: object, key: string, receiver: object ): any {
@@ -32,7 +46,7 @@ export const stateHandlers: ProxyHandler< object > = {
 		if ( getter && ns ) {
 			prop.update( { get: getter } );
 			setNamespace( ns );
-			const value = prop.get( withScope ).value;
+			const value = prop.getComputed( withScope ).value;
 			resetNamespace();
 			return value;
 		}
@@ -50,7 +64,7 @@ export const stateHandlers: ProxyHandler< object > = {
 					: value,
 		} );
 
-		return prop.get().value;
+		return prop.getComputed().value;
 	},
 
 	set(
@@ -73,7 +87,7 @@ export const stateHandlers: ProxyHandler< object > = {
 
 		if ( result ) {
 			if ( isNew && objToIterable.has( target ) ) {
-				objToIterable.get( target ).value++;
+				objToIterable.get( target )!.value++;
 			}
 
 			if ( Array.isArray( target ) ) {
@@ -107,7 +121,7 @@ export const stateHandlers: ProxyHandler< object > = {
 			prop.update( {} );
 
 			if ( objToIterable.has( target ) ) {
-				objToIterable.get( target ).value++;
+				objToIterable.get( target )!.value++;
 			}
 		}
 
@@ -118,7 +132,7 @@ export const stateHandlers: ProxyHandler< object > = {
 		if ( ! objToIterable.has( target ) ) {
 			objToIterable.set( target, signal( 0 ) );
 		}
-		( objToIterable as any )._ = objToIterable.get( target ).value;
+		( objToIterable as any )._ = objToIterable.get( target )!.value;
 		return Reflect.ownKeys( target );
 	},
 };

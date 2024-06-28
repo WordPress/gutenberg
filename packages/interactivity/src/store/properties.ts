@@ -12,32 +12,19 @@ import {
 /**
  * Internal dependencies
  */
-import { getProxy } from './proxies';
 import { getScope } from '../hooks';
 
 const DEFAULT_SCOPE = Symbol();
-const objToProps: WeakMap< object, Map< string, Property > > = new WeakMap();
 
-export const getProperty = ( target: object, key: string ) => {
-	if ( ! objToProps.has( target ) ) {
-		objToProps.set( target, new Map() );
-	}
-	const props = objToProps.get( target )!;
-	if ( ! props.has( key ) ) {
-		props.set( key, new Property( target ) );
-	}
-	return props.get( key )!;
-};
-
-class Property {
+export class Property {
 	private owner: object;
-	private accessors: WeakMap< object, ReadonlySignal >;
-	private signal?: Signal;
-	private getter?: Signal< ( () => any ) | undefined >;
+	private computedsByScope: WeakMap< WeakKey, ReadonlySignal >;
+	private valueSignal?: Signal;
+	private getterSignal?: Signal< ( () => any ) | undefined >;
 
 	constructor( owner: object ) {
 		this.owner = owner;
-		this.accessors = new WeakMap();
+		this.computedsByScope = new WeakMap();
 	}
 
 	public update( {
@@ -47,39 +34,45 @@ class Property {
 		get?: () => any;
 		value?: unknown;
 	} ): void {
-		if ( ! this.signal ) {
-			this.signal = signal( value );
-			this.getter = signal( get );
+		if ( ! this.valueSignal ) {
+			this.valueSignal = signal( value );
+			this.getterSignal = signal( get );
 		} else if (
-			value !== this.signal.peek() ||
-			get !== this.getter?.peek()
+			value !== this.valueSignal.peek() ||
+			get !== this.getterSignal?.peek()
 		) {
 			batch( () => {
-				this.signal!.value = value;
-				this.getter!.value = get;
+				this.valueSignal!.value = value;
+				this.getterSignal!.value = get;
 			} );
 		}
 	}
 
-	get( wrapper?: < G extends () => any >( getter: G ) => G ): ReadonlySignal {
+	public getComputed(
+		wrapper?: < G extends () => any >( getter: G ) => G
+	): ReadonlySignal {
 		const scope = getScope() || DEFAULT_SCOPE;
 
-		if ( ! this.accessors.has( scope ) ) {
-			this.accessors.set(
+		if ( ! this.valueSignal && ! this.getterSignal ) {
+			this.update( {} );
+		}
+
+		if ( ! this.computedsByScope.has( scope ) ) {
+			this.computedsByScope.set(
 				scope,
 				computed( () => {
-					const getter = this.getter?.value;
+					const getter = this.getterSignal?.value;
 					if ( getter ) {
-						const proxy = getProxy( this.owner );
+						const owner = this.owner;
 						return wrapper
-							? wrapper( () => getter.call( proxy ) )()
-							: getter.call( proxy );
+							? wrapper( () => getter.call( owner ) )()
+							: getter.call( owner );
 					}
-					return this.signal?.value;
+					return this.valueSignal?.value;
 				} )
 			);
 		}
 
-		return this.accessors.get( scope )!;
+		return this.computedsByScope.get( scope )!;
 	}
 }
