@@ -20,6 +20,7 @@ import { useRegistry } from '@wordpress/data';
 import { ActionWithModal } from './item-actions';
 import type { Action } from './types';
 import type { ActionTriggerProps } from './item-actions';
+import type { SetSelection } from './private-types';
 
 interface ActionButtonProps< Item > {
 	action: Action< Item >;
@@ -32,14 +33,14 @@ interface ToolbarContentProps< Item > {
 	selection: string[];
 	actionsToShow: Action< Item >[];
 	selectedItems: Item[];
-	onSelectionChange: ( selection: Item[] ) => void;
+	onSelectionChange: SetSelection;
 }
 
 interface BulkActionsToolbarProps< Item > {
 	data: Item[];
 	selection: string[];
 	actions: Action< Item >[];
-	onSelectionChange: ( selection: Item[] ) => void;
+	onSelectionChange: SetSelection;
 	getItemId: ( item: Item ) => string;
 }
 
@@ -131,7 +132,7 @@ function renderToolbarContent< Item >(
 	selectedItems: Item[],
 	actionInProgress: string | null,
 	setActionInProgress: ( actionId: string | null ) => void,
-	onSelectionChange: ( selection: Item[] ) => void
+	onSelectionChange: SetSelection
 ) {
 	return (
 		<>

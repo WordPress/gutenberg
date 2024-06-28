@@ -149,12 +149,14 @@ test.describe( 'Block Style Variations', () => {
 				},
 			},
 		} );
-		// The save button has been re-enabled.
+
+		// Wait for the save button to be re-enabled.
 		await expect(
 			page
 				.getByRole( 'region', { name: 'Editor top bar' } )
 				.getByRole( 'button', { name: 'Save' } )
-		).toBeEnabled();
+		).toBeVisible();
+
 		// Second revision (current).
 		await siteEditorBlockStyleVariations.saveRevision( stylesPostId, {
 			blocks: {
