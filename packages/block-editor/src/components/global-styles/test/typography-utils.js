@@ -5,6 +5,7 @@ import {
 	getTypographyFontSizeValue,
 	getFluidTypographyOptionsFromSettings,
 	getMergedFontFamiliesAndFontFamilyFaces,
+	findNearestFontWeight,
 } from '../typography-utils';
 
 describe( 'typography utils', () => {
@@ -893,6 +894,61 @@ describe( 'typography utils', () => {
 				).toEqual( expected );
 			} );
 		} );
+	} );
+
+	describe( 'findNearestFontWeight', () => {
+		[
+			{
+				message:
+					'should return empty string when newFontWeightValue is `undefined`',
+				availableFontWeights: undefined,
+				newFontWeightValue: undefined,
+				expected: '',
+			},
+			{
+				message:
+					'should return newFontWeightValue value when availableFontWeights is empty',
+				availableFontWeights: [],
+				newFontWeightValue: '300',
+				expected: '300',
+			},
+			{
+				message: 'should return correct nearest higher font weight',
+				availableFontWeights: [
+					{ name: 'Regular', value: '400' },
+					{ name: 'Bold', value: '700' },
+					{ name: 'Black', value: '900' },
+				],
+				newFontWeightValue: '300',
+				expected: '400',
+			},
+			{
+				message: 'should return correct nearest lower font weight',
+				availableFontWeights: [
+					{ name: 'Thin', value: '100' },
+					{ name: 'Light', value: '300' },
+					{ name: 'Regular', value: '400' },
+				],
+				newFontWeightValue: '900',
+				expected: '400',
+			},
+		].forEach(
+			( {
+				message,
+				availableFontWeights,
+				newFontWeightValue,
+				expected,
+			} ) => {
+				it( `${ message }`, () => {
+					expect(
+						findNearestFontWeight(
+							availableFontWeights,
+							newFontWeightValue
+						)
+					).toEqual( expected );
+				} );
+			}
+		);
 	} );
 
 	describe( 'typography utils', () => {

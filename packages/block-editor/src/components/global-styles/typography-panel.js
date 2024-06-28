@@ -23,7 +23,10 @@ import TextDecorationControl from '../text-decoration-control';
 import WritingModeControl from '../writing-mode-control';
 import { getValueFromVariable, TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
 import { setImmutably } from '../../utils/object';
-import { getMergedFontFamiliesAndFontFamilyFaces } from './typography-utils';
+import {
+	getMergedFontFamiliesAndFontFamilyFaces,
+	findNearestFontWeight,
+} from './typography-utils';
 import { getFontStylesAndWeights } from '../../utils/get-font-styles-and-weights';
 
 const MIN_TEXT_COLUMNS = 1;
@@ -262,12 +265,24 @@ export default function TypographyPanel( {
 			( { value: fw } ) => fw === fontWeight
 		);
 
+		// Try to set nearest available font weight
+		if ( ! hasFontWeight && fontWeight ) {
+			setFontAppearance( {
+				fontStyle,
+				fontWeight: findNearestFontWeight( fontWeights, fontWeight ),
+			} );
+		}
+
+		// Set the same weight and style values if the font family is a system font or if both are the same
 		if ( isSystemFont || ( hasFontStyle && hasFontWeight ) ) {
 			setFontAppearance( {
 				fontStyle,
 				fontWeight,
 			} );
-		} else {
+		}
+
+		// Reset font appearance if the font family does not have the selected font style
+		if ( ! hasFontStyle ) {
 			resetFontAppearance();
 		}
 	}, [ fontFamily ] );
