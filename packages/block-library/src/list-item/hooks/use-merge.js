@@ -90,13 +90,22 @@ export default function useMerge( clientId, onMerge ) {
 				// also need to move any nested list items. Check if there's a
 				// listed list, and append its nested list items to the current
 				// list.
-				const [ nestedListClientId ] = getBlockOrder( clientIdB );
-				if ( nestedListClientId ) {
-					moveBlocksToPosition(
-						getBlockOrder( nestedListClientId ),
-						nestedListClientId,
-						getBlockRootClientId( clientIdA )
-					);
+				const [ nestedListClientIdB ] = getBlockOrder( clientIdB );
+				if ( nestedListClientIdB ) {
+					const [ nestedListClientIdA ] = getBlockOrder( clientIdA );
+					if ( ! nestedListClientIdA ) {
+						moveBlocksToPosition(
+							[ nestedListClientIdB ],
+							clientIdB,
+							clientIdA
+						);
+					} else {
+						moveBlocksToPosition(
+							getBlockOrder( nestedListClientIdB ),
+							nestedListClientIdB,
+							nestedListClientIdA
+						);
+					}
 				}
 				mergeBlocks( clientIdA, clientIdB );
 			} );
