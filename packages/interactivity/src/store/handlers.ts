@@ -68,11 +68,10 @@ export const stateHandlers: ProxyHandler< object > = {
 			value = proxify( value, stateHandlers, ns );
 		}
 
+		const isNew = ! ( key in target );
 		const result = Reflect.set( target, key, value, receiver );
 
 		if ( result ) {
-			const isNew = ! ( key in target );
-
 			if ( isNew && objToIterable.has( target ) ) {
 				objToIterable.get( target ).value++;
 			}
