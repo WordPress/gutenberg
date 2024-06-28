@@ -314,7 +314,7 @@ function useDuotoneStyles( {
 	}, [ isValidFilter, blockElement ] );
 }
 
-function useBlockProps( { name, style } ) {
+function useBlockProps( { clientId, name, style } ) {
 	const id = useInstanceId( useBlockProps );
 	const selector = useMemo( () => {
 		const blockType = getBlockType( name );
@@ -362,7 +362,7 @@ function useBlockProps( { name, style } ) {
 	const shouldRender = selector && attribute;
 
 	useDuotoneStyles( {
-		clientId: id,
+		clientId,
 		id: filterClass,
 		selector,
 		attribute,
