@@ -193,6 +193,7 @@ export default class TokenList {
 		return true;
 	}
 
+	/* eslint-disable @typescript-eslint/no-unused-vars */
 	/**
 	 * Returns true if `token` is in the associated attribute’s supported
 	 * tokens. Returns false otherwise.
@@ -204,7 +205,8 @@ export default class TokenList {
 	 *
 	 * @return Whether token is supported.
 	 */
-	supports( _token: string ): boolean { /* eslint-disable @typescript-eslint/no-unused-vars */
+	supports( _token: string ): boolean {
 		return true;
 	}
+	/* eslint-enable @typescript-eslint/no-unused-vars */
 }
