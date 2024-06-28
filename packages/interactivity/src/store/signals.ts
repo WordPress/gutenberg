@@ -17,7 +17,7 @@ import { getProxyNs } from './proxies';
 
 const DEFAULT_SCOPE = Symbol();
 
-export class Property {
+export class PropSignal {
 	public readonly namespace: string;
 	private owner: object;
 	private computedsByScope: WeakMap< WeakKey, ReadonlySignal >;
@@ -36,7 +36,7 @@ export class Property {
 	}: {
 		get?: () => any;
 		value?: unknown;
-	} ): Property {
+	} ): PropSignal {
 		if ( ! this.valueSignal ) {
 			this.valueSignal = signal( value );
 			this.getterSignal = signal( get );

@@ -7,22 +7,25 @@ import { signal, type Signal } from '@preact/signals';
  * Internal dependencies
  */
 import { proxify, getProxy, getProxyNs, shouldProxy } from './proxies';
-import { Property } from './properties';
+import { PropSignal } from './signals';
 import { withScope } from '../utils';
 import { setNamespace, resetNamespace } from '../hooks';
 import { stores } from '../store';
 
-const proxyToProps: WeakMap< object, Map< string, Property > > = new WeakMap();
+const proxyToProps: WeakMap<
+	object,
+	Map< string, PropSignal >
+> = new WeakMap();
 const objToIterable = new WeakMap< object, Signal< number > >();
 
-const getProperty = ( target: object, key: string ) => {
+const getPropSignal = ( target: object, key: string ) => {
 	const proxy = getProxy( target );
 	if ( ! proxyToProps.has( proxy ) ) {
 		proxyToProps.set( proxy, new Map() );
 	}
 	const props = proxyToProps.get( proxy )!;
 	if ( ! props.has( key ) ) {
-		props.set( key, new Property( proxy ) );
+		props.set( key, new PropSignal( proxy ) );
 	}
 	return props.get( key )!;
 };
@@ -38,7 +41,7 @@ export const stateHandlers: ProxyHandler< object > = {
 		 * First, we get a reference of the property we want to access. The
 		 * property object is automatically instanciated if needed.
 		 */
-		const prop = getProperty( target, key );
+		const prop = getPropSignal( target, key );
 
 		/*
 		 * When the value is a getter, it updates the internal getter value.
@@ -85,7 +88,7 @@ export const stateHandlers: ProxyHandler< object > = {
 			}
 
 			if ( Array.isArray( target ) ) {
-				const length = getProperty( target, 'length' );
+				const length = getPropSignal( target, 'length' );
 				length.update( { value: target.length } );
 			}
 		}
@@ -101,7 +104,7 @@ export const stateHandlers: ProxyHandler< object > = {
 		const result = Reflect.defineProperty( target, key, desc );
 
 		if ( result ) {
-			const prop = getProperty( target, key );
+			const prop = getPropSignal( target, key );
 			const { value, get } = desc;
 			prop.update( {
 				value: shouldProxy( value )
@@ -117,7 +120,7 @@ export const stateHandlers: ProxyHandler< object > = {
 		const result = Reflect.deleteProperty( target, key );
 
 		if ( result ) {
-			const prop = getProperty( target, key );
+			const prop = getPropSignal( target, key );
 			prop.update( {} );
 
 			if ( objToIterable.has( target ) ) {
