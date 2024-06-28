@@ -8,7 +8,7 @@ import {
 	privateApis,
 } from '@wordpress/interactivity';
 
-const { directive, deepSignal, h } = privateApis(
+const { directive, getStateProxy, h } = privateApis(
 	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
 );
 
@@ -41,12 +41,15 @@ directive(
 	'test-context',
 	( { context: { Provider }, props: { children } } ) => {
 		executionProof( 'context' );
-		const value = deepSignal( {
-			[ namespace ]: {
-				attribute: 'from context',
-				text: 'from context',
-			},
-		} );
+		const value = {
+			[ namespace ]: getStateProxy(
+				{
+					attribute: 'from context',
+					text: 'from context',
+				},
+				namespace
+			),
+		} ;
 		return h( Provider, { value }, children );
 	},
 	{ priority: 8 }
