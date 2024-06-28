@@ -51,13 +51,13 @@ import { getResolvedThemeFilePath } from './theme-file-uri-utils';
 const IMAGE_BACKGROUND_TYPE = 'image';
 const DEFAULT_CONTROLS = {
 	backgroundImage: true,
-	backgroundSize: true,
 };
 const BACKGROUND_POPOVER_PROPS = {
 	placement: 'left-start',
 	offset: 36,
 	shift: true,
 	className: 'block-editor-global-styles-background-panel__popover',
+	expandOnMobile: true,
 };
 const noop = () => {};
 
@@ -414,7 +414,6 @@ function BackgroundImageControls( {
 					<MenuItem
 						onClick={ () => {
 							closeAndFocus();
-							resetBackgroundImage();
 							onRemoveImage();
 						} }
 					>
@@ -661,6 +660,10 @@ export default function BackgroundPanel( {
 			background: {},
 		};
 	}, [] );
+
+	const resetBackground = () =>
+		onChange( setImmutably( value, [ 'background' ], {} ) );
+
 	const { title, url } = value?.background?.backgroundImage || {
 		...inheritedValue?.background?.backgroundImage,
 	};
@@ -668,32 +671,12 @@ export default function BackgroundPanel( {
 		hasBackgroundImageValue( value ) ||
 		hasBackgroundImageValue( inheritedValue );
 
-	const hasSizeValue =
-		hasBackgroundSizeValue( value ) ||
-		hasBackgroundSizeValue( inheritedValue );
-
 	const shouldShowBackgroundImageControls =
 		hasImageValue &&
 		( settings?.background?.backgroundSize ||
 			settings?.background?.backgroundPosition ||
 			settings?.background?.backgroundRepeat );
-	const resetBackgroundSize = () =>
-		onChange(
-			setImmutably( value, [ 'background' ], {
-				...value?.background,
-				backgroundPosition: undefined,
-				backgroundRepeat: undefined,
-				backgroundSize: undefined,
-			} )
-		);
-	const resetBackgroundImage = () =>
-		onChange(
-			setImmutably(
-				value,
-				[ 'background', 'backgroundImage' ],
-				undefined
-			)
-		);
+
 	const [ isDropDownOpen, setIsDropDownOpen ] = useState( false );
 
 	return (
@@ -726,16 +709,14 @@ export default function BackgroundPanel( {
 								style={ value }
 								inheritedValue={ inheritedValue }
 								displayInPanel
-								onRemoveImage={ () =>
-									setIsDropDownOpen( false )
-								}
+								onRemoveImage={ () => {
+									setIsDropDownOpen( false );
+									resetBackground();
+								} }
 							/>
 							<BackgroundSizeControls
 								onChange={ onChange }
 								panelId={ panelId }
-								isShownByDefault={
-									defaultControls.backgroundImage
-								}
 								style={ value }
 								defaultValues={ defaultValues }
 								inheritedValue={ inheritedValue }
@@ -756,15 +737,7 @@ export default function BackgroundPanel( {
 			<ToolsPanelItem
 				hasValue={ () => hasImageValue }
 				label={ __( 'Image' ) }
-				onDeselect={ resetBackgroundImage }
-				isShownByDefault={ defaultControls.backgroundImage }
-				panelId={ panelId }
-				className="block-editor-global-styles-background-panel__hidden-tools-panel-item"
-			/>
-			<ToolsPanelItem
-				hasValue={ () => hasSizeValue }
-				label={ __( 'Size' ) }
-				onDeselect={ resetBackgroundSize }
+				onDeselect={ resetBackground }
 				isShownByDefault={ defaultControls.backgroundImage }
 				panelId={ panelId }
 				className="block-editor-global-styles-background-panel__hidden-tools-panel-item"

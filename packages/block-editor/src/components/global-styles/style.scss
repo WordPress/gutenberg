@@ -184,6 +184,7 @@
 
 .block-editor-global-styles-background-panel__dropdown-content-wrapper {
 	min-width: 260px;
+	overflow-x: hidden;
 	.components-base-control__help,
 	.components-toggle-control {
 		margin-bottom: 0;

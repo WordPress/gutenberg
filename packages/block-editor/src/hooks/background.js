@@ -174,9 +174,6 @@ export function BackgroundImagePanel( {
 		<StylesBackgroundPanel
 			as={ BackgroundInspectorControl }
 			panelId={ clientId }
-			/*
-			defaultControls={ defaultControls }
-			*/
 			defaultValues={ BACKGROUND_DEFAULT_VALUES }
 			settings={ updatedSettings }
 			onChange={ onChange }
