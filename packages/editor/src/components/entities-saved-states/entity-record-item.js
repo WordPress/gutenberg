@@ -58,15 +58,13 @@ export default function EntityRecordItem( { record, checked, onChange } ) {
 					onChange={ onChange }
 				/>
 			</PanelRow>
-			{ Object.keys( postMetaChanges ).length > 0 && (
+			{ postMetaChanges.length > 0 && (
 				<div className="entities-saved-states__changes">
 					<p>Post Meta</p>
 					<ul>
-						{ Object.keys( postMetaChanges ).map(
-							( postMetaKey ) => (
-								<li key={ postMetaKey }>{ postMetaKey }</li>
-							)
-						) }
+						{ postMetaChanges.map( ( postMeta ) => (
+							<li key={ postMeta }>{ postMeta }</li>
+						) ) }
 					</ul>
 				</div>
 			) }

@@ -23,6 +23,7 @@ import {
 import { TEMPLATE_PART_POST_TYPE } from './constants';
 import { getFilteredTemplatePartBlocks } from './utils/get-filtered-template-parts';
 import { getEntityActions as _getEntityActions } from '../dataviews/store/private-selectors';
+import { deepCompare } from '../../../block-editor/src/components/global-styles/get-global-styles-changes';
 
 const EMPTY_INSERTION_POINT = {
 	rootClientId: undefined,
@@ -165,21 +166,10 @@ export const getPostMetaChanges = createRegistrySelector(
 		);
 
 		if ( ! original?.meta || ! edits?.meta ) {
-			return {};
+			return [];
 		}
 
-		const keys = Object.keys( original.meta );
-		const differences = {};
-		for ( const key of keys ) {
-			if ( key === 'footnotes' ) {
-				continue;
-			}
-			if ( original.meta[ key ] !== edits.meta[ key ] ) {
-				differences[ key ] = edits.meta[ key ];
-			}
-		}
-
-		return differences;
+		return deepCompare( edits.meta, original.meta );
 	}
 );
 
