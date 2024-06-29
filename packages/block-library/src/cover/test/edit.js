@@ -372,8 +372,9 @@ describe( 'Cover block', () => {
 					} )
 				);
 
-				const [ heightControl ] =
-					screen.getAllByLabelText( /Minimum height/ );
+				const heightControl = screen.getByRole( 'spinbutton', {
+					name: 'Minimum height',
+				} );
 
 				await userEvent.clear( heightControl );
 				await userEvent.type( heightControl, '300' );
