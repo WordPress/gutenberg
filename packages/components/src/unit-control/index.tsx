@@ -172,6 +172,7 @@ function UnforwardedUnitControl(
 			// matches the first character of a unit.
 			if (
 				! event.metaKey &&
+				! event.ctrlKey &&
 				reFirstCharacterOfUnits.test( event.key )
 			) {
 				refInputSuffix.current?.focus();
