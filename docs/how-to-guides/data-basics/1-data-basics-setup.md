@@ -24,18 +24,17 @@ function MyFirstApp() {
 	return <span>Hello from JavaScript!</span>;
 }
 
-document.addEventListener( 'DOMContentLoaded', function() {
-	const root = createRoot( document.getElementById( 'my-first-gutenberg-app' ) );
-	window.addEventListener(
-		'load',
-		function () {
-			root.render(
-				<MyFirstApp />,
-			);
-		},
-		false
-	);
-});
+window.addEventListener(
+	'load',
+	function () {
+		const rootDomElement = document.getElementById( 'my-first-gutenberg-app' );
+		const root = createRoot( rootDomElement );
+		root.render(
+			<MyFirstApp />,
+		);
+	},
+	false
+);
 ```
 
 **style.css:**
