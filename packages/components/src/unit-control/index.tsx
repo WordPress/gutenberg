@@ -251,9 +251,5 @@ function UnforwardedUnitControl(
  */
 export const UnitControl = forwardRef( UnforwardedUnitControl );
 
-export {
-	parseQuantityAndUnitFromRawValue,
-	getValidParsedQuantityAndUnit,
-	useCustomUnits,
-} from './utils';
+export { parseQuantityAndUnitFromRawValue, useCustomUnits } from './utils';
 export default UnitControl;

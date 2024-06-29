@@ -187,7 +187,6 @@ export {
 	default as __experimentalUnitControl,
 	useCustomUnits as __experimentalUseCustomUnits,
 	parseQuantityAndUnitFromRawValue as __experimentalParseQuantityAndUnitFromRawValue,
-	getValidParsedQuantityAndUnit as __experimentalGetValidParsedQuantityAndUnit,
 } from './unit-control';
 export { View as __experimentalView } from './view';
 export { VisuallyHidden } from './visually-hidden';
