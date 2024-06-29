@@ -4,6 +4,11 @@
 import clsx from 'clsx';
 
 /**
+ * WordPress dependencies
+ */
+import { forwardRef } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import BlockSelectionButton from './block-selection-button';
@@ -11,10 +16,7 @@ import { PrivateBlockPopover } from '../block-popover';
 import useBlockToolbarPopoverProps from './use-block-toolbar-popover-props';
 import useSelectedBlockToolProps from './use-selected-block-tool-props';
 
-export default function BlockToolbarBreadcrumb( {
-	clientId,
-	__unstableContentRef,
-} ) {
+function BlockToolbarBreadcrumb( { clientId, __unstableContentRef }, ref ) {
 	const {
 		capturingClientId,
 		isInsertionPointVisible,
@@ -38,9 +40,12 @@ export default function BlockToolbarBreadcrumb( {
 			{ ...popoverProps }
 		>
 			<BlockSelectionButton
+				ref={ ref }
 				clientId={ clientId }
 				rootClientId={ rootClientId }
 			/>
 		</PrivateBlockPopover>
 	);
 }
+
+export default forwardRef( BlockToolbarBreadcrumb );

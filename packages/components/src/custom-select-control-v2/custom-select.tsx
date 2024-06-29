@@ -88,11 +88,13 @@ function _CustomSelect(
 		label,
 		size,
 		store,
+		className,
 		...restProps
 	} = props;
 
 	return (
-		<>
+		// Where should `restProps` be forwarded to?
+		<div className={ className }>
 			{ hideLabelFromVision ? ( // TODO: Replace with BaseControl
 				<VisuallyHidden as="label">{ label }</VisuallyHidden>
 			) : (
@@ -110,13 +112,18 @@ function _CustomSelect(
 					size={ size }
 					store={ store }
 				/>
-				<Styled.SelectPopover gutter={ 12 } store={ store } sameWidth>
+				<Styled.SelectPopover
+					gutter={ 12 }
+					store={ store }
+					sameWidth
+					slide={ false }
+				>
 					<CustomSelectContext.Provider value={ { store } }>
 						{ children }
 					</CustomSelectContext.Provider>
 				</Styled.SelectPopover>
 			</InputBase>
-		</>
+		</div>
 	);
 }
 

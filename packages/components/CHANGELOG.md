@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `UnitControl`: Fix colors when disabled. ([#62970](https://github.com/WordPress/gutenberg/pull/62970))
+
+### Internal
+
+-   `CustomSelectControlV2`: add root element wrapper. ([#62803](https://github.com/WordPress/gutenberg/pull/62803))
+-   `CustomSelectControlV2`: fix popover styles. ([#62821](https://github.com/WordPress/gutenberg/pull/62821))
+-   `CustomSelectControlV2`: fix trigger text alignment in RTL languages ([#62869](https://github.com/WordPress/gutenberg/pull/62869)).
+-   `CustomSelectControlV2`: fix select popover content overflow. ([#62844](https://github.com/WordPress/gutenberg/pull/62844))
+
+## 28.2.0 (2024-06-26)
+
 ### Enhancements
 
 -   `DropZone`: rewrite animation without depending on framer-motion. ([#62044](https://github.com/WordPress/gutenberg/pull/62044))

@@ -220,9 +220,35 @@ The `wp-class` directive is executed:
 - When the element is created
 - Each time there's a change on any of the properties of the `state` or `context` involved in getting the final value of the directive (inside the callback or the expression passed as reference)
 
-When `wp-class` directive references a callback to get its final boolean value, the callback receives the class name: `className`.
-
 The boolean value received by the directive is used to toggle (add when `true` or remove when `false`) the associated class name from the `class` attribute.
+
+It's important to note that when using the `wp-class` directive, it's recommended to use kebab-case for class names instead of camelCase. This is because HTML attributes are not case-sensitive, and HTML will treat `data-wp-class--isDark` the same as `data-wp-class--isdark` or `DATA-WP-CLASS--ISDARK`.
+
+So, for example, use the class name `is-dark` instead of `isDark` and `data-wp-class--is-dark` instead of `data-wp-class--isDark`:
+
+```html
+<!-- Recommended -->
+<div data-wp-class--is-dark="context.isDarkMode">
+  <!-- ... -->
+</div>
+
+<!-- Not recommended -->
+<div data-wp-class--isDark="context.isDarkMode">
+  <!-- ... -->
+</div>
+```
+
+```css
+/* Recommended */
+.is-dark {
+  /* ... */
+}
+
+/* Not recommended */
+.isDark {
+  /* ... */
+}
+```
 
 ### `wp-style`
 
@@ -255,8 +281,6 @@ The `wp-style` directive is executed:
 
 - When the element is created
 - Each time there's a change on any of the properties of the `state` or `context` involved in getting the final value of the directive (inside the callback or the expression passed as reference)
-
-When `wp-style` directive references a callback to get its final value, the callback receives the class style property: `css-property`.
 
 The value received by the directive is used to add or remove the style attribute with the associated CSS property:
 
@@ -531,7 +555,7 @@ The `unique-id` doesn't need to be unique globally. It just needs to be differen
   <summary><em>See store used with the directive above</em></summary>
 
 ```js
-import { store, useState, useEffect } from '@wordpress/interactivity';
+import { getElement, store, useState, useEffect } from '@wordpress/interactivity';
 
 // Unlike `data-wp-init` and `data-wp-watch`, you can use any hooks inside
 // `data-wp-run` callbacks.
@@ -1071,7 +1095,7 @@ Those attributes will contain the directives of that element. In the button exam
 
 ```js
 // store
-import { store, getContext } from '@wordpress/interactivity';
+import { store, getElement } from '@wordpress/interactivity';
 
 store( "myPlugin", {
   actions: {
