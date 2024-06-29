@@ -40,13 +40,15 @@ function CoverHeightInput( {
 	value = '',
 } ) {
 	const handleOnChange = ( unprocessedValue ) => {
-		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
-		const [ currentValue, currentUnit ] =
+		const parsedQuantityAndUnit =
 			parseQuantityAndUnitFromRawValue( unprocessedValue );
+		const currentValue = parsedQuantityAndUnit[ 0 ];
 
 		if ( isNaN( currentValue ) && currentValue !== undefined ) {
 			return;
 		}
+
+		const currentUnit = parsedQuantityAndUnit[ 1 ];
 
 		onUnitChange( currentUnit );
 		onChange( currentValue );
