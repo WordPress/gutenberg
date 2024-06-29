@@ -11,7 +11,6 @@ import {
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
-	__experimentalGetValidParsedQuantityAndUnit as getValidParsedQuantityAndUnit,
 	Disabled,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
@@ -50,10 +49,10 @@ function TagCloudEdit( { attributes, setAttributes } ) {
 		largestFontSize,
 	} = attributes;
 
-	const [ availableUnits ] = useSettings( 'spacing.units' );
 	const units = useCustomUnits( {
-		availableUnits: availableUnits || [ '%', 'px', 'em', 'rem' ],
+		availableUnits: [ 'px', 'em', 'rem', 'vw', 'vh', 'pt' ],
 	} );
+
 	const taxonomies = useSelect(
 		( select ) => select( coreStore ).getTaxonomies( { per_page: -1 } ),
 		[]
@@ -76,12 +75,6 @@ function TagCloudEdit( { attributes, setAttributes } ) {
 
 		return [ selectOption, ...taxonomyOptions ];
 	};
-
-	// If default unit isn't available, convert default value to first available unit.
-	const [ smallestFontSizeValue, smallestFontSizeUnit ] =
-		getValidParsedQuantityAndUnit( smallestFontSize, units );
-	const [ largestFontSizeValue, largestFontSizeUnit ] =
-		getValidParsedQuantityAndUnit( largestFontSize, units );
 
 	const onFontSizeChange = ( fontSizeLabel, newValue ) => {
 		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
@@ -143,7 +136,7 @@ function TagCloudEdit( { attributes, setAttributes } ) {
 					<FlexItem isBlock>
 						<UnitControl
 							label={ __( 'Smallest size' ) }
-							value={ `${ smallestFontSizeValue }${ smallestFontSizeUnit }` }
+							value={ smallestFontSize }
 							onChange={ ( value ) => {
 								onFontSizeChange( 'smallestFontSize', value );
 							} }
@@ -155,7 +148,7 @@ function TagCloudEdit( { attributes, setAttributes } ) {
 					<FlexItem isBlock>
 						<UnitControl
 							label={ __( 'Largest size' ) }
-							value={ `${ largestFontSizeValue }${ largestFontSizeUnit }` }
+							value={ largestFontSize }
 							onChange={ ( value ) => {
 								onFontSizeChange( 'largestFontSize', value );
 							} }
