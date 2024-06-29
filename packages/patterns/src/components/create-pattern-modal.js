@@ -44,6 +44,8 @@ export default function CreatePatternModal( {
 			title={ modalTitle || defaultModalTitle }
 			onRequestClose={ restProps.onClose }
 			overlayClassName={ className }
+			focusOnMount="firstContentElement"
+			size="small"
 		>
 			<CreatePatternModalContents { ...restProps } />
 		</Modal>

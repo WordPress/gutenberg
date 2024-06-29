@@ -1,9 +1,9 @@
 /**
  * WordPress dependencies
  */
-import type { Action, AnyItem } from '@wordpress/dataviews';
+import type { Action } from '@wordpress/dataviews';
 
-export function registerEntityAction< Item extends AnyItem >(
+export function registerEntityAction< Item >(
 	kind: string,
 	name: string,
 	config: Action< Item >

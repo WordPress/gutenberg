@@ -39,6 +39,7 @@ export default function TypographyVariations( { title, gap = 2 } ) {
 							key={ index }
 							variation={ variation }
 							property="typography"
+							showTooltip
 						>
 							{ ( isFocused ) => (
 								<PreviewIframe
