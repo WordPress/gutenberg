@@ -5,7 +5,6 @@ import { parse } from '@wordpress/blocks';
 import { useSelect, createSelector } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
-import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -16,7 +15,6 @@ import {
 	PATTERN_TYPES,
 	PATTERN_SYNC_TYPES,
 	TEMPLATE_PART_POST_TYPE,
-	TEMPLATE_ORIGINS,
 	TEMPLATE_PART_AREA_DEFAULT_CATEGORY,
 } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
@@ -25,38 +23,16 @@ import { store as editSiteStore } from '../../store';
 
 const EMPTY_PATTERN_LIST = [];
 
-const createTemplatePartId = ( theme, slug ) =>
-	theme && slug ? theme + '//' + slug : null;
-
-const templatePartToPattern = ( templatePart ) => ( {
-	blocks: parse( templatePart.content.raw, {
-		__unstableSkipMigrationLogs: true,
-	} ),
-	categories: [ templatePart.area ],
-	description: templatePart.description || '',
-	isCustom: templatePart.source === TEMPLATE_ORIGINS.custom,
-	keywords: templatePart.keywords || [],
-	id: createTemplatePartId( templatePart.theme, templatePart.slug ),
-	name: createTemplatePartId( templatePart.theme, templatePart.slug ),
-	title: decodeEntities( templatePart.title.rendered ),
-	type: templatePart.type,
-	_links: templatePart._links,
-	templatePart,
-} );
-
-const selectTemplatePartsAsPatterns = createSelector(
+const selectTemplateParts = createSelector(
 	( select, categoryId, search = '' ) => {
 		const { getEntityRecords, isResolving: isResolvingSelector } =
 			select( coreStore );
 		const { __experimentalGetDefaultTemplatePartAreas } =
 			select( editorStore );
 		const query = { per_page: -1 };
-		const rawTemplateParts =
+		const templateParts =
 			getEntityRecords( 'postType', TEMPLATE_PART_POST_TYPE, query ) ??
 			EMPTY_PATTERN_LIST;
-		const templateParts = rawTemplateParts.map( ( templatePart ) =>
-			templatePartToPattern( templatePart )
-		);
 
 		// In the case where a custom template part area has been removed we need
 		// the current list of areas to cross check against so orphaned template
@@ -66,12 +42,12 @@ const selectTemplatePartsAsPatterns = createSelector(
 
 		const templatePartHasCategory = ( item, category ) => {
 			if ( category !== TEMPLATE_PART_AREA_DEFAULT_CATEGORY ) {
-				return item.templatePart.area === category;
+				return item.area === category;
 			}
 
 			return (
-				item.templatePart.area === category ||
-				! templatePartAreas.includes( item.templatePart.area )
+				item.area === category ||
+				! templatePartAreas.includes( item.area )
 			);
 		};
 
@@ -298,11 +274,7 @@ export const usePatterns = (
 	return useSelect(
 		( select ) => {
 			if ( postType === TEMPLATE_PART_POST_TYPE ) {
-				return selectTemplatePartsAsPatterns(
-					select,
-					categoryId,
-					search
-				);
+				return selectTemplateParts( select, categoryId, search );
 			} else if ( postType === PATTERN_TYPES.user && !! categoryId ) {
 				const appliedCategory =
 					categoryId === 'uncategorized' ? '' : categoryId;
