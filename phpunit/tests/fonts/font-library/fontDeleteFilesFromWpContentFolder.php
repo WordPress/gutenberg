@@ -2,19 +2,30 @@
 // @core-merge: Do not include these tests, they are for Gutenberg only.
 
 /**
- * Test deleting font files from the previous fonts folder (wp-content/fonts).
+ * Tests deleting font files from the previous fonts folder default (wp-content/fonts).
+ *
+ * This covers cases where fonts were installed with older versions of Gutenberg, but are then deleted with
+ * newer versions of Gutenberg and/or WordPress.
  *
  * @package WordPress
  * @subpackage Font Library
  *
  * @group fonts
  * @group font-library
- *
- * @covers ::gutenberg_before_delete_font_face
  */
 class Tests_Font_Delete_Files_From_Wp_Content_Folder extends WP_UnitTestCase {
+	/**
+	 * ID of a super admin user.
+	 *
+	 * @var int
+	 */
 	protected static $super_admin_id;
 
+	/**
+	 * Sets up test class.
+	 *
+	 * @param WP_UnitTest_Factory $factory Unit test factory instance.
+	 */
 	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
 		self::$super_admin_id = $factory->user->create(
 			array(
@@ -24,11 +35,19 @@ class Tests_Font_Delete_Files_From_Wp_Content_Folder extends WP_UnitTestCase {
 		grant_super_admin( self::$super_admin_id );
 	}
 
+	/**
+	 * Tears down test class.
+	 */
 	public static function wpTearDownAfterClass() {
 		self::delete_user( self::$super_admin_id );
 	}
 
-	public function test_uploaded_font_files_are_deleted_from_wp_content_folder() {
+	/**
+	 * Tests that font files uploaded to wp-content/fonts are deleted when the associated font face post is deleted.
+	 *
+	 * @covers ::gutenberg_before_delete_font_face
+	 */
+	public function test_uploaded_font_files_are_deleted_from_wp_content_fonts_folder() {
 		wp_set_current_user( self::$super_admin_id );
 		$font_family_id = $this->create_font_family();
 
@@ -53,10 +72,14 @@ class Tests_Font_Delete_Files_From_Wp_Content_Folder extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that font files uploaded to wp-content/fonts are deleted when the associated font face post is deleted on multisite.
+	 *
 	 * @group multisite
 	 * @group ms-required
+	 *
+	 * @covers ::gutenberg_before_delete_font_face
 	 */
-	public function test_uploaded_font_files_are_deleted_from_wp_content_folder_multisite() {
+	public function test_uploaded_font_files_are_deleted_from_wp_content_fonts_folder_multisite() {
 		wp_set_current_user( self::$super_admin_id );
 		$blog_id = self::factory()->blog->create();
 
@@ -88,7 +111,7 @@ class Tests_Font_Delete_Files_From_Wp_Content_Folder extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Set the font directory to wp-content/fonts, the default previously used in Gutenberg.
+	 * Sets the font upload directory to wp-content/fonts, the default previously used in Gutenberg.
 	 *
 	 * @param array $font_dir Font directory settings.
 	 * @return array Filtered font directory settings.
@@ -107,6 +130,11 @@ class Tests_Font_Delete_Files_From_Wp_Content_Folder extends WP_UnitTestCase {
 		return $font_dir;
 	}
 
+	/**
+	 * Creates a font family post for testing.
+	 *
+	 * @return int Font family post ID.
+	 */
 	protected function create_font_family() {
 		return self::factory()->post->create(
 			wp_slash(
@@ -125,6 +153,12 @@ class Tests_Font_Delete_Files_From_Wp_Content_Folder extends WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * Creates a font face post under the specified font family for testing.
+	 *
+	 * @param int $font_family_id Font family post ID.
+	 * @return WP_REST_Response REST response object for font face creation.
+	 */
 	protected function create_font_face( $font_family_id ) {
 		// Create a new font face with a font file upload.
 		$font_file = GUTENBERG_DIR_TESTDATA . '/fonts/OpenSans-Regular.woff2';
