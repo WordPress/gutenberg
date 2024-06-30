@@ -309,8 +309,7 @@ function Iframe( {
 		iframeDocument.documentElement.style.setProperty(
 			'--wp-block-editor-iframe-zoom-out-scale',
 			scale === 'default'
-				? Math.min( containerWidth, maxWidth ) /
-						prevContainerWidthRef.current
+				? Math.min( 1, containerWidth / prevContainerWidthRef.current )
 				: scale
 		);
 		iframeDocument.documentElement.style.setProperty(
@@ -324,14 +323,6 @@ function Iframe( {
 		iframeDocument.documentElement.style.setProperty(
 			'--wp-block-editor-iframe-zoom-out-inner-height',
 			`${ iframeWindowInnerHeight }px`
-		);
-		iframeDocument.documentElement.style.setProperty(
-			'--wp-block-editor-iframe-zoom-out-container-width',
-			`${ containerWidth }px`
-		);
-		iframeDocument.documentElement.style.setProperty(
-			'--wp-block-editor-iframe-zoom-out-prev-container-width',
-			`${ prevContainerWidthRef.current }px`
 		);
 
 		return () => {
@@ -349,12 +340,6 @@ function Iframe( {
 			iframeDocument.documentElement.style.removeProperty(
 				'--wp-block-editor-iframe-zoom-out-inner-height'
 			);
-			iframeDocument.documentElement.style.removeProperty(
-				'--wp-block-editor-iframe-zoom-out-container-width'
-			);
-			iframeDocument.documentElement.style.removeProperty(
-				'--wp-block-editor-iframe-zoom-out-prev-container-width'
-			);
 		};
 	}, [
 		scale,
@@ -371,8 +356,9 @@ function Iframe( {
 	// mode. They're only needed to capture focus in edit mode.
 	const shouldRenderFocusCaptureElements = tabIndex >= 0 && ! isPreviewMode;
 
-	const iframe = (
+	return (
 		<>
+			{ containerResizeListener }
 			{ shouldRenderFocusCaptureElements && before }
 			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
 			<iframe
@@ -381,7 +367,7 @@ function Iframe( {
 					...props.style,
 					height: props.style?.height,
 				} }
-				ref={ useMergeRefs( [ ref, setRef ] ) }
+				ref={ useMergeRefs( [ ref, setRef, windowResizeRef ] ) }
 				tabIndex={ tabIndex }
 				// Correct doctype is required to enable rendering in standards
 				// mode. Also preload the styles to avoid a flash of unstyled
@@ -442,26 +428,6 @@ function Iframe( {
 			</iframe>
 			{ shouldRenderFocusCaptureElements && after }
 		</>
-	);
-
-	return (
-		<div className="block-editor-iframe__container" ref={ windowResizeRef }>
-			{ containerResizeListener }
-			<div
-				className={ clsx(
-					'block-editor-iframe__scale-container',
-					isZoomedOut && 'is-zoomed-out'
-				) }
-				style={ {
-					'--wp-block-editor-iframe-zoom-out-container-width':
-						isZoomedOut && `${ containerWidth }px`,
-					'--wp-block-editor-iframe-zoom-out-prev-container-width':
-						isZoomedOut && `${ prevContainerWidthRef.current }px`,
-				} }
-			>
-				{ iframe }
-			</div>
-		</div>
 	);
 }
 
