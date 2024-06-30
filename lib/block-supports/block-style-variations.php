@@ -274,19 +274,3 @@ function gutenberg_register_block_style_variations_from_theme_json_partials( $va
 		}
 	}
 }
-
-// DO NOT BACKPORT TO CORE.
-// To be removed when core has backported this PR.
-if ( function_exists( 'wp_resolve_block_style_variations_from_styles_registry' ) ) {
-	remove_filter( 'wp_theme_json_data_theme', 'wp_resolve_block_style_variations_from_styles_registry' );
-}
-if ( function_exists( 'wp_resolve_block_style_variations_from_primary_theme_json' ) ) {
-	remove_filter( 'wp_theme_json_data_theme', 'wp_resolve_block_style_variations_from_primary_theme_json' );
-}
-if ( function_exists( 'wp_resolve_block_style_variations_from_theme_json_partials' ) ) {
-	remove_filter( 'wp_theme_json_data_theme', 'wp_resolve_block_style_variations_from_theme_json_partials' );
-}
-if ( function_exists( 'wp_resolve_block_style_variations_from_theme_style_variation' ) ) {
-	remove_filter( 'wp_theme_json_data_user', 'wp_resolve_block_style_variations_from_theme_style_variation' );
-}
-// END OF DO NOT BACKPORT TO CORE.
