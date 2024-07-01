@@ -559,7 +559,9 @@ describe.each( [
 
 			await user.keyboard( '{arrowdown}' );
 			await user.keyboard( '{arrowdown}' );
-			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'listbox', { name: props.label } )
+			).not.toBeInTheDocument();
 
 			expect( currentSelectedItem ).toHaveTextContent(
 				props.options[ 2 ].name

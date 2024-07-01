@@ -573,7 +573,11 @@ describe.each( [
 
 			await press.ArrowDown();
 			await press.ArrowDown();
-			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'listbox', {
+					name: legacyProps.label,
+				} )
+			).not.toBeInTheDocument();
 
 			expect( currentSelectedItem ).toHaveTextContent(
 				legacyProps.options[ 2 ].name
