@@ -117,9 +117,9 @@ const SocialLinkEdit = ( {
 					<PanelRow>
 						<TextControl
 							__nextHasNoMarginBottom
-							label={ __( 'Link text' ) }
+							label={ __( 'Text' ) }
 							help={ __(
-								'The link text is visible when enabled from the parent Social Icons block.'
+								'The text is visible when enabled from the parent Social Icons block.'
 							) }
 							value={ label }
 							onChange={ ( value ) =>
