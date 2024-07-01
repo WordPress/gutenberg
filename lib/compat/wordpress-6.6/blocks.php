@@ -17,7 +17,7 @@ function gutenberg_replace_pattern_override_default_binding( $parsed_block ) {
 	$supported_block_attrs = array(
 		'core/paragraph' => array( 'content' ),
 		'core/heading'   => array( 'content' ),
-		'core/image'     => array( 'id', 'url', 'title', 'alt' ),
+		'core/image'     => array( 'id', 'url', 'title', 'alt', 'caption', 'href', 'rel', 'linkClass', 'linkTarget' ),
 		'core/button'    => array( 'url', 'text', 'linkTarget', 'rel' ),
 	);
 
