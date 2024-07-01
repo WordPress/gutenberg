@@ -17,3 +17,6 @@ packages/edit-site/lib/** linguist-vendored
 
 # The changelog.txt file is authored as markdown.
 changelog.txt linguist-language=Markdown
+
+# Flag docs directory as documentation for GitHub stats.
+docs/** linguist-documentation
