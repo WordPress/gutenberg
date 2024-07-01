@@ -241,26 +241,24 @@ if ( ! is_wp_version_compatible( '6.6' ) ) {
 	 * @param WP_Block $block_instance The block instance.
 	 * @return string  Block content with the bind applied.
 	 */
-	function gutenberg_process_block_bindings( $block_content, $parsed_block, $block_instance ) {
-		$modified_block_content = $block_content;
-		foreach ( $parsed_block['attrs']['metadata']['bindings'] as $attribute_name => $block_binding ) {
-			// Only process the caption for compatibility.
-			if ( 'caption' !== $attribute_name ) {
-				continue;
-			}
-
-			$block_binding_source = get_block_bindings_source( $block_binding['source'] );
-			$source_args          = ! empty( $block_binding['args'] ) && is_array( $block_binding['args'] ) ? $block_binding['args'] : array();
-			$source_value         = $block_binding_source->get_value( $source_args, $block_instance, $attribute_name );
-
-			// If the value is not null, process the HTML based on the block and the attribute.
-			if ( ! is_null( $source_value ) ) {
-				$modified_block_content = gutenberg_block_bindings_replace_caption( $modified_block_content, $block_instance->name, $attribute_name, $source_value );
-			}
+	function gutenberg_process_image_caption_binding( $block_content, $parsed_block, $block_instance ) {
+		if ( ! isset( $parsed_block['attrs']['metadata']['bindings']['caption'] ) ) {
+			return $block_content;
 		}
 
-		return $modified_block_content;
+		$caption_binding = $parsed_block['attrs']['metadata']['bindings']['caption'];
+
+		$caption_binding_source = get_block_bindings_source( $caption_binding['source'] );
+		$source_args            = ! empty( $caption_binding['args'] ) && is_array( $caption_binding['args'] ) ? $caption_binding['args'] : array();
+		$source_value           = $caption_binding_source->get_value( $source_args, $block_instance, 'caption' );
+
+		// If the value is not null, process the HTML based on the block and the attribute.
+		if ( is_null( $source_value ) ) {
+			return $block_content;
+		}
+
+		return gutenberg_block_bindings_replace_caption( $block_content, $block_instance->name, 'caption', $source_value );
 	}
 
-	add_filter( 'render_block_core/image', 'gutenberg_process_block_bindings', 20, 3 );
+	add_filter( 'render_block_core/image', 'gutenberg_process_image_caption_binding', 20, 3 );
 }
