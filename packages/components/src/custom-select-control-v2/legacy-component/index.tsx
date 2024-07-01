@@ -64,12 +64,14 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 	const children = options.map(
 		( { name, key, __experimentalHint, style, className } ) => {
 			const withHint = (
-				<Styled.ItemHintWrapper>
-					<Styled.ItemHintContent>{ name }</Styled.ItemHintContent>
-					<Styled.ItemHint className="components-custom-select-control__item-hint">
+				<Styled.WithHintItemWrapper>
+					<Styled.WithHintItemContent>
+						{ name }
+					</Styled.WithHintItemContent>
+					<Styled.WithHintItemHint className="components-custom-select-control__item-hint">
 						{ __experimentalHint }
-					</Styled.ItemHint>
-				</Styled.ItemHintWrapper>
+					</Styled.WithHintItemHint>
+				</Styled.WithHintItemWrapper>
 			);
 
 			return (

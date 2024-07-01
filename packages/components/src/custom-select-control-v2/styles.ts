@@ -139,14 +139,6 @@ const truncateStyles = css`
 	white-space: nowrap;
 `;
 
-export const ItemHintWrapper = styled.div`
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	flex-wrap: wrap;
-	flex: 1;
-`;
-
 export const SelectedExperimentalHintWrapper = styled.div`
 	${ truncateStyles }
 `;
@@ -156,11 +148,19 @@ export const SelectedExperimentalHintItem = styled.span`
 	margin-inline-start: ${ space( 2 ) };
 `;
 
-export const ItemHintContent = styled.span`
+export const WithHintItemWrapper = styled.div`
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	flex-wrap: wrap;
+	flex: 1;
+`;
+
+export const WithHintItemContent = styled.span`
 	padding-inline-end: ${ space( 4 ) };
 `;
 
-export const ItemHint = styled.span`
+export const WithHintItemHint = styled.span`
 	// Necessary to override V1 styles passed via the legacy
 	// '.components-custom-select-control__item-hint' class
 	${ SelectItem } && {
