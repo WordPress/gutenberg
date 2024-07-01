@@ -347,7 +347,7 @@ function GridLayoutTypeControl( { layout, onChange } ) {
 	const [ tempColumnCount, setTempColumnCount ] = useState(
 		columnCount || 3
 	);
-	const [ tempRowCount, setTempRowCount ] = useState( rowCount || 2 );
+	const [ tempRowCount, setTempRowCount ] = useState( rowCount );
 	const [ tempMinimumColumnWidth, setTempMinimumColumnWidth ] = useState(
 		minimumColumnWidth || '12rem'
 	);
@@ -363,7 +363,7 @@ function GridLayoutTypeControl( { layout, onChange } ) {
 			setTempMinimumColumnWidth( minimumColumnWidth || '12rem' );
 		} else {
 			setTempColumnCount( columnCount || 3 );
-			setTempRowCount( rowCount || 2 );
+			setTempRowCount( rowCount );
 		}
 		onChange( {
 			...layout,

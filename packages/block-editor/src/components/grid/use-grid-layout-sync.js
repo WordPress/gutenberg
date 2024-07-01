@@ -11,27 +11,16 @@ import { store as blockEditorStore } from '../../store';
 import { GridRect } from './utils';
 
 export function useGridLayoutSync( { clientId: gridClientId } ) {
-	const { gridLayout, blockOrder } = useSelect(
-		( select ) => {
-			const { getBlockAttributes, getBlockOrder } =
-				select( blockEditorStore );
-			return {
-				gridLayout: getBlockAttributes( gridClientId ).layout ?? {},
-				blockOrder: getBlockOrder( gridClientId ),
-			};
-		},
-		[ gridClientId ]
-	);
-
-	const { getBlockAttributes } = useSelect( blockEditorStore );
+	const { getBlockOrder, getBlockAttributes } = useSelect( blockEditorStore );
 	const { updateBlockAttributes, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
+	const blockOrder = getBlockOrder( gridClientId );
+
 	useEffect( () => {
+		const gridLayout = getBlockAttributes( gridClientId ).layout ?? {};
 		const updates = {};
-
 		const { columnCount, rowCount, manualPlacement } = gridLayout;
-
 		const isManualGrid = !! manualPlacement;
 
 		if ( isManualGrid ) {
@@ -147,7 +136,6 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 	}, [
 		// Actual deps to sync:
 		gridClientId,
-		gridLayout,
 		blockOrder,
 		// Needed for linter:
 		__unstableMarkNextChangeAsNotPersistent,
