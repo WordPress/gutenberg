@@ -29,3 +29,10 @@ No notes.
 ### `patches/react-native+0.73.3.patch`
 
 No notes.
+
+### `patches/postcss-urlrebase+1.3.0.patch`
+
+This package uses a `URL` global value but imports the Node.js `URL` type. Remove the
+Node.js-specific type import to use the global URL type available in both browsers and Node.js.
+
+This fixes a type issue where some Gutenberg packages use postcss in the browser.
