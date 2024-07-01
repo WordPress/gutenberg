@@ -158,7 +158,6 @@ if ( ! is_wp_version_compatible( '6.6' ) ) {
 
 				// Append the new element.
 				$this->lexical_updates[] = new WP_HTML_Text_Replacement( $after_closer_tag, 0, $new_element );
-				$this->release_bookmark( 'closer_tag' );
 			}
 
 			/**
@@ -178,7 +177,6 @@ if ( ! is_wp_version_compatible( '6.6' ) ) {
 						'tag_closers' => 'visit',
 					)
 				) || ! $this->is_tag_closer() ) {
-					$this->release_bookmark( 'opener_tag' );
 					return false;
 				}
 
@@ -202,8 +200,6 @@ if ( ! is_wp_version_compatible( '6.6' ) ) {
 
 				// Remove the current tag.
 				$this->lexical_updates[] = new WP_HTML_Text_Replacement( $opener_tag_bookmark->start, $current_tag_length, '' );
-				$this->release_bookmark( 'opener_tag' );
-				$this->release_bookmark( 'closer_tag' );
 				return true;
 			}
 		};
