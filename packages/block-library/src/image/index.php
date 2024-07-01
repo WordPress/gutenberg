@@ -37,7 +37,7 @@ function render_block_core_image( $attributes, $content, $block ) {
 		$p->set_attribute( 'data-id', $id );
 
 		// If there's a mismatch with the 'wp-image-' class and the actual id, the id was
-		// probably overridden by pattern overrides. Update it to the correct value.
+		// probably overridden by block bindings. Update it to the correct value.
 		// See https://github.com/WordPress/gutenberg/issues/62886 for why this is needed.
 		$image_classes = $p->get_attribute( 'class' );
 		$expected_id_class = "wp-image-$id";
