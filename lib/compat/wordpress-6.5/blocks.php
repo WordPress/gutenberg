@@ -154,6 +154,93 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 	}
 
 	/**
+	 * Check if the parsed block is supported by block bindings and it includes the bindings attribute.
+	 *
+	 * @param array $parsed_block  The full block, including name and attributes.
+	 */
+	function gutenberg_is_valid_block_for_block_bindings( $parsed_block ) {
+		$supported_blocks = array(
+			'core/paragraph',
+			'core/heading',
+			'core/image',
+			'core/button',
+		);
+
+		// Check if the block is supported.
+		if (
+		! in_array( $parsed_block['blockName'], $supported_blocks, true ) ||
+		empty( $parsed_block['attrs']['metadata']['bindings'] ) ||
+		! is_array( $parsed_block['attrs']['metadata']['bindings'] )
+		) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Check if the binding created is valid.
+	 *
+	 * @param array  $parsed_block   The full block, including name and attributes.
+	 * @param string $attribute_name The attribute name being processed.
+	 * @param array  $block_binding  The block binding configuration.
+	 */
+	function gutenberg_is_valid_block_binding( $parsed_block, $attribute_name, $block_binding ) {
+		// Check if it is a valid block.
+		if ( ! gutenberg_is_valid_block_for_block_bindings( $parsed_block ) ) {
+			return false;
+		}
+
+		$supported_block_attrs = array(
+			'core/paragraph' => array( 'content' ),
+			'core/heading'   => array( 'content' ),
+			'core/image'     => array( 'id', 'url', 'title', 'alt', 'caption', 'href', 'rel', 'linkClass', 'linkTarget' ),
+			'core/button'    => array( 'url', 'text', 'linkTarget', 'rel' ),
+		);
+
+		// Check if the attribute is not in the supported list.
+		if ( ! in_array( $attribute_name, $supported_block_attrs[ $parsed_block['blockName'] ], true ) ) {
+			return false;
+		}
+		// Check if no source is provided, or that source is not registered.
+		if ( ! isset( $block_binding['source'] ) || ! is_string( $block_binding['source'] ) || null === get_block_bindings_source( $block_binding['source'] ) ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Replace the block attributes and the HTML with the values from block bindings.
+	 * These filters are temporary for backward-compatibility. It is handled properly without filters in core.
+	 *
+	 */
+	add_filter(
+		'render_block_data',
+		/**
+		 * Filter to modify the block attributes with a placeholder value for each attribute that has a block binding.
+		 *
+		 * @param array    $parsed_block  The full block, including name and attributes.
+		 */
+		function ( $parsed_block ) {
+			if ( ! gutenberg_is_valid_block_for_block_bindings( $parsed_block ) ) {
+				return $parsed_block;
+			}
+
+			foreach ( $parsed_block['attrs']['metadata']['bindings'] as $attribute_name => $block_binding ) {
+				if ( ! gutenberg_is_valid_block_binding( $parsed_block, $attribute_name, $block_binding ) ) {
+					continue;
+				}
+				// Adds a placeholder value that will get replaced by the replace_html in the render_block filter.
+				$parsed_block['attrs'][ $attribute_name ] = 'placeholder';
+			}
+			return $parsed_block;
+		},
+		20,
+		1
+	);
+
+	/**
 	 * Process the block bindings attribute.
 	 *
 	 * @param string   $block_content Block Content.
@@ -162,55 +249,18 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 	 * @return string  Block content with the bind applied.
 	 */
 	function gutenberg_process_block_bindings( $block_content, $parsed_block, $block_instance ) {
-		$supported_block_attrs = array(
-			'core/paragraph' => array( 'content' ),
-			'core/heading'   => array( 'content' ),
-			'core/image'     => array( 'id', 'url', 'title', 'alt', 'caption', 'href', 'rel', 'linkClass', 'linkTarget' ),
-			'core/button'    => array( 'url', 'text', 'linkTarget', 'rel' ),
-		);
-
-		// If the block doesn't have the bindings property or isn't one of the supported block types, return.
-		if (
-		! isset( $supported_block_attrs[ $block_instance->name ] ) ||
-		empty( $parsed_block['attrs']['metadata']['bindings'] ) ||
-		! is_array( $parsed_block['attrs']['metadata']['bindings'] )
-		) {
+		if ( ! gutenberg_is_valid_block_for_block_bindings( $parsed_block ) ) {
 			return $block_content;
 		}
-
-		/*
-		 * Assuming the following format for the bindings property of the "metadata" attribute:
-		 *
-		 * "bindings": {
-		 *   "title": {
-		 *     "source": "core/post-meta",
-		 *     "args": { "key": "text_custom_field" }
-		 *   },
-		 *   "url": {
-		 *     "source": "core/post-meta",
-		 *     "args": { "key": "url_custom_field" }
-		 *   }
-		 * }
-		 */
-
 		$modified_block_content = $block_content;
 		foreach ( $parsed_block['attrs']['metadata']['bindings'] as $attribute_name => $block_binding ) {
-			// If the attribute is not in the supported list, process next attribute.
-			if ( ! in_array( $attribute_name, $supported_block_attrs[ $block_instance->name ], true ) ) {
-				continue;
-			}
-			// If no source is provided, or that source is not registered, process next attribute.
-			if ( ! isset( $block_binding['source'] ) || ! is_string( $block_binding['source'] ) ) {
+			if ( ! gutenberg_is_valid_block_binding( $parsed_block, $attribute_name, $block_binding ) ) {
 				continue;
 			}
 
 			$block_binding_source = get_block_bindings_source( $block_binding['source'] );
-			if ( null === $block_binding_source ) {
-				continue;
-			}
-
-			$source_args  = ! empty( $block_binding['args'] ) && is_array( $block_binding['args'] ) ? $block_binding['args'] : array();
-			$source_value = $block_binding_source->get_value( $source_args, $block_instance, $attribute_name );
+			$source_args          = ! empty( $block_binding['args'] ) && is_array( $block_binding['args'] ) ? $block_binding['args'] : array();
+			$source_value         = $block_binding_source->get_value( $source_args, $block_instance, $attribute_name );
 
 			// If the value is not null, process the HTML based on the block and the attribute.
 			if ( ! is_null( $source_value ) ) {
