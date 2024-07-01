@@ -766,13 +766,20 @@ const useDuplicatePostAction = ( postType ) => {
 						} ),
 						[ items ]
 					);
+					const form = useMemo(
+						() => ( {
+							closeForm: closeModal,
+							isBusy: isCreatingPage,
+							onSubmitLabel: _x( 'Duplicate', 'action label' ),
+						} ),
+						[ closeModal, isCreatingPage ]
+					);
 					return (
 						<DataForm
 							item={ item }
 							onUpdateItem={ createPage }
 							fields={ fields }
-							closeForm={ closeModal }
-							isBusy={ isCreatingPage }
+							form={ form }
 						/>
 					);
 				},

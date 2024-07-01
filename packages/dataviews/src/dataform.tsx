@@ -6,7 +6,7 @@ import type { FormEventHandler } from 'react'; // TODO: how to import FormEventH
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import {
 	Button,
 	TextControl,
@@ -24,16 +24,19 @@ type DataFormProps< Item > = {
 	item: Item;
 	onUpdateItem: ( item: Item ) => void;
 	fields: NormalizedField< Item >[]; // TODO: use Field. Normalize them first.
-	closeForm: () => void;
-	isBusy: boolean;
+	form: {
+		closeForm: () => void;
+		isBusy: boolean;
+		onSubmitLabel?: string;
+		onCancelLabel?: string;
+	};
 };
 
 export default function DataForm< Item >( {
 	item: data,
 	onUpdateItem,
 	fields,
-	closeForm,
-	isBusy,
+	form: { closeForm, isBusy, onCancelLabel, onSubmitLabel },
 }: DataFormProps< Item > ) {
 	const [ item, setItem ] = useState( data );
 	const onSubmit: FormEventHandler< HTMLFormElement > = useCallback(
@@ -73,7 +76,7 @@ export default function DataForm< Item >( {
 				{ components }
 				<HStack spacing={ 2 } justify="end">
 					<Button variant="tertiary" onClick={ closeForm }>
-						{ __( 'Cancel' ) }
+						{ onCancelLabel || __( 'Cancel' ) }
 					</Button>
 					<Button
 						variant="primary"
@@ -81,7 +84,7 @@ export default function DataForm< Item >( {
 						isBusy={ isBusy }
 						aria-disabled={ isBusy }
 					>
-						{ _x( 'Duplicate', 'action label' ) }
+						{ onSubmitLabel || __( 'Submit' ) }
 					</Button>
 				</HStack>
 			</VStack>
