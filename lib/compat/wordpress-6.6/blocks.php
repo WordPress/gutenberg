@@ -66,14 +66,14 @@ if ( ! is_wp_version_compatible( '6.6' ) ) {
 			 */
 
 			/**
-			 * Replace the inner text of an HTML with the passed content.
+			 * Replace the inner content of a figcaption element with the passed content.
 			 *
-			 * @param string $new_content New text to insert in the HTML element.
-			 * @return bool Whether the inner text was properly replaced.
+			 * @param string $new_content New content to insert in the figcaption element.
+			 * @return bool Whether the inner content was properly replaced.
 			 */
-			public function gutenberg_set_inner_text( $new_content ) {
+			public function gutenberg_set_content_between_figcaption_balanced_tags( $new_content ) {
 				// Check that the processor is paused on an opener tag.
-				if ( $this->is_tag_closer() ) {
+				if ( $this->is_tag_closer() || 'FIGCAPTION' !== $this->get_tag() ) {
 					return false;
 				}
 
@@ -123,13 +123,17 @@ if ( ! is_wp_version_compatible( '6.6' ) ) {
 			}
 
 			/**
-			 * Add a new HTML element after the current tag.
+			 * Add a new figcaption element after the `img` or `a` tag.
 			 *
-			 * @param string $new_element New HTML element to append after the current tag.
+			 * @param string $new_element New figcaption element to append after the tag.
 			 * @return bool Whether the element was properly appended.
 			 */
-			public function gutenberg_append_element_after_tag( $new_element ) {
+			public function gutenberg_append_figcaption_element_after_tag( $new_element ) {
 				$tag_name = $this->get_tag();
+				// Ensure figcaption is only added in the correct place.
+				if ( 'IMG' !== $tag_name && 'A' !== $tag_name ) {
+					return false;
+				}
 				$this->set_bookmark( 'current_tag' );
 				// Visit the closing tag if exists.
 				if ( ! $this->next_tag(
@@ -166,16 +170,20 @@ if ( ! is_wp_version_compatible( '6.6' ) ) {
 			}
 
 			/**
-			 * Remove the current tag element.
+			 * Remove the current figcaption tag element.
 			 *
 			 * @return bool Whether the element was properly removed.
 			 */
-			public function gutenberg_remove_current_tag_element() {
+			public function gutenberg_remove_figcaption_tag_element() {
+				$tag_name = $this->get_tag();
+				// Ensure only figcaption is removed.
+				if ( 'FIGCAPTION' !== $tag_name ) {
+					return false;
+				}
 				// Set position of the opener tag.
 				$this->set_bookmark( 'opener_tag' );
 
 				// Visit the closing tag.
-				$tag_name = $this->get_tag();
 				if ( ! $this->next_tag(
 					array(
 						'tag_name'    => $tag_name,
@@ -228,9 +236,9 @@ if ( ! is_wp_version_compatible( '6.6' ) ) {
 
 		if ( $block_reader->next_tag( 'figcaption' ) ) {
 			if ( empty( $new_value ) ) {
-				$block_reader->gutenberg_remove_current_tag_element();
+				$block_reader->gutenberg_remove_figcaption_tag_element();
 			} else {
-				$block_reader->gutenberg_set_inner_text( $new_value );
+				$block_reader->gutenberg_set_content_between_figcaption_balanced_tags( $new_value );
 			}
 		} else {
 			$block_reader->seek( 'figure' );
@@ -238,7 +246,7 @@ if ( ! is_wp_version_compatible( '6.6' ) ) {
 				$block_reader->seek( 'figure' );
 				$block_reader->next_tag( 'img' );
 			}
-			$block_reader->gutenberg_append_element_after_tag( '<figcaption class="wp-element-caption">' . $new_value . '</figcaption>' );
+			$block_reader->gutenberg_append_figcaption_element_after_tag( '<figcaption class="wp-element-caption">' . $new_value . '</figcaption>' );
 		}
 
 		return $block_reader->get_updated_html();

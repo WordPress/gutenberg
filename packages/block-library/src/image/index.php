@@ -36,12 +36,17 @@ function render_block_core_image( $attributes, $content, $block ) {
 		 */
 
 		/**
-		 * Add a new HTML element after the current tag.
+		 * Add a new figcaption element after the `img` or `a` tag.
 		 *
-		 * @param string $new_element New HTML element to append after the current tag.
+		 * @param string $new_element New figcaption element to append after the tag.
+		 * @return bool Whether the element was properly appended.
 		 */
-		public function append_element_after_tag( $new_element ) {
+		public function append_figcaption_element_after_tag( $new_element ) {
 			$tag_name = $this->get_tag();
+			// Ensure figcaption is only added in the correct place.
+			if ( 'IMG' !== $tag_name && 'A' !== $tag_name ) {
+				return false;
+			}
 			$this->set_bookmark( 'current_tag' );
 			// Visit the closing tag if exists.
 			if ( ! $this->next_tag(
@@ -70,19 +75,24 @@ function render_block_core_image( $attributes, $content, $block ) {
 
 			// Append the new element.
 			$this->lexical_updates[] = new WP_HTML_Text_Replacement( $after_closer_tag, 0, $new_element );
+			return true;
 		}
 
 		/**
-		 * Remove the current tag element.
+		 * Remove the current figcaption tag element.
 		 *
 		 * @return bool Whether the element was properly removed.
 		 */
-		public function remove_current_tag_element() {
+		public function remove_figcaption_tag_element() {
+			$tag_name = $this->get_tag();
+			// Ensure only figcaption is removed.
+			if ( 'FIGCAPTION' !== $tag_name ) {
+				return false;
+			}
 			// Set position of the opener tag.
 			$this->set_bookmark( 'opener_tag' );
 
 			// Visit the closing tag.
-			$tag_name = $this->get_tag();
 			if ( ! $this->next_tag(
 				array(
 					'tag_name'    => $tag_name,
@@ -95,7 +105,7 @@ function render_block_core_image( $attributes, $content, $block ) {
 			// Set position of the closer tag.
 			$this->set_bookmark( 'closer_tag' );
 
-			// Get tag positions.
+			// Get position of the tags.
 			$opener_tag_bookmark = $this->bookmarks['opener_tag'];
 			$closer_tag_bookmark = $this->bookmarks['closer_tag'];
 
@@ -180,7 +190,7 @@ function render_block_core_image( $attributes, $content, $block ) {
 	if ( $p->next_tag( 'figcaption' ) ) {
 		// Remove `<figcaption>` if exists and caption attribute exists but it is empty.
 		if ( isset( $attributes['caption'] ) && strlen( $attributes['caption'] ) === 0 ) {
-			$p->remove_current_tag_element();
+			$p->remove_figcaption_tag_element();
 		}
 	} else {
 		// Add caption if it doesn't exist and the caption is not empty.
@@ -191,7 +201,7 @@ function render_block_core_image( $attributes, $content, $block ) {
 				$p->seek( 'figure' );
 				$p->next_tag( 'img' );
 			}
-			$p->append_element_after_tag( '<figcaption class="wp-element-caption">' . $attributes['caption'] . '</figcaption>' );
+			$p->append_figcaption_element_after_tag( '<figcaption class="wp-element-caption">' . $attributes['caption'] . '</figcaption>' );
 		}
 	}
 	$p->release_bookmark( 'figure' );
