@@ -48,6 +48,7 @@ export default function DataForm< Item >( {
 		[ item ]
 	);
 
+	// TODO: make it work for all fields.
 	const onChange = useCallback( ( title: string ) => {
 		setItem( { ...item, title } );
 	}, [] );
