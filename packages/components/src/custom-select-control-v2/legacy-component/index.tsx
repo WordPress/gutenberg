@@ -65,9 +65,7 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 		( { name, key, __experimentalHint, style, className } ) => {
 			const withHint = (
 				<Styled.WithHintItemWrapper>
-					<Styled.WithHintItemContent>
-						{ name }
-					</Styled.WithHintItemContent>
+					<span>{ name }</span>
 					<Styled.WithHintItemHint className="components-custom-select-control__item-hint">
 						{ __experimentalHint }
 					</Styled.WithHintItemHint>
