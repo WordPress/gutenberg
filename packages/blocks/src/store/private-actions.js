@@ -55,6 +55,6 @@ export function registerBlockBindingsSource( source ) {
 		setValue: source.setValue,
 		setValues: source.setValues,
 		getPlaceholder: source.getPlaceholder,
-		lockAttributesEditing: source.lockAttributesEditing,
+		canUserEditValue: source.canUserEditValue,
 	};
 }

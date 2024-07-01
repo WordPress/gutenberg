@@ -191,10 +191,14 @@
 			box-shadow: inset 0 -#{$border-width} 0 $gray-100;
 			padding-top: $grid-unit-10;
 			padding-bottom: $grid-unit-10;
+			padding-left: $grid-unit-15;
 			font-size: 11px;
 			text-transform: uppercase;
 			font-weight: 500;
-			padding-left: $grid-unit-05;
+
+			&:has(.dataviews-view-table-header-button) {
+				padding-left: $grid-unit-05;
+			}
 		}
 	}
 	tbody {
@@ -370,8 +374,7 @@
 		line-height: 16px;
 
 		&:not(:empty) {
-			padding: $grid-unit-15 0;
-			padding-top: 0;
+			padding: 0 0 $grid-unit-15;
 		}
 
 		.dataviews-view-grid__field {
@@ -437,6 +440,7 @@
 			.components-button {
 				opacity: 0;
 				position: fixed;
+				right: 0;
 			}
 		}
 
@@ -603,11 +607,6 @@
 	}
 }
 
-.dataviews-filters__custom-menu-radio-item-prefix {
-	display: block;
-	width: 24px;
-}
-
 .dataviews-bulk-edit-button.components-button {
 	flex-shrink: 0;
 }
@@ -764,7 +763,7 @@
 		padding: 0 $grid-unit-15;
 		height: $grid-unit-40;
 		background: $gray-100;
-		color: $gray-700;
+		color: $gray-800;
 		position: relative;
 		display: flex;
 		align-items: center;
@@ -892,12 +891,14 @@
 }
 
 .dataviews-bulk-actions {
-	position: absolute;
+	position: sticky;
 	display: flex;
 	flex-direction: column;
 	align-content: center;
 	flex-wrap: wrap;
-	width: 100%;
+	width: fit-content;
+	margin-left: auto;
+	margin-right: auto;
 	bottom: $grid-unit-30;
 	z-index: z-index(".dataviews-bulk-actions");
 

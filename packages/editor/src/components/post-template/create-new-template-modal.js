@@ -109,6 +109,8 @@ export default function CreateNewTemplateModal( { onClose } ) {
 		<Modal
 			title={ __( 'Create custom template' ) }
 			onRequestClose={ cancel }
+			focusOnMount="firstContentElement"
+			size="small"
 		>
 			<form
 				className="editor-post-template__create-form"

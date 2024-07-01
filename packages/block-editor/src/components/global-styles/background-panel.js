@@ -23,7 +23,7 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
 } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { getFilename } from '@wordpress/url';
 import { useCallback, Platform, useRef } from '@wordpress/element';
@@ -34,7 +34,7 @@ import { isBlobURL } from '@wordpress/blob';
 /**
  * Internal dependencies
  */
-import { TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
+import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
 import MediaReplaceFlow from '../media-replace-flow';
 import { store as blockEditorStore } from '../../store';
@@ -544,17 +544,26 @@ function BackgroundSizeToolsPanelItem( {
 				<ToggleGroupControlOption
 					key="cover"
 					value="cover"
-					label={ __( 'Cover' ) }
+					label={ _x(
+						'Cover',
+						'Size option for background image control'
+					) }
 				/>
 				<ToggleGroupControlOption
 					key="contain"
 					value="contain"
-					label={ __( 'Contain' ) }
+					label={ _x(
+						'Contain',
+						'Size option for background image control'
+					) }
 				/>
 				<ToggleGroupControlOption
 					key="tile"
 					value="auto"
-					label={ __( 'Tile' ) }
+					label={ _x(
+						'Tile',
+						'Size option for background image control'
+					) }
 				/>
 			</ToggleGroupControl>
 			<HStack justify="flex-start" spacing={ 2 } as="span">
@@ -591,6 +600,7 @@ function BackgroundToolsPanel( {
 	children,
 	headerLabel,
 } ) {
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const resetAll = () => {
 		const updatedValue = resetAllFilter( value );
 		onChange( updatedValue );
@@ -603,7 +613,7 @@ function BackgroundToolsPanel( {
 			label={ headerLabel }
 			resetAll={ resetAll }
 			panelId={ panelId }
-			dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
+			dropdownMenuProps={ dropdownMenuProps }
 		>
 			{ children }
 		</VStack>

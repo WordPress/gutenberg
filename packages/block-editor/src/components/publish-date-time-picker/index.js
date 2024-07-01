@@ -17,10 +17,18 @@ export function PublishDateTimePicker(
 		onChange,
 		showPopoverHeaderActions,
 		isCompact,
+		currentDate,
 		...additionalProps
 	},
 	ref
 ) {
+	const datePickerProps = {
+		startOfWeek: getSettings().l10n.startOfWeek,
+		onChange,
+		currentDate: isCompact ? undefined : currentDate,
+		currentTime: isCompact ? currentDate : undefined,
+		...additionalProps,
+	};
 	const DatePickerComponent = isCompact ? TimePicker : DateTimePicker;
 	return (
 		<div ref={ ref } className="block-editor-publish-date-time-picker">
@@ -38,11 +46,7 @@ export function PublishDateTimePicker(
 				}
 				onClose={ onClose }
 			/>
-			<DatePickerComponent
-				startOfWeek={ getSettings().l10n.startOfWeek }
-				onChange={ onChange }
-				{ ...additionalProps }
-			/>
+			<DatePickerComponent { ...datePickerProps } />
 		</div>
 	);
 }

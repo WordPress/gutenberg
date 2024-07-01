@@ -76,7 +76,6 @@ const DEFAULT_VIEW = {
 	search: '',
 	page: 1,
 	perPage: 20,
-	hiddenFields: [],
 	layout: {
 		...defaultConfigPerViewType[ LAYOUT_GRID ],
 	},
@@ -86,15 +85,12 @@ const DEFAULT_VIEW = {
 const SYNC_FILTERS = [
 	{
 		value: PATTERN_SYNC_TYPES.full,
-		label: _x( 'Synced', 'Option that shows all synchronized patterns' ),
+		label: _x( 'Synced', 'pattern (singular)' ),
 		description: __( 'Patterns that are kept in sync across the site.' ),
 	},
 	{
 		value: PATTERN_SYNC_TYPES.unsynced,
-		label: _x(
-			'Not synced',
-			'Option that shows all patterns that are not synchronized'
-		),
+		label: _x( 'Not synced', 'pattern (singular)' ),
 		description: __(
 			'Patterns that can be changed freely without affecting the site.'
 		),
@@ -298,13 +294,19 @@ export default function DataviewsPatterns() {
 						<span
 							className={ `edit-site-patterns__field-sync-status-${ item.syncStatus }` }
 						>
-							{ SYNC_FILTERS.find(
-								( { value } ) => value === item.syncStatus
-							)?.label ||
-								SYNC_FILTERS.find(
-									( { value } ) =>
-										value === PATTERN_SYNC_TYPES.unsynced
-								).label }
+							{
+								(
+									SYNC_FILTERS.find(
+										( { value } ) =>
+											value === item.syncStatus
+									) ||
+									SYNC_FILTERS.find(
+										( { value } ) =>
+											value ===
+											PATTERN_SYNC_TYPES.unsynced
+									)
+								).label
+							}
 						</span>
 					);
 				},
@@ -351,8 +353,14 @@ export default function DataviewsPatterns() {
 		return filterSortAndPaginate( patterns, viewWithoutFilters, fields );
 	}, [ patterns, view, fields, type ] );
 
-	const templatePartActions = usePostActions( TEMPLATE_PART_POST_TYPE );
-	const patternActions = usePostActions( PATTERN_TYPES.user );
+	const templatePartActions = usePostActions( {
+		postType: TEMPLATE_PART_POST_TYPE,
+		context: 'list',
+	} );
+	const patternActions = usePostActions( {
+		postType: PATTERN_TYPES.user,
+		context: 'list',
+	} );
 	const editAction = useEditPostAction();
 
 	const actions = useMemo( () => {

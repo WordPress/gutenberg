@@ -9,23 +9,22 @@ const CONTENT = 'content';
 export default {
 	name: 'core/pattern-overrides',
 	label: _x( 'Pattern Overrides', 'block bindings source' ),
-	getValue( { registry, clientId, attributeName } ) {
-		const { getBlockAttributes, getBlockParentsByBlockName } =
-			registry.select( blockEditorStore );
+	getValue( { registry, clientId, context, attributeName } ) {
+		const patternOverridesContent = context[ 'pattern/overrides' ];
+		const { getBlockAttributes } = registry.select( blockEditorStore );
 		const currentBlockAttributes = getBlockAttributes( clientId );
-		const [ patternClientId ] = getBlockParentsByBlockName(
-			clientId,
-			'core/block',
-			true
-		);
+
+		if ( ! patternOverridesContent ) {
+			return currentBlockAttributes[ attributeName ];
+		}
 
 		const overridableValue =
-			getBlockAttributes( patternClientId )?.[ CONTENT ]?.[
+			patternOverridesContent?.[
 				currentBlockAttributes?.metadata?.name
 			]?.[ attributeName ];
 
 		// If there is no pattern client ID, or it is not overwritten, return the default value.
-		if ( ! patternClientId || overridableValue === undefined ) {
+		if ( overridableValue === undefined ) {
 			return currentBlockAttributes[ attributeName ];
 		}
 
@@ -89,7 +88,5 @@ export default {
 				},
 			} );
 	},
-	lockAttributesEditing() {
-		return false;
-	},
+	canUserEditValue: () => true,
 };

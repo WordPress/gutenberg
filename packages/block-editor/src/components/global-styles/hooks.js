@@ -77,6 +77,7 @@ const VALID_SETTINGS = [
 	'typography.fontWeight',
 	'typography.letterSpacing',
 	'typography.lineHeight',
+	'typography.textAlign',
 	'typography.textColumns',
 	'typography.textDecoration',
 	'typography.textTransform',
@@ -88,10 +89,7 @@ export const useGlobalStylesReset = () => {
 	const canReset = !! config && ! fastDeepEqual( config, EMPTY_CONFIG );
 	return [
 		canReset,
-		useCallback(
-			() => setUserConfig( () => EMPTY_CONFIG ),
-			[ setUserConfig ]
-		),
+		useCallback( () => setUserConfig( EMPTY_CONFIG ), [ setUserConfig ] ),
 	];
 };
 
@@ -298,6 +296,7 @@ export function useSettingsForBlockElement(
 			'fontStyle',
 			'fontWeight',
 			'letterSpacing',
+			'textAlign',
 			'textTransform',
 			'textDecoration',
 			'writingMode',
@@ -378,8 +377,13 @@ export function useSettingsForBlockElement(
 			? updatedSettings.shadow
 			: false;
 
+		// Text alignment is only available for blocks.
+		if ( element ) {
+			updatedSettings.typography.textAlign = false;
+		}
+
 		return updatedSettings;
-	}, [ parentSettings, supportedStyles, supports ] );
+	}, [ parentSettings, supportedStyles, supports, element ] );
 }
 
 export function useColorsPerOrigin( settings ) {

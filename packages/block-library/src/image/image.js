@@ -49,7 +49,7 @@ import { Caption } from '../utils/caption';
 /**
  * Module constants
  */
-import { TOOLSPANEL_DROPDOWNMENU_PROPS } from '../utils/constants';
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { MIN_SIZE, ALLOWED_MEDIA_TYPES } from './constants';
 import { evalAspectRatio } from './utils';
 
@@ -182,8 +182,7 @@ export default function Image( {
 		allowResize &&
 		hasNonContentControls &&
 		! isWideAligned &&
-		isLargeViewport &&
-		parentLayoutType !== 'grid';
+		isLargeViewport;
 	const imageSizeOptions = imageSizes
 		.filter(
 			( { slug } ) => image?.media_details?.sizes?.[ slug ]?.source_url
@@ -373,6 +372,8 @@ export default function Image( {
 	const lightboxChecked =
 		!! lightbox?.enabled || ( ! lightbox && !! lightboxSetting?.enabled );
 
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
 	const dimensionsControl = (
 		<DimensionsTool
 			value={ { width, height, scale, aspectRatio } }
@@ -403,6 +404,20 @@ export default function Image( {
 		/>
 	);
 
+	const aspectRatioControl = (
+		<DimensionsTool
+			value={ { aspectRatio } }
+			onChange={ ( { aspectRatio: newAspectRatio } ) => {
+				setAttributes( {
+					aspectRatio: newAspectRatio,
+					scale: 'cover',
+				} );
+			} }
+			defaultAspectRatio="auto"
+			tools={ [ 'aspectRatio' ] }
+		/>
+	);
+
 	const resetAll = () => {
 		setAttributes( {
 			alt: undefined,
@@ -419,12 +434,18 @@ export default function Image( {
 			<ToolsPanel
 				label={ __( 'Settings' ) }
 				resetAll={ resetAll }
-				dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
+				dropdownMenuProps={ dropdownMenuProps }
 			>
-				{ isResizable && dimensionsControl }
+				{ isResizable &&
+					( parentLayoutType === 'grid'
+						? aspectRatioControl
+						: dimensionsControl ) }
 			</ToolsPanel>
 		</InspectorControls>
 	);
+
+	const arePatternOverridesEnabled =
+		metadata?.bindings?.__default?.source === 'core/pattern-overrides';
 
 	const {
 		lockUrlControls = false,
@@ -440,16 +461,12 @@ export default function Image( {
 				return {};
 			}
 			const { getBlockBindingsSource } = unlock( select( blocksStore ) );
-			const { getBlockParentsByBlockName } = unlock(
-				select( blockEditorStore )
-			);
 			const {
 				url: urlBinding,
 				alt: altBinding,
 				title: titleBinding,
 			} = metadata?.bindings || {};
-			const hasParentPattern =
-				getBlockParentsByBlockName( clientId, 'core/block' ).length > 0;
+			const hasParentPattern = !! context[ 'pattern/overrides' ];
 			const urlBindingSource = getBlockBindingsSource(
 				urlBinding?.source
 			);
@@ -462,20 +479,26 @@ export default function Image( {
 			return {
 				lockUrlControls:
 					!! urlBinding &&
-					( ! urlBindingSource ||
-						urlBindingSource?.lockAttributesEditing() ),
+					! urlBindingSource?.canUserEditValue( {
+						select,
+						context,
+						args: urlBinding?.args,
+					} ),
 				lockHrefControls:
 					// Disable editing the link of the URL if the image is inside a pattern instance.
 					// This is a temporary solution until we support overriding the link on the frontend.
-					hasParentPattern,
+					hasParentPattern || arePatternOverridesEnabled,
 				lockCaption:
 					// Disable editing the caption if the image is inside a pattern instance.
 					// This is a temporary solution until we support overriding the caption on the frontend.
 					hasParentPattern,
 				lockAltControls:
 					!! altBinding &&
-					( ! altBindingSource ||
-						altBindingSource?.lockAttributesEditing() ),
+					! altBindingSource?.canUserEditValue( {
+						select,
+						context,
+						args: altBinding?.args,
+					} ),
 				lockAltControlsMessage: altBindingSource?.label
 					? sprintf(
 							/* translators: %s: Label of the bindings source. */
@@ -485,8 +508,11 @@ export default function Image( {
 					: __( 'Connected to dynamic data' ),
 				lockTitleControls:
 					!! titleBinding &&
-					( ! titleBindingSource ||
-						titleBindingSource?.lockAttributesEditing() ),
+					! titleBindingSource?.canUserEditValue( {
+						select,
+						context,
+						args: titleBinding?.args,
+					} ),
 				lockTitleControlsMessage: titleBindingSource?.label
 					? sprintf(
 							/* translators: %s: Label of the bindings source. */
@@ -496,7 +522,12 @@ export default function Image( {
 					: __( 'Connected to dynamic data' ),
 			};
 		},
-		[ clientId, isSingleSelected, metadata?.bindings ]
+		[
+			arePatternOverridesEnabled,
+			context,
+			isSingleSelected,
+			metadata?.bindings,
+		]
 	);
 
 	const showUrlInput =
@@ -679,7 +710,7 @@ export default function Image( {
 				<ToolsPanel
 					label={ __( 'Settings' ) }
 					resetAll={ resetAll }
-					dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
+					dropdownMenuProps={ dropdownMenuProps }
 				>
 					{ isSingleSelected && (
 						<ToolsPanelItem
@@ -723,7 +754,10 @@ export default function Image( {
 							/>
 						</ToolsPanelItem>
 					) }
-					{ isResizable && dimensionsControl }
+					{ isResizable &&
+						( parentLayoutType === 'grid'
+							? aspectRatioControl
+							: dimensionsControl ) }
 					{ !! imageSizeOptions.length && (
 						<ResolutionTool
 							value={ sizeSlug }
@@ -833,7 +867,7 @@ export default function Image( {
 				/>
 			</ImageWrapper>
 		);
-	} else if ( ! isResizable ) {
+	} else if ( ! isResizable || parentLayoutType === 'grid' ) {
 		img = (
 			<div style={ { width, height, aspectRatio } }>
 				<ImageWrapper href={ href }>{ img }</ImageWrapper>
@@ -962,7 +996,11 @@ export default function Image( {
 				isSelected={ isSingleSelected }
 				insertBlocksAfter={ insertBlocksAfter }
 				label={ __( 'Image caption text' ) }
-				showToolbarButton={ isSingleSelected && hasNonContentControls }
+				showToolbarButton={
+					isSingleSelected &&
+					hasNonContentControls &&
+					! arePatternOverridesEnabled
+				}
 				readOnly={ lockCaption }
 			/>
 		</>

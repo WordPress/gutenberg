@@ -201,6 +201,7 @@ export default function ShadowsEditPanel() {
 						setIsConfirmDialogVisible( false );
 					} }
 					confirmButtonText={ __( 'Delete' ) }
+					size="medium"
 				>
 					{ sprintf(
 						// translators: %s: name of the shadow
@@ -305,7 +306,7 @@ function ShadowEditor( { shadow, onChange } ) {
 						align="center"
 						className="edit-site-global-styles__shadows-panel__title"
 					>
-						<Subtitle level={ 3 }>Shadows</Subtitle>
+						<Subtitle level={ 3 }>{ __( 'Shadows' ) }</Subtitle>
 					</Flex>
 					<FlexItem className="edit-site-global-styles__shadows-panel__options-container">
 						<Button

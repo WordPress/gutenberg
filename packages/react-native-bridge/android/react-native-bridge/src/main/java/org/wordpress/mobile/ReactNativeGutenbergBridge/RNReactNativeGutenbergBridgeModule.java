@@ -66,6 +66,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     private static final String EVENT_NAME_ON_UNDO_PRESSED = "onUndoPressed";
 
     private static final String EVENT_NAME_ON_REDO_PRESSED = "onRedoPressed";
+    private static final String EVENT_NAME_ON_CONTENT_UPDATE = "onContentUpdate";
 
     private static final String MAP_KEY_UPDATE_HTML = "html";
     private static final String MAP_KEY_UPDATE_TITLE = "title";
@@ -91,6 +92,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     private static final String MAP_KEY_REPLACE_BLOCK_HTML = "html";
     private static final String MAP_KEY_REPLACE_BLOCK_BLOCK_ID = "clientId";
 
+    private static final String MAP_KEY_UPDATE_CONTENT = "content";
     public static final String MAP_KEY_FEATURED_IMAGE_ID = "featuredImageId";
 
     public static final String MAP_KEY_IS_CONNECTED = "isConnected";
@@ -212,6 +214,13 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
 
     public void onRedoPressed() {
         emitToJS(EVENT_NAME_ON_REDO_PRESSED, null);
+    }
+
+    public void onContentUpdate(String content) {
+        WritableMap writableMap = new WritableNativeMap();
+
+        writableMap.putString(MAP_KEY_UPDATE_CONTENT, content);
+        emitToJS(EVENT_NAME_ON_CONTENT_UPDATE, writableMap);
     }
 
     @ReactMethod

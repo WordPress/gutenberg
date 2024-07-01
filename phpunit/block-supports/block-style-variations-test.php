@@ -10,6 +10,41 @@
 
 class WP_Block_Supports_Block_Style_Variations_Test extends WP_UnitTestCase {
 	/**
+	 * Administrator ID.
+	 *
+	 * @var int
+	 */
+	protected static $administrator_id;
+
+	/**
+	 * WP_Theme_JSON_Resolver_Gutenberg::$blocks_cache property.
+	 *
+	 * @var ReflectionProperty
+	 */
+	private static $property_blocks_cache;
+
+	/**
+	 * Original value of the WP_Theme_JSON_Resolver_Gutenberg::$blocks_cache property.
+	 *
+	 * @var array
+	 */
+	private static $property_blocks_cache_orig_value;
+
+	/**
+	 * WP_Theme_JSON_Resolver_Gutenberg::$core property.
+	 *
+	 * @var ReflectionProperty
+	 */
+	private static $property_core;
+
+	/**
+	 * Original value of the WP_Theme_JSON_Resolver_Gutenberg::$core property.
+	 *
+	 * @var WP_Theme_JSON_Gutenberg
+	 */
+	private static $property_core_orig_value;
+
+	/**
 	 * Theme root directory.
 	 *
 	 * @var string|null
@@ -89,6 +124,22 @@ class WP_Block_Supports_Block_Style_Variations_Test extends WP_UnitTestCase {
 			),
 		);
 
+		/*
+		 * This style is to be deliberately overwritten by the theme.json partial
+		 * See `phpunit/data/themedir1/block-theme/styles/block-style-variation-with-slug.json`.
+		 */
+		register_block_style(
+			'core/group',
+			array(
+				'name'       => 'WithSlug',
+				'style_data' => array(
+					'color' => array(
+						'background' => 'whitesmoke',
+						'text'       => 'black',
+					),
+				),
+			)
+		);
 		register_block_style(
 			'core/group',
 			array(
@@ -101,7 +152,6 @@ class WP_Block_Supports_Block_Style_Variations_Test extends WP_UnitTestCase {
 		$group_styles = $theme_json['styles']['blocks']['core/group'] ?? array();
 		$expected     = array(
 			'variations' => array(
-				'my-variation'            => $variation_styles_data,
 
 				/*
 				 * The following block style variations are registered
@@ -120,11 +170,23 @@ class WP_Block_Supports_Block_Style_Variations_Test extends WP_UnitTestCase {
 						'text'       => 'lightblue',
 					),
 				),
+
+				/*
+				 * Manually registered variations.
+				 */
+				'WithSlug'                => array(
+					'color' => array(
+						'background' => 'aliceblue',
+						'text'       => 'midnightblue',
+					),
+				),
+				'my-variation'            => $variation_styles_data,
 			),
 		);
 
 		unregister_block_style( 'core/group', 'my-variation' );
+		unregister_block_style( 'core/group', 'WithSlug' );
 
-		$this->assertSameSetsWithIndex( $group_styles, $expected );
+		$this->assertSameSetsWithIndex( $expected, $group_styles, 'Variation data does not match' );
 	}
 }
