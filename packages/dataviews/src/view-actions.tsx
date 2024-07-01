@@ -315,7 +315,7 @@ function _ViewActions< Item extends AnyItem >( {
 				<Button
 					size="compact"
 					icon={ settings }
-					label={ __( 'View options' ) }
+					label={ __( 'Screen options' ) }
 				/>
 			}
 		>
