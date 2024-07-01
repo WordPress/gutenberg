@@ -67,7 +67,43 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 		switch ( $block_type->attributes[ $attribute_name ]['source'] ) {
 			case 'html':
 			case 'rich-text':
-				$block_reader = new WP_HTML_Tag_Processor( $block_content );
+				// Create private anonymous class because the HTML API doesn't support `set_inner_html` method yet.
+				$block_reader = new class($block_content) extends WP_HTML_Tag_Processor{
+					public function gutenberg_set_inner_text( $new_content ) {
+						$tag_name = $this->get_tag();
+						// Get position of the opener tag.
+						$this->set_bookmark( 'opener_tag' );
+						$opener_tag_bookmark = $this->bookmarks['opener_tag'];
+
+						// Visit the closing tag.
+						if ( ! $this->next_tag(
+							array(
+								'tag_name'    => $tag_name,
+								'tag_closers' => 'visit',
+							)
+						) || ! $this->is_tag_closer() ) {
+							$this->release_bookmark( 'opener_tag' );
+							return null;
+						}
+
+						// Get position of the closer tag.
+						$closer_tag_bookmark = $this->set_bookmark( 'closer_tag' );
+						$closer_tag_bookmark = $this->bookmarks['closer_tag'];
+
+						// Appends the new content.
+						$after_opener_tag        = $opener_tag_bookmark->start + $opener_tag_bookmark->length;
+						$inner_content_length    = $closer_tag_bookmark->start - $after_opener_tag;
+						$this->lexical_updates[] = new WP_HTML_Text_Replacement( $after_opener_tag, $inner_content_length, $new_content );
+						$this->release_bookmark( 'opener_tag' );
+						$this->release_bookmark( 'closer_tag' );
+					}
+				};
+
+				if ( 'core/image' === $block_name && 'caption' === $attribute_name ) {
+					$block_reader->next_tag( 'figcaption' );
+					$block_reader->gutenberg_set_inner_text( wp_kses_post( $source_value ) );
+					return $block_reader->get_updated_html();
+				}
 
 				// TODO: Support for CSS selectors whenever they are ready in the HTML API.
 				// In the meantime, support comma-separated selectors by exploding them into an array.
@@ -122,16 +158,6 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 								$amended_button->set_attribute( $attribute_key, $attribute_value );
 							}
 							return $amended_button->get_updated_html();
-						}
-						if ( 'core/image' === $block_name && 'caption' === $attribute_name ) {
-							// TODO: Don't use regex.
-							return preg_replace_callback(
-								'/<figcaption[^>]*>.*?<\/figcaption>/is',
-								function () use ( $amended_content ) {
-									return $amended_content->get_updated_html();
-								},
-								$block_content
-							);
 						}
 					} else {
 						$block_reader->seek( 'iterate-selectors' );
