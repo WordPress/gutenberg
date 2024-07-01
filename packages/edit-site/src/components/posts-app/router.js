@@ -41,10 +41,12 @@ export default function useLayoutAreas() {
 					/>
 				),
 				content: <PostsList postType={ postType } />,
-				preview: ( isListLayout || canvas === 'edit' ) && <Editor />,
+				preview: ( isListLayout || canvas === 'edit' ) && (
+					<Editor isPostsList />
+				),
 				mobile:
 					canvas === 'edit' ? (
-						<Editor />
+						<Editor isPostsList />
 					) : (
 						<PostsList postType={ postType } />
 					),
@@ -60,8 +62,8 @@ export default function useLayoutAreas() {
 		key: 'default',
 		areas: {
 			sidebar: <SidebarNavigationScreenMain />,
-			preview: <Editor />,
-			mobile: canvas === 'edit' && <Editor />,
+			preview: <Editor isPostsList />,
+			mobile: canvas === 'edit' && <Editor isPostsList />,
 		},
 	};
 }

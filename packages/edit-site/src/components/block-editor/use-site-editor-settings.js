@@ -136,7 +136,10 @@ export function useSpecificEditorSettings() {
 				templateSlug: _record.slug,
 				canvasMode: getCanvasMode(),
 				settings: getSettings(),
-				postWithTemplate: _context?.postId,
+				postWithTemplate:
+					// TODO: The `postType` check should be removed when the default rendering mode per post type is merged.
+					// @see https://github.com/WordPress/gutenberg/pull/62304/
+					_context?.postId && _context?.postType !== 'post',
 			};
 		},
 		[]
