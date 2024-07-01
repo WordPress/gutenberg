@@ -45,8 +45,8 @@ function gutenberg_replace_pattern_override_default_binding( $parsed_block ) {
 
 add_filter( 'render_block_data', 'gutenberg_replace_pattern_override_default_binding', 10, 1 );
 
-// Only process caption in WordPress 6.5.
-if ( ! is_wp_version_compatible( '6.6' ) && is_wp_version_compatible( '6.5' ) ) {
+// Only process caption for compat versions of WordPress.
+if ( ! is_wp_version_compatible( '6.6' ) ) {
 	/**
 	 * Replace the caption value in the HTML based on the binding value.
 	 *
@@ -72,16 +72,8 @@ if ( ! is_wp_version_compatible( '6.6' ) && is_wp_version_compatible( '6.5' ) ) 
 			 * @return bool Whether the inner text was properly replaced.
 			 */
 			public function gutenberg_set_inner_text( $new_content ) {
-				/*
-				 * THIS IS A STOP-GAP MEASURE NOT TO BE EMULATED.
-				 *
-				 * Check that the processor is paused on an opener tag.
-				 *
-				 */
-				if (
-					WP_HTML_Tag_Processor::STATE_MATCHED_TAG !== $this->parser_state ||
-					$this->is_tag_closer()
-				) {
+				// Check that the processor is paused on an opener tag.
+				if ( $this->is_tag_closer() ) {
 					return false;
 				}
 
@@ -110,13 +102,19 @@ if ( ! is_wp_version_compatible( '6.6' ) && is_wp_version_compatible( '6.5' ) ) 
 				$closer_tag_bookmark = $this->bookmarks['closer_tag'];
 
 				// Appends the new content.
+				// Compat for 6.4, where bookmarks and WP_HTML_Text_Replacement are different.
+				if ( ! empty( $opener_tag_bookmark->end ) ) {
+					$this->lexical_updates[] = new WP_HTML_Text_Replacement( $opener_tag_bookmark->end + 1, $closer_tag_bookmark->start, $new_content );
+					return true;
+				}
+
 				$after_opener_tag = $opener_tag_bookmark->start + $opener_tag_bookmark->length;
 				/*
 				 * There was a bug in the HTML Processor token length fixed after 6.5.
 				 * This check is needed to add compatibility for that.
 				 * Related issue: https://github.com/WordPress/wordpress-develop/pull/6625
 				 */
-				if ( '>' !== $this->html[ $after_opener_tag - 1 ] ) {
+				if ( '>' === $this->html[ $after_opener_tag ] ) {
 					++$after_opener_tag;
 				}
 				$inner_content_length    = $closer_tag_bookmark->start - $after_opener_tag;
@@ -128,6 +126,7 @@ if ( ! is_wp_version_compatible( '6.6' ) && is_wp_version_compatible( '6.5' ) ) 
 			 * Add a new HTML element after the current tag.
 			 *
 			 * @param string $new_element New HTML element to append after the current tag.
+			 * @return bool Whether the element was properly appended.
 			 */
 			public function gutenberg_append_element_after_tag( $new_element ) {
 				$tag_name = $this->get_tag();
@@ -146,7 +145,12 @@ if ( ! is_wp_version_compatible( '6.6' ) && is_wp_version_compatible( '6.5' ) ) 
 				// Get position of the closer tag.
 				$this->set_bookmark( 'closer_tag' );
 				$closer_tag_bookmark = $this->bookmarks['closer_tag'];
-				$after_closer_tag    = $closer_tag_bookmark->start + $closer_tag_bookmark->length;
+				// Compat for 6.4, where bookmarks and WP_HTML_Text_Replacement are different.
+				if ( ! empty( $closer_tag_bookmark->end ) ) {
+					$this->lexical_updates[] = new WP_HTML_Text_Replacement( $closer_tag_bookmark->end + 1, $closer_tag_bookmark->end + 1, $new_element );
+					return true;
+				}
+				$after_closer_tag = $closer_tag_bookmark->start + $closer_tag_bookmark->length;
 				/*
 				 * There was a bug in the HTML Processor token length fixed after 6.5.
 				 * This check is needed to add compatibility for that.
@@ -158,6 +162,7 @@ if ( ! is_wp_version_compatible( '6.6' ) && is_wp_version_compatible( '6.5' ) ) 
 
 				// Append the new element.
 				$this->lexical_updates[] = new WP_HTML_Text_Replacement( $after_closer_tag, 0, $new_element );
+				return true;
 			}
 
 			/**
@@ -186,6 +191,12 @@ if ( ! is_wp_version_compatible( '6.6' ) && is_wp_version_compatible( '6.5' ) ) 
 				// Get position of the tags.
 				$opener_tag_bookmark = $this->bookmarks['opener_tag'];
 				$closer_tag_bookmark = $this->bookmarks['closer_tag'];
+
+				// Compat for 6.4, where bookmarks and WP_HTML_Text_Replacement are different.
+				if ( ! empty( $closer_tag_bookmark->end ) ) {
+					$this->lexical_updates[] = new WP_HTML_Text_Replacement( $opener_tag_bookmark->start, $closer_tag_bookmark->end + 1, '' );
+					return true;
+				}
 
 				$after_closer_tag = $closer_tag_bookmark->start + $closer_tag_bookmark->length;
 				/*
