@@ -272,6 +272,12 @@ function GridLayoutColumnsAndRowsControl( {
 	return (
 		<>
 			<fieldset>
+				{ ( ! window.__experimentalEnableGridInteractivity ||
+					! manualPlacement ) && (
+					<BaseControl.VisualLabel as="legend">
+						{ __( 'Columns' ) }
+					</BaseControl.VisualLabel>
+				) }
 				<Flex gap={ 4 }>
 					<FlexItem isBlock>
 						<NumberControl
@@ -293,6 +299,10 @@ function GridLayoutColumnsAndRowsControl( {
 							value={ columnCount }
 							min={ 0 }
 							label={ __( 'Columns' ) }
+							hideLabelFromVision={
+								! window.__experimentalEnableGridInteractivity ||
+								! manualPlacement
+							}
 						/>
 					</FlexItem>
 
@@ -383,6 +393,15 @@ function GridLayoutTypeControl( { layout, onChange } ) {
 		} );
 	};
 
+	const helpText =
+		gridPlacement === 'manual'
+			? __(
+					'Grid items can be manually placed in any position on the grid.'
+			  )
+			: __(
+					'Grid items are placed automatically depending on their order.'
+			  );
+
 	return (
 		<ToggleGroupControl
 			__nextHasNoMarginBottom
@@ -391,13 +410,9 @@ function GridLayoutTypeControl( { layout, onChange } ) {
 			onChange={ onChangeType }
 			isBlock
 			help={
-				gridPlacement === 'manual'
-					? __(
-							'Grid items can be manually placed in any position on the grid.'
-					  )
-					: __(
-							'Grid items are placed automatically depending on their order.'
-					  )
+				window.__experimentalEnableGridInteractivity
+					? helpText
+					: undefined
 			}
 		>
 			<ToggleGroupControlOption
