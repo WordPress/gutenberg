@@ -45,8 +45,8 @@ function gutenberg_replace_pattern_override_default_binding( $parsed_block ) {
 
 add_filter( 'render_block_data', 'gutenberg_replace_pattern_override_default_binding', 10, 1 );
 
-// Only process block bindings if they are not processed in core.
-if ( ! is_wp_version_compatible( '6.6' ) ) {
+// Only process caption in WordPress 6.5.
+if ( ! is_wp_version_compatible( '6.6' ) && is_wp_version_compatible( '6.5' ) ) {
 	/**
 	 * Replace the caption value in the HTML based on the binding value.
 	 *
