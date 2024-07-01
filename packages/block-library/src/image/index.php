@@ -22,7 +22,66 @@ function render_block_core_image( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$p = new WP_HTML_Tag_Processor( $content );
+	/*
+	 * Use a private anonymous class until the HTML API provides similar methods.
+	 * TODO: Replace the logic to remove the `figcaption` when HTML API provides its own methods.
+	 *
+	 * @phpcs:disable Gutenberg.NamingConventions.ValidBlockLibraryFunctionName.FunctionNameInvalid, Gutenberg.Commenting.SinceTag.MissingMethodSinceTag
+	 */
+	$p = new class( $content ) extends WP_HTML_Tag_Processor {
+		public function append_element_after_tag( $new_element ) {
+			$tag_name = $this->get_tag();
+			$this->set_bookmark( 'current_tag' );
+			// Visit the closing tag if exists.
+			if ( ! $this->next_tag(
+				array(
+					'tag_name'    => $tag_name,
+					'tag_closers' => 'visit',
+				)
+			) || ! $this->is_tag_closer() ) {
+				$this->seek( 'current_tag' );
+				$this->release_bookmark( 'current_tag' );
+			}
+
+			// Get position of the closer tag.
+			$this->set_bookmark( 'closer_tag' );
+			$closer_tag_bookmark = $this->bookmarks['closer_tag'];
+
+			// Append the new element.
+			$this->lexical_updates[] = new WP_HTML_Text_Replacement( $closer_tag_bookmark->start + $closer_tag_bookmark->length, 0, $new_element );
+			$this->release_bookmark( 'closer_tag' );
+		}
+
+		public function remove_current_tag_element() {
+			// Get position of the opener tag.
+			$this->set_bookmark( 'opener_tag' );
+			$opener_tag_bookmark = $this->bookmarks['opener_tag'];
+
+			// Visit the closing tag.
+			$tag_name = $this->get_tag();
+			if ( ! $this->next_tag(
+				array(
+					'tag_name'    => $tag_name,
+					'tag_closers' => 'visit',
+				)
+			) || ! $this->is_tag_closer() ) {
+				$this->release_bookmark( 'opener_tag' );
+				return null;
+			}
+
+			// Get position of the closer tag.
+			$this->set_bookmark( 'closer_tag' );
+			$closer_tag_bookmark = $this->bookmarks['closer_tag'];
+
+			// Remove the current tag.
+			$after_closer_tag        = $closer_tag_bookmark->start + $closer_tag_bookmark->length;
+			$current_tag_length      = $after_closer_tag - $opener_tag_bookmark->start;
+			$this->lexical_updates[] = new WP_HTML_Text_Replacement( $opener_tag_bookmark->start, $current_tag_length, '' );
+			$this->release_bookmark( 'opener_tag' );
+			$this->release_bookmark( 'closer_tag' );
+		}
+	};
+	// @phpcs:enable
 
 	if ( $p->next_tag( 'figure' ) ) {
 		$p->set_bookmark( 'figure' );
@@ -82,34 +141,27 @@ function render_block_core_image( $attributes, $content, $block ) {
 		remove_filter( 'render_block_core/image', 'block_core_image_render_lightbox', 15 );
 	}
 
-	// TODO: Replace the logic to remove the `figcaption` when HTML API provides its own methods.
-	$new_content = $p->get_updated_html();
-
-	// Remove `<figcaption>` if caption is empty.
 	$p->seek( 'figure' );
 	if ( $p->next_tag( 'figcaption' ) ) {
-		// If the next token is the closing tag, the caption is empty.
-		$is_empty = true;
-		$tag      = $p->get_tag();
-		while ( $p->next_token() && $tag !== $p->get_token_name() && $is_empty ) {
-			if ( '#comment' !== $p->get_token_type() ) {
-				/**
-				 * Anything else implies this is not empty.
-				 * This might include any text content (including a space),
-				 * inline images or other HTML.
-				 */
-				$is_empty = false;
-			}
+		// Remove `<figcaption>` if exists and caption attribute exists but it is empty.
+		if ( isset( $attributes['caption'] ) && strlen( $attributes['caption'] ) === 0 ) {
+			$p->remove_current_tag_element();
 		}
-
-		if ( $is_empty ) {
-			$new_content = preg_replace( '/<figcaption[^>]*>.*?<\/figcaption>/is', '', $new_content );
+	} else {
+		// Add caption if it doesn't exist and the caption is not empty.
+		if ( ! empty( $attributes['caption'] ) ) {
+			$p->seek( 'figure' );
+			// Append caption after link or image.
+			if ( ! $p->next_tag( 'a' ) ) {
+				$p->seek( 'figure' );
+				$p->next_tag( 'img' );
+			}
+			$p->append_element_after_tag( '<figcaption class="wp-element-caption">' . $attributes['caption'] . '</figcaption>' );
 		}
 	}
-
 	$p->release_bookmark( 'figure' );
 
-	return $new_content;
+	return $p->get_updated_html();
 }
 
 /**

@@ -86,11 +86,13 @@ export default function save( { attributes } ) {
 			) : (
 				image
 			) }
-			<RichText.Content
-				className={ __experimentalGetElementClassName( 'caption' ) }
-				tagName="figcaption"
-				value={ caption }
-			/>
+			{ ! RichText.isEmpty( caption ) && (
+				<RichText.Content
+					className={ __experimentalGetElementClassName( 'caption' ) }
+					tagName="figcaption"
+					value={ caption }
+				/>
+			) }
 		</>
 	);
 
