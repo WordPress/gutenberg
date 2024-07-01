@@ -24,6 +24,9 @@ function render_block_core_image( $attributes, $content, $block ) {
 
 	$p = new WP_HTML_Tag_Processor( $content );
 
+	if ( $p->next_tag( 'figure' ) ) {
+		$p->set_bookmark( 'figure' );
+	}
 	if ( ! $p->next_tag( 'img' ) || null === $p->get_attribute( 'src' ) ) {
 		return '';
 	}
@@ -35,6 +38,42 @@ function render_block_core_image( $attributes, $content, $block ) {
 		// `render_block_data` hook.
 		$p->set_attribute( 'data-id', $attributes['data-id'] );
 	}
+
+	// Wrap the image with an anchor tag if it's not already wrapped and href is defined.
+	// This could happen when using block bindings.
+	$p->seek( 'figure' );
+	if ( ! $p->next_tag( 'a' ) && ! empty( $attributes['href'] ) ) {
+		// Build the anchor tag manually until the HTML API can handle it.
+		$anchor_tag = '<a href="' . esc_url( $attributes['href'] ) . '"';
+		// Add class attribute if exists.
+		if ( ! empty( $attributes['linkClass'] ) ) {
+			$anchor_tag .= ' class="' . $attributes['linkClass'] . '"';
+		}
+		// Add target attribute if exists.
+		if ( ! empty( $attributes['linkTarget'] ) ) {
+			$anchor_tag .= ' target="' . $attributes['linkTarget'] . '"';
+		}
+		// Add rel attribute if exists.
+		if ( ! empty( $attributes['rel'] ) ) {
+			$anchor_tag .= ' rel="' . $attributes['rel'] . '"';
+		}
+		$anchor_tag .= '>';
+
+		// Replace the img tag with an a tag wrapped around it using regular expressions.
+		$content = preg_replace( '/(<img[^>]+>)/', $anchor_tag . '$1</a>', $content );
+		$p       = new WP_HTML_Tag_Processor( $content );
+	}
+
+	// Add the caption if it doesn't exist and caption is defined.
+	// This could happen when using block bindings.
+	$p->seek( 'figure' );
+	if ( ! $p->next_tag( 'figcaption' ) && ! empty( $attributes['caption'] ) ) {
+		$caption_tag = '<figcaption class="wp-element-caption">' . $attributes['caption'] . '</figcaption>';
+		$content     = str_replace( '</figure>', $caption_tag . '</figure>', $content );
+		$p           = new WP_HTML_Tag_Processor( $content );
+	}
+
+	$p->release_bookmark( 'figure' );
 
 	$link_destination  = isset( $attributes['linkDestination'] ) ? $attributes['linkDestination'] : 'none';
 	$lightbox_settings = block_core_image_get_lightbox_settings( $block->parsed_block );
