@@ -17,11 +17,11 @@ Note that `PLUGIN_NAME` and `PLUGIN-SLUG` are used here as placeholders and shou
 - .npmrc
 - assets/
 	- screenshot-*.png
+- block.json (for block plugins)
 - package.json
 - phpcs.xml.dist
 - readme.txt
 - src/
-	- block.json (for block plugins)
 	- index.js
 	- style.scss
 - PLUGIN-SLUG.php
@@ -97,7 +97,7 @@ The block name should use the prefix `gutenberg` (e.g. `gutenberg/block-name` ) 
 
 ### block.json
 
-Block plugins should define a `block.json` file in the `src/` directory. Plugins should use the most recent `block.json` version supported by the current WordPress release.
+Block plugins should define a `block.json` file. Currently the `block.json` file should be located in `plugins/PLUGIN-SLUG/block.json`, rather than `plugins/PLUGIN-SLUG/src/block.json`, so it will be available in the Github PHPUnit test environment for block registration. Plugins should use the most recent `block.json` version supported by the current WordPress release.
 
 `block.json` files for plugins have some differeneces from those for core blocks (from `@wordpress/block-library`)
 
