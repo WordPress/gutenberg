@@ -82,19 +82,8 @@ function render_block_core_image( $attributes, $content, $block ) {
 		remove_filter( 'render_block_core/image', 'block_core_image_render_lightbox', 15 );
 	}
 
-	// TODO: Replace the logic to remove the `a` tag wrapper and `figcaption` when HTML API provides its own methods.
+	// TODO: Replace the logic to remove the `figcaption` when HTML API provides its own methods.
 	$new_content = $p->get_updated_html();
-	// Remove `<a>` tag wrapper if it hasn't `href` attribute.
-	$p->seek( 'figure' );
-	if ( $p->next_tag( 'a' ) && empty( $p->get_attribute( 'href' ) ) ) {
-		$new_content = preg_replace_callback(
-			'/<a[^>]*>(.*?)<\/a>/is',
-			function ( $matches ) {
-				return $matches[1];
-			},
-			$new_content
-		);
-	}
 
 	// Remove `<figcaption>` if caption is empty.
 	$p->seek( 'figure' );
