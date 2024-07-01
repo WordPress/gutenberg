@@ -125,7 +125,13 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 						}
 						if ( 'core/image' === $block_name && 'caption' === $attribute_name ) {
 							// TODO: Don't use regex.
-							return preg_replace( '/(<figcaption[^>]*>)(.*?)(<\/figcaption>)/i', $amended_content->get_updated_html(), $block_content );
+							return preg_replace_callback(
+								'/<figcaption[^>]*>.*?<\/figcaption>/is',
+								function () use ( $amended_content ) {
+									return $amended_content->get_updated_html();
+								},
+								$block_content
+							);
 						}
 					} else {
 						$block_reader->seek( 'iterate-selectors' );
