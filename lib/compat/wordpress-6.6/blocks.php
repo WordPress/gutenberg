@@ -116,7 +116,7 @@ if ( ! is_wp_version_compatible( '6.6' ) && is_wp_version_compatible( '6.5' ) ) 
 				 * This check is needed to add compatibility for that.
 				 * Related issue: https://github.com/WordPress/wordpress-develop/pull/6625
 				 */
-				if ( '>' === $this->html[ $after_opener_tag ] ) {
+				if ( '>' !== $this->html[ $after_opener_tag - 1 ] ) {
 					++$after_opener_tag;
 				}
 				$inner_content_length    = $closer_tag_bookmark->start - $after_opener_tag;
