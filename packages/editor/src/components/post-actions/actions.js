@@ -757,9 +757,9 @@ const useDuplicatePostAction = ( postType ) => {
 						<DataForm
 							title={ title }
 							setTitle={ setTitle }
-							createPage={ createPage }
-							closeModal={ closeModal }
-							isCreatingPage={ isCreatingPage }
+							onSubmit={ createPage }
+							closeForm={ closeModal }
+							isBusy={ isCreatingPage }
 						/>
 					);
 				},

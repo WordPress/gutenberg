@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { FormEventHandler } from 'react'; // TODO: how to import FormEventHandler?
+
+/**
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
@@ -12,20 +17,20 @@ import {
 type DataFormProps = {
 	title: any;
 	setTitle: any;
-	createPage: any;
-	closeModal: any;
-	isCreatingPage: any;
+	onSubmit: FormEventHandler;
+	closeForm: any;
+	isBusy: any;
 };
 
 export default function DataForm( {
-	createPage,
 	title,
 	setTitle,
-	closeModal,
-	isCreatingPage,
+	onSubmit,
+	closeForm,
+	isBusy,
 }: DataFormProps ) {
 	return (
-		<form onSubmit={ createPage }>
+		<form onSubmit={ onSubmit }>
 			<VStack spacing={ 3 }>
 				<TextControl
 					label={ __( 'Title' ) }
@@ -34,14 +39,14 @@ export default function DataForm( {
 					value={ title }
 				/>
 				<HStack spacing={ 2 } justify="end">
-					<Button variant="tertiary" onClick={ closeModal }>
+					<Button variant="tertiary" onClick={ closeForm }>
 						{ __( 'Cancel' ) }
 					</Button>
 					<Button
 						variant="primary"
 						type="submit"
-						isBusy={ isCreatingPage }
-						aria-disabled={ isCreatingPage }
+						isBusy={ isBusy }
+						aria-disabled={ isBusy }
 					>
 						{ _x( 'Duplicate', 'action label' ) }
 					</Button>
