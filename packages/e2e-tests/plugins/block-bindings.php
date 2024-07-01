@@ -50,5 +50,15 @@ function gutenberg_test_block_bindings_register_custom_fields() {
 			'default'      => 'show_in_rest false field value',
 		)
 	);
+	register_meta(
+		'post',
+		'empty_custom_field',
+		array(
+			'show_in_rest' => true,
+			'type'         => 'string',
+			'single'       => true,
+			'default'      => '',
+		)
+	);
 }
 add_action( 'init', 'gutenberg_test_block_bindings_register_custom_fields' );

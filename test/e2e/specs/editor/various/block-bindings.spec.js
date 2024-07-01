@@ -1083,6 +1083,48 @@ test.describe( 'Block bindings', () => {
 				expect( titleValue ).toBe( 'default title value' );
 			} );
 
+			test( 'should hide caption control and lock editing when it is bound', async ( {
+				editor,
+				page,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/image',
+					attributes: {
+						url: imagePlaceholderSrc,
+						caption: 'default caption value',
+						metadata: {
+							bindings: {
+								caption: {
+									source: 'core/post-meta',
+									args: { key: 'text_custom_field' },
+								},
+							},
+						},
+					},
+				} );
+				const imageBlock = editor.canvas.getByRole( 'document', {
+					name: 'Block: Image',
+				} );
+				await imageBlock.click();
+
+				// Control to remove caption doesn't exist.
+				await expect(
+					page
+						.getByRole( 'toolbar', { name: 'Block tools' } )
+						.getByLabel( 'Remove caption' )
+				).toBeHidden();
+
+				// Caption shows the custom field key.
+				const caption = imageBlock.getByLabel( 'Image caption text' );
+				await expect( caption ).toHaveText( 'text_custom_field' );
+
+				// Caption is not editable.
+				await expect( caption ).toHaveAttribute(
+					'contenteditable',
+					'false'
+				);
+			} );
+
 			test( 'Multiple bindings should lock the appropriate controls', async ( {
 				editor,
 				page,
@@ -1853,6 +1895,122 @@ test.describe( 'Block bindings', () => {
 				);
 			} );
 
+			test( 'should show value of the custom field in the caption rich text when caption is bound', async ( {
+				editor,
+				page,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/image',
+					attributes: {
+						anchor: 'image-caption-binding',
+						url: imagePlaceholderSrc,
+						caption: 'default caption value',
+						metadata: {
+							bindings: {
+								caption: {
+									source: 'core/post-meta',
+									args: { key: 'text_custom_field' },
+								},
+							},
+						},
+					},
+				} );
+				const imageBlock = editor.canvas.getByRole( 'document', {
+					name: 'Block: Image',
+				} );
+				await imageBlock.click();
+
+				// Control to remove caption doesn't exist.
+				await expect(
+					page
+						.getByRole( 'toolbar', { name: 'Block tools' } )
+						.getByLabel( 'Remove caption' )
+				).toBeHidden();
+
+				// Caption shows the custom field value.
+				const caption = imageBlock.getByLabel( 'Image caption text' );
+				await expect( caption ).toHaveText(
+					'Value of the text_custom_field'
+				);
+
+				// The value of the custom field is shown in the frontend.
+				const previewPage = await editor.openPreviewPage();
+				const figureDom = previewPage.locator(
+					'#image-caption-binding figcaption'
+				);
+				await expect( figureDom ).toHaveText(
+					'Value of the text_custom_field'
+				);
+			} );
+
+			test( 'should add figcaption element when original caption is empty but it is bound to a value', async ( {
+				editor,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/image',
+					attributes: {
+						anchor: 'image-caption-binding',
+						url: imagePlaceholderSrc,
+						metadata: {
+							bindings: {
+								caption: {
+									source: 'core/post-meta',
+									args: { key: 'text_custom_field' },
+								},
+							},
+						},
+					},
+				} );
+				const imageBlock = editor.canvas.getByRole( 'document', {
+					name: 'Block: Image',
+				} );
+				await imageBlock.click();
+
+				// Caption shows the custom field value in the editor.
+				const caption = imageBlock.getByLabel( 'Image caption text' );
+				await expect( caption ).toHaveText(
+					'Value of the text_custom_field'
+				);
+
+				// The value of the custom field is shown in the figcaption element.
+				const previewPage = await editor.openPreviewPage();
+				const figureDom = previewPage.locator(
+					'#image-caption-binding figcaption'
+				);
+				await expect( figureDom ).toHaveText(
+					'Value of the text_custom_field'
+				);
+			} );
+
+			test( 'should remove figcaption element when bound to an empty value', async ( {
+				editor,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/image',
+					attributes: {
+						anchor: 'image-caption-binding',
+						url: imagePlaceholderSrc,
+						caption: 'default caption value',
+						metadata: {
+							bindings: {
+								caption: {
+									source: 'core/post-meta',
+									args: { key: 'empty_custom_field' },
+								},
+							},
+						},
+					},
+				} );
+
+				// Wait until the image is loaded.
+				const previewPage = await editor.openPreviewPage();
+				await previewPage.locator( '#image-caption-binding' ).waitFor();
+				// Check the figcaption doesn't exist.
+				await expect(
+					previewPage.locator( '#image-caption-binding figcaption' )
+				).toHaveCount( 0 );
+			} );
+
 			test( 'Multiple bindings should show the value of the custom fields', async ( {
 				editor,
 				page,
@@ -2169,6 +2327,48 @@ test.describe( 'Block bindings', () => {
 				await expect(
 					previewPage.locator( '#image-alt-binding img' )
 				).toHaveAttribute( 'alt', 'new value' );
+			} );
+
+			test( 'should be possible to edit the value of the text custom field from the image caption', async ( {
+				editor,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/image',
+					attributes: {
+						anchor: 'image-caption-binding',
+						url: imagePlaceholderSrc,
+						caption: 'default caption value',
+						metadata: {
+							bindings: {
+								caption: {
+									source: 'core/post-meta',
+									args: { key: 'text_custom_field' },
+								},
+							},
+						},
+					},
+				} );
+				const imageBlock = editor.canvas.getByRole( 'document', {
+					name: 'Block: Image',
+				} );
+				await imageBlock.click();
+
+				// Edit the custom field value in the caption input text.
+				const captionInput =
+					imageBlock.getByLabel( 'Image caption text' );
+				await expect( captionInput ).not.toHaveAttribute( 'readonly' );
+				await captionInput.fill( 'new value' );
+
+				// Check that the image caption attribute didn't change.
+				const [ imageBlockObject ] = await editor.getBlocks();
+				expect( imageBlockObject.attributes.caption ).toBe(
+					'default caption value'
+				);
+				// Check the value of the custom field is being updated by visiting the frontend.
+				const previewPage = await editor.openPreviewPage();
+				await expect(
+					previewPage.locator( '#image-caption-binding figcaption' )
+				).toHaveText( 'new value' );
 			} );
 		} );
 	} );
