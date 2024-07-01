@@ -20,7 +20,17 @@ export const PARTIAL_SYNCING_SUPPORTED_BLOCKS = {
 	'core/paragraph': [ 'content' ],
 	'core/heading': [ 'content' ],
 	'core/button': [ 'text', 'url', 'linkTarget', 'rel' ],
-	'core/image': [ 'id', 'url', 'title', 'alt' ],
+	'core/image': [
+		'id',
+		'url',
+		'title',
+		'alt',
+		'caption',
+		'href',
+		'rel',
+		'linkClass',
+		'linkTarget',
+	],
 };
 
 export const PATTERN_OVERRIDES_BINDING_SOURCE = 'core/pattern-overrides';
