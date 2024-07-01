@@ -81,7 +81,6 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 						 * @return bool Whether the inner text was properly replaced.
 						 */
 						public function gutenberg_set_inner_text( $new_content ) {
-							return;
 							/*
 							 * THIS IS A STOP-GAP MEASURE NOT TO BE EMULATED.
 							 *
