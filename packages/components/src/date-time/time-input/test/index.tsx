@@ -9,7 +9,7 @@ import userEvent from '@testing-library/user-event';
  */
 import TimeInput from '..';
 
-describe( 'TimePicker', () => {
+describe( 'TimeInput', () => {
 	it( 'should call onChange with updated values | 24-hours format', async () => {
 		const user = userEvent.setup();
 
