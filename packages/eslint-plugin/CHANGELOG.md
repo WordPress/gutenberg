@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+- `@typescript-eslint/no-unused-vars` is now turned on with level "error" when running `wp-scripts lint-js`.
+
 ## 19.2.0 (2024-06-26)
 
 ## 19.1.0 (2024-06-15)
