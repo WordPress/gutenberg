@@ -564,6 +564,7 @@ describe.each( [
 				expanded: false,
 			} );
 
+			await sleep();
 			await press.Tab();
 			expect( currentSelectedItem ).toHaveFocus();
 			expect( currentSelectedItem ).toHaveTextContent(
