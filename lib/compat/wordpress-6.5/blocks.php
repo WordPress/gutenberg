@@ -67,44 +67,72 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 		switch ( $block_type->attributes[ $attribute_name ]['source'] ) {
 			case 'html':
 			case 'rich-text':
-				// Create private anonymous class because the HTML API doesn't support `set_inner_html` method yet.
-				$block_reader = new class($block_content) extends WP_HTML_Tag_Processor{
-					public function gutenberg_set_inner_text( $new_content ) {
-						$tag_name = $this->get_tag();
-						// Get position of the opener tag.
-						$this->set_bookmark( 'opener_tag' );
-						$opener_tag_bookmark = $this->bookmarks['opener_tag'];
-
-						// Visit the closing tag.
-						if ( ! $this->next_tag(
-							array(
-								'tag_name'    => $tag_name,
-								'tag_closers' => 'visit',
-							)
-						) || ! $this->is_tag_closer() ) {
-							$this->release_bookmark( 'opener_tag' );
-							return null;
-						}
-
-						// Get position of the closer tag.
-						$closer_tag_bookmark = $this->set_bookmark( 'closer_tag' );
-						$closer_tag_bookmark = $this->bookmarks['closer_tag'];
-
-						// Appends the new content.
-						$after_opener_tag        = $opener_tag_bookmark->start + $opener_tag_bookmark->length;
-						$inner_content_length    = $closer_tag_bookmark->start - $after_opener_tag;
-						$this->lexical_updates[] = new WP_HTML_Text_Replacement( $after_opener_tag, $inner_content_length, $new_content );
-						$this->release_bookmark( 'opener_tag' );
-						$this->release_bookmark( 'closer_tag' );
-					}
-				};
-
 				if ( 'core/image' === $block_name && 'caption' === $attribute_name ) {
+					// Create private anonymous class until the HTML API provides `set_inner_html` method.
+					$block_reader = new class($block_content) extends WP_HTML_Tag_Processor{
+						/**
+						 * Replace the inner text of an HTML with the passed content.
+						 *
+						 * THIS IS A TEMPORARY SOLUTION IN CORE NOT TO BE EMULATED.
+						 * IT IS A TEMPORARY SOLUTION THAT JUST WORKS FOR THIS SPECIFIC
+						 * USE CASE UNTIL THE HTML PROCESSOR PROVIDES ITS OWN METHOD.
+						 *
+						 * @param string $new_content New text to insert in the HTML element.
+						 * @return bool Whether the inner text was properly replaced.
+						 */
+						public function gutenberg_set_inner_text( $new_content ) {
+							return;
+							/*
+							 * THIS IS A STOP-GAP MEASURE NOT TO BE EMULATED.
+							 *
+							 * Check that the processor is paused on an opener tag.
+							 *
+							 */
+							if (
+								WP_HTML_Tag_Processor::STATE_MATCHED_TAG !== $this->parser_state ||
+								$this->is_tag_closer()
+							) {
+								return false;
+							}
+
+							// Set position of the opener tag.
+							$this->set_bookmark( 'opener_tag' );
+
+							/*
+							 * This is a best-effort guess to visit the closer tag and check it exists.
+							 * In the future, this code should rely on the HTML Processor for this kind of operation.
+							 */
+							$tag_name = $this->get_tag();
+							if ( ! $this->next_tag(
+								array(
+									'tag_name'    => $tag_name,
+									'tag_closers' => 'visit',
+								)
+							) || ! $this->is_tag_closer() ) {
+								return false;
+							}
+
+							// Set position of the closer tag.
+							$this->set_bookmark( 'closer_tag' );
+
+							// Get opener and closer tag bookmarks.
+							$opener_tag_bookmark = $this->bookmarks['_opener_tag'];
+							$closer_tag_bookmark = $this->bookmarks['_closer_tag'];
+
+							// Appends the new content.
+							$after_opener_tag        = $opener_tag_bookmark->start + $opener_tag_bookmark->length;
+							$inner_content_length    = $closer_tag_bookmark->start - $after_opener_tag;
+							$this->lexical_updates[] = new WP_HTML_Text_Replacement( $after_opener_tag, $inner_content_length, $new_content );
+							return true;
+						}
+					};
 					if ( $block_reader->next_tag( 'figcaption' ) ) {
 						$block_reader->gutenberg_set_inner_text( wp_kses_post( $source_value ) );
 					}
 					return $block_reader->get_updated_html();
 				}
+
+				$block_reader = new WP_HTML_Tag_Processor( $block_content );
 
 				// TODO: Support for CSS selectors whenever they are ready in the HTML API.
 				// In the meantime, support comma-separated selectors by exploding them into an array.
