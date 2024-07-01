@@ -70,8 +70,6 @@ export default function save( { attributes } ) {
 		/>
 	);
 
-	// Always add the figcaption element.
-	// It will be removed in the `render.php` if needed.
 	const figure = (
 		<>
 			{ href ? (
