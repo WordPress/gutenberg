@@ -167,9 +167,8 @@ if ( ! is_wp_version_compatible( '6.6' ) ) {
 			 * @return bool Whether the element was properly removed.
 			 */
 			public function gutenberg_remove_current_tag_element() {
-				// Get position of the opener tag.
+				// Set position of the opener tag.
 				$this->set_bookmark( 'opener_tag' );
-				$opener_tag_bookmark = $this->bookmarks['opener_tag'];
 
 				// Visit the closing tag.
 				$tag_name = $this->get_tag();
@@ -183,11 +182,13 @@ if ( ! is_wp_version_compatible( '6.6' ) ) {
 					return false;
 				}
 
-				// Get position of the closer tag.
+				// Set position of the closer tag.
 				$this->set_bookmark( 'closer_tag' );
+
+				// Get position of the tags.
+				$opener_tag_bookmark = $this->bookmarks['opener_tag'];
 				$closer_tag_bookmark = $this->bookmarks['closer_tag'];
 
-				// Remove the current tag.
 				$after_closer_tag = $closer_tag_bookmark->start + $closer_tag_bookmark->length;
 				/*
 				 * There was a bug in the HTML Processor token length fixed after 6.5.
@@ -197,7 +198,9 @@ if ( ! is_wp_version_compatible( '6.6' ) ) {
 				if ( '>' === $this->html[ $after_closer_tag ] ) {
 					++$after_closer_tag;
 				}
-				$current_tag_length      = $after_closer_tag - $opener_tag_bookmark->start;
+				$current_tag_length = $after_closer_tag - $opener_tag_bookmark->start;
+
+				// Remove the current tag.
 				$this->lexical_updates[] = new WP_HTML_Text_Replacement( $opener_tag_bookmark->start, $current_tag_length, '' );
 				$this->release_bookmark( 'opener_tag' );
 				$this->release_bookmark( 'closer_tag' );
