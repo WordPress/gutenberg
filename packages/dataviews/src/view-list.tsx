@@ -152,13 +152,170 @@ function ListItem< Item >( {
 									<div className="dataviews-view-list__media-placeholder"></div>
 								) }
 							</div>
-							<VStack spacing={ 0 }>
-								<span
-									className="dataviews-view-list__primary-field"
-									id={ labelId }
-								>
-									{ primaryField?.render( { item } ) }
-								</span>
+							<VStack
+								spacing={ 0 }
+								style={ { flexGrow: 1 } }
+								className="dataviews-view-list__fields-wrapper"
+							>
+								<HStack>
+									<span
+										className="dataviews-view-list__primary-field"
+										id={ labelId }
+									>
+										{ primaryField?.render( { item } ) }
+									</span>
+									{ eligibleActions?.length > 0 && (
+										<HStack
+											spacing={ 2 }
+											justify="flex-end"
+											className="dataviews-view-list__item-actions"
+											style={ {
+												flexShrink: '0',
+												width: 'auto',
+											} }
+										>
+											{ primaryAction &&
+												'RenderModal' in
+													primaryAction && (
+													<div role="gridcell">
+														<CompositeItem
+															store={ store }
+															render={
+																<Button
+																	label={
+																		primaryActionLabel
+																	}
+																	icon={
+																		primaryAction.icon
+																	}
+																	isDestructive={
+																		primaryAction.isDestructive
+																	}
+																	size="small"
+																	onClick={ () =>
+																		setIsModalOpen(
+																			true
+																		)
+																	}
+																/>
+															}
+														>
+															{ isModalOpen && (
+																<ActionModal< Item >
+																	action={
+																		primaryAction
+																	}
+																	items={ [
+																		item,
+																	] }
+																	closeModal={ () =>
+																		setIsModalOpen(
+																			false
+																		)
+																	}
+																/>
+															) }
+														</CompositeItem>
+													</div>
+												) }
+											{ primaryAction &&
+												! (
+													'RenderModal' in
+													primaryAction
+												) && (
+													<div
+														role="gridcell"
+														key={ primaryAction.id }
+													>
+														<CompositeItem
+															store={ store }
+															render={
+																<Button
+																	label={
+																		primaryActionLabel
+																	}
+																	icon={
+																		primaryAction.icon
+																	}
+																	isDestructive={
+																		primaryAction.isDestructive
+																	}
+																	size="small"
+																	onClick={ () => {
+																		primaryAction.callback(
+																			[
+																				item,
+																			],
+																			{
+																				registry,
+																			}
+																		);
+																	} }
+																/>
+															}
+														/>
+													</div>
+												) }
+											<div role="gridcell">
+												<DropdownMenu
+													trigger={
+														<CompositeItem
+															store={ store }
+															render={
+																<Button
+																	size="small"
+																	icon={
+																		moreVertical
+																	}
+																	label={ __(
+																		'Actions'
+																	) }
+																	__experimentalIsFocusable
+																	disabled={
+																		! actions.length
+																	}
+																	onKeyDown={ ( event: {
+																		key: string;
+																		preventDefault: () => void;
+																	} ) => {
+																		if (
+																			event.key ===
+																			'ArrowDown'
+																		) {
+																			// Prevent the default behaviour (open dropdown menu) and go down.
+																			event.preventDefault();
+																			store.move(
+																				store.down()
+																			);
+																		}
+																		if (
+																			event.key ===
+																			'ArrowUp'
+																		) {
+																			// Prevent the default behavior (open dropdown menu) and go up.
+																			event.preventDefault();
+																			store.move(
+																				store.up()
+																			);
+																		}
+																	} }
+																/>
+															}
+														/>
+													}
+													placement="bottom-end"
+												>
+													<ActionsDropdownMenuGroup
+														actions={
+															eligibleActions
+														}
+														item={ item }
+													/>
+												</DropdownMenu>
+											</div>
+										</HStack>
+									) }
+								</HStack>
 								<div
 									className="dataviews-view-list__fields"
 									id={ descriptionId }
@@ -184,120 +341,6 @@ function ListItem< Item >( {
 						</HStack>
 					</CompositeItem>
 				</div>
-				{ eligibleActions?.length > 0 && (
-					<HStack
-						spacing={ 1 }
-						justify="flex-end"
-						className="dataviews-view-list__item-actions"
-						style={ {
-							flexShrink: '0',
-							width: 'auto',
-						} }
-					>
-						{ primaryAction && 'RenderModal' in primaryAction && (
-							<div role="gridcell">
-								<CompositeItem
-									store={ store }
-									render={
-										<Button
-											label={ primaryActionLabel }
-											icon={ primaryAction.icon }
-											isDestructive={
-												primaryAction.isDestructive
-											}
-											size="compact"
-											onClick={ () =>
-												setIsModalOpen( true )
-											}
-										/>
-									}
-								>
-									{ isModalOpen && (
-										<ActionModal< Item >
-											action={ primaryAction }
-											items={ [ item ] }
-											closeModal={ () =>
-												setIsModalOpen( false )
-											}
-										/>
-									) }
-								</CompositeItem>
-							</div>
-						) }
-						{ primaryAction &&
-							! ( 'RenderModal' in primaryAction ) && (
-								<div role="gridcell" key={ primaryAction.id }>
-									<CompositeItem
-										store={ store }
-										render={
-											<Button
-												label={ primaryActionLabel }
-												icon={ primaryAction.icon }
-												isDestructive={
-													primaryAction.isDestructive
-												}
-												size="compact"
-												onClick={ () => {
-													primaryAction.callback(
-														[ item ],
-														{ registry }
-													);
-												} }
-											/>
-										}
-									/>
-								</div>
-							) }
-						<div role="gridcell">
-							<DropdownMenu
-								trigger={
-									<CompositeItem
-										store={ store }
-										render={
-											<Button
-												size="compact"
-												icon={ moreVertical }
-												label={ __( 'Actions' ) }
-												__experimentalIsFocusable
-												disabled={ ! actions.length }
-												onKeyDown={ ( event: {
-													key: string;
-													preventDefault: () => void;
-												} ) => {
-													if (
-														event.key ===
-														'ArrowDown'
-													) {
-														// Prevent the default behaviour (open dropdown menu) and go down.
-														event.preventDefault();
-														store.move(
-															store.down()
-														);
-													}
-													if (
-														event.key === 'ArrowUp'
-													) {
-														// Prevent the default behavior (open dropdown menu) and go up.
-														event.preventDefault();
-														store.move(
-															store.up()
-														);
-													}
-												} }
-											/>
-										}
-									/>
-								}
-								placement="bottom-end"
-							>
-								<ActionsDropdownMenuGroup
-									actions={ eligibleActions }
-									item={ item }
-								/>
-							</DropdownMenu>
-						</div>
-					</HStack>
-				) }
 			</HStack>
 		</CompositeRow>
 	);

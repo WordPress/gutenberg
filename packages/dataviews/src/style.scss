@@ -442,16 +442,12 @@
 		&.is-hovered,
 		&:focus-within {
 			.dataviews-view-list__item-actions {
-				padding-right: $grid-unit-30;
+				padding-right: $grid-unit-05;
 
 				.components-button {
 					opacity: 1;
 					position: static;
 				}
-			}
-
-			.dataviews-view-list__item {
-				padding-right: 0;
 			}
 		}
 
@@ -487,7 +483,7 @@
 	}
 
 	.dataviews-view-list__item {
-		padding: $grid-unit-20 0 $grid-unit-20 $grid-unit-30;
+		padding: $grid-unit-20 $grid-unit-30;
 		width: 100%;
 		scroll-margin: $grid-unit-10 0;
 
@@ -504,15 +500,15 @@
 			}
 		}
 		.dataviews-view-list__primary-field {
-			min-height: $grid-unit-05 * 5;
-			line-height: $grid-unit-05 * 5;
+			min-height: $grid-unit-30;
+			line-height: $grid-unit-30;
 			overflow: hidden;
 		}
 	}
 
 	.dataviews-view-list__media-wrapper {
-		width: $grid-unit-50;
-		height: $grid-unit-50;
+		width: $grid-unit-50 + $grid-unit-05;
+		height: $grid-unit-50 + $grid-unit-05;
 		overflow: hidden;
 		position: relative;
 		flex-shrink: 0;
@@ -543,10 +539,15 @@
 		background-color: $gray-200;
 	}
 
+	.dataviews-view-list__fields-wrapper {
+		min-height: $grid-unit-05 * 11;
+	}
+
 	.dataviews-view-list__fields {
 		color: $gray-700;
 		display: flex;
 		gap: $grid-unit-10;
+		row-gap: 0;
 		flex-wrap: wrap;
 		font-size: 12px;
 
@@ -563,6 +564,10 @@
 	}
 	.dataviews-view-list__item-actions {
 		padding-right: $grid-unit-30;
+
+		> div {
+			height: $grid-unit-30;
+		}
 	}
 
 	& + .dataviews-pagination {
