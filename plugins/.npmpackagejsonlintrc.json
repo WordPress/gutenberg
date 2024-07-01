@@ -1,0 +1,7 @@
+{
+	"extends": "@wordpress/npm-package-json-lint-config",
+	"rules": {
+		"require-publishConfig": "error",
+		"valid-values-author": [ "error", [ "WordPress.org" ] ]
+	}
+}
