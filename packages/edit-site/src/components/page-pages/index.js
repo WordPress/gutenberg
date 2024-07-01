@@ -482,7 +482,6 @@ export default function PagePages() {
 		],
 		[ authors, view.type, frontPageId, postsPageId ]
 	);
-
 	const postTypeActions = usePostActions( {
 		postType: 'page',
 		context: 'list',
