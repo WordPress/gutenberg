@@ -21,8 +21,8 @@ import { useCallback, useMemo, useState } from '@wordpress/element';
 import type { NormalizedField } from './types';
 
 type DataFormProps< Item > = {
-	item: Item;
-	onUpdateItem: ( item: Item ) => void;
+	data: Item;
+	onUpdate: ( item: Item ) => void;
 	fields: NormalizedField< Item >[]; // TODO: use Field. Normalize them first.
 	form: {
 		closeForm: () => void;
@@ -33,8 +33,8 @@ type DataFormProps< Item > = {
 };
 
 export default function DataForm< Item >( {
-	item: data,
-	onUpdateItem,
+	data,
+	onUpdate,
 	fields,
 	form: { closeForm, isBusy, onCancelLabel, onSubmitLabel },
 }: DataFormProps< Item > ) {
@@ -43,7 +43,7 @@ export default function DataForm< Item >( {
 		( event ) => {
 			event.preventDefault();
 
-			onUpdateItem( item );
+			onUpdate( item );
 		},
 		[ item ]
 	);

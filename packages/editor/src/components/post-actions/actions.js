@@ -776,8 +776,8 @@ const useDuplicatePostAction = ( postType ) => {
 					);
 					return (
 						<DataForm
-							item={ item }
-							onUpdateItem={ createPage }
+							data={ item }
+							onUpdate={ createPage }
 							fields={ fields }
 							form={ form }
 						/>
