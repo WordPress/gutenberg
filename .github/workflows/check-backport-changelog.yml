@@ -13,10 +13,10 @@ on:
             - 'phpunit/**'
             - '!phpunit/experimental/**'
             - '!phpunit/blocks/**'
+            - '!phpunit/plugins/**'
             - 'packages/**/*.php'
             - '!packages/block-library/**'
             - '!packages/e2e-tests/**'
-            - '!plugins/**'
 jobs:
     check:
         name: Check CHANGELOG diff
