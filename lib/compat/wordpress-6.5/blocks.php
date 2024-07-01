@@ -67,183 +67,6 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 		switch ( $block_type->attributes[ $attribute_name ]['source'] ) {
 			case 'html':
 			case 'rich-text':
-				if ( 'core/image' === $block_name && 'caption' === $attribute_name ) {
-					// Create private anonymous class until the HTML API provides `set_inner_html` method.
-					$block_reader = new class($block_content) extends WP_HTML_Tag_Processor{
-						/**
-						 * THESE METHODS ARE A TEMPORARY SOLUTION IN CORE NOT TO BE EMULATED.
-						 * IT IS A TEMPORARY SOLUTION THAT JUST WORKS FOR THIS SPECIFIC
-						 * USE CASE UNTIL THE HTML PROCESSOR PROVIDES ITS OWN METHOD.
-						 */
-
-						/**
-						 * Replace the inner text of an HTML with the passed content.
-						 *
-						 * @param string $new_content New text to insert in the HTML element.
-						 * @return bool Whether the inner text was properly replaced.
-						 */
-						public function gutenberg_set_inner_text( $new_content ) {
-							/*
-							 * THIS IS A STOP-GAP MEASURE NOT TO BE EMULATED.
-							 *
-							 * Check that the processor is paused on an opener tag.
-							 *
-							 */
-							if (
-								WP_HTML_Tag_Processor::STATE_MATCHED_TAG !== $this->parser_state ||
-								$this->is_tag_closer()
-							) {
-								return false;
-							}
-
-							// Set position of the opener tag.
-							$this->set_bookmark( 'opener_tag' );
-
-							/*
-							 * This is a best-effort guess to visit the closer tag and check it exists.
-							 * In the future, this code should rely on the HTML Processor for this kind of operation.
-							 */
-							$tag_name = $this->get_tag();
-							if ( ! $this->next_tag(
-								array(
-									'tag_name'    => $tag_name,
-									'tag_closers' => 'visit',
-								)
-							) || ! $this->is_tag_closer() ) {
-								return false;
-							}
-
-							// Set position of the closer tag.
-							$this->set_bookmark( 'closer_tag' );
-
-							// Get opener and closer tag bookmarks.
-							$opener_tag_bookmark = $this->bookmarks['opener_tag'];
-							$closer_tag_bookmark = $this->bookmarks['closer_tag'];
-
-							// Appends the new content.
-							$after_opener_tag = $opener_tag_bookmark->start + $opener_tag_bookmark->length;
-							/*
-							 * There was a bug in the HTML Processor token length fixed after 6.5.
-							 * This check is needed to add compatibility for that.
-							 * Related issue: https://github.com/WordPress/wordpress-develop/pull/6625
-							 */
-							if ( '>' === $this->html[ $after_opener_tag ] ) {
-								++$after_opener_tag;
-							}
-							$inner_content_length    = $closer_tag_bookmark->start - $after_opener_tag;
-							$this->lexical_updates[] = new WP_HTML_Text_Replacement( $after_opener_tag, $inner_content_length, $new_content );
-							return true;
-						}
-
-						/**
-						 * Add a new HTML element after the current tag.
-						 *
-						 * @param string $new_element New HTML element to append after the current tag.
-						 */
-						public function gutenberg_append_element_after_tag( $new_element ) {
-							$tag_name = $this->get_tag();
-							$this->set_bookmark( 'current_tag' );
-							// Visit the closing tag if exists.
-							if ( ! $this->next_tag(
-								array(
-									'tag_name'    => $tag_name,
-									'tag_closers' => 'visit',
-								)
-							) || ! $this->is_tag_closer() ) {
-								$this->seek( 'current_tag' );
-								$this->release_bookmark( 'current_tag' );
-							}
-
-							// Get position of the closer tag.
-							$this->set_bookmark( 'closer_tag' );
-							$closer_tag_bookmark = $this->bookmarks['closer_tag'];
-							$after_closer_tag    = $closer_tag_bookmark->start + $closer_tag_bookmark->length;
-							/*
-							 * There was a bug in the HTML Processor token length fixed after 6.5.
-							 * This check is needed to add compatibility for that.
-							 * Related issue: https://github.com/WordPress/wordpress-develop/pull/6625
-							 */
-							if ( '>' === $this->html[ $after_closer_tag ] ) {
-								++$after_closer_tag;
-							}
-
-							// Append the new element.
-							$this->lexical_updates[] = new WP_HTML_Text_Replacement( $after_closer_tag, 0, $new_element );
-							$this->release_bookmark( 'closer_tag' );
-						}
-
-						/**
-						 * Remove the current tag element.
-						 *
-						 * @return bool Whether the element was properly removed.
-						 */
-						public function gutenberg_remove_current_tag_element() {
-							// Get position of the opener tag.
-							$this->set_bookmark( 'opener_tag' );
-							$opener_tag_bookmark = $this->bookmarks['opener_tag'];
-
-							// Visit the closing tag.
-							$tag_name = $this->get_tag();
-							if ( ! $this->next_tag(
-								array(
-									'tag_name'    => $tag_name,
-									'tag_closers' => 'visit',
-								)
-							) || ! $this->is_tag_closer() ) {
-								$this->release_bookmark( 'opener_tag' );
-								return false;
-							}
-
-							// Get position of the closer tag.
-							$this->set_bookmark( 'closer_tag' );
-							$closer_tag_bookmark = $this->bookmarks['closer_tag'];
-
-							// Remove the current tag.
-							$after_closer_tag = $closer_tag_bookmark->start + $closer_tag_bookmark->length;
-							/*
-							 * There was a bug in the HTML Processor token length fixed after 6.5.
-							 * This check is needed to add compatibility for that.
-							 * Related issue: https://github.com/WordPress/wordpress-develop/pull/6625
-							 */
-							if ( '>' === $this->html[ $after_closer_tag ] ) {
-								++$after_closer_tag;
-							}
-							$current_tag_length      = $after_closer_tag - $opener_tag_bookmark->start;
-							$this->lexical_updates[] = new WP_HTML_Text_Replacement( $opener_tag_bookmark->start, $current_tag_length, '' );
-							$this->release_bookmark( 'opener_tag' );
-							$this->release_bookmark( 'closer_tag' );
-							return true;
-						}
-					};
-
-					/*
-					 * For backward compatibility, the logic from the image render needs to be replicated.
-					 * This is because the block attributes can't be modified with the binding value with `render_block_data` filter,
-					 * as it doesn't have access to the block instance.
-					 */
-					if ( $block_reader->next_tag( 'figure' ) ) {
-						$block_reader->set_bookmark( 'figure' );
-					}
-
-					$new_value = wp_kses_post( $source_value );
-
-					if ( $block_reader->next_tag( 'figcaption' ) ) {
-						if ( empty( $new_value ) ) {
-							$block_reader->gutenberg_remove_current_tag_element();
-						} else {
-							$block_reader->gutenberg_set_inner_text( $new_value );
-						}
-					} else {
-						$block_reader->seek( 'figure' );
-						if ( ! $block_reader->next_tag( 'a' ) ) {
-							$block_reader->seek( 'figure' );
-							$block_reader->next_tag( 'img' );
-						}
-						$block_reader->gutenberg_append_element_after_tag( '<figcaption class="wp-element-caption">' . $new_value . '</figcaption>' );
-					}
-					return $block_reader->get_updated_html();
-				}
-
 				$block_reader = new WP_HTML_Tag_Processor( $block_content );
 
 				// TODO: Support for CSS selectors whenever they are ready in the HTML API.
@@ -326,63 +149,6 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 	}
 
 	/**
-	 * Check if the parsed block is supported by block bindings and it includes the bindings attribute.
-	 *
-	 * @param array $parsed_block  The full block, including name and attributes.
-	 */
-	function gutenberg_is_valid_block_for_block_bindings( $parsed_block ) {
-		$supported_blocks = array(
-			'core/paragraph',
-			'core/heading',
-			'core/image',
-			'core/button',
-		);
-
-		// Check if the block is supported.
-		if (
-		! in_array( $parsed_block['blockName'], $supported_blocks, true ) ||
-		empty( $parsed_block['attrs']['metadata']['bindings'] ) ||
-		! is_array( $parsed_block['attrs']['metadata']['bindings'] )
-		) {
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
-	 * Check if the binding created is valid.
-	 *
-	 * @param array  $parsed_block   The full block, including name and attributes.
-	 * @param string $attribute_name The attribute name being processed.
-	 * @param array  $block_binding  The block binding configuration.
-	 */
-	function gutenberg_is_valid_block_binding( $parsed_block, $attribute_name, $block_binding ) {
-		// Check if it is a valid block.
-		if ( ! gutenberg_is_valid_block_for_block_bindings( $parsed_block ) ) {
-			return false;
-		}
-
-		$supported_block_attrs = array(
-			'core/paragraph' => array( 'content' ),
-			'core/heading'   => array( 'content' ),
-			'core/image'     => array( 'id', 'url', 'title', 'alt', 'caption' ),
-			'core/button'    => array( 'url', 'text', 'linkTarget', 'rel' ),
-		);
-
-		// Check if the attribute is not in the supported list.
-		if ( ! in_array( $attribute_name, $supported_block_attrs[ $parsed_block['blockName'] ], true ) ) {
-			return false;
-		}
-		// Check if no source is provided, or that source is not registered.
-		if ( ! isset( $block_binding['source'] ) || ! is_string( $block_binding['source'] ) || null === get_block_bindings_source( $block_binding['source'] ) ) {
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
 	 * Process the block bindings attribute.
 	 *
 	 * @param string   $block_content Block Content.
@@ -391,18 +157,55 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 	 * @return string  Block content with the bind applied.
 	 */
 	function gutenberg_process_block_bindings( $block_content, $parsed_block, $block_instance ) {
-		if ( ! gutenberg_is_valid_block_for_block_bindings( $parsed_block ) ) {
+		$supported_block_attrs = array(
+			'core/paragraph' => array( 'content' ),
+			'core/heading'   => array( 'content' ),
+			'core/image'     => array( 'id', 'url', 'title', 'alt' ),
+			'core/button'    => array( 'url', 'text', 'linkTarget', 'rel' ),
+		);
+
+		// If the block doesn't have the bindings property or isn't one of the supported block types, return.
+		if (
+		! isset( $supported_block_attrs[ $block_instance->name ] ) ||
+		empty( $parsed_block['attrs']['metadata']['bindings'] ) ||
+		! is_array( $parsed_block['attrs']['metadata']['bindings'] )
+		) {
 			return $block_content;
 		}
+
+		/*
+		 * Assuming the following format for the bindings property of the "metadata" attribute:
+		 *
+		 * "bindings": {
+		 *   "title": {
+		 *     "source": "core/post-meta",
+		 *     "args": { "key": "text_custom_field" }
+		 *   },
+		 *   "url": {
+		 *     "source": "core/post-meta",
+		 *     "args": { "key": "url_custom_field" }
+		 *   }
+		 * }
+		 */
+
 		$modified_block_content = $block_content;
 		foreach ( $parsed_block['attrs']['metadata']['bindings'] as $attribute_name => $block_binding ) {
-			if ( ! gutenberg_is_valid_block_binding( $parsed_block, $attribute_name, $block_binding ) ) {
+			// If the attribute is not in the supported list, process next attribute.
+			if ( ! in_array( $attribute_name, $supported_block_attrs[ $block_instance->name ], true ) ) {
+				continue;
+			}
+			// If no source is provided, or that source is not registered, process next attribute.
+			if ( ! isset( $block_binding['source'] ) || ! is_string( $block_binding['source'] ) ) {
 				continue;
 			}
 
 			$block_binding_source = get_block_bindings_source( $block_binding['source'] );
-			$source_args          = ! empty( $block_binding['args'] ) && is_array( $block_binding['args'] ) ? $block_binding['args'] : array();
-			$source_value         = $block_binding_source->get_value( $source_args, $block_instance, $attribute_name );
+			if ( null === $block_binding_source ) {
+				continue;
+			}
+
+			$source_args  = ! empty( $block_binding['args'] ) && is_array( $block_binding['args'] ) ? $block_binding['args'] : array();
+			$source_value = $block_binding_source->get_value( $source_args, $block_instance, $attribute_name );
 
 			// If the value is not null, process the HTML based on the block and the attribute.
 			if ( ! is_null( $source_value ) ) {
