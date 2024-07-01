@@ -11,7 +11,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { useMemo, useState } from '@wordpress/element';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { parse } from '@wordpress/blocks';
-
+import { DataForm } from '@wordpress/dataviews';
 import {
 	Button,
 	TextControl,
@@ -754,32 +754,13 @@ const useDuplicatePostAction = ( postType ) => {
 						}
 					}
 					return (
-						<form onSubmit={ createPage }>
-							<VStack spacing={ 3 }>
-								<TextControl
-									label={ __( 'Title' ) }
-									onChange={ setTitle }
-									placeholder={ __( 'No title' ) }
-									value={ title }
-								/>
-								<HStack spacing={ 2 } justify="end">
-									<Button
-										variant="tertiary"
-										onClick={ closeModal }
-									>
-										{ __( 'Cancel' ) }
-									</Button>
-									<Button
-										variant="primary"
-										type="submit"
-										isBusy={ isCreatingPage }
-										aria-disabled={ isCreatingPage }
-									>
-										{ _x( 'Duplicate', 'action label' ) }
-									</Button>
-								</HStack>
-							</VStack>
-						</form>
+						<DataForm
+							title={ title }
+							setTitle={ setTitle }
+							createPage={ createPage }
+							closeModal={ closeModal }
+							isCreatingPage={ isCreatingPage }
+						/>
 					);
 				},
 			},
