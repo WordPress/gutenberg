@@ -1,14 +1,14 @@
 # Disable Editor functionality
 
-This page is dedicated to the many ways you can disable specific functionality in the Post Editor and Site Editor that are not covered in other areas of the curation documentation. 
+This page is dedicated to the many ways you can disable specific functionality in the Post Editor and Site Editor that are not covered in other areas of the curation documentation.
 
 ## Restrict block options
 
-There might be times when you don’t want access to a block at all to be available for users. To control what’s available in the inserter, you can take two approaches: [an allow list](/docs/reference-guides/filters/block-filters.md#using-an-allow-list) that disables all blocks except those on the list or a [deny list that unregisters specific blocks](/docs/reference-guides/filters/block-filters.md#using-a-deny-list). 
+There might be times when you don’t want access to a block at all to be available for users. To control what’s available in the inserter, you can take two approaches: [an allow list](/docs/reference-guides/filters/block-filters.md#using-an-allow-list) that disables all blocks except those on the list or a [deny list that unregisters specific blocks](/docs/reference-guides/filters/block-filters.md#using-a-deny-list).
 
 ## Disable the Pattern Directory
 
-To fully remove patterns bundled with WordPress core from being accessed in the Inserter, the following can be added to your `functions.php` file: 
+To fully remove patterns bundled with WordPress core from being accessed in the Inserter, the following can be added to your `functions.php` file:
 
 ```php
 function example_theme_support() {
@@ -21,7 +21,7 @@ add_action( 'after_setup_theme', 'example_theme_support' );
 
 Some Core blocks are actually [block variations](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-variations/). A great example is the Row and Stack blocks, which are actually variations of the Group block. If you want to disable these "blocks", you actually need to disable the respective variations.
 
-Block variations are registered using JavaScript and need to be disabled with JavaScript. The code below will disable the Row variation. 
+Block variations are registered using JavaScript and need to be disabled with JavaScript. The code below will disable the Row variation.
 
 ```js
 wp.domReady( () => {
@@ -48,7 +48,7 @@ add_action( 'enqueue_block_editor_assets', 'example_disable_variations_script' )
 
 There are a few Core blocks that include their own [block styles](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-styles/). An example is the Image block, which includes a block style for rounded images called "Rounded". You many not want your users to round images, or you might prefer to use the border-radius control instead of the block style. Either way, it's easy to disable any unwanted block styles.
 
-Unlike block variations, you can register styles in either JavaScript or PHP. If a style was registered in JavaScript, it must be disabled with JavaScript. If registered using PHP, the style can be disabled with either. All Core block styles are registed in JavaScript.
+Unlike block variations, you can register styles in either JavaScript or PHP. If a style was registered in JavaScript, it must be disabled with JavaScript. If registered using PHP, the style can be disabled with either. All Core block styles are registered in JavaScript.
 
 So, you would use the following code to disable the "Rounded" block style for the Image block.
 
@@ -58,7 +58,7 @@ wp.domReady( () => {
 });
 ```
 
-This JavaScript should be enqueued much like the block variation example above. Refer to the [block styles](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-styles/) documentation for how to register and unregister styles using PHP. 
+This JavaScript should be enqueued much like the block variation example above. Refer to the [block styles](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-styles/) documentation for how to register and unregister styles using PHP.
 
 ## Disable access to the Template Editor
 
@@ -71,7 +71,7 @@ function example_theme_support() {
 add_action( 'after_setup_theme', 'example_theme_support' );
 ```
 
-This prevents both the ability to create new block templates or edit them from within the Post Editor. 
+This prevents both the ability to create new block templates or edit them from within the Post Editor.
 
 ## Disable access to the Code Editor
 

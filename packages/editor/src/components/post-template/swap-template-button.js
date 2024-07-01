@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, useState, useCallback } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __experimentalBlockPatternsList as BlockPatternsList } from '@wordpress/block-editor';
 import { MenuItem, Modal } from '@wordpress/components';
@@ -18,9 +18,6 @@ import { useAvailableTemplates, useEditedPostContext } from './hooks';
 
 export default function SwapTemplateButton( { onClick } ) {
 	const [ showModal, setShowModal ] = useState( false );
-	const onClose = useCallback( () => {
-		setShowModal( false );
-	}, [] );
 	const { postType, postId } = useEditedPostContext();
 	const availableTemplates = useAvailableTemplates( postType );
 	const { editEntityRecord } = useDispatch( coreStore );
@@ -35,7 +32,7 @@ export default function SwapTemplateButton( { onClick } ) {
 			{ template: template.name },
 			{ undoIgnore: true }
 		);
-		onClose(); // Close the template suggestions modal first.
+		setShowModal( false ); // Close the template suggestions modal first.
 		onClick();
 	};
 	return (
@@ -46,7 +43,7 @@ export default function SwapTemplateButton( { onClick } ) {
 			{ showModal && (
 				<Modal
 					title={ __( 'Choose a template' ) }
-					onRequestClose={ onClose }
+					onRequestClose={ () => setShowModal( false ) }
 					overlayClassName="editor-post-template__swap-template-modal"
 					isFullScreen
 				>

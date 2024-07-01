@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 export default function NavigableRegion( {
 	children,
@@ -12,7 +12,7 @@ export default function NavigableRegion( {
 } ) {
 	return (
 		<Tag
-			className={ classnames( 'interface-navigable-region', className ) }
+			className={ clsx( 'interface-navigable-region', className ) }
 			aria-label={ ariaLabel }
 			role="region"
 			tabIndex="-1"

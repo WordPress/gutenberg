@@ -540,8 +540,8 @@ class BottomSheet extends Component {
 				}
 				onAccessibilityEscape={ this.onCloseBottomSheet }
 				testID="bottom-sheet"
-				hardwareAccelerated={ true }
-				useNativeDriverForBackdrop={ true }
+				hardwareAccelerated
+				useNativeDriverForBackdrop
 				{ ...rest }
 			>
 				<KeyboardAvoidingView

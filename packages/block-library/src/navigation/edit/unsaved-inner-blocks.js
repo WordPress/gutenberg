@@ -5,7 +5,7 @@ import { useInnerBlocksProps } from '@wordpress/block-editor';
 import { Disabled } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { useContext, useEffect, useRef, useMemo } from '@wordpress/element';
+import { useContext, useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -42,17 +42,6 @@ export default function UnsavedInnerBlocks( {
 		blocks
 	);
 
-	const shouldDirectInsert = useMemo(
-		() =>
-			blocks.every(
-				( { name } ) =>
-					name === 'core/navigation-link' ||
-					name === 'core/navigation-submenu' ||
-					name === 'core/page-list'
-			),
-		[ blocks ]
-	);
-
 	// The block will be disabled in a block preview, use this as a way of
 	// avoiding the side-effects of this component for block previews.
 	const isDisabled = useContext( Disabled.Context );
@@ -64,7 +53,7 @@ export default function UnsavedInnerBlocks( {
 		{
 			renderAppender: hasSelection ? undefined : false,
 			defaultBlock: DEFAULT_BLOCK,
-			directInsert: shouldDirectInsert,
+			directInsert: true,
 		}
 	);
 

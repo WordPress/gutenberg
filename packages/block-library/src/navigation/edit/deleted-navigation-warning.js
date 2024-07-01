@@ -11,7 +11,7 @@ function DeletedNavigationWarning( { onCreateNew } ) {
 		<Warning>
 			{ createInterpolateElement(
 				__(
-					'Navigation menu has been deleted or is unavailable. <button>Create a new menu?</button>'
+					'Navigation Menu has been deleted or is unavailable. <button>Create a new Menu?</button>'
 				),
 				{
 					button: <Button onClick={ onCreateNew } variant="link" />,

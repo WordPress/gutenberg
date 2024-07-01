@@ -7,6 +7,8 @@ import {
 	isBlockSubtreeDisabled,
 	getEnabledClientIdsTree,
 	getEnabledBlockParents,
+	getExpandedBlock,
+	isDragging,
 } from '../private-selectors';
 import { getBlockEditingMode } from '../selectors';
 
@@ -475,6 +477,36 @@ describe( 'private selectors', () => {
 				'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c',
 				'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
 			] );
+		} );
+	} );
+
+	describe( 'isDragging', () => {
+		it( 'should return true if the dragging state is true', () => {
+			const state = {
+				isDragging: true,
+			};
+
+			expect( isDragging( state ) ).toBe( true );
+		} );
+
+		it( 'should return false if the dragging state is false', () => {
+			const state = {
+				isDragging: false,
+			};
+
+			expect( isDragging( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'getExpandedBlock', () => {
+		it( 'should return the expanded block', () => {
+			const state = {
+				expandedBlock: '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+			};
+
+			expect( getExpandedBlock( state ) ).toBe(
+				'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f'
+			);
 		} );
 	} );
 } );

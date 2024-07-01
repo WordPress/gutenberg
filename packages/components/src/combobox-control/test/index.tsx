@@ -98,7 +98,7 @@ describe.each( [
 			<Component
 				options={ timezones }
 				label={ defaultLabelText }
-				hideLabelFromVision={ true }
+				hideLabelFromVision
 			/>
 		);
 		const label = getLabel( defaultLabelText );

@@ -8,7 +8,7 @@ import {
 	Button,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { __, _n } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -17,9 +17,8 @@ import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 export function BlockRemovalWarningModal( { rules } ) {
-	const { clientIds, selectPrevious, blockNamesForPrompt } = useSelect(
-		( select ) =>
-			unlock( select( blockEditorStore ) ).getRemovalPromptData()
+	const { clientIds, selectPrevious, message } = useSelect( ( select ) =>
+		unlock( select( blockEditorStore ) ).getRemovalPromptData()
 	);
 
 	const {
@@ -37,7 +36,7 @@ export function BlockRemovalWarningModal( { rules } ) {
 		};
 	}, [ rules, setBlockRemovalRules ] );
 
-	if ( ! blockNamesForPrompt ) {
+	if ( ! message ) {
 		return;
 	}
 
@@ -52,13 +51,7 @@ export function BlockRemovalWarningModal( { rules } ) {
 			onRequestClose={ clearBlockRemovalPrompt }
 			size="medium"
 		>
-			<p>
-				{ _n(
-					'Deleting this block will stop your post or page content from displaying on this template. It is not recommended.',
-					'Deleting these blocks will stop your post or page content from displaying on this template. It is not recommended.',
-					blockNamesForPrompt.length
-				) }
-			</p>
+			<p>{ message }</p>
 			<HStack justify="right">
 				<Button variant="tertiary" onClick={ clearBlockRemovalPrompt }>
 					{ __( 'Cancel' ) }

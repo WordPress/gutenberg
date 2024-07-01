@@ -92,6 +92,7 @@ export default function ReusableBlockConvertButton( {
 						hasBlockSupport( block.name, 'reusable', true )
 				) &&
 				// Hide when current doesn't have permission to do that.
+				// Blocks refers to the wp_block post type, this checks the ability to create a post of that type.
 				!! canUser( 'create', 'blocks' );
 
 			return _canConvert;
@@ -184,10 +185,7 @@ export default function ReusableBlockConvertButton( {
 								placeholder={ __( 'My pattern' ) }
 							/>
 							<ToggleControl
-								label={ _x(
-									'Synced',
-									'Option that makes an individual pattern synchronized'
-								) }
+								label={ _x( 'Synced', 'pattern (singular)' ) }
 								help={ __(
 									'Sync this pattern across multiple locations.'
 								) }

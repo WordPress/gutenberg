@@ -180,10 +180,10 @@ export function Button( props ) {
 	const element = (
 		<TouchableOpacity
 			activeOpacity={ 0.7 }
-			accessible={ true }
+			accessible
 			accessibilityLabel={ label }
 			accessibilityStates={ states }
-			accessibilityRole={ 'button' }
+			accessibilityRole="button"
 			accessibilityHint={ hint }
 			onPress={ onClick }
 			style={ containerStyle }

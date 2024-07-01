@@ -3,12 +3,11 @@
  */
 import {
 	TextareaControl,
-	Tooltip,
+	Notice,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Icon, info } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -29,9 +28,12 @@ export default function AdvancedPanel( {
 			css: newValue,
 		} );
 		if ( cssError ) {
+			// Check if the new value is valid CSS, and pass a wrapping selector
+			// to ensure that `transformStyles` validates the CSS. Note that the
+			// wrapping selector here is not used in the actual output of any styles.
 			const [ transformed ] = transformStyles(
 				[ { css: newValue } ],
-				'.editor-styles-wrapper'
+				'.for-validation-only'
 			);
 			if ( transformed ) {
 				setCSSError( null );
@@ -44,9 +46,12 @@ export default function AdvancedPanel( {
 			return;
 		}
 
+		// Check if the new value is valid CSS, and pass a wrapping selector
+		// to ensure that `transformStyles` validates the CSS. Note that the
+		// wrapping selector here is not used in the actual output of any styles.
 		const [ transformed ] = transformStyles(
 			[ { css: event.target.value } ],
-			'.editor-styles-wrapper'
+			'.for-validation-only'
 		);
 
 		setCSSError(
@@ -58,6 +63,11 @@ export default function AdvancedPanel( {
 
 	return (
 		<VStack spacing={ 3 }>
+			{ cssError && (
+				<Notice status="error" onRemove={ () => setCSSError( null ) }>
+					{ cssError }
+				</Notice>
+			) }
 			<TextareaControl
 				label={ __( 'Additional CSS' ) }
 				__nextHasNoMarginBottom
@@ -67,16 +77,6 @@ export default function AdvancedPanel( {
 				className="block-editor-global-styles-advanced-panel__custom-css-input"
 				spellCheck={ false }
 			/>
-			{ cssError && (
-				<Tooltip text={ cssError }>
-					<div className="block-editor-global-styles-advanced-panel__custom-css-validation-wrapper">
-						<Icon
-							icon={ info }
-							className="block-editor-global-styles-advanced-panel__custom-css-validation-icon"
-						/>
-					</div>
-				</Tooltip>
-			) }
 		</VStack>
 	);
 }

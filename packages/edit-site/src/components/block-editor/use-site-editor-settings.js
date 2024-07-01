@@ -5,15 +5,19 @@ import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { usePrevious } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import { usePostLinkProps } from './use-post-link-props';
+import useNavigateToEntityRecord from './use-navigate-to-entity-record';
+import { FOCUSABLE_ENTITIES } from '../../utils/constants';
 
 const { useBlockEditorSettings } = unlock( editorPrivateApis );
+const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 function useArchiveLabel( templateSlug ) {
 	const taxonomyMatches = templateSlug?.match(
@@ -87,37 +91,67 @@ function useArchiveLabel( templateSlug ) {
 	);
 }
 
+function useNavigateToPreviousEntityRecord() {
+	const location = useLocation();
+	const previousLocation = usePrevious( location );
+	const history = useHistory();
+	const goBack = useMemo( () => {
+		const isFocusMode =
+			location.params.focusMode ||
+			( location.params.postId &&
+				FOCUSABLE_ENTITIES.includes( location.params.postType ) );
+		const didComeFromEditorCanvas =
+			previousLocation?.params.canvas === 'edit';
+		const showBackButton = isFocusMode && didComeFromEditorCanvas;
+		return showBackButton ? () => history.back() : undefined;
+		// Disable reason: previousLocation changes when the component updates for any reason, not
+		// just when location changes. Until this is fixed we can't add it to deps. See
+		// https://github.com/WordPress/gutenberg/pull/58710#discussion_r1479219465.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ location, history ] );
+	return goBack;
+}
+
 export function useSpecificEditorSettings() {
-	const getPostLinkProps = usePostLinkProps();
-	const { templateSlug, canvasMode, settings, postWithTemplate } = useSelect(
-		( select ) => {
-			const {
-				getEditedPostType,
-				getEditedPostId,
-				getEditedPostContext,
-				getCanvasMode,
-				getSettings,
-			} = unlock( select( editSiteStore ) );
-			const { getEditedEntityRecord } = select( coreStore );
-			const usedPostType = getEditedPostType();
-			const usedPostId = getEditedPostId();
-			const _record = getEditedEntityRecord(
-				'postType',
-				usedPostType,
-				usedPostId
-			);
-			const _context = getEditedPostContext();
-			return {
-				templateSlug: _record.slug,
-				canvasMode: getCanvasMode(),
-				settings: getSettings(),
-				postWithTemplate: _context?.postId,
-			};
-		},
-		[]
-	);
+	const onNavigateToEntityRecord = useNavigateToEntityRecord();
+	const {
+		templateSlug,
+		canvasMode,
+		settings,
+		shouldUseTemplateAsDefaultRenderingMode,
+	} = useSelect( ( select ) => {
+		const {
+			getEditedPostType,
+			getEditedPostId,
+			getEditedPostContext,
+			getCanvasMode,
+			getSettings,
+		} = unlock( select( editSiteStore ) );
+		const { getEditedEntityRecord } = select( coreStore );
+		const usedPostType = getEditedPostType();
+		const usedPostId = getEditedPostId();
+		const _record = getEditedEntityRecord(
+			'postType',
+			usedPostType,
+			usedPostId
+		);
+		const _context = getEditedPostContext();
+		return {
+			templateSlug: _record.slug,
+			canvasMode: getCanvasMode(),
+			settings: getSettings(),
+			// TODO: The `postType` check should be removed when the default rendering mode per post type is merged.
+			// @see https://github.com/WordPress/gutenberg/pull/62304/
+			shouldUseTemplateAsDefaultRenderingMode:
+				_context?.postId && _context?.postType !== 'post',
+		};
+	}, [] );
 	const archiveLabels = useArchiveLabel( templateSlug );
-	const defaultRenderingMode = postWithTemplate ? 'template-locked' : 'all';
+	const defaultRenderingMode = shouldUseTemplateAsDefaultRenderingMode
+		? 'template-locked'
+		: 'post-only';
+	const onNavigateToPreviousEntityRecord =
+		useNavigateToPreviousEntityRecord();
 	const defaultEditorSettings = useMemo( () => {
 		return {
 			...settings,
@@ -126,16 +160,19 @@ export function useSpecificEditorSettings() {
 			supportsTemplateMode: true,
 			focusMode: canvasMode !== 'view',
 			defaultRenderingMode,
-			getPostLinkProps,
+			onNavigateToEntityRecord,
+			onNavigateToPreviousEntityRecord,
 			// I wonder if they should be set in the post editor too
 			__experimentalArchiveTitleTypeLabel: archiveLabels.archiveTypeLabel,
 			__experimentalArchiveTitleNameLabel: archiveLabels.archiveNameLabel,
+			__unstableIsPreviewMode: canvasMode === 'view',
 		};
 	}, [
 		settings,
 		canvasMode,
 		defaultRenderingMode,
-		getPostLinkProps,
+		onNavigateToEntityRecord,
+		onNavigateToPreviousEntityRecord,
 		archiveLabels.archiveTypeLabel,
 		archiveLabels.archiveNameLabel,
 	] );

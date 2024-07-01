@@ -6,7 +6,6 @@ import { act } from '@testing-library/react-native';
 /**
  * Internal dependencies
  */
-import { FRAME_TIME } from './constants';
 import { withFakeTimers } from './with-fake-timers';
 
 /**
@@ -21,9 +20,6 @@ import { withFakeTimers } from './with-fake-timers';
  */
 export async function withReanimatedTimer( fn ) {
 	return withFakeTimers( async () => {
-		global.requestAnimationFrame = ( callback ) =>
-			setTimeout( callback, FRAME_TIME );
-
 		// Reanimated uses a custom `now` function to advance animations. In order to be able to use
 		// Jest timer functions to advance animations we need to set the fake timers' internal clock.
 		// Reference: https://t.ly/0S__f

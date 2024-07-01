@@ -1,7 +1,7 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import createSelector from 'rememo';
+import { createSelector } from '@wordpress/data';
 
 /**
  * An object containing information about a guide.

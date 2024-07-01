@@ -38,8 +38,8 @@ test.describe( 'Settings sidebar', () => {
 			await expect(
 				page
 					.getByRole( 'region', { name: 'Editor settings' } )
-					.getByRole( 'button', { name: 'Template (selected)' } )
-			).toHaveClass( /is-active/ );
+					.getByRole( 'tab', { selected: true } )
+			).toHaveText( 'Template' );
 		} );
 
 		test( `should show the currently selected template's title and description`, async ( {
@@ -53,14 +53,11 @@ test.describe( 'Settings sidebar', () => {
 				name: 'Editor settings',
 			} );
 			const templateTitle = settingsSideber.locator(
-				'.edit-site-sidebar-card__title'
-			);
-			const templateDescription = settingsSideber.locator(
-				'.edit-site-sidebar-card__description'
+				'.editor-post-card-panel__title'
 			);
 
 			await expect( templateTitle ).toHaveText( 'Index' );
-			await expect( templateDescription ).toHaveText(
+			await expect( settingsSideber ).toContainText(
 				'Used as a fallback template for all pages when a more specific template is not defined.'
 			);
 
@@ -71,7 +68,7 @@ test.describe( 'Settings sidebar', () => {
 			} );
 
 			await expect( templateTitle ).toHaveText( 'Single Entries' );
-			await expect( templateDescription ).toHaveText(
+			await expect( settingsSideber ).toContainText(
 				'Displays any single entry, such as a post or a page. This template will serve as a fallback when a more specific template (e.g. Single Post, Page, or Attachment) cannot be found.'
 			);
 		} );
@@ -90,8 +87,8 @@ test.describe( 'Settings sidebar', () => {
 			await expect(
 				page
 					.getByRole( 'region', { name: 'Editor settings' } )
-					.getByRole( 'button', { name: 'Block (selected)' } )
-			).toHaveClass( /is-active/ );
+					.getByRole( 'tab', { selected: true } )
+			).toHaveText( 'Block' );
 		} );
 	} );
 
@@ -105,16 +102,17 @@ test.describe( 'Settings sidebar', () => {
 			await expect(
 				page
 					.getByRole( 'region', { name: 'Editor settings' } )
-					.getByRole( 'button', { name: 'Template (selected)' } )
-			).toHaveClass( /is-active/ );
+					.getByRole( 'tab', { selected: true } )
+			).toHaveText( 'Template' );
 
 			// By inserting the block is also selected.
 			await editor.insertBlock( { name: 'core/heading' } );
+
 			await expect(
 				page
 					.getByRole( 'region', { name: 'Editor settings' } )
-					.getByRole( 'button', { name: 'Block (selected)' } )
-			).toHaveClass( /is-active/ );
+					.getByRole( 'tab', { selected: true } )
+			).toHaveText( 'Block' );
 		} );
 
 		test( 'should switch to Template tab when a block was selected and we select the Template', async ( {
@@ -129,8 +127,8 @@ test.describe( 'Settings sidebar', () => {
 			await expect(
 				page
 					.getByRole( 'region', { name: 'Editor settings' } )
-					.getByRole( 'button', { name: 'Block (selected)' } )
-			).toHaveClass( /is-active/ );
+					.getByRole( 'tab', { selected: true } )
+			).toHaveText( 'Block' );
 
 			await page.evaluate( () => {
 				window.wp.data
@@ -141,8 +139,8 @@ test.describe( 'Settings sidebar', () => {
 			await expect(
 				page
 					.getByRole( 'region', { name: 'Editor settings' } )
-					.getByRole( 'button', { name: 'Template (selected)' } )
-			).toHaveClass( /is-active/ );
+					.getByRole( 'tab', { selected: true } )
+			).toHaveText( 'Template' );
 		} );
 	} );
 } );

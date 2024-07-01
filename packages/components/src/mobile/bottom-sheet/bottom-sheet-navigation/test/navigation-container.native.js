@@ -2,12 +2,7 @@
  * External dependencies
  */
 import { Text } from 'react-native';
-import {
-	render,
-	fireEvent,
-	withReanimatedTimer,
-	advanceAnimationByTime,
-} from 'test/helpers';
+import { act, render, fireEvent, withReanimatedTimer } from 'test/helpers';
 import { useNavigation } from '@react-navigation/native';
 
 /**
@@ -63,7 +58,7 @@ it( 'animates height transitioning from non-full-screen to non-full-screen', asy
 			screen.getByTestId( 'navigation-screen-test-screen-1' ),
 			screen1Layout
 		);
-		advanceAnimationByTime( 1 );
+		act( () => jest.advanceTimersByTime( 1 ) );
 		expect( navigationContainer ).toHaveAnimatedStyle( screen1Layout );
 
 		// Navigate to screen 2
@@ -75,7 +70,7 @@ it( 'animates height transitioning from non-full-screen to non-full-screen', asy
 		);
 		// The animation takes 300 ms, so we wait that time plus 1 ms
 		// to the completion.
-		advanceAnimationByTime( 301 );
+		act( () => jest.advanceTimersByTime( 301 ) );
 		expect( navigationContainer ).toHaveAnimatedStyle( screen2Layout );
 	} ) );
 
@@ -105,14 +100,14 @@ it( 'animates height transitioning from non-full-screen to full-screen', async (
 			screen.getByTestId( 'navigation-screen-test-screen-1' ),
 			screen1Layout
 		);
-		advanceAnimationByTime( 1 );
+		act( () => jest.advanceTimersByTime( 1 ) );
 		expect( navigationContainer ).toHaveAnimatedStyle( screen1Layout );
 
 		// Navigate to screen 2
 		fireEvent.press( screen.getByText( /test-screen-1/ ) );
 		// The animation takes 300 ms, so we wait that time plus 1 ms
 		// to the completion.
-		advanceAnimationByTime( 301 );
+		act( () => jest.advanceTimersByTime( 301 ) );
 		expect( navigationContainer ).toHaveAnimatedStyle( {
 			height: WINDOW_HEIGHT,
 		} );
@@ -144,14 +139,14 @@ it( 'animates height transitioning from full-screen to non-full-screen', async (
 			screen.getByTestId( 'navigation-screen-test-screen-1' ),
 			screen1Layout
 		);
-		advanceAnimationByTime( 1 );
+		act( () => jest.advanceTimersByTime( 1 ) );
 		expect( navigationContainer ).toHaveAnimatedStyle( screen1Layout );
 
 		// Navigate to screen 2
 		fireEvent.press( screen.getByText( /test-screen-1/ ) );
 		// The animation takes 300 ms, so we wait that time plus 1 ms
 		// to the completion.
-		advanceAnimationByTime( 301 );
+		act( () => jest.advanceTimersByTime( 301 ) );
 		expect( navigationContainer ).toHaveAnimatedStyle( {
 			height: WINDOW_HEIGHT,
 		} );
@@ -160,7 +155,7 @@ it( 'animates height transitioning from full-screen to non-full-screen', async (
 		fireEvent.press( await screen.findByText( /test-screen-2/ ) );
 		// The animation takes 300 ms, so we wait that time plus 1 ms
 		// to the completion.
-		advanceAnimationByTime( 301 );
+		act( () => jest.advanceTimersByTime( 301 ) );
 		expect( navigationContainer ).toHaveAnimatedStyle( screen1Layout );
 	} ) );
 
@@ -187,7 +182,7 @@ it( 'does not animate height transitioning from full-screen to full-screen', asy
 
 		// First height value should be set without animation, but we need
 		// to wait for a frame to let animated styles be updated.
-		advanceAnimationByTime( 1 );
+		act( () => jest.advanceTimersByTime( 1 ) );
 		expect( navigationContainer ).toHaveAnimatedStyle( {
 			height: WINDOW_HEIGHT,
 		} );
@@ -195,7 +190,7 @@ it( 'does not animate height transitioning from full-screen to full-screen', asy
 		// Navigate to screen 2
 		fireEvent.press( screen.getByText( /test-screen-1/ ) );
 		// We wait some milliseconds to check if height has changed.
-		advanceAnimationByTime( 10 );
+		act( () => jest.advanceTimersByTime( 10 ) );
 		expect( navigationContainer ).toHaveAnimatedStyle( {
 			height: WINDOW_HEIGHT,
 		} );

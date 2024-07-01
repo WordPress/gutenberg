@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -63,7 +63,7 @@ function BlockContent( {
 	if ( pages === null ) {
 		return (
 			<div { ...blockProps }>
-				<Notice status={ 'warning' } isDismissible={ false }>
+				<Notice status="warning" isDismissible={ false }>
 					{ __( 'Page List: Cannot retrieve Pages.' ) }
 				</Notice>
 			</div>
@@ -73,7 +73,7 @@ function BlockContent( {
 	if ( pages.length === 0 ) {
 		return (
 			<div { ...blockProps }>
-				<Notice status={ 'info' } isDismissible={ false }>
+				<Notice status="info" isDismissible={ false }>
 					{ __( 'Page List: Cannot retrieve Pages.' ) }
 				</Notice>
 			</div>
@@ -101,7 +101,7 @@ function BlockContent( {
 
 		return (
 			<div { ...blockProps }>
-				<Notice status={ 'warning' } isDismissible={ false }>
+				<Notice status="warning" isDismissible={ false }>
 					{ __( 'Page List: Cannot retrieve Pages.' ) }
 				</Notice>
 			</div>
@@ -170,7 +170,7 @@ export default function PageListEdit( {
 	}, [ pages ] );
 
 	const blockProps = useBlockProps( {
-		className: classnames( 'wp-block-page-list', {
+		className: clsx( 'wp-block-page-list', {
 			'has-text-color': !! context.textColor,
 			[ getColorClassName( 'color', context.textColor ) ]:
 				!! context.textColor,
@@ -338,6 +338,7 @@ export default function PageListEdit( {
 						<p>{ convertDescription }</p>
 						<Button
 							variant="primary"
+							__experimentalIsFocusable
 							disabled={ ! hasResolvedPages }
 							onClick={ convertToNavigationLinks }
 						>

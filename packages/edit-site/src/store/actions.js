@@ -1,30 +1,27 @@
 /**
  * WordPress dependencies
  */
-import apiFetch from '@wordpress/api-fetch';
-import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
+import { parse } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
-import { addQueryArgs } from '@wordpress/url';
-import { __ } from '@wordpress/i18n';
-import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
-import { store as interfaceStore } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { store as editorStore } from '@wordpress/editor';
-import { speak } from '@wordpress/a11y';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
  */
-import { STORE_NAME as editSiteStoreName } from './constants';
-import isTemplateRevertable from '../utils/is-template-revertable';
 import {
 	TEMPLATE_POST_TYPE,
 	TEMPLATE_PART_POST_TYPE,
 	NAVIGATION_POST_TYPE,
 } from '../utils/constants';
-import { removeTemplates } from './private-actions';
+import { unlock } from '../lock-unlock';
+
+const { interfaceStore } = unlock( editorPrivateApis );
 
 /**
  * Dispatches an action that toggles a feature flag.
@@ -134,9 +131,13 @@ export const addTemplate =
  *
  * @param {Object} template The template object.
  */
-export const removeTemplate = ( template ) => {
-	return removeTemplates( [ template ] );
-};
+export const removeTemplate =
+	( template ) =>
+	( { registry } ) => {
+		return unlock( registry.dispatch( editorStore ) ).removeTemplates( [
+			template,
+		] );
+	};
 
 /**
  * Action that sets a template part.
@@ -220,7 +221,7 @@ export function setEditedPostContext( context ) {
  *
  * @deprecated
  *
- * @return {number} The resolved template ID for the page route.
+ * @return {Object} Action object.
  */
 export function setPage() {
 	deprecated( "dispatch( 'core/edit-site' ).setPage", {
@@ -346,130 +347,14 @@ export function setIsSaveViewOpened( isOpen ) {
  *                                      reverting the template. Default true.
  */
 export const revertTemplate =
-	( template, { allowUndo = true } = {} ) =>
-	async ( { registry } ) => {
-		const noticeId = 'edit-site-template-reverted';
-		registry.dispatch( noticesStore ).removeNotice( noticeId );
-		if ( ! isTemplateRevertable( template ) ) {
-			registry
-				.dispatch( noticesStore )
-				.createErrorNotice( __( 'This template is not revertable.' ), {
-					type: 'snackbar',
-				} );
-			return;
-		}
-
-		try {
-			const templateEntityConfig = registry
-				.select( coreStore )
-				.getEntityConfig( 'postType', template.type );
-
-			if ( ! templateEntityConfig ) {
-				registry
-					.dispatch( noticesStore )
-					.createErrorNotice(
-						__(
-							'The editor has encountered an unexpected error. Please reload.'
-						),
-						{ type: 'snackbar' }
-					);
-				return;
-			}
-
-			const fileTemplatePath = addQueryArgs(
-				`${ templateEntityConfig.baseURL }/${ template.id }`,
-				{ context: 'edit', source: 'theme' }
-			);
-
-			const fileTemplate = await apiFetch( { path: fileTemplatePath } );
-			if ( ! fileTemplate ) {
-				registry
-					.dispatch( noticesStore )
-					.createErrorNotice(
-						__(
-							'The editor has encountered an unexpected error. Please reload.'
-						),
-						{ type: 'snackbar' }
-					);
-				return;
-			}
-
-			const serializeBlocks = ( {
-				blocks: blocksForSerialization = [],
-			} ) => __unstableSerializeAndClean( blocksForSerialization );
-
-			const edited = registry
-				.select( coreStore )
-				.getEditedEntityRecord(
-					'postType',
-					template.type,
-					template.id
-				);
-
-			// We are fixing up the undo level here to make sure we can undo
-			// the revert in the header toolbar correctly.
-			registry.dispatch( coreStore ).editEntityRecord(
-				'postType',
-				template.type,
-				template.id,
-				{
-					content: serializeBlocks, // Required to make the `undo` behave correctly.
-					blocks: edited.blocks, // Required to revert the blocks in the editor.
-					source: 'custom', // required to avoid turning the editor into a dirty state
-				},
-				{
-					undoIgnore: true, // Required to merge this edit with the last undo level.
-				}
-			);
-
-			const blocks = parse( fileTemplate?.content?.raw );
-			registry
-				.dispatch( coreStore )
-				.editEntityRecord( 'postType', template.type, fileTemplate.id, {
-					content: serializeBlocks,
-					blocks,
-					source: 'theme',
-				} );
-
-			if ( allowUndo ) {
-				const undoRevert = () => {
-					registry
-						.dispatch( coreStore )
-						.editEntityRecord(
-							'postType',
-							template.type,
-							edited.id,
-							{
-								content: serializeBlocks,
-								blocks: edited.blocks,
-								source: 'custom',
-							}
-						);
-				};
-
-				registry
-					.dispatch( noticesStore )
-					.createSuccessNotice( __( 'Template reverted.' ), {
-						type: 'snackbar',
-						id: noticeId,
-						actions: [
-							{
-								label: __( 'Undo' ),
-								onClick: undoRevert,
-							},
-						],
-					} );
-			}
-		} catch ( error ) {
-			const errorMessage =
-				error.message && error.code !== 'unknown_error'
-					? error.message
-					: __( 'Template revert failed. Please reload.' );
-			registry
-				.dispatch( noticesStore )
-				.createErrorNotice( errorMessage, { type: 'snackbar' } );
-		}
+	( template, options ) =>
+	( { registry } ) => {
+		return unlock( registry.dispatch( editorStore ) ).revertTemplate(
+			template,
+			options
+		);
 	};
+
 /**
  * Action that opens an editor sidebar.
  *
@@ -477,16 +362,10 @@ export const revertTemplate =
  */
 export const openGeneralSidebar =
 	( name ) =>
-	( { dispatch, registry } ) => {
-		const isDistractionFree = registry
-			.select( preferencesStore )
-			.get( 'core', 'distractionFree' );
-		if ( isDistractionFree ) {
-			dispatch.toggleDistractionFree();
-		}
+	( { registry } ) => {
 		registry
 			.dispatch( interfaceStore )
-			.enableComplementaryArea( editSiteStoreName, name );
+			.enableComplementaryArea( 'core', name );
 	};
 
 /**
@@ -495,34 +374,24 @@ export const openGeneralSidebar =
 export const closeGeneralSidebar =
 	() =>
 	( { registry } ) => {
-		registry
-			.dispatch( interfaceStore )
-			.disableComplementaryArea( editSiteStoreName );
+		registry.dispatch( interfaceStore ).disableComplementaryArea( 'core' );
 	};
 
+/**
+ * Triggers an action used to switch editor mode.
+ *
+ * @deprecated
+ *
+ * @param {string} mode The editor mode.
+ */
 export const switchEditorMode =
 	( mode ) =>
-	( { dispatch, registry } ) => {
-		registry
-			.dispatch( 'core/preferences' )
-			.set( 'core', 'editorMode', mode );
-
-		// Unselect blocks when we switch to a non visual mode.
-		if ( mode !== 'visual' ) {
-			registry.dispatch( blockEditorStore ).clearSelectedBlock();
-		}
-
-		if ( mode === 'visual' ) {
-			speak( __( 'Visual editor selected' ), 'assertive' );
-		} else if ( mode === 'text' ) {
-			const isDistractionFree = registry
-				.select( preferencesStore )
-				.get( 'core', 'distractionFree' );
-			if ( isDistractionFree ) {
-				dispatch.toggleDistractionFree();
-			}
-			speak( __( 'Code editor selected' ), 'assertive' );
-		}
+	( { registry } ) => {
+		deprecated( "dispatch( 'core/edit-site' ).switchEditorMode", {
+			since: '6.6',
+			alternative: "dispatch( 'core/editor').switchEditorMode",
+		} );
+		registry.dispatch( editorStore ).switchEditorMode( mode );
 	};
 
 /**
@@ -552,47 +421,15 @@ export const setHasPageContentFocus =
  * Action that toggles Distraction free mode.
  * Distraction free mode expects there are no sidebars, as due to the
  * z-index values set, you can't close sidebars.
+ *
+ * @deprecated
  */
 export const toggleDistractionFree =
 	() =>
-	( { dispatch, registry } ) => {
-		const isDistractionFree = registry
-			.select( preferencesStore )
-			.get( 'core', 'distractionFree' );
-		if ( ! isDistractionFree ) {
-			registry.batch( () => {
-				registry
-					.dispatch( preferencesStore )
-					.set( 'core', 'fixedToolbar', true );
-				registry.dispatch( editorStore ).setIsInserterOpened( false );
-				registry.dispatch( editorStore ).setIsListViewOpened( false );
-				dispatch.closeGeneralSidebar();
-			} );
-		}
-		registry.batch( () => {
-			registry
-				.dispatch( preferencesStore )
-				.set( 'core', 'distractionFree', ! isDistractionFree );
-			registry
-				.dispatch( noticesStore )
-				.createInfoNotice(
-					isDistractionFree
-						? __( 'Distraction free off.' )
-						: __( 'Distraction free on.' ),
-					{
-						id: 'core/edit-site/distraction-free-mode/notice',
-						type: 'snackbar',
-						actions: [
-							{
-								label: __( 'Undo' ),
-								onClick: () => {
-									registry
-										.dispatch( preferencesStore )
-										.toggle( 'core', 'distractionFree' );
-								},
-							},
-						],
-					}
-				);
+	( { registry } ) => {
+		deprecated( "dispatch( 'core/edit-site' ).toggleDistractionFree", {
+			since: '6.6',
+			alternative: "dispatch( 'core/editor').toggleDistractionFree",
 		} );
+		registry.dispatch( editorStore ).toggleDistractionFree();
 	};

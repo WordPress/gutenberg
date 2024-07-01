@@ -235,11 +235,7 @@ describe( 'Confirm', () => {
 	describe( 'When controlled (isOpen is not `undefined`)', () => {
 		it( 'should render when `isOpen` is set to `true`', async () => {
 			render(
-				<ConfirmDialog
-					isOpen={ true }
-					onConfirm={ noop }
-					onCancel={ noop }
-				>
+				<ConfirmDialog isOpen onConfirm={ noop } onCancel={ noop }>
 					Are you sure?
 				</ConfirmDialog>
 			);
@@ -273,7 +269,7 @@ describe( 'Confirm', () => {
 			const onConfirm = jest.fn().mockName( 'onConfirm()' );
 
 			render(
-				<ConfirmDialog isOpen={ true } onConfirm={ onConfirm }>
+				<ConfirmDialog isOpen onConfirm={ onConfirm }>
 					Are you sure?
 				</ConfirmDialog>
 			);
@@ -291,11 +287,7 @@ describe( 'Confirm', () => {
 			const onCancel = jest.fn().mockName( 'onCancel()' );
 
 			render(
-				<ConfirmDialog
-					isOpen={ true }
-					onConfirm={ noop }
-					onCancel={ onCancel }
-				>
+				<ConfirmDialog isOpen onConfirm={ noop } onCancel={ onCancel }>
 					Are you sure?
 				</ConfirmDialog>
 			);
@@ -312,11 +304,7 @@ describe( 'Confirm', () => {
 			const onCancel = jest.fn().mockName( 'onCancel()' );
 
 			render(
-				<ConfirmDialog
-					isOpen={ true }
-					onConfirm={ noop }
-					onCancel={ onCancel }
-				>
+				<ConfirmDialog isOpen onConfirm={ noop } onCancel={ onCancel }>
 					Are you sure?
 				</ConfirmDialog>
 			);
@@ -352,11 +340,7 @@ describe( 'Confirm', () => {
 			const onConfirm = jest.fn().mockName( 'onConfirm()' );
 
 			render(
-				<ConfirmDialog
-					isOpen={ true }
-					onConfirm={ onConfirm }
-					onCancel={ noop }
-				>
+				<ConfirmDialog isOpen onConfirm={ onConfirm } onCancel={ noop }>
 					Are you sure?
 				</ConfirmDialog>
 			);

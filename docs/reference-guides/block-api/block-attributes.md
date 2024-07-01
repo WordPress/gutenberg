@@ -66,7 +66,7 @@ The saved HTML will contain the `title` and `size` in the comment delimiter, and
 <!-- /block:your-block -->
 ```
 
-If an attributes change over time then a [block deprecation](/docs/reference-guides/block-api/block-deprecation.md) can help migrate from an older attribute, or remove it entirely.
+If an attribute changes over time then a [block deprecation](/docs/reference-guides/block-api/block-deprecation.md) can help migrate from an older attribute, or remove it entirely.
 
 ## Type validation
 
@@ -374,9 +374,6 @@ Attribute definition:
 ```
 
 From here, meta attributes can be read and written by a block using the same interface as any attribute:
-
-
-{% JSX %}
 
 ```js
 edit( { attributes, setAttributes } ) {

@@ -50,18 +50,4 @@ describe( 'Video block', () => {
 		const addVideoButton = screen.queryByText( 'Add video' );
 		expect( addVideoButton ).toBeNull();
 	} );
-
-	it( `should not render empty state when 'guid' and 'id' attributes are present`, async () => {
-		await initializeEditor( {
-			initialHtml: `
-<!-- wp:video {"guid":"ABCD1234","id":1234 -->
-<figure class="wp-block-video wp-block-embed is-type-video is-provider-videopress"><div class="wp-block-embed__wrapper">
-https://videopress.com/<VIDEO_ID>
-</div></figure>
-<!-- /wp:video -->
-		`,
-		} );
-		const addVideoButton = screen.queryByText( 'Add video' );
-		expect( addVideoButton ).toBeNull();
-	} );
 } );

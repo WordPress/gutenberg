@@ -127,16 +127,44 @@ const getSettingsPropertiesMarkup = ( struct ) => {
 	}
 
 	let markup = '| Property  | Type   | Default | Props  |\n';
-	markup += '| ---       | ---    | ---    |---   |\n';
+	markup += '| ---    | ---    | ---    |---   |\n';
 	ks.forEach( ( key ) => {
 		const def = 'default' in props[ key ] ? props[ key ].default : '';
-		const ps =
+		let type = props[ key ].type || '';
+		let ps =
 			props[ key ].type === 'array'
 				? keys( getPropertiesFromArray( props[ key ].items ) )
 						.sort()
 						.join( ', ' )
 				: '';
-		markup += `| ${ key } | ${ props[ key ].type } | ${ def } | ${ ps } |\n`;
+
+		/*
+		 * Handle`oneOf` type definitions - extract the type and properties.
+		 * See: https://json-schema.org/understanding-json-schema/reference/combining#oneOf
+		 */
+		if ( props[ key ].oneOf && Array.isArray( props[ key ].oneOf ) ) {
+			if ( ! type ) {
+				type = props[ key ].oneOf
+					.map( ( item ) => item.type )
+					.join( ', ' );
+			}
+
+			if ( ! ps ) {
+				ps = props[ key ].oneOf
+					.map( ( item ) =>
+						item?.type === 'object' && item?.properties
+							? '_{' +
+							  keys( getPropertiesFromArray( item ) )
+									.sort()
+									.join( ', ' ) +
+							  '}_'
+							: ''
+					)
+					.join( ' ' );
+			}
+		}
+
+		markup += `| ${ key } | ${ type } | ${ def } | ${ ps } |\n`;
 	} );
 
 	return markup;
@@ -213,10 +241,13 @@ const formatType = ( prop ) => {
 		const types = [];
 
 		propTypes.forEach( ( item ) => {
-			if ( item.type ) types.push( item.type );
+			if ( item.type ) {
+				types.push( item.type );
+			}
 			// refComplete is always an object
-			if ( item.$ref && item.$ref === '#/definitions/refComplete' )
+			if ( item.$ref && item.$ref === '#/definitions/refComplete' ) {
 				types.push( 'object' );
+			}
 		} );
 
 		type = [ ...new Set( types ) ].join( ', ' );

@@ -1,8 +1,12 @@
 /**
  * External dependencies
  */
-import createSelector from 'rememo';
 import EquivalentKeyMap from 'equivalent-key-map';
+
+/**
+ * WordPress dependencies
+ */
+import { createSelector } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -125,4 +129,10 @@ export function getQueriedTotalItems( state, query = {} ) {
 	const { stableKey, context } = getQueryParts( query );
 
 	return state.queries?.[ context ]?.[ stableKey ]?.meta?.totalItems ?? null;
+}
+
+export function getQueriedTotalPages( state, query = {} ) {
+	const { stableKey, context } = getQueryParts( query );
+
+	return state.queries?.[ context ]?.[ stableKey ]?.meta?.totalPages ?? null;
 }

@@ -8,6 +8,8 @@
 /**
  * Renders the `core/post-date` block on the server.
  *
+ * @since 5.8.0
+ *
  * @param array    $attributes Block attributes.
  * @param string   $content    Block default content.
  * @param WP_Block $block      Block instance.
@@ -18,8 +20,14 @@ function render_block_core_post_date( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$post_ID          = $block->context['postId'];
-	$formatted_date   = get_the_date( empty( $attributes['format'] ) ? '' : $attributes['format'], $post_ID );
+	$post_ID = $block->context['postId'];
+
+	if ( isset( $attributes['format'] ) && 'human-diff' === $attributes['format'] ) {
+		// translators: %s: human-readable time difference.
+		$formatted_date = sprintf( __( '%s ago', 'gutenberg' ), human_time_diff( get_post_timestamp( $post_ID ) ) );
+	} else {
+		$formatted_date = get_the_date( empty( $attributes['format'] ) ? '' : $attributes['format'], $post_ID );
+	}
 	$unformatted_date = esc_attr( get_the_date( 'c', $post_ID ) );
 	$classes          = array();
 
@@ -36,7 +44,12 @@ function render_block_core_post_date( $attributes, $content, $block ) {
 	 */
 	if ( isset( $attributes['displayType'] ) && 'modified' === $attributes['displayType'] ) {
 		if ( get_the_modified_date( 'Ymdhi', $post_ID ) > get_the_date( 'Ymdhi', $post_ID ) ) {
-			$formatted_date   = get_the_modified_date( empty( $attributes['format'] ) ? '' : $attributes['format'], $post_ID );
+			if ( isset( $attributes['format'] ) && 'human-diff' === $attributes['format'] ) {
+				// translators: %s: human-readable time difference.
+				$formatted_date = sprintf( __( '%s ago', 'gutenberg' ), human_time_diff( get_post_timestamp( $post_ID, 'modified' ) ) );
+			} else {
+				$formatted_date = get_the_modified_date( empty( $attributes['format'] ) ? '' : $attributes['format'], $post_ID );
+			}
 			$unformatted_date = esc_attr( get_the_modified_date( 'c', $post_ID ) );
 			$classes[]        = 'wp-block-post-date__modified-date';
 		} else {
@@ -60,6 +73,8 @@ function render_block_core_post_date( $attributes, $content, $block ) {
 
 /**
  * Registers the `core/post-date` block on the server.
+ *
+ * @since 5.8.0
  */
 function register_block_core_post_date() {
 	register_block_type_from_metadata(

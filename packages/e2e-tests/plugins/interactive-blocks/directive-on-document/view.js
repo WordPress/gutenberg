@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { store, directive } from '@wordpress/interactivity';
+import { store, privateApis } from '@wordpress/interactivity';
+
+const { directive } = privateApis(
+	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
+);
 
 // Mock `data-wp-show` directive to test when things are removed from the
 // DOM.  Replace with `data-wp-show` when it's ready.
@@ -21,6 +25,8 @@ const { state } = store( 'directive-on-document', {
 		counter: 0,
 		isVisible: true,
 		isEventAttached: 'no',
+		keydownHandler: 'no',
+		keydownSecondHandler: 'no',
 	},
 	callbacks: {
 		keydownHandler() {
@@ -35,5 +41,11 @@ const { state } = store( 'directive-on-document', {
 			state.isEventAttached = 'no';
 			state.isVisible = ! state.isVisible;
 		},
-	}
+		keydownHandler: () => {
+			state.keydownHandler = 'yes';
+		},
+		keydownSecondHandler: () => {
+			state.keydownSecondHandler = 'yes';
+		},
+	},
 } );

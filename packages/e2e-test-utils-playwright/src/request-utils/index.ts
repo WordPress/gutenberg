@@ -93,7 +93,7 @@ class RequestUtils {
 			},
 		} );
 
-		const requestUtils = new RequestUtils( requestContext, {
+		const requestUtils = new this( requestContext, {
 			user,
 			storageState,
 			storageStatePath,

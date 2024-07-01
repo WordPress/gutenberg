@@ -48,4 +48,5 @@ test/storybook-playwright/specs/__snapshots__
 test/storybook-playwright/specs/*-snapshots/**
 test/gutenberg-test-themes/twentytwentyone
 test/gutenberg-test-themes/twentytwentythree
+test/gutenberg-test-themes/twentytwentyfour
 packages/react-native-editor/src/setup-local.js

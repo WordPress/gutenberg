@@ -237,16 +237,20 @@ function getMappedTypeAnnotation( typeAnnotation ) {
  * @param {babelTypes.TSTypeReference} typeAnnotation
  */
 function getTypeReferenceTypeAnnotation( typeAnnotation ) {
-	if ( ! typeAnnotation.typeParameters ) {
-		if ( babelTypes.isTSQualifiedName( typeAnnotation.typeName ) ) {
-			return unifyQualifiedName( typeAnnotation.typeName );
-		}
-		return typeAnnotation.typeName.name;
+	let typeName;
+	if ( babelTypes.isTSQualifiedName( typeAnnotation.typeName ) ) {
+		typeName = unifyQualifiedName( typeAnnotation.typeName );
+	} else {
+		typeName = typeAnnotation.typeName.name;
 	}
-	const typeParams = typeAnnotation.typeParameters.params
-		.map( getTypeAnnotation )
-		.join( ', ' );
-	return `${ typeAnnotation.typeName.name }< ${ typeParams } >`;
+
+	if ( typeAnnotation.typeParameters ) {
+		const typeParams = typeAnnotation.typeParameters.params
+			.map( getTypeAnnotation )
+			.join( ', ' );
+		typeName = `${ typeName }< ${ typeParams } >`;
+	}
+	return typeName;
 }
 
 /**

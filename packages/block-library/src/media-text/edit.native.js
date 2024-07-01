@@ -52,6 +52,7 @@ class MediaTextEdit extends Component {
 
 		this.onSelectMedia = this.onSelectMedia.bind( this );
 		this.onMediaUpdate = this.onMediaUpdate.bind( this );
+		this.onMediaThumbnailUpdate = this.onMediaThumbnailUpdate.bind( this );
 		this.onWidthChange = this.onWidthChange.bind( this );
 		this.commitWidthChange = this.commitWidthChange.bind( this );
 		this.onLayoutChange = this.onLayoutChange.bind( this );
@@ -121,6 +122,14 @@ class MediaTextEdit extends Component {
 		} );
 	}
 
+	onMediaThumbnailUpdate( mediaUrl ) {
+		const { setAttributes } = this.props;
+
+		setAttributes( {
+			mediaUrl,
+		} );
+	}
+
 	onWidthChange( width ) {
 		this.setState( {
 			mediaWidth: applyWidthConstraints( width ),
@@ -182,7 +191,7 @@ class MediaTextEdit extends Component {
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
-						label={ __( 'Crop image to fill entire column' ) }
+						label={ __( 'Crop image to fill' ) }
 						checked={ imageFill }
 						onChange={ this.onSetImageFill }
 					/>
@@ -221,6 +230,7 @@ class MediaTextEdit extends Component {
 				onFocus={ this.props.onFocus }
 				onMediaSelected={ this.onMediaSelected }
 				onMediaUpdate={ this.onMediaUpdate }
+				onMediaThumbnailUpdate={ this.onMediaThumbnailUpdate }
 				onSelectMedia={ this.onSelectMedia }
 				onSetOpenPickerRef={ this.onSetOpenPickerRef }
 				onWidthChange={ this.onWidthChange }

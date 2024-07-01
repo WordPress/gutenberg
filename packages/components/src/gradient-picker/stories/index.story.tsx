@@ -85,7 +85,6 @@ const Template: StoryFn< typeof GradientPicker > = ( {
 
 export const Default = Template.bind( {} );
 Default.args = {
-	__nextHasNoMargin: true,
 	gradients: GRADIENTS,
 };
 

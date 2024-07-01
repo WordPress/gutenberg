@@ -11,14 +11,21 @@
 		"ref": {
 			"type": "number"
 		},
-		"overrides": {
-			"type": "object"
+		"content": {
+			"type": "object",
+			"default": {}
 		}
+	},
+	"providesContext": {
+		"pattern/overrides": "content"
 	},
 	"supports": {
 		"customClassName": false,
 		"html": false,
 		"inserter": false,
-		"renaming": false
+		"renaming": false,
+		"interactivity": {
+			"clientNavigation": true
+		}
 	}
 }

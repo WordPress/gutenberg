@@ -6,7 +6,6 @@ import type { ForwardedRef } from 'react';
 /**
  * WordPress dependencies
  */
-import deprecated from '@wordpress/deprecated';
 import { __ } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
 import { useState, useMemo, forwardRef } from '@wordpress/element';
@@ -31,42 +30,33 @@ import {
 	HeaderHint,
 	HeaderLabel,
 	HeaderToggle,
-	Controls,
 } from './styles';
 import { Spacer } from '../spacer';
 import FontSizePickerSelect from './font-size-picker-select';
 import FontSizePickerToggleGroup from './font-size-picker-toggle-group';
 import { T_SHIRT_NAMES } from './constants';
 
+const DEFAULT_UNITS = [ 'px', 'em', 'rem', 'vw', 'vh' ];
+
 const UnforwardedFontSizePicker = (
 	props: FontSizePickerProps,
 	ref: ForwardedRef< any >
 ) => {
 	const {
-		/** Start opting into the new margin-free styles that will become the default in a future version. */
-		__nextHasNoMarginBottom = false,
 		__next40pxDefaultSize = false,
 		fallbackFontSize,
 		fontSizes = [],
 		disableCustomFontSizes = false,
 		onChange,
 		size = 'default',
-		units: unitsProp,
+		units: unitsProp = DEFAULT_UNITS,
 		value,
 		withSlider = false,
 		withReset = true,
 	} = props;
 
-	if ( ! __nextHasNoMarginBottom ) {
-		deprecated( 'Bottom margin styles for wp.components.FontSizePicker', {
-			since: '6.1',
-			version: '6.4',
-			hint: 'Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version.',
-		} );
-	}
-
 	const units = useCustomUnits( {
-		availableUnits: unitsProp || [ 'px', 'em', 'rem' ],
+		availableUnits: unitsProp,
 	} );
 
 	const shouldUseSelectControl = fontSizes.length > 5;
@@ -122,7 +112,7 @@ const UnforwardedFontSizePicker = (
 		units
 	);
 	const isValueUnitRelative =
-		!! valueUnit && [ 'em', 'rem' ].includes( valueUnit );
+		!! valueUnit && [ 'em', 'rem', 'vw', 'vh' ].includes( valueUnit );
 	const isDisabled = value === undefined;
 
 	return (
@@ -159,10 +149,7 @@ const UnforwardedFontSizePicker = (
 					) }
 				</Header>
 			</Spacer>
-			<Controls
-				className="components-font-size-picker__controls"
-				__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
-			>
+			<div>
 				{ !! fontSizes.length &&
 					shouldUseSelectControl &&
 					! showCustomValueControl && (
@@ -196,7 +183,6 @@ const UnforwardedFontSizePicker = (
 					<FontSizePickerToggleGroup
 						fontSizes={ fontSizes }
 						value={ value }
-						__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 						__next40pxDefaultSize={ __next40pxDefaultSize }
 						size={ size }
 						onChange={ ( newValue ) => {
@@ -243,9 +229,7 @@ const UnforwardedFontSizePicker = (
 							<FlexItem isBlock>
 								<Spacer marginX={ 2 } marginBottom={ 0 }>
 									<RangeControl
-										__nextHasNoMarginBottom={
-											__nextHasNoMarginBottom
-										}
+										__nextHasNoMarginBottom
 										__next40pxDefaultSize={
 											__next40pxDefaultSize
 										}
@@ -297,7 +281,7 @@ const UnforwardedFontSizePicker = (
 						) }
 					</Flex>
 				) }
-			</Controls>
+			</div>
 		</Container>
 	);
 };

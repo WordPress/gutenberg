@@ -7,7 +7,7 @@ This is done by setting the `target` on `<PluginSidebarMoreMenuItem>` to match t
 
 ```js
 import { registerPlugin } from '@wordpress/plugins';
-import { PluginSidebar, PluginSidebarMoreMenuItem } from '@wordpress/edit-post';
+import { PluginSidebar, PluginSidebarMoreMenuItem } from '@wordpress/editor';
 import { image } from '@wordpress/icons';
 
 const PluginSidebarMoreMenuItemTest = () => (

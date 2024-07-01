@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import type { CSSProperties } from 'react';
 import type { Meta, StoryFn } from '@storybook/react';
 
 /**
@@ -92,13 +91,11 @@ MultipleOrigins.args = {
 export const CSSVariables: StoryFn< typeof ColorPalette > = ( args ) => {
 	return (
 		<div
-			style={
-				{
-					'--red': '#f00',
-					'--yellow': '#ff0',
-					'--blue': '#00f',
-				} as CSSProperties
-			}
+			style={ {
+				'--red': '#f00',
+				'--yellow': '#ff0',
+				'--blue': '#00f',
+			} }
 		>
 			<Template { ...args } />
 		</div>

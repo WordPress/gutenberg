@@ -5,12 +5,12 @@ import type { ForwardedRef } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import * as Ariakit from '@ariakit/react';
 // eslint-disable-next-line no-restricted-imports
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 /**
  * WordPress dependencies
  */
-import { useInstanceId } from '@wordpress/compose';
+import { useReducedMotion, useInstanceId } from '@wordpress/compose';
 import { useMemo } from '@wordpress/element';
 
 /**
@@ -147,7 +147,9 @@ function ToggleGroupControlOptionBase(
 								{ ...commonProps }
 								onFocus={ ( event ) => {
 									onFocusProp?.( event );
-									if ( event.defaultPrevented ) return;
+									if ( event.defaultPrevented ) {
+										return;
+									}
 									toggleGroupControlContext.setValue( value );
 								} }
 							/>
@@ -160,16 +162,18 @@ function ToggleGroupControlOptionBase(
 			</WithToolTip>
 			{ /* Animated backdrop using framer motion's shared layout animation */ }
 			{ isPressed ? (
-				<motion.div
-					className={ backdropClasses }
-					transition={
-						shouldReduceMotion
-							? REDUCED_MOTION_TRANSITION_CONFIG
-							: undefined
-					}
-					role="presentation"
-					layoutId={ LAYOUT_ID }
-				/>
+				<motion.div layout layoutRoot>
+					<motion.div
+						className={ backdropClasses }
+						transition={
+							shouldReduceMotion
+								? REDUCED_MOTION_TRANSITION_CONFIG
+								: undefined
+						}
+						role="presentation"
+						layoutId={ LAYOUT_ID }
+					/>
+				</motion.div>
 			) : null }
 		</LabelView>
 	);

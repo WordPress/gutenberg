@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -124,7 +124,7 @@ const ResizableAvatar = ( {
 				<img
 					src={ doubledSizedSrc }
 					alt={ avatar.alt }
-					className={ classnames(
+					className={ clsx(
 						'avatar',
 						'avatar-' + attributes.size,
 						'photo',
@@ -187,7 +187,7 @@ const UserEdit = ( { attributes, context, setAttributes, isSelected } ) => {
 	return (
 		<>
 			<AvatarInspectorControls
-				selectUser={ true }
+				selectUser
 				attributes={ attributes }
 				avatar={ avatar }
 				setAttributes={ setAttributes }

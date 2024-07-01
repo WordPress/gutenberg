@@ -49,7 +49,6 @@ const legacyData = {
 			},
 			editorMode: 'text',
 			hiddenBlockTypes: [ 'core/heading', 'core/list' ],
-			preferredStyleVariations: { 'core/quote': 'plain' },
 			localAutosaveInterval: 15,
 		},
 	},
@@ -114,9 +113,6 @@ const alreadyConvertedData = {
 				fullscreenMode: false,
 				hiddenBlockTypes: [ 'core/audio', 'core/cover' ],
 				editorMode: 'visual',
-				preferredStyleVariations: {
-					'core/quote': 'large',
-				},
 				inactivePanels: [],
 				openPanels: [ 'post-status' ],
 				complementaryArea: 'edit-post/block',
@@ -161,9 +157,6 @@ describe( 'convertLegacyData', () => {
 		    "pinnedItems": {
 		      "my-sidebar-plugin/title-sidebar": false,
 		    },
-		    "preferredStyleVariations": {
-		      "core/quote": "plain",
-		    },
 		    "welcomeGuide": false,
 		  },
 		  "core/edit-site": {
@@ -205,9 +198,6 @@ describe( 'convertLegacyData', () => {
 		    ],
 		    "pinnedItems": {
 		      "my-sidebar-plugin/title-sidebar": false,
-		    },
-		    "preferredStyleVariations": {
-		      "core/quote": "large",
 		    },
 		    "welcomeGuide": false,
 		  },

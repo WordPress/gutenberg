@@ -29,11 +29,28 @@ export async function getBlocks(
 
 	return await this.page.evaluate(
 		( [ _full, _clientId ] ) => {
+			// Serialize serializable attributes of blocks.
+			function serializeAttributes(
+				attributes: Record< string, unknown >
+			) {
+				return Object.fromEntries(
+					Object.entries( attributes ).map( ( [ key, value ] ) => {
+						// Serialize RichTextData to string.
+						if (
+							value instanceof window.wp.richText.RichTextData
+						) {
+							return [ key, ( value as string ).toString() ];
+						}
+						return [ key, value ];
+					} )
+				);
+			}
+
 			// Remove other unpredictable properties like clientId from blocks for testing purposes.
 			function recursivelyTransformBlocks( blocks: Block[] ): Block[] {
 				return blocks.map( ( block ) => ( {
 					name: block.name,
-					attributes: block.attributes,
+					attributes: serializeAttributes( block.attributes ),
 					innerBlocks: recursivelyTransformBlocks(
 						block.innerBlocks
 					),

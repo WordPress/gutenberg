@@ -70,7 +70,6 @@ Default.args = {
 				},
 			],
 			content: 'Post published.',
-			isDismissible: true,
 			explicitDismiss: false,
 		},
 		{
@@ -83,7 +82,6 @@ Default.args = {
 				},
 			],
 			content: 'Post updated.',
-			isDismissible: true,
 			explicitDismiss: false,
 		},
 		{
@@ -91,7 +89,6 @@ Default.args = {
 			spokenMessage: 'All content copied.',
 			actions: [],
 			content: 'All content copied.',
-			isDismissible: true,
 			explicitDismiss: false,
 		},
 	],

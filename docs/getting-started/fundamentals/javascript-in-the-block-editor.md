@@ -1,53 +1,94 @@
-# Working with Javascript for the Block Editor
+# Working with JavaScript for the Block Editor
 
-A JavaScript Build Process is recommended for most cases when working with Javascript for the Block Editor. With a build process, you'll be able to work with ESNext and JSX (among others) syntaxes and features in your code while producing code ready for the majority of the browsers.
+Developing blocks for the Block Editor often involves using modern JavaScript (ESNext and JSX), and most examples here in the Block Editor Handbook are written in these syntaxes.
 
-## JavaScript build process
+However, this form of JavaScript must be transformed into a browser-compatible format, necessitating a build step. This process transforms, bundles, and optimizes JavaScript source code and related assets into a format suitable for production environments.
 
-["ESNext"](https://developer.mozilla.org/en-US/docs/Web/JavaScript/JavaScript_technologies_overview#standardization_process) is a dynamic name that refers to Javascript's latest syntax and features. ["JSX"](https://react.dev/learn/writing-markup-with-jsx) is a custom syntax extension to JavaScript, created by React project, that allows you to write JavaScript using a familiar HTML tag-like syntax.
+## JavaScript with a build process
 
-Browsers cannot interpret or run ESNext and JSX syntaxes, so a transformation step is needed to convert these syntaxes to code that browsers can understand.
+Using a build process for block development unlocks the full potential of modern JavaScript, facilitating the use of ESNext and JSX.
 
-["webpack"](https://webpack.js.org/concepts/why-webpack/) is a pluggable tool that processes JavaScript and creates a compiled bundle that runs in a browser. ["babel"](https://babeljs.io/) transforms JavaScript from one format to another. Babel is a webpack plugin to transform ESNext and JSX to production-ready JavaScript.
+[ESNext](https://developer.mozilla.org/en-US/docs/Web/JavaScript/JavaScript_technologies_overview#standardization_process) refers to JavaScript's most recent syntax and features. [JSX](https://react.dev/learn/writing-markup-with-jsx) is a syntax extension developed by the React project that enables you to write JavaScript that resembles HTML.
 
-[`@wordpress/scripts`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/) package abstracts these libraries away to standardize and simplify development, so you won’t need to handle the details for configuring webpack or babel. Check the [Get started with wp-scripts](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-scripts/) intro guide.
+Since browsers cannot directly execute ESNext and JSX, these syntaxes must be transformed into browser-compatible JavaScript.
 
+[webpack](https://webpack.js.org/concepts/why-webpack/) is a pluggable tool that processes and bundles JavaScript for browser compatibility. [Babel](https://babeljs.io/), a plugin for webpack, converts ESNext and JSX into standard JavaScript.
 
-Among other things, with `wp-scripts` package you can use Javascript modules to distribute your code among different files and get a few bundled files at the end of the build process (see [example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/data-basics-59c8f8)).
+Configuring webpack and Babel can be challenging, so it's recommended that you use the [`@wordpress/scripts`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/) package. This tool simplifies development by preconfiguring both, so you rarely need to write custom webpack or Babel configurations.
+
+For an introduction, refer to the [Get started with wp-scripts](/docs/getting-started/devenv/get-started-with-wp-scripts.md) guide.
+
+### An overview of `wp-scripts`
+
+The diagram below provides an overview of the build process when using the `wp-scripts` package. It's designed to work out of the box with [standard configurations](/docs/getting-started/devenv/get-started-with-wp-scripts.md#basic-usage) for development and production environments.
 
 [![Open Build Process diagram image](https://developer.wordpress.org/files/2023/11/build-process.png)](https://developer.wordpress.org/files/2023/11/build-process.png "Open Build Process diagram image")
 
-With the [proper `package.json` scripts](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-scripts/#basic-usage) you can launch the build process with `wp-scripts` in production and development mode:
+- **Production Mode (`npm run build`):** In this mode, `wp-scripts` compiles your JavaScript, minifying the output to reduce file size and improve loading times in the browser. This is ideal for deploying your code to a live site.
 
-- **`npm run build` for "production" mode build** - This process [minifies the code](https://developer.mozilla.org/en-US/docs/Glossary/Minification) so it downloads faster in the browser. 
-- **`npm run start` for "development" mode build**  - This process does not minify the code of the bundled files, provides [source maps files](https://firefox-source-docs.mozilla.org/devtools-user/debugger/how_to/use_a_source_map/index.html) for them, and additionally continues a running process to watch the source file for more changes and rebuilds as you develop.
+- **Development Mode (`npm run start`):** This mode is tailored for active development. It skips minification for easier debugging, generates source maps for better error tracking, and watches your source files for changes. When a change is detected, it automatically rebuilds the affected files, allowing you to see updates in real-time.
 
-<div class="callout callout-tip">
-    You can <a href="https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/#provide-your-own-webpack-config">provide your own custom <code>webpack.config.js</code></a> to <code>wp-scripts</code> to customize the build process to suit your needs 
-</div>
-
-## Javascript without a build process
-
-Using Javascript without a build process may be another good option for code developments with few requirements (especially those not requiring JSX). 
-
-Without a build process, you access the methods directly from the `wp` global object and must enqueue the script manually. [WordPress Javascript packages](https://developer.wordpress.org/block-editor/reference-guides/packages/) can be accessed through the `wp` [global variable](https://developer.mozilla.org/en-US/docs/Glossary/Global_variable) but every script that wants to use them through this `wp` object is responsible for adding [the handle of that package](https://developer.wordpress.org/block-editor/contributors/code/scripts/) to the dependency array when registered.
-
-So, for example if a script wants to register a block variation using the `registerBlockVariation` method out of the ["blocks" package](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-blocks/), the `wp-blocks` handle would need to get added to the dependency array to ensure that `wp.blocks.registerBlockVariation` is defined when the script tries to access it (see [example](https://github.com/wptrainingteam/block-theme-examples/blob/master/example-block-variation/functions.php)). 
+The `wp-scripts` package also facilitates the use of JavaScript modules, allowing code distribution across multiple files and resulting in a streamlined bundle after the build process. The [block-development-example](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/data-basics-59c8f8) GitHub repository provides some good examples.
 
 <div class="callout callout-tip">
-    Try running <code>wp.data.select('core/editor').getBlocks())</code> in your browser's dev tools while editing a post or a site. The entire editor is available from the console.
+    In most situations, no customization will be needed, but you can provide a <a href="https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/#provide-your-own-webpack-config"><code>webpack.config.js</code></a> when using <code>wp-scripts</code> to modify the build process to suit your needs.
 </div>
 
-Use [`enqueue_block_editor_assets`](https://developer.wordpress.org/reference/hooks/enqueue_block_editor_assets/) hook coupled with the standard [`wp_enqueue_script`](https://developer.wordpress.org/reference/functions/wp_enqueue_script/) (and [`wp_register_script`](https://developer.wordpress.org/reference/functions/wp_register_script/)) to enqueue javascript assets for the Editor with access to these packages via `wp` (see [example](https://github.com/wptrainingteam/block-theme-examples/tree/master/example-block-variation)). Refer to [Enqueueing assets in the Editor](https://developer.wordpress.org/block-editor/how-to-guides/enqueueing-assets-in-the-editor/) for more info.
+## JavaScript without a build process
+
+Integrating JavaScript into your WordPress projects without a build process can be the most straightforward approach in specific scenarios. This is particularly true for projects that don't leverage JSX or other advanced JavaScript features requiring compilation.
+
+When you opt out of a build process, you interact directly with WordPress's [JavaScript APIs](/docs/reference-guides/packages/) through the global `wp` object. This means that all the methods and packages provided by WordPress are readily available, but with one caveat: you must manually manage script dependencies. This is done by adding [the handle](/docs/contributors/code/scripts.md) of each corresponding package to the dependency array of your enqueued JavaScript file.
+
+For example, suppose you're creating a script that registers a new block [variation](/docs/reference-guides/block-api/block-variations.md) using the `registerBlockVariation` function from the [`blocks`](/docs/reference-guides/packages/packages-blocks.md) package. You must include `wp-blocks` in your script's dependency array. This guarantees that the `wp.blocks.registerBlockVariation` method is available and defined by the time your script executes.
+
+In the following example, the `wp-blocks` dependency is defined when enqueuing the `variations.js` file.
+
+```php
+function example_enqueue_block_variations() {
+	wp_enqueue_script(
+		'example-enqueue-block-variations',
+		get_template_directory_uri() . '/assets/js/variations.js',
+		array( 'wp-blocks' ),
+		wp_get_theme()->get( 'Version' ),
+		false
+	);
+}
+add_action( 'enqueue_block_editor_assets', 'example_enqueue_block_variations' );
+```
+
+Then in the `variations.js` file, you can register a new variation for the Media & Text block like so:
+
+```js
+wp.blocks.registerBlockVariation(
+	'core/media-text',
+	{
+		name: 'media-text-custom',
+		title: 'Media & Text Custom',
+		attributes: {
+			align: 'wide',
+			backgroundColor: 'tertiary'
+		},
+	}
+);
+```
+
+For scripts that need to run in the Block Editor, make sure you use the [`enqueue_block_editor_assets`](https://developer.wordpress.org/reference/hooks/enqueue_block_editor_assets/) hook coupled with the standard [`wp_enqueue_script`](https://developer.wordpress.org/reference/functions/wp_enqueue_script/) function.
+
+Refer to [Enqueueing assets in the Editor](/docs/how-to-guides/enqueueing-assets-in-the-editor.md) for more information. You can also visit the [block-development-example](https://github.com/wptrainingteam/block-theme-examples/blob/master/example-block-variation/functions.php) GitHub repository for more practical examples.
+
+<div class="callout callout-tip">
+    Open your browser's dev tools and try running <code>wp.data.select('core/editor').getBlocks()</code> in the console when editing a post or when using the Site Editor. This command will return all available blocks.
+</div>
 
 ## Additional resources
 
-- [Package Reference](https://developer.wordpress.org/block-editor/reference-guides/packages/)
-- [Get started with wp-scripts](https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-scripts/) 
-- [Enqueueing assets in the Editor](https://developer.wordpress.org/block-editor/how-to-guides/enqueueing-assets-in-the-editor/) 
-- [WordPress Packages handles](https://developer.wordpress.org/block-editor/contributors/code/scripts/) 
-- [Javascript Reference](https://developer.mozilla.org/en-US/docs/Web/JavaScript) | MDN Web Docs
+- [Package reference](/docs/reference-guides/packages.md)
+- [Get started with wp-scripts](/docs/getting-started/devenv/get-started-with-wp-scripts.md)
+- [Enqueueing assets in the Editor](/docs/how-to-guides/enqueueing-assets-in-the-editor.md)
+- [WordPress package handles](/docs/contributors/code/scripts.md)
+- [JavaScript reference](https://developer.mozilla.org/en-US/docs/Web/JavaScript) | MDN Web Docs
 - [block-development-examples](https://github.com/WordPress/block-development-examples) | GitHub repository
 - [block-theme-examples](https://github.com/wptrainingteam/block-theme-examples) | GitHub repository
 - [How webpack and WordPress packages interact](https://developer.wordpress.org/news/2023/04/how-webpack-and-wordpress-packages-interact/) | Developer Blog
-- [Build Process Diagram](https://excalidraw.com/#json=4aNG9JUti3pMnsfoga35b,ihEAI8p5dwkpjWr6gQmjuw)
+- [Build process diagram](https://excalidraw.com/#json=4aNG9JUti3pMnsfoga35b,ihEAI8p5dwkpjWr6gQmjuw)

@@ -228,12 +228,14 @@ test.describe( 'Links', () => {
 		await LinkUtils.createLink();
 
 		// Click on the Edit button.
-		await page.getByRole( 'button', { name: 'Edit', exact: true } ).click();
+		await page
+			.getByRole( 'button', { name: 'Edit link', exact: true } )
+			.click();
 
 		// Change the URL.
 		// getByPlaceholder required in order to handle Link Control component
 		// managing focus onto other inputs within the control.
-		await page.getByPlaceholder( 'Search or type url' ).fill( '' );
+		await page.getByPlaceholder( 'Search or type URL' ).fill( '' );
 		await page.keyboard.type( '/handbook' );
 
 		// Submit the link.
@@ -255,7 +257,9 @@ test.describe( 'Links', () => {
 
 		const linkPopover = LinkUtils.getLinkPopover();
 
-		await linkPopover.getByRole( 'button', { name: 'Unlink' } ).click();
+		await linkPopover
+			.getByRole( 'button', { name: 'Remove link' } )
+			.click();
 
 		// The link should have been removed.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -345,7 +349,7 @@ test.describe( 'Links', () => {
 		// Change the URL.
 		// getByPlaceholder required in order to handle Link Control component
 		// managing focus onto other inputs within the control.
-		await page.getByPlaceholder( 'Search or type url' ).fill( '' );
+		await page.getByPlaceholder( 'Search or type URL' ).fill( '' );
 		await page.keyboard.type( '/handbook' );
 
 		// Submit the link.
@@ -675,7 +679,7 @@ test.describe( 'Links', () => {
 		// Change the URL.
 		// Note: getByPlaceholder required in order to handle Link Control component
 		// managing focus onto other inputs within the control.
-		await linkPopover.getByPlaceholder( 'Search or type url' ).fill( '' );
+		await linkPopover.getByPlaceholder( 'Search or type URL' ).fill( '' );
 		await page.keyboard.type( 'wordpress.org' );
 
 		// Save the link.
@@ -874,7 +878,94 @@ test.describe( 'Links', () => {
 		] );
 	} );
 
+	// Fix for https://github.com/WordPress/gutenberg/issues/58322
+	test( 'can click links within the same paragraph to open the correct link preview (@firefox)', async ( {
+		editor,
+		LinkUtils,
+	} ) => {
+		// Create a paragraph with two links
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content: `<a href="https://wordpressfoundation.org/donate/">Donate to the WordPress Foundation</a> to support <a href="https://wordpress.org/gutenberg">Gutenberg</a>`,
+			},
+		} );
+
+		// Click on "Gutenberg" link in the canvas
+		await editor.canvas
+			.getByRole( 'link', {
+				name: 'Gutenberg',
+			} )
+			.click();
+
+		const linkPopover = LinkUtils.getLinkPopover();
+		await expect( linkPopover ).toBeVisible();
+		await expect(
+			linkPopover.getByText( 'wordpress.org/gutenberg' )
+		).toBeVisible();
+
+		// Click the other link in the same paragraph. We need a short delay between mousdown and mouseup to get the popover to show
+		await editor.canvas
+			.getByRole( 'link', {
+				name: 'WordPress',
+			} )
+			.click( { delay: 100 } );
+
+		await expect( linkPopover ).toBeVisible();
+		await expect(
+			linkPopover.getByText( 'wordpress.org/gutenberg' )
+		).toBeHidden();
+		await expect(
+			linkPopover.getByText( 'wordpressfoundation.org/donate/' )
+		).toBeVisible();
+	} );
+
 	test.describe( 'Editing link text', () => {
+		test( 'should allow editing text underneath popover when activated via mouse', async ( {
+			page,
+			editor,
+			LinkUtils,
+		} ) => {
+			await LinkUtils.createLink();
+
+			// Click on some other part of the text to move the caret.
+			await editor.canvas
+				.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} )
+				.click();
+
+			// Click on the link to activate the Link UI.
+			const richTextLink = editor.canvas.getByRole( 'link', {
+				name: 'Gutenberg',
+			} );
+
+			await richTextLink.click();
+
+			// Check focus remains in the RichText.
+			await expect(
+				editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} )
+			).toBeFocused();
+
+			// Type to modify the link text.
+			await page.keyboard.type( ' is awesome' );
+
+			// expect link UI to be visible
+			const linkPopover = LinkUtils.getLinkPopover();
+
+			await expect( linkPopover ).toBeVisible();
+
+			// Press "Edit" on Link UI
+			await linkPopover.getByRole( 'button', { name: 'Edit' } ).click();
+
+			// Check that the Link Text input reflects the change to the text
+			// made in the RichText.
+			const textInput = linkPopover.getByLabel( 'Text', { exact: true } );
+			await expect( textInput ).toHaveValue( 'Gute is awesomenberg' );
+		} );
+
 		test( 'should allow for modification of link text via the Link UI', async ( {
 			page,
 			pageUtils,
@@ -980,8 +1071,8 @@ test.describe( 'Links', () => {
 			pageUtils,
 			editor,
 		} ) => {
-			const textToSelect = `\u2003\u2003 spaces\u2003 `;
-			const textWithWhitespace = `Text with leading and trailing       spaces    `;
+			const textToSelect = `         spaces     `;
+			const textWithWhitespace = `Text with leading and trailing${ textToSelect }`;
 
 			// Create a block with some text.
 			await editor.insertBlock( {

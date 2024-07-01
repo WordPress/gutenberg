@@ -12,7 +12,7 @@ import {
 const block = 'List';
 const initialHtml = `
 <!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>First Item</li>
 <!-- /wp:list-item -->
 

@@ -3,4 +3,5 @@
  */
 import './custom-sources-backwards-compatibility';
 import './default-autocompleters';
-import './pattern-partial-syncing';
+import './media-upload';
+import './pattern-overrides';

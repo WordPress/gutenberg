@@ -256,7 +256,7 @@ const BlockActionsMenu = ( {
 				<ToolbarButton
 					title={ __( 'Open Block Actions Menu' ) }
 					icon={ moreHorizontalMobile }
-					disabled={ true }
+					disabled
 				/>
 			</ToolbarGroup>
 		);
@@ -311,7 +311,7 @@ const BlockActionsMenu = ( {
 				destructiveButtonIndex={ options.length }
 				disabledButtonIndices={ disabledButtonIndices }
 				hideCancelButton={ Platform.OS !== 'ios' }
-				leftAlign={ true }
+				leftAlign
 				getAnchor={ getAnchor }
 				// translators: %s: block title e.g: "Paragraph".
 				title={ sprintf( __( '%s block options' ), blockTitle ) }

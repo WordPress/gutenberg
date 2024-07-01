@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useCallback, useMemo, useState } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { RichTextToolbarButton, useSettings } from '@wordpress/block-editor';
 import {
 	Icon,
@@ -66,21 +66,13 @@ function TextColorEdit( {
 		'color.palette'
 	);
 	const [ isAddingColor, setIsAddingColor ] = useState( false );
-	const enableIsAddingColor = useCallback(
-		() => setIsAddingColor( true ),
-		[ setIsAddingColor ]
-	);
-	const disableIsAddingColor = useCallback(
-		() => setIsAddingColor( false ),
-		[ setIsAddingColor ]
-	);
 	const colorIndicatorStyle = useMemo(
 		() =>
 			fillComputedColors(
 				contentRef.current,
 				getActiveColors( value, name, colors )
 			),
-		[ value, colors ]
+		[ contentRef, value, colors ]
 	);
 
 	const hasColorsToChoose = colors.length || ! allowCustomControl;
@@ -107,7 +99,7 @@ function TextColorEdit( {
 				// If has no colors to choose but a color is active remove the color onClick.
 				onClick={
 					hasColorsToChoose
-						? enableIsAddingColor
+						? () => setIsAddingColor( true )
 						: () => onChange( removeFormat( value, name ) )
 				}
 				role="menuitemcheckbox"
@@ -115,11 +107,12 @@ function TextColorEdit( {
 			{ isAddingColor && (
 				<InlineColorUI
 					name={ name }
-					onClose={ disableIsAddingColor }
+					onClose={ () => setIsAddingColor( false ) }
 					activeAttributes={ activeAttributes }
 					value={ value }
 					onChange={ onChange }
 					contentRef={ contentRef }
+					isActive={ isActive }
 				/>
 			) }
 		</>

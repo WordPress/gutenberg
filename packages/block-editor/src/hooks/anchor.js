@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
-import { PanelBody, TextControl, ExternalLink } from '@wordpress/components';
+import { TextControl, ExternalLink } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { hasBlockSupport } from '@wordpress/blocks';
 import { Platform } from '@wordpress/element';
@@ -51,71 +51,53 @@ export function addAttribute( settings ) {
 	return settings;
 }
 
-function BlockEditAnchorControlPure( {
-	name: blockName,
-	anchor,
-	setAttributes,
-} ) {
+function BlockEditAnchorControlPure( { anchor, setAttributes } ) {
 	const blockEditingMode = useBlockEditingMode();
 
-	const isWeb = Platform.OS === 'web';
-	const textControl = (
-		<TextControl
-			__nextHasNoMarginBottom
-			__next40pxDefaultSize
-			className="html-anchor-control"
-			label={ __( 'HTML anchor' ) }
-			help={
-				<>
-					{ __(
-						'Enter a word or two — without spaces — to make a unique web address just for this block, called an “anchor.” Then, you’ll be able to link directly to this section of your page.'
-					) }
+	if ( blockEditingMode !== 'default' ) {
+		return null;
+	}
 
-					{ isWeb && (
-						<ExternalLink
-							href={ __(
-								'https://wordpress.org/documentation/article/page-jumps/'
-							) }
-						>
-							{ __( 'Learn more about anchors' ) }
-						</ExternalLink>
-					) }
-				</>
-			}
-			value={ anchor || '' }
-			placeholder={ ! isWeb ? __( 'Add an anchor' ) : null }
-			onChange={ ( nextValue ) => {
-				nextValue = nextValue.replace( ANCHOR_REGEX, '-' );
-				setAttributes( {
-					anchor: nextValue,
-				} );
-			} }
-			autoCapitalize="none"
-			autoComplete="off"
-		/>
-	);
+	const isWeb = Platform.OS === 'web';
 
 	return (
-		<>
-			{ isWeb && blockEditingMode === 'default' && (
-				<InspectorControls group="advanced">
-					{ textControl }
-				</InspectorControls>
-			) }
-			{ /*
-			 * We plan to remove scoping anchors to 'core/heading' to support
-			 * anchors for all eligble blocks. Additionally we plan to explore
-			 * leveraging InspectorAdvancedControls instead of a custom
-			 * PanelBody title. https://github.com/WordPress/gutenberg/issues/28363
-			 */ }
-			{ ! isWeb && blockName === 'core/heading' && (
-				<InspectorControls>
-					<PanelBody title={ __( 'Heading settings' ) }>
-						{ textControl }
-					</PanelBody>
-				</InspectorControls>
-			) }
-		</>
+		<InspectorControls group="advanced">
+			<TextControl
+				__nextHasNoMarginBottom
+				__next40pxDefaultSize
+				className="html-anchor-control"
+				label={ __( 'HTML anchor' ) }
+				help={
+					<>
+						{ __(
+							'Enter a word or two — without spaces — to make a unique web address just for this block, called an “anchor”. Then, you’ll be able to link directly to this section of your page.'
+						) }
+						{ isWeb && (
+							<>
+								{ ' ' }
+								<ExternalLink
+									href={ __(
+										'https://wordpress.org/documentation/article/page-jumps/'
+									) }
+								>
+									{ __( 'Learn more about anchors' ) }
+								</ExternalLink>
+							</>
+						) }
+					</>
+				}
+				value={ anchor || '' }
+				placeholder={ ! isWeb ? __( 'Add an anchor' ) : null }
+				onChange={ ( nextValue ) => {
+					nextValue = nextValue.replace( ANCHOR_REGEX, '-' );
+					setAttributes( {
+						anchor: nextValue,
+					} );
+				} }
+				autoCapitalize="none"
+				autoComplete="off"
+			/>
+		</InspectorControls>
 	);
 }
 
