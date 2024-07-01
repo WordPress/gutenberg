@@ -455,6 +455,7 @@ export default function Image( {
 		lockTitleControls = false,
 		lockTitleControlsMessage,
 		lockCaption = false,
+		hideCaptionControls = false,
 	} = useSelect(
 		( select ) => {
 			if ( ! isSingleSelected ) {
@@ -465,6 +466,7 @@ export default function Image( {
 				url: urlBinding,
 				alt: altBinding,
 				title: titleBinding,
+				caption: captionBinding,
 			} = metadata?.bindings || {};
 			const hasParentPattern = !! context[ 'pattern/overrides' ];
 			const urlBindingSource = getBlockBindingsSource(
@@ -475,6 +477,9 @@ export default function Image( {
 			);
 			const titleBindingSource = getBlockBindingsSource(
 				titleBinding?.source
+			);
+			const captionBindingSource = getBlockBindingsSource(
+				captionBinding?.source
 			);
 			return {
 				lockUrlControls:
@@ -520,6 +525,13 @@ export default function Image( {
 							titleBindingSource.label
 					  )
 					: __( 'Connected to dynamic data' ),
+				hideCaptionControls:
+					captionBinding ||
+					! captionBindingSource?.canUserEditValue( {
+						select,
+						context,
+						args: captionBinding?.args,
+					} ),
 			};
 		},
 		[
