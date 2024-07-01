@@ -115,8 +115,8 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 							$this->set_bookmark( 'closer_tag' );
 
 							// Get opener and closer tag bookmarks.
-							$opener_tag_bookmark = $this->bookmarks['_opener_tag'];
-							$closer_tag_bookmark = $this->bookmarks['_closer_tag'];
+							$opener_tag_bookmark = $this->bookmarks['opener_tag'];
+							$closer_tag_bookmark = $this->bookmarks['closer_tag'];
 
 							// Appends the new content.
 							$after_opener_tag        = $opener_tag_bookmark->start + $opener_tag_bookmark->length;
