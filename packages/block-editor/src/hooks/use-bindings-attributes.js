@@ -231,9 +231,8 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 						) &&
 						Object.keys( keptAttributes ).length
 					) {
-						// Don't update caption and href until they are supported.
+						// Don't update href until they are supported.
 						if ( hasPatternOverridesDefaultBinding ) {
-							delete keptAttributes?.caption;
 							delete keptAttributes?.href;
 						}
 						setAttributes( keptAttributes );
