@@ -4,7 +4,6 @@
 import {
 	BottomSheet,
 	ColorSettings,
-	FocalPointSettingsPanel,
 	LinkPickerScreen,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -18,6 +17,7 @@ import ImageLinkDestinationsScreen from '../image-link-destinations';
 import useMultipleOriginColorsAndGradients from '../colors-gradients/use-multiple-origin-colors-and-gradients';
 import { useMobileGlobalStylesColors } from '../global-styles/use-global-styles-context';
 import AdvancedControls from '../inspector-controls-tabs/advanced-controls-panel';
+import FocalPointSettingsPanel from '../focal-point-settings-panel';
 
 export const blockSettingsScreens = {
 	settings: 'Settings',

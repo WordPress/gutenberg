@@ -9,14 +9,17 @@ import { useRoute, useNavigation } from '@react-navigation/native';
  */
 import { __ } from '@wordpress/i18n';
 import { memo, useContext, useState, useCallback } from '@wordpress/element';
+import { blockSettingsScreens } from '@wordpress/block-editor';
+import {
+	BottomSheet,
+	BottomSheetContext,
+	FocalPointPicker,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import NavBar from '../bottom-sheet/nav-bar';
 import styles from './styles.scss';
-import { BottomSheetContext } from '../bottom-sheet/bottom-sheet-context';
-import FocalPointPicker from '../../focal-point-picker';
 
 const FocalPointSettingsPanelMemo = memo(
 	( { focalPoint, shouldEnableBottomSheetScroll, url } ) => {
@@ -24,11 +27,7 @@ const FocalPointSettingsPanelMemo = memo(
 
 		function onButtonPress( action ) {
 			if ( action === 'apply' ) {
-				// TODO: To better align with existing code, the below 'Settings' string
-				// literal should be replaced with a constant. However, importing the
-				// current constant creates a circular dependency.
-				// https://github.com/WordPress/gutenberg/blob/12518a05af35aa504f7c8b086cb6f255cf094f25/packages/block-editor/src/components/block-settings/container.native.js#L23
-				navigation.navigate( 'Settings', {
+				navigation.navigate( blockSettingsScreens.settings, {
 					draftFocalPoint,
 				} );
 				return;
@@ -47,17 +46,17 @@ const FocalPointSettingsPanelMemo = memo(
 
 		return (
 			<SafeAreaView style={ styles.safearea }>
-				<NavBar>
-					<NavBar.DismissButton
+				<BottomSheet.NavBar>
+					<BottomSheet.NavBar.DismissButton
 						onPress={ () => onButtonPress( 'cancel' ) }
 					/>
-					<NavBar.Heading>
+					<BottomSheet.NavBar.Heading>
 						{ __( 'Edit focal point' ) }
-					</NavBar.Heading>
-					<NavBar.ApplyButton
+					</BottomSheet.NavBar.Heading>
+					<BottomSheet.NavBar.ApplyButton
 						onPress={ () => onButtonPress( 'apply' ) }
 					/>
-				</NavBar>
+				</BottomSheet.NavBar>
 				<FocalPointPicker
 					focalPoint={ draftFocalPoint }
 					onChange={ useCallback( setPosition, [] ) }
