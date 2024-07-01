@@ -13,22 +13,29 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { useCallback, useState } from '@wordpress/element';
+import { useCallback, useMemo, useState } from '@wordpress/element';
 
-type DataFormProps = {
-	item: any;
-	onUpdateItem: ( item: any ) => void;
-	closeForm: any;
-	isBusy: any;
+/**
+ * Internal dependencies
+ */
+import type { NormalizedField } from './types';
+
+type DataFormProps< Item > = {
+	item: Item;
+	onUpdateItem: ( item: Item ) => void;
+	fields: NormalizedField< Item >[]; // TODO: use Field. Normalize them first.
+	closeForm: () => void;
+	isBusy: boolean;
 };
 
-export default function DataForm( {
-	item: initialItem,
+export default function DataForm< Item >( {
+	item: data,
 	onUpdateItem,
+	fields,
 	closeForm,
 	isBusy,
-}: DataFormProps ) {
-	const [ item, setItem ] = useState( initialItem );
+}: DataFormProps< Item > ) {
+	const [ item, setItem ] = useState( data );
 	const onSubmit: FormEventHandler< HTMLFormElement > = useCallback(
 		( event ) => {
 			event.preventDefault();
@@ -42,15 +49,28 @@ export default function DataForm( {
 		setItem( { ...item, title } );
 	}, [] );
 
+	const components = useMemo(
+		() =>
+			fields.map( ( field ) => {
+				if ( field.type === 'text' ) {
+					return (
+						<TextControl
+							label={ field.header }
+							onChange={ onChange }
+							placeholder={ field.placeholder }
+							value={ field.getValue( { item } ) }
+						/>
+					);
+				}
+				return null;
+			} ),
+		[ fields, item ]
+	);
+
 	return (
 		<form onSubmit={ onSubmit }>
 			<VStack spacing={ 3 }>
-				<TextControl
-					label={ __( 'Title' ) }
-					onChange={ onChange }
-					placeholder={ __( 'No title' ) }
-					value={ item.title }
-				/>
+				{ components }
 				<HStack spacing={ 2 } justify="end">
 					<Button variant="tertiary" onClick={ closeForm }>
 						{ __( 'Cancel' ) }

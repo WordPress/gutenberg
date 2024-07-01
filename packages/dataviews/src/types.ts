@@ -49,6 +49,11 @@ export type ItemRecord = Record< string, unknown >;
  */
 export type Field< Item > = {
 	/**
+	 * Type of the fields.
+	 */
+	type?: string; // TODO: provide a enum-like list for valid values.
+
+	/**
 	 * The unique identifier of the field.
 	 */
 	id: string;
@@ -57,6 +62,11 @@ export type Field< Item > = {
 	 * The label of the field. Defaults to the id.
 	 */
 	header?: string;
+
+	/**
+	 * Placeholder for the field.
+	 */
+	placeholder?: string;
 
 	/**
 	 * Callback used to render the field. Defaults to `field.getValue`.

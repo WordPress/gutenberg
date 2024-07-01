@@ -39,6 +39,17 @@ import { CreateTemplatePartModalContents } from '../create-template-part-modal';
 const { PATTERN_TYPES, CreatePatternModalContents, useDuplicatePatternProps } =
 	unlock( patternsPrivateApis );
 
+// TODO: this should be shared with other components (page-pages).
+const fields = [
+	{
+		type: 'text',
+		header: __( 'Title' ),
+		id: 'title',
+		placeholder: __( 'No title' ),
+		getValue: ( { item } ) => item.title,
+	},
+];
+
 /**
  * Check if a template is removable.
  *
@@ -759,6 +770,7 @@ const useDuplicatePostAction = ( postType ) => {
 						<DataForm
 							item={ item }
 							onUpdateItem={ createPage }
+							fields={ fields }
 							closeForm={ closeModal }
 							isBusy={ isCreatingPage }
 						/>
