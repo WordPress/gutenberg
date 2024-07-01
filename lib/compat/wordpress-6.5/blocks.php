@@ -111,7 +111,7 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 						foreach ( $selector_attrs as $attribute_key => $attribute_value ) {
 							$amended_content->set_attribute( $attribute_key, $attribute_value );
 						}
-						if ( 'core/paragraph' === $block_name || 'core/heading' === $block_name ) {
+						if ( 'core/paragraph' === $block_name || 'core/heading' === $block_name || ( 'core/image' === $block_name && 'caption' === $attribute_name ) ) {
 							return $amended_content->get_updated_html();
 						}
 						if ( 'core/button' === $block_name ) {
