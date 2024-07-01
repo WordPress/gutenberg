@@ -134,9 +134,8 @@ export const SelectItem = styled( Ariakit.SelectItem )`
 	justify-content: space-between;
 	padding: ${ ITEM_PADDING };
 	font-size: ${ CONFIG.fontSize };
-	// Legacy line height is 28px.
-	// TODO: reassess for non-legacy v2
-	line-height: calc( 28px / ${ CONFIG.fontSize } );
+	// TODO: reassess line-height for non-legacy v2
+	line-height: 28px;
 	scroll-margin: ${ space( 1 ) };
 	user-select: none;
 
