@@ -25,6 +25,7 @@ function gutenberg_posts_dashboard() {
 		'styles'         => get_block_editor_theme_styles(),
 		'supportsLayout' => wp_theme_has_theme_json(),
 	);
+
 	$editor_settings         = get_block_editor_settings( $custom_settings, $block_editor_context );
 	$active_global_styles_id = WP_Theme_JSON_Resolver::get_user_global_styles_post_id();
 	$active_theme            = get_stylesheet();
@@ -70,11 +71,11 @@ function gutenberg_posts_dashboard() {
  * Redirects to the new posts dashboard page and adds the postType query arg.
  */
 function gutenberg_add_post_type_arg() {
-    global $pagenow;
-    if ( 'admin.php' === $pagenow && isset( $_GET['page'] ) && 'gutenberg-posts-dashboard' === $_GET['page'] && empty( $_GET['postType'] ) ) {
-        wp_redirect( admin_url( '/admin.php?page=gutenberg-posts-dashboard&postType=post' ) );
-        exit;
-    }
+	global $pagenow;
+	if ( 'admin.php' === $pagenow && isset( $_GET['page'] ) && 'gutenberg-posts-dashboard' === $_GET['page'] && empty( $_GET['postType'] ) ) {
+		wp_redirect( admin_url( '/admin.php?page=gutenberg-posts-dashboard&postType=post' ) );
+		exit;
+	}
 }
 add_action( 'admin_init', 'gutenberg_add_post_type_arg' );
 
