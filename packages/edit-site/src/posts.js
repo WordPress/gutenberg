@@ -9,7 +9,6 @@ import {
 } from '@wordpress/block-library';
 import { dispatch } from '@wordpress/data';
 import { createRoot, StrictMode } from '@wordpress/element';
-import { store as editorStore } from '@wordpress/editor';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	registerLegacyWidgetBlock,
@@ -25,7 +24,6 @@ import { store as editSiteStore } from './store';
 /**
  * Internal dependencies
  */
-// import { initializeEditor } from './index';
 import PostsApp from './components/posts-app';
 
 /**
@@ -77,15 +75,6 @@ export function initializePostsDashboard( id, settings ) {
 	} );
 
 	dispatch( editSiteStore ).updateSettings( settings );
-
-	// Keep the defaultTemplateTypes in the core/editor settings too,
-	// so that they can be selected with core/editor selectors in any editor.
-	// This is needed because edit-site doesn't initialize with EditorProvider,
-	// which internally uses updateEditorSettings as well.
-	dispatch( editorStore ).updateEditorSettings( {
-		defaultTemplateTypes: settings.defaultTemplateTypes,
-		defaultTemplatePartAreas: settings.defaultTemplatePartAreas,
-	} );
 
 	// Prevent the default browser action for files dropped outside of dropzones.
 	window.addEventListener( 'dragover', ( e ) => e.preventDefault(), false );

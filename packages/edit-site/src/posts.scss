@@ -44,4 +44,12 @@ body {
 		min-height: 0;
 		position: static;
 	}
+
+	.components-editor-notices__snackbar {
+		position: fixed;
+		right: 0;
+		bottom: 16px;
+		padding-left: 16px;
+		padding-right: 16px;
+	}
 }

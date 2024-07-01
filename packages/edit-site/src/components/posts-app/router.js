@@ -36,7 +36,7 @@ export default function useLayoutAreas() {
 				sidebar: (
 					<SidebarNavigationScreen
 						title={ labels?.name }
-						// backPath={ {} }
+						isRoot
 						content={ <DataViewsSidebarContent /> }
 					/>
 				),
