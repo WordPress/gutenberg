@@ -90,7 +90,7 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 				};
 				lowestRowEnd = Math.max( lowestRowEnd, rowStart + rowSpan - 1 );
 			}
-			if ( rowCount < lowestRowEnd ) {
+			if ( rowCount !== lowestRowEnd ) {
 				updates[ gridClientId ] = {
 					layout: {
 						...gridLayout,

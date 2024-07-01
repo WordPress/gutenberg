@@ -372,12 +372,12 @@ function GridLayoutTypeControl( { layout, onChange } ) {
 				value === 'manual' &&
 				window.__experimentalEnableGridInteractivity
 					? tempRowCount
-					: null,
+					: undefined,
 			manualPlacement:
 				value === 'manual' &&
 				window.__experimentalEnableGridInteractivity
 					? true
-					: null,
+					: undefined,
 			minimumColumnWidth:
 				value === 'auto' ? tempMinimumColumnWidth : null,
 		} );
