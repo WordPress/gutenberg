@@ -30,6 +30,12 @@ function render_block_core_image( $attributes, $content, $block ) {
 	 */
 	$p = new class( $content ) extends WP_HTML_Tag_Processor {
 		/**
+		 * THESE METHODS ARE A TEMPORARY SOLUTION NOT TO BE EMULATED.
+		 * IT IS A TEMPORARY SOLUTION THAT JUST WORKS FOR THIS SPECIFIC
+		 * USE CASE UNTIL THE HTML PROCESSOR PROVIDES ITS OWN METHOD.
+		 */
+
+		/**
 		 * Add a new HTML element after the current tag.
 		 *
 		 * @param string $new_element New HTML element to append after the current tag.
