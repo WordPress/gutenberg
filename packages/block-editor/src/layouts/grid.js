@@ -192,8 +192,11 @@ export default {
 
 // Enables setting minimum width of grid items.
 function GridLayoutMinimumWidthControl( { layout, onChange } ) {
-	const { minimumColumnWidth: value = '12rem' } = layout;
-	const [ quantity, unit ] = parseQuantityAndUnitFromRawValue( value );
+	const { minimumColumnWidth, columnCount, manualPlacement } = layout;
+	const defaultValue = manualPlacement || columnCount ? null : '12rem';
+	const value = minimumColumnWidth || defaultValue;
+	const [ quantity, unit = 'rem' ] =
+		parseQuantityAndUnitFromRawValue( value );
 
 	const handleSliderChange = ( next ) => {
 		onChange( {
@@ -248,7 +251,7 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 				<FlexItem isBlock>
 					<RangeControl
 						onChange={ handleSliderChange }
-						value={ quantity }
+						value={ quantity || 0 }
 						min={ 0 }
 						max={ RANGE_CONTROL_MAX_VALUES[ unit ] || 600 }
 						withInputField={ false }
