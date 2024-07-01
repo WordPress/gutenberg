@@ -29,6 +29,11 @@ function render_block_core_image( $attributes, $content, $block ) {
 	 * @phpcs:disable Gutenberg.NamingConventions.ValidBlockLibraryFunctionName.FunctionNameInvalid, Gutenberg.Commenting.SinceTag.MissingMethodSinceTag
 	 */
 	$p = new class( $content ) extends WP_HTML_Tag_Processor {
+		/**
+		 * Add a new HTML element after the current tag.
+		 *
+		 * @param string $new_element New HTML element to append after the current tag.
+		 */
 		public function append_element_after_tag( $new_element ) {
 			$tag_name = $this->get_tag();
 			$this->set_bookmark( 'current_tag' );
@@ -46,12 +51,27 @@ function render_block_core_image( $attributes, $content, $block ) {
 			// Get position of the closer tag.
 			$this->set_bookmark( 'closer_tag' );
 			$closer_tag_bookmark = $this->bookmarks['closer_tag'];
+			$after_closer_tag    = $closer_tag_bookmark->start + $closer_tag_bookmark->length;
+			/*
+			 * There was a bug in the HTML Processor token length fixed after 6.5.
+			 * This check is needed to add compatibility for that.
+			 * It can be removed once 6.5 is not supported anymore.
+			 * Related issue: https://github.com/WordPress/wordpress-develop/pull/6625
+			 */
+			if ( '>' === $this->html[ $after_closer_tag ] ) {
+				++$after_closer_tag;
+			}
 
 			// Append the new element.
-			$this->lexical_updates[] = new WP_HTML_Text_Replacement( $closer_tag_bookmark->start + $closer_tag_bookmark->length, 0, $new_element );
+			$this->lexical_updates[] = new WP_HTML_Text_Replacement( $after_closer_tag, 0, $new_element );
 			$this->release_bookmark( 'closer_tag' );
 		}
 
+		/**
+		 * Remove the current tag element.
+		 *
+		 * @return bool Whether the element was properly removed.
+		 */
 		public function remove_current_tag_element() {
 			// Get position of the opener tag.
 			$this->set_bookmark( 'opener_tag' );
@@ -66,7 +86,7 @@ function render_block_core_image( $attributes, $content, $block ) {
 				)
 			) || ! $this->is_tag_closer() ) {
 				$this->release_bookmark( 'opener_tag' );
-				return null;
+				return false;
 			}
 
 			// Get position of the closer tag.
@@ -74,11 +94,21 @@ function render_block_core_image( $attributes, $content, $block ) {
 			$closer_tag_bookmark = $this->bookmarks['closer_tag'];
 
 			// Remove the current tag.
-			$after_closer_tag        = $closer_tag_bookmark->start + $closer_tag_bookmark->length;
+			$after_closer_tag = $closer_tag_bookmark->start + $closer_tag_bookmark->length;
+			/*
+			 * There was a bug in the HTML Processor token length fixed after 6.5.
+			 * This check is needed to add compatibility for that.
+			 * It can be removed once 6.5 is not supported anymore.
+			 * Related issue: https://github.com/WordPress/wordpress-develop/pull/6625
+			 */
+			if ( '>' === $this->html[ $after_closer_tag ] ) {
+				++$after_closer_tag;
+			}
 			$current_tag_length      = $after_closer_tag - $opener_tag_bookmark->start;
 			$this->lexical_updates[] = new WP_HTML_Text_Replacement( $opener_tag_bookmark->start, $current_tag_length, '' );
 			$this->release_bookmark( 'opener_tag' );
 			$this->release_bookmark( 'closer_tag' );
+			return true;
 		}
 	};
 	// @phpcs:enable

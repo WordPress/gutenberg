@@ -71,11 +71,13 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 					// Create private anonymous class until the HTML API provides `set_inner_html` method.
 					$block_reader = new class($block_content) extends WP_HTML_Tag_Processor{
 						/**
-						 * Replace the inner text of an HTML with the passed content.
-						 *
-						 * THIS IS A TEMPORARY SOLUTION IN CORE NOT TO BE EMULATED.
+						 * THESE METHODS ARE A TEMPORARY SOLUTION IN CORE NOT TO BE EMULATED.
 						 * IT IS A TEMPORARY SOLUTION THAT JUST WORKS FOR THIS SPECIFIC
 						 * USE CASE UNTIL THE HTML PROCESSOR PROVIDES ITS OWN METHOD.
+						 */
+
+						/**
+						 * Replace the inner text of an HTML with the passed content.
 						 *
 						 * @param string $new_content New text to insert in the HTML element.
 						 * @return bool Whether the inner text was properly replaced.
@@ -119,14 +121,125 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 							$closer_tag_bookmark = $this->bookmarks['closer_tag'];
 
 							// Appends the new content.
-							$after_opener_tag        = $opener_tag_bookmark->start + $opener_tag_bookmark->length;
+							$after_opener_tag = $opener_tag_bookmark->start + $opener_tag_bookmark->length;
+							/*
+							 * There was a bug in the HTML Processor token length fixed after 6.5.
+							 * This check is needed to add compatibility for that.
+							 * Related issue: https://github.com/WordPress/wordpress-develop/pull/6625
+							 */
+							if ( '>' === $this->html[ $after_opener_tag ] ) {
+								++$after_opener_tag;
+							}
 							$inner_content_length    = $closer_tag_bookmark->start - $after_opener_tag;
 							$this->lexical_updates[] = new WP_HTML_Text_Replacement( $after_opener_tag, $inner_content_length, $new_content );
 							return true;
 						}
+
+						/**
+						 * Add a new HTML element after the current tag.
+						 *
+						 * @param string $new_element New HTML element to append after the current tag.
+						 */
+						public function gutenberg_append_element_after_tag( $new_element ) {
+							$tag_name = $this->get_tag();
+							$this->set_bookmark( 'current_tag' );
+							// Visit the closing tag if exists.
+							if ( ! $this->next_tag(
+								array(
+									'tag_name'    => $tag_name,
+									'tag_closers' => 'visit',
+								)
+							) || ! $this->is_tag_closer() ) {
+								$this->seek( 'current_tag' );
+								$this->release_bookmark( 'current_tag' );
+							}
+
+							// Get position of the closer tag.
+							$this->set_bookmark( 'closer_tag' );
+							$closer_tag_bookmark = $this->bookmarks['closer_tag'];
+							$after_closer_tag    = $closer_tag_bookmark->start + $closer_tag_bookmark->length;
+							/*
+							 * There was a bug in the HTML Processor token length fixed after 6.5.
+							 * This check is needed to add compatibility for that.
+							 * Related issue: https://github.com/WordPress/wordpress-develop/pull/6625
+							 */
+							if ( '>' === $this->html[ $after_closer_tag ] ) {
+								++$after_closer_tag;
+							}
+
+							// Append the new element.
+							$this->lexical_updates[] = new WP_HTML_Text_Replacement( $after_closer_tag, 0, $new_element );
+							$this->release_bookmark( 'closer_tag' );
+						}
+
+						/**
+						 * Remove the current tag element.
+						 *
+						 * @return bool Whether the element was properly removed.
+						 */
+						public function gutenberg_remove_current_tag_element() {
+							// Get position of the opener tag.
+							$this->set_bookmark( 'opener_tag' );
+							$opener_tag_bookmark = $this->bookmarks['opener_tag'];
+
+							// Visit the closing tag.
+							$tag_name = $this->get_tag();
+							if ( ! $this->next_tag(
+								array(
+									'tag_name'    => $tag_name,
+									'tag_closers' => 'visit',
+								)
+							) || ! $this->is_tag_closer() ) {
+								$this->release_bookmark( 'opener_tag' );
+								return false;
+							}
+
+							// Get position of the closer tag.
+							$this->set_bookmark( 'closer_tag' );
+							$closer_tag_bookmark = $this->bookmarks['closer_tag'];
+
+							// Remove the current tag.
+							$after_closer_tag = $closer_tag_bookmark->start + $closer_tag_bookmark->length;
+							/*
+							 * There was a bug in the HTML Processor token length fixed after 6.5.
+							 * This check is needed to add compatibility for that.
+							 * Related issue: https://github.com/WordPress/wordpress-develop/pull/6625
+							 */
+							if ( '>' === $this->html[ $after_closer_tag ] ) {
+								++$after_closer_tag;
+							}
+							$current_tag_length      = $after_closer_tag - $opener_tag_bookmark->start;
+							$this->lexical_updates[] = new WP_HTML_Text_Replacement( $opener_tag_bookmark->start, $current_tag_length, '' );
+							$this->release_bookmark( 'opener_tag' );
+							$this->release_bookmark( 'closer_tag' );
+							return true;
+						}
 					};
+
+					/*
+					 * For backward compatibility, the logic from the image render needs to be replicated.
+					 * This is because the block attributes can't be modified with the binding value with `render_block_data` filter,
+					 * as it doesn't have access to the block instance.
+					 */
+					if ( $block_reader->next_tag( 'figure' ) ) {
+						$block_reader->set_bookmark( 'figure' );
+					}
+
+					$new_value = wp_kses_post( $source_value );
+
 					if ( $block_reader->next_tag( 'figcaption' ) ) {
-						$block_reader->gutenberg_set_inner_text( wp_kses_post( $source_value ) );
+						if ( empty( $new_value ) ) {
+							$block_reader->gutenberg_remove_current_tag_element();
+						} else {
+							$block_reader->gutenberg_set_inner_text( $new_value );
+						}
+					} else {
+						$block_reader->seek( 'figure' );
+						if ( ! $block_reader->next_tag( 'a' ) ) {
+							$block_reader->seek( 'figure' );
+							$block_reader->next_tag( 'img' );
+						}
+						$block_reader->gutenberg_append_element_after_tag( '<figcaption class="wp-element-caption">' . $new_value . '</figcaption>' );
 					}
 					return $block_reader->get_updated_html();
 				}
@@ -268,36 +381,6 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 
 		return true;
 	}
-
-	/**
-	 * Replace the block attributes and the HTML with the values from block bindings.
-	 * These filters are temporary for backward-compatibility. It is handled properly without filters in core.
-	 *
-	 */
-	add_filter(
-		'render_block_data',
-		/**
-		 * Filter to modify the block attributes with a placeholder value for each attribute that has a block binding.
-		 *
-		 * @param array    $parsed_block  The full block, including name and attributes.
-		 */
-		function ( $parsed_block ) {
-			if ( ! gutenberg_is_valid_block_for_block_bindings( $parsed_block ) ) {
-				return $parsed_block;
-			}
-
-			foreach ( $parsed_block['attrs']['metadata']['bindings'] as $attribute_name => $block_binding ) {
-				if ( ! gutenberg_is_valid_block_binding( $parsed_block, $attribute_name, $block_binding ) ) {
-					continue;
-				}
-				// Adds a placeholder value that will get replaced by the replace_html in the render_block filter.
-				$parsed_block['attrs'][ $attribute_name ] = 'placeholder';
-			}
-			return $parsed_block;
-		},
-		20,
-		1
-	);
 
 	/**
 	 * Process the block bindings attribute.
