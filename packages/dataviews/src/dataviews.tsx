@@ -18,7 +18,10 @@ import Filters from './filters';
 import Search from './search';
 import { LAYOUT_TABLE, LAYOUT_GRID } from './constants';
 import { VIEW_LAYOUTS } from './layouts';
-import BulkActions from './bulk-actions';
+import {
+	default as BulkActions,
+	useSomeItemHasAPossibleBulkAction,
+} from './bulk-actions';
 import { normalizeFields } from './normalize-fields';
 import BulkActionsToolbar from './bulk-actions-toolbar';
 import type { Action, Field, View, ViewBaseProps } from './types';
@@ -50,22 +53,6 @@ type DataViewsProps< Item > = {
 const defaultGetItemId = ( item: ItemWithId ) => item.id;
 
 const defaultOnSelectionChange = () => {};
-
-function useSomeItemHasAPossibleBulkAction< Item >(
-	actions: Action< Item >[],
-	data: Item[]
-) {
-	return useMemo( () => {
-		return data.some( ( item ) => {
-			return actions.some( ( action ) => {
-				return (
-					action.supportsBulk &&
-					( ! action.isEligible || action.isEligible( item ) )
-				);
-			} );
-		} );
-	}, [ actions, data ] );
-}
 
 export default function DataViews< Item >( {
 	view,

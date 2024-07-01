@@ -304,8 +304,8 @@ async function draftNewPage( page ) {
 	await page.getByRole( 'button', { name: 'Pages' } ).click();
 	await page.getByRole( 'button', { name: 'Add new page' } ).click();
 	await page
-		.locator( 'role=dialog[name="Draft a new page"i]' )
-		.locator( 'role=textbox[name="Page title"i]' )
+		.locator( 'role=dialog[name="Draft new: page"i]' )
+		.locator( 'role=textbox[name="title"i]' )
 		.fill( TEST_PAGE_TITLE );
 	await page.keyboard.press( 'Enter' );
 	await expect(
