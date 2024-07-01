@@ -7,11 +7,11 @@ Stable tag:        1.0.0
 License:           GPL-2.0-or-later
 License URI:       https://www.gnu.org/licenses/gpl-2.0.html
 
-A block that shows the average time it takes to read the current post or page.
+A block that shows the estimated time it will take to read the current post or page.
 
 == Description ==
 
-A block that shows the average time it takes to read the current post or page. The time is calculated based on the content length.
+A block that shows the estimated time it will take to read the current post or page. The time is calculated based on the content length.
 
 == Installation ==
 

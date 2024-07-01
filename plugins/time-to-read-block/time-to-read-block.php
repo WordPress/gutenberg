@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Time to Read Block
  * Plugin URI:        https://github.com/WordPress/gutenberg/tree/trunk/plugins/time-to-read-block
- * Description:       A block that shows the average time it takes to read the current post.
+ * Description:       A block that shows the estimated time it will take to read the current post.
  * Version:           1.0.0
  * Requires at least: 6.4
  * Requires PHP:      7.0
