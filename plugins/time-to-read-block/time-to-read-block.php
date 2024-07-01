@@ -170,6 +170,7 @@ function gutenberg_register_time_to_read_block() {
 	register_block_type(
 		__DIR__ . '/build',
 		array(
+			'name'            => 'gutenberg/time-to-read',
 			'render_callback' => 'gutenberg_render_block_time_to_read',
 		)
 	);
