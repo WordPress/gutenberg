@@ -649,32 +649,22 @@ const useDuplicatePostAction = ( postType ) => {
 					return status !== 'trash';
 				},
 				RenderModal: ( { items, closeModal, onActionPerformed } ) => {
-					const [ item ] = items;
 					const [ isCreatingPage, setIsCreatingPage ] =
 						useState( false );
-					const [ title, setTitle ] = useState(
-						sprintf(
-							/* translators: %s: Existing item title */
-							__( '%s (Copy)' ),
-							getItemTitle( item )
-						)
-					);
 
 					const { saveEntityRecord } = useDispatch( coreStore );
 					const { createSuccessNotice, createErrorNotice } =
 						useDispatch( noticesStore );
 
-					async function createPage( event ) {
-						event.preventDefault();
-
+					async function createPage( item ) {
 						if ( isCreatingPage ) {
 							return;
 						}
 
 						const newItemOject = {
 							status: 'draft',
-							title,
-							slug: title || __( 'No title' ),
+							title: item.title,
+							slug: item.title || __( 'No title' ),
 							comment_status: item.comment_status,
 							content:
 								typeof item.content === 'string'
@@ -725,7 +715,7 @@ const useDuplicatePostAction = ( postType ) => {
 									// translators: %s: Title of the created template e.g: "Category".
 									__( '"%s" successfully created.' ),
 									decodeEntities(
-										newItem.title?.rendered || title
+										newItem.title?.rendered || item.title
 									)
 								),
 								{
@@ -753,11 +743,22 @@ const useDuplicatePostAction = ( postType ) => {
 							closeModal();
 						}
 					}
+
+					const item = useMemo(
+						() => ( {
+							...items[ 0 ],
+							title: sprintf(
+								/* translators: %s: Existing template title */
+								__( '%s (Copy)' ),
+								getItemTitle( items[ 0 ] )
+							),
+						} ),
+						[ items ]
+					);
 					return (
 						<DataForm
-							title={ title }
-							setTitle={ setTitle }
-							onSubmit={ createPage }
+							item={ item }
+							onUpdateItem={ createPage }
 							closeForm={ closeModal }
 							isBusy={ isCreatingPage }
 						/>

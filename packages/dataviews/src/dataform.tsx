@@ -13,30 +13,43 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
+import { useCallback, useState } from '@wordpress/element';
 
 type DataFormProps = {
-	title: any;
-	setTitle: any;
-	onSubmit: FormEventHandler;
+	item: any;
+	onUpdateItem: ( item: any ) => void;
 	closeForm: any;
 	isBusy: any;
 };
 
 export default function DataForm( {
-	title,
-	setTitle,
-	onSubmit,
+	item: initialItem,
+	onUpdateItem,
 	closeForm,
 	isBusy,
 }: DataFormProps ) {
+	const [ item, setItem ] = useState( initialItem );
+	const onSubmit: FormEventHandler< HTMLFormElement > = useCallback(
+		( event ) => {
+			event.preventDefault();
+
+			onUpdateItem( item );
+		},
+		[ item ]
+	);
+
+	const onChange = useCallback( ( title: string ) => {
+		setItem( { ...item, title } );
+	}, [] );
+
 	return (
 		<form onSubmit={ onSubmit }>
 			<VStack spacing={ 3 }>
 				<TextControl
 					label={ __( 'Title' ) }
-					onChange={ setTitle }
+					onChange={ onChange }
 					placeholder={ __( 'No title' ) }
-					value={ title }
+					value={ item.title }
 				/>
 				<HStack spacing={ 2 } justify="end">
 					<Button variant="tertiary" onClick={ closeForm }>
