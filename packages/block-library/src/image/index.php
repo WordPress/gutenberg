@@ -36,6 +36,20 @@ function render_block_core_image( $attributes, $content, $block ) {
 		$p->set_attribute( 'data-id', $attributes['data-id'] );
 	}
 
+	// If there's a mismatch with the 'wp-image-' classname and the actual id, the id
+	// was probably overridden by pattern overrides. Update it to the correct value.
+	// See https://github.com/WordPress/gutenberg/issues/62886 for why this is needed.
+	if ( isset( $attributes['id'] ) ) {
+		$id = $attributes['id'];
+		$image_classes = $p->get_attribute( 'class' ) ?? '';
+		$expected_id_class = "wp-image-$id";
+
+		if ( ! empty( $image_classes ) && ! str_contains( $image_classes, $expected_id_class ) ) {
+			$image_classes = preg_replace( '/wp-image-(\d+)/', "wp-image-$id", $image_classes );
+			$p->set_attribute( 'class', $image_classes );
+		}
+	}
+
 	$link_destination  = isset( $attributes['linkDestination'] ) ? $attributes['linkDestination'] : 'none';
 	$lightbox_settings = block_core_image_get_lightbox_settings( $block->parsed_block );
 
