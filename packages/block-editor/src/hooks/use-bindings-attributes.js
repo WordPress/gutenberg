@@ -25,7 +25,17 @@ import { unlock } from '../lock-unlock';
 const BLOCK_BINDINGS_ALLOWED_BLOCKS = {
 	'core/paragraph': [ 'content' ],
 	'core/heading': [ 'content' ],
-	'core/image': [ 'id', 'url', 'title', 'alt' ],
+	'core/image': [
+		'id',
+		'url',
+		'title',
+		'alt',
+		'caption',
+		'href',
+		'rel',
+		'linkClass',
+		'linkTarget',
+	],
 	'core/button': [ 'url', 'text', 'linkTarget', 'rel' ],
 };
 
