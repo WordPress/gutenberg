@@ -4,6 +4,8 @@
 import {
 	getTypographyFontSizeValue,
 	getFluidTypographyOptionsFromSettings,
+	getMergedFontFamiliesAndFontFamilyFaces,
+	findNearestFontWeight,
 } from '../typography-utils';
 
 describe( 'typography utils', () => {
@@ -680,6 +682,273 @@ describe( 'typography utils', () => {
 				);
 			} );
 		} );
+	} );
+
+	describe( 'getMergedFontFamiliesAndFontFamilyFaces', () => {
+		[
+			{
+				message:
+					'should return empty arrays when settings and fontFamily are empty',
+				settings: {},
+				fontFamily: '',
+				expected: {
+					fontFamilies: [],
+					fontFamilyFaces: [],
+				},
+			},
+
+			{
+				message:
+					'should return empty arrays when only settings is `undefined`',
+				settings: undefined,
+				fontFamily: 'ABeeZee, sans-serif',
+				expected: {
+					fontFamilies: [],
+					fontFamilyFaces: [],
+				},
+			},
+
+			{
+				message:
+					'should return fontFamilies array and an empty fontFamilyFaces array when fontfamily is empty',
+				settings: {
+					typography: {
+						fontFamilies: {
+							custom: [
+								{
+									name: 'ABeeZee',
+									slug: 'abeezee',
+									fontFamily: 'ABeeZee, sans-serif',
+									fontFace: [
+										{
+											src: 'http://www.wordpress.org/wp-content/uploads/fonts/esDT31xSG-6AGleN2tCkkJUCGpG-GQ.woff2',
+											fontWeight: '400',
+											fontStyle: 'italic',
+											fontFamily: 'ABeeZee',
+										},
+									],
+								},
+							],
+						},
+					},
+				},
+				fontFamily: '',
+				expected: {
+					fontFamilies: [
+						{
+							fontFace: [
+								{
+									fontFamily: 'ABeeZee',
+									fontStyle: 'italic',
+									fontWeight: '400',
+									src: 'http://www.wordpress.org/wp-content/uploads/fonts/esDT31xSG-6AGleN2tCkkJUCGpG-GQ.woff2',
+								},
+							],
+							fontFamily: 'ABeeZee, sans-serif',
+							name: 'ABeeZee',
+							slug: 'abeezee',
+						},
+					],
+					fontFamilyFaces: [],
+				},
+			},
+
+			{
+				message:
+					'should return font families and font faces when both settings and fontFamily are defined',
+				settings: {
+					typography: {
+						fontFamilies: {
+							theme: [
+								{
+									fontFace: [
+										{
+											fontFamily: 'PT Sans',
+											fontStyle: 'normal',
+											fontWeight: '400',
+											src: [
+												'file:./assets/fonts/pt-sans_normal_400.ttf',
+											],
+										},
+										{
+											fontFamily: 'PT Sans',
+											fontStyle: 'normal',
+											fontWeight: '700',
+											src: [
+												'file:./assets/fonts/pt-sans_normal_700.ttf',
+											],
+										},
+										{
+											fontFamily: 'PT Sans',
+											fontStyle: 'italic',
+											fontWeight: '400',
+											src: [
+												'file:./assets/fonts/pt-sans_italic_400.ttf',
+											],
+										},
+										{
+											fontFamily: 'PT Sans',
+											fontStyle: 'italic',
+											fontWeight: '700',
+											src: [
+												'file:./assets/fonts/pt-sans_italic_700.ttf',
+											],
+										},
+									],
+									fontFamily: 'PT Sans',
+									name: 'PT Sans',
+									slug: 'pt-sans',
+								},
+							],
+							custom: [
+								{
+									name: 'ABeeZee',
+									slug: 'abeezee',
+									fontFamily: 'ABeeZee, sans-serif',
+									fontFace: [
+										{
+											src: 'http://www.wordpress.org/wp-content/uploads/fonts/esDT31xSG-6AGleN2tCkkJUCGpG-GQ.woff2',
+											fontWeight: '400',
+											fontStyle: 'italic',
+											fontFamily: 'ABeeZee',
+										},
+									],
+								},
+							],
+						},
+					},
+				},
+				fontFamily: 'ABeeZee, sans-serif',
+				expected: {
+					fontFamilyFaces: [
+						{
+							fontFamily: 'ABeeZee',
+							fontStyle: 'italic',
+							fontWeight: '400',
+							src: 'http://www.wordpress.org/wp-content/uploads/fonts/esDT31xSG-6AGleN2tCkkJUCGpG-GQ.woff2',
+						},
+					],
+					fontFamilies: [
+						{
+							fontFace: [
+								{
+									fontFamily: 'PT Sans',
+									fontStyle: 'normal',
+									fontWeight: '400',
+									src: [
+										'file:./assets/fonts/pt-sans_normal_400.ttf',
+									],
+								},
+								{
+									fontFamily: 'PT Sans',
+									fontStyle: 'normal',
+									fontWeight: '700',
+									src: [
+										'file:./assets/fonts/pt-sans_normal_700.ttf',
+									],
+								},
+								{
+									fontFamily: 'PT Sans',
+									fontStyle: 'italic',
+									fontWeight: '400',
+									src: [
+										'file:./assets/fonts/pt-sans_italic_400.ttf',
+									],
+								},
+								{
+									fontFamily: 'PT Sans',
+									fontStyle: 'italic',
+									fontWeight: '700',
+									src: [
+										'file:./assets/fonts/pt-sans_italic_700.ttf',
+									],
+								},
+							],
+							fontFamily: 'PT Sans',
+							name: 'PT Sans',
+							slug: 'pt-sans',
+						},
+						{
+							fontFace: [
+								{
+									fontFamily: 'ABeeZee',
+									fontStyle: 'italic',
+									fontWeight: '400',
+									src: 'http://www.wordpress.org/wp-content/uploads/fonts/esDT31xSG-6AGleN2tCkkJUCGpG-GQ.woff2',
+								},
+							],
+							fontFamily: 'ABeeZee, sans-serif',
+							name: 'ABeeZee',
+							slug: 'abeezee',
+						},
+					],
+				},
+			},
+		].forEach( ( { message, settings, fontFamily, expected } ) => {
+			it( `${ message }`, () => {
+				expect(
+					getMergedFontFamiliesAndFontFamilyFaces(
+						settings,
+						fontFamily
+					)
+				).toEqual( expected );
+			} );
+		} );
+	} );
+
+	describe( 'findNearestFontWeight', () => {
+		[
+			{
+				message:
+					'should return empty string when newFontWeightValue is `undefined`',
+				availableFontWeights: undefined,
+				newFontWeightValue: undefined,
+				expected: '',
+			},
+			{
+				message:
+					'should return newFontWeightValue value when availableFontWeights is empty',
+				availableFontWeights: [],
+				newFontWeightValue: '300',
+				expected: '300',
+			},
+			{
+				message: 'should return correct nearest higher font weight',
+				availableFontWeights: [
+					{ name: 'Regular', value: '400' },
+					{ name: 'Bold', value: '700' },
+					{ name: 'Black', value: '900' },
+				],
+				newFontWeightValue: '300',
+				expected: '400',
+			},
+			{
+				message: 'should return correct nearest lower font weight',
+				availableFontWeights: [
+					{ name: 'Thin', value: '100' },
+					{ name: 'Light', value: '300' },
+					{ name: 'Regular', value: '400' },
+				],
+				newFontWeightValue: '900',
+				expected: '400',
+			},
+		].forEach(
+			( {
+				message,
+				availableFontWeights,
+				newFontWeightValue,
+				expected,
+			} ) => {
+				it( `${ message }`, () => {
+					expect(
+						findNearestFontWeight(
+							availableFontWeights,
+							newFontWeightValue
+						)
+					).toEqual( expected );
+				} );
+			}
+		);
 	} );
 
 	describe( 'typography utils', () => {
