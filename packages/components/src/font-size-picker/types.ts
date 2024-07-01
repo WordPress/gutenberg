@@ -1,9 +1,18 @@
 export type FontSizePickerProps = {
 	/**
+	 * TBD description
+	 *
+	 * @default 'both'
+	 */
+	pickerMode?: 'custom' | 'predefined' | 'both';
+	/**
+	 * _Note: this prop is deprecated. Please use the `pickerMode` prop instead._
+	 *
 	 * If `true`, it will not be possible to choose a custom fontSize. The user
 	 * will be forced to pick one of the pre-defined sizes passed in fontSizes.
 	 *
 	 * @default false
+	 * @deprecated
 	 */
 	disableCustomFontSizes?: boolean;
 	/**
