@@ -140,7 +140,7 @@ export const SelectItem = styled( Ariakit.SelectItem )`
 	user-select: none;
 
 	&[aria-disabled='true'] {
-		opacity: 0.5;
+		cursor: not-allowed;
 	}
 
 	&[data-active-item] {
