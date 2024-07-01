@@ -168,9 +168,8 @@ function gutenberg_time_to_read_word_count( $text, $type, $settings = array() ) 
  */
 function gutenberg_register_time_to_read_block() {
 	register_block_type(
-		__DIR__ . '/build',
+		__DIR__ . '/block.json',
 		array(
-			'name'            => 'gutenberg/time-to-read',
 			'render_callback' => 'gutenberg_render_block_time_to_read',
 		)
 	);

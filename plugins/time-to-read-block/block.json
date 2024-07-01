@@ -43,6 +43,6 @@
 			"clientNavigation": true
 		}
 	},
-	"editorScript": "file:./index.js",
-	"style": "file:./style.css"
+	"editorScript": "file:./build/index.js",
+	"style": "file:./build/style.css"
 }
