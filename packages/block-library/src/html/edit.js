@@ -45,14 +45,12 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 			<BlockControls>
 				<ToolbarGroup>
 					<ToolbarButton
-						className="components-tab-button"
 						isPressed={ ! isPreview }
 						onClick={ switchToHTML }
 					>
 						HTML
 					</ToolbarButton>
 					<ToolbarButton
-						className="components-tab-button"
 						isPressed={ isPreview }
 						onClick={ switchToPreview }
 					>

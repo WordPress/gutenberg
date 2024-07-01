@@ -116,7 +116,9 @@ function VariationsToggleGroupControl( {
 				{ variations.map( ( variation ) => (
 					<ToggleGroupControlOptionIcon
 						key={ variation.name }
-						icon={ variation.icon }
+						icon={
+							<BlockIcon icon={ variation.icon } showColors />
+						}
 						value={ variation.name }
 						label={
 							selectedValue === variation.name
@@ -178,7 +180,9 @@ function __experimentalBlockVariationTransforms( { blockClientId } ) {
 	};
 
 	// Skip rendering if there are no variations
-	if ( ! variations?.length ) return null;
+	if ( ! variations?.length ) {
+		return null;
+	}
 
 	const baseClass = 'block-editor-block-variation-transforms';
 

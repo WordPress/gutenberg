@@ -1,0 +1,12 @@
+.block-editor__spacing-visualizer {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	opacity: 0.5;
+	border-color: var(--wp-admin-theme-color);
+	border-style: solid;
+	pointer-events: none;
+	box-sizing: border-box;
+}

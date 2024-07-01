@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -69,7 +69,7 @@ export default function saveV1( { attributes } ) {
 								{ ! RichText.isEmpty( image.caption ) && (
 									<RichText.Content
 										tagName="figcaption"
-										className={ classnames(
+										className={ clsx(
 											'blocks-gallery-item__caption',
 											__experimentalGetElementClassName(
 												'caption'
@@ -86,7 +86,7 @@ export default function saveV1( { attributes } ) {
 			{ ! RichText.isEmpty( caption ) && (
 				<RichText.Content
 					tagName="figcaption"
-					className={ classnames(
+					className={ clsx(
 						'blocks-gallery-caption',
 						__experimentalGetElementClassName( 'caption' )
 					) }

@@ -44,7 +44,7 @@ function PostTemplateToggle( { isOpen, onClick } ) {
 
 	return (
 		<Button
-			className="edit-post-post-template__toggle"
+			__next40pxDefaultSize
 			variant="tertiary"
 			aria-expanded={ isOpen }
 			aria-label={ __( 'Template options' ) }
@@ -55,6 +55,14 @@ function PostTemplateToggle( { isOpen, onClick } ) {
 	);
 }
 
+/**
+ * Renders the dropdown content for selecting a post template.
+ *
+ * @param {Object}   props         The component props.
+ * @param {Function} props.onClose The function to close the dropdown.
+ *
+ * @return {JSX.Element} The rendered dropdown content.
+ */
 function PostTemplateDropdownContent( { onClose } ) {
 	const allowSwitchingTemplate = useAllowSwitchingTemplates();
 	const {
@@ -64,7 +72,7 @@ function PostTemplateDropdownContent( { onClose } ) {
 		canCreate,
 		canEdit,
 		currentTemplateId,
-		getPostLinkProps,
+		onNavigateToEntityRecord,
 		getEditorSettings,
 	} = useSelect(
 		( select ) => {
@@ -94,20 +102,13 @@ function PostTemplateDropdownContent( { onClose } ) {
 					editorSettings.supportsTemplateMode &&
 					!! _currentTemplateId,
 				currentTemplateId: _currentTemplateId,
-				getPostLinkProps: editorSettings.getPostLinkProps,
+				onNavigateToEntityRecord:
+					editorSettings.onNavigateToEntityRecord,
 				getEditorSettings: select( editorStore ).getEditorSettings,
 			};
 		},
 		[ allowSwitchingTemplate ]
 	);
-
-	const editTemplate =
-		getPostLinkProps && currentTemplateId
-			? getPostLinkProps( {
-					postId: currentTemplateId,
-					postType: 'wp_template',
-			  } )
-			: {};
 
 	const options = useMemo(
 		() =>
@@ -168,12 +169,15 @@ function PostTemplateDropdownContent( { onClose } ) {
 					}
 				/>
 			) }
-			{ canEdit && (
+			{ canEdit && onNavigateToEntityRecord && (
 				<p>
 					<Button
 						variant="link"
 						onClick={ () => {
-							editTemplate.onClick();
+							onNavigateToEntityRecord( {
+								postId: currentTemplateId,
+								postType: 'wp_template',
+							} );
 							onClose();
 							createSuccessNotice(
 								__(
@@ -185,7 +189,7 @@ function PostTemplateDropdownContent( { onClose } ) {
 										{
 											label: __( 'Go back' ),
 											onClick: () =>
-												getEditorSettings().goBack(),
+												getEditorSettings().onNavigateToPreviousEntityRecord(),
 										},
 									],
 								}
@@ -220,4 +224,11 @@ function ClassicThemeControl() {
 	);
 }
 
+/**
+ * Provides a dropdown menu for selecting and managing post templates.
+ *
+ * The dropdown menu includes a button for toggling the menu, a list of available templates, and options for creating and editing templates.
+ *
+ * @return {JSX.Element} The rendered ClassicThemeControl component.
+ */
 export default ClassicThemeControl;

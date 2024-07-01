@@ -1,18 +1,48 @@
 /**
  * External dependencies
  */
-import styled from '@emotion/styled';
 // eslint-disable-next-line no-restricted-imports
 import * as Ariakit from '@ariakit/react';
-
+import { css } from '@emotion/react';
+import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import { COLORS } from '../utils';
+import { COLORS, CONFIG } from '../utils';
 import { space } from '../utils/space';
-import type { CustomSelectProps } from './types';
+import { chevronIconSize } from '../select-control/styles/select-control-styles';
+import type { CustomSelectButtonSize } from './types';
 
-export const CustomSelectLabel = styled( Ariakit.SelectLabel )`
+const ITEM_PADDING = space( 2 );
+
+const truncateStyles = css`
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+`;
+
+export const WithHintWrapper = styled.div`
+	display: flex;
+	justify-content: space-between;
+	flex: 1;
+`;
+
+export const SelectedExperimentalHintWrapper = styled.div`
+	${ truncateStyles }
+`;
+
+export const SelectedExperimentalHintItem = styled.span`
+	color: ${ COLORS.theme.gray[ 600 ] };
+	margin-inline-start: ${ space( 2 ) };
+`;
+
+export const ExperimentalHintItem = styled.span`
+	color: ${ COLORS.theme.gray[ 600 ] };
+	text-align: right;
+	margin-inline-end: ${ space( 1 ) };
+`;
+
+export const SelectLabel = styled( Ariakit.SelectLabel )`
 	font-size: 11px;
 	font-weight: 500;
 	line-height: 1.4;
@@ -20,57 +50,98 @@ export const CustomSelectLabel = styled( Ariakit.SelectLabel )`
 	margin-bottom: ${ space( 2 ) };
 `;
 
-const inputHeights = {
-	default: 40,
-	small: 24,
-};
-
-export const CustomSelectButton = styled( Ariakit.Select, {
+export const Select = styled( Ariakit.Select, {
 	// Do not forward `hasCustomRenderProp` to the underlying Ariakit.Select component
 	shouldForwardProp: ( prop ) => prop !== 'hasCustomRenderProp',
 } )( ( {
 	size,
 	hasCustomRenderProp,
 }: {
-	size: NonNullable< CustomSelectProps[ 'size' ] >;
+	size: NonNullable< CustomSelectButtonSize[ 'size' ] >;
 	hasCustomRenderProp: boolean;
 } ) => {
-	const isSmallSize = size === 'small' && ! hasCustomRenderProp;
 	const heightProperty = hasCustomRenderProp ? 'minHeight' : 'height';
 
-	return {
-		display: 'flex',
-		justifyContent: 'space-between',
-		alignItems: 'center',
-		backgroundColor: COLORS.white,
-		border: `1px solid ${ COLORS.gray[ 600 ] }`,
-		borderRadius: space( 0.5 ),
-		cursor: 'pointer',
-		width: '100%',
-		[ heightProperty ]: `${ inputHeights[ size ] }px`,
-		padding: isSmallSize ? space( 2 ) : space( 4 ),
-		fontSize: isSmallSize ? '11px' : '13px',
-		'&[data-focus-visible]': {
-			outlineStyle: 'solid',
-		},
-		'&[aria-expanded="true"]': {
-			outlineStyle: `1.5px solid ${ COLORS.theme.accent }`,
-		},
+	const getSize = () => {
+		const sizes = {
+			compact: {
+				[ heightProperty ]: 32,
+				paddingInlineStart: 8,
+				paddingInlineEnd: 8 + chevronIconSize,
+			},
+			default: {
+				[ heightProperty ]: 40,
+				paddingInlineStart: 16,
+				paddingInlineEnd: 16 + chevronIconSize,
+			},
+			small: {
+				[ heightProperty ]: 24,
+				paddingInlineStart: 8,
+				paddingInlineEnd: 8 + chevronIconSize,
+			},
+		};
+
+		return sizes[ size ] || sizes.default;
 	};
+
+	return css`
+		display: block;
+		background-color: ${ COLORS.theme.background };
+		border: none;
+		color: ${ COLORS.theme.foreground };
+		cursor: pointer;
+		font-family: inherit;
+		font-size: ${ CONFIG.fontSize };
+		text-align: start;
+		width: 100%;
+
+		&[data-focus-visible] {
+			outline: none; // handled by InputBase component
+		}
+
+		${ getSize() }
+		${ ! hasCustomRenderProp && truncateStyles }
+	`;
 } );
 
-export const CustomSelectPopover = styled( Ariakit.SelectPopover )`
-	border-radius: ${ space( 0.5 ) };
-	background: ${ COLORS.white };
-	border: 1px solid ${ COLORS.gray[ 900 ] };
+export const SelectPopover = styled( Ariakit.SelectPopover )`
+	display: flex;
+	flex-direction: column;
+
+	background-color: ${ COLORS.theme.background };
+	border-radius: 2px;
+	border: 1px solid ${ COLORS.theme.foreground };
+
+	/* z-index(".components-popover") */
+	z-index: 1000000;
+
+	max-height: min( var( --popover-available-height, 400px ), 400px );
+	overflow: auto;
+	overscroll-behavior: contain;
+
+	// The smallest size without overflowing the container.
+	min-width: min-content;
+
+	&[data-focus-visible] {
+		outline: none; // outline will be on the trigger, rather than the popover
+	}
 `;
 
-export const CustomSelectItem = styled( Ariakit.SelectItem )`
+export const SelectItem = styled( Ariakit.SelectItem )`
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	padding: ${ space( 2 ) };
+	padding: ${ ITEM_PADDING };
+	font-size: ${ CONFIG.fontSize };
+	line-height: 2.15rem; // TODO: Remove this in default but keep for back-compat in legacy
 	&[data-active-item] {
-		background-color: ${ COLORS.gray[ 300 ] };
+		background-color: ${ COLORS.theme.gray[ 300 ] };
 	}
+`;
+
+export const SelectedItemCheck = styled( Ariakit.SelectItemCheck )`
+	display: flex;
+	align-items: center;
+	margin-inline-start: ${ ITEM_PADDING };
+	font-size: 24px; // Size of checkmark icon
 `;

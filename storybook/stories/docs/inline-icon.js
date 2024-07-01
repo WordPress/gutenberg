@@ -9,6 +9,4 @@ const StyledIcons = styled( Icons )`
 	width: 14px;
 `;
 
-export const InlineIcon = ( props ) => (
-	<StyledIcons aria-hidden={ true } { ...props } />
-);
+export const InlineIcon = ( props ) => <StyledIcons aria-hidden { ...props } />;

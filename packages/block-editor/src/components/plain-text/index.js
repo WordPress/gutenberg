@@ -2,7 +2,7 @@
  * External dependencies
  */
 import TextareaAutosize from 'react-autosize-textarea';
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -27,7 +27,7 @@ const PlainText = forwardRef( ( { __experimentalVersion, ...props }, ref ) => {
 	return (
 		<TextareaAutosize
 			ref={ ref }
-			className={ classnames( 'block-editor-plain-text', className ) }
+			className={ clsx( 'block-editor-plain-text', className ) }
 			onChange={ ( event ) => onChange( event.target.value ) }
 			{ ...remainingProps }
 		/>

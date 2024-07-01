@@ -4,12 +4,10 @@
  *
  * @package gutenberg-test-interactive-blocks
  */
-
-wp_enqueue_script_module( 'directive-key-view' );
 ?>
 
 <div
-	data-wp-interactive='{ "namespace": "directive-key" }'
+	data-wp-interactive="directive-key"
 	data-wp-router-region="some-id"
 >
 	<ul>

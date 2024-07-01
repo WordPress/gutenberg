@@ -171,3 +171,9 @@
 .wide {
 	width: 100%;
 }
+
+.nonVisibleImage {
+	height: 1;
+	width: 1;
+	opacity: 0;
+}

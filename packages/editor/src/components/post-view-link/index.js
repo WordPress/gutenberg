@@ -42,6 +42,7 @@ export default function PostViewLink() {
 			href={ permalink }
 			target="_blank"
 			showTooltip={ ! showIconLabels }
+			size="compact"
 		/>
 	);
 }

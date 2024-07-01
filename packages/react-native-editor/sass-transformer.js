@@ -40,7 +40,7 @@ const sass = require( 'sass' );
 // eslint-disable-next-line import/no-extraneous-dependencies
 const css2rn = require( 'css-to-react-native-transform' ).default;
 // eslint-disable-next-line import/no-extraneous-dependencies
-const upstreamTransformer = require( 'metro-react-native-babel-transformer' );
+const upstreamTransformer = require( '@react-native/metro-babel-transformer' );
 
 // TODO: need to find a way to pass the include paths and the default asset files via some config.
 const autoImportIncludePaths = [
@@ -60,9 +60,14 @@ const imports =
 	'@import "' + autoImportAssets.join( '";\n@import "' ) + '";\n\n';
 
 // Iterate through the include paths and extensions to find the file variant.
-function findVariant( name, extensions, includePaths ) {
+function findVariant( name, extensions, includePaths, projectRoot ) {
 	for ( let i = 0; i < includePaths.length; i++ ) {
-		const includePath = includePaths[ i ];
+		let includePath = includePaths[ i ];
+
+		// Workaround for not having the full path when loaded from Gutenberg Mobile
+		if ( includePath.startsWith( 'gutenberg' ) ) {
+			includePath = `${ projectRoot }/${ includePath }`;
+		}
 
 		// Try to find the file iterating through the extensions, in order.
 		const foundExtention = extensions.find( ( extension ) => {
@@ -117,7 +122,12 @@ function transform( src, filename, options ) {
 						path.resolve( path.dirname( filename ), urlPath.dir )
 					); // Add the file's dir to the search array.
 				}
-				const f = findVariant( urlPath.name, exts, incPaths );
+				const f = findVariant(
+					urlPath.name,
+					exts,
+					incPaths,
+					options.projectRoot
+				);
 
 				if ( f ) {
 					return { file: f };

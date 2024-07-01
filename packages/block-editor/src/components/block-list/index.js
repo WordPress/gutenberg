@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -46,19 +46,26 @@ const pendingBlockVisibilityUpdatesPerRegistry = new WeakMap();
 
 function Root( { className, ...settings } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const { isOutlineMode, isFocusMode, editorMode } = useSelect(
-		( select ) => {
-			const { getSettings, __unstableGetEditorMode } =
-				select( blockEditorStore );
-			const { outlineMode, focusMode } = getSettings();
-			return {
-				isOutlineMode: outlineMode,
-				isFocusMode: focusMode,
-				editorMode: __unstableGetEditorMode(),
-			};
-		},
-		[]
-	);
+	const {
+		isOutlineMode,
+		isFocusMode,
+		editorMode,
+		temporarilyEditingAsBlocks,
+	} = useSelect( ( select ) => {
+		const {
+			getSettings,
+			__unstableGetEditorMode,
+			getTemporarilyEditingAsBlocks,
+			isTyping,
+		} = unlock( select( blockEditorStore ) );
+		const { outlineMode, focusMode } = getSettings();
+		return {
+			isOutlineMode: outlineMode && ! isTyping(),
+			isFocusMode: focusMode,
+			editorMode: __unstableGetEditorMode(),
+			temporarilyEditingAsBlocks: getTemporarilyEditingAsBlocks(),
+		};
+	}, [] );
 	const registry = useRegistry();
 	const { setBlockVisibility } = useDispatch( blockEditorStore );
 
@@ -104,7 +111,7 @@ function Root( { className, ...settings } ) {
 				useInBetweenInserter(),
 				useTypingObserver(),
 			] ),
-			className: classnames( 'is-root-container', className, {
+			className: clsx( 'is-root-container', className, {
 				'is-outline-mode': isOutlineMode,
 				'is-focus-mode': isFocusMode && isLargeViewport,
 				'is-navigate-mode': editorMode === 'navigation',
@@ -115,6 +122,11 @@ function Root( { className, ...settings } ) {
 	return (
 		<IntersectionObserver.Provider value={ intersectionObserver }>
 			<div { ...innerBlocksProps } />
+			{ !! temporarilyEditingAsBlocks && (
+				<StopEditingAsBlocksOnOutsideSelect
+					clientId={ temporarilyEditingAsBlocks }
+				/>
+			) }
 		</IntersectionObserver.Provider>
 	);
 }
@@ -148,31 +160,62 @@ export default function BlockList( settings ) {
 	);
 }
 
+const EMPTY_ARRAY = [];
+const EMPTY_SET = new Set();
+
 function Items( {
 	placeholder,
 	rootClientId,
-	renderAppender,
+	renderAppender: CustomAppender,
 	__experimentalAppenderTagName,
 	layout = defaultLayout,
 } ) {
-	const { order, selectedBlocks, visibleBlocks, temporarilyEditingAsBlocks } =
+	// Avoid passing CustomAppender to useSelect because it could be a new
+	// function on every render.
+	const hasAppender = CustomAppender !== false;
+	const hasCustomAppender = !! CustomAppender;
+	const { order, selectedBlocks, visibleBlocks, shouldRenderAppender } =
 		useSelect(
 			( select ) => {
 				const {
+					getSettings,
 					getBlockOrder,
+					getSelectedBlockClientId,
 					getSelectedBlockClientIds,
 					__unstableGetVisibleBlocks,
-					__unstableGetTemporarilyEditingAsBlocks,
+					getTemplateLock,
+					getBlockEditingMode,
+					__unstableGetEditorMode,
 				} = select( blockEditorStore );
+
+				const _order = getBlockOrder( rootClientId );
+
+				if ( getSettings().__unstableIsPreviewMode ) {
+					return {
+						order: _order,
+						selectedBlocks: EMPTY_ARRAY,
+						visibleBlocks: EMPTY_SET,
+					};
+				}
+
+				const selectedBlockClientId = getSelectedBlockClientId();
 				return {
-					order: getBlockOrder( rootClientId ),
+					order: _order,
 					selectedBlocks: getSelectedBlockClientIds(),
 					visibleBlocks: __unstableGetVisibleBlocks(),
-					temporarilyEditingAsBlocks:
-						__unstableGetTemporarilyEditingAsBlocks(),
+					shouldRenderAppender:
+						hasAppender &&
+						__unstableGetEditorMode() !== 'zoom-out' &&
+						( hasCustomAppender
+							? ! getTemplateLock( rootClientId ) &&
+							  getBlockEditingMode( rootClientId ) !== 'disabled'
+							: rootClientId === selectedBlockClientId ||
+							  ( ! rootClientId &&
+									! selectedBlockClientId &&
+									! _order.length ) ),
 				};
 			},
-			[ rootClientId ]
+			[ rootClientId, hasAppender, hasCustomAppender ]
 		);
 
 	return (
@@ -194,16 +237,13 @@ function Items( {
 				</AsyncModeProvider>
 			) ) }
 			{ order.length < 1 && placeholder }
-			{ !! temporarilyEditingAsBlocks && (
-				<StopEditingAsBlocksOnOutsideSelect
-					clientId={ temporarilyEditingAsBlocks }
+			{ shouldRenderAppender && (
+				<BlockListAppender
+					tagName={ __experimentalAppenderTagName }
+					rootClientId={ rootClientId }
+					CustomAppender={ CustomAppender }
 				/>
 			) }
-			<BlockListAppender
-				tagName={ __experimentalAppenderTagName }
-				rootClientId={ rootClientId }
-				renderAppender={ renderAppender }
-			/>
 		</LayoutProvider>
 	);
 }

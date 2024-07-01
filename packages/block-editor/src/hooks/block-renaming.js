@@ -3,13 +3,6 @@
  */
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
-import { __ } from '@wordpress/i18n';
-import { TextControl } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
-import { InspectorControls } from '../components';
 
 /**
  * Filters registered block settings, adding an `__experimentalLabel` callback if one does not already exist.
@@ -44,32 +37,6 @@ export function addLabelCallback( settings ) {
 
 	return settings;
 }
-
-function BlockRenameControlPure( { metadata, setAttributes } ) {
-	return (
-		<InspectorControls group="advanced">
-			<TextControl
-				__nextHasNoMarginBottom
-				__next40pxDefaultSize
-				label={ __( 'Block name' ) }
-				value={ metadata?.name || '' }
-				onChange={ ( newName ) => {
-					setAttributes( {
-						metadata: { ...metadata, name: newName },
-					} );
-				} }
-			/>
-		</InspectorControls>
-	);
-}
-
-export default {
-	edit: BlockRenameControlPure,
-	attributeKeys: [ 'metadata' ],
-	hasSupport( name ) {
-		return hasBlockSupport( name, 'renaming', true );
-	},
-};
 
 addFilter(
 	'blocks.registerBlockType',

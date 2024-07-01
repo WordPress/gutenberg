@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
 import { useMergeRefs } from '@wordpress/compose';
-import { forwardRef, useMemo } from '@wordpress/element';
+import { forwardRef, useMemo, memo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import {
 	getBlockSupport,
@@ -41,6 +41,8 @@ function BlockContext( { children, clientId } ) {
 		</BlockContextProvider>
 	);
 }
+
+const BlockListItemsMemo = memo( BlockListItems );
 
 /**
  * InnerBlocks is a component which allows a single block to have multiple blocks
@@ -117,8 +119,10 @@ function UncontrolledInnerBlocks( props ) {
 		[ defaultLayout, usedLayout, allowSizingOnChildren ]
 	);
 
+	// For controlled inner blocks, we don't want a change in blocks to
+	// re-render the blocks list.
 	const items = (
-		<BlockListItems
+		<BlockListItemsMemo
 			rootClientId={ clientId }
 			renderAppender={ renderAppender }
 			__experimentalAppenderTagName={ __experimentalAppenderTagName }
@@ -186,10 +190,6 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 	} = useBlockEditContext();
 	const selected = useSelect(
 		( select ) => {
-			if ( ! clientId ) {
-				return {};
-			}
-
 			const {
 				getBlockName,
 				isBlockSelected,
@@ -197,11 +197,23 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				__unstableGetEditorMode,
 				getTemplateLock,
 				getBlockRootClientId,
-				__unstableIsWithinBlockOverlay,
-				__unstableHasActiveBlockOverlayActive,
 				getBlockEditingMode,
 				getBlockSettings,
+				isDragging,
+				getSettings,
 			} = unlock( select( blockEditorStore ) );
+			let _isDropZoneDisabled;
+			// In zoom out mode, we want to disable the drop zone for the sections.
+			// The inner blocks belonging to the section drop zone is
+			// already disabled by the blocks themselves being disabled.
+			if ( __unstableGetEditorMode() === 'zoom-out' ) {
+				const { sectionRootClientId } = unlock( getSettings() );
+				_isDropZoneDisabled = clientId !== sectionRootClientId;
+			}
+			if ( ! clientId ) {
+				return { isDropZoneDisabled: _isDropZoneDisabled };
+			}
+
 			const { hasBlockSupport, getBlockType } = select( blocksStore );
 			const blockName = getBlockName( clientId );
 			const enableClickThrough =
@@ -209,6 +221,11 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 			const blockEditingMode = getBlockEditingMode( clientId );
 			const parentClientId = getBlockRootClientId( clientId );
 			const [ defaultLayout ] = getBlockSettings( clientId, 'layout' );
+
+			if ( _isDropZoneDisabled !== undefined ) {
+				_isDropZoneDisabled = blockEditingMode === 'disabled';
+			}
+
 			return {
 				__experimentalCaptureToolbars: hasBlockSupport(
 					blockName,
@@ -219,15 +236,13 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 					blockName !== 'core/template' &&
 					! isBlockSelected( clientId ) &&
 					! hasSelectedInnerBlock( clientId, true ) &&
-					enableClickThrough,
+					enableClickThrough &&
+					! isDragging(),
 				name: blockName,
 				blockType: getBlockType( blockName ),
 				parentLock: getTemplateLock( parentClientId ),
 				parentClientId,
-				isDropZoneDisabled:
-					blockEditingMode !== 'default' ||
-					__unstableHasActiveBlockOverlayActive( clientId ) ||
-					__unstableIsWithinBlockOverlay( clientId ),
+				isDropZoneDisabled: _isDropZoneDisabled,
 				defaultLayout,
 			};
 		},
@@ -248,12 +263,15 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		dropZoneElement,
 		rootClientId: clientId,
 		parentClientId,
-		isDisabled: isDropZoneDisabled,
 	} );
 
 	const ref = useMergeRefs( [
 		props.ref,
-		__unstableDisableDropZone ? null : blockDropZoneRef,
+		__unstableDisableDropZone ||
+		isDropZoneDisabled ||
+		( layout?.columnCount && window.__experimentalEnableGridInteractivity )
+			? null
+			: blockDropZoneRef,
 	] );
 
 	const innerBlocksProps = {
@@ -273,7 +291,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 	return {
 		...props,
 		ref,
-		className: classnames(
+		className: clsx(
 			props.className,
 			'block-editor-block-list__layout',
 			__unstableDisableLayoutClassNames ? '' : layoutClassNames,

@@ -3,12 +3,12 @@
 	border-radius: $grid-unit-05;
 	width: calc(100% - #{$grid-unit-40});
 	margin: auto;
-	max-width: 420px;
+	max-width: 400px;
 	position: relative;
-	top: calc(15% + #{$header-height});
+	top: calc(5% + #{$header-height});
 
 	@include break-small() {
-		top: 15%;
+		top: calc(10% + #{$header-height});
 	}
 
 	.components-modal__content {
@@ -25,7 +25,7 @@
 .commands-command-menu__header {
 	display: flex;
 	align-items: center;
-	padding-left: $grid-unit-20;
+	padding: 0 $grid-unit-20;
 
 	.components-button {
 		height: $grid-unit-70;
@@ -49,11 +49,11 @@
 	[cmdk-input] {
 		border: none;
 		width: 100%;
-		padding: $grid-unit-20 $grid-unit-20 $grid-unit-20 $grid-unit-10;
+		padding: $grid-unit-20 $grid-unit-05;
 		outline: none;
 		color: $gray-900;
 		margin: 0;
-		font-size: 16px;
+		font-size: 15px;
 		line-height: 28px;
 		border-radius: 0;
 
@@ -74,7 +74,6 @@
 		align-items: center;
 		color: $gray-900;
 		font-size: $default-font-size;
-		min-height: $button-size-next-default-40px;
 
 		&[aria-selected="true"],
 		&:active {
@@ -96,7 +95,8 @@
 		}
 
 		> div {
-			padding: $grid-unit;
+			min-height: $button-size-next-default-40px;
+			padding: $grid-unit-05;
 			padding-left: $grid-unit-50; // Account for commands without icons.
 		}
 
@@ -109,8 +109,13 @@
 		max-height: 368px; // Specific to not have commands overflow oddly.
 		overflow: auto;
 
+		// Ensures there is always padding bottom on the last group, when there are commands.
+		& [cmdk-list-sizer] > [cmdk-group]:last-child [cmdk-group-items]:not(:empty) {
+			padding-bottom: $grid-unit-10;
+		}
+
 		& [cmdk-list-sizer] > [cmdk-group] > [cmdk-group-items]:not(:empty) {
-			padding: 0 $grid-unit $grid-unit;
+			padding: 0 $grid-unit-10;
 		}
 	}
 

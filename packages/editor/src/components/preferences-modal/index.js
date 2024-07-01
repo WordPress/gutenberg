@@ -10,12 +10,14 @@ import {
 	store as preferencesStore,
 	privateApis as preferencesPrivateApis,
 } from '@wordpress/preferences';
+import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
  */
 import EnablePanelOption from './enable-panel';
 import EnablePluginDocumentSettingPanelOption from './enable-plugin-document-setting-panel';
+import EnablePublishSidebarOption from './enable-publish-sidebar';
 import BlockManager from '../block-manager';
 import PostTaxonomies from '../post-taxonomies';
 import PostFeaturedImageCheck from '../post-featured-image/check';
@@ -32,16 +34,13 @@ const {
 	PreferenceToggleControl,
 } = unlock( preferencesPrivateApis );
 
-export default function EditorPreferencesModal( {
-	extraSections = {},
-	isActive,
-	onClose,
-} ) {
+export default function EditorPreferencesModal( { extraSections = {} } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const { showBlockBreadcrumbsOption } = useSelect(
+	const { isActive, showBlockBreadcrumbsOption } = useSelect(
 		( select ) => {
 			const { getEditorSettings } = select( editorStore );
 			const { get } = select( preferencesStore );
+			const { isModalActive } = select( interfaceStore );
 			const isRichEditingEnabled = getEditorSettings().richEditingEnabled;
 			const isDistractionFreeEnabled = get( 'core', 'distractionFree' );
 			return {
@@ -49,25 +48,15 @@ export default function EditorPreferencesModal( {
 					! isDistractionFreeEnabled &&
 					isLargeViewport &&
 					isRichEditingEnabled,
+				isActive: isModalActive( 'editor/preferences' ),
 			};
 		},
 		[ isLargeViewport ]
 	);
-
+	const { closeModal } = useDispatch( interfaceStore );
 	const { setIsListViewOpened, setIsInserterOpened } =
 		useDispatch( editorStore );
 	const { set: setPreference } = useDispatch( preferencesStore );
-
-	const toggleDistractionFree = () => {
-		setPreference( 'core', 'fixedToolbar', true );
-		setIsInserterOpened( false );
-		setIsListViewOpened( false );
-		// Todo: Check sidebar when closing/opening distraction free.
-	};
-
-	const turnOffDistractionFree = () => {
-		setPreference( 'core', 'distractionFree', false );
-	};
 
 	const sections = useMemo(
 		() => [
@@ -81,9 +70,9 @@ export default function EditorPreferencesModal( {
 								scope="core"
 								featureName="showListViewByDefault"
 								help={ __(
-									'Opens the block list view sidebar by default.'
+									'Opens the List View sidebar by default.'
 								) }
-								label={ __( 'Always open list view' ) }
+								label={ __( 'Always open List View' ) }
 							/>
 							{ showBlockBreadcrumbsOption && (
 								<PreferenceToggleControl
@@ -99,7 +88,7 @@ export default function EditorPreferencesModal( {
 								scope="core"
 								featureName="allowRightClickOverrides"
 								help={ __(
-									'Allows contextual list view menus via right-click, overriding browser defaults.'
+									'Allows contextual List View menus via right-click, overriding browser defaults.'
 								) }
 								label={ __(
 									'Allow right-click contextual menus'
@@ -148,6 +137,18 @@ export default function EditorPreferencesModal( {
 								/>
 							</PageAttributesCheck>
 						</PreferencesModalSection>
+						{ isLargeViewport && (
+							<PreferencesModalSection
+								title={ __( 'Publishing' ) }
+							>
+								<EnablePublishSidebarOption
+									help={ __(
+										'Review settings, such as visibility and tags.'
+									) }
+									label={ __( 'Enable pre-publish checks' ) }
+								/>
+							</PreferencesModalSection>
+						) }
 						{ extraSections?.general }
 					</>
 				),
@@ -165,7 +166,13 @@ export default function EditorPreferencesModal( {
 						<PreferenceToggleControl
 							scope="core"
 							featureName="fixedToolbar"
-							onToggle={ turnOffDistractionFree }
+							onToggle={ () =>
+								setPreference(
+									'core',
+									'distractionFree',
+									false
+								)
+							}
 							help={ __(
 								'Access all block and document tools in a single place.'
 							) }
@@ -174,7 +181,11 @@ export default function EditorPreferencesModal( {
 						<PreferenceToggleControl
 							scope="core"
 							featureName="distractionFree"
-							onToggle={ toggleDistractionFree }
+							onToggle={ () => {
+								setPreference( 'core', 'fixedToolbar', true );
+								setIsInserterOpened( false );
+								setIsListViewOpened( false );
+							} }
 							help={ __(
 								'Reduce visual distractions by hiding the toolbar and other elements to focus on writing.'
 							) }
@@ -254,7 +265,14 @@ export default function EditorPreferencesModal( {
 				),
 			},
 		],
-		[ isLargeViewport, showBlockBreadcrumbsOption, extraSections ]
+		[
+			showBlockBreadcrumbsOption,
+			extraSections,
+			setIsInserterOpened,
+			setIsListViewOpened,
+			setPreference,
+			isLargeViewport,
+		]
 	);
 
 	if ( ! isActive ) {
@@ -262,7 +280,7 @@ export default function EditorPreferencesModal( {
 	}
 
 	return (
-		<PreferencesModal closeModal={ onClose }>
+		<PreferencesModal closeModal={ closeModal }>
 			<PreferencesModalTabs sections={ sections } />
 		</PreferencesModal>
 	);

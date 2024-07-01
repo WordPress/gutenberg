@@ -359,8 +359,8 @@ _Returns_
 
 The RichTextData class is used to instantiate a wrapper around rich text values, with methods that can be used to transform or manipulate the data.
 
--   Create an emtpy instance: `new RichTextData()`.
--   Create one from an html string: `RichTextData.fromHTMLString(
+-   Create an empty instance: `new RichTextData()`.
+-   Create one from an HTML string: `RichTextData.fromHTMLString(
 '<em>hello</em>' )`.
 -   Create one from a wrapper HTMLElement: `RichTextData.fromHTMLElement(
 document.querySelector( 'p' ) )`.
@@ -432,6 +432,7 @@ _Parameters_
 
 -   _$1_ `Object`: Named argements.
 -   _$1.value_ `RichTextValue`: Rich text value.
+-   _$1.preserveWhiteSpace_ `[boolean]`: Preserves newlines if true.
 
 _Returns_
 

@@ -8,7 +8,6 @@ import FastImage from 'react-native-fast-image';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Icon } from '@wordpress/components';
 import { image, offline } from '@wordpress/icons';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { useEffect, useState, Platform } from '@wordpress/element';
@@ -20,6 +19,7 @@ import { getImageWithFocalPointStyles } from './utils';
 import styles from './style.scss';
 import SvgIconRetry from './icon-retry';
 import ImageEditingButton from './image-editing-button';
+import Icon from '../../icon';
 
 const ICON_TYPE = {
 	OFFLINE: 'offline',
@@ -54,6 +54,9 @@ const ImageComponent = ( {
 } ) => {
 	const [ imageData, setImageData ] = useState( null );
 	const [ containerSize, setContainerSize ] = useState( null );
+	const [ localURL, setLocalURL ] = useState( null );
+	const [ networkURL, setNetworkURL ] = useState( null );
+	const [ networkImageLoaded, setNetworkImageLoaded ] = useState( false );
 
 	// Disabled for Android due to https://github.com/WordPress/gutenberg/issues/43149
 	const Image =
@@ -80,6 +83,33 @@ const ImageComponent = ( {
 					onImageDataLoad( metaData );
 				}
 			} );
+
+			if ( url.startsWith( 'file:///' ) ) {
+				setLocalURL( url );
+				setNetworkURL( null );
+				setNetworkImageLoaded( false );
+			} else if ( url.startsWith( 'https://' ) ) {
+				if ( Platform.isIOS ) {
+					setNetworkURL( url );
+				} else if ( Platform.isAndroid ) {
+					RNImage.prefetch( url ).then(
+						() => {
+							if ( ! isCurrent ) {
+								return;
+							}
+							setNetworkURL( url );
+							setNetworkImageLoaded( true );
+						},
+						() => {
+							// This callback is called when the image fails to load,
+							// but these events are handled by `isUploadFailed`
+							// and `isUploadPaused` events instead.
+							//
+							// Ignoring the error event will persist the local image URI.
+						}
+					);
+				}
+			}
 		}
 		return () => ( isCurrent = false );
 		// Disable reason: deferring this refactor to the native team.
@@ -190,7 +220,6 @@ const ImageComponent = ( {
 
 	const imageStyles = [
 		{
-			opacity: isUploadInProgress ? 0.3 : 1,
 			height: containerSize?.height,
 		},
 		! resizeMode && {
@@ -214,12 +243,29 @@ const ImageComponent = ( {
 		imageHeight && { height: imageHeight },
 		shapeStyle,
 	];
+
+	// On iOS, add 1 to height to account for the 1px non-visible image
+	// that is used to determine when the network image has loaded
+	// We also must verify that it is not NaN, as it can be NaN when the image is loading.
+	// This is not necessary on Android as the non-visible image is not used.
+	let calculatedSelectedHeight;
+	if ( Platform.isIOS ) {
+		calculatedSelectedHeight =
+			containerSize && ! isNaN( containerSize.height )
+				? containerSize.height + 1
+				: 0;
+	} else {
+		calculatedSelectedHeight = containerSize?.height;
+	}
+
 	const imageSelectedStyles = [
 		usePreferredColorSchemeStyle(
 			styles.imageBorder,
 			styles.imageBorderDark
 		),
-		{ height: containerSize?.height },
+		{
+			height: calculatedSelectedHeight,
+		},
 	];
 
 	return (
@@ -239,17 +285,13 @@ const ImageComponent = ( {
 				disabled={ ! isSelected }
 				accessibilityLabel={ alt }
 				accessibilityHint={ __( 'Double tap and hold to edit' ) }
-				accessibilityRole={ 'imagebutton' }
+				accessibilityRole="imagebutton"
 				key={ url }
 				style={ imageContainerStyles }
 			>
-				{ isSelected &&
-					highlightSelected &&
-					! (
-						isUploadInProgress ||
-						isUploadFailed ||
-						isUploadPaused
-					) && <View style={ imageSelectedStyles } /> }
+				{ isSelected && highlightSelected && (
+					<View style={ imageSelectedStyles } />
+				) }
 
 				{ ! imageData ? (
 					<View style={ placeholderStyles }>
@@ -259,14 +301,62 @@ const ImageComponent = ( {
 					</View>
 				) : (
 					<View style={ focalPoint && styles.focalPointContent }>
-						<Image
-							style={ imageStyles }
-							source={ { uri: url } }
-							{ ...( ! focalPoint && {
-								resizeMethod: 'scale',
-							} ) }
-							resizeMode={ imageResizeMode }
-						/>
+						{ Platform.isAndroid && (
+							<>
+								{ networkImageLoaded && networkURL && (
+									<Image
+										style={ imageStyles }
+										fadeDuration={ 0 }
+										source={ { uri: networkURL } }
+										{ ...( ! focalPoint && {
+											resizeMethod: 'scale',
+										} ) }
+										resizeMode={ imageResizeMode }
+										testID={ `network-image-${ url }` }
+									/>
+								) }
+								{ ! networkImageLoaded && ! networkURL && (
+									<Image
+										style={ imageStyles }
+										fadeDuration={ 0 }
+										source={ { uri: localURL } }
+										{ ...( ! focalPoint && {
+											resizeMethod: 'scale',
+										} ) }
+										resizeMode={ imageResizeMode }
+									/>
+								) }
+							</>
+						) }
+						{ Platform.isIOS && (
+							<>
+								<Image
+									style={ imageStyles }
+									source={ {
+										uri:
+											networkURL && networkImageLoaded
+												? networkURL
+												: localURL || url,
+									} }
+									{ ...( ! focalPoint && {
+										resizeMethod: 'scale',
+									} ) }
+									resizeMode={ imageResizeMode }
+									testID={ `network-image-${
+										networkURL && networkImageLoaded
+											? networkURL
+											: localURL || url
+									}` }
+								/>
+								<Image
+									source={ { uri: networkURL } }
+									style={ styles.nonVisibleImage }
+									onLoad={ () => {
+										setNetworkImageLoaded( true );
+									} }
+								/>
+							</>
+						) }
 					</View>
 				) }
 

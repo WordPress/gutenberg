@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classNames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -85,7 +85,7 @@ function BlockAlignmentUI( {
 												key={ controlName }
 												icon={ icon }
 												iconPosition="left"
-												className={ classNames(
+												className={ clsx(
 													'components-dropdown-menu__menu-item',
 													{
 														'is-active': isSelected,

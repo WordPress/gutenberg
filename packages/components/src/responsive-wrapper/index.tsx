@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -49,7 +49,7 @@ function ResponsiveWrapper( {
 		<TagName className="components-responsive-wrapper">
 			<div>
 				{ cloneElement( children, {
-					className: classnames(
+					className: clsx(
 						'components-responsive-wrapper__content',
 						children.props.className
 					),

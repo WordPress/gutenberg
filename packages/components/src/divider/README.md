@@ -55,4 +55,4 @@ Divider's orientation. When using inside a flex container, you may need to make 
 
 ### Inherited props
 
-`Divider` also inherits all of the [`Separator` props](https://reakit.io/docs/separator/).
+`Divider` also inherits all of the [`Separator` props](https://ariakit.org/reference/separator#optional-props).

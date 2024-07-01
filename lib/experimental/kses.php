@@ -31,7 +31,7 @@ function gutenberg_filter_global_styles_post( $data ) {
 	) {
 		unset( $decoded_data['isGlobalStylesUserThemeJSON'] );
 
-		$data_to_encode = WP_Theme_JSON_Gutenberg::remove_insecure_properties( $decoded_data );
+		$data_to_encode = WP_Theme_JSON_Gutenberg::remove_insecure_properties( $decoded_data, 'custom' );
 
 		$data_to_encode['isGlobalStylesUserThemeJSON'] = true;
 		return wp_slash( wp_json_encode( $data_to_encode ) );
@@ -87,3 +87,17 @@ if ( ! function_exists( 'allow_filter_in_styles' ) ) {
 	}
 }
 add_filter( 'safecss_filter_attr_allow_css', 'allow_filter_in_styles', 10, 2 );
+
+/**
+ * Update allowed inline style attributes list.
+ *
+ * @param string[] $attrs Array of allowed CSS attributes.
+ * @return string[] CSS attributes.
+ */
+function gutenberg_safe_grid_attrs( $attrs ) {
+	$attrs[] = 'grid-column';
+	$attrs[] = 'grid-row';
+	$attrs[] = 'container-type';
+	return $attrs;
+}
+add_filter( 'safe_style_css', 'gutenberg_safe_grid_attrs' );

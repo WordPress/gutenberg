@@ -22,13 +22,26 @@
 			"selector": "cite",
 			"__experimentalRole": "content"
 		},
-		"align": {
+		"textAlign": {
 			"type": "string"
 		}
 	},
 	"supports": {
 		"anchor": true,
 		"html": false,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"__experimentalDefaultControls": {
+				"backgroundImage": true
+			}
+		},
+		"dimensions": {
+			"minHeight": true,
+			"__experimentalDefaultControls": {
+				"minHeight": false
+			}
+		},
 		"__experimentalOnEnter": true,
 		"__experimentalOnMerge": true,
 		"typography": {
@@ -58,6 +71,9 @@
 		},
 		"spacing": {
 			"blockGap": true
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	},
 	"styles": [

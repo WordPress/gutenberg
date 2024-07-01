@@ -27,6 +27,7 @@ const VALID_SETTINGS = [
 	'background.backgroundImage',
 	'background.backgroundRepeat',
 	'background.backgroundSize',
+	'background.backgroundPosition',
 	'border.color',
 	'border.radius',
 	'border.style',
@@ -59,6 +60,7 @@ const VALID_SETTINGS = [
 	'position.fixed',
 	'position.sticky',
 	'spacing.customSpacingSize',
+	'spacing.defaultSpacingSizes',
 	'spacing.spacingSizes',
 	'spacing.spacingScale',
 	'spacing.blockGap',
@@ -75,6 +77,7 @@ const VALID_SETTINGS = [
 	'typography.fontWeight',
 	'typography.letterSpacing',
 	'typography.lineHeight',
+	'typography.textAlign',
 	'typography.textColumns',
 	'typography.textDecoration',
 	'typography.textTransform',
@@ -86,10 +89,7 @@ export const useGlobalStylesReset = () => {
 	const canReset = !! config && ! fastDeepEqual( config, EMPTY_CONFIG );
 	return [
 		canReset,
-		useCallback(
-			() => setUserConfig( () => EMPTY_CONFIG ),
-			[ setUserConfig ]
-		),
+		useCallback( () => setUserConfig( EMPTY_CONFIG ), [ setUserConfig ] ),
 	];
 };
 
@@ -205,6 +205,11 @@ export function useGlobalStyle(
 	return [ result, setStyle ];
 }
 
+export function useGlobalStyleLinks() {
+	const { merged: mergedConfig } = useContext( GlobalStylesContext );
+	return mergedConfig?._links;
+}
+
 /**
  * React hook that overrides a global settings object with block and element specific settings.
  *
@@ -291,6 +296,7 @@ export function useSettingsForBlockElement(
 			'fontStyle',
 			'fontWeight',
 			'letterSpacing',
+			'textAlign',
 			'textTransform',
 			'textDecoration',
 			'writingMode',
@@ -371,8 +377,13 @@ export function useSettingsForBlockElement(
 			? updatedSettings.shadow
 			: false;
 
+		// Text alignment is only available for blocks.
+		if ( element ) {
+			updatedSettings.typography.textAlign = false;
+		}
+
 		return updatedSettings;
-	}, [ parentSettings, supportedStyles, supports ] );
+	}, [ parentSettings, supportedStyles, supports, element ] );
 }
 
 export function useColorsPerOrigin( settings ) {

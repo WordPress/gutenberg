@@ -56,9 +56,9 @@ const meta: Meta< typeof DropdownMenu > = {
 		children: { control: { type: null } },
 		trigger: { control: { type: null } },
 	},
+	tags: [ 'status-private' ],
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
-		badges: [ 'private' ],
 		controls: { expanded: true },
 		docs: {
 			canvas: { sourceState: 'shown' },
@@ -110,7 +110,7 @@ export const Default: StoryFn< typeof DropdownMenu > = ( props ) => (
 			>
 				<DropdownMenuItemLabel>With prefix</DropdownMenuItemLabel>
 			</DropdownMenuItem>
-			<DropdownMenuItem suffix={ '⌘S' }>With suffix</DropdownMenuItem>
+			<DropdownMenuItem suffix="⌘S">With suffix</DropdownMenuItem>
 			<DropdownMenuItem
 				disabled
 				prefix={ <Icon icon={ formatCapitalize } size={ 24 } /> }

@@ -38,7 +38,7 @@
 	},
 	"supports": {
 		"anchor": true,
-		"className": false,
+		"html": false,
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
@@ -69,9 +69,11 @@
 			}
 		},
 		"__unstablePasteTextInline": true,
-		"__experimentalSelector": "ol,ul",
 		"__experimentalOnMerge": true,
-		"__experimentalSlashInserter": true
+		"__experimentalSlashInserter": true,
+		"interactivity": {
+			"clientNavigation": true
+		}
 	},
 	"editorStyle": "wp-block-list-editor",
 	"style": "wp-block-list"

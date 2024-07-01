@@ -356,7 +356,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await page.keyboard.type( 'a' );
 		await page.keyboard.press( 'Backspace' );
 		await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li></li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->` );
@@ -591,6 +591,37 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 			{
 				name: 'core/paragraph',
 				attributes: { content: '>' },
+			},
+		] );
+	} );
+
+	test( 'should remove first empty paragraph on Backspace', async ( {
+		editor,
+		page,
+	} ) => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
+		await page.keyboard.press( 'ArrowUp' );
+
+		// Ensure setup is correct.
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: '' },
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: '2' },
+			},
+		] );
+
+		await page.keyboard.press( 'Backspace' );
+
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: '2' },
 			},
 		] );
 	} );
@@ -923,32 +954,34 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		// Confirm correct setup.
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:table -->
-<figure class="wp-block-table"><table><tbody><tr><td></td><td>2</td></tr><tr><td></td><td></td></tr></tbody></table></figure>
+<figure class="wp-block-table"><table class="has-fixed-layout"><tbody><tr><td></td><td>2</td></tr><tr><td></td><td></td></tr></tbody></table></figure>
 <!-- /wp:table -->` );
 	} );
 
-	test( 'should unselect all blocks when hitting double escape', async ( {
+	test( 'escape should set select mode and then focus the canvas', async ( {
 		page,
 		writingFlowUtils,
 	} ) => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Random Paragraph' );
 
+		// First escape enters navigation mode.
+		await page.keyboard.press( 'Escape' );
+		const navigationButton = page.getByLabel(
+			'Paragraph Block. Row 1. Random Paragraph'
+		);
+		await expect( navigationButton ).toBeVisible();
 		await expect
 			.poll( writingFlowUtils.getActiveBlockName )
 			.toBe( 'core/paragraph' );
 
-		// First escape enters navigaiton mode.
+		// Second escape should send focus to the canvas
 		await page.keyboard.press( 'Escape' );
-		await expect
-			.poll( writingFlowUtils.getActiveBlockName )
-			.toBe( 'core/paragraph' );
-
-		// Second escape unselects the blocks.
-		await page.keyboard.press( 'Escape' );
-		await expect
-			.poll( writingFlowUtils.getActiveBlockName )
-			.toBe( undefined );
+		// The navigation button should be hidden.
+		await expect( navigationButton ).toBeHidden();
+		await expect(
+			page.getByRole( 'region', { name: 'Editor content' } )
+		).toBeFocused();
 	} );
 
 	// Checks for regressions of https://github.com/WordPress/gutenberg/issues/40091.
@@ -1122,9 +1155,12 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await page.keyboard.type( 'synced' );
 
 		await editor.clickBlockOptionsMenuItem( 'Create pattern' );
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.type( 'test' );
+		const createPatternDialog = editor.page.getByRole( 'dialog', {
+			name: 'add new pattern',
+		} );
+		await createPatternDialog
+			.getByRole( 'textbox', { name: 'Name' } )
+			.fill( 'test' );
 		await page.keyboard.press( 'Enter' );
 
 		await expect(
@@ -1169,7 +1205,7 @@ class WritingFlowUtils {
 			.locator( 'role=button[name="Two columns; equal split"i]' )
 			.click();
 		await this.editor.canvas
-			.locator( 'role=button[name="Add block"i]' )
+			.locator( '.is-selected >> role=button[name="Add block"i]' )
 			.click();
 		await this.page.click(
 			'role=listbox[name="Blocks"i] >> role=option[name="Paragraph"i]'

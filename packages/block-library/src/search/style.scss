@@ -12,6 +12,8 @@ $button-spacing-y: math.div($grid-unit-15, 2); // 6px
 	svg {
 		min-width: $grid-unit-30;
 		min-height: $grid-unit-30;
+		width: 1.25em;
+		height: 1.25em;
 		fill: currentColor;
 		vertical-align: text-bottom;
 	}
@@ -93,6 +95,17 @@ $button-spacing-y: math.div($grid-unit-15, 2); // 6px
 			flex-basis: 0;
 		}
 	}
+}
+
+// We are lowering the specificity so that the input element can override the rule for the input element inside the search block.
+:where(.wp-block-search__input) {
+	font-family: inherit;
+	font-weight: inherit;
+	font-size: inherit;
+	line-height: inherit;
+	letter-spacing: inherit;
+	text-transform: inherit;
+	font-style: inherit;
 }
 
 // We are lowering the specificity so that the button element can override the rule for the button inside the search block.

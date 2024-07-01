@@ -15,13 +15,7 @@ describe( 'Block Toolbar', () => {
 	it( "doesn't render the block settings button if there aren't any settings for the current selected block", async () => {
 		// Arrange
 		const screen = await initializeEditor();
-		await addBlock( screen, 'Image' );
-
-		// Act
-		fireEvent(
-			screen.getByTestId( 'media-options-picker' ),
-			'backdropPress'
-		);
+		await addBlock( screen, 'Shortcode' );
 
 		// Assert
 		expect( screen.queryByLabelText( 'Open Settings' ) ).toBeNull();

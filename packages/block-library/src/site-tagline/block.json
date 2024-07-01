@@ -10,6 +10,10 @@
 	"attributes": {
 		"textAlign": {
 			"type": "string"
+		},
+		"level": {
+			"type": "number",
+			"default": 0
 		}
 	},
 	"example": {},
@@ -40,9 +44,13 @@
 			"__experimentalFontStyle": true,
 			"__experimentalFontWeight": true,
 			"__experimentalLetterSpacing": true,
+			"__experimentalWritingMode": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	},
 	"editorStyle": "wp-block-site-tagline-editor"

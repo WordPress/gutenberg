@@ -23,8 +23,8 @@ test.describe( 'Site editor writing flow', () => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//header',
 			postType: 'wp_template_part',
+			canvas: 'edit',
 		} );
-		await editor.canvas.locator( 'body' ).click();
 		// Select the first site title block.
 		const siteTitleBlock = editor.canvas.locator(
 			'role=document[name="Block: Site Title"i]'
@@ -51,8 +51,8 @@ test.describe( 'Site editor writing flow', () => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//header',
 			postType: 'wp_template_part',
+			canvas: 'edit',
 		} );
-		await editor.canvas.locator( 'body' ).click();
 		// Make sure the sidebar is open.
 		await editor.openDocumentSettingsSidebar();
 
@@ -65,9 +65,9 @@ test.describe( 'Site editor writing flow', () => {
 
 		// Tab to the inspector, tabbing three times to go past the two resize handles.
 		await pageUtils.pressKeys( 'Tab', { times: 3 } );
-		const inspectorTemplateTab = page.locator(
-			'role=region[name="Editor settings"i] >> role=button[name="Template part"i]'
+		const inspectorBlockTab = page.locator(
+			'role=region[name="Editor settings"i] >> role=tab[name="Block"i]'
 		);
-		await expect( inspectorTemplateTab ).toBeFocused();
+		await expect( inspectorBlockTab ).toBeFocused();
 	} );
 } );

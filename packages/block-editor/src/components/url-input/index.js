@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
-import scrollIntoView from 'dom-scroll-into-view';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -83,21 +82,13 @@ class URLInput extends Component {
 		if (
 			showSuggestions &&
 			selectedSuggestion !== null &&
-			this.suggestionNodes[ selectedSuggestion ] &&
-			! this.scrollingIntoView
+			this.suggestionNodes[ selectedSuggestion ]
 		) {
-			this.scrollingIntoView = true;
-			scrollIntoView(
-				this.suggestionNodes[ selectedSuggestion ],
-				this.autocompleteRef.current,
-				{
-					onlyScrollIfNeeded: true,
-				}
-			);
-
-			this.props.setTimeout( () => {
-				this.scrollingIntoView = false;
-			}, 100 );
+			this.suggestionNodes[ selectedSuggestion ].scrollIntoView( {
+				behavior: 'instant',
+				block: 'nearest',
+				inline: 'nearest',
+			} );
 		}
 
 		// Update suggestions when the value changes.
@@ -450,7 +441,7 @@ class URLInput extends Component {
 		const controlProps = {
 			id: inputId, // Passes attribute to label for the for attribute
 			label,
-			className: classnames( 'block-editor-url-input', className, {
+			className: clsx( 'block-editor-url-input', className, {
 				'is-full-width': isFullWidth,
 			} ),
 			hideLabelFromVision,
@@ -555,7 +546,7 @@ class URLInput extends Component {
 			<Popover placement="bottom" focusOnMount={ false }>
 				<div
 					{ ...suggestionsListProps }
-					className={ classnames(
+					className={ clsx(
 						'block-editor-url-input__suggestions',
 						`${ className }__suggestions`
 					) }
@@ -564,7 +555,7 @@ class URLInput extends Component {
 						<Button
 							{ ...buildSuggestionItemProps( suggestion, index ) }
 							key={ suggestion.id }
-							className={ classnames(
+							className={ clsx(
 								'block-editor-url-input__suggestion',
 								{
 									'is-selected': index === selectedSuggestion,

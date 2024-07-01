@@ -19,7 +19,26 @@ import useFocusOutside from '../use-focus-outside';
 import useMergeRefs from '../use-merge-refs';
 
 type DialogOptions = {
+	/**
+	 * Determines whether focus should be automatically moved to the popover
+	 * when it mounts. `false` causes no focus shift, `true` causes the popover
+	 * itself to gain focus, and `firstElement` focuses the first focusable
+	 * element within the popover.
+	 *
+	 * @default 'firstElement'
+	 */
 	focusOnMount?: Parameters< typeof useFocusOnMount >[ 0 ];
+	/**
+	 * Determines whether tabbing is constrained to within the popover,
+	 * preventing keyboard focus from leaving the popover content without
+	 * explicit focus elsewhere, or whether the popover remains part of the
+	 * wider tab order.
+	 * If no value is passed, it will be derived from `focusOnMount`.
+	 *
+	 * @see focusOnMount
+	 * @default `focusOnMount` !== false
+	 */
+	constrainTabbing?: boolean;
 	onClose?: () => void;
 	/**
 	 * Use the `onClose` prop instead.
@@ -48,6 +67,7 @@ type useDialogReturn = [
  */
 function useDialog( options: DialogOptions ): useDialogReturn {
 	const currentOptions = useRef< DialogOptions | undefined >();
+	const { constrainTabbing = options.focusOnMount !== false } = options;
 	useEffect( () => {
 		currentOptions.current = options;
 	}, Object.values( options ) );
@@ -83,7 +103,7 @@ function useDialog( options: DialogOptions ): useDialogReturn {
 
 	return [
 		useMergeRefs( [
-			options.focusOnMount !== false ? constrainedTabbingRef : null,
+			constrainTabbing ? constrainedTabbingRef : null,
 			options.focusOnMount !== false ? focusReturnRef : null,
 			options.focusOnMount !== false ? focusOnMountRef : null,
 			closeOnEscapeRef,

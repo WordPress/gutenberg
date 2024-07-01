@@ -98,18 +98,18 @@ export function removeBlockTypes( names ) {
  * Returns an action object used in signalling that new block styles have been added.
  * Ignored from documentation as the recommended usage for this action through registerBlockStyle from @wordpress/blocks.
  *
- * @param {string}       blockName Block name.
- * @param {Array|Object} styles    Block style object or array of block style objects.
+ * @param {string|Array} blockNames Block names to register new styles for.
+ * @param {Array|Object} styles     Block style object or array of block style objects.
  *
  * @ignore
  *
  * @return {Object} Action object.
  */
-export function addBlockStyles( blockName, styles ) {
+export function addBlockStyles( blockNames, styles ) {
 	return {
 		type: 'ADD_BLOCK_STYLES',
 		styles: Array.isArray( styles ) ? styles : [ styles ],
-		blockName,
+		blockNames: Array.isArray( blockNames ) ? blockNames : [ blockNames ],
 	};
 }
 

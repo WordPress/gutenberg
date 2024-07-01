@@ -13,6 +13,7 @@ import { select, dispatch } from '@wordpress/data';
 import {
 	registerBlockType,
 	registerBlockCollection,
+	registerBlockVariation,
 	unregisterBlockCollection,
 	unregisterBlockType,
 	setFreeformContentHandlerName,
@@ -26,6 +27,7 @@ import {
 	getBlockType,
 	getBlockTypes,
 	getBlockSupport,
+	getBlockVariations,
 	hasBlockSupport,
 	isReusableBlock,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
@@ -398,39 +400,47 @@ describe( 'blocks', () => {
 			} );
 		} );
 
-		// This can be removed once polyfill adding selectors has been removed.
-		it( 'should apply selectors on the client when not set on the server', () => {
-			const blockName = 'core/test-block-with-selectors';
+		it( 'should merge settings provided by server and client', () => {
+			const blockName = 'core/test-block-with-merged-settings';
 			unstable__bootstrapServerSideBlockDefinitions( {
 				[ blockName ]: {
-					category: 'widgets',
-				},
-			} );
-			unstable__bootstrapServerSideBlockDefinitions( {
-				[ blockName ]: {
-					selectors: { root: '.wp-block-custom-selector' },
-					category: 'ignored',
+					variations: [
+						{ name: 'foo', label: 'Foo' },
+						{ name: 'baz', label: 'Baz', description: 'Testing' },
+					],
 				},
 			} );
 
 			const blockType = {
-				title: 'block title',
+				title: 'block settings merge',
+				variations: [
+					{ name: 'bar', label: 'Bar' },
+					{ name: 'baz', label: 'Baz', icon: 'layout' },
+				],
 			};
 			registerBlockType( blockName, blockType );
 			expect( getBlockType( blockName ) ).toEqual( {
 				name: blockName,
 				save: expect.any( Function ),
-				title: 'block title',
-				category: 'widgets',
+				title: 'block settings merge',
 				icon: { src: BLOCK_ICON_DEFAULT },
 				attributes: {},
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
-				selectors: { root: '.wp-block-custom-selector' },
+				selectors: {},
 				supports: {},
 				styles: [],
-				variations: [],
+				variations: [
+					{ name: 'foo', label: 'Foo' },
+					{
+						description: 'Testing',
+						name: 'baz',
+						label: 'Baz',
+						icon: 'layout',
+					},
+					{ name: 'bar', label: 'Bar' },
+				],
 				blockHooks: {},
 			} );
 		} );
@@ -1400,6 +1410,26 @@ describe( 'blocks', () => {
 		it( 'should return false for other blocks', () => {
 			const block = { name: 'core/paragraph' };
 			expect( isReusableBlock( block ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'registerBlockVariation', () => {
+		it( 'should warn when registering block variation without a name', () => {
+			registerBlockType( 'core/variation-block', defaultBlockSettings );
+			registerBlockVariation( 'core/variation-block', {
+				title: 'Variation Title',
+				description: 'Variation description',
+			} );
+
+			expect( console ).toHaveWarnedWith(
+				'Variation names must be unique strings.'
+			);
+			expect( getBlockVariations( 'core/variation-block' ) ).toEqual( [
+				{
+					title: 'Variation Title',
+					description: 'Variation description',
+				},
+			] );
 		} );
 	} );
 } );

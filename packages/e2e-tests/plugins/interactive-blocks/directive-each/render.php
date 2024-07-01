@@ -4,14 +4,24 @@
  *
  * @package gutenberg-test-interactive-blocks
  */
-
-wp_enqueue_script_module( 'directive-each-view' );
 ?>
 
-<div data-wp-interactive='{ "namespace": "directive-each" }'>
+<div data-wp-interactive="directive-each">
 	<div data-testid="letters">
 		<template data-wp-each="state.letters">
 			<p data-wp-text="context.item" data-testid="item"></p>
+		</template>
+		<!-- SSRed elements; they should be removed on hydration -->
+		<p data-testid="item" data-wp-each-child>A</p>
+		<p data-testid="item" data-wp-each-child>B</p>
+		<p data-testid="item" data-wp-each-child>C</p>
+	</div>
+
+	<hr>
+
+	<div data-testid="letters-kebab-case">
+		<template data-wp-each--my-item="state.letters">
+			<p data-wp-text="context.myItem" data-testid="item"></p>
 		</template>
 		<!-- SSRed elements; they should be removed on hydration -->
 		<p data-testid="item" data-wp-each-child>A</p>
@@ -208,7 +218,7 @@ wp_enqueue_script_module( 'directive-each-view' );
 <hr>
 
 <div
-	data-wp-interactive='{ "namespace": "directive-each" }'
+	data-wp-interactive="directive-each"
 	data-wp-router-region="navigation-updated list"
 	data-wp-context='{ "list": [ "beta", "gamma", "delta" ] }'
 	data-testid="navigation-updated list"
@@ -223,4 +233,30 @@ wp_enqueue_script_module( 'directive-each-view' );
 	<p data-testid="item" data-wp-each-child>beta</p>
 	<p data-testid="item" data-wp-each-child>gamma</p>
 	<p data-testid="item" data-wp-each-child>delta</p>
+</div>
+
+<hr>
+
+<div
+	data-wp-interactive="directive-each"
+	data-wp-context='{ "list": [ "beta" ], "callbackRunCount": 0 }'
+	data-testid="elements with directives"
+>
+	<template data-wp-each="context.list">
+		<div
+			data-testid="item"
+			data-wp-text="context.item"
+			data-wp-priority-2-init="callbacks.updateCallbackRunCount"
+		></div>
+	</template>
+	<div
+		data-wp-each-child
+		data-testid="item"
+		data-wp-text="context.item"
+		data-wp-priority-2-init="callbacks.updateCallbackRunCount"
+	></div>
+	<data
+		data-testid="callbackRunCount"
+		data-wp-text="context.callbackRunCount"
+	></data>
 </div>

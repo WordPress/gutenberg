@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -447,10 +447,7 @@ function CoverEdit( {
 				) }
 				<TagName
 					{ ...blockProps }
-					className={ classnames(
-						'is-placeholder',
-						blockProps.className
-					) }
+					className={ clsx( 'is-placeholder', blockProps.className ) }
 					style={ {
 						...blockProps.style,
 						minHeight: minHeightWithUnit || undefined,
@@ -464,7 +461,7 @@ function CoverEdit( {
 					>
 						<div className="wp-block-cover__placeholder-background-options">
 							<ColorPalette
-								disableCustomColors={ true }
+								disableCustomColors
 								value={ overlayColor.color }
 								onChange={ onSetOverlayColor }
 								clearable={ false }
@@ -476,7 +473,7 @@ function CoverEdit( {
 		);
 	}
 
-	const classes = classnames(
+	const classes = clsx(
 		{
 			'is-dark-theme': isDark,
 			'is-light': ! isDark,
@@ -489,21 +486,24 @@ function CoverEdit( {
 		getPositionClassName( contentPosition )
 	);
 
+	const showOverlay =
+		url || ! useFeaturedImage || ( useFeaturedImage && ! url );
+
 	return (
 		<>
 			{ blockControls }
 			{ inspectorControls }
 			<TagName
 				{ ...blockProps }
-				className={ classnames( classes, blockProps.className ) }
+				className={ clsx( classes, blockProps.className ) }
 				style={ { ...style, ...blockProps.style } }
 				data-url={ url }
 			>
 				{ resizeListener }
-				{ ( ! useFeaturedImage || url ) && (
+				{ showOverlay && (
 					<span
 						aria-hidden="true"
-						className={ classnames(
+						className={ clsx(
 							'wp-block-cover__background',
 							dimRatioToClass( dimRatio ),
 							{
@@ -525,7 +525,7 @@ function CoverEdit( {
 				{ ! url && useFeaturedImage && (
 					<Placeholder
 						className="wp-block-cover__image--placeholder-image"
-						withIllustration={ true }
+						withIllustration
 					/>
 				) }
 
@@ -544,7 +544,7 @@ function CoverEdit( {
 							ref={ mediaElement }
 							role={ alt ? 'img' : undefined }
 							aria-label={ alt ? alt : undefined }
-							className={ classnames(
+							className={ clsx(
 								classes,
 								'wp-block-cover__image-background'
 							) }

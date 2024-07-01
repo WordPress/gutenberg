@@ -28,6 +28,8 @@ export type FontSizePickerProps = {
 	) => void;
 	/**
 	 * Available units for custom font size selection.
+	 *
+	 * @default `[ 'px', 'em', 'rem' ]`
 	 */
 	units?: string[];
 	/**
@@ -55,6 +57,8 @@ export type FontSizePickerProps = {
 	 * can be safely removed once this happens.)
 	 *
 	 * @default false
+	 * @deprecated Default behavior since WP 6.5. Prop can be safely removed.
+	 * @ignore
 	 */
 	__nextHasNoMarginBottom?: boolean;
 	/**
@@ -111,7 +115,7 @@ export type FontSizePickerSelectOption = {
 
 export type FontSizePickerToggleGroupProps = Pick<
 	FontSizePickerProps,
-	'value' | 'size' | '__nextHasNoMarginBottom' | '__next40pxDefaultSize'
+	'value' | 'size' | '__next40pxDefaultSize'
 > & {
 	fontSizes: NonNullable< FontSizePickerProps[ 'fontSizes' ] >;
 	onChange: NonNullable< FontSizePickerProps[ 'onChange' ] >;

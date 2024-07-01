@@ -2,24 +2,18 @@
  * External dependencies
  */
 import { render, screen } from '@testing-library/react';
-import { press } from '@ariakit/test';
+import { press, sleep } from '@ariakit/test';
 
 /**
  * Internal dependencies
  */
 import CircularOptionPicker from '..';
 
-const SINGLE_OPTION = [ <CircularOptionPicker.Option key={ 'option' } /> ];
+const SINGLE_OPTION = [ <CircularOptionPicker.Option key="option" /> ];
 
 const MULTIPLE_OPTIONS = [
-	<CircularOptionPicker.Option
-		key={ 'option-1' }
-		aria-label={ 'Option One' }
-	/>,
-	<CircularOptionPicker.Option
-		key={ 'option-2' }
-		aria-label={ 'Option Two' }
-	/>,
+	<CircularOptionPicker.Option key="option-1" aria-label="Option One" />,
+	<CircularOptionPicker.Option key="option-2" aria-label="Option Two" />,
 ];
 
 const DEFAULT_PROPS = {
@@ -59,9 +53,7 @@ describe( 'CircularOptionPicker', () => {
 
 	describe( 'when `asButtons` is true', () => {
 		it( 'should render as buttons', async () => {
-			render(
-				<CircularOptionPicker { ...DEFAULT_PROPS } asButtons={ true } />
-			);
+			render( <CircularOptionPicker { ...DEFAULT_PROPS } asButtons /> );
 
 			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
 			expect( screen.queryByRole( 'option' ) ).not.toBeInTheDocument();
@@ -78,6 +70,7 @@ describe( 'CircularOptionPicker', () => {
 				/>
 			);
 
+			await sleep();
 			await press.Tab();
 			expect( getOption( 'Option One' ) ).toHaveFocus();
 			await press.ArrowRight();
@@ -93,10 +86,11 @@ describe( 'CircularOptionPicker', () => {
 				<CircularOptionPicker
 					{ ...DEFAULT_PROPS }
 					options={ MULTIPLE_OPTIONS }
-					loop={ true }
+					loop
 				/>
 			);
 
+			await sleep();
 			await press.Tab();
 			expect( getOption( 'Option One' ) ).toHaveFocus();
 			await press.ArrowRight();
@@ -116,6 +110,7 @@ describe( 'CircularOptionPicker', () => {
 				/>
 			);
 
+			await sleep();
 			await press.Tab();
 			expect( getOption( 'Option One' ) ).toHaveFocus();
 			await press.ArrowRight();

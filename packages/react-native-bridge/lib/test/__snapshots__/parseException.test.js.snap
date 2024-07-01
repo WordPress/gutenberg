@@ -1,0 +1,70 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Parse exception parses stack trace 1`] = `
+{
+  "context": {
+    "hermes_version": null,
+    "is_fabric_enabled": false,
+    "is_hermes_enabled": false,
+    "is_turbo_module_enabled": false,
+    "react_native_version": "0.71.2-beta-1",
+  },
+  "message": "Test exception",
+  "stacktrace": [
+    {
+      "colno": 21,
+      "filename": "app:///reactNative.js",
+      "function": "reactNativeFunction",
+      "lineno": 5383,
+    },
+    {
+      "colno": 42,
+      "filename": "app:///otherFile.native.js",
+      "function": "anonymous",
+      "lineno": 64266,
+    },
+    {
+      "filename": "native",
+      "function": "forEach",
+    },
+    {
+      "colno": 43,
+      "filename": "app:///rootFile.native.js",
+      "function": "topLevelFunction",
+      "lineno": 64215,
+    },
+    {
+      "colno": 21,
+      "filename": "app:///bridge.native.js",
+      "function": "functionThatTriggersNative",
+      "lineno": 62932,
+    },
+    {
+      "filename": "native",
+      "function": "apply",
+    },
+    {
+      "colno": 22,
+      "filename": "app:///file3.native.js",
+      "function": "otherFunction",
+      "lineno": 62524,
+    },
+    {
+      "colno": 40,
+      "filename": "app:///file2.native.js",
+      "function": "parentFunction",
+      "lineno": 459785,
+    },
+    {
+      "colno": 24,
+      "filename": "app:///file1.native.js",
+      "function": "functionThatFailed",
+      "lineno": 546277,
+    },
+  ],
+  "tags": {
+    "gutenberg_mobile_version": "1.100.0",
+  },
+  "type": "Error",
+}
+`;

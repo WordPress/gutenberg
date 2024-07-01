@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -40,13 +40,14 @@ export default function PostSavedState( { forceIsDirty } ) {
 		isAutosaving,
 		isDirty,
 		isNew,
-		isPending,
 		isPublished,
 		isSaveable,
 		isSaving,
 		isScheduled,
 		hasPublishAction,
 		showIconLabels,
+		postStatus,
+		postStatusHasChanged,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -59,14 +60,13 @@ export default function PostSavedState( { forceIsDirty } ) {
 				getCurrentPost,
 				isAutosavingPost,
 				getEditedPostAttribute,
+				getPostEdits,
 			} = select( editorStore );
 			const { get } = select( preferencesStore );
-
 			return {
 				isAutosaving: isAutosavingPost(),
 				isDirty: forceIsDirty || isEditedPostDirty(),
 				isNew: isEditedPostNew(),
-				isPending: 'pending' === getEditedPostAttribute( 'status' ),
 				isPublished: isCurrentPostPublished(),
 				isSaving: isSavingPost(),
 				isSaveable: isEditedPostSaveable(),
@@ -74,11 +74,13 @@ export default function PostSavedState( { forceIsDirty } ) {
 				hasPublishAction:
 					getCurrentPost()?._links?.[ 'wp:action-publish' ] ?? false,
 				showIconLabels: get( 'core', 'showIconLabels' ),
+				postStatus: getEditedPostAttribute( 'status' ),
+				postStatusHasChanged: !! getPostEdits()?.status,
 			};
 		},
 		[ forceIsDirty ]
 	);
-
+	const isPending = postStatus === 'pending';
 	const { savePost } = useDispatch( editorStore );
 
 	const wasSaving = usePrevious( isSaving );
@@ -102,7 +104,13 @@ export default function PostSavedState( { forceIsDirty } ) {
 		return null;
 	}
 
-	if ( isPublished || isScheduled ) {
+	if (
+		isPublished ||
+		isScheduled ||
+		! [ 'pending', 'draft', 'auto-draft' ].includes( postStatus ) ||
+		( postStatusHasChanged &&
+			[ 'pending', 'draft' ].includes( postStatus ) )
+	) {
 		return null;
 	}
 
@@ -115,7 +123,6 @@ export default function PostSavedState( { forceIsDirty } ) {
 	const isSaved = forceSavedMessage || ( ! isNew && ! isDirty );
 	const isSavedState = isSaving || isSaved;
 	const isDisabled = isSaving || isSaved || ! isSaveable;
-
 	let text;
 
 	if ( isSaving ) {
@@ -134,7 +141,7 @@ export default function PostSavedState( { forceIsDirty } ) {
 		<Button
 			className={
 				isSaveable || isSaving
-					? classnames( {
+					? clsx( {
 							'editor-post-save-draft': ! isSavedState,
 							'editor-post-saved-state': isSavedState,
 							'is-saving': isSaving,

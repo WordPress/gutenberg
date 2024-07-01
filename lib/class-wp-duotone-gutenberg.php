@@ -32,10 +32,6 @@
  * @since 6.3.0
  */
 
-if ( class_exists( 'WP_Duotone_Gutenberg' ) ) {
-	return;
-}
-
 /**
  * Manages duotone block supports and global styles.
  *
@@ -627,7 +623,7 @@ class WP_Duotone_Gutenberg {
 	 * @return string The CSS for global styles.
 	 */
 	private static function get_global_styles_presets( $sources ) {
-		$css = 'body{';
+		$css = WP_Theme_JSON_Gutenberg::ROOT_CSS_PROPERTIES_SELECTOR . '{';
 		foreach ( $sources as $filter_id => $filter_data ) {
 			$slug              = $filter_data['slug'];
 			$colors            = $filter_data['colors'];
@@ -895,6 +891,45 @@ class WP_Duotone_Gutenberg {
 		$tags = new WP_HTML_Tag_Processor( $block_content );
 		if ( $tags->next_tag() ) {
 			$tags->add_class( $filter_id );
+		}
+
+		return $tags->get_updated_html();
+	}
+
+	/**
+	 * Fixes the issue with our generated class name not being added to the block's outer container
+	 * in classic themes due to gutenberg_restore_image_outer_container from layout block supports.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param  string $block_content Rendered block content.
+	 * @return string                Filtered block content.
+	 */
+	public static function restore_image_outer_container( $block_content ) {
+		if ( wp_theme_has_theme_json() ) {
+			return $block_content;
+		}
+
+		$tags          = new WP_HTML_Tag_Processor( $block_content );
+		$wrapper_query = array(
+			'tag_name'   => 'div',
+			'class_name' => 'wp-block-image',
+		);
+		if ( ! $tags->next_tag( $wrapper_query ) ) {
+			return $block_content;
+		}
+
+		$tags->set_bookmark( 'wrapper-div' );
+		$tags->next_tag();
+
+		$inner_classnames = explode( ' ', $tags->get_attribute( 'class' ) );
+		foreach ( $inner_classnames as $classname ) {
+			if ( 0 === strpos( $classname, 'wp-duotone' ) ) {
+				$tags->remove_class( $classname );
+				$tags->seek( 'wrapper-div' );
+				$tags->add_class( $classname );
+				break;
+			}
 		}
 
 		return $tags->get_updated_html();

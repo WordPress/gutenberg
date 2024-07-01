@@ -1,20 +1,22 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
+
+/**
+ * WordPress dependencies
+ */
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import BlockSelectionButton from './block-selection-button';
-import BlockPopover from '../block-popover';
+import { PrivateBlockPopover } from '../block-popover';
 import useBlockToolbarPopoverProps from './use-block-toolbar-popover-props';
 import useSelectedBlockToolProps from './use-selected-block-tool-props';
 
-export default function BlockToolbarBreadcrumb( {
-	clientId,
-	__unstableContentRef,
-} ) {
+function BlockToolbarBreadcrumb( { clientId, __unstableContentRef }, ref ) {
 	const {
 		capturingClientId,
 		isInsertionPointVisible,
@@ -28,19 +30,22 @@ export default function BlockToolbarBreadcrumb( {
 	} );
 
 	return (
-		<BlockPopover
+		<PrivateBlockPopover
 			clientId={ capturingClientId || clientId }
 			bottomClientId={ lastClientId }
-			className={ classnames( 'block-editor-block-list__block-popover', {
+			className={ clsx( 'block-editor-block-list__block-popover', {
 				'is-insertion-point-visible': isInsertionPointVisible,
 			} ) }
 			resize={ false }
 			{ ...popoverProps }
 		>
 			<BlockSelectionButton
+				ref={ ref }
 				clientId={ clientId }
 				rootClientId={ rootClientId }
 			/>
-		</BlockPopover>
+		</PrivateBlockPopover>
 	);
 }
+
+export default forwardRef( BlockToolbarBreadcrumb );

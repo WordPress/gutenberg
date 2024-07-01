@@ -12,7 +12,6 @@ import {
 	setFocalPointPickerTooltipShown,
 } from '@wordpress/react-native-bridge';
 import { __ } from '@wordpress/i18n';
-import { Image, UnitControl } from '@wordpress/components';
 import { useRef, useState, useMemo, useEffect } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
@@ -24,6 +23,8 @@ import Tooltip from './tooltip';
 import styles from './style.scss';
 import { isVideoType } from './utils';
 import { clamp } from '../utils/math';
+import Image from '../mobile/image';
+import UnitControl from '../unit-control';
 
 const MIN_POSITION_VALUE = 0;
 const MAX_POSITION_VALUE = 100;

@@ -88,7 +88,6 @@ exports[`LinksUI LinksUI renders 1`] = `
             >
               <View
                 collapsable={false}
-                forwardedRef={[Function]}
                 pointerEvents="box-none"
                 style={
                   {
@@ -178,7 +177,6 @@ exports[`LinksUI LinksUI renders 1`] = `
                   >
                     <View
                       collapsable={false}
-                      forwardedRef={[Function]}
                       handlerTag={1}
                       handlerType="PanGestureHandler"
                       needsOffscreenAlphaCompositing={true}

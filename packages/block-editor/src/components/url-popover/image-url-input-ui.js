@@ -2,17 +2,19 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useRef, useState } from '@wordpress/element';
+import { useRef, useEffect, useState } from '@wordpress/element';
+import { focus } from '@wordpress/dom';
 import {
 	ToolbarButton,
+	NavigableMenu,
 	Button,
 	MenuItem,
 	ToggleControl,
 	TextControl,
-	MenuGroup,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import {
+	Icon,
 	link as linkIcon,
 	image,
 	page,
@@ -44,6 +46,7 @@ const ImageURLInputUI = ( {
 	showLightboxSetting,
 	lightboxEnabled,
 	onSetLightbox,
+	resetLightbox,
 } ) => {
 	const [ isOpen, setIsOpen ] = useState( false );
 	// Use internal state instead of a ref to make sure that the component
@@ -57,6 +60,17 @@ const ImageURLInputUI = ( {
 	const [ urlInput, setUrlInput ] = useState( null );
 
 	const autocompleteRef = useRef( null );
+	const wrapperRef = useRef();
+
+	useEffect( () => {
+		if ( ! wrapperRef.current ) {
+			return;
+		}
+		const nextFocusTarget =
+			focus.focusable.find( wrapperRef.current )[ 0 ] ||
+			wrapperRef.current;
+		nextFocusTarget.focus();
+	}, [ isEditingLink, url, lightboxEnabled ] );
 
 	const startEditLink = () => {
 		if (
@@ -228,7 +242,9 @@ const ImageURLInputUI = ( {
 	);
 
 	const linkEditorValue = urlInput !== null ? urlInput : url;
-	const showLinkEditor = ( ! linkEditorValue && ! lightboxEnabled ) === true;
+	const hideLightboxPanel =
+		! lightboxEnabled || ( lightboxEnabled && ! showLightboxSetting );
+	const showLinkEditor = ! linkEditorValue && hideLightboxPanel;
 
 	const urlLabel = (
 		getLinkDestinations().find(
@@ -236,28 +252,90 @@ const ImageURLInputUI = ( {
 		) || {}
 	).title;
 
+	const PopoverChildren = () => {
+		if (
+			lightboxEnabled &&
+			showLightboxSetting &&
+			! url &&
+			! isEditingLink
+		) {
+			return (
+				<div className="block-editor-url-popover__expand-on-click">
+					<Icon icon={ fullscreen } />
+					<div className="text">
+						<p>{ __( 'Expand on click' ) }</p>
+						<p className="description">
+							{ __( 'Scales the image with a lightbox effect' ) }
+						</p>
+					</div>
+					<Button
+						icon={ linkOff }
+						label={ __( 'Disable expand on click' ) }
+						onClick={ () => {
+							onSetLightbox( false );
+						} }
+						size="compact"
+					/>
+				</div>
+			);
+		} else if ( ! url || isEditingLink ) {
+			return (
+				<URLPopover.LinkEditor
+					className="block-editor-format-toolbar__link-container-content"
+					value={ linkEditorValue }
+					onChangeInputValue={ setUrlInput }
+					onSubmit={ onSubmitLinkChange() }
+					autocompleteRef={ autocompleteRef }
+				/>
+			);
+		} else if ( url && ! isEditingLink ) {
+			return (
+				<>
+					<URLPopover.LinkViewer
+						className="block-editor-format-toolbar__link-container-content"
+						url={ url }
+						onEditLinkClick={ startEditLink }
+						urlLabel={ urlLabel }
+					/>
+					<Button
+						icon={ linkOff }
+						label={ __( 'Remove link' ) }
+						onClick={ () => {
+							onLinkRemove();
+							resetLightbox();
+						} }
+						size="compact"
+					/>
+				</>
+			);
+		}
+	};
+
 	return (
 		<>
 			<ToolbarButton
 				icon={ linkIcon }
 				className="components-toolbar__control"
-				label={ url ? __( 'Edit link' ) : __( 'Add link' ) }
+				label={ __( 'Link' ) }
 				aria-expanded={ isOpen }
 				onClick={ openLinkUI }
 				ref={ setPopoverAnchor }
-				isActive={ !! url }
+				isActive={
+					!! url || ( lightboxEnabled && showLightboxSetting )
+				}
 			/>
 			{ isOpen && (
 				<URLPopover
+					ref={ wrapperRef }
 					anchor={ popoverAnchor }
 					onFocusOutside={ onFocusOutside() }
 					onClose={ closeLinkUI }
 					renderSettings={
-						! lightboxEnabled ? () => advancedOptions : null
+						hideLightboxPanel ? () => advancedOptions : null
 					}
 					additionalControls={
 						showLinkEditor && (
-							<MenuGroup>
+							<NavigableMenu>
 								{ getLinkDestinations().map( ( link ) => (
 									<MenuItem
 										key={ link.linkDestination }
@@ -295,61 +373,12 @@ const ImageURLInputUI = ( {
 										{ __( 'Expand on click' ) }
 									</MenuItem>
 								) }
-							</MenuGroup>
+							</NavigableMenu>
 						)
 					}
+					offset={ 13 }
 				>
-					{ ( ! url || isEditingLink ) && ! lightboxEnabled && (
-						<>
-							<URLPopover.LinkEditor
-								className="block-editor-format-toolbar__link-container-content"
-								value={ linkEditorValue }
-								onChangeInputValue={ setUrlInput }
-								onSubmit={ onSubmitLinkChange() }
-								autocompleteRef={ autocompleteRef }
-							/>
-						</>
-					) }
-					{ url && ! isEditingLink && ! lightboxEnabled && (
-						<>
-							<URLPopover.LinkViewer
-								className="block-editor-format-toolbar__link-container-content"
-								url={ url }
-								onEditLinkClick={ startEditLink }
-								urlLabel={ urlLabel }
-							/>
-							<Button
-								icon={ linkOff }
-								label={ __( 'Remove link' ) }
-								onClick={ onLinkRemove }
-								size="compact"
-							/>
-						</>
-					) }
-					{ ! url && ! isEditingLink && lightboxEnabled && (
-						<div className="block-editor-url-popover__expand-on-click">
-							<div className="fullscreen-icon">
-								{ fullscreen }
-							</div>
-							<div className="text">
-								<p>{ __( 'Expand on click' ) }</p>
-								<p className="description">
-									{ __(
-										'Scales the image with a lightbox effect'
-									) }
-								</p>
-							</div>
-							<Button
-								icon={ linkOff }
-								className="remove-link"
-								label={ __( 'Disable expand on click' ) }
-								onClick={ () => {
-									onSetLightbox( false );
-								} }
-								size="compact"
-							/>
-						</div>
-					) }
+					{ PopoverChildren() }
 				</URLPopover>
 			) }
 		</>

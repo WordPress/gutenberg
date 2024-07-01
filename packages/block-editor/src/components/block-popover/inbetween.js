@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -241,7 +241,7 @@ function BlockPopoverInbetween( {
 			// This makes sure the popover doesn't animate from its previous position.
 			key={ nextClientId + '--' + rootClientId }
 			{ ...props }
-			className={ classnames(
+			className={ clsx(
 				'block-editor-block-popover',
 				'block-editor-block-popover__inbetween',
 				props.className

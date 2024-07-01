@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { render, screen, waitFor } from '@testing-library/react';
-import { press, click, hover, type } from '@ariakit/test';
+import { press, click, hover, sleep, type } from '@ariakit/test';
 
 /**
  * WordPress dependencies
@@ -54,9 +54,14 @@ describe( 'DropdownMenu', () => {
 
 		expect( toggleButton ).toHaveAttribute( 'aria-expanded', 'true' );
 
-		expect(
-			screen.getByRole( 'menu', { name: toggleButton.textContent ?? '' } )
-		).toHaveFocus();
+		await waitFor( () =>
+			expect(
+				screen.getByRole( 'menu', {
+					name: toggleButton.textContent ?? '',
+				} )
+			).toHaveFocus()
+		);
+
 		expect( screen.getByRole( 'separator' ) ).toHaveAttribute(
 			'aria-orientation',
 			'horizontal'
@@ -123,6 +128,7 @@ describe( 'DropdownMenu', () => {
 			} );
 
 			// Move focus on the toggle
+			await sleep();
 			await press.Tab();
 
 			expect( toggleButton ).toHaveFocus();
@@ -153,6 +159,7 @@ describe( 'DropdownMenu', () => {
 			} );
 
 			// Move focus on the toggle
+			await sleep();
 			await press.Tab();
 
 			expect( toggleButton ).toHaveFocus();
@@ -908,6 +915,7 @@ describe( 'DropdownMenu', () => {
 
 			// The outer button can be focused by pressing tab. Doing so will cause
 			// the DropdownMenu to close.
+			await sleep();
 			await press.Tab();
 			expect( outerButton ).toBeInTheDocument();
 			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
