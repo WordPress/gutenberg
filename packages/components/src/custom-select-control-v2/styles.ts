@@ -92,7 +92,8 @@ export const Select = styled( Ariakit.Select, {
 		cursor: pointer;
 		font-family: inherit;
 		font-size: ${ CONFIG.fontSize };
-		text-align: left;
+		text-align: start;
+		user-select: none;
 		width: 100%;
 
 		&[data-focus-visible] {
@@ -105,9 +106,22 @@ export const Select = styled( Ariakit.Select, {
 } );
 
 export const SelectPopover = styled( Ariakit.SelectPopover )`
+	display: flex;
+	flex-direction: column;
+
+	background-color: ${ COLORS.theme.background };
 	border-radius: 2px;
-	background: ${ COLORS.theme.background };
 	border: 1px solid ${ COLORS.theme.foreground };
+
+	/* z-index(".components-popover") */
+	z-index: 1000000;
+
+	max-height: min( var( --popover-available-height, 400px ), 400px );
+	overflow: auto;
+	overscroll-behavior: contain;
+
+	// The smallest size without overflowing the container.
+	min-width: min-content;
 
 	&[data-focus-visible] {
 		outline: none; // outline will be on the trigger, rather than the popover
@@ -120,7 +134,15 @@ export const SelectItem = styled( Ariakit.SelectItem )`
 	justify-content: space-between;
 	padding: ${ ITEM_PADDING };
 	font-size: ${ CONFIG.fontSize };
-	line-height: 2.15rem; // TODO: Remove this in default but keep for back-compat in legacy
+	// TODO: reassess line-height for non-legacy v2
+	line-height: 28px;
+	scroll-margin: ${ space( 1 ) };
+	user-select: none;
+
+	&[aria-disabled='true'] {
+		cursor: not-allowed;
+	}
+
 	&[data-active-item] {
 		background-color: ${ COLORS.theme.gray[ 300 ] };
 	}

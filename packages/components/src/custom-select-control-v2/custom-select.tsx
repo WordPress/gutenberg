@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createContext, useMemo } from '@wordpress/element';
+import { createContext, useCallback, useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -14,6 +14,7 @@ import type {
 	CustomSelectStore,
 	CustomSelectButtonProps,
 	CustomSelectButtonSize,
+	_CustomSelectInternalProps,
 	_CustomSelectProps,
 } from './types';
 import type { WordPressComponentProps } from '../context';
@@ -80,7 +81,10 @@ const CustomSelectButton = ( {
 };
 
 function _CustomSelect(
-	props: _CustomSelectProps & CustomSelectStore & CustomSelectButtonSize
+	props: _CustomSelectInternalProps &
+		_CustomSelectProps &
+		CustomSelectStore &
+		CustomSelectButtonSize
 ) {
 	const {
 		children,
@@ -88,11 +92,24 @@ function _CustomSelect(
 		label,
 		size,
 		store,
+		className,
+		isLegacy = false,
 		...restProps
 	} = props;
 
+	const onSelectPopoverKeyDown: React.KeyboardEventHandler< HTMLDivElement > =
+		useCallback(
+			( e ) => {
+				if ( isLegacy ) {
+					e.stopPropagation();
+				}
+			},
+			[ isLegacy ]
+		);
+
 	return (
-		<>
+		// Where should `restProps` be forwarded to?
+		<div className={ className }>
 			{ hideLabelFromVision ? ( // TODO: Replace with BaseControl
 				<VisuallyHidden as="label">{ label }</VisuallyHidden>
 			) : (
@@ -110,13 +127,19 @@ function _CustomSelect(
 					size={ size }
 					store={ store }
 				/>
-				<Styled.SelectPopover gutter={ 12 } store={ store } sameWidth>
+				<Styled.SelectPopover
+					gutter={ 12 }
+					store={ store }
+					sameWidth
+					slide={ false }
+					onKeyDown={ onSelectPopoverKeyDown }
+				>
 					<CustomSelectContext.Provider value={ { store } }>
 						{ children }
 					</CustomSelectContext.Provider>
 				</Styled.SelectPopover>
 			</InputBase>
-		</>
+		</div>
 	);
 }
 

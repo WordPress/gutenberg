@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+
 import {
 	trash,
 	pages,
@@ -11,6 +12,9 @@ import {
 	pending,
 	notAllowed,
 } from '@wordpress/icons';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -36,7 +40,7 @@ export const DEFAULT_CONFIG_PER_VIEW_TYPE = {
 	},
 };
 
-const DEFAULT_PAGE_BASE = {
+const DEFAULT_POST_BASE = {
 	type: LAYOUT_LIST,
 	search: '',
 	filters: [],
@@ -54,103 +58,114 @@ const DEFAULT_PAGE_BASE = {
 	},
 };
 
-export const DEFAULT_VIEWS = {
-	page: [
-		{
-			title: __( 'All pages' ),
-			slug: 'all',
-			icon: pages,
-			view: DEFAULT_PAGE_BASE,
+export function useDefaultViews( { postType } ) {
+	const labels = useSelect(
+		( select ) => {
+			const { getPostType } = select( coreStore );
+			return getPostType( postType )?.labels;
 		},
-		{
-			title: __( 'Published' ),
-			slug: 'published',
-			icon: published,
-			view: {
-				...DEFAULT_PAGE_BASE,
-				filters: [
-					{
-						field: 'status',
-						operator: OPERATOR_IS_ANY,
-						value: 'publish',
+		[ postType ]
+	);
+	return useMemo( () => {
+		return {
+			[ postType ]: [
+				{
+					title: labels?.all_items || __( 'All items' ),
+					slug: 'all',
+					icon: pages,
+					view: DEFAULT_POST_BASE,
+				},
+				{
+					title: __( 'Published' ),
+					slug: 'published',
+					icon: published,
+					view: {
+						...DEFAULT_POST_BASE,
+						filters: [
+							{
+								field: 'status',
+								operator: OPERATOR_IS_ANY,
+								value: 'publish',
+							},
+						],
 					},
-				],
-			},
-		},
-		{
-			title: __( 'Scheduled' ),
-			slug: 'future',
-			icon: scheduled,
-			view: {
-				...DEFAULT_PAGE_BASE,
-				filters: [
-					{
-						field: 'status',
-						operator: OPERATOR_IS_ANY,
-						value: 'future',
+				},
+				{
+					title: __( 'Scheduled' ),
+					slug: 'future',
+					icon: scheduled,
+					view: {
+						...DEFAULT_POST_BASE,
+						filters: [
+							{
+								field: 'status',
+								operator: OPERATOR_IS_ANY,
+								value: 'future',
+							},
+						],
 					},
-				],
-			},
-		},
-		{
-			title: __( 'Drafts' ),
-			slug: 'drafts',
-			icon: drafts,
-			view: {
-				...DEFAULT_PAGE_BASE,
-				filters: [
-					{
-						field: 'status',
-						operator: OPERATOR_IS_ANY,
-						value: 'draft',
+				},
+				{
+					title: __( 'Drafts' ),
+					slug: 'drafts',
+					icon: drafts,
+					view: {
+						...DEFAULT_POST_BASE,
+						filters: [
+							{
+								field: 'status',
+								operator: OPERATOR_IS_ANY,
+								value: 'draft',
+							},
+						],
 					},
-				],
-			},
-		},
-		{
-			title: __( 'Pending' ),
-			slug: 'pending',
-			icon: pending,
-			view: {
-				...DEFAULT_PAGE_BASE,
-				filters: [
-					{
-						field: 'status',
-						operator: OPERATOR_IS_ANY,
-						value: 'pending',
+				},
+				{
+					title: __( 'Pending' ),
+					slug: 'pending',
+					icon: pending,
+					view: {
+						...DEFAULT_POST_BASE,
+						filters: [
+							{
+								field: 'status',
+								operator: OPERATOR_IS_ANY,
+								value: 'pending',
+							},
+						],
 					},
-				],
-			},
-		},
-		{
-			title: __( 'Private' ),
-			slug: 'private',
-			icon: notAllowed,
-			view: {
-				...DEFAULT_PAGE_BASE,
-				filters: [
-					{
-						field: 'status',
-						operator: OPERATOR_IS_ANY,
-						value: 'private',
+				},
+				{
+					title: __( 'Private' ),
+					slug: 'private',
+					icon: notAllowed,
+					view: {
+						...DEFAULT_POST_BASE,
+						filters: [
+							{
+								field: 'status',
+								operator: OPERATOR_IS_ANY,
+								value: 'private',
+							},
+						],
 					},
-				],
-			},
-		},
-		{
-			title: __( 'Trash' ),
-			slug: 'trash',
-			icon: trash,
-			view: {
-				...DEFAULT_PAGE_BASE,
-				filters: [
-					{
-						field: 'status',
-						operator: OPERATOR_IS_ANY,
-						value: 'trash',
+				},
+				{
+					title: __( 'Trash' ),
+					slug: 'trash',
+					icon: trash,
+					view: {
+						...DEFAULT_POST_BASE,
+						filters: [
+							{
+								field: 'status',
+								operator: OPERATOR_IS_ANY,
+								value: 'trash',
+							},
+						],
 					},
-				],
-			},
-		},
-	],
-};
+				},
+			],
+		};
+	}, [ labels, postType ] );
+}

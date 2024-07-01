@@ -49,7 +49,20 @@ export type CustomSelectButtonProps = {
 	value?: string | string[];
 };
 
+// Props only exposed on the internal implementation
+export type _CustomSelectInternalProps = {
+	/**
+	 * True if the consumer is emulating the legacy component behavior and look
+	 */
+	isLegacy?: boolean;
+};
+
+// Props that are exposed in exported components
 export type _CustomSelectProps = CustomSelectButtonProps & {
+	/**
+	 * Additional className added to the root wrapper element.
+	 */
+	className?: string;
 	/**
 	 * The child elements. This should be composed of `CustomSelectItem` components.
 	 */
@@ -66,9 +79,7 @@ export type _CustomSelectProps = CustomSelectButtonProps & {
 	label: string;
 };
 
-export type CustomSelectProps = _CustomSelectProps &
-	CustomSelectButtonProps &
-	CustomSelectSize;
+export type CustomSelectProps = _CustomSelectProps & CustomSelectSize;
 
 /**
  * The legacy object structure for the options array.
