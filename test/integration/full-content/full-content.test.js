@@ -90,9 +90,7 @@ describe( 'full post content fixture', () => {
 		}
 
 		// Bootstrap and register block plugins.
-		const blockPluginMetadataFiles = glob.sync(
-			'plugins/*/src/block.json'
-		);
+		const blockPluginMetadataFiles = glob.sync( 'plugins/*/block.json' );
 		const blockPluginDefinitions = Object.fromEntries(
 			blockPluginMetadataFiles.map( ( file ) => {
 				const metadata = require( file );
