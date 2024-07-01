@@ -39,42 +39,6 @@ function render_block_core_image( $attributes, $content, $block ) {
 		$p->set_attribute( 'data-id', $attributes['data-id'] );
 	}
 
-	// Wrap the image with an anchor tag if it's not already wrapped and href is defined.
-	// This could happen when using block bindings.
-	$p->seek( 'figure' );
-	if ( ! $p->next_tag( 'a' ) && ! empty( $attributes['href'] ) ) {
-		// Build the anchor tag manually until the HTML API can handle it.
-		$anchor_tag = '<a href="' . esc_url( $attributes['href'] ) . '"';
-		// Add class attribute if exists.
-		if ( ! empty( $attributes['linkClass'] ) ) {
-			$anchor_tag .= ' class="' . $attributes['linkClass'] . '"';
-		}
-		// Add target attribute if exists.
-		if ( ! empty( $attributes['linkTarget'] ) ) {
-			$anchor_tag .= ' target="' . $attributes['linkTarget'] . '"';
-		}
-		// Add rel attribute if exists.
-		if ( ! empty( $attributes['rel'] ) ) {
-			$anchor_tag .= ' rel="' . $attributes['rel'] . '"';
-		}
-		$anchor_tag .= '>';
-
-		// Replace the img tag with an a tag wrapped around it using regular expressions.
-		$content = preg_replace( '/(<img[^>]+>)/', $anchor_tag . '$1</a>', $content );
-		$p       = new WP_HTML_Tag_Processor( $content );
-	}
-
-	// Add the caption if it doesn't exist and caption is defined.
-	// This could happen when using block bindings.
-	$p->seek( 'figure' );
-	if ( ! $p->next_tag( 'figcaption' ) && ! empty( $attributes['caption'] ) ) {
-		$caption_tag = '<figcaption class="wp-element-caption">' . $attributes['caption'] . '</figcaption>';
-		$content     = str_replace( '</figure>', $caption_tag . '</figure>', $content );
-		$p           = new WP_HTML_Tag_Processor( $content );
-	}
-
-	$p->release_bookmark( 'figure' );
-
 	$link_destination  = isset( $attributes['linkDestination'] ) ? $attributes['linkDestination'] : 'none';
 	$lightbox_settings = block_core_image_get_lightbox_settings( $block->parsed_block );
 
@@ -118,7 +82,45 @@ function render_block_core_image( $attributes, $content, $block ) {
 		remove_filter( 'render_block_core/image', 'block_core_image_render_lightbox', 15 );
 	}
 
-	return $p->get_updated_html();
+	// TODO: Replace the logic to remove the `a` tag wrapper and `figcaption` when HTML API provides its own methods.
+	$new_content = $p->get_updated_html();
+	// Remove `<a>` tag wrapper if it hasn't `href` attribute.
+	$p->seek( 'figure' );
+	if ( $p->next_tag( 'a' ) && empty( $p->get_attribute( 'href' ) ) ) {
+		$new_content = preg_replace_callback(
+			'/<a[^>]*>(.*?)<\/a>/is',
+			function ( $matches ) {
+				return $matches[1];
+			},
+			$new_content
+		);
+	}
+
+	// Remove `<figcaption>` if caption is empty.
+	$p->seek( 'figure' );
+	if ( $p->next_tag( 'figcaption' ) ) {
+		// If the next token is the closing tag, the caption is empty.
+		$is_empty = true;
+		$tag      = $p->get_tag();
+		while ( $p->next_token() && $tag !== $p->get_token_name() && $is_empty ) {
+			if ( '#comment' !== $p->get_token_type() ) {
+				/**
+				 * Anything else implies this is not empty.
+				 * This might include any text content (including a space),
+				 * inline images or other HTML.
+				 */
+				$is_empty = false;
+			}
+		}
+
+		if ( $is_empty ) {
+			$new_content = preg_replace( '/<figcaption[^>]*>.*?<\/figcaption>/is', '', $new_content );
+		}
+	}
+
+	$p->release_bookmark( 'figure' );
+
+	return $new_content;
 }
 
 /**

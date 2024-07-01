@@ -70,27 +70,24 @@ export default function save( { attributes } ) {
 		/>
 	);
 
+	// Always wrap the image in a link, and always add the figcaption.
+	// They will be removed in the `render.php` if needed.
 	const figure = (
 		<>
-			{ href ? (
-				<a
-					className={ linkClass }
-					href={ href }
-					target={ linkTarget }
-					rel={ newRel }
-				>
-					{ image }
-				</a>
-			) : (
-				image
-			) }
-			{ ! RichText.isEmpty( caption ) && (
-				<RichText.Content
-					className={ __experimentalGetElementClassName( 'caption' ) }
-					tagName="figcaption"
-					value={ caption }
-				/>
-			) }
+			<a
+				className={ linkClass }
+				href={ href }
+				target={ linkTarget }
+				rel={ newRel }
+			>
+				{ image }
+			</a>
+
+			<RichText.Content
+				className={ __experimentalGetElementClassName( 'caption' ) }
+				tagName="figcaption"
+				value={ caption }
+			/>
 		</>
 	);
 
