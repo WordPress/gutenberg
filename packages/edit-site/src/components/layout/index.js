@@ -85,7 +85,7 @@ export default function Layout( { route } ) {
 	const isEditorLoading = useIsSiteEditorLoading();
 	const [ isResizableFrameOversized, setIsResizableFrameOversized ] =
 		useState( false );
-	const { key: routeKey, areas, widths } = route;
+	const { key: routeKey, areas, narrowLayout } = route;
 	const animationRef = useMovingAnimation( {
 		triggerAnimationOnChange: canvasMode + '__' + routeKey,
 	} );
@@ -181,10 +181,9 @@ export default function Layout( { route } ) {
 						areas.content &&
 						canvasMode !== 'edit' && (
 							<div
-								className="edit-site-layout__area"
-								style={ {
-									maxWidth: widths?.content,
-								} }
+								className={ clsx( 'edit-site-layout__area', {
+									'is-narrow-layout': narrowLayout,
+								} ) }
 							>
 								{ areas.content }
 							</div>

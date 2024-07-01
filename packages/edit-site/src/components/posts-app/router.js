@@ -51,9 +51,7 @@ export default function useLayoutAreas() {
 						<PostsList postType={ postType } />
 					),
 			},
-			widths: {
-				content: isListLayout ? 380 : undefined,
-			},
+			narrowLayout: isListLayout,
 		};
 	}
 

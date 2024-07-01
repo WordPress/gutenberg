@@ -442,7 +442,7 @@
 		&.is-hovered,
 		&:focus-within {
 			.dataviews-view-list__item-actions {
-				padding-right: $grid-unit-30;
+				padding-right: $grid-unit-60;
 
 				.components-button {
 					opacity: 1;
@@ -487,7 +487,7 @@
 	}
 
 	.dataviews-view-list__item {
-		padding: $grid-unit-20 0 $grid-unit-20 $grid-unit-30;
+		padding: $grid-unit-20 0 $grid-unit-20 $grid-unit-60;
 		width: 100%;
 		scroll-margin: $grid-unit-10 0;
 
@@ -853,12 +853,16 @@
 	}
 
 	.dataviews-view-table tr td:first-child,
-	.dataviews-view-table tr th:first-child {
+	.dataviews-view-table tr th:first-child,
+	.dataviews-view-list .dataviews-view-list__item {
 		padding-left: $grid-unit-30;
 	}
 
 	.dataviews-view-table tr td:last-child,
-	.dataviews-view-table tr th:last-child {
+	.dataviews-view-table tr th:last-child,
+	.dataviews-view-list li.is-hovered .dataviews-view-list__item-actions,
+	.dataviews-view-list li.is-selected .dataviews-view-list__item-actions,
+	.dataviews-view-list li:focus-within .dataviews-view-list__item-actions {
 		padding-right: $grid-unit-30;
 	}
 

@@ -26,6 +26,14 @@
 		width: $nav-sidebar-width;
 	}
 
+	@include break-xlarge {
+		width: $nav-sidebar-width + $grid-unit-30;
+	}
+
+	@include break-huge {
+		width: $nav-sidebar-width + $grid-unit-60;
+	}
+
 	// This is only necessary for the exit animation
 	.edit-site-layout.is-full-canvas & {
 		position: fixed !important;
@@ -233,6 +241,24 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 	@include break-medium() {
 		border-radius: 8px;
 		margin: $canvas-padding $canvas-padding $canvas-padding 0;
+	}
+
+	&.is-narrow-layout {
+		@include break-medium {
+			max-width: $content-area-min-width;
+		}
+
+		@include break-xlarge {
+			max-width: $content-area-min-width + $grid-unit-40;
+		}
+
+		@include break-huge {
+			max-width: $content-area-min-width + $grid-unit-80;
+		}
+
+		@include break-xhuge {
+			max-width: $content-area-min-width + $grid-unit-80 + $grid-unit-80;
+		}
 	}
 }
 

@@ -99,9 +99,7 @@ export default function useLayoutAreas() {
 						<PostsList postType={ postType } />
 					),
 			},
-			widths: {
-				content: isListLayout ? 380 : undefined,
-			},
+			narrowLayout: isListLayout,
 		};
 	}
 
@@ -118,9 +116,7 @@ export default function useLayoutAreas() {
 				preview: ( isListLayout || canvas === 'edit' ) && <Editor />,
 				mobile: <PageTemplates />,
 			},
-			widths: {
-				content: isListLayout ? 380 : undefined,
-			},
+			narrowLayout: isListLayout,
 		};
 	}
 
