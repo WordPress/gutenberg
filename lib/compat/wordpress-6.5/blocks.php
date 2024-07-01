@@ -100,8 +100,7 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 				};
 
 				if ( 'core/image' === $block_name && 'caption' === $attribute_name ) {
-					if ( $block_reader->next_tag( 'figcaption' )
-					) {
+					if ( $block_reader->next_tag( 'figcaption' ) ) {
 						$block_reader->gutenberg_set_inner_text( wp_kses_post( $source_value ) );
 					}
 					return $block_reader->get_updated_html();
