@@ -221,7 +221,7 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 										onClick={ () => {
 											setCanvasMode( 'view' );
 											// TODO: this is a temporary solution to navigate to the posts list if we are
-											// come here throught `posts list` and are in focus mode editing a template or template part.
+											// come here through `posts list` and are in focus mode editing a template, template part etc..
 											if (
 												isPostsList &&
 												params?.focusMode
