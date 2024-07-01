@@ -9,7 +9,6 @@ import { useRoute, useNavigation } from '@react-navigation/native';
  */
 import { __ } from '@wordpress/i18n';
 import { memo, useContext, useState, useCallback } from '@wordpress/element';
-import { blockSettingsScreens } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -25,7 +24,11 @@ const FocalPointSettingsPanelMemo = memo(
 
 		function onButtonPress( action ) {
 			if ( action === 'apply' ) {
-				navigation.navigate( blockSettingsScreens.settings, {
+				// TODO: To better align with existing code, the below 'Settings' string
+				// literal should be replaced with a constant. However, importing the
+				// current constant creates a circular dependency.
+				// https://github.com/WordPress/gutenberg/blob/12518a05af35aa504f7c8b086cb6f255cf094f25/packages/block-editor/src/components/block-settings/container.native.js#L23
+				navigation.navigate( 'Settings', {
 					draftFocalPoint,
 				} );
 				return;
