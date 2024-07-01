@@ -214,7 +214,7 @@ if ( ! is_wp_version_compatible( '6.6' ) ) {
 			$block_reader->set_bookmark( 'figure' );
 		}
 
-					$new_value = wp_kses_post( $source_value );
+		$new_value = wp_kses_post( $source_value );
 
 		if ( $block_reader->next_tag( 'figcaption' ) ) {
 			if ( empty( $new_value ) ) {
@@ -230,7 +230,8 @@ if ( ! is_wp_version_compatible( '6.6' ) ) {
 			}
 			$block_reader->gutenberg_append_element_after_tag( '<figcaption class="wp-element-caption">' . $new_value . '</figcaption>' );
 		}
-					return $block_reader->get_updated_html();
+
+		return $block_reader->get_updated_html();
 	}
 
 	/**
