@@ -190,14 +190,14 @@ describe.each( [
 		await user.keyboard( '{enter}' );
 		expect(
 			screen.getByRole( 'listbox', {
-				name: 'label!',
+				name: props.label,
 			} )
 		).toBeVisible();
 
 		await user.keyboard( '{escape}' );
 		expect(
 			screen.queryByRole( 'listbox', {
-				name: 'label!',
+				name: props.label,
 			} )
 		).not.toBeInTheDocument();
 
@@ -460,7 +460,7 @@ describe.each( [
 			await user.click( currentSelectedItem );
 
 			const customSelect = screen.getByRole( 'listbox', {
-				name: 'label!',
+				name: props.label,
 			} );
 			await user.type( customSelect, '{enter}' );
 
@@ -482,7 +482,7 @@ describe.each( [
 			await user.keyboard( '{enter}' );
 			expect(
 				screen.getByRole( 'listbox', {
-					name: 'label!',
+					name: props.label,
 				} )
 			).toHaveFocus();
 
@@ -507,7 +507,7 @@ describe.each( [
 			await user.keyboard( '{enter}' );
 			expect(
 				screen.getByRole( 'listbox', {
-					name: 'label!',
+					name: props.label,
 				} )
 			).toHaveFocus();
 
@@ -533,7 +533,7 @@ describe.each( [
 
 			expect(
 				screen.queryByRole( 'listbox', {
-					name: 'label!',
+					name: props.label,
 					hidden: true,
 				} )
 			).not.toBeInTheDocument();

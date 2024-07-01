@@ -204,14 +204,14 @@ describe.each( [
 		await press.Enter();
 		expect(
 			screen.getByRole( 'listbox', {
-				name: 'label!',
+				name: legacyProps.label,
 			} )
 		).toBeVisible();
 
 		await press.Escape();
 		expect(
 			screen.queryByRole( 'listbox', {
-				name: 'label!',
+				name: legacyProps.label,
 			} )
 		).not.toBeInTheDocument();
 
@@ -472,7 +472,7 @@ describe.each( [
 			await click( currentSelectedItem );
 
 			const customSelect = screen.getByRole( 'listbox', {
-				name: 'label!',
+				name: legacyProps.label,
 			} );
 			expect( customSelect ).toHaveFocus();
 			await press.Enter();
@@ -494,7 +494,7 @@ describe.each( [
 			await press.Enter();
 			expect(
 				screen.getByRole( 'listbox', {
-					name: 'label!',
+					name: legacyProps.label,
 				} )
 			).toHaveFocus();
 
@@ -518,7 +518,7 @@ describe.each( [
 			await press.Enter();
 			expect(
 				screen.getByRole( 'listbox', {
-					name: 'label!',
+					name: legacyProps.label,
 				} )
 			).toHaveFocus();
 
@@ -546,7 +546,7 @@ describe.each( [
 
 			expect(
 				screen.queryByRole( 'listbox', {
-					name: 'label!',
+					name: legacyProps.label,
 					hidden: true,
 				} )
 			).not.toBeInTheDocument();
