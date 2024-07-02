@@ -32,13 +32,42 @@ type DataFormProps< Item > = {
 	};
 };
 
+type DataFormTextControlProps< Item > = {
+	field: NormalizedField< Item >;
+	item: Item;
+	setItem: any; // TODO: fix type.
+};
+
+function DataFormTextControl< Item >( {
+	field,
+	item,
+	setItem,
+}: DataFormTextControlProps< Item > ) {
+	const { id, header, placeholder, getValue } = field;
+
+	const onChange = useCallback(
+		( value: string ) =>
+			setItem( ( prevItem: any ) => ( { ...prevItem, [ id ]: value } ) ),
+		[ id, setItem ]
+	);
+
+	return (
+		<TextControl
+			label={ header }
+			placeholder={ placeholder }
+			value={ getValue( { item } ) }
+			onChange={ onChange }
+		/>
+	);
+}
+
 export default function DataForm< Item >( {
 	data,
 	onUpdate,
 	fields,
 	form: { closeForm, isBusy, onCancelLabel, onSubmitLabel },
 }: DataFormProps< Item > ) {
-	const [ item, setItem ] = useState( data );
+	const [ item, setItem ] = useState< Item >( data );
 	const onSubmit: FormEventHandler< HTMLFormElement > = useCallback(
 		( event ) => {
 			event.preventDefault();
@@ -48,21 +77,15 @@ export default function DataForm< Item >( {
 		[ item ]
 	);
 
-	// TODO: make it work for all fields.
-	const onChange = useCallback( ( title: string ) => {
-		setItem( { ...item, title } );
-	}, [] );
-
 	const components = useMemo(
 		() =>
 			fields.map( ( field ) => {
 				if ( field.type === 'text' ) {
 					return (
-						<TextControl
-							label={ field.header }
-							onChange={ onChange }
-							placeholder={ field.placeholder }
-							value={ field.getValue( { item } ) }
+						<DataFormTextControl
+							field={ field }
+							item={ item }
+							setItem={ setItem }
 						/>
 					);
 				}
