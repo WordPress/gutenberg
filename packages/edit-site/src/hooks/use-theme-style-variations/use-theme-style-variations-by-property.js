@@ -60,7 +60,7 @@ export function removePropertiesFromObject( object, properties ) {
  */
 function isEmptyStyleVariation( { title, settings, styles } ) {
 	return (
-		title === __( 'Default' ) || // Always preseve the default variation.
+		title === __( 'Default' ) || // Always preserve the default variation.
 		Object.keys( settings ).length > 0 ||
 		Object.keys( styles ).length > 0
 	);
