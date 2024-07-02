@@ -23,6 +23,7 @@ const DEFAULT_FONT_SIZE = 16;
 
 function FontSizePicker( {
 	fontSizes = [],
+	// Can this be kept as-is?
 	disableCustomFontSizes = false,
 	onChange,
 	value: selectedValue,

@@ -209,7 +209,9 @@ export default function TypographyPanel( {
 
 	// Font Size
 	const hasFontSizeEnabled = useHasFontSizeControl( settings );
-	const disableCustomFontSizes = ! settings?.typography?.customFontSize;
+	const fontSizePickerMode = ! settings?.typography?.customFontSize
+		? 'predefined'
+		: 'both';
 	const mergedFontSizes = getMergedFontSizes( settings );
 
 	const fontSize = decodeValue( inheritedValue?.typography?.fontSize );
@@ -443,7 +445,7 @@ export default function TypographyPanel( {
 						value={ fontSize }
 						onChange={ setFontSize }
 						fontSizes={ mergedFontSizes }
-						disableCustomFontSizes={ disableCustomFontSizes }
+						pickerMode={ fontSizePickerMode }
 						withReset={ false }
 						withSlider
 						size="__unstable-large"
