@@ -9,7 +9,7 @@ import { useFocusOnMount, useMergeRefs } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { focus } from '@wordpress/dom';
 import { useCallback, useRef, useState } from '@wordpress/element';
-import { _x } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { ESCAPE } from '@wordpress/keycodes';
 
@@ -146,6 +146,7 @@ export default function ListViewSidebar() {
 				onSelect={ ( tabName ) => setTab( tabName ) }
 				defaultTabId="list-view"
 				ref={ tabsRef }
+				closeButtonLabel={ __( 'Close' ) }
 			/>
 		</div>
 	);

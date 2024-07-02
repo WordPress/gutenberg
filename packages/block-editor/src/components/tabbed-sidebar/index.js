@@ -6,7 +6,6 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
 
 /**
@@ -17,7 +16,7 @@ import { unlock } from '../../lock-unlock';
 const { Tabs } = unlock( componentsPrivateApis );
 
 function TabbedSidebar(
-	{ defaultTabId, onClose, onSelect, selectedTab, tabs },
+	{ defaultTabId, onClose, onSelect, selectedTab, tabs, closeButtonLabel },
 	ref
 ) {
 	return (
@@ -32,7 +31,7 @@ function TabbedSidebar(
 					<Button
 						className="block-editor-tabbed-sidebar__close-button"
 						icon={ closeSmall }
-						label={ __( 'Close block inserter' ) }
+						label={ closeButtonLabel }
 						onClick={ () => onClose() }
 						size="small"
 					/>
