@@ -60,9 +60,9 @@ export function removePropertiesFromObject( object, properties ) {
  */
 function isEmptyStyleVariation( { title, settings, styles } ) {
 	return (
-		title === __( 'Default' ) || // Always preserve the default variation.
-		Object.keys( settings ).length > 0 ||
-		Object.keys( styles ).length > 0
+		title !== __( 'Default' ) && // Always preserve the default variation.
+		Object.keys( settings ).length === 0 &&
+		Object.keys( styles ).length === 0
 	);
 }
 
@@ -120,8 +120,8 @@ export function useCurrentMergeThemeStyleVariationsWithUserConfig( {
 	 * Filter out variations with no settings or styles.
 	 */
 	return variationsByProperty?.length
-		? variationsByProperty.filter( ( variation ) =>
-				isEmptyStyleVariation( variation )
+		? variationsByProperty.filter(
+				( variation ) => ! isEmptyStyleVariation( variation )
 		  )
 		: [];
 }
