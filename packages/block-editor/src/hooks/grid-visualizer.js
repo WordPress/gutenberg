@@ -20,7 +20,10 @@ const addGridVisualizerToBlockEdit = createHigherOrderComponent(
 
 		return (
 			<>
-				<GridVisualizer clientId={ props.clientId } />
+				<GridVisualizer
+					clientId={ props.clientId }
+					parentLayout={ props.attributes.layout }
+				/>
 
 				<BlockEdit { ...props } />
 			</>

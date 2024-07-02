@@ -12,6 +12,9 @@
 				pointer-events: all;
 			}
 		}
+		.block-editor-inserter * {
+			pointer-events: auto;
+		}
 	}
 }
 
