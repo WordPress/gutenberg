@@ -19,6 +19,54 @@ const INLINE_PADDING = {
 	default: 16, // space(4)
 };
 
+const getSelectSize = (
+	size: NonNullable< CustomSelectButtonSize[ 'size' ] >,
+	heightProperty: 'minHeight' | 'height'
+) => {
+	const sizes = {
+		compact: {
+			[ heightProperty ]: 32,
+			paddingInlineStart: INLINE_PADDING.compact,
+			paddingInlineEnd: INLINE_PADDING.compact + chevronIconSize,
+		},
+		default: {
+			[ heightProperty ]: 40,
+			paddingInlineStart: INLINE_PADDING.default,
+			paddingInlineEnd: INLINE_PADDING.default + chevronIconSize,
+		},
+		small: {
+			[ heightProperty ]: 24,
+			paddingInlineStart: INLINE_PADDING.small,
+			paddingInlineEnd: INLINE_PADDING.small + chevronIconSize,
+		},
+	};
+
+	return sizes[ size ] || sizes.default;
+};
+
+const getSelectItemSize = (
+	size: NonNullable< CustomSelectButtonSize[ 'size' ] >
+) => {
+	// Used to visually align the checkmark with the chevron
+	const checkmarkCorrection = 6;
+	const sizes = {
+		compact: {
+			paddingInlineStart: INLINE_PADDING.compact,
+			paddingInlineEnd: INLINE_PADDING.compact - checkmarkCorrection,
+		},
+		default: {
+			paddingInlineStart: INLINE_PADDING.default,
+			paddingInlineEnd: INLINE_PADDING.default - checkmarkCorrection,
+		},
+		small: {
+			paddingInlineStart: INLINE_PADDING.small,
+			paddingInlineEnd: INLINE_PADDING.small - checkmarkCorrection,
+		},
+	};
+
+	return sizes[ size ] || sizes.default;
+};
+
 export const SelectLabel = styled( Ariakit.SelectLabel )`
 	font-size: 11px;
 	font-weight: 500;
@@ -30,38 +78,14 @@ export const SelectLabel = styled( Ariakit.SelectLabel )`
 export const Select = styled( Ariakit.Select, {
 	// Do not forward `hasCustomRenderProp` to the underlying Ariakit.Select component
 	shouldForwardProp: ( prop ) => prop !== 'hasCustomRenderProp',
-} )( ( {
-	size,
-	hasCustomRenderProp,
-}: {
-	size: NonNullable< CustomSelectButtonSize[ 'size' ] >;
-	hasCustomRenderProp: boolean;
-} ) => {
-	const heightProperty = hasCustomRenderProp ? 'minHeight' : 'height';
-
-	const getSize = () => {
-		const sizes = {
-			compact: {
-				[ heightProperty ]: 32,
-				paddingInlineStart: INLINE_PADDING.compact,
-				paddingInlineEnd: INLINE_PADDING.compact + chevronIconSize,
-			},
-			default: {
-				[ heightProperty ]: 40,
-				paddingInlineStart: INLINE_PADDING.default,
-				paddingInlineEnd: INLINE_PADDING.default + chevronIconSize,
-			},
-			small: {
-				[ heightProperty ]: 24,
-				paddingInlineStart: INLINE_PADDING.small,
-				paddingInlineEnd: INLINE_PADDING.small + chevronIconSize,
-			},
-		};
-
-		return sizes[ size ] || sizes.default;
-	};
-
-	return css`
+} )(
+	( {
+		size,
+		hasCustomRenderProp,
+	}: {
+		size: NonNullable< CustomSelectButtonSize[ 'size' ] >;
+		hasCustomRenderProp: boolean;
+	} ) => css`
 		display: block;
 		background-color: ${ COLORS.theme.background };
 		border: none;
@@ -77,10 +101,10 @@ export const Select = styled( Ariakit.Select, {
 			outline: none; // handled by InputBase component
 		}
 
-		${ getSize() }
+		${ getSelectSize( size, hasCustomRenderProp ? 'minHeight' : 'height' ) }
 		${ ! hasCustomRenderProp && truncateStyles }
-	`;
-} );
+	`
+);
 
 export const SelectPopover = styled( Ariakit.SelectPopover )`
 	display: flex;
@@ -105,33 +129,12 @@ export const SelectPopover = styled( Ariakit.SelectPopover )`
 	}
 `;
 
-export const SelectItem = styled( Ariakit.SelectItem )( ( {
-	size,
-}: {
-	size: NonNullable< CustomSelectButtonSize[ 'size' ] >;
-} ) => {
-	const getSize = () => {
-		// Used to visually align the checkmark with the chevron
-		const checkmarkCorrection = 6;
-		const sizes = {
-			compact: {
-				paddingInlineStart: INLINE_PADDING.compact,
-				paddingInlineEnd: INLINE_PADDING.compact - checkmarkCorrection,
-			},
-			default: {
-				paddingInlineStart: INLINE_PADDING.default,
-				paddingInlineEnd: INLINE_PADDING.default - checkmarkCorrection,
-			},
-			small: {
-				paddingInlineStart: INLINE_PADDING.small,
-				paddingInlineEnd: INLINE_PADDING.small - checkmarkCorrection,
-			},
-		};
-
-		return sizes[ size ] || sizes.default;
-	};
-
-	return css`
+export const SelectItem = styled( Ariakit.SelectItem )(
+	( {
+		size,
+	}: {
+		size: NonNullable< CustomSelectButtonSize[ 'size' ] >;
+	} ) => css`
 		cursor: default;
 		display: flex;
 		align-items: center;
@@ -143,8 +146,6 @@ export const SelectItem = styled( Ariakit.SelectItem )( ( {
 		scroll-margin: ${ space( 1 ) };
 		user-select: none;
 
-		${ getSize() }
-
 		&[aria-disabled='true'] {
 			cursor: not-allowed;
 		}
@@ -152,8 +153,10 @@ export const SelectItem = styled( Ariakit.SelectItem )( ( {
 		&[data-active-item] {
 			background-color: ${ COLORS.theme.gray[ 300 ] };
 		}
-	`;
-} );
+
+		${ getSelectItemSize( size ) }
+	`
+);
 
 export const SelectedItemCheck = styled( Ariakit.SelectItemCheck )`
 	display: flex;
