@@ -12,8 +12,6 @@ export type CustomSelectStore = {
 	store: Ariakit.SelectStore;
 };
 
-export type CustomSelectContext = CustomSelectStore | undefined;
-
 type CustomSelectSize< Size = 'compact' | 'default' > = {
 	/**
 	 * The size of the control.
@@ -26,6 +24,10 @@ type CustomSelectSize< Size = 'compact' | 'default' > = {
 export type CustomSelectButtonSize = CustomSelectSize<
 	'compact' | 'default' | 'small'
 >;
+
+export type CustomSelectContext =
+	| ( CustomSelectStore & CustomSelectButtonSize )
+	| undefined;
 
 export type CustomSelectButtonProps = {
 	/**

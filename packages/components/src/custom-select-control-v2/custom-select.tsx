@@ -107,6 +107,8 @@ function _CustomSelect(
 			[ isLegacy ]
 		);
 
+	const contextValue = useMemo( () => ( { store, size } ), [ store, size ] );
+
 	return (
 		// Where should `restProps` be forwarded to?
 		<div className={ className }>
@@ -134,7 +136,7 @@ function _CustomSelect(
 					slide={ false }
 					onKeyDown={ onSelectPopoverKeyDown }
 				>
-					<CustomSelectContext.Provider value={ { store } }>
+					<CustomSelectContext.Provider value={ contextValue }>
 						{ children }
 					</CustomSelectContext.Provider>
 				</Styled.SelectPopover>
