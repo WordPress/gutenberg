@@ -19,8 +19,13 @@ function actions( state: ActionState = {}, action: ReduxAction ) {
 			return {
 				...state,
 				[ action.kind ]: {
+					...state[ action.kind ],
 					[ action.name ]: [
-						...( state[ action.kind ]?.[ action.name ] ?? [] ),
+						...(
+							state[ action.kind ]?.[ action.name ] ?? []
+						).filter(
+							( _action ) => _action.id !== action.config.id
+						),
 						action.config,
 					],
 				},
@@ -28,9 +33,12 @@ function actions( state: ActionState = {}, action: ReduxAction ) {
 		case 'UNREGISTER_ENTITY_ACTION': {
 			return {
 				...state,
-				[ action.kind ]: (
-					state[ action.kind ]?.[ action.name ] ?? []
-				).filter( ( _action ) => _action.id !== action.actionId ),
+				[ action.kind ]: {
+					...state[ action.kind ],
+					[ action.name ]: (
+						state[ action.kind ]?.[ action.name ] ?? []
+					).filter( ( _action ) => _action.id !== action.actionId ),
+				},
 			};
 		}
 	}

@@ -9,18 +9,15 @@ import { downloadZip } from 'client-zip';
  */
 import { downloadBlob } from '@wordpress/blob';
 import { __ } from '@wordpress/i18n';
-import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
+import type { Action } from '@wordpress/dataviews';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../../lock-unlock';
-import { getItemTitle } from '../../dataviews/actions/utils';
+import type { Pattern } from '../types';
+import { getItemTitle } from './utils';
 
-// Patterns.
-const { PATTERN_TYPES } = unlock( patternsPrivateApis );
-
-function getJsonFromItem( item ) {
+function getJsonFromItem( item: Pattern ) {
 	return JSON.stringify(
 		{
 			__file: item.type,
@@ -33,7 +30,7 @@ function getJsonFromItem( item ) {
 	);
 }
 
-export const exportPatternAsJSONAction = {
+const exportPattern: Action< Pattern > = {
 	id: 'export-pattern',
 	label: __( 'Export as JSON' ),
 	supportsBulk: true,
@@ -41,7 +38,7 @@ export const exportPatternAsJSONAction = {
 		if ( ! item.type ) {
 			return false;
 		}
-		return item.type === PATTERN_TYPES.user;
+		return item.type === 'wp_block';
 	},
 	callback: async ( items ) => {
 		if ( items.length === 1 ) {
@@ -53,7 +50,7 @@ export const exportPatternAsJSONAction = {
 				'application/json'
 			);
 		}
-		const nameCount = {};
+		const nameCount: Record< string, number > = {};
 		const filesToZip = items.map( ( item ) => {
 			const name = kebabCase( getItemTitle( item ) || item.slug );
 			nameCount[ name ] = ( nameCount[ name ] || 0 ) + 1;
@@ -75,3 +72,5 @@ export const exportPatternAsJSONAction = {
 		);
 	},
 };
+
+export default exportPattern;
