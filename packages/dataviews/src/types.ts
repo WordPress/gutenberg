@@ -142,6 +142,13 @@ export type Fields< Item > = Field< Item >[];
 export type Data< Item > = Item[];
 
 /**
+ * The form configuration.
+ */
+export type Form = {
+	visibleFields?: string[];
+};
+
+/**
  * The filters applied to the dataset.
  */
 export interface Filter {

@@ -50,6 +50,10 @@ const fields = [
 	},
 ];
 
+const form = {
+	visibleFields: [ 'title' ],
+};
+
 /**
  * Check if a template is removable.
  *
@@ -772,6 +776,7 @@ const useDuplicatePostAction = ( postType ) => {
 								<DataForm
 									data={ item }
 									fields={ fields }
+									form={ form }
 									onUpdate={ setItem }
 								/>
 								<HStack spacing={ 2 } justify="end">

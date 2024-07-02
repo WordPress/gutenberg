@@ -3,17 +3,19 @@
  */
 import { __ } from '@wordpress/i18n';
 import { TextControl } from '@wordpress/components';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useMemo } from '@wordpress/element';
 import { useDebouncedInput } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import type { NormalizedField } from './types';
+import type { Form, Field, NormalizedField } from './types';
+import { normalizeFields } from './normalize-fields';
 
 type DataFormProps< Item > = {
 	data: Item;
-	fields: NormalizedField< Item >[]; // TODO: use Field. Normalize them first.
+	fields: Field< Item >[];
+	form: Form;
 	onUpdate: any; // TODO: fix this type.
 };
 
@@ -53,9 +55,20 @@ function DataFormTextControl< Item >( {
 export default function DataForm< Item >( {
 	data,
 	fields,
+	form,
 	onUpdate,
 }: DataFormProps< Item > ) {
-	return fields.map( ( field ) => {
+	const visibleFields = useMemo(
+		() =>
+			normalizeFields(
+				fields.filter(
+					( { id } ) => !! form.visibleFields?.includes( id )
+				)
+			),
+		[ fields, form.visibleFields ]
+	);
+
+	return visibleFields.map( ( field ) => {
 		if ( field.type === 'text' ) {
 			return (
 				<DataFormTextControl
