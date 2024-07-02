@@ -3,7 +3,7 @@
  */
 import {
 	__experimentalListView as ListView,
-	TabbedSidebar,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useFocusOnMount, useMergeRefs } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -19,6 +19,8 @@ import { ESCAPE } from '@wordpress/keycodes';
 import ListViewOutline from './list-view-outline';
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
+
+const { TabbedSidebar } = unlock( blockEditorPrivateApis );
 
 export default function ListViewSidebar() {
 	const { setIsListViewOpened } = useDispatch( editorStore );

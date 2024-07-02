@@ -804,10 +804,6 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#registerStore>
 
-### TabbedSidebar
-
-Undocumented declaration.
-
 ### ToolSelector
 
 Undocumented declaration.
