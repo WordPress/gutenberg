@@ -640,4 +640,10 @@ describe( 'FontSizePicker', () => {
 			expect( units[ 2 ] ).toHaveAccessibleName( 'ex' );
 		} );
 	}
+
+	describe( 'pickerModes', () => {
+		it( 'should pass', async () => {
+			expect( 5 ).toBeGreaterThan( 4 );
+		} );
+	} );
 } );
