@@ -347,3 +347,17 @@ export const getMergedAttributesWithPreview = (
 		),
 	};
 };
+
+/**
+ * Replaces any domain extension with 'com' in a given URL.
+ *
+ * @param {string} url - The URL string to be modified.
+ * @return {string} - The modified URL string with the domain extension replaced by 'com'.
+ */
+export function replaceDomain( url ) {
+	// Create a URL object to easily manipulate the URL parts
+	const urlObj = new URL( url );
+	// Replace any domain extension with 'com'
+	urlObj.hostname = urlObj.hostname.replace( /\.[a-z]{2,}$/, '.com' );
+	return urlObj.href;
+}

@@ -8,6 +8,7 @@ import {
 	fallback,
 	getEmbedInfoByProvider,
 	getMergedAttributesWithPreview,
+	replaceDomain,
 } from './util';
 import EmbedControls from './embed-controls';
 import { embedContentIcon } from './icons';
@@ -220,8 +221,20 @@ const EmbedEdit = ( props ) => {
 							attributes.className
 						);
 
+						let modifiedUrl;
+						// If the provider is Pinterest, replace the domain in the URL and update local state.
+						if ( title === 'Pinterest' ) {
+							modifiedUrl = replaceDomain( url );
+							setURL( modifiedUrl );
+						} else {
+							modifiedUrl = url;
+						}
+
 						setIsEditingURL( false );
-						setAttributes( { url, className: blockClass } );
+						setAttributes( {
+							url: modifiedUrl,
+							className: blockClass,
+						} );
 					} }
 					value={ url }
 					cannotEmbed={ cannotEmbed }
