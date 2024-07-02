@@ -147,13 +147,6 @@ export function BackgroundImagePanel( {
 		return null;
 	}
 
-	/*
-	const defaultControls = getBlockSupport( name, [
-		BACKGROUND_SUPPORT_KEY,
-		'__experimentalDefaultControls',
-	] );
-*/
-
 	const onChange = ( newStyle ) => {
 		setAttributes( {
 			style: cleanEmptyObject( newStyle ),
