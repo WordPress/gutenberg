@@ -18,7 +18,7 @@ type DataFormProps< Item > = {
 	onUpdate: any; // TODO: fix this type.
 };
 
-type DataFormTextControlProps< Item > = {
+type DataFormControlProps< Item > = {
 	data: Item;
 	field: NormalizedField< Item >;
 	onUpdate: any; // TODO: fix this type.
@@ -28,7 +28,7 @@ function DataFormTextControl< Item >( {
 	data,
 	field,
 	onUpdate,
-}: DataFormTextControlProps< Item > ) {
+}: DataFormControlProps< Item > ) {
 	const { id, header, placeholder } = field;
 	const value = field.getValue( { item: data } );
 
@@ -51,6 +51,26 @@ function DataFormTextControl< Item >( {
 	);
 }
 
+const controls: {
+	[ key: string ]: < Item >(
+		props: DataFormControlProps< Item >
+	) => JSX.Element;
+} = {
+	text: DataFormTextControl,
+};
+
+function getControlForField< Item >( field: NormalizedField< Item > ) {
+	if ( ! field.type ) {
+		return null;
+	}
+
+	if ( ! Object.keys( controls ).includes( field.type ) ) {
+		return null;
+	}
+
+	return controls[ field.type ];
+}
+
 export default function DataForm< Item >( {
 	data,
 	fields,
@@ -68,15 +88,14 @@ export default function DataForm< Item >( {
 	);
 
 	return visibleFields.map( ( field ) => {
-		if ( field.type === 'text' ) {
-			return (
-				<DataFormTextControl
-					data={ data }
-					field={ field }
-					onUpdate={ onUpdate }
-				/>
-			);
-		}
-		return null;
+		const DataFormControl = getControlForField( field );
+		return DataFormControl ? (
+			<DataFormControl
+				key={ field.id }
+				data={ data }
+				field={ field }
+				onUpdate={ onUpdate }
+			/>
+		) : null;
 	} );
 }
