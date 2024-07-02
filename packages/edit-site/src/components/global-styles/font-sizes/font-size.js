@@ -38,14 +38,17 @@ function FontSize() {
 	const [ isRenameDialogOpen, setIsRenameDialogOpen ] = useState( false );
 
 	const {
-		params: { slug },
+		params: { origin, slug },
 		goBack,
+		goTo,
 	} = useNavigator();
+
 	const [ fontSizes, setFontSizes ] = useGlobalSetting(
 		'typography.fontSizes'
 	);
-	// Get the font sizes from the theme or use the default ones.
-	const sizes = fontSizes.theme ?? fontSizes.default ?? [];
+
+	// Get the font sizes from the origin, default to empty array.
+	const sizes = fontSizes[ origin ] ?? [];
 
 	// Get the font size by slug.
 	const fontSize = sizes.find( ( size ) => size.slug === slug );
@@ -99,7 +102,7 @@ function FontSize() {
 
 		setFontSizes( {
 			...fontSizes,
-			theme: newFontSizes,
+			[ origin ]: newFontSizes,
 		} );
 	};
 
@@ -110,7 +113,7 @@ function FontSize() {
 		const newFontSizes = sizes.filter( ( size ) => size.slug !== slug );
 		setFontSizes( {
 			...fontSizes,
-			theme: newFontSizes,
+			[ origin ]: newFontSizes,
 		} );
 	};
 
@@ -149,6 +152,7 @@ function FontSize() {
 							__( 'Manage the font size %s.' ),
 							fontSize.name
 						) }
+						onBack={ () => goTo( '/typography/font-sizes/' ) }
 					/>
 					<FlexItem>
 						<Spacer
@@ -199,6 +203,9 @@ function FontSize() {
 
 							<ToggleControl
 								label={ __( 'Fluid typography' ) }
+								help={ __(
+									'Enable fluid typography for this font size with default min and max values.'
+								) }
 								checked={ isFluid }
 								onChange={ handleFluidChange }
 								__nextHasNoMarginBottom

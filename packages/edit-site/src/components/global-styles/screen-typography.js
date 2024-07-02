@@ -13,7 +13,7 @@ import TypographyElements from './typography-elements';
 import TypographyVariations from './variations/variations-typography';
 import FontFamilies from './font-families';
 import ScreenHeader from './header';
-import FontSizes from './font-sizes/font-sizes';
+import FontSizesCount from './font-sizes/font-sizes-count';
 
 function ScreenTypography() {
 	const fontLibraryEnabled = useSelect(
@@ -36,7 +36,7 @@ function ScreenTypography() {
 						fontLibraryEnabled && <FontFamilies /> }
 					<TypographyElements />
 					<TypographyVariations title={ __( 'Presets' ) } />
-					<FontSizes />
+					<FontSizesCount />
 				</VStack>
 			</div>
 		</>
