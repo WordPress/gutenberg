@@ -15,37 +15,10 @@ import type { CustomSelectButtonSize } from './types';
 
 const ITEM_PADDING = space( 2 );
 
-const truncateStyles = css`
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-`;
-
-export const WithHintWrapper = styled.div`
-	display: flex;
-	justify-content: space-between;
-	flex: 1;
-`;
-
-export const SelectedExperimentalHintWrapper = styled.div`
-	${ truncateStyles }
-`;
-
-export const SelectedExperimentalHintItem = styled.span`
-	color: ${ COLORS.theme.gray[ 600 ] };
-	margin-inline-start: ${ space( 2 ) };
-`;
-
-export const ExperimentalHintItem = styled.span`
-	color: ${ COLORS.theme.gray[ 600 ] };
-	text-align: right;
-	margin-inline-end: ${ space( 1 ) };
-`;
-
 export const SelectLabel = styled( Ariakit.SelectLabel )`
 	font-size: 11px;
 	font-weight: 500;
-	line-height: 1.4;
+	line-height: ${ CONFIG.fontLineHeightBase };
 	text-transform: uppercase;
 	margin-bottom: ${ space( 2 ) };
 `;
@@ -129,6 +102,7 @@ export const SelectPopover = styled( Ariakit.SelectPopover )`
 `;
 
 export const SelectItem = styled( Ariakit.SelectItem )`
+	cursor: default;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
@@ -153,4 +127,36 @@ export const SelectedItemCheck = styled( Ariakit.SelectItemCheck )`
 	align-items: center;
 	margin-inline-start: ${ ITEM_PADDING };
 	font-size: 24px; // Size of checkmark icon
+`;
+
+const truncateStyles = css`
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+`;
+
+export const SelectedExperimentalHintWrapper = styled.div`
+	${ truncateStyles }
+`;
+
+export const SelectedExperimentalHintItem = styled.span`
+	color: ${ COLORS.theme.gray[ 600 ] };
+	margin-inline-start: ${ space( 2 ) };
+`;
+
+export const WithHintItemWrapper = styled.div`
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	flex-wrap: wrap;
+	flex: 1;
+	column-gap: ${ space( 4 ) };
+`;
+
+export const WithHintItemHint = styled.span`
+	color: ${ COLORS.theme.gray[ 600 ] };
+	text-align: initial;
+	line-height: ${ CONFIG.fontLineHeightBase };
+	padding-inline-end: ${ space( 1 ) };
+	margin-block: ${ space( 1 ) };
 `;

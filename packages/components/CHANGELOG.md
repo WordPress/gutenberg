@@ -15,6 +15,7 @@
 -   `CustomSelectControlV2`: add root element wrapper. ([#62803](https://github.com/WordPress/gutenberg/pull/62803))
 -   `CustomSelectControlV2`: fix popover styles. ([#62821](https://github.com/WordPress/gutenberg/pull/62821))
 -   `CustomSelectControlV2`: fix trigger text alignment in RTL languages ([#62869](https://github.com/WordPress/gutenberg/pull/62869)).
+-   `CustomSelectControlV2`: allow wrapping item hint to new line ([#62848](https://github.com/WordPress/gutenberg/pull/62848)).
 -   `CustomSelectControlV2`: fix select popover content overflow. ([#62844](https://github.com/WordPress/gutenberg/pull/62844))
 -   Extract `TimeInput` component from `TimePicker` ([#60613](https://github.com/WordPress/gutenberg/pull/60613)).
 
