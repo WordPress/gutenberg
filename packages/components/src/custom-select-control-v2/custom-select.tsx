@@ -1,4 +1,10 @@
 /**
+ * External dependencies
+ */
+// eslint-disable-next-line no-restricted-imports
+import type * as Ariakit from '@ariakit/react';
+
+/**
  * WordPress dependencies
  */
 import { createContext, useCallback, useMemo } from '@wordpress/element';
@@ -12,13 +18,11 @@ import * as Styled from './styles';
 import type {
 	CustomSelectContext as CustomSelectContextType,
 	CustomSelectStore,
-	CustomSelectButtonInternalProps,
 	CustomSelectButtonProps,
 	CustomSelectButtonSize,
 	_CustomSelectInternalProps,
 	_CustomSelectProps,
 } from './types';
-import type { WordPressComponentProps } from '../context';
 import InputBase from '../input-control/input-base';
 import SelectControlChevronDown from '../select-control/chevron-down';
 
@@ -52,14 +56,10 @@ const CustomSelectButton = ( {
 	store,
 	...restProps
 }: Omit<
-	WordPressComponentProps<
-		CustomSelectButtonInternalProps &
-			CustomSelectButtonProps &
-			CustomSelectButtonSize &
-			CustomSelectStore,
-		'button',
-		false
-	>,
+	React.ComponentProps< typeof Ariakit.Select > &
+		CustomSelectButtonProps &
+		CustomSelectButtonSize &
+		CustomSelectStore,
 	'onChange'
 > ) => {
 	const { value: currentValue } = store.useState();
