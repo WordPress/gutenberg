@@ -73,14 +73,11 @@ class EmbedPreview extends Component {
 		const { interactive } = this.state;
 
 		const html = 'photo' === type ? getPhotoHtml( preview ) : preview.html;
-		const parsedHost = new URL( url ).host.split( '.' );
-		const parsedHostBaseUrl = parsedHost
-			.splice( parsedHost.length - 2, parsedHost.length - 1 )
-			.join( '.' );
+		const embedSourceUrl = new URL( url ).hostname;
 		const iframeTitle = sprintf(
 			// translators: %s: host providing embed content e.g: www.youtube.com
 			__( 'Embedded content from %s' ),
-			parsedHostBaseUrl
+			embedSourceUrl
 		);
 		const sandboxClassnames = clsx(
 			type,
@@ -136,7 +133,7 @@ class EmbedPreview extends Component {
 								__(
 									"Embedded content from %s can't be previewed in the editor."
 								),
-								parsedHostBaseUrl
+								embedSourceUrl
 							) }
 						</p>
 					</Placeholder>
