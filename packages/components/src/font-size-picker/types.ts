@@ -1,6 +1,9 @@
 export type FontSizePickerProps = {
 	/**
-	 * TBD description
+	 * When set to `predefined`, the user will be only able to pick a font size
+	 * from the predefined list passed via the `fontSizes` prop. When set to
+	 * `custom`, the user will be only able to choose a custom font size. When
+	 * set to `both`, the user will be able to access both UIs through a toggle.
 	 *
 	 * @default 'both'
 	 */
@@ -8,8 +11,9 @@ export type FontSizePickerProps = {
 	/**
 	 * _Note: this prop is deprecated. Please use the `pickerMode` prop instead._
 	 *
-	 * If `true`, it will not be possible to choose a custom fontSize. The user
-	 * will be forced to pick one of the pre-defined sizes passed in fontSizes.
+	 * If `true`, it will not be possible to choose a custom font size. The user
+	 * will be forced to pick one of the pre-defined sizes passed via the
+	 * `fontSizes` prop.
 	 *
 	 * @default false
 	 * @deprecated
@@ -38,7 +42,7 @@ export type FontSizePickerProps = {
 	/**
 	 * Available units for custom font size selection.
 	 *
-	 * @default `[ 'px', 'em', 'rem' ]`
+	 * @default [ 'px', 'em', 'rem' ]
 	 */
 	units?: string[];
 	/**
@@ -46,8 +50,8 @@ export type FontSizePickerProps = {
 	 */
 	value?: number | string;
 	/**
-	 * If `true`, the UI will contain a slider, instead of a numeric text input
-	 * field. If `false`, no slider will be present.
+	 * If `true`, a slider will be displayed alongside the input field when a
+	 * custom font size is active. Has no effect when `pickerMode` is `predefined`.
 	 *
 	 * @default false
 	 */
@@ -55,7 +59,7 @@ export type FontSizePickerProps = {
 	/**
 	 * If `true`, a reset button will be displayed alongside the input field
 	 * when a custom font size is active. Has no effect when
-	 * `disableCustomFontSizes` or `withSlider` is `true`.
+	 * `pickerMode` is `'predefined'` or `withSlider` is `true`.
 	 *
 	 * @default true
 	 */

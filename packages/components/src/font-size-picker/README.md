@@ -48,13 +48,6 @@ const MyFontSizePicker = () => {
 
 The component accepts the following props:
 
-### `disableCustomFontSizes`: `boolean`
-
-If `true`, it will not be possible to choose a custom fontSize. The user will be forced to pick one of the pre-defined sizes passed in fontSizes.
-
--   Required: no
--   Default: `false`
-
 ### `fallbackFontSize`: `number`
 
 If no value exists, this prop defines the starting position for the font size picker slider. Only relevant if `withSlider` is `true`.
@@ -80,6 +73,13 @@ If onChange is called without any parameter, it should reset the value, attendin
 
 -   Required: Yes
 
+### `pickerMode`: `'predefined' | 'custom' | 'both`
+
+When set to `predefined`, the user will be only able to pick a font size from the predefined list passed via the `fontSizes` prop. When set to `custom`, the user will be only able to choose a custom font size. When set to `both`, the user will be able to access both UIs through a toggle.
+
+-   Required: No
+-   Default: `'both'`
+
 ### `size`: `'default' | '__unstable-large'`
 
 Size of the control.
@@ -102,14 +102,23 @@ The current font size value.
 
 ### `withReset`: `boolean`
 
-If `true`, a reset button will be displayed alongside the input field when a custom font size is active. Has no effect when `disableCustomFontSizes` is `true`.
+If `true`, a reset button will be displayed alongside the input field when a custom font size is active. Has no effect when `pickerMode` is `'predefined'` or `withSlider` is `true`.
 
 -   Required: no
 -   Default: `true`
 
 ### `withSlider`: `boolean`
 
-If `true`, a slider will be displayed alongside the input field when a custom font size is active. Has no effect when `disableCustomFontSizes` is `true`.
+If `true`, a slider will be displayed alongside the input field when a custom font size is active. Has no effect when `pickerMode` is `predefined`.
+
+-   Required: no
+-   Default: `false`
+
+### `disableCustomFontSizes`: `boolean`
+
+_Note: this prop is deprecated. Please use the `pickerMode` prop instead._
+
+If `true`, it will not be possible to choose a custom font size. The user will be forced to pick one of the pre-defined sizes passed via the `fontSizes` prop.
 
 -   Required: no
 -   Default: `false`
