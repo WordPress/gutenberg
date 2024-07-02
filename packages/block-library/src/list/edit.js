@@ -111,7 +111,7 @@ function IndentUI( { clientId } ) {
 				icon={ isRTL() ? formatOutdentRTL : formatOutdent }
 				title={ __( 'Outdent' ) }
 				describedBy={ __( 'Outdent list item' ) }
-				disabled={ ! canOutdent }
+				isDisabled={ ! canOutdent }
 				onClick={ outdentList }
 			/>
 		</>
