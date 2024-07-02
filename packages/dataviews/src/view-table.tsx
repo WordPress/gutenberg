@@ -51,6 +51,7 @@ import type {
 	ViewTable as ViewTableType,
 	ViewTableProps,
 } from './types';
+import type { SetSelection } from './private-types';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -71,7 +72,7 @@ interface HeaderMenuProps< Item > {
 
 interface BulkSelectionCheckboxProps< Item > {
 	selection: string[];
-	onSelectionChange: ( items: Item[] ) => void;
+	onSelectionChange: SetSelection;
 	data: Item[];
 	actions: Action< Item >[];
 	getItemId: ( item: Item ) => string;
@@ -86,8 +87,7 @@ interface TableRowProps< Item > {
 	primaryField?: NormalizedField< Item >;
 	selection: string[];
 	getItemId: ( item: Item ) => string;
-	onSelectionChange: ( items: Item[] ) => void;
-	data: Item[];
+	onSelectionChange: SetSelection;
 }
 
 function WithDropDownMenuSeparators( { children }: { children: ReactNode } ) {
@@ -276,7 +276,9 @@ function BulkSelectionCheckbox< Item >( {
 				if ( areAllSelected ) {
 					onSelectionChange( [] );
 				} else {
-					onSelectionChange( selectableItems );
+					onSelectionChange(
+						selectableItems.map( ( item ) => getItemId( item ) )
+					);
 				}
 			} }
 			aria-label={
@@ -296,7 +298,6 @@ function TableRow< Item >( {
 	selection,
 	getItemId,
 	onSelectionChange,
-	data,
 }: TableRowProps< Item > ) {
 	const hasPossibleBulkAction = useHasAPossibleBulkAction( actions, item );
 	const isSelected = hasPossibleBulkAction && selection.includes( id );
@@ -336,27 +337,11 @@ function TableRow< Item >( {
 					! isTouchDevice.current &&
 					document.getSelection()?.type !== 'Range'
 				) {
-					if ( ! isSelected ) {
-						onSelectionChange(
-							data.filter( ( _item ) => {
-								const itemId = getItemId?.( _item );
-								return (
-									itemId === id ||
-									selection.includes( itemId )
-								);
-							} )
-						);
-					} else {
-						onSelectionChange(
-							data.filter( ( _item ) => {
-								const itemId = getItemId?.( _item );
-								return (
-									itemId !== id &&
-									selection.includes( itemId )
-								);
-							} )
-						);
-					}
+					onSelectionChange(
+						selection.includes( id )
+							? selection.filter( ( itemId ) => id !== itemId )
+							: [ ...selection, id ]
+					);
 				}
 			} }
 		>
@@ -373,7 +358,6 @@ function TableRow< Item >( {
 							selection={ selection }
 							onSelectionChange={ onSelectionChange }
 							getItemId={ getItemId }
-							data={ data }
 							primaryField={ primaryField }
 							disabled={ ! hasPossibleBulkAction }
 						/>
@@ -579,7 +563,6 @@ function ViewTable< Item >( {
 								selection={ selection }
 								getItemId={ getItemId }
 								onSelectionChange={ onSelectionChange }
-								data={ data }
 							/>
 						) ) }
 				</tbody>

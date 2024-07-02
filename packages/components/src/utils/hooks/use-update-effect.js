@@ -6,7 +6,7 @@ import { useRef, useEffect } from '@wordpress/element';
 /**
  * A `React.useEffect` that will not run on the first render.
  * Source:
- * https://github.com/ariakit/ariakit/blob/reakit/packages/reakit-utils/src/useUpdateEffect.ts
+ * https://github.com/ariakit/ariakit/blob/main/packages/ariakit-react-core/src/utils/hooks.ts
  *
  * @param {import('react').EffectCallback} effect
  * @param {import('react').DependencyList} deps
@@ -25,6 +25,13 @@ function useUpdateEffect( effect, deps ) {
 		// see https://github.com/WordPress/gutenberg/pull/41166
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, deps );
+
+	useEffect(
+		() => () => {
+			mounted.current = false;
+		},
+		[]
+	);
 }
 
 export default useUpdateEffect;

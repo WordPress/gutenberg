@@ -796,7 +796,7 @@ _Returns_
 
 Custom react hook for retrieving props from registered selectors.
 
-In general, this custom React hook follows the [rules of hooks](https://reactjs.org/docs/hooks-rules.html).
+In general, this custom React hook follows the [rules of hooks](https://react.dev/reference/rules/rules-of-hooks).
 
 _Usage_
 

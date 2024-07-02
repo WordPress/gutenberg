@@ -75,7 +75,7 @@ test.describe( 'Pattern Overrides', () => {
 			await editor.clickBlockOptionsMenuItem( 'Rename' );
 			await page
 				.getByRole( 'dialog', { name: 'Rename' } )
-				.getByRole( 'textbox', { name: 'Block name' } )
+				.getByRole( 'textbox', { name: 'Name' } )
 				.fill( editableParagraphName );
 			await page
 				.getByRole( 'dialog', { name: 'Rename' } )
