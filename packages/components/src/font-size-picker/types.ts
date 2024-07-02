@@ -107,9 +107,7 @@ export type FontSizePickerSelectProps = Pick<
 	'value' | 'size'
 > & {
 	fontSizes: NonNullable< FontSizePickerProps[ 'fontSizes' ] >;
-	disableCustomFontSizes: NonNullable<
-		FontSizePickerProps[ 'disableCustomFontSizes' ]
-	>;
+	pickerMode: NonNullable< FontSizePickerProps[ 'pickerMode' ] >;
 	onChange: NonNullable< FontSizePickerProps[ 'onChange' ] >;
 	onSelectCustom: () => void;
 	__next40pxDefaultSize: boolean;

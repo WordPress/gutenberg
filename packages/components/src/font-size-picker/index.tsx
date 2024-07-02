@@ -207,9 +207,7 @@ const UnforwardedFontSizePicker = (
 						__next40pxDefaultSize={ __next40pxDefaultSize }
 						fontSizes={ fontSizes }
 						value={ value }
-						disableCustomFontSizes={
-							preferredPickerMode === 'predefined'
-						}
+						pickerMode={ computedPickerMode }
 						size={ size }
 						onChange={ ( newValue ) => {
 							if ( newValue === undefined ) {
@@ -224,8 +222,6 @@ const UnforwardedFontSizePicker = (
 								);
 							}
 						} }
-						// TODO: "Custom" shouldn't be shown if
-						// computedPickerMode is "predefined-only"
 						onSelectCustom={ () =>
 							setCurrentPickerType( 'custom' )
 						}
