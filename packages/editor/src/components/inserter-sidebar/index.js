@@ -102,16 +102,10 @@ export default function InserterSidebar() {
 		</div>
 	);
 
-	if ( window.__experimentalEnableZoomedOutPatternsTab ) {
-		return (
-			// eslint-disable-next-line jsx-a11y/no-static-element-interactions
-			<div
-				onKeyDown={ closeOnEscape }
-				className="editor-inserter-sidebar"
-			>
-				{ inserterContents }
-			</div>
-		);
-	}
-	return <div className="editor-inserter-sidebar">{ inserterContents }</div>;
+	return (
+		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
+		<div onKeyDown={ closeOnEscape } className="editor-inserter-sidebar">
+			{ inserterContents }
+		</div>
+	);
 }
