@@ -132,6 +132,18 @@ export default function CoverInspectorControls( {
 		[ id, isImageBackground ]
 	);
 
+	function updateImage( newSizeSlug ) {
+		const newUrl = image?.media_details?.sizes?.[ newSizeSlug ]?.source_url;
+		if ( ! newUrl ) {
+			return null;
+		}
+
+		setAttributes( {
+			url: newUrl,
+			sizeSlug: newSizeSlug,
+		} );
+	}
+
 	const imageSizeOptions = imageSizes
 		.filter(
 			( { slug } ) => image?.media_details?.sizes?.[ slug ]?.source_url
@@ -185,42 +197,8 @@ export default function CoverInspectorControls( {
 		),
 	};
 
-	function updateImage( newSizeSlug ) {
-		const newUrl = image?.media_details?.sizes?.[ newSizeSlug ]?.source_url;
-		if ( ! newUrl ) {
-			return null;
-		}
-
-		setAttributes( {
-			url: newUrl,
-			sizeSlug: newSizeSlug,
-		} );
-	}
-
 	return (
 		<>
-			<InspectorControls group="dimensions">
-				{ !! imageSizeOptions.length && (
-					<ToolsPanelItem
-						hasValue={ () => !! sizeSlug }
-						label={ __( 'Resolution' ) }
-						onDeselect={ () =>
-							setAttributes( { sizeSlug: undefined } )
-						}
-						resetAllFilter={ () => ( {
-							sizeSlug: undefined,
-						} ) }
-						isShownByDefault
-						panelId={ clientId }
-					>
-						<ResolutionTool
-							value={ sizeSlug }
-							onChange={ updateImage }
-							options={ imageSizeOptions }
-						/>
-					</ToolsPanelItem>
-				) }
-			</InspectorControls>
 			<InspectorControls>
 				{ !! url && (
 					<PanelBody title={ __( 'Settings' ) }>
@@ -354,6 +332,26 @@ export default function CoverInspectorControls( {
 				</InspectorControls>
 			) }
 			<InspectorControls group="dimensions">
+				{ ! useFeaturedImage && !! imageSizeOptions.length && (
+					<ToolsPanelItem
+						hasValue={ () => !! sizeSlug }
+						label={ __( 'Resolution' ) }
+						onDeselect={ () =>
+							setAttributes( { sizeSlug: undefined } )
+						}
+						resetAllFilter={ () => ( {
+							sizeSlug: undefined,
+						} ) }
+						isShownByDefault
+						panelId={ clientId }
+					>
+						<ResolutionTool
+							value={ sizeSlug }
+							onChange={ updateImage }
+							options={ imageSizeOptions }
+						/>
+					</ToolsPanelItem>
+				) }
 				<ToolsPanelItem
 					hasValue={ () => !! minHeight }
 					label={ __( 'Minimum height' ) }
