@@ -8,7 +8,7 @@ import type { ForwardedRef } from 'react';
  */
 import { __ } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
-import { useState, forwardRef } from '@wordpress/element';
+import { useState, forwardRef, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -131,6 +131,12 @@ const UnforwardedFontSizePicker = (
 	const [ currentPickerType, setCurrentPickerType ] = useState<
 		'select' | 'togglegroup' | 'custom'
 	>( getPickerType( computedPickerMode, isCustomValue, fontSizes ) );
+
+	useEffect( () => {
+		setCurrentPickerType(
+			getPickerType( computedPickerMode, isCustomValue, fontSizes )
+		);
+	}, [ computedPickerMode, isCustomValue, fontSizes ] );
 
 	const units = useCustomUnits( {
 		availableUnits: unitsProp,
