@@ -95,7 +95,7 @@ export function useCurrentMergeThemeStyleVariationsWithUserConfig( {
 			userVariationWithoutProperties,
 			...variationsWithPropertiesAndBase,
 		];
-	}, [ properties, userVariation, variationsFromTheme ] );
+	}, [ properties.toString(), userVariation, variationsFromTheme ] );
 }
 
 /**
