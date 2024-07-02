@@ -6,58 +6,28 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
-import { debounce, useViewportMatch } from '@wordpress/compose';
 import {
 	Button,
 	__experimentalTruncate as Truncate,
-	Popover,
 } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import BlockStylesPreviewPanel from './preview-panel';
 import useStylesForBlocks from './use-styles-for-block';
 
 const noop = () => {};
 
 // Block Styles component for the Settings Sidebar.
-function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
-	const {
-		onSelect,
-		stylesToRender,
-		activeStyle,
-		genericPreviewBlock,
-		className: previewClassName,
-	} = useStylesForBlocks( {
+function BlockStyles( { clientId, onSwitch = noop } ) {
+	const { onSelect, stylesToRender, activeStyle } = useStylesForBlocks( {
 		clientId,
 		onSwitch,
 	} );
-	const [ hoveredStyle, setHoveredStyle ] = useState( null );
-	const isMobileViewport = useViewportMatch( 'medium', '<' );
 
 	if ( ! stylesToRender || stylesToRender.length === 0 ) {
 		return null;
 	}
-
-	const debouncedSetHoveredStyle = debounce( setHoveredStyle, 250 );
-
-	const onSelectStylePreview = ( style ) => {
-		onSelect( style );
-		onHoverClassName( null );
-		setHoveredStyle( null );
-		debouncedSetHoveredStyle.cancel();
-	};
-
-	const styleItemHandler = ( item ) => {
-		if ( hoveredStyle === item ) {
-			debouncedSetHoveredStyle.cancel();
-			return;
-		}
-		debouncedSetHoveredStyle( item );
-		onHoverClassName( item?.name ?? null );
-	};
 
 	return (
 		<div className="block-editor-block-styles">
@@ -78,11 +48,7 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 							key={ style.name }
 							variant="secondary"
 							label={ buttonText }
-							onMouseEnter={ () => styleItemHandler( style ) }
-							onFocus={ () => styleItemHandler( style ) }
-							onMouseLeave={ () => styleItemHandler( null ) }
-							onBlur={ () => styleItemHandler( null ) }
-							onClick={ () => onSelectStylePreview( style ) }
+							onClick={ () => onSelect( style ) }
 							aria-current={ activeStyle.name === style.name }
 						>
 							<Truncate
@@ -95,25 +61,6 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 					);
 				} ) }
 			</div>
-			{ hoveredStyle && ! isMobileViewport && (
-				<Popover
-					placement="left-start"
-					offset={ 34 }
-					focusOnMount={ false }
-				>
-					<div
-						className="block-editor-block-styles__preview-panel"
-						onMouseLeave={ () => styleItemHandler( null ) }
-					>
-						<BlockStylesPreviewPanel
-							activeStyle={ activeStyle }
-							className={ previewClassName }
-							genericPreviewBlock={ genericPreviewBlock }
-							style={ hoveredStyle }
-						/>
-					</div>
-				</Popover>
-			) }
 		</div>
 	);
 }
