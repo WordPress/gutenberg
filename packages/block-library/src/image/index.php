@@ -31,11 +31,17 @@ function render_block_core_image( $attributes, $content, $block ) {
 	if ( isset( $attributes['id'] ) ) {
 		$id = $attributes['id'];
 
+		// Use block context to detect whether the block is nested in a gallery.
+		// As the context names are very generic, check multiple array keys to
+		// reduce the chance a non-gallery parent is providing the same context.
+		$is_gallery_child = array_key_exists( 'allowResize', $block->context )
+			&& array_key_exists( 'imageCrop', $block->context )
+			&& array_key_exists( 'fixedHeight', $block->context );
+
 		// Adds the data-id="$id" attribute to the img element to provide backwards
 		// compatibility for the Gallery Block, which now wraps Image Blocks within
 		// innerBlocks. The data-id attribute is added in a core/gallery
 		// `render_block_data` hook.
-		$is_gallery_child = array_key_exists( 'allowResize', $block->context );
 		if ( $is_gallery_child ) {
 			$p->set_attribute( 'data-id', $id );
 		}
