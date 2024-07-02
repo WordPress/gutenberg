@@ -2,7 +2,7 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"allowJs": false,
+		"allowJs": true,
 		"checkJs": false,
 		"noEmit": true,
 		"emitDeclarationOnly": false,
@@ -18,5 +18,10 @@
 	},
 	"references": [ { "path": "./tsconfig.json" } ],
 	"include": [ "src/**/stories", "src/**/test" ],
-	"exclude": []
+	"exclude": [
+		"**/*.android.js",
+		"**/*.ios.js",
+		"**/*.native.js",
+		"packages/**/react-native-*/**"
+	]
 }
