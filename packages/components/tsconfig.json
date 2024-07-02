@@ -33,7 +33,7 @@
 		"src/**/*.native.js",
 		"src/**/react-native-*",
 
-		// Stories and tests are included in another project dedicated project.
+		// Stories and tests are included in another project.
 		"src/**/stories",
 		"src/**/test"
 	]
