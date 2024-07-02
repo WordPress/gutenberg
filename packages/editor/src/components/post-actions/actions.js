@@ -660,6 +660,15 @@ const useDuplicatePostAction = ( postType ) => {
 					return status !== 'trash';
 				},
 				RenderModal: ( { items, closeModal, onActionPerformed } ) => {
+					const [ item, setItem ] = useState( {
+						...items[ 0 ],
+						title: sprintf(
+							/* translators: %s: Existing template title */
+							__( '%s (Copy)' ),
+							getItemTitle( items[ 0 ] )
+						),
+					} );
+
 					const [ isCreatingPage, setIsCreatingPage ] =
 						useState( false );
 
@@ -667,7 +676,9 @@ const useDuplicatePostAction = ( postType ) => {
 					const { createSuccessNotice, createErrorNotice } =
 						useDispatch( noticesStore );
 
-					async function createPage( item ) {
+					async function createPage( event ) {
+						event.preventDefault();
+
 						if ( isCreatingPage ) {
 							return;
 						}
@@ -755,32 +766,32 @@ const useDuplicatePostAction = ( postType ) => {
 						}
 					}
 
-					const item = useMemo(
-						() => ( {
-							...items[ 0 ],
-							title: sprintf(
-								/* translators: %s: Existing template title */
-								__( '%s (Copy)' ),
-								getItemTitle( items[ 0 ] )
-							),
-						} ),
-						[ items ]
-					);
-					const form = useMemo(
-						() => ( {
-							closeForm: closeModal,
-							isBusy: isCreatingPage,
-							onSubmitLabel: _x( 'Duplicate', 'action label' ),
-						} ),
-						[ closeModal, isCreatingPage ]
-					);
 					return (
-						<DataForm
-							data={ item }
-							onUpdate={ createPage }
-							fields={ fields }
-							form={ form }
-						/>
+						<form onSubmit={ createPage }>
+							<VStack spacing={ 3 }>
+								<DataForm
+									data={ item }
+									fields={ fields }
+									onUpdate={ setItem }
+								/>
+								<HStack spacing={ 2 } justify="end">
+									<Button
+										variant="tertiary"
+										onClick={ closeModal }
+									>
+										{ __( 'Cancel' ) }
+									</Button>
+									<Button
+										variant="primary"
+										type="submit"
+										isBusy={ isCreatingPage }
+										aria-disabled={ isCreatingPage }
+									>
+										{ _x( 'Duplicate', 'action label' ) }
+									</Button>
+								</HStack>
+							</VStack>
+						</form>
 					);
 				},
 			},
