@@ -539,16 +539,30 @@ describe( 'FontSizePicker', () => {
 			expect( onChange ).toHaveBeenCalledWith( '80px' );
 		} );
 
-		it( 'does not allow custom values when disableCustomFontSizes is set', () => {
-			render(
+		it( 'does not allow custom values when the pickerMode mode is not "both"', () => {
+			const { rerender } = render(
 				<FontSizePicker
 					fontSizes={ fontSizes }
-					disableCustomFontSizes
+					pickerMode="predefined"
 				/>
 			);
 			expect(
 				screen.queryByRole( 'button', { name: 'Set custom size' } )
 			).not.toBeInTheDocument();
+
+			rerender(
+				<FontSizePicker fontSizes={ fontSizes } pickerMode="custom" />
+			);
+			expect(
+				screen.queryByRole( 'button', { name: 'Set custom size' } )
+			).not.toBeInTheDocument();
+
+			rerender(
+				<FontSizePicker fontSizes={ fontSizes } pickerMode="both" />
+			);
+			expect(
+				screen.getByRole( 'button', { name: 'Set custom size' } )
+			).toBeVisible();
 		} );
 
 		it( 'does not display a slider by default', async () => {
