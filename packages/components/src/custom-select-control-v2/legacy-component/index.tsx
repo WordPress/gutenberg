@@ -128,6 +128,7 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 				'components-custom-select-control',
 				classNameProp
 			) }
+			isLegacy
 			{ ...restProps }
 		>
 			{ children }

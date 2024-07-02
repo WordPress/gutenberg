@@ -109,6 +109,11 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 				),
 			[ props.attributes.metadata?.bindings, name ]
 		);
+
+		// While this hook doesn't directly call any selectors, `useSelect` is
+		// used purposely here to ensure `boundAttributes` is updated whenever
+		// there are attribute updates.
+		// `source.getValues` may also call a selector via `registry.select`.
 		const boundAttributes = useSelect( () => {
 			if ( ! bindings ) {
 				return;

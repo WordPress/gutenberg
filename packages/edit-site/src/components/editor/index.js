@@ -44,12 +44,15 @@ import SiteEditorMoreMenu from '../more-menu';
 import SiteIcon from '../site-icon';
 import useEditorIframeProps from '../block-editor/use-editor-iframe-props';
 import useEditorTitle from './use-editor-title';
+import { useIsSiteEditorLoading } from '../layout/hooks';
 
 const { Editor, BackButton } = unlock( editorPrivateApis );
-const { useHistory } = unlock( routerPrivateApis );
+const { useHistory, useLocation } = unlock( routerPrivateApis );
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 
-export default function EditSiteEditor( { isLoading } ) {
+export default function EditSiteEditor( { isPostsList = false } ) {
+	const { params } = useLocation();
+	const isLoading = useIsSiteEditorLoading();
 	const {
 		editedPostType,
 		editedPostId,
@@ -215,9 +218,20 @@ export default function EditSiteEditor( { isLoading } ) {
 									<Button
 										label={ __( 'Open Navigation' ) }
 										className="edit-site-layout__view-mode-toggle"
-										onClick={ () =>
-											setCanvasMode( 'view' )
-										}
+										onClick={ () => {
+											setCanvasMode( 'view' );
+											// TODO: this is a temporary solution to navigate to the posts list if we are
+											// come here through `posts list` and are in focus mode editing a template, template part etc..
+											if (
+												isPostsList &&
+												params?.focusMode
+											) {
+												history.push( {
+													page: 'gutenberg-posts-dashboard',
+													postType: 'post',
+												} );
+											}
+										} }
 									>
 										<SiteIcon className="edit-site-layout__view-mode-toggle-icon" />
 									</Button>
