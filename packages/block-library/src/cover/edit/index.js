@@ -99,6 +99,7 @@ function CoverEdit( {
 		templateLock,
 		tagName: TagName = 'div',
 		isUserOverlayColor,
+		sizeSlug,
 	} = attributes;
 
 	const [ featuredImage ] = useEntityProp(
@@ -107,6 +108,7 @@ function CoverEdit( {
 		'featured_media',
 		postId
 	);
+	const { getSettings } = useSelect( blockEditorStore );
 
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
@@ -194,6 +196,22 @@ function CoverEdit( {
 			newOverlayColor,
 			averageBackgroundColor
 		);
+
+		if ( backgroundType === IMAGE_BACKGROUND_TYPE && mediaAttributes.id ) {
+			const { imageDefaultSize } = getSettings();
+
+			// Try to use the previous selected image size if its available
+			// otherwise try the default image size or fallback full size.
+			if ( sizeSlug && newMedia?.sizes?.[ sizeSlug ] ) {
+				mediaAttributes.sizeSlug = sizeSlug;
+				mediaAttributes.url = newMedia?.sizes?.[ sizeSlug ].url;
+			} else if ( newMedia?.sizes?.[ imageDefaultSize ] ) {
+				mediaAttributes.sizeSlug = imageDefaultSize;
+				mediaAttributes.url = newMedia?.sizes?.[ sizeSlug ].url;
+			} else {
+				mediaAttributes.sizeSlug = 'full';
+			}
+		}
 
 		setAttributes( {
 			...mediaAttributes,
