@@ -50,7 +50,7 @@ const stateHandlers: ProxyHandler< object > = {
 			const value = Reflect.get( target, key, receiver );
 			prop.setValue(
 				shouldProxy( value )
-					? getStateProxy( value, prop.namespace )
+					? proxifyState( value, prop.namespace )
 					: value
 			);
 		}
@@ -92,7 +92,7 @@ const stateHandlers: ProxyHandler< object > = {
 			} else {
 				prop.setValue(
 					shouldProxy( value )
-						? getStateProxy( value, prop.namespace )
+						? proxifyState( value, prop.namespace )
 						: value
 				);
 			}
@@ -135,10 +135,8 @@ const stateHandlers: ProxyHandler< object > = {
 	},
 };
 
-export const getStateProxy = < T extends object >(
-	obj: T,
-	namespace: string
-) => getProxy( obj, stateHandlers, namespace );
+export const proxifyState = < T extends object >( obj: T, namespace: string ) =>
+	getProxy( obj, stateHandlers, namespace );
 
 export const peek = ( obj: object, key: string ): unknown => {
 	const prop = getPropSignal( obj, key );

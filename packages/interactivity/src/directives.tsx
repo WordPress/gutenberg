@@ -9,7 +9,7 @@ import { useContext, useMemo, useRef } from 'preact/hooks';
 /**
  * Internal dependencies
  */
-import { getStateProxy, peek } from './proxies';
+import { proxifyState, peek } from './proxies';
 
 /**
  * Internal dependencies
@@ -271,7 +271,7 @@ export default () => {
 
 			const ns = defaultEntry!.namespace;
 			const currentValue = useRef( {
-				[ ns ]: getStateProxy( {}, ns ),
+				[ ns ]: proxifyState( {}, ns ),
 			} );
 
 			// No change should be made if `defaultEntry` does not exist.
@@ -683,7 +683,7 @@ export default () => {
 				const itemProp =
 					suffix === 'default' ? 'item' : kebabToCamelCase( suffix );
 				const itemContext = {
-					[ namespace ]: getStateProxy( {}, namespace ),
+					[ namespace ]: proxifyState( {}, namespace ),
 				};
 				const mergedContext = proxifyContext(
 					itemContext,

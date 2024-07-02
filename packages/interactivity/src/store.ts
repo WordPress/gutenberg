@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { getStateProxy, getStoreProxy } from './proxies';
+import { proxifyState, proxifyStore } from './proxies';
 import { getNamespace } from './hooks';
 
 const isObject = ( item: unknown ): item is Record< string, unknown > =>
@@ -148,10 +148,10 @@ export function store(
 			storeLocks.set( namespace, lock );
 		}
 		const rawStore = {
-			state: getStateProxy( isObject( state ) ? state : {}, namespace ),
+			state: proxifyState( isObject( state ) ? state : {}, namespace ),
 			...block,
 		};
-		const proxiedStore = getStoreProxy( rawStore, namespace, true );
+		const proxiedStore = proxifyStore( rawStore, namespace, true );
 		rawStores.set( namespace, rawStore );
 		stores.set( namespace, proxiedStore );
 	} else {

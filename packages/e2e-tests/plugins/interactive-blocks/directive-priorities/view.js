@@ -8,7 +8,7 @@ import {
 	privateApis,
 } from '@wordpress/interactivity';
 
-const { directive, getStateProxy, h } = privateApis(
+const { directive, proxifyState, h } = privateApis(
 	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
 );
 
@@ -42,7 +42,7 @@ directive(
 	( { context: { Provider }, props: { children } } ) => {
 		executionProof( 'context' );
 		const value = {
-			[ namespace ]: getStateProxy(
+			[ namespace ]: proxifyState(
 				{
 					attribute: 'from context',
 					text: 'from context',

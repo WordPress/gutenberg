@@ -1,5 +1,5 @@
 /**
  * Internal dependencies
  */
-export { getStateProxy, peek } from './state';
-export { getStoreProxy } from './store';
+export { proxifyState, peek } from './state';
+export { proxifyStore } from './store';
