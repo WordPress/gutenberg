@@ -57,7 +57,6 @@ const BACKGROUND_POPOVER_PROPS = {
 	offset: 36,
 	shift: true,
 	className: 'block-editor-global-styles-background-panel__popover',
-	expandOnMobile: true,
 };
 const noop = () => {};
 
@@ -546,7 +545,6 @@ function BackgroundSizeControls( {
 	return (
 		<VStack spacing={ 3 } className="single-column">
 			<FocalPointPicker
-				__next40pxDefaultSize
 				__nextHasNoMarginBottom
 				label={ __( 'Position' ) }
 				url={ getResolvedThemeFilePath( imageValue, themeFileURIs ) }
@@ -554,7 +552,6 @@ function BackgroundSizeControls( {
 				onChange={ updateBackgroundPosition }
 			/>
 			<ToggleGroupControl
-				size="__unstable-large"
 				label={ __( 'Size' ) }
 				value={ currentValueForToggle }
 				onChange={ updateBackgroundSize }
@@ -589,26 +586,24 @@ function BackgroundSizeControls( {
 				/>
 			</ToggleGroupControl>
 			<HStack justify="flex-start" spacing={ 2 } as="span">
-				{ currentValueForToggle !== undefined &&
-				currentValueForToggle !== 'cover' &&
-				currentValueForToggle !== 'contain' ? (
-					<UnitControl
-						aria-label={ __( 'Background image width' ) }
-						onChange={ updateBackgroundSize }
-						value={ sizeValue }
-						size="__unstable-large"
-						__unstableInputWidth="100px"
-						min={ 0 }
-						placeholder={ __( 'Auto' ) }
-					/>
-				) : null }
-				{ currentValueForToggle !== 'cover' && (
-					<ToggleControl
-						label={ __( 'Repeat' ) }
-						checked={ repeatCheckedValue }
-						onChange={ toggleIsRepeated }
-					/>
-				) }
+				<UnitControl
+					aria-label={ __( 'Background image width' ) }
+					onChange={ updateBackgroundSize }
+					value={ sizeValue }
+					__unstableInputWidth="100px"
+					min={ 0 }
+					placeholder={ __( 'Auto' ) }
+					disabled={
+						currentValueForToggle !== 'auto' ||
+						currentValueForToggle === undefined
+					}
+				/>
+				<ToggleControl
+					label={ __( 'Repeat' ) }
+					checked={ repeatCheckedValue }
+					onChange={ toggleIsRepeated }
+					disabled={ currentValueForToggle === 'cover' }
+				/>
 			</HStack>
 		</VStack>
 	);
