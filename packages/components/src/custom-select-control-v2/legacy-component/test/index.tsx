@@ -454,8 +454,7 @@ describe.each( [
 	} );
 
 	describe( 'Keyboard behavior and accessibility', () => {
-		// skip reason: legacy v2 doesn't currently implement this behavior
-		it.skip( 'Captures the keypress event and does not let it propagate', async () => {
+		it( 'Captures the keypress event and does not let it propagate', async () => {
 			const onKeyDown = jest.fn();
 
 			render(
