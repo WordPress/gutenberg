@@ -10,16 +10,14 @@ import {
 	FlexBlock,
 	FlexItem,
 } from '@wordpress/components';
-import {
-	__experimentalGetBlockLabel,
-	store as blocksStore,
-} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
 import BlockIcon from '../block-icon';
+import useBlockDisplayInformation from '../use-block-display-information';
+import useBlockDisplayTitle from '../block-title/use-block-display-title';
 
 export default function BlockQuickNavigation( { clientIds, onSelect } ) {
 	if ( ! clientIds.length ) {
@@ -39,28 +37,17 @@ export default function BlockQuickNavigation( { clientIds, onSelect } ) {
 }
 
 function BlockQuickNavigationItem( { clientId, onSelect } ) {
-	const { name, icon, isSelected } = useSelect(
+	const blockInformation = useBlockDisplayInformation( clientId );
+	const blockTitle = useBlockDisplayTitle( {
+		clientId,
+		context: 'list-view',
+	} );
+	const { isSelected } = useSelect(
 		( select ) => {
-			const {
-				getBlockName,
-				getBlockAttributes,
-				isBlockSelected,
-				hasSelectedInnerBlock,
-			} = select( blockEditorStore );
-			const { getBlockType } = select( blocksStore );
-
-			const blockType = getBlockType( getBlockName( clientId ) );
-			const attributes = getBlockAttributes( clientId );
+			const { isBlockSelected, hasSelectedInnerBlock } =
+				select( blockEditorStore );
 
 			return {
-				name:
-					blockType &&
-					__experimentalGetBlockLabel(
-						blockType,
-						attributes,
-						'list-view'
-					),
-				icon: blockType?.icon,
 				isSelected:
 					isBlockSelected( clientId ) ||
 					hasSelectedInnerBlock( clientId, /* deep: */ true ),
@@ -82,10 +69,10 @@ function BlockQuickNavigationItem( { clientId, onSelect } ) {
 		>
 			<Flex>
 				<FlexItem>
-					<BlockIcon icon={ icon } />
+					<BlockIcon icon={ blockInformation?.icon } />
 				</FlexItem>
 				<FlexBlock style={ { textAlign: 'left' } }>
-					<Truncate>{ name }</Truncate>
+					<Truncate>{ blockTitle }</Truncate>
 				</FlexBlock>
 			</Flex>
 		</Button>
