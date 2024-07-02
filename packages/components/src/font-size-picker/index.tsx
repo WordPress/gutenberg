@@ -99,7 +99,7 @@ const UnforwardedFontSizePicker = (
 		fallbackFontSize,
 		fontSizes = [],
 		onChange,
-		pickerMode = 'both',
+		pickerMode = 'all',
 		size = 'default',
 		units: unitsProp = DEFAULT_UNITS,
 		value,
@@ -112,7 +112,7 @@ const UnforwardedFontSizePicker = (
 
 	let computedPickerMode = pickerMode;
 	if ( disableCustomFontSizes !== undefined ) {
-		computedPickerMode = disableCustomFontSizes ? 'predefined' : 'both';
+		computedPickerMode = disableCustomFontSizes ? 'predefined' : 'all';
 	}
 
 	const selectedFontSize = fontSizes.find(
@@ -173,8 +173,8 @@ const UnforwardedFontSizePicker = (
 							</HeaderHint>
 						) }
 					</HeaderLabel>
-					{ /* Show toggle button only when both picker modes are enabled */ }
-					{ computedPickerMode === 'both' && (
+					{ /* Show toggle button only when all picker modes are enabled */ }
+					{ computedPickerMode === 'all' && (
 						<HeaderToggle
 							label={
 								currentPickerType === 'custom'

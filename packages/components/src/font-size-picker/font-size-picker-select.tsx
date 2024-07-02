@@ -59,7 +59,7 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
 				__experimentalHint: hint,
 			};
 		} ),
-		...( pickerMode === 'both' ? [ CUSTOM_OPTION ] : [] ),
+		...( pickerMode === 'all' ? [ CUSTOM_OPTION ] : [] ),
 	];
 
 	const selectedOption = value

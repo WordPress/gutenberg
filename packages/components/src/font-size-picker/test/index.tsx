@@ -539,7 +539,7 @@ describe( 'FontSizePicker', () => {
 			expect( onChange ).toHaveBeenCalledWith( '80px' );
 		} );
 
-		it( 'does not allow custom values when the pickerMode mode is not "both"', () => {
+		it( 'does not allow custom values when the pickerMode mode is not "all"', () => {
 			const { rerender } = render(
 				<FontSizePicker
 					fontSizes={ fontSizes }
@@ -558,7 +558,7 @@ describe( 'FontSizePicker', () => {
 			).not.toBeInTheDocument();
 
 			rerender(
-				<FontSizePicker fontSizes={ fontSizes } pickerMode="both" />
+				<FontSizePicker fontSizes={ fontSizes } pickerMode="all" />
 			);
 			expect(
 				screen.getByRole( 'button', { name: 'Set custom size' } )

@@ -1,4 +1,4 @@
-export type FontSizePickerMode = 'predefined' | 'custom' | 'both';
+export type FontSizePickerMode = 'predefined' | 'custom' | 'all';
 
 export type FontSizePickerType = 'select' | 'togglegroup' | 'custom';
 
@@ -7,9 +7,9 @@ export type FontSizePickerProps = {
 	 * When set to `predefined`, the user will be only able to pick a font size
 	 * from the predefined list passed via the `fontSizes` prop. When set to
 	 * `custom`, the user will be only able to choose a custom font size. When
-	 * set to `both`, the user will be able to access both UIs through a toggle.
+	 * set to `all`, the user will be able to access all UIs through a toggle.
 	 *
-	 * @default 'both'
+	 * @default 'all'
 	 */
 	pickerMode?: FontSizePickerMode;
 	/**

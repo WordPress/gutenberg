@@ -73,12 +73,12 @@ If onChange is called without any parameter, it should reset the value, attendin
 
 -   Required: Yes
 
-### `pickerMode`: `'predefined' | 'custom' | 'both`
+### `pickerMode`: `'predefined' | 'custom' | 'all`
 
-When set to `predefined`, the user will be only able to pick a font size from the predefined list passed via the `fontSizes` prop. When set to `custom`, the user will be only able to choose a custom font size. When set to `both`, the user will be able to access both UIs through a toggle.
+When set to `predefined`, the user will be only able to pick a font size from the predefined list passed via the `fontSizes` prop. When set to `custom`, the user will be only able to choose a custom font size. When set to `all`, the user will be able to access all UIs through a toggle.
 
 -   Required: No
--   Default: `'both'`
+-   Default: `'all'`
 
 ### `size`: `'default' | '__unstable-large'`
 
