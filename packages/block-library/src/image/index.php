@@ -49,11 +49,11 @@ function render_block_core_image( $attributes, $content, $block ) {
 		// If there's a mismatch with the 'wp-image-' class and the actual id, the id was
 		// probably overridden by block bindings. Update it to the correct value.
 		// See https://github.com/WordPress/gutenberg/issues/62886 for why this is needed.
-		$image_classes     = $p->get_attribute( 'class' );
+		$image_classnames  = $p->get_attribute( 'class' );
 		$expected_id_class = "wp-image-$id";
-		if ( is_string( $image_classes ) && ! str_contains( $image_classes, $expected_id_class ) ) {
-			$image_classes = preg_replace( '/wp-image-(\d+)/', "wp-image-$id", $image_classes );
-			$p->set_attribute( 'class', $image_classes );
+		if ( is_string( $image_classnames ) && ! str_contains( $image_classnames, $expected_id_class ) ) {
+			$image_classnames = preg_replace( '/wp-image-(\d+)/', "wp-image-$id", $image_classnames );
+			$p->set_attribute( 'class', $image_classnames );
 		}
 	}
 
