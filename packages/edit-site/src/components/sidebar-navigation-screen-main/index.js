@@ -20,6 +20,7 @@ import {
 	TEMPLATE_POST_TYPE,
 	PATTERN_TYPES,
 } from '../../utils/constants';
+import SidebarNavigationScreenMainPlugins from './plugins';
 
 export default function SidebarNavigationScreenMain() {
 	const { setEditorCanvasContainerView } = unlock(
@@ -80,6 +81,7 @@ export default function SidebarNavigationScreenMain() {
 						>
 							{ __( 'Patterns' ) }
 						</SidebarNavigationItem>
+						<SidebarNavigationScreenMainPlugins.Slot />
 					</ItemGroup>
 				</>
 			}
