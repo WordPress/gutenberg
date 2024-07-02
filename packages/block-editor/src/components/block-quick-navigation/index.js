@@ -21,7 +21,7 @@ import {
 import { store as blockEditorStore } from '../../store';
 import BlockIcon from '../block-icon';
 
-export default function BlockQuickNavigation( { clientIds } ) {
+export default function BlockQuickNavigation( { clientIds, onSelect } ) {
 	if ( ! clientIds.length ) {
 		return null;
 	}
@@ -29,6 +29,7 @@ export default function BlockQuickNavigation( { clientIds } ) {
 		<VStack spacing={ 1 }>
 			{ clientIds.map( ( clientId ) => (
 				<BlockQuickNavigationItem
+					onSelect={ onSelect }
 					key={ clientId }
 					clientId={ clientId }
 				/>
@@ -37,7 +38,7 @@ export default function BlockQuickNavigation( { clientIds } ) {
 	);
 }
 
-function BlockQuickNavigationItem( { clientId } ) {
+function BlockQuickNavigationItem( { clientId, onSelect } ) {
 	const { name, icon, isSelected } = useSelect(
 		( select ) => {
 			const {
@@ -72,7 +73,12 @@ function BlockQuickNavigationItem( { clientId } ) {
 	return (
 		<Button
 			isPressed={ isSelected }
-			onClick={ () => selectBlock( clientId ) }
+			onClick={ async () => {
+				await selectBlock( clientId );
+				if ( onSelect ) {
+					onSelect( clientId );
+				}
+			} }
 		>
 			<Flex>
 				<FlexItem>

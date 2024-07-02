@@ -1,13 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -27,6 +28,7 @@ const PAGE_CONTENT_BLOCKS = [
 const TEMPLATE_PART_BLOCK = 'core/template-part';
 
 export default function TemplateContentPanel( renderingMode ) {
+	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const { clientIds, postType } = useSelect( ( select ) => {
 		const { getBlocksByName } = select( blockEditorStore );
 		const { getCurrentPostType } = select( editorStore );
@@ -46,7 +48,12 @@ export default function TemplateContentPanel( renderingMode ) {
 
 	return (
 		<PanelBody title={ __( 'Content' ) }>
-			<BlockQuickNavigation clientIds={ clientIds } />
+			<BlockQuickNavigation
+				clientIds={ clientIds }
+				onSelect={ () => {
+					enableComplementaryArea( 'core', 'edit-post/document' );
+				} }
+			/>
 		</PanelBody>
 	);
 }
