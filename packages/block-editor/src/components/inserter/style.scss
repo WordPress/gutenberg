@@ -19,6 +19,7 @@ $block-inserter-tabs-height: 44px;
 .block-editor-inserter__main-area {
 	height: 100%;
 	gap: $grid-unit-20;
+	position: relative;
 
 	&.show-as-tabs {
 		gap: 0;
