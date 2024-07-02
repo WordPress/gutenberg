@@ -532,7 +532,7 @@ _Returns_
 
 ### PageAttributesOrder
 
-Renders the Page Attributes Order component. A number input in an editor interface for setting the order of a given page. The component is now not used in core but was kept for backward compatibility.
+Renders the Page Attributes Order component. A number input in an editor interface for setting the order of a given page.
 
 _Returns_
 
