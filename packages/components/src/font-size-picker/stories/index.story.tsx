@@ -66,7 +66,6 @@ const TwoFontSizePickersWithState: StoryFn< typeof FontSizePicker > = ( {
 export const Default: StoryFn< typeof FontSizePicker > =
 	FontSizePickerWithState.bind( {} );
 Default.args = {
-	disableCustomFontSizes: false,
 	fontSizes: [
 		{
 			name: 'Small',
@@ -98,14 +97,14 @@ WithSlider.args = {
 };
 
 /**
- * With custom font sizes disabled via the `disableCustomFontSizes` prop, the user will
+ * With the `pickerMode` set to `'predefined'`, the user will
  * only be able to pick one of the predefined sizes passed in `fontSizes`.
  */
 export const WithCustomSizesDisabled: StoryFn< typeof FontSizePicker > =
 	FontSizePickerWithState.bind( {} );
 WithCustomSizesDisabled.args = {
 	...Default.args,
-	disableCustomFontSizes: true,
+	pickerMode: 'predefined',
 };
 
 /**
