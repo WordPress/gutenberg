@@ -634,7 +634,7 @@ function useRenamePostAction( postType ) {
 	);
 }
 
-function ReorderModal( { items, closeModal, onActionPerformed } ) {
+function OrderModal( { items, closeModal, onActionPerformed } ) {
 	const [ item ] = items;
 	const { editEntityRecord, saveEditedEntityRecord } =
 		useDispatch( coreStore );
@@ -642,7 +642,7 @@ function ReorderModal( { items, closeModal, onActionPerformed } ) {
 		useDispatch( noticesStore );
 	const [ orderInput, setOrderInput ] = useState( item.menu_order );
 
-	async function onReorder( event ) {
+	async function onOrder( event ) {
 		event.preventDefault();
 		if (
 			! Number.isInteger( Number( orderInput ) ) ||
@@ -677,7 +677,7 @@ function ReorderModal( { items, closeModal, onActionPerformed } ) {
 		! Number.isInteger( Number( orderInput ) ) ||
 		orderInput?.trim?.() === '';
 	return (
-		<form onSubmit={ onReorder }>
+		<form onSubmit={ onOrder }>
 			<VStack
 				spacing="5"
 				style={ {
@@ -722,7 +722,7 @@ function ReorderModal( { items, closeModal, onActionPerformed } ) {
 	);
 }
 
-function useReorderPagesAction( postType ) {
+function useOrderPagesAction( postType ) {
 	const supportsPageAttributes = useSelect(
 		( select ) => {
 			const { getPostType } = select( coreStore );
@@ -736,11 +736,12 @@ function useReorderPagesAction( postType ) {
 	return useMemo(
 		() =>
 			supportsPageAttributes && {
-				id: 'reorder-pages',
+				id: 'order-pages',
+				label: __( 'Order' ),
 				isEligible( { status } ) {
 					return status !== 'trash';
 				},
-				RenderModal: ReorderModal,
+				RenderModal: OrderModal,
 			},
 		[ supportsPageAttributes ]
 	);
