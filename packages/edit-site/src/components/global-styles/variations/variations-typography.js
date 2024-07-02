@@ -29,24 +29,22 @@ export default function TypographyVariations( { title, gap = 2 } ) {
 				gap={ gap }
 				className="edit-site-global-styles-style-variations-container"
 			>
-				{ typographyVariations &&
-					typographyVariations.length &&
-					typographyVariations.map( ( variation, index ) => {
-						return (
-							<Variation
-								key={ index }
-								variation={ variation }
-								property="typography"
-								showTooltip
-							>
-								{ () => (
-									<StylesPreviewTypography
-										variation={ variation }
-									/>
-								) }
-							</Variation>
-						);
-					} ) }
+				{ typographyVariations.map( ( variation, index ) => {
+					return (
+						<Variation
+							key={ index }
+							variation={ variation }
+							property="typography"
+							showTooltip
+						>
+							{ () => (
+								<StylesPreviewTypography
+									variation={ variation }
+								/>
+							) }
+						</Variation>
+					);
+				} ) }
 			</Grid>
 		</VStack>
 	);
