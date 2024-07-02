@@ -66,7 +66,10 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 			const withHint = (
 				<Styled.WithHintItemWrapper>
 					<span>{ name }</span>
-					<Styled.WithHintItemHint className="components-custom-select-control__item-hint">
+					<Styled.WithHintItemHint
+					// TODO: Legacy classname. Add V1 styles are removed from the codebase
+					// className="components-custom-select-control__item-hint"
+					>
 						{ __experimentalHint }
 					</Styled.WithHintItemHint>
 				</Styled.WithHintItemWrapper>
@@ -79,12 +82,13 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 					children={ __experimentalHint ? withHint : name }
 					style={ style }
 					className={ clsx(
-						// Legacy classnames
-						'components-custom-select-control__item',
-						className,
-						{
-							'has-hint': !! __experimentalHint,
-						}
+						// TODO: Legacy classname. Add V1 styles are removed from the codebase
+						// 'components-custom-select-control__item',
+						className
+						// TODO: Legacy classname. Add V1 styles are removed from the codebase
+						// {
+						// 	'has-hint': __experimentalHint,
+						// }
 					) }
 				/>
 			);
@@ -101,7 +105,10 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 		return (
 			<Styled.SelectedExperimentalHintWrapper>
 				{ currentValue }
-				<Styled.SelectedExperimentalHintItem className="components-custom-select-control__hint">
+				<Styled.SelectedExperimentalHintItem
+				// TODO: Legacy classname. Add V1 styles are removed from the codebase
+				// className="components-custom-select-control__hint"
+				>
 					{ currentHint?.__experimentalHint }
 				</Styled.SelectedExperimentalHintItem>
 			</Styled.SelectedExperimentalHintWrapper>
@@ -132,7 +139,8 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 			size={ translatedSize }
 			store={ store }
 			className={ clsx(
-				'components-custom-select-control',
+				// TODO: Legacy classname. Add V1 styles are removed from the codebase
+				// 'components-custom-select-control',
 				classNameProp
 			) }
 			isLegacy

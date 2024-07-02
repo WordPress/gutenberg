@@ -102,27 +102,23 @@ export const SelectPopover = styled( Ariakit.SelectPopover )`
 `;
 
 export const SelectItem = styled( Ariakit.SelectItem )`
-	// Necessary to override V1 styles passed via the legacy
-	// '.components-custom-select-control__item' class
-	&& {
-		cursor: default;
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding: ${ ITEM_PADDING };
-		font-size: ${ CONFIG.fontSize };
-		// TODO: reassess line-height for non-legacy v2
-		line-height: 28px;
-		scroll-margin: ${ space( 1 ) };
-		user-select: none;
+	cursor: default;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: ${ ITEM_PADDING };
+	font-size: ${ CONFIG.fontSize };
+	// TODO: reassess line-height for non-legacy v2
+	line-height: 28px;
+	scroll-margin: ${ space( 1 ) };
+	user-select: none;
 
-		&[aria-disabled='true'] {
-			cursor: not-allowed;
-		}
+	&[aria-disabled='true'] {
+		cursor: not-allowed;
+	}
 
-		&[data-active-item] {
-			background-color: ${ COLORS.theme.gray[ 300 ] };
-		}
+	&[data-active-item] {
+		background-color: ${ COLORS.theme.gray[ 300 ] };
 	}
 `;
 
@@ -159,12 +155,8 @@ export const WithHintItemWrapper = styled.div`
 `;
 
 export const WithHintItemHint = styled.span`
-	// Necessary to override V1 styles passed via the legacy
-	// '.components-custom-select-control__item-hint' class
-	${ SelectItem } && {
-		color: ${ COLORS.theme.gray[ 600 ] };
-		text-align: initial;
-		line-height: ${ CONFIG.fontLineHeightBase };
-		padding-inline-end: ${ space( 1 ) };
-	}
+	color: ${ COLORS.theme.gray[ 600 ] };
+	text-align: initial;
+	line-height: ${ CONFIG.fontLineHeightBase };
+	padding-inline-end: ${ space( 1 ) };
 `;
