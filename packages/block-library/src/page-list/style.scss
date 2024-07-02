@@ -2,6 +2,7 @@
 .wp-block-navigation {
 	.wp-block-page-list {
 		display: flex;
+		/* stylelint-disable-next-line declaration-property-value-allowed-list -- This variable value does not use row-reverse or column-reverse. */
 		flex-direction: var(--navigation-layout-direction, initial);
 		justify-content: var(--navigation-layout-justify, initial);
 		align-items: var(--navigation-layout-align, initial);
