@@ -117,6 +117,7 @@ function PreviewWrapper( { item, onClick, ariaDescribedBy, children } ) {
 
 function Preview( { item, viewType } ) {
 	const descriptionId = useId();
+	const description = item.description || item?.excerpt?.raw;
 	const isUserPattern = item.type === PATTERN_TYPES.user;
 	const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
 	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
@@ -143,7 +144,7 @@ function Preview( { item, viewType } ) {
 			<PreviewWrapper
 				item={ item }
 				onClick={ onClick }
-				ariaDescribedBy={ item.description ? descriptionId : undefined }
+				ariaDescribedBy={ !! description ? descriptionId : undefined }
 			>
 				{ isEmpty && isTemplatePart && __( 'Empty template part' ) }
 				{ isEmpty && ! isTemplatePart && __( 'Empty pattern' ) }
@@ -156,9 +157,9 @@ function Preview( { item, viewType } ) {
 					</Async>
 				) }
 			</PreviewWrapper>
-			{ item.description && (
+			{ !! description && (
 				<div hidden id={ descriptionId }>
-					{ item.description }
+					{ description }
 				</div>
 			) }
 		</div>
@@ -222,7 +223,7 @@ function Title( { item } ) {
 						// See https://github.com/WordPress/gutenberg/pull/51898#discussion_r1243399243.
 						tabIndex="-1"
 					>
-						{ title || item.name }
+						{ title }
 					</Button>
 				) }
 			</Flex>
@@ -300,6 +301,8 @@ export default function DataviewsPatterns() {
 				header: __( 'Sync status' ),
 				id: 'sync-status',
 				render: ( { item } ) => {
+					const syncStatus =
+						item.wp_pattern_sync_status || PATTERN_SYNC_TYPES.full;
 					// User patterns can have their sync statuses checked directly.
 					// Non-user patterns are all unsynced for the time being.
 					return (
@@ -309,8 +312,7 @@ export default function DataviewsPatterns() {
 							{
 								(
 									SYNC_FILTERS.find(
-										( { value } ) =>
-											value === item.syncStatus
+										( { value } ) => value === syncStatus
 									) ||
 									SYNC_FILTERS.find(
 										( { value } ) =>

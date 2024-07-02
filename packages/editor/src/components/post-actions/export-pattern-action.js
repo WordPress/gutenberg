@@ -15,6 +15,7 @@ import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
+import { getItemTitle } from '../../dataviews/actions/utils';
 
 // Patterns.
 const { PATTERN_TYPES } = unlock( patternsPrivateApis );
@@ -23,9 +24,9 @@ function getJsonFromItem( item ) {
 	return JSON.stringify(
 		{
 			__file: item.type,
-			title: item.title || item.name,
-			content: item.patternPost.content.raw,
-			syncStatus: item.patternPost.wp_pattern_sync_status,
+			title: getItemTitle( item ),
+			content: item.content.raw,
+			syncStatus: item.wp_pattern_sync_status,
 		},
 		null,
 		2
@@ -45,14 +46,16 @@ export const exportPatternAsJSONAction = {
 	callback: async ( items ) => {
 		if ( items.length === 1 ) {
 			return downloadBlob(
-				`${ kebabCase( items[ 0 ].title || items[ 0 ].name ) }.json`,
+				`${ kebabCase(
+					getItemTitle( items[ 0 ] ) || items[ 0 ].slug
+				) }.json`,
 				getJsonFromItem( items[ 0 ] ),
 				'application/json'
 			);
 		}
 		const nameCount = {};
 		const filesToZip = items.map( ( item ) => {
-			const name = kebabCase( item.title || item.name );
+			const name = kebabCase( getItemTitle( item ) || item.slug );
 			nameCount[ name ] = ( nameCount[ name ] || 0 ) + 1;
 			return {
 				name: `${

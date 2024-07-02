@@ -33,6 +33,7 @@ import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { exportPatternAsJSONAction } from './export-pattern-action';
 import { CreateTemplatePartModalContents } from '../create-template-part-modal';
+import { getItemTitle } from '../../dataviews/actions/utils';
 
 // Patterns.
 const { PATTERN_TYPES, CreatePatternModalContents, useDuplicatePatternProps } =
@@ -70,13 +71,6 @@ function isTemplateRemovable( template ) {
 		template?.source === TEMPLATE_ORIGINS.custom &&
 		! template?.has_theme_file
 	);
-}
-
-function getItemTitle( item ) {
-	if ( typeof item.title === 'string' ) {
-		return decodeEntities( item.title );
-	}
-	return decodeEntities( item.title?.rendered || '' );
 }
 
 const trashPostAction = {
@@ -810,10 +804,8 @@ export const duplicatePatternAction = {
 	modalHeader: _x( 'Duplicate pattern', 'action label' ),
 	RenderModal: ( { items, closeModal } ) => {
 		const [ item ] = items;
-		const isThemePattern = item.type === PATTERN_TYPES.theme;
 		const duplicatedProps = useDuplicatePatternProps( {
-			pattern:
-				isThemePattern || ! item.patternPost ? item : item.patternPost,
+			pattern: item,
 			onSuccess: () => closeModal(),
 		} );
 		return (

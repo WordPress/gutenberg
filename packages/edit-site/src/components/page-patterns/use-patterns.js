@@ -128,8 +128,11 @@ const selectPatterns = createSelector(
 			patterns: themePatterns,
 			isResolving: isResolvingThemePatterns,
 		} = selectThemePatterns( select );
-		const { patterns: userPatterns, isResolving: isResolvingUserPatterns } =
-			selectUserPatterns( select );
+		const {
+			patterns: userPatterns,
+			isResolving: isResolvingUserPatterns,
+			categories: userPatternCategories,
+		} = selectUserPatterns( select );
 
 		let patterns = [
 			...( themePatterns || [] ),
@@ -141,7 +144,8 @@ const selectPatterns = createSelector(
 			// Non-user patterns are all unsynced for the time being.
 			patterns = patterns.filter( ( pattern ) => {
 				return pattern.type === PATTERN_TYPES.user
-					? pattern.syncStatus === syncStatus
+					? ( pattern.wp_pattern_sync_status ||
+							PATTERN_SYNC_TYPES.full ) === syncStatus
 					: syncStatus === PATTERN_SYNC_TYPES.unsynced;
 			} );
 		}
@@ -149,8 +153,17 @@ const selectPatterns = createSelector(
 		if ( categoryId ) {
 			patterns = searchItems( patterns, search, {
 				categoryId,
-				hasCategory: ( item, currentCategory ) =>
-					item.categories?.includes( currentCategory ),
+				hasCategory: ( item, currentCategory ) => {
+					if ( item.type === PATTERN_TYPES.user ) {
+						return item.wp_pattern_category.some(
+							( catId ) =>
+								userPatternCategories.find(
+									( cat ) => cat.id === catId
+								)?.slug === currentCategory
+						);
+					}
+					return item.categories?.includes( currentCategory );
+				},
 			} );
 		} else {
 			patterns = searchItems( patterns, search, {
@@ -167,41 +180,6 @@ const selectPatterns = createSelector(
 		selectUserPatterns( select ),
 	]
 );
-
-/**
- * Converts a post of type `wp_block` to a 'pattern item' that more closely
- * matches the structure of theme provided patterns.
- *
- * @param {Object} patternPost The `wp_block` record being normalized.
- * @param {Map}    categories  A Map of user created categories.
- *
- * @return {Object} The normalized item.
- */
-const convertPatternPostToItem = ( patternPost, categories ) => ( {
-	blocks: parse( patternPost.content.raw, {
-		__unstableSkipMigrationLogs: true,
-	} ),
-	...( patternPost.wp_pattern_category.length > 0 && {
-		categories: patternPost.wp_pattern_category.map(
-			( patternCategoryId ) =>
-				categories && categories.get( patternCategoryId )
-					? categories.get( patternCategoryId ).slug
-					: patternCategoryId
-		),
-	} ),
-	termLabels: patternPost.wp_pattern_category.map( ( patternCategoryId ) =>
-		categories?.get( patternCategoryId )
-			? categories.get( patternCategoryId ).label
-			: patternCategoryId
-	),
-	id: patternPost.id,
-	name: patternPost.slug,
-	syncStatus: patternPost.wp_pattern_sync_status || PATTERN_SYNC_TYPES.full,
-	title: patternPost.title.raw,
-	type: patternPost.type,
-	description: patternPost.excerpt.raw,
-	patternPost,
-} );
 
 const selectUserPatterns = createSelector(
 	( select, syncStatus, search = '' ) => {
@@ -222,12 +200,7 @@ const selectUserPatterns = createSelector(
 		userPatternCategories.forEach( ( userCategory ) =>
 			categories.set( userCategory.id, userCategory )
 		);
-		let patterns = patternPosts
-			? patternPosts.map( ( record ) =>
-					convertPatternPostToItem( record, categories )
-			  )
-			: EMPTY_PATTERN_LIST;
-
+		let patterns = patternPosts ?? EMPTY_PATTERN_LIST;
 		const isResolving = isResolvingSelector( 'getEntityRecords', [
 			'postType',
 			PATTERN_TYPES.user,
@@ -236,7 +209,9 @@ const selectUserPatterns = createSelector(
 
 		if ( syncStatus ) {
 			patterns = patterns.filter(
-				( pattern ) => pattern.syncStatus === syncStatus
+				( pattern ) =>
+					pattern.wp_pattern_sync_status ||
+					PATTERN_SYNC_TYPES.full === syncStatus
 			);
 		}
 

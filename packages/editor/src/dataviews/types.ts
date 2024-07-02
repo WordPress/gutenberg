@@ -9,7 +9,7 @@ type PostStatus =
 
 export interface BasePost {
 	status?: PostStatus;
-	title: string | { rendered: string };
+	title: string | { rendered: string } | { raw: string };
 	type: string;
 	id: string | number;
 }
