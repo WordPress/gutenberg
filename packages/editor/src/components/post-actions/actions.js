@@ -687,7 +687,7 @@ function ReorderModal( { items, closeModal, onActionPerformed } ) {
 			>
 				<div>
 					{ __(
-						'Determines the order of pages in the Page List block. Pages with the same order value are sorted alphabetically. Negative order values are supported.'
+						'Determines the order of pages. Pages with the same order value are sorted alphabetically. Negative order values are supported.'
 					) }
 				</div>
 				<NumberControl
@@ -712,7 +712,7 @@ function ReorderModal( { items, closeModal, onActionPerformed } ) {
 						variant="primary"
 						type="submit"
 						disabled={ saveIsDisabled }
-						__experimentalIsFocusable={ ! saveIsDisabled }
+						__experimentalIsFocusable
 					>
 						{ __( 'Save' ) }
 					</Button>
@@ -737,7 +737,9 @@ function useReorderPagesAction( postType ) {
 		() =>
 			supportsPageAttributes && {
 				id: 'reorder-pages',
-				label: __( 'Reorder' ),
+				isEligible( { status } ) {
+					return status !== 'trash';
+				},
 				RenderModal: ReorderModal,
 			},
 		[ supportsPageAttributes ]
