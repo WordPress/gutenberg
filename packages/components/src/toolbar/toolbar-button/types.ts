@@ -22,6 +22,9 @@ export type ToolbarButtonProps = {
 	isActive?: boolean;
 	/**
 	 * Indicates if the button is disabled.
+	 *
+	 * @deprecated Use `disabled` instead.
+	 * @ignore
 	 */
 	isDisabled?: boolean;
 	/**
