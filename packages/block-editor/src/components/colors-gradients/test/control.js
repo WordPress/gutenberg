@@ -43,7 +43,7 @@ describe( 'ColorPaletteControl', () => {
 
 		// Is showing the two tab buttons.
 		expect(
-			screen.getByRole( 'tab', { name: 'Color' } )
+			await screen.findByRole( 'tab', { name: 'Color' } )
 		).toBeInTheDocument();
 		expect(
 			screen.getByRole( 'tab', { name: 'Gradient' } )

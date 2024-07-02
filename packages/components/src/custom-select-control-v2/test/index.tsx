@@ -401,7 +401,7 @@ describe.each( [
 
 		// expect that the initial selection renders an image
 		expect( currentSelectedItem ).toContainElement(
-			screen.getByRole( 'img', { name: 'april-29' } )
+			await screen.findByRole( 'img', { name: 'april-29' } )
 		);
 
 		expect(
