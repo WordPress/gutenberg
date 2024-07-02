@@ -58,11 +58,11 @@ export function removePropertiesFromObject( object, properties ) {
  * @param {Object} variation.styles   The styles of the variation.
  * @return {boolean} Whether the variation is empty.
  */
-function isEmptyStyleVariation( { title, settings, styles } ) {
+function hasThemeVariation( { title, settings, styles } ) {
 	return (
-		title !== __( 'Default' ) && // Always preserve the default variation.
-		Object.keys( settings ).length === 0 &&
-		Object.keys( styles ).length === 0
+		title !== __( 'Default' ) || // Always preserve the default variation.
+		Object.keys( settings ).length > 0 ||
+		Object.keys( styles ).length > 0
 	);
 }
 
