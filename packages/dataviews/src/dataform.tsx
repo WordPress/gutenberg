@@ -3,8 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { TextControl } from '@wordpress/components';
-import { useEffect, useMemo } from '@wordpress/element';
-import { useDebouncedInput } from '@wordpress/compose';
+import { useCallback, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -31,23 +30,23 @@ function DataFormTextControl< Item >( {
 	onUpdate,
 }: DataFormTextControlProps< Item > ) {
 	const { id, header, placeholder } = field;
-	const [ value, setValue, debouncedValue ] = useDebouncedInput(
-		field.getValue( { item: data } )
-	);
+	const value = field.getValue( { item: data } );
 
-	useEffect( () => {
-		onUpdate( ( prevItem: any ) => ( {
-			...prevItem,
-			[ id ]: debouncedValue,
-		} ) );
-	}, [ debouncedValue ] );
+	const onChange = useCallback(
+		( newValue: string ) =>
+			onUpdate( ( prevItem: any ) => ( {
+				...prevItem,
+				[ id ]: newValue,
+			} ) ),
+		[ id, onUpdate ]
+	);
 
 	return (
 		<TextControl
 			label={ header }
 			placeholder={ placeholder }
 			value={ value }
-			onChange={ setValue }
+			onChange={ onChange }
 		/>
 	);
 }
