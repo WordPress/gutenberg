@@ -9,6 +9,7 @@ import type { ForwardedRef } from 'react';
 import { __ } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
 import { useState, forwardRef, useEffect } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -23,7 +24,6 @@ import {
 } from '../unit-control';
 import { VisuallyHidden } from '../visually-hidden';
 import { getCommonSizeUnit } from './utils';
-import type { FontSize, FontSizePickerProps } from './types';
 import {
 	Container,
 	Header,
@@ -35,21 +35,23 @@ import { Spacer } from '../spacer';
 import FontSizePickerSelect from './font-size-picker-select';
 import FontSizePickerToggleGroup from './font-size-picker-toggle-group';
 import { T_SHIRT_NAMES } from './constants';
-import deprecated from '@wordpress/deprecated';
+import type {
+	FontSize,
+	FontSizePickerProps,
+	FontSizePickerMode,
+	FontSizePickerType,
+} from './types';
 
 const DEFAULT_UNITS = [ 'px', 'em', 'rem', 'vw', 'vh' ];
-
-type PickerMode = 'predefined' | 'custom' | 'both';
-type PickerType = 'select' | 'togglegroup' | 'custom';
 
 const shouldUseSelectOverToggle = ( howManyfontSizes: number ) =>
 	howManyfontSizes > 5;
 
 const getPickerType = (
-	pickerMode: PickerMode,
+	pickerMode: FontSizePickerMode,
 	isCustomValue: boolean,
 	fontSizes: FontSize[]
-): PickerType => {
+): FontSizePickerType => {
 	if (
 		pickerMode === 'custom' ||
 		( pickerMode !== 'predefined' && isCustomValue )
@@ -63,7 +65,7 @@ const getPickerType = (
 };
 
 const getHeaderHint = (
-	currentPickerType: PickerType,
+	currentPickerType: FontSizePickerType,
 	selectedFontSize: FontSize | undefined,
 	fontSizes: FontSize[]
 ) => {
@@ -128,9 +130,9 @@ const UnforwardedFontSizePicker = (
 	);
 	const isCustomValue = !! value && ! selectedFontSize;
 
-	const [ currentPickerType, setCurrentPickerType ] = useState<
-		'select' | 'togglegroup' | 'custom'
-	>( getPickerType( computedPickerMode, isCustomValue, fontSizes ) );
+	const [ currentPickerType, setCurrentPickerType ] = useState(
+		getPickerType( computedPickerMode, isCustomValue, fontSizes )
+	);
 
 	useEffect( () => {
 		setCurrentPickerType(

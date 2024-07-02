@@ -1,3 +1,7 @@
+export type FontSizePickerMode = 'predefined' | 'custom' | 'both';
+
+export type FontSizePickerType = 'select' | 'togglegroup' | 'custom';
+
 export type FontSizePickerProps = {
 	/**
 	 * When set to `predefined`, the user will be only able to pick a font size
@@ -7,7 +11,7 @@ export type FontSizePickerProps = {
 	 *
 	 * @default 'both'
 	 */
-	pickerMode?: 'custom' | 'predefined' | 'both';
+	pickerMode?: FontSizePickerMode;
 	/**
 	 * _Note: this prop is deprecated. Please use the `pickerMode` prop instead._
 	 *
