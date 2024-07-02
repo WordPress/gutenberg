@@ -7,32 +7,45 @@ import {
 	InspectorAdvancedControls,
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { BaseControl, Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import {
-	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
+	__EXPERIMENTAL_STYLE_PROPERTY,
 	getBlockType,
 	hasBlockSupport,
 } from '@wordpress/blocks';
 import { useContext, useMemo, useCallback } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import { useSupportedStyles } from '../../components/global-styles/hooks';
 import { unlock } from '../../lock-unlock';
+import cloneDeep from '../../utils/clone-deep';
+import setNestedValue from '../../utils/set-nested-value';
 
-const { GlobalStylesContext, useBlockEditingMode } = unlock(
+const { cleanEmptyObject, GlobalStylesContext } = unlock(
 	blockEditorPrivateApis
 );
+
+// Block Gap is a special case and isn't defined within the blocks
+// style properties config. We'll add it here to allow it to be pushed
+// to global styles as well.
+const STYLE_PROPERTY = {
+	...__EXPERIMENTAL_STYLE_PROPERTY,
+	blockGap: { value: [ 'spacing', 'blockGap' ] },
+};
 
 // TODO: Temporary duplication of constant in @wordpress/block-editor. Can be
 // removed by moving PushChangesToGlobalStylesControl to
 // @wordpress/block-editor.
 const STYLE_PATH_TO_CSS_VAR_INFIX = {
+	'border.color': 'color',
 	'color.background': 'color',
 	'color.text': 'color',
 	'elements.link.color.text': 'color',
@@ -74,6 +87,7 @@ const STYLE_PATH_TO_CSS_VAR_INFIX = {
 	'elements.h6.typography.fontFamily': 'font-family',
 	'elements.h6.color.gradient': 'gradient',
 	'color.gradient': 'gradient',
+	blockGap: 'spacing',
 	'typography.fontSize': 'font-size',
 	'typography.fontFamily': 'font-family',
 };
@@ -82,6 +96,7 @@ const STYLE_PATH_TO_CSS_VAR_INFIX = {
 // removed by moving PushChangesToGlobalStylesControl to
 // @wordpress/block-editor.
 const STYLE_PATH_TO_PRESET_BLOCK_ATTRIBUTE = {
+	'border.color': 'borderColor',
 	'color.background': 'backgroundColor',
 	'color.text': 'textColor',
 	'color.gradient': 'gradient',
@@ -99,74 +114,127 @@ const getValueFromObjectPath = ( object, path ) => {
 	return value;
 };
 
-function useChangesToPush( name, attributes ) {
-	const supports = useSupportedStyles( name );
+const flatBorderProperties = [ 'borderColor', 'borderWidth', 'borderStyle' ];
+const sides = [ 'top', 'right', 'bottom', 'left' ];
 
-	return useMemo(
-		() =>
-			supports.flatMap( ( key ) => {
-				if ( ! STYLE_PROPERTY[ key ] ) {
-					return [];
-				}
-				const { value: path } = STYLE_PROPERTY[ key ];
-				const presetAttributeKey = path.join( '.' );
-				const presetAttributeValue =
-					attributes[
-						STYLE_PATH_TO_PRESET_BLOCK_ATTRIBUTE[
-							presetAttributeKey
-						]
-					];
-				const value = presetAttributeValue
-					? `var:preset|${ STYLE_PATH_TO_CSS_VAR_INFIX[ presetAttributeKey ] }|${ presetAttributeValue }`
-					: getValueFromObjectPath( attributes.style, path );
-				return value ? [ { path, value } ] : [];
-			} ),
-		[ supports, name, attributes ]
-	);
-}
-
-/**
- * Sets the value at path of object.
- * If a portion of path doesn’t exist, it’s created.
- * Arrays are created for missing index properties while objects are created
- * for all other missing properties.
- *
- * This function intentionally mutates the input object.
- *
- * Inspired by _.set().
- *
- * @see https://lodash.com/docs/4.17.15#set
- *
- * @todo Needs to be deduplicated with its copy in `@wordpress/core-data`.
- *
- * @param {Object} object Object to modify
- * @param {Array}  path   Path of the property to set.
- * @param {*}      value  Value to set.
- */
-function setNestedValue( object, path, value ) {
-	if ( ! object || typeof object !== 'object' ) {
-		return object;
+function getBorderStyleChanges( border, presetColor, userStyle ) {
+	if ( ! border && ! presetColor ) {
+		return [];
 	}
 
-	path.reduce( ( acc, key, idx ) => {
-		if ( acc[ key ] === undefined ) {
-			if ( Number.isInteger( path[ idx + 1 ] ) ) {
-				acc[ key ] = [];
-			} else {
-				acc[ key ] = {};
-			}
-		}
-		if ( idx === path.length - 1 ) {
-			acc[ key ] = value;
-		}
-		return acc[ key ];
-	}, object );
+	const changes = [
+		...getFallbackBorderStyleChange( 'top', border, userStyle ),
+		...getFallbackBorderStyleChange( 'right', border, userStyle ),
+		...getFallbackBorderStyleChange( 'bottom', border, userStyle ),
+		...getFallbackBorderStyleChange( 'left', border, userStyle ),
+	];
 
-	return object;
+	// Handle a flat border i.e. all sides the same, CSS shorthand.
+	const { color: customColor, style, width } = border || {};
+	const hasColorOrWidth = presetColor || customColor || width;
+
+	if ( hasColorOrWidth && ! style ) {
+		// Global Styles need individual side configurations to overcome
+		// theme.json configurations which are per side as well.
+		sides.forEach( ( side ) => {
+			// Only add fallback border-style if global styles don't already
+			// have something set.
+			if ( ! userStyle?.[ side ]?.style ) {
+				changes.push( {
+					path: [ 'border', side, 'style' ],
+					value: 'solid',
+				} );
+			}
+		} );
+	}
+
+	return changes;
 }
 
-function cloneDeep( object ) {
-	return ! object ? {} : JSON.parse( JSON.stringify( object ) );
+function getFallbackBorderStyleChange( side, border, globalBorderStyle ) {
+	if ( ! border?.[ side ] || globalBorderStyle?.[ side ]?.style ) {
+		return [];
+	}
+
+	const { color, style, width } = border[ side ];
+	const hasColorOrWidth = color || width;
+
+	if ( ! hasColorOrWidth || style ) {
+		return [];
+	}
+
+	return [ { path: [ 'border', side, 'style' ], value: 'solid' } ];
+}
+
+function useChangesToPush( name, attributes, userConfig ) {
+	const supports = useSupportedStyles( name );
+	const blockUserConfig = userConfig?.styles?.blocks?.[ name ];
+
+	return useMemo( () => {
+		const changes = supports.flatMap( ( key ) => {
+			if ( ! STYLE_PROPERTY[ key ] ) {
+				return [];
+			}
+			const { value: path } = STYLE_PROPERTY[ key ];
+			const presetAttributeKey = path.join( '.' );
+			const presetAttributeValue =
+				attributes[
+					STYLE_PATH_TO_PRESET_BLOCK_ATTRIBUTE[ presetAttributeKey ]
+				];
+			const value = presetAttributeValue
+				? `var:preset|${ STYLE_PATH_TO_CSS_VAR_INFIX[ presetAttributeKey ] }|${ presetAttributeValue }`
+				: getValueFromObjectPath( attributes.style, path );
+
+			// Links only have a single support entry but have two element
+			// style properties, color and hover color. The following check
+			// will add the hover color to the changes if required.
+			if ( key === 'linkColor' ) {
+				const linkChanges = value ? [ { path, value } ] : [];
+				const hoverPath = [
+					'elements',
+					'link',
+					':hover',
+					'color',
+					'text',
+				];
+				const hoverValue = getValueFromObjectPath(
+					attributes.style,
+					hoverPath
+				);
+
+				if ( hoverValue ) {
+					linkChanges.push( { path: hoverPath, value: hoverValue } );
+				}
+
+				return linkChanges;
+			}
+
+			// The shorthand border styles can't be mapped directly as global
+			// styles requires longhand config.
+			if ( flatBorderProperties.includes( key ) && value ) {
+				// The shorthand config path is included to clear the block attribute.
+				const borderChanges = [ { path, value } ];
+				sides.forEach( ( side ) => {
+					const currentPath = [ ...path ];
+					currentPath.splice( -1, 0, side );
+					borderChanges.push( { path: currentPath, value } );
+				} );
+				return borderChanges;
+			}
+
+			return value ? [ { path, value } ] : [];
+		} );
+
+		// To ensure display of a visible border, global styles require a
+		// default border style if a border color or width is present.
+		getBorderStyleChanges(
+			attributes.style?.border,
+			attributes.borderColor,
+			blockUserConfig?.border
+		).forEach( ( change ) => changes.push( change ) );
+
+		return changes;
+	}, [ supports, attributes, blockUserConfig ] );
 }
 
 function PushChangesToGlobalStylesControl( {
@@ -174,10 +242,10 @@ function PushChangesToGlobalStylesControl( {
 	attributes,
 	setAttributes,
 } ) {
-	const changes = useChangesToPush( name, attributes );
-
 	const { user: userConfig, setUserConfig } =
 		useContext( GlobalStylesContext );
+
+	const changes = useChangesToPush( name, attributes, userConfig );
 
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
@@ -188,51 +256,71 @@ function PushChangesToGlobalStylesControl( {
 			return;
 		}
 
-		const { style: blockStyles } = attributes;
+		if ( changes.length > 0 ) {
+			const { style: blockStyles } = attributes;
 
-		const newBlockStyles = cloneDeep( blockStyles );
-		const newUserConfig = cloneDeep( userConfig );
+			const newBlockStyles = cloneDeep( blockStyles );
+			const newUserConfig = cloneDeep( userConfig );
 
-		for ( const { path, value } of changes ) {
-			setNestedValue( newBlockStyles, path, undefined );
-			setNestedValue(
-				newUserConfig,
-				[ 'styles', 'blocks', name, ...path ],
-				value
+			for ( const { path, value } of changes ) {
+				setNestedValue( newBlockStyles, path, undefined );
+				setNestedValue(
+					newUserConfig,
+					[ 'styles', 'blocks', name, ...path ],
+					value
+				);
+			}
+
+			const newBlockAttributes = {
+				borderColor: undefined,
+				backgroundColor: undefined,
+				textColor: undefined,
+				gradient: undefined,
+				fontSize: undefined,
+				fontFamily: undefined,
+				style: cleanEmptyObject( newBlockStyles ),
+			};
+
+			// @wordpress/core-data doesn't support editing multiple entity types in
+			// a single undo level. So for now, we disable @wordpress/core-data undo
+			// tracking and implement our own Undo button in the snackbar
+			// notification.
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( newBlockAttributes );
+			setUserConfig( newUserConfig, { undoIgnore: true } );
+			createSuccessNotice(
+				sprintf(
+					// translators: %s: Title of the block e.g. 'Heading'.
+					__( '%s styles applied.' ),
+					getBlockType( name ).title
+				),
+				{
+					type: 'snackbar',
+					actions: [
+						{
+							label: __( 'Undo' ),
+							onClick() {
+								__unstableMarkNextChangeAsNotPersistent();
+								setAttributes( attributes );
+								setUserConfig( userConfig, {
+									undoIgnore: true,
+								} );
+							},
+						},
+					],
+				}
 			);
 		}
-
-		// @wordpress/core-data doesn't support editing multiple entity types in
-		// a single undo level. So for now, we disable @wordpress/core-data undo
-		// tracking and implement our own Undo button in the snackbar
-		// notification.
-		__unstableMarkNextChangeAsNotPersistent();
-		setAttributes( { style: newBlockStyles } );
-		setUserConfig( () => newUserConfig, { undoIgnore: true } );
-
-		createSuccessNotice(
-			sprintf(
-				// translators: %s: Title of the block e.g. 'Heading'.
-				__( '%s styles applied.' ),
-				getBlockType( name ).title
-			),
-			{
-				type: 'snackbar',
-				actions: [
-					{
-						label: __( 'Undo' ),
-						onClick() {
-							__unstableMarkNextChangeAsNotPersistent();
-							setAttributes( { style: blockStyles } );
-							setUserConfig( () => userConfig, {
-								undoIgnore: true,
-							} );
-						},
-					},
-				],
-			}
-		);
-	}, [ changes, attributes, userConfig, name ] );
+	}, [
+		__unstableMarkNextChangeAsNotPersistent,
+		attributes,
+		changes,
+		createSuccessNotice,
+		name,
+		setAttributes,
+		setUserConfig,
+		userConfig,
+	] );
 
 	return (
 		<BaseControl
@@ -249,7 +337,9 @@ function PushChangesToGlobalStylesControl( {
 				{ __( 'Styles' ) }
 			</BaseControl.VisualLabel>
 			<Button
-				variant="primary"
+				__next40pxDefaultSize
+				variant="secondary"
+				__experimentalIsFocusable
 				disabled={ changes.length === 0 }
 				onClick={ pushChanges }
 			>
@@ -259,24 +349,36 @@ function PushChangesToGlobalStylesControl( {
 	);
 }
 
-const withPushChangesToGlobalStyles = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		const blockEditingMode = useBlockEditingMode();
-		const supportsStyles = SUPPORTED_STYLES.some( ( feature ) =>
-			hasBlockSupport( props.name, feature )
-		);
+function PushChangesToGlobalStyles( props ) {
+	const blockEditingMode = useBlockEditingMode();
+	const isBlockBasedTheme = useSelect(
+		( select ) => select( coreStore ).getCurrentTheme()?.is_block_theme,
+		[]
+	);
+	const supportsStyles = SUPPORTED_STYLES.some( ( feature ) =>
+		hasBlockSupport( props.name, feature )
+	);
+	const isDisplayed =
+		blockEditingMode === 'default' && supportsStyles && isBlockBasedTheme;
 
-		return (
-			<>
-				<BlockEdit { ...props } />
-				{ blockEditingMode === 'default' && supportsStyles && (
-					<InspectorAdvancedControls>
-						<PushChangesToGlobalStylesControl { ...props } />
-					</InspectorAdvancedControls>
-				) }
-			</>
-		);
+	if ( ! isDisplayed ) {
+		return null;
 	}
+
+	return (
+		<InspectorAdvancedControls>
+			<PushChangesToGlobalStylesControl { ...props } />
+		</InspectorAdvancedControls>
+	);
+}
+
+const withPushChangesToGlobalStyles = createHigherOrderComponent(
+	( BlockEdit ) => ( props ) => (
+		<>
+			<BlockEdit { ...props } />
+			{ props.isSelected && <PushChangesToGlobalStyles { ...props } /> }
+		</>
+	)
 );
 
 addFilter(

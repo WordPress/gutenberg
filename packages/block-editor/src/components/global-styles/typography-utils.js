@@ -7,7 +7,10 @@
 /**
  * Internal dependencies
  */
-import { getComputedFluidTypographyValue } from '../font-sizes/fluid-utils';
+import {
+	getComputedFluidTypographyValue,
+	getTypographyValueAndUnit,
+} from '../font-sizes/fluid-utils';
 
 /**
  * @typedef {Object} FluidPreset
@@ -25,8 +28,8 @@ import { getComputedFluidTypographyValue } from '../font-sizes/fluid-utils';
 
 /**
  * @typedef {Object} TypographySettings
- * @property {?string} minViewPortWidth  Minimum viewport size from which type will have fluidity. Optional if size is specified.
- * @property {?string} maxViewPortWidth  Maximum size up to which type will have fluidity. Optional if size is specified.
+ * @property {?string} minViewportWidth  Minimum viewport size from which type will have fluidity. Optional if size is specified.
+ * @property {?string} maxViewportWidth  Maximum size up to which type will have fluidity. Optional if size is specified.
  * @property {?number} scaleFactor       A scale factor to determine how fast a font scales within boundaries. Optional.
  * @property {?number} minFontSizeFactor How much to scale defaultFontSize by to derive minimumFontSize. Optional.
  * @property {?string} minFontSize       The smallest a calculated font size may be. Optional.
@@ -37,15 +40,16 @@ import { getComputedFluidTypographyValue } from '../font-sizes/fluid-utils';
  * Takes into account fluid typography parameters and attempts to return a css formula depending on available, valid values.
  *
  * @param {Preset}                     preset
- * @param {Object}                     typographyOptions
- * @param {boolean|TypographySettings} typographyOptions.fluid Whether fluid typography is enabled, and, optionally, fluid font size options.
+ * @param {Object}                     settings
+ * @param {boolean|TypographySettings} settings.typography.fluid  Whether fluid typography is enabled, and, optionally, fluid font size options.
+ * @param {Object?}                    settings.typography.layout Layout options.
  *
  * @return {string|*} A font-size value or the value of preset.size.
  */
-export function getTypographyFontSizeValue( preset, typographyOptions ) {
+export function getTypographyFontSizeValue( preset, settings ) {
 	const { size: defaultSize } = preset;
 
-	if ( ! isFluidTypographyEnabled( typographyOptions ) ) {
+	if ( ! isFluidTypographyEnabled( settings?.typography ) ) {
 		return defaultSize;
 	}
 	/*
@@ -57,9 +61,11 @@ export function getTypographyFontSizeValue( preset, typographyOptions ) {
 		return defaultSize;
 	}
 
-	const fluidTypographySettings =
-		typeof typographyOptions?.fluid === 'object'
-			? typographyOptions?.fluid
+	let fluidTypographySettings =
+		getFluidTypographyOptionsFromSettings( settings );
+	fluidTypographySettings =
+		typeof fluidTypographySettings?.fluid === 'object'
+			? fluidTypographySettings?.fluid
 			: {};
 
 	const fluidFontSizeValue = getComputedFluidTypographyValue( {
@@ -67,7 +73,8 @@ export function getTypographyFontSizeValue( preset, typographyOptions ) {
 		maximumFontSize: preset?.fluid?.max,
 		fontSize: defaultSize,
 		minimumFontSizeLimit: fluidTypographySettings?.minFontSize,
-		maximumViewPortWidth: fluidTypographySettings?.maxViewPortWidth,
+		maximumViewportWidth: fluidTypographySettings?.maxViewportWidth,
+		minimumViewportWidth: fluidTypographySettings?.minViewportWidth,
 	} );
 
 	if ( !! fluidFontSizeValue ) {
@@ -98,15 +105,83 @@ function isFluidTypographyEnabled( typographySettings ) {
 export function getFluidTypographyOptionsFromSettings( settings ) {
 	const typographySettings = settings?.typography;
 	const layoutSettings = settings?.layout;
-	return isFluidTypographyEnabled( typographySettings ) &&
+	const defaultMaxViewportWidth = getTypographyValueAndUnit(
 		layoutSettings?.wideSize
+	)
+		? layoutSettings?.wideSize
+		: null;
+	return isFluidTypographyEnabled( typographySettings ) &&
+		defaultMaxViewportWidth
 		? {
 				fluid: {
-					maxViewPortWidth: layoutSettings.wideSize,
+					maxViewportWidth: defaultMaxViewportWidth,
 					...typographySettings.fluid,
 				},
 		  }
 		: {
 				fluid: typographySettings?.fluid,
 		  };
+}
+
+/**
+ * Returns an object of merged font families and the font faces from the selected font family
+ * based on the theme.json settings object and the currently selected font family.
+ *
+ * @param {Object} settings           Theme.json settings
+ * @param {string} selectedFontFamily Decoded font family string
+ * @return {Object} Merged font families and font faces from the selected font family
+ */
+export function getMergedFontFamiliesAndFontFamilyFaces(
+	settings,
+	selectedFontFamily
+) {
+	const fontFamiliesFromSettings = settings?.typography?.fontFamilies;
+
+	const fontFamilies = [ 'default', 'theme', 'custom' ].flatMap(
+		( key ) => fontFamiliesFromSettings?.[ key ] ?? []
+	);
+
+	const fontFamilyFaces =
+		fontFamilies.find(
+			( family ) => family.fontFamily === selectedFontFamily
+		)?.fontFace ?? [];
+
+	return { fontFamilies, fontFamilyFaces };
+}
+
+/**
+ * Returns the nearest font weight value from the available font weight list based on the new font weight.
+ * The nearest font weight is the one with the smallest difference from the new font weight.
+ *
+ * @param {Array}  availableFontWeights Array of available font weights
+ * @param {string} newFontWeightValue   New font weight value
+ * @return {string} Nearest font weight
+ */
+
+export function findNearestFontWeight(
+	availableFontWeights,
+	newFontWeightValue
+) {
+	if ( ! newFontWeightValue || typeof newFontWeightValue !== 'string' ) {
+		return '';
+	}
+
+	if ( ! availableFontWeights || availableFontWeights.length === 0 ) {
+		return newFontWeightValue;
+	}
+
+	const nearestFontWeight = availableFontWeights?.reduce(
+		( nearest, { value: fw } ) => {
+			const currentDiff = Math.abs(
+				parseInt( fw ) - parseInt( newFontWeightValue )
+			);
+			const nearestDiff = Math.abs(
+				parseInt( nearest ) - parseInt( newFontWeightValue )
+			);
+			return currentDiff < nearestDiff ? fw : nearest;
+		},
+		availableFontWeights[ 0 ]?.value
+	);
+
+	return nearestFontWeight;
 }

@@ -1,12 +1,11 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 import { Platform } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { BottomSheet, PanelBody } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { menu } from '@wordpress/icons';
 
@@ -15,6 +14,8 @@ import { menu } from '@wordpress/icons';
  */
 import Button from '../button';
 import Dropdown from '../dropdown';
+import BottomSheet from '../mobile/bottom-sheet';
+import PanelBody from '../panel/body';
 
 function mergeProps( defaultProps = {}, props = {} ) {
 	const mergedProps = {
@@ -23,10 +24,7 @@ function mergeProps( defaultProps = {}, props = {} ) {
 	};
 
 	if ( props.className && defaultProps.className ) {
-		mergedProps.className = classnames(
-			props.className,
-			defaultProps.className
-		);
+		mergedProps.className = clsx( props.className, defaultProps.className );
 	}
 
 	return mergedProps;
@@ -72,17 +70,14 @@ function DropdownMenu( {
 
 	return (
 		<Dropdown
-			className={ classnames( 'components-dropdown-menu', className ) }
+			className={ clsx( 'components-dropdown-menu', className ) }
 			popoverProps={ mergedPopoverProps }
 			renderToggle={ ( { isOpen, onToggle } ) => {
 				const mergedToggleProps = mergeProps(
 					{
-						className: classnames(
-							'components-dropdown-menu__toggle',
-							{
-								'is-opened': isOpen,
-							}
-						),
+						className: clsx( 'components-dropdown-menu__toggle', {
+							'is-opened': isOpen,
+						} ),
 					},
 					toggleProps
 				);
@@ -108,7 +103,7 @@ function DropdownMenu( {
 			renderContent={ ( { isOpen, onClose, ...props } ) => {
 				return (
 					<BottomSheet
-						hideHeader={ true }
+						hideHeader
 						isVisible={ isOpen }
 						onClose={ onClose }
 					>
@@ -135,7 +130,7 @@ function DropdownMenu( {
 												} }
 												editable={ false }
 												icon={ control.icon }
-												leftAlign={ true }
+												leftAlign
 												isSelected={ control.isActive }
 												separatorType={
 													Platform.OS === 'android'

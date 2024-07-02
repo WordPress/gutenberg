@@ -61,7 +61,7 @@ deprecated( 'wp.components.ClipboardButton', {
 } );
 ```
 
-## Dev Notes
+## Dev notes
 
 Dev notes are [posts published on the make/core site](https://make.wordpress.org/core/tag/dev-notes/) prior to WordPress releases to inform third-party developers about important changes to the developer APIs, these changes can include:
 
@@ -70,7 +70,7 @@ Dev notes are [posts published on the make/core site](https://make.wordpress.org
 -   Unavoidable backward compatibility breakage, with reasoning and migration flows.
 -   Important deprecations (even without breakage), with reasoning and migration flows.
 
-### Dev Note Workflow
+### Dev note workflow
 
 -   When working on a pull request and the need for a dev note is discovered, add the **Needs Dev Note** label to the PR.
 -   If possible, add a comment to the PR explaining why the dev note is needed.

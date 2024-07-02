@@ -7,16 +7,20 @@ import type { CSSProperties } from 'react';
  * Internal dependencies
  */
 import type { Props } from './types';
-import { space } from '../ui/utils/space';
+import { space } from '../utils/space';
 import { CONFIG } from '../utils';
 
 export function getLineHeight(
 	adjustLineHeightForInnerControls: Props[ 'adjustLineHeightForInnerControls' ],
 	lineHeight: CSSProperties[ 'lineHeight' ]
 ) {
-	if ( lineHeight ) return lineHeight;
+	if ( lineHeight ) {
+		return lineHeight;
+	}
 
-	if ( ! adjustLineHeightForInnerControls ) return;
+	if ( ! adjustLineHeightForInnerControls ) {
+		return;
+	}
 
 	let value = `calc(${ CONFIG.controlHeight } + ${ space( 2 ) })`;
 

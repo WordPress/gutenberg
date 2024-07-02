@@ -29,6 +29,8 @@ export async function loginUser(
 	await pressKeyWithModifier( 'primary', 'a' );
 	await page.type( '#user_pass', password );
 
-	const waitForLoginNavigation = page.waitForNavigation();
-	await Promise.all( [ waitForLoginNavigation, page.click( '#wp-submit' ) ] );
+	await Promise.all( [
+		page.click( '#wp-submit' ),
+		page.waitForNavigation( { waitUntil: 'networkidle0' } ),
+	] );
 }

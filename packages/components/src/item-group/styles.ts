@@ -25,7 +25,7 @@ export const unstyledButton = ( as: 'a' | 'button' ) => {
 		}
 
 		&:hover {
-			color: ${ COLORS.ui.theme };
+			color: ${ COLORS.theme.accent };
 		}
 
 		&:focus {
@@ -35,10 +35,7 @@ export const unstyledButton = ( as: 'a' | 'button' ) => {
 
 		&:focus-visible {
 			box-shadow: 0 0 0 var( --wp-admin-border-width-focus )
-				var(
-					--wp-components-color-accent,
-					var( --wp-admin-theme-color, ${ COLORS.ui.theme } )
-				);
+				${ COLORS.theme.accent };
 			// Windows high contrast mode.
 			outline: 2px solid transparent;
 			outline-offset: 0;

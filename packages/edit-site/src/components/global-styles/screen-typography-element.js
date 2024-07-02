@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
@@ -67,9 +67,7 @@ function ScreenTypographyElement( { element } ) {
 					>
 						<ToggleGroupControlOption
 							value="heading"
-							/* translators: 'All' refers to selecting all heading levels 
-							and applying the same style to h1-h6. */
-							label={ __( 'All' ) }
+							label={ _x( 'All', 'heading levels' ) }
 						/>
 						<ToggleGroupControlOption
 							value="h1"

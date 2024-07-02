@@ -13,10 +13,6 @@ import {
 	LINK_DESTINATION_NONE,
 	LINK_DESTINATION_MEDIA,
 } from './constants';
-import {
-	LINK_DESTINATION_ATTACHMENT as DEPRECATED_LINK_DESTINATION_ATTACHMENT,
-	LINK_DESTINATION_MEDIA as DEPRECATED_LINK_DESTINATION_MEDIA,
-} from './v1/constants';
 import { pickRelevantMediaFiles, isGalleryV2Enabled } from './shared';
 
 const parseShortcodeIds = ( ids ) => {
@@ -177,57 +173,7 @@ const transforms = {
 		{
 			type: 'shortcode',
 			tag: 'gallery',
-
-			attributes: {
-				images: {
-					type: 'array',
-					shortcode: ( { named: { ids } } ) => {
-						if ( ! isGalleryV2Enabled() ) {
-							return parseShortcodeIds( ids ).map( ( id ) => ( {
-								id: id.toString(),
-							} ) );
-						}
-					},
-				},
-				ids: {
-					type: 'array',
-					shortcode: ( { named: { ids } } ) => {
-						if ( ! isGalleryV2Enabled() ) {
-							return parseShortcodeIds( ids );
-						}
-					},
-				},
-				columns: {
-					type: 'number',
-					shortcode: ( { named: { columns = '3' } } ) => {
-						return parseInt( columns, 10 );
-					},
-				},
-				linkTo: {
-					type: 'string',
-					shortcode: ( { named: { link } } ) => {
-						if ( ! isGalleryV2Enabled() ) {
-							switch ( link ) {
-								case 'post':
-									return DEPRECATED_LINK_DESTINATION_ATTACHMENT;
-								case 'file':
-									return DEPRECATED_LINK_DESTINATION_MEDIA;
-								default:
-									return DEPRECATED_LINK_DESTINATION_ATTACHMENT;
-							}
-						}
-						switch ( link ) {
-							case 'post':
-								return LINK_DESTINATION_ATTACHMENT;
-							case 'file':
-								return LINK_DESTINATION_MEDIA;
-							default:
-								return LINK_DESTINATION_NONE;
-						}
-					},
-				},
-			},
-			transform( { named: { ids, columns = 3, link } } ) {
+			transform( { named: { ids, columns = 3, link, orderby } } ) {
 				const imageIds = parseShortcodeIds( ids ).map( ( id ) =>
 					parseInt( id, 10 )
 				);
@@ -244,6 +190,7 @@ const transforms = {
 					{
 						columns: parseInt( columns, 10 ),
 						linkTo,
+						randomOrder: orderby === 'rand',
 					},
 					imageIds.map( ( imageId ) =>
 						createBlock( 'core/image', { id: imageId } )

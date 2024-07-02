@@ -66,7 +66,7 @@ To find out more about contributing to this package or Gutenberg as a whole, ple
 
 ⚠️ Adding new blocks to this package **requires** additional steps!
 
-1.  Do not forget to register a new core block in the [`index.js`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/index.js) file of this package. For example, if you were to add the new core block called `core/blinking-paragraph`, you would have to add something like:
+1.  Do not forget to register a new core block in the [`index.js`](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/index.js) file of this package. For example, if you were to add the new core block called `core/blinking-paragraph`, you would have to add something like:
 
     ```js
     // packages/block-library/src/index.js
@@ -83,7 +83,7 @@ To find out more about contributing to this package or Gutenberg as a whole, ple
     }
     ```
 
-2.  Register the block in the `gutenberg_reregister_core_block_types()` function of the [`lib/blocks.php`](https://github.com/WordPress/gutenberg/blob/trunk/lib/blocks.php) file. Add it to the `block_folders` array if it's a [static block](https://developer.wordpress.org/block-editor/explanations/glossary/#static-block) or to the `block_names` array if it's a [dynamic block](https://developer.wordpress.org/block-editor/explanations/glossary/#dynamic-block).
+2.  Register the block in the `gutenberg_reregister_core_block_types()` function of the [`lib/blocks.php`](https://github.com/WordPress/gutenberg/blob/trunk/lib/blocks.php) file. Add it to the `block_folders` array if it's a [static block](https://developer.wordpress.org/block-editor/getting-started/glossary/#static-block) or to the `block_names` array if it's a [dynamic block](https://developer.wordpress.org/block-editor/getting-started/glossary/#dynamic-block).
 
 3.  Add `init.js` file to the directory of the new block:
 
@@ -118,5 +118,36 @@ To find out more about contributing to this package or Gutenberg as a whole, ple
     	return $content;
     }
     ```
+
+### Naming convention for PHP functions
+
+All PHP function names declared within the subdirectories of the `packages/block-library/src/` directory should start with one of the following prefixes:
+
+-   `block_core_<directory_name>`
+-   `render_block_core_<directory_name>`
+-   `register_block_core_<directory_name>`
+
+In this context, `<directory_name>` represents the name of the directory where the corresponding `.php` file is located.
+The directory name is converted to lowercase, and any characters except for letters and digits are replaced with underscores.
+
+#### Example:
+
+For the PHP functions declared in the `packages/block-library/src/my-block/index.php` file, the correct prefixes would be:
+
+-   `block_core_my_block`
+-   `render_block_core_my_block`
+-   `register_block_core_my_block`
+
+#### Using plugin-specific prefixes/suffixes
+
+Unlike in [PHP code in the /lib directory](https://github.com/WordPress/gutenberg/blob/trunk/lib/README.md), you should generally avoid applying plugin-specific prefixes/suffixes such as `gutenberg_` to functions and other code in block PHP files.
+
+There are times, however, when blocks may need to use Gutenberg functions even when a Core-equivalent exists, for example, where a Gutenberg function relies on code that is only available in the plugin.
+
+In such cases, you can use the corresponding Core `wp_` function in the block PHP code, and add its name to [a list of prefixed functions in the Webpack configuration file](https://github.com/WordPress/gutenberg/blob/trunk/tools/webpack/blocks.js#L30).
+
+At build time, Webpack will search for `wp_` functions in that list and replace them with their `gutenberg_` equivalents. This process ensures that the plugin calls the `gutenberg_` functions, but the block will still call the Core `wp_` function when updates are back ported.
+
+Webpack assumes that, prefixes aside, the functions' names are identical: `wp_get_something_useful()` will be replaced with `gutenberg_get_something_useful()`.
 
 <br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

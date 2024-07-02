@@ -2,20 +2,14 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { backup, edit, seen } from '@wordpress/icons';
+import { edit, seen } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import {
-	Icon,
-	__experimentalNavigatorButton as NavigatorButton,
-	__experimentalVStack as HStack,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
+import { __experimentalVStack as VStack } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { BlockEditorProvider } from '@wordpress/block-editor';
-import { humanTimeDiff } from '@wordpress/date';
 import { useCallback } from '@wordpress/element';
-import { store as noticesStore } from '@wordpress/notices';
+import { store as editorStore } from '@wordpress/editor';
 import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
@@ -29,30 +23,20 @@ import SidebarButton from '../sidebar-button';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import StyleBook from '../style-book';
 import useGlobalStylesRevisions from '../global-styles/screen-revisions/use-global-styles-revisions';
+import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-details-footer';
+import ColorVariations from '../global-styles/variations/variations-color';
+import TypographyVariations from '../global-styles/variations/variations-typography';
+import {
+	useColorVariations,
+	useTypographyVariations,
+} from '../global-styles/hooks';
 
 const noop = () => {};
 
 export function SidebarNavigationItemGlobalStyles( props ) {
 	const { openGeneralSidebar } = useDispatch( editSiteStore );
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
-	const { createNotice } = useDispatch( noticesStore );
-	const { set: setPreference } = useDispatch( preferencesStore );
-	const { get: getPrefference } = useSelect( preferencesStore );
 
-	const turnOffDistractionFreeMode = useCallback( () => {
-		const isDistractionFree = getPrefference(
-			editSiteStore.name,
-			'distractionFree'
-		);
-		if ( ! isDistractionFree ) {
-			return;
-		}
-		setPreference( editSiteStore.name, 'distractionFree', false );
-		createNotice( 'info', __( 'Distraction free mode turned off' ), {
-			isDismissible: true,
-			type: 'snackbar',
-		} );
-	}, [ createNotice, setPreference, getPrefference ] );
 	const hasGlobalStyleVariations = useSelect(
 		( select ) =>
 			!! select(
@@ -62,10 +46,10 @@ export function SidebarNavigationItemGlobalStyles( props ) {
 	);
 	if ( hasGlobalStyleVariations ) {
 		return (
-			<NavigatorButton
+			<SidebarNavigationItem
 				{ ...props }
-				as={ SidebarNavigationItem }
-				path="/wp_global_styles"
+				params={ { path: '/wp_global_styles' } }
+				uid="global-styles-navigation-item"
 			/>
 		);
 	}
@@ -73,7 +57,6 @@ export function SidebarNavigationItemGlobalStyles( props ) {
 		<SidebarNavigationItem
 			{ ...props }
 			onClick={ () => {
-				turnOffDistractionFreeMode();
 				// Switch to edit mode.
 				setCanvasMode( 'edit' );
 				// Open global styles sidebar.
@@ -88,9 +71,13 @@ function SidebarNavigationScreenGlobalStylesContent() {
 		const { getSettings } = unlock( select( editSiteStore ) );
 
 		return {
-			storedSettings: getSettings( false ),
+			storedSettings: getSettings(),
 		};
 	}, [] );
+
+	const colorVariations = useColorVariations();
+	const typographyVariations = useTypographyVariations();
+	const gap = 3;
 
 	// Wrap in a BlockEditorProvider to ensure that the Iframe's dependencies are
 	// loaded. This is necessary because the Iframe component waits until
@@ -103,106 +90,65 @@ function SidebarNavigationScreenGlobalStylesContent() {
 			onChange={ noop }
 			onInput={ noop }
 		>
-			<StyleVariationsContainer />
+			<VStack
+				spacing={ 10 }
+				className="edit-site-global-styles-variation-container"
+			>
+				<StyleVariationsContainer gap={ gap } />
+				{ colorVariations?.length && (
+					<ColorVariations title={ __( 'Palettes' ) } gap={ gap } />
+				) }
+				{ typographyVariations?.length && (
+					<TypographyVariations
+						title={ __( 'Typography' ) }
+						gap={ gap }
+					/>
+				) }
+			</VStack>
 		</BlockEditorProvider>
 	);
 }
 
-function SidebarNavigationScreenGlobalStylesFooter( { onClickRevisions } ) {
-	const { revisions, isLoading } = useGlobalStylesRevisions();
-	const { revisionsCount } = useSelect( ( select ) => {
-		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
-			select( coreStore );
-
-		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
-		const globalStyles = globalStylesId
-			? getEntityRecord( 'root', 'globalStyles', globalStylesId )
-			: undefined;
-
-		return {
-			revisionsCount:
-				globalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0,
-		};
-	}, [] );
-
-	const hasRevisions = revisionsCount >= 2;
-	const modified = revisions?.[ 0 ]?.modified;
-
-	if ( ! hasRevisions || isLoading || ! modified ) {
-		return null;
-	}
-
-	return (
-		<VStack className="edit-site-sidebar-navigation-screen-global-styles__footer">
-			<SidebarNavigationItem
-				className="edit-site-sidebar-navigation-screen-global-styles__revisions"
-				label={ __( 'Revisions' ) }
-				onClick={ onClickRevisions }
-			>
-				<HStack
-					as="span"
-					alignment="center"
-					spacing={ 5 }
-					direction="row"
-					justify="space-between"
-				>
-					<span className="edit-site-sidebar-navigation-screen-global-styles__revisions__label">
-						{ __( 'Last modified' ) }
-					</span>
-					<span>
-						<time dateTime={ modified }>
-							{ humanTimeDiff( modified ) }
-						</time>
-					</span>
-					<Icon icon={ backup } style={ { fill: 'currentcolor' } } />
-				</HStack>
-			</SidebarNavigationItem>
-		</VStack>
-	);
-}
-
-export default function SidebarNavigationScreenGlobalStyles() {
-	const { openGeneralSidebar, setIsListViewOpened } =
-		useDispatch( editSiteStore );
+export default function SidebarNavigationScreenGlobalStyles( { backPath } ) {
+	const { revisions, isLoading: isLoadingRevisions } =
+		useGlobalStylesRevisions();
+	const { openGeneralSidebar } = useDispatch( editSiteStore );
+	const { setIsListViewOpened } = useDispatch( editorStore );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const { setCanvasMode, setEditorCanvasContainerView } = unlock(
 		useDispatch( editSiteStore )
 	);
-	const { createNotice } = useDispatch( noticesStore );
+	const { isViewMode, isStyleBookOpened, revisionsCount } = useSelect(
+		( select ) => {
+			const { getCanvasMode, getEditorCanvasContainerView } = unlock(
+				select( editSiteStore )
+			);
+			const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
+				select( coreStore );
+			const globalStylesId = __experimentalGetCurrentGlobalStylesId();
+			const globalStyles = globalStylesId
+				? getEntityRecord( 'root', 'globalStyles', globalStylesId )
+				: undefined;
+			return {
+				isViewMode: 'view' === getCanvasMode(),
+				isStyleBookOpened:
+					'style-book' === getEditorCanvasContainerView(),
+				revisionsCount:
+					globalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.count ??
+					0,
+			};
+		},
+		[]
+	);
 	const { set: setPreference } = useDispatch( preferencesStore );
-	const { get: getPrefference } = useSelect( preferencesStore );
-	const { isViewMode, isStyleBookOpened } = useSelect( ( select ) => {
-		const { getCanvasMode, getEditorCanvasContainerView } = unlock(
-			select( editSiteStore )
-		);
-		return {
-			isViewMode: 'view' === getCanvasMode(),
-			isStyleBookOpened: 'style-book' === getEditorCanvasContainerView(),
-		};
-	}, [] );
-
-	const turnOffDistractionFreeMode = useCallback( () => {
-		const isDistractionFree = getPrefference(
-			editSiteStore.name,
-			'distractionFree'
-		);
-		if ( ! isDistractionFree ) {
-			return;
-		}
-		setPreference( editSiteStore.name, 'distractionFree', false );
-		createNotice( 'info', __( 'Distraction free mode turned off' ), {
-			isDismissible: true,
-			type: 'snackbar',
-		} );
-	}, [ createNotice, setPreference, getPrefference ] );
 
 	const openGlobalStyles = useCallback( async () => {
-		turnOffDistractionFreeMode();
 		return Promise.all( [
+			setPreference( 'core', 'distractionFree', false ),
 			setCanvasMode( 'edit' ),
 			openGeneralSidebar( 'edit-site/global-styles' ),
 		] );
-	}, [ setCanvasMode, openGeneralSidebar, turnOffDistractionFreeMode ] );
+	}, [ setCanvasMode, openGeneralSidebar, setPreference ] );
 
 	const openStyleBook = useCallback( async () => {
 		await openGlobalStyles();
@@ -226,6 +172,12 @@ export default function SidebarNavigationScreenGlobalStyles() {
 		setEditorCanvasContainerView( 'global-styles-revisions' );
 	}, [ openGlobalStyles, setEditorCanvasContainerView ] );
 
+	// If there are no revisions, do not render a footer.
+	const hasRevisions = revisionsCount > 0;
+	const modifiedDateTime = revisions?.[ 0 ]?.modified;
+	const shouldShowGlobalStylesFooter =
+		hasRevisions && ! isLoadingRevisions && modifiedDateTime;
+
 	return (
 		<>
 			<SidebarNavigationScreen
@@ -233,11 +185,15 @@ export default function SidebarNavigationScreenGlobalStyles() {
 				description={ __(
 					'Choose a different style combination for the theme styles.'
 				) }
+				backPath={ backPath }
 				content={ <SidebarNavigationScreenGlobalStylesContent /> }
 				footer={
-					<SidebarNavigationScreenGlobalStylesFooter
-						onClickRevisions={ openRevisions }
-					/>
+					shouldShowGlobalStylesFooter && (
+						<SidebarNavigationScreenDetailsFooter
+							record={ revisions?.[ 0 ] }
+							onClick={ openRevisions }
+						/>
+					)
 				}
 				actions={
 					<>

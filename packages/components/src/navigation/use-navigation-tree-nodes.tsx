@@ -4,7 +4,7 @@
 import { useState } from '@wordpress/element';
 
 export function useNavigationTreeNodes<
-	TNode extends { children?: React.ReactNode; [ key: string ]: unknown }
+	TNode extends { children?: React.ReactNode; [ key: string ]: unknown },
 >() {
 	const [ nodes, setNodes ] = useState<
 		Record< string, Omit< TNode, 'children' > >

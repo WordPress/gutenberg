@@ -1,4 +1,4 @@
-.wp-block-embed figcaption {
+.wp-block-embed :where(figcaption) {
 	@include caption-style-theme();
 }
 

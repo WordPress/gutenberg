@@ -40,6 +40,7 @@ export default function useInspectorControlsTabs( blockName ) {
 		position: positionGroup,
 		styles: stylesGroup,
 		typography: typographyGroup,
+		effects: effectsGroup,
 	} = InspectorControlsGroups;
 
 	// List View Tab: If there are any fills for the list group add that tab.
@@ -55,6 +56,7 @@ export default function useInspectorControlsTabs( blockName ) {
 		...( useSlotFills( dimensionsGroup.Slot.__unstableName ) || [] ),
 		...( useSlotFills( stylesGroup.Slot.__unstableName ) || [] ),
 		...( useSlotFills( typographyGroup.Slot.__unstableName ) || [] ),
+		...( useSlotFills( effectsGroup.Slot.__unstableName ) || [] ),
 	];
 	const hasStyleFills = styleFills.length;
 

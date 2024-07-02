@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -12,16 +12,18 @@ export default function SidebarNavigationScreenDetailsPanelRow( {
 	label,
 	children,
 	className,
+	...extraProps
 } ) {
 	return (
 		<HStack
 			key={ label }
 			spacing={ 5 }
 			alignment="left"
-			className={ classnames(
+			className={ clsx(
 				'edit-site-sidebar-navigation-details-screen-panel__row',
 				className
 			) }
+			{ ...extraProps }
 		>
 			{ children }
 		</HStack>

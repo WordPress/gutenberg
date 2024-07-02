@@ -1,38 +1,23 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
 
 /**
  * WordPress dependencies
  */
-import { useEffect, useRef, useState } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
-import { contextConnect, useContextSystem } from '../ui/context';
+import { contextConnect, useContextSystem } from '../context';
+import { useControlledValue } from '../utils/hooks';
 import Popover from '../popover';
 import type { DropdownProps, DropdownInternalContext } from './types';
-
-function useObservableState(
-	initialState: boolean,
-	onStateChange?: ( newState: boolean ) => void
-) {
-	const [ state, setState ] = useState( initialState );
-	return [
-		state,
-		( value: boolean ) => {
-			setState( value );
-			if ( onStateChange ) {
-				onStateChange( value );
-			}
-		},
-	] as const;
-}
 
 const UnconnectedDropdown = (
 	props: DropdownProps,
@@ -50,6 +35,9 @@ const UnconnectedDropdown = (
 		onClose,
 		onToggle,
 		style,
+
+		open,
+		defaultOpen,
 
 		// Deprecated props
 		position,
@@ -74,20 +62,12 @@ const UnconnectedDropdown = (
 	const [ fallbackPopoverAnchor, setFallbackPopoverAnchor ] =
 		useState< HTMLDivElement | null >( null );
 	const containerRef = useRef< HTMLDivElement >();
-	const [ isOpen, setIsOpen ] = useObservableState( false, onToggle );
 
-	useEffect(
-		() => () => {
-			if ( onToggle && isOpen ) {
-				onToggle( false );
-			}
-		},
-		[ onToggle, isOpen ]
-	);
-
-	function toggle() {
-		setIsOpen( ! isOpen );
-	}
+	const [ isOpen, setIsOpen ] = useControlledValue( {
+		defaultValue: defaultOpen,
+		value: open,
+		onChange: onToggle,
+	} );
 
 	/**
 	 * Closes the popover when focus leaves it unless the toggle was pressed or
@@ -112,13 +92,15 @@ const UnconnectedDropdown = (
 	}
 
 	function close() {
-		if ( onClose ) {
-			onClose();
-		}
+		onClose?.();
 		setIsOpen( false );
 	}
 
-	const args = { isOpen, onToggle: toggle, onClose: close };
+	const args = {
+		isOpen: !! isOpen,
+		onToggle: () => setIsOpen( ! isOpen ),
+		onClose: close,
+	};
 	const popoverPropsHaveAnchor =
 		!! popoverProps?.anchor ||
 		// Note: `anchorRef`, `getAnchorRect` and `anchorRect` are deprecated and
@@ -160,7 +142,7 @@ const UnconnectedDropdown = (
 					}
 					variant={ variant }
 					{ ...popoverProps }
-					className={ classnames(
+					className={ clsx(
 						'components-dropdown__content',
 						popoverProps?.className,
 						contentClassName

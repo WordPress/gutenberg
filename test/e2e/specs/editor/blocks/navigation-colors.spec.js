@@ -6,57 +6,44 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 test.describe( 'Navigation colors', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		// We want emptytheme because it doesn't have any styles.
-		await requestUtils.activateTheme( 'emptytheme' );
-		await requestUtils.deleteAllTemplates( 'wp_template_part' );
-		await requestUtils.deleteAllMenus();
-		await requestUtils.deleteAllPages();
+		await Promise.all( [
+			requestUtils.activateTheme( 'emptytheme' ),
+			requestUtils.deleteAllMenus(),
+			requestUtils.deleteAllPages(),
+		] );
 	} );
 
 	test.beforeEach( async ( { admin, editor, requestUtils } ) => {
-		await admin.visitSiteEditor( {
-			postId: 'emptytheme//header',
-			postType: 'wp_template_part',
-		} );
-		await editor.canvas.click( 'body' );
 		const { id: pageId } = await requestUtils.createPage( {
 			title: 'Test Page',
 			status: 'publish',
 		} );
+
 		const { id: menuId } = await requestUtils.createNavigationMenu( {
 			title: 'Colored menu',
 			content: `<!-- wp:navigation-submenu {"label":"Custom Link","type":"custom","url":"https://wordpress.org","kind":"custom"} --><!-- wp:navigation-link {"label":"Submenu Link","type":"custom","url":"https://wordpress.org","kind":"custom"} /--><!-- /wp:navigation-submenu --><!-- wp:navigation-link {"label":"Page Link","type":"page","id": ${ pageId },"url":"http://localhost:8889/?page_id=${ pageId }","kind":"post-type"} /-->`,
 			attributes: { openSubmenusOnClick: true },
 		} );
+
+		await admin.createNewPost();
+
 		await editor.insertBlock( {
 			name: 'core/navigation',
 			attributes: {
 				ref: menuId,
 			},
 		} );
-
-		await editor.saveSiteEditorEntities();
-		await admin.visitSiteEditor();
-		await editor.canvas.click( 'body' );
-		// Focus the navigation block inside the header template part.
-		await editor.canvas
-			.getByRole( 'document', { name: 'Block: header' } )
-			.focus();
-		await editor.canvas
-			.getByRole( 'document', { name: 'Block: Navigation' } )
-			.click();
 	} );
 
 	test.afterEach( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllTemplates( 'wp_template_part' );
-		await requestUtils.deleteAllMenus();
-		await requestUtils.deleteAllPages();
+		await Promise.all( [
+			requestUtils.deleteAllMenus(),
+			requestUtils.deleteAllPages(),
+		] );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
 		await Promise.all( [
-			requestUtils.deleteAllTemplates( 'wp_template_part' ),
-			requestUtils.deleteAllMenus(),
-			requestUtils.deleteAllPages(),
 			requestUtils.activateTheme( 'twentytwentyone' ),
 		] );
 	} );
@@ -68,6 +55,7 @@ test.describe( 'Navigation colors', () => {
 	} );
 
 	test( 'All navigation links should default to the body color and submenus and mobile overlay should default to a white background with black text', async ( {
+		editor,
 		page,
 		colorControl,
 	} ) => {
@@ -80,8 +68,9 @@ test.describe( 'Navigation colors', () => {
 
 		await colorControl.testEditorColors( expectedNavigationColors );
 
-		// And finally we check the colors of the links on the frontend.
-		await page.goto( '/' );
+		// Check the colors of the links on the frontend.
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
 
 		await colorControl.testFrontendColors( expectedNavigationColors );
 	} );
@@ -104,29 +93,21 @@ test.describe( 'Navigation colors', () => {
 		await page.getByRole( 'tab', { name: 'Styles' } ).click();
 		await page.getByRole( 'button', { name: 'Color Text styles' } ).click();
 		await page
-			.getByRole( 'button', { name: 'Color: White' } )
+			.getByRole( 'option', { name: 'Color: White' } )
 			.click( { force: true } );
 
 		await page
 			.getByRole( 'button', { name: 'Color Background styles' } )
 			.click();
 		await page
-			.getByRole( 'button', { name: 'Color: Black' } )
+			.getByRole( 'option', { name: 'Color: Black' } )
 			.click( { force: true } );
 
-		// Save them so we can check on the frontend later too.
-		await editor.saveSiteEditorEntities();
 		// Close the sidebar so our selectors don't accidentally select the sidebar links instead of the editor canvas.
 		await page
 			.getByRole( 'button', { name: 'Close Settings' } )
 			.click( { force: true } );
 
-		await editor.canvas.click( 'body' );
-
-		// Focus the navigation block inside the header template part.
-		await editor.canvas
-			.getByRole( 'document', { name: 'Block: header' } )
-			.focus();
 		await editor.canvas
 			.getByRole( 'document', { name: 'Block: Navigation' } )
 			.click();
@@ -140,8 +121,9 @@ test.describe( 'Navigation colors', () => {
 
 		await colorControl.testEditorColors( expectedNavigationColors );
 
-		// And finally we check the colors of the links on the frontend.
-		await page.goto( '/' );
+		// Check the colors of the links on the frontend.
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
 
 		await colorControl.testFrontendColors( expectedNavigationColors );
 	} );
@@ -169,27 +151,19 @@ test.describe( 'Navigation colors', () => {
 		await page.getByRole( 'button', { name: 'Color Link styles' } ).click();
 		// rga(207, 46 ,46) is the color of the "vivid red" color preset.
 		await page
-			.getByRole( 'button', { name: 'Color: Vivid red' } )
+			.getByRole( 'option', { name: 'Color: Vivid red' } )
 			.click( { force: true } );
 		await page.getByRole( 'tab', { name: 'Hover' } ).click();
 		// rgb(155, 81, 224) is the color of the "vivid purple" color preset.
 		await page
-			.getByRole( 'button', { name: 'Color: Vivid purple' } )
+			.getByRole( 'option', { name: 'Color: Vivid purple' } )
 			.click( { force: true } );
 
-		// Save them so we can check on the frontend later too.
-		await editor.saveSiteEditorEntities();
 		// Close the sidebar so our selectors don't accidentally select the sidebar links instead of the editor canvas.
 		await page
 			.getByRole( 'button', { name: 'Close Settings' } )
 			.click( { force: true } );
 
-		await editor.canvas.click( 'body' );
-
-		// Focus the navigation block inside the header template part.
-		await editor.canvas
-			.getByRole( 'document', { name: 'Block: header' } )
-			.focus();
 		await editor.canvas
 			.getByRole( 'document', { name: 'Block: Navigation' } )
 			.click();
@@ -203,8 +177,9 @@ test.describe( 'Navigation colors', () => {
 
 		await colorControl.testEditorColors( expectedNavigationColors );
 
-		// And finally we check the colors of the links on the frontend.
-		await page.goto( '/' );
+		// Check the colors of the links on the frontend.
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
 
 		await colorControl.testFrontendColors( expectedNavigationColors );
 	} );
@@ -223,21 +198,14 @@ test.describe( 'Navigation colors', () => {
 		// 247, 141, 167 is the color of the "Pale pink" color preset.
 		const palePink = 'rgb(247, 141, 167)';
 		await page
-			.getByRole( 'button', { name: 'Color: Pale pink' } )
+			.getByRole( 'option', { name: 'Color: Pale pink' } )
 			.click( { force: true } );
 
-		await editor.saveSiteEditorEntities();
 		// Close the sidebar so our selectors don't accidentally select the sidebar links instead of the editor canvas.
 		await page
 			.getByRole( 'button', { name: 'Close Settings' } )
 			.click( { force: true } );
 
-		await editor.canvas.click( 'body' );
-
-		// Focus the navigation block inside the header template part.
-		await editor.canvas
-			.getByRole( 'document', { name: 'Block: header' } )
-			.focus();
 		await editor.canvas
 			.getByRole( 'document', { name: 'Block: Navigation' } )
 			.click();
@@ -251,8 +219,9 @@ test.describe( 'Navigation colors', () => {
 
 		await colorControl.testEditorColors( expectedNavigationColors );
 
-		// And finally we check the colors of the links on the frontend.
-		await page.goto( '/' );
+		// Check the colors of the links on the frontend.
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
 
 		await colorControl.testFrontendColors( expectedNavigationColors );
 	} );
@@ -273,20 +242,14 @@ test.describe( 'Navigation colors', () => {
 		// 142, 209, 252 is the color of the "Pale cyan blue" color preset.
 		const paleCyan = 'rgb(142, 209, 252)';
 		await page
-			.getByRole( 'button', { name: 'Color: Pale cyan blue' } )
+			.getByRole( 'option', { name: 'Color: Pale cyan blue' } )
 			.click( { force: true } );
 
-		await editor.saveSiteEditorEntities();
 		// Close the sidebar so our selectors don't accidentally select the sidebar links instead of the editor canvas.
 		await page
 			.getByRole( 'button', { name: 'Close Settings' } )
 			.click( { force: true } );
-		await editor.canvas.click( 'body' );
 
-		// Focus the navigation block inside the header template part.
-		await editor.canvas
-			.getByRole( 'document', { name: 'Block: header' } )
-			.focus();
 		await editor.canvas
 			.getByRole( 'document', { name: 'Block: Navigation' } )
 			.click();
@@ -301,8 +264,9 @@ test.describe( 'Navigation colors', () => {
 
 		await colorControl.testEditorColors( expectedNavigationColors );
 
-		// And finally we check the colors of the links on the frontend.
-		await page.goto( '/' );
+		// Check the colors of the links on the frontend.
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
 
 		await colorControl.testFrontendColors( expectedNavigationColors );
 	} );
@@ -321,7 +285,7 @@ test.describe( 'Navigation colors', () => {
 		// 247, 141, 167 is the color of the "Pale pink" color preset.
 		const palePink = 'rgb(247, 141, 167)';
 		await page
-			.getByRole( 'button', { name: 'Color: Pale pink' } )
+			.getByRole( 'option', { name: 'Color: Pale pink' } )
 			.click( { force: true } );
 		// Pale cyan blue for the background color.
 		await page
@@ -330,7 +294,7 @@ test.describe( 'Navigation colors', () => {
 		// 142, 209, 252 is the color of the "Pale cyan blue" color preset.
 		const paleCyan = 'rgb(142, 209, 252)';
 		await page
-			.getByRole( 'button', { name: 'Color: Pale cyan blue' } )
+			.getByRole( 'option', { name: 'Color: Pale cyan blue' } )
 			.click( { force: true } );
 		// Cyan bluish gray for the submenu and overlay text color.
 		await page
@@ -339,7 +303,7 @@ test.describe( 'Navigation colors', () => {
 		// 171, 184, 195 is the color of the "Cyan bluish gray" color preset.
 		const cyanBluishGray = 'rgb(171, 184, 195)';
 		await page
-			.getByRole( 'button', { name: 'Color: Cyan bluish gray' } )
+			.getByRole( 'option', { name: 'Color: Cyan bluish gray' } )
 			.click( { force: true } );
 		// Luminous vivid amber for the submenu and overlay background color.
 		await page
@@ -348,21 +312,14 @@ test.describe( 'Navigation colors', () => {
 		// 252, 185, 0 is the color of the "Luminous vivid amber" color preset.
 		const vividAmber = 'rgb(252, 185, 0)';
 		await page
-			.getByRole( 'button', { name: 'Color: Luminous vivid amber' } )
+			.getByRole( 'option', { name: 'Color: Luminous vivid amber' } )
 			.click( { force: true } );
 
-		await editor.saveSiteEditorEntities();
 		// Close the sidebar so our selectors don't accidentally select the sidebar links instead of the editor canvas.
 		await page
 			.getByRole( 'button', { name: 'Close Settings' } )
 			.click( { force: true } );
 
-		await editor.canvas.click( 'body' );
-
-		// Focus the navigation block inside the header template part.
-		await editor.canvas
-			.getByRole( 'document', { name: 'Block: header' } )
-			.focus();
 		await editor.canvas
 			.getByRole( 'document', { name: 'Block: Navigation' } )
 			.click();
@@ -376,8 +333,9 @@ test.describe( 'Navigation colors', () => {
 
 		await colorControl.testEditorColors( expectedNavigationColors );
 
-		// And finally we check the colors of the links on the frontend.
-		await page.goto( '/' );
+		// Check the colors of the links on the frontend.
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
 
 		await colorControl.testFrontendColors( expectedNavigationColors );
 	} );
@@ -425,12 +383,12 @@ class ColorControl {
 		await customLink.click();
 
 		// Submenu elements.
-		const submenuLink = this.editor.canvas
-			.locator( 'a' )
-			.filter( { hasText: 'Submenu Link' } );
 		const submenuWrapper = this.editor.canvas
 			.getByRole( 'document', { name: 'Block: Custom Link' } )
-			.filter( { has: submenuLink } );
+			.filter( { hasText: 'Submenu Link' } );
+		const submenuLink = submenuWrapper
+			.locator( 'a' )
+			.filter( { hasText: 'Submenu Link' } );
 
 		// Submenu link color.
 		await expect( submenuLink ).toHaveCSS( 'color', submenuTextColor );
@@ -455,6 +413,10 @@ class ColorControl {
 			.getByRole( 'button', { name: 'Open menu' } )
 			.click();
 
+		// Move the mouse to avoid accidentally triggering hover
+		// state on the links once the overlay opens.
+		await this.page.mouse.move( 1000, 1000 );
+
 		const overlay = this.editor.canvas
 			.locator( '.wp-block-navigation__responsive-container' )
 			.filter( { hasText: 'Submenu Link' } );
@@ -469,6 +431,9 @@ class ColorControl {
 			'background-color',
 			submenuBackgroundColor
 		);
+
+		// Set the mobile view option back to mobile
+		await this.page.getByRole( 'radio', { name: 'Mobile' } ).click();
 	}
 
 	async testFrontendColors( {

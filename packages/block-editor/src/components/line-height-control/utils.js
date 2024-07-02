@@ -1,5 +1,10 @@
 export const BASE_DEFAULT_VALUE = 1.5;
-export const STEP = 0.1;
+export const STEP = 0.01;
+/**
+ * A spin factor of 10 allows the spin controls to increment/decrement by 0.1.
+ * e.g. A line-height value of 1.55 will increment to 1.65.
+ */
+export const SPIN_FACTOR = 10;
 /**
  * There are varying value types within LineHeightControl:
  *

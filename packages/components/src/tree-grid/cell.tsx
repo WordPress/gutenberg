@@ -7,7 +7,7 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import TreeGridItem from './item';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import type { TreeGridCellProps } from './types';
 
 function UnforwardedTreeGridCell(

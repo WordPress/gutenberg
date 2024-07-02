@@ -23,7 +23,7 @@ import { useBlockProps } from '@wordpress/block-editor';
  * @param {Object}   props.attributes    Available block attributes.
  * @param {Function} props.setAttributes Function that updates individual attributes.
  *
- * @return {WPElement} Element to render.
+ * @return {Element} Element to render.
  */
 export default function Edit( { attributes, setAttributes } ) {
 	const blockProps = useBlockProps();

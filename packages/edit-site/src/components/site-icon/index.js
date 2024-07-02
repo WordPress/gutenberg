@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -36,13 +36,13 @@ function SiteIcon( { className } ) {
 	) : (
 		<Icon
 			className="edit-site-site-icon__icon"
-			size="48px"
 			icon={ wordpress }
+			size={ 48 }
 		/>
 	);
 
 	return (
-		<div className={ classnames( className, 'edit-site-site-icon' ) }>
+		<div className={ clsx( className, 'edit-site-site-icon' ) }>
 			{ icon }
 		</div>
 	);

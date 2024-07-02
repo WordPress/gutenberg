@@ -24,6 +24,10 @@ const EMPTY_CONFIG = { settings: {}, styles: {} };
 const VALID_SETTINGS = [
 	'appearanceTools',
 	'useRootPaddingAwareAlignments',
+	'background.backgroundImage',
+	'background.backgroundRepeat',
+	'background.backgroundSize',
+	'background.backgroundPosition',
 	'border.color',
 	'border.radius',
 	'border.style',
@@ -46,13 +50,17 @@ const VALID_SETTINGS = [
 	'color.palette',
 	'color.text',
 	'custom',
+	'dimensions.aspectRatio',
 	'dimensions.minHeight',
 	'layout.contentSize',
 	'layout.definitions',
 	'layout.wideSize',
+	'lightbox.enabled',
+	'lightbox.allowEditing',
 	'position.fixed',
 	'position.sticky',
 	'spacing.customSpacingSize',
+	'spacing.defaultSpacingSizes',
 	'spacing.spacingSizes',
 	'spacing.spacingScale',
 	'spacing.blockGap',
@@ -61,6 +69,7 @@ const VALID_SETTINGS = [
 	'spacing.units',
 	'typography.fluid',
 	'typography.customFontSize',
+	'typography.defaultFontSizes',
 	'typography.dropCap',
 	'typography.fontFamilies',
 	'typography.fontSizes',
@@ -68,6 +77,7 @@ const VALID_SETTINGS = [
 	'typography.fontWeight',
 	'typography.letterSpacing',
 	'typography.lineHeight',
+	'typography.textAlign',
 	'typography.textColumns',
 	'typography.textDecoration',
 	'typography.textTransform',
@@ -79,16 +89,12 @@ export const useGlobalStylesReset = () => {
 	const canReset = !! config && ! fastDeepEqual( config, EMPTY_CONFIG );
 	return [
 		canReset,
-		useCallback(
-			() => setUserConfig( () => EMPTY_CONFIG ),
-			[ setUserConfig ]
-		),
+		useCallback( () => setUserConfig( EMPTY_CONFIG ), [ setUserConfig ] ),
 	];
 };
 
 export function useGlobalSetting( propertyPath, blockName, source = 'all' ) {
 	const { setUserConfig, ...configs } = useContext( GlobalStylesContext );
-
 	const appendedBlockPath = blockName ? '.blocks.' + blockName : '';
 	const appendedPropertyPath = propertyPath ? '.' + propertyPath : '';
 	const contextualPath = `settings${ appendedBlockPath }${ appendedPropertyPath }`;
@@ -116,7 +122,7 @@ export function useGlobalSetting( propertyPath, blockName, source = 'all' ) {
 					`settings${ appendedBlockPath }.${ setting }`
 				) ??
 				getValueFromObjectPath( configToUse, `settings.${ setting }` );
-			if ( value ) {
+			if ( value !== undefined ) {
 				result = setImmutably( result, setting.split( '.' ), value );
 			}
 		} );
@@ -135,7 +141,6 @@ export function useGlobalSetting( propertyPath, blockName, source = 'all' ) {
 			setImmutably( currentConfig, contextualPath.split( '.' ), newValue )
 		);
 	};
-
 	return [ settingValue, setSetting ];
 }
 
@@ -200,6 +205,11 @@ export function useGlobalStyle(
 	return [ result, setStyle ];
 }
 
+export function useGlobalStyleLinks() {
+	const { merged: mergedConfig } = useContext( GlobalStylesContext );
+	return mergedConfig?._links;
+}
+
 /**
  * React hook that overrides a global settings object with block and element specific settings.
  *
@@ -235,6 +245,7 @@ export function useSettingsForBlockElement(
 				...updatedSettings.typography,
 				fontSizes: {},
 				customFontSize: false,
+				defaultFontSizes: false,
 			};
 		}
 
@@ -285,6 +296,7 @@ export function useSettingsForBlockElement(
 			'fontStyle',
 			'fontWeight',
 			'letterSpacing',
+			'textAlign',
 			'textTransform',
 			'textDecoration',
 			'writingMode',
@@ -327,7 +339,8 @@ export function useSettingsForBlockElement(
 			const sides = Array.isArray( supports?.spacing?.[ key ] )
 				? supports?.spacing?.[ key ]
 				: supports?.spacing?.[ key ]?.sides;
-			if ( sides?.length ) {
+			// Check if spacing type is supported before adding sides.
+			if ( sides?.length && updatedSettings.spacing?.[ key ] ) {
 				updatedSettings.spacing = {
 					...updatedSettings.spacing,
 					[ key ]: {
@@ -338,12 +351,14 @@ export function useSettingsForBlockElement(
 			}
 		} );
 
-		if ( ! supportedStyles.includes( 'minHeight' ) ) {
-			updatedSettings.dimensions = {
-				...updatedSettings.dimensions,
-				minHeight: false,
-			};
-		}
+		[ 'aspectRatio', 'minHeight' ].forEach( ( key ) => {
+			if ( ! supportedStyles.includes( key ) ) {
+				updatedSettings.dimensions = {
+					...updatedSettings.dimensions,
+					[ key ]: false,
+				};
+			}
+		} );
 
 		[ 'radius', 'color', 'style', 'width' ].forEach( ( key ) => {
 			if (
@@ -362,8 +377,13 @@ export function useSettingsForBlockElement(
 			? updatedSettings.shadow
 			: false;
 
+		// Text alignment is only available for blocks.
+		if ( element ) {
+			updatedSettings.typography.textAlign = false;
+		}
+
 		return updatedSettings;
-	}, [ parentSettings, supportedStyles, supports ] );
+	}, [ parentSettings, supportedStyles, supports, element ] );
 }
 
 export function useColorsPerOrigin( settings ) {

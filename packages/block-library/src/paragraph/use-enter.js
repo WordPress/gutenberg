@@ -6,7 +6,11 @@ import { useRefEffect } from '@wordpress/compose';
 import { ENTER } from '@wordpress/keycodes';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { hasBlockSupport, createBlock } from '@wordpress/blocks';
+import {
+	hasBlockSupport,
+	createBlock,
+	getDefaultBlockName,
+} from '@wordpress/blocks';
 
 export function useOnEnter( props ) {
 	const { batch } = useRegistry();
@@ -23,6 +27,7 @@ export function useOnEnter( props ) {
 		getBlockName,
 		getBlock,
 		getNextBlockClientId,
+		canInsertBlockType,
 	} = useSelect( blockEditorStore );
 	const propsRef = useRef( props );
 	propsRef.current = props;
@@ -56,21 +61,46 @@ export function useOnEnter( props ) {
 			}
 
 			const order = getBlockOrder( wrapperClientId );
-
-			event.preventDefault();
-
 			const position = order.indexOf( clientId );
 
 			// If it is the last block, exit.
 			if ( position === order.length - 1 ) {
-				moveBlocksToPosition(
-					[ clientId ],
-					wrapperClientId,
-					getBlockRootClientId( wrapperClientId ),
-					getBlockIndex( wrapperClientId ) + 1
-				);
+				let newWrapperClientId = wrapperClientId;
+
+				while (
+					! canInsertBlockType(
+						getBlockName( clientId ),
+						getBlockRootClientId( newWrapperClientId )
+					)
+				) {
+					newWrapperClientId =
+						getBlockRootClientId( newWrapperClientId );
+				}
+
+				if ( typeof newWrapperClientId === 'string' ) {
+					event.preventDefault();
+					moveBlocksToPosition(
+						[ clientId ],
+						wrapperClientId,
+						getBlockRootClientId( newWrapperClientId ),
+						getBlockIndex( newWrapperClientId ) + 1
+					);
+				}
 				return;
 			}
+
+			const defaultBlockName = getDefaultBlockName();
+
+			if (
+				! canInsertBlockType(
+					defaultBlockName,
+					getBlockRootClientId( wrapperClientId )
+				)
+			) {
+				return;
+			}
+
+			event.preventDefault();
 
 			// If it is in the middle, split the block in two.
 			const wrapperBlock = getBlock( wrapperClientId );
@@ -87,7 +117,7 @@ export function useOnEnter( props ) {
 					wrapperBlock.innerBlocks.slice( position + 1 )
 				);
 				insertBlock(
-					createBlock( 'core/paragraph' ),
+					createBlock( defaultBlockName ),
 					blockIndex + 1,
 					getBlockRootClientId( wrapperClientId ),
 					true

@@ -64,6 +64,7 @@ function DetailsEdit( { attributes, setAttributes, clientId } ) {
 			>
 				<summary onClick={ ( event ) => event.preventDefault() }>
 					<RichText
+						identifier="summary"
 						aria-label={ __( 'Write summary' ) }
 						placeholder={ __( 'Write summary…' ) }
 						allowedFormats={ [] }
@@ -72,7 +73,6 @@ function DetailsEdit( { attributes, setAttributes, clientId } ) {
 						onChange={ ( newSummary ) =>
 							setAttributes( { summary: newSummary } )
 						}
-						multiline={ false }
 					/>
 				</summary>
 				{ innerBlocksProps.children }

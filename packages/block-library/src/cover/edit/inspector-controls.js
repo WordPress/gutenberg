@@ -20,10 +20,11 @@ import {
 import { useInstanceId } from '@wordpress/compose';
 import {
 	InspectorControls,
-	useSetting,
+	useSettings,
 	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
 	__experimentalUseGradient,
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
@@ -31,6 +32,9 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { COVER_MIN_HEIGHT, mediaPosition } from '../shared';
+import { unlock } from '../../lock-unlock';
+
+const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
 function CoverHeightInput( {
 	onChange,
@@ -42,14 +46,9 @@ function CoverHeightInput( {
 	const inputId = `block-cover-height-input-${ instanceId }`;
 	const isPx = unit === 'px';
 
+	const [ availableUnits ] = useSettings( 'spacing.units' );
 	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units' ) || [
-			'px',
-			'em',
-			'rem',
-			'vw',
-			'vh',
-		],
+		availableUnits: availableUnits || [ 'px', 'em', 'rem', 'vw', 'vh' ],
 		defaultValues: { px: 430, '%': 20, em: 20, rem: 20, vw: 20, vh: 50 },
 	} );
 
@@ -80,7 +79,7 @@ function CoverHeightInput( {
 			min={ min }
 			onChange={ handleOnChange }
 			onUnitChange={ onUnitChange }
-			__unstableInputWidth={ '80px' }
+			__unstableInputWidth="80px"
 			units={ units }
 			value={ computedValue }
 		/>
@@ -93,6 +92,8 @@ export default function CoverInspectorControls( {
 	setOverlayColor,
 	coverRef,
 	currentSettings,
+	updateDimRatio,
+	onClearMedia,
 } ) {
 	const {
 		useFeaturedImage,
@@ -110,7 +111,6 @@ export default function CoverInspectorControls( {
 		isImageBackground,
 		mediaElement,
 		url,
-		isImgElement,
 		overlayColor,
 	} = currentSettings;
 
@@ -147,7 +147,7 @@ export default function CoverInspectorControls( {
 			'The <header> element should represent introductory content, typically a group of introductory or navigational aids.'
 		),
 		main: __(
-			'The <main> element should be used for the primary content of your document only. '
+			'The <main> element should be used for the primary content of your document only.'
 		),
 		section: __(
 			"The <section> element should represent a standalone portion of the document that can't be better represented by another element."
@@ -167,7 +167,7 @@ export default function CoverInspectorControls( {
 		<>
 			<InspectorControls>
 				{ !! url && (
-					<PanelBody title={ __( 'Media settings' ) }>
+					<PanelBody title={ __( 'Settings' ) }>
 						{ isImageBackground && (
 							<>
 								<ToggleControl
@@ -188,7 +188,8 @@ export default function CoverInspectorControls( {
 						{ showFocalPointPicker && (
 							<FocalPointPicker
 								__nextHasNoMarginBottom
-								label={ __( 'Focal point picker' ) }
+								__next40pxDefaultSize
+								label={ __( 'Focal point' ) }
 								url={ url }
 								value={ focalPoint }
 								onDragStart={ imperativeFocalPointPreview }
@@ -200,48 +201,40 @@ export default function CoverInspectorControls( {
 								}
 							/>
 						) }
-						{ ! useFeaturedImage &&
-							url &&
-							isImageBackground &&
-							isImgElement && (
-								<TextareaControl
-									__nextHasNoMarginBottom
-									label={ __( 'Alternative text' ) }
-									value={ alt }
-									onChange={ ( newAlt ) =>
-										setAttributes( { alt: newAlt } )
-									}
-									help={
-										<>
-											<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
-												{ __(
-													'Describe the purpose of the image.'
-												) }
-											</ExternalLink>
-											<br />
+						{ ! useFeaturedImage && url && ! isVideoBackground && (
+							<TextareaControl
+								__nextHasNoMarginBottom
+								label={ __( 'Alternative text' ) }
+								value={ alt }
+								onChange={ ( newAlt ) =>
+									setAttributes( { alt: newAlt } )
+								}
+								help={
+									<>
+										<ExternalLink
+											href={
+												// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
+												__(
+													'https://www.w3.org/WAI/tutorials/images/decision-tree/'
+												)
+											}
+										>
 											{ __(
-												'Leave empty if decorative.'
+												'Describe the purpose of the image.'
 											) }
-										</>
-									}
-								/>
-							) }
+										</ExternalLink>
+										<br />
+										{ __( 'Leave empty if decorative.' ) }
+									</>
+								}
+							/>
+						) }
 						<PanelRow>
 							<Button
 								variant="secondary"
-								isSmall
+								size="small"
 								className="block-library-cover__reset-button"
-								onClick={ () =>
-									setAttributes( {
-										url: undefined,
-										id: undefined,
-										backgroundType: undefined,
-										focalPoint: undefined,
-										hasParallax: undefined,
-										isRepeated: undefined,
-										useFeaturedImage: false,
-									} )
-								}
+								onClick={ onClearMedia }
 							>
 								{ __( 'Clear Media' ) }
 							</Button>
@@ -281,9 +274,7 @@ export default function CoverInspectorControls( {
 								: dimRatio !== ( url ? 50 : 100 );
 						} }
 						label={ __( 'Overlay opacity' ) }
-						onDeselect={ () =>
-							setAttributes( { dimRatio: url ? 50 : 100 } )
-						}
+						onDeselect={ () => updateDimRatio( url ? 50 : 100 ) }
 						resetAllFilter={ () => ( {
 							dimRatio: url ? 50 : 100,
 						} ) }
@@ -294,10 +285,8 @@ export default function CoverInspectorControls( {
 							__nextHasNoMarginBottom
 							label={ __( 'Overlay opacity' ) }
 							value={ dimRatio }
-							onChange={ ( newDimRation ) =>
-								setAttributes( {
-									dimRatio: newDimRation,
-								} )
+							onChange={ ( newDimRatio ) =>
+								updateDimRatio( newDimRatio )
 							}
 							min={ 0 }
 							max={ 100 }
@@ -322,14 +311,27 @@ export default function CoverInspectorControls( {
 						minHeight: undefined,
 						minHeightUnit: undefined,
 					} ) }
-					isShownByDefault={ true }
+					isShownByDefault
 					panelId={ clientId }
 				>
 					<CoverHeightInput
-						value={ minHeight }
+						value={
+							attributes?.style?.dimensions?.aspectRatio
+								? ''
+								: minHeight
+						}
 						unit={ minHeightUnit }
 						onChange={ ( newMinHeight ) =>
-							setAttributes( { minHeight: newMinHeight } )
+							setAttributes( {
+								minHeight: newMinHeight,
+								style: cleanEmptyObject( {
+									...attributes?.style,
+									dimensions: {
+										...attributes?.style?.dimensions,
+										aspectRatio: undefined, // Reset aspect ratio when minHeight is set.
+									},
+								} ),
+							} )
 						}
 						onUnitChange={ ( nextUnit ) =>
 							setAttributes( {
@@ -342,6 +344,7 @@ export default function CoverInspectorControls( {
 			<InspectorControls group="advanced">
 				<SelectControl
 					__nextHasNoMarginBottom
+					__next40pxDefaultSize
 					label={ __( 'HTML element' ) }
 					options={ [
 						{ label: __( 'Default (<div>)' ), value: 'div' },

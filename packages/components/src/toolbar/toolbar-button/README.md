@@ -1,6 +1,6 @@
 # ToolbarButton
 
-ToolbarButton can be used to add actions to a toolbar, usually inside a [Toolbar](/packages/components/src/toolbar/README.md) or [ToolbarGroup](/packages/components/src/toolbar-group/README.md) when used to create general interfaces. If you're using it to add controls to your custom block, you should consider using [BlockControls](/docs/how-to-guides/block-tutorial/block-controls-toolbar-and-sidebar.md).
+ToolbarButton can be used to add actions to a toolbar, usually inside a [Toolbar](/packages/components/src/toolbar/README.md) or [ToolbarGroup](/packages/components/src/toolbar-group/README.md) when used to create general interfaces. If you're using it to add controls to your custom block, you should consider using [BlockControls](/docs/getting-started/fundamentals/block-in-the-editor.md).
 
 It has similar features to the [Button](/packages/components/src/button/README.md) component. Using `ToolbarButton` will ensure the correct styling for a button in a toolbar, and also that keyboard interactions in a toolbar are consistent with the [WAI-ARIA toolbar pattern](https://www.w3.org/TR/wai-aria-practices/#toolbar).
 
@@ -27,7 +27,7 @@ function MyToolbar() {
 
 ### Inside BlockControls
 
-If you're working on a custom block and you want to add controls to the block toolbar, you should use [BlockControls](/docs/how-to-guides/block-tutorial/block-controls-toolbar-and-sidebar.md) instead. Optionally wrapping it with [ToolbarGroup](/packages/components/src/toolbar-group/README.md).
+If you're working on a custom block and you want to add controls to the block toolbar, you should use [BlockControls](/docs/getting-started/fundamentals/block-in-the-editor.md) instead. Optionally wrapping it with [ToolbarGroup](/packages/components/src/toolbar-group/README.md).
 
 ```jsx
 import { BlockControls } from '@wordpress/block-editor';

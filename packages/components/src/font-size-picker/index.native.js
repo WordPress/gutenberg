@@ -10,14 +10,14 @@ import { useNavigation } from '@react-navigation/native';
 import { useState } from '@wordpress/element';
 import { Icon, chevronRight, check } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
-import { BottomSheet } from '@wordpress/components';
-import { getPxFromCssUnit } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
+import { default as getPxFromCssUnit } from '../mobile/utils/get-px-from-css-unit';
 import { default as UnitControl, useCustomUnits } from '../unit-control';
 import styles from './style.scss';
+import BottomSheet from '../mobile/bottom-sheet';
 
 const DEFAULT_FONT_SIZE = 16;
 
@@ -59,8 +59,14 @@ function FontSizePicker( {
 	const label = __( 'Font Size' );
 
 	const units = useCustomUnits( {
-		availableUnits: [ 'px', 'em', 'rem' ],
+		availableUnits: [ 'px', 'em', 'rem', 'vw', 'vh' ],
 	} );
+
+	const accessibilityLabel = sprintf(
+		// translators: %1$s: Font size name e.g. Small
+		__( 'Font Size, %1$s' ),
+		selectedOption.name
+	);
 
 	return (
 		<BottomSheet.SubSheet
@@ -79,8 +85,8 @@ function FontSizePicker( {
 							: __( 'Default' )
 					}
 					onPress={ openSubSheet }
-					accessibilityRole={ 'button' }
-					accessibilityLabel={ selectedOption.name }
+					accessibilityRole="button"
+					accessibilityLabel={ accessibilityLabel }
 					accessibilityHint={ sprintf(
 						// translators: %s: Select control button label e.g. Small
 						__( 'Navigates to select %s' ),
@@ -105,9 +111,9 @@ function FontSizePicker( {
 						separatorType="none"
 						label={ __( 'Default' ) }
 						onPress={ onChangeValue( undefined ) }
-						leftAlign={ true }
-						key={ 'default' }
-						accessibilityRole={ 'button' }
+						leftAlign
+						key="default"
+						accessibilityRole="button"
 						accessibilityLabel={ __( 'Selected: Default' ) }
 						accessibilityHint={ __(
 							'Double tap to select default font size'
@@ -131,9 +137,9 @@ function FontSizePicker( {
 								label={ item.name }
 								subLabel={ item.sizePx }
 								onPress={ onChangeValue( item.sizePx ) }
-								leftAlign={ true }
+								leftAlign
 								key={ index }
-								accessibilityRole={ 'button' }
+								accessibilityRole="button"
 								accessibilityLabel={
 									item.sizePx === selectedValue
 										? sprintf(

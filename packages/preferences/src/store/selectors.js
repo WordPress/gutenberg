@@ -1,4 +1,47 @@
 /**
+ * WordPress dependencies
+ */
+import deprecated from '@wordpress/deprecated';
+
+const withDeprecatedKeys = ( originalGet ) => ( state, scope, name ) => {
+	const settingsToMoveToCore = [
+		'allowRightClickOverrides',
+		'distractionFree',
+		'editorMode',
+		'fixedToolbar',
+		'focusMode',
+		'hiddenBlockTypes',
+		'inactivePanels',
+		'keepCaretInsideBlock',
+		'mostUsedBlocks',
+		'openPanels',
+		'showBlockBreadcrumbs',
+		'showIconLabels',
+		'showListViewByDefault',
+		'isPublishSidebarEnabled',
+		'isComplementaryAreaVisible',
+		'pinnedItems',
+	];
+
+	if (
+		settingsToMoveToCore.includes( name ) &&
+		[ 'core/edit-post', 'core/edit-site' ].includes( scope )
+	) {
+		deprecated(
+			`wp.data.select( 'core/preferences' ).get( '${ scope }', '${ name }' )`,
+			{
+				since: '6.5',
+				alternative: `wp.data.select( 'core/preferences' ).get( 'core', '${ name }' )`,
+			}
+		);
+
+		return originalGet( state, 'core', name );
+	}
+
+	return originalGet( state, scope, name );
+};
+
+/**
  * Returns a boolean indicating whether a prefer is active for a particular
  * scope.
  *
@@ -8,7 +51,7 @@
  *
  * @return {*} Is the feature enabled?
  */
-export function get( state, scope, name ) {
+export const get = withDeprecatedKeys( ( state, scope, name ) => {
 	const value = state.preferences[ scope ]?.[ name ];
 	return value !== undefined ? value : state.defaults[ scope ]?.[ name ];
-}
+} );

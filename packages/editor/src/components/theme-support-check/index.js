@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -9,12 +9,23 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { store as editorStore } from '../../store';
 
-export function ThemeSupportCheck( {
-	themeSupports,
-	children,
-	postType,
-	supportKeys,
-} ) {
+/**
+ * Checks if the current theme supports specific features and renders the children if supported.
+ *
+ * @param {Object}          props             The component props.
+ * @param {Element}         props.children    The children to render if the theme supports the specified features.
+ * @param {string|string[]} props.supportKeys The key(s) of the theme support(s) to check.
+ *
+ * @return {JSX.Element|null} The rendered children if the theme supports the specified features, otherwise null.
+ */
+export default function ThemeSupportCheck( { children, supportKeys } ) {
+	const { postType, themeSupports } = useSelect( ( select ) => {
+		return {
+			postType: select( editorStore ).getEditedPostAttribute( 'type' ),
+			themeSupports: select( coreStore ).getThemeSupports(),
+		};
+	}, [] );
+
 	const isSupported = (
 		Array.isArray( supportKeys ) ? supportKeys : [ supportKeys ]
 	).some( ( key ) => {
@@ -35,12 +46,3 @@ export function ThemeSupportCheck( {
 
 	return children;
 }
-
-export default withSelect( ( select ) => {
-	const { getThemeSupports } = select( coreStore );
-	const { getEditedPostAttribute } = select( editorStore );
-	return {
-		postType: getEditedPostAttribute( 'type' ),
-		themeSupports: getThemeSupports(),
-	};
-} )( ThemeSupportCheck );

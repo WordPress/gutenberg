@@ -4,6 +4,19 @@
 	"name": "core/navigation",
 	"title": "Navigation",
 	"category": "theme",
+	"allowedBlocks": [
+		"core/navigation-link",
+		"core/search",
+		"core/social-links",
+		"core/page-list",
+		"core/spacer",
+		"core/home-link",
+		"core/site-title",
+		"core/site-logo",
+		"core/navigation-submenu",
+		"core/loginout",
+		"core/buttons"
+	],
 	"description": "A collection of blocks that allow visitors to get around your site.",
 	"keywords": [ "menu", "navigation", "links" ],
 	"textdomain": "default",
@@ -91,6 +104,7 @@
 	},
 	"supports": {
 		"align": [ "wide", "full" ],
+		"ariaLabel": true,
 		"html": false,
 		"inserter": true,
 		"typography": {
@@ -123,17 +137,9 @@
 				"type": "flex"
 			}
 		},
-		"__experimentalStyle": {
-			"elements": {
-				"link": {
-					"color": {
-						"text": "inherit"
-					}
-				}
-			}
-		}
+		"interactivity": true,
+		"renaming": false
 	},
-	"viewScript": [ "file:./view.min.js", "file:./view-modal.min.js" ],
 	"editorStyle": "wp-block-navigation-editor",
 	"style": "wp-block-navigation"
 }

@@ -61,7 +61,7 @@ describe( 'DownloadableBlockListItem', () => {
 		);
 		const button = screen.getByRole( 'option' );
 		// Keeping it false to avoid focus loss and disable it using aria-disabled.
-		expect( button.disabled ).toBe( false );
+		expect( button ).toBeEnabled();
 		expect( button ).toHaveAttribute( 'aria-disabled', 'true' );
 	} );
 

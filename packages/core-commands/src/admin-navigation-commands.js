@@ -3,7 +3,7 @@
  */
 import { useCommand } from '@wordpress/commands';
 import { __ } from '@wordpress/i18n';
-import { external, plus } from '@wordpress/icons';
+import { plus } from '@wordpress/icons';
 
 export function useAdminNavigationCommands() {
 	useCommand( {
@@ -21,13 +21,5 @@ export function useAdminNavigationCommands() {
 		callback: () => {
 			document.location.href = 'post-new.php?post_type=page';
 		},
-	} );
-	useCommand( {
-		name: 'core/manage-reusable-blocks',
-		label: __( 'Manage all of my patterns' ),
-		callback: () => {
-			document.location.href = 'edit.php?post_type=wp_block';
-		},
-		icon: external,
 	} );
 }

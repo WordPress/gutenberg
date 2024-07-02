@@ -8,22 +8,27 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import DimensionsPanel from './dimensions-panel';
+import BackgroundPanel from './background-panel';
 import ScreenHeader from './header';
-import BlockPreviewPanel from './block-preview-panel';
 import { unlock } from '../../lock-unlock';
 
-const { useHasDimensionsPanel, useGlobalSetting, useSettingsForBlockElement } =
-	unlock( blockEditorPrivateApis );
+const {
+	useHasBackgroundPanel,
+	useHasDimensionsPanel,
+	useGlobalSetting,
+	useSettingsForBlockElement,
+} = unlock( blockEditorPrivateApis );
 
 function ScreenLayout() {
 	const [ rawSettings ] = useGlobalSetting( '' );
 	const settings = useSettingsForBlockElement( rawSettings );
 	const hasDimensionsPanel = useHasDimensionsPanel( settings );
+	const hasBackgroundPanel = useHasBackgroundPanel( settings );
 	return (
 		<>
 			<ScreenHeader title={ __( 'Layout' ) } />
-			<BlockPreviewPanel />
 			{ hasDimensionsPanel && <DimensionsPanel /> }
+			{ hasBackgroundPanel && <BackgroundPanel /> }
 		</>
 	);
 }

@@ -3,7 +3,7 @@
  */
 import { isEmpty, isPhrasingContent } from '@wordpress/dom';
 
-export default function normaliseBlocks( HTML ) {
+export default function normaliseBlocks( HTML, options = {} ) {
 	const decuDoc = document.implementation.createHTMLDocument( '' );
 	const accuDoc = document.implementation.createHTMLDocument( '' );
 
@@ -47,7 +47,7 @@ export default function normaliseBlocks( HTML ) {
 				}
 			} else if ( node.nodeName === 'P' ) {
 				// Only append non-empty paragraph nodes.
-				if ( isEmpty( node ) ) {
+				if ( isEmpty( node ) && ! options.raw ) {
 					decu.removeChild( node );
 				} else {
 					accu.appendChild( node );

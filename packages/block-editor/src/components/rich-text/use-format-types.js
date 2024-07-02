@@ -29,7 +29,9 @@ const interactiveContentTags = new Set( [
 ] );
 
 function prefixSelectKeys( selected, prefix ) {
-	if ( typeof selected !== 'object' ) return { [ prefix ]: selected };
+	if ( typeof selected !== 'object' ) {
+		return { [ prefix ]: selected };
+	}
 	return Object.fromEntries(
 		Object.entries( selected ).map( ( [ key, value ] ) => [
 			`${ prefix }.${ key }`,
@@ -39,7 +41,9 @@ function prefixSelectKeys( selected, prefix ) {
 }
 
 function getPrefixedSelectKeys( selected, prefix ) {
-	if ( selected[ prefix ] ) return selected[ prefix ];
+	if ( selected[ prefix ] ) {
+		return selected[ prefix ];
+	}
 	return Object.keys( selected )
 		.filter( ( key ) => key.startsWith( prefix + '.' ) )
 		.reduce( ( accumulator, key ) => {
@@ -66,21 +70,21 @@ export function useFormatTypes( {
 } ) {
 	const allFormatTypes = useSelect( formatTypesSelector, [] );
 	const formatTypes = useMemo( () => {
-		return allFormatTypes.filter( ( { name, tagName } ) => {
+		return allFormatTypes.filter( ( { name, interactive, tagName } ) => {
 			if ( allowedFormats && ! allowedFormats.includes( name ) ) {
 				return false;
 			}
 
 			if (
 				withoutInteractiveFormatting &&
-				interactiveContentTags.has( tagName )
+				( interactive || interactiveContentTags.has( tagName ) )
 			) {
 				return false;
 			}
 
 			return true;
 		} );
-	}, [ allFormatTypes, allowedFormats, interactiveContentTags ] );
+	}, [ allFormatTypes, allowedFormats, withoutInteractiveFormatting ] );
 	const keyedSelected = useSelect(
 		( select ) =>
 			formatTypes.reduce( ( accumulator, type ) => {

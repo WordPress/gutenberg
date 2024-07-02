@@ -23,11 +23,13 @@ if ( ! function_exists( 'emptyhybrid_support' ) ) :
 	add_action( 'after_setup_theme', 'emptyhybrid_support' );
 endif;
 
-/**
- * Enqueue scripts and styles.
- */
-function emptyhybrid_scripts() {
-	// Enqueue theme stylesheet.
-	wp_enqueue_style( 'emptyhybrid-style', get_template_directory_uri() . '/style.css', array(), wp_get_theme()->get( 'Version' ) );
-}
-add_action( 'wp_enqueue_scripts', 'emptyhybrid_scripts' );
+if ( ! function_exists( 'emptyhybrid_scripts' ) ) :
+	/**
+	 * Enqueue scripts and styles.
+	 */
+	function emptyhybrid_scripts() {
+		// Enqueue theme stylesheet.
+		wp_enqueue_style( 'emptyhybrid-style', get_template_directory_uri() . '/style.css', array(), wp_get_theme()->get( 'Version' ) );
+	}
+	add_action( 'wp_enqueue_scripts', 'emptyhybrid_scripts' );
+endif;

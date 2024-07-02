@@ -29,6 +29,9 @@
 			"default": "_self"
 		}
 	},
+	"example": {
+		"viewportWidth": 350
+	},
 	"supports": {
 		"align": [ "wide", "full" ],
 		"html": false,
@@ -55,10 +58,11 @@
 			"__experimentalTextDecoration": true,
 			"__experimentalLetterSpacing": true,
 			"__experimentalDefaultControls": {
-				"fontSize": true,
-				"fontAppearance": true,
-				"textTransform": true
+				"fontSize": true
 			}
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	},
 	"style": "wp-block-post-title"

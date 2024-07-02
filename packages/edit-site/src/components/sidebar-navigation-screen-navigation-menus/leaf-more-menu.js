@@ -18,10 +18,6 @@ const POPOVER_PROPS = {
 /**
  * Internal dependencies
  */
-import {
-	isPreviewingTheme,
-	currentlyPreviewingTheme,
-} from '../../utils/is-previewing-theme';
 import { unlock } from '../../lock-unlock';
 
 const { useHistory } = unlock( routerPrivateApis );
@@ -63,22 +59,30 @@ export default function LeafMoreMenu( props ) {
 				attributes.type &&
 				history
 			) {
-				history.push( {
-					postType: attributes.type,
-					postId: attributes.id,
-					...( isPreviewingTheme() && {
-						wp_theme_preview: currentlyPreviewingTheme(),
-					} ),
-				} );
+				const { params } = history.getLocationWithParams();
+				history.push(
+					{
+						postType: attributes.type,
+						postId: attributes.id,
+						canvas: 'edit',
+					},
+					{
+						backPath: params,
+					}
+				);
 			}
 			if ( name === 'core/page-list-item' && attributes.id && history ) {
-				history.push( {
-					postType: 'page',
-					postId: attributes.id,
-					...( isPreviewingTheme() && {
-						wp_theme_preview: currentlyPreviewingTheme(),
-					} ),
-				} );
+				const { params } = history.getLocationWithParams();
+				history.push(
+					{
+						postType: 'page',
+						postId: attributes.id,
+						canvas: 'edit',
+					},
+					{
+						backPath: params,
+					}
+				);
 			}
 		},
 		[ history ]
@@ -114,16 +118,17 @@ export default function LeafMoreMenu( props ) {
 						>
 							{ __( 'Move down' ) }
 						</MenuItem>
-						{ block.attributes?.id && (
-							<MenuItem
-								onClick={ () => {
-									onGoToPage( block );
-									onClose();
-								} }
-							>
-								{ goToLabel }
-							</MenuItem>
-						) }
+						{ block.attributes?.type === 'page' &&
+							block.attributes?.id && (
+								<MenuItem
+									onClick={ () => {
+										onGoToPage( block );
+										onClose();
+									} }
+								>
+									{ goToLabel }
+								</MenuItem>
+							) }
 					</MenuGroup>
 					<MenuGroup>
 						<MenuItem

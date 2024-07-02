@@ -43,10 +43,6 @@
 			"type": "object",
 			"default": {}
 		},
-		"buttonBehavior": {
-			"type": "string",
-			"default": "expand-searchfield"
-		},
 		"isSearchFieldHidden": {
 			"type": "boolean",
 			"default": false
@@ -62,6 +58,7 @@
 				"text": true
 			}
 		},
+		"interactivity": true,
 		"typography": {
 			"__experimentalSkipSerialization": true,
 			"__experimentalSelector": ".wp-block-search__label, .wp-block-search__input, .wp-block-search__button",

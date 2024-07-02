@@ -3,6 +3,7 @@
  */
 import { __unstableGetInnerBlocksProps as getInnerBlocksProps } from '@wordpress/blocks';
 import { useRef } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -21,6 +22,9 @@ import { useBlockEditContext } from '../block-edit/context';
 import useBlockSync from '../provider/use-block-sync';
 import { BlockContextProvider } from '../block-context';
 import { defaultLayout, LayoutProvider } from '../block-list/layout';
+import { store as blockEditorStore } from '../../store';
+import WarningMaxDepthExceeded from './warning-max-depth-exceeded';
+import { MAX_NESTING_DEPTH } from './constants';
 
 /**
  * This hook is used to lightly mark an element as an inner blocks wrapper
@@ -101,8 +105,21 @@ function UncontrolledInnerBlocks( props ) {
 
 	const context = useBlockContext( clientId );
 
+	const { nestingLevel, parentLock } = useSelect(
+		( select ) => {
+			const { getBlockParents, getTemplateLock, getBlockRootClientId } =
+				select( blockEditorStore );
+			return {
+				nestingLevel: getBlockParents( clientId )?.length,
+				parentLock: getTemplateLock( getBlockRootClientId( clientId ) ),
+			};
+		},
+		[ clientId ]
+	);
+
 	useNestedSettingsUpdate(
 		clientId,
+		parentLock,
 		allowedBlocks,
 		prioritizedInserterBlocks,
 		defaultBlock,
@@ -121,6 +138,10 @@ function UncontrolledInnerBlocks( props ) {
 		templateLock,
 		templateInsertUpdatesSelection
 	);
+
+	if ( nestingLevel >= MAX_NESTING_DEPTH ) {
+		return <WarningMaxDepthExceeded clientId={ clientId } />;
+	}
 
 	return (
 		<LayoutProvider value={ layout }>

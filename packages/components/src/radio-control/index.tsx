@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 import type { ChangeEvent } from 'react';
 
 /**
@@ -13,7 +13,7 @@ import { useInstanceId } from '@wordpress/compose';
  * Internal dependencies
  */
 import BaseControl from '../base-control';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import type { RadioControlProps } from './types';
 import { VStack } from '../v-stack';
 
@@ -71,9 +71,9 @@ export function RadioControl(
 			id={ id }
 			hideLabelFromVision={ hideLabelFromVision }
 			help={ help }
-			className={ classnames( className, 'components-radio-control' ) }
+			className={ clsx( className, 'components-radio-control' ) }
 		>
-			<VStack spacing={ 1 }>
+			<VStack spacing={ 3 }>
 				{ options.map( ( option, index ) => (
 					<div
 						key={ `${ id }-${ index }` }
@@ -92,7 +92,10 @@ export function RadioControl(
 							}
 							{ ...additionalProps }
 						/>
-						<label htmlFor={ `${ id }-${ index }` }>
+						<label
+							className="components-radio-control__label"
+							htmlFor={ `${ id }-${ index }` }
+						>
 							{ option.label }
 						</label>
 					</div>

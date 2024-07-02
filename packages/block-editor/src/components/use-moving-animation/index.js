@@ -1,35 +1,32 @@
 /**
  * External dependencies
  */
-import { useSpring } from '@react-spring/web';
+import { Controller } from '@react-spring/web';
 
 /**
  * WordPress dependencies
  */
-import {
-	useState,
-	useLayoutEffect,
-	useReducer,
-	useMemo,
-	useRef,
-} from '@wordpress/element';
-import { useReducedMotion } from '@wordpress/compose';
+import { useLayoutEffect, useMemo, useRef } from '@wordpress/element';
 import { getScrollContainer } from '@wordpress/dom';
+import { useSelect } from '@wordpress/data';
 
 /**
- * Simple reducer used to increment a counter.
- *
- * @param {number} state Previous counter value.
- * @return {number} New state value.
+ * Internal dependencies
  */
-const counterReducer = ( state ) => state + 1;
+import { store as blockEditorStore } from '../../store';
 
-const getAbsolutePosition = ( element ) => {
+/**
+ * If the block count exceeds the threshold, we disable the reordering animation
+ * to avoid laginess.
+ */
+const BLOCK_ANIMATION_THRESHOLD = 200;
+
+function getAbsolutePosition( element ) {
 	return {
 		top: element.offsetTop,
 		left: element.offsetLeft,
 	};
-};
+}
 
 /**
  * Hook used to compute the styles required to move a div into a new position.
@@ -42,114 +39,122 @@ const getAbsolutePosition = ( element ) => {
  *  - It uses the "resetAnimation" flag to reset the animation
  *    from the beginning in order to animate to the new destination point.
  *
- * @param {Object}  $1                          Options
- * @param {boolean} $1.isSelected               Whether it's the current block or not.
- * @param {boolean} $1.adjustScrolling          Adjust the scroll position to the current block.
- * @param {boolean} $1.enableAnimation          Enable/Disable animation.
- * @param {*}       $1.triggerAnimationOnChange Variable used to trigger the animation if it changes.
+ * @param {Object} $1                          Options
+ * @param {*}      $1.triggerAnimationOnChange Variable used to trigger the animation if it changes.
+ * @param {string} $1.clientId
  */
-function useMovingAnimation( {
-	isSelected,
-	adjustScrolling,
-	enableAnimation,
-	triggerAnimationOnChange,
-} ) {
+function useMovingAnimation( { triggerAnimationOnChange, clientId } ) {
 	const ref = useRef();
-	const prefersReducedMotion = useReducedMotion() || ! enableAnimation;
-	const [ triggeredAnimation, triggerAnimation ] = useReducer(
-		counterReducer,
-		0
-	);
-	const [ finishedAnimation, endAnimation ] = useReducer( counterReducer, 0 );
-	const [ transform, setTransform ] = useState( { x: 0, y: 0 } );
-	const previous = useMemo(
-		() => ( ref.current ? getAbsolutePosition( ref.current ) : null ),
+	const {
+		isTyping,
+		getGlobalBlockCount,
+		isBlockSelected,
+		isFirstMultiSelectedBlock,
+		isBlockMultiSelected,
+		isAncestorMultiSelected,
+	} = useSelect( blockEditorStore );
+
+	// Whenever the trigger changes, we need to take a snapshot of the current
+	// position of the block to use it as a destination point for the animation.
+	const { previous, prevRect } = useMemo(
+		() => ( {
+			previous: ref.current && getAbsolutePosition( ref.current ),
+			prevRect: ref.current && ref.current.getBoundingClientRect(),
+		} ),
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[ triggerAnimationOnChange ]
 	);
 
-	// Calculate the previous position of the block relative to the viewport and
-	// return a function to maintain that position by scrolling.
-	const preserveScrollPosition = useMemo( () => {
-		if ( ! adjustScrolling || ! ref.current ) {
-			return () => {};
+	useLayoutEffect( () => {
+		if ( ! previous || ! ref.current ) {
+			return;
 		}
 
 		const scrollContainer = getScrollContainer( ref.current );
+		const isSelected = isBlockSelected( clientId );
+		const adjustScrolling =
+			isSelected || isFirstMultiSelectedBlock( clientId );
 
-		if ( ! scrollContainer ) {
-			return () => {};
-		}
+		function preserveScrollPosition() {
+			if ( adjustScrolling && prevRect ) {
+				const blockRect = ref.current.getBoundingClientRect();
+				const diff = blockRect.top - prevRect.top;
 
-		const prevRect = ref.current.getBoundingClientRect();
-		return () => {
-			const blockRect = ref.current.getBoundingClientRect();
-			const diff = blockRect.top - prevRect.top;
-
-			if ( diff ) {
-				scrollContainer.scrollTop += diff;
+				if ( diff ) {
+					scrollContainer.scrollTop += diff;
+				}
 			}
-		};
-	}, [ triggerAnimationOnChange, adjustScrolling ] );
-
-	useLayoutEffect( () => {
-		if ( triggeredAnimation ) {
-			endAnimation();
-		}
-	}, [ triggeredAnimation ] );
-	useLayoutEffect( () => {
-		if ( ! previous ) {
-			return;
 		}
 
-		if ( prefersReducedMotion ) {
+		// We disable the animation if the user has a preference for reduced
+		// motion, if the user is typing (insertion by Enter), or if the block
+		// count exceeds the threshold (insertion caused all the blocks that
+		// follow to animate).
+		// To do: consider enableing the _moving_ animation even for large
+		// posts, while only disabling the _insertion_ animation?
+		const disableAnimation =
+			window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches ||
+			isTyping() ||
+			getGlobalBlockCount() > BLOCK_ANIMATION_THRESHOLD;
+
+		if ( disableAnimation ) {
 			// If the animation is disabled and the scroll needs to be adjusted,
 			// just move directly to the final scroll position.
 			preserveScrollPosition();
-
 			return;
 		}
+
+		const isPartOfSelection =
+			isSelected ||
+			isBlockMultiSelected( clientId ) ||
+			isAncestorMultiSelected( clientId );
+		// Make sure the other blocks move under the selected block(s).
+		const zIndex = isPartOfSelection ? '1' : '';
+
+		const controller = new Controller( {
+			x: 0,
+			y: 0,
+			config: { mass: 5, tension: 2000, friction: 200 },
+			onChange( { value } ) {
+				if ( ! ref.current ) {
+					return;
+				}
+				let { x, y } = value;
+				x = Math.round( x );
+				y = Math.round( y );
+				const finishedMoving = x === 0 && y === 0;
+				ref.current.style.transformOrigin = 'center center';
+				ref.current.style.transform = finishedMoving
+					? null // Set to `null` to explicitly remove the transform.
+					: `translate3d(${ x }px,${ y }px,0)`;
+				ref.current.style.zIndex = zIndex;
+				preserveScrollPosition();
+			},
+		} );
 
 		ref.current.style.transform = undefined;
 		const destination = getAbsolutePosition( ref.current );
 
-		triggerAnimation();
-		setTransform( {
-			x: Math.round( previous.left - destination.left ),
-			y: Math.round( previous.top - destination.top ),
-		} );
-	}, [ triggerAnimationOnChange ] );
+		const x = Math.round( previous.left - destination.left );
+		const y = Math.round( previous.top - destination.top );
 
-	function onChange( { value } ) {
-		if ( ! ref.current ) {
-			return;
-		}
-		let { x, y } = value;
-		x = Math.round( x );
-		y = Math.round( y );
-		const finishedMoving = x === 0 && y === 0;
-		ref.current.style.transformOrigin = 'center center';
-		ref.current.style.transform = finishedMoving
-			? undefined
-			: `translate3d(${ x }px,${ y }px,0)`;
-		ref.current.style.zIndex = isSelected ? '1' : '';
+		controller.start( { x: 0, y: 0, from: { x, y } } );
 
-		preserveScrollPosition();
-	}
-
-	useSpring( {
-		from: {
-			x: transform.x,
-			y: transform.y,
-		},
-		to: {
-			x: 0,
-			y: 0,
-		},
-		reset: triggeredAnimation !== finishedAnimation,
-		config: { mass: 5, tension: 2000, friction: 200 },
-		immediate: prefersReducedMotion,
-		onChange,
-	} );
+		return () => {
+			controller.stop();
+			controller.set( { x: 0, y: 0 } );
+		};
+	}, [
+		previous,
+		prevRect,
+		clientId,
+		isTyping,
+		getGlobalBlockCount,
+		isBlockSelected,
+		isFirstMultiSelectedBlock,
+		isBlockMultiSelected,
+		isAncestorMultiSelected,
+	] );
 
 	return ref;
 }

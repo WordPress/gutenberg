@@ -90,7 +90,6 @@ const EmbedLinkSettings = ( {
 			onDismiss={ onDismiss }
 			setAttributes={ onSetAttributes }
 			options={ linkSettingsOptions }
-			testID="embed-edit-url-modal"
 			withBottomSheet={ withBottomSheet }
 			showIcon
 		/>

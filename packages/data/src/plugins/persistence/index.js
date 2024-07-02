@@ -21,7 +21,6 @@ import { combineReducers } from '../../';
  *                                at least implement `getItem` and `setItem` of
  *                                the Web Storage API.
  * @property {string}  storageKey Key on which to set in persistent storage.
- *
  */
 
 /**

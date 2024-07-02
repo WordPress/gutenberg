@@ -44,10 +44,10 @@ import {
 	MEDIA_TYPE_IMAGE,
 	BlockControls,
 	InspectorControls,
-	BlockAlignmentToolbar,
 	BlockStyles,
 	store as blockEditorStore,
 	blockSettingsScreens,
+	RichText,
 } from '@wordpress/block-editor';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { getProtocol, hasQueryArg, isURL } from '@wordpress/url';
@@ -212,7 +212,6 @@ export class ImageEdit extends Component {
 		this.onSetFeatured = this.onSetFeatured.bind( this );
 		this.onFocusCaption = this.onFocusCaption.bind( this );
 		this.onSelectURL = this.onSelectURL.bind( this );
-		this.updateAlignment = this.updateAlignment.bind( this );
 		this.accessibilityLabelCreator =
 			this.accessibilityLabelCreator.bind( this );
 		this.setMappedAttributes = this.setMappedAttributes.bind( this );
@@ -305,6 +304,20 @@ export class ImageEdit extends Component {
 			this.replacedFeaturedImage = false;
 			setFeaturedImage( id );
 		}
+
+		const { align } = attributes;
+		const { __unstableMarkNextChangeAsNotPersistent } = this.props;
+
+		// Update the attributes if the align is wide or full
+		if ( [ 'wide', 'full' ].includes( align ) ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( {
+				width: undefined,
+				height: undefined,
+				aspectRatio: undefined,
+				scale: undefined,
+			} );
+		}
 	}
 
 	static getDerivedStateFromProps( props, state ) {
@@ -317,9 +330,7 @@ export class ImageEdit extends Component {
 
 	accessibilityLabelCreator( caption ) {
 		// Checks if caption is empty.
-		return ( typeof caption === 'string' && caption.trim().length === 0 ) ||
-			caption === undefined ||
-			caption === null
+		return RichText.isEmpty( caption )
 			? /* translators: accessibility text. Empty image caption. */
 			  'Image caption. Empty'
 			: sprintf(
@@ -388,18 +399,6 @@ export class ImageEdit extends Component {
 			url,
 			width: undefined,
 			height: undefined,
-		} );
-	}
-
-	updateAlignment( nextAlign ) {
-		const extraUpdatedAttributes = Object.values(
-			WIDE_ALIGNMENTS.alignments
-		).includes( nextAlign )
-			? { width: undefined, height: undefined }
-			: {};
-		this.props.setAttributes( {
-			...extraUpdatedAttributes,
-			align: nextAlign,
 		} );
 	}
 
@@ -582,7 +581,10 @@ export class ImageEdit extends Component {
 						) }{ ' ' }
 						<FooterMessageLink
 							href={
-								'https://www.w3.org/WAI/tutorials/images/decision-tree/'
+								// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
+								__(
+									'https://www.w3.org/WAI/tutorials/images/decision-tree/'
+								)
 							}
 							value={ __( 'What is alt text?' ) }
 						/>
@@ -618,7 +620,7 @@ export class ImageEdit extends Component {
 					styles.removeFeaturedButton,
 				] }
 				cellContainerStyle={ styles.setFeaturedButtonCellContainer }
-				separatorType={ 'none' }
+				separatorType="none"
 				onPress={ () =>
 					this.onSetFeatured( MEDIA_ID_NO_FEATURED_IMAGE_SET )
 				}
@@ -630,7 +632,7 @@ export class ImageEdit extends Component {
 				label={ __( 'Set as Featured Image' ) }
 				labelStyle={ setFeaturedButtonStyle }
 				cellContainerStyle={ styles.setFeaturedButtonCellContainer }
-				separatorType={ 'none' }
+				separatorType="none"
 				onPress={ () => this.onSetFeatured( attributes.id ) }
 			/>
 		);
@@ -711,10 +713,6 @@ export class ImageEdit extends Component {
 						onClick={ open }
 					/>
 				</ToolbarGroup>
-				<BlockAlignmentToolbar
-					value={ align }
-					onChange={ this.updateAlignment }
-				/>
 			</BlockControls>
 		);
 
@@ -817,6 +815,7 @@ export class ImageEdit extends Component {
 						{ ! this.state.isCaptionSelected &&
 							getToolbarEditButton( openMediaOptions ) }
 						<MediaUploadProgress
+							enablePausedUploads
 							coverUrl={ url }
 							mediaId={ id }
 							onUpdateMediaProgress={ this.updateMediaProgress }
@@ -830,6 +829,7 @@ export class ImageEdit extends Component {
 								this.mediaUploadStateReset
 							}
 							renderContent={ ( {
+								isUploadPaused,
 								isUploadInProgress,
 								isUploadFailed,
 								retryMessage,
@@ -848,6 +848,7 @@ export class ImageEdit extends Component {
 												! isCaptionSelected
 											}
 											isUploadFailed={ isUploadFailed }
+											isUploadPaused={ isUploadPaused }
 											isUploadInProgress={
 												isUploadInProgress
 											}
@@ -891,7 +892,7 @@ export class ImageEdit extends Component {
 		return (
 			<MediaUpload
 				allowedTypes={ [ MEDIA_TYPE_IMAGE ] }
-				isReplacingMedia={ true }
+				isReplacingMedia
 				onSelect={ this.onSelectMediaUploadOption }
 				onSelectURL={ this.onSelectURL }
 				render={ ( { open, getMediaOptions } ) => {
@@ -941,8 +942,11 @@ export default compose( [
 	} ),
 	withDispatch( ( dispatch ) => {
 		const { createErrorNotice } = dispatch( noticesStore );
+		const { __unstableMarkNextChangeAsNotPersistent } =
+			dispatch( blockEditorStore );
 
 		return {
+			__unstableMarkNextChangeAsNotPersistent,
 			createErrorNotice,
 			closeSettingsBottomSheet() {
 				dispatch( editPostStore ).closeGeneralSidebar();

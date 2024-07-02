@@ -4,12 +4,6 @@ Buttons let users take actions and make choices with a single click or tap.
 
 ![Button components](https://make.wordpress.org/design/files/2019/03/button.png)
 
-## Table of contents
-
-1. [Design guidelines](#design-guidelines)
-2. [Development guidelines](#development-guidelines)
-3. [Related components](#related-components)
-
 ## Design guidelines
 
 ### Usage
@@ -141,13 +135,7 @@ An accessible description for the button.
 
 #### `disabled`: `boolean`
 
-Whether the button is disabled. If `true`, this will force a `button` element to be rendered.
-
--   Required: No
-
-#### `focus`: `boolean`
-
-Whether the button is focused.
+Whether the button is disabled. If `true`, this will force a `button` element to be rendered, even when an `href` is given.
 
 -   Required: No
 
@@ -188,11 +176,37 @@ Renders a red text-based button style to indicate destructive behavior.
 
 -   Required: No
 
+#### `isLink`: `boolean`
+
+Deprecated: Renders a button with an anchor style.
+Use `variant` prop with `link` value instead.
+
+-   Required: No
+-   Default: `false`
+
 #### `isPressed`: `boolean`
 
 Renders a pressed button style.
 
+If the native `aria-pressed` attribute is also set, it will take precedence.
+
 -   Required: No
+
+#### `isPrimary`: `boolean`
+
+Deprecated: Renders a primary button style.
+Use `variant` prop with `primary` value instead.
+
+-   Required: No
+-   Default: `false`
+
+#### `isSecondary`: `boolean`
+
+Deprecated: Renders a default button style.
+Use `variant` prop with `secondary` value instead.
+
+-   Required: No
+-   Default: `false`
 
 #### `isSmall`: `boolean`
 
@@ -201,6 +215,14 @@ Decreases the size of the button.
 Deprecated in favor of the `size` prop. If both props are defined, the `size` prop will take precedence.
 
 -   Required: No
+
+#### `isTertiary`: `boolean`
+
+Deprecated: Renders a text-based button style.
+Use `variant` prop with `tertiary` value instead.
+
+-   Required: No
+-   Default: `false`
 
 #### `label`: `string`
 

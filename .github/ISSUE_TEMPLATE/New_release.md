@@ -1,6 +1,7 @@
 ---
 name: Gutenberg Release
 about: A checklist for the Gutenberg plugin release process
+labels: Gutenberg Plugin, [Type] Project Management
 ---
 
 This issue is to provide visibility on the progress of the release process of Gutenberg VERSION_NUMBER and to centralize any conversations about it. The ultimate goal of this issue is to keep the reference of the steps, resources, work, and conversations about this release so it can be helpful for the next contributors releasing a new Gutenberg version.
@@ -22,7 +23,6 @@ This issue is to provide visibility on the progress of the release process of Gu
 
 ### RC Day - {Weekday, Month, Date}
 
--   [ ] _Optional:_ Attend `#core-editor` meeting (14:00UTC)
 -   [ ] Post a message in `#core-editor` channel to let folks know you are starting the RC release process
 -   [ ] Organize and Label PRs on the relevant milestone
 -   [ ] Start the release process by triggering the `rc` [workflow](https://developer.wordpress.org/block-editor/contributors/code/release/#running-workflow)

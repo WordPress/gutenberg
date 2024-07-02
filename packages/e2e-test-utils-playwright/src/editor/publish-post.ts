@@ -10,11 +10,21 @@ import type { Editor } from './index';
  * @param this
  */
 export async function publishPost( this: Editor ) {
-	await this.page.click( 'role=button[name="Publish"i]' );
-	const entitiesSaveButton = this.page.locator(
-		'role=region[name="Editor publish"i] >> role=button[name="Save"i]'
-	);
+	// If we have changes in other entities, the label is `Save` instead of `Publish`.
+	const saveButton = this.page
+		.getByRole( 'region', { name: 'Editor top bar' } )
+		.getByRole( 'button', { name: 'Save', exact: true } );
+	const publishButton = this.page
+		.getByRole( 'region', { name: 'Editor top bar' } )
+		.getByRole( 'button', { name: 'Publish', exact: true } );
+	const buttonToClick = ( await saveButton.isVisible() )
+		? saveButton
+		: publishButton;
+	await buttonToClick.click();
 
+	const entitiesSaveButton = this.page
+		.getByRole( 'region', { name: 'Editor publish' } )
+		.getByRole( 'button', { name: 'Save', exact: true } );
 	const isEntitiesSavePanelVisible = await entitiesSaveButton.isVisible();
 
 	// Save any entities.
@@ -28,12 +38,11 @@ export async function publishPost( this: Editor ) {
 		'role=region[name="Editor publish"i] >> role=button[name="Publish"i]'
 	);
 
-	const urlString = await this.page
-		.getByRole( 'region', { name: 'Editor publish' } )
-		.getByRole( 'textbox', { name: 'address' } )
-		.inputValue();
-	const url = new URL( urlString );
-	const postId = url.searchParams.get( 'p' );
+	await this.page
+		.getByRole( 'button', { name: 'Dismiss this notice' } )
+		.filter( { hasText: 'published' } )
+		.waitFor();
+	const postId = new URL( this.page.url() ).searchParams.get( 'post' );
 
 	return typeof postId === 'string' ? parseInt( postId, 10 ) : null;
 }

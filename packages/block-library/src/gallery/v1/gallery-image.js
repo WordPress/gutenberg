@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -192,7 +192,7 @@ class GalleryImage extends Component {
 			/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
 		);
 
-		const className = classnames( {
+		const className = clsx( {
 			'is-selected': isSelected,
 			'is-transient': isBlobURL( url ),
 		} );
@@ -222,6 +222,8 @@ class GalleryImage extends Component {
 						onClick={ isFirstItem ? undefined : onMoveBackward }
 						label={ __( 'Move image backward' ) }
 						aria-disabled={ isFirstItem }
+						// Disable reason: Truly disable when image is not selected.
+						// eslint-disable-next-line no-restricted-syntax
 						disabled={ ! isSelected }
 					/>
 					<Button
@@ -229,6 +231,8 @@ class GalleryImage extends Component {
 						onClick={ isLastItem ? undefined : onMoveForward }
 						label={ __( 'Move image forward' ) }
 						aria-disabled={ isLastItem }
+						// Disable reason: Truly disable when image is not selected.
+						// eslint-disable-next-line no-restricted-syntax
 						disabled={ ! isSelected }
 					/>
 				</ButtonGroup>
@@ -237,12 +241,16 @@ class GalleryImage extends Component {
 						icon={ edit }
 						onClick={ this.onEdit }
 						label={ __( 'Replace image' ) }
+						// Disable reason: Truly disable when image is not selected.
+						// eslint-disable-next-line no-restricted-syntax
 						disabled={ ! isSelected }
 					/>
 					<Button
 						icon={ closeSmall }
 						onClick={ onRemove }
 						label={ __( 'Remove image' ) }
+						// Disable reason: Truly disable when image is not selected.
+						// eslint-disable-next-line no-restricted-syntax
 						disabled={ ! isSelected }
 					/>
 				</ButtonGroup>

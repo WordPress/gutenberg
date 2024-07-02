@@ -2,15 +2,18 @@
  * External dependencies
  */
 import {
+	act,
 	addBlock,
+	dismissModal,
 	fireEvent,
+	getBlock,
 	getEditorHtml,
 	initializeEditor,
+	openBlockActionsMenu,
 	openBlockSettings,
-	within,
-	getBlock,
-	dismissModal,
+	screen,
 	waitForModalVisible,
+	within,
 } from 'test/helpers';
 
 /**
@@ -42,7 +45,7 @@ afterAll( () => {
 
 describe( 'Columns block', () => {
 	it( 'inserts block', async () => {
-		const screen = await initializeEditor();
+		await initializeEditor();
 
 		// Add block
 		await addBlock( screen, 'Columns' );
@@ -54,7 +57,7 @@ describe( 'Columns block', () => {
 	} );
 
 	it( 'adds a column block using the appender', async () => {
-		const screen = await initializeEditor( {
+		await initializeEditor( {
 			initialHtml: TWO_COLUMNS_BLOCK_HTML,
 		} );
 
@@ -72,7 +75,7 @@ describe( 'Columns block', () => {
 
 	describe( 'when using the number of columns setting', () => {
 		it( 'adds a column block when incrementing the value', async () => {
-			const screen = await initializeEditor( {
+			await initializeEditor( {
 				initialHtml: TWO_COLUMNS_BLOCK_HTML,
 			} );
 			const { getByLabelText } = screen;
@@ -94,7 +97,7 @@ describe( 'Columns block', () => {
 		} );
 
 		it( 'adds at least 15 Column blocks without limitation', async () => {
-			const screen = await initializeEditor( {
+			await initializeEditor( {
 				initialHtml: TWO_COLUMNS_BLOCK_HTML,
 			} );
 			const { getByLabelText } = screen;
@@ -119,7 +122,7 @@ describe( 'Columns block', () => {
 		} );
 
 		it( 'removes a column block when decrementing the value', async () => {
-			const screen = await initializeEditor( {
+			await initializeEditor( {
 				initialHtml: TWO_COLUMNS_BLOCK_HTML,
 			} );
 			const { getByLabelText } = screen;
@@ -141,7 +144,7 @@ describe( 'Columns block', () => {
 		} );
 
 		it( 'reaches the minimum limit of number of column blocks', async () => {
-			const screen = await initializeEditor();
+			await initializeEditor();
 
 			// Add block
 			await addBlock( screen, 'Columns' );
@@ -184,7 +187,7 @@ describe( 'Columns block', () => {
 	} );
 
 	it( 'removes column with the remove button', async () => {
-		const screen = await initializeEditor( {
+		await initializeEditor( {
 			initialHtml: TWO_COLUMNS_BLOCK_HTML,
 		} );
 		const { getByLabelText } = screen;
@@ -209,7 +212,7 @@ describe( 'Columns block', () => {
 	} );
 
 	it( 'removes the only one left Column with the remove button', async () => {
-		const screen = await initializeEditor( {
+		await initializeEditor( {
 			initialHtml: TWO_COLUMNS_BLOCK_HTML,
 		} );
 		const { getByLabelText } = screen;
@@ -246,7 +249,7 @@ describe( 'Columns block', () => {
 	} );
 
 	it( 'changes vertical alignment on Columns', async () => {
-		const screen = await initializeEditor( {
+		await initializeEditor( {
 			initialHtml: TWO_COLUMNS_BLOCK_HTML,
 		} );
 		const { getByLabelText } = screen;
@@ -269,7 +272,7 @@ describe( 'Columns block', () => {
 	} );
 
 	it( 'changes the vertical alignment on individual Column', async () => {
-		const screen = await initializeEditor( {
+		await initializeEditor( {
 			initialHtml: TWO_COLUMNS_BLOCK_HTML,
 		} );
 
@@ -290,6 +293,10 @@ describe( 'Columns block', () => {
 		// Get the first column
 		const firstColumnBlock = await getBlock( screen, 'Column' );
 		fireEvent.press( firstColumnBlock );
+		// Inner blocks batch store updates with microtasks.
+		// To avoid `act` warnings, we let queued microtasks to be executed.
+		// Reference: https://t.ly/b95nA
+		await act( async () => {} );
 
 		// Open vertical alignment menu
 		fireEvent.press( verticalAlignmentButton );
@@ -303,7 +310,7 @@ describe( 'Columns block', () => {
 	} );
 
 	it( 'sets current vertical alignment on new Columns', async () => {
-		const screen = await initializeEditor( {
+		await initializeEditor( {
 			initialHtml: TWO_COLUMNS_BLOCK_HTML,
 		} );
 		const { getByLabelText } = screen;
@@ -332,7 +339,7 @@ describe( 'Columns block', () => {
 
 	describe( 'when using columns percentage mechanism', () => {
 		it( "updates the slider's input value", async () => {
-			const screen = await initializeEditor();
+			await initializeEditor();
 
 			// Add block
 			await addBlock( screen, 'Columns' );
@@ -372,7 +379,7 @@ describe( 'Columns block', () => {
 		} );
 
 		it( 'sets custom values correctly', async () => {
-			const screen = await initializeEditor( {
+			await initializeEditor( {
 				initialHtml: TWO_COLUMNS_BLOCK_HTML,
 			} );
 			const { getByLabelText, getByTestId } = screen;
@@ -438,7 +445,7 @@ describe( 'Columns block', () => {
 		test.each( testData )(
 			'sets the predefined percentages for %s',
 			async ( layout ) => {
-				const screen = await initializeEditor();
+				await initializeEditor();
 
 				// Add block
 				await addBlock( screen, 'Columns' );
@@ -457,5 +464,33 @@ describe( 'Columns block', () => {
 				expect( getEditorHtml() ).toMatchSnapshot();
 			}
 		);
+	} );
+
+	it( 'transforms a nested Columns block into a Group block', async () => {
+		await initializeEditor( {
+			initialHtml: `<!-- wp:group {"layout":{"type":"constrained"}} -->
+			<div class="wp-block-group"><!-- wp:columns -->
+			<div class="wp-block-columns"><!-- wp:column {"width":"100%"} -->
+			<div class="wp-block-column" style="flex-basis:100%"><!-- wp:paragraph -->
+			<p></p>
+			<!-- /wp:paragraph --></div>
+			<!-- /wp:column --></div>
+			<!-- /wp:columns --></div>
+			<!-- /wp:group -->`,
+		} );
+
+		// Get Columns block
+		const columnsBlock = await getBlock( screen, 'Columns' );
+		fireEvent.press( columnsBlock );
+
+		// Open block actions menu
+		await openBlockActionsMenu( screen );
+
+		// Tap on the Transform block button
+		fireEvent.press( screen.getByLabelText( /Transform block…/ ) );
+
+		// Tap on the Group transform button
+		fireEvent.press( screen.getByLabelText( 'Group' ) );
+		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 } );

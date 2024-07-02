@@ -4,7 +4,6 @@
 import { __ } from '@wordpress/i18n';
 import {
 	sidesAll,
-	sidesAxial,
 	sidesBottom,
 	sidesHorizontal,
 	sidesLeft,
@@ -12,6 +11,8 @@ import {
 	sidesTop,
 	sidesVertical,
 } from '@wordpress/icons';
+
+export const RANGE_CONTROL_MAX_SIZE = 8;
 
 export const ALL_SIDES = [ 'top', 'right', 'bottom', 'left' ];
 
@@ -24,7 +25,7 @@ export const DEFAULT_VALUES = {
 
 export const ICONS = {
 	custom: sidesAll,
-	axial: sidesAxial,
+	axial: sidesAll,
 	horizontal: sidesHorizontal,
 	vertical: sidesVertical,
 	top: sidesTop,
@@ -101,8 +102,8 @@ export function getCustomValueFromPreset( value, spacingSizes ) {
  * @return {string} The preset value if it can be found.
  */
 export function getPresetValueFromCustomValue( value, spacingSizes ) {
-	// Return value as-is if it is already a preset;
-	if ( isValueSpacingPreset( value ) ) {
+	// Return value as-is if it is undefined or is already a preset, or '0';
+	if ( ! value || isValueSpacingPreset( value ) || value === '0' ) {
 		return value;
 	}
 

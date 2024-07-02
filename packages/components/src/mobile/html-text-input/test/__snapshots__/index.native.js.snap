@@ -14,7 +14,9 @@ exports[`HTMLTextInput HTMLTextInput renders and matches snapshot 1`] = `
         placeholderTextColor="white"
         style={
           [
-            undefined,
+            {
+              "color": "white",
+            },
             undefined,
           ]
         }

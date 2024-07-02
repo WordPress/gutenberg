@@ -2,7 +2,8 @@
  * External dependencies
  */
 import type { ForwardedRef } from 'react';
-import { colord, extend, Colord } from 'colord';
+import type { Colord } from 'colord';
+import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 
 /**
@@ -15,7 +16,11 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { useContextSystem, contextConnect } from '../ui/context';
+import {
+	useContextSystem,
+	contextConnect,
+	ContextSystemProvider,
+} from '../context';
 import {
 	ColorfulWrapper,
 	SelectControl,
@@ -37,6 +42,9 @@ const options = [
 	{ label: 'HSL', value: 'hsl' as const },
 	{ label: 'Hex', value: 'hex' as const },
 ];
+
+// `isBorderless` is still experimental and not a public prop for InputControl yet.
+const BORDERLESS_SELECT_CONTROL_CONTEXT = { InputBase: { isBorderless: true } };
 
 const UnconnectedColorPicker = (
 	props: ColorPickerProps,
@@ -84,16 +92,20 @@ const UnconnectedColorPicker = (
 			/>
 			<AuxiliaryColorArtefactWrapper>
 				<AuxiliaryColorArtefactHStackHeader justify="space-between">
-					<SelectControl
-						__nextHasNoMarginBottom
-						options={ options }
-						value={ colorType }
-						onChange={ ( nextColorType ) =>
-							setColorType( nextColorType as ColorType )
-						}
-						label={ __( 'Color format' ) }
-						hideLabelFromVision
-					/>
+					<ContextSystemProvider
+						value={ BORDERLESS_SELECT_CONTROL_CONTEXT }
+					>
+						<SelectControl
+							__nextHasNoMarginBottom
+							options={ options }
+							value={ colorType }
+							onChange={ ( nextColorType ) =>
+								setColorType( nextColorType as ColorType )
+							}
+							label={ __( 'Color format' ) }
+							hideLabelFromVision
+						/>
+					</ContextSystemProvider>
 					<ColorCopyButton
 						color={ safeColordColor }
 						colorType={ copyFormat || colorType }

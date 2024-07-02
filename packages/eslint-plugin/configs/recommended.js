@@ -25,6 +25,12 @@ if ( isPackageInstalled( 'prettier' ) ) {
 	const prettierConfig = { ...defaultPrettierConfig, ...localPrettierConfig };
 	config.rules = {
 		'prettier/prettier': [ 'error', prettierConfig ],
+		// Prettier _disables_ this rule, but we want it!
+		// See https://github.com/prettier/eslint-config-prettier?tab=readme-ov-file#curly
+		// > This rule requires certain options.
+		// > …
+		// > If you like this rule, it can be used just fine with Prettier as long as you don’t use the "multi-line" or "multi-or-nest" option.
+		curly: [ 'error', 'all' ],
 	};
 }
 
@@ -45,7 +51,7 @@ if ( isPackageInstalled( 'typescript' ) ) {
 			parser: '@typescript-eslint/parser',
 			rules: {
 				'no-duplicate-imports': 'off',
-				'@typescript-eslint/no-duplicate-imports': 'error',
+				'import/no-duplicates': 'error',
 				// Don't require redundant JSDoc types in TypeScript files.
 				'jsdoc/require-param-type': 'off',
 				'jsdoc/require-returns-type': 'off',

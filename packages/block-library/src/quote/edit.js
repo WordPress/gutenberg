@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classNames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -10,21 +10,21 @@ import { __ } from '@wordpress/i18n';
 import {
 	AlignmentControl,
 	BlockControls,
-	RichText,
 	useBlockProps,
 	useInnerBlocksProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { BlockQuotation } from '@wordpress/components';
-import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
-import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
+import { useDispatch, useRegistry } from '@wordpress/data';
 import { Platform, useEffect } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
+import { verse } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import { migrateToQuoteV2 } from './deprecated';
+import { Caption } from '../utils/caption';
 
 const isWebPlatform = Platform.OS === 'web';
 
@@ -73,67 +73,59 @@ export default function QuoteEdit( {
 	clientId,
 	className,
 	style,
+	isSelected,
 } ) {
-	const { align, citation } = attributes;
+	const { textAlign } = attributes;
 
 	useMigrateOnLoad( attributes, clientId );
 
-	const hasSelection = useSelect( ( select ) => {
-		const { isBlockSelected, hasSelectedInnerBlock } =
-			select( blockEditorStore );
-		return hasSelectedInnerBlock( clientId ) || isBlockSelected( clientId );
-	}, [] );
-
 	const blockProps = useBlockProps( {
-		className: classNames( className, {
-			[ `has-text-align-${ align }` ]: align,
+		className: clsx( className, {
+			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 		...( ! isWebPlatform && { style } ),
 	} );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
 		templateInsertUpdatesSelection: true,
+		__experimentalCaptureToolbars: true,
+		renderAppender: false,
 	} );
 
 	return (
 		<>
 			<BlockControls group="block">
 				<AlignmentControl
-					value={ align }
+					value={ textAlign }
 					onChange={ ( nextAlign ) => {
-						setAttributes( { align: nextAlign } );
+						setAttributes( { textAlign: nextAlign } );
 					} }
 				/>
 			</BlockControls>
 			<BlockQuotation { ...innerBlocksProps }>
 				{ innerBlocksProps.children }
-				{ ( ! RichText.isEmpty( citation ) || hasSelection ) && (
-					<RichText
-						identifier="citation"
-						tagName={ isWebPlatform ? 'cite' : undefined }
-						style={ { display: 'block' } }
-						value={ citation }
-						onChange={ ( nextCitation ) => {
-							setAttributes( {
-								citation: nextCitation,
-							} );
-						} }
-						__unstableMobileNoFocusOnMount
-						aria-label={ __( 'Quote citation' ) }
-						placeholder={
-							// translators: placeholder text used for the
-							// citation
-							__( 'Add citation' )
-						}
-						className="wp-block-quote__citation"
-						__unstableOnSplitAtEnd={ () =>
-							insertBlocksAfter(
-								createBlock( getDefaultBlockName() )
-							)
-						}
-						{ ...( ! isWebPlatform ? { textAlign: align } : {} ) }
-					/>
-				) }
+				<Caption
+					attributeKey="citation"
+					tagName={ isWebPlatform ? 'cite' : 'p' }
+					style={ isWebPlatform && { display: 'block' } }
+					isSelected={ isSelected }
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					__unstableMobileNoFocusOnMount
+					icon={ verse }
+					label={ __( 'Quote citation' ) }
+					placeholder={
+						// translators: placeholder text used for the
+						// citation
+						__( 'Add citation' )
+					}
+					addLabel={ __( 'Add citation' ) }
+					removeLabel={ __( 'Remove citation' ) }
+					excludeElementClassName
+					className="wp-block-quote__citation"
+					insertBlocksAfter={ insertBlocksAfter }
+					{ ...( ! isWebPlatform ? { textAlign } : {} ) }
+				/>
 			</BlockQuotation>
 		</>
 	);

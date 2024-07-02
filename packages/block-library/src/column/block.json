@@ -23,18 +23,21 @@
 		}
 	},
 	"supports": {
+		"__experimentalOnEnter": true,
 		"anchor": true,
 		"reusable": false,
 		"html": false,
 		"color": {
 			"gradients": true,
 			"heading": true,
+			"button": true,
 			"link": true,
 			"__experimentalDefaultControls": {
 				"background": true,
 				"text": true
 			}
 		},
+		"shadow": true,
 		"spacing": {
 			"blockGap": true,
 			"padding": true,
@@ -66,6 +69,9 @@
 				"fontSize": true
 			}
 		},
-		"layout": true
+		"layout": true,
+		"interactivity": {
+			"clientNavigation": true
+		}
 	}
 }

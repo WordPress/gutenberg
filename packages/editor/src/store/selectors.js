@@ -1,19 +1,15 @@
 /**
- * External dependencies
- */
-import createSelector from 'rememo';
-
-/**
  * WordPress dependencies
  */
 import {
 	getFreeformContentHandlerName,
 	getDefaultBlockName,
 	__unstableSerializeAndClean,
+	parse,
 } from '@wordpress/blocks';
 import { isInTheFuture, getDate } from '@wordpress/date';
 import { addQueryArgs, cleanForSlug } from '@wordpress/url';
-import { createRegistrySelector } from '@wordpress/data';
+import { createSelector, createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { Platform } from '@wordpress/element';
 import { layout } from '@wordpress/icons';
@@ -41,15 +37,6 @@ import { getTemplatePartIcon } from '../utils/get-template-part-icon';
  * maintained by the reducer result in state.
  */
 const EMPTY_OBJECT = {};
-
-/**
- * Shared reference to an empty array for cases where it is important to avoid
- * returning a new array reference on every invocation, as in a connected or
- * other pure component which performs `shouldComponentUpdate` check on props.
- * This should be used as a last resort, since the normalized data should be
- * maintained by the reducer result in state.
- */
-const EMPTY_ARRAY = [];
 
 /**
  * Returns true if any past editor history snapshots exist, or false otherwise.
@@ -113,16 +100,11 @@ export const isEditedPostDirty = createRegistrySelector(
 		// inferred to contain unsaved values.
 		const postType = getCurrentPostType( state );
 		const postId = getCurrentPostId( state );
-		if (
-			select( coreStore ).hasEditsForEntityRecord(
-				'postType',
-				postType,
-				postId
-			)
-		) {
-			return true;
-		}
-		return false;
+		return select( coreStore ).hasEditsForEntityRecord(
+			'postType',
+			postType,
+			postId
+		);
 	}
 );
 
@@ -214,6 +196,17 @@ export function getCurrentPostId( state ) {
 }
 
 /**
+ * Returns the template ID currently being rendered/edited
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string?} Template ID.
+ */
+export function getCurrentTemplateId( state ) {
+	return state.templateId;
+}
+
+/**
  * Returns the number of revisions of the post currently being edited.
  *
  * @param {Object} state Global application state.
@@ -297,17 +290,23 @@ export function getCurrentPostAttribute( state, attributeName ) {
  *
  * @return {*} Post attribute value.
  */
-const getNestedEditedPostProperty = ( state, attributeName ) => {
-	const edits = getPostEdits( state );
-	if ( ! edits.hasOwnProperty( attributeName ) ) {
-		return getCurrentPostAttribute( state, attributeName );
-	}
+const getNestedEditedPostProperty = createSelector(
+	( state, attributeName ) => {
+		const edits = getPostEdits( state );
+		if ( ! edits.hasOwnProperty( attributeName ) ) {
+			return getCurrentPostAttribute( state, attributeName );
+		}
 
-	return {
-		...getCurrentPostAttribute( state, attributeName ),
-		...edits[ attributeName ],
-	};
-};
+		return {
+			...getCurrentPostAttribute( state, attributeName ),
+			...edits[ attributeName ],
+		};
+	},
+	( state, attributeName ) => [
+		getCurrentPostAttribute( state, attributeName ),
+		getPostEdits( state )[ attributeName ],
+	]
+);
 
 /**
  * Returns a single attribute of the post being edited, preferring the unsaved
@@ -364,6 +363,12 @@ export const getAutosaveAttribute = createRegistrySelector(
 		}
 
 		const postType = getCurrentPostType( state );
+
+		// Currently template autosaving is not supported.
+		if ( postType === 'wp_template' ) {
+			return false;
+		}
+
 		const postId = getCurrentPostId( state );
 		const currentUserId = select( coreStore ).getCurrentUser()?.id;
 		const autosave = select( coreStore ).getAutosave(
@@ -507,16 +512,31 @@ export function isEditedPostSaveable( state ) {
  *
  * @return {boolean} Whether post has content.
  */
-export function isEditedPostEmpty( state ) {
-	// While the condition of truthy content string is sufficient to determine
-	// emptiness, testing saveable blocks length is a trivial operation. Since
-	// this function can be called frequently, optimize for the fast case as a
-	// condition of the mere existence of blocks. Note that the value of edited
-	// content takes precedent over block content, and must fall through to the
-	// default logic.
-	const blocks = getEditorBlocks( state );
+export const isEditedPostEmpty = createRegistrySelector(
+	( select ) => ( state ) => {
+		// While the condition of truthy content string is sufficient to determine
+		// emptiness, testing saveable blocks length is a trivial operation. Since
+		// this function can be called frequently, optimize for the fast case as a
+		// condition of the mere existence of blocks. Note that the value of edited
+		// content takes precedent over block content, and must fall through to the
+		// default logic.
+		const postId = getCurrentPostId( state );
+		const postType = getCurrentPostType( state );
+		const record = select( coreStore ).getEditedEntityRecord(
+			'postType',
+			postType,
+			postId
+		);
+		if ( typeof record.content !== 'function' ) {
+			return ! record.content;
+		}
 
-	if ( blocks.length ) {
+		const blocks = getEditedPostAttribute( state, 'blocks' );
+
+		if ( blocks.length === 0 ) {
+			return true;
+		}
+
 		// Pierce the abstraction of the serializer in knowing that blocks are
 		// joined with newlines such that even if every individual block
 		// produces an empty save result, the serialized content is non-empty.
@@ -542,10 +562,10 @@ export function isEditedPostEmpty( state ) {
 		) {
 			return false;
 		}
-	}
 
-	return ! getEditedPostContent( state );
-}
+		return ! getEditedPostContent( state );
+	}
+);
 
 /**
  * Returns true if the post can be autosaved, or false otherwise.
@@ -568,6 +588,12 @@ export const isEditedPostAutosaveable = createRegistrySelector(
 		}
 
 		const postType = getCurrentPostType( state );
+
+		// Currently template autosaving is not supported.
+		if ( postType === 'wp_template' ) {
+			return false;
+		}
+
 		const postId = getCurrentPostId( state );
 		const hasFetchedAutosave = select( coreStore ).hasFetchedAutosaves(
 			postType,
@@ -604,8 +630,8 @@ export const isEditedPostAutosaveable = createRegistrySelector(
 			return true;
 		}
 
-		// If the title or excerpt has changed, the post is autosaveable.
-		return [ 'title', 'excerpt' ].some(
+		// If title, excerpt, or meta have changed, the post is autosaveable.
+		return [ 'title', 'excerpt', 'meta' ].some(
 			( field ) =>
 				getPostRawValue( autosave[ field ] ) !==
 				getEditedPostAttribute( state, field )
@@ -806,54 +832,56 @@ export function getEditedPostPreviewLink( state ) {
  * is a single block within the post and it is of a type known to match a
  * default post format. Returns null if the format cannot be determined.
  *
- * @param {Object} state Global application state.
- *
  * @return {?string} Suggested post format.
  */
-export function getSuggestedPostFormat( state ) {
-	const blocks = getEditorBlocks( state );
+export const getSuggestedPostFormat = createRegistrySelector(
+	( select ) => () => {
+		const blocks = select( blockEditorStore ).getBlocks();
 
-	if ( blocks.length > 2 ) return null;
+		if ( blocks.length > 2 ) {
+			return null;
+		}
 
-	let name;
-	// If there is only one block in the content of the post grab its name
-	// so we can derive a suitable post format from it.
-	if ( blocks.length === 1 ) {
-		name = blocks[ 0 ].name;
-		// Check for core/embed `video` and `audio` eligible suggestions.
-		if ( name === 'core/embed' ) {
-			const provider = blocks[ 0 ].attributes?.providerNameSlug;
-			if ( [ 'youtube', 'vimeo' ].includes( provider ) ) {
-				name = 'core/video';
-			} else if ( [ 'spotify', 'soundcloud' ].includes( provider ) ) {
-				name = 'core/audio';
+		let name;
+		// If there is only one block in the content of the post grab its name
+		// so we can derive a suitable post format from it.
+		if ( blocks.length === 1 ) {
+			name = blocks[ 0 ].name;
+			// Check for core/embed `video` and `audio` eligible suggestions.
+			if ( name === 'core/embed' ) {
+				const provider = blocks[ 0 ].attributes?.providerNameSlug;
+				if ( [ 'youtube', 'vimeo' ].includes( provider ) ) {
+					name = 'core/video';
+				} else if ( [ 'spotify', 'soundcloud' ].includes( provider ) ) {
+					name = 'core/audio';
+				}
 			}
 		}
-	}
 
-	// If there are two blocks in the content and the last one is a text blocks
-	// grab the name of the first one to also suggest a post format from it.
-	if ( blocks.length === 2 && blocks[ 1 ].name === 'core/paragraph' ) {
-		name = blocks[ 0 ].name;
-	}
+		// If there are two blocks in the content and the last one is a text blocks
+		// grab the name of the first one to also suggest a post format from it.
+		if ( blocks.length === 2 && blocks[ 1 ].name === 'core/paragraph' ) {
+			name = blocks[ 0 ].name;
+		}
 
-	// We only convert to default post formats in core.
-	switch ( name ) {
-		case 'core/image':
-			return 'image';
-		case 'core/quote':
-		case 'core/pullquote':
-			return 'quote';
-		case 'core/gallery':
-			return 'gallery';
-		case 'core/video':
-			return 'video';
-		case 'core/audio':
-			return 'audio';
-		default:
-			return null;
+		// We only convert to default post formats in core.
+		switch ( name ) {
+			case 'core/image':
+				return 'image';
+			case 'core/quote':
+			case 'core/pullquote':
+				return 'quote';
+			case 'core/gallery':
+				return 'gallery';
+			case 'core/video':
+				return 'video';
+			case 'core/audio':
+				return 'audio';
+			default:
+				return null;
+		}
 	}
-}
+);
 
 /**
  * Returns the content of the post being edited.
@@ -955,7 +983,7 @@ export function getEditedPostSlug( state ) {
 }
 
 /**
- * Returns the permalink for a post, split into it's three parts: the prefix,
+ * Returns the permalink for a post, split into its three parts: the prefix,
  * the postName, and the suffix.
  *
  * @param {Object} state Editor state.
@@ -1076,10 +1104,7 @@ export function canUserUseUnfilteredHTML( state ) {
  */
 export const isPublishSidebarEnabled = createRegistrySelector(
 	( select ) => () =>
-		!! select( preferencesStore ).get(
-			'core/edit-post',
-			'isPublishSidebarEnabled'
-		)
+		!! select( preferencesStore ).get( 'core', 'isPublishSidebarEnabled' )
 );
 
 /**
@@ -1088,9 +1113,76 @@ export const isPublishSidebarEnabled = createRegistrySelector(
  * @param {Object} state
  * @return {Array} Block list.
  */
-export function getEditorBlocks( state ) {
-	return getEditedPostAttribute( state, 'blocks' ) || EMPTY_ARRAY;
+export const getEditorBlocks = createSelector(
+	( state ) => {
+		return (
+			getEditedPostAttribute( state, 'blocks' ) ||
+			parse( getEditedPostContent( state ) )
+		);
+	},
+	( state ) => [
+		getEditedPostAttribute( state, 'blocks' ),
+		getEditedPostContent( state ),
+	]
+);
+
+/**
+ * Returns true if the given panel was programmatically removed, or false otherwise.
+ * All panels are not removed by default.
+ *
+ * @param {Object} state     Global application state.
+ * @param {string} panelName A string that identifies the panel.
+ *
+ * @return {boolean} Whether or not the panel is removed.
+ */
+export function isEditorPanelRemoved( state, panelName ) {
+	return state.removedPanels.includes( panelName );
 }
+
+/**
+ * Returns true if the given panel is enabled, or false otherwise. Panels are
+ * enabled by default.
+ *
+ * @param {Object} state     Global application state.
+ * @param {string} panelName A string that identifies the panel.
+ *
+ * @return {boolean} Whether or not the panel is enabled.
+ */
+export const isEditorPanelEnabled = createRegistrySelector(
+	( select ) => ( state, panelName ) => {
+		// For backward compatibility, we check edit-post
+		// even though now this is in "editor" package.
+		const inactivePanels = select( preferencesStore ).get(
+			'core',
+			'inactivePanels'
+		);
+		return (
+			! isEditorPanelRemoved( state, panelName ) &&
+			! inactivePanels?.includes( panelName )
+		);
+	}
+);
+
+/**
+ * Returns true if the given panel is open, or false otherwise. Panels are
+ * closed by default.
+ *
+ * @param {Object} state     Global application state.
+ * @param {string} panelName A string that identifies the panel.
+ *
+ * @return {boolean} Whether or not the panel is open.
+ */
+export const isEditorPanelOpened = createRegistrySelector(
+	( select ) => ( state, panelName ) => {
+		// For backward compatibility, we check edit-post
+		// even though now this is in "editor" package.
+		const openPanels = select( preferencesStore ).get(
+			'core',
+			'openPanels'
+		);
+		return !! openPanels?.includes( panelName );
+	}
+);
 
 /**
  * A block selection object.
@@ -1152,7 +1244,7 @@ export function getEditorSelection( state ) {
  * @return {boolean} is Ready.
  */
 export function __unstableIsEditorReady( state ) {
-	return state.isReady;
+	return !! state.postId;
 }
 
 /**
@@ -1165,6 +1257,62 @@ export function __unstableIsEditorReady( state ) {
 export function getEditorSettings( state ) {
 	return state.editorSettings;
 }
+
+/**
+ * Returns the post editor's rendering mode.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {string} Rendering mode.
+ */
+export function getRenderingMode( state ) {
+	return state.renderingMode;
+}
+
+/**
+ * Returns the current editing canvas device type.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string} Device type.
+ */
+export function getDeviceType( state ) {
+	return state.deviceType;
+}
+
+/**
+ * Returns true if the list view is opened.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the list view is opened.
+ */
+export function isListViewOpened( state ) {
+	return state.listViewPanel;
+}
+
+/**
+ * Returns true if the inserter is opened.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the inserter is opened.
+ */
+export function isInserterOpened( state ) {
+	return !! state.blockInserterPanel;
+}
+
+/**
+ * Returns the current editing mode.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string} Editing mode.
+ */
+export const getEditorMode = createRegistrySelector(
+	( select ) => () =>
+		select( preferencesStore ).get( 'core', 'editorMode' ) ?? 'visual'
+);
 
 /*
  * Backward compatibility
@@ -1547,8 +1695,8 @@ export function __experimentalGetDefaultTemplateTypes( state ) {
 export const __experimentalGetDefaultTemplatePartAreas = createSelector(
 	( state ) => {
 		const areas =
-			getEditorSettings( state )?.defaultTemplatePartAreas || [];
-		return areas?.map( ( item ) => {
+			getEditorSettings( state )?.defaultTemplatePartAreas ?? [];
+		return areas.map( ( item ) => {
 			return { ...item, icon: getTemplatePartIcon( item.icon ) };
 		} );
 	},
@@ -1576,7 +1724,7 @@ export const __experimentalGetDefaultTemplateType = createSelector(
 			) ?? EMPTY_OBJECT
 		);
 	},
-	( state, slug ) => [ __experimentalGetDefaultTemplateTypes( state ), slug ]
+	( state ) => [ __experimentalGetDefaultTemplateTypes( state ) ]
 );
 
 /**
@@ -1587,32 +1735,39 @@ export const __experimentalGetDefaultTemplateType = createSelector(
  * @param {Object} template The template for which we need information.
  * @return {Object} Information about the template, including title, description, and icon.
  */
-export function __experimentalGetTemplateInfo( state, template ) {
-	if ( ! template ) {
-		return EMPTY_OBJECT;
-	}
+export const __experimentalGetTemplateInfo = createSelector(
+	( state, template ) => {
+		if ( ! template ) {
+			return EMPTY_OBJECT;
+		}
 
-	const { description, slug, title, area } = template;
-	const { title: defaultTitle, description: defaultDescription } =
-		__experimentalGetDefaultTemplateType( state, slug );
+		const { description, slug, title, area } = template;
+		const { title: defaultTitle, description: defaultDescription } =
+			__experimentalGetDefaultTemplateType( state, slug );
 
-	const templateTitle = typeof title === 'string' ? title : title?.rendered;
-	const templateDescription =
-		typeof description === 'string' ? description : description?.raw;
-	const templateIcon =
-		__experimentalGetDefaultTemplatePartAreas( state ).find(
-			( item ) => area === item.area
-		)?.icon || layout;
+		const templateTitle =
+			typeof title === 'string' ? title : title?.rendered;
+		const templateDescription =
+			typeof description === 'string' ? description : description?.raw;
+		const templateIcon =
+			__experimentalGetDefaultTemplatePartAreas( state ).find(
+				( item ) => area === item.area
+			)?.icon || layout;
 
-	return {
-		title:
-			templateTitle && templateTitle !== slug
-				? templateTitle
-				: defaultTitle || slug,
-		description: templateDescription || defaultDescription,
-		icon: templateIcon,
-	};
-}
+		return {
+			title:
+				templateTitle && templateTitle !== slug
+					? templateTitle
+					: defaultTitle || slug,
+			description: templateDescription || defaultDescription,
+			icon: templateIcon,
+		};
+	},
+	( state ) => [
+		__experimentalGetDefaultTemplateTypes( state ),
+		__experimentalGetDefaultTemplatePartAreas( state ),
+	]
+);
 
 /**
  * Returns a post type label depending on the current post.
@@ -1630,3 +1785,14 @@ export const getPostTypeLabel = createRegistrySelector(
 		return postType?.labels?.singular_name;
 	}
 );
+
+/**
+ * Returns true if the publish sidebar is opened.
+ *
+ * @param {Object} state Global application state
+ *
+ * @return {boolean} Whether the publish sidebar is open.
+ */
+export function isPublishSidebarOpened( state ) {
+	return state.publishSidebarActive;
+}

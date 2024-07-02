@@ -76,7 +76,6 @@ function InlineLanguageUI( { value, contentRef, onChange, onClose } ) {
 		<Popover
 			className="block-editor-format-toolbar__language-popover"
 			anchor={ popoverAnchor }
-			placement="bottom"
 			onClose={ onClose }
 		>
 			<form

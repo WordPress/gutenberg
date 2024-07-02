@@ -11,7 +11,6 @@ import { isRTL } from '@wordpress/i18n';
  */
 import { store as blockEditorStore } from '../../store';
 import { InsertionPointOpenRef } from '../block-tools/insertion-point';
-import { unlock } from '../../lock-unlock';
 
 export function useInBetweenInserter() {
 	const openRef = useContext( InsertionPointOpenRef );
@@ -29,7 +28,8 @@ export function useInBetweenInserter() {
 		getTemplateLock,
 		__unstableIsWithinBlockOverlay,
 		getBlockEditingMode,
-	} = unlock( useSelect( blockEditorStore ) );
+		getBlockName,
+	} = useSelect( blockEditorStore );
 	const { showInsertionPoint, hideInsertionPoint } =
 		useDispatch( blockEditorStore );
 
@@ -40,7 +40,9 @@ export function useInBetweenInserter() {
 			}
 
 			function onMouseMove( event ) {
-				if ( openRef.current ) {
+				// openRef is the reference to the insertion point between blocks.
+				// If the reference is not set or the insertion point is already open, return.
+				if ( openRef === undefined || openRef.current ) {
 					return;
 				}
 
@@ -76,7 +78,8 @@ export function useInBetweenInserter() {
 
 				if (
 					getTemplateLock( rootClientId ) ||
-					getBlockEditingMode( rootClientId ) === 'disabled'
+					getBlockEditingMode( rootClientId ) === 'disabled' ||
+					getBlockName( rootClientId ) === 'core/block'
 				) {
 					return;
 				}

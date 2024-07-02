@@ -15,12 +15,6 @@ $swatch-gap: 12px;
 	min-width: 0;
 }
 
-.block-editor-color-gradient-control__tabs {
-	.block-editor-color-gradient-control__panel {
-		padding: $grid-unit-20;
-	}
-}
-
 .block-editor-panel-color-gradient-settings.block-editor-panel-color-gradient-settings {
 	&,
 	& > div:not(:first-of-type) {
@@ -33,7 +27,6 @@ $swatch-gap: 12px;
 		.components-circular-option-picker__swatches {
 			display: grid;
 			grid-template-columns: repeat(6, $swatch-size);
-			justify-content: space-between;
 		}
 	}
 
@@ -77,14 +70,16 @@ $swatch-gap: 12px;
 	border-right: 1px solid $gray-300;
 	border-bottom: 1px solid $gray-300;
 
-	&.first {
+	// Identify the first visible instance as placeholder items will not have this class.
+	&:nth-child(1 of &) {
 		margin-top: $grid-unit-30;
 		border-top-left-radius: $radius-block-ui;
 		border-top-right-radius: $radius-block-ui;
 		border-top: 1px solid $gray-300;
 	}
 
-	&.last {
+	// Identify the last visible instance as placeholder items will not have this class.
+	&:nth-last-child(1 of &) {
 		border-bottom-left-radius: $radius-block-ui;
 		border-bottom-right-radius: $radius-block-ui;
 	}

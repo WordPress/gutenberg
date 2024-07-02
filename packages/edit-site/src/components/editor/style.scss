@@ -1,14 +1,10 @@
-.edit-site-editor__interface-skeleton {
+.edit-site-editor__editor-interface {
 	opacity: 1;
 	transition: opacity 0.1s ease-out;
 	@include reduce-motion("transition");
 
 	&.is-loading {
 		opacity: 0;
-	}
-
-	.interface-interface-skeleton__header {
-		border: 0;
 	}
 }
 
@@ -21,13 +17,3 @@
 	display: flex;
 	justify-content: center;
 }
-
-// Adjust the position of the notices
-.edit-site .components-editor-notices__snackbar {
-	position: absolute;
-	right: 0;
-	bottom: 40px;
-	padding-left: 16px;
-	padding-right: 16px;
-}
-@include editor-left(".edit-site .components-editor-notices__snackbar")

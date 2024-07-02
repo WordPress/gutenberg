@@ -10,6 +10,10 @@ const { sync: resolveBin } = require( 'resolve-bin' );
 const { getArgFromCLI, getWebpackArgs, hasArgInCLI } = require( '../utils' );
 const EXIT_ERROR_CODE = 1;
 
+if ( hasArgInCLI( '--experimental-modules' ) ) {
+	process.env.WP_EXPERIMENTAL_MODULES = true;
+}
+
 if ( hasArgInCLI( '--webpack-no-externals' ) ) {
 	process.env.WP_NO_EXTERNALS = true;
 }

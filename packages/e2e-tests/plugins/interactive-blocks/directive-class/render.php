@@ -4,9 +4,9 @@
  *
  * @package gutenberg-test-interactive-blocks
  */
-
 ?>
-<div data-wp-interactive>
+
+<div data-wp-interactive='{"namespace": "directive-class"}'>
 	<button
 		data-wp-on--click="actions.toggleTrueValue"
 		data-testid="toggle trueValue"
@@ -72,4 +72,15 @@
 			Toggle context falseValue
 		</button>
 	</div>
+
+	<div
+		data-wp-class--block__element--modifier="state.trueValue"
+		data-testid="can use BEM notation classes"
+	></div>
+
+	<div
+		data-wp-class--main-bg----color="state.trueValue"
+		data-testid="can use classes with several dashes"
+	></div>
+
 </div>

@@ -31,7 +31,7 @@ export function isTabbableIndex( element ) {
 	return getTabIndex( element ) !== -1;
 }
 
-/** @typedef {Element & { type?: string, checked?: boolean, name?: string }} MaybeHTMLInputElement */
+/** @typedef {HTMLElement & { type?: string, checked?: boolean, name?: string }} MaybeHTMLInputElement */
 
 /**
  * Returns a stateful reducer function which constructs a filtered array of
@@ -84,10 +84,10 @@ function createStatefulCollapseRadioGroup() {
  * sort where equal tabIndex should be left in order of their occurrence in the
  * document.
  *
- * @param {Element} element Element.
- * @param {number}  index   Array index of element.
+ * @param {HTMLElement} element Element.
+ * @param {number}      index   Array index of element.
  *
- * @return {{ element: Element, index: number }} Mapped object with element, index.
+ * @return {{ element: HTMLElement, index: number }} Mapped object with element, index.
  */
 function mapElementToObjectTabbable( element, index ) {
 	return { element, index };
@@ -97,9 +97,9 @@ function mapElementToObjectTabbable( element, index ) {
  * An array map callback, returning an element of the given mapped object's
  * element value.
  *
- * @param {{ element: Element }} object Mapped object with element.
+ * @param {{ element: HTMLElement }} object Mapped object with element.
  *
- * @return {Element} Mapped object element.
+ * @return {HTMLElement} Mapped object element.
  */
 function mapObjectTabbableToElement( object ) {
 	return object.element;
@@ -110,8 +110,8 @@ function mapObjectTabbableToElement( object ) {
  *
  * @see mapElementToObjectTabbable
  *
- * @param {{ element: Element, index: number }} a First object to compare.
- * @param {{ element: Element, index: number }} b Second object to compare.
+ * @param {{ element: HTMLElement, index: number }} a First object to compare.
+ * @param {{ element: HTMLElement, index: number }} b Second object to compare.
  *
  * @return {number} Comparator result.
  */
@@ -129,9 +129,9 @@ function compareObjectTabbables( a, b ) {
 /**
  * Givin focusable elements, filters out tabbable element.
  *
- * @param {Element[]} focusables Focusable elements to filter.
+ * @param {HTMLElement[]} focusables Focusable elements to filter.
  *
- * @return {Element[]} Tabbable elements.
+ * @return {HTMLElement[]} Tabbable elements.
  */
 function filterTabbable( focusables ) {
 	return focusables
@@ -144,7 +144,7 @@ function filterTabbable( focusables ) {
 
 /**
  * @param {Element} context
- * @return {Element[]} Tabbable elements within the context.
+ * @return {HTMLElement[]} Tabbable elements within the context.
  */
 export function find( context ) {
 	return filterTabbable( findFocusable( context ) );
@@ -156,18 +156,17 @@ export function find( context ) {
  * @param {Element} element The focusable element before which to look. Defaults
  *                          to the active element.
  *
- * @return {Element|undefined} Preceding tabbable element.
+ * @return {HTMLElement|undefined} Preceding tabbable element.
  */
 export function findPrevious( element ) {
 	return filterTabbable( findFocusable( element.ownerDocument.body ) )
 		.reverse()
-		.find( ( focusable ) => {
-			return (
+		.find(
+			( focusable ) =>
 				// eslint-disable-next-line no-bitwise
 				element.compareDocumentPosition( focusable ) &
 				element.DOCUMENT_POSITION_PRECEDING
-			);
-		} );
+		);
 }
 
 /**
@@ -176,16 +175,13 @@ export function findPrevious( element ) {
  * @param {Element} element The focusable element after which to look. Defaults
  *                          to the active element.
  *
- * @return {Element|undefined} Next tabbable element.
+ * @return {HTMLElement|undefined} Next tabbable element.
  */
 export function findNext( element ) {
 	return filterTabbable( findFocusable( element.ownerDocument.body ) ).find(
-		( focusable ) => {
-			return (
-				// eslint-disable-next-line no-bitwise
-				element.compareDocumentPosition( focusable ) &
-				element.DOCUMENT_POSITION_FOLLOWING
-			);
-		}
+		( focusable ) =>
+			// eslint-disable-next-line no-bitwise
+			element.compareDocumentPosition( focusable ) &
+			element.DOCUMENT_POSITION_FOLLOWING
 	);
 }

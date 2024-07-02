@@ -18,7 +18,7 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 ### uploadMedia
 
 Media upload util is a function that allows the invokers to upload files to the WordPress media library.
-As an example, provided that `myFiles` is an array of file objects, `onFileChange` on onFileChange is a function that receives an array of objects containing the description of WordPress media items and `handleFileError` is a function that receives an object describing a possible error, the following code uploads a file to the WordPress media library:
+As an example, provided that `myFiles` is an array of file objects, `handleFileChange` on onFileChange is a function that receives an array of objects containing the description of WordPress media items and `handleFileError` is a function that receives an object describing a possible error, the following code uploads a file to the WordPress media library:
 
 ```js
 wp.mediaUtils.utils.uploadMedia( {
@@ -43,7 +43,7 @@ Beware that first onFileChange is called with temporary blob URLs and then with 
 ### MediaUpload
 
 Media upload component provides a UI button that allows users to open the WordPress media library. It is normally used in conjunction with the filter `editor.MediaUpload`.
-The component follows the interface specified in https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/media-upload/README.md, and more details regarding its usage can be checked there.
+The component follows the interface specified in [https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/media-upload/README.md](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/media-upload/README.md), and more details regarding its usage can be checked there.
 
 ## Contributing to this package
 

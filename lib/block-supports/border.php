@@ -94,14 +94,14 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 		! wp_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'color' )
 	) {
 		$preset_border_color          = array_key_exists( 'borderColor', $block_attributes ) ? "var:preset|color|{$block_attributes['borderColor']}" : null;
-		$custom_border_color          = _wp_array_get( $block_attributes, array( 'style', 'border', 'color' ), null );
+		$custom_border_color          = $block_attributes['style']['border']['color'] ?? null;
 		$border_block_styles['color'] = $preset_border_color ? $preset_border_color : $custom_border_color;
 	}
 
 	// Generate styles for individual border sides.
 	if ( $has_border_color_support || $has_border_width_support ) {
 		foreach ( array( 'top', 'right', 'bottom', 'left' ) as $side ) {
-			$border                       = _wp_array_get( $block_attributes, array( 'style', 'border', $side ), null );
+			$border                       = $block_attributes['style']['border'][ $side ] ?? null;
 			$border_side_values           = array(
 				'width' => isset( $border['width'] ) && ! wp_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'width' ) ? $border['width'] : null,
 				'color' => isset( $border['color'] ) && ! wp_should_skip_block_supports_serialization( $block_type, '__experimentalBorder', 'color' ) ? $border['color'] : null,
@@ -134,24 +134,24 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
  * flag nested under `experimentalBorder` must be enabled for the feature
  * to be opted into.
  *
- * @param WP_Block_Type $block_type Block type to check for support.
- * @param string        $feature    Name of the feature to check support for.
- * @param mixed         $default    Fallback value for feature support, defaults to false.
+ * @param WP_Block_Type $block_type    Block type to check for support.
+ * @param string        $feature       Name of the feature to check support for.
+ * @param mixed         $default_value Fallback value for feature support, defaults to false.
  *
  * @return boolean                  Whether or not the feature is supported.
  */
-function gutenberg_has_border_feature_support( $block_type, $feature, $default = false ) {
+function gutenberg_has_border_feature_support( $block_type, $feature, $default_value = false ) {
 	// Check if all border support features have been opted into via `"__experimentalBorder": true`.
-	if (
-		property_exists( $block_type, 'supports' ) &&
-		( true === _wp_array_get( $block_type->supports, array( '__experimentalBorder' ), $default ) )
-	) {
-		return true;
+	if ( $block_type instanceof WP_Block_Type ) {
+		$block_type_supports_border = $block_type->supports['__experimentalBorder'] ?? $default_value;
+		if ( true === $block_type_supports_border ) {
+			return true;
+		}
 	}
 
 	// Check if the specific feature has been opted into individually
 	// via nested flag under `__experimentalBorder`.
-	return block_has_support( $block_type, array( '__experimentalBorder', $feature ), $default );
+	return block_has_support( $block_type, array( '__experimentalBorder', $feature ), $default_value );
 }
 
 // Register the block support.

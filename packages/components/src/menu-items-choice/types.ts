@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import type { ShortcutProps } from '../shortcut/types';
+import type { ButtonAsButtonProps } from '../button/types';
 
 export type MenuItemsChoiceProps = {
 	/**
@@ -38,6 +39,10 @@ export type MenuItemChoice = {
 	 * Unique value for choice.
 	 */
 	value: string;
+	/**
+	 * Whether the menu item is disabled.
+	 */
+	disabled?: ButtonAsButtonProps[ 'disabled' ];
 	/**
 	 * Additional information which will be rendered below the given label.
 	 */

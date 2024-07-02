@@ -9,7 +9,6 @@ import Clipboard from '@react-native-clipboard/clipboard';
  */
 import { useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { BottomSheet, Icon } from '@wordpress/components';
 import { getProtocol, isURL, prependHTTP } from '@wordpress/url';
 import { link, cancelCircleFilled } from '@wordpress/icons';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
@@ -20,6 +19,8 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import LinkPickerResults from './link-picker-results';
 import NavBar from '../bottom-sheet/nav-bar';
 import styles from './styles.scss';
+import BottomSheet from '../bottom-sheet';
+import Icon from '../../icon';
 
 // This creates a search suggestion for adding a url directly.
 export const createDirectEntry = ( value ) => {
@@ -57,10 +58,8 @@ export const LinkPicker = ( {
 	onLinkPicked,
 	onCancel: cancel,
 } ) => {
-	const [ { value, clipboardUrl }, setValue ] = useState( {
-		value: initialValue,
-		clipboardUrl: '',
-	} );
+	const [ value, setValue ] = useState( initialValue );
+	const [ clipboardUrl, setClipboardUrl ] = useState( '' );
 	const directEntry = createDirectEntry( value );
 
 	// The title of a direct entry is displayed as the raw input value, but if we
@@ -74,7 +73,8 @@ export const LinkPicker = ( {
 	};
 
 	const clear = () => {
-		setValue( { value: '', clipboardUrl } );
+		setValue( '' );
+		setClipboardUrl( '' );
 	};
 
 	const omniCellStyle = usePreferredColorSchemeStyle(
@@ -89,11 +89,8 @@ export const LinkPicker = ( {
 
 	useEffect( () => {
 		getURLFromClipboard()
-			.then( ( url ) => setValue( { value, clipboardUrl: url } ) )
-			.catch( () => setValue( { value, clipboardUrl: '' } ) );
-		// Disable reason: deferring this refactor to the native team.
-		// see https://github.com/WordPress/gutenberg/pull/41166
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+			.then( setClipboardUrl )
+			.catch( () => setClipboardUrl( '' ) );
 	}, [] );
 
 	// TODO: Localize the accessibility label.
@@ -115,9 +112,7 @@ export const LinkPicker = ( {
 					autoCapitalize="none"
 					autoCorrect={ false }
 					keyboardType="url"
-					onChangeValue={ ( newValue ) => {
-						setValue( { value: newValue, clipboardUrl } );
-					} }
+					onChangeValue={ setValue }
 					onSubmit={ onSubmit }
 					/* eslint-disable-next-line jsx-a11y/no-autofocus */
 					autoFocus

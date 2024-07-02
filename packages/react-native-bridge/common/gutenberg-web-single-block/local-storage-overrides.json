@@ -10,8 +10,13 @@
 			},
 			"editorMode": "visual",
 			"pinnedPluginItems": {},
-			"hiddenBlockTypes": [],
-			"preferredStyleVariations": {}
+			"hiddenBlockTypes": []
+		}
+	},
+	"core/nux": {
+		"preferences": {
+			"areTipsEnabled": false,
+			"dismissedTips": {}
 		}
 	}
 }

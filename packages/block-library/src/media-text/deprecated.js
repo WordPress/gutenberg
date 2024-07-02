@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -76,7 +76,7 @@ const migrateDefaultAlign = ( attributes ) => {
 	};
 };
 
-const baseAttributes = {
+const v0Attributes = {
 	align: {
 		type: 'string',
 		default: 'wide',
@@ -104,12 +104,16 @@ const baseAttributes = {
 	},
 	isStackedOnMobile: {
 		type: 'boolean',
-		default: true,
+		default: false,
 	},
 };
 
 const v4ToV5BlockAttributes = {
-	...baseAttributes,
+	...v0Attributes,
+	isStackedOnMobile: {
+		type: 'boolean',
+		default: true,
+	},
 	mediaUrl: {
 		type: 'string',
 		source: 'attribute',
@@ -259,7 +263,7 @@ const v6 = {
 			attributes.mediaSizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
 		const newRel = ! rel ? undefined : rel;
 
-		const imageClasses = classnames( {
+		const imageClasses = clsx( {
 			[ `wp-image-${ mediaId }` ]: mediaId && mediaType === 'image',
 			[ `size-${ mediaSizeSlug }` ]: mediaId && mediaType === 'image',
 		} );
@@ -289,7 +293,7 @@ const v6 = {
 			image: () => image,
 			video: () => <video controls src={ mediaUrl } />,
 		};
-		const className = classnames( {
+		const className = clsx( {
 			'has-media-on-the-right': 'right' === mediaPosition,
 			'is-stacked-on-mobile': isStackedOnMobile,
 			[ `is-vertically-aligned-${ verticalAlignment }` ]:
@@ -388,7 +392,7 @@ const v5 = {
 			attributes.mediaSizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
 		const newRel = ! rel ? undefined : rel;
 
-		const imageClasses = classnames( {
+		const imageClasses = clsx( {
 			[ `wp-image-${ mediaId }` ]: mediaId && mediaType === 'image',
 			[ `size-${ mediaSizeSlug }` ]: mediaId && mediaType === 'image',
 		} );
@@ -418,7 +422,7 @@ const v5 = {
 			image: () => image,
 			video: () => <video controls src={ mediaUrl } />,
 		};
-		const className = classnames( {
+		const className = clsx( {
 			'has-media-on-the-right': 'right' === mediaPosition,
 			'is-stacked-on-mobile': isStackedOnMobile,
 			[ `is-vertically-aligned-${ verticalAlignment }` ]:
@@ -502,7 +506,7 @@ const v4 = {
 			attributes.mediaSizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
 		const newRel = ! rel ? undefined : rel;
 
-		const imageClasses = classnames( {
+		const imageClasses = clsx( {
 			[ `wp-image-${ mediaId }` ]: mediaId && mediaType === 'image',
 			[ `size-${ mediaSizeSlug }` ]: mediaId && mediaType === 'image',
 		} );
@@ -533,7 +537,7 @@ const v4 = {
 			video: () => <video controls src={ mediaUrl } />,
 		};
 
-		const className = classnames( {
+		const className = clsx( {
 			'has-media-on-the-right': 'right' === mediaPosition,
 			'is-stacked-on-mobile': isStackedOnMobile,
 			[ `is-vertically-aligned-${ verticalAlignment }` ]:
@@ -578,7 +582,11 @@ const v4 = {
 // See: https://github.com/WordPress/gutenberg/pull/21169
 const v3 = {
 	attributes: {
-		...baseAttributes,
+		...v0Attributes,
+		isStackedOnMobile: {
+			type: 'boolean',
+			default: true,
+		},
 		backgroundColor: {
 			type: 'string',
 		},
@@ -680,7 +688,7 @@ const v3 = {
 			'background-color',
 			backgroundColor
 		);
-		const className = classnames( {
+		const className = clsx( {
 			'has-media-on-the-right': 'right' === mediaPosition,
 			'has-background': backgroundClass || customBackgroundColor,
 			[ backgroundClass ]: backgroundClass,
@@ -726,7 +734,7 @@ const v3 = {
 // See: https://github.com/WordPress/gutenberg/pull/14364
 const v2 = {
 	attributes: {
-		...baseAttributes,
+		...v0Attributes,
 		backgroundColor: {
 			type: 'string',
 		},
@@ -783,7 +791,7 @@ const v2 = {
 			'background-color',
 			backgroundColor
 		);
-		const className = classnames( {
+		const className = clsx( {
 			'has-media-on-the-right': 'right' === mediaPosition,
 			[ backgroundClass ]: backgroundClass,
 			'is-stacked-on-mobile': isStackedOnMobile,
@@ -828,7 +836,7 @@ const v2 = {
 // See: https://github.com/WordPress/gutenberg/pull/11922
 const v1 = {
 	attributes: {
-		...baseAttributes,
+		...v0Attributes,
 		backgroundColor: {
 			type: 'string',
 		},
@@ -862,7 +870,7 @@ const v1 = {
 			'background-color',
 			backgroundColor
 		);
-		const className = classnames( {
+		const className = clsx( {
 			'has-media-on-the-right': 'right' === mediaPosition,
 			[ backgroundClass ]: backgroundClass,
 			'is-stacked-on-mobile': isStackedOnMobile,

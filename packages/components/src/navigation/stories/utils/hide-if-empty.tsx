@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ComponentStory } from '@storybook/react';
+import type { StoryFn } from '@storybook/react';
 
 /**
  * Internal dependencies
@@ -10,7 +10,7 @@ import { Navigation } from '../..';
 import { NavigationItem } from '../../item';
 import { NavigationMenu } from '../../menu';
 
-export const HideIfEmptyStory: ComponentStory< typeof Navigation > = ( {
+export const HideIfEmptyStory: StoryFn< typeof Navigation > = ( {
 	className,
 	...props
 } ) => {
@@ -42,11 +42,7 @@ export const HideIfEmptyStory: ComponentStory< typeof Navigation > = ( {
 					/>
 				</NavigationMenu>
 
-				<NavigationMenu
-					menu="root-sub-1"
-					parentMenu="root"
-					isEmpty={ true }
-				/>
+				<NavigationMenu menu="root-sub-1" parentMenu="root" isEmpty />
 				<NavigationMenu
 					menu="root-sub-2"
 					parentMenu="root"
@@ -57,7 +53,7 @@ export const HideIfEmptyStory: ComponentStory< typeof Navigation > = ( {
 				<NavigationMenu
 					menu="root-sub-1-sub-1"
 					parentMenu="root-sub-1"
-					isEmpty={ true }
+					isEmpty
 				/>
 			</Navigation>
 

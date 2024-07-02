@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { usePrevious } from '@wordpress/compose';
 import { useState, useLayoutEffect } from '@wordpress/element';
 
 /** @typedef {import('../register-format-type').WPFormat} WPFormat */
@@ -20,16 +21,35 @@ import { useState, useLayoutEffect } from '@wordpress/element';
 function getFormatElement( range, editableContentElement, tagName, className ) {
 	let element = range.startContainer;
 
-	// If the caret is right before the element, select the next element.
-	element = element.nextElementSibling || element;
+	// Even if the active format is defined, the actualy DOM range's start
+	// container may be outside of the format's DOM element:
+	// `a‸<strong>b</strong>` (DOM) while visually it's `a<strong>‸b</strong>`.
+	// So at a given selection index, start with the deepest format DOM element.
+	if (
+		element.nodeType === element.TEXT_NODE &&
+		range.startOffset === element.length &&
+		element.nextSibling
+	) {
+		element = element.nextSibling;
+
+		while ( element.firstChild ) {
+			element = element.firstChild;
+		}
+	}
 
 	if ( element.nodeType !== element.ELEMENT_NODE ) {
 		element = element.parentElement;
 	}
 
-	if ( ! element ) return;
-	if ( element === editableContentElement ) return;
-	if ( ! editableContentElement.contains( element ) ) return;
+	if ( ! element ) {
+		return;
+	}
+	if ( element === editableContentElement ) {
+		return;
+	}
+	if ( ! editableContentElement.contains( element ) ) {
+		return;
+	}
 
 	const selector = tagName + ( className ? '.' + className : '' );
 
@@ -51,7 +71,7 @@ function getFormatElement( range, editableContentElement, tagName, className ) {
 /**
  * @typedef {Object} VirtualAnchorElement
  * @property {() => DOMRect} getBoundingClientRect A function returning a DOMRect
- * @property {Document}      ownerDocument         The element's ownerDocument
+ * @property {HTMLElement}   contextElement        The actual DOM element
  */
 
 /**
@@ -64,7 +84,7 @@ function getFormatElement( range, editableContentElement, tagName, className ) {
  */
 function createVirtualAnchorElement( range, editableContentElement ) {
 	return {
-		ownerDocument: range.startContainer.ownerDocument,
+		contextElement: editableContentElement,
 		getBoundingClientRect() {
 			return editableContentElement.contains( range.startContainer )
 				? range.getBoundingClientRect()
@@ -86,18 +106,26 @@ function createVirtualAnchorElement( range, editableContentElement ) {
  * @return {HTMLElement|VirtualAnchorElement|undefined} The anchor.
  */
 function getAnchor( editableContentElement, tagName, className ) {
-	if ( ! editableContentElement ) return;
+	if ( ! editableContentElement ) {
+		return;
+	}
 
 	const { ownerDocument } = editableContentElement;
 	const { defaultView } = ownerDocument;
 	const selection = defaultView.getSelection();
 
-	if ( ! selection ) return;
-	if ( ! selection.rangeCount ) return;
+	if ( ! selection ) {
+		return;
+	}
+	if ( ! selection.rangeCount ) {
+		return;
+	}
 
 	const range = selection.getRangeAt( 0 );
 
-	if ( ! range || ! range.startContainer ) return;
+	if ( ! range || ! range.startContainer ) {
+		return;
+	}
 
 	const formatElement = getFormatElement(
 		range,
@@ -106,7 +134,9 @@ function getAnchor( editableContentElement, tagName, className ) {
 		className
 	);
 
-	if ( formatElement ) return formatElement;
+	if ( formatElement ) {
+		return formatElement;
+	}
 
 	return createVirtualAnchorElement( range, editableContentElement );
 }
@@ -124,15 +154,16 @@ function getAnchor( editableContentElement, tagName, className ) {
  * @return {Element|VirtualAnchorElement|undefined|null} The active element or selection range.
  */
 export function useAnchor( { editableContentElement, settings = {} } ) {
-	const { tagName, className } = settings;
+	const { tagName, className, isActive } = settings;
 	const [ anchor, setAnchor ] = useState( () =>
 		getAnchor( editableContentElement, tagName, className )
 	);
+	const wasActive = usePrevious( isActive );
 
 	useLayoutEffect( () => {
-		if ( ! editableContentElement ) return;
-
-		const { ownerDocument } = editableContentElement;
+		if ( ! editableContentElement ) {
+			return;
+		}
 
 		function callback() {
 			setAnchor(
@@ -148,15 +179,33 @@ export function useAnchor( { editableContentElement, settings = {} } ) {
 			ownerDocument.removeEventListener( 'selectionchange', callback );
 		}
 
-		if ( editableContentElement === ownerDocument.activeElement ) {
+		const { ownerDocument } = editableContentElement;
+
+		if (
+			editableContentElement === ownerDocument.activeElement ||
+			// When a link is created, we need to attach the popover to the newly created anchor.
+			( ! wasActive && isActive ) ||
+			// Sometimes we're _removing_ an active anchor, such as the inline color popover.
+			// When we add the color, it switches from a virtual anchor to a `<mark>` element.
+			// When we _remove_ the color, it switches from a `<mark>` element to a virtual anchor.
+			( wasActive && ! isActive )
+		) {
+			setAnchor(
+				getAnchor( editableContentElement, tagName, className )
+			);
 			attach();
 		}
 
 		editableContentElement.addEventListener( 'focusin', attach );
 		editableContentElement.addEventListener( 'focusout', detach );
 
-		return detach;
-	}, [ editableContentElement, tagName, className ] );
+		return () => {
+			detach();
+
+			editableContentElement.removeEventListener( 'focusin', attach );
+			editableContentElement.removeEventListener( 'focusout', detach );
+		};
+	}, [ editableContentElement, tagName, className, isActive, wasActive ] );
 
 	return anchor;
 }

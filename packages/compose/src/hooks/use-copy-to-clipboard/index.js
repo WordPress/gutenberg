@@ -54,9 +54,6 @@ export default function useCopyToClipboard( text, onSuccess ) {
 			// button, ensuring that it is not reset to the body, and
 			// further that it is kept within the rendered node.
 			clearSelection();
-			// Handle ClipboardJS focus bug, see
-			// https://github.com/zenorocha/clipboard.js/issues/680
-			node.focus();
 
 			if ( onSuccessRef.current ) {
 				onSuccessRef.current();

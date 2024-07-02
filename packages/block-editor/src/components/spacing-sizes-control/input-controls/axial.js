@@ -2,7 +2,12 @@
  * Internal dependencies
  */
 import SpacingInputControl from './spacing-input-control';
-import { LABELS, ICONS, hasAxisSupport } from '../utils';
+import {
+	LABELS,
+	ICONS,
+	getPresetValueFromCustomValue,
+	hasAxisSupport,
+} from '../utils';
 
 const groupedSides = [ 'vertical', 'horizontal' ];
 
@@ -20,7 +25,17 @@ export default function AxialInputControls( {
 		if ( ! onChange ) {
 			return;
 		}
-		const nextValues = { ...values };
+
+		// Encode the existing value into the preset value if the passed in value matches the value of one of the spacingSizes.
+		const nextValues = {
+			...Object.keys( values ).reduce( ( acc, key ) => {
+				acc[ key ] = getPresetValueFromCustomValue(
+					values[ key ],
+					spacingSizes
+				);
+				return acc;
+			}, {} ),
+		};
 
 		if ( side === 'vertical' ) {
 			nextValues.top = next;

@@ -1,16 +1,22 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import {
 	__experimentalHStack as HStack,
 	__experimentalHeading as Heading,
-	__experimentalUseNavigator as useNavigator,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { isRTL, __, sprintf } from '@wordpress/i18n';
 import { chevronRight, chevronLeft } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -22,6 +28,9 @@ import {
 	isPreviewingTheme,
 	currentlyPreviewingTheme,
 } from '../../utils/is-previewing-theme';
+import { SidebarNavigationContext } from '../sidebar';
+
+const { useHistory, useLocation } = unlock( routerPrivateApis );
 
 export default function SidebarNavigationScreen( {
 	isRoot,
@@ -31,50 +40,52 @@ export default function SidebarNavigationScreen( {
 	content,
 	footer,
 	description,
-	backPath,
+	backPath: backPathProp,
 } ) {
-	const { dashboardLink } = useSelect( ( select ) => {
-		const { getSettings } = unlock( select( editSiteStore ) );
-		return {
-			dashboardLink: getSettings().__experimentalDashboardLink,
-		};
-	}, [] );
-	const { getTheme } = useSelect( coreStore );
-	const navigator = useNavigator();
-	const theme = getTheme( currentlyPreviewingTheme() );
+	const { dashboardLink, dashboardLinkText, previewingThemeName } = useSelect(
+		( select ) => {
+			const { getSettings } = unlock( select( editSiteStore ) );
+			const currentlyPreviewingThemeId = currentlyPreviewingTheme();
+			return {
+				dashboardLink: getSettings().__experimentalDashboardLink,
+				dashboardLinkText:
+					getSettings().__experimentalDashboardLinkText,
+				// Do not call `getTheme` with null, it will cause a request to
+				// the server.
+				previewingThemeName: currentlyPreviewingThemeId
+					? select( coreStore ).getTheme( currentlyPreviewingThemeId )
+							?.name?.rendered
+					: undefined,
+			};
+		},
+		[]
+	);
+	const location = useLocation();
+	const history = useHistory();
+	const { navigate } = useContext( SidebarNavigationContext );
+	const backPath = backPathProp ?? location.state?.backPath;
 	const icon = isRTL() ? chevronRight : chevronLeft;
 
 	return (
 		<>
 			<VStack
-				className="edit-site-sidebar-navigation-screen__main"
+				className={ clsx( 'edit-site-sidebar-navigation-screen__main', {
+					'has-footer': !! footer,
+				} ) }
 				spacing={ 0 }
 				justify="flex-start"
 			>
 				<HStack
-					spacing={ 4 }
+					spacing={ 3 }
 					alignment="flex-start"
 					className="edit-site-sidebar-navigation-screen__title-icon"
 				>
-					{ ! isRoot && ! backPath && (
+					{ ! isRoot && (
 						<SidebarButton
 							onClick={ () => {
-								if ( navigator.location.isInitial ) {
-									navigator.goToParent( { replace: true } );
-								} else {
-									navigator.goBack();
-								}
+								history.push( backPath );
+								navigate( 'back' );
 							} }
-							icon={ icon }
-							label={ __( 'Back' ) }
-							showTooltip={ false }
-						/>
-					) }
-					{ ! isRoot && backPath && (
-						<SidebarButton
-							onClick={ () =>
-								navigator.goTo( backPath, { isBack: true } )
-							}
 							icon={ icon }
 							label={ __( 'Back' ) }
 							showTooltip={ false }
@@ -84,15 +95,9 @@ export default function SidebarNavigationScreen( {
 						<SidebarButton
 							icon={ icon }
 							label={
-								! isPreviewingTheme()
-									? __( 'Go to the Dashboard' )
-									: __( 'Go back to the theme showcase' )
+								dashboardLinkText || __( 'Go to the Dashboard' )
 							}
-							href={
-								! isPreviewingTheme()
-									? dashboardLink || 'index.php'
-									: 'themes.php'
-							}
+							href={ dashboardLink || 'index.php' }
 						/>
 					) }
 					<Heading
@@ -105,7 +110,7 @@ export default function SidebarNavigationScreen( {
 							? title
 							: sprintf(
 									'Previewing %1$s: %2$s',
-									theme?.name?.rendered,
+									previewingThemeName,
 									title
 							  ) }
 					</Heading>

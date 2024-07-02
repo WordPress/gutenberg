@@ -19,15 +19,15 @@ test.describe( 'Site editor browser history', () => {
 
 		// Navigate to a single template
 		await page.click( 'role=button[name="Templates"]' );
-		await page.click( 'role=button[name="Index"]' );
+		await page.getByRole( 'link', { name: 'Index' } ).click();
 		await expect( page ).toHaveURL(
-			'/wp-admin/site-editor.php?postType=wp_template&postId=emptytheme%2F%2Findex'
+			'/wp-admin/site-editor.php?postId=emptytheme%2F%2Findex&postType=wp_template&canvas=edit'
 		);
 
 		// Navigate back to the template list
 		await page.goBack();
 		await expect( page ).toHaveURL(
-			'/wp-admin/site-editor.php?path=%2Fwp_template'
+			'/wp-admin/site-editor.php?postType=wp_template'
 		);
 
 		// Navigate back to the dashboard

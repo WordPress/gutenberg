@@ -31,6 +31,7 @@ export type CategorySelectProps = Pick<
 	categoriesList: Category[];
 	onChange: ( newCategory: string ) => void;
 	selectedCategoryId?: Category[ 'id' ];
+	__next40pxDefaultSize: boolean;
 };
 
 export type AuthorSelectProps = Pick<
@@ -40,6 +41,7 @@ export type AuthorSelectProps = Pick<
 	authorList?: Author[];
 	onChange: ( newAuthor: string ) => void;
 	selectedAuthorId?: Author[ 'id' ];
+	__next40pxDefaultSize: boolean;
 };
 
 type Order = 'asc' | 'desc';
@@ -101,6 +103,13 @@ type BaseQueryControlsProps = {
 	 * The selected author ID.
 	 */
 	selectedAuthorId?: AuthorSelectProps[ 'selectedAuthorId' ];
+	/**
+	 * Start opting into the larger default height that will become the
+	 * default size in a future version.
+	 *
+	 * @default false
+	 */
+	__next40pxDefaultSize?: boolean;
 };
 
 export type QueryControlsWithSingleCategorySelectionProps =

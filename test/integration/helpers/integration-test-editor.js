@@ -9,17 +9,11 @@ import userEvent from '@testing-library/user-event';
  */
 import { useState, useEffect } from '@wordpress/element';
 import {
-	BlockEditorKeyboardShortcuts,
 	BlockEditorProvider,
-	BlockList,
-	BlockTools,
 	BlockInspector,
-	WritingFlow,
-	ObserveTyping,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { Popover, SlotFillProvider } from '@wordpress/components';
 import { registerCoreBlocks } from '@wordpress/block-library';
-import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 import '@wordpress/format-library';
 import {
 	createBlock,
@@ -31,6 +25,11 @@ import {
  * Internal dependencies
  */
 import { waitForStoreResolvers } from './wait-for-store-resolvers';
+import { unlock } from '../../../packages/block-library/src/lock-unlock';
+
+const { ExperimentalBlockCanvas: BlockCanvas } = unlock(
+	blockEditorPrivateApis
+);
 
 // Polyfill for String.prototype.replaceAll until CI is runnig Node 15 or higher.
 if ( ! String.prototype.replaceAll ) {
@@ -69,28 +68,15 @@ export function Editor( { testBlocks, settings = {} } ) {
 	}, [] );
 
 	return (
-		<ShortcutProvider>
-			<SlotFillProvider>
-				<BlockEditorProvider
-					value={ currentBlocks }
-					onInput={ updateBlocks }
-					onChange={ updateBlocks }
-					settings={ settings }
-				>
-					<BlockInspector />
-					<BlockTools>
-						<BlockEditorKeyboardShortcuts.Register />
-						<WritingFlow>
-							<ObserveTyping>
-								<BlockList />
-							</ObserveTyping>
-						</WritingFlow>
-					</BlockTools>
-
-					<Popover.Slot />
-				</BlockEditorProvider>
-			</SlotFillProvider>
-		</ShortcutProvider>
+		<BlockEditorProvider
+			value={ currentBlocks }
+			onInput={ updateBlocks }
+			onChange={ updateBlocks }
+			settings={ settings }
+		>
+			<BlockInspector />
+			<BlockCanvas height="100%" shouldIframe={ false } />
+		</BlockEditorProvider>
 	);
 }
 

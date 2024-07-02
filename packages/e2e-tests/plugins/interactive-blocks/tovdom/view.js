@@ -1,5 +1,6 @@
-( ( { wp } ) => {
-	const { store } = wp.interactivity;
+/**
+ * WordPress dependencies
+ */
+import { store } from '@wordpress/interactivity';
 
-	store( {} );
-} )( window );
+store( 'tovdom', {} );

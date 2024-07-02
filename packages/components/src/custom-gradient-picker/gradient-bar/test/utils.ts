@@ -13,7 +13,7 @@ describe( 'getHorizontalRelativeGradientPosition', () => {
 				( {
 					x: 0,
 					width: 1000,
-				} as DOMRect )
+				} ) as DOMRect
 		);
 
 		const containerElement = document.createElement( 'div' );
@@ -31,7 +31,7 @@ describe( 'getHorizontalRelativeGradientPosition', () => {
 				( {
 					x: 50,
 					width: 1000,
-				} as DOMRect )
+				} ) as DOMRect
 		);
 
 		const containerElement = document.createElement( 'div' );
@@ -49,7 +49,7 @@ describe( 'getHorizontalRelativeGradientPosition', () => {
 				( {
 					x: 0,
 					width: 1000,
-				} as DOMRect )
+				} ) as DOMRect
 		);
 
 		const containerElement = document.createElement( 'div' );
@@ -68,7 +68,7 @@ describe( 'getHorizontalRelativeGradientPosition', () => {
 				( {
 					x: 50,
 					width: 1000,
-				} as DOMRect )
+				} ) as DOMRect
 		);
 		const containerElement = document.createElement( 'div' );
 
@@ -86,7 +86,7 @@ describe( 'getHorizontalRelativeGradientPosition', () => {
 				( {
 					x: 50,
 					width: 1000,
-				} as DOMRect )
+				} ) as DOMRect
 		);
 
 		const containerElement = document.createElement( 'div' );

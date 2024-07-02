@@ -35,7 +35,7 @@ export default function mediaUpload( {
 	onError = noop,
 	onFileChange,
 } ) {
-	const { getCurrentPostId, getEditorSettings } = select( editorStore );
+	const { getCurrentPost, getEditorSettings } = select( editorStore );
 	const {
 		lockPostAutosaving,
 		unlockPostAutosaving,
@@ -48,13 +48,19 @@ export default function mediaUpload( {
 	let imageIsUploading = false;
 	maxUploadFileSize =
 		maxUploadFileSize || getEditorSettings().maxUploadFileSize;
-
+	const currentPost = getCurrentPost();
+	// Templates and template parts' numerical ID is stored in `wp_id`.
+	const currentPostId =
+		typeof currentPost?.id === 'number'
+			? currentPost.id
+			: currentPost?.wp_id;
 	const setUploadLock = () => {
 		lockPostSaving( lockKey );
 		lockPostAutosaving( lockKey );
 		imageIsUploading = true;
 	};
 
+	const postData = currentPostId ? { post: currentPostId } : {};
 	const clearUploadLock = () => {
 		unlockPostSaving( lockKey );
 		unlockPostAutosaving( lockKey );
@@ -73,7 +79,7 @@ export default function mediaUpload( {
 			onFileChange( file );
 		},
 		additionalData: {
-			post: getCurrentPostId(),
+			...postData,
 			...additionalData,
 		},
 		maxUploadFileSize,

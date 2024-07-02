@@ -3,9 +3,12 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-test.describe( 'splitting and merging blocks', () => {
-	test.beforeEach( async ( { admin } ) => {
+test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
+	test.beforeEach( async ( { admin, editor } ) => {
 		await admin.createNewPost();
+		await expect(
+			editor.canvas.getByRole( 'textbox', { name: 'Add title' } )
+		).toBeFocused();
 	} );
 
 	test.afterEach( async ( { requestUtils } ) => {
@@ -334,10 +337,17 @@ test.describe( 'splitting and merging blocks', () => {
 		await pageUtils.pressKeys( 'primary+z' );
 
 		// Check the content.
-		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: '12',
+				},
+			},
+		] );
 	} );
 
-	test( 'should not split with line break in front', async ( {
+	test( 'should not split with line break in front (-firefox)', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -364,6 +374,52 @@ test.describe( 'splitting and merging blocks', () => {
 	} );
 
 	test.describe( 'test restore selection when merge produces more than one block', () => {
+		const snap1 = [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'hi',
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'item 1',
+				},
+			},
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: {
+							content: 'item 2',
+						},
+					},
+				],
+			},
+		];
+
+		const snap2 = [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'hi-item 1',
+				},
+			},
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: {
+							content: 'item 2',
+						},
+					},
+				],
+			},
+		];
+
 		test( 'on forward delete', async ( { editor, page, pageUtils } ) => {
 			await editor.insertBlock( { name: 'core/paragraph' } );
 			await page.keyboard.type( 'hi' );
@@ -374,14 +430,14 @@ test.describe( 'splitting and merging blocks', () => {
 			await pageUtils.pressKeys( 'ArrowUp', { times: 3 } );
 			await page.keyboard.press( 'Delete' );
 
-			expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+			expect( await editor.getBlocks() ).toMatchObject( snap1 );
 
 			await page.keyboard.press( 'Delete' );
 			// Carret should be in the first block and at the proper position.
 			await page.keyboard.type( '-' );
 
 			// Check the content.
-			expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+			expect( await editor.getBlocks() ).toMatchObject( snap2 );
 		} );
 
 		test( 'on backspace', async ( { editor, page, pageUtils } ) => {
@@ -395,14 +451,14 @@ test.describe( 'splitting and merging blocks', () => {
 			await pageUtils.pressKeys( 'ArrowLeft', { times: 6 } );
 			await page.keyboard.press( 'Backspace' );
 
-			expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+			expect( await editor.getBlocks() ).toMatchObject( snap1 );
 
 			await page.keyboard.press( 'Backspace' );
 			// Carret should be in the first block and at the proper position.
 			await page.keyboard.type( '-' );
 
 			// Check the content.
-			expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+			expect( await editor.getBlocks() ).toMatchObject( snap2 );
 		} );
 	} );
 } );

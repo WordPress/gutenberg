@@ -38,7 +38,7 @@ export function useNavModeExit( clientId ) {
 			node.addEventListener( 'mousedown', onMouseDown );
 
 			return () => {
-				node.addEventListener( 'mousedown', onMouseDown );
+				node.removeEventListener( 'mousedown', onMouseDown );
 			};
 		},
 		[ clientId, isNavigationMode, isBlockSelected, setNavigationMode ]

@@ -6,14 +6,16 @@ import { View, useWindowDimensions } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { useConvertUnitToMobile } from '@wordpress/components';
+import {
+	useConvertUnitToMobile,
+	getPxFromCssUnit,
+} from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import {
 	InspectorControls,
 	isValueSpacingPreset,
-	useSetting,
+	useSettings,
 	getCustomValueFromPreset,
-	getPxFromCssUnit,
 } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
 
@@ -39,10 +41,11 @@ const Spacer = ( {
 		fontSize: DEFAULT_FONT_SIZE,
 	};
 	const { height, width } = attributes;
-	const spacingSizes = [
-		{ name: 0, slug: '0', size: 0 },
-		...( useSetting( 'spacing.spacingSizes' ) || [] ),
-	];
+	const spacingSizes = [ { name: 0, slug: '0', size: 0 } ];
+	const [ settingsSizes ] = useSettings( 'spacing.spacingSizes' );
+	if ( settingsSizes ) {
+		spacingSizes.push( ...settingsSizes );
+	}
 	const { orientation } = context;
 	const defaultStyle = getStylesFromColorScheme(
 		styles.staticSpacer,

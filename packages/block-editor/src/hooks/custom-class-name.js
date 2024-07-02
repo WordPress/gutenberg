@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -10,7 +10,6 @@ import { addFilter } from '@wordpress/hooks';
 import { TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { hasBlockSupport } from '@wordpress/blocks';
-import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -39,58 +38,39 @@ export function addAttribute( settings ) {
 	return settings;
 }
 
-/**
- * Override the default edit UI to include a new block inspector control for
- * assigning the custom class name, if block supports custom class name.
- * The control is displayed within the Advanced panel in the block inspector.
- *
- * @param {WPComponent} BlockEdit Original component.
- *
- * @return {WPComponent} Wrapped component.
- */
-export const withInspectorControl = createHigherOrderComponent(
-	( BlockEdit ) => {
-		return ( props ) => {
-			const blockEditingMode = useBlockEditingMode();
-			const hasCustomClassName = hasBlockSupport(
-				props.name,
-				'customClassName',
-				true
-			);
-			if ( hasCustomClassName && props.isSelected ) {
-				return (
-					<>
-						<BlockEdit { ...props } />
-						{ blockEditingMode === 'default' && (
-							<InspectorControls group="advanced">
-								<TextControl
-									__nextHasNoMarginBottom
-									autoComplete="off"
-									label={ __( 'Additional CSS class(es)' ) }
-									value={ props.attributes.className || '' }
-									onChange={ ( nextValue ) => {
-										props.setAttributes( {
-											className:
-												nextValue !== ''
-													? nextValue
-													: undefined,
-										} );
-									} }
-									help={ __(
-										'Separate multiple classes with spaces.'
-									) }
-								/>
-							</InspectorControls>
-						) }
-					</>
-				);
-			}
+function CustomClassNameControlsPure( { className, setAttributes } ) {
+	const blockEditingMode = useBlockEditingMode();
+	if ( blockEditingMode !== 'default' ) {
+		return null;
+	}
 
-			return <BlockEdit { ...props } />;
-		};
+	return (
+		<InspectorControls group="advanced">
+			<TextControl
+				__nextHasNoMarginBottom
+				__next40pxDefaultSize
+				autoComplete="off"
+				label={ __( 'Additional CSS class(es)' ) }
+				value={ className || '' }
+				onChange={ ( nextValue ) => {
+					setAttributes( {
+						className: nextValue !== '' ? nextValue : undefined,
+					} );
+				} }
+				help={ __( 'Separate multiple classes with spaces.' ) }
+			/>
+		</InspectorControls>
+	);
+}
+
+export default {
+	edit: CustomClassNameControlsPure,
+	addSaveProps,
+	attributeKeys: [ 'className' ],
+	hasSupport( name ) {
+		return hasBlockSupport( name, 'customClassName', true );
 	},
-	'withInspectorControl'
-);
+};
 
 /**
  * Override props assigned to save component to inject the className, if block
@@ -108,7 +88,7 @@ export function addSaveProps( extraProps, blockType, attributes ) {
 		hasBlockSupport( blockType, 'customClassName', true ) &&
 		attributes.className
 	) {
-		extraProps.className = classnames(
+		extraProps.className = clsx(
 			extraProps.className,
 			attributes.className
 		);
@@ -158,18 +138,8 @@ export function addTransforms( result, source, index, results ) {
 
 addFilter(
 	'blocks.registerBlockType',
-	'core/custom-class-name/attribute',
+	'core/editor/custom-class-name/attribute',
 	addAttribute
-);
-addFilter(
-	'editor.BlockEdit',
-	'core/editor/custom-class-name/with-inspector-control',
-	withInspectorControl
-);
-addFilter(
-	'blocks.getSaveContent.extraProps',
-	'core/custom-class-name/save-props',
-	addSaveProps
 );
 
 addFilter(

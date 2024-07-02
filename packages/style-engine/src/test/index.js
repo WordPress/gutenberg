@@ -224,6 +224,14 @@ describe( 'getCSSRules', () => {
 		expect(
 			getCSSRules(
 				{
+					background: {
+						backgroundImage: {
+							url: 'https://example.com/image.jpg',
+						},
+						backgroundPosition: '50% 50%',
+						backgroundRepeat: 'no-repeat',
+						backgroundSize: '300px',
+					},
 					color: {
 						text: '#dddddd',
 						background: '#555555',
@@ -371,6 +379,26 @@ describe( 'getCSSRules', () => {
 				key: 'boxShadow',
 				value: '10px 10px red',
 			},
+			{
+				selector: '.some-selector',
+				key: 'backgroundImage',
+				value: "url( 'https://example.com/image.jpg' )",
+			},
+			{
+				selector: '.some-selector',
+				key: 'backgroundPosition',
+				value: '50% 50%',
+			},
+			{
+				selector: '.some-selector',
+				key: 'backgroundRepeat',
+				value: 'no-repeat',
+			},
+			{
+				selector: '.some-selector',
+				key: 'backgroundSize',
+				value: '300px',
+			},
 		] );
 	} );
 
@@ -397,6 +425,28 @@ describe( 'getCSSRules', () => {
 				selector: '.some-selector a',
 				key: 'padding',
 				value: '11px',
+			},
+		] );
+	} );
+
+	it( 'should output background image value when that value is a string', () => {
+		expect(
+			getCSSRules(
+				{
+					background: {
+						backgroundImage:
+							"linear-gradient(to bottom,rgb(255 255 0 / 50%),rgb(0 0 255 / 50%), url('https://example.com/image.jpg')",
+					},
+				},
+				{
+					selector: '.some-selector',
+				}
+			)
+		).toEqual( [
+			{
+				selector: '.some-selector',
+				key: 'backgroundImage',
+				value: "linear-gradient(to bottom,rgb(255 255 0 / 50%),rgb(0 0 255 / 50%), url('https://example.com/image.jpg')",
 			},
 		] );
 	} );
