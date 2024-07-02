@@ -119,9 +119,7 @@ export function useCurrentMergeThemeStyleVariationsWithUserConfig( {
 		 * Filter out variations with no settings or styles.
 		 */
 		return variationsByProperty?.length
-			? variationsByProperty.filter(
-					( variation ) => ! isEmptyStyleVariation( variation )
-			  )
+			? variationsByProperty.filter( hasThemeVariation )
 			: [];
 	}, [ properties.toString(), userVariation, variationsFromTheme ] );
 }
