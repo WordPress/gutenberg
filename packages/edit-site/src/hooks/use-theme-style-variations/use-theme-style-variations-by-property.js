@@ -89,7 +89,7 @@ export function useCurrentMergeThemeStyleVariationsWithUserConfig( {
 	}, [] );
 	const { user: userVariation } = useContext( GlobalStylesContext );
 
-	const variationsByProperty = useMemo( () => {
+	return useMemo( () => {
 		const clonedUserVariation = cloneDeep( userVariation );
 
 		// Get user variation and remove the settings for the given property.
@@ -110,20 +110,20 @@ export function useCurrentMergeThemeStyleVariationsWithUserConfig( {
 				);
 			} );
 
-		return [
+		const variationsByProperty = [
 			userVariationWithoutProperties,
 			...variationsWithPropertiesAndBase,
 		];
-	}, [ properties.toString(), userVariation, variationsFromTheme ] );
 
-	/*
-	 * Filter out variations with no settings or styles.
-	 */
-	return variationsByProperty?.length
-		? variationsByProperty.filter(
-				( variation ) => ! isEmptyStyleVariation( variation )
-		  )
-		: [];
+		/*
+		 * Filter out variations with no settings or styles.
+		 */
+		return variationsByProperty?.length
+			? variationsByProperty.filter(
+					( variation ) => ! isEmptyStyleVariation( variation )
+			  )
+			: [];
+	}, [ properties.toString(), userVariation, variationsFromTheme ] );
 }
 
 /**
