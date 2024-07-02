@@ -336,12 +336,6 @@ export default function CoverInspectorControls( {
 					<ToolsPanelItem
 						hasValue={ () => !! sizeSlug }
 						label={ __( 'Resolution' ) }
-						onDeselect={ () =>
-							setAttributes( { sizeSlug: undefined } )
-						}
-						resetAllFilter={ () => ( {
-							sizeSlug: undefined,
-						} ) }
 						isShownByDefault
 						panelId={ clientId }
 					>
