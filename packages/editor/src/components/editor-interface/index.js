@@ -215,18 +215,22 @@ export default function EditorInterface( {
 				)
 			}
 			actions={
-				customSavePanel || (
-					<SavePublishPanels
-						closeEntitiesSavedStates={ closeEntitiesSavedStates }
-						isEntitiesSavedStatesOpen={
-							entitiesSavedStatesCallback
-						}
-						setEntitiesSavedStatesCallback={
-							setEntitiesSavedStatesCallback
-						}
-						forceIsDirtyPublishPanel={ forceIsDirty }
-					/>
-				)
+				! isPreviewMode
+					? customSavePanel || (
+							<SavePublishPanels
+								closeEntitiesSavedStates={
+									closeEntitiesSavedStates
+								}
+								isEntitiesSavedStatesOpen={
+									entitiesSavedStatesCallback
+								}
+								setEntitiesSavedStatesCallback={
+									setEntitiesSavedStatesCallback
+								}
+								forceIsDirtyPublishPanel={ forceIsDirty }
+							/>
+					  )
+					: undefined
 			}
 			shortcuts={ {
 				previous: previousShortcut,

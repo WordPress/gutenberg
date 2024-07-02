@@ -43,6 +43,7 @@ import { useIsSiteEditorLoading } from './hooks';
 import useMovingAnimation from './animation';
 import SidebarContent from '../sidebar';
 import SaveHub from '../save-hub';
+import SavePanel from '../save-panel';
 import useSyncCanvasModeWithURL from '../sync-state-with-url/use-sync-canvas-mode-with-url';
 
 const { useCommands } = unlock( coreCommandsPrivateApis );
@@ -162,6 +163,7 @@ export default function Layout( { route } ) {
 											{ areas.sidebar }
 										</SidebarContent>
 										<SaveHub />
+										<SavePanel />
 									</motion.div>
 								) }
 							</AnimatePresence>

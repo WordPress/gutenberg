@@ -203,11 +203,7 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 					customSaveButton={
 						_isPreviewingTheme && <SaveButton size="compact" />
 					}
-					customSavePanel={
-						( _isPreviewingTheme || canvasMode === 'view' ) && (
-							<SavePanel />
-						)
-					}
+					customSavePanel={ _isPreviewingTheme && <SavePanel /> }
 					forceDisableBlockTools={ ! hasDefaultEditorCanvasView }
 					title={ title }
 					icon={ icon }
