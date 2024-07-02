@@ -151,7 +151,6 @@ export const WithHintItemWrapper = styled.div`
 	flex-wrap: wrap;
 	flex: 1;
 	column-gap: ${ space( 4 ) };
-	row-gap: ${ space( 1 ) };
 `;
 
 export const WithHintItemHint = styled.span`
@@ -159,4 +158,5 @@ export const WithHintItemHint = styled.span`
 	text-align: initial;
 	line-height: ${ CONFIG.fontLineHeightBase };
 	padding-inline-end: ${ space( 1 ) };
+	margin-block: ${ space( 1 ) };
 `;
