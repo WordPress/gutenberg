@@ -21,7 +21,7 @@ export const setCanvasMode =
 				registry.dispatch( editorStore ).setDeviceType( 'Desktop' );
 				registry
 					.dispatch( blockEditorStore )
-					.__unstableSetEditorMode( mode );
+					.__unstableSetEditorMode( 'edit' );
 				const isPublishSidebarOpened = registry
 					.select( editorStore )
 					.isPublishSidebarOpened();
