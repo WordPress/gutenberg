@@ -77,11 +77,14 @@ const EmbedPreview = ( {
 
 	const { provider_url: providerUrl } = preview;
 	const html = 'photo' === type ? getPhotoHtml( preview ) : preview.html;
-	const embedSourceUrl = new URL( url ).host.split( '.' );
+	const parsedHost = new URL( url ).host.split( '.' );
+	const parsedHostBaseUrl = parsedHost
+		.splice( parsedHost.length - 2, parsedHost.length - 1 )
+		.join( '.' );
 	const iframeTitle = sprintf(
 		// translators: %s: host providing embed content e.g: www.youtube.com
 		__( 'Embedded content from %s' ),
-		embedSourceUrl
+		parsedHostBaseUrl
 	);
 	const sandboxClassnames = clsx(
 		type,
