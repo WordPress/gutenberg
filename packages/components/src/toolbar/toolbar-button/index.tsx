@@ -60,7 +60,6 @@ function UnforwardedToolbarButton(
 						className
 					) }
 					isPressed={ isActive }
-					__experimentalIsFocusable
 					disabled={ isDisabled }
 					data-toolbar-item
 					{ ...extraProps }
@@ -86,7 +85,6 @@ function UnforwardedToolbarButton(
 				<Button
 					label={ title }
 					isPressed={ isActive }
-					__experimentalIsFocusable
 					disabled={ isDisabled }
 					{ ...toolbarItemProps }
 				>
