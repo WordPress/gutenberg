@@ -57,7 +57,7 @@ const getPickerType = (
 		return 'custom';
 	}
 
-	return shouldUseSelectOverToggle( fontSizes.length ) || isCustomValue
+	return shouldUseSelectOverToggle( fontSizes.length )
 		? 'select'
 		: 'togglegroup';
 };
