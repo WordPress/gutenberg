@@ -46,7 +46,6 @@ import SiteHub from '../site-hub';
 import ResizableFrame from '../resizable-frame';
 import useSyncCanvasModeWithURL from '../sync-state-with-url/use-sync-canvas-mode-with-url';
 import { unlock } from '../../lock-unlock';
-import SavePanel from '../save-panel';
 import KeyboardShortcutsRegister from '../keyboard-shortcuts/register';
 import KeyboardShortcutsGlobal from '../keyboard-shortcuts/global';
 import { useCommonCommands } from '../../hooks/commands/use-common-commands';
@@ -56,6 +55,7 @@ import useLayoutAreas from './router';
 import useMovingAnimation from './animation';
 import SidebarContent from '../sidebar';
 import SaveHub from '../save-hub';
+import SavePanel from '../save-panel';
 
 const { useCommands } = unlock( coreCommandsPrivateApis );
 const { useCommandContext } = unlock( commandsPrivateApis );
@@ -209,6 +209,7 @@ export default function Layout() {
 											{ areas.sidebar }
 										</SidebarContent>
 										<SaveHub />
+										<SavePanel />
 									</motion.div>
 								) }
 							</AnimatePresence>
@@ -282,8 +283,6 @@ export default function Layout() {
 						</div>
 					) }
 				</div>
-
-				<SavePanel />
 			</div>
 		</>
 	);

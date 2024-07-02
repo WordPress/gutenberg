@@ -29,6 +29,7 @@ function Editor( {
 	className,
 	styles,
 	customSaveButton,
+	customSavePanel,
 	forceDisableBlockTools,
 	title,
 	iframeProps,
@@ -81,6 +82,7 @@ function Editor( {
 				styles={ styles }
 				enableRegionNavigation={ enableRegionNavigation }
 				customSaveButton={ customSaveButton }
+				customSavePanel={ customSavePanel }
 				forceDisableBlockTools={ forceDisableBlockTools }
 				title={ title }
 				iframeProps={ iframeProps }
