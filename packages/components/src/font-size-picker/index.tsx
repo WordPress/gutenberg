@@ -9,7 +9,6 @@ import type { ForwardedRef } from 'react';
 import { __ } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
 import { useState, forwardRef, useEffect } from '@wordpress/element';
-import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -113,15 +112,6 @@ const UnforwardedFontSizePicker = (
 
 	let computedPickerMode = pickerMode;
 	if ( disableCustomFontSizes !== undefined ) {
-		deprecated(
-			'`disableCustomFontSizes` prop in wp.components.FontSizePicker',
-			{
-				since: '6.7',
-				version: '6.9',
-				alternative: '`pickerMode` prop',
-			}
-		);
-
 		computedPickerMode = disableCustomFontSizes ? 'predefined' : 'both';
 	}
 
