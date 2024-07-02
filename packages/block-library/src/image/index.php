@@ -29,12 +29,16 @@ function render_block_core_image( $attributes, $content, $block ) {
 	}
 
 	if ( isset( $attributes['id'] ) ) {
+		$id = $attributes['id'];
+
 		// Adds the data-id="$id" attribute to the img element to provide backwards
 		// compatibility for the Gallery Block, which now wraps Image Blocks within
 		// innerBlocks. The data-id attribute is added in a core/gallery
 		// `render_block_data` hook.
-		$id = $attributes['id'];
-		$p->set_attribute( 'data-id', $id );
+		$is_gallery_child = array_key_exists( 'allowResize', $block->context );
+		if ( $is_gallery_child ) {
+			$p->set_attribute( 'data-id', $id );
+		}
 
 		// If there's a mismatch with the 'wp-image-' class and the actual id, the id was
 		// probably overridden by block bindings. Update it to the correct value.
