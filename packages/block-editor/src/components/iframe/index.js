@@ -13,6 +13,7 @@ import {
 	useMemo,
 	useEffect,
 	useRef,
+	useInsertionEffect,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
@@ -20,6 +21,7 @@ import {
 	useMergeRefs,
 	useRefEffect,
 	useDisabled,
+	useReducedMotion,
 } from '@wordpress/compose';
 import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
@@ -122,7 +124,6 @@ function Iframe( {
 	}, [] );
 	const { styles = '', scripts = '' } = resolvedAssets;
 	const [ iframeDocument, setIframeDocument ] = useState();
-	const prevContainerWidthRef = useRef();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
 	const clearerRef = useBlockSelectionClearer();
 	const [ before, writingFlowRef, after ] = useWritingFlow();
@@ -191,6 +192,10 @@ function Iframe( {
 				preventFileDropDefault,
 				false
 			);
+			iFrameDocument.addEventListener(
+				'transitionend',
+				refZoomOutStatus.current
+			);
 		}
 
 		node.addEventListener( 'load', onLoad );
@@ -239,13 +244,62 @@ function Iframe( {
 		};
 	}, [] );
 
-	const isZoomedOut = scale !== 1;
+	const isReducedMotion = useReducedMotion();
 
-	useEffect( () => {
-		if ( ! isZoomedOut ) {
-			prevContainerWidthRef.current = containerWidth;
+	const isZoomedOut = scale !== 1;
+	const shouldScaleToDefault = scale === 'default';
+
+	const refZoomOutStatus = useRef( {
+		isZoomOut: isZoomedOut,
+		isZoomingOut: false,
+		priorContainerWidth: null,
+		scale: null,
+		/** @param { TransitionEvent } $ */
+		handleEvent( { propertyName } ) {
+			if ( propertyName === 'transform' && this.isZoomingOut ) {
+				this.isZoomingOut = false;
+			}
+		},
+	} );
+
+	// Readies zoom out related (mutable) state once engaged.
+	useInsertionEffect( () => {
+		refZoomOutStatus.current.isZoomOut = isZoomedOut;
+		if ( isZoomedOut ) {
+			if ( ! isReducedMotion ) {
+				refZoomOutStatus.current.isZoomingOut = true;
+			}
+			if ( shouldScaleToDefault ) {
+				refZoomOutStatus.current.scale = null;
+				refZoomOutStatus.current.priorContainerWidth = containerWidth;
+			}
 		}
-	}, [ containerWidth, isZoomedOut ] );
+	}, [ isZoomedOut, isReducedMotion, shouldScaleToDefault ] );
+
+	// Derives the scaling factor for 'default' scale as containerWidth changes
+	// yet leaves it constant after the container’s automated resize completes.
+	// This is so that container width changes caused by a user action like
+	// browser window resizing should not change the scale.
+	useEffect( () => {
+		if ( ! shouldScaleToDefault ) {
+			return;
+		}
+		const { priorContainerWidth, isZoomingOut } = refZoomOutStatus.current;
+		// Updates scale only while the container’s width transitions.
+		if ( isZoomingOut ) {
+			refZoomOutStatus.current.scale =
+				containerWidth / priorContainerWidth;
+		}
+		// With reduced motion, updates the scale only the first time
+		// containerWidth differs from priorContainerWidth.
+		else if (
+			refZoomOutStatus.current.scale === null &&
+			containerWidth !== priorContainerWidth
+		) {
+			refZoomOutStatus.current.scale =
+				containerWidth / priorContainerWidth;
+		}
+	}, [ containerWidth, shouldScaleToDefault ] );
 
 	const disabledRef = useDisabled( { isDisabled: ! readonly } );
 	const bodyRef = useMergeRefs( [
@@ -305,12 +359,9 @@ function Iframe( {
 
 		iframeDocument.documentElement.classList.add( 'is-zoomed-out' );
 
-		const maxWidth = 750;
 		iframeDocument.documentElement.style.setProperty(
 			'--wp-block-editor-iframe-zoom-out-scale',
-			scale === 'default'
-				? Math.min( 1, containerWidth / prevContainerWidthRef.current )
-				: scale
+			scale === 'default' ? refZoomOutStatus.current.scale : scale
 		);
 		iframeDocument.documentElement.style.setProperty(
 			'--wp-block-editor-iframe-zoom-out-frame-size',
