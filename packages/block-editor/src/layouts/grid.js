@@ -322,7 +322,7 @@ function GridLayoutColumnsAndRowsControl( {
 								onChange={ ( value ) => {
 									onChange( {
 										...layout,
-										rowCount: value,
+										rowCount: parseInt( value, 10 ),
 									} );
 								} }
 								value={ rowCount }
@@ -335,7 +335,7 @@ function GridLayoutColumnsAndRowsControl( {
 								onChange={ ( value ) =>
 									onChange( {
 										...layout,
-										columnCount: value,
+										columnCount: parseInt( value, 10 ),
 									} )
 								}
 								min={ 0 }
