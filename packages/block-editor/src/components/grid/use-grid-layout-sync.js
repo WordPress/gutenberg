@@ -11,21 +11,28 @@ import { store as blockEditorStore } from '../../store';
 import { GridRect } from './utils';
 
 export function useGridLayoutSync( { clientId: gridClientId } ) {
-	const { getBlockOrder, getBlockAttributes } = useSelect( blockEditorStore );
+	const { gridLayout, blockOrder, getBlockAttributes } = useSelect(
+		( select ) => {
+			const { getBlockAttributes: _getBlockAttributes, getBlockOrder } =
+				select( blockEditorStore );
+			return {
+				gridLayout: _getBlockAttributes( gridClientId ).layout ?? {},
+				blockOrder: getBlockOrder( gridClientId ),
+				getBlockAttributes: _getBlockAttributes,
+			};
+		},
+		[ gridClientId ]
+	);
 	const { updateBlockAttributes, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
-	const blockOrder = getBlockOrder( gridClientId );
-
 	useEffect( () => {
-		const gridLayout = getBlockAttributes( gridClientId ).layout ?? {};
 		const updates = {};
 		const { columnCount, rowCount, manualPlacement } = gridLayout;
 		const isManualGrid = !! manualPlacement;
 
 		if ( isManualGrid ) {
 			const rects = [];
-			let cellsTaken = 0;
 			let lowestRowEnd = 0;
 
 			// Respect the position of blocks that already have a columnStart and rowStart value.
@@ -37,7 +44,6 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 					columnSpan = 1,
 					rowSpan = 1,
 				} = attributes.style?.layout || {};
-				cellsTaken += columnSpan * rowSpan;
 				if ( ! columnStart || ! rowStart ) {
 					continue;
 				}
@@ -52,9 +58,6 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 				lowestRowEnd = Math.max( lowestRowEnd, rowStart + rowSpan - 1 );
 			}
 
-			// Ensure there's enough rows to fit all blocks.
-			const minimumNeededRows = Math.ceil( cellsTaken / columnCount );
-
 			// When in manual mode, ensure that every block has a columnStart and rowStart value.
 			for ( const clientId of blockOrder ) {
 				const attributes = getBlockAttributes( clientId );
@@ -66,7 +69,7 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 				const [ newColumnStart, newRowStart ] = getFirstEmptyCell(
 					rects,
 					columnCount,
-					minimumNeededRows,
+					Math.max( rowCount, lowestRowEnd ),
 					columnSpan,
 					rowSpan
 				);
@@ -90,11 +93,11 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 				};
 				lowestRowEnd = Math.max( lowestRowEnd, rowStart + rowSpan - 1 );
 			}
-			if ( rowCount !== lowestRowEnd ) {
+			if ( ! rowCount || rowCount < lowestRowEnd ) {
 				updates[ gridClientId ] = {
 					layout: {
 						...gridLayout,
-						rowCount: minimumNeededRows,
+						rowCount: lowestRowEnd,
 					},
 				};
 			}
@@ -137,6 +140,7 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 		// Actual deps to sync:
 		gridClientId,
 		blockOrder,
+		gridLayout,
 		// Needed for linter:
 		__unstableMarkNextChangeAsNotPersistent,
 		getBlockAttributes,
