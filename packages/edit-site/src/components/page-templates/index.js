@@ -256,7 +256,7 @@ export default function PageTemplates() {
 		}
 	);
 	const history = useHistory();
-	const onSelectionChange = useCallback(
+	const onChangeSelection = useCallback(
 		( items ) => {
 			if ( view?.type === LAYOUT_LIST ) {
 				history.push( {
@@ -372,7 +372,7 @@ export default function PageTemplates() {
 				isLoading={ isLoadingData }
 				view={ view }
 				onChangeView={ onChangeView }
-				onSelectionChange={ onSelectionChange }
+				onChangeSelection={ onChangeSelection }
 				selection={ selection }
 				setSelection={ setSelection }
 				defaultLayouts={ defaultLayouts }

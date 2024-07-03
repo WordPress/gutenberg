@@ -2,8 +2,11 @@
 
 ## Unreleased
 
-## 3.0.0 (2024-07-10)
+### Breaking Changes
 
+- `onSelectionChange` has been renamed to `onChangeSelection`.
+
+## 3.0.0 (2024-07-10)
 
 ### Breaking Changes
 
