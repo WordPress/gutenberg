@@ -10,7 +10,10 @@ import userEvent from '@testing-library/user-event';
 import Picker from '..';
 import type { FocalPointPickerProps } from '../types';
 
-interface Log { name: string; args: unknown[] }
+interface Log {
+	name: string;
+	args: unknown[];
+}
 type EventLogger = ( name: string, args: unknown[] ) => void;
 
 const props: FocalPointPickerProps = {
