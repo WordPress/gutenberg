@@ -17,7 +17,7 @@ import { useBorderBoxControlLinkedButton } from './hook';
 import type { LinkedButtonProps } from '../types';
 
 const BorderBoxControlLinkedButton = (
-	props: WordPressComponentProps< LinkedButtonProps, 'button' >,
+	props: WordPressComponentProps< LinkedButtonProps, 'button', true >,
 	forwardedRef: React.ForwardedRef< any >
 ) => {
 	const { className, isLinked, ...buttonProps } =

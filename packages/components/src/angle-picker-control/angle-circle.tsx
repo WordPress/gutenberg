@@ -26,7 +26,7 @@ function AngleCircle( {
 	value,
 	onChange,
 	...props
-}: WordPressComponentProps< AngleCircleProps, 'div' > ) {
+}: WordPressComponentProps< AngleCircleProps, 'div', true > ) {
 	const angleCircleRef = useRef< HTMLDivElement | null >( null );
 	const angleCircleCenter = useRef< { x: number; y: number } | undefined >();
 	const previousCursorValue = useRef< CSSStyleDeclaration[ 'cursor' ] >();

@@ -44,7 +44,7 @@ export { useBaseControlProps } from './hooks';
  * ```
  */
 const UnconnectedBaseControl = (
-	props: WordPressComponentProps< BaseControlProps, null >
+	props: WordPressComponentProps< BaseControlProps, null, true >
 ) => {
 	const {
 		__nextHasNoMarginBottom = false,
@@ -120,7 +120,7 @@ export const VisualLabel = ( {
 	className,
 	children,
 	...props
-}: WordPressComponentProps< BaseControlVisualLabelProps, 'span' > ) => {
+}: WordPressComponentProps< BaseControlVisualLabelProps, 'span', true > ) => {
 	return (
 		<StyledVisualLabel
 			{ ...props }

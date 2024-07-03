@@ -19,7 +19,7 @@ import type { BorderControlProps } from '../../border-control/types';
 import type { SplitControlsProps } from '../types';
 
 const BorderBoxControlSplitControls = (
-	props: WordPressComponentProps< SplitControlsProps, 'div' >,
+	props: WordPressComponentProps< SplitControlsProps, 'div', true >,
 	forwardedRef: React.ForwardedRef< any >
 ) => {
 	const {
