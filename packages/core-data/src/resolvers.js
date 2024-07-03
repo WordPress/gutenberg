@@ -543,13 +543,12 @@ export const __experimentalGetCurrentGlobalStylesId =
 		const globalStylesURL =
 			activeThemes?.[ 0 ]?._links?.[ 'wp:user-global-styles' ]?.[ 0 ]
 				?.href;
-		if ( globalStylesURL ) {
-			const globalStylesObject = await apiFetch( {
-				url: globalStylesURL,
-			} );
-			dispatch.__experimentalReceiveCurrentGlobalStylesId(
-				globalStylesObject.id
-			);
+		if ( ! globalStylesURL ) {
+			return;
+		}
+		const id = +globalStylesURL.split( '/' ).pop();
+		if ( id ) {
+			dispatch.__experimentalReceiveCurrentGlobalStylesId( id );
 		}
 	};
 
