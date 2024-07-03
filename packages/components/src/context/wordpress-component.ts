@@ -3,6 +3,14 @@
  */
 import type * as React from 'react';
 
+export interface Polymorphic<
+	/** The HTML element to inherit props from. */
+	T extends React.ElementType | null,
+> {
+	/** The HTML element or React component to render the component as. */
+	as?: T | keyof JSX.IntrinsicElements;
+}
+
 // Based on https://github.com/ariakit/ariakit/blob/reakit/packages/reakit-utils/src/types.ts
 export type WordPressComponentProps<
 	/** Prop types. */
@@ -21,12 +29,7 @@ export type WordPressComponentProps<
 				'as' | keyof P | 'children'
 		  >
 		: {} ) &
-	( IsPolymorphic extends true
-		? {
-				/** The HTML element or React component to render the component as. */
-				as?: T | keyof JSX.IntrinsicElements;
-		  }
-		: {} );
+	( IsPolymorphic extends true ? Polymorphic< T > : {} );
 
 export interface WordPressComponent<
 	T extends React.ElementType | null,
