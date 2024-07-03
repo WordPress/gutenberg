@@ -11,7 +11,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { useMemo, useState } from '@wordpress/element';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { parse } from '@wordpress/blocks';
-
+import { DataForm } from '@wordpress/dataviews';
 import {
 	Button,
 	TextControl,
@@ -38,6 +38,21 @@ import { CreateTemplatePartModalContents } from '../create-template-part-modal';
 // Patterns.
 const { PATTERN_TYPES, CreatePatternModalContents, useDuplicatePatternProps } =
 	unlock( patternsPrivateApis );
+
+// TODO: this should be shared with other components (page-pages).
+const fields = [
+	{
+		type: 'text',
+		header: __( 'Title' ),
+		id: 'title',
+		placeholder: __( 'No title' ),
+		getValue: ( { item } ) => item.title,
+	},
+];
+
+const form = {
+	visibleFields: [ 'title' ],
+};
 
 /**
  * Check if a template is removable.
@@ -649,16 +664,17 @@ const useDuplicatePostAction = ( postType ) => {
 					return status !== 'trash';
 				},
 				RenderModal: ( { items, closeModal, onActionPerformed } ) => {
-					const [ item ] = items;
+					const [ item, setItem ] = useState( {
+						...items[ 0 ],
+						title: sprintf(
+							/* translators: %s: Existing template title */
+							__( '%s (Copy)' ),
+							getItemTitle( items[ 0 ] )
+						),
+					} );
+
 					const [ isCreatingPage, setIsCreatingPage ] =
 						useState( false );
-					const [ title, setTitle ] = useState(
-						sprintf(
-							/* translators: %s: Existing item title */
-							__( '%s (Copy)' ),
-							getItemTitle( item )
-						)
-					);
 
 					const { saveEntityRecord } = useDispatch( coreStore );
 					const { createSuccessNotice, createErrorNotice } =
@@ -673,8 +689,8 @@ const useDuplicatePostAction = ( postType ) => {
 
 						const newItemOject = {
 							status: 'draft',
-							title,
-							slug: title || __( 'No title' ),
+							title: item.title,
+							slug: item.title || __( 'No title' ),
 							comment_status: item.comment_status,
 							content:
 								typeof item.content === 'string'
@@ -725,7 +741,7 @@ const useDuplicatePostAction = ( postType ) => {
 									// translators: %s: Title of the created template e.g: "Category".
 									__( '"%s" successfully created.' ),
 									decodeEntities(
-										newItem.title?.rendered || title
+										newItem.title?.rendered || item.title
 									)
 								),
 								{
@@ -753,14 +769,15 @@ const useDuplicatePostAction = ( postType ) => {
 							closeModal();
 						}
 					}
+
 					return (
 						<form onSubmit={ createPage }>
 							<VStack spacing={ 3 }>
-								<TextControl
-									label={ __( 'Title' ) }
-									onChange={ setTitle }
-									placeholder={ __( 'No title' ) }
-									value={ title }
+								<DataForm
+									data={ item }
+									fields={ fields }
+									form={ form }
+									onChange={ setItem }
 								/>
 								<HStack spacing={ 2 } justify="end">
 									<Button

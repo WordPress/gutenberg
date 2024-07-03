@@ -39,6 +39,7 @@ export const VariantStates: StoryFn< typeof Button > = (
 					key={ variant ?? 'undefined' }
 				>
 					<Button { ...props } variant={ variant } />
+					{ /* eslint-disable-next-line no-restricted-syntax */ }
 					<Button { ...props } variant={ variant } disabled />
 					<Button
 						{ ...props }

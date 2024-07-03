@@ -199,6 +199,7 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 											? control.role
 											: 'menuitem'
 									}
+									__experimentalIsFocusable
 									disabled={ control.isDisabled }
 								>
 									{ control.title }
