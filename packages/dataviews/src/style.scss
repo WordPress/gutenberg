@@ -106,15 +106,6 @@
 			gap: $grid-unit-05;
 		}
 
-		th,
-		td {
-			&:first-child,
-			&:last-child {
-				transition: padding ease-out 0.1s;
-				@include reduce-motion("transition");
-			}
-		}
-
 		td:first-child,
 		th:first-child {
 			padding-left: $grid-unit-60;
