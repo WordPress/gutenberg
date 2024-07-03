@@ -477,13 +477,17 @@ return array(
 		'isActive'   => array( 'service' )
 	),
 	array(
-		'name'       => 'gravatar',
-		'title'      => 'Gravatar',
-		'icon'       => 'commentAuthorAvatar',
-		'attributes' => array(
-			'service' => 'gravatar',
+		'name'       => 'mail',
+		'title'      => __( 'Mail' ),
+		'keywords'   => array(
+			__( 'email' ),
+			__( 'e-mail' )
 		),
-		'isActive'   => array( 'service' )
+		'icon'       => 'mail',
+		'attributes' => array(
+			'service' => 'mail',
+		),
+		'isActive'   => array( 'mail' )
 	),
 );
 
