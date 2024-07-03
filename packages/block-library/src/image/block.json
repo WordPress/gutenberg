@@ -11,7 +11,7 @@
 	"attributes": {
 		"blob": {
 			"type": "string",
-			"isTemporary": true
+			"__experimentalRole": "local"
 		},
 		"url": {
 			"type": "string",

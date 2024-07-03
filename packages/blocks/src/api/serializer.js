@@ -237,8 +237,8 @@ export function getCommentAttributes( blockType, attributes ) {
 				return accumulator;
 			}
 
-			// Ignore all temporary attributes
-			if ( attributeSchema.isTemporary ) {
+			// Ignore all local attributes
+			if ( attributeSchema.__experimentalRole === 'local' ) {
 				return accumulator;
 			}
 
