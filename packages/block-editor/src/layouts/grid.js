@@ -300,7 +300,7 @@ function GridLayoutColumnsAndRowsControl( {
 									columnCount:
 										window.__experimentalEnableGridInteractivity
 											? parseInt( value, 10 ) || null
-											: validValue,
+											: parseInt( validValue, 10 ),
 								} );
 							} }
 							value={ columnCount }
@@ -335,7 +335,7 @@ function GridLayoutColumnsAndRowsControl( {
 								onChange={ ( value ) =>
 									onChange( {
 										...layout,
-										columnCount: parseInt( value, 10 ),
+										columnCount: value,
 									} )
 								}
 								min={ 0 }
