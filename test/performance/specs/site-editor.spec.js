@@ -333,7 +333,14 @@ test.describe( 'Site Editor Performance', () => {
 						.click();
 				} else {
 					await page
-						.getByRole( 'button', { name: 'Transform into:' } )
+						.getByRole( 'button', { name: 'Design' } )
+						.or(
+							// Locator for backward compatibility with the old UI.
+							// The label was updated in https://github.com/WordPress/gutenberg/pull/62161.
+							page.getByRole( 'button', {
+								name: 'Transform into:',
+							} )
+						)
 						.click();
 				}
 

@@ -24,6 +24,7 @@ import fontSize from './font-size';
 import textAlign from './text-align';
 import border from './border';
 import position from './position';
+import blockStyleVariation from './block-style-variation';
 import layout from './layout';
 import childLayout from './layout-child';
 import contentLockUI from './content-lock-ui';
@@ -61,6 +62,7 @@ createBlockListBlockFilter( [
 	fontSize,
 	border,
 	position,
+	blockStyleVariation,
 	childLayout,
 ] );
 createBlockSaveFilter( [
@@ -86,3 +88,4 @@ export { getTypographyClassesAndStyles } from './use-typography-props';
 export { getGapCSSValue } from './gap';
 export { useCachedTruthy } from './use-cached-truthy';
 export { useZoomOut } from './use-zoom-out';
+export { __unstableBlockStyleVariationOverridesWithConfig } from './block-style-variation';

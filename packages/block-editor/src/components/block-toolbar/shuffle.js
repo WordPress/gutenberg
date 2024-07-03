@@ -60,7 +60,9 @@ export default function Shuffle( { clientId, as = Container } ) {
 				pattern.blocks.length === 1 &&
 				pattern.categories?.some( ( category ) => {
 					return categories.includes( category );
-				} )
+				} ) &&
+				// Check if the pattern is not a synced pattern.
+				( pattern.syncStatus === 'unsynced' || ! pattern.id )
 			);
 		} );
 	}, [ categories, patterns ] );

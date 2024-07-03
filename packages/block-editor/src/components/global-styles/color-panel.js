@@ -27,7 +27,7 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import ColorGradientControl from '../colors-gradients/control';
 import { useColorsPerOrigin, useGradientsPerOrigin } from './hooks';
-import { getValueFromVariable, TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
+import { getValueFromVariable, useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
 import { unlock } from '../../lock-unlock';
 
@@ -116,6 +116,7 @@ function ColorToolsPanel( {
 	panelId,
 	children,
 } ) {
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const resetAll = () => {
 		const updatedValue = resetAllFilter( value );
 		onChange( updatedValue );
@@ -131,7 +132,7 @@ function ColorToolsPanel( {
 			className="color-block-support-panel"
 			__experimentalFirstVisibleItemClass="first"
 			__experimentalLastVisibleItemClass="last"
-			dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
+			dropdownMenuProps={ dropdownMenuProps }
 		>
 			<div className="color-block-support-panel__inner-wrapper">
 				{ children }
@@ -209,7 +210,7 @@ function ColorPanelDropdown( {
 	panelId,
 } ) {
 	const currentTab = tabs.find( ( tab ) => tab.userValue !== undefined );
-
+	const { key: firstTabKey, ...firstTab } = tabs[ 0 ] ?? {};
 	return (
 		<ToolsPanelItem
 			className="block-editor-tools-panel-color-gradient-settings__item"
@@ -251,7 +252,8 @@ function ColorPanelDropdown( {
 						<div className="block-editor-panel-color-gradient-settings__dropdown-content">
 							{ tabs.length === 1 && (
 								<ColorPanelTab
-									{ ...tabs[ 0 ] }
+									key={ firstTabKey }
+									{ ...firstTab }
 									colorGradientControlSettings={
 										colorGradientControlSettings
 									}
@@ -271,14 +273,17 @@ function ColorPanelDropdown( {
 									</Tabs.TabList>
 
 									{ tabs.map( ( tab ) => {
+										const { key: tabKey, ...restTabProps } =
+											tab;
 										return (
 											<Tabs.TabPanel
-												key={ tab.key }
-												tabId={ tab.key }
+												key={ tabKey }
+												tabId={ tabKey }
 												focusable={ false }
 											>
 												<ColorPanelTab
-													{ ...tab }
+													key={ tabKey }
+													{ ...restTabProps }
 													colorGradientControlSettings={
 														colorGradientControlSettings
 													}

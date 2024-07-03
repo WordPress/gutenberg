@@ -176,6 +176,21 @@ test.describe( 'Style Book', () => {
 			'style book should be visible'
 		).toBeVisible();
 	} );
+
+	test( 'should allow opening the command menu from the header when open', async ( {
+		page,
+	} ) => {
+		// Open the command menu from the header.
+		await page
+			.getByRole( 'heading', {
+				name: 'Style Book',
+			} )
+			.click();
+
+		await expect(
+			page.getByLabel( 'Search commands and settings' )
+		).toBeVisible();
+	} );
 } );
 
 class StyleBook {

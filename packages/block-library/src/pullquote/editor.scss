@@ -1,4 +1,6 @@
 // .is-style-solid-color is deprecated.
+// This selector has not been scoped with `:root :where`, as global styles
+// does, to keep its specificity as it was at the time of deprecation.
 .wp-block-pullquote.is-style-solid-color {
 	& blockquote p {
 		font-size: 32px;

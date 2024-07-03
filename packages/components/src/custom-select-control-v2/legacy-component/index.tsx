@@ -3,10 +3,8 @@
  */
 // eslint-disable-next-line no-restricted-imports
 import * as Ariakit from '@ariakit/react';
-/**
- * WordPress dependencies
- */
-import { useMemo } from '@wordpress/element';
+import clsx from 'clsx';
+
 /**
  * Internal dependencies
  */
@@ -14,23 +12,28 @@ import _CustomSelect from '../custom-select';
 import CustomSelectItem from '../item';
 import type { LegacyCustomSelectProps } from '../types';
 import * as Styled from '../styles';
-import { ContextSystemProvider } from '../../context';
 
 function CustomSelectControl( props: LegacyCustomSelectProps ) {
 	const {
-		__experimentalShowSelectedHint,
+		__experimentalShowSelectedHint = false,
 		__next40pxDefaultSize = false,
+		describedBy,
 		options,
 		onChange,
 		size = 'default',
 		value,
+		className: classNameProp,
 		...restProps
 	} = props;
 
 	// Forward props + store from v2 implementation
 	const store = Ariakit.useSelectStore( {
 		async setValue( nextValue ) {
-			if ( ! onChange ) {
+			const nextOption = options.find(
+				( item ) => item.name === nextValue
+			);
+
+			if ( ! onChange || ! nextOption ) {
 				return;
 			}
 
@@ -45,25 +48,31 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 				),
 				inputValue: '',
 				isOpen: state.open,
-				selectedItem: {
-					name: nextValue as string,
-					key: nextValue as string,
-				},
+				selectedItem: nextOption,
 				type: '',
 			};
 			onChange( changeObject );
 		},
+		value: value?.name,
+		// Setting the first option as a default value when no value is provided
+		// is already done natively by the underlying Ariakit component,
+		// but doing this explicitly avoids the `onChange` callback from firing
+		// on initial render, thus making this implementation closer to the v1.
+		defaultValue: options[ 0 ]?.name,
 	} );
 
 	const children = options.map(
-		( { name, key, __experimentalHint, ...rest } ) => {
+		( { name, key, __experimentalHint, style, className } ) => {
 			const withHint = (
-				<Styled.WithHintWrapper>
+				<Styled.WithHintItemWrapper>
 					<span>{ name }</span>
-					<Styled.ExperimentalHintItem className="components-custom-select-control__item-hint">
+					<Styled.WithHintItemHint
+					// TODO: Legacy classname. Add V1 styles are removed from the codebase
+					// className="components-custom-select-control__item-hint"
+					>
 						{ __experimentalHint }
-					</Styled.ExperimentalHintItem>
-				</Styled.WithHintWrapper>
+					</Styled.WithHintItemHint>
+				</Styled.WithHintItemWrapper>
 			);
 
 			return (
@@ -71,7 +80,16 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 					key={ key }
 					value={ name }
 					children={ __experimentalHint ? withHint : name }
-					{ ...rest }
+					style={ style }
+					className={ clsx(
+						// TODO: Legacy classname. Add V1 styles are removed from the codebase
+						// 'components-custom-select-control__item',
+						className
+						// TODO: Legacy classname. Add V1 styles are removed from the codebase
+						// {
+						// 	'has-hint': __experimentalHint,
+						// }
+					) }
 				/>
 			);
 		}
@@ -85,48 +103,51 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 		);
 
 		return (
-			<>
+			<Styled.SelectedExperimentalHintWrapper>
 				{ currentValue }
-				<Styled.SelectedExperimentalHintItem className="components-custom-select-control__hint">
+				<Styled.SelectedExperimentalHintItem
+				// TODO: Legacy classname. Add V1 styles are removed from the codebase
+				// className="components-custom-select-control__hint"
+				>
 					{ currentHint?.__experimentalHint }
 				</Styled.SelectedExperimentalHintItem>
-			</>
+			</Styled.SelectedExperimentalHintWrapper>
 		);
 	};
 
-	// translate legacy button sizing
-	const contextSystemValue = useMemo( () => {
-		let selectedSize;
-
+	const translatedSize = ( () => {
 		if (
 			( __next40pxDefaultSize && size === 'default' ) ||
 			size === '__unstable-large'
 		) {
-			selectedSize = 'default';
-		} else if ( ! __next40pxDefaultSize && size === 'default' ) {
-			selectedSize = 'compact';
-		} else {
-			selectedSize = size;
+			return 'default';
 		}
-
-		return {
-			CustomSelectControlButton: { _overrides: { size: selectedSize } },
-		};
-	}, [ __next40pxDefaultSize, size ] );
-
-	const translatedProps = {
-		'aria-describedby': props.describedBy,
-		children,
-		renderSelectedValue: __experimentalShowSelectedHint
-			? renderSelectedValueHint
-			: undefined,
-		...restProps,
-	};
+		if ( ! __next40pxDefaultSize && size === 'default' ) {
+			return 'compact';
+		}
+		return size;
+	} )();
 
 	return (
-		<ContextSystemProvider value={ contextSystemValue }>
-			<_CustomSelect { ...translatedProps } store={ store } />
-		</ContextSystemProvider>
+		<_CustomSelect
+			aria-describedby={ describedBy }
+			renderSelectedValue={
+				__experimentalShowSelectedHint
+					? renderSelectedValueHint
+					: undefined
+			}
+			size={ translatedSize }
+			store={ store }
+			className={ clsx(
+				// TODO: Legacy classname. Add V1 styles are removed from the codebase
+				// 'components-custom-select-control',
+				classNameProp
+			) }
+			isLegacy
+			{ ...restProps }
+		>
+			{ children }
+		</_CustomSelect>
 	);
 }
 

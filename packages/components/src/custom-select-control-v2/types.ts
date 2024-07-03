@@ -12,7 +12,22 @@ export type CustomSelectStore = {
 	store: Ariakit.SelectStore;
 };
 
-export type CustomSelectContext = CustomSelectStore | undefined;
+type CustomSelectSize< Size = 'compact' | 'default' > = {
+	/**
+	 * The size of the control.
+	 *
+	 * @default 'default'
+	 */
+	size?: Size;
+};
+
+export type CustomSelectButtonSize = CustomSelectSize<
+	'compact' | 'default' | 'small'
+>;
+
+export type CustomSelectContext =
+	| ( CustomSelectStore & CustomSelectButtonSize )
+	| undefined;
 
 export type CustomSelectButtonProps = {
 	/**
@@ -31,18 +46,25 @@ export type CustomSelectButtonProps = {
 		selectedValue: string | string[]
 	) => React.ReactNode;
 	/**
-	 * The size of the control.
-	 *
-	 * @default 'default'
-	 */
-	size?: 'compact' | 'default' | 'small';
-	/**
 	 * The value of the control when used in uncontrolled mode.
 	 */
 	value?: string | string[];
 };
 
-export type _CustomSelectProps = {
+// Props only exposed on the internal implementation
+export type _CustomSelectInternalProps = {
+	/**
+	 * True if the consumer is emulating the legacy component behavior and look
+	 */
+	isLegacy?: boolean;
+};
+
+// Props that are exposed in exported components
+export type _CustomSelectProps = CustomSelectButtonProps & {
+	/**
+	 * Additional className added to the root wrapper element.
+	 */
+	className?: string;
 	/**
 	 * The child elements. This should be composed of `CustomSelectItem` components.
 	 */
@@ -59,15 +81,7 @@ export type _CustomSelectProps = {
 	label: string;
 };
 
-export type CustomSelectProps = _CustomSelectProps &
-	Omit< CustomSelectButtonProps, 'size' > & {
-		/**
-		 * The size of the control.
-		 *
-		 * @default 'default'
-		 */
-		size?: Exclude< CustomSelectButtonProps[ 'size' ], 'small' >;
-	};
+export type CustomSelectProps = _CustomSelectProps & CustomSelectSize;
 
 /**
  * The legacy object structure for the options array.
@@ -78,6 +92,7 @@ type LegacyOption = {
 	style?: React.CSSProperties;
 	className?: string;
 	__experimentalHint?: string;
+	[ key: string ]: any;
 };
 
 /**

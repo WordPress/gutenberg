@@ -147,7 +147,10 @@ function BlockPattern( {
 							/>
 
 							{ showTitle && (
-								<HStack className="block-editor-patterns__pattern-details">
+								<HStack
+									className="block-editor-patterns__pattern-details"
+									spacing={ 2 }
+								>
 									{ pattern.type ===
 										INSERTER_PATTERN_TYPES.user &&
 										! pattern.syncStatus && (

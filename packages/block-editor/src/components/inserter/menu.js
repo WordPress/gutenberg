@@ -30,8 +30,8 @@ import { PatternCategoryPreviewPanel } from './block-patterns-tab/pattern-catego
 import { MediaTab, MediaCategoryPanel } from './media-tab';
 import InserterSearchResults from './search-results';
 import useInsertionPoint from './hooks/use-insertion-point';
-import InserterTabs from './tabs';
 import { store as blockEditorStore } from '../../store';
+import TabbedSidebar from '../tabbed-sidebar';
 
 const NOOP = () => {};
 function InserterMenu(
@@ -45,7 +45,7 @@ function InserterMenu(
 		showMostUsedBlocks,
 		__experimentalFilterValue = '',
 		shouldFocusBlock = true,
-		__experimentalOnPatternCategorySelection = NOOP,
+		onPatternCategorySelection,
 		onClose,
 		__experimentalInitialTab,
 		__experimentalInitialCategory,
@@ -81,8 +81,13 @@ function InserterMenu(
 	const blockTypesTabRef = useRef();
 
 	const onInsert = useCallback(
-		( blocks, meta, shouldForceFocusBlock ) => {
-			onInsertBlocks( blocks, meta, shouldForceFocusBlock );
+		( blocks, meta, shouldForceFocusBlock, _rootClientId ) => {
+			onInsertBlocks(
+				blocks,
+				meta,
+				shouldForceFocusBlock,
+				_rootClientId
+			);
 			onSelect();
 
 			// Check for focus loss due to filtering blocks by selected block type
@@ -111,7 +116,7 @@ function InserterMenu(
 
 	const onHover = useCallback(
 		( item ) => {
-			onToggleInsertionPoint( !! item );
+			onToggleInsertionPoint( item );
 			setHoveredItem( item );
 		},
 		[ onToggleInsertionPoint, setHoveredItem ]
@@ -128,9 +133,9 @@ function InserterMenu(
 		( patternCategory, filter ) => {
 			setSelectedPatternCategory( patternCategory );
 			setPatternFilter( filter );
-			__experimentalOnPatternCategorySelection();
+			onPatternCategorySelection?.();
 		},
-		[ setSelectedPatternCategory, __experimentalOnPatternCategorySelection ]
+		[ setSelectedPatternCategory, onPatternCategorySelection ]
 	);
 
 	const showPatternPanel =
@@ -310,21 +315,49 @@ function InserterMenu(
 			ref={ ref }
 		>
 			<div className="block-editor-inserter__main-area">
-				<InserterTabs
+				<TabbedSidebar
 					ref={ tabsRef }
 					onSelect={ handleSetSelectedTab }
 					onClose={ onClose }
 					selectedTab={ selectedTab }
-				>
-					{ inserterSearch }
-					{ selectedTab === 'blocks' &&
-						! delayedFilterValue &&
-						blocksTab }
-					{ selectedTab === 'patterns' &&
-						! delayedFilterValue &&
-						patternsTab }
-					{ selectedTab === 'media' && mediaTab }
-				</InserterTabs>
+					closeButtonLabel={ __( 'Close block inserter' ) }
+					tabs={ [
+						{
+							name: 'blocks',
+							title: __( 'Blocks' ),
+							panel: (
+								<>
+									{ inserterSearch }
+									{ selectedTab === 'blocks' &&
+										! delayedFilterValue &&
+										blocksTab }
+								</>
+							),
+						},
+						{
+							name: 'patterns',
+							title: __( 'Patterns' ),
+							panel: (
+								<>
+									{ inserterSearch }
+									{ selectedTab === 'patterns' &&
+										! delayedFilterValue &&
+										patternsTab }
+								</>
+							),
+						},
+						{
+							name: 'media',
+							title: __( 'Media' ),
+							panel: (
+								<>
+									{ inserterSearch }
+									{ mediaTab }
+								</>
+							),
+						},
+					] }
+				/>
 			</div>
 			{ showInserterHelpPanel && hoveredItem && (
 				<Popover
@@ -341,4 +374,16 @@ function InserterMenu(
 	);
 }
 
-export default forwardRef( InserterMenu );
+export const PrivateInserterMenu = forwardRef( InserterMenu );
+
+function PublicInserterMenu( props, ref ) {
+	return (
+		<PrivateInserterMenu
+			{ ...props }
+			onPatternCategorySelection={ NOOP }
+			ref={ ref }
+		/>
+	);
+}
+
+export default forwardRef( PublicInserterMenu );

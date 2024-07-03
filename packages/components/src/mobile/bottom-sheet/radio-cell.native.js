@@ -21,14 +21,14 @@ export default function BottomSheetRadioCell( props ) {
 	return (
 		<Cell
 			{ ...cellProps }
-			accessibilityRole={ 'radio' }
+			accessibilityRole="radio"
 			accessibilityState={ { selected } }
 			accessibilityHint={
 				/* translators: accessibility text (hint for selecting option) */
 				__( 'Double tap to select the option' )
 			}
 			editable={ false }
-			value={ '' }
+			value=""
 			showLockIcon={ selected }
 		>
 			{ selected && (

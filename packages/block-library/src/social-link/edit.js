@@ -6,15 +6,11 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { DELETE, BACKSPACE } from '@wordpress/keycodes';
-import { useDispatch } from '@wordpress/data';
-
 import {
 	InspectorControls,
 	URLPopover,
 	URLInput,
 	useBlockProps,
-	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
 import {
@@ -36,9 +32,7 @@ const SocialLinkURLPopover = ( {
 	setAttributes,
 	setPopover,
 	popoverAnchor,
-	clientId,
 } ) => {
-	const { removeBlock } = useDispatch( blockEditorStore );
 	return (
 		<URLPopover
 			anchor={ popoverAnchor }
@@ -62,18 +56,6 @@ const SocialLinkURLPopover = ( {
 						label={ __( 'Enter social link' ) }
 						hideLabelFromVision
 						disableSuggestions
-						onKeyDown={ ( event ) => {
-							if (
-								!! url ||
-								event.defaultPrevented ||
-								! [ BACKSPACE, DELETE ].includes(
-									event.keyCode
-								)
-							) {
-								return;
-							}
-							removeBlock( clientId );
-						} }
 					/>
 				</div>
 				<Button
@@ -91,7 +73,6 @@ const SocialLinkEdit = ( {
 	context,
 	isSelected,
 	setAttributes,
-	clientId,
 } ) => {
 	const { url, service, label = '', rel } = attributes;
 	const {
@@ -136,9 +117,9 @@ const SocialLinkEdit = ( {
 					<PanelRow>
 						<TextControl
 							__nextHasNoMarginBottom
-							label={ __( 'Link text' ) }
+							label={ __( 'Text' ) }
 							help={ __(
-								'The link text is visible when enabled from the parent Social Icons block.'
+								'The text is visible when enabled from the parent Social Icons block.'
 							) }
 							value={ label }
 							onChange={ ( value ) =>
@@ -178,7 +159,6 @@ const SocialLinkEdit = ( {
 						setAttributes={ setAttributes }
 						setPopover={ setPopover }
 						popoverAnchor={ popoverAnchor }
-						clientId={ clientId }
 					/>
 				) }
 			</li>

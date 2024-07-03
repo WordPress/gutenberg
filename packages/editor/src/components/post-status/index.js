@@ -27,6 +27,8 @@ import {
 	NAVIGATION_POST_TYPE,
 } from '../../store/constants';
 import PostPanelRow from '../post-panel-row';
+import PostSticky from '../post-sticky';
+import { PrivatePostSchedule } from '../post-schedule';
 import { store as editorStore } from '../../store';
 
 const labels = {
@@ -174,11 +176,6 @@ export default function PostStatus() {
 		let newPassword = password;
 		if ( status === 'future' && new Date( date ) > new Date() ) {
 			newDate = null;
-		} else if ( value === 'future' ) {
-			if ( ! date || new Date( date ) < new Date() ) {
-				newDate = new Date();
-				newDate.setDate( newDate.getDate() + 7 );
-			}
 		}
 		if ( value === 'private' && password ) {
 			newPassword = '';
@@ -232,6 +229,16 @@ export default function PostStatus() {
 												: status
 										}
 									/>
+									{ status === 'future' && (
+										<div className="editor-change-status__publish-date-wrapper">
+											<PrivatePostSchedule
+												showPopoverHeaderActions={
+													false
+												}
+												isCompact
+											/>
+										</div>
+									) }
 									{ status !== 'private' && (
 										<VStack
 											as="fieldset"
@@ -275,6 +282,7 @@ export default function PostStatus() {
 											) }
 										</VStack>
 									) }
+									<PostSticky />
 								</VStack>
 							</form>
 						</>

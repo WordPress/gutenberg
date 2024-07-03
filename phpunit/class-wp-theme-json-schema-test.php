@@ -223,6 +223,20 @@ class WP_Theme_JSON_Schema_Gutenberg_Test extends WP_UnitTestCase {
 						),
 					),
 				),
+				'spacing'    => array(
+					'spacingSizes' => array(
+						array(
+							'name' => 'Small',
+							'slug' => 20,
+							'size' => '20px',
+						),
+						array(
+							'name' => 'Large',
+							'slug' => 80,
+							'size' => '80px',
+						),
+					),
+				),
 			),
 		);
 
@@ -243,6 +257,21 @@ class WP_Theme_JSON_Schema_Gutenberg_Test extends WP_UnitTestCase {
 							'name' => 'Normal',
 							'slug' => 'normal',
 							'size' => 16,
+						),
+					),
+				),
+				'spacing'    => array(
+					'defaultSpacingSizes' => false,
+					'spacingSizes'        => array(
+						array(
+							'name' => 'Small',
+							'slug' => 20,
+							'size' => '20px',
+						),
+						array(
+							'name' => 'Large',
+							'slug' => 80,
+							'size' => '80px',
 						),
 					),
 				),

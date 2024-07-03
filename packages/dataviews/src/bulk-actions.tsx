@@ -7,13 +7,15 @@ import {
 	Modal,
 } from '@wordpress/components';
 import { __, sprintf, _n } from '@wordpress/i18n';
-import { useMemo, useState, useCallback, useEffect } from '@wordpress/element';
+import { useMemo, useState, useCallback } from '@wordpress/element';
+import { useRegistry } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { unlock } from './lock-unlock';
-import type { Action, ActionModal, AnyItem } from './types';
+import type { Action, ActionModal } from './types';
+import type { SetSelection } from './private-types';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -22,34 +24,34 @@ const {
 	DropdownMenuSeparatorV2: DropdownMenuSeparator,
 } = unlock( componentsPrivateApis );
 
-interface ActionWithModalProps< Item extends AnyItem > {
+interface ActionWithModalProps< Item > {
 	action: ActionModal< Item >;
 	selectedItems: Item[];
 	setActionWithModal: ( action?: ActionModal< Item > ) => void;
 	onMenuOpenChange: ( isOpen: boolean ) => void;
 }
 
-interface BulkActionsItemProps< Item extends AnyItem > {
+interface BulkActionsItemProps< Item > {
 	action: Action< Item >;
 	selectedItems: Item[];
 	setActionWithModal: ( action?: ActionModal< Item > ) => void;
 }
 
-interface ActionsMenuGroupProps< Item extends AnyItem > {
+interface ActionsMenuGroupProps< Item > {
 	actions: Action< Item >[];
 	selectedItems: Item[];
 	setActionWithModal: ( action?: ActionModal< Item > ) => void;
 }
 
-interface BulkActionsProps< Item extends AnyItem > {
+interface BulkActionsProps< Item > {
 	data: Item[];
 	actions: Action< Item >[];
 	selection: string[];
-	onSelectionChange: ( selection: Item[] ) => void;
+	onSelectionChange: SetSelection;
 	getItemId: ( item: Item ) => string;
 }
 
-export function useHasAPossibleBulkAction< Item extends AnyItem >(
+export function useHasAPossibleBulkAction< Item >(
 	actions: Action< Item >[],
 	item: Item
 ) {
@@ -63,7 +65,7 @@ export function useHasAPossibleBulkAction< Item extends AnyItem >(
 	}, [ actions, item ] );
 }
 
-export function useSomeItemHasAPossibleBulkAction< Item extends AnyItem >(
+export function useSomeItemHasAPossibleBulkAction< Item >(
 	actions: Action< Item >[],
 	data: Item[]
 ) {
@@ -79,7 +81,7 @@ export function useSomeItemHasAPossibleBulkAction< Item extends AnyItem >(
 	}, [ actions, data ] );
 }
 
-function ActionWithModal< Item extends AnyItem >( {
+function ActionWithModal< Item >( {
 	action,
 	selectedItems,
 	setActionWithModal,
@@ -94,9 +96,13 @@ function ActionWithModal< Item extends AnyItem >( {
 	const onCloseModal = useCallback( () => {
 		setActionWithModal( undefined );
 	}, [ setActionWithModal ] );
+	const label =
+		typeof action.label === 'string'
+			? action.label
+			: action.label( selectedItems );
 	return (
 		<Modal
-			title={ ! hideModalHeader ? action.label : undefined }
+			title={ ! hideModalHeader ? label : undefined }
 			__experimentalHideHeader={ !! hideModalHeader }
 			onRequestClose={ onCloseModal }
 			overlayClassName="dataviews-action-modal"
@@ -110,11 +116,12 @@ function ActionWithModal< Item extends AnyItem >( {
 	);
 }
 
-function BulkActionItem< Item extends AnyItem >( {
+function BulkActionItem< Item >( {
 	action,
 	selectedItems,
 	setActionWithModal,
 }: BulkActionsItemProps< Item > ) {
+	const registry = useRegistry();
 	const eligibleItems = useMemo( () => {
 		return selectedItems.filter(
 			( item ) => ! action.isEligible || action.isEligible( item )
@@ -132,7 +139,7 @@ function BulkActionItem< Item extends AnyItem >( {
 				if ( shouldShowModal ) {
 					setActionWithModal( action );
 				} else {
-					await action.callback( eligibleItems );
+					action.callback( eligibleItems, { registry } );
 				}
 			} }
 			suffix={
@@ -144,7 +151,7 @@ function BulkActionItem< Item extends AnyItem >( {
 	);
 }
 
-function ActionsMenuGroup< Item extends AnyItem >( {
+function ActionsMenuGroup< Item >( {
 	actions,
 	selectedItems,
 	setActionWithModal,
@@ -166,7 +173,7 @@ function ActionsMenuGroup< Item extends AnyItem >( {
 	);
 }
 
-export default function BulkActions< Item extends AnyItem >( {
+export default function BulkActions< Item >( {
 	data,
 	actions,
 	selection,
@@ -190,37 +197,16 @@ export default function BulkActions< Item extends AnyItem >( {
 	}, [ data, bulkActions ] );
 
 	const numberSelectableItems = selectableItems.length;
-	const areAllSelected =
-		selection && selection.length === numberSelectableItems;
 
 	const selectedItems = useMemo( () => {
-		return data.filter( ( item ) =>
-			selection.includes( getItemId( item ) )
+		return data.filter(
+			( item ) =>
+				selection.includes( getItemId( item ) ) &&
+				selectableItems.includes( item )
 		);
-	}, [ selection, data, getItemId ] );
+	}, [ selection, data, getItemId, selectableItems ] );
 
-	const hasNonSelectableItemSelected = useMemo( () => {
-		return selectedItems.some( ( item ) => {
-			return ! selectableItems.includes( item );
-		} );
-	}, [ selectedItems, selectableItems ] );
-	useEffect( () => {
-		if ( hasNonSelectableItemSelected ) {
-			onSelectionChange(
-				selectedItems.filter( ( selectedItem ) => {
-					return selectableItems.some( ( item ) => {
-						return getItemId( selectedItem ) === getItemId( item );
-					} );
-				} )
-			);
-		}
-	}, [
-		hasNonSelectableItemSelected,
-		selectedItems,
-		selectableItems,
-		getItemId,
-		onSelectionChange,
-	] );
+	const areAllSelected = selectedItems.length === numberSelectableItems;
 
 	if ( bulkActions.length === 0 ) {
 		return null;
@@ -239,15 +225,15 @@ export default function BulkActions< Item extends AnyItem >( {
 						variant="tertiary"
 						size="compact"
 					>
-						{ selection.length
+						{ selectedItems.length
 							? sprintf(
 									/* translators: %d: Number of items. */
 									_n(
 										'Edit %d item',
 										'Edit %d items',
-										selection.length
+										selectedItems.length
 									),
-									selection.length
+									selectedItems.length
 							  )
 							: __( 'Bulk edit' ) }
 					</Button>
@@ -263,7 +249,11 @@ export default function BulkActions< Item extends AnyItem >( {
 						disabled={ areAllSelected }
 						hideOnClick={ false }
 						onClick={ () => {
-							onSelectionChange( selectableItems );
+							onSelectionChange(
+								selectableItems.map( ( item ) =>
+									getItemId( item )
+								)
+							);
 						} }
 						suffix={ numberSelectableItems }
 					>

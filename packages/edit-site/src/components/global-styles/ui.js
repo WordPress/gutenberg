@@ -41,7 +41,6 @@ import ScreenStyleVariations from './screen-style-variations';
 import StyleBook from '../style-book';
 import ScreenCSS from './screen-css';
 import ScreenRevisions from './screen-revisions';
-import ScreenBackground from './screen-background';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 
@@ -354,12 +353,8 @@ function GlobalStylesUI() {
 				<ScreenCSS />
 			</GlobalStylesNavigationScreen>
 
-			<GlobalStylesNavigationScreen path={ '/revisions' }>
+			<GlobalStylesNavigationScreen path="/revisions">
 				<ScreenRevisions />
-			</GlobalStylesNavigationScreen>
-
-			<GlobalStylesNavigationScreen path={ '/background' }>
-				<ScreenBackground />
 			</GlobalStylesNavigationScreen>
 
 			{ blocks.map( ( block ) => (
