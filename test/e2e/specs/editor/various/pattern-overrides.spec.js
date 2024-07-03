@@ -796,8 +796,7 @@ test.describe( 'Pattern Overrides', () => {
 		expect( patternInnerBlocks[ 0 ].attributes.link ).toBe( undefined );
 	} );
 
-	// eslint-disable-next-line playwright/expect-expect
-	test( 'image block classname and data-id attributes contain the correct media ids', async ( {
+	test( 'image block classname and data-id attributes contain the correct media ids when used in a gallery', async ( {
 		admin,
 		editor,
 		page,
@@ -860,6 +859,70 @@ test.describe( 'Pattern Overrides', () => {
 			'data-id',
 			`${ overrideImageId }`
 		);
+		await expect( imageBlock ).toHaveAttribute(
+			'class',
+			`wp-image-${ overrideImageId }`
+		);
+	} );
+
+	test( 'image block classname contains the correct media id and has no data-id attribute when used as a standalone image', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		// Upload two images, one for the original pattern, one for the override.
+		const { id: originalImageId, source_url: originalImageSrc } =
+			await requestUtils.uploadMedia(
+				path.resolve(
+					process.cwd(),
+					'test/e2e/assets/10x10_e2e_test_image_z9T8jK.png'
+				)
+			);
+		const { id: overrideImageId, source_url: overrideImageSrc } =
+			await requestUtils.uploadMedia(
+				path.resolve(
+					process.cwd(),
+					'test/e2e/assets/1024x768_e2e_test_image_size.jpeg'
+				)
+			);
+		const overrideName = 'test';
+
+		// Might be overkill, but check that the ids are actually different.
+		expect( overrideImageId ).not.toBe( originalImageId );
+
+		// Create a pattern with a gallery that has a single image with pattern overrides enabled.
+		// It has media that is not yet uploaded.
+		const { id } = await requestUtils.createBlock( {
+			title: 'Pattern',
+			content: `<!-- wp:image {"id":${ originalImageId },"sizeSlug":"large","linkDestination":"none","metadata":{"bindings":{"__default":{"source":"core/pattern-overrides"}},"name":"${ overrideName }"}} -->
+<figure class="wp-block-image size-large"><img src="${ originalImageSrc }" alt="" class="wp-image-${ originalImageId }"/></figure>
+<!-- /wp:image -->`,
+			status: 'publish',
+		} );
+
+		// Insert the pattern into a new post, overriding the image via the pattern block attributes.
+		await admin.createNewPost();
+		const imageAlt = 'Overridden Image';
+		await editor.insertBlock( {
+			name: 'core/block',
+			attributes: {
+				ref: id,
+				content: {
+					[ overrideName ]: {
+						id: overrideImageId,
+						url: overrideImageSrc,
+						alt: imageAlt,
+					},
+				},
+			},
+		} );
+
+		// Check the image attributes on the frontend.
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+		const imageBlock = page.getByAltText( imageAlt );
+		await expect( imageBlock ).not.toHaveAttribute( 'data-id' );
 		await expect( imageBlock ).toHaveAttribute(
 			'class',
 			`wp-image-${ overrideImageId }`
