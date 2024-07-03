@@ -154,9 +154,12 @@
 	text-align-last: center;
 }
 
-.block-editor-global-styles-background-panel__inspector-image-indicator-wrapper {
-	width: 20px;
-	height: 20px;
+.block-editor-global-styles-background-panel__inspector-preview-inner {
+	.block-editor-global-styles-background-panel__inspector-image-indicator-wrapper {
+		width: 20px;
+		height: 20px;
+		min-width: auto;
+	}
 }
 
 .block-editor-global-styles-background-panel__inspector-image-indicator {
@@ -190,7 +193,7 @@
 		margin-bottom: 0;
 	}
 	.components-focal-point-picker__media--image {
-		max-height: 100px;
+		max-height: clamp(120px, 9vh, 280px);
 	}
 }
 

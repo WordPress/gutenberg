@@ -545,6 +545,7 @@ function BackgroundSizeControls( {
 	return (
 		<VStack spacing={ 3 } className="single-column">
 			<FocalPointPicker
+				__next40pxDefaultSize
 				__nextHasNoMarginBottom
 				label={ __( 'Position' ) }
 				url={ getResolvedThemeFilePath( imageValue, themeFileURIs ) }
@@ -552,6 +553,7 @@ function BackgroundSizeControls( {
 				onChange={ updateBackgroundPosition }
 			/>
 			<ToggleGroupControl
+				size="__unstable-large"
 				label={ __( 'Size' ) }
 				value={ currentValueForToggle }
 				onChange={ updateBackgroundSize }
@@ -590,6 +592,7 @@ function BackgroundSizeControls( {
 					aria-label={ __( 'Background image width' ) }
 					onChange={ updateBackgroundSize }
 					value={ sizeValue }
+					size="__unstable-large"
 					__unstableInputWidth="100px"
 					min={ 0 }
 					placeholder={ __( 'Auto' ) }
