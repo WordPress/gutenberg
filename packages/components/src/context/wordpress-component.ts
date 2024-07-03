@@ -11,14 +11,39 @@ export interface Polymorphic<
 	as?: T | keyof JSX.IntrinsicElements;
 }
 
-// Based on https://github.com/ariakit/ariakit/blob/reakit/packages/reakit-utils/src/types.ts
+/**
+ * Props for a WordPress component.
+ *
+ * For a polymorphic version, {@see WordPressPolymorphicComponentProps}.
+ *
+ * Based on https://github.com/ariakit/ariakit/blob/reakit/packages/reakit-utils/src/types.ts
+ */
 export type WordPressComponentProps<
 	/** Prop types. */
 	P,
 	/** The HTML element to inherit props from. */
 	T extends React.ElementType | null,
-	/** Supports polymorphism through the `as` prop. */
-	IsPolymorphic extends boolean,
+> = P &
+	( T extends React.ElementType
+		? // The `children` prop is being explicitly omitted since it is otherwise implicitly added
+		  // by `ComponentPropsWithRef`. The context is that components should require the `children`
+		  // prop explicitly when needed (see https://github.com/WordPress/gutenberg/pull/31817).
+		  Omit<
+				React.ComponentPropsWithoutRef< T >,
+				'as' | keyof P | 'children'
+		  >
+		: {} );
+
+/**
+ * Props for a polymorphic WordPress component.
+ *
+ * Supports polymorphism through the `as` prop.
+ */
+export type WordPressPolymorphicComponentProps<
+	/** Prop types. */
+	P,
+	/** The HTML element to inherit props from. */
+	T extends React.ElementType | null,
 > = P &
 	( T extends React.ElementType
 		? // The `children` prop is being explicitly omitted since it is otherwise implicitly added
@@ -29,13 +54,13 @@ export type WordPressComponentProps<
 				'as' | keyof P | 'children'
 		  >
 		: {} ) &
-	( IsPolymorphic extends true ? Polymorphic< T > : {} );
+	Polymorphic< T >;
 
 export interface WordPressComponent< T extends React.ElementType | null, O > {
 	< TT extends React.ElementType >(
-		props: WordPressComponentProps< O, TT, false >
+		props: WordPressComponentProps< O, TT >
 	): JSX.Element | null;
-	( props: WordPressComponentProps< O, T, false > ): JSX.Element | null;
+	( props: WordPressComponentProps< O, T > ): JSX.Element | null;
 	displayName?: string;
 	/**
 	 * A CSS selector used to fake component interpolation in styled components
@@ -53,9 +78,9 @@ export interface WordPressPolymorphicComponent<
 	O,
 > {
 	< TT extends React.ElementType >(
-		props: WordPressComponentProps< O, TT, true > & { as: TT }
+		props: WordPressPolymorphicComponentProps< O, TT > & { as: TT }
 	): JSX.Element | null;
-	( props: WordPressComponentProps< O, T, true > ): JSX.Element | null;
+	( props: WordPressPolymorphicComponentProps< O, T > ): JSX.Element | null;
 	displayName?: string;
 	/**
 	 * A CSS selector used to fake component interpolation in styled components
@@ -71,22 +96,14 @@ export interface WordPressPolymorphicComponent<
 export type WordPressComponentFromProps<
 	Props,
 	ForwardsRef extends boolean = true,
-> = Props extends WordPressComponentProps< infer P, infer T, infer I >
-	? I extends false
-		? WordPressComponent<
-				T,
-				P &
-					( ForwardsRef extends true
-						? React.RefAttributes< any >
-						: {} )
-		  >
-		: I extends true
-		? WordPressPolymorphicComponent<
-				T,
-				P &
-					( ForwardsRef extends true
-						? React.RefAttributes< any >
-						: {} )
-		  >
-		: never
+> = Props extends WordPressPolymorphicComponentProps< infer P, infer T >
+	? WordPressPolymorphicComponent<
+			T,
+			P & ( ForwardsRef extends true ? React.RefAttributes< any > : {} )
+	  >
+	: Props extends WordPressComponentProps< infer P, infer T >
+	? WordPressComponent<
+			T,
+			P & ( ForwardsRef extends true ? React.RefAttributes< any > : {} )
+	  >
 	: never;
