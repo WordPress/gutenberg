@@ -237,7 +237,7 @@ function GalleryEdit( props ) {
 		return (
 			ALLOWED_MEDIA_TYPES.some(
 				( mediaType ) => mediaTypeSelector?.indexOf( mediaType ) === 0
-			) || file.url?.indexOf( 'blob:' ) === 0
+			) || file.blob
 		);
 	}
 
@@ -272,7 +272,7 @@ function GalleryEdit( props ) {
 			.map( ( file ) => {
 				if ( ! file.url ) {
 					return {
-						blob: createBlobURL( file ),
+						blob: file.blob || createBlobURL( file ),
 					};
 				}
 
