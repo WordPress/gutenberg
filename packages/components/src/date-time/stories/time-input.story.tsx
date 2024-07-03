@@ -31,3 +31,6 @@ const Template: StoryFn< typeof TimeInput > = ( args ) => {
 };
 
 export const Default: StoryFn< typeof TimeInput > = Template.bind( {} );
+Default.args = {
+	label: 'Time',
+};
