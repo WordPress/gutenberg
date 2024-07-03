@@ -87,10 +87,10 @@ function useResolvedElement< T extends HTMLElement >(
 	);
 }
 
-type ObservedSize = {
+interface ObservedSize {
 	width: number | undefined;
 	height: number | undefined;
-};
+}
 
 type ResizeHandler = ( size: ObservedSize ) => void;
 

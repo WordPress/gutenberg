@@ -9,9 +9,9 @@ import type { ReactNode } from 'react';
  */
 import Theme from '../';
 
-type MyThemableComponentProps = {
+interface MyThemableComponentProps {
 	children: ReactNode;
-};
+}
 
 const MyThemableComponent = ( props: MyThemableComponentProps ) => {
 	return (

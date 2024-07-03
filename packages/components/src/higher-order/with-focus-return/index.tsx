@@ -17,9 +17,9 @@ function isComponentLike( object: any ): object is React.ComponentType {
 	return object instanceof Component || typeof object === 'function';
 }
 
-type Props = {
+interface Props {
 	onFocusReturn?: () => void;
-};
+}
 
 /**
  * Higher Order Component used to be used to wrap disposable elements like

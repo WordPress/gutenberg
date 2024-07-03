@@ -8,7 +8,7 @@ import type {
 import { createHigherOrderComponent } from '../../utils/create-higher-order-component';
 import useInstanceId from '../../hooks/use-instance-id';
 
-type InstanceIdProps = { instanceId: string | number };
+interface InstanceIdProps { instanceId: string | number }
 
 /**
  * A Higher Order Component used to provide a unique instance ID by component.

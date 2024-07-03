@@ -14,7 +14,7 @@ import { useRef } from '@wordpress/element';
  */
 import { getAutoCompleterUI } from '../autocompleter-ui';
 
-type FruitOption = { visual: string; name: string; id: number };
+interface FruitOption { visual: string; name: string; id: number }
 
 describe( 'AutocompleterUI', () => {
 	describe( 'click outside behavior', () => {

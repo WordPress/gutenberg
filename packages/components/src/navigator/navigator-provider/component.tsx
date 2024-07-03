@@ -36,11 +36,11 @@ type RouterAction =
 	| { type: 'goto'; path: string; options?: NavigateOptions }
 	| { type: 'gotoparent'; options?: NavigateToParentOptions };
 
-type RouterState = {
+interface RouterState {
 	screens: Screen[];
 	locationHistory: NavigatorLocation[];
 	matchedPath: MatchedPath;
-};
+}
 
 const MAX_HISTORY_LENGTH = 50;
 

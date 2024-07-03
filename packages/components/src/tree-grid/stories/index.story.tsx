@@ -70,10 +70,10 @@ const Descender = ( { level }: { level: number } ) => {
 	return <span aria-hidden="true">{ indentation + '├ ' }</span>;
 };
 
-type Item = {
+interface Item {
 	name: string;
 	types?: Item[];
-};
+}
 
 const Rows = ( {
 	items = [],
