@@ -20,30 +20,30 @@ type DataFormProps< Item > = {
 	data: Item;
 	fields: Field< Item >[];
 	form: Form;
-	onUpdate: Dispatch< SetStateAction< Item > >;
+	onChange: Dispatch< SetStateAction< Item > >;
 };
 
 type DataFormControlProps< Item > = {
 	data: Item;
 	field: NormalizedField< Item >;
-	onUpdate: Dispatch< SetStateAction< Item > >;
+	onChange: Dispatch< SetStateAction< Item > >;
 };
 
 function DataFormTextControl< Item >( {
 	data,
 	field,
-	onUpdate,
+	onChange,
 }: DataFormControlProps< Item > ) {
 	const { id, header, placeholder } = field;
 	const value = field.getValue( { item: data } );
 
-	const onChange = useCallback(
+	const onChangeControl = useCallback(
 		( newValue: string ) =>
-			onUpdate( ( prevItem: Item ) => ( {
+			onChange( ( prevItem: Item ) => ( {
 				...prevItem,
 				[ id ]: newValue,
 			} ) ),
-		[ id, onUpdate ]
+		[ id, onChange ]
 	);
 
 	return (
@@ -51,7 +51,7 @@ function DataFormTextControl< Item >( {
 			label={ header }
 			placeholder={ placeholder }
 			value={ value }
-			onChange={ onChange }
+			onChange={ onChangeControl }
 		/>
 	);
 }
@@ -80,7 +80,7 @@ export default function DataForm< Item >( {
 	data,
 	fields,
 	form,
-	onUpdate,
+	onChange,
 }: DataFormProps< Item > ) {
 	const visibleFields = useMemo(
 		() =>
@@ -99,7 +99,7 @@ export default function DataForm< Item >( {
 				key={ field.id }
 				data={ data }
 				field={ field }
-				onUpdate={ onUpdate }
+				onChange={ onChange }
 			/>
 		) : null;
 	} );
