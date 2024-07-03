@@ -234,6 +234,16 @@ describe( 'interactivity api handlers', () => {
 			state.nested = obj;
 			expect( raw.nested ).toBe( obj );
 		} );
+
+		it( 'should keep object references across namespaces', () => {
+			const raw1 = { obj: {} };
+			const raw2 = { obj: {} };
+			const state1 = proxifyState( raw1, 'test-1' );
+			const state2 = proxifyState( raw2, 'test-2' );
+			state2.obj = state1.obj;
+			expect( state2.obj ).toBe( state1.obj );
+			expect( raw2.obj ).toBe( state1.obj );
+		} );
 	} );
 
 	describe( 'computations', () => {
