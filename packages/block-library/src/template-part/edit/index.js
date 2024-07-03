@@ -40,6 +40,7 @@ import {
 	useAlternativeTemplateParts,
 	useTemplatePartArea,
 } from './utils/hooks';
+import ContentPanel from './content-panel';
 
 function ReplaceButton( {
 	isEntityAvailable,
@@ -301,6 +302,7 @@ export default function TemplatePartEdit( {
 				</BlockSettingsMenuControls>
 
 				<InspectorControls>
+					<ContentPanel clientId={ clientId } />
 					<TemplatesList
 						area={ area }
 						clientId={ clientId }
