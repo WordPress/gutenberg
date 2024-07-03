@@ -18,7 +18,7 @@ function Dashicon( {
 	size = 20,
 	style = {},
 	...extraProps
-}: WordPressComponentProps< DashiconProps, 'span', false > ) {
+}: WordPressComponentProps< DashiconProps, 'span' > ) {
 	const iconClass = [
 		'dashicon',
 		'dashicons',

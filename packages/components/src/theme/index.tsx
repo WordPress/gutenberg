@@ -7,7 +7,7 @@ import { useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import type { ThemeProps } from './types';
-import type { WordPressComponentProps } from '../context';
+import type { WordPressPolymorphicComponentProps } from '../context';
 import { colorVariables, Wrapper } from './styles';
 import { generateThemeVariables } from './color-algorithms';
 import { useCx } from '../utils';
@@ -36,7 +36,7 @@ function Theme( {
 	background,
 	className,
 	...props
-}: WordPressComponentProps< ThemeProps, 'div', true > ) {
+}: WordPressPolymorphicComponentProps< ThemeProps, 'div' > ) {
 	const cx = useCx();
 	const classes = useMemo(
 		() =>

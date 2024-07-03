@@ -17,7 +17,7 @@ function UnforwardedTreeGridRow(
 		setSize,
 		isExpanded,
 		...props
-	}: WordPressComponentProps< TreeGridRowProps, 'tr', false >,
+	}: WordPressComponentProps< TreeGridRowProps, 'tr' >,
 	ref: React.ForwardedRef< HTMLTableRowElement >
 ) {
 	return (

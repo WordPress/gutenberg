@@ -15,7 +15,7 @@ import type { WordPressComponentProps } from '../context';
 
 export const Tab = forwardRef<
 	HTMLButtonElement,
-	Omit< WordPressComponentProps< TabProps, 'button', false >, 'id' >
+	Omit< WordPressComponentProps< TabProps, 'button' >, 'id' >
 >( function Tab( { children, tabId, disabled, render, ...otherProps }, ref ) {
 	const context = useTabsContext();
 	if ( ! context ) {

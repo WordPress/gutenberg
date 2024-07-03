@@ -24,7 +24,7 @@ import warning from '@wordpress/warning';
 import Button from '../button';
 import type { SnackbarProps } from './types';
 import type { NoticeAction } from '../notice/types';
-import type { WordPressComponentProps } from '../context';
+import type { WordPressPolymorphicComponentProps } from '../context';
 
 const NOTICE_TIMEOUT = 10000;
 
@@ -64,7 +64,7 @@ function UnforwardedSnackbar(
 		// actually the function to call to remove the snackbar from the UI.
 		onDismiss,
 		listRef,
-	}: WordPressComponentProps< SnackbarProps, 'div', true >,
+	}: WordPressPolymorphicComponentProps< SnackbarProps, 'div' >,
 	ref: ForwardedRef< any >
 ) {
 	function dismissMe( event: KeyboardEvent | MouseEvent ) {

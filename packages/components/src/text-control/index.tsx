@@ -18,7 +18,7 @@ import type { WordPressComponentProps } from '../context';
 import type { TextControlProps } from './types';
 
 function UnforwardedTextControl(
-	props: WordPressComponentProps< TextControlProps, 'input', false >,
+	props: WordPressComponentProps< TextControlProps, 'input' >,
 	ref: ForwardedRef< HTMLInputElement >
 ) {
 	const {

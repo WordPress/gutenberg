@@ -24,7 +24,7 @@ function AlignmentMatrixControlIcon( {
 	style = {},
 	value = 'center',
 	...props
-}: WordPressComponentProps< AlignmentMatrixControlIconProps, 'div', false > ) {
+}: WordPressComponentProps< AlignmentMatrixControlIconProps, 'div' > ) {
 	const alignIndex = getAlignmentIndex( value );
 	const scale = ( size / BASE_SIZE ).toFixed( 2 );
 

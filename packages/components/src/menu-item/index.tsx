@@ -19,7 +19,7 @@ import type { WordPressComponentProps } from '../context';
 import type { MenuItemProps } from './types';
 
 function UnforwardedMenuItem(
-	props: WordPressComponentProps< MenuItemProps, 'button', false >,
+	props: WordPressComponentProps< MenuItemProps, 'button' >,
 	ref: ForwardedRef< HTMLButtonElement >
 ) {
 	let {

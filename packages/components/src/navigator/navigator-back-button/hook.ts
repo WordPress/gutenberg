@@ -6,14 +6,17 @@ import { useCallback } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../../context';
+import type { WordPressPolymorphicComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import Button from '../../button';
 import useNavigator from '../use-navigator';
 import type { NavigatorBackButtonHookProps } from '../types';
 
 export function useNavigatorBackButton(
-	props: WordPressComponentProps< NavigatorBackButtonHookProps, 'button', true >
+	props: WordPressPolymorphicComponentProps<
+		NavigatorBackButtonHookProps,
+		'button'
+	>
 ) {
 	const {
 		onClick,

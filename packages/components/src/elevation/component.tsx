@@ -6,14 +6,14 @@ import type { ForwardedRef } from 'react';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../context';
+import type { WordPressPolymorphicComponentProps } from '../context';
 import { contextConnect } from '../context';
 import { View } from '../view';
 import { useElevation } from './hook';
 import type { ElevationProps } from './types';
 
 function UnconnectedElevation(
-	props: WordPressComponentProps< ElevationProps, 'div', true >,
+	props: WordPressPolymorphicComponentProps< ElevationProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const elevationProps = useElevation( props );

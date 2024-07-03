@@ -93,7 +93,7 @@ export type CircularOptionPickerProps =
 
 export type DropdownLinkActionProps = {
 	buttonProps?: Omit<
-		WordPressComponentProps< ButtonAsButtonProps, 'button', false >,
+		WordPressComponentProps< ButtonAsButtonProps, 'button' >,
 		'children'
 	>;
 	linkText: string;
@@ -107,7 +107,7 @@ export type OptionGroupProps = {
 };
 
 export type OptionProps = Omit<
-	WordPressComponentProps< ButtonAsButtonProps, 'button', false >,
+	WordPressComponentProps< ButtonAsButtonProps, 'button' >,
 	'isPressed' | 'className'
 > & {
 	className?: string;

@@ -10,10 +10,10 @@ import { contextConnect } from '../context';
 import { View } from '../view';
 import { useSurface } from './hook';
 import type { SurfaceProps } from './types';
-import type { WordPressComponentProps } from '../context';
+import type { WordPressPolymorphicComponentProps } from '../context';
 
 function UnconnectedSurface(
-	props: WordPressComponentProps< SurfaceProps, 'div', true >,
+	props: WordPressPolymorphicComponentProps< SurfaceProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const surfaceProps = useSurface( props );

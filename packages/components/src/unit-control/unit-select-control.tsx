@@ -26,7 +26,7 @@ function UnitSelectControl(
 		unit = 'px',
 		units = CSS_UNITS,
 		...props
-	}: WordPressComponentProps< UnitSelectControlProps, 'select', false >,
+	}: WordPressComponentProps< UnitSelectControlProps, 'select' >,
 	ref: ForwardedRef< any >
 ) {
 	if ( ! hasUnits( units ) || units?.length === 1 ) {

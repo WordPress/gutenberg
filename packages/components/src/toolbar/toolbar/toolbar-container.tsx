@@ -19,7 +19,7 @@ import type { ToolbarProps } from './types';
 import type { WordPressComponentProps } from '../../context';
 
 function UnforwardedToolbarContainer(
-	{ label, ...props }: WordPressComponentProps< ToolbarProps, 'div', false >,
+	{ label, ...props }: WordPressComponentProps< ToolbarProps, 'div' >,
 	ref: ForwardedRef< any >
 ) {
 	const toolbarStore = Ariakit.useToolbarStore( {

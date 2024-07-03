@@ -37,7 +37,7 @@ export const noop = () => {};
  * ```
  */
 export function FormToggle(
-	props: WordPressComponentProps< FormToggleProps, 'input', false >,
+	props: WordPressComponentProps< FormToggleProps, 'input' >,
 	ref: ForwardedRef< HTMLInputElement >
 ) {
 	const {

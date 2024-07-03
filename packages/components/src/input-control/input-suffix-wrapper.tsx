@@ -7,12 +7,15 @@ import type { ForwardedRef } from 'react';
  * Internal dependencies
  */
 import { Spacer } from '../spacer';
-import type { WordPressComponentProps } from '../context';
+import type { WordPressPolymorphicComponentProps } from '../context';
 import { contextConnect, useContextSystem } from '../context';
 import type { InputControlSuffixWrapperProps } from './types';
 
 function UnconnectedInputControlSuffixWrapper(
-	props: WordPressComponentProps< InputControlSuffixWrapperProps, 'div', true >,
+	props: WordPressPolymorphicComponentProps<
+		InputControlSuffixWrapperProps,
+		'div'
+	>,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const derivedProps = useContextSystem( props, 'InputControlSuffixWrapper' );

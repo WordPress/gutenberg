@@ -19,11 +19,14 @@ import { useMergeRefs } from '@wordpress/compose';
  */
 import { View } from '../../view';
 import SlotFillContext from './slot-fill-context';
-import type { WordPressComponentProps } from '../../context';
+import type { WordPressPolymorphicComponentProps } from '../../context';
 import type { SlotComponentProps } from '../types';
 
 function Slot(
-	props: WordPressComponentProps< Omit< SlotComponentProps, 'bubblesVirtually' >, 'div', true >,
+	props: WordPressPolymorphicComponentProps<
+		Omit< SlotComponentProps, 'bubblesVirtually' >,
+		'div'
+	>,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const {

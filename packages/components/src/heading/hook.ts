@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../context';
+import type { WordPressPolymorphicComponentProps } from '../context';
 import { useContextSystem } from '../context';
 import { useText } from '../text';
 import { getHeadingFontSize } from '../utils/font-size';
@@ -9,7 +9,7 @@ import { CONFIG, COLORS } from '../utils';
 import type { HeadingProps } from './types';
 
 export function useHeading(
-	props: WordPressComponentProps< HeadingProps, 'h1', true >
+	props: WordPressPolymorphicComponentProps< HeadingProps, 'h1' >
 ) {
 	const {
 		as: asProp,

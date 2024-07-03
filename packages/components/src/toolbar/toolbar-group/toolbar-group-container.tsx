@@ -8,7 +8,7 @@ const ToolbarGroupContainer = ( {
 	className,
 	children,
 	...props
-}: WordPressComponentProps< ToolbarGroupContainerProps, 'div', false > ) => (
+}: WordPressComponentProps< ToolbarGroupContainerProps, 'div' > ) => (
 	<div className={ className } { ...props }>
 		{ children }
 	</div>

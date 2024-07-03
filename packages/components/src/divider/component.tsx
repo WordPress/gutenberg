@@ -14,7 +14,7 @@ import { DividerView } from './styles';
 import type { DividerProps } from './types';
 
 function UnconnectedDivider(
-	props: WordPressComponentProps< DividerProps, 'hr', false >,
+	props: WordPressComponentProps< DividerProps, 'hr' >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const contextProps = useContextSystem( props, 'Divider' );

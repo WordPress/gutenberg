@@ -41,7 +41,7 @@ const PlaceholderIllustration = (
  * ```
  */
 export function Placeholder(
-	props: WordPressComponentProps< PlaceholderProps, 'div', false >
+	props: WordPressComponentProps< PlaceholderProps, 'div' >
 ) {
 	const {
 		icon,

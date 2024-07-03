@@ -6,14 +6,14 @@ import type { ForwardedRef } from 'react';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../context';
+import type { WordPressPolymorphicComponentProps } from '../context';
 import { contextConnect } from '../context';
 import { View } from '../view';
 import { useVStack } from './hook';
 import type { VStackProps } from './types';
 
 function UnconnectedVStack(
-	props: WordPressComponentProps< VStackProps, 'div', true >,
+	props: WordPressPolymorphicComponentProps< VStackProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const vStackProps = useVStack( props );

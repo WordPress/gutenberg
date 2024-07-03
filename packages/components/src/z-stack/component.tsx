@@ -15,10 +15,10 @@ import { getValidChildren } from '../utils/get-valid-children';
 import { contextConnect, useContextSystem } from '../context';
 import { ZStackView, ZStackChildView } from './styles';
 import type { ZStackProps } from './types';
-import type { WordPressComponentProps } from '../context';
+import type { WordPressPolymorphicComponentProps } from '../context';
 
 function UnconnectedZStack(
-	props: WordPressComponentProps< ZStackProps, 'div', true >,
+	props: WordPressPolymorphicComponentProps< ZStackProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const {

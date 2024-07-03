@@ -43,7 +43,7 @@ import { VStack } from '../v-stack';
  * ```
  */
 export function RadioControl(
-	props: WordPressComponentProps< RadioControlProps, 'input', false >
+	props: WordPressComponentProps< RadioControlProps, 'input' >
 ) {
 	const {
 		label,

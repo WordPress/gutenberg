@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../context';
+import type { WordPressPolymorphicComponentProps } from '../context';
 import {
 	Root,
 	Viewbox,
@@ -19,7 +19,7 @@ export default function BoxControlIcon( {
 	side = 'all',
 	sides,
 	...props
-}: WordPressComponentProps< BoxControlIconProps, 'span', true > ) {
+}: WordPressPolymorphicComponentProps< BoxControlIconProps, 'span' > ) {
 	const isSideDisabled = (
 		value: NonNullable< BoxControlProps[ 'sides' ] >[ number ]
 	) => sides?.length && ! sides.includes( value );

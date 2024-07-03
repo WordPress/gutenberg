@@ -6,7 +6,7 @@ import type { ForwardedRef } from 'react';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../../context';
+import type { WordPressPolymorphicComponentProps } from '../../context';
 import { contextConnect } from '../../context';
 import { Scrollable } from '../../scrollable';
 import { View } from '../../view';
@@ -14,7 +14,7 @@ import { useCardBody } from './hook';
 import type { BodyProps } from '../types';
 
 function UnconnectedCardBody(
-	props: WordPressComponentProps< BodyProps, 'div', true >,
+	props: WordPressPolymorphicComponentProps< BodyProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const { isScrollable, ...otherProps } = useCardBody( props );

@@ -12,7 +12,7 @@ import { DropdownContentWrapperDiv } from './styles';
 import type { DropdownContentWrapperProps } from './types';
 
 function UnconnectedDropdownContentWrapper(
-	props: WordPressComponentProps< DropdownContentWrapperProps, 'div', false >,
+	props: WordPressComponentProps< DropdownContentWrapperProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const { paddingSize = 'small', ...derivedProps } = useContextSystem(

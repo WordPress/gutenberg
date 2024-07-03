@@ -14,7 +14,7 @@ import { chevronUp, chevronDown } from '@wordpress/icons';
  * Internal dependencies
  */
 import type { PanelBodyProps, PanelBodyTitleProps } from './types';
-import type { WordPressComponentProps } from '../context';
+import type { WordPressPolymorphicComponentProps } from '../context';
 import Button from '../button';
 import Icon from '../icon';
 import { useControlledState, useUpdateEffect } from '../utils';
@@ -106,7 +106,7 @@ const PanelBodyTitle = forwardRef(
 			icon,
 			title,
 			...props
-		}: WordPressComponentProps< PanelBodyTitleProps, 'button', true >,
+		}: WordPressPolymorphicComponentProps< PanelBodyTitleProps, 'button' >,
 		ref: React.ForwardedRef< any >
 	) => {
 		if ( ! title ) {

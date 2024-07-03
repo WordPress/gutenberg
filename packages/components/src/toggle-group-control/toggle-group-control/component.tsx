@@ -26,7 +26,7 @@ import { ToggleGroupControlAsRadioGroup } from './as-radio-group';
 import { ToggleGroupControlAsButtonGroup } from './as-button-group';
 
 function UnconnectedToggleGroupControl(
-	props: WordPressComponentProps< ToggleGroupControlProps, 'div', false >,
+	props: WordPressComponentProps< ToggleGroupControlProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const {

@@ -82,7 +82,7 @@ const UnforwardedTabPanel = (
 		orientation = 'horizontal',
 		activeClass = 'is-active',
 		onSelect,
-	}: WordPressComponentProps< TabPanelProps, 'div', false >,
+	}: WordPressComponentProps< TabPanelProps, 'div' >,
 	ref: ForwardedRef< any >
 ) => {
 	const instanceId = useInstanceId( TabPanel, 'tab-panel' );

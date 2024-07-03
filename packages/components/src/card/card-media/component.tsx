@@ -6,14 +6,14 @@ import type { ForwardedRef } from 'react';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../../context';
+import type { WordPressPolymorphicComponentProps } from '../../context';
 import { contextConnect } from '../../context';
 import { View } from '../../view';
 import { useCardMedia } from './hook';
 import type { MediaProps } from '../types';
 
 function UnconnectedCardMedia(
-	props: WordPressComponentProps< MediaProps, 'div', true >,
+	props: WordPressPolymorphicComponentProps< MediaProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const cardMediaProps = useCardMedia( props );

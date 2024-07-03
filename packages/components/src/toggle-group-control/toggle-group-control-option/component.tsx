@@ -16,11 +16,7 @@ import type { ToggleGroupControlOptionProps } from '../types';
 import { ToggleGroupControlOptionBase } from '../toggle-group-control-option-base';
 
 function UnforwardedToggleGroupControlOption(
-	props: WordPressComponentProps<
-		ToggleGroupControlOptionProps,
-		'button',
-		false
-	>,
+	props: WordPressComponentProps< ToggleGroupControlOptionProps, 'button' >,
 	ref: ForwardedRef< any >
 ) {
 	const { label, ...restProps } = props;

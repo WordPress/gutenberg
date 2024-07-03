@@ -53,8 +53,7 @@ const CustomSelectButton = ( {
 }: Omit<
 	WordPressComponentProps<
 		CustomSelectButtonProps & CustomSelectButtonSize & CustomSelectStore,
-		'button',
-		false
+		'button'
 	>,
 	'onChange'
 > ) => {

@@ -263,7 +263,7 @@ function useOnValueUpdate< T >(
 
 export const TabList = forwardRef<
 	HTMLDivElement,
-	WordPressComponentProps< TabListProps, 'div', false >
+	WordPressComponentProps< TabListProps, 'div' >
 >( function TabList( { children, ...otherProps }, ref ) {
 	const context = useTabsContext();
 

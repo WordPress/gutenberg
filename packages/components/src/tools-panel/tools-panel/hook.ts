@@ -13,7 +13,7 @@ import {
  * Internal dependencies
  */
 import * as styles from '../styles';
-import type { WordPressComponentProps } from '../../context';
+import type { WordPressPolymorphicComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import { useCx } from '../../utils/hooks/use-cx';
 import type {
@@ -80,7 +80,7 @@ const isMenuItemTypeEmpty = (
 ) => obj && Object.keys( obj ).length === 0;
 
 export function useToolsPanel(
-	props: WordPressComponentProps< ToolsPanelProps, 'div', true >
+	props: WordPressPolymorphicComponentProps< ToolsPanelProps, 'div' >
 ) {
 	const {
 		className,

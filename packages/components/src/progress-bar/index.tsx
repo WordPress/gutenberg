@@ -17,7 +17,7 @@ import type { ProgressBarProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
 function UnforwardedProgressBar(
-	props: WordPressComponentProps< ProgressBarProps, 'progress', false >,
+	props: WordPressComponentProps< ProgressBarProps, 'progress' >,
 	ref: ForwardedRef< HTMLProgressElement >
 ) {
 	const { className, value, ...progressProps } = props;

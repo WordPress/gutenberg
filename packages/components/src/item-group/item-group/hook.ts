@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../../context';
+import type { WordPressPolymorphicComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 
 /**
@@ -12,7 +12,7 @@ import { useCx } from '../../utils/hooks/use-cx';
 import type { ItemGroupProps } from '../types';
 
 export function useItemGroup(
-	props: WordPressComponentProps< ItemGroupProps, 'div', true >
+	props: WordPressPolymorphicComponentProps< ItemGroupProps, 'div' >
 ) {
 	const {
 		className,

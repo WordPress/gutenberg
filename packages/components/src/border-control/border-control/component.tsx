@@ -34,7 +34,7 @@ const BorderLabel = ( props: LabelProps ) => {
 };
 
 const UnconnectedBorderControl = (
-	props: WordPressComponentProps< BorderControlProps, 'div', false >,
+	props: WordPressComponentProps< BorderControlProps, 'div' >,
 	forwardedRef: React.ForwardedRef< any >
 ) => {
 	const {

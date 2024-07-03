@@ -10,14 +10,14 @@ import { __ } from '@wordpress/i18n';
 import Button from '../../button';
 import Tooltip from '../../tooltip';
 import { View } from '../../view';
-import type { WordPressComponentProps } from '../../context';
+import type { WordPressPolymorphicComponentProps } from '../../context';
 import { contextConnect } from '../../context';
 import { useBorderBoxControlLinkedButton } from './hook';
 
 import type { LinkedButtonProps } from '../types';
 
 const BorderBoxControlLinkedButton = (
-	props: WordPressComponentProps< LinkedButtonProps, 'button', true >,
+	props: WordPressPolymorphicComponentProps< LinkedButtonProps, 'button' >,
 	forwardedRef: React.ForwardedRef< any >
 ) => {
 	const { className, isLinked, ...buttonProps } =

@@ -51,7 +51,7 @@ export function ToggleControl(
 		className,
 		onChange,
 		disabled,
-	}: WordPressComponentProps< ToggleControlProps, 'input', false >,
+	}: WordPressComponentProps< ToggleControlProps, 'input' >,
 	ref: ForwardedRef< HTMLInputElement >
 ) {
 	function onChangeToggle( event: ChangeEvent< HTMLInputElement > ) {
