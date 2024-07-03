@@ -11,23 +11,25 @@ import { store as blockEditorStore } from '../../store';
 import { GridRect } from './utils';
 
 export function useGridLayoutSync( { clientId: gridClientId } ) {
-	const { gridLayout, blockOrder, getBlockAttributes } = useSelect(
+	const { gridLayout, blockOrder } = useSelect(
 		( select ) => {
-			const { getBlockAttributes: _getBlockAttributes, getBlockOrder } =
+			const { getBlockAttributes, getBlockOrder } =
 				select( blockEditorStore );
 			return {
-				gridLayout: _getBlockAttributes( gridClientId ).layout ?? {},
+				gridLayout: getBlockAttributes( gridClientId ).layout ?? {},
 				blockOrder: getBlockOrder( gridClientId ),
-				getBlockAttributes: _getBlockAttributes,
 			};
 		},
 		[ gridClientId ]
 	);
+
+	const { getBlockAttributes } = useSelect( blockEditorStore );
 	const { updateBlockAttributes, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
 	useEffect( () => {
 		const updates = {};
+
 		const { columnCount, rowCount, isManualPlacement } = gridLayout;
 		const isManualGrid = !! isManualPlacement;
 
@@ -103,6 +105,8 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 					parseInt( newRowStart, 10 ) + parseInt( rowSpan, 10 ) - 1
 				);
 			}
+
+			// Ensure there's enough rows to fit all blocks.
 			if ( ! rowCount || rowCount < bottomMostRow ) {
 				updates[ gridClientId ] = {
 					layout: {
@@ -127,6 +131,7 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 					};
 				}
 			}
+
 			// Remove row styles in auto mode
 			if ( rowCount ) {
 				updates[ gridClientId ] = {
@@ -149,8 +154,8 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 	}, [
 		// Actual deps to sync:
 		gridClientId,
-		blockOrder,
 		gridLayout,
+		blockOrder,
 		// Needed for linter:
 		__unstableMarkNextChangeAsNotPersistent,
 		getBlockAttributes,
