@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { Dispatch, SetStateAction } from 'react';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -15,13 +20,13 @@ type DataFormProps< Item > = {
 	data: Item;
 	fields: Field< Item >[];
 	form: Form;
-	onUpdate: any; // TODO: fix this type.
+	onUpdate: Dispatch< SetStateAction< Item > >;
 };
 
 type DataFormControlProps< Item > = {
 	data: Item;
 	field: NormalizedField< Item >;
-	onUpdate: any; // TODO: fix this type.
+	onUpdate: Dispatch< SetStateAction< Item > >;
 };
 
 function DataFormTextControl< Item >( {
@@ -34,7 +39,7 @@ function DataFormTextControl< Item >( {
 
 	const onChange = useCallback(
 		( newValue: string ) =>
-			onUpdate( ( prevItem: any ) => ( {
+			onUpdate( ( prevItem: Item ) => ( {
 				...prevItem,
 				[ id ]: newValue,
 			} ) ),
