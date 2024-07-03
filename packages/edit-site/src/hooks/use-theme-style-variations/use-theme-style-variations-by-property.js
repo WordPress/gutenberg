@@ -14,7 +14,9 @@ import { __ } from '@wordpress/i18n';
 import cloneDeep from '../../utils/clone-deep';
 import { unlock } from '../../lock-unlock';
 
-const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
+const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
+	blockEditorPrivateApis
+);
 const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
 
 /**
@@ -144,10 +146,5 @@ export function isVariationWithProperties( variation, properties ) {
 		properties
 	);
 
-	return (
-		JSON.stringify( variationWithProperties?.styles ) ===
-			JSON.stringify( variation?.styles ) &&
-		JSON.stringify( variationWithProperties?.settings ) ===
-			JSON.stringify( variation?.settings )
-	);
+	return areGlobalStyleConfigsEqual( variationWithProperties, variation );
 }
