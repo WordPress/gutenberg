@@ -23,7 +23,6 @@ import { appendSelectors, getBlockGapCSS } from './utils';
 import { getGapCSSValue } from '../hooks/gap';
 import { shouldSkipSerialization } from '../hooks/utils';
 import { LAYOUT_DEFINITIONS } from './definitions';
-import { useGridLayoutSync } from '../components/grid';
 
 const RANGE_CONTROL_MAX_VALUES = {
 	px: 600,
@@ -101,14 +100,8 @@ export default {
 			</>
 		);
 	},
-	toolBarControls: function GridLayoutToolbarControls( { clientId } ) {
-		return (
-			<>
-				{ window.__experimentalEnableGridInteractivity && (
-					<GridLayoutSync clientId={ clientId } />
-				) }
-			</>
-		);
+	toolBarControls: function GridLayoutToolbarControls() {
+		return null;
 	},
 	getLayoutStyle: function getLayoutStyle( {
 		selector,
@@ -433,8 +426,4 @@ function GridLayoutTypeControl( { layout, onChange } ) {
 			/>
 		</ToggleGroupControl>
 	);
-}
-
-function GridLayoutSync( props ) {
-	useGridLayoutSync( props );
 }

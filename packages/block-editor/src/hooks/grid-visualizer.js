@@ -7,7 +7,11 @@ import { addFilter } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import { GridVisualizer } from '../components/grid';
+import { GridVisualizer, useGridLayoutSync } from '../components/grid';
+
+function GridLayoutSync( props ) {
+	useGridLayoutSync( props );
+}
 
 const addGridVisualizerToBlockEdit = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
@@ -24,6 +28,7 @@ const addGridVisualizerToBlockEdit = createHigherOrderComponent(
 					clientId={ props.clientId }
 					parentLayout={ props.attributes.layout }
 				/>
+				<GridLayoutSync clientId={ props.clientId } />
 
 				<BlockEdit { ...props } />
 			</>
