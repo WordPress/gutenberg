@@ -12,7 +12,7 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../../context';
+import type { WordPressPolymorphicComponentProps } from '../../context';
 import { contextConnect, useContextSystem } from '../../context';
 import { useCx } from '../../utils/hooks/use-cx';
 import { patternMatch, findParent } from '../utils/router';
@@ -36,11 +36,11 @@ type RouterAction =
 	| { type: 'goto'; path: string; options?: NavigateOptions }
 	| { type: 'gotoparent'; options?: NavigateToParentOptions };
 
-type RouterState = {
+interface RouterState {
 	screens: Screen[];
 	locationHistory: NavigatorLocation[];
 	matchedPath: MatchedPath;
-};
+}
 
 const MAX_HISTORY_LENGTH = 50;
 
@@ -204,7 +204,7 @@ function routerReducer(
 }
 
 function UnconnectedNavigatorProvider(
-	props: WordPressComponentProps< NavigatorProviderProps, 'div' >,
+	props: WordPressPolymorphicComponentProps< NavigatorProviderProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const { initialPath, children, className, ...otherProps } =

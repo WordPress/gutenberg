@@ -8,7 +8,7 @@ import { createContext } from '@wordpress/element';
  */
 import { disabledStyles } from './styles/disabled-styles';
 import type { DisabledProps } from './types';
-import type { WordPressComponentProps } from '../context';
+import type { WordPressPolymorphicComponentProps } from '../context';
 import { useCx } from '../utils';
 
 const Context = createContext< boolean >( false );
@@ -56,7 +56,7 @@ function Disabled( {
 	children,
 	isDisabled = true,
 	...props
-}: WordPressComponentProps< DisabledProps, 'div' > ) {
+}: WordPressPolymorphicComponentProps< DisabledProps, 'div' > ) {
 	const cx = useCx();
 
 	return (

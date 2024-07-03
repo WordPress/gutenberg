@@ -51,8 +51,7 @@ export type ColorPickerProps = WordPressComponentProps<
 		 */
 		copyFormat?: ColorType;
 	},
-	'div',
-	false
+	'div'
 >;
 
 export interface PickerProps {

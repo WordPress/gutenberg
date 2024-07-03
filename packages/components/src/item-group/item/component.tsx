@@ -8,12 +8,12 @@ import type { ForwardedRef } from 'react';
  */
 import type { ItemProps } from '../types';
 import { useItem } from './hook';
-import type { WordPressComponentProps } from '../../context';
+import type { WordPressPolymorphicComponentProps } from '../../context';
 import { contextConnect } from '../../context';
 import { View } from '../../view';
 
 function UnconnectedItem(
-	props: WordPressComponentProps< ItemProps, 'div' >,
+	props: WordPressPolymorphicComponentProps< ItemProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const { role, wrapperClassName, ...otherProps } = useItem( props );

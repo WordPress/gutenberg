@@ -6,14 +6,14 @@ import type { ForwardedRef } from 'react';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../../context';
+import type { WordPressPolymorphicComponentProps } from '../../context';
 import { contextConnect } from '../../context';
 import { Flex } from '../../flex';
 import { useCardFooter } from './hook';
 import type { FooterProps } from '../types';
 
 function UnconnectedCardFooter(
-	props: WordPressComponentProps< FooterProps, 'div' >,
+	props: WordPressPolymorphicComponentProps< FooterProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const footerProps = useCardFooter( props );

@@ -25,7 +25,7 @@ function UnforwardedToolbar(
 		label,
 		variant,
 		...props
-	}: WordPressComponentProps< ToolbarProps, 'div', false >,
+	}: WordPressComponentProps< ToolbarProps, 'div' >,
 	ref: ForwardedRef< any >
 ) {
 	const isVariantDefined = variant !== undefined;

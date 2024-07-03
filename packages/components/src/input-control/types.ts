@@ -192,7 +192,7 @@ export interface InputControlProps
 		 * the InputControl, but the rest of the props for InputField are passed through.
 		 */
 		Omit<
-			WordPressComponentProps< InputFieldProps, 'input', false >,
+			WordPressComponentProps< InputFieldProps, 'input' >,
 			| 'stateReducer'
 			| 'prefix'
 			| 'paddingInlineStart'

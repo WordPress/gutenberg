@@ -1,13 +1,13 @@
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../context';
+import type { WordPressPolymorphicComponentProps } from '../context';
 import { useContextSystem } from '../context';
 import { useHStack } from '../h-stack';
 import type { VStackProps } from './types';
 
 export function useVStack(
-	props: WordPressComponentProps< VStackProps, 'div' >
+	props: WordPressPolymorphicComponentProps< VStackProps, 'div' >
 ) {
 	const {
 		expanded = false,

@@ -27,7 +27,7 @@ import { VisuallyHidden } from '../visually-hidden';
 import { createPortal } from 'react-dom';
 import type { AutocompleterUIProps, KeyedOption, WPCompleter } from './types';
 
-type ListBoxProps = {
+interface ListBoxProps {
 	items: KeyedOption[];
 	onSelect: ( option: KeyedOption ) => void;
 	selectedIndex: number;
@@ -35,7 +35,7 @@ type ListBoxProps = {
 	listBoxId: string | undefined;
 	className?: string;
 	Component?: React.ElementType;
-};
+}
 
 function ListBox( {
 	items,

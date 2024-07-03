@@ -59,7 +59,7 @@ function UnforwardedSearchControl(
 		size = 'default',
 		...restProps
 	}: Omit<
-		WordPressComponentProps< SearchControlProps, 'input', false >,
+		WordPressComponentProps< SearchControlProps, 'input' >,
 		// TODO: Background styling currently doesn't support a disabled state. Needs design work.
 		'disabled'
 	>,

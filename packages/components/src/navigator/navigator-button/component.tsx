@@ -6,14 +6,14 @@ import type { ForwardedRef } from 'react';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../../context';
+import type { WordPressPolymorphicComponentProps } from '../../context';
 import { contextConnect } from '../../context';
 import { View } from '../../view';
 import { useNavigatorButton } from './hook';
 import type { NavigatorButtonProps } from '../types';
 
 function UnconnectedNavigatorButton(
-	props: WordPressComponentProps< NavigatorButtonProps, 'button' >,
+	props: WordPressPolymorphicComponentProps< NavigatorButtonProps, 'button' >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const navigatorButtonProps = useNavigatorButton( props );

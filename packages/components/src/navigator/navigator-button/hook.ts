@@ -7,7 +7,7 @@ import { escapeAttribute } from '@wordpress/escape-html';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../../context';
+import type { WordPressPolymorphicComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import Button from '../../button';
 import useNavigator from '../use-navigator';
@@ -17,7 +17,7 @@ const cssSelectorForAttribute = ( attrName: string, attrValue: string ) =>
 	`[${ attrName }="${ attrValue }"]`;
 
 export function useNavigatorButton(
-	props: WordPressComponentProps< NavigatorButtonProps, 'button' >
+	props: WordPressPolymorphicComponentProps< NavigatorButtonProps, 'button' >
 ) {
 	const {
 		path,

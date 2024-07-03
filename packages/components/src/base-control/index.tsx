@@ -15,7 +15,7 @@ import {
 	StyledHelp,
 	StyledVisualLabel,
 } from './styles/base-control-styles';
-import type { WordPressComponentProps } from '../context';
+import type { WordPressPolymorphicComponentProps } from '../context';
 import { contextConnectWithoutRef, useContextSystem } from '../context';
 
 export { useBaseControlProps } from './hooks';
@@ -44,7 +44,7 @@ export { useBaseControlProps } from './hooks';
  * ```
  */
 const UnconnectedBaseControl = (
-	props: WordPressComponentProps< BaseControlProps, null >
+	props: WordPressPolymorphicComponentProps< BaseControlProps, null >
 ) => {
 	const {
 		__nextHasNoMarginBottom = false,
@@ -120,7 +120,10 @@ export const VisualLabel = ( {
 	className,
 	children,
 	...props
-}: WordPressComponentProps< BaseControlVisualLabelProps, 'span' > ) => {
+}: WordPressPolymorphicComponentProps<
+	BaseControlVisualLabelProps,
+	'span'
+> ) => {
 	return (
 		<StyledVisualLabel
 			{ ...props }

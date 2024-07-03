@@ -52,8 +52,7 @@ export type NavigableContainerProps = WordPressComponentProps<
 		 */
 		stopNavigationEvents: boolean;
 	},
-	'div',
-	false
+	'div'
 >;
 
 export type NavigableMenuProps = WordPressComponentProps<
@@ -65,12 +64,10 @@ export type NavigableMenuProps = WordPressComponentProps<
 		 */
 		orientation?: 'vertical' | 'horizontal' | 'both';
 	},
-	'div',
-	false
+	'div'
 >;
 
 export type TabbableContainerProps = WordPressComponentProps<
 	BaseProps & Partial< Pick< NavigableContainerProps, 'eventToOffset' > >,
-	'div',
-	false
+	'div'
 >;

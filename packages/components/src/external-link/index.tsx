@@ -17,10 +17,7 @@ import type { ExternalLinkProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
 function UnforwardedExternalLink(
-	props: Omit<
-		WordPressComponentProps< ExternalLinkProps, 'a', false >,
-		'target'
-	>,
+	props: Omit< WordPressComponentProps< ExternalLinkProps, 'a' >, 'target' >,
 	ref: ForwardedRef< HTMLAnchorElement >
 ) {
 	const { href, children, className, rel = '', ...additionalProps } = props;

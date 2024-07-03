@@ -12,7 +12,7 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../context';
+import type { WordPressPolymorphicComponentProps } from '../context';
 import { useContextSystem } from '../context';
 import * as styles from './styles';
 import { CONFIG } from '../utils';
@@ -29,7 +29,7 @@ export function getBoxShadow( value: number ) {
 }
 
 export function useElevation(
-	props: WordPressComponentProps< ElevationProps, 'div' >
+	props: WordPressPolymorphicComponentProps< ElevationProps, 'div' >
 ) {
 	const {
 		active,

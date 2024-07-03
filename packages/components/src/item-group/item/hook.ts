@@ -6,14 +6,16 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../../context';
+import type { WordPressPolymorphicComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import * as styles from '../styles';
 import { useItemGroupContext } from '../context';
 import { useCx } from '../../utils/hooks/use-cx';
 import type { ItemProps } from '../types';
 
-export function useItem( props: WordPressComponentProps< ItemProps, 'div' > ) {
+export function useItem(
+	props: WordPressPolymorphicComponentProps< ItemProps, 'div' >
+) {
 	const {
 		as: asProp,
 		className,

@@ -13,7 +13,7 @@ import { Divider } from '../../divider';
 import { useCardDivider } from './hook';
 
 function UnconnectedCardDivider(
-	props: WordPressComponentProps< DividerProps, 'hr', false >,
+	props: WordPressComponentProps< DividerProps, 'hr' >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const dividerProps = useCardDivider( props );

@@ -16,7 +16,7 @@ import type { ButtonGroupProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
 function UnforwardedButtonGroup(
-	props: WordPressComponentProps< ButtonGroupProps, 'div', false >,
+	props: WordPressComponentProps< ButtonGroupProps, 'div' >,
 	ref: ForwardedRef< HTMLDivElement >
 ) {
 	const { className, ...restProps } = props;

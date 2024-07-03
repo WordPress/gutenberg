@@ -11,7 +11,7 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../context';
+import type { WordPressPolymorphicComponentProps } from '../context';
 import { useContextSystem } from '../context';
 import { getAlignmentProps } from './utils';
 import { useResponsiveValue } from '../utils/use-responsive-value';
@@ -20,7 +20,7 @@ import { useCx } from '../utils/hooks/use-cx';
 import type { GridProps } from './types';
 
 export default function useGrid(
-	props: WordPressComponentProps< GridProps, 'div' >
+	props: WordPressPolymorphicComponentProps< GridProps, 'div' >
 ) {
 	const {
 		align,

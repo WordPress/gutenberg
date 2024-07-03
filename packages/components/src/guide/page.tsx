@@ -10,7 +10,7 @@ import deprecated from '@wordpress/deprecated';
 import type { WordPressComponentProps } from '../context';
 
 export default function GuidePage(
-	props: WordPressComponentProps< {}, 'div', false >
+	props: WordPressComponentProps< {}, 'div' >
 ) {
 	useEffect( () => {
 		deprecated( '<GuidePage>', {

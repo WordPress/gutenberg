@@ -14,7 +14,7 @@ export default function Label( {
 	hideLabelFromVision,
 	htmlFor,
 	...props
-}: WordPressComponentProps< InputControlLabelProps, 'label', false > ) {
+}: WordPressComponentProps< InputControlLabelProps, 'label' > ) {
 	if ( ! children ) {
 		return null;
 	}

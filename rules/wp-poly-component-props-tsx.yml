@@ -1,0 +1,12 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/ast-grep/ast-grep/main/schemas/rule.json
+
+id: wp-poly-component-props
+message: Add your rule message here....
+severity: error # error, warning, info, hint
+language: TSX
+rule:
+    any:
+        - pattern:
+              selector: generic_type
+              context: 'let v: WordPressComponentProps< $A, $B, true >'
+fix: WordPressPolymorphicComponentProps< $A, $B >

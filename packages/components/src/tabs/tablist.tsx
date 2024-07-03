@@ -64,7 +64,7 @@ function useEvent< T extends AnyFunction >( callback?: T ) {
 /**
  * `useResizeObserver` options.
  */
-type UseResizeObserverOptions = {
+interface UseResizeObserverOptions {
 	/**
 	 * Whether to trigger the callback when an element's ResizeObserver is
 	 * first set up.
@@ -72,7 +72,7 @@ type UseResizeObserverOptions = {
 	 * @default true
 	 */
 	fireOnObserve?: boolean;
-};
+}
 
 /**
  * Fires `onResize` when the target element is resized.
@@ -156,7 +156,7 @@ function useResizeObserver(
 /**
  * The position and dimensions of an element, relative to its offset parent.
  */
-type ElementOffsetRect = {
+interface ElementOffsetRect {
 	/**
 	 * The distance from the left edge of the offset parent to the left edge of
 	 * the element.
@@ -175,7 +175,7 @@ type ElementOffsetRect = {
 	 * The height of the element.
 	 */
 	height: number;
-};
+}
 
 /**
  * An `ElementOffsetRect` object with all values set to zero.
@@ -263,7 +263,7 @@ function useOnValueUpdate< T >(
 
 export const TabList = forwardRef<
 	HTMLDivElement,
-	WordPressComponentProps< TabListProps, 'div', false >
+	WordPressComponentProps< TabListProps, 'div' >
 >( function TabList( { children, ...otherProps }, ref ) {
 	const context = useTabsContext();
 

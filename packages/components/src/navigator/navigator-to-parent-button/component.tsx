@@ -6,14 +6,17 @@ import type { ForwardedRef } from 'react';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../../context';
+import type { WordPressPolymorphicComponentProps } from '../../context';
 import { contextConnect } from '../../context';
 import { View } from '../../view';
 import { useNavigatorBackButton } from '../navigator-back-button/hook';
 import type { NavigatorToParentButtonProps } from '../types';
 
 function UnconnectedNavigatorToParentButton(
-	props: WordPressComponentProps< NavigatorToParentButtonProps, 'button' >,
+	props: WordPressPolymorphicComponentProps<
+		NavigatorToParentButtonProps,
+		'button'
+	>,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const navigatorToParentButtonProps = useNavigatorBackButton( {

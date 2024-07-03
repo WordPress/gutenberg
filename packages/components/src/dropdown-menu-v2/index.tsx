@@ -24,7 +24,10 @@ import { SVG, Circle } from '@wordpress/primitives';
  * Internal dependencies
  */
 import { useContextSystem, contextConnect } from '../context';
-import type { WordPressComponentProps } from '../context';
+import type {
+	WordPressComponentProps,
+	WordPressPolymorphicComponentProps,
+} from '../context';
 import Icon from '../icon';
 import type {
 	DropdownMenuContext as DropdownMenuContextType,
@@ -43,7 +46,7 @@ export const DropdownMenuContext = createContext<
 
 export const DropdownMenuItem = forwardRef<
 	HTMLDivElement,
-	WordPressComponentProps< DropdownMenuItemProps, 'div', false >
+	WordPressComponentProps< DropdownMenuItemProps, 'div' >
 >( function DropdownMenuItem(
 	{ prefix, suffix, children, hideOnClick = true, ...props },
 	ref
@@ -77,7 +80,7 @@ export const DropdownMenuItem = forwardRef<
 
 export const DropdownMenuCheckboxItem = forwardRef<
 	HTMLDivElement,
-	WordPressComponentProps< DropdownMenuCheckboxItemProps, 'div', false >
+	WordPressComponentProps< DropdownMenuCheckboxItemProps, 'div' >
 >( function DropdownMenuCheckboxItem(
 	{ suffix, children, hideOnClick = false, ...props },
 	ref
@@ -124,7 +127,7 @@ const radioCheck = (
 
 export const DropdownMenuRadioItem = forwardRef<
 	HTMLDivElement,
-	WordPressComponentProps< DropdownMenuRadioItemProps, 'div', false >
+	WordPressComponentProps< DropdownMenuRadioItemProps, 'div' >
 >( function DropdownMenuRadioItem(
 	{ suffix, children, hideOnClick = false, ...props },
 	ref
@@ -165,7 +168,7 @@ export const DropdownMenuRadioItem = forwardRef<
 
 export const DropdownMenuGroup = forwardRef<
 	HTMLDivElement,
-	WordPressComponentProps< DropdownMenuGroupProps, 'div', false >
+	WordPressComponentProps< DropdownMenuGroupProps, 'div' >
 >( function DropdownMenuGroup( props, ref ) {
 	const dropdownMenuContext = useContext( DropdownMenuContext );
 	return (
@@ -178,7 +181,7 @@ export const DropdownMenuGroup = forwardRef<
 } );
 
 const UnconnectedDropdownMenu = (
-	props: WordPressComponentProps< DropdownMenuProps, 'div', false >,
+	props: WordPressComponentProps< DropdownMenuProps, 'div' >,
 	ref: React.ForwardedRef< HTMLDivElement >
 ) => {
 	const {
@@ -343,7 +346,7 @@ export const DropdownMenu = contextConnect(
 
 export const DropdownMenuSeparator = forwardRef<
 	HTMLHRElement,
-	WordPressComponentProps< DropdownMenuSeparatorProps, 'hr', false >
+	WordPressComponentProps< DropdownMenuSeparatorProps, 'hr' >
 >( function DropdownMenuSeparator( props, ref ) {
 	const dropdownMenuContext = useContext( DropdownMenuContext );
 	return (
@@ -358,7 +361,7 @@ export const DropdownMenuSeparator = forwardRef<
 
 export const DropdownMenuItemLabel = forwardRef<
 	HTMLSpanElement,
-	WordPressComponentProps< { children: React.ReactNode }, 'span', true >
+	WordPressPolymorphicComponentProps< { children: React.ReactNode }, 'span' >
 >( function DropdownMenuItemLabel( props, ref ) {
 	return (
 		<Styled.DropdownMenuItemLabel
@@ -371,7 +374,7 @@ export const DropdownMenuItemLabel = forwardRef<
 
 export const DropdownMenuItemHelpText = forwardRef<
 	HTMLSpanElement,
-	WordPressComponentProps< { children: React.ReactNode }, 'span', true >
+	WordPressPolymorphicComponentProps< { children: React.ReactNode }, 'span' >
 >( function DropdownMenuItemHelpText( props, ref ) {
 	return (
 		<Styled.DropdownMenuItemHelpText

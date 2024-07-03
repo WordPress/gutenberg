@@ -18,7 +18,7 @@ import {
 	__unstableAnimatePresence as AnimatePresence,
 } from '../animation';
 import type { SnackbarListProps } from './types';
-import type { WordPressComponentProps } from '../context';
+import type { WordPressPolymorphicComponentProps } from '../context';
 
 const SNACKBAR_VARIANTS = {
 	init: {
@@ -65,7 +65,7 @@ export function SnackbarList( {
 	className,
 	children,
 	onRemove,
-}: WordPressComponentProps< SnackbarListProps, 'div' > ) {
+}: WordPressPolymorphicComponentProps< SnackbarListProps, 'div' > ) {
 	const listRef = useRef< HTMLDivElement | null >( null );
 	const isReducedMotion = useReducedMotion();
 	className = clsx( 'components-snackbar-list', className );

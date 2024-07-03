@@ -74,7 +74,9 @@ export interface LegacyStateOptions {
 type Component = React.FunctionComponent< any >;
 
 type CompositeStore = ReturnType< typeof Current.useCompositeStore >;
-type CompositeStoreState = { store: CompositeStore };
+interface CompositeStoreState {
+	store: CompositeStore;
+}
 export type CompositeState = CompositeStoreState &
 	Required< Pick< LegacyStateOptions, 'baseId' > >;
 
@@ -110,7 +112,7 @@ function mapLegacyStatePropsToComponentProps(
 		return { ...rest, ...props, store };
 	}
 
-	return legacyProps;
+	return legacyProps as CompositeComponentProps;
 }
 
 function proxyComposite< C extends Component >(

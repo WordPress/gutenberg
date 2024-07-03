@@ -8,14 +8,14 @@ import type { ForwardedRef } from 'react';
  */
 import { useToolsPanelItem } from './hook';
 import { View } from '../../view';
-import type { WordPressComponentProps } from '../../context';
+import type { WordPressPolymorphicComponentProps } from '../../context';
 import { contextConnect } from '../../context';
 import type { ToolsPanelItemProps } from '../types';
 
 // This wraps controls to be conditionally displayed within a tools panel. It
 // prevents props being applied to HTML elements that would make them invalid.
 const UnconnectedToolsPanelItem = (
-	props: WordPressComponentProps< ToolsPanelItemProps, 'div' >,
+	props: WordPressPolymorphicComponentProps< ToolsPanelItemProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) => {
 	const {

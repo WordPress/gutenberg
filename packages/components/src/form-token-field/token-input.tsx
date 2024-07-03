@@ -16,7 +16,7 @@ import type { WordPressComponentProps } from '../context';
 import type { TokenInputProps } from './types';
 
 export function UnForwardedTokenInput(
-	props: WordPressComponentProps< TokenInputProps, 'input', false >,
+	props: WordPressComponentProps< TokenInputProps, 'input' >,
 	ref: ForwardedRef< HTMLInputElement >
 ) {
 	const {

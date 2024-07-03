@@ -100,7 +100,7 @@ export function FocalPointPicker( {
 		y: 0.5,
 	},
 	...restProps
-}: WordPressComponentProps< FocalPointPickerProps, 'div', false > ) {
+}: WordPressComponentProps< FocalPointPickerProps, 'div' > ) {
 	const [ point, setPoint ] = useState( valueProp );
 	const [ showGridOverlay, setShowGridOverlay ] = useState( false );
 

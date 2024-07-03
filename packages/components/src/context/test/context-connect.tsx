@@ -7,17 +7,17 @@ import type { ForwardedRef } from 'react';
  * Internal dependencies
  */
 import { contextConnect, contextConnectWithoutRef } from '../context-connect';
-import type { WordPressComponentProps } from '../wordpress-component';
+import type { WordPressPolymorphicComponentProps } from '../wordpress-component';
 
 // Static TypeScript tests
 /* eslint-disable jest/expect-expect */
 describe( 'ref forwarding', () => {
 	const ComponentWithRef = (
-		props: WordPressComponentProps< {}, 'div' >,
+		props: WordPressPolymorphicComponentProps< {}, 'div' >,
 		ref: ForwardedRef< any >
 	) => <div { ...props } ref={ ref } />;
 	const ComponentWithoutRef = (
-		props: WordPressComponentProps< {}, 'div' >
+		props: WordPressPolymorphicComponentProps< {}, 'div' >
 	) => <div { ...props } />;
 
 	it( 'should not trigger a TS error if components are passed to the correct connect* functions', () => {

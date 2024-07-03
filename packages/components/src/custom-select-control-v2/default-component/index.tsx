@@ -12,7 +12,7 @@ import type { WordPressComponentProps } from '../../context';
 import Item from '../item';
 
 function CustomSelectControlV2(
-	props: WordPressComponentProps< CustomSelectProps, 'button', false >
+	props: WordPressComponentProps< CustomSelectProps, 'button' >
 ) {
 	const { defaultValue, onChange, value, ...restProps } = props;
 	// Forward props + store from v2 implementation

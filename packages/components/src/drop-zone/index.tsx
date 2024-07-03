@@ -48,7 +48,7 @@ export function DropZoneComponent( {
 	onHTMLDrop,
 	onDrop,
 	...restProps
-}: WordPressComponentProps< DropZoneProps, 'div', false > ) {
+}: WordPressComponentProps< DropZoneProps, 'div' > ) {
 	const [ isDraggingOverDocument, setIsDraggingOverDocument ] =
 		useState< boolean >();
 	const [ isDraggingOverElement, setIsDraggingOverElement ] =

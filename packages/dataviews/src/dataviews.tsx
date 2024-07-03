@@ -27,7 +27,7 @@ import BulkActionsToolbar from './bulk-actions-toolbar';
 import type { Action, Field, View, ViewBaseProps } from './types';
 import type { SetSelection, SelectionOrUpdater } from './private-types';
 
-type ItemWithId = { id: string };
+interface ItemWithId { id: string }
 
 type DataViewsProps< Item > = {
 	view: View;

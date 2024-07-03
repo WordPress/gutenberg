@@ -26,7 +26,7 @@ export default function ClipboardButton( {
 	onFinishCopy,
 	text,
 	...buttonProps
-}: WordPressComponentProps< ClipboardButtonProps, 'button', false > ) {
+}: WordPressComponentProps< ClipboardButtonProps, 'button' > ) {
 	deprecated( 'wp.components.ClipboardButton', {
 		since: '5.8',
 		alternative: 'wp.compose.useCopyToClipboard',

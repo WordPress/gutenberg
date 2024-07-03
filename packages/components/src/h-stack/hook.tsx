@@ -6,14 +6,16 @@ import type { ReactElement } from 'react';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../context';
+import type { WordPressPolymorphicComponentProps } from '../context';
 import { hasConnectNamespace, useContextSystem } from '../context';
 import { FlexItem, useFlex } from '../flex';
 import { getAlignmentProps } from './utils';
 import { getValidChildren } from '../utils/get-valid-children';
 import type { Props } from './types';
 
-export function useHStack( props: WordPressComponentProps< Props, 'div' > ) {
+export function useHStack(
+	props: WordPressPolymorphicComponentProps< Props, 'div' >
+) {
 	const {
 		alignment = 'edge',
 		children,

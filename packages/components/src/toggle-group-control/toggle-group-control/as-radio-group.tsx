@@ -33,11 +33,7 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 		value: valueProp,
 		id: idProp,
 		...otherProps
-	}: WordPressComponentProps<
-		ToggleGroupControlMainControlProps,
-		'div',
-		false
-	>,
+	}: WordPressComponentProps< ToggleGroupControlMainControlProps, 'div' >,
 	forwardedRef: ForwardedRef< HTMLDivElement >
 ) {
 	const generatedId = useInstanceId(

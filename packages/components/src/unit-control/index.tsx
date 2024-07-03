@@ -29,11 +29,7 @@ import type { UnitControlProps, UnitControlOnChangeCallback } from './types';
 import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
 
 function UnforwardedUnitControl(
-	unitControlProps: WordPressComponentProps<
-		UnitControlProps,
-		'input',
-		false
-	>,
+	unitControlProps: WordPressComponentProps< UnitControlProps, 'input' >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const {

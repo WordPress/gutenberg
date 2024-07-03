@@ -7,7 +7,7 @@ import { css } from '@emotion/react';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../../context';
+import type { WordPressPolymorphicComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import { useFlexContext } from '../context';
 import * as styles from '../styles';
@@ -15,7 +15,7 @@ import { useCx } from '../../utils/hooks/use-cx';
 import type { FlexItemProps } from '../types';
 
 export function useFlexItem(
-	props: WordPressComponentProps< FlexItemProps, 'div' >
+	props: WordPressPolymorphicComponentProps< FlexItemProps, 'div' >
 ) {
 	const {
 		className,

@@ -18,7 +18,7 @@ import BubblesVirtuallySlot from './bubbles-virtually/slot';
 import BubblesVirtuallySlotFillProvider from './bubbles-virtually/slot-fill-provider';
 import SlotFillProvider from './provider';
 import SlotFillContext from './bubbles-virtually/slot-fill-context';
-import type { WordPressComponentProps } from '../context';
+import type { WordPressPolymorphicComponentProps } from '../context';
 
 export { default as useSlot } from './bubbles-virtually/use-slot';
 export { default as useSlotFills } from './bubbles-virtually/use-slot-fills';
@@ -44,7 +44,7 @@ export function Fill( props: FillComponentProps ) {
 
 export function UnforwardedSlot(
 	props: SlotComponentProps &
-		Omit< WordPressComponentProps< {}, 'div' >, 'className' >,
+		Omit< WordPressPolymorphicComponentProps< {}, 'div' >, 'className' >,
 	ref: ForwardedRef< any >
 ) {
 	const { bubblesVirtually, ...restProps } = props;

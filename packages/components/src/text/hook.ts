@@ -12,7 +12,7 @@ import { useMemo, Children, cloneElement } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../context';
+import type { WordPressPolymorphicComponentProps } from '../context';
 import { hasConnectNamespace, useContextSystem } from '../context';
 import { useTruncate } from '../truncate';
 import { getOptimalTextShade } from '../utils/colors';
@@ -29,7 +29,7 @@ import type React from 'react';
  * @param {import('../context').WordPressComponentProps<import('./types').Props, 'span'>} props
  */
 export default function useText(
-	props: WordPressComponentProps< Props, 'span' >
+	props: WordPressPolymorphicComponentProps< Props, 'span' >
 ) {
 	const {
 		adjustLineHeightForInnerControls,

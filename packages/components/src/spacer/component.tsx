@@ -6,14 +6,14 @@ import type { ForwardedRef } from 'react';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../context';
+import type { WordPressPolymorphicComponentProps } from '../context';
 import { contextConnect } from '../context';
 import { View } from '../view';
 import { useSpacer } from './hook';
 import type { SpacerProps } from './types';
 
 function UnconnectedSpacer(
-	props: WordPressComponentProps< SpacerProps, 'div' >,
+	props: WordPressPolymorphicComponentProps< SpacerProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const spacerProps = useSpacer( props );

@@ -1,0 +1,20 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/ast-grep/ast-grep/main/schemas/rule.json
+
+id: interface-not-type
+message: Add your rule message here....
+severity: error # error, warning, info, hint
+language: TSX
+rule:
+    all:
+        - pattern: type $NAME = $DEF
+        - kind: type_alias_declaration
+        - has:
+              kind: object_type
+    not:
+        any:
+            - has:
+                  kind: intersection_type
+            - has:
+                  kind: union_type
+
+fix: interface $NAME $DEF

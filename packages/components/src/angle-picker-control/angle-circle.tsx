@@ -13,7 +13,7 @@ import {
 	CircleIndicator,
 } from './styles/angle-picker-control-styles';
 
-import type { WordPressComponentProps } from '../context';
+import type { WordPressPolymorphicComponentProps } from '../context';
 import type { AngleCircleProps } from './types';
 
 type UseDraggingArgumentType = Parameters< typeof useDragging >[ 0 ];
@@ -26,7 +26,7 @@ function AngleCircle( {
 	value,
 	onChange,
 	...props
-}: WordPressComponentProps< AngleCircleProps, 'div' > ) {
+}: WordPressPolymorphicComponentProps< AngleCircleProps, 'div' > ) {
 	const angleCircleRef = useRef< HTMLDivElement | null >( null );
 	const angleCircleCenter = useRef< { x: number; y: number } | undefined >();
 	const previousCursorValue = useRef< CSSStyleDeclaration[ 'cursor' ] >();

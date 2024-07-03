@@ -14,7 +14,7 @@ import {
  */
 import * as styles from '../styles';
 import { useToolsPanelContext } from '../context';
-import type { WordPressComponentProps } from '../../context';
+import type { WordPressPolymorphicComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import { useCx } from '../../utils/hooks/use-cx';
 import type { ToolsPanelItemProps } from '../types';
@@ -22,7 +22,7 @@ import type { ToolsPanelItemProps } from '../types';
 const noop = () => {};
 
 export function useToolsPanelItem(
-	props: WordPressComponentProps< ToolsPanelItemProps, 'div' >
+	props: WordPressPolymorphicComponentProps< ToolsPanelItemProps, 'div' >
 ) {
 	const {
 		className,

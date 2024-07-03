@@ -8,7 +8,7 @@ import { useCallback, useMemo, useState } from '@wordpress/element';
  */
 import * as styles from '../styles';
 import { parseQuantityAndUnitFromRawValue } from '../../unit-control/utils';
-import type { WordPressComponentProps } from '../../context';
+import type { WordPressPolymorphicComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import { useCx } from '../../utils/hooks/use-cx';
 
@@ -23,7 +23,7 @@ const isValidBorder = ( border?: Border ) => {
 };
 
 export function useBorderControl(
-	props: WordPressComponentProps< BorderControlProps, 'div' >
+	props: WordPressPolymorphicComponentProps< BorderControlProps, 'div' >
 ) {
 	const {
 		className,

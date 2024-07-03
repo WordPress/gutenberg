@@ -49,7 +49,7 @@ export function AlignmentMatrixControl( {
 	onChange,
 	width = 92,
 	...props
-}: WordPressComponentProps< AlignmentMatrixControlProps, 'div', false > ) {
+}: WordPressComponentProps< AlignmentMatrixControlProps, 'div' > ) {
 	const baseId = useInstanceId(
 		AlignmentMatrixControl,
 		'alignment-matrix-control',

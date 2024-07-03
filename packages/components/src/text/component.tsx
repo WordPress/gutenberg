@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../context';
+import type { WordPressPolymorphicComponentProps } from '../context';
 import { contextConnect } from '../context';
 import { View } from '../view';
 import useText from './hook';
@@ -12,7 +12,7 @@ import type { Props } from './types';
  * @param forwardedRef
  */
 function UnconnectedText(
-	props: WordPressComponentProps< Props, 'span' >,
+	props: WordPressPolymorphicComponentProps< Props, 'span' >,
 	forwardedRef: React.ForwardedRef< any >
 ) {
 	const textProps = useText( props );

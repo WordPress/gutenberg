@@ -34,7 +34,7 @@ export function FormFileUpload( {
 	onClick,
 	render,
 	...props
-}: WordPressComponentProps< FormFileUploadProps, 'button', false > ) {
+}: WordPressComponentProps< FormFileUploadProps, 'button' > ) {
 	const ref = useRef< HTMLInputElement >( null );
 	const openFileDialog = () => {
 		ref.current?.click();

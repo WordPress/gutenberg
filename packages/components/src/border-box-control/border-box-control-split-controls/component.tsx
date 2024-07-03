@@ -11,7 +11,7 @@ import { useMergeRefs } from '@wordpress/compose';
 import BorderBoxControlVisualizer from '../border-box-control-visualizer';
 import { BorderControl } from '../../border-control';
 import { Grid } from '../../grid';
-import type { WordPressComponentProps } from '../../context';
+import type { WordPressPolymorphicComponentProps } from '../../context';
 import { contextConnect } from '../../context';
 import { useBorderBoxControlSplitControls } from './hook';
 
@@ -19,7 +19,7 @@ import type { BorderControlProps } from '../../border-control/types';
 import type { SplitControlsProps } from '../types';
 
 const BorderBoxControlSplitControls = (
-	props: WordPressComponentProps< SplitControlsProps, 'div' >,
+	props: WordPressPolymorphicComponentProps< SplitControlsProps, 'div' >,
 	forwardedRef: React.ForwardedRef< any >
 ) => {
 	const {

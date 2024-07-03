@@ -6,14 +6,14 @@ import type { ForwardedRef } from 'react';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../context';
+import type { WordPressPolymorphicComponentProps } from '../context';
 import { contextConnect } from '../context';
 import { View } from '../view';
 import useGrid from './hook';
 import type { GridProps } from './types';
 
 function UnconnectedGrid(
-	props: WordPressComponentProps< GridProps, 'div' >,
+	props: WordPressPolymorphicComponentProps< GridProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const gridProps = useGrid( props );

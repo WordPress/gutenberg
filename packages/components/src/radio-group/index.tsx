@@ -26,7 +26,7 @@ function UnforwardedRadioGroup(
 		onChange,
 		children,
 		...props
-	}: WordPressComponentProps< RadioGroupProps, 'div', false >,
+	}: WordPressComponentProps< RadioGroupProps, 'div' >,
 	ref: React.ForwardedRef< any >
 ) {
 	const radioStore = Ariakit.useRadioStore( {

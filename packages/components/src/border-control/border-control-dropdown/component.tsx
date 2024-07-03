@@ -19,7 +19,7 @@ import ColorPalette from '../../color-palette';
 import Dropdown from '../../dropdown';
 import { HStack } from '../../h-stack';
 import { VStack } from '../../v-stack';
-import type { WordPressComponentProps } from '../../context';
+import type { WordPressPolymorphicComponentProps } from '../../context';
 import { contextConnect } from '../../context';
 import { useBorderControlDropdown } from './hook';
 import { StyledLabel } from '../../base-control/styles/base-control-styles';
@@ -130,7 +130,7 @@ const getToggleAriaLabel = (
 };
 
 const BorderControlDropdown = (
-	props: WordPressComponentProps< DropdownProps, 'div' >,
+	props: WordPressPolymorphicComponentProps< DropdownProps, 'div' >,
 	forwardedRef: React.ForwardedRef< any >
 ) => {
 	const {

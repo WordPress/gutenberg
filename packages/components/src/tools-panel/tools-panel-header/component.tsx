@@ -19,7 +19,7 @@ import MenuItem from '../../menu-item';
 import { HStack } from '../../h-stack';
 import { Heading } from '../../heading';
 import { useToolsPanelHeader } from './hook';
-import type { WordPressComponentProps } from '../../context';
+import type { WordPressPolymorphicComponentProps } from '../../context';
 import { contextConnect } from '../../context';
 import { ResetLabel } from '../styles';
 import type {
@@ -149,7 +149,7 @@ const OptionalControlsGroup = ( {
 };
 
 const ToolsPanelHeader = (
-	props: WordPressComponentProps< ToolsPanelHeaderProps, 'h2' >,
+	props: WordPressPolymorphicComponentProps< ToolsPanelHeaderProps, 'h2' >,
 	forwardedRef: ForwardedRef< any >
 ) => {
 	const {

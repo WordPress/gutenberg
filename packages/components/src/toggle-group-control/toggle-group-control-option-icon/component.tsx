@@ -19,8 +19,7 @@ import Icon from '../../icon';
 function UnforwardedToggleGroupControlOptionIcon(
 	props: WordPressComponentProps<
 		ToggleGroupControlOptionIconProps,
-		'button',
-		false
+		'button'
 	>,
 	ref: ForwardedRef< any >
 ) {

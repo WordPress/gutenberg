@@ -11,15 +11,15 @@ import { forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../wordpress-component';
+import type { WordPressPolymorphicComponentProps } from '../wordpress-component';
 
 // Static TypeScript checks
 /* eslint-disable jest/expect-expect */
 describe( 'WordPressComponentProps', () => {
 	it( 'should not accept a ref', () => {
-		const Foo = ( props: WordPressComponentProps< {}, 'div' > ) => (
-			<div { ...props } />
-		);
+		const Foo = (
+			props: WordPressPolymorphicComponentProps< {}, 'div' >
+		) => <div { ...props } />;
 
 		// @ts-expect-error The ref prop should trigger an error.
 		<Foo ref={ null } />;
@@ -27,7 +27,7 @@ describe( 'WordPressComponentProps', () => {
 
 	it( 'should accept a ref if wrapped by a forwardRef()', () => {
 		const Foo = (
-			props: WordPressComponentProps< {}, 'div' >,
+			props: WordPressPolymorphicComponentProps< {}, 'div' >,
 			ref: ForwardedRef< any >
 		) => <div { ...props } ref={ ref } />;
 		const ForwardedFoo = forwardRef( Foo );

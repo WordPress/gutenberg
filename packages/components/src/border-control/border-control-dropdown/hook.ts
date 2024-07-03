@@ -8,14 +8,14 @@ import { useMemo } from '@wordpress/element';
  */
 import * as styles from '../styles';
 import { parseQuantityAndUnitFromRawValue } from '../../unit-control/utils';
-import type { WordPressComponentProps } from '../../context';
+import type { WordPressPolymorphicComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import { useCx } from '../../utils/hooks/use-cx';
 
 import type { DropdownProps } from '../types';
 
 export function useBorderControlDropdown(
-	props: WordPressComponentProps< DropdownProps, 'div' >
+	props: WordPressPolymorphicComponentProps< DropdownProps, 'div' >
 ) {
 	const {
 		border,
