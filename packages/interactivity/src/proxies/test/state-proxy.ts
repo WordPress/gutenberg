@@ -27,10 +27,12 @@ type State = {
 const withScopeAndNs = ( scope, ns, callback ) => () => {
 	setScope( scope );
 	setNamespace( ns );
-	const result = callback();
-	resetNamespace();
-	resetScope();
-	return result;
+	try {
+		return callback();
+	} finally {
+		resetNamespace();
+		resetScope();
+	}
 };
 
 const proxifyStateTest = < T extends object >( obj: T ) =>
@@ -93,17 +95,36 @@ describe( 'interactivity api - state proxy', () => {
 		} );
 
 		it( 'should support getters using ownKeys traps', () => {
-			const raw = proxifyStateTest( {
+			const state = proxifyStateTest( {
 				x: {
 					a: 1,
 					b: 2,
 				},
 				get y() {
-					return Object.values( raw.x );
+					return Object.values( state.x );
 				},
 			} );
 
-			expect( raw.y ).toEqual( [ 1, 2 ] );
+			expect( state.y ).toEqual( [ 1, 2 ] );
+		} );
+
+		it( 'should support getters accessing the scope', () => {
+			const state = proxifyStateTest( {
+				get y() {
+					const ctx = getContext< { value: string } >();
+					return ctx.value;
+				},
+			} );
+
+			const scope = { context: { test: { value: 'from context' } } };
+			try {
+				setScope( scope as any );
+				setNamespace( 'test' );
+				expect( state.y ).toBe( 'from context' );
+			} finally {
+				resetNamespace();
+				resetScope();
+			}
 		} );
 
 		it( 'should work with normal functions', () => {
@@ -123,6 +144,25 @@ describe( 'interactivity api - state proxy', () => {
 			expect( state.value ).toBe( 1 );
 			state.replace( 2 );
 			expect( state.value ).toBe( 2 );
+		} );
+
+		it( 'should work with normal functions accessing the scope', () => {
+			const state = proxifyStateTest( {
+				sumContextValue( newValue: number ): number {
+					const ctx = getContext< { value: number } >();
+					return ctx.value + newValue;
+				},
+			} );
+
+			const scope = { context: { test: { value: 1 } } };
+			try {
+				setScope( scope as any );
+				setNamespace( 'test' );
+				expect( state.sumContextValue( 2 ) ).toBe( 3 );
+			} finally {
+				resetNamespace();
+				resetScope();
+			}
 		} );
 	} );
 
