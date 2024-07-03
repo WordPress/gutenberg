@@ -460,7 +460,9 @@ Starting with version 6.7, it is possible to specify a PHP file in `block.json` 
 { "variations": "file:./variations.php" }
 ```
 
-That PHP file is expected to `return` an array that contains the block variations. For example:
+That PHP file is expected to `return` an array that contains the block variations. Strings found in the variations returned from the PHP file will not be localized automatically; instead, use the `__()` function as usual.
+
+For example:
 
 ```php
 <?php
