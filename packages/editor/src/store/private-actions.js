@@ -241,7 +241,6 @@ export const revertTemplate =
 	async ( { registry } ) => {
 		const noticeId = 'edit-site-template-reverted';
 		registry.dispatch( noticesStore ).removeNotice( noticeId );
-
 		if ( ! isTemplateRevertable( template ) ) {
 			registry
 				.dispatch( noticesStore )
