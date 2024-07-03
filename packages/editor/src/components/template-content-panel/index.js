@@ -27,7 +27,7 @@ const PAGE_CONTENT_BLOCKS = [
 
 const TEMPLATE_PART_BLOCK = 'core/template-part';
 
-export default function TemplateContentPanel( renderingMode ) {
+export default function TemplateContentPanel( { renderingMode } ) {
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const { clientIds, postType } = useSelect( ( select ) => {
 		const { getBlocksByName } = select( blockEditorStore );
@@ -42,7 +42,8 @@ export default function TemplateContentPanel( renderingMode ) {
 			),
 		};
 	}, [] );
-	if ( renderingMode !== 'post-only' && postType !== TEMPLATE_POST_TYPE ) {
+
+	if ( renderingMode === 'post-only' && postType !== TEMPLATE_POST_TYPE ) {
 		return null;
 	}
 
