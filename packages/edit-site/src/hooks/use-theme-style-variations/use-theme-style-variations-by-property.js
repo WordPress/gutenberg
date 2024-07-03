@@ -20,8 +20,8 @@ const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
 /**
  * Removes all instances of properties from an object.
  *
- * @param {Object} object     The object to remove the properties from.
- * @param {string} properties The properties to remove.
+ * @param {Object}   object     The object to remove the properties from.
+ * @param {string[]} properties The properties to remove.
  * @return {Object} The modified object.
  */
 export function removePropertiesFromObject( object, properties ) {
@@ -51,8 +51,8 @@ export function removePropertiesFromObject( object, properties ) {
  * Fetches the current theme style variations that contain only the specified properties
  * and merges them with the user config.
  *
- * @param {Object} props            Object of hook args.
- * @param {string} props.properties The properties to filter by.
+ * @param {Object}   props            Object of hook args.
+ * @param {string[]} props.properties The properties to filter by.
  * @return {Object[]|*} The merged object.
  */
 export function useCurrentMergeThemeStyleVariationsWithUserConfig( {
@@ -104,8 +104,8 @@ export function useCurrentMergeThemeStyleVariationsWithUserConfig( {
  * The function is recursive, so it will perform a deep search for the given properties.
  * E.g., the function will return `{ a: { b: { c: { test: 1 } } } }` if the properties are  `[ 'test' ]`.
  *
- * @param {Object} object     The object to filter
- * @param {string[]}  properties The properties to filter by
+ * @param {Object}   object     The object to filter
+ * @param {string[]} properties The properties to filter by
  * @return {Object} The merged object.
  */
 export const filterObjectByProperties = ( object, properties ) => {
@@ -134,7 +134,7 @@ export const filterObjectByProperties = ( object, properties ) => {
  * Compares a style variation to the same variation filtered by the specified properties.
  * Returns true if the variation contains only the properties specified.
  *
- * @param {Object} variation  The variation to compare.
+ * @param {Object}   variation  The variation to compare.
  * @param {string[]} properties The properties to compare.
  * @return {boolean} Whether the variation contains only the specified properties.
  */
