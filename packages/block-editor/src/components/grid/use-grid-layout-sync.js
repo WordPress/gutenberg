@@ -57,22 +57,26 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 				);
 				bottomMostRow = Math.max(
 					bottomMostRow,
-					rowStart + rowSpan - 1
+					parseInt( rowStart, 10 ) + parseInt( rowSpan, 10 ) - 1
 				);
 			}
 
 			// When in manual mode, ensure that every block has a columnStart and rowStart value.
 			for ( const clientId of blockOrder ) {
 				const attributes = getBlockAttributes( clientId );
-				const { columnStart, rowStart, columnSpan, rowSpan } =
-					attributes.style?.layout || {};
+				const {
+					columnStart,
+					rowStart,
+					columnSpan = 1,
+					rowSpan = 1,
+				} = attributes.style?.layout || {};
 				if ( columnStart && rowStart ) {
 					continue;
 				}
 				const [ newColumnStart, newRowStart ] = getFirstEmptyCell(
 					rects,
 					columnCount,
-					Math.max( rowCount, bottomMostRow ),
+					Math.max( rowCount || 2, bottomMostRow ),
 					columnSpan,
 					rowSpan
 				);
@@ -96,7 +100,7 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 				};
 				bottomMostRow = Math.max(
 					bottomMostRow,
-					rowStart + rowSpan - 1
+					parseInt( newRowStart, 10 ) + parseInt( rowSpan, 10 ) - 1
 				);
 			}
 			if ( ! rowCount || rowCount < bottomMostRow ) {
