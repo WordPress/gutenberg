@@ -8,14 +8,16 @@ import clsx from 'clsx';
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Button, __experimentalHStack as HStack } from '@wordpress/components';
+import { useViewportMatch } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
-import { memo, forwardRef } from '@wordpress/element';
+import { memo, forwardRef, useContext } from '@wordpress/element';
 import { search } from '@wordpress/icons';
 import { store as commandsStore } from '@wordpress/commands';
 import { displayShortcut } from '@wordpress/keycodes';
 import { filterURLForDisplay } from '@wordpress/url';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -23,9 +25,15 @@ import { filterURLForDisplay } from '@wordpress/url';
 import { store as editSiteStore } from '../../store';
 import SiteIcon from '../site-icon';
 import { unlock } from '../../lock-unlock';
+const { useHistory } = unlock( routerPrivateApis );
+import { SidebarNavigationContext } from '../sidebar';
 
 const SiteHub = memo(
 	forwardRef( ( { isTransparent }, ref ) => {
+		const isMobileViewport = useViewportMatch( 'medium', '<' );
+		const history = useHistory();
+		const { navigate } = useContext( SidebarNavigationContext );
+
 		const { dashboardLink, homeUrl, siteTitle } = useSelect( ( select ) => {
 			const { getSettings } = unlock( select( editSiteStore ) );
 
@@ -57,18 +65,37 @@ const SiteHub = memo(
 							}
 						) }
 					>
-						<Button
-							ref={ ref }
-							href={ dashboardLink }
-							label={ __( 'Go to the Dashboard' ) }
-							className="edit-site-layout__view-mode-toggle"
-							style={ {
-								transform: 'scale(0.5)',
-								borderRadius: 4,
-							} }
-						>
-							<SiteIcon className="edit-site-layout__view-mode-toggle-icon" />
-						</Button>
+						{ ! isMobileViewport && (
+							<Button
+								ref={ ref }
+								href={ dashboardLink }
+								label={ __( 'Go to the Dashboard' ) }
+								className="edit-site-layout__view-mode-toggle"
+								style={ {
+									transform: 'scale(0.5)',
+									borderRadius: 4,
+								} }
+							>
+								<SiteIcon className="edit-site-layout__view-mode-toggle-icon" />
+							</Button>
+						) }
+						{ isMobileViewport && (
+							<Button
+								ref={ ref }
+								label={ __( 'Go to Site Editor' ) }
+								className="edit-site-layout__view-mode-toggle"
+								style={ {
+									transform: 'scale(0.5)',
+									borderRadius: 4,
+								} }
+								onClick={ () => {
+									history.push( {} );
+									navigate( 'back' );
+								} }
+							>
+								<SiteIcon className="edit-site-layout__view-mode-toggle-icon" />
+							</Button>
+						) }
 					</div>
 
 					<HStack>

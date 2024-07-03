@@ -175,10 +175,14 @@ export default function Layout( { route } ) {
 					{ isMobileViewport && areas.mobile && (
 						<div className="edit-site-layout__mobile">
 							{ canvasMode !== 'edit' && (
-								<SiteHub
-									ref={ toggleRef }
-									isTransparent={ isResizableFrameOversized }
-								/>
+								<SidebarContent routeKey={ routeKey }>
+									<SiteHub
+										ref={ toggleRef }
+										isTransparent={
+											isResizableFrameOversized
+										}
+									/>
+								</SidebarContent>
 							) }
 							{ areas.mobile }
 						</div>
