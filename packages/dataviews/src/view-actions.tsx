@@ -315,7 +315,7 @@ function _ViewActions< Item extends AnyItem >( {
 				<Button
 					size="compact"
 					icon={ settings }
-					label={ __( 'Screen options' ) }
+					label={ _x( 'View options', 'View is used as a noun' ) }
 				/>
 			}
 		>
