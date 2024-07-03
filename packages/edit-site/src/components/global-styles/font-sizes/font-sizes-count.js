@@ -40,8 +40,11 @@ function FontSizes() {
 				<Subtitle level={ 3 }>{ __( 'Font Sizes' ) }</Subtitle>
 			</HStack>
 			<ItemGroup isBordered isSeparated>
-				<NavigationButtonAsItem path="/typography/font-sizes/">
-					<HStack justify="space-between" align="center">
+				<NavigationButtonAsItem
+					path="/typography/font-sizes/"
+					aria-label={ __( 'Edit font size presets' ) }
+				>
+					<HStack direction="row">
 						<FlexItem>
 							{ sprintf(
 								/* translators: %d: number of font sizes */
@@ -53,11 +56,7 @@ function FontSizes() {
 								fontSizesCount
 							) }
 						</FlexItem>
-						<FlexItem>
-							<Icon
-								icon={ isRTL() ? chevronLeft : chevronRight }
-							/>
-						</FlexItem>
+						<Icon icon={ isRTL() ? chevronLeft : chevronRight } />
 					</HStack>
 				</NavigationButtonAsItem>
 			</ItemGroup>
