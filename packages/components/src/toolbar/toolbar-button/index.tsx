@@ -60,6 +60,7 @@ function UnforwardedToolbarButton(
 						className
 					) }
 					isPressed={ isActive }
+					__experimentalIsFocusable
 					disabled={ isDisabled }
 					data-toolbar-item
 					{ ...extraProps }
@@ -85,6 +86,10 @@ function UnforwardedToolbarButton(
 				<Button
 					label={ title }
 					isPressed={ isActive }
+					// TODO: Should be focusable disabled, but adding `__experimentalIsFocusable` will trigger a
+					// focus bug when ToolbarButton is disabled via the `disabled` prop.
+					// Must address first: https://github.com/WordPress/gutenberg/issues/63070
+					// eslint-disable-next-line no-restricted-syntax
 					disabled={ isDisabled }
 					{ ...toolbarItemProps }
 				>
