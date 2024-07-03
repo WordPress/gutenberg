@@ -14,7 +14,7 @@ import { View } from '../../view';
 import type { ItemGroupProps } from '../types';
 
 function UnconnectedItemGroup(
-	props: WordPressComponentProps< ItemGroupProps, 'div' >,
+	props: WordPressComponentProps< ItemGroupProps, 'div', true >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const {

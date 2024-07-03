@@ -13,7 +13,7 @@ import { useCx } from '../../utils/hooks/use-cx';
 import type { BodyProps } from '../types';
 
 export function useCardBody(
-	props: WordPressComponentProps< BodyProps, 'div' >
+	props: WordPressComponentProps< BodyProps, 'div', true >
 ) {
 	const {
 		className,

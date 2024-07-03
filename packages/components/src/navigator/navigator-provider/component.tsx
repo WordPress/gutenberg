@@ -204,7 +204,7 @@ function routerReducer(
 }
 
 function UnconnectedNavigatorProvider(
-	props: WordPressComponentProps< NavigatorProviderProps, 'div' >,
+	props: WordPressComponentProps< NavigatorProviderProps, 'div', true >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const { initialPath, children, className, ...otherProps } =

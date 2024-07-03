@@ -12,7 +12,7 @@ import { contextConnect, useContextSystem } from '../context';
 import type { InputControlPrefixWrapperProps } from './types';
 
 function UnconnectedInputControlPrefixWrapper(
-	props: WordPressComponentProps< InputControlPrefixWrapperProps, 'div' >,
+	props: WordPressComponentProps< InputControlPrefixWrapperProps, 'div', true >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const derivedProps = useContextSystem( props, 'InputControlPrefixWrapper' );

@@ -13,7 +13,7 @@ import type { FlexBlockProps } from '../types';
 import { useFlexBlock } from './hook';
 
 function UnconnectedFlexBlock(
-	props: WordPressComponentProps< FlexBlockProps, 'div' >,
+	props: WordPressComponentProps< FlexBlockProps, 'div', true >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const flexBlockProps = useFlexBlock( props );

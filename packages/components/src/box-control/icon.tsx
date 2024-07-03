@@ -19,7 +19,7 @@ export default function BoxControlIcon( {
 	side = 'all',
 	sides,
 	...props
-}: WordPressComponentProps< BoxControlIconProps, 'span' > ) {
+}: WordPressComponentProps< BoxControlIconProps, 'span', true > ) {
 	const isSideDisabled = (
 		value: NonNullable< BoxControlProps[ 'sides' ] >[ number ]
 	) => sides?.length && ! sides.includes( value );

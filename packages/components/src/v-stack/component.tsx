@@ -13,7 +13,7 @@ import { useVStack } from './hook';
 import type { VStackProps } from './types';
 
 function UnconnectedVStack(
-	props: WordPressComponentProps< VStackProps, 'div' >,
+	props: WordPressComponentProps< VStackProps, 'div', true >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const vStackProps = useVStack( props );

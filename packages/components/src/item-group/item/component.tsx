@@ -13,7 +13,7 @@ import { contextConnect } from '../../context';
 import { View } from '../../view';
 
 function UnconnectedItem(
-	props: WordPressComponentProps< ItemProps, 'div' >,
+	props: WordPressComponentProps< ItemProps, 'div', true >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const { role, wrapperClassName, ...otherProps } = useItem( props );

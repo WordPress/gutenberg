@@ -23,7 +23,7 @@ const isValidBorder = ( border?: Border ) => {
 };
 
 export function useBorderControl(
-	props: WordPressComponentProps< BorderControlProps, 'div' >
+	props: WordPressComponentProps< BorderControlProps, 'div', true >
 ) {
 	const {
 		className,

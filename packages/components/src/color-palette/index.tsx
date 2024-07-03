@@ -178,7 +178,7 @@ export function CustomColorPickerDropdown( {
 }
 
 function UnforwardedColorPalette(
-	props: WordPressComponentProps< ColorPaletteProps, 'div' >,
+	props: WordPressComponentProps< ColorPaletteProps, 'div', true >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const {

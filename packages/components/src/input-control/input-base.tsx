@@ -65,7 +65,7 @@ function getUIFlexProps( labelPosition?: LabelPosition ) {
 }
 
 function InputBase(
-	props: WordPressComponentProps< InputBaseProps, 'div' >,
+	props: WordPressComponentProps< InputBaseProps, 'div', true >,
 	ref: ForwardedRef< HTMLDivElement >
 ) {
 	const {

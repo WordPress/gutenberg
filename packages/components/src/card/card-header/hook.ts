@@ -13,7 +13,7 @@ import { useCx } from '../../utils/hooks/use-cx';
 import type { HeaderProps } from '../types';
 
 export function useCardHeader(
-	props: WordPressComponentProps< HeaderProps, 'div' >
+	props: WordPressComponentProps< HeaderProps, 'div', true >
 ) {
 	const {
 		className,

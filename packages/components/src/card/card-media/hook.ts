@@ -13,7 +13,7 @@ import { useCx } from '../../utils/hooks/use-cx';
 import type { MediaProps } from '../types';
 
 export function useCardMedia(
-	props: WordPressComponentProps< MediaProps, 'div' >
+	props: WordPressComponentProps< MediaProps, 'div', true >
 ) {
 	const { className, ...otherProps } = useContextSystem( props, 'CardMedia' );
 

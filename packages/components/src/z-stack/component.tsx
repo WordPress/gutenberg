@@ -18,7 +18,7 @@ import type { ZStackProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
 function UnconnectedZStack(
-	props: WordPressComponentProps< ZStackProps, 'div' >,
+	props: WordPressComponentProps< ZStackProps, 'div', true >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const {

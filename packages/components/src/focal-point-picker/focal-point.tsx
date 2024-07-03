@@ -13,7 +13,7 @@ export default function FocalPoint( {
 	left = '50%',
 	top = '50%',
 	...props
-}: WordPressComponentProps< FocalPointProps, 'div' > ) {
+}: WordPressComponentProps< FocalPointProps, 'div', true > ) {
 	const style = { left, top };
 
 	return (

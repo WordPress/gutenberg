@@ -14,7 +14,7 @@ import { useCx } from '../../utils';
 import type { VisualizerProps } from '../types';
 
 export function useBorderBoxControlVisualizer(
-	props: WordPressComponentProps< VisualizerProps, 'div' >
+	props: WordPressComponentProps< VisualizerProps, 'div', true >
 ) {
 	const {
 		className,

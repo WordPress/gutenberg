@@ -14,7 +14,7 @@ import { useCardBody } from './hook';
 import type { BodyProps } from '../types';
 
 function UnconnectedCardBody(
-	props: WordPressComponentProps< BodyProps, 'div' >,
+	props: WordPressComponentProps< BodyProps, 'div', true >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const { isScrollable, ...otherProps } = useCardBody( props );

@@ -13,7 +13,7 @@ import { useSpacer } from './hook';
 import type { SpacerProps } from './types';
 
 function UnconnectedSpacer(
-	props: WordPressComponentProps< SpacerProps, 'div' >,
+	props: WordPressComponentProps< SpacerProps, 'div', true >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const spacerProps = useSpacer( props );

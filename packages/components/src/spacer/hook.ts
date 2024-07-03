@@ -16,7 +16,7 @@ const isDefined = < T >( o: T ): o is Exclude< T, null | undefined > =>
 	typeof o !== 'undefined' && o !== null;
 
 export function useSpacer(
-	props: WordPressComponentProps< SpacerProps, 'div' >
+	props: WordPressComponentProps< SpacerProps, 'div', true >
 ) {
 	const {
 		className,

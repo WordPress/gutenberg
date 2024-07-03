@@ -56,7 +56,7 @@ function Disabled( {
 	children,
 	isDisabled = true,
 	...props
-}: WordPressComponentProps< DisabledProps, 'div' > ) {
+}: WordPressComponentProps< DisabledProps, 'div', true > ) {
 	const cx = useCx();
 
 	return (

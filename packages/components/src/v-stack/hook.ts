@@ -7,7 +7,7 @@ import { useHStack } from '../h-stack';
 import type { VStackProps } from './types';
 
 export function useVStack(
-	props: WordPressComponentProps< VStackProps, 'div' >
+	props: WordPressComponentProps< VStackProps, 'div', true >
 ) {
 	const {
 		expanded = false,

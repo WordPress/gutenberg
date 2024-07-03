@@ -13,7 +13,7 @@ import useGrid from './hook';
 import type { GridProps } from './types';
 
 function UnconnectedGrid(
-	props: WordPressComponentProps< GridProps, 'div' >,
+	props: WordPressComponentProps< GridProps, 'div', true >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const gridProps = useGrid( props );

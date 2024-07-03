@@ -14,7 +14,7 @@ import { View } from '../../view';
 import type { FlexProps } from '../types';
 
 function UnconnectedFlex(
-	props: WordPressComponentProps< FlexProps, 'div' >,
+	props: WordPressComponentProps< FlexProps, 'div', true >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const { children, isColumn, ...otherProps } = useFlex( props );

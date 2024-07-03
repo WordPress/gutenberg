@@ -15,7 +15,7 @@ import { useCx } from '../../utils/hooks/use-cx';
 import type { DropdownProps } from '../types';
 
 export function useBorderControlDropdown(
-	props: WordPressComponentProps< DropdownProps, 'div' >
+	props: WordPressComponentProps< DropdownProps, 'div', true >
 ) {
 	const {
 		border,

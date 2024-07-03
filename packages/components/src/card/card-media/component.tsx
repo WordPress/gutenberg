@@ -13,7 +13,7 @@ import { useCardMedia } from './hook';
 import type { MediaProps } from '../types';
 
 function UnconnectedCardMedia(
-	props: WordPressComponentProps< MediaProps, 'div' >,
+	props: WordPressComponentProps< MediaProps, 'div', true >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const cardMediaProps = useCardMedia( props );

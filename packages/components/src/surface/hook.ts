@@ -13,7 +13,7 @@ import type { SurfaceProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
 export function useSurface(
-	props: WordPressComponentProps< SurfaceProps, 'div' >
+	props: WordPressComponentProps< SurfaceProps, 'div', true >
 ) {
 	const {
 		backgroundSize = 12,

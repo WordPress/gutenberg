@@ -7,7 +7,7 @@ import { useFlexItem } from '../flex-item';
 import type { FlexBlockProps } from '../types';
 
 export function useFlexBlock(
-	props: WordPressComponentProps< FlexBlockProps, 'div' >
+	props: WordPressComponentProps< FlexBlockProps, 'div', true >
 ) {
 	const otherProps = useContextSystem( props, 'FlexBlock' );
 	const flexItemProps = useFlexItem( { isBlock: true, ...otherProps } );

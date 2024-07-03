@@ -9,7 +9,7 @@ import { CONFIG, COLORS } from '../utils';
 import type { HeadingProps } from './types';
 
 export function useHeading(
-	props: WordPressComponentProps< HeadingProps, 'h1' >
+	props: WordPressComponentProps< HeadingProps, 'h1', true >
 ) {
 	const {
 		as: asProp,

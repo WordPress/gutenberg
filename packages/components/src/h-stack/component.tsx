@@ -8,7 +8,7 @@ import { useHStack } from './hook';
 import type { Props } from './types';
 
 function UnconnectedHStack(
-	props: WordPressComponentProps< Props, 'div' >,
+	props: WordPressComponentProps< Props, 'div', true >,
 	forwardedRef: React.ForwardedRef< any >
 ) {
 	const hStackProps = useHStack( props );

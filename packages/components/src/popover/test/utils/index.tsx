@@ -13,7 +13,7 @@ import type { WordPressComponentProps } from '../../../context';
 const GenericIframe = ( {
 	children,
 	...props
-}: WordPressComponentProps< { children: React.ReactNode }, 'iframe' > ) => {
+}: WordPressComponentProps< { children: React.ReactNode }, 'iframe', true > ) => {
 	const [ containerNode, setContainerNode ] = useState< HTMLElement >();
 
 	return (

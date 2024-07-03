@@ -20,7 +20,7 @@ import { useCx } from '../utils/hooks/use-cx';
 import type { GridProps } from './types';
 
 export default function useGrid(
-	props: WordPressComponentProps< GridProps, 'div' >
+	props: WordPressComponentProps< GridProps, 'div', true >
 ) {
 	const {
 		align,

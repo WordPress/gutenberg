@@ -13,11 +13,11 @@ import type { WordPressComponentProps } from '../wordpress-component';
 /* eslint-disable jest/expect-expect */
 describe( 'ref forwarding', () => {
 	const ComponentWithRef = (
-		props: WordPressComponentProps< {}, 'div' >,
+		props: WordPressComponentProps< {}, 'div', true >,
 		ref: ForwardedRef< any >
 	) => <div { ...props } ref={ ref } />;
 	const ComponentWithoutRef = (
-		props: WordPressComponentProps< {}, 'div' >
+		props: WordPressComponentProps< {}, 'div', true >
 	) => <div { ...props } />;
 
 	it( 'should not trigger a TS error if components are passed to the correct connect* functions', () => {

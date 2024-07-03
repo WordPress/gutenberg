@@ -13,7 +13,7 @@ import { useNavigatorButton } from './hook';
 import type { NavigatorButtonProps } from '../types';
 
 function UnconnectedNavigatorButton(
-	props: WordPressComponentProps< NavigatorButtonProps, 'button' >,
+	props: WordPressComponentProps< NavigatorButtonProps, 'button', true >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const navigatorButtonProps = useNavigatorButton( props );

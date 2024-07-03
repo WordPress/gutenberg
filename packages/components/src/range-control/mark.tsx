@@ -12,7 +12,7 @@ import type { RangeMarkProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
 export default function RangeMark(
-	props: WordPressComponentProps< RangeMarkProps, 'span' >
+	props: WordPressComponentProps< RangeMarkProps, 'span', true >
 ) {
 	const {
 		className,

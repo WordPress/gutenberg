@@ -149,7 +149,7 @@ const OptionalControlsGroup = ( {
 };
 
 const ToolsPanelHeader = (
-	props: WordPressComponentProps< ToolsPanelHeaderProps, 'h2' >,
+	props: WordPressComponentProps< ToolsPanelHeaderProps, 'h2', true >,
 	forwardedRef: ForwardedRef< any >
 ) => {
 	const {
