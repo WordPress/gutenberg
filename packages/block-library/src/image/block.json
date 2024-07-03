@@ -9,7 +9,7 @@
 	"keywords": [ "img", "photo", "picture" ],
 	"textdomain": "default",
 	"attributes": {
-		"temporaryUrl": {
+		"blob": {
 			"type": "string",
 			"isTemporary": true
 		},

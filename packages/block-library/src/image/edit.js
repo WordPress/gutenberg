@@ -107,9 +107,7 @@ export function ImageEdit( {
 		align,
 		metadata,
 	} = attributes;
-	const [ temporaryURL, setTemporaryURL ] = useState(
-		attributes.temporaryUrl
-	);
+	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
 
 	const altRef = useRef();
 	useEffect( () => {
@@ -146,7 +144,7 @@ export function ImageEdit( {
 			src: undefined,
 			id: undefined,
 			url: undefined,
-			temporaryUrl: undefined,
+			blob: undefined,
 		} );
 	}
 
@@ -158,7 +156,7 @@ export function ImageEdit( {
 				id: undefined,
 				title: undefined,
 				caption: undefined,
-				temporaryUrl: undefined,
+				blob: undefined,
 			} );
 			setTemporaryURL();
 
@@ -243,7 +241,7 @@ export function ImageEdit( {
 		mediaAttributes.href = href;
 
 		setAttributes( {
-			temporaryUrl: undefined,
+			blob: undefined,
 			...mediaAttributes,
 			...additionalAttributes,
 			linkDestination,
@@ -254,7 +252,7 @@ export function ImageEdit( {
 	function onSelectURL( newURL ) {
 		if ( newURL !== url ) {
 			setAttributes( {
-				temporaryUrl: undefined,
+				blob: undefined,
 				url: newURL,
 				id: undefined,
 				sizeSlug: getSettings().imageDefaultSize,

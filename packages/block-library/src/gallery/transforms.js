@@ -223,7 +223,7 @@ const transforms = {
 				if ( isGalleryV2Enabled() ) {
 					const innerBlocks = files.map( ( file ) =>
 						createBlock( 'core/image', {
-							temporaryUrl: createBlobURL( file ),
+							blob: createBlobURL( file ),
 						} )
 					);
 

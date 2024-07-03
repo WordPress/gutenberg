@@ -250,7 +250,7 @@ function GalleryEdit( props ) {
 			? Array.from( selectedImages ).map( ( file ) => {
 					if ( ! file.url ) {
 						return {
-							temporaryUrl: createBlobURL( file ),
+							blob: createBlobURL( file ),
 						};
 					}
 
@@ -272,7 +272,7 @@ function GalleryEdit( props ) {
 			.map( ( file ) => {
 				if ( ! file.url ) {
 					return {
-						temporaryUrl: createBlobURL( file ),
+						blob: createBlobURL( file ),
 					};
 				}
 
@@ -307,7 +307,7 @@ function GalleryEdit( props ) {
 		const newBlocks = newImageList.map( ( image ) => {
 			return createBlock( 'core/image', {
 				id: image.id,
-				temporaryUrl: image.temporaryUrl,
+				blob: image.blob,
 				url: image.url,
 				caption: image.caption,
 				alt: image.alt,
