@@ -91,7 +91,7 @@ The header in the plugin's main .php file should use the [standard plugin header
 
 ## Block Plugins
 
-Block plugins should follow the [block specifec plugin guidelines](https://developer.wordpress.org/plugins/wordpress-org/block-specific-plugin-guidelines/#block-plugins-and-the-block-directory) and contain only one top-level block per plugin.
+Block plugins intended for the [block directory](https://wordpress.org/documentation/article/block-directory) should follow the [block specific plugin guidelines](https://developer.wordpress.org/plugins/wordpress-org/block-specific-plugin-guidelines/#block-plugins-and-the-block-directory) and contain only one top-level block per plugin.
 
 The block name should use the prefix `gutenberg` (e.g. `gutenberg/block-name` ) to differentiate it from core blocks.
 
