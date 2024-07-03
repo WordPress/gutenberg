@@ -56,7 +56,7 @@ export function removePropertiesFromObject( object, properties ) {
  * @return {Object[]|*} The merged object.
  */
 export function useCurrentMergeThemeStyleVariationsWithUserConfig( {
-	properties,
+	properties = [],
 } ) {
 	const { variationsFromTheme } = useSelect( ( select ) => {
 		const _variationsFromTheme =
