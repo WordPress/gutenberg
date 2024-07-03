@@ -160,7 +160,6 @@ export default {
 				<DefaultLayoutJustifyContentControl
 					layout={ layout }
 					onChange={ onChange }
-					isToolbar
 				/>
 			</BlockControls>
 		);
@@ -299,11 +298,7 @@ const POPOVER_PROPS = {
 	placement: 'bottom-start',
 };
 
-function DefaultLayoutJustifyContentControl( {
-	layout,
-	onChange,
-	isToolbar = false,
-} ) {
+function DefaultLayoutJustifyContentControl( { layout, onChange } ) {
 	const { justifyContent = 'center' } = layout;
 	const onJustificationChange = ( value ) => {
 		onChange( {
@@ -313,53 +308,12 @@ function DefaultLayoutJustifyContentControl( {
 	};
 	const allowedControls = [ 'left', 'center', 'right' ];
 
-	if ( isToolbar ) {
-		return (
-			<JustifyContentControl
-				allowedControls={ allowedControls }
-				value={ justifyContent }
-				onChange={ onJustificationChange }
-				popoverProps={ POPOVER_PROPS }
-			/>
-		);
-	}
-
-	const justificationOptions = [
-		{
-			value: 'left',
-			icon: justifyLeft,
-			label: __( 'Justify items left' ),
-		},
-		{
-			value: 'center',
-			icon: justifyCenter,
-			label: __( 'Justify items center' ),
-		},
-		{
-			value: 'right',
-			icon: justifyRight,
-			label: __( 'Justify items right' ),
-		},
-	];
-
 	return (
-		<ToggleGroupControl
-			__nextHasNoMarginBottom
-			label={ __( 'Justification' ) }
+		<JustifyContentControl
+			allowedControls={ allowedControls }
 			value={ justifyContent }
 			onChange={ onJustificationChange }
-			className="block-editor-hooks__flex-layout-justification-controls"
-		>
-			{ justificationOptions.map( ( { value, icon, label } ) => {
-				return (
-					<ToggleGroupControlOptionIcon
-						key={ value }
-						value={ value }
-						icon={ icon }
-						label={ label }
-					/>
-				);
-			} ) }
-		</ToggleGroupControl>
+			popoverProps={ POPOVER_PROPS }
+		/>
 	);
 }
