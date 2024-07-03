@@ -2,12 +2,23 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `UnitControl`: Fix colors when disabled. ([#62970](https://github.com/WordPress/gutenberg/pull/62970))
+-   `useUpdateEffect`: Correctly track mounted state in strict mode. ([#62974](https://github.com/WordPress/gutenberg/pull/62974))
+-   `UnitControl`: Fix an issue where keyboard shortcuts unintentionally shift focus on Windows OS. ([#62988](https://github.com/WordPress/gutenberg/pull/62988))
+
 ### Internal
 
+-   `CustomSelectControlV2`: prevent keyboard event propagation in legacy wrapper. ([#62907](https://github.com/WordPress/gutenberg/pull/62907))
+-   `CustomSelectControlV2`: fix item styles ([#62825](https://github.com/WordPress/gutenberg/pull/62825))
 -   `CustomSelectControlV2`: add root element wrapper. ([#62803](https://github.com/WordPress/gutenberg/pull/62803))
+-   `CustomSelectControlV2`: tweak item inline padding based on size ([#62850](https://github.com/WordPress/gutenberg/pull/62850)).
 -   `CustomSelectControlV2`: fix popover styles. ([#62821](https://github.com/WordPress/gutenberg/pull/62821))
 -   `CustomSelectControlV2`: fix trigger text alignment in RTL languages ([#62869](https://github.com/WordPress/gutenberg/pull/62869)).
+-   `CustomSelectControlV2`: allow wrapping item hint to new line ([#62848](https://github.com/WordPress/gutenberg/pull/62848)).
 -   `CustomSelectControlV2`: fix select popover content overflow. ([#62844](https://github.com/WordPress/gutenberg/pull/62844))
+-   Extract `TimeInput` component from `TimePicker` ([#60613](https://github.com/WordPress/gutenberg/pull/60613)).
 
 ## 28.2.0 (2024-06-26)
 

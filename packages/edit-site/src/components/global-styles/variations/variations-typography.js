@@ -3,22 +3,19 @@
  */
 import {
 	__experimentalGrid as Grid,
-	__experimentalVStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
+import StylesPreviewTypography from '../preview-typography';
 import { useTypographyVariations } from '../hooks';
-import TypographyExample from '../typography-example';
-import PreviewIframe from '../preview-iframe';
 import Variation from './variation';
 import Subtitle from '../subtitle';
 
 export default function TypographyVariations( { title, gap = 2 } ) {
 	const typographyVariations = useTypographyVariations();
-
 	// Return null if there is only one variation (the default).
 	if ( typographyVariations?.length <= 1 ) {
 		return null;
@@ -32,40 +29,22 @@ export default function TypographyVariations( { title, gap = 2 } ) {
 				gap={ gap }
 				className="edit-site-global-styles-style-variations-container"
 			>
-				{ typographyVariations &&
-					typographyVariations.length &&
-					typographyVariations.map( ( variation, index ) => (
+				{ typographyVariations.map( ( variation, index ) => {
+					return (
 						<Variation
 							key={ index }
 							variation={ variation }
 							property="typography"
 							showTooltip
 						>
-							{ ( isFocused ) => (
-								<PreviewIframe
-									label={ variation?.title }
-									isFocused={ isFocused }
-								>
-									{ ( { ratio, key } ) => (
-										<HStack
-											key={ key }
-											spacing={ 10 * ratio }
-											justify="center"
-											style={ {
-												height: '100%',
-												overflow: 'hidden',
-											} }
-										>
-											<TypographyExample
-												variation={ variation }
-												fontSize={ 85 * ratio }
-											/>
-										</HStack>
-									) }
-								</PreviewIframe>
+							{ () => (
+								<StylesPreviewTypography
+									variation={ variation }
+								/>
 							) }
 						</Variation>
-					) ) }
+					);
+				} ) }
 			</Grid>
 		</VStack>
 	);

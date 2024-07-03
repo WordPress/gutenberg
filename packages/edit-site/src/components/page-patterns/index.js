@@ -30,6 +30,8 @@ import { usePrevious } from '@wordpress/compose';
 import { useEntityRecords } from '@wordpress/core-data';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { parse } from '@wordpress/blocks';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -53,6 +55,7 @@ import PatternsHeader from './header';
 import { useLink } from '../routes/link';
 import { useAddedBy } from '../page-templates/hooks';
 import { useEditPostAction } from '../dataviews-actions';
+import { defaultGetTitle } from './search-items';
 
 const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
 	blockEditorPrivateApis
@@ -116,14 +119,21 @@ function Preview( { item, viewType } ) {
 	const descriptionId = useId();
 	const isUserPattern = item.type === PATTERN_TYPES.user;
 	const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
-	const isEmpty = ! item.blocks?.length;
-
 	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
 	const { onClick } = useLink( {
 		postType: item.type,
-		postId: isUserPattern ? item.id : item.name,
+		postId: isUserPattern || isTemplatePart ? item.id : item.name,
 		canvas: 'edit',
 	} );
+	const blocks = useMemo( () => {
+		return (
+			item.blocks ??
+			parse( item.content.raw, {
+				__unstableSkipMigrationLogs: true,
+			} )
+		);
+	}, [ item?.content?.raw, item.blocks ] );
+	const isEmpty = ! blocks?.length;
 
 	return (
 		<div
@@ -140,7 +150,7 @@ function Preview( { item, viewType } ) {
 				{ ! isEmpty && (
 					<Async>
 						<BlockPreview
-							blocks={ item.blocks }
+							blocks={ blocks }
 							viewportWidth={ item.viewportWidth }
 						/>
 					</Async>
@@ -187,11 +197,13 @@ function Author( { item, viewType } ) {
 
 function Title( { item } ) {
 	const isUserPattern = item.type === PATTERN_TYPES.user;
+	const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
 	const { onClick } = useLink( {
 		postType: item.type,
-		postId: isUserPattern ? item.id : item.name,
+		postId: isUserPattern || isTemplatePart ? item.id : item.name,
 		canvas: 'edit',
 	} );
+	const title = decodeEntities( defaultGetTitle( item ) );
 	return (
 		<HStack alignment="center" justify="flex-start" spacing={ 2 }>
 			<Flex
@@ -201,7 +213,7 @@ function Title( { item } ) {
 				className="edit-site-patterns__pattern-title"
 			>
 				{ item.type === PATTERN_TYPES.theme ? (
-					item.title
+					title
 				) : (
 					<Button
 						variant="link"
@@ -210,7 +222,7 @@ function Title( { item } ) {
 						// See https://github.com/WordPress/gutenberg/pull/51898#discussion_r1243399243.
 						tabIndex="-1"
 					>
-						{ item.title || item.name }
+						{ title || item.name }
 					</Button>
 				) }
 			</Flex>
@@ -321,7 +333,7 @@ export default function DataviewsPatterns() {
 			_fields.push( {
 				header: __( 'Author' ),
 				id: 'author',
-				getValue: ( { item } ) => item.templatePart.author_text,
+				getValue: ( { item } ) => item.author_text,
 				render: ( { item } ) => {
 					return <Author viewType={ view.type } item={ item } />;
 				},
@@ -406,7 +418,7 @@ export default function DataviewsPatterns() {
 					fields={ fields }
 					actions={ actions }
 					data={ data || EMPTY_ARRAY }
-					getItemId={ ( item ) => item.name }
+					getItemId={ ( item ) => item.name ?? item.id }
 					isLoading={ isResolving }
 					view={ view }
 					onChangeView={ onChangeView }

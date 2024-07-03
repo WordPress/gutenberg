@@ -41,7 +41,7 @@ test.describe( 'Site Editor - Multi-entity save flow', () => {
 		).toBeEnabled();
 		await expect(
 			page
-				.getByRole( 'region', { name: 'Save panel' } )
+				.getByRole( 'region', { name: 'Editor publish' } )
 				.getByRole( 'button', { name: 'Open save panel' } )
 		).toBeVisible();
 

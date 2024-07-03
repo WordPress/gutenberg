@@ -48,6 +48,7 @@ import { PrivateInserterLibrary } from './components/inserter/library';
 import { PrivatePublishDateTimePicker } from './components/publish-date-time-picker';
 import useSpacingSizes from './components/spacing-sizes-control/hooks/use-spacing-sizes';
 import useBlockDisplayTitle from './components/block-title/use-block-display-title';
+import TabbedSidebar from './components/tabbed-sidebar';
 
 /**
  * Private @wordpress/block-editor APIs.
@@ -77,6 +78,7 @@ lock( privateApis, {
 	useLayoutStyles,
 	DimensionsTool,
 	ResolutionTool,
+	TabbedSidebar,
 	TextAlignmentControl,
 	ReusableBlocksRenameHint,
 	useReusableBlocksRenameHint,

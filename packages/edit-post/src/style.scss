@@ -31,11 +31,13 @@ body.js.block-editor-page {
 	}
 }
 
-// Target the editor UI excluding the visual editor contents, metaboxes and custom fields areas.
+// Target the editor UI excluding the non-iframed visual editor contents, metaboxes
+//  and custom fields areas.
 .editor-header,
 .editor-text-editor,
 .editor-sidebar,
-.editor-post-publish-panel {
+.editor-post-publish-panel,
+.edit-post-visual-editor.is-iframed {
 	@include reset;
 }
 
