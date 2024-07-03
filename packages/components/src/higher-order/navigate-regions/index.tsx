@@ -37,10 +37,10 @@ const defaultShortcuts = {
 	] as const,
 };
 
-type Shortcuts = {
+interface Shortcuts {
 	previous: readonly { modifier: WPKeycodeModifier; character: string }[];
 	next: readonly { modifier: WPKeycodeModifier; character: string }[];
-};
+}
 
 export function useNavigateRegions( shortcuts: Shortcuts = defaultShortcuts ) {
 	const ref = useRef< HTMLDivElement >( null );

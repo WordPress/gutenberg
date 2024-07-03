@@ -264,7 +264,7 @@ export function DatePicker( {
 	);
 }
 
-type DayProps = {
+interface DayProps {
 	day: Date;
 	column: number;
 	isSelected: boolean;
@@ -275,7 +275,7 @@ type DayProps = {
 	isInvalid: boolean;
 	onClick: () => void;
 	onKeyDown: KeyboardEventHandler;
-};
+}
 
 function Day( {
 	day,

@@ -16,12 +16,12 @@ import { baseLabelTypography, COLORS, CONFIG, rtl } from '../../utils';
 import type { LabelPosition, Size } from '../types';
 import { space } from '../../utils/space';
 
-type ContainerProps = {
+interface ContainerProps {
 	disabled?: boolean;
 	hideLabel?: boolean;
 	__unstableInputWidth?: CSSProperties[ 'width' ];
 	labelPosition?: LabelPosition;
-};
+}
 
 export const Prefix = styled.span`
 	box-sizing: border-box;
@@ -35,10 +35,10 @@ export const Suffix = styled.span`
 	display: flex;
 `;
 
-type BackdropProps = {
+interface BackdropProps {
 	disabled?: boolean;
 	isBorderless?: boolean;
-};
+}
 
 const backdropBorderColor = ( {
 	disabled,
@@ -134,7 +134,7 @@ export const Container = styled.div< ContainerProps >`
 	${ containerWidthStyles }
 `;
 
-type InputProps = {
+interface InputProps {
 	__next40pxDefaultSize?: boolean;
 	disabled?: boolean;
 	inputSize?: Size;
@@ -142,7 +142,7 @@ type InputProps = {
 	dragCursor?: CSSProperties[ 'cursor' ];
 	paddingInlineStart?: CSSProperties[ 'paddingInlineStart' ];
 	paddingInlineEnd?: CSSProperties[ 'paddingInlineEnd' ];
-};
+}
 
 const disabledStyles = ( { disabled }: InputProps ) => {
 	if ( ! disabled ) {

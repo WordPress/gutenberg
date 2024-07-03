@@ -9,15 +9,15 @@ import fastDeepEqual from 'fast-deep-equal/es6';
 import { Component } from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
 
-type Props = {
+interface Props {
 	node?: HTMLElement;
 	[ key: string ]: any;
-};
+}
 
-type State = {
+interface State {
 	fallbackStyles?: { [ key: string ]: any };
 	grabStylesCompleted: boolean;
-};
+}
 
 export default (
 	mapNodeToProps: (

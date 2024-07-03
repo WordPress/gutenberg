@@ -15,7 +15,7 @@ import { useEffect, useState } from '@wordpress/element';
 import Tabs from '..';
 import type { TabsProps } from '../types';
 
-type Tab = {
+interface Tab {
 	tabId: string;
 	title: string;
 	content: React.ReactNode;
@@ -26,7 +26,7 @@ type Tab = {
 	tabpanel?: {
 		focusable?: boolean;
 	};
-};
+}
 
 const TABS: Tab[] = [
 	{
