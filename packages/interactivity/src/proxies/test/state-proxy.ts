@@ -861,5 +861,27 @@ describe( 'interactivity api - state proxy', () => {
 			expect( () => state.sumValueFromContext ).toThrow();
 			expect( () => state.sumValueFromElement ).toThrow();
 		} );
+
+		it( 'should react to changes in props inside functions', () => {
+			const state = proxifyStateTest( {
+				number: 1,
+				otherNumber: 3,
+				sum( value: number ) {
+					return state.number + state.otherNumber + value;
+				},
+			} );
+
+			let result = 0;
+
+			effect( () => {
+				result = state.sum( 2 );
+			} );
+
+			expect( result ).toBe( 6 );
+			state.number = 2;
+			expect( result ).toBe( 7 );
+			state.otherNumber = 4;
+			expect( result ).toBe( 8 );
+		} );
 	} );
 } );
