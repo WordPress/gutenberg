@@ -58,7 +58,7 @@ function ListBox( {
 					id={ `components-autocomplete-item-${ instanceId }-${ option.key }` }
 					role="option"
 					aria-selected={ index === selectedIndex }
-					__experimentalIsFocusable
+					accessibleWhenDisabled
 					disabled={ option.isDisabled }
 					className={ clsx(
 						'components-autocomplete__result',
