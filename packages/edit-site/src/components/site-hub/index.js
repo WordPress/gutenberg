@@ -33,6 +33,9 @@ const SiteHub = memo(
 		const isMobileViewport = useViewportMatch( 'medium', '<' );
 		const history = useHistory();
 		const { navigate } = useContext( SidebarNavigationContext );
+		const isRoot =
+			history.location.pathname === '/wp-admin/site-editor.php' &&
+			history.location.search === '';
 
 		const { dashboardLink, homeUrl, siteTitle } = useSelect( ( select ) => {
 			const { getSettings } = unlock( select( editSiteStore ) );
@@ -65,7 +68,7 @@ const SiteHub = memo(
 							}
 						) }
 					>
-						{ ! isMobileViewport && (
+						{ ( isRoot || ! isMobileViewport ) && (
 							<Button
 								ref={ ref }
 								href={ dashboardLink }
