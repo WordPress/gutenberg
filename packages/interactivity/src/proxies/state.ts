@@ -135,8 +135,10 @@ const stateHandlers: ProxyHandler< object > = {
 	},
 };
 
-export const proxifyState = < T extends object >( obj: T, namespace: string ) =>
-	getProxy( obj, stateHandlers, namespace );
+export const proxifyState = < T extends object >(
+	obj: T,
+	namespace: string
+): T => getProxy( obj, stateHandlers, namespace ) as T;
 
 export const peek = ( obj: object, key: string ): unknown => {
 	const prop = getPropSignal( obj, key );
