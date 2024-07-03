@@ -10,7 +10,7 @@ import {
 	Button,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { memo } from '@wordpress/element';
 import { settings } from '@wordpress/icons';
 
