@@ -71,7 +71,7 @@ export default function save( { attributes } ) {
 				} ) }
 			>
 				{ ! isCheckboxOrRadio && (
-					<span className="wp-block-form-input__label-content before">
+					<span className="wp-block-form-input__label-content">
 						<RichText.Content value={ label } />
 					</span>
 				) }
@@ -85,7 +85,7 @@ export default function save( { attributes } ) {
 					style={ inputStyle }
 				/>
 				{ isCheckboxOrRadio && (
-					<span className="wp-block-form-input__label-content after">
+					<span className="wp-block-form-input__label-content">
 						<RichText.Content value={ label } />
 					</span>
 				) }
