@@ -28,12 +28,12 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 
 	useEffect( () => {
 		const updates = {};
-		const { columnCount, rowCount, manualPlacement } = gridLayout;
-		const isManualGrid = !! manualPlacement;
+		const { columnCount, rowCount, isManualPlacement } = gridLayout;
+		const isManualGrid = !! isManualPlacement;
 
 		if ( isManualGrid ) {
 			const rects = [];
-			let lowestRowEnd = 0;
+			let bottomMostRow = 0;
 
 			// Respect the position of blocks that already have a columnStart and rowStart value.
 			for ( const clientId of blockOrder ) {
@@ -55,7 +55,10 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 						rowSpan,
 					} )
 				);
-				lowestRowEnd = Math.max( lowestRowEnd, rowStart + rowSpan - 1 );
+				bottomMostRow = Math.max(
+					bottomMostRow,
+					rowStart + rowSpan - 1
+				);
 			}
 
 			// When in manual mode, ensure that every block has a columnStart and rowStart value.
@@ -69,7 +72,7 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 				const [ newColumnStart, newRowStart ] = getFirstEmptyCell(
 					rects,
 					columnCount,
-					Math.max( rowCount, lowestRowEnd ),
+					Math.max( rowCount, bottomMostRow ),
 					columnSpan,
 					rowSpan
 				);
@@ -91,13 +94,16 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 						},
 					},
 				};
-				lowestRowEnd = Math.max( lowestRowEnd, rowStart + rowSpan - 1 );
+				bottomMostRow = Math.max(
+					bottomMostRow,
+					rowStart + rowSpan - 1
+				);
 			}
-			if ( ! rowCount || rowCount < lowestRowEnd ) {
+			if ( ! rowCount || rowCount < bottomMostRow ) {
 				updates[ gridClientId ] = {
 					layout: {
 						...gridLayout,
-						rowCount: lowestRowEnd,
+						rowCount: bottomMostRow,
 					},
 				};
 			}

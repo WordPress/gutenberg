@@ -196,8 +196,8 @@ export default {
 
 // Enables setting minimum width of grid items.
 function GridLayoutMinimumWidthControl( { layout, onChange } ) {
-	const { minimumColumnWidth, columnCount, manualPlacement } = layout;
-	const defaultValue = manualPlacement || columnCount ? null : '12rem';
+	const { minimumColumnWidth, columnCount, isManualPlacement } = layout;
+	const defaultValue = isManualPlacement || columnCount ? null : '12rem';
 	const value = minimumColumnWidth || defaultValue;
 	const [ quantity, unit = 'rem' ] =
 		parseQuantityAndUnitFromRawValue( value );
@@ -274,13 +274,13 @@ function GridLayoutColumnsAndRowsControl( {
 	onChange,
 	allowSizingOnChildren,
 } ) {
-	const { columnCount = 3, rowCount, manualPlacement } = layout;
+	const { columnCount = 3, rowCount, isManualPlacement } = layout;
 
 	return (
 		<>
 			<fieldset>
 				{ ( ! window.__experimentalEnableGridInteractivity ||
-					! manualPlacement ) && (
+					! isManualPlacement ) && (
 					<BaseControl.VisualLabel as="legend">
 						{ __( 'Columns' ) }
 					</BaseControl.VisualLabel>
@@ -308,7 +308,7 @@ function GridLayoutColumnsAndRowsControl( {
 							label={ __( 'Columns' ) }
 							hideLabelFromVision={
 								! window.__experimentalEnableGridInteractivity ||
-								! manualPlacement
+								! isManualPlacement
 							}
 						/>
 					</FlexItem>
@@ -316,7 +316,7 @@ function GridLayoutColumnsAndRowsControl( {
 					<FlexItem isBlock>
 						{ window.__experimentalEnableGridInteractivity &&
 						allowSizingOnChildren &&
-						manualPlacement ? (
+						isManualPlacement ? (
 							<NumberControl
 								size="__unstable-large"
 								onChange={ ( value ) => {
@@ -354,7 +354,7 @@ function GridLayoutColumnsAndRowsControl( {
 
 // Enables switching between grid types
 function GridLayoutTypeControl( { layout, onChange } ) {
-	const { columnCount, rowCount, minimumColumnWidth, manualPlacement } =
+	const { columnCount, rowCount, minimumColumnWidth, isManualPlacement } =
 		layout;
 
 	/**
@@ -370,7 +370,7 @@ function GridLayoutTypeControl( { layout, onChange } ) {
 	);
 
 	const gridPlacement =
-		manualPlacement ||
+		isManualPlacement ||
 		( !! columnCount && ! window.__experimentalEnableGridInteractivity )
 			? 'manual'
 			: 'auto';
@@ -390,7 +390,7 @@ function GridLayoutTypeControl( { layout, onChange } ) {
 				window.__experimentalEnableGridInteractivity
 					? tempRowCount
 					: undefined,
-			manualPlacement:
+			isManualPlacement:
 				value === 'manual' &&
 				window.__experimentalEnableGridInteractivity
 					? true
