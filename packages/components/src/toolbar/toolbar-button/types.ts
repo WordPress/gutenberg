@@ -37,6 +37,16 @@ export type ToolbarButtonProps = {
 	title?: string;
 };
 
+export type ToolbarButtonDeprecatedProps = {
+	/**
+	 * Whether to keep the button focusable when disabled.
+	 *
+	 * @deprecated ToolbarButton will always be focusable.
+	 * @ignore
+	 */
+	__experimentalIsFocusable?: boolean;
+};
+
 export type ToolbarButtonContainerProps = {
 	/**
 	 * Children to be rendered inside the button container.

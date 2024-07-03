@@ -16,7 +16,7 @@ import Button from '../../button';
 import ToolbarItem from '../toolbar-item';
 import ToolbarContext from '../toolbar-context';
 import ToolbarButtonContainer from './toolbar-button-container';
-import type { ToolbarButtonProps } from './types';
+import type { ToolbarButtonDeprecatedProps, ToolbarButtonProps } from './types';
 import type { WordPressComponentProps } from '../../context';
 
 function useDeprecatedProps( {
@@ -30,7 +30,11 @@ function useDeprecatedProps( {
 }
 
 function UnforwardedToolbarButton(
-	props: WordPressComponentProps< ToolbarButtonProps, typeof Button, false >,
+	props: Omit<
+		WordPressComponentProps< ToolbarButtonProps, typeof Button, false >,
+		'__experimentalIsFocusable' // ToolbarButton will always be focusable.
+	> &
+		ToolbarButtonDeprecatedProps,
 	ref: ForwardedRef< any >
 ) {
 	const {
@@ -111,6 +115,7 @@ function UnforwardedToolbarButton(
  * ```jsx
  * import { Toolbar, ToolbarButton } from '@wordpress/components';
  * import { edit } from '@wordpress/icons';
+  import { __ } from '../../../../i18n/build-types/create-i18n';
  *
  * function MyToolbar() {
  *   return (
