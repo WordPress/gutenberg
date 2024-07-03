@@ -44,6 +44,8 @@ export type Operator =
 
 export type ItemRecord = Record< string, unknown >;
 
+export type FieldType = 'text';
+
 /**
  * A dataview field for a specific property of a data type.
  */
@@ -51,7 +53,7 @@ export type Field< Item > = {
 	/**
 	 * Type of the fields.
 	 */
-	type?: string; // TODO: provide a enum-like list for valid values.
+	type?: FieldType;
 
 	/**
 	 * The unique identifier of the field.
