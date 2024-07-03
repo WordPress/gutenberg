@@ -25,6 +25,7 @@ import { IconWithCurrentColor } from './icon-with-current-color';
 import { NavigationButtonAsItem } from './navigation-button';
 import RootMenu from './root-menu';
 import PreviewStyles from './preview-styles';
+import { useThemeStyles } from '../../hooks';
 import { unlock } from '../../lock-unlock';
 
 const { useGlobalStyle } = unlock( blockEditorPrivateApis );
@@ -32,12 +33,9 @@ const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 function ScreenRoot() {
 	const [ customCSS ] = useGlobalStyle( 'css' );
 
-	const { hasVariations, canEditCSS } = useSelect( ( select ) => {
-		const {
-			getEntityRecord,
-			__experimentalGetCurrentGlobalStylesId,
-			__experimentalGetCurrentThemeGlobalStylesVariations,
-		} = select( coreStore );
+	const { canEditCSS } = useSelect( ( select ) => {
+		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
+			select( coreStore );
 
 		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
 		const globalStyles = globalStylesId
@@ -45,12 +43,11 @@ function ScreenRoot() {
 			: undefined;
 
 		return {
-			hasVariations:
-				!! __experimentalGetCurrentThemeGlobalStylesVariations()
-					?.length,
 			canEditCSS: !! globalStyles?._links?.[ 'wp:action-edit-css' ],
 		};
 	}, [] );
+
+	const themeStyles = useThemeStyles();
 
 	return (
 		<Card size="small" className="edit-site-global-styles-screen-root">
@@ -61,7 +58,7 @@ function ScreenRoot() {
 							<PreviewStyles />
 						</CardMedia>
 					</Card>
-					{ hasVariations && (
+					{ themeStyles?.length && (
 						<ItemGroup>
 							<NavigationButtonAsItem
 								path="/variations"
