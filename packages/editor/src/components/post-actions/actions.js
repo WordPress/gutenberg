@@ -32,7 +32,6 @@ import {
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import isTemplateRevertable from '../../store/utils/is-template-revertable';
-import isTemplatePartRevertable from '../../store/utils/is-template-part-revertable';
 import { exportPatternAsJSONAction } from './export-pattern-action';
 import { CreateTemplatePartModalContents } from '../create-template-part-modal';
 
@@ -792,9 +791,7 @@ const resetTemplateAction = {
 	id: 'reset-template',
 	label: __( 'Reset' ),
 	isEligible: ( item ) => {
-		return item.type === TEMPLATE_PART_POST_TYPE
-			? isTemplatePartRevertable( item )
-			: isTemplateRevertable( item );
+		return isTemplateRevertable( item );
 	},
 	icon: backup,
 	supportsBulk: true,

@@ -15,8 +15,6 @@ import { decodeEntities } from '@wordpress/html-entities';
  * Internal dependencies
  */
 import isTemplateRevertable from './utils/is-template-revertable';
-import isTemplatePartRevertable from './utils/is-template-part-revertable';
-import { TEMPLATE_PART_POST_TYPE } from './constants';
 export * from '../dataviews/store/private-actions';
 
 /**
@@ -244,11 +242,7 @@ export const revertTemplate =
 		const noticeId = 'edit-site-template-reverted';
 		registry.dispatch( noticesStore ).removeNotice( noticeId );
 
-		const isRevertable =
-			template.type === TEMPLATE_PART_POST_TYPE
-				? isTemplatePartRevertable
-				: isTemplateRevertable;
-		if ( ! isRevertable( template ) ) {
+		if ( ! isTemplateRevertable( template ) ) {
 			registry
 				.dispatch( noticesStore )
 				.createErrorNotice( __( 'This template is not revertable.' ), {
