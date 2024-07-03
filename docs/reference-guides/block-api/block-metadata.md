@@ -427,7 +427,7 @@ See the [Example documentation](/docs/reference-guides/block-api/block-registrat
 
 ### Variations
 
--   Type: `object[]|string`
+-   Type: `object[]|WPDefinedPath` ([learn more](#wpdefinedpath))
 -   Optional
 -   Localized: Yes (`title`, `description`, and `keywords` of each variation only)
 -   Property: `variations`
@@ -454,12 +454,39 @@ Block Variations is the API that allows a block to have similar versions of it, 
 
 _Note: In JavaScript you can provide a function for the `isActive` property, and a React element for the `icon`. In the `block.json` file both only support strings_
 
-_Note: Starting with version 6.7, it is possible to specify a PHP file that generates the list of block variations on the server side:_
+Starting with version 6.7, it is possible to specify a PHP file in `block.json` that generates the list of block variations on the server side:
 
 ```json
-{
-	"variations": "file:./variations.php"
-}
+{ "variations": "file:./variations.php" }
+```
+
+That PHP file is expected to `return` an array that contains the block variations. For example:
+
+```php
+<?php
+
+return array(
+	array(
+		'isDefault'  => true,
+		'name'       => 'wordpress',
+		'title'      => 'WordPress',
+		'icon'       => 'wordpress',
+		'attributes' => array(
+			'service' => 'wordpress',
+		),
+		'isActive'   => array( 'service' )
+	),
+	array(
+		'name'       => 'gravatar',
+		'title'      => 'Gravatar',
+		'icon'       => 'commentAuthorAvatar',
+		'attributes' => array(
+			'service' => 'gravatar',
+		),
+		'isActive'   => array( 'service' )
+	),
+);
+
 ```
 
 See [the variations documentation](/docs/reference-guides/block-api/block-variations.md) for more details.
