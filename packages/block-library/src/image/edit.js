@@ -19,7 +19,7 @@ import {
 	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { image as icon, plugins as pluginsIcon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
@@ -95,7 +95,6 @@ export function ImageEdit( {
 	__unstableParentLayout: parentLayout,
 } ) {
 	const {
-		temporaryUrl,
 		url = '',
 		alt,
 		caption,
@@ -108,6 +107,9 @@ export function ImageEdit( {
 		align,
 		metadata,
 	} = attributes;
+	const [ temporaryURL, setTemporaryURL ] = useState(
+		attributes.temporaryUrl
+	);
 
 	const altRef = useRef();
 	useEffect( () => {
@@ -158,15 +160,13 @@ export function ImageEdit( {
 				caption: undefined,
 				temporaryUrl: undefined,
 			} );
+			setTemporaryURL();
 
 			return;
 		}
 
 		if ( isBlobURL( media.url ) ) {
-			setAttributes( {
-				temporaryUrl: media.url,
-				url: undefined,
-			} );
+			setTemporaryURL( media.url );
 			return;
 		}
 
@@ -248,6 +248,7 @@ export function ImageEdit( {
 			...additionalAttributes,
 			linkDestination,
 		} );
+		setTemporaryURL();
 	}
 
 	function onSelectURL( newURL ) {
@@ -258,11 +259,12 @@ export function ImageEdit( {
 				id: undefined,
 				sizeSlug: getSettings().imageDefaultSize,
 			} );
+			setTemporaryURL();
 		}
 	}
 
 	useUploadMediaFromBlobURL( {
-		temporaryUrl,
+		url: temporaryURL,
 		allowedTypes: ALLOWED_MEDIA_TYPES,
 		onChange: onSelectImage,
 		onError: onUploadError,
@@ -283,7 +285,7 @@ export function ImageEdit( {
 	const shadowProps = getShadowClassesAndStyles( attributes );
 
 	const classes = clsx( className, {
-		'is-transient': !! temporaryUrl,
+		'is-transient': !! temporaryURL,
 		'is-resized': !! width || !! height,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 		'has-custom-border':
@@ -366,7 +368,7 @@ export function ImageEdit( {
 	return (
 		<figure { ...blockProps }>
 			<Image
-				temporaryURL={ temporaryUrl }
+				temporaryURL={ temporaryURL }
 				attributes={ attributes }
 				setAttributes={ setAttributes }
 				isSingleSelected={ isSingleSelected }
@@ -390,7 +392,7 @@ export function ImageEdit( {
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				value={ { id, src } }
 				mediaPreview={ mediaPreview }
-				disableMediaButtons={ temporaryUrl || url }
+				disableMediaButtons={ temporaryURL || url }
 			/>
 		</figure>
 	);

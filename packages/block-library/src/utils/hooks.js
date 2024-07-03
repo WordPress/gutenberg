@@ -48,17 +48,16 @@ export function useUploadMediaFromBlobURL( args = {} ) {
 			return;
 		}
 
-		if ( ! latestArgs.current.temporaryUrl ) {
+		if ( ! latestArgs.current.url ) {
 			return;
 		}
 
-		const file = getBlobByURL( latestArgs.current.temporaryUrl );
+		const file = getBlobByURL( latestArgs.current.url );
 		if ( ! file ) {
 			return;
 		}
 
-		const { temporaryUrl, allowedTypes, onChange, onError } =
-			latestArgs.current;
+		const { url, allowedTypes, onChange, onError } = latestArgs.current;
 		const { mediaUpload } = getSettings();
 
 		hasUploadStarted.current = true;
@@ -71,12 +70,12 @@ export function useUploadMediaFromBlobURL( args = {} ) {
 					return;
 				}
 
-				revokeBlobURL( temporaryUrl );
+				revokeBlobURL( url );
 				onChange( media );
 				hasUploadStarted.current = false;
 			},
 			onError: ( message ) => {
-				revokeBlobURL( temporaryUrl );
+				revokeBlobURL( url );
 				onError( message );
 				hasUploadStarted.current = false;
 			},
