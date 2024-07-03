@@ -121,10 +121,10 @@ New plugins should be added to `.wp-env.json` so that they are available in the 
 ```json
 {
 	...
-	"plugins": [
-		".",
-		"./plugins/PLUGIN-SLUG"
-	],
+	"mappings": {
+		...
+		"wp-content/plugins/PLUGIN-SLUG": "./plugins/PLUGIN-SLUG"
+	},
 	...
 }
 ```

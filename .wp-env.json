@@ -1,7 +1,10 @@
 {
 	"core": "WordPress/WordPress",
-	"plugins": [ ".", "./plugins/time-to-read-block" ],
+	"plugins": [ "." ],
 	"themes": [ "./test/emptytheme" ],
+	"mappings": {
+		"wp-content/plugins/time-to-read-block": "./plugins/time-to-read-block"
+	},
 	"env": {
 		"tests": {
 			"mappings": {
