@@ -44,10 +44,17 @@ export type Operator =
 
 export type ItemRecord = Record< string, unknown >;
 
+export type FieldType = 'text';
+
 /**
  * A dataview field for a specific property of a data type.
  */
 export type Field< Item > = {
+	/**
+	 * Type of the fields.
+	 */
+	type?: FieldType;
+
 	/**
 	 * The unique identifier of the field.
 	 */
@@ -57,6 +64,11 @@ export type Field< Item > = {
 	 * The label of the field. Defaults to the id.
 	 */
 	header?: string;
+
+	/**
+	 * Placeholder for the field.
+	 */
+	placeholder?: string;
 
 	/**
 	 * Callback used to render the field. Defaults to `field.getValue`.
@@ -130,6 +142,13 @@ export type NormalizedField< Item > = Field< Item > & {
 export type Fields< Item > = Field< Item >[];
 
 export type Data< Item > = Item[];
+
+/**
+ * The form configuration.
+ */
+export type Form = {
+	visibleFields?: string[];
+};
 
 /**
  * The filters applied to the dataset.
