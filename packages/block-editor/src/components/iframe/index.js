@@ -129,8 +129,10 @@ function Iframe( {
 	const [ before, writingFlowRef, after ] = useWritingFlow();
 	const [ contentResizeListener, { height: contentHeight } ] =
 		useResizeObserver();
-	const [ containerResizeListener, { width: containerWidth } ] =
-		useResizeObserver();
+	const [
+		containerResizeListener,
+		{ width: containerWidth, height: containerHeight },
+	] = useResizeObserver();
 
 	const setRef = useRefEffect( ( node ) => {
 		node._load = () => {
@@ -214,36 +216,6 @@ function Iframe( {
 		};
 	}, [] );
 
-	const [ iframeWindowInnerHeight, setIframeWindowInnerHeight ] = useState();
-
-	const iframeResizeRef = useRefEffect( ( node ) => {
-		const nodeWindow = node.ownerDocument.defaultView;
-
-		setIframeWindowInnerHeight( nodeWindow.innerHeight );
-		const onResize = () => {
-			setIframeWindowInnerHeight( nodeWindow.innerHeight );
-		};
-		nodeWindow.addEventListener( 'resize', onResize );
-		return () => {
-			nodeWindow.removeEventListener( 'resize', onResize );
-		};
-	}, [] );
-
-	const [ windowInnerWidth, setWindowInnerWidth ] = useState();
-
-	const windowResizeRef = useRefEffect( ( node ) => {
-		const nodeWindow = node.ownerDocument.defaultView;
-
-		setWindowInnerWidth( nodeWindow.innerWidth );
-		const onResize = () => {
-			setWindowInnerWidth( nodeWindow.innerWidth );
-		};
-		nodeWindow.addEventListener( 'resize', onResize );
-		return () => {
-			nodeWindow.removeEventListener( 'resize', onResize );
-		};
-	}, [] );
-
 	const isReducedMotion = useReducedMotion();
 
 	const isZoomedOut = scale !== 1;
@@ -308,10 +280,6 @@ function Iframe( {
 		clearerRef,
 		writingFlowRef,
 		disabledRef,
-		// Avoid resize listeners when not needed, these will trigger
-		// unnecessary re-renders when animating the iframe width, or when
-		// expanding preview iframes.
-		isZoomedOut ? iframeResizeRef : null,
 	] );
 
 	// Correct doctype is required to enable rendering in standards
@@ -372,8 +340,8 @@ function Iframe( {
 			`${ contentHeight }px`
 		);
 		iframeDocument.documentElement.style.setProperty(
-			'--wp-block-editor-iframe-zoom-out-inner-height',
-			`${ iframeWindowInnerHeight }px`
+			'--wp-block-editor-iframe-zoom-out-container-height',
+			`${ containerHeight }px`
 		);
 
 		return () => {
@@ -389,17 +357,16 @@ function Iframe( {
 				'--wp-block-editor-iframe-zoom-out-content-height'
 			);
 			iframeDocument.documentElement.style.removeProperty(
-				'--wp-block-editor-iframe-zoom-out-inner-height'
+				'--wp-block-editor-iframe-zoom-out-container-height'
 			);
 		};
 	}, [
 		scale,
 		frameSize,
 		iframeDocument,
-		iframeWindowInnerHeight,
 		contentHeight,
 		containerWidth,
-		windowInnerWidth,
+		containerHeight,
 		isZoomedOut,
 	] );
 
@@ -418,7 +385,7 @@ function Iframe( {
 					...props.style,
 					height: props.style?.height,
 				} }
-				ref={ useMergeRefs( [ ref, setRef, windowResizeRef ] ) }
+				ref={ useMergeRefs( [ ref, setRef ] ) }
 				tabIndex={ tabIndex }
 				// Correct doctype is required to enable rendering in standards
 				// mode. Also preload the styles to avoid a flash of unstyled

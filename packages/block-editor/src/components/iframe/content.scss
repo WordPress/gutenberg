@@ -29,8 +29,8 @@
 	margin-bottom: calc(-1 * #{$total-height});
 
 	body {
-		$inner-height: var(--wp-block-editor-iframe-zoom-out-inner-height);
-		min-height: calc((#{$inner-height} - #{$total-frame-height}) / #{$scale});
+		$container-height: var(--wp-block-editor-iframe-zoom-out-container-height);
+		min-height: calc((#{$container-height} - #{$total-frame-height}) / #{$scale});
 		display: flex;
 		flex-direction: column;
 
