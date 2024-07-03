@@ -164,6 +164,16 @@ describe( 'interactivity api - state proxy', () => {
 				resetScope();
 			}
 		} );
+
+		it( 'should allow using `this` inside functions', () => {
+			const state = proxifyStateTest( {
+				value: 1,
+				sum( newValue: number ): number {
+					return this.value + newValue;
+				},
+			} );
+			expect( state.sum( 2 ) ).toBe( 3 );
+		} );
 	} );
 
 	describe( 'set', () => {
@@ -716,7 +726,7 @@ describe( 'interactivity api - state proxy', () => {
 			expect( number ).toBe( 3 );
 		} );
 
-		it( 'should react to changes in getter subscriptions', () => {
+		it( 'should react to changes in props inside getters', () => {
 			const state = proxifyStateTest( {
 				number: 1,
 				otherNumber: 3,
@@ -740,7 +750,7 @@ describe( 'interactivity api - state proxy', () => {
 			expect( number ).toBe( 4 );
 		} );
 
-		it( 'should react to changes in getter subscriptions if they become getters', () => {
+		it( 'should react to changes in props inside getters if they become getters', () => {
 			const state = proxifyStateTest( {
 				number: 1,
 				otherNumber: 3,

@@ -66,7 +66,7 @@ const stateHandlers: ProxyHandler< object > = {
 			return ( ...args: unknown[] ) => {
 				setNamespace( prop.namespace );
 				try {
-					return result( ...args );
+					return result.call( receiver, ...args );
 				} finally {
 					resetNamespace();
 				}
