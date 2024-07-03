@@ -47,7 +47,7 @@ function FontSizes() {
 								/* translators: %d: number of font sizes */
 								_n(
 									'%d Font size preset',
-									'%d Font sizes presets',
+									'%d Font size presets',
 									fontSizesCount
 								),
 								fontSizesCount
