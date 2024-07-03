@@ -111,7 +111,7 @@ export function useCurrentMergeThemeStyleVariationsWithUserConfig( {
  * @return {Object} The merged object.
  */
 export const filterObjectByProperties = ( object, properties ) => {
-	if ( ! object ) {
+	if ( ! object || ! properties?.length ) {
 		return {};
 	}
 
