@@ -105,7 +105,7 @@ export function useCurrentMergeThemeStyleVariationsWithUserConfig( {
  * E.g., the function will return `{ a: { b: { c: { test: 1 } } } }` if the properties are  `[ 'test' ]`.
  *
  * @param {Object} object     The object to filter
- * @param {Array}  properties The properties to filter by
+ * @param {string[]}  properties The properties to filter by
  * @return {Object} The merged object.
  */
 export const filterObjectByProperties = ( object, properties ) => {
