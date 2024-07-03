@@ -159,7 +159,7 @@ const transforms = {
 			transform( files ) {
 				const blocks = files.map( ( file ) => {
 					return createBlock( 'core/image', {
-						url: createBlobURL( file ),
+						temporaryUrl: createBlobURL( file ),
 					} );
 				} );
 				return blocks;

@@ -9,6 +9,10 @@
 	"keywords": [ "img", "photo", "picture" ],
 	"textdomain": "default",
 	"attributes": {
+		"temporaryUrl": {
+			"type": "string",
+			"isTemporary": true
+		},
 		"url": {
 			"type": "string",
 			"source": "attribute",

@@ -237,6 +237,11 @@ export function getCommentAttributes( blockType, attributes ) {
 				return accumulator;
 			}
 
+			// Ignore all temporary attributes
+			if ( attributeSchema.isTemporary ) {
+				return accumulator;
+			}
+
 			// Ignore default value.
 			if (
 				'default' in attributeSchema &&

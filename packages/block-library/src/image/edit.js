@@ -19,7 +19,7 @@ import {
 	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
-import { useEffect, useRef, useState } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { image as icon, plugins as pluginsIcon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
@@ -55,17 +55,6 @@ export const pickRelevantMediaFiles = ( image, size ) => {
 		image.url;
 	return imageProps;
 };
-
-/**
- * Is the URL a temporary blob URL? A blob URL is one that is used temporarily
- * while the image is being uploaded and will not have an id yet allocated.
- *
- * @param {number=} id  The id of the image.
- * @param {string=} url The url of the image.
- *
- * @return {boolean} Is the URL a Blob URL
- */
-const isTemporaryImage = ( id, url ) => ! id && isBlobURL( url );
 
 /**
  * Is the url for the image hosted externally. An externally hosted image has no
@@ -106,6 +95,7 @@ export function ImageEdit( {
 	__unstableParentLayout: parentLayout,
 } ) {
 	const {
+		temporaryUrl,
 		url = '',
 		alt,
 		caption,
@@ -118,9 +108,6 @@ export function ImageEdit( {
 		align,
 		metadata,
 	} = attributes;
-	const [ temporaryURL, setTemporaryURL ] = useState( () => {
-		return isTemporaryImage( id, url ) ? url : undefined;
-	} );
 
 	const altRef = useRef();
 	useEffect( () => {
@@ -157,8 +144,8 @@ export function ImageEdit( {
 			src: undefined,
 			id: undefined,
 			url: undefined,
+			temporaryUrl: undefined,
 		} );
-		setTemporaryURL( undefined );
 	}
 
 	function onSelectImage( media ) {
@@ -169,17 +156,19 @@ export function ImageEdit( {
 				id: undefined,
 				title: undefined,
 				caption: undefined,
+				temporaryUrl: undefined,
 			} );
 
 			return;
 		}
 
 		if ( isBlobURL( media.url ) ) {
-			setTemporaryURL( media.url );
+			setAttributes( {
+				temporaryUrl: media.url,
+				url: undefined,
+			} );
 			return;
 		}
-
-		setTemporaryURL();
 
 		const { imageDefaultSize } = getSettings();
 
@@ -254,6 +243,7 @@ export function ImageEdit( {
 		mediaAttributes.href = href;
 
 		setAttributes( {
+			temporaryUrl: undefined,
 			...mediaAttributes,
 			...additionalAttributes,
 			linkDestination,
@@ -263,6 +253,7 @@ export function ImageEdit( {
 	function onSelectURL( newURL ) {
 		if ( newURL !== url ) {
 			setAttributes( {
+				temporaryUrl: undefined,
 				url: newURL,
 				id: undefined,
 				sizeSlug: getSettings().imageDefaultSize,
@@ -271,7 +262,7 @@ export function ImageEdit( {
 	}
 
 	useUploadMediaFromBlobURL( {
-		url,
+		temporaryUrl,
 		allowedTypes: ALLOWED_MEDIA_TYPES,
 		onChange: onSelectImage,
 		onError: onUploadError,
@@ -292,7 +283,7 @@ export function ImageEdit( {
 	const shadowProps = getShadowClassesAndStyles( attributes );
 
 	const classes = clsx( className, {
-		'is-transient': temporaryURL,
+		'is-transient': !! temporaryUrl,
 		'is-resized': !! width || !! height,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 		'has-custom-border':
@@ -375,7 +366,7 @@ export function ImageEdit( {
 	return (
 		<figure { ...blockProps }>
 			<Image
-				temporaryURL={ temporaryURL }
+				temporaryURL={ temporaryUrl }
 				attributes={ attributes }
 				setAttributes={ setAttributes }
 				isSingleSelected={ isSingleSelected }
@@ -399,7 +390,7 @@ export function ImageEdit( {
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				value={ { id, src } }
 				mediaPreview={ mediaPreview }
-				disableMediaButtons={ temporaryURL || url }
+				disableMediaButtons={ temporaryUrl || url }
 			/>
 		</figure>
 	);

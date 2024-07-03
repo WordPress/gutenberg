@@ -249,9 +249,9 @@ function GalleryEdit( props ) {
 		const imageArray = newFileUploads
 			? Array.from( selectedImages ).map( ( file ) => {
 					if ( ! file.url ) {
-						return pickRelevantMediaFiles( {
-							url: createBlobURL( file ),
-						} );
+						return {
+							temporaryUrl: createBlobURL( file ),
+						};
 					}
 
 					return file;
@@ -271,9 +271,9 @@ function GalleryEdit( props ) {
 			.filter( ( file ) => file.url || isValidFileType( file ) )
 			.map( ( file ) => {
 				if ( ! file.url ) {
-					return pickRelevantMediaFiles( {
-						url: createBlobURL( file ),
-					} );
+					return {
+						temporaryUrl: createBlobURL( file ),
+					};
 				}
 
 				return file;
@@ -307,6 +307,7 @@ function GalleryEdit( props ) {
 		const newBlocks = newImageList.map( ( image ) => {
 			return createBlock( 'core/image', {
 				id: image.id,
+				temporaryUrl: image.temporaryUrl,
 				url: image.url,
 				caption: image.caption,
 				alt: image.alt,
