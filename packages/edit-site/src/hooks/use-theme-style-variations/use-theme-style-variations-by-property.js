@@ -135,7 +135,7 @@ export const filterObjectByProperties = ( object, properties ) => {
  * Returns true if the variation contains only the properties specified.
  *
  * @param {Object} variation  The variation to compare.
- * @param {string} properties The properties to compare.
+ * @param {string[]} properties The properties to compare.
  * @return {boolean} Whether the variation contains only the specified properties.
  */
 export function isVariationWithProperties( variation, properties ) {
