@@ -29,7 +29,7 @@ export function getBoxShadow( value: number ) {
 }
 
 export function useElevation(
-	props: WordPressComponentProps< ElevationProps, 'div' >
+	props: WordPressComponentProps< ElevationProps, 'div', true >
 ) {
 	const {
 		active,

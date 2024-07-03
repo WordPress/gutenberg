@@ -13,7 +13,7 @@ import { useElevation } from './hook';
 import type { ElevationProps } from './types';
 
 function UnconnectedElevation(
-	props: WordPressComponentProps< ElevationProps, 'div' >,
+	props: WordPressComponentProps< ElevationProps, 'div', true >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const elevationProps = useElevation( props );

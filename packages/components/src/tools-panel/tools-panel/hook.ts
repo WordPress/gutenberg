@@ -80,7 +80,7 @@ const isMenuItemTypeEmpty = (
 ) => obj && Object.keys( obj ).length === 0;
 
 export function useToolsPanel(
-	props: WordPressComponentProps< ToolsPanelProps, 'div' >
+	props: WordPressComponentProps< ToolsPanelProps, 'div', true >
 ) {
 	const {
 		className,

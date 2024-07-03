@@ -12,7 +12,7 @@ import type { InputRangeProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
 function InputRange(
-	props: WordPressComponentProps< InputRangeProps, 'input' >,
+	props: WordPressComponentProps< InputRangeProps, 'input', true >,
 	ref: React.ForwardedRef< HTMLInputElement >
 ) {
 	const { describedBy, label, value, ...otherProps } = props;

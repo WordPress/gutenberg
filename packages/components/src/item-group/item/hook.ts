@@ -13,7 +13,7 @@ import { useItemGroupContext } from '../context';
 import { useCx } from '../../utils/hooks/use-cx';
 import type { ItemProps } from '../types';
 
-export function useItem( props: WordPressComponentProps< ItemProps, 'div' > ) {
+export function useItem( props: WordPressComponentProps< ItemProps, 'div', true > ) {
 	const {
 		as: asProp,
 		className,

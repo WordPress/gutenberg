@@ -13,7 +13,7 @@ import { useCx } from '../utils/hooks/use-cx';
 import type { ScrollableProps } from './types';
 
 export function useScrollable(
-	props: WordPressComponentProps< ScrollableProps, 'div' >
+	props: WordPressComponentProps< ScrollableProps, 'div', true >
 ) {
 	const {
 		className,

@@ -15,7 +15,7 @@ import { useCx } from '../../utils/hooks/use-cx';
 import type { FlexItemProps } from '../types';
 
 export function useFlexItem(
-	props: WordPressComponentProps< FlexItemProps, 'div' >
+	props: WordPressComponentProps< FlexItemProps, 'div', true >
 ) {
 	const {
 		className,

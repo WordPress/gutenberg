@@ -19,7 +19,7 @@ import { useCx } from '../utils/hooks/use-cx';
 import type { TruncateProps } from './types';
 
 export default function useTruncate(
-	props: WordPressComponentProps< TruncateProps, 'span' >
+	props: WordPressComponentProps< TruncateProps, 'span', true >
 ) {
 	const {
 		className,

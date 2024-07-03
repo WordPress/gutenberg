@@ -15,7 +15,7 @@ import { contextConnect } from '../../context';
 import type { ToolsPanelProps } from '../types';
 
 const UnconnectedToolsPanel = (
-	props: WordPressComponentProps< ToolsPanelProps, 'div' >,
+	props: WordPressComponentProps< ToolsPanelProps, 'div', true >,
 	forwardedRef: ForwardedRef< any >
 ) => {
 	const {

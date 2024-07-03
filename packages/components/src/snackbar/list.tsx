@@ -65,7 +65,7 @@ export function SnackbarList( {
 	className,
 	children,
 	onRemove,
-}: WordPressComponentProps< SnackbarListProps, 'div' > ) {
+}: WordPressComponentProps< SnackbarListProps, 'div', true > ) {
 	const listRef = useRef< HTMLDivElement | null >( null );
 	const isReducedMotion = useReducedMotion();
 	className = clsx( 'components-snackbar-list', className );

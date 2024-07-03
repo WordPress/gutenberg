@@ -14,7 +14,7 @@ import * as styles from '../styles';
 import { useCx } from '../../utils/hooks/use-cx';
 import type { Props } from '../types';
 
-type CardProps = WordPressComponentProps< Props, 'div' >;
+type CardProps = WordPressComponentProps< Props, 'div', true >;
 
 function useDeprecatedProps( {
 	elevation,

@@ -18,7 +18,7 @@ import type {
 } from './types';
 
 export default function RangeRail(
-	props: WordPressComponentProps< RailProps, 'span' >
+	props: WordPressComponentProps< RailProps, 'span', true >
 ) {
 	const {
 		disabled = false,
@@ -47,7 +47,7 @@ export default function RangeRail(
 	);
 }
 
-function Marks( props: WordPressComponentProps< MarksProps, 'span' > ) {
+function Marks( props: WordPressComponentProps< MarksProps, 'span', true > ) {
 	const {
 		disabled = false,
 		marks = false,

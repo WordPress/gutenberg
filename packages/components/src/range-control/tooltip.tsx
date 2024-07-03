@@ -17,7 +17,7 @@ import type { TooltipProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
 export default function SimpleTooltip(
-	props: WordPressComponentProps< TooltipProps, 'span' >
+	props: WordPressComponentProps< TooltipProps, 'span', true >
 ) {
 	const {
 		className,

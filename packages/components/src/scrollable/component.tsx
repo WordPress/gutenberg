@@ -13,7 +13,7 @@ import { useScrollable } from './hook';
 import type { ScrollableProps } from './types';
 
 function UnconnectedScrollable(
-	props: WordPressComponentProps< ScrollableProps, 'div' >,
+	props: WordPressComponentProps< ScrollableProps, 'div', true >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const scrollableProps = useScrollable( props );

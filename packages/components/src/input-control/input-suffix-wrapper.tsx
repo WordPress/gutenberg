@@ -12,7 +12,7 @@ import { contextConnect, useContextSystem } from '../context';
 import type { InputControlSuffixWrapperProps } from './types';
 
 function UnconnectedInputControlSuffixWrapper(
-	props: WordPressComponentProps< InputControlSuffixWrapperProps, 'div' >,
+	props: WordPressComponentProps< InputControlSuffixWrapperProps, 'div', true >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const derivedProps = useContextSystem( props, 'InputControlSuffixWrapper' );

@@ -23,10 +23,7 @@ import type { WordPressComponentProps } from '../../context';
 import type { SlotComponentProps } from '../types';
 
 function Slot(
-	props: WordPressComponentProps<
-		Omit< SlotComponentProps, 'bubblesVirtually' >,
-		'div'
-	>,
+	props: WordPressComponentProps< Omit< SlotComponentProps, 'bubblesVirtually' >, 'div', true >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const {

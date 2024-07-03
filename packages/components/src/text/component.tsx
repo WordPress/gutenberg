@@ -12,7 +12,7 @@ import type { Props } from './types';
  * @param forwardedRef
  */
 function UnconnectedText(
-	props: WordPressComponentProps< Props, 'span' >,
+	props: WordPressComponentProps< Props, 'span', true >,
 	forwardedRef: React.ForwardedRef< any >
 ) {
 	const textProps = useText( props );

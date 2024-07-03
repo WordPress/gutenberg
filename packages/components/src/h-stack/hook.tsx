@@ -13,7 +13,7 @@ import { getAlignmentProps } from './utils';
 import { getValidChildren } from '../utils/get-valid-children';
 import type { Props } from './types';
 
-export function useHStack( props: WordPressComponentProps< Props, 'div' > ) {
+export function useHStack( props: WordPressComponentProps< Props, 'div', true > ) {
 	const {
 		alignment = 'edge',
 		children,

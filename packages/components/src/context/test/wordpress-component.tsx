@@ -17,7 +17,7 @@ import type { WordPressComponentProps } from '../wordpress-component';
 /* eslint-disable jest/expect-expect */
 describe( 'WordPressComponentProps', () => {
 	it( 'should not accept a ref', () => {
-		const Foo = ( props: WordPressComponentProps< {}, 'div' > ) => (
+		const Foo = ( props: WordPressComponentProps< {}, 'div', true > ) => (
 			<div { ...props } />
 		);
 
@@ -27,7 +27,7 @@ describe( 'WordPressComponentProps', () => {
 
 	it( 'should accept a ref if wrapped by a forwardRef()', () => {
 		const Foo = (
-			props: WordPressComponentProps< {}, 'div' >,
+			props: WordPressComponentProps< {}, 'div', true >,
 			ref: ForwardedRef< any >
 		) => <div { ...props } ref={ ref } />;
 		const ForwardedFoo = forwardRef( Foo );

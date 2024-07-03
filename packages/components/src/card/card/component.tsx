@@ -23,7 +23,7 @@ import { useCx } from '../../utils/hooks/use-cx';
 import type { Props } from '../types';
 
 function UnconnectedCard(
-	props: WordPressComponentProps< Props, 'div' >,
+	props: WordPressComponentProps< Props, 'div', true >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const {

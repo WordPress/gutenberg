@@ -13,7 +13,7 @@ import { useHeading } from './hook';
 import type { HeadingProps } from './types';
 
 function UnconnectedHeading(
-	props: WordPressComponentProps< HeadingProps, 'h1' >,
+	props: WordPressComponentProps< HeadingProps, 'h1', true >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const headerProps = useHeading( props );

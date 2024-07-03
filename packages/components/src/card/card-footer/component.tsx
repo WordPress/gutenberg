@@ -13,7 +13,7 @@ import { useCardFooter } from './hook';
 import type { FooterProps } from '../types';
 
 function UnconnectedCardFooter(
-	props: WordPressComponentProps< FooterProps, 'div' >,
+	props: WordPressComponentProps< FooterProps, 'div', true >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const footerProps = useCardFooter( props );

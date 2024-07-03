@@ -13,7 +13,7 @@ import useTruncate from './hook';
 import type { TruncateProps } from './types';
 
 function UnconnectedTruncate(
-	props: WordPressComponentProps< TruncateProps, 'span' >,
+	props: WordPressComponentProps< TruncateProps, 'span', true >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const truncateProps = useTruncate( props );

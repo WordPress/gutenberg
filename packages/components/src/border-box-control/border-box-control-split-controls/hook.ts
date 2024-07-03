@@ -14,7 +14,7 @@ import { useCx } from '../../utils/';
 import type { SplitControlsProps } from '../types';
 
 export function useBorderBoxControlSplitControls(
-	props: WordPressComponentProps< SplitControlsProps, 'div' >
+	props: WordPressComponentProps< SplitControlsProps, 'div', true >
 ) {
 	const {
 		className,

@@ -14,7 +14,7 @@ import { useBorderBoxControlVisualizer } from './hook';
 import type { VisualizerProps } from '../types';
 
 const BorderBoxControlVisualizer = (
-	props: WordPressComponentProps< VisualizerProps, 'div' >,
+	props: WordPressComponentProps< VisualizerProps, 'div', true >,
 	forwardedRef: React.ForwardedRef< any >
 ) => {
 	const { value, ...otherProps } = useBorderBoxControlVisualizer( props );

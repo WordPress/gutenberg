@@ -13,7 +13,7 @@ import { useCx } from '../../utils/hooks/use-cx';
 import type { FooterProps } from '../types';
 
 export function useCardFooter(
-	props: WordPressComponentProps< FooterProps, 'div' >
+	props: WordPressComponentProps< FooterProps, 'div', true >
 ) {
 	const {
 		className,

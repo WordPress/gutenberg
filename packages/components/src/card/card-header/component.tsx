@@ -13,7 +13,7 @@ import { useCardHeader } from './hook';
 import type { HeaderProps } from '../types';
 
 function UnconnectedCardHeader(
-	props: WordPressComponentProps< HeaderProps, 'div' >,
+	props: WordPressComponentProps< HeaderProps, 'div', true >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const headerProps = useCardHeader( props );

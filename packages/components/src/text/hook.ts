@@ -29,7 +29,7 @@ import type React from 'react';
  * @param {import('../context').WordPressComponentProps<import('./types').Props, 'span'>} props
  */
 export default function useText(
-	props: WordPressComponentProps< Props, 'span' >
+	props: WordPressComponentProps< Props, 'span', true >
 ) {
 	const {
 		adjustLineHeightForInnerControls,

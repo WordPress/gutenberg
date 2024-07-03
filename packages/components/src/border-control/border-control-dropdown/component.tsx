@@ -130,7 +130,7 @@ const getToggleAriaLabel = (
 };
 
 const BorderControlDropdown = (
-	props: WordPressComponentProps< DropdownProps, 'div' >,
+	props: WordPressComponentProps< DropdownProps, 'div', true >,
 	forwardedRef: React.ForwardedRef< any >
 ) => {
 	const {

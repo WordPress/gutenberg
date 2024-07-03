@@ -64,7 +64,7 @@ function UnforwardedSnackbar(
 		// actually the function to call to remove the snackbar from the UI.
 		onDismiss,
 		listRef,
-	}: WordPressComponentProps< SnackbarProps, 'div' >,
+	}: WordPressComponentProps< SnackbarProps, 'div', true >,
 	ref: ForwardedRef< any >
 ) {
 	function dismissMe( event: KeyboardEvent | MouseEvent ) {

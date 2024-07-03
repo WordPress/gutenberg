@@ -13,7 +13,7 @@ import { useFlexItem } from './hook';
 import type { FlexItemProps } from '../types';
 
 function UnconnectedFlexItem(
-	props: WordPressComponentProps< FlexItemProps, 'div' >,
+	props: WordPressComponentProps< FlexItemProps, 'div', true >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const flexItemProps = useFlexItem( props );

@@ -24,7 +24,7 @@ import type { Border } from '../../border-control/types';
 import type { Borders, BorderSide, BorderBoxControlProps } from '../types';
 
 export function useBorderBoxControl(
-	props: WordPressComponentProps< BorderBoxControlProps, 'div' >
+	props: WordPressComponentProps< BorderBoxControlProps, 'div', true >
 ) {
 	const {
 		className,

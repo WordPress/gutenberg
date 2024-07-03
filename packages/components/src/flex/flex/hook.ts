@@ -21,7 +21,7 @@ import { useCx } from '../../utils';
 import type { FlexProps } from '../types';
 
 function useDeprecatedProps(
-	props: WordPressComponentProps< FlexProps, 'div' >
+	props: WordPressComponentProps< FlexProps, 'div', true >
 ): Omit< typeof props, 'isReversed' > {
 	const { isReversed, ...otherProps } = props;
 
@@ -39,7 +39,7 @@ function useDeprecatedProps(
 	return otherProps;
 }
 
-export function useFlex( props: WordPressComponentProps< FlexProps, 'div' > ) {
+export function useFlex( props: WordPressComponentProps< FlexProps, 'div', true > ) {
 	const {
 		align,
 		className,

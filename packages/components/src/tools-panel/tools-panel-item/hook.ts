@@ -22,7 +22,7 @@ import type { ToolsPanelItemProps } from '../types';
 const noop = () => {};
 
 export function useToolsPanelItem(
-	props: WordPressComponentProps< ToolsPanelItemProps, 'div' >
+	props: WordPressComponentProps< ToolsPanelItemProps, 'div', true >
 ) {
 	const {
 		className,

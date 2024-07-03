@@ -12,7 +12,7 @@ import type { WordPressComponentProps } from '../context/wordpress-component';
 export default function FocalPointPickerGrid( {
 	bounds,
 	...props
-}: WordPressComponentProps< FocalPointPickerGridProps, 'div' > ) {
+}: WordPressComponentProps< FocalPointPickerGridProps, 'div', true > ) {
 	return (
 		<GridView
 			{ ...props }

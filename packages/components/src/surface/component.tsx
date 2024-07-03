@@ -13,7 +13,7 @@ import type { SurfaceProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
 function UnconnectedSurface(
-	props: WordPressComponentProps< SurfaceProps, 'div' >,
+	props: WordPressComponentProps< SurfaceProps, 'div', true >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const surfaceProps = useSurface( props );
