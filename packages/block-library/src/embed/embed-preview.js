@@ -20,6 +20,7 @@ import {
 } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
+import { getAuthority } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -73,7 +74,7 @@ class EmbedPreview extends Component {
 		const { interactive } = this.state;
 
 		const html = 'photo' === type ? getPhotoHtml( preview ) : preview.html;
-		const embedSourceUrl = new URL( url ).hostname;
+		const embedSourceUrl = getAuthority( url );
 		const iframeTitle = sprintf(
 			// translators: %s: host providing embed content e.g: www.youtube.com
 			__( 'Embedded content from %s' ),
