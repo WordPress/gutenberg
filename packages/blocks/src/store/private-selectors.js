@@ -8,7 +8,7 @@ import { createSelector } from '@wordpress/data';
  */
 import { getBlockType } from './selectors';
 import { getValueFromObjectPath } from './utils';
-import { __EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY } from '../api/constants';
+import { __EXPERIMENTAL_STYLE_PROPERTY as RAW_STYLE_PROPERTY } from '../api/constants';
 
 const ROOT_BLOCK_SUPPORTS = [
 	'background',
@@ -31,6 +31,43 @@ const ROOT_BLOCK_SUPPORTS = [
 	'textTransform',
 	'letterSpacing',
 ];
+
+const TYPOGRAPHY_SUPPORTS_EXPERIMENTAL_TO_STABLE = {
+	__experimentalFontFamily: 'fontFamily',
+	__experimentalTextDecoration: 'textDecoration',
+	__experimentalFontStyle: 'fontStyle',
+	__experimentalFontWeight: 'fontWeight',
+	__experimentalLetterSpacing: 'letterSpacing',
+	__experimentalTextTransform: 'textTransform',
+	__experimentalWritingMode: 'writingMode',
+};
+
+// Stabilize the style property support keys by mapping experimental supports to stable supports.
+const STYLE_PROPERTY = Object.keys( RAW_STYLE_PROPERTY ).reduce(
+	( acc, key ) => {
+		const value = RAW_STYLE_PROPERTY[ key ];
+		const support = value.support;
+
+		if ( support[ 0 ] === 'typography' ) {
+			const stableSupport =
+				TYPOGRAPHY_SUPPORTS_EXPERIMENTAL_TO_STABLE[ support[ 1 ] ];
+
+			if ( stableSupport ) {
+				acc[ key ] = {
+					...value,
+					support: [ 'typography', stableSupport ],
+				};
+			} else {
+				acc[ key ] = value;
+			}
+		} else {
+			acc[ key ] = value;
+		}
+
+		return acc;
+	},
+	{}
+);
 
 /**
  * Filters the list of supported styles for a given element.
@@ -93,6 +130,36 @@ function filterElementBlockSupports( blockSupports, name, element ) {
 	} );
 }
 
+function getStableBlockSupports( blockType ) {
+	if ( ! blockType.supports ) {
+		return {};
+	}
+
+	const supports = { ...blockType.supports };
+
+	if ( blockType.supports.typography ) {
+		supports.typography = {};
+		Object.keys( blockType.supports.typography ).forEach(
+			( typographySupport ) => {
+				const stableSupport =
+					TYPOGRAPHY_SUPPORTS_EXPERIMENTAL_TO_STABLE[
+						typographySupport
+					];
+
+				if ( stableSupport ) {
+					supports.typography[ stableSupport ] =
+						blockType.supports.typography[ typographySupport ];
+				} else {
+					supports.typography[ typographySupport ] =
+						blockType.supports.typography[ typographySupport ];
+				}
+			}
+		);
+	}
+
+	return supports;
+}
+
 /**
  * Returns the list of supported styles for a given block name and element.
  */
@@ -113,15 +180,16 @@ export const getSupportedStyles = createSelector(
 		}
 
 		const supportKeys = [];
+		const blockTypeSupports = getStableBlockSupports( blockType );
 
 		// Check for blockGap support.
 		// Block spacing support doesn't map directly to a single style property, so needs to be handled separately.
-		if ( blockType?.supports?.spacing?.blockGap ) {
+		if ( blockTypeSupports?.spacing?.blockGap ) {
 			supportKeys.push( 'blockGap' );
 		}
 
 		// check for shadow support
-		if ( blockType?.supports?.shadow ) {
+		if ( blockTypeSupports?.shadow ) {
 			supportKeys.push( 'shadow' );
 		}
 
@@ -136,9 +204,9 @@ export const getSupportedStyles = createSelector(
 			if ( STYLE_PROPERTY[ styleName ].requiresOptOut ) {
 				if (
 					STYLE_PROPERTY[ styleName ].support[ 0 ] in
-						blockType.supports &&
+						blockTypeSupports &&
 					getValueFromObjectPath(
-						blockType.supports,
+						blockTypeSupports,
 						STYLE_PROPERTY[ styleName ].support
 					) !== false
 				) {
@@ -149,7 +217,7 @@ export const getSupportedStyles = createSelector(
 
 			if (
 				getValueFromObjectPath(
-					blockType.supports,
+					blockTypeSupports,
 					STYLE_PROPERTY[ styleName ].support,
 					false
 				)

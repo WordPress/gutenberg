@@ -120,7 +120,7 @@ describe( 'private selectors', () => {
 			expect( supports ).toEqual( [] );
 		} );
 
-		it( 'return the allowed styles according to the blocks support keys', () => {
+		it( 'return the allowed styles according to the blocks support keys, falling back to experimental supports', () => {
 			const supports = getSupportedStyles(
 				getState( [
 					{
@@ -133,6 +133,40 @@ describe( 'private selectors', () => {
 								__experimentalTextDecoration: true,
 								__experimentalTextTransform: true,
 								__experimentalLetterSpacing: true,
+								fontSize: true,
+								lineHeight: true,
+							},
+						},
+					},
+				] ),
+				'core/example-block'
+			);
+
+			expect( supports ).toEqual( [
+				'fontFamily',
+				'fontSize',
+				'fontStyle',
+				'fontWeight',
+				'lineHeight',
+				'textDecoration',
+				'textTransform',
+				'letterSpacing',
+			] );
+		} );
+
+		it( 'return the allowed styles according to the blocks support keys', () => {
+			const supports = getSupportedStyles(
+				getState( [
+					{
+						name: 'core/example-block',
+						supports: {
+							typography: {
+								fontFamily: true,
+								fontStyle: true,
+								fontWeight: true,
+								textDecoration: true,
+								textTransform: true,
+								letterSpacing: true,
 								fontSize: true,
 								lineHeight: true,
 							},

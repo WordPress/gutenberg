@@ -13,7 +13,9 @@ import { shouldSkipSerialization } from './utils';
 import { TYPOGRAPHY_SUPPORT_KEY } from './typography';
 import { unlock } from '../lock-unlock';
 
-export const FONT_FAMILY_SUPPORT_KEY = 'typography.__experimentalFontFamily';
+export const FONT_FAMILY_SUPPORT_KEY = 'typography.fontFamily';
+export const EXPERIMENTAL_FONT_FAMILY_SUPPORT_KEY =
+	'typography.__experimentalFontFamily';
 const { kebabCase } = unlock( componentsPrivateApis );
 
 /**
@@ -24,7 +26,10 @@ const { kebabCase } = unlock( componentsPrivateApis );
  * @return {Object}         Filtered block settings
  */
 function addAttributes( settings ) {
-	if ( ! hasBlockSupport( settings, FONT_FAMILY_SUPPORT_KEY ) ) {
+	if (
+		! hasBlockSupport( settings, FONT_FAMILY_SUPPORT_KEY ) &&
+		! hasBlockSupport( settings, EXPERIMENTAL_FONT_FAMILY_SUPPORT_KEY )
+	) {
 		return settings;
 	}
 
@@ -49,7 +54,10 @@ function addAttributes( settings ) {
  * @return {Object}           Filtered props applied to save element
  */
 function addSaveProps( props, blockType, attributes ) {
-	if ( ! hasBlockSupport( blockType, FONT_FAMILY_SUPPORT_KEY ) ) {
+	if (
+		! hasBlockSupport( blockType, FONT_FAMILY_SUPPORT_KEY ) &&
+		! hasBlockSupport( blockType, EXPERIMENTAL_FONT_FAMILY_SUPPORT_KEY )
+	) {
 		return props;
 	}
 
@@ -85,7 +93,10 @@ export default {
 	addSaveProps,
 	attributeKeys: [ 'fontFamily' ],
 	hasSupport( name ) {
-		return hasBlockSupport( name, FONT_FAMILY_SUPPORT_KEY );
+		return (
+			hasBlockSupport( name, FONT_FAMILY_SUPPORT_KEY ) ||
+			hasBlockSupport( name, EXPERIMENTAL_FONT_FAMILY_SUPPORT_KEY )
+		);
 	},
 };
 

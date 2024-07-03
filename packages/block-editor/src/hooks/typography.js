@@ -15,7 +15,10 @@ import {
 } from '../components/global-styles/typography-panel';
 
 import { LINE_HEIGHT_SUPPORT_KEY } from './line-height';
-import { FONT_FAMILY_SUPPORT_KEY } from './font-family';
+import {
+	FONT_FAMILY_SUPPORT_KEY,
+	EXPERIMENTAL_FONT_FAMILY_SUPPORT_KEY,
+} from './font-family';
 import { FONT_SIZE_SUPPORT_KEY } from './font-size';
 import { TEXT_ALIGN_SUPPORT_KEY } from './text-align';
 import { cleanEmptyObject } from './utils';
@@ -27,13 +30,25 @@ function omit( object, keys ) {
 	);
 }
 
-const LETTER_SPACING_SUPPORT_KEY = 'typography.__experimentalLetterSpacing';
-const TEXT_TRANSFORM_SUPPORT_KEY = 'typography.__experimentalTextTransform';
-const TEXT_DECORATION_SUPPORT_KEY = 'typography.__experimentalTextDecoration';
+const LETTER_SPACING_SUPPORT_KEY = 'typography.letterSpacing';
+const TEXT_TRANSFORM_SUPPORT_KEY = 'typography.textTransform';
+const TEXT_DECORATION_SUPPORT_KEY = 'typography.textDecoration';
 const TEXT_COLUMNS_SUPPORT_KEY = 'typography.textColumns';
-const FONT_STYLE_SUPPORT_KEY = 'typography.__experimentalFontStyle';
-const FONT_WEIGHT_SUPPORT_KEY = 'typography.__experimentalFontWeight';
-const WRITING_MODE_SUPPORT_KEY = 'typography.__experimentalWritingMode';
+const FONT_STYLE_SUPPORT_KEY = 'typography.fontStyle';
+const FONT_WEIGHT_SUPPORT_KEY = 'typography.fontWeight';
+const WRITING_MODE_SUPPORT_KEY = 'typography.writingMode';
+const EXPERIMENTAL_LETTER_SPACING_SUPPORT_KEY =
+	'typography.__experimentalLetterSpacing';
+const EXPERIMENTAL_TEXT_TRANSFORM_SUPPORT_KEY =
+	'typography.__experimentalTextTransform';
+const EXPERIMENTAL_TEXT_DECORATION_SUPPORT_KEY =
+	'typography.__experimentalTextDecoration';
+const EXPERIMENTAL_FONT_STYLE_SUPPORT_KEY =
+	'typography.__experimentalFontStyle';
+const EXPERIMENTAL_FONT_WEIGHT_SUPPORT_KEY =
+	'typography.__experimentalFontWeight';
+const EXPERIMENTAL_WRITING_MODE_SUPPORT_KEY =
+	'typography.__experimentalWritingMode';
 export const TYPOGRAPHY_SUPPORT_KEY = 'typography';
 export const TYPOGRAPHY_SUPPORT_KEYS = [
 	LINE_HEIGHT_SUPPORT_KEY,
@@ -47,6 +62,13 @@ export const TYPOGRAPHY_SUPPORT_KEYS = [
 	WRITING_MODE_SUPPORT_KEY,
 	TEXT_TRANSFORM_SUPPORT_KEY,
 	LETTER_SPACING_SUPPORT_KEY,
+	EXPERIMENTAL_LETTER_SPACING_SUPPORT_KEY,
+	EXPERIMENTAL_TEXT_TRANSFORM_SUPPORT_KEY,
+	EXPERIMENTAL_TEXT_DECORATION_SUPPORT_KEY,
+	EXPERIMENTAL_FONT_STYLE_SUPPORT_KEY,
+	EXPERIMENTAL_FONT_WEIGHT_SUPPORT_KEY,
+	EXPERIMENTAL_WRITING_MODE_SUPPORT_KEY,
+	EXPERIMENTAL_FONT_FAMILY_SUPPORT_KEY,
 ];
 
 function styleToAttributes( style ) {
