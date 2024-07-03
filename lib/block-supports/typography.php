@@ -20,32 +20,32 @@ function gutenberg_register_typography_support( $block_type ) {
 		return;
 	}
 
-	$has_font_family_support	 = ( isset( $typography_supports['fontFamily'] ) && $typography_supports['fontFamily'] ) ||
-								   ( isset( $typography_supports['__experimentalFontFamily'] ) && $typography_supports['__experimentalFontFamily'] ) ||
-								   false;
-	$has_font_style_support		 = ( isset( $typography_supports['fontStyle'] ) && $typography_supports['fontStyle'] ) ||
-								   ( isset( $typography_supports['__experimentalFontStyle'] ) && $typography_supports['__experimentalFontStyle'] ) ||
-								   false;
-	$has_font_weight_support	 = ( isset( $typography_supports['fontWeight'] ) && $typography_supports['fontWeight'] ) ||
-								   ( isset( $typography_supports['__experimentalFontWeight'] ) && $typography_supports['__experimentalFontWeight'] ) ||
-								   false;
-	$has_letter_spacing_support	 = ( isset( $typography_supports['letterSpacing'] ) && $typography_supports['letterSpacing'] ) ||
-								   ( isset( $typography_supports['__experimentalLetterSpacing'] ) && $typography_supports['__experimentalLetterSpacing'] ) ||
-								   false;
+	$has_font_family_support     = ( isset( $typography_supports['fontFamily'] ) && $typography_supports['fontFamily'] ) ||
+									( isset( $typography_supports['__experimentalFontFamily'] ) && $typography_supports['__experimentalFontFamily'] ) ||
+									false;
+	$has_font_style_support      = ( isset( $typography_supports['fontStyle'] ) && $typography_supports['fontStyle'] ) ||
+									( isset( $typography_supports['__experimentalFontStyle'] ) && $typography_supports['__experimentalFontStyle'] ) ||
+									false;
+	$has_font_weight_support     = ( isset( $typography_supports['fontWeight'] ) && $typography_supports['fontWeight'] ) ||
+									( isset( $typography_supports['__experimentalFontWeight'] ) && $typography_supports['__experimentalFontWeight'] ) ||
+									false;
+	$has_letter_spacing_support  = ( isset( $typography_supports['letterSpacing'] ) && $typography_supports['letterSpacing'] ) ||
+									( isset( $typography_supports['__experimentalLetterSpacing'] ) && $typography_supports['__experimentalLetterSpacing'] ) ||
+									false;
 	$has_text_decoration_support = ( isset( $typography_supports['textDecoration'] ) && $typography_supports['textDecoration'] ) ||
-								   ( isset( $typography_supports['__experimentalTextDecoration'] ) && $typography_supports['__experimentalTextDecoration'] ) ||
-								   false;
+									( isset( $typography_supports['__experimentalTextDecoration'] ) && $typography_supports['__experimentalTextDecoration'] ) ||
+									false;
 	$has_text_transform_support  = ( isset( $typography_supports['textTransform'] ) && $typography_supports['textTransform'] ) ||
-								   ( isset( $typography_supports['__experimentalTextTransform'] ) && $typography_supports['__experimentalTextTransform'] ) ||
-								   false;
-	$has_writing_mode_support	 = ( isset( $typography_supports['writingMode'] ) && $typography_supports['writingMode'] ) ||
-								   ( isset( $typography_supports['__experimentalWritingMode'] ) && $typography_supports['__experimentalWritingMode'] ) ||
-								   false;
+									( isset( $typography_supports['__experimentalTextTransform'] ) && $typography_supports['__experimentalTextTransform'] ) ||
+									false;
+	$has_writing_mode_support    = ( isset( $typography_supports['writingMode'] ) && $typography_supports['writingMode'] ) ||
+									( isset( $typography_supports['__experimentalWritingMode'] ) && $typography_supports['__experimentalWritingMode'] ) ||
+									false;
 
-	$has_font_size_support       = $typography_supports['fontSize'] ?? false;
-	$has_line_height_support     = $typography_supports['lineHeight'] ?? false;
-	$has_text_align_support      = $typography_supports['textAlign'] ?? false;
-	$has_text_columns_support    = $typography_supports['textColumns'] ?? false;
+	$has_font_size_support    = $typography_supports['fontSize'] ?? false;
+	$has_line_height_support  = $typography_supports['lineHeight'] ?? false;
+	$has_text_align_support   = $typography_supports['textAlign'] ?? false;
+	$has_text_columns_support = $typography_supports['textColumns'] ?? false;
 
 	$has_typography_support = $has_font_family_support
 		|| $has_font_size_support
@@ -106,32 +106,32 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 		return array();
 	}
 
-	$has_font_family_support	 = ( isset( $typography_supports['fontFamily'] ) && $typography_supports['fontFamily'] ) ||
-								   ( isset( $typography_supports['__experimentalFontFamily'] ) && $typography_supports['__experimentalFontFamily'] ) ||
-								   false;
-	$has_font_style_support		 = ( isset( $typography_supports['fontStyle'] ) && $typography_supports['fontStyle'] ) ||
-								   ( isset( $typography_supports['__experimentalFontStyle'] ) && $typography_supports['__experimentalFontStyle'] ) ||
-								   false;
-	$has_font_weight_support	 = ( isset( $typography_supports['fontWeight'] ) && $typography_supports['fontWeight'] ) ||
-								   ( isset( $typography_supports['__experimentalFontWeight'] ) && $typography_supports['__experimentalFontWeight'] ) ||
-								   false;
-	$has_letter_spacing_support	 = ( isset( $typography_supports['letterSpacing'] ) && $typography_supports['letterSpacing'] ) ||
-								   ( isset( $typography_supports['__experimentalLetterSpacing'] ) && $typography_supports['__experimentalLetterSpacing'] ) ||
-								   false;
+	$has_font_family_support     = ( isset( $typography_supports['fontFamily'] ) && $typography_supports['fontFamily'] ) ||
+									( isset( $typography_supports['__experimentalFontFamily'] ) && $typography_supports['__experimentalFontFamily'] ) ||
+									false;
+	$has_font_style_support      = ( isset( $typography_supports['fontStyle'] ) && $typography_supports['fontStyle'] ) ||
+									( isset( $typography_supports['__experimentalFontStyle'] ) && $typography_supports['__experimentalFontStyle'] ) ||
+									false;
+	$has_font_weight_support     = ( isset( $typography_supports['fontWeight'] ) && $typography_supports['fontWeight'] ) ||
+									( isset( $typography_supports['__experimentalFontWeight'] ) && $typography_supports['__experimentalFontWeight'] ) ||
+									false;
+	$has_letter_spacing_support  = ( isset( $typography_supports['letterSpacing'] ) && $typography_supports['letterSpacing'] ) ||
+									( isset( $typography_supports['__experimentalLetterSpacing'] ) && $typography_supports['__experimentalLetterSpacing'] ) ||
+									false;
 	$has_text_decoration_support = ( isset( $typography_supports['textDecoration'] ) && $typography_supports['textDecoration'] ) ||
-								   ( isset( $typography_supports['__experimentalTextDecoration'] ) && $typography_supports['__experimentalTextDecoration'] ) ||
-								   false;
+									( isset( $typography_supports['__experimentalTextDecoration'] ) && $typography_supports['__experimentalTextDecoration'] ) ||
+									false;
 	$has_text_transform_support  = ( isset( $typography_supports['textTransform'] ) && $typography_supports['textTransform'] ) ||
-								   ( isset( $typography_supports['__experimentalTextTransform'] ) && $typography_supports['__experimentalTextTransform'] ) ||
-								   false;
-	$has_writing_mode_support	 = ( isset( $typography_supports['writingMode'] ) && $typography_supports['writingMode'] ) ||
-								   ( isset( $typography_supports['__experimentalWritingMode'] ) && $typography_supports['__experimentalWritingMode'] ) ||
-								   false;
+									( isset( $typography_supports['__experimentalTextTransform'] ) && $typography_supports['__experimentalTextTransform'] ) ||
+									false;
+	$has_writing_mode_support    = ( isset( $typography_supports['writingMode'] ) && $typography_supports['writingMode'] ) ||
+									( isset( $typography_supports['__experimentalWritingMode'] ) && $typography_supports['__experimentalWritingMode'] ) ||
+									false;
 
-	$has_font_size_support       = $typography_supports['fontSize'] ?? false;
-	$has_line_height_support     = $typography_supports['lineHeight'] ?? false;
-	$has_text_align_support      = $typography_supports['textAlign'] ?? false;
-	$has_text_columns_support    = $typography_supports['textColumns'] ?? false;
+	$has_font_size_support    = $typography_supports['fontSize'] ?? false;
+	$has_line_height_support  = $typography_supports['lineHeight'] ?? false;
+	$has_text_align_support   = $typography_supports['textAlign'] ?? false;
+	$has_text_columns_support = $typography_supports['textColumns'] ?? false;
 
 	// Whether to skip individual block support features.
 	$should_skip_font_size       = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'fontSize' );
