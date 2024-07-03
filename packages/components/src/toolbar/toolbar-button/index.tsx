@@ -115,7 +115,6 @@ function UnforwardedToolbarButton(
  * ```jsx
  * import { Toolbar, ToolbarButton } from '@wordpress/components';
  * import { edit } from '@wordpress/icons';
-  import { __ } from '../../../../i18n/build-types/create-i18n';
  *
  * function MyToolbar() {
  *   return (
