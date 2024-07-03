@@ -28,7 +28,7 @@ function useUniqueId( idProp?: string ) {
 }
 
 function UnforwardedSelectControl(
-	props: WordPressComponentProps< SelectControlProps, 'select', false >,
+	props: WordPressComponentProps< SelectControlProps, 'select' >,
 	ref: React.ForwardedRef< HTMLSelectElement >
 ) {
 	const {

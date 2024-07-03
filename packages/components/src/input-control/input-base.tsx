@@ -22,7 +22,7 @@ import {
 	getSizeConfig,
 } from './styles/input-control-styles';
 import type { InputBaseProps, LabelPosition } from './types';
-import type { WordPressComponentProps } from '../context';
+import type { WordPressPolymorphicComponentProps } from '../context';
 import {
 	ContextSystemProvider,
 	contextConnect,
@@ -65,7 +65,7 @@ function getUIFlexProps( labelPosition?: LabelPosition ) {
 }
 
 function InputBase(
-	props: WordPressComponentProps< InputBaseProps, 'div', true >,
+	props: WordPressPolymorphicComponentProps< InputBaseProps, 'div' >,
 	ref: ForwardedRef< HTMLDivElement >
 ) {
 	const {

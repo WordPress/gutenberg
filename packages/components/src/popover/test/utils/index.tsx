@@ -8,12 +8,15 @@ import { createPortal, useState } from '@wordpress/element';
  */
 import Popover from '../..';
 import { Provider as SlotFillProvider } from '../../../slot-fill';
-import type { WordPressComponentProps } from '../../../context';
+import type { WordPressPolymorphicComponentProps } from '../../../context';
 
 const GenericIframe = ( {
 	children,
 	...props
-}: WordPressComponentProps< { children: React.ReactNode }, 'iframe', true > ) => {
+}: WordPressPolymorphicComponentProps<
+	{ children: React.ReactNode },
+	'iframe'
+> ) => {
 	const [ containerNode, setContainerNode ] = useState< HTMLElement >();
 
 	return (

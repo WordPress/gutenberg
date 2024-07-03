@@ -9,7 +9,7 @@ import { isRTL } from '@wordpress/i18n';
 import RangeMark from './mark';
 import { MarksWrapper, Rail } from './styles/range-control-styles';
 
-import type { WordPressComponentProps } from '../context';
+import type { WordPressPolymorphicComponentProps } from '../context';
 import type {
 	MarksProps,
 	RangeMarkProps,
@@ -18,7 +18,7 @@ import type {
 } from './types';
 
 export default function RangeRail(
-	props: WordPressComponentProps< RailProps, 'span', true >
+	props: WordPressPolymorphicComponentProps< RailProps, 'span' >
 ) {
 	const {
 		disabled = false,
@@ -47,7 +47,9 @@ export default function RangeRail(
 	);
 }
 
-function Marks( props: WordPressComponentProps< MarksProps, 'span', true > ) {
+function Marks(
+	props: WordPressPolymorphicComponentProps< MarksProps, 'span' >
+) {
 	const {
 		disabled = false,
 		marks = false,

@@ -6,7 +6,7 @@ import type { ForwardedRef } from 'react';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../../context';
+import type { WordPressPolymorphicComponentProps } from '../../context';
 import { contextConnect } from '../../context';
 import { useFlex } from './hook';
 import { FlexContext } from './../context';
@@ -14,7 +14,7 @@ import { View } from '../../view';
 import type { FlexProps } from '../types';
 
 function UnconnectedFlex(
-	props: WordPressComponentProps< FlexProps, 'div', true >,
+	props: WordPressPolymorphicComponentProps< FlexProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const { children, isColumn, ...otherProps } = useFlex( props );

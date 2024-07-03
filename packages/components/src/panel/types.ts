@@ -52,8 +52,7 @@ export type PanelBodyProps = {
 	 */
 	buttonProps?: WordPressComponentProps<
 		Omit< ButtonAsButtonProps, 'icon' >,
-		'button',
-		false
+		'button'
 	>;
 	/**
 	 * The content to display in the `PanelBody`.If a function is provided for

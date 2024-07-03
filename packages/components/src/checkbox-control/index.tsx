@@ -41,7 +41,7 @@ import type { WordPressComponentProps } from '../context';
  * ```
  */
 export function CheckboxControl(
-	props: WordPressComponentProps< CheckboxControlProps, 'input', false >
+	props: WordPressComponentProps< CheckboxControlProps, 'input' >
 ) {
 	const {
 		__nextHasNoMarginBottom,

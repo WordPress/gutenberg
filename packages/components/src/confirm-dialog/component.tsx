@@ -19,7 +19,7 @@ import * as styles from './styles';
 import { useCx } from '../utils/hooks/use-cx';
 
 const UnconnectedConfirmDialog = (
-	props: WordPressComponentProps< ConfirmDialogProps, 'div', false >,
+	props: WordPressComponentProps< ConfirmDialogProps, 'div' >,
 	forwardedRef: React.ForwardedRef< any >
 ) => {
 	const {

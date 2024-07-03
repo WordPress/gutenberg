@@ -22,7 +22,7 @@ function UnforwardedRadio(
 		value,
 		children,
 		...props
-	}: WordPressComponentProps< RadioProps, 'button', false >,
+	}: WordPressComponentProps< RadioProps, 'button' >,
 	ref: React.ForwardedRef< any >
 ) {
 	const { store, disabled } = useContext( RadioGroupContext );

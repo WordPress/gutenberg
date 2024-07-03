@@ -12,7 +12,7 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../../context';
+import type { WordPressPolymorphicComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import { useResponsiveValue } from '../../utils/use-responsive-value';
 import { space } from '../../utils/space';
@@ -21,7 +21,7 @@ import { useCx } from '../../utils';
 import type { FlexProps } from '../types';
 
 function useDeprecatedProps(
-	props: WordPressComponentProps< FlexProps, 'div', true >
+	props: WordPressPolymorphicComponentProps< FlexProps, 'div' >
 ): Omit< typeof props, 'isReversed' > {
 	const { isReversed, ...otherProps } = props;
 
@@ -39,7 +39,9 @@ function useDeprecatedProps(
 	return otherProps;
 }
 
-export function useFlex( props: WordPressComponentProps< FlexProps, 'div', true > ) {
+export function useFlex(
+	props: WordPressPolymorphicComponentProps< FlexProps, 'div' >
+) {
 	const {
 		align,
 		className,

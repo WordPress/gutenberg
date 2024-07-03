@@ -8,13 +8,13 @@ import { useMemo } from '@wordpress/element';
  */
 import * as styles from '../styles';
 import { useToolsPanelContext } from '../context';
-import type { WordPressComponentProps } from '../../context';
+import type { WordPressPolymorphicComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import { useCx } from '../../utils/hooks/use-cx';
 import type { ToolsPanelHeaderProps } from '../types';
 
 export function useToolsPanelHeader(
-	props: WordPressComponentProps< ToolsPanelHeaderProps, 'h2', true >
+	props: WordPressPolymorphicComponentProps< ToolsPanelHeaderProps, 'h2' >
 ) {
 	const {
 		className,

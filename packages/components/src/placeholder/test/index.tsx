@@ -34,10 +34,7 @@ const testIcon = (
 );
 
 const Placeholder = (
-	props: Omit<
-		WordPressComponentProps< PlaceholderProps, 'div', false >,
-		'ref'
-	>
+	props: Omit< WordPressComponentProps< PlaceholderProps, 'div' >, 'ref' >
 ) => <BasePlaceholder data-testid="placeholder" { ...props } />;
 
 const getPlaceholder = () => screen.getByTestId( 'placeholder' );

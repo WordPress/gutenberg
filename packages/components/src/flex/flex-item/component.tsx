@@ -6,14 +6,14 @@ import type { ForwardedRef } from 'react';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../../context';
+import type { WordPressPolymorphicComponentProps } from '../../context';
 import { contextConnect } from '../../context';
 import { View } from '../../view';
 import { useFlexItem } from './hook';
 import type { FlexItemProps } from '../types';
 
 function UnconnectedFlexItem(
-	props: WordPressComponentProps< FlexItemProps, 'div', true >,
+	props: WordPressPolymorphicComponentProps< FlexItemProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const flexItemProps = useFlexItem( props );

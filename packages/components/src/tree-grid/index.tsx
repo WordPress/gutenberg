@@ -42,7 +42,7 @@ function UnforwardedTreeGrid(
 		onFocusRow = () => {},
 		applicationAriaLabel,
 		...props
-	}: WordPressComponentProps< TreeGridProps, 'table', false >,
+	}: WordPressComponentProps< TreeGridProps, 'table' >,
 	/** A ref to the underlying DOM table element. */
 	ref: React.ForwardedRef< HTMLTableElement >
 ) {

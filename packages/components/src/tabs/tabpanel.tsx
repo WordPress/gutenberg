@@ -16,7 +16,7 @@ import type { WordPressComponentProps } from '../context';
 
 export const TabPanel = forwardRef<
 	HTMLDivElement,
-	Omit< WordPressComponentProps< TabPanelProps, 'div', false >, 'id' >
+	Omit< WordPressComponentProps< TabPanelProps, 'div' >, 'id' >
 >( function TabPanel(
 	{ children, tabId, focusable = true, ...otherProps },
 	ref

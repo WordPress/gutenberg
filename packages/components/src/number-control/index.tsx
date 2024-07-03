@@ -30,7 +30,7 @@ import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props'
 const noop = () => {};
 
 function UnforwardedNumberControl(
-	props: WordPressComponentProps< NumberControlProps, 'input', false >,
+	props: WordPressComponentProps< NumberControlProps, 'input' >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const {

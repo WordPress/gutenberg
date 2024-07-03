@@ -311,8 +311,7 @@ const BaseLabel = styled( Text )< { labelPosition?: LabelPosition } >`
 export const Label = (
 	props: WordPressComponentProps<
 		{ labelPosition?: LabelPosition; children: ReactNode },
-		'label',
-		false
+		'label'
 	>
 ) => <BaseLabel { ...props } as="label" />;
 

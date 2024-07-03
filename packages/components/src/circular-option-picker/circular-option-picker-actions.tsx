@@ -44,7 +44,7 @@ export function ButtonAction( {
 	className,
 	children,
 	...additionalProps
-}: WordPressComponentProps< ButtonAsButtonProps, 'button', false > ) {
+}: WordPressComponentProps< ButtonAsButtonProps, 'button' > ) {
 	return (
 		<Button
 			className={ clsx(

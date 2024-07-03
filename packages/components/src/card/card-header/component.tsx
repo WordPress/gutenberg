@@ -6,14 +6,14 @@ import type { ForwardedRef } from 'react';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../../context';
+import type { WordPressPolymorphicComponentProps } from '../../context';
 import { contextConnect } from '../../context';
 import { Flex } from '../../flex';
 import { useCardHeader } from './hook';
 import type { HeaderProps } from '../types';
 
 function UnconnectedCardHeader(
-	props: WordPressComponentProps< HeaderProps, 'div', true >,
+	props: WordPressPolymorphicComponentProps< HeaderProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const headerProps = useCardHeader( props );

@@ -27,11 +27,7 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 		value: valueProp,
 		id: idProp,
 		...otherProps
-	}: WordPressComponentProps<
-		ToggleGroupControlMainControlProps,
-		'div',
-		false
-	>,
+	}: WordPressComponentProps< ToggleGroupControlMainControlProps, 'div' >,
 	forwardedRef: React.ForwardedRef< HTMLDivElement >
 ) {
 	const generatedId = useInstanceId(

@@ -54,7 +54,7 @@ type DropdownCallbackProps = {
 // creates a union that is too large for TypeScript to handle.
 type ToggleProps = Partial<
 	Omit<
-		WordPressComponentProps< ButtonAsButtonProps, 'button', false >,
+		WordPressComponentProps< ButtonAsButtonProps, 'button' >,
 		'label' | 'text'
 	>
 > & {

@@ -112,7 +112,7 @@ const getPopoverFallbackContainer = () => {
 
 const UnforwardedPopover = (
 	props: Omit<
-		WordPressComponentProps< PopoverProps, 'div', false >,
+		WordPressComponentProps< PopoverProps, 'div' >,
 		// To avoid overlaps between the standard HTML attributes and the props
 		// expected by `framer-motion`, omit all framer motion props from popover
 		// props (except for `animate` and `children`, which are re-defined in `PopoverProps`).

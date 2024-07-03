@@ -24,7 +24,7 @@ const UnforwardedDisclosureContent = (
 		visible,
 		children,
 		...props
-	}: WordPressComponentProps< DisclosureContentProps, 'div', false >,
+	}: WordPressComponentProps< DisclosureContentProps, 'div' >,
 	ref: React.ForwardedRef< any >
 ) => {
 	const disclosure = Ariakit.useDisclosureStore( { open: visible } );

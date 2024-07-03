@@ -16,7 +16,7 @@ import type { WordPressComponentProps } from '../context';
 import { forwardRef } from '@wordpress/element';
 
 export function UnforwardedSpinner(
-	{ className, ...props }: WordPressComponentProps< {}, 'svg', false >,
+	{ className, ...props }: WordPressComponentProps< {}, 'svg' >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	return (

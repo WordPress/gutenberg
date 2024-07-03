@@ -30,7 +30,7 @@ import * as styles from '../styles';
 import type { NavigatorScreenProps } from '../types';
 
 function UnconnectedNavigatorScreen(
-	props: WordPressComponentProps< NavigatorScreenProps, 'div', false >,
+	props: WordPressComponentProps< NavigatorScreenProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const screenId = useId();

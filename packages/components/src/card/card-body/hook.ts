@@ -6,14 +6,14 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../../context';
+import type { WordPressPolymorphicComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import * as styles from '../styles';
 import { useCx } from '../../utils/hooks/use-cx';
 import type { BodyProps } from '../types';
 
 export function useCardBody(
-	props: WordPressComponentProps< BodyProps, 'div', true >
+	props: WordPressPolymorphicComponentProps< BodyProps, 'div' >
 ) {
 	const {
 		className,

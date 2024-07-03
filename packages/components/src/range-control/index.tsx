@@ -42,7 +42,7 @@ import { space } from '../utils/space';
 const noop = () => {};
 
 function UnforwardedRangeControl(
-	props: WordPressComponentProps< RangeControlProps, 'input', false >,
+	props: WordPressComponentProps< RangeControlProps, 'input' >,
 	forwardedRef: ForwardedRef< HTMLInputElement >
 ) {
 	const {

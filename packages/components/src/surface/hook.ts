@@ -10,10 +10,10 @@ import { useContextSystem } from '../context';
 import * as styles from './styles';
 import { useCx } from '../utils/hooks/use-cx';
 import type { SurfaceProps } from './types';
-import type { WordPressComponentProps } from '../context';
+import type { WordPressPolymorphicComponentProps } from '../context';
 
 export function useSurface(
-	props: WordPressComponentProps< SurfaceProps, 'div', true >
+	props: WordPressPolymorphicComponentProps< SurfaceProps, 'div' >
 ) {
 	const {
 		backgroundSize = 12,

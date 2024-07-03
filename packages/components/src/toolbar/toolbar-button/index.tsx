@@ -29,7 +29,7 @@ function UnforwardedToolbarButton(
 		isDisabled,
 		title,
 		...props
-	}: WordPressComponentProps< ToolbarButtonProps, typeof Button, false >,
+	}: WordPressComponentProps< ToolbarButtonProps, typeof Button >,
 	ref: ForwardedRef< any >
 ) {
 	const accessibleToolbarState = useContext( ToolbarContext );

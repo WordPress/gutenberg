@@ -9,10 +9,10 @@ import clsx from 'clsx';
 import { Mark, MarkLabel } from './styles/range-control-styles';
 
 import type { RangeMarkProps } from './types';
-import type { WordPressComponentProps } from '../context';
+import type { WordPressPolymorphicComponentProps } from '../context';
 
 export default function RangeMark(
-	props: WordPressComponentProps< RangeMarkProps, 'span', true >
+	props: WordPressPolymorphicComponentProps< RangeMarkProps, 'span' >
 ) {
 	const {
 		className,

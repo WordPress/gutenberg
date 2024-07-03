@@ -48,7 +48,7 @@ function InputField(
 		value: valueProp,
 		type,
 		...props
-	}: WordPressComponentProps< InputFieldProps, 'input', false >,
+	}: WordPressComponentProps< InputFieldProps, 'input' >,
 	ref: ForwardedRef< HTMLInputElement >
 ) {
 	const {

@@ -16,7 +16,7 @@ import type { WordPressComponentProps } from '../context';
 import type { ColorIndicatorProps } from './types';
 
 function UnforwardedColorIndicator(
-	props: WordPressComponentProps< ColorIndicatorProps, 'span', false >,
+	props: WordPressComponentProps< ColorIndicatorProps, 'span' >,
 	forwardedRef: ForwardedRef< HTMLSpanElement >
 ) {
 	const { className, colorValue, ...additionalProps } = props;

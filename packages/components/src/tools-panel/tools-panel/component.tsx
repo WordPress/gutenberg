@@ -10,12 +10,12 @@ import ToolsPanelHeader from '../tools-panel-header';
 import { ToolsPanelContext } from '../context';
 import { useToolsPanel } from './hook';
 import { Grid } from '../../grid';
-import type { WordPressComponentProps } from '../../context';
+import type { WordPressPolymorphicComponentProps } from '../../context';
 import { contextConnect } from '../../context';
 import type { ToolsPanelProps } from '../types';
 
 const UnconnectedToolsPanel = (
-	props: WordPressComponentProps< ToolsPanelProps, 'div', true >,
+	props: WordPressPolymorphicComponentProps< ToolsPanelProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) => {
 	const {

@@ -15,7 +15,7 @@ function UnforwardedTreeGridCell(
 		children,
 		withoutGridItem = false,
 		...props
-	}: WordPressComponentProps< TreeGridCellProps, 'td', false >,
+	}: WordPressComponentProps< TreeGridCellProps, 'td' >,
 	ref: React.ForwardedRef< any >
 ) {
 	return (

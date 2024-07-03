@@ -48,11 +48,7 @@ const WithToolTip = ( { showTooltip, text, children }: WithToolTipProps ) => {
 
 function ToggleGroupControlOptionBase(
 	props: Omit<
-		WordPressComponentProps<
-			ToggleGroupControlOptionBaseProps,
-			'button',
-			false
-		>,
+		WordPressComponentProps< ToggleGroupControlOptionBaseProps, 'button' >,
 		// the element's id is generated internally
 		'id'
 	>,

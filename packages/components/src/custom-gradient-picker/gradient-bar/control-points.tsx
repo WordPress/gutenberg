@@ -34,7 +34,7 @@ import {
 	MINIMUM_SIGNIFICANT_MOVE,
 	KEYBOARD_CONTROL_POINT_VARIATION,
 } from './constants';
-import type { WordPressComponentProps } from '../../context';
+import type { WordPressPolymorphicComponentProps } from '../../context';
 import type {
 	ControlPointButtonProps,
 	ControlPointMoveState,
@@ -49,7 +49,7 @@ function ControlPointButton( {
 	position,
 	color,
 	...additionalProps
-}: WordPressComponentProps< ControlPointButtonProps, 'button', true > ) {
+}: WordPressPolymorphicComponentProps< ControlPointButtonProps, 'button' > ) {
 	const instanceId = useInstanceId( ControlPointButton );
 	const descriptionId = `components-custom-gradient-picker__control-point-button-description-${ instanceId }`;
 	return (

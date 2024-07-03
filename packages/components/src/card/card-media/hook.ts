@@ -6,14 +6,14 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../../context';
+import type { WordPressPolymorphicComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import * as styles from '../styles';
 import { useCx } from '../../utils/hooks/use-cx';
 import type { MediaProps } from '../types';
 
 export function useCardMedia(
-	props: WordPressComponentProps< MediaProps, 'div', true >
+	props: WordPressPolymorphicComponentProps< MediaProps, 'div' >
 ) {
 	const { className, ...otherProps } = useContextSystem( props, 'CardMedia' );
 

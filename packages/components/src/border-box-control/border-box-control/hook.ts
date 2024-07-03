@@ -16,7 +16,7 @@ import {
 	isCompleteBorder,
 	isEmptyBorder,
 } from '../utils';
-import type { WordPressComponentProps } from '../../context';
+import type { WordPressPolymorphicComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import { useCx } from '../../utils/hooks/use-cx';
 
@@ -24,7 +24,7 @@ import type { Border } from '../../border-control/types';
 import type { Borders, BorderSide, BorderBoxControlProps } from '../types';
 
 export function useBorderBoxControl(
-	props: WordPressComponentProps< BorderBoxControlProps, 'div', true >
+	props: WordPressPolymorphicComponentProps< BorderBoxControlProps, 'div' >
 ) {
 	const {
 		className,

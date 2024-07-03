@@ -9,10 +9,10 @@ import { forwardRef } from '@wordpress/element';
 import { InputRange as BaseInputRange } from './styles/range-control-styles';
 
 import type { InputRangeProps } from './types';
-import type { WordPressComponentProps } from '../context';
+import type { WordPressPolymorphicComponentProps } from '../context';
 
 function InputRange(
-	props: WordPressComponentProps< InputRangeProps, 'input', true >,
+	props: WordPressPolymorphicComponentProps< InputRangeProps, 'input' >,
 	ref: React.ForwardedRef< HTMLInputElement >
 ) {
 	const { describedBy, label, value, ...otherProps } = props;
