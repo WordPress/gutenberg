@@ -19,7 +19,7 @@ function gutenberg_filter_block_type_metadata_settings_allow_variations_php_file
 		$variations_path = wp_normalize_path(
 			realpath(
 				dirname( $metadata['file'] ) . '/' .
-				remove_block_asset_path_prefix( $metadata['variations'] )
+				remove_block_asset_path_prefix( $settings['variations'] )
 			)
 		);
 		if ( $variations_path ) {
