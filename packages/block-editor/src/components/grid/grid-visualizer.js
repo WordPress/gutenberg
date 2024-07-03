@@ -199,7 +199,8 @@ function GridVisualizerDropZone( {
 	highlightedRect,
 	setHighlightedRect,
 } ) {
-	const { getBlockAttributes } = useSelect( blockEditorStore );
+	const { getBlockAttributes, getBlockRootClientId } =
+		useSelect( blockEditorStore );
 	const {
 		updateBlockAttributes,
 		moveBlocksToPosition,
@@ -264,7 +265,7 @@ function GridVisualizerDropZone( {
 			__unstableMarkNextChangeAsNotPersistent();
 			moveBlocksToPosition(
 				[ srcClientId ],
-				gridClientId,
+				getBlockRootClientId( srcClientId ),
 				gridClientId,
 				getNumberOfBlocksBeforeCell( column, row )
 			);
