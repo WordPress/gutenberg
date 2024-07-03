@@ -35,7 +35,6 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 
 		if ( isManualGrid ) {
 			const rects = [];
-			let bottomMostRow = 0;
 
 			// Respect the position of blocks that already have a columnStart and rowStart value.
 			for ( const clientId of blockOrder ) {
@@ -57,10 +56,6 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 						rowSpan,
 					} )
 				);
-				bottomMostRow = Math.max(
-					bottomMostRow,
-					parseInt( rowStart, 10 ) + parseInt( rowSpan, 10 ) - 1
-				);
 			}
 
 			// When in manual mode, ensure that every block has a columnStart and rowStart value.
@@ -78,7 +73,6 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 				const [ newColumnStart, newRowStart ] = getFirstEmptyCell(
 					rects,
 					columnCount,
-					Math.max( rowCount || 2, bottomMostRow ),
 					columnSpan,
 					rowSpan
 				);
@@ -100,13 +94,10 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 						},
 					},
 				};
-				bottomMostRow = Math.max(
-					bottomMostRow,
-					parseInt( newRowStart, 10 ) + parseInt( rowSpan, 10 ) - 1
-				);
 			}
 
 			// Ensure there's enough rows to fit all blocks.
+			const bottomMostRow = Math.max( ...rects.map( ( r ) => r.rowEnd ) );
 			if ( ! rowCount || rowCount < bottomMostRow ) {
 				updates[ gridClientId ] = {
 					layout: {
@@ -163,14 +154,8 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 	] );
 }
 
-function getFirstEmptyCell(
-	rects,
-	columnCount,
-	rowCount,
-	columnSpan = 1,
-	rowSpan = 1
-) {
-	for ( let row = 1; row <= rowCount; row++ ) {
+function getFirstEmptyCell( rects, columnCount, columnSpan = 1, rowSpan = 1 ) {
+	for ( let row = 1; ; row++ ) {
 		for ( let column = 1; column <= columnCount; column++ ) {
 			const rect = new GridRect( {
 				columnStart: column,
@@ -183,5 +168,4 @@ function getFirstEmptyCell(
 			}
 		}
 	}
-	return [ 1, 1 ];
 }
