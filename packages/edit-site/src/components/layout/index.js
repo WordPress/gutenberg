@@ -153,13 +153,13 @@ export default function Layout( { route } ) {
 										} }
 										className="edit-site-layout__sidebar"
 									>
-										<SiteHub
-											ref={ toggleRef }
-											isTransparent={
-												isResizableFrameOversized
-											}
-										/>
 										<SidebarContent routeKey={ routeKey }>
+											<SiteHub
+												ref={ toggleRef }
+												isTransparent={
+													isResizableFrameOversized
+												}
+											/>
 											{ areas.sidebar }
 										</SidebarContent>
 										<SaveHub />
