@@ -12,6 +12,7 @@
 ### Enhancements
 
 -   `ToolbarButton`: Deprecate `isDisabled` prop and merge with `disabled` ([#63101](https://github.com/WordPress/gutenberg/pull/63101)).
+-   `Button`: Stabilize `__experimentalIsFocusable` prop ([#62282](https://github.com/WordPress/gutenberg/pull/62282)).
 
 ### Internal
 
