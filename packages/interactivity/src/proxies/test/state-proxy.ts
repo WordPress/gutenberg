@@ -1,5 +1,4 @@
 /* eslint-disable eslint-comments/disable-enable-pair */
-/* eslint-disable jest/no-identical-title */
 /* eslint-disable @typescript-eslint/no-shadow */
 /**
  * External dependencies
@@ -80,7 +79,7 @@ describe( 'interactivity api - state proxy', () => {
 			expect( state.double ).toBe( 4 );
 		} );
 
-		it( 'should support getters returning other parts of the raw', () => {
+		it( 'should support getters returning other parts of the state', () => {
 			const state = proxifyStateTest( {
 				switch: 'a',
 				a: { data: 'a' },
