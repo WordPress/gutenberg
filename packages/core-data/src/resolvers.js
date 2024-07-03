@@ -546,7 +546,12 @@ export const __experimentalGetCurrentGlobalStylesId =
 		if ( ! globalStylesURL ) {
 			return;
 		}
-		const id = +globalStylesURL.split( '/' ).pop();
+
+		// Regex matches the ID at the end of a URL or immediately before
+		// the query string.
+		const matches = globalStylesURL.match( /\/(\d+)(?:\?|$)/ );
+		const id = matches ? Number( matches[ 1 ] ) : null;
+
 		if ( id ) {
 			dispatch.__experimentalReceiveCurrentGlobalStylesId( id );
 		}
