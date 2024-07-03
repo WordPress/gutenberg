@@ -28,34 +28,32 @@ function render_block_core_image( $attributes, $content, $block ) {
 		return '';
 	}
 
-	/*
-	 * The data-id attribute is added in a core/gallery
-	 * `render_block_data` hook.
-	 */
-	if ( isset( $attributes['data-id'] ) ) {
-		// The initial id when the block was parsed.
-		$initial_id = $attributes['data-id'];
-		/*
-		 * The id attribute could change during rendering while applying block bindings.
-		 * If data-id attribute exists, it is safe to assume that
-		 * id attribute is also present.
-		 */
-		$rendered_id = $attributes['id'];
-		/*
-		 * Adds the data-id="$id" attribute to the img element to provide backwards
-		 * compatibility for the Gallery Block, which now wraps Image Blocks within
-		 * innerBlocks.
-		 */
-		$p->set_attribute( 'data-id', $rendered_id );
+	if ( isset( $attributes['id'] ) ) {
+		$id = $attributes['id'];
 
-		/*
-		 * If the id has changed, it was probably overridden by block bindings.
-		 * Update it to the correct value.
-		 * See https://github.com/WordPress/gutenberg/issues/62886 for why this is needed.
-		 */
-		if ( $initial_id !== $rendered_id ) {
-			$p->remove_class( 'wp-image-' . $attributes['data-id'] );
-			$p->add_class( 'wp-image-' . $rendered_id );
+		// Use block context to detect whether the block is nested in a gallery.
+		// As the context names are very generic, check multiple array keys to
+		// reduce the chance a non-gallery parent is providing the same context.
+		$is_gallery_child = array_key_exists( 'allowResize', $block->context )
+			&& array_key_exists( 'imageCrop', $block->context )
+			&& array_key_exists( 'fixedHeight', $block->context );
+
+		// Adds the data-id="$id" attribute to the img element to provide backwards
+		// compatibility for the Gallery Block, which now wraps Image Blocks within
+		// innerBlocks. The data-id attribute is added in a core/gallery
+		// `render_block_data` hook.
+		if ( $is_gallery_child ) {
+			$p->set_attribute( 'data-id', $id );
+		}
+
+		// If there's a mismatch with the 'wp-image-' class and the actual id, the id was
+		// probably overridden by block bindings. Update it to the correct value.
+		// See https://github.com/WordPress/gutenberg/issues/62886 for why this is needed.
+		$image_classnames  = $p->get_attribute( 'class' );
+		$expected_id_class = "wp-image-$id";
+		if ( is_string( $image_classnames ) && ! str_contains( $image_classnames, $expected_id_class ) ) {
+			$image_classnames = preg_replace( '/wp-image-(\d+)/', "wp-image-$id", $image_classnames );
+			$p->set_attribute( 'class', $image_classnames );
 		}
 	}
 
