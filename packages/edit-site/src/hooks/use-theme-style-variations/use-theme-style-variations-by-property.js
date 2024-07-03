@@ -25,7 +25,7 @@ const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
  * @return {Object} The modified object.
  */
 export function removePropertiesFromObject( object, properties ) {
-	if ( ! properties || typeof properties !== 'object' ) {
+	if ( ! properties?.length ) {
 		return object;
 	}
 
