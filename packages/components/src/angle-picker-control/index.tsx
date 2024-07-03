@@ -23,7 +23,7 @@ import type { WordPressComponentProps } from '../context';
 import type { AnglePickerControlProps } from './types';
 
 function UnforwardedAnglePickerControl(
-	props: WordPressComponentProps< AnglePickerControlProps, 'div' >,
+	props: WordPressComponentProps< AnglePickerControlProps, 'div', true >,
 	ref: ForwardedRef< any >
 ) {
 	const {
