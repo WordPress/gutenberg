@@ -27,15 +27,12 @@ import {
 	MediaContainer,
 } from './styles/focal-point-picker-style';
 import { INITIAL_BOUNDS } from './utils';
-import { useUpdateEffect } from '../utils/hooks';
 import type { WordPressComponentProps } from '../context/wordpress-component';
 import type {
 	FocalPoint as FocalPointType,
 	FocalPointPickerProps,
 } from './types';
 import type { KeyboardEventHandler } from 'react';
-
-const GRID_OVERLAY_TIMEOUT = 600;
 
 /**
  * Focal Point Picker is a component which creates a UI for identifying the most important visual point of an image.
@@ -116,6 +113,7 @@ export function FocalPointPicker( {
 			}
 
 			onDragStart?.( value, event );
+			setShowGridOverlay( true );
 			setPoint( value );
 		},
 		onDragMove: ( event ) => {
@@ -129,6 +127,7 @@ export function FocalPointPicker( {
 			setPoint( value );
 		},
 		onDragEnd: () => {
+			setShowGridOverlay( false );
 			onDragEnd?.();
 			onChange?.( point );
 		},
@@ -236,15 +235,6 @@ export function FocalPointPicker( {
 
 	const instanceId = useInstanceId( FocalPointPicker );
 	const id = `inspector-focal-point-picker-control-${ instanceId }`;
-
-	useUpdateEffect( () => {
-		setShowGridOverlay( true );
-		const timeout = window.setTimeout( () => {
-			setShowGridOverlay( false );
-		}, GRID_OVERLAY_TIMEOUT );
-
-		return () => window.clearTimeout( timeout );
-	}, [ x, y ] );
 
 	return (
 		<BaseControl
