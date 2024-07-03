@@ -139,8 +139,15 @@ const namespaceStack: string[] = [];
  *                  function exists is used.
  * @return The context content.
  */
-export const getContext = < T extends object >( namespace?: string ): T =>
-	getScope()?.context[ namespace || getNamespace() ];
+export const getContext = < T extends object >( namespace?: string ): T => {
+	const scope = getScope();
+	if ( ! scope ) {
+		throw Error(
+			'Cannot call `getContext()` outside getters and actions used by directives.'
+		);
+	}
+	return scope.context[ namespace || getNamespace() ];
+};
 
 /**
  * Retrieves a representation of the element where a function from the store

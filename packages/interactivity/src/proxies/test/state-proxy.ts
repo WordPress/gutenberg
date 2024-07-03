@@ -15,6 +15,7 @@ import {
 	setNamespace,
 	resetNamespace,
 	getContext,
+	getElement,
 } from '../../hooks';
 
 type State = {
@@ -40,8 +41,6 @@ describe( 'interactivity api handlers', () => {
 	let array = [ 3, nested ];
 	let state: State = { a: 1, nested, array };
 	let store = proxifyState( state );
-
-	const window = globalThis as any;
 
 	beforeEach( () => {
 		nested = { b: 2 };
@@ -645,7 +644,7 @@ describe( 'interactivity api handlers', () => {
 			expect( b ).toBe( 2 );
 		} );
 
-		it( 'should keep subscribed to properties even when replaced by getters', () => {
+		it( 'should keep subscribed to properties that become getters', () => {
 			const store = proxifyState( {
 				number: 1,
 			} );
@@ -690,7 +689,7 @@ describe( 'interactivity api handlers', () => {
 			expect( number ).toBe( 4 );
 		} );
 
-		it( 'should react to changes in getter subscriptions even if they become getters', () => {
+		it( 'should react to changes in getter subscriptions if they become getters', () => {
 			const store = proxifyState( {
 				number: 1,
 				otherNumber: 3,
@@ -745,43 +744,71 @@ describe( 'interactivity api handlers', () => {
 			expect( number ).toBe( 4 );
 		} );
 
-		it( 'should support different scopes for getters', () => {
+		it( 'should support different scopes for the same getter', () => {
 			const store = proxifyState( {
 				number: 1,
-				get sum() {
+				get numWithTag() {
+					let tag = 'No scope';
+					try {
+						tag = getContext< any >().tag;
+					} catch ( e ) {}
+					return `${ tag }: ${ this.number }`;
+				},
+			} );
+
+			const scopeA = {
+				context: { test: { tag: 'A' } },
+			};
+			const scopeB = {
+				context: { test: { tag: 'B' } },
+			};
+
+			let resultA = '';
+			let resultB = '';
+			let resultNoScope = '';
+
+			effect(
+				withScopeAndNs( scopeA, 'test', () => {
+					resultA = store.numWithTag;
+				} )
+			);
+			effect(
+				withScopeAndNs( scopeB, 'test', () => {
+					resultB = store.numWithTag;
+				} )
+			);
+			effect( () => {
+				resultNoScope = store.numWithTag;
+			} );
+
+			expect( resultA ).toBe( 'A: 1' );
+			expect( resultB ).toBe( 'B: 1' );
+			expect( resultNoScope ).toBe( 'No scope: 1' );
+			store.number = 2;
+			expect( resultA ).toBe( 'A: 2' );
+			expect( resultB ).toBe( 'B: 2' );
+			expect( resultNoScope ).toBe( 'No scope: 2' );
+		} );
+
+		it( 'should throw an error in getters that require an scope', () => {
+			const store = proxifyState( {
+				number: 1,
+				get sumValueFromContext() {
 					const ctx = getContext();
 					return ctx
 						? this.number + ( ctx as any ).value
 						: this.number;
 				},
+				get sumValueFromElement() {
+					const element = getElement();
+					return element
+						? this.number + element.attributes.value
+						: this.number;
+				},
 			} );
 
-			const scopeA = {
-				context: { test: { value: 10 } },
-			};
-			const scopeB = {
-				context: { test: { value: 20 } },
-			};
-
-			let resultA = 0;
-			let resultB = 0;
-
-			effect(
-				withScopeAndNs( scopeA, 'test', () => {
-					resultA = store.sum;
-				} )
-			);
-			effect(
-				withScopeAndNs( scopeB, 'test', () => {
-					resultB = store.sum;
-				} )
-			);
-
-			expect( resultA ).toBe( 11 );
-			expect( resultB ).toBe( 21 );
-			store.number = 2;
-			expect( resultA ).toBe( 12 );
-			expect( resultB ).toBe( 22 );
+			expect( () => store.sumValueFromContext ).toThrow();
+			expect( () => store.sumValueFromElement ).toThrow();
 		} );
 	} );
 } );
