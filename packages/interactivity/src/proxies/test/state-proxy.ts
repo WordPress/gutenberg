@@ -36,7 +36,7 @@ const withScopeAndNs = ( scope, ns, callback ) => () => {
 const proxifyStateTest = < T extends object >( obj: T ) =>
 	proxifyState( obj, 'test' ) as T;
 
-describe( 'interactivity api handlers', () => {
+describe( 'interactivity api - state proxy', () => {
 	let nested = { b: 2 };
 	let array = [ 3, nested ];
 	let raw: State = { a: 1, nested, array };
