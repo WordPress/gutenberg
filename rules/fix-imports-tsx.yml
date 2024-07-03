@@ -1,0 +1,12 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/ast-grep/ast-grep/main/schemas/rule.json
+
+id: fix-imports
+message: Add your rule message here....
+severity: error # error, warning, info, hint
+language: TSX
+rule:
+    any:
+        - pattern:
+              selector: import_specifier
+              context: "import { WordPressComponentProps } from 'x'"
+fix: WordPressComponentProps, WordPressPolymorphicComponentProps
