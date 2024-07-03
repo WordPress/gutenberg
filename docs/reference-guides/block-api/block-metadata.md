@@ -466,6 +466,7 @@ For example:
 
 ```php
 <?php
+// Generate variations for a Social Icon kind of block.
 
 return array(
 	array(
