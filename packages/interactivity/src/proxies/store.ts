@@ -47,10 +47,10 @@ export const proxifyStore = < T extends object >(
 	obj: T,
 	namespace: string,
 	isRoot = false
-) => {
+): T => {
 	const proxy = getProxy( obj, storeHandlers, namespace );
 	if ( proxy && isRoot ) {
 		storeRoots.add( proxy );
 	}
-	return proxy;
+	return proxy as T;
 };
