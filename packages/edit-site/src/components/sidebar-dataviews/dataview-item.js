@@ -29,7 +29,7 @@ export default function DataViewItem( {
 	suffix,
 } ) {
 	const {
-		params: { postType, layout },
+		params: { postType, layout, activeView: previousView },
 	} = useLocation();
 
 	const iconToUse =
@@ -41,7 +41,7 @@ export default function DataViewItem( {
 	}
 	const linkInfo = useLink( {
 		postType,
-		layout,
+		layout: type !== 'list' || previousView === 'trash' ? type : layout,
 		activeView,
 		isCustom: isCustom ? 'true' : undefined,
 	} );
