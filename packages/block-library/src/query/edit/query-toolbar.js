@@ -100,7 +100,7 @@ export default function QueryToolbar( {
 									<NumberControl
 										id={ maxPageInputId }
 										__unstableInputWidth="60px"
-										label={ __( 'Max page to show' ) }
+										label={ __( 'Max pages to show' ) }
 										labelPosition="edge"
 										min={ 0 }
 										onChange={ ( value ) => {
