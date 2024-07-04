@@ -62,6 +62,11 @@ export type TimeInputProps = {
 	minutesProps?: React.ComponentProps< typeof MinutesInput >;
 
 	/**
+	 * The label for the time input.
+	 */
+	label?: string;
+
+	/**
 	 * The function is called when a new time has been selected.
 	 * Passing hours and minutes as an object properties.
 	 */

@@ -31,7 +31,6 @@ import {
 } from '../../store/constants';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import isTemplateRevertable from '../../store/utils/is-template-revertable';
 import { exportPatternAsJSONAction } from './export-pattern-action';
 import { CreateTemplatePartModalContents } from '../create-template-part-modal';
 
@@ -804,114 +803,6 @@ const useDuplicatePostAction = ( postType ) => {
 	);
 };
 
-const resetTemplateAction = {
-	id: 'reset-template',
-	label: __( 'Reset' ),
-	isEligible: ( item ) => {
-		return isTemplateRevertable( item );
-	},
-	icon: backup,
-	supportsBulk: true,
-	hideModalHeader: true,
-	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
-		const [ isBusy, setIsBusy ] = useState( false );
-		const { revertTemplate } = unlock( useDispatch( editorStore ) );
-		const { saveEditedEntityRecord } = useDispatch( coreStore );
-		const { createSuccessNotice, createErrorNotice } =
-			useDispatch( noticesStore );
-		const onConfirm = async () => {
-			try {
-				for ( const template of items ) {
-					await revertTemplate( template, {
-						allowUndo: false,
-					} );
-					await saveEditedEntityRecord(
-						'postType',
-						template.type,
-						template.id
-					);
-				}
-				createSuccessNotice(
-					items.length > 1
-						? sprintf(
-								/* translators: The number of items. */
-								__( '%s items reset.' ),
-								items.length
-						  )
-						: sprintf(
-								/* translators: The template/part's name. */
-								__( '"%s" reset.' ),
-								decodeEntities( getItemTitle( items[ 0 ] ) )
-						  ),
-					{
-						type: 'snackbar',
-						id: 'revert-template-action',
-					}
-				);
-			} catch ( error ) {
-				let fallbackErrorMessage;
-				if ( items[ 0 ].type === TEMPLATE_POST_TYPE ) {
-					fallbackErrorMessage =
-						items.length === 1
-							? __(
-									'An error occurred while reverting the template.'
-							  )
-							: __(
-									'An error occurred while reverting the templates.'
-							  );
-				} else {
-					fallbackErrorMessage =
-						items.length === 1
-							? __(
-									'An error occurred while reverting the template part.'
-							  )
-							: __(
-									'An error occurred while reverting the template parts.'
-							  );
-				}
-				const errorMessage =
-					error.message && error.code !== 'unknown_error'
-						? error.message
-						: fallbackErrorMessage;
-
-				createErrorNotice( errorMessage, { type: 'snackbar' } );
-			}
-		};
-		return (
-			<VStack spacing="5">
-				<Text>
-					{ __( 'Reset to default and clear all customizations?' ) }
-				</Text>
-				<HStack justify="right">
-					<Button
-						variant="tertiary"
-						onClick={ closeModal }
-						disabled={ isBusy }
-						accessibleWhenDisabled
-					>
-						{ __( 'Cancel' ) }
-					</Button>
-					<Button
-						variant="primary"
-						onClick={ async () => {
-							setIsBusy( true );
-							await onConfirm( items );
-							onActionPerformed?.( items );
-							setIsBusy( false );
-							closeModal();
-						} }
-						isBusy={ isBusy }
-						disabled={ isBusy }
-						accessibleWhenDisabled
-					>
-						{ __( 'Reset' ) }
-					</Button>
-				</HStack>
-			</VStack>
-		);
-	},
-};
-
 export const duplicatePatternAction = {
 	id: 'duplicate-pattern',
 	label: _x( 'Duplicate', 'action label' ),
@@ -1037,9 +928,7 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 			isPattern && userCanCreatePostType && duplicatePatternAction,
 			supportsTitle && renamePostActionForPostType,
 			isPattern && exportPatternAsJSONAction,
-			isTemplateOrTemplatePart
-				? resetTemplateAction
-				: restorePostActionForPostType,
+			! isTemplateOrTemplatePart && restorePostActionForPostType,
 			! isTemplateOrTemplatePart &&
 				! isPattern &&
 				trashPostActionForPostType,
@@ -1066,12 +955,18 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 					const existingCallback = actions[ i ].callback;
 					actions[ i ] = {
 						...actions[ i ],
-						callback: ( items, { _onActionPerformed } ) => {
-							existingCallback( items, ( _items ) => {
-								if ( _onActionPerformed ) {
-									_onActionPerformed( _items );
-								}
-								onActionPerformed( actions[ i ].id, _items );
+						callback: ( items, argsObject ) => {
+							existingCallback( items, {
+								...argsObject,
+								onActionPerformed: ( _items ) => {
+									if ( argsObject.onActionPerformed ) {
+										argsObject.onActionPerformed( _items );
+									}
+									onActionPerformed(
+										actions[ i ].id,
+										_items
+									);
+								},
 							} );
 						},
 					};
