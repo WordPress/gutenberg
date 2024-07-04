@@ -17,7 +17,7 @@ export type TimePickerProps = {
 	is12Hour?: boolean;
 
 	/**
-	 * The order of day, month, year.
+	 * The order of day, month, and year.
 	 *
 	 * @default 'dmy'
 	 */
