@@ -12,21 +12,24 @@ import { setNamespace, resetNamespace } from '../hooks';
 
 const proxyToProps: WeakMap<
 	object,
-	Map< string, PropSignal >
+	Map< string | symbol, PropSignal >
 > = new WeakMap();
 
 const objToIterable = new WeakMap< object, Signal< number > >();
 const descriptor = Object.getOwnPropertyDescriptor;
 
+let peeking = false;
+
 const stateHandlers: ProxyHandler< object > = {
 	get( target: object, key: string, receiver: object ): any {
 		const desc = descriptor( target, key );
+		const isPropFromObjectPrototype = ! desc && key in target;
 
 		/*
-		 * This property comes from the Object prototype and should not
-		 * be processed.
+		 * If peeking, or the property comes from the Object prototype, then it
+		 * should not be processed.
 		 */
-		if ( ! desc && key in target ) {
+		if ( peeking || isPropFromObjectPrototype ) {
 			return Reflect.get( target, key, receiver );
 		}
 
@@ -53,6 +56,10 @@ const stateHandlers: ProxyHandler< object > = {
 					? proxifyState( value, prop.namespace )
 					: value
 			);
+		}
+
+		if ( peeking ) {
+			return prop.getComputed().peek();
 		}
 
 		const result = prop.getComputed().value;
@@ -140,16 +147,26 @@ export const proxifyState = < T extends object >(
 	namespace: string
 ): T => getProxy( obj, stateHandlers, namespace ) as T;
 
-export const peek = ( obj: object, key: string ): unknown => {
-	const prop = getPropSignal( obj, key );
-	// TODO: handle values for properties that have not been accessed yet.
-	return prop.getComputed().peek();
+export const peek = < T extends object, K extends keyof T >(
+	obj: T,
+	key: K
+): T[ K ] => {
+	peeking = true;
+	try {
+		return obj[ key ];
+	} finally {
+		peeking = false;
+	}
 };
 
-export const getPropSignal = ( proxy: object, key: string ) => {
+export const getPropSignal = (
+	proxy: object,
+	key: string | number | symbol
+) => {
 	if ( ! proxyToProps.has( proxy ) ) {
 		proxyToProps.set( proxy, new Map() );
 	}
+	key = typeof key === 'number' ? `${ key }` : key;
 	const props = proxyToProps.get( proxy )!;
 	if ( ! props.has( key ) ) {
 		props.set( key, new PropSignal( proxy ) );

@@ -133,7 +133,7 @@ const proxifyContext = ( current: object, inherited: object = {} ): object => {
  * @param proxy  A deepSignal instance.
  * @param source Object with properties to update in `proxy`.
  */
-const updateSignals = ( proxy: object, source: object ) => {
+const updateSignals = ( proxy: any, source: any ) => {
 	for ( const k in source ) {
 		if (
 			isPlainObject( peek( proxy, k ) ) &&
