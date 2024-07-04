@@ -73,17 +73,16 @@ function FontSizeGroup( {
 			</HStack>
 
 			{ !! sizes.length && (
-				<ItemGroup isBordered isSeparated>
+				<ItemGroup isBordered isSeparated size="large">
 					{ sizes.map( ( size ) => (
 						<NavigationButtonAsItem
 							key={ size.slug }
 							path={ `/typography/font-sizes/${ origin }/${ size.slug }` }
 						>
-							<HStack justify="space-between">
+							<HStack direction="row">
 								<FlexItem className="edit-site-font-size__item">
 									{ size.name }
 								</FlexItem>
-								``
 								<FlexItem className="edit-site-font-size__item edit-site-font-size__item-value">
 									{ size.size }
 								</FlexItem>
