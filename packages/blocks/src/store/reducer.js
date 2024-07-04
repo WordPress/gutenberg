@@ -372,7 +372,7 @@ export function collections( state = {}, action ) {
 }
 
 export function blockBindingsSources( state = {}, action ) {
-	if ( action.type === 'REGISTER_BLOCK_BINDINGS_SOURCE' ) {
+	if ( action.type === 'ADD_BLOCK_BINDINGS_SOURCE' ) {
 		return {
 			...state,
 			[ action.sourceName ]: {

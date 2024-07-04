@@ -758,3 +758,102 @@ export const registerBlockVariation = ( blockName, variation ) => {
 export const unregisterBlockVariation = ( blockName, variationName ) => {
 	dispatch( blocksStore ).removeBlockVariations( blockName, variationName );
 };
+
+export const registerBlockBindingsSource = ( source ) => {
+	const {
+		name,
+		label: newLabel,
+		getValue,
+		setValue,
+		setValues,
+		getPlaceholder,
+		canUserEditValue,
+	} = source;
+
+	// Sources could exist because they have been initialized in the server.
+	const existingSource = unlock(
+		select( blocksStore )
+	).getBlockBindingsSource( name );
+
+	// Override the label if provided.
+	const label = newLabel || existingSource?.label;
+
+	// If the getValue callback is already provided, it shouldn't be overriden.
+	// It can't rely on name or label because those could be initialized in the server.
+	if ( existingSource?.getValue ) {
+		console.error(
+			'Block bindings source"' + name + '" is already registered.'
+		);
+		return;
+	}
+
+	// Check the `name` property is correct.
+	if ( typeof name !== 'string' ) {
+		console.error( 'Block bindings source name must be a string.' );
+		return;
+	}
+
+	if ( /[A-Z]+/.test( name ) ) {
+		console.error(
+			'Block bindings source name must not contain uppercase characters.'
+		);
+		return;
+	}
+
+	if ( ! /^[a-z0-9-]+\/[a-z0-9-]+$/.test( name ) ) {
+		console.error(
+			'Block bindings source name must contain a namespace prefix. Example: my-plugin/my-custom-source'
+		);
+		return;
+	}
+
+	// Check the `label` property is correct.
+	if ( typeof label !== 'string' ) {
+		console.error( 'Block bindings source label must be a string.' );
+		return;
+	}
+
+	// Check the `getValue` property is correct.
+	if ( getValue && typeof getValue !== 'function' ) {
+		console.error( 'Block bindings source getValue must be a function.' );
+		return;
+	}
+
+	// Check the `setValue` property is correct.
+	if ( setValue && typeof setValue !== 'function' ) {
+		console.error( 'Block bindings source setValue must be a function.' );
+		return;
+	}
+
+	// Check the `setValues` property is correct.
+	if ( setValues && typeof setValues !== 'function' ) {
+		console.error( 'Block bindings source setValues must be a function.' );
+		return;
+	}
+
+	// Check the `getPlaceholder` property is correct.
+	if ( getPlaceholder && typeof getPlaceholder !== 'function' ) {
+		console.error(
+			'Block bindings source getPlaceholder must be a function.'
+		);
+		return;
+	}
+
+	// Check the `getPlaceholder` property is correct.
+	if ( canUserEditValue && typeof canUserEditValue !== 'function' ) {
+		console.error(
+			'Block bindings source canUserEditValue must be a function.'
+		);
+		return;
+	}
+
+	unlock( dispatch( blocksStore ) ).addBlockBindingsSource( {
+		name,
+		label,
+		getValue,
+		setValue,
+		setValues,
+		getPlaceholder,
+		canUserEditValue,
+	} );
+};
