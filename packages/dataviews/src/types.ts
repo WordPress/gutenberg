@@ -406,7 +406,7 @@ export interface ViewBaseProps< Item > {
 	fields: NormalizedField< Item >[];
 	getItemId: ( item: Item ) => string;
 	isLoading?: boolean;
-	onChangeView( view: View ): void;
+	onChangeView: ( view: View ) => void;
 	onSelectionChange: SetSelection;
 	selection: string[];
 	setOpenedFilter: ( fieldId: string ) => void;
