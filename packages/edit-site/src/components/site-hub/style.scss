@@ -36,20 +36,8 @@
 
 	&:hover,
 	&:focus,
-	&:active,
-	&:focus-visible {
-		color: $gray-100;
-		svg {
-			opacity: 1;
-		}
-	}
-
-	svg {
-		opacity: 0;
-		vertical-align: middle;
-		padding-left: 4px;
-		transition: opacity 0.1s ease-in-out;
-		@include reduce-motion("transition");
+	&:active {
+		color: $gray-200;
 	}
 
 	&:focus {
@@ -67,6 +55,21 @@
 		outline-offset: 2px;
 	}
 
+	&::after {
+		content: "\2197";
+		font-weight: 400;
+		opacity: 0;
+		position: absolute;
+		right: 0;
+		transition: opacity 0.1s linear;
+		@include reduce-motion("transition");
+	}
+
+	&:hover::after,
+	&:focus::after,
+	&:active::after {
+		opacity: 1;
+	}
 }
 
 .edit-site-site-hub_toggle-command-center {
