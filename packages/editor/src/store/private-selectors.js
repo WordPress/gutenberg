@@ -211,7 +211,9 @@ export const getPostMetaChanges = createRegistrySelector(
 			return [];
 		}
 
-		return deepCompare( edits.meta, original.meta );
+		return deepCompare( edits.meta, original.meta ).filter(
+			( item ) => item !== 'footnotes'
+		);
 	}
 );
 
