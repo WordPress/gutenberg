@@ -28,33 +28,44 @@ function render_block_core_image( $attributes, $content, $block ) {
 		return '';
 	}
 
-	if ( isset( $attributes['id'] ) ) {
-		$id = $attributes['id'];
+	$has_id_binding = isset( $attributes['metadata']['bindings']['id'] ) && isset( $attributes['id'] );
 
-		// Use block context to detect whether the block is nested in a gallery.
-		// As the context names are very generic, check multiple array keys to
-		// reduce the chance a non-gallery parent is providing the same context.
-		$is_gallery_child = array_key_exists( 'allowResize', $block->context )
-			&& array_key_exists( 'imageCrop', $block->context )
-			&& array_key_exists( 'fixedHeight', $block->context );
-
-		// Adds the data-id="$id" attribute to the img element to provide backwards
-		// compatibility for the Gallery Block, which now wraps Image Blocks within
-		// innerBlocks. The data-id attribute is added in a core/gallery
-		// `render_block_data` hook.
-		if ( $is_gallery_child ) {
-			$p->set_attribute( 'data-id', $id );
-		}
-
+	// Ensure the `wp-image-id` classname on the image block supports block bindings.
+	if ( $has_id_binding ) {
 		// If there's a mismatch with the 'wp-image-' class and the actual id, the id was
 		// probably overridden by block bindings. Update it to the correct value.
 		// See https://github.com/WordPress/gutenberg/issues/62886 for why this is needed.
+		$id = $attributes['id'];
 		$image_classnames  = $p->get_attribute( 'class' );
-		$expected_id_class = "wp-image-$id";
-		if ( is_string( $image_classnames ) && ! str_contains( $image_classnames, $expected_id_class ) ) {
-			$image_classnames = preg_replace( '/wp-image-(\d+)/', "wp-image-$id", $image_classnames );
+		$class_with_binding_value = "wp-image-$id";
+		if ( is_string( $image_classnames ) && ! str_contains( $image_classnames, $class_with_binding_value ) ) {
+			$image_classnames = preg_replace( '/wp-image-(\d+)/', $class_with_binding_value, $image_classnames );
 			$p->set_attribute( 'class', $image_classnames );
 		}
+	}
+
+	// For backwards compatibility, the data-id html attribute is only
+	// set for image blocks nested in a gallery.
+	// `data-id` is an attribute set by the gallery block using a filter,
+	// so checkings it's set serves this purpose.
+	if ( isset( $attributes['data-id'] ) ) {
+		$data_id;
+
+		if ( $has_id_binding ) {
+			// If there is a binding for the id, use the `id` attribute.
+			// This ensures the `data-id` html attribute contains the correct
+			// block binding value since the `data-id` block attribute does
+			// not support bindings.
+			$data_id = $attributes['id'];
+		} else {
+			// If there are no bindings for the id, for backward compatibility
+			// use the `data-id` attribute added by the gallery block.
+			// This attribute may be filtered by third parties to change what's
+			// stored in the data-id html attribute.
+			$data_id = $attributes['data-id'];
+		}
+
+		$p->set_attribute( 'data-id', $data_id );
 	}
 
 	$link_destination  = isset( $attributes['linkDestination'] ) ? $attributes['linkDestination'] : 'none';
