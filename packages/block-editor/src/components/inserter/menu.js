@@ -90,7 +90,9 @@ function InserterMenu(
 				_rootClientId
 			);
 			onSelect();
-			__experimentalOnSelect( blocks );
+			if ( __experimentalOnSelect ) {
+				__experimentalOnSelect( blocks );
+			}
 
 			// Check for focus loss due to filtering blocks by selected block type
 			window.requestAnimationFrame( () => {
