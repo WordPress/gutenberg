@@ -152,7 +152,10 @@ export default {
 		onChange,
 		layoutBlockSupport,
 	} ) {
-		if ( layoutBlockSupport?.allowSwitching ) {
+		const { allowSwitching, allowJustification = true } =
+			layoutBlockSupport;
+
+		if ( allowSwitching || ! allowJustification ) {
 			return null;
 		}
 		return (
