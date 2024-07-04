@@ -58,7 +58,6 @@
 			"__experimentalFontWeight": true,
 			"__experimentalLetterSpacing": true,
 			"__experimentalTextTransform": true,
-			"__experimentalTextIndent": true,
 			"__experimentalWritingMode": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true
