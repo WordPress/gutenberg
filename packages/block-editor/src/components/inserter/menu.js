@@ -40,6 +40,7 @@ function InserterMenu(
 		clientId,
 		isAppender,
 		__experimentalInsertionIndex,
+		__experimentalOnSelect,
 		onSelect,
 		showInserterHelpPanel,
 		showMostUsedBlocks,
@@ -89,6 +90,7 @@ function InserterMenu(
 				_rootClientId
 			);
 			onSelect();
+			__experimentalOnSelect( blocks );
 
 			// Check for focus loss due to filtering blocks by selected block type
 			window.requestAnimationFrame( () => {
