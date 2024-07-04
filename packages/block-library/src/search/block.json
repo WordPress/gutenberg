@@ -48,6 +48,7 @@
 			"default": false
 		}
 	},
+	"usesContext": [ "enhancedPagination" ],
 	"supports": {
 		"align": [ "left", "center", "right" ],
 		"color": {

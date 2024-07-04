@@ -16,7 +16,7 @@
  *
  * @return string The search block markup.
  */
-function render_block_core_search( $attributes ) {
+function render_block_core_search( $attributes, $content, $block ) {
 	// Older versions of the Search block defaulted the label and buttonText
 	// attributes to `__( 'Search' )` meaning that many posts contain `<!--
 	// wp:search /-->`. Support these by defaulting an undefined label and
@@ -48,6 +48,8 @@ function render_block_core_search( $attributes ) {
 	// This variable is a constant and its value is always false at this moment.
 	// It is defined this way because some values depend on it, in case it changes in the future.
 	$open_by_default = false;
+	// Check if the block is using the enhanced pagination.
+	$enhanced_pagination = isset( $block->context['enhancedPagination'] ) && $block->context['enhancedPagination'];
 
 	$label_inner_html = empty( $attributes['label'] ) ? __( 'Search' ) : wp_kses_post( $attributes['label'] );
 	$label            = new WP_HTML_Tag_Processor( sprintf( '<label %1$s>%2$s</label>', $inline_styles['label'], $label_inner_html ) );
@@ -79,7 +81,8 @@ function render_block_core_search( $attributes ) {
 
 		// If it's interactive, enqueue the script module and add the directives.
 		$is_expandable_searchfield = 'button-only' === $button_position;
-		if ( $is_expandable_searchfield ) {
+
+		if ( $is_expandable_searchfield || $enhanced_pagination ) {
 			$suffix = wp_scripts_get_suffix();
 			if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 				$module_url = gutenberg_url( '/build/interactivity/search.min.js' );
@@ -93,13 +96,19 @@ function render_block_core_search( $attributes ) {
 			);
 			wp_enqueue_script_module( '@wordpress/block-library/search' );
 
+		}
+		if ( $is_expandable_searchfield ) {
 			$input->set_attribute( 'data-wp-bind--aria-hidden', '!context.isSearchInputVisible' );
 			$input->set_attribute( 'data-wp-bind--tabindex', 'state.tabindex' );
-
 			// Adding these attributes manually is needed until the Interactivity API
 			// SSR logic is added to core.
 			$input->set_attribute( 'aria-hidden', 'true' );
 			$input->set_attribute( 'tabindex', '-1' );
+		}
+		// Instant search is only available when using the enhanced pagination.
+		if ( $enhanced_pagination ) {
+			$input->set_attribute( 'data-wp-bind--value', 'state.search' );
+			$input->set_attribute( 'data-wp-on--input', 'actions.updateSearch' );
 		}
 	}
 
@@ -176,6 +185,14 @@ function render_block_core_search( $attributes ) {
 	$form_directives      = '';
 
 	// If it's interactive, add the directives.
+	if ( $is_expandable_searchfield || $enhanced_pagination ) {
+		$form_directives = 'data-wp-interactive="core/search"';
+	}
+
+	if ( $enhanced_pagination ) {
+		// TODO: add wp_interactivity_state()
+	}
+
 	if ( $is_expandable_searchfield ) {
 		$aria_label_expanded  = __( 'Submit Search' );
 		$aria_label_collapsed = __( 'Expand search field' );
@@ -187,9 +204,7 @@ function render_block_core_search( $attributes ) {
 				'ariaLabelCollapsed'   => $aria_label_collapsed,
 			)
 		);
-		$form_directives      = '
-		 data-wp-interactive="core/search"'
-		. $form_context .
+		$form_directives     .= $form_context .
 		'data-wp-class--wp-block-search__searchfield-hidden="!context.isSearchInputVisible"
 		 data-wp-on-async--keydown="actions.handleSearchKeydown"
 		 data-wp-on-async--focusout="actions.handleSearchFocusout"
