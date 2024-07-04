@@ -34,6 +34,7 @@ import {
 import { TIMEZONELESS_FORMAT } from '../constants';
 import { TimeInput } from '../time-input';
 
+const DEFAULT_DATE_ORDER = 'dmy';
 const VALID_DATE_ORDERS = [ 'dmy', 'mdy', 'ymd' ];
 
 /**
@@ -60,7 +61,7 @@ export function TimePicker( {
 	is12Hour,
 	currentTime,
 	onChange,
-	dateOrder = 'dmy',
+	dateOrder = DEFAULT_DATE_ORDER,
 }: TimePickerProps ) {
 	const [ date, setDate ] = useState( () =>
 		// Truncate the date at the minutes, see: #15495.
@@ -192,20 +193,20 @@ export function TimePicker( {
 
 	const isValidDateOrder = VALID_DATE_ORDERS.includes( dateOrder );
 
-	const fields = isValidDateOrder
-		? dateOrder.split( '' ).map( ( field ) => {
-				switch ( field ) {
-					case 'd':
-						return dayField;
-					case 'm':
-						return monthField;
-					case 'y':
-						return yearField;
-					default:
-						return null;
-				}
-		  } )
-		: [ dayField, monthField, yearField ];
+	const fields = ( isValidDateOrder ? dateOrder : DEFAULT_DATE_ORDER )
+		.split( '' )
+		.map( ( field ) => {
+			switch ( field ) {
+				case 'd':
+					return dayField;
+				case 'm':
+					return monthField;
+				case 'y':
+					return yearField;
+				default:
+					return null;
+			}
+		} );
 
 	return (
 		<Wrapper
