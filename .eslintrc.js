@@ -421,6 +421,26 @@ module.exports = {
 			extends: [ 'plugin:ssr-friendly/recommended' ],
 		},
 		{
+			files: [ 'packages/components/src/**' ],
+			rules: {
+				'no-restricted-imports': [
+					'error',
+					// The `ariakit` and `framer-motion` APIs are meant to be consumed via
+					// the `@wordpress/components` package, hence why importing those
+					// dependencies should be allowed in the components package.
+					{
+						paths: restrictedImports.filter(
+							( { name } ) =>
+								! [
+									'@ariakit/react',
+									'framer-motion',
+								].includes( name )
+						),
+					},
+				],
+			},
+		},
+		{
 			files: [ 'packages/block-editor/**' ],
 			rules: {
 				'no-restricted-imports': [
