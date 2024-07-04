@@ -61,7 +61,9 @@ export class PostPublishButton extends Component {
 			// TODO: Explore how to manage `getPostMetaChanges` and pre-publish workflow properly.
 			if (
 				( hasNonPostEntityChanges ||
-					( postMetaChanges.length > 0 && isPublished ) ) &&
+					( postMetaChanges &&
+						postMetaChanges.length > 0 &&
+						isPublished ) ) &&
 				setEntitiesSavedStatesCallback
 			) {
 				// The modal for multiple entity saving will open,
