@@ -41,7 +41,7 @@ export type ToolbarButtonDeprecatedProps = {
 	/**
 	 * Whether to keep the button focusable when disabled.
 	 *
-	 * @deprecated ToolbarButton will always be focusable.
+	 * @deprecated ToolbarButton will always be focusable even when disabled.
 	 * @ignore
 	 */
 	__experimentalIsFocusable?: boolean;
