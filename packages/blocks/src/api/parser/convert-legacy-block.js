@@ -77,6 +77,35 @@ export function convertLegacyBlockNameAndAttributes( name, attributes ) {
 		newAttributes.legacy = true;
 	}
 
+	// Grid layout attributes were stored as strings in WP 6.6. Convert them to numbers.
+	if (
+		attributes.layout?.type === 'grid' &&
+		typeof attributes.layout?.columnCount === 'string'
+	) {
+		newAttributes.layout = {
+			...newAttributes.layout,
+			columnCount: parseInt( attributes.layout.columnCount, 10 ),
+		};
+	}
+	if ( typeof attributes.style?.layout?.columnSpan === 'string' ) {
+		newAttributes.style = {
+			...newAttributes.style,
+			layout: {
+				...newAttributes.style.layout,
+				columnSpan: parseInt( attributes.style.layout.columnSpan, 10 ),
+			},
+		};
+	}
+	if ( typeof attributes.style?.layout?.rowSpan === 'string' ) {
+		newAttributes.style = {
+			...newAttributes.style,
+			layout: {
+				...newAttributes.style.layout,
+				columnSpan: parseInt( attributes.style.layout.rowSpan, 10 ),
+			},
+		};
+	}
+
 	// The following code is only relevant for the Gutenberg plugin.
 	// It's a stand-alone if statement for dead-code elimination.
 	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
