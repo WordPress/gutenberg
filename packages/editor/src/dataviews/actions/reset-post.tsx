@@ -116,7 +116,7 @@ const resetPost: Action< Post > = {
 						variant="tertiary"
 						onClick={ closeModal }
 						disabled={ isBusy }
-						__experimentalIsFocusable
+						accessibleWhenDisabled
 					>
 						{ __( 'Cancel' ) }
 					</Button>
@@ -131,7 +131,7 @@ const resetPost: Action< Post > = {
 						} }
 						isBusy={ isBusy }
 						disabled={ isBusy }
-						__experimentalIsFocusable
+						accessibleWhenDisabled
 					>
 						{ __( 'Reset' ) }
 					</Button>
