@@ -47,7 +47,7 @@ export default function Pagination( {
 				<Button
 					variant={ buttonVariant }
 					onClick={ () => changePage( 1 ) }
-					__experimentalIsFocusable
+					accessibleWhenDisabled
 					disabled={ disabled || currentPage === 1 }
 					label={ __( 'First page' ) }
 					icon={ previous }
@@ -56,7 +56,7 @@ export default function Pagination( {
 				<Button
 					variant={ buttonVariant }
 					onClick={ () => changePage( currentPage - 1 ) }
-					__experimentalIsFocusable
+					accessibleWhenDisabled
 					disabled={ disabled || currentPage === 1 }
 					label={ __( 'Previous page' ) }
 					icon={ chevronLeft }
@@ -75,7 +75,7 @@ export default function Pagination( {
 				<Button
 					variant={ buttonVariant }
 					onClick={ () => changePage( currentPage + 1 ) }
-					__experimentalIsFocusable
+					accessibleWhenDisabled
 					disabled={ disabled || currentPage === numPages }
 					label={ __( 'Next page' ) }
 					icon={ chevronRight }
@@ -84,7 +84,7 @@ export default function Pagination( {
 				<Button
 					variant={ buttonVariant }
 					onClick={ () => changePage( numPages ) }
-					__experimentalIsFocusable
+					accessibleWhenDisabled
 					disabled={ disabled || currentPage === numPages }
 					label={ __( 'Last page' ) }
 					icon={ next }

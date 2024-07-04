@@ -329,7 +329,7 @@ function InstalledFonts() {
 								saveFontFamilies( fontFamilies );
 							} }
 							disabled={ ! fontFamiliesHasChanges }
-							__experimentalIsFocusable
+							accessibleWhenDisabled
 						>
 							{ __( 'Update' ) }
 						</Button>

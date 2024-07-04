@@ -621,6 +621,7 @@ describe( 'Button', () => {
 		} );
 
 		it( 'should not break when the legacy __experimentalIsFocusable prop is passed', () => {
+			// eslint-disable-next-line no-restricted-syntax
 			render( <Button disabled __experimentalIsFocusable /> );
 			const button = screen.getByRole( 'button' );
 
