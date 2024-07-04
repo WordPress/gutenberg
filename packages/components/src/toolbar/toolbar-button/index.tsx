@@ -74,7 +74,7 @@ function UnforwardedToolbarButton(
 						className
 					) }
 					isPressed={ isActive }
-					__experimentalIsFocusable
+					accessibleWhenDisabled
 					data-toolbar-item
 					{ ...extraProps }
 					{ ...restProps }

@@ -258,7 +258,7 @@ function ListItem< Item >( {
 												size="compact"
 												icon={ moreVertical }
 												label={ __( 'Actions' ) }
-												__experimentalIsFocusable
+												accessibleWhenDisabled
 												disabled={ ! actions.length }
 												onKeyDown={ ( event: {
 													key: string;

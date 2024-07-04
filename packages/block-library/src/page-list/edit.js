@@ -338,7 +338,7 @@ export default function PageListEdit( {
 						<p>{ convertDescription }</p>
 						<Button
 							variant="primary"
-							__experimentalIsFocusable
+							accessibleWhenDisabled
 							disabled={ ! hasResolvedPages }
 							onClick={ convertToNavigationLinks }
 						>
