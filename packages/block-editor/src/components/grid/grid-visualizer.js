@@ -155,6 +155,16 @@ const GridVisualizerGrid = forwardRef(
 														style={ {
 															color: gridInfo.currentColor,
 														} }
+														blockAttributes={ {
+															style: {
+																layout: {
+																	columnStart:
+																		column,
+																	rowStart:
+																		row,
+																},
+															},
+														} }
 													/>
 												) }
 											</GridVisualizerCell>

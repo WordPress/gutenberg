@@ -150,6 +150,8 @@ class PrivateInserter extends Component {
 			prioritizePatterns,
 			onSelectOrClose,
 			selectBlockOnInsert,
+			blockAttributes,
+			updateBlockAttributes,
 		} = this.props;
 
 		if ( isQuick ) {
@@ -167,6 +169,12 @@ class PrivateInserter extends Component {
 							onSelectOrClose( firstBlock );
 						}
 						onClose();
+						if ( blockAttributes ) {
+							updateBlockAttributes(
+								firstBlock.clientId,
+								blockAttributes
+							);
+						}
 					} }
 					rootClientId={ rootClientId }
 					clientId={ clientId }
@@ -269,7 +277,9 @@ export const ComposedPrivateInserter = compose( [
 		}
 	),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
+		const { updateBlockAttributes } = dispatch( blockEditorStore );
 		return {
+			updateBlockAttributes,
 			insertOnlyAllowedBlock() {
 				const {
 					rootClientId,
