@@ -17,6 +17,7 @@ export interface TemplateOrTemplatePart extends BasePost {
 	type: 'wp_template' | 'wp_template_part';
 	source: string;
 	has_theme_file: boolean;
+	id: string;
 }
 
 export type Post = TemplateOrTemplatePart | BasePost;
