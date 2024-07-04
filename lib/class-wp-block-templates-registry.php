@@ -51,10 +51,10 @@ if ( ! class_exists( 'WP_Block_Templates_Registry' ) ) {
 			if ( ! is_string( $template_name ) ) {
 				_doing_it_wrong(
 					__METHOD__,
-					__( 'Block template names must be strings.', 'gutenberg' ),
+					__( 'Block template names must be a string.', 'gutenberg' ),
 					'6.7.0'
 				);
-				return false;
+				return new WP_Error( 'template_name_no_string', __( 'Block template names must be a string.' ) );
 			}
 
 			if ( preg_match( '/[A-Z]+/', $template_name ) ) {
@@ -63,7 +63,7 @@ if ( ! class_exists( 'WP_Block_Templates_Registry' ) ) {
 					__( 'Block template names must not contain uppercase characters.', 'gutenberg' ),
 					'6.7.0'
 				);
-				return false;
+				return new WP_Error( 'template_name_no_uppercase', __( 'Block template names must not contain uppercase characters.' ) );
 			}
 
 			$name_matcher = '/^[a-z0-9-]+\/\/[a-z0-9-]+$/';
@@ -73,7 +73,7 @@ if ( ! class_exists( 'WP_Block_Templates_Registry' ) ) {
 					__( 'Block template names must contain a namespace prefix. Example: my-plugin//my-custom-template', 'gutenberg' ),
 					'6.7.0'
 				);
-				return false;
+				return new WP_Error( 'template_no_prefix', __( 'Block template names must contain a namespace prefix. Example: my-plugin//my-custom-template' ) );
 			}
 
 			if ( $this->is_registered( $template_name ) ) {
@@ -83,7 +83,7 @@ if ( ! class_exists( 'WP_Block_Templates_Registry' ) ) {
 					sprintf( __( 'Template "%s" is already registered.', 'gutenberg' ), $template_name ),
 					'6.7.0'
 				);
-				return false;
+				return new WP_Error( 'template_already_registered', __( 'Template "%s" is already registered.' ) );
 			}
 
 			if ( ! $template ) {
@@ -229,11 +229,11 @@ if ( ! class_exists( 'WP_Block_Templates_Registry' ) ) {
 			if ( ! $this->is_registered( $template_name ) ) {
 				_doing_it_wrong(
 					__METHOD__,
-					/* translators: %s: Block name. */
-					sprintf( __( 'Block template "%s" is not registered.', 'gutenberg' ), $template_name ),
+					/* translators: %s: template name. */
+					sprintf( __( 'Template "%s" is not registered.', 'gutenberg' ), $template_name ),
 					'6.7.0'
 				);
-				return false;
+				return new WP_Error( 'template_not_registered', __( 'Template "%s" is not registered.' ) );
 			}
 
 			$unregistered_block_template = $this->registered_block_templates[ $template_name ];
