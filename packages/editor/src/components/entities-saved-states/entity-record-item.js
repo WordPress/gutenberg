@@ -17,7 +17,7 @@ export default function EntityRecordItem( { record, checked, onChange } ) {
 	const { name, kind, title, key } = record;
 
 	// Handle templates that might use default descriptive titles.
-	const selectResults = useSelect(
+	const { entityRecordTitle, postMetaChanges } = useSelect(
 		( select ) => {
 			const _postMetaChanges = unlock(
 				select( editorStore )
@@ -45,8 +45,6 @@ export default function EntityRecordItem( { record, checked, onChange } ) {
 		},
 		[ name, kind, title, key ]
 	);
-
-	const { entityRecordTitle, postMetaChanges } = selectResults;
 
 	return (
 		<>
