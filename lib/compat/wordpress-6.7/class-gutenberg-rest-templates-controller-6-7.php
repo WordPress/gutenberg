@@ -139,7 +139,6 @@ class Gutenberg_REST_Templates_Controller_6_7 extends Gutenberg_REST_Templates_C
 	 * @param WP_Block_Template $template_object Template instance.
 	 * @return string                            Human readable text for the author.
 	 */
-	// @core-merge: Nothing has changed in this function, the only reason to include it here is that it's a private function.
 	private static function get_wp_templates_author_text_field( $template_object ) {
 		$original_source = self::get_wp_templates_original_source_field( $template_object );
 		switch ( $original_source ) {
@@ -147,22 +146,35 @@ class Gutenberg_REST_Templates_Controller_6_7 extends Gutenberg_REST_Templates_C
 				$theme_name = wp_get_theme( $template_object->theme )->get( 'Name' );
 				return empty( $theme_name ) ? $template_object->theme : $theme_name;
 			case 'plugin':
-				$plugins = wp_get_active_and_valid_plugins();
 				// @core-merge: Prioritize plugin name instead of theme name for plugin-registered templates.
-				$plugin_name = isset( $template_object->plugin ) ? $template_object->plugin . '/' . $template_object->plugin : $template_object->theme;
-				$plugin_path = plugin_basename( sanitize_text_field( $plugin_name . '.php' ) );
+				if ( isset( $template_object->plugin ) ) {
+					$plugins     = wp_get_active_and_valid_plugins();
 
-				$plugin = null;
-				foreach ( $plugins as $plugin_file ) {
-					if ( plugin_basename( $plugin_file ) === $plugin_path ) {
-						$plugin_data = get_plugin_data( $plugin_file );
-						$plugin = $plugin_data;
-						break;
+					foreach ( $plugins as $plugin_file ) {
+						$plugin_basename = plugin_basename( $plugin_file );
+						// Split basename by '/' to get the plugin slug.
+						list( $plugin_slug, ) = explode( '/', $plugin_basename );
+
+						if ( $plugin_slug === $template_object->plugin ) {
+							$plugin_data = get_plugin_data( $plugin_file );
+
+							if ( ! empty( $plugin_data['Name'] ) ) {
+								return $plugin_data['Name'];
+							}
+
+							break;
+						}
 					}
 				}
-
-				return empty( $plugin['Name'] ) ? $template_object->theme : $plugin['Name'];
 				// @core-merge: End of changes to merge in core.
+
+				/*
+				 * Fallback to the theme name if the plugin is not defined. That's needed to keep backwards
+				 * compatibility with templates that were registered before the plugin attribute was added.
+				 */
+				$plugins = get_plugins();
+				$plugin  = $plugins[ plugin_basename( sanitize_text_field( $template_object->theme . '.php' ) ) ];
+				return empty( $plugin['Name'] ) ? $template_object->theme : $plugin['Name'];
 			case 'site':
 				return get_bloginfo( 'name' );
 			case 'user':
