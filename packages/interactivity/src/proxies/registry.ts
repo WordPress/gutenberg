@@ -9,6 +9,9 @@ export const getProxy = < T extends object >(
 	handlers?: ProxyHandler< T >,
 	namespace?: string
 ): T => {
+	if ( ! shouldProxy( obj ) ) {
+		throw Error( 'This object can be proxified.' );
+	}
 	if ( ! objToProxy.has( obj ) && handlers && namespace ) {
 		const proxy = new Proxy( obj, handlers );
 		ignore.add( proxy );
