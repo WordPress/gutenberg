@@ -339,3 +339,22 @@ export const getLayoutSupport = ( nameOrType ) =>
  */
 export const hasStyleSupport = ( nameOrType ) =>
 	styleSupportKeys.some( ( key ) => hasBlockSupport( nameOrType, key ) );
+
+/**
+ * Returns true if the block defines support for block class name.
+ *
+ * @param {string|Object} nameOrType Block name or type object.
+ * @return {boolean} Whether the block supports the feature.
+ */
+export const hasBlockClassNameSupport = ( nameOrType ) =>
+	getBlockSupport( nameOrType, 'className', true ) === true ||
+	hasBlockSupport( nameOrType, 'className.block', false );
+
+/**
+ * Returns true if the block defines support for variation class name.
+ *
+ * @param {string|Object} nameOrType Block name or type object.
+ * @return {boolean} Whether the block supports the feature.
+ */
+export const hasVariationClassNameSupport = ( nameOrType ) =>
+	hasBlockSupport( nameOrType, 'className.variation', false );
