@@ -31,9 +31,6 @@ function ElementItem( { parentMenu, element, label } ) {
 	const [ fontFamily ] = useGlobalStyle( prefix + 'typography.fontFamily' );
 	const [ fontStyle ] = useGlobalStyle( prefix + 'typography.fontStyle' );
 	const [ fontWeight ] = useGlobalStyle( prefix + 'typography.fontWeight' );
-	const [ letterSpacing ] = useGlobalStyle(
-		prefix + 'typography.letterSpacing'
-	);
 	const [ backgroundColor ] = useGlobalStyle( prefix + 'color.background' );
 	const [ fallbackBackgroundColor ] = useGlobalStyle( 'color.background' );
 	const [ gradientValue ] = useGlobalStyle( prefix + 'color.gradient' );
@@ -62,7 +59,6 @@ function ElementItem( { parentMenu, element, label } ) {
 						color,
 						fontStyle,
 						fontWeight,
-						letterSpacing,
 						...extraStyles,
 					} }
 				>
