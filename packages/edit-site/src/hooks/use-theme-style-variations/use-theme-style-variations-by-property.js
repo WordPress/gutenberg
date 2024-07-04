@@ -88,6 +88,8 @@ export function useCurrentMergeThemeStyleVariationsWithUserConfig(
 	}, [] );
 	const { user: userVariation } = useContext( GlobalStylesContext );
 
+	const propertiesAsString = properties.toString();
+
 	return useMemo( () => {
 		const clonedUserVariation = cloneDeep( userVariation );
 
@@ -120,7 +122,7 @@ export function useCurrentMergeThemeStyleVariationsWithUserConfig(
 		return variationsByProperties?.length
 			? variationsByProperties.filter( hasThemeVariation )
 			: [];
-	}, [ properties.toString(), userVariation, variationsFromTheme ] );
+	}, [ propertiesAsString, userVariation, variationsFromTheme ] );
 }
 
 /**
