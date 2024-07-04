@@ -50,6 +50,7 @@ function ToolbarItem(
 
 	return (
 		<Ariakit.ToolbarItem
+			accessibleWhenDisabled
 			{ ...allProps }
 			store={ accessibleToolbarStore }
 			render={ render }
