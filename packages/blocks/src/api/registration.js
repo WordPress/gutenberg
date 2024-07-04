@@ -759,6 +759,36 @@ export const unregisterBlockVariation = ( blockName, variationName ) => {
 	dispatch( blocksStore ).removeBlockVariations( blockName, variationName );
 };
 
+/**
+ * Registers a new block bindings source with an object defining its
+ * behavior. Once registered, the source is available to be connected
+ * to the supported block attributes.
+ *
+ * @param {Object}   source                    Properties of the source to be registered.
+ * @param {string}   source.name               The unique and machine-readable name.
+ * @param {string}   source.label              Human-readable label.
+ * @param {Function} [source.getValue]         Function to get the value of the source.
+ * @param {Function} [source.setValue]         Function to update the value of the source.
+ * @param {Function} [source.setValues]        Function to update multiple values connected to the source.
+ * @param {Function} [source.getPlaceholder]   Function to get the placeholder when the value is undefined.
+ * @param {Function} [source.canUserEditValue] Function to determine if the user can edit the value.
+ *
+ * @example
+ * ```js
+ * import { _x } from '@wordpress/i18n';
+ * import { registerBlockBindingsSource } from '@wordpress/blocks'
+ *
+ * registerBlockBindingsSource( {
+ *     name: 'plugin/my-custom-source',
+ *     label: _x( 'My Custom Source', 'block bindings source' ),
+ *     getValue: () => 'Value to place in the block attribute',
+ *     setValue: () => updateMyCustomValue(),
+ *     setValues: () => updateMyCustomValuesInBatch(),
+ *     getPlaceholder: () => 'Placeholder text when the value is undefined',
+ *     canUserEditValue: () => true,
+ * } );
+ * ```
+ */
 export const registerBlockBindingsSource = ( source ) => {
 	const {
 		name,
