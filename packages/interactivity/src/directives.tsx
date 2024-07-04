@@ -271,7 +271,7 @@ export default () => {
 
 			const ns = defaultEntry!.namespace;
 			const currentValue = useRef( {
-				[ ns ]: proxifyState( {}, ns ),
+				[ ns ]: proxifyState( ns, {} ),
 			} );
 
 			// No change should be made if `defaultEntry` does not exist.
@@ -683,7 +683,7 @@ export default () => {
 				const itemProp =
 					suffix === 'default' ? 'item' : kebabToCamelCase( suffix );
 				const itemContext = {
-					[ namespace ]: proxifyState( {}, namespace ),
+					[ namespace ]: proxifyState( namespace, {} ),
 				};
 				const mergedContext = proxifyContext(
 					itemContext,

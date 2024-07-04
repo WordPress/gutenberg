@@ -6,7 +6,7 @@ import { signal, type Signal } from '@preact/signals';
 /**
  * Internal dependencies
  */
-import { getProxy, shouldProxy } from './registry';
+import { createProxy, getProxy, shouldProxy } from './registry';
 import { PropSignal } from './signals';
 import { setNamespace, resetNamespace } from '../hooks';
 
@@ -78,7 +78,7 @@ const stateHandlers: ProxyHandler< object > = {
 			const value = Reflect.get( target, key, receiver );
 			prop.setValue(
 				shouldProxy( value )
-					? proxifyState( value, prop.namespace )
+					? proxifyState( prop.namespace, value )
 					: value
 			);
 		}
@@ -124,7 +124,7 @@ const stateHandlers: ProxyHandler< object > = {
 			} else {
 				prop.setValue(
 					shouldProxy( value )
-						? proxifyState( value, prop.namespace )
+						? proxifyState( prop.namespace, value )
 						: value
 				);
 			}
@@ -168,9 +168,9 @@ const stateHandlers: ProxyHandler< object > = {
 };
 
 export const proxifyState = < T extends object >(
-	obj: T,
-	namespace: string
-): T => getProxy( obj, stateHandlers, namespace ) as T;
+	namespace: string,
+	obj: T
+): T => createProxy( namespace, obj, stateHandlers ) as T;
 
 export const peek = < T extends object, K extends keyof T >(
 	obj: T,

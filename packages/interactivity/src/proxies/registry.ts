@@ -4,10 +4,10 @@ const ignore = new WeakSet< object >();
 
 const supported = new Set( [ Object, Array ] );
 
-export const getProxy = < T extends object >(
+export const createProxy = < T extends object >(
+	namespace: string,
 	obj: T,
-	handlers?: ProxyHandler< T >,
-	namespace?: string
+	handlers: ProxyHandler< T >
 ): T => {
 	if ( ! shouldProxy( obj ) ) {
 		throw Error( 'This object can be proxified.' );
@@ -20,6 +20,9 @@ export const getProxy = < T extends object >(
 	}
 	return objToProxy.get( obj ) as T;
 };
+
+export const getProxy = < T extends object >( obj: T ): T =>
+	objToProxy.get( obj ) as T;
 
 export const getProxyNs = ( proxy: object ): string => proxyToNs.get( proxy )!;
 

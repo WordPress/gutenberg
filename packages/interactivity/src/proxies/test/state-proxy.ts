@@ -35,14 +35,11 @@ const withScopeAndNs = ( scope, ns, callback ) => () => {
 	}
 };
 
-const proxifyStateTest = < T extends object >( obj: T ) =>
-	proxifyState( obj, 'test' ) as T;
-
 describe( 'interactivity api - state proxy', () => {
 	let nested = { b: 2 };
 	let array = [ 3, nested ];
 	let raw: State = { a: 1, nested, array };
-	let state = proxifyStateTest( raw );
+	let state = proxifyState( 'test', raw );
 
 	const window = globalThis as any;
 
@@ -50,7 +47,7 @@ describe( 'interactivity api - state proxy', () => {
 		nested = { b: 2 };
 		array = [ 3, nested ];
 		raw = { a: 1, nested, array };
-		state = proxifyStateTest( raw );
+		state = proxifyState( 'test', raw );
 	} );
 
 	describe( 'get - plain', () => {
@@ -71,7 +68,7 @@ describe( 'interactivity api - state proxy', () => {
 		} );
 
 		it( 'should support reading from getters', () => {
-			const state = proxifyStateTest( {
+			const state = proxifyState( 'test', {
 				counter: 1,
 				get double() {
 					return state.counter * 2;
@@ -83,7 +80,7 @@ describe( 'interactivity api - state proxy', () => {
 		} );
 
 		it( 'should support getters returning other parts of the state', () => {
-			const state = proxifyStateTest( {
+			const state = proxifyState( 'test', {
 				switch: 'a',
 				a: { data: 'a' },
 				b: { data: 'b' },
@@ -97,7 +94,7 @@ describe( 'interactivity api - state proxy', () => {
 		} );
 
 		it( 'should support getters using ownKeys traps', () => {
-			const state = proxifyStateTest( {
+			const state = proxifyState( 'test', {
 				x: {
 					a: 1,
 					b: 2,
@@ -111,7 +108,7 @@ describe( 'interactivity api - state proxy', () => {
 		} );
 
 		it( 'should support getters accessing the scope', () => {
-			const state = proxifyStateTest( {
+			const state = proxifyState( 'test', {
 				get y() {
 					const ctx = getContext< { value: string } >();
 					return ctx.value;
@@ -130,7 +127,7 @@ describe( 'interactivity api - state proxy', () => {
 		} );
 
 		it( 'should work with normal functions', () => {
-			const state = proxifyStateTest( {
+			const state = proxifyState( 'test', {
 				value: 1,
 				isBigger: ( newValue: number ): boolean =>
 					state.value < newValue,
@@ -149,7 +146,7 @@ describe( 'interactivity api - state proxy', () => {
 		} );
 
 		it( 'should work with normal functions accessing the scope', () => {
-			const state = proxifyStateTest( {
+			const state = proxifyState( 'test', {
 				sumContextValue( newValue: number ): number {
 					const ctx = getContext< { value: number } >();
 					return ctx.value + newValue;
@@ -168,7 +165,7 @@ describe( 'interactivity api - state proxy', () => {
 		} );
 
 		it( 'should allow using `this` inside functions', () => {
-			const state = proxifyStateTest( {
+			const state = proxifyState( 'test', {
 				value: 1,
 				sum( newValue: number ): number {
 					return this.value + newValue;
@@ -189,7 +186,7 @@ describe( 'interactivity api - state proxy', () => {
 		} );
 
 		it( 'should support setting values with setters', () => {
-			const state = proxifyStateTest( {
+			const state = proxifyState( 'test', {
 				counter: 1,
 				get double() {
 					return state.counter * 2;
@@ -218,10 +215,10 @@ describe( 'interactivity api - state proxy', () => {
 		} );
 
 		it( 'should support setting getters on the fly', () => {
-			const state = proxifyStateTest< {
+			const state = proxifyState< {
 				counter: number;
 				double?: number;
-			} >( {
+			} >( 'test', {
 				counter: 1,
 			} );
 			Object.defineProperty( state, 'double', {
@@ -235,10 +232,10 @@ describe( 'interactivity api - state proxy', () => {
 		} );
 
 		it( 'should copy object like plain JavaScript', () => {
-			const state = proxifyStateTest< {
+			const state = proxifyState< {
 				a?: { id: number; nested: { id: number } };
 				b: { id: number; nested: { id: number } };
-			} >( {
+			} >( 'test', {
 				b: { id: 1, nested: { id: 1 } },
 			} );
 
@@ -290,8 +287,8 @@ describe( 'interactivity api - state proxy', () => {
 		it( 'should keep object references across namespaces', () => {
 			const raw1 = { obj: {} };
 			const raw2 = { obj: {} };
-			const state1 = proxifyState( raw1, 'test-1' );
-			const state2 = proxifyState( raw2, 'test-2' );
+			const state1 = proxifyState( 'test-1', raw1 );
+			const state2 = proxifyState( 'test-2', raw2 );
 			state2.obj = state1.obj;
 			expect( state2.obj ).toBe( state1.obj );
 			expect( raw2.obj ).toBe( state1.obj );
@@ -300,7 +297,7 @@ describe( 'interactivity api - state proxy', () => {
 
 	describe( 'computations', () => {
 		it( 'should subscribe to values mutated with setters', () => {
-			const state = proxifyStateTest( {
+			const state = proxifyState( 'test', {
 				counter: 1,
 				get double() {
 					return state.counter * 2;
@@ -325,7 +322,7 @@ describe( 'interactivity api - state proxy', () => {
 		} );
 
 		it( 'should subscribe to changes when an item is removed from the array', () => {
-			const state = proxifyStateTest( [ 0, 0, 0 ] );
+			const state = proxifyState( 'test', [ 0, 0, 0 ] );
 			let sum = 0;
 
 			effect( () => {
@@ -340,7 +337,7 @@ describe( 'interactivity api - state proxy', () => {
 
 		it( 'should subscribe to changes to for..in loops', () => {
 			const raw: Record< string, number > = { a: 0, b: 0 };
-			const state = proxifyStateTest( raw );
+			const state = proxifyState( 'test', raw );
 			let sum = 0;
 
 			effect( () => {
@@ -364,7 +361,7 @@ describe( 'interactivity api - state proxy', () => {
 
 		it( 'should subscribe to changes for Object.getOwnPropertyNames()', () => {
 			const raw: Record< string, number > = { a: 1, b: 2 };
-			const state = proxifyStateTest( raw );
+			const state = proxifyState( 'test', raw );
 			let sum = 0;
 
 			effect( () => {
@@ -386,7 +383,7 @@ describe( 'interactivity api - state proxy', () => {
 
 		it( 'should subscribe to changes to Object.keys/values/entries()', () => {
 			const raw: Record< string, number > = { a: 1, b: 2 };
-			const state = proxifyStateTest( raw );
+			const state = proxifyState( 'test', raw );
 			let keys = 0;
 			let values = 0;
 			let entries = 0;
@@ -422,7 +419,7 @@ describe( 'interactivity api - state proxy', () => {
 		} );
 
 		it( 'should subscribe to changes to for..of loops', () => {
-			const state = proxifyStateTest( [ 0, 0 ] );
+			const state = proxifyState( 'test', [ 0, 0 ] );
 			let sum = 0;
 
 			effect( () => {
@@ -442,7 +439,7 @@ describe( 'interactivity api - state proxy', () => {
 		} );
 
 		it( 'should subscribe to implicit changes in length', () => {
-			const state = proxifyStateTest( [ 'foo', 'bar' ] );
+			const state = proxifyState( 'test', [ 'foo', 'bar' ] );
 			let x = '';
 
 			effect( () => {
@@ -481,10 +478,10 @@ describe( 'interactivity api - state proxy', () => {
 		it( 'should subscribe to changes when mutating objects', () => {
 			let x, y;
 
-			const state = proxifyStateTest< {
+			const state = proxifyState< {
 				a?: { id: number; nested: { id: number } };
 				b: { id: number; nested: { id: number } }[];
-			} >( {
+			} >( 'test', {
 				b: [
 					{ id: 1, nested: { id: 1 } },
 					{ id: 2, nested: { id: 2 } },
@@ -532,7 +529,7 @@ describe( 'interactivity api - state proxy', () => {
 
 		it( 'should subscribe corretcly from getters', () => {
 			let x;
-			const state = proxifyStateTest( {
+			const state = proxifyState( 'test', {
 				counter: 1,
 				get double() {
 					return state.counter * 2;
@@ -546,7 +543,7 @@ describe( 'interactivity api - state proxy', () => {
 
 		it( 'should subscribe corretcly from getters returning other parts of the state', () => {
 			let data;
-			const state = proxifyStateTest( {
+			const state = proxifyState( 'test', {
 				switch: 'a',
 				a: { data: 'a' },
 				b: { data: 'b' },
@@ -658,7 +655,7 @@ describe( 'interactivity api - state proxy', () => {
 
 		it( 'should subscribe to array length', () => {
 			const array = [ 1 ];
-			const state = proxifyStateTest( { array } );
+			const state = proxifyState( 'test', { array } );
 			const spy1 = jest.fn( () => state.array.length );
 			const spy2 = jest.fn( () => state.array.map( ( i: number ) => i ) );
 
@@ -708,7 +705,7 @@ describe( 'interactivity api - state proxy', () => {
 		} );
 
 		it( 'should keep subscribed to properties that become getters', () => {
-			const state = proxifyStateTest( {
+			const state = proxifyState( 'test', {
 				number: 1,
 			} );
 
@@ -729,7 +726,7 @@ describe( 'interactivity api - state proxy', () => {
 		} );
 
 		it( 'should react to changes in props inside getters', () => {
-			const state = proxifyStateTest( {
+			const state = proxifyState( 'test', {
 				number: 1,
 				otherNumber: 3,
 			} );
@@ -753,7 +750,7 @@ describe( 'interactivity api - state proxy', () => {
 		} );
 
 		it( 'should react to changes in props inside getters if they become getters', () => {
-			const state = proxifyStateTest( {
+			const state = proxifyState( 'test', {
 				number: 1,
 				otherNumber: 3,
 			} );
@@ -782,7 +779,7 @@ describe( 'interactivity api - state proxy', () => {
 		} );
 
 		it( 'should allow getters to use `this`', () => {
-			const state = proxifyStateTest( {
+			const state = proxifyState( 'test', {
 				number: 1,
 				otherNumber: 3,
 			} );
@@ -808,7 +805,7 @@ describe( 'interactivity api - state proxy', () => {
 		} );
 
 		it( 'should support different scopes for the same getter', () => {
-			const state = proxifyStateTest( {
+			const state = proxifyState( 'test', {
 				number: 1,
 				get numWithTag() {
 					let tag = 'No scope';
@@ -854,7 +851,7 @@ describe( 'interactivity api - state proxy', () => {
 		} );
 
 		it( 'should throw an error in getters that require an scope', () => {
-			const state = proxifyStateTest( {
+			const state = proxifyState( 'test', {
 				number: 1,
 				get sumValueFromContext() {
 					const ctx = getContext();
@@ -875,7 +872,7 @@ describe( 'interactivity api - state proxy', () => {
 		} );
 
 		it( 'should react to changes in props inside functions', () => {
-			const state = proxifyStateTest( {
+			const state = proxifyState( 'test', {
 				number: 1,
 				otherNumber: 3,
 				sum( value: number ) {
@@ -962,7 +959,7 @@ describe( 'interactivity api - state proxy', () => {
 		} );
 
 		it( 'should support returning peek from getters', () => {
-			const state = proxifyStateTest( {
+			const state = proxifyState( 'test', {
 				counter: 1,
 				get double() {
 					return state.counter * 2;
@@ -974,14 +971,14 @@ describe( 'interactivity api - state proxy', () => {
 		} );
 
 		it( 'should support peeking getters accessing the scope', () => {
-			const state = proxifyStateTest( {
+			const state = proxifyState( 'test', {
 				get double() {
 					const { counter } = getContext< { counter: number } >();
 					return counter * 2;
 				},
 			} );
 
-			const context = proxifyStateTest( { counter: 1 } );
+			const context = proxifyState( 'test', { counter: 1 } );
 			const scope = { context: { test: context } };
 			const peekStateDouble = withScopeAndNs( scope, 'test', () =>
 				peek( state, 'double' )
@@ -999,25 +996,19 @@ describe( 'interactivity api - state proxy', () => {
 		} );
 
 		it( 'should support peeking getters accessing other namespaces', () => {
-			const state2 = proxifyState(
-				{
-					get counter() {
-						const { counter } = getContext< { counter: number } >();
-						return counter;
-					},
+			const state2 = proxifyState( 'test2', {
+				get counter() {
+					const { counter } = getContext< { counter: number } >();
+					return counter;
 				},
-				'test2'
-			);
-			const context2 = proxifyState( { counter: 1 }, 'test2' );
+			} );
+			const context2 = proxifyState( 'test-2', { counter: 1 } );
 
-			const state1 = proxifyState(
-				{
-					get double() {
-						return state2.counter * 2;
-					},
+			const state1 = proxifyState( 'test1', {
+				get double() {
+					return state2.counter * 2;
 				},
-				'test1'
-			);
+			} );
 
 			const peekStateDouble = withScopeAndNs(
 				{ context: { test2: context2 } },
@@ -1060,14 +1051,14 @@ describe( 'interactivity api - state proxy', () => {
 
 		it( 'should return the same proxy if initialized more than once', () => {
 			const raw = {};
-			const state1 = proxifyStateTest( raw );
-			const state2 = proxifyStateTest( raw );
+			const state1 = proxifyState( 'test', raw );
+			const state2 = proxifyState( 'test', raw );
 			expect( state1 ).toBe( state2 );
 		} );
 
 		it( 'should return the same proxy when trying to re-proxify a state object', () => {
-			const state = proxifyStateTest( {} );
-			expect( () => proxifyStateTest( state ) ).toThrow();
+			const state = proxifyState( 'test', {} );
+			expect( () => proxifyState( 'test', state ) ).toThrow();
 		} );
 	} );
 
@@ -1075,57 +1066,57 @@ describe( 'interactivity api - state proxy', () => {
 		it( 'should throw when trying to proxify a class instance', () => {
 			class MyClass {}
 			const obj = new MyClass();
-			expect( () => proxifyStateTest( obj ) ).toThrow();
+			expect( () => proxifyState( 'test', obj ) ).toThrow();
 		} );
 
 		it( 'should not wrap a class instance', () => {
 			class MyClass {}
 			const obj = new MyClass();
-			const state = proxifyStateTest( { obj } );
+			const state = proxifyState( 'test', { obj } );
 			expect( state.obj ).toBe( obj );
 		} );
 
 		it( 'should not wrap built-ins in proxies', () => {
 			window.MyClass = class MyClass {};
 			const obj = new window.MyClass();
-			const state = proxifyStateTest( { obj } );
+			const state = proxifyState( 'test', { obj } );
 			expect( state.obj ).toBe( obj );
 		} );
 
 		it( 'should not wrap elements in proxies', () => {
 			const el = window.document.createElement( 'div' );
-			const state = proxifyStateTest( { el } );
+			const state = proxifyState( 'test', { el } );
 			expect( state.el ).toBe( el );
 		} );
 
 		it( 'should wrap global objects', () => {
 			window.obj = { b: 2 };
-			const state = proxifyStateTest( window.obj );
+			const state = proxifyState( 'test', window.obj );
 			expect( state ).not.toBe( window.obj );
 			expect( state ).toStrictEqual( { b: 2 } );
 		} );
 
 		it( 'should not wrap dates', () => {
 			const date = new Date();
-			const state = proxifyStateTest( { date } );
+			const state = proxifyState( 'test', { date } );
 			expect( state.date ).toBe( date );
 		} );
 
 		it( 'should not wrap regular expressions', () => {
 			const regex = new RegExp( '' );
-			const state = proxifyStateTest( { regex } );
+			const state = proxifyState( 'test', { regex } );
 			expect( state.regex ).toBe( regex );
 		} );
 
 		it( 'should not wrap Map', () => {
 			const map = new Map();
-			const state = proxifyStateTest( { map } );
+			const state = proxifyState( 'test', { map } );
 			expect( state.map ).toBe( map );
 		} );
 
 		it( 'should not wrap Set', () => {
 			const set = new Set();
-			const state = proxifyStateTest( { set } );
+			const state = proxifyState( 'test', { set } );
 			expect( state.set ).toBe( set );
 		} );
 	} );
@@ -1134,7 +1125,10 @@ describe( 'interactivity api - state proxy', () => {
 		it( 'should observe symbols', () => {
 			const key = Symbol( 'key' );
 			let x;
-			const store = proxifyStateTest< { [ key: symbol ]: any } >( {} );
+			const store = proxifyState< { [ key: symbol ]: any } >(
+				'test',
+				{}
+			);
 			effect( () => ( x = store[ key ] ) );
 
 			expect( store[ key ] ).toBe( undefined );
@@ -1149,7 +1143,10 @@ describe( 'interactivity api - state proxy', () => {
 		it( 'should not observe well-known symbols', () => {
 			const key = Symbol.isConcatSpreadable;
 			let x;
-			const state = proxifyStateTest< { [ key: symbol ]: any } >( {} );
+			const state = proxifyState< { [ key: symbol ]: any } >(
+				'test',
+				{}
+			);
 			effect( () => ( x = state[ key ] ) );
 
 			expect( state[ key ] ).toBe( undefined );

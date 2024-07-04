@@ -13,7 +13,7 @@ import {
 describe( 'interactivity api - store proxy', () => {
 	describe( 'get', () => {
 		it( 'should initialize properties at the top level if they do not exist', () => {
-			const store = proxifyStore< any >( {}, 'test', true );
+			const store = proxifyStore< any >( 'test', {} );
 			expect( store.state.props ).toBeUndefined();
 			expect( store.state ).toEqual( {} );
 		} );
@@ -26,16 +26,12 @@ describe( 'interactivity api - store proxy', () => {
 				result = ctx.value;
 			};
 
-			const storeTest = proxifyStore(
-				{
-					callbacks: {
-						syncFunc,
-						nested: { syncFunc },
-					},
+			const storeTest = proxifyStore( 'test', {
+				callbacks: {
+					syncFunc,
+					nested: { syncFunc },
 				},
-				'test',
-				true
-			);
+			} );
 
 			const scope = {
 				context: {
@@ -62,11 +58,9 @@ describe( 'interactivity api - store proxy', () => {
 				return `${ data } from ${ ctx.value }`;
 			};
 
-			const storeTest = proxifyStore(
-				{ callbacks: { asyncFunc, nested: { asyncFunc } } },
-				'test',
-				true
-			);
+			const storeTest = proxifyStore( 'test', {
+				callbacks: { asyncFunc, nested: { asyncFunc } },
+			} );
 
 			const scope = {
 				context: {
@@ -92,25 +86,18 @@ describe( 'interactivity api - store proxy', () => {
 				return `${ data } from ${ ctx.value }`;
 			};
 
-			const storeTest1 = proxifyStore(
-				{ callbacks: { asyncFunc } },
-				'test1',
-				true
-			);
+			const storeTest1 = proxifyStore( 'test1', {
+				callbacks: { asyncFunc },
+			} );
 
-			const storeTest2 = proxifyStore(
-				{
-					callbacks: {
-						*asyncFunc() {
-							const result =
-								yield storeTest1.callbacks.asyncFunc();
-							return result;
-						},
+			const storeTest2 = proxifyStore( 'test2', {
+				callbacks: {
+					*asyncFunc() {
+						const result = yield storeTest1.callbacks.asyncFunc();
+						return result;
 					},
 				},
-				'test2',
-				true
-			);
+			} );
 
 			const scope = {
 				context: {
@@ -129,8 +116,8 @@ describe( 'interactivity api - store proxy', () => {
 		} );
 
 		it( 'should not wrap other proxified objects with a store proxy', () => {
-			const state = proxifyState( {}, 'test' );
-			const store = proxifyStore( { state }, 'test' );
+			const state = proxifyState( 'test', {} );
+			const store = proxifyStore( 'test', { state } );
 
 			expect( store.state ).toBe( state );
 		} );

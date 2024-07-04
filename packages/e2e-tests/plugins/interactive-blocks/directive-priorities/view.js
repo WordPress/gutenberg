@@ -42,13 +42,10 @@ directive(
 	( { context: { Provider }, props: { children } } ) => {
 		executionProof( 'context' );
 		const value = {
-			[ namespace ]: proxifyState(
-				{
-					attribute: 'from context',
-					text: 'from context',
-				},
-				namespace
-			),
+			[ namespace ]: proxifyState( namespace, {
+				attribute: 'from context',
+				text: 'from context',
+			} ),
 		};
 		return h( Provider, { value }, children );
 	},

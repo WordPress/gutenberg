@@ -148,10 +148,10 @@ export function store(
 			storeLocks.set( namespace, lock );
 		}
 		const rawStore = {
-			state: proxifyState( isObject( state ) ? state : {}, namespace ),
+			state: proxifyState( namespace, isObject( state ) ? state : {} ),
 			...block,
 		};
-		const proxiedStore = proxifyStore( rawStore, namespace, true );
+		const proxiedStore = proxifyStore( namespace, rawStore );
 		rawStores.set( namespace, rawStore );
 		stores.set( namespace, proxiedStore );
 	} else {
