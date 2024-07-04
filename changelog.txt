@@ -1,5 +1,25 @@
 == Changelog ==
 
+= 18.7.1 =
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Block Library
+- Button Block: Add back compat for WP6.4 regarding HTML Tag Processor. ([63082](https://github.com/WordPress/gutenberg/pull/63082))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@t-hamano
+
+
 = 18.7.0 =
 
 ## Changelog
