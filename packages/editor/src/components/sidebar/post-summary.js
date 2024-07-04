@@ -21,7 +21,6 @@ import PostLastEditedPanel from '../post-last-edited-panel';
 import PostPanelSection from '../post-panel-section';
 import PostSchedulePanel from '../post-schedule/panel';
 import PostStatusPanel from '../post-status';
-import PostStickyPanel from '../post-sticky';
 import PostSyncStatus from '../post-sync-status';
 import PostTemplatePanel from '../post-template/panel';
 import PostURLPanel from '../post-url/panel';
@@ -69,7 +68,7 @@ export default function PostSummary( { onActionPerformed } ) {
 								<PostLastEditedPanel />
 							</VStack>
 							{ ! isRemovedPostStatusPanel && (
-								<VStack spacing={ 2 }>
+								<VStack spacing={ 4 }>
 									<VStack spacing={ 1 }>
 										<PostStatusPanel />
 										<PostSchedulePanel />
@@ -84,7 +83,6 @@ export default function PostSummary( { onActionPerformed } ) {
 										<PostsPerPage />
 										<SiteDiscussion />
 										<PostFormatPanel />
-										<PostStickyPanel />
 									</VStack>
 									<TemplateAreas />
 									{ fills }

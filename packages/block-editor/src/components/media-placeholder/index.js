@@ -60,28 +60,37 @@ const InsertFromURLPopover = ( {
 	</URLPopover>
 );
 
-const URLSelectionUI = ( {
-	isURLInputVisible,
-	src,
-	onChangeSrc,
-	onSubmitSrc,
-	openURLInput,
-	closeURLInput,
-} ) => {
+const URLSelectionUI = ( { src, onChangeSrc, onSelectURL } ) => {
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+	const [ isURLInputVisible, setIsURLInputVisible ] = useState( false );
+
+	const openURLInput = () => {
+		setIsURLInputVisible( true );
+	};
+	const closeURLInput = () => {
+		setIsURLInputVisible( false );
+		popoverAnchor?.focus();
+	};
+
+	const onSubmitSrc = ( event ) => {
+		event.preventDefault();
+		if ( src && onSelectURL ) {
+			onSelectURL( src );
+			closeURLInput();
+		}
+	};
 
 	return (
-		<div
-			className="block-editor-media-placeholder__url-input-container"
-			ref={ setPopoverAnchor }
-		>
+		<div className="block-editor-media-placeholder__url-input-container">
 			<Button
 				className="block-editor-media-placeholder__button"
 				onClick={ openURLInput }
 				isPressed={ isURLInputVisible }
 				variant="secondary"
+				aria-haspopup="dialog"
+				ref={ setPopoverAnchor }
 			>
 				{ __( 'Insert from URL' ) }
 			</Button>
@@ -138,7 +147,6 @@ export function MediaPlaceholder( {
 		return getSettings().mediaUpload;
 	}, [] );
 	const [ src, setSrc ] = useState( '' );
-	const [ isURLInputVisible, setIsURLInputVisible ] = useState( false );
 
 	useEffect( () => {
 		setSrc( value?.src ?? '' );
@@ -157,21 +165,6 @@ export function MediaPlaceholder( {
 
 	const onChangeSrc = ( event ) => {
 		setSrc( event.target.value );
-	};
-
-	const openURLInput = () => {
-		setIsURLInputVisible( true );
-	};
-	const closeURLInput = () => {
-		setIsURLInputVisible( false );
-	};
-
-	const onSubmitSrc = ( event ) => {
-		event.preventDefault();
-		if ( src && onSelectURL ) {
-			onSelectURL( src );
-			closeURLInput();
-		}
 	};
 
 	const onFilesUpload = ( files ) => {
@@ -404,12 +397,9 @@ export function MediaPlaceholder( {
 		return (
 			onSelectURL && (
 				<URLSelectionUI
-					isURLInputVisible={ isURLInputVisible }
 					src={ src }
 					onChangeSrc={ onChangeSrc }
-					onSubmitSrc={ onSubmitSrc }
-					openURLInput={ openURLInput }
-					closeURLInput={ closeURLInput }
+					onSelectURL={ onSelectURL }
 				/>
 			)
 		);

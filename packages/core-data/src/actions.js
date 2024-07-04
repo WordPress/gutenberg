@@ -773,10 +773,10 @@ export const __experimentalBatch =
 /**
  * Action triggered to save an entity record's edits.
  *
- * @param {string} kind     Kind of the entity.
- * @param {string} name     Name of the entity.
- * @param {Object} recordId ID of the record.
- * @param {Object} options  Saving options.
+ * @param {string}  kind     Kind of the entity.
+ * @param {string}  name     Name of the entity.
+ * @param {Object}  recordId ID of the record.
+ * @param {Object=} options  Saving options.
  */
 export const saveEditedEntityRecord =
 	( kind, name, recordId, options ) =>

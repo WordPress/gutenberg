@@ -30,3 +30,49 @@ if ( ! function_exists( 'gutenberg_register_edit_site_export_controller_endpoint
 }
 
 add_action( 'rest_api_init', 'gutenberg_register_edit_site_export_controller_endpoints' );
+
+if ( ! function_exists( 'gutenberg_register_wp_rest_post_types_controller_fields' ) ) {
+	/**
+	 * Adds `template` and `template_lock` fields to WP_REST_Post_Types_Controller class.
+	 */
+	function gutenberg_register_wp_rest_post_types_controller_fields() {
+		register_rest_field(
+			'type',
+			'template',
+			array(
+				'get_callback' => function ( $item ) {
+					$post_type = get_post_type_object( $item['slug'] );
+					if ( ! empty( $post_type ) ) {
+						return $post_type->template ?? array();
+					}
+				},
+				'schema'       => array(
+					'type'        => 'array',
+					'description' => __( 'The block template associated with the post type.', 'gutenberg' ),
+					'readonly'    => true,
+					'context'     => array( 'view', 'edit', 'embed' ),
+				),
+			)
+		);
+		register_rest_field(
+			'type',
+			'template_lock',
+			array(
+				'get_callback' => function ( $item ) {
+					$post_type = get_post_type_object( $item['slug'] );
+					if ( ! empty( $post_type ) ) {
+						return ! empty( $post_type->template_lock ) ? $post_type->template_lock : false;
+					}
+				},
+				'schema'       => array(
+					'type'        => array( 'string', 'boolean' ),
+					'enum'        => array( 'all', 'insert', 'contentOnly', false ),
+					'description' => __( 'The template_lock associated with the post type, or false if none.', 'gutenberg' ),
+					'readonly'    => true,
+					'context'     => array( 'view', 'edit', 'embed' ),
+				),
+			)
+		);
+	}
+}
+add_action( 'rest_api_init', 'gutenberg_register_wp_rest_post_types_controller_fields' );

@@ -3,7 +3,7 @@
 `PostTaxonomies` is a component used to render the taxonomy picker
 UI. It uses the `FlatTermSelector` or `HierarchicalTermSelector` components
 based on the value of the `hierarchical` argument specified in
-[register_taxonomy](https://codex.wordpress.org/Function_Reference/register_taxonomy).
+[register_taxonomy](https://developer.wordpress.org/reference/functions/register_taxonomy).
 
 The output of the respective taxonomy components can be customized using
 the following filter:

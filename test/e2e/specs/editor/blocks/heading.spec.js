@@ -377,7 +377,7 @@ test.describe( 'Heading', () => {
 		await editor.clickBlockOptionsMenuItem( 'Rename' );
 		await page
 			.getByRole( 'dialog', { name: 'Rename' } )
-			.getByRole( 'textbox', { name: 'Block name' } )
+			.getByRole( 'textbox', { name: 'Name' } )
 			.fill( 'My new name' );
 
 		await page

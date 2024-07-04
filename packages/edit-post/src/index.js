@@ -25,8 +25,10 @@ import {
 import Layout from './components/layout';
 import { unlock } from './lock-unlock';
 
-const { BackButton: __experimentalMainDashboardButton } =
-	unlock( editorPrivateApis );
+const {
+	BackButton: __experimentalMainDashboardButton,
+	registerDefaultActions,
+} = unlock( editorPrivateApis );
 
 /**
  * Initializes and returns an instance of Editor.
@@ -91,6 +93,7 @@ export function initializeEditor(
 			enableFSEBlocks: settings.__unstableEnableFullSiteEditingBlocks,
 		} );
 	}
+	registerDefaultActions();
 
 	// Show a console log warning if the browser is not in Standards rendering mode.
 	const documentMode =

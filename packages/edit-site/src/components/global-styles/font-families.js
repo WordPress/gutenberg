@@ -5,11 +5,9 @@ import { __ } from '@wordpress/i18n';
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalVStack as VStack,
-	__experimentalHStack as HStack,
 	Button,
 } from '@wordpress/components';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-import { settings } from '@wordpress/icons';
 import { useContext } from '@wordpress/element';
 
 /**
@@ -51,30 +49,41 @@ function FontFamilies() {
 			) }
 
 			<VStack spacing={ 2 }>
-				<HStack justify="space-between">
-					<Subtitle level={ 3 }>{ __( 'Fonts' ) }</Subtitle>
-					<Button
-						onClick={ () => setModalTabOpen( 'installed-fonts' ) }
-						label={ __( 'Manage fonts' ) }
-						icon={ settings }
-						size="small"
-					/>
-				</HStack>
+				<Subtitle level={ 3 }>{ __( 'Fonts' ) }</Subtitle>
 				{ hasFonts ? (
-					<ItemGroup isBordered isSeparated>
-						{ customFonts.map( ( font ) => (
-							<FontFamilyItem key={ font.slug } font={ font } />
-						) ) }
-						{ themeFonts.map( ( font ) => (
-							<FontFamilyItem key={ font.slug } font={ font } />
-						) ) }
-					</ItemGroup>
+					<>
+						<ItemGroup isBordered isSeparated>
+							{ customFonts.map( ( font ) => (
+								<FontFamilyItem
+									key={ font.slug }
+									font={ font }
+								/>
+							) ) }
+							{ themeFonts.map( ( font ) => (
+								<FontFamilyItem
+									key={ font.slug }
+									font={ font }
+								/>
+							) ) }
+						</ItemGroup>
+						<Button
+							className="edit-site-global-styles-font-families__manage-fonts"
+							variant="secondary"
+							__next40pxDefaultSize
+							onClick={ () =>
+								setModalTabOpen( 'installed-fonts' )
+							}
+						>
+							{ __( 'Manage fonts' ) }
+						</Button>
+					</>
 				) : (
 					<>
 						{ __( 'No fonts installed.' ) }
 						<Button
 							className="edit-site-global-styles-font-families__add-fonts"
 							variant="secondary"
+							__next40pxDefaultSize
 							onClick={ () => setModalTabOpen( 'upload-fonts' ) }
 						>
 							{ __( 'Add fonts' ) }

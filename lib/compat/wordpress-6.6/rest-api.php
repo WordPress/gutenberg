@@ -157,3 +157,20 @@ if ( ! function_exists( 'gutenberg_register_wp_rest_themes_template_directory_ur
 	}
 }
 add_action( 'rest_api_init', 'gutenberg_register_wp_rest_themes_template_directory_uri_field' );
+
+/**
+ * Preload theme and global styles paths to avoid flash of variation styles in post editor.
+ *
+ * @param array                   $paths REST API paths to preload.
+ * @param WP_Block_Editor_Context $context Current block editor context.
+ * @return array Filtered preload paths.
+ */
+function gutenberg_block_editor_preload_paths_6_6( $paths, $context ) {
+	if ( 'core/edit-post' === $context->name ) {
+		$paths[] = '/wp/v2/global-styles/themes/' . get_stylesheet();
+		$paths[] = '/wp/v2/themes?context=edit&status=active';
+		$paths[] = '/wp/v2/global-styles/' . WP_Theme_JSON_Resolver::get_user_global_styles_post_id() . '?context=edit';
+	}
+	return $paths;
+}
+add_filter( 'block_editor_rest_api_preload_paths', 'gutenberg_block_editor_preload_paths_6_6', 10, 2 );

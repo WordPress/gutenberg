@@ -27,7 +27,13 @@ export default function ColorVariations( { title, gap = 2 } ) {
 			{ title && <Subtitle level={ 3 }>{ title }</Subtitle> }
 			<Grid spacing={ gap }>
 				{ colorVariations.map( ( variation, index ) => (
-					<Variation key={ index } variation={ variation } isPill>
+					<Variation
+						key={ index }
+						variation={ variation }
+						isPill
+						properties={ [ 'color' ] }
+						showTooltip
+					>
 						{ () => <StylesPreviewColors /> }
 					</Variation>
 				) ) }

@@ -397,6 +397,7 @@ module.exports = {
 				'no-restricted-syntax': [
 					'error',
 					...restrictedSyntax,
+					...restrictedSyntaxComponents,
 					{
 						selector:
 							':matches(Literal[value=/--wp-admin-theme-/],TemplateElement[value.cooked=/--wp-admin-theme-/])',
