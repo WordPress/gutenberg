@@ -34,12 +34,6 @@ const exportPattern: Action< Pattern > = {
 	id: 'export-pattern',
 	label: __( 'Export as JSON' ),
 	supportsBulk: true,
-	isEligible: ( item ) => {
-		if ( ! item.type ) {
-			return false;
-		}
-		return item.type === 'wp_block';
-	},
 	callback: async ( items ) => {
 		if ( items.length === 1 ) {
 			return downloadBlob(
