@@ -745,7 +745,7 @@ $metadata = array(
 );
 ```
 
-Implementation follows the existing [get_plugin_data](https://codex.wordpress.org/Function_Reference/get_plugin_data) function which parses the plugin contents to retrieve the plugin’s metadata, and it applies translations dynamically.
+Implementation follows the existing [get_plugin_data](https://developer.wordpress.org/reference/functions/get_plugin_data) function which parses the plugin contents to retrieve the plugin’s metadata, and it applies translations dynamically.
 
 ### JavaScript
 
