@@ -6,10 +6,7 @@ import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import {
-	useViewportMatch,
-	__experimentalUseDialog as useDialog,
-} from '@wordpress/compose';
+import { useViewportMatch } from '@wordpress/compose';
 import { useCallback, useRef } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { ESCAPE } from '@wordpress/keycodes';
@@ -63,10 +60,6 @@ export default function InserterSidebar() {
 	const { disableComplementaryArea } = useDispatch( interfaceStore );
 
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
-		onClose: () => setIsInserterOpened( false ),
-		focusOnMount: true,
-	} );
 	const libraryRef = useRef();
 
 	// When closing the inserter, focus should return to the toggle button.
@@ -109,23 +102,9 @@ export default function InserterSidebar() {
 		</div>
 	);
 
-	if ( window.__experimentalEnableZoomedOutPatternsTab ) {
-		return (
-			// eslint-disable-next-line jsx-a11y/no-static-element-interactions
-			<div
-				onKeyDown={ closeOnEscape }
-				className="editor-inserter-sidebar"
-			>
-				{ inserterContents }
-			</div>
-		);
-	}
 	return (
-		<div
-			ref={ inserterDialogRef }
-			{ ...inserterDialogProps }
-			className="editor-inserter-sidebar"
-		>
+		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
+		<div onKeyDown={ closeOnEscape } className="editor-inserter-sidebar">
 			{ inserterContents }
 		</div>
 	);

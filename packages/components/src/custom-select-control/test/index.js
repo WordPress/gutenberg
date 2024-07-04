@@ -190,14 +190,14 @@ describe.each( [
 		await user.keyboard( '{enter}' );
 		expect(
 			screen.getByRole( 'listbox', {
-				name: 'label!',
+				name: props.label,
 			} )
 		).toBeVisible();
 
 		await user.keyboard( '{escape}' );
 		expect(
 			screen.queryByRole( 'listbox', {
-				name: 'label!',
+				name: props.label,
 			} )
 		).not.toBeInTheDocument();
 
@@ -460,7 +460,7 @@ describe.each( [
 			await user.click( currentSelectedItem );
 
 			const customSelect = screen.getByRole( 'listbox', {
-				name: 'label!',
+				name: props.label,
 			} );
 			await user.type( customSelect, '{enter}' );
 
@@ -482,7 +482,7 @@ describe.each( [
 			await user.keyboard( '{enter}' );
 			expect(
 				screen.getByRole( 'listbox', {
-					name: 'label!',
+					name: props.label,
 				} )
 			).toHaveFocus();
 
@@ -507,7 +507,7 @@ describe.each( [
 			await user.keyboard( '{enter}' );
 			expect(
 				screen.getByRole( 'listbox', {
-					name: 'label!',
+					name: props.label,
 				} )
 			).toHaveFocus();
 
@@ -533,13 +533,39 @@ describe.each( [
 
 			expect(
 				screen.queryByRole( 'listbox', {
-					name: 'label!',
+					name: props.label,
 					hidden: true,
 				} )
 			).not.toBeInTheDocument();
 
 			await user.keyboard( '{enter}' );
 			expect( currentSelectedItem ).toHaveTextContent( 'aquamarine' );
+		} );
+
+		it( 'Can change selection with a focused input and closed dropdown while pressing arrow keys', async () => {
+			const user = userEvent.setup();
+
+			render( <Component { ...props } /> );
+
+			const currentSelectedItem = screen.getByRole( 'button', {
+				expanded: false,
+			} );
+
+			await user.tab();
+			expect( currentSelectedItem ).toHaveFocus();
+			expect( currentSelectedItem ).toHaveTextContent(
+				props.options[ 0 ].name
+			);
+
+			await user.keyboard( '{arrowdown}' );
+			await user.keyboard( '{arrowdown}' );
+			expect(
+				screen.queryByRole( 'listbox', { name: props.label } )
+			).not.toBeInTheDocument();
+
+			expect( currentSelectedItem ).toHaveTextContent(
+				props.options[ 2 ].name
+			);
 		} );
 
 		it( 'Should have correct aria-selected value for selections', async () => {

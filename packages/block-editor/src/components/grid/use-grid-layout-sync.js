@@ -30,12 +30,11 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 	useEffect( () => {
 		const updates = {};
 
-		const { columnCount, rowCount = 2 } = gridLayout;
-		const isManualGrid = !! columnCount;
+		const { columnCount, rowCount, isManualPlacement } = gridLayout;
+		const isManualGrid = !! isManualPlacement;
 
 		if ( isManualGrid ) {
 			const rects = [];
-			let cellsTaken = 0;
 
 			// Respect the position of blocks that already have a columnStart and rowStart value.
 			for ( const clientId of blockOrder ) {
@@ -46,7 +45,6 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 					columnSpan = 1,
 					rowSpan = 1,
 				} = attributes.style?.layout || {};
-				cellsTaken += columnSpan * rowSpan;
 				if ( ! columnStart || ! rowStart ) {
 					continue;
 				}
@@ -60,29 +58,21 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 				);
 			}
 
-			// Ensure there's enough rows to fit all blocks.
-			const minimumNeededRows = Math.ceil( cellsTaken / columnCount );
-			if ( rowCount < minimumNeededRows ) {
-				updates[ gridClientId ] = {
-					layout: {
-						...gridLayout,
-						rowCount: minimumNeededRows,
-					},
-				};
-			}
-
 			// When in manual mode, ensure that every block has a columnStart and rowStart value.
 			for ( const clientId of blockOrder ) {
 				const attributes = getBlockAttributes( clientId );
-				const { columnStart, rowStart, columnSpan, rowSpan } =
-					attributes.style?.layout || {};
+				const {
+					columnStart,
+					rowStart,
+					columnSpan = 1,
+					rowSpan = 1,
+				} = attributes.style?.layout || {};
 				if ( columnStart && rowStart ) {
 					continue;
 				}
 				const [ newColumnStart, newRowStart ] = getFirstEmptyCell(
 					rects,
 					columnCount,
-					minimumNeededRows,
 					columnSpan,
 					rowSpan
 				);
@@ -105,6 +95,17 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 					},
 				};
 			}
+
+			// Ensure there's enough rows to fit all blocks.
+			const bottomMostRow = Math.max( ...rects.map( ( r ) => r.rowEnd ) );
+			if ( ! rowCount || rowCount < bottomMostRow ) {
+				updates[ gridClientId ] = {
+					layout: {
+						...gridLayout,
+						rowCount: bottomMostRow,
+					},
+				};
+			}
 		} else {
 			// When in auto mode, remove all of the columnStart and rowStart values.
 			for ( const clientId of blockOrder ) {
@@ -120,6 +121,16 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 						},
 					};
 				}
+			}
+
+			// Remove row styles in auto mode
+			if ( rowCount ) {
+				updates[ gridClientId ] = {
+					layout: {
+						...gridLayout,
+						rowCount: undefined,
+					},
+				};
 			}
 		}
 
@@ -143,14 +154,8 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 	] );
 }
 
-function getFirstEmptyCell(
-	rects,
-	columnCount,
-	rowCount,
-	columnSpan = 1,
-	rowSpan = 1
-) {
-	for ( let row = 1; row <= rowCount; row++ ) {
+function getFirstEmptyCell( rects, columnCount, columnSpan = 1, rowSpan = 1 ) {
+	for ( let row = 1; ; row++ ) {
 		for ( let column = 1; column <= columnCount; column++ ) {
 			const rect = new GridRect( {
 				columnStart: column,
@@ -163,5 +168,4 @@ function getFirstEmptyCell(
 			}
 		}
 	}
-	return [ 1, 1 ];
 }

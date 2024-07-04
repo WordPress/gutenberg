@@ -13,10 +13,10 @@ import { store as editorStore } from '@wordpress/editor';
 export const setCanvasMode =
 	( mode ) =>
 	( { registry, dispatch } ) => {
+		const isMediumOrBigger =
+			window.matchMedia( '(min-width: 782px)' ).matches;
 		const switchCanvasMode = () => {
 			registry.batch( () => {
-				const isMediumOrBigger =
-					window.matchMedia( '(min-width: 782px)' ).matches;
 				registry.dispatch( blockEditorStore ).clearSelectedBlock();
 				registry.dispatch( editorStore ).setDeviceType( 'Desktop' );
 				registry
@@ -59,7 +59,11 @@ export const setCanvasMode =
 			} );
 		};
 
-		if ( ! document.startViewTransition ) {
+		/*
+		 * Skip transition in mobile, otherwise it crashes the browser.
+		 * See: https://github.com/WordPress/gutenberg/pull/63002.
+		 */
+		if ( ! isMediumOrBigger || ! document.startViewTransition ) {
 			switchCanvasMode();
 		} else {
 			document.documentElement.classList.add(

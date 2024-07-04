@@ -74,6 +74,8 @@ export default function Token( {
 				className="components-form-token-field__remove-token"
 				icon={ closeSmall }
 				onClick={ ! disabled ? onClick : undefined }
+				// Disable reason: Even when FormTokenField itself is accessibly disabled, token reset buttons shouldn't be in the tab sequence.
+				// eslint-disable-next-line no-restricted-syntax
 				disabled={ disabled }
 				label={ messages.remove }
 				aria-describedby={ `components-form-token-field__token-text-${ instanceId }` }

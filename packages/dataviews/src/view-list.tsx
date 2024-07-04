@@ -166,7 +166,7 @@ function ListItem< Item >( {
 									</span>
 									{ eligibleActions?.length > 0 && (
 										<HStack
-											spacing={ 2 }
+											spacing={ 1 }
 											justify="flex-end"
 											className="dataviews-view-list__item-actions"
 											style={ {
@@ -191,7 +191,7 @@ function ListItem< Item >( {
 																	isDestructive={
 																		primaryAction.isDestructive
 																	}
-																	size="small"
+																	size="compact"
 																	onClick={ () =>
 																		setIsModalOpen(
 																			true
@@ -240,7 +240,7 @@ function ListItem< Item >( {
 																	isDestructive={
 																		primaryAction.isDestructive
 																	}
-																	size="small"
+																	size="compact"
 																	onClick={ () => {
 																		primaryAction.callback(
 																			[
@@ -263,14 +263,14 @@ function ListItem< Item >( {
 															store={ store }
 															render={
 																<Button
-																	size="small"
+																	size="compact"
 																	icon={
 																		moreVertical
 																	}
 																	label={ __(
 																		'Actions'
 																	) }
-																	__experimentalIsFocusable
+																	accessibleWhenDisabled
 																	disabled={
 																		! actions.length
 																	}
@@ -368,9 +368,10 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 	const primaryField = fields.find(
 		( field ) => field.id === view.layout.primaryField
 	);
+	const viewFields = view.fields || fields.map( ( field ) => field.id );
 	const visibleFields = fields.filter(
 		( field ) =>
-			! view.hiddenFields?.includes( field.id ) &&
+			viewFields.includes( field.id ) &&
 			! [ view.layout.primaryField, view.layout.mediaField ].includes(
 				field.id
 			)

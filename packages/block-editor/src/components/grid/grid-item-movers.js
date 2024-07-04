@@ -46,7 +46,7 @@ export function GridItemMovers( {
 			<ToolbarButton
 				icon={ arrowUp }
 				label={ __( 'Move block up' ) }
-				isDisabled={ rowStart <= 1 }
+				disabled={ rowStart <= 1 }
 				onClick={ () => {
 					onChange( {
 						rowStart: rowStart - 1,
@@ -66,7 +66,7 @@ export function GridItemMovers( {
 			<ToolbarButton
 				icon={ arrowDown }
 				label={ __( 'Move block down' ) }
-				isDisabled={ rowCount && rowEnd >= rowCount }
+				disabled={ rowCount && rowEnd >= rowCount }
 				onClick={ () => {
 					onChange( {
 						rowStart: rowStart + 1,
@@ -86,7 +86,7 @@ export function GridItemMovers( {
 			<ToolbarButton
 				icon={ arrowLeft }
 				label={ __( 'Move block left' ) }
-				isDisabled={ columnStart <= 1 }
+				disabled={ columnStart <= 1 }
 				onClick={ () => {
 					onChange( {
 						columnStart: columnStartNumber - 1,
@@ -106,7 +106,7 @@ export function GridItemMovers( {
 			<ToolbarButton
 				icon={ arrowRight }
 				label={ __( 'Move block right' ) }
-				isDisabled={ columnCount && columnEnd >= columnCount }
+				disabled={ columnCount && columnEnd >= columnCount }
 				onClick={ () => {
 					onChange( {
 						columnStart: columnStartNumber + 1,

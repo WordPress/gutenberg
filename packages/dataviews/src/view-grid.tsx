@@ -185,10 +185,11 @@ export default function ViewGrid< Item >( {
 	const primaryField = fields.find(
 		( field ) => field.id === view.layout.primaryField
 	);
+	const viewFields = view.fields || fields.map( ( field ) => field.id );
 	const { visibleFields, badgeFields } = fields.reduce(
 		( accumulator: Record< string, NormalizedField< Item >[] >, field ) => {
 			if (
-				view.hiddenFields?.includes( field.id ) ||
+				! viewFields.includes( field.id ) ||
 				[ view.layout.mediaField, view.layout.primaryField ].includes(
 					field.id
 				)
