@@ -276,7 +276,7 @@ const permanentlyDeletePostAction = {
 	isEligible( { status } ) {
 		return status === 'trash';
 	},
-	async callback( posts, { registry } ) {
+	async callback( posts, { registry, onActionPerformed } ) {
 		const { createSuccessNotice, createErrorNotice } =
 			registry.dispatch( noticesStore );
 		const { deleteEntityRecord } = registry.dispatch( coreStore );
@@ -307,6 +307,7 @@ const permanentlyDeletePostAction = {
 				type: 'snackbar',
 				id: 'permanently-delete-post-action',
 			} );
+			onActionPerformed?.( posts );
 		} else {
 			// If there was at lease one failure.
 			let errorMessage;
