@@ -4,7 +4,7 @@
 
 ### Breaking Changes
 
-- `@typescript-eslint/no-unused-vars` is now turned on with level "error" when running `wp-scripts lint-js`.
+- Add [`@typescript-eslint/no-unused-vars` rule](https://typescript-eslint.io/rules/no-unused-vars) to the recommended TypeScript ruleset ([#62925](https://github.com/WordPress/gutenberg/pull/62925)).
 
 ## 19.2.0 (2024-06-26)
 
