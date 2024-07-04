@@ -25,7 +25,12 @@ function focusSidebarElement( el, direction, focusSelector ) {
 		elementToFocus = el.querySelector( focusSelector );
 	}
 	if ( direction !== null && ! elementToFocus ) {
-		const [ firstTabbable ] = focus.tabbable.find( el );
+		// When looking for the first tabbable element, we need to skip the
+		// site hub if present, where we do not want to place focus.
+		const siblingOfSiteHub = el.querySelector(
+			'.edit-site-site-hub'
+		)?.nextElementSibling;
+		const [ firstTabbable ] = focus.tabbable.find( siblingOfSiteHub || el );
 		elementToFocus = firstTabbable ?? el;
 	}
 	elementToFocus?.focus();
