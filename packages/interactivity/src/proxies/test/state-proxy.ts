@@ -7,7 +7,7 @@ import { effect } from '@preact/signals-core';
 /**
  * Internal dependencies
  */
-import { proxifyState } from '../';
+import { proxifyState, peek } from '../';
 import {
 	setScope,
 	resetScope,
@@ -42,6 +42,8 @@ describe( 'interactivity api - state proxy', () => {
 	let array = [ 3, nested ];
 	let raw: State = { a: 1, nested, array };
 	let state = proxifyStateTest( raw );
+
+	const window = globalThis as any;
 
 	beforeEach( () => {
 		nested = { b: 2 };
@@ -891,6 +893,176 @@ describe( 'interactivity api - state proxy', () => {
 			expect( result ).toBe( 7 );
 			state.otherNumber = 4;
 			expect( result ).toBe( 8 );
+		} );
+	} );
+
+	describe( 'peek', () => {
+		it( 'should return correct values when using peek()', () => {
+			expect( peek( state, 'a' ) ).toBe( 1 );
+			expect( peek( state.nested, 'b' ) ).toBe( 2 );
+			expect( peek( state.array, 0 ) ).toBe( 3 );
+			const nested = peek( state, 'array' )[ 1 ];
+			expect( typeof nested === 'object' && nested.b ).toBe( 2 );
+			expect( peek( state.array, 'length' ) ).toBe( 2 );
+		} );
+
+		it( 'should not subscribe to changes when peeking', () => {
+			const spy1 = jest.fn( () => peek( state, 'a' ) );
+			const spy2 = jest.fn( () => peek( state, 'nested' ) );
+			const spy3 = jest.fn( () => peek( state, 'nested' ).b );
+			const spy4 = jest.fn( () => peek( state, 'array' )[ 0 ] );
+			const spy5 = jest.fn( () => {
+				const nested = peek( state, 'array' )[ 1 ];
+				return typeof nested === 'object' && nested.b;
+			} );
+			const spy6 = jest.fn( () => peek( state, 'array' ).length );
+
+			effect( spy1 );
+			effect( spy2 );
+			effect( spy3 );
+			effect( spy4 );
+			effect( spy5 );
+			effect( spy6 );
+
+			expect( spy1 ).toHaveBeenCalledTimes( 1 );
+			expect( spy2 ).toHaveBeenCalledTimes( 1 );
+			expect( spy3 ).toHaveBeenCalledTimes( 1 );
+			expect( spy4 ).toHaveBeenCalledTimes( 1 );
+			expect( spy5 ).toHaveBeenCalledTimes( 1 );
+			expect( spy6 ).toHaveBeenCalledTimes( 1 );
+
+			state.a = 11;
+			state.nested.b = 22;
+			state.nested = { b: 222 };
+			state.array[ 0 ] = 33;
+			if ( typeof state.array[ 1 ] === 'object' ) {
+				state.array[ 1 ].b = 2222;
+			}
+			state.array.push( 4 );
+
+			expect( spy1 ).toHaveBeenCalledTimes( 1 );
+			expect( spy2 ).toHaveBeenCalledTimes( 1 );
+			expect( spy3 ).toHaveBeenCalledTimes( 1 );
+			expect( spy4 ).toHaveBeenCalledTimes( 1 );
+			expect( spy5 ).toHaveBeenCalledTimes( 1 );
+			expect( spy6 ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'should subscribe to some changes but not other when peeking inside an object', () => {
+			const spy1 = jest.fn( () => peek( state.nested, 'b' ) );
+			effect( spy1 );
+			expect( spy1 ).toHaveBeenCalledTimes( 1 );
+			state.nested.b = 22;
+			expect( spy1 ).toHaveBeenCalledTimes( 1 );
+			state.nested = { b: 222 };
+			expect( spy1 ).toHaveBeenCalledTimes( 2 );
+			state.nested.b = 2222;
+			expect( spy1 ).toHaveBeenCalledTimes( 2 );
+		} );
+
+		it( 'should support returning peek from getters', () => {
+			const state = proxifyStateTest( {
+				counter: 1,
+				get double() {
+					return state.counter * 2;
+				},
+			} );
+			expect( peek( state, 'double' ) ).toBe( 2 );
+			state.counter = 2;
+			expect( peek( state, 'double' ) ).toBe( 4 );
+		} );
+	} );
+
+	describe( 'refs', () => {
+		it( 'should preserve object references', () => {
+			expect( state.nested ).toBe( state.array[ 1 ] );
+
+			state.nested.b = 22;
+
+			expect( state.nested ).toBe( state.array[ 1 ] );
+			expect( state.nested.b ).toBe( 22 );
+			expect(
+				typeof state.array[ 1 ] === 'object' && state.array[ 1 ].b
+			).toBe( 22 );
+
+			state.nested = { b: 222 };
+
+			expect( state.nested ).not.toBe( state.array[ 1 ] );
+			expect( state.nested.b ).toBe( 222 );
+			expect(
+				typeof state.array[ 1 ] === 'object' && state.array[ 1 ].b
+			).toBe( 22 );
+		} );
+
+		it( 'should return the same proxy if initialized more than once', () => {
+			const raw = {};
+			const state1 = proxifyStateTest( raw );
+			const state2 = proxifyStateTest( raw );
+			expect( state1 ).toBe( state2 );
+		} );
+
+		it( 'should return the same proxy when trying to re-proxify a state object', () => {
+			const state = proxifyStateTest( {} );
+			expect( () => proxifyStateTest( state ) ).toThrow();
+		} );
+	} );
+
+	describe( 'unsupported data structures', () => {
+		it( 'should throw when trying to proxify a class instance', () => {
+			class MyClass {}
+			const obj = new MyClass();
+			expect( () => proxifyStateTest( obj ) ).toThrow();
+		} );
+
+		it( 'should not wrap a class instance', () => {
+			class MyClass {}
+			const obj = new MyClass();
+			const state = proxifyStateTest( { obj } );
+			expect( state.obj ).toBe( obj );
+		} );
+
+		it( 'should not wrap built-ins in proxies', () => {
+			window.MyClass = class MyClass {};
+			const obj = new window.MyClass();
+			const state = proxifyStateTest( { obj } );
+			expect( state.obj ).toBe( obj );
+		} );
+
+		it( 'should not wrap elements in proxies', () => {
+			const el = window.document.createElement( 'div' );
+			const state = proxifyStateTest( { el } );
+			expect( state.el ).toBe( el );
+		} );
+
+		it( 'should wrap global objects', () => {
+			window.obj = { b: 2 };
+			const state = proxifyStateTest( window.obj );
+			expect( state ).not.toBe( window.obj );
+			expect( state ).toStrictEqual( { b: 2 } );
+		} );
+
+		it( 'should not wrap dates', () => {
+			const date = new Date();
+			const state = proxifyStateTest( { date } );
+			expect( state.date ).toBe( date );
+		} );
+
+		it( 'should not wrap regular expressions', () => {
+			const regex = new RegExp( '' );
+			const state = proxifyStateTest( { regex } );
+			expect( state.regex ).toBe( regex );
+		} );
+
+		it( 'should not wrap Map', () => {
+			const map = new Map();
+			const state = proxifyStateTest( { map } );
+			expect( state.map ).toBe( map );
+		} );
+
+		it( 'should not wrap Set', () => {
+			const set = new Set();
+			const state = proxifyStateTest( { set } );
+			expect( state.set ).toBe( set );
 		} );
 	} );
 } );
