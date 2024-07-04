@@ -117,7 +117,7 @@ function FontSizeGroup( {
 										{ size.name }
 									</FlexItem>
 									<FlexItem>
-										<HStack direction="row">
+										<HStack justify="flex-end">
 											<FlexItem className="edit-site-font-size__item edit-site-font-size__item-value">
 												{ size.size }
 											</FlexItem>
