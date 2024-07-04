@@ -110,7 +110,7 @@ export function useCurrentMergeThemeStyleVariationsWithUserConfig( {
 				);
 			} );
 
-		const variationsByProperty = [
+		const variationsByProperties = [
 			userVariationWithoutProperties,
 			...variationsWithPropertiesAndBase,
 		];
@@ -118,8 +118,8 @@ export function useCurrentMergeThemeStyleVariationsWithUserConfig( {
 		/*
 		 * Filter out variations with no settings or styles.
 		 */
-		return variationsByProperty?.length
-			? variationsByProperty.filter( hasThemeVariation )
+		return variationsByProperties?.length
+			? variationsByProperties.filter( hasThemeVariation )
 			: [];
 	}, [ properties.toString(), userVariation, variationsFromTheme ] );
 }
