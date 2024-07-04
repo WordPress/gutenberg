@@ -250,7 +250,8 @@ export function ParentRow() {
 						/>
 						<div>
 							{ __(
-								"Child pages inherit characteristics from their parent, such as URL structure. For instance, if 'Web Design' is a child of 'Services,' its URL would be mysite.com/services/web-design."
+								/* translators: To avoid the potential for linking to live sites, the example URL should be either wordpress.org, a sub-domain of wordpress.org, example.com or example.org */
+								"Child pages inherit characteristics from their parent, such as URL structure. For instance, if 'Web Design' is a child of 'Services,' its URL would be example.com/services/web-design."
 							) }
 							<p>
 								{ __(
