@@ -31,30 +31,6 @@ function focusSidebarElement( el, direction, focusSelector ) {
 	elementToFocus?.focus();
 }
 
-// Navigation state that is updated when navigating back or forward. Helps us
-// manage the animations and also focus.
-function createNavState() {
-	let state = {
-		direction: null,
-		focusSelector: null,
-	};
-
-	return {
-		get() {
-			return state;
-		},
-		navigate( direction, focusSelector = null ) {
-			state = {
-				direction,
-				focusSelector:
-					direction === 'forward' && focusSelector
-						? focusSelector
-						: state.focusSelector,
-			};
-		},
-	};
-}
-
 function SidebarContentWrapper( { children } ) {
 	const navState = useContext( SidebarNavigationContext );
 	const wrapperRef = useRef();
@@ -79,15 +55,11 @@ function SidebarContentWrapper( { children } ) {
 }
 
 export default function SidebarContent( { routeKey, children } ) {
-	const [ navState ] = useState( createNavState );
-
 	return (
-		<SidebarNavigationContext.Provider value={ navState }>
-			<div className="edit-site-sidebar__content">
-				<SidebarContentWrapper key={ routeKey }>
-					{ children }
-				</SidebarContentWrapper>
-			</div>
-		</SidebarNavigationContext.Provider>
+		<div className="edit-site-sidebar__content">
+			<SidebarContentWrapper key={ routeKey }>
+				{ children }
+			</SidebarContentWrapper>
+		</div>
 	);
 }
