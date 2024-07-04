@@ -40,6 +40,7 @@ import Media from '../media';
 import { unlock } from '../../lock-unlock';
 import { useEditPostAction } from '../dataviews-actions';
 import { usePrevious } from '@wordpress/compose';
+import { PostAuthorField } from '../page-templates/author-field';
 
 const { usePostActions } = unlock( editorPrivateApis );
 const { useLocation, useHistory } = unlock( routerPrivateApis );
@@ -395,6 +396,11 @@ export default function PostsList( { postType } ) {
 						value: id,
 						label: name,
 					} ) ) || [],
+				render: ( { item } ) => {
+					return (
+						<PostAuthorField viewType={ view.type } item={ item } />
+					);
+				},
 			},
 			{
 				header: __( 'Status' ),
