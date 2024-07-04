@@ -6,11 +6,15 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
+import { DELETE, BACKSPACE } from '@wordpress/keycodes';
+import { useDispatch } from '@wordpress/data';
+
 import {
 	InspectorControls,
 	URLPopover,
 	URLInput,
 	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
 import {
@@ -32,17 +36,24 @@ const SocialLinkURLPopover = ( {
 	setAttributes,
 	setPopover,
 	popoverAnchor,
+	clientId,
 } ) => {
+	const { removeBlock } = useDispatch( blockEditorStore );
 	return (
 		<URLPopover
 			anchor={ popoverAnchor }
-			onClose={ () => setPopover( false ) }
+			aria-label={ __( 'Edit social link' ) }
+			onClose={ () => {
+				setPopover( false );
+				popoverAnchor?.focus();
+			} }
 		>
 			<form
 				className="block-editor-url-popover__link-editor"
 				onSubmit={ ( event ) => {
 					event.preventDefault();
 					setPopover( false );
+					popoverAnchor?.focus();
 				} }
 			>
 				<div className="block-editor-url-input">
@@ -56,6 +67,18 @@ const SocialLinkURLPopover = ( {
 						label={ __( 'Enter social link' ) }
 						hideLabelFromVision
 						disableSuggestions
+						onKeyDown={ ( event ) => {
+							if (
+								!! url ||
+								event.defaultPrevented ||
+								! [ BACKSPACE, DELETE ].includes(
+									event.keyCode
+								)
+							) {
+								return;
+							}
+							removeBlock( clientId );
+						} }
 					/>
 				</div>
 				<Button
@@ -73,6 +96,7 @@ const SocialLinkEdit = ( {
 	context,
 	isSelected,
 	setAttributes,
+	clientId,
 } ) => {
 	const { url, service, label = '', rel } = attributes;
 	const {
@@ -143,6 +167,7 @@ const SocialLinkEdit = ( {
 					className="wp-block-social-link-anchor"
 					ref={ setPopoverAnchor }
 					onClick={ () => setPopover( true ) }
+					aria-haspopup="dialog"
 				>
 					<IconComponent />
 					<span
@@ -159,6 +184,7 @@ const SocialLinkEdit = ( {
 						setAttributes={ setAttributes }
 						setPopover={ setPopover }
 						popoverAnchor={ popoverAnchor }
+						clientId={ clientId }
 					/>
 				) }
 			</li>
