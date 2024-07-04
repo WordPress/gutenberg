@@ -25,7 +25,11 @@ function render_block_core_button( $attributes, $content ) {
 	 * TODO: After the Gutenberg plugin drops support for WordPress 6.4, this
 	 * class should be replaced with `WP_HTML_Tag_Processor`.
 	 */
-	$p = new Gutenberg_HTML_Tag_Processor_6_5( $content ); // phpcs:ignore Gutenberg.CodeAnalysis.ForbiddenFunctionsAndClasses.ForbiddenClassUsage
+	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN && class_exists( 'Gutenberg_HTML_Tag_Processor_6_5' ) ) {
+	$p = new Gutenberg_HTML_Tag_Processor_6_5( $content );
+} else {
+	$p = new WP_HTML_Tag_Processor( $content );
+}
 
 	/*
 	 * The button block can render an `<a>` or `<button>` and also has a
