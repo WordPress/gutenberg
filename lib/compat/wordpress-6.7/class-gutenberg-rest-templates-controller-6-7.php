@@ -147,13 +147,20 @@ class Gutenberg_REST_Templates_Controller_6_7 extends Gutenberg_REST_Templates_C
 				$theme_name = wp_get_theme( $template_object->theme )->get( 'Name' );
 				return empty( $theme_name ) ? $template_object->theme : $theme_name;
 			case 'plugin':
-				if ( ! function_exists( 'get_plugins' ) ) {
-					require_once ABSPATH . 'wp-admin/includes/plugin.php';
-				}
-				$plugins = get_plugins();
+				$plugins = wp_get_active_and_valid_plugins();
 				// @core-merge: Prioritize plugin name instead of theme name for plugin-registered templates.
 				$plugin_name = isset( $template_object->plugin ) ? $template_object->plugin . '/' . $template_object->plugin : $template_object->theme;
-				$plugin      = $plugins[ plugin_basename( sanitize_text_field( $plugin_name . '.php' ) ) ];
+				$plugin_path = plugin_basename( sanitize_text_field( $plugin_name . '.php' ) );
+
+				$plugin = null;
+				foreach ( $plugins as $plugin_file ) {
+					if ( plugin_basename( $plugin_file ) === $plugin_path ) {
+						$plugin_data = get_plugin_data( $plugin_file );
+						$plugin = $plugin_data;
+						break;
+					}
+				}
+
 				return empty( $plugin['Name'] ) ? $template_object->theme : $plugin['Name'];
 				// @core-merge: End of changes to merge in core.
 			case 'site':
