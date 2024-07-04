@@ -421,6 +421,23 @@ module.exports = {
 			extends: [ 'plugin:ssr-friendly/recommended' ],
 		},
 		{
+			files: [ 'packages/components/src/**' ],
+			rules: {
+				'no-restricted-imports': [
+					'error',
+					{
+						paths: restrictedImports.filter(
+							( { name } ) =>
+								! [
+									'@ariakit/react',
+									'framer-motion',
+								].includes( name )
+						),
+					},
+				],
+			},
+		},
+		{
 			files: [ 'packages/block-editor/**' ],
 			rules: {
 				'no-restricted-imports': [
