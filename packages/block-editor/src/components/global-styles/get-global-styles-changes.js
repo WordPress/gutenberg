@@ -68,7 +68,7 @@ function getTranslation( key ) {
  * @param {string} parentPath     A key/value pair object of block names and their rendered titles.
  * @return {string[]}             An array of paths whose values have changed.
  */
-export function deepCompare( changedObject, originalObject, parentPath = '' ) {
+function deepCompare( changedObject, originalObject, parentPath = '' ) {
 	// We have two non-object values to compare.
 	if ( ! isObject( changedObject ) && ! isObject( originalObject ) ) {
 		/*

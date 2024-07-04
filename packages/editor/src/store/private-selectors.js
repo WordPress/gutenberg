@@ -23,13 +23,55 @@ import {
 import { TEMPLATE_PART_POST_TYPE } from './constants';
 import { getFilteredTemplatePartBlocks } from './utils/get-filtered-template-parts';
 import { getEntityActions as _getEntityActions } from '../dataviews/store/private-selectors';
-import { deepCompare } from '../../../block-editor/src/components/global-styles/get-global-styles-changes';
 
 const EMPTY_INSERTION_POINT = {
 	rootClientId: undefined,
 	insertionIndex: undefined,
 	filterValue: undefined,
 };
+const isObject = ( obj ) => obj !== null && typeof obj === 'object';
+
+/**
+ * A deep comparison of two objects, optimized for comparing metadata changes.
+ * @param {Object} changedObject  The changed object to compare.
+ * @param {Object} originalObject The original object to compare against.
+ * @param {string} parentPath     A key/value pair object of block names and their rendered titles.
+ * @return {string[]}             An array of paths whose values have changed.
+ */
+function deepCompare( changedObject, originalObject, parentPath = '' ) {
+	// We have two non-object values to compare.
+	if ( ! isObject( changedObject ) && ! isObject( originalObject ) ) {
+		/*
+		 * Only return a path if the value has changed.
+		 */
+		return changedObject !== originalObject
+			? parentPath.split( '.' ).join( ' > ' )
+			: undefined;
+	}
+
+	// Enable comparison when an object doesn't have a corresponding property to compare.
+	changedObject = isObject( changedObject ) ? changedObject : {};
+	originalObject = isObject( originalObject ) ? originalObject : {};
+
+	const allKeys = new Set( [
+		...Object.keys( changedObject ),
+		...Object.keys( originalObject ),
+	] );
+
+	let diffs = [];
+	for ( const key of allKeys ) {
+		const path = parentPath ? parentPath + '.' + key : key;
+		const changedPath = deepCompare(
+			changedObject[ key ],
+			originalObject[ key ],
+			path
+		);
+		if ( changedPath ) {
+			diffs = diffs.concat( changedPath );
+		}
+	}
+	return diffs;
+}
 
 /**
  * Get the insertion point for the inserter.
