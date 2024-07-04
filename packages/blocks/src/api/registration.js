@@ -762,7 +762,7 @@ export const unregisterBlockVariation = ( blockName, variationName ) => {
 export const registerBlockBindingsSource = ( source ) => {
 	const {
 		name,
-		label: newLabel,
+		label,
 		getValue,
 		setValue,
 		setValues,
@@ -770,17 +770,11 @@ export const registerBlockBindingsSource = ( source ) => {
 		canUserEditValue,
 	} = source;
 
-	// Sources could exist because they have been initialized in the server.
+	// Check if the source is already registered.
 	const existingSource = unlock(
 		select( blocksStore )
 	).getBlockBindingsSource( name );
-
-	// Override the label if provided.
-	const label = newLabel || existingSource?.label;
-
-	// If the getValue callback is already provided, it shouldn't be overriden.
-	// It can't rely on name or label because those could be initialized in the server.
-	if ( existingSource?.getValue ) {
+	if ( existingSource ) {
 		console.error(
 			'Block bindings source"' + name + '" is already registered.'
 		);
