@@ -4,8 +4,6 @@
 	display: grid;
 	grid-auto-flow: row;
 	grid-template: auto / $header-height minmax(0, max-content) minmax(min-content, 1fr) $header-height;
-	// This class applies when the Document Bar is showing which is from mobile breakpoint unless the
-	// collapsible block toolbar is expanded.
 	&.has-center {
 		grid-template: auto / $header-height min-content 1fr min-content $header-height;
 		@include break-medium {

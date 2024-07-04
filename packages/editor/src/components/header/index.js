@@ -12,10 +12,7 @@ import { __unstableMotion as motion } from '@wordpress/components';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { useState } from '@wordpress/element';
 import { PinnedItems } from '@wordpress/interface';
-import {
-	store as blockEditorStore,
-	privateApis as blockEditorPrivateApis,
-} from '@wordpress/block-editor';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -31,9 +28,6 @@ import PostSavedState from '../post-saved-state';
 import PostViewLink from '../post-view-link';
 import PreviewDropdown from '../preview-dropdown';
 import { store as editorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
-
-const { useHasBlockToolbar } = unlock( blockEditorPrivateApis );
 
 const toolbarVariations = {
 	distractionFreeDisabled: { y: '-50px' },
@@ -92,17 +86,7 @@ function Header( {
 	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
 		useState( true );
 
-	const blockToolbar =
-		useHasBlockToolbar() && hasFixedToolbar && isLargeViewport ? (
-			<CollapsibleBlockToolbar
-				isCollapsed={ isBlockToolsCollapsed }
-				onToggle={ setIsBlockToolsCollapsed }
-			/>
-		) : null;
-
-	const showDocumentBar =
-		( ! blockToolbar || isBlockToolsCollapsed ) &&
-		! isTooNarrowForDocumentBar;
+	const hasCenter = isBlockToolsCollapsed && ! isTooNarrowForDocumentBar;
 	const hasBackButton = useHasBackButton();
 
 	// The edit-post-header classname is only kept for backward compatibilty
@@ -111,7 +95,7 @@ function Header( {
 		<div
 			className={ clsx( 'editor-header edit-post-header', {
 				'has-back-button': hasBackButton,
-				'has-center': showDocumentBar,
+				'has-center': hasCenter,
 			} ) }
 		>
 			{ hasBackButton && (
@@ -130,9 +114,14 @@ function Header( {
 				<DocumentTools
 					disableBlockTools={ forceDisableBlockTools || isTextEditor }
 				/>
-				{ blockToolbar }
+				{ hasFixedToolbar && isLargeViewport && (
+					<CollapsibleBlockToolbar
+						isCollapsed={ isBlockToolsCollapsed }
+						onToggle={ setIsBlockToolsCollapsed }
+					/>
+				) }
 			</motion.div>
-			{ ( title || showDocumentBar ) && (
+			{ hasCenter && (
 				<motion.div
 					className="editor-header__center"
 					variants={ toolbarVariations }
