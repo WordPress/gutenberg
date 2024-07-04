@@ -10,7 +10,8 @@ import { __, _n, sprintf, _x } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useMemo, useState } from '@wordpress/element';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
-
+import { parse } from '@wordpress/blocks';
+import { DataForm } from '@wordpress/dataviews';
 import {
 	Button,
 	TextControl,
@@ -38,6 +39,21 @@ import { CreateTemplatePartModalContents } from '../create-template-part-modal';
 const { PATTERN_TYPES, CreatePatternModalContents, useDuplicatePatternProps } =
 	unlock( patternsPrivateApis );
 
+// TODO: this should be shared with other components (page-pages).
+const fields = [
+	{
+		type: 'text',
+		header: __( 'Title' ),
+		id: 'title',
+		placeholder: __( 'No title' ),
+		getValue: ( { item } ) => item.title,
+	},
+];
+
+const form = {
+	visibleFields: [ 'title' ],
+};
+
 /**
  * Check if a template is removable.
  *
@@ -52,18 +68,10 @@ function isTemplateRemovable( template ) {
 	// than the one returned from the endpoint. This is why we need to check for
 	// two props whether is custom or has a theme file.
 	return (
-		[ template.source, template.templatePart?.source ].includes(
-			TEMPLATE_ORIGINS.custom
-		) &&
-		! template.has_theme_file &&
-		! template.templatePart?.has_theme_file
+		template?.source === TEMPLATE_ORIGINS.custom &&
+		! template?.has_theme_file
 	);
 }
-const canDeleteOrReset = ( item ) => {
-	const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
-	const isUserPattern = item.type === PATTERN_TYPES.user;
-	return isUserPattern || ( isTemplatePart && item.isCustom );
-};
 
 function getItemTitle( item ) {
 	if ( typeof item.title === 'string' ) {
@@ -71,81 +79,6 @@ function getItemTitle( item ) {
 	}
 	return decodeEntities( item.title?.rendered || '' );
 }
-
-// This action is used for templates, patterns and template parts.
-// Every other post type uses the similar `trashPostAction` which
-// moves the post to trash.
-const deletePostAction = {
-	id: 'delete-post',
-	label: __( 'Delete' ),
-	isPrimary: true,
-	icon: trash,
-	isEligible( post ) {
-		if (
-			[ TEMPLATE_POST_TYPE, TEMPLATE_PART_POST_TYPE ].includes(
-				post.type
-			)
-		) {
-			return isTemplateRemovable( post );
-		}
-		// We can only remove user patterns.
-		return post.type === PATTERN_TYPES.user;
-	},
-	supportsBulk: true,
-	hideModalHeader: true,
-	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
-		const [ isBusy, setIsBusy ] = useState( false );
-		const { removeTemplates } = unlock( useDispatch( editorStore ) );
-		return (
-			<VStack spacing="5">
-				<Text>
-					{ items.length > 1
-						? sprintf(
-								// translators: %d: number of items to delete.
-								_n(
-									'Delete %d item?',
-									'Delete %d items?',
-									items.length
-								),
-								items.length
-						  )
-						: sprintf(
-								// translators: %s: The template or template part's titles
-								__( 'Delete "%s"?' ),
-								getItemTitle( items[ 0 ] )
-						  ) }
-				</Text>
-				<HStack justify="right">
-					<Button
-						variant="tertiary"
-						onClick={ closeModal }
-						disabled={ isBusy }
-						__experimentalIsFocusable
-					>
-						{ __( 'Cancel' ) }
-					</Button>
-					<Button
-						variant="primary"
-						onClick={ async () => {
-							setIsBusy( true );
-							await removeTemplates( items, {
-								allowUndo: false,
-							} );
-							onActionPerformed?.( items );
-							setIsBusy( false );
-							closeModal();
-						} }
-						isBusy={ isBusy }
-						disabled={ isBusy }
-						__experimentalIsFocusable
-					>
-						{ __( 'Delete' ) }
-					</Button>
-				</HStack>
-			</VStack>
-		);
-	},
-};
 
 const trashPostAction = {
 	id: 'move-to-trash',
@@ -223,7 +156,11 @@ const trashPostAction = {
 								} else if ( items[ 0 ].type === 'page' ) {
 									successMessage = sprintf(
 										/* translators: The number of items. */
-										__( '%s items moved to trash.' ),
+										_n(
+											'%s item moved to trash.',
+											'%s items moved to trash.',
+											items.length
+										),
 										items.length
 									);
 								} else {
@@ -307,34 +244,29 @@ const trashPostAction = {
 	},
 };
 
-function useTrashPostAction( postType ) {
+function useCanUserEligibilityCheckPostType( capability, resource, action ) {
 	const registry = useRegistry();
-	const { resource, cachedCanUserResolvers } = useSelect(
-		( select ) => {
-			const { getPostType, getCachedResolvers } = select( coreStore );
-			return {
-				resource: getPostType( postType )?.rest_base || '',
-				cachedCanUserResolvers: getCachedResolvers().canUser,
-			};
-		},
-		[ postType ]
-	);
 	return useMemo(
 		() => ( {
-			...trashPostAction,
+			...action,
 			isEligible( item ) {
 				return (
-					trashPostAction.isEligible( item ) &&
+					action.isEligible( item ) &&
 					registry
 						.select( coreStore )
-						.canUser( 'delete', resource, item.id )
+						.canUser( capability, resource, item.id )
 				);
 			},
 		} ),
-		// We are making this use memo depend on cachedCanUserResolvers as a way to make the component using this hook re-render
-		// when user capabilities are resolved. This makes sure the isEligible function is re-evaluated.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[ registry, resource, cachedCanUserResolvers ]
+		[ action, registry, capability, resource ]
+	);
+}
+
+function useTrashPostAction( resource ) {
+	return useCanUserEligibilityCheckPostType(
+		'delete',
+		resource,
+		trashPostAction
 	);
 }
 
@@ -427,6 +359,14 @@ const permanentlyDeletePostAction = {
 		}
 	},
 };
+
+function usePermanentlyDeletePostAction( resource ) {
+	return useCanUserEligibilityCheckPostType(
+		'delete',
+		resource,
+		permanentlyDeletePostAction
+	);
+}
 
 const restorePostAction = {
 	id: 'restore',
@@ -535,6 +475,14 @@ const restorePostAction = {
 	},
 };
 
+function useRestorePostAction( resource ) {
+	return useCanUserEligibilityCheckPostType(
+		'update',
+		resource,
+		restorePostAction
+	);
+}
+
 const viewPostAction = {
 	id: 'view-post',
 	label: __( 'View' ),
@@ -615,19 +563,13 @@ const renamePostAction = {
 		// two props whether is custom or has a theme file.
 		const isCustomPattern =
 			isUserPattern ||
-			( isTemplatePart &&
-				( post.isCustom || post.source === TEMPLATE_ORIGINS.custom ) );
-		const hasThemeFile =
-			isTemplatePart &&
-			( post.templatePart?.has_theme_file || post.has_theme_file );
+			( isTemplatePart && post.source === TEMPLATE_ORIGINS.custom );
+		const hasThemeFile = post?.has_theme_file;
 		return isCustomPattern && ! hasThemeFile;
 	},
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ item ] = items;
-		const originalTitle = decodeEntities(
-			typeof item.title === 'string' ? item.title : item.title.rendered
-		);
-		const [ title, setTitle ] = useState( () => originalTitle );
+		const [ title, setTitle ] = useState( () => getItemTitle( item ) );
 		const { editEntityRecord, saveEditedEntityRecord } =
 			useDispatch( coreStore );
 		const { createSuccessNotice, createErrorNotice } =
@@ -694,6 +636,14 @@ const renamePostAction = {
 	},
 };
 
+function useRenamePostAction( resource ) {
+	return useCanUserEligibilityCheckPostType(
+		'update',
+		resource,
+		renamePostAction
+	);
+}
+
 const useDuplicatePostAction = ( postType ) => {
 	const { userCanCreatePost } = useSelect(
 		( select ) => {
@@ -714,16 +664,17 @@ const useDuplicatePostAction = ( postType ) => {
 					return status !== 'trash';
 				},
 				RenderModal: ( { items, closeModal, onActionPerformed } ) => {
-					const [ item ] = items;
+					const [ item, setItem ] = useState( {
+						...items[ 0 ],
+						title: sprintf(
+							/* translators: %s: Existing template title */
+							__( '%s (Copy)' ),
+							getItemTitle( items[ 0 ] )
+						),
+					} );
+
 					const [ isCreatingPage, setIsCreatingPage ] =
 						useState( false );
-					const [ title, setTitle ] = useState(
-						sprintf(
-							/* translators: %s: Existing item title */
-							__( '%s (Copy)' ),
-							getItemTitle( item )
-						)
-					);
 
 					const { saveEntityRecord } = useDispatch( coreStore );
 					const { createSuccessNotice, createErrorNotice } =
@@ -738,8 +689,8 @@ const useDuplicatePostAction = ( postType ) => {
 
 						const newItemOject = {
 							status: 'draft',
-							title,
-							slug: title || __( 'No title' ),
+							title: item.title,
+							slug: item.title || __( 'No title' ),
 							comment_status: item.comment_status,
 							content:
 								typeof item.content === 'string'
@@ -790,7 +741,7 @@ const useDuplicatePostAction = ( postType ) => {
 									// translators: %s: Title of the created template e.g: "Category".
 									__( '"%s" successfully created.' ),
 									decodeEntities(
-										newItem.title?.rendered || title
+										newItem.title?.rendered || item.title
 									)
 								),
 								{
@@ -818,14 +769,15 @@ const useDuplicatePostAction = ( postType ) => {
 							closeModal();
 						}
 					}
+
 					return (
 						<form onSubmit={ createPage }>
 							<VStack spacing={ 3 }>
-								<TextControl
-									label={ __( 'Title' ) }
-									onChange={ setTitle }
-									placeholder={ __( 'No title' ) }
-									value={ title }
+								<DataForm
+									data={ item }
+									fields={ fields }
+									form={ form }
+									onChange={ setItem }
 								/>
 								<HStack spacing={ 2 } justify="end">
 									<Button
@@ -852,68 +804,50 @@ const useDuplicatePostAction = ( postType ) => {
 	);
 };
 
-const isTemplatePartRevertable = ( item ) => {
-	if ( ! item ) {
-		return false;
-	}
-	const hasThemeFile = item.templatePart?.has_theme_file;
-	return canDeleteOrReset( item ) && hasThemeFile;
-};
-
 const resetTemplateAction = {
 	id: 'reset-template',
 	label: __( 'Reset' ),
 	isEligible: ( item ) => {
-		return item.type === TEMPLATE_PART_POST_TYPE
-			? isTemplatePartRevertable( item )
-			: isTemplateRevertable( item );
+		return isTemplateRevertable( item );
 	},
 	icon: backup,
 	supportsBulk: true,
 	hideModalHeader: true,
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ isBusy, setIsBusy ] = useState( false );
-		const { revertTemplate, removeTemplates } = unlock(
-			useDispatch( editorStore )
-		);
+		const { revertTemplate } = unlock( useDispatch( editorStore ) );
 		const { saveEditedEntityRecord } = useDispatch( coreStore );
 		const { createSuccessNotice, createErrorNotice } =
 			useDispatch( noticesStore );
 		const onConfirm = async () => {
 			try {
-				if ( items[ 0 ].type === TEMPLATE_PART_POST_TYPE ) {
-					await removeTemplates( items );
-				} else {
-					for ( const template of items ) {
-						if ( template.type === TEMPLATE_POST_TYPE ) {
-							await revertTemplate( template, {
-								allowUndo: false,
-							} );
-							await saveEditedEntityRecord(
-								'postType',
-								template.type,
-								template.id
-							);
-						}
-					}
-					createSuccessNotice(
-						items.length > 1
-							? sprintf(
-									/* translators: The number of items. */
-									__( '%s items reset.' ),
-									items.length
-							  )
-							: sprintf(
-									/* translators: The template/part's name. */
-									__( '"%s" reset.' ),
-									decodeEntities( getItemTitle( items[ 0 ] ) )
-							  ),
-						{
-							type: 'snackbar',
-							id: 'revert-template-action',
-						}
+				for ( const template of items ) {
+					await revertTemplate( template, {
+						allowUndo: false,
+					} );
+					await saveEditedEntityRecord(
+						'postType',
+						template.type,
+						template.id
 					);
 				}
+				createSuccessNotice(
+					items.length > 1
+						? sprintf(
+								/* translators: The number of items. */
+								__( '%s items reset.' ),
+								items.length
+						  )
+						: sprintf(
+								/* translators: The template/part's name. */
+								__( '"%s" reset.' ),
+								decodeEntities( getItemTitle( items[ 0 ] ) )
+						  ),
+					{
+						type: 'snackbar',
+						id: 'revert-template-action',
+					}
+				);
 			} catch ( error ) {
 				let fallbackErrorMessage;
 				if ( items[ 0 ].type === TEMPLATE_POST_TYPE ) {
@@ -1008,13 +942,21 @@ export const duplicateTemplatePartAction = {
 	modalHeader: _x( 'Duplicate template part', 'action label' ),
 	RenderModal: ( { items, closeModal } ) => {
 		const [ item ] = items;
+		const blocks = useMemo( () => {
+			return (
+				item.blocks ??
+				parse( item.content.raw, {
+					__unstableSkipMigrationLogs: true,
+				} )
+			);
+		}, [ item?.content?.raw, item.blocks ] );
 		const { createSuccessNotice } = useDispatch( noticesStore );
 		function onTemplatePartSuccess() {
 			createSuccessNotice(
 				sprintf(
 					// translators: %s: The new template part's title e.g. 'Call to action (copy)'.
 					__( '"%s" duplicated.' ),
-					item.title
+					getItemTitle( item )
 				),
 				{ type: 'snackbar', id: 'edit-site-patterns-success' }
 			);
@@ -1022,12 +964,12 @@ export const duplicateTemplatePartAction = {
 		}
 		return (
 			<CreateTemplatePartModalContents
-				blocks={ item.blocks }
-				defaultArea={ item.templatePart?.area || item.area }
+				blocks={ blocks }
+				defaultArea={ item.area }
 				defaultTitle={ sprintf(
 					/* translators: %s: Existing template part title */
 					__( '%s (Copy)' ),
-					item.title
+					getItemTitle( item )
 				) }
 				onCreate={ onTemplatePartSuccess }
 				onError={ closeModal }
@@ -1038,23 +980,36 @@ export const duplicateTemplatePartAction = {
 };
 
 export function usePostActions( { postType, onActionPerformed, context } ) {
-	const { defaultActions, postTypeObject, userCanCreatePostType } = useSelect(
+	const {
+		defaultActions,
+		postTypeObject,
+		userCanCreatePostType,
+		resource,
+		cachedCanUserResolvers,
+	} = useSelect(
 		( select ) => {
-			const { getPostType, canUser } = select( coreStore );
+			const { getPostType, canUser, getCachedResolvers } =
+				select( coreStore );
 			const { getEntityActions } = unlock( select( editorStore ) );
 			const _postTypeObject = getPostType( postType );
-			const resource = _postTypeObject?.rest_base || '';
+			const _resource = _postTypeObject?.rest_base || '';
 			return {
 				postTypeObject: _postTypeObject,
 				defaultActions: getEntityActions( 'postType', postType ),
-				userCanCreatePostType: canUser( 'create', resource ),
+				userCanCreatePostType: canUser( 'create', _resource ),
+				resource: _resource,
+				cachedCanUserResolvers: getCachedResolvers()?.canUser,
 			};
 		},
 		[ postType ]
 	);
 
 	const duplicatePostAction = useDuplicatePostAction( postType );
-	const trashPostActionForPostType = useTrashPostAction( postType );
+	const trashPostActionForPostType = useTrashPostAction( resource );
+	const permanentlyDeletePostActionForPostType =
+		usePermanentlyDeletePostAction( resource );
+	const renamePostActionForPostType = useRenamePostAction( resource );
+	const restorePostActionForPostType = useRestorePostAction( resource );
 	const isTemplateOrTemplatePart = [
 		TEMPLATE_POST_TYPE,
 		TEMPLATE_PART_POST_TYPE,
@@ -1080,13 +1035,16 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 				userCanCreatePostType &&
 				duplicateTemplatePartAction,
 			isPattern && userCanCreatePostType && duplicatePatternAction,
-			supportsTitle && renamePostAction,
+			supportsTitle && renamePostActionForPostType,
 			isPattern && exportPatternAsJSONAction,
-			isTemplateOrTemplatePart ? resetTemplateAction : restorePostAction,
-			isTemplateOrTemplatePart || isPattern
-				? deletePostAction
-				: trashPostActionForPostType,
-			! isTemplateOrTemplatePart && permanentlyDeletePostAction,
+			isTemplateOrTemplatePart
+				? resetTemplateAction
+				: restorePostActionForPostType,
+			! isTemplateOrTemplatePart &&
+				! isPattern &&
+				trashPostActionForPostType,
+			! isTemplateOrTemplatePart &&
+				permanentlyDeletePostActionForPostType,
 			...defaultActions,
 		].filter( Boolean );
 		// Filter actions based on provided context. If not provided
@@ -1144,6 +1102,9 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 		}
 
 		return actions;
+		// We are making this use memo depend on cachedCanUserResolvers as a way to make the component using this hook re-render
+		// when user capabilities are resolved. This makes sure the isEligible functions of actions dependent on capabilities are re-evaluated.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [
 		defaultActions,
 		userCanCreatePostType,
@@ -1152,10 +1113,14 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 		postTypeObject?.viewable,
 		duplicatePostAction,
 		trashPostActionForPostType,
+		restorePostActionForPostType,
+		renamePostActionForPostType,
+		permanentlyDeletePostActionForPostType,
 		onActionPerformed,
 		isLoaded,
 		supportsRevisions,
 		supportsTitle,
 		context,
+		cachedCanUserResolvers,
 	] );
 }

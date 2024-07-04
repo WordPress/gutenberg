@@ -37,13 +37,13 @@ import { store as editSiteStore } from '../../store';
 import SiteHub from '../site-hub';
 import ResizableFrame from '../resizable-frame';
 import { unlock } from '../../lock-unlock';
-import SavePanel from '../save-panel';
 import KeyboardShortcutsRegister from '../keyboard-shortcuts/register';
 import KeyboardShortcutsGlobal from '../keyboard-shortcuts/global';
 import { useIsSiteEditorLoading } from './hooks';
 import useMovingAnimation from './animation';
 import SidebarContent from '../sidebar';
 import SaveHub from '../save-hub';
+import SavePanel from '../save-panel';
 import useSyncCanvasModeWithURL from '../sync-state-with-url/use-sync-canvas-mode-with-url';
 
 const { useCommands } = unlock( coreCommandsPrivateApis );
@@ -163,6 +163,7 @@ export default function Layout( { route } ) {
 											{ areas.sidebar }
 										</SidebarContent>
 										<SaveHub />
+										<SavePanel />
 									</motion.div>
 								) }
 							</AnimatePresence>
@@ -236,8 +237,6 @@ export default function Layout( { route } ) {
 						</div>
 					) }
 				</div>
-
-				<SavePanel />
 			</div>
 		</>
 	);

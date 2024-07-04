@@ -262,6 +262,12 @@ _Usage_
 <DocumentBar />
 ```
 
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.title_ `string`: A title for the document, defaulting to the document or template title currently being edited.
+-   _props.icon_ `import("@wordpress/components").IconType`: An icon for the document, defaulting to an icon for document or template currently being edited.
+
 _Returns_
 
 -   `JSX.Element`: The rendered DocumentBar component.
@@ -1289,7 +1295,7 @@ _Returns_
 
 ### PostSticky
 
-Renders the PostSticky component. It provide toggle control for the sticky post feature.
+Renders the PostSticky component. It provides a checkbox control for the sticky post feature.
 
 _Returns_
 

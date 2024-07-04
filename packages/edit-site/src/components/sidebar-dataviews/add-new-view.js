@@ -19,7 +19,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  * Internal dependencies
  */
 import SidebarNavigationItem from '../sidebar-navigation-item';
-import { DEFAULT_VIEWS } from './default-views';
+import { useDefaultViews } from './default-views';
 import { unlock } from '../../lock-unlock';
 
 const { useHistory } = unlock( routerPrivateApis );
@@ -29,6 +29,7 @@ function AddNewItemModalContent( { type, setIsAdding } ) {
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const [ title, setTitle ] = useState( '' );
 	const [ isSaving, setIsSaving ] = useState( false );
+	const DEFAULT_VIEWS = useDefaultViews( { postType: type } );
 	return (
 		<form
 			onSubmit={ async ( event ) => {

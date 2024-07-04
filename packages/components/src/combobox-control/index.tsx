@@ -346,6 +346,8 @@ function ComboboxControl( props: ComboboxControlProps ) {
 								<Button
 									className="components-combobox-control__reset"
 									icon={ closeSmall }
+									// Disable reason: Focus returns to input field when reset is clicked.
+									// eslint-disable-next-line no-restricted-syntax
 									disabled={ ! value }
 									onClick={ handleOnReset }
 									label={ __( 'Reset' ) }
