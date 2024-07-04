@@ -92,6 +92,7 @@ class Gutenberg_REST_Templates_Controller_6_7 extends Gutenberg_REST_Templates_C
 	 * @param WP_Block_Template $template_object Template instance.
 	 * @return string                            Original source of the template one of theme, plugin, site, or user.
 	 */
+	// @core-merge: Nothing has changed in this function, the only reason to include it here is that it's a private function.
 	private static function get_wp_templates_original_source_field( $template_object ) {
 		if ( 'wp_template' === $template_object->type || 'wp_template_part' === $template_object->type ) {
 			// Added by theme.
