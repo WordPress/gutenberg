@@ -10,12 +10,34 @@ import { getProxy, shouldProxy } from './registry';
 import { PropSignal } from './signals';
 import { setNamespace, resetNamespace } from '../hooks';
 
+type WellKnownSymbols =
+	| 'asyncIterator'
+	| 'hasInstance'
+	| 'isConcatSpreadable'
+	| 'iterator'
+	| 'match'
+	| 'matchAll'
+	| 'replace'
+	| 'search'
+	| 'species'
+	| 'split'
+	| 'toPrimitive'
+	| 'toStringTag'
+	| 'unscopables';
+
 const proxyToProps: WeakMap<
 	object,
 	Map< string | symbol, PropSignal >
 > = new WeakMap();
 
 const objToIterable = new WeakMap< object, Signal< number > >();
+
+const wellKnownSymbols = new Set(
+	Object.getOwnPropertyNames( Symbol )
+		.map( ( key ) => Symbol[ key as WellKnownSymbols ] )
+		.filter( ( value ) => typeof value === 'symbol' )
+);
+
 const descriptor = Object.getOwnPropertyDescriptor;
 
 let peeking = false;
@@ -23,13 +45,16 @@ let peeking = false;
 const stateHandlers: ProxyHandler< object > = {
 	get( target: object, key: string, receiver: object ): any {
 		const desc = descriptor( target, key );
-		const isPropFromObjectPrototype = ! desc && key in target;
 
 		/*
-		 * If peeking, or the property comes from the Object prototype, then it
-		 * should not be processed.
+		 * If peeking, the property comes from the Object prototype, or the key
+		 * is a well-known symbol, then it should not be processed.
 		 */
-		if ( peeking || isPropFromObjectPrototype ) {
+		if (
+			peeking ||
+			( ! desc && key in Object.prototype ) ||
+			( typeof key === 'symbol' && wellKnownSymbols.has( key ) )
+		) {
 			return Reflect.get( target, key, receiver );
 		}
 

@@ -1128,4 +1128,35 @@ describe( 'interactivity api - state proxy', () => {
 			expect( state.set ).toBe( set );
 		} );
 	} );
+
+	describe( 'symbols', () => {
+		it( 'should observe symbols', () => {
+			const key = Symbol( 'key' );
+			let x;
+			const store = proxifyStateTest< { [ key: symbol ]: any } >( {} );
+			effect( () => ( x = store[ key ] ) );
+
+			expect( store[ key ] ).toBe( undefined );
+			expect( x ).toBe( undefined );
+
+			store[ key ] = true;
+
+			expect( store[ key ] ).toBe( true );
+			expect( x ).toBe( true );
+		} );
+
+		it( 'should not observe well-known symbols', () => {
+			const key = Symbol.isConcatSpreadable;
+			let x;
+			const state = proxifyStateTest< { [ key: symbol ]: any } >( {} );
+			effect( () => ( x = state[ key ] ) );
+
+			expect( state[ key ] ).toBe( undefined );
+			expect( x ).toBe( undefined );
+
+			state[ key ] = true;
+			expect( state[ key ] ).toBe( true );
+			expect( x ).toBe( undefined );
+		} );
+	} );
 } );
