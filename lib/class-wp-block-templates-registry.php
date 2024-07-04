@@ -54,7 +54,7 @@ if ( ! class_exists( 'WP_Block_Templates_Registry' ) ) {
 					__( 'Block template names must be a string.', 'gutenberg' ),
 					'6.7.0'
 				);
-				return new WP_Error( 'template_name_no_string', __( 'Block template names must be a string.' ) );
+				return new WP_Error( 'template_name_no_string', __( 'Block template names must be a string.', 'gutenberg' ) );
 			}
 
 			if ( preg_match( '/[A-Z]+/', $template_name ) ) {
@@ -63,7 +63,7 @@ if ( ! class_exists( 'WP_Block_Templates_Registry' ) ) {
 					__( 'Block template names must not contain uppercase characters.', 'gutenberg' ),
 					'6.7.0'
 				);
-				return new WP_Error( 'template_name_no_uppercase', __( 'Block template names must not contain uppercase characters.' ) );
+				return new WP_Error( 'template_name_no_uppercase', __( 'Block template names must not contain uppercase characters.', 'gutenberg' ) );
 			}
 
 			$name_matcher = '/^[a-z0-9-]+\/\/[a-z0-9-]+$/';
@@ -73,7 +73,7 @@ if ( ! class_exists( 'WP_Block_Templates_Registry' ) ) {
 					__( 'Block template names must contain a namespace prefix. Example: my-plugin//my-custom-template', 'gutenberg' ),
 					'6.7.0'
 				);
-				return new WP_Error( 'template_no_prefix', __( 'Block template names must contain a namespace prefix. Example: my-plugin//my-custom-template' ) );
+				return new WP_Error( 'template_no_prefix', __( 'Block template names must contain a namespace prefix. Example: my-plugin//my-custom-template', 'gutenberg' ) );
 			}
 
 			if ( $this->is_registered( $template_name ) ) {
@@ -83,7 +83,8 @@ if ( ! class_exists( 'WP_Block_Templates_Registry' ) ) {
 					sprintf( __( 'Template "%s" is already registered.', 'gutenberg' ), $template_name ),
 					'6.7.0'
 				);
-				return new WP_Error( 'template_already_registered', __( 'Template "%s" is already registered.' ) );
+				/* translators: %s: Template name. */
+				return new WP_Error( 'template_already_registered', __( 'Template "%s" is already registered.', 'gutenberg' ) );
 			}
 
 			if ( ! $template ) {
@@ -184,11 +185,14 @@ if ( ! class_exists( 'WP_Block_Templates_Registry' ) ) {
 				return array();
 			}
 
-			$query = wp_parse_args( $query, array(
-				'slug__in'      => array(),
-				'slug__not_in'  => array(),
-				'post_type'     => '',
-			) );
+			$query            = wp_parse_args(
+				$query,
+				array(
+					'slug__in'     => array(),
+					'slug__not_in' => array(),
+					'post_type'    => '',
+				)
+			);
 			$slugs_to_include = $query['slug__in'];
 			$slugs_to_skip    = $query['slug__not_in'];
 			$post_type        = $query['post_type'];
@@ -234,11 +238,12 @@ if ( ! class_exists( 'WP_Block_Templates_Registry' ) ) {
 			if ( ! $this->is_registered( $template_name ) ) {
 				_doing_it_wrong(
 					__METHOD__,
-					/* translators: %s: template name. */
+					/* translators: %s: Template name. */
 					sprintf( __( 'Template "%s" is not registered.', 'gutenberg' ), $template_name ),
 					'6.7.0'
 				);
-				return new WP_Error( 'template_not_registered', __( 'Template "%s" is not registered.' ) );
+				/* translators: %s: Template name. */
+				return new WP_Error( 'template_not_registered', __( 'Template "%s" is not registered.', 'gutenberg' ) );
 			}
 
 			$unregistered_block_template = $this->registered_block_templates[ $template_name ];

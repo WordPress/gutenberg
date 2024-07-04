@@ -148,7 +148,7 @@ class Gutenberg_REST_Templates_Controller_6_7 extends Gutenberg_REST_Templates_C
 			case 'plugin':
 				// @core-merge: Prioritize plugin name instead of theme name for plugin-registered templates.
 				if ( isset( $template_object->plugin ) ) {
-					$plugins     = wp_get_active_and_valid_plugins();
+					$plugins = wp_get_active_and_valid_plugins();
 
 					foreach ( $plugins as $plugin_file ) {
 						$plugin_basename = plugin_basename( $plugin_file );
