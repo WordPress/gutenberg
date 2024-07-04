@@ -22,53 +22,49 @@ export { metadata, name };
 export const settings = {
 	icon,
 	example: {
+		attributes: {
+			layout: {
+				type: 'constrained',
+				justifyContent: 'center',
+			},
+			style: {
+				spacing: {
+					padding: {
+						top: '1em',
+						right: '1em',
+						bottom: '1em',
+						left: '1em',
+					},
+				},
+			},
+		},
 		innerBlocks: [
 			{
-				name: 'core/paragraph',
+				name: 'core/heading',
 				attributes: {
-					customTextColor: '#cf2e2e',
-					fontSize: 'large',
-					content: __( 'One.' ),
+					content: __( 'La Mancha' ),
+					textAlign: 'center',
+				},
+			},
+			{
+				name: 'core/image',
+				attributes: {
+					url: 'https://s.w.org/images/core/5.3/Glacial_lakes%2C_Bhutan.jpg',
 				},
 			},
 			{
 				name: 'core/paragraph',
 				attributes: {
-					customTextColor: '#ff6900',
-					fontSize: 'large',
-					content: __( 'Two.' ),
+					align: 'center',
+					content: __(
+						'In a village of La Mancha, the name of which I have no desire to call to mind, there lived not long since one of those gentlemen that keep a lance in the lance-rack, an old buckler, a lean hack, and a greyhound for coursing.'
+					),
 				},
 			},
 			{
-				name: 'core/paragraph',
+				name: 'core/button',
 				attributes: {
-					customTextColor: '#fcb900',
-					fontSize: 'large',
-					content: __( 'Three.' ),
-				},
-			},
-			{
-				name: 'core/paragraph',
-				attributes: {
-					customTextColor: '#00d084',
-					fontSize: 'large',
-					content: __( 'Four.' ),
-				},
-			},
-			{
-				name: 'core/paragraph',
-				attributes: {
-					customTextColor: '#0693e3',
-					fontSize: 'large',
-					content: __( 'Five.' ),
-				},
-			},
-			{
-				name: 'core/paragraph',
-				attributes: {
-					customTextColor: '#9b51e0',
-					fontSize: 'large',
-					content: __( 'Six.' ),
+					text: __( 'Read more' ),
 				},
 			},
 		],
