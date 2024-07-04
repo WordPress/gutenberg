@@ -106,7 +106,7 @@ function FontSizeGroup( {
 				</HStack>
 
 				{ !! sizes.length && (
-					<ItemGroup isBordered isSeparated size="large">
+					<ItemGroup isBordered isSeparated>
 						{ sizes.map( ( size ) => (
 							<NavigationButtonAsItem
 								key={ size.slug }
