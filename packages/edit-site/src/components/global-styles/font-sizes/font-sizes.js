@@ -139,7 +139,9 @@ function FontSizes() {
 		<VStack spacing={ 2 }>
 			<ScreenHeader
 				title={ __( 'Font size presets' ) }
-				description={ __( 'Manage the font size presets' ) }
+				description={ __(
+					'Create and edit the presets used for font sizes across the site.'
+				) }
 			/>
 
 			<View>
