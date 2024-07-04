@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New features
+
+- Added a new `DataForm` component to render controls from a given configuration (fields, form), and data.
+
 ## 2.2.0 (2024-06-26)
 
 ## 2.1.0 (2024-06-15)

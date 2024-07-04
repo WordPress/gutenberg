@@ -13,39 +13,64 @@ import { space } from '../utils/space';
 import { chevronIconSize } from '../select-control/styles/select-control-styles';
 import type { CustomSelectButtonSize } from './types';
 
-const ITEM_PADDING = space( 2 );
+const INLINE_PADDING = {
+	compact: 8, // space(2)
+	small: 8, // space(2)
+	default: 16, // space(4)
+};
 
-const truncateStyles = css`
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-`;
+const getSelectSize = (
+	size: NonNullable< CustomSelectButtonSize[ 'size' ] >,
+	heightProperty: 'minHeight' | 'height'
+) => {
+	const sizes = {
+		compact: {
+			[ heightProperty ]: 32,
+			paddingInlineStart: INLINE_PADDING.compact,
+			paddingInlineEnd: INLINE_PADDING.compact + chevronIconSize,
+		},
+		default: {
+			[ heightProperty ]: 40,
+			paddingInlineStart: INLINE_PADDING.default,
+			paddingInlineEnd: INLINE_PADDING.default + chevronIconSize,
+		},
+		small: {
+			[ heightProperty ]: 24,
+			paddingInlineStart: INLINE_PADDING.small,
+			paddingInlineEnd: INLINE_PADDING.small + chevronIconSize,
+		},
+	};
 
-export const WithHintWrapper = styled.div`
-	display: flex;
-	justify-content: space-between;
-	flex: 1;
-`;
+	return sizes[ size ] || sizes.default;
+};
 
-export const SelectedExperimentalHintWrapper = styled.div`
-	${ truncateStyles }
-`;
+const getSelectItemSize = (
+	size: NonNullable< CustomSelectButtonSize[ 'size' ] >
+) => {
+	// Used to visually align the checkmark with the chevron
+	const checkmarkCorrection = 6;
+	const sizes = {
+		compact: {
+			paddingInlineStart: INLINE_PADDING.compact,
+			paddingInlineEnd: INLINE_PADDING.compact - checkmarkCorrection,
+		},
+		default: {
+			paddingInlineStart: INLINE_PADDING.default,
+			paddingInlineEnd: INLINE_PADDING.default - checkmarkCorrection,
+		},
+		small: {
+			paddingInlineStart: INLINE_PADDING.small,
+			paddingInlineEnd: INLINE_PADDING.small - checkmarkCorrection,
+		},
+	};
 
-export const SelectedExperimentalHintItem = styled.span`
-	color: ${ COLORS.theme.gray[ 600 ] };
-	margin-inline-start: ${ space( 2 ) };
-`;
-
-export const ExperimentalHintItem = styled.span`
-	color: ${ COLORS.theme.gray[ 600 ] };
-	text-align: right;
-	margin-inline-end: ${ space( 1 ) };
-`;
+	return sizes[ size ] || sizes.default;
+};
 
 export const SelectLabel = styled( Ariakit.SelectLabel )`
 	font-size: 11px;
 	font-weight: 500;
-	line-height: 1.4;
+	line-height: ${ CONFIG.fontLineHeightBase };
 	text-transform: uppercase;
 	margin-bottom: ${ space( 2 ) };
 `;
@@ -53,38 +78,14 @@ export const SelectLabel = styled( Ariakit.SelectLabel )`
 export const Select = styled( Ariakit.Select, {
 	// Do not forward `hasCustomRenderProp` to the underlying Ariakit.Select component
 	shouldForwardProp: ( prop ) => prop !== 'hasCustomRenderProp',
-} )( ( {
-	size,
-	hasCustomRenderProp,
-}: {
-	size: NonNullable< CustomSelectButtonSize[ 'size' ] >;
-	hasCustomRenderProp: boolean;
-} ) => {
-	const heightProperty = hasCustomRenderProp ? 'minHeight' : 'height';
-
-	const getSize = () => {
-		const sizes = {
-			compact: {
-				[ heightProperty ]: 32,
-				paddingInlineStart: 8,
-				paddingInlineEnd: 8 + chevronIconSize,
-			},
-			default: {
-				[ heightProperty ]: 40,
-				paddingInlineStart: 16,
-				paddingInlineEnd: 16 + chevronIconSize,
-			},
-			small: {
-				[ heightProperty ]: 24,
-				paddingInlineStart: 8,
-				paddingInlineEnd: 8 + chevronIconSize,
-			},
-		};
-
-		return sizes[ size ] || sizes.default;
-	};
-
-	return css`
+} )(
+	( {
+		size,
+		hasCustomRenderProp,
+	}: {
+		size: NonNullable< CustomSelectButtonSize[ 'size' ] >;
+		hasCustomRenderProp: boolean;
+	} ) => css`
 		display: block;
 		background-color: ${ COLORS.theme.background };
 		border: none;
@@ -100,10 +101,10 @@ export const Select = styled( Ariakit.Select, {
 			outline: none; // handled by InputBase component
 		}
 
-		${ getSize() }
+		${ getSelectSize( size, hasCustomRenderProp ? 'minHeight' : 'height' ) }
 		${ ! hasCustomRenderProp && truncateStyles }
-	`;
-} );
+	`
+);
 
 export const SelectPopover = styled( Ariakit.SelectPopover )`
 	display: flex;
@@ -128,29 +129,70 @@ export const SelectPopover = styled( Ariakit.SelectPopover )`
 	}
 `;
 
-export const SelectItem = styled( Ariakit.SelectItem )`
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	padding: ${ ITEM_PADDING };
-	font-size: ${ CONFIG.fontSize };
-	// TODO: reassess line-height for non-legacy v2
-	line-height: 28px;
-	scroll-margin: ${ space( 1 ) };
-	user-select: none;
+export const SelectItem = styled( Ariakit.SelectItem )(
+	( {
+		size,
+	}: {
+		size: NonNullable< CustomSelectButtonSize[ 'size' ] >;
+	} ) => css`
+		cursor: default;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		font-size: ${ CONFIG.fontSize };
+		// TODO: reassess line-height for non-legacy v2
+		line-height: 28px;
+		padding-block: ${ space( 2 ) };
+		scroll-margin: ${ space( 1 ) };
+		user-select: none;
 
-	&[aria-disabled='true'] {
-		cursor: not-allowed;
-	}
+		&[aria-disabled='true'] {
+			cursor: not-allowed;
+		}
 
-	&[data-active-item] {
-		background-color: ${ COLORS.theme.gray[ 300 ] };
-	}
-`;
+		&[data-active-item] {
+			background-color: ${ COLORS.theme.gray[ 300 ] };
+		}
+
+		${ getSelectItemSize( size ) }
+	`
+);
 
 export const SelectedItemCheck = styled( Ariakit.SelectItemCheck )`
 	display: flex;
 	align-items: center;
-	margin-inline-start: ${ ITEM_PADDING };
+	margin-inline-start: ${ space( 2 ) };
 	font-size: 24px; // Size of checkmark icon
+`;
+
+const truncateStyles = css`
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+`;
+
+export const SelectedExperimentalHintWrapper = styled.div`
+	${ truncateStyles }
+`;
+
+export const SelectedExperimentalHintItem = styled.span`
+	color: ${ COLORS.theme.gray[ 600 ] };
+	margin-inline-start: ${ space( 2 ) };
+`;
+
+export const WithHintItemWrapper = styled.div`
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	flex-wrap: wrap;
+	flex: 1;
+	column-gap: ${ space( 4 ) };
+`;
+
+export const WithHintItemHint = styled.span`
+	color: ${ COLORS.theme.gray[ 600 ] };
+	text-align: initial;
+	line-height: ${ CONFIG.fontLineHeightBase };
+	padding-inline-end: ${ space( 1 ) };
+	margin-block: ${ space( 1 ) };
 `;

@@ -466,29 +466,8 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			}
 		}
 	} elseif ( 'grid' === $layout_type ) {
-		if ( ! empty( $layout['columnCount'] ) ) {
-			$layout_styles[] = array(
-				'selector'     => $selector,
-				'declarations' => array( 'grid-template-columns' => 'repeat(' . $layout['columnCount'] . ', minmax(0, 1fr))' ),
-			);
-			if ( ! empty( $layout['rowCount'] ) ) {
-				$layout_styles[] = array(
-					'selector'     => $selector,
-					'declarations' => array( 'grid-template-rows' => 'repeat(' . $layout['rowCount'] . ', minmax(0, 1fr))' ),
-				);
-			}
-		} else {
-			$minimum_column_width = ! empty( $layout['minimumColumnWidth'] ) ? $layout['minimumColumnWidth'] : '12rem';
-
-			$layout_styles[] = array(
-				'selector'     => $selector,
-				'declarations' => array(
-					'grid-template-columns' => 'repeat(auto-fill, minmax(min(' . $minimum_column_width . ', 100%), 1fr))',
-					'container-type'        => 'inline-size',
-				),
-			);
-		}
-
+		// Deal with block gap first so it can be used for responsive computation.
+		$responsive_gap_value = '1.2rem';
 		if ( $has_block_gap_support && isset( $gap_value ) ) {
 			$combined_gap_value = '';
 			$gap_sides          = is_array( $gap_value ) ? array( 'top', 'left' ) : array( 'top' );
@@ -506,14 +485,53 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 				}
 				$combined_gap_value .= "$process_value ";
 			}
-			$gap_value = trim( $combined_gap_value );
+			$gap_value            = trim( $combined_gap_value );
+			$responsive_gap_value = $gap_value;
+		}
 
-			if ( null !== $gap_value && ! $should_skip_gap_serialization ) {
+		if ( ! empty( $layout['columnCount'] ) && ! empty( $layout['minimumColumnWidth'] ) ) {
+			$max_value       = 'max(' . $layout['minimumColumnWidth'] . ', (100% - (' . $responsive_gap_value . ' * (' . $layout['columnCount'] . ' - 1))) /' . $layout['columnCount'] . ')';
+			$layout_styles[] = array(
+				'selector'     => $selector,
+				'declarations' => array(
+					'grid-template-columns' => 'repeat(auto-fill, minmax(' . $max_value . ', 1fr))',
+					'container-type'        => 'inline-size',
+				),
+			);
+			if ( ! empty( $layout['rowCount'] ) ) {
 				$layout_styles[] = array(
 					'selector'     => $selector,
-					'declarations' => array( 'gap' => $gap_value ),
+					'declarations' => array( 'grid-template-rows' => 'repeat(' . $layout['rowCount'] . ', minmax(8px, auto))' ),
 				);
 			}
+		} elseif ( ! empty( $layout['columnCount'] ) ) {
+			$layout_styles[] = array(
+				'selector'     => $selector,
+				'declarations' => array( 'grid-template-columns' => 'repeat(' . $layout['columnCount'] . ', minmax(0, 1fr))' ),
+			);
+			if ( ! empty( $layout['rowCount'] ) ) {
+				$layout_styles[] = array(
+					'selector'     => $selector,
+					'declarations' => array( 'grid-template-rows' => 'repeat(' . $layout['rowCount'] . ', minmax(8px, auto))' ),
+				);
+			}
+		} else {
+			$minimum_column_width = ! empty( $layout['minimumColumnWidth'] ) ? $layout['minimumColumnWidth'] : '12rem';
+
+			$layout_styles[] = array(
+				'selector'     => $selector,
+				'declarations' => array(
+					'grid-template-columns' => 'repeat(auto-fill, minmax(min(' . $minimum_column_width . ', 100%), 1fr))',
+					'container-type'        => 'inline-size',
+				),
+			);
+		}
+
+		if ( $has_block_gap_support && null !== $gap_value && ! $should_skip_gap_serialization ) {
+			$layout_styles[] = array(
+				'selector'     => $selector,
+				'declarations' => array( 'gap' => $gap_value ),
+			);
 		}
 	}
 
@@ -653,17 +671,19 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			 * A default gap value is used for this computation because custom gap values may not be
 			 * viable to use in the computation of the container query value.
 			 */
-			$default_gap_value     = 'px' === $parent_column_unit ? 24 : 1.5;
-			$container_query_value = $highest_number * $parent_column_value + ( $highest_number - 1 ) * $default_gap_value;
-			$container_query_value = $container_query_value . $parent_column_unit;
+			$default_gap_value             = 'px' === $parent_column_unit ? 24 : 1.5;
+			$container_query_value         = $highest_number * $parent_column_value + ( $highest_number - 1 ) * $default_gap_value;
+			$minimum_container_query_value = $parent_column_value * 2 + $default_gap_value - 1;
+			$container_query_value         = max( $container_query_value, $minimum_container_query_value ) . $parent_column_unit;
 			// If a span is set we want to preserve it as long as possible, otherwise we just reset the value.
-			$grid_column_value = $column_span ? '1/-1' : 'auto';
+			$grid_column_value = $column_span && $column_span > 1 ? '1/-1' : 'auto';
 
 			$child_layout_styles[] = array(
 				'rules_group'  => "@container (max-width: $container_query_value )",
 				'selector'     => ".$container_content_class",
 				'declarations' => array(
 					'grid-column' => $grid_column_value,
+					'grid-row'    => 'auto',
 				),
 			);
 		}

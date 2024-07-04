@@ -75,6 +75,7 @@ function useRedirectOldPaths() {
 export default function useLayoutAreas() {
 	const { params } = useLocation();
 	const { postType, postId, path, layout, isCustom, canvas } = params;
+	const hasEditCanvasMode = canvas === 'edit';
 	useRedirectOldPaths();
 
 	// Page list
@@ -91,13 +92,12 @@ export default function useLayoutAreas() {
 					/>
 				),
 				content: <PostsList postType={ postType } />,
-				preview: ( isListLayout || canvas === 'edit' ) && <Editor />,
-				mobile:
-					canvas === 'edit' ? (
-						<Editor />
-					) : (
-						<PostsList postType={ postType } />
-					),
+				preview: ( isListLayout || hasEditCanvasMode ) && <Editor />,
+				mobile: hasEditCanvasMode ? (
+					<Editor />
+				) : (
+					<PostsList postType={ postType } />
+				),
 			},
 			widths: {
 				content: isListLayout ? 380 : undefined,
@@ -115,8 +115,8 @@ export default function useLayoutAreas() {
 					<SidebarNavigationScreenTemplatesBrowse backPath={ {} } />
 				),
 				content: <PageTemplates />,
-				preview: ( isListLayout || canvas === 'edit' ) && <Editor />,
-				mobile: <PageTemplates />,
+				preview: ( isListLayout || hasEditCanvasMode ) && <Editor />,
+				mobile: hasEditCanvasMode ? <Editor /> : <PageTemplates />,
 			},
 			widths: {
 				content: isListLayout ? 380 : undefined,
@@ -133,8 +133,8 @@ export default function useLayoutAreas() {
 			areas: {
 				sidebar: <SidebarNavigationScreenPatterns backPath={ {} } />,
 				content: <PagePatterns />,
-				mobile: <PagePatterns />,
-				preview: canvas === 'edit' && <Editor />,
+				mobile: hasEditCanvasMode ? <Editor /> : <PagePatterns />,
+				preview: hasEditCanvasMode && <Editor />,
 			},
 		};
 	}
@@ -148,7 +148,7 @@ export default function useLayoutAreas() {
 					<SidebarNavigationScreenGlobalStyles backPath={ {} } />
 				),
 				preview: <Editor />,
-				mobile: canvas === 'edit' && <Editor />,
+				mobile: hasEditCanvasMode && <Editor />,
 			},
 		};
 	}
@@ -165,7 +165,7 @@ export default function useLayoutAreas() {
 						/>
 					),
 					preview: <Editor />,
-					mobile: canvas === 'edit' && <Editor />,
+					mobile: hasEditCanvasMode && <Editor />,
 				},
 			};
 		}
@@ -176,7 +176,7 @@ export default function useLayoutAreas() {
 					<SidebarNavigationScreenNavigationMenus backPath={ {} } />
 				),
 				preview: <Editor />,
-				mobile: canvas === 'edit' && <Editor />,
+				mobile: hasEditCanvasMode && <Editor />,
 			},
 		};
 	}
@@ -187,7 +187,7 @@ export default function useLayoutAreas() {
 		areas: {
 			sidebar: <SidebarNavigationScreenMain />,
 			preview: <Editor />,
-			mobile: canvas === 'edit' && <Editor />,
+			mobile: hasEditCanvasMode && <Editor />,
 		},
 	};
 }
