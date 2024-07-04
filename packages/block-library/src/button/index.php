@@ -19,7 +19,7 @@
 function render_block_core_button( $attributes, $content ) {
 	/*
 	 * The current Gutenberg plugin supports WordPress 6.4, but the next_token()
-	 *  method does not exist in WordPress 6.4. Therefore, if Gutenberg is used
+	 * method does not exist in WordPress 6.4. Therefore, if Gutenberg is used
 	 * as a plugin, use the Gutenberg class that has the `next_token()` method.
 	 *
 	 * TODO: After the Gutenberg plugin drops support for WordPress 6.4, this
