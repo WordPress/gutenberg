@@ -44,27 +44,16 @@ function render_block_core_image( $attributes, $content, $block ) {
 		}
 	}
 
-	// For backwards compatibility, the data-id html attribute is only
-	// set for image blocks nested in a gallery.
-	// `data-id` is an attribute set by the gallery block using a filter,
-	// so checkings it's set serves this purpose.
+	// For backwards compatibility, the data-id html attribute is only set for
+	// image blocks nested in a gallery. Detect if the image is in a gallery by
+	// checking the data-id attribute.
+	// See the `block_core_gallery_data_id_backcompatibility` function.
 	if ( isset( $attributes['data-id'] ) ) {
-		$data_id;
-
-		if ( $has_id_binding ) {
-			// If there is a binding for the id, use the `id` attribute.
-			// This ensures the `data-id` html attribute contains the correct
-			// block binding value since the `data-id` block attribute does
-			// not support bindings.
-			$data_id = $attributes['id'];
-		} else {
-			// If there are no bindings for the id, for backward compatibility
-			// use the `data-id` attribute added by the gallery block.
-			// This attribute may be filtered by third parties to change what's
-			// stored in the data-id html attribute.
-			$data_id = $attributes['data-id'];
-		}
-
+		// If there's a binding for the `id`, the `id` attribute is used for the
+		// value, since `data-id` does not support block bindings.
+		// Else the `data-id` is used for backwards compatibility, since
+		// third parties may be filtering its value.
+		$data_id = $has_id_binding ? $attributes['id'] : $attributes['data-id'];
 		$p->set_attribute( 'data-id', $data_id );
 	}
 
