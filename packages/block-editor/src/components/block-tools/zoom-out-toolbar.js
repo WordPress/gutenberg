@@ -99,7 +99,7 @@ export default function ZoomOutToolbar( { clientId, rootClientId } ) {
 					{ ( draggableProps ) => (
 						<Button
 							icon={ dragHandle }
-							className="block-selection-button_drag-handle"
+							className="block-selection-button_drag-handle zoom-out-toolbar-button"
 							aria-hidden="true"
 							label={ __( 'Drag' ) }
 							iconSize={ 24 }
@@ -127,6 +127,7 @@ export default function ZoomOutToolbar( { clientId, rootClientId } ) {
 			) }
 			{ canRemove && ! isBlockTemplatePart && (
 				<ToolbarButton
+					className="zoom-out-toolbar-button"
 					icon={ trash }
 					label="Delete"
 					onClick={ () => {
