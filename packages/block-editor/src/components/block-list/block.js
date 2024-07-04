@@ -592,12 +592,30 @@ function BlockListBlockProvider( props ) {
 				hasBlockSupport: _hasBlockSupport,
 				getActiveBlockVariation,
 			} = select( blocksStore );
+
 			const attributes = getBlockAttributes( clientId );
 			const { name: blockName, isValid } = blockWithoutAttributes;
+			const match = getActiveBlockVariation( blockName, attributes );
 			const blockType = getBlockType( blockName );
 			const { supportsLayout, __unstableIsPreviewMode: isPreviewMode } =
 				getSettings();
 			const hasLightBlockWrapper = blockType?.apiVersion > 1;
+			const defaultClassNames = [];
+			if ( hasLightBlockWrapper && blockName ) {
+				defaultClassNames.push( getBlockDefaultClassName( blockName ) );
+
+				if (
+					hasBlockSupport( blockType, 'className.variation', false )
+				) {
+					if ( match && match?.name ) {
+						defaultClassNames.push(
+							getBlockDefaultClassName(
+								`${ blockName }/${ match.name }`
+							)
+						);
+					}
+				}
+			}
 			const previewContext = {
 				isPreviewMode,
 				blockWithoutAttributes,
@@ -610,9 +628,10 @@ function BlockListBlockProvider( props ) {
 				className: hasLightBlockWrapper
 					? attributes.className
 					: undefined,
-				defaultClassName: hasLightBlockWrapper
-					? getBlockDefaultClassName( blockName )
-					: undefined,
+				defaultClassName:
+					defaultClassNames.length > 0
+						? clsx( defaultClassNames )
+						: undefined,
 				blockTitle: blockType?.title,
 			};
 
@@ -625,7 +644,6 @@ function BlockListBlockProvider( props ) {
 			const _isSelected = isBlockSelected( clientId );
 			const canRemove = canRemoveBlock( clientId );
 			const canMove = canMoveBlock( clientId );
-			const match = getActiveBlockVariation( blockName, attributes );
 			const isMultiSelected = isBlockMultiSelected( clientId );
 			const checkDeep = true;
 			const isAncestorOfSelectedBlock = hasSelectedInnerBlock(

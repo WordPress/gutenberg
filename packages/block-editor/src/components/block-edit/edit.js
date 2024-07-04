@@ -11,6 +11,7 @@ import {
 	getBlockDefaultClassName,
 	hasBlockSupport,
 	getBlockType,
+	getActiveBlockVariation,
 } from '@wordpress/blocks';
 import { useContext, useMemo } from '@wordpress/element';
 
@@ -71,12 +72,24 @@ const EditWithGeneratedProps = ( props ) => {
 		return <EditWithFilters { ...props } context={ context } />;
 	}
 
-	// Generate a class name for the block's editable form.
-	const generatedClassName = hasBlockSupport( blockType, 'className', true )
-		? getBlockDefaultClassName( name )
-		: null;
+	const generatedClassNames = [];
+
+	if ( hasBlockSupport( blockType, 'className', true ) ) {
+		generatedClassNames.push( getBlockDefaultClassName( name ) );
+	}
+	if ( hasBlockSupport( blockType, 'className.variation', false ) ) {
+		const activeVariation = getActiveBlockVariation( name, attributes );
+		if ( activeVariation && activeVariation?.name ) {
+			generatedClassNames.push(
+				getBlockDefaultClassName(
+					`${ name }/${ activeVariation.name }`
+				)
+			);
+		}
+	}
+
 	const className = clsx(
-		generatedClassName,
+		generatedClassNames,
 		attributes.className,
 		props.className
 	);

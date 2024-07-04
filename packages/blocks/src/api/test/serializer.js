@@ -13,6 +13,7 @@ import serialize, {
 	getCommentDelimitedContent,
 	serializeBlock,
 	getBlockInnerHTML,
+	getBlockDefaultClassName,
 } from '../serializer';
 import {
 	getBlockTypes,
@@ -470,6 +471,32 @@ describe( 'block serializer', () => {
 				isValid: true,
 			};
 			expect( getBlockInnerHTML( block ) ).toBe( 'chicken' );
+		} );
+	} );
+
+	describe( 'getBlockDefaultClassName', () => {
+		it( 'should return the default class name for a block without the core namespace', () => {
+			expect( getBlockDefaultClassName( 'core/test-block' ) ).toBe(
+				'wp-block-test-block'
+			);
+		} );
+
+		it( 'should return the default class name for a block', () => {
+			expect( getBlockDefaultClassName( 'core/test-block' ) ).toBe(
+				'wp-block-test-block'
+			);
+			expect( getBlockDefaultClassName( 'plugin/test-block' ) ).toBe(
+				'wp-block-plugin-test-block'
+			);
+		} );
+
+		it( 'should return the default class name for a variant block nomenclature', () => {
+			expect(
+				getBlockDefaultClassName( 'core/test-block/variant' )
+			).toBe( 'wp-block-test-block-variant' );
+			expect(
+				getBlockDefaultClassName( 'plugin/test-block/variant' )
+			).toBe( 'wp-block-plugin-test-block-variant' );
 		} );
 	} );
 } );

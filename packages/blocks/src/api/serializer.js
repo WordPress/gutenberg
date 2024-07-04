@@ -41,7 +41,7 @@ export function getBlockDefaultClassName( blockName ) {
 	// Generated HTML classes for blocks follow the `wp-block-{name}` nomenclature.
 	// Blocks provided by WordPress drop the prefixes 'core/' or 'core-' (historically used in 'core-embed/').
 	const className =
-		'wp-block-' + blockName.replace( /\//, '-' ).replace( /^core-/, '' );
+		'wp-block-' + blockName.replace( /\//g, '-' ).replace( /^core-/, '' );
 
 	return applyFilters(
 		'blocks.getBlockDefaultClassName',

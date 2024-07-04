@@ -694,6 +694,26 @@ export const getBlockVariations = ( blockName, scope ) => {
 };
 
 /**
+ * Returns the active block variation for a given block based on its attributes.
+ * Ignored from documentation as the recommended usage is via useSelect from @wordpress/data.
+ *
+ * @ignore
+ *
+ * @param {string}                blockName  Name of block (example: “core/columns”).
+ * @param {Object}                attributes Block attributes used to determine active variation.
+ * @param {WPBlockVariationScope} [scope]    Block variation scope name.
+ *
+ * @return {(WPBlockVariation|undefined)} Active block variation.
+ */
+export const getActiveBlockVariation = ( blockName, attributes, scope ) => {
+	return select( blocksStore ).getActiveBlockVariation(
+		blockName,
+		attributes,
+		scope
+	);
+};
+
+/**
  * Registers a new block variation for the given block type.
  *
  * For more information on block variations see

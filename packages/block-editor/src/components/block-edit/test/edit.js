@@ -9,6 +9,8 @@ import { render, screen } from '@testing-library/react';
 import {
 	registerBlockType,
 	unregisterBlockType,
+	registerBlockVariation,
+	unregisterBlockVariation,
 	getBlockTypes,
 } from '@wordpress/blocks';
 
@@ -82,6 +84,47 @@ describe( 'Edit', () => {
 		const editElement = screen.getByTestId( 'foo-bar' );
 		expect( editElement ).toHaveClass( 'wp-block-test-block' );
 		expect( editElement ).toHaveClass( 'my-class' );
+	} );
+
+	it( 'should combine the default class name with a variation one', () => {
+		const edit = ( { className } ) => (
+			<div data-testid="foo-bar" className={ className } />
+		);
+
+		registerBlockType( 'core/test-block', {
+			edit,
+			save: noop,
+			category: 'text',
+			title: 'block title',
+			attributes: {
+				fruit: {
+					type: 'string',
+					default: 'Apples',
+				},
+			},
+		} );
+
+		registerBlockVariation( 'core/test-block', {
+			name: 'variation',
+			title: 'block variation title',
+			attributes: {
+				fruit: {
+					type: 'string',
+					default: 'Bananas',
+				},
+			},
+			isActive: ( { fruit } ) => fruit === 'Bananas',
+		} );
+
+		render(
+			<Edit name="core/test-block" attributes={ { fruit: 'Bananas' } } />
+		);
+
+		const editElement = screen.getByTestId( 'foo-bar' );
+		expect( editElement ).toHaveClass( 'wp-block-test-block' );
+		expect( editElement ).toHaveClass( 'wp-block-test-block-variation' );
+
+		unregisterBlockVariation( 'core/test-block', 'variation' );
 	} );
 
 	it( 'should assign context', () => {
