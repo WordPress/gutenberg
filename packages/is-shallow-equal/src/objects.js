@@ -4,7 +4,8 @@
 import isShallowEqualArrays from './arrays';
 
 /**
- * Checks for shallow array equality and returns true if the two values are equal, or false otherwise.
+ * Returns true if the two values are equal, or false otherwise.
+ * Includes a check for shallow array equality.
  *
  * @param {any} a
  * @param {any} b
