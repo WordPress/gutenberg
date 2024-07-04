@@ -16,7 +16,8 @@ export default function isTemplateRevertable( template ) {
 	/* eslint-disable camelcase */
 	return (
 		template?.source === TEMPLATE_ORIGINS.custom &&
-		( template?.origin === 'plugin' || template?.has_theme_file )
+		( template?.origin === TEMPLATE_ORIGINS.plugin ||
+			template?.has_theme_file )
 	);
 	/* eslint-enable camelcase */
 }

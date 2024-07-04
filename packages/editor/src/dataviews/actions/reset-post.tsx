@@ -32,7 +32,7 @@ const resetPost: Action< Post > = {
 		return (
 			isTemplateOrTemplatePart( item ) &&
 			item?.source === TEMPLATE_ORIGINS.custom &&
-			item?.has_theme_file
+			( item?.origin === TEMPLATE_ORIGINS.plugin || item?.has_theme_file )
 		);
 	},
 	icon: backup,
