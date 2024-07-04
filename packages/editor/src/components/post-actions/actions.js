@@ -153,7 +153,7 @@ const trashPostAction = {
 										__( '"%s" moved to trash.' ),
 										getItemTitle( items[ 0 ] )
 									);
-								} else if ( items[ 0 ].type === 'page' ) {
+								} else {
 									successMessage = sprintf(
 										/* translators: The number of items. */
 										_n(
@@ -161,12 +161,6 @@ const trashPostAction = {
 											'%s items moved to trash.',
 											items.length
 										),
-										items.length
-									);
-								} else {
-									successMessage = sprintf(
-										/* translators: The number of posts. */
-										__( '%s items move to trash.' ),
 										items.length
 									);
 								}
