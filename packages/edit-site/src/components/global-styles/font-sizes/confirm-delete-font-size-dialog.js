@@ -18,7 +18,7 @@ function ConfirmDeleteFontSizeDialog( {
 	const handleConfirm = async () => {
 		toggleOpen();
 		handleRemoveFontSize( fontSize );
-		navigator.goTo( '/typography/' );
+		navigator.goTo( '/typography/font-sizes/' );
 	};
 
 	const handleCancel = () => {
