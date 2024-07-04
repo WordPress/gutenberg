@@ -16,7 +16,7 @@ import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { memo, forwardRef } from '@wordpress/element';
-import { search, external } from '@wordpress/icons';
+import { search } from '@wordpress/icons';
 import { store as commandsStore } from '@wordpress/commands';
 import { displayShortcut } from '@wordpress/keycodes';
 import { filterURLForDisplay } from '@wordpress/url';
@@ -81,8 +81,6 @@ const SiteHub = memo(
 								variant="link"
 								href={ homeUrl }
 								target="_blank"
-								icon={ external }
-								iconPosition="right"
 							>
 								{ decodeEntities( siteTitle ) }
 								<VisuallyHidden as="span">
