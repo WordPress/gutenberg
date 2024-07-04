@@ -170,6 +170,7 @@ function FieldsVisibilityMenu< Item >( {
 		( field ) =>
 			field.enableHiding !== false && field.id !== view.layout.mediaField
 	);
+	const viewFields = view.fields || fields.map( ( field ) => field.id );
 	if ( ! hidableFields?.length ) {
 		return null;
 	}
@@ -188,20 +189,15 @@ function FieldsVisibilityMenu< Item >( {
 					<DropdownMenuCheckboxItem
 						key={ field.id }
 						value={ field.id }
-						checked={ ! view.hiddenFields?.includes( field.id ) }
+						checked={ viewFields.includes( field.id ) }
 						onChange={ () => {
 							onChangeView( {
 								...view,
-								hiddenFields: view.hiddenFields?.includes(
-									field.id
-								)
-									? view.hiddenFields.filter(
+								fields: viewFields.includes( field.id )
+									? viewFields.filter(
 											( id ) => id !== field.id
 									  )
-									: [
-											...( view.hiddenFields || [] ),
-											field.id,
-									  ],
+									: [ ...viewFields, field.id ],
 							} );
 						} }
 					>

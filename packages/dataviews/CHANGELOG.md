@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+
+### Breaking Changes
+
+- Replace the `hiddenFields` property in the view prop of `DataViews` with a `fields` property that accepts an array of visible fields instead.
+
 ### New features
 
 -   Added a new `DataForm` component to render controls from a given configuration (fields, form), and data.
