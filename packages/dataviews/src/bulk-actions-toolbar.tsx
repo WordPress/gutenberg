@@ -80,7 +80,7 @@ function ActionTrigger< Item >( {
 			size="compact"
 			onClick={ onClick }
 			isBusy={ isBusy }
-			__experimentalIsFocusable
+			accessibleWhenDisabled
 			tooltipPosition="top"
 		/>
 	);

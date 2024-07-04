@@ -268,7 +268,7 @@ function ReusableBlockEdit( {
 						<ToolbarButton
 							onClick={ resetContent }
 							disabled={ ! content }
-							__experimentalIsFocusable
+							accessibleWhenDisabled
 						>
 							{ __( 'Reset' ) }
 						</ToolbarButton>
