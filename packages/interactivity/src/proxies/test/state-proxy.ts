@@ -971,6 +971,69 @@ describe( 'interactivity api - state proxy', () => {
 			state.counter = 2;
 			expect( peek( state, 'double' ) ).toBe( 4 );
 		} );
+
+		it( 'should support peeking getters accessing the scope', () => {
+			const state = proxifyStateTest( {
+				get double() {
+					const { counter } = getContext< { counter: number } >();
+					return counter * 2;
+				},
+			} );
+
+			const context = proxifyStateTest( { counter: 1 } );
+			const scope = { context: { test: context } };
+			const peekStateDouble = withScopeAndNs( scope, 'test', () =>
+				peek( state, 'double' )
+			);
+
+			const spy = jest.fn( peekStateDouble );
+			effect( spy );
+			expect( spy ).toHaveBeenCalledTimes( 1 );
+			expect( peekStateDouble() ).toBe( 2 );
+
+			context.counter = 2;
+
+			expect( spy ).toHaveBeenCalledTimes( 1 );
+			expect( peekStateDouble() ).toBe( 4 );
+		} );
+
+		it( 'should support peeking getters accessing other namespaces', () => {
+			const state2 = proxifyState(
+				{
+					get counter() {
+						const { counter } = getContext< { counter: number } >();
+						return counter;
+					},
+				},
+				'test2'
+			);
+			const context2 = proxifyState( { counter: 1 }, 'test2' );
+
+			const state1 = proxifyState(
+				{
+					get double() {
+						return state2.counter * 2;
+					},
+				},
+				'test1'
+			);
+
+			const peekStateDouble = withScopeAndNs(
+				{ context: { test2: context2 } },
+				'test2',
+				() => peek( state1, 'double' )
+			);
+
+			const spy = jest.fn( peekStateDouble );
+			effect( spy );
+			expect( spy ).toHaveBeenCalledTimes( 1 );
+			expect( peekStateDouble() ).toBe( 2 );
+
+			context2.counter = 2;
+
+			expect( spy ).toHaveBeenCalledTimes( 1 );
+			expect( peekStateDouble() ).toBe( 4 );
+		} );
 	} );
 
 	describe( 'refs', () => {
