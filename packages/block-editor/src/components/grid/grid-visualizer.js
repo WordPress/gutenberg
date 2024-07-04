@@ -75,6 +75,17 @@ const GridVisualizerGrid = forwardRef(
 		const [ isDroppingAllowed, setIsDroppingAllowed ] = useState( false );
 		const [ highlightedRect, setHighlightedRect ] = useState( null );
 
+		const {
+			updateBlockAttributes,
+			moveBlocksToPosition,
+			__unstableMarkNextChangeAsNotPersistent,
+		} = useDispatch( blockEditorStore );
+
+		const getNumberOfBlocksBeforeCell = useGetNumberOfBlocksBeforeCell(
+			clientId,
+			gridInfo.numColumns
+		);
+
 		useEffect( () => {
 			const observers = [];
 			for ( const element of [ gridElement, ...gridElement.children ] ) {
@@ -155,15 +166,34 @@ const GridVisualizerGrid = forwardRef(
 														style={ {
 															color: gridInfo.currentColor,
 														} }
-														blockAttributes={ {
-															style: {
-																layout: {
-																	columnStart:
-																		column,
-																	rowStart:
-																		row,
-																},
-															},
+														onSelectCallback={ (
+															block
+														) => {
+															updateBlockAttributes(
+																block.clientId,
+																{
+																	style: {
+																		layout: {
+																			columnStart:
+																				column,
+																			rowStart:
+																				row,
+																		},
+																	},
+																}
+															);
+															__unstableMarkNextChangeAsNotPersistent();
+															moveBlocksToPosition(
+																[
+																	block.clientId,
+																],
+																clientId,
+																clientId,
+																getNumberOfBlocksBeforeCell(
+																	column,
+																	row
+																)
+															);
 														} }
 													/>
 												) }
