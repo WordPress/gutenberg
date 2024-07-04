@@ -19,19 +19,29 @@ import ToolbarButtonContainer from './toolbar-button-container';
 import type { ToolbarButtonProps } from './types';
 import type { WordPressComponentProps } from '../../context';
 
+function useDeprecatedProps( {
+	isDisabled,
+	...otherProps
+}: React.ComponentProps< typeof ToolbarButton > ) {
+	return {
+		disabled: isDisabled,
+		...otherProps,
+	};
+}
+
 function UnforwardedToolbarButton(
-	{
+	props: WordPressComponentProps< ToolbarButtonProps, typeof Button, false >,
+	ref: ForwardedRef< any >
+) {
+	const {
 		children,
 		className,
 		containerClassName,
 		extraProps,
 		isActive,
-		isDisabled,
 		title,
-		...props
-	}: WordPressComponentProps< ToolbarButtonProps, typeof Button, false >,
-	ref: ForwardedRef< any >
-) {
+		...restProps
+	} = useDeprecatedProps( props );
 	const accessibleToolbarState = useContext( ToolbarContext );
 
 	if ( ! accessibleToolbarState ) {
@@ -39,10 +49,10 @@ function UnforwardedToolbarButton(
 			<ToolbarButtonContainer className={ containerClassName }>
 				<Button
 					ref={ ref }
-					icon={ props.icon }
+					icon={ restProps.icon }
 					label={ title }
-					shortcut={ props.shortcut }
-					data-subscript={ props.subscript }
+					shortcut={ restProps.shortcut }
+					data-subscript={ restProps.subscript }
 					onClick={ (
 						event: ReactMouseEvent<
 							HTMLButtonElement & HTMLAnchorElement,
@@ -50,9 +60,9 @@ function UnforwardedToolbarButton(
 						>
 					) => {
 						event.stopPropagation();
-						// TODO: Possible bug; maybe use onClick instead of props.onClick.
-						if ( props.onClick ) {
-							props.onClick( event );
+						// TODO: Possible bug; maybe use onClick instead of restProps.onClick.
+						if ( restProps.onClick ) {
+							restProps.onClick( event );
 						}
 					} }
 					className={ clsx(
@@ -60,10 +70,10 @@ function UnforwardedToolbarButton(
 						className
 					) }
 					isPressed={ isActive }
-					disabled={ isDisabled }
+					__experimentalIsFocusable
 					data-toolbar-item
 					{ ...extraProps }
-					{ ...props }
+					{ ...restProps }
 				>
 					{ children }
 				</Button>
@@ -78,14 +88,13 @@ function UnforwardedToolbarButton(
 		<ToolbarItem
 			className={ clsx( 'components-toolbar-button', className ) }
 			{ ...extraProps }
-			{ ...props }
+			{ ...restProps }
 			ref={ ref }
 		>
 			{ ( toolbarItemProps ) => (
 				<Button
 					label={ title }
 					isPressed={ isActive }
-					disabled={ isDisabled }
 					{ ...toolbarItemProps }
 				>
 					{ children }
