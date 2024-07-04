@@ -25,7 +25,7 @@ import Page from '../page';
 import { default as Link, useLink } from '../routes/link';
 import {
 	useDefaultViews,
-	DEFAULT_CONFIG_PER_VIEW_TYPE,
+	defaultFields,
 } from '../sidebar-dataviews/default-views';
 import {
 	LAYOUT_GRID,
@@ -67,9 +67,6 @@ function useView( postType ) {
 			return {
 				...defaultView,
 				type: layout,
-				layout: {
-					...( DEFAULT_CONFIG_PER_VIEW_TYPE[ layout ] || {} ),
-				},
 			};
 		}
 		return defaultView;
@@ -102,16 +99,7 @@ function useView( postType ) {
 		const storedView =
 			editedViewRecord?.content &&
 			JSON.parse( editedViewRecord?.content );
-		if ( ! storedView ) {
-			return storedView;
-		}
-
-		return {
-			...storedView,
-			layout: {
-				...( DEFAULT_CONFIG_PER_VIEW_TYPE[ storedView?.type ] || {} ),
-			},
-		};
+		return storedView;
 	}, [ editedViewRecord?.content ] );
 
 	const setCustomView = useCallback(
@@ -496,23 +484,6 @@ export default function PostsList( { postType } ) {
 		() => [ editAction, ...postTypeActions ],
 		[ postTypeActions, editAction ]
 	);
-
-	const onChangeView = useCallback(
-		( newView ) => {
-			if ( newView.type !== view.type ) {
-				newView = {
-					...newView,
-					layout: {
-						...DEFAULT_CONFIG_PER_VIEW_TYPE[ newView.type ],
-					},
-				};
-			}
-
-			setView( newView );
-		},
-		[ view.type, setView ]
-	);
-
 	const [ showAddPostModal, setShowAddPostModal ] = useState( false );
 
 	const openModal = () => setShowAddPostModal( true );
@@ -558,11 +529,12 @@ export default function PostsList( { postType } ) {
 				data={ records || EMPTY_ARRAY }
 				isLoading={ isLoadingMainEntities || isLoadingAuthors }
 				view={ view }
-				onChangeView={ onChangeView }
+				onChangeView={ setView }
 				selection={ selection }
 				setSelection={ setSelection }
 				onSelectionChange={ onSelectionChange }
 				getItemId={ getItemId }
+				defaultFields={ defaultFields }
 			/>
 		</Page>
 	);

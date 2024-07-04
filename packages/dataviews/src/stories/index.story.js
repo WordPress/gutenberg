@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useMemo, useCallback } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -17,14 +17,18 @@ const meta = {
 };
 export default meta;
 
-const defaultConfigPerViewType = {
-	[ LAYOUT_TABLE ]: {
-		primaryField: 'title',
-	},
-	[ LAYOUT_GRID ]: {
-		mediaField: 'image',
-		primaryField: 'title',
-	},
+const defaultFields = {
+	[ LAYOUT_TABLE ]: [
+		{ render: 'primary', field: 'title' },
+		'description',
+		'categories',
+	],
+	[ LAYOUT_GRID ]: [
+		{ render: 'media', field: 'image' },
+		{ render: 'primary', field: 'title' },
+		'description',
+		'categories',
+	],
 };
 
 export const Default = ( props ) => {
@@ -32,21 +36,6 @@ export const Default = ( props ) => {
 	const { data: shownData, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( data, view, fields );
 	}, [ view ] );
-	const onChangeView = useCallback(
-		( newView ) => {
-			if ( newView.type !== view.type ) {
-				newView = {
-					...newView,
-					layout: {
-						...defaultConfigPerViewType[ newView.type ],
-					},
-				};
-			}
-
-			setView( newView );
-		},
-		[ view.type, setView ]
-	);
 	return (
 		<DataViews
 			{ ...props }
@@ -54,7 +43,8 @@ export const Default = ( props ) => {
 			data={ shownData }
 			view={ view }
 			fields={ fields }
-			onChangeView={ onChangeView }
+			onChangeView={ setView }
+			defaultFields={ defaultFields }
 		/>
 	);
 };

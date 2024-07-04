@@ -20,7 +20,8 @@ import { cog } from '@wordpress/icons';
 import { unlock } from './lock-unlock';
 import { SORTING_DIRECTIONS, sortLabels } from './constants';
 import { VIEW_LAYOUTS } from './layouts';
-import type { NormalizedField, View } from './types';
+import type { FieldRenderConfig, NormalizedField, View } from './types';
+import { normalizeFieldRenderConfigs } from './normalize-field-render-configs';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -35,6 +36,7 @@ interface ViewTypeMenuProps {
 	view: View;
 	onChangeView: ( view: View ) => void;
 	supportedLayouts?: string[];
+	defaultFields?: Record< string, FieldRenderConfig[] >;
 }
 
 interface PageSizeMenuProps {
@@ -59,12 +61,14 @@ interface ViewActionsProps< Item > {
 	view: View;
 	onChangeView: ( view: View ) => void;
 	supportedLayouts?: string[];
+	defaultFields?: Record< string, FieldRenderConfig[] >;
 }
 
 function ViewTypeMenu( {
 	view,
 	onChangeView,
 	supportedLayouts,
+	defaultFields,
 }: ViewTypeMenuProps ) {
 	let _availableViews = VIEW_LAYOUTS;
 	if ( supportedLayouts ) {
@@ -106,7 +110,9 @@ function ViewTypeMenu( {
 									return onChangeView( {
 										...view,
 										type: e.target.value,
-										layout: {},
+										fields:
+											defaultFields?.[ e.target.value ] ??
+											undefined,
 									} );
 							}
 							throw new Error( 'Invalid dataview' );
@@ -166,11 +172,16 @@ function FieldsVisibilityMenu< Item >( {
 	onChangeView,
 	fields,
 }: FieldsVisibilityMenuProps< Item > ) {
-	const hidableFields = fields.filter(
-		( field ) =>
-			field.enableHiding !== false && field.id !== view.layout.mediaField
+	const fieldRenderConfigs = normalizeFieldRenderConfigs(
+		view.fields,
+		fields
 	);
-	const viewFields = view.fields || fields.map( ( field ) => field.id );
+	const mediaFieldId = fieldRenderConfigs.find(
+		( fieldRender ) => fieldRender.render === 'media'
+	)?.field;
+	const hidableFields = fields.filter(
+		( field ) => field.enableHiding !== false && field.id !== mediaFieldId
+	);
 	if ( ! hidableFields?.length ) {
 		return null;
 	}
@@ -185,19 +196,23 @@ function FieldsVisibilityMenu< Item >( {
 			}
 		>
 			{ hidableFields?.map( ( field ) => {
+				const isVisible = !! fieldRenderConfigs.find(
+					( f ) => f.field === field.id
+				);
 				return (
 					<DropdownMenuCheckboxItem
 						key={ field.id }
 						value={ field.id }
-						checked={ viewFields.includes( field.id ) }
+						checked={ isVisible }
 						onChange={ () => {
 							onChangeView( {
 								...view,
-								fields: viewFields.includes( field.id )
-									? viewFields.filter(
-											( id ) => id !== field.id
+								fields: isVisible
+									? fieldRenderConfigs.filter(
+											( fieldRender ) =>
+												fieldRender.field !== field.id
 									  )
-									: [ ...viewFields, field.id ],
+									: [ ...fieldRenderConfigs, field.id ],
 							} );
 						} }
 					>
@@ -304,6 +319,7 @@ function _ViewActions< Item >( {
 	view,
 	onChangeView,
 	supportedLayouts,
+	defaultFields,
 }: ViewActionsProps< Item > ) {
 	return (
 		<DropdownMenu
@@ -320,6 +336,7 @@ function _ViewActions< Item >( {
 					view={ view }
 					onChangeView={ onChangeView }
 					supportedLayouts={ supportedLayouts }
+					defaultFields={ defaultFields }
 				/>
 				<SortMenu
 					fields={ fields }

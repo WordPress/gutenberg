@@ -207,11 +207,23 @@ export interface NormalizedFilter {
 	isPrimary: boolean;
 }
 
-interface ViewBase {
+export interface NormalizedFieldRenderConfig {
+	render: 'primary' | 'badge' | 'media' | 'default';
+	field: string;
+}
+
+export type FieldRenderConfig =
+	| string
+	| {
+			render: 'primary' | 'badge' | 'media' | 'default';
+			field: string;
+	  };
+
+export interface View {
 	/**
 	 * The layout of the view.
 	 */
-	type: string;
+	type: 'table' | 'grid' | 'list';
 
 	/**
 	 * The global search term.
@@ -251,68 +263,8 @@ interface ViewBase {
 	/**
 	 * The hidden fields.
 	 */
-	fields?: string[];
+	fields?: FieldRenderConfig[];
 }
-
-export interface ViewTable extends ViewBase {
-	type: 'table';
-
-	layout: {
-		/**
-		 * The field to use as the primary field.
-		 */
-		primaryField?: string;
-
-		/**
-		 * The field to use as the media field.
-		 */
-		mediaField?: string;
-	};
-}
-
-export interface ViewList extends ViewBase {
-	type: 'list';
-
-	layout: {
-		/**
-		 * The field to use as the primary field.
-		 */
-		primaryField?: string;
-
-		/**
-		 * The field to use as the media field.
-		 */
-		mediaField?: string;
-	};
-}
-
-export interface ViewGrid extends ViewBase {
-	type: 'grid';
-
-	layout: {
-		/**
-		 * The field to use as the primary field.
-		 */
-		primaryField?: string;
-
-		/**
-		 * The field to use as the media field.
-		 */
-		mediaField?: string;
-
-		/**
-		 * The fields to use as columns.
-		 */
-		columnFields?: string[];
-
-		/**
-		 * The fields to use as badge fields.
-		 */
-		badgeFields?: string[];
-	};
-}
-
-export type View = ViewList | ViewGrid | ViewTable;
 
 interface ActionBase< Item > {
 	/**
@@ -400,7 +352,7 @@ export interface ActionButton< Item > extends ActionBase< Item > {
 
 export type Action< Item > = ActionModal< Item > | ActionButton< Item >;
 
-export interface ViewBaseProps< Item > {
+export interface ViewProps< Item > {
 	actions: Action< Item >[];
 	data: Item[];
 	fields: NormalizedField< Item >[];
@@ -412,20 +364,3 @@ export interface ViewBaseProps< Item > {
 	setOpenedFilter: ( fieldId: string ) => void;
 	view: View;
 }
-
-export interface ViewTableProps< Item > extends ViewBaseProps< Item > {
-	view: ViewTable;
-}
-
-export interface ViewListProps< Item > extends ViewBaseProps< Item > {
-	view: ViewList;
-}
-
-export interface ViewGridProps< Item > extends ViewBaseProps< Item > {
-	view: ViewGrid;
-}
-
-export type ViewProps< Item > =
-	| ViewTableProps< Item >
-	| ViewGridProps< Item >
-	| ViewListProps< Item >;

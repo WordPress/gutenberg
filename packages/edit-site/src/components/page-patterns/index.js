@@ -13,13 +13,7 @@ import {
 	Flex,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
-import {
-	useState,
-	useMemo,
-	useCallback,
-	useId,
-	useEffect,
-} from '@wordpress/element';
+import { useState, useMemo, useId, useEffect } from '@wordpress/element';
 import {
 	BlockPreview,
 	privateApis as blockEditorPrivateApis,
@@ -64,25 +58,27 @@ const { usePostActions } = unlock( editorPrivateApis );
 const { useLocation } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
-const defaultConfigPerViewType = {
-	[ LAYOUT_TABLE ]: {
-		primaryField: 'title',
-	},
-	[ LAYOUT_GRID ]: {
-		mediaField: 'preview',
-		primaryField: 'title',
-		badgeFields: [ 'sync-status' ],
-	},
+const defaultFields = {
+	[ LAYOUT_TABLE ]: [
+		'preview',
+		{ render: 'primary', field: 'title' },
+		'sync-status',
+		'author',
+	],
+	[ LAYOUT_GRID ]: [
+		{ render: 'media', field: 'preview' },
+		{ render: 'primary', field: 'title' },
+		{ render: 'badge', field: 'sync-status' },
+		'author',
+	],
 };
 const DEFAULT_VIEW = {
 	type: LAYOUT_GRID,
 	search: '',
 	page: 1,
 	perPage: 20,
-	layout: {
-		...defaultConfigPerViewType[ LAYOUT_GRID ],
-	},
 	filters: [],
+	fields: defaultFields[ LAYOUT_GRID ],
 };
 
 const SYNC_FILTERS = [
@@ -381,20 +377,6 @@ export default function DataviewsPatterns() {
 		}
 		return [ editAction, ...patternActions ].filter( Boolean );
 	}, [ editAction, type, templatePartActions, patternActions ] );
-	const onChangeView = useCallback(
-		( newView ) => {
-			if ( newView.type !== view.type ) {
-				newView = {
-					...newView,
-					layout: {
-						...defaultConfigPerViewType[ newView.type ],
-					},
-				};
-			}
-			setView( newView );
-		},
-		[ view.type, setView ]
-	);
 	const id = useId();
 	const settings = usePatternSettings();
 	// Wrap everything in a block editor provider.
@@ -421,8 +403,9 @@ export default function DataviewsPatterns() {
 					getItemId={ ( item ) => item.name ?? item.id }
 					isLoading={ isResolving }
 					view={ view }
-					onChangeView={ onChangeView }
+					onChangeView={ setView }
 					supportedLayouts={ [ LAYOUT_GRID, LAYOUT_TABLE ] }
+					defaultFields={ defaultFields }
 				/>
 			</Page>
 		</ExperimentalBlockEditorProvider>

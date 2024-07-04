@@ -22,20 +22,26 @@ import { __ } from '@wordpress/i18n';
 import ItemActions from './item-actions';
 import SingleSelectionCheckbox from './single-selection-checkbox';
 import { useHasAPossibleBulkAction } from './bulk-actions';
-import type { Action, NormalizedField, ViewGridProps } from './types';
+import type {
+	Action,
+	NormalizedField,
+	NormalizedFieldRenderConfig,
+	ViewProps,
+} from './types';
 import type { SetSelection } from './private-types';
+import { normalizeFieldRenderConfigs } from './normalize-field-render-configs';
+import FieldRenderPrimary from './field-render-primary';
 
 interface GridItemProps< Item > {
 	selection: string[];
 	onSelectionChange: SetSelection;
 	getItemId: ( item: Item ) => string;
 	item: Item;
+	fields: NormalizedField< Item >[];
 	actions: Action< Item >[];
 	mediaField?: NormalizedField< Item >;
 	primaryField?: NormalizedField< Item >;
-	visibleFields: NormalizedField< Item >[];
-	badgeFields: NormalizedField< Item >[];
-	columnFields?: string[];
+	groupedRenderFields: Record< string, NormalizedFieldRenderConfig[] >;
 }
 
 function GridItem< Item >( {
@@ -44,15 +50,16 @@ function GridItem< Item >( {
 	getItemId,
 	item,
 	actions,
+	fields,
 	mediaField,
 	primaryField,
-	visibleFields,
-	badgeFields,
-	columnFields,
+	groupedRenderFields,
 }: GridItemProps< Item > ) {
 	const hasBulkAction = useHasAPossibleBulkAction( actions, item );
 	const id = getItemId( item );
 	const isSelected = selection.includes( id );
+	const badgeFields = groupedRenderFields.badge;
+	const defaultFields = groupedRenderFields.default;
 	return (
 		<VStack
 			spacing={ 0 }
@@ -81,6 +88,7 @@ function GridItem< Item >( {
 			<HStack
 				justify="space-between"
 				className="dataviews-view-grid__title-actions"
+				alignment="center"
 			>
 				<SingleSelectionCheckbox
 					item={ item }
@@ -90,9 +98,9 @@ function GridItem< Item >( {
 					primaryField={ primaryField }
 					disabled={ ! hasBulkAction }
 				/>
-				<HStack className="dataviews-view-grid__primary-field">
-					{ primaryField?.render( { item } ) }
-				</HStack>
+				{ !! primaryField && (
+					<FieldRenderPrimary item={ item } field={ primaryField } />
+				) }
 				<ItemActions item={ item } actions={ actions } isCompact />
 			</HStack>
 			{ !! badgeFields?.length && (
@@ -103,7 +111,13 @@ function GridItem< Item >( {
 					alignment="top"
 					justify="flex-start"
 				>
-					{ badgeFields.map( ( field ) => {
+					{ fields.map( ( field ) => {
+						const isVisible = !! badgeFields.find(
+							( fr ) => field.id === fr.field
+						);
+						if ( ! isVisible ) {
+							return null;
+						}
 						const renderedValue = field.render( {
 							item,
 						} );
@@ -121,9 +135,15 @@ function GridItem< Item >( {
 					} ) }
 				</HStack>
 			) }
-			{ !! visibleFields?.length && (
+			{ !! defaultFields?.length && (
 				<VStack className="dataviews-view-grid__fields" spacing={ 3 }>
-					{ visibleFields.map( ( field ) => {
+					{ fields.map( ( field ) => {
+						const isVisible = !! defaultFields.find(
+							( fr ) => field.id === fr.field
+						);
+						if ( ! isVisible ) {
+							return null;
+						}
 						const renderedValue = field.render( {
 							item,
 						} );
@@ -132,22 +152,12 @@ function GridItem< Item >( {
 						}
 						return (
 							<Flex
-								className={ clsx(
-									'dataviews-view-grid__field',
-									columnFields?.includes( field.id )
-										? 'is-column'
-										: 'is-row'
-								) }
+								className="dataviews-view-grid__field"
 								key={ field.id }
 								gap={ 1 }
 								justify="flex-start"
 								expanded
 								style={ { height: 'auto' } }
-								direction={
-									columnFields?.includes( field.id )
-										? 'column'
-										: 'row'
-								}
 							>
 								<>
 									<FlexItem className="dataviews-view-grid__field-name">
@@ -178,33 +188,33 @@ export default function ViewGrid< Item >( {
 	onSelectionChange,
 	selection,
 	view,
-}: ViewGridProps< Item > ) {
-	const mediaField = fields.find(
-		( field ) => field.id === view.layout.mediaField
+}: ViewProps< Item > ) {
+	const fieldRenderConfigs = normalizeFieldRenderConfigs(
+		view.fields,
+		fields
 	);
-	const primaryField = fields.find(
-		( field ) => field.id === view.layout.primaryField
-	);
-	const viewFields = view.fields || fields.map( ( field ) => field.id );
-	const { visibleFields, badgeFields } = fields.reduce(
-		( accumulator: Record< string, NormalizedField< Item >[] >, field ) => {
+	const mediaFieldId = fieldRenderConfigs.find(
+		( fieldRender ) => fieldRender.render === 'media'
+	)?.field;
+	const primaryFieldId = fieldRenderConfigs.find(
+		( fieldRender ) => fieldRender.render === 'primary'
+	)?.field;
+	const mediaField = fields.find( ( f ) => f.id === mediaFieldId );
+	const primaryField = fields.find( ( f ) => f.id === primaryFieldId );
+	const groupedFields = fieldRenderConfigs.reduce(
+		(
+			accumulator: Record< string, NormalizedFieldRenderConfig[] >,
+			fieldRender
+		) => {
 			if (
-				! viewFields.includes( field.id ) ||
-				[ view.layout.mediaField, view.layout.primaryField ].includes(
-					field.id
-				)
+				[ mediaFieldId, primaryFieldId ].includes( fieldRender.field )
 			) {
 				return accumulator;
 			}
-			// If the field is a badge field, add it to the badgeFields array
-			// otherwise add it to the rest visibleFields array.
-			const key = view.layout.badgeFields?.includes( field.id )
-				? 'badgeFields'
-				: 'visibleFields';
-			accumulator[ key ].push( field );
+			accumulator[ fieldRender.render ].push( fieldRender );
 			return accumulator;
 		},
-		{ visibleFields: [], badgeFields: [] }
+		{ default: [], badge: [], column: [] }
 	);
 	const hasData = !! data?.length;
 	return (
@@ -226,11 +236,10 @@ export default function ViewGrid< Item >( {
 								getItemId={ getItemId }
 								item={ item }
 								actions={ actions }
+								fields={ fields }
 								mediaField={ mediaField }
 								primaryField={ primaryField }
-								visibleFields={ visibleFields }
-								badgeFields={ badgeFields }
-								columnFields={ view.layout.columnFields }
+								groupedRenderFields={ groupedFields }
 							/>
 						);
 					} ) }

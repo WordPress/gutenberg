@@ -24,7 +24,13 @@ import {
 } from './bulk-actions';
 import { normalizeFields } from './normalize-fields';
 import BulkActionsToolbar from './bulk-actions-toolbar';
-import type { Action, Field, View, ViewBaseProps } from './types';
+import type {
+	Action,
+	Field,
+	FieldRenderConfig,
+	View,
+	ViewProps,
+} from './types';
 import type { SetSelection, SelectionOrUpdater } from './private-types';
 
 type ItemWithId = { id: string };
@@ -46,6 +52,7 @@ type DataViewsProps< Item > = {
 	selection?: string[];
 	setSelection?: SetSelection;
 	onSelectionChange?: ( items: Item[] ) => void;
+	defaultFields?: Record< string, FieldRenderConfig[] >;
 } & ( Item extends ItemWithId
 	? { getItemId?: ( item: Item ) => string }
 	: { getItemId: ( item: Item ) => string } );
@@ -69,6 +76,7 @@ export default function DataViews< Item >( {
 	selection: selectionProperty,
 	setSelection: setSelectionProperty,
 	onSelectionChange = defaultOnSelectionChange,
+	defaultFields,
 }: DataViewsProps< Item > ) {
 	const [ selectionState, setSelectionState ] = useState< string[] >( [] );
 	const isUncontrolled =
@@ -89,7 +97,7 @@ export default function DataViews< Item >( {
 	}
 
 	const ViewComponent = VIEW_LAYOUTS.find( ( v ) => v.type === view.type )
-		?.component as ComponentType< ViewBaseProps< Item > >;
+		?.component as ComponentType< ViewProps< Item > >;
 	const _fields = useMemo( () => normalizeFields( fields ), [ fields ] );
 
 	const hasPossibleBulkAction = useSomeItemHasAPossibleBulkAction(
@@ -143,6 +151,7 @@ export default function DataViews< Item >( {
 					view={ view }
 					onChangeView={ onChangeView }
 					supportedLayouts={ supportedLayouts }
+					defaultFields={ defaultFields }
 				/>
 			</HStack>
 			<ViewComponent

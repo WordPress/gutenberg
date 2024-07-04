@@ -33,12 +33,20 @@ import { useRegistry } from '@wordpress/data';
  * Internal dependencies
  */
 import { unlock } from './lock-unlock';
-import type { Action, NormalizedField, ViewListProps } from './types';
+import type {
+	Action,
+	NormalizedField,
+	NormalizedFieldRenderConfig,
+	ViewProps,
+} from './types';
 
 import { ActionsDropdownMenuGroup, ActionModal } from './item-actions';
+import { normalizeFieldRenderConfigs } from './normalize-field-render-configs';
+import FieldRenderPrimary from './field-render-primary';
 
 interface ListViewItemProps< Item > {
 	actions: Action< Item >[];
+	fields: NormalizedField< Item >[];
 	id?: string;
 	isSelected: boolean;
 	item: Item;
@@ -46,7 +54,7 @@ interface ListViewItemProps< Item > {
 	onSelect: ( item: Item ) => void;
 	primaryField?: NormalizedField< Item >;
 	store: CompositeStore;
-	visibleFields: NormalizedField< Item >[];
+	defaultFields: NormalizedFieldRenderConfig[];
 }
 
 const {
@@ -59,6 +67,7 @@ const {
 
 function ListItem< Item >( {
 	actions,
+	fields,
 	id,
 	isSelected,
 	item,
@@ -66,7 +75,7 @@ function ListItem< Item >( {
 	onSelect,
 	primaryField,
 	store,
-	visibleFields,
+	defaultFields,
 }: ListViewItemProps< Item > ) {
 	const registry = useRegistry();
 	const itemRef = useRef< HTMLElement >( null );
@@ -153,32 +162,41 @@ function ListItem< Item >( {
 								) }
 							</div>
 							<VStack spacing={ 0 }>
-								<span
-									className="dataviews-view-list__primary-field"
-									id={ labelId }
-								>
-									{ primaryField?.render( { item } ) }
-								</span>
+								{ !! primaryField && (
+									<FieldRenderPrimary
+										item={ item }
+										field={ primaryField }
+										id={ labelId }
+									/>
+								) }
 								<div
 									className="dataviews-view-list__fields"
 									id={ descriptionId }
 								>
-									{ visibleFields.map( ( field ) => (
-										<div
-											key={ field.id }
-											className="dataviews-view-list__field"
-										>
-											<VisuallyHidden
-												as="span"
-												className="dataviews-view-list__field-label"
+									{ fields.map( ( field ) => {
+										const isVisible = !! defaultFields.find(
+											( fr ) => field.id === fr.field
+										);
+										if ( ! isVisible ) {
+											return null;
+										}
+										return (
+											<div
+												key={ field.id }
+												className="dataviews-view-list__field"
 											>
-												{ field.header }
-											</VisuallyHidden>
-											<span className="dataviews-view-list__field-value">
-												{ field.render( { item } ) }
-											</span>
-										</div>
-									) ) }
+												<VisuallyHidden
+													as="span"
+													className="dataviews-view-list__field-label"
+												>
+													{ field.header }
+												</VisuallyHidden>
+												<span className="dataviews-view-list__field-value">
+													{ field.render( { item } ) }
+												</span>
+											</div>
+										);
+									} ) }
 								</div>
 							</VStack>
 						</HStack>
@@ -303,7 +321,7 @@ function ListItem< Item >( {
 	);
 }
 
-export default function ViewList< Item >( props: ViewListProps< Item > ) {
+export default function ViewList< Item >( props: ViewProps< Item > ) {
 	const {
 		actions,
 		data,
@@ -318,20 +336,21 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 	const selectedItem = data?.findLast( ( item ) =>
 		selection.includes( getItemId( item ) )
 	);
-
-	const mediaField = fields.find(
-		( field ) => field.id === view.layout.mediaField
+	const fieldRenderConfigs = normalizeFieldRenderConfigs(
+		view.fields,
+		fields
 	);
-	const primaryField = fields.find(
-		( field ) => field.id === view.layout.primaryField
-	);
-	const viewFields = view.fields || fields.map( ( field ) => field.id );
-	const visibleFields = fields.filter(
-		( field ) =>
-			viewFields.includes( field.id ) &&
-			! [ view.layout.primaryField, view.layout.mediaField ].includes(
-				field.id
-			)
+	const mediaFieldId = fieldRenderConfigs.find(
+		( fieldRender ) => fieldRender.render === 'media'
+	)?.field;
+	const primaryFieldId = fieldRenderConfigs.find(
+		( fieldRender ) => fieldRender.render === 'primary'
+	)?.field;
+	const mediaField = fields.find( ( f ) => f.id === mediaFieldId );
+	const primaryField = fields.find( ( f ) => f.id === primaryFieldId );
+	const defaultFields = fieldRenderConfigs.filter(
+		( fieldRender ) =>
+			! [ mediaFieldId, primaryFieldId ].includes( fieldRender.field )
 	);
 
 	const onSelect = ( item: Item ) =>
@@ -396,13 +415,14 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 						key={ id }
 						id={ id }
 						actions={ actions }
+						fields={ fields }
 						item={ item }
 						isSelected={ item === selectedItem }
 						onSelect={ onSelect }
 						mediaField={ mediaField }
 						primaryField={ primaryField }
 						store={ store }
-						visibleFields={ visibleFields }
+						defaultFields={ defaultFields }
 					/>
 				);
 			} ) }

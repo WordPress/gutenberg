@@ -150,7 +150,6 @@ const view = {
 		direction: 'desc',
 	},
 	fields: [ 'author', 'status' ],
-	layout: {},
 };
 ```
 
@@ -167,10 +166,7 @@ Properties:
 -   `sort`:
     -   `field`: the field used for sorting the dataset.
     -   `direction`: the direction to use for sorting, one of `asc` or `desc`.
--   `fields`: the `id` of the fields that are visible in the UI.
--   `layout`: config that is specific to a particular layout type.
-    -   `mediaField`: used by the `grid` and `list` layouts. The `id` of the field to be used for rendering each card's media.
-    -   `primaryField`: used by the `table`, `grid` and `list` layouts. The `id` of the field to be highlighted in each row/card/item.
+-   `fields`: the `id` of the fields that are visible in the UI. Can also be an object to define the render type of the field example: `{ field: 'author', render: 'media' }`.
 
 ### `onChangeView`: `function`
 
@@ -200,7 +196,6 @@ function MyCustomPageTable() {
 			},
 		],
 		fields: [ 'author', 'status' ],
-		layout: {},
 	} );
 
 	const queryArgs = useMemo( () => {

@@ -48,10 +48,13 @@ import type {
 	Action,
 	NormalizedField,
 	SortDirection,
-	ViewTable as ViewTableType,
-	ViewTableProps,
+	ViewProps,
+	View,
+	NormalizedFieldRenderConfig,
 } from './types';
 import type { SetSelection } from './private-types';
+import FieldRenderPrimary from './field-render-primary';
+import { normalizeFieldRenderConfigs } from './normalize-field-render-configs';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -64,9 +67,9 @@ const {
 
 interface HeaderMenuProps< Item > {
 	field: NormalizedField< Item >;
-	view: ViewTableType;
+	view: View;
 	fields: NormalizedField< Item >[];
-	onChangeView: ( view: ViewTableType ) => void;
+	onChangeView: ( view: View ) => void;
 	onHide: ( field: NormalizedField< Item > ) => void;
 	setOpenedFilter: ( fieldId: string ) => void;
 }
@@ -82,9 +85,10 @@ interface BulkSelectionCheckboxProps< Item > {
 interface TableRowProps< Item > {
 	hasBulkActions: boolean;
 	item: Item;
+	fields: NormalizedField< Item >[];
 	actions: Action< Item >[];
 	id: string;
-	visibleFields: NormalizedField< Item >[];
+	fieldRenderConfigs: NormalizedFieldRenderConfig[];
 	primaryField?: NormalizedField< Item >;
 	selection: string[];
 	getItemId: ( item: Item ) => string;
@@ -296,30 +300,30 @@ function TableRow< Item >( {
 	hasBulkActions,
 	item,
 	actions,
+	fields,
 	id,
-	visibleFields,
-	primaryField,
+	fieldRenderConfigs,
 	selection,
 	getItemId,
 	onSelectionChange,
 }: TableRowProps< Item > ) {
 	const hasPossibleBulkAction = useHasAPossibleBulkAction( actions, item );
 	const isSelected = hasPossibleBulkAction && selection.includes( id );
-
 	const [ isHovered, setIsHovered ] = useState( false );
-
 	const handleMouseEnter = () => {
 		setIsHovered( true );
 	};
-
 	const handleMouseLeave = () => {
 		setIsHovered( false );
 	};
-
 	// Will be set to true if `onTouchStart` fires. This happens before
 	// `onClick` and can be used to exclude touchscreen devices from certain
 	// behaviours.
 	const isTouchDevice = useRef( false );
+	const primaryFieldId = fieldRenderConfigs.find(
+		( fieldRenderConfig ) => fieldRenderConfig.render === 'primary'
+	)?.field;
+	const primaryField = fields.find( ( f ) => f.id === primaryFieldId );
 
 	return (
 		<tr
@@ -368,30 +372,35 @@ function TableRow< Item >( {
 					</div>
 				</td>
 			) }
-			{ visibleFields.map( ( field ) => (
-				<td
-					key={ field.id }
-					style={ {
-						width: field.width || undefined,
-						minWidth: field.minWidth || undefined,
-						maxWidth: field.maxWidth || undefined,
-					} }
-				>
-					<div
-						className={ clsx(
-							'dataviews-view-table__cell-content-wrapper',
-							{
-								'dataviews-view-table__primary-field':
-									primaryField?.id === field.id,
-							}
-						) }
+			{ fields.map( ( field ) => {
+				const fieldRender = fieldRenderConfigs.find(
+					( fr ) => fr.field === field.id
+				);
+				if ( ! fieldRender ) {
+					return null;
+				}
+				const fieldOutput =
+					fieldRender.render === 'primary' ? (
+						<FieldRenderPrimary field={ field } item={ item } />
+					) : (
+						field.render( { item } )
+					);
+
+				return (
+					<td
+						key={ field.id }
+						style={ {
+							width: field.width || undefined,
+							minWidth: field.minWidth || undefined,
+							maxWidth: field.maxWidth || undefined,
+						} }
 					>
-						{ field.render( {
-							item,
-						} ) }
-					</div>
-				</td>
-			) ) }
+						<div className="dataviews-view-table__cell-content-wrapper">
+							{ fieldOutput }
+						</div>
+					</td>
+				);
+			} ) }
 			{ !! actions?.length && (
 				// Disable reason: we are not making the element interactive,
 				// but preventing any click events from bubbling up to the
@@ -423,7 +432,7 @@ function ViewTable< Item >( {
 	selection,
 	setOpenedFilter,
 	view,
-}: ViewTableProps< Item > ) {
+}: ViewProps< Item > ) {
 	const headerMenuRefs = useRef<
 		Map< string, { node: HTMLButtonElement; fallback: string } >
 	>( new Map() );
@@ -459,16 +468,10 @@ function ViewTable< Item >( {
 		setNextHeaderMenuToFocus( fallback?.node );
 	};
 
-	const viewFields = view.fields || fields.map( ( f ) => f.id );
-	const visibleFields = fields.filter(
-		( field ) =>
-			viewFields.includes( field.id ) ||
-			[ view.layout.mediaField ].includes( field.id )
-	);
 	const hasData = !! data?.length;
-
-	const primaryField = fields.find(
-		( field ) => field.id === view.layout.primaryField
+	const fieldRenderConfigs = normalizeFieldRenderConfigs(
+		view.fields,
+		fields
 	);
 
 	return (
@@ -498,52 +501,63 @@ function ViewTable< Item >( {
 								/>
 							</th>
 						) }
-						{ visibleFields.map( ( field, index ) => (
-							<th
-								key={ field.id }
-								style={ {
-									width: field.width || undefined,
-									minWidth: field.minWidth || undefined,
-									maxWidth: field.maxWidth || undefined,
-								} }
-								data-field-id={ field.id }
-								aria-sort={
-									view.sort?.field === field.id
-										? sortValues[ view.sort.direction ]
-										: undefined
-								}
-								scope="col"
-							>
-								<HeaderMenu
-									ref={ ( node ) => {
-										if ( node ) {
-											headerMenuRefs.current.set(
-												field.id,
-												{
-													node,
-													fallback:
-														visibleFields[
-															index > 0
-																? index - 1
-																: 1
-														]?.id,
-												}
-											);
-										} else {
-											headerMenuRefs.current.delete(
-												field.id
-											);
-										}
+						{ fields.map( ( field ) => {
+							const fieldRenderIndex =
+								fieldRenderConfigs.findIndex(
+									( fieldRender ) =>
+										fieldRender.field === field.id
+								);
+							if ( fieldRenderIndex === -1 ) {
+								return null;
+							}
+							const fallback =
+								fieldRenderConfigs[
+									fieldRenderIndex > 0
+										? fieldRenderIndex - 1
+										: 1
+								]?.field;
+							return (
+								<th
+									key={ field.id }
+									style={ {
+										width: field.width || undefined,
+										minWidth: field.minWidth || undefined,
+										maxWidth: field.maxWidth || undefined,
 									} }
-									field={ field }
-									view={ view }
-									fields={ fields }
-									onChangeView={ onChangeView }
-									onHide={ onHide }
-									setOpenedFilter={ setOpenedFilter }
-								/>
-							</th>
-						) ) }
+									data-field-id={ field.id }
+									aria-sort={
+										view.sort?.field === field.id
+											? sortValues[ view.sort.direction ]
+											: undefined
+									}
+									scope="col"
+								>
+									<HeaderMenu
+										ref={ ( node ) => {
+											if ( node ) {
+												headerMenuRefs.current.set(
+													field.id,
+													{
+														node,
+														fallback,
+													}
+												);
+											} else {
+												headerMenuRefs.current.delete(
+													field.id
+												);
+											}
+										} }
+										field={ field }
+										view={ view }
+										fields={ fields }
+										onChangeView={ onChangeView }
+										onHide={ onHide }
+										setOpenedFilter={ setOpenedFilter }
+									/>
+								</th>
+							);
+						} ) }
 						{ !! actions?.length && (
 							<th
 								data-field-id="actions"
@@ -564,9 +578,9 @@ function ViewTable< Item >( {
 								item={ item }
 								hasBulkActions={ hasBulkActions }
 								actions={ actions }
+								fields={ fields }
 								id={ getItemId( item ) || index.toString() }
-								visibleFields={ visibleFields }
-								primaryField={ primaryField }
+								fieldRenderConfigs={ fieldRenderConfigs }
 								selection={ selection }
 								getItemId={ getItemId }
 								onSelectionChange={ onSelectionChange }

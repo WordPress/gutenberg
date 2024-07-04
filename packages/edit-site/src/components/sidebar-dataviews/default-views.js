@@ -26,18 +26,24 @@ import {
 	OPERATOR_IS_ANY,
 } from '../../utils/constants';
 
-export const DEFAULT_CONFIG_PER_VIEW_TYPE = {
-	[ LAYOUT_TABLE ]: {
-		primaryField: 'title',
-	},
-	[ LAYOUT_GRID ]: {
-		mediaField: 'featured-image',
-		primaryField: 'title',
-	},
-	[ LAYOUT_LIST ]: {
-		primaryField: 'title',
-		mediaField: 'featured-image',
-	},
+export const defaultFields = {
+	[ LAYOUT_TABLE ]: [
+		{ render: 'primary', field: 'title' },
+		'author',
+		'status',
+	],
+	[ LAYOUT_GRID ]: [
+		{ render: 'media', field: 'featured-image' },
+		{ render: 'primary', field: 'title' },
+		'author',
+		'status',
+	],
+	[ LAYOUT_LIST ]: [
+		{ render: 'media', field: 'featured-image' },
+		{ render: 'primary', field: 'title' },
+		'author',
+		'status',
+	],
 };
 
 const DEFAULT_POST_BASE = {
@@ -50,10 +56,7 @@ const DEFAULT_POST_BASE = {
 		field: 'date',
 		direction: 'desc',
 	},
-	fields: [ 'title', 'author', 'status' ],
-	layout: {
-		...DEFAULT_CONFIG_PER_VIEW_TYPE[ LAYOUT_LIST ],
-	},
+	fields: defaultFields[ LAYOUT_LIST ],
 };
 
 export function useDefaultViews( { postType } ) {
