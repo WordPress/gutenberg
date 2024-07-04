@@ -184,9 +184,14 @@ if ( ! class_exists( 'WP_Block_Templates_Registry' ) ) {
 				return array();
 			}
 
-			$slugs_to_include = isset( $query['slug__in'] ) ? $query['slug__in'] : array();
-			$slugs_to_skip    = isset( $query['slug__not_in'] ) ? $query['slug__not_in'] : array();
-			$post_type        = isset( $query['post_type'] ) ? $query['post_type'] : '';
+			$query = wp_parse_args( $query, array(
+				'slug__in'      => array(),
+				'slug__not_in'  => array(),
+				'post_type'     => '',
+			) );
+			$slugs_to_include = $query['slug__in'];
+			$slugs_to_skip    = $query['slug__not_in'];
+			$post_type        = $query['post_type'];
 
 			foreach ( $all_templates as $template_name => $template ) {
 				if ( ! empty( $slugs_to_include ) && ! in_array( $template->slug, $slugs_to_include, true ) ) {
