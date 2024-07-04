@@ -204,7 +204,7 @@ function FontSize() {
 							<ToggleControl
 								label={ __( 'Fluid typography' ) }
 								help={ __(
-									'Enable fluid typography for this font size with default min and max values.'
+									'Scale the font size dynamically to fit the screen or viewport.'
 								) }
 								checked={ isFluid }
 								onChange={ handleFluidChange }
