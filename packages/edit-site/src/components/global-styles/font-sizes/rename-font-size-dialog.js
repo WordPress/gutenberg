@@ -26,6 +26,7 @@ function RenameFontSizeDialog( { fontSize, toggleOpen, handleRename } ) {
 	return (
 		<Modal
 			onRequestClose={ toggleOpen }
+			focusOnMount="firstContentElement"
 			title={ __( 'Rename' ) }
 			size="small"
 		>
