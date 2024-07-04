@@ -59,7 +59,10 @@
 	},
 	"usesContext": [ "postId", "postType", "queryId" ],
 	"example": {
-		"viewportWidth": 350
+		"viewportWidth": 350,
+		"attributes": {
+			"width": 300
+		}
 	},
 	"supports": {
 		"align": [ "left", "right", "center", "wide", "full" ],
