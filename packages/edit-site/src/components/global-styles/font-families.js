@@ -52,7 +52,7 @@ function FontFamilies() {
 				<Subtitle level={ 3 }>{ __( 'Fonts' ) }</Subtitle>
 				{ hasFonts ? (
 					<>
-						<ItemGroup isBordered isSeparated>
+						<ItemGroup size="large" isBordered isSeparated>
 							{ customFonts.map( ( font ) => (
 								<FontFamilyItem
 									key={ font.slug }
