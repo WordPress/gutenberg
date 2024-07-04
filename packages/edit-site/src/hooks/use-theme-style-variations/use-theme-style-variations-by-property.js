@@ -60,7 +60,7 @@ export function removePropertiesFromObject( object, properties ) {
  */
 function hasThemeVariation( { title, settings, styles } ) {
 	return (
-		title !== __( 'Default' ) || // Always preserve the default variation.
+		title === __( 'Default' ) || // Always preserve the default variation.
 		Object.keys( settings ).length > 0 ||
 		Object.keys( styles ).length > 0
 	);
@@ -70,13 +70,12 @@ function hasThemeVariation( { title, settings, styles } ) {
  * Fetches the current theme style variations that contain only the specified properties
  * and merges them with the user config.
  *
- * @param {Object}   props            Object of hook args.
- * @param {string[]} props.properties The properties to filter by.
+ * @param {string[]} properties The properties to filter by.
  * @return {Object[]|*} The merged object.
  */
-export function useCurrentMergeThemeStyleVariationsWithUserConfig( {
-	properties = [],
-} ) {
+export function useCurrentMergeThemeStyleVariationsWithUserConfig(
+	properties = []
+) {
 	const { variationsFromTheme } = useSelect( ( select ) => {
 		const _variationsFromTheme =
 			select(
