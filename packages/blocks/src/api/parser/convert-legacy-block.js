@@ -101,7 +101,7 @@ export function convertLegacyBlockNameAndAttributes( name, attributes ) {
 			...newAttributes.style,
 			layout: {
 				...newAttributes.style.layout,
-				columnSpan: parseInt( attributes.style.layout.rowSpan, 10 ),
+				rowSpan: parseInt( attributes.style.layout.rowSpan, 10 ),
 			},
 		};
 	}
