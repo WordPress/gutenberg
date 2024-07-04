@@ -7,7 +7,7 @@ import { _x } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { store as editorStore } from '../store';
+import { store as editorStore } from '../../../store';
 
 export default {
 	name: 'core/post-meta',
