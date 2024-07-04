@@ -84,7 +84,7 @@ export default function ResetOverridesControl( props ) {
 				<ToolbarButton
 					onClick={ onClick }
 					disabled={ ! isOverriden }
-					accessibleWhenDisabled
+					__experimentalIsFocusable
 				>
 					{ __( 'Reset' ) }
 				</ToolbarButton>
