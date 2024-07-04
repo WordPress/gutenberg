@@ -20,6 +20,7 @@ import {
 	chevronLeft,
 	chevronRight,
 } from '@wordpress/icons';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -35,6 +36,7 @@ import Subtitle from '../subtitle';
 import { NavigationButtonAsItem } from '../navigation-button';
 import { getNewIndexFromPresets } from '../utils';
 import ScreenHeader from '../header';
+import ConfirmResetFontSizesDialog from './confirm-reset-font-sizes-dialog';
 
 function FontSizeGroup( {
 	label,
@@ -43,72 +45,98 @@ function FontSizeGroup( {
 	handleAddFontSize,
 	handleResetFontSizes,
 } ) {
-	return (
-		<VStack spacing={ 4 }>
-			<HStack justify="space-between" align="center">
-				<Subtitle level={ 3 }>{ label }</Subtitle>
-				<FlexItem>
-					{ origin === 'custom' && (
-						<Button
-							label={ __( 'Add font size' ) }
-							icon={ plus }
-							size="small"
-							onClick={ handleAddFontSize }
-						/>
-					) }
-					{ !! handleResetFontSizes && (
-						<DropdownMenu
-							trigger={
-								<Button
-									size="small"
-									icon={ moreVertical }
-									label={ __( 'Menu' ) }
-								/>
-							}
-						>
-							<DropdownMenuItem onClick={ handleResetFontSizes }>
-								<DropdownMenuItemLabel>
-									{ origin === 'custom'
-										? __( 'Remove font size presets' )
-										: __( 'Reset font size presets' ) }
-								</DropdownMenuItemLabel>
-							</DropdownMenuItem>
-						</DropdownMenu>
-					) }
-				</FlexItem>
-			</HStack>
+	const [ isResetDialogOpen, setIsResetDialogOpen ] = useState( false );
 
-			{ !! sizes.length && (
-				<ItemGroup isBordered isSeparated size="large">
-					{ sizes.map( ( size ) => (
-						<NavigationButtonAsItem
-							key={ size.slug }
-							path={ `/typography/font-sizes/${ origin }/${ size.slug }` }
-						>
-							<HStack direction="row">
-								<FlexItem className="edit-site-font-size__item">
-									{ size.name }
-								</FlexItem>
-								<FlexItem>
-									<HStack direction="row">
-										<FlexItem className="edit-site-font-size__item edit-site-font-size__item-value">
-											{ size.size }
-										</FlexItem>
-										<Icon
-											icon={
-												isRTL()
-													? chevronLeft
-													: chevronRight
-											}
-										/>
-									</HStack>
-								</FlexItem>
-							</HStack>
-						</NavigationButtonAsItem>
-					) ) }
-				</ItemGroup>
+	const toggleResetDialog = () => setIsResetDialogOpen( ! isResetDialogOpen );
+
+	const resetDialogText =
+		origin === 'custom'
+			? __(
+					'Are you sure you want to remove all custom font size presets?'
+			  )
+			: __(
+					'Are you sure you want to reset all font size presets to their default values?'
+			  );
+
+	return (
+		<>
+			{ isResetDialogOpen && (
+				<ConfirmResetFontSizesDialog
+					text={ resetDialogText }
+					confirmButtonText={
+						origin === 'custom' ? __( 'Remove' ) : __( 'Reset' )
+					}
+					isOpen={ isResetDialogOpen }
+					toggleOpen={ toggleResetDialog }
+					onConfirm={ handleResetFontSizes }
+				/>
 			) }
-		</VStack>
+			<VStack spacing={ 4 }>
+				<HStack justify="space-between" align="center">
+					<Subtitle level={ 3 }>{ label }</Subtitle>
+					<FlexItem>
+						{ origin === 'custom' && (
+							<Button
+								label={ __( 'Add font size' ) }
+								icon={ plus }
+								size="small"
+								onClick={ handleAddFontSize }
+							/>
+						) }
+						{ !! handleResetFontSizes && (
+							<DropdownMenu
+								trigger={
+									<Button
+										size="small"
+										icon={ moreVertical }
+										label={ __( 'Menu' ) }
+									/>
+								}
+							>
+								<DropdownMenuItem onClick={ toggleResetDialog }>
+									<DropdownMenuItemLabel>
+										{ origin === 'custom'
+											? __( 'Remove font size presets' )
+											: __( 'Reset font size presets' ) }
+									</DropdownMenuItemLabel>
+								</DropdownMenuItem>
+							</DropdownMenu>
+						) }
+					</FlexItem>
+				</HStack>
+
+				{ !! sizes.length && (
+					<ItemGroup isBordered isSeparated size="large">
+						{ sizes.map( ( size ) => (
+							<NavigationButtonAsItem
+								key={ size.slug }
+								path={ `/typography/font-sizes/${ origin }/${ size.slug }` }
+							>
+								<HStack direction="row">
+									<FlexItem className="edit-site-font-size__item">
+										{ size.name }
+									</FlexItem>
+									<FlexItem>
+										<HStack direction="row">
+											<FlexItem className="edit-site-font-size__item edit-site-font-size__item-value">
+												{ size.size }
+											</FlexItem>
+											<Icon
+												icon={
+													isRTL()
+														? chevronLeft
+														: chevronRight
+												}
+											/>
+										</HStack>
+									</FlexItem>
+								</HStack>
+							</NavigationButtonAsItem>
+						) ) }
+					</ItemGroup>
+				) }
+			</VStack>
+		</>
 	);
 }
 
@@ -169,6 +197,7 @@ function FontSizes() {
 								label={ __( 'Theme' ) }
 								origin="theme"
 								sizes={ themeFontSizes }
+								baseSizes={ baseThemeFontSizes }
 								handleAddFontSize={ handleAddFontSize }
 								handleResetFontSizes={
 									themeFontSizes !== baseThemeFontSizes
@@ -187,6 +216,7 @@ function FontSizes() {
 									label={ __( 'Default' ) }
 									origin="default"
 									sizes={ defaultFontSizes }
+									baseSizes={ baseDefaultFontSizes }
 									handleAddFontSize={ handleAddFontSize }
 									handleResetFontSizes={
 										defaultFontSizes !==
