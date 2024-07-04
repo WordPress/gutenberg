@@ -12,7 +12,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { memo } from '@wordpress/element';
-import { settings } from '@wordpress/icons';
+import { cog } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -314,7 +314,7 @@ function _ViewActions< Item >( {
 			trigger={
 				<Button
 					size="compact"
-					icon={ settings }
+					icon={ cog }
 					label={ __( 'View options' ) }
 				/>
 			}
