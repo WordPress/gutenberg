@@ -113,13 +113,17 @@ function _CustomSelect(
 	return (
 		// Where should `restProps` be forwarded to?
 		<div className={ className }>
-			{ hideLabelFromVision ? ( // TODO: Replace with BaseControl
-				<VisuallyHidden as="label">{ label }</VisuallyHidden>
-			) : (
-				<Styled.SelectLabel store={ store }>
-					{ label }
-				</Styled.SelectLabel>
-			) }
+			<Styled.SelectLabel
+				store={ store }
+				render={
+					hideLabelFromVision ? (
+						// @ts-expect-error `children` are passed via the render prop
+						<VisuallyHidden as="label" />
+					) : undefined
+				}
+			>
+				{ label }
+			</Styled.SelectLabel>
 			<InputBase
 				__next40pxDefaultSize
 				size={ size }
