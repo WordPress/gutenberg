@@ -17,14 +17,16 @@ export default function EntityRecordItem( { record, checked, onChange } ) {
 	const { name, kind, title, key } = record;
 
 	// Handle templates that might use default descriptive titles.
-	const { entityRecordTitle, postMetaChanges } = useSelect(
+	const selectResults = useSelect(
 		( select ) => {
+			const _postMetaChanges = unlock(
+				select( editorStore )
+			).getPostMetaChanges();
+
 			if ( 'postType' !== kind || 'wp_template' !== name ) {
 				return {
 					entityRecordTitle: title,
-					postMetaChanges: unlock(
-						select( editorStore )
-					).getPostMetaChanges( name, key ),
+					postMetaChanges: _postMetaChanges,
 				};
 			}
 
@@ -38,13 +40,13 @@ export default function EntityRecordItem( { record, checked, onChange } ) {
 					select( editorStore ).__experimentalGetTemplateInfo(
 						template
 					).title,
-				postMetaChanges: unlock(
-					select( editorStore )
-				).getPostMetaChanges( name, key ),
+				postMetaChanges: _postMetaChanges,
 			};
 		},
 		[ name, kind, title, key ]
 	);
+
+	const { entityRecordTitle, postMetaChanges } = selectResults;
 
 	return (
 		<>
