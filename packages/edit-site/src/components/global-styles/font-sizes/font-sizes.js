@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, sprintf, isRTL } from '@wordpress/i18n';
 import {
 	privateApis as componentsPrivateApis,
 	__experimentalSpacer as Spacer,
@@ -13,7 +13,13 @@ import {
 	FlexItem,
 	Button,
 } from '@wordpress/components';
-import { plus, moreVertical } from '@wordpress/icons';
+import {
+	Icon,
+	plus,
+	moreVertical,
+	chevronLeft,
+	chevronRight,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -83,8 +89,19 @@ function FontSizeGroup( {
 								<FlexItem className="edit-site-font-size__item">
 									{ size.name }
 								</FlexItem>
-								<FlexItem className="edit-site-font-size__item edit-site-font-size__item-value">
-									{ size.size }
+								<FlexItem>
+									<HStack direction="row">
+										<FlexItem className="edit-site-font-size__item edit-site-font-size__item-value">
+											{ size.size }
+										</FlexItem>
+										<Icon
+											icon={
+												isRTL()
+													? chevronLeft
+													: chevronRight
+											}
+										/>
+									</HStack>
 								</FlexItem>
 							</HStack>
 						</NavigationButtonAsItem>
