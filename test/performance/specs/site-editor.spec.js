@@ -416,6 +416,12 @@ test.describe( 'Site Editor Performance', () => {
 				} )
 			);
 
+			await admin.visitSiteEditor();
+			await page.getByRole( 'button', { name: 'Pages' } ).click();
+
+			// Check if we're dealing with the old URL structure.
+			const path = new URL( page.url() ).searchParams.get( 'path' );
+
 			const samples = 10;
 			for ( let i = 1; i <= samples; i++ ) {
 				// Start from the trash view, then navigate to all pages, so we
@@ -423,7 +429,9 @@ test.describe( 'Site Editor Performance', () => {
 				// For some reason `visiSiteEditor` does not work with these
 				// parameters.
 				await admin.visitAdminPage(
-					'site-editor.php?postType=page&layout=table&activeView=trash'
+					path
+						? 'site-editor.php?path=%2Fpage&layout=table&activeView=trash'
+						: 'site-editor.php?postType=page&layout=table&activeView=trash'
 				);
 
 				const startTime = performance.now();
