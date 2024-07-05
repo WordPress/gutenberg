@@ -30,7 +30,7 @@ export default {
 
 		return overridableValue === '' ? undefined : overridableValue;
 	},
-	setValuesInBatch( { registry, clientId, attributes } ) {
+	setValuesInBatch( { registry, clientId, sourceBindings } ) {
 		const { getBlockAttributes, getBlockParentsByBlockName, getBlocks } =
 			registry.select( blockEditorStore );
 		const currentBlockAttributes = getBlockAttributes( clientId );
@@ -43,6 +43,15 @@ export default {
 			clientId,
 			'core/block',
 			true
+		);
+
+		// Extract the updated attributes from the source bindings.
+		const attributes = Object.entries( sourceBindings ).reduce(
+			( attrs, [ key, { newValue } ] ) => {
+				attrs[ key ] = newValue;
+				return attrs;
+			},
+			{}
 		);
 
 		// If there is no pattern client ID, sync blocks with the same name and same attributes.
