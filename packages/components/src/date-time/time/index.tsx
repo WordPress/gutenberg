@@ -61,7 +61,7 @@ export function TimePicker( {
 	is12Hour,
 	currentTime,
 	onChange,
-	dateOrder = DEFAULT_DATE_ORDER,
+	dateOrder: _dateOrder,
 }: TimePickerProps ) {
 	const [ date, setDate ] = useState( () =>
 		// Truncate the date at the minutes, see: #15495.
@@ -191,22 +191,28 @@ export function TimePicker( {
 		/>
 	);
 
-	const isValidDateOrder = VALID_DATE_ORDERS.includes( dateOrder );
+	let dateOrder;
 
-	const fields = ( isValidDateOrder ? dateOrder : DEFAULT_DATE_ORDER )
-		.split( '' )
-		.map( ( field ) => {
-			switch ( field ) {
-				case 'd':
-					return dayField;
-				case 'm':
-					return monthField;
-				case 'y':
-					return yearField;
-				default:
-					return null;
-			}
-		} );
+	if ( ! _dateOrder ) {
+		dateOrder = is12Hour ? 'mdy' : 'dmy';
+	} else {
+		dateOrder = VALID_DATE_ORDERS.includes( _dateOrder )
+			? _dateOrder
+			: DEFAULT_DATE_ORDER;
+	}
+
+	const fields = dateOrder.split( '' ).map( ( field ) => {
+		switch ( field ) {
+			case 'd':
+				return dayField;
+			case 'm':
+				return monthField;
+			case 'y':
+				return yearField;
+			default:
+				return null;
+		}
+	} );
 
 	return (
 		<Wrapper
