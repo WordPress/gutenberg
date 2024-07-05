@@ -32,6 +32,13 @@ function InserterPreviewPanel( { item } ) {
 	}, [ name, example, initialAttributes ] );
 	// Same as height of BlockPreviewPanel.
 	const previewHeight = 144;
+	const sidebarWidth = 280;
+	const viewportWidth = example?.viewportWidth ?? 500;
+	const scale = sidebarWidth / viewportWidth;
+	const minHeight =
+		scale !== 0 && scale < 1 && previewHeight
+			? previewHeight / scale
+			: previewHeight;
 
 	return (
 		<div className="block-editor-inserter__preview-container">
@@ -40,13 +47,14 @@ function InserterPreviewPanel( { item } ) {
 					<div className="block-editor-inserter__preview-content">
 						<BlockPreview
 							blocks={ blocks }
-							viewportWidth={ example?.viewportWidth ?? 500 }
+							viewportWidth={ viewportWidth }
 							minHeight={ previewHeight }
 							additionalStyles={ [
 								{
 									css: `
 										body { 
 											padding: 24px;
+											min-height:${ Math.round( minHeight ) }px;
 											display:flex;align-items:center;justify-content:center; 
 										}
 									`,
