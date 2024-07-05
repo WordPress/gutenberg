@@ -103,7 +103,7 @@ export function TimeInput( {
 				</BaseControl.VisualLabel>
 			) }
 
-			<HStack alignment="left">
+			<HStack alignment="left" expanded={ false }>
 				<TimeWrapper
 					className="components-datetime__time-field components-datetime__time-field-time" // Unused, for backwards compatibility.
 				>
