@@ -66,19 +66,13 @@ export function useHasAPossibleBulkAction< Item >(
 }
 
 export function useSomeItemHasAPossibleBulkAction< Item >(
-	actions: Action< Item >[],
-	data: Item[]
+	actions: Action< Item >[]
 ) {
 	return useMemo( () => {
-		return data.some( ( item ) => {
-			return actions.some( ( action ) => {
-				return (
-					action.supportsBulk &&
-					( ! action.isEligible || action.isEligible( item ) )
-				);
-			} );
+		return actions.some( ( action ) => {
+			return action.supportsBulk;
 		} );
-	}, [ actions, data ] );
+	}, [ actions ] );
 }
 
 function ActionWithModal< Item >( {

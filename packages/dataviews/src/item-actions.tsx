@@ -157,9 +157,12 @@ export function ActionsDropdownMenuGroup< Item >( {
 	item,
 }: ActionsDropdownMenuGroupProps< Item > ) {
 	const registry = useRegistry();
+	const eligibleActions = actions.filter(
+		( action ) => ! action.isEligible || action.isEligible( item )
+	);
 	return (
 		<DropdownMenuGroup>
-			{ actions.map( ( action ) => {
+			{ eligibleActions.map( ( action ) => {
 				if ( 'RenderModal' in action ) {
 					return (
 						<ActionWithModal
@@ -181,6 +184,11 @@ export function ActionsDropdownMenuGroup< Item >( {
 					/>
 				);
 			} ) }
+			{ ! eligibleActions.length && (
+				<DropdownMenuItem disabled>
+					{ __( 'No actions available' ) }
+				</DropdownMenuItem>
+			) }
 		</DropdownMenuGroup>
 	);
 }

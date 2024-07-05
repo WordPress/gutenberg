@@ -18,13 +18,7 @@ import {
 	Spinner,
 	VisuallyHidden,
 } from '@wordpress/components';
-import {
-	useCallback,
-	useEffect,
-	useMemo,
-	useRef,
-	useState,
-} from '@wordpress/element';
+import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
 import { useRegistry } from '@wordpress/data';
@@ -91,20 +85,9 @@ function ListItem< Item >( {
 		}
 	}, [ isSelected ] );
 
-	const { primaryAction, eligibleActions } = useMemo( () => {
-		// If an action is eligible for all items, doesn't need
-		// to provide the `isEligible` function.
-		const _eligibleActions = actions.filter(
-			( action ) => ! action.isEligible || action.isEligible( item )
-		);
-		const _primaryActions = _eligibleActions.filter(
-			( action ) => action.isPrimary && !! action.icon
-		);
-		return {
-			primaryAction: _primaryActions?.[ 0 ],
-			eligibleActions: _eligibleActions,
-		};
-	}, [ actions, item ] );
+	const primaryAction = actions.filter(
+		( action ) => action.isPrimary && !! action.icon
+	)?.[ 0 ];
 
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const primaryActionLabel =
@@ -184,7 +167,7 @@ function ListItem< Item >( {
 						</HStack>
 					</CompositeItem>
 				</div>
-				{ eligibleActions?.length > 0 && (
+				{ actions?.length > 0 && (
 					<HStack
 						spacing={ 1 }
 						justify="flex-end"
@@ -291,7 +274,7 @@ function ListItem< Item >( {
 								placement="bottom-end"
 							>
 								<ActionsDropdownMenuGroup
-									actions={ eligibleActions }
+									actions={ actions }
 									item={ item }
 								/>
 							</DropdownMenu>
