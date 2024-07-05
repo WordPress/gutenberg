@@ -54,7 +54,7 @@ interface ListViewItemProps< Item > {
 	onSelect: ( item: Item ) => void;
 	primaryField?: NormalizedField< Item >;
 	store: CompositeStore;
-	defaultFields: NormalizedFieldRenderConfig[];
+	otherFields: NormalizedFieldRenderConfig[];
 }
 
 const {
@@ -75,7 +75,7 @@ function ListItem< Item >( {
 	onSelect,
 	primaryField,
 	store,
-	defaultFields,
+	otherFields,
 }: ListViewItemProps< Item > ) {
 	const registry = useRegistry();
 	const itemRef = useRef< HTMLElement >( null );
@@ -174,7 +174,7 @@ function ListItem< Item >( {
 									id={ descriptionId }
 								>
 									{ fields.map( ( field ) => {
-										const isVisible = !! defaultFields.find(
+										const isVisible = !! otherFields.find(
 											( fr ) => field.id === fr.field
 										);
 										if ( ! isVisible ) {
@@ -348,7 +348,7 @@ export default function ViewList< Item >( props: ViewProps< Item > ) {
 	)?.field;
 	const mediaField = fields.find( ( f ) => f.id === mediaFieldId );
 	const primaryField = fields.find( ( f ) => f.id === primaryFieldId );
-	const defaultFields = fieldRenderConfigs.filter(
+	const otherFields = fieldRenderConfigs.filter(
 		( fieldRender ) =>
 			! [ mediaFieldId, primaryFieldId ].includes( fieldRender.field )
 	);
@@ -422,7 +422,7 @@ export default function ViewList< Item >( props: ViewProps< Item > ) {
 						mediaField={ mediaField }
 						primaryField={ primaryField }
 						store={ store }
-						defaultFields={ defaultFields }
+						otherFields={ otherFields }
 					/>
 				);
 			} ) }

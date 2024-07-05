@@ -59,7 +59,7 @@ function GridItem< Item >( {
 	const id = getItemId( item );
 	const isSelected = selection.includes( id );
 	const badgeFields = groupedRenderFields.badge;
-	const defaultFields = groupedRenderFields.default;
+	const otherFields = groupedRenderFields.default;
 	return (
 		<VStack
 			spacing={ 0 }
@@ -135,10 +135,10 @@ function GridItem< Item >( {
 					} ) }
 				</HStack>
 			) }
-			{ !! defaultFields?.length && (
+			{ !! otherFields?.length && (
 				<VStack className="dataviews-view-grid__fields" spacing={ 3 }>
 					{ fields.map( ( field ) => {
-						const isVisible = !! defaultFields.find(
+						const isVisible = !! otherFields.find(
 							( fr ) => field.id === fr.field
 						);
 						if ( ! isVisible ) {
