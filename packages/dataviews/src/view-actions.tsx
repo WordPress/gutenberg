@@ -48,6 +48,7 @@ interface FieldsVisibilityMenuProps< Item > {
 	view: View;
 	onChangeView: ( view: View ) => void;
 	fields: NormalizedField< Item >[];
+	defaultFields?: Record< string, FieldRenderConfig[] >;
 }
 
 interface SortMenuProps< Item > {
@@ -171,6 +172,7 @@ function FieldsVisibilityMenu< Item >( {
 	view,
 	onChangeView,
 	fields,
+	defaultFields,
 }: FieldsVisibilityMenuProps< Item > ) {
 	const fieldRenderConfigs = normalizeFieldRenderConfigs(
 		view.fields,
@@ -185,6 +187,10 @@ function FieldsVisibilityMenu< Item >( {
 	if ( ! hidableFields?.length ) {
 		return null;
 	}
+	const normalizedDefaultFields = normalizeFieldRenderConfigs(
+		defaultFields?.[ view.type ],
+		[]
+	);
 	return (
 		<DropdownMenu
 			trigger={
@@ -205,6 +211,9 @@ function FieldsVisibilityMenu< Item >( {
 						value={ field.id }
 						checked={ isVisible }
 						onChange={ () => {
+							const fieldFormat = normalizedDefaultFields.find(
+								( f ) => f.field === field.id
+							);
 							onChangeView( {
 								...view,
 								fields: isVisible
@@ -212,7 +221,10 @@ function FieldsVisibilityMenu< Item >( {
 											( fieldRender ) =>
 												fieldRender.field !== field.id
 									  )
-									: [ ...fieldRenderConfigs, field.id ],
+									: [
+											...fieldRenderConfigs,
+											fieldFormat ?? field.id,
+									  ],
 							} );
 						} }
 					>
@@ -347,6 +359,7 @@ function _ViewActions< Item >( {
 					fields={ fields }
 					view={ view }
 					onChangeView={ onChangeView }
+					defaultFields={ defaultFields }
 				/>
 				<PageSizeMenu view={ view } onChangeView={ onChangeView } />
 			</DropdownMenuGroup>
