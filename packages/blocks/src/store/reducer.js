@@ -329,11 +329,11 @@ export function categories( state = DEFAULT_CATEGORIES, action ) {
 	switch ( action.type ) {
 		case 'SET_CATEGORIES':
 			// Ensure, that categories are unique by slug.
-			const categories = new Map();
-			(action.categories || []).forEach( (category) => {
-				categories.set(category.slug, category);
-			});
-			return [...categories.values()];
+			const uniqueCategories = new Map();
+			( action.categories || [] ).forEach( ( category ) => {
+				uniqueCategories.set( category.slug, category );
+			} );
+			return [ ...uniqueCategories.values() ];
 		case 'UPDATE_CATEGORY': {
 			if (
 				! action.category ||
