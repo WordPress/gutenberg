@@ -48,7 +48,7 @@ const BlockPreviewPanel = ( { name, variation = '' } ) => {
 			>
 				<BlockPreview
 					blocks={ blocks }
-					viewportWidth={ viewportWidth ?? 500 }
+					viewportWidth={ viewportWidth ?? 350 }
 					minHeight={ previewHeight }
 					additionalStyles={ [
 						{
