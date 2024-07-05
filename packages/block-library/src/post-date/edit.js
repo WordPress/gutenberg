@@ -129,11 +129,8 @@ export default function PostDateEdit( {
 										is12Hour={ is12Hour }
 										onClose={ onClose }
 										dateOrder={
-											is12Hour
-												? /* translators: Order of day, month, and year when the 12-hour clock is enabled. Available formats are 'dmy', 'mdy', and 'ymd'. */
-												  _x( 'mdy', 'date order' )
-												: /* translators: Order of day, month, and year when the 12-hour clock is disabled. Available formats are 'dmy', 'mdy', and 'ymd'. */
-												  _x( 'dmy', 'date order' )
+											/* translators: Order of day, month, and year. Available formats are 'dmy', 'mdy', and 'ymd'. */
+											 _x( 'dmy', 'date order' )
 										}
 									/>
 								) }
