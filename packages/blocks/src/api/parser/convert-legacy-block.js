@@ -77,7 +77,7 @@ export function convertLegacyBlockNameAndAttributes( name, attributes ) {
 		newAttributes.legacy = true;
 	}
 
-	// Grid layout attributes were stored as strings in WP 6.6. Convert them to numbers.
+	// Column count was stored as a string from WP 6.3-6.6. Convert it to a number.
 	if (
 		attributes.layout?.type === 'grid' &&
 		typeof attributes.layout?.columnCount === 'string'
@@ -87,6 +87,8 @@ export function convertLegacyBlockNameAndAttributes( name, attributes ) {
 			columnCount: parseInt( attributes.layout.columnCount, 10 ),
 		};
 	}
+
+	// Column span and row span were stored as strings in WP 6.6. Convert them to numbers.
 	if ( typeof attributes.style?.layout?.columnSpan === 'string' ) {
 		newAttributes.style = {
 			...newAttributes.style,
