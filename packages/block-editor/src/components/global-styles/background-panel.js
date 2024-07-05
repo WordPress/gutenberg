@@ -551,7 +551,7 @@ function BackgroundSizeControls( {
 			<FocalPointPicker
 				__next40pxDefaultSize
 				__nextHasNoMarginBottom
-				label={ __( 'Position' ) }
+				label={ __( 'Focal point' ) }
 				url={ getResolvedThemeFilePath( imageValue, themeFileURIs ) }
 				value={ backgroundPositionToCoords( positionValue ) }
 				onChange={ updateBackgroundPosition }
