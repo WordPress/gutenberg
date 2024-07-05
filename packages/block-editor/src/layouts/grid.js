@@ -291,7 +291,15 @@ function GridLayoutColumnsAndRowsControl( {
 	onChange,
 	allowSizingOnChildren,
 } ) {
-	const { columnCount = 3, rowCount, isManualPlacement } = layout;
+	// If the grid interactivity experiment is enabled, allow unsetting the column count.
+	const defaultColumnCount = window.__experimentalEnableGridInteractivity
+		? undefined
+		: 3;
+	const {
+		columnCount = defaultColumnCount,
+		rowCount,
+		isManualPlacement,
+	} = layout;
 
 	return (
 		<>
@@ -311,12 +319,11 @@ function GridLayoutColumnsAndRowsControl( {
 									window.__experimentalEnableGridInteractivity
 								) {
 									// Allow unsetting the column count when in auto mode.
-									const defaultColumnCount = isManualPlacement
-										? 1
-										: null; // TODO: Why not undefined?
+									const defaultNewColumnCount =
+										isManualPlacement ? 1 : undefined;
 									const newColumnCount =
 										value === ''
-											? defaultColumnCount
+											? defaultNewColumnCount
 											: parseInt( value, 10 );
 									onChange( {
 										...layout,
