@@ -223,18 +223,16 @@ const Sidebar = ( { extraPanels, onActionPerformed } ) => {
 	);
 
 	return (
-		<Tabs selectOnMove={ false }>
-			<SidebarContent
-				tabName={ tabName }
-				keyboardShortcut={ keyboardShortcut }
-				showSummary={ showSummary }
-				renderingMode={ renderingMode }
-				onActionPerformed={ onActionPerformed }
-				extraPanels={ extraPanels }
-				selectedTabId={ tabName }
-				onSelect={ onTabSelect }
-			/>
-		</Tabs>
+		<SidebarContent
+			tabName={ tabName }
+			keyboardShortcut={ keyboardShortcut }
+			showSummary={ showSummary }
+			renderingMode={ renderingMode }
+			onActionPerformed={ onActionPerformed }
+			extraPanels={ extraPanels }
+			selectedTabId={ tabName }
+			onSelect={ onTabSelect }
+		/>
 	);
 };
 
