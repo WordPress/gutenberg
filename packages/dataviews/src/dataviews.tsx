@@ -6,8 +6,10 @@ import type { ComponentType } from 'react';
 /**
  * WordPress dependencies
  */
-import { __experimentalHStack as HStack } from '@wordpress/components';
+import { __experimentalHStack as HStack, Button } from '@wordpress/components';
 import { useMemo, useState } from '@wordpress/element';
+import { funnel } from '@wordpress/icons';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -73,6 +75,7 @@ export default function DataViews< Item >( {
 	onChangeSelection,
 }: DataViewsProps< Item > ) {
 	const [ selectionState, setSelectionState ] = useState< string[] >( [] );
+	const [ isShowingFilter, setIsShowingFilter ] = useState< boolean >( true );
 	const isUncontrolled =
 		selectionProperty === undefined || onChangeSelection === undefined;
 	const selection = isUncontrolled ? selectionState : selectionProperty;
@@ -121,6 +124,7 @@ export default function DataViews< Item >( {
 							onChangeView={ onChangeView }
 						/>
 					) }
+					{ isShowingFilter && (
 					<Filters
 						fields={ _fields }
 						view={ view }
@@ -128,6 +132,7 @@ export default function DataViews< Item >( {
 						openedFilter={ openedFilter }
 						setOpenedFilter={ setOpenedFilter }
 					/>
+					) }
 				</HStack>
 				{ [ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type ) &&
 					hasPossibleBulkAction && (
@@ -145,6 +150,23 @@ export default function DataViews< Item >( {
 					onChangeView={ onChangeView }
 					defaultLayouts={ defaultLayouts }
 				/>
+				<div className="dataviews-filters-toggle__container">
+					<Button
+						size="compact"
+						icon={ funnel }
+						label={ __( 'Toggle filter display' ) }
+						onClick={ () =>
+							setIsShowingFilter( ! isShowingFilter )
+						}
+						isPressed={ isShowingFilter }
+						aria-expanded={ isShowingFilter }
+					/>
+					{ view.filters.length > 0 && (
+						<span className="dataviews-filters-toggle__count">
+							{ view.filters.length }
+						</span>
+					) }
+				</div>
 			</HStack>
 			<ViewComponent
 				actions={ actions }

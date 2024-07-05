@@ -949,3 +949,22 @@
 		margin: 0 $grid-unit-10 0 $grid-unit-10;
 	}
 }
+
+.dataviews-filters-toggle__container {
+	position: relative;
+}
+
+.dataviews-filters-toggle__count {
+	position: absolute;
+	top: -$grid-unit-15/2;
+	right: -$grid-unit-15;
+	background:var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+	height: $grid-unit-15 + 2*$border-width;
+	width: $grid-unit-15 + 2*$border-width;
+	line-height: $grid-unit-15 + 2*$border-width;
+	text-align: center;
+	border-radius: 50%;
+	font-size: 10px;
+	outline: $border-width solid white;
+	color: white;
+}
