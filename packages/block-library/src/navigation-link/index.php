@@ -183,10 +183,14 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 		 * @since 6.7.0
 		 *
 		 * @param array $post_status
+		 * @param array $attributes
+		 * @param WP_Block $block
 		 */
 		$allowed_post_status = (array) apply_filters(
 			'render_block_core_navigation_link_allowed_post_status',
-			array( 'publish' )
+			array( 'publish' ),
+			$attributes,
+			$block
 		);
 		if ( ! $post || ! in_array( $post->post_status, $allowed_post_status, true ) ) {
 			return '';
