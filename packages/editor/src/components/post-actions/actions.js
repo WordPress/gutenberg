@@ -59,11 +59,6 @@ function isTemplateRemovable( template ) {
 		! template.templatePart?.has_theme_file
 	);
 }
-const canDeleteOrReset = ( item ) => {
-	const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
-	const isUserPattern = item.type === PATTERN_TYPES.user;
-	return isUserPattern || ( isTemplatePart && item.isCustom );
-};
 
 function getItemTitle( item ) {
 	if ( typeof item.title === 'string' ) {
@@ -879,21 +874,11 @@ const duplicatePostAction = {
 	},
 };
 
-const isTemplatePartRevertable = ( item ) => {
-	if ( ! item ) {
-		return false;
-	}
-	const hasThemeFile = item.templatePart?.has_theme_file;
-	return canDeleteOrReset( item ) && hasThemeFile;
-};
-
 const resetTemplateAction = {
 	id: 'reset-template',
 	label: __( 'Reset' ),
 	isEligible: ( item ) => {
-		return item.type === TEMPLATE_PART_POST_TYPE
-			? isTemplatePartRevertable( item )
-			: isTemplateRevertable( item );
+		return isTemplateRevertable( item );
 	},
 	icon: backup,
 	supportsBulk: true,
@@ -905,47 +890,39 @@ const resetTemplateAction = {
 		onActionPerformed,
 	} ) => {
 		const [ isBusy, setIsBusy ] = useState( false );
-		const { revertTemplate, removeTemplates } = unlock(
-			useDispatch( editorStore )
-		);
+		const { revertTemplate } = unlock( useDispatch( editorStore ) );
 		const { saveEditedEntityRecord } = useDispatch( coreStore );
 		const { createSuccessNotice, createErrorNotice } =
 			useDispatch( noticesStore );
 		const onConfirm = async () => {
 			try {
-				if ( items[ 0 ].type === TEMPLATE_PART_POST_TYPE ) {
-					await removeTemplates( items );
-				} else {
-					for ( const template of items ) {
-						if ( template.type === TEMPLATE_POST_TYPE ) {
-							await revertTemplate( template, {
-								allowUndo: false,
-							} );
-							await saveEditedEntityRecord(
-								'postType',
-								template.type,
-								template.id
-							);
-						}
-					}
-					createSuccessNotice(
-						items.length > 1
-							? sprintf(
-									/* translators: The number of items. */
-									__( '%s items reset.' ),
-									items.length
-							  )
-							: sprintf(
-									/* translators: The template/part's name. */
-									__( '"%s" reset.' ),
-									decodeEntities( getItemTitle( items[ 0 ] ) )
-							  ),
-						{
-							type: 'snackbar',
-							id: 'revert-template-action',
-						}
+				for ( const template of items ) {
+					await revertTemplate( template, {
+						allowUndo: false,
+					} );
+					await saveEditedEntityRecord(
+						'postType',
+						template.type,
+						template.id
 					);
 				}
+				createSuccessNotice(
+					items.length > 1
+						? sprintf(
+								/* translators: The number of items. */
+								__( '%s items reset.' ),
+								items.length
+						  )
+						: sprintf(
+								/* translators: The template/part's name. */
+								__( '"%s" reset.' ),
+								decodeEntities( getItemTitle( items[ 0 ] ) )
+						  ),
+					{
+						type: 'snackbar',
+						id: 'revert-template-action',
+					}
+				);
 			} catch ( error ) {
 				let fallbackErrorMessage;
 				if ( items[ 0 ].type === TEMPLATE_POST_TYPE ) {
