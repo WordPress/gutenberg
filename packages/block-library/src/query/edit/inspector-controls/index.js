@@ -238,7 +238,7 @@ export default function QueryInspectorControls( props ) {
 							pages: 0,
 						} );
 					} }
-					dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
+					dropdownMenuProps={ dropdownMenuProps }
 				>
 					<ToolsPanelItem
 						label={ __( 'Items' ) }
