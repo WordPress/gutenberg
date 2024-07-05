@@ -16,9 +16,10 @@ async function clearInput( input: HTMLInputElement ) {
 	await click( input );
 
 	// Press backspace as many times as the input's current value
-	[ ...Array( input.value.length ) ].forEach(
-		async () => await press.Backspace()
-	);
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	for ( const _ of Array( input.value.length ) ) {
+		await press.Backspace();
+	}
 }
 
 describe( 'getNameAndSlugForPosition', () => {
