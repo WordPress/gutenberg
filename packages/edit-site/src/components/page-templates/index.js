@@ -63,6 +63,7 @@ const defaultFields = {
 	[ LAYOUT_GRID ]: [
 		{ render: 'media', field: 'preview' },
 		{ render: 'primary', field: 'title' },
+		{ render: 'column', field: 'description' },
 	],
 	[ LAYOUT_LIST ]: [
 		{ render: 'media', field: 'preview' },

@@ -59,7 +59,7 @@ function GridItem< Item >( {
 	const id = getItemId( item );
 	const isSelected = selection.includes( id );
 	const badgeFields = groupedRenderFields.badge;
-	const otherFields = groupedRenderFields.default;
+	const otherFields = groupedRenderFields.other;
 	return (
 		<VStack
 			spacing={ 0 }
@@ -138,10 +138,10 @@ function GridItem< Item >( {
 			{ !! otherFields?.length && (
 				<VStack className="dataviews-view-grid__fields" spacing={ 3 }>
 					{ fields.map( ( field ) => {
-						const isVisible = !! otherFields.find(
+						const fieldRenderConfig = otherFields.find(
 							( fr ) => field.id === fr.field
 						);
-						if ( ! isVisible ) {
+						if ( ! fieldRenderConfig ) {
 							return null;
 						}
 						const renderedValue = field.render( {
@@ -152,12 +152,22 @@ function GridItem< Item >( {
 						}
 						return (
 							<Flex
-								className="dataviews-view-grid__field"
+								className={ clsx(
+									'dataviews-view-grid__field',
+									fieldRenderConfig.render === 'column'
+										? 'is-column'
+										: 'is-row'
+								) }
 								key={ field.id }
 								gap={ 1 }
 								justify="flex-start"
 								expanded
 								style={ { height: 'auto' } }
+								direction={
+									fieldRenderConfig.render === 'column'
+										? 'column'
+										: 'row'
+								}
 							>
 								<>
 									<FlexItem className="dataviews-view-grid__field-name">
@@ -211,10 +221,11 @@ export default function ViewGrid< Item >( {
 			) {
 				return accumulator;
 			}
-			accumulator[ fieldRender.render ].push( fieldRender );
+			const key = fieldRender.render === 'badge' ? 'badge' : 'other';
+			accumulator[ key ].push( fieldRender );
 			return accumulator;
 		},
-		{ default: [], badge: [], column: [] }
+		{ other: [], badge: [] }
 	);
 	const hasData = !! data?.length;
 	return (
