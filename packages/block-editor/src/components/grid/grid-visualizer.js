@@ -140,32 +140,43 @@ const GridVisualizerGrid = forwardRef(
 												column,
 												row
 											);
+										const isHighlighted =
+											highlightedRect?.contains(
+												column,
+												row
+											) ?? false;
 										return (
 											<GridVisualizerCell
 												key={ `${ row }-${ column }` }
 												color={ gridInfo.currentColor }
+												className={
+													isHighlighted &&
+													'is-highlighted'
+												}
 											>
-												<GridVisualizerDropZone
-													column={ column }
-													row={ row }
-													gridClientId={ clientId }
-													gridInfo={ gridInfo }
-													highlightedRect={
-														highlightedRect
-													}
-													setHighlightedRect={
-														setHighlightedRect
-													}
-												/>
-												{ ! isCellOccupied && (
-													<ButtonBlockAppender
-														rootClientId={
+												{ isCellOccupied ? (
+													<GridVisualizerDropZone
+														column={ column }
+														row={ row }
+														gridClientId={
 															clientId
 														}
-														className="grid-visualizer-appender"
-														style={ {
-															color: gridInfo.currentColor,
-														} }
+														gridInfo={ gridInfo }
+														setHighlightedRect={
+															setHighlightedRect
+														}
+													/>
+												) : (
+													<GridVisualizerAppender
+														column={ column }
+														row={ row }
+														gridClientId={
+															clientId
+														}
+														gridInfo={ gridInfo }
+														setHighlightedRect={
+															setHighlightedRect
+														}
 														onSelectCallback={ (
 															block
 														) => {
@@ -217,10 +228,13 @@ const GridVisualizerGrid = forwardRef(
 	}
 );
 
-function GridVisualizerCell( { color, children } ) {
+function GridVisualizerCell( { color, children, className } ) {
 	return (
 		<div
-			className="block-editor-grid-visualizer__cell"
+			className={ clsx(
+				'block-editor-grid-visualizer__cell',
+				className
+			) }
 			style={ {
 				boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${ color } 20%, #0000)`,
 				color,
@@ -231,14 +245,13 @@ function GridVisualizerCell( { color, children } ) {
 	);
 }
 
-function GridVisualizerDropZone( {
+function useGridVisualizerDropZone(
 	column,
 	row,
 	gridClientId,
 	gridInfo,
-	highlightedRect,
-	setHighlightedRect,
-} ) {
+	setHighlightedRect
+) {
 	const { getBlockAttributes, getBlockRootClientId } =
 		useSelect( blockEditorStore );
 	const {
@@ -252,7 +265,7 @@ function GridVisualizerDropZone( {
 		gridInfo.numColumns
 	);
 
-	const ref = useDropZoneWithValidation( {
+	return useDropZoneWithValidation( {
 		validateDrag( srcClientId ) {
 			const attributes = getBlockAttributes( srcClientId );
 			const rect = new GridRect( {
@@ -311,15 +324,52 @@ function GridVisualizerDropZone( {
 			);
 		},
 	} );
+}
 
-	const isHighlighted = highlightedRect?.contains( column, row ) ?? false;
-
+function GridVisualizerDropZone( {
+	column,
+	row,
+	gridClientId,
+	gridInfo,
+	setHighlightedRect,
+} ) {
 	return (
 		<div
-			ref={ ref }
-			className={ clsx( 'block-editor-grid-visualizer__drop-zone', {
-				'is-highlighted': isHighlighted,
-			} ) }
+			className="block-editor-grid-visualizer__drop-zone"
+			ref={ useGridVisualizerDropZone(
+				column,
+				row,
+				gridClientId,
+				gridInfo,
+				setHighlightedRect
+			) }
+		/>
+	);
+}
+
+function GridVisualizerAppender( {
+	column,
+	row,
+	gridClientId,
+	gridInfo,
+	setHighlightedRect,
+	onSelectCallback,
+} ) {
+	return (
+		<ButtonBlockAppender
+			rootClientId={ gridClientId }
+			className="block-editor-grid-visualizer__appender"
+			ref={ useGridVisualizerDropZone(
+				column,
+				row,
+				gridClientId,
+				gridInfo,
+				setHighlightedRect
+			) }
+			style={ {
+				color: gridInfo.currentColor,
+			} }
+			onSelectCallback={ onSelectCallback }
 		/>
 	);
 }
