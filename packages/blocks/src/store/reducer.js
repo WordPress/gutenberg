@@ -378,6 +378,7 @@ export function blockBindingsSources( state = {}, action ) {
 			[ action.sourceName ]: {
 				label: action.sourceLabel,
 				getValue: action.getValue,
+				getValuesInBatch: action.getValuesInBatch,
 				setValue: action.setValue,
 				setValuesInBatch: action.setValuesInBatch,
 				getPlaceholder: action.getPlaceholder,

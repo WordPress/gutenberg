@@ -52,6 +52,7 @@ export function registerBlockBindingsSource( source ) {
 		sourceName: source.name,
 		sourceLabel: source.label,
 		getValue: source.getValue,
+		getValuesInBatch: source.getValuesInBatch,
 		setValue: source.setValue,
 		setValuesInBatch: source.setValuesInBatch,
 		getPlaceholder: source.getPlaceholder,

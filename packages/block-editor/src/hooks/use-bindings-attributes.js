@@ -121,33 +121,77 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 
 			const attributes = {};
 
-			for ( const [ attributeName, boundAttribute ] of Object.entries(
+			const bindingsBySource = new Map();
+
+			for ( const [ attributeName, binding ] of Object.entries(
 				bindings
 			) ) {
-				const source = sources[ boundAttribute.source ];
+				const { source: sourceName, args: sourceArgs } = binding;
+				const source = sources[ sourceName ];
 				if (
-					! source?.getValue ||
+					( ! source?.getValue && ! source?.getValuesInBatch ) ||
 					! canBindAttribute( name, attributeName )
 				) {
 					continue;
 				}
 
-				const args = {
-					registry,
-					context,
-					clientId,
-					attributeName,
-					args: boundAttribute.args,
-				};
+				bindingsBySource.set( source, {
+					...bindingsBySource.get( source ),
+					[ attributeName ]: {
+						args: sourceArgs,
+					},
+				} );
+			}
 
-				attributes[ attributeName ] = source.getValue( args );
-
-				if ( attributes[ attributeName ] === undefined ) {
-					if ( attributeName === 'url' ) {
-						attributes[ attributeName ] = null;
+			if ( bindingsBySource.size ) {
+				for ( const [ source, sourceBindings ] of bindingsBySource ) {
+					// Get values in batch if the source supports it.
+					if ( source.getValuesInBatch ) {
+						const values = source.getValuesInBatch( {
+							registry,
+							context,
+							clientId,
+							sourceBindings,
+						} );
+						for ( const [ attributeName, value ] of Object.entries(
+							values
+						) ) {
+							attributes[ attributeName ] = value;
+						}
 					} else {
-						attributes[ attributeName ] =
-							source.getPlaceholder?.( args );
+						for ( const [
+							attributeName,
+							{ args },
+						] of Object.entries( sourceBindings ) ) {
+							attributes[ attributeName ] = source.getValue( {
+								registry,
+								context,
+								clientId,
+								attributeName,
+								args,
+							} );
+						}
+					}
+
+					// Add placeholders when value is undefined.
+					// TODO: Revisit this part.
+					for ( const [ attributeName, { args } ] of Object.entries(
+						sourceBindings
+					) ) {
+						if ( attributes[ attributeName ] === undefined ) {
+							if ( attributeName === 'url' ) {
+								attributes[ attributeName ] = null;
+							} else {
+								attributes[ attributeName ] =
+									source.getPlaceholder?.( {
+										registry,
+										context,
+										clientId,
+										attributeName,
+										args,
+									} );
+							}
+						}
 					}
 				}
 			}
@@ -202,6 +246,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 							source,
 							sourceBindings,
 						] of bindingsBySource ) {
+							// Set values in batch if the source supports it.
 							if ( source.setValuesInBatch ) {
 								source.setValuesInBatch( {
 									registry,
