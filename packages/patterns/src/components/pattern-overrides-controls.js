@@ -32,9 +32,9 @@ function addBindings( bindings ) {
 }
 
 function PatternOverridesControls( {
-	attributes,
+	metadata,
 	setAttributes,
-	name: blockName,
+	hasUnsupportedAttributes,
 } ) {
 	const controlId = useId();
 	const [ showAllowOverridesModal, setShowAllowOverridesModal ] =
@@ -42,8 +42,8 @@ function PatternOverridesControls( {
 	const [ showDisallowOverridesModal, setShowDisallowOverridesModal ] =
 		useState( false );
 
-	const hasName = !! attributes.metadata?.name;
-	const defaultBindings = attributes.metadata?.bindings?.__default;
+	const hasName = !! metadata?.name;
+	const defaultBindings = metadata?.bindings?.__default;
 	const hasOverrides =
 		hasName && defaultBindings?.source === PATTERN_OVERRIDES_BINDING_SOURCE;
 	const isConnectedToOtherSources =
@@ -51,13 +51,13 @@ function PatternOverridesControls( {
 		defaultBindings.source !== PATTERN_OVERRIDES_BINDING_SOURCE;
 
 	function updateBindings( isChecked, customName ) {
-		const prevBindings = attributes?.metadata?.bindings;
+		const prevBindings = metadata?.bindings;
 		const updatedBindings = isChecked
 			? addBindings( prevBindings )
 			: removeBindings( prevBindings );
 
 		const updatedMetadata = {
-			...attributes.metadata,
+			...metadata,
 			bindings: updatedBindings,
 		};
 
@@ -75,12 +75,8 @@ function PatternOverridesControls( {
 		return null;
 	}
 
-	const hasUnsupportedImageAttributes =
-		blockName === 'core/image' &&
-		( !! attributes.caption?.length || !! attributes.href?.length );
-
 	const helpText =
-		! hasOverrides && hasUnsupportedImageAttributes
+		! hasOverrides && hasUnsupportedAttributes
 			? __(
 					`Overrides currently don't support image captions or links. Remove the caption or link first before enabling overrides.`
 			  )
@@ -108,9 +104,7 @@ function PatternOverridesControls( {
 								setShowAllowOverridesModal( true );
 							}
 						} }
-						disabled={
-							! hasOverrides && hasUnsupportedImageAttributes
-						}
+						disabled={ ! hasOverrides && hasUnsupportedAttributes }
 						accessibleWhenDisabled
 					>
 						{ hasOverrides
@@ -122,7 +116,7 @@ function PatternOverridesControls( {
 
 			{ showAllowOverridesModal && (
 				<AllowOverridesModal
-					initialName={ attributes.metadata?.name }
+					initialName={ metadata?.name }
 					onClose={ () => setShowAllowOverridesModal( false ) }
 					onSave={ ( newName ) => {
 						updateBindings( true, newName );

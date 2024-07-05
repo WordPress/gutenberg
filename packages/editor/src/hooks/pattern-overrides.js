@@ -6,6 +6,7 @@ import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useBlockEditingMode } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
+import { memo } from '@wordpress/element';
 import { store as blocksStore } from '@wordpress/blocks';
 
 /**
@@ -25,6 +26,68 @@ const {
 	PATTERN_SYNC_TYPES,
 } = unlock( patternsPrivateApis );
 
+// Split into a separate component to avoid a store subscription
+// on every block.
+const MemoizedControlsWithStoreSubscription = memo(
+	function ControlsWithStoreSubscription( props ) {
+		const blockEditingMode = useBlockEditingMode();
+		const { hasPatternOverridesSource, isEditingSyncedPattern } = useSelect(
+			( select ) => {
+				const { getBlockBindingsSource } = unlock(
+					select( blocksStore )
+				);
+				const { getCurrentPostType, getEditedPostAttribute } =
+					select( editorStore );
+
+				return {
+					// For editing link to the site editor if the theme and user permissions support it.
+					hasPatternOverridesSource: !! getBlockBindingsSource(
+						'core/pattern-overrides'
+					),
+					isEditingSyncedPattern:
+						getCurrentPostType() === PATTERN_TYPES.user &&
+						getEditedPostAttribute( 'meta' )
+							?.wp_pattern_sync_status !==
+							PATTERN_SYNC_TYPES.unsynced &&
+						getEditedPostAttribute( 'wp_pattern_sync_status' ) !==
+							PATTERN_SYNC_TYPES.unsynced,
+				};
+			},
+			[]
+		);
+
+		const bindings = props.metadata?.bindings;
+		const hasPatternBindings =
+			!! bindings &&
+			Object.values( bindings ).some(
+				( binding ) => binding.source === 'core/pattern-overrides'
+			);
+
+		const shouldShowPatternOverridesControls =
+			isEditingSyncedPattern && blockEditingMode === 'default';
+		const shouldShowResetOverridesControl =
+			! isEditingSyncedPattern &&
+			!! props.metadata?.name &&
+			blockEditingMode !== 'disabled' &&
+			hasPatternBindings;
+
+		if ( ! hasPatternOverridesSource ) {
+			return null;
+		}
+
+		return (
+			<>
+				{ shouldShowPatternOverridesControls && (
+					<PatternOverridesControls { ...props } />
+				) }
+				{ shouldShowResetOverridesControl && (
+					<ResetOverridesControl { ...props } />
+				) }
+			</>
+		);
+	}
+);
+
 /**
  * Override the default edit UI to include a new block inspector control for
  * assigning a partial syncing controls to supported blocks in the pattern editor.
@@ -41,9 +104,19 @@ const withPatternOverrideControls = createHigherOrderComponent(
 
 		return (
 			<>
-				<BlockEdit { ...props } />
+				<BlockEdit key="edit" { ...props } />
 				{ props.isSelected && isSupportedBlock && (
-					<ControlsWithStoreSubscription { ...props } />
+					<MemoizedControlsWithStoreSubscription
+						clientId={ props.clientId }
+						name={ props.name }
+						metadata={ props.attributes.metadata }
+						setAttributes={ props.setAttributes }
+						hasUnsupportedAttributes={
+							props.name === 'core/image' &&
+							( !! props.attributes.caption?.length ||
+								!! props.attributes.href?.length )
+						}
+					/>
 				) }
 				{ isSupportedBlock && <PatternOverridesBlockControls /> }
 			</>
@@ -51,63 +124,6 @@ const withPatternOverrideControls = createHigherOrderComponent(
 	},
 	'withPatternOverrideControls'
 );
-
-// Split into a separate component to avoid a store subscription
-// on every block.
-function ControlsWithStoreSubscription( props ) {
-	const blockEditingMode = useBlockEditingMode();
-	const { hasPatternOverridesSource, isEditingSyncedPattern } = useSelect(
-		( select ) => {
-			const { getBlockBindingsSource } = unlock( select( blocksStore ) );
-			const { getCurrentPostType, getEditedPostAttribute } =
-				select( editorStore );
-
-			return {
-				// For editing link to the site editor if the theme and user permissions support it.
-				hasPatternOverridesSource: !! getBlockBindingsSource(
-					'core/pattern-overrides'
-				),
-				isEditingSyncedPattern:
-					getCurrentPostType() === PATTERN_TYPES.user &&
-					getEditedPostAttribute( 'meta' )?.wp_pattern_sync_status !==
-						PATTERN_SYNC_TYPES.unsynced &&
-					getEditedPostAttribute( 'wp_pattern_sync_status' ) !==
-						PATTERN_SYNC_TYPES.unsynced,
-			};
-		},
-		[]
-	);
-
-	const bindings = props.attributes.metadata?.bindings;
-	const hasPatternBindings =
-		!! bindings &&
-		Object.values( bindings ).some(
-			( binding ) => binding.source === 'core/pattern-overrides'
-		);
-
-	const shouldShowPatternOverridesControls =
-		isEditingSyncedPattern && blockEditingMode === 'default';
-	const shouldShowResetOverridesControl =
-		! isEditingSyncedPattern &&
-		!! props.attributes.metadata?.name &&
-		blockEditingMode !== 'disabled' &&
-		hasPatternBindings;
-
-	if ( ! hasPatternOverridesSource ) {
-		return null;
-	}
-
-	return (
-		<>
-			{ shouldShowPatternOverridesControls && (
-				<PatternOverridesControls { ...props } />
-			) }
-			{ shouldShowResetOverridesControl && (
-				<ResetOverridesControl { ...props } />
-			) }
-		</>
-	);
-}
 
 addFilter(
 	'editor.BlockEdit',

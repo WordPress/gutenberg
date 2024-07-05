@@ -12,7 +12,7 @@ import { __ } from '@wordpress/i18n';
 const CONTENT = 'content';
 
 export default function ResetOverridesControl( props ) {
-	const name = props.attributes.metadata?.name;
+	const name = props.metadata?.name;
 	const registry = useRegistry();
 	const isOverriden = useSelect(
 		( select ) => {
