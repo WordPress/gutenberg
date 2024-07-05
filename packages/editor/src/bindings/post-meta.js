@@ -24,6 +24,8 @@ export default {
 				context?.postId
 			).meta?.[ args.key ];
 	},
+	// When `setValuesInBatch` is defined, this is not running.
+	// Keeping it here to show the different possibilities.
 	setValue( { registry, context, args, value } ) {
 		registry
 			.dispatch( coreDataStore )
@@ -31,6 +33,17 @@ export default {
 				meta: {
 					[ args.key ]: value,
 				},
+			} );
+	},
+	setValuesInBatch( { registry, context, sourceBindings } ) {
+		const newMeta = {};
+		Object.values( sourceBindings ).forEach( ( { args, newValue } ) => {
+			newMeta[ args.key ] = newValue;
+		} );
+		registry
+			.dispatch( coreDataStore )
+			.editEntityRecord( 'postType', context?.postType, context?.postId, {
+				meta: newMeta,
 			} );
 	},
 	canUserEditValue( { select, context, args } ) {
