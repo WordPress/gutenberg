@@ -30,7 +30,7 @@ export default {
 
 		return overridableValue === '' ? undefined : overridableValue;
 	},
-	setValues( { registry, clientId, attributes } ) {
+	setValuesInBatch( { registry, clientId, attributes } ) {
 		const { getBlockAttributes, getBlockParentsByBlockName, getBlocks } =
 			registry.select( blockEditorStore );
 		const currentBlockAttributes = getBlockAttributes( clientId );
