@@ -428,6 +428,10 @@
 			}
 		}
 
+		.dataviews-view-list__field {
+			display: inline-flex;
+		}
+
 		&.is-selected,
 		&.is-hovered,
 		&:focus-within {
@@ -497,8 +501,8 @@
 	}
 
 	.dataviews-view-list__media-wrapper {
-		width: $grid-unit-50 + $grid-unit-05;
-		height: $grid-unit-50 + $grid-unit-05;
+		width: $grid-unit-60;
+		height: $grid-unit-60;
 		overflow: hidden;
 		position: relative;
 		flex-shrink: 0;
@@ -548,7 +552,7 @@
 		}
 
 		.dataviews-view-list__field-value {
-			line-height: $grid-unit-05 * 5;
+			line-height: $grid-unit-30;
 			display: inline-flex;
 		}
 	}
