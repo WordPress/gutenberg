@@ -1,36 +1,57 @@
+iframe[name="editor-canvas"].is-zoomed-out {
+	$scale: var(--wp-block-editor-iframe-zoom-out-scale);
+	$inset: var(--wp-block-editor-iframe-zoom-out-inset);
+	position: relative;
+	inset: $inset;
+	transform: scale(#{$scale});
+	transform-origin: 50% 0;
+	// Transform scale doesn’t affect the layout size of the element, so counterscale
+	// the width, height and negative margins to fit the untransformed size.
+	width: calc((100% - #{$inset} * 2) / #{$scale});
+	margin-inline: calc((-50% + #{$inset}) / #{$scale} + 50% - #{$inset});
+	height: calc((100% - #{$inset} * 2) / #{$scale});
+	margin-block: 0 calc(-100% / #{$scale});
+}
+
 .block-editor-iframe__body {
 	position: relative;
 }
 
-.block-editor-iframe__html {
-	border: 0 solid $gray-300;
-	transform-origin: top center;
-	@include editor-canvas-resize-animation;
-}
-
 .block-editor-iframe__html.is-zoomed-out {
 	$scale: var(--wp-block-editor-iframe-zoom-out-scale);
-	transform: scale(#{$scale});
-	margin-inline: calc(-50% / #{$scale} + 50%);
 
-	background-color: $gray-300;
-
-	$frame-size: var(--wp-block-editor-iframe-zoom-out-frame-size);
-	// Firefox and Safari don't render margin-bottom here and margin-bottom is needed for Chrome
-	// layout, so we use border matching the background instead of margins.
-	border: calc(#{$frame-size} / #{$scale}) solid $gray-300;
-
-	// Chrome seems to respect that transform scale shouldn't affect the layout size of the element,
-	// so we need to adjust the height of the content to match the scale by using negative margins.
-	$content-height: var(--wp-block-editor-iframe-zoom-out-content-height);
-	$extra-content-height: calc(#{$content-height} * (1 - #{$scale}));
-	$total-frame-height: calc(2 * #{$frame-size});
-	$total-height: calc(#{$extra-content-height} + #{$total-frame-height} + 2px);
-	margin-bottom: calc(-1 * #{$total-height});
+	// Customize the scrollbar to counterscale its width but only for devices with fine
+	// pointers as otherwise scrollbars are likely to be overlaid and not affected by
+	// scaling. This isn’t perfect as some devices might have a fine cursor but still use
+	// overlaid scrollbars. Additionally, the width of the scrollbar reduces the width of
+	// the content area so the "default" scaling should factor it in to accurately keep
+	// the content width the same as when unzoomed.
+	@media (pointer: fine) {
+		&::-webkit-scrollbar {
+			// 15px seems a de facto standard but likely not all devices. It may
+			// be possible to derive the device size with some DOM measurements
+			// if this needs to be improved.
+			width: calc(15px / #{$scale});
+		}
+		&::-webkit-scrollbar-track {
+			background-color: $gray-100;
+			border-inline-start: calc(1px / #{$scale}) solid $gray-300;
+		}
+		&::-webkit-scrollbar-thumb {
+			background-color: $gray-400;
+			background-clip: content-box;
+			border-color: transparent;
+			border-style: solid;
+			$border-width-base: calc(3px / #{$scale});
+			border-width: $border-width-base;
+			// One more pixel on the start side to make the thumb appear centered
+			// in the track due to its one pixel border on the start side.
+			border-inline-start-width: calc(4px / #{$scale});
+			border-radius: 999px;
+		}
+	}
 
 	body {
-		$container-height: var(--wp-block-editor-iframe-zoom-out-container-height);
-		min-height: calc((#{$container-height} - #{$total-frame-height}) / #{$scale});
 		display: flex;
 		flex-direction: column;
 

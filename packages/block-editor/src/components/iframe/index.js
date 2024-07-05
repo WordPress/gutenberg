@@ -13,6 +13,7 @@ import {
 	useMemo,
 	useEffect,
 	useRef,
+	useCallback,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
@@ -20,7 +21,6 @@ import {
 	useMergeRefs,
 	useRefEffect,
 	useDisabled,
-	useReducedMotion,
 } from '@wordpress/compose';
 import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
@@ -126,12 +126,8 @@ function Iframe( {
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
 	const clearerRef = useBlockSelectionClearer();
 	const [ before, writingFlowRef, after ] = useWritingFlow();
-	const [ contentResizeListener, { height: contentHeight } ] =
+	const [ containerResizeListener, { width: containerWidth } ] =
 		useResizeObserver();
-	const [
-		containerResizeListener,
-		{ width: containerWidth, height: containerHeight },
-	] = useResizeObserver();
 
 	const setRef = useRefEffect( ( node ) => {
 		node._load = () => {
@@ -211,62 +207,86 @@ function Iframe( {
 		};
 	}, [] );
 
-	const isReducedMotion = useReducedMotion();
-
 	const isZoomedOut = scale !== 1;
 	const shouldScaleToDefault = scale === 'default';
 
 	const refZoomOutStatus = useRef( {
-		isZoomingOut: false,
 		priorContainerWidth: null,
 		scale: null,
-		timerIdDetectZoomingOutEnd: -1,
+		timerId: -1,
+		effect: null,
 	} );
 
-	// Readies zoom out related state once engaged.
-	useEffect( () => {
-		if ( isZoomedOut ) {
-			if ( ! isReducedMotion ) {
-				refZoomOutStatus.current.isZoomingOut = true;
+	const actualizeZoom = useCallback(
+		( nextScale, inset ) => {
+			if ( ! iframeDocument ) {
+				return;
 			}
-			if ( shouldScaleToDefault ) {
-				refZoomOutStatus.current.scale = null;
-				refZoomOutStatus.current.priorContainerWidth = containerWidth;
+			const { documentElement, defaultView } = iframeDocument;
+			if ( nextScale < 1 ) {
+				documentElement.classList.add( 'is-zoomed-out' );
+				documentElement.style.setProperty(
+					'--wp-block-editor-iframe-zoom-out-scale',
+					nextScale
+				);
+				defaultView.frameElement.style.setProperty(
+					'--wp-block-editor-iframe-zoom-out-scale',
+					nextScale
+				);
+				defaultView.frameElement.style.setProperty(
+					'--wp-block-editor-iframe-zoom-out-inset',
+					inset === 'number' ? `${ inset }px` : inset
+				);
+			} else {
+				documentElement.classList.remove( 'is-zoomed-out' );
+				documentElement.style.removeProperty(
+					'--wp-block-editor-iframe-zoom-out-scale'
+				);
+				defaultView.frameElement.style.removeProperty(
+					'--wp-block-editor-iframe-zoom-out-scale'
+				);
+				defaultView.frameElement.style.removeProperty(
+					'--wp-block-editor-iframe-zoom-out-inset'
+				);
 			}
-		}
-	}, [ isZoomedOut, isReducedMotion, shouldScaleToDefault ] );
+		},
+		[ iframeDocument ]
+	);
 
-	// Derives the scaling factor for 'default' scale as containerWidth changes
-	// yet leaves it constant after the container’s automated resize completes.
-	// This is so that container width changes caused by a user action like
-	// browser window resizing should not change the scale.
+	useEffect(
+		() => {
+			if ( ! shouldScaleToDefault ) {
+				actualizeZoom( scale, frameSize );
+				return;
+			}
+			refZoomOutStatus.current.priorContainerWidth = containerWidth;
+			// Derives the scaling factor for 'default' scale as containerWidth changes
+			// yet leaves it constant after the container’s automated resize completes.
+			// This is so that container width changes caused by a user action like
+			// browser window resizing should not change the scale.
+			refZoomOutStatus.current.effect = ( isActive, nextWidth ) => {
+				if ( isActive ) {
+					const { priorContainerWidth } = refZoomOutStatus.current;
+					actualizeZoom( nextWidth / priorContainerWidth, frameSize );
+					clearTimeout( refZoomOutStatus.current.timerId );
+					refZoomOutStatus.current.timerId = setTimeout( () => {
+						refZoomOutStatus.current.effect = null;
+					}, 250 );
+				} else {
+					clearTimeout( refZoomOutStatus.current.timerId );
+				}
+			};
+		},
+		// containerWidth is purposely omitted to memoize its value once
+		// "default" scaling begins.
+		[ actualizeZoom, frameSize, isZoomedOut, scale, shouldScaleToDefault ]
+	);
+
 	useEffect( () => {
-		if ( ! shouldScaleToDefault ) {
-			clearTimeout( refZoomOutStatus.current.timerIdDetectZoomingOutEnd );
-			return;
-		}
-		const { priorContainerWidth, isZoomingOut } = refZoomOutStatus.current;
-		// Updates scale only while the container’s width transitions.
-		if ( isZoomingOut ) {
-			refZoomOutStatus.current.scale =
-				containerWidth / priorContainerWidth;
-			clearTimeout( refZoomOutStatus.current.timerIdDetectZoomingOutEnd );
-			refZoomOutStatus.current.timerIdDetectZoomingOutEnd = setTimeout(
-				() => {
-					refZoomOutStatus.current.isZoomingOut = false;
-				},
-				200
-			);
-		}
-		// With reduced motion, updates the scale only the first time
-		// containerWidth differs from priorContainerWidth.
-		else if (
-			refZoomOutStatus.current.scale === null &&
-			containerWidth !== priorContainerWidth
-		) {
-			refZoomOutStatus.current.scale =
-				containerWidth / priorContainerWidth;
-		}
+		refZoomOutStatus.current.effect?.(
+			shouldScaleToDefault,
+			containerWidth
+		);
 	}, [ containerWidth, shouldScaleToDefault ] );
 
 	const disabledRef = useDisabled( { isDisabled: ! readonly } );
@@ -291,13 +311,6 @@ function Iframe( {
 				height: auto !important;
 				min-height: 100%;
 			}
-			/* Lowest specificity to not override global styles */
-			:where(body) {
-				margin: 0;
-				/* Default background color in case zoom out mode background
-				colors the html element */
-				background-color: white;
-			}
 		</style>
 		${ styles }
 		${ scripts }
@@ -316,55 +329,10 @@ function Iframe( {
 
 	useEffect( () => cleanup, [ cleanup ] );
 
-	useEffect( () => {
-		if ( ! iframeDocument || ! isZoomedOut ) {
-			return;
-		}
-
-		iframeDocument.documentElement.classList.add( 'is-zoomed-out' );
-
-		iframeDocument.documentElement.style.setProperty(
-			'--wp-block-editor-iframe-zoom-out-scale',
-			scale === 'default' ? refZoomOutStatus.current.scale : scale
-		);
-		iframeDocument.documentElement.style.setProperty(
-			'--wp-block-editor-iframe-zoom-out-frame-size',
-			typeof frameSize === 'number' ? `${ frameSize }px` : frameSize
-		);
-		iframeDocument.documentElement.style.setProperty(
-			'--wp-block-editor-iframe-zoom-out-content-height',
-			`${ contentHeight }px`
-		);
-		iframeDocument.documentElement.style.setProperty(
-			'--wp-block-editor-iframe-zoom-out-container-height',
-			`${ containerHeight }px`
-		);
-
-		return () => {
-			iframeDocument.documentElement.classList.remove( 'is-zoomed-out' );
-
-			iframeDocument.documentElement.style.removeProperty(
-				'--wp-block-editor-iframe-zoom-out-scale'
-			);
-			iframeDocument.documentElement.style.removeProperty(
-				'--wp-block-editor-iframe-zoom-out-frame-size'
-			);
-			iframeDocument.documentElement.style.removeProperty(
-				'--wp-block-editor-iframe-zoom-out-content-height'
-			);
-			iframeDocument.documentElement.style.removeProperty(
-				'--wp-block-editor-iframe-zoom-out-container-height'
-			);
-		};
-	}, [
-		scale,
-		frameSize,
-		iframeDocument,
-		contentHeight,
-		containerWidth,
-		containerHeight,
-		isZoomedOut,
-	] );
+	const { marginLeft, marginRight, ...styleWithoutInlineMargins } =
+		props.style || {};
+	// Omits inline margins for zoom out so static styles don’t need !important to override them.
+	const usedStyle = ! isZoomedOut ? props.style : styleWithoutInlineMargins;
 
 	// Make sure to not render the before and after focusable div elements in view
 	// mode. They're only needed to capture focus in edit mode.
@@ -377,10 +345,11 @@ function Iframe( {
 			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
 			<iframe
 				{ ...props }
-				style={ {
-					...props.style,
-					height: props.style?.height,
-				} }
+				className={ clsx(
+					props.className,
+					isZoomedOut && 'is-zoomed-out'
+				) }
+				style={ { border: 0, ...usedStyle } }
 				ref={ useMergeRefs( [ ref, setRef ] ) }
 				tabIndex={ tabIndex }
 				// Correct doctype is required to enable rendering in standards
@@ -432,7 +401,6 @@ function Iframe( {
 								...bodyClasses
 							) }
 						>
-							{ contentResizeListener }
 							<StyleProvider document={ iframeDocument }>
 								{ children }
 							</StyleProvider>
