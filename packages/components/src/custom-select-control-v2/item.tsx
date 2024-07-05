@@ -17,7 +17,11 @@ export function CustomSelectItem( {
 }: WordPressComponentProps< CustomSelectItemProps, 'div', false > ) {
 	const customSelectContext = useContext( CustomSelectContext );
 	return (
-		<Styled.SelectItem store={ customSelectContext?.store } { ...props }>
+		<Styled.SelectItem
+			store={ customSelectContext?.store }
+			size={ customSelectContext?.size ?? 'default' }
+			{ ...props }
+		>
 			{ children ?? props.value }
 			<Styled.SelectedItemCheck>
 				<Icon icon={ check } />

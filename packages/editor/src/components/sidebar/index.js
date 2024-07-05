@@ -30,6 +30,7 @@ import PostTaxonomiesPanel from '../post-taxonomies/panel';
 import PostTransformPanel from '../post-transform-panel';
 import SidebarHeader from './header';
 import TemplateContentPanel from '../template-content-panel';
+import TemplatePartContentPanel from '../template-part-content-panel';
 import useAutoSwitchEditorSidebars from '../provider/use-auto-switch-editor-sidebars';
 import { sidebars } from './constants';
 import { unlock } from '../../lock-unlock';
@@ -111,9 +112,8 @@ const SidebarContent = ( {
 				<Tabs.TabPanel tabId={ sidebars.document } focusable={ false }>
 					<PostSummary onActionPerformed={ onActionPerformed } />
 					<PluginDocumentSettingPanel.Slot />
-					{ renderingMode !== 'post-only' && (
-						<TemplateContentPanel />
-					) }
+					<TemplateContentPanel renderingMode={ renderingMode } />
+					<TemplatePartContentPanel />
 					<PostTransformPanel />
 					<PostTaxonomiesPanel />
 					<PatternOverridesPanel />

@@ -10,9 +10,9 @@ import {
 	Button,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { memo } from '@wordpress/element';
-import { settings } from '@wordpress/icons';
+import { cog } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -20,7 +20,7 @@ import { settings } from '@wordpress/icons';
 import { unlock } from './lock-unlock';
 import { SORTING_DIRECTIONS, sortLabels } from './constants';
 import { VIEW_LAYOUTS } from './layouts';
-import type { AnyItem, NormalizedField, View } from './types';
+import type { NormalizedField, View } from './types';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -42,19 +42,19 @@ interface PageSizeMenuProps {
 	onChangeView: ( view: View ) => void;
 }
 
-interface FieldsVisibilityMenuProps< Item extends AnyItem > {
+interface FieldsVisibilityMenuProps< Item > {
 	view: View;
 	onChangeView: ( view: View ) => void;
 	fields: NormalizedField< Item >[];
 }
 
-interface SortMenuProps< Item extends AnyItem > {
+interface SortMenuProps< Item > {
 	fields: NormalizedField< Item >[];
 	view: View;
 	onChangeView: ( view: View ) => void;
 }
 
-interface ViewActionsProps< Item extends AnyItem > {
+interface ViewActionsProps< Item > {
 	fields: NormalizedField< Item >[];
 	view: View;
 	onChangeView: ( view: View ) => void;
@@ -161,7 +161,7 @@ function PageSizeMenu( { view, onChangeView }: PageSizeMenuProps ) {
 	);
 }
 
-function FieldsVisibilityMenu< Item extends AnyItem >( {
+function FieldsVisibilityMenu< Item >( {
 	view,
 	onChangeView,
 	fields,
@@ -170,6 +170,7 @@ function FieldsVisibilityMenu< Item extends AnyItem >( {
 		( field ) =>
 			field.enableHiding !== false && field.id !== view.layout.mediaField
 	);
+	const viewFields = view.fields || fields.map( ( field ) => field.id );
 	if ( ! hidableFields?.length ) {
 		return null;
 	}
@@ -188,20 +189,15 @@ function FieldsVisibilityMenu< Item extends AnyItem >( {
 					<DropdownMenuCheckboxItem
 						key={ field.id }
 						value={ field.id }
-						checked={ ! view.hiddenFields?.includes( field.id ) }
+						checked={ viewFields.includes( field.id ) }
 						onChange={ () => {
 							onChangeView( {
 								...view,
-								hiddenFields: view.hiddenFields?.includes(
-									field.id
-								)
-									? view.hiddenFields.filter(
+								fields: viewFields.includes( field.id )
+									? viewFields.filter(
 											( id ) => id !== field.id
 									  )
-									: [
-											...( view.hiddenFields || [] ),
-											field.id,
-									  ],
+									: [ ...viewFields, field.id ],
 							} );
 						} }
 					>
@@ -215,7 +211,7 @@ function FieldsVisibilityMenu< Item extends AnyItem >( {
 	);
 }
 
-function SortMenu< Item extends AnyItem >( {
+function SortMenu< Item >( {
 	fields,
 	view,
 	onChangeView,
@@ -303,7 +299,7 @@ function SortMenu< Item extends AnyItem >( {
 	);
 }
 
-function _ViewActions< Item extends AnyItem >( {
+function _ViewActions< Item >( {
 	fields,
 	view,
 	onChangeView,
@@ -314,8 +310,8 @@ function _ViewActions< Item extends AnyItem >( {
 			trigger={
 				<Button
 					size="compact"
-					icon={ settings }
-					label={ __( 'View options' ) }
+					icon={ cog }
+					label={ _x( 'View options', 'View is used as a noun' ) }
 				/>
 			}
 		>

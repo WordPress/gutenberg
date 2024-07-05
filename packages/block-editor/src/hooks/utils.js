@@ -140,6 +140,7 @@ export function useStyleOverride( {
 	css,
 	assets,
 	__unstableType,
+	variation,
 	clientId,
 } = {} ) {
 	const { setStyleOverride, deleteStyleOverride } = unlock(
@@ -159,6 +160,7 @@ export function useStyleOverride( {
 			css,
 			assets,
 			__unstableType,
+			variation,
 			clientId,
 		};
 		// Batch updates to style overrides to avoid triggering cascading renders
@@ -582,6 +584,7 @@ export function createBlockListBlockFilter( features ) {
 						hasSupport,
 						attributeKeys = [],
 						useBlockProps,
+						isMatch,
 					} = feature;
 
 					const neededProps = {};
@@ -595,7 +598,8 @@ export function createBlockListBlockFilter( features ) {
 						// Skip rendering if none of the needed attributes are
 						// set.
 						! Object.keys( neededProps ).length ||
-						! hasSupport( props.name )
+						! hasSupport( props.name ) ||
+						( isMatch && ! isMatch( neededProps ) )
 					) {
 						return null;
 					}

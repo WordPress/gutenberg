@@ -78,9 +78,7 @@ const DEFAULT_VIEW = {
 		field: 'title',
 		direction: 'asc',
 	},
-	// All fields are visible by default, so it's
-	// better to keep track of the hidden ones.
-	hiddenFields: [ 'preview' ],
+	fields: [ 'title', 'description', 'author' ],
 	layout: defaultConfigPerViewType[ LAYOUT_GRID ],
 	filters: [],
 };
@@ -186,7 +184,9 @@ function Preview( { item, viewType } ) {
 
 export default function PageTemplates() {
 	const { params } = useLocation();
-	const { activeView = 'all', layout } = params;
+	const { activeView = 'all', layout, postId } = params;
+	const [ selection, setSelection ] = useState( [ postId ] );
+
 	const defaultView = useMemo( () => {
 		const usedType = layout ?? DEFAULT_VIEW.type;
 		return {
@@ -323,7 +323,10 @@ export default function PageTemplates() {
 		return filterSortAndPaginate( records, view, fields );
 	}, [ records, view, fields ] );
 
-	const postTypeActions = usePostActions( TEMPLATE_POST_TYPE );
+	const postTypeActions = usePostActions( {
+		postType: TEMPLATE_POST_TYPE,
+		context: 'list',
+	} );
 	const editAction = useEditPostAction();
 	const actions = useMemo(
 		() => [ editAction, ...postTypeActions ],
@@ -366,6 +369,8 @@ export default function PageTemplates() {
 				view={ view }
 				onChangeView={ onChangeView }
 				onSelectionChange={ onSelectionChange }
+				selection={ selection }
+				setSelection={ setSelection }
 			/>
 		</Page>
 	);

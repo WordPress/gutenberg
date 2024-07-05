@@ -12,33 +12,35 @@ import { useMemo, useState, useRef } from '@wordpress/element';
 import { _n, sprintf, __ } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
 import { useReducedMotion } from '@wordpress/compose';
+import { useRegistry } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { ActionWithModal } from './item-actions';
-import type { Action, AnyItem } from './types';
+import type { Action } from './types';
 import type { ActionTriggerProps } from './item-actions';
+import type { SetSelection } from './private-types';
 
-interface ActionButtonProps< Item extends AnyItem > {
+interface ActionButtonProps< Item > {
 	action: Action< Item >;
 	selectedItems: Item[];
 	actionInProgress: string | null;
 	setActionInProgress: ( actionId: string | null ) => void;
 }
 
-interface ToolbarContentProps< Item extends AnyItem > {
+interface ToolbarContentProps< Item > {
 	selection: string[];
 	actionsToShow: Action< Item >[];
 	selectedItems: Item[];
-	onSelectionChange: ( selection: Item[] ) => void;
+	onSelectionChange: SetSelection;
 }
 
-interface BulkActionsToolbarProps< Item extends AnyItem > {
+interface BulkActionsToolbarProps< Item > {
 	data: Item[];
 	selection: string[];
 	actions: Action< Item >[];
-	onSelectionChange: ( selection: Item[] ) => void;
+	onSelectionChange: SetSelection;
 	getItemId: ( item: Item ) => string;
 }
 
@@ -61,7 +63,7 @@ const SNACKBAR_VARIANTS = {
 	},
 };
 
-function ActionTrigger< Item extends AnyItem >( {
+function ActionTrigger< Item >( {
 	action,
 	onClick,
 	isBusy,
@@ -78,7 +80,6 @@ function ActionTrigger< Item extends AnyItem >( {
 			size="compact"
 			onClick={ onClick }
 			isBusy={ isBusy }
-			__experimentalIsFocusable
 			tooltipPosition="top"
 		/>
 	);
@@ -86,12 +87,13 @@ function ActionTrigger< Item extends AnyItem >( {
 
 const EMPTY_ARRAY: [] = [];
 
-function ActionButton< Item extends AnyItem >( {
+function ActionButton< Item >( {
 	action,
 	selectedItems,
 	actionInProgress,
 	setActionInProgress,
 }: ActionButtonProps< Item > ) {
+	const registry = useRegistry();
 	const selectedEligibleItems = useMemo( () => {
 		return selectedItems.filter( ( item ) => {
 			return ! action.isEligible || action.isEligible( item );
@@ -113,7 +115,9 @@ function ActionButton< Item extends AnyItem >( {
 			action={ action }
 			onClick={ () => {
 				setActionInProgress( action.id );
-				action.callback( selectedItems );
+				action.callback( selectedItems, {
+					registry,
+				} );
 			} }
 			items={ selectedEligibleItems }
 			isBusy={ actionInProgress === action.id }
@@ -121,13 +125,13 @@ function ActionButton< Item extends AnyItem >( {
 	);
 }
 
-function renderToolbarContent< Item extends AnyItem >(
+function renderToolbarContent< Item >(
 	selection: string[],
 	actionsToShow: Action< Item >[],
 	selectedItems: Item[],
 	actionInProgress: string | null,
 	setActionInProgress: ( actionId: string | null ) => void,
-	onSelectionChange: ( selection: Item[] ) => void
+	onSelectionChange: SetSelection
 ) {
 	return (
 		<>
@@ -175,7 +179,7 @@ function renderToolbarContent< Item extends AnyItem >(
 	);
 }
 
-function ToolbarContent< Item extends AnyItem >( {
+function ToolbarContent< Item >( {
 	selection,
 	actionsToShow,
 	selectedItems,
@@ -210,7 +214,7 @@ function ToolbarContent< Item extends AnyItem >( {
 	return buttons.current;
 }
 
-export default function BulkActionsToolbar< Item extends AnyItem >( {
+export default function BulkActionsToolbar< Item >( {
 	data,
 	selection,
 	actions = EMPTY_ARRAY,

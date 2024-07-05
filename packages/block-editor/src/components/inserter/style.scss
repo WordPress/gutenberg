@@ -17,18 +17,12 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__main-area {
-	position: relative;
-	display: flex;
-	flex-direction: column;
 	height: 100%;
 	gap: $grid-unit-20;
+	position: relative;
 
 	&.show-as-tabs {
 		gap: 0;
-	}
-
-	@include break-medium {
-		width: $block-inserter-width;
 	}
 }
 
@@ -107,48 +101,6 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__search {
 	padding: $grid-unit-20 $grid-unit-20 0 $grid-unit-20;
-}
-
-.block-editor-inserter__tabs {
-	flex-grow: 1;
-	display: flex;
-	flex-direction: column;
-	overflow: hidden;
-
-	.block-editor-inserter__tablist-and-close-button {
-		border-bottom: $border-width solid $gray-300;
-		padding-right: $grid-unit-15;
-		display: flex;
-		justify-content: space-between;
-	}
-
-	.block-editor-inserter__close-button {
-		/* stylelint-disable-next-line property-disallowed-list -- This should be refactored to avoid order if possible */
-		order: 1;
-		align-self: center;
-	}
-
-	.block-editor-inserter__tablist {
-		width: 100%;
-		margin-bottom: -$border-width;
-
-		button[role="tab"] {
-			flex-grow: 1;
-			&[id$="reusable"] {
-				flex-grow: inherit;
-				// These are to align the `reusable` icon with the search icon.
-				padding-left: $grid-unit-20;
-				padding-right: $grid-unit-20;
-			}
-		}
-	}
-
-	.block-editor-inserter__tabpanel {
-		display: flex;
-		flex-grow: 1;
-		flex-direction: column;
-		overflow-y: auto;
-	}
 }
 
 .block-editor-inserter__no-tab-container {

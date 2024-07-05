@@ -2,7 +2,6 @@
  * External dependencies
  */
 import styled from '@emotion/styled';
-// eslint-disable-next-line no-restricted-imports
 import * as Ariakit from '@ariakit/react';
 
 /**
@@ -36,22 +35,20 @@ export const TabListWrapper = styled.div`
 		outline-offset: -1px;
 	}
 	&:not( [aria-orientation='vertical'] )::after {
-		left: var( --indicator-left );
 		bottom: 0;
+		left: var( --indicator-left );
 		width: var( --indicator-width );
 		height: 0;
 		border-bottom: var( --wp-admin-border-width-focus ) solid
 			${ COLORS.theme.accent };
 	}
 	&[aria-orientation='vertical']::after {
-		/* Temporarily hidden, context: https://github.com/WordPress/gutenberg/pull/60560#issuecomment-2126670072 */
-		opacity: 0;
-
-		right: 0;
+		z-index: -1;
+		left: 0;
+		width: 100%;
 		top: var( --indicator-top );
 		height: var( --indicator-height );
-		border-right: var( --wp-admin-border-width-focus ) solid
-			${ COLORS.theme.accent };
+		background-color: ${ COLORS.theme.gray[ 100 ] };
 	}
 `;
 

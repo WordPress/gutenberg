@@ -249,9 +249,12 @@ export function ParentRow() {
 							onClose={ onClose }
 						/>
 						<div>
-							{ __(
-								"Child pages inherit characteristics from their parent, such as URL structure. For instance, if 'Web Design' is a child of 'Services,' its URL would be mysite.com/services/web-design."
-							) }
+							{
+								/* translators: The domain name should be a reserved domain name to prevent linking to third party sites outside the WordPress project's control. You may also wish to use wordpress.org or a wordpress.org sub-domain. */
+								__(
+									"Child pages inherit characteristics from their parent, such as URL structure. For instance, if 'Web Design' is a child of 'Services', its URL would be example.org/services/web-design."
+								)
+							}
 							<p>
 								{ __(
 									'They also show up as sub-items in the default navigation menu. '

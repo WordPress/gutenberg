@@ -55,11 +55,19 @@ if ( isPackageInstalled( 'typescript' ) ) {
 				// Don't require redundant JSDoc types in TypeScript files.
 				'jsdoc/require-param-type': 'off',
 				'jsdoc/require-returns-type': 'off',
-				// Handled by TS itself.
+				// Use eslint for unused variable and parameter detection.
+				// This overlaps with TypeScript noUnusedLocals and noUnusedParameters settings.
+				// TypeScript may only run on a subset of files. Prefer eslint which is more
+				// likely to run on the entire codebase.
 				'no-unused-vars': 'off',
+				'@typescript-eslint/no-unused-vars': [
+					'error',
+					{ ignoreRestSiblings: true },
+				],
 				// no-shadow doesn't work correctly in TS, so let's use a TS-dedicated version instead.
 				'no-shadow': 'off',
 				'@typescript-eslint/no-shadow': 'error',
+				'@typescript-eslint/method-signature-style': 'error',
 			},
 		},
 	];

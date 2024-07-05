@@ -25,8 +25,7 @@ import {
 	getCurrentPost,
 	__experimentalGetDefaultTemplatePartAreas,
 } from './selectors';
-import { TEMPLATE_PART_POST_TYPE } from './constants';
-import { getFilteredTemplatePartBlocks } from './utils/get-filtered-template-parts';
+import { getEntityActions as _getEntityActions } from '../dataviews/store/private-selectors';
 
 const EMPTY_INSERTION_POINT = {
 	rootClientId: undefined,
@@ -120,29 +119,6 @@ export const getPostIcon = createRegistrySelector(
 );
 
 /**
- * Returns the template parts and their blocks for the current edited template.
- *
- * @param {Object} state Global application state.
- * @return {Array} Template parts and their blocks in an array.
- */
-export const getCurrentTemplateTemplateParts = createRegistrySelector(
-	( select ) => () => {
-		const templateParts = select( coreStore ).getEntityRecords(
-			'postType',
-			TEMPLATE_PART_POST_TYPE,
-			{ per_page: -1 }
-		);
-
-		const clientIds =
-			select( blockEditorStore ).getBlocksByName( 'core/template-part' );
-		const blocks =
-			select( blockEditorStore ).getBlocksByClientId( clientIds );
-
-		return getFilteredTemplatePartBlocks( blocks, templateParts );
-	}
-);
-
-/**
  * Returns true if there are unsaved changes to the
  * post's meta fields, and false otherwise.
  *
@@ -180,3 +156,7 @@ export const hasPostMetaChanges = createRegistrySelector(
 		);
 	}
 );
+
+export function getEntityActions( state, ...args ) {
+	return _getEntityActions( state.dataviews, ...args );
+}

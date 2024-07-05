@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 4.2.0 (2024-06-26)
+
+## 4.1.0 (2024-06-15)
+
 ## 4.0.0 (2024-05-31)
 
 ### Breaking Changes
@@ -139,7 +143,7 @@
 
 ## 1.18.0 (2020-10-06)
 
-### New Feature
+### New Features
 
 -   Expose the `syncSelect` control for synchronous calls of registry selectors
 

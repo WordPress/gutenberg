@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 2.2.0 (2024-06-26)
+
+## 2.1.0 (2024-06-15)
+
 ## 2.0.0 (2024-05-31)
 
 ### Breaking Changes
@@ -35,6 +39,6 @@
 
 ## 1.0.0 (2024-01-24)
 
-### Breaking changes
+### Breaking Changes
 
 -   Initial version. ([57924](https://github.com/WordPress/gutenberg/pull/57924))

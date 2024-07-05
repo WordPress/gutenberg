@@ -176,19 +176,6 @@ figure.wp-block-image:not(.wp-block) {
 	}
 }
 
-.wp-block-image__aspect-ratio {
-	height: $grid-unit-60 - $border-width - $border-width;
-	margin-bottom: -$grid-unit-10;
-	display: flex;
-	align-items: center;
-
-	.components-button {
-		width: $button-size;
-		padding-left: 0;
-		padding-right: 0;
-	}
-}
-
 .wp-block-image__toolbar_content_textarea {
 	// Corresponds to the size of the textarea in the block inspector.
 	width: 250px;

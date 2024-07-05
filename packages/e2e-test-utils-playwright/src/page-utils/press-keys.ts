@@ -8,16 +8,7 @@ import type { Page } from '@playwright/test';
  * Internal dependencies
  */
 import type { PageUtils } from './';
-
-/**
- * WordPress dependencies
- */
-import {
-	modifiers as baseModifiers,
-	SHIFT,
-	ALT,
-	CTRL,
-} from '@wordpress/keycodes';
+import { modifiers as baseModifiers, SHIFT, ALT, CTRL } from './keycodes';
 
 let clipboardDataHolder: {
 	'text/plain': string;
