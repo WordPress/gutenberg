@@ -30,6 +30,28 @@ export default {
 
 		return overridableValue === '' ? undefined : overridableValue;
 	},
+	// When `getValuesInBatch` is defined, this is not running.
+	// Keeping it here to show the different possibilities.
+	getValuesInBatch( { registry, clientId, context, sourceBindings } ) {
+		const patternOverridesContent = context[ 'pattern/overrides' ];
+		if ( ! patternOverridesContent ) {
+			return {};
+		}
+
+		const { getBlockAttributes } = registry.select( blockEditorStore );
+		const currentBlockAttributes = getBlockAttributes( clientId );
+
+		const overridesValues = {};
+		for ( const attributeName of Object.keys( sourceBindings ) ) {
+			const overridableValue =
+				patternOverridesContent?.[
+					currentBlockAttributes?.metadata?.name
+				]?.[ attributeName ];
+			overridesValues[ attributeName ] =
+				overridableValue === '' ? undefined : overridableValue;
+		}
+		return overridesValues;
+	},
 	setValuesInBatch( { registry, clientId, sourceBindings } ) {
 		const { getBlockAttributes, getBlockParentsByBlockName, getBlocks } =
 			registry.select( blockEditorStore );
