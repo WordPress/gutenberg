@@ -233,7 +233,7 @@ describe( 'filters', () => {
 } );
 
 describe( 'sorting', () => {
-	it( 'should sort by text field', () => {
+	it( 'should sort by string', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
@@ -253,18 +253,19 @@ describe( 'sorting', () => {
 		expect( result[ 1 ].title ).toBe( 'Neptune' );
 	} );
 
-	it( 'should sort by number field', () => {
+	it( 'should sort by number', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
-				sort: { field: 'id', direction: 'desc' },
+				sort: { field: 'satellites', direction: 'desc' },
 			},
 			fields
 		);
 
 		expect( result ).toHaveLength( 11 );
-		expect( result[ 10 ].title ).toBe( 'Apollo' );
-		expect( result[ 0 ].title ).toBe( 'Uranus' );
+		expect( result[ 0 ].title ).toBe( 'Saturn' );
+		expect( result[ 1 ].title ).toBe( 'Jupiter' );
+		expect( result[ 2 ].title ).toBe( 'Uranus' );
 	} );
 } );
 

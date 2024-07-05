@@ -22,6 +22,7 @@ export const data = [
 		image: 'https://live.staticflickr.com/5725/21726228300_51333bd62c_b.jpg',
 		type: 'Not a planet',
 		categories: [ 'Space', 'NASA' ],
+		satellites: 0,
 	},
 	{
 		id: 2,
@@ -30,6 +31,7 @@ export const data = [
 		image: 'https://live.staticflickr.com/5678/21911065441_92e2d44708_b.jpg',
 		type: 'Not a planet',
 		categories: [ 'Space' ],
+		satellites: 0,
 	},
 	{
 		id: 3,
@@ -38,6 +40,7 @@ export const data = [
 		image: 'https://live.staticflickr.com/742/21712365770_8f70a2c91e_b.jpg',
 		type: 'Not a planet',
 		categories: [ 'NASA' ],
+		satellites: 0,
 	},
 	{
 		id: 4,
@@ -46,6 +49,7 @@ export const data = [
 		image: 'https://live.staticflickr.com/5725/21726228300_51333bd62c_b.jpg',
 		type: 'Ice giant',
 		categories: [ 'Space', 'Planet', 'Solar system' ],
+		satellites: 14,
 	},
 	{
 		id: 5,
@@ -54,6 +58,7 @@ export const data = [
 		image: 'https://live.staticflickr.com/5725/21726228300_51333bd62c_b.jpg',
 		type: 'Terrestrial',
 		categories: [ 'Space', 'Planet', 'Solar system' ],
+		satellites: 0,
 	},
 	{
 		id: 6,
@@ -62,6 +67,7 @@ export const data = [
 		image: 'https://live.staticflickr.com/5725/21726228300_51333bd62c_b.jpg',
 		type: 'Terrestrial',
 		categories: [ 'Space', 'Planet', 'Solar system' ],
+		satellites: 0,
 	},
 	{
 		id: 7,
@@ -70,6 +76,7 @@ export const data = [
 		image: 'https://live.staticflickr.com/5725/21726228300_51333bd62c_b.jpg',
 		type: 'Terrestrial',
 		categories: [ 'Space', 'Planet', 'Solar system' ],
+		satellites: 1,
 	},
 	{
 		id: 8,
@@ -78,6 +85,7 @@ export const data = [
 		image: 'https://live.staticflickr.com/5725/21726228300_51333bd62c_b.jpg',
 		type: 'Terrestrial',
 		categories: [ 'Space', 'Planet', 'Solar system' ],
+		satellites: 2,
 	},
 	{
 		id: 9,
@@ -86,6 +94,7 @@ export const data = [
 		image: 'https://live.staticflickr.com/5725/21726228300_51333bd62c_b.jpg',
 		type: 'Gas giant',
 		categories: [ 'Space', 'Planet', 'Solar system' ],
+		satellites: 95,
 	},
 	{
 		id: 10,
@@ -94,6 +103,7 @@ export const data = [
 		image: 'https://live.staticflickr.com/5725/21726228300_51333bd62c_b.jpg',
 		type: 'Gas giant',
 		categories: [ 'Space', 'Planet', 'Solar system' ],
+		satellites: 146,
 	},
 	{
 		id: 11,
@@ -102,6 +112,7 @@ export const data = [
 		image: 'https://live.staticflickr.com/5725/21726228300_51333bd62c_b.jpg',
 		type: 'Ice giant',
 		categories: [ 'Space', 'Ice giant', 'Solar system' ],
+		satellites: 28,
 	},
 ];
 
@@ -177,6 +188,11 @@ export const fields = [
 			{ value: 'Terrestrial', label: 'Terrestrial' },
 			{ value: 'Gas giant', label: 'Gas giant' },
 		],
+	},
+	{
+		header: 'Satellites',
+		id: 'satellites',
+		enableSorting: true,
 	},
 	{
 		header: 'Description',
