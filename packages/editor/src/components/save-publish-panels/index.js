@@ -92,7 +92,7 @@ export default function SavePublishPanels( {
 					onClick={ openEntitiesSavedStates }
 					aria-expanded={ false }
 					disabled={ ! isDirty }
-					__experimentalIsFocusable
+					accessibleWhenDisabled
 				>
 					{ __( 'Open save panel' ) }
 				</Button>

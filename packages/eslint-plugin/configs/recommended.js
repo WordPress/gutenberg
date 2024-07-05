@@ -60,6 +60,7 @@ if ( isPackageInstalled( 'typescript' ) ) {
 				// no-shadow doesn't work correctly in TS, so let's use a TS-dedicated version instead.
 				'no-shadow': 'off',
 				'@typescript-eslint/no-shadow': 'error',
+				'@typescript-eslint/method-signature-style': 'error',
 			},
 		},
 	];

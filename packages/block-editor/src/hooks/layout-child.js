@@ -152,7 +152,7 @@ function ChildLayoutControlsPure( { clientId, style, setAttributes } ) {
 	const {
 		type: parentLayoutType = 'default',
 		allowSizingOnChildren = false,
-		columnCount,
+		isManualPlacement,
 	} = parentLayout;
 
 	const rootClientId = useSelect(
@@ -168,8 +168,6 @@ function ChildLayoutControlsPure( { clientId, style, setAttributes } ) {
 	if ( parentLayoutType !== 'grid' ) {
 		return null;
 	}
-
-	const isManualGrid = !! columnCount;
 
 	function updateLayout( layout ) {
 		setAttributes( {
@@ -199,15 +197,16 @@ function ChildLayoutControlsPure( { clientId, style, setAttributes } ) {
 					parentLayout={ parentLayout }
 				/>
 			) }
-			{ isManualGrid && window.__experimentalEnableGridInteractivity && (
-				<GridItemMovers
-					layout={ style?.layout }
-					parentLayout={ parentLayout }
-					onChange={ updateLayout }
-					gridClientId={ rootClientId }
-					blockClientId={ clientId }
-				/>
-			) }
+			{ isManualPlacement &&
+				window.__experimentalEnableGridInteractivity && (
+					<GridItemMovers
+						layout={ style?.layout }
+						parentLayout={ parentLayout }
+						onChange={ updateLayout }
+						gridClientId={ rootClientId }
+						blockClientId={ clientId }
+					/>
+				) }
 		</>
 	);
 }

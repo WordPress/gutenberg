@@ -120,7 +120,7 @@ const trashPostAction = {
 						variant="tertiary"
 						onClick={ closeModal }
 						disabled={ isBusy }
-						__experimentalIsFocusable
+						accessibleWhenDisabled
 					>
 						{ __( 'Cancel' ) }
 					</Button>
@@ -152,7 +152,7 @@ const trashPostAction = {
 										__( '"%s" moved to trash.' ),
 										getItemTitle( items[ 0 ] )
 									);
-								} else if ( items[ 0 ].type === 'page' ) {
+								} else {
 									successMessage = sprintf(
 										/* translators: The number of items. */
 										_n(
@@ -160,12 +160,6 @@ const trashPostAction = {
 											'%s items moved to trash.',
 											items.length
 										),
-										items.length
-									);
-								} else {
-									successMessage = sprintf(
-										/* translators: The number of posts. */
-										__( '%s items move to trash.' ),
 										items.length
 									);
 								}
@@ -233,7 +227,7 @@ const trashPostAction = {
 						} }
 						isBusy={ isBusy }
 						disabled={ isBusy }
-						__experimentalIsFocusable
+						accessibleWhenDisabled
 					>
 						{ __( 'Trash' ) }
 					</Button>
@@ -276,7 +270,7 @@ const permanentlyDeletePostAction = {
 	isEligible( { status } ) {
 		return status === 'trash';
 	},
-	async callback( posts, { registry } ) {
+	async callback( posts, { registry, onActionPerformed } ) {
 		const { createSuccessNotice, createErrorNotice } =
 			registry.dispatch( noticesStore );
 		const { deleteEntityRecord } = registry.dispatch( coreStore );
@@ -307,6 +301,7 @@ const permanentlyDeletePostAction = {
 				type: 'snackbar',
 				id: 'permanently-delete-post-action',
 			} );
+			onActionPerformed?.( posts );
 		} else {
 			// If there was at lease one failure.
 			let errorMessage;
@@ -955,12 +950,18 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 					const existingCallback = actions[ i ].callback;
 					actions[ i ] = {
 						...actions[ i ],
-						callback: ( items, { _onActionPerformed } ) => {
-							existingCallback( items, ( _items ) => {
-								if ( _onActionPerformed ) {
-									_onActionPerformed( _items );
-								}
-								onActionPerformed( actions[ i ].id, _items );
+						callback: ( items, argsObject ) => {
+							existingCallback( items, {
+								...argsObject,
+								onActionPerformed: ( _items ) => {
+									if ( argsObject.onActionPerformed ) {
+										argsObject.onActionPerformed( _items );
+									}
+									onActionPerformed(
+										actions[ i ].id,
+										_items
+									);
+								},
 							} );
 						},
 					};
