@@ -90,20 +90,27 @@ export function convertLegacyBlockNameAndAttributes( name, attributes ) {
 
 	// Column span and row span were stored as strings in WP 6.6. Convert them to numbers.
 	if ( typeof attributes.style?.layout?.columnSpan === 'string' ) {
+		const columnSpanNumber = parseInt(
+			attributes.style.layout.columnSpan,
+			10
+		);
 		newAttributes.style = {
 			...newAttributes.style,
 			layout: {
 				...newAttributes.style.layout,
-				columnSpan: parseInt( attributes.style.layout.columnSpan, 10 ),
+				columnSpan: isNaN( columnSpanNumber )
+					? undefined
+					: columnSpanNumber,
 			},
 		};
 	}
 	if ( typeof attributes.style?.layout?.rowSpan === 'string' ) {
+		const rowSpanNumber = parseInt( attributes.style.layout.rowSpan, 10 );
 		newAttributes.style = {
 			...newAttributes.style,
 			layout: {
 				...newAttributes.style.layout,
-				rowSpan: parseInt( attributes.style.layout.rowSpan, 10 ),
+				rowSpan: isNaN( rowSpanNumber ) ? undefined : rowSpanNumber,
 			},
 		};
 	}
