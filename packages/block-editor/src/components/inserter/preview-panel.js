@@ -40,7 +40,7 @@ function InserterPreviewPanel( { item } ) {
 					<div className="block-editor-inserter__preview-content">
 						<BlockPreview
 							blocks={ blocks }
-							viewportWidth={ example?.viewportWidth ?? 350 }
+							viewportWidth={ example?.viewportWidth ?? 500 }
 							minHeight={ previewHeight }
 							additionalStyles={ [
 								{
