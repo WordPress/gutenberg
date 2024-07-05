@@ -58,6 +58,11 @@ export type TooltipProps = {
 	 * The text shown in the tooltip when anchor element is focused or hovered.
 	 */
 	text?: string;
+	/**
+	 * The custom class name for the tooltip.
+	 * The default class for tooltip is `components-tooltip` and always will be added.
+	 */
+	className?: string;
 };
 
 export type TooltipInternalContext = {

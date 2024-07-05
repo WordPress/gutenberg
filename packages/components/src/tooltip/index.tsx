@@ -50,6 +50,7 @@ function UnforwardedTooltip(
 		position,
 		shortcut,
 		text,
+		className,
 
 		...restProps
 	} = props;
@@ -112,7 +113,7 @@ function UnforwardedTooltip(
 			{ isOnlyChild && ( text || shortcut ) && (
 				<Ariakit.Tooltip
 					{ ...restProps }
-					className="components-tooltip"
+					className={ className === undefined ? "components-tooltip" : "components-tooltip " + className }
 					unmountOnHide
 					gutter={ 4 }
 					id={ describedById }
