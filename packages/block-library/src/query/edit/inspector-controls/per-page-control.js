@@ -16,7 +16,7 @@ const PerPageControl = ( { perPage, offset = 0, onChange } ) => {
 			onChange={ ( newPerPage ) => {
 				onChange( { perPage: newPerPage, offset } );
 			} }
-			value={ perPage }
+			value={ parseInt( perPage, 10 ) }
 		/>
 	);
 };
