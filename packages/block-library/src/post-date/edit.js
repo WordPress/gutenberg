@@ -61,11 +61,6 @@ export default function PostDateEdit( {
 		'site',
 		'date_format'
 	);
-	const [ siteTimeFormat = dateSettings.formats.time ] = useEntityProp(
-		'root',
-		'site',
-		'time_format'
-	);
 	const [ date, setDate ] = useEntityProp(
 		'postType',
 		postTypeSlug,
@@ -124,9 +119,6 @@ export default function PostDateEdit( {
 									<PublishDateTimePicker
 										currentDate={ date }
 										onChange={ setDate }
-										is12Hour={ is12HourFormat(
-											siteTimeFormat
-										) }
 										onClose={ onClose }
 										dateOrder={
 											/* translators: Order of day, month, and year. Available formats are 'dmy', 'mdy', and 'ymd'. */
