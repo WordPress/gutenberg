@@ -44,10 +44,12 @@ function InserterPreviewPanel( { item } ) {
 							minHeight={ previewHeight }
 							additionalStyles={ [
 								{
-									css: `body { 
-									padding: 24px;
-									min-height:100%;
-									display:flex;align-items:center;justify-content:center; }`,
+									css: `
+										body { 
+											padding: 24px;
+											display:flex;align-items:center;justify-content:center; 
+										}
+									`,
 								},
 							] }
 						/>
