@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { store as blocksStore } from '@wordpress/blocks';
+import {
+	store as blocksStore,
+	privateApis as blocksPrivateApis,
+} from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useRegistry, useSelect } from '@wordpress/data';
 import { useCallback, useMemo } from '@wordpress/element';
@@ -11,6 +14,8 @@ import { addFilter } from '@wordpress/hooks';
  * Internal dependencies
  */
 import { unlock } from '../lock-unlock';
+
+const { isBindingSourceActiveKey } = unlock( blocksPrivateApis );
 
 /** @typedef {import('@wordpress/compose').WPHigherOrderComponent} WPHigherOrderComponent */
 /** @typedef {import('@wordpress/blocks').WPBlockSettings} WPBlockSettings */
@@ -92,11 +97,21 @@ export function canBindAttribute( blockName, attributeName ) {
 
 export const withBlockBindingSupport = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
+		const { name, clientId, context } = props;
 		const registry = useRegistry();
-		const sources = useSelect( ( select ) =>
+		const registeredSources = useSelect( ( select ) =>
 			unlock( select( blocksStore ) ).getAllBlockBindingsSources()
 		);
-		const { name, clientId, context } = props;
+		const sources = Object.fromEntries(
+			Object.entries( registeredSources ).filter(
+				( [ , sourceData ] ) =>
+					sourceData[ isBindingSourceActiveKey ]?.( {
+						registry,
+						context,
+						clientId,
+					} ) ?? true
+			)
+		);
 		const hasParentPattern = !! props.context[ 'pattern/overrides' ];
 		const hasPatternOverridesDefaultBinding =
 			props.attributes.metadata?.bindings?.[ DEFAULT_ATTRIBUTE ]

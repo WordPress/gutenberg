@@ -462,6 +462,10 @@ _Returns_
 
 -   `Array|string`: A list of blocks or a string, depending on `handlerMode`.
 
+### privateApis
+
+Private @wordpress/blocks APIs.
+
 ### rawHandler
 
 Converts an HTML string to known blocks.

@@ -930,99 +930,49 @@ test.describe( 'Pattern Overrides', () => {
 	} );
 
 	test( 'blocks with the same name should be synced', async ( {
-		page,
 		admin,
 		requestUtils,
 		editor,
 	} ) => {
-		let patternId;
 		const sharedName = 'Shared Name';
-
-		await test.step( 'create a pattern with synced blocks with the same name', async () => {
-			const { id } = await requestUtils.createBlock( {
-				title: 'Blocks with the same name',
-				content: `<!-- wp:heading {"metadata":{"name":"${ sharedName }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
+		const { id: patternId } = await requestUtils.createBlock( {
+			title: 'Blocks with the same name',
+			content: `<!-- wp:heading {"metadata":{"name":"${ sharedName }","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
 			<h2>default name</h2>
 			<!-- /wp:heading -->
-			<!-- wp:paragraph {"metadata":{"name":"${ sharedName }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
+			<!-- wp:paragraph {"metadata":{"name":"${ sharedName }","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
 			<p>default content</p>
 			<!-- /wp:paragraph -->
-			<!-- wp:paragraph {"metadata":{"name":"${ sharedName }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
+			<!-- wp:paragraph {"metadata":{"name":"${ sharedName }","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
 			<p>default content</p>
 			<!-- /wp:paragraph -->`,
-				status: 'publish',
-			} );
-			await admin.visitSiteEditor( {
-				postId: id,
-				postType: 'wp_block',
-				canvas: 'edit',
-			} );
+			status: 'publish',
+		} );
+		await admin.createNewPost();
 
-			const headingBlock = editor.canvas.getByRole( 'document', {
-				name: 'Block: Heading',
-			} );
-			const firstParagraph = editor.canvas
-				.getByRole( 'document', {
-					name: 'Block: Paragraph',
-				} )
-				.first();
-			const secondParagraph = editor.canvas
-				.getByRole( 'document', {
-					name: 'Block: Paragraph',
-				} )
-				.last();
-
-			// Update the content of one of the blocks.
-			await headingBlock.fill( 'updated content' );
-
-			// Check that every content has been updated.
-			for ( const block of [
-				headingBlock,
-				firstParagraph,
-				secondParagraph,
-			] ) {
-				await expect( block ).toHaveText( 'updated content' );
-			}
-
-			await page
-				.getByRole( 'region', { name: 'Editor top bar' } )
-				.getByRole( 'button', { name: 'Save' } )
-				.click();
-
-			await expect(
-				page.getByRole( 'button', { name: 'Dismiss this notice' } )
-			).toBeVisible();
-
-			patternId = new URL( page.url() ).searchParams.get( 'postId' );
+		await editor.insertBlock( {
+			name: 'core/block',
+			attributes: { ref: patternId },
 		} );
 
-		await test.step( 'create a post and insert the pattern with synced values', async () => {
-			await admin.createNewPost();
-
-			await editor.insertBlock( {
-				name: 'core/block',
-				attributes: { ref: patternId },
-			} );
-
-			const headingBlock = editor.canvas.getByRole( 'document', {
-				name: 'Block: Heading',
-			} );
-			const firstParagraph = editor.canvas
-				.getByRole( 'document', {
-					name: 'Block: Paragraph',
-				} )
-				.first();
-			const secondParagraph = editor.canvas
-				.getByRole( 'document', {
-					name: 'Block: Paragraph',
-				} )
-				.last();
-
-			await firstParagraph.fill( 'overriden content' );
-			await expect( headingBlock ).toHaveText( 'overriden content' );
-			await expect( firstParagraph ).toHaveText( 'overriden content' );
-			await expect( secondParagraph ).toHaveText( 'overriden content' );
+		const headingBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Heading',
 		} );
+		const firstParagraph = editor.canvas
+			.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} )
+			.first();
+		const secondParagraph = editor.canvas
+			.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} )
+			.last();
+
+		await firstParagraph.fill( 'overriden content' );
+		await expect( headingBlock ).toHaveText( 'overriden content' );
+		await expect( firstParagraph ).toHaveText( 'overriden content' );
+		await expect( secondParagraph ).toHaveText( 'overriden content' );
 	} );
 
 	// https://github.com/WordPress/gutenberg/issues/61610.
