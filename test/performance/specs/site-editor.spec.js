@@ -29,6 +29,7 @@ const results = {
 	listViewOpen: [],
 	navigate: [],
 	loadPatterns: [],
+	loadPages: [],
 };
 
 test.describe( 'Site Editor Performance', () => {
@@ -381,6 +382,63 @@ test.describe( 'Site Editor Performance', () => {
 				results.loadPatterns.push( endTime - startTime );
 
 				await page.keyboard.press( 'Escape' );
+			}
+		} );
+	} );
+
+	test.describe( 'Loading Pages', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activateTheme( 'twentytwentyfour' );
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.activateTheme( 'twentytwentyfour' );
+		} );
+
+		const perPage = 20;
+
+		test( 'Run the test', async ( { page, admin, requestUtils } ) => {
+			await Promise.all(
+				Array.from( { length: perPage }, async ( el, index ) => {
+					const { id } = await requestUtils.createPage( {
+						status: 'publish',
+						title: `Page (${ index })`,
+						content: `
+<!-- wp:heading -->
+<p>Hello</p>
+<!-- /wp:heading -->
+<!-- wp:paragraph -->
+<p>Post content</p>
+<!-- /wp:paragraph -->`,
+					} );
+
+					return id;
+				} )
+			);
+
+			const samples = 10;
+			for ( let i = 1; i <= samples; i++ ) {
+				// We want to start from a fresh state each time, without
+				// queries or patterns already cached.
+				await admin.visitSiteEditor();
+
+				const startTime = performance.now();
+
+				await page.getByRole( 'button', { name: 'Pages' } ).click();
+
+				await Promise.all(
+					Array.from( { length: perPage }, async ( el, index ) => {
+						return await page
+							.getByRole( 'button', {
+								name: `Page (${ index })`,
+							} )
+							.waitFor( { state: 'attached' } );
+					} )
+				);
+
+				const endTime = performance.now();
+
+				results.loadPages.push( endTime - startTime );
 			}
 		} );
 	} );

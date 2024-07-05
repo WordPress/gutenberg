@@ -34,6 +34,7 @@ export interface WPRawPerformanceResults {
 	inserterSearch: number[];
 	inserterHover: number[];
 	loadPatterns: number[];
+	loadPages: number[];
 	listViewOpen: number[];
 	navigate: number[];
 	wpBeforeTemplate: number[];
@@ -69,6 +70,7 @@ export interface WPPerformanceResults {
 	inserterSearch?: PerformanceStats;
 	inserterHover?: PerformanceStats;
 	loadPatterns?: PerformanceStats;
+	loadPages?: PerformanceStats;
 	listViewOpen?: PerformanceStats;
 	navigate?: PerformanceStats;
 	wpBeforeTemplate?: PerformanceStats;
@@ -106,6 +108,7 @@ export function curateResults(
 		inserterSearch: stats( results.inserterSearch ),
 		inserterHover: stats( results.inserterHover ),
 		loadPatterns: stats( results.loadPatterns ),
+		loadPages: stats( results.loadPages ),
 		listViewOpen: stats( results.listViewOpen ),
 		navigate: stats( results.navigate ),
 		wpBeforeTemplate: stats( results.wpBeforeTemplate ),
