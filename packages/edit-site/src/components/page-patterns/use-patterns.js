@@ -167,7 +167,21 @@ const selectPatterns = createSelector(
 			} );
 		} else {
 			patterns = searchItems( patterns, search, {
-				hasCategory: ( item ) => ! item.hasOwnProperty( 'categories' ),
+				hasCategory: ( item ) => {
+					if ( item.type === PATTERN_TYPES.user ) {
+						return (
+							userPatternCategories?.length &&
+							( ! item.wp_pattern_category?.length ||
+								! item.wp_pattern_category.some( ( catId ) =>
+									userPatternCategories.find(
+										( cat ) => cat.id === catId
+									)
+								) )
+						);
+					}
+
+					return ! item.hasOwnProperty( 'categories' );
+				},
 			} );
 		}
 		return {

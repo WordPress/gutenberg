@@ -64,7 +64,12 @@ export default function usePatternCategories() {
 				}
 			} );
 			// If the pattern has no categories, add it to uncategorized.
-			if ( ! pattern.categories?.length ) {
+			if (
+				! pattern.wp_pattern_category?.length ||
+				! pattern.wp_pattern_category.some( ( catId ) =>
+					userPatternCategories.find( ( cat ) => cat.id === catId )
+				)
+			) {
 				categoryMap.uncategorized.count += 1;
 			}
 		} );
