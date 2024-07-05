@@ -375,7 +375,7 @@ function GridLayoutColumnsAndRowsControl( {
 							/>
 						) : (
 							<RangeControl
-								value={ columnCount }
+								value={ columnCount ?? 0 }
 								onChange={ ( value ) =>
 									onChange( {
 										...layout,
