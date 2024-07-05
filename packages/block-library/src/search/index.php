@@ -189,8 +189,14 @@ function render_block_core_search( $attributes, $content, $block ) {
 		$form_directives = 'data-wp-interactive="core/search"';
 	}
 
+	// Adding wp_interactivity_state for the search block.
 	if ( $enhanced_pagination ) {
-		// TODO: add wp_interactivity_state()
+		wp_interactivity_state(
+			'core/search',
+			array(
+				'search' => isset( $_GET['search'] ) ? $_GET['search'] : '',
+			)
+		);
 	}
 
 	if ( $is_expandable_searchfield ) {

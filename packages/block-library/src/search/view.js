@@ -3,7 +3,26 @@
  */
 import { store, getContext, getElement } from '@wordpress/interactivity';
 
-const { actions } = store(
+const isEmpty = ( obj ) =>
+	[ Object, Array ].includes( ( obj || {} ).constructor ) &&
+	! Object.entries( obj || {} ).length;
+
+const updateURL = async ( value, name ) => {
+	const url = new URL( window.location );
+	const { actions } = await import( '@wordpress/interactivity-router' );
+
+	if ( 's' === name ) {
+		if ( ! isEmpty( value ) ) {
+			url.searchParams.set( 'search', value );
+		} else {
+			url.searchParams.delete( 'search' );
+		}
+	}
+
+	await actions.navigate( `${ window.location.pathname }${ url.search }` );
+};
+
+const { state, actions } = store(
 	'core/search',
 	{
 		state: {
@@ -65,6 +84,22 @@ const { actions } = store(
 				) {
 					actions.closeSearchInput();
 				}
+			},
+			*updateSearch() {
+				const { ref } = getElement();
+				const { value, name } = ref;
+
+				// Don't navigate if the search didn't really change.
+				if ( 's' === name && value === state.search ) {
+					return;
+				}
+
+				if ( 's' === name ) {
+					state.search = value;
+				}
+
+				// If not, navigate to the new URL.
+				yield updateURL( value, name );
 			},
 		},
 	},
