@@ -156,7 +156,7 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 					'backgroundImage' => true,
 				),
 				'background_style'    => array(
-					'backgroundImage'  => array(
+					'backgroundImage'      => array(
 						'url'    => 'https://example.com/image.jpg',
 						'source' => 'file',
 					),
