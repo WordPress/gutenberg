@@ -299,7 +299,7 @@ _Parameters_
 -   _kind_ `string`: Kind of the entity.
 -   _name_ `string`: Name of the entity.
 -   _recordId_ `Object`: ID of the record.
--   _options_ `Object`: Saving options.
+-   _options_ `Object=`: Saving options.
 
 ### saveEntityRecord
 

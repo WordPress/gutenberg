@@ -27,7 +27,7 @@ import { lock, unlock } from '../../lock-unlock';
 import { useGlobalStylesContext } from '../global-styles-provider';
 
 const EMPTY_BLOCKS_LIST = [];
-const DEFAULT_STYLES = {};
+const EMPTY_OBJECT = {};
 
 function __experimentalReusableBlocksSelect( select ) {
 	return (
@@ -88,8 +88,12 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__experimentalArchiveTitleNameLabel',
 ];
 
-const { globalStylesDataKey, selectBlockPatternsKey, reusableBlocksSelectKey } =
-	unlock( privateApis );
+const {
+	globalStylesDataKey,
+	globalStylesLinksDataKey,
+	selectBlockPatternsKey,
+	reusableBlocksSelectKey,
+} = unlock( privateApis );
 
 /**
  * React hook used to compute the block editor settings to use for the post editor.
@@ -179,7 +183,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 	);
 
 	const { merged: mergedGlobalStyles } = useGlobalStylesContext();
-	const globalStylesData = mergedGlobalStyles.styles ?? DEFAULT_STYLES;
+	const globalStylesData = mergedGlobalStyles.styles ?? EMPTY_OBJECT;
+	const globalStylesLinksData = mergedGlobalStyles._links ?? EMPTY_OBJECT;
 
 	const settingsBlockPatterns =
 		settings.__experimentalAdditionalBlockPatterns ?? // WP 6.0
@@ -268,6 +273,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				)
 			),
 			[ globalStylesDataKey ]: globalStylesData,
+			[ globalStylesLinksDataKey ]: globalStylesLinksData,
 			allowedBlockTypes,
 			allowRightClickOverrides,
 			focusMode: focusMode && ! forceDisableFocusMode,

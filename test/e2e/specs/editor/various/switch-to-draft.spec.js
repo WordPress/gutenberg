@@ -57,7 +57,10 @@ test.describe( 'Clicking "Switch to draft" on a published/scheduled post/page', 
 							.getByRole( 'button', { name: 'Close Settings' } )
 							.click();
 					}
-					await page.getByRole( 'button', { name: 'Save' } ).click();
+					await page
+						.getByRole( 'region', { name: 'Editor top bar' } )
+						.getByRole( 'button', { name: 'Save', exact: true } )
+						.click();
 					await expect(
 						page.getByRole( 'button', {
 							name: 'Dismiss this notice',

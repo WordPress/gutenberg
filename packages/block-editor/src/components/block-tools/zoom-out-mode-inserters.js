@@ -21,9 +21,10 @@ function ZoomOutModeInserters() {
 		sectionRootClientId,
 		insertionPoint,
 		setInserterIsOpened,
-		selectedSection,
+		hasSelection,
 	} = useSelect( ( select ) => {
-		const { getSettings, getBlockOrder } = select( blockEditorStore );
+		const { getSettings, getBlockOrder, getSelectionStart } =
+			select( blockEditorStore );
 		const { sectionRootClientId: root } = unlock( getSettings() );
 		// To do: move ZoomOutModeInserters to core/editor.
 		// Or we perhaps we should move the insertion point state to the
@@ -33,7 +34,7 @@ function ZoomOutModeInserters() {
 		// eslint-disable-next-line @wordpress/data-no-store-string-literals
 		const editor = select( 'core/editor' );
 		return {
-			selectedSection: editor.getSelectedBlock(),
+			hasSelection: !! getSelectionStart().clientId,
 			blockOrder: getBlockOrder( root ),
 			insertionPoint: unlock( editor ).getInsertionPoint(),
 			sectionRootClientId: root,
@@ -63,7 +64,7 @@ function ZoomOutModeInserters() {
 		};
 	}, [] );
 
-	if ( ! isReady || ! selectedSection ) {
+	if ( ! isReady || ! hasSelection ) {
 		return null;
 	}
 

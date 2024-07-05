@@ -2,9 +2,7 @@
  * External dependencies
  */
 import type { ForwardedRef } from 'react';
-// eslint-disable-next-line no-restricted-imports
 import * as Ariakit from '@ariakit/react';
-// eslint-disable-next-line no-restricted-imports
 import { motion } from 'framer-motion';
 
 /**

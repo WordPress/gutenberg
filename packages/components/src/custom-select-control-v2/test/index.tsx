@@ -105,14 +105,14 @@ describe.each( [
 		await press.Enter();
 		expect(
 			screen.getByRole( 'listbox', {
-				name: 'label!',
+				name: defaultProps.label,
 			} )
 		).toBeVisible();
 
 		await press.Escape();
 		expect(
 			screen.queryByRole( 'listbox', {
-				name: 'label!',
+				name: defaultProps.label,
 			} )
 		).not.toBeInTheDocument();
 
@@ -134,7 +134,7 @@ describe.each( [
 			await press.Enter();
 			expect(
 				screen.getByRole( 'listbox', {
-					name: 'label!',
+					name: defaultProps.label,
 				} )
 			).toHaveFocus();
 
@@ -156,7 +156,7 @@ describe.each( [
 			await press.Enter();
 			expect(
 				screen.getByRole( 'listbox', {
-					name: 'label!',
+					name: defaultProps.label,
 				} )
 			).toHaveFocus();
 
@@ -182,7 +182,7 @@ describe.each( [
 
 			expect(
 				screen.queryByRole( 'listbox', {
-					name: 'label!',
+					name: defaultProps.label,
 					hidden: true,
 				} )
 			).not.toBeInTheDocument();
@@ -414,6 +414,26 @@ describe.each( [
 		expect( screen.getByRole( 'img', { name: 'july-9' } ) ).toBeVisible();
 		expect(
 			screen.getByRole( 'option', { name: 'july-9' } )
+		).toBeVisible();
+	} );
+
+	it( 'Should open the select popover when focussing the trigger button and pressing arrow down', async () => {
+		render( <Component { ...defaultProps } /> );
+
+		const currentSelectedItem = screen.getByRole( 'combobox', {
+			expanded: false,
+		} );
+
+		await sleep();
+		await press.Tab();
+		expect( currentSelectedItem ).toHaveFocus();
+		expect( currentSelectedItem ).toHaveTextContent( items[ 0 ].value );
+
+		await press.ArrowDown();
+		expect(
+			screen.getByRole( 'listbox', {
+				name: defaultProps.label,
+			} )
 		).toBeVisible();
 	} );
 } );

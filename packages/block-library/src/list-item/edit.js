@@ -61,7 +61,7 @@ export function IndentUI( { clientId } ) {
 				icon={ isRTL() ? formatIndentRTL : formatIndent }
 				title={ __( 'Indent' ) }
 				describedBy={ __( 'Indent list item' ) }
-				isDisabled={ ! canIndent }
+				disabled={ ! canIndent }
 				onClick={ () => indentListItem() }
 			/>
 		</>

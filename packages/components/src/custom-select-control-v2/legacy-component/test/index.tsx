@@ -204,14 +204,14 @@ describe.each( [
 		await press.Enter();
 		expect(
 			screen.getByRole( 'listbox', {
-				name: 'label!',
+				name: legacyProps.label,
 			} )
 		).toBeVisible();
 
 		await press.Escape();
 		expect(
 			screen.queryByRole( 'listbox', {
-				name: 'label!',
+				name: legacyProps.label,
 			} )
 		).not.toBeInTheDocument();
 
@@ -454,8 +454,7 @@ describe.each( [
 	} );
 
 	describe( 'Keyboard behavior and accessibility', () => {
-		// skip reason: legacy v2 doesn't currently implement this behavior
-		it.skip( 'Captures the keypress event and does not let it propagate', async () => {
+		it( 'Captures the keypress event and does not let it propagate', async () => {
 			const onKeyDown = jest.fn();
 
 			render(
@@ -473,7 +472,7 @@ describe.each( [
 			await click( currentSelectedItem );
 
 			const customSelect = screen.getByRole( 'listbox', {
-				name: 'label!',
+				name: legacyProps.label,
 			} );
 			expect( customSelect ).toHaveFocus();
 			await press.Enter();
@@ -495,7 +494,7 @@ describe.each( [
 			await press.Enter();
 			expect(
 				screen.getByRole( 'listbox', {
-					name: 'label!',
+					name: legacyProps.label,
 				} )
 			).toHaveFocus();
 
@@ -519,7 +518,7 @@ describe.each( [
 			await press.Enter();
 			expect(
 				screen.getByRole( 'listbox', {
-					name: 'label!',
+					name: legacyProps.label,
 				} )
 			).toHaveFocus();
 
@@ -547,7 +546,7 @@ describe.each( [
 
 			expect(
 				screen.queryByRole( 'listbox', {
-					name: 'label!',
+					name: legacyProps.label,
 					hidden: true,
 				} )
 			).not.toBeInTheDocument();
@@ -556,6 +555,33 @@ describe.each( [
 			await press.Enter();
 
 			expect( currentSelectedItem ).toHaveTextContent( 'amber' );
+		} );
+
+		it( 'Can change selection with a focused input and closed dropdown while pressing arrow keys', async () => {
+			render( <Component { ...legacyProps } /> );
+
+			const currentSelectedItem = screen.getByRole( 'combobox', {
+				expanded: false,
+			} );
+
+			await sleep();
+			await press.Tab();
+			expect( currentSelectedItem ).toHaveFocus();
+			expect( currentSelectedItem ).toHaveTextContent(
+				legacyProps.options[ 0 ].name
+			);
+
+			await press.ArrowDown();
+			await press.ArrowDown();
+			expect(
+				screen.queryByRole( 'listbox', {
+					name: legacyProps.label,
+				} )
+			).not.toBeInTheDocument();
+
+			expect( currentSelectedItem ).toHaveTextContent(
+				legacyProps.options[ 2 ].name
+			);
 		} );
 
 		it( 'Should have correct aria-selected value for selections', async () => {
