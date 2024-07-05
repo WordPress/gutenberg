@@ -64,3 +64,5 @@ export const TimeInput = TimeInputTemplate.bind( {} );
 TimeInput.args = {
 	label: 'Time',
 };
+// Hide TimePicker controls because they don't apply to TimeInput
+TimeInput.parameters = { controls: { include: [] } };
