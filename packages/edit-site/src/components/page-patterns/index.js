@@ -61,14 +61,14 @@ const EMPTY_ARRAY = [];
 const defaultFields = {
 	[ LAYOUT_TABLE ]: [
 		'preview',
-		{ render: 'primary', field: 'title' },
+		{ format: 'primary', field: 'title' },
 		'sync-status',
 		'author',
 	],
 	[ LAYOUT_GRID ]: [
-		{ render: 'media', field: 'preview' },
-		{ render: 'primary', field: 'title' },
-		{ render: 'badge', field: 'sync-status' },
+		{ format: 'media', field: 'preview' },
+		{ format: 'primary', field: 'title' },
+		{ format: 'badge', field: 'sync-status' },
 		'author',
 	],
 };

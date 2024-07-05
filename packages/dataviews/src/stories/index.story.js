@@ -19,13 +19,13 @@ export default meta;
 
 const defaultFields = {
 	[ LAYOUT_TABLE ]: [
-		{ render: 'primary', field: 'title' },
+		{ format: 'primary', field: 'title' },
 		'description',
 		'categories',
 	],
 	[ LAYOUT_GRID ]: [
-		{ render: 'media', field: 'image' },
-		{ render: 'primary', field: 'title' },
+		{ format: 'media', field: 'image' },
+		{ format: 'primary', field: 'title' },
 		'description',
 		'categories',
 	],

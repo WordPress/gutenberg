@@ -42,7 +42,7 @@ import type {
 
 import { ActionsDropdownMenuGroup, ActionModal } from './item-actions';
 import { normalizeFieldRenderConfigs } from './normalize-field-render-configs';
-import FieldRenderPrimary from './field-render-primary';
+import FieldFormatPrimary from './field-format-primary';
 
 interface ListViewItemProps< Item > {
 	actions: Action< Item >[];
@@ -163,7 +163,7 @@ function ListItem< Item >( {
 							</div>
 							<VStack spacing={ 0 }>
 								{ !! primaryField && (
-									<FieldRenderPrimary
+									<FieldFormatPrimary
 										item={ item }
 										field={ primaryField }
 										id={ labelId }
@@ -341,10 +341,10 @@ export default function ViewList< Item >( props: ViewProps< Item > ) {
 		fields
 	);
 	const mediaFieldId = fieldRenderConfigs.find(
-		( fieldRender ) => fieldRender.render === 'media'
+		( fieldRender ) => fieldRender.format === 'media'
 	)?.field;
 	const primaryFieldId = fieldRenderConfigs.find(
-		( fieldRender ) => fieldRender.render === 'primary'
+		( fieldRender ) => fieldRender.format === 'primary'
 	)?.field;
 	const mediaField = fields.find( ( f ) => f.id === mediaFieldId );
 	const primaryField = fields.find( ( f ) => f.id === primaryFieldId );

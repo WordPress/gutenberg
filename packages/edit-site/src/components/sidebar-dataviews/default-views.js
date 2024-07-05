@@ -28,19 +28,19 @@ import {
 
 export const defaultFields = {
 	[ LAYOUT_TABLE ]: [
-		{ render: 'primary', field: 'title' },
+		{ format: 'primary', field: 'title' },
 		'author',
 		'status',
 	],
 	[ LAYOUT_GRID ]: [
-		{ render: 'media', field: 'featured-image' },
-		{ render: 'primary', field: 'title' },
+		{ format: 'media', field: 'featured-image' },
+		{ format: 'primary', field: 'title' },
 		'author',
 		'status',
 	],
 	[ LAYOUT_LIST ]: [
-		{ render: 'media', field: 'featured-image' },
-		{ render: 'primary', field: 'title' },
+		{ format: 'media', field: 'featured-image' },
+		{ format: 'primary', field: 'title' },
 		'author',
 		'status',
 	],

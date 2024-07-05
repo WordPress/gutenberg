@@ -166,7 +166,7 @@ Properties:
 -   `sort`:
     -   `field`: the field used for sorting the dataset.
     -   `direction`: the direction to use for sorting, one of `asc` or `desc`.
--   `fields`: the `id` of the fields that are visible in the UI. Can also be an object to define the render type of the field example: `{ field: 'author', render: 'media' }`.
+-   `fields`: the `id` of the fields that are visible in the UI. Can also be an object to define the render type of the field example: `{ field: 'author', format: 'media' }`.
 
 ### `onChangeView`: `function`
 

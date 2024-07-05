@@ -208,14 +208,14 @@ export interface NormalizedFilter {
 }
 
 export interface NormalizedFieldRenderConfig {
-	render: 'primary' | 'badge' | 'media' | 'column' | 'default';
+	format: 'primary' | 'badge' | 'media' | 'column' | 'default';
 	field: string;
 }
 
 export type FieldRenderConfig =
 	| string
 	| {
-			render: 'primary' | 'badge' | 'media' | 'column' | 'default';
+			format: 'primary' | 'badge' | 'media' | 'column' | 'default';
 			field: string;
 	  };
 

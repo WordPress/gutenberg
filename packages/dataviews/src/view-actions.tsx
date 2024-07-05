@@ -177,7 +177,7 @@ function FieldsVisibilityMenu< Item >( {
 		fields
 	);
 	const mediaFieldId = fieldRenderConfigs.find(
-		( fieldRender ) => fieldRender.render === 'media'
+		( fieldRender ) => fieldRender.format === 'media'
 	)?.field;
 	const hidableFields = fields.filter(
 		( field ) => field.enableHiding !== false && field.id !== mediaFieldId

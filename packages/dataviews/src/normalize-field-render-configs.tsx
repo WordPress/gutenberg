@@ -22,10 +22,10 @@ export function normalizeFieldRenderConfigs(
 	return configs
 		? configs.map( ( config ) => {
 				if ( typeof config === 'string' ) {
-					return { render: 'default', field: config };
+					return { format: 'default', field: config };
 				}
 
 				return config;
 		  } )
-		: fields.map( ( f ) => ( { render: 'default', field: f.id } ) );
+		: fields.map( ( f ) => ( { format: 'default', field: f.id } ) );
 }

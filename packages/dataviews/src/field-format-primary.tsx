@@ -3,19 +3,19 @@
  */
 import type { NormalizedField } from './types';
 
-interface FieldRenderPrimaryProps< Item > {
+interface FieldFormatPrimaryProps< Item > {
 	field: NormalizedField< Item >;
 	item: Item;
 	id?: string;
 }
 
-export default function FieldRenderPrimary< Item >( {
+export default function FieldFormatPrimary< Item >( {
 	field,
 	item,
 	id,
-}: FieldRenderPrimaryProps< Item > ) {
+}: FieldFormatPrimaryProps< Item > ) {
 	return (
-		<div className="dataviews-field-render-primary" id={ id }>
+		<div className="dataviews-field-format-primary" id={ id }>
 			{ field.render( { item } ) }
 		</div>
 	);

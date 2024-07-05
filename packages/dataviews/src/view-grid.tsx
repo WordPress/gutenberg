@@ -30,7 +30,7 @@ import type {
 } from './types';
 import type { SetSelection } from './private-types';
 import { normalizeFieldRenderConfigs } from './normalize-field-render-configs';
-import FieldRenderPrimary from './field-render-primary';
+import FieldFormatPrimary from './field-format-primary';
 
 interface GridItemProps< Item > {
 	selection: string[];
@@ -99,7 +99,7 @@ function GridItem< Item >( {
 					disabled={ ! hasBulkAction }
 				/>
 				{ !! primaryField && (
-					<FieldRenderPrimary item={ item } field={ primaryField } />
+					<FieldFormatPrimary item={ item } field={ primaryField } />
 				) }
 				<ItemActions item={ item } actions={ actions } isCompact />
 			</HStack>
@@ -154,7 +154,7 @@ function GridItem< Item >( {
 							<Flex
 								className={ clsx(
 									'dataviews-view-grid__field',
-									fieldRenderConfig.render === 'column'
+									fieldRenderConfig.format === 'column'
 										? 'is-column'
 										: 'is-row'
 								) }
@@ -164,7 +164,7 @@ function GridItem< Item >( {
 								expanded
 								style={ { height: 'auto' } }
 								direction={
-									fieldRenderConfig.render === 'column'
+									fieldRenderConfig.format === 'column'
 										? 'column'
 										: 'row'
 								}
@@ -204,10 +204,10 @@ export default function ViewGrid< Item >( {
 		fields
 	);
 	const mediaFieldId = fieldRenderConfigs.find(
-		( fieldRender ) => fieldRender.render === 'media'
+		( fieldRender ) => fieldRender.format === 'media'
 	)?.field;
 	const primaryFieldId = fieldRenderConfigs.find(
-		( fieldRender ) => fieldRender.render === 'primary'
+		( fieldRender ) => fieldRender.format === 'primary'
 	)?.field;
 	const mediaField = fields.find( ( f ) => f.id === mediaFieldId );
 	const primaryField = fields.find( ( f ) => f.id === primaryFieldId );
@@ -221,7 +221,7 @@ export default function ViewGrid< Item >( {
 			) {
 				return accumulator;
 			}
-			const key = fieldRender.render === 'badge' ? 'badge' : 'other';
+			const key = fieldRender.format === 'badge' ? 'badge' : 'other';
 			accumulator[ key ].push( fieldRender );
 			return accumulator;
 		},

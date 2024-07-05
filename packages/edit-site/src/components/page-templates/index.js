@@ -56,18 +56,18 @@ const EMPTY_ARRAY = [];
 
 const defaultFields = {
 	[ LAYOUT_TABLE ]: [
-		{ render: 'primary', field: 'title' },
+		{ format: 'primary', field: 'title' },
 		'description',
 		'author',
 	],
 	[ LAYOUT_GRID ]: [
-		{ render: 'media', field: 'preview' },
-		{ render: 'primary', field: 'title' },
-		{ render: 'column', field: 'description' },
+		{ format: 'media', field: 'preview' },
+		{ format: 'primary', field: 'title' },
+		{ format: 'column', field: 'description' },
 	],
 	[ LAYOUT_LIST ]: [
-		{ render: 'media', field: 'preview' },
-		{ render: 'primary', field: 'title' },
+		{ format: 'media', field: 'preview' },
+		{ format: 'primary', field: 'title' },
 		'author',
 	],
 };

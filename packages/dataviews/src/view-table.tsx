@@ -53,7 +53,7 @@ import type {
 	NormalizedFieldRenderConfig,
 } from './types';
 import type { SetSelection } from './private-types';
-import FieldRenderPrimary from './field-render-primary';
+import FieldFormatPrimary from './field-format-primary';
 import { normalizeFieldRenderConfigs } from './normalize-field-render-configs';
 
 const {
@@ -321,7 +321,7 @@ function TableRow< Item >( {
 	// behaviours.
 	const isTouchDevice = useRef( false );
 	const primaryFieldId = fieldRenderConfigs.find(
-		( fieldRenderConfig ) => fieldRenderConfig.render === 'primary'
+		( fieldRenderConfig ) => fieldRenderConfig.format === 'primary'
 	)?.field;
 	const primaryField = fields.find( ( f ) => f.id === primaryFieldId );
 
@@ -380,8 +380,8 @@ function TableRow< Item >( {
 					return null;
 				}
 				const fieldOutput =
-					fieldRender.render === 'primary' ? (
-						<FieldRenderPrimary field={ field } item={ item } />
+					fieldRender.format === 'primary' ? (
+						<FieldFormatPrimary field={ field } item={ item } />
 					) : (
 						field.render( { item } )
 					);
