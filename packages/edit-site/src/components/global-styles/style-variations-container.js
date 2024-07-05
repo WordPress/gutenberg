@@ -93,6 +93,10 @@ export default function StyleVariationsContainer( { gap = 2 } ) {
 		];
 	}, [ themeStyles, userStyles?.blocks, userStyles?.css ] );
 
+	if ( themeVariations.length <= 1 ) {
+		return null;
+	}
+
 	return (
 		<Grid
 			columns={ 2 }
