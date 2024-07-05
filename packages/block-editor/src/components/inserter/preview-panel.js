@@ -30,6 +30,8 @@ function InserterPreviewPanel( { item } ) {
 			innerBlocks: example.innerBlocks,
 		} );
 	}, [ name, example, initialAttributes ] );
+	// Same as height of BlockPreviewPanel.
+	const previewHeight = 144;
 
 	return (
 		<div className="block-editor-inserter__preview-container">
@@ -39,8 +41,14 @@ function InserterPreviewPanel( { item } ) {
 						<BlockPreview
 							blocks={ blocks }
 							viewportWidth={ example?.viewportWidth ?? 500 }
+							minHeight={ previewHeight }
 							additionalStyles={ [
-								{ css: 'body { padding: 24px; }' },
+								{
+									css: `body { 
+									padding: 24px;
+									min-height:100%;
+									display:flex;align-items:center;justify-content:center; }`,
+								},
 							] }
 						/>
 					</div>

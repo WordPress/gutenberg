@@ -33,7 +33,8 @@ const BlockPreviewPanel = ( { name, variation = '' } ) => {
 	}, [ name, blockExample, variation ] );
 
 	const viewportWidth = blockExample?.viewportWidth ?? null;
-	const previewHeight = 150;
+	// Same as height of InserterPreviewPanel.
+	const previewHeight = 144;
 
 	if ( ! blockExample ) {
 		return null;
@@ -47,13 +48,14 @@ const BlockPreviewPanel = ( { name, variation = '' } ) => {
 			>
 				<BlockPreview
 					blocks={ blocks }
-					viewportWidth={ viewportWidth }
+					viewportWidth={ viewportWidth ?? 500 }
 					minHeight={ previewHeight }
 					additionalStyles={ [
 						{
 							css: `
 								body{
-									min-height:${ previewHeight }px;
+									padding: 24px;
+									min-height:100%;
 									display:flex;align-items:center;justify-content:center;
 								}
 							`,
