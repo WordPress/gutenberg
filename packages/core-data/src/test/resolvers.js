@@ -289,6 +289,7 @@ describe( 'canUser', () => {
 			select: jest.fn( () => ( {
 				hasStartedResolution: () => false,
 			} ) ),
+			batch: ( callback ) => callback(),
 		};
 		triggerFetch.mockReset();
 	} );
