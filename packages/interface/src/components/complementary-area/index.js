@@ -183,7 +183,6 @@ function ComplementaryArea( {
 	title,
 	toggleShortcut,
 	isActiveByDefault,
-	hideHeader = false,
 } ) {
 	// This state is used to delay the rendering of the Fill
 	// until the initial effect runs.
@@ -296,7 +295,7 @@ function ComplementaryArea( {
 				scope={ scope }
 				id={ identifier.replace( '/', ':' ) }
 			>
-				{ ! hideHeader && (
+				{ header !== false && (
 					<ComplementaryAreaHeader
 						className={ headerClassName }
 						closeLabel={ closeLabel }

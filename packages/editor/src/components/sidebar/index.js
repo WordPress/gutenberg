@@ -103,7 +103,7 @@ const SidebarContent = ( {
 			toggleShortcut={ keyboardShortcut }
 			icon={ isRTL() ? drawerLeft : drawerRight }
 			isActiveByDefault={ SIDEBAR_ACTIVE_BY_DEFAULT }
-			hideHeader
+			header={ false }
 		>
 			<TabbedSidebar
 				tabs={ [
