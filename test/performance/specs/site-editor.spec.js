@@ -418,18 +418,23 @@ test.describe( 'Site Editor Performance', () => {
 
 			const samples = 10;
 			for ( let i = 1; i <= samples; i++ ) {
-				// We want to start from a fresh state each time, without
-				// queries or patterns already cached.
-				await admin.visitSiteEditor();
+				// Start from the trash view, then navigate to all pages, so we
+				// test item loading rather than site editor load as a whole.
+				// For some reason `visiSiteEditor` does not work with these
+				// parameters.
+				await admin.visitAdminPage(
+					'site-editor.php?postType=page&layout=table&activeView=trash'
+				);
 
 				const startTime = performance.now();
 
-				await page.getByRole( 'button', { name: 'Pages' } ).click();
+				await page.getByRole( 'button', { name: 'All Pages' } ).click();
 
+				// Wait for all pages to be rendered.
 				await Promise.all(
 					Array.from( { length: perPage }, async ( el, index ) => {
 						return await page
-							.getByRole( 'button', {
+							.getByRole( 'link', {
 								name: `Page (${ index })`,
 							} )
 							.waitFor( { state: 'attached' } );
