@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
 import type { Action } from '@wordpress/dataviews';
 
 type ReduxAction =
