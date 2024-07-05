@@ -414,12 +414,14 @@ export const canUser =
 			permissions[ actionName ] = allowedMethods.includes( methodName );
 		}
 
-		for ( const action of retrievedActions ) {
-			dispatch.receiveUserPermission(
-				`${ action }/${ resourcePath }`,
-				permissions[ action ]
-			);
-		}
+		registry.batch( () => {
+			for ( const action of retrievedActions ) {
+				dispatch.receiveUserPermission(
+					`${ action }/${ resourcePath }`,
+					permissions[ action ]
+				);
+			}
+		} );
 	};
 
 /**
