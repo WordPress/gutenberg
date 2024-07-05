@@ -190,7 +190,11 @@ export function __unstableBlockStyleVariationOverridesWithConfig( { config } ) {
  *
  * @return {Object|undefined} The global styles data for the specified variation.
  */
-function getVariationStylesWithRefValues( globalStyles, name, variation ) {
+export function getVariationStylesWithRefValues(
+	globalStyles,
+	name,
+	variation
+) {
 	if ( ! globalStyles?.styles?.blocks?.[ name ]?.variations?.[ variation ] ) {
 		return;
 	}
@@ -226,6 +230,12 @@ function getVariationStylesWithRefValues( globalStyles, name, variation ) {
 				} else {
 					// Recursively resolve `ref` values in nested objects.
 					replaceRefs( value );
+
+					// After recursion, if value is empty due to explicitly
+					// `undefined` ref value, remove it.
+					if ( Object.keys( value ).length === 0 ) {
+						delete variationStyles[ key ];
+					}
 				}
 			}
 		} );
