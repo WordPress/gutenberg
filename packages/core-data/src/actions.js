@@ -83,39 +83,70 @@ export function addEntities( entities ) {
  * @param {?Object}      meta            Meta information about pagination.
  * @return {Object} Action object.
  */
-export function receiveEntityRecords(
-	kind,
-	name,
-	records,
-	query,
-	invalidateCache = false,
-	edits,
-	meta
-) {
-	// Auto drafts should not have titles, but some plugins rely on them so we can't filter this
-	// on the server.
-	if ( kind === 'postType' ) {
-		records = ( Array.isArray( records ) ? records : [ records ] ).map(
-			( record ) =>
-				record.status === 'auto-draft'
-					? { ...record, title: '' }
-					: record
-		);
-	}
-	let action;
-	if ( query ) {
-		action = receiveQueriedItems( records, query, edits, meta );
-	} else {
-		action = receiveItems( records, edits, meta );
-	}
+export const receiveEntityRecords =
+	( kind, name, records, query, invalidateCache = false, edits, meta ) =>
+	( { dispatch, select } ) => {
+		// Auto drafts should not have titles, but some plugins rely on them so we can't filter this
+		// on the server.
+		if ( kind === 'postType' ) {
+			records = ( Array.isArray( records ) ? records : [ records ] ).map(
+				( record ) =>
+					record.status === 'auto-draft'
+						? { ...record, title: '' }
+						: record
+			);
 
-	return {
-		...action,
-		kind,
-		name,
-		invalidateCache,
+			const postTypeObject = select.getPostType( name );
+			const resource = postTypeObject?.rest_base || '';
+
+			for ( const record of records ) {
+				const allowedMethods = record.allow;
+
+				if ( allowedMethods && resource ) {
+					const resourcePath = `${ resource }/${ record.id }`;
+					const retrievedActions = [
+						'create',
+						'read',
+						'update',
+						'delete',
+					];
+					const permissions = {};
+					const methods = {
+						create: 'POST',
+						read: 'GET',
+						update: 'PUT',
+						delete: 'DELETE',
+					};
+					for ( const [ actionName, methodName ] of Object.entries(
+						methods
+					) ) {
+						permissions[ actionName ] =
+							allowedMethods.includes( methodName );
+					}
+
+					for ( const action of retrievedActions ) {
+						dispatch.receiveUserPermission(
+							`${ action }/${ resourcePath }`,
+							permissions[ action ]
+						);
+					}
+				}
+			}
+		}
+		let action;
+		if ( query ) {
+			action = receiveQueriedItems( records, query, edits, meta );
+		} else {
+			action = receiveItems( records, edits, meta );
+		}
+
+		return dispatch( {
+			...action,
+			kind,
+			name,
+			invalidateCache,
+		} );
 	};
-}
 
 /**
  * Returns an action object used in signalling that the current theme has been received.

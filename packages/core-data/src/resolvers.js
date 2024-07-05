@@ -360,6 +360,14 @@ export const getEmbedPreview =
 export const canUser =
 	( requestedAction, resource, id ) =>
 	async ( { dispatch, registry } ) => {
+		const value = registry
+			.select( STORE_NAME )
+			.canUser( requestedAction, resource, id );
+
+		if ( value !== undefined ) {
+			return;
+		}
+
 		const { hasStartedResolution } = registry.select( STORE_NAME );
 
 		const resourcePath = id ? `${ resource }/${ id }` : resource;

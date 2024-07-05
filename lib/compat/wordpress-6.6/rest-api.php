@@ -77,6 +77,55 @@ function gutenberg_add_class_list_to_public_post_types() {
 }
 add_action( 'rest_api_init', 'gutenberg_add_class_list_to_public_post_types' );
 
+/**
+ * Adds the allow methods to the REST API response.
+ *
+ * @param array $post The response object data.
+ *
+ * @return string
+ */
+function gutenberg_add_allow_to_api_response( $post ) {
+	$request = new WP_REST_Request( 'OPTIONS', rest_get_route_for_post( $post['id'] ) );
+	$response = rest_do_request( $request );
+	$server = rest_get_server();
+	$response = apply_filters( 'rest_post_dispatch', rest_ensure_response( $response ), $server, $request );
+
+	if ( is_wp_error( $response ) ) {
+		return array();
+	}
+
+	return $response->get_headers()["Allow"];
+}
+
+/**
+ * Adds the allow methods to public post types in the REST API.
+ */
+function gutenberg_add_allow_to_public_post_types() {
+	$post_types = get_post_types(
+		array(
+			'public'       => true,
+			'show_in_rest' => true,
+		),
+		'names'
+	);
+
+	if ( ! empty( $post_types ) ) {
+		register_rest_field(
+			$post_types,
+			'allow',
+			array(
+				'get_callback' => 'gutenberg_add_allow_to_api_response',
+				'schema'       => array(
+					'description' => __( 'Allowed methods for the post.', 'gutenberg' ),
+					'type'        => 'string',
+				),
+				'context'      => array( 'edit' ),
+			)
+		);
+	}
+}
+add_action( 'rest_api_init', 'gutenberg_add_allow_to_public_post_types' );
+
 
 /**
  * Registers the Global Styles Revisions REST API routes.
