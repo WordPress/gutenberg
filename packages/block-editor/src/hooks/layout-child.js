@@ -59,6 +59,19 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 				grid-column: span ${ columnSpan };
 			}`;
 		}
+		if ( rowStart && rowSpan ) {
+			css += `${ selector } {
+				grid-row: ${ rowStart } / span ${ rowSpan };
+			}`;
+		} else if ( rowStart ) {
+			css += `${ selector } {
+				grid-row: ${ rowStart };
+			}`;
+		} else if ( rowSpan ) {
+			css += `${ selector } {
+				grid-row: span ${ rowSpan };
+			}`;
+		}
 		/**
 		 * If minimumColumnWidth is set on the parent, or if no
 		 * columnCount is set, the grid is responsive so a
@@ -103,26 +116,22 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 			const containerQueryValue =
 				highestNumber * parentColumnValue +
 				( highestNumber - 1 ) * defaultGapValue;
+			// For blocks that only span one column, we want to remove any rowStart values as
+			// the container reduces in size, so that blocks are still arranged in markup order.
+			const minimumContainerQueryValue =
+				parentColumnValue * 2 + defaultGapValue - 1;
 			// If a span is set we want to preserve it as long as possible, otherwise we just reset the value.
-			const gridColumnValue = columnSpan ? '1/-1' : 'auto';
+			const gridColumnValue =
+				columnSpan && columnSpan > 1 ? '1/-1' : 'auto';
 
-			css += `@container (max-width: ${ containerQueryValue }${ parentColumnUnit }) {
+			css += `@container (max-width: ${ Math.max(
+				containerQueryValue,
+				minimumContainerQueryValue
+			) }${ parentColumnUnit }) {
 				${ selector } {
 					grid-column: ${ gridColumnValue };
+					grid-row: auto;
 				}
-			}`;
-		}
-		if ( rowStart && rowSpan ) {
-			css += `${ selector } {
-				grid-row: ${ rowStart } / span ${ rowSpan };
-			}`;
-		} else if ( rowStart ) {
-			css += `${ selector } {
-				grid-row: ${ rowStart };
-			}`;
-		} else if ( rowSpan ) {
-			css += `${ selector } {
-				grid-row: span ${ rowSpan };
 			}`;
 		}
 	}
@@ -143,7 +152,7 @@ function ChildLayoutControlsPure( { clientId, style, setAttributes } ) {
 	const {
 		type: parentLayoutType = 'default',
 		allowSizingOnChildren = false,
-		columnCount,
+		isManualPlacement,
 	} = parentLayout;
 
 	const rootClientId = useSelect(
@@ -159,8 +168,6 @@ function ChildLayoutControlsPure( { clientId, style, setAttributes } ) {
 	if ( parentLayoutType !== 'grid' ) {
 		return null;
 	}
-
-	const isManualGrid = !! columnCount;
 
 	function updateLayout( layout ) {
 		setAttributes( {
@@ -190,15 +197,16 @@ function ChildLayoutControlsPure( { clientId, style, setAttributes } ) {
 					parentLayout={ parentLayout }
 				/>
 			) }
-			{ isManualGrid && window.__experimentalEnableGridInteractivity && (
-				<GridItemMovers
-					layout={ style?.layout }
-					parentLayout={ parentLayout }
-					onChange={ updateLayout }
-					gridClientId={ rootClientId }
-					blockClientId={ clientId }
-				/>
-			) }
+			{ isManualPlacement &&
+				window.__experimentalEnableGridInteractivity && (
+					<GridItemMovers
+						layout={ style?.layout }
+						parentLayout={ parentLayout }
+						onChange={ updateLayout }
+						gridClientId={ rootClientId }
+						blockClientId={ clientId }
+					/>
+				) }
 		</>
 	);
 }

@@ -8,7 +8,7 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useCallback, useMemo } from '@wordpress/element';
+import { useCallback, useMemo, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -23,6 +23,11 @@ import TextDecorationControl from '../text-decoration-control';
 import WritingModeControl from '../writing-mode-control';
 import { getValueFromVariable, useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
+import {
+	getMergedFontFamiliesAndFontFamilyFaces,
+	findNearestFontWeight,
+} from './typography-utils';
+import { getFontStylesAndWeights } from '../../utils/get-font-styles-and-weights';
 
 const MIN_TEXT_COLUMNS = 1;
 const MAX_TEXT_COLUMNS = 6;
@@ -180,15 +185,13 @@ export default function TypographyPanel( {
 
 	// Font Family
 	const hasFontFamilyEnabled = useHasFontFamilyControl( settings );
-	const fontFamilies = settings?.typography?.fontFamilies;
-	const mergedFontFamilies = useMemo( () => {
-		return [ 'default', 'theme', 'custom' ].flatMap(
-			( key ) => fontFamilies?.[ key ] ?? []
-		);
-	}, [ fontFamilies ] );
 	const fontFamily = decodeValue( inheritedValue?.typography?.fontFamily );
+	const { fontFamilies, fontFamilyFaces } = useMemo( () => {
+		return getMergedFontFamiliesAndFontFamilyFaces( settings, fontFamily );
+	}, [ settings, fontFamily ] );
+
 	const setFontFamily = ( newValue ) => {
-		const slug = mergedFontFamilies?.find(
+		const slug = fontFamilies?.find(
 			( { fontFamily: f } ) => f === newValue
 		)?.slug;
 		onChange(
@@ -251,6 +254,39 @@ export default function TypographyPanel( {
 	const resetFontAppearance = () => {
 		setFontAppearance( {} );
 	};
+
+	// Check if previous font style and weight values are available in the new font family
+	useEffect( () => {
+		const { fontStyles, fontWeights, isSystemFont } =
+			getFontStylesAndWeights( fontFamilyFaces );
+		const hasFontStyle = fontStyles?.some(
+			( { value: fs } ) => fs === fontStyle
+		);
+		const hasFontWeight = fontWeights?.some(
+			( { value: fw } ) => fw === fontWeight
+		);
+
+		// Try to set nearest available font weight
+		if ( ! hasFontWeight && fontWeight ) {
+			setFontAppearance( {
+				fontStyle,
+				fontWeight: findNearestFontWeight( fontWeights, fontWeight ),
+			} );
+		}
+
+		// Set the same weight and style values if the font family is a system font or if both are the same
+		if ( isSystemFont || ( hasFontStyle && hasFontWeight ) ) {
+			setFontAppearance( {
+				fontStyle,
+				fontWeight,
+			} );
+		}
+
+		// Reset font appearance if the font family does not have the selected font style
+		if ( ! hasFontStyle ) {
+			resetFontAppearance();
+		}
+	}, [ fontFamily ] );
 
 	// Line Height
 	const hasLineHeightEnabled = useHasLineHeightControl( settings );
@@ -387,7 +423,7 @@ export default function TypographyPanel( {
 					panelId={ panelId }
 				>
 					<FontFamilyControl
-						fontFamilies={ mergedFontFamilies }
+						fontFamilies={ fontFamilies }
 						value={ fontFamily }
 						onChange={ setFontFamily }
 						size="__unstable-large"
@@ -431,6 +467,7 @@ export default function TypographyPanel( {
 						onChange={ setFontAppearance }
 						hasFontStyles={ hasFontStyles }
 						hasFontWeights={ hasFontWeights }
+						fontFamilyFaces={ fontFamilyFaces }
 						size="__unstable-large"
 						__nextHasNoMarginBottom
 					/>

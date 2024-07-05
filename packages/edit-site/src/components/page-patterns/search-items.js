@@ -20,11 +20,14 @@ import {
 	PATTERN_DEFAULT_CATEGORY,
 	PATTERN_USER_CATEGORY,
 	PATTERN_TYPES,
+	TEMPLATE_PART_POST_TYPE,
 } from '../../utils/constants';
 
 // Default search helpers.
-const defaultGetName = ( item ) => item.name || '';
-const defaultGetTitle = ( item ) => item.title;
+const defaultGetName = ( item ) =>
+	item.type !== TEMPLATE_PART_POST_TYPE ? item.name || '' : '';
+export const defaultGetTitle = ( item ) =>
+	typeof item.title === 'string' ? item.title : item.title.rendered;
 const defaultGetDescription = ( item ) => item.description || '';
 const defaultGetKeywords = ( item ) => item.keywords || [];
 const defaultHasCategory = () => false;

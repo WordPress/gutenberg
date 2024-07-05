@@ -110,7 +110,7 @@ export const DEFAULT_VIEW = {
 	search: '',
 	page: 1,
 	perPage: 10,
-	hiddenFields: [ 'image', 'type' ],
+	fields: [ 'title', 'description', 'categories' ],
 	layout: {},
 	filters: [],
 };

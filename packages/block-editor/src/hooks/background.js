@@ -147,11 +147,6 @@ export function BackgroundImagePanel( {
 		return null;
 	}
 
-	const defaultControls = getBlockSupport( name, [
-		BACKGROUND_SUPPORT_KEY,
-		'__experimentalDefaultControls',
-	] );
-
 	const onChange = ( newStyle ) => {
 		setAttributes( {
 			style: cleanEmptyObject( newStyle ),
@@ -172,7 +167,6 @@ export function BackgroundImagePanel( {
 		<StylesBackgroundPanel
 			as={ BackgroundInspectorControl }
 			panelId={ clientId }
-			defaultControls={ defaultControls }
 			defaultValues={ BACKGROUND_DEFAULT_VALUES }
 			settings={ updatedSettings }
 			onChange={ onChange }

@@ -182,8 +182,7 @@ export default function Image( {
 		allowResize &&
 		hasNonContentControls &&
 		! isWideAligned &&
-		isLargeViewport &&
-		parentLayoutType !== 'grid';
+		isLargeViewport;
 	const imageSizeOptions = imageSizes
 		.filter(
 			( { slug } ) => image?.media_details?.sizes?.[ slug ]?.source_url
@@ -405,6 +404,20 @@ export default function Image( {
 		/>
 	);
 
+	const aspectRatioControl = (
+		<DimensionsTool
+			value={ { aspectRatio } }
+			onChange={ ( { aspectRatio: newAspectRatio } ) => {
+				setAttributes( {
+					aspectRatio: newAspectRatio,
+					scale: 'cover',
+				} );
+			} }
+			defaultAspectRatio="auto"
+			tools={ [ 'aspectRatio' ] }
+		/>
+	);
+
 	const resetAll = () => {
 		setAttributes( {
 			alt: undefined,
@@ -423,7 +436,10 @@ export default function Image( {
 				resetAll={ resetAll }
 				dropdownMenuProps={ dropdownMenuProps }
 			>
-				{ isResizable && dimensionsControl }
+				{ isResizable &&
+					( parentLayoutType === 'grid'
+						? aspectRatioControl
+						: dimensionsControl ) }
 			</ToolsPanel>
 		</InspectorControls>
 	);
@@ -738,7 +754,10 @@ export default function Image( {
 							/>
 						</ToolsPanelItem>
 					) }
-					{ isResizable && dimensionsControl }
+					{ isResizable &&
+						( parentLayoutType === 'grid'
+							? aspectRatioControl
+							: dimensionsControl ) }
 					{ !! imageSizeOptions.length && (
 						<ResolutionTool
 							value={ sizeSlug }
@@ -848,7 +867,7 @@ export default function Image( {
 				/>
 			</ImageWrapper>
 		);
-	} else if ( ! isResizable ) {
+	} else if ( ! isResizable || parentLayoutType === 'grid' ) {
 		img = (
 			<div style={ { width, height, aspectRatio } }>
 				<ImageWrapper href={ href }>{ img }</ImageWrapper>

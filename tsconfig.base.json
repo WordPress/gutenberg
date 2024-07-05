@@ -14,6 +14,8 @@
 		"emitDeclarationOnly": true,
 		"isolatedModules": true,
 
+		"skipDefaultLibCheck": true,
+
 		/* Strict Type-Checking Options */
 		"strict": true,
 

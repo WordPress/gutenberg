@@ -243,7 +243,7 @@ When the meta box area is saving, we display an updating overlay, to prevent use
 
 An example save url would look like:
 
-`mysite.com/wp-admin/post.php?post=1&action=edit&meta-box-loader=1`
+`example.org/wp-admin/post.php?post=1&action=edit&meta-box-loader=1`
 
 This url is automatically passed into React via a `_wpMetaBoxUrl` global variable.
 

@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
 import * as Ariakit from '@ariakit/react';
 import clsx from 'clsx';
 
@@ -64,12 +63,15 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 	const children = options.map(
 		( { name, key, __experimentalHint, style, className } ) => {
 			const withHint = (
-				<Styled.WithHintWrapper>
+				<Styled.WithHintItemWrapper>
 					<span>{ name }</span>
-					<Styled.ExperimentalHintItem className="components-custom-select-control__item-hint">
+					<Styled.WithHintItemHint
+					// TODO: Legacy classname. Add V1 styles are removed from the codebase
+					// className="components-custom-select-control__item-hint"
+					>
 						{ __experimentalHint }
-					</Styled.ExperimentalHintItem>
-				</Styled.WithHintWrapper>
+					</Styled.WithHintItemHint>
+				</Styled.WithHintItemWrapper>
 			);
 
 			return (
@@ -78,7 +80,15 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 					value={ name }
 					children={ __experimentalHint ? withHint : name }
 					style={ style }
-					className={ className }
+					className={ clsx(
+						// TODO: Legacy classname. Add V1 styles are removed from the codebase
+						// 'components-custom-select-control__item',
+						className
+						// TODO: Legacy classname. Add V1 styles are removed from the codebase
+						// {
+						// 	'has-hint': __experimentalHint,
+						// }
+					) }
 				/>
 			);
 		}
@@ -94,7 +104,10 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 		return (
 			<Styled.SelectedExperimentalHintWrapper>
 				{ currentValue }
-				<Styled.SelectedExperimentalHintItem className="components-custom-select-control__hint">
+				<Styled.SelectedExperimentalHintItem
+				// TODO: Legacy classname. Add V1 styles are removed from the codebase
+				// className="components-custom-select-control__hint"
+				>
 					{ currentHint?.__experimentalHint }
 				</Styled.SelectedExperimentalHintItem>
 			</Styled.SelectedExperimentalHintWrapper>
@@ -125,9 +138,11 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 			size={ translatedSize }
 			store={ store }
 			className={ clsx(
-				'components-custom-select-control',
+				// TODO: Legacy classname. Add V1 styles are removed from the codebase
+				// 'components-custom-select-control',
 				classNameProp
 			) }
+			isLegacy
 			{ ...restProps }
 		>
 			{ children }

@@ -293,10 +293,7 @@ test.describe( 'Image', () => {
 		).toMatchSnapshot();
 	} );
 
-	// Reason - skipped temporarily until this issue is fixed:
-	// https://github.com/WordPress/wordpress-develop/pull/6875#issuecomment-2185694119
-	// eslint-disable-next-line playwright/no-skipped-test
-	test.skip( 'allows changing aspect ratio using the crop tools', async ( {
+	test( 'allows changing aspect ratio using the crop tools', async ( {
 		editor,
 		page,
 		imageBlockUtils,

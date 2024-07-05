@@ -12,7 +12,7 @@ import {
 	Flex,
 	FlexItem,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 
@@ -142,17 +142,26 @@ function FlexControls( {
 				<ToggleGroupControlOption
 					key="fit"
 					value="fit"
-					label={ __( 'Fit' ) }
+					label={ _x(
+						'Fit',
+						'Intrinsic block width in flex layout'
+					) }
 				/>
 				<ToggleGroupControlOption
 					key="fill"
 					value="fill"
-					label={ __( 'Fill' ) }
+					label={ _x(
+						'Grow',
+						'Block with expanding width in flex layout'
+					) }
 				/>
 				<ToggleGroupControlOption
 					key="fixed"
 					value="fixed"
-					label={ __( 'Fixed' ) }
+					label={ _x(
+						'Fixed',
+						'Block with fixed width in flex layout'
+					) }
 				/>
 			</ToggleGroupControl>
 			{ selfStretch === 'fixed' && (

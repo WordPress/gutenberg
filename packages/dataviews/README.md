@@ -149,7 +149,7 @@ const view = {
 		field: 'date',
 		direction: 'desc',
 	},
-	hiddenFields: [ 'date', 'featured-image' ],
+	fields: [ 'author', 'status' ],
 	layout: {},
 };
 ```
@@ -167,7 +167,7 @@ Properties:
 -   `sort`:
     -   `field`: the field used for sorting the dataset.
     -   `direction`: the direction to use for sorting, one of `asc` or `desc`.
--   `hiddenFields`: the `id` of the fields that are hidden in the UI.
+-   `fields`: the `id` of the fields that are visible in the UI.
 -   `layout`: config that is specific to a particular layout type.
     -   `mediaField`: used by the `grid` and `list` layouts. The `id` of the field to be used for rendering each card's media.
     -   `primaryField`: used by the `table`, `grid` and `list` layouts. The `id` of the field to be highlighted in each row/card/item.
@@ -199,7 +199,7 @@ function MyCustomPageTable() {
 				value: [ 'publish', 'draft' ],
 			},
 		],
-		hiddenFields: [ 'date', 'featured-image' ],
+		fields: [ 'author', 'status' ],
 		layout: {},
 	} );
 

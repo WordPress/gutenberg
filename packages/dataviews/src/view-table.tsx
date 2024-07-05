@@ -51,6 +51,7 @@ import type {
 	ViewTable as ViewTableType,
 	ViewTableProps,
 } from './types';
+import type { SetSelection } from './private-types';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -64,6 +65,7 @@ const {
 interface HeaderMenuProps< Item > {
 	field: NormalizedField< Item >;
 	view: ViewTableType;
+	fields: NormalizedField< Item >[];
 	onChangeView: ( view: ViewTableType ) => void;
 	onHide: ( field: NormalizedField< Item > ) => void;
 	setOpenedFilter: ( fieldId: string ) => void;
@@ -71,7 +73,7 @@ interface HeaderMenuProps< Item > {
 
 interface BulkSelectionCheckboxProps< Item > {
 	selection: string[];
-	onSelectionChange: ( items: Item[] ) => void;
+	onSelectionChange: SetSelection;
 	data: Item[];
 	actions: Action< Item >[];
 	getItemId: ( item: Item ) => string;
@@ -86,8 +88,7 @@ interface TableRowProps< Item > {
 	primaryField?: NormalizedField< Item >;
 	selection: string[];
 	getItemId: ( item: Item ) => string;
-	onSelectionChange: ( items: Item[] ) => void;
-	data: Item[];
+	onSelectionChange: SetSelection;
 }
 
 function WithDropDownMenuSeparators( { children }: { children: ReactNode } ) {
@@ -105,6 +106,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 	{
 		field,
 		view,
+		fields,
 		onChangeView,
 		onHide,
 		setOpenedFilter,
@@ -219,12 +221,14 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 					<DropdownMenuItem
 						prefix={ <Icon icon={ unseen } /> }
 						onClick={ () => {
+							const viewFields =
+								view.fields || fields.map( ( f ) => f.id );
 							onHide( field );
 							onChangeView( {
 								...view,
-								hiddenFields: (
-									view.hiddenFields ?? []
-								).concat( field.id ),
+								fields: viewFields.filter(
+									( fieldId ) => fieldId !== field.id
+								),
 							} );
 						} }
 					>
@@ -276,7 +280,9 @@ function BulkSelectionCheckbox< Item >( {
 				if ( areAllSelected ) {
 					onSelectionChange( [] );
 				} else {
-					onSelectionChange( selectableItems );
+					onSelectionChange(
+						selectableItems.map( ( item ) => getItemId( item ) )
+					);
 				}
 			} }
 			aria-label={
@@ -296,7 +302,6 @@ function TableRow< Item >( {
 	selection,
 	getItemId,
 	onSelectionChange,
-	data,
 }: TableRowProps< Item > ) {
 	const hasPossibleBulkAction = useHasAPossibleBulkAction( actions, item );
 	const isSelected = hasPossibleBulkAction && selection.includes( id );
@@ -336,27 +341,11 @@ function TableRow< Item >( {
 					! isTouchDevice.current &&
 					document.getSelection()?.type !== 'Range'
 				) {
-					if ( ! isSelected ) {
-						onSelectionChange(
-							data.filter( ( _item ) => {
-								const itemId = getItemId?.( _item );
-								return (
-									itemId === id ||
-									selection.includes( itemId )
-								);
-							} )
-						);
-					} else {
-						onSelectionChange(
-							data.filter( ( _item ) => {
-								const itemId = getItemId?.( _item );
-								return (
-									itemId !== id &&
-									selection.includes( itemId )
-								);
-							} )
-						);
-					}
+					onSelectionChange(
+						selection.includes( id )
+							? selection.filter( ( itemId ) => id !== itemId )
+							: [ ...selection, id ]
+					);
 				}
 			} }
 		>
@@ -373,7 +362,6 @@ function TableRow< Item >( {
 							selection={ selection }
 							onSelectionChange={ onSelectionChange }
 							getItemId={ getItemId }
-							data={ data }
 							primaryField={ primaryField }
 							disabled={ ! hasPossibleBulkAction }
 						/>
@@ -470,10 +458,12 @@ function ViewTable< Item >( {
 			: undefined;
 		setNextHeaderMenuToFocus( fallback?.node );
 	};
+
+	const viewFields = view.fields || fields.map( ( f ) => f.id );
 	const visibleFields = fields.filter(
 		( field ) =>
-			! view.hiddenFields?.includes( field.id ) &&
-			! [ view.layout.mediaField ].includes( field.id )
+			viewFields.includes( field.id ) ||
+			[ view.layout.mediaField ].includes( field.id )
 	);
 	const hasData = !! data?.length;
 
@@ -547,6 +537,7 @@ function ViewTable< Item >( {
 									} }
 									field={ field }
 									view={ view }
+									fields={ fields }
 									onChangeView={ onChangeView }
 									onHide={ onHide }
 									setOpenedFilter={ setOpenedFilter }
@@ -579,7 +570,6 @@ function ViewTable< Item >( {
 								selection={ selection }
 								getItemId={ getItemId }
 								onSelectionChange={ onSelectionChange }
-								data={ data }
 							/>
 						) ) }
 				</tbody>

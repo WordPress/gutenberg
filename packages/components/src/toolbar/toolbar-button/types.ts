@@ -22,6 +22,9 @@ export type ToolbarButtonProps = {
 	isActive?: boolean;
 	/**
 	 * Indicates if the button is disabled.
+	 *
+	 * @deprecated Use `disabled` instead.
+	 * @ignore
 	 */
 	isDisabled?: boolean;
 	/**
@@ -32,6 +35,16 @@ export type ToolbarButtonProps = {
 	 * An optional title/label for the button.
 	 */
 	title?: string;
+};
+
+export type ToolbarButtonDeprecatedProps = {
+	/**
+	 * Whether to keep the button focusable when disabled.
+	 *
+	 * @deprecated ToolbarButton will always be focusable even when disabled.
+	 * @ignore
+	 */
+	__experimentalIsFocusable?: boolean;
 };
 
 export type ToolbarButtonContainerProps = {
