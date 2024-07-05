@@ -118,7 +118,7 @@ export function curateResults(
 	return Object.fromEntries(
 		Object.entries( output )
 			// Reduce the output to contain taken metrics only.
-			.filter( ( [ _, value ] ) => value !== undefined )
+			.filter( ( [ , value ] ) => value !== undefined )
 	);
 }
 

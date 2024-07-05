@@ -9,13 +9,17 @@ import {
 /**
  * Internal dependencies
  */
+
 import StylesPreviewTypography from '../preview-typography';
-import { useTypographyVariations } from '../hooks';
+import { useCurrentMergeThemeStyleVariationsWithUserConfig } from '../../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
 import Variation from './variation';
 import Subtitle from '../subtitle';
 
 export default function TypographyVariations( { title, gap = 2 } ) {
-	const typographyVariations = useTypographyVariations();
+	const propertiesToFilter = [ 'typography' ];
+	const typographyVariations =
+		useCurrentMergeThemeStyleVariationsWithUserConfig( propertiesToFilter );
+
 	// Return null if there is only one variation (the default).
 	if ( typographyVariations?.length <= 1 ) {
 		return null;
@@ -34,7 +38,7 @@ export default function TypographyVariations( { title, gap = 2 } ) {
 						<Variation
 							key={ index }
 							variation={ variation }
-							properties={ [ 'typography' ] }
+							properties={ propertiesToFilter }
 							showTooltip
 						>
 							{ () => (
