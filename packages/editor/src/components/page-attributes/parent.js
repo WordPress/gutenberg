@@ -261,7 +261,9 @@ export function ParentRow() {
 								__(
 									"Child pages inherit characteristics from their parent, such as URL structure. For instance, if 'Web Design' is a child of 'Services,' its URL would be %1$s/services/web-design."
 								),
-								homeUrl.replace( /^https?:\/\//, '' )
+								homeUrl
+									.replace( /^https?:\/\//, '' )
+									.replace( /\/$/, '' )
 							) }
 							<p>
 								{ __(
