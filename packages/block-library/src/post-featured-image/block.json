@@ -61,7 +61,8 @@
 	"example": {
 		"viewportWidth": 350,
 		"attributes": {
-			"width": 300
+			"width": 300,
+			"height": 150
 		}
 	},
 	"supports": {
