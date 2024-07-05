@@ -316,6 +316,7 @@ function InserterMenu(
 		>
 			<div className="block-editor-inserter__main-area">
 				<TabbedSidebar
+					className="block-editor__tabbed-sidebar"
 					ref={ tabsRef }
 					onSelect={ handleSetSelectedTab }
 					onClose={ onClose }

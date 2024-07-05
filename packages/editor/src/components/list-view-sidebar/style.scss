@@ -49,3 +49,8 @@
 	}
 }
 
+.block-editor__tabbed-sidebar {
+	@include break-medium() {
+		width: 350px;
+	}
+}

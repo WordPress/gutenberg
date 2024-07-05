@@ -4,10 +4,6 @@
 	flex-direction: column;
 	flex-grow: 1;
 	overflow: hidden;
-
-	@include break-medium() {
-		width: 350px;
-	}
 }
 
 .block-editor-tabbed-sidebar__tablist-and-close-button {
