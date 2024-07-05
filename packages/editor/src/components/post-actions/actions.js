@@ -31,7 +31,6 @@ import {
 } from '../../store/constants';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import { exportPatternAsJSONAction } from './export-pattern-action';
 import { CreateTemplatePartModalContents } from '../create-template-part-modal';
 import { getItemTitle } from '../../dataviews/actions/utils';
 
@@ -914,7 +913,6 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 				duplicateTemplatePartAction,
 			isPattern && userCanCreatePostType && duplicatePatternAction,
 			supportsTitle && renamePostActionForPostType,
-			isPattern && exportPatternAsJSONAction,
 			! isTemplateOrTemplatePart && restorePostActionForPostType,
 			! isTemplateOrTemplatePart &&
 				! isPattern &&
