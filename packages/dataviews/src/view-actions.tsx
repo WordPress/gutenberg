@@ -10,7 +10,7 @@ import {
 	Button,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { memo } from '@wordpress/element';
 import { cog } from '@wordpress/icons';
 
@@ -311,7 +311,7 @@ function _ViewActions< Item >( {
 				<Button
 					size="compact"
 					icon={ cog }
-					label={ __( 'View options' ) }
+					label={ _x( 'View options', 'View is used as a noun' ) }
 				/>
 			}
 		>
