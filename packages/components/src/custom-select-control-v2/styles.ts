@@ -67,14 +67,6 @@ const getSelectItemSize = (
 	return sizes[ size ] || sizes.default;
 };
 
-export const SelectLabel = styled( Ariakit.SelectLabel )`
-	font-size: 11px;
-	font-weight: 500;
-	line-height: ${ CONFIG.fontLineHeightBase };
-	text-transform: uppercase;
-	margin-bottom: ${ space( 2 ) };
-`;
-
 export const Select = styled( Ariakit.Select, {
 	// Do not forward `hasCustomRenderProp` to the underlying Ariakit.Select component
 	shouldForwardProp: ( prop ) => prop !== 'hasCustomRenderProp',
