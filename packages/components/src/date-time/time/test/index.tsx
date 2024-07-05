@@ -333,7 +333,7 @@ describe( 'TimePicker', () => {
 		expect( monthInputIndex < dayInputIndex ).toBe( true );
 	} );
 
-	it( 'Should change layouts/orders when dateOrder is passed', () => {
+	it( 'Should change layouts/orders when `dateOrder` prop is passed', () => {
 		const onChangeSpy = jest.fn();
 
 		render(
