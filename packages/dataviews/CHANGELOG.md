@@ -6,6 +6,7 @@
 ### Breaking Changes
 
 - Replace the `hiddenFields` property in the view prop of `DataViews` with a `fields` property that accepts an array of visible fields instead.
+- Remove the `layout` property in the view prop of `DataViews`. The format is now determined by the `view.fields` property. Each field can be a string or an object with a `format` property.
 
 ### New features
 
