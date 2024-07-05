@@ -373,6 +373,15 @@ export function useSettingsForBlockElement(
 			}
 		} );
 
+		[ 'backgroundImage', 'backgroundSize' ].forEach( ( key ) => {
+			if ( ! supportedStyles.includes( key ) ) {
+				updatedSettings.background = {
+					...updatedSettings.background,
+					[ key ]: false,
+				};
+			}
+		} );
+
 		updatedSettings.shadow = supportedStyles.includes( 'shadow' )
 			? updatedSettings.shadow
 			: false;
