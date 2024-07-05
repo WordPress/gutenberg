@@ -302,23 +302,19 @@ export default function DataviewsPatterns() {
 				id: 'sync-status',
 				render: ( { item } ) => {
 					const syncStatus =
-						item.wp_pattern_sync_status || PATTERN_SYNC_TYPES.full;
+						'wp_pattern_sync_status' in item
+							? item.wp_pattern_sync_status ||
+							  PATTERN_SYNC_TYPES.full
+							: PATTERN_SYNC_TYPES.unsynced;
 					// User patterns can have their sync statuses checked directly.
 					// Non-user patterns are all unsynced for the time being.
 					return (
 						<span
-							className={ `edit-site-patterns__field-sync-status-${ item.syncStatus }` }
+							className={ `edit-site-patterns__field-sync-status-${ syncStatus }` }
 						>
 							{
-								(
-									SYNC_FILTERS.find(
-										( { value } ) => value === syncStatus
-									) ||
-									SYNC_FILTERS.find(
-										( { value } ) =>
-											value ===
-											PATTERN_SYNC_TYPES.unsynced
-									)
+								SYNC_FILTERS.find(
+									( { value } ) => value === syncStatus
 								).label
 							}
 						</span>
