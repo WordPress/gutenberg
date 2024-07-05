@@ -258,7 +258,8 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 						onChange={ ( newValue ) => {
 							onChange( {
 								...layout,
-								minimumColumnWidth: newValue,
+								minimumColumnWidth:
+									newValue === '' ? undefined : newValue,
 							} );
 						} }
 						onUnitChange={ handleUnitChange }
