@@ -51,7 +51,7 @@ function gutenberg_resolve_block_style_variation_ref_values( &$variation_data, $
 		// Only need to potentially process arrays.
 		if ( is_array( $value ) ) {
 			// If ref value is set, attempt to find its matching value and update it.
-			if ( isset( $value['ref'] ) ) {
+			if ( array_key_exists( 'ref', $value ) ) {
 				// Clean up any invalid ref value.
 				if ( empty( $value['ref'] ) || ! is_string( $value['ref'] ) ) {
 					unset( $variation_data[ $key ] );
