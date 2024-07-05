@@ -50,7 +50,7 @@ The function called when a new date or time has been selected. It is passed the 
 
 ### `is12Hour`: `boolean`
 
-Whether we use a 12-hour clock. With a 12-hour clock, an AM/PM widget is displayed.
+Whether we use a 12-hour clock. With a 12-hour clock, an AM/PM widget is displayed and the time format is assumed to be `MM-DD-YYYY` (as opposed to the default format `DD-MM-YYYY`).
 
 -   Type: `bool`
 -   Required: No
@@ -58,7 +58,7 @@ Whether we use a 12-hour clock. With a 12-hour clock, an AM/PM widget is display
 
 ### `dateOrder`: `'dmy' | 'mdy' | 'ymd'`
 
-The order of day, month, and year.
+The order of day, month, and year. This prop overrides the time format determined by `is12Hour` prop.
 
 -   Type: `string`
 -   Required: No

@@ -17,7 +17,8 @@ export type TimePickerProps = {
 	is12Hour?: boolean;
 
 	/**
-	 * The order of day, month, and year.
+	 * The order of day, month, and year. This prop overrides the time format
+	 * determined by `is12Hour` prop.
 	 *
 	 * @default 'dmy'
 	 */
