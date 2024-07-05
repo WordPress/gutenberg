@@ -58,7 +58,10 @@ export default function usePatternCategories() {
 
 		// Update the category counts to reflect user registered patterns.
 		userPatterns.forEach( ( pattern ) => {
-			pattern.categories?.forEach( ( category ) => {
+			pattern.wp_pattern_category?.forEach( ( catId ) => {
+				const category = userPatternCategories.find(
+					( cat ) => cat.id === catId
+				)?.name;
 				if ( categoryMap[ category ] ) {
 					categoryMap[ category ].count += 1;
 				}
