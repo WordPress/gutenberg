@@ -50,16 +50,32 @@ export function removePropertiesFromObject( object, properties ) {
 }
 
 /**
+ * Checks whether a style variation is empty.
+ *
+ * @param {Object} variation          A style variation object.
+ * @param {string} variation.title    The title of the variation.
+ * @param {Object} variation.settings The settings of the variation.
+ * @param {Object} variation.styles   The styles of the variation.
+ * @return {boolean} Whether the variation is empty.
+ */
+function hasThemeVariation( { title, settings, styles } ) {
+	return (
+		title === __( 'Default' ) || // Always preserve the default variation.
+		Object.keys( settings ).length > 0 ||
+		Object.keys( styles ).length > 0
+	);
+}
+
+/**
  * Fetches the current theme style variations that contain only the specified properties
  * and merges them with the user config.
  *
- * @param {Object}   props            Object of hook args.
- * @param {string[]} props.properties The properties to filter by.
+ * @param {string[]} properties The properties to filter by.
  * @return {Object[]|*} The merged object.
  */
-export function useCurrentMergeThemeStyleVariationsWithUserConfig( {
-	properties = [],
-} ) {
+export function useCurrentMergeThemeStyleVariationsWithUserConfig(
+	properties = []
+) {
 	const { variationsFromTheme } = useSelect( ( select ) => {
 		const _variationsFromTheme =
 			select(
@@ -71,6 +87,8 @@ export function useCurrentMergeThemeStyleVariationsWithUserConfig( {
 		};
 	}, [] );
 	const { user: userVariation } = useContext( GlobalStylesContext );
+
+	const propertiesAsString = properties.toString();
 
 	return useMemo( () => {
 		const clonedUserVariation = cloneDeep( userVariation );
@@ -93,11 +111,18 @@ export function useCurrentMergeThemeStyleVariationsWithUserConfig( {
 				);
 			} );
 
-		return [
+		const variationsByProperties = [
 			userVariationWithoutProperties,
 			...variationsWithPropertiesAndBase,
 		];
-	}, [ properties.toString(), userVariation, variationsFromTheme ] );
+
+		/*
+		 * Filter out variations with no settings or styles.
+		 */
+		return variationsByProperties?.length
+			? variationsByProperties.filter( hasThemeVariation )
+			: [];
+	}, [ propertiesAsString, userVariation, variationsFromTheme ] );
 }
 
 /**
