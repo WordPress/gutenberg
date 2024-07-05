@@ -42,7 +42,7 @@ import {
 import ErrorBoundary from '../error-boundary';
 import { store as editSiteStore } from '../../store';
 import useInitEditedEntityFromURL from '../sync-state-with-url/use-init-edited-entity-from-url';
-import SiteHub from '../site-hub';
+import { default as SiteHub, SiteHubMobile } from '../site-hub';
 import ResizableFrame from '../resizable-frame';
 import useSyncCanvasModeWithURL from '../sync-state-with-url/use-sync-canvas-mode-with-url';
 import { unlock } from '../../lock-unlock';
@@ -220,6 +220,16 @@ export default function Layout() {
 
 					{ isMobileViewport && areas.mobile && (
 						<div className="edit-site-layout__mobile">
+							{ canvasMode !== 'edit' && (
+								<SidebarContent routeKey={ routeKey }>
+									<SiteHubMobile
+										ref={ toggleRef }
+										isTransparent={
+											isResizableFrameOversized
+										}
+									/>
+								</SidebarContent>
+							) }
 							{ areas.mobile }
 						</div>
 					) }
