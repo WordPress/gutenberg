@@ -81,7 +81,7 @@ function gutenberg_render_block_style_variation_support_styles( $parsed_block ) 
 
 	// Recursively resolve any ref values with the appropriate value within the
 	// theme_json data.
-	$replace_refs = function ( &$variation_data ) use( &$replace_refs, $theme_json ) {
+	$replace_refs = function ( &$variation_data ) use ( &$replace_refs, $theme_json ) {
 		foreach ( $variation_data as $key => &$value ) {
 			// Only need to potentially process arrays.
 			if ( is_array( $value ) ) {
