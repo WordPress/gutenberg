@@ -39,6 +39,43 @@ function gutenberg_get_block_style_variation_name_from_class( $class_string ) {
 }
 
 /**
+ * Recursively resolves any `ref` values within a block style variation's data.
+ *
+ * @since 6.6.0
+ *
+ * @param array $variation_data Reference to the variation data being processed.
+ * @param array $theme_json     Theme.json data to retrieve referenced values from.
+ */
+function gutenberg_resolve_block_style_variation_ref_values( &$variation_data, $theme_json ) {
+	foreach ( $variation_data as $key => &$value ) {
+		// Only need to potentially process arrays.
+		if ( is_array( $value ) ) {
+			// If ref value is set, attempt to find its matching value and update it.
+			if ( isset( $value['ref'] ) ) {
+				// Clean up any invalid ref value.
+				if ( empty( $value['ref'] ) || ! is_string( $value['ref'] ) ) {
+					unset( $variation_data[ $key ] );
+				}
+
+				$value_path = explode( '.', $value['ref'] ?? '' );
+				$ref_value  = _wp_array_get( $theme_json, $value_path );
+
+				// Only update this value if the referenced path matched a value.
+				if ( $ref_value ) {
+					$value = $ref_value;
+				} else {
+					// Otherwise, remove the ref node.
+					unset( $variation_data[ $key ] );
+				}
+			} else {
+				// Recursively look for ref instances.
+				gutenberg_resolve_block_style_variation_ref_values( $value, $theme_json );
+			}
+		}
+	}
+}
+
+/**
  * Render the block style variation's styles.
  *
  * In the case of nested blocks with variations applied, we want the parent
@@ -81,35 +118,7 @@ function gutenberg_render_block_style_variation_support_styles( $parsed_block ) 
 
 	// Recursively resolve any ref values with the appropriate value within the
 	// theme_json data.
-	$replace_refs = function ( &$variation_data ) use ( &$replace_refs, $theme_json ) {
-		foreach ( $variation_data as $key => &$value ) {
-			// Only need to potentially process arrays.
-			if ( is_array( $value ) ) {
-				// If ref value is set, attempt to find its matching value and update it.
-				if ( isset( $value['ref'] ) ) {
-					// Clean up any invalid ref value.
-					if ( empty( $value['ref'] ) || ! is_string( $value['ref'] ) ) {
-						unset( $variation_data[ $key ] );
-					}
-
-					$value_path = explode( '.', $value['ref'] ?? '' );
-					$ref_value  = _wp_array_get( $theme_json, $value_path );
-
-					// Only update this value if the referenced path matched a value.
-					if ( $ref_value ) {
-						$value = $ref_value;
-					} else {
-						// Otherwise, remove the ref node.
-						unset( $variation_data[ $key ] );
-					}
-				} else {
-					// Recursively look for ref instances.
-					$replace_refs( $value, $theme_json );
-				}
-			}
-		}
-	};
-	$replace_refs( $variation_data );
+	gutenberg_resolve_block_style_variation_ref_values( $variation_data, $theme_json );
 
 	$variation_instance = gutenberg_create_block_style_variation_instance_name( $parsed_block, $variation );
 	$class_name         = "is-style-$variation_instance";
