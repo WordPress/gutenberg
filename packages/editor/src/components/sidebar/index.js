@@ -7,17 +7,10 @@ import {
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	Platform,
-	useCallback,
-	useContext,
-	useEffect,
-	useRef,
-} from '@wordpress/element';
+import { Platform, useCallback, useEffect, useRef } from '@wordpress/element';
 import { isRTL, __, _x } from '@wordpress/i18n';
 import { drawerLeft, drawerRight } from '@wordpress/icons';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { store as interfaceStore } from '@wordpress/interface';
 
 /**
@@ -41,7 +34,6 @@ import {
 	TEMPLATE_POST_TYPE,
 } from '../../store/constants';
 
-const { Tabs } = unlock( componentsPrivateApis );
 const { TabbedSidebar } = unlock( blockEditorPrivateApis );
 
 const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {
@@ -58,10 +50,6 @@ const SidebarContent = ( {
 	onSelect,
 } ) => {
 	const tabListRef = useRef( null );
-	// Because `PluginSidebar` renders a `ComplementaryArea`, we
-	// need to forward the `Tabs` context so it can be passed through the
-	// underlying slot/fill.
-	const tabsContextValue = useContext( Tabs.Context );
 
 	// This effect addresses a race condition caused by tabbing from the last
 	// block in the editor into the settings sidebar. Without this effect, the
@@ -151,24 +139,7 @@ const SidebarContent = ( {
 				defaultTabId={ sidebars.document }
 				ref={ tabListRef }
 				closeButtonLabel={ __( 'Close Settings' ) }
-				tabsContextValue={ tabsContextValue }
 			/>
-
-			<Tabs.Context.Provider value={ tabsContextValue }>
-				<Tabs.TabPanel tabId={ sidebars.document } focusable={ false }>
-					<PostSummary onActionPerformed={ onActionPerformed } />
-					<PluginDocumentSettingPanel.Slot />
-					<TemplateContentPanel renderingMode={ renderingMode } />
-					<TemplatePartContentPanel />
-					<PostTransformPanel />
-					<PostTaxonomiesPanel />
-					<PatternOverridesPanel />
-					{ extraPanels }
-				</Tabs.TabPanel>
-				<Tabs.TabPanel tabId={ sidebars.block } focusable={ false }>
-					<BlockInspector />
-				</Tabs.TabPanel>
-			</Tabs.Context.Provider>
 		</PluginSidebar>
 	);
 };
