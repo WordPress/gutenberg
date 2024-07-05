@@ -92,10 +92,7 @@ export default function DataViews< Item >( {
 		?.component as ComponentType< ViewBaseProps< Item > >;
 	const _fields = useMemo( () => normalizeFields( fields ), [ fields ] );
 
-	const hasPossibleBulkAction = useSomeItemHasAPossibleBulkAction(
-		actions,
-		data
-	);
+	const hasPossibleBulkAction = useSomeItemHasAPossibleBulkAction( actions );
 	const _selection = useMemo( () => {
 		return selection.filter( ( id ) =>
 			data.some( ( item ) => getItemId( item ) === id )

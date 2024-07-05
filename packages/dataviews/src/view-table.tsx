@@ -426,7 +426,7 @@ function ViewTable< Item >( {
 	const headerMenuToFocusRef = useRef< HTMLButtonElement >();
 	const [ nextHeaderMenuToFocus, setNextHeaderMenuToFocus ] =
 		useState< HTMLButtonElement >();
-	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
+	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions );
 
 	useEffect( () => {
 		if ( headerMenuToFocusRef.current ) {
