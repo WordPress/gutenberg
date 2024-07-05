@@ -289,36 +289,51 @@ describe( 'TimePicker', () => {
 		expect( screen.getByText( 'PM' ) ).toHaveClass( 'is-primary' );
 	} );
 
-	it( 'should have default layouts/orders', () => {
+	it( 'should have different layouts/orders for 12/24 hour formats', () => {
 		const onChangeSpy = jest.fn();
 
-		render(
+		const { rerender } = render(
 			<form aria-label="form">
 				<TimePicker
 					currentTime="1986-10-18T11:00:00"
 					onChange={ onChangeSpy }
+					is12Hour={ false }
 				/>
 			</form>
 		);
 
 		const form = screen.getByRole( 'form' ) as HTMLFormElement;
 
-		const yearInputIndex = Array.from( form.elements ).indexOf(
-			screen.getByLabelText( 'Year' )
-		);
-
-		const monthInputIndex = Array.from( form.elements ).indexOf(
+		let monthInputIndex = Array.from( form.elements ).indexOf(
 			screen.getByLabelText( 'Month' )
 		);
-		const dayInputIndex = Array.from( form.elements ).indexOf(
+		let dayInputIndex = Array.from( form.elements ).indexOf(
 			screen.getByLabelText( 'Day' )
 		);
 
-		expect( yearInputIndex > monthInputIndex ).toBe( true );
 		expect( monthInputIndex > dayInputIndex ).toBe( true );
+
+		rerender(
+			<form aria-label="form">
+				<TimePicker
+					currentTime="1986-10-18T11:00:00"
+					onChange={ onChangeSpy }
+					is12Hour
+				/>
+			</form>
+		);
+
+		monthInputIndex = Array.from( form.elements ).indexOf(
+			screen.getByLabelText( 'Month' )
+		);
+		dayInputIndex = Array.from( form.elements ).indexOf(
+			screen.getByLabelText( 'Day' )
+		);
+
+		expect( monthInputIndex < dayInputIndex ).toBe( true );
 	} );
 
-	it( 'should change layouts/orders when dateOrder is changed', () => {
+	it( 'Should change layouts/orders when dateOrder is passed', () => {
 		const onChangeSpy = jest.fn();
 
 		render(
@@ -348,7 +363,7 @@ describe( 'TimePicker', () => {
 		expect( dayInputIndex > monthInputIndex ).toBe( true );
 	} );
 
-	it( 'should ignore `is12Hour` prop setting when `dateOrder` prop is explicitly passed', () => {
+	it( 'Should ignore `is12Hour` prop setting when `dateOrder` prop is explicitly passed', () => {
 		const onChangeSpy = jest.fn();
 
 		render(
