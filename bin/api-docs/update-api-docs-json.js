@@ -216,7 +216,7 @@ glob.stream( [
 				,
 				path = findDefaultSourcePath( dirname( file ) ),
 			] of tokens ) {
-				const { stdout } = await execa(
+				await execa(
 					`"${ join(
 						__dirname,
 						'..',
@@ -227,16 +227,12 @@ glob.stream( [
 					) }"`,
 					[
 						relative( ROOT_DIR, resolve( dirname( file ), path ) ),
-						`--output ${ output.replace(
-							'README',
-							file
-						) }.replace(".md", ".json") }`,
+						`--output ${ output.replace( '.md', '.json' ) }`,
 						`--formatter=./packages/docgen/lib/phpdoc-parser/index.js`,
 						'--ignore "/unstable|experimental/i"',
 					],
 					{ shell: true }
 				);
-				console.log( stdout );
 			}
 			await execa( 'npm', [ 'run', 'format', output ], {
 				shell: true,
