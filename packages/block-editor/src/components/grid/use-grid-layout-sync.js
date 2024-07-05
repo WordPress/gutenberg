@@ -31,9 +31,8 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 		const updates = {};
 
 		const { columnCount, rowCount, isManualPlacement } = gridLayout;
-		const isManualGrid = !! isManualPlacement;
 
-		if ( isManualGrid ) {
+		if ( isManualPlacement ) {
 			const rects = [];
 
 			// Respect the position of blocks that already have a columnStart and rowStart value.
