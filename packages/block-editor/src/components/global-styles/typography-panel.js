@@ -25,9 +25,8 @@ import { getValueFromVariable, useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
 import {
 	getMergedFontFamiliesAndFontFamilyFaces,
-	findNearestFontWeight,
+	findNearestStyleAndWeight,
 } from './typography-utils';
-import { getFontStylesAndWeights } from '../../utils/get-font-styles-and-weights';
 
 const MIN_TEXT_COLUMNS = 1;
 const MAX_TEXT_COLUMNS = 6;
@@ -257,55 +256,13 @@ export default function TypographyPanel( {
 
 	// Check if previous font style and weight values are available in the new font family
 	useEffect( () => {
-		const { fontStyles, fontWeights, combinedStyleAndWeightOptions } =
-			getFontStylesAndWeights( fontFamilyFaces );
-		const hasFontStyle = fontStyles?.some(
-			( { value: fs } ) => fs === fontStyle
-		);
-		const hasFontWeight = fontWeights?.some(
-			( { value: fw } ) => fw === fontWeight
-		);
+		const { nearestFontStyle, nearestFontWeight } =
+			findNearestStyleAndWeight( fontFamilyFaces, fontStyle, fontWeight );
 
-		// Default to previous values if they are available
-		let newFontStyle = fontStyle;
-		let newFontWeight = fontWeight;
-
-		if ( ! hasFontStyle ) {
-			if ( ! fontStyle && fontWeight ) {
-				newFontStyle = combinedStyleAndWeightOptions?.find(
-					( option ) => option.style.fontWeight === fontWeight
-				)?.style?.fontStyle;
-			}
-
-			if ( ! fontWeight && ! fontStyle ) {
-				newFontStyle = undefined;
-			}
-		}
-
-		if ( ! hasFontWeight ) {
-			if ( fontWeight ) {
-				newFontWeight = findNearestFontWeight(
-					fontWeights,
-					fontWeight
-				);
-			}
-
-			if ( ! fontWeight && fontStyle ) {
-				newFontWeight = newFontWeight =
-					combinedStyleAndWeightOptions?.find(
-						( option ) => option.style.fontStyle === fontStyle
-					)?.style?.fontWeight;
-			}
-
-			if ( ! fontWeight && ! fontStyle ) {
-				newFontWeight = undefined;
-			}
-		}
-
-		if ( newFontStyle && newFontWeight ) {
+		if ( nearestFontStyle && nearestFontWeight ) {
 			setFontAppearance( {
-				fontStyle: newFontStyle,
-				fontWeight: newFontWeight,
+				fontStyle: nearestFontStyle,
+				fontWeight: nearestFontWeight,
 			} );
 		} else {
 			// Reset font appearance if there are no available styles or weights

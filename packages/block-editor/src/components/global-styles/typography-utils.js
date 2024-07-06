@@ -11,6 +11,7 @@ import {
 	getComputedFluidTypographyValue,
 	getTypographyValueAndUnit,
 } from '../font-sizes/fluid-utils';
+import { getFontStylesAndWeights } from '../../utils/get-font-styles-and-weights';
 
 /**
  * @typedef {Object} FluidPreset
@@ -184,4 +185,61 @@ export function findNearestFontWeight(
 	);
 
 	return nearestFontWeight;
+}
+
+/**
+ * Returns the nearest font style and weight based on the available font family faces and the new font style and weight.
+ *
+ * @param {Array}  fontFamilyFaces Array of available font family faces
+ * @param {string} fontStyle       New font style
+ * @param {string} fontWeight      New font weight
+ * @return {Object} Nearest font style and weight
+ */
+export function findNearestStyleAndWeight(
+	fontFamilyFaces,
+	fontStyle,
+	fontWeight
+) {
+	if ( ! fontStyle && ! fontWeight ) {
+		return { nearestFontStyle: undefined, nearestFontWeight: undefined };
+	}
+
+	// Default to previous values if they are available
+	let nearestFontStyle = fontStyle ?? undefined;
+	let nearestFontWeight = fontWeight ?? undefined;
+
+	const { fontStyles, fontWeights, combinedStyleAndWeightOptions } =
+		getFontStylesAndWeights( fontFamilyFaces );
+
+	const hasFontStyle = fontStyles?.some(
+		( { value: fs } ) => fs === fontStyle
+	);
+	const hasFontWeight = fontWeights?.some(
+		( { value: fw } ) => fw === fontWeight
+	);
+
+	if ( ! hasFontStyle ) {
+		if ( fontWeight ) {
+			nearestFontStyle = combinedStyleAndWeightOptions?.find(
+				( option ) => option.style.fontWeight === fontWeight
+			)?.style?.fontStyle;
+		}
+	}
+
+	if ( ! hasFontWeight ) {
+		if ( fontWeight ) {
+			nearestFontWeight = findNearestFontWeight(
+				fontWeights,
+				fontWeight
+			);
+		}
+
+		if ( ! fontWeight && fontStyle ) {
+			nearestFontWeight = combinedStyleAndWeightOptions?.find(
+				( option ) => option.style.fontStyle === fontStyle
+			)?.style?.fontWeight;
+		}
+	}
+
+	return { nearestFontStyle, nearestFontWeight };
 }
