@@ -191,26 +191,22 @@ export function findNearestFontWeight(
  * Returns the nearest font style and weight based on the available font family faces and the new font style and weight.
  *
  * @param {Array}  fontFamilyFaces Array of available font family faces
- * @param {string} fontStyle       New font style
- * @param {string} fontWeight      New font weight
- * @return {Object} Nearest font style and weight
+ * @param {string} fontStyle       New font style. Defaults to previous value.
+ * @param {string} fontWeight      New font weight. Defaults to previous value.
+ * @return {Object} Nearest font style and font weight
  */
 export function findNearestStyleAndWeight(
 	fontFamilyFaces,
 	fontStyle,
 	fontWeight
 ) {
-	if ( ! fontStyle && ! fontWeight ) {
-		return { nearestFontStyle: undefined, nearestFontWeight: undefined };
-	}
-
-	// Default to previous values if they are available
-	let nearestFontStyle = fontStyle ?? undefined;
-	let nearestFontWeight = fontWeight ?? undefined;
+	let nearestFontStyle = fontStyle;
+	let nearestFontWeight = fontWeight;
 
 	const { fontStyles, fontWeights, combinedStyleAndWeightOptions } =
 		getFontStylesAndWeights( fontFamilyFaces );
 
+	// Check if the new font style and weight are available in the font family faces
 	const hasFontStyle = fontStyles?.some(
 		( { value: fs } ) => fs === fontStyle
 	);
@@ -219,26 +215,24 @@ export function findNearestStyleAndWeight(
 	);
 
 	if ( ! hasFontStyle ) {
-		if ( fontWeight ) {
-			nearestFontStyle = combinedStyleAndWeightOptions?.find(
-				( option ) => option.style.fontWeight === fontWeight
-			)?.style?.fontStyle;
-		}
+		nearestFontStyle =
+			fontStyle === 'oblique'
+				? 'italic'
+				: combinedStyleAndWeightOptions?.find(
+						( option ) =>
+							option.style.fontWeight ===
+							findNearestFontWeight( fontWeights, fontWeight )
+				  )?.style?.fontStyle;
 	}
 
 	if ( ! hasFontWeight ) {
-		if ( fontWeight ) {
-			nearestFontWeight = findNearestFontWeight(
-				fontWeights,
-				fontWeight
-			);
-		}
-
-		if ( ! fontWeight && fontStyle ) {
-			nearestFontWeight = combinedStyleAndWeightOptions?.find(
-				( option ) => option.style.fontStyle === fontStyle
-			)?.style?.fontWeight;
-		}
+		nearestFontWeight = fontWeight
+			? findNearestFontWeight( fontWeights, fontWeight )
+			: combinedStyleAndWeightOptions?.find(
+					( option ) =>
+						option.style.fontStyle ===
+						( nearestFontStyle || fontStyle )
+			  )?.style?.fontWeight;
 	}
 
 	return { nearestFontStyle, nearestFontWeight };
