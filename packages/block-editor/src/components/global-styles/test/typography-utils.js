@@ -1066,7 +1066,7 @@ describe( 'typography utils', () => {
 			},
 			{
 				message:
-					'should return nearest fontStyle and fontWeight for italic/700',
+					'should return nearest fontStyle and fontWeight for italic/900',
 				fontFamilyFaces: [
 					{
 						fontFamily: 'IBM Plex Mono',
