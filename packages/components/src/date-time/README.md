@@ -62,7 +62,7 @@ The order of day, month, and year. This prop overrides the time format determine
 
 -   Type: `string`
 -   Required: No
--   Default: `dmy`
+-   Default: `'dmy'`
 
 ### `isInvalidDate`: `( date: Date ) => boolean`
 
