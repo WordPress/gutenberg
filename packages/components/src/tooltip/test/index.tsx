@@ -106,7 +106,7 @@ describe( 'Tooltip', () => {
 			).not.toHaveAttribute( 'data-foo' );
 		} );
 
-		it( 'should add custom class to the tooltip', async () => {
+		it( 'should add default and custom class names to the tooltip', async () => {
 			render( <Tooltip { ...props } className="foo" /> );
 
 			// Hover over the anchor, tooltip should show
