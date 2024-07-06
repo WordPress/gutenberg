@@ -59,9 +59,7 @@ export type TooltipProps = {
 	 */
 	text?: string;
 	/**
-	 * The custom class name for the tooltip.
-	 * The default class for tooltip is `components-tooltip` and always will be added.
-	 * The custom class name will be appended to the default class.
+	 * Custom class name for the tooltip, in addition to the default `components-tooltip`.
 	 */
 	className?: string;
 };
