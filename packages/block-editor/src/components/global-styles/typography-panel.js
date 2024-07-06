@@ -257,7 +257,7 @@ export default function TypographyPanel( {
 
 	// Check if previous font style and weight values are available in the new font family
 	useEffect( () => {
-		const { fontStyles, fontWeights, isSystemFont } =
+		const { fontStyles, fontWeights, combinedStyleAndWeightOptions } =
 			getFontStylesAndWeights( fontFamilyFaces );
 		const hasFontStyle = fontStyles?.some(
 			( { value: fs } ) => fs === fontStyle
@@ -266,24 +266,49 @@ export default function TypographyPanel( {
 			( { value: fw } ) => fw === fontWeight
 		);
 
-		// Try to set nearest available font weight
-		if ( ! hasFontWeight && fontWeight ) {
-			setFontAppearance( {
-				fontStyle,
-				fontWeight: findNearestFontWeight( fontWeights, fontWeight ),
-			} );
-		}
+		// Default to previous values if they are available
+		let newFontStyle = fontStyle;
+		let newFontWeight = fontWeight;
 
-		// Set the same weight and style values if the font family is a system font or if both are the same
-		if ( isSystemFont || ( hasFontStyle && hasFontWeight ) ) {
-			setFontAppearance( {
-				fontStyle,
-				fontWeight,
-			} );
-		}
-
-		// Reset font appearance if the font family does not have the selected font style
 		if ( ! hasFontStyle ) {
+			if ( ! fontStyle && fontWeight ) {
+				newFontStyle = combinedStyleAndWeightOptions?.find(
+					( option ) => option.style.fontWeight === fontWeight
+				)?.style?.fontStyle;
+			}
+
+			if ( ! fontWeight && ! fontStyle ) {
+				newFontStyle = undefined;
+			}
+		}
+
+		if ( ! hasFontWeight ) {
+			if ( fontWeight ) {
+				newFontWeight = findNearestFontWeight(
+					fontWeights,
+					fontWeight
+				);
+			}
+
+			if ( ! fontWeight && fontStyle ) {
+				newFontWeight = newFontWeight =
+					combinedStyleAndWeightOptions?.find(
+						( option ) => option.style.fontStyle === fontStyle
+					)?.style?.fontWeight;
+			}
+
+			if ( ! fontWeight && ! fontStyle ) {
+				newFontWeight = undefined;
+			}
+		}
+
+		if ( newFontStyle && newFontWeight ) {
+			setFontAppearance( {
+				fontStyle: newFontStyle,
+				fontWeight: newFontWeight,
+			} );
+		} else {
+			// Reset font appearance if there are no available styles or weights
 			resetFontAppearance();
 		}
 	}, [ fontFamily ] );
