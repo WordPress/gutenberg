@@ -2,6 +2,7 @@
  * External dependencies
  */
 import * as Ariakit from '@ariakit/react';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
