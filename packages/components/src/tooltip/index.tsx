@@ -45,13 +45,13 @@ function UnforwardedTooltip(
 ) {
 	const {
 		children,
+		className,
 		delay = TOOLTIP_DELAY,
 		hideOnClick = true,
 		placement,
 		position,
 		shortcut,
 		text,
-		className,
 
 		...restProps
 	} = props;
