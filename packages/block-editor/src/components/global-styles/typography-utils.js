@@ -190,10 +190,10 @@ export function findNearestFontWeight(
 /**
  * Returns the nearest font style and weight based on the available font family faces and the new font style and weight.
  *
- * @param {Array}  fontFamilyFaces Array of available font family faces
+ * @param {Array}  fontFamilyFaces Array of available font family faces.
  * @param {string} fontStyle       New font style. Defaults to previous value.
  * @param {string} fontWeight      New font weight. Defaults to previous value.
- * @return {Object} Nearest font style and font weight
+ * @return {Object} Nearest font style and font weight.
  */
 export function findNearestStyleAndWeight(
 	fontFamilyFaces,
