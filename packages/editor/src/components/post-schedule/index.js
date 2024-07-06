@@ -6,6 +6,7 @@ import { parseISO, endOfMonth, startOfMonth } from 'date-fns';
 /**
  * WordPress dependencies
  */
+import { getSettings } from '@wordpress/date';
 import { _x } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
@@ -80,10 +81,24 @@ export function PrivatePostSchedule( {
 		[ eventsByPostType ]
 	);
 
+	const settings = getSettings();
+
+	// To know if the current timezone is a 12 hour time with look for "a" in the time format
+	// We also make sure this a is not escaped by a "/"
+	const is12HourTime = /a(?!\\)/i.test(
+		settings.formats.time
+			.toLowerCase() // Test only the lower case a.
+			.replace( /\\\\/g, '' ) // Replace "//" with empty strings.
+			.split( '' )
+			.reverse()
+			.join( '' ) // Reverse the string and test for "a" not followed by a slash.
+	);
+
 	return (
 		<PrivatePublishDateTimePicker
 			currentDate={ postDate }
 			onChange={ onUpdateDate }
+			is12Hour={ is12HourTime }
 			dateOrder={
 				/* translators: Order of day, month, and year. Available formats are 'dmy', 'mdy', and 'ymd'. */
 				_x( 'dmy', 'date order' )
