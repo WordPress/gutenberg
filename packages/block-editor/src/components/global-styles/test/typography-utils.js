@@ -6,6 +6,7 @@ import {
 	getFluidTypographyOptionsFromSettings,
 	getMergedFontFamiliesAndFontFamilyFaces,
 	findNearestFontWeight,
+	findNearestStyleAndWeight,
 } from '../typography-utils';
 
 describe( 'typography utils', () => {
@@ -944,6 +945,223 @@ describe( 'typography utils', () => {
 						findNearestFontWeight(
 							availableFontWeights,
 							newFontWeightValue
+						)
+					).toEqual( expected );
+				} );
+			}
+		);
+	} );
+
+	describe( 'findNearestStyleAndWeight', () => {
+		[
+			{
+				message: 'should return empty object when all values are empty',
+				fontFamilyFaces: [],
+				fontStyle: undefined,
+				fontWeight: undefined,
+				expected: {},
+			},
+			{
+				message:
+					'should return original fontStyle and fontWeight when fontFamilyFaces is empty',
+				fontFamilyFaces: [],
+				fontStyle: 'italic',
+				fontWeight: '700',
+				expected: {
+					nearestFontStyle: 'italic',
+					nearestFontWeight: '700',
+				},
+			},
+			{
+				message:
+					'should return undefined values if fontStyle and fontWeight are not available',
+				fontFamilyFaces: [
+					{
+						fontFamily: 'ABeeZee',
+						fontStyle: 'italic',
+						fontWeight: '400',
+						src: [
+							'file:./assets/fonts/esDT31xSG-6AGleN2tCkkJUCGpG-GQ.woff2',
+						],
+					},
+				],
+				fontStyle: undefined,
+				fontWeight: undefined,
+				expected: {
+					nearestFontStyle: undefined,
+					nearestFontWeight: undefined,
+				},
+			},
+			{
+				message:
+					'should return nearest fontStyle and fontWeight for normal/400',
+				fontFamilyFaces: [
+					{
+						fontFamily: 'IBM Plex Mono',
+						fontStyle: 'normal',
+						fontWeight: '400',
+						src: [
+							'file:./assets/fonts/ibm-plex-mono/IBMPlexMono-Regular.woff2',
+						],
+					},
+					{
+						fontFamily: 'IBM Plex Mono',
+						fontStyle: 'italic',
+						fontWeight: '400',
+						src: [
+							'file:./assets/fonts/ibm-plex-mono/IBMPlexMono-Italic.woff2',
+						],
+					},
+					{
+						fontFamily: 'IBM Plex Mono',
+						fontStyle: 'normal',
+						fontWeight: '700',
+						src: [
+							'file:./assets/fonts/ibm-plex-mono/IBMPlexMono-Bold.woff2',
+						],
+					},
+				],
+				fontStyle: 'normal',
+				fontWeight: '100',
+				expected: {
+					nearestFontStyle: 'normal',
+					nearestFontWeight: '400',
+				},
+			},
+			{
+				message:
+					'should return nearest fontStyle and fontWeight for italic/700',
+				fontFamilyFaces: [
+					{
+						fontFamily: 'IBM Plex Mono',
+						fontStyle: 'normal',
+						fontWeight: '400',
+						src: [
+							'file:./assets/fonts/ibm-plex-mono/IBMPlexMono-Regular.woff2',
+						],
+					},
+					{
+						fontFamily: 'IBM Plex Mono',
+						fontStyle: 'italic',
+						fontWeight: '400',
+						src: [
+							'file:./assets/fonts/ibm-plex-mono/IBMPlexMono-Italic.woff2',
+						],
+					},
+					{
+						fontFamily: 'IBM Plex Mono',
+						fontStyle: 'normal',
+						fontWeight: '700',
+						src: [
+							'file:./assets/fonts/ibm-plex-mono/IBMPlexMono-Bold.woff2',
+						],
+					},
+				],
+				fontStyle: 'italic',
+				fontWeight: '900',
+				expected: {
+					nearestFontStyle: 'italic',
+					nearestFontWeight: '700',
+				},
+			},
+			{
+				message:
+					'should return nearest fontStyle and fontWeight for oblique/600',
+				fontFamilyFaces: [
+					{
+						fontFamily: 'IBM Plex Mono',
+						fontStyle: 'normal',
+						fontWeight: '400',
+						src: [
+							'file:./assets/fonts/ibm-plex-mono/IBMPlexMono-Regular.woff2',
+						],
+					},
+					{
+						fontFamily: 'IBM Plex Mono',
+						fontStyle: 'italic',
+						fontWeight: '700',
+						src: [
+							'file:./assets/fonts/ibm-plex-mono/IBMPlexMono-Bold.woff2',
+						],
+					},
+				],
+				fontStyle: 'oblique',
+				fontWeight: '600',
+				expected: {
+					nearestFontStyle: 'italic',
+					nearestFontWeight: '700',
+				},
+			},
+			{
+				message:
+					'should return nearest fontStyle and fontWeight for just 300',
+				fontFamilyFaces: [
+					{
+						fontFamily: 'IBM Plex Mono',
+						fontStyle: 'normal',
+						fontWeight: '400',
+						src: [
+							'file:./assets/fonts/ibm-plex-mono/IBMPlexMono-Regular.woff2',
+						],
+					},
+					{
+						fontFamily: 'IBM Plex Mono',
+						fontStyle: 'italic',
+						fontWeight: '700',
+						src: [
+							'file:./assets/fonts/ibm-plex-mono/IBMPlexMono-Bold.woff2',
+						],
+					},
+				],
+				fontStyle: undefined,
+				fontWeight: '300',
+				expected: {
+					nearestFontStyle: 'normal',
+					nearestFontWeight: '400',
+				},
+			},
+			{
+				message:
+					'should return nearest fontStyle and fontWeight for just oblique',
+				fontFamilyFaces: [
+					{
+						fontFamily: 'IBM Plex Mono',
+						fontStyle: 'normal',
+						fontWeight: '400',
+						src: [
+							'file:./assets/fonts/ibm-plex-mono/IBMPlexMono-Regular.woff2',
+						],
+					},
+					{
+						fontFamily: 'IBM Plex Mono',
+						fontStyle: 'italic',
+						fontWeight: '700',
+						src: [
+							'file:./assets/fonts/ibm-plex-mono/IBMPlexMono-Bold.woff2',
+						],
+					},
+				],
+				fontStyle: 'oblique',
+				fontWeight: undefined,
+				expected: {
+					nearestFontStyle: 'italic',
+					nearestFontWeight: '400',
+				},
+			},
+		].forEach(
+			( {
+				message,
+				fontFamilyFaces,
+				fontStyle,
+				fontWeight,
+				expected,
+			} ) => {
+				it( `${ message }`, () => {
+					expect(
+						findNearestStyleAndWeight(
+							fontFamilyFaces,
+							fontStyle,
+							fontWeight
 						)
 					).toEqual( expected );
 				} );
