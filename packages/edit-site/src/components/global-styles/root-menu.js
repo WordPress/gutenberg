@@ -4,6 +4,7 @@
 import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
 import {
 	typography,
+	background,
 	color,
 	layout,
 	shadow as shadowIcon,
@@ -33,6 +34,7 @@ function RootMenu() {
 	const hasShadowPanel = true; // useHasShadowPanel( settings );
 	const hasDimensionsPanel = useHasDimensionsPanel( settings );
 	const hasLayoutPanel = hasDimensionsPanel;
+	const hasBackgroundPanel = true; // useHasBackgroundPanel( settings );
 
 	return (
 		<>
@@ -71,6 +73,15 @@ function RootMenu() {
 						aria-label={ __( 'Layout styles' ) }
 					>
 						{ __( 'Layout' ) }
+					</NavigationButtonAsItem>
+				) }
+				{ hasBackgroundPanel && (
+					<NavigationButtonAsItem
+						icon={ background }
+						path="/background"
+						aria-label={ __( 'Background styles' ) }
+					>
+						{ __( 'Background' ) }
 					</NavigationButtonAsItem>
 				) }
 			</ItemGroup>

@@ -73,10 +73,32 @@
 
 
 .block-editor-global-styles-background-panel__inspector-media-replace-container {
-	border: 1px solid $gray-300;
-	border-radius: 2px;
 	// Full width. ToolsPanel lays out children in a grid.
 	grid-column: 1 / -1;
+
+	& > div {
+		// Border styles.
+		border-left: 1px solid $gray-300;
+		border-right: 1px solid $gray-300;
+		border-bottom: 1px solid $gray-300;
+
+		&:nth-child(1 of &) {
+			border-top-left-radius: $radius-block-ui;
+			border-top-right-radius: $radius-block-ui;
+			border-top: 1px solid $gray-300;
+		}
+
+		// Identify the last visible instance as placeholder items will not have this class.
+		&:nth-last-child(1 of &) {
+			border-bottom-left-radius: $radius-block-ui;
+			border-bottom-right-radius: $radius-block-ui;
+		}
+
+		> div,
+		> div > button {
+			border-radius: inherit;
+		}
+	}
 
 	&.is-open {
 		background-color: $gray-100;
@@ -84,7 +106,6 @@
 
 	.block-editor-global-styles-background-panel__image-tools-panel-item {
 		flex-grow: 1;
-		border: 0;
 		.components-dropdown {
 			display: block;
 		}
@@ -101,8 +122,6 @@
 }
 
 .block-editor-global-styles-background-panel__image-tools-panel-item {
-	border: 1px solid $gray-300;
-	border-radius: 2px;
 	// Full width. ToolsPanel lays out children in a grid.
 	grid-column: 1 / -1;
 	// Since there is no option to skip rendering the drag'n'drop icon in drop

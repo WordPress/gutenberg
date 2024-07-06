@@ -20,7 +20,12 @@ function ScreenBackground() {
 	const hasBackgroundPanel = useHasBackgroundPanel( settings );
 	return (
 		<>
-			<ScreenHeader title={ __( 'Background image' ) } />
+			<ScreenHeader
+				title={ __( 'Background' ) }
+				description={ __(
+					'Edit the site background image and color.'
+				) }
+			/>
 			{ hasBackgroundPanel && <BackgroundPanel /> }
 		</>
 	);

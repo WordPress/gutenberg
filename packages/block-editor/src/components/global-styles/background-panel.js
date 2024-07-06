@@ -7,6 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import {
+	__experimentalUseNavigator as useNavigator,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	ToggleControl,
@@ -14,7 +15,10 @@ import {
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalUnitControl as UnitControl,
 	__experimentalVStack as VStack,
+	Button,
+	ColorIndicator,
 	DropZone,
+	Flex,
 	FlexItem,
 	FocalPointPicker,
 	MenuItem,
@@ -22,8 +26,10 @@ import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
+	__experimentalZStack as ZStack,
 	Dropdown,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
@@ -42,15 +48,19 @@ import { isBlobURL } from '@wordpress/blob';
 /**
  * Internal dependencies
  */
-import { useToolsPanelDropdownMenuProps } from './utils';
+import { getValueFromVariable, useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
+import { useColorsPerOrigin, useGradientsPerOrigin } from './hooks';
+import ColorGradientControl from '../colors-gradients/control';
 import MediaReplaceFlow from '../media-replace-flow';
 import { store as blockEditorStore } from '../../store';
 import { getResolvedThemeFilePath } from './theme-file-uri-utils';
+import { unlock } from '../../lock-unlock';
 
 const IMAGE_BACKGROUND_TYPE = 'image';
 const DEFAULT_CONTROLS = {
 	backgroundImage: true,
+	background: true,
 };
 const BACKGROUND_POPOVER_PROPS = {
 	placement: 'left-start',
@@ -644,6 +654,140 @@ function BackgroundToolsPanel( {
 	);
 }
 
+const { Tabs } = unlock( componentsPrivateApis );
+
+function ColorPanelTab( {
+	isGradient,
+	inheritedValue,
+	userValue,
+	setValue,
+	colorGradientControlSettings,
+} ) {
+	return (
+		<ColorGradientControl
+			{ ...colorGradientControlSettings }
+			showTitle={ false }
+			enableAlpha
+			__experimentalIsRenderedInSidebar
+			colorValue={ isGradient ? undefined : inheritedValue }
+			gradientValue={ isGradient ? inheritedValue : undefined }
+			onColorChange={ isGradient ? undefined : setValue }
+			onGradientChange={ isGradient ? setValue : undefined }
+			clearable={ inheritedValue === userValue }
+			headingLevel={ 3 }
+		/>
+	);
+}
+
+const LabeledColorIndicators = ( { indicators, label } ) => (
+	<HStack justify="flex-start">
+		<ZStack isLayered={ false } offset={ -8 }>
+			{ indicators.map( ( indicator, index ) => (
+				<Flex key={ index } expanded={ false }>
+					<ColorIndicator colorValue={ indicator } />
+				</Flex>
+			) ) }
+		</ZStack>
+		<FlexItem
+			className="block-editor-panel-color-gradient-settings__color-name"
+			title={ label }
+		>
+			{ label }
+		</FlexItem>
+	</HStack>
+);
+
+function ColorPanelDropdown( {
+	label,
+	hasValue,
+	resetValue,
+	isShownByDefault,
+	indicators,
+	tabs,
+	colorGradientControlSettings,
+	panelId,
+} ) {
+	const currentTab = tabs.find( ( tab ) => tab.userValue !== undefined );
+	return (
+		<ToolsPanelItem
+			className="block-editor-global-styles-background-panel__image-tools-panel-item"
+			hasValue={ hasValue }
+			label={ label }
+			onDeselect={ resetValue }
+			isShownByDefault={ isShownByDefault }
+			panelId={ panelId }
+		>
+			<Dropdown
+				popoverProps={ BACKGROUND_POPOVER_PROPS }
+				renderToggle={ ( { onToggle, isOpen } ) => {
+					const toggleProps = {
+						onClick: onToggle,
+						className: clsx(
+							'block-editor-panel-color-gradient-settings__dropdown',
+							{ 'is-open': isOpen }
+						),
+						'aria-expanded': isOpen,
+						'aria-label': sprintf(
+							/* translators: %s is the type of color property, e.g., "background" */
+							__( 'Color %s styles' ),
+							label
+						),
+					};
+
+					return (
+						<Button { ...toggleProps }>
+							<LabeledColorIndicators
+								indicators={ indicators }
+								label={ label }
+							/>
+						</Button>
+					);
+				} }
+				renderContent={ () => (
+					<DropdownContentWrapper paddingSize="none">
+						<div className="block-editor-panel-color-gradient-settings__dropdown-content">
+							{ tabs.length > 1 && (
+								<Tabs defaultTabId={ currentTab?.key }>
+									<Tabs.TabList>
+										{ tabs.map( ( tab ) => (
+											<Tabs.Tab
+												key={ tab.key }
+												tabId={ tab.key }
+											>
+												{ tab.label }
+											</Tabs.Tab>
+										) ) }
+									</Tabs.TabList>
+
+									{ tabs.map( ( tab ) => {
+										const { key: tabKey, ...restTabProps } =
+											tab;
+										return (
+											<Tabs.TabPanel
+												key={ tabKey }
+												tabId={ tabKey }
+												focusable={ false }
+											>
+												<ColorPanelTab
+													key={ tabKey }
+													{ ...restTabProps }
+													colorGradientControlSettings={
+														colorGradientControlSettings
+													}
+												/>
+											</Tabs.TabPanel>
+										);
+									} ) }
+								</Tabs>
+							) }
+						</div>
+					</DropdownContentWrapper>
+				) }
+			/>
+		</ToolsPanelItem>
+	);
+}
+
 export default function BackgroundPanel( {
 	as: Wrapper = BackgroundToolsPanel,
 	value,
@@ -653,13 +797,83 @@ export default function BackgroundPanel( {
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
 	defaultValues = {},
-	headerLabel = __( 'Background image' ),
+	headerLabel = __( 'Elements' ),
 	themeFileURIs,
 } ) {
+	const navigator = useNavigator();
+	const { path } = navigator.location;
+
+	const colors = useColorsPerOrigin( settings );
+	const gradients = useGradientsPerOrigin( settings );
+	const areCustomSolidsEnabled = settings?.color?.custom;
+	const areCustomGradientsEnabled = settings?.color?.customGradient;
+	const hasSolidColors = colors.length > 0 || areCustomSolidsEnabled;
+	const hasGradientColors = gradients.length > 0 || areCustomGradientsEnabled;
+	const decodeValue = ( rawValue ) =>
+		getValueFromVariable( { settings }, '', rawValue );
+	const encodeColorValue = ( colorValue ) => {
+		const allColors = colors.flatMap(
+			( { colors: originColors } ) => originColors
+		);
+		const colorObject = allColors.find(
+			( { color } ) => color === colorValue
+		);
+		return colorObject
+			? 'var:preset|color|' + colorObject.slug
+			: colorValue;
+	};
+	const encodeGradientValue = ( gradientValue ) => {
+		const allGradients = gradients.flatMap(
+			( { gradients: originGradients } ) => originGradients
+		);
+		const gradientObject = allGradients.find(
+			( { gradient } ) => gradient === gradientValue
+		);
+		return gradientObject
+			? 'var:preset|gradient|' + gradientObject.slug
+			: gradientValue;
+	};
+
+	// BackgroundColor
+	const showBackgroundPanel = useHasBackgroundPanel( settings );
+	const backgroundColor = decodeValue( inheritedValue?.color?.background );
+	const userBackgroundColor = decodeValue( value?.color?.background );
+	const gradient = decodeValue( inheritedValue?.color?.gradient );
+	const userGradient = decodeValue( value?.color?.gradient );
+	const hasBackground = () => !! userBackgroundColor || !! userGradient;
+	const setBackgroundColor = ( newColor ) => {
+		const newValue = setImmutably(
+			value,
+			[ 'color', 'background' ],
+			encodeColorValue( newColor )
+		);
+		newValue.color.gradient = undefined;
+		onChange( newValue );
+	};
+	const setGradient = ( newGradient ) => {
+		const newValue = setImmutably(
+			value,
+			[ 'color', 'gradient' ],
+			encodeGradientValue( newGradient )
+		);
+		newValue.color.background = undefined;
+		onChange( newValue );
+	};
+	const resetBackgroundColor = () => {
+		const newValue = setImmutably(
+			value,
+			[ 'color', 'background' ],
+			undefined
+		);
+		newValue.color.gradient = undefined;
+		onChange( newValue );
+	};
+
 	const resetAllFilter = useCallback( ( previousValue ) => {
 		return {
 			...previousValue,
 			background: {},
+			color: undefined,
 		};
 	}, [] );
 
@@ -697,44 +911,84 @@ export default function BackgroundPanel( {
 					}
 				) }
 			>
-				{ shouldShowBackgroundImageControls ? (
-					<BackgroundControlsPanel
-						label={ title }
-						filename={ title }
-						url={ getResolvedThemeFilePath( url, themeFileURIs ) }
-						onToggle={ setIsDropDownOpen }
-						hasImageValue={ hasImageValue }
-					>
-						<VStack spacing={ 3 } className="single-column">
-							<BackgroundImageControls
-								onChange={ onChange }
-								style={ value }
-								inheritedValue={ inheritedValue }
-								themeFileURIs={ themeFileURIs }
-								displayInPanel
-								onRemoveImage={ () => {
-									setIsDropDownOpen( false );
-									resetBackground();
-								} }
-							/>
-							<BackgroundSizeControls
-								onChange={ onChange }
-								panelId={ panelId }
-								style={ value }
-								defaultValues={ defaultValues }
-								inheritedValue={ inheritedValue }
-								themeFileURIs={ themeFileURIs }
-							/>
-						</VStack>
-					</BackgroundControlsPanel>
-				) : (
-					<BackgroundImageControls
-						onChange={ onChange }
-						style={ value }
-						inheritedValue={ inheritedValue }
-						themeFileURIs={ themeFileURIs }
-					/>
-				) }
+				<>
+					{ shouldShowBackgroundImageControls ? (
+						<BackgroundControlsPanel
+							label={ title }
+							filename={ title }
+							url={ getResolvedThemeFilePath(
+								url,
+								themeFileURIs
+							) }
+							onToggle={ setIsDropDownOpen }
+							hasImageValue={ hasImageValue }
+						>
+							<VStack spacing={ 3 } className="single-column">
+								<BackgroundImageControls
+									onChange={ onChange }
+									style={ value }
+									inheritedValue={ inheritedValue }
+									themeFileURIs={ themeFileURIs }
+									displayInPanel
+									onRemoveImage={ () => {
+										setIsDropDownOpen( false );
+										resetBackground();
+									} }
+								/>
+								<BackgroundSizeControls
+									onChange={ onChange }
+									panelId={ panelId }
+									style={ value }
+									defaultValues={ defaultValues }
+									inheritedValue={ inheritedValue }
+									themeFileURIs={ themeFileURIs }
+								/>
+							</VStack>
+						</BackgroundControlsPanel>
+					) : (
+						<BackgroundImageControls
+							onChange={ onChange }
+							style={ value }
+							inheritedValue={ inheritedValue }
+							themeFileURIs={ themeFileURIs }
+						/>
+					) }
+					{ showBackgroundPanel && path === '/background' && (
+						<ColorPanelDropdown
+							key="background"
+							label={ __( 'Color' ) }
+							hasValue={ hasBackground }
+							resetValue={ resetBackgroundColor }
+							isShownByDefault={ defaultControls.background }
+							indicators={ [ gradient ?? backgroundColor ] }
+							tabs={ [
+								hasSolidColors && {
+									key: 'background',
+									label: __( 'Background' ),
+									inheritedValue: backgroundColor,
+									setValue: setBackgroundColor,
+									userValue: userBackgroundColor,
+								},
+								hasGradientColors && {
+									key: 'gradient',
+									label: __( 'Gradient' ),
+									inheritedValue: gradient,
+									setValue: setGradient,
+									userValue: userGradient,
+									isGradient: true,
+								},
+							].filter( Boolean ) }
+							colorGradientControlSettings={ {
+								colors,
+								disableCustomColors: ! areCustomSolidsEnabled,
+								gradients,
+								disableCustomGradients:
+									! areCustomGradientsEnabled,
+							} }
+							panelId={ panelId }
+						/>
+					) }
+				</>
 			</div>
 
 			{ /* Dummy ToolsPanel items, so we can control what's in the dropdown popover */ }
