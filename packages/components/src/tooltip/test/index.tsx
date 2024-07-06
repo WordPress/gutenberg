@@ -114,22 +114,13 @@ describe( 'Tooltip', () => {
 				screen.getByRole( 'button', { name: 'Tooltip anchor' } )
 			);
 
-			// Check core class
+			// Check default and custom classnames
 			await waitFor( () =>
 				expect(
 					screen.getByRole( 'tooltip', {
 						name: 'tooltip text',
 					} )
-				).toHaveClass('components-tooltip')
-			);
-
-			// Check custom class
-			await waitFor( () =>
-				expect(
-					screen.getByRole( 'tooltip', {
-						name: 'tooltip text',
-					} )
-				).toHaveClass('foo')
+				).toHaveClass( 'components-tooltip', 'foo' )
 			);
 		} );
 	} );
