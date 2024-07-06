@@ -17,6 +17,10 @@ export type TooltipProps = {
 	 */
 	children: React.ReactElement;
 	/**
+	 * Custom class name for the tooltip, in addition to the default `components-tooltip`.
+	 */
+	className?: string;
+	/**
 	 * Option to hide the tooltip when the anchor is clicked.
 	 *
 	 * @default true
@@ -58,10 +62,6 @@ export type TooltipProps = {
 	 * The text shown in the tooltip when anchor element is focused or hovered.
 	 */
 	text?: string;
-	/**
-	 * Custom class name for the tooltip, in addition to the default `components-tooltip`.
-	 */
-	className?: string;
 };
 
 export type TooltipInternalContext = {
