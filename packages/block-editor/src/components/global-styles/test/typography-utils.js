@@ -974,7 +974,7 @@ describe( 'typography utils', () => {
 			},
 			{
 				message:
-					'should return undefined values if fontStyle and fontWeight are not available',
+					'should return undefined values if both fontStyle and fontWeight are not available',
 				fontFamilyFaces: [
 					{
 						fontFamily: 'ABeeZee',
@@ -1130,7 +1130,7 @@ describe( 'typography utils', () => {
 			},
 			{
 				message:
-					'should return nearest fontStyle and fontWeight for just 300',
+					'should return nearest fontStyle and fontWeight for 300 font weight and empty font style',
 				fontFamilyFaces: [
 					{
 						fontFamily: 'IBM Plex Mono',
@@ -1158,7 +1158,7 @@ describe( 'typography utils', () => {
 			},
 			{
 				message:
-					'should return nearest fontStyle and fontWeight for just oblique',
+					'should return nearest fontStyle and fontWeight for oblique font style and empty font weight',
 				fontFamilyFaces: [
 					{
 						fontFamily: 'IBM Plex Mono',
