@@ -25,7 +25,7 @@ function UnforwardedDateTimePicker(
 	{
 		currentDate,
 		is12Hour,
-		dateOrder = 'dmy',
+		dateOrder,
 		isInvalidDate,
 		onMonthPreviewed = noop,
 		onChange,
