@@ -30,10 +30,10 @@ export const settings = {
 			style: {
 				spacing: {
 					padding: {
-						top: '1em',
-						right: '1em',
-						bottom: '1em',
-						left: '1em',
+						top: '4em',
+						right: '3em',
+						bottom: '4em',
+						left: '3em',
 					},
 				},
 			},
@@ -47,12 +47,6 @@ export const settings = {
 				},
 			},
 			{
-				name: 'core/image',
-				attributes: {
-					url: 'https://s.w.org/images/core/5.3/Glacial_lakes%2C_Bhutan.jpg',
-				},
-			},
-			{
 				name: 'core/paragraph',
 				attributes: {
 					align: 'center',
@@ -62,12 +56,19 @@ export const settings = {
 				},
 			},
 			{
+				name: 'core/spacer',
+				attributes: {
+					height: '10px',
+				},
+			},
+			{
 				name: 'core/button',
 				attributes: {
 					text: __( 'Read more' ),
 				},
 			},
 		],
+		viewportWidth: 600,
 	},
 	transforms,
 	edit,
