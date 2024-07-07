@@ -153,9 +153,11 @@ export const saveDirtyEntities =
 		close?.( entitiesToSave );
 		const siteItemsToSave = [];
 		const pendingSavedRecords = [];
+		let showSiteUpdatedMessage = false;
 		entitiesToSave.forEach( ( { kind, name, key, property } ) => {
 			if ( 'root' === kind && 'site' === name ) {
 				siteItemsToSave.push( property );
+				showSiteUpdatedMessage = true;
 			} else {
 				if (
 					PUBLISH_ON_SAVE_ENTITIES.some(
@@ -176,6 +178,13 @@ export const saveDirtyEntities =
 						.dispatch( coreStore )
 						.saveEditedEntityRecord( kind, name, key )
 				);
+
+				// This flag allows us to avoid showing the 'site updated' message
+				// in scenarios related to entity changes when the message shouldn't be
+				// triggered, like when modifying post meta via block bindings.
+				if ( kind !== 'postType' ) {
+					showSiteUpdatedMessage = true;
+				}
 			}
 		} );
 		if ( siteItemsToSave.length ) {
@@ -204,7 +213,7 @@ export const saveDirtyEntities =
 					registry
 						.dispatch( noticesStore )
 						.createErrorNotice( __( 'Saving failed.' ) );
-				} else {
+				} else if ( showSiteUpdatedMessage ) {
 					registry
 						.dispatch( noticesStore )
 						.createSuccessNotice( __( 'Site updated.' ), {
