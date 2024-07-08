@@ -2,7 +2,6 @@
 
 ## Unreleased
 
-
 ### Enhancements
 
 -   `Tooltip`: Add support for `className` prop ([#63157](https://github.com/WordPress/gutenberg/pull/63157)).
