@@ -161,7 +161,7 @@ export function useInBetweenInserter() {
 
 				if ( event.type === 'click' ) {
 					hideInsertionPoint();
-					selectBlock( clientId );
+					selectBlock( clientId, -1 );
 					return;
 				}
 
