@@ -186,6 +186,9 @@ function ManualGridVisualizer( { gridClientId, gridInfo } ) {
 							gridInfo={ gridInfo }
 							setHighlightedRect={ setHighlightedRect }
 							onSelect={ ( block ) => {
+								if ( ! block ) {
+									return;
+								}
 								updateBlockAttributes( block.clientId, {
 									style: {
 										layout: {

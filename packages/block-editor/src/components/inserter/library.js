@@ -20,7 +20,6 @@ function InserterLibrary(
 		showInserterHelpPanel,
 		showMostUsedBlocks = false,
 		__experimentalInsertionIndex,
-		__experimentalOnSelect,
 		__experimentalInitialTab,
 		__experimentalInitialCategory,
 		__experimentalFilterValue,
@@ -52,7 +51,6 @@ function InserterLibrary(
 			showInserterHelpPanel={ showInserterHelpPanel }
 			showMostUsedBlocks={ showMostUsedBlocks }
 			__experimentalInsertionIndex={ __experimentalInsertionIndex }
-			__experimentalOnSelect={ __experimentalOnSelect }
 			__experimentalFilterValue={ __experimentalFilterValue }
 			onPatternCategorySelection={ onPatternCategorySelection }
 			__experimentalInitialTab={ __experimentalInitialTab }
