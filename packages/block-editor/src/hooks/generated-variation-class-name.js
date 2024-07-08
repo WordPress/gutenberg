@@ -3,10 +3,14 @@
  */
 import { addFilter } from '@wordpress/hooks';
 import {
-	hasBlockSupport,
 	getBlockDefaultClassName,
 	getActiveBlockVariation,
 } from '@wordpress/blocks';
+
+/**
+ * Internal dependencies
+ */
+import { hasVariationClassNameSupport } from '../hooks/supports';
 
 /**
  * Override props assigned to save component to inject generated className if
@@ -25,7 +29,7 @@ export function addGeneratedVariationClassName(
 	attributes
 ) {
 	// Adding the generated className.
-	if ( hasBlockSupport( blockType, 'className.variation', false ) ) {
+	if ( hasVariationClassNameSupport( blockType ) ) {
 		const activeVariation = getActiveBlockVariation(
 			blockType.name,
 			attributes

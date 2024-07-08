@@ -2,7 +2,12 @@
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
-import { hasBlockSupport, getBlockDefaultClassName } from '@wordpress/blocks';
+import { getBlockDefaultClassName } from '@wordpress/blocks';
+
+/**
+ * Internal dependencies
+ */
+import { hasBlockClassNameSupport } from '../hooks/supports';
 
 /**
  * Override props assigned to save component to inject generated className if
@@ -16,7 +21,7 @@ import { hasBlockSupport, getBlockDefaultClassName } from '@wordpress/blocks';
  */
 export function addGeneratedClassName( extraProps, blockType ) {
 	// Adding the generated className.
-	if ( hasBlockSupport( blockType, 'className', true ) ) {
+	if ( hasBlockClassNameSupport( blockType ) ) {
 		if ( typeof extraProps.className === 'string' ) {
 			// We have some extra classes and want to add the default classname
 			// We use uniq to prevent duplicate classnames.

@@ -43,6 +43,7 @@ import { useBlockProps } from './use-block-props';
 import { store as blockEditorStore } from '../../store';
 import { useLayout } from './layout';
 import { PrivateBlockContext } from './private-block-context';
+import { hasVariationClassNameSupport } from '../../hooks/supports';
 
 import { unlock } from '../../lock-unlock';
 
@@ -604,9 +605,7 @@ function BlockListBlockProvider( props ) {
 			if ( hasLightBlockWrapper && blockName ) {
 				defaultClassNames.push( getBlockDefaultClassName( blockName ) );
 
-				if (
-					hasBlockSupport( blockType, 'className.variation', false )
-				) {
+				if ( hasVariationClassNameSupport( blockType ) ) {
 					if ( match && match?.name ) {
 						defaultClassNames.push(
 							getBlockDefaultClassName(
