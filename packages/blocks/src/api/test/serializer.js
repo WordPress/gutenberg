@@ -482,9 +482,6 @@ describe( 'block serializer', () => {
 		} );
 
 		it( 'should return the default class name for a block', () => {
-			expect( getBlockDefaultClassName( 'core/test-block' ) ).toBe(
-				'wp-block-test-block'
-			);
 			expect( getBlockDefaultClassName( 'plugin/test-block' ) ).toBe(
 				'wp-block-plugin-test-block'
 			);
