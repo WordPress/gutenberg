@@ -18,7 +18,7 @@ export default function isTemplateRevertable( templateOrTemplatePart ) {
 
 	return (
 		templateOrTemplatePart.source === TEMPLATE_ORIGINS.custom &&
-		( templateOrTemplatePart?.origin === TEMPLATE_ORIGINS.plugin ||
+		( Boolean( templateOrTemplatePart?.plugin ) ||
 			templateOrTemplatePart?.has_theme_file )
 	);
 }

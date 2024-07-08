@@ -16,7 +16,7 @@ export default function isTemplateRemovable( template ) {
 
 	return (
 		template.source === TEMPLATE_ORIGINS.custom &&
-		template.origin !== TEMPLATE_ORIGINS.plugin &&
+		! Boolean( template.plugin ) &&
 		! template.has_theme_file
 	);
 }

@@ -23,6 +23,14 @@
  * the registry.
  */
 function _gutenberg_add_block_templates_from_registry( $query_result, $query, $template_type ) {
+	// Add `plugin` property to templates registered by a plugin.
+	foreach ( $query_result as $key => $value ) {
+		$registered_template = WP_Block_Templates_Registry::get_instance()->get_by_slug( $query_result[ $key ]->slug );
+		if ( $registered_template ) {
+			$query_result[ $key ]->plugin = $registered_template->plugin;
+		}
+	}
+
 	if ( ! isset( $query['wp_id'] ) ) {
 		$template_files = _gutenberg_get_block_templates_files( $template_type, $query );
 
@@ -47,6 +55,24 @@ function _gutenberg_add_block_templates_from_registry( $query_result, $query, $t
 	return $query_result;
 }
 add_filter( 'get_block_templates', '_gutenberg_add_block_templates_from_registry', 10, 3 );
+
+/**
+ * Hooks into `get_block_template` to add the `plugin` property when necessary.
+ *
+ * @param [WP_Block_Template|null] $block_template The found block template, or null if there isn’t one.
+ * @return [WP_Block_Template|null] The block template that was already found with the plugin property defined if it was reigstered by a plugin.
+ */
+function _gutenberg_add_block_template_plugin_attribute( $block_template ) {
+	if ( $block_template ) {
+		$registered_template = WP_Block_Templates_Registry::get_instance()->get_by_slug( $block_template->slug );
+		if ( $registered_template ) {
+			$block_template->plugin = $registered_template->plugin;
+		}
+	}
+
+	return $block_template;
+}
+add_filter( 'get_block_template', '_gutenberg_add_block_template_plugin_attribute', 10, 1 );
 
 /**
  * Hooks into `get_block_file_template` so templates from the registry are also returned.

@@ -42,6 +42,7 @@ export interface TemplatePart extends CommonPost {
 	type: 'wp_template_part';
 	source: string;
 	origin: string;
+	plugin?: string;
 	has_theme_file: boolean;
 	id: string;
 	area: string;

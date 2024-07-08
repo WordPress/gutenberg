@@ -11,6 +11,186 @@
  */
 class Gutenberg_REST_Templates_Controller_6_7 extends Gutenberg_REST_Templates_Controller_6_6 {
 	/**
+	 * Retrieves the block type' schema, conforming to JSON Schema.
+	 *
+	 * @since 5.8.0
+	 * @since 5.9.0 Added `'area'`.
+	 * @since 6.7.0 Added `'plugin'`.
+	 *
+	 * @return array Item schema data.
+	 */
+	public function get_item_schema() {
+		if ( $this->schema ) {
+			return $this->add_additional_fields_schema( $this->schema );
+		}
+
+		$schema = array(
+			'$schema'    => 'http://json-schema.org/draft-04/schema#',
+			'title'      => $this->post_type,
+			'type'       => 'object',
+			'properties' => array(
+				'id'              => array(
+					'description' => __( 'ID of template.' ),
+					'type'        => 'string',
+					'context'     => array( 'embed', 'view', 'edit' ),
+					'readonly'    => true,
+				),
+				'slug'            => array(
+					'description' => __( 'Unique slug identifying the template.' ),
+					'type'        => 'string',
+					'context'     => array( 'embed', 'view', 'edit' ),
+					'required'    => true,
+					'minLength'   => 1,
+					'pattern'     => '[a-zA-Z0-9_\%-]+',
+				),
+				'theme'           => array(
+					'description' => __( 'Theme identifier for the template.' ),
+					'type'        => 'string',
+					'context'     => array( 'embed', 'view', 'edit' ),
+				),
+				// @core-merge: Add plugin property to the schema.
+				'plugin'          => array(
+					'description' => __( 'Plugin that registered the template.' ),
+					'type'        => 'string',
+					'context'     => array( 'embed', 'view', 'edit' ),
+				),
+				// @core-merge: End of changes.
+				'type'            => array(
+					'description' => __( 'Type of template.' ),
+					'type'        => 'string',
+					'context'     => array( 'embed', 'view', 'edit' ),
+				),
+				'source'          => array(
+					'description' => __( 'Source of template' ),
+					'type'        => 'string',
+					'context'     => array( 'embed', 'view', 'edit' ),
+					'readonly'    => true,
+				),
+				'origin'          => array(
+					'description' => __( 'Source of a customized template' ),
+					'type'        => 'string',
+					'context'     => array( 'embed', 'view', 'edit' ),
+					'readonly'    => true,
+				),
+				'content'         => array(
+					'description' => __( 'Content of template.' ),
+					'type'        => array( 'object', 'string' ),
+					'default'     => '',
+					'context'     => array( 'embed', 'view', 'edit' ),
+					'properties'  => array(
+						'raw'           => array(
+							'description' => __( 'Content for the template, as it exists in the database.' ),
+							'type'        => 'string',
+							'context'     => array( 'view', 'edit' ),
+						),
+						'block_version' => array(
+							'description' => __( 'Version of the content block format used by the template.' ),
+							'type'        => 'integer',
+							'context'     => array( 'edit' ),
+							'readonly'    => true,
+						),
+					),
+				),
+				'title'           => array(
+					'description' => __( 'Title of template.' ),
+					'type'        => array( 'object', 'string' ),
+					'default'     => '',
+					'context'     => array( 'embed', 'view', 'edit' ),
+					'properties'  => array(
+						'raw'      => array(
+							'description' => __( 'Title for the template, as it exists in the database.' ),
+							'type'        => 'string',
+							'context'     => array( 'view', 'edit', 'embed' ),
+						),
+						'rendered' => array(
+							'description' => __( 'HTML title for the template, transformed for display.' ),
+							'type'        => 'string',
+							'context'     => array( 'view', 'edit', 'embed' ),
+							'readonly'    => true,
+						),
+					),
+				),
+				'description'     => array(
+					'description' => __( 'Description of template.' ),
+					'type'        => 'string',
+					'default'     => '',
+					'context'     => array( 'embed', 'view', 'edit' ),
+				),
+				'status'          => array(
+					'description' => __( 'Status of template.' ),
+					'type'        => 'string',
+					'enum'        => array_keys( get_post_stati( array( 'internal' => false ) ) ),
+					'default'     => 'publish',
+					'context'     => array( 'embed', 'view', 'edit' ),
+				),
+				'wp_id'           => array(
+					'description' => __( 'Post ID.' ),
+					'type'        => 'integer',
+					'context'     => array( 'embed', 'view', 'edit' ),
+					'readonly'    => true,
+				),
+				'has_theme_file'  => array(
+					'description' => __( 'Theme file exists.' ),
+					'type'        => 'bool',
+					'context'     => array( 'embed', 'view', 'edit' ),
+					'readonly'    => true,
+				),
+				'author'          => array(
+					'description' => __( 'The ID for the author of the template.' ),
+					'type'        => 'integer',
+					'context'     => array( 'view', 'edit', 'embed' ),
+				),
+				'modified'        => array(
+					'description' => __( "The date the template was last modified, in the site's timezone." ),
+					'type'        => 'string',
+					'format'      => 'date-time',
+					'context'     => array( 'view', 'edit' ),
+					'readonly'    => true,
+				),
+				'author_text'     => array(
+					'type'        => 'string',
+					'description' => __( 'Human readable text for the author.' ),
+					'readonly'    => true,
+					'context'     => array( 'view', 'edit', 'embed' ),
+				),
+				'original_source' => array(
+					'description' => __( 'Where the template originally comes from e.g. \'theme\'' ),
+					'type'        => 'string',
+					'readonly'    => true,
+					'context'     => array( 'view', 'edit', 'embed' ),
+					'enum'        => array(
+						'theme',
+						'plugin',
+						'site',
+						'user',
+					),
+				),
+			),
+		);
+
+		if ( 'wp_template' === $this->post_type ) {
+			$schema['properties']['is_custom'] = array(
+				'description' => __( 'Whether a template is a custom template.' ),
+				'type'        => 'bool',
+				'context'     => array( 'embed', 'view', 'edit' ),
+				'readonly'    => true,
+			);
+		}
+
+		if ( 'wp_template_part' === $this->post_type ) {
+			$schema['properties']['area'] = array(
+				'description' => __( 'Where the template part is intended for use (header, footer, etc.)' ),
+				'type'        => 'string',
+				'context'     => array( 'embed', 'view', 'edit' ),
+			);
+		}
+
+		$this->schema = $schema;
+
+		return $this->add_additional_fields_schema( $this->schema );
+	}
+
+	/**
 	 * Returns the given template
 	 *
 	 * @param WP_REST_Request $request The request instance.
@@ -59,6 +239,13 @@ class Gutenberg_REST_Templates_Controller_6_7 extends Gutenberg_REST_Templates_C
 
 		if ( rest_is_field_included( 'origin', $fields ) ) {
 			$data['origin'] = 'plugin';
+		}
+
+		if ( rest_is_field_included( 'plugin', $fields ) ) {
+			$registered_template = WP_Block_Templates_Registry::get_instance()->get_by_slug( $cloned_item->slug );
+			if ( $registered_template ) {
+				$data['plugin'] = $registered_template->plugin;
+			}
 		}
 
 		if ( rest_is_field_included( 'author_text', $fields ) ) {
