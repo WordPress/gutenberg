@@ -185,7 +185,7 @@ function ManualGridVisualizer( { gridClientId, gridInfo } ) {
 							gridClientId={ gridClientId }
 							gridInfo={ gridInfo }
 							setHighlightedRect={ setHighlightedRect }
-							onSelectCallback={ ( block ) => {
+							onSelect={ ( block ) => {
 								updateBlockAttributes( block.clientId, {
 									style: {
 										layout: {
@@ -335,7 +335,7 @@ function GridVisualizerAppender( {
 	gridClientId,
 	gridInfo,
 	setHighlightedRect,
-	onSelectCallback,
+	onSelect,
 } ) {
 	return (
 		<ButtonBlockAppender
@@ -351,7 +351,7 @@ function GridVisualizerAppender( {
 			style={ {
 				color: gridInfo.currentColor,
 			} }
-			onSelectCallback={ onSelectCallback }
+			onSelect={ onSelect }
 		/>
 	);
 }

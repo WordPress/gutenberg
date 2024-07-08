@@ -150,7 +150,6 @@ class PrivateInserter extends Component {
 			prioritizePatterns,
 			onSelectOrClose,
 			selectBlockOnInsert,
-			onSelectCallback,
 		} = this.props;
 
 		if ( isQuick ) {
@@ -168,9 +167,6 @@ class PrivateInserter extends Component {
 							onSelectOrClose( firstBlock );
 						}
 						onClose();
-						if ( onSelectCallback ) {
-							onSelectCallback( firstBlock );
-						}
 					} }
 					rootClientId={ rootClientId }
 					clientId={ clientId }
