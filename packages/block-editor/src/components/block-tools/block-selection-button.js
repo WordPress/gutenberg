@@ -138,12 +138,6 @@ function BlockSelectionButton( { clientId, rootClientId }, ref ) {
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const selectionEndClientId = getMultiSelectedBlocksEndClientId();
-		const selectionBeforeEndClientId = getPreviousBlockClientId(
-			selectionEndClientId || selectedBlockClientId
-		);
-		const selectionAfterEndClientId = getNextBlockClientId(
-			selectionEndClientId || selectedBlockClientId
-		);
 
 		const navigateUp = ( isTab && isShift ) || isUp;
 		const navigateDown = ( isTab && ! isShift ) || isDown;
@@ -154,9 +148,13 @@ function BlockSelectionButton( { clientId, rootClientId }, ref ) {
 
 		let focusedBlockUid;
 		if ( navigateUp ) {
-			focusedBlockUid = selectionBeforeEndClientId;
+			focusedBlockUid = getPreviousBlockClientId(
+				selectionEndClientId || selectedBlockClientId
+			);
 		} else if ( navigateDown ) {
-			focusedBlockUid = selectionAfterEndClientId;
+			focusedBlockUid = getNextBlockClientId(
+				selectionEndClientId || selectedBlockClientId
+			);
 		} else if ( navigateOut ) {
 			focusedBlockUid =
 				getBlockRootClientId( selectedBlockClientId ) ??
