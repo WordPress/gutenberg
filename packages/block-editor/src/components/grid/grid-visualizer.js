@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useState, useEffect, forwardRef } from '@wordpress/element';
+import { useState, useEffect, forwardRef, useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __experimentalUseDropZone as useDropZone } from '@wordpress/compose';
 
@@ -118,35 +118,33 @@ const GridVisualizerGrid = forwardRef(
 function ManualGridVisualizer( { gridClientId, gridInfo } ) {
 	const [ highlightedRect, setHighlightedRect ] = useState( null );
 
-	const occupiedRects = useSelect(
-		( select ) => {
-			const { getBlockOrder, getBlockAttributes } =
-				select( blockEditorStore );
-			const rects = [];
-			for ( const clientId of getBlockOrder( gridClientId ) ) {
-				const attributes = getBlockAttributes( clientId );
-				const {
-					columnStart,
-					rowStart,
-					columnSpan = 1,
-					rowSpan = 1,
-				} = attributes.style?.layout || {};
-				if ( ! columnStart || ! rowStart ) {
-					continue;
-				}
-				rects.push(
-					new GridRect( {
-						columnStart,
-						rowStart,
-						columnSpan,
-						rowSpan,
-					} )
-				);
-			}
-			return rects;
-		},
+	const gridItems = useSelect(
+		( select ) => select( blockEditorStore ).getBlocks( gridClientId ),
 		[ gridClientId ]
 	);
+	const occupiedRects = useMemo( () => {
+		const rects = [];
+		for ( const block of gridItems ) {
+			const {
+				columnStart,
+				rowStart,
+				columnSpan = 1,
+				rowSpan = 1,
+			} = block.attributes.style?.layout || {};
+			if ( ! columnStart || ! rowStart ) {
+				continue;
+			}
+			rects.push(
+				new GridRect( {
+					columnStart,
+					rowStart,
+					columnSpan,
+					rowSpan,
+				} )
+			);
+		}
+		return rects;
+	}, [ gridItems ] );
 
 	const {
 		updateBlockAttributes,
