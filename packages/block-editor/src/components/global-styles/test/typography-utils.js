@@ -985,6 +985,15 @@ describe( 'typography utils', () => {
 				newFontStyleValue: 'oblique',
 				expected: 'italic',
 			},
+			{
+				message: 'should return normal if normal is available',
+				availableFontStyles: [
+					{ name: 'Regular', value: 'normal' },
+					{ name: 'Italic', value: 'italic' },
+				],
+				newFontStyleValue: 'normal',
+				expected: 'normal',
+			},
 		].forEach(
 			( {
 				message,
