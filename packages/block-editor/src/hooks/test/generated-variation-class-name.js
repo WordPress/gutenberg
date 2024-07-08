@@ -81,13 +81,9 @@ describe( 'generated variation className', () => {
 		it( 'should inject the generated className', () => {
 			const attributes = { fruit: 'Apples' };
 			const blockType = getBlockType( 'core/test-block' );
-			const variationBlockType = {
-				...blockType,
-				...variationBlockSettings,
-			};
 			const extraProps = addSaveProps(
 				{ className: 'foo' },
-				variationBlockType,
+				blockType,
 				attributes
 			);
 
