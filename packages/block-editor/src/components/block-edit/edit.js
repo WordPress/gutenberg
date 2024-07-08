@@ -7,14 +7,21 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { withFilters } from '@wordpress/components';
-import { getBlockType } from '@wordpress/blocks';
+import {
+	getBlockDefaultClassName,
+	getBlockType,
+	getActiveBlockVariation,
+} from '@wordpress/blocks';
 import { useContext, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import BlockContext from '../block-context';
-import { addGeneratedClassName } from '../../hooks/generated-class-name';
+import {
+	hasBlockClassNameSupport,
+	hasVariationClassNameSupport,
+} from '../../hooks/supports';
 
 /**
  * Default value used for blocks which do not define their own context needs,
@@ -68,14 +75,24 @@ const EditWithGeneratedProps = ( props ) => {
 		return <EditWithFilters { ...props } context={ context } />;
 	}
 
-	const generatedClassName = addGeneratedClassName(
-		{},
-		blockType,
-		attributes
-	)?.className;
+	const generatedClassNames = [];
+
+	if ( hasBlockClassNameSupport( blockType ) ) {
+		generatedClassNames.push( getBlockDefaultClassName( name ) );
+	}
+	if ( hasVariationClassNameSupport( blockType ) ) {
+		const activeVariation = getActiveBlockVariation( name, attributes );
+		if ( activeVariation && activeVariation?.name ) {
+			generatedClassNames.push(
+				getBlockDefaultClassName(
+					`${ name }/${ activeVariation.name }`
+				)
+			);
+		}
+	}
 
 	const className = clsx(
-		generatedClassName,
+		generatedClassNames,
 		attributes.className,
 		props.className
 	);
