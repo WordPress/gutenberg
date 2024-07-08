@@ -102,6 +102,12 @@ describe( 'Edit', () => {
 					default: 'Apples',
 				},
 			},
+			supports: {
+				className: {
+					block: true,
+					variation: true,
+				},
+			},
 		} );
 
 		registerBlockVariation( 'core/test-block', {
