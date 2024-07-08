@@ -10,6 +10,8 @@ import { useState } from '@wordpress/element';
 import { commentAuthorAvatar as authorIcon } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { __ } from '@wordpress/i18n';
+
 /**
  * Internal dependencies
  */
@@ -30,7 +32,7 @@ function BaseAuthorField( { viewType, text, icon, imageUrl } ) {
 				>
 					<img
 						onLoad={ () => setIsImageLoaded( true ) }
-						alt=""
+						alt={ __( 'Author avatar' ) }
 						src={ imageUrl }
 					/>
 				</div>
