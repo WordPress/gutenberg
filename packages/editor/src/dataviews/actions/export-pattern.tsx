@@ -22,7 +22,7 @@ function getJsonFromItem( item: Pattern ) {
 		{
 			__file: item.type,
 			title: getItemTitle( item ),
-			content: item.content.raw,
+			content: item.content?.raw || item.content,
 			syncStatus: item.wp_pattern_sync_status,
 		},
 		null,
