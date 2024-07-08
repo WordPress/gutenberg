@@ -214,54 +214,24 @@ function BlockSelectionButton( { clientId, rootClientId }, ref ) {
 		}
 
 		const selectedBlockClientId = getSelectedBlockClientId();
-		const navigateUp = ( isTab && isShift ) || isUp;
-		const navigateDown = ( isTab && ! isShift ) || isDown;
+		const navigateUp = isUp || ( isTab && isShift );
+		const navigateDown = isDown || ( isTab && ! isShift );
 		// Move out of current nesting level (no effect if at root level).
 		const navigateOut = isLeft;
 		// Move into next nesting level (no effect if the current block has no innerBlocks).
 		const navigateIn = isRight;
 
-		let focusedBlockUid;
-		if ( navigateUp || navigateDown ) {
-			focusedBlockUid = navigateUp ? previous : next;
-		} else if ( navigateOut || navigateIn ) {
-			focusedBlockUid = navigateOut ? parent : firstChild;
-		}
-
-		const startingBlockClientId = hasBlockMovingClientId();
-		if ( isEscape && startingBlockClientId && ! event.defaultPrevented ) {
-			setBlockMovingClientId( null );
-			event.preventDefault();
-		}
-		if ( ( isEnter || isSpace ) && startingBlockClientId ) {
-			const sourceRoot = getBlockRootClientId( startingBlockClientId );
-			const destRoot = getBlockRootClientId( selectedBlockClientId );
-			const sourceBlockIndex = getBlockIndex( startingBlockClientId );
-			let destinationBlockIndex = getBlockIndex( selectedBlockClientId );
-			if (
-				sourceBlockIndex < destinationBlockIndex &&
-				sourceRoot === destRoot
-			) {
-				destinationBlockIndex -= 1;
-			}
-			moveBlockToPosition(
-				startingBlockClientId,
-				sourceRoot,
-				destRoot,
-				destinationBlockIndex
-			);
-			selectBlock( startingBlockClientId );
-			setBlockMovingClientId( null );
-		}
-		// Prevent the block from being moved into itself.
-		if (
-			startingBlockClientId &&
-			selectedBlockClientId === startingBlockClientId &&
-			navigateIn
-		) {
-			return;
-		}
+		// Select mode block navigation.
 		if ( navigateDown || navigateUp || navigateOut || navigateIn ) {
+			let focusedBlockUid;
+			if ( navigateUp || navigateDown ) {
+				focusedBlockUid = navigateUp ? previous : next;
+			} else if ( navigateOut || navigateIn ) {
+				focusedBlockUid = navigateOut ? parent : firstChild;
+			}
+
+			// If a next block to focus was found, select it, else
+			// handle moving focus out of the block tree.
 			if ( focusedBlockUid ) {
 				event.preventDefault();
 				selectBlock( focusedBlockUid );
@@ -291,6 +261,37 @@ function BlockSelectionButton( { clientId, rootClientId }, ref ) {
 					nextTabbable.focus();
 					clearSelectedBlock();
 				}
+			}
+		}
+
+		// Block moving mode.
+		const movingBlockClientId = hasBlockMovingClientId();
+		if ( movingBlockClientId ) {
+			if ( isEscape && ! event.defaultPrevented ) {
+				setBlockMovingClientId( null );
+				event.preventDefault();
+			}
+			if ( isEnter || isSpace ) {
+				const sourceRoot = getBlockRootClientId( movingBlockClientId );
+				const destRoot = getBlockRootClientId( selectedBlockClientId );
+				const sourceBlockIndex = getBlockIndex( movingBlockClientId );
+				let destinationBlockIndex = getBlockIndex(
+					selectedBlockClientId
+				);
+				if (
+					sourceBlockIndex < destinationBlockIndex &&
+					sourceRoot === destRoot
+				) {
+					destinationBlockIndex -= 1;
+				}
+				moveBlockToPosition(
+					movingBlockClientId,
+					sourceRoot,
+					destRoot,
+					destinationBlockIndex
+				);
+				selectBlock( movingBlockClientId );
+				setBlockMovingClientId( null );
 			}
 		}
 	}
