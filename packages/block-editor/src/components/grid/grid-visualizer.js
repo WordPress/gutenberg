@@ -118,32 +118,35 @@ const GridVisualizerGrid = forwardRef(
 function ManualGridVisualizer( { gridClientId, gridInfo } ) {
 	const [ highlightedRect, setHighlightedRect ] = useState( null );
 
-	const occupiedRects = useSelect( ( select ) => {
-		const { getBlockOrder, getBlockAttributes } =
-			select( blockEditorStore );
-		const rects = [];
-		for ( const clientId of getBlockOrder( gridClientId ) ) {
-			const attributes = getBlockAttributes( clientId );
-			const {
-				columnStart,
-				rowStart,
-				columnSpan = 1,
-				rowSpan = 1,
-			} = attributes.style?.layout || {};
-			if ( ! columnStart || ! rowStart ) {
-				continue;
-			}
-			rects.push(
-				new GridRect( {
+	const occupiedRects = useSelect(
+		( select ) => {
+			const { getBlockOrder, getBlockAttributes } =
+				select( blockEditorStore );
+			const rects = [];
+			for ( const clientId of getBlockOrder( gridClientId ) ) {
+				const attributes = getBlockAttributes( clientId );
+				const {
 					columnStart,
 					rowStart,
-					columnSpan,
-					rowSpan,
-				} )
-			);
-		}
-		return rects;
-	} );
+					columnSpan = 1,
+					rowSpan = 1,
+				} = attributes.style?.layout || {};
+				if ( ! columnStart || ! rowStart ) {
+					continue;
+				}
+				rects.push(
+					new GridRect( {
+						columnStart,
+						rowStart,
+						columnSpan,
+						rowSpan,
+					} )
+				);
+			}
+			return rects;
+		},
+		[ gridClientId ]
+	);
 
 	const {
 		updateBlockAttributes,
