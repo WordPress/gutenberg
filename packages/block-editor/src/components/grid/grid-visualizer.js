@@ -15,7 +15,7 @@ import { __experimentalUseDropZone as useDropZone } from '@wordpress/compose';
  */
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockPopoverCover from '../block-popover/cover';
-import { range, GridRect, getGridInfo, getComputedCSS } from './utils';
+import { range, GridRect, getGridInfo } from './utils';
 import { store as blockEditorStore } from '../../store';
 import { useGetNumberOfBlocksBeforeCell } from './use-get-number-of-blocks-before-cell';
 import ButtonBlockAppender from '../button-block-appender';
@@ -37,7 +37,7 @@ export function GridVisualizer( { clientId, contentRef, parentLayout } ) {
 		window.__experimentalEnableGridInteractivity;
 	return (
 		<GridVisualizerGrid
-			clientId={ clientId }
+			gridClientId={ clientId }
 			gridElement={ gridElement }
 			isManualGrid={ isManualGrid }
 			ref={ contentRef }
@@ -45,46 +45,12 @@ export function GridVisualizer( { clientId, contentRef, parentLayout } ) {
 	);
 }
 
-const checkIfCellOccupied = ( gridElement, column, row ) => {
-	const cell = Array.from( gridElement.children ).find( ( child ) => {
-		const [ columnStart, columnSpan ] =
-			getComputedCSS( child, 'grid-column' ).match( /\d+/g ) || [];
-		const [ rowStart, rowSpan ] =
-			getComputedCSS( child, 'grid-row' ).match( /\d+/g ) || [];
-		const columnEnd = columnSpan
-			? parseInt( columnStart, 10 ) + parseInt( columnSpan, 10 ) - 1
-			: columnStart;
-		const rowEnd = rowSpan
-			? parseInt( rowStart, 10 ) + parseInt( rowSpan, 10 ) - 1
-			: rowStart;
-		return (
-			column >= columnStart &&
-			column <= columnEnd &&
-			row >= rowStart &&
-			row <= rowEnd
-		);
-	} );
-	return cell !== undefined;
-};
-
 const GridVisualizerGrid = forwardRef(
-	( { clientId, gridElement, isManualGrid }, ref ) => {
+	( { gridClientId, gridElement, isManualGrid }, ref ) => {
 		const [ gridInfo, setGridInfo ] = useState( () =>
 			getGridInfo( gridElement )
 		);
 		const [ isDroppingAllowed, setIsDroppingAllowed ] = useState( false );
-		const [ highlightedRect, setHighlightedRect ] = useState( null );
-
-		const {
-			updateBlockAttributes,
-			moveBlocksToPosition,
-			__unstableMarkNextChangeAsNotPersistent,
-		} = useDispatch( blockEditorStore );
-
-		const getNumberOfBlocksBeforeCell = useGetNumberOfBlocksBeforeCell(
-			clientId,
-			gridInfo.numColumns
-		);
 
 		useEffect( () => {
 			const observers = [];
@@ -122,7 +88,7 @@ const GridVisualizerGrid = forwardRef(
 				className={ clsx( 'block-editor-grid-visualizer', {
 					'is-dropping-allowed': isDroppingAllowed,
 				} ) }
-				clientId={ clientId }
+				clientId={ gridClientId }
 				__unstablePopoverSlot="block-toolbar"
 			>
 				<div
@@ -130,103 +96,118 @@ const GridVisualizerGrid = forwardRef(
 					className="block-editor-grid-visualizer__grid"
 					style={ gridInfo.style }
 				>
-					{ isManualGrid
-						? range( 1, gridInfo.numRows ).map( ( row ) =>
-								range( 1, gridInfo.numColumns ).map(
-									( column ) => {
-										const isCellOccupied =
-											checkIfCellOccupied(
-												gridElement,
-												column,
-												row
-											);
-										const isHighlighted =
-											highlightedRect?.contains(
-												column,
-												row
-											) ?? false;
-										return (
-											<GridVisualizerCell
-												key={ `${ row }-${ column }` }
-												color={ gridInfo.currentColor }
-												className={
-													isHighlighted &&
-													'is-highlighted'
-												}
-											>
-												{ isCellOccupied ? (
-													<GridVisualizerDropZone
-														column={ column }
-														row={ row }
-														gridClientId={
-															clientId
-														}
-														gridInfo={ gridInfo }
-														setHighlightedRect={
-															setHighlightedRect
-														}
-													/>
-												) : (
-													<GridVisualizerAppender
-														column={ column }
-														row={ row }
-														gridClientId={
-															clientId
-														}
-														gridInfo={ gridInfo }
-														setHighlightedRect={
-															setHighlightedRect
-														}
-														onSelectCallback={ (
-															block
-														) => {
-															updateBlockAttributes(
-																block.clientId,
-																{
-																	style: {
-																		layout: {
-																			columnStart:
-																				column,
-																			rowStart:
-																				row,
-																		},
-																	},
-																}
-															);
-															__unstableMarkNextChangeAsNotPersistent();
-															moveBlocksToPosition(
-																[
-																	block.clientId,
-																],
-																clientId,
-																clientId,
-																getNumberOfBlocksBeforeCell(
-																	column,
-																	row
-																)
-															);
-														} }
-													/>
-												) }
-											</GridVisualizerCell>
-										);
-									}
-								)
-						  )
-						: Array.from(
-								{ length: gridInfo.numItems },
-								( _, i ) => (
-									<GridVisualizerCell
-										key={ i }
-										color={ gridInfo.currentColor }
-									/>
-								)
-						  ) }
+					{ isManualGrid ? (
+						<ManualGridVisualizer
+							gridClientId={ gridClientId }
+							gridInfo={ gridInfo }
+						/>
+					) : (
+						Array.from( { length: gridInfo.numItems }, ( _, i ) => (
+							<GridVisualizerCell
+								key={ i }
+								color={ gridInfo.currentColor }
+							/>
+						) )
+					) }
 				</div>
 			</BlockPopoverCover>
 		);
 	}
 );
+
+function ManualGridVisualizer( { gridClientId, gridInfo } ) {
+	const [ highlightedRect, setHighlightedRect ] = useState( null );
+
+	const occupiedRects = useSelect( ( select ) => {
+		const { getBlockOrder, getBlockAttributes } =
+			select( blockEditorStore );
+		const rects = [];
+		for ( const clientId of getBlockOrder( gridClientId ) ) {
+			const attributes = getBlockAttributes( clientId );
+			const {
+				columnStart,
+				rowStart,
+				columnSpan = 1,
+				rowSpan = 1,
+			} = attributes.style?.layout || {};
+			if ( ! columnStart || ! rowStart ) {
+				continue;
+			}
+			rects.push(
+				new GridRect( {
+					columnStart,
+					rowStart,
+					columnSpan,
+					rowSpan,
+				} )
+			);
+		}
+		return rects;
+	} );
+
+	const {
+		updateBlockAttributes,
+		moveBlocksToPosition,
+		__unstableMarkNextChangeAsNotPersistent,
+	} = useDispatch( blockEditorStore );
+
+	const getNumberOfBlocksBeforeCell = useGetNumberOfBlocksBeforeCell(
+		gridClientId,
+		gridInfo.numColumns
+	);
+
+	return range( 1, gridInfo.numRows ).map( ( row ) =>
+		range( 1, gridInfo.numColumns ).map( ( column ) => {
+			const isCellOccupied = occupiedRects.some( ( rect ) =>
+				rect.contains( column, row )
+			);
+			const isHighlighted =
+				highlightedRect?.contains( column, row ) ?? false;
+			return (
+				<GridVisualizerCell
+					key={ `${ row }-${ column }` }
+					color={ gridInfo.currentColor }
+					className={ isHighlighted && 'is-highlighted' }
+				>
+					{ isCellOccupied ? (
+						<GridVisualizerDropZone
+							column={ column }
+							row={ row }
+							gridClientId={ gridClientId }
+							gridInfo={ gridInfo }
+							setHighlightedRect={ setHighlightedRect }
+						/>
+					) : (
+						<GridVisualizerAppender
+							column={ column }
+							row={ row }
+							gridClientId={ gridClientId }
+							gridInfo={ gridInfo }
+							setHighlightedRect={ setHighlightedRect }
+							onSelectCallback={ ( block ) => {
+								updateBlockAttributes( block.clientId, {
+									style: {
+										layout: {
+											columnStart: column,
+											rowStart: row,
+										},
+									},
+								} );
+								__unstableMarkNextChangeAsNotPersistent();
+								moveBlocksToPosition(
+									[ block.clientId ],
+									gridClientId,
+									gridClientId,
+									getNumberOfBlocksBeforeCell( column, row )
+								);
+							} }
+						/>
+					) }
+				</GridVisualizerCell>
+			);
+		} )
+	);
+}
 
 function GridVisualizerCell( { color, children, className } ) {
 	return (
