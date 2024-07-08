@@ -51,6 +51,7 @@ function DataFormTextControl< Item >( {
 			placeholder={ placeholder }
 			value={ value }
 			onChange={ onChangeControl }
+			__next40pxDefaultSize
 		/>
 	);
 }
