@@ -235,24 +235,24 @@ export default function TypographyPanel( {
 	const hasFontWeights = settings?.typography?.fontWeight;
 	const fontStyle = decodeValue( inheritedValue?.typography?.fontStyle );
 	const fontWeight = decodeValue( inheritedValue?.typography?.fontWeight );
-	const setFontAppearance = ( {
-		fontStyle: newFontStyle,
-		fontWeight: newFontWeight,
-	} ) => {
-		onChange( {
-			...value,
-			typography: {
-				...value?.typography,
-				fontStyle: newFontStyle || undefined,
-				fontWeight: newFontWeight || undefined,
-			},
-		} );
-	};
+	const setFontAppearance = useCallback(
+		( { fontStyle: newFontStyle, fontWeight: newFontWeight } ) => {
+			onChange( {
+				...value,
+				typography: {
+					...value?.typography,
+					fontStyle: newFontStyle || undefined,
+					fontWeight: newFontWeight || undefined,
+				},
+			} );
+		},
+		[ value, onChange ]
+	);
 	const hasFontAppearance = () =>
 		!! value?.typography?.fontStyle || !! value?.typography?.fontWeight;
-	const resetFontAppearance = () => {
+	const resetFontAppearance = useCallback( () => {
 		setFontAppearance( {} );
-	};
+	}, [ setFontAppearance ] );
 
 	// Check if previous font style and weight values are available in the new font family
 	useEffect( () => {
@@ -268,7 +268,14 @@ export default function TypographyPanel( {
 			// Reset font appearance if there are no available styles or weights
 			resetFontAppearance();
 		}
-	}, [ fontFamily ] );
+	}, [
+		fontFamily,
+		fontFamilyFaces,
+		fontStyle,
+		fontWeight,
+		resetFontAppearance,
+		setFontAppearance,
+	] );
 
 	// Line Height
 	const hasLineHeightEnabled = useHasLineHeightControl( settings );
