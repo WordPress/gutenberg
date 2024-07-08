@@ -505,7 +505,7 @@ class WP_Theme_JSON_Gutenberg {
 	const VALID_STYLES = array(
 		'background' => array(
 			'backgroundImage'      => null,
-            'backgroundAttachment' => null,
+			'backgroundAttachment' => null,
 			'backgroundPosition'   => null,
 			'backgroundRepeat'     => null,
 			'backgroundSize'       => null,
