@@ -1,8 +1,15 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import {
+	Icon,
 	__experimentalText as Text,
+	__experimentalHStack as HStack,
 	VisuallyHidden,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -25,7 +32,7 @@ import { Async } from '../async';
 import Page from '../page';
 import { default as Link, useLink } from '../routes/link';
 import AddNewTemplate from '../add-new-template';
-
+import { useAddedBy } from './hooks';
 import {
 	TEMPLATE_POST_TYPE,
 	OPERATOR_IS_ANY,
@@ -37,7 +44,6 @@ import {
 import usePatternSettings from '../page-patterns/use-pattern-settings';
 import { unlock } from '../../lock-unlock';
 import { useEditPostAction } from '../dataviews-actions';
-import { TemplateAuthorField } from './author-field';
 
 const { usePostActions } = unlock( editorPrivateApis );
 
@@ -92,6 +98,36 @@ function Title( { item, viewType } ) {
 		<Link { ...linkProps }>
 			{ decodeEntities( item.title?.rendered ) || __( '(no title)' ) }
 		</Link>
+	);
+}
+
+function AuthorField( { item, viewType } ) {
+	const [ isImageLoaded, setIsImageLoaded ] = useState( false );
+	const { text, icon, imageUrl } = useAddedBy( item.type, item.id );
+	const withIcon = viewType !== LAYOUT_LIST;
+
+	return (
+		<HStack alignment="left" spacing={ 1 }>
+			{ withIcon && imageUrl && (
+				<div
+					className={ clsx( 'page-templates-author-field__avatar', {
+						'is-loaded': isImageLoaded,
+					} ) }
+				>
+					<img
+						onLoad={ () => setIsImageLoaded( true ) }
+						alt=""
+						src={ imageUrl }
+					/>
+				</div>
+			) }
+			{ withIcon && ! imageUrl && (
+				<div className="page-templates-author-field__icon">
+					<Icon icon={ icon } />
+				</div>
+			) }
+			<span className="page-templates-author-field__name">{ text }</span>
+		</HStack>
 	);
 }
 
@@ -274,12 +310,7 @@ export default function PageTemplates() {
 				id: 'author',
 				getValue: ( { item } ) => item.author_text,
 				render: ( { item } ) => {
-					return (
-						<TemplateAuthorField
-							viewType={ view.type }
-							item={ item }
-						/>
-					);
+					return <AuthorField viewType={ view.type } item={ item } />;
 				},
 				elements: authors,
 				width: '1%',
