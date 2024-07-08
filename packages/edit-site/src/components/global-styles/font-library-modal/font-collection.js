@@ -438,7 +438,7 @@ function FontCollection( { slug } ) {
 								disabled={
 									fontsToInstall.length === 0 || isInstalling
 								}
-								__experimentalIsFocusable
+								accessibleWhenDisabled
 							>
 								{ __( 'Install' ) }
 							</Button>
@@ -455,7 +455,7 @@ function FontCollection( { slug } ) {
 								size="compact"
 								onClick={ () => setPage( 1 ) }
 								disabled={ page === 1 }
-								__experimentalIsFocusable
+								accessibleWhenDisabled
 							>
 								<span>«</span>
 							</Button>
@@ -464,7 +464,7 @@ function FontCollection( { slug } ) {
 								size="compact"
 								onClick={ () => setPage( page - 1 ) }
 								disabled={ page === 1 }
-								__experimentalIsFocusable
+								accessibleWhenDisabled
 							>
 								<span>‹</span>
 							</Button>
@@ -514,7 +514,7 @@ function FontCollection( { slug } ) {
 								size="compact"
 								onClick={ () => setPage( page + 1 ) }
 								disabled={ page === totalPages }
-								__experimentalIsFocusable
+								accessibleWhenDisabled
 							>
 								<span>›</span>
 							</Button>
@@ -523,7 +523,7 @@ function FontCollection( { slug } ) {
 								size="compact"
 								onClick={ () => setPage( totalPages ) }
 								disabled={ page === totalPages }
-								__experimentalIsFocusable
+								accessibleWhenDisabled
 							>
 								<span>»</span>
 							</Button>

@@ -62,7 +62,7 @@ function BlockMover( {
 				orientation: getBlockListSettings( _rootClientId )?.orientation,
 				isManualGrid:
 					layout.type === 'grid' &&
-					!! layout.columnCount &&
+					layout.isManualPlacement &&
 					window.__experimentalEnableGridInteractivity,
 			};
 		},

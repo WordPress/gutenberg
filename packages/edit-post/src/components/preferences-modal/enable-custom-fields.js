@@ -42,7 +42,7 @@ export function CustomFieldsConfirmation( { willEnable } ) {
 				className="edit-post-preferences-modal__custom-fields-confirmation-button"
 				variant="secondary"
 				isBusy={ isReloading }
-				__experimentalIsFocusable
+				accessibleWhenDisabled
 				disabled={ isReloading }
 				onClick={ () => {
 					setIsReloading( true );

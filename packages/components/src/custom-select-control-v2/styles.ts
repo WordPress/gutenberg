@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
 import * as Ariakit from '@ariakit/react';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
@@ -11,6 +10,7 @@ import styled from '@emotion/styled';
 import { COLORS, CONFIG } from '../utils';
 import { space } from '../utils/space';
 import { chevronIconSize } from '../select-control/styles/select-control-styles';
+import { fontSizeStyles } from '../input-control/styles/input-control-styles';
 import type { CustomSelectButtonSize } from './types';
 
 const INLINE_PADDING = {
@@ -92,7 +92,6 @@ export const Select = styled( Ariakit.Select, {
 		color: ${ COLORS.theme.foreground };
 		cursor: pointer;
 		font-family: inherit;
-		font-size: ${ CONFIG.fontSize };
 		text-align: start;
 		user-select: none;
 		width: 100%;
@@ -103,6 +102,7 @@ export const Select = styled( Ariakit.Select, {
 
 		${ getSelectSize( size, hasCustomRenderProp ? 'minHeight' : 'height' ) }
 		${ ! hasCustomRenderProp && truncateStyles }
+		${ fontSizeStyles( { inputSize: size } ) }
 	`
 );
 

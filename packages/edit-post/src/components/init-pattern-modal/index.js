@@ -100,7 +100,7 @@ export default function InitPatternModal() {
 									variant="primary"
 									type="submit"
 									disabled={ ! title }
-									__experimentalIsFocusable
+									accessibleWhenDisabled
 								>
 									{ __( 'Create' ) }
 								</Button>

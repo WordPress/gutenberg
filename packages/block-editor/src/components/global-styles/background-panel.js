@@ -269,6 +269,7 @@ function BackgroundImageControls( {
 	inheritedValue,
 	onRemoveImage = noop,
 	displayInPanel,
+	themeFileURIs,
 } ) {
 	const mediaUpload = useSelect(
 		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
@@ -392,7 +393,10 @@ function BackgroundImageControls( {
 				name={
 					<InspectorImagePreviewItem
 						className="block-editor-global-styles-background-panel__image-preview"
-						imgUrl={ url }
+						imgUrl={ getResolvedThemeFilePath(
+							url,
+							themeFileURIs
+						) }
 						filename={ title }
 						label={ imgLabel }
 					/>
@@ -547,7 +551,7 @@ function BackgroundSizeControls( {
 			<FocalPointPicker
 				__next40pxDefaultSize
 				__nextHasNoMarginBottom
-				label={ __( 'Position' ) }
+				label={ __( 'Focal point' ) }
 				url={ getResolvedThemeFilePath( imageValue, themeFileURIs ) }
 				value={ backgroundPositionToCoords( positionValue ) }
 				onChange={ updateBackgroundPosition }
@@ -706,6 +710,7 @@ export default function BackgroundPanel( {
 								onChange={ onChange }
 								style={ value }
 								inheritedValue={ inheritedValue }
+								themeFileURIs={ themeFileURIs }
 								displayInPanel
 								onRemoveImage={ () => {
 									setIsDropDownOpen( false );
@@ -727,6 +732,7 @@ export default function BackgroundPanel( {
 						onChange={ onChange }
 						style={ value }
 						inheritedValue={ inheritedValue }
+						themeFileURIs={ themeFileURIs }
 					/>
 				) }
 			</div>

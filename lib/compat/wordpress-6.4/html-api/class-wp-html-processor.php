@@ -101,16 +101,12 @@ if ( ! class_exists( 'WP_HTML_Processor' ) ) {
 	 *
 	 * The following list specifies the HTML tags that _are_ supported:
 	 *
-	 *  - Containers: ADDRESS, BLOCKQUOTE, DETAILS, DIALOG, DIV, FOOTER, HEADER, MAIN, MENU, SPAN, SUMMARY.
-	 *  - Form elements: BUTTON, FIELDSET, SEARCH.
-	 *  - Formatting elements: B, BIG, CODE, EM, FONT, I, SMALL, STRIKE, STRONG, TT, U.
-	 *  - Heading elements: HGROUP.
 	 *  - Links: A.
-	 *  - Lists: DL.
-	 *  - Media elements: FIGCAPTION, FIGURE, IMG.
+	 *  - The formatting elements: B, BIG, CODE, EM, FONT, I, SMALL, STRIKE, STRONG, TT, U.
+	 *  - Containers: DIV, FIGCAPTION, FIGURE, SPAN.
+	 *  - Form elements: BUTTON.
 	 *  - Paragraph: P.
-	 *  - Sectioning elements: ARTICLE, ASIDE, NAV, SECTION
-	 *  - Deprecated elements: CENTER, DIR
+	 *  - Void elements: IMG.
 	 *
 	 * ### Supported markup
 	 *
@@ -211,8 +207,8 @@ if ( ! class_exists( 'WP_HTML_Processor' ) ) {
 		private $release_internal_bookmark_on_destruct = null;
 
 		/*
-		* Public Interface Functions
-		*/
+		 * Public Interface Functions
+		 */
 
 		/**
 		 * Creates an HTML processor in the fragment parsing mode.
@@ -254,7 +250,7 @@ if ( ! class_exists( 'WP_HTML_Processor' ) ) {
 			$p->state->context_node   = array( 'BODY', array() );
 			$p->state->insertion_mode = WP_HTML_Processor_State::INSERTION_MODE_IN_BODY;
 
-			// @todo Create "fake" bookmarks for non-existent but implied nodes.
+			// @TODO: Create "fake" bookmarks for non-existent but implied nodes.
 			$p->bookmarks['root-node']    = new WP_HTML_Span( 0, 0 );
 			$p->bookmarks['context-node'] = new WP_HTML_Span( 0, 0 );
 
@@ -309,10 +305,10 @@ if ( ! class_exists( 'WP_HTML_Processor' ) ) {
 			$this->state = new WP_HTML_Processor_State();
 
 			/*
-			* Create this wrapper so that it's possible to pass
-			* a private method into WP_HTML_Token classes without
-			* exposing it to any public API.
-			*/
+			 * Create this wrapper so that it's possible to pass
+			 * a private method into WP_HTML_Token classes without
+			 * exposing it to any public API.
+			 */
 			$this->release_internal_bookmark_on_destruct = function ( $name ) {
 				parent::release_bookmark( $name );
 			};
@@ -348,7 +344,7 @@ if ( ! class_exists( 'WP_HTML_Processor' ) ) {
 		/**
 		 * Finds the next tag matching the $query.
 		 *
-		 * @todo Support matching the class name and tag name.
+		 * @TODO: Support matching the class name and tag name.
 		 *
 		 * @since 6.4.0
 		 *
@@ -500,19 +496,19 @@ if ( ! class_exists( 'WP_HTML_Processor' ) ) {
 
 			if ( self::PROCESS_NEXT_NODE === $node_to_process ) {
 				/*
-				* Void elements still hop onto the stack of open elements even though
-				* there's no corresponding closing tag. This is important for managing
-				* stack-based operations such as "navigate to parent node" or checking
-				* on an element's breadcrumbs.
-				*
-				* When moving on to the next node, therefore, if the bottom-most element
-				* on the stack is a void element, it must be closed.
-				*
-				* @todo Once self-closing foreign elements and BGSOUND are supported,
-				*        they must also be implicitly closed here too. BGSOUND is
-				*        special since it's only self-closing if the self-closing flag
-				*        is provided in the opening tag, otherwise it expects a tag closer.
-				*/
+				 * Void elements still hop onto the stack of open elements even though
+				 * there's no corresponding closing tag. This is important for managing
+				 * stack-based operations such as "navigate to parent node" or checking
+				 * on an element's breadcrumbs.
+				 *
+				 * When moving on to the next node, therefore, if the bottom-most element
+				 * on the stack is a void element, it must be closed.
+				 *
+				 * @TODO: Once self-closing foreign elements and BGSOUND are supported,
+				 *        they must also be implicitly closed here too. BGSOUND is
+				 *        special since it's only self-closing if the self-closing flag
+				 *        is provided in the opening tag, otherwise it expects a tag closer.
+				 */
 				$top_node = $this->state->stack_of_open_elements->current_node();
 				if ( $top_node && self::is_void( $top_node->node_name ) ) {
 					$this->state->stack_of_open_elements->pop();
@@ -544,9 +540,9 @@ if ( ! class_exists( 'WP_HTML_Processor' ) ) {
 				}
 			} catch ( WP_HTML_Unsupported_Exception $e ) {
 				/*
-				* Exceptions are used in this class to escape deep call stacks that
-				* otherwise might involve messier calling and return conventions.
-				*/
+				 * Exceptions are used in this class to escape deep call stacks that
+				 * otherwise might involve messier calling and return conventions.
+				 */
 				return false;
 			}
 		}
@@ -557,9 +553,9 @@ if ( ! class_exists( 'WP_HTML_Processor' ) ) {
 		 * Breadcrumbs start at the outermost parent and descend toward the matched element.
 		 * They always include the entire path from the root HTML node to the matched element.
 		 *
-		 * @todo It could be more efficient to expose a generator-based version of this function
-		 *       to avoid creating the array copy on tag iteration. If this is done, it would likely
-		 *       be more useful to walk up the stack when yielding instead of starting at the top.
+		 * @TODO: It could be more efficient to expose a generator-based version of this function
+		 *        to avoid creating the array copy on tag iteration. If this is done, it would likely
+		 *        be more useful to walk up the stack when yielding instead of starting at the top.
 		 *
 		 * Example
 		 *
@@ -606,11 +602,11 @@ if ( ! class_exists( 'WP_HTML_Processor' ) ) {
 
 			switch ( $op ) {
 				/*
-				* > A start tag whose tag name is "button"
-				*/
+				 * > A start tag whose tag name is "button"
+				 */
 				case '+BUTTON':
 					if ( $this->state->stack_of_open_elements->has_element_in_scope( 'BUTTON' ) ) {
-						// @todo Indicate a parse error once it's possible. This error does not impact the logic here.
+						// @TODO: Indicate a parse error once it's possible. This error does not impact the logic here.
 						$this->generate_implied_end_tags();
 						$this->state->stack_of_open_elements->pop_until( 'BUTTON' );
 					}
@@ -622,34 +618,16 @@ if ( ! class_exists( 'WP_HTML_Processor' ) ) {
 					return true;
 
 				/*
-				* > A start tag whose tag name is one of: "address", "article", "aside",
-				* > "blockquote", "center", "details", "dialog", "dir", "div", "dl",
-				* > "fieldset", "figcaption", "figure", "footer", "header", "hgroup",
-				* > "main", "menu", "nav", "ol", "p", "search", "section", "summary", "ul"
-				*/
-				case '+ADDRESS':
-				case '+ARTICLE':
-				case '+ASIDE':
+				 * > A start tag whose tag name is one of: "address", "article", "aside",
+				 * > "blockquote", "center", "details", "dialog", "dir", "div", "dl",
+				 * > "fieldset", "figcaption", "figure", "footer", "header", "hgroup",
+				 * > "main", "menu", "nav", "ol", "p", "search", "section", "summary", "ul"
+				 */
 				case '+BLOCKQUOTE':
-				case '+CENTER':
-				case '+DETAILS':
-				case '+DIALOG':
-				case '+DIR':
 				case '+DIV':
-				case '+DL':
-				case '+FIELDSET':
 				case '+FIGCAPTION':
 				case '+FIGURE':
-				case '+FOOTER':
-				case '+HEADER':
-				case '+HGROUP':
-				case '+MAIN':
-				case '+MENU':
-				case '+NAV':
 				case '+P':
-				case '+SEARCH':
-				case '+SECTION':
-				case '+SUMMARY':
 					if ( $this->state->stack_of_open_elements->has_p_in_button_scope() ) {
 						$this->close_a_p_element();
 					}
@@ -658,50 +636,32 @@ if ( ! class_exists( 'WP_HTML_Processor' ) ) {
 					return true;
 
 				/*
-				* > An end tag whose tag name is one of: "address", "article", "aside", "blockquote",
-				* > "button", "center", "details", "dialog", "dir", "div", "dl", "fieldset",
-				* > "figcaption", "figure", "footer", "header", "hgroup", "listing", "main",
-				* > "menu", "nav", "ol", "pre", "search", "section", "summary", "ul"
-				*/
-				case '-ADDRESS':
-				case '-ARTICLE':
-				case '-ASIDE':
+				 * > An end tag whose tag name is one of: "address", "article", "aside", "blockquote",
+				 * > "button", "center", "details", "dialog", "dir", "div", "dl", "fieldset",
+				 * > "figcaption", "figure", "footer", "header", "hgroup", "listing", "main",
+				 * > "menu", "nav", "ol", "pre", "search", "section", "summary", "ul"
+				 */
 				case '-BLOCKQUOTE':
 				case '-BUTTON':
-				case '-CENTER':
-				case '-DETAILS':
-				case '-DIALOG':
-				case '-DIR':
 				case '-DIV':
-				case '-DL':
-				case '-FIELDSET':
 				case '-FIGCAPTION':
 				case '-FIGURE':
-				case '-FOOTER':
-				case '-HEADER':
-				case '-HGROUP':
-				case '-MAIN':
-				case '-MENU':
-				case '-NAV':
-				case '-SEARCH':
-				case '-SECTION':
-				case '-SUMMARY':
 					if ( ! $this->state->stack_of_open_elements->has_element_in_scope( $tag_name ) ) {
-						// @todo Report parse error.
+						// @TODO: Report parse error.
 						// Ignore the token.
 						return $this->step();
 					}
 
 					$this->generate_implied_end_tags();
 					if ( $this->state->stack_of_open_elements->current_node()->node_name !== $tag_name ) {
-						// @todo Record parse error: this error doesn't impact parsing.
+						// @TODO: Record parse error: this error doesn't impact parsing.
 					}
 					$this->state->stack_of_open_elements->pop_until( $tag_name );
 					return true;
 
 				/*
-				* > An end tag whose tag name is "p"
-				*/
+				 * > An end tag whose tag name is "p"
+				 */
 				case '-P':
 					if ( ! $this->state->stack_of_open_elements->has_p_in_button_scope() ) {
 						$this->insert_html_element( $this->state->current_token );
@@ -731,9 +691,9 @@ if ( ! class_exists( 'WP_HTML_Processor' ) ) {
 					return true;
 
 				/*
-				* > A start tag whose tag name is one of: "b", "big", "code", "em", "font", "i",
-				* > "s", "small", "strike", "strong", "tt", "u"
-				*/
+				 * > A start tag whose tag name is one of: "b", "big", "code", "em", "font", "i",
+				 * > "s", "small", "strike", "strong", "tt", "u"
+				 */
 				case '+B':
 				case '+BIG':
 				case '+CODE':
@@ -752,9 +712,9 @@ if ( ! class_exists( 'WP_HTML_Processor' ) ) {
 					return true;
 
 				/*
-				* > An end tag whose tag name is one of: "a", "b", "big", "code", "em", "font", "i",
-				* > "nobr", "s", "small", "strike", "strong", "tt", "u"
-				*/
+				 * > An end tag whose tag name is one of: "a", "b", "big", "code", "em", "font", "i",
+				 * > "nobr", "s", "small", "strike", "strong", "tt", "u"
+				 */
 				case '-A':
 				case '-B':
 				case '-BIG':
@@ -772,24 +732,24 @@ if ( ! class_exists( 'WP_HTML_Processor' ) ) {
 					return true;
 
 				/*
-				* > A start tag whose tag name is one of: "area", "br", "embed", "img", "keygen", "wbr"
-				*/
+				 * > A start tag whose tag name is one of: "area", "br", "embed", "img", "keygen", "wbr"
+				 */
 				case '+IMG':
 					$this->reconstruct_active_formatting_elements();
 					$this->insert_html_element( $this->state->current_token );
 					return true;
 
 				/*
-				* > Any other start tag
-				*/
+				 * > Any other start tag
+				 */
 				case '+SPAN':
 					$this->reconstruct_active_formatting_elements();
 					$this->insert_html_element( $this->state->current_token );
 					return true;
 
 				/*
-				* Any other end tag
-				*/
+				 * Any other end tag
+				 */
 				case '-SPAN':
 					foreach ( $this->state->stack_of_open_elements->walk_up() as $item ) {
 						// > If node is an HTML element with the same tag name as the token, then:
@@ -817,8 +777,8 @@ if ( ! class_exists( 'WP_HTML_Processor' ) ) {
 		}
 
 		/*
-		* Internal helpers
-		*/
+		 * Internal helpers
+		 */
 
 		/**
 		 * Creates a new bookmark for the currently-matched tag and returns the generated name.
@@ -843,8 +803,8 @@ if ( ! class_exists( 'WP_HTML_Processor' ) ) {
 		}
 
 		/*
-		* HTML semantic overrides for Tag Processor
-		*/
+		 * HTML semantic overrides for Tag Processor
+		 */
 
 		/**
 		 * Returns the uppercase name of the matched tag.
@@ -877,9 +837,9 @@ if ( ! class_exists( 'WP_HTML_Processor' ) ) {
 			switch ( $tag_name ) {
 				case 'IMAGE':
 					/*
-					* > A start tag whose tag name is "image"
-					* > Change the token's tag name to "img" and reprocess it. (Don't ask.)
-					*/
+					 * > A start tag whose tag name is "image"
+					 * > Change the token's tag name to "img" and reprocess it. (Don't ask.)
+					 */
 					return 'IMG';
 
 				default:
@@ -936,13 +896,13 @@ if ( ! class_exists( 'WP_HTML_Processor' ) ) {
 
 				case 'backward':
 					/*
-					* When moving backwards, clear out all existing stack entries which appear after the destination
-					* bookmark. These could be stored for later retrieval, but doing so would require additional
-					* memory overhead and also demand that references and bookmarks are updated as the document
-					* changes. In time this could be a valuable optimization, but it's okay to give up that
-					* optimization in exchange for more CPU time to recompute the stack, to re-parse the
-					* document that may have already been parsed once.
-					*/
+					 * When moving backwards, clear out all existing stack entries which appear after the destination
+					 * bookmark. These could be stored for later retrieval, but doing so would require additional
+					 * memory overhead and also demand that references and bookmarks are updated as the document
+					 * changes. In time this could be a valuable optimization, but it's okay to give up that
+					 * optimization in exchange for more CPU time to recompute the stack, to re-parse the
+					 * document that may have already been parsed once.
+					 */
 					foreach ( $this->state->stack_of_open_elements->walk_up() as $item ) {
 						if ( $bookmark_starts_at >= $this->bookmarks[ $item->bookmark_name ]->start ) {
 							break;
@@ -1048,8 +1008,8 @@ if ( ! class_exists( 'WP_HTML_Processor' ) ) {
 		}
 
 		/*
-		* HTML Parsing Algorithms
-		*/
+		 * HTML Parsing Algorithms
+		 */
 
 		/**
 		 * Closes a P element.
@@ -1126,9 +1086,9 @@ if ( ! class_exists( 'WP_HTML_Processor' ) ) {
 		 */
 		private function reconstruct_active_formatting_elements() {
 			/*
-			* > If there are no entries in the list of active formatting elements, then there is nothing
-			* > to reconstruct; stop this algorithm.
-			*/
+			 * > If there are no entries in the list of active formatting elements, then there is nothing
+			 * > to reconstruct; stop this algorithm.
+			 */
 			if ( 0 === $this->state->active_formatting_elements->count() ) {
 				return false;
 			}
@@ -1137,16 +1097,16 @@ if ( ! class_exists( 'WP_HTML_Processor' ) ) {
 			if (
 
 				/*
-				* > If the last (most recently added) entry in the list of active formatting elements is a marker;
-				* > stop this algorithm.
-				*/
+				 * > If the last (most recently added) entry in the list of active formatting elements is a marker;
+				 * > stop this algorithm.
+				 */
 				'marker' === $last_entry->node_name ||
 
 				/*
-				* > If the last (most recently added) entry in the list of active formatting elements is an
-				* > element that is in the stack of open elements, then there is nothing to reconstruct;
-				* > stop this algorithm.
-				*/
+				 * > If the last (most recently added) entry in the list of active formatting elements is an
+				 * > element that is in the stack of open elements, then there is nothing to reconstruct;
+				 * > stop this algorithm.
+				 */
 				$this->state->stack_of_open_elements->contains_node( $last_entry )
 			) {
 				return false;
@@ -1187,11 +1147,11 @@ if ( ! class_exists( 'WP_HTML_Processor' ) ) {
 				}
 
 				/*
-				* > Let formatting element be the last element in the list of active formatting elements that:
-				* >   - is between the end of the list and the last marker in the list,
-				* >     if any, or the start of the list otherwise,
-				* >   - and has the tag name subject.
-				*/
+				 * > Let formatting element be the last element in the list of active formatting elements that:
+				 * >   - is between the end of the list and the last marker in the list,
+				 * >     if any, or the start of the list otherwise,
+				 * >   - and has the tag name subject.
+				 */
 				$formatting_element = null;
 				foreach ( $this->state->active_formatting_elements->walk_up() as $item ) {
 					if ( 'marker' === $item->node_name ) {
@@ -1222,9 +1182,9 @@ if ( ! class_exists( 'WP_HTML_Processor' ) ) {
 				}
 
 				/*
-				* > Let furthest block be the topmost node in the stack of open elements that is lower in the stack
-				* > than formatting element, and is an element in the special category. There might not be one.
-				*/
+				 * > Let furthest block be the topmost node in the stack of open elements that is lower in the stack
+				 * > than formatting element, and is an element in the special category. There might not be one.
+				 */
 				$is_above_formatting_element = true;
 				$furthest_block              = null;
 				foreach ( $this->state->stack_of_open_elements->walk_down() as $item ) {
@@ -1244,10 +1204,10 @@ if ( ! class_exists( 'WP_HTML_Processor' ) ) {
 				}
 
 				/*
-				* > If there is no furthest block, then the UA must first pop all the nodes from the bottom of the
-				* > stack of open elements, from the current node up to and including formatting element, then
-				* > remove formatting element from the list of active formatting elements, and finally return.
-				*/
+				 * > If there is no furthest block, then the UA must first pop all the nodes from the bottom of the
+				 * > stack of open elements, from the current node up to and including formatting element, then
+				 * > remove formatting element from the list of active formatting elements, and finally return.
+				 */
 				if ( null === $furthest_block ) {
 					foreach ( $this->state->stack_of_open_elements->walk_up() as $item ) {
 						$this->state->stack_of_open_elements->pop();
@@ -1281,8 +1241,8 @@ if ( ! class_exists( 'WP_HTML_Processor' ) ) {
 		}
 
 		/*
-		* HTML Specification Helpers
-		*/
+		 * HTML Specification Helpers
+		 */
 
 		/**
 		 * Returns whether an element of a given name is in the HTML special category.
@@ -1430,8 +1390,8 @@ if ( ! class_exists( 'WP_HTML_Processor' ) ) {
 		}
 
 		/*
-		* Constants that would pollute the top of the class if they were found there.
-		*/
+		 * Constants that would pollute the top of the class if they were found there.
+		 */
 
 		/**
 		 * Indicates that the next HTML token should be parsed and processed.

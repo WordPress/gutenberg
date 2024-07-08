@@ -99,16 +99,16 @@ if ( ! class_exists( 'WP_HTML_Active_Formatting_Elements' ) ) {
 		 */
 		public function push( $token ) {
 			/*
-			* > If there are already three elements in the list of active formatting elements after the last marker,
-			* > if any, or anywhere in the list if there are no markers, that have the same tag name, namespace, and
-			* > attributes as element, then remove the earliest such element from the list of active formatting
-			* > elements. For these purposes, the attributes must be compared as they were when the elements were
-			* > created by the parser; two elements have the same attributes if all their parsed attributes can be
-			* > paired such that the two attributes in each pair have identical names, namespaces, and values
-			* > (the order of the attributes does not matter).
-			*
-			* @todo Implement the "Noah's Ark clause" to only add up to three of any given kind of formatting elements to the stack.
-			*/
+			 * > If there are already three elements in the list of active formatting elements after the last marker,
+			 * > if any, or anywhere in the list if there are no markers, that have the same tag name, namespace, and
+			 * > attributes as element, then remove the earliest such element from the list of active formatting
+			 * > elements. For these purposes, the attributes must be compared as they were when the elements were
+			 * > created by the parser; two elements have the same attributes if all their parsed attributes can be
+			 * > paired such that the two attributes in each pair have identical names, namespaces, and values
+			 * > (the order of the attributes does not matter).
+			 *
+			 * @TODO: Implement the "Noah's Ark clause" to only add up to three of any given kind of formatting elements to the stack.
+			 */
 			// > Add element to the list of active formatting elements.
 			$this->stack[] = $token;
 		}

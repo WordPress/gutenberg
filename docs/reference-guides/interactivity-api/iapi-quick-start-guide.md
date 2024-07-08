@@ -39,3 +39,15 @@ npx @wp-now/wp-now start
 ```
 
 You should be able to insert the "My First Interactive Block" block into any post and see how it behaves in the front end when published.
+
+<div class="callout callout-info">
+    <p>To get more advanced examples of using the Interactivity API you can check the following resources:</p>
+    <ul>
+      <li><a href="https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/#docs-examples">Docs & Examples</a></li>
+      <li><a href="https://github.com/WordPress/gutenberg/discussions/52894">Getting Started - and other learning resources</a></li>
+      <li><a href="https://github.com/WordPress/gutenberg/discussions/55642#">Interactivity API showcase</a></li>
+    </ul>
+</div>
+
+
+
