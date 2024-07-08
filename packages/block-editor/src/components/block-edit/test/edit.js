@@ -116,7 +116,7 @@ describe( 'Edit', () => {
 			attributes: {
 				fruit: 'Bananas',
 			},
-			isActive: ( { fruit } ) => fruit === 'Bananas',
+			isActive: [ 'fruit' ],
 		} );
 
 		render(
