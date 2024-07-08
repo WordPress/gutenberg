@@ -24,7 +24,7 @@ export function addGeneratedClassName( extraProps, blockType ) {
 	if ( hasBlockClassNameSupport( blockType ) ) {
 		if ( typeof extraProps.className === 'string' ) {
 			// We have some extra classes and want to add the default classname
-			// We use uniq to prevent duplicate classnames.
+			// We use a Set to prevent duplicate classnames.
 
 			extraProps.className = [
 				...new Set( [
