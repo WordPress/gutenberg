@@ -11,7 +11,13 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+              with:
+                  fetch-depth: 2 # Fetch the last two commits to compare changes
+            - name: Check for changes in backport-changelog
+              run: |
+                  git diff --quiet HEAD^ HEAD -- backport-changelog || echo "changes=true" >> $GITHUB_OUTPUT
             - name: Sync Issue
+              if: env.changes == 'true'
               uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
               with:
                   script: |
