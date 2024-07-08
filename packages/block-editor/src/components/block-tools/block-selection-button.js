@@ -162,7 +162,7 @@ function BlockSelectionButton( { clientId, rootClientId }, ref ) {
 
 	// Focus the block selection button in navigation mode.
 	// Only one block selection button renders at a time (for the individual selected block),
-	// so the instance should be focused once on mount, and then never again.
+	// so the instance should only be focused on change of client id.
 	const focusedClientId = useRef();
 	useEffect( () => {
 		const canFocus =
