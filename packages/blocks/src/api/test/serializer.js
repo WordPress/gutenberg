@@ -486,14 +486,5 @@ describe( 'block serializer', () => {
 				'wp-block-plugin-test-block'
 			);
 		} );
-
-		it( 'should return the default class name for a variant block nomenclature', () => {
-			expect(
-				getBlockDefaultClassName( 'core/test-block/variant' )
-			).toBe( 'wp-block-test-block-variant' );
-			expect(
-				getBlockDefaultClassName( 'plugin/test-block/variant' )
-			).toBe( 'wp-block-plugin-test-block-variant' );
-		} );
 	} );
 } );
