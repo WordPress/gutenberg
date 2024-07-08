@@ -48,14 +48,21 @@ const { state, actions } = store(
 				const { isSearchInputVisible } = getContext();
 				return isSearchInputVisible ? '0' : '-1';
 			},
+			get isSearchInputVisible() {
+				const ctx = getContext();
+				if ( typeof ctx.isSearchInputVisible === 'undefined' ) {
+					return ctx.isSearchInputInitiallyVisible;
+				}
+				return ctx.isSearchInputVisible;
+			},
 		},
 		actions: {
 			openSearchInput( event ) {
-				const ctx = getContext();
-				const { ref } = getElement();
-				if ( ! ctx.isSearchInputVisible ) {
+				if ( ! state.isSearchInputVisible ) {
 					event.preventDefault();
+					const ctx = getContext();
 					ctx.isSearchInputVisible = true;
+					const { ref } = getElement();
 					ref.parentElement.querySelector( 'input' ).focus();
 				}
 			},

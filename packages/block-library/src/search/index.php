@@ -204,10 +204,10 @@ function render_block_core_search( $attributes, $content, $block ) {
 		$aria_label_collapsed = __( 'Expand search field' );
 		$form_context         = wp_interactivity_data_wp_context(
 			array(
-				'isSearchInputVisible' => $open_by_default,
-				'inputId'              => $input_id,
-				'ariaLabelExpanded'    => $aria_label_expanded,
-				'ariaLabelCollapsed'   => $aria_label_collapsed,
+				'isSearchInputInitiallyVisible' => $open_by_default,
+				'inputId'                       => $input_id,
+				'ariaLabelExpanded'             => $aria_label_expanded,
+				'ariaLabelCollapsed'            => $aria_label_collapsed,
 			)
 		);
 		$form_directives     .= $form_context .
