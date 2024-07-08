@@ -11,8 +11,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import CustomSelectControl from '../legacy-component';
-import * as V1Story from '../../custom-select-control/stories/index.story';
+import CustomSelectControl from '../';
 
 const meta: Meta< typeof CustomSelectControl > = {
 	title: 'Components/CustomSelectControl v2/Legacy',
