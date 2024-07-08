@@ -179,6 +179,14 @@ If this property is added, a help text will be generated using help property as 
 -   Type: `String|Element`
 -   Required: No
 
+#### isBorderless
+
+Whether to hide the border when not focused.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
+
 #### multiple
 
 If this property is added, multiple values can be selected. The `value` passed should be an array.

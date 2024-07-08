@@ -15,6 +15,7 @@ type SelectControlBaseProps = Pick<
 	| '__next40pxDefaultSize'
 	| 'disabled'
 	| 'hideLabelFromVision'
+	| 'isBorderless'
 	| 'label'
 	| 'labelPosition'
 	| 'prefix'

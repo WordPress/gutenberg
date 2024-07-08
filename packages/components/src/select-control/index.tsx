@@ -36,6 +36,7 @@ function UnforwardedSelectControl(
 		help,
 		hideLabelFromVision,
 		id: idProp,
+		isBorderless,
 		label,
 		multiple = false,
 		onChange,
@@ -86,6 +87,7 @@ function UnforwardedSelectControl(
 				disabled={ disabled }
 				hideLabelFromVision={ hideLabelFromVision }
 				id={ id }
+				isBorderless={ isBorderless }
 				label={ label }
 				size={ size }
 				suffix={
