@@ -150,13 +150,6 @@ export const SelectItem = styled( Ariakit.SelectItem )(
 	`
 );
 
-export const SelectedItemCheck = styled( Ariakit.SelectItemCheck )`
-	display: flex;
-	align-items: center;
-	margin-inline-start: ${ space( 2 ) };
-	font-size: 24px; // Size of checkmark icon
-`;
-
 const truncateStyles = css`
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -187,4 +180,19 @@ export const WithHintItemHint = styled.span`
 	line-height: ${ CONFIG.fontLineHeightBase };
 	padding-inline-end: ${ space( 1 ) };
 	margin-block: ${ space( 1 ) };
+`;
+
+export const SelectedItemCheck = styled( Ariakit.SelectItemCheck )`
+	display: flex;
+	align-items: center;
+	margin-inline-start: ${ space( 2 ) };
+
+	// Since the checkmark's dimensions are applied with 'em' units, setting a
+	// font size of 0 allows the space reserved for the checkmark to collapse for
+	// items that are not selected or that don't have an associated item hint.
+	font-size: 0;
+	${ WithHintItemWrapper } ~ &,
+	&:not(:empty) {
+		font-size: 24px; // Size of checkmark icon
+	}
 `;
