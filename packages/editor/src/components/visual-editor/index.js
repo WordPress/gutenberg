@@ -341,7 +341,7 @@ function VisualEditor( {
 	const zoomOutProps = isZoomOutMode
 		? {
 				scale: 'default',
-				frameSize: '20px',
+				frameSize: '48px',
 		  }
 		: {};
 

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Method style type signatures have been changed to function style ([#62718](https://github.com/WordPress/gutenberg/pull/62718)).
+
 ## 7.2.0 (2024-06-26)
 
 ## 7.1.0 (2024-06-15)

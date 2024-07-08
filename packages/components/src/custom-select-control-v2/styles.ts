@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
 import * as Ariakit from '@ariakit/react';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
@@ -11,6 +10,7 @@ import styled from '@emotion/styled';
 import { COLORS, CONFIG } from '../utils';
 import { space } from '../utils/space';
 import { chevronIconSize } from '../select-control/styles/select-control-styles';
+import { fontSizeStyles } from '../input-control/styles/input-control-styles';
 import type { CustomSelectButtonSize } from './types';
 
 const INLINE_PADDING = {
@@ -67,14 +67,6 @@ const getSelectItemSize = (
 	return sizes[ size ] || sizes.default;
 };
 
-export const SelectLabel = styled( Ariakit.SelectLabel )`
-	font-size: 11px;
-	font-weight: 500;
-	line-height: ${ CONFIG.fontLineHeightBase };
-	text-transform: uppercase;
-	margin-bottom: ${ space( 2 ) };
-`;
-
 export const Select = styled( Ariakit.Select, {
 	// Do not forward `hasCustomRenderProp` to the underlying Ariakit.Select component
 	shouldForwardProp: ( prop ) => prop !== 'hasCustomRenderProp',
@@ -92,7 +84,6 @@ export const Select = styled( Ariakit.Select, {
 		color: ${ COLORS.theme.foreground };
 		cursor: pointer;
 		font-family: inherit;
-		font-size: ${ CONFIG.fontSize };
 		text-align: start;
 		user-select: none;
 		width: 100%;
@@ -103,6 +94,7 @@ export const Select = styled( Ariakit.Select, {
 
 		${ getSelectSize( size, hasCustomRenderProp ? 'minHeight' : 'height' ) }
 		${ ! hasCustomRenderProp && truncateStyles }
+		${ fontSizeStyles( { inputSize: size } ) }
 	`
 );
 
@@ -158,13 +150,6 @@ export const SelectItem = styled( Ariakit.SelectItem )(
 	`
 );
 
-export const SelectedItemCheck = styled( Ariakit.SelectItemCheck )`
-	display: flex;
-	align-items: center;
-	margin-inline-start: ${ space( 2 ) };
-	font-size: 24px; // Size of checkmark icon
-`;
-
 const truncateStyles = css`
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -195,4 +180,25 @@ export const WithHintItemHint = styled.span`
 	line-height: ${ CONFIG.fontLineHeightBase };
 	padding-inline-end: ${ space( 1 ) };
 	margin-block: ${ space( 1 ) };
+`;
+
+export const SelectedItemCheck = styled( Ariakit.SelectItemCheck )`
+	display: flex;
+	align-items: center;
+	margin-inline-start: ${ space( 2 ) };
+
+	// Keep the checkmark vertically aligned at the top. Since the item text has a
+	// 28px line height and the checkmark is 24px tall, a (28-24)/2 = 2px margin
+	// is applied to keep the correct alignment between the text and the checkmark.
+	align-self: start;
+	margin-block-start: 2px;
+
+	// Since the checkmark's dimensions are applied with 'em' units, setting a
+	// font size of 0 allows the space reserved for the checkmark to collapse for
+	// items that are not selected or that don't have an associated item hint.
+	font-size: 0;
+	${ WithHintItemWrapper } ~ &,
+	&:not(:empty) {
+		font-size: 24px; // Size of checkmark icon
+	}
 `;

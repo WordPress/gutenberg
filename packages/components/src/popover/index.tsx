@@ -13,9 +13,7 @@ import {
 	offset as offsetMiddleware,
 	size,
 } from '@floating-ui/react-dom';
-// eslint-disable-next-line no-restricted-imports
 import type { HTMLMotionProps, MotionProps } from 'framer-motion';
-// eslint-disable-next-line no-restricted-imports
 import { motion } from 'framer-motion';
 
 /**

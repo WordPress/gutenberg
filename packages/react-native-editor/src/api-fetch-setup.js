@@ -8,8 +8,14 @@ import { applyFilters } from '@wordpress/hooks';
 const SUPPORTED_METHODS = [ 'GET', 'POST' ];
 // Please add only wp.org API paths here!
 const SUPPORTED_ENDPOINTS = {
+	// Temporarily disabling themes endpoint calls within the editor.
+	// Issue: https://github.com/wordpress-mobile/WordPress-Android/issues/21034
+	// The editor's GET requests to the themes endpoint are not functioning as expected.
+	// This is likely due to the method used for performing GET requests within the host Android app.
+	// TODO: Investigate and resolve the issue with GET requests from the editor.
+	// Until then, themes endpoint calls are disabled to prevent unexpected behavior.
 	GET: [
-		/wp\/v2\/(media|categories|blocks|themes)\/?\d*?.*/i,
+		/wp\/v2\/(media|categories|blocks)\/?\d*?.*/i,
 		/wp\/v2\/search\?.*/i,
 		/oembed\/1\.0\/proxy\?.*/i,
 	],

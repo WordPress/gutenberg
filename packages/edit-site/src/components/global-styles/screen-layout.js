@@ -23,7 +23,11 @@ function ScreenLayout() {
 	const [ rawSettings ] = useGlobalSetting( '' );
 	const settings = useSettingsForBlockElement( rawSettings );
 	const hasDimensionsPanel = useHasDimensionsPanel( settings );
-	const hasBackgroundPanel = useHasBackgroundPanel( settings );
+	/*
+	 * Use the raw settings to determine if the background panel should be displayed,
+	 * as the background panel is not dependent on the block element settings.
+	 */
+	const hasBackgroundPanel = useHasBackgroundPanel( rawSettings );
 	return (
 		<>
 			<ScreenHeader title={ __( 'Layout' ) } />

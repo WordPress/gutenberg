@@ -65,6 +65,7 @@ const {
 interface HeaderMenuProps< Item > {
 	field: NormalizedField< Item >;
 	view: ViewTableType;
+	fields: NormalizedField< Item >[];
 	onChangeView: ( view: ViewTableType ) => void;
 	onHide: ( field: NormalizedField< Item > ) => void;
 	setOpenedFilter: ( fieldId: string ) => void;
@@ -105,6 +106,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 	{
 		field,
 		view,
+		fields,
 		onChangeView,
 		onHide,
 		setOpenedFilter,
@@ -219,12 +221,14 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 					<DropdownMenuItem
 						prefix={ <Icon icon={ unseen } /> }
 						onClick={ () => {
+							const viewFields =
+								view.fields || fields.map( ( f ) => f.id );
 							onHide( field );
 							onChangeView( {
 								...view,
-								hiddenFields: (
-									view.hiddenFields ?? []
-								).concat( field.id ),
+								fields: viewFields.filter(
+									( fieldId ) => fieldId !== field.id
+								),
 							} );
 						} }
 					>
@@ -454,10 +458,12 @@ function ViewTable< Item >( {
 			: undefined;
 		setNextHeaderMenuToFocus( fallback?.node );
 	};
+
+	const viewFields = view.fields || fields.map( ( f ) => f.id );
 	const visibleFields = fields.filter(
 		( field ) =>
-			! view.hiddenFields?.includes( field.id ) &&
-			! [ view.layout.mediaField ].includes( field.id )
+			viewFields.includes( field.id ) ||
+			[ view.layout.mediaField ].includes( field.id )
 	);
 	const hasData = !! data?.length;
 
@@ -531,6 +537,7 @@ function ViewTable< Item >( {
 									} }
 									field={ field }
 									view={ view }
+									fields={ fields }
 									onChangeView={ onChangeView }
 									onHide={ onHide }
 									setOpenedFilter={ setOpenedFilter }

@@ -106,15 +106,6 @@
 			gap: $grid-unit-05;
 		}
 
-		th,
-		td {
-			&:first-child,
-			&:last-child {
-				transition: padding ease-out 0.1s;
-				@include reduce-motion("transition");
-			}
-		}
-
 		td:first-child,
 		th:first-child {
 			padding-left: $grid-unit-60;
@@ -753,8 +744,8 @@
 		border-radius: $grid-unit-20;
 		border: 1px solid transparent;
 		cursor: pointer;
-		padding: 0 $grid-unit-15;
-		height: $grid-unit-40;
+		padding: $grid-unit-05 $grid-unit-15;
+		min-height: $grid-unit-40;
 		background: $gray-100;
 		color: $gray-800;
 		position: relative;

@@ -23,19 +23,19 @@ if ( ! class_exists( 'WP_HTML_Processor_State' ) ) {
 	 */
 	class WP_HTML_Processor_State {
 		/*
-		* Insertion mode constants.
-		*
-		* These constants exist and are named to make it easier to
-		* discover and recognize the supported insertion modes in
-		* the parser.
-		*
-		* Out of all the possible insertion modes, only those
-		* supported by the parser are listed here. As support
-		* is added to the parser for more modes, add them here
-		* following the same naming and value pattern.
-		*
-		* @see https://html.spec.whatwg.org/#the-insertion-mode
-		*/
+		 * Insertion mode constants.
+		 *
+		 * These constants exist and are named to make it easier to
+		 * discover and recognize the supported insertion modes in
+		 * the parser.
+		 *
+		 * Out of all the possible insertion modes, only those
+		 * supported by the parser are listed here. As support
+		 * is added to the parser for more modes, add them here
+		 * following the same naming and value pattern.
+		 *
+		 * @see https://html.spec.whatwg.org/#the-insertion-mode
+		 */
 
 		/**
 		 * Initial insertion mode for full HTML parser.
@@ -86,6 +86,15 @@ if ( ! class_exists( 'WP_HTML_Processor_State' ) ) {
 		 * @var WP_HTML_Active_Formatting_Elements
 		 */
 		public $active_formatting_elements = null;
+
+		/**
+		 * Refers to the currently-matched tag, if any.
+		 *
+		 * @since 6.4.0
+		 *
+		 * @var WP_HTML_Token|null
+		 */
+		public $current_token = null;
 
 		/**
 		 * Tree construction insertion mode.
