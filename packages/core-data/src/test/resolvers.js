@@ -389,6 +389,7 @@ describe( 'canUser', () => {
 		} );
 
 		registry = {
+			...registry,
 			select: () => ( {
 				hasStartedResolution: ( _, [ action ] ) => action === 'read',
 			} ),
@@ -419,6 +420,7 @@ describe( 'canUser', () => {
 		} );
 
 		registry = {
+			...registry,
 			select: () => ( {
 				hasStartedResolution: ( _, [ action ] ) => action === 'read',
 			} ),
@@ -457,6 +459,7 @@ describe( 'canUser', () => {
 		} );
 
 		registry = {
+			...registry,
 			select: () => ( {
 				hasStartedResolution: ( _, [ action ] ) => action === 'create',
 			} ),
