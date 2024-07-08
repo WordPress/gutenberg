@@ -21,6 +21,7 @@
 -   `UnitControl`: Fix an issue where keyboard shortcuts unintentionally shift focus on Windows OS. ([#62988](https://github.com/WordPress/gutenberg/pull/62988))
 -   Fix inaccessibly disabled `Button`s ([#62306](https://github.com/WordPress/gutenberg/pull/62306)).
 -   `TimePicker`: Fix time zone overflow ([#63209](https://github.com/WordPress/gutenberg/pull/63209)).
+-   `SelectControl`: Fix disabled styles ([#63266](https://github.com/WordPress/gutenberg/pull/63266)).
 
 ### Internal
 
