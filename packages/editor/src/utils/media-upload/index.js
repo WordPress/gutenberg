@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { v4 as uuid } from 'uuid';
+
 /**
  * WordPress dependencies
  */
@@ -54,14 +55,14 @@ export default function mediaUpload( {
 		typeof currentPost?.id === 'number'
 			? currentPost.id
 			: currentPost?.wp_id;
-	const setUploadLock = () => {
+	const setSaveLock = () => {
 		lockPostSaving( lockKey );
 		lockPostAutosaving( lockKey );
 		imageIsUploading = true;
 	};
 
 	const postData = currentPostId ? { post: currentPostId } : {};
-	const clearUploadLock = () => {
+	const clearSaveLock = () => {
 		unlockPostSaving( lockKey );
 		unlockPostAutosaving( lockKey );
 		imageIsUploading = false;
@@ -72,9 +73,9 @@ export default function mediaUpload( {
 		filesList,
 		onFileChange: ( file ) => {
 			if ( ! imageIsUploading ) {
-				setUploadLock();
+				setSaveLock();
 			} else {
-				clearUploadLock();
+				clearSaveLock();
 			}
 			onFileChange( file );
 		},
@@ -84,7 +85,7 @@ export default function mediaUpload( {
 		},
 		maxUploadFileSize,
 		onError: ( { message } ) => {
-			clearUploadLock();
+			clearSaveLock();
 			onError( message );
 		},
 		wpAllowedMimeTypes,
