@@ -569,8 +569,8 @@ function BackgroundSizeControls( {
 				onChange={ updateBackgroundPosition }
 			/>
 			<ToggleControl
-				label={ __( 'Scroll with page' ) }
-				checked={ attachmentValue !== 'fixed' }
+				label={ __( 'Fixed background' ) }
+				checked={ attachmentValue === 'fixed' }
 				onChange={ toggleScrollWithPage }
 				help={ __(
 					'Whether your image should scroll with the page or stay fixed in place.'
