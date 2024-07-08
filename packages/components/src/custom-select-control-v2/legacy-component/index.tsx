@@ -9,31 +9,33 @@ import clsx from 'clsx';
  */
 import _CustomSelect from '../custom-select';
 import CustomSelectItem from '../item';
-import type { LegacyCustomSelectProps, LegacyOption } from '../types';
+import type { LegacyCustomSelectProps } from '../types';
 import * as Styled from '../styles';
 
 function useDeprecatedProps( {
 	showSelectedHint = false,
+	options,
 	// Deprecated
 	__experimentalShowSelectedHint,
 	...otherProps
 }: LegacyCustomSelectProps ) {
 	return {
 		...otherProps,
+		options: options.map(
+			( { __experimentalHint, hint, ...restOption } ) => ( {
+				...restOption,
+				hint:
+					typeof __experimentalHint !== 'undefined'
+						? __experimentalHint
+						: hint,
+			} )
+		),
 		showSelectedHint:
 			typeof __experimentalShowSelectedHint !== 'undefined'
 				? __experimentalShowSelectedHint
 				: showSelectedHint,
 	};
 }
-const computeOptionDeprecatedProps = ( {
-	__experimentalHint,
-	hint,
-	...rest
-}: LegacyOption ) => ( {
-	...rest,
-	hint: typeof __experimentalHint !== 'undefined' ? __experimentalHint : hint,
-} );
 
 function CustomSelectControl( props: LegacyCustomSelectProps ) {
 	const {
@@ -83,10 +85,7 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 		defaultValue: options[ 0 ]?.name,
 	} );
 
-	const children = options.map( ( option ) => {
-		const { name, key, hint, style, className } =
-			computeOptionDeprecatedProps( option );
-
+	const children = options.map( ( { name, key, hint, style, className } ) => {
 		const withHint = (
 			<Styled.WithHintItemWrapper>
 				<span>{ name }</span>
@@ -121,19 +120,19 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 	const renderSelectedValueHint = () => {
 		const { value: currentValue } = store.getState();
 
-		const selectedOption = options?.find(
+		const selectedOptionHint = options?.find(
 			( { name } ) => currentValue === name
-		);
+		)?.hint;
 
 		return (
 			<Styled.SelectedExperimentalHintWrapper>
 				{ currentValue }
-				{ selectedOption && (
+				{ selectedOptionHint && (
 					<Styled.SelectedExperimentalHintItem
 					// TODO: Legacy classname. Add V1 styles are removed from the codebase
 					// className="components-custom-select-control__hint"
 					>
-						{ computeOptionDeprecatedProps( selectedOption )?.hint }
+						{ selectedOptionHint }
 					</Styled.SelectedExperimentalHintItem>
 				) }
 			</Styled.SelectedExperimentalHintWrapper>

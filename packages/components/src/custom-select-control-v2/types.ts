@@ -85,7 +85,7 @@ export type CustomSelectProps = _CustomSelectProps & CustomSelectSize;
 /**
  * The legacy object structure for the options array.
  */
-export type LegacyOption = {
+type LegacyOption = {
 	key: string;
 	name: string;
 	style?: React.CSSProperties;
