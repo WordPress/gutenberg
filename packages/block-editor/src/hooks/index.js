@@ -14,7 +14,6 @@ import anchor from './anchor';
 import ariaLabel from './aria-label';
 import customClassName from './custom-class-name';
 import './generated-class-name';
-import './generated-variation-class-name';
 import style from './style';
 import './settings';
 import color from './color';

@@ -11,7 +11,6 @@ import align from './align';
 import anchor from './anchor';
 import customClassName from './custom-class-name';
 import './generated-class-name';
-import './generated-variation-class-name';
 import style from './style';
 import color from './color';
 import fontSize from './font-size';
