@@ -30,7 +30,7 @@ test.describe( 'Font Appearance Control dropdown menu', () => {
 			.click();
 		await expect(
 			page.getByRole( 'button', { name: 'Appearance' } )
-		).toContainText( 'Regular' );
+		).toHaveText( 'Regular' );
 
 		await editor.insertBlock( {
 			name: 'core/paragraph',
@@ -46,7 +46,7 @@ test.describe( 'Font Appearance Control dropdown menu', () => {
 			.click();
 		await expect(
 			page.getByRole( 'button', { name: 'Appearance' } )
-		).toContainText( 'Extra Light Italic' );
+		).toHaveText( 'Extra Light Italic' );
 
 		await editor.insertBlock( {
 			name: 'core/paragraph',
@@ -62,7 +62,7 @@ test.describe( 'Font Appearance Control dropdown menu', () => {
 			.click();
 		await expect(
 			page.getByRole( 'button', { name: 'Appearance' } )
-		).toContainText( 'Bold Italic' );
+		).toHaveText( 'Bold Italic' );
 	} );
 
 	test( 'should apply Default appearance if weight and style are invalid', async ( {
@@ -89,6 +89,6 @@ test.describe( 'Font Appearance Control dropdown menu', () => {
 			.click();
 		await expect(
 			page.getByRole( 'button', { name: 'Appearance' } )
-		).toContainText( 'Default' );
+		).toHaveText( 'Default' );
 	} );
 } );
