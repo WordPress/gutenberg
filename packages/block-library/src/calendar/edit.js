@@ -34,7 +34,17 @@ const getYearMonth = memoize( ( date ) => {
 } );
 
 export default function CalendarEdit( { attributes } ) {
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps( {
+		className: [
+			attributes.backgroundColor
+				? `has-${ attributes.backgroundColor }-background-color`
+				: '',
+			attributes.textColor ? `has-${ attributes.textColor }-color` : '',
+		]
+			.filter( Boolean )
+			.join( ' ' ),
+	} );
+
 	const { date, hasPosts, hasPostsResolved } = useSelect( ( select ) => {
 		const { getEntityRecords, hasFinishedResolution } = select( coreStore );
 
