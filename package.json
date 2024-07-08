@@ -92,8 +92,7 @@
 		"@wordpress/warning": "file:packages/warning",
 		"@wordpress/widgets": "file:packages/widgets",
 		"@wordpress/wordcount": "file:packages/wordcount",
-		"es-module-shims": "^1.8.2",
-		"postcss-local-keyframes": "^0.0.2"
+		"es-module-shims": "^1.8.2"
 	},
 	"devDependencies": {
 		"@actions/core": "1.9.1",
