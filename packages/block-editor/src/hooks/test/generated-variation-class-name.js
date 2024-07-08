@@ -34,12 +34,7 @@ describe( 'generated variation className', () => {
 
 	const variationBlockSettings = {
 		attributes: {
-			fruit: {
-				type: 'string',
-				default: 'Bananas',
-				source: 'text',
-				selector: 'div',
-			},
+			fruit: 'Apples',
 		},
 		isActive: ( { fruit } ) => fruit === 'Apples',
 	};
