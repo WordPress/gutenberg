@@ -6,7 +6,6 @@ import type { Dispatch, SetStateAction } from 'react';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { TextControl } from '@wordpress/components';
 import { useCallback, useMemo } from '@wordpress/element';
 

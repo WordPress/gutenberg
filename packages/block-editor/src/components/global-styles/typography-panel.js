@@ -469,7 +469,6 @@ export default function TypographyPanel( {
 						hasFontWeights={ hasFontWeights }
 						fontFamilyFaces={ fontFamilyFaces }
 						size="__unstable-large"
-						__nextHasNoMarginBottom
 					/>
 				</ToolsPanelItem>
 			) }

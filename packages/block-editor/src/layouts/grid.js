@@ -125,6 +125,23 @@ export default {
 			rowCount = null,
 		} = layout;
 
+		// Check that the grid layout attributes are of the correct type, so that we don't accidentally
+		// write code that stores a string attribute instead of a number.
+		if ( process.env.NODE_ENV === 'development' ) {
+			if (
+				minimumColumnWidth &&
+				typeof minimumColumnWidth !== 'string'
+			) {
+				throw new Error( 'minimumColumnWidth must be a string' );
+			}
+			if ( columnCount && typeof columnCount !== 'number' ) {
+				throw new Error( 'columnCount must be a number' );
+			}
+			if ( rowCount && typeof rowCount !== 'number' ) {
+				throw new Error( 'rowCount must be a number' );
+			}
+		}
+
 		// If a block's block.json skips serialization for spacing or spacing.blockGap,
 		// don't apply the user-defined value to the styles.
 		const blockGapValue =
@@ -241,7 +258,8 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 						onChange={ ( newValue ) => {
 							onChange( {
 								...layout,
-								minimumColumnWidth: newValue,
+								minimumColumnWidth:
+									newValue === '' ? undefined : newValue,
 							} );
 						} }
 						onUnitChange={ handleUnitChange }
@@ -274,7 +292,15 @@ function GridLayoutColumnsAndRowsControl( {
 	onChange,
 	allowSizingOnChildren,
 } ) {
-	const { columnCount = 3, rowCount, isManualPlacement } = layout;
+	// If the grid interactivity experiment is enabled, allow unsetting the column count.
+	const defaultColumnCount = window.__experimentalEnableGridInteractivity
+		? undefined
+		: 3;
+	const {
+		columnCount = defaultColumnCount,
+		rowCount,
+		isManualPlacement,
+	} = layout;
 
 	return (
 		<>
@@ -290,18 +316,31 @@ function GridLayoutColumnsAndRowsControl( {
 						<NumberControl
 							size="__unstable-large"
 							onChange={ ( value ) => {
-								/**
-								 * If the input is cleared, avoid switching
-								 * back to "Auto" by setting a value of "1".
-								 */
-								const validValue = value !== '' ? value : '1';
-								onChange( {
-									...layout,
-									columnCount:
-										window.__experimentalEnableGridInteractivity
-											? parseInt( value, 10 ) || null
-											: parseInt( validValue, 10 ),
-								} );
+								if (
+									window.__experimentalEnableGridInteractivity
+								) {
+									// Allow unsetting the column count when in auto mode.
+									const defaultNewColumnCount =
+										isManualPlacement ? 1 : undefined;
+									const newColumnCount =
+										value === ''
+											? defaultNewColumnCount
+											: parseInt( value, 10 );
+									onChange( {
+										...layout,
+										columnCount: newColumnCount,
+									} );
+								} else {
+									// Don't allow unsetting the column count.
+									const newColumnCount =
+										value === ''
+											? 1
+											: parseInt( value, 10 );
+									onChange( {
+										...layout,
+										columnCount: newColumnCount,
+									} );
+								}
 							} }
 							value={ columnCount }
 							min={ 0 }
@@ -320,9 +359,14 @@ function GridLayoutColumnsAndRowsControl( {
 							<NumberControl
 								size="__unstable-large"
 								onChange={ ( value ) => {
+									// Don't allow unsetting the row count.
+									const newRowCount =
+										value === ''
+											? 1
+											: parseInt( value, 10 );
 									onChange( {
 										...layout,
-										rowCount: parseInt( value, 10 ),
+										rowCount: newRowCount,
 									} );
 								} }
 								value={ rowCount }
@@ -331,7 +375,7 @@ function GridLayoutColumnsAndRowsControl( {
 							/>
 						) : (
 							<RangeControl
-								value={ parseInt( columnCount, 10 ) } // RangeControl can't deal with strings.
+								value={ columnCount ?? 0 }
 								onChange={ ( value ) =>
 									onChange( {
 										...layout,

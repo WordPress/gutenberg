@@ -3,7 +3,7 @@
  */
 import { trash } from '@wordpress/icons';
 import { useDispatch } from '@wordpress/data';
-import { __, _n, sprintf, _x } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import {
 	Button,

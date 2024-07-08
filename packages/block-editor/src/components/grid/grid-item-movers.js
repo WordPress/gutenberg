@@ -32,13 +32,9 @@ export function GridItemMovers( {
 	const columnCount = parentLayout?.columnCount;
 	const rowCount = parentLayout?.rowCount;
 
-	const columnCountNumber = parseInt( columnCount, 10 );
-	const rowStartNumber = parseInt( rowStart, 10 );
-	const columnStartNumber = parseInt( columnStart, 10 );
-
 	const getNumberOfBlocksBeforeCell = useGetNumberOfBlocksBeforeCell(
 		gridClientId,
-		columnCountNumber
+		columnCount
 	);
 
 	return (
@@ -56,10 +52,7 @@ export function GridItemMovers( {
 						[ blockClientId ],
 						gridClientId,
 						gridClientId,
-						getNumberOfBlocksBeforeCell(
-							columnStartNumber,
-							rowStartNumber - 1
-						)
+						getNumberOfBlocksBeforeCell( columnStart, rowStart - 1 )
 					);
 				} }
 			/>
@@ -76,10 +69,7 @@ export function GridItemMovers( {
 						[ blockClientId ],
 						gridClientId,
 						gridClientId,
-						getNumberOfBlocksBeforeCell(
-							columnStartNumber,
-							rowStartNumber + 1
-						)
+						getNumberOfBlocksBeforeCell( columnStart, rowStart + 1 )
 					);
 				} }
 			/>
@@ -89,17 +79,14 @@ export function GridItemMovers( {
 				disabled={ columnStart <= 1 }
 				onClick={ () => {
 					onChange( {
-						columnStart: columnStartNumber - 1,
+						columnStart: columnStart - 1,
 					} );
 					__unstableMarkNextChangeAsNotPersistent();
 					moveBlocksToPosition(
 						[ blockClientId ],
 						gridClientId,
 						gridClientId,
-						getNumberOfBlocksBeforeCell(
-							columnStartNumber - 1,
-							rowStartNumber
-						)
+						getNumberOfBlocksBeforeCell( columnStart - 1, rowStart )
 					);
 				} }
 			/>
@@ -109,17 +96,14 @@ export function GridItemMovers( {
 				disabled={ columnCount && columnEnd >= columnCount }
 				onClick={ () => {
 					onChange( {
-						columnStart: columnStartNumber + 1,
+						columnStart: columnStart + 1,
 					} );
 					__unstableMarkNextChangeAsNotPersistent();
 					moveBlocksToPosition(
 						[ blockClientId ],
 						gridClientId,
 						gridClientId,
-						getNumberOfBlocksBeforeCell(
-							columnStartNumber + 1,
-							rowStartNumber
-						)
+						getNumberOfBlocksBeforeCell( columnStart + 1, rowStart )
 					);
 				} }
 			/>

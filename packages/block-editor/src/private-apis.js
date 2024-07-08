@@ -21,6 +21,7 @@ import BlockQuickNavigation from './components/block-quick-navigation';
 import { LayoutStyle } from './components/block-list/layout';
 import { BlockRemovalWarningModal } from './components/block-removal-warning-modal';
 import {
+	setBackgroundStyleDefaults,
 	useLayoutClasses,
 	useLayoutStyles,
 	__unstableBlockStyleVariationOverridesWithConfig,
@@ -40,6 +41,7 @@ import {
 	selectBlockPatternsKey,
 	reusableBlocksSelectKey,
 	globalStylesDataKey,
+	globalStylesLinksDataKey,
 } from './store/private-keys';
 import { requiresWrapperOnCopy } from './components/writing-flow/utils';
 import { PrivateRichText } from './components/rich-text/';
@@ -85,6 +87,7 @@ lock( privateApis, {
 	usesContextKey,
 	useFlashEditableBlocks,
 	globalStylesDataKey,
+	globalStylesLinksDataKey,
 	selectBlockPatternsKey,
 	requiresWrapperOnCopy,
 	PrivateRichText,
@@ -95,4 +98,5 @@ lock( privateApis, {
 	useSpacingSizes,
 	useBlockDisplayTitle,
 	__unstableBlockStyleVariationOverridesWithConfig,
+	setBackgroundStyleDefaults,
 } );

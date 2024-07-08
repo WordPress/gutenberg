@@ -10,12 +10,14 @@ import {
  * Internal dependencies
  */
 import StylesPreviewColors from '../preview-colors';
-import { useColorVariations } from '../hooks';
+import { useCurrentMergeThemeStyleVariationsWithUserConfig } from '../../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
 import Subtitle from '../subtitle';
 import Variation from './variation';
 
 export default function ColorVariations( { title, gap = 2 } ) {
-	const colorVariations = useColorVariations();
+	const propertiesToFilter = [ 'color' ];
+	const colorVariations =
+		useCurrentMergeThemeStyleVariationsWithUserConfig( propertiesToFilter );
 
 	// Return null if there is only one variation (the default).
 	if ( colorVariations?.length <= 1 ) {
@@ -31,7 +33,7 @@ export default function ColorVariations( { title, gap = 2 } ) {
 						key={ index }
 						variation={ variation }
 						isPill
-						properties={ [ 'color' ] }
+						properties={ propertiesToFilter }
 						showTooltip
 					>
 						{ () => <StylesPreviewColors /> }
