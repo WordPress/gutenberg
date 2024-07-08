@@ -26,8 +26,7 @@ describe( 'generated variation className', () => {
 			},
 		},
 		save: ( { attributes } ) => (
-			// eslint-disable-next-line react/no-unknown-property
-			<div class={ attributes.className }>{ attributes.fruit }</div>
+			<div className={ attributes.className }>{ attributes.fruit }</div>
 		),
 		category: 'text',
 		title: 'block title',
