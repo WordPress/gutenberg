@@ -20,7 +20,6 @@ export function applyBuiltInValidationFixes( block, blockType ) {
 		blockType,
 		block.originalContent
 	);
-
 	return {
 		...block,
 		attributes: updatedBlockAttributes,
