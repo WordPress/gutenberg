@@ -192,8 +192,12 @@
 	.components-toggle-control {
 		margin-bottom: 0;
 	}
+	.components-focal-point-picker-wrapper {
+		background-color: $gray-100;
+		width: 100%;
+	}
 	.components-focal-point-picker__media--image {
-		max-height: clamp(120px, 9vh, 280px);
+		max-height: 180px;
 	}
 }
 
