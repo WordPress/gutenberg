@@ -3,14 +3,16 @@
  */
 import { test, expect } from '@playwright/test';
 
+test.use( { baseURL: 'https://playground.wordpress.net' } );
+
 test( 'WP Editor default view', async ( { context, page } ) => {
-	// 1. Go to the Gutenberg PR Preview page and submit the PR number.
-	await page.goto( 'https://playground.wordpress.net/gutenberg.html' );
-
-	const prInput = page.getByLabel( 'Pull request number or URL:' );
-
-	await prInput.fill( process.env.PR_NUMBER );
-	await prInput.press( 'Enter' );
+	if ( process.env.PR_NUMBER ) {
+		// 1. Go to the Gutenberg PR Preview page and submit the PR number.
+		await page.goto( `/gutenberg.html?pr=${ process.env.PR_NUMBER }` );
+	} else {
+		// 1. Go to the WordPress Playground (Gutenberg plugin disabled).
+		await page.goto( '/' );
+	}
 
 	// 2. Get the URL of the iframed WordPress instance so we can strip the
 	//    Playground UI off.
