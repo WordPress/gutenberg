@@ -17,7 +17,7 @@ export type TooltipProps = {
 	 */
 	children: React.ReactElement;
 	/**
-	 * Custom class name for the tooltip, in addition to the default `components-tooltip`.
+	 * Custom class name for the tooltip.
 	 */
 	className?: string;
 	/**
