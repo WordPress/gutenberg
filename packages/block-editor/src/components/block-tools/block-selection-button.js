@@ -9,7 +9,7 @@ import clsx from 'clsx';
 import { dragHandle } from '@wordpress/icons';
 import { Button, Flex, FlexItem } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { forwardRef, useEffect } from '@wordpress/element';
+import { forwardRef, useEffect, useMemo, useRef } from '@wordpress/element';
 import {
 	BACKSPACE,
 	DELETE,
@@ -41,6 +41,49 @@ import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-
 import { unlock } from '../../lock-unlock';
 
 /**
+ * Given `clientIdsTree` data structure as the haystack, and `selectedClientId`
+ * as the needle, find the neighboring blocks (parent, firstChild, previous, next).
+ *
+ * @param {Object}  clientIdsTree  A block hierarchy with each block only containing
+ *                                 the `clientId` and `innerBlocks` properties.
+ * @param {string}  targetClientId The clientId to find.
+ * @param {?Object} parent         The parent block of the currently selected block.
+ *                                 This can be omitted when searching from the root.
+ */
+function findBlockNeighbors( clientIdsTree, targetClientId, parent ) {
+	for (
+		let blockIndex = 0;
+		blockIndex < clientIdsTree.length;
+		blockIndex++
+	) {
+		const block = clientIdsTree[ blockIndex ];
+
+		if ( block.clientId === targetClientId ) {
+			return {
+				parent: parent?.clientId,
+				previous: clientIdsTree[ blockIndex - 1 ]?.clientId,
+				next: clientIdsTree[ blockIndex + 1 ]?.clientId,
+				firstChild: block?.innerBlocks?.[ 0 ]?.clientId,
+				blockIndex,
+			};
+		}
+
+		// Search the inner blocks for the selected block.
+		if ( block?.innerBlocks?.length ) {
+			const result = findBlockNeighbors(
+				block.innerBlocks,
+				targetClientId,
+				block
+			);
+
+			if ( result ) {
+				return result;
+			}
+		}
+	}
+}
+
+/**
  * Block selection button component, displaying the label of the block. If the block
  * descends from a root block, a button is displayed enabling the user to select
  * the root block.
@@ -56,7 +99,6 @@ function BlockSelectionButton( { clientId, rootClientId }, ref ) {
 		( select ) => {
 			const {
 				getBlock,
-				getBlockIndex,
 				hasBlockMovingClientId,
 				getBlockListSettings,
 				__unstableGetEditorMode,
@@ -64,9 +106,11 @@ function BlockSelectionButton( { clientId, rootClientId }, ref ) {
 				getPreviousBlockClientId,
 				canMoveBlock,
 			} = select( blockEditorStore );
+			const { getEnabledClientIdsTree } = unlock(
+				select( blockEditorStore )
+			);
 			const { getActiveBlockVariation, getBlockType } =
 				select( blocksStore );
-			const index = getBlockIndex( clientId );
 			const { name, attributes } = getBlock( clientId );
 			const blockType = getBlockType( name );
 			const orientation =
@@ -74,32 +118,64 @@ function BlockSelectionButton( { clientId, rootClientId }, ref ) {
 			const match = getActiveBlockVariation( name, attributes );
 
 			return {
+				blockType,
+				orientation,
+				attributes,
 				blockMovingMode: hasBlockMovingClientId(),
 				editorMode: __unstableGetEditorMode(),
 				icon: match?.icon || blockType.icon,
-				label: getAccessibleBlockLabel(
-					blockType,
-					attributes,
-					index + 1,
-					orientation
-				),
 				canMove: canMoveBlock( clientId, rootClientId ),
 				getNextBlockClientId,
 				getPreviousBlockClientId,
+				enabledClientIdsTree: getEnabledClientIdsTree(),
 			};
 		},
 		[ clientId, rootClientId ]
 	);
-	const { label, icon, blockMovingMode, editorMode, canMove } = selected;
+	const {
+		blockType,
+		attributes,
+		orientation,
+		icon,
+		blockMovingMode,
+		editorMode,
+		canMove,
+		enabledClientIdsTree,
+	} = selected;
 	const { setNavigationMode, removeBlock } = useDispatch( blockEditorStore );
 
-	// Focus the breadcrumb in navigation mode.
+	const { parent, firstChild, previous, next, blockIndex } = useMemo(
+		() => findBlockNeighbors( enabledClientIdsTree, clientId ),
+		[ enabledClientIdsTree, clientId ]
+	);
+
+	const label = useMemo(
+		() =>
+			getAccessibleBlockLabel(
+				blockType,
+				attributes,
+				blockIndex,
+				orientation
+			),
+		[ attributes, blockIndex, blockType, orientation ]
+	);
+
+	// Focus the block selection button in navigation mode.
+	// Only one block selection button renders at a time (for the individual selected block),
+	// so the instance should be focused once on mount, and then never again.
+	const focusedClientId = useRef();
 	useEffect( () => {
-		if ( editorMode === 'navigation' ) {
+		const canFocus =
+			editorMode === 'navigation' &&
+			focusedClientId.current !== clientId &&
+			ref?.current?.focus;
+
+		if ( canFocus ) {
 			ref.current.focus();
 			speak( label );
+			focusedClientId.current = clientId;
 		}
-	}, [ label, editorMode ] );
+	}, [ clientId, editorMode, label, ref ] );
 	const blockElement = useBlockElement( clientId );
 
 	const {
@@ -107,9 +183,7 @@ function BlockSelectionButton( { clientId, rootClientId }, ref ) {
 		getBlockIndex,
 		getBlockRootClientId,
 		getSelectedBlockClientId,
-		getMultiSelectedBlocksEndClientId,
-		getEnabledClientIdsTree,
-	} = unlock( useSelect( blockEditorStore ) );
+	} = useSelect( blockEditorStore );
 	const {
 		selectBlock,
 		clearSelectedBlock,
@@ -136,64 +210,17 @@ function BlockSelectionButton( { clientId, rootClientId }, ref ) {
 		}
 
 		const selectedBlockClientId = getSelectedBlockClientId();
-		const selectionEndClientId = getMultiSelectedBlocksEndClientId();
-
 		const navigateUp = ( isTab && isShift ) || isUp;
 		const navigateDown = ( isTab && ! isShift ) || isDown;
 		// Move out of current nesting level (no effect if at root level).
 		const navigateOut = isLeft;
 		// Move into next nesting level (no effect if the current block has no innerBlocks).
 		const navigateIn = isRight;
-		const enabledClientIdsTree = getEnabledClientIdsTree();
-
-		function findSelectedBlockNeighbors(
-			clientIdsTree,
-			selectedClientId,
-			parent
-		) {
-			for (
-				let blockIndex = 0;
-				blockIndex < clientIdsTree.length;
-				blockIndex++
-			) {
-				const block = clientIdsTree[ blockIndex ];
-
-				if ( block.clientId === selectedClientId ) {
-					return {
-						parent: parent?.clientId,
-						previous: clientIdsTree[ blockIndex - 1 ]?.clientId,
-						next: clientIdsTree[ blockIndex + 1 ]?.clientId,
-						firstChild: block?.innerBlocks?.[ 0 ]?.clientId,
-					};
-				}
-
-				// Search the inner blocks for the selected block.
-				if ( block?.innerBlocks?.length ) {
-					const result = findSelectedBlockNeighbors(
-						block.innerBlocks,
-						selectedClientId,
-						block
-					);
-
-					if ( result ) {
-						return result;
-					}
-				}
-			}
-		}
 
 		let focusedBlockUid;
 		if ( navigateUp || navigateDown ) {
-			const { previous, next } = findSelectedBlockNeighbors(
-				enabledClientIdsTree,
-				selectionEndClientId || selectedBlockClientId
-			);
 			focusedBlockUid = navigateUp ? previous : next;
 		} else if ( navigateOut || navigateIn ) {
-			const { parent, firstChild } = findSelectedBlockNeighbors(
-				enabledClientIdsTree,
-				selectedBlockClientId
-			);
 			focusedBlockUid = navigateOut ? parent : firstChild;
 		}
 
