@@ -38,6 +38,7 @@ import BlockIcon from '../block-icon';
 import { store as blockEditorStore } from '../../store';
 import BlockDraggable from '../block-draggable';
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
+import { unlock } from '../../lock-unlock';
 
 /**
  * Block selection button component, displaying the label of the block. If the block
@@ -105,12 +106,10 @@ function BlockSelectionButton( { clientId, rootClientId }, ref ) {
 		hasBlockMovingClientId,
 		getBlockIndex,
 		getBlockRootClientId,
-		getClientIdsOfDescendants,
 		getSelectedBlockClientId,
 		getMultiSelectedBlocksEndClientId,
-		getPreviousBlockClientId,
-		getNextBlockClientId,
-	} = useSelect( blockEditorStore );
+		getEnabledClientIdsTree,
+	} = unlock( useSelect( blockEditorStore ) );
 	const {
 		selectBlock,
 		clearSelectedBlock,
@@ -145,25 +144,59 @@ function BlockSelectionButton( { clientId, rootClientId }, ref ) {
 		const navigateOut = isLeft;
 		// Move into next nesting level (no effect if the current block has no innerBlocks).
 		const navigateIn = isRight;
+		const enabledClientIdsTree = getEnabledClientIdsTree();
+
+		function findSelectedBlockNeighbors(
+			clientIdsTree,
+			selectedClientId,
+			parent
+		) {
+			for (
+				let blockIndex = 0;
+				blockIndex < clientIdsTree.length;
+				blockIndex++
+			) {
+				const block = clientIdsTree[ blockIndex ];
+
+				if ( block.clientId === selectedClientId ) {
+					return {
+						parent: parent?.clientId,
+						previous: clientIdsTree[ blockIndex - 1 ]?.clientId,
+						next: clientIdsTree[ blockIndex + 1 ]?.clientId,
+						firstChild: block?.innerBlocks?.[ 0 ]?.clientId,
+					};
+				}
+
+				// Search the inner blocks for the selected block.
+				if ( block?.innerBlocks?.length ) {
+					const result = findSelectedBlockNeighbors(
+						block.innerBlocks,
+						selectedClientId,
+						block
+					);
+
+					if ( result ) {
+						return result;
+					}
+				}
+			}
+		}
 
 		let focusedBlockUid;
-		if ( navigateUp ) {
-			focusedBlockUid = getPreviousBlockClientId(
+		if ( navigateUp || navigateDown ) {
+			const { previous, next } = findSelectedBlockNeighbors(
+				enabledClientIdsTree,
 				selectionEndClientId || selectedBlockClientId
 			);
-		} else if ( navigateDown ) {
-			focusedBlockUid = getNextBlockClientId(
-				selectionEndClientId || selectedBlockClientId
+			focusedBlockUid = navigateUp ? previous : next;
+		} else if ( navigateOut || navigateIn ) {
+			const { parent, firstChild } = findSelectedBlockNeighbors(
+				enabledClientIdsTree,
+				selectedBlockClientId
 			);
-		} else if ( navigateOut ) {
-			focusedBlockUid =
-				getBlockRootClientId( selectedBlockClientId ) ??
-				selectedBlockClientId;
-		} else if ( navigateIn ) {
-			focusedBlockUid =
-				getClientIdsOfDescendants( selectedBlockClientId )[ 0 ] ??
-				selectedBlockClientId;
+			focusedBlockUid = navigateOut ? parent : firstChild;
 		}
+
 		const startingBlockClientId = hasBlockMovingClientId();
 		if ( isEscape && startingBlockClientId && ! event.defaultPrevented ) {
 			setBlockMovingClientId( null );
