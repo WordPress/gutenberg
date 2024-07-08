@@ -95,22 +95,9 @@ describe( 'generated variation className', () => {
 		it( 'should not inject duplicates into className', () => {
 			const attributes = { fruit: 'Apples' };
 			const blockType = getBlockType( 'core/test-block' );
-			const variationBlockType = {
-				...blockType,
-				attributes: {
-					...blockType.attributes,
-					fruit: {
-						type: 'string',
-						default: 'Apples',
-						source: 'text',
-						selector: 'div',
-					},
-				},
-				isActive: ( { fruit } ) => fruit === 'Apples',
-			};
 			const extraProps = addSaveProps(
 				{ className: 'foo wp-block-test-block-variation' },
-				variationBlockType,
+				blockType,
 				attributes
 			);
 
