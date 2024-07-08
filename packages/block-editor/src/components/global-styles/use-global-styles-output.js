@@ -671,7 +671,7 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 						}
 						const variationSelector =
 							blockSelectors[ blockName ]
-								.styleVariationSelectors?.[ variationName ];
+								?.styleVariationSelectors?.[ variationName ];
 
 						// Process the variation's inner element styles.
 						// This comes before the inner block styles so the
@@ -700,18 +700,18 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 								const variationBlockSelector = scopeSelector(
 									variationSelector,
 									blockSelectors[ variationBlockName ]
-										.selector
+										?.selector
 								);
 								const variationDuotoneSelector = scopeSelector(
 									variationSelector,
 									blockSelectors[ variationBlockName ]
-										.duotoneSelector
+										?.duotoneSelector
 								);
 								const variationFeatureSelectors =
 									scopeFeatureSelectors(
 										variationSelector,
 										blockSelectors[ variationBlockName ]
-											.featureSelectors
+											?.featureSelectors
 									);
 
 								const variationBlockStyleNodes =
@@ -728,10 +728,10 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 									featureSelectors: variationFeatureSelectors,
 									fallbackGapValue:
 										blockSelectors[ variationBlockName ]
-											.fallbackGapValue,
+											?.fallbackGapValue,
 									hasLayoutSupport:
 										blockSelectors[ variationBlockName ]
-											.hasLayoutSupport,
+											?.hasLayoutSupport,
 									styles: variationBlockStyleNodes,
 								} );
 
