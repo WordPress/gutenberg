@@ -79,7 +79,7 @@ function FontFamilies() {
 				{ ! hasFonts && (
 					<VStack>
 						<Subtitle level={ 3 }>{ __( 'Fonts' ) }</Subtitle>
-						<Text>{ __( 'No fonts installed.' ) }</Text>
+						<Text as="p">{ __( 'No fonts installed.' ) }</Text>
 					</VStack>
 				) }
 				<Button
