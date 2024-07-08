@@ -5,7 +5,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Font Appearance Control dropdown menu', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'twentytwentythree' );
+		await requestUtils.activateTheme( 'twentytwentyfour' );
 	} );
 
 	test.beforeEach( async ( { admin } ) => {
