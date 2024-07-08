@@ -24,13 +24,17 @@
 
 .block-editor-grid-visualizer__cell {
 	display: grid;
+	position: relative;
 
 	.block-editor-inserter {
 		color: inherit;
 		z-index: 32;
-		max-height: 100%;
-		grid-column: 1;
-		grid-row: 1;
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		overflow: hidden;
 
 		.block-editor-grid-visualizer__appender {
 			box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor  20%, #0000);
@@ -40,11 +44,6 @@
 			width: 100%;
 			padding: 0 !important;
 			opacity: 0;
-
-			svg {
-				width: auto;
-				height: auto;
-			}
 		}
 
 	}
@@ -56,8 +55,10 @@
 		}
 	}
 
-	&:hover .block-editor-grid-visualizer__appender {
+	&:hover .block-editor-grid-visualizer__appender,
+	.block-editor-grid-visualizer__appender:focus {
 		opacity: 1;
+		background-color: color-mix(in srgb, currentColor  20%, #0000);
 	}
 }
 
