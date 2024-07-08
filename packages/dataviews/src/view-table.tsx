@@ -15,6 +15,8 @@ import {
 	privateApis as componentsPrivateApis,
 	CheckboxControl,
 	Spinner,
+	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import {
 	forwardRef,
@@ -50,6 +52,7 @@ import type {
 	SortDirection,
 	ViewTable as ViewTableType,
 	ViewTableProps,
+	CombinedField,
 } from './types';
 import type { SetSelection } from './private-types';
 
@@ -63,7 +66,7 @@ const {
 } = unlock( componentsPrivateApis );
 
 interface HeaderMenuProps< Item > {
-	field: NormalizedField< Item >;
+	fieldId: string;
 	view: ViewTableType;
 	fields: NormalizedField< Item >[];
 	onChangeView: ( view: ViewTableType ) => void;
@@ -79,12 +82,35 @@ interface BulkSelectionCheckboxProps< Item > {
 	getItemId: ( item: Item ) => string;
 }
 
+interface TableColumnFieldProps< Item > {
+	primaryField?: NormalizedField< Item >;
+	field: NormalizedField< Item >;
+	item: Item;
+}
+
+interface TableColumnCombinedProps< Item > {
+	primaryField?: NormalizedField< Item >;
+	fields: NormalizedField< Item >[];
+	field: CombinedField;
+	item: Item;
+	view: ViewTableType;
+}
+
+interface TableColumnProps< Item > {
+	primaryField?: NormalizedField< Item >;
+	fields: NormalizedField< Item >[];
+	item: Item;
+	column: string;
+	view: ViewTableType;
+}
+
 interface TableRowProps< Item > {
 	hasBulkActions: boolean;
 	item: Item;
 	actions: Action< Item >[];
+	fields: NormalizedField< Item >[];
 	id: string;
-	visibleFields: NormalizedField< Item >[];
+	view: ViewTableType;
 	primaryField?: NormalizedField< Item >;
 	selection: string[];
 	getItemId: ( item: Item ) => string;
@@ -104,7 +130,7 @@ function WithDropDownMenuSeparators( { children }: { children: ReactNode } ) {
 
 const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 	{
-		field,
+		fieldId,
 		view,
 		fields,
 		onChangeView,
@@ -113,6 +139,16 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 	}: HeaderMenuProps< Item >,
 	ref: Ref< HTMLButtonElement >
 ) {
+	const combinedField = view.layout?.combinedFields?.find(
+		( f ) => f.id === fieldId
+	);
+	if ( !! combinedField ) {
+		return combinedField.header;
+	}
+	const field = fields.find( ( f ) => f.id === fieldId );
+	if ( ! field ) {
+		return null;
+	}
 	const isHidable = field.enableHiding !== false;
 	const isSortable = field.enableSorting !== false;
 	const isSorted = view.sort?.field === field.id;
@@ -227,7 +263,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 							onChangeView( {
 								...view,
 								fields: viewFields.filter(
-									( fieldId ) => fieldId !== field.id
+									( id ) => id !== field.id
 								),
 							} );
 						} }
@@ -292,12 +328,74 @@ function BulkSelectionCheckbox< Item >( {
 	);
 }
 
+function TableColumn< Item >( {
+	column,
+	fields,
+	view,
+	...props
+}: TableColumnProps< Item > ) {
+	const field = fields.find( ( f ) => f.id === column );
+	if ( !! field ) {
+		return <TableColumnField { ...props } field={ field } />;
+	}
+	const combinedField = view.layout?.combinedFields?.find(
+		( f ) => f.id === column
+	);
+	if ( !! combinedField ) {
+		return (
+			<TableColumnCombined
+				{ ...props }
+				fields={ fields }
+				view={ view }
+				field={ combinedField }
+			/>
+		);
+	}
+
+	return null;
+}
+
+function TableColumnField< Item >( {
+	primaryField,
+	item,
+	field,
+}: TableColumnFieldProps< Item > ) {
+	return (
+		<div
+			className={ clsx( 'dataviews-view-table__cell-content-wrapper', {
+				'dataviews-view-table__primary-field':
+					primaryField?.id === field.id,
+			} ) }
+		>
+			{ field.render( {
+				item,
+			} ) }
+		</div>
+	);
+}
+
+function TableColumnCombined< Item >( {
+	field,
+	...props
+}: TableColumnCombinedProps< Item > ) {
+	const Stack = field.direction === 'horizontal' ? HStack : VStack;
+
+	return (
+		<Stack>
+			{ field.children.map( ( child ) => (
+				<TableColumn key={ child } { ...props } column={ child } />
+			) ) }
+		</Stack>
+	);
+}
+
 function TableRow< Item >( {
 	hasBulkActions,
 	item,
 	actions,
+	fields,
 	id,
-	visibleFields,
+	view,
 	primaryField,
 	selection,
 	getItemId,
@@ -305,13 +403,11 @@ function TableRow< Item >( {
 }: TableRowProps< Item > ) {
 	const hasPossibleBulkAction = useHasAPossibleBulkAction( actions, item );
 	const isSelected = hasPossibleBulkAction && selection.includes( id );
-
 	const [ isHovered, setIsHovered ] = useState( false );
 
 	const handleMouseEnter = () => {
 		setIsHovered( true );
 	};
-
 	const handleMouseLeave = () => {
 		setIsHovered( false );
 	};
@@ -320,6 +416,7 @@ function TableRow< Item >( {
 	// `onClick` and can be used to exclude touchscreen devices from certain
 	// behaviours.
 	const isTouchDevice = useRef( false );
+	const columns = view.fields || fields.map( ( f ) => f.id );
 
 	return (
 		<tr
@@ -368,28 +465,22 @@ function TableRow< Item >( {
 					</div>
 				</td>
 			) }
-			{ visibleFields.map( ( field ) => (
+			{ columns.map( ( column ) => (
 				<td
-					key={ field.id }
-					style={ {
+					key={ column }
+					/*style={ {
 						width: field.width || undefined,
 						minWidth: field.minWidth || undefined,
 						maxWidth: field.maxWidth || undefined,
-					} }
+					} }*/
 				>
-					<div
-						className={ clsx(
-							'dataviews-view-table__cell-content-wrapper',
-							{
-								'dataviews-view-table__primary-field':
-									primaryField?.id === field.id,
-							}
-						) }
-					>
-						{ field.render( {
-							item,
-						} ) }
-					</div>
+					<TableColumn
+						primaryField={ primaryField }
+						fields={ fields }
+						item={ item }
+						column={ column }
+						view={ view }
+					/>
 				</td>
 			) ) }
 			{ !! actions?.length && (
@@ -459,12 +550,7 @@ function ViewTable< Item >( {
 		setNextHeaderMenuToFocus( fallback?.node );
 	};
 
-	const viewFields = view.fields || fields.map( ( f ) => f.id );
-	const visibleFields = fields.filter(
-		( field ) =>
-			viewFields.includes( field.id ) ||
-			[ view.layout?.mediaField ].includes( field.id )
-	);
+	const columns = view.fields || fields.map( ( f ) => f.id );
 	const hasData = !! data?.length;
 
 	const primaryField = fields.find(
@@ -486,7 +572,6 @@ function ViewTable< Item >( {
 								style={ {
 									width: '1%',
 								} }
-								data-field-id="selection"
 								scope="col"
 							>
 								<BulkSelectionCheckbox
@@ -498,17 +583,16 @@ function ViewTable< Item >( {
 								/>
 							</th>
 						) }
-						{ visibleFields.map( ( field, index ) => (
+						{ columns.map( ( column, index ) => (
 							<th
-								key={ field.id }
-								style={ {
+								key={ column }
+								/*style={ {
 									width: field.width || undefined,
 									minWidth: field.minWidth || undefined,
 									maxWidth: field.maxWidth || undefined,
-								} }
-								data-field-id={ field.id }
+								} }*/
 								aria-sort={
-									view.sort?.field === field.id
+									view.sort?.field === column
 										? sortValues[ view.sort.direction ]
 										: undefined
 								}
@@ -518,24 +602,24 @@ function ViewTable< Item >( {
 									ref={ ( node ) => {
 										if ( node ) {
 											headerMenuRefs.current.set(
-												field.id,
+												column,
 												{
 													node,
 													fallback:
-														visibleFields[
+														columns[
 															index > 0
 																? index - 1
 																: 1
-														]?.id,
+														],
 												}
 											);
 										} else {
 											headerMenuRefs.current.delete(
-												field.id
+												column
 											);
 										}
 									} }
-									field={ field }
+									fieldId={ column }
 									view={ view }
 									fields={ fields }
 									onChangeView={ onChangeView }
@@ -545,10 +629,7 @@ function ViewTable< Item >( {
 							</th>
 						) ) }
 						{ !! actions?.length && (
-							<th
-								data-field-id="actions"
-								className="dataviews-view-table__actions-column"
-							>
+							<th className="dataviews-view-table__actions-column">
 								<span className="dataviews-view-table-header">
 									{ __( 'Actions' ) }
 								</span>
@@ -564,8 +645,9 @@ function ViewTable< Item >( {
 								item={ item }
 								hasBulkActions={ hasBulkActions }
 								actions={ actions }
+								fields={ fields }
 								id={ getItemId( item ) || index.toString() }
-								visibleFields={ visibleFields }
+								view={ view }
 								primaryField={ primaryField }
 								selection={ selection }
 								getItemId={ getItemId }

@@ -249,9 +249,25 @@ interface ViewBase {
 	perPage?: number;
 
 	/**
-	 * The hidden fields.
+	 * The fields to render
 	 */
 	fields?: string[];
+}
+
+export interface CombinedField {
+	id: string;
+
+	header: string;
+
+	/**
+	 * The fields to use as columns.
+	 */
+	children: string[];
+
+	/**
+	 * The direction of the stack.
+	 */
+	direction: 'horizontal' | 'vertical';
 }
 
 export interface ViewTable extends ViewBase {
@@ -267,6 +283,11 @@ export interface ViewTable extends ViewBase {
 		 * The field to use as the media field.
 		 */
 		mediaField?: string;
+
+		/**
+		 * The fields to use as columns.
+		 */
+		combinedFields?: CombinedField[];
 	};
 }
 

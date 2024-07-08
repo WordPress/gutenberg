@@ -56,11 +56,21 @@ const EMPTY_ARRAY = [];
 
 const defaultLayouts = {
 	[ LAYOUT_TABLE ]: {
+		fields: [ 'template', 'author' ],
 		layout: {
 			primaryField: 'title',
+			combinedFields: [
+				{
+					id: 'template',
+					header: __( 'Template' ),
+					children: [ 'title', 'description' ],
+					direction: 'vertical',
+				},
+			],
 		},
 	},
 	[ LAYOUT_GRID ]: {
+		fields: [ 'title', 'description', 'author' ],
 		layout: {
 			mediaField: 'preview',
 			primaryField: 'title',
@@ -68,6 +78,7 @@ const defaultLayouts = {
 		},
 	},
 	[ LAYOUT_LIST ]: {
+		fields: [ 'title', 'description', 'author' ],
 		layout: {
 			primaryField: 'title',
 			mediaField: 'preview',
@@ -84,7 +95,7 @@ const DEFAULT_VIEW = {
 		field: 'title',
 		direction: 'asc',
 	},
-	fields: [ 'title', 'description', 'author' ],
+	fields: defaultLayouts[ LAYOUT_GRID ].fields,
 	layout: defaultLayouts[ LAYOUT_GRID ].layout,
 	filters: [],
 };
@@ -199,6 +210,7 @@ export default function PageTemplates() {
 			...DEFAULT_VIEW,
 			type: usedType,
 			layout: defaultLayouts[ usedType ].layout,
+			fields: defaultLayouts[ usedType ].fields,
 			filters:
 				activeView !== 'all'
 					? [
