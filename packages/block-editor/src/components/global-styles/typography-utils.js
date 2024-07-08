@@ -128,9 +128,9 @@ export function getFluidTypographyOptionsFromSettings( settings ) {
  * Returns an object of merged font families and the font faces from the selected font family
  * based on the theme.json settings object and the currently selected font family.
  *
- * @param {Object} settings           Theme.json settings
- * @param {string} selectedFontFamily Decoded font family string
- * @return {Object} Merged font families and font faces from the selected font family
+ * @param {Object} settings           Theme.json settings.
+ * @param {string} selectedFontFamily Decoded font family string.
+ * @return {Object} Merged font families and font faces from the selected font family.
  */
 export function getMergedFontFamiliesAndFontFamilyFaces(
 	settings,
@@ -154,9 +154,9 @@ export function getMergedFontFamiliesAndFontFamilyFaces(
  * Returns the nearest font weight value from the available font weight list based on the new font weight.
  * The nearest font weight is the one with the smallest difference from the new font weight.
  *
- * @param {Array}  availableFontWeights Array of available font weights
- * @param {string} newFontWeightValue   New font weight value
- * @return {string} Nearest font weight
+ * @param {Array}  availableFontWeights Array of available font weights.
+ * @param {string} newFontWeightValue   New font weight value.
+ * @return {string} Nearest font weight.
  */
 
 export function findNearestFontWeight(
@@ -206,7 +206,7 @@ export function findNearestStyleAndWeight(
 	const { fontStyles, fontWeights, combinedStyleAndWeightOptions } =
 		getFontStylesAndWeights( fontFamilyFaces );
 
-	// Check if the new font style and weight are available in the font family faces
+	// Check if the new font style and weight are available in the font family faces.
 	const hasFontStyle = fontStyles?.some(
 		( { value: fs } ) => fs === fontStyle
 	);
@@ -215,8 +215,10 @@ export function findNearestStyleAndWeight(
 	);
 
 	if ( ! hasFontStyle ) {
-		// Default to italic if oblique is not available
-		// Or find the nearest font style based on the nearest font weight
+		/*
+		 * Default to italic if oblique is not available.
+		 * Or find the nearest font style based on the nearest font weight.
+		 */
 		nearestFontStyle =
 			fontStyle === 'oblique'
 				? 'italic'
@@ -228,8 +230,10 @@ export function findNearestStyleAndWeight(
 	}
 
 	if ( ! hasFontWeight ) {
-		// Find the nearest font weight based on available weights
-		// Or find the nearest font weight based on the nearest font style
+		/*
+		 * Find the nearest font weight based on available weights.
+		 * Or find the nearest font weight based on the nearest font style.
+		 */
 		nearestFontWeight = fontWeight
 			? findNearestFontWeight( fontWeights, fontWeight )
 			: combinedStyleAndWeightOptions?.find(

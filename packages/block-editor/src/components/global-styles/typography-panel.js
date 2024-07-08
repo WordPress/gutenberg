@@ -254,7 +254,7 @@ export default function TypographyPanel( {
 		setFontAppearance( {} );
 	}, [ setFontAppearance ] );
 
-	// Check if previous font style and weight values are available in the new font family
+	// Check if previous font style and weight values are available in the new font family.
 	useEffect( () => {
 		const { nearestFontStyle, nearestFontWeight } =
 			findNearestStyleAndWeight( fontFamilyFaces, fontStyle, fontWeight );
@@ -265,7 +265,7 @@ export default function TypographyPanel( {
 				fontWeight: nearestFontWeight,
 			} );
 		} else {
-			// Reset font appearance if there are no available styles or weights
+			// Reset font appearance if there are no available styles or weights.
 			resetFontAppearance();
 		}
 	}, [
