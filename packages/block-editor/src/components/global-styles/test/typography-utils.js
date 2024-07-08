@@ -6,6 +6,7 @@ import {
 	getFluidTypographyOptionsFromSettings,
 	getMergedFontFamiliesAndFontFamilyFaces,
 	findNearestFontWeight,
+	findNearestFontStyle,
 	findNearestStyleAndWeight,
 } from '../typography-utils';
 
@@ -945,6 +946,57 @@ describe( 'typography utils', () => {
 						findNearestFontWeight(
 							availableFontWeights,
 							newFontWeightValue
+						)
+					).toEqual( expected );
+				} );
+			}
+		);
+	} );
+
+	describe( 'findNearestFontStyle', () => {
+		[
+			{
+				message:
+					'should return empty string when newFontStyleValue is `undefined`',
+				availableFontStyles: undefined,
+				newFontStyleValue: undefined,
+				expected: '',
+			},
+			{
+				message:
+					'should return newFontStyleValue value when availableFontStyles is empty',
+				availableFontStyles: [],
+				newFontStyleValue: 'italic',
+				expected: 'italic',
+			},
+			{
+				message:
+					'should return empty string if there is no new font style available',
+				availableFontStyles: [ { name: 'Normal', value: 'normal' } ],
+				newFontStyleValue: 'italic',
+				expected: '',
+			},
+			{
+				message: 'should return italic if oblique is not available',
+				availableFontStyles: [
+					{ name: 'Regular', value: 'normal' },
+					{ name: 'Italic', value: 'italic' },
+				],
+				newFontStyleValue: 'oblique',
+				expected: 'italic',
+			},
+		].forEach(
+			( {
+				message,
+				availableFontStyles,
+				newFontStyleValue,
+				expected,
+			} ) => {
+				it( `${ message }`, () => {
+					expect(
+						findNearestFontStyle(
+							availableFontStyles,
+							newFontStyleValue
 						)
 					).toEqual( expected );
 				} );
