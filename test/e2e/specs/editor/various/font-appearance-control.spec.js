@@ -74,7 +74,10 @@ test.describe( 'Font Appearance Control dropdown menu', () => {
 			attributes: {
 				content: 'Default',
 				style: {
-					typography: { fontWeight: '', fontStyle: '' },
+					typography: {
+						fontWeight: '',
+						fontStyle: 'invalid-style',
+					},
 				},
 			},
 		} );
