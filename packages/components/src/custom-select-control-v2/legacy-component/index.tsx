@@ -21,15 +21,20 @@ function useDeprecatedProps( {
 }: LegacyCustomSelectProps ) {
 	return {
 		...otherProps,
-		options: options.map(
-			( { __experimentalHint, hint, ...restOption } ) => ( {
-				...restOption,
-				hint:
-					typeof __experimentalHint !== 'undefined'
-						? __experimentalHint
-						: hint,
-			} )
-		),
+		options: options.map( ( o ) => {
+			const toReturn = o;
+
+			const hint =
+				typeof o.__experimentalHint !== 'undefined'
+					? o.__experimentalHint
+					: o.hint;
+
+			if ( hint ) {
+				toReturn.hint = hint;
+			}
+
+			return toReturn;
+		} ),
 		showSelectedHint:
 			typeof __experimentalShowSelectedHint !== 'undefined'
 				? __experimentalShowSelectedHint
