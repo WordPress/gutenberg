@@ -24,7 +24,7 @@ Embed a simple audio player. ([Source](https://github.com/WordPress/gutenberg/tr
 -	**Name:** core/audio
 -	**Category:** media
 -	**Supports:** align, anchor, interactivity (clientNavigation), spacing (margin, padding)
--	**Attributes:** autoplay, caption, id, loop, preload, src
+-	**Attributes:** autoplay, blob, caption, id, loop, preload, src
 
 ## Avatar
 
