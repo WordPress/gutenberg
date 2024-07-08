@@ -47,7 +47,6 @@ export function useUploadMediaFromBlobURL( args = {} ) {
 		if ( hasUploadStarted.current ) {
 			return;
 		}
-
 		if (
 			! latestArgs.current.url ||
 			! isBlobURL( latestArgs.current.url )

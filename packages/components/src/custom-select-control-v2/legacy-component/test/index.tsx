@@ -453,6 +453,16 @@ describe.each( [
 		);
 	} );
 
+	it( 'Should label the component correctly even when the label is not visible', () => {
+		render( <Component { ...legacyProps } hideLabelFromVision /> );
+
+		expect(
+			screen.getByRole( 'combobox', {
+				name: legacyProps.label,
+			} )
+		).toBeVisible();
+	} );
+
 	describe( 'Keyboard behavior and accessibility', () => {
 		it( 'Captures the keypress event and does not let it propagate', async () => {
 			const onKeyDown = jest.fn();

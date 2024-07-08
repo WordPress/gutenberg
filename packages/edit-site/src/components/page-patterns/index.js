@@ -82,6 +82,7 @@ const DEFAULT_VIEW = {
 	layout: {
 		...defaultConfigPerViewType[ LAYOUT_GRID ],
 	},
+	fields: [ 'title', 'sync-status' ],
 	filters: [],
 };
 
@@ -285,7 +286,6 @@ export default function DataviewsPatterns() {
 					<Preview item={ item } viewType={ view.type } />
 				),
 				enableSorting: false,
-				enableHiding: false,
 				width: '1%',
 			},
 			{
