@@ -85,11 +85,17 @@ export type CustomSelectProps = _CustomSelectProps & CustomSelectSize;
 /**
  * The legacy object structure for the options array.
  */
-type LegacyOption = {
+export type LegacyOption = {
 	key: string;
 	name: string;
 	style?: React.CSSProperties;
 	className?: string;
+	hint?: string;
+	/**
+	 * Use the `hint` property instead
+	 * @deprecated
+	 * @ignore
+	 */
 	__experimentalHint?: string;
 	[ key: string ]: any;
 };
