@@ -9,8 +9,6 @@ import { render, screen } from '@testing-library/react';
 import {
 	registerBlockType,
 	unregisterBlockType,
-	registerBlockVariation,
-	unregisterBlockVariation,
 	getBlockTypes,
 } from '@wordpress/blocks';
 
@@ -108,15 +106,16 @@ describe( 'Edit', () => {
 					variation: true,
 				},
 			},
-		} );
-
-		registerBlockVariation( 'core/test-block', {
-			name: 'variation',
-			title: 'block variation title',
-			attributes: {
-				fruit: 'Bananas',
-			},
-			isActive: [ 'fruit' ],
+			variations: [
+				{
+					name: 'variation',
+					title: 'block variation title',
+					attributes: {
+						fruit: 'Bananas',
+					},
+					isActive: [ 'fruit' ],
+				},
+			],
 		} );
 
 		render(
@@ -126,8 +125,6 @@ describe( 'Edit', () => {
 		const editElement = screen.getByTestId( 'foo-bar' );
 		expect( editElement ).toHaveClass( 'wp-block-test-block' );
 		expect( editElement ).toHaveClass( 'wp-block-test-block-variation' );
-
-		unregisterBlockVariation( 'core/test-block', 'variation' );
 	} );
 
 	it( 'should assign context', () => {
