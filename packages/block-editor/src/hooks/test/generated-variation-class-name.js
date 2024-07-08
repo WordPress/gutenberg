@@ -28,6 +28,12 @@ describe( 'generated variation className', () => {
 		save: ( { attributes } ) => (
 			<div className={ attributes.className }>{ attributes.fruit }</div>
 		),
+		supports: {
+			className: {
+				block: true,
+				variation: true,
+			},
+		},
 		category: 'text',
 		title: 'block title',
 	};
