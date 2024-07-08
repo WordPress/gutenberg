@@ -9,6 +9,7 @@ import type { ChangeEvent } from 'react';
 import {
 	Button,
 	privateApis as componentsPrivateApis,
+	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { memo } from '@wordpress/element';
@@ -291,44 +292,56 @@ function _ViewActions< Item >( {
 	const activeView = VIEW_LAYOUTS.find( ( v ) => view.type === v.type );
 	return (
 		<>
-			<DropdownMenu
-				trigger={
-					<Button
-						size="compact"
-						icon={ activeView?.icon }
-						label={ __( 'Layout' ) }
-					/>
-				}
+			<HStack
+				spacing={ 1 }
+				expanded={ false }
+				style={ { flexShrink: 0 } }
 			>
-				<ViewTypeMenu
-					view={ view }
-					onChangeView={ onChangeView }
-					supportedLayouts={ supportedLayouts }
-				/>
-			</DropdownMenu>
-			<DropdownMenu
-				trigger={
-					<Button
-						size="compact"
-						icon={ cog }
-						label={ _x( 'View options', 'View is used as a noun' ) }
-					/>
-				}
-			>
-				<DropdownMenuGroup>
-					<SortMenu
-						fields={ fields }
+				<DropdownMenu
+					trigger={
+						<Button
+							size="compact"
+							icon={ activeView?.icon }
+							label={ __( 'Layout' ) }
+						/>
+					}
+				>
+					<ViewTypeMenu
 						view={ view }
 						onChangeView={ onChangeView }
+						supportedLayouts={ supportedLayouts }
 					/>
-					<FieldsVisibilityMenu
-						fields={ fields }
-						view={ view }
-						onChangeView={ onChangeView }
-					/>
-					<PageSizeMenu view={ view } onChangeView={ onChangeView } />
-				</DropdownMenuGroup>
-			</DropdownMenu>
+				</DropdownMenu>
+				<DropdownMenu
+					trigger={
+						<Button
+							size="compact"
+							icon={ cog }
+							label={ _x(
+								'View options',
+								'View is used as a noun'
+							) }
+						/>
+					}
+				>
+					<DropdownMenuGroup>
+						<SortMenu
+							fields={ fields }
+							view={ view }
+							onChangeView={ onChangeView }
+						/>
+						<FieldsVisibilityMenu
+							fields={ fields }
+							view={ view }
+							onChangeView={ onChangeView }
+						/>
+						<PageSizeMenu
+							view={ view }
+							onChangeView={ onChangeView }
+						/>
+					</DropdownMenuGroup>
+				</DropdownMenu>
+			</HStack>
 		</>
 	);
 }
