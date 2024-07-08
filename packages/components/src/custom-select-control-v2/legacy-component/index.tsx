@@ -12,9 +12,23 @@ import CustomSelectItem from '../item';
 import type { LegacyCustomSelectProps } from '../types';
 import * as Styled from '../styles';
 
+function useDeprecatedProps( {
+	showSelectedHint = false,
+	// Deprecated
+	__experimentalShowSelectedHint,
+	...otherProps
+}: LegacyCustomSelectProps ) {
+	return {
+		...otherProps,
+		showSelectedHint:
+			typeof __experimentalShowSelectedHint !== 'undefined'
+				? __experimentalShowSelectedHint
+				: showSelectedHint,
+	};
+}
+
 function CustomSelectControl( props: LegacyCustomSelectProps ) {
 	const {
-		__experimentalShowSelectedHint = false,
 		__next40pxDefaultSize = false,
 		describedBy,
 		options,
@@ -22,8 +36,9 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 		size = 'default',
 		value,
 		className: classNameProp,
+		showSelectedHint,
 		...restProps
-	} = props;
+	} = useDeprecatedProps( props );
 
 	// Forward props + store from v2 implementation
 	const store = Ariakit.useSelectStore( {
@@ -131,9 +146,7 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 		<_CustomSelect
 			aria-describedby={ describedBy }
 			renderSelectedValue={
-				__experimentalShowSelectedHint
-					? renderSelectedValueHint
-					: undefined
+				showSelectedHint ? renderSelectedValueHint : undefined
 			}
 			size={ translatedSize }
 			store={ store }
