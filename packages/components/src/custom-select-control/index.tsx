@@ -60,7 +60,8 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 			}
 
 			// Executes the logic in a microtask after the popup is closed.
-			// This is simply to ensure the isOpen state matches that in Downshift.
+			// This is simply to ensure the isOpen state matches the one from the
+			// previous legacy implementation.
 			await Promise.resolve();
 			const state = store.getState();
 
