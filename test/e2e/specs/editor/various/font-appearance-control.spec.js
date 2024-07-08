@@ -29,7 +29,7 @@ test.describe( 'Font Appearance Control dropdown menu', () => {
 			.getByRole( 'button', { name: 'Typography options' } )
 			.click();
 		await expect(
-			page.getByRole( 'button', { name: 'Appearance' } )
+			page.getByRole( 'combobox', { name: 'Appearance' } )
 		).toHaveText( 'Regular' );
 
 		await editor.insertBlock( {
@@ -45,7 +45,7 @@ test.describe( 'Font Appearance Control dropdown menu', () => {
 			.getByRole( 'button', { name: 'Typography options' } )
 			.click();
 		await expect(
-			page.getByRole( 'button', { name: 'Appearance' } )
+			page.getByRole( 'combobox', { name: 'Appearance' } )
 		).toHaveText( 'Extra Light Italic' );
 
 		await editor.insertBlock( {
@@ -61,7 +61,7 @@ test.describe( 'Font Appearance Control dropdown menu', () => {
 			.getByRole( 'button', { name: 'Typography options' } )
 			.click();
 		await expect(
-			page.getByRole( 'button', { name: 'Appearance' } )
+			page.getByRole( 'combobox', { name: 'Appearance' } )
 		).toHaveText( 'Bold Italic' );
 	} );
 
@@ -88,7 +88,7 @@ test.describe( 'Font Appearance Control dropdown menu', () => {
 			.getByRole( 'menuitemcheckbox', { name: 'Show Appearance' } )
 			.click();
 		await expect(
-			page.getByRole( 'button', { name: 'Appearance' } )
+			page.getByRole( 'combobox', { name: 'Appearance' } )
 		).toHaveText( 'Default' );
 	} );
 } );
