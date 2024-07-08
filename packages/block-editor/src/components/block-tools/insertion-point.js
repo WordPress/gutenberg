@@ -175,9 +175,7 @@ function InbetweenInsertionPointPopover( {
 				tabIndex={ -1 }
 				onClick={ onClick }
 				onFocus={ onFocus }
-				className={ clsx( className, {
-					'is-with-inserter': isInserterShown,
-				} ) }
+				className={ className }
 				onHoverEnd={ maybeHideInserterPoint }
 			>
 				<motion.div

@@ -30,18 +30,10 @@
 	// drop zone.
 	pointer-events: none;
 
-	* {
-		pointer-events: none;
-	}
-
 	// Re-enable pointer events when the inbetween inserter has a '+' button.
 	// Needs specificity, do not simplify.
-	.is-with-inserter {
+	.block-editor-block-list__insertion-point-inserter {
 		pointer-events: all;
-
-		* {
-			pointer-events: all;
-		}
 	}
 }
 
