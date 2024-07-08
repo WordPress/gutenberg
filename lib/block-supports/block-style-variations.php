@@ -60,12 +60,11 @@ function gutenberg_resolve_block_style_variation_ref_values( &$variation_data, $
 				$value_path = explode( '.', $value['ref'] ?? '' );
 				$ref_value  = _wp_array_get( $theme_json, $value_path );
 
-				// Only update this value if the referenced path matched a value.
-				if ( $ref_value ) {
-					$value = $ref_value;
-				} else {
-					// Otherwise, remove the ref node.
+				// Only update the current value if the referenced path matched a value.
+				if ( null === $ref_value ) {
 					unset( $variation_data[ $key ] );
+				} else {
+					$value = $ref_value;
 				}
 			} else {
 				// Recursively look for ref instances.
