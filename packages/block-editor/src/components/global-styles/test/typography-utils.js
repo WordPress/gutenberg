@@ -977,6 +977,16 @@ describe( 'typography utils', () => {
 				expected: '',
 			},
 			{
+				message:
+					'should return empty string if the new font style is invalid',
+				availableFontStyles: [
+					{ name: 'Regular', value: 'normal' },
+					{ name: 'Italic', value: 'italic' },
+				],
+				newFontStyleValue: 'not-valid',
+				expected: '',
+			},
+			{
 				message: 'should return italic if oblique is not available',
 				availableFontStyles: [
 					{ name: 'Regular', value: 'normal' },
