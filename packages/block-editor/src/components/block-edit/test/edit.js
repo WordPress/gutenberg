@@ -114,10 +114,7 @@ describe( 'Edit', () => {
 			name: 'variation',
 			title: 'block variation title',
 			attributes: {
-				fruit: {
-					type: 'string',
-					default: 'Bananas',
-				},
+				fruit: 'Bananas',
 			},
 			isActive: ( { fruit } ) => fruit === 'Bananas',
 		} );
