@@ -235,6 +235,10 @@ function BlockSelectionButton( { clientId, rootClientId }, ref ) {
 			if ( focusedBlockUid ) {
 				event.preventDefault();
 				selectBlock( focusedBlockUid );
+			} else if ( ! isTab ) {
+				// Prevent screenreaders from moving beyond the bounds of
+				// the block list when using arrow key navigation.
+				event.preventDefault();
 			} else if ( isTab && selectedBlockClientId ) {
 				let nextTabbable;
 
