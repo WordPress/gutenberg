@@ -42,7 +42,7 @@ const STICKY_OPTION = {
 	key: 'sticky',
 	value: 'sticky',
 	name: _x( 'Sticky', 'Name for the value of the CSS position property' ),
-	__experimentalHint: __(
+	hint: __(
 		'The block will stick to the top of the window instead of scrolling.'
 	),
 };
@@ -51,9 +51,7 @@ const FIXED_OPTION = {
 	key: 'fixed',
 	value: 'fixed',
 	name: _x( 'Fixed', 'Name for the value of the CSS position property' ),
-	__experimentalHint: __(
-		'The block will not move when the page is scrolled.'
-	),
+	hint: __( 'The block will not move when the page is scrolled.' ),
 };
 
 const POSITION_SIDES = [ 'top', 'right', 'bottom', 'left' ];

@@ -297,7 +297,7 @@ describe.each( [
 					{
 						key: 'one',
 						name: 'One',
-						__experimentalHint: 'Hint',
+						hint: 'Hint',
 					},
 				] }
 			/>
@@ -318,7 +318,7 @@ describe.each( [
 					{
 						key: 'one',
 						name: 'One',
-						__experimentalHint: 'Hint',
+						hint: 'Hint',
 					},
 				] }
 				showSelectedHint
@@ -343,7 +343,7 @@ describe.each( [
 					{
 						key: 'one',
 						name: 'One',
-						__experimentalHint: 'Hint',
+						hint: 'Hint',
 					},
 				] }
 			/>
