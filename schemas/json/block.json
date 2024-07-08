@@ -263,11 +263,11 @@
 							"properties": {
 								"block": {
 									"type": "boolean",
-									"description": "Add a block specific class name"
+									"description": "Add the .wp-block-your-block-name class to the block's wrapper element"
 								},
 								"variation": {
 									"type": "boolean",
-									"description": "Add a variation specific class name"
+									"description": "Add the .wp-block-your-block-name-your-block-variation class to the block's wrapper element"
 								}
 							}
 						}
