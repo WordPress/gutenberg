@@ -280,11 +280,6 @@ export interface ViewTable extends ViewBase {
 		primaryField?: string;
 
 		/**
-		 * The field to use as the media field.
-		 */
-		mediaField?: string;
-
-		/**
 		 * The fields to use as columns.
 		 */
 		combinedFields?: CombinedField[];
