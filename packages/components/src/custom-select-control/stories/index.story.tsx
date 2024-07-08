@@ -106,22 +106,22 @@ WithHints.args = {
 		{
 			key: 'thumbnail',
 			name: 'Thumbnail',
-			hint: '150x150',
+			__experimentalHint: '150x150',
 		},
 		{
 			key: 'medium',
 			name: 'Medium',
-			hint: '250x250',
+			__experimentalHint: '250x250',
 		},
 		{
 			key: 'large',
 			name: 'Large',
-			hint: '1024x1024',
+			__experimentalHint: '1024x1024',
 		},
 		{
 			key: 'full',
 			name: 'Full Size',
-			hint: '1600x1600',
+			__experimentalHint: '1600x1600',
 		},
 	],
 };
