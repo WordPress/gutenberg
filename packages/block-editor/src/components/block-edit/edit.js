@@ -84,9 +84,7 @@ const EditWithGeneratedProps = ( props ) => {
 		const activeVariation = getActiveBlockVariation( name, attributes );
 		if ( activeVariation && activeVariation?.name ) {
 			generatedClassNames.push(
-				getBlockDefaultClassName(
-					`${ name }/${ activeVariation.name }`
-				)
+				getBlockDefaultClassName( name ) + '-' + activeVariation.name
 			);
 		}
 	}

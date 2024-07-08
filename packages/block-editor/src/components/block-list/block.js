@@ -608,9 +608,9 @@ function BlockListBlockProvider( props ) {
 				if ( hasVariationClassNameSupport( blockType ) ) {
 					if ( match && match?.name ) {
 						defaultClassNames.push(
-							getBlockDefaultClassName(
-								`${ blockName }/${ match.name }`
-							)
+							getBlockDefaultClassName( blockName ) +
+								'-' +
+								match.name
 						);
 					}
 				}
