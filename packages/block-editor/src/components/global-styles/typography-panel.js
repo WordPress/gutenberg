@@ -268,14 +268,9 @@ export default function TypographyPanel( {
 			// Reset font appearance if there are no available styles or weights.
 			resetFontAppearance();
 		}
-	}, [
-		fontFamily,
-		fontFamilyFaces,
-		fontStyle,
-		fontWeight,
-		resetFontAppearance,
-		setFontAppearance,
-	] );
+		// We need to limit the dependency array to just `fontFamily` to avoid infinite loops.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ fontFamily ] );
 
 	// Line Height
 	const hasLineHeightEnabled = useHasLineHeightControl( settings );
