@@ -100,7 +100,6 @@ function BlockSelectionButton( { clientId, rootClientId }, ref ) {
 			const {
 				getBlock,
 				hasBlockMovingClientId,
-				getBlockListSettings,
 				__unstableGetEditorMode,
 				getNextBlockClientId,
 				getPreviousBlockClientId,
@@ -113,13 +112,10 @@ function BlockSelectionButton( { clientId, rootClientId }, ref ) {
 				select( blocksStore );
 			const { name, attributes } = getBlock( clientId );
 			const blockType = getBlockType( name );
-			const orientation =
-				getBlockListSettings( rootClientId )?.orientation;
 			const match = getActiveBlockVariation( name, attributes );
 
 			return {
 				blockType,
-				orientation,
 				attributes,
 				blockMovingMode: hasBlockMovingClientId(),
 				editorMode: __unstableGetEditorMode(),
@@ -135,30 +131,51 @@ function BlockSelectionButton( { clientId, rootClientId }, ref ) {
 	const {
 		blockType,
 		attributes,
-		orientation,
 		icon,
 		blockMovingMode,
 		editorMode,
 		canMove,
 		enabledClientIdsTree,
 	} = selected;
-	const { setNavigationMode, removeBlock } = useDispatch( blockEditorStore );
+	const {
+		setNavigationMode,
+		removeBlock,
+		selectBlock,
+		clearSelectedBlock,
+		setBlockMovingClientId,
+		moveBlockToPosition,
+	} = useDispatch( blockEditorStore );
+
+	const {
+		hasBlockMovingClientId,
+		getBlockIndex,
+		getBlockRootClientId,
+		getSelectedBlockClientId,
+		getBlockListSettings,
+	} = useSelect( blockEditorStore );
 
 	const { parent, firstChild, previous, next, blockIndex } = useMemo(
 		() => findBlockNeighbors( enabledClientIdsTree, clientId ),
 		[ enabledClientIdsTree, clientId ]
 	);
 
-	const label = useMemo(
-		() =>
-			getAccessibleBlockLabel(
-				blockType,
-				attributes,
-				blockIndex,
-				orientation
-			),
-		[ attributes, blockIndex, blockType, orientation ]
-	);
+	const label = useMemo( () => {
+		const orientation = getBlockListSettings(
+			parent?.clientId ?? ''
+		)?.orientation;
+		return getAccessibleBlockLabel(
+			blockType,
+			attributes,
+			blockIndex,
+			orientation
+		);
+	}, [
+		attributes,
+		blockIndex,
+		blockType,
+		getBlockListSettings,
+		parent?.clientId,
+	] );
 
 	// Focus the block selection button in navigation mode.
 	// Only one block selection button renders at a time (for the individual selected block),
@@ -177,19 +194,6 @@ function BlockSelectionButton( { clientId, rootClientId }, ref ) {
 		}
 	}, [ clientId, editorMode, label, ref ] );
 	const blockElement = useBlockElement( clientId );
-
-	const {
-		hasBlockMovingClientId,
-		getBlockIndex,
-		getBlockRootClientId,
-		getSelectedBlockClientId,
-	} = useSelect( blockEditorStore );
-	const {
-		selectBlock,
-		clearSelectedBlock,
-		setBlockMovingClientId,
-		moveBlockToPosition,
-	} = useDispatch( blockEditorStore );
 
 	function onKeyDown( event ) {
 		const { keyCode } = event;
