@@ -12,7 +12,7 @@ const noop = () => {};
 
 describe( 'generated className', () => {
 	const blockSettings = {
-		name: 'chicken/ribs',
+		name: 'produce/fruit',
 		save: noop,
 		category: 'text',
 		title: 'block title',
@@ -48,18 +48,18 @@ describe( 'generated className', () => {
 				attributes
 			);
 
-			expect( extraProps.className ).toBe( 'wp-block-chicken-ribs foo' );
+			expect( extraProps.className ).toBe( 'wp-block-produce-fruit foo' );
 		} );
 
 		it( 'should not inject duplicates into className', () => {
 			const attributes = { className: 'bar' };
 			const extraProps = addSaveProps(
-				{ className: 'foo wp-block-chicken-ribs' },
+				{ className: 'foo wp-block-produce-fruit' },
 				blockSettings,
 				attributes
 			);
 
-			expect( extraProps.className ).toBe( 'wp-block-chicken-ribs foo' );
+			expect( extraProps.className ).toBe( 'wp-block-produce-fruit foo' );
 		} );
 	} );
 } );
