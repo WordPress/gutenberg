@@ -6,12 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import {
-	Icon,
-	__experimentalText as Text,
-	__experimentalHStack as HStack,
-	VisuallyHidden,
-} from '@wordpress/components';
+import { Icon, __experimentalHStack as HStack } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
@@ -301,20 +296,11 @@ export default function PageTemplates() {
 				header: __( 'Description' ),
 				id: 'description',
 				render: ( { item } ) => {
-					return item.description ? (
-						<span className="page-templates-description">
-							{ decodeEntities( item.description ) }
-						</span>
-					) : (
-						view.type === LAYOUT_TABLE && (
-							<>
-								<Text variant="muted" aria-hidden="true">
-									&#8212;
-								</Text>
-								<VisuallyHidden>
-									{ __( 'No description.' ) }
-								</VisuallyHidden>
-							</>
+					return (
+						item.description && (
+							<span className="page-templates-description">
+								{ decodeEntities( item.description ) }
+							</span>
 						)
 					);
 				},

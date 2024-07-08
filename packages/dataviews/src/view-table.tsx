@@ -360,17 +360,23 @@ function TableColumnField< Item >( {
 	item,
 	field,
 }: TableColumnFieldProps< Item > ) {
+	const value = field.render( {
+		item,
+	} );
 	return (
-		<div
-			className={ clsx( 'dataviews-view-table__cell-content-wrapper', {
-				'dataviews-view-table__primary-field':
-					primaryField?.id === field.id,
-			} ) }
-		>
-			{ field.render( {
-				item,
-			} ) }
-		</div>
+		!! value && (
+			<div
+				className={ clsx(
+					'dataviews-view-table__cell-content-wrapper',
+					{
+						'dataviews-view-table__primary-field':
+							primaryField?.id === field.id,
+					}
+				) }
+			>
+				{ value }
+			</div>
+		)
 	);
 }
 
