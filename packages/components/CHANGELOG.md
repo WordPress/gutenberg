@@ -23,6 +23,7 @@
 -   Fix inaccessibly disabled `Button`s ([#62306](https://github.com/WordPress/gutenberg/pull/62306)).
 -   `TimePicker`: Fix time zone overflow ([#63209](https://github.com/WordPress/gutenberg/pull/63209)).
 -   `Tabs`: Fix text-align when text wraps in vertical mode ([#63272](https://github.com/WordPress/gutenberg/pull/63272)).
+-   `Tabs`: Fix "With tab icons" Storybook example ([#63297](https://github.com/WordPress/gutenberg/pull/63297)).
 
 ### Internal
 
