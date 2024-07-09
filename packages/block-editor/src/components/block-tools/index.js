@@ -202,12 +202,6 @@ export default function BlockTools( {
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div { ...props } onKeyDown={ onKeyDown }>
 			<InsertionPointOpenRef.Provider value={ useRef( false ) }>
-				{ ! isTyping && (
-					<InsertionPoint
-						__unstableContentRef={ __unstableContentRef }
-					/>
-				) }
-
 				{ showEmptyBlockSideInserter && (
 					<EmptyBlockInserter
 						__unstableContentRef={ __unstableContentRef }
@@ -251,6 +245,11 @@ export default function BlockTools( {
 					name="__unstable-block-tools-after"
 					ref={ blockToolbarAfterRef }
 				/>
+				{ ! isTyping && (
+					<InsertionPoint
+						__unstableContentRef={ __unstableContentRef }
+					/>
+				) }
 				{ window.__experimentalEnableZoomedOutPatternsTab &&
 					isZoomOutMode && (
 						<ZoomOutModeInserters
