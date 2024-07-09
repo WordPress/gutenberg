@@ -140,6 +140,7 @@ const namespaceStack: string[] = [];
  * @return The context content.
  */
 export const getContext = < T extends object >( namespace?: string ): T =>
+	// @ts-expect-error it's any!
 	getScope()?.context[ namespace || getNamespace() ];
 
 /**

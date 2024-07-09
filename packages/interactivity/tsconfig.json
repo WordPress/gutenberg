@@ -4,8 +4,7 @@
 	"compilerOptions": {
 		"rootDir": "src",
 		"declarationDir": "build-types",
-
-		"noImplicitAny": false
+		"types": [ "gutenberg-env" ]
 	},
 	"include": [ "src/**/*" ]
 }
