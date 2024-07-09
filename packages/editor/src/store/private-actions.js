@@ -153,6 +153,7 @@ export const saveDirtyEntities =
 		close?.( entitiesToSave );
 		const siteItemsToSave = [];
 		const pendingSavedRecords = [];
+		let showPostUpdatedMessage = false;
 		let showSiteUpdatedMessage = false;
 		entitiesToSave.forEach( ( { kind, name, key, property } ) => {
 			if ( 'root' === kind && 'site' === name ) {
@@ -182,7 +183,9 @@ export const saveDirtyEntities =
 				// This flag allows us to avoid showing the 'site updated' message
 				// in scenarios related to entity changes when the message shouldn't be
 				// triggered, like when modifying post meta via block bindings.
-				if ( kind !== 'postType' ) {
+				if ( kind === 'postType' ) {
+					showPostUpdatedMessage = true;
+				} else {
 					showSiteUpdatedMessage = true;
 				}
 			}
@@ -213,19 +216,30 @@ export const saveDirtyEntities =
 					registry
 						.dispatch( noticesStore )
 						.createErrorNotice( __( 'Saving failed.' ) );
-				} else if ( showSiteUpdatedMessage ) {
-					registry
-						.dispatch( noticesStore )
-						.createSuccessNotice( __( 'Site updated.' ), {
-							type: 'snackbar',
-							id: saveNoticeId,
-							actions: [
-								{
-									label: __( 'View site' ),
-									url: homeUrl,
-								},
-							],
-						} );
+				} else {
+					if ( showSiteUpdatedMessage ) {
+						registry
+							.dispatch( noticesStore )
+							.createSuccessNotice( __( 'Site updated.' ), {
+								type: 'snackbar',
+								id: saveNoticeId,
+								actions: [
+									{
+										label: __( 'View site' ),
+										url: homeUrl,
+									},
+								],
+							} );
+					}
+
+					if ( showPostUpdatedMessage ) {
+						registry
+							.dispatch( noticesStore )
+							.createSuccessNotice( __( 'Post updated.' ), {
+								type: 'snackbar',
+								id: saveNoticeId,
+							} );
+					}
 				}
 			} )
 			.catch( ( error ) =>
