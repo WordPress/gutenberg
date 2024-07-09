@@ -10,12 +10,12 @@ import clsx from 'clsx';
 import _CustomSelect from '../custom-select-control-v2/custom-select';
 import CustomSelectItem from '../custom-select-control-v2/item';
 import * as Styled from '../custom-select-control-v2/styles';
-import type { LegacyCustomSelectProps } from './types';
+import type { CustomSelectProps } from './types';
 
 function useDeprecatedProps( {
 	__experimentalShowSelectedHint,
 	...otherProps
-}: LegacyCustomSelectProps ) {
+}: CustomSelectProps ) {
 	return {
 		showSelectedHint: __experimentalShowSelectedHint,
 		...otherProps,
@@ -28,14 +28,14 @@ function useDeprecatedProps( {
 function applyOptionDeprecations( {
 	__experimentalHint,
 	...rest
-}: LegacyCustomSelectProps[ 'options' ][ number ] ) {
+}: CustomSelectProps[ 'options' ][ number ] ) {
 	return {
 		hint: __experimentalHint,
 		...rest,
 	};
 }
 
-function CustomSelectControl( props: LegacyCustomSelectProps ) {
+function CustomSelectControl( props: CustomSelectProps ) {
 	const {
 		__next40pxDefaultSize = false,
 		describedBy,

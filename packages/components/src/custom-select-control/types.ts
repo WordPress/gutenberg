@@ -4,9 +4,9 @@
 import type { FocusEventHandler, MouseEventHandler } from 'react';
 
 /**
- * The legacy object structure for the options array.
+ * The object structure for the options array.
  */
-type LegacyOption = {
+type Option = {
 	key: string;
 	name: string;
 	style?: React.CSSProperties;
@@ -22,17 +22,17 @@ type LegacyOption = {
 };
 
 /**
- * The legacy object returned from the onChange event.
+ * The object returned from the onChange event.
  */
-type LegacyOnChangeObject = {
+type ChangeObject = {
 	highlightedIndex?: number;
 	inputValue?: string;
 	isOpen?: boolean;
 	type?: string;
-	selectedItem: LegacyOption;
+	selectedItem: Option;
 };
 
-export type LegacyCustomSelectProps = {
+export type CustomSelectProps = {
 	/**
 	 * Optional classname for the component.
 	 */
@@ -56,7 +56,7 @@ export type LegacyCustomSelectProps = {
 	 * Function called with the control's internal state changes. The `selectedItem`
 	 * property contains the next selected item.
 	 */
-	onChange?: ( newValue: LegacyOnChangeObject ) => void;
+	onChange?: ( newValue: ChangeObject ) => void;
 	/**
 	 * A handler for `onBlur` events.
 	 *
@@ -84,7 +84,7 @@ export type LegacyCustomSelectProps = {
 	/**
 	 * The options that can be chosen from.
 	 */
-	options: Array< LegacyOption >;
+	options: Array< Option >;
 	/**
 	 * The size of the control.
 	 *
@@ -94,7 +94,7 @@ export type LegacyCustomSelectProps = {
 	/**
 	 * Can be used to externally control the value of the control.
 	 */
-	value?: LegacyOption;
+	value?: Option;
 	/**
 	 * Use the `showSelectedHint` property instead.
 	 * @deprecated
