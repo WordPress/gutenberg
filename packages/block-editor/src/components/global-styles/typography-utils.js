@@ -192,7 +192,7 @@ export function findNearestFontWeight(
  *
  * @param {Array}  availableFontStyles Array of available font weights.
  * @param {string} newFontStyleValue   New font style value.
- * @return {string} Nearest font style.
+ * @return {string} Nearest font style or an empty string.
  */
 export function findNearestFontStyle( availableFontStyles, newFontStyleValue ) {
 	if ( typeof newFontStyleValue !== 'string' || ! newFontStyleValue ) {
@@ -209,7 +209,7 @@ export function findNearestFontStyle( availableFontStyles, newFontStyleValue ) {
 		return newFontStyleValue;
 	}
 
-	let nearestFontStyle;
+	let nearestFontStyle = '';
 	const validStyles = [ 'normal', 'italic', 'oblique' ];
 
 	if (
