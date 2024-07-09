@@ -15,9 +15,13 @@ export const TabListWrapper = styled.div`
 	display: flex;
 	align-items: stretch;
 	flex-direction: row;
+	text-align: center;
+
 	&[aria-orientation='vertical'] {
 		flex-direction: column;
+		text-align: start;
 	}
+
 	@media not ( prefers-reduced-motion: reduce ) {
 		&.is-animation-enabled::after {
 			transition-property: left, top, width, height;
@@ -70,6 +74,7 @@ export const Tab = styled( Ariakit.Tab )`
 		padding: ${ space( 4 ) };
 		margin-left: 0;
 		font-weight: 500;
+		text-align: inherit;
 
 		&[aria-disabled='true'] {
 			cursor: default;
