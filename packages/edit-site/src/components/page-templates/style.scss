@@ -71,6 +71,7 @@
 	display: flex;
 
 	img {
+		margin-left: -$grid-unit-05;
 		width: 20px;
 		height: 20px;
 		object-fit: cover;
@@ -94,6 +95,7 @@
 	height: $grid-unit-30;
 
 	svg {
+		margin-left: -$grid-unit-05;
 		fill: currentColor;
 	}
 }

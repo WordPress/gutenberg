@@ -101,14 +101,13 @@ function Title( { item, viewType } ) {
 	);
 }
 
-function AuthorField( { item, viewType } ) {
+function AuthorField( { item } ) {
 	const [ isImageLoaded, setIsImageLoaded ] = useState( false );
 	const { text, icon, imageUrl } = useAddedBy( item.type, item.id );
-	const withIcon = viewType !== LAYOUT_LIST;
 
 	return (
 		<HStack alignment="left" spacing={ 1 }>
-			{ withIcon && imageUrl && (
+			{ imageUrl && (
 				<div
 					className={ clsx( 'page-templates-author-field__avatar', {
 						'is-loaded': isImageLoaded,
@@ -121,7 +120,7 @@ function AuthorField( { item, viewType } ) {
 					/>
 				</div>
 			) }
-			{ withIcon && ! imageUrl && (
+			{ ! imageUrl && (
 				<div className="page-templates-author-field__icon">
 					<Icon icon={ icon } />
 				</div>

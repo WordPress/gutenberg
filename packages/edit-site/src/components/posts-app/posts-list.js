@@ -241,26 +241,22 @@ function PostStatusField( { item } ) {
 	);
 }
 
-function PostAuthorField( { item, viewType } ) {
-	const { text, icon, imageUrl } = useSelect(
+function PostAuthorField( { item } ) {
+	const { text, imageUrl } = useSelect(
 		( select ) => {
 			const { getUser } = select( coreStore );
 			const user = getUser( item.author );
 			return {
-				icon: authorIcon,
 				imageUrl: user?.avatar_urls?.[ 48 ],
 				text: user?.name,
 			};
 		},
 		[ item ]
 	);
-
-	const withAuthorImage = viewType !== LAYOUT_LIST && imageUrl;
-	const withAuthorIcon = viewType !== LAYOUT_LIST && ! imageUrl;
 	const [ isImageLoaded, setIsImageLoaded ] = useState( false );
 	return (
 		<HStack alignment="left" spacing={ 1 }>
-			{ withAuthorImage && (
+			{ !! imageUrl && (
 				<div
 					className={ clsx( 'page-templates-author-field__avatar', {
 						'is-loaded': isImageLoaded,
@@ -273,9 +269,9 @@ function PostAuthorField( { item, viewType } ) {
 					/>
 				</div>
 			) }
-			{ withAuthorIcon && (
+			{ ! imageUrl && (
 				<div className="page-templates-author-field__icon">
-					<Icon icon={ icon } />
+					<Icon icon={ authorIcon } />
 				</div>
 			) }
 			<span className="page-templates-author-field__name">{ text }</span>
@@ -471,11 +467,7 @@ export default function PostsList( { postType } ) {
 						value: id,
 						label: name,
 					} ) ) || [],
-				render: ( { item } ) => {
-					return (
-						<PostAuthorField viewType={ view.type } item={ item } />
-					);
-				},
+				render: PostAuthorField,
 			},
 			{
 				header: __( 'Status' ),
