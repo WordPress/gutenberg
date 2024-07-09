@@ -24,8 +24,10 @@ function getJsonFromItem( item ) {
 		{
 			__file: item.type,
 			title: item.title || item.name,
-			content: item.patternPost.content.raw,
-			syncStatus: item.patternPost.wp_pattern_sync_status,
+			content: item?.patternPost?.content?.raw || item.content,
+			syncStatus:
+				item?.patternPost?.wp_pattern_sync_status ||
+				item.wp_pattern_sync_status,
 		},
 		null,
 		2
