@@ -146,17 +146,6 @@ function ManualGridVisualizer( { gridClientId, gridInfo } ) {
 		return rects;
 	}, [ gridItems ] );
 
-	const {
-		updateBlockAttributes,
-		moveBlocksToPosition,
-		__unstableMarkNextChangeAsNotPersistent,
-	} = useDispatch( blockEditorStore );
-
-	const getNumberOfBlocksBeforeCell = useGetNumberOfBlocksBeforeCell(
-		gridClientId,
-		gridInfo.numColumns
-	);
-
 	return range( 1, gridInfo.numRows ).map( ( row ) =>
 		range( 1, gridInfo.numColumns ).map( ( column ) => {
 			const isCellOccupied = occupiedRects.some( ( rect ) =>
@@ -185,26 +174,6 @@ function ManualGridVisualizer( { gridClientId, gridInfo } ) {
 							gridClientId={ gridClientId }
 							gridInfo={ gridInfo }
 							setHighlightedRect={ setHighlightedRect }
-							onSelect={ ( block ) => {
-								if ( ! block ) {
-									return;
-								}
-								updateBlockAttributes( block.clientId, {
-									style: {
-										layout: {
-											columnStart: column,
-											rowStart: row,
-										},
-									},
-								} );
-								__unstableMarkNextChangeAsNotPersistent();
-								moveBlocksToPosition(
-									[ block.clientId ],
-									gridClientId,
-									gridClientId,
-									getNumberOfBlocksBeforeCell( column, row )
-								);
-							} }
 						/>
 					) }
 				</GridVisualizerCell>
@@ -338,8 +307,18 @@ function GridVisualizerAppender( {
 	gridClientId,
 	gridInfo,
 	setHighlightedRect,
-	onSelect,
 } ) {
+	const {
+		updateBlockAttributes,
+		moveBlocksToPosition,
+		__unstableMarkNextChangeAsNotPersistent,
+	} = useDispatch( blockEditorStore );
+
+	const getNumberOfBlocksBeforeCell = useGetNumberOfBlocksBeforeCell(
+		gridClientId,
+		gridInfo.numColumns
+	);
+
 	return (
 		<ButtonBlockAppender
 			rootClientId={ gridClientId }
@@ -354,7 +333,26 @@ function GridVisualizerAppender( {
 			style={ {
 				color: gridInfo.currentColor,
 			} }
-			onSelect={ onSelect }
+			onSelect={ ( block ) => {
+				if ( ! block ) {
+					return;
+				}
+				updateBlockAttributes( block.clientId, {
+					style: {
+						layout: {
+							columnStart: column,
+							rowStart: row,
+						},
+					},
+				} );
+				__unstableMarkNextChangeAsNotPersistent();
+				moveBlocksToPosition(
+					[ block.clientId ],
+					gridClientId,
+					gridClientId,
+					getNumberOfBlocksBeforeCell( column, row )
+				);
+			} }
 		/>
 	);
 }
