@@ -1145,10 +1145,17 @@ export function isPreviewEmbedFallback( state: State, url: string ): boolean {
 export function canUser(
 	state: State,
 	action: string,
-	resource: string,
+	resource: string | Record< string, any >,
 	id?: EntityRecordKey
 ): boolean | undefined {
-	const key = [ action, resource, id ].filter( Boolean ).join( '/' );
+	const key = (
+		typeof resource === 'object'
+			? [ action, resource.kind, resource.name, resource.id ]
+			: [ action, resource, id ]
+	)
+		.filter( Boolean )
+		.join( '/' );
+
 	return state.userPermissions[ key ];
 }
 

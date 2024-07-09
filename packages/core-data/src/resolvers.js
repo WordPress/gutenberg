@@ -360,14 +360,34 @@ export const getEmbedPreview =
 export const canUser =
 	( requestedAction, resource, id ) =>
 	async ( { dispatch, registry } ) => {
-		const { hasStartedResolution } = registry.select( STORE_NAME );
-
-		const resourcePath = id ? `${ resource }/${ id }` : resource;
 		const retrievedActions = [ 'create', 'read', 'update', 'delete' ];
 
 		if ( ! retrievedActions.includes( requestedAction ) ) {
 			throw new Error( `'${ requestedAction }' is not a valid action.` );
 		}
+
+		let resourcePath = null;
+		if ( typeof resource === 'object' ) {
+			const configs = await dispatch(
+				getOrLoadEntitiesConfig( resource.kind, resource.name )
+			);
+			const entityConfig = configs.find(
+				( config ) =>
+					config.name === resource.name &&
+					config.kind === resource.name
+			);
+			if ( ! entityConfig ) {
+				return;
+			}
+
+			resourcePath =
+				entityConfig.baseURL + ( resource.id ? '/' + resource.id : '' );
+		} else {
+			// @todo: Maybe warn when detecting a legacy usage.
+			resourcePath = `/wp/v2/${ resource }` + ( id ? '/' + id : '' );
+		}
+
+		const { hasStartedResolution } = registry.select( STORE_NAME );
 
 		// Prevent resolving the same resource twice.
 		for ( const relatedAction of retrievedActions ) {
@@ -387,7 +407,7 @@ export const canUser =
 		let response;
 		try {
 			response = await apiFetch( {
-				path: `/wp/v2/${ resourcePath }`,
+				path: resourcePath,
 				method: 'OPTIONS',
 				parse: false,
 			} );
@@ -416,10 +436,15 @@ export const canUser =
 
 		registry.batch( () => {
 			for ( const action of retrievedActions ) {
-				dispatch.receiveUserPermission(
-					`${ action }/${ resourcePath }`,
-					permissions[ action ]
-				);
+				const key = (
+					typeof resource === 'object'
+						? [ action, resource.kind, resource.name, resource.id ]
+						: [ action, resource, id ]
+				)
+					.filter( Boolean )
+					.join( '/' );
+
+				dispatch.receiveUserPermission( key, permissions[ action ] );
 			}
 		} );
 	};
