@@ -100,7 +100,6 @@ data class GutenbergProps @JvmOverloads constructor(
         private const val PROP_COLORS = "colors"
         private const val PROP_GRADIENTS = "gradients"
         private const val PROP_IS_FSE_THEME = "isFSETheme"
-        private const val PROP_GALLERY_WITH_IMAGE_BLOCKS = "galleryWithImageBlocks"
         private const val PROP_QUOTE_BLOCK_V2 = "quoteBlockV2"
         private const val PROP_LIST_BLOCK_V2 = "listBlockV2"
 

@@ -230,10 +230,6 @@ public class Gutenberg: UIResponder {
     private func properties(from editorSettings: GutenbergEditorSettings?) -> [String : Any] {
         var settingsUpdates = [String : Any]()
         settingsUpdates["isFSETheme"] = editorSettings?.isFSETheme ?? false
-        
-        if let galleryWithImageBlocks = editorSettings?.galleryWithImageBlocks {
-            settingsUpdates["galleryWithImageBlocks"] = galleryWithImageBlocks
-        }
 
         if let quoteBlockV2 = editorSettings?.quoteBlockV2 {
             settingsUpdates["quoteBlockV2"] = quoteBlockV2
