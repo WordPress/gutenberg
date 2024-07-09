@@ -14,6 +14,7 @@ import {
 	ToggleControl,
 	RangeControl,
 	Spinner,
+	withNotices,
 } from '@wordpress/components';
 import {
 	store as blockEditorStore,
@@ -633,6 +634,7 @@ function GalleryEdit( props ) {
 		</>
 	);
 }
-export default compose( [ withViewportMatch( { isNarrow: '< small' } ) ] )(
-	GalleryEdit
-);
+export default compose( [
+	withNotices,
+	withViewportMatch( { isNarrow: '< small' } ),
+] )( GalleryEdit );
