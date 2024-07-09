@@ -6,7 +6,6 @@
  * @package gutenberg
  */
 
-
 /**
  * Given a numeric value, returns a rounded a valid CSS <number> as a string.
  * Negative zero values, e.g., `-0.0`, will return "0".
