@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useMemo, useCallback } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -17,36 +17,11 @@ const meta = {
 };
 export default meta;
 
-const defaultConfigPerViewType = {
-	[ LAYOUT_TABLE ]: {
-		primaryField: 'title',
-	},
-	[ LAYOUT_GRID ]: {
-		mediaField: 'image',
-		primaryField: 'title',
-	},
-};
-
 export const Default = ( props ) => {
 	const [ view, setView ] = useState( DEFAULT_VIEW );
 	const { data: shownData, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( data, view, fields );
 	}, [ view ] );
-	const onChangeView = useCallback(
-		( newView ) => {
-			if ( newView.type !== view.type ) {
-				newView = {
-					...newView,
-					layout: {
-						...defaultConfigPerViewType[ newView.type ],
-					},
-				};
-			}
-
-			setView( newView );
-		},
-		[ view.type, setView ]
-	);
 	return (
 		<DataViews
 			{ ...props }
@@ -54,11 +29,23 @@ export const Default = ( props ) => {
 			data={ shownData }
 			view={ view }
 			fields={ fields }
-			onChangeView={ onChangeView }
+			onChangeView={ setView }
 		/>
 	);
 };
 Default.args = {
 	actions,
-	supportedLayouts: [ LAYOUT_TABLE, LAYOUT_GRID ],
+	defaultLayouts: {
+		[ LAYOUT_TABLE ]: {
+			layout: {
+				primaryField: 'title',
+			},
+		},
+		[ LAYOUT_GRID ]: {
+			layout: {
+				mediaField: 'image',
+				primaryField: 'title',
+			},
+		},
+	},
 };

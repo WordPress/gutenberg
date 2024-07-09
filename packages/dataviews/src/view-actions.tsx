@@ -21,7 +21,7 @@ import { cog } from '@wordpress/icons';
 import { unlock } from './lock-unlock';
 import { SORTING_DIRECTIONS, sortLabels } from './constants';
 import { VIEW_LAYOUTS } from './layouts';
-import type { NormalizedField, View } from './types';
+import type { NormalizedField, View, SupportedLayouts } from './types';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -35,7 +35,7 @@ const {
 interface ViewTypeMenuProps {
 	view: View;
 	onChangeView: ( view: View ) => void;
-	supportedLayouts?: string[];
+	defaultLayouts?: SupportedLayouts;
 }
 
 interface PageSizeMenuProps {
@@ -59,30 +59,29 @@ interface ViewActionsProps< Item > {
 	fields: NormalizedField< Item >[];
 	view: View;
 	onChangeView: ( view: View ) => void;
-	supportedLayouts?: string[];
+	defaultLayouts?: SupportedLayouts;
 }
 
 function ViewTypeMenu( {
 	view,
 	onChangeView,
-	supportedLayouts,
+	defaultLayouts = { list: {}, grid: {}, table: {} },
 }: ViewTypeMenuProps ) {
-	let _availableViews = VIEW_LAYOUTS;
-	if ( supportedLayouts ) {
-		_availableViews = _availableViews.filter( ( _view ) =>
-			supportedLayouts.includes( _view.type )
-		);
-	}
-	if ( _availableViews.length === 1 ) {
+	const availableLayouts = Object.keys( defaultLayouts );
+	if ( availableLayouts.length <= 1 ) {
 		return null;
 	}
-	return _availableViews.map( ( availableView ) => {
+	return availableLayouts.map( ( layout ) => {
+		const config = VIEW_LAYOUTS.find( ( v ) => v.type === layout );
+		if ( ! config ) {
+			return null;
+		}
 		return (
 			<DropdownMenuRadioItem
-				key={ availableView.type }
-				value={ availableView.type }
+				key={ layout }
+				value={ layout }
 				name="view-actions-available-view"
-				checked={ availableView.type === view.type }
+				checked={ layout === view.type }
 				hideOnClick
 				onChange={ ( e: ChangeEvent< HTMLInputElement > ) => {
 					switch ( e.target.value ) {
@@ -92,15 +91,13 @@ function ViewTypeMenu( {
 							return onChangeView( {
 								...view,
 								type: e.target.value,
-								layout: {},
+								...defaultLayouts[ e.target.value ],
 							} );
 					}
 					throw new Error( 'Invalid dataview' );
 				} }
 			>
-				<DropdownMenuItemLabel>
-					{ availableView.label }
-				</DropdownMenuItemLabel>
+				<DropdownMenuItemLabel>{ config.label }</DropdownMenuItemLabel>
 			</DropdownMenuRadioItem>
 		);
 	} );
@@ -152,7 +149,8 @@ function FieldsVisibilityMenu< Item >( {
 }: FieldsVisibilityMenuProps< Item > ) {
 	const hidableFields = fields.filter(
 		( field ) =>
-			field.enableHiding !== false && field.id !== view.layout.mediaField
+			field.enableHiding !== false &&
+			field.id !== view?.layout?.mediaField
 	);
 	const viewFields = view.fields || fields.map( ( field ) => field.id );
 	if ( ! hidableFields?.length ) {
@@ -287,7 +285,7 @@ function _ViewActions< Item >( {
 	fields,
 	view,
 	onChangeView,
-	supportedLayouts,
+	defaultLayouts,
 }: ViewActionsProps< Item > ) {
 	const activeView = VIEW_LAYOUTS.find( ( v ) => view.type === v.type );
 	return (
@@ -309,7 +307,7 @@ function _ViewActions< Item >( {
 					<ViewTypeMenu
 						view={ view }
 						onChangeView={ onChangeView }
-						supportedLayouts={ supportedLayouts }
+						defaultLayouts={ defaultLayouts }
 					/>
 				</DropdownMenu>
 				<DropdownMenu

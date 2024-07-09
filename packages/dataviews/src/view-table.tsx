@@ -463,12 +463,12 @@ function ViewTable< Item >( {
 	const visibleFields = fields.filter(
 		( field ) =>
 			viewFields.includes( field.id ) ||
-			[ view.layout.mediaField ].includes( field.id )
+			[ view.layout?.mediaField ].includes( field.id )
 	);
 	const hasData = !! data?.length;
 
 	const primaryField = fields.find(
-		( field ) => field.id === view.layout.primaryField
+		( field ) => field.id === view.layout?.primaryField
 	);
 
 	return (
