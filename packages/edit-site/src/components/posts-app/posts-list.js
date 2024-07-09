@@ -1,7 +1,16 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
-import { Button, __experimentalHStack as HStack } from '@wordpress/components';
+import {
+	Button,
+	__experimentalHStack as HStack,
+	Icon,
+} from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -17,6 +26,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { DataViews } from '@wordpress/dataviews';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { commentAuthorAvatar as authorIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -207,6 +217,48 @@ function getItemId( item ) {
 	return item.id.toString();
 }
 
+function PostAuthorField( { item, viewType } ) {
+	const { text, icon, imageUrl } = useSelect(
+		( select ) => {
+			const { getUser } = select( coreStore );
+			const user = getUser( item.author );
+			return {
+				icon: authorIcon,
+				imageUrl: user?.avatar_urls?.[ 48 ],
+				text: user?.name,
+			};
+		},
+		[ item ]
+	);
+
+	const withAuthorImage = viewType !== LAYOUT_LIST && imageUrl;
+	const withAuthorIcon = viewType !== LAYOUT_LIST && ! imageUrl;
+	const [ isImageLoaded, setIsImageLoaded ] = useState( false );
+	return (
+		<HStack alignment="left" spacing={ 1 }>
+			{ withAuthorImage && (
+				<div
+					className={ clsx( 'page-templates-author-field__avatar', {
+						'is-loaded': isImageLoaded,
+					} ) }
+				>
+					<img
+						onLoad={ () => setIsImageLoaded( true ) }
+						alt={ __( 'Author avatar' ) }
+						src={ imageUrl }
+					/>
+				</div>
+			) }
+			{ withAuthorIcon && (
+				<div className="page-templates-author-field__icon">
+					<Icon icon={ icon } />
+				</div>
+			) }
+			<span className="page-templates-author-field__name">{ text }</span>
+		</HStack>
+	);
+}
+
 export default function PostsList( { postType } ) {
 	const [ view, setView ] = useView( postType );
 	const history = useHistory();
@@ -395,6 +447,11 @@ export default function PostsList( { postType } ) {
 						value: id,
 						label: name,
 					} ) ) || [],
+				render: ( { item } ) => {
+					return (
+						<PostAuthorField viewType={ view.type } item={ item } />
+					);
+				},
 			},
 			{
 				header: __( 'Status' ),
