@@ -9,8 +9,8 @@ import clsx from 'clsx';
  */
 import _CustomSelect from '../custom-select-control-v2/custom-select';
 import CustomSelectItem from '../custom-select-control-v2/item';
-import type { LegacyCustomSelectProps } from '../custom-select-control-v2/types';
 import * as Styled from '../custom-select-control-v2/styles';
+import type { LegacyCustomSelectProps } from './types';
 
 function useDeprecatedProps( {
 	__experimentalShowSelectedHint,
