@@ -93,7 +93,7 @@ function ListBox( { view, filter, onChangeView }: SearchWidgetProps ) {
 		// so the first item is not selected, since the focus is on the operators control.
 		defaultActiveId: filter.operators?.length === 1 ? undefined : null,
 	} );
-	const currentFilter = view.filters.find(
+	const currentFilter = view.filters?.find(
 		( f ) => f.field === filter.field
 	);
 	const currentValue = getCurrentValue( filter, currentFilter );
@@ -130,7 +130,7 @@ function ListBox( { view, filter, onChangeView }: SearchWidgetProps ) {
 							onClick={ () => {
 								const newFilters = currentFilter
 									? [
-											...view.filters.map(
+											...( view.filters ?? [] ).map(
 												( _filter ) => {
 													if (
 														_filter.field ===
@@ -154,7 +154,7 @@ function ListBox( { view, filter, onChangeView }: SearchWidgetProps ) {
 											),
 									  ]
 									: [
-											...view.filters,
+											...( view.filters ?? [] ),
 											{
 												field: filter.field,
 												operator: filter.operators[ 0 ],
@@ -201,7 +201,7 @@ function ListBox( { view, filter, onChangeView }: SearchWidgetProps ) {
 function ComboboxList( { view, filter, onChangeView }: SearchWidgetProps ) {
 	const [ searchValue, setSearchValue ] = useState( '' );
 	const deferredSearchValue = useDeferredValue( searchValue );
-	const currentFilter = view.filters.find(
+	const currentFilter = view.filters?.find(
 		( _filter ) => _filter.field === filter.field
 	);
 	const currentValue = getCurrentValue( filter, currentFilter );
@@ -218,7 +218,7 @@ function ComboboxList( { view, filter, onChangeView }: SearchWidgetProps ) {
 			setSelectedValue={ ( value ) => {
 				const newFilters = currentFilter
 					? [
-							...view.filters.map( ( _filter ) => {
+							...( view.filters ?? [] ).map( ( _filter ) => {
 								if ( _filter.field === filter.field ) {
 									return {
 										..._filter,
@@ -232,7 +232,7 @@ function ComboboxList( { view, filter, onChangeView }: SearchWidgetProps ) {
 							} ),
 					  ]
 					: [
-							...view.filters,
+							...( view.filters ?? [] ),
 							{
 								field: filter.field,
 								operator: filter.operators[ 0 ],

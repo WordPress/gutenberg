@@ -73,3 +73,10 @@
 	font-weight: 400;
 	flex-shrink: 0;
 }
+
+.posts-list-page-post-author-field__icon-container {
+	height: $grid-unit-30;
+	svg {
+		fill: currentColor;
+	}
+}

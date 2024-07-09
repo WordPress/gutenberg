@@ -1,7 +1,16 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
-import { Button, __experimentalHStack as HStack } from '@wordpress/components';
+import {
+	Button,
+	__experimentalHStack as HStack,
+	Icon,
+} from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -17,6 +26,15 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { DataViews } from '@wordpress/dataviews';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import {
+	trash,
+	drafts,
+	published,
+	scheduled,
+	pending,
+	notAllowed,
+	commentAuthorAvatar as authorIcon,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -154,12 +172,12 @@ function useView( postType ) {
 // See https://github.com/WordPress/gutenberg/issues/55886
 // We do not support custom statutes at the moment.
 const STATUSES = [
-	{ value: 'draft', label: __( 'Draft' ) },
-	{ value: 'future', label: __( 'Scheduled' ) },
-	{ value: 'pending', label: __( 'Pending Review' ) },
-	{ value: 'private', label: __( 'Private' ) },
-	{ value: 'publish', label: __( 'Published' ) },
-	{ value: 'trash', label: __( 'Trash' ) },
+	{ value: 'draft', label: __( 'Draft' ), icon: drafts },
+	{ value: 'future', label: __( 'Scheduled' ), icon: scheduled },
+	{ value: 'pending', label: __( 'Pending Review' ), icon: pending },
+	{ value: 'private', label: __( 'Private' ), icon: notAllowed },
+	{ value: 'publish', label: __( 'Published' ), icon: published },
+	{ value: 'trash', label: __( 'Trash' ), icon: trash },
 ];
 const DEFAULT_STATUSES = 'draft,future,pending,private,publish'; // All but 'trash'.
 
@@ -205,6 +223,64 @@ function FeaturedImage( { item, viewType } ) {
 
 function getItemId( item ) {
 	return item.id.toString();
+}
+
+function PostStatusField( { item } ) {
+	const status = STATUSES.find( ( { value } ) => value === item.status );
+	const label = status?.label || item.status;
+	const icon = status?.icon;
+	return (
+		<HStack alignment="left" spacing={ 1 }>
+			{ icon && (
+				<div className="posts-list-page-post-author-field__icon-container">
+					<Icon icon={ icon } />
+				</div>
+			) }
+			<span>{ label }</span>
+		</HStack>
+	);
+}
+
+function PostAuthorField( { item, viewType } ) {
+	const { text, icon, imageUrl } = useSelect(
+		( select ) => {
+			const { getUser } = select( coreStore );
+			const user = getUser( item.author );
+			return {
+				icon: authorIcon,
+				imageUrl: user?.avatar_urls?.[ 48 ],
+				text: user?.name,
+			};
+		},
+		[ item ]
+	);
+
+	const withAuthorImage = viewType !== LAYOUT_LIST && imageUrl;
+	const withAuthorIcon = viewType !== LAYOUT_LIST && ! imageUrl;
+	const [ isImageLoaded, setIsImageLoaded ] = useState( false );
+	return (
+		<HStack alignment="left" spacing={ 1 }>
+			{ withAuthorImage && (
+				<div
+					className={ clsx( 'page-templates-author-field__avatar', {
+						'is-loaded': isImageLoaded,
+					} ) }
+				>
+					<img
+						onLoad={ () => setIsImageLoaded( true ) }
+						alt={ __( 'Author avatar' ) }
+						src={ imageUrl }
+					/>
+				</div>
+			) }
+			{ withAuthorIcon && (
+				<div className="page-templates-author-field__icon">
+					<Icon icon={ icon } />
+				</div>
+			) }
+			<span className="page-templates-author-field__name">{ text }</span>
+		</HStack>
+	);
 }
 
 export default function PostsList( { postType } ) {
@@ -395,6 +471,11 @@ export default function PostsList( { postType } ) {
 						value: id,
 						label: name,
 					} ) ) || [],
+				render: ( { item } ) => {
+					return (
+						<PostAuthorField viewType={ view.type } item={ item } />
+					);
+				},
 			},
 			{
 				header: __( 'Status' ),
@@ -403,6 +484,7 @@ export default function PostsList( { postType } ) {
 					STATUSES.find( ( { value } ) => value === item.status )
 						?.label ?? item.status,
 				elements: STATUSES,
+				render: PostStatusField,
 				enableSorting: false,
 				filterBy: {
 					operators: [ OPERATOR_IS_ANY ],

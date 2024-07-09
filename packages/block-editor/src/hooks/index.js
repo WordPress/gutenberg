@@ -33,6 +33,7 @@ import blockHooks from './block-hooks';
 import blockBindingsPanel from './block-bindings';
 import './block-renaming';
 import './use-bindings-attributes';
+import './grid-visualizer';
 
 createBlockEditFilter(
 	[

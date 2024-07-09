@@ -88,7 +88,7 @@ function InserterMenu(
 				shouldForceFocusBlock,
 				_rootClientId
 			);
-			onSelect();
+			onSelect( blocks );
 
 			// Check for focus loss due to filtering blocks by selected block type
 			window.requestAnimationFrame( () => {
