@@ -900,10 +900,12 @@
 			"description": "Block Variations is the API that allows a block to have similar versions of it, but all these versions share some common functionality.",
 			"oneOf": [
 				{
-					"type": "string"
+					"type": "string",
+					"description": "The path to a PHP file that returns an array of block variations."
 				},
 				{
 					"type": "array",
+					"description": "An array of block variations.",
 					"items": {
 						"type": "object",
 						"required": [ "name", "title" ],
