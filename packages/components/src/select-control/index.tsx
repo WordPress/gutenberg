@@ -97,6 +97,7 @@ function UnforwardedSelectControl(
 				}
 				prefix={ prefix }
 				labelPosition={ labelPosition }
+				variant={ variant }
 				__next40pxDefaultSize={ __next40pxDefaultSize }
 			>
 				<Select

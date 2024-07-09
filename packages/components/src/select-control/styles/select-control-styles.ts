@@ -35,11 +35,22 @@ const disabledStyles = ( { disabled }: SelectProps ) => {
 	`;
 };
 
+const inputBaseBorderlessStyles = ( { variant }: SelectProps ) => {
+	if ( variant === 'borderless' ) {
+		return css`
+			display: inline-flex;
+		`;
+	}
+
+	return '';
+};
+
 export const StyledInputBase = styled( InputBase )`
 	color: ${ COLORS.theme.foreground };
 	cursor: pointer;
 
 	${ disabledStyles }
+	${ inputBaseBorderlessStyles }
 `;
 
 const sizeStyles = ( {
