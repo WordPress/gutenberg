@@ -1173,13 +1173,7 @@ export function canUserEditEntityRecord(
 	name: string,
 	recordId: EntityRecordKey
 ): boolean | undefined {
-	const entityConfig = getEntityConfig( state, kind, name );
-	if ( ! entityConfig ) {
-		return false;
-	}
-	const resource = entityConfig.__unstable_rest_base;
-
-	return canUser( state, 'update', resource, recordId );
+	return hasPermission( state, 'update', kind, name, recordId );
 }
 
 /**

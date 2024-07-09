@@ -519,16 +519,7 @@ export const hasPermission =
 export const canUserEditEntityRecord =
 	( kind, name, recordId ) =>
 	async ( { dispatch } ) => {
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
-		const entityConfig = configs.find(
-			( config ) => config.name === name && config.kind === kind
-		);
-		if ( ! entityConfig ) {
-			return;
-		}
-
-		const resource = entityConfig.__unstable_rest_base;
-		await dispatch( canUser( 'update', resource, recordId ) );
+		await dispatch( hasPermission( 'update', kind, name, recordId ) );
 	};
 
 /**
