@@ -91,8 +91,8 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 				<Styled.WithHintItemWrapper>
 					<span>{ name }</span>
 					<Styled.WithHintItemHint
-					// TODO: Legacy classname. Add V1 styles are removed from the codebase
-					// className="components-custom-select-control__item-hint"
+						// Keeping the classname for legacy reasons
+						className="components-custom-select-control__item-hint"
 					>
 						{ hint }
 					</Styled.WithHintItemHint>
@@ -106,13 +106,12 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 					children={ hint ? withHint : name }
 					style={ style }
 					className={ clsx(
-						// TODO: Legacy classname. Add V1 styles are removed from the codebase
-						// 'components-custom-select-control__item',
-						className
-						// TODO: Legacy classname. Add V1 styles are removed from the codebase
-						// {
-						// 	'has-hint': hint,
-						// }
+						className,
+						// Keeping the classnames for legacy reasons
+						'components-custom-select-control__item',
+						{
+							'has-hint': hint,
+						}
 					) }
 				/>
 			);
@@ -130,8 +129,8 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 				{ currentValue }
 				{ selectedOptionHint && (
 					<Styled.SelectedExperimentalHintItem
-					// TODO: Legacy classname. Add V1 styles are removed from the codebase
-					// className="components-custom-select-control__hint"
+						// Keeping the classname for legacy reasons
+						className="components-custom-select-control__hint"
 					>
 						{ selectedOptionHint }
 					</Styled.SelectedExperimentalHintItem>
@@ -162,8 +161,8 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 			size={ translatedSize }
 			store={ store }
 			className={ clsx(
-				// TODO: Legacy classname. Add V1 styles are removed from the codebase
-				// 'components-custom-select-control',
+				// Keeping the classname for legacy reasons
+				'components-custom-select-control',
 				classNameProp
 			) }
 			isLegacy
