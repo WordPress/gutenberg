@@ -106,7 +106,7 @@ function AuthorField( { item } ) {
 	const { text, icon, imageUrl } = useAddedBy( item.type, item.id );
 
 	return (
-		<HStack alignment="left" spacing={ 1 }>
+		<HStack alignment="left" spacing={ 0 }>
 			{ imageUrl && (
 				<div
 					className={ clsx( 'page-templates-author-field__avatar', {

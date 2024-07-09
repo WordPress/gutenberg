@@ -230,7 +230,7 @@ function PostStatusField( { item } ) {
 	const label = status?.label || item.status;
 	const icon = status?.icon;
 	return (
-		<HStack alignment="left" spacing={ 1 }>
+		<HStack alignment="left" spacing={ 0 }>
 			{ icon && (
 				<div className="posts-list-page-post-author-field__icon-container">
 					<Icon icon={ icon } />
@@ -255,7 +255,7 @@ function PostAuthorField( { item } ) {
 	);
 	const [ isImageLoaded, setIsImageLoaded ] = useState( false );
 	return (
-		<HStack alignment="left" spacing={ 1 }>
+		<HStack alignment="left" spacing={ 0 }>
 			{ !! imageUrl && (
 				<div
 					className={ clsx( 'page-templates-author-field__avatar', {

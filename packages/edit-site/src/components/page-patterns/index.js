@@ -173,7 +173,7 @@ function Author( { item, viewType } ) {
 	const withIcon = viewType !== LAYOUT_LIST;
 
 	return (
-		<HStack alignment="left" spacing={ 1 }>
+		<HStack alignment="left" spacing={ 0 }>
 			{ withIcon && imageUrl && (
 				<div
 					className={ clsx( 'page-templates-author-field__avatar', {
