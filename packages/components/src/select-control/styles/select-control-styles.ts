@@ -17,7 +17,7 @@ import InputBase from '../../input-control/input-base';
 interface SelectProps
 	extends Pick<
 		SelectControlProps,
-		'__next40pxDefaultSize' | 'disabled' | 'multiple'
+		'__next40pxDefaultSize' | 'disabled' | 'multiple' | 'variant'
 	> {
 	// Using `selectSize` instead of `size` to avoid a type conflict with the
 	// `size` HTML attribute of the `select` element.
@@ -127,6 +127,16 @@ const overflowStyles = ( { multiple }: SelectProps ) => {
 	};
 };
 
+const variantStyles = ( { variant }: SelectProps ) => {
+	if ( variant === 'borderless' ) {
+		return css( {
+			fieldSizing: 'content',
+		} );
+	}
+
+	return '';
+};
+
 // TODO: Resolve need to use &&& to increase specificity
 // https://github.com/WordPress/gutenberg/issues/18483
 
@@ -150,6 +160,7 @@ export const Select = styled.select< SelectProps >`
 		${ sizeStyles };
 		${ sizePaddings };
 		${ overflowStyles }
+		${ variantStyles }
 	}
 `;
 

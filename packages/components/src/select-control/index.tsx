@@ -54,6 +54,8 @@ function UnforwardedSelectControl(
 	const id = useUniqueId( idProp );
 	const helpId = help ? `${ id }__help` : undefined;
 
+	const isBorderless = variant === 'borderless';
+
 	// Disable reason: A select with an onchange throws a warning.
 	if ( ! options?.length && ! children ) {
 		return null;
@@ -87,7 +89,7 @@ function UnforwardedSelectControl(
 				disabled={ disabled }
 				hideLabelFromVision={ hideLabelFromVision }
 				id={ id }
-				isBorderless={ variant === 'borderless' ? true : undefined }
+				isBorderless={ isBorderless }
 				label={ label }
 				size={ size }
 				suffix={
@@ -109,6 +111,7 @@ function UnforwardedSelectControl(
 					ref={ ref }
 					selectSize={ size }
 					value={ valueProp }
+					variant={ variant }
 				>
 					{ children ||
 						options.map( ( option, index ) => {
