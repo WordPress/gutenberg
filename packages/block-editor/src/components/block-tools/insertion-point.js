@@ -79,7 +79,7 @@ function InbetweenInsertionPointPopover( {
 			rootClientId: insertionPoint.rootClientId,
 			isNavigationMode: _isNavigationMode(),
 			isDistractionFree: settings.isDistractionFree,
-			isInserterShown: insertionPoint?.__unstableWithInserter ?? true,
+			isInserterShown: insertionPoint?.__unstableWithInserter,
 		};
 	}, [] );
 	const { getBlockEditingMode } = useSelect( blockEditorStore );

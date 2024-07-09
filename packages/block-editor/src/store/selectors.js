@@ -1476,7 +1476,7 @@ export const getBlockInsertionPoint = createSelector(
 			index = getBlockOrder( state ).length;
 		}
 
-		return { rootClientId, index };
+		return { rootClientId, index, __unstableWithInserter: true };
 	},
 	( state ) => [
 		state.insertionPoint,
