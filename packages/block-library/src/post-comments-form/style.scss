@@ -8,7 +8,7 @@
 	}
 
 	textarea,
-	input:not([type="submit"]):not([type="checkbox"]) {
+	input:where(:not([type="submit"]):not([type="checkbox"])) {
 		padding: calc(0.667em + 2px); // The extra 2px is added to match outline buttons.
 	}
 }
