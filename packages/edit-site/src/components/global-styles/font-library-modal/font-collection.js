@@ -28,13 +28,7 @@ import {
 } from '@wordpress/components';
 import { debounce } from '@wordpress/compose';
 import { sprintf, __, _x } from '@wordpress/i18n';
-import {
-	moreVertical,
-	chevronLeft,
-	chevronRight,
-	previous,
-	next,
-} from '@wordpress/icons';
+import { moreVertical, chevronLeft, chevronRight } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -457,28 +451,16 @@ function FontCollection( { slug } ) {
 							justify="center"
 							className="font-library-modal__footer"
 						>
-							<HStack expanded={ false } spacing={ 1 }>
-								<Button
-									label={ __( 'First page' ) }
-									size="compact"
-									onClick={ () => setPage( 1 ) }
-									disabled={ page === 1 }
-									showTooltip
-									accessibleWhenDisabled
-									icon={ previous }
-									tooltipPosition="top"
-								/>
-								<Button
-									label={ __( 'Previous page' ) }
-									size="compact"
-									onClick={ () => setPage( page - 1 ) }
-									disabled={ page === 1 }
-									showTooltip
-									accessibleWhenDisabled
-									icon={ chevronLeft }
-									tooltipPosition="top"
-								/>
-							</HStack>
+							<Button
+								label={ __( 'Previous page' ) }
+								size="compact"
+								onClick={ () => setPage( page - 1 ) }
+								disabled={ page === 1 }
+								showTooltip
+								accessibleWhenDisabled
+								icon={ chevronLeft }
+								tooltipPosition="top"
+							/>
 							<HStack
 								justify="flex-start"
 								expanded={ false }
@@ -521,26 +503,15 @@ function FontCollection( { slug } ) {
 									}
 								) }
 							</HStack>
-							<HStack expanded={ false } spacing={ 1 }>
-								<Button
-									label={ __( 'Next page' ) }
-									size="compact"
-									onClick={ () => setPage( page + 1 ) }
-									disabled={ page === totalPages }
-									accessibleWhenDisabled
-									icon={ chevronRight }
-									tooltipPosition="top"
-								/>
-								<Button
-									label={ __( 'Last page' ) }
-									size="compact"
-									onClick={ () => setPage( totalPages ) }
-									disabled={ page === totalPages }
-									accessibleWhenDisabled
-									icon={ next }
-									tooltipPosition="top"
-								/>
-							</HStack>
+							<Button
+								label={ __( 'Next page' ) }
+								size="compact"
+								onClick={ () => setPage( page + 1 ) }
+								disabled={ page === totalPages }
+								accessibleWhenDisabled
+								icon={ chevronRight }
+								tooltipPosition="top"
+							/>
 						</HStack>
 					) }
 				</>
