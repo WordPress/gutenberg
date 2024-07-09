@@ -230,11 +230,13 @@ function PostAuthorField( { item, viewType } ) {
 		},
 		[ item ]
 	);
-	const withIcon = viewType !== LAYOUT_LIST;
+
+	const withAuthorImage = viewType !== LAYOUT_LIST && imageUrl;
+	const withAuthorIcon = viewType !== LAYOUT_LIST && ! imageUrl;
 	const [ isImageLoaded, setIsImageLoaded ] = useState( false );
 	return (
 		<HStack alignment="left" spacing={ 1 }>
-			{ withIcon && imageUrl && (
+			{ withAuthorImage && (
 				<div
 					className={ clsx( 'page-templates-author-field__avatar', {
 						'is-loaded': isImageLoaded,
@@ -247,7 +249,7 @@ function PostAuthorField( { item, viewType } ) {
 					/>
 				</div>
 			) }
-			{ withIcon && ! imageUrl && (
+			{ withAuthorIcon && (
 				<div className="page-templates-author-field__icon">
 					<Icon icon={ icon } />
 				</div>
