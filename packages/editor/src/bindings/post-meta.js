@@ -34,6 +34,11 @@ export default {
 			} );
 	},
 	canUserEditValue( { select, context, args } ) {
+		// Lock editing in query loop.
+		if ( context?.query || context?.queryId ) {
+			return false;
+		}
+
 		const postType =
 			context?.postType || select( editorStore ).getCurrentPostType();
 

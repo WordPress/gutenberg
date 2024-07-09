@@ -24,7 +24,7 @@ Embed a simple audio player. ([Source](https://github.com/WordPress/gutenberg/tr
 -	**Name:** core/audio
 -	**Category:** media
 -	**Supports:** align, anchor, interactivity (clientNavigation), spacing (margin, padding)
--	**Attributes:** autoplay, caption, id, loop, preload, src
+-	**Attributes:** autoplay, blob, caption, id, loop, preload, src
 
 ## Avatar
 
@@ -273,7 +273,7 @@ Add a link to a downloadable file. ([Source](https://github.com/WordPress/gutenb
 -	**Name:** core/file
 -	**Category:** media
 -	**Supports:** align, anchor, color (background, gradients, link, ~~text~~), interactivity, spacing (margin, padding)
--	**Attributes:** displayPreview, downloadButtonText, fileId, fileName, href, id, previewHeight, showDownloadButton, textLinkHref, textLinkTarget
+-	**Attributes:** blob, displayPreview, downloadButtonText, fileId, fileName, href, id, previewHeight, showDownloadButton, textLinkHref, textLinkTarget
 
 ## Footnotes
 

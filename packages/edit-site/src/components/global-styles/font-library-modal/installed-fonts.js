@@ -311,7 +311,7 @@ function InstalledFonts() {
 
 					<HStack
 						justify="flex-end"
-						className="font-library-modal__tabpanel-layout__footer"
+						className="font-library-modal__footer"
 					>
 						{ isInstalling && <ProgressBar /> }
 						{ shouldDisplayDeleteButton && (
