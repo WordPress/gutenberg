@@ -104,5 +104,5 @@ export const WithCustomChildren: StoryFn< typeof SelectControl > = ( args ) => {
 export const Borderless = SelectControlWithState.bind( {} );
 Borderless.args = {
 	...Default.args,
-	isBorderless: true,
+	variant: 'borderless',
 };
