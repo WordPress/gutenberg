@@ -195,6 +195,8 @@
 	.components-focal-point-picker-wrapper {
 		background-color: $gray-100;
 		width: 100%;
+		border-radius: $radius-block-ui;
+		border: $border-width solid $gray-300;
 	}
 	.components-focal-point-picker__media--image {
 		max-height: 180px;
