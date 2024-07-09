@@ -152,7 +152,10 @@ function ListItem< Item >( {
 									<div className="dataviews-view-list__media-placeholder"></div>
 								) }
 							</div>
-							<VStack spacing={ 0 }>
+							<VStack
+								spacing={ 1 }
+								className="dataviews-view-list__field-wrapper"
+							>
 								<span
 									className="dataviews-view-list__primary-field"
 									id={ labelId }
@@ -186,7 +189,7 @@ function ListItem< Item >( {
 				</div>
 				{ eligibleActions?.length > 0 && (
 					<HStack
-						spacing={ 1 }
+						spacing={ 3 }
 						justify="flex-end"
 						className="dataviews-view-list__item-actions"
 						style={ {
@@ -205,7 +208,7 @@ function ListItem< Item >( {
 											isDestructive={
 												primaryAction.isDestructive
 											}
-											size="compact"
+											size="small"
 											onClick={ () =>
 												setIsModalOpen( true )
 											}
@@ -236,7 +239,7 @@ function ListItem< Item >( {
 												isDestructive={
 													primaryAction.isDestructive
 												}
-												size="compact"
+												size="small"
 												onClick={ () => {
 													primaryAction.callback(
 														[ item ],
@@ -255,7 +258,7 @@ function ListItem< Item >( {
 										store={ store }
 										render={
 											<Button
-												size="compact"
+												size="small"
 												icon={ moreVertical }
 												label={ __( 'Actions' ) }
 												accessibleWhenDisabled
