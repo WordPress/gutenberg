@@ -13,6 +13,7 @@
 -   `ProgressBar`: Fix indeterminate RTL support. ([#63129](https://github.com/WordPress/gutenberg/pull/63129)).
 -   `RangeControl`: Fix RTL support for custom marks ([#63198](https://github.com/WordPress/gutenberg/pull/63198)).
 -   `TimePicker`: Add `dateOrder` prop ([#62481](https://github.com/WordPress/gutenberg/pull/62481)).
+-   `SelectControl`: Add borderless variant ([#63265](https://github.com/WordPress/gutenberg/pull/63265)).
 
 ### Bug Fixes
 
