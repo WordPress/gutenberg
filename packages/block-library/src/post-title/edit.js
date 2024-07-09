@@ -42,7 +42,8 @@ export default function PostTitleEdit( {
 			if ( isDescendentOfQueryLoop ) {
 				return false;
 			}
-			return select( coreStore ).canUserEditEntityRecord(
+			return select( coreStore ).hasPermission(
+				'update',
 				'postType',
 				postType,
 				postId

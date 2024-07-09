@@ -59,7 +59,8 @@ export default {
 		}
 
 		// Check that the user has the capability to edit post meta.
-		const canUserEdit = select( coreDataStore ).canUserEditEntityRecord(
+		const canUserEdit = select( coreDataStore ).hasPermission(
+			'update',
 			'postType',
 			context?.postType,
 			context?.postId

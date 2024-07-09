@@ -18,7 +18,7 @@ import { useViewportMatch } from '@wordpress/compose';
 export function useCanEditEntity( kind, name, recordId ) {
 	return useSelect(
 		( select ) =>
-			select( coreStore ).canUserEditEntityRecord( kind, name, recordId ),
+			select( coreStore ).hasPermission( 'update', kind, name, recordId ),
 		[ kind, name, recordId ]
 	);
 }
