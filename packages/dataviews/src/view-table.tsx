@@ -384,15 +384,14 @@ function TableColumnCombined< Item >( {
 	field,
 	...props
 }: TableColumnCombinedProps< Item > ) {
-	const Stack = field.direction === 'horizontal' ? HStack : VStack;
+	const children = field.children.map( ( child ) => (
+		<TableColumn key={ child } { ...props } column={ child } />
+	) );
 
-	return (
-		<Stack>
-			{ field.children.map( ( child ) => (
-				<TableColumn key={ child } { ...props } column={ child } />
-			) ) }
-		</Stack>
-	);
+	if ( field.direction === 'horizontal' ) {
+		return <HStack spacing={ 3 }>{ children }</HStack>;
+	}
+	return <VStack spacing={ 0 }>{ children }</VStack>;
 }
 
 function TableRow< Item >( {
