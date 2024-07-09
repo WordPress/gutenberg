@@ -550,6 +550,26 @@ _Returns_
 
 -   `boolean`: True if the REST request was completed. False otherwise.
 
+### hasPermission
+
+Returns whether the current user can perform the given action on the entity record.
+
+Calling this may trigger an OPTIONS request to the REST API via the `hasPermission()` resolver.
+
+<https://developer.wordpress.org/rest-api/reference/>
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+-   _action_ `string`: Action to check. One of: 'create', 'read', 'update', 'delete'.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name
+-   _key_ `EntityRecordKey`: Optional record's key.
+
+_Returns_
+
+-   `boolean | undefined`: Whether or not the user can perform the action, or `undefined` if the OPTIONS request is still being made.
+
 ### hasRedo
 
 Returns true if there is a next edit from the current undo offset for the entity records edits history, and false otherwise.

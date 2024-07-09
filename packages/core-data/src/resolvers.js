@@ -425,6 +425,90 @@ export const canUser =
 	};
 
 /**
+ * Checks whether the current user can perform the given action on the entity record.
+ *
+ * @param {string}        action Action to check. One of: 'create', 'read', 'update', 'delete'.
+ * @param {string}        kind   Entity kind.
+ * @param {string}        name   Entity name
+ * @param {number|string} key    Optional record's key.
+ */
+export const hasPermission =
+	( action, kind, name, key ) =>
+	async ( { dispatch, registry } ) => {
+		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
+		const entityConfig = configs.find(
+			( config ) => config.name === name && config.kind === kind
+		);
+		if ( ! entityConfig ) {
+			return;
+		}
+
+		const { hasStartedResolution } = registry.select( STORE_NAME );
+		const supportedActions = [ 'create', 'read', 'update', 'delete' ];
+
+		if ( ! supportedActions.includes( action ) ) {
+			throw new Error( `'${ action }' is not a valid action.` );
+		}
+
+		// Prevent resolving the same resource twice.
+		for ( const relatedAction of supportedActions ) {
+			if ( relatedAction === action ) {
+				continue;
+			}
+			const isAlreadyResolving = hasStartedResolution( 'hasPermission', [
+				relatedAction,
+				kind,
+				name,
+				key,
+			] );
+			if ( isAlreadyResolving ) {
+				return;
+			}
+		}
+
+		let response;
+		try {
+			response = await apiFetch( {
+				path: entityConfig.baseURL + ( key ? '/' + key : '' ),
+				method: 'OPTIONS',
+				parse: false,
+			} );
+		} catch ( error ) {
+			// Do nothing if our OPTIONS request comes back with an API error (4xx or
+			// 5xx). The previously determined isAllowed value will remain in the store.
+			return;
+		}
+
+		// Optional chaining operator is used here because the API requests don't
+		// return the expected result in the native version. Instead, API requests
+		// only return the result, without including response properties like the headers.
+		const allowHeader = response.headers?.get( 'allow' );
+		const allowedMethods = allowHeader?.allow || allowHeader || '';
+
+		const permissions = {};
+		const methods = {
+			create: 'POST',
+			read: 'GET',
+			update: 'PUT',
+			delete: 'DELETE',
+		};
+		for ( const [ actionName, methodName ] of Object.entries( methods ) ) {
+			permissions[ actionName ] = allowedMethods.includes( methodName );
+		}
+
+		registry.batch( () => {
+			for ( const supportedAction of supportedActions ) {
+				dispatch.receiveUserPermission(
+					[ supportedAction, kind, name, key ]
+						.filter( Boolean )
+						.join( '/' ),
+					permissions[ supportedAction ]
+				);
+			}
+		} );
+	};
+
+/**
  * Checks whether the current user can perform the given action on the given
  * REST resource.
  *

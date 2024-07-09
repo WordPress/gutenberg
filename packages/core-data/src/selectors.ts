@@ -1183,6 +1183,34 @@ export function canUserEditEntityRecord(
 }
 
 /**
+ * Returns whether the current user can perform the given action on the entity record.
+ *
+ * Calling this may trigger an OPTIONS request to the REST API via the
+ * `hasPermission()` resolver.
+ *
+ * https://developer.wordpress.org/rest-api/reference/
+ *
+ * @param state  Data state.
+ * @param action Action to check. One of: 'create', 'read', 'update', 'delete'.
+ * @param kind   Entity kind.
+ * @param name   Entity name
+ * @param key    Optional record's key.
+ *
+ * @return Whether or not the user can perform the action,
+ *         or `undefined` if the OPTIONS request is still being made.
+ */
+export function hasPermission(
+	state: State,
+	action: string,
+	kind: string,
+	name: string,
+	key?: EntityRecordKey
+): boolean | undefined {
+	const cacheKey = [ action, kind, name, key ].filter( Boolean ).join( '/' );
+	return state.userPermissions[ cacheKey ];
+}
+
+/**
  * Returns the latest autosaves for the post.
  *
  * May return multiple autosaves since the backend stores one autosave per
