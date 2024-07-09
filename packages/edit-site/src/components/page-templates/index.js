@@ -54,18 +54,24 @@ const { useHistory, useLocation } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
 
-const defaultConfigPerViewType = {
+const defaultLayouts = {
 	[ LAYOUT_TABLE ]: {
-		primaryField: 'title',
+		layout: {
+			primaryField: 'title',
+		},
 	},
 	[ LAYOUT_GRID ]: {
-		mediaField: 'preview',
-		primaryField: 'title',
-		columnFields: [ 'description' ],
+		layout: {
+			mediaField: 'preview',
+			primaryField: 'title',
+			columnFields: [ 'description' ],
+		},
 	},
 	[ LAYOUT_LIST ]: {
-		primaryField: 'title',
-		mediaField: 'preview',
+		layout: {
+			primaryField: 'title',
+			mediaField: 'preview',
+		},
 	},
 };
 
@@ -79,7 +85,7 @@ const DEFAULT_VIEW = {
 		direction: 'asc',
 	},
 	fields: [ 'title', 'description', 'author' ],
-	layout: defaultConfigPerViewType[ LAYOUT_GRID ],
+	layout: defaultLayouts[ LAYOUT_GRID ].layout,
 	filters: [],
 };
 
@@ -192,7 +198,7 @@ export default function PageTemplates() {
 		return {
 			...DEFAULT_VIEW,
 			type: usedType,
-			layout: defaultConfigPerViewType[ usedType ],
+			layout: defaultLayouts[ usedType ].layout,
 			filters:
 				activeView !== 'all'
 					? [
@@ -336,13 +342,6 @@ export default function PageTemplates() {
 	const onChangeView = useCallback(
 		( newView ) => {
 			if ( newView.type !== view.type ) {
-				newView = {
-					...newView,
-					layout: {
-						...defaultConfigPerViewType[ newView.type ],
-					},
-				};
-
 				history.push( {
 					...params,
 					layout: newView.type,
@@ -371,6 +370,7 @@ export default function PageTemplates() {
 				onSelectionChange={ onSelectionChange }
 				selection={ selection }
 				setSelection={ setSelection }
+				defaultLayouts={ defaultLayouts }
 			/>
 		</Page>
 	);
