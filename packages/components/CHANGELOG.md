@@ -16,6 +16,7 @@
 
 ### Bug Fixes
 
+-   `Tabs`: Make Tabs have a fluid height ([#62027](https://github.com/WordPress/gutenberg/pull/62027)).
 -   `UnitControl`: Fix colors when disabled. ([#62970](https://github.com/WordPress/gutenberg/pull/62970))
 -   `useUpdateEffect`: Correctly track mounted state in strict mode. ([#62974](https://github.com/WordPress/gutenberg/pull/62974))
 -   `UnitControl`: Fix an issue where keyboard shortcuts unintentionally shift focus on Windows OS. ([#62988](https://github.com/WordPress/gutenberg/pull/62988))

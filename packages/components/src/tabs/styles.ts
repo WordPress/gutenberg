@@ -58,12 +58,16 @@ export const Tab = styled( Ariakit.Tab )`
 		align-items: center;
 		position: relative;
 		border-radius: 0;
-		height: ${ space( 12 ) };
+		min-height: ${ space(
+			12
+		) }; // Avoid fixed height to allow for long strings that go in multiple lines.
+		height: auto;
 		background: transparent;
 		border: none;
 		box-shadow: none;
 		cursor: pointer;
-		padding: 3px ${ space( 4 ) }; // Use padding to offset the [aria-selected="true"] border, this benefits Windows High Contrast mode
+		line-height: 1.2; // Some languages characters e.g. Japanese may have a native higher line-height.
+		padding: ${ space( 4 ) };
 		margin-left: 0;
 		font-weight: 500;
 
@@ -93,7 +97,8 @@ export const Tab = styled( Ariakit.Tab )`
 			pointer-events: none;
 
 			// Draw the indicator.
-			box-shadow: 0 0 0 var( --wp-admin-border-width-focus )
+			// Outline works for Windows high contrast mode as well.
+			outline: var( --wp-admin-border-width-focus ) solid
 				${ COLORS.theme.accent };
 			border-radius: 2px;
 
@@ -107,9 +112,6 @@ export const Tab = styled( Ariakit.Tab )`
 
 		&:focus-visible::before {
 			opacity: 1;
-
-			// Windows high contrast mode.
-			outline: 2px solid transparent;
 		}
 	}
 `;
