@@ -199,6 +199,11 @@ export function findNearestFontStyle( availableFontStyles, newFontStyleValue ) {
 		return '';
 	}
 
+	const validStyles = [ 'normal', 'italic', 'oblique' ];
+	if ( ! validStyles.includes( newFontStyleValue ) ) {
+		return '';
+	}
+
 	if (
 		! availableFontStyles ||
 		availableFontStyles.length === 0 ||
@@ -209,26 +214,14 @@ export function findNearestFontStyle( availableFontStyles, newFontStyleValue ) {
 		return newFontStyleValue;
 	}
 
-	let nearestFontStyle = '';
-	const validStyles = [ 'normal', 'italic', 'oblique' ];
-
-	if (
-		! validStyles.includes( newFontStyleValue ) ||
-		! availableFontStyles.find(
-			( style ) => style.value === newFontStyleValue
-		)
-	) {
-		nearestFontStyle = '';
-	}
-
 	if (
 		newFontStyleValue === 'oblique' &&
 		! availableFontStyles.find( ( style ) => style.value === 'oblique' )
 	) {
-		nearestFontStyle = 'italic';
+		return 'italic';
 	}
 
-	return nearestFontStyle;
+	return '';
 }
 
 /**
