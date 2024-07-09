@@ -138,7 +138,7 @@ export default {
 			);
 			if ( rowCount ) {
 				rules.push(
-					`grid-template-rows: repeat(${ rowCount }, minmax(8px, auto))`
+					`grid-template-rows: repeat(${ rowCount }, minmax(1rem, auto))`
 				);
 			}
 		} else if ( columnCount ) {
@@ -147,7 +147,7 @@ export default {
 			);
 			if ( rowCount ) {
 				rules.push(
-					`grid-template-rows: repeat(${ rowCount }, minmax(8px, auto))`
+					`grid-template-rows: repeat(${ rowCount }, minmax(1rem, auto))`
 				);
 			}
 		} else {
