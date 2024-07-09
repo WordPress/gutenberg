@@ -231,14 +231,6 @@ public class Gutenberg: UIResponder {
         var settingsUpdates = [String : Any]()
         settingsUpdates["isFSETheme"] = editorSettings?.isFSETheme ?? false
 
-        if let quoteBlockV2 = editorSettings?.quoteBlockV2 {
-            settingsUpdates["quoteBlockV2"] = quoteBlockV2
-        }
-
-        if let listBlockV2 = editorSettings?.listBlockV2 {
-            settingsUpdates["listBlockV2"] = listBlockV2
-        }
-
         if let rawStyles = editorSettings?.rawStyles {
             settingsUpdates["rawStyles"] = rawStyles
         }
