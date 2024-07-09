@@ -292,7 +292,7 @@ export const deleteEntityRecord =
 		);
 		let error;
 		let deletedRecord = false;
-		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
+		if ( ! entityConfig ) {
 			return;
 		}
 
@@ -507,7 +507,7 @@ export const saveEntityRecord =
 		const entityConfig = configs.find(
 			( config ) => config.kind === kind && config.name === name
 		);
-		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
+		if ( ! entityConfig ) {
 			return;
 		}
 		const entityIdKey = entityConfig.key || DEFAULT_ENTITY_KEY;
