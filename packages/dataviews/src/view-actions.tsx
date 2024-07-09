@@ -9,6 +9,7 @@ import type { ChangeEvent } from 'react';
 import {
 	Button,
 	privateApis as componentsPrivateApis,
+	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { memo } from '@wordpress/element';
@@ -75,51 +76,34 @@ function ViewTypeMenu( {
 	if ( _availableViews.length === 1 ) {
 		return null;
 	}
-	const activeView = _availableViews.find( ( v ) => view.type === v.type );
-	return (
-		<DropdownMenu
-			trigger={
-				<DropdownMenuItem
-					suffix={
-						<span aria-hidden="true">{ activeView?.label }</span>
+	return _availableViews.map( ( availableView ) => {
+		return (
+			<DropdownMenuRadioItem
+				key={ availableView.type }
+				value={ availableView.type }
+				name="view-actions-available-view"
+				checked={ availableView.type === view.type }
+				hideOnClick
+				onChange={ ( e: ChangeEvent< HTMLInputElement > ) => {
+					switch ( e.target.value ) {
+						case 'list':
+						case 'grid':
+						case 'table':
+							return onChangeView( {
+								...view,
+								type: e.target.value,
+								layout: {},
+							} );
 					}
-				>
-					<DropdownMenuItemLabel>
-						{ __( 'Layout' ) }
-					</DropdownMenuItemLabel>
-				</DropdownMenuItem>
-			}
-		>
-			{ _availableViews.map( ( availableView ) => {
-				return (
-					<DropdownMenuRadioItem
-						key={ availableView.type }
-						value={ availableView.type }
-						name="view-actions-available-view"
-						checked={ availableView.type === view.type }
-						hideOnClick
-						onChange={ ( e: ChangeEvent< HTMLInputElement > ) => {
-							switch ( e.target.value ) {
-								case 'list':
-								case 'grid':
-								case 'table':
-									return onChangeView( {
-										...view,
-										type: e.target.value,
-										layout: {},
-									} );
-							}
-							throw new Error( 'Invalid dataview' );
-						} }
-					>
-						<DropdownMenuItemLabel>
-							{ availableView.label }
-						</DropdownMenuItemLabel>
-					</DropdownMenuRadioItem>
-				);
-			} ) }
-		</DropdownMenu>
-	);
+					throw new Error( 'Invalid dataview' );
+				} }
+			>
+				<DropdownMenuItemLabel>
+					{ availableView.label }
+				</DropdownMenuItemLabel>
+			</DropdownMenuRadioItem>
+		);
+	} );
 }
 
 const PAGE_SIZE_VALUES = [ 10, 20, 50, 100 ];
@@ -305,35 +289,60 @@ function _ViewActions< Item >( {
 	onChangeView,
 	supportedLayouts,
 }: ViewActionsProps< Item > ) {
+	const activeView = VIEW_LAYOUTS.find( ( v ) => view.type === v.type );
 	return (
-		<DropdownMenu
-			trigger={
-				<Button
-					size="compact"
-					icon={ cog }
-					label={ _x( 'View options', 'View is used as a noun' ) }
-				/>
-			}
-		>
-			<DropdownMenuGroup>
-				<ViewTypeMenu
-					view={ view }
-					onChangeView={ onChangeView }
-					supportedLayouts={ supportedLayouts }
-				/>
-				<SortMenu
-					fields={ fields }
-					view={ view }
-					onChangeView={ onChangeView }
-				/>
-				<FieldsVisibilityMenu
-					fields={ fields }
-					view={ view }
-					onChangeView={ onChangeView }
-				/>
-				<PageSizeMenu view={ view } onChangeView={ onChangeView } />
-			</DropdownMenuGroup>
-		</DropdownMenu>
+		<>
+			<HStack
+				spacing={ 1 }
+				expanded={ false }
+				style={ { flexShrink: 0 } }
+			>
+				<DropdownMenu
+					trigger={
+						<Button
+							size="compact"
+							icon={ activeView?.icon }
+							label={ __( 'Layout' ) }
+						/>
+					}
+				>
+					<ViewTypeMenu
+						view={ view }
+						onChangeView={ onChangeView }
+						supportedLayouts={ supportedLayouts }
+					/>
+				</DropdownMenu>
+				<DropdownMenu
+					trigger={
+						<Button
+							size="compact"
+							icon={ cog }
+							label={ _x(
+								'View options',
+								'View is used as a noun'
+							) }
+						/>
+					}
+				>
+					<DropdownMenuGroup>
+						<SortMenu
+							fields={ fields }
+							view={ view }
+							onChangeView={ onChangeView }
+						/>
+						<FieldsVisibilityMenu
+							fields={ fields }
+							view={ view }
+							onChangeView={ onChangeView }
+						/>
+						<PageSizeMenu
+							view={ view }
+							onChangeView={ onChangeView }
+						/>
+					</DropdownMenuGroup>
+				</DropdownMenu>
+			</HStack>
+		</>
 	);
 }
 
