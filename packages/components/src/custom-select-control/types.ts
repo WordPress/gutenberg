@@ -38,14 +38,13 @@ export type CustomSelectProps = {
 	 */
 	className?: string;
 	/**
-	 * Used to visually hide the label. It will always be visible to screen readers.
-	 *
+	 * Hide the label visually, while keeping available to assistive technology.
 	 */
 	hideLabelFromVision?: boolean;
 	/**
-	 * Pass in a description that will be shown to screen readers associated with the
-	 * select trigger button. If no value is passed, the text "Currently selected:
-	 * selectedItem.name" will be used fully translated.
+	 * Description for the select trigger button used by assistive technology.
+	 * If no value is passed, the text "Currently selected: selectedItem.name"
+	 * will be used fully translated.
 	 */
 	describedBy?: string;
 	/**
@@ -58,31 +57,31 @@ export type CustomSelectProps = {
 	 */
 	onChange?: ( newValue: ChangeObject ) => void;
 	/**
-	 * A handler for `onBlur` events.
+	 * A handler for `blur` events on the trigger button.
 	 *
 	 * @ignore
 	 */
 	onBlur?: FocusEventHandler< HTMLButtonElement >;
 	/**
-	 * A handler for `onFocus` events.
+	 * A handler for `focus` events on the trigger button.
 	 *
 	 * @ignore
 	 */
 	onFocus?: FocusEventHandler< HTMLButtonElement >;
 	/**
-	 * A handler for `onMouseOver` events.
+	 * A handler for `mouseout` events on the trigger button.
 	 *
 	 * @ignore
 	 */
 	onMouseOut?: MouseEventHandler< HTMLButtonElement >;
 	/**
-	 * A handler for `onMouseOut` events.
+	 * A handler for `mouseover` events on the trigger button.
 	 *
 	 * @ignore
 	 */
 	onMouseOver?: MouseEventHandler< HTMLButtonElement >;
 	/**
-	 * The options that can be chosen from.
+	 * The list of options that can be chosen from.
 	 */
 	options: Array< Option >;
 	/**
