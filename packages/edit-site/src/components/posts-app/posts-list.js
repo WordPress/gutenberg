@@ -26,7 +26,15 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { DataViews } from '@wordpress/dataviews';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
-import { commentAuthorAvatar as authorIcon } from '@wordpress/icons';
+import {
+	trash,
+	drafts,
+	published,
+	scheduled,
+	pending,
+	notAllowed,
+	commentAuthorAvatar as authorIcon,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -164,12 +172,12 @@ function useView( postType ) {
 // See https://github.com/WordPress/gutenberg/issues/55886
 // We do not support custom statutes at the moment.
 const STATUSES = [
-	{ value: 'draft', label: __( 'Draft' ) },
-	{ value: 'future', label: __( 'Scheduled' ) },
-	{ value: 'pending', label: __( 'Pending Review' ) },
-	{ value: 'private', label: __( 'Private' ) },
-	{ value: 'publish', label: __( 'Published' ) },
-	{ value: 'trash', label: __( 'Trash' ) },
+	{ value: 'draft', label: __( 'Draft' ), icon: drafts },
+	{ value: 'future', label: __( 'Scheduled' ), icon: scheduled },
+	{ value: 'pending', label: __( 'Pending Review' ), icon: pending },
+	{ value: 'private', label: __( 'Private' ), icon: notAllowed },
+	{ value: 'publish', label: __( 'Published' ), icon: published },
+	{ value: 'trash', label: __( 'Trash' ), icon: trash },
 ];
 const DEFAULT_STATUSES = 'draft,future,pending,private,publish'; // All but 'trash'.
 
@@ -215,6 +223,22 @@ function FeaturedImage( { item, viewType } ) {
 
 function getItemId( item ) {
 	return item.id.toString();
+}
+
+function PostStatusField( { item } ) {
+	const status = STATUSES.find( ( { value } ) => value === item.status );
+	const label = status?.label || item.status;
+	const icon = status?.icon;
+	return (
+		<HStack alignment="left" spacing={ 1 }>
+			{ icon && (
+				<div className="posts-list-page-post-author-field__icon-container">
+					<Icon icon={ icon } />
+				</div>
+			) }
+			<span>{ label }</span>
+		</HStack>
+	);
 }
 
 function PostAuthorField( { item, viewType } ) {
@@ -460,6 +484,7 @@ export default function PostsList( { postType } ) {
 					STATUSES.find( ( { value } ) => value === item.status )
 						?.label ?? item.status,
 				elements: STATUSES,
+				render: PostStatusField,
 				enableSorting: false,
 				filterBy: {
 					operators: [ OPERATOR_IS_ANY ],
