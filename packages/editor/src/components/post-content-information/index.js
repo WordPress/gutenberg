@@ -25,8 +25,11 @@ export default function PostContentInformation() {
 	const { postContent } = useSelect( ( select ) => {
 		const { getEditedPostAttribute, getCurrentPostType, getCurrentPostId } =
 			select( editorStore );
+		const { canUser } = select( coreStore );
 		const { getEntityRecord } = select( coreStore );
-		const siteSettings = getEntityRecord( 'root', 'site' );
+		const siteSettings = canUser( 'read', 'settings' )
+			? getEntityRecord( 'root', 'site' )
+			: undefined;
 		const postType = getCurrentPostType();
 		const _id = getCurrentPostId();
 		const isPostsPage = +_id === siteSettings?.page_for_posts;

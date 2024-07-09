@@ -33,17 +33,25 @@ export function mergeBaseAndUserConfigs( base, user ) {
 function useGlobalStylesUserConfig() {
 	const { globalStylesId, isReady, settings, styles, _links } = useSelect(
 		( select ) => {
-			const { getEditedEntityRecord, hasFinishedResolution } =
-				select( coreStore );
+			const {
+				getEditedEntityRecord,
+				hasFinishedResolution,
+				getUser,
+				getCurrentUser,
+			} = select( coreStore );
 			const _globalStylesId =
 				select( coreStore ).__experimentalGetCurrentGlobalStylesId();
-			const record = _globalStylesId
-				? getEditedEntityRecord(
-						'root',
-						'globalStyles',
-						_globalStylesId
-				  )
-				: undefined;
+			const userId = getCurrentUser()?.id;
+			const canEditThemeOptions =
+				userId && getUser( userId )?.capabilities?.edit_theme_options;
+			const record =
+				_globalStylesId && canEditThemeOptions
+					? getEditedEntityRecord(
+							'root',
+							'globalStyles',
+							_globalStylesId
+					  )
+					: undefined;
 
 			let hasResolved = false;
 			if (
@@ -126,9 +134,19 @@ function useGlobalStylesUserConfig() {
 
 function useGlobalStylesBaseConfig() {
 	const baseConfig = useSelect( ( select ) => {
-		return select(
-			coreStore
-		).__experimentalGetCurrentThemeBaseGlobalStyles();
+		const {
+			getCurrentUser,
+			getUser,
+			__experimentalGetCurrentThemeBaseGlobalStyles,
+		} = select( coreStore );
+		const userId = getCurrentUser()?.id;
+		const canEditThemeOptions =
+			userId && getUser( userId )?.capabilities?.edit_theme_options;
+
+		return (
+			canEditThemeOptions &&
+			__experimentalGetCurrentThemeBaseGlobalStyles()
+		);
 	}, [] );
 
 	return [ !! baseConfig, baseConfig ];

@@ -61,8 +61,10 @@ export default function PostURLPanel() {
 function PostURLToggle( { isOpen, onClick } ) {
 	const { slug, isFrontPage, postLink } = useSelect( ( select ) => {
 		const { getCurrentPostId, getCurrentPost } = select( editorStore );
-		const { getEditedEntityRecord } = select( coreStore );
-		const siteSettings = getEditedEntityRecord( 'root', 'site' );
+		const { getEditedEntityRecord, canUser } = select( coreStore );
+		const siteSettings = canUser( 'read', 'settings' )
+			? getEditedEntityRecord( 'root', 'site' )
+			: undefined;
 		const _id = getCurrentPostId();
 		return {
 			slug: select( editorStore ).getEditedPostSlug(),

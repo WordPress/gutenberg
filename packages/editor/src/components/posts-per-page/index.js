@@ -24,8 +24,10 @@ export default function PostsPerPage() {
 	const { postsPerPage, isTemplate, postSlug } = useSelect( ( select ) => {
 		const { getEditedPostAttribute, getCurrentPostType } =
 			select( editorStore );
-		const { getEditedEntityRecord } = select( coreStore );
-		const siteSettings = getEditedEntityRecord( 'root', 'site' );
+		const { getEditedEntityRecord, canUser } = select( coreStore );
+		const siteSettings = canUser( 'read', 'settings' )
+			? getEditedEntityRecord( 'root', 'site' )
+			: undefined;
 		return {
 			isTemplate: getCurrentPostType() === TEMPLATE_POST_TYPE,
 			postSlug: getEditedPostAttribute( 'slug' ),

@@ -27,9 +27,11 @@ export default function BlogTitle() {
 	const { editEntityRecord } = useDispatch( coreStore );
 	const { postsPageTitle, postsPageId, isTemplate, postSlug } = useSelect(
 		( select ) => {
-			const { getEntityRecord, getEditedEntityRecord } =
+			const { getEntityRecord, getEditedEntityRecord, canUser } =
 				select( coreStore );
-			const siteSettings = getEntityRecord( 'root', 'site' );
+			const siteSettings = canUser( 'read', 'settings' )
+				? getEntityRecord( 'root', 'site' )
+				: undefined;
 			const _postsPageRecord = siteSettings?.page_for_posts
 				? getEditedEntityRecord(
 						'postType',
