@@ -15,6 +15,7 @@ import {
 	canUser,
 	getAutosaves,
 	getCurrentUser,
+	hasPermission,
 } from '../resolvers';
 
 describe( 'getEntityRecord', () => {
@@ -490,6 +491,278 @@ describe( 'canUser', () => {
 		);
 		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
 			'delete/blocks/123',
+			true
+		);
+	} );
+} );
+
+describe( 'hasPermission', () => {
+	const ENTITIES = [
+		{
+			name: 'media',
+			kind: 'root',
+			baseURL: '/wp/v2/media',
+			baseURLParams: { context: 'edit' },
+		},
+		{
+			name: 'wp_block',
+			kind: 'postType',
+			baseURL: '/wp/v2/blocks',
+			baseURLParams: { context: 'edit' },
+		},
+	];
+
+	let dispatch, registry;
+	beforeEach( async () => {
+		registry = {
+			select: jest.fn( () => ( {
+				hasStartedResolution: () => false,
+			} ) ),
+			batch: ( callback ) => callback(),
+		};
+		dispatch = Object.assign( jest.fn(), {
+			receiveUserPermission: jest.fn(),
+		} );
+
+		// Provide entities
+		dispatch.mockReturnValue( ENTITIES );
+		triggerFetch.mockReset();
+	} );
+
+	it( 'does nothing when there is an API error', async () => {
+		triggerFetch.mockImplementation( () =>
+			Promise.reject( { status: 404 } )
+		);
+
+		await hasPermission(
+			'create',
+			'root',
+			'media'
+		)( { dispatch, registry } );
+
+		expect( triggerFetch ).toHaveBeenCalledWith( {
+			path: '/wp/v2/media',
+			method: 'OPTIONS',
+			parse: false,
+		} );
+
+		expect( dispatch.receiveUserPermission ).not.toHaveBeenCalled();
+	} );
+
+	it( 'receives false when the user is not allowed to perform an action', async () => {
+		triggerFetch.mockImplementation( () => ( {
+			headers: new Map( [ [ 'allow', 'GET' ] ] ),
+		} ) );
+
+		await hasPermission(
+			'create',
+			'root',
+			'media'
+		)( {
+			dispatch,
+			registry,
+		} );
+
+		expect( triggerFetch ).toHaveBeenCalledWith( {
+			path: '/wp/v2/media',
+			method: 'OPTIONS',
+			parse: false,
+		} );
+
+		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
+			'create/root/media',
+			false
+		);
+	} );
+
+	it( 'receives true when the user is allowed to perform an action', async () => {
+		triggerFetch.mockImplementation( () => ( {
+			headers: new Map( [ [ 'allow', 'POST, GET, PUT, DELETE' ] ] ),
+		} ) );
+
+		await hasPermission(
+			'create',
+			'root',
+			'media'
+		)( { dispatch, registry } );
+
+		expect( triggerFetch ).toHaveBeenCalledWith( {
+			path: '/wp/v2/media',
+			method: 'OPTIONS',
+			parse: false,
+		} );
+
+		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
+			'create/root/media',
+			true
+		);
+	} );
+
+	it( 'receives true when the user is allowed to perform an action on a specific resource', async () => {
+		triggerFetch.mockImplementation( () => ( {
+			headers: new Map( [ [ 'allow', 'POST, GET, PUT, DELETE' ] ] ),
+		} ) );
+
+		await hasPermission(
+			'create',
+			'postType',
+			'wp_block',
+			123
+		)( { dispatch, registry } );
+
+		expect( triggerFetch ).toHaveBeenCalledWith( {
+			path: '/wp/v2/blocks/123',
+			method: 'OPTIONS',
+			parse: false,
+		} );
+
+		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
+			'create/postType/wp_block/123',
+			true
+		);
+	} );
+
+	it( 'runs apiFetch only once per resource', async () => {
+		registry = {
+			...registry,
+			select: () => ( {
+				hasStartedResolution: ( _, [ action ] ) => action === 'read',
+			} ),
+		};
+
+		triggerFetch.mockImplementation( () => ( {
+			headers: new Map( [ [ 'allow', 'POST, GET' ] ] ),
+		} ) );
+
+		await hasPermission(
+			'create',
+			'postType',
+			'wp_block'
+		)( { dispatch, registry } );
+		await hasPermission(
+			'read',
+			'postType',
+			'wp_block'
+		)( { dispatch, registry } );
+
+		expect( triggerFetch ).toHaveBeenCalledTimes( 1 );
+
+		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
+			'create/postType/wp_block',
+			true
+		);
+		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
+			'read/postType/wp_block',
+			true
+		);
+	} );
+
+	it( 'retrieves all permissions even when ID is not given', async () => {
+		registry = {
+			...registry,
+			select: () => ( {
+				hasStartedResolution: ( _, [ action ] ) => action === 'read',
+			} ),
+		};
+
+		triggerFetch.mockImplementation( () => ( {
+			headers: new Map( [ [ 'allow', 'POST, GET' ] ] ),
+		} ) );
+
+		await hasPermission(
+			'create',
+			'postType',
+			'wp_block'
+		)( { dispatch, registry } );
+		await hasPermission(
+			'read',
+			'postType',
+			'wp_block'
+		)( { dispatch, registry } );
+		await hasPermission(
+			'update',
+			'postType',
+			'wp_block'
+		)( { dispatch, registry } );
+		await hasPermission(
+			'delete',
+			'postType',
+			'wp_block'
+		)( { dispatch, registry } );
+
+		expect( triggerFetch ).toHaveBeenCalledTimes( 1 );
+
+		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
+			'create/postType/wp_block',
+			true
+		);
+		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
+			'read/postType/wp_block',
+			true
+		);
+		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
+			'update/postType/wp_block',
+			false
+		);
+		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
+			'delete/postType/wp_block',
+			false
+		);
+	} );
+
+	it( 'runs apiFetch only once per resource ID', async () => {
+		registry = {
+			...registry,
+			select: () => ( {
+				hasStartedResolution: ( _, [ action ] ) => action === 'create',
+			} ),
+		};
+
+		triggerFetch.mockImplementation( () => ( {
+			headers: new Map( [ [ 'allow', 'POST, GET, PUT, DELETE' ] ] ),
+		} ) );
+
+		await hasPermission(
+			'create',
+			'postType',
+			'wp_block',
+			123
+		)( { dispatch, registry } );
+		await hasPermission(
+			'read',
+			'postType',
+			'blocks',
+			123
+		)( { dispatch, registry } );
+		await hasPermission(
+			'update',
+			'postType',
+			'wp_block',
+			123
+		)( { dispatch, registry } );
+		await hasPermission(
+			'delete',
+			'postType',
+			'wp_block',
+			123
+		)( { dispatch, registry } );
+
+		expect( triggerFetch ).toHaveBeenCalledTimes( 1 );
+
+		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
+			'create/postType/wp_block/123',
+			true
+		);
+		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
+			'read/postType/wp_block/123',
+			true
+		);
+		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
+			'update/postType/wp_block/123',
+			true
+		);
+		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
+			'delete/postType/wp_block/123',
 			true
 		);
 	} );

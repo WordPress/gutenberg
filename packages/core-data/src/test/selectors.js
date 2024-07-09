@@ -24,6 +24,7 @@ import {
 	getCurrentUser,
 	getRevisions,
 	getRevision,
+	hasPermission,
 } from '../selectors';
 // getEntityRecord and __experimentalGetEntityRecordNoResolver selectors share the same tests.
 describe.each( [
@@ -763,6 +764,39 @@ describe( 'canUserEditEntityRecord', () => {
 		expect(
 			canUserEditEntityRecord( state, 'postType', 'post', '1' )
 		).toBe( true );
+	} );
+} );
+
+describe( 'hasPermission', () => {
+	it( 'returns undefined by default', () => {
+		const state = deepFreeze( {
+			userPermissions: {},
+		} );
+		expect( hasPermission( state, 'create', 'root', 'media' ) ).toBe(
+			undefined
+		);
+	} );
+
+	it( 'returns whether an action can be performed', () => {
+		const state = deepFreeze( {
+			userPermissions: {
+				'create/root/media': false,
+			},
+		} );
+		expect( hasPermission( state, 'create', 'root', 'media' ) ).toBe(
+			false
+		);
+	} );
+
+	it( 'returns whether an action can be performed for a given resource', () => {
+		const state = deepFreeze( {
+			userPermissions: {
+				'update/root/media/123': true,
+			},
+		} );
+		expect( hasPermission( state, 'update', 'root', 'media', 123 ) ).toBe(
+			true
+		);
 	} );
 } );
 
