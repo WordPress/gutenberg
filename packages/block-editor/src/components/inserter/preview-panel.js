@@ -55,7 +55,7 @@ function InserterPreviewPanel( { item } ) {
 										body { 
 											padding: 24px;
 											min-height:${ Math.round( minHeight ) }px;
-											display:flex;align-items:center;justify-content:center; 
+											display:flex;align-items:center;
 										}
 										.is-root-container { width: 100%; }
 									`,

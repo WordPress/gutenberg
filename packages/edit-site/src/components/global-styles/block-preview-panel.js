@@ -56,7 +56,7 @@ const BlockPreviewPanel = ( { name, variation = '' } ) => {
 								body{
 									padding: 24px;
 									min-height:100%;
-									display:flex;align-items:center;justify-content:center;
+									display:flex;align-items:center;
 								}
 								.is-root-container { width: 100%; }
 							`,
