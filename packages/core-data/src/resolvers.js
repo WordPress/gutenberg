@@ -368,6 +368,10 @@ export const canUser =
 
 		let resourcePath = null;
 		if ( typeof resource === 'object' ) {
+			if ( ! resource.kind || ! resource.name ) {
+				return;
+			}
+
 			const configs = await dispatch(
 				getOrLoadEntitiesConfig( resource.kind, resource.name )
 			);

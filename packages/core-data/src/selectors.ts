@@ -1147,9 +1147,14 @@ export function canUser(
 	action: string,
 	resource: string | Record< string, any >,
 	id?: EntityRecordKey
-): boolean | undefined {
+): boolean | undefined | null {
+	const isEntity = typeof resource === 'object';
+	if ( isEntity && ( ! resource.kind || ! resource.name ) ) {
+		return null;
+	}
+
 	const key = (
-		typeof resource === 'object'
+		isEntity
 			? [ action, resource.kind, resource.name, resource.id ]
 			: [ action, resource, id ]
 	)
@@ -1179,7 +1184,7 @@ export function canUserEditEntityRecord(
 	kind: string,
 	name: string,
 	recordId: EntityRecordKey
-): boolean | undefined {
+): boolean | undefined | null {
 	return canUser( state, 'update', { kind, name, id: recordId } );
 }
 

@@ -333,6 +333,25 @@ describe( 'canUser', () => {
 		expect( dispatch.receiveUserPermission ).not.toHaveBeenCalled();
 	} );
 
+	it( 'does nothing when entity kind or name is missing', async () => {
+		triggerFetch.mockImplementation( () =>
+			Promise.reject( { status: 404 } )
+		);
+
+		await canUser( 'create', { kind: 'root', name: 'media' } )( {
+			dispatch,
+			registry,
+		} );
+		await canUser( 'create', { name: 'wp_block' } )( {
+			dispatch,
+			registry,
+		} );
+
+		expect( triggerFetch ).not.toHaveBeenCalledWith();
+
+		expect( dispatch.receiveUserPermission ).not.toHaveBeenCalled();
+	} );
+
 	it( 'receives false when the user is not allowed to perform an action', async () => {
 		triggerFetch.mockImplementation( () => ( {
 			headers: new Map( [ [ 'allow', 'GET' ] ] ),

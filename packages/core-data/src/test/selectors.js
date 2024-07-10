@@ -694,6 +694,14 @@ describe( 'canUser', () => {
 		).toBe( undefined );
 	} );
 
+	it( 'returns null when entity kind or name is missing', () => {
+		const state = deepFreeze( {
+			userPermissions: {},
+		} );
+		expect( canUser( state, 'create', { name: 'media' } ) ).toBe( null );
+		expect( canUser( state, 'create', { kind: 'root' } ) ).toBe( null );
+	} );
+
 	it( 'returns whether an action can be performed', () => {
 		const state = deepFreeze( {
 			userPermissions: {
