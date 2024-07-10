@@ -370,7 +370,7 @@ export const canUser =
 		let resourcePath = null;
 		if ( typeof resource === 'object' ) {
 			if ( ! resource.kind || ! resource.name ) {
-				return;
+				throw new Error( 'The entity resource object is not valid.' );
 			}
 
 			const configs = await dispatch(

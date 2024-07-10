@@ -333,23 +333,13 @@ describe( 'canUser', () => {
 		expect( dispatch.receiveUserPermission ).not.toHaveBeenCalled();
 	} );
 
-	it( 'does nothing when entity kind or name is missing', async () => {
-		triggerFetch.mockImplementation( () =>
-			Promise.reject( { status: 404 } )
-		);
-
-		await canUser( 'create', { kind: 'root', name: 'media' } )( {
-			dispatch,
-			registry,
-		} );
-		await canUser( 'create', { name: 'wp_block' } )( {
-			dispatch,
-			registry,
-		} );
-
-		expect( triggerFetch ).not.toHaveBeenCalledWith();
-
-		expect( dispatch.receiveUserPermission ).not.toHaveBeenCalled();
+	it( 'throws an error when an entity resource object is malformed', async () => {
+		await expect(
+			canUser( 'create', { name: 'wp_block' } )( {
+				dispatch,
+				registry,
+			} )
+		).rejects.toThrow( 'The entity resource object is not valid.' );
 	} );
 
 	it( 'receives false when the user is not allowed to perform an action', async () => {
