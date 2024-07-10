@@ -177,6 +177,7 @@ function PostFeaturedImage( {
 											? null
 											: `editor-post-featured-image-${ featuredImageId }-describedby`
 									}
+									aria-haspopup="dialog"
 								>
 									{ !! featuredImageId && media && (
 										<img
@@ -197,6 +198,7 @@ function PostFeaturedImage( {
 										<Button
 											className="editor-post-featured-image__action"
 											onClick={ open }
+											aria-haspopup="dialog"
 										>
 											{ __( 'Replace' ) }
 										</Button>
