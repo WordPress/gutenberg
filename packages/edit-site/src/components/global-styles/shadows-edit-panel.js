@@ -371,8 +371,7 @@ function ShadowItem( { shadow, onChange, canRemove, onRemove } ) {
 						'edit-site-global-styles__shadow-editor__remove-button',
 						{ 'is-open': isOpen }
 					),
-					ariaLabel: __( 'Remove shadow' ),
-					tooltip: __( 'Remove shadow' ),
+					label: __( 'Remove shadow' ),
 				};
 
 				return (

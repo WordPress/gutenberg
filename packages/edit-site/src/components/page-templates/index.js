@@ -54,18 +54,24 @@ const { useHistory, useLocation } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
 
-const defaultConfigPerViewType = {
+const defaultLayouts = {
 	[ LAYOUT_TABLE ]: {
-		primaryField: 'title',
+		layout: {
+			primaryField: 'title',
+		},
 	},
 	[ LAYOUT_GRID ]: {
-		mediaField: 'preview',
-		primaryField: 'title',
-		columnFields: [ 'description' ],
+		layout: {
+			mediaField: 'preview',
+			primaryField: 'title',
+			columnFields: [ 'description' ],
+		},
 	},
 	[ LAYOUT_LIST ]: {
-		primaryField: 'title',
-		mediaField: 'preview',
+		layout: {
+			primaryField: 'title',
+			mediaField: 'preview',
+		},
 	},
 };
 
@@ -78,10 +84,8 @@ const DEFAULT_VIEW = {
 		field: 'title',
 		direction: 'asc',
 	},
-	// All fields are visible by default, so it's
-	// better to keep track of the hidden ones.
-	hiddenFields: [ 'preview' ],
-	layout: defaultConfigPerViewType[ LAYOUT_GRID ],
+	fields: [ 'title', 'description', 'author' ],
+	layout: defaultLayouts[ LAYOUT_GRID ].layout,
 	filters: [],
 };
 
@@ -103,14 +107,13 @@ function Title( { item, viewType } ) {
 	);
 }
 
-function AuthorField( { item, viewType } ) {
+function AuthorField( { item } ) {
 	const [ isImageLoaded, setIsImageLoaded ] = useState( false );
 	const { text, icon, imageUrl } = useAddedBy( item.type, item.id );
-	const withIcon = viewType !== LAYOUT_LIST;
 
 	return (
-		<HStack alignment="left" spacing={ 1 }>
-			{ withIcon && imageUrl && (
+		<HStack alignment="left" spacing={ 0 }>
+			{ imageUrl && (
 				<div
 					className={ clsx( 'page-templates-author-field__avatar', {
 						'is-loaded': isImageLoaded,
@@ -123,7 +126,7 @@ function AuthorField( { item, viewType } ) {
 					/>
 				</div>
 			) }
-			{ withIcon && ! imageUrl && (
+			{ ! imageUrl && (
 				<div className="page-templates-author-field__icon">
 					<Icon icon={ icon } />
 				</div>
@@ -194,7 +197,7 @@ export default function PageTemplates() {
 		return {
 			...DEFAULT_VIEW,
 			type: usedType,
-			layout: defaultConfigPerViewType[ usedType ],
+			layout: defaultLayouts[ usedType ].layout,
 			filters:
 				activeView !== 'all'
 					? [
@@ -338,13 +341,6 @@ export default function PageTemplates() {
 	const onChangeView = useCallback(
 		( newView ) => {
 			if ( newView.type !== view.type ) {
-				newView = {
-					...newView,
-					layout: {
-						...defaultConfigPerViewType[ newView.type ],
-					},
-				};
-
 				history.push( {
 					...params,
 					layout: newView.type,
@@ -373,6 +369,7 @@ export default function PageTemplates() {
 				onSelectionChange={ onSelectionChange }
 				selection={ selection }
 				setSelection={ setSelection }
+				defaultLayouts={ defaultLayouts }
 			/>
 		</Page>
 	);

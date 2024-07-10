@@ -257,7 +257,7 @@ function CompactItemActions< Item >( {
 					size="compact"
 					icon={ moreVertical }
 					label={ __( 'Actions' ) }
-					__experimentalIsFocusable
+					accessibleWhenDisabled
 					disabled={ ! actions.length }
 					className="dataviews-all-actions-button"
 				/>

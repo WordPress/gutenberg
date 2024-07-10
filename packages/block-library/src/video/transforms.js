@@ -20,7 +20,7 @@ const transforms = {
 				// It's already done as part of the `componentDidMount`
 				// in the video block
 				const block = createBlock( 'core/video', {
-					src: createBlobURL( file ),
+					blob: createBlobURL( file ),
 				} );
 				return block;
 			},

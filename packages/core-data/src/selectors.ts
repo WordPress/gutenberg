@@ -232,7 +232,9 @@ export function getEntitiesByKind( state: State, kind: string ): Array< any > {
 export const getEntitiesConfig = createSelector(
 	( state: State, kind: string ): Array< any > =>
 		state.entities.config.filter( ( entity ) => entity.kind === kind ),
+	/* eslint-disable @typescript-eslint/no-unused-vars */
 	( state: State, kind: string ) => state.entities.config
+	/* eslint-enable @typescript-eslint/no-unused-vars */
 );
 /**
  * Returns the entity config given its kind and name.
@@ -992,6 +994,7 @@ export function getLastEntityDeleteError(
 		?.error;
 }
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Returns the previous edit from the current undo offset
  * for the entity records edits history, if any.
@@ -1008,7 +1011,9 @@ export function getUndoEdit( state: State ): Optional< any > {
 	} );
 	return undefined;
 }
+/* eslint-enable @typescript-eslint/no-unused-vars */
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Returns the next edit from the current undo offset
  * for the entity records edits history, if any.
@@ -1025,6 +1030,7 @@ export function getRedoEdit( state: State ): Optional< any > {
 	} );
 	return undefined;
 }
+/* eslint-enable @typescript-eslint/no-unused-vars */
 
 /**
  * Returns true if there is a previous edit from the current undo offset

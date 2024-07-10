@@ -31,8 +31,8 @@ import {
 } from '../../store/constants';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import { exportPatternAsJSONAction } from './export-pattern-action';
 import { CreateTemplatePartModalContents } from '../create-template-part-modal';
+import { getItemTitle } from '../../dataviews/actions/utils';
 
 // Patterns.
 const { PATTERN_TYPES, CreatePatternModalContents, useDuplicatePatternProps } =
@@ -70,13 +70,6 @@ function isTemplateRemovable( template ) {
 		template?.source === TEMPLATE_ORIGINS.custom &&
 		! template?.has_theme_file
 	);
-}
-
-function getItemTitle( item ) {
-	if ( typeof item.title === 'string' ) {
-		return decodeEntities( item.title );
-	}
-	return decodeEntities( item.title?.rendered || '' );
 }
 
 const trashPostAction = {
@@ -120,7 +113,7 @@ const trashPostAction = {
 						variant="tertiary"
 						onClick={ closeModal }
 						disabled={ isBusy }
-						__experimentalIsFocusable
+						accessibleWhenDisabled
 					>
 						{ __( 'Cancel' ) }
 					</Button>
@@ -152,7 +145,7 @@ const trashPostAction = {
 										__( '"%s" moved to trash.' ),
 										getItemTitle( items[ 0 ] )
 									);
-								} else if ( items[ 0 ].type === 'page' ) {
+								} else {
 									successMessage = sprintf(
 										/* translators: The number of items. */
 										_n(
@@ -160,12 +153,6 @@ const trashPostAction = {
 											'%s items moved to trash.',
 											items.length
 										),
-										items.length
-									);
-								} else {
-									successMessage = sprintf(
-										/* translators: The number of posts. */
-										__( '%s items move to trash.' ),
 										items.length
 									);
 								}
@@ -233,7 +220,7 @@ const trashPostAction = {
 						} }
 						isBusy={ isBusy }
 						disabled={ isBusy }
-						__experimentalIsFocusable
+						accessibleWhenDisabled
 					>
 						{ __( 'Trash' ) }
 					</Button>
@@ -783,6 +770,7 @@ const useDuplicatePostAction = ( postType ) => {
 									<Button
 										variant="tertiary"
 										onClick={ closeModal }
+										__next40pxDefaultSize
 									>
 										{ __( 'Cancel' ) }
 									</Button>
@@ -791,6 +779,7 @@ const useDuplicatePostAction = ( postType ) => {
 										type="submit"
 										isBusy={ isCreatingPage }
 										aria-disabled={ isCreatingPage }
+										__next40pxDefaultSize
 									>
 										{ _x( 'Duplicate', 'action label' ) }
 									</Button>
@@ -811,10 +800,8 @@ export const duplicatePatternAction = {
 	modalHeader: _x( 'Duplicate pattern', 'action label' ),
 	RenderModal: ( { items, closeModal } ) => {
 		const [ item ] = items;
-		const isThemePattern = item.type === PATTERN_TYPES.theme;
 		const duplicatedProps = useDuplicatePatternProps( {
-			pattern:
-				isThemePattern || ! item.patternPost ? item : item.patternPost,
+			pattern: item,
 			onSuccess: () => closeModal(),
 		} );
 		return (
@@ -928,7 +915,6 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 				duplicateTemplatePartAction,
 			isPattern && userCanCreatePostType && duplicatePatternAction,
 			supportsTitle && renamePostActionForPostType,
-			isPattern && exportPatternAsJSONAction,
 			! isTemplateOrTemplatePart && restorePostActionForPostType,
 			! isTemplateOrTemplatePart &&
 				! isPattern &&

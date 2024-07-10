@@ -4,7 +4,7 @@
 import { backup } from '@wordpress/icons';
 import { useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { __, _n, sprintf, _x } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useState } from '@wordpress/element';
 import {
@@ -116,7 +116,7 @@ const resetPost: Action< Post > = {
 						variant="tertiary"
 						onClick={ closeModal }
 						disabled={ isBusy }
-						__experimentalIsFocusable
+						accessibleWhenDisabled
 					>
 						{ __( 'Cancel' ) }
 					</Button>
@@ -131,7 +131,7 @@ const resetPost: Action< Post > = {
 						} }
 						isBusy={ isBusy }
 						disabled={ isBusy }
-						__experimentalIsFocusable
+						accessibleWhenDisabled
 					>
 						{ __( 'Reset' ) }
 					</Button>

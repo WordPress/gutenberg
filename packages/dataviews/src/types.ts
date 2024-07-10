@@ -221,7 +221,7 @@ interface ViewBase {
 	/**
 	 * The filters to apply.
 	 */
-	filters: Filter[];
+	filters?: Filter[];
 
 	/**
 	 * The sorting configuration.
@@ -251,13 +251,13 @@ interface ViewBase {
 	/**
 	 * The hidden fields.
 	 */
-	hiddenFields?: string[];
+	fields?: string[];
 }
 
 export interface ViewTable extends ViewBase {
 	type: 'table';
 
-	layout: {
+	layout?: {
 		/**
 		 * The field to use as the primary field.
 		 */
@@ -273,7 +273,7 @@ export interface ViewTable extends ViewBase {
 export interface ViewList extends ViewBase {
 	type: 'list';
 
-	layout: {
+	layout?: {
 		/**
 		 * The field to use as the primary field.
 		 */
@@ -289,7 +289,7 @@ export interface ViewList extends ViewBase {
 export interface ViewGrid extends ViewBase {
 	type: 'grid';
 
-	layout: {
+	layout?: {
 		/**
 		 * The field to use as the primary field.
 		 */
@@ -406,7 +406,7 @@ export interface ViewBaseProps< Item > {
 	fields: NormalizedField< Item >[];
 	getItemId: ( item: Item ) => string;
 	isLoading?: boolean;
-	onChangeView( view: View ): void;
+	onChangeView: ( view: View ) => void;
 	onSelectionChange: SetSelection;
 	selection: string[];
 	setOpenedFilter: ( fieldId: string ) => void;
@@ -429,3 +429,9 @@ export type ViewProps< Item > =
 	| ViewTableProps< Item >
 	| ViewGridProps< Item >
 	| ViewListProps< Item >;
+
+export interface SupportedLayouts {
+	list?: Omit< ViewList, 'type' >;
+	grid?: Omit< ViewGrid, 'type' >;
+	table?: Omit< ViewTable, 'type' >;
+}

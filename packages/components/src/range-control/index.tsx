@@ -327,7 +327,7 @@ function UnforwardedRangeControl(
 						<Button
 							className="components-range-control__reset"
 							// If the RangeControl itself is disabled, the reset button shouldn't be in the tab sequence.
-							__experimentalIsFocusable={ ! disabled }
+							accessibleWhenDisabled={ ! disabled }
 							disabled={ disabled || value === undefined }
 							variant="secondary"
 							size="small"

@@ -440,6 +440,16 @@ describe.each( [
 		);
 	} );
 
+	it( 'Should label the component correctly even when the label is not visible', () => {
+		render( <Component { ...props } hideLabelFromVision /> );
+
+		expect(
+			screen.getByRole( 'button', {
+				name: props.label,
+			} )
+		).toBeVisible();
+	} );
+
 	describe( 'Keyboard behavior and accessibility', () => {
 		it( 'Captures the keypress event and does not let it propagate', async () => {
 			const user = userEvent.setup();
