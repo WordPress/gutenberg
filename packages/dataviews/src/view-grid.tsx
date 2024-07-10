@@ -22,12 +22,12 @@ import { __ } from '@wordpress/i18n';
 import ItemActions from './item-actions';
 import SingleSelectionCheckbox from './single-selection-checkbox';
 import { useHasAPossibleBulkAction } from './bulk-actions';
-import type { Action, AnyItem, NormalizedField, ViewGridProps } from './types';
+import type { Action, NormalizedField, ViewGridProps } from './types';
+import type { SetSelection } from './private-types';
 
-interface GridItemProps< Item extends AnyItem > {
+interface GridItemProps< Item > {
 	selection: string[];
-	data: Item[];
-	onSelectionChange: ( items: Item[] ) => void;
+	onSelectionChange: SetSelection;
 	getItemId: ( item: Item ) => string;
 	item: Item;
 	actions: Action< Item >[];
@@ -38,9 +38,8 @@ interface GridItemProps< Item extends AnyItem > {
 	columnFields?: string[];
 }
 
-function GridItem< Item extends AnyItem >( {
+function GridItem< Item >( {
 	selection,
-	data,
 	onSelectionChange,
 	getItemId,
 	item,
@@ -68,27 +67,11 @@ function GridItem< Item extends AnyItem >( {
 					if ( ! hasBulkAction ) {
 						return;
 					}
-					if ( ! isSelected ) {
-						onSelectionChange(
-							data.filter( ( _item ) => {
-								const itemId = getItemId?.( _item );
-								return (
-									itemId === id ||
-									selection.includes( itemId )
-								);
-							} )
-						);
-					} else {
-						onSelectionChange(
-							data.filter( ( _item ) => {
-								const itemId = getItemId?.( _item );
-								return (
-									itemId !== id &&
-									selection.includes( itemId )
-								);
-							} )
-						);
-					}
+					onSelectionChange(
+						selection.includes( id )
+							? selection.filter( ( itemId ) => id !== itemId )
+							: [ ...selection, id ]
+					);
 				}
 			} }
 		>
@@ -104,7 +87,6 @@ function GridItem< Item extends AnyItem >( {
 					selection={ selection }
 					onSelectionChange={ onSelectionChange }
 					getItemId={ getItemId }
-					data={ data }
 					primaryField={ primaryField }
 					disabled={ ! hasBulkAction }
 				/>
@@ -187,7 +169,7 @@ function GridItem< Item extends AnyItem >( {
 	);
 }
 
-export default function ViewGrid< Item extends AnyItem >( {
+export default function ViewGrid< Item >( {
 	actions,
 	data,
 	fields,
@@ -198,24 +180,26 @@ export default function ViewGrid< Item extends AnyItem >( {
 	view,
 }: ViewGridProps< Item > ) {
 	const mediaField = fields.find(
-		( field ) => field.id === view.layout.mediaField
+		( field ) => field.id === view.layout?.mediaField
 	);
 	const primaryField = fields.find(
-		( field ) => field.id === view.layout.primaryField
+		( field ) => field.id === view.layout?.primaryField
 	);
+	const viewFields = view.fields || fields.map( ( field ) => field.id );
 	const { visibleFields, badgeFields } = fields.reduce(
 		( accumulator: Record< string, NormalizedField< Item >[] >, field ) => {
 			if (
-				view.hiddenFields.includes( field.id ) ||
-				[ view.layout.mediaField, view.layout.primaryField ].includes(
-					field.id
-				)
+				! viewFields.includes( field.id ) ||
+				[
+					view.layout?.mediaField,
+					view?.layout?.primaryField,
+				].includes( field.id )
 			) {
 				return accumulator;
 			}
 			// If the field is a badge field, add it to the badgeFields array
 			// otherwise add it to the rest visibleFields array.
-			const key = view.layout.badgeFields?.includes( field.id )
+			const key = view.layout?.badgeFields?.includes( field.id )
 				? 'badgeFields'
 				: 'visibleFields';
 			accumulator[ key ].push( field );
@@ -239,7 +223,6 @@ export default function ViewGrid< Item extends AnyItem >( {
 							<GridItem
 								key={ getItemId( item ) }
 								selection={ selection }
-								data={ data }
 								onSelectionChange={ onSelectionChange }
 								getItemId={ getItemId }
 								item={ item }
@@ -248,7 +231,7 @@ export default function ViewGrid< Item extends AnyItem >( {
 								primaryField={ primaryField }
 								visibleFields={ visibleFields }
 								badgeFields={ badgeFields }
-								columnFields={ view.layout.columnFields }
+								columnFields={ view.layout?.columnFields }
 							/>
 						);
 					} ) }

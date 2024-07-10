@@ -16,8 +16,6 @@ import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
 import { STORE_NAME } from './name';
 import { updateFootnotesFromMeta } from './footnotes';
 
-/** @typedef {import('@wordpress/blocks').WPBlock} WPBlock */
-
 const EMPTY_ARRAY = [];
 
 const EntityContext = createContext( {} );
@@ -133,7 +131,7 @@ const parsedBlocksCache = new WeakMap();
  * @param {Object} options
  * @param {string} [options.id] An entity ID to use instead of the context-provided one.
  *
- * @return {[WPBlock[], Function, Function]} The block array and setters.
+ * @return {[unknown[], Function, Function]} The block array and setters.
  */
 export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 	const providerId = useEntityId( kind, name );

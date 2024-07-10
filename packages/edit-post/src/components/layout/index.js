@@ -138,7 +138,9 @@ function useEditorStyles() {
 			return [
 				...baseStyles,
 				{
-					css: 'body{padding-bottom: 40vh}',
+					// Should override global styles padding, so ensure 0-1-0
+					// specificity.
+					css: ':root :where(body){padding-bottom: 40vh}',
 				},
 			];
 		}

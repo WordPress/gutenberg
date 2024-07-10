@@ -33,11 +33,11 @@ import { useRegistry } from '@wordpress/data';
  * Internal dependencies
  */
 import { unlock } from './lock-unlock';
-import type { Action, AnyItem, NormalizedField, ViewListProps } from './types';
+import type { Action, NormalizedField, ViewListProps } from './types';
 
 import { ActionsDropdownMenuGroup, ActionModal } from './item-actions';
 
-interface ListViewItemProps< Item extends AnyItem > {
+interface ListViewItemProps< Item > {
 	actions: Action< Item >[];
 	id?: string;
 	isSelected: boolean;
@@ -57,7 +57,7 @@ const {
 	DropdownMenuV2: DropdownMenu,
 } = unlock( componentsPrivateApis );
 
-function ListItem< Item extends AnyItem >( {
+function ListItem< Item >( {
 	actions,
 	id,
 	isSelected,
@@ -258,7 +258,7 @@ function ListItem< Item extends AnyItem >( {
 												size="compact"
 												icon={ moreVertical }
 												label={ __( 'Actions' ) }
-												__experimentalIsFocusable
+												accessibleWhenDisabled
 												disabled={ ! actions.length }
 												onKeyDown={ ( event: {
 													key: string;
@@ -303,9 +303,7 @@ function ListItem< Item extends AnyItem >( {
 	);
 }
 
-export default function ViewList< Item extends AnyItem >(
-	props: ViewListProps< Item >
-) {
+export default function ViewList< Item >( props: ViewListProps< Item > ) {
 	const {
 		actions,
 		data,
@@ -322,23 +320,22 @@ export default function ViewList< Item extends AnyItem >(
 	);
 
 	const mediaField = fields.find(
-		( field ) => field.id === view.layout.mediaField
+		( field ) => field.id === view.layout?.mediaField
 	);
 	const primaryField = fields.find(
-		( field ) => field.id === view.layout.primaryField
+		( field ) => field.id === view.layout?.primaryField
 	);
+	const viewFields = view.fields || fields.map( ( field ) => field.id );
 	const visibleFields = fields.filter(
 		( field ) =>
-			! view.hiddenFields.includes( field.id ) &&
-			! [ view.layout.primaryField, view.layout.mediaField ].includes(
+			viewFields.includes( field.id ) &&
+			! [ view.layout?.primaryField, view.layout?.mediaField ].includes(
 				field.id
 			)
 	);
 
-	const onSelect = useCallback(
-		( item: Item ) => onSelectionChange( [ item ] ),
-		[ onSelectionChange ]
-	);
+	const onSelect = ( item: Item ) =>
+		onSelectionChange( [ getItemId( item ) ] );
 
 	const getItemDomId = useCallback(
 		( item?: Item ) =>

@@ -18,7 +18,7 @@ import { __ } from '@wordpress/i18n';
  */
 import BorderRadiusControl from '../border-radius-control';
 import { useColorsPerOrigin } from './hooks';
-import { getValueFromVariable, TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
+import { getValueFromVariable, useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
 import { useBorderPanelLabel } from '../../hooks/border';
 import { ShadowPopover, useShadowPresets } from './shadow-panel-components';
@@ -69,6 +69,7 @@ function BorderToolsPanel( {
 	children,
 	label,
 } ) {
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const resetAll = () => {
 		const updatedValue = resetAllFilter( value );
 		onChange( updatedValue );
@@ -79,7 +80,7 @@ function BorderToolsPanel( {
 			label={ label }
 			resetAll={ resetAll }
 			panelId={ panelId }
-			dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
+			dropdownMenuProps={ dropdownMenuProps }
 		>
 			{ children }
 		</ToolsPanel>

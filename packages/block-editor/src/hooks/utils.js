@@ -140,6 +140,7 @@ export function useStyleOverride( {
 	css,
 	assets,
 	__unstableType,
+	variation,
 	clientId,
 } = {} ) {
 	const { setStyleOverride, deleteStyleOverride } = unlock(
@@ -159,6 +160,7 @@ export function useStyleOverride( {
 			css,
 			assets,
 			__unstableType,
+			variation,
 			clientId,
 		};
 		// Batch updates to style overrides to avoid triggering cascading renders

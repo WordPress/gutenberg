@@ -36,6 +36,7 @@ export default function RenameModal( { menuTitle, onClose, onSave } ) {
 						value={ editedMenuTitle }
 						placeholder={ __( 'Navigation title' ) }
 						onChange={ setEditedMenuTitle }
+						label={ __( 'Name' ) }
 					/>
 					<HStack justify="right">
 						<Button
@@ -48,7 +49,7 @@ export default function RenameModal( { menuTitle, onClose, onSave } ) {
 
 						<Button
 							__next40pxDefaultSize
-							__experimentalIsFocusable
+							accessibleWhenDisabled
 							disabled={ ! isEditedMenuTitleValid }
 							variant="primary"
 							type="submit"

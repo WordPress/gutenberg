@@ -32,13 +32,9 @@ export function GridItemMovers( {
 	const columnCount = parentLayout?.columnCount;
 	const rowCount = parentLayout?.rowCount;
 
-	const columnCountNumber = parseInt( columnCount, 10 );
-	const rowStartNumber = parseInt( rowStart, 10 );
-	const columnStartNumber = parseInt( columnStart, 10 );
-
 	const getNumberOfBlocksBeforeCell = useGetNumberOfBlocksBeforeCell(
 		gridClientId,
-		columnCountNumber
+		columnCount
 	);
 
 	return (
@@ -46,7 +42,7 @@ export function GridItemMovers( {
 			<ToolbarButton
 				icon={ arrowUp }
 				label={ __( 'Move block up' ) }
-				isDisabled={ rowStart <= 1 }
+				disabled={ rowStart <= 1 }
 				onClick={ () => {
 					onChange( {
 						rowStart: rowStart - 1,
@@ -56,17 +52,14 @@ export function GridItemMovers( {
 						[ blockClientId ],
 						gridClientId,
 						gridClientId,
-						getNumberOfBlocksBeforeCell(
-							columnStartNumber,
-							rowStartNumber - 1
-						)
+						getNumberOfBlocksBeforeCell( columnStart, rowStart - 1 )
 					);
 				} }
 			/>
 			<ToolbarButton
 				icon={ arrowDown }
 				label={ __( 'Move block down' ) }
-				isDisabled={ rowCount && rowEnd >= rowCount }
+				disabled={ rowCount && rowEnd >= rowCount }
 				onClick={ () => {
 					onChange( {
 						rowStart: rowStart + 1,
@@ -76,50 +69,41 @@ export function GridItemMovers( {
 						[ blockClientId ],
 						gridClientId,
 						gridClientId,
-						getNumberOfBlocksBeforeCell(
-							columnStartNumber,
-							rowStartNumber + 1
-						)
+						getNumberOfBlocksBeforeCell( columnStart, rowStart + 1 )
 					);
 				} }
 			/>
 			<ToolbarButton
 				icon={ arrowLeft }
 				label={ __( 'Move block left' ) }
-				isDisabled={ columnStart <= 1 }
+				disabled={ columnStart <= 1 }
 				onClick={ () => {
 					onChange( {
-						columnStart: columnStartNumber - 1,
+						columnStart: columnStart - 1,
 					} );
 					__unstableMarkNextChangeAsNotPersistent();
 					moveBlocksToPosition(
 						[ blockClientId ],
 						gridClientId,
 						gridClientId,
-						getNumberOfBlocksBeforeCell(
-							columnStartNumber - 1,
-							rowStartNumber
-						)
+						getNumberOfBlocksBeforeCell( columnStart - 1, rowStart )
 					);
 				} }
 			/>
 			<ToolbarButton
 				icon={ arrowRight }
 				label={ __( 'Move block right' ) }
-				isDisabled={ columnCount && columnEnd >= columnCount }
+				disabled={ columnCount && columnEnd >= columnCount }
 				onClick={ () => {
 					onChange( {
-						columnStart: columnStartNumber + 1,
+						columnStart: columnStart + 1,
 					} );
 					__unstableMarkNextChangeAsNotPersistent();
 					moveBlocksToPosition(
 						[ blockClientId ],
 						gridClientId,
 						gridClientId,
-						getNumberOfBlocksBeforeCell(
-							columnStartNumber + 1,
-							rowStartNumber
-						)
+						getNumberOfBlocksBeforeCell( columnStart + 1, rowStart )
 					);
 				} }
 			/>

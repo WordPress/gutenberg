@@ -76,6 +76,9 @@ require __DIR__ . '/experimental/editor-settings.php';
 require __DIR__ . '/compat/plugin/edit-site-routes-backwards-compat.php';
 require __DIR__ . '/compat/plugin/footnotes.php';
 
+// The Token Map was created during 6.6 in order to support the HTML API. It must be loaded before it.
+require __DIR__ . '/compat/wordpress-6.6/class-gutenberg-token-map-6-6.php';
+
 /*
  * There are upstream updates to the Tag Processor that may not appear if Gutenberg is running
  * a version of WordPress newer than 6.3 and older than the latest `trunk`. This file should
@@ -89,6 +92,14 @@ require __DIR__ . '/compat/wordpress-6.5/html-api/class-gutenberg-html-open-elem
 require __DIR__ . '/compat/wordpress-6.5/html-api/class-gutenberg-html-processor-state-6-5.php';
 require __DIR__ . '/compat/wordpress-6.5/html-api/class-gutenberg-html-tag-processor-6-5.php';
 require __DIR__ . '/compat/wordpress-6.5/html-api/class-gutenberg-html-processor-6-5.php';
+
+require __DIR__ . '/compat/wordpress-6.6/html-api/gutenberg-html5-named-character-references-6-6.php';
+require __DIR__ . '/compat/wordpress-6.6/html-api/class-gutenberg-html-decoder-6-6.php';
+require __DIR__ . '/compat/wordpress-6.6/html-api/class-gutenberg-html-tag-processor-6-6.php';
+require __DIR__ . '/compat/wordpress-6.6/html-api/class-gutenberg-html-open-elements-6-6.php';
+require __DIR__ . '/compat/wordpress-6.6/html-api/class-gutenberg-html-stack-event-6-6.php';
+require __DIR__ . '/compat/wordpress-6.6/html-api/class-gutenberg-html-processor-state-6-6.php';
+require __DIR__ . '/compat/wordpress-6.6/html-api/class-gutenberg-html-processor-6-6.php';
 
 /*
  * The HTML Processor appeared after WordPress 6.3. If Gutenberg is running on a version of
@@ -140,6 +151,9 @@ require __DIR__ . '/compat/wordpress-6.6/block-bindings/pattern-overrides.php';
 require __DIR__ . '/compat/wordpress-6.6/block-template-utils.php';
 require __DIR__ . '/compat/wordpress-6.6/option.php';
 require __DIR__ . '/compat/wordpress-6.6/post.php';
+
+// WordPress 6.7 compat.
+require __DIR__ . '/compat/wordpress-6.7/blocks.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
