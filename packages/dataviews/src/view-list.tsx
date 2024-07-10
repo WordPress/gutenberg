@@ -67,7 +67,7 @@ function ListItem< Item >( {
 	visibleFields,
 }: ListViewItemProps< Item > ) {
 	const registry = useRegistry();
-	const itemRef = useRef< HTMLElement >( null );
+	const itemRef = useRef< HTMLDivElement >( null );
 	const labelId = `${ id }-label`;
 	const descriptionId = `${ id }-description`;
 
