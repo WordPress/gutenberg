@@ -71,7 +71,7 @@ Optional classname for the component.
 
 #### `hideLabelFromVision`: `boolean`
 
-Hide the label visually, while keeping available to assistive technology
+Hide the label visually, while keeping available to assistive technology.
 
 -   Required: No
 
@@ -103,7 +103,7 @@ The list of options that can be chosen from.
 
 The size of the control.
 
--   Default: `false`
+-   Default: `'default'`
 -   Required: No
 
 #### `value`: `Option`
