@@ -15,6 +15,7 @@ import { removep } from '@wordpress/autop';
  * Internal dependencies
  */
 import {
+	getActiveBlockVariation,
 	getBlockType,
 	getFreeformContentHandlerName,
 	getUnregisteredTypeHandlerName,
@@ -48,6 +49,26 @@ export function getBlockDefaultClassName( blockName ) {
 		className,
 		blockName
 	);
+}
+
+/**
+ * Returns a block variation specific classname.
+ *
+ * If the given block matches a variation, the classname will be the block's default classname
+ * with the variation name appended (separated by a hyphen).
+ *
+ * @param {string} blockName  The block name.
+ * @param {Object} attributes Block attributes.
+ *
+ * @return {string|null} The block variation classname, or null if the block doesn't match any variation.
+ */
+export function getBlockVariationClassName( blockName, attributes ) {
+	const activeVariation = getActiveBlockVariation( blockName, attributes );
+	if ( ! activeVariation ) {
+		return null;
+	}
+
+	return getBlockDefaultClassName( blockName ) + '-' + activeVariation.name;
 }
 
 /**

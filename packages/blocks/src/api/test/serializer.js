@@ -14,6 +14,7 @@ import serialize, {
 	serializeBlock,
 	getBlockInnerHTML,
 	getBlockDefaultClassName,
+	getBlockVariationClassName,
 } from '../serializer';
 import {
 	getBlockTypes,
@@ -485,6 +486,62 @@ describe( 'block serializer', () => {
 			expect( getBlockDefaultClassName( 'plugin/test-block' ) ).toBe(
 				'wp-block-plugin-test-block'
 			);
+		} );
+	} );
+
+	describe( 'getBlockVariationClassName', () => {
+		const blockSettings = {
+			title: 'Fruit',
+			attributes: {
+				fruit: {
+					type: 'string',
+					default: 'apple',
+				},
+			}
+		};
+		const variations = [
+			{
+				name: 'apple',
+				attributes: {
+					fruit: 'apple',
+				},
+				isActive: [ 'fruit' ],
+				isDefault: true,
+			},
+			{
+				name: 'banana',
+				attributes: {
+					fruit: 'banana',
+				},
+				isActive: [ 'fruit' ],
+			},
+		];
+
+		it( 'should return null if the block does not have any variations', () => {
+			registerBlockType( 'core/fruit', blockSettings );
+			expect(
+				getBlockVariationClassName( 'core/fruit', {
+					fruit: 'orange',
+				} )
+			).toBeNull();
+		} );
+
+		it( 'should return null if the given attributes do not match any variation', () => {
+			registerBlockType( 'core/fruit', { ...blockSettings, variations } );
+			expect(
+				getBlockVariationClassName( 'core/fruit', {
+					fruit: 'orange',
+				} )
+			).toBeNull();
+		} );
+
+		it( 'should return the correct variation class name for a block', () => {
+			registerBlockType( 'core/fruit', { ...blockSettings, variations } );
+			expect(
+				getBlockVariationClassName( 'core/fruit', {
+					fruit: 'banana',
+				} )
+			).toBe( 'wp-block-fruit-banana' );
 		} );
 	} );
 } );
