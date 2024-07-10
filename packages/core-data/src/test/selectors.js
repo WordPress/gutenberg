@@ -698,8 +698,8 @@ describe( 'canUser', () => {
 		const state = deepFreeze( {
 			userPermissions: {},
 		} );
-		expect( canUser( state, 'create', { name: 'media' } ) ).toBe( null );
-		expect( canUser( state, 'create', { kind: 'root' } ) ).toBe( null );
+		expect( canUser( state, 'create', { name: 'media' } ) ).toBe( false );
+		expect( canUser( state, 'create', { kind: 'root' } ) ).toBe( false );
 	} );
 
 	it( 'returns whether an action can be performed', () => {

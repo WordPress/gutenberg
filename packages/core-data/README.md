@@ -344,7 +344,7 @@ _Parameters_
 
 _Returns_
 
--   `boolean | undefined | null`: Whether or not the user can perform the action, or `undefined` if the OPTIONS request is still being made.
+-   `boolean | undefined`: Whether or not the user can perform the action, or `undefined` if the OPTIONS request is still being made.
 
 ### canUserEditEntityRecord
 
@@ -363,7 +363,7 @@ _Parameters_
 
 _Returns_
 
--   `boolean | undefined | null`: Whether or not the user can edit, or `undefined` if the OPTIONS request is still being made.
+-   `boolean | undefined`: Whether or not the user can edit, or `undefined` if the OPTIONS request is still being made.
 
 ### getAuthors
 
