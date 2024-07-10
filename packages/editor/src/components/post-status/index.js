@@ -171,7 +171,7 @@ export default function PostStatus() {
 					contentClassName="editor-change-status__content"
 					popoverProps={ popoverProps }
 					focusOnMount
-					renderToggle={ ( { onToggle } ) => (
+					renderToggle={ ( { onToggle, isOpen } ) => (
 						<Button
 							variant="tertiary"
 							size="compact"
@@ -182,6 +182,7 @@ export default function PostStatus() {
 								__( 'Change status: %s' ),
 								postStatusesInfo[ status ]?.label
 							) }
+							aria-expanded={ isOpen }
 						>
 							{ postStatusesInfo[ status ]?.label }
 						</Button>
