@@ -469,7 +469,7 @@
 			}
 		}
 
-		&.is-selected {
+		&.is-selected.is-selected {
 			border-top: 1px solid rgba(var(--wp-admin-theme-color--rgb), 0.12);
 
 			& + li {
