@@ -13,28 +13,25 @@ import type { LegacyCustomSelectProps } from '../types';
 import * as Styled from '../styles';
 
 function useDeprecatedProps( {
-	options,
-	// Deprecated
 	__experimentalShowSelectedHint,
 	...otherProps
 }: LegacyCustomSelectProps ) {
 	return {
 		showSelectedHint: __experimentalShowSelectedHint,
 		...otherProps,
-		options: options.map( ( o ) => {
-			const toReturn = o;
+	};
+}
 
-			const hint =
-				typeof o.__experimentalHint !== 'undefined'
-					? o.__experimentalHint
-					: o.hint;
-
-			if ( hint ) {
-				toReturn.hint = hint;
-			}
-
-			return toReturn;
-		} ),
+// The removal of `__experimentalHint` in favour of `hint` doesn't happen in
+// the `useDeprecatedProps` hook in order not to break consumers that rely
+// on object identity (see https://github.com/WordPress/gutenberg/pull/63248/files/175907e16310fcd3ef13fcb2964e138a69134760#r1668842238)
+function applyOptionDeprecations( {
+	__experimentalHint,
+	...rest
+}: LegacyCustomSelectProps[ 'options' ][ number ] ) {
+	return {
+		hint: __experimentalHint,
+		...rest,
 	};
 }
 
@@ -86,44 +83,46 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 		defaultValue: options[ 0 ]?.name,
 	} );
 
-	const children = options.map( ( { name, key, hint, style, className } ) => {
-		const withHint = (
-			<Styled.WithHintItemWrapper>
-				<span>{ name }</span>
-				<Styled.WithHintItemHint
-				// TODO: Legacy classname. Add V1 styles are removed from the codebase
-				// className="components-custom-select-control__item-hint"
-				>
-					{ hint }
-				</Styled.WithHintItemHint>
-			</Styled.WithHintItemWrapper>
-		);
+	const children = options
+		.map( applyOptionDeprecations )
+		.map( ( { name, key, hint, style, className } ) => {
+			const withHint = (
+				<Styled.WithHintItemWrapper>
+					<span>{ name }</span>
+					<Styled.WithHintItemHint
+					// TODO: Legacy classname. Add V1 styles are removed from the codebase
+					// className="components-custom-select-control__item-hint"
+					>
+						{ hint }
+					</Styled.WithHintItemHint>
+				</Styled.WithHintItemWrapper>
+			);
 
-		return (
-			<CustomSelectItem
-				key={ key }
-				value={ name }
-				children={ hint ? withHint : name }
-				style={ style }
-				className={ clsx(
-					// TODO: Legacy classname. Add V1 styles are removed from the codebase
-					// 'components-custom-select-control__item',
-					className
-					// TODO: Legacy classname. Add V1 styles are removed from the codebase
-					// {
-					// 	'has-hint': hint,
-					// }
-				) }
-			/>
-		);
-	} );
+			return (
+				<CustomSelectItem
+					key={ key }
+					value={ name }
+					children={ hint ? withHint : name }
+					style={ style }
+					className={ clsx(
+						// TODO: Legacy classname. Add V1 styles are removed from the codebase
+						// 'components-custom-select-control__item',
+						className
+						// TODO: Legacy classname. Add V1 styles are removed from the codebase
+						// {
+						// 	'has-hint': hint,
+						// }
+					) }
+				/>
+			);
+		} );
 
 	const renderSelectedValueHint = () => {
 		const { value: currentValue } = store.getState();
 
-		const selectedOptionHint = options?.find(
-			( { name } ) => currentValue === name
-		)?.hint;
+		const selectedOptionHint = options
+			?.map( applyOptionDeprecations )
+			?.find( ( { name } ) => currentValue === name )?.hint;
 
 		return (
 			<Styled.SelectedExperimentalHintWrapper>
