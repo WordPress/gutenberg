@@ -33,7 +33,7 @@
 		border: 1px solid $gray-600;
 		border-right: 0;
 		justify-content: center;
-		border-radius: $radius-block-ui 0 0 $radius-block-ui;
+		border-radius: $radius-primitive 0 0 $radius-primitive;
 
 		& + [cmdk-input] {
 			border-top-left-radius: 0;
@@ -68,7 +68,7 @@
 	}
 
 	[cmdk-item] {
-		border-radius: $radius-block-ui;
+		border-radius: $radius-primitive;
 		cursor: pointer;
 		display: flex;
 		align-items: center;

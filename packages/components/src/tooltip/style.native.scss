@@ -8,7 +8,7 @@ $tooltipArrowOffset: -($tooltipArrowSize - 1);
 
 .tooltip__box {
 	background-color: $tooltipColor;
-	border-radius: 4px;
+	border-radius: $radius-primitive;
 }
 
 .tooltip__shadow {

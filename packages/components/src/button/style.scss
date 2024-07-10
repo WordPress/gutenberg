@@ -15,7 +15,7 @@
 	align-items: center;
 	box-sizing: border-box;
 	padding: 6px 12px;
-	border-radius: $radius-block-ui;
+	border-radius: $radius-primitive;
 	color: $components-color-foreground;
 
 	&.is-next-40px-default-size {
@@ -235,7 +235,7 @@
 		height: auto;
 
 		&:focus {
-			border-radius: $radius-block-ui;
+			border-radius: $radius-primitive;
 		}
 	}
 

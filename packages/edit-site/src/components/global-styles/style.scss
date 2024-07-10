@@ -19,7 +19,7 @@
 	min-height: 100px;
 	margin-bottom: $grid-unit-20;
 	background: $gray-100;
-	border-radius: $radius-block-ui;
+	border-radius: $radius-primitive;
 	overflow: hidden;
 }
 
@@ -34,7 +34,7 @@
 	display: flex !important;
 	align-items: center;
 	justify-content: center;
-	border-radius: $radius-block-ui;
+	border-radius: $radius-primitive;
 }
 
 .edit-site-global-styles-screen-typography__font-variants-count {
@@ -104,13 +104,13 @@
 	width: 100%;
 	overflow: auto;
 	border: $gray-200 $border-width solid;
-	border-radius: $radius-block-ui;
+	border-radius: $radius-primitive;
 }
 
 .edit-site-global-styles__shadow-preview-panel {
 	height: 150px;
 	border: $gray-200 $border-width solid;
-	border-radius: $radius-block-ui;
+	border-radius: $radius-primitive;
 	overflow: auto;
 	background-image: repeating-linear-gradient(45deg, #f5f5f5 25%, #0000 0, #0000 75%, #f5f5f5 0, #f5f5f5), repeating-linear-gradient(45deg, #f5f5f5 25%, #0000 0, #0000 75%, #f5f5f5 0, #f5f5f5);
 	background-position: 0 0, 8px 8px;
@@ -118,7 +118,7 @@
 
 	.edit-site-global-styles__shadow-preview-block {
 		border: $gray-200 $border-width solid;
-		border-radius: $radius-block-ui;
+		border-radius: $radius-primitive;
 		background-color: $white;
 		width: 60%;
 		height: 60px;
