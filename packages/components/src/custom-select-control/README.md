@@ -106,6 +106,12 @@ The size of the control.
 -   Default: `'default'`
 -   Required: No
 
+#### `showSelectedHint`: `boolean`
+
+Show the hint of the selected item in the trigger button.
+
+-   Required: No
+
 #### `value`: `Option`
 
 Can be used to externally control the value of the control, like in the `MyControlledCustomSelectControl` example above.
