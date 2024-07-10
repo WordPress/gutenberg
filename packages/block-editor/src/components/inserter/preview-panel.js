@@ -57,6 +57,7 @@ function InserterPreviewPanel( { item } ) {
 											min-height:${ Math.round( minHeight ) }px;
 											display:flex;align-items:center;justify-content:center; 
 										}
+										.is-root-container { width: 100%; }
 									`,
 								},
 							] }
