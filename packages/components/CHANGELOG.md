@@ -4,7 +4,8 @@
 
 ### Internal
 
--   `CustomSelectControlV2`: animate select popover appearance. ([#63343](https://github.com/WordPress/gutenberg/pull/63343))
+-   `CustomSelectControl`: switch to ariakit-based implementation ([#63258](https://github.com/WordPress/gutenberg/pull/63258)).
+-   `CustomSelectControl`: animate select popover appearance. ([#63343](https://github.com/WordPress/gutenberg/pull/63343))
 
 ### Enhancements
 
@@ -58,7 +59,6 @@
 -   `TimeInput`: Add `label` prop ([#63106](https://github.com/WordPress/gutenberg/pull/63106)).
 -   Method style type signatures have been changed to function style ([#62718](https://github.com/WordPress/gutenberg/pull/62718)).
 -   `FontSizePicker`: use CustomSelectControl V2 legacy adapter ([#63134](https://github.com/WordPress/gutenberg/pull/63134)).
--   `CustomSelectControl`: switch to ariakit-based implementation ([#63258](https://github.com/WordPress/gutenberg/pull/63258)).
 
 ## 28.2.0 (2024-06-26)
 
