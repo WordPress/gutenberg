@@ -17,12 +17,13 @@
  * WordPress dependencies
  */
 import { forwardRef } from '@wordpress/element';
+import { useInstanceId } from '@wordpress/compose';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
 import * as Current from '../current';
-import { useInstanceId } from '@wordpress/compose';
 
 type Orientation = 'horizontal' | 'vertical';
 
@@ -123,6 +124,12 @@ function proxyComposite< C extends Component >(
 	propMap: Record< string, string > = {}
 ): CompositeComponent< C > {
 	const displayName = ProxiedComponent.displayName;
+
+	deprecated( `__unstable${ displayName }`, {
+		since: '6.7',
+		alternative: `stable ${ displayName } component`,
+	} );
+
 	const Component = ( legacyProps: CompositeStateProps ) => {
 		const { store, ...rest } =
 			mapLegacyStatePropsToComponentProps( legacyProps );
@@ -160,15 +167,40 @@ const unproxiedCompositeGroup = forwardRef<
 } );
 unproxiedCompositeGroup.displayName = 'CompositeGroup';
 
+/**
+ * _Note: please use the stable `Composite` component instead._
+ *
+ * @deprecated
+ */
 export const Composite = proxyComposite( Current.Composite, { baseId: 'id' } );
+/**
+ * _Note: please use the stable `CompositeGroup` component instead._
+ *
+ * @deprecated
+ */
 export const CompositeGroup = proxyComposite( unproxiedCompositeGroup );
+/**
+ * _Note: please use the stable `CompositeItem` component instead._
+ *
+ * @deprecated
+ */
 export const CompositeItem = proxyComposite( Current.CompositeItem, {
 	focusable: 'accessibleWhenDisabled',
 } );
 
+/**
+ * _Note: please use the stable `useCompositeStore` hook instead._
+ *
+ * @deprecated
+ */
 export function useCompositeState(
 	legacyStateOptions: LegacyStateOptions = {}
 ): CompositeState {
+	deprecated( `__unstableUseCompositeState`, {
+		since: '6.7',
+		alternative: `useCompositeStore hook`,
+	} );
+
 	const {
 		baseId,
 		currentId: defaultActiveId,
