@@ -14,6 +14,10 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	Button,
+	Composite,
+	CompositeItem,
+	CompositeRow,
+	useCompositeStore,
 	privateApis as componentsPrivateApis,
 	Spinner,
 	VisuallyHidden,
@@ -49,13 +53,7 @@ interface ListViewItemProps< Item > {
 	visibleFields: NormalizedField< Item >[];
 }
 
-const {
-	useCompositeStoreV2: useCompositeStore,
-	CompositeV2: Composite,
-	CompositeItemV2: CompositeItem,
-	CompositeRowV2: CompositeRow,
-	DropdownMenuV2: DropdownMenu,
-} = unlock( componentsPrivateApis );
+const { DropdownMenuV2: DropdownMenu } = unlock( componentsPrivateApis );
 
 function ListItem< Item >( {
 	actions,

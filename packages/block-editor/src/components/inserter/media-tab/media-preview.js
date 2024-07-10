@@ -16,7 +16,7 @@ import {
 	Flex,
 	FlexItem,
 	Button,
-	privateApis as componentsPrivateApis,
+	CompositeItem,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
@@ -33,7 +33,6 @@ import { isBlobURL } from '@wordpress/blob';
 import InserterDraggableBlocks from '../../inserter-draggable-blocks';
 import { getBlockAndPreviewFromMedia } from './utils';
 import { store as blockEditorStore } from '../../../store';
-import { unlock } from '../../../lock-unlock';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 const MAXIMUM_TITLE_LENGTH = 25;
@@ -42,8 +41,6 @@ const MEDIA_OPTIONS_POPOVER_PROPS = {
 	className:
 		'block-editor-inserter__media-list__item-preview-options__popover',
 };
-
-const { CompositeItemV2: CompositeItem } = unlock( componentsPrivateApis );
 
 function MediaPreviewOptions( { category, media } ) {
 	if ( ! category.getReportUrl ) {

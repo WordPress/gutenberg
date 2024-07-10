@@ -9,7 +9,9 @@ import {
 	FlexItem,
 	SearchControl,
 	TextHighlight,
-	privateApis as componentsPrivateApis,
+	Composite,
+	CompositeItem,
+	useCompositeStore,
 	__experimentalText as Text,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
@@ -20,14 +22,7 @@ import { useDebouncedInput } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { unlock } from '../../lock-unlock';
 import { mapToIHasNameAndId } from './utils';
-
-const {
-	CompositeV2: Composite,
-	CompositeItemV2: CompositeItem,
-	useCompositeStoreV2: useCompositeStore,
-} = unlock( componentsPrivateApis );
 
 const EMPTY_ARRAY = [];
 

@@ -1,19 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../../lock-unlock';
+import { Composite, useCompositeStore } from '@wordpress/components';
 
 export { default as InserterListboxGroup } from './group';
 export { default as InserterListboxRow } from './row';
 export { default as InserterListboxItem } from './item';
-
-const { CompositeV2: Composite, useCompositeStoreV2: useCompositeStore } =
-	unlock( componentsPrivateApis );
 
 function InserterListbox( { children } ) {
 	const store = useCompositeStore( {

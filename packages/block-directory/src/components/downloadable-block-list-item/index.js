@@ -6,7 +6,7 @@ import {
 	Button,
 	Spinner,
 	VisuallyHidden,
-	privateApis as componentsPrivateApis,
+	CompositeItem,
 } from '@wordpress/components';
 import { createInterpolateElement } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -20,9 +20,6 @@ import BlockRatings from '../block-ratings';
 import DownloadableBlockIcon from '../downloadable-block-icon';
 import DownloadableBlockNotice from '../downloadable-block-notice';
 import { store as blockDirectoryStore } from '../../store';
-import { unlock } from '../../lock-unlock';
-
-const { CompositeItemV2: CompositeItem } = unlock( componentsPrivateApis );
 
 // Return the appropriate block item label, given the block data and status.
 function getDownloadableBlockLabel(

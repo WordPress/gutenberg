@@ -11,7 +11,9 @@ import {
 	MenuItem,
 	Popover,
 	VisuallyHidden,
-	privateApis as componentsPrivateApis,
+	Composite,
+	CompositeItem,
+	useCompositeStore,
 } from '@wordpress/components';
 
 /**
@@ -19,13 +21,6 @@ import {
  */
 import BlockPreview from '../block-preview';
 import useTransformedPatterns from './use-transformed-patterns';
-import { unlock } from '../../lock-unlock';
-
-const {
-	CompositeV2: Composite,
-	CompositeItemV2: CompositeItem,
-	useCompositeStoreV2: useCompositeStore,
-} = unlock( componentsPrivateApis );
 
 function PatternTransformationsMenu( {
 	blocks,

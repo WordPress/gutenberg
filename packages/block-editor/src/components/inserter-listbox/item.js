@@ -1,18 +1,8 @@
 /**
  * WordPress dependencies
  */
-import {
-	Button,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
+import { Button, CompositeItem } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../../lock-unlock';
-
-const { CompositeItemV2: CompositeItem } = unlock( componentsPrivateApis );
 
 function InserterListboxItem(
 	{ isFirst, as: Component, children, ...props },

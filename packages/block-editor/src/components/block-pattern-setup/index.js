@@ -5,7 +5,9 @@ import { useDispatch } from '@wordpress/data';
 import { cloneBlock } from '@wordpress/blocks';
 import {
 	VisuallyHidden,
-	privateApis as componentsPrivateApis,
+	Composite,
+	CompositeItem,
+	useCompositeStore,
 } from '@wordpress/components';
 
 import { useState } from '@wordpress/element';
@@ -20,13 +22,6 @@ import BlockPreview from '../block-preview';
 import SetupToolbar from './setup-toolbar';
 import usePatternsSetup from './use-patterns-setup';
 import { VIEWMODES } from './constants';
-import { unlock } from '../../lock-unlock';
-
-const {
-	CompositeV2: Composite,
-	CompositeItemV2: CompositeItem,
-	useCompositeStoreV2: useCompositeStore,
-} = unlock( componentsPrivateApis );
 
 const SetupContent = ( {
 	viewMode,
