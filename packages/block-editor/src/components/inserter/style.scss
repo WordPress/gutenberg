@@ -228,9 +228,9 @@ $block-inserter-tabs-height: 44px;
 		margin-top: auto;
 	}
 
-	// Temporary disable the component's indicator animation. This override should
-	// removed in favour of using the native component's styles and behavior.
-	// See https://github.com/WordPress/gutenberg/pull/62879#issuecomment-2219720582
+	// Temporarily disable the component's indicator animation.
+	// TODO: remove in favor of using the native component's styles and behavior,
+	// see https://github.com/WordPress/gutenberg/pull/62879#issuecomment-2219720582
 	&[aria-orientation="vertical"]::after {
 		content: none;
 	}
