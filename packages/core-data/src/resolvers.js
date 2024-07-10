@@ -352,10 +352,11 @@ export const getEmbedPreview =
  * Checks whether the current user can perform the given action on the given
  * REST resource.
  *
- * @param {string}  requestedAction Action to check. One of: 'create', 'read', 'update',
- *                                  'delete'.
- * @param {string}  resource        REST resource to check, e.g. 'media' or 'posts'.
- * @param {?string} id              ID of the rest resource to check.
+ * @param {string}        requestedAction Action to check. One of: 'create', 'read', 'update',
+ *                                        'delete'.
+ * @param {string|Object} resource        Entity resource to check. Accepts entity object `{ kind: 'root', name: 'media', id: 1 }`
+ *                                        or REST base as a string - `media`.
+ * @param {?string}       id              ID of the rest resource to check.
  */
 export const canUser =
 	( requestedAction, resource, id ) =>
