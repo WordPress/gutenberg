@@ -283,7 +283,7 @@ describe( 'getEmbedPreview', () => {
 } );
 
 describe( 'canUser', () => {
-	let registry;
+	let dispatch, registry;
 	beforeEach( async () => {
 		registry = {
 			select: jest.fn( () => ( {
@@ -291,14 +291,13 @@ describe( 'canUser', () => {
 			} ) ),
 			batch: ( callback ) => callback(),
 		};
+		dispatch = Object.assign( jest.fn(), {
+			receiveUserPermission: jest.fn(),
+		} );
 		triggerFetch.mockReset();
 	} );
 
 	it( 'does nothing when there is an API error', async () => {
-		const dispatch = Object.assign( jest.fn(), {
-			receiveUserPermission: jest.fn(),
-		} );
-
 		triggerFetch.mockImplementation( () =>
 			Promise.reject( { status: 404 } )
 		);
@@ -315,10 +314,6 @@ describe( 'canUser', () => {
 	} );
 
 	it( 'receives false when the user is not allowed to perform an action', async () => {
-		const dispatch = Object.assign( jest.fn(), {
-			receiveUserPermission: jest.fn(),
-		} );
-
 		triggerFetch.mockImplementation( () => ( {
 			headers: new Map( [ [ 'allow', 'GET' ] ] ),
 		} ) );
@@ -338,10 +333,6 @@ describe( 'canUser', () => {
 	} );
 
 	it( 'receives true when the user is allowed to perform an action', async () => {
-		const dispatch = Object.assign( jest.fn(), {
-			receiveUserPermission: jest.fn(),
-		} );
-
 		triggerFetch.mockImplementation( () => ( {
 			headers: new Map( [ [ 'allow', 'POST, GET, PUT, DELETE' ] ] ),
 		} ) );
@@ -361,10 +352,6 @@ describe( 'canUser', () => {
 	} );
 
 	it( 'receives true when the user is allowed to perform an action on a specific resource', async () => {
-		const dispatch = Object.assign( jest.fn(), {
-			receiveUserPermission: jest.fn(),
-		} );
-
 		triggerFetch.mockImplementation( () => ( {
 			headers: new Map( [ [ 'allow', 'POST, GET, PUT, DELETE' ] ] ),
 		} ) );
@@ -384,10 +371,6 @@ describe( 'canUser', () => {
 	} );
 
 	it( 'runs apiFetch only once per resource', async () => {
-		const dispatch = Object.assign( jest.fn(), {
-			receiveUserPermission: jest.fn(),
-		} );
-
 		registry = {
 			...registry,
 			select: () => ( {
@@ -415,10 +398,6 @@ describe( 'canUser', () => {
 	} );
 
 	it( 'retrieves all permissions even when ID is not given', async () => {
-		const dispatch = Object.assign( jest.fn(), {
-			receiveUserPermission: jest.fn(),
-		} );
-
 		registry = {
 			...registry,
 			select: () => ( {
@@ -454,10 +433,6 @@ describe( 'canUser', () => {
 	} );
 
 	it( 'runs apiFetch only once per resource ID', async () => {
-		const dispatch = Object.assign( jest.fn(), {
-			receiveUserPermission: jest.fn(),
-		} );
-
 		registry = {
 			...registry,
 			select: () => ( {
