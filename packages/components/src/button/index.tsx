@@ -162,7 +162,7 @@ export function UnforwardedButton(
 	} );
 
 	const trulyDisabled = disabled && ! accessibleWhenDisabled;
-	const Tag = href !== undefined && ! trulyDisabled ? 'a' : 'button';
+	const Tag = href !== undefined && ! disabled ? 'a' : 'button';
 	const buttonProps: ComponentPropsWithoutRef< 'button' > =
 		Tag === 'button'
 			? {
