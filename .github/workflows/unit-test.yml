@@ -185,7 +185,7 @@ jobs:
             # dependency versions are installed and cached.
             ##
             - name: Set up PHP
-              uses: shivammathur/setup-php@2e947f1f6932d141d076ca441d0e1e881775e95b # v2.31.0
+              uses: shivammathur/setup-php@c541c155eee45413f5b09a52248675b1a2575231 # v2.31.1
               with:
                   php-version: '${{ matrix.php }}'
                   ini-file: development
@@ -209,7 +209,7 @@ jobs:
                   custom-cache-suffix: $(/bin/date -u --date='last Mon' "+%F")
 
             - name: Download built JavaScript assets
-              uses: actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e # v4.1.7
+              uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
               with:
                   name: build-assets
                   path: ./build
@@ -287,7 +287,7 @@ jobs:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Set up PHP
-              uses: shivammathur/setup-php@2e947f1f6932d141d076ca441d0e1e881775e95b # v2.31.0
+              uses: shivammathur/setup-php@c541c155eee45413f5b09a52248675b1a2575231 # v2.31.1
               with:
                   php-version: '7.4'
                   coverage: none
