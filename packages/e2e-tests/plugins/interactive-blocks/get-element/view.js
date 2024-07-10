@@ -16,7 +16,7 @@ const { state } = store( 'test/get-element', {
 		mutateDOM() {
 			state.prefix = '++';
 			const el = document.querySelector(
-				'[data-testid="read from attributes]'
+				'[data-testid="read from attributes"]'
 			);
 			el.setAttribute( 'data-some-value', 'New DOM value' );
 		},
