@@ -46,7 +46,7 @@ export const getWidgets = createRegistrySelector( ( select ) =>
 						[ widget.id ]: widget,
 					} ),
 					{}
-				) || {}
+				) ?? {}
 			);
 		},
 		() => [
