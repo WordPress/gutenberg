@@ -2,45 +2,11 @@
 /**
  * WordPress dependencies
  */
-import {
-	useRef,
-	useInsertionEffect,
-	useCallback,
-	useEffect,
-	useState,
-} from '@wordpress/element';
-
+import { useRef, useEffect, useState } from '@wordpress/element';
 /**
- * Any function.
+ * Internal dependencies
  */
-export type AnyFunction = ( ...args: any ) => any;
-
-/**
- * Creates a stable callback function that has access to the latest state and
- * can be used within event handlers and effect callbacks. Throws when used in
- * the render phase.
- *
- * @example
- *
- * ```tsx
- * function Component(props) {
- *   const onClick = useEvent(props.onClick);
- *   React.useEffect(() => {}, [onClick]);
- * }
- * ```
- */
-export function useEvent< T extends AnyFunction >( callback?: T ) {
-	const ref = useRef< AnyFunction | undefined >( () => {
-		throw new Error( 'Cannot call an event handler while rendering.' );
-	} );
-	useInsertionEffect( () => {
-		ref.current = callback;
-	} );
-	return useCallback< AnyFunction >(
-		( ...args ) => ref.current?.( ...args ),
-		[]
-	) as T;
-}
+import { useEvent } from './hooks/use-event';
 
 /**
  * `useTrackElementRectUpdates` options.
@@ -228,35 +194,4 @@ export function useTrackElementOffsetRect(
 	return indicatorPosition;
 }
 
-/**
- * Context object for the `onUpdate` callback of `useOnValueUpdate`.
- */
-export type ValueUpdateContext< T > = {
-	previousValue: T;
-};
-
-/**
- * Calls the `onUpdate` callback when the `value` changes.
- */
-export function useOnValueUpdate< T >(
-	/**
-	 * The value to watch for changes.
-	 */
-	value: T,
-	/**
-	 * Callback to fire when the value changes.
-	 */
-	onUpdate: ( context: ValueUpdateContext< T > ) => void
-) {
-	const previousValueRef = useRef( value );
-	const updateCallbackEvent = useEvent( onUpdate );
-	useEffect( () => {
-		if ( previousValueRef.current !== value ) {
-			updateCallbackEvent( {
-				previousValue: previousValueRef.current,
-			} );
-			previousValueRef.current = value;
-		}
-	}, [ updateCallbackEvent, value ] );
-}
 /* eslint-enable jsdoc/require-param */

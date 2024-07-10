@@ -17,7 +17,8 @@ import { useTabsContext } from './context';
 import { TabListWrapper } from './styles';
 import type { WordPressComponentProps } from '../context';
 import clsx from 'clsx';
-import { useOnValueUpdate, useTrackElementOffsetRect } from '../utils/react';
+import { useTrackElementOffsetRect } from '../utils/element-rect';
+import { useOnValueUpdate } from '../utils/hooks/use-on-value-update';
 
 export const TabList = forwardRef<
 	HTMLDivElement,
