@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 3.0.0 (2024-07-10)
+
 
 ### Breaking Changes
 
