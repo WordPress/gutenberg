@@ -42,63 +42,77 @@ export function useEvent< T extends AnyFunction >( callback?: T ) {
 }
 
 /**
- * `useResizeObserver` options.
+ * `useTrackElementRectUpdates` options.
  */
-export type UseResizeObserverOptions = {
+export type UseTrackElementRectUpdatesOptions = {
 	/**
 	 * Whether to trigger the callback when an element's ResizeObserver is
-	 * first set up.
+	 * first set up, including when the target element changes.
 	 *
 	 * @default true
 	 */
-	fireOnObserve?: boolean;
+	fireOnElementInit?: boolean;
 };
 
 /**
- * Fires `onResize` when the target element is resized.
+ * Tracks an element's "rect" (size and position) and fires `onRect` for all
+ * of its discrete values. The element can be changed dynamically and **it
+ * must not be stored in a ref**. Instead, it should be stored in a React
+ * state or equivalent.
  *
- * **The element must not be stored in a ref**, else it won't be observed
- * or updated. Instead, it should be stored in a React state or equivalent.
+ * By default, `onRect` is called initially for the target element (including
+ * when the target element changes), not only on size or position updates.
+ * This allows consumers of the hook to always be in sync with all rect values
+ * of the target element throughout its lifetime. This behavior can be
+ * disabled by setting the `fireOnElementInit` option to `false`.
  *
- * It sets up a `ResizeObserver` that tracks the element under the hood. The
+ * Under the hood, it sets up a `ResizeObserver` that tracks the element. The
  * target element can be changed dynamically, and the observer will be
  * updated accordingly.
- *
- * By default, `onResize` is called when the observer is set up, in addition
- * to when the element is resized. This behavior can be disabled with the
- * `fireOnObserve` option.
  *
  * @example
  *
  * ```tsx
  * const [ targetElement, setTargetElement ] = useState< HTMLElement | null >();
  *
- * useResizeObserver( targetElement, ( element ) => {
+ * useTrackElementRectUpdates( targetElement, ( element ) => {
  *   console.log( 'Element resized:', element );
  * } );
  *
  * <div ref={ setTargetElement } />;
  * ```
  */
-export function useResizeObserver(
+export function useTrackElementRectUpdates(
 	/**
 	 * The target element to observe. It can be changed dynamically.
 	 */
 	targetElement: HTMLElement | undefined | null,
-
 	/**
 	 * Callback to fire when the element is resized. It will also be
-	 * called when the observer is set up, unless `fireOnObserve` is
+	 * called when the observer is set up, unless `fireOnElementInit` is
 	 * set to `false`.
 	 */
-	onResize: ( element: HTMLElement ) => void,
-	{ fireOnObserve = true }: UseResizeObserverOptions = {}
+	onRect: (
+		/**
+		 * The element being tracked at the time of this update.
+		 */
+		element: HTMLElement,
+		/**
+		 * The list of
+		 * [`ResizeObserverEntry`](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserverEntry)
+		 * objects passed to the `ResizeObserver.observe` callback. This list
+		 * won't be available when the observer is set up, and only on updates.
+		 */
+		resizeObserverEntries?: ResizeObserverEntry[]
+	) => void,
+	{ fireOnElementInit = true }: UseTrackElementRectUpdatesOptions = {}
 ) {
-	const onResizeEvent = useEvent( onResize );
+	const onRectEvent = useEvent( onRect );
 
 	const observedElementRef = useRef< HTMLElement | null >();
 	const resizeObserverRef = useRef< ResizeObserver >();
 
+	// TODO: could this be a layout effect?
 	useEffect( () => {
 		if ( targetElement === observedElementRef.current ) {
 			return;
@@ -108,9 +122,9 @@ export function useResizeObserver(
 
 		// Set up a ResizeObserver.
 		if ( ! resizeObserverRef.current ) {
-			resizeObserverRef.current = new ResizeObserver( () => {
+			resizeObserverRef.current = new ResizeObserver( ( entries ) => {
 				if ( observedElementRef.current ) {
-					onResizeEvent( observedElementRef.current );
+					onRectEvent( observedElementRef.current, entries );
 				}
 			} );
 		}
@@ -118,8 +132,10 @@ export function useResizeObserver(
 
 		// Observe new element.
 		if ( targetElement ) {
-			if ( fireOnObserve ) {
-				onResizeEvent( targetElement );
+			if ( fireOnElementInit ) {
+				// TODO: investigate if this can be removed,
+				// see: https://stackoverflow.com/a/60026394
+				onRectEvent( targetElement );
 			}
 			resizeObserver.observe( targetElement );
 		}
@@ -130,7 +146,7 @@ export function useResizeObserver(
 				resizeObserver.unobserve( observedElementRef.current );
 			}
 		};
-	}, [ fireOnObserve, onResizeEvent, targetElement ] );
+	}, [ fireOnElementInit, onRectEvent, targetElement ] );
 }
 
 /**
@@ -204,7 +220,7 @@ export function useTrackElementOffsetRect(
 	const [ indicatorPosition, setIndicatorPosition ] =
 		useState< ElementOffsetRect >( NULL_ELEMENT_OFFSET_RECT );
 
-	useResizeObserver( targetElement, ( element ) =>
+	useTrackElementRectUpdates( targetElement, ( element ) =>
 		setIndicatorPosition( getElementOffsetRect( element ) )
 	);
 
