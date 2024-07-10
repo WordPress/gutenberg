@@ -363,6 +363,7 @@
 
 		.dataviews-view-grid__field {
 			align-items: flex-start;
+			min-height: $grid-unit-30;
 
 			&:not(.is-column) {
 				align-items: center;
@@ -376,6 +377,12 @@
 					overflow: hidden;
 					text-overflow: ellipsis;
 					white-space: nowrap;
+				}
+			}
+
+			&.is-column {
+				& + .is-row {
+					margin-top: $grid-unit-05;
 				}
 			}
 
