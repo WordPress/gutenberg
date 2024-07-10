@@ -115,6 +115,17 @@ The presence of a `href` prop determines whether an `anchor` element is rendered
 
 Props not included in this set will be applied to the `a` or `button` element.
 
+#### `accessibleWhenDisabled`: `boolean`
+
+Whether to keep the button focusable when disabled.
+
+In most cases, it is recommended to set this to `true`. Disabling a control without maintaining focusability can cause accessibility issues, by hiding their presence from screen reader users, or by preventing focus from returning to a trigger element.
+
+Learn more about the [focusability of disabled controls](https://www.w3.org/WAI/ARIA/apg/practices/keyboard-interface/#focusabilityofdisabledcontrols) in the WAI-ARIA Authoring Practices Guide.
+
+-   Required: No
+-   Default: `false`
+
 #### `children`: `ReactNode`
 
 The button's children.
@@ -136,6 +147,8 @@ An accessible description for the button.
 #### `disabled`: `boolean`
 
 Whether the button is disabled. If `true`, this will force a `button` element to be rendered, even when an `href` is given.
+
+In most cases, it is recommended to also set the `accessibleWhenDisabled` prop to `true`.
 
 -   Required: No
 

@@ -74,7 +74,7 @@ function BlockBreadcrumb( { rootLabelText } ) {
 
 							clearSelectedBlock();
 
-							getEditorRegion( blockEditor ).focus();
+							getEditorRegion( blockEditor )?.focus();
 						} }
 					>
 						{ rootLabel }

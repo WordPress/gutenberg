@@ -45,13 +45,6 @@ export default function BackgroundPanel() {
 	const _links = useGlobalStyleLinks();
 	const [ settings ] = useGlobalSetting( '' );
 
-	const defaultControls = {
-		backgroundImage: true,
-		backgroundSize:
-			hasBackgroundImageValue( style ) ||
-			hasBackgroundImageValue( inheritedStyle ),
-	};
-
 	return (
 		<StylesBackgroundPanel
 			inheritedValue={ inheritedStyle }
@@ -59,7 +52,6 @@ export default function BackgroundPanel() {
 			onChange={ setStyle }
 			settings={ settings }
 			defaultValues={ BACKGROUND_DEFAULT_VALUES }
-			defaultControls={ defaultControls }
 			themeFileURIs={ _links?.[ 'wp:theme-file' ] }
 		/>
 	);

@@ -114,35 +114,40 @@ function useNavigateToPreviousEntityRecord() {
 
 export function useSpecificEditorSettings() {
 	const onNavigateToEntityRecord = useNavigateToEntityRecord();
-	const { templateSlug, canvasMode, settings, postWithTemplate } = useSelect(
-		( select ) => {
-			const {
-				getEditedPostType,
-				getEditedPostId,
-				getEditedPostContext,
-				getCanvasMode,
-				getSettings,
-			} = unlock( select( editSiteStore ) );
-			const { getEditedEntityRecord } = select( coreStore );
-			const usedPostType = getEditedPostType();
-			const usedPostId = getEditedPostId();
-			const _record = getEditedEntityRecord(
-				'postType',
-				usedPostType,
-				usedPostId
-			);
-			const _context = getEditedPostContext();
-			return {
-				templateSlug: _record.slug,
-				canvasMode: getCanvasMode(),
-				settings: getSettings(),
-				postWithTemplate: _context?.postId,
-			};
-		},
-		[]
-	);
+	const {
+		templateSlug,
+		canvasMode,
+		settings,
+		shouldUseTemplateAsDefaultRenderingMode,
+	} = useSelect( ( select ) => {
+		const {
+			getEditedPostType,
+			getEditedPostId,
+			getEditedPostContext,
+			getCanvasMode,
+			getSettings,
+		} = unlock( select( editSiteStore ) );
+		const { getEditedEntityRecord } = select( coreStore );
+		const usedPostType = getEditedPostType();
+		const usedPostId = getEditedPostId();
+		const _record = getEditedEntityRecord(
+			'postType',
+			usedPostType,
+			usedPostId
+		);
+		const _context = getEditedPostContext();
+		return {
+			templateSlug: _record.slug,
+			canvasMode: getCanvasMode(),
+			settings: getSettings(),
+			// TODO: The `postType` check should be removed when the default rendering mode per post type is merged.
+			// @see https://github.com/WordPress/gutenberg/pull/62304/
+			shouldUseTemplateAsDefaultRenderingMode:
+				_context?.postId && _context?.postType !== 'post',
+		};
+	}, [] );
 	const archiveLabels = useArchiveLabel( templateSlug );
-	const defaultRenderingMode = postWithTemplate
+	const defaultRenderingMode = shouldUseTemplateAsDefaultRenderingMode
 		? 'template-locked'
 		: 'post-only';
 	const onNavigateToPreviousEntityRecord =

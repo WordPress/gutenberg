@@ -94,7 +94,7 @@ describe( 'FontSizePicker', () => {
 			const user = userEvent.setup();
 			render( <FontSizePicker fontSizes={ fontSizes } /> );
 			await user.click(
-				screen.getByRole( 'button', { name: 'Font size' } )
+				screen.getByRole( 'combobox', { name: 'Font size' } )
 			);
 			const options = screen.getAllByRole( 'option' );
 			expect( options ).toHaveLength( 8 );
@@ -148,7 +148,7 @@ describe( 'FontSizePicker', () => {
 					/>
 				);
 				await user.click(
-					screen.getByRole( 'button', { name: 'Font size' } )
+					screen.getByRole( 'combobox', { name: 'Font size' } )
 				);
 				await user.click(
 					screen.getByRole( 'option', { name: option } )
@@ -200,7 +200,7 @@ describe( 'FontSizePicker', () => {
 			const user = userEvent.setup();
 			render( <FontSizePicker fontSizes={ fontSizes } /> );
 			await user.click(
-				screen.getByRole( 'button', { name: 'Font size' } )
+				screen.getByRole( 'combobox', { name: 'Font size' } )
 			);
 			const options = screen.getAllByRole( 'option' );
 			expect( options ).toHaveLength( 8 );
@@ -225,7 +225,7 @@ describe( 'FontSizePicker', () => {
 					<FontSizePicker fontSizes={ fontSizes } value={ value } />
 				);
 				expect(
-					screen.getByRole( 'button', { name: 'Font size' } )
+					screen.getByRole( 'combobox', { name: 'Font size' } )
 				).toHaveTextContent( option );
 			}
 		);
@@ -291,7 +291,7 @@ describe( 'FontSizePicker', () => {
 					/>
 				);
 				await user.click(
-					screen.getByRole( 'button', { name: 'Font size' } )
+					screen.getByRole( 'combobox', { name: 'Font size' } )
 				);
 				await user.click(
 					screen.getByRole( 'option', { name: option } )
@@ -509,7 +509,7 @@ describe( 'FontSizePicker', () => {
 				<FontSizePicker fontSizes={ fontSizes } onChange={ onChange } />
 			);
 			await user.click(
-				screen.getByRole( 'button', { name: 'Font size' } )
+				screen.getByRole( 'combobox', { name: 'Font size' } )
 			);
 			await user.click(
 				screen.getByRole( 'option', { name: 'Custom' } )

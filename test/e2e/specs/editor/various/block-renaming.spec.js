@@ -60,7 +60,7 @@ test.describe( 'Block Renaming', () => {
 			await expect( renameModal ).toBeVisible();
 
 			const nameInput = renameModal.getByRole( 'textbox', {
-				name: 'Block name',
+				name: 'Name',
 			} );
 
 			// Check focus is transferred into the input within the Modal.

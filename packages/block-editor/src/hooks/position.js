@@ -26,26 +26,23 @@ import { cleanEmptyObject, useStyleOverride } from './utils';
 import { unlock } from '../lock-unlock';
 import { store as blockEditorStore } from '../store';
 
-const { CustomSelectControl } = unlock( componentsPrivateApis );
+const { CustomSelectControlV2Legacy: CustomSelectControl } = unlock(
+	componentsPrivateApis
+);
 
 const POSITION_SUPPORT_KEY = 'position';
-
-const OPTION_CLASSNAME =
-	'block-editor-hooks__position-selection__select-control__option';
 
 const DEFAULT_OPTION = {
 	key: 'default',
 	value: '',
 	name: __( 'Default' ),
-	className: OPTION_CLASSNAME,
 };
 
 const STICKY_OPTION = {
 	key: 'sticky',
 	value: 'sticky',
 	name: _x( 'Sticky', 'Name for the value of the CSS position property' ),
-	className: OPTION_CLASSNAME,
-	__experimentalHint: __(
+	hint: __(
 		'The block will stick to the top of the window instead of scrolling.'
 	),
 };
@@ -54,10 +51,7 @@ const FIXED_OPTION = {
 	key: 'fixed',
 	value: 'fixed',
 	name: _x( 'Fixed', 'Name for the value of the CSS position property' ),
-	className: OPTION_CLASSNAME,
-	__experimentalHint: __(
-		'The block will not move when the page is scrolled.'
-	),
+	hint: __( 'The block will not move when the page is scrolled.' ),
 };
 
 const POSITION_SIDES = [ 'top', 'right', 'bottom', 'left' ];
@@ -283,13 +277,11 @@ export function PositionPanelPure( {
 			options.length > 1 ? (
 				<InspectorControls group="position">
 					<BaseControl
-						className="block-editor-hooks__position-selection"
 						__nextHasNoMarginBottom
 						help={ stickyHelpText }
 					>
 						<CustomSelectControl
 							__next40pxDefaultSize
-							className="block-editor-hooks__position-selection__select-control"
 							label={ __( 'Position' ) }
 							hideLabelFromVision
 							describedBy={ sprintf(
@@ -299,7 +291,6 @@ export function PositionPanelPure( {
 							) }
 							options={ options }
 							value={ selectedOption }
-							__experimentalShowSelectedHint
 							onChange={ ( { selectedItem } ) => {
 								onChangeType( selectedItem.value );
 							} }

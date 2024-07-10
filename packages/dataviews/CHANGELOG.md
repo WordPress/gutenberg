@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+## 3.0.0 (2024-07-10)
+
+
+### Breaking Changes
+
+- Replace the `hiddenFields` property in the view prop of `DataViews` with a `fields` property that accepts an array of visible fields instead.
+- Replace the `supportedLayouts` prop in the `DataViews` component with a `defaultLayouts` prop that accepts an object whose keys are the layout names and values are the default view objects for these layouts.
+
+### New features
+
+-   Added a new `DataForm` component to render controls from a given configuration (fields, form), and data.
+
+### Internal
+
+-   Method style type signatures have been changed to function style ([#62718](https://github.com/WordPress/gutenberg/pull/62718)).
+
 ## 2.2.0 (2024-06-26)
 
 ## 2.1.0 (2024-06-15)

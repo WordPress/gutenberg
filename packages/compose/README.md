@@ -602,7 +602,7 @@ _Returns_
 
 ### withInstanceId
 
-A Higher Order Component used to be provide a unique instance ID by component.
+A Higher Order Component used to provide a unique instance ID by component.
 
 ### withSafeTimeout
 

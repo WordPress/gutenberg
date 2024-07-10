@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useMemo } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import {
 	applyFormat,
@@ -129,14 +129,6 @@ function ColorPicker( { name, property, value, onChange } ) {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings().colors ?? [];
 	}, [] );
-	const onColorChange = useCallback(
-		( color ) => {
-			onChange(
-				setColors( value, name, colors, { [ property ]: color } )
-			);
-		},
-		[ colors, onChange, property ]
-	);
 	const activeColors = useMemo(
 		() => getActiveColors( value, name, colors ),
 		[ name, value, colors ]
@@ -145,7 +137,11 @@ function ColorPicker( { name, property, value, onChange } ) {
 	return (
 		<ColorPalette
 			value={ activeColors[ property ] }
-			onChange={ onColorChange }
+			onChange={ ( color ) => {
+				onChange(
+					setColors( value, name, colors, { [ property ]: color } )
+				);
+			} }
 		/>
 	);
 }

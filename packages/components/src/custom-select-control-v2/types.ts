@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
 import type * as Ariakit from '@ariakit/react';
 import type { FocusEventHandler, MouseEventHandler } from 'react';
 
@@ -11,8 +10,6 @@ export type CustomSelectStore = {
 	 */
 	store: Ariakit.SelectStore;
 };
-
-export type CustomSelectContext = CustomSelectStore | undefined;
 
 type CustomSelectSize< Size = 'compact' | 'default' > = {
 	/**
@@ -26,6 +23,10 @@ type CustomSelectSize< Size = 'compact' | 'default' > = {
 export type CustomSelectButtonSize = CustomSelectSize<
 	'compact' | 'default' | 'small'
 >;
+
+export type CustomSelectContext =
+	| ( CustomSelectStore & CustomSelectButtonSize )
+	| undefined;
 
 export type CustomSelectButtonProps = {
 	/**
@@ -49,6 +50,15 @@ export type CustomSelectButtonProps = {
 	value?: string | string[];
 };
 
+// Props only exposed on the internal implementation
+export type _CustomSelectInternalProps = {
+	/**
+	 * True if the consumer is emulating the legacy component behavior and look
+	 */
+	isLegacy?: boolean;
+};
+
+// Props that are exposed in exported components
 export type _CustomSelectProps = CustomSelectButtonProps & {
 	/**
 	 * Additional className added to the root wrapper element.
@@ -70,9 +80,7 @@ export type _CustomSelectProps = CustomSelectButtonProps & {
 	label: string;
 };
 
-export type CustomSelectProps = _CustomSelectProps &
-	CustomSelectButtonProps &
-	CustomSelectSize;
+export type CustomSelectProps = _CustomSelectProps & CustomSelectSize;
 
 /**
  * The legacy object structure for the options array.
@@ -82,6 +90,12 @@ type LegacyOption = {
 	name: string;
 	style?: React.CSSProperties;
 	className?: string;
+	hint?: string;
+	/**
+	 * Use the `hint` property instead
+	 * @deprecated
+	 * @ignore
+	 */
 	__experimentalHint?: string;
 	[ key: string ]: any;
 };
@@ -161,11 +175,17 @@ export type LegacyCustomSelectProps = {
 	 */
 	value?: LegacyOption;
 	/**
-	 * Legacy way to add additional text to the right of each option.
+	 * Use the `showSelectedHint` property instead.
+	 * @deprecated
+	 * @ignore
+	 */
+	__experimentalShowSelectedHint?: boolean;
+	/**
+	 * Show the hint of the selected item in the trigger button.
 	 *
 	 * @default false
 	 */
-	__experimentalShowSelectedHint?: boolean;
+	showSelectedHint?: boolean;
 	/**
 	 * Opt-in prop for an unconstrained width style which became the default in
 	 * WordPress 6.5. The prop is no longer needed and can be safely removed.
