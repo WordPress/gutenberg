@@ -9,6 +9,10 @@
 		max-width: 100%;
 		vertical-align: bottom;
 		box-sizing: border-box;
+
+		&.hide {
+			opacity: 0;
+		}
 	}
 
 	// The following style maintains border radius application for deprecated
