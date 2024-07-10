@@ -87,7 +87,7 @@ function gutenberg_render_background_support( $block_content, $block ) {
 		array( 'convert_vars_to_classnames' => ! empty( $preset_gradient_color ) && empty( $background_styles ) )
 	);
 
-	if ( ! empty( $styles['css'] ) ) {
+	if ( ! empty( $styles['css'] ) || $preset_gradient_color ) {
 		// Inject background styles to the first element, presuming it's the wrapper, if it exists.
 		$tags = new WP_HTML_Tag_Processor( $block_content );
 
@@ -95,33 +95,36 @@ function gutenberg_render_background_support( $block_content, $block ) {
 			$existing_style = $tags->get_attribute( 'style' );
 
 			// Remove any existing background color if a background image and gradient is set.
-			if ( ! empty( $background_gradient_styles['gradient'] ) && ! empty( $background_styles ) ) {
-				// This is just testing. The style engine should be smart enough to remove the classname for a preset, where
-				// it's used in the CSS string.
-				// And this is done in the site editor when editing the block.
-				if ( ! empty( $styles['classnames'] ) && $preset_gradient_color ) {
-					foreach ( explode( ' ', $styles['classnames'] ) as $class_name ) {
-						if ( 'has-background' !== $class_name ) {
-							$tags->remove_class( $class_name );
-						}
-					}
-				}
+			if ( $existing_style && ! empty( $background_gradient_styles['gradient'] ) && ! empty( $background_styles ) ) {
 				$existing_style = preg_replace( '/background\s*:\s*' . preg_quote( $background_gradient_styles['gradient'], '/' ) . '\s*;?/', '', $existing_style, 1 );
 			}
 
-			$updated_style = '';
+            if ( ! empty( $styles['css'] ) ) {
+                $updated_style = '';
 
-			if ( ! empty( $existing_style ) ) {
-				$updated_style = $existing_style;
-				if ( ! str_ends_with( $existing_style, ';' ) ) {
-					$updated_style .= ';';
-				}
-			}
+                if ( ! empty( $existing_style ) ) {
+                    $updated_style = $existing_style;
+                    if ( ! str_ends_with( $existing_style, ';' ) ) {
+                        $updated_style .= ';';
+                    }
+                }
 
-			$updated_style .= $styles['css'];
-			$tags->set_attribute( 'style', $updated_style );
-            // $tags->add_class( 'has-background' );
+                $updated_style .= $styles['css'];
+                $tags->set_attribute( 'style', $updated_style );
+                // $tags->add_class( 'has-background' );
+            }
 		}
+
+        // This is just testing. The style engine should be smart enough to remove the classname for a preset, where
+        // it's used in the CSS string.
+        // And this is done in the site editor when editing the block.
+        if ( ! empty( $styles['classnames'] ) && $preset_gradient_color ) {
+            foreach ( explode( ' ', $styles['classnames'] ) as $class_name ) {
+                if ( 'has-background' !== $class_name ) {
+                    $tags->remove_class( $class_name );
+                }
+            }
+        }
 
 		return $tags->get_updated_html();
 	}

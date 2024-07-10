@@ -33,6 +33,9 @@ import {
 } from '../components/global-styles/color-panel';
 import BlockColorContrastChecker from './contrast-checker';
 import { store as blockEditorStore } from '../store';
+import {
+	globalStylesDataKey,
+} from '../store/private-keys';
 
 export const COLOR_SUPPORT_KEY = 'color';
 
@@ -130,9 +133,15 @@ function addAttributes( settings ) {
  * @param {Object|string} blockNameOrType Block type.
  * @param {Object}        attributes      Block attributes.
  *
+ * @param                 inheritedValue
  * @return {Object} Filtered props applied to save element.
  */
-export function addSaveProps( props, blockNameOrType, attributes ) {
+export function addSaveProps(
+	props,
+	blockNameOrType,
+	attributes,
+	inheritedValue
+) {
 	if (
 		! hasColorSupport( blockNameOrType ) ||
 		shouldSkipSerialization( blockNameOrType, COLOR_SUPPORT_KEY )
@@ -162,7 +171,10 @@ export function addSaveProps( props, blockNameOrType, attributes ) {
 	// Do not add gradient class if there is a background image, because the values are merged into `background-image`.
 	const hasBackgroundImage =
 		typeof style?.background?.backgroundImage === 'string' ||
-		typeof style?.background?.backgroundImage?.url === 'string';
+		typeof style?.background?.backgroundImage?.url === 'string' ||
+		typeof inheritedValue?.background?.backgroundImage === 'string' ||
+		typeof inheritedValue?.background?.backgroundImage?.url === 'string';
+
 	const gradientClass =
 		! hasBackgroundImage && shouldSerialize( 'gradients' )
 			? __experimentalGetGradientClass( gradient )
@@ -355,6 +367,25 @@ function useBlockProps( {
 		'color.palette.theme',
 		'color.palette.default'
 	);
+	// HACK alert.
+	// Could this be passed to useBlockProps as middleware somewhere?
+	const { inheritedValue } = useSelect(
+		( select ) => {
+			const { getSettings } = select( blockEditorStore );
+			const _settings = getSettings();
+			return {
+				/*
+				 * @TODO 1. Pass inherited value down to all block style controls,
+				 *   See: packages/block-editor/src/hooks/style.js
+				 * @TODO 2. Add support for block style variations,
+				 *   See implementation: packages/block-editor/src/hooks/block-style-variation.js
+				 */
+				inheritedValue:
+					_settings[ globalStylesDataKey ]?.blocks?.[ name ],
+			};
+		},
+		[ name ]
+	);
 
 	const colors = useMemo(
 		() => [
@@ -391,12 +422,17 @@ function useBlockProps( {
 		)?.color;
 	}
 
-	const saveProps = addSaveProps( { style: extraStyles }, name, {
-		textColor,
-		backgroundColor,
-		gradient,
-		style,
-	} );
+	const saveProps = addSaveProps(
+		{ style: extraStyles },
+		name,
+		{
+			textColor,
+			backgroundColor,
+			gradient,
+			style,
+		},
+		inheritedValue
+	);
 
 	const hasBackgroundValue =
 		backgroundColor ||
