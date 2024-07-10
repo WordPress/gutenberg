@@ -2,6 +2,10 @@
 
 This slot allows for injecting items into the bottom of the post-publish panel that appears after a post is published.
 
+<div class="callout callout-info">
+`PluginPostPublishPanel` was moved from the `@wordpress/edit-post` package to `@wordpress/editor` in Gutenberg 18.1 (to be included in WordPress 6.6). The deprecated export will be removed with WordPress 6.8.
+</div>
+
 ## Example
 
 ```js
