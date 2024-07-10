@@ -1,3 +1,4 @@
+/* eslint-disable jsdoc/require-param */
 /**
  * WordPress dependencies
  */
@@ -258,3 +259,4 @@ export function useOnValueUpdate< T >(
 		}
 	}, [ updateCallbackEvent, value ] );
 }
+/* eslint-enable jsdoc/require-param */
