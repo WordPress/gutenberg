@@ -110,7 +110,7 @@ export type FontSizePickerSelectOption = {
 	key: string;
 	name: string;
 	value?: FontSize[ 'size' ];
-	__experimentalHint?: string;
+	hint?: string;
 };
 
 export type FontSizePickerToggleGroupProps = Pick<

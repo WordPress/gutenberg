@@ -6,6 +6,10 @@
 
 -   `CustomSelectControlV2`: animate select popover appearance. ([#63343](https://github.com/WordPress/gutenberg/pull/63343))
 
+### Enhancements
+
+-   `CustomSelectControl`: Stabilize `__experimentalShowSelectedHint` and `options[]. __experimentalHint` props ([#63248](https://github.com/WordPress/gutenberg/pull/63248)).
+
 ## 28.3.0 (2024-07-10)
 
 ### Enhancements
