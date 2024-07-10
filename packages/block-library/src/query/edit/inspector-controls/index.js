@@ -5,6 +5,7 @@ import {
 	PanelBody,
 	TextControl,
 	SelectControl,
+	RadioControl,
 	RangeControl,
 	ToggleControl,
 	Notice,
@@ -101,6 +102,10 @@ export default function QueryInspectorControls( props ) {
 	const showInheritControl = isControlAllowed( allowedControls, 'inherit' );
 	const showPostTypeControl =
 		! inherit && isControlAllowed( allowedControls, 'postType' );
+	const postTypeControlLabel = __( 'Post content' );
+	const postTypeControlHelp = __(
+		'WordPress contains different types of content and they are divided into collections called “Post types”. By default there are a few different ones such as blog posts and pages, but plugins could add more.'
+	);
 	const showColumnsControl = false;
 	const showOrderControl =
 		! inherit && isControlAllowed( allowedControls, 'order' );
@@ -152,18 +157,26 @@ export default function QueryInspectorControls( props ) {
 							}
 						/>
 					) }
-					{ showPostTypeControl && (
-						<SelectControl
-							__nextHasNoMarginBottom
-							options={ postTypesSelectOptions }
-							value={ postType }
-							label={ __( 'Post type' ) }
-							onChange={ onPostTypeChange }
-							help={ __(
-								'WordPress contains different types of content and they are divided into collections called “Post types”. By default there are a few different ones such as blog posts and pages, but plugins could add more.'
-							) }
-						/>
-					) }
+					{ showPostTypeControl &&
+						( ( postTypesSelectOptions.length > 2 && (
+							<SelectControl
+								__nextHasNoMarginBottom
+								options={ postTypesSelectOptions }
+								value={ postType }
+								label={ postTypeControlLabel }
+								onChange={ onPostTypeChange }
+								help={ postTypeControlHelp }
+							/>
+						) ) || (
+							<RadioControl
+								__nextHasNoMarginBottom
+								options={ postTypesSelectOptions }
+								selected={ postType }
+								label={ postTypeControlLabel }
+								onChange={ onPostTypeChange }
+								help={ postTypeControlHelp }
+							/>
+						) ) }
 					{ showColumnsControl && (
 						<>
 							<RangeControl
