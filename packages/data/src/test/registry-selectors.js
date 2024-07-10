@@ -29,6 +29,12 @@ const getFilteredElements = createRegistrySelector( ( select ) =>
 	)
 );
 
+// Regular selector that internally calls registry selector
+const getFilteredElementsAbbr = createSelector(
+	( state ) => getFilteredElements( state ).map( ( el ) => el.slice( 0, 2 ) ),
+	( state ) => [ getFilteredElements( state ) ]
+);
+
 const elementsStore = createReduxStore( 'elements', {
 	reducer( state = [], action ) {
 		if ( action.type === 'ADD' ) {
@@ -58,6 +64,7 @@ const uiStore = createReduxStore( 'ui', {
 		getFilterValue,
 		getElementCount,
 		getFilteredElements,
+		getFilteredElementsAbbr,
 	},
 } );
 
@@ -115,6 +122,55 @@ describe( 'createRegistrySelector', () => {
 		expect( registry2.select( uiStore ).getFilteredElements() ).toEqual( [
 			'Helium',
 		] );
+	} );
+
+	it( 'can call registry selector from a regular one with correct registry binding', () => {
+		const registry1 = createRegistry();
+		registry1.register( elementsStore );
+		registry1.register( uiStore );
+		registry1.dispatch( elementsStore ).add( 'Carbon' );
+
+		const registry2 = createRegistry();
+		registry2.register( elementsStore );
+		registry2.register( uiStore );
+		registry2.dispatch( elementsStore ).add( 'Helium' );
+
+		// Expects that each call internally calls `getFilteredElements` bound to the correct registry
+		expect( registry1.select( uiStore ).getFilteredElementsAbbr() ).toEqual(
+			[ 'Ca' ]
+		);
+		expect( registry2.select( uiStore ).getFilteredElementsAbbr() ).toEqual(
+			[ 'He' ]
+		);
+	} );
+
+	it( 'can call unregistered registry selector from a regular one', () => {
+		const getElements = createRegistrySelector(
+			( select ) => () => select( elementsStore ).getElements()
+		);
+
+		// Selectors that calls `getElements`, a registry selector that's not registered (bound) anywhere
+		const getPaginatedElements = ( state, offset, limit ) =>
+			getElements( state ).slice( offset, offset + limit );
+
+		const pageStore = createReduxStore( 'page', {
+			reducer( state = null ) {
+				return state;
+			},
+			actions: {},
+			selectors: {
+				getPaginatedElements,
+			},
+		} );
+
+		const registry = createRegistry();
+		registry.register( elementsStore );
+		registry.register( pageStore );
+		registry.dispatch( elementsStore ).add( 'Carbon', 'Nitrogen' );
+
+		expect(
+			registry.select( pageStore ).getPaginatedElements( 1, 1 )
+		).toEqual( [ 'Nitrogen' ] );
 	} );
 
 	it( 'can bind a memoized selector to a registry', () => {
