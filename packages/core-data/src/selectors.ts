@@ -1188,6 +1188,11 @@ export function canUserEditEntityRecord(
 	name: string,
 	recordId: EntityRecordKey
 ): boolean | undefined {
+	deprecated( `wp.data.select( 'core' ).canUserEditEntityRecord()`, {
+		since: '6.7',
+		alternative: `wp.data.select( 'core' ).canUser( 'update', { kind, name, id } )`,
+	} );
+
 	return canUser( state, 'update', { kind, name, id: recordId } );
 }
 
