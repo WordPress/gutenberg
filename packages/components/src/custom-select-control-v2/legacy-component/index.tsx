@@ -13,13 +13,13 @@ import type { LegacyCustomSelectProps } from '../types';
 import * as Styled from '../styles';
 
 function useDeprecatedProps( {
-	showSelectedHint = false,
 	options,
 	// Deprecated
 	__experimentalShowSelectedHint,
 	...otherProps
 }: LegacyCustomSelectProps ) {
 	return {
+		showSelectedHint: __experimentalShowSelectedHint,
 		...otherProps,
 		options: options.map( ( o ) => {
 			const toReturn = o;
@@ -35,10 +35,6 @@ function useDeprecatedProps( {
 
 			return toReturn;
 		} ),
-		showSelectedHint:
-			typeof __experimentalShowSelectedHint !== 'undefined'
-				? __experimentalShowSelectedHint
-				: showSelectedHint,
 	};
 }
 
@@ -51,7 +47,7 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 		size = 'default',
 		value,
 		className: classNameProp,
-		showSelectedHint,
+		showSelectedHint = false,
 		...restProps
 	} = useDeprecatedProps( props );
 
