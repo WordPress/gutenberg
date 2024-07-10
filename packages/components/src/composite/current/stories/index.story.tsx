@@ -21,7 +21,8 @@ import {
 import { UseCompositeStorePlaceholder, transform } from './utils';
 
 const meta: Meta< typeof UseCompositeStorePlaceholder > = {
-	title: 'Components/Composite (V2)',
+	// TODO: do we need a redirect from the previous path?
+	title: 'Components/Composite',
 	component: UseCompositeStorePlaceholder,
 	subcomponents: {
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
@@ -33,7 +34,6 @@ const meta: Meta< typeof UseCompositeStorePlaceholder > = {
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		CompositeItem,
 	},
-	tags: [ 'status-private' ],
 	parameters: {
 		docs: {
 			canvas: { sourceState: 'shown' },

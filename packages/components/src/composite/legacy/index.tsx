@@ -5,6 +5,11 @@
  * tab stop for the whole Composite element. This means that it can behave as
  * a roving tabindex or aria-activedescendant container.
  *
+ * This file aims at providing component that are as close as possible to the
+ * original `reakit`-based implementation (which was removed from the codebase),
+ * although it is recommended that consumers of the package switch to the stable,
+ * un-prefixed, ariakit-based version of `Composite`.
+ *
  * @see https://ariakit.org/components/composite
  */
 

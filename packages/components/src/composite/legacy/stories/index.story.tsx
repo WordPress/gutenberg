@@ -15,7 +15,9 @@ import {
 import { UseCompositeStatePlaceholder, transform } from './utils';
 
 const meta: Meta< typeof UseCompositeStatePlaceholder > = {
-	title: 'Components/Composite',
+	// TODO: should we keep this story around? If so, how should we call it?
+	// Should we add a `status-deprecated` tag with associated badge?
+	title: 'Components/Composite/Legacy',
 	component: UseCompositeStatePlaceholder,
 	subcomponents: {
 		Composite,

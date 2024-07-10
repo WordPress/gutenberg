@@ -61,6 +61,14 @@ export {
 	CompositeGroup as __unstableCompositeGroup,
 	CompositeItem as __unstableCompositeItem,
 	useCompositeState as __unstableUseCompositeState,
+} from './composite/legacy';
+export {
+	Composite,
+	CompositeGroup,
+	CompositeGroupLabel,
+	CompositeItem,
+	CompositeRow,
+	useCompositeStore,
 } from './composite';
 export { ConfirmDialog as __experimentalConfirmDialog } from './confirm-dialog';
 export { default as CustomSelectControl } from './custom-select-control';
