@@ -213,7 +213,7 @@ function FeaturedImage( { item, viewType } ) {
 			: [ 'thumbnail', 'medium', 'large', 'full' ];
 	const media = hasMedia ? (
 		<Media
-			className="posts-list-page__featured-image"
+			className="edit-site-post-list__featured-image"
 			id={ item.featured_media }
 			size={ size }
 		/>
@@ -221,11 +221,11 @@ function FeaturedImage( { item, viewType } ) {
 	const renderButton = viewType !== LAYOUT_LIST && ! isDisabled;
 	return (
 		<div
-			className={ `posts-list-page__featured-image-wrapper is-layout-${ viewType }` }
+			className={ `edit-site-post-list__featured-image-wrapper is-layout-${ viewType }` }
 		>
 			{ renderButton ? (
 				<button
-					className="posts-list-page-preview-field__button"
+					className="edit-site-post-list__featured-image-button"
 					type="button"
 					onClick={ onClick }
 					aria-label={ item.title?.rendered || __( '(no title)' ) }
@@ -250,7 +250,7 @@ function PostStatusField( { item } ) {
 	return (
 		<HStack alignment="left" spacing={ 0 }>
 			{ icon && (
-				<div className="posts-list-page-post-author-field__icon-container">
+				<div className="edit-site-post-list__status-icon">
 					<Icon icon={ icon } />
 				</div>
 			) }
@@ -297,7 +297,7 @@ function PostAuthorField( { item } ) {
 	);
 }
 
-export default function PostsList( { postType } ) {
+export default function PostList( { postType } ) {
 	const [ view, setView ] = useView( postType );
 	const history = useHistory();
 	const {
@@ -449,13 +449,13 @@ export default function PostsList( { postType } ) {
 					let suffix = '';
 					if ( item.id === frontPageId ) {
 						suffix = (
-							<span className="posts-list-page-title-badge">
+							<span className="edit-site-post-list__title-badge">
 								{ __( 'Front Page' ) }
 							</span>
 						);
 					} else if ( item.id === postsPageId ) {
 						suffix = (
-							<span className="posts-list-page-title-badge">
+							<span className="edit-site-post-list__title-badge">
 								{ __( 'Posts Page' ) }
 							</span>
 						);
@@ -463,7 +463,7 @@ export default function PostsList( { postType } ) {
 
 					return (
 						<HStack
-							className="posts-list-page-title"
+							className="edit-site-post-list__title"
 							alignment="center"
 							justify="flex-start"
 						>
