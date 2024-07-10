@@ -451,9 +451,9 @@ function BackgroundSizeControls( {
 	const positionValue =
 		style?.background?.backgroundPosition ||
 		inheritedValue?.background?.backgroundPosition;
-	const attachmentValue = style?.background?.backgroundAttachment || {
-		...inheritedValue?.background?.backgroundAttachment,
-	};
+	const attachmentValue =
+		style?.background?.backgroundAttachment ||
+		inheritedValue?.background?.backgroundAttachment;
 
 	/*
 	 * An `undefined` value is replaced with any supplied
