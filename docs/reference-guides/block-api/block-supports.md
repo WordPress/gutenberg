@@ -180,7 +180,7 @@ attributes: {
 -   Default value: `true`
 -   Subproperties:
     -   `block`: type `boolean`, default value `true`
-    -   `variation`: type `boolean`, default value `true`
+    -   `variation`: type `boolean`, default value `false`
 
 By default, the class `.wp-block-your-block-name` is added to the root element of your saved markup. This helps by providing a consistent mechanism for styling blocks that themes and plugins can rely on. If, for whatever reason, a class is not desired on the markup, this functionality can be disabled.
 
