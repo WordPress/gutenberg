@@ -172,6 +172,7 @@ export default function ViewGrid< Item >( {
 	onChangeSelection,
 	selection,
 	view,
+	density,
 }: ViewGridProps< Item > ) {
 	const mediaField = fields.find(
 		( field ) => field.id === view.layout?.mediaField
@@ -202,6 +203,9 @@ export default function ViewGrid< Item >( {
 		{ visibleFields: [], badgeFields: [] }
 	);
 	const hasData = !! data?.length;
+	const gridStyle = density
+		? { gridTemplateColumns: `repeat(${ density }, minmax(0, 1fr))` }
+		: {};
 	return (
 		<>
 			{ hasData && (
@@ -210,6 +214,7 @@ export default function ViewGrid< Item >( {
 					columns={ 2 }
 					alignment="top"
 					className="dataviews-view-grid"
+					style={ gridStyle }
 					aria-busy={ isLoading }
 				>
 					{ data.map( ( item ) => {
