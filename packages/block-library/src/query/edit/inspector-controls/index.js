@@ -150,7 +150,7 @@ export default function QueryInspectorControls( props ) {
 							__nextHasNoMarginBottom
 							label={ __( 'Inherit query from template' ) }
 							help={ __(
-								'Toggle to use the global query context that is set with the current template, such as an archive or search. Disable to customize the settings independently.'
+								'Enable to use the global query context that is set with the current template, such as an archive or search. Disable to customize the settings independently.'
 							) }
 							checked={ !! inherit }
 							onChange={ ( value ) =>
