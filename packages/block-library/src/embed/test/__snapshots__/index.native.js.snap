@@ -106,21 +106,13 @@ exports[`Embed block edit URL sets empty state when setting an empty URL 1`] = `
 
 exports[`Embed block insert via slash inserter insert generic embed block 1`] = `"<!-- wp:embed /-->"`;
 
-exports[`Embed block insert via slash inserter inserts Twitter embed block 1`] = `"<!-- wp:embed {"providerNameSlug":"twitter","responsive":true} /-->"`;
+exports[`Embed block insertion inserts Twitter Embed block 1`] = `"<!-- wp:embed {"providerNameSlug":"twitter","responsive":true} /-->"`;
 
-exports[`Embed block insert via slash inserter inserts Vimeo embed block 1`] = `"<!-- wp:embed {"providerNameSlug":"vimeo","responsive":true} /-->"`;
+exports[`Embed block insertion inserts Vimeo Embed block 1`] = `"<!-- wp:embed {"providerNameSlug":"vimeo","responsive":true} /-->"`;
 
-exports[`Embed block insert via slash inserter inserts WordPress embed block 1`] = `"<!-- wp:embed {"providerNameSlug":"wordpress"} /-->"`;
+exports[`Embed block insertion inserts WordPress Embed block 1`] = `"<!-- wp:embed {"providerNameSlug":"wordpress"} /-->"`;
 
-exports[`Embed block insert via slash inserter inserts YouTube embed block 1`] = `"<!-- wp:embed {"providerNameSlug":"youtube","responsive":true} /-->"`;
-
-exports[`Embed block insertion inserts Twitter embed block 1`] = `"<!-- wp:embed {"providerNameSlug":"twitter","responsive":true} /-->"`;
-
-exports[`Embed block insertion inserts Vimeo embed block 1`] = `"<!-- wp:embed {"providerNameSlug":"vimeo","responsive":true} /-->"`;
-
-exports[`Embed block insertion inserts WordPress embed block 1`] = `"<!-- wp:embed {"providerNameSlug":"wordpress"} /-->"`;
-
-exports[`Embed block insertion inserts YouTube embed block 1`] = `"<!-- wp:embed {"providerNameSlug":"youtube","responsive":true} /-->"`;
+exports[`Embed block insertion inserts YouTube Embed block 1`] = `"<!-- wp:embed {"providerNameSlug":"youtube","responsive":true} /-->"`;
 
 exports[`Embed block insertion inserts generic embed block 1`] = `"<!-- wp:embed /-->"`;
 
@@ -180,7 +172,13 @@ https://twitter.com/notnownikki
 <!-- /wp:embed -->"
 `;
 
-exports[`Embed block set URL when empty block sets empty URL when dismissing edit URL modal 1`] = `"<!-- wp:embed {"url":""} /-->"`;
+exports[`Embed block set URL when empty block sets empty URL when dismissing edit URL modal 1`] = `
+"<!-- wp:embed {"url":"https://twitter.com/notnownikki","type":"rich","providerNameSlug":"twitter","responsive":true} -->
+<figure class="wp-block-embed is-type-rich is-provider-twitter wp-block-embed-twitter"><div class="wp-block-embed__wrapper">
+https://twitter.com/notnownikki
+</div></figure>
+<!-- /wp:embed -->"
+`;
 
 exports[`Embed block sets block caption 1`] = `
 "<!-- wp:embed {"url":"https://twitter.com/notnownikki","type":"rich","providerNameSlug":"twitter","responsive":true} -->

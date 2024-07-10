@@ -230,7 +230,7 @@ describe( 'Embed block', () => {
 		} );
 
 		MOST_USED_PROVIDERS.forEach( ( { title } ) =>
-			it( `inserts ${ title } embed block`, async () => {
+			it( `inserts ${ title } block`, async () => {
 				const { block } = await insertEmbedBlock( title );
 				const blockName = within( block ).getByText( title );
 
@@ -1000,7 +1000,7 @@ describe( 'Embed block', () => {
 		} );
 
 		MOST_USED_PROVIDERS.forEach( ( { title } ) =>
-			it( `inserts ${ title } embed block`, async () => {
+			it( `inserts ${ title } block`, async () => {
 				const embedBlockSlashInserter = `/${ title }`;
 				const editor = await initializeEditor( {
 					initialHtml: EMPTY_PARAGRAPH_HTML,
