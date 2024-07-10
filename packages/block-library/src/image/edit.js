@@ -23,6 +23,7 @@ import { useEffect, useRef, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { image as icon, plugins as pluginsIcon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
+import { useResizeObserver } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -108,6 +109,9 @@ export function ImageEdit( {
 		metadata,
 	} = attributes;
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
+
+	const [ contentResizeListener, { width: containerWidth } ] =
+		useResizeObserver();
 
 	const altRef = useRef();
 	useEffect( () => {
@@ -364,35 +368,39 @@ export function ImageEdit( {
 	};
 
 	return (
-		<figure { ...blockProps }>
-			<Image
-				temporaryURL={ temporaryURL }
-				attributes={ attributes }
-				setAttributes={ setAttributes }
-				isSingleSelected={ isSingleSelected }
-				insertBlocksAfter={ insertBlocksAfter }
-				onReplace={ onReplace }
-				onSelectImage={ onSelectImage }
-				onSelectURL={ onSelectURL }
-				onUploadError={ onUploadError }
-				context={ context }
-				clientId={ clientId }
-				blockEditingMode={ blockEditingMode }
-				parentLayoutType={ parentLayout?.type }
-			/>
-			<MediaPlaceholder
-				icon={ <BlockIcon icon={ icon } /> }
-				onSelect={ onSelectImage }
-				onSelectURL={ onSelectURL }
-				onError={ onUploadError }
-				placeholder={ placeholder }
-				accept="image/*"
-				allowedTypes={ ALLOWED_MEDIA_TYPES }
-				value={ { id, src } }
-				mediaPreview={ mediaPreview }
-				disableMediaButtons={ temporaryURL || url }
-			/>
-		</figure>
+		<>
+			{ contentResizeListener }
+			<figure { ...blockProps }>
+				<Image
+					temporaryURL={ temporaryURL }
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					isSingleSelected={ isSingleSelected }
+					insertBlocksAfter={ insertBlocksAfter }
+					onReplace={ onReplace }
+					onSelectImage={ onSelectImage }
+					onSelectURL={ onSelectURL }
+					onUploadError={ onUploadError }
+					context={ context }
+					clientId={ clientId }
+					blockEditingMode={ blockEditingMode }
+					parentLayoutType={ parentLayout?.type }
+					containerWidth={ containerWidth }
+				/>
+				<MediaPlaceholder
+					icon={ <BlockIcon icon={ icon } /> }
+					onSelect={ onSelectImage }
+					onSelectURL={ onSelectURL }
+					onError={ onUploadError }
+					placeholder={ placeholder }
+					accept="image/*"
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					value={ { id, src } }
+					mediaPreview={ mediaPreview }
+					disableMediaButtons={ temporaryURL || url }
+				/>
+			</figure>
+		</>
 	);
 }
 
