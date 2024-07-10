@@ -23,6 +23,7 @@ const { state, actions, callbacks } = store(
 	'core/image',
 	{
 		state: {
+			metadata: {},
 			currentImage: {},
 			get overlayOpened() {
 				return state.currentImage.currentSrc;
@@ -58,14 +59,20 @@ const { state, actions, callbacks } = store(
 					return;
 				}
 
-				// Stores the positons of the scroll to fix it until the overlay is
+				// Stores the positions of the scroll to fix it until the overlay is
 				// closed.
 				state.scrollTopReset = document.documentElement.scrollTop;
 				state.scrollLeftReset = document.documentElement.scrollLeft;
 
-				// Moves the information of the expaned image to the state.
-				ctx.currentSrc = ctx.imageRef.currentSrc;
-				state.currentImage = ctx;
+				// Sets the information of the expanded image in the state.
+				state.currentImage = {
+					...state.metadata[ ctx.imageId ],
+					imageRef: ctx.imageRef,
+					buttonRef: ctx.buttonRef,
+					currentSrc: ctx.imageRef.currentSrc,
+					imageButtonTop: ctx.imageButtonTop,
+					imageButtonRight: ctx.imageButtonRight,
+				};
 				state.overlayEnabled = true;
 
 				// Computes the styles of the overlay for the animation.

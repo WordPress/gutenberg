@@ -185,22 +185,36 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	$p->seek( 'figure' );
 	$figure_class_names = $p->get_attribute( 'class' );
 	$figure_styles      = $p->get_attribute( 'style' );
+
+	// Create unique id and set the image metadata in the state.
+	$unique_image_id = wp_unique_id( 'image-' );
+	wp_interactivity_state(
+		'core/image',
+		array(
+			'metadata' => array(
+				$unique_image_id => array(
+					'uploadedSrc'      => $img_uploaded_src,
+					'figureClassNames' => $figure_class_names,
+					'figureStyles'     => $figure_styles,
+					'imgClassNames'    => $img_class_names,
+					'imgStyles'        => $img_styles,
+					'targetWidth'      => $img_width,
+					'targetHeight'     => $img_height,
+					'scaleAttr'        => $block['attrs']['scale'] ?? false,
+					'ariaLabel'        => $aria_label,
+					'alt'              => $alt,
+				),
+			),
+		)
+	);
+
 	$p->add_class( 'wp-lightbox-container' );
 	$p->set_attribute( 'data-wp-interactive', 'core/image' );
 	$p->set_attribute(
 		'data-wp-context',
 		wp_json_encode(
 			array(
-				'uploadedSrc'      => $img_uploaded_src,
-				'figureClassNames' => $figure_class_names,
-				'figureStyles'     => $figure_styles,
-				'imgClassNames'    => $img_class_names,
-				'imgStyles'        => $img_styles,
-				'targetWidth'      => $img_width,
-				'targetHeight'     => $img_height,
-				'scaleAttr'        => $block['attrs']['scale'] ?? false,
-				'ariaLabel'        => $aria_label,
-				'alt'              => $alt,
+				'imageId' => $unique_image_id,
 			),
 			JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP
 		)
