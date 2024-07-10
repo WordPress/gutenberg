@@ -3,10 +3,9 @@
  */
 import {
 	__experimentalInputControl as InputControl,
-	__experimentalSpacer as Spacer,
+	__experimentalVStack as VStack,
+	__experimentalHStack as HStack,
 	Button,
-	Flex,
-	FlexItem,
 	Modal,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
