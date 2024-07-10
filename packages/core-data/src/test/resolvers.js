@@ -307,7 +307,7 @@ describe( 'canUser', () => {
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/media',
-			method: 'OPTIONS',
+			method: 'HEAD',
 			parse: false,
 		} );
 
@@ -327,7 +327,7 @@ describe( 'canUser', () => {
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/media',
-			method: 'OPTIONS',
+			method: 'HEAD',
 			parse: false,
 		} );
 
@@ -350,7 +350,7 @@ describe( 'canUser', () => {
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/media',
-			method: 'OPTIONS',
+			method: 'HEAD',
 			parse: false,
 		} );
 
@@ -373,7 +373,7 @@ describe( 'canUser', () => {
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/blocks/123',
-			method: 'OPTIONS',
+			method: 'HEAD',
 			parse: false,
 		} );
 
