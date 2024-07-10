@@ -1,0 +1,18 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "core/tab",
+	"title": "Tab",
+	"category": "design",
+	"description": "Tab container for content (use within the Tabs block).",
+	"textdomain": "default",
+	"__experimental": true,
+	"attributes": {},
+	"parent": [ "core/tabs" ],
+	"supports": {
+		"align": false,
+		"html": false
+	},
+	"editorScript": "file:./build/index.js",
+	"style": "file:./build/style.css"
+}

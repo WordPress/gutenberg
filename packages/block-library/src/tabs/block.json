@@ -1,0 +1,28 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "core/tabs",
+	"title": "Tabs",
+	"category": "design",
+	"description": "Organize content into tabs.",
+	"textdomain": "default",
+	"__experimental": true,
+	"allowedBlocks": [ "core/tab" ],
+	"attributes": {},
+	"supports": {
+		"align": [ "wide", "full" ],
+		"html": false,
+		"layout": {
+			"default": { "type": "flex", "orientation": "horizontal" },
+			"allowSwitching": false,
+			"allowJustification": false
+		},
+		"shadow": true,
+		"spacing": {
+			"margin": true,
+			"padding": true
+		}
+	},
+	"editorScript": "file:./build/index.js",
+	"style": "file:./build/style.css"
+}

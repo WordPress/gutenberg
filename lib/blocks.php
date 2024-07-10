@@ -39,6 +39,8 @@ function gutenberg_reregister_core_block_types() {
 				'spacer',
 				'table',
 				'table-of-contents',
+				'tab',
+				'tabs',
 				'text-columns',
 				'verse',
 				'video',
