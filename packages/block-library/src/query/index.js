@@ -71,7 +71,7 @@ export const settings = {
 	deprecated,
 };
 
-const previousPostTypes = [];
+let previousPostTypes = [];
 let haltSubscribing = false;
 
 const keywords = {
@@ -112,11 +112,17 @@ subscribe( () => {
 						postType: postType.slug,
 					},
 				},
-				keywords: keywords[ postType.slug ] ?? [],
+				keywords: [
+					postType.labels.name,
+					postType.labels.menu_name,
+					...( keywords[ postType.slug ] ?? [] ),
+				],
 			} );
 			haltSubscribing = false;
 		}
 	}
+
+	previousPostTypes = filteredPostTypes;
 } );
 
 export const init = () => initBlock( { name, metadata, settings } );
