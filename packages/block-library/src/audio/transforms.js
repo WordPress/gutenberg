@@ -20,7 +20,7 @@ const transforms = {
 				// It's already done as part of the `componentDidMount`
 				// in the audio block.
 				const block = createBlock( 'core/audio', {
-					src: createBlobURL( file ),
+					blob: createBlobURL( file ),
 				} );
 
 				return block;

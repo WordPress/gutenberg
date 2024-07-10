@@ -770,6 +770,7 @@ const useDuplicatePostAction = ( postType ) => {
 									<Button
 										variant="tertiary"
 										onClick={ closeModal }
+										__next40pxDefaultSize
 									>
 										{ __( 'Cancel' ) }
 									</Button>
@@ -778,6 +779,7 @@ const useDuplicatePostAction = ( postType ) => {
 										type="submit"
 										isBusy={ isCreatingPage }
 										aria-disabled={ isCreatingPage }
+										__next40pxDefaultSize
 									>
 										{ _x( 'Duplicate', 'action label' ) }
 									</Button>
