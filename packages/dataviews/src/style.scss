@@ -211,6 +211,10 @@
 				}
 			}
 		}
+
+		.components-v-stack > .dataviews-view-table__cell-content-wrapper:not(:first-child) {
+			min-height: 0;
+		}
 	}
 	.dataviews-view-table-header-button {
 		padding: $grid-unit-05 $grid-unit-10;
