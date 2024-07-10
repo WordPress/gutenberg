@@ -105,10 +105,10 @@ export const Select = styled( Ariakit.Select, {
 	`
 );
 
-const slideUpAndFade = keyframes( {
+const slideDownAndFade = keyframes( {
 	'0%': {
 		opacity: 0,
-		transform: `translateY(${ ANIMATION_PARAMS.SLIDE_AMOUNT })`,
+		transform: `translateY(-${ ANIMATION_PARAMS.SLIDE_AMOUNT })`,
 	},
 	'100%': { opacity: 1, transform: 'translateY(0)' },
 } );
@@ -134,7 +134,7 @@ export const SelectPopover = styled( Ariakit.SelectPopover )`
 	/* Animation */
 	animation-duration: ${ ANIMATION_PARAMS.DURATION };
 	animation-timing-function: ${ ANIMATION_PARAMS.EASING };
-	animation-name: ${ slideUpAndFade };
+	animation-name: ${ slideDownAndFade };
 	will-change: transform, opacity;
 	@media ( prefers-reduced-motion ) {
 		animation-duration: 0s;
