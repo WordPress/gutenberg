@@ -470,24 +470,23 @@ function TableRow< Item >( {
 					</div>
 				</td>
 			) }
-			{ columns.map( ( column ) => (
-				<td
-					key={ column }
-					/*style={ {
-						width: field.width || undefined,
-						minWidth: field.minWidth || undefined,
-						maxWidth: field.maxWidth || undefined,
-					} }*/
-				>
-					<TableColumn
-						primaryField={ primaryField }
-						fields={ fields }
-						item={ item }
-						column={ column }
-						view={ view }
-					/>
-				</td>
-			) ) }
+			{ columns.map( ( column: string ) => {
+				// Explicits picks the supported styles.
+				const { width, maxWidth, minWidth } =
+					view.layout?.styles?.[ column ] ?? {};
+
+				return (
+					<td key={ column } style={ { width, maxWidth, minWidth } }>
+						<TableColumn
+							primaryField={ primaryField }
+							fields={ fields }
+							item={ item }
+							column={ column }
+							view={ view }
+						/>
+					</td>
+				);
+			} ) }
 			{ !! actions?.length && (
 				// Disable reason: we are not making the element interactive,
 				// but preventing any click events from bubbling up to the
@@ -588,51 +587,52 @@ function ViewTable< Item >( {
 								/>
 							</th>
 						) }
-						{ columns.map( ( column, index ) => (
-							<th
-								key={ column }
-								/*style={ {
-									width: field.width || undefined,
-									minWidth: field.minWidth || undefined,
-									maxWidth: field.maxWidth || undefined,
-								} }*/
-								aria-sort={
-									view.sort?.field === column
-										? sortValues[ view.sort.direction ]
-										: undefined
-								}
-								scope="col"
-							>
-								<HeaderMenu
-									ref={ ( node ) => {
-										if ( node ) {
-											headerMenuRefs.current.set(
-												column,
-												{
-													node,
-													fallback:
-														columns[
-															index > 0
-																? index - 1
-																: 1
-														],
-												}
-											);
-										} else {
-											headerMenuRefs.current.delete(
-												column
-											);
-										}
-									} }
-									fieldId={ column }
-									view={ view }
-									fields={ fields }
-									onChangeView={ onChangeView }
-									onHide={ onHide }
-									setOpenedFilter={ setOpenedFilter }
-								/>
-							</th>
-						) ) }
+						{ columns.map( ( column, index ) => {
+							// Explicits picks the supported styles.
+							const { width, maxWidth, minWidth } =
+								view.layout?.styles?.[ column ] ?? {};
+							return (
+								<th
+									key={ column }
+									style={ { width, maxWidth, minWidth } }
+									aria-sort={
+										view.sort?.field === column
+											? sortValues[ view.sort.direction ]
+											: undefined
+									}
+									scope="col"
+								>
+									<HeaderMenu
+										ref={ ( node ) => {
+											if ( node ) {
+												headerMenuRefs.current.set(
+													column,
+													{
+														node,
+														fallback:
+															columns[
+																index > 0
+																	? index - 1
+																	: 1
+															],
+													}
+												);
+											} else {
+												headerMenuRefs.current.delete(
+													column
+												);
+											}
+										} }
+										fieldId={ column }
+										view={ view }
+										fields={ fields }
+										onChangeView={ onChangeView }
+										onHide={ onHide }
+										setOpenedFilter={ setOpenedFilter }
+									/>
+								</th>
+							);
+						} ) }
 						{ !! actions?.length && (
 							<th className="dataviews-view-table__actions-column">
 								<span className="dataviews-view-table-header">

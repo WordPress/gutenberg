@@ -39,6 +39,20 @@ Default.args = {
 		[ LAYOUT_TABLE ]: {
 			layout: {
 				primaryField: 'title',
+				styles: {
+					image: {
+						width: 50,
+					},
+					title: {
+						maxWidth: 400,
+					},
+					type: {
+						maxWidth: 400,
+					},
+					description: {
+						maxWidth: 200,
+					},
+				},
 			},
 		},
 		[ LAYOUT_GRID ]: {

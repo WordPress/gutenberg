@@ -62,6 +62,19 @@ const defaultLayouts = {
 					direction: 'vertical',
 				},
 			],
+			styles: {
+				template: {
+					maxWidth: 400,
+					minWidth: 320,
+				},
+				preview: {
+					minWidth: 120,
+					maxWidth: 120,
+				},
+				author: {
+					width: '1%',
+				},
+			},
 		},
 	},
 	[ LAYOUT_GRID ]: {
@@ -277,8 +290,6 @@ export default function PageTemplates() {
 				render: ( { item } ) => {
 					return <Preview item={ item } viewType={ view.type } />;
 				},
-				minWidth: 120,
-				maxWidth: 120,
 				enableSorting: false,
 			},
 			{
@@ -288,7 +299,6 @@ export default function PageTemplates() {
 				render: ( { item } ) => (
 					<Title item={ item } viewType={ view.type } />
 				),
-				maxWidth: 400,
 				enableHiding: false,
 				enableGlobalSearch: true,
 			},
@@ -304,8 +314,6 @@ export default function PageTemplates() {
 						)
 					);
 				},
-				maxWidth: 400,
-				minWidth: 320,
 				enableSorting: false,
 				enableGlobalSearch: true,
 			},
@@ -317,7 +325,6 @@ export default function PageTemplates() {
 					return <AuthorField viewType={ view.type } item={ item } />;
 				},
 				elements: authors,
-				width: '1%',
 			},
 		],
 		[ authors, view.type ]
