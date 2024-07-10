@@ -154,38 +154,40 @@ function FontSize() {
 						) }
 						onBack={ () => goTo( '/typography/font-sizes/' ) }
 					/>
-					<FlexItem>
-						<Spacer
-							marginTop={ 3 }
-							marginBottom={ 0 }
-							paddingX={ 4 }
-						>
-							<DropdownMenu
-								trigger={
-									<Button
-										size="small"
-										icon={ moreVertical }
-										label={ __( 'Font size options' ) }
-									/>
-								}
+					{ origin !== 'default' && (
+						<FlexItem>
+							<Spacer
+								marginTop={ 3 }
+								marginBottom={ 0 }
+								paddingX={ 4 }
 							>
-								<DropdownMenuItem
-									onClick={ toggleRenameDialog }
+								<DropdownMenu
+									trigger={
+										<Button
+											size="small"
+											icon={ moreVertical }
+											label={ __( 'Font size options' ) }
+										/>
+									}
 								>
-									<DropdownMenuItemLabel>
-										{ __( 'Rename' ) }
-									</DropdownMenuItemLabel>
-								</DropdownMenuItem>
-								<DropdownMenuItem
-									onClick={ toggleDeleteConfirm }
-								>
-									<DropdownMenuItemLabel>
-										{ __( 'Delete' ) }
-									</DropdownMenuItemLabel>
-								</DropdownMenuItem>
-							</DropdownMenu>
-						</Spacer>
-					</FlexItem>
+									<DropdownMenuItem
+										onClick={ toggleRenameDialog }
+									>
+										<DropdownMenuItemLabel>
+											{ __( 'Rename' ) }
+										</DropdownMenuItemLabel>
+									</DropdownMenuItem>
+									<DropdownMenuItem
+										onClick={ toggleDeleteConfirm }
+									>
+										<DropdownMenuItemLabel>
+											{ __( 'Delete' ) }
+										</DropdownMenuItemLabel>
+									</DropdownMenuItem>
+								</DropdownMenu>
+							</Spacer>
+						</FlexItem>
+					) }
 				</HStack>
 
 				<View>
