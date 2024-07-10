@@ -165,7 +165,7 @@ function FontSize() {
 									<Button
 										size="small"
 										icon={ moreVertical }
-										label={ __( 'Menu' ) }
+										label={ __( 'Font size options' ) }
 									/>
 								}
 							>
