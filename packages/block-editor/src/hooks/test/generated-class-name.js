@@ -76,6 +76,24 @@ describe( 'generated className', () => {
 			expect( extraProps ).not.toHaveProperty( 'className' );
 		} );
 
+		it( 'should do nothing if the block settings opt out of generated className support via the block property', () => {
+			const attributes = { className: 'foo' };
+			const extraProps = addSaveProps(
+				{},
+				{
+					...blockSettings,
+					supports: {
+						className: {
+							block: false,
+						},
+					},
+				},
+				attributes
+			);
+
+			expect( extraProps ).not.toHaveProperty( 'className' );
+		} );
+
 		it( 'should inject the generated className', () => {
 			const attributes = { className: 'bar' };
 			const extraProps = addSaveProps(
@@ -115,27 +133,6 @@ describe( 'generated className', () => {
 			expect( extraProps ).not.toHaveProperty( 'className' );
 		} );
 
-		it( 'should inject the generated variation className', () => {
-			const attributes = { className: 'bar', fruit: 'banana' };
-			const extraProps = addSaveProps(
-				{ className: 'foo' },
-				{
-					...blockSettings,
-					variations,
-					supports: {
-						className: {
-							variation: true,
-						},
-					},
-				},
-				attributes
-			);
-
-			expect( extraProps.className ).toBe(
-				'wp-block-produce-fruit-banana foo'
-			);
-		} );
-
 		it( 'should inject generated classNames for both block and variation', () => {
 			const attributes = { className: 'bar', fruit: 'banana' };
 			const extraProps = addSaveProps(
@@ -145,7 +142,6 @@ describe( 'generated className', () => {
 					variations,
 					supports: {
 						className: {
-							block: true,
 							variation: true,
 						},
 					},
@@ -155,6 +151,28 @@ describe( 'generated className', () => {
 
 			expect( extraProps.className ).toBe(
 				'wp-block-produce-fruit wp-block-produce-fruit-banana foo'
+			);
+		} );
+
+		it( 'should only inject the generated variation className if the block property is explicitly set to false', () => {
+			const attributes = { className: 'bar', fruit: 'banana' };
+			const extraProps = addSaveProps(
+				{ className: 'foo' },
+				{
+					...blockSettings,
+					variations,
+					supports: {
+						className: {
+							block: false,
+							variation: true,
+						},
+					},
+				},
+				attributes
+			);
+
+			expect( extraProps.className ).toBe(
+				'wp-block-produce-fruit-banana foo'
 			);
 		} );
 	} );

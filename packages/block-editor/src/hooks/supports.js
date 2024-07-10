@@ -346,9 +346,20 @@ export const hasStyleSupport = ( nameOrType ) =>
  * @param {string|Object} nameOrType Block name or type object.
  * @return {boolean} Whether the block supports the feature.
  */
-export const hasBlockClassNameSupport = ( nameOrType ) =>
-	getBlockSupport( nameOrType, 'className', true ) === true ||
-	hasBlockSupport( nameOrType, 'className.block', false );
+export const hasBlockClassNameSupport = ( nameOrType ) => {
+	const classNameSupport = getBlockSupport( nameOrType, 'className', true );
+
+	if ( classNameSupport === true || classNameSupport === false ) {
+		return classNameSupport;
+	}
+
+	// classNameSupport can be an object. If it doesn't have a block key,
+	// we default to true.
+	return (
+		! Object.hasOwn( classNameSupport, 'block' ) ||
+		classNameSupport.block === true
+	);
+};
 
 /**
  * Returns true if the block defines support for variation class name.
