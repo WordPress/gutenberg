@@ -339,7 +339,7 @@ function PushChangesToGlobalStylesControl( {
 			<Button
 				__next40pxDefaultSize
 				variant="secondary"
-				__experimentalIsFocusable
+				accessibleWhenDisabled
 				disabled={ changes.length === 0 }
 				onClick={ pushChanges }
 			>

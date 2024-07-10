@@ -12,6 +12,7 @@ import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-reco
 
 declare module './base-entity-records' {
 	export namespace BaseEntityRecords {
+		/* eslint-disable-next-line @typescript-eslint/no-unused-vars */
 		export interface Settings< C extends Context > {
 			/**
 			 * What to show on the front page

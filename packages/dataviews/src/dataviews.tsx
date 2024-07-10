@@ -18,10 +18,19 @@ import Filters from './filters';
 import Search from './search';
 import { LAYOUT_TABLE, LAYOUT_GRID } from './constants';
 import { VIEW_LAYOUTS } from './layouts';
-import BulkActions from './bulk-actions';
+import {
+	default as BulkActions,
+	useSomeItemHasAPossibleBulkAction,
+} from './bulk-actions';
 import { normalizeFields } from './normalize-fields';
 import BulkActionsToolbar from './bulk-actions-toolbar';
-import type { Action, Field, View, ViewBaseProps } from './types';
+import type {
+	Action,
+	Field,
+	View,
+	ViewBaseProps,
+	SupportedLayouts,
+} from './types';
 import type { SetSelection, SelectionOrUpdater } from './private-types';
 
 type ItemWithId = { id: string };
@@ -39,7 +48,7 @@ type DataViewsProps< Item > = {
 		totalItems: number;
 		totalPages: number;
 	};
-	supportedLayouts: string[];
+	defaultLayouts: SupportedLayouts;
 	selection?: string[];
 	setSelection?: SetSelection;
 	onSelectionChange?: ( items: Item[] ) => void;
@@ -50,22 +59,6 @@ type DataViewsProps< Item > = {
 const defaultGetItemId = ( item: ItemWithId ) => item.id;
 
 const defaultOnSelectionChange = () => {};
-
-function useSomeItemHasAPossibleBulkAction< Item >(
-	actions: Action< Item >[],
-	data: Item[]
-) {
-	return useMemo( () => {
-		return data.some( ( item ) => {
-			return actions.some( ( action ) => {
-				return (
-					action.supportsBulk &&
-					( ! action.isEligible || action.isEligible( item ) )
-				);
-			} );
-		} );
-	}, [ actions, data ] );
-}
 
 export default function DataViews< Item >( {
 	view,
@@ -78,7 +71,7 @@ export default function DataViews< Item >( {
 	getItemId = defaultGetItemId,
 	isLoading = false,
 	paginationInfo,
-	supportedLayouts,
+	defaultLayouts,
 	selection: selectionProperty,
 	setSelection: setSelectionProperty,
 	onSelectionChange = defaultOnSelectionChange,
@@ -155,7 +148,7 @@ export default function DataViews< Item >( {
 					fields={ _fields }
 					view={ view }
 					onChangeView={ onChangeView }
-					supportedLayouts={ supportedLayouts }
+					defaultLayouts={ defaultLayouts }
 				/>
 			</HStack>
 			<ViewComponent

@@ -44,10 +44,17 @@ export type Operator =
 
 export type ItemRecord = Record< string, unknown >;
 
+export type FieldType = 'text';
+
 /**
  * A dataview field for a specific property of a data type.
  */
 export type Field< Item > = {
+	/**
+	 * Type of the fields.
+	 */
+	type?: FieldType;
+
 	/**
 	 * The unique identifier of the field.
 	 */
@@ -57,6 +64,11 @@ export type Field< Item > = {
 	 * The label of the field. Defaults to the id.
 	 */
 	header?: string;
+
+	/**
+	 * Placeholder for the field.
+	 */
+	placeholder?: string;
 
 	/**
 	 * Callback used to render the field. Defaults to `field.getValue`.
@@ -132,6 +144,13 @@ export type Fields< Item > = Field< Item >[];
 export type Data< Item > = Item[];
 
 /**
+ * The form configuration.
+ */
+export type Form = {
+	visibleFields?: string[];
+};
+
+/**
  * The filters applied to the dataset.
  */
 export interface Filter {
@@ -202,7 +221,7 @@ interface ViewBase {
 	/**
 	 * The filters to apply.
 	 */
-	filters: Filter[];
+	filters?: Filter[];
 
 	/**
 	 * The sorting configuration.
@@ -232,13 +251,13 @@ interface ViewBase {
 	/**
 	 * The hidden fields.
 	 */
-	hiddenFields?: string[];
+	fields?: string[];
 }
 
 export interface ViewTable extends ViewBase {
 	type: 'table';
 
-	layout: {
+	layout?: {
 		/**
 		 * The field to use as the primary field.
 		 */
@@ -254,7 +273,7 @@ export interface ViewTable extends ViewBase {
 export interface ViewList extends ViewBase {
 	type: 'list';
 
-	layout: {
+	layout?: {
 		/**
 		 * The field to use as the primary field.
 		 */
@@ -270,7 +289,7 @@ export interface ViewList extends ViewBase {
 export interface ViewGrid extends ViewBase {
 	type: 'grid';
 
-	layout: {
+	layout?: {
 		/**
 		 * The field to use as the primary field.
 		 */
@@ -387,7 +406,7 @@ export interface ViewBaseProps< Item > {
 	fields: NormalizedField< Item >[];
 	getItemId: ( item: Item ) => string;
 	isLoading?: boolean;
-	onChangeView( view: View ): void;
+	onChangeView: ( view: View ) => void;
 	onSelectionChange: SetSelection;
 	selection: string[];
 	setOpenedFilter: ( fieldId: string ) => void;
@@ -410,3 +429,9 @@ export type ViewProps< Item > =
 	| ViewTableProps< Item >
 	| ViewGridProps< Item >
 	| ViewListProps< Item >;
+
+export interface SupportedLayouts {
+	list?: Omit< ViewList, 'type' >;
+	grid?: Omit< ViewGrid, 'type' >;
+	table?: Omit< ViewTable, 'type' >;
+}

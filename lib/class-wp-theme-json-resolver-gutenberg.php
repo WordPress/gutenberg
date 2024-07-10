@@ -805,6 +805,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * as the value of `_link` object in REST API responses.
 	 *
 	 * @since 6.6.0
+	 * @since 6.7.0 Added support for resolving block styles.
 	 *
 	 * @param WP_Theme_JSON_Gutenberg $theme_json A theme json instance.
 	 * @return array An array of resolved paths.
@@ -818,10 +819,11 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 
 		$theme_json_data = $theme_json->get_raw_data();
 
-		// Top level styles.
-		$background_image_url = $theme_json_data['styles']['background']['backgroundImage']['url'] ?? null;
 		// Using the same file convention when registering web fonts. See: WP_Font_Face_Resolver:: to_theme_file_uri.
 		$placeholder = 'file:./';
+
+		// Top level styles.
+		$background_image_url = $theme_json_data['styles']['background']['backgroundImage']['url'] ?? null;
 		if (
 			isset( $background_image_url ) &&
 			is_string( $background_image_url ) &&
@@ -838,6 +840,33 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 					$resolved_theme_uri['type'] = $file_type['type'];
 				}
 				$resolved_theme_uris[] = $resolved_theme_uri;
+		}
+
+		// Block styles.
+		if ( ! empty( $theme_json_data['styles']['blocks'] ) ) {
+			foreach ( $theme_json_data['styles']['blocks'] as $block_name => $block_styles ) {
+				if ( ! isset( $block_styles['background']['backgroundImage']['url'] ) ) {
+					continue;
+				}
+				$background_image_url = $block_styles['background']['backgroundImage']['url'] ?? null;
+				if (
+					isset( $background_image_url ) &&
+					is_string( $background_image_url ) &&
+					// Skip if the src doesn't start with the placeholder, as there's nothing to replace.
+					str_starts_with( $background_image_url, $placeholder ) ) {
+					$file_type          = wp_check_filetype( $background_image_url );
+					$src_url            = str_replace( $placeholder, '', $background_image_url );
+					$resolved_theme_uri = array(
+						'name'   => $background_image_url,
+						'href'   => sanitize_url( get_theme_file_uri( $src_url ) ),
+						'target' => "styles.blocks.{$block_name}.background.backgroundImage.url",
+					);
+					if ( isset( $file_type['type'] ) ) {
+						$resolved_theme_uri['type'] = $file_type['type'];
+					}
+					$resolved_theme_uris[] = $resolved_theme_uri;
+				}
+			}
 		}
 
 		return $resolved_theme_uris;

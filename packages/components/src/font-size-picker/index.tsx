@@ -262,7 +262,7 @@ const UnforwardedFontSizePicker = (
 							<FlexItem>
 								<Button
 									disabled={ isDisabled }
-									__experimentalIsFocusable
+									accessibleWhenDisabled
 									onClick={ () => {
 										onChange?.( undefined );
 									} }

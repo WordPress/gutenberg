@@ -81,11 +81,7 @@ export default function ResetOverridesControl( props ) {
 	return (
 		<BlockControls group="other">
 			<ToolbarGroup>
-				<ToolbarButton
-					onClick={ onClick }
-					disabled={ ! isOverriden }
-					__experimentalIsFocusable
-				>
+				<ToolbarButton onClick={ onClick } disabled={ ! isOverriden }>
 					{ __( 'Reset' ) }
 				</ToolbarButton>
 			</ToolbarGroup>

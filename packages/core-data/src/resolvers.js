@@ -63,7 +63,7 @@ export const getEntityRecord =
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
 		);
-		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
+		if ( ! entityConfig ) {
 			return;
 		}
 
@@ -198,7 +198,7 @@ export const getEntityRecords =
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
 		);
-		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
+		if ( ! entityConfig ) {
 			return;
 		}
 
@@ -414,12 +414,14 @@ export const canUser =
 			permissions[ actionName ] = allowedMethods.includes( methodName );
 		}
 
-		for ( const action of retrievedActions ) {
-			dispatch.receiveUserPermission(
-				`${ action }/${ resourcePath }`,
-				permissions[ action ]
-			);
-		}
+		registry.batch( () => {
+			for ( const action of retrievedActions ) {
+				dispatch.receiveUserPermission(
+					`${ action }/${ resourcePath }`,
+					permissions[ action ]
+				);
+			}
+		} );
 	};
 
 /**
@@ -543,13 +545,17 @@ export const __experimentalGetCurrentGlobalStylesId =
 		const globalStylesURL =
 			activeThemes?.[ 0 ]?._links?.[ 'wp:user-global-styles' ]?.[ 0 ]
 				?.href;
-		if ( globalStylesURL ) {
-			const globalStylesObject = await apiFetch( {
-				url: globalStylesURL,
-			} );
-			dispatch.__experimentalReceiveCurrentGlobalStylesId(
-				globalStylesObject.id
-			);
+		if ( ! globalStylesURL ) {
+			return;
+		}
+
+		// Regex matches the ID at the end of a URL or immediately before
+		// the query string.
+		const matches = globalStylesURL.match( /\/(\d+)(?:\?|$)/ );
+		const id = matches ? Number( matches[ 1 ] ) : null;
+
+		if ( id ) {
+			dispatch.__experimentalReceiveCurrentGlobalStylesId( id );
 		}
 	};
 
@@ -736,7 +742,7 @@ export const getRevisions =
 			( config ) => config.name === name && config.kind === kind
 		);
 
-		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
+		if ( ! entityConfig ) {
 			return;
 		}
 
@@ -861,7 +867,7 @@ export const getRevision =
 			( config ) => config.name === name && config.kind === kind
 		);
 
-		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
+		if ( ! entityConfig ) {
 			return;
 		}
 

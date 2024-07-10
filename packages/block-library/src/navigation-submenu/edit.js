@@ -387,7 +387,7 @@ export default function NavigationSubmenuEdit( {
 						title={ __( 'Convert to Link' ) }
 						onClick={ transformToLink }
 						className="wp-block-navigation__submenu__revert"
-						isDisabled={ ! canConvertToLink }
+						disabled={ ! canConvertToLink }
 					/>
 				</ToolbarGroup>
 			</BlockControls>

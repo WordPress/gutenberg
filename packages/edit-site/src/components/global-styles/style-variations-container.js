@@ -13,7 +13,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
  */
 import PreviewStyles from './preview-styles';
 import Variation from './variations/variation';
-import { isVariationWithSingleProperty } from '../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
+import { isVariationWithProperties } from '../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
 import { unlock } from '../../lock-unlock';
 
 const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
@@ -33,11 +33,14 @@ export default function StyleVariationsContainer( { gap = 2 } ) {
 		).__experimentalGetCurrentThemeGlobalStylesVariations();
 	}, [] );
 
-	// Filter out variations that are of single property type, i.e. color or typography variations.
-	const multiplePropertyVariations = variations?.filter( ( variation ) => {
+	// Filter out variations that are color or typography variations.
+	const fullStyleVariations = variations?.filter( ( variation ) => {
 		return (
-			! isVariationWithSingleProperty( variation, 'color' ) &&
-			! isVariationWithSingleProperty( variation, 'typography' )
+			! isVariationWithProperties( variation, [ 'color' ] ) &&
+			! isVariationWithProperties( variation, [
+				'typography',
+				'spacing',
+			] )
 		);
 	} );
 
@@ -48,7 +51,7 @@ export default function StyleVariationsContainer( { gap = 2 } ) {
 				settings: {},
 				styles: {},
 			},
-			...( multiplePropertyVariations ?? [] ),
+			...( fullStyleVariations ?? [] ),
 		];
 		return [
 			...withEmptyVariation.map( ( variation ) => {
@@ -105,7 +108,7 @@ export default function StyleVariationsContainer( { gap = 2 } ) {
 				};
 			} ),
 		];
-	}, [ multiplePropertyVariations, userStyles?.blocks, userStyles?.css ] );
+	}, [ fullStyleVariations, userStyles?.blocks, userStyles?.css ] );
 
 	return (
 		<Grid

@@ -269,7 +269,8 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		props.ref,
 		__unstableDisableDropZone ||
 		isDropZoneDisabled ||
-		( layout?.columnCount && window.__experimentalEnableGridInteractivity )
+		( layout?.isManualPlacement &&
+			window.__experimentalEnableGridInteractivity )
 			? null
 			: blockDropZoneRef,
 	] );
