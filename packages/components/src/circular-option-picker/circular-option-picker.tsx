@@ -13,7 +13,7 @@ import { isRTL } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { CircularOptionPickerContext } from './circular-option-picker-context';
-import { Composite, useCompositeStore } from '../composite/v2';
+import { Composite, useCompositeStore } from '../composite';
 import type {
 	CircularOptionPickerProps,
 	ListboxCircularOptionPickerProps,
