@@ -176,8 +176,11 @@ attributes: {
 
 ## className
 
--   Type: `boolean`
+-   Type: `boolean` or `Object`
 -   Default value: `true`
+-   Subproperties:
+    -   `block`: type `boolean`, default value `false`
+    -   `variation`: type `boolean`, default value `true`
 
 By default, the class `.wp-block-your-block-name` is added to the root element of your saved markup. This helps by providing a consistent mechanism for styling blocks that themes and plugins can rely on. If, for whatever reason, a class is not desired on the markup, this functionality can be disabled.
 
@@ -185,6 +188,32 @@ By default, the class `.wp-block-your-block-name` is added to the root element o
 supports: {
 	// Remove the support for the generated className.
 	className: false
+}
+```
+
+### className.block
+
+The above is equivalent to the more verbose
+
+```js
+supports: {
+	// Remove the support for the generated className.
+	className: {
+		block: false
+	}
+}
+```
+
+### className.variation
+
+In the same vein, it is possible to have a variation-specific class added to a block (if the latter supports variations). E.g. if a block named `your/block-name` has a variation called `your-variation`, the following will add the class `.wp-block-your-block-name-your-variation`:
+
+```js
+supports: {
+	// Add block variation-specific className.
+	className: {
+		variation: true
+	}
 }
 ```
 
