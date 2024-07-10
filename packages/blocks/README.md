@@ -198,6 +198,21 @@ _Returns_
 
 -   `Array`: Block settings.
 
+### getBlockVariationClassName
+
+Returns a block variation specific classname.
+
+If the given block matches a variation, the classname will be the block's default classname with the variation name appended (separated by a hyphen).
+
+_Parameters_
+
+-   _blockName_ `string`: The block name.
+-   _attributes_ `Object`: Block attributes.
+
+_Returns_
+
+-   `string|null`: The block variation classname, or null if the block doesn't match any variation.
+
 ### getChildBlockNames
 
 Returns an array with the child blocks of a given block.
