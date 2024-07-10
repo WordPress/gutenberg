@@ -388,6 +388,14 @@ module.exports = {
 			},
 		},
 		{
+			files: [ '**/@(storybook|stories)/*' ],
+			rules: {
+				// Suggested workaround for hooks used in CSF3 format stories.
+				// https://github.com/storybookjs/eslint-plugin-storybook/pull/149
+				'react-hooks/rules-of-hooks': 'off',
+			},
+		},
+		{
 			files: [ 'packages/components/src/**' ],
 			excludedFiles: [
 				'packages/components/src/utils/colors-values.js',
