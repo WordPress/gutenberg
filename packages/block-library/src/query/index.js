@@ -2,6 +2,13 @@
  * WordPress dependencies
  */
 import { loop as icon } from '@wordpress/icons';
+import { subscribe, select } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+import {
+	registerBlockVariation,
+	unregisterBlockVariation,
+} from '@wordpress/blocks';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -63,5 +70,53 @@ export const settings = {
 	variations,
 	deprecated,
 };
+
+const previousPostTypes = [];
+let haltSubscribing = false;
+
+const keywords = {
+	post: [ 'blog' ],
+};
+
+subscribe( () => {
+	if ( haltSubscribing ) {
+		return;
+	}
+	const { getPostTypes } = select( coreStore );
+	const excludedPostTypes = [ 'attachment' ];
+	const filteredPostTypes = ( getPostTypes( { per_page: -1 } ) ?? [] ).filter(
+		( { viewable, slug } ) =>
+			viewable && ! excludedPostTypes.includes( slug )
+	);
+
+	for ( const postType of previousPostTypes ) {
+		if ( ! filteredPostTypes.includes( postType ) ) {
+			haltSubscribing = true;
+			unregisterBlockVariation( name, postType.slug );
+			haltSubscribing = false;
+		}
+	}
+
+	for ( const postType of filteredPostTypes ) {
+		if ( ! previousPostTypes.includes( postType ) ) {
+			haltSubscribing = true;
+			registerBlockVariation( name, {
+				name: postType.slug,
+				title: sprintf(
+					/* translators: %s: post type */
+					__( '%s Query Loop' ),
+					postType.labels.singular_name
+				),
+				attributes: {
+					query: {
+						postType: postType.slug,
+					},
+				},
+				keywords: keywords[ postType.slug ] ?? [],
+			} );
+			haltSubscribing = false;
+		}
+	}
+} );
 
 export const init = () => initBlock( { name, metadata, settings } );
