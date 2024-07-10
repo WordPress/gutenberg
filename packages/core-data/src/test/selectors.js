@@ -690,24 +690,35 @@ describe( 'canUser', () => {
 			userPermissions: {},
 		} );
 		expect( canUser( state, 'create', 'media' ) ).toBe( undefined );
+		expect(
+			canUser( state, 'create', { kind: 'root', name: 'media' } )
+		).toBe( undefined );
 	} );
 
 	it( 'returns whether an action can be performed', () => {
 		const state = deepFreeze( {
 			userPermissions: {
 				'create/media': false,
+				'create/root/media': false,
 			},
 		} );
 		expect( canUser( state, 'create', 'media' ) ).toBe( false );
+		expect(
+			canUser( state, 'create', { kind: 'root', name: 'media' } )
+		).toBe( false );
 	} );
 
 	it( 'returns whether an action can be performed for a given resource', () => {
 		const state = deepFreeze( {
 			userPermissions: {
 				'create/media/123': false,
+				'create/root/media/123': false,
 			},
 		} );
 		expect( canUser( state, 'create', 'media', 123 ) ).toBe( false );
+		expect(
+			canUser( state, 'create', { kind: 'root', name: 'media', id: 123 } )
+		).toBe( false );
 	} );
 } );
 

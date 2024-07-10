@@ -374,7 +374,7 @@ export const canUser =
 			const entityConfig = configs.find(
 				( config ) =>
 					config.name === resource.name &&
-					config.kind === resource.name
+					config.kind === resource.kind
 			);
 			if ( ! entityConfig ) {
 				return;

@@ -283,6 +283,21 @@ describe( 'getEmbedPreview', () => {
 } );
 
 describe( 'canUser', () => {
+	const ENTITIES = [
+		{
+			name: 'media',
+			kind: 'root',
+			baseURL: '/wp/v2/media',
+			baseURLParams: { context: 'edit' },
+		},
+		{
+			name: 'wp_block',
+			kind: 'postType',
+			baseURL: '/wp/v2/blocks',
+			baseURLParams: { context: 'edit' },
+		},
+	];
+
 	let dispatch, registry;
 	beforeEach( async () => {
 		registry = {
@@ -294,6 +309,7 @@ describe( 'canUser', () => {
 		dispatch = Object.assign( jest.fn(), {
 			receiveUserPermission: jest.fn(),
 		} );
+		dispatch.mockReturnValue( ENTITIES );
 		triggerFetch.mockReset();
 	} );
 
@@ -303,6 +319,10 @@ describe( 'canUser', () => {
 		);
 
 		await canUser( 'create', 'media' )( { dispatch, registry } );
+		await canUser( 'create', { kind: 'root', name: 'media' } )( {
+			dispatch,
+			registry,
+		} );
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/media',
@@ -332,6 +352,28 @@ describe( 'canUser', () => {
 		);
 	} );
 
+	it( 'receives false when the user is not allowed to perform an action on entities', async () => {
+		triggerFetch.mockImplementation( () => ( {
+			headers: new Map( [ [ 'allow', 'GET' ] ] ),
+		} ) );
+
+		await canUser( 'create', { kind: 'root', name: 'media' } )( {
+			dispatch,
+			registry,
+		} );
+
+		expect( triggerFetch ).toHaveBeenCalledWith( {
+			path: '/wp/v2/media',
+			method: 'OPTIONS',
+			parse: false,
+		} );
+
+		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
+			'create/root/media',
+			false
+		);
+	} );
+
 	it( 'receives true when the user is allowed to perform an action', async () => {
 		triggerFetch.mockImplementation( () => ( {
 			headers: new Map( [ [ 'allow', 'POST, GET, PUT, DELETE' ] ] ),
@@ -351,6 +393,28 @@ describe( 'canUser', () => {
 		);
 	} );
 
+	it( 'receives true when the user is allowed to perform an action on entities', async () => {
+		triggerFetch.mockImplementation( () => ( {
+			headers: new Map( [ [ 'allow', 'POST, GET, PUT, DELETE' ] ] ),
+		} ) );
+
+		await canUser( 'create', { kind: 'root', name: 'media' } )( {
+			dispatch,
+			registry,
+		} );
+
+		expect( triggerFetch ).toHaveBeenCalledWith( {
+			path: '/wp/v2/media',
+			method: 'OPTIONS',
+			parse: false,
+		} );
+
+		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
+			'create/root/media',
+			true
+		);
+	} );
+
 	it( 'receives true when the user is allowed to perform an action on a specific resource', async () => {
 		triggerFetch.mockImplementation( () => ( {
 			headers: new Map( [ [ 'allow', 'POST, GET, PUT, DELETE' ] ] ),
@@ -366,6 +430,32 @@ describe( 'canUser', () => {
 
 		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
 			'create/blocks/123',
+			true
+		);
+	} );
+
+	it( 'receives true when the user is allowed to perform an action on a specific entity', async () => {
+		triggerFetch.mockImplementation( () => ( {
+			headers: new Map( [ [ 'allow', 'POST, GET, PUT, DELETE' ] ] ),
+		} ) );
+
+		await canUser( 'create', {
+			kind: 'postType',
+			name: 'wp_block',
+			id: 123,
+		} )( {
+			dispatch,
+			registry,
+		} );
+
+		expect( triggerFetch ).toHaveBeenCalledWith( {
+			path: '/wp/v2/blocks/123',
+			method: 'OPTIONS',
+			parse: false,
+		} );
+
+		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
+			'create/postType/wp_block/123',
 			true
 		);
 	} );
@@ -393,6 +483,45 @@ describe( 'canUser', () => {
 		);
 		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
 			'read/blocks',
+			true
+		);
+	} );
+
+	it( 'runs apiFetch only once per entity', async () => {
+		registry = {
+			...registry,
+			select: () => ( {
+				hasStartedResolution: ( _, [ action ] ) => action === 'read',
+			} ),
+		};
+
+		triggerFetch.mockImplementation( () => ( {
+			headers: new Map( [ [ 'allow', 'POST, GET' ] ] ),
+		} ) );
+
+		await canUser( 'create', {
+			kind: 'postType',
+			name: 'wp_block',
+		} )( {
+			dispatch,
+			registry,
+		} );
+		await canUser( 'read', {
+			kind: 'postType',
+			name: 'wp_block',
+		} )( {
+			dispatch,
+			registry,
+		} );
+
+		expect( triggerFetch ).toHaveBeenCalledTimes( 1 );
+
+		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
+			'create/postType/wp_block',
+			true
+		);
+		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
+			'read/postType/wp_block',
 			true
 		);
 	} );
@@ -465,6 +594,59 @@ describe( 'canUser', () => {
 		);
 		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
 			'delete/blocks/123',
+			true
+		);
+	} );
+
+	it( 'runs apiFetch only once per entity ID', async () => {
+		registry = {
+			...registry,
+			select: () => ( {
+				hasStartedResolution: ( _, [ action ] ) => action === 'create',
+			} ),
+		};
+
+		triggerFetch.mockImplementation( () => ( {
+			headers: new Map( [ [ 'allow', 'POST, GET, PUT, DELETE' ] ] ),
+		} ) );
+
+		await canUser( 'create', {
+			kind: 'postType',
+			name: 'wp_block',
+			id: 123,
+		} )( { dispatch, registry } );
+		await canUser( 'read', {
+			kind: 'postType',
+			name: 'wp_block',
+			id: 123,
+		} )( { dispatch, registry } );
+		await canUser( 'update', {
+			kind: 'postType',
+			name: 'wp_block',
+			id: 123,
+		} )( { dispatch, registry } );
+		await canUser( 'delete', {
+			kind: 'postType',
+			name: 'wp_block',
+			id: 123,
+		} )( { dispatch, registry } );
+
+		expect( triggerFetch ).toHaveBeenCalledTimes( 1 );
+
+		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
+			'create/postType/wp_block/123',
+			true
+		);
+		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
+			'read/postType/wp_block/123',
+			true
+		);
+		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
+			'update/postType/wp_block/123',
+			true
+		);
+		expect( dispatch.receiveUserPermission ).toHaveBeenCalledWith(
+			'delete/postType/wp_block/123',
 			true
 		);
 	} );
