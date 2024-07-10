@@ -37,26 +37,32 @@ function RenameFontSizeDialog( { fontSize, toggleOpen, handleRename } ) {
 					toggleOpen();
 				} }
 			>
-				<InputControl
-					autoComplete="off"
-					value={ newName }
-					onChange={ setNewName }
-					label={ __( 'Name' ) }
-					placeholder={ __( 'Font size preset name' ) }
-				/>
-				<Spacer marginBottom={ 6 } />
-				<Flex justify="flex-end" expanded={ false }>
-					<FlexItem>
-						<Button variant="tertiary" onClick={ toggleOpen }>
+				<VStack spacing="3">
+					<InputControl
+						__next40pxDefaultSize
+						autoComplete="off"
+						value={ newName }
+						onChange={ setNewName }
+						label={ __( 'Name' ) }
+						placeholder={ __( 'Font size preset name' ) }
+					/>
+					<HStack justify="right">
+						<Button
+							__next40pxDefaultSize
+							variant="tertiary"
+							onClick={ toggleOpen }
+						>
 							{ __( 'Cancel' ) }
 						</Button>
-					</FlexItem>
-					<FlexItem>
-						<Button variant="primary" type="submit">
+						<Button
+							__next40pxDefaultSize
+							variant="primary"
+							type="submit"
+						>
 							{ __( 'Save' ) }
 						</Button>
-					</FlexItem>
-				</Flex>
+					</HStack>
+				</VStack>
 			</form>
 		</Modal>
 	);
