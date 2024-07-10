@@ -199,8 +199,9 @@ function FontSize() {
 
 							<SizeControl
 								label={ __( 'Size' ) }
-								value={ fontSize.size }
+								value={ ! isCustomFluid ? fontSize.size : '' }
 								onChange={ handleFontSizeChange }
+								disabled={ isCustomFluid }
 							/>
 
 							<ToggleControl
