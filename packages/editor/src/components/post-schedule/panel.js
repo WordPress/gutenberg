@@ -61,7 +61,10 @@ export default function PostSchedulePanel() {
 
 	return (
 		<PostScheduleCheck>
-			<PostPanelRow label={ __( 'Publish' ) } ref={ setPopoverAnchor }>
+			<PostPanelRow
+				label={ __( 'Published Date' ) }
+				ref={ setPopoverAnchor }
+			>
 				<Dropdown
 					popoverProps={ popoverProps }
 					focusOnMount
