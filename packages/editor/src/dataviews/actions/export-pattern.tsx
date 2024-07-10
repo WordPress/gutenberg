@@ -9,50 +9,48 @@ import { downloadZip } from 'client-zip';
  */
 import { downloadBlob } from '@wordpress/blob';
 import { __ } from '@wordpress/i18n';
-import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
+import type { Action } from '@wordpress/dataviews';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../../lock-unlock';
+import type { Pattern } from '../types';
+import { getItemTitle } from './utils';
 
-// Patterns.
-const { PATTERN_TYPES } = unlock( patternsPrivateApis );
-
-function getJsonFromItem( item ) {
+function getJsonFromItem( item: Pattern ) {
 	return JSON.stringify(
 		{
 			__file: item.type,
-			title: item.title || item.name,
-			content: item.patternPost.content.raw,
-			syncStatus: item.patternPost.wp_pattern_sync_status,
+			title: getItemTitle( item ),
+			content:
+				typeof item.content === 'string'
+					? item.content
+					: item.content?.raw,
+			syncStatus: item.wp_pattern_sync_status,
 		},
 		null,
 		2
 	);
 }
 
-export const exportPatternAsJSONAction = {
+const exportPattern: Action< Pattern > = {
 	id: 'export-pattern',
 	label: __( 'Export as JSON' ),
 	supportsBulk: true,
-	isEligible: ( item ) => {
-		if ( ! item.type ) {
-			return false;
-		}
-		return item.type === PATTERN_TYPES.user;
-	},
+	isEligible: ( item ) => item.type === 'wp_block',
 	callback: async ( items ) => {
 		if ( items.length === 1 ) {
 			return downloadBlob(
-				`${ kebabCase( items[ 0 ].title || items[ 0 ].name ) }.json`,
+				`${ kebabCase(
+					getItemTitle( items[ 0 ] ) || items[ 0 ].slug
+				) }.json`,
 				getJsonFromItem( items[ 0 ] ),
 				'application/json'
 			);
 		}
-		const nameCount = {};
+		const nameCount: Record< string, number > = {};
 		const filesToZip = items.map( ( item ) => {
-			const name = kebabCase( item.title || item.name );
+			const name = kebabCase( getItemTitle( item ) || item.slug );
 			nameCount[ name ] = ( nameCount[ name ] || 0 ) + 1;
 			return {
 				name: `${
@@ -72,3 +70,5 @@ export const exportPatternAsJSONAction = {
 		);
 	},
 };
+
+export default exportPattern;

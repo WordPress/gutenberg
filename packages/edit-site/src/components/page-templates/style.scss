@@ -67,12 +67,12 @@
 	width: $grid-unit-30;
 	height: $grid-unit-30;
 	align-items: center;
-	justify-content: center;
+	justify-content: left;
 	display: flex;
 
 	img {
-		width: 20px;
-		height: 20px;
+		width: $grid-unit-20;
+		height: $grid-unit-20;
 		object-fit: cover;
 		opacity: 0;
 		transition: opacity 0.1s linear;
@@ -94,6 +94,7 @@
 	height: $grid-unit-30;
 
 	svg {
+		margin-left: -$grid-unit-05;
 		fill: currentColor;
 	}
 }

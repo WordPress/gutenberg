@@ -50,9 +50,7 @@ const DEFAULT_POST_BASE = {
 		field: 'date',
 		direction: 'desc',
 	},
-	// All fields are visible by default, so it's
-	// better to keep track of the hidden ones.
-	hiddenFields: [ 'date', 'featured-image' ],
+	fields: [ 'title', 'author', 'status' ],
 	layout: {
 		...DEFAULT_CONFIG_PER_VIEW_TYPE[ LAYOUT_LIST ],
 	},

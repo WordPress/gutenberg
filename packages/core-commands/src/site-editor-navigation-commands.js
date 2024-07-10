@@ -315,7 +315,7 @@ function useSiteEditorBasicNavigationCommands() {
 				icon: page,
 				callback: ( { close } ) => {
 					const args = {
-						post_type: 'page',
+						postType: 'page',
 					};
 					const targetUrl = addQueryArgs( 'site-editor.php', args );
 					if ( isSiteEditor ) {

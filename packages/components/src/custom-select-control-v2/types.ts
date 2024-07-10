@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
 import type * as Ariakit from '@ariakit/react';
 import type { FocusEventHandler, MouseEventHandler } from 'react';
 
@@ -91,6 +90,12 @@ type LegacyOption = {
 	name: string;
 	style?: React.CSSProperties;
 	className?: string;
+	hint?: string;
+	/**
+	 * Use the `hint` property instead
+	 * @deprecated
+	 * @ignore
+	 */
 	__experimentalHint?: string;
 	[ key: string ]: any;
 };
@@ -170,11 +175,17 @@ export type LegacyCustomSelectProps = {
 	 */
 	value?: LegacyOption;
 	/**
-	 * Legacy way to add additional text to the right of each option.
+	 * Use the `showSelectedHint` property instead.
+	 * @deprecated
+	 * @ignore
+	 */
+	__experimentalShowSelectedHint?: boolean;
+	/**
+	 * Show the hint of the selected item in the trigger button.
 	 *
 	 * @default false
 	 */
-	__experimentalShowSelectedHint?: boolean;
+	showSelectedHint?: boolean;
 	/**
 	 * Opt-in prop for an unconstrained width style which became the default in
 	 * WordPress 6.5. The prop is no longer needed and can be safely removed.

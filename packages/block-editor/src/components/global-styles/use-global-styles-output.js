@@ -31,6 +31,7 @@ import { GlobalStylesContext } from './context';
 import { useGlobalSetting } from './hooks';
 import { getDuotoneFilter } from '../duotone/utils';
 import { getGapCSSValue } from '../../hooks/gap';
+import { setBackgroundStyleDefaults } from '../../hooks/background';
 import { store as blockEditorStore } from '../../store';
 import { LAYOUT_DEFINITIONS } from '../../layouts/definitions';
 import { getValueFromObjectPath, setImmutably } from '../../utils/object';
@@ -387,6 +388,20 @@ export function getStylesDeclarations(
 		[]
 	);
 
+	/*
+	 * Set background defaults.
+	 * Applies to all background styles except the top-level site background.
+	 */
+	if ( ! isRoot && !! blockStyles.background ) {
+		blockStyles = {
+			...blockStyles,
+			background: {
+				...blockStyles.background,
+				...setBackgroundStyleDefaults( blockStyles.background ),
+			},
+		};
+	}
+
 	// The goal is to move everything to server side generated engine styles
 	// This is temporary as we absorb more and more styles into the engine.
 	const extraRules = getCSSRules( blockStyles );
@@ -656,7 +671,7 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 						}
 						const variationSelector =
 							blockSelectors[ blockName ]
-								.styleVariationSelectors?.[ variationName ];
+								?.styleVariationSelectors?.[ variationName ];
 
 						// Process the variation's inner element styles.
 						// This comes before the inner block styles so the
@@ -685,18 +700,18 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 								const variationBlockSelector = scopeSelector(
 									variationSelector,
 									blockSelectors[ variationBlockName ]
-										.selector
+										?.selector
 								);
 								const variationDuotoneSelector = scopeSelector(
 									variationSelector,
 									blockSelectors[ variationBlockName ]
-										.duotoneSelector
+										?.duotoneSelector
 								);
 								const variationFeatureSelectors =
 									scopeFeatureSelectors(
 										variationSelector,
 										blockSelectors[ variationBlockName ]
-											.featureSelectors
+											?.featureSelectors
 									);
 
 								const variationBlockStyleNodes =
@@ -713,10 +728,10 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 									featureSelectors: variationFeatureSelectors,
 									fallbackGapValue:
 										blockSelectors[ variationBlockName ]
-											.fallbackGapValue,
+											?.fallbackGapValue,
 									hasLayoutSupport:
 										blockSelectors[ variationBlockName ]
-											.hasLayoutSupport,
+											?.hasLayoutSupport,
 									styles: variationBlockStyleNodes,
 								} );
 
@@ -924,8 +939,8 @@ export const toStyles = (
 			ruleset += `padding-right: 0; padding-left: 0; padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom) }
 				.has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }
 				.has-global-padding > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); }
-				.has-global-padding :where(:not(.alignfull.is-layout-flow) > .has-global-padding:not(.wp-block-block, .alignfull, .alignwide)) { padding-right: 0; padding-left: 0; }
-				.has-global-padding :where(:not(.alignfull.is-layout-flow) > .has-global-padding:not(.wp-block-block, .alignfull, .alignwide)) > .alignfull { margin-left: 0; margin-right: 0;
+				.has-global-padding :where(:not(.alignfull.is-layout-flow) > .has-global-padding:not(.wp-block-block, .alignfull)) { padding-right: 0; padding-left: 0; }
+				.has-global-padding :where(:not(.alignfull.is-layout-flow) > .has-global-padding:not(.wp-block-block, .alignfull)) > .alignfull { margin-left: 0; margin-right: 0;
 				`;
 		}
 

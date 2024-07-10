@@ -93,9 +93,14 @@ export const processBlockType =
 			save: () => null,
 			...bootstrappedBlockType,
 			...blockSettings,
+			// blockType.variations can be defined as a filePath.
 			variations: mergeBlockVariations(
-				bootstrappedBlockType?.variations,
-				blockSettings?.variations
+				Array.isArray( bootstrappedBlockType?.variations )
+					? bootstrappedBlockType.variations
+					: [],
+				Array.isArray( blockSettings?.variations )
+					? blockSettings.variations
+					: []
 			),
 		};
 

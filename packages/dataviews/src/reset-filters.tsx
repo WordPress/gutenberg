@@ -33,7 +33,7 @@ export default function ResetFilter( {
 	return (
 		<Button
 			disabled={ isDisabled }
-			__experimentalIsFocusable
+			accessibleWhenDisabled
 			size="compact"
 			variant="tertiary"
 			className="dataviews-filters__reset-button"

@@ -17,6 +17,14 @@ export type TimePickerProps = {
 	is12Hour?: boolean;
 
 	/**
+	 * The order of day, month, and year. This prop overrides the time format
+	 * determined by `is12Hour` prop.
+	 *
+	 * @default 'dmy'
+	 */
+	dateOrder?: 'dmy' | 'mdy' | 'ymd';
+
+	/**
 	 * The function called when a new time has been selected. It is passed the
 	 * time as an argument.
 	 */
@@ -60,6 +68,11 @@ export type TimeInputProps = {
 	 * The props to pass down to the minutes input.
 	 */
 	minutesProps?: React.ComponentProps< typeof MinutesInput >;
+
+	/**
+	 * The label for the time input.
+	 */
+	label?: string;
 
 	/**
 	 * The function is called when a new time has been selected.

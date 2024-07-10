@@ -193,8 +193,7 @@ function GridControls( {
 	panelId,
 } ) {
 	const { columnStart, rowStart, columnSpan, rowSpan } = childLayout;
-	const { columnCount } = parentLayout ?? {};
-	const gridColumnNumber = parseInt( columnCount, 10 ) || 3;
+	const { columnCount = 3, rowCount } = parentLayout ?? {};
 	const rootClientId = useSelect( ( select ) =>
 		select( blockEditorStore ).getBlockRootClientId( panelId )
 	);
@@ -202,7 +201,7 @@ function GridControls( {
 		useDispatch( blockEditorStore );
 	const getNumberOfBlocksBeforeCell = useGetNumberOfBlocksBeforeCell(
 		rootClientId,
-		gridColumnNumber
+		columnCount
 	);
 	const hasStartValue = () => !! columnStart || !! rowStart;
 	const hasSpanValue = () => !! columnSpan || !! rowSpan;
@@ -234,14 +233,17 @@ function GridControls( {
 					label={ __( 'Column span' ) }
 					type="number"
 					onChange={ ( value ) => {
+						// Don't allow unsetting.
+						const newColumnSpan =
+							value === '' ? 1 : parseInt( value, 10 );
 						onChange( {
 							columnStart,
 							rowStart,
 							rowSpan,
-							columnSpan: value,
+							columnSpan: newColumnSpan,
 						} );
 					} }
-					value={ columnSpan }
+					value={ columnSpan ?? 1 }
 					min={ 1 }
 				/>
 				<InputControl
@@ -249,14 +251,17 @@ function GridControls( {
 					label={ __( 'Row span' ) }
 					type="number"
 					onChange={ ( value ) => {
+						// Don't allow unsetting.
+						const newRowSpan =
+							value === '' ? 1 : parseInt( value, 10 );
 						onChange( {
 							columnStart,
 							rowStart,
 							columnSpan,
-							rowSpan: value,
+							rowSpan: newRowSpan,
 						} );
 					} }
-					value={ rowSpan }
+					value={ rowSpan ?? 1 }
 					min={ 1 }
 				/>
 			</HStack>
@@ -278,8 +283,11 @@ function GridControls( {
 							label={ __( 'Column' ) }
 							type="number"
 							onChange={ ( value ) => {
+								// Don't allow unsetting.
+								const newColumnStart =
+									value === '' ? 1 : parseInt( value, 10 );
 								onChange( {
-									columnStart: value,
+									columnStart: newColumnStart,
 									rowStart,
 									columnSpan,
 									rowSpan,
@@ -290,16 +298,16 @@ function GridControls( {
 									rootClientId,
 									rootClientId,
 									getNumberOfBlocksBeforeCell(
-										value,
+										newColumnStart,
 										rowStart
 									)
 								);
 							} }
-							value={ columnStart }
+							value={ columnStart ?? 1 }
 							min={ 1 }
 							max={
-								gridColumnNumber
-									? gridColumnNumber - ( columnSpan ?? 1 ) + 1
+								columnCount
+									? columnCount - ( columnSpan ?? 1 ) + 1
 									: undefined
 							}
 						/>
@@ -310,9 +318,12 @@ function GridControls( {
 							label={ __( 'Row' ) }
 							type="number"
 							onChange={ ( value ) => {
+								// Don't allow unsetting.
+								const newRowStart =
+									value === '' ? 1 : parseInt( value, 10 );
 								onChange( {
 									columnStart,
-									rowStart: value,
+									rowStart: newRowStart,
 									columnSpan,
 									rowSpan,
 								} );
@@ -323,17 +334,15 @@ function GridControls( {
 									rootClientId,
 									getNumberOfBlocksBeforeCell(
 										columnStart,
-										value
+										newRowStart
 									)
 								);
 							} }
-							value={ rowStart }
+							value={ rowStart ?? 1 }
 							min={ 1 }
 							max={
-								parentLayout?.rowCount
-									? parentLayout.rowCount -
-									  ( rowSpan ?? 1 ) +
-									  1
+								rowCount
+									? rowCount - ( rowSpan ?? 1 ) + 1
 									: undefined
 							}
 						/>
