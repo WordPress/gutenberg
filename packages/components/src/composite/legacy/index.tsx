@@ -125,12 +125,12 @@ function proxyComposite< C extends Component >(
 ): CompositeComponent< C > {
 	const displayName = ProxiedComponent.displayName;
 
-	deprecated( `__unstable${ displayName }`, {
-		since: '6.7',
-		alternative: `stable ${ displayName } component`,
-	} );
-
 	const Component = ( legacyProps: CompositeStateProps ) => {
+		deprecated( `wp.components.__unstable${ displayName }`, {
+			since: '6.7',
+			alternative: `the unprefixed, stable version of the ${ displayName } component`,
+		} );
+
 		const { store, ...rest } =
 			mapLegacyStatePropsToComponentProps( legacyProps );
 		const props = rest as ComponentProps< C >;
@@ -196,9 +196,9 @@ export const CompositeItem = proxyComposite( Current.CompositeItem, {
 export function useCompositeState(
 	legacyStateOptions: LegacyStateOptions = {}
 ): CompositeState {
-	deprecated( `__unstableUseCompositeState`, {
+	deprecated( `wp.components.__unstableUseCompositeState`, {
 		since: '6.7',
-		alternative: `useCompositeStore hook`,
+		alternative: `the useCompositeStore hook`,
 	} );
 
 	const {
