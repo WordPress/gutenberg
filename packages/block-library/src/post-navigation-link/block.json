@@ -4,6 +4,7 @@
 	"name": "core/post-navigation-link",
 	"title": "Post Navigation Link",
 	"category": "theme",
+	"parent": [ "core/post-navigation" ],
 	"description": "Displays the next or previous post link that is adjacent to the current post.",
 	"textdomain": "default",
 	"attributes": {

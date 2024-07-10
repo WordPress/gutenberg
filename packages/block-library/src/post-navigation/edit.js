@@ -26,7 +26,6 @@ export default function PostNavigationEdit( { setAttributes, attributes } ) {
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: TEMPLATE,
 		allowedBlocks: ALLOWED_BLOCKS,
-		templateLock: 'all',
 	} );
 	return (
 		<>
