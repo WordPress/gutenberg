@@ -62,6 +62,24 @@ import { usePrevious } from '@wordpress/compose';
 const { usePostActions } = unlock( editorPrivateApis );
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 const EMPTY_ARRAY = [];
+const defaultLayouts = {
+	[ LAYOUT_TABLE ]: {
+		layout: {
+			'featured-image': {
+				width: '1%',
+			},
+			title: {
+				maxWidth: 300,
+			},
+		},
+	},
+	[ LAYOUT_GRID ]: {
+		layout: {},
+	},
+	[ LAYOUT_LIST ]: {
+		layout: {},
+	},
+};
 
 const getFormattedDate = ( dateToDisplay ) =>
 	dateI18n(
@@ -401,7 +419,6 @@ export default function PostsList( { postType } ) {
 					<FeaturedImage item={ item } viewType={ view.type } />
 				),
 				enableSorting: false,
-				width: '1%',
 			},
 			{
 				header: __( 'Title' ),
@@ -455,7 +472,6 @@ export default function PostsList( { postType } ) {
 						</HStack>
 					);
 				},
-				maxWidth: 300,
 				enableHiding: false,
 			},
 			{
@@ -637,6 +653,7 @@ export default function PostsList( { postType } ) {
 				setSelection={ setSelection }
 				onSelectionChange={ onSelectionChange }
 				getItemId={ getItemId }
+				defaultLayouts={ defaultLayouts }
 			/>
 		</Page>
 	);
