@@ -24,7 +24,7 @@ function useDeprecatedProps( {
 
 // The removal of `__experimentalHint` in favour of `hint` doesn't happen in
 // the `useDeprecatedProps` hook in order not to break consumers that rely
-// on object identity (see https://github.com/WordPress/gutenberg/pull/63248/files/175907e16310fcd3ef13fcb2964e138a69134760#r1668842238)
+// on object identity (see https://github.com/WordPress/gutenberg/pull/63248#discussion_r1672213131)
 function applyOptionDeprecations( {
 	__experimentalHint,
 	...rest
