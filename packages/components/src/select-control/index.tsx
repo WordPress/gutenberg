@@ -87,7 +87,7 @@ function UnforwardedSelectControl(
 				disabled={ disabled }
 				hideLabelFromVision={ hideLabelFromVision }
 				id={ id }
-				isBorderless={ variant === 'borderless' }
+				isBorderless={ variant === 'minimal' }
 				label={ label }
 				size={ size }
 				suffix={

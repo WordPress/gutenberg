@@ -58,7 +58,7 @@ type SelectControlBaseProps = Pick<
 		 *
 		 * @default 'default'
 		 */
-		variant?: 'default' | 'borderless';
+		variant?: 'default' | 'minimal';
 	};
 
 export type SelectControlSingleSelectionProps = SelectControlBaseProps & {

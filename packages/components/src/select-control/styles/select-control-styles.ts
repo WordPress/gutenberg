@@ -35,8 +35,8 @@ const disabledStyles = ( { disabled }: SelectProps ) => {
 	`;
 };
 
-const inputBaseBorderlessStyles = ( { variant }: SelectProps ) => {
-	if ( variant === 'borderless' ) {
+const inputBaseVariantStyles = ( { variant }: SelectProps ) => {
+	if ( variant === 'minimal' ) {
 		return css`
 			display: inline-flex;
 		`;
@@ -50,7 +50,7 @@ export const StyledInputBase = styled( InputBase )`
 	cursor: pointer;
 
 	${ disabledStyles }
-	${ inputBaseBorderlessStyles }
+	${ inputBaseVariantStyles }
 `;
 
 const sizeStyles = ( {
@@ -139,7 +139,7 @@ const overflowStyles = ( { multiple }: SelectProps ) => {
 };
 
 const variantStyles = ( { variant }: SelectProps ) => {
-	if ( variant === 'borderless' ) {
+	if ( variant === 'minimal' ) {
 		return css( {
 			fieldSizing: 'content',
 		} );

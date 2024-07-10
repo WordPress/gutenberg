@@ -218,7 +218,7 @@ If multiple is false the value received is a single value with the new selected 
 
 The style variant of the control.
 
--   Type: `'default' | 'borderless'`
+-   Type: `'default' | 'minimal'`
 -   Required: No
 -   Default: `'default'`
 

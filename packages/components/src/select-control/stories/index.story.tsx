@@ -101,8 +101,8 @@ export const WithCustomChildren: StoryFn< typeof SelectControl > = ( args ) => {
 	);
 };
 
-export const Borderless = SelectControlWithState.bind( {} );
-Borderless.args = {
+export const Minimal = SelectControlWithState.bind( {} );
+Minimal.args = {
 	...Default.args,
-	variant: 'borderless',
+	variant: 'minimal',
 };
