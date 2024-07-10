@@ -23,6 +23,7 @@ import {
 	isUnmodifiedBlock,
 	isReusableBlock,
 	getBlockDefaultClassName,
+	getBlockVariationClassName,
 	hasBlockSupport,
 	store as blocksStore,
 } from '@wordpress/blocks';
@@ -596,7 +597,6 @@ function BlockListBlockProvider( props ) {
 
 			const attributes = getBlockAttributes( clientId );
 			const { name: blockName, isValid } = blockWithoutAttributes;
-			const match = getActiveBlockVariation( blockName, attributes );
 			const blockType = getBlockType( blockName );
 			const { supportsLayout, __unstableIsPreviewMode: isPreviewMode } =
 				getSettings();
@@ -606,12 +606,12 @@ function BlockListBlockProvider( props ) {
 				defaultClassNames.push( getBlockDefaultClassName( blockName ) );
 
 				if ( hasVariationClassNameSupport( blockType ) ) {
-					if ( match && match?.name ) {
-						defaultClassNames.push(
-							getBlockDefaultClassName( blockName ) +
-								'-' +
-								match.name
-						);
+					const variationClassName = getBlockVariationClassName(
+						blockType.name,
+						attributes
+					);
+					if ( variationClassName ) {
+						defaultClassNames.push( variationClassName );
 					}
 				}
 			}
@@ -651,6 +651,8 @@ function BlockListBlockProvider( props ) {
 			);
 			const movingClientId = hasBlockMovingClientId();
 			const blockEditingMode = getBlockEditingMode( clientId );
+
+			const match = getActiveBlockVariation( blockName, attributes );
 
 			const multiple = hasBlockSupport( blockName, 'multiple', true );
 

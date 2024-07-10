@@ -9,8 +9,8 @@ import clsx from 'clsx';
 import { withFilters } from '@wordpress/components';
 import {
 	getBlockDefaultClassName,
+	getBlockVariationClassName,
 	getBlockType,
-	getActiveBlockVariation,
 } from '@wordpress/blocks';
 import { useContext, useMemo } from '@wordpress/element';
 
@@ -81,11 +81,12 @@ const EditWithGeneratedProps = ( props ) => {
 		generatedClassNames.push( getBlockDefaultClassName( name ) );
 	}
 	if ( hasVariationClassNameSupport( blockType ) ) {
-		const activeVariation = getActiveBlockVariation( name, attributes );
-		if ( activeVariation && activeVariation?.name ) {
-			generatedClassNames.push(
-				getBlockDefaultClassName( name ) + '-' + activeVariation.name
-			);
+		const variationClassName = getBlockVariationClassName(
+			blockType.name,
+			attributes
+		);
+		if ( variationClassName ) {
+			generatedClassNames.push( variationClassName );
 		}
 	}
 

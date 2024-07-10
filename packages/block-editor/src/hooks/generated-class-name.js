@@ -4,7 +4,7 @@
 import { addFilter } from '@wordpress/hooks';
 import {
 	getBlockDefaultClassName,
-	getActiveBlockVariation,
+	getBlockVariationClassName,
 } from '@wordpress/blocks';
 
 /**
@@ -32,16 +32,12 @@ export function addGeneratedClassName( extraProps, blockType, attributes ) {
 		generatedClassNames.push( getBlockDefaultClassName( blockType.name ) );
 	}
 	if ( hasVariationClassNameSupport( blockType ) ) {
-		const activeVariation = getActiveBlockVariation(
+		const variationClassName = getBlockVariationClassName(
 			blockType.name,
 			attributes
 		);
-		if ( activeVariation ) {
-			generatedClassNames.push(
-				getBlockDefaultClassName( blockType.name ) +
-					'-' +
-					activeVariation.name
-			);
+		if ( variationClassName ) {
+			generatedClassNames.push( variationClassName );
 		}
 	}
 	if ( typeof extraProps.className === 'string' ) {
