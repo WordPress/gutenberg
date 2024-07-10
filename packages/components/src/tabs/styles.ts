@@ -75,6 +75,7 @@ export const Tab = styled( Ariakit.Tab )`
 		margin-left: 0;
 		font-weight: 500;
 		text-align: inherit;
+		hyphens: auto;
 
 		&[aria-disabled='true'] {
 			cursor: default;

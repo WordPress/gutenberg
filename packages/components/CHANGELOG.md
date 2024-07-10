@@ -2,8 +2,15 @@
 
 ## Unreleased
 
+### Internal
+
+-   `CustomSelectControlV2`: animate select popover appearance. ([#63343](https://github.com/WordPress/gutenberg/pull/63343))
+
+## 28.3.0 (2024-07-10)
+
 ### Enhancements
 
+-   `Tabs`: hyphenate tab labels ([#63337](https://github.com/WordPress/gutenberg/pull/63337)).
 -   `Tooltip`: Add support for `className` prop ([#63157](https://github.com/WordPress/gutenberg/pull/63157)).
 -   `Toolbar`: Add support for `vertical` orientation ([#60123](https://github.com/WordPress/gutenberg/pull/60123)).
 -   `BaseControl`: forward ref on `VisualLabel` ([#63169](https://github.com/WordPress/gutenberg/pull/63169)).

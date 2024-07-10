@@ -76,7 +76,9 @@
 
 .posts-list-page-post-author-field__icon-container {
 	height: $grid-unit-30;
+	width: $grid-unit-30;
 	svg {
 		fill: currentColor;
+		margin-left: -$grid-unit-05;
 	}
 }
