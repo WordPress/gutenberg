@@ -137,7 +137,6 @@ function FontSize() {
 			{ isRenameDialogOpen && (
 				<RenameFontSizeDialog
 					fontSize={ fontSize }
-					isOpen={ isRenameDialogOpen }
 					toggleOpen={ toggleRenameDialog }
 					handleRename={ handleNameChange }
 				/>
