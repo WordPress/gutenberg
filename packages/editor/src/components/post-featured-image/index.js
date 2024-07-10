@@ -170,7 +170,9 @@ function PostFeaturedImage( {
 									aria-label={
 										! featuredImageId
 											? null
-											: __( 'Edit or replace the image' )
+											: __(
+													'Edit or replace the featured image'
+											  )
 									}
 									aria-describedby={
 										! featuredImageId
