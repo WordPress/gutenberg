@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   `Composite`: export new stable version, deprecate unstable version. ([#63364](https://github.com/WordPress/gutenberg/pull/63364))
+
 ### Internal
 
 -   `CustomSelectControl`: switch to ariakit-based implementation ([#63258](https://github.com/WordPress/gutenberg/pull/63258)).
