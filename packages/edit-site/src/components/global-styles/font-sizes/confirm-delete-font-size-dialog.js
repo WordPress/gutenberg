@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalConfirmDialog as ConfirmDialog,
-	__experimentalUseNavigator as useNavigator,
-} from '@wordpress/components';
+import { __experimentalConfirmDialog as ConfirmDialog } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
 function ConfirmDeleteFontSizeDialog( {
@@ -13,12 +10,9 @@ function ConfirmDeleteFontSizeDialog( {
 	toggleOpen,
 	handleRemoveFontSize,
 } ) {
-	const navigator = useNavigator();
-
 	const handleConfirm = async () => {
 		toggleOpen();
 		handleRemoveFontSize( fontSize );
-		navigator.goTo( '/typography/font-sizes/' );
 	};
 
 	const handleCancel = () => {
