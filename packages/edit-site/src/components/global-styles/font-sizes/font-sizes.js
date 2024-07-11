@@ -11,6 +11,7 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 	FlexItem,
+	FlexBlock,
 	Button,
 } from '@wordpress/components';
 import {
@@ -89,7 +90,9 @@ function FontSizeGroup( {
 									<Button
 										size="small"
 										icon={ moreVertical }
-										label={ __( 'Font size presets options' ) }
+										label={ __(
+											'Font size presets options'
+										) }
 									/>
 								}
 							>
@@ -118,9 +121,9 @@ function FontSizeGroup( {
 									</FlexItem>
 									<FlexItem>
 										<HStack justify="flex-end">
-											<FlexItem className="edit-site-font-size__item edit-site-font-size__item-value">
+											<FlexBlock className="edit-site-font-size__item edit-site-font-size__item-value">
 												{ size.size }
-											</FlexItem>
+											</FlexBlock>
 											<Icon
 												icon={
 													isRTL()
