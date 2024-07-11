@@ -32,20 +32,20 @@ import {
 /**
  * Internal dependencies
  */
-import SingleSelectionCheckbox from './single-selection-checkbox';
-import { unlock } from './lock-unlock';
-import ItemActions from './item-actions';
-import { sanitizeOperators } from './utils';
+import SingleSelectionCheckbox from '../../single-selection-checkbox';
+import { unlock } from '../../lock-unlock';
+import ItemActions from '../../item-actions';
+import { sanitizeOperators } from '../../utils';
 import {
 	SORTING_DIRECTIONS,
 	sortArrows,
 	sortLabels,
 	sortValues,
-} from './constants';
+} from '../../constants';
 import {
 	useSomeItemHasAPossibleBulkAction,
 	useHasAPossibleBulkAction,
-} from './bulk-actions';
+} from '../../bulk-actions';
 import type {
 	Action,
 	NormalizedField,
@@ -53,8 +53,8 @@ import type {
 	ViewTable as ViewTableType,
 	ViewTableProps,
 	CombinedField,
-} from './types';
-import type { SetSelection } from './private-types';
+} from '../../types';
+import type { SetSelection } from '../../private-types';
 
 const {
 	DropdownMenuV2: DropdownMenu,

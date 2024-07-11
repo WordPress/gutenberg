@@ -32,10 +32,9 @@ import { useRegistry } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { unlock } from './lock-unlock';
-import type { Action, NormalizedField, ViewListProps } from './types';
-
-import { ActionsDropdownMenuGroup, ActionModal } from './item-actions';
+import { unlock } from '../../lock-unlock';
+import { ActionsDropdownMenuGroup, ActionModal } from '../../item-actions';
+import type { Action, NormalizedField, ViewListProps } from '../../types';
 
 interface ListViewItemProps< Item > {
 	actions: Action< Item >[];
