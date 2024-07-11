@@ -133,12 +133,13 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 			}
 		}
 
-		// TODO: We should be able to replace this with a single call to updateBlockAttributes(),
-		// but there seems to be a bug where getBlocks() selectors don't always update when
-		// updating attributes this way.
-		for ( const [ clientId, attributes ] of Object.entries( updates ) ) {
+		if ( Object.keys( updates ).length ) {
 			__unstableMarkNextChangeAsNotPersistent();
-			updateBlockAttributes( clientId, attributes );
+			updateBlockAttributes(
+				Object.keys( updates ),
+				updates,
+				/* uniqueByBlock: */ true
+			);
 		}
 	}, [
 		// Actual deps to sync:
