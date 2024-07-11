@@ -43,19 +43,43 @@ figure.wp-block-gallery.has-nested-images {
 			width: auto;
 		}
 
-		figcaption {
-			background: linear-gradient(0deg, rgba($color: $black, $alpha: 0.7) 0, rgba($color: $black, $alpha: 0.3) 70%, transparent);
-			bottom: 0;
-			color: $white;
-			font-size: $default-font-size;
-			left: 0;
-			margin-bottom: 0;
-			max-height: 60%;
-			overflow: auto;
-			padding: 0 8px 8px;
+		// Position caption and scrim at the bottom.
+		figcaption,
+		figcaption::after {
 			position: absolute;
+			bottom: 0;
+			right: 0;
+			left: 0;
+			max-height: 80%;
+		}
+
+		// Put the scrim on its own layer.
+		figcaption::after {
+			content: "";
+			z-index: -1;
+			height: 100%;
+			max-height: none;
+
+			// Dark gradient scrim. This can just be a solid color, as the mask will make it a
+			//background: linear-gradient(0deg, rgba($color: $black, $alpha: 0.6) 0, rgba($color: $black, $alpha: 0.3) 50%, transparent);
+			background: linear-gradient(0deg, rgba($color: $black, $alpha: 0.4) 0%, rgba($color: $black, $alpha: 0.2) 100%, transparent);
+			//filter: blur(10px);
+
+			// Blur the background under the gradient scrim.
+			backdrop-filter: blur(4px);
+
+			// Crop the caption so the blur is only on the edge.
+			mask-image: linear-gradient(0deg, rgba($color: $black, $alpha: 1) 20%, rgba($color: $black, $alpha: 0) 100%);
+		}
+
+		figcaption {
+			color: $white;
+			text-shadow: 0 0 1.5px rgba($color: $black, $alpha: 0.8);
+			font-size: $default-font-size;
+			margin: 0;
+			overflow: auto;
+			padding: 1em;
 			text-align: center;
-			width: 100%;
 			box-sizing: border-box;
 			@include custom-scrollbars-on-hover(transparent, rgba($white, 0.8));
 
