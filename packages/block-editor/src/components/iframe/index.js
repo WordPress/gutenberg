@@ -306,12 +306,6 @@ function Iframe( {
 	<head>
 		<meta charset="utf-8">
 		<script>window.frameElement._load()</script>
-		<style>
-			html{
-				height: auto !important;
-				min-height: 100%;
-			}
-		</style>
 		${ styles }
 		${ scripts }
 	</head>

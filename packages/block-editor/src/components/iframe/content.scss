@@ -13,8 +13,13 @@ iframe[name="editor-canvas"].is-zoomed-out {
 	margin-block: 0 calc(-100% / #{$scale});
 }
 
-.block-editor-iframe__body {
-	position: relative;
+.block-editor-iframe__html {
+	// Keeps body background styles from being clipped.
+	// See: https://github.com/WordPress/gutenberg/issues/44374#issuecomment-1260784743
+	height: auto;
+	// Keeps body background image from repeating.
+	// See: https://github.com/WordPress/gutenberg/issues/46782
+	min-height: 100%;
 }
 
 .block-editor-iframe__html.is-zoomed-out {
@@ -64,4 +69,8 @@ iframe[name="editor-canvas"].is-zoomed-out {
 	> body > .is-root-container:not(.wp-block-post-content) > main {
 		flex: 1;
 	}
+}
+
+.block-editor-iframe__body {
+	position: relative;
 }
