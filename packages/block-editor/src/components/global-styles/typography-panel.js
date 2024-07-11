@@ -8,7 +8,7 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useCallback, useMemo, useEffect } from '@wordpress/element';
+import { useCallback, useMemo, useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -185,6 +185,7 @@ export default function TypographyPanel( {
 	// Font Family
 	const hasFontFamilyEnabled = useHasFontFamilyControl( settings );
 	const fontFamily = decodeValue( inheritedValue?.typography?.fontFamily );
+	const previousFontFamily = useRef( fontFamily );
 	const { fontFamilies, fontFamilyFaces } = useMemo( () => {
 		return getMergedFontFamiliesAndFontFamilyFaces( settings, fontFamily );
 	}, [ settings, fontFamily ] );
@@ -256,21 +257,34 @@ export default function TypographyPanel( {
 
 	// Check if previous font style and weight values are available in the new font family.
 	useEffect( () => {
-		const { nearestFontStyle, nearestFontWeight } =
-			findNearestStyleAndWeight( fontFamilyFaces, fontStyle, fontWeight );
+		if ( fontFamily !== previousFontFamily.current ) {
+			const { nearestFontStyle, nearestFontWeight } =
+				findNearestStyleAndWeight(
+					fontFamilyFaces,
+					fontStyle,
+					fontWeight
+				);
 
-		if ( nearestFontStyle && nearestFontWeight ) {
-			setFontAppearance( {
-				fontStyle: nearestFontStyle,
-				fontWeight: nearestFontWeight,
-			} );
-		} else {
-			// Reset font appearance if there are no available styles or weights.
-			resetFontAppearance();
+			if ( nearestFontStyle && nearestFontWeight ) {
+				setFontAppearance( {
+					fontStyle: nearestFontStyle,
+					fontWeight: nearestFontWeight,
+				} );
+			} else {
+				// Reset font appearance if there are no available styles or weights.
+				resetFontAppearance();
+			}
+
+			previousFontFamily.current = fontFamily;
 		}
-		// We need to limit the dependency array to just `fontFamily` to avoid infinite loops.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ fontFamily ] );
+	}, [
+		fontFamily,
+		fontFamilyFaces,
+		fontStyle,
+		fontWeight,
+		resetFontAppearance,
+		setFontAppearance,
+	] );
 
 	// Line Height
 	const hasLineHeightEnabled = useHasLineHeightControl( settings );
