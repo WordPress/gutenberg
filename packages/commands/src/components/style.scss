@@ -1,6 +1,6 @@
 // dirty hack to clean up modal
 .commands-command-menu {
-	border-radius: $grid-unit-05;
+	border-radius: $radius-small-container;
 	width: calc(100% - #{$grid-unit-40});
 	margin: auto;
 	max-width: 400px;

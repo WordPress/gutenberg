@@ -9,7 +9,6 @@
 	// See https://dev.w3.org/csswg/css-flexbox/#min-size-auto
 	min-width: 0;
 	background: $gray-100;
-	border-radius: $grid-unit-05;
 	width: min(100%, 416px);
 
 	&:hover {
@@ -17,7 +16,6 @@
 	}
 
 	.components-button {
-		border-radius: $grid-unit-05;
 		transition: all 0.1s ease-out;
 		@include reduce-motion("transition");
 
