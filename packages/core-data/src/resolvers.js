@@ -58,7 +58,7 @@ export const getCurrentUser =
  */
 export const getEntityRecord =
 	( kind, name, key = '', query ) =>
-	async ( { select, dispatch } ) => {
+	async ( { select, dispatch, registry } ) => {
 		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
@@ -165,8 +165,44 @@ export const getEntityRecord =
 					}
 				}
 
-				const record = await apiFetch( { path } );
-				dispatch.receiveEntityRecords( kind, name, record, query );
+				const response = await apiFetch( { path, parse: false } );
+				const record = await response.json();
+
+				const allowHeader = response.headers?.get( 'allow' );
+				const allowedMethods = allowHeader?.allow || allowHeader || '';
+				const permissions = {};
+				const methods = {
+					create: 'POST',
+					read: 'GET',
+					update: 'PUT',
+					delete: 'DELETE',
+				};
+				for ( const [ actionName, methodName ] of Object.entries(
+					methods
+				) ) {
+					permissions[ actionName ] =
+						allowedMethods.includes( methodName );
+				}
+
+				registry.batch( () => {
+					dispatch.receiveEntityRecords( kind, name, record, query );
+
+					for ( const action of [
+						'create',
+						'read',
+						'update',
+						'delete',
+					] ) {
+						const permissionKey = [ action, kind, name, key ]
+							.filter( Boolean )
+							.join( '/' );
+
+						dispatch.receiveUserPermission(
+							permissionKey,
+							permissions[ action ]
+						);
+					}
+				} );
 			}
 		} finally {
 			dispatch.__unstableReleaseStoreLock( lock );
