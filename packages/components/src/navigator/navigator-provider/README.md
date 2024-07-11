@@ -10,38 +10,42 @@ The `NavigatorProvider` component allows rendering nested views/panels/menus (vi
 
 ```jsx
 import {
-  __experimentalNavigatorProvider as NavigatorProvider,
-  __experimentalNavigatorScreen as NavigatorScreen,
-  __experimentalNavigatorButton as NavigatorButton,
-  __experimentalNavigatorBackButton as NavigatorBackButton,
+	__experimentalNavigatorProvider as NavigatorProvider,
+	__experimentalNavigatorScreen as NavigatorScreen,
+	__experimentalNavigatorButton as NavigatorButton,
+	__experimentalNavigatorBackButton as NavigatorBackButton,
 } from '@wordpress/components';
 
 const MyNavigation = () => (
-  <NavigatorProvider initialPath="/">
-    <NavigatorScreen path="/">
-      <p>This is the home screen.</p>
-       <NavigatorButton path="/child">
-         Navigate to child screen.
-      </NavigatorButton>
-    </NavigatorScreen>
+	<NavigatorProvider initialPath="/">
+		<NavigatorScreen path="/">
+			<p>This is the home screen.</p>
+			<NavigatorButton path="/child">
+				Navigate to child screen.
+			</NavigatorButton>
+		</NavigatorScreen>
 
-    <NavigatorScreen path="/child">
-      <p>This is the child screen.</p>
-      <NavigatorBackButton>
-        Go back
-      </NavigatorBackButton>
-    </NavigatorScreen>
-  </NavigatorProvider>
+		<NavigatorScreen path="/child">
+			<p>This is the child screen.</p>
+			<NavigatorBackButton>Go back</NavigatorBackButton>
+		</NavigatorScreen>
+	</NavigatorProvider>
 );
 ```
+
 **Important note**
 
-Parent/child navigation only works if the path you define are hierarchical, following a URL-like scheme where each path segment is separated by the `/` character.
+`Navigator` assumes that screens are organized hierarchically according to their `path`, which should follow a URL-like scheme where each path segment is separated by the `/` character.
+
+`Navigator` will treat "back" navigations as going to the parent screen — it is therefore responsibility of the consumer of the component to create the correct screen hierarchy.
+
 For example:
-- `/` is the root of all paths. There should always be a screen with `path="/"`.
-- `/parent/child` is a child of `/parent`.
-- `/parent/child/grand-child` is a child of `/parent/child`.
-- `/parent/:param` is a child of `/parent` as well.
+
+-   `/` is the root of all paths. There should always be a screen with `path="/"`.
+-   `/parent/child` is a child of `/parent`.
+-   `/parent/child/grand-child` is a child of `/parent/child`.
+-   `/parent/:param` is a child of `/parent` as well.
+-   if the current screen has a `path` with value `/parent/child/grand-child`, when going "back" Navigator will try to recursively navigate the path hierarchy until a matching screen (or the root `/`) are found.
 
 ## Props
 
@@ -65,8 +69,8 @@ The `goTo` function allows navigating to a given path. The second argument can a
 
 The available options are:
 
-- `focusTargetSelector`: `string`. An optional property used to specify the CSS selector used to restore focus on the matching element when navigating back.
-- `isBack`: `boolean`. An optional property used to specify whether the navigation should be considered as backwards (thus enabling focus restoration when possible, and causing the animation to be backwards too)
+-   `focusTargetSelector`: `string`. An optional property used to specify the CSS selector used to restore focus on the matching element when navigating back.
+-   `isBack`: `boolean`. An optional property used to specify whether the navigation should be considered as backwards (thus enabling focus restoration when possible, and causing the animation to be backwards too)
 
 ### `goBack`: `() => void`
 
@@ -80,9 +84,9 @@ When a match is not found, the function will try to recursively navigate the pat
 
 The `location` object represent the current location, and has a few properties:
 
-- `path`: `string`. The path associated to the location.
-- `isBack`: `boolean`. A flag that is `true` when the current location was reached by navigating backwards in the location stack.
-- `isInitial`: `boolean`. A flag that is `true` only for the first (root) location in the location stack.
+-   `path`: `string`. The path associated to the location.
+-   `isBack`: `boolean`. A flag that is `true` when the current location was reached by navigating backwards in the location history.
+-   `isInitial`: `boolean`. A flag that is `true` only for the first (root) location in the location history.
 
 ### `params`: `Record< string, string | string[] >`
 
