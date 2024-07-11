@@ -65,7 +65,7 @@ const STYLE_BOOK_IFRAME_STYLES = `
 	}
 
 	.edit-site-style-book__example {
-		border-radius: 2px;
+		border-radius: $radius-primitive;
 		cursor: pointer;
 		display: flex;
 		flex-direction: column;

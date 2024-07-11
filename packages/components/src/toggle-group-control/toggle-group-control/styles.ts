@@ -19,7 +19,7 @@ export const toggleGroupControl = ( {
 } ) => css`
 	background: ${ COLORS.ui.background };
 	border: 1px solid transparent;
-	border-radius: ${ CONFIG.controlBorderRadius };
+	border-radius: ${ CONFIG.radiusPrimitive };
 	display: inline-flex;
 	min-width: 0;
 	position: relative;

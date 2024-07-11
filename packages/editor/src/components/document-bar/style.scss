@@ -8,16 +8,12 @@
 	// subsequently truncate child text, we set an explicit min-width.
 	// See https://dev.w3.org/csswg/css-flexbox/#min-size-auto
 	min-width: 0;
-	background: $gray-100;
 	width: min(100%, 416px);
-
-	&:hover {
-		background-color: $gray-200;
-	}
 
 	.components-button {
 		transition: all 0.1s ease-out;
 		@include reduce-motion("transition");
+		background: $gray-100;
 
 		&:hover {
 			background: $gray-200;

@@ -37,7 +37,7 @@ export const buttonView = ( {
 	appearance: none;
 	background: transparent;
 	border: none;
-	border-radius: ${ CONFIG.controlBorderRadius };
+	border-radius: ${ CONFIG.radiusPrimitive };
 	color: ${ COLORS.gray[ 700 ] };
 	fill: currentColor;
 	cursor: pointer;
@@ -117,7 +117,7 @@ const isIconStyles = ( {
 
 export const backdropView = css`
 	background: ${ COLORS.gray[ 900 ] };
-	border-radius: ${ CONFIG.controlBorderRadius };
+	border-radius: ${ CONFIG.radiusPrimitive };
 	position: absolute;
 	inset: 0;
 	z-index: 1;

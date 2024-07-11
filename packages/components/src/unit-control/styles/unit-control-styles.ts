@@ -135,7 +135,7 @@ export const UnitSelect = styled.select< SelectProps >`
 	&&& {
 		appearance: none;
 		background: transparent;
-		border-radius: 2px;
+		border-radius: ${ CONFIG.radiusPrimitive };
 		border: none;
 		display: block;
 		outline: none;

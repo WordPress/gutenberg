@@ -55,7 +55,7 @@ Snapshot Diff:
 
 exports[`ItemGroup ItemGroup component should render correctly 1`] = `
 .emotion-0 {
-  border-radius: 2px;
+  border-radius: $radius-primitive;
 }
 
 .emotion-0>*:first-of-type>* {
@@ -80,7 +80,7 @@ exports[`ItemGroup ItemGroup component should render correctly 1`] = `
   display: block;
   margin: 0;
   color: inherit;
-  border-radius: 2px;
+  border-radius: $radius-primitive;
 }
 
 <div>

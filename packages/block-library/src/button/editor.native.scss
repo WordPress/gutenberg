@@ -29,7 +29,7 @@ $block-spacing: 4px;
 }
 
 .defaultButton {
-	border-radius: $border-width * 4;
+	border-radius: $radius-primitive;
 	padding: $block-spacing;
 	border-width: $border-width;
 	margin: 2 * $grid-unit-20;

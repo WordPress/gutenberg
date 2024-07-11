@@ -33,10 +33,10 @@
 		&.is-viewtype-table {
 			width: 96px;
 			flex-grow: 0;
-			border-radius: 2px;
+			border-radius: $radius-primitive;
 
 			.page-patterns-preview-field__button {
-				border-radius: 2px;
+				border-radius: $radius-primitive;
 			}
 		}
 

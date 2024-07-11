@@ -189,7 +189,7 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 		right: 9px;
 		bottom: 9px;
 		left: 9px;
-		border-radius: $radius-primitive + $border-width + $border-width;
+		border-radius: $radius-primitive;
 		box-shadow: none;
 	}
 
@@ -243,7 +243,7 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 	margin: 0;
 	overflow: hidden;
 	@include break-medium() {
-		border-radius: 8px;
+		border-radius: $radius-large-container;
 		margin: $canvas-padding $canvas-padding $canvas-padding 0;
 	}
 }

@@ -1,6 +1,6 @@
 @import "./style.scss";
 
 .button {
-	border-radius: $border-width * 8;
+	border-radius: $radius-primitive;
 	padding: $grid-unit-15;
 }

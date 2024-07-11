@@ -1,6 +1,6 @@
 /** @format */
 .inserter-menu__add-block-button {
-	border-radius: 2px;
+	border-radius: $radius-primitive;
 	background-color: $black;
 	margin: 9px $grid-unit-20 10px $grid-unit-20;
 	padding: 0;

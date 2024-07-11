@@ -44,14 +44,14 @@
 	&:focus a[data-mce-selected] {
 		padding: 0 2px;
 		margin: 0 -2px;
-		border-radius: 2px;
+		border-radius: $radius-primitive;
 		box-shadow: 0 0 0 $border-width #e5f5fa;
 		background: #e5f5fa;
 	}
 
 	code {
 		padding: 2px;
-		border-radius: 2px;
+		border-radius: $radius-primitive;
 		color: $gray-900;
 		background: $gray-100;
 		font-family: $editor-html-font;

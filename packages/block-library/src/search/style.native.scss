@@ -18,7 +18,7 @@
 
 .border {
 	border: $border-width solid $gray-5;
-	border-radius: $grid-unit-05;
+	border-radius: $radius-primitive;
 	padding: $grid-unit-05;
 }
 
@@ -31,7 +31,7 @@
 	padding: $grid-unit-10;
 	border: $border-width solid $button-fallback-bg;
 	margin-left: $grid-unit-05;
-	border-radius: $grid-unit-05;
+	border-radius: $radius-primitive;
 	align-content: center;
 	align-items: center;
 }

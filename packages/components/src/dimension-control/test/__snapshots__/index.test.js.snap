@@ -39,7 +39,7 @@ exports[`DimensionControl rendering renders with custom sizes 1`] = `
   justify-content: space-between;
   box-sizing: border-box;
   position: relative;
-  border-radius: 2px;
+  border-radius: $radius-primitive;
   padding-top: 0;
   color: var(--wp-components-color-foreground, #1e1e1e);
   cursor: pointer;
@@ -324,7 +324,7 @@ exports[`DimensionControl rendering renders with defaults 1`] = `
   justify-content: space-between;
   box-sizing: border-box;
   position: relative;
-  border-radius: 2px;
+  border-radius: $radius-primitive;
   padding-top: 0;
   color: var(--wp-components-color-foreground, #1e1e1e);
   cursor: pointer;
@@ -619,7 +619,7 @@ exports[`DimensionControl rendering renders with icon and custom icon label 1`] 
   justify-content: space-between;
   box-sizing: border-box;
   position: relative;
-  border-radius: 2px;
+  border-radius: $radius-primitive;
   padding-top: 0;
   color: var(--wp-components-color-foreground, #1e1e1e);
   cursor: pointer;
@@ -926,7 +926,7 @@ exports[`DimensionControl rendering renders with icon and default icon label 1`]
   justify-content: space-between;
   box-sizing: border-box;
   position: relative;
-  border-radius: 2px;
+  border-radius: $radius-primitive;
   padding-top: 0;
   color: var(--wp-components-color-foreground, #1e1e1e);
   cursor: pointer;

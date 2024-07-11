@@ -15,7 +15,7 @@ $cell-disable-opacity: 0.38;
 	margin: auto;
 	margin-top: 6px;
 	margin-bottom: 6px;
-	border-radius: 2px;
+	border-radius: $radius-primitive;
 }
 
 .separator {
@@ -169,7 +169,7 @@ $cell-disable-opacity: 0.38;
 .colorCircle {
 	width: 2 * $grid-unit-20;
 	height: 2 * $grid-unit-20;
-	border-radius: $grid-unit-20;
+	border-radius: $radius-round;
 }
 
 // Radio Cell

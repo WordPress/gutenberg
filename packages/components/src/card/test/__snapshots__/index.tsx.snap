@@ -370,7 +370,7 @@ exports[`Card Card component should render correctly 1`] = `
   left: 0;
   right: 0;
   top: 0;
-  border-radius: 2px;
+  border-radius: $radius-primitive;
 }
 
 @media not ( prefers-reduced-motion ) {
@@ -518,7 +518,7 @@ exports[`Card Card component should warn when the isElevated prop is passed 1`] 
   left: 0;
   right: 0;
   top: 0;
-  border-radius: 2px;
+  border-radius: $radius-primitive;
 }
 
 @media not ( prefers-reduced-motion ) {
@@ -542,7 +542,7 @@ exports[`Card Card component should warn when the isElevated prop is passed 1`] 
   left: 0;
   right: 0;
   top: 0;
-  border-radius: 2px;
+  border-radius: $radius-primitive;
 }
 
 @media not ( prefers-reduced-motion ) {

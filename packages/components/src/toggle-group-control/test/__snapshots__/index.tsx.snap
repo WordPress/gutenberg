@@ -41,7 +41,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
 .emotion-8 {
   background: var(--wp-components-color-background, #fff);
   border: 1px solid transparent;
-  border-radius: 2px;
+  border-radius: $radius-primitive;
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
@@ -88,7 +88,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   appearance: none;
   background: transparent;
   border: none;
-  border-radius: 2px;
+  border-radius: $radius-primitive;
   color: #757575;
   fill: currentColor;
   cursor: pointer;
@@ -151,7 +151,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
 
 .emotion-15 {
   background: #1e1e1e;
-  border-radius: 2px;
+  border-radius: $radius-primitive;
   position: absolute;
   inset: 0;
   z-index: 1;
@@ -170,7 +170,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   appearance: none;
   background: transparent;
   border: none;
-  border-radius: 2px;
+  border-radius: $radius-primitive;
   color: #757575;
   fill: currentColor;
   cursor: pointer;
@@ -367,7 +367,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
 .emotion-8 {
   background: var(--wp-components-color-background, #fff);
   border: 1px solid transparent;
-  border-radius: 2px;
+  border-radius: $radius-primitive;
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
@@ -414,7 +414,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
   appearance: none;
   background: transparent;
   border: none;
-  border-radius: 2px;
+  border-radius: $radius-primitive;
   color: #757575;
   fill: currentColor;
   cursor: pointer;
@@ -586,7 +586,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
 .emotion-8 {
   background: var(--wp-components-color-background, #fff);
   border: 1px solid transparent;
-  border-radius: 2px;
+  border-radius: $radius-primitive;
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
@@ -633,7 +633,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   appearance: none;
   background: transparent;
   border: none;
-  border-radius: 2px;
+  border-radius: $radius-primitive;
   color: #757575;
   fill: currentColor;
   cursor: pointer;
@@ -696,7 +696,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
 
 .emotion-15 {
   background: #1e1e1e;
-  border-radius: 2px;
+  border-radius: $radius-primitive;
   position: absolute;
   inset: 0;
   z-index: 1;
@@ -715,7 +715,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   appearance: none;
   background: transparent;
   border: none;
-  border-radius: 2px;
+  border-radius: $radius-primitive;
   color: #757575;
   fill: currentColor;
   cursor: pointer;
@@ -906,7 +906,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
 .emotion-8 {
   background: var(--wp-components-color-background, #fff);
   border: 1px solid transparent;
-  border-radius: 2px;
+  border-radius: $radius-primitive;
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
@@ -953,7 +953,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
   appearance: none;
   background: transparent;
   border: none;
-  border-radius: 2px;
+  border-radius: $radius-primitive;
   color: #757575;
   fill: currentColor;
   cursor: pointer;

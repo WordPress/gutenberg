@@ -13,7 +13,7 @@
 .block-editor-block-list__insertion-point-indicator {
 	position: absolute;
 	background: var(--wp-admin-theme-color);
-	border-radius: 2px;
+	border-radius: $radius-primitive;
 	transform-origin: center;
 	opacity: 0;
 	will-change: transform, opacity;
@@ -188,7 +188,7 @@
 
 	.block-editor-block-contextual-toolbar {
 		border: $border-width solid $gray-900;
-		border-radius: $radius-primitive;
+		border-radius: $radius-small-container;
 		overflow: visible; // allow the parent selector to be visible
 		position: static;
 		width: auto;

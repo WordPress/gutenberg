@@ -8,7 +8,7 @@ import styled from '@emotion/styled';
  * Internal dependencies
  */
 import NumberControl from '../../number-control';
-import { COLORS, rtl } from '../../utils';
+import { COLORS, rtl, CONFIG } from '../../utils';
 import { space } from '../../utils/space';
 
 import type {
@@ -281,7 +281,7 @@ const tooltipPosition = ( { position }: TooltipProps ) => {
 
 export const Tooltip = styled.span< TooltipProps >`
 	background: rgba( 0, 0, 0, 0.8 );
-	border-radius: 2px;
+	border-radius: ${ CONFIG.radiusPrimitive };
 	color: white;
 	display: inline-block;
 	font-size: 12px;
