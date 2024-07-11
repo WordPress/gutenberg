@@ -25,19 +25,15 @@ export function useNavigatorBackButton(
 		...otherProps
 	} = useContextSystem( props, 'NavigatorBackButton' );
 
-	const { goBack, goToParent } = useNavigator();
+	const { goBack } = useNavigator();
 	const handleClick: React.MouseEventHandler< HTMLButtonElement > =
 		useCallback(
 			( e ) => {
 				e.preventDefault();
-				if ( goToParentProp ) {
-					goToParent();
-				} else {
-					goBack();
-				}
+				goBack();
 				onClick?.( e );
 			},
-			[ goToParentProp, goToParent, goBack, onClick ]
+			[ goBack, onClick ]
 		);
 
 	return {
