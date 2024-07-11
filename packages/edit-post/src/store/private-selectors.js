@@ -13,7 +13,10 @@ export const getEditedPostTemplateId = createRegistrySelector(
 			slug,
 		} = select( editorStore ).getCurrentPost();
 		const { getSite, getEntityRecords, canUser } = select( coreStore );
-		const siteSettings = canUser( 'read', 'settings' )
+		const siteSettings = canUser( 'read', {
+			kind: 'root',
+			name: 'site',
+		} )
 			? getSite()
 			: undefined;
 		// First check if the current page is set as the posts page.

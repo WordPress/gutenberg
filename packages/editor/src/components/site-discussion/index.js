@@ -56,7 +56,10 @@ export default function SiteDiscussion() {
 			const { getEditedPostAttribute, getCurrentPostType } =
 				select( editorStore );
 			const { getEditedEntityRecord, canUser } = select( coreStore );
-			const siteSettings = canUser( 'read', 'settings' )
+			const siteSettings = canUser( 'read', {
+				kind: 'root',
+				name: 'site',
+			} )
 				? getEditedEntityRecord( 'root', 'site' )
 				: undefined;
 			return {

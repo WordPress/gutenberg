@@ -29,7 +29,10 @@ export default function BlogTitle() {
 		( select ) => {
 			const { getEntityRecord, getEditedEntityRecord, canUser } =
 				select( coreStore );
-			const siteSettings = canUser( 'read', 'settings' )
+			const siteSettings = canUser( 'read', {
+				kind: 'root',
+				name: 'site',
+			} )
 				? getEntityRecord( 'root', 'site' )
 				: undefined;
 			const _postsPageRecord = siteSettings?.page_for_posts

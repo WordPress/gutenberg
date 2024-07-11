@@ -27,7 +27,10 @@ export default function PostContentInformation() {
 			select( editorStore );
 		const { canUser } = select( coreStore );
 		const { getEntityRecord } = select( coreStore );
-		const siteSettings = canUser( 'read', 'settings' )
+		const siteSettings = canUser( 'read', {
+			kind: 'root',
+			name: 'site',
+		} )
 			? getEntityRecord( 'root', 'site' )
 			: undefined;
 		const postType = getCurrentPostType();
