@@ -66,9 +66,11 @@ export type NavigatorBackButtonProps = ButtonAsButtonProps;
 
 export type NavigatorBackButtonHookProps = NavigatorBackButtonProps & {
 	/**
+	 * _Note: this prop is deprecated and won't have any effect on the component._
 	 * Whether we should navigate to the parent screen.
 	 *
-	 * @default 'false'
+	 * @deprecated
+	 * @ignore
 	 */
 	goToParent?: boolean;
 };

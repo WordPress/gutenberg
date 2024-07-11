@@ -18,7 +18,10 @@ export function useNavigatorBackButton(
 	const {
 		onClick,
 		as = Button,
-		goToParent: goToParentProp = false,
+
+		// Deprecated
+		goToParent,
+
 		...otherProps
 	} = useContextSystem( props, 'NavigatorBackButton' );
 
