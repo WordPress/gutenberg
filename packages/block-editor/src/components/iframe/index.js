@@ -235,7 +235,7 @@ function Iframe( {
 				);
 				defaultView.frameElement.style.setProperty(
 					'--wp-block-editor-iframe-zoom-out-inset',
-					inset === 'number' ? `${ inset }px` : inset
+					inset
 				);
 			} else {
 				documentElement.classList.remove( 'is-zoomed-out' );
@@ -267,7 +267,9 @@ function Iframe( {
 			refZoomOutStatus.current.effect = ( isActive, nextWidth ) => {
 				if ( isActive ) {
 					const { priorContainerWidth } = refZoomOutStatus.current;
-					actualizeZoom( nextWidth / priorContainerWidth, frameSize );
+					nextWidth -= frameSize * 2;
+					const nextScale = nextWidth / priorContainerWidth;
+					actualizeZoom( nextScale, `${ frameSize }px` );
 					clearTimeout( refZoomOutStatus.current.timerId );
 					refZoomOutStatus.current.timerId = setTimeout( () => {
 						refZoomOutStatus.current.effect = null;
