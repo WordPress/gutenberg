@@ -1078,6 +1078,33 @@ store( "myPlugin", {
 });
 ```
 
+When `getContext()` called with a namespace argument, `getContext(namespace)` retrieves the context specific to that namespace within the current element's context.
+
+```php
+// render.php
+<div data-wp-interactive="myPlugin" data-wp-context='{ "isOpen": false, "region": { "name": "North" } }'>
+	<button data-wp-on--click="actions.log">Log</button>
+</div>
+```
+
+```js
+// store
+import { store, getContext } from '@wordpress/interactivity';
+
+store( "myPlugin", {
+  actions: {
+    log: () => {
+      // Retrieve the context for the 'region' namespace.
+      const regionContext = getContext('region');
+      // Logs "North"
+      console.log('regionContext => ', regionContext.name);
+      // Logs the entire 'region' context object.
+      console.log('regionContext => ', regionContext);
+    },
+  },
+});
+```
+
 #### getElement()
 
 Retrieves a representation of the element that the action is bound to or called from. Such representation is read-only, and contains a reference to the DOM element, its props and a local reactive state.
