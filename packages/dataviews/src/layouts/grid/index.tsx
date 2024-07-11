@@ -122,7 +122,7 @@ function GridItem< Item >( {
 				</HStack>
 			) }
 			{ !! visibleFields?.length && (
-				<VStack className="dataviews-view-grid__fields" spacing={ 3 }>
+				<VStack className="dataviews-view-grid__fields" spacing={ 1 }>
 					{ visibleFields.map( ( field ) => {
 						const renderedValue = field.render( {
 							item,
