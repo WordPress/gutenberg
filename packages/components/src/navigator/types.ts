@@ -31,6 +31,11 @@ export type Navigator = {
 	params: MatchParams;
 	goTo: ( path: string, options?: NavigateOptions ) => void;
 	goBack: ( options?: NavigateToParentOptions ) => void;
+	/**
+	 * _Note: This function is deprecated. Please use `goBack` instead._
+	 * @deprecated
+	 * @ignore
+	 */
 	goToParent: ( options?: NavigateToParentOptions ) => void;
 };
 

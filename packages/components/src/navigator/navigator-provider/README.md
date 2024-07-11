@@ -68,17 +68,13 @@ The available options are:
 - `focusTargetSelector`: `string`. An optional property used to specify the CSS selector used to restore focus on the matching element when navigating back.
 - `isBack`: `boolean`. An optional property used to specify whether the navigation should be considered as backwards (thus enabling focus restoration when possible, and causing the animation to be backwards too)
 
-### `goToParent`: `() => void;`
+### `goBack`: `() => void`
 
-The `goToParent` function allows navigating to the parent screen.
+The `goBack` function allows navigating to the parent screen.
 
 Parent/child navigation only works if the path you define are hierarchical (see note above).
 
 When a match is not found, the function will try to recursively navigate the path hierarchy until a matching screen (or the root `/`) are found.
-
-### `goBack`: `() => void`
-
-The `goBack` function allows navigating to the previous path.
 
 ### `location`: `NavigatorLocation`
 
