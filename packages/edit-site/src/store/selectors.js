@@ -76,7 +76,7 @@ export const getCanUserCreateMedia = createRegistrySelector(
 			`wp.data.select( 'core/edit-site' ).getCanUserCreateMedia()`,
 			{
 				since: '6.7',
-				alternative: `wp.data.select( 'core' ).canUser()`,
+				alternative: `wp.data.select( 'core' ).canUser( 'create', { kind: 'root', type: 'media' } )`,
 			}
 		);
 
