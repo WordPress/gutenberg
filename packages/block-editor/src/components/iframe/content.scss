@@ -51,19 +51,17 @@ iframe[name="editor-canvas"].is-zoomed-out {
 		}
 	}
 
-	body {
+	// Expands main content area.
+	// See: https://github.com/WordPress/gutenberg/pull/59512
+	&,
+	> body,
+	> body > .is-root-container:not(.wp-block-post-content) {
 		display: flex;
 		flex-direction: column;
+		flex: 1; // Doesn’t effect the html element but grouping is simpler this way.
+	}
 
-		> .is-root-container:not(.wp-block-post-content) {
-			flex: 1;
-			display: flex;
-			flex-direction: column;
-			height: 100%;
-
-			> main {
-				flex: 1;
-			}
-		}
+	> body > .is-root-container:not(.wp-block-post-content) > main {
+		flex: 1;
 	}
 }
