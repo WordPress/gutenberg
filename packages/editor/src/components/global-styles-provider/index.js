@@ -41,9 +41,14 @@ function useGlobalStylesUserConfig() {
 			} = select( coreStore );
 			const _globalStylesId =
 				select( coreStore ).__experimentalGetCurrentGlobalStylesId();
+
+			// Doing canUser( 'read', 'global_styles' ) returns false even for users with the capability.
+			// See: https://github.com/WordPress/gutenberg/issues/63438
+			// So we need to check the user capabilities directly.
 			const userId = getCurrentUser()?.id;
 			const canEditThemeOptions =
 				userId && getUser( userId )?.capabilities?.edit_theme_options;
+
 			const record =
 				_globalStylesId && canEditThemeOptions
 					? getEditedEntityRecord(
@@ -139,6 +144,10 @@ function useGlobalStylesBaseConfig() {
 			getUser,
 			__experimentalGetCurrentThemeBaseGlobalStyles,
 		} = select( coreStore );
+
+		// Doing canUser( 'read', 'global_styles' ) returns false even for users with the capability.
+		// See: https://github.com/WordPress/gutenberg/issues/63438
+		// So we need to check the user capabilities directly.
 		const userId = getCurrentUser()?.id;
 		const canEditThemeOptions =
 			userId && getUser( userId )?.capabilities?.edit_theme_options;
