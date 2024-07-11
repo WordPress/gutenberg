@@ -10,6 +10,7 @@
 
 -   `ComboboxControl`: Fix ComboboxControl reset button when using the keyboard. ([#63410](https://github.com/WordPress/gutenberg/pull/63410))
 -   `Button`: Never apply `aria-disabled` to anchor ([#63376](https://github.com/WordPress/gutenberg/pull/63376)).
+-   `ToggleGroupControl`: support disabled options ([#63450](https://github.com/WordPress/gutenberg/pull/63450)).
 
 ### Internal
 
