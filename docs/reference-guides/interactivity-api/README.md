@@ -42,6 +42,21 @@ You can start creating interactions once you set up a block development environm
 
 ### Code requirements
 
+#### Add `interactivity` to your project
+
+Install the Interactivity API to your project with the following command:
+
+```bash
+npm install @wordpress/interactivity --save
+```
+
+Import the store into your `view.js`. Refer to the [store documentation](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/api-reference/#the-store) for more information.
+
+```js
+import { store } from '@wordpress/interactivity';
+```
+
+
 #### Add `interactivity` support to `block.json`
 
 To indicate that the block [supports](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/) the Interactivity API features, add `"interactivity": true` to the `supports` attribute of the block's `block.json` file.
