@@ -7,7 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
-import { Button } from '@wordpress/components';
+import { Button, VisuallyHidden } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import {
 	EditorKeyboardShortcutsRegister,
@@ -95,7 +95,7 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 				'trash',
 		};
 	}, [] );
-	useEditorTitle();
+	const editorTitle = useEditorTitle();
 	const _isPreviewingTheme = isPreviewingTheme();
 	const hasDefaultEditorCanvasView = ! useHasEditorCanvasContainer();
 	const iframeProps = useEditorIframeProps();
@@ -182,6 +182,11 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 
 	return (
 		<>
+			<VisuallyHidden as="h1">
+				{ editorTitle
+					? decodeEntities( editorTitle )
+					: __( 'No Title' ) }
+			</VisuallyHidden>
 			<GlobalStylesRenderer />
 			<EditorKeyboardShortcutsRegister />
 			{ isEditMode && <BlockKeyboardShortcuts /> }
