@@ -65,7 +65,9 @@ function FontFamilies() {
 				) }
 				{ customFonts.length > 0 && (
 					<VStack>
-						<Subtitle level={ 3 }>{ __( 'User fonts' ) }</Subtitle>
+						<Subtitle level={ 3 }>
+							{ __( 'Custom fonts' ) }
+						</Subtitle>
 						<ItemGroup isBordered isSeparated>
 							{ customFonts.map( ( font ) => (
 								<FontFamilyItem
