@@ -43,7 +43,7 @@ export default function SavePublishPanels( {
 		} = select( editorStore );
 		const _hasOtherEntitiesChanges =
 			hasNonPostEntityChanges() ||
-			unlock( select( editorStore ) ).hasPostMetaChanges();
+			unlock( select( editorStore ) ).getPostMetaChanges().length > 0;
 		return {
 			publishSidebarOpened: isPublishSidebarOpened(),
 			isPublishable:
@@ -52,7 +52,6 @@ export default function SavePublishPanels( {
 			hasOtherEntitiesChanges: _hasOtherEntitiesChanges,
 		};
 	}, [] );
-
 	const openEntitiesSavedStates = useCallback(
 		() => setEntitiesSavedStatesCallback( true ),
 		[]

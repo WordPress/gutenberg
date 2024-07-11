@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import fastDeepEqual from 'fast-deep-equal';
-
-/**
  * WordPress dependencies
  */
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -32,6 +27,49 @@ const EMPTY_INSERTION_POINT = {
 	insertionIndex: undefined,
 	filterValue: undefined,
 };
+const isObject = ( obj ) => obj !== null && typeof obj === 'object';
+
+/**
+ * A deep comparison of two objects, optimized for comparing metadata changes.
+ * @param {Object} changedObject  The changed object to compare.
+ * @param {Object} originalObject The original object to compare against.
+ * @param {string} parentPath     A key/value pair object of block names and their rendered titles.
+ * @return {string[]}             An array of paths whose values have changed.
+ */
+function deepCompare( changedObject, originalObject, parentPath = '' ) {
+	// We have two non-object values to compare.
+	if ( ! isObject( changedObject ) && ! isObject( originalObject ) ) {
+		/*
+		 * Only return a path if the value has changed.
+		 */
+		return changedObject !== originalObject
+			? parentPath.split( '.' ).join( ' > ' )
+			: undefined;
+	}
+
+	// Enable comparison when an object doesn't have a corresponding property to compare.
+	changedObject = isObject( changedObject ) ? changedObject : {};
+	originalObject = isObject( originalObject ) ? originalObject : {};
+
+	const allKeys = new Set( [
+		...Object.keys( changedObject ),
+		...Object.keys( originalObject ),
+	] );
+
+	let diffs = [];
+	for ( const key of allKeys ) {
+		const path = parentPath ? parentPath + '.' + key : key;
+		const changedPath = deepCompare(
+			changedObject[ key ],
+			originalObject[ key ],
+			path
+		);
+		if ( changedPath ) {
+			diffs = diffs.concat( changedPath );
+		}
+	}
+	return diffs;
+}
 
 /**
  * Get the insertion point for the inserter.
@@ -128,31 +166,28 @@ export const getPostIcon = createRegistrySelector(
  *
  * @return {boolean} Whether there are edits or not in the meta fields of the relevant post.
  */
-export const hasPostMetaChanges = createRegistrySelector(
+export const getPostMetaChanges = createRegistrySelector(
 	( select ) => ( state, postType, postId ) => {
 		const { type: currentPostType, id: currentPostId } =
 			getCurrentPost( state );
 		// If no postType or postId is passed, use the current post.
+		const original = select( coreStore ).getEntityRecord(
+			'postType',
+			postType || currentPostType,
+			postId || currentPostId
+		);
 		const edits = select( coreStore ).getEntityRecordNonTransientEdits(
 			'postType',
 			postType || currentPostType,
 			postId || currentPostId
 		);
 
-		if ( ! edits?.meta ) {
-			return false;
+		if ( ! original?.meta || ! edits?.meta ) {
+			return [];
 		}
 
-		// Compare if anything apart from `footnotes` has changed.
-		const originalPostMeta = select( coreStore ).getEntityRecord(
-			'postType',
-			postType || currentPostType,
-			postId || currentPostId
-		)?.meta;
-
-		return ! fastDeepEqual(
-			{ ...originalPostMeta, footnotes: undefined },
-			{ ...edits.meta, footnotes: undefined }
+		return deepCompare( edits.meta, original.meta ).filter(
+			( item ) => item !== 'footnotes'
 		);
 	}
 );

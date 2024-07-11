@@ -24,9 +24,13 @@
 	color: $gray-700;
 	font-size: $helptext-font-size;
 	margin: $grid-unit-10 $grid-unit-20 0 $grid-unit-20;
-	list-style: disc;
 
-	li {
-		margin-bottom: $grid-unit-05;
+	ul {
+		list-style: disc;
+		margin: $grid-unit-10 $grid-unit-30 0 $grid-unit-30;
+
+		li {
+			margin-bottom: $grid-unit-05;
+		}
 	}
 }

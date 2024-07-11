@@ -1,4 +1,30 @@
 /**
+ * Internal dependencies
+ */
+import isShallowEqualArrays from './arrays';
+
+/**
+ * Returns true if the two values are equal, or false otherwise.
+ * Includes a check for shallow array equality.
+ *
+ * @param {any} a
+ * @param {any} b
+ *
+ * @return {boolean} Whether the two values are equal.
+ */
+function isEqual( a, b ) {
+	if ( Array.isArray( a ) && Array.isArray( b ) ) {
+		return isShallowEqualArrays( a, b );
+	}
+
+	if ( a === b ) {
+		return true;
+	}
+
+	return false;
+}
+
+/**
  * Returns true if the two objects are shallow equal, or false otherwise.
  *
  * @param {import('.').ComparableObject} a First object to compare.
@@ -31,7 +57,7 @@ export default function isShallowEqualObjects( a, b ) {
 			//
 			// Example: isShallowEqualObjects( { a: undefined }, { b: 5 } )
 			( aValue === undefined && ! b.hasOwnProperty( key ) ) ||
-			aValue !== b[ key ]
+			! isEqual( aValue, b[ key ] )
 		) {
 			return false;
 		}
