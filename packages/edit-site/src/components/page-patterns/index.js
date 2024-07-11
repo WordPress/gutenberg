@@ -13,13 +13,7 @@ import {
 	Flex,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
-import {
-	useState,
-	useMemo,
-	useCallback,
-	useId,
-	useEffect,
-} from '@wordpress/element';
+import { useState, useMemo, useId, useEffect } from '@wordpress/element';
 import {
 	BlockPreview,
 	privateApis as blockEditorPrivateApis,
@@ -64,14 +58,26 @@ const { usePostActions } = unlock( editorPrivateApis );
 const { useLocation } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
-const defaultConfigPerViewType = {
+const defaultLayouts = {
 	[ LAYOUT_TABLE ]: {
-		primaryField: 'title',
+		layout: {
+			primaryField: 'title',
+			styles: {
+				preview: {
+					width: '1%',
+				},
+				author: {
+					width: '1%',
+				},
+			},
+		},
 	},
 	[ LAYOUT_GRID ]: {
-		mediaField: 'preview',
-		primaryField: 'title',
-		badgeFields: [ 'sync-status' ],
+		layout: {
+			mediaField: 'preview',
+			primaryField: 'title',
+			badgeFields: [ 'sync-status' ],
+		},
 	},
 };
 const DEFAULT_VIEW = {
@@ -79,9 +85,8 @@ const DEFAULT_VIEW = {
 	search: '',
 	page: 1,
 	perPage: 20,
-	layout: {
-		...defaultConfigPerViewType[ LAYOUT_GRID ],
-	},
+	layout: defaultLayouts[ LAYOUT_GRID ].layout,
+	fields: [ 'title', 'sync-status' ],
 	filters: [],
 };
 
@@ -172,7 +177,7 @@ function Author( { item, viewType } ) {
 	const withIcon = viewType !== LAYOUT_LIST;
 
 	return (
-		<HStack alignment="left" spacing={ 1 }>
+		<HStack alignment="left" spacing={ 0 }>
 			{ withIcon && imageUrl && (
 				<div
 					className={ clsx( 'page-templates-author-field__avatar', {
@@ -285,8 +290,6 @@ export default function DataviewsPatterns() {
 					<Preview item={ item } viewType={ view.type } />
 				),
 				enableSorting: false,
-				enableHiding: false,
-				width: '1%',
 			},
 			{
 				header: __( 'Title' ),
@@ -339,7 +342,6 @@ export default function DataviewsPatterns() {
 				filterBy: {
 					isPrimary: true,
 				},
-				width: '1%',
 			} );
 		}
 
@@ -379,20 +381,6 @@ export default function DataviewsPatterns() {
 		}
 		return [ editAction, ...patternActions ].filter( Boolean );
 	}, [ editAction, type, templatePartActions, patternActions ] );
-	const onChangeView = useCallback(
-		( newView ) => {
-			if ( newView.type !== view.type ) {
-				newView = {
-					...newView,
-					layout: {
-						...defaultConfigPerViewType[ newView.type ],
-					},
-				};
-			}
-			setView( newView );
-		},
-		[ view.type, setView ]
-	);
 	const id = useId();
 	const settings = usePatternSettings();
 	// Wrap everything in a block editor provider.
@@ -419,8 +407,8 @@ export default function DataviewsPatterns() {
 					getItemId={ ( item ) => item.name ?? item.id }
 					isLoading={ isResolving }
 					view={ view }
-					onChangeView={ onChangeView }
-					supportedLayouts={ [ LAYOUT_GRID, LAYOUT_TABLE ] }
+					onChangeView={ setView }
+					defaultLayouts={ defaultLayouts }
 				/>
 			</Page>
 		</ExperimentalBlockEditorProvider>

@@ -180,25 +180,26 @@ export default function ViewGrid< Item >( {
 	view,
 }: ViewGridProps< Item > ) {
 	const mediaField = fields.find(
-		( field ) => field.id === view.layout.mediaField
+		( field ) => field.id === view.layout?.mediaField
 	);
 	const primaryField = fields.find(
-		( field ) => field.id === view.layout.primaryField
+		( field ) => field.id === view.layout?.primaryField
 	);
 	const viewFields = view.fields || fields.map( ( field ) => field.id );
 	const { visibleFields, badgeFields } = fields.reduce(
 		( accumulator: Record< string, NormalizedField< Item >[] >, field ) => {
 			if (
 				! viewFields.includes( field.id ) ||
-				[ view.layout.mediaField, view.layout.primaryField ].includes(
-					field.id
-				)
+				[
+					view.layout?.mediaField,
+					view?.layout?.primaryField,
+				].includes( field.id )
 			) {
 				return accumulator;
 			}
 			// If the field is a badge field, add it to the badgeFields array
 			// otherwise add it to the rest visibleFields array.
-			const key = view.layout.badgeFields?.includes( field.id )
+			const key = view.layout?.badgeFields?.includes( field.id )
 				? 'badgeFields'
 				: 'visibleFields';
 			accumulator[ key ].push( field );
@@ -230,7 +231,7 @@ export default function ViewGrid< Item >( {
 								primaryField={ primaryField }
 								visibleFields={ visibleFields }
 								badgeFields={ badgeFields }
-								columnFields={ view.layout.columnFields }
+								columnFields={ view.layout?.columnFields }
 							/>
 						);
 					} ) }

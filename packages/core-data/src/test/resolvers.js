@@ -289,6 +289,7 @@ describe( 'canUser', () => {
 			select: jest.fn( () => ( {
 				hasStartedResolution: () => false,
 			} ) ),
+			batch: ( callback ) => callback(),
 		};
 		triggerFetch.mockReset();
 	} );
@@ -388,6 +389,7 @@ describe( 'canUser', () => {
 		} );
 
 		registry = {
+			...registry,
 			select: () => ( {
 				hasStartedResolution: ( _, [ action ] ) => action === 'read',
 			} ),
@@ -418,6 +420,7 @@ describe( 'canUser', () => {
 		} );
 
 		registry = {
+			...registry,
 			select: () => ( {
 				hasStartedResolution: ( _, [ action ] ) => action === 'read',
 			} ),
@@ -456,6 +459,7 @@ describe( 'canUser', () => {
 		} );
 
 		registry = {
+			...registry,
 			select: () => ( {
 				hasStartedResolution: ( _, [ action ] ) => action === 'create',
 			} ),

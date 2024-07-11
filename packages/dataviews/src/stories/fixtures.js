@@ -167,20 +167,17 @@ export const fields = [
 				<img src={ item.image } alt="" style={ { width: '100%' } } />
 			);
 		},
-		width: 50,
 		enableSorting: false,
 	},
 	{
 		header: 'Title',
 		id: 'title',
-		maxWidth: 400,
 		enableHiding: false,
 		enableGlobalSearch: true,
 	},
 	{
 		header: 'Type',
 		id: 'type',
-		maxWidth: 400,
 		enableHiding: false,
 		elements: [
 			{ value: 'Not a planet', label: 'Not a planet' },
@@ -197,7 +194,6 @@ export const fields = [
 	{
 		header: 'Description',
 		id: 'description',
-		maxWidth: 200,
 		enableSorting: false,
 		enableGlobalSearch: true,
 	},

@@ -23,9 +23,7 @@ export interface TemplateOrTemplatePart extends BasePost {
 export interface Pattern extends BasePost {
 	slug: string;
 	title: { raw: string };
-	content: {
-		raw: string;
-	};
+	content: { raw: string } | string;
 	wp_pattern_sync_status: string;
 }
 

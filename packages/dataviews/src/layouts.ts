@@ -16,6 +16,7 @@ import ViewTable from './view-table';
 import ViewGrid from './view-grid';
 import ViewList from './view-list';
 import { LAYOUT_GRID, LAYOUT_LIST, LAYOUT_TABLE } from './constants';
+import type { View } from './types';
 
 export const VIEW_LAYOUTS = [
 	{
@@ -37,3 +38,29 @@ export const VIEW_LAYOUTS = [
 		icon: isRTL() ? formatListBulletsRTL : formatListBullets,
 	},
 ];
+
+export function getMandatoryFields( view: View ): string[] {
+	if ( view.type === 'table' ) {
+		return [ view.layout?.primaryField ]
+			.concat(
+				view.layout?.combinedFields?.flatMap(
+					( field ) => field.children
+				) ?? []
+			)
+			.filter( ( item ): item is string => !! item );
+	}
+
+	if ( view.type === 'grid' ) {
+		return [ view.layout?.primaryField, view.layout?.mediaField ].filter(
+			( item ): item is string => !! item
+		);
+	}
+
+	if ( view.type === 'list' ) {
+		return [ view.layout?.primaryField, view.layout?.mediaField ].filter(
+			( item ): item is string => !! item
+		);
+	}
+
+	return [];
+}

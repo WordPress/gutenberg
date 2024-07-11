@@ -501,7 +501,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			if ( ! empty( $layout['rowCount'] ) ) {
 				$layout_styles[] = array(
 					'selector'     => $selector,
-					'declarations' => array( 'grid-template-rows' => 'repeat(' . $layout['rowCount'] . ', minmax(8px, auto))' ),
+					'declarations' => array( 'grid-template-rows' => 'repeat(' . $layout['rowCount'] . ', minmax(1rem, auto))' ),
 				);
 			}
 		} elseif ( ! empty( $layout['columnCount'] ) ) {
@@ -512,7 +512,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			if ( ! empty( $layout['rowCount'] ) ) {
 				$layout_styles[] = array(
 					'selector'     => $selector,
-					'declarations' => array( 'grid-template-rows' => 'repeat(' . $layout['rowCount'] . ', minmax(8px, auto))' ),
+					'declarations' => array( 'grid-template-rows' => 'repeat(' . $layout['rowCount'] . ', minmax(1rem, auto))' ),
 				);
 			}
 		} else {

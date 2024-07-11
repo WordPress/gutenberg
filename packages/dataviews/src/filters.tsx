@@ -52,7 +52,7 @@ function _Filters< Item >( {
 			operators,
 			isVisible:
 				isPrimary ||
-				view.filters.some(
+				!! view.filters?.some(
 					( f ) =>
 						f.field === field.id &&
 						ALL_OPERATORS.includes( f.operator )

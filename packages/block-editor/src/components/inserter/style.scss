@@ -228,6 +228,13 @@ $block-inserter-tabs-height: 44px;
 		margin-top: auto;
 	}
 
+	// Temporarily disable the component's indicator animation.
+	// TODO: remove in favor of using the native component's styles and behavior,
+	// see https://github.com/WordPress/gutenberg/pull/62879#issuecomment-2219720582
+	&[aria-orientation="vertical"]::after {
+		content: none;
+	}
+
 	.block-editor-inserter__category-tab {
 		// Account for the icon on the right so that it's visually balanced.
 		padding: $grid-unit-10 $grid-unit-05 $grid-unit-10 $grid-unit-15;

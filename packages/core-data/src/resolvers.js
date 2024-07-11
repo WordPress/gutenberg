@@ -63,7 +63,7 @@ export const getEntityRecord =
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
 		);
-		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
+		if ( ! entityConfig ) {
 			return;
 		}
 
@@ -198,7 +198,7 @@ export const getEntityRecords =
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
 		);
-		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
+		if ( ! entityConfig ) {
 			return;
 		}
 
@@ -414,12 +414,14 @@ export const canUser =
 			permissions[ actionName ] = allowedMethods.includes( methodName );
 		}
 
-		for ( const action of retrievedActions ) {
-			dispatch.receiveUserPermission(
-				`${ action }/${ resourcePath }`,
-				permissions[ action ]
-			);
-		}
+		registry.batch( () => {
+			for ( const action of retrievedActions ) {
+				dispatch.receiveUserPermission(
+					`${ action }/${ resourcePath }`,
+					permissions[ action ]
+				);
+			}
+		} );
 	};
 
 /**
@@ -740,7 +742,7 @@ export const getRevisions =
 			( config ) => config.name === name && config.kind === kind
 		);
 
-		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
+		if ( ! entityConfig ) {
 			return;
 		}
 
@@ -865,7 +867,7 @@ export const getRevision =
 			( config ) => config.name === name && config.kind === kind
 		);
 
-		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
+		if ( ! entityConfig ) {
 			return;
 		}
 

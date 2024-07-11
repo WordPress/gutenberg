@@ -297,7 +297,7 @@ describe.each( [
 					{
 						key: 'one',
 						name: 'One',
-						__experimentalHint: 'Hint',
+						hint: 'Hint',
 					},
 				] }
 			/>
@@ -309,7 +309,7 @@ describe.each( [
 		);
 	} );
 
-	it( 'shows selected hint when __experimentalShowSelectedHint is set', async () => {
+	it( 'shows selected hint when showSelectedHint is set', async () => {
 		render(
 			<Component
 				{ ...legacyProps }
@@ -318,10 +318,10 @@ describe.each( [
 					{
 						key: 'one',
 						name: 'One',
-						__experimentalHint: 'Hint',
+						hint: 'Hint',
 					},
 				] }
-				__experimentalShowSelectedHint
+				showSelectedHint
 			/>
 		);
 
@@ -334,7 +334,7 @@ describe.each( [
 		);
 	} );
 
-	it( 'shows selected hint in list of options when added, regardless of __experimentalShowSelectedHint prop', async () => {
+	it( 'shows selected hint in list of options when added, regardless of showSelectedHint prop', async () => {
 		render(
 			<Component
 				{ ...legacyProps }
@@ -343,7 +343,7 @@ describe.each( [
 					{
 						key: 'one',
 						name: 'One',
-						__experimentalHint: 'Hint',
+						hint: 'Hint',
 					},
 				] }
 			/>
@@ -451,6 +451,16 @@ describe.each( [
 				} ),
 			} )
 		);
+	} );
+
+	it( 'Should label the component correctly even when the label is not visible', () => {
+		render( <Component { ...legacyProps } hideLabelFromVision /> );
+
+		expect(
+			screen.getByRole( 'combobox', {
+				name: legacyProps.label,
+			} )
+		).toBeVisible();
 	} );
 
 	describe( 'Keyboard behavior and accessibility', () => {
