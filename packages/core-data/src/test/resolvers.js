@@ -308,6 +308,7 @@ describe( 'canUser', () => {
 		};
 		dispatch = Object.assign( jest.fn(), {
 			receiveUserPermission: jest.fn(),
+			finishResolution: jest.fn(),
 		} );
 		dispatch.mockReturnValue( ENTITIES );
 		triggerFetch.mockReset();
