@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { postList } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -15,31 +14,6 @@ import {
 } from './icons';
 
 const variations = [
-	{
-		name: 'posts-list',
-		title: __( 'Posts List' ),
-		description: __(
-			'Display a list of your most recent posts, excluding sticky posts.'
-		),
-		icon: postList,
-		attributes: {
-			namespace: 'core/posts-list',
-			query: {
-				perPage: 4,
-				pages: 1,
-				offset: 0,
-				postType: 'post',
-				order: 'desc',
-				orderBy: 'date',
-				author: '',
-				search: '',
-				sticky: 'exclude',
-				inherit: false,
-			},
-		},
-		scope: [ 'inserter' ],
-		isActive: [ 'namespace', 'query.postType' ],
-	},
 	{
 		name: 'title-date',
 		title: __( 'Title & Date' ),
