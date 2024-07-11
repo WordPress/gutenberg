@@ -450,6 +450,15 @@ export const canUser =
 					.join( '/' );
 
 				dispatch.receiveUserPermission( key, permissions[ action ] );
+
+				// Mark related action resolutions as finished.
+				if ( action !== requestedAction ) {
+					dispatch.finishResolution( 'canUser', [
+						action,
+						resource,
+						id,
+					] );
+				}
 			}
 		} );
 	};
