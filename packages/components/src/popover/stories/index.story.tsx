@@ -132,14 +132,7 @@ export const Unstyled: StoryObj< typeof Popover > = {
 	...Default,
 	args: {
 		...Default.args,
-		children: (
-			<div style={ { width: '280px', whiteSpace: 'normal' } }>
-				Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-				eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-				enim ad minim veniam, quis nostrud exercitation ullamco laboris
-				nisi ut aliquip ex ea commodo consequat.
-			</div>
-		),
+
 		variant: 'unstyled',
 	},
 };
@@ -228,7 +221,7 @@ export const DynamicHeight: StoryObj< typeof Popover > = {
 					</p>
 
 					<div>
-						<style>{ `.components-popover { --height: ${ height }px; }` }</style>
+						<style>{ `.components-popover { --dynamic-height: ${ height }px; }` }</style>
 						<Story />
 					</div>
 				</div>
@@ -240,7 +233,7 @@ export const DynamicHeight: StoryObj< typeof Popover > = {
 		children: (
 			<div
 				style={ {
-					height: 'var(--height)',
+					height: 'var(--dynamic-height)',
 					background: '#eee',
 					padding: '20px',
 				} }
