@@ -1054,7 +1054,12 @@ Apart from the store function, there are also some methods that allows the devel
 
 #### getContext()
 
-Retrieves the context inherited by the element evaluating a function from the store. The returned value depends on the element and the namespace where the function calling `getContext()` exists.
+Retrieves the context inherited by the element evaluating a function from the store. The returned value depends on the element and the namespace where the function calling `getContext()` exists. It can also take an optional namespace argument to retrieve the context of a specific interactive region.
+
+```js
+const context = getContext(namespace);
+```
+- `namespace` (optional): A string that matches the namespace of an interactive region. If not provided, it retrieves the context of the current interactive region.
 
 ```php
 // render.php
@@ -1073,33 +1078,11 @@ store( "myPlugin", {
       const context = getContext();
 			 // Logs "false"
       console.log('context => ', context.isOpen)
-    },
-  },
-});
-```
 
-When `getContext()` called with a namespace argument, `getContext(namespace)` retrieves the context specific to that namespace within the current element's context.
-
-```php
-// render.php
-<div data-wp-interactive="myPlugin" data-wp-context='{ "isOpen": false, "region": { "name": "North" } }'>
-	<button data-wp-on--click="actions.log">Log</button>
-</div>
-```
-
-```js
-// store
-import { store, getContext } from '@wordpress/interactivity';
-
-store( "myPlugin", {
-  actions: {
-    log: () => {
-      // Retrieve the context for the 'region' namespace.
-      const regionContext = getContext('region');
-      // Logs "North"
-      console.log('regionContext => ', regionContext.name);
-      // Logs the entire 'region' context object.
-      console.log('regionContext => ', regionContext);
+      // With namespace argument.
+      const myPluginContext = getContext("myPlugin");
+      // Logs "false"
+      console.log('myPlugin isOpen => ', myPluginContext.isOpen);
     },
   },
 });
