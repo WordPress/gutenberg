@@ -1,34 +1,9 @@
 /**
- * WordPress dependencies
- */
-import { store as coreDataStore } from '@wordpress/core-data';
-
-/**
  * Internal dependencies
  */
-import {
-	getCanUserCreateMedia,
-	getEditedPostType,
-	getEditedPostId,
-	isPage,
-} from '../selectors';
+import { getEditedPostType, getEditedPostId, isPage } from '../selectors';
 
 describe( 'selectors', () => {
-	const canUser = jest.fn( () => true );
-	getCanUserCreateMedia.registry = {
-		select: jest.fn( () => ( { canUser } ) ),
-	};
-
-	describe( 'getCanUserCreateMedia', () => {
-		it( "selects `canUser( 'create', 'media' )` from the core store", () => {
-			expect( getCanUserCreateMedia() ).toBe( true );
-			expect(
-				getCanUserCreateMedia.registry.select
-			).toHaveBeenCalledWith( coreDataStore );
-			expect( canUser ).toHaveBeenCalledWith( 'create', 'media' );
-		} );
-	} );
-
 	describe( 'getEditedPostId', () => {
 		it( 'returns the template ID', () => {
 			const state = { editedPost: { id: 10 } };

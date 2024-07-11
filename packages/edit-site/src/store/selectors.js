@@ -71,7 +71,17 @@ export const __experimentalGetPreviewDeviceType = createRegistrySelector(
  * @return {Object} Whether the current user can create media or not.
  */
 export const getCanUserCreateMedia = createRegistrySelector(
-	( select ) => () => select( coreDataStore ).canUser( 'create', 'media' )
+	( select ) => () => {
+		deprecated(
+			`wp.data.select( 'core/edit-site' ).getCanUserCreateMedia()`,
+			{
+				since: '6.7',
+				alternative: `wp.data.select( 'core' ).canUser()`,
+			}
+		);
+
+		return select( coreDataStore ).canUser( 'create', 'media' );
+	}
 );
 
 /**
