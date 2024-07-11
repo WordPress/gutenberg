@@ -70,6 +70,24 @@
 			}
 		}
 	}
+
+	/* Content Justification */
+	&.is-content-justification-left {
+		justify-content: flex-start;
+	}
+
+	&.is-content-justification-center {
+		justify-content: center;
+	}
+
+	&.is-content-justification-right {
+		justify-content: flex-end;
+	}
+
+	&.is-content-justification-space-between {
+		justify-content: space-between;
+	}
+
 }
 
 // Lower specificity of margin styles so they don't override the Layout block support.
