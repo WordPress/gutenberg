@@ -120,6 +120,8 @@ type EntityRecordArgs =
 	| [ string, string, EntityRecordKey ]
 	| [ string, string, EntityRecordKey, GetRecordsHttpQuery ];
 
+type EntityResource = { kind: string; name: string; id?: EntityRecordKey };
+
 /**
  * Shared reference to an empty object for cases where it is important to avoid
  * returning a new object reference on every invocation, as in a connected or
@@ -1136,7 +1138,8 @@ export function isPreviewEmbedFallback( state: State, url: string ): boolean {
  *
  * @param state    Data state.
  * @param action   Action to check. One of: 'create', 'read', 'update', 'delete'.
- * @param resource REST resource to check, e.g. 'media' or 'posts'.
+ * @param resource Entity resource to check. Accepts entity object `{ kind: 'root', name: 'media', id: 1 }`
+ *                 or REST base as a string - `media`.
  * @param id       Optional ID of the rest resource to check.
  *
  * @return Whether or not the user can perform the action,
@@ -1145,10 +1148,22 @@ export function isPreviewEmbedFallback( state: State, url: string ): boolean {
 export function canUser(
 	state: State,
 	action: string,
-	resource: string,
+	resource: string | EntityResource,
 	id?: EntityRecordKey
 ): boolean | undefined {
-	const key = [ action, resource, id ].filter( Boolean ).join( '/' );
+	const isEntity = typeof resource === 'object';
+	if ( isEntity && ( ! resource.kind || ! resource.name ) ) {
+		return false;
+	}
+
+	const key = (
+		isEntity
+			? [ action, resource.kind, resource.name, resource.id ]
+			: [ action, resource, id ]
+	)
+		.filter( Boolean )
+		.join( '/' );
+
 	return state.userPermissions[ key ];
 }
 
@@ -1173,13 +1188,12 @@ export function canUserEditEntityRecord(
 	name: string,
 	recordId: EntityRecordKey
 ): boolean | undefined {
-	const entityConfig = getEntityConfig( state, kind, name );
-	if ( ! entityConfig ) {
-		return false;
-	}
-	const resource = entityConfig.__unstable_rest_base;
+	deprecated( `wp.data.select( 'core' ).canUserEditEntityRecord()`, {
+		since: '6.7',
+		alternative: `wp.data.select( 'core' ).canUser( 'update', { kind, name, id } )`,
+	} );
 
-	return canUser( state, 'update', resource, recordId );
+	return canUser( state, 'update', { kind, name, id: recordId } );
 }
 
 /**
