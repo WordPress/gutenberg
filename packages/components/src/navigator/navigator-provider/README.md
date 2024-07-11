@@ -35,7 +35,7 @@ const MyNavigation = () => (
 
 **Important note**
 
-`Navigator` assumes that screens are organized hierarchically according to their `path`, which should follow a URL-like scheme where each path segment is separated by the `/` character.
+`Navigator` assumes that screens are organized hierarchically according to their `path`, which should follow a URL-like scheme where each path segment starts with and is separated by the `/` character.
 
 `Navigator` will treat "back" navigations as going to the parent screen — it is therefore responsibility of the consumer of the component to create the correct screen hierarchy.
 
