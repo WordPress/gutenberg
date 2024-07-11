@@ -50,9 +50,11 @@ const BlockPreviewPanel = ( { name, variation = '' } ) => {
 					blocks={ blocks }
 					viewportWidth={ viewportWidth }
 					minHeight={ previewHeight }
-					additionalStyles={ [
-						{
-							css: `
+					additionalStyles={
+						//We want this CSS to be in sync with the one in InserterPreviewPanel.
+						[
+							{
+								css: `
 								body{
 									padding: 24px;
 									min-height:100%;
@@ -61,8 +63,9 @@ const BlockPreviewPanel = ( { name, variation = '' } ) => {
 								}
 								.is-root-container { width: 100%; }
 							`,
-						},
-					] }
+							},
+						]
+					}
 				/>
 			</div>
 		</Spacer>

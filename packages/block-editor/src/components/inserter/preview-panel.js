@@ -49,9 +49,11 @@ function InserterPreviewPanel( { item } ) {
 							blocks={ blocks }
 							viewportWidth={ viewportWidth }
 							minHeight={ previewHeight }
-							additionalStyles={ [
-								{
-									css: `
+							additionalStyles={
+								//We want this CSS to be in sync with the one in BlockPreviewPanel.
+								[
+									{
+										css: `
 										body { 
 											padding: 24px;
 											min-height:${ Math.round( minHeight ) }px;
@@ -60,8 +62,9 @@ function InserterPreviewPanel( { item } ) {
 										}
 										.is-root-container { width: 100%; }
 									`,
-								},
-							] }
+									},
+								]
+							}
 						/>
 					</div>
 				) : (
