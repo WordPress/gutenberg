@@ -37,12 +37,12 @@ Add a user’s avatar. ([Source](https://github.com/WordPress/gutenberg/tree/tru
 
 ## Pattern
 
-Reuse this design across your site. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/block))
+Reuse this design across your site. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/pattern))
 
--	**Name:** core/block
--	**Category:** reusable
--	**Supports:** interactivity (clientNavigation), ~~customClassName~~, ~~html~~, ~~inserter~~, ~~renaming~~
--	**Attributes:** content, ref
+-	**Name:** core/pattern
+-	**Category:** theme
+-	**Supports:** interactivity (clientNavigation)
+-	**Attributes:** slug
 
 ## Button
 
