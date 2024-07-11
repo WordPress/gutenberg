@@ -15,11 +15,11 @@ const LINE_HEIGHT_SUPPORT_KEY = 'typography.lineHeight';
 /**
  * Key within block settings' support array indicating support for font style.
  */
-const FONT_STYLE_SUPPORT_KEY = 'typography.__experimentalFontStyle';
+const FONT_STYLE_SUPPORT_KEY = 'typography.fontStyle';
 /**
  * Key within block settings' support array indicating support for font weight.
  */
-const FONT_WEIGHT_SUPPORT_KEY = 'typography.__experimentalFontWeight';
+const FONT_WEIGHT_SUPPORT_KEY = 'typography.fontWeight';
 /**
  * Key within block settings' supports array indicating support for text
  * align e.g. settings found in `block.json`.
@@ -34,23 +34,23 @@ const TEXT_COLUMNS_SUPPORT_KEY = 'typography.textColumns';
  * Key within block settings' supports array indicating support for text
  * decorations e.g. settings found in `block.json`.
  */
-const TEXT_DECORATION_SUPPORT_KEY = 'typography.__experimentalTextDecoration';
+const TEXT_DECORATION_SUPPORT_KEY = 'typography.textDecoration';
 /**
  * Key within block settings' supports array indicating support for writing mode
  * e.g. settings found in `block.json`.
  */
-const WRITING_MODE_SUPPORT_KEY = 'typography.__experimentalWritingMode';
+const WRITING_MODE_SUPPORT_KEY = 'typography.writingMode';
 /**
  * Key within block settings' supports array indicating support for text
  * transforms e.g. settings found in `block.json`.
  */
-const TEXT_TRANSFORM_SUPPORT_KEY = 'typography.__experimentalTextTransform';
+const TEXT_TRANSFORM_SUPPORT_KEY = 'typography.textTransform';
 
 /**
  * Key within block settings' supports array indicating support for letter-spacing
  * e.g. settings found in `block.json`.
  */
-const LETTER_SPACING_SUPPORT_KEY = 'typography.__experimentalLetterSpacing';
+const LETTER_SPACING_SUPPORT_KEY = 'typography.letterSpacing';
 const LAYOUT_SUPPORT_KEY = 'layout';
 const TYPOGRAPHY_SUPPORT_KEYS = [
 	LINE_HEIGHT_SUPPORT_KEY,

@@ -13,7 +13,7 @@ import { shouldSkipSerialization } from './utils';
 import { TYPOGRAPHY_SUPPORT_KEY } from './typography';
 import { unlock } from '../lock-unlock';
 
-export const FONT_FAMILY_SUPPORT_KEY = 'typography.__experimentalFontFamily';
+export const FONT_FAMILY_SUPPORT_KEY = 'typography.fontFamily';
 const { kebabCase } = unlock( componentsPrivateApis );
 
 /**

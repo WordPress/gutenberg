@@ -183,7 +183,7 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	},
 	fontFamily: {
 		value: [ 'typography', 'fontFamily' ],
-		support: [ 'typography', '__experimentalFontFamily' ],
+		support: [ 'typography', 'fontFamily' ],
 		useEngine: true,
 	},
 	fontSize: {
@@ -193,12 +193,12 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	},
 	fontStyle: {
 		value: [ 'typography', 'fontStyle' ],
-		support: [ 'typography', '__experimentalFontStyle' ],
+		support: [ 'typography', 'fontStyle' ],
 		useEngine: true,
 	},
 	fontWeight: {
 		value: [ 'typography', 'fontWeight' ],
-		support: [ 'typography', '__experimentalFontWeight' ],
+		support: [ 'typography', 'fontWeight' ],
 		useEngine: true,
 	},
 	lineHeight: {
@@ -240,22 +240,22 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	},
 	textDecoration: {
 		value: [ 'typography', 'textDecoration' ],
-		support: [ 'typography', '__experimentalTextDecoration' ],
+		support: [ 'typography', 'textDecoration' ],
 		useEngine: true,
 	},
 	textTransform: {
 		value: [ 'typography', 'textTransform' ],
-		support: [ 'typography', '__experimentalTextTransform' ],
+		support: [ 'typography', 'textTransform' ],
 		useEngine: true,
 	},
 	letterSpacing: {
 		value: [ 'typography', 'letterSpacing' ],
-		support: [ 'typography', '__experimentalLetterSpacing' ],
+		support: [ 'typography', 'letterSpacing' ],
 		useEngine: true,
 	},
 	writingMode: {
 		value: [ 'typography', 'writingMode' ],
-		support: [ 'typography', '__experimentalWritingMode' ],
+		support: [ 'typography', 'writingMode' ],
 		useEngine: true,
 	},
 	'--wp--style--root--padding': {
@@ -296,4 +296,14 @@ export const __EXPERIMENTAL_PATHS_WITH_OVERRIDE = {
 	'dimensions.aspectRatios': true,
 	'typography.fontSizes': true,
 	'spacing.spacingSizes': true,
+};
+
+export const TYPOGRAPHY_SUPPORTS_EXPERIMENTAL_TO_STABLE = {
+	__experimentalFontFamily: 'fontFamily',
+	__experimentalTextDecoration: 'textDecoration',
+	__experimentalFontStyle: 'fontStyle',
+	__experimentalFontWeight: 'fontWeight',
+	__experimentalLetterSpacing: 'letterSpacing',
+	__experimentalTextTransform: 'textTransform',
+	__experimentalWritingMode: 'writingMode',
 };
