@@ -76,14 +76,12 @@ $navigation-icon-size: 24px;
 		}
 	}
 
-	&:where(:not([class*="has-text-decoration"])) {
-		a {
-			text-decoration: none;
+	&:where(:not([class*="has-text-decoration"])) :where(a) {
+		text-decoration: none;
 
-			&:focus,
-			&:active {
-				text-decoration: none;
-			}
+		&:focus,
+		&:active {
+			text-decoration: none;
 		}
 	}
 
