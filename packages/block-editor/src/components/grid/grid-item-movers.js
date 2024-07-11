@@ -7,7 +7,11 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Button, VisuallyHidden } from '@wordpress/components';
+import {
+	VisuallyHidden,
+	ToolbarButton,
+	ToolbarGroup,
+} from '@wordpress/components';
 import {
 	chevronLeft,
 	chevronUp,
@@ -50,7 +54,7 @@ export function GridItemMovers( {
 
 	return (
 		<BlockControls group="parent">
-			<div className="block-editor-grid-item-mover__move-button-container">
+			<ToolbarGroup className="block-editor-grid-item-mover__move-button-container">
 				<GridItemMover
 					className="is-left-button"
 					icon={ chevronLeft }
@@ -141,7 +145,7 @@ export function GridItemMovers( {
 						);
 					} }
 				/>
-			</div>
+			</ToolbarGroup>
 		</BlockControls>
 	);
 }
@@ -158,7 +162,7 @@ function GridItemMover( {
 	const descriptionId = `block-editor-grid-item-mover-button__description-${ instanceId }`;
 	return (
 		<>
-			<Button
+			<ToolbarButton
 				className={ clsx(
 					'block-editor-grid-item-mover-button',
 					className

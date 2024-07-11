@@ -174,16 +174,14 @@
 
 .show-icon-labels {
 
-	.block-editor-grid-item-mover-button {
-		.block-editor-grid-item-mover-button.is-left-button {
-			border-right: 1px solid $gray-700;
-		}
-
-		.block-editor-grid-item-mover-button.is-right-button {
-			border-left: 1px solid $gray-700;
-		}
-
+	.block-editor-grid-item-mover-button.is-left-button {
+		border-right: 1px solid $gray-700;
 	}
+
+	.block-editor-grid-item-mover-button.is-right-button {
+		border-left: 1px solid $gray-700;
+	}
+
 
 	.block-editor-grid-item-mover__move-vertical-button-container {
 		&::before {
