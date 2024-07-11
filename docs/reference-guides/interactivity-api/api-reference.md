@@ -1054,7 +1054,12 @@ Apart from the store function, there are also some methods that allows the devel
 
 #### getContext()
 
-Retrieves the context inherited by the element evaluating a function from the store. The returned value depends on the element and the namespace where the function calling `getContext()` exists.
+Retrieves the context inherited by the element evaluating a function from the store. The returned value depends on the element and the namespace where the function calling `getContext()` exists. It can also take an optional namespace argument to retrieve the context of a specific interactive region.
+
+```js
+const context = getContext('namespace');
+```
+- `namespace` (optional): A string that matches the namespace of an interactive region. If not provided, it retrieves the context of the current interactive region.
 
 ```php
 // render.php
@@ -1073,6 +1078,11 @@ store( "myPlugin", {
       const context = getContext();
 			 // Logs "false"
       console.log('context => ', context.isOpen)
+
+      // With namespace argument.
+      const myPluginContext = getContext("myPlugin");
+      // Logs "false"
+      console.log('myPlugin isOpen => ', myPluginContext.isOpen);
     },
   },
 });
