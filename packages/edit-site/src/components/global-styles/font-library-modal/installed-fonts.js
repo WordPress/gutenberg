@@ -93,7 +93,11 @@ function InstalledFonts() {
 			const { canUser } = select( coreStore );
 			return (
 				customFontFamilyId &&
-				canUser( 'delete', 'font-families', customFontFamilyId )
+				canUser( 'delete', {
+					kind: 'postType',
+					name: 'wp_font_family',
+					id: customFontFamilyId,
+				} )
 			);
 		},
 		[ customFontFamilyId ]
