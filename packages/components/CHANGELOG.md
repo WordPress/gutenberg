@@ -4,7 +4,8 @@
 
 ### Internal
 
--   `CustomSelectControlV2`: animate select popover appearance. ([#63343](https://github.com/WordPress/gutenberg/pull/63343))
+-   `CustomSelectControl`: switch to ariakit-based implementation ([#63258](https://github.com/WordPress/gutenberg/pull/63258)).
+-   `CustomSelectControl`: animate select popover appearance. ([#63343](https://github.com/WordPress/gutenberg/pull/63343))
 
 ### Enhancements
 
