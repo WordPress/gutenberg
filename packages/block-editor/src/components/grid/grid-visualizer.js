@@ -89,7 +89,7 @@ const GridVisualizerGrid = forwardRef(
 					'is-dropping-allowed': isDroppingAllowed,
 				} ) }
 				clientId={ gridClientId }
-				__unstablePopoverSlot="block-toolbar"
+				__unstablePopoverSlot="__unstable-block-tools-after"
 			>
 				<div
 					ref={ ref }
