@@ -153,7 +153,7 @@ function FontSize() {
 						) }
 						onBack={ () => goTo( '/typography/font-sizes/' ) }
 					/>
-					{ origin !== 'default' && (
+					{ origin === 'custom' && (
 						<FlexItem>
 							<Spacer
 								marginTop={ 3 }
