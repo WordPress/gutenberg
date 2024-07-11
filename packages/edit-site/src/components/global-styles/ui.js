@@ -233,12 +233,7 @@ function GlobalStylesBlockLink() {
 		if ( newPath !== currentPath ) {
 			navigator.goTo( newPath, { skipFocus: true } );
 		}
-	}, [
-		selectedBlockClientId,
-		selectedBlockName,
-		blockHasGlobalStyles,
-		navigator,
-	] );
+	}, [ selectedBlockClientId, selectedBlockName, blockHasGlobalStyles ] );
 }
 
 function GlobalStylesEditorCanvasContainerLink() {
@@ -289,7 +284,7 @@ function GlobalStylesEditorCanvasContainerLink() {
 				goTo( '/' );
 				break;
 		}
-	}, [ editorCanvasContainerView, isRevisionsOpen, goTo, path ] );
+	}, [ editorCanvasContainerView, isRevisionsOpen, goTo ] );
 }
 
 function GlobalStylesUI() {
