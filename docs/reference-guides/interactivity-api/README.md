@@ -50,7 +50,7 @@ Install the Interactivity API to your project with the following command:
 npm install @wordpress/interactivity --save
 ```
 
-Import the store into your `view.js`. Refer to the [store documentation](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/api-reference/#the-store) for more information
+Import the store into your `view.js`. Refer to the [store documentation](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/api-reference/#the-store) for more information.
 
 ```js
 import { store } from '@wordpress/interactivity';
