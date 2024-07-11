@@ -25,8 +25,8 @@ import {
 import type { NavigateOptions } from '../types';
 
 const INVALID_HTML_ATTRIBUTE = {
-	raw: ' "\'><=invalid_path',
-	escaped: " &quot;'&gt;<=invalid_path",
+	raw: '/ "\'><=invalid_path',
+	escaped: "/ &quot;'&gt;<=invalid_path",
 };
 
 const PATHS = {
