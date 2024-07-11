@@ -243,7 +243,10 @@ $block-inserter-tabs-height: 44px;
 		display: block;
 		position: relative;
 		height: auto;
-		min-height: $grid-unit-50;
+
+		@include break-medium {
+			min-height: $grid-unit-50;
+		}
 
 		&[aria-selected="true"] {
 			color: var(--wp-admin-theme-color);
