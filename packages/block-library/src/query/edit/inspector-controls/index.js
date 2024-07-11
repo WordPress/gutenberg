@@ -102,9 +102,9 @@ export default function QueryInspectorControls( props ) {
 	const showInheritControl = isControlAllowed( allowedControls, 'inherit' );
 	const showPostTypeControl =
 		! inherit && isControlAllowed( allowedControls, 'postType' );
-	const postTypeControlLabel = __( 'Post content' );
+	const postTypeControlLabel = __( 'Content type' );
 	const postTypeControlHelp = __(
-		'WordPress contains different types of content and they are divided into collections called “Post types”. By default there are a few different ones such as blog posts and pages, but plugins could add more.'
+		'WordPress contains different types of content you can filter by. Posts and pages are the default types, but plugins could add more.'
 	);
 	const showColumnsControl = false;
 	const showOrderControl =
