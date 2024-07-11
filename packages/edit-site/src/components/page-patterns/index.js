@@ -62,6 +62,14 @@ const defaultLayouts = {
 	[ LAYOUT_TABLE ]: {
 		layout: {
 			primaryField: 'title',
+			styles: {
+				preview: {
+					width: '1%',
+				},
+				author: {
+					width: '1%',
+				},
+			},
 		},
 	},
 	[ LAYOUT_GRID ]: {
@@ -282,7 +290,6 @@ export default function DataviewsPatterns() {
 					<Preview item={ item } viewType={ view.type } />
 				),
 				enableSorting: false,
-				width: '1%',
 			},
 			{
 				header: __( 'Title' ),
@@ -335,7 +342,6 @@ export default function DataviewsPatterns() {
 				filterBy: {
 					isPrimary: true,
 				},
-				width: '1%',
 			} );
 		}
 

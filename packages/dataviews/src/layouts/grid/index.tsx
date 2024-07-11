@@ -19,11 +19,11 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import ItemActions from './item-actions';
-import SingleSelectionCheckbox from './single-selection-checkbox';
-import { useHasAPossibleBulkAction } from './bulk-actions';
-import type { Action, NormalizedField, ViewGridProps } from './types';
-import type { SetSelection } from './private-types';
+import ItemActions from '../../item-actions';
+import SingleSelectionCheckbox from '../../single-selection-checkbox';
+import { useHasAPossibleBulkAction } from '../../bulk-actions';
+import type { Action, NormalizedField, ViewGridProps } from '../../types';
+import type { SetSelection } from '../../private-types';
 
 interface GridItemProps< Item > {
 	selection: string[];

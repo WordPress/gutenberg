@@ -6,12 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import {
-	Icon,
-	__experimentalText as Text,
-	__experimentalHStack as HStack,
-	VisuallyHidden,
-} from '@wordpress/components';
+import { Icon, __experimentalHStack as HStack } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
@@ -56,11 +51,34 @@ const EMPTY_ARRAY = [];
 
 const defaultLayouts = {
 	[ LAYOUT_TABLE ]: {
+		fields: [ 'template', 'author' ],
 		layout: {
 			primaryField: 'title',
+			combinedFields: [
+				{
+					id: 'template',
+					header: __( 'Template' ),
+					children: [ 'title', 'description' ],
+					direction: 'vertical',
+				},
+			],
+			styles: {
+				template: {
+					maxWidth: 400,
+					minWidth: 320,
+				},
+				preview: {
+					minWidth: 120,
+					maxWidth: 120,
+				},
+				author: {
+					width: '1%',
+				},
+			},
 		},
 	},
 	[ LAYOUT_GRID ]: {
+		fields: [ 'title', 'description', 'author' ],
 		layout: {
 			mediaField: 'preview',
 			primaryField: 'title',
@@ -68,6 +86,7 @@ const defaultLayouts = {
 		},
 	},
 	[ LAYOUT_LIST ]: {
+		fields: [ 'title', 'description', 'author' ],
 		layout: {
 			primaryField: 'title',
 			mediaField: 'preview',
@@ -84,7 +103,7 @@ const DEFAULT_VIEW = {
 		field: 'title',
 		direction: 'asc',
 	},
-	fields: [ 'title', 'description', 'author' ],
+	fields: defaultLayouts[ LAYOUT_GRID ].fields,
 	layout: defaultLayouts[ LAYOUT_GRID ].layout,
 	filters: [],
 };
@@ -198,6 +217,7 @@ export default function PageTemplates() {
 			...DEFAULT_VIEW,
 			type: usedType,
 			layout: defaultLayouts[ usedType ].layout,
+			fields: defaultLayouts[ usedType ].fields,
 			filters:
 				activeView !== 'all'
 					? [
@@ -269,8 +289,6 @@ export default function PageTemplates() {
 				render: ( { item } ) => {
 					return <Preview item={ item } viewType={ view.type } />;
 				},
-				minWidth: 120,
-				maxWidth: 120,
 				enableSorting: false,
 			},
 			{
@@ -280,7 +298,6 @@ export default function PageTemplates() {
 				render: ( { item } ) => (
 					<Title item={ item } viewType={ view.type } />
 				),
-				maxWidth: 400,
 				enableHiding: false,
 				enableGlobalSearch: true,
 			},
@@ -288,25 +305,14 @@ export default function PageTemplates() {
 				header: __( 'Description' ),
 				id: 'description',
 				render: ( { item } ) => {
-					return item.description ? (
-						<span className="page-templates-description">
-							{ decodeEntities( item.description ) }
-						</span>
-					) : (
-						view.type === LAYOUT_TABLE && (
-							<>
-								<Text variant="muted" aria-hidden="true">
-									&#8212;
-								</Text>
-								<VisuallyHidden>
-									{ __( 'No description.' ) }
-								</VisuallyHidden>
-							</>
+					return (
+						item.description && (
+							<span className="page-templates-description">
+								{ decodeEntities( item.description ) }
+							</span>
 						)
 					);
 				},
-				maxWidth: 400,
-				minWidth: 320,
 				enableSorting: false,
 				enableGlobalSearch: true,
 			},
@@ -318,7 +324,6 @@ export default function PageTemplates() {
 					return <AuthorField viewType={ view.type } item={ item } />;
 				},
 				elements: authors,
-				width: '1%',
 			},
 		],
 		[ authors, view.type ]

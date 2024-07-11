@@ -26,14 +26,12 @@ function GridTools( { clientId, layout } ) {
 		};
 	} );
 
-	if ( ! isSelected && ! isDragging ) {
-		return null;
-	}
-
 	return (
 		<>
-			<GridVisualizer clientId={ clientId } parentLayout={ layout } />
 			<GridLayoutSync clientId={ clientId } />
+			{ ( isSelected || isDragging ) && (
+				<GridVisualizer clientId={ clientId } parentLayout={ layout } />
+			) }
 		</>
 	);
 }
