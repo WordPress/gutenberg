@@ -369,7 +369,6 @@ export function ImageEdit( {
 
 	return (
 		<>
-			{ contentResizeListener }
 			<figure { ...blockProps }>
 				<Image
 					temporaryURL={ temporaryURL }
@@ -400,6 +399,11 @@ export function ImageEdit( {
 					disableMediaButtons={ temporaryURL || url }
 				/>
 			</figure>
+			{
+				// The listener cannot be placed as the first element as it will break the in-between inserter.
+				// See https://github.com/WordPress/gutenberg/blob/71134165868298fc15e22896d0c28b41b3755ff7/packages/block-editor/src/components/block-list/use-in-between-inserter.js#L120
+				contentResizeListener
+			}
 		</>
 	);
 }
