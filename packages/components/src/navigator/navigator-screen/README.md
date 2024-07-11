@@ -18,4 +18,16 @@ The component accepts the following props:
 
 The screen's path, matched against the current path stored in the navigator.
 
+`Navigator` assumes that screens are organized hierarchically according to their `path`, which should follow a URL-like scheme where each path segment is separated by the `/` character.
+
+`Navigator` will treat "back" navigations as going to the parent screen — it is therefore responsibility of the consumer of the component to create the correct screen hierarchy.
+
+For example:
+
+-   `/` is the root of all paths. There should always be a screen with `path="/"`.
+-   `/parent/child` is a child of `/parent`.
+-   `/parent/child/grand-child` is a child of `/parent/child`.
+-   `/parent/:param` is a child of `/parent` as well.
+-   if the current screen has a `path` with value `/parent/child/grand-child`, when going "back" Navigator will try to recursively navigate the path hierarchy until a matching screen (or the root `/`) are found.
+
 -   Required: Yes
