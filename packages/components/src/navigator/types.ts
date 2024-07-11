@@ -80,8 +80,6 @@ export type NavigatorBackButtonHookProps = NavigatorBackButtonProps & {
 	goToParent?: boolean;
 };
 
-export type NavigatorToParentButtonProps = NavigatorBackButtonProps;
-
 export type NavigatorButtonProps = NavigatorBackButtonProps & {
 	/**
 	 * The path of the screen to navigate to. The value of this prop needs to be

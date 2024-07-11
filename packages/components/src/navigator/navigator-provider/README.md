@@ -13,7 +13,7 @@ import {
   __experimentalNavigatorProvider as NavigatorProvider,
   __experimentalNavigatorScreen as NavigatorScreen,
   __experimentalNavigatorButton as NavigatorButton,
-  __experimentalNavigatorToParentButton as NavigatorToParentButton,
+  __experimentalNavigatorBackButton as NavigatorBackButton,
 } from '@wordpress/components';
 
 const MyNavigation = () => (
@@ -27,9 +27,9 @@ const MyNavigation = () => (
 
     <NavigatorScreen path="/child">
       <p>This is the child screen.</p>
-      <NavigatorToParentButton>
+      <NavigatorBackButton>
         Go back
-      </NavigatorToParentButton>
+      </NavigatorBackButton>
     </NavigatorScreen>
   </NavigatorProvider>
 );
