@@ -92,13 +92,11 @@ export const getCanUserCreateMedia = createRegistrySelector(
  * @return {Array} The available reusable blocks.
  */
 export const getReusableBlocks = createRegistrySelector( ( select ) => () => {
-	deprecated(
-		"select( 'core/core' ).getEntityRecords( 'postType', 'wp_block' )",
-		{
-			since: '6.5',
-			version: '6.8',
-		}
-	);
+	deprecated( `select( 'core/edit-site' ).getReusableBlocks()`, {
+		since: '6.5',
+		version: '6.8',
+		alternative: `select( 'core/core' ).getEntityRecords( 'postType', 'wp_block' )`,
+	} );
 	const isWeb = Platform.OS === 'web';
 	return isWeb
 		? select( coreDataStore ).getEntityRecords( 'postType', 'wp_block', {
