@@ -52,7 +52,6 @@ function SizeControl( props ) {
 						__next40pxDefaultSize
 						__nextHasNoMarginBottom
 						label={ __( 'Custom' ) }
-						labelPosition="top"
 						hideLabelFromVision
 						value={ value }
 						onChange={ handleUnitControlChange }
