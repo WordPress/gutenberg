@@ -152,6 +152,7 @@
 	position: relative;
 	@include break-small() {
 		flex-direction: column;
+		justify-content: space-around;
 
 		> .block-editor-grid-item-mover-button.block-editor-grid-item-mover-button {
 			height: $block-toolbar-height * 0.5 - $grid-unit-05;
@@ -166,20 +167,22 @@
 
 		.block-editor-grid-item-mover-button.is-up-button svg,
 		.block-editor-grid-item-mover-button.is-down-button svg {
-			top: 3px;
 			flex-shrink: 0;
+			height: $block-toolbar-height * 0.5 - $grid-unit-05;
 		}
 	}
 }
 
 .show-icon-labels {
 
-	.block-editor-grid-item-mover-button.is-left-button {
+	.block-editor-grid-item-mover-button.block-editor-grid-item-mover-button.is-left-button {
 		border-right: 1px solid $gray-700;
+		padding-right: 12px;
 	}
 
-	.block-editor-grid-item-mover-button.is-right-button {
+	.block-editor-grid-item-mover-button.block-editor-grid-item-mover-button.is-right-button {
 		border-left: 1px solid $gray-700;
+		padding-left: 12px;
 	}
 
 
