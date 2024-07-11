@@ -46,7 +46,7 @@ function SizeControl( props ) {
 
 	return (
 		<BaseControl { ...baseControlProps }>
-			<Flex className="components-size-control__custom-size-control">
+			<Flex>
 				<FlexItem isBlock>
 					<UnitControl
 						__next40pxDefaultSize
@@ -65,7 +65,6 @@ function SizeControl( props ) {
 						<RangeControl
 							__next40pxDefaultSize
 							__nextHasNoMarginBottom
-							className="components-size-control__custom-input"
 							label={ __( 'Custom Size' ) }
 							hideLabelFromVision
 							value={ valueQuantity }
