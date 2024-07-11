@@ -57,10 +57,6 @@ const fetchHandler = (
 	}
 
 	const parseResponse = ( response ) => {
-		if ( typeof response === 'string' ) {
-			return ( response = JSON.parse( response ) );
-		}
-
 		// If the 'parse' parameter is false, return the response as a new Response object
 		// with the JSON string. This is necessary because one of the middlewares in the API
 		// fetch library expects the response to be a JavaScript Response object with JSON
@@ -71,6 +67,10 @@ const fetchHandler = (
 			return new Response( jsonData, {
 				headers: { 'Content-Type': 'application/json' },
 			} );
+		}
+
+		if ( typeof response === 'string' ) {
+			response = JSON.parse( response );
 		}
 		return response;
 	};
