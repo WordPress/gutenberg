@@ -20,16 +20,39 @@ export type NavigateOptions = {
 export type NavigateToParentOptions = Omit< NavigateOptions, 'isBack' >;
 
 export type NavigatorLocation = NavigateOptions & {
+	/**
+	 * Wether the current location is the initial one (ie. first in the stack).
+	 */
 	isInitial?: boolean;
+	/**
+	 * The path associated to the location.
+	 */
 	path?: string;
+	/**
+	 * Whether focus was already restored for this location (in case of
+	 * backwards navigation).
+	 */
 	hasRestoredFocus?: boolean;
 };
 
 // Returned by the `useNavigator` hook.
 export type Navigator = {
+	/**
+	 * The current location.
+	 */
 	location: NavigatorLocation;
+	/**
+	 * Params associated with the current location
+	 */
 	params: MatchParams;
+	/**
+	 * Navigate to a new location.
+	 */
 	goTo: ( path: string, options?: NavigateOptions ) => void;
+	/**
+	 * Go back to the parent location (ie. "/some/path" will navigate back
+	 * to "/some")
+	 */
 	goBack: ( options?: NavigateToParentOptions ) => void;
 	/**
 	 * _Note: This function is deprecated. Please use `goBack` instead._
