@@ -55,9 +55,11 @@ const { state, actions, callbacks } = store(
 				const ctx = getContext();
 
 				// Bails out if the image has not loaded yet.
-				if ( ! ctx.imageRef?.complete ) {
+				if ( ! state.metadata[ ctx.imageId ].imageRef?.complete ) {
 					return;
 				}
+
+				state.overlayEnabled = true;
 
 				// Stores the positions of the scroll to fix it until the overlay is
 				// closed.
@@ -65,15 +67,7 @@ const { state, actions, callbacks } = store(
 				state.scrollLeftReset = document.documentElement.scrollLeft;
 
 				// Sets the information of the expanded image in the state.
-				state.currentImage = {
-					...state.metadata[ ctx.imageId ],
-					imageRef: ctx.imageRef,
-					buttonRef: ctx.buttonRef,
-					currentSrc: ctx.imageRef.currentSrc,
-					imageButtonTop: ctx.imageButtonTop,
-					imageButtonRight: ctx.imageButtonRight,
-				};
-				state.overlayEnabled = true;
+				state.currentImage = state.metadata[ ctx.imageId ];
 
 				// Computes the styles of the overlay for the animation.
 				callbacks.setOverlayStyles();
@@ -332,7 +326,11 @@ const { state, actions, callbacks } = store(
 			setButtonStyles() {
 				const ctx = getContext();
 				const { ref } = getElement();
-				ctx.imageRef = ref;
+				state.metadata[ ctx.imageId ] = {
+					...state.metadata[ ctx.imageId ],
+					imageRef: ref,
+					currentSrc: ref.currentSrc,
+				};
 
 				const {
 					naturalWidth,
@@ -375,6 +373,9 @@ const { state, actions, callbacks } = store(
 				const buttonOffsetTop = figureHeight - offsetHeight;
 				const buttonOffsetRight = figureWidth - offsetWidth;
 
+				let imageButtonTop = buttonOffsetTop + 16;
+				let imageButtonRight = buttonOffsetRight + 16;
+
 				// In the case of an image with object-fit: contain, the size of the
 				// <img> element can be larger than the image itself, so it needs to
 				// calculate where to place the button.
@@ -388,25 +389,28 @@ const { state, actions, callbacks } = store(
 						// If it reaches the width first, it keeps the width and compute the
 						// height.
 						const referenceHeight = offsetWidth / naturalRatio;
-						ctx.imageButtonTop =
+						imageButtonTop =
 							( offsetHeight - referenceHeight ) / 2 +
 							buttonOffsetTop +
 							16;
-						ctx.imageButtonRight = buttonOffsetRight + 16;
+						imageButtonRight = buttonOffsetRight + 16;
 					} else {
 						// If it reaches the height first, it keeps the height and compute
 						// the width.
 						const referenceWidth = offsetHeight * naturalRatio;
-						ctx.imageButtonTop = buttonOffsetTop + 16;
-						ctx.imageButtonRight =
+						imageButtonTop = buttonOffsetTop + 16;
+						imageButtonRight =
 							( offsetWidth - referenceWidth ) / 2 +
 							buttonOffsetRight +
 							16;
 					}
-				} else {
-					ctx.imageButtonTop = buttonOffsetTop + 16;
-					ctx.imageButtonRight = buttonOffsetRight + 16;
 				}
+
+				state.metadata[ ctx.imageId ] = {
+					...state.metadata[ ctx.imageId ],
+					imageButtonTop,
+					imageButtonRight,
+				};
 			},
 			setOverlayFocus() {
 				if ( state.overlayEnabled ) {
@@ -418,7 +422,10 @@ const { state, actions, callbacks } = store(
 			initTriggerButton() {
 				const ctx = getContext();
 				const { ref } = getElement();
-				ctx.buttonRef = ref;
+				state.metadata[ ctx.imageId ] = {
+					...state.metadata[ ctx.imageId ],
+					buttonRef: ref,
+				};
 			},
 		},
 	},
