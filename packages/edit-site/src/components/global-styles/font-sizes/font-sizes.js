@@ -183,6 +183,10 @@ function FontSizes() {
 		setCustomFontSizes( [ ...customFontSizes, newFontSize ] );
 	};
 
+	const hasSameSizeValues = ( arr1, arr2 ) =>
+		arr1.map( ( item ) => item.size ).join( '' ) ===
+		arr2.map( ( item ) => item.size ).join( '' );
+
 	return (
 		<VStack spacing={ 2 }>
 			<ScreenHeader
@@ -203,12 +207,15 @@ function FontSizes() {
 								baseSizes={ baseThemeFontSizes }
 								handleAddFontSize={ handleAddFontSize }
 								handleResetFontSizes={
-									themeFontSizes !== baseThemeFontSizes
-										? () =>
+									hasSameSizeValues(
+										themeFontSizes,
+										baseThemeFontSizes
+									)
+										? null
+										: () =>
 												setThemeFontSizes(
 													baseThemeFontSizes
 												)
-										: null
 								}
 							/>
 						) }
@@ -222,13 +229,15 @@ function FontSizes() {
 									baseSizes={ baseDefaultFontSizes }
 									handleAddFontSize={ handleAddFontSize }
 									handleResetFontSizes={
-										defaultFontSizes !==
-										baseDefaultFontSizes
-											? () =>
+										hasSameSizeValues(
+											defaultFontSizes,
+											baseDefaultFontSizes
+										)
+											? null
+											: () =>
 													setDefaultFontSizes(
 														baseDefaultFontSizes
 													)
-											: null
 									}
 								/>
 							) }
