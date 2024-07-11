@@ -36,7 +36,7 @@ function SizeControl( props ) {
 
 	// Receives the new value from the UnitControl component as a string containing the value and unit.
 	const handleUnitControlChange = ( newValue ) => {
-		onChange?.( newValue );
+		onChange( newValue );
 	};
 
 	// Receives the new value from the RangeControl component as a number.
