@@ -43,7 +43,7 @@ import Page from '../page';
 import { default as Link, useLink } from '../routes/link';
 import {
 	useDefaultViews,
-	DEFAULT_CONFIG_PER_VIEW_TYPE,
+	defaultLayouts,
 } from '../sidebar-dataviews/default-views';
 import {
 	LAYOUT_GRID,
@@ -62,24 +62,6 @@ import { usePrevious } from '@wordpress/compose';
 const { usePostActions } = unlock( editorPrivateApis );
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 const EMPTY_ARRAY = [];
-const defaultLayouts = {
-	[ LAYOUT_TABLE ]: {
-		layout: {
-			'featured-image': {
-				width: '1%',
-			},
-			title: {
-				maxWidth: 300,
-			},
-		},
-	},
-	[ LAYOUT_GRID ]: {
-		layout: {},
-	},
-	[ LAYOUT_LIST ]: {
-		layout: {},
-	},
-};
 
 const getFormattedDate = ( dateToDisplay ) =>
 	dateI18n(
@@ -103,9 +85,7 @@ function useView( postType ) {
 			return {
 				...defaultView,
 				type: layout,
-				layout: {
-					...( DEFAULT_CONFIG_PER_VIEW_TYPE[ layout ] || {} ),
-				},
+				layout: defaultLayouts[ layout ]?.layout,
 			};
 		}
 		return defaultView;
@@ -144,9 +124,7 @@ function useView( postType ) {
 
 		return {
 			...storedView,
-			layout: {
-				...( DEFAULT_CONFIG_PER_VIEW_TYPE[ storedView?.type ] || {} ),
-			},
+			layout: defaultLayouts[ storedView?.type ]?.layout,
 		};
 	}, [ editedViewRecord?.content ] );
 
@@ -587,22 +565,6 @@ export default function PostList( { postType } ) {
 		[ postTypeActions, editAction ]
 	);
 
-	const onChangeView = useCallback(
-		( newView ) => {
-			if ( newView.type !== view.type ) {
-				newView = {
-					...newView,
-					layout: {
-						...DEFAULT_CONFIG_PER_VIEW_TYPE[ newView.type ],
-					},
-				};
-			}
-
-			setView( newView );
-		},
-		[ view.type, setView ]
-	);
-
 	const [ showAddPostModal, setShowAddPostModal ] = useState( false );
 
 	const openModal = () => setShowAddPostModal( true );
@@ -648,7 +610,7 @@ export default function PostList( { postType } ) {
 				data={ records || EMPTY_ARRAY }
 				isLoading={ isLoadingMainEntities || isLoadingAuthors }
 				view={ view }
-				onChangeView={ onChangeView }
+				onChangeView={ setView }
 				selection={ selection }
 				setSelection={ setSelection }
 				onSelectionChange={ onSelectionChange }
