@@ -30,7 +30,7 @@ export type Navigator = {
 	location: NavigatorLocation;
 	params: MatchParams;
 	goTo: ( path: string, options?: NavigateOptions ) => void;
-	goBack: () => void;
+	goBack: ( options?: NavigateToParentOptions ) => void;
 	goToParent: ( options?: NavigateToParentOptions ) => void;
 };
 
