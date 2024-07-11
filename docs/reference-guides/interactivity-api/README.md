@@ -44,7 +44,7 @@ You can start creating interactions once you set up a block development environm
 
 #### Add `interactivity` to your project
 
-Install the Interactivity API to your project with the following command
+Install the Interactivity API to your project with the following command:
 
 ```bash
 npm install @wordpress/interactivity --save
