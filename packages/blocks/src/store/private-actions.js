@@ -49,8 +49,8 @@ export function addUnprocessedBlockType( name, blockType ) {
 export function addBlockBindingsSource( source ) {
 	return {
 		type: 'ADD_BLOCK_BINDINGS_SOURCE',
-		sourceName: source.name,
-		sourceLabel: source.label,
+		name: source.name,
+		label: source.label,
 		getValue: source.getValue,
 		setValue: source.setValue,
 		setValues: source.setValues,

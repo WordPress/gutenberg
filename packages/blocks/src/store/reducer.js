@@ -375,8 +375,8 @@ export function blockBindingsSources( state = {}, action ) {
 	if ( action.type === 'ADD_BLOCK_BINDINGS_SOURCE' ) {
 		return {
 			...state,
-			[ action.sourceName ]: {
-				label: action.sourceLabel,
+			[ action.name ]: {
+				label: action.label,
 				getValue: action.getValue,
 				setValue: action.setValue,
 				setValues: action.setValues,

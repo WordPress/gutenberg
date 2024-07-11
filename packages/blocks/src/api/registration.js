@@ -871,13 +871,5 @@ export const registerBlockBindingsSource = ( source ) => {
 		return;
 	}
 
-	unlock( dispatch( blocksStore ) ).addBlockBindingsSource( {
-		name,
-		label,
-		getValue,
-		setValue,
-		setValues,
-		getPlaceholder,
-		canUserEditValue,
-	} );
+	unlock( dispatch( blocksStore ) ).addBlockBindingsSource( source );
 };
