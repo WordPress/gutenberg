@@ -119,7 +119,7 @@
 }
 
 .edit-site-global-styles__shadow-preview-panel {
-	height: 150px;
+	height: $grid-unit-60 * 3;
 	border: $gray-200 $border-width solid;
 	border-radius: $radius-block-ui;
 	overflow: auto;
