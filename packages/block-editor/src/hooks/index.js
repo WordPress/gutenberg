@@ -33,6 +33,7 @@ import blockHooks from './block-hooks';
 import blockBindingsPanel from './block-bindings';
 import './block-renaming';
 import './use-bindings-attributes';
+import './grid-visualizer';
 
 createBlockEditFilter(
 	[
@@ -87,5 +88,6 @@ export { getSpacingClassesAndStyles } from './use-spacing-props';
 export { getTypographyClassesAndStyles } from './use-typography-props';
 export { getGapCSSValue } from './gap';
 export { useCachedTruthy } from './use-cached-truthy';
+export { setBackgroundStyleDefaults } from './background';
 export { useZoomOut } from './use-zoom-out';
 export { __unstableBlockStyleVariationOverridesWithConfig } from './block-style-variation';

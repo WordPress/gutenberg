@@ -175,7 +175,6 @@ module.exports = function buildDockerComposeConfig( config ) {
 	}}:3306`;
 
 	return {
-		version: '3.7',
 		services: {
 			mysql: {
 				image: 'mariadb:lts',

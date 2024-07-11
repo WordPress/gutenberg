@@ -15,6 +15,7 @@ import { useRegistry } from '@wordpress/data';
  */
 import { unlock } from './lock-unlock';
 import type { Action, ActionModal } from './types';
+import type { SetSelection } from './private-types';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -46,7 +47,7 @@ interface BulkActionsProps< Item > {
 	data: Item[];
 	actions: Action< Item >[];
 	selection: string[];
-	onSelectionChange: ( selection: Item[] ) => void;
+	onSelectionChange: SetSelection;
 	getItemId: ( item: Item ) => string;
 }
 
@@ -248,7 +249,11 @@ export default function BulkActions< Item >( {
 						disabled={ areAllSelected }
 						hideOnClick={ false }
 						onClick={ () => {
-							onSelectionChange( selectableItems );
+							onSelectionChange(
+								selectableItems.map( ( item ) =>
+									getItemId( item )
+								)
+							);
 						} }
 						suffix={ numberSelectableItems }
 					>

@@ -56,6 +56,18 @@
 	position: relative;
 	width: 100%;
 	z-index: z-index(".edit-site-layout__canvas-container");
+
+	/*
+	 * The SiteHubMobile component is displayed
+	 * for pages that do not have a sidebar,
+	 * yet it needs the Sidebar component for the React context.
+	 *
+	 * This removes the padding in this scenario.
+	 * See https://github.com/WordPress/gutenberg/pull/63118
+	 */
+	.edit-site-sidebar__screen-wrapper {
+		padding: 0;
+	}
 }
 
 .edit-site-layout__canvas-container {

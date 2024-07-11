@@ -36,7 +36,7 @@ export function ConvertToLinksModal( { onClick, onClose, disabled } ) {
 				</Button>
 				<Button
 					variant="primary"
-					__experimentalIsFocusable
+					accessibleWhenDisabled
 					disabled={ disabled }
 					onClick={ onClick }
 				>

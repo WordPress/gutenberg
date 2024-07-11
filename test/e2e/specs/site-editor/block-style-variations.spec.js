@@ -149,12 +149,14 @@ test.describe( 'Block Style Variations', () => {
 				},
 			},
 		} );
-		// The save button has been re-enabled.
+
+		// Wait for the save button to be re-enabled.
 		await expect(
 			page
 				.getByRole( 'region', { name: 'Editor top bar' } )
 				.getByRole( 'button', { name: 'Save' } )
-		).toBeEnabled();
+		).toBeVisible();
+
 		// Second revision (current).
 		await siteEditorBlockStyleVariations.saveRevision( stylesPostId, {
 			blocks: {
@@ -302,8 +304,8 @@ async function draftNewPage( page ) {
 	await page.getByRole( 'button', { name: 'Pages' } ).click();
 	await page.getByRole( 'button', { name: 'Add new page' } ).click();
 	await page
-		.locator( 'role=dialog[name="Draft a new page"i]' )
-		.locator( 'role=textbox[name="Page title"i]' )
+		.locator( 'role=dialog[name="Draft new: page"i]' )
+		.locator( 'role=textbox[name="title"i]' )
 		.fill( TEST_PAGE_TITLE );
 	await page.keyboard.press( 'Enter' );
 	await expect(

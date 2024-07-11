@@ -204,14 +204,14 @@ describe.each( [
 		await press.Enter();
 		expect(
 			screen.getByRole( 'listbox', {
-				name: 'label!',
+				name: legacyProps.label,
 			} )
 		).toBeVisible();
 
 		await press.Escape();
 		expect(
 			screen.queryByRole( 'listbox', {
-				name: 'label!',
+				name: legacyProps.label,
 			} )
 		).not.toBeInTheDocument();
 
@@ -297,7 +297,7 @@ describe.each( [
 					{
 						key: 'one',
 						name: 'One',
-						__experimentalHint: 'Hint',
+						hint: 'Hint',
 					},
 				] }
 			/>
@@ -309,7 +309,7 @@ describe.each( [
 		);
 	} );
 
-	it( 'shows selected hint when __experimentalShowSelectedHint is set', async () => {
+	it( 'shows selected hint when showSelectedHint is set', async () => {
 		render(
 			<Component
 				{ ...legacyProps }
@@ -318,10 +318,10 @@ describe.each( [
 					{
 						key: 'one',
 						name: 'One',
-						__experimentalHint: 'Hint',
+						hint: 'Hint',
 					},
 				] }
-				__experimentalShowSelectedHint
+				showSelectedHint
 			/>
 		);
 
@@ -334,7 +334,7 @@ describe.each( [
 		);
 	} );
 
-	it( 'shows selected hint in list of options when added, regardless of __experimentalShowSelectedHint prop', async () => {
+	it( 'shows selected hint in list of options when added, regardless of showSelectedHint prop', async () => {
 		render(
 			<Component
 				{ ...legacyProps }
@@ -343,7 +343,7 @@ describe.each( [
 					{
 						key: 'one',
 						name: 'One',
-						__experimentalHint: 'Hint',
+						hint: 'Hint',
 					},
 				] }
 			/>
@@ -453,9 +453,18 @@ describe.each( [
 		);
 	} );
 
+	it( 'Should label the component correctly even when the label is not visible', () => {
+		render( <Component { ...legacyProps } hideLabelFromVision /> );
+
+		expect(
+			screen.getByRole( 'combobox', {
+				name: legacyProps.label,
+			} )
+		).toBeVisible();
+	} );
+
 	describe( 'Keyboard behavior and accessibility', () => {
-		// skip reason: legacy v2 doesn't currently implement this behavior
-		it.skip( 'Captures the keypress event and does not let it propagate', async () => {
+		it( 'Captures the keypress event and does not let it propagate', async () => {
 			const onKeyDown = jest.fn();
 
 			render(
@@ -473,7 +482,7 @@ describe.each( [
 			await click( currentSelectedItem );
 
 			const customSelect = screen.getByRole( 'listbox', {
-				name: 'label!',
+				name: legacyProps.label,
 			} );
 			expect( customSelect ).toHaveFocus();
 			await press.Enter();
@@ -495,7 +504,7 @@ describe.each( [
 			await press.Enter();
 			expect(
 				screen.getByRole( 'listbox', {
-					name: 'label!',
+					name: legacyProps.label,
 				} )
 			).toHaveFocus();
 
@@ -519,7 +528,7 @@ describe.each( [
 			await press.Enter();
 			expect(
 				screen.getByRole( 'listbox', {
-					name: 'label!',
+					name: legacyProps.label,
 				} )
 			).toHaveFocus();
 
@@ -547,7 +556,7 @@ describe.each( [
 
 			expect(
 				screen.queryByRole( 'listbox', {
-					name: 'label!',
+					name: legacyProps.label,
 					hidden: true,
 				} )
 			).not.toBeInTheDocument();
@@ -556,6 +565,33 @@ describe.each( [
 			await press.Enter();
 
 			expect( currentSelectedItem ).toHaveTextContent( 'amber' );
+		} );
+
+		it( 'Can change selection with a focused input and closed dropdown while pressing arrow keys', async () => {
+			render( <Component { ...legacyProps } /> );
+
+			const currentSelectedItem = screen.getByRole( 'combobox', {
+				expanded: false,
+			} );
+
+			await sleep();
+			await press.Tab();
+			expect( currentSelectedItem ).toHaveFocus();
+			expect( currentSelectedItem ).toHaveTextContent(
+				legacyProps.options[ 0 ].name
+			);
+
+			await press.ArrowDown();
+			await press.ArrowDown();
+			expect(
+				screen.queryByRole( 'listbox', {
+					name: legacyProps.label,
+				} )
+			).not.toBeInTheDocument();
+
+			expect( currentSelectedItem ).toHaveTextContent(
+				legacyProps.options[ 2 ].name
+			);
 		} );
 
 		it( 'Should have correct aria-selected value for selections', async () => {

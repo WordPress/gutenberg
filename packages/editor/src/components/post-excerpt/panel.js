@@ -173,7 +173,7 @@ function PrivateExcerpt() {
 		return false;
 	}
 	const excerptText = !! excerpt && (
-		<Text align="left" numberOfLines={ 4 } truncate>
+		<Text align="left" numberOfLines={ 4 } truncate={ allowEditing }>
 			{ decodeEntities( excerpt ) }
 		</Text>
 	);

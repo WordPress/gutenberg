@@ -106,7 +106,7 @@ test.describe( 'Embedding content', () => {
 		await expect(
 			currenEmbedBlock.locator( 'iframe' ),
 			'Valid embed. Should render valid element.'
-		).toHaveAttribute( 'title', 'Embedded content from twitter' );
+		).toHaveAttribute( 'title', 'Embedded content from twitter.com' );
 
 		await embedUtils.insertEmbed(
 			'https://twitter.com/wooyaygutenberg123454312'
@@ -150,7 +150,7 @@ test.describe( 'Embedding content', () => {
 		await expect(
 			currenEmbedBlock.locator( 'iframe' ),
 			'Photo content. Should render valid iframe element.'
-		).toHaveAttribute( 'title', 'Embedded content from cloudup' );
+		).toHaveAttribute( 'title', 'Embedded content from cloudup.com' );
 	} );
 
 	test( 'should allow the user to convert unembeddable URLs to a paragraph with a link in it', async ( {

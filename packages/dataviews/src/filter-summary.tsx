@@ -157,7 +157,7 @@ function OperatorSelector( {
 		value: operator,
 		label: OPERATORS[ operator ]?.label,
 	} ) );
-	const currentFilter = view.filters.find(
+	const currentFilter = view.filters?.find(
 		( _filter ) => _filter.field === filter.field
 	);
 	const value = currentFilter?.operator || filter.operators[ 0 ];
@@ -180,18 +180,22 @@ function OperatorSelector( {
 						const operator = newValue as Operator;
 						const newFilters = currentFilter
 							? [
-									...view.filters.map( ( _filter ) => {
-										if ( _filter.field === filter.field ) {
-											return {
-												..._filter,
-												operator,
-											};
+									...( view.filters ?? [] ).map(
+										( _filter ) => {
+											if (
+												_filter.field === filter.field
+											) {
+												return {
+													..._filter,
+													operator,
+												};
+											}
+											return _filter;
 										}
-										return _filter;
-									} ),
+									),
 							  ]
 							: [
-									...view.filters,
+									...( view.filters ?? [] ),
 									{
 										field: filter.field,
 										operator,
@@ -220,7 +224,9 @@ export default function FilterSummary( {
 }: FilterSummaryProps ) {
 	const toggleRef = useRef< HTMLDivElement >( null );
 	const { filter, view, onChangeView } = commonProps;
-	const filterInView = view.filters.find( ( f ) => f.field === filter.field );
+	const filterInView = view.filters?.find(
+		( f ) => f.field === filter.field
+	);
 	const activeElements = filter.elements.filter( ( element ) => {
 		if ( filter.singleSelection ) {
 			return element.value === filterInView?.value;
@@ -290,7 +296,7 @@ export default function FilterSummary( {
 									onChangeView( {
 										...view,
 										page: 1,
-										filters: view.filters.filter(
+										filters: view.filters?.filter(
 											( _filter ) =>
 												_filter.field !== filter.field
 										),

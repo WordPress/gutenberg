@@ -47,7 +47,6 @@ export default function BlockLockToolbar( { clientId } ) {
 		<>
 			<ToolbarGroup className="block-editor-block-lock-toolbar">
 				<ToolbarButton
-					accessibleWhenDisabled
 					disabled={ ! canLock }
 					icon={ isLocked ? lock : unlock }
 					label={ label }
