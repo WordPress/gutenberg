@@ -597,3 +597,21 @@
 		}
 	}
 }
+
+@mixin selected-block-outline($widthRatio: 1) {
+	outline-color: var(--wp-admin-theme-color);
+	outline-style: solid;
+	outline-width: calc(#{$widthRatio} * (var(--wp-admin-border-width-focus) / var(--wp-block-editor-iframe-zoom-out-scale, 1)));
+	outline-offset: calc(#{$widthRatio} * ((-1 * var(--wp-admin-border-width-focus) ) / var(--wp-block-editor-iframe-zoom-out-scale, 1)));
+}
+
+@mixin selected-block-focus($widthRatio: 1) {
+	content: "";
+	position: absolute;
+	pointer-events: none;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	@include selected-block-outline($widthRatio);
+}

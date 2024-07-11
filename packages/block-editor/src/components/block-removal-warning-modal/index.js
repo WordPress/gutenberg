@@ -53,10 +53,18 @@ export function BlockRemovalWarningModal( { rules } ) {
 		>
 			<p>{ message }</p>
 			<HStack justify="right">
-				<Button variant="tertiary" onClick={ clearBlockRemovalPrompt }>
+				<Button
+					variant="tertiary"
+					onClick={ clearBlockRemovalPrompt }
+					__next40pxDefaultSize
+				>
 					{ __( 'Cancel' ) }
 				</Button>
-				<Button variant="primary" onClick={ onConfirmRemoval }>
+				<Button
+					variant="primary"
+					onClick={ onConfirmRemoval }
+					__next40pxDefaultSize
+				>
 					{ __( 'Delete' ) }
 				</Button>
 			</HStack>

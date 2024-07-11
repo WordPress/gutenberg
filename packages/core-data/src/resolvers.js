@@ -352,22 +352,47 @@ export const getEmbedPreview =
  * Checks whether the current user can perform the given action on the given
  * REST resource.
  *
- * @param {string}  requestedAction Action to check. One of: 'create', 'read', 'update',
- *                                  'delete'.
- * @param {string}  resource        REST resource to check, e.g. 'media' or 'posts'.
- * @param {?string} id              ID of the rest resource to check.
+ * @param {string}        requestedAction Action to check. One of: 'create', 'read', 'update',
+ *                                        'delete'.
+ * @param {string|Object} resource        Entity resource to check. Accepts entity object `{ kind: 'root', name: 'media', id: 1 }`
+ *                                        or REST base as a string - `media`.
+ * @param {?string}       id              ID of the rest resource to check.
  */
 export const canUser =
 	( requestedAction, resource, id ) =>
 	async ( { dispatch, registry } ) => {
-		const { hasStartedResolution } = registry.select( STORE_NAME );
-
-		const resourcePath = id ? `${ resource }/${ id }` : resource;
 		const retrievedActions = [ 'create', 'read', 'update', 'delete' ];
 
 		if ( ! retrievedActions.includes( requestedAction ) ) {
 			throw new Error( `'${ requestedAction }' is not a valid action.` );
 		}
+
+		let resourcePath = null;
+		if ( typeof resource === 'object' ) {
+			if ( ! resource.kind || ! resource.name ) {
+				throw new Error( 'The entity resource object is not valid.' );
+			}
+
+			const configs = await dispatch(
+				getOrLoadEntitiesConfig( resource.kind, resource.name )
+			);
+			const entityConfig = configs.find(
+				( config ) =>
+					config.name === resource.name &&
+					config.kind === resource.kind
+			);
+			if ( ! entityConfig ) {
+				return;
+			}
+
+			resourcePath =
+				entityConfig.baseURL + ( resource.id ? '/' + resource.id : '' );
+		} else {
+			// @todo: Maybe warn when detecting a legacy usage.
+			resourcePath = `/wp/v2/${ resource }` + ( id ? '/' + id : '' );
+		}
+
+		const { hasStartedResolution } = registry.select( STORE_NAME );
 
 		// Prevent resolving the same resource twice.
 		for ( const relatedAction of retrievedActions ) {
@@ -387,7 +412,7 @@ export const canUser =
 		let response;
 		try {
 			response = await apiFetch( {
-				path: `/wp/v2/${ resourcePath }`,
+				path: resourcePath,
 				method: 'OPTIONS',
 				parse: false,
 			} );
@@ -416,10 +441,15 @@ export const canUser =
 
 		registry.batch( () => {
 			for ( const action of retrievedActions ) {
-				dispatch.receiveUserPermission(
-					`${ action }/${ resourcePath }`,
-					permissions[ action ]
-				);
+				const key = (
+					typeof resource === 'object'
+						? [ action, resource.kind, resource.name, resource.id ]
+						: [ action, resource, id ]
+				)
+					.filter( Boolean )
+					.join( '/' );
+
+				dispatch.receiveUserPermission( key, permissions[ action ] );
 			}
 		} );
 	};
@@ -435,16 +465,7 @@ export const canUser =
 export const canUserEditEntityRecord =
 	( kind, name, recordId ) =>
 	async ( { dispatch } ) => {
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
-		const entityConfig = configs.find(
-			( config ) => config.name === name && config.kind === kind
-		);
-		if ( ! entityConfig ) {
-			return;
-		}
-
-		const resource = entityConfig.__unstable_rest_base;
-		await dispatch( canUser( 'update', resource, recordId ) );
+		await dispatch( canUser( 'update', { kind, name, id: recordId } ) );
 	};
 
 /**

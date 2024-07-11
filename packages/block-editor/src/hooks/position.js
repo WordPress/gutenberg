@@ -8,10 +8,7 @@ import clsx from 'clsx';
  */
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
-import {
-	BaseControl,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
+import { BaseControl, CustomSelectControl } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useMemo, Platform } from '@wordpress/element';
@@ -23,12 +20,7 @@ import { useSettings } from '../components/use-settings';
 import InspectorControls from '../components/inspector-controls';
 import useBlockDisplayInformation from '../components/use-block-display-information';
 import { cleanEmptyObject, useStyleOverride } from './utils';
-import { unlock } from '../lock-unlock';
 import { store as blockEditorStore } from '../store';
-
-const { CustomSelectControlV2Legacy: CustomSelectControl } = unlock(
-	componentsPrivateApis
-);
 
 const POSITION_SUPPORT_KEY = 'position';
 
@@ -42,7 +34,7 @@ const STICKY_OPTION = {
 	key: 'sticky',
 	value: 'sticky',
 	name: _x( 'Sticky', 'Name for the value of the CSS position property' ),
-	__experimentalHint: __(
+	hint: __(
 		'The block will stick to the top of the window instead of scrolling.'
 	),
 };
@@ -51,9 +43,7 @@ const FIXED_OPTION = {
 	key: 'fixed',
 	value: 'fixed',
 	name: _x( 'Fixed', 'Name for the value of the CSS position property' ),
-	__experimentalHint: __(
-		'The block will not move when the page is scrolled.'
-	),
+	hint: __( 'The block will not move when the page is scrolled.' ),
 };
 
 const POSITION_SIDES = [ 'top', 'right', 'bottom', 'left' ];

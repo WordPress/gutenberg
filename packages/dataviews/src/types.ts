@@ -76,21 +76,6 @@ export type Field< Item > = {
 	render?: ( args: { item: Item } ) => ReactNode;
 
 	/**
-	 * The width of the field column.
-	 */
-	width?: string | number;
-
-	/**
-	 * The minimum width of the field column.
-	 */
-	maxWidth?: string | number;
-
-	/**
-	 * The maximum width of the field column.
-	 */
-	minWidth?: string | number;
-
-	/**
 	 * Whether the field is sortable.
 	 */
 	enableSorting?: boolean;
@@ -249,9 +234,42 @@ interface ViewBase {
 	perPage?: number;
 
 	/**
-	 * The hidden fields.
+	 * The fields to render
 	 */
 	fields?: string[];
+}
+
+export interface CombinedField {
+	id: string;
+
+	header: string;
+
+	/**
+	 * The fields to use as columns.
+	 */
+	children: string[];
+
+	/**
+	 * The direction of the stack.
+	 */
+	direction: 'horizontal' | 'vertical';
+}
+
+export interface ColumnStyle {
+	/**
+	 * The width of the field column.
+	 */
+	width?: string | number;
+
+	/**
+	 * The minimum width of the field column.
+	 */
+	maxWidth?: string | number;
+
+	/**
+	 * The maximum width of the field column.
+	 */
+	minWidth?: string | number;
 }
 
 export interface ViewTable extends ViewBase {
@@ -264,9 +282,14 @@ export interface ViewTable extends ViewBase {
 		primaryField?: string;
 
 		/**
-		 * The field to use as the media field.
+		 * The fields to use as columns.
 		 */
-		mediaField?: string;
+		combinedFields?: CombinedField[];
+
+		/**
+		 * The styles for the columns.
+		 */
+		styles?: Record< string, ColumnStyle >;
 	};
 }
 

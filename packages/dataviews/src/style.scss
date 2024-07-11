@@ -91,7 +91,7 @@
 		padding: $grid-unit-15;
 		white-space: nowrap;
 
-		&[data-field-id="actions"] {
+		&.dataviews-view-table__actions-column {
 			text-align: right;
 		}
 
@@ -204,16 +204,10 @@
 			min-height: $grid-unit-40;
 			display: flex;
 			align-items: center;
+		}
 
-			> * {
-				flex-grow: 1;
-			}
-
-			&.dataviews-view-table__primary-field {
-				a {
-					flex-grow: 0;
-				}
-			}
+		.components-v-stack > .dataviews-view-table__cell-content-wrapper:not(:first-child) {
+			min-height: 0;
 		}
 	}
 	.dataviews-view-table-header-button {

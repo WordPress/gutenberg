@@ -18,7 +18,7 @@ _Parameters_
 
 -   _state_ `State`: Data state.
 -   _action_ `string`: Action to check. One of: 'create', 'read', 'update', 'delete'.
--   _resource_ `string`: REST resource to check, e.g. 'media' or 'posts'.
+-   _resource_ `string | EntityResource`: Entity resource to check. Accepts entity object `{ kind: 'root', name: 'media', id: 1 }` or REST base as a string - `media`.
 -   _id_ `EntityRecordKey`: Optional ID of the rest resource to check.
 
 _Returns_
