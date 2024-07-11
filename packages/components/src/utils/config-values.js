@@ -43,6 +43,7 @@ export default Object.assign( {}, CONTROL_PROPS, TOGGLE_GROUP_CONTROL_PROPS, {
 	colorScrollbarTrack: 'rgba(0, 0, 0, 0.04)',
 	elevationIntensity: 1,
 	radiusBlockUi: '2px',
+	radiusAtom: '2px',
 	radiusPrimitive: '4px',
 	radiusSmallContainer: '8px',
 	radiusLargeContainer: '12px',

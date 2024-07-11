@@ -117,7 +117,7 @@ const isIconStyles = ( {
 
 export const backdropView = css`
 	background: ${ COLORS.gray[ 900 ] };
-	border-radius: ${ CONFIG.radiusPrimitive };
+	border-radius: ${ CONFIG.radiusAtom };
 	position: absolute;
 	inset: 0;
 	z-index: 1;
