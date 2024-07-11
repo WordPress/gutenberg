@@ -19,6 +19,7 @@ import {
 	useInnerBlocksProps,
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
+	JustifyContentControl,
 	__experimentalBlockVariationPicker,
 	useBlockProps,
 	store as blockEditorStore,
@@ -187,7 +188,12 @@ function ColumnInspectorControls( {
 }
 
 function ColumnsEditContainer( { attributes, setAttributes, clientId } ) {
-	const { isStackedOnMobile, verticalAlignment, templateLock } = attributes;
+	const {
+		isStackedOnMobile,
+		verticalAlignment,
+		templateLock,
+		justification,
+	} = attributes;
 	const registry = useRegistry();
 	const { getBlockOrder } = useSelect( blockEditorStore );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
@@ -195,11 +201,13 @@ function ColumnsEditContainer( { attributes, setAttributes, clientId } ) {
 	const classes = clsx( {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 		[ `is-not-stacked-on-mobile` ]: ! isStackedOnMobile,
+		[ `is-content-justification-${ justification }` ]: justification,
 	} );
 
 	const blockProps = useBlockProps( {
 		className: classes,
 	} );
+
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		defaultBlock: DEFAULT_BLOCK,
 		directInsert: true,
@@ -228,9 +236,37 @@ function ColumnsEditContainer( { attributes, setAttributes, clientId } ) {
 		} );
 	}
 
+	/**
+	 * Update all child columns with a new justification setting based on whatever
+	 * justification is passed in. This allows change to parent to override anything
+	 * set on an individual column basis.
+	 *
+	 * @since 6.6.0
+	 *
+	 * @param {string} newJustification The justification setting.
+	 *
+	 * @return {void}
+	 */
+	function updateJustification( newJustification ) {
+		const innerBlockClientIds = getBlockOrder( clientId );
+
+		// Update own and child Column block vertical alignments.
+		// This is a single action; the batching prevents creating multiple history records.
+		registry.batch( () => {
+			setAttributes( { justification: newJustification } );
+			updateBlockAttributes( innerBlockClientIds, {
+				justification: newJustification,
+			} );
+		} );
+	}
+
 	return (
 		<>
-			<BlockControls>
+			<BlockControls group="block">
+				<JustifyContentControl
+					value={ attributes.justification }
+					onChange={ updateJustification }
+				/>
 				<BlockVerticalAlignmentToolbar
 					onChange={ updateAlignment }
 					value={ verticalAlignment }
