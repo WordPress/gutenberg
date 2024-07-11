@@ -81,7 +81,9 @@ export function useInBetweenInserter() {
 					getTemplateLock( rootClientId ) ||
 					getBlockEditingMode( rootClientId ) === 'disabled' ||
 					getBlockName( rootClientId ) === 'core/block' ||
-					getBlockAttributes( rootClientId ).layout?.isManualPlacement
+					( rootClientId &&
+						getBlockAttributes( rootClientId ).layout
+							?.isManualPlacement )
 				) {
 					return;
 				}
