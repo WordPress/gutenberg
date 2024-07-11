@@ -50,35 +50,16 @@ export function GridItemMovers( {
 
 	return (
 		<BlockControls group="parent">
-			<GridItemMover
-				className="is-left-button"
-				icon={ chevronLeft }
-				label={ __( 'Move block left' ) }
-				description={ __( 'Move block left' ) }
-				isDisabled={ columnStart <= 1 }
-				onClick={ () => {
-					onChange( {
-						columnStart: columnStart - 1,
-					} );
-					__unstableMarkNextChangeAsNotPersistent();
-					moveBlocksToPosition(
-						[ blockClientId ],
-						gridClientId,
-						gridClientId,
-						getNumberOfBlocksBeforeCell( columnStart - 1, rowStart )
-					);
-				} }
-			/>
-			<div className="block-editor-block-mover__move-button-container">
+			<div className="block-editor-grid-item-mover__move-button-container">
 				<GridItemMover
-					className="is-up-button"
-					icon={ chevronUp }
-					label={ __( 'Move block up' ) }
-					description={ __( 'Move block up' ) }
-					isDisabled={ rowStart <= 1 }
+					className="is-left-button"
+					icon={ chevronLeft }
+					label={ __( 'Move left' ) }
+					description={ __( 'Move left' ) }
+					isDisabled={ columnStart <= 1 }
 					onClick={ () => {
 						onChange( {
-							rowStart: rowStart - 1,
+							columnStart: columnStart - 1,
 						} );
 						__unstableMarkNextChangeAsNotPersistent();
 						moveBlocksToPosition(
@@ -86,21 +67,67 @@ export function GridItemMovers( {
 							gridClientId,
 							gridClientId,
 							getNumberOfBlocksBeforeCell(
-								columnStart,
-								rowStart - 1
+								columnStart - 1,
+								rowStart
 							)
 						);
 					} }
 				/>
+				<div className="block-editor-grid-item-mover__move-vertical-button-container">
+					<GridItemMover
+						className="is-up-button"
+						icon={ chevronUp }
+						label={ __( 'Move up' ) }
+						description={ __( 'Move up' ) }
+						isDisabled={ rowStart <= 1 }
+						onClick={ () => {
+							onChange( {
+								rowStart: rowStart - 1,
+							} );
+							__unstableMarkNextChangeAsNotPersistent();
+							moveBlocksToPosition(
+								[ blockClientId ],
+								gridClientId,
+								gridClientId,
+								getNumberOfBlocksBeforeCell(
+									columnStart,
+									rowStart - 1
+								)
+							);
+						} }
+					/>
+					<GridItemMover
+						className="is-down-button"
+						icon={ chevronDown }
+						label={ __( 'Move down' ) }
+						description={ __( 'Move down' ) }
+						isDisabled={ rowCount && rowEnd >= rowCount }
+						onClick={ () => {
+							onChange( {
+								rowStart: rowStart + 1,
+							} );
+							__unstableMarkNextChangeAsNotPersistent();
+							moveBlocksToPosition(
+								[ blockClientId ],
+								gridClientId,
+								gridClientId,
+								getNumberOfBlocksBeforeCell(
+									columnStart,
+									rowStart + 1
+								)
+							);
+						} }
+					/>
+				</div>
 				<GridItemMover
-					className="is-down-button"
-					icon={ chevronDown }
-					label={ __( 'Move block down' ) }
-					description={ __( 'Move block down' ) }
-					isDisabled={ rowCount && rowEnd >= rowCount }
+					className="is-right-button"
+					icon={ chevronRight }
+					label={ __( 'Move right' ) }
+					description={ __( 'Move right' ) }
+					isDisabled={ columnCount && columnEnd >= columnCount }
 					onClick={ () => {
 						onChange( {
-							rowStart: rowStart + 1,
+							columnStart: columnStart + 1,
 						} );
 						__unstableMarkNextChangeAsNotPersistent();
 						moveBlocksToPosition(
@@ -108,32 +135,13 @@ export function GridItemMovers( {
 							gridClientId,
 							gridClientId,
 							getNumberOfBlocksBeforeCell(
-								columnStart,
-								rowStart + 1
+								columnStart + 1,
+								rowStart
 							)
 						);
 					} }
 				/>
 			</div>
-			<GridItemMover
-				className="is-right-button"
-				icon={ chevronRight }
-				label={ __( 'Move block right' ) }
-				description={ __( 'Move block right' ) }
-				isDisabled={ columnCount && columnEnd >= columnCount }
-				onClick={ () => {
-					onChange( {
-						columnStart: columnStart + 1,
-					} );
-					__unstableMarkNextChangeAsNotPersistent();
-					moveBlocksToPosition(
-						[ blockClientId ],
-						gridClientId,
-						gridClientId,
-						getNumberOfBlocksBeforeCell( columnStart + 1, rowStart )
-					);
-				} }
-			/>
 		</BlockControls>
 	);
 }
@@ -147,12 +155,12 @@ function GridItemMover( {
 	description,
 } ) {
 	const instanceId = useInstanceId( GridItemMover );
-	const descriptionId = `block-editor-block-mover-button__description-${ instanceId }`;
+	const descriptionId = `block-editor-grid-item-mover-button__description-${ instanceId }`;
 	return (
 		<>
 			<Button
 				className={ clsx(
-					'block-editor-block-mover-button',
+					'block-editor-grid-item-mover-button',
 					className
 				) }
 				icon={ icon }
