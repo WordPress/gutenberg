@@ -50,7 +50,7 @@ A function that returns nodes to be rendered within the Autocomplete.
 
 ### isSelected
 
-Whether or not the Autocomplte componenet is selected, and if its `Popover` should be displayed.
+Whether or not the Autocomplete component is selected, and if its `Popover` should be displayed.
 
 - Required: Yes
 - Type: `Boolean`
