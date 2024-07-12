@@ -44,13 +44,6 @@ const meta: Meta< typeof DropdownMenu > = {
 export default meta;
 
 export const Default: StoryObj< typeof DropdownMenu > = {
-	decorators: [
-		( Story ) => (
-			<div style={ { height: 150 } }>
-				<Story />
-			</div>
-		),
-	],
 	args: {
 		label: 'Select a direction.',
 		icon: menu,
