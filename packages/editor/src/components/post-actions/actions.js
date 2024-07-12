@@ -946,7 +946,7 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 							existingCallback( items, {
 								...argsObject,
 								onActionPerformed: ( _items ) => {
-									if ( argsObject.onActionPerformed ) {
+									if ( argsObject?.onActionPerformed ) {
 										argsObject.onActionPerformed( _items );
 									}
 									onActionPerformed(
