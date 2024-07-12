@@ -698,3 +698,23 @@ $block-inserter-tabs-height: 44px;
 		}
 	}
 }
+
+.show-icon-labels {
+	@media (max-width: #{ ($break-large - 1) }) {
+		.block-editor-block-patterns-explorer .block-editor-patterns__grid-pagination {
+			flex-direction: column;
+			.block-editor-patterns__grid-pagination-previous,
+			.block-editor-patterns__grid-pagination-next {
+				flex-direction: column;
+			}
+		}
+	}
+
+	.block-editor-inserter__category-panel .block-editor-patterns__grid-pagination {
+		flex-direction: column;
+		.block-editor-patterns__grid-pagination-previous,
+		.block-editor-patterns__grid-pagination-next {
+			flex-direction: column;
+		}
+	}
+}
