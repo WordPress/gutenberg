@@ -226,7 +226,8 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 			const [ defaultLayout ] = getBlockSettings( clientId, 'layout' );
 
 			if ( _isDropZoneDisabled !== undefined ) {
-				_isDropZoneDisabled = blockEditingMode === 'disabled';
+				// Taking out this line disables drop zones on the inner blocks.
+				//_isDropZoneDisabled = blockEditingMode === 'disabled';
 			}
 
 			return {

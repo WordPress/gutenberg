@@ -151,6 +151,8 @@ export default function useDropZone( {
 				if ( ! event.defaultPrevented && onDragOverRef.current ) {
 					onDragOverRef.current( event );
 				}
+				console.log( 'on drag over', event.target );
+				// TODO - when this has been held for X seconds, enable drop zones on the target.
 
 				// Prevent the browser default while also signalling to parent
 				// drop zones that `onDragOver` is already handled.
