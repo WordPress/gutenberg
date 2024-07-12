@@ -23,10 +23,12 @@ const { state, actions, callbacks } = store(
 	'core/image',
 	{
 		state: {
-			metadata: {},
-			currentImage: {},
+			currentImageId: null,
+			get currentImage() {
+				return state.metadata[ state.currentImageId ];
+			},
 			get overlayOpened() {
-				return state.currentImage.currentSrc;
+				return state.currentImageId !== null;
 			},
 			get roleAttribute() {
 				return state.overlayOpened ? 'dialog' : null;
@@ -52,28 +54,32 @@ const { state, actions, callbacks } = store(
 		},
 		actions: {
 			showLightbox() {
-				const ctx = getContext();
+				const { imageId } = getContext();
 
 				// Bails out if the image has not loaded yet.
-				if ( ! state.metadata[ ctx.imageId ].imageRef?.complete ) {
+				if ( ! state.metadata[ imageId ].imageRef?.complete ) {
 					return;
 				}
-
-				state.overlayEnabled = true;
 
 				// Stores the positions of the scroll to fix it until the overlay is
 				// closed.
 				state.scrollTopReset = document.documentElement.scrollTop;
 				state.scrollLeftReset = document.documentElement.scrollLeft;
 
-				// Sets the information of the expanded image in the state.
-				state.currentImage = state.metadata[ ctx.imageId ];
+				// Sets the current expanded image in the state and enables the overlay.
+				state.currentImageId = imageId;
+				state.overlayEnabled = true;
 
 				// Computes the styles of the overlay for the animation.
 				callbacks.setOverlayStyles();
 			},
 			hideLightbox() {
 				if ( state.overlayEnabled ) {
+					// Starts the overlay closing animation. The showClosingAnimation
+					// class is used to avoid showing it on page load.
+					state.showClosingAnimation = true;
+					state.overlayEnabled = false;
+
 					// Waits until the close animation has completed before allowing a
 					// user to scroll again. The duration of this animation is defined in
 					// the `styles.scss` file, but in any case we should wait a few
@@ -87,14 +93,9 @@ const { state, actions, callbacks } = store(
 							preventScroll: true,
 						} );
 
-						// Resets the current image to mark the overlay as closed.
-						state.currentImage = {};
+						// Resets the current image id to mark the overlay as closed.
+						state.currentImageId = null;
 					}, 450 );
-
-					// Starts the overlay closing animation. The showClosingAnimation
-					// class is used to avoid showing it on page load.
-					state.showClosingAnimation = true;
-					state.overlayEnabled = false;
 				}
 			},
 			handleKeydown( event ) {
@@ -214,6 +215,7 @@ const { state, actions, callbacks } = store(
 				let containerMaxHeight = imgMaxHeight;
 				let containerWidth = imgMaxWidth;
 				let containerHeight = imgMaxHeight;
+
 				// Checks if the target image has a different ratio than the original
 				// one (thumbnail). Recalculates the width and height.
 				if ( naturalRatio.toFixed( 2 ) !== imgRatio.toFixed( 2 ) ) {
