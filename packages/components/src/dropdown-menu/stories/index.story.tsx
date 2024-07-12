@@ -73,6 +73,7 @@ export const Default: StoryObj< typeof DropdownMenu > = {
 
 export const WithChildren: StoryObj< typeof DropdownMenu > = {
 	...Default,
+	controls: null,
 	// Adding custom source because Storybook is not able to show the contents of
 	// the `children` prop correctly in the code snippet.
 	parameters: {
