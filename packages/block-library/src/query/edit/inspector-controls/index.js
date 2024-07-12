@@ -171,6 +171,7 @@ export default function QueryInspectorControls( props ) {
 						) ) || (
 							<ToggleGroupControl
 								__nextHasNoMarginBottom
+								isBlock
 								value={ postType }
 								label={ postTypeControlLabel }
 								onChange={ onPostTypeChange }
