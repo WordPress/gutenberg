@@ -651,7 +651,7 @@ Displays links to the next and previous post, when applicable. ([Source](https:/
 
 -	**Name:** core/post-navigation
 -	**Category:** theme
--	**Supports:** align, ariaLabel, color (background, gradients, link, text), layout (default, ~~allowInheriting~~, ~~allowSwitching~~), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align, ariaLabel, color (background, gradients, link, text), layout (default, ~~allowInheriting~~, ~~allowSwitching~~), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** ariaLabel
 
 ## Post Navigation Link

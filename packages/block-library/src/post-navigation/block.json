@@ -18,7 +18,6 @@
 	"supports": {
 		"align": true,
 		"ariaLabel": true,
-		"html": false,
 		"color": {
 			"gradients": true,
 			"link": true,
@@ -28,12 +27,34 @@
 				"link": true
 			}
 		},
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true,
+			"__experimentalDefaultControls": {
+				"color": true,
+				"radius": true,
+				"style": true,
+				"width": true
+			}
+		},
+		"html": false,
 		"layout": {
 			"allowSwitching": false,
 			"allowInheriting": false,
 			"default": {
 				"type": "flex",
 				"justifyContent": "space-between"
+			}
+		},
+		"spacing": {
+			"margin": [ "top", "bottom" ],
+			"padding": true,
+			"blockGap": true,
+			"__experimentalDefaultControls": {
+				"padding": true,
+				"blockGap": true
 			}
 		},
 		"typography": {
