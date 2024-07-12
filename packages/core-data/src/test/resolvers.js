@@ -211,10 +211,12 @@ describe( 'getEntityRecords', () => {
 	} );
 
 	it( 'marks specific entity records as resolved', async () => {
+		const finishResolutions = jest.fn();
 		const dispatch = Object.assign( jest.fn(), {
 			receiveEntityRecords: jest.fn(),
 			__unstableAcquireStoreLock: jest.fn(),
 			__unstableReleaseStoreLock: jest.fn(),
+			finishResolutions,
 		} );
 		// Provide entities
 		dispatch.mockReturnValueOnce( ENTITIES );
@@ -230,16 +232,9 @@ describe( 'getEntityRecords', () => {
 		} );
 
 		// The record should have been received.
-		expect( dispatch ).toHaveBeenCalledWith( {
-			type: 'START_RESOLUTIONS',
-			selectorName: 'getEntityRecord',
-			args: [ [ ENTITIES[ 1 ].kind, ENTITIES[ 1 ].name, 2 ] ],
-		} );
-		expect( dispatch ).toHaveBeenCalledWith( {
-			type: 'FINISH_RESOLUTIONS',
-			selectorName: 'getEntityRecord',
-			args: [ [ ENTITIES[ 1 ].kind, ENTITIES[ 1 ].name, 2 ] ],
-		} );
+		expect( finishResolutions ).toHaveBeenCalledWith( 'getEntityRecord', [
+			[ ENTITIES[ 1 ].kind, ENTITIES[ 1 ].name, 2 ],
+		] );
 	} );
 } );
 
