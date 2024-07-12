@@ -5,9 +5,10 @@ import {
 	PanelBody,
 	TextControl,
 	SelectControl,
-	RadioControl,
 	RangeControl,
 	ToggleControl,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	Notice,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -168,15 +169,23 @@ export default function QueryInspectorControls( props ) {
 								help={ postTypeControlHelp }
 							/>
 						) ) || (
-							<RadioControl
+							<ToggleGroupControl
 								__nextHasNoMarginBottom
-								options={ postTypesSelectOptions }
-								selected={ postType }
+								value={ postType }
 								label={ postTypeControlLabel }
 								onChange={ onPostTypeChange }
 								help={ postTypeControlHelp }
-							/>
+							>
+								{ postTypesSelectOptions.map( ( option ) => (
+									<ToggleGroupControlOption
+										key={ option.value }
+										value={ option.value }
+										label={ option.label }
+									/>
+								) ) }
+							</ToggleGroupControl>
 						) ) }
+
 					{ showColumnsControl && (
 						<>
 							<RangeControl
