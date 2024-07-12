@@ -42,13 +42,6 @@ const meta: Meta< typeof Dropdown > = {
 export default meta;
 
 export const Default: StoryObj< typeof Dropdown > = {
-	decorators: [
-		( Story ) => (
-			<div style={ { height: 150 } }>
-				<Story />
-			</div>
-		),
-	],
 	args: {
 		renderToggle: ( { isOpen, onToggle } ) => (
 			<Button
