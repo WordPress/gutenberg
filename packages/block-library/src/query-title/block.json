@@ -26,6 +26,9 @@
 			"default": true
 		}
 	},
+	"example": {
+		"viewportWidth": 350
+	},
 	"supports": {
 		"align": [ "wide", "full" ],
 		"html": false,
