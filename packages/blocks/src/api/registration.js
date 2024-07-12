@@ -812,6 +812,11 @@ export const registerBlockBindingsSource = ( source ) => {
 	}
 
 	// Check the `name` property is correct.
+	if ( ! name ) {
+		console.error( 'Block bindings source must contain a name.' );
+		return;
+	}
+
 	if ( typeof name !== 'string' ) {
 		console.error( 'Block bindings source name must be a string.' );
 		return;
@@ -824,14 +829,26 @@ export const registerBlockBindingsSource = ( source ) => {
 		return;
 	}
 
+	if ( ! /^[a-z0-9/-]+$/.test( name ) ) {
+		console.error(
+			'Block bindings source name must contain only valid characters: lowercase characters, hyphens, or digits. Example: my-plugin/my-custom-source.'
+		);
+		return;
+	}
+
 	if ( ! /^[a-z0-9-]+\/[a-z0-9-]+$/.test( name ) ) {
 		console.error(
-			'Block bindings source name must contain a namespace prefix. Example: my-plugin/my-custom-source'
+			'Block bindings source name must contain a namespace and valid characters. Example: my-plugin/my-custom-source.'
 		);
 		return;
 	}
 
 	// Check the `label` property is correct.
+	if ( ! label ) {
+		console.error( 'Block bindings source must contain a label.' );
+		return;
+	}
+
 	if ( typeof label !== 'string' ) {
 		console.error( 'Block bindings source label must be a string.' );
 		return;
@@ -871,5 +888,5 @@ export const registerBlockBindingsSource = ( source ) => {
 		return;
 	}
 
-	unlock( dispatch( blocksStore ) ).addBlockBindingsSource( source );
+	return unlock( dispatch( blocksStore ) ).addBlockBindingsSource( source );
 };
