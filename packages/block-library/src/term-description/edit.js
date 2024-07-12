@@ -11,13 +11,22 @@ import {
 	useBlockProps,
 	BlockControls,
 	AlignmentControl,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
 
 export default function TermDescriptionEdit( {
 	attributes,
 	setAttributes,
 	mergedStyle,
 } ) {
+	const { ArchiveDescription } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const { __experimentalArchiveDescription } = getSettings();
+		return {
+			ArchiveDescription: __experimentalArchiveDescription,
+		};
+	} );
 	const { textAlign } = attributes;
 	const blockProps = useBlockProps( {
 		className: clsx( {
@@ -25,6 +34,9 @@ export default function TermDescriptionEdit( {
 		} ),
 		style: mergedStyle,
 	} );
+
+	const termDescription = ArchiveDescription || __( 'Term Description' );
+
 	return (
 		<>
 			<BlockControls group="block">
@@ -37,7 +49,7 @@ export default function TermDescriptionEdit( {
 			</BlockControls>
 			<div { ...blockProps }>
 				<div className="wp-block-term-description__placeholder">
-					<span>{ __( 'Term Description' ) }</span>
+					<span>{ termDescription }</span>
 				</div>
 			</div>
 		</>

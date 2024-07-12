@@ -10,31 +10,22 @@ import {
 	AlignmentControl,
 	BlockControls,
 	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { store as coreStore } from '@wordpress/core-data';
 
 function PostAuthorBiographyEdit( {
-	context: { postType, postId },
 	attributes: { textAlign },
 	setAttributes,
 } ) {
-	const { authorDetails } = useSelect(
-		( select ) => {
-			const { getEditedEntityRecord, getUser } = select( coreStore );
-			const _authorId = getEditedEntityRecord(
-				'postType',
-				postType,
-				postId
-			)?.author;
-
-			return {
-				authorDetails: _authorId ? getUser( _authorId ) : null,
-			};
-		},
-		[ postType, postId ]
-	);
+	const { authorDetails } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const { __experimentalArchiveDescription } = getSettings();
+		return {
+			authorDetails: __experimentalArchiveDescription,
+		};
+	} );
 
 	const blockProps = useBlockProps( {
 		className: clsx( {
@@ -42,8 +33,7 @@ function PostAuthorBiographyEdit( {
 		} ),
 	} );
 
-	const displayAuthorBiography =
-		authorDetails?.description || __( 'Author Biography' );
+	const displayAuthorBiography = authorDetails || __( 'Author Biography' );
 
 	return (
 		<>

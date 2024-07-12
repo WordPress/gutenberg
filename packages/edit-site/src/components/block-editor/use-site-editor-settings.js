@@ -60,9 +60,11 @@ function useArchiveLabel( templateSlug ) {
 				select( coreStore );
 			let archiveTypeLabel;
 			let archiveNameLabel;
+			let archiveDescription;
 			if ( taxonomy ) {
 				archiveTypeLabel =
 					getTaxonomy( taxonomy )?.labels?.singular_name;
+				archiveDescription = getTaxonomy( taxonomy )?.description;
 			}
 			if ( term ) {
 				const records = getEntityRecords( 'taxonomy', taxonomy, {
@@ -71,6 +73,7 @@ function useArchiveLabel( templateSlug ) {
 				} );
 				if ( records && records[ 0 ] ) {
 					archiveNameLabel = records[ 0 ].name;
+					archiveDescription = records[ 0 ].description;
 				}
 			}
 			if ( isAuthor ) {
@@ -79,12 +82,14 @@ function useArchiveLabel( templateSlug ) {
 					const authorRecords = getAuthors( { slug: authorSlug } );
 					if ( authorRecords && authorRecords[ 0 ] ) {
 						archiveNameLabel = authorRecords[ 0 ].name;
+						archiveDescription = authorRecords[ 0 ].description;
 					}
 				}
 			}
 			return {
 				archiveTypeLabel,
 				archiveNameLabel,
+				archiveDescription,
 			};
 		},
 		[ authorSlug, isAuthor, taxonomy, term ]
@@ -165,6 +170,7 @@ export function useSpecificEditorSettings() {
 			// I wonder if they should be set in the post editor too
 			__experimentalArchiveTitleTypeLabel: archiveLabels.archiveTypeLabel,
 			__experimentalArchiveTitleNameLabel: archiveLabels.archiveNameLabel,
+			__experimentalArchiveDescription: archiveLabels.archiveDescription,
 			__unstableIsPreviewMode: canvasMode === 'view',
 		};
 	}, [
@@ -175,6 +181,7 @@ export function useSpecificEditorSettings() {
 		onNavigateToPreviousEntityRecord,
 		archiveLabels.archiveTypeLabel,
 		archiveLabels.archiveNameLabel,
+		archiveLabels.archiveDescription,
 	] );
 
 	return defaultEditorSettings;

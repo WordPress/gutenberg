@@ -85,6 +85,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__unstableIsBlockBasedTheme',
 	'__experimentalArchiveTitleTypeLabel',
 	'__experimentalArchiveTitleNameLabel',
+	'__experimentalArchiveDescription',
 ];
 
 const {
