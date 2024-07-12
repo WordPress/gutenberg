@@ -122,6 +122,7 @@ function QueryVariationPicker( {
 						setAttributes( {
 							...variation.attributes,
 							query: {
+								...attributes.query,
 								...variation.attributes.query,
 								postType:
 									attributes.query.postType ||
