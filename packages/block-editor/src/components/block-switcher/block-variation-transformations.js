@@ -4,18 +4,16 @@
 import { MenuItem } from '@wordpress/components';
 import {
 	getBlockMenuDefaultClassName,
-	cloneBlock,
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-import { useState, useMemo } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
 import BlockIcon from '../block-icon';
-import PreviewBlockPopover from './preview-block-popover';
 
 const EMPTY_OBJECT = {};
 
@@ -54,42 +52,21 @@ export function useBlockVariationTransforms( { clientIds, blocks } ) {
 	return transformations;
 }
 
-const BlockVariationTransformations = ( {
-	transformations,
-	onSelect,
-	blocks,
-} ) => {
-	const [ hoveredTransformItemName, setHoveredTransformItemName ] =
-		useState();
+const BlockVariationTransformations = ( { transformations, onSelect } ) => {
 	return (
 		<>
-			{ hoveredTransformItemName && (
-				<PreviewBlockPopover
-					blocks={ cloneBlock(
-						blocks[ 0 ],
-						transformations.find(
-							( { name } ) => name === hoveredTransformItemName
-						).attributes
-					) }
-				/>
-			) }
 			{ transformations?.map( ( item ) => (
 				<BlockVariationTranformationItem
 					key={ item.name }
 					item={ item }
 					onSelect={ onSelect }
-					setHoveredTransformItemName={ setHoveredTransformItemName }
 				/>
 			) ) }
 		</>
 	);
 };
 
-function BlockVariationTranformationItem( {
-	item,
-	onSelect,
-	setHoveredTransformItemName,
-} ) {
+function BlockVariationTranformationItem( { item, onSelect } ) {
 	const { name, icon, title } = item;
 	return (
 		<MenuItem
@@ -98,8 +75,6 @@ function BlockVariationTranformationItem( {
 				event.preventDefault();
 				onSelect( name );
 			} }
-			onMouseLeave={ () => setHoveredTransformItemName( null ) }
-			onMouseEnter={ () => setHoveredTransformItemName( name ) }
 		>
 			<BlockIcon icon={ icon } showColors />
 			{ title }

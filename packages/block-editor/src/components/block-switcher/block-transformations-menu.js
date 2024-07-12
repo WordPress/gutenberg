@@ -3,17 +3,13 @@
  */
 import { __ } from '@wordpress/i18n';
 import { MenuGroup, MenuItem } from '@wordpress/components';
-import {
-	getBlockMenuDefaultClassName,
-	switchToBlockType,
-} from '@wordpress/blocks';
-import { useState, useMemo } from '@wordpress/element';
+import { getBlockMenuDefaultClassName } from '@wordpress/blocks';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import BlockIcon from '../block-icon';
-import PreviewBlockPopover from './preview-block-popover';
 import BlockVariationTransformations from './block-variation-transformations';
 
 /**
@@ -88,9 +84,6 @@ const BlockTransformationsMenu = ( {
 	onSelectVariation,
 	blocks,
 } ) => {
-	const [ hoveredTransformItemName, setHoveredTransformItemName ] =
-		useState();
-
 	const { priorityTextTransformations, restTransformations } =
 		useGroupedTransforms( possibleBlockTransformations );
 	// We have to check if both content transformations(priority and rest) are set
@@ -101,20 +94,11 @@ const BlockTransformationsMenu = ( {
 		<RestTransformationItems
 			restTransformations={ restTransformations }
 			onSelect={ onSelect }
-			setHoveredTransformItemName={ setHoveredTransformItemName }
 		/>
 	);
 	return (
 		<>
 			<MenuGroup label={ __( 'Transform to' ) } className={ className }>
-				{ hoveredTransformItemName && (
-					<PreviewBlockPopover
-						blocks={ switchToBlockType(
-							blocks,
-							hoveredTransformItemName
-						) }
-					/>
-				) }
 				{ !! possibleBlockVariationTransformations?.length && (
 					<BlockVariationTransformations
 						transformations={
@@ -129,9 +113,6 @@ const BlockTransformationsMenu = ( {
 						key={ item.name }
 						item={ item }
 						onSelect={ onSelect }
-						setHoveredTransformItemName={
-							setHoveredTransformItemName
-						}
 					/>
 				) ) }
 				{ ! hasBothContentTransformations && restTransformItems }
@@ -145,26 +126,17 @@ const BlockTransformationsMenu = ( {
 	);
 };
 
-function RestTransformationItems( {
-	restTransformations,
-	onSelect,
-	setHoveredTransformItemName,
-} ) {
+function RestTransformationItems( { restTransformations, onSelect } ) {
 	return restTransformations.map( ( item ) => (
 		<BlockTranformationItem
 			key={ item.name }
 			item={ item }
 			onSelect={ onSelect }
-			setHoveredTransformItemName={ setHoveredTransformItemName }
 		/>
 	) );
 }
 
-function BlockTranformationItem( {
-	item,
-	onSelect,
-	setHoveredTransformItemName,
-} ) {
+function BlockTranformationItem( { item, onSelect } ) {
 	const { name, icon, title, isDisabled } = item;
 	return (
 		<MenuItem
@@ -174,8 +146,6 @@ function BlockTranformationItem( {
 				onSelect( name );
 			} }
 			disabled={ isDisabled }
-			onMouseLeave={ () => setHoveredTransformItemName( null ) }
-			onMouseEnter={ () => setHoveredTransformItemName( name ) }
 		>
 			<BlockIcon icon={ icon } showColors />
 			{ title }
