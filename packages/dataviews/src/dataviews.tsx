@@ -32,6 +32,7 @@ import type {
 	SupportedLayouts,
 } from './types';
 import type { SetSelection, SelectionOrUpdater } from './private-types';
+import AspectRatioControl from './aspect-ratio-control';
 
 type ItemWithId = { id: string };
 
@@ -134,6 +135,12 @@ export default function DataViews< Item >( {
 						setOpenedFilter={ setOpenedFilter }
 					/>
 				</HStack>
+				{ view.type === LAYOUT_GRID && (
+					<AspectRatioControl
+						view={ view }
+						onChangeView={ onChangeView }
+					/>
+				) }
 				{ [ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type ) &&
 					hasPossibleBulkAction && (
 						<BulkActions

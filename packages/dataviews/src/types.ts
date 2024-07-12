@@ -332,6 +332,11 @@ export interface ViewGrid extends ViewBase {
 		 * The fields to use as badge fields.
 		 */
 		badgeFields?: string[];
+
+		/**
+		 * True if the grid has a 1:1 aspect ratio the default, and false if it doesn't.
+		 */
+		hasOneOneAspectRatio?: boolean;
 	};
 }
 

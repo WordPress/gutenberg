@@ -36,6 +36,7 @@ interface GridItemProps< Item > {
 	visibleFields: NormalizedField< Item >[];
 	badgeFields: NormalizedField< Item >[];
 	columnFields?: string[];
+	hasOneOneAspectRatio?: boolean;
 }
 
 function GridItem< Item >( {
@@ -49,6 +50,7 @@ function GridItem< Item >( {
 	visibleFields,
 	badgeFields,
 	columnFields,
+	hasOneOneAspectRatio,
 }: GridItemProps< Item > ) {
 	const hasBulkAction = useHasAPossibleBulkAction( actions, item );
 	const id = getItemId( item );
@@ -59,6 +61,8 @@ function GridItem< Item >( {
 	const renderedPrimaryField = primaryField?.render ? (
 		<primaryField.render item={ item } />
 	) : null;
+	const mediaStyle =
+		hasOneOneAspectRatio === false ? { aspectRatio: 'auto' } : undefined;
 	return (
 		<VStack
 			spacing={ 0 }
@@ -81,7 +85,7 @@ function GridItem< Item >( {
 				}
 			} }
 		>
-			<div className="dataviews-view-grid__media">
+			<div className="dataviews-view-grid__media" style={ mediaStyle }>
 				{ renderedMediaField }
 			</div>
 			<HStack
@@ -226,6 +230,9 @@ export default function ViewGrid< Item >( {
 								visibleFields={ visibleFields }
 								badgeFields={ badgeFields }
 								columnFields={ view.layout?.columnFields }
+								hasOneOneAspectRatio={
+									view.layout?.hasOneOneAspectRatio
+								}
 							/>
 						);
 					} ) }
