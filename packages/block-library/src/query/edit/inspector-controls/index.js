@@ -162,6 +162,7 @@ export default function QueryInspectorControls( props ) {
 						( ( postTypesSelectOptions.length > 2 && (
 							<SelectControl
 								__nextHasNoMarginBottom
+								__next40pxDefaultSize
 								options={ postTypesSelectOptions }
 								value={ postType }
 								label={ postTypeControlLabel }
@@ -171,6 +172,7 @@ export default function QueryInspectorControls( props ) {
 						) ) || (
 							<ToggleGroupControl
 								__nextHasNoMarginBottom
+								__next40pxDefaultSize
 								isBlock
 								value={ postType }
 								label={ postTypeControlLabel }
@@ -191,6 +193,7 @@ export default function QueryInspectorControls( props ) {
 						<>
 							<RangeControl
 								__nextHasNoMarginBottom
+								__next40pxDefaultSize
 								label={ __( 'Columns' ) }
 								value={ displayLayout.columns }
 								onChange={ ( value ) =>
@@ -285,6 +288,7 @@ export default function QueryInspectorControls( props ) {
 						>
 							<TextControl
 								__nextHasNoMarginBottom
+								__next40pxDefaultSize
 								label={ __( 'Keyword' ) }
 								value={ querySearch }
 								onChange={ setQuerySearch }
