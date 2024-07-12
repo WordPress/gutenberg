@@ -1,10 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { isTextField } from '@wordpress/dom';
 import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
+import { getDefaultBlockName } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -20,9 +20,16 @@ import { store as blockEditorStore } from '../../../store';
  * @param {string} clientId Block client ID.
  */
 export function useEventHandlers( { clientId, isSelected } ) {
-	const { getBlockRootClientId, getBlockIndex } =
-		useSelect( blockEditorStore );
-	const { insertAfterBlock, removeBlock } = useDispatch( blockEditorStore );
+	const {
+		getBlockRootClientId,
+		getBlockIndex,
+		canInsertBlockType,
+		getNextBlockClientId,
+		getBlockOrder,
+		getBlockEditingMode,
+	} = useSelect( blockEditorStore );
+	const { insertAfterBlock, removeBlock, selectBlock } =
+		useDispatch( blockEditorStore );
 
 	return useRefEffect(
 		( node ) => {
@@ -42,6 +49,10 @@ export function useEventHandlers( { clientId, isSelected } ) {
 			function onKeyDown( event ) {
 				const { keyCode, target } = event;
 
+				if ( event.defaultPrevented ) {
+					return;
+				}
+
 				if (
 					keyCode !== ENTER &&
 					keyCode !== BACKSPACE &&
@@ -50,14 +61,50 @@ export function useEventHandlers( { clientId, isSelected } ) {
 					return;
 				}
 
-				if ( target !== node || isTextField( target ) ) {
+				if ( target !== node ) {
 					return;
 				}
 
 				event.preventDefault();
 
 				if ( keyCode === ENTER ) {
-					insertAfterBlock( clientId );
+					const rootClientId = getBlockRootClientId( clientId );
+					if (
+						canInsertBlockType(
+							getDefaultBlockName(),
+							rootClientId
+						)
+					) {
+						insertAfterBlock( clientId );
+					} else {
+						function getNextClientId( id ) {
+							let nextClientId = null;
+
+							while (
+								typeof id === 'string' &&
+								! ( nextClientId = getNextBlockClientId( id ) )
+							) {
+								id = getBlockRootClientId( id );
+							}
+
+							return nextClientId;
+						}
+
+						let nextClientId =
+							getBlockOrder( clientId )[ 0 ] ??
+							getNextClientId( clientId );
+
+						while (
+							nextClientId &&
+							getBlockEditingMode( nextClientId ) === 'disabled'
+						) {
+							nextClientId = getNextClientId( nextClientId );
+						}
+
+						if ( nextClientId ) {
+							selectBlock( nextClientId );
+						}
+					}
 				} else {
 					removeBlock( clientId );
 				}
