@@ -58,3 +58,15 @@ export function addBlockBindingsSource( source ) {
 		canUserEditValue: source.canUserEditValue,
 	};
 }
+
+/**
+ * Removes existing block bindings source.
+ *
+ * @param {string} name Name of the source to remove.
+ */
+export function removeBlockBindingsSource( name ) {
+	return {
+		type: 'REMOVE_BLOCK_BINDINGS_SOURCE',
+		name,
+	};
+}
