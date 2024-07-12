@@ -21,6 +21,7 @@
 
 ### Enhancements
 
+-   `Button`: Rename Button describedBy prop to description and deprecate old name. ([#63486](https://github.com/WordPress/gutenberg/pull/63486))
 -   `ToggleGroupControl`: support disabled options ([#63450](https://github.com/WordPress/gutenberg/pull/63450)).
 -   `CustomSelectControl`: Stabilize `__experimentalShowSelectedHint` and `options[]. __experimentalHint` props ([#63248](https://github.com/WordPress/gutenberg/pull/63248)).
 

@@ -109,7 +109,7 @@ function IndentUI( { clientId } ) {
 		<>
 			<ToolbarButton
 				icon={ isRTL() ? formatOutdentRTL : formatOutdent }
-				title={ __( 'Outdentx' ) }
+				title={ __( 'Outdent' ) }
 				description={ __( 'Outdent list item' ) }
 				disabled={ ! canOutdent }
 				onClick={ outdentList }
