@@ -268,7 +268,7 @@ export default function QueryInspectorControls( props ) {
 							/>
 						</ToolsPanelItem>
 					) }
-					{ showParentControl && (
+					{ true && (
 						<ToolsPanelItem
 							hasValue={ () => !! parents?.length }
 							label={ __( 'Parents' ) }
