@@ -306,4 +306,153 @@ describe.each( [
 		expect( onChangeSpy ).toHaveBeenCalledWith( targetOption.value );
 		expect( input ).toHaveValue( targetOption.label );
 	} );
+
+	it( 'should render with Reset button disabled', () => {
+		render(
+			<Component
+				options={ timezones }
+				label={ defaultLabelText }
+				allowReset
+			/>
+		);
+
+		const resetButton = screen.getByRole( 'button', { name: 'Reset' } );
+
+		expect( resetButton ).toBeInTheDocument();
+		expect( resetButton ).toBeVisible();
+		expect( resetButton ).toBeDisabled();
+	} );
+
+	it( 'should render with Reset button enabled after option selection', async () => {
+		const user = await userEvent.setup();
+		const targetOption = timezones[ 13 ];
+
+		render(
+			<Component
+				options={ timezones }
+				label={ defaultLabelText }
+				allowReset
+			/>
+		);
+
+		// Pressing tab selects the input and shows the options.
+		await user.tab();
+		// Type enough characters to ensure a predictable search result.
+		await user.keyboard( getOptionSearchString( targetOption ) );
+		// Pressing Enter/Return selects the currently focused option.
+		await user.keyboard( '{Enter}' );
+
+		const resetButton = screen.getByRole( 'button', { name: 'Reset' } );
+
+		expect( resetButton ).toBeInTheDocument();
+		expect( resetButton ).toBeVisible();
+		expect( resetButton ).toBeEnabled();
+	} );
+
+	it( 'should reset input when clicking the Reset button', async () => {
+		const user = await userEvent.setup();
+		const targetOption = timezones[ 13 ];
+
+		render(
+			<Component
+				options={ timezones }
+				label={ defaultLabelText }
+				allowReset
+			/>
+		);
+
+		// Pressing tab selects the input and shows the options.
+		await user.tab();
+		// Type enough characters to ensure a predictable search result.
+		await user.keyboard( getOptionSearchString( targetOption ) );
+		// Pressing Enter/Return selects the currently focused option.
+		await user.keyboard( '{Enter}' );
+
+		const input = getInput( defaultLabelText );
+
+		expect( input ).toHaveValue( targetOption.label );
+
+		const resetButton = screen.getByRole( 'button', { name: 'Reset' } );
+		await user.click( resetButton );
+
+		expect( input ).toHaveValue( '' );
+		expect( resetButton ).toBeDisabled();
+		expect( input ).toHaveFocus();
+	} );
+
+	it( 'should reset input when pressing the Reset button with the Enter key', async () => {
+		const user = await userEvent.setup();
+		const targetOption = timezones[ 13 ];
+
+		render(
+			<Component
+				options={ timezones }
+				label={ defaultLabelText }
+				allowReset
+			/>
+		);
+
+		// Pressing tab selects the input and shows the options.
+		await user.tab();
+		// Type enough characters to ensure a predictable search result.
+		await user.keyboard( getOptionSearchString( targetOption ) );
+		// Pressing Enter/Return selects the currently focused option.
+		await user.keyboard( '{Enter}' );
+
+		const input = getInput( defaultLabelText );
+
+		expect( input ).toHaveValue( targetOption.label );
+
+		// Pressing tab moves focus to the Reset buttons
+		await user.tab();
+
+		const resetButton = screen.getByRole( 'button', { name: 'Reset' } );
+
+		expect( resetButton ).toHaveFocus();
+
+		// Pressing Enter/Return resets the input.
+		await user.keyboard( '{Enter}' );
+
+		expect( input ).toHaveValue( '' );
+		expect( resetButton ).toBeDisabled();
+		expect( input ).toHaveFocus();
+	} );
+
+	it( 'should reset input when pressing the Reset button with the Spacebar key', async () => {
+		const user = await userEvent.setup();
+		const targetOption = timezones[ 13 ];
+
+		render(
+			<Component
+				options={ timezones }
+				label={ defaultLabelText }
+				allowReset
+			/>
+		);
+
+		// Pressing tab selects the input and shows the options.
+		await user.tab();
+		// Type enough characters to ensure a predictable search result.
+		await user.keyboard( getOptionSearchString( targetOption ) );
+		// Pressing Enter/Return selects the currently focused option.
+		await user.keyboard( '{Enter}' );
+
+		const input = getInput( defaultLabelText );
+
+		expect( input ).toHaveValue( targetOption.label );
+
+		// Pressing tab moves focus to the Reset buttons.
+		await user.tab();
+
+		const resetButton = screen.getByRole( 'button', { name: 'Reset' } );
+
+		expect( resetButton ).toHaveFocus();
+
+		// Pressing Spacebar resets the input.
+		await user.keyboard( ' ' );
+
+		expect( input ).toHaveValue( '' );
+		expect( resetButton ).toBeDisabled();
+		expect( input ).toHaveFocus();
+	} );
 } );
