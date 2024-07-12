@@ -631,7 +631,7 @@ export default function LogoEdit( {
 											{ isLoading ? (
 												<Spinner />
 											) : (
-												__( 'Add media' )
+												__( 'Add Site Logo' )
 											) }
 										</Button>
 										<DropZone onFilesDrop={ onFilesDrop } />
