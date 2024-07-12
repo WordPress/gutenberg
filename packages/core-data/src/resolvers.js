@@ -281,16 +281,10 @@ export const getEntityRecords =
 						.filter( ( record ) => record?.[ key ] )
 						.map( ( record ) => [ kind, name, record[ key ] ] );
 
-					dispatch( {
-						type: 'START_RESOLUTIONS',
-						selectorName: 'getEntityRecord',
-						args: resolutionsArgs,
-					} );
-					dispatch( {
-						type: 'FINISH_RESOLUTIONS',
-						selectorName: 'getEntityRecord',
-						args: resolutionsArgs,
-					} );
+					dispatch.finishResolutions(
+						'getEntityRecord',
+						resolutionsArgs
+					);
 				}
 
 				dispatch.__unstableReleaseStoreLock( lock );
@@ -856,16 +850,8 @@ export const getRevisions =
 						record[ key ],
 					] );
 
-				dispatch( {
-					type: 'START_RESOLUTIONS',
-					selectorName: 'getRevision',
-					args: resolutionsArgs,
-				} );
-				dispatch( {
-					type: 'FINISH_RESOLUTIONS',
-					selectorName: 'getRevision',
-					args: resolutionsArgs,
-				} );
+				dispatch.startResolutions( 'getRevision', resolutionsArgs );
+				dispatch.finishResolutions( 'getRevision', resolutionsArgs );
 			}
 		}
 	};
