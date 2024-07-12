@@ -206,16 +206,6 @@ export function CommandMenu() {
 		} );
 	}, [ registerShortcut ] );
 
-	// Temporary fix for the suggestions Listbox labeling.
-	// See https://github.com/pacocoursey/cmdk/issues/196
-	useEffect( () => {
-		commandListRef.current?.removeAttribute( 'aria-labelledby' );
-		commandListRef.current?.setAttribute(
-			'aria-label',
-			__( 'Command suggestions' )
-		);
-	}, [ commandListRef.current ] );
-
 	useShortcut(
 		'core/commands',
 		/** @type {import('react').KeyboardEventHandler} */
@@ -287,7 +277,10 @@ export function CommandMenu() {
 						/>
 						<Icon icon={ inputIcon } />
 					</div>
-					<Command.List ref={ commandListRef }>
+					<Command.List
+						ref={ commandListRef }
+						label={ __( 'Command suggestions' ) }
+					>
 						{ search && ! isLoading && (
 							<Command.Empty>
 								{ __( 'No results found.' ) }
