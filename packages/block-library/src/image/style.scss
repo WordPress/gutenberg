@@ -11,7 +11,11 @@
 		box-sizing: border-box;
 
 		&.hide {
-			opacity: 0;
+			visibility: hidden;
+		}
+
+		&.show {
+			animation: show-content-image 0.4s;
 		}
 	}
 
@@ -320,6 +324,18 @@
 				}
 			}
 		}
+	}
+}
+
+@keyframes show-content-image {
+	0% {
+		visibility: hidden;
+	}
+	99% {
+		visibility: hidden;
+	}
+	100% {
+		visibility: visible;
 	}
 }
 

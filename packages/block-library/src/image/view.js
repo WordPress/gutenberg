@@ -59,6 +59,19 @@ const { state, actions, callbacks } = store(
 				const { imageId } = getContext();
 				return state.metadata[ imageId ].imageButtonTop;
 			},
+			get contentImageHide() {
+				const ctx = getContext();
+				return (
+					state.overlayEnabled && state.currentImageId === ctx.imageId
+				);
+			},
+			get contentImageShow() {
+				const ctx = getContext();
+				return (
+					! state.overlayEnabled &&
+					state.currentImageId === ctx.imageId
+				);
+			},
 		},
 		actions: {
 			showLightbox() {
@@ -75,8 +88,8 @@ const { state, actions, callbacks } = store(
 				state.scrollLeftReset = document.documentElement.scrollLeft;
 
 				// Sets the current expanded image in the state and enables the overlay.
-				state.currentImageId = imageId;
 				state.overlayEnabled = true;
+				state.currentImageId = imageId;
 
 				// Computes the styles of the overlay for the animation.
 				callbacks.setOverlayStyles();
