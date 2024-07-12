@@ -324,13 +324,11 @@ const { state, actions, callbacks } = store(
 			`;
 			},
 			setButtonStyles() {
-				const ctx = getContext();
+				const { imageId } = getContext();
 				const { ref } = getElement();
-				state.metadata[ ctx.imageId ] = {
-					...state.metadata[ ctx.imageId ],
-					imageRef: ref,
-					currentSrc: ref.currentSrc,
-				};
+
+				state.metadata[ imageId ].imageRef = ref;
+				state.metadata[ imageId ].currentSrc = ref.currentSrc;
 
 				const {
 					naturalWidth,
@@ -406,11 +404,8 @@ const { state, actions, callbacks } = store(
 					}
 				}
 
-				state.metadata[ ctx.imageId ] = {
-					...state.metadata[ ctx.imageId ],
-					imageButtonTop,
-					imageButtonRight,
-				};
+				state.metadata[ imageId ].imageButtonTop = imageButtonTop;
+				state.metadata[ imageId ].imageButtonRight = imageButtonRight;
 			},
 			setOverlayFocus() {
 				if ( state.overlayEnabled ) {
@@ -420,12 +415,9 @@ const { state, actions, callbacks } = store(
 				}
 			},
 			initTriggerButton() {
-				const ctx = getContext();
+				const { imageId } = getContext();
 				const { ref } = getElement();
-				state.metadata[ ctx.imageId ] = {
-					...state.metadata[ ctx.imageId ],
-					buttonRef: ref,
-				};
+				state.metadata[ imageId ].buttonRef = ref;
 			},
 		},
 	},
