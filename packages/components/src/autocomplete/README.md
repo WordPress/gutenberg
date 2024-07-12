@@ -8,7 +8,7 @@ The following props are used to control the behavior of the component.
 
 ### record
 
-The rich text value object the autocomleter is being applied to.
+The rich text value object the autocompleter is being applied to.
 
 -   Required: Yes
 -   Type: `RichTextValue`
