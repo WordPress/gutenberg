@@ -14,18 +14,37 @@ import {
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import { store as coreStore } from '@wordpress/core-data';
 
 function PostAuthorBiographyEdit( {
+	context: { postType, postId },
 	attributes: { textAlign },
 	setAttributes,
 } ) {
-	const { authorDetails } = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		const { __experimentalArchiveDescription } = getSettings();
-		return {
-			authorDetails: __experimentalArchiveDescription,
-		};
-	} );
+	const { authorBiography } = useSelect(
+		( select ) => {
+			let authorDetails;
+			let biography;
+			if ( postType && postId ) {
+				const { getEditedEntityRecord, getUser } = select( coreStore );
+				const _authorId = getEditedEntityRecord(
+					'postType',
+					postType,
+					postId
+				)?.author;
+				authorDetails = _authorId ? getUser( _authorId ) : null;
+				biography = authorDetails?.description;
+			} else {
+				const { getSettings } = select( blockEditorStore );
+				const { __experimentalArchiveDescription } = getSettings();
+				biography = __experimentalArchiveDescription;
+			}
+			return {
+				authorBiography: biography,
+			};
+		},
+		[ postType, postId ]
+	);
 
 	const blockProps = useBlockProps( {
 		className: clsx( {
@@ -33,7 +52,7 @@ function PostAuthorBiographyEdit( {
 		} ),
 	} );
 
-	const displayAuthorBiography = authorDetails || __( 'Author Biography' );
+	const displayAuthorBiography = authorBiography || __( 'Author Biography' );
 
 	return (
 		<>
