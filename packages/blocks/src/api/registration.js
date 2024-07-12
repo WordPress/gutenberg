@@ -806,7 +806,7 @@ export const registerBlockBindingsSource = ( source ) => {
 	).getBlockBindingsSource( name );
 	if ( existingSource ) {
 		console.error(
-			'Block bindings source"' + name + '" is already registered.'
+			'Block bindings source "' + name + '" is already registered.'
 		);
 		return;
 	}
@@ -911,7 +911,7 @@ export function unregisterBlockBindingsSource( name ) {
 		);
 		return;
 	}
-	unlock( dispatch( blocksStore ) ).removeBlockBindings( name );
+	unlock( dispatch( blocksStore ) ).removeBlockBindingsSource( name );
 }
 
 /**

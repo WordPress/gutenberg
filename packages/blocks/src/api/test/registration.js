@@ -14,8 +14,10 @@ import {
 	registerBlockType,
 	registerBlockCollection,
 	registerBlockVariation,
+	registerBlockBindingsSource,
 	unregisterBlockCollection,
 	unregisterBlockType,
+	unregisterBlockBindingsSource,
 	setFreeformContentHandlerName,
 	getFreeformContentHandlerName,
 	setUnregisteredTypeHandlerName,
@@ -28,6 +30,7 @@ import {
 	getBlockTypes,
 	getBlockSupport,
 	getBlockVariations,
+	getBlockBindingsSource,
 	hasBlockSupport,
 	isReusableBlock,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
@@ -1430,6 +1433,213 @@ describe( 'blocks', () => {
 					description: 'Variation description',
 				},
 			] );
+		} );
+	} );
+
+	describe( 'registerBlockBindingsSource', () => {
+		// Check the name is correct.
+		it( 'should contain name property', () => {
+			const source = registerBlockBindingsSource( {} );
+			expect( console ).toHaveErroredWith(
+				'Block bindings source must contain a name.'
+			);
+			expect( source ).toBeUndefined();
+		} );
+
+		it( 'should reject numbers', () => {
+			const source = registerBlockBindingsSource( { name: 1 } );
+			expect( console ).toHaveErroredWith(
+				'Block bindings source name must be a string.'
+			);
+			expect( source ).toBeUndefined();
+		} );
+
+		it( 'should reject names with uppercase characters', () => {
+			registerBlockBindingsSource( {
+				name: 'Core/WrongName',
+			} );
+			expect( console ).toHaveErroredWith(
+				'Block bindings source name must not contain uppercase characters.'
+			);
+			expect(
+				getBlockBindingsSource( 'Core/WrongName' )
+			).toBeUndefined();
+		} );
+
+		it( 'should reject names with invalid characters', () => {
+			registerBlockBindingsSource( {
+				name: 'core/_wrong_name',
+			} );
+			expect( console ).toHaveErroredWith(
+				'Block bindings source name must contain only valid characters: lowercase characters, hyphens, or digits. Example: my-plugin/my-custom-source.'
+			);
+			expect(
+				getBlockBindingsSource( 'core/_wrong_name' )
+			).toBeUndefined();
+		} );
+
+		it( 'should reject invalid names without namespace', () => {
+			registerBlockBindingsSource( {
+				name: 'wrong-name',
+			} );
+			expect( console ).toHaveErroredWith(
+				'Block bindings source name must contain a namespace and valid characters. Example: my-plugin/my-custom-source.'
+			);
+			expect( getBlockBindingsSource( 'wrong-name' ) ).toBeUndefined();
+		} );
+
+		// Check the label is correct.
+		it( 'should contain label property', () => {
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+			} );
+			expect( console ).toHaveErroredWith(
+				'Block bindings source must contain a label.'
+			);
+			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
+		} );
+
+		it( 'should reject invalid label', () => {
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 1,
+			} );
+			expect( console ).toHaveErroredWith(
+				'Block bindings source label must be a string.'
+			);
+			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
+		} );
+
+		// Check the `getValue` callback is correct.
+		it( 'should reject invalid getValue callback', () => {
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+				getValue: 'should be a function',
+			} );
+			expect( console ).toHaveErroredWith(
+				'Block bindings source getValue must be a function.'
+			);
+			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
+		} );
+
+		// Check the `setValue` callback is correct.
+		it( 'should reject invalid setValue callback', () => {
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+				setValue: 'should be a function',
+			} );
+			expect( console ).toHaveErroredWith(
+				'Block bindings source setValue must be a function.'
+			);
+			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
+		} );
+
+		// Check the `setValues` callback is correct.
+		it( 'should reject invalid setValues callback', () => {
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+				setValues: 'should be a function',
+			} );
+			expect( console ).toHaveErroredWith(
+				'Block bindings source setValues must be a function.'
+			);
+			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
+		} );
+
+		// Check the `getPlaceholder` callback is correct.
+		it( 'should reject invalid getPlaceholder callback', () => {
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+				getPlaceholder: 'should be a function',
+			} );
+			expect( console ).toHaveErroredWith(
+				'Block bindings source getPlaceholder must be a function.'
+			);
+			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
+		} );
+
+		// Check the `canUserEditValue` callback is correct.
+		it( 'should reject invalid canUserEditValue callback', () => {
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+				canUserEditValue: 'should be a function',
+			} );
+			expect( console ).toHaveErroredWith(
+				'Block bindings source canUserEditValue must be a function.'
+			);
+			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
+		} );
+
+		// Check correct sources are registered as expected.
+		it( 'should register a valid source', () => {
+			const sourceProperties = {
+				label: 'Valid Source',
+				getValue: () => 'value',
+				setValue: () => 'new value',
+				setValues: () => 'new values',
+				getPlaceholder: () => 'placeholder',
+				canUserEditValue: () => true,
+			};
+			registerBlockBindingsSource( {
+				name: 'core/valid-source',
+				...sourceProperties,
+			} );
+			expect( getBlockBindingsSource( 'core/valid-source' ) ).toEqual(
+				sourceProperties
+			);
+			unregisterBlockBindingsSource( 'core/valid-source' );
+		} );
+
+		it( 'should register a source with default values', () => {
+			registerBlockBindingsSource( {
+				name: 'core/valid-source',
+				label: 'Valid Source',
+			} );
+			const source = getBlockBindingsSource( 'core/valid-source' );
+			expect( source.getValue ).toBeUndefined();
+			expect( source.setValue ).toBeUndefined();
+			expect( source.setValues ).toBeUndefined();
+			expect( source.getPlaceholder ).toBeUndefined();
+			expect( source.canUserEditValue() ).toBe( false );
+			unregisterBlockBindingsSource( 'core/valid-source' );
+		} );
+
+		it( 'should reject registering the same source twice', () => {
+			const source = {
+				name: 'core/test-source',
+				label: 'Test Source',
+			};
+			registerBlockBindingsSource( source );
+			registerBlockBindingsSource( source );
+			unregisterBlockBindingsSource( 'core/test-source' );
+			expect( console ).toHaveErroredWith(
+				'Block bindings source "core/test-source" is already registered.'
+			);
+		} );
+	} );
+
+	describe( 'unregisterBlockBindingsSource', () => {
+		it( 'should remove an existing block bindings source', () => {
+			registerBlockBindingsSource( {
+				name: 'core/test-source',
+				label: 'Test Source',
+			} );
+			unregisterBlockBindingsSource( 'core/test-source' );
+			expect(
+				getBlockBindingsSource( 'core/test-source' )
+			).toBeUndefined();
+		} );
+
+		it( 'should reject removing a source that does not exist', () => {
+			unregisterBlockBindingsSource( 'core/non-existing-source' );
+			expect( console ).toHaveErroredWith(
+				'Block bindings source "core/non-existing-source" is not registered.'
+			);
 		} );
 	} );
 } );
