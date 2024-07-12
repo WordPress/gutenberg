@@ -24,6 +24,12 @@
 		"showSearchTerm": {
 			"type": "boolean",
 			"default": true
+		},
+		"searchResultsTerm": {
+			"type": "string"
+		},
+		"searchResultsTermSuffix": {
+			"type": "string"
 		}
 	},
 	"supports": {

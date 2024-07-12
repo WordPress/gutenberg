@@ -2,3 +2,7 @@
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;
 }
+div.wp-block-query-title__placeholder {
+	display: flex;
+	gap: 10px;
+}

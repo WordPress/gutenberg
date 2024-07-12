@@ -775,7 +775,7 @@ Display the query title. ([Source](https://github.com/WordPress/gutenberg/tree/t
 -	**Name:** core/query-title
 -	**Category:** theme
 -	**Supports:** align (full, wide), color (background, gradients, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** level, showPrefix, showSearchTerm, textAlign, type
+-	**Attributes:** level, searchResultsTerm, searchResultsTermSuffix, showPrefix, showSearchTerm, textAlign, type
 
 ## Quote
 

@@ -14,6 +14,7 @@ import {
 	Warning,
 	HeadingLevelDropdown,
 	store as blockEditorStore,
+	RichText,
 } from '@wordpress/block-editor';
 import { ToggleControl, PanelBody } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
@@ -22,7 +23,15 @@ import { useSelect } from '@wordpress/data';
 const SUPPORTED_TYPES = [ 'archive', 'search' ];
 
 export default function QueryTitleEdit( {
-	attributes: { type, level, textAlign, showPrefix, showSearchTerm },
+	attributes: {
+		type,
+		level,
+		textAlign,
+		showPrefix,
+		showSearchTerm,
+		searchResultsTerm,
+		searchResultsTermSuffix,
+	},
 	setAttributes,
 } ) {
 	const { archiveTypeTitle, archiveNameLabel } = useSelect( ( select ) => {
@@ -123,11 +132,40 @@ export default function QueryTitleEdit( {
 					</PanelBody>
 				</InspectorControls>
 
-				<TagName { ...blockProps }>
-					{ showSearchTerm
-						? __( 'Search results for: “search term”' )
-						: __( 'Search results' ) }
-				</TagName>
+				{ showSearchTerm ? (
+					<div { ...blockProps }>
+						<RichText
+							tagName={ `h${ level }` }
+							value={ searchResultsTerm }
+							onChange={ ( content ) =>
+								setAttributes( { searchResultsTerm: content } )
+							}
+							placeholder={ __( 'Search Results for:' ) }
+						/>
+						<TagName>{ __( 'Search Term' ) }</TagName>
+						<RichText
+							tagName={ `h${ level }` }
+							value={ searchResultsTermSuffix }
+							onChange={ ( content ) =>
+								setAttributes( {
+									searchResultsTermSuffix: content,
+								} )
+							}
+							placeholder={ __( 'Suffix' ) }
+						/>
+					</div>
+				) : (
+					<RichText
+						{ ...blockProps }
+						tagName={ `h${ level }` }
+						value={ searchResultsTerm }
+						allowedFormats={ [] }
+						onChange={ ( content ) =>
+							setAttributes( { searchResultsTerm: content } )
+						}
+						placeholder={ __( 'Search Results' ) }
+					/>
+				) }
 			</>
 		);
 	}
