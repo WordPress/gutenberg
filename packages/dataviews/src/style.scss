@@ -244,6 +244,12 @@
 	}
 }
 
+.dataviews-view-table__cell-content-wrapper:empty,
+.dataviews-view-grid__field-value:empty,
+.dataviews-view-grid__field:empty {
+	display: none;
+}
+
 .dataviews-view-list__primary-field,
 .dataviews-view-grid__primary-field,
 .dataviews-view-table__primary-field {
