@@ -377,7 +377,7 @@ const { state, actions, callbacks } = store(
 				// In the case of an image with object-fit: contain, the size of the
 				// <img> element can be larger than the image itself, so it needs to
 				// calculate where to place the button.
-				if ( ctx.scaleAttr === 'contain' ) {
+				if ( state.metadata[ imageId ].scaleAttr === 'contain' ) {
 					// Natural ratio of the image.
 					const naturalRatio = naturalWidth / naturalHeight;
 					// Offset ratio of the image.
