@@ -25,42 +25,39 @@ function UnconnectedNavigatorToParentButton(
 }
 
 /*
- * The `NavigatorToParentButton` component can be used to navigate to a screen and
- * should be used in combination with the `NavigatorProvider`, the
- * `NavigatorScreen` and the `NavigatorButton` components (or the `useNavigator`
+ * The `Navigator.ToParentButton` component can be used to navigate to a screen and
+ * should be used in combination with the `NavigatorProvider` (also aliased as `Navigator`),
+ * the `Navigator.Screen` and the `Navigator.Button` components (or the `useNavigator`
  * hook).
  *
  * @example
  * ```jsx
  * import {
- *   __experimentalNavigatorProvider as NavigatorProvider,
- *   __experimentalNavigatorScreen as NavigatorScreen,
- *   __experimentalNavigatorButton as NavigatorButton,
- *   __experimentalNavigatorToParentButton as NavigatorToParentButton,
+ *   Navigator,
  * } from '@wordpress/components';
  *
  * const MyNavigation = () => (
- *   <NavigatorProvider initialPath="/">
- *     <NavigatorScreen path="/">
+ *   <Navigator.Root initialPath="/">
+ *     <Navigator.Screen path="/">
  *       <p>This is the home screen.</p>
- *        <NavigatorButton path="/child">
+ *        <Navigator.Button path="/child">
  *          Navigate to child screen.
- *       </NavigatorButton>
- *     </NavigatorScreen>
+ *       </Navigator.Button>
+ *     </Navigator.Screen>
  *
- *     <NavigatorScreen path="/child">
+ *     <Navigator.Screen path="/child">
  *       <p>This is the child screen.</p>
- *       <NavigatorToParentButton>
+ *       <Navigator.ToParentButton>
  *         Go to parent
- *       </NavigatorToParentButton>
- *     </NavigatorScreen>
- *   </NavigatorProvider>
+ *       </Navigator.ToParentButton>
+ *     </Navigator.Screen>
+ *   </Navigator.Root>
  * );
  * ```
  */
 export const NavigatorToParentButton = contextConnect(
 	UnconnectedNavigatorToParentButton,
-	'NavigatorToParentButton'
+	'Navigator.ToParentButton'
 );
 
 export default NavigatorToParentButton;

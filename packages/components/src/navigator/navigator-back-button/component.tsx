@@ -22,42 +22,39 @@ function UnconnectedNavigatorBackButton(
 }
 
 /**
- * The `NavigatorBackButton` component can be used to navigate to a screen and
- * should be used in combination with the `NavigatorProvider`, the
- * `NavigatorScreen` and the `NavigatorButton` components (or the `useNavigator`
+ * The `Navigator.BackButton` component can be used to navigate to a screen and
+ * should be used in combination with the `NavigatorProvider` (also aliased as `Navigator`),
+ * the `Navigator.Screen` and the `Navigator.Button` components (or the `useNavigator`
  * hook).
  *
  * @example
  * ```jsx
  * import {
- *   __experimentalNavigatorProvider as NavigatorProvider,
- *   __experimentalNavigatorScreen as NavigatorScreen,
- *   __experimentalNavigatorButton as NavigatorButton,
- *   __experimentalNavigatorBackButton as NavigatorBackButton,
+ *   Navigator,
  * } from '@wordpress/components';
  *
  * const MyNavigation = () => (
- *   <NavigatorProvider initialPath="/">
- *     <NavigatorScreen path="/">
+ *   <Navigator.Root initialPath="/">
+ *     <Navigator.Screen path="/">
  *       <p>This is the home screen.</p>
- *        <NavigatorButton path="/child">
+ *        <Navigator.Button path="/child">
  *          Navigate to child screen.
- *       </NavigatorButton>
- *     </NavigatorScreen>
+ *       </Navigator.Button>
+ *     </Navigator.Screen>
  *
- *     <NavigatorScreen path="/child">
+ *     <Navigator.Screen path="/child">
  *       <p>This is the child screen.</p>
- *       <NavigatorBackButton>
+ *       <Navigator.BackButton>
  *         Go back
- *       </NavigatorBackButton>
- *     </NavigatorScreen>
- *   </NavigatorProvider>
+ *       </Navigator.BackButton>
+ *     </Navigator.Screen>
+ *   </Navigator.Root>
  * );
  * ```
  */
 export const NavigatorBackButton = contextConnect(
 	UnconnectedNavigatorBackButton,
-	'NavigatorBackButton'
+	'Navigator.BackButton'
 );
 
 export default NavigatorBackButton;

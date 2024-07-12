@@ -1,47 +1,38 @@
 # `NavigatorProvider`
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
-
-The `NavigatorProvider` component allows rendering nested views/panels/menus (via the [`NavigatorScreen` component](/packages/components/src/navigator/navigator-screen/README.md)) and navigate between these different states (via the [`NavigatorButton`](/packages/components/src/navigator/navigator-button/README.md), [`NavigatorToParentButton`](/packages/components/src/navigator/navigator-to-parent-button/README.md) and [`NavigatorBackButton`](/packages/components/src/navigator/navigator-back-button/README.md) components or the `useNavigator` hook). The Global Styles sidebar is an example of this.
+The `NavigatorProvider` (also aliased as `Navigator`) component allows rendering nested views/panels/menus (via the [`Navigator.Screen` component](/packages/components/src/navigator/navigator-screen/README.md)) and navigate between these different states (via the [`Navigator.Button`](/packages/components/src/navigator/navigator-button/README.md), [`Navigator.ToParentButton`](/packages/components/src/navigator/navigator-to-parent-button/README.md) and [`Navigator.BackButton`](/packages/components/src/navigator/navigator-back-button/README.md) components or the `useNavigator` hook). The Global Styles sidebar is an example of this.
 
 ## Usage
 
 ```jsx
-import {
-  __experimentalNavigatorProvider as NavigatorProvider,
-  __experimentalNavigatorScreen as NavigatorScreen,
-  __experimentalNavigatorButton as NavigatorButton,
-  __experimentalNavigatorToParentButton as NavigatorToParentButton,
-} from '@wordpress/components';
+import { Navigator } from '@wordpress/components';
 
 const MyNavigation = () => (
-  <NavigatorProvider initialPath="/">
-    <NavigatorScreen path="/">
-      <p>This is the home screen.</p>
-       <NavigatorButton path="/child">
-         Navigate to child screen.
-      </NavigatorButton>
-    </NavigatorScreen>
+	<Navigator.Root initialPath="/">
+		<Navigator.Screen path="/">
+			<p>This is the home screen.</p>
+			<Navigator.Button path="/child">
+				Navigate to child screen.
+			</Navigator.Button>
+		</Navigator.Screen>
 
-    <NavigatorScreen path="/child">
-      <p>This is the child screen.</p>
-      <NavigatorToParentButton>
-        Go back
-      </NavigatorToParentButton>
-    </NavigatorScreen>
-  </NavigatorProvider>
+		<Navigator.Screen path="/child">
+			<p>This is the child screen.</p>
+			<Navigator.ToParentButton>Go back</Navigator.ToParentButton>
+		</Navigator.Screen>
+	</Navigator.Root>
 );
 ```
+
 **Important note**
 
 Parent/child navigation only works if the path you define are hierarchical, following a URL-like scheme where each path segment is separated by the `/` character.
 For example:
-- `/` is the root of all paths. There should always be a screen with `path="/"`.
-- `/parent/child` is a child of `/parent`.
-- `/parent/child/grand-child` is a child of `/parent/child`.
-- `/parent/:param` is a child of `/parent` as well.
+
+-   `/` is the root of all paths. There should always be a screen with `path="/"`.
+-   `/parent/child` is a child of `/parent`.
+-   `/parent/child/grand-child` is a child of `/parent/child`.
+-   `/parent/:param` is a child of `/parent` as well.
 
 ## Props
 
@@ -65,8 +56,8 @@ The `goTo` function allows navigating to a given path. The second argument can a
 
 The available options are:
 
-- `focusTargetSelector`: `string`. An optional property used to specify the CSS selector used to restore focus on the matching element when navigating back.
-- `isBack`: `boolean`. An optional property used to specify whether the navigation should be considered as backwards (thus enabling focus restoration when possible, and causing the animation to be backwards too)
+-   `focusTargetSelector`: `string`. An optional property used to specify the CSS selector used to restore focus on the matching element when navigating back.
+-   `isBack`: `boolean`. An optional property used to specify whether the navigation should be considered as backwards (thus enabling focus restoration when possible, and causing the animation to be backwards too)
 
 ### `goToParent`: `() => void;`
 
@@ -84,9 +75,9 @@ The `goBack` function allows navigating to the previous path.
 
 The `location` object represent the current location, and has a few properties:
 
-- `path`: `string`. The path associated to the location.
-- `isBack`: `boolean`. A flag that is `true` when the current location was reached by navigating backwards in the location stack.
-- `isInitial`: `boolean`. A flag that is `true` only for the first (root) location in the location stack.
+-   `path`: `string`. The path associated to the location.
+-   `isBack`: `boolean`. A flag that is `true` when the current location was reached by navigating backwards in the location stack.
+-   `isInitial`: `boolean`. A flag that is `true` only for the first (root) location in the location stack.
 
 ### `params`: `Record< string, string | string[] >`
 

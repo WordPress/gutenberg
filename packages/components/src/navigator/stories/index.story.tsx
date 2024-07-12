@@ -10,20 +10,19 @@ import Button from '../../button';
 import { Card, CardBody, CardFooter, CardHeader } from '../../card';
 import { VStack } from '../../v-stack';
 import Dropdown from '../../dropdown';
-import {
-	NavigatorProvider,
-	NavigatorScreen,
-	NavigatorButton,
-	NavigatorBackButton,
-	NavigatorToParentButton,
-	useNavigator,
-} from '..';
+import { Navigator, useNavigator } from '..';
 
-const meta: Meta< typeof NavigatorProvider > = {
-	component: NavigatorProvider,
-	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
-	subcomponents: { NavigatorScreen, NavigatorButton, NavigatorBackButton },
-	title: 'Components (Experimental)/Navigator',
+const meta: Meta< typeof Navigator.Root > = {
+	component: Navigator.Root,
+	subcomponents: {
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		'Navigator.Screen': Navigator.Screen,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		'Navigator.Button': Navigator.Button,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		'Navigator.BackButton': Navigator.BackButton,
+	},
+	title: 'Components/Navigator',
 	argTypes: {
 		as: { control: { type: null } },
 		children: { control: { type: null } },
@@ -36,38 +35,35 @@ const meta: Meta< typeof NavigatorProvider > = {
 };
 export default meta;
 
-const Template: StoryFn< typeof NavigatorProvider > = ( {
-	style,
-	...props
-} ) => (
-	<NavigatorProvider
+const Template: StoryFn< typeof Navigator.Root > = ( { style, ...props } ) => (
+	<Navigator.Root
 		style={ { ...style, height: '100vh', maxHeight: '450px' } }
 		{ ...props }
 	>
-		<NavigatorScreen path="/">
+		<Navigator.Screen path="/">
 			<Card>
 				<CardBody>
 					<p>This is the home screen.</p>
 
 					<VStack alignment="left">
-						<NavigatorButton variant="secondary" path="/child">
+						<Navigator.Button variant="secondary" path="/child">
 							Navigate to child screen.
-						</NavigatorButton>
+						</Navigator.Button>
 
-						<NavigatorButton
+						<Navigator.Button
 							variant="secondary"
 							path="/overflow-child"
 						>
 							Navigate to screen with horizontal overflow.
-						</NavigatorButton>
+						</Navigator.Button>
 
-						<NavigatorButton variant="secondary" path="/stickies">
+						<Navigator.Button variant="secondary" path="/stickies">
 							Navigate to screen with sticky content.
-						</NavigatorButton>
+						</Navigator.Button>
 
-						<NavigatorButton variant="secondary" path="/product/1">
+						<Navigator.Button variant="secondary" path="/product/1">
 							Navigate to product screen with id 1.
-						</NavigatorButton>
+						</Navigator.Button>
 
 						<Dropdown
 							renderToggle={ ( {
@@ -96,25 +92,25 @@ const Template: StoryFn< typeof NavigatorProvider > = ( {
 					</VStack>
 				</CardBody>
 			</Card>
-		</NavigatorScreen>
+		</Navigator.Screen>
 
-		<NavigatorScreen path="/child">
+		<Navigator.Screen path="/child">
 			<Card>
 				<CardBody>
 					<p>This is the child screen.</p>
-					<NavigatorBackButton variant="secondary">
+					<Navigator.BackButton variant="secondary">
 						Go back
-					</NavigatorBackButton>
+					</Navigator.BackButton>
 				</CardBody>
 			</Card>
-		</NavigatorScreen>
+		</Navigator.Screen>
 
-		<NavigatorScreen path="/overflow-child">
+		<Navigator.Screen path="/overflow-child">
 			<Card>
 				<CardBody>
-					<NavigatorBackButton variant="secondary">
+					<Navigator.BackButton variant="secondary">
 						Go back
-					</NavigatorBackButton>
+					</Navigator.BackButton>
 					<div
 						style={ {
 							display: 'inline-block',
@@ -133,14 +129,14 @@ const Template: StoryFn< typeof NavigatorProvider > = ( {
 					</div>
 				</CardBody>
 			</Card>
-		</NavigatorScreen>
+		</Navigator.Screen>
 
-		<NavigatorScreen path="/stickies">
+		<Navigator.Screen path="/stickies">
 			<Card>
 				<CardHeader style={ getStickyStyles( { zIndex: 2 } ) }>
-					<NavigatorBackButton variant="secondary">
+					<Navigator.BackButton variant="secondary">
 						Go back
-					</NavigatorBackButton>
+					</Navigator.BackButton>
 				</CardHeader>
 				<CardBody>
 					<div
@@ -172,15 +168,15 @@ const Template: StoryFn< typeof NavigatorProvider > = ( {
 					<Button variant="primary">Primary noop</Button>
 				</CardFooter>
 			</Card>
-		</NavigatorScreen>
+		</Navigator.Screen>
 
-		<NavigatorScreen path="/product/:id">
+		<Navigator.Screen path="/product/:id">
 			<ProductDetails />
-		</NavigatorScreen>
-	</NavigatorProvider>
+		</Navigator.Screen>
+	</Navigator.Root>
 );
 
-export const Default: StoryFn< typeof NavigatorProvider > = Template.bind( {} );
+export const Default: StoryFn< typeof Navigator.Root > = Template.bind( {} );
 Default.args = {
 	initialPath: '/',
 };
@@ -225,75 +221,75 @@ function ProductDetails() {
 	return (
 		<Card>
 			<CardBody>
-				<NavigatorBackButton variant="secondary">
+				<Navigator.BackButton variant="secondary">
 					Go back
-				</NavigatorBackButton>
+				</Navigator.BackButton>
 				<p>This is the screen for the product with id: { params.id }</p>
 			</CardBody>
 		</Card>
 	);
 }
 
-const NestedNavigatorTemplate: StoryFn< typeof NavigatorProvider > = ( {
+const NestedNavigatorTemplate: StoryFn< typeof Navigator.Root > = ( {
 	style,
 	...props
 } ) => (
-	<NavigatorProvider
+	<Navigator.Root
 		style={ { ...style, height: '100vh', maxHeight: '450px' } }
 		{ ...props }
 	>
-		<NavigatorScreen path="/">
+		<Navigator.Screen path="/">
 			<Card>
 				<CardBody>
-					<NavigatorButton variant="secondary" path="/child1">
+					<Navigator.Button variant="secondary" path="/child1">
 						Go to first child.
-					</NavigatorButton>
-					<NavigatorButton variant="secondary" path="/child2">
+					</Navigator.Button>
+					<Navigator.Button variant="secondary" path="/child2">
 						Go to second child.
-					</NavigatorButton>
+					</Navigator.Button>
 				</CardBody>
 			</Card>
-		</NavigatorScreen>
-		<NavigatorScreen path="/child1">
+		</Navigator.Screen>
+		<Navigator.Screen path="/child1">
 			<Card>
 				<CardBody>
 					This is the first child
-					<NavigatorToParentButton variant="secondary">
+					<Navigator.ToParentButton variant="secondary">
 						Go back to parent
-					</NavigatorToParentButton>
+					</Navigator.ToParentButton>
 				</CardBody>
 			</Card>
-		</NavigatorScreen>
-		<NavigatorScreen path="/child2">
+		</Navigator.Screen>
+		<Navigator.Screen path="/child2">
 			<Card>
 				<CardBody>
 					This is the second child
-					<NavigatorToParentButton variant="secondary">
+					<Navigator.ToParentButton variant="secondary">
 						Go back to parent
-					</NavigatorToParentButton>
-					<NavigatorButton
+					</Navigator.ToParentButton>
+					<Navigator.Button
 						variant="secondary"
 						path="/child2/grandchild"
 					>
 						Go to grand child.
-					</NavigatorButton>
+					</Navigator.Button>
 				</CardBody>
 			</Card>
-		</NavigatorScreen>
-		<NavigatorScreen path="/child2/grandchild">
+		</Navigator.Screen>
+		<Navigator.Screen path="/child2/grandchild">
 			<Card>
 				<CardBody>
 					This is the grand child
-					<NavigatorToParentButton variant="secondary">
+					<Navigator.ToParentButton variant="secondary">
 						Go back to parent
-					</NavigatorToParentButton>
+					</Navigator.ToParentButton>
 				</CardBody>
 			</Card>
-		</NavigatorScreen>
-	</NavigatorProvider>
+		</Navigator.Screen>
+	</Navigator.Root>
 );
 
-export const NestedNavigator: StoryFn< typeof NavigatorProvider > =
+export const NestedNavigator: StoryFn< typeof Navigator.Root > =
 	NestedNavigatorTemplate.bind( {} );
 NestedNavigator.args = {
 	initialPath: '/child2/grandchild',
@@ -303,7 +299,7 @@ const NavigatorButtonWithSkipFocus = ( {
 	path,
 	onClick,
 	...props
-}: React.ComponentProps< typeof NavigatorButton > ) => {
+}: React.ComponentProps< typeof Navigator.Button > ) => {
 	const { goTo } = useNavigator();
 
 	return (
@@ -317,8 +313,8 @@ const NavigatorButtonWithSkipFocus = ( {
 	);
 };
 
-export const SkipFocus: StoryFn< typeof NavigatorProvider > = ( args ) => {
-	return <NavigatorProvider { ...args } />;
+export const SkipFocus: StoryFn< typeof Navigator.Root > = ( args ) => {
+	return <Navigator.Root { ...args } />;
 };
 SkipFocus.args = {
 	initialPath: '/',
@@ -330,28 +326,28 @@ SkipFocus.args = {
 					border: '1px solid black',
 				} }
 			>
-				<NavigatorScreen
+				<Navigator.Screen
 					path="/"
 					style={ {
 						height: '100%',
 					} }
 				>
 					<h1>Home screen</h1>
-					<NavigatorButton variant="secondary" path="/child">
+					<Navigator.Button variant="secondary" path="/child">
 						Go to child screen.
-					</NavigatorButton>
-				</NavigatorScreen>
-				<NavigatorScreen
+					</Navigator.Button>
+				</Navigator.Screen>
+				<Navigator.Screen
 					path="/child"
 					style={ {
 						height: '100%',
 					} }
 				>
 					<h2>Child screen</h2>
-					<NavigatorToParentButton variant="secondary">
+					<Navigator.ToParentButton variant="secondary">
 						Go to parent screen.
-					</NavigatorToParentButton>
-				</NavigatorScreen>
+					</Navigator.ToParentButton>
+				</Navigator.Screen>
 			</div>
 
 			<NavigatorButtonWithSkipFocus

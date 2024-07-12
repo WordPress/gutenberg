@@ -162,6 +162,11 @@
 
 -   `FontSizerPicker`: Improve docs for default units ([#60996](https://github.com/WordPress/gutenberg/pull/60996)).
 
+### Deprecation
+
+-   `Navigator`: Remove "experimental" designation ([#60927](https://github.com/WordPress/gutenberg/pull/60927)).
+-   `Navigator`: Group all related children as properties in the root component `NavigatorProvider` and add a `Navigator` alias for it ([#60926](https://github.com/WordPress/gutenberg/pull/60926)).
+
 ## 27.4.0 (2024-04-19)
 
 ### Deprecations
