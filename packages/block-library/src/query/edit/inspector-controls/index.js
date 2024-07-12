@@ -159,7 +159,7 @@ export default function QueryInspectorControls( props ) {
 						/>
 					) }
 					{ showPostTypeControl &&
-						( ( postTypesSelectOptions.length > 2 && (
+						( postTypesSelectOptions.length > 2 ? (
 							<SelectControl
 								__nextHasNoMarginBottom
 								__next40pxDefaultSize
@@ -169,7 +169,7 @@ export default function QueryInspectorControls( props ) {
 								onChange={ onPostTypeChange }
 								help={ postTypeControlHelp }
 							/>
-						) ) || (
+						) : (
 							<ToggleGroupControl
 								__nextHasNoMarginBottom
 								__next40pxDefaultSize
