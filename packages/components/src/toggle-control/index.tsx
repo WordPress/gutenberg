@@ -91,7 +91,7 @@ export function ToggleControl(
 			className={ classes }
 			__nextHasNoMarginBottom
 		>
-			<HStack justify="flex-start" spacing={ 3 }>
+			<HStack justify="flex-start" spacing={ 2 }>
 				<FormToggle
 					id={ id }
 					checked={ checked }
