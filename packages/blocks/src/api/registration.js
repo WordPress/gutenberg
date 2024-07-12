@@ -890,3 +890,46 @@ export const registerBlockBindingsSource = ( source ) => {
 
 	return unlock( dispatch( blocksStore ) ).addBlockBindingsSource( source );
 };
+
+/**
+ * Unregisters a block bindings source
+ *
+ * @param {string} name The name of the block bindings source to unregister.
+ *
+ * @example
+ * ```js
+ * import { unregisterBlockBindingsSource } from '@wordpress/blocks';
+ *
+ * unregisterBlockBindingsSource( 'plugin/my-custom-source' );
+ * ```
+ */
+export function unregisterBlockBindingsSource( name ) {
+	const oldSource = getBlockBindingsSource( name );
+	if ( ! oldSource ) {
+		console.error(
+			'Block bindings source "' + name + '" is not registered.'
+		);
+		return;
+	}
+	unlock( dispatch( blocksStore ) ).removeBlockBindings( name );
+}
+
+/**
+ * Returns a registered block bindings source.
+ *
+ * @param {string} name Block bindings source name.
+ *
+ * @return {?Object} Block bindings source.
+ */
+export function getBlockBindingsSource( name ) {
+	return unlock( select( blocksStore ) ).getBlockBindingsSource( name );
+}
+
+/**
+ * Returns all registered block bindings sources.
+ *
+ * @return {Array} Block bindings sources.
+ */
+export function getBlockBindingsSources() {
+	return unlock( select( blocksStore ) ).getAllBlockBindingsSources();
+}
