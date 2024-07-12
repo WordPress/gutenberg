@@ -192,7 +192,6 @@ export function CommandMenu() {
 	);
 	const { open, close } = useDispatch( commandsStore );
 	const [ loaders, setLoaders ] = useState( {} );
-	const commandListRef = useRef();
 
 	useEffect( () => {
 		registerShortcut( {
@@ -277,10 +276,7 @@ export function CommandMenu() {
 						/>
 						<Icon icon={ inputIcon } />
 					</div>
-					<Command.List
-						ref={ commandListRef }
-						label={ __( 'Command suggestions' ) }
-					>
+					<Command.List label={ __( 'Command suggestions' ) }>
 						{ search && ! isLoading && (
 							<Command.Empty>
 								{ __( 'No results found.' ) }
