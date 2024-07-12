@@ -10,12 +10,14 @@
 		vertical-align: bottom;
 		box-sizing: border-box;
 
-		&.hide {
-			visibility: hidden;
-		}
+		@media (prefers-reduced-motion: no-preference) {
+			&.hide {
+				visibility: hidden;
+			}
 
-		&.show {
-			animation: show-content-image 0.4s;
+			&.show {
+				animation: show-content-image 0.4s;
+			}
 		}
 	}
 
