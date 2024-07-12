@@ -89,7 +89,6 @@ describe.each( [
 			<Component options={ timezones } label={ defaultLabelText } />
 		);
 		const label = getLabel( defaultLabelText );
-		expect( label ).toBeInTheDocument();
 		expect( label ).toBeVisible();
 	} );
 
@@ -318,35 +317,8 @@ describe.each( [
 
 		const resetButton = screen.getByRole( 'button', { name: 'Reset' } );
 
-		expect( resetButton ).toBeInTheDocument();
 		expect( resetButton ).toBeVisible();
 		expect( resetButton ).toBeDisabled();
-	} );
-
-	it( 'should render with Reset button enabled after option selection', async () => {
-		const user = await userEvent.setup();
-		const targetOption = timezones[ 13 ];
-
-		render(
-			<Component
-				options={ timezones }
-				label={ defaultLabelText }
-				allowReset
-			/>
-		);
-
-		// Pressing tab selects the input and shows the options.
-		await user.tab();
-		// Type enough characters to ensure a predictable search result.
-		await user.keyboard( getOptionSearchString( targetOption ) );
-		// Pressing Enter/Return selects the currently focused option.
-		await user.keyboard( '{Enter}' );
-
-		const resetButton = screen.getByRole( 'button', { name: 'Reset' } );
-
-		expect( resetButton ).toBeInTheDocument();
-		expect( resetButton ).toBeVisible();
-		expect( resetButton ).toBeEnabled();
 	} );
 
 	it( 'should reset input when clicking the Reset button', async () => {
@@ -373,6 +345,9 @@ describe.each( [
 		expect( input ).toHaveValue( targetOption.label );
 
 		const resetButton = screen.getByRole( 'button', { name: 'Reset' } );
+
+		expect( resetButton ).toBeEnabled();
+
 		await user.click( resetButton );
 
 		expect( input ).toHaveValue( '' );
@@ -408,6 +383,7 @@ describe.each( [
 
 		const resetButton = screen.getByRole( 'button', { name: 'Reset' } );
 
+		// If the button has focus that implies it is enabled.
 		expect( resetButton ).toHaveFocus();
 
 		// Pressing Enter/Return resets the input.
@@ -446,10 +422,11 @@ describe.each( [
 
 		const resetButton = screen.getByRole( 'button', { name: 'Reset' } );
 
+		// If the button has focus that implies it is enabled.
 		expect( resetButton ).toHaveFocus();
 
 		// Pressing Spacebar resets the input.
-		await user.keyboard( ' ' );
+		await user.keyboard( '[Space]' );
 
 		expect( input ).toHaveValue( '' );
 		expect( resetButton ).toBeDisabled();
