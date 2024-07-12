@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ReactElement, ReactNode } from 'react';
+import type { ReactElement, ComponentType } from 'react';
 
 /**
  * Internal dependencies
@@ -73,7 +73,7 @@ export type Field< Item > = {
 	/**
 	 * Callback used to render the field. Defaults to `field.getValue`.
 	 */
-	render?: ( args: { item: Item } ) => ReactNode;
+	render?: ComponentType< { item: Item } >;
 
 	/**
 	 * Whether the field is sortable.
@@ -118,7 +118,7 @@ export type Field< Item > = {
 export type NormalizedField< Item > = Field< Item > & {
 	header: string;
 	getValue: ( args: { item: Item } ) => any;
-	render: ( args: { item: Item } ) => ReactNode;
+	render: ComponentType< { item: Item } >;
 };
 
 /**

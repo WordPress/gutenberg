@@ -107,13 +107,13 @@ export const DropdownMenu = styled( Ariakit.Menu )<
 	/* Default animation.*/
 	animation-name: ${ slideDownAndFade };
 
-	&[data-side='right'] {
+	&[data-side='left'] {
 		animation-name: ${ slideLeftAndFade };
 	}
-	&[data-side='bottom'] {
+	&[data-side='up'] {
 		animation-name: ${ slideUpAndFade };
 	}
-	&[data-side='left'] {
+	&[data-side='right'] {
 		animation-name: ${ slideRightAndFade };
 	}
 	@media ( prefers-reduced-motion ) {
