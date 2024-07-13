@@ -703,6 +703,10 @@ $block-inserter-tabs-height: 44px;
 			height: 100%;
 		}
 	}
+
+	.block-editor-inserter__category-panel {
+		box-shadow: none;
+	}
 }
 
 .show-icon-labels {
