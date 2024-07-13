@@ -55,8 +55,7 @@ body:
           label: Please confirm that you have searched existing issues in the repo.
           description: You can do this by searching https://github.com/WordPress/gutenberg/issues and making sure the bug is not related to another plugin.
           options:
-              - 'Yes'
-              - 'No'
+              - label: 'Yes'
       validations:
           required: true
 
@@ -65,7 +64,6 @@ body:
       attributes:
           label: Please confirm that you have tested with all plugins deactivated except Gutenberg.
           options:
-              - 'Yes'
-              - 'No'
+              - label: 'Yes'
       validations:
           required: true
