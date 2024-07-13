@@ -56,8 +56,7 @@ body:
           description: You can do this by searching https://github.com/WordPress/gutenberg/issues and making sure the bug is not related to another plugin.
           options:
               - label: 'Yes'
-      validations:
-          required: true
+              - required: true
 
     - type: checkboxes
       id: plugins
@@ -65,5 +64,4 @@ body:
           label: Please confirm that you have tested with all plugins deactivated except Gutenberg.
           options:
               - label: 'Yes'
-      validations:
-          required: true
+              - required: true
