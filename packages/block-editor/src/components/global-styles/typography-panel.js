@@ -8,7 +8,7 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useCallback, useMemo, useEffect, useRef } from '@wordpress/element';
+import { useCallback, useMemo, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -185,7 +185,6 @@ export default function TypographyPanel( {
 	// Font Family
 	const hasFontFamilyEnabled = useHasFontFamilyControl( settings );
 	const fontFamily = decodeValue( inheritedValue?.typography?.fontFamily );
-	const previousFontFamily = useRef( fontFamily );
 	const { fontFamilies, fontFamilyFaces } = useMemo( () => {
 		return getMergedFontFamiliesAndFontFamilyFaces( settings, fontFamily );
 	}, [ settings, fontFamily ] );
@@ -236,18 +235,26 @@ export default function TypographyPanel( {
 	const hasFontWeights = settings?.typography?.fontWeight;
 	const fontStyle = decodeValue( inheritedValue?.typography?.fontStyle );
 	const fontWeight = decodeValue( inheritedValue?.typography?.fontWeight );
+	const { nearestFontStyle, nearestFontWeight } = findNearestStyleAndWeight(
+		fontFamilyFaces,
+		fontStyle,
+		fontWeight
+	);
 	const setFontAppearance = useCallback(
 		( { fontStyle: newFontStyle, fontWeight: newFontWeight } ) => {
-			onChange( {
-				...value,
-				typography: {
-					...value?.typography,
-					fontStyle: newFontStyle || undefined,
-					fontWeight: newFontWeight || undefined,
-				},
-			} );
+			// Only update the font style and weight if they have changed.
+			if ( newFontStyle !== fontStyle || newFontWeight !== fontWeight ) {
+				onChange( {
+					...value,
+					typography: {
+						...value?.typography,
+						fontStyle: newFontStyle || undefined,
+						fontWeight: newFontWeight || undefined,
+					},
+				} );
+			}
 		},
-		[ value, onChange ]
+		[ fontStyle, fontWeight, onChange, value ]
 	);
 	const hasFontAppearance = () =>
 		!! value?.typography?.fontStyle || !! value?.typography?.fontWeight;
@@ -257,31 +264,18 @@ export default function TypographyPanel( {
 
 	// Check if previous font style and weight values are available in the new font family.
 	useEffect( () => {
-		if ( fontFamily !== previousFontFamily.current ) {
-			const { nearestFontStyle, nearestFontWeight } =
-				findNearestStyleAndWeight(
-					fontFamilyFaces,
-					fontStyle,
-					fontWeight
-				);
-
-			if ( nearestFontStyle && nearestFontWeight ) {
-				setFontAppearance( {
-					fontStyle: nearestFontStyle,
-					fontWeight: nearestFontWeight,
-				} );
-			} else {
-				// Reset font appearance if there are no available styles or weights.
-				resetFontAppearance();
-			}
-
-			previousFontFamily.current = fontFamily;
+		if ( nearestFontStyle && nearestFontWeight ) {
+			setFontAppearance( {
+				fontStyle: nearestFontStyle,
+				fontWeight: nearestFontWeight,
+			} );
+		} else {
+			// Reset font appearance if there are no available styles or weights.
+			resetFontAppearance();
 		}
 	}, [
-		fontFamily,
-		fontFamilyFaces,
-		fontStyle,
-		fontWeight,
+		nearestFontStyle,
+		nearestFontWeight,
 		resetFontAppearance,
 		setFontAppearance,
 	] );
