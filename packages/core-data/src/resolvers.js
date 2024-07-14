@@ -201,6 +201,10 @@ export const getEntityRecord =
 							permissionKey,
 							permissions[ action ]
 						);
+						dispatch.finishResolution( 'canUser', [
+							action,
+							{ kind, name, id: key },
+						] );
 					}
 				} );
 			}
