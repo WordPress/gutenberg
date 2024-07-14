@@ -172,7 +172,7 @@ function InstalledFonts() {
 								{ baseThemeFonts.length > 0 && (
 									<VStack>
 										<h2 className="font-library-modal__fonts-title">
-											{ __( 'Theme Fonts' ) }
+											{ __( 'Theme' ) }
 										</h2>
 										{ /*
 										 * Disable reason: The `list` ARIA role is redundant but
@@ -209,7 +209,7 @@ function InstalledFonts() {
 								{ baseCustomFonts.length > 0 && (
 									<VStack>
 										<h2 className="font-library-modal__fonts-title">
-											{ __( 'Custom fonts' ) }
+											{ __( 'Custom' ) }
 										</h2>
 										{ /*
 										 * Disable reason: The `list` ARIA role is redundant but
