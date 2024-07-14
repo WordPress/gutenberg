@@ -9,10 +9,11 @@ import type { ChangeEvent } from 'react';
 import {
 	Button,
 	privateApis as componentsPrivateApis,
+	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { memo } from '@wordpress/element';
-import { settings } from '@wordpress/icons';
+import { cog } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -20,7 +21,7 @@ import { settings } from '@wordpress/icons';
 import { unlock } from './lock-unlock';
 import { SORTING_DIRECTIONS, sortLabels } from './constants';
 import { VIEW_LAYOUTS } from './layouts';
-import type { AnyItem, NormalizedField, View } from './types';
+import type { NormalizedField, View, SupportedLayouts } from './types';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -34,7 +35,7 @@ const {
 interface ViewTypeMenuProps {
 	view: View;
 	onChangeView: ( view: View ) => void;
-	supportedLayouts?: string[];
+	defaultLayouts?: SupportedLayouts;
 }
 
 interface PageSizeMenuProps {
@@ -42,84 +43,64 @@ interface PageSizeMenuProps {
 	onChangeView: ( view: View ) => void;
 }
 
-interface FieldsVisibilityMenuProps< Item extends AnyItem > {
+interface FieldsVisibilityMenuProps< Item > {
 	view: View;
 	onChangeView: ( view: View ) => void;
 	fields: NormalizedField< Item >[];
 }
 
-interface SortMenuProps< Item extends AnyItem > {
+interface SortMenuProps< Item > {
 	fields: NormalizedField< Item >[];
 	view: View;
 	onChangeView: ( view: View ) => void;
 }
 
-interface ViewActionsProps< Item extends AnyItem > {
+interface ViewActionsProps< Item > {
 	fields: NormalizedField< Item >[];
 	view: View;
 	onChangeView: ( view: View ) => void;
-	supportedLayouts?: string[];
+	defaultLayouts?: SupportedLayouts;
 }
 
 function ViewTypeMenu( {
 	view,
 	onChangeView,
-	supportedLayouts,
+	defaultLayouts = { list: {}, grid: {}, table: {} },
 }: ViewTypeMenuProps ) {
-	let _availableViews = VIEW_LAYOUTS;
-	if ( supportedLayouts ) {
-		_availableViews = _availableViews.filter( ( _view ) =>
-			supportedLayouts.includes( _view.type )
-		);
-	}
-	if ( _availableViews.length === 1 ) {
+	const availableLayouts = Object.keys( defaultLayouts );
+	if ( availableLayouts.length <= 1 ) {
 		return null;
 	}
-	const activeView = _availableViews.find( ( v ) => view.type === v.type );
-	return (
-		<DropdownMenu
-			trigger={
-				<DropdownMenuItem
-					suffix={
-						<span aria-hidden="true">{ activeView?.label }</span>
+	return availableLayouts.map( ( layout ) => {
+		const config = VIEW_LAYOUTS.find( ( v ) => v.type === layout );
+		if ( ! config ) {
+			return null;
+		}
+		return (
+			<DropdownMenuRadioItem
+				key={ layout }
+				value={ layout }
+				name="view-actions-available-view"
+				checked={ layout === view.type }
+				hideOnClick
+				onChange={ ( e: ChangeEvent< HTMLInputElement > ) => {
+					switch ( e.target.value ) {
+						case 'list':
+						case 'grid':
+						case 'table':
+							return onChangeView( {
+								...view,
+								type: e.target.value,
+								...defaultLayouts[ e.target.value ],
+							} );
 					}
-				>
-					<DropdownMenuItemLabel>
-						{ __( 'Layout' ) }
-					</DropdownMenuItemLabel>
-				</DropdownMenuItem>
-			}
-		>
-			{ _availableViews.map( ( availableView ) => {
-				return (
-					<DropdownMenuRadioItem
-						key={ availableView.type }
-						value={ availableView.type }
-						name="view-actions-available-view"
-						checked={ availableView.type === view.type }
-						hideOnClick
-						onChange={ ( e: ChangeEvent< HTMLInputElement > ) => {
-							switch ( e.target.value ) {
-								case 'list':
-								case 'grid':
-								case 'table':
-									return onChangeView( {
-										...view,
-										type: e.target.value,
-										layout: {},
-									} );
-							}
-							throw new Error( 'Invalid dataview' );
-						} }
-					>
-						<DropdownMenuItemLabel>
-							{ availableView.label }
-						</DropdownMenuItemLabel>
-					</DropdownMenuRadioItem>
-				);
-			} ) }
-		</DropdownMenu>
-	);
+					throw new Error( 'Invalid dataview' );
+				} }
+			>
+				<DropdownMenuItemLabel>{ config.label }</DropdownMenuItemLabel>
+			</DropdownMenuRadioItem>
+		);
+	} );
 }
 
 const PAGE_SIZE_VALUES = [ 10, 20, 50, 100 ];
@@ -161,15 +142,17 @@ function PageSizeMenu( { view, onChangeView }: PageSizeMenuProps ) {
 	);
 }
 
-function FieldsVisibilityMenu< Item extends AnyItem >( {
+function FieldsVisibilityMenu< Item >( {
 	view,
 	onChangeView,
 	fields,
 }: FieldsVisibilityMenuProps< Item > ) {
 	const hidableFields = fields.filter(
 		( field ) =>
-			field.enableHiding !== false && field.id !== view.layout.mediaField
+			field.enableHiding !== false &&
+			field.id !== view?.layout?.mediaField
 	);
+	const viewFields = view.fields || fields.map( ( field ) => field.id );
 	if ( ! hidableFields?.length ) {
 		return null;
 	}
@@ -188,20 +171,15 @@ function FieldsVisibilityMenu< Item extends AnyItem >( {
 					<DropdownMenuCheckboxItem
 						key={ field.id }
 						value={ field.id }
-						checked={ ! view.hiddenFields?.includes( field.id ) }
+						checked={ viewFields.includes( field.id ) }
 						onChange={ () => {
 							onChangeView( {
 								...view,
-								hiddenFields: view.hiddenFields?.includes(
-									field.id
-								)
-									? view.hiddenFields.filter(
+								fields: viewFields.includes( field.id )
+									? viewFields.filter(
 											( id ) => id !== field.id
 									  )
-									: [
-											...( view.hiddenFields || [] ),
-											field.id,
-									  ],
+									: [ ...viewFields, field.id ],
 							} );
 						} }
 					>
@@ -215,7 +193,7 @@ function FieldsVisibilityMenu< Item extends AnyItem >( {
 	);
 }
 
-function SortMenu< Item extends AnyItem >( {
+function SortMenu< Item >( {
 	fields,
 	view,
 	onChangeView,
@@ -303,41 +281,66 @@ function SortMenu< Item extends AnyItem >( {
 	);
 }
 
-function _ViewActions< Item extends AnyItem >( {
+function _ViewActions< Item >( {
 	fields,
 	view,
 	onChangeView,
-	supportedLayouts,
+	defaultLayouts,
 }: ViewActionsProps< Item > ) {
+	const activeView = VIEW_LAYOUTS.find( ( v ) => view.type === v.type );
 	return (
-		<DropdownMenu
-			trigger={
-				<Button
-					size="compact"
-					icon={ settings }
-					label={ __( 'View options' ) }
-				/>
-			}
-		>
-			<DropdownMenuGroup>
-				<ViewTypeMenu
-					view={ view }
-					onChangeView={ onChangeView }
-					supportedLayouts={ supportedLayouts }
-				/>
-				<SortMenu
-					fields={ fields }
-					view={ view }
-					onChangeView={ onChangeView }
-				/>
-				<FieldsVisibilityMenu
-					fields={ fields }
-					view={ view }
-					onChangeView={ onChangeView }
-				/>
-				<PageSizeMenu view={ view } onChangeView={ onChangeView } />
-			</DropdownMenuGroup>
-		</DropdownMenu>
+		<>
+			<HStack
+				spacing={ 1 }
+				expanded={ false }
+				style={ { flexShrink: 0 } }
+			>
+				<DropdownMenu
+					trigger={
+						<Button
+							size="compact"
+							icon={ activeView?.icon }
+							label={ __( 'Layout' ) }
+						/>
+					}
+				>
+					<ViewTypeMenu
+						view={ view }
+						onChangeView={ onChangeView }
+						defaultLayouts={ defaultLayouts }
+					/>
+				</DropdownMenu>
+				<DropdownMenu
+					trigger={
+						<Button
+							size="compact"
+							icon={ cog }
+							label={ _x(
+								'View options',
+								'View is used as a noun'
+							) }
+						/>
+					}
+				>
+					<DropdownMenuGroup>
+						<SortMenu
+							fields={ fields }
+							view={ view }
+							onChangeView={ onChangeView }
+						/>
+						<FieldsVisibilityMenu
+							fields={ fields }
+							view={ view }
+							onChangeView={ onChangeView }
+						/>
+						<PageSizeMenu
+							view={ view }
+							onChangeView={ onChangeView }
+						/>
+					</DropdownMenuGroup>
+				</DropdownMenu>
+			</HStack>
+		</>
 	);
 }
 

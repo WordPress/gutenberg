@@ -26,10 +26,7 @@ import useGlobalStylesRevisions from '../global-styles/screen-revisions/use-glob
 import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-details-footer';
 import ColorVariations from '../global-styles/variations/variations-color';
 import TypographyVariations from '../global-styles/variations/variations-typography';
-import {
-	useColorVariations,
-	useTypographyVariations,
-} from '../global-styles/hooks';
+import { useCurrentMergeThemeStyleVariationsWithUserConfig } from '../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
 
 const noop = () => {};
 
@@ -75,8 +72,12 @@ function SidebarNavigationScreenGlobalStylesContent() {
 		};
 	}, [] );
 
-	const colorVariations = useColorVariations();
-	const typographyVariations = useTypographyVariations();
+	const colorVariations = useCurrentMergeThemeStyleVariationsWithUserConfig( [
+		'color',
+	] );
+	const typographyVariations =
+		useCurrentMergeThemeStyleVariationsWithUserConfig( [ 'typography' ] );
+
 	const gap = 3;
 
 	// Wrap in a BlockEditorProvider to ensure that the Iframe's dependencies are

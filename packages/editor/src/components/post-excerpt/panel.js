@@ -13,6 +13,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { useMemo, useState } from '@wordpress/element';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -172,8 +173,8 @@ function PrivateExcerpt() {
 		return false;
 	}
 	const excerptText = !! excerpt && (
-		<Text align="left" numberOfLines={ 4 } truncate>
-			{ excerpt }
+		<Text align="left" numberOfLines={ 4 } truncate={ allowEditing }>
+			{ decodeEntities( excerpt ) }
 		</Text>
 	);
 	if ( ! allowEditing ) {

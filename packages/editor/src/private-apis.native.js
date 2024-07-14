@@ -12,7 +12,6 @@ import { EntitiesSavedStatesExtensible } from './components/entities-saved-state
 import useBlockEditorSettings from './components/provider/use-block-editor-settings';
 import PluginPostExcerpt from './components/post-excerpt/plugin';
 import PreferencesModal from './components/preferences-modal';
-import { usePostActions } from './components/post-actions/actions';
 import ToolsMoreMenuGroup from './components/more-menu/tools-more-menu-group';
 import ViewMoreMenuGroup from './components/more-menu/view-more-menu-group';
 
@@ -24,7 +23,6 @@ lock( privateApis, {
 	EntitiesSavedStatesExtensible,
 	PluginPostExcerpt,
 	PreferencesModal,
-	usePostActions,
 	ToolsMoreMenuGroup,
 	ViewMoreMenuGroup,
 

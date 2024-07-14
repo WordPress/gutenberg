@@ -56,6 +56,14 @@ Whether we use a 12-hour clock. With a 12-hour clock, an AM/PM widget is display
 -   Required: No
 -   Default: false
 
+### `dateOrder`: `'dmy' | 'mdy' | 'ymd'`
+
+The order of day, month, and year. This prop overrides the time format determined by `is12Hour` prop.
+
+-   Type: `string`
+-   Required: No
+-   Default: `'dmy'`
+
 ### `isInvalidDate`: `( date: Date ) => boolean`
 
 A callback function which receives a Date object representing a day as an argument, and should return a Boolean to signify if the day is valid or not.

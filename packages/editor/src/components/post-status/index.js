@@ -27,6 +27,7 @@ import {
 	NAVIGATION_POST_TYPE,
 } from '../../store/constants';
 import PostPanelRow from '../post-panel-row';
+import PostSticky from '../post-sticky';
 import { PrivatePostSchedule } from '../post-schedule';
 import { store as editorStore } from '../../store';
 
@@ -39,7 +40,7 @@ const labels = {
 	publish: __( 'Published' ),
 };
 
-const STATUS_OPTIONS = [
+export const STATUS_OPTIONS = [
 	{
 		label: (
 			<>
@@ -281,6 +282,7 @@ export default function PostStatus() {
 											) }
 										</VStack>
 									) }
+									<PostSticky />
 								</VStack>
 							</form>
 						</>

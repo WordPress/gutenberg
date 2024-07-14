@@ -51,6 +51,7 @@ function Header( {
 	forceDisableBlockTools,
 	setEntitiesSavedStatesCallback,
 	title,
+	icon,
 } ) {
 	const isWideViewport = useViewportMatch( 'large' );
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -116,7 +117,7 @@ function Header( {
 							! isBlockToolsCollapsed && hasTopToolbar,
 					} ) }
 				>
-					{ ! title ? <DocumentBar /> : title }
+					<DocumentBar title={ title } icon={ icon } />
 				</div>
 			</motion.div>
 			<motion.div

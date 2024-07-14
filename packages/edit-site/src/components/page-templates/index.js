@@ -54,18 +54,24 @@ const { useHistory, useLocation } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
 
-const defaultConfigPerViewType = {
+const defaultLayouts = {
 	[ LAYOUT_TABLE ]: {
-		primaryField: 'title',
+		layout: {
+			primaryField: 'title',
+		},
 	},
 	[ LAYOUT_GRID ]: {
-		mediaField: 'preview',
-		primaryField: 'title',
-		columnFields: [ 'description' ],
+		layout: {
+			mediaField: 'preview',
+			primaryField: 'title',
+			columnFields: [ 'description' ],
+		},
 	},
 	[ LAYOUT_LIST ]: {
-		primaryField: 'title',
-		mediaField: 'preview',
+		layout: {
+			primaryField: 'title',
+			mediaField: 'preview',
+		},
 	},
 };
 
@@ -78,10 +84,8 @@ const DEFAULT_VIEW = {
 		field: 'title',
 		direction: 'asc',
 	},
-	// All fields are visible by default, so it's
-	// better to keep track of the hidden ones.
-	hiddenFields: [ 'preview' ],
-	layout: defaultConfigPerViewType[ LAYOUT_GRID ],
+	fields: [ 'title', 'description', 'author' ],
+	layout: defaultLayouts[ LAYOUT_GRID ].layout,
 	filters: [],
 };
 
@@ -186,13 +190,15 @@ function Preview( { item, viewType } ) {
 
 export default function PageTemplates() {
 	const { params } = useLocation();
-	const { activeView = 'all', layout } = params;
+	const { activeView = 'all', layout, postId } = params;
+	const [ selection, setSelection ] = useState( [ postId ] );
+
 	const defaultView = useMemo( () => {
 		const usedType = layout ?? DEFAULT_VIEW.type;
 		return {
 			...DEFAULT_VIEW,
 			type: usedType,
-			layout: defaultConfigPerViewType[ usedType ],
+			layout: defaultLayouts[ usedType ].layout,
 			filters:
 				activeView !== 'all'
 					? [
@@ -336,13 +342,6 @@ export default function PageTemplates() {
 	const onChangeView = useCallback(
 		( newView ) => {
 			if ( newView.type !== view.type ) {
-				newView = {
-					...newView,
-					layout: {
-						...defaultConfigPerViewType[ newView.type ],
-					},
-				};
-
 				history.push( {
 					...params,
 					layout: newView.type,
@@ -369,6 +368,9 @@ export default function PageTemplates() {
 				view={ view }
 				onChangeView={ onChangeView }
 				onSelectionChange={ onSelectionChange }
+				selection={ selection }
+				setSelection={ setSelection }
+				defaultLayouts={ defaultLayouts }
 			/>
 		</Page>
 	);

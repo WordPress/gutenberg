@@ -1,0 +1,184 @@
+name: Auto Cherry-Pick
+
+on:
+    push:
+        branches:
+            - trunk
+    # We also want to attempt cherry-picking when a PR is labeled after the PR
+    # is merged.
+    pull_request:
+        types: [labeled]
+        branches:
+            - trunk
+
+# Ensure that new jobs wait for the previous job to finish.
+concurrency:
+    group: ${{ github.workflow }}
+    cancel-in-progress: false
+
+jobs:
+    cherry-pick:
+        runs-on: ubuntu-latest
+        # When in the context of a PR, ensure the PR is merged.
+        if: github.event.pull_request == null || github.event.pull_request.merged == true
+        steps:
+            - name: Determine if label should trigger cherry-pick
+              id: label-check
+              uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+              with:
+                  script: |
+                      const commit_sha = context.payload.pull_request ? context.payload.pull_request.merge_commit_sha : context.sha;
+                      console.log(`Commit SHA: ${commit_sha}`);
+                      core.exportVariable('commit_sha', commit_sha);
+                      const prs = await github.rest.repos.listPullRequestsAssociatedWithCommit({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        commit_sha,
+                      });
+                      if (prs.data.length === 0) {
+                        console.log(`No PR found for commit ${context.sha}.`);
+                        return;
+                      }
+                      const pr_number = prs.data[0].number;
+                      console.log(`PR: ${pr_number}`);
+                      core.exportVariable('pr_number', pr_number);
+
+                      const pr = await github.rest.pulls.get({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        pull_number: pr_number,
+                      });
+                      const labels = pr.data.labels.map(label => label.name);
+                      console.log(`Labels: ${labels}`);
+                      const regex = /^Backport to WP ([0-9]+\.[0-9]+) Beta\/RC$/;
+                      let matched = false;
+                      for (const label of labels) {
+                        const match = label.match(regex);
+                        if (match) {
+                          const version = match[1];
+                          console.log(`Matched label: ${label}`);
+                          console.log(`Extracted version: ${version}`);
+                          core.exportVariable('cherry_pick', 'true');
+                          core.exportVariable('version', version);
+                          matched = true;
+                          break;
+                        }
+                      }
+                      if (!matched) {
+                        core.exportVariable('cherry_pick', 'false');
+                      }
+
+            - name: Checkout repository
+              if: env.cherry_pick == 'true'
+              uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+              with:
+                  token: ${{ secrets.GUTENBERG_TOKEN }}
+                  fetch-depth: 0
+
+            - name: Set up Git
+              if: env.cherry_pick == 'true'
+              run: |
+                  git config --global user.name "Gutenberg Repository Automation"
+                  git config --global user.email "gutenberg@wordpress.org"
+
+            - name: Cherry-pick the commit
+              id: cherry-pick
+              if: env.cherry_pick == 'true'
+              run: |
+                  TARGET_BRANCH="wp/${{ env.version }}"
+                  COMMIT_SHA="${{ env.commit_sha }}"
+                  echo "Target branch: $TARGET_BRANCH"
+                  echo "Commit SHA: $COMMIT_SHA"
+                  git checkout $TARGET_BRANCH
+                  git cherry-pick $COMMIT_SHA || echo "cherry-pick-failed" > result
+                  if [ -f result ] && grep -q "cherry-pick-failed" result; then
+                    echo "conflict=true" >> $GITHUB_ENV
+                    git cherry-pick --abort
+                  else
+                    CHERRY_PICK_SHA=$(git rev-parse HEAD)
+                    echo "conflict=false" >> $GITHUB_ENV
+                    echo "cherry_pick_sha=$CHERRY_PICK_SHA" >> $GITHUB_ENV
+                    git push origin $TARGET_BRANCH
+                  fi
+
+            - name: Remove cherry-pick label
+              if: env.cherry_pick == 'true' && env.conflict == 'false'
+              uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+              with:
+                  script: |
+                      const prNumber = process.env.pr_number;
+                      const version = process.env.version;
+                      console.log(`prNumber: ${prNumber}`);
+                      console.log(`version: ${version}`);
+                      const oldLabel = `Backport to WP ${version} Beta/RC`;
+                      const newLabel = `Backported to WP Core`;
+                      await github.rest.issues.removeLabel({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number: prNumber,
+                        name: oldLabel
+                      });
+                      await github.rest.issues.addLabels({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number: prNumber,
+                        labels: [newLabel]
+                      });
+
+            - name: Comment on the PR
+              if: env.cherry_pick == 'true' && env.conflict == 'false'
+              uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+              with:
+                  script: |
+                      const prNumber = process.env.pr_number;
+                      const cherryPickSha = process.env.cherry_pick_sha;
+                      const targetBranch = `wp/${process.env.version}`;
+                      console.log(`prNumber: ${prNumber}`);
+                      console.log(`cherryPickSha: ${cherryPickSha}`);
+                      console.log(`targetBranch: ${targetBranch}`);
+                      await github.rest.issues.createComment({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number: prNumber,
+                        body: `I just cherry-picked this PR to the ${targetBranch} branch to get it included in the next release: ${cherryPickSha}`
+                      });
+
+            - name: Comment on the PR about conflict
+              if: env.cherry_pick == 'true' && env.conflict == 'true'
+              uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+              with:
+                  script: |
+                      const prNumber = process.env.pr_number;
+                      const commitSha = process.env.commit_sha;
+                      const targetBranch = `wp/${process.env.version}`;
+                      console.log(`prNumber: ${prNumber}`);
+                      console.log(`targetBranch: ${targetBranch}`);
+                      await github.rest.issues.createComment({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number: prNumber,
+                        body: `There was a conflict while trying to cherry-pick the commit to the ${targetBranch} branch. Please resolve the conflict manually and create a PR to the ${targetBranch} branch.
+
+                        PRs to ${targetBranch} are similar to PRs to trunk, but you should base your PR on the ${targetBranch} branch instead of trunk.
+
+                        \`\`\`
+                        # Checkout the ${targetBranch} branch instead of trunk.
+                        git checkout ${targetBranch}
+                        # Create a new branch for your PR.
+                        git checkout -b my-branch
+                        # Cherry-pick the commit.
+                        git cherry-pick ${commitSha}
+                        # Check which files have conflicts.
+                        git status
+                        # Resolve the conflict...
+                        # Add the resolved files to the staging area.
+                        git status
+                        git add .
+                        git cherry-pick --continue
+                        # Push the branch to the repository
+                        git push origin my-branch
+                        # Create a PR and set the base to the ${targetBranch} branch.
+                        # See https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/changing-the-base-branch-of-a-pull-request.
+                        \`\`\`
+                        `
+                      });

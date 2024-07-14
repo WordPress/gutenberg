@@ -1216,6 +1216,22 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 							'url' => 'file:./example/img/image.png',
 						),
 					),
+					'blocks'     => array(
+						'core/quote' => array(
+							'background' => array(
+								'backgroundImage' => array(
+									'url' => 'file:./example/img/quote.png',
+								),
+							),
+						),
+						'core/verse' => array(
+							'background' => array(
+								'backgroundImage' => array(
+									'url' => 'file:./example/img/verse.png',
+								),
+							),
+						),
+					),
 				),
 			)
 		);
@@ -1226,6 +1242,22 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 				'background' => array(
 					'backgroundImage' => array(
 						'url' => 'https://example.org/wp-content/themes/example-theme/example/img/image.png',
+					),
+				),
+				'blocks'     => array(
+					'core/quote' => array(
+						'background' => array(
+							'backgroundImage' => array(
+								'url' => 'https://example.org/wp-content/themes/example-theme/example/img/quote.png',
+							),
+						),
+					),
+					'core/verse' => array(
+						'background' => array(
+							'backgroundImage' => array(
+								'url' => 'https://example.org/wp-content/themes/example-theme/example/img/verse.png',
+							),
+						),
 					),
 				),
 			),
@@ -1261,6 +1293,22 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 							'url' => 'file:./example/img/image.png',
 						),
 					),
+					'blocks'     => array(
+						'core/quote' => array(
+							'background' => array(
+								'backgroundImage' => array(
+									'url' => 'file:./example/img/quote.jpg',
+								),
+							),
+						),
+						'core/verse' => array(
+							'background' => array(
+								'backgroundImage' => array(
+									'url' => 'file:./example/img/verse.gif',
+								),
+							),
+						),
+					),
 				),
 			)
 		);
@@ -1271,6 +1319,18 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 				'href'   => 'https://example.org/wp-content/themes/example-theme/example/img/image.png',
 				'target' => 'styles.background.backgroundImage.url',
 				'type'   => 'image/png',
+			),
+			array(
+				'name'   => 'file:./example/img/quote.jpg',
+				'href'   => 'https://example.org/wp-content/themes/example-theme/example/img/quote.jpg',
+				'target' => 'styles.blocks.core/quote.background.backgroundImage.url',
+				'type'   => 'image/jpeg',
+			),
+			array(
+				'name'   => 'file:./example/img/verse.gif',
+				'href'   => 'https://example.org/wp-content/themes/example-theme/example/img/verse.gif',
+				'target' => 'styles.blocks.core/verse.background.backgroundImage.url',
+				'type'   => 'image/gif',
 			),
 		);
 
@@ -1288,5 +1348,94 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		remove_filter( 'theme_file_uri', $filter_theme_file_uri_callback );
 
 		$this->assertSame( $expected_data, $actual );
+	}
+
+	/**
+	 * Tests that block style variations data gets merged in the following
+	 * priority order, from highest priority to lowest.
+	 *
+	 * - `styles.blocks.blockType.variations` from theme.json
+	 * - `styles.variations` from theme.json
+	 * - variations from block style variation files under `/styles`
+	 * - variations from `WP_Block_Styles_Registry`
+	 */
+	public function test_block_style_variation_merge_order() {
+		switch_theme( 'block-theme-child-with-block-style-variations' );
+
+		/*
+		 * Register style for a block that isn't included in the block style variation's partial
+		 * theme.json's blockTypes. The name must match though so we can ensure the partial's
+		 * styles do not get applied to this block.
+		 */
+		register_block_style(
+			'core/heading',
+			array(
+				'name'  => 'block-style-variation-b',
+				'label' => 'Heading only variation',
+			)
+		);
+
+		// Register variation for a block that will be partially overridden at all levels.
+		register_block_style(
+			'core/media-text',
+			array(
+				'name'       => 'block-style-variation-a',
+				'label'      => 'Block Style Variation A',
+				'style_data' => array(
+					'color' => array(
+						'background' => 'pink',
+						'gradient'   => 'var(--custom)',
+					),
+				),
+			)
+		);
+
+		$data         = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data()->get_raw_data();
+		$block_styles = $data['styles']['blocks'] ?? array();
+		$actual       = array_intersect_key(
+			$block_styles,
+			array_flip( array( 'core/button', 'core/media-text', 'core/heading' ) )
+		);
+		$expected     = array(
+			'core/button'     => array(
+				'variations' => array(
+					'outline' => array(
+						'color' => array(
+							'background' => 'red',
+							'text'       => 'white',
+						),
+					),
+				),
+			),
+			'core/media-text' => array(
+				'variations' => array(
+					'block-style-variation-a' => array(
+						'color'      => array(
+							'background' => 'blue',
+							'gradient'   => 'var(--custom)',
+							'text'       => 'aliceblue',
+						),
+						'typography' => array(
+							'fontSize'   => '1.5em',
+							'lineHeight' => '1.4em',
+						),
+					),
+				),
+			),
+			'core/heading'    => array(
+				'variations' => array(
+					'block-style-variation-b' => array(
+						'typography' => array(
+							'fontSize' => '3em',
+						),
+					),
+				),
+			),
+		);
+
+		unregister_block_style( 'core/heading', 'block-style-variation-b' );
+		unregister_block_style( 'core/media-text', 'block-style-variation-a' );
+
+		$this->assertSameSetsWithIndex( $expected, $actual, 'Merged variation styles do not match.' );
 	}
 }

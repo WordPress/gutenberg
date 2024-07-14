@@ -958,7 +958,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 <!-- /wp:table -->` );
 	} );
 
-	test( 'escape should toggle between edit and navigation modes', async ( {
+	test( 'escape should set select mode and then focus the canvas', async ( {
 		page,
 		writingFlowUtils,
 	} ) => {
@@ -975,15 +975,13 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 			.poll( writingFlowUtils.getActiveBlockName )
 			.toBe( 'core/paragraph' );
 
-		// Second escape Toggles back to Edit Mode
+		// Second escape should send focus to the canvas
 		await page.keyboard.press( 'Escape' );
+		// The navigation button should be hidden.
 		await expect( navigationButton ).toBeHidden();
-		const blockToolbar = page.getByLabel( 'Block tools' );
-
-		await expect( blockToolbar ).toBeVisible();
-		await expect
-			.poll( writingFlowUtils.getActiveBlockName )
-			.toBe( 'core/paragraph' );
+		await expect(
+			page.getByRole( 'region', { name: 'Editor content' } )
+		).toBeFocused();
 	} );
 
 	// Checks for regressions of https://github.com/WordPress/gutenberg/issues/40091.
@@ -1157,9 +1155,12 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await page.keyboard.type( 'synced' );
 
 		await editor.clickBlockOptionsMenuItem( 'Create pattern' );
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.type( 'test' );
+		const createPatternDialog = editor.page.getByRole( 'dialog', {
+			name: 'add new pattern',
+		} );
+		await createPatternDialog
+			.getByRole( 'textbox', { name: 'Name' } )
+			.fill( 'test' );
 		await page.keyboard.press( 'Enter' );
 
 		await expect(

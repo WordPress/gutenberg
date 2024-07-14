@@ -21,7 +21,6 @@ import PostLastEditedPanel from '../post-last-edited-panel';
 import PostPanelSection from '../post-panel-section';
 import PostSchedulePanel from '../post-schedule/panel';
 import PostStatusPanel from '../post-status';
-import PostStickyPanel from '../post-sticky';
 import PostSyncStatus from '../post-sync-status';
 import PostTemplatePanel from '../post-template/panel';
 import PostURLPanel from '../post-url/panel';
@@ -29,7 +28,6 @@ import BlogTitle from '../blog-title';
 import PostsPerPage from '../posts-per-page';
 import SiteDiscussion from '../site-discussion';
 import { store as editorStore } from '../../store';
-import TemplateAreas from '../template-areas';
 import { PrivatePostLastRevision } from '../post-last-revision';
 
 /**
@@ -84,9 +82,7 @@ export default function PostSummary( { onActionPerformed } ) {
 										<PostsPerPage />
 										<SiteDiscussion />
 										<PostFormatPanel />
-										<PostStickyPanel />
 									</VStack>
-									<TemplateAreas />
 									{ fills }
 								</VStack>
 							) }

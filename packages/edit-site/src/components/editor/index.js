@@ -36,20 +36,24 @@ import PluginTemplateSettingPanel from '../plugin-template-setting-panel';
 import GlobalStylesSidebar from '../global-styles-sidebar';
 import { isPreviewingTheme } from '../../utils/is-previewing-theme';
 import {
-	getEditorCanvasContainerTitle,
+	getEditorCanvasContainerTitleAndIcon,
 	useHasEditorCanvasContainer,
 } from '../editor-canvas-container';
 import SaveButton from '../save-button';
+import SavePanel from '../save-panel';
 import SiteEditorMoreMenu from '../more-menu';
 import SiteIcon from '../site-icon';
 import useEditorIframeProps from '../block-editor/use-editor-iframe-props';
 import useEditorTitle from './use-editor-title';
+import { useIsSiteEditorLoading } from '../layout/hooks';
 
 const { Editor, BackButton } = unlock( editorPrivateApis );
-const { useHistory } = unlock( routerPrivateApis );
+const { useHistory, useLocation } = unlock( routerPrivateApis );
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 
-export default function EditSiteEditor( { isLoading } ) {
+export default function EditSiteEditor( { isPostsList = false } ) {
+	const { params } = useLocation();
+	const isLoading = useIsSiteEditorLoading();
 	const {
 		editedPostType,
 		editedPostId,
@@ -63,6 +67,7 @@ export default function EditSiteEditor( { isLoading } ) {
 		currentPostIsTrashed,
 	} = useSelect( ( select ) => {
 		const {
+			getEditorCanvasContainerView,
 			getEditedPostContext,
 			getCanvasMode,
 			isPage,
@@ -84,9 +89,7 @@ export default function EditSiteEditor( { isLoading } ) {
 			isEditingPage: isPage(),
 			supportsGlobalStyles: getCurrentTheme()?.is_block_theme,
 			showIconLabels: get( 'core', 'showIconLabels' ),
-			editorCanvasView: unlock(
-				select( editSiteStore )
-			).getEditorCanvasContainerView(),
+			editorCanvasView: getEditorCanvasContainerView(),
 			currentPostIsTrashed:
 				select( editorStore ).getCurrentPostAttribute( 'status' ) ===
 				'trash',
@@ -110,14 +113,12 @@ export default function EditSiteEditor( { isLoading } ) {
 			{
 				// Forming a "block formatting context" to prevent margin collapsing.
 				// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
-
-				css: `body{${
+				css:
 					canvasMode === 'view'
-						? `min-height: 100vh; ${
+						? `body{min-height: 100vh; ${
 								currentPostIsTrashed ? '' : 'cursor: pointer;'
-						  }`
-						: ''
-				}}}`,
+						  }}`
+						: undefined,
 			},
 		],
 		[ settings.styles, canvasMode, currentPostIsTrashed ]
@@ -173,6 +174,10 @@ export default function EditSiteEditor( { isLoading } ) {
 		[ history, createSuccessNotice ]
 	);
 
+	// Replace the title and icon displayed in the DocumentBar when there's an overlay visible.
+	const { title, icon } =
+		getEditorCanvasContainerTitleAndIcon( editorCanvasView );
+
 	const isReady = ! isLoading;
 
 	return (
@@ -198,12 +203,10 @@ export default function EditSiteEditor( { isLoading } ) {
 					customSaveButton={
 						_isPreviewingTheme && <SaveButton size="compact" />
 					}
+					customSavePanel={ _isPreviewingTheme && <SavePanel /> }
 					forceDisableBlockTools={ ! hasDefaultEditorCanvasView }
-					title={
-						! hasDefaultEditorCanvasView
-							? getEditorCanvasContainerTitle( editorCanvasView )
-							: undefined
-					}
+					title={ title }
+					icon={ icon }
 					iframeProps={ iframeProps }
 					onActionPerformed={ onActionPerformed }
 					extraSidebarPanels={
@@ -217,9 +220,20 @@ export default function EditSiteEditor( { isLoading } ) {
 									<Button
 										label={ __( 'Open Navigation' ) }
 										className="edit-site-layout__view-mode-toggle"
-										onClick={ () =>
-											setCanvasMode( 'view' )
-										}
+										onClick={ () => {
+											setCanvasMode( 'view' );
+											// TODO: this is a temporary solution to navigate to the posts list if we are
+											// come here through `posts list` and are in focus mode editing a template, template part etc..
+											if (
+												isPostsList &&
+												params?.focusMode
+											) {
+												history.push( {
+													page: 'gutenberg-posts-dashboard',
+													postType: 'post',
+												} );
+											}
+										} }
 									>
 										<SiteIcon className="edit-site-layout__view-mode-toggle-icon" />
 									</Button>

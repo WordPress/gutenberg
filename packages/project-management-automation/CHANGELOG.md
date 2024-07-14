@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 2.2.0 (2024-06-26)
+
+### Internal
+
+-   Upgrade `@octokit/webhooks` dependency ([#62666](https://github.com/WordPress/gutenberg/pull/62666)).
+
 ## 2.1.0 (2024-06-15)
 
 ## 2.0.0 (2024-05-31)

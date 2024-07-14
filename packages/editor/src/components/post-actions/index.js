@@ -59,7 +59,7 @@ export default function PostActions( { onActionPerformed, buttonProps } ) {
 					icon={ moreVertical }
 					label={ __( 'Actions' ) }
 					disabled={ ! actions.length }
-					__experimentalIsFocusable
+					accessibleWhenDisabled
 					className="editor-all-actions-button"
 					onClick={ () =>
 						setIsActionsMenuOpen( ! isActionsMenuOpen )
@@ -123,6 +123,8 @@ function ActionWithModal( { action, item, ActionTrigger, onClose } ) {
 					overlayClassName={ `editor-action-modal editor-action-modal__${ kebabCase(
 						action.id
 					) }` }
+					focusOnMount="firstContentElement"
+					size="small"
 				>
 					<RenderModal
 						items={ [ item ] }
