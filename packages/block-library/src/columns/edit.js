@@ -231,7 +231,7 @@ function ColumnsEditContainer( { attributes, setAttributes, clientId } ) {
 
 	return (
 		<>
-			<BlockControls group="block">
+			<BlockControls>
 				<BlockVerticalAlignmentToolbar
 					onChange={ updateAlignment }
 					value={ verticalAlignment }
