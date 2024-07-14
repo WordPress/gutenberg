@@ -52,7 +52,7 @@ function FontFamilies() {
 			<VStack spacing={ 4 }>
 				{ themeFonts.length > 0 && (
 					<VStack>
-						<Subtitle level={ 3 }>{ __( 'Theme Fonts' ) }</Subtitle>
+						<Subtitle level={ 3 }>{ __( 'Theme' ) }</Subtitle>
 						<ItemGroup isBordered isSeparated>
 							{ themeFonts.map( ( font ) => (
 								<FontFamilyItem
@@ -65,9 +65,7 @@ function FontFamilies() {
 				) }
 				{ customFonts.length > 0 && (
 					<VStack>
-						<Subtitle level={ 3 }>
-							{ __( 'Custom fonts' ) }
-						</Subtitle>
+						<Subtitle level={ 3 }>{ __( 'Custom' ) }</Subtitle>
 						<ItemGroup isBordered isSeparated>
 							{ customFonts.map( ( font ) => (
 								<FontFamilyItem
