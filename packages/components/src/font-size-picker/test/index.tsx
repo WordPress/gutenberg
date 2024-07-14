@@ -9,6 +9,29 @@ import userEvent from '@testing-library/user-event';
  */
 import FontSizePicker from '../';
 import type { FontSize } from '../types';
+/**
+ * WordPress dependencies
+ */
+import { useState } from '@wordpress/element';
+
+const ControlledFontSizePicker = ( {
+	onChange,
+	...props
+}: React.ComponentProps< typeof FontSizePicker > ) => {
+	const [ fontSize, setFontSize ] =
+		useState< typeof props.value >( undefined );
+
+	return (
+		<FontSizePicker
+			{ ...props }
+			value={ fontSize }
+			onChange={ ( newFontSize ) => {
+				setFontSize( newFontSize );
+				onChange?.( newFontSize );
+			} }
+		/>
+	);
+};
 
 describe( 'FontSizePicker', () => {
 	test.each( [
@@ -525,6 +548,39 @@ describe( 'FontSizePicker', () => {
 			expect( screen.getByLabelText( 'Custom' ) ).toBeInTheDocument();
 		} );
 
+		it( 'hides custom input when disableCustomFontSizes is set to `true` with a custom font size', () => {
+			const { rerender } = render(
+				<FontSizePicker fontSizes={ fontSizes } value="3px" />
+			);
+			expect( screen.getByLabelText( 'Custom' ) ).toBeInTheDocument();
+
+			rerender(
+				<FontSizePicker
+					disableCustomFontSizes
+					fontSizes={ fontSizes }
+					value="3px"
+				/>
+			);
+			expect(
+				screen.queryByLabelText( 'Custom' )
+			).not.toBeInTheDocument();
+		} );
+
+		it( "doesn't hide custom input when the selected font size is a predef", () => {
+			const { rerender } = render(
+				<FontSizePicker fontSizes={ fontSizes } value="3px" />
+			);
+			expect( screen.getByLabelText( 'Custom' ) ).toBeInTheDocument();
+
+			rerender(
+				<FontSizePicker
+					fontSizes={ fontSizes }
+					value={ fontSizes[ 0 ].size }
+				/>
+			);
+			expect( screen.getByLabelText( 'Custom' ) ).toBeInTheDocument();
+		} );
+
 		it( 'allows custom values by default', async () => {
 			const user = userEvent.setup();
 			const onChange = jest.fn();
@@ -537,6 +593,26 @@ describe( 'FontSizePicker', () => {
 			await user.type( screen.getByLabelText( 'Custom' ), '80' );
 			expect( onChange ).toHaveBeenCalledTimes( 2 ); // Once per keystroke.
 			expect( onChange ).toHaveBeenCalledWith( '80px' );
+		} );
+
+		it( 'allows switching between custom and predef inputs when pressing the dedicated toggle', async () => {
+			const user = userEvent.setup();
+
+			render( <ControlledFontSizePicker fontSizes={ fontSizes } /> );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Set custom size' } )
+			);
+
+			await user.type( screen.getByLabelText( 'Custom' ), '80' );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Use size preset' } )
+			);
+
+			expect(
+				screen.queryByLabelText( 'Custom' )
+			).not.toBeInTheDocument();
 		} );
 
 		it( 'does not allow custom values when disableCustomFontSizes is set', () => {
