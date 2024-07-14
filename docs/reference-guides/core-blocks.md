@@ -360,7 +360,7 @@ Introduce new sections and organize content to help visitors (and search engines
 -	**Name:** core/heading
 -	**Category:** text
 -	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, className, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fontSize, lineHeight)
--	**Attributes:** content, level, placeholder, textAlign
+-	**Attributes:** content, level, levelOptions, placeholder, textAlign
 
 ## Home Link
 
