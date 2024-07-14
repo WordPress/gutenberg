@@ -139,6 +139,13 @@ function GroupPlaceHolder( { name, onSelect } ) {
 	const blockProps = useBlockProps( {
 		className: 'wp-block-group__placeholder',
 	} );
+
+	useEffect( () => {
+		if ( variations && variations.length === 1 ) {
+			onSelect( variations[ 0 ] );
+		}
+	}, [ onSelect, variations ] );
+
 	return (
 		<div { ...blockProps }>
 			<Placeholder

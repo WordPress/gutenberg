@@ -134,7 +134,7 @@ export function EntitiesSavedStatesExtensible( {
 					ref={ saveButtonRef }
 					variant="primary"
 					disabled={ ! saveEnabled }
-					__experimentalIsFocusable
+					accessibleWhenDisabled
 					onClick={ () =>
 						saveDirtyEntities( {
 							onSave,

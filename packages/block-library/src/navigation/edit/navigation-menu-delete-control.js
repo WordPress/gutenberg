@@ -41,6 +41,7 @@ export default function NavigationMenuDeleteControl( { onDelete } ) {
 						setIsConfirmDialogVisible( false );
 					} }
 					confirmButtonText={ __( 'Delete' ) }
+					size="medium"
 				>
 					{ __(
 						'Are you sure you want to delete this Navigation Menu?'

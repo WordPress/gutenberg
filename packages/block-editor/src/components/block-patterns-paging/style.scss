@@ -24,11 +24,6 @@
 
 .show-icon-labels {
 	.block-editor-patterns__grid-pagination {
-		flex-direction: column;
-		.block-editor-patterns__grid-pagination-previous,
-		.block-editor-patterns__grid-pagination-next {
-			flex-direction: column;
-		}
 		.components-button {
 			width: auto;
 			// Hide the button icons when labels are set to display...

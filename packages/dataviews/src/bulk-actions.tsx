@@ -14,7 +14,8 @@ import { useRegistry } from '@wordpress/data';
  * Internal dependencies
  */
 import { unlock } from './lock-unlock';
-import type { Action, ActionModal, AnyItem } from './types';
+import type { Action, ActionModal } from './types';
+import type { SetSelection } from './private-types';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -23,34 +24,34 @@ const {
 	DropdownMenuSeparatorV2: DropdownMenuSeparator,
 } = unlock( componentsPrivateApis );
 
-interface ActionWithModalProps< Item extends AnyItem > {
+interface ActionWithModalProps< Item > {
 	action: ActionModal< Item >;
 	selectedItems: Item[];
 	setActionWithModal: ( action?: ActionModal< Item > ) => void;
 	onMenuOpenChange: ( isOpen: boolean ) => void;
 }
 
-interface BulkActionsItemProps< Item extends AnyItem > {
+interface BulkActionsItemProps< Item > {
 	action: Action< Item >;
 	selectedItems: Item[];
 	setActionWithModal: ( action?: ActionModal< Item > ) => void;
 }
 
-interface ActionsMenuGroupProps< Item extends AnyItem > {
+interface ActionsMenuGroupProps< Item > {
 	actions: Action< Item >[];
 	selectedItems: Item[];
 	setActionWithModal: ( action?: ActionModal< Item > ) => void;
 }
 
-interface BulkActionsProps< Item extends AnyItem > {
+interface BulkActionsProps< Item > {
 	data: Item[];
 	actions: Action< Item >[];
 	selection: string[];
-	onSelectionChange: ( selection: Item[] ) => void;
+	onSelectionChange: SetSelection;
 	getItemId: ( item: Item ) => string;
 }
 
-export function useHasAPossibleBulkAction< Item extends AnyItem >(
+export function useHasAPossibleBulkAction< Item >(
 	actions: Action< Item >[],
 	item: Item
 ) {
@@ -64,7 +65,7 @@ export function useHasAPossibleBulkAction< Item extends AnyItem >(
 	}, [ actions, item ] );
 }
 
-export function useSomeItemHasAPossibleBulkAction< Item extends AnyItem >(
+export function useSomeItemHasAPossibleBulkAction< Item >(
 	actions: Action< Item >[],
 	data: Item[]
 ) {
@@ -80,7 +81,7 @@ export function useSomeItemHasAPossibleBulkAction< Item extends AnyItem >(
 	}, [ actions, data ] );
 }
 
-function ActionWithModal< Item extends AnyItem >( {
+function ActionWithModal< Item >( {
 	action,
 	selectedItems,
 	setActionWithModal,
@@ -115,7 +116,7 @@ function ActionWithModal< Item extends AnyItem >( {
 	);
 }
 
-function BulkActionItem< Item extends AnyItem >( {
+function BulkActionItem< Item >( {
 	action,
 	selectedItems,
 	setActionWithModal,
@@ -132,7 +133,6 @@ function BulkActionItem< Item extends AnyItem >( {
 	return (
 		<DropdownMenuItem
 			key={ action.id }
-			disabled={ eligibleItems.length === 0 }
 			hideOnClick={ ! shouldShowModal }
 			onClick={ async () => {
 				if ( shouldShowModal ) {
@@ -141,24 +141,30 @@ function BulkActionItem< Item extends AnyItem >( {
 					action.callback( eligibleItems, { registry } );
 				}
 			} }
-			suffix={
-				eligibleItems.length > 0 ? eligibleItems.length : undefined
-			}
+			suffix={ eligibleItems.length }
 		>
 			{ action.label }
 		</DropdownMenuItem>
 	);
 }
 
-function ActionsMenuGroup< Item extends AnyItem >( {
+function ActionsMenuGroup< Item >( {
 	actions,
 	selectedItems,
 	setActionWithModal,
 }: ActionsMenuGroupProps< Item > ) {
+	const elligibleActions = useMemo( () => {
+		return actions.filter( ( action ) => {
+			return selectedItems.some(
+				( item ) => ! action.isEligible || action.isEligible( item )
+			);
+		} );
+	}, [ actions, selectedItems ] );
+
 	return (
 		<>
 			<DropdownMenuGroup>
-				{ actions.map( ( action ) => (
+				{ elligibleActions.map( ( action ) => (
 					<BulkActionItem
 						key={ action.id }
 						action={ action }
@@ -172,7 +178,7 @@ function ActionsMenuGroup< Item extends AnyItem >( {
 	);
 }
 
-export default function BulkActions< Item extends AnyItem >( {
+export default function BulkActions< Item >( {
 	data,
 	actions,
 	selection,
@@ -248,7 +254,11 @@ export default function BulkActions< Item extends AnyItem >( {
 						disabled={ areAllSelected }
 						hideOnClick={ false }
 						onClick={ () => {
-							onSelectionChange( selectableItems );
+							onSelectionChange(
+								selectableItems.map( ( item ) =>
+									getItemId( item )
+								)
+							);
 						} }
 						suffix={ numberSelectableItems }
 					>

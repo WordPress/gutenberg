@@ -40,7 +40,7 @@ const labels = {
 	publish: __( 'Published' ),
 };
 
-const STATUS_OPTIONS = [
+export const STATUS_OPTIONS = [
 	{
 		label: (
 			<>

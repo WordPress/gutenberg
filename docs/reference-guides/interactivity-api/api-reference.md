@@ -220,9 +220,35 @@ The `wp-class` directive is executed:
 - When the element is created
 - Each time there's a change on any of the properties of the `state` or `context` involved in getting the final value of the directive (inside the callback or the expression passed as reference)
 
-When `wp-class` directive references a callback to get its final boolean value, the callback receives the class name: `className`.
-
 The boolean value received by the directive is used to toggle (add when `true` or remove when `false`) the associated class name from the `class` attribute.
+
+It's important to note that when using the `wp-class` directive, it's recommended to use kebab-case for class names instead of camelCase. This is because HTML attributes are not case-sensitive, and HTML will treat `data-wp-class--isDark` the same as `data-wp-class--isdark` or `DATA-WP-CLASS--ISDARK`.
+
+So, for example, use the class name `is-dark` instead of `isDark` and `data-wp-class--is-dark` instead of `data-wp-class--isDark`:
+
+```html
+<!-- Recommended -->
+<div data-wp-class--is-dark="context.isDarkMode">
+  <!-- ... -->
+</div>
+
+<!-- Not recommended -->
+<div data-wp-class--isDark="context.isDarkMode">
+  <!-- ... -->
+</div>
+```
+
+```css
+/* Recommended */
+.is-dark {
+  /* ... */
+}
+
+/* Not recommended */
+.isDark {
+  /* ... */
+}
+```
 
 ### `wp-style`
 
@@ -255,8 +281,6 @@ The `wp-style` directive is executed:
 
 - When the element is created
 - Each time there's a change on any of the properties of the `state` or `context` involved in getting the final value of the directive (inside the callback or the expression passed as reference)
-
-When `wp-style` directive references a callback to get its final value, the callback receives the class style property: `css-property`.
 
 The value received by the directive is used to add or remove the style attribute with the associated CSS property:
 
@@ -531,17 +555,18 @@ The `unique-id` doesn't need to be unique globally. It just needs to be differen
   <summary><em>See store used with the directive above</em></summary>
 
 ```js
-import { store, useState, useEffect } from '@wordpress/interactivity';
+import { getElement, store, useState, useEffect } from '@wordpress/interactivity';
 
 // Unlike `data-wp-init` and `data-wp-watch`, you can use any hooks inside
 // `data-wp-run` callbacks.
-const useInView = ( ref ) => {
+const useInView = () => {
   const [ inView, setInView ] = useState( false );
   useEffect( () => {
+    const { ref } = getElement();
     const observer = new IntersectionObserver( ( [ entry ] ) => {
       setInView( entry.isIntersecting );
     } );
-    if ( ref ) observer.observe( ref );
+    observer.observe( ref );
     return () => ref && observer.unobserve( ref );
   }, []);
   return inView;
@@ -550,8 +575,7 @@ const useInView = ( ref ) => {
 store( 'myPlugin', {
   callbacks: {
     logInView: () => {
-      const { ref } = getElement();
-      const isInView = useInView( ref );
+      const isInView = useInView();
       useEffect( () => {
         if ( isInView ) {
           console.log( 'Inside' );
@@ -564,6 +588,8 @@ store( 'myPlugin', {
 } );
 ```
 </details>
+
+It's important to note that, similar to (P)React components, the `ref` from `getElement()` is `null` during the first render. To properly access the DOM element reference, you typically need to use an effect-like hook such as `useEffect`, `useInit`, or `useWatch`. This ensures that the `getElement()` runs after the component has been mounted and the `ref` is available.
 
 ### `wp-key`
 
@@ -1028,7 +1054,12 @@ Apart from the store function, there are also some methods that allows the devel
 
 #### getContext()
 
-Retrieves the context inherited by the element evaluating a function from the store. The returned value depends on the element and the namespace where the function calling `getContext()` exists.
+Retrieves the context inherited by the element evaluating a function from the store. The returned value depends on the element and the namespace where the function calling `getContext()` exists. It can also take an optional namespace argument to retrieve the context of a specific interactive region.
+
+```js
+const context = getContext('namespace');
+```
+- `namespace` (optional): A string that matches the namespace of an interactive region. If not provided, it retrieves the context of the current interactive region.
 
 ```php
 // render.php
@@ -1047,6 +1078,11 @@ store( "myPlugin", {
       const context = getContext();
 			 // Logs "false"
       console.log('context => ', context.isOpen)
+
+      // With namespace argument.
+      const myPluginContext = getContext("myPlugin");
+      // Logs "false"
+      console.log('myPlugin isOpen => ', myPluginContext.isOpen);
     },
   },
 });
@@ -1069,7 +1105,7 @@ Those attributes will contain the directives of that element. In the button exam
 
 ```js
 // store
-import { store, getContext } from '@wordpress/interactivity';
+import { store, getElement } from '@wordpress/interactivity';
 
 store( "myPlugin", {
   actions: {

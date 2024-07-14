@@ -169,10 +169,10 @@ function InstalledFonts() {
 										{ notice.message }
 									</Notice>
 								) }
-								{ baseCustomFonts.length > 0 && (
+								{ baseThemeFonts.length > 0 && (
 									<VStack>
 										<h2 className="font-library-modal__fonts-title">
-											{ __( 'Installed Fonts' ) }
+											{ __( 'Theme Fonts' ) }
 										</h2>
 										{ /*
 										 * Disable reason: The `list` ARIA role is redundant but
@@ -183,7 +183,7 @@ function InstalledFonts() {
 											role="list"
 											className="font-library-modal__fonts-list"
 										>
-											{ baseCustomFonts.map( ( font ) => (
+											{ baseThemeFonts.map( ( font ) => (
 												<li
 													key={ font.slug }
 													className="font-library-modal__fonts-list-item"
@@ -206,10 +206,10 @@ function InstalledFonts() {
 										{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
 									</VStack>
 								) }
-								{ baseThemeFonts.length > 0 && (
+								{ baseCustomFonts.length > 0 && (
 									<VStack>
 										<h2 className="font-library-modal__fonts-title">
-											{ __( 'Theme Fonts' ) }
+											{ __( 'Custom fonts' ) }
 										</h2>
 										{ /*
 										 * Disable reason: The `list` ARIA role is redundant but
@@ -220,7 +220,7 @@ function InstalledFonts() {
 											role="list"
 											className="font-library-modal__fonts-list"
 										>
-											{ baseThemeFonts.map( ( font ) => (
+											{ baseCustomFonts.map( ( font ) => (
 												<li
 													key={ font.slug }
 													className="font-library-modal__fonts-list-item"
@@ -311,7 +311,7 @@ function InstalledFonts() {
 
 					<HStack
 						justify="flex-end"
-						className="font-library-modal__tabpanel-layout__footer"
+						className="font-library-modal__footer"
 					>
 						{ isInstalling && <ProgressBar /> }
 						{ shouldDisplayDeleteButton && (
@@ -329,7 +329,7 @@ function InstalledFonts() {
 								saveFontFamilies( fontFamilies );
 							} }
 							disabled={ ! fontFamiliesHasChanges }
-							__experimentalIsFocusable
+							accessibleWhenDisabled
 						>
 							{ __( 'Update' ) }
 						</Button>

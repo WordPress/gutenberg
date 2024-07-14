@@ -34,6 +34,11 @@ export default {
 			} );
 	},
 	canUserEditValue( { select, context, args } ) {
+		// Lock editing in query loop.
+		if ( context?.query || context?.queryId ) {
+			return false;
+		}
+
 		const postType =
 			context?.postType || select( editorStore ).getCurrentPostType();
 
@@ -54,11 +59,11 @@ export default {
 		}
 
 		// Check that the user has the capability to edit post meta.
-		const canUserEdit = select( coreDataStore ).canUserEditEntityRecord(
-			'postType',
-			context?.postType,
-			context?.postId
-		);
+		const canUserEdit = select( coreDataStore ).canUser( 'update', {
+			kind: 'postType',
+			name: context?.postType,
+			id: context?.postId,
+		} );
 		if ( ! canUserEdit ) {
 			return false;
 		}

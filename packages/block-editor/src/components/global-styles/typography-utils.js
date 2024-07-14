@@ -122,3 +122,66 @@ export function getFluidTypographyOptionsFromSettings( settings ) {
 				fluid: typographySettings?.fluid,
 		  };
 }
+
+/**
+ * Returns an object of merged font families and the font faces from the selected font family
+ * based on the theme.json settings object and the currently selected font family.
+ *
+ * @param {Object} settings           Theme.json settings
+ * @param {string} selectedFontFamily Decoded font family string
+ * @return {Object} Merged font families and font faces from the selected font family
+ */
+export function getMergedFontFamiliesAndFontFamilyFaces(
+	settings,
+	selectedFontFamily
+) {
+	const fontFamiliesFromSettings = settings?.typography?.fontFamilies;
+
+	const fontFamilies = [ 'default', 'theme', 'custom' ].flatMap(
+		( key ) => fontFamiliesFromSettings?.[ key ] ?? []
+	);
+
+	const fontFamilyFaces =
+		fontFamilies.find(
+			( family ) => family.fontFamily === selectedFontFamily
+		)?.fontFace ?? [];
+
+	return { fontFamilies, fontFamilyFaces };
+}
+
+/**
+ * Returns the nearest font weight value from the available font weight list based on the new font weight.
+ * The nearest font weight is the one with the smallest difference from the new font weight.
+ *
+ * @param {Array}  availableFontWeights Array of available font weights
+ * @param {string} newFontWeightValue   New font weight value
+ * @return {string} Nearest font weight
+ */
+
+export function findNearestFontWeight(
+	availableFontWeights,
+	newFontWeightValue
+) {
+	if ( ! newFontWeightValue || typeof newFontWeightValue !== 'string' ) {
+		return '';
+	}
+
+	if ( ! availableFontWeights || availableFontWeights.length === 0 ) {
+		return newFontWeightValue;
+	}
+
+	const nearestFontWeight = availableFontWeights?.reduce(
+		( nearest, { value: fw } ) => {
+			const currentDiff = Math.abs(
+				parseInt( fw ) - parseInt( newFontWeightValue )
+			);
+			const nearestDiff = Math.abs(
+				parseInt( nearest ) - parseInt( newFontWeightValue )
+			);
+			return currentDiff < nearestDiff ? fw : nearest;
+		},
+		availableFontWeights[ 0 ]?.value
+	);
+
+	return nearestFontWeight;
+}
