@@ -132,7 +132,10 @@ function UncontrolledInnerBlocks( props ) {
 		/>
 	);
 
-	if ( Object.keys( blockType.providesContext ).length === 0 ) {
+	if (
+		! blockType?.providesContext ||
+		Object.keys( blockType.providesContext ).length === 0
+	) {
 		return items;
 	}
 
@@ -269,7 +272,8 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		props.ref,
 		__unstableDisableDropZone ||
 		isDropZoneDisabled ||
-		( layout?.columnCount && window.__experimentalEnableGridInteractivity )
+		( layout?.isManualPlacement &&
+			window.__experimentalEnableGridInteractivity )
 			? null
 			: blockDropZoneRef,
 	] );

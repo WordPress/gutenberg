@@ -59,9 +59,11 @@ export const ColorScheme: StoryFn< typeof Theme > = ( {
 } ) => {
 	const { colors } = generateThemeVariables( { accent, background } );
 	const { gray, ...otherColors } = colors;
+	/* eslint-disable @typescript-eslint/no-unused-vars */
 	const contrastIssues = Object.entries(
 		checkContrasts( { accent, background }, colors )
 	).filter( ( [ _, error ] ) => !! error );
+	/* eslint-enable @typescript-eslint/no-unused-vars */
 
 	const Chip = ( { color, name }: { color: string; name: string } ) => (
 		<HStack justify="flex-start">

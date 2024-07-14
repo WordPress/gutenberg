@@ -28,7 +28,7 @@ import {
 } from '@wordpress/components';
 import { debounce } from '@wordpress/compose';
 import { sprintf, __, _x } from '@wordpress/i18n';
-import { moreVertical, chevronLeft } from '@wordpress/icons';
+import { moreVertical, chevronLeft, chevronRight } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -429,7 +429,7 @@ function FontCollection( { slug } ) {
 					{ selectedFont && (
 						<Flex
 							justify="flex-end"
-							className="font-library-modal__tabpanel-layout__footer"
+							className="font-library-modal__footer"
 						>
 							<Button
 								variant="primary"
@@ -438,7 +438,7 @@ function FontCollection( { slug } ) {
 								disabled={
 									fontsToInstall.length === 0 || isInstalling
 								}
-								__experimentalIsFocusable
+								accessibleWhenDisabled
 							>
 								{ __( 'Install' ) }
 							</Button>
@@ -446,32 +446,26 @@ function FontCollection( { slug } ) {
 					) }
 
 					{ ! selectedFont && (
-						<Flex
+						<HStack
+							spacing={ 4 }
 							justify="center"
-							className="font-library-modal__tabpanel-layout__footer"
+							className="font-library-modal__footer"
 						>
-							<Button
-								label={ __( 'First page' ) }
-								size="compact"
-								onClick={ () => setPage( 1 ) }
-								disabled={ page === 1 }
-								__experimentalIsFocusable
-							>
-								<span>«</span>
-							</Button>
 							<Button
 								label={ __( 'Previous page' ) }
 								size="compact"
 								onClick={ () => setPage( page - 1 ) }
 								disabled={ page === 1 }
-								__experimentalIsFocusable
-							>
-								<span>‹</span>
-							</Button>
+								showTooltip
+								accessibleWhenDisabled
+								icon={ chevronLeft }
+								tooltipPosition="top"
+							/>
 							<HStack
 								justify="flex-start"
 								expanded={ false }
 								spacing={ 2 }
+								className="font-library-modal__page-selection"
 							>
 								{ createInterpolateElement(
 									sprintf(
@@ -514,20 +508,11 @@ function FontCollection( { slug } ) {
 								size="compact"
 								onClick={ () => setPage( page + 1 ) }
 								disabled={ page === totalPages }
-								__experimentalIsFocusable
-							>
-								<span>›</span>
-							</Button>
-							<Button
-								label={ __( 'Last page' ) }
-								size="compact"
-								onClick={ () => setPage( totalPages ) }
-								disabled={ page === totalPages }
-								__experimentalIsFocusable
-							>
-								<span>»</span>
-							</Button>
-						</Flex>
+								accessibleWhenDisabled
+								icon={ chevronRight }
+								tooltipPosition="top"
+							/>
+						</HStack>
 					) }
 				</>
 			) }
