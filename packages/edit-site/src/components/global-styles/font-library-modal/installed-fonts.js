@@ -16,6 +16,7 @@ import {
 	Flex,
 	Notice,
 	ProgressBar,
+	CheckboxControl,
 } from '@wordpress/components';
 import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
@@ -50,8 +51,12 @@ function InstalledFonts() {
 		notice,
 		setNotice,
 		fontFamilies,
+		deactivateFontFamily,
+		activateFontFamily,
 	} = useContext( FontLibraryContext );
 	const [ isConfirmDeleteOpen, setIsConfirmDeleteOpen ] = useState( false );
+	const [ isSelectAllChecked, setIsSelectAllChecked ] = useState( true );
+
 	const [ baseFontFamilies ] = useGlobalSetting(
 		'typography.fontFamilies',
 		undefined,
@@ -143,6 +148,16 @@ function InstalledFonts() {
 		handleSetLibraryFontSelected( libraryFontSelected );
 		refreshLibrary();
 	}, [] );
+
+	const handleSelectAll = () => {
+		if ( isSelectAllChecked ) {
+			deactivateFontFamily( libraryFontSelected );
+		} else {
+			activateFontFamily( libraryFontSelected );
+		}
+
+		setIsSelectAllChecked( ! isSelectAllChecked );
+	};
 
 	return (
 		<div className="font-library-modal__tabpanel-layout">
@@ -295,6 +310,18 @@ function InstalledFonts() {
 							</Text>
 							<Spacer margin={ 4 } />
 							<VStack spacing={ 0 }>
+								<Flex
+									className="font-library-modal__select-all"
+									justify="flex-start"
+									align="center"
+									gap="1rem"
+								>
+									<CheckboxControl
+										label={ __( 'Select all' ) }
+										checked={ isSelectAllChecked }
+										onChange={ handleSelectAll }
+									/>
+								</Flex>
 								<Spacer margin={ 8 } />
 								{ getFontFacesToDisplay(
 									libraryFontSelected
