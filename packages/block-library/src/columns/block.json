@@ -18,9 +18,6 @@
 		"templateLock": {
 			"type": [ "string", "boolean" ],
 			"enum": [ "all", "insert", "contentOnly", false ]
-		},
-		"justification": {
-			"type": "string"
 		}
 	},
 	"supports": {
@@ -52,7 +49,9 @@
 		"layout": {
 			"allowSwitching": false,
 			"allowInheriting": false,
-			"allowEditing": false,
+			"allowEditing": true,
+			"allowJustification": true,
+			"allowVerticalAlignment": false,
 			"default": {
 				"type": "flex",
 				"flexWrap": "nowrap"

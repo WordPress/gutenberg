@@ -107,8 +107,8 @@ Display content in multiple columns, with blocks added to each column. ([Source]
 -	**Name:** core/columns
 -	**Category:** design
 -	**Allowed Blocks:** core/column
--	**Supports:** align (full, wide), anchor, color (background, button, gradients, heading, link, text), interactivity (clientNavigation), layout (default, ~~allowEditing~~, ~~allowInheriting~~, ~~allowSwitching~~), shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** isStackedOnMobile, justification, templateLock, verticalAlignment
+-	**Supports:** align (full, wide), anchor, color (background, button, gradients, heading, link, text), interactivity (clientNavigation), layout (allowEditing, allowJustification, default, ~~allowInheriting~~, ~~allowSwitching~~, ~~allowVerticalAlignment~~), shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Attributes:** isStackedOnMobile, templateLock, verticalAlignment
 
 ## Comment Author Avatar (deprecated)
 
