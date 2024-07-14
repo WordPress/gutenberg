@@ -15,7 +15,11 @@ import {
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
+import {
+	InspectorControls,
+	useBlockProps,
+	useSettings,
+} from '@wordpress/block-editor';
 import ServerSideRender from '@wordpress/server-side-render';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -45,8 +49,14 @@ function TagCloudEdit( { attributes, setAttributes } ) {
 		largestFontSize,
 	} = attributes;
 
+	const [ availableUnits ] = useSettings( 'spacing.units' );
+
+	// The `pt` unit is used as the default value and is therefore
+	// always considered an available unit.
 	const units = useCustomUnits( {
-		availableUnits: [ 'px', 'em', 'rem', 'vw', 'vh', 'pt' ],
+		availableUnits: availableUnits
+			? [ ...availableUnits, 'pt' ]
+			: [ '%', 'px', 'em', 'rem', 'pt' ],
 	} );
 
 	const taxonomies = useSelect(
