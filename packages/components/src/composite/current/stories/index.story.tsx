@@ -32,7 +32,10 @@ const meta: Meta< typeof UseCompositeStorePlaceholder > = {
 			canvas: { sourceState: 'shown' },
 			source: { transform },
 			extractArgTypes: ( component: React.FunctionComponent ) => {
-				const name = component.displayName;
+				const name =
+					component.displayName === 'useStore'
+						? 'useCompositeStore'
+						: component.displayName;
 				const path = name
 					?.replace(
 						/([a-z])([A-Z])/g,
