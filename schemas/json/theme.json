@@ -821,6 +821,11 @@
 				"custom"
 			]
 		},
+		"settingsPropertiesComplete": {
+			"type": "object",
+			"allOf": [ { "$ref": "#/definitions/settingsProperties" } ],
+			"propertyNames": { "$ref": "#/definitions/settingsPropertyNames" }
+		},
 		"settingsTopLevelOnlyProperties": {
 			"type": "object",
 			"properties": {
@@ -833,11 +838,6 @@
 		},
 		"settingsTopLevelOnlyPropertyNames": {
 			"enum": [ "useRootPaddingAwareAlignments" ]
-		},
-		"settingsPropertiesComplete": {
-			"type": "object",
-			"allOf": [ { "$ref": "#/definitions/settingsProperties" } ],
-			"propertyNames": { "$ref": "#/definitions/settingsPropertyNames" }
 		},
 		"settingsBlocksPropertiesComplete": {
 			"description": "Settings defined on a per-block basis.",
