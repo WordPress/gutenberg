@@ -132,9 +132,23 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   border: 0;
 }
 
-.emotion-12[disabled] {
-  opacity: 0.4;
+.emotion-12[disabled],
+.emotion-12[aria-disabled='true'] {
   cursor: default;
+}
+
+.emotion-12[disabled] .emotion-14,
+.emotion-12[aria-disabled='true'] .emotion-14 {
+  opacity: 0.4;
+}
+
+.emotion-12[disabled][role='radio']:focus-visible::after,
+.emotion-12[aria-disabled='true'][role='radio']:focus-visible::after {
+  position: absolute;
+  content: '';
+  inset: var( --wp-admin-border-width-focus ) 4px;
+  border-radius: 2px;
+  outline: var( --wp-admin-border-width-focus ) solid var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
 }
 
 .emotion-12:active {
@@ -218,9 +232,23 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   border: 0;
 }
 
-.emotion-18[disabled] {
-  opacity: 0.4;
+.emotion-18[disabled],
+.emotion-18[aria-disabled='true'] {
   cursor: default;
+}
+
+.emotion-18[disabled] .emotion-14,
+.emotion-18[aria-disabled='true'] .emotion-14 {
+  opacity: 0.4;
+}
+
+.emotion-18[disabled][role='radio']:focus-visible::after,
+.emotion-18[aria-disabled='true'][role='radio']:focus-visible::after {
+  position: absolute;
+  content: '';
+  inset: var( --wp-admin-border-width-focus ) 4px;
+  border-radius: 2px;
+  outline: var( --wp-admin-border-width-focus ) solid var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
 }
 
 .emotion-18:active {
@@ -462,9 +490,23 @@ exports[`ToggleGroupControl controlled should render correctly with text options
   border: 0;
 }
 
-.emotion-12[disabled] {
-  opacity: 0.4;
+.emotion-12[disabled],
+.emotion-12[aria-disabled='true'] {
   cursor: default;
+}
+
+.emotion-12[disabled] .emotion-14,
+.emotion-12[aria-disabled='true'] .emotion-14 {
+  opacity: 0.4;
+}
+
+.emotion-12[disabled][role='radio']:focus-visible::after,
+.emotion-12[aria-disabled='true'][role='radio']:focus-visible::after {
+  position: absolute;
+  content: '';
+  inset: var( --wp-admin-border-width-focus ) 4px;
+  border-radius: 2px;
+  outline: var( --wp-admin-border-width-focus ) solid var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
 }
 
 .emotion-12:active {
@@ -692,9 +734,23 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   border: 0;
 }
 
-.emotion-12[disabled] {
-  opacity: 0.4;
+.emotion-12[disabled],
+.emotion-12[aria-disabled='true'] {
   cursor: default;
+}
+
+.emotion-12[disabled] .emotion-14,
+.emotion-12[aria-disabled='true'] .emotion-14 {
+  opacity: 0.4;
+}
+
+.emotion-12[disabled][role='radio']:focus-visible::after,
+.emotion-12[aria-disabled='true'][role='radio']:focus-visible::after {
+  position: absolute;
+  content: '';
+  inset: var( --wp-admin-border-width-focus ) 4px;
+  border-radius: 2px;
+  outline: var( --wp-admin-border-width-focus ) solid var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
 }
 
 .emotion-12:active {
@@ -778,9 +834,23 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   border: 0;
 }
 
-.emotion-18[disabled] {
-  opacity: 0.4;
+.emotion-18[disabled],
+.emotion-18[aria-disabled='true'] {
   cursor: default;
+}
+
+.emotion-18[disabled] .emotion-14,
+.emotion-18[aria-disabled='true'] .emotion-14 {
+  opacity: 0.4;
+}
+
+.emotion-18[disabled][role='radio']:focus-visible::after,
+.emotion-18[aria-disabled='true'][role='radio']:focus-visible::after {
+  position: absolute;
+  content: '';
+  inset: var( --wp-admin-border-width-focus ) 4px;
+  border-radius: 2px;
+  outline: var( --wp-admin-border-width-focus ) solid var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
 }
 
 .emotion-18:active {
@@ -1016,9 +1086,23 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
   border: 0;
 }
 
-.emotion-12[disabled] {
-  opacity: 0.4;
+.emotion-12[disabled],
+.emotion-12[aria-disabled='true'] {
   cursor: default;
+}
+
+.emotion-12[disabled] .emotion-14,
+.emotion-12[aria-disabled='true'] .emotion-14 {
+  opacity: 0.4;
+}
+
+.emotion-12[disabled][role='radio']:focus-visible::after,
+.emotion-12[aria-disabled='true'][role='radio']:focus-visible::after {
+  position: absolute;
+  content: '';
+  inset: var( --wp-admin-border-width-focus ) 4px;
+  border-radius: 2px;
+  outline: var( --wp-admin-border-width-focus ) solid var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
 }
 
 .emotion-12:active {
