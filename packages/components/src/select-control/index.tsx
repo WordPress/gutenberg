@@ -95,6 +95,9 @@ function UnforwardedSelectControl(
 				}
 				prefix={ prefix }
 				labelPosition={ labelPosition }
+				__unstableInputWidth={
+					variant === 'minimal' ? 'auto' : undefined
+				}
 				variant={ variant }
 				__next40pxDefaultSize={ __next40pxDefaultSize }
 			>
