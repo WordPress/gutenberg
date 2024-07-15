@@ -310,18 +310,12 @@ function InstalledFonts() {
 							</Text>
 							<Spacer margin={ 4 } />
 							<VStack spacing={ 0 }>
-								<Flex
+								<CheckboxControl
 									className="font-library-modal__select-all"
-									justify="flex-start"
-									align="center"
-									gap="1rem"
-								>
-									<CheckboxControl
-										label={ __( 'Select all' ) }
-										checked={ isSelectAllChecked }
-										onChange={ handleSelectAll }
-									/>
-								</Flex>
+									label={ __( 'Select all' ) }
+									checked={ isSelectAllChecked }
+									onChange={ handleSelectAll }
+								/>
 								<Spacer margin={ 8 } />
 								{ getFontFacesToDisplay(
 									libraryFontSelected
