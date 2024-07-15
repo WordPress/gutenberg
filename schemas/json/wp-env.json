@@ -6,6 +6,7 @@
 			"reference": "https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/"
 		},
 		"wpEnvProperties": {
+			"type": "object",
 			"properties": {
 				"core": {
 					"description": "The WordPress installation to use. If null is specified, wp-env will use the latest production release of WordPress.",
@@ -63,13 +64,22 @@
 					"type": "object"
 				}
 			}
+		},
+		"wpEnvPropertyNames": {
+			"enum": [
+				"core",
+				"phpVersion",
+				"plugins",
+				"themes",
+				"port",
+				"config",
+				"mappings"
+			]
 		}
 	},
 	"type": "object",
 	"allOf": [
-		{
-			"$ref": "#/definitions/wpEnvProperties"
-		},
+		{ "$ref": "#/definitions/wpEnvProperties" },
 		{
 			"properties": {
 				"$schema": {
@@ -82,26 +92,24 @@
 					"patternProperties": {
 						"[a-zA-Z]": {
 							"type": "object",
-							"$ref": "#/definitions/wpEnvProperties",
-							"additionalProperties": false
+							"allOf": [
+								{ "$ref": "#/definitions/wpEnvProperties" }
+							],
+							"propertyNames": {
+								"$ref": "#/definitions/wpEnvPropertyNames"
+							}
 						}
 					}
 				}
 			}
 		},
 		{
-			"properties": {
-				"$schema": true,
-				"core": true,
-				"phpVersion": true,
-				"plugins": true,
-				"themes": true,
-				"port": true,
-				"config": true,
-				"mappings": true,
-				"env": true
-			},
-			"additionalProperties": false
+			"propertyNames": {
+				"anyOf": [
+					{ "$ref": "#/definitions/wpEnvPropertyNames" },
+					{ "enum": [ "$schema", "env" ] }
+				]
+			}
 		}
 	]
 }
