@@ -171,6 +171,10 @@ function FontSizes() {
 		'typography.defaultFontSizes'
 	);
 
+	const [ customFontSizeEnabled ] = useGlobalSetting(
+		'typography.customFontSize'
+	);
+
 	const handleAddFontSize = () => {
 		const index = getNewIndexFromPresets( customFontSizes, 'custom-' );
 		const newFontSize = {
@@ -242,17 +246,19 @@ function FontSizes() {
 								/>
 							) }
 
-						<FontSizeGroup
-							label={ __( 'Custom' ) }
-							origin="custom"
-							sizes={ customFontSizes }
-							handleAddFontSize={ handleAddFontSize }
-							handleResetFontSizes={
-								customFontSizes.length > 0
-									? () => setCustomFontSizes( [] )
-									: null
-							}
-						/>
+						{ customFontSizeEnabled && (
+							<FontSizeGroup
+								label={ __( 'Custom' ) }
+								origin="custom"
+								sizes={ customFontSizes }
+								handleAddFontSize={ handleAddFontSize }
+								handleResetFontSizes={
+									customFontSizes.length > 0
+										? () => setCustomFontSizes( [] )
+										: null
+								}
+							/>
+						) }
 					</VStack>
 				</Spacer>
 			</View>
