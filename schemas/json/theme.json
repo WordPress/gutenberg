@@ -831,6 +831,16 @@
 				"custom"
 			]
 		},
+		"settingsTopLevelOnlyProperties": {
+			"allOf": [
+				{
+					"$ref": "#/definitions/settingsPropertiesUseRootPaddingAwareAlignments"
+				}
+			]
+		},
+		"settingsTopLevelOnlyPropertyNames": {
+			"enum": [ "useRootPaddingAwareAlignments" ]
+		},
 		"settingsPropertiesComplete": {
 			"type": "object",
 			"allOf": [ { "$ref": "#/definitions/settingsProperties" } ],
@@ -2769,7 +2779,7 @@
 					"$ref": "#/definitions/settingsProperties"
 				},
 				{
-					"$ref": "#/definitions/settingsPropertiesUseRootPaddingAwareAlignments"
+					"$ref": "#/definitions/settingsTopLevelOnlyProperties"
 				},
 				{
 					"properties": {
@@ -2785,7 +2795,10 @@
 						"$ref": "#/definitions/settingsPropertyNames"
 					},
 					{
-						"enum": [ "useRootPaddingAwareAlignments", "blocks" ]
+						"$ref": "#/definitions/settingsTopLevelOnlyPropertyNames"
+					},
+					{
+						"enum": [ "blocks" ]
 					}
 				]
 			}

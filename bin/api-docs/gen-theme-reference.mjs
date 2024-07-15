@@ -208,11 +208,15 @@ const formatType = ( prop ) => {
 };
 
 // Settings
+const topLevelOnlySettings =
+	themejson.definitions.settingsTopLevelOnlyProperties.allOf.flatMap(
+		( { properties } ) => Object.entries( properties )
+	);
 const settings = themejson.definitions.settingsProperties.allOf.flatMap(
 	( { properties } ) => Object.entries( properties )
 );
 autogen += '## Settings' + '\n\n';
-settings.forEach( ( [ section, data ] ) => {
+[ ...topLevelOnlySettings, ...settings ].forEach( ( [ section, data ] ) => {
 	autogen += getSectionMarkup( section, data, 'settings' );
 } );
 
