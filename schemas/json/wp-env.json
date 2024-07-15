@@ -6,6 +6,7 @@
 			"reference": "https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/"
 		},
 		"wpEnvProperties": {
+			"type": "object",
 			"properties": {
 				"core": {
 					"description": "The WordPress installation to use. If null is specified, wp-env will use the latest production release of WordPress.",
@@ -71,6 +72,7 @@
 			"$ref": "#/definitions/wpEnvProperties"
 		},
 		{
+			"type": "object",
 			"properties": {
 				"$schema": {
 					"type": "string"
@@ -81,10 +83,10 @@
 					"default": {},
 					"patternProperties": {
 						"[a-zA-Z]": {
-							"type": "object",
 							"allOf": [
 								{ "$ref": "#/definitions/wpEnvProperties" },
 								{
+									"type": "object",
 									"properties": {
 										"core": {},
 										"phpVersion": {},
@@ -103,6 +105,7 @@
 			}
 		},
 		{
+			"type": "object",
 			"properties": {
 				"$schema": {},
 				"core": {},

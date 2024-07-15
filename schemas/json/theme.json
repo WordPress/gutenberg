@@ -28,6 +28,7 @@
 			}
 		},
 		"settingsPropertiesUseRootPaddingAwareAlignments": {
+			"type": "object",
 			"properties": {
 				"useRootPaddingAwareAlignments": {
 					"description": "Enables root padding (the values from `styles.spacing.padding`) to be applied to the contents of full-width blocks instead of the root block.\n\nPlease note that when using this setting, `styles.spacing.padding` should always be set as an object with `top`, `right`, `bottom`, `left` values declared separately.",
@@ -814,12 +815,12 @@
 			]
 		},
 		"settingsPropertiesComplete": {
-			"type": "object",
 			"allOf": [
 				{
 					"$ref": "#/definitions/settingsProperties"
 				},
 				{
+					"type": "object",
 					"properties": {
 						"appearanceTools": {},
 						"background": {},
@@ -1871,12 +1872,12 @@
 			}
 		},
 		"stylesPropertiesComplete": {
-			"type": "object",
 			"allOf": [
 				{
 					"$ref": "#/definitions/stylesProperties"
 				},
 				{
+					"type": "object",
 					"properties": {
 						"background": {},
 						"border": {},
@@ -1898,12 +1899,12 @@
 			"type": "object",
 			"properties": {
 				"button": {
-					"type": "object",
 					"allOf": [
 						{
 							"$ref": "#/definitions/stylesProperties"
 						},
 						{
+							"type": "object",
 							"properties": {
 								"border": {},
 								"background": {},
@@ -1939,12 +1940,12 @@
 					]
 				},
 				"link": {
-					"type": "object",
 					"allOf": [
 						{
 							"$ref": "#/definitions/stylesProperties"
 						},
 						{
+							"type": "object",
 							"properties": {
 								"background": {},
 								"border": {},
@@ -2316,12 +2317,12 @@
 			"additionalProperties": false
 		},
 		"stylesPropertiesAndElementsComplete": {
-			"type": "object",
 			"allOf": [
 				{
 					"$ref": "#/definitions/stylesProperties"
 				},
 				{
+					"type": "object",
 					"properties": {
 						"background": {},
 						"border": {},
@@ -2353,12 +2354,12 @@
 			}
 		},
 		"stylesVariationProperties": {
-			"type": "object",
 			"allOf": [
 				{
 					"$ref": "#/definitions/stylesProperties"
 				},
 				{
+					"type": "object",
 					"properties": {
 						"background": {},
 						"border": {},
@@ -2390,12 +2391,12 @@
 			}
 		},
 		"stylesVariationPropertiesComplete": {
-			"type": "object",
 			"allOf": [
 				{
 					"$ref": "#/definitions/stylesProperties"
 				},
 				{
+					"type": "object",
 					"properties": {
 						"background": {},
 						"border": {},
@@ -2724,12 +2725,12 @@
 			"additionalProperties": false
 		},
 		"stylesVariationBlockPropertiesComplete": {
-			"type": "object",
 			"allOf": [
 				{
 					"$ref": "#/definitions/stylesProperties"
 				},
 				{
+					"type": "object",
 					"properties": {
 						"background": {},
 						"border": {},
@@ -2782,12 +2783,12 @@
 		},
 		"settings": {
 			"description": "Settings for the block editor and individual blocks. These include things like:\n- Which customization options should be available to the user. \n- The default colors, font sizes... available to the user. \n- CSS custom properties and class names used in styles.\n- And the default layout of the editor (widths and available alignments).",
-			"type": "object",
 			"allOf": [
 				{
 					"$ref": "#/definitions/settingsProperties"
 				},
 				{
+					"type": "object",
 					"properties": {
 						"appearanceTools": {},
 						"useRootPaddingAwareAlignments": {
@@ -2814,12 +2815,12 @@
 		},
 		"styles": {
 			"description": "Organized way to set CSS properties. Styles in the top-level will be added in the `body` selector.",
-			"type": "object",
 			"allOf": [
 				{
 					"$ref": "#/definitions/stylesProperties"
 				},
 				{
+					"type": "object",
 					"properties": {
 						"background": {},
 						"border": {},
