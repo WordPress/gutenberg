@@ -811,6 +811,22 @@
 				{ "$ref": "#/definitions/settingsPropertiesCustom" }
 			]
 		},
+		"settingsPropertyNames": {
+			"enum": [
+				"appearanceTools",
+				"background",
+				"border",
+				"color",
+				"dimensions",
+				"layout",
+				"lightbox",
+				"position",
+				"shadow",
+				"spacing",
+				"typography",
+				"custom"
+			]
+		},
 		"settingsPropertiesComplete": {
 			"type": "object",
 			"allOf": [
@@ -818,21 +834,9 @@
 					"$ref": "#/definitions/settingsProperties"
 				},
 				{
-					"properties": {
-						"appearanceTools": true,
-						"background": true,
-						"border": true,
-						"color": true,
-						"dimensions": true,
-						"layout": true,
-						"lightbox": true,
-						"position": true,
-						"shadow": true,
-						"spacing": true,
-						"typography": true,
-						"custom": true
-					},
-					"additionalProperties": false
+					"propertyNames": {
+						"$ref": "#/definitions/settingsPropertyNames"
+					}
 				}
 			]
 		},
@@ -1879,6 +1883,20 @@
 				}
 			}
 		},
+		"stylesPropertyNames": {
+			"enum": [
+				"background",
+				"border",
+				"color",
+				"dimensions",
+				"spacing",
+				"typography",
+				"filter",
+				"shadow",
+				"outline",
+				"css"
+			]
+		},
 		"stylesPropertiesComplete": {
 			"type": "object",
 			"allOf": [
@@ -1886,19 +1904,9 @@
 					"$ref": "#/definitions/stylesProperties"
 				},
 				{
-					"properties": {
-						"background": true,
-						"border": true,
-						"color": true,
-						"dimensions": true,
-						"spacing": true,
-						"typography": true,
-						"filter": true,
-						"shadow": true,
-						"outline": true,
-						"css": true
-					},
-					"additionalProperties": false
+					"propertyNames": {
+						"$ref": "#/definitions/stylesPropertyNames"
+					}
 				}
 			]
 		},
@@ -1914,16 +1922,6 @@
 						},
 						{
 							"properties": {
-								"border": true,
-								"background": true,
-								"color": true,
-								"dimensions": true,
-								"filter": true,
-								"shadow": true,
-								"outline": true,
-								"spacing": true,
-								"typography": true,
-								"css": true,
 								":hover": {
 									"$ref": "#/definitions/stylesPropertiesComplete"
 								},
@@ -1942,8 +1940,26 @@
 								":any-link": {
 									"$ref": "#/definitions/stylesPropertiesComplete"
 								}
-							},
-							"additionalProperties": false
+							}
+						},
+						{
+							"propertyNames": {
+								"anyOf": [
+									{
+										"$ref": "#/definitions/stylesPropertyNames"
+									},
+									{
+										"enum": [
+											":hover",
+											":focus",
+											":active",
+											":visited",
+											":link",
+											":any-link"
+										]
+									}
+								]
+							}
 						}
 					]
 				},
@@ -1955,16 +1971,6 @@
 						},
 						{
 							"properties": {
-								"background": true,
-								"border": true,
-								"color": true,
-								"dimensions": true,
-								"spacing": true,
-								"typography": true,
-								"filter": true,
-								"shadow": true,
-								"outline": true,
-								"css": true,
 								":hover": {
 									"$ref": "#/definitions/stylesPropertiesComplete"
 								},
@@ -1983,8 +1989,26 @@
 								":any-link": {
 									"$ref": "#/definitions/stylesPropertiesComplete"
 								}
-							},
-							"additionalProperties": false
+							}
+						},
+						{
+							"propertyNames": {
+								"anyOf": [
+									{
+										"$ref": "#/definitions/stylesPropertyNames"
+									},
+									{
+										"enum": [
+											":hover",
+											":focus",
+											":active",
+											":visited",
+											":link",
+											":any-link"
+										]
+									}
+								]
+							}
 						}
 					]
 				},
@@ -2332,24 +2356,25 @@
 				},
 				{
 					"properties": {
-						"background": true,
-						"border": true,
-						"color": true,
-						"dimensions": true,
-						"spacing": true,
-						"typography": true,
-						"filter": true,
-						"shadow": true,
-						"outline": true,
-						"css": true,
 						"elements": {
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"
 						},
 						"variations": {
 							"$ref": "#/definitions/stylesVariationsPropertiesComplete"
 						}
-					},
-					"additionalProperties": false
+					}
+				},
+				{
+					"propertyNames": {
+						"anyOf": [
+							{
+								"$ref": "#/definitions/stylesPropertyNames"
+							},
+							{
+								"enum": [ "elements", "variations" ]
+							}
+						]
+					}
 				}
 			]
 		},
@@ -2369,24 +2394,25 @@
 				},
 				{
 					"properties": {
-						"background": true,
-						"border": true,
-						"color": true,
-						"dimensions": true,
-						"spacing": true,
-						"typography": true,
-						"filter": true,
-						"shadow": true,
-						"outline": true,
-						"css": true,
 						"elements": {
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"
 						},
 						"blocks": {
 							"$ref": "#/definitions/stylesVariationBlocksPropertiesComplete"
 						}
-					},
-					"additionalProperties": false
+					}
+				},
+				{
+					"propertyNames": {
+						"anyOf": [
+							{
+								"$ref": "#/definitions/stylesPropertyNames"
+							},
+							{
+								"enum": [ "elements", "blocks" ]
+							}
+						]
+					}
 				}
 			]
 		},
@@ -2406,24 +2432,25 @@
 				},
 				{
 					"properties": {
-						"background": true,
-						"border": true,
-						"color": true,
-						"dimensions": true,
-						"spacing": true,
-						"typography": true,
-						"filter": true,
-						"shadow": true,
-						"outline": true,
-						"css": true,
 						"elements": {
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"
 						},
 						"blocks": {
 							"$ref": "#/definitions/stylesVariationBlocksPropertiesComplete"
 						}
-					},
-					"additionalProperties": false
+					}
+				},
+				{
+					"propertyNames": {
+						"anyOf": [
+							{
+								"$ref": "#/definitions/stylesPropertyNames"
+							},
+							{
+								"enum": [ "elements", "blocks" ]
+							}
+						]
+					}
 				}
 			]
 		},
@@ -2740,21 +2767,22 @@
 				},
 				{
 					"properties": {
-						"background": true,
-						"border": true,
-						"color": true,
-						"dimensions": true,
-						"spacing": true,
-						"typography": true,
-						"filter": true,
-						"shadow": true,
-						"outline": true,
-						"css": true,
 						"elements": {
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"
 						}
-					},
-					"additionalProperties": false
+					}
+				},
+				{
+					"propertyNames": {
+						"anyOf": [
+							{
+								"$ref": "#/definitions/stylesPropertyNames"
+							},
+							{
+								"enum": [ "elements" ]
+							}
+						]
+					}
 				}
 			]
 		}
@@ -2798,26 +2826,28 @@
 				},
 				{
 					"properties": {
-						"appearanceTools": true,
 						"useRootPaddingAwareAlignments": {
 							"$ref": "#/definitions/settingsPropertiesUseRootPaddingAwareAlignments/properties/useRootPaddingAwareAlignments"
 						},
-						"background": true,
-						"color": true,
-						"layout": true,
-						"lightbox": true,
-						"spacing": true,
-						"typography": true,
-						"border": true,
-						"shadow": true,
-						"position": true,
-						"dimensions": true,
-						"custom": true,
 						"blocks": {
 							"$ref": "#/definitions/settingsBlocksPropertiesComplete"
 						}
-					},
-					"additionalProperties": false
+					}
+				},
+				{
+					"propertyNames": {
+						"anyOf": [
+							{
+								"$ref": "#/definitions/settingsPropertyNames"
+							},
+							{
+								"enum": [
+									"useRootPaddingAwareAlignments",
+									"blocks"
+								]
+							}
+						]
+					}
 				}
 			]
 		},
@@ -2830,16 +2860,6 @@
 				},
 				{
 					"properties": {
-						"background": true,
-						"border": true,
-						"color": true,
-						"dimensions": true,
-						"spacing": true,
-						"typography": true,
-						"filter": true,
-						"shadow": true,
-						"outline": true,
-						"css": true,
 						"elements": {
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"
 						},
@@ -2849,8 +2869,19 @@
 						"variations": {
 							"$ref": "#/definitions/stylesVariationsProperties"
 						}
-					},
-					"additionalProperties": false
+					}
+				},
+				{
+					"propertyNames": {
+						"anyOf": [
+							{
+								"$ref": "#/definitions/stylesPropertyNames"
+							},
+							{
+								"enum": [ "elements", "blocks", "variations" ]
+							}
+						]
+					}
 				}
 			]
 		},
