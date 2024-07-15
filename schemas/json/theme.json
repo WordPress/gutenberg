@@ -14,7 +14,8 @@
 					"description": "A reference to another property value. e.g. `styles.color.text`",
 					"type": "string"
 				}
-			}
+			},
+			"additionalProperties": false
 		},
 		"settingsPropertiesAppearanceTools": {
 			"type": "object",
