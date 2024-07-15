@@ -51,6 +51,14 @@ const { state, actions, callbacks } = store(
 					) }; object-fit:cover;`
 				);
 			},
+			get imageButtonRight() {
+				const { imageId } = getContext();
+				return state.metadata[ imageId ].imageButtonRight;
+			},
+			get imageButtonTop() {
+				const { imageId } = getContext();
+				return state.metadata[ imageId ].imageButtonTop;
+			},
 		},
 		actions: {
 			showLightbox() {

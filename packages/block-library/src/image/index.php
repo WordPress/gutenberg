@@ -246,8 +246,8 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 			aria-label="' . esc_attr( $aria_label ) . '"
 			data-wp-init="callbacks.initTriggerButton"
 			data-wp-on-async--click="actions.showLightbox"
-			data-wp-style--right="context.imageButtonRight"
-			data-wp-style--top="context.imageButtonTop"
+			data-wp-style--right="state.imageButtonRight"
+			data-wp-style--top="state.imageButtonTop"
 		>
 			<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 12 12">
 				<path fill="#fff" d="M2 0a2 2 0 0 0-2 2v2h1.5V2a.5.5 0 0 1 .5-.5h2V0H2Zm2 10.5H2a.5.5 0 0 1-.5-.5V8H0v2a2 2 0 0 0 2 2h2v-1.5ZM8 12v-1.5h2a.5.5 0 0 0 .5-.5V8H12v2a2 2 0 0 1-2 2H8Zm2-12a2 2 0 0 1 2 2v2h-1.5V2a.5.5 0 0 0-.5-.5H8V0h2Z" />
