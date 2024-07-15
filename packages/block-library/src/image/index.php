@@ -187,7 +187,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	$figure_styles      = $p->get_attribute( 'style' );
 
 	// Create unique id and set the image metadata in the state.
-	$unique_image_id = substr( md5( $img_uploaded_src ), 0, 10 );
+	$unique_image_id = uniqid();
 
 	wp_interactivity_state(
 		'core/image',
