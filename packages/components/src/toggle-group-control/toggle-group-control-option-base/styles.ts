@@ -64,9 +64,28 @@ export const buttonView = ( {
 		border: 0;
 	}
 
-	&[disabled] {
-		opacity: 0.4;
+	&[disabled],
+	&[aria-disabled='true'] {
 		cursor: default;
+		${ ButtonContentView } {
+			opacity: 0.4;
+		}
+
+		/**
+		 * Show an additional focus ring for disabled radio items, since the
+		 * indicator won't follow keyboard focus. This is not an issue for non-radio
+		 * items, since the backdrop is already decoupled from keyboard focus.
+		 */
+		&[role='radio']:focus-visible::after {
+			position: absolute;
+			content: '';
+
+			/* y-axis inset matches the border width for good sub-pixel alignment */
+			inset: var( --wp-admin-border-width-focus ) 4px;
+			border-radius: 2px;
+			outline: var( --wp-admin-border-width-focus ) solid
+				${ COLORS.theme.accent };
+		}
 	}
 
 	&:active {

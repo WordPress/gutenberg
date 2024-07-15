@@ -143,6 +143,7 @@ function ToggleGroupControlOptionBase(
 					</button>
 				) : (
 					<Ariakit.Radio
+						accessibleWhenDisabled
 						disabled={ disabled }
 						render={
 							<button
@@ -153,7 +154,11 @@ function ToggleGroupControlOptionBase(
 									if ( event.defaultPrevented ) {
 										return;
 									}
-									toggleGroupControlContext.setValue( value );
+									if ( ! disabled ) {
+										toggleGroupControlContext.setValue(
+											value
+										);
+									}
 								} }
 							/>
 						}
