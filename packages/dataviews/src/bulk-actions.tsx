@@ -160,7 +160,9 @@ function ActionsMenuGroup< Item >( {
 			);
 		} );
 	}, [ actions, selectedItems ] );
-
+	if ( ! elligibleActions.length ) {
+		return null;
+	}
 	return (
 		<>
 			<DropdownMenuGroup>
