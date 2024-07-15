@@ -21,7 +21,7 @@ import { forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import * as Current from '../current';
+import * as Current from '..';
 import { useInstanceId } from '@wordpress/compose';
 
 type Orientation = 'horizontal' | 'vertical';
