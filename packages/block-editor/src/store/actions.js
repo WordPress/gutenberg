@@ -572,7 +572,6 @@ export const insertBlocks =
 			}
 		}
 		if ( allowedBlocks.length ) {
-			dispatch.updateInsertUsage( blocks );
 			dispatch( {
 				type: 'INSERT_BLOCKS',
 				blocks: allowedBlocks,
@@ -582,6 +581,7 @@ export const insertBlocks =
 				initialPosition: updateSelection ? initialPosition : null,
 				meta,
 			} );
+			dispatch.updateInsertUsage( blocks );
 		}
 	};
 

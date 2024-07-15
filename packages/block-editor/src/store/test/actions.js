@@ -228,7 +228,6 @@ describe( 'actions', () => {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'chicken' ],
 				blocks: [ block ],
-				time: expect.any( Number ),
 				initialPosition: 0,
 			} );
 		} );
@@ -372,13 +371,14 @@ describe( 'actions', () => {
 			const dispatch = jest.fn();
 			dispatch.ensureDefaultBlock = jest.fn();
 			dispatch.updateInsertUsage = jest.fn();
+			const registry = createRegistry();
 
 			replaceBlocks(
 				[ 'pineapple' ],
 				blocks,
 				null,
 				null
-			)( { select, dispatch } );
+			)( { select, dispatch, registry } );
 
 			expect( dispatch.updateInsertUsage ).toHaveBeenCalledWith( blocks );
 		} );
