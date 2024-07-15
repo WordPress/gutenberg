@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   `Composite`: add stable version of the component ([#63564](https://github.com/WordPress/gutenberg/pull/63564)).
+
 ### Enhancements
 
 -   `TimePicker`: add `hideLabelFromVision` prop ([#64267](https://github.com/WordPress/gutenberg/pull/64267)).
