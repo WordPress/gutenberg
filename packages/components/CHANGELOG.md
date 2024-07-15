@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Deprecations
+
+-   `FormTokenField`: Deprecate bottom margin. Add a `__nextHasNoMarginBottom` prop to start opting into the margin-free styles that will become the default in a future version, currently scheduled to be WordPress 7.0 ([#63491](https://github.com/WordPress/gutenberg/pull/63491)).
+
 ### Bug Fixes
 
 -   `ComboboxControl`: Fix ComboboxControl reset button when using the keyboard. ([#63410](https://github.com/WordPress/gutenberg/pull/63410))

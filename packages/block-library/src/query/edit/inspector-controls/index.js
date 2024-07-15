@@ -239,7 +239,7 @@ export default function QueryInspectorControls( props ) {
 			) }
 			{ ! inherit && showFiltersPanel && (
 				<ToolsPanel
-					className="block-library-query-toolspanel__filters"
+					className="block-library-query-toolspanel__filters" // unused but kept for backward compatibility
 					label={ __( 'Filters' ) }
 					resetAll={ () => {
 						setQuery( {
