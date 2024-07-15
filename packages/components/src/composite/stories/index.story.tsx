@@ -56,7 +56,9 @@ const meta: Meta< typeof UseCompositeStorePlaceholder > = {
 };
 export default meta;
 
-export const Default: StoryFn< typeof Composite > = ( { ...initialState } ) => {
+export const Default: StoryFn< typeof Composite.Root > = ( {
+	...initialState
+} ) => {
 	const rtl = isRTL();
 	const store = Composite.useStore( { rtl, ...initialState } );
 
