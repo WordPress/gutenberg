@@ -53,7 +53,7 @@ export default function BlockThemeControl( { id } ) {
 
 	const canCreateTemplate = useSelect(
 		( select ) =>
-			select( coreStore ).canUser( 'create', {
+			!! select( coreStore ).canUser( 'create', {
 				kind: 'postType',
 				name: 'wp_template',
 			} ),
