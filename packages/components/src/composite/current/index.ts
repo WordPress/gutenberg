@@ -8,7 +8,10 @@
  * @see https://ariakit.org/components/composite
  */
 
-export {
+/**
+ * External dependencies
+ */
+import {
 	Composite,
 	CompositeGroup,
 	CompositeGroupLabel,
@@ -16,5 +19,15 @@ export {
 	CompositeRow,
 	useCompositeStore,
 } from '@ariakit/react';
+import type { CompositeStore, CompositeStoreProps } from '@ariakit/react';
 
-export type { CompositeStore, CompositeStoreProps } from '@ariakit/react';
+// Exports
+export const useStore = useCompositeStore;
+export const Root = Composite;
+export const Group = CompositeGroup;
+export const GroupLabel = CompositeGroupLabel;
+export const Item = CompositeItem;
+export const Row = CompositeRow;
+
+export type Store = CompositeStore;
+export type StoreProps = CompositeStoreProps;
