@@ -77,6 +77,7 @@ function AuthorControl( { value, onChange } ) {
 			onChange={ onAuthorChange }
 			__experimentalShowHowTo={ false }
 			__nextHasNoMarginBottom
+			__next40pxDefaultSize
 		/>
 	);
 }

@@ -49,7 +49,10 @@ export default function QueryContent( {
 	const { postsPerPage } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		const { getEntityRecord, canUser } = select( coreStore );
-		const settingPerPage = canUser( 'read', 'settings' )
+		const settingPerPage = canUser( 'read', {
+			kind: 'root',
+			name: 'site',
+		} )
 			? +getEntityRecord( 'root', 'site' )?.posts_per_page
 			: +getSettings().postsPerPage;
 		return {

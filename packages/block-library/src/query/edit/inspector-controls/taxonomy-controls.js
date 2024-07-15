@@ -191,6 +191,7 @@ function TaxonomyItem( { taxonomy, termIds, onChange } ) {
 				onChange={ onTermsChange }
 				__experimentalShowHowTo={ false }
 				__nextHasNoMarginBottom
+				__next40pxDefaultSize
 			/>
 		</div>
 	);
