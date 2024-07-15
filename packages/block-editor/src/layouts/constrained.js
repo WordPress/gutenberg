@@ -24,6 +24,7 @@ import { getCSSRules } from '@wordpress/style-engine';
 import { useSettings } from '../components/use-settings';
 import { appendSelectors, getBlockGapCSS, getAlignmentsInfo } from './utils';
 import { getGapCSSValue } from '../hooks/gap';
+import { BlockControls, JustifyContentControl } from '../components';
 import { shouldSkipSerialization } from '../hooks/utils';
 import { LAYOUT_DEFINITIONS } from './definitions';
 
@@ -146,8 +147,24 @@ export default {
 			</>
 		);
 	},
-	toolBarControls: function DefaultLayoutToolbarControls() {
-		return null;
+	toolBarControls: function DefaultLayoutToolbarControls( {
+		layout = {},
+		onChange,
+		layoutBlockSupport,
+	} ) {
+		const { allowJustification = true } = layoutBlockSupport;
+
+		if ( ! allowJustification ) {
+			return null;
+		}
+		return (
+			<BlockControls group="block" __experimentalShareWithChildBlocks>
+				<DefaultLayoutJustifyContentControl
+					layout={ layout }
+					onChange={ onChange }
+				/>
+			</BlockControls>
+		);
 	},
 	getLayoutStyle: function getLayoutStyle( {
 		selector,
@@ -278,3 +295,27 @@ export default {
 		return alignments;
 	},
 };
+
+const POPOVER_PROPS = {
+	placement: 'bottom-start',
+};
+
+function DefaultLayoutJustifyContentControl( { layout, onChange } ) {
+	const { justifyContent = 'center' } = layout;
+	const onJustificationChange = ( value ) => {
+		onChange( {
+			...layout,
+			justifyContent: value,
+		} );
+	};
+	const allowedControls = [ 'left', 'center', 'right' ];
+
+	return (
+		<JustifyContentControl
+			allowedControls={ allowedControls }
+			value={ justifyContent }
+			onChange={ onJustificationChange }
+			popoverProps={ POPOVER_PROPS }
+		/>
+	);
+}

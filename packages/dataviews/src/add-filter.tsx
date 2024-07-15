@@ -44,7 +44,7 @@ function AddFilter(
 		<DropdownMenu
 			trigger={
 				<Button
-					__experimentalIsFocusable
+					accessibleWhenDisabled
 					size="compact"
 					className="dataviews-filters-button"
 					variant="tertiary"

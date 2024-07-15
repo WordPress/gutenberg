@@ -266,7 +266,10 @@ function useSiteEditorBasicNavigationCommands() {
 		'site-editor.php'
 	);
 	const canCreateTemplate = useSelect( ( select ) => {
-		return select( coreStore ).canUser( 'create', 'templates' );
+		return select( coreStore ).canUser( 'create', {
+			kind: 'postType',
+			name: 'wp_template',
+		} );
 	}, [] );
 	const isBlockBasedTheme = useIsBlockBasedTheme();
 	const commands = useMemo( () => {
@@ -315,7 +318,7 @@ function useSiteEditorBasicNavigationCommands() {
 				icon: page,
 				callback: ( { close } ) => {
 					const args = {
-						post_type: 'page',
+						postType: 'page',
 					};
 					const targetUrl = addQueryArgs( 'site-editor.php', args );
 					if ( isSiteEditor ) {

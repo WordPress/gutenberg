@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
+	__experimentalText as Text,
 	__experimentalItemGroup as ItemGroup,
 	__experimentalVStack as VStack,
 	Button,
@@ -48,17 +49,11 @@ function FontFamilies() {
 				/>
 			) }
 
-			<VStack spacing={ 2 }>
-				<Subtitle level={ 3 }>{ __( 'Fonts' ) }</Subtitle>
-				{ hasFonts ? (
-					<>
+			<VStack spacing={ 4 }>
+				{ themeFonts.length > 0 && (
+					<VStack>
+						<Subtitle level={ 3 }>{ __( 'Theme Fonts' ) }</Subtitle>
 						<ItemGroup isBordered isSeparated>
-							{ customFonts.map( ( font ) => (
-								<FontFamilyItem
-									key={ font.slug }
-									font={ font }
-								/>
-							) ) }
 							{ themeFonts.map( ( font ) => (
 								<FontFamilyItem
 									key={ font.slug }
@@ -66,30 +61,41 @@ function FontFamilies() {
 								/>
 							) ) }
 						</ItemGroup>
-						<Button
-							className="edit-site-global-styles-font-families__manage-fonts"
-							variant="secondary"
-							__next40pxDefaultSize
-							onClick={ () =>
-								setModalTabOpen( 'installed-fonts' )
-							}
-						>
-							{ __( 'Manage fonts' ) }
-						</Button>
-					</>
-				) : (
-					<>
-						{ __( 'No fonts installed.' ) }
-						<Button
-							className="edit-site-global-styles-font-families__add-fonts"
-							variant="secondary"
-							__next40pxDefaultSize
-							onClick={ () => setModalTabOpen( 'upload-fonts' ) }
-						>
-							{ __( 'Add fonts' ) }
-						</Button>
-					</>
+					</VStack>
 				) }
+				{ customFonts.length > 0 && (
+					<VStack>
+						<Subtitle level={ 3 }>
+							{ __( 'Custom fonts' ) }
+						</Subtitle>
+						<ItemGroup isBordered isSeparated>
+							{ customFonts.map( ( font ) => (
+								<FontFamilyItem
+									key={ font.slug }
+									font={ font }
+								/>
+							) ) }
+						</ItemGroup>
+					</VStack>
+				) }
+				{ ! hasFonts && (
+					<VStack>
+						<Subtitle level={ 3 }>{ __( 'Fonts' ) }</Subtitle>
+						<Text as="p">{ __( 'No fonts installed.' ) }</Text>
+					</VStack>
+				) }
+				<Button
+					className="edit-site-global-styles-font-families__manage-fonts"
+					variant="secondary"
+					__next40pxDefaultSize
+					onClick={ () =>
+						setModalTabOpen(
+							hasFonts ? 'installed-fonts' : 'upload-fonts'
+						)
+					}
+				>
+					{ hasFonts ? __( 'Manage fonts' ) : __( 'Add fonts' ) }
+				</Button>
 			</VStack>
 		</>
 	);

@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "18.7.0-rc.1",
+	"version": "18.8.0-rc.2",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -92,8 +92,7 @@
 		"@wordpress/warning": "file:packages/warning",
 		"@wordpress/widgets": "file:packages/widgets",
 		"@wordpress/wordcount": "file:packages/wordcount",
-		"es-module-shims": "^1.8.2",
-		"postcss-local-keyframes": "^0.0.2"
+		"es-module-shims": "^1.8.2"
 	},
 	"devDependencies": {
 		"@actions/core": "1.9.1",
@@ -111,7 +110,7 @@
 		"@octokit/rest": "16.26.0",
 		"@octokit/types": "6.34.0",
 		"@octokit/webhooks-types": "5.8.0",
-		"@playwright/test": "1.43.0",
+		"@playwright/test": "1.45.1",
 		"@pmmmwh/react-refresh-webpack-plugin": "0.5.11",
 		"@react-native/babel-preset": "0.73.10",
 		"@react-native/metro-babel-transformer": "0.73.10",

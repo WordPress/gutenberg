@@ -36,8 +36,14 @@ export default function PostCardPanel( { actions } ) {
 				getCurrentPostId,
 				__experimentalGetTemplateInfo,
 			} = select( editorStore );
+			const { canUser } = select( coreStore );
 			const { getEditedEntityRecord } = select( coreStore );
-			const siteSettings = getEditedEntityRecord( 'root', 'site' );
+			const siteSettings = canUser( 'read', {
+				kind: 'root',
+				name: 'site',
+			} )
+				? getEditedEntityRecord( 'root', 'site' )
+				: undefined;
 			const _type = getCurrentPostType();
 			const _id = getCurrentPostId();
 			const _record = getEditedEntityRecord( 'postType', _type, _id );

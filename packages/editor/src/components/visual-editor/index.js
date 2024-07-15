@@ -142,7 +142,10 @@ function VisualEditor( {
 		const editorSettings = getEditorSettings();
 		const supportsTemplateMode = editorSettings.supportsTemplateMode;
 		const postTypeObject = getPostType( postTypeSlug );
-		const canEditTemplate = canUser( 'create', 'templates' );
+		const canEditTemplate = canUser( 'create', {
+			kind: 'postType',
+			name: 'wp_template',
+		} );
 		const currentTemplateId = getCurrentTemplateId();
 		const template = currentTemplateId
 			? getEditedEntityRecord(
@@ -341,7 +344,7 @@ function VisualEditor( {
 	const zoomOutProps = isZoomOutMode
 		? {
 				scale: 'default',
-				frameSize: '20px',
+				frameSize: '48px',
 		  }
 		: {};
 

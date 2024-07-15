@@ -13,7 +13,6 @@ import {
 	useRef,
 	useMemo,
 } from '@wordpress/element';
-import { __, _n } from '@wordpress/i18n';
 import { useInstanceId, useMergeRefs, useRefEffect } from '@wordpress/compose';
 import {
 	create,

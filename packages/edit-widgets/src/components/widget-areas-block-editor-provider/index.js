@@ -30,6 +30,8 @@ const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 
+const EMPTY_ARRAY = [];
+
 export default function WidgetAreasBlockEditorProvider( {
 	blockEditorSettings,
 	children,
@@ -46,7 +48,10 @@ export default function WidgetAreasBlockEditorProvider( {
 	} = useSelect( ( select ) => {
 		const { canUser, getEntityRecord, getEntityRecords } =
 			select( coreStore );
-		const siteSettings = canUser( 'read', 'settings' )
+		const siteSettings = canUser( 'read', {
+			kind: 'root',
+			name: 'site',
+		} )
 			? getEntityRecord( 'root', 'site' )
 			: undefined;
 		return {
@@ -54,7 +59,7 @@ export default function WidgetAreasBlockEditorProvider( {
 			widgets: select( editWidgetsStore ).getWidgets(),
 			reusableBlocks: ALLOW_REUSABLE_BLOCKS
 				? getEntityRecords( 'postType', 'wp_block' )
-				: [],
+				: EMPTY_ARRAY,
 			isFixedToolbarActive: !! select( preferencesStore ).get(
 				'core/edit-widgets',
 				'fixedToolbar'

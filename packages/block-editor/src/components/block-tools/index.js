@@ -20,6 +20,7 @@ import {
 } from './insertion-point';
 import BlockToolbarPopover from './block-toolbar-popover';
 import BlockToolbarBreadcrumb from './block-toolbar-breadcrumb';
+import ZoomOutPopover from './zoom-out-popover';
 import { store as blockEditorStore } from '../../store';
 import usePopoverScroll from '../block-popover/use-popover-scroll';
 import ZoomOutModeInserters from './zoom-out-mode-inserters';
@@ -79,6 +80,7 @@ export default function BlockTools( {
 		showEmptyBlockSideInserter,
 		showBreadcrumb,
 		showBlockToolbarPopover,
+		showZoomOutToolbar,
 	} = useShowBlockTools();
 
 	const {
@@ -224,6 +226,13 @@ export default function BlockTools( {
 				{ showBreadcrumb && (
 					<BlockToolbarBreadcrumb
 						ref={ blockSelectionButtonRef }
+						__unstableContentRef={ __unstableContentRef }
+						clientId={ clientId }
+					/>
+				) }
+
+				{ showZoomOutToolbar && (
+					<ZoomOutPopover
 						__unstableContentRef={ __unstableContentRef }
 						clientId={ clientId }
 					/>

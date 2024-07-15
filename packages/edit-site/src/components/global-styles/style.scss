@@ -23,6 +23,17 @@
 	overflow: hidden;
 }
 
+.edit-site-font-size__item {
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	line-break: anywhere;
+}
+
+.edit-site-font-size__item-value {
+	color: $gray-700;
+}
+
 .edit-site-global-styles-screen {
 	margin: $grid-unit-15 $grid-unit-20 $grid-unit-20;
 }
@@ -41,7 +52,6 @@
 	color: $gray-700;
 }
 
-.edit-site-global-styles-font-families__add-fonts,
 .edit-site-global-styles-font-families__manage-fonts {
 	justify-content: center;
 }
@@ -108,7 +118,7 @@
 }
 
 .edit-site-global-styles__shadow-preview-panel {
-	height: 150px;
+	height: $grid-unit-60 * 3;
 	border: $gray-200 $border-width solid;
 	border-radius: $radius-block-ui;
 	overflow: auto;

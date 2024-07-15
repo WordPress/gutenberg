@@ -24,7 +24,13 @@ import {
 } from './bulk-actions';
 import { normalizeFields } from './normalize-fields';
 import BulkActionsToolbar from './bulk-actions-toolbar';
-import type { Action, Field, View, ViewBaseProps } from './types';
+import type {
+	Action,
+	Field,
+	View,
+	ViewBaseProps,
+	SupportedLayouts,
+} from './types';
 import type { SetSelection, SelectionOrUpdater } from './private-types';
 
 type ItemWithId = { id: string };
@@ -42,7 +48,7 @@ type DataViewsProps< Item > = {
 		totalItems: number;
 		totalPages: number;
 	};
-	supportedLayouts: string[];
+	defaultLayouts: SupportedLayouts;
 	selection?: string[];
 	setSelection?: SetSelection;
 	onSelectionChange?: ( items: Item[] ) => void;
@@ -65,7 +71,7 @@ export default function DataViews< Item >( {
 	getItemId = defaultGetItemId,
 	isLoading = false,
 	paginationInfo,
-	supportedLayouts,
+	defaultLayouts,
 	selection: selectionProperty,
 	setSelection: setSelectionProperty,
 	onSelectionChange = defaultOnSelectionChange,
@@ -142,7 +148,7 @@ export default function DataViews< Item >( {
 					fields={ _fields }
 					view={ view }
 					onChangeView={ onChangeView }
-					supportedLayouts={ supportedLayouts }
+					defaultLayouts={ defaultLayouts }
 				/>
 			</HStack>
 			<ViewComponent

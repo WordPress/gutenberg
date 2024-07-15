@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import * as Ariakit from '@ariakit/react';
+
+/**
  * WordPress dependencies
  */
 import { createContext, useCallback, useMemo } from '@wordpress/element';
@@ -17,9 +22,9 @@ import type {
 	_CustomSelectInternalProps,
 	_CustomSelectProps,
 } from './types';
-import type { WordPressComponentProps } from '../context';
 import InputBase from '../input-control/input-base';
 import SelectControlChevronDown from '../select-control/chevron-down';
+import BaseControl from '../base-control';
 
 export const CustomSelectContext =
 	createContext< CustomSelectContextType >( undefined );
@@ -51,11 +56,10 @@ const CustomSelectButton = ( {
 	store,
 	...restProps
 }: Omit<
-	WordPressComponentProps<
-		CustomSelectButtonProps & CustomSelectButtonSize & CustomSelectStore,
-		'button',
-		false
-	>,
+	React.ComponentProps< typeof Ariakit.Select > &
+		CustomSelectButtonProps &
+		CustomSelectButtonSize &
+		CustomSelectStore,
 	'onChange'
 > ) => {
 	const { value: currentValue } = store.useState();
@@ -71,9 +75,6 @@ const CustomSelectButton = ( {
 			size={ size }
 			hasCustomRenderProp={ !! renderSelectedValue }
 			store={ store }
-			// to match legacy behavior where using arrow keys
-			// move selection rather than open the popover
-			showOnKeyDown={ false }
 		>
 			{ computedRenderSelectedValue( currentValue ) }
 		</Styled.Select>
@@ -107,16 +108,25 @@ function _CustomSelect(
 			[ isLegacy ]
 		);
 
+	const contextValue = useMemo( () => ( { store, size } ), [ store, size ] );
+
 	return (
 		// Where should `restProps` be forwarded to?
 		<div className={ className }>
-			{ hideLabelFromVision ? ( // TODO: Replace with BaseControl
-				<VisuallyHidden as="label">{ label }</VisuallyHidden>
-			) : (
-				<Styled.SelectLabel store={ store }>
-					{ label }
-				</Styled.SelectLabel>
-			) }
+			<Ariakit.SelectLabel
+				store={ store }
+				render={
+					hideLabelFromVision ? (
+						// @ts-expect-error `children` are passed via the render prop
+						<VisuallyHidden />
+					) : (
+						// @ts-expect-error `children` are passed via the render prop
+						<BaseControl.VisualLabel as="div" />
+					)
+				}
+			>
+				{ label }
+			</Ariakit.SelectLabel>
 			<InputBase
 				__next40pxDefaultSize
 				size={ size }
@@ -126,6 +136,8 @@ function _CustomSelect(
 					{ ...restProps }
 					size={ size }
 					store={ store }
+					// Match legacy behavior (move selection rather than open the popover)
+					showOnKeyDown={ ! isLegacy }
 				/>
 				<Styled.SelectPopover
 					gutter={ 12 }
@@ -133,8 +145,10 @@ function _CustomSelect(
 					sameWidth
 					slide={ false }
 					onKeyDown={ onSelectPopoverKeyDown }
+					// Match legacy behavior
+					flip={ ! isLegacy }
 				>
-					<CustomSelectContext.Provider value={ { store } }>
+					<CustomSelectContext.Provider value={ contextValue }>
 						{ children }
 					</CustomSelectContext.Provider>
 				</Styled.SelectPopover>

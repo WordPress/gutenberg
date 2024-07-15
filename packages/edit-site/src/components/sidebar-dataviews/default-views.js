@@ -26,17 +26,31 @@ import {
 	OPERATOR_IS_ANY,
 } from '../../utils/constants';
 
-export const DEFAULT_CONFIG_PER_VIEW_TYPE = {
+export const defaultLayouts = {
 	[ LAYOUT_TABLE ]: {
-		primaryField: 'title',
+		layout: {
+			primaryField: 'title',
+			styles: {
+				'featured-image': {
+					width: '1%',
+				},
+				title: {
+					maxWidth: 300,
+				},
+			},
+		},
 	},
 	[ LAYOUT_GRID ]: {
-		mediaField: 'featured-image',
-		primaryField: 'title',
+		layout: {
+			mediaField: 'featured-image',
+			primaryField: 'title',
+		},
 	},
 	[ LAYOUT_LIST ]: {
-		primaryField: 'title',
-		mediaField: 'featured-image',
+		layout: {
+			primaryField: 'title',
+			mediaField: 'featured-image',
+		},
 	},
 };
 
@@ -50,12 +64,8 @@ const DEFAULT_POST_BASE = {
 		field: 'date',
 		direction: 'desc',
 	},
-	// All fields are visible by default, so it's
-	// better to keep track of the hidden ones.
-	hiddenFields: [ 'date', 'featured-image' ],
-	layout: {
-		...DEFAULT_CONFIG_PER_VIEW_TYPE[ LAYOUT_LIST ],
-	},
+	fields: [ 'title', 'author', 'status' ],
+	layout: defaultLayouts[ LAYOUT_LIST ].layout,
 };
 
 export function useDefaultViews( { postType } ) {
