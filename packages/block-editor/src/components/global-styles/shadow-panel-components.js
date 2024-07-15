@@ -10,7 +10,7 @@ import {
 	Button,
 	FlexItem,
 	Dropdown,
-	privateApis as componentsPrivateApis,
+	Composite,
 } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { shadow as shadowIcon, Icon, check } from '@wordpress/icons';
@@ -21,20 +21,12 @@ import { shadow as shadowIcon, Icon, check } from '@wordpress/icons';
 import clsx from 'clsx';
 
 /**
- * Internal dependencies
- */
-import { unlock } from '../../lock-unlock';
-
-/**
  * Shared reference to an empty array for cases where it is important to avoid
  * returning a new array reference on every invocation.
  *
  * @type {Array}
  */
 const EMPTY_ARRAY = [];
-const { CompositeItemV2: CompositeItem, CompositeV2: Composite } = unlock(
-	componentsPrivateApis
-);
 
 export function ShadowPopoverContainer( { shadow, onShadowChange, settings } ) {
 	const shadows = useShadowPresets( settings );
@@ -88,7 +80,7 @@ export function ShadowPresets( { presets, activeShadow, onSelect } ) {
 
 export function ShadowIndicator( { type, label, isActive, onSelect, shadow } ) {
 	return (
-		<CompositeItem
+		<Composite.Item
 			role="option"
 			aria-label={ label }
 			aria-selected={ isActive }

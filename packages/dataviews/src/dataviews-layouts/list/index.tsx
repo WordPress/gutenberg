@@ -14,6 +14,7 @@ import {
 	privateApis as componentsPrivateApis,
 	Spinner,
 	VisuallyHidden,
+	Composite,
 } from '@wordpress/components';
 import {
 	useCallback,
@@ -48,12 +49,7 @@ interface ListViewItemProps< Item > {
 	onDropdownTriggerKeyDown: React.KeyboardEventHandler< HTMLButtonElement >;
 }
 
-const {
-	CompositeV2: Composite,
-	CompositeItemV2: CompositeItem,
-	CompositeRowV2: CompositeRow,
-	DropdownMenuV2: DropdownMenu,
-} = unlock( componentsPrivateApis );
+const { DropdownMenuV2: DropdownMenu } = unlock( componentsPrivateApis );
 
 function generateItemWrapperCompositeId( idPrefix: string ) {
 	return `${ idPrefix }-item-wrapper`;
@@ -92,7 +88,7 @@ function PrimaryActionGridCell< Item >( {
 
 	return 'RenderModal' in primaryAction ? (
 		<div role="gridcell" key={ primaryAction.id }>
-			<CompositeItem
+			<Composite.Item
 				id={ compositeItemId }
 				render={
 					<Button
@@ -111,11 +107,11 @@ function PrimaryActionGridCell< Item >( {
 						closeModal={ () => setIsModalOpen( false ) }
 					/>
 				) }
-			</CompositeItem>
+			</Composite.Item>
 		</div>
 	) : (
 		<div role="gridcell" key={ primaryAction.id }>
-			<CompositeItem
+			<Composite.Item
 				id={ compositeItemId }
 				render={
 					<Button
@@ -192,7 +188,7 @@ function ListItem< Item >( {
 	) : null;
 
 	return (
-		<CompositeRow
+		<Composite.Row
 			ref={ itemRef }
 			render={ <li /> }
 			role="row"
@@ -209,7 +205,7 @@ function ListItem< Item >( {
 				spacing={ 0 }
 			>
 				<div role="gridcell">
-					<CompositeItem
+					<Composite.Item
 						render={ <div /> }
 						role="button"
 						id={ generateItemWrapperCompositeId( idPrefix ) }
@@ -260,7 +256,7 @@ function ListItem< Item >( {
 								</div>
 							</VStack>
 						</HStack>
-					</CompositeItem>
+					</Composite.Item>
 				</div>
 				{ eligibleActions?.length > 0 && (
 					<HStack
@@ -282,7 +278,7 @@ function ListItem< Item >( {
 						<div role="gridcell">
 							<DropdownMenu
 								trigger={
-									<CompositeItem
+									<Composite.Item
 										id={ generateDropdownTriggerCompositeId(
 											idPrefix
 										) }
@@ -311,7 +307,7 @@ function ListItem< Item >( {
 					</HStack>
 				) }
 			</HStack>
-		</CompositeRow>
+		</Composite.Row>
 	);
 }
 
