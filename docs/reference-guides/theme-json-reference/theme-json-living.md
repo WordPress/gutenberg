@@ -24,6 +24,15 @@ See [Developing with theme.json](/docs/how-to-guides/themes/global-settings-and-
 ## Settings
 
 
+### useRootPaddingAwareAlignments
+
+Enables root padding (the values from `styles.spacing.padding`) to be applied to the contents of full-width blocks instead of the root block.
+
+Please note that when using this setting, `styles.spacing.padding` should always be set as an object with `top`, `right`, `bottom`, `left` values declared separately.
+
+
+---
+
 ### appearanceTools
 
 Setting that enables the following UI tools:
@@ -39,14 +48,14 @@ Setting that enables the following UI tools:
 
 ---
 
-### useRootPaddingAwareAlignments
+### background
 
-_**Note:** Since WordPress 6.1._
+Settings related to background.
 
-Enables root padding (the values from `styles.spacing.padding`) to be applied to the contents of full-width blocks instead of the root block.
-
-Please note that when using this setting, `styles.spacing.padding` should always be set as an object with `top`, `right`, `bottom`, `left` values declared separately.
-
+| Property  | Type   | Default | Props  |
+| ---    | ---    | ---    |---   |
+| backgroundImage | boolean | false |  |
+| backgroundSize | boolean | false |  |
 
 ---
 
@@ -60,17 +69,6 @@ Settings related to borders.
 | radius | boolean | false |  |
 | style | boolean | false |  |
 | width | boolean | false |  |
-
----
-
-### shadow
-
-Settings related to shadows.
-
-| Property  | Type   | Default | Props  |
-| ---    | ---    | ---    |---   |
-| defaultPresets | boolean | true |  |
-| presets | array |  | name, shadow, slug |
 
 ---
 
@@ -95,17 +93,6 @@ Settings related to colors.
 | heading | boolean | true |  |
 | button | boolean | true |  |
 | caption | boolean | true |  |
-
----
-
-### background
-
-Settings related to background.
-
-| Property  | Type   | Default | Props  |
-| ---    | ---    | ---    |---   |
-| backgroundImage | boolean | false |  |
-| backgroundSize | boolean | false |  |
 
 ---
 
@@ -153,6 +140,17 @@ Settings related to position.
 | Property  | Type   | Default | Props  |
 | ---    | ---    | ---    |---   |
 | sticky | boolean | false |  |
+
+---
+
+### shadow
+
+Settings related to shadows.
+
+| Property  | Type   | Default | Props  |
+| ---    | ---    | ---    |---   |
+| defaultPresets | boolean | true |  |
+| presets | array |  | name, shadow, slug |
 
 ---
 
