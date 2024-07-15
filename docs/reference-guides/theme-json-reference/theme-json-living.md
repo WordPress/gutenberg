@@ -41,8 +41,6 @@ Setting that enables the following UI tools:
 
 ### useRootPaddingAwareAlignments
 
-_**Note:** Since WordPress 6.1._
-
 Enables root padding (the values from `styles.spacing.padding`) to be applied to the contents of full-width blocks instead of the root block.
 
 Please note that when using this setting, `styles.spacing.padding` should always be set as an object with `top`, `right`, `bottom`, `left` values declared separately.
