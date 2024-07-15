@@ -30,4 +30,9 @@
 .components-radio-control__label {
 	cursor: pointer;
 	font-weight: 500;
+	line-height: $radio-input-size-sm;
+
+	@include break-small() {
+		line-height: $radio-input-size;
+	}
 }
