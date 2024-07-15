@@ -20,7 +20,7 @@ import {
 import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useContext, useEffect, useState } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { chevronLeft } from '@wordpress/icons';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
@@ -172,7 +172,10 @@ function InstalledFonts() {
 								{ baseThemeFonts.length > 0 && (
 									<VStack>
 										<h2 className="font-library-modal__fonts-title">
-											{ __( 'Theme' ) }
+											{
+												/* translators: Heading for a list of fonts provided by the theme. */
+												_x( 'Theme' )
+											}
 										</h2>
 										{ /*
 										 * Disable reason: The `list` ARIA role is redundant but
@@ -209,7 +212,10 @@ function InstalledFonts() {
 								{ baseCustomFonts.length > 0 && (
 									<VStack>
 										<h2 className="font-library-modal__fonts-title">
-											{ __( 'Custom' ) }
+											{
+												/* translators: Heading for a list of fonts installed by the user. */
+												_x( 'Custom' )
+											}
 										</h2>
 										{ /*
 										 * Disable reason: The `list` ARIA role is redundant but
