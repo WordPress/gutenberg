@@ -161,12 +161,32 @@ const unproxiedCompositeGroup = forwardRef<
 	return <Component ref={ ref } role={ role } { ...props } />;
 } );
 
+/**
+ * _Note: please use the `Composite` component instead._
+ *
+ * @deprecated
+ */
 export const Composite = proxyComposite( Current, { baseId: 'id' } );
+/**
+ * _Note: please use the `Composite.Group` component instead._
+ *
+ * @deprecated
+ */
 export const CompositeGroup = proxyComposite( unproxiedCompositeGroup );
+/**
+ * _Note: please use the `Composite.Item` component instead._
+ *
+ * @deprecated
+ */
 export const CompositeItem = proxyComposite( Current.Item, {
 	focusable: 'accessibleWhenDisabled',
 } );
 
+/**
+ * _Note: please use the `Composite` component instead._
+ *
+ * @deprecated
+ */
 export function useCompositeState(
 	legacyStateOptions: LegacyStateOptions = {}
 ): CompositeState {
