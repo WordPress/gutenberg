@@ -517,6 +517,10 @@ _Parameters_
 
 > **Deprecated** since 5.3, use `wp.blockEditor.ObserveTyping` instead.
 
+### OfflineStatus
+
+Undocumented declaration.
+
 ### PageAttributesCheck
 
 Wrapper component that renders its children only if the post type supports page attributes.

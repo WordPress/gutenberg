@@ -450,19 +450,6 @@ _Returns_
 
 -   `import('react').RefCallback<TypeFromRef<TRef>>`: The merged ref callback.
 
-### useObservableValue
-
-React hook that lets you observe an entry in an `ObservableMap`. The hook returns the current value corresponding to the key, or `undefined` when there is no value stored. It also observes changes to the value and triggers an update of the calling component in case the value changes.
-
-_Parameters_
-
--   _map_ `ObservableMap< K, V >`: The `ObservableMap` to observe.
--   _name_ `K`: The map key to observe.
-
-_Returns_
-
--   `V | undefined`: The value corresponding to the map key requested.
-
 ### useNetworkConnectivity
 
 Returns the current network connectivity status provided by `window.navigator`.
@@ -476,6 +463,19 @@ const { isConnected } = useNetworkConnectivity();
 _Returns_
 
 -   `NetworkInformation`: Network information.
+
+### useObservableValue
+
+React hook that lets you observe an entry in an `ObservableMap`. The hook returns the current value corresponding to the key, or `undefined` when there is no value stored. It also observes changes to the value and triggers an update of the calling component in case the value changes.
+
+_Parameters_
+
+-   _map_ `ObservableMap< K, V >`: The `ObservableMap` to observe.
+-   _name_ `K`: The map key to observe.
+
+_Returns_
+
+-   `V | undefined`: The value corresponding to the map key requested.
 
 ### usePrevious
 
