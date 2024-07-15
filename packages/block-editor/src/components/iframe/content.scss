@@ -23,7 +23,7 @@
 
 .block-editor-iframe__html {
 	transform-origin: top center;
-	transition: transform 0.3s;
+	transition: transform 0.3s, opacity 0.5s ease-in-out 0.1s;
 	@include reduce-motion("transition");
 }
 

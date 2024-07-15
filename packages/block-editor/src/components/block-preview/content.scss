@@ -1,3 +1,9 @@
+.block-editor-block-preview__content-iframe {
+	opacity: 0;
+	transition: opacity 1s ease-in-out;
+	transition-delay: 0.5s;
+}
+
 // Hide inserter from previews.
 .block-editor-block-preview__content-iframe .block-list-appender {
 	display: none;
