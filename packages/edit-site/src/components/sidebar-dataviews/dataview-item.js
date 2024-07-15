@@ -35,11 +35,15 @@ export default function DataViewItem( {
 	const iconToUse =
 		icon || VIEW_LAYOUTS.find( ( v ) => v.type === type ).icon;
 
+	let activeView = isCustom ? customViewId : slug;
+	if ( activeView === 'all' ) {
+		activeView = undefined;
+	}
 	const linkInfo = useLink( {
 		postType,
 		layout,
-		activeView: isCustom ? customViewId : slug,
-		isCustom: isCustom ? 'true' : 'false',
+		activeView,
+		isCustom: isCustom ? 'true' : undefined,
 	} );
 	return (
 		<HStack

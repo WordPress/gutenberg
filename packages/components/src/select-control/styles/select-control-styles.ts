@@ -12,6 +12,7 @@ import { space } from '../../utils/space';
 import type { SelectControlProps } from '../types';
 import InputControlSuffixWrapper from '../../input-control/input-suffix-wrapper';
 import { fontSizeStyles } from '../../input-control/styles/input-control-styles';
+import InputBase from '../../input-control/input-base';
 
 interface SelectProps
 	extends Pick<
@@ -28,10 +29,18 @@ const disabledStyles = ( { disabled }: SelectProps ) => {
 		return '';
 	}
 
-	return css( {
-		color: COLORS.ui.textDisabled,
-	} );
+	return css`
+		color: ${ COLORS.ui.textDisabled };
+		cursor: default;
+	`;
 };
+
+export const StyledInputBase = styled( InputBase )`
+	color: ${ COLORS.theme.foreground };
+	cursor: pointer;
+
+	${ disabledStyles }
+`;
 
 const sizeStyles = ( {
 	__next40pxDefaultSize,
@@ -128,17 +137,15 @@ export const Select = styled.select< SelectProps >`
 		box-sizing: border-box;
 		border: none;
 		box-shadow: none !important;
-		color: ${ COLORS.gray[ 900 ] };
+		cursor: inherit;
 		display: block;
 		font-family: inherit;
 		margin: 0;
 		width: 100%;
 		max-width: none;
-		cursor: pointer;
 		white-space: nowrap;
 		text-overflow: ellipsis;
 
-		${ disabledStyles };
 		${ fontSizeStyles };
 		${ sizeStyles };
 		${ sizePaddings };
@@ -149,6 +156,10 @@ export const Select = styled.select< SelectProps >`
 export const DownArrowWrapper = styled.div`
 	margin-inline-end: ${ space( -1 ) }; // optically adjust the icon
 	line-height: 0;
+
+	path {
+		fill: currentColor;
+	}
 `;
 
 export const InputControlSuffixWrapperWithClickThrough = styled(

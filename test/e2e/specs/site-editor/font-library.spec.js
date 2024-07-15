@@ -14,15 +14,15 @@ test.describe( 'Font Library', () => {
 			await editor.canvas.locator( 'body' ).click();
 		} );
 
-		test( 'should display the "Manage Fonts" icon', async ( { page } ) => {
+		test( 'should display the "Add fonts" button', async ( { page } ) => {
 			await page.getByRole( 'button', { name: 'Styles' } ).click();
 			await page
 				.getByRole( 'button', { name: 'Typography Styles' } )
 				.click();
-			const manageFontsIcon = page.getByRole( 'button', {
-				name: 'Manage Fonts',
+			const addFontsButton = page.getByRole( 'button', {
+				name: 'Add fonts',
 			} );
-			await expect( manageFontsIcon ).toBeVisible();
+			await expect( addFontsButton ).toBeVisible();
 		} );
 	} );
 
@@ -36,18 +36,20 @@ test.describe( 'Font Library', () => {
 			await editor.canvas.locator( 'body' ).click();
 		} );
 
-		test( 'should display the "Manage Fonts" icon', async ( { page } ) => {
+		test( 'should display the "Manage fonts" button', async ( {
+			page,
+		} ) => {
 			await page.getByRole( 'button', { name: 'Styles' } ).click();
 			await page
 				.getByRole( 'button', { name: 'Typography Styles' } )
 				.click();
-			const manageFontsIcon = page.getByRole( 'button', {
-				name: 'Manage Fonts',
+			const manageFontsButton = page.getByRole( 'button', {
+				name: 'Manage fonts',
 			} );
-			await expect( manageFontsIcon ).toBeVisible();
+			await expect( manageFontsButton ).toBeVisible();
 		} );
 
-		test( 'should open the "Manage Fonts" modal when clicking the "Manage Fonts" icon', async ( {
+		test( 'should open the "Manage fonts" modal when clicking the "Manage fonts" button', async ( {
 			page,
 		} ) => {
 			await page.getByRole( 'button', { name: 'Styles' } ).click();
@@ -56,7 +58,7 @@ test.describe( 'Font Library', () => {
 				.click();
 			await page
 				.getByRole( 'button', {
-					name: 'Manage Fonts',
+					name: 'Manage fonts',
 				} )
 				.click();
 			await expect( page.getByRole( 'dialog' ) ).toBeVisible();
@@ -74,7 +76,7 @@ test.describe( 'Font Library', () => {
 				.click();
 			await page
 				.getByRole( 'button', {
-					name: 'Manage Fonts',
+					name: 'Manage fonts',
 				} )
 				.click();
 			await page.getByRole( 'button', { name: 'System Font' } ).click();
@@ -120,12 +122,11 @@ test.describe( 'Font Library', () => {
 				.click();
 			await page
 				.getByRole( 'button', {
-					name: 'Manage Fonts',
+					name: 'Add fonts',
 				} )
 				.click();
 
 			// Upload local fonts.
-			await page.getByRole( 'tab', { name: 'Upload' } ).click();
 			const fileChooserPromise = page.waitForEvent( 'filechooser' );
 			await page.getByRole( 'button', { name: 'Upload Font' } ).click();
 			const fileChooser = await fileChooserPromise;
@@ -163,7 +164,7 @@ test.describe( 'Font Library', () => {
 			await page.getByRole( 'button', { name: 'Back' } ).click();
 			await page
 				.getByRole( 'button', {
-					name: 'Manage Fonts',
+					name: 'Manage fonts',
 				} )
 				.click();
 

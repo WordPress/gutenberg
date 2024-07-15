@@ -145,18 +145,14 @@ function ColorGradientControlInner( {
 								</Tabs.TabList>
 								<Tabs.TabPanel
 									tabId={ TAB_IDS.color }
-									className={
-										'block-editor-color-gradient-control__panel'
-									}
+									className="block-editor-color-gradient-control__panel"
 									focusable={ false }
 								>
 									{ tabPanels.color }
 								</Tabs.TabPanel>
 								<Tabs.TabPanel
 									tabId={ TAB_IDS.gradient }
-									className={
-										'block-editor-color-gradient-control__panel'
-									}
+									className="block-editor-color-gradient-control__panel"
 									focusable={ false }
 								>
 									{ tabPanels.gradient }

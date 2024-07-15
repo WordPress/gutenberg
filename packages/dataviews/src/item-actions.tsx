@@ -15,12 +15,13 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
 import { moreVertical } from '@wordpress/icons';
+import { useRegistry } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { unlock } from './lock-unlock';
-import type { Action, ActionModal as ActionModalType, AnyItem } from './types';
+import type { Action, ActionModal as ActionModalType } from './types';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -30,47 +31,50 @@ const {
 	kebabCase,
 } = unlock( componentsPrivateApis );
 
-export interface ActionTriggerProps< Item extends AnyItem > {
+export interface ActionTriggerProps< Item > {
 	action: Action< Item >;
 	onClick: MouseEventHandler;
 	isBusy?: boolean;
+	items: Item[];
 }
 
-interface ActionModalProps< Item extends AnyItem > {
+interface ActionModalProps< Item > {
 	action: ActionModalType< Item >;
 	items: Item[];
 	closeModal?: () => void;
 }
 
-interface ActionWithModalProps< Item extends AnyItem >
-	extends ActionModalProps< Item > {
+interface ActionWithModalProps< Item > extends ActionModalProps< Item > {
 	ActionTrigger: ( props: ActionTriggerProps< Item > ) => ReactElement;
 	isBusy?: boolean;
 }
 
-interface ActionsDropdownMenuGroupProps< Item extends AnyItem > {
+interface ActionsDropdownMenuGroupProps< Item > {
 	actions: Action< Item >[];
 	item: Item;
 }
 
-interface ItemActionsProps< Item extends AnyItem > {
+interface ItemActionsProps< Item > {
 	item: Item;
 	actions: Action< Item >[];
 	isCompact?: boolean;
 }
 
-interface CompactItemActionsProps< Item extends AnyItem > {
+interface CompactItemActionsProps< Item > {
 	item: Item;
 	actions: Action< Item >[];
 }
 
-function ButtonTrigger< Item extends AnyItem >( {
+function ButtonTrigger< Item >( {
 	action,
 	onClick,
+	items,
 }: ActionTriggerProps< Item > ) {
+	const label =
+		typeof action.label === 'string' ? action.label : action.label( items );
 	return (
 		<Button
-			label={ action.label }
+			label={ label }
 			icon={ action.icon }
 			isDestructive={ action.isDestructive }
 			size="compact"
@@ -79,45 +83,47 @@ function ButtonTrigger< Item extends AnyItem >( {
 	);
 }
 
-function DropdownMenuItemTrigger< Item extends AnyItem >( {
+function DropdownMenuItemTrigger< Item >( {
 	action,
 	onClick,
+	items,
 }: ActionTriggerProps< Item > ) {
+	const label =
+		typeof action.label === 'string' ? action.label : action.label( items );
 	return (
 		<DropdownMenuItem
 			onClick={ onClick }
 			hideOnClick={ ! ( 'RenderModal' in action ) }
 		>
-			<DropdownMenuItemLabel>{ action.label }</DropdownMenuItemLabel>
+			<DropdownMenuItemLabel>{ label }</DropdownMenuItemLabel>
 		</DropdownMenuItem>
 	);
 }
 
-export function ActionModal< Item extends AnyItem >( {
+export function ActionModal< Item >( {
 	action,
 	items,
 	closeModal,
 }: ActionModalProps< Item > ) {
+	const label =
+		typeof action.label === 'string' ? action.label : action.label( items );
 	return (
 		<Modal
-			title={ action.modalHeader || action.label }
+			title={ action.modalHeader || label }
 			__experimentalHideHeader={ !! action.hideModalHeader }
 			onRequestClose={ closeModal ?? ( () => {} ) }
+			focusOnMount="firstContentElement"
+			size="small"
 			overlayClassName={ `dataviews-action-modal dataviews-action-modal__${ kebabCase(
 				action.id
 			) }` }
 		>
-			<action.RenderModal
-				items={ items }
-				closeModal={ closeModal }
-				onActionStart={ action.onActionStart }
-				onActionPerformed={ action.onActionPerformed }
-			/>
+			<action.RenderModal items={ items } closeModal={ closeModal } />
 		</Modal>
 	);
 }
 
-export function ActionWithModal< Item extends AnyItem >( {
+export function ActionWithModal< Item >( {
 	action,
 	items,
 	ActionTrigger,
@@ -146,10 +152,11 @@ export function ActionWithModal< Item extends AnyItem >( {
 	);
 }
 
-export function ActionsDropdownMenuGroup< Item extends AnyItem >( {
+export function ActionsDropdownMenuGroup< Item >( {
 	actions,
 	item,
 }: ActionsDropdownMenuGroupProps< Item > ) {
+	const registry = useRegistry();
 	return (
 		<DropdownMenuGroup>
 			{ actions.map( ( action ) => {
@@ -167,7 +174,10 @@ export function ActionsDropdownMenuGroup< Item extends AnyItem >( {
 					<DropdownMenuItemTrigger
 						key={ action.id }
 						action={ action }
-						onClick={ () => action.callback( [ item ] ) }
+						onClick={ () => {
+							action.callback( [ item ], { registry } );
+						} }
+						items={ [ item ] }
 					/>
 				);
 			} ) }
@@ -175,11 +185,12 @@ export function ActionsDropdownMenuGroup< Item extends AnyItem >( {
 	);
 }
 
-export default function ItemActions< Item extends AnyItem >( {
+export default function ItemActions< Item >( {
 	item,
 	actions,
 	isCompact,
 }: ItemActionsProps< Item > ) {
+	const registry = useRegistry();
 	const { primaryActions, eligibleActions } = useMemo( () => {
 		// If an action is eligible for all items, doesn't need
 		// to provide the `isEligible` function.
@@ -223,7 +234,10 @@ export default function ItemActions< Item extends AnyItem >( {
 						<ButtonTrigger
 							key={ action.id }
 							action={ action }
-							onClick={ () => action.callback( [ item ] ) }
+							onClick={ () => {
+								action.callback( [ item ], { registry } );
+							} }
+							items={ [ item ] }
 						/>
 					);
 				} ) }
@@ -232,7 +246,7 @@ export default function ItemActions< Item extends AnyItem >( {
 	);
 }
 
-function CompactItemActions< Item extends AnyItem >( {
+function CompactItemActions< Item >( {
 	item,
 	actions,
 }: CompactItemActionsProps< Item > ) {
@@ -243,6 +257,7 @@ function CompactItemActions< Item extends AnyItem >( {
 					size="compact"
 					icon={ moreVertical }
 					label={ __( 'Actions' ) }
+					accessibleWhenDisabled
 					disabled={ ! actions.length }
 					className="dataviews-all-actions-button"
 				/>

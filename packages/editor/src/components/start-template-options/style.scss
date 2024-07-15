@@ -44,12 +44,4 @@ $actions-height: 92px;
 			display: none;
 		}
 	}
-
-	.block-editor-block-patterns-list__item {
-		// Avoid to override the BlockPatternList component
-		// default hover and focus styles.
-		&:not(:focus):not(:hover) .block-editor-block-preview__container {
-			box-shadow: 0 0 0 1px $gray-300;
-		}
-	}
 }

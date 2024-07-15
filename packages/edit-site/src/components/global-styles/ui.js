@@ -33,6 +33,8 @@ import {
 import ScreenBlock from './screen-block';
 import ScreenTypography from './screen-typography';
 import ScreenTypographyElement from './screen-typography-element';
+import FontSize from './font-sizes/font-size';
+import FontSizes from './font-sizes/font-sizes';
 import ScreenColors from './screen-colors';
 import ScreenColorPalette from './screen-color-palette';
 import { ScreenShadows, ScreenShadowsEdit } from './screen-shadows';
@@ -313,6 +315,14 @@ function GlobalStylesUI() {
 				<ScreenTypography />
 			</GlobalStylesNavigationScreen>
 
+			<GlobalStylesNavigationScreen path="/typography/font-sizes/">
+				<FontSizes />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen path="/typography/font-sizes/:origin/:slug">
+				<FontSize />
+			</GlobalStylesNavigationScreen>
+
 			<GlobalStylesNavigationScreen path="/typography/text">
 				<ScreenTypographyElement element="text" />
 			</GlobalStylesNavigationScreen>
@@ -353,7 +363,7 @@ function GlobalStylesUI() {
 				<ScreenCSS />
 			</GlobalStylesNavigationScreen>
 
-			<GlobalStylesNavigationScreen path={ '/revisions' }>
+			<GlobalStylesNavigationScreen path="/revisions">
 				<ScreenRevisions />
 			</GlobalStylesNavigationScreen>
 

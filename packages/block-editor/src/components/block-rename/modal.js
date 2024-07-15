@@ -9,7 +9,7 @@ import {
 	Modal,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useState, useId } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
 
 /**
@@ -27,7 +27,6 @@ export default function BlockRenameModal( {
 	hasOverridesWarning,
 } ) {
 	const [ editedBlockName, setEditedBlockName ] = useState( blockName );
-	const descriptionId = useId();
 
 	const nameHasChanged = editedBlockName !== blockName;
 	const nameIsOriginal = editedBlockName === originalBlockName;
@@ -65,7 +64,6 @@ export default function BlockRenameModal( {
 			onRequestClose={ onClose }
 			overlayClassName="block-editor-block-rename-modal"
 			focusOnMount="firstContentElement"
-			aria={ { describedby: descriptionId } }
 			size="small"
 		>
 			<form
@@ -79,16 +77,12 @@ export default function BlockRenameModal( {
 					handleSubmit();
 				} }
 			>
-				<p id={ descriptionId }>
-					{ __( 'Enter a custom name for this block.' ) }
-				</p>
 				<VStack spacing="3">
 					<TextControl
 						__nextHasNoMarginBottom
 						__next40pxDefaultSize
 						value={ editedBlockName }
-						label={ __( 'Block name' ) }
-						hideLabelFromVision
+						label={ __( 'Name' ) }
 						help={
 							hasOverridesWarning
 								? __(

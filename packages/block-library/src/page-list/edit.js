@@ -63,7 +63,7 @@ function BlockContent( {
 	if ( pages === null ) {
 		return (
 			<div { ...blockProps }>
-				<Notice status={ 'warning' } isDismissible={ false }>
+				<Notice status="warning" isDismissible={ false }>
 					{ __( 'Page List: Cannot retrieve Pages.' ) }
 				</Notice>
 			</div>
@@ -73,7 +73,7 @@ function BlockContent( {
 	if ( pages.length === 0 ) {
 		return (
 			<div { ...blockProps }>
-				<Notice status={ 'info' } isDismissible={ false }>
+				<Notice status="info" isDismissible={ false }>
 					{ __( 'Page List: Cannot retrieve Pages.' ) }
 				</Notice>
 			</div>
@@ -101,7 +101,7 @@ function BlockContent( {
 
 		return (
 			<div { ...blockProps }>
-				<Notice status={ 'warning' } isDismissible={ false }>
+				<Notice status="warning" isDismissible={ false }>
 					{ __( 'Page List: Cannot retrieve Pages.' ) }
 				</Notice>
 			</div>
@@ -338,6 +338,7 @@ export default function PageListEdit( {
 						<p>{ convertDescription }</p>
 						<Button
 							variant="primary"
+							accessibleWhenDisabled
 							disabled={ ! hasResolvedPages }
 							onClick={ convertToNavigationLinks }
 						>

@@ -74,7 +74,7 @@ const Pagination = memo( function Pagination( {
 											page: +newValue,
 										} );
 									} }
-									size={ 'compact' }
+									size="compact"
 									__nextHasNoMarginBottom
 								/>
 							),
@@ -90,7 +90,7 @@ const Pagination = memo( function Pagination( {
 							} )
 						}
 						disabled={ currentPage === 1 }
-						__experimentalIsFocusable
+						accessibleWhenDisabled
 						label={ __( 'Previous page' ) }
 						icon={ chevronLeft }
 						showTooltip
@@ -102,7 +102,7 @@ const Pagination = memo( function Pagination( {
 							onChangeView( { ...view, page: currentPage + 1 } )
 						}
 						disabled={ currentPage >= totalPages }
-						__experimentalIsFocusable
+						accessibleWhenDisabled
 						label={ __( 'Next page' ) }
 						icon={ chevronRight }
 						showTooltip

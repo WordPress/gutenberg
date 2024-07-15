@@ -38,7 +38,8 @@ p.has-drop-cap.has-background {
 	overflow: hidden;
 }
 
-p.has-background {
+// Specificity is reduced to 0-1-0 so global styles can override this.
+:root :where(p.has-background) {
 	padding: $block-bg-padding--v $block-bg-padding--h;
 }
 

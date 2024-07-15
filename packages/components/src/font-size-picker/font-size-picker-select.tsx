@@ -56,7 +56,7 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
 				key: fontSize.slug,
 				name: fontSize.name || fontSize.slug,
 				value: fontSize.size,
-				__experimentalHint: hint,
+				hint,
 			};
 		} ),
 		...( disableCustomFontSizes ? [] : [ CUSTOM_OPTION ] ),
@@ -79,7 +79,7 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
 			) }
 			options={ options }
 			value={ selectedOption }
-			__experimentalShowSelectedHint
+			showSelectedHint
 			onChange={ ( {
 				selectedItem,
 			}: {

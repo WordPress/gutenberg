@@ -441,7 +441,7 @@ export default function SearchEdit( {
 									widthUnit: newUnit,
 								} );
 							} }
-							__unstableInputWidth={ '80px' }
+							__unstableInputWidth="80px"
 							value={ `${ width }${ widthUnit }` }
 							units={ units }
 						/>

@@ -40,7 +40,8 @@ import { name as patternBlockName } from './index';
 import { unlock } from '../lock-unlock';
 
 const { useLayoutClasses } = unlock( blockEditorPrivateApis );
-const { isOverridableBlock } = unlock( patternsPrivateApis );
+const { isOverridableBlock, hasOverridableBlocks } =
+	unlock( patternsPrivateApis );
 
 const fullAlignments = [ 'full', 'wide', 'left', 'right' ];
 
@@ -72,15 +73,6 @@ const useInferredLayout = ( blocks, parentLayout ) => {
 		return { alignment, layout };
 	}, [ blocks, parentLayout ] );
 };
-
-function hasOverridableBlocks( blocks ) {
-	return blocks.some( ( block ) => {
-		if ( isOverridableBlock( block ) ) {
-			return true;
-		}
-		return hasOverridableBlocks( block.innerBlocks );
-	} );
-}
 
 function setBlockEditMode( setEditMode, blocks, mode ) {
 	blocks.forEach( ( block ) => {
@@ -164,7 +156,11 @@ function ReusableBlockEdit( {
 				getBlockEditingMode: _getBlockEditingMode,
 			} = select( blockEditorStore );
 			const { getBlockBindingsSource } = unlock( select( blocksStore ) );
-			const canEdit = canUser( 'update', 'blocks', ref );
+			const canEdit = canUser( 'update', {
+				kind: 'postType',
+				name: 'wp_block',
+				id: ref,
+			} );
 
 			// For editing link to the site editor if the theme and user permissions support it.
 			return {
@@ -276,7 +272,6 @@ function ReusableBlockEdit( {
 						<ToolbarButton
 							onClick={ resetContent }
 							disabled={ ! content }
-							__experimentalIsFocusable
 						>
 							{ __( 'Reset' ) }
 						</ToolbarButton>

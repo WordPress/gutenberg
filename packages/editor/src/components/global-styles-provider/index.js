@@ -33,17 +33,30 @@ export function mergeBaseAndUserConfigs( base, user ) {
 function useGlobalStylesUserConfig() {
 	const { globalStylesId, isReady, settings, styles, _links } = useSelect(
 		( select ) => {
-			const { getEditedEntityRecord, hasFinishedResolution } =
-				select( coreStore );
+			const {
+				getEditedEntityRecord,
+				hasFinishedResolution,
+				getUser,
+				getCurrentUser,
+			} = select( coreStore );
 			const _globalStylesId =
 				select( coreStore ).__experimentalGetCurrentGlobalStylesId();
-			const record = _globalStylesId
-				? getEditedEntityRecord(
-						'root',
-						'globalStyles',
-						_globalStylesId
-				  )
-				: undefined;
+
+			// Doing canUser( 'read', 'global_styles' ) returns false even for users with the capability.
+			// See: https://github.com/WordPress/gutenberg/issues/63438
+			// So we need to check the user capabilities directly.
+			const userId = getCurrentUser()?.id;
+			const canEditThemeOptions =
+				userId && getUser( userId )?.capabilities?.edit_theme_options;
+
+			const record =
+				_globalStylesId && canEditThemeOptions
+					? getEditedEntityRecord(
+							'root',
+							'globalStyles',
+							_globalStylesId
+					  )
+					: undefined;
 
 			let hasResolved = false;
 			if (
@@ -82,7 +95,13 @@ function useGlobalStylesUserConfig() {
 	}, [ settings, styles, _links ] );
 
 	const setConfig = useCallback(
-		( callback, options = {} ) => {
+		/**
+		 * Set the global styles config.
+		 * @param {Function|Object} callbackOrObject If the callbackOrObject is a function, pass the current config to the callback so the consumer can merge values.
+		 *                                           Otherwise, overwrite the current config with the incoming object.
+		 * @param {Object}          options          Options for editEntityRecord Core selector.
+		 */
+		( callbackOrObject, options = {} ) => {
 			const record = getEditedEntityRecord(
 				'root',
 				'globalStyles',
@@ -94,7 +113,11 @@ function useGlobalStylesUserConfig() {
 				settings: record?.settings ?? {},
 				_links: record?._links ?? {},
 			};
-			const updatedConfig = callback( currentConfig );
+
+			const updatedConfig =
+				typeof callbackOrObject === 'function'
+					? callbackOrObject( currentConfig )
+					: callbackOrObject;
 
 			editEntityRecord(
 				'root',
@@ -108,7 +131,7 @@ function useGlobalStylesUserConfig() {
 				options
 			);
 		},
-		[ globalStylesId ]
+		[ globalStylesId, editEntityRecord, getEditedEntityRecord ]
 	);
 
 	return [ isReady, config, setConfig ];
@@ -116,9 +139,23 @@ function useGlobalStylesUserConfig() {
 
 function useGlobalStylesBaseConfig() {
 	const baseConfig = useSelect( ( select ) => {
-		return select(
-			coreStore
-		).__experimentalGetCurrentThemeBaseGlobalStyles();
+		const {
+			getCurrentUser,
+			getUser,
+			__experimentalGetCurrentThemeBaseGlobalStyles,
+		} = select( coreStore );
+
+		// Doing canUser( 'read', 'global_styles' ) returns false even for users with the capability.
+		// See: https://github.com/WordPress/gutenberg/issues/63438
+		// So we need to check the user capabilities directly.
+		const userId = getCurrentUser()?.id;
+		const canEditThemeOptions =
+			userId && getUser( userId )?.capabilities?.edit_theme_options;
+
+		return (
+			canEditThemeOptions &&
+			__experimentalGetCurrentThemeBaseGlobalStyles()
+		);
 	}, [] );
 
 	return [ !! baseConfig, baseConfig ];
@@ -128,10 +165,12 @@ export function useGlobalStylesContext() {
 	const [ isUserConfigReady, userConfig, setUserConfig ] =
 		useGlobalStylesUserConfig();
 	const [ isBaseConfigReady, baseConfig ] = useGlobalStylesBaseConfig();
+
 	const mergedConfig = useMemo( () => {
 		if ( ! baseConfig || ! userConfig ) {
 			return {};
 		}
+
 		return mergeBaseAndUserConfigs( baseConfig, userConfig );
 	}, [ userConfig, baseConfig ] );
 

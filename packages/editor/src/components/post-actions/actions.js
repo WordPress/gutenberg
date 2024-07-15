@@ -3,15 +3,15 @@
  */
 import { external, trash, backup } from '@wordpress/icons';
 import { addQueryArgs } from '@wordpress/url';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, _n, sprintf, _x } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useMemo, useState } from '@wordpress/element';
-import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
-
+import { parse } from '@wordpress/blocks';
+import { DataForm } from '@wordpress/dataviews';
 import {
 	Button,
 	TextControl,
@@ -31,17 +31,45 @@ import {
 } from '../../store/constants';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import isTemplateRevertable from '../../store/utils/is-template-revertable';
-import { exportPatternAsJSONAction } from './export-pattern-action';
+import { CreateTemplatePartModalContents } from '../create-template-part-modal';
+import { getItemTitle } from '../../dataviews/actions/utils';
 
 // Patterns.
-const { PATTERN_TYPES } = unlock( patternsPrivateApis );
+const { PATTERN_TYPES, CreatePatternModalContents, useDuplicatePatternProps } =
+	unlock( patternsPrivateApis );
 
-function getItemTitle( item ) {
-	if ( typeof item.title === 'string' ) {
-		return decodeEntities( item.title );
+// TODO: this should be shared with other components (page-pages).
+const fields = [
+	{
+		type: 'text',
+		header: __( 'Title' ),
+		id: 'title',
+		placeholder: __( 'No title' ),
+		getValue: ( { item } ) => item.title,
+	},
+];
+
+const form = {
+	visibleFields: [ 'title' ],
+};
+
+/**
+ * Check if a template is removable.
+ *
+ * @param {Object} template The template entity to check.
+ * @return {boolean} Whether the template is removable.
+ */
+function isTemplateRemovable( template ) {
+	if ( ! template ) {
+		return false;
 	}
-	return decodeEntities( item.title?.rendered || '' );
+	// In patterns list page we map the templates parts to a different object
+	// than the one returned from the endpoint. This is why we need to check for
+	// two props whether is custom or has a theme file.
+	return (
+		template?.source === TEMPLATE_ORIGINS.custom &&
+		! template?.has_theme_file
+	);
 }
 
 const trashPostAction = {
@@ -54,12 +82,7 @@ const trashPostAction = {
 	},
 	supportsBulk: true,
 	hideModalHeader: true,
-	RenderModal: ( {
-		items: posts,
-		closeModal,
-		onActionStart,
-		onActionPerformed,
-	} ) => {
+	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ isBusy, setIsBusy ] = useState( false );
 		const { createSuccessNotice, createErrorNotice } =
 			useDispatch( noticesStore );
@@ -67,20 +90,22 @@ const trashPostAction = {
 		return (
 			<VStack spacing="5">
 				<Text>
-					{ posts.length === 1
+					{ items.length === 1
 						? sprintf(
-								// translators: %s: The page's title.
-								__( 'Are you sure you want to delete "%s"?' ),
-								getItemTitle( posts[ 0 ] )
+								// translators: %s: The item's title.
+								__(
+									'Are you sure you want to move to trash "%s"?'
+								),
+								getItemTitle( items[ 0 ] )
 						  )
 						: sprintf(
-								// translators: %d: The number of pages (2 or more).
+								// translators: %d: The number of items (2 or more).
 								_n(
-									'Are you sure you want to delete %d page?',
-									'Are you sure you want to delete %d pages?',
-									posts.length
+									'Are you sure you want to move to trash %d item?',
+									'Are you sure you want to move to trash %d items?',
+									items.length
 								),
-								posts.length
+								items.length
 						  ) }
 				</Text>
 				<HStack justify="right">
@@ -88,7 +113,7 @@ const trashPostAction = {
 						variant="tertiary"
 						onClick={ closeModal }
 						disabled={ isBusy }
-						__experimentalIsFocusable
+						accessibleWhenDisabled
 					>
 						{ __( 'Cancel' ) }
 					</Button>
@@ -96,19 +121,16 @@ const trashPostAction = {
 						variant="primary"
 						onClick={ async () => {
 							setIsBusy( true );
-							if ( onActionStart ) {
-								onActionStart( posts );
-							}
 							const promiseResult = await Promise.allSettled(
-								posts.map( ( post ) => {
-									return deleteEntityRecord(
+								items.map( ( item ) =>
+									deleteEntityRecord(
 										'postType',
-										post.type,
-										post.id,
+										item.type,
+										item.id,
 										{},
 										{ throwOnError: true }
-									);
-								} )
+									)
+								)
 							);
 							// If all the promises were fulfilled with success.
 							if (
@@ -119,41 +141,39 @@ const trashPostAction = {
 								let successMessage;
 								if ( promiseResult.length === 1 ) {
 									successMessage = sprintf(
-										/* translators: The posts's title. */
-										__( '"%s" moved to the Trash.' ),
-										getItemTitle( posts[ 0 ] )
-									);
-								} else if ( posts[ 0 ].type === 'page' ) {
-									successMessage = sprintf(
-										/* translators: The number of pages. */
-										__( '%s pages moved to the Trash.' ),
-										posts.length
+										/* translators: The item's title. */
+										__( '"%s" moved to trash.' ),
+										getItemTitle( items[ 0 ] )
 									);
 								} else {
 									successMessage = sprintf(
-										/* translators: The number of posts. */
-										__( '%s posts moved to the Trash.' ),
-										posts.length
+										/* translators: The number of items. */
+										_n(
+											'%s item moved to trash.',
+											'%s items moved to trash.',
+											items.length
+										),
+										items.length
 									);
 								}
 								createSuccessNotice( successMessage, {
 									type: 'snackbar',
-									id: 'trash-post-action',
+									id: 'move-to-trash-action',
 								} );
 							} else {
-								// If there was at lease one failure.
+								// If there was at least one failure.
 								let errorMessage;
-								// If we were trying to move a single post to the trash.
+								// If we were trying to delete a single item.
 								if ( promiseResult.length === 1 ) {
 									if ( promiseResult[ 0 ].reason?.message ) {
 										errorMessage =
 											promiseResult[ 0 ].reason.message;
 									} else {
 										errorMessage = __(
-											'An error occurred while moving the post to the trash.'
+											'An error occurred while moving to trash the item.'
 										);
 									}
-									// If we were trying to move multiple posts to the trash
+									// If we were trying to delete multiple items.
 								} else {
 									const errorMessages = new Set();
 									const failedPromises = promiseResult.filter(
@@ -168,13 +188,13 @@ const trashPostAction = {
 									}
 									if ( errorMessages.size === 0 ) {
 										errorMessage = __(
-											'An error occurred while moving the posts to the trash.'
+											'An error occurred while moving to trash the items.'
 										);
 									} else if ( errorMessages.size === 1 ) {
 										errorMessage = sprintf(
 											/* translators: %s: an error message */
 											__(
-												'An error occurred while moving the posts to the trash: %s'
+												'An error occurred while moving to trash the item: %s'
 											),
 											[ ...errorMessages ][ 0 ]
 										);
@@ -182,7 +202,7 @@ const trashPostAction = {
 										errorMessage = sprintf(
 											/* translators: %s: a list of comma separated error messages */
 											__(
-												'Some errors occurred while moving the pages to the trash: %s'
+												'Some errors occurred while moving to trash the items: %s'
 											),
 											[ ...errorMessages ].join( ',' )
 										);
@@ -193,16 +213,16 @@ const trashPostAction = {
 								} );
 							}
 							if ( onActionPerformed ) {
-								onActionPerformed( posts );
+								onActionPerformed( items );
 							}
 							setIsBusy( false );
 							closeModal();
 						} }
 						isBusy={ isBusy }
 						disabled={ isBusy }
-						__experimentalIsFocusable
+						accessibleWhenDisabled
 					>
-						{ __( 'Delete' ) }
+						{ __( 'Trash' ) }
 					</Button>
 				</HStack>
 			</VStack>
@@ -210,244 +230,245 @@ const trashPostAction = {
 	},
 };
 
-function usePermanentlyDeletePostAction() {
-	const { createSuccessNotice, createErrorNotice } =
-		useDispatch( noticesStore );
-	const { deleteEntityRecord } = useDispatch( coreStore );
-
+function useCanUserEligibilityCheckPostType( capability, postType, action ) {
+	const registry = useRegistry();
 	return useMemo(
 		() => ( {
-			id: 'permanently-delete',
-			label: __( 'Permanently delete' ),
-			supportsBulk: true,
-			isEligible( { status } ) {
-				return status === 'trash';
-			},
-			async callback( posts, onActionPerformed ) {
-				const promiseResult = await Promise.allSettled(
-					posts.map( ( post ) => {
-						return deleteEntityRecord(
-							'postType',
-							post.type,
-							post.id,
-							{ force: true },
-							{ throwOnError: true }
-						);
+			...action,
+			isEligible( item ) {
+				return (
+					action.isEligible( item ) &&
+					registry.select( coreStore ).canUser( capability, {
+						kind: 'postType',
+						name: postType,
+						id: item.id,
 					} )
 				);
-				// If all the promises were fulfilled with success.
-				if (
-					promiseResult.every(
-						( { status } ) => status === 'fulfilled'
-					)
-				) {
-					let successMessage;
-					if ( promiseResult.length === 1 ) {
-						successMessage = sprintf(
-							/* translators: The posts's title. */
-							__( '"%s" permanently deleted.' ),
-							getItemTitle( posts[ 0 ] )
-						);
-					} else {
-						successMessage = __(
-							'The posts were permanently deleted.'
-						);
-					}
-					createSuccessNotice( successMessage, {
-						type: 'snackbar',
-						id: 'permanently-delete-post-action',
-					} );
-					if ( onActionPerformed ) {
-						onActionPerformed( posts );
-					}
-				} else {
-					// If there was at lease one failure.
-					let errorMessage;
-					// If we were trying to permanently delete a single post.
-					if ( promiseResult.length === 1 ) {
-						if ( promiseResult[ 0 ].reason?.message ) {
-							errorMessage = promiseResult[ 0 ].reason.message;
-						} else {
-							errorMessage = __(
-								'An error occurred while permanently deleting the post.'
-							);
-						}
-						// If we were trying to permanently delete multiple posts
-					} else {
-						const errorMessages = new Set();
-						const failedPromises = promiseResult.filter(
-							( { status } ) => status === 'rejected'
-						);
-						for ( const failedPromise of failedPromises ) {
-							if ( failedPromise.reason?.message ) {
-								errorMessages.add(
-									failedPromise.reason.message
-								);
-							}
-						}
-						if ( errorMessages.size === 0 ) {
-							errorMessage = __(
-								'An error occurred while permanently deleting the posts.'
-							);
-						} else if ( errorMessages.size === 1 ) {
-							errorMessage = sprintf(
-								/* translators: %s: an error message */
-								__(
-									'An error occurred while permanently deleting the posts: %s'
-								),
-								[ ...errorMessages ][ 0 ]
-							);
-						} else {
-							errorMessage = sprintf(
-								/* translators: %s: a list of comma separated error messages */
-								__(
-									'Some errors occurred while permanently deleting the posts: %s'
-								),
-								[ ...errorMessages ].join( ',' )
-							);
-						}
-					}
-					createErrorNotice( errorMessage, {
-						type: 'snackbar',
-					} );
-				}
 			},
 		} ),
-		[ createSuccessNotice, createErrorNotice, deleteEntityRecord ]
+		[ action, registry, capability, postType ]
 	);
 }
 
-function useRestorePostAction() {
-	const { createSuccessNotice, createErrorNotice } =
-		useDispatch( noticesStore );
-	const { editEntityRecord, saveEditedEntityRecord } =
-		useDispatch( coreStore );
+function useTrashPostAction( postType ) {
+	return useCanUserEligibilityCheckPostType(
+		'delete',
+		postType,
+		trashPostAction
+	);
+}
 
-	return useMemo(
-		() => ( {
-			id: 'restore',
-			label: __( 'Restore' ),
-			isPrimary: true,
-			icon: backup,
-			supportsBulk: true,
-			isEligible( { status } ) {
-				return status === 'trash';
-			},
-			async callback( posts, onActionPerformed ) {
-				await Promise.allSettled(
-					posts.map( ( post ) => {
-						return editEntityRecord(
-							'postType',
-							post.type,
-							post.id,
-							{
-								status: 'draft',
-							}
-						);
-					} )
+const permanentlyDeletePostAction = {
+	id: 'permanently-delete',
+	label: __( 'Permanently delete' ),
+	supportsBulk: true,
+	isEligible( { status } ) {
+		return status === 'trash';
+	},
+	async callback( posts, { registry, onActionPerformed } ) {
+		const { createSuccessNotice, createErrorNotice } =
+			registry.dispatch( noticesStore );
+		const { deleteEntityRecord } = registry.dispatch( coreStore );
+		const promiseResult = await Promise.allSettled(
+			posts.map( ( post ) => {
+				return deleteEntityRecord(
+					'postType',
+					post.type,
+					post.id,
+					{ force: true },
+					{ throwOnError: true }
 				);
-				const promiseResult = await Promise.allSettled(
-					posts.map( ( post ) => {
-						return saveEditedEntityRecord(
-							'postType',
-							post.type,
-							post.id,
-							{ throwOnError: true }
-						);
-					} )
+			} )
+		);
+		// If all the promises were fulfilled with success.
+		if ( promiseResult.every( ( { status } ) => status === 'fulfilled' ) ) {
+			let successMessage;
+			if ( promiseResult.length === 1 ) {
+				successMessage = sprintf(
+					/* translators: The posts's title. */
+					__( '"%s" permanently deleted.' ),
+					getItemTitle( posts[ 0 ] )
 				);
-
-				if (
-					promiseResult.every(
-						( { status } ) => status === 'fulfilled'
-					)
-				) {
-					let successMessage;
-					if ( posts.length === 1 ) {
-						successMessage = sprintf(
-							/* translators: The number of posts. */
-							__( '"%s" has been restored.' ),
-							getItemTitle( posts[ 0 ] )
-						);
-					} else if ( posts[ 0 ].type === 'page' ) {
-						successMessage = sprintf(
-							/* translators: The number of posts. */
-							__( '%d pages have been restored.' ),
-							posts.length
-						);
-					} else {
-						successMessage = sprintf(
-							/* translators: The number of posts. */
-							__( '%d posts have been restored.' ),
-							posts.length
-						);
-					}
-					createSuccessNotice( successMessage, {
-						type: 'snackbar',
-						id: 'restore-post-action',
-					} );
-					if ( onActionPerformed ) {
-						onActionPerformed( posts );
-					}
+			} else {
+				successMessage = __( 'The posts were permanently deleted.' );
+			}
+			createSuccessNotice( successMessage, {
+				type: 'snackbar',
+				id: 'permanently-delete-post-action',
+			} );
+			onActionPerformed?.( posts );
+		} else {
+			// If there was at lease one failure.
+			let errorMessage;
+			// If we were trying to permanently delete a single post.
+			if ( promiseResult.length === 1 ) {
+				if ( promiseResult[ 0 ].reason?.message ) {
+					errorMessage = promiseResult[ 0 ].reason.message;
 				} else {
-					// If there was at lease one failure.
-					let errorMessage;
-					// If we were trying to move a single post to the trash.
-					if ( promiseResult.length === 1 ) {
-						if ( promiseResult[ 0 ].reason?.message ) {
-							errorMessage = promiseResult[ 0 ].reason.message;
-						} else {
-							errorMessage = __(
-								'An error occurred while restoring the post.'
-							);
-						}
-						// If we were trying to move multiple posts to the trash
-					} else {
-						const errorMessages = new Set();
-						const failedPromises = promiseResult.filter(
-							( { status } ) => status === 'rejected'
-						);
-						for ( const failedPromise of failedPromises ) {
-							if ( failedPromise.reason?.message ) {
-								errorMessages.add(
-									failedPromise.reason.message
-								);
-							}
-						}
-						if ( errorMessages.size === 0 ) {
-							errorMessage = __(
-								'An error occurred while restoring the posts.'
-							);
-						} else if ( errorMessages.size === 1 ) {
-							errorMessage = sprintf(
-								/* translators: %s: an error message */
-								__(
-									'An error occurred while restoring the posts: %s'
-								),
-								[ ...errorMessages ][ 0 ]
-							);
-						} else {
-							errorMessage = sprintf(
-								/* translators: %s: a list of comma separated error messages */
-								__(
-									'Some errors occurred while restoring the posts: %s'
-								),
-								[ ...errorMessages ].join( ',' )
-							);
-						}
-					}
-					createErrorNotice( errorMessage, {
-						type: 'snackbar',
-					} );
+					errorMessage = __(
+						'An error occurred while permanently deleting the post.'
+					);
 				}
-			},
-		} ),
-		[
-			createSuccessNotice,
-			createErrorNotice,
-			editEntityRecord,
-			saveEditedEntityRecord,
-		]
+				// If we were trying to permanently delete multiple posts
+			} else {
+				const errorMessages = new Set();
+				const failedPromises = promiseResult.filter(
+					( { status } ) => status === 'rejected'
+				);
+				for ( const failedPromise of failedPromises ) {
+					if ( failedPromise.reason?.message ) {
+						errorMessages.add( failedPromise.reason.message );
+					}
+				}
+				if ( errorMessages.size === 0 ) {
+					errorMessage = __(
+						'An error occurred while permanently deleting the posts.'
+					);
+				} else if ( errorMessages.size === 1 ) {
+					errorMessage = sprintf(
+						/* translators: %s: an error message */
+						__(
+							'An error occurred while permanently deleting the posts: %s'
+						),
+						[ ...errorMessages ][ 0 ]
+					);
+				} else {
+					errorMessage = sprintf(
+						/* translators: %s: a list of comma separated error messages */
+						__(
+							'Some errors occurred while permanently deleting the posts: %s'
+						),
+						[ ...errorMessages ].join( ',' )
+					);
+				}
+			}
+			createErrorNotice( errorMessage, {
+				type: 'snackbar',
+			} );
+		}
+	},
+};
+
+function usePermanentlyDeletePostAction( postType ) {
+	return useCanUserEligibilityCheckPostType(
+		'delete',
+		postType,
+		permanentlyDeletePostAction
+	);
+}
+
+const restorePostAction = {
+	id: 'restore',
+	label: __( 'Restore' ),
+	isPrimary: true,
+	icon: backup,
+	supportsBulk: true,
+	isEligible( { status } ) {
+		return status === 'trash';
+	},
+	async callback( posts, { registry, onActionPerformed } ) {
+		const { createSuccessNotice, createErrorNotice } =
+			registry.dispatch( noticesStore );
+		const { editEntityRecord, saveEditedEntityRecord } =
+			registry.dispatch( coreStore );
+		await Promise.allSettled(
+			posts.map( ( post ) => {
+				return editEntityRecord( 'postType', post.type, post.id, {
+					status: 'draft',
+				} );
+			} )
+		);
+		const promiseResult = await Promise.allSettled(
+			posts.map( ( post ) => {
+				return saveEditedEntityRecord( 'postType', post.type, post.id, {
+					throwOnError: true,
+				} );
+			} )
+		);
+
+		if ( promiseResult.every( ( { status } ) => status === 'fulfilled' ) ) {
+			let successMessage;
+			if ( posts.length === 1 ) {
+				successMessage = sprintf(
+					/* translators: The number of posts. */
+					__( '"%s" has been restored.' ),
+					getItemTitle( posts[ 0 ] )
+				);
+			} else if ( posts[ 0 ].type === 'page' ) {
+				successMessage = sprintf(
+					/* translators: The number of posts. */
+					__( '%d pages have been restored.' ),
+					posts.length
+				);
+			} else {
+				successMessage = sprintf(
+					/* translators: The number of posts. */
+					__( '%d posts have been restored.' ),
+					posts.length
+				);
+			}
+			createSuccessNotice( successMessage, {
+				type: 'snackbar',
+				id: 'restore-post-action',
+			} );
+			if ( onActionPerformed ) {
+				onActionPerformed( posts );
+			}
+		} else {
+			// If there was at lease one failure.
+			let errorMessage;
+			// If we were trying to move a single post to the trash.
+			if ( promiseResult.length === 1 ) {
+				if ( promiseResult[ 0 ].reason?.message ) {
+					errorMessage = promiseResult[ 0 ].reason.message;
+				} else {
+					errorMessage = __(
+						'An error occurred while restoring the post.'
+					);
+				}
+				// If we were trying to move multiple posts to the trash
+			} else {
+				const errorMessages = new Set();
+				const failedPromises = promiseResult.filter(
+					( { status } ) => status === 'rejected'
+				);
+				for ( const failedPromise of failedPromises ) {
+					if ( failedPromise.reason?.message ) {
+						errorMessages.add( failedPromise.reason.message );
+					}
+				}
+				if ( errorMessages.size === 0 ) {
+					errorMessage = __(
+						'An error occurred while restoring the posts.'
+					);
+				} else if ( errorMessages.size === 1 ) {
+					errorMessage = sprintf(
+						/* translators: %s: an error message */
+						__( 'An error occurred while restoring the posts: %s' ),
+						[ ...errorMessages ][ 0 ]
+					);
+				} else {
+					errorMessage = sprintf(
+						/* translators: %s: a list of comma separated error messages */
+						__(
+							'Some errors occurred while restoring the posts: %s'
+						),
+						[ ...errorMessages ].join( ',' )
+					);
+				}
+			}
+			createErrorNotice( errorMessage, {
+				type: 'snackbar',
+			} );
+		}
+	},
+};
+
+function useRestorePostAction( postType ) {
+	return useCanUserEligibilityCheckPostType(
+		'update',
+		postType,
+		restorePostAction
 	);
 }
 
@@ -459,7 +480,7 @@ const viewPostAction = {
 	isEligible( post ) {
 		return post.status !== 'trash';
 	},
-	callback( posts, onActionPerformed ) {
+	callback( posts, { onActionPerformed } ) {
 		const post = posts[ 0 ];
 		window.open( post.link, '_blank' );
 		if ( onActionPerformed ) {
@@ -470,8 +491,16 @@ const viewPostAction = {
 
 const postRevisionsAction = {
 	id: 'view-post-revisions',
-	label: __( 'View revisions' ),
-	isPrimary: false,
+	context: 'list',
+	label( items ) {
+		const revisionsCount =
+			items[ 0 ]._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0;
+		return sprintf(
+			/* translators: %s: number of revisions */
+			__( 'View revisions (%s)' ),
+			revisionsCount
+		);
+	},
 	isEligible: ( post ) => {
 		if ( post.status === 'trash' ) {
 			return false;
@@ -482,7 +511,7 @@ const postRevisionsAction = {
 			post?._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0;
 		return lastRevisionId && revisionsCount > 1;
 	},
-	callback( posts, onActionPerformed ) {
+	callback( posts, { onActionPerformed } ) {
 		const post = posts[ 0 ];
 		const href = addQueryArgs( 'revision.php', {
 			revision: post?._links?.[ 'predecessor-version' ]?.[ 0 ]?.id,
@@ -511,7 +540,7 @@ const renamePostAction = {
 		) {
 			return true;
 		}
-		// In the case of templates, we can only remove custom templates.
+		// In the case of templates, we can only rename custom templates.
 		if ( post.type === TEMPLATE_POST_TYPE ) {
 			return isTemplateRemovable( post ) && post.is_custom;
 		}
@@ -523,19 +552,13 @@ const renamePostAction = {
 		// two props whether is custom or has a theme file.
 		const isCustomPattern =
 			isUserPattern ||
-			( isTemplatePart &&
-				( post.isCustom || post.source === TEMPLATE_ORIGINS.custom ) );
-		const hasThemeFile =
-			isTemplatePart &&
-			( post.templatePart?.has_theme_file || post.has_theme_file );
+			( isTemplatePart && post.source === TEMPLATE_ORIGINS.custom );
+		const hasThemeFile = post?.has_theme_file;
 		return isCustomPattern && ! hasThemeFile;
 	},
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ item ] = items;
-		const originalTitle = decodeEntities(
-			typeof item.title === 'string' ? item.title : item.title.rendered
-		);
-		const [ title, setTitle ] = useState( () => originalTitle );
+		const [ title, setTitle ] = useState( () => getItemTitle( item ) );
 		const { editEntityRecord, saveEditedEntityRecord } =
 			useDispatch( coreStore );
 		const { createSuccessNotice, createErrorNotice } =
@@ -602,534 +625,317 @@ const renamePostAction = {
 	},
 };
 
-const duplicatePostAction = {
-	id: 'duplicate-post',
-	label: _x( 'Duplicate', 'action label' ),
-	isEligible( { status } ) {
-		return status !== 'trash';
-	},
-	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
-		const [ item ] = items;
-		const [ isCreatingPage, setIsCreatingPage ] = useState( false );
-		const [ title, setTitle ] = useState(
-			sprintf(
-				/* translators: %s: Existing item title */
-				__( '%s (Copy)' ),
-				getItemTitle( item )
-			)
-		);
-
-		const { saveEntityRecord } = useDispatch( coreStore );
-		const { createSuccessNotice, createErrorNotice } =
-			useDispatch( noticesStore );
-
-		async function createPage( event ) {
-			event.preventDefault();
-
-			if ( isCreatingPage ) {
-				return;
-			}
-			setIsCreatingPage( true );
-			try {
-				const newItem = await saveEntityRecord(
-					'postType',
-					item.type,
-					{
-						status: 'draft',
-						title,
-						slug: title || __( 'No title' ),
-						author: item.author,
-						comment_status: item.comment_status,
-						content:
-							typeof item.content === 'string'
-								? item.content
-								: item.content.raw,
-						excerpt: item.excerpt.raw,
-						meta: item.meta,
-						parent: item.parent,
-						password: item.password,
-						template: item.template,
-						format: item.format,
-						featured_media: item.featured_media,
-						menu_order: item.menu_order,
-						ping_status: item.ping_status,
-						categories: item.categories,
-						tags: item.tags,
-					},
-					{ throwOnError: true }
-				);
-
-				createSuccessNotice(
-					sprintf(
-						// translators: %s: Title of the created template e.g: "Category".
-						__( '"%s" successfully created.' ),
-						newItem.title?.rendered || title
-					),
-					{
-						id: 'duplicate-post-action',
-						type: 'snackbar',
-					}
-				);
-
-				if ( onActionPerformed ) {
-					onActionPerformed( [ newItem ] );
-				}
-			} catch ( error ) {
-				const errorMessage =
-					error.message && error.code !== 'unknown_error'
-						? error.message
-						: __( 'An error occurred while duplicating the page.' );
-
-				createErrorNotice( errorMessage, {
-					type: 'snackbar',
-				} );
-			} finally {
-				setIsCreatingPage( false );
-				closeModal();
-			}
-		}
-		return (
-			<form onSubmit={ createPage }>
-				<VStack spacing={ 3 }>
-					<TextControl
-						label={ __( 'Title' ) }
-						onChange={ setTitle }
-						placeholder={ __( 'No title' ) }
-						value={ title }
-					/>
-					<HStack spacing={ 2 } justify="end">
-						<Button variant="tertiary" onClick={ closeModal }>
-							{ __( 'Cancel' ) }
-						</Button>
-						<Button
-							variant="primary"
-							type="submit"
-							isBusy={ isCreatingPage }
-							aria-disabled={ isCreatingPage }
-						>
-							{ _x( 'Duplicate', 'action label' ) }
-						</Button>
-					</HStack>
-				</VStack>
-			</form>
-		);
-	},
-};
-
-const isTemplatePartRevertable = ( item ) => {
-	if ( ! item ) {
-		return false;
-	}
-	const hasThemeFile = item.templatePart?.has_theme_file;
-	return canDeleteOrReset( item ) && hasThemeFile;
-};
-
-const resetTemplateAction = {
-	id: 'reset-template',
-	label: __( 'Reset' ),
-	isEligible: ( item ) => {
-		return item.type === TEMPLATE_PART_POST_TYPE
-			? isTemplatePartRevertable( item )
-			: isTemplateRevertable( item );
-	},
-	icon: backup,
-	supportsBulk: true,
-	hideModalHeader: true,
-	RenderModal: ( {
-		items,
-		closeModal,
-		onActionStart,
-		onActionPerformed,
-	} ) => {
-		const [ isBusy, setIsBusy ] = useState( false );
-		const { revertTemplate, removeTemplates } = unlock(
-			useDispatch( editorStore )
-		);
-		const { saveEditedEntityRecord } = useDispatch( coreStore );
-		const { createSuccessNotice, createErrorNotice } =
-			useDispatch( noticesStore );
-		const onConfirm = async () => {
-			try {
-				if ( items[ 0 ].type === TEMPLATE_PART_POST_TYPE ) {
-					await removeTemplates( items );
-				} else {
-					for ( const template of items ) {
-						if ( template.type === TEMPLATE_POST_TYPE ) {
-							await revertTemplate( template, {
-								allowUndo: false,
-							} );
-							await saveEditedEntityRecord(
-								'postType',
-								template.type,
-								template.id
-							);
-						}
-					}
-					createSuccessNotice(
-						items.length > 1
-							? sprintf(
-									/* translators: The number of items. */
-									__( '%s items reset.' ),
-									items.length
-							  )
-							: sprintf(
-									/* translators: The template/part's name. */
-									__( '"%s" reset.' ),
-									decodeEntities( getItemTitle( items[ 0 ] ) )
-							  ),
-						{
-							type: 'snackbar',
-							id: 'revert-template-action',
-						}
-					);
-				}
-			} catch ( error ) {
-				let fallbackErrorMessage;
-				if ( items[ 0 ].type === TEMPLATE_POST_TYPE ) {
-					fallbackErrorMessage =
-						items.length === 1
-							? __(
-									'An error occurred while reverting the template.'
-							  )
-							: __(
-									'An error occurred while reverting the templates.'
-							  );
-				} else {
-					fallbackErrorMessage =
-						items.length === 1
-							? __(
-									'An error occurred while reverting the template part.'
-							  )
-							: __(
-									'An error occurred while reverting the template parts.'
-							  );
-				}
-				const errorMessage =
-					error.message && error.code !== 'unknown_error'
-						? error.message
-						: fallbackErrorMessage;
-
-				createErrorNotice( errorMessage, { type: 'snackbar' } );
-			}
-		};
-		return (
-			<VStack spacing="5">
-				<Text>
-					{ __( 'Reset to default and clear all customizations?' ) }
-				</Text>
-				<HStack justify="right">
-					<Button
-						variant="tertiary"
-						onClick={ closeModal }
-						disabled={ isBusy }
-						__experimentalIsFocusable
-					>
-						{ __( 'Cancel' ) }
-					</Button>
-					<Button
-						variant="primary"
-						onClick={ async () => {
-							setIsBusy( true );
-							if ( onActionStart ) {
-								onActionStart( items );
-							}
-							await onConfirm( items );
-							onActionPerformed?.( items );
-							setIsBusy( false );
-							closeModal();
-						} }
-						isBusy={ isBusy }
-						disabled={ isBusy }
-						__experimentalIsFocusable
-					>
-						{ __( 'Reset' ) }
-					</Button>
-				</HStack>
-			</VStack>
-		);
-	},
-};
-
-/**
- * Check if a template is removable.
- * Copy from packages/edit-site/src/utils/is-template-removable.js.
- *
- * @param {Object} template The template entity to check.
- * @return {boolean} Whether the template is revertable.
- */
-function isTemplateRemovable( template ) {
-	if ( ! template ) {
-		return false;
-	}
-
-	return (
-		template.source === TEMPLATE_ORIGINS.custom && ! template.has_theme_file
+function useRenamePostAction( postType ) {
+	return useCanUserEligibilityCheckPostType(
+		'update',
+		postType,
+		renamePostAction
 	);
 }
 
-const deleteTemplateAction = {
-	id: 'delete-template',
-	label: __( 'Delete' ),
-	isEligible: isTemplateRemovable,
-	icon: trash,
-	supportsBulk: true,
-	hideModalHeader: true,
-	RenderModal: ( {
-		items: templates,
-		closeModal,
-		onActionStart,
-		onActionPerformed,
-	} ) => {
-		const [ isBusy, setIsBusy ] = useState( false );
-		const { removeTemplates } = unlock( useDispatch( editorStore ) );
-		return (
-			<VStack spacing="5">
-				<Text>
-					{ templates.length > 1
-						? sprintf(
-								// translators: %d: number of items to delete.
-								_n(
-									'Delete %d item?',
-									'Delete %d items?',
-									templates.length
-								),
-								templates.length
-						  )
-						: sprintf(
-								// translators: %s: The template or template part's titles
-								__( 'Delete "%s"?' ),
-								decodeEntities(
-									templates?.[ 0 ]?.title?.rendered
+const useDuplicatePostAction = ( postType ) => {
+	const userCanCreatePost = useSelect(
+		( select ) => {
+			return select( coreStore ).canUser( 'create', {
+				kind: 'postType',
+				name: postType,
+			} );
+		},
+		[ postType ]
+	);
+	return useMemo(
+		() =>
+			userCanCreatePost && {
+				id: 'duplicate-post',
+				label: _x( 'Duplicate', 'action label' ),
+				isEligible( { status } ) {
+					return status !== 'trash';
+				},
+				RenderModal: ( { items, closeModal, onActionPerformed } ) => {
+					const [ item, setItem ] = useState( {
+						...items[ 0 ],
+						title: sprintf(
+							/* translators: %s: Existing template title */
+							__( '%s (Copy)' ),
+							getItemTitle( items[ 0 ] )
+						),
+					} );
+
+					const [ isCreatingPage, setIsCreatingPage ] =
+						useState( false );
+
+					const { saveEntityRecord } = useDispatch( coreStore );
+					const { createSuccessNotice, createErrorNotice } =
+						useDispatch( noticesStore );
+
+					async function createPage( event ) {
+						event.preventDefault();
+
+						if ( isCreatingPage ) {
+							return;
+						}
+
+						const newItemOject = {
+							status: 'draft',
+							title: item.title,
+							slug: item.title || __( 'No title' ),
+							comment_status: item.comment_status,
+							content:
+								typeof item.content === 'string'
+									? item.content
+									: item.content.raw,
+							excerpt: item.excerpt.raw,
+							meta: item.meta,
+							parent: item.parent,
+							password: item.password,
+							template: item.template,
+							format: item.format,
+							featured_media: item.featured_media,
+							menu_order: item.menu_order,
+							ping_status: item.ping_status,
+						};
+						const assignablePropertiesPrefix = 'wp:action-assign-';
+						// Get all the properties that the current user is able to assign normally author, categories, tags,
+						// and custom taxonomies.
+						const assignableProperties = Object.keys(
+							item?._links || {}
+						)
+							.filter( ( property ) =>
+								property.startsWith(
+									assignablePropertiesPrefix
 								)
-						  ) }
-				</Text>
-				<HStack justify="right">
-					<Button
-						variant="tertiary"
-						onClick={ closeModal }
-						disabled={ isBusy }
-						__experimentalIsFocusable
-					>
-						{ __( 'Cancel' ) }
-					</Button>
-					<Button
-						variant="primary"
-						onClick={ async () => {
-							setIsBusy( true );
-							if ( onActionStart ) {
-								onActionStart( templates );
+							)
+							.map( ( property ) =>
+								property.slice(
+									assignablePropertiesPrefix.length
+								)
+							);
+						assignableProperties.forEach( ( property ) => {
+							if ( item[ property ] ) {
+								newItemOject[ property ] = item[ property ];
 							}
-							await removeTemplates( templates, {
-								allowUndo: false,
+						} );
+						setIsCreatingPage( true );
+						try {
+							const newItem = await saveEntityRecord(
+								'postType',
+								item.type,
+								newItemOject,
+								{ throwOnError: true }
+							);
+
+							createSuccessNotice(
+								sprintf(
+									// translators: %s: Title of the created template e.g: "Category".
+									__( '"%s" successfully created.' ),
+									decodeEntities(
+										newItem.title?.rendered || item.title
+									)
+								),
+								{
+									id: 'duplicate-post-action',
+									type: 'snackbar',
+								}
+							);
+
+							if ( onActionPerformed ) {
+								onActionPerformed( [ newItem ] );
+							}
+						} catch ( error ) {
+							const errorMessage =
+								error.message && error.code !== 'unknown_error'
+									? error.message
+									: __(
+											'An error occurred while duplicating the page.'
+									  );
+
+							createErrorNotice( errorMessage, {
+								type: 'snackbar',
 							} );
-							onActionPerformed?.( templates );
-							setIsBusy( false );
+						} finally {
+							setIsCreatingPage( false );
 							closeModal();
-						} }
-						isBusy={ isBusy }
-						disabled={ isBusy }
-						__experimentalIsFocusable
-					>
-						{ __( 'Delete' ) }
-					</Button>
-				</HStack>
-			</VStack>
-		);
-	},
-};
-
-const canDeleteOrReset = ( item ) => {
-	const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
-	const isUserPattern = item.type === PATTERN_TYPES.user;
-	return isUserPattern || ( isTemplatePart && item.isCustom );
-};
-
-export const deletePatternAction = {
-	id: 'delete-pattern',
-	label: __( 'Delete' ),
-	isEligible: ( item ) => {
-		if ( ! item ) {
-			return false;
-		}
-		const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
-		const hasThemeFile =
-			isTemplatePart && item.templatePart?.has_theme_file;
-		return canDeleteOrReset( item ) && ! hasThemeFile;
-	},
-	hideModalHeader: true,
-	supportsBulk: true,
-	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
-		const { __experimentalDeleteReusableBlock } =
-			useDispatch( reusableBlocksStore );
-		const { createErrorNotice, createSuccessNotice } =
-			useDispatch( noticesStore );
-		const { removeTemplates } = unlock( useDispatch( editorStore ) );
-
-		const deletePattern = async () => {
-			const promiseResult = await Promise.allSettled(
-				items.map( ( item ) => {
-					return __experimentalDeleteReusableBlock( item.id );
-				} )
-			);
-			// If all the promises were fulfilled with success.
-			if (
-				promiseResult.every( ( { status } ) => status === 'fulfilled' )
-			) {
-				let successMessage;
-				if ( promiseResult.length === 1 ) {
-					successMessage = sprintf(
-						/* translators: The posts's title. */
-						__( '"%s" deleted.' ),
-						items[ 0 ].title
-					);
-				} else {
-					successMessage = __( 'The patterns were deleted.' );
-				}
-				createSuccessNotice( successMessage, {
-					type: 'snackbar',
-					id: 'edit-site-page-trashed',
-				} );
-			} else {
-				// If there was at lease one failure.
-				let errorMessage;
-				// If we were trying to delete a single pattern.
-				if ( promiseResult.length === 1 ) {
-					if ( promiseResult[ 0 ].reason?.message ) {
-						errorMessage = promiseResult[ 0 ].reason.message;
-					} else {
-						errorMessage = __(
-							'An error occurred while deleting the pattern.'
-						);
-					}
-					// If we were trying to delete multiple patterns.
-				} else {
-					const errorMessages = new Set();
-					const failedPromises = promiseResult.filter(
-						( { status } ) => status === 'rejected'
-					);
-					for ( const failedPromise of failedPromises ) {
-						if ( failedPromise.reason?.message ) {
-							errorMessages.add( failedPromise.reason.message );
 						}
 					}
-					if ( errorMessages.size === 0 ) {
-						errorMessage = __(
-							'An error occurred while deleting the patterns.'
-						);
-					} else if ( errorMessages.size === 1 ) {
-						errorMessage = sprintf(
-							/* translators: %s: an error message */
-							__(
-								'An error occurred while deleting the patterns: %s'
-							),
-							[ ...errorMessages ][ 0 ]
-						);
-					} else {
-						errorMessage = sprintf(
-							/* translators: %s: a list of comma separated error messages */
-							__(
-								'Some errors occurred while deleting the patterns: %s'
-							),
-							[ ...errorMessages ].join( ',' )
-						);
-					}
-					createErrorNotice( errorMessage, {
-						type: 'snackbar',
-					} );
-				}
-			}
-		};
-		const deleteItem = () => {
-			if ( items[ 0 ].type === TEMPLATE_PART_POST_TYPE ) {
-				removeTemplates( items );
-			} else {
-				deletePattern();
-			}
-			if ( onActionPerformed ) {
-				onActionPerformed();
-			}
-			closeModal();
-		};
-		let questionMessage;
-		if ( items.length === 1 ) {
-			questionMessage = sprintf(
-				// translators: %s: The page's title.
-				__( 'Are you sure you want to delete "%s"?' ),
-				decodeEntities( items[ 0 ].title || items[ 0 ].name )
-			);
-		} else if (
-			items.length > 1 &&
-			items[ 0 ].type === TEMPLATE_PART_POST_TYPE
-		) {
-			questionMessage = sprintf(
-				// translators: %d: The number of template parts (2 or more).
-				__( 'Are you sure you want to delete %d template parts?' ),
-				items.length
-			);
-		} else {
-			questionMessage = sprintf(
-				// translators: %d: The number of patterns (2 or more).
-				__( 'Are you sure you want to delete %d patterns?' ),
-				items.length
-			);
-		}
+
+					return (
+						<form onSubmit={ createPage }>
+							<VStack spacing={ 3 }>
+								<DataForm
+									data={ item }
+									fields={ fields }
+									form={ form }
+									onChange={ setItem }
+								/>
+								<HStack spacing={ 2 } justify="end">
+									<Button
+										variant="tertiary"
+										onClick={ closeModal }
+										__next40pxDefaultSize
+									>
+										{ __( 'Cancel' ) }
+									</Button>
+									<Button
+										variant="primary"
+										type="submit"
+										isBusy={ isCreatingPage }
+										aria-disabled={ isCreatingPage }
+										__next40pxDefaultSize
+									>
+										{ _x( 'Duplicate', 'action label' ) }
+									</Button>
+								</HStack>
+							</VStack>
+						</form>
+					);
+				},
+			},
+		[ userCanCreatePost ]
+	);
+};
+
+export const duplicatePatternAction = {
+	id: 'duplicate-pattern',
+	label: _x( 'Duplicate', 'action label' ),
+	isEligible: ( item ) => item.type !== TEMPLATE_PART_POST_TYPE,
+	modalHeader: _x( 'Duplicate pattern', 'action label' ),
+	RenderModal: ( { items, closeModal } ) => {
+		const [ item ] = items;
+		const duplicatedProps = useDuplicatePatternProps( {
+			pattern: item,
+			onSuccess: () => closeModal(),
+		} );
 		return (
-			<VStack spacing="5">
-				<Text>{ questionMessage }</Text>
-				<HStack justify="right">
-					<Button variant="tertiary" onClick={ closeModal }>
-						{ __( 'Cancel' ) }
-					</Button>
-					<Button variant="primary" onClick={ deleteItem }>
-						{ __( 'Delete' ) }
-					</Button>
-				</HStack>
-			</VStack>
+			<CreatePatternModalContents
+				onClose={ closeModal }
+				confirmLabel={ _x( 'Duplicate', 'action label' ) }
+				{ ...duplicatedProps }
+			/>
 		);
 	},
 };
 
-export function usePostActions( postType, onActionPerformed ) {
-	const { postTypeObject } = useSelect(
+export const duplicateTemplatePartAction = {
+	id: 'duplicate-template-part',
+	label: _x( 'Duplicate', 'action label' ),
+	isEligible: ( item ) => item.type === TEMPLATE_PART_POST_TYPE,
+	modalHeader: _x( 'Duplicate template part', 'action label' ),
+	RenderModal: ( { items, closeModal } ) => {
+		const [ item ] = items;
+		const blocks = useMemo( () => {
+			return (
+				item.blocks ??
+				parse( item.content.raw, {
+					__unstableSkipMigrationLogs: true,
+				} )
+			);
+		}, [ item?.content?.raw, item.blocks ] );
+		const { createSuccessNotice } = useDispatch( noticesStore );
+		function onTemplatePartSuccess() {
+			createSuccessNotice(
+				sprintf(
+					// translators: %s: The new template part's title e.g. 'Call to action (copy)'.
+					__( '"%s" duplicated.' ),
+					getItemTitle( item )
+				),
+				{ type: 'snackbar', id: 'edit-site-patterns-success' }
+			);
+			closeModal();
+		}
+		return (
+			<CreateTemplatePartModalContents
+				blocks={ blocks }
+				defaultArea={ item.area }
+				defaultTitle={ sprintf(
+					/* translators: %s: Existing template part title */
+					__( '%s (Copy)' ),
+					getItemTitle( item )
+				) }
+				onCreate={ onTemplatePartSuccess }
+				onError={ closeModal }
+				confirmLabel={ _x( 'Duplicate', 'action label' ) }
+			/>
+		);
+	},
+};
+
+export function usePostActions( { postType, onActionPerformed, context } ) {
+	const {
+		defaultActions,
+		postTypeObject,
+		userCanCreatePostType,
+		cachedCanUserResolvers,
+	} = useSelect(
 		( select ) => {
-			const { getPostType } = select( coreStore );
+			const { getPostType, canUser, getCachedResolvers } =
+				select( coreStore );
+			const { getEntityActions } = unlock( select( editorStore ) );
+			const _postTypeObject = getPostType( postType );
 			return {
-				postTypeObject: getPostType( postType ),
+				postTypeObject: _postTypeObject,
+				defaultActions: getEntityActions( 'postType', postType ),
+				userCanCreatePostType: canUser( 'create', {
+					kind: 'postType',
+					name: postType,
+				} ),
+				cachedCanUserResolvers: getCachedResolvers()?.canUser,
 			};
 		},
 		[ postType ]
 	);
 
-	const permanentlyDeletePostAction = usePermanentlyDeletePostAction();
-	const restorePostAction = useRestorePostAction();
+	const duplicatePostAction = useDuplicatePostAction( postType );
+	const trashPostActionForPostType = useTrashPostAction( postType );
+	const permanentlyDeletePostActionForPostType =
+		usePermanentlyDeletePostAction( postType );
+	const renamePostActionForPostType = useRenamePostAction( postType );
+	const restorePostActionForPostType = useRestorePostAction( postType );
 	const isTemplateOrTemplatePart = [
 		TEMPLATE_POST_TYPE,
 		TEMPLATE_PART_POST_TYPE,
 	].includes( postType );
 	const isPattern = postType === PATTERN_POST_TYPE;
 	const isLoaded = !! postTypeObject;
+	const supportsRevisions = !! postTypeObject?.supports?.revisions;
+	const supportsTitle = !! postTypeObject?.supports?.title;
 	return useMemo( () => {
 		if ( ! isLoaded ) {
 			return [];
 		}
 
-		const actions = [
+		let actions = [
 			postTypeObject?.viewable && viewPostAction,
-			postRevisionsAction,
+			supportsRevisions && postRevisionsAction,
 			globalThis.IS_GUTENBERG_PLUGIN
 				? ! isTemplateOrTemplatePart &&
 				  ! isPattern &&
 				  duplicatePostAction
 				: false,
-			renamePostAction,
-			isPattern && exportPatternAsJSONAction,
-			isTemplateOrTemplatePart ? resetTemplateAction : restorePostAction,
-			isTemplateOrTemplatePart
-				? deleteTemplateAction
-				: permanentlyDeletePostAction,
-			isPattern && deletePatternAction,
-			! isTemplateOrTemplatePart && trashPostAction,
+			isTemplateOrTemplatePart &&
+				userCanCreatePostType &&
+				duplicateTemplatePartAction,
+			isPattern && userCanCreatePostType && duplicatePatternAction,
+			supportsTitle && renamePostActionForPostType,
+			! isTemplateOrTemplatePart && restorePostActionForPostType,
+			! isTemplateOrTemplatePart &&
+				! isPattern &&
+				trashPostActionForPostType,
+			! isTemplateOrTemplatePart &&
+				permanentlyDeletePostActionForPostType,
+			...defaultActions,
 		].filter( Boolean );
+		// Filter actions based on provided context. If not provided
+		// all actions are returned. We'll have a single entry for getting the actions
+		// and the consumer should provide the context to filter the actions, if needed.
+		// Actions should also provide the `context` they support, if it's specific, to
+		// compare with the provided context to get all the actions.
+		// Right now the only supported context is `list`.
+		actions = actions.filter( ( action ) => {
+			if ( ! action.context ) {
+				return true;
+			}
+			return action.context === context;
+		} );
 
 		if ( onActionPerformed ) {
 			for ( let i = 0; i < actions.length; ++i ) {
@@ -1137,12 +943,18 @@ export function usePostActions( postType, onActionPerformed ) {
 					const existingCallback = actions[ i ].callback;
 					actions[ i ] = {
 						...actions[ i ],
-						callback: ( items, _onActionPerformed ) => {
-							existingCallback( items, ( _items ) => {
-								if ( _onActionPerformed ) {
-									_onActionPerformed( _items );
-								}
-								onActionPerformed( actions[ i ].id, _items );
+						callback: ( items, argsObject ) => {
+							existingCallback( items, {
+								...argsObject,
+								onActionPerformed: ( _items ) => {
+									if ( argsObject?.onActionPerformed ) {
+										argsObject.onActionPerformed( _items );
+									}
+									onActionPerformed(
+										actions[ i ].id,
+										_items
+									);
+								},
 							} );
 						},
 					};
@@ -1173,13 +985,25 @@ export function usePostActions( postType, onActionPerformed ) {
 		}
 
 		return actions;
+		// We are making this use memo depend on cachedCanUserResolvers as a way to make the component using this hook re-render
+		// when user capabilities are resolved. This makes sure the isEligible functions of actions dependent on capabilities are re-evaluated.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [
+		defaultActions,
+		userCanCreatePostType,
 		isTemplateOrTemplatePart,
 		isPattern,
 		postTypeObject?.viewable,
-		permanentlyDeletePostAction,
-		restorePostAction,
+		duplicatePostAction,
+		trashPostActionForPostType,
+		restorePostActionForPostType,
+		renamePostActionForPostType,
+		permanentlyDeletePostActionForPostType,
 		onActionPerformed,
 		isLoaded,
+		supportsRevisions,
+		supportsTitle,
+		context,
+		cachedCanUserResolvers,
 	] );
 }

@@ -13,9 +13,7 @@ import {
 	offset as offsetMiddleware,
 	size,
 } from '@floating-ui/react-dom';
-// eslint-disable-next-line no-restricted-imports
 import type { HTMLMotionProps, MotionProps } from 'framer-motion';
-// eslint-disable-next-line no-restricted-imports
 import { motion } from 'framer-motion';
 
 /**
@@ -78,7 +76,7 @@ export const SLOT_NAME = 'Popover';
 const ArrowTriangle = () => (
 	<SVG
 		xmlns="http://www.w3.org/2000/svg"
-		viewBox={ `0 0 100 100` }
+		viewBox="0 0 100 100"
 		className="components-popover__triangle"
 		role="presentation"
 	>

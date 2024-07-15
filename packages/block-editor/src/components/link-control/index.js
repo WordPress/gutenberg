@@ -220,7 +220,6 @@ function LinkControl( {
 		// because otherwise using the keyboard to select text
 		// *within* the link format is not possible.
 		if ( isMounting.current ) {
-			isMounting.current = false;
 			return;
 		}
 
@@ -237,6 +236,16 @@ function LinkControl( {
 
 		isEndingEditWithFocus.current = false;
 	}, [ isEditingLink, isCreatingPage ] );
+
+	// The component mounting reference is maintained separately
+	// to correctly reset values in `StrictMode`.
+	useEffect( () => {
+		isMounting.current = false;
+
+		return () => {
+			isMounting.current = true;
+		};
+	}, [] );
 
 	const hasLinkValue = value?.url?.trim()?.length > 0;
 

@@ -50,6 +50,18 @@ const afterNextFrame = ( callback: () => void ) => {
 };
 
 /**
+ * Returns a promise that resolves after yielding to main.
+ *
+ * @return Promise
+ */
+export const splitTask = () => {
+	return new Promise( ( resolve ) => {
+		// TODO: Use scheduler.yield() when available.
+		setTimeout( resolve, 0 );
+	} );
+};
+
+/**
  * Creates a Flusher object that can be used to flush computed values and notify listeners.
  *
  * Using the mangled properties:

@@ -26,9 +26,12 @@ import MostUsedTerms from './most-used-terms';
 const EMPTY_ARRAY = [];
 
 /**
- * Module constants
+ * How the max suggestions limit was chosen:
+ *  - Matches the `per_page` range set by the REST API.
+ *  - Can't use "unbound" query. The `FormTokenField` needs a fixed number.
+ *  - Matches default for `FormTokenField`.
  */
-const MAX_TERMS_SUGGESTIONS = 20;
+const MAX_TERMS_SUGGESTIONS = 100;
 const DEFAULT_QUERY = {
 	per_page: MAX_TERMS_SUGGESTIONS,
 	_fields: 'id,name',
@@ -49,6 +52,14 @@ const termNamesToIds = ( names, terms ) => {
 		.filter( ( id ) => id !== undefined );
 };
 
+/**
+ * Renders a flat term selector component.
+ *
+ * @param {Object} props      The component props.
+ * @param {string} props.slug The slug of the taxonomy.
+ *
+ * @return {JSX.Element} The rendered flat term selector component.
+ */
 export function FlatTermSelector( { slug } ) {
 	const [ values, setValues ] = useState( [] );
 	const [ search, setSearch ] = useState( '' );
@@ -75,7 +86,7 @@ export function FlatTermSelector( { slug } ) {
 
 			const query = {
 				...DEFAULT_QUERY,
-				include: _termIds.join( ',' ),
+				include: _termIds?.join( ',' ),
 				per_page: -1,
 			};
 
@@ -92,7 +103,7 @@ export function FlatTermSelector( { slug } ) {
 					: false,
 				taxonomy: _taxonomy,
 				termIds: _termIds,
-				terms: _termIds.length
+				terms: _termIds?.length
 					? getEntityRecords( 'taxonomy', slug, query )
 					: EMPTY_ARRAY,
 				hasResolvedTerms: hasFinishedResolution( 'getEntityRecords', [

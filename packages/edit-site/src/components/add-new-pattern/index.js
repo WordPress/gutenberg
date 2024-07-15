@@ -13,11 +13,11 @@ import {
 } from '@wordpress/patterns';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import CreateTemplatePartModal from '../create-template-part-modal';
 import { unlock } from '../../lock-unlock';
 import {
 	PATTERN_TYPES,
@@ -29,27 +29,43 @@ const { useHistory } = unlock( routerPrivateApis );
 const { CreatePatternModal, useAddPatternCategory } = unlock(
 	editPatternsPrivateApis
 );
+const { CreateTemplatePartModal } = unlock( editorPrivateApis );
 
 export default function AddNewPattern() {
 	const history = useHistory();
 	const [ showPatternModal, setShowPatternModal ] = useState( false );
 	const [ showTemplatePartModal, setShowTemplatePartModal ] =
 		useState( false );
+	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
 	const { createPatternFromFile } = unlock( useDispatch( patternsStore ) );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 	const patternUploadInputRef = useRef();
-	const { isBlockBasedTheme, addNewPatternLabel, addNewTemplatePartLabel } =
-		useSelect( ( select ) => {
-			const { getCurrentTheme, getPostType } = select( coreStore );
-			return {
-				isBlockBasedTheme: getCurrentTheme()?.is_block_theme,
-				addNewPatternLabel: getPostType( PATTERN_TYPES.user )?.labels
-					?.add_new_item,
-				addNewTemplatePartLabel: getPostType( TEMPLATE_PART_POST_TYPE )
-					?.labels?.add_new_item,
-			};
-		}, [] );
+	const {
+		isBlockBasedTheme,
+		addNewPatternLabel,
+		addNewTemplatePartLabel,
+		canCreatePattern,
+		canCreateTemplatePart,
+	} = useSelect( ( select ) => {
+		const { getCurrentTheme, getPostType, canUser } = select( coreStore );
+		return {
+			isBlockBasedTheme: getCurrentTheme()?.is_block_theme,
+			addNewPatternLabel: getPostType( PATTERN_TYPES.user )?.labels
+				?.add_new_item,
+			addNewTemplatePartLabel: getPostType( TEMPLATE_PART_POST_TYPE )
+				?.labels?.add_new_item,
+			// Blocks refers to the wp_block post type, this checks the ability to create a post of that type.
+			canCreatePattern: canUser( 'create', {
+				kind: 'postType',
+				name: PATTERN_TYPES.user,
+			} ),
+			canCreateTemplatePart: canUser( 'create', {
+				kind: 'postType',
+				name: TEMPLATE_PART_POST_TYPE,
+			} ),
+		};
+	}, [] );
 
 	function handleCreatePattern( { pattern } ) {
 		setShowPatternModal( false );
@@ -77,15 +93,16 @@ export default function AddNewPattern() {
 		setShowTemplatePartModal( false );
 	}
 
-	const controls = [
-		{
+	const controls = [];
+	if ( canCreatePattern ) {
+		controls.push( {
 			icon: symbol,
 			onClick: () => setShowPatternModal( true ),
 			title: addNewPatternLabel,
-		},
-	];
+		} );
+	}
 
-	if ( isBlockBasedTheme ) {
+	if ( isBlockBasedTheme && canCreateTemplatePart ) {
 		controls.push( {
 			icon: symbolFilled,
 			onClick: () => setShowTemplatePartModal( true ),
@@ -93,22 +110,31 @@ export default function AddNewPattern() {
 		} );
 	}
 
-	controls.push( {
-		icon: upload,
-		onClick: () => {
-			patternUploadInputRef.current.click();
-		},
-		title: __( 'Import pattern from JSON' ),
-	} );
+	if ( canCreatePattern ) {
+		controls.push( {
+			icon: upload,
+			onClick: () => {
+				patternUploadInputRef.current.click();
+			},
+			title: __( 'Import pattern from JSON' ),
+		} );
+	}
 
 	const { categoryMap, findOrCreateTerm } = useAddPatternCategory();
+	if ( controls.length === 0 ) {
+		return null;
+	}
 	return (
 		<>
 			{ addNewPatternLabel && (
 				<DropdownMenu
 					controls={ controls }
 					icon={ null }
-					toggleProps={ { variant: 'primary', showTooltip: false } }
+					toggleProps={ {
+						variant: 'primary',
+						showTooltip: false,
+						__next40pxDefaultSize: true,
+					} }
 					text={ addNewPatternLabel }
 					label={ addNewPatternLabel }
 				/>
