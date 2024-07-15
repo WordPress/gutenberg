@@ -4,6 +4,10 @@ The collection of schemas used in WordPress, including the `theme.json`, `block.
 
 JSON schemas are used by code editors to offer tooltips, autocomplete, and validation.
 
+## Usage
+
+This has no usage within the code; as such, it should _not_ be used as a source of truth. These schemas are for development usage only and are mainly focused on providing auto-complete and tooltips in your editor. Using these schemas for validation may catch some errors, but will not catch all of them.
+
 ## JSON schema usage
 
 Many editors recognize the `$schema` property in JSON files.
