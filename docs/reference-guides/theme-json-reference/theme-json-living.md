@@ -199,7 +199,7 @@ Settings related to typography.
 
 ### custom
 
-Generate custom CSS custom properties of the form `--wp--custom--{key}--{nested-key}: {value};`. `camelCased` keys are transformed to `kebab-case` as to follow the CSS property naming schema. Keys at different depth levels are separated by `--`, so keys should not include `--` in the name.
+undefined
 
 
 ---
