@@ -24,21 +24,23 @@ const localStorage = window.localStorage;
  *                                                     `localStorage.setItem`.
  * @param {?number} options.requestDebounceMS          Debounce requests to the API so that they only occur at
  *                                                     minimum every `requestDebounceMS` milliseconds, and don't
- *                                                     swamp the server. Defaults to 2500ms.
+ *                                                     swamp the server. Defaults to 1000ms.
  *
  * @param {?number} options.expensiveRequestDebounceMS A longer debounce that can be defined for updates that have
- *                                                     `isExpensive=true` defined. defaults to 60000ms.
+ *                                                     `isExpensive=true` defined. defaults to 5000ms.
  *
+ * @param {?number} options.maxWaitMS
  * @return {Object} A persistence layer for WordPress user meta.
  */
 export default function create( {
 	preloadedData,
 	localStorageRestoreKey = 'WP_PREFERENCES_RESTORE_DATA',
-	requestDebounceMS = 2500,
-	expensiveRequestDebounceMS = 60000,
+	requestDebounceMS = 1000,
+	expensiveRequestDebounceMS = 5000,
+	maxWaitMS = 10000,
 } = {} ) {
 	let cache = preloadedData;
-	const debounce = createAsyncDebouncer();
+	const debounce = createAsyncDebouncer( { maxWaitMS } );
 
 	async function get() {
 		if ( cache ) {
@@ -108,7 +110,6 @@ export default function create( {
 				delayMS: isExpensive
 					? expensiveRequestDebounceMS
 					: requestDebounceMS,
-				isTrailing: isExpensive,
 			}
 		);
 	}
