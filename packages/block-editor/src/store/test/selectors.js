@@ -3293,6 +3293,13 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getInserterItems', () => {
+		afterAll( async () => {
+			await dispatch( store ).updateSettings( {
+				__experimentalReusableBlocks: [],
+			} );
+			await dispatch( store ).resetBlocks( [] );
+		} );
+
 		it( 'should properly list block type and reusable block items', async () => {
 			getInsertUsage.mockImplementation( () => ( {} ) );
 
@@ -3446,7 +3453,7 @@ describe( 'selectors', () => {
 
 		it( 'should set a frecency', async () => {
 			getInsertUsage.mockImplementation( () => ( {
-				'core/test-block-b': { count: 10, time: 1000 },
+				'core/test-block-b': { count: 10, time: Date.now() },
 			} ) );
 			const items = select( store ).getInserterItems();
 			const reusableBlock2Item = items.find(
