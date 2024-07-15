@@ -581,7 +581,7 @@ export const insertBlocks =
 				initialPosition: updateSelection ? initialPosition : null,
 				meta,
 			} );
-			dispatch.updateInsertUsage( blocks );
+			dispatch.updateInsertUsage( allowedBlocks );
 		}
 	};
 
