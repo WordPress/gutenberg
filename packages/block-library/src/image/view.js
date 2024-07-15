@@ -59,13 +59,13 @@ const { state, actions, callbacks } = store(
 				const { imageId } = getContext();
 				return state.metadata[ imageId ].imageButtonTop;
 			},
-			get contentImageHide() {
+			get isContentHidden() {
 				const ctx = getContext();
 				return (
 					state.overlayEnabled && state.currentImageId === ctx.imageId
 				);
 			},
-			get contentImageShow() {
+			get isContentVisible() {
 				const ctx = getContext();
 				return (
 					! state.overlayEnabled &&
