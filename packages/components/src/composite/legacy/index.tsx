@@ -78,7 +78,7 @@ export interface LegacyStateOptions {
 
 type Component = React.FunctionComponent< any >;
 
-type CompositeStore = ReturnType< typeof Current.useCompositeStore >;
+type CompositeStore = ReturnType< typeof Current.useStore >;
 type CompositeStoreState = { store: CompositeStore };
 export type CompositeState = CompositeStoreState &
 	Required< Pick< LegacyStateOptions, 'baseId' > >;
@@ -98,9 +98,9 @@ type CompositeComponent< C extends Component > = (
 ) => React.ReactElement;
 type CompositeComponentProps = CompositeState &
 	(
-		| ComponentProps< typeof Current.CompositeGroup >
-		| ComponentProps< typeof Current.CompositeItem >
-		| ComponentProps< typeof Current.CompositeRow >
+		| ComponentProps< typeof Current.Group >
+		| ComponentProps< typeof Current.Item >
+		| ComponentProps< typeof Current.Row >
 	);
 
 function mapLegacyStatePropsToComponentProps(
@@ -150,19 +150,16 @@ function proxyComposite< C extends Component >(
 // provided role, and returning the appropriate component.
 const unproxiedCompositeGroup = forwardRef<
 	any,
-	React.ComponentPropsWithoutRef<
-		typeof Current.CompositeGroup | typeof Current.CompositeRow
-	>
+	React.ComponentPropsWithoutRef< typeof Current.Group | typeof Current.Row >
 >( ( { role, ...props }, ref ) => {
-	const Component =
-		role === 'row' ? Current.CompositeRow : Current.CompositeGroup;
+	const Component = role === 'row' ? Current.Row : Current.Group;
 	return <Component ref={ ref } role={ role } { ...props } />;
 } );
 unproxiedCompositeGroup.displayName = 'CompositeGroup';
 
-export const Composite = proxyComposite( Current.Composite, { baseId: 'id' } );
+export const Composite = proxyComposite( Current.Root, { baseId: 'id' } );
 export const CompositeGroup = proxyComposite( unproxiedCompositeGroup );
-export const CompositeItem = proxyComposite( Current.CompositeItem, {
+export const CompositeItem = proxyComposite( Current.Item, {
 	focusable: 'accessibleWhenDisabled',
 } );
 
@@ -183,7 +180,7 @@ export function useCompositeState(
 
 	return {
 		baseId: useInstanceId( Composite, 'composite', baseId ),
-		store: Current.useCompositeStore( {
+		store: Current.useStore( {
 			defaultActiveId,
 			rtl,
 			orientation,
