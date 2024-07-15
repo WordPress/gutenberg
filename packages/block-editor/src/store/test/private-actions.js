@@ -12,6 +12,8 @@ import {
 	stopDragging,
 } from '../private-actions';
 
+import { lock } from '../../lock-unlock';
+
 describe( 'private actions', () => {
 	describe( 'hideBlockInterface', () => {
 		it( 'should return the HIDE_BLOCK_INTERFACE action', () => {
@@ -31,12 +33,11 @@ describe( 'private actions', () => {
 
 	describe( 'updateInsertUsage', () => {
 		it( 'should record recently used blocks', () => {
-			const setPreference = jest.fn();
+			const actions = { set: jest.fn() };
+			const privateActions = { markNextChangeAsExpensive: jest.fn() };
+			lock( actions, privateActions );
 			const registry = {
-				dispatch: () => ( {
-					set: setPreference,
-					markNextChangeAsExpensive: () => {},
-				} ),
+				dispatch: () => actions,
 				select: () => ( {
 					get: () => {},
 					getActiveBlockVariation: () => {},
@@ -50,25 +51,23 @@ describe( 'private actions', () => {
 				},
 			] )( { registry } );
 
-			expect( setPreference ).toHaveBeenCalledWith(
-				'core',
-				'insertUsage',
-				{
-					'core/embed': {
-						time: expect.any( Number ),
-						count: 1,
-					},
-				}
-			);
+			expect(
+				privateActions.markNextChangeAsExpensive
+			).toHaveBeenCalled();
+			expect( actions.set ).toHaveBeenCalledWith( 'core', 'insertUsage', {
+				'core/embed': {
+					time: expect.any( Number ),
+					count: 1,
+				},
+			} );
 		} );
 
 		it( 'merges insert usage if more blocks are added of the same type', () => {
-			const setPreference = jest.fn();
+			const actions = { set: jest.fn() };
+			const privateActions = { markNextChangeAsExpensive: jest.fn() };
+			lock( actions, privateActions );
 			const registry = {
-				dispatch: () => ( {
-					set: setPreference,
-					markNextChangeAsExpensive: () => {},
-				} ),
+				dispatch: () => actions,
 				select: () => ( {
 					// simulate an existing embed block.
 					get: () => ( {
@@ -93,35 +92,33 @@ describe( 'private actions', () => {
 				},
 			] )( { registry } );
 
-			expect( setPreference ).toHaveBeenCalledWith(
-				'core',
-				'insertUsage',
-				{
-					// The reusable block has a special case where each ref is
-					// stored as though an individual block, and the ref is
-					// also recorded in the `insert` object.
-					'core/block/123': {
-						time: expect.any( Number ),
-						count: 1,
-					},
-					'core/embed': {
-						time: expect.any( Number ),
-						count: 2,
-					},
-				}
-			);
+			expect(
+				privateActions.markNextChangeAsExpensive
+			).toHaveBeenCalled();
+			expect( actions.set ).toHaveBeenCalledWith( 'core', 'insertUsage', {
+				// The reusable block has a special case where each ref is
+				// stored as though an individual block, and the ref is
+				// also recorded in the `insert` object.
+				'core/block/123': {
+					time: expect.any( Number ),
+					count: 1,
+				},
+				'core/embed': {
+					time: expect.any( Number ),
+					count: 2,
+				},
+			} );
 		} );
 
 		describe( 'block variations handling', () => {
 			const blockWithVariations = 'core/test-block-with-variations';
 
 			it( 'should return proper results with both found or not found block variation matches', () => {
-				const setPreference = jest.fn();
+				const actions = { set: jest.fn() };
+				const privateActions = { markNextChangeAsExpensive: jest.fn() };
+				lock( actions, privateActions );
 				const registry = {
-					dispatch: () => ( {
-						set: setPreference,
-						markNextChangeAsExpensive: () => {},
-					} ),
+					dispatch: () => actions,
 					select: () => ( {
 						get: () => {},
 						// simulate an active block variation:
@@ -168,7 +165,10 @@ describe( 'private actions', () => {
 				const orangeVariationName = `${ blockWithVariations }/orange`;
 				const appleVariationName = `${ blockWithVariations }/apple`;
 
-				expect( setPreference ).toHaveBeenCalledWith(
+				expect(
+					privateActions.markNextChangeAsExpensive
+				).toHaveBeenCalled();
+				expect( actions.set ).toHaveBeenCalledWith(
 					'core',
 					'insertUsage',
 					{

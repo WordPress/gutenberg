@@ -447,7 +447,9 @@ export const updateInsertUsage =
 			updatedInsertUsage = Object.fromEntries( entriesToKeep );
 		}
 
-		registry.dispatch( preferencesStore );
+		unlock(
+			registry.dispatch( preferencesStore )
+		).markNextChangeAsExpensive();
 		registry
 			.dispatch( preferencesStore )
 			.set( 'core', 'insertUsage', updatedInsertUsage );
