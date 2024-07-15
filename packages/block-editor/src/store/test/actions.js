@@ -301,8 +301,6 @@ describe( 'actions', () => {
 				clientIds: [ 'chicken' ],
 				blocks,
 				initialPosition: 0,
-				indexToSelect: undefined,
-				meta: undefined,
 			} );
 		} );
 
@@ -414,7 +412,6 @@ describe( 'actions', () => {
 				rootClientId: 'testclientid',
 				updateSelection: true,
 				initialPosition: 0,
-				meta: undefined,
 			} );
 		} );
 	} );
@@ -468,7 +465,6 @@ describe( 'actions', () => {
 				rootClientId: 'testrootid',
 				updateSelection: false,
 				initialPosition: null,
-				meta: undefined,
 			} );
 		} );
 
@@ -554,7 +550,7 @@ describe( 'actions', () => {
 			} );
 		} );
 
-		it( 'should set insertUsage in the preferences store', () => {
+		it( 'should update insertUsage', () => {
 			const blocks = [
 				{
 					clientId: 'ribs',
