@@ -791,7 +791,6 @@
 			"type": "object",
 			"properties": {
 				"custom": {
-					"description": "Generate custom CSS custom properties of the form `--wp--custom--{key}--{nested-key}: {value};`. `camelCased` keys are transformed to `kebab-case` as to follow the CSS property naming schema. Keys at different depth levels are separated by `--`, so keys should not include `--` in the name.",
 					"$ref": "#/definitions/settingsCustomAdditionalProperties"
 				}
 			}
@@ -838,6 +837,7 @@
 			]
 		},
 		"settingsBlocksPropertiesComplete": {
+			"description": "Settings defined on a per-block basis.",
 			"type": "object",
 			"properties": {
 				"core/archives": {
@@ -1143,6 +1143,7 @@
 			"additionalProperties": false
 		},
 		"settingsCustomAdditionalProperties": {
+			"description": "Generate custom CSS custom properties of the form `--wp--custom--{key}--{nested-key}: {value};`. `camelCased` keys are transformed to `kebab-case` as to follow the CSS property naming schema. Keys at different depth levels are separated by `--`, so keys should not include `--` in the name.",
 			"type": "object",
 			"additionalProperties": {
 				"oneOf": [
@@ -1891,6 +1892,7 @@
 			]
 		},
 		"stylesElementsPropertiesComplete": {
+			"description": "Styles defined on a per-element basis using the element's selector.",
 			"type": "object",
 			"properties": {
 				"button": {
@@ -2790,7 +2792,6 @@
 						"dimensions": true,
 						"custom": true,
 						"blocks": {
-							"description": "Settings defined on a per-block basis.",
 							"$ref": "#/definitions/settingsBlocksPropertiesComplete"
 						}
 					},
@@ -2817,7 +2818,6 @@
 						"outline": true,
 						"css": true,
 						"elements": {
-							"description": "Styles defined on a per-element basis using the element's selector.",
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"
 						},
 						"blocks": {
