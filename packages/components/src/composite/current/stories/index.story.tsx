@@ -15,7 +15,7 @@ import * as Composite from '..';
 import { UseCompositeStorePlaceholder, transform } from './utils';
 
 const meta: Meta< typeof UseCompositeStorePlaceholder > = {
-	title: 'Components/Composite (V2)',
+	title: 'Components/Composite',
 	component: UseCompositeStorePlaceholder,
 	subcomponents: {
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
@@ -27,7 +27,6 @@ const meta: Meta< typeof UseCompositeStorePlaceholder > = {
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		Item: Composite.Item,
 	},
-	tags: [ 'status-private' ],
 	parameters: {
 		docs: {
 			canvas: { sourceState: 'shown' },
