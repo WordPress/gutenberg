@@ -435,11 +435,7 @@ export const updateInsertUsage =
 		const entries = Object.entries( updatedInsertUsage );
 		if ( entries.length > limit ) {
 			// Most recently inserted blocks first.
-			entries.sort( ( entryLeft, entryRight ) => {
-				const [ , { time: timeLeft } ] = entryLeft;
-				const [ , { time: timeRight } ] = entryRight;
-				return timeRight - timeLeft;
-			} );
+			entries.sort( ( a, b ) => b[ 1 ].time - a[ 1 ].time );
 
 			// Slice an array of items that are the newest and convert them
 			// back into object form.
