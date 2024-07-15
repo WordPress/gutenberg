@@ -8,6 +8,9 @@ import type { StoryContext } from '@storybook/react';
  */
 import type { StoreProps as CompositeStoreProps } from '..';
 
+/**
+ * Renders a composite widget.
+ */
 export function UseCompositeStorePlaceholder( props: CompositeStoreProps ) {
 	return (
 		<dl>
