@@ -83,8 +83,6 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__unstableIsPreviewMode',
 	'__unstableResolvedAssets',
 	'__unstableIsBlockBasedTheme',
-	'__experimentalArchiveTitleTypeLabel',
-	'__experimentalArchiveTitleNameLabel',
 ];
 
 const {

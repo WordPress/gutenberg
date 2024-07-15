@@ -303,9 +303,11 @@ export default function SpacingInputControl( {
 				<CustomSelectControl
 					className="spacing-sizes-control__custom-select-control"
 					value={
+						// passing empty string as a fallback to continue using the
+						// component in controlled mode
 						options.find(
 							( option ) => option.key === currentValue
-						) || '' // passing undefined here causes a downshift controlled/uncontrolled warning
+						) || ''
 					}
 					onChange={ ( selection ) => {
 						onChange(

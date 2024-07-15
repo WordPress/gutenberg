@@ -7,15 +7,15 @@ import clsx from 'clsx';
 /**
  * Internal dependencies
  */
-import _CustomSelect from '../custom-select';
-import CustomSelectItem from '../item';
-import type { LegacyCustomSelectProps } from '../types';
-import * as Styled from '../styles';
+import _CustomSelect from '../custom-select-control-v2/custom-select';
+import CustomSelectItem from '../custom-select-control-v2/item';
+import * as Styled from '../custom-select-control-v2/styles';
+import type { CustomSelectProps } from './types';
 
 function useDeprecatedProps( {
 	__experimentalShowSelectedHint,
 	...otherProps
-}: LegacyCustomSelectProps ) {
+}: CustomSelectProps ) {
 	return {
 		showSelectedHint: __experimentalShowSelectedHint,
 		...otherProps,
@@ -28,14 +28,14 @@ function useDeprecatedProps( {
 function applyOptionDeprecations( {
 	__experimentalHint,
 	...rest
-}: LegacyCustomSelectProps[ 'options' ][ number ] ) {
+}: CustomSelectProps[ 'options' ][ number ] ) {
 	return {
 		hint: __experimentalHint,
 		...rest,
 	};
 }
 
-function CustomSelectControl( props: LegacyCustomSelectProps ) {
+function CustomSelectControl( props: CustomSelectProps ) {
 	const {
 		__next40pxDefaultSize = false,
 		describedBy,
@@ -60,7 +60,8 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 			}
 
 			// Executes the logic in a microtask after the popup is closed.
-			// This is simply to ensure the isOpen state matches that in Downshift.
+			// This is simply to ensure the isOpen state matches the one from the
+			// previous legacy implementation.
 			await Promise.resolve();
 			const state = store.getState();
 
@@ -90,8 +91,8 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 				<Styled.WithHintItemWrapper>
 					<span>{ name }</span>
 					<Styled.WithHintItemHint
-					// TODO: Legacy classname. Add V1 styles are removed from the codebase
-					// className="components-custom-select-control__item-hint"
+						// Keeping the classname for legacy reasons
+						className="components-custom-select-control__item-hint"
 					>
 						{ hint }
 					</Styled.WithHintItemHint>
@@ -105,13 +106,12 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 					children={ hint ? withHint : name }
 					style={ style }
 					className={ clsx(
-						// TODO: Legacy classname. Add V1 styles are removed from the codebase
-						// 'components-custom-select-control__item',
-						className
-						// TODO: Legacy classname. Add V1 styles are removed from the codebase
-						// {
-						// 	'has-hint': hint,
-						// }
+						className,
+						// Keeping the classnames for legacy reasons
+						'components-custom-select-control__item',
+						{
+							'has-hint': hint,
+						}
 					) }
 				/>
 			);
@@ -129,8 +129,8 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 				{ currentValue }
 				{ selectedOptionHint && (
 					<Styled.SelectedExperimentalHintItem
-					// TODO: Legacy classname. Add V1 styles are removed from the codebase
-					// className="components-custom-select-control__hint"
+						// Keeping the classname for legacy reasons
+						className="components-custom-select-control__hint"
 					>
 						{ selectedOptionHint }
 					</Styled.SelectedExperimentalHintItem>
@@ -161,8 +161,8 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 			size={ translatedSize }
 			store={ store }
 			className={ clsx(
-				// TODO: Legacy classname. Add V1 styles are removed from the codebase
-				// 'components-custom-select-control',
+				// Keeping the classname for legacy reasons
+				'components-custom-select-control',
 				classNameProp
 			) }
 			isLegacy
