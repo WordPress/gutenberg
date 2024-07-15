@@ -43,7 +43,7 @@ add_filter( 'render_block_data', 'block_core_gallery_data_id_backcompatibility' 
  * @param string $content Content of the block being rendered.
  * @return string The content of the block being rendered.
  */
-function block_core_gallery_render( $attributes, $content ) {
+function block_core_gallery_render( $attributes, $content, $block ) {
 	// Adds a style tag for the --wp--style--unstable-gallery-gap var.
 	// The Gallery block needs to recalculate Image block width based on
 	// the current gap setting in order to maintain the number of flex columns
@@ -121,6 +121,35 @@ function block_core_gallery_render( $attributes, $content ) {
 		)
 	);
 
+	$lightbox_settings = block_core_image_get_lightbox_settings( $block->parsed_block );
+
+	if (
+		isset( $lightbox_settings ) &&
+		// 'none' === $link_destination &&
+		isset( $lightbox_settings['enabled'] ) &&
+		true === $lightbox_settings['enabled']
+	) {
+		$processed_content->set_attribute( 'data-wp-interactive', 'core/gallery' );
+		$processed_content->set_attribute( 'data-wp-context', '{"lightbox": true, "images": []}' );
+		$processed_content->set_attribute( 'data-wp-init', 'callbacks.init' );
+		$processed_content->set_attribute( 'data-wp-on-async--load', 'callbacks.init' );
+
+		$suffix = wp_scripts_get_suffix();
+		if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+			$module_url = gutenberg_url( '/build/interactivity/gallery.min.js' );
+		}
+
+		wp_register_script_module(
+			'@wordpress/block-library/gallery',
+			isset( $module_url ) ? $module_url : includes_url( "blocks/gallery/view{$suffix}.js" ),
+			array( '@wordpress/interactivity' ),
+			defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
+		);
+
+		wp_enqueue_script_module( '@wordpress/block-library/gallery' );
+
+	}
+
 	// The WP_HTML_Tag_Processor class calls get_updated_html() internally
 	// when the instance is treated as a string, but here we explicitly
 	// convert it to a string.
@@ -166,6 +195,33 @@ function block_core_gallery_render( $attributes, $content ) {
 
 	return $content;
 }
+
+// NOTE: this setting isn't required for the gallery block.
+// since lightbox implementation is done in the image block, it can totally be removed.
+function block_core_gallery_get_lightbox_settings( $block ) {
+	// Gets the lightbox setting from the block attributes.
+	if ( isset( $block['attrs']['lightbox'] ) ) {
+		$lightbox_settings = $block['attrs']['lightbox'];
+	}
+
+	if ( ! isset( $lightbox_settings ) ) {
+		// TODO: change it to gallery block name.
+		$lightbox_settings = wp_get_global_settings( array( 'lightbox' ), array( 'block_name' => 'core/image' ) );
+
+		// If not present in global settings, check the top-level global settings.
+		//
+		// NOTE: If no block-level settings are found, the previous call to
+		// `wp_get_global_settings` will return the whole `theme.json` structure in
+		// which case we can check if the "lightbox" key is present at the top-level
+		// of the global settings and use its value.
+		if ( isset( $lightbox_settings['lightbox'] ) ) {
+			$lightbox_settings = wp_get_global_settings( array( 'lightbox' ) );
+		}
+	}
+
+	return $lightbox_settings ?? null;
+}
+
 /**
  * Registers the `core/gallery` block on server.
  *

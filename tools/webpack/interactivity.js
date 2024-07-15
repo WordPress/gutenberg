@@ -23,6 +23,7 @@ module.exports = {
 		navigation: './packages/block-library/src/navigation/view.js',
 		query: './packages/block-library/src/query/view.js',
 		image: './packages/block-library/src/image/view.js',
+		gallery: './packages/block-library/src/gallery/view.js',
 		file: './packages/block-library/src/file/view.js',
 		search: './packages/block-library/src/search/view.js',
 	},

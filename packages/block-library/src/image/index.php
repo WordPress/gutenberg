@@ -220,6 +220,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 			JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP
 		)
 	);
+	$p->set_attribute( 'data-wp-init', 'callbacks.initImage' );
 
 	// Image.
 	$p->next_tag( 'img' );
@@ -268,6 +269,8 @@ function block_core_image_render_lightbox( $block_content, $block ) {
  */
 function block_core_image_print_lightbox_overlay() {
 	$close_button_label = esc_attr__( 'Close' );
+	$prev_button_label = esc_attr__( 'Previous' );
+	$next_button_label = esc_attr__( 'Next' );
 
 	// If the current theme does NOT have a `theme.json`, or the colors are not
 	// defined, it needs to set the background color & close button color to some
@@ -288,7 +291,7 @@ function block_core_image_print_lightbox_overlay() {
 		<div
 			class="wp-lightbox-overlay zoom"
 			data-wp-interactive="core/image"
-			data-wp-context='{}'
+			data-wp-context='{ "carousel": "true" }'
 			data-wp-bind--role="state.roleAttribute"
 			data-wp-bind--aria-label="state.currentImage.ariaLabel"
 			data-wp-bind--aria-modal="state.ariaModal"
@@ -306,6 +309,12 @@ function block_core_image_print_lightbox_overlay() {
 			>
 				<button type="button" aria-label="$close_button_label" style="fill: $close_button_color" class="close-button">
 					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="m13.06 12 6.47-6.47-1.06-1.06L12 10.94 5.53 4.47 4.47 5.53 10.94 12l-6.47 6.47 1.06 1.06L12 13.06l6.47 6.47 1.06-1.06L13.06 12Z"></path></svg>
+				</button>
+				<button type="button" aria-label="$prev_button_label" style="fill: $close_button_color" class="prev-button" data-wp-bind--hidden="!state.isGallery" data-wp-on--click="actions.showPreviousImage">
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M14.6 7l-1.2-1L8 12l5.4 6 1.2-1-4.6-5z"></path></svg>
+				</button>
+				<button type="button" aria-label="$next_button_label" style="fill: $close_button_color" class="next-button" data-wp-bind--hidden="!state.isGallery" data-wp-on--click="actions.showNextImage">
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M10.6 6L9.4 7l4.6 5-4.6 5 1.2 1 5.4-6z"></path></svg>
 				</button>
 				<div class="lightbox-image-container">
 					<figure data-wp-bind--class="state.currentImage.figureClassNames" data-wp-bind--style="state.figureStyles">

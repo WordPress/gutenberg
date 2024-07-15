@@ -23,7 +23,14 @@ const { state, actions, callbacks } = store(
 	'core/image',
 	{
 		state: {
-			currentImageId: null,
+			isGallery: false,
+			images: [],
+			currentImageIndex: -1,
+			get currentImageId() {
+				return state.currentImageIndex > -1 && state.images.length > 0
+					? state.images[ state.currentImageIndex ]
+					: null;
+			},
 			get currentImage() {
 				return state.metadata[ state.currentImageId ];
 			},
@@ -96,6 +103,13 @@ const { state, actions, callbacks } = store(
 				state.scrollTopReset = document.documentElement.scrollTop;
 				state.scrollLeftReset = document.documentElement.scrollLeft;
 
+				const { lightbox, images } = getContext( 'core/gallery' ) || {};
+				state.isGallery = !! lightbox;
+				state.images = state.isGallery ? images || [] : [ imageId ];
+
+				// Sets the current image index to the one that was clicked.
+				callbacks.setCurrentImageIndex( imageId );
+
 				// Sets the current expanded image in the state and enables the overlay.
 				state.overlayEnabled = true;
 				state.currentImageId = imageId;
@@ -123,10 +137,35 @@ const { state, actions, callbacks } = store(
 							preventScroll: true,
 						} );
 
-						// Resets the current image id to mark the overlay as closed.
-						state.currentImageId = null;
+						// Resets the current image index to mark the overlay as closed.
+						state.currentImageIndex = -1;
+						state.images = [];
 					}, 450 );
 				}
+			},
+			showPreviousImage( e ) {
+				if ( ! state.isGallery ) {
+					return;
+				}
+
+				e.stopPropagation();
+				if ( state.currentImageIndex - 1 < 0 ) {
+					return;
+				}
+				state.currentImageIndex = state.currentImageIndex - 1;
+				callbacks.setOverlayStyles();
+			},
+			showNextImage( e ) {
+				if ( ! state.isGallery ) {
+					return;
+				}
+
+				e.stopPropagation();
+				if ( state.currentImageIndex + 1 >= state.images.length ) {
+					return;
+				}
+				state.currentImageIndex = state.currentImageIndex + 1;
+				callbacks.setOverlayStyles();
 			},
 			handleKeydown( event ) {
 				if ( state.overlayEnabled ) {
@@ -135,10 +174,18 @@ const { state, actions, callbacks } = store(
 						event.preventDefault();
 						const { ref } = getElement();
 						ref.querySelector( 'button' ).focus();
+
+						// TODO: now that there are next and prev buttons, rotate the focus
 					}
 					// Closes the lightbox when the user presses the escape key.
 					if ( event.key === 'Escape' ) {
 						actions.hideLightbox();
+					}
+
+					if ( event.key === 'ArrowLeft' ) {
+						actions.showPreviousImage( event );
+					} else if ( event.key === 'ArrowRight' ) {
+						actions.showNextImage( event );
 					}
 				}
 			},
@@ -187,6 +234,21 @@ const { state, actions, callbacks } = store(
 			},
 		},
 		callbacks: {
+			initImage() {
+				const { lightbox, images } = getContext( 'core/gallery' ) || {};
+				if ( ! lightbox ) {
+					return;
+				}
+
+				const ctx = getContext();
+				images.push( ctx.imageId );
+			},
+			setCurrentImageIndex( imageId ) {
+				const currentIndex = state.images.findIndex(
+					( id ) => id === imageId
+				);
+				state.currentImageIndex = currentIndex;
+			},
 			setOverlayStyles() {
 				if ( ! state.overlayEnabled ) {
 					return;
@@ -229,12 +291,14 @@ const { state, actions, callbacks } = store(
 				// size), the image's dimensions in the lightbox are the same
 				// as those of the image in the content.
 				let imgMaxWidth = parseFloat(
-					state.currentImage.targetWidth !== 'none'
+					state.currentImage.targetWidth &&
+						state.currentImage.targetWidth !== 'none'
 						? state.currentImage.targetWidth
 						: naturalWidth
 				);
 				let imgMaxHeight = parseFloat(
-					state.currentImage.targetHeight !== 'none'
+					state.currentImage.targetHeight &&
+						state.currentImage.targetHeight !== 'none'
 						? state.currentImage.targetHeight
 						: naturalHeight
 				);
