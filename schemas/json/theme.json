@@ -1906,6 +1906,7 @@
 								"border": {},
 								"background": {},
 								"color": {},
+								"dimensions": {},
 								"filter": {},
 								"shadow": {},
 								"outline": {},
@@ -1943,10 +1944,16 @@
 						},
 						{
 							"properties": {
+								"background": {},
 								"border": {},
 								"color": {},
+								"dimensions": {},
 								"spacing": {},
 								"typography": {},
+								"filter": {},
+								"shadow": {},
+								"outline": {},
+								"css": {},
 								":hover": {
 									"$ref": "#/definitions/stylesPropertiesComplete"
 								},
@@ -2350,6 +2357,7 @@
 				},
 				{
 					"properties": {
+						"background": {},
 						"border": {},
 						"color": {},
 						"dimensions": {},
@@ -2386,6 +2394,7 @@
 				},
 				{
 					"properties": {
+						"background": {},
 						"border": {},
 						"color": {},
 						"dimensions": {},
@@ -2719,6 +2728,7 @@
 				},
 				{
 					"properties": {
+						"background": {},
 						"border": {},
 						"color": {},
 						"dimensions": {},
@@ -2812,6 +2822,7 @@
 						"background": {},
 						"border": {},
 						"color": {},
+						"dimensions": {},
 						"spacing": {},
 						"typography": {},
 						"filter": {},
