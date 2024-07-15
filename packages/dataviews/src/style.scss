@@ -204,16 +204,6 @@
 			min-height: $grid-unit-40;
 			display: flex;
 			align-items: center;
-
-			> * {
-				flex-grow: 1;
-			}
-
-			&.dataviews-view-table__primary-field {
-				a {
-					flex-grow: 0;
-				}
-			}
 		}
 
 		.components-v-stack > .dataviews-view-table__cell-content-wrapper:not(:first-child) {
@@ -252,6 +242,12 @@
 			opacity: 1;
 		}
 	}
+}
+
+.dataviews-view-table__cell-content-wrapper:empty,
+.dataviews-view-grid__field-value:empty,
+.dataviews-view-grid__field:empty {
+	display: none;
 }
 
 .dataviews-view-list__primary-field,
@@ -371,6 +367,7 @@
 
 		.dataviews-view-grid__field {
 			align-items: flex-start;
+			min-height: $grid-unit-30;
 
 			&:not(.is-column) {
 				align-items: center;
@@ -384,6 +381,12 @@
 					overflow: hidden;
 					text-overflow: ellipsis;
 					white-space: nowrap;
+				}
+			}
+
+			&.is-column {
+				& + .is-row {
+					margin-top: $grid-unit-05;
 				}
 			}
 

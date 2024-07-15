@@ -19,11 +19,11 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import ItemActions from './item-actions';
-import SingleSelectionCheckbox from './single-selection-checkbox';
-import { useHasAPossibleBulkAction } from './bulk-actions';
-import type { Action, NormalizedField, ViewGridProps } from './types';
-import type { SetSelection } from './private-types';
+import ItemActions from '../../item-actions';
+import SingleSelectionCheckbox from '../../single-selection-checkbox';
+import { useHasAPossibleBulkAction } from '../../bulk-actions';
+import type { Action, NormalizedField, ViewGridProps } from '../../types';
+import type { SetSelection } from '../../private-types';
 
 interface GridItemProps< Item > {
 	selection: string[];
@@ -53,6 +53,12 @@ function GridItem< Item >( {
 	const hasBulkAction = useHasAPossibleBulkAction( actions, item );
 	const id = getItemId( item );
 	const isSelected = selection.includes( id );
+	const renderedMediaField = mediaField?.render ? (
+		<mediaField.render item={ item } />
+	) : null;
+	const renderedPrimaryField = primaryField?.render ? (
+		<primaryField.render item={ item } />
+	) : null;
 	return (
 		<VStack
 			spacing={ 0 }
@@ -76,7 +82,7 @@ function GridItem< Item >( {
 			} }
 		>
 			<div className="dataviews-view-grid__media">
-				{ mediaField?.render( { item } ) }
+				{ renderedMediaField }
 			</div>
 			<HStack
 				justify="space-between"
@@ -91,7 +97,7 @@ function GridItem< Item >( {
 					disabled={ ! hasBulkAction }
 				/>
 				<HStack className="dataviews-view-grid__primary-field">
-					{ primaryField?.render( { item } ) }
+					{ renderedPrimaryField }
 				</HStack>
 				<ItemActions item={ item } actions={ actions } isCompact />
 			</HStack>
@@ -104,32 +110,20 @@ function GridItem< Item >( {
 					justify="flex-start"
 				>
 					{ badgeFields.map( ( field ) => {
-						const renderedValue = field.render( {
-							item,
-						} );
-						if ( ! renderedValue ) {
-							return null;
-						}
 						return (
 							<FlexItem
 								key={ field.id }
 								className="dataviews-view-grid__field-value"
 							>
-								{ renderedValue }
+								<field.render item={ item } />
 							</FlexItem>
 						);
 					} ) }
 				</HStack>
 			) }
 			{ !! visibleFields?.length && (
-				<VStack className="dataviews-view-grid__fields" spacing={ 3 }>
+				<VStack className="dataviews-view-grid__fields" spacing={ 1 }>
 					{ visibleFields.map( ( field ) => {
-						const renderedValue = field.render( {
-							item,
-						} );
-						if ( ! renderedValue ) {
-							return null;
-						}
 						return (
 							<Flex
 								className={ clsx(
@@ -157,7 +151,7 @@ function GridItem< Item >( {
 										className="dataviews-view-grid__field-value"
 										style={ { maxHeight: 'none' } }
 									>
-										{ renderedValue }
+										<field.render item={ item } />
 									</FlexItem>
 								</>
 							</Flex>

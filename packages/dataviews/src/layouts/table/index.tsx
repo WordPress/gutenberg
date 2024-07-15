@@ -32,20 +32,20 @@ import {
 /**
  * Internal dependencies
  */
-import SingleSelectionCheckbox from './single-selection-checkbox';
-import { unlock } from './lock-unlock';
-import ItemActions from './item-actions';
-import { sanitizeOperators } from './utils';
+import SingleSelectionCheckbox from '../../single-selection-checkbox';
+import { unlock } from '../../lock-unlock';
+import ItemActions from '../../item-actions';
+import { sanitizeOperators } from '../../utils';
 import {
 	SORTING_DIRECTIONS,
 	sortArrows,
 	sortLabels,
 	sortValues,
-} from './constants';
+} from '../../constants';
 import {
 	useSomeItemHasAPossibleBulkAction,
 	useHasAPossibleBulkAction,
-} from './bulk-actions';
+} from '../../bulk-actions';
 import type {
 	Action,
 	NormalizedField,
@@ -53,8 +53,8 @@ import type {
 	ViewTable as ViewTableType,
 	ViewTableProps,
 	CombinedField,
-} from './types';
-import type { SetSelection } from './private-types';
+} from '../../types';
+import type { SetSelection } from '../../private-types';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -360,23 +360,15 @@ function TableColumnField< Item >( {
 	item,
 	field,
 }: TableColumnFieldProps< Item > ) {
-	const value = field.render( {
-		item,
-	} );
 	return (
-		!! value && (
-			<div
-				className={ clsx(
-					'dataviews-view-table__cell-content-wrapper',
-					{
-						'dataviews-view-table__primary-field':
-							primaryField?.id === field.id,
-					}
-				) }
-			>
-				{ value }
-			</div>
-		)
+		<div
+			className={ clsx( 'dataviews-view-table__cell-content-wrapper', {
+				'dataviews-view-table__primary-field':
+					primaryField?.id === field.id,
+			} ) }
+		>
+			<field.render { ...{ item } } />
+		</div>
 	);
 }
 

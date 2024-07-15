@@ -20,7 +20,7 @@ const customStyles = {
 	rotate: '13deg',
 };
 
-const legacyProps = {
+const props = {
 	label: 'label!',
 	options: [
 		{
@@ -87,8 +87,8 @@ it( 'Should apply external controlled updates', async () => {
 	const mockOnChange = jest.fn();
 	const { rerender } = render(
 		<UncontrolledCustomSelectControl
-			{ ...legacyProps }
-			value={ legacyProps.options[ 0 ] }
+			{ ...props }
+			value={ props.options[ 0 ] }
 			onChange={ mockOnChange }
 		/>
 	);
@@ -97,22 +97,18 @@ it( 'Should apply external controlled updates', async () => {
 		expanded: false,
 	} );
 
-	expect( currentSelectedItem ).toHaveTextContent(
-		legacyProps.options[ 0 ].name
-	);
+	expect( currentSelectedItem ).toHaveTextContent( props.options[ 0 ].name );
 
 	expect( mockOnChange ).not.toHaveBeenCalled();
 
 	rerender(
 		<UncontrolledCustomSelectControl
-			{ ...legacyProps }
-			value={ legacyProps.options[ 1 ] }
+			{ ...props }
+			value={ props.options[ 1 ] }
 		/>
 	);
 
-	expect( currentSelectedItem ).toHaveTextContent(
-		legacyProps.options[ 1 ].name
-	);
+	expect( currentSelectedItem ).toHaveTextContent( props.options[ 1 ].name );
 
 	// Necessary to wait for onChange to potentially fire
 	await sleep();
@@ -128,13 +124,13 @@ describe.each( [
 
 	it( 'Should select the first option when no explicit initial value is passed without firing onChange', async () => {
 		const mockOnChange = jest.fn();
-		render( <Component { ...legacyProps } onChange={ mockOnChange } /> );
+		render( <Component { ...props } onChange={ mockOnChange } /> );
 
 		expect(
 			screen.getByRole( 'combobox', {
 				expanded: false,
 			} )
-		).toHaveTextContent( legacyProps.options[ 0 ].name );
+		).toHaveTextContent( props.options[ 0 ].name );
 
 		// Necessary to wait for onChange to potentially fire
 		await sleep();
@@ -146,9 +142,9 @@ describe.each( [
 		const mockOnChange = jest.fn();
 		render(
 			<Component
-				{ ...legacyProps }
+				{ ...props }
 				onChange={ mockOnChange }
-				value={ legacyProps.options[ 3 ] }
+				value={ props.options[ 3 ] }
 			/>
 		);
 
@@ -156,7 +152,7 @@ describe.each( [
 			screen.getByRole( 'combobox', {
 				expanded: false,
 			} )
-		).toHaveTextContent( legacyProps.options[ 3 ].name );
+		).toHaveTextContent( props.options[ 3 ].name );
 
 		// Necessary to wait for onChange to potentially fire
 		await sleep();
@@ -165,7 +161,7 @@ describe.each( [
 	} );
 
 	it( 'Should replace the initial selection when a new item is selected', async () => {
-		render( <Component { ...legacyProps } /> );
+		render( <Component { ...props } /> );
 
 		const currentSelectedItem = screen.getByRole( 'combobox', {
 			expanded: false,
@@ -193,7 +189,7 @@ describe.each( [
 	} );
 
 	it( 'Should keep current selection if dropdown is closed without changing selection', async () => {
-		render( <Component { ...legacyProps } /> );
+		render( <Component { ...props } /> );
 
 		const currentSelectedItem = screen.getByRole( 'combobox', {
 			expanded: false,
@@ -204,24 +200,24 @@ describe.each( [
 		await press.Enter();
 		expect(
 			screen.getByRole( 'listbox', {
-				name: legacyProps.label,
+				name: props.label,
 			} )
 		).toBeVisible();
 
 		await press.Escape();
 		expect(
 			screen.queryByRole( 'listbox', {
-				name: legacyProps.label,
+				name: props.label,
 			} )
 		).not.toBeInTheDocument();
 
 		expect( currentSelectedItem ).toHaveTextContent(
-			legacyProps.options[ 0 ].name
+			props.options[ 0 ].name
 		);
 	} );
 
 	it( 'Should apply class only to options that have a className defined', async () => {
-		render( <Component { ...legacyProps } /> );
+		render( <Component { ...props } /> );
 
 		await click(
 			screen.getByRole( 'combobox', {
@@ -230,7 +226,7 @@ describe.each( [
 		);
 
 		// return an array of items _with_ a className added
-		const itemsWithClass = legacyProps.options.filter(
+		const itemsWithClass = props.options.filter(
 			( option ) => option.className !== undefined
 		);
 
@@ -242,7 +238,7 @@ describe.each( [
 		);
 
 		// return an array of items _without_ a className added
-		const itemsWithoutClass = legacyProps.options.filter(
+		const itemsWithoutClass = props.options.filter(
 			( option ) => option.className === undefined
 		);
 
@@ -255,7 +251,7 @@ describe.each( [
 	} );
 
 	it( 'Should apply styles only to options that have styles defined', async () => {
-		render( <Component { ...legacyProps } /> );
+		render( <Component { ...props } /> );
 
 		await click(
 			screen.getByRole( 'combobox', {
@@ -264,7 +260,7 @@ describe.each( [
 		);
 
 		// return an array of items _with_ styles added
-		const styledItems = legacyProps.options.filter(
+		const styledItems = props.options.filter(
 			( option ) => option.style !== undefined
 		);
 
@@ -276,7 +272,7 @@ describe.each( [
 		);
 
 		// return an array of items _without_ styles added
-		const unstyledItems = legacyProps.options.filter(
+		const unstyledItems = props.options.filter(
 			( option ) => option.style === undefined
 		);
 
@@ -291,7 +287,7 @@ describe.each( [
 	it( 'does not show selected hint by default', async () => {
 		render(
 			<Component
-				{ ...legacyProps }
+				{ ...props }
 				label="Custom select"
 				options={ [
 					{
@@ -312,7 +308,7 @@ describe.each( [
 	it( 'shows selected hint when showSelectedHint is set', async () => {
 		render(
 			<Component
-				{ ...legacyProps }
+				{ ...props }
 				label="Custom select"
 				options={ [
 					{
@@ -337,7 +333,7 @@ describe.each( [
 	it( 'shows selected hint in list of options when added, regardless of showSelectedHint prop', async () => {
 		render(
 			<Component
-				{ ...legacyProps }
+				{ ...props }
 				label="Custom select"
 				options={ [
 					{
@@ -359,7 +355,7 @@ describe.each( [
 	it( 'Should return object onChange', async () => {
 		const mockOnChange = jest.fn();
 
-		render( <Component { ...legacyProps } onChange={ mockOnChange } /> );
+		render( <Component { ...props } onChange={ mockOnChange } /> );
 
 		await click(
 			screen.getByRole( 'combobox', {
@@ -389,7 +385,7 @@ describe.each( [
 	it( 'Should return selectedItem object when specified onChange', async () => {
 		const mockOnChange = jest.fn();
 
-		render( <Component { ...legacyProps } onChange={ mockOnChange } /> );
+		render( <Component { ...props } onChange={ mockOnChange } /> );
 
 		await sleep();
 		await press.Tab();
@@ -416,7 +412,7 @@ describe.each( [
 	it( "Should pass arbitrary props to onChange's selectedItem, but apply only style and className to DOM elements", async () => {
 		const onChangeMock = jest.fn();
 
-		render( <Component { ...legacyProps } onChange={ onChangeMock } /> );
+		render( <Component { ...props } onChange={ onChangeMock } /> );
 
 		const currentSelectedItem = screen.getByRole( 'combobox', {
 			expanded: false,
@@ -454,11 +450,11 @@ describe.each( [
 	} );
 
 	it( 'Should label the component correctly even when the label is not visible', () => {
-		render( <Component { ...legacyProps } hideLabelFromVision /> );
+		render( <Component { ...props } hideLabelFromVision /> );
 
 		expect(
 			screen.getByRole( 'combobox', {
-				name: legacyProps.label,
+				name: props.label,
 			} )
 		).toBeVisible();
 	} );
@@ -473,7 +469,7 @@ describe.each( [
 					role="none"
 					onKeyDown={ onKeyDown }
 				>
-					<Component { ...legacyProps } />
+					<Component { ...props } />
 				</div>
 			);
 			const currentSelectedItem = screen.getByRole( 'combobox', {
@@ -482,7 +478,7 @@ describe.each( [
 			await click( currentSelectedItem );
 
 			const customSelect = screen.getByRole( 'listbox', {
-				name: legacyProps.label,
+				name: props.label,
 			} );
 			expect( customSelect ).toHaveFocus();
 			await press.Enter();
@@ -491,7 +487,7 @@ describe.each( [
 		} );
 
 		it( 'Should be able to change selection using keyboard', async () => {
-			render( <Component { ...legacyProps } /> );
+			render( <Component { ...props } /> );
 
 			const currentSelectedItem = screen.getByRole( 'combobox', {
 				expanded: false,
@@ -504,7 +500,7 @@ describe.each( [
 			await press.Enter();
 			expect(
 				screen.getByRole( 'listbox', {
-					name: legacyProps.label,
+					name: props.label,
 				} )
 			).toHaveFocus();
 
@@ -512,12 +508,12 @@ describe.each( [
 			await press.Enter();
 
 			expect( currentSelectedItem ).toHaveTextContent(
-				legacyProps.options[ 1 ].name
+				props.options[ 1 ].name
 			);
 		} );
 
 		it( 'Should be able to type characters to select matching options', async () => {
-			render( <Component { ...legacyProps } /> );
+			render( <Component { ...props } /> );
 
 			const currentSelectedItem = screen.getByRole( 'combobox', {
 				expanded: false,
@@ -528,7 +524,7 @@ describe.each( [
 			await press.Enter();
 			expect(
 				screen.getByRole( 'listbox', {
-					name: legacyProps.label,
+					name: props.label,
 				} )
 			).toHaveFocus();
 
@@ -538,7 +534,7 @@ describe.each( [
 		} );
 
 		it( 'Can change selection with a focused input and closed dropdown if typed characters match an option', async () => {
-			render( <Component { ...legacyProps } /> );
+			render( <Component { ...props } /> );
 
 			const currentSelectedItem = screen.getByRole( 'combobox', {
 				expanded: false,
@@ -548,7 +544,7 @@ describe.each( [
 			await press.Tab();
 			expect( currentSelectedItem ).toHaveFocus();
 			expect( currentSelectedItem ).toHaveTextContent(
-				legacyProps.options[ 0 ].name
+				props.options[ 0 ].name
 			);
 
 			// Ideally we would test a multi-character typeahead, but anything more than a single character is flaky
@@ -556,7 +552,7 @@ describe.each( [
 
 			expect(
 				screen.queryByRole( 'listbox', {
-					name: legacyProps.label,
+					name: props.label,
 					hidden: true,
 				} )
 			).not.toBeInTheDocument();
@@ -568,7 +564,7 @@ describe.each( [
 		} );
 
 		it( 'Can change selection with a focused input and closed dropdown while pressing arrow keys', async () => {
-			render( <Component { ...legacyProps } /> );
+			render( <Component { ...props } /> );
 
 			const currentSelectedItem = screen.getByRole( 'combobox', {
 				expanded: false,
@@ -578,24 +574,24 @@ describe.each( [
 			await press.Tab();
 			expect( currentSelectedItem ).toHaveFocus();
 			expect( currentSelectedItem ).toHaveTextContent(
-				legacyProps.options[ 0 ].name
+				props.options[ 0 ].name
 			);
 
 			await press.ArrowDown();
 			await press.ArrowDown();
 			expect(
 				screen.queryByRole( 'listbox', {
-					name: legacyProps.label,
+					name: props.label,
 				} )
 			).not.toBeInTheDocument();
 
 			expect( currentSelectedItem ).toHaveTextContent(
-				legacyProps.options[ 2 ].name
+				props.options[ 2 ].name
 			);
 		} );
 
 		it( 'Should have correct aria-selected value for selections', async () => {
-			render( <Component { ...legacyProps } /> );
+			render( <Component { ...props } /> );
 
 			const currentSelectedItem = screen.getByRole( 'combobox', {
 				expanded: false,
@@ -604,8 +600,8 @@ describe.each( [
 			await click( currentSelectedItem );
 
 			// get all items except for first option
-			const unselectedItems = legacyProps.options.filter(
-				( { name } ) => name !== legacyProps.options[ 0 ].name
+			const unselectedItems = props.options.filter(
+				( { name } ) => name !== props.options[ 0 ].name
 			);
 
 			// assert that all other items have aria-selected="false"
@@ -618,7 +614,7 @@ describe.each( [
 			// assert that first item has aria-selected="true"
 			expect(
 				screen.getByRole( 'option', {
-					name: legacyProps.options[ 0 ].name,
+					name: props.options[ 0 ].name,
 					selected: true,
 				} )
 			).toBeVisible();
@@ -632,7 +628,7 @@ describe.each( [
 			// check that first item is has aria-selected="false" after new selection
 			expect(
 				screen.getByRole( 'option', {
-					name: legacyProps.options[ 0 ].name,
+					name: props.options[ 0 ].name,
 					selected: false,
 				} )
 			).toBeVisible();
@@ -653,7 +649,7 @@ describe.each( [
 			render(
 				<>
 					<Component
-						{ ...legacyProps }
+						{ ...props }
 						onFocus={ onFocusMock }
 						onBlur={ onBlurMock }
 					/>

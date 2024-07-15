@@ -32,10 +32,9 @@ import { useRegistry } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { unlock } from './lock-unlock';
-import type { Action, NormalizedField, ViewListProps } from './types';
-
-import { ActionsDropdownMenuGroup, ActionModal } from './item-actions';
+import { unlock } from '../../lock-unlock';
+import { ActionsDropdownMenuGroup, ActionModal } from '../../item-actions';
+import type { Action, NormalizedField, ViewListProps } from '../../types';
 
 interface ListViewItemProps< Item > {
 	actions: Action< Item >[];
@@ -113,6 +112,16 @@ function ListItem< Item >( {
 			? primaryAction.label
 			: primaryAction.label( [ item ] ) );
 
+	const renderedMediaField = mediaField?.render ? (
+		<mediaField.render item={ item } />
+	) : (
+		<div className="dataviews-view-list__media-placeholder"></div>
+	);
+
+	const renderedPrimaryField = primaryField?.render ? (
+		<primaryField.render item={ item } />
+	) : null;
+
 	return (
 		<CompositeRow
 			ref={ itemRef }
@@ -148,9 +157,7 @@ function ListItem< Item >( {
 							alignment="flex-start"
 						>
 							<div className="dataviews-view-list__media-wrapper">
-								{ mediaField?.render( { item } ) || (
-									<div className="dataviews-view-list__media-placeholder"></div>
-								) }
+								{ renderedMediaField }
 							</div>
 							<VStack
 								spacing={ 1 }
@@ -160,7 +167,7 @@ function ListItem< Item >( {
 									className="dataviews-view-list__primary-field"
 									id={ labelId }
 								>
-									{ primaryField?.render( { item } ) }
+									{ renderedPrimaryField }
 								</span>
 								<div
 									className="dataviews-view-list__fields"
@@ -178,7 +185,7 @@ function ListItem< Item >( {
 												{ field.header }
 											</VisuallyHidden>
 											<span className="dataviews-view-list__field-value">
-												{ field.render( { item } ) }
+												<field.render item={ item } />
 											</span>
 										</div>
 									) ) }

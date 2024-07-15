@@ -133,7 +133,6 @@ function BulkActionItem< Item >( {
 	return (
 		<DropdownMenuItem
 			key={ action.id }
-			disabled={ eligibleItems.length === 0 }
 			hideOnClick={ ! shouldShowModal }
 			onClick={ async () => {
 				if ( shouldShowModal ) {
@@ -142,9 +141,7 @@ function BulkActionItem< Item >( {
 					action.callback( eligibleItems, { registry } );
 				}
 			} }
-			suffix={
-				eligibleItems.length > 0 ? eligibleItems.length : undefined
-			}
+			suffix={ eligibleItems.length }
 		>
 			{ action.label }
 		</DropdownMenuItem>
@@ -156,10 +153,18 @@ function ActionsMenuGroup< Item >( {
 	selectedItems,
 	setActionWithModal,
 }: ActionsMenuGroupProps< Item > ) {
+	const elligibleActions = useMemo( () => {
+		return actions.filter( ( action ) => {
+			return selectedItems.some(
+				( item ) => ! action.isEligible || action.isEligible( item )
+			);
+		} );
+	}, [ actions, selectedItems ] );
+
 	return (
 		<>
 			<DropdownMenuGroup>
-				{ actions.map( ( action ) => (
+				{ elligibleActions.map( ( action ) => (
 					<BulkActionItem
 						key={ action.id }
 						action={ action }
