@@ -14,7 +14,7 @@ import type { Icon } from '@wordpress/icons';
 import type { ButtonAsButtonProps } from '../button/types';
 import type { DropdownProps } from '../dropdown/types';
 import type { WordPressComponentProps } from '../context';
-import type { CompositeStore } from '../composite/v2';
+import type { Store as CompositeStore } from '../composite';
 
 type CommonCircularOptionPickerProps = {
 	/**

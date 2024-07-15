@@ -16,7 +16,7 @@ import { Icon, check } from '@wordpress/icons';
  */
 import { CircularOptionPickerContext } from './circular-option-picker-context';
 import Button from '../button';
-import { CompositeItem } from '../composite/v2';
+import * as Composite from '../composite';
 import Tooltip from '../tooltip';
 import type { OptionProps, CircularOptionPickerCompositeStore } from './types';
 
@@ -57,7 +57,7 @@ function UnforwardedOptionAsOption(
 	}
 
 	return (
-		<CompositeItem
+		<Composite.Item
 			render={
 				<Button
 					{ ...additionalProps }

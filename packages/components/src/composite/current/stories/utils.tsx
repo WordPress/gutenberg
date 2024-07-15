@@ -6,7 +6,7 @@ import type { StoryContext } from '@storybook/react';
 /**
  * Internal dependencies
  */
-import type { CompositeStoreProps } from '..';
+import type { StoreProps as CompositeStoreProps } from '..';
 
 export function UseCompositeStorePlaceholder( props: CompositeStoreProps ) {
 	return (

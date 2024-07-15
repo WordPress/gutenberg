@@ -13,7 +13,7 @@ import { isRTL } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { CircularOptionPickerContext } from './circular-option-picker-context';
-import { Composite, useCompositeStore } from '../composite/v2';
+import * as Composite from '../composite';
 import type {
 	CircularOptionPickerProps,
 	ListboxCircularOptionPickerProps,
@@ -85,7 +85,7 @@ function ListboxCircularOptionPicker(
 		...additionalProps
 	} = props;
 
-	const compositeStore = useCompositeStore( {
+	const compositeStore = Composite.useStore( {
 		focusLoop: loop,
 		rtl: isRTL(),
 	} );
@@ -98,14 +98,14 @@ function ListboxCircularOptionPicker(
 	return (
 		<div className={ className }>
 			<CircularOptionPickerContext.Provider value={ compositeContext }>
-				<Composite
+				<Composite.Root
 					{ ...additionalProps }
 					id={ baseId }
 					store={ compositeStore }
 					role="listbox"
 				>
 					{ options }
-				</Composite>
+				</Composite.Root>
 				{ children }
 				{ actions }
 			</CircularOptionPickerContext.Provider>
