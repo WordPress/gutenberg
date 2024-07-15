@@ -121,7 +121,7 @@ const getSettingsPropertiesMarkup = ( struct ) => {
 		return '';
 	}
 	const props = struct.properties;
-	const ks = keys( props );
+	const ks = Object.keys( props );
 	if ( ks.length < 1 ) {
 		return '';
 	}
@@ -133,7 +133,7 @@ const getSettingsPropertiesMarkup = ( struct ) => {
 		let type = props[ key ].type || '';
 		let ps =
 			props[ key ].type === 'array'
-				? keys( getPropertiesFromArray( props[ key ].items ) )
+				? Object.keys( getPropertiesFromArray( props[ key ].items ) )
 						.sort()
 						.join( ', ' )
 				: '';
@@ -154,7 +154,7 @@ const getSettingsPropertiesMarkup = ( struct ) => {
 					.map( ( item ) =>
 						item?.type === 'object' && item?.properties
 							? '_{' +
-							  keys( getPropertiesFromArray( item ) )
+							  Object.keys( getPropertiesFromArray( item ) )
 									.sort()
 									.join( ', ' ) +
 							  '}_'
@@ -181,7 +181,7 @@ const getStylePropertiesMarkup = ( struct ) => {
 		return '';
 	}
 	const props = struct.properties;
-	const ks = keys( props );
+	const ks = Object.keys( props );
 	if ( ks.length < 1 ) {
 		return '';
 	}
@@ -191,7 +191,7 @@ const getStylePropertiesMarkup = ( struct ) => {
 	ks.forEach( ( key ) => {
 		const ps =
 			props[ key ].type === 'object'
-				? keys( props[ key ].properties ).sort().join( ', ' )
+				? Object.keys( props[ key ].properties ).sort().join( ', ' )
 				: '';
 		const type = formatType( props[ key ] );
 		markup += `| ${ key } | ${ type } | ${ ps } |\n`;
@@ -266,7 +266,7 @@ const settings = Object.entries( themejson.definitions )
 			Object.assign( settingsObj, properties ),
 		{}
 	);
-const settingSections = keys( settings );
+const settingSections = Object.keys( settings );
 autogen += '## Settings' + '\n\n';
 settingSections.forEach( ( section ) => {
 	autogen += getSectionMarkup( section, settings[ section ], 'settings' );
@@ -274,7 +274,7 @@ settingSections.forEach( ( section ) => {
 
 // Styles
 const styles = themejson.definitions.stylesProperties.properties;
-const styleSections = keys( styles );
+const styleSections = Object.keys( styles );
 autogen += '## Styles' + '\n\n';
 styleSections.forEach( ( section ) => {
 	autogen += getSectionMarkup( section, styles[ section ], 'styles' );
@@ -288,7 +288,7 @@ const templateTableGeneration = ( themeJson, context ) => {
 		'Type: `' + themeJson.properties[ context ].items.type + '`.\n\n';
 	content += '| Property | Description | Type |\n';
 	content += '| ---      | ---         | ---  |\n';
-	keys( themeJson.properties[ context ].items.properties ).forEach(
+	Object.keys( themeJson.properties[ context ].items.properties ).forEach(
 		( key ) => {
 			content += `| ${ key } | ${ themeJson.properties[ context ].items.properties[ key ].description } | ${ themeJson.properties[ context ].items.properties[ key ].type } |\n`;
 		}
