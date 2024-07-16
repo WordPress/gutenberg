@@ -2,7 +2,7 @@
  * External dependencies
  */
 import type { ReactNode, MutableRefObject, SyntheticEvent } from 'react';
-import type { Placement } from '@floating-ui/react-dom';
+import type { Placement, ShiftOptions } from '@floating-ui/react-dom';
 
 type PositionYAxis = 'top' | 'middle' | 'bottom';
 type PositionXAxis = 'left' | 'center' | 'right';
@@ -139,7 +139,7 @@ export type PopoverProps = {
 	 *
 	 * @default false
 	 */
-	shift?: boolean;
+	shift?: boolean | ShiftOptions;
 	/**
 	 * Specifies the popover's style.
 	 *

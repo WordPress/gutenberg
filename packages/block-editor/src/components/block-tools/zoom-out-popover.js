@@ -24,7 +24,7 @@ export default function ZoomOutPopover( { clientId, __unstableContentRef } ) {
 		...popoverProps,
 		placement: 'left-start',
 		flip: false,
-		shift: true,
+		shift: { padding: { top: 48, bottom: 48 } },
 	};
 
 	return (
