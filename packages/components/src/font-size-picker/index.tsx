@@ -8,7 +8,7 @@ import type { ForwardedRef } from 'react';
  */
 import { __ } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
-import { useState, forwardRef } from '@wordpress/element';
+import { useState, useMemo, forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -23,11 +23,7 @@ import {
 } from '../unit-control';
 import { VisuallyHidden } from '../visually-hidden';
 import { getCommonSizeUnit } from './utils';
-import type {
-	FontSize,
-	FontSizePickerProps,
-	FontSizePickerType,
-} from './types';
+import type { FontSizePickerProps } from './types';
 import {
 	Container,
 	Header,
@@ -42,35 +38,7 @@ import { T_SHIRT_NAMES } from './constants';
 
 const DEFAULT_UNITS = [ 'px', 'em', 'rem', 'vw', 'vh' ];
 
-const shouldUseSelectOverToggle = ( howManyfontSizes: number ) =>
-	howManyfontSizes > 5;
-
-const getHeaderHint = (
-	currentPickerType: FontSizePickerType,
-	selectedFontSize: FontSize | undefined,
-	fontSizes: FontSize[]
-) => {
-	if ( currentPickerType === 'custom' ) {
-		return __( 'Custom' );
-	}
-
-	if ( ! shouldUseSelectOverToggle( fontSizes.length ) ) {
-		if ( selectedFontSize ) {
-			return (
-				selectedFontSize.name ||
-				T_SHIRT_NAMES[ fontSizes.indexOf( selectedFontSize ) ]
-			);
-		}
-		return '';
-	}
-
-	const commonUnit = getCommonSizeUnit( fontSizes );
-	if ( commonUnit ) {
-		return `(${ commonUnit })`;
-	}
-
-	return '';
-};
+const MAX_TOGGLE_GROUP_SIZES = 5;
 
 const UnforwardedFontSizePicker = (
 	props: FontSizePickerProps,
@@ -102,25 +70,44 @@ const UnforwardedFontSizePicker = (
 		availableUnits: unitsProp,
 	} );
 
-	if ( fontSizes.length === 0 && disableCustomFontSizes ) {
-		return null;
 	let currentPickerType;
 	if ( ! disableCustomFontSizes && userRequestedCustom ) {
 		// While showing the custom value picker, switch back to predef only if
 		// `disableCustomFontSizes` is set to `true`.
 		currentPickerType = 'custom' as const;
 	} else {
-		currentPickerType = shouldUseSelectOverToggle( fontSizes.length )
-			? ( 'select' as const )
-			: ( 'togglegroup' as const );
+		currentPickerType =
+			fontSizes.length > MAX_TOGGLE_GROUP_SIZES
+				? ( 'select' as const )
+				: ( 'togglegroup' as const );
 	}
 
+	const headerHint = useMemo( () => {
+		switch ( currentPickerType ) {
+			case 'custom':
+				return __( 'Custom' );
+			case 'togglegroup':
+				if ( selectedFontSize ) {
+					return (
+						selectedFontSize.name ||
+						T_SHIRT_NAMES[ fontSizes.indexOf( selectedFontSize ) ]
+					);
+				}
+				break;
+			case 'select':
+				const commonUnit = getCommonSizeUnit( fontSizes );
+				if ( commonUnit ) {
+					return `(${ commonUnit })`;
+				}
+				break;
+		}
 
-	const headerHint = getHeaderHint(
-		currentPickerType,
-		selectedFontSize,
-		fontSizes
-	);
+		return '';
+	}, [ currentPickerType, selectedFontSize, fontSizes ] );
+
+	if ( fontSizes.length === 0 && disableCustomFontSizes ) {
+		return null;
+	}
 
 	// If neither the value or first font size is a string, then FontSizePicker
 	// operates in a legacy "unitless" mode where UnitControl can only be used

@@ -1,5 +1,3 @@
-export type FontSizePickerType = 'select' | 'togglegroup' | 'custom';
-
 export type FontSizePickerProps = {
 	/**
 	 * If `true`, it will not be possible to choose a custom fontSize. The user
