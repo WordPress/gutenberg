@@ -678,13 +678,7 @@ function ReorderModal( { items, closeModal, onActionPerformed } ) {
 		orderInput?.trim?.() === '';
 	return (
 		<form onSubmit={ onOrder }>
-			<VStack
-				spacing="5"
-				style={ {
-					// editor styles are not loaded in dataviews so we use an inline style here.
-					maxWidth: 384 - 32 - 32 - 6 - 6,
-				} }
-			>
+			<VStack spacing="5">
 				<div>
 					{ __(
 						'Determines the order of pages. Pages with the same order value are sorted alphabetically. Negative order values are supported.'
