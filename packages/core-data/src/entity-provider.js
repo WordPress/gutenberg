@@ -1,9 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { createContext, useContext, useMemo } from '@wordpress/element';
+import { useContext, useMemo } from '@wordpress/element';
 
-const EntityContext = createContext( {} );
+/**
+ * Internal dependencies
+ */
+import { EntityContext } from './entity-context';
 
 /**
  * Context provider component for providing

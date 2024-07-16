@@ -1,9 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { useContext, createContext } from '@wordpress/element';
+import { useContext } from '@wordpress/element';
 
-const EntityContext = createContext( {} );
+/**
+ * Internal dependencies
+ */
+import { EntityContext } from '../entity-context';
 
 /**
  * Hook that returns the ID for the nearest
