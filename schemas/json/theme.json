@@ -661,8 +661,8 @@
 							"description": "Font family presets for the font family selector.\nGenerates a single custom property (`--wp--preset--font-family--{slug}`) per preset value.",
 							"type": "array",
 							"items": {
-								"type": "object",
 								"description": "Font family preset",
+								"type": "object",
 								"properties": {
 									"name": {
 										"description": "Name of the font family preset, translatable.",
@@ -822,12 +822,12 @@
 			]
 		},
 		"settingsPropertiesComplete": {
-			"type": "object",
 			"allOf": [
 				{
 					"$ref": "#/definitions/settingsProperties"
 				},
 				{
+					"type": "object",
 					"propertyNames": {
 						"$ref": "#/definitions/settingsPropertyNames"
 					}
@@ -1909,12 +1909,12 @@
 			"type": "object",
 			"properties": {
 				"button": {
-					"type": "object",
 					"allOf": [
 						{
 							"$ref": "#/definitions/stylesProperties"
 						},
 						{
+							"type": "object",
 							"properties": {
 								":hover": {
 									"$ref": "#/definitions/stylesPropertiesComplete"
@@ -1958,12 +1958,12 @@
 					]
 				},
 				"link": {
-					"type": "object",
 					"allOf": [
 						{
 							"$ref": "#/definitions/stylesProperties"
 						},
 						{
+							"type": "object",
 							"properties": {
 								":hover": {
 									"$ref": "#/definitions/stylesPropertiesComplete"
@@ -2343,12 +2343,12 @@
 			"additionalProperties": false
 		},
 		"stylesPropertiesAndElementsComplete": {
-			"type": "object",
 			"allOf": [
 				{
 					"$ref": "#/definitions/stylesProperties"
 				},
 				{
+					"type": "object",
 					"properties": {
 						"elements": {
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"
@@ -2381,12 +2381,12 @@
 			}
 		},
 		"stylesVariationProperties": {
-			"type": "object",
 			"allOf": [
 				{
 					"$ref": "#/definitions/stylesProperties"
 				},
 				{
+					"type": "object",
 					"properties": {
 						"elements": {
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"
@@ -2419,12 +2419,12 @@
 			}
 		},
 		"stylesVariationPropertiesComplete": {
-			"type": "object",
 			"allOf": [
 				{
 					"$ref": "#/definitions/stylesProperties"
 				},
 				{
+					"type": "object",
 					"properties": {
 						"elements": {
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"
@@ -2754,12 +2754,12 @@
 			"additionalProperties": false
 		},
 		"stylesVariationBlockPropertiesComplete": {
-			"type": "object",
 			"allOf": [
 				{
 					"$ref": "#/definitions/stylesProperties"
 				},
 				{
+					"type": "object",
 					"properties": {
 						"elements": {
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"
@@ -2813,12 +2813,12 @@
 		},
 		"settings": {
 			"description": "Settings for the block editor and individual blocks. These include things like:\n- Which customization options should be available to the user. \n- The default colors, font sizes... available to the user. \n- CSS custom properties and class names used in styles.\n- And the default layout of the editor (widths and available alignments).",
-			"type": "object",
 			"allOf": [
 				{
 					"$ref": "#/definitions/settingsProperties"
 				},
 				{
+					"type": "object",
 					"properties": {
 						"useRootPaddingAwareAlignments": {
 							"description": "Enables root padding (the values from `styles.spacing.padding`) to be applied to the contents of full-width blocks instead of the root block.\n\nPlease note that when using this setting, `styles.spacing.padding` should always be set as an object with `top`, `right`, `bottom`, `left` values declared separately.",
@@ -2849,12 +2849,12 @@
 		},
 		"styles": {
 			"description": "Organized way to set CSS properties. Styles in the top-level will be added in the `body` selector.",
-			"type": "object",
 			"allOf": [
 				{
 					"$ref": "#/definitions/stylesProperties"
 				},
 				{
+					"type": "object",
 					"properties": {
 						"elements": {
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"
