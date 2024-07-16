@@ -197,21 +197,24 @@ if ( ! class_exists( 'WP_Templates_Registry' ) ) {
 			$slugs_to_skip    = $query['slug__not_in'];
 			$post_type        = $query['post_type'];
 
+			$matching_templates = array();
 			foreach ( $all_templates as $template_name => $template ) {
 				if ( ! empty( $slugs_to_include ) && ! in_array( $template->slug, $slugs_to_include, true ) ) {
-					unset( $all_templates[ $template_name ] );
+					continue;
 				}
 
 				if ( ! empty( $slugs_to_skip ) && in_array( $template->slug, $slugs_to_skip, true ) ) {
-					unset( $all_templates[ $template_name ] );
+					continue;
 				}
 
 				if ( ! empty( $post_type ) && ! in_array( $post_type, $template->post_types, true ) ) {
-					unset( $all_templates[ $template_name ] );
+					continue;
 				}
+
+				$matching_templates[ $template_name ] = $template;
 			}
 
-			return $all_templates;
+			return $matching_templates;
 		}
 
 		/**
