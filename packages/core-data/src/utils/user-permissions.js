@@ -9,7 +9,7 @@ export function getUserPermissionsFromResponse( response ) {
 	const permissions = {};
 
 	// Optional chaining operator is used here because the API requests don't
-	// return the expected result in the native version. Instead, API requests
+	// return the expected result in the React native version. Instead, API requests
 	// only return the result, without including response properties like the headers.
 	const allowedMethods = response.headers?.get( 'allow' ) || '';
 
