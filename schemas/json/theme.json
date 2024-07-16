@@ -1529,6 +1529,10 @@
 					},
 					"additionalProperties": false
 				},
+				"css": {
+					"description": "Sets custom CSS to apply styling not covered by other theme.json properties.",
+					"type": "string"
+				},
 				"dimensions": {
 					"description": "Dimensions styles",
 					"type": "object",
@@ -1556,6 +1560,86 @@
 							]
 						}
 					}
+				},
+				"filter": {
+					"description": "CSS and SVG filter styles.",
+					"type": "object",
+					"properties": {
+						"duotone": {
+							"description": "Sets the duotone filter.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						}
+					},
+					"additionalProperties": false
+				},
+				"outline": {
+					"description": "Outline styles.",
+					"type": "object",
+					"properties": {
+						"color": {
+							"description": "Sets the `outline-color` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						},
+						"offset": {
+							"description": "Sets the `outline-offset` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						},
+						"style": {
+							"description": "Sets the `outline-style` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						},
+						"width": {
+							"description": "Sets the `outline-width` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						}
+					},
+					"additionalProperties": false
+				},
+				"shadow": {
+					"description": "Box shadow styles.",
+					"oneOf": [
+						{
+							"type": "string"
+						},
+						{
+							"$ref": "#/definitions/refComplete"
+						}
+					]
 				},
 				"spacing": {
 					"description": "Spacing styles.",
@@ -1804,90 +1888,6 @@
 						}
 					},
 					"additionalProperties": false
-				},
-				"filter": {
-					"description": "CSS and SVG filter styles.",
-					"type": "object",
-					"properties": {
-						"duotone": {
-							"description": "Sets the duotone filter.",
-							"oneOf": [
-								{
-									"type": "string"
-								},
-								{
-									"$ref": "#/definitions/refComplete"
-								}
-							]
-						}
-					},
-					"additionalProperties": false
-				},
-				"shadow": {
-					"description": "Box shadow styles.",
-					"oneOf": [
-						{
-							"type": "string"
-						},
-						{
-							"$ref": "#/definitions/refComplete"
-						}
-					]
-				},
-				"outline": {
-					"description": "Outline styles.",
-					"type": "object",
-					"properties": {
-						"color": {
-							"description": "Sets the `outline-color` CSS property.",
-							"oneOf": [
-								{
-									"type": "string"
-								},
-								{
-									"$ref": "#/definitions/refComplete"
-								}
-							]
-						},
-						"offset": {
-							"description": "Sets the `outline-offset` CSS property.",
-							"oneOf": [
-								{
-									"type": "string"
-								},
-								{
-									"$ref": "#/definitions/refComplete"
-								}
-							]
-						},
-						"style": {
-							"description": "Sets the `outline-style` CSS property.",
-							"oneOf": [
-								{
-									"type": "string"
-								},
-								{
-									"$ref": "#/definitions/refComplete"
-								}
-							]
-						},
-						"width": {
-							"description": "Sets the `outline-width` CSS property.",
-							"oneOf": [
-								{
-									"type": "string"
-								},
-								{
-									"$ref": "#/definitions/refComplete"
-								}
-							]
-						}
-					},
-					"additionalProperties": false
-				},
-				"css": {
-					"description": "Sets custom CSS to apply styling not covered by other theme.json properties.",
-					"type": "string"
 				}
 			}
 		},
@@ -1896,13 +1896,13 @@
 				"background",
 				"border",
 				"color",
+				"css",
 				"dimensions",
-				"spacing",
-				"typography",
 				"filter",
-				"shadow",
 				"outline",
-				"css"
+				"shadow",
+				"spacing",
+				"typography"
 			]
 		},
 		"stylesPropertiesComplete": {
