@@ -13,7 +13,6 @@ const RtlCssPlugin = require( 'rtlcss-webpack-plugin' );
 const TerserPlugin = require( 'terser-webpack-plugin' );
 const { realpathSync } = require( 'fs' );
 const { sync: glob } = require( 'fast-glob' );
-const { validate } = require( 'schema-utils' );
 
 /**
  * WordPress dependencies
@@ -32,11 +31,11 @@ const {
 	hasPostCSSConfig,
 	getWordPressSrcDirectory,
 	getWebpackEntryPoints,
-	getPhpFilePaths,
 	getAsBooleanFromENV,
 	getBlockJsonModuleFields,
 	getBlockJsonScriptFields,
 	fromProjectRoot,
+	PhpFilePathsPlugin,
 } = require( '../utils' );
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -49,49 +48,6 @@ const hasReactFastRefresh = hasArgInCLI( '--hot' ) && ! isProduction;
 const hasExperimentalModulesFlag = getAsBooleanFromENV(
 	'WP_EXPERIMENTAL_MODULES'
 );
-
-const phpFilePathsPluginSchema = {
-	type: 'object',
-	properties: {
-		props: {
-			type: 'array',
-			items: {
-				type: 'string',
-			},
-		},
-	},
-};
-
-/**
- * The plugin recomputes PHP file paths once on each compilation. It is necessary to avoid repeating processing
- * when filtering every discovered PHP file in the source folder. This is the most performant way to ensure that
- * changes in `block.json` files are picked up in watch mode.
- */
-class PhpFilePathsPlugin {
-	/**
-	 * PHP file paths from `render` and `variations` props found in `block.json` files.
-	 *
-	 * @type {string[]}
-	 */
-	static paths;
-
-	constructor( options = {} ) {
-		validate( phpFilePathsPluginSchema, options, {
-			name: 'PHP File Paths Plugin',
-			baseDataPath: 'options',
-		} );
-
-		this.options = options;
-	}
-
-	apply( compiler ) {
-		const pluginName = this.constructor.name;
-
-		compiler.hooks.thisCompilation.tap( pluginName, () => {
-			this.constructor.paths = getPhpFilePaths( this.options.props );
-		} );
-	}
-}
 
 const cssLoaders = [
 	{
