@@ -494,16 +494,6 @@ $block-inserter-tabs-height: 44px;
 	font-weight: 500;
 }
 
-.block-editor-inserter__patterns-explore-button,
-.block-editor-inserter__media-library-button {
-	&.components-button {
-		padding: $grid-unit-20;
-		justify-content: center;
-		margin-top: $grid-unit-20;
-		width: 100%;
-	}
-}
-
 .block-editor-inserter__media-panel {
 	min-height: 100%;
 	padding: 0 $grid-unit-20;
