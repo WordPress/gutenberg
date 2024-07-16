@@ -39,6 +39,7 @@ import { BLOCK_ICON_DEFAULT, DEPRECATED_ENTRY_KEYS } from '../constants';
 import { omit } from '../utils';
 import { store as blocksStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import { logged as warningLoggedSet } from '../../../../warning/src/utils';
 
 const noop = () => {};
 
@@ -67,6 +68,7 @@ describe( 'blocks', () => {
 		for ( const key in logged ) {
 			delete logged[ key ];
 		}
+		warningLoggedSet.clear();
 	} );
 
 	describe( 'registerBlockType()', () => {
