@@ -126,6 +126,7 @@ function generateDocs( themejson ) {
 	let autogen = '';
 
 	// Settings
+	autogen += '## Settings\n\n';
 	const settings = themejson.definitions.settingsProperties.allOf.flatMap(
 		( settingsProperties ) =>
 			Object.entries( settingsProperties.properties )
@@ -136,14 +137,13 @@ function generateDocs( themejson ) {
 		themejson.properties.settings.allOf[ 1 ].properties
 			.useRootPaddingAwareAlignments,
 	] );
-	autogen += '## Settings\n\n';
-	for ( const [ section, data ] of settings ) {
+	for ( const [ section, schema ] of settings ) {
 		autogen += `### ${ section }\n\n`;
-		autogen += `${ data.description }\n\n`;
-		if ( data.properties ) {
+		autogen += `${ schema.description }\n\n`;
+		if ( schema.properties ) {
 			autogen += '| Property  | Type   | Default | Props  |\n';
 			autogen += '| ---       | ---    | ---     | ---    |\n';
-			const properties = Object.entries( data.properties );
+			const properties = Object.entries( schema.properties );
 			for ( const [ property, subschema ] of properties ) {
 				const type = formatType( subschema );
 				const defaultValue = subschema.default ?? '';
@@ -158,17 +158,17 @@ function generateDocs( themejson ) {
 	}
 
 	// Styles
+	autogen += '## Styles\n\n';
 	const styles = Object.entries(
 		themejson.definitions.stylesProperties.properties
 	);
-	autogen += '## Styles\n\n';
-	for ( const [ section, data ] of styles ) {
+	for ( const [ section, schema ] of styles ) {
 		autogen += `### ${ section }\n\n`;
-		autogen += `${ data.description }\n\n`;
-		if ( data.properties ) {
+		autogen += `${ schema.description }\n\n`;
+		if ( schema.properties ) {
 			autogen += '| Property  | Type   | Props  |\n';
 			autogen += '| ---       | ---    | ---    |\n';
-			const properties = Object.entries( data.properties );
+			const properties = Object.entries( schema.properties );
 			for ( const [ property, subschema ] of properties ) {
 				const props = formatProperties( subschema );
 				const type = formatType( subschema );
