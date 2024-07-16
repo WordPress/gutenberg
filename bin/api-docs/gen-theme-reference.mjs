@@ -117,17 +117,12 @@ const formatArrayProperties = serialize.bind(
 );
 
 /**
- * Main function.
+ * Generate documentation from theme.json schema.
+ *
+ * @param {JSONSchema} themejson
+ * @return {string} generated documentation
  */
-async function main() {
-	const themejson = await $RefParser.dereference(
-		THEME_JSON_SCHEMA_FILE.pathname,
-		{
-			parse: { binary: false, text: false, yaml: false },
-			resolve: { external: false },
-		}
-	);
-
+function generateDocs( themejson ) {
 	let autogen = '';
 
 	// Settings
@@ -219,14 +214,28 @@ async function main() {
 	autogen += themejson.properties.patterns.description + '\n';
 	autogen += 'Type: `' + themejson.properties.patterns.type + '`.\n\n';
 
-	// Read existing file to wrap auto generated content.
+	return `${ START_TOKEN }\n${ autogen }\n${ END_TOKEN }`;
+}
+
+/**
+ * Main function.
+ */
+async function main() {
+	const themejson = await $RefParser.dereference(
+		THEME_JSON_SCHEMA_FILE.pathname,
+		{
+			parse: { binary: false, text: false, yaml: false },
+			resolve: { external: false },
+		}
+	);
+
 	let docsContent = await fs.readFile( THEME_JSON_REF_DOC, {
 		encoding: 'utf8',
 		flag: 'r',
 	} );
 
 	// Replace auto generated part with new generated docs.
-	autogen = START_TOKEN + '\n' + autogen + '\n' + END_TOKEN;
+	const autogen = generateDocs( themejson );
 	docsContent = docsContent.replace( TOKEN_PATTERN, autogen );
 
 	// Write back out.
