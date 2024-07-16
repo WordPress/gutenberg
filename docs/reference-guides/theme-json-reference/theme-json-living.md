@@ -346,7 +346,7 @@ Type: `object`.
 | title | Title of the template, translatable. | string |
 | area | The area the template part is used for. Block variations for `header` and `footer` values exist and will be used when the area is set to one of those. | string |
 
-## Patterns
+## patterns
 
 An array of pattern slugs to be registered from the Pattern Directory.
 Type: `array`.
