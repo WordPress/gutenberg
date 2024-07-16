@@ -125,7 +125,7 @@ class Gutenberg_REST_Templates_Controller_6_7 extends Gutenberg_REST_Templates_C
 			}
 
 			// Added by plugin.
-			if ( $template_object->has_theme_file && 'plugin' === $template_object->origin ) {
+			if ( 'plugin' === $template_object->origin ) {
 				return 'plugin';
 			}
 

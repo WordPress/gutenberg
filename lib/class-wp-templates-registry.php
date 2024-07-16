@@ -91,22 +91,21 @@ if ( ! class_exists( 'WP_Templates_Registry' ) ) {
 				$theme_name = get_stylesheet();
 				$slug       = isset( $args['slug'] ) ? $args['slug'] : explode( '//', $template_name )[1];
 
-				$template                 = new WP_Block_Template();
-				$template->id             = $theme_name . '//' . $slug;
-				$template->theme          = $theme_name;
-				$template->plugin         = isset( $args['plugin'] ) ? $args['plugin'] : '';
-				$template->author         = null;
-				$template->content        = isset( $args['content'] ) ? $args['content'] : '';
-				$template->source         = 'plugin';
-				$template->slug           = $slug;
-				$template->type           = 'wp_template';
-				$template->title          = isset( $args['title'] ) ? $args['title'] : '';
-				$template->description    = isset( $args['description'] ) ? $args['description'] : '';
-				$template->status         = 'publish';
-				$template->has_theme_file = true;
-				$template->origin         = 'plugin';
-				$template->is_custom      = true;
-				$template->post_types     = isset( $args['post_types'] ) ? $args['post_types'] : '';
+				$template              = new WP_Block_Template();
+				$template->id          = $theme_name . '//' . $slug;
+				$template->theme       = $theme_name;
+				$template->plugin      = isset( $args['plugin'] ) ? $args['plugin'] : '';
+				$template->author      = null;
+				$template->content     = isset( $args['content'] ) ? $args['content'] : '';
+				$template->source      = 'plugin';
+				$template->slug        = $slug;
+				$template->type        = 'wp_template';
+				$template->title       = isset( $args['title'] ) ? $args['title'] : '';
+				$template->description = isset( $args['description'] ) ? $args['description'] : '';
+				$template->status      = 'publish';
+				$template->origin      = 'plugin';
+				$template->is_custom   = true;
+				$template->post_types  = isset( $args['post_types'] ) ? $args['post_types'] : '';
 			}
 
 			$this->registered_templates[ $template_name ] = $template;
