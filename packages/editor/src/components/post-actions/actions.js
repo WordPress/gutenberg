@@ -711,7 +711,7 @@ function ReorderModal( { items, closeModal, onActionPerformed } ) {
 						__next40pxDefaultSize
 						variant="primary"
 						type="submit"
-						// eslint-disable-next-line no-restricted-syntax
+						accessibleWhenDisabled
 						disabled={ saveIsDisabled }
 						__experimentalIsFocusable
 					>
