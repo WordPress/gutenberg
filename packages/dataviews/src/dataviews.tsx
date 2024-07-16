@@ -75,7 +75,8 @@ export default function DataViews< Item >( {
 	onChangeSelection,
 }: DataViewsProps< Item > ) {
 	const [ selectionState, setSelectionState ] = useState< string[] >( [] );
-	const [ isShowingFilter, setIsShowingFilter ] = useState< boolean >( true );
+	const [ isShowingFilter, setIsShowingFilter ] =
+		useState< boolean >( false );
 	const isUncontrolled =
 		selectionProperty === undefined || onChangeSelection === undefined;
 	const selection = isUncontrolled ? selectionState : selectionProperty;
@@ -114,7 +115,7 @@ export default function DataViews< Item >( {
 			>
 				<HStack
 					justify="start"
-					className="dataviews-filters__container"
+					className="dataviews-search__container"
 					wrap
 				>
 					{ search && (
@@ -123,15 +124,6 @@ export default function DataViews< Item >( {
 							view={ view }
 							onChangeView={ onChangeView }
 						/>
-					) }
-					{ isShowingFilter && (
-					<Filters
-						fields={ _fields }
-						view={ view }
-						onChangeView={ onChangeView }
-						openedFilter={ openedFilter }
-						setOpenedFilter={ setOpenedFilter }
-					/>
 					) }
 				</HStack>
 				{ [ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type ) &&
@@ -161,13 +153,22 @@ export default function DataViews< Item >( {
 						isPressed={ isShowingFilter }
 						aria-expanded={ isShowingFilter }
 					/>
-					{ view.filters.length > 0 && (
+					{ !! view.filters?.length && view.filters?.length > 0 && (
 						<span className="dataviews-filters-toggle__count">
 							{ view.filters.length }
 						</span>
 					) }
 				</div>
 			</HStack>
+			{ isShowingFilter && (
+				<Filters
+					fields={ _fields }
+					view={ view }
+					onChangeView={ onChangeView }
+					openedFilter={ openedFilter }
+					setOpenedFilter={ setOpenedFilter }
+				/>
+			) }
 			<ViewComponent
 				actions={ actions }
 				data={ data }

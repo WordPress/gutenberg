@@ -113,7 +113,12 @@ function _Filters< Item >( {
 	}
 
 	return (
-		<HStack justify="flex-start" style={ { width: 'fit-content' } } wrap>
+		<HStack
+			justify="flex-start"
+			style={ { width: 'fit-content' } }
+			className="dataviews-filters__container"
+			wrap
+		>
 			{ filterComponents }
 		</HStack>
 	);
