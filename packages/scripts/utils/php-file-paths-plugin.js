@@ -11,6 +11,9 @@ const { getPhpFilePaths } = require( '../utils' );
 const phpFilePathsPluginSchema = {
 	type: 'object',
 	properties: {
+		context: {
+			type: 'string',
+		},
 		props: {
 			type: 'array',
 			items: {
@@ -46,7 +49,10 @@ class PhpFilePathsPlugin {
 		const pluginName = this.constructor.name;
 
 		compiler.hooks.thisCompilation.tap( pluginName, () => {
-			this.constructor.paths = getPhpFilePaths( this.options.props );
+			this.constructor.paths = getPhpFilePaths(
+				this.options.context,
+				this.options.props
+			);
 		} );
 	}
 }

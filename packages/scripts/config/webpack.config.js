@@ -301,7 +301,10 @@ const scriptConfig = {
 				cleanStaleWebpackAssets: false,
 			} ),
 
-		new PhpFilePathsPlugin( { props: [ 'render', 'variations' ] } ),
+		new PhpFilePathsPlugin( {
+			context: getWordPressSrcDirectory(),
+			props: [ 'render', 'variations' ],
+		} ),
 		new CopyWebpackPlugin( {
 			patterns: [
 				{

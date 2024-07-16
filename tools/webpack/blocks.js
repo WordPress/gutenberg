@@ -92,7 +92,10 @@ module.exports = [
 		plugins: [
 			...plugins,
 			new DependencyExtractionWebpackPlugin( { injectPolyfill: false } ),
-			new PhpFilePathsPlugin( { props: [ 'render' ] } ),
+			new PhpFilePathsPlugin( {
+				context: './packages/block-library/src/',
+				props: [ 'render' ],
+			} ),
 			new CopyWebpackPlugin( {
 				patterns: [].concat(
 					[
