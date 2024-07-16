@@ -38,6 +38,7 @@ const Template: StoryFn< typeof FocalPointPicker > = ( {
 
 	return (
 		<FocalPointPicker
+			__nextHasNoMarginBottom
 			{ ...props }
 			value={ focalPoint }
 			onChange={ ( ...changeArgs ) => {

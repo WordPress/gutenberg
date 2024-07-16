@@ -39,6 +39,7 @@ const TreeSelectWithState: StoryFn< typeof TreeSelect > = ( props ) => {
 
 	return (
 		<TreeSelect
+			__nextHasNoMarginBottom
 			{ ...props }
 			onChange={ setSelection }
 			selectedId={ selection }

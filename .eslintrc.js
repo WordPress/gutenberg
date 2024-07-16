@@ -147,6 +147,14 @@ const restrictedSyntaxComponents = [
 		message:
 			'`disabled` used without the `accessibleWhenDisabled` prop. Disabling a control without maintaining focusability can cause accessibility issues, by hiding their presence from screen reader users, or preventing focus from returning to a trigger element. (Ignore this error if you truly mean to disable.)',
 	},
+	...[ 'FocalPointPicker', 'TextareaControl', 'TreeSelect' ].map(
+		( componentName ) => ( {
+			selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__nextHasNoMarginBottom"]))`,
+			message:
+				componentName +
+				' should have the `__nextHasNoMarginBottom` prop to opt-in to the new margin-free styles.',
+		} )
+	),
 ];
 
 module.exports = {
@@ -268,7 +276,7 @@ module.exports = {
 				'packages/*/src/**/*.[tj]s?(x)',
 				'storybook/stories/**/*.[tj]s?(x)',
 			],
-			excludedFiles: [ '**/*.native.js' ],
+			excludedFiles: [ '**/*.@(native|ios|android).js' ],
 			rules: {
 				'no-restricted-syntax': [
 					'error',
@@ -392,6 +400,7 @@ module.exports = {
 			excludedFiles: [
 				'packages/components/src/utils/colors-values.js',
 				'packages/components/src/theme/**',
+				'**/*.@(native|ios|android).js',
 			],
 			rules: {
 				'no-restricted-syntax': [

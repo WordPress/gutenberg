@@ -39,6 +39,7 @@ const Template: StoryFn< typeof TextareaControl > = ( {
 
 	return (
 		<TextareaControl
+			__nextHasNoMarginBottom
 			{ ...args }
 			value={ value }
 			onChange={ ( v ) => {
