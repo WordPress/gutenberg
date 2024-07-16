@@ -39,6 +39,7 @@ import { BLOCK_ICON_DEFAULT, DEPRECATED_ENTRY_KEYS } from '../constants';
 import { omit } from '../utils';
 import { store as blocksStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import { logged as warningLoggedSet } from '../../../../warning/src/utils';
 
 const noop = () => {};
 
@@ -67,12 +68,13 @@ describe( 'blocks', () => {
 		for ( const key in logged ) {
 			delete logged[ key ];
 		}
+		warningLoggedSet.clear();
 	} );
 
 	describe( 'registerBlockType()', () => {
 		it( 'should reject numbers', () => {
 			const block = registerBlockType( 999 );
-			expect( console ).toHaveErroredWith(
+			expect( console ).toHaveWarnedWith(
 				'Block names must be strings.'
 			);
 			expect( block ).toBeUndefined();
@@ -80,7 +82,7 @@ describe( 'blocks', () => {
 
 		it( 'should reject blocks without a namespace', () => {
 			const block = registerBlockType( 'doing-it-wrong' );
-			expect( console ).toHaveErroredWith(
+			expect( console ).toHaveWarnedWith(
 				'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block'
 			);
 			expect( block ).toBeUndefined();
@@ -88,7 +90,7 @@ describe( 'blocks', () => {
 
 		it( 'should reject blocks with too many namespaces', () => {
 			const block = registerBlockType( 'doing/it/wrong' );
-			expect( console ).toHaveErroredWith(
+			expect( console ).toHaveWarnedWith(
 				'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block'
 			);
 			expect( block ).toBeUndefined();
@@ -96,7 +98,7 @@ describe( 'blocks', () => {
 
 		it( 'should reject blocks with invalid characters', () => {
 			const block = registerBlockType( 'still/_doing_it_wrong' );
-			expect( console ).toHaveErroredWith(
+			expect( console ).toHaveWarnedWith(
 				'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block'
 			);
 			expect( block ).toBeUndefined();
@@ -104,7 +106,7 @@ describe( 'blocks', () => {
 
 		it( 'should reject blocks with uppercase characters', () => {
 			const block = registerBlockType( 'Core/Paragraph' );
-			expect( console ).toHaveErroredWith(
+			expect( console ).toHaveWarnedWith(
 				'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block'
 			);
 			expect( block ).toBeUndefined();
@@ -115,7 +117,7 @@ describe( 'blocks', () => {
 				'my-plugin/4-fancy-block',
 				defaultBlockSettings
 			);
-			expect( console ).toHaveErroredWith(
+			expect( console ).toHaveWarnedWith(
 				'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block'
 			);
 			expect( block ).toBeUndefined();
@@ -126,7 +128,7 @@ describe( 'blocks', () => {
 				'my-plugin/fancy-block-4',
 				defaultBlockSettings
 			);
-			expect( console ).not.toHaveErrored();
+			expect( console ).not.toHaveWarned();
 			expect( block ).toEqual( {
 				name: 'my-plugin/fancy-block-4',
 				icon: { src: BLOCK_ICON_DEFAULT },
@@ -151,7 +153,7 @@ describe( 'blocks', () => {
 				'core/test-block',
 				defaultBlockSettings
 			);
-			expect( console ).toHaveErroredWith(
+			expect( console ).toHaveWarnedWith(
 				'Block "core/test-block" is already registered.'
 			);
 			expect( block ).toBeUndefined();
@@ -164,7 +166,7 @@ describe( 'blocks', () => {
 				keywords: [],
 				save: 'invalid',
 			} );
-			expect( console ).toHaveErroredWith(
+			expect( console ).toHaveWarnedWith(
 				'The "save" property must be a valid function.'
 			);
 			expect( block ).toBeUndefined();
@@ -181,7 +183,7 @@ describe( 'blocks', () => {
 					'my-plugin/fancy-block-6',
 					blockType
 				);
-			expect( console ).toHaveErroredWith(
+			expect( console ).toHaveWarnedWith(
 				'The "edit" property must be a valid component.'
 			);
 			expect( block ).toBeUndefined();
@@ -227,7 +229,7 @@ describe( 'blocks', () => {
 					'my-plugin/fancy-block-9',
 					blockType
 				);
-			expect( console ).toHaveErroredWith(
+			expect( console ).toHaveWarnedWith(
 				'The block "my-plugin/fancy-block-9" must have a title.'
 			);
 			expect( block ).toBeUndefined();
@@ -244,7 +246,7 @@ describe( 'blocks', () => {
 					'my-plugin/fancy-block-10',
 					blockType
 				);
-			expect( console ).toHaveErroredWith(
+			expect( console ).toHaveWarnedWith(
 				'The block "my-plugin/fancy-block-10" must have a title.'
 			);
 			expect( block ).toBeUndefined();
@@ -261,7 +263,7 @@ describe( 'blocks', () => {
 					'my-plugin/fancy-block-11',
 					blockType
 				);
-			expect( console ).toHaveErroredWith(
+			expect( console ).toHaveWarnedWith(
 				'Block titles must be strings.'
 			);
 			expect( block ).toBeUndefined();
@@ -501,7 +503,7 @@ describe( 'blocks', () => {
 				'core/test-block-icon-normalize-element',
 				blockType
 			);
-			expect( console ).toHaveErrored();
+			expect( console ).toHaveWarned();
 			expect( block ).toBeUndefined();
 		} );
 
@@ -749,7 +751,7 @@ describe( 'blocks', () => {
 					'my-plugin/fancy-block-12',
 					defaultBlockSettings
 				);
-				expect( console ).toHaveErroredWith(
+				expect( console ).toHaveWarnedWith(
 					'The block "my-plugin/fancy-block-12" must have a title.'
 				);
 				expect( block ).toBeUndefined();
@@ -767,7 +769,7 @@ describe( 'blocks', () => {
 					'my-plugin/fancy-block-13',
 					defaultBlockSettings
 				);
-				expect( console ).toHaveErroredWith(
+				expect( console ).toHaveWarnedWith(
 					'Block settings must be a valid object.'
 				);
 				expect( block ).toBeUndefined();
@@ -1093,7 +1095,7 @@ describe( 'blocks', () => {
 	describe( 'unregisterBlockType()', () => {
 		it( 'should fail if a block is not registered', () => {
 			const oldBlock = unregisterBlockType( 'core/test-block' );
-			expect( console ).toHaveErroredWith(
+			expect( console ).toHaveWarnedWith(
 				'Block "core/test-block" is not registered.'
 			);
 			expect( oldBlock ).toBeUndefined();
@@ -1120,7 +1122,7 @@ describe( 'blocks', () => {
 				},
 			] );
 			const oldBlock = unregisterBlockType( 'core/test-block' );
-			expect( console ).not.toHaveErrored();
+			expect( console ).not.toHaveWarned();
 			expect( oldBlock ).toEqual( {
 				name: 'core/test-block',
 				save: noop,
@@ -1440,7 +1442,7 @@ describe( 'blocks', () => {
 		// Check the name is correct.
 		it( 'should contain name property', () => {
 			const source = registerBlockBindingsSource( {} );
-			expect( console ).toHaveErroredWith(
+			expect( console ).toHaveWarnedWith(
 				'Block bindings source must contain a name.'
 			);
 			expect( source ).toBeUndefined();
@@ -1448,7 +1450,7 @@ describe( 'blocks', () => {
 
 		it( 'should reject numbers', () => {
 			const source = registerBlockBindingsSource( { name: 1 } );
-			expect( console ).toHaveErroredWith(
+			expect( console ).toHaveWarnedWith(
 				'Block bindings source name must be a string.'
 			);
 			expect( source ).toBeUndefined();
@@ -1458,7 +1460,7 @@ describe( 'blocks', () => {
 			registerBlockBindingsSource( {
 				name: 'Core/WrongName',
 			} );
-			expect( console ).toHaveErroredWith(
+			expect( console ).toHaveWarnedWith(
 				'Block bindings source name must not contain uppercase characters.'
 			);
 			expect(
@@ -1470,7 +1472,7 @@ describe( 'blocks', () => {
 			registerBlockBindingsSource( {
 				name: 'core/_wrong_name',
 			} );
-			expect( console ).toHaveErroredWith(
+			expect( console ).toHaveWarnedWith(
 				'Block bindings source name must contain only valid characters: lowercase characters, hyphens, or digits. Example: my-plugin/my-custom-source.'
 			);
 			expect(
@@ -1482,7 +1484,7 @@ describe( 'blocks', () => {
 			registerBlockBindingsSource( {
 				name: 'wrong-name',
 			} );
-			expect( console ).toHaveErroredWith(
+			expect( console ).toHaveWarnedWith(
 				'Block bindings source name must contain a namespace and valid characters. Example: my-plugin/my-custom-source.'
 			);
 			expect( getBlockBindingsSource( 'wrong-name' ) ).toBeUndefined();
@@ -1493,7 +1495,7 @@ describe( 'blocks', () => {
 			registerBlockBindingsSource( {
 				name: 'core/testing',
 			} );
-			expect( console ).toHaveErroredWith(
+			expect( console ).toHaveWarnedWith(
 				'Block bindings source must contain a label.'
 			);
 			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
@@ -1504,7 +1506,7 @@ describe( 'blocks', () => {
 				name: 'core/testing',
 				label: 1,
 			} );
-			expect( console ).toHaveErroredWith(
+			expect( console ).toHaveWarnedWith(
 				'Block bindings source label must be a string.'
 			);
 			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
@@ -1517,7 +1519,7 @@ describe( 'blocks', () => {
 				label: 'testing',
 				getValue: 'should be a function',
 			} );
-			expect( console ).toHaveErroredWith(
+			expect( console ).toHaveWarnedWith(
 				'Block bindings source getValue must be a function.'
 			);
 			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
@@ -1530,7 +1532,7 @@ describe( 'blocks', () => {
 				label: 'testing',
 				setValue: 'should be a function',
 			} );
-			expect( console ).toHaveErroredWith(
+			expect( console ).toHaveWarnedWith(
 				'Block bindings source setValue must be a function.'
 			);
 			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
@@ -1543,7 +1545,7 @@ describe( 'blocks', () => {
 				label: 'testing',
 				setValues: 'should be a function',
 			} );
-			expect( console ).toHaveErroredWith(
+			expect( console ).toHaveWarnedWith(
 				'Block bindings source setValues must be a function.'
 			);
 			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
@@ -1556,7 +1558,7 @@ describe( 'blocks', () => {
 				label: 'testing',
 				getPlaceholder: 'should be a function',
 			} );
-			expect( console ).toHaveErroredWith(
+			expect( console ).toHaveWarnedWith(
 				'Block bindings source getPlaceholder must be a function.'
 			);
 			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
@@ -1569,7 +1571,7 @@ describe( 'blocks', () => {
 				label: 'testing',
 				canUserEditValue: 'should be a function',
 			} );
-			expect( console ).toHaveErroredWith(
+			expect( console ).toHaveWarnedWith(
 				'Block bindings source canUserEditValue must be a function.'
 			);
 			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
@@ -1617,7 +1619,7 @@ describe( 'blocks', () => {
 			registerBlockBindingsSource( source );
 			registerBlockBindingsSource( source );
 			unregisterBlockBindingsSource( 'core/test-source' );
-			expect( console ).toHaveErroredWith(
+			expect( console ).toHaveWarnedWith(
 				'Block bindings source "core/test-source" is already registered.'
 			);
 		} );
@@ -1637,7 +1639,7 @@ describe( 'blocks', () => {
 
 		it( 'should reject removing a source that does not exist', () => {
 			unregisterBlockBindingsSource( 'core/non-existing-source' );
-			expect( console ).toHaveErroredWith(
+			expect( console ).toHaveWarnedWith(
 				'Block bindings source "core/non-existing-source" is not registered.'
 			);
 		} );
