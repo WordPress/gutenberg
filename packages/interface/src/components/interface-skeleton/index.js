@@ -86,9 +86,6 @@ function InterfaceSkeleton(
 		labels,
 		className,
 		enableRegionNavigation = true,
-		// Todo: does this need to be a prop.
-		// Can we use a dependency to keyboard-shortcuts directly?
-		shortcuts,
 	},
 	ref
 ) {
@@ -101,7 +98,7 @@ function InterfaceSkeleton(
 		duration: disableMotion ? 0 : ANIMATION_DURATION,
 		ease: [ 0.6, 0, 0.4, 1 ],
 	};
-	const navigateRegionsProps = useNavigateRegions( shortcuts );
+	const navigateRegionsProps = useNavigateRegions();
 	useHTMLClass( 'interface-interface-skeleton__html-container' );
 
 	const defaultLabels = {

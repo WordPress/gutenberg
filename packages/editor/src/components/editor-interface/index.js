@@ -15,7 +15,6 @@ import {
 	BlockBreadcrumb,
 	BlockToolbar,
 } from '@wordpress/block-editor';
-import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { useViewportMatch } from '@wordpress/compose';
 import { useState, useCallback } from '@wordpress/element';
 
@@ -69,8 +68,6 @@ export default function EditorInterface( {
 		isListViewOpened,
 		isDistractionFree,
 		isPreviewMode,
-		previousShortcut,
-		nextShortcut,
 		showBlockBreadcrumbs,
 		documentLabel,
 		isZoomOut,
@@ -88,12 +85,6 @@ export default function EditorInterface( {
 			isListViewOpened: select( editorStore ).isListViewOpened(),
 			isDistractionFree: get( 'core', 'distractionFree' ),
 			isPreviewMode: editorSettings.__unstableIsPreviewMode,
-			previousShortcut: select(
-				keyboardShortcutsStore
-			).getAllShortcutKeyCombinations( 'core/editor/previous-region' ),
-			nextShortcut: select(
-				keyboardShortcutsStore
-			).getAllShortcutKeyCombinations( 'core/editor/next-region' ),
 			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
 			// translators: Default label for the Document in the Block Breadcrumb.
 			documentLabel: postTypeLabel || _x( 'Document', 'noun' ),
@@ -231,10 +222,6 @@ export default function EditorInterface( {
 					  )
 					: undefined
 			}
-			shortcuts={ {
-				previous: previousShortcut,
-				next: nextShortcut,
-			} }
 		/>
 	);
 }
