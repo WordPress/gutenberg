@@ -7,7 +7,7 @@
 /**
  * External dependencies
  */
-import fs from 'fs';
+import fs from 'node:fs/promises';
 import $RefParser from '@apidevtools/json-schema-ref-parser';
 
 /**
@@ -245,7 +245,7 @@ async function main() {
 	autogen += 'Type: `' + themejson.properties.patterns.type + '`.\n\n';
 
 	// Read existing file to wrap auto generated content.
-	let docsContent = fs.readFileSync( THEME_JSON_REF_DOC, {
+	let docsContent = await fs.readFile( THEME_JSON_REF_DOC, {
 		encoding: 'utf8',
 		flag: 'r',
 	} );
@@ -255,7 +255,7 @@ async function main() {
 	docsContent = docsContent.replace( TOKEN_PATTERN, autogen );
 
 	// Write back out.
-	fs.writeFileSync( THEME_JSON_REF_DOC, docsContent, { encoding: 'utf8' } );
+	await fs.writeFile( THEME_JSON_REF_DOC, docsContent, { encoding: 'utf8' } );
 }
 
 main().catch( ( error ) => {
