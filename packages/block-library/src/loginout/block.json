@@ -49,10 +49,10 @@
 			"width": true,
 			"style": true,
 			"__experimentalDefaultControls": {
-				"radius": false,
-				"color": false,
-				"width": false,
-				"style": false
+				"radius": true,
+				"color": true,
+				"width": true,
+				"style": true
 			}
 		},
 		"interactivity": {
