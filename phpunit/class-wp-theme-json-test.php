@@ -4765,12 +4765,13 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'styles'  => array(
 					'background' => array(
-						'backgroundImage'    => array(
+						'backgroundImage'      => array(
 							'url' => 'http://example.org/image.png',
 						),
-						'backgroundSize'     => 'contain',
-						'backgroundRepeat'   => 'no-repeat',
-						'backgroundPosition' => 'center center',
+						'backgroundSize'       => 'contain',
+						'backgroundRepeat'     => 'no-repeat',
+						'backgroundPosition'   => 'center center',
+						'backgroundAttachment' => 'fixed',
 					),
 				),
 			)
@@ -4781,7 +4782,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			'selector' => 'body',
 		);
 
-		$expected_styles = "html{min-height: calc(100% - var(--wp-admin--admin-bar--height, 0px));}:root :where(body){background-image: url('http://example.org/image.png');background-position: center center;background-repeat: no-repeat;background-size: contain;}";
+		$expected_styles = "html{min-height: calc(100% - var(--wp-admin--admin-bar--height, 0px));}:root :where(body){background-image: url('http://example.org/image.png');background-position: center center;background-repeat: no-repeat;background-size: contain;background-attachment: fixed;}";
 		$this->assertSame( $expected_styles, $theme_json->get_styles_for_block( $body_node ), 'Styles returned from "::get_styles_for_block()" with top-level background styles do not match expectations' );
 
 		$theme_json = new WP_Theme_JSON_Gutenberg(
@@ -4789,16 +4790,17 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'styles'  => array(
 					'background' => array(
-						'backgroundImage'    => "url('http://example.org/image.png')",
-						'backgroundSize'     => 'contain',
-						'backgroundRepeat'   => 'no-repeat',
-						'backgroundPosition' => 'center center',
+						'backgroundImage'      => "url('http://example.org/image.png')",
+						'backgroundSize'       => 'contain',
+						'backgroundRepeat'     => 'no-repeat',
+						'backgroundPosition'   => 'center center',
+						'backgroundAttachment' => 'fixed',
 					),
 				),
 			)
 		);
 
-		$expected_styles = "html{min-height: calc(100% - var(--wp-admin--admin-bar--height, 0px));}:root :where(body){background-image: url('http://example.org/image.png');background-position: center center;background-repeat: no-repeat;background-size: contain;}";
+		$expected_styles = "html{min-height: calc(100% - var(--wp-admin--admin-bar--height, 0px));}:root :where(body){background-image: url('http://example.org/image.png');background-position: center center;background-repeat: no-repeat;background-size: contain;background-attachment: fixed;}";
 		$this->assertSame( $expected_styles, $theme_json->get_styles_for_block( $body_node ), 'Styles returned from "::get_styles_for_block()" with top-level background image as string type do not match expectations' );
 	}
 
@@ -4810,10 +4812,11 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'blocks' => array(
 						'core/group' => array(
 							'background' => array(
-								'backgroundImage'    => "url('http://example.org/group.png')",
-								'backgroundSize'     => 'cover',
-								'backgroundRepeat'   => 'no-repeat',
-								'backgroundPosition' => 'center center',
+								'backgroundImage'      => "url('http://example.org/group.png')",
+								'backgroundSize'       => 'cover',
+								'backgroundRepeat'     => 'no-repeat',
+								'backgroundPosition'   => 'center center',
+								'backgroundAttachment' => 'fixed',
 							),
 						),
 						'core/quote' => array(
@@ -4852,7 +4855,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			),
 		);
 
-		$group_styles = ":root :where(.wp-block-group){background-image: url('http://example.org/group.png');background-position: center center;background-repeat: no-repeat;background-size: cover;}";
+		$group_styles = ":root :where(.wp-block-group){background-image: url('http://example.org/group.png');background-position: center center;background-repeat: no-repeat;background-size: cover;background-attachment: fixed;}";
 		$this->assertSame( $group_styles, $theme_json->get_styles_for_block( $group_node ), 'Styles returned from "::get_styles_for_block()" with block-level background styles as string type do not match expectations' );
 	}
 

@@ -1220,6 +1220,17 @@
 									"$ref": "#/definitions/refComplete"
 								}
 							]
+						},
+						"backgroundAttachment": {
+							"description": "Sets the `background-attachment` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
 						}
 					},
 					"additionalProperties": false
