@@ -238,6 +238,13 @@ Color styles.
 
 ---
 
+### css
+
+Sets custom CSS to apply styling not covered by other theme.json properties.
+
+
+---
+
 ### dimensions
 
 Dimensions styles
@@ -246,6 +253,36 @@ Dimensions styles
 | ---       | ---    |---   |
 | aspectRatio | string, object |  |
 | minHeight | string, object |  |
+
+---
+
+### filter
+
+CSS and SVG filter styles.
+
+| Property  | Type   |  Props  |
+| ---       | ---    |---   |
+| duotone | string, object |  |
+
+---
+
+### outline
+
+Outline styles.
+
+| Property  | Type   |  Props  |
+| ---       | ---    |---   |
+| color | string, object |  |
+| offset | string, object |  |
+| style | string, object |  |
+| width | string, object |  |
+
+---
+
+### shadow
+
+Box shadow styles.
+
 
 ---
 
@@ -278,43 +315,6 @@ Typography styles.
 | textDecoration | string, object |  |
 | writingMode | string, object |  |
 | textTransform | string, object |  |
-
----
-
-### filter
-
-CSS and SVG filter styles.
-
-| Property  | Type   |  Props  |
-| ---       | ---    |---   |
-| duotone | string, object |  |
-
----
-
-### shadow
-
-Box shadow styles.
-
-
----
-
-### outline
-
-Outline styles.
-
-| Property  | Type   |  Props  |
-| ---       | ---    |---   |
-| color | string, object |  |
-| offset | string, object |  |
-| style | string, object |  |
-| width | string, object |  |
-
----
-
-### css
-
-Sets custom CSS to apply styling not covered by other theme.json properties.
-
 
 ---
 ## customTemplates
