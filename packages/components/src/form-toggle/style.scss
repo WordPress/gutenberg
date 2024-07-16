@@ -88,11 +88,6 @@ $transition-duration: 0.2s;
 	.components-disabled & {
 		opacity: 0.3;
 	}
-
-	& + .components-toggle-control__label {
-		line-height: $toggle-height;
-		cursor: pointer;
-	}
 }
 
 // This needs specificity to override inherited checkbox styles.
