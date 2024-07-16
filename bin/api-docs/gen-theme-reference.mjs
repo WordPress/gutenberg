@@ -211,6 +211,12 @@ const formatType = ( prop ) => {
 const settings = themejson.definitions.settingsProperties.allOf.flatMap(
 	( settingsProperties ) => Object.entries( settingsProperties.properties )
 );
+// This property is only available at the root level, so it isn't included in the settingsProperties.
+settings.unshift( [
+	'useRootPaddingAwareAlignments',
+	themejson.properties.settings.allOf[ 1 ].properties
+		.useRootPaddingAwareAlignments,
+] );
 autogen += '## Settings' + '\n\n';
 settings.forEach( ( [ section, data ] ) => {
 	autogen += getSectionMarkup( section, data, 'settings' );
