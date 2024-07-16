@@ -268,7 +268,6 @@ module.exports = {
 				'packages/*/src/**/*.[tj]s?(x)',
 				'storybook/stories/**/*.[tj]s?(x)',
 			],
-			excludedFiles: [ '**/*.@(native|ios|android).js' ],
 			rules: {
 				'no-restricted-syntax': [
 					'error',
@@ -417,8 +416,6 @@ module.exports = {
 			excludedFiles: [
 				'packages/components/src/utils/colors-values.js',
 				'packages/components/src/theme/**',
-				'packages/components/src/**/@(test|stories)/**',
-				'**/*.@(native|ios|android).js',
 			],
 			rules: {
 				'no-restricted-syntax': [
