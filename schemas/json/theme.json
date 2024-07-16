@@ -1892,12 +1892,12 @@
 			]
 		},
 		"stylesPropertiesComplete": {
-			"type": "object",
 			"allOf": [
 				{
 					"$ref": "#/definitions/stylesProperties"
 				},
 				{
+					"type": "object",
 					"propertyNames": {
 						"$ref": "#/definitions/stylesPropertyNames"
 					}
@@ -1939,7 +1939,6 @@
 		},
 		"stylesElementsPropertiesComplete": {
 			"description": "Styles defined on a per-element basis using the element's selector.",
-			"type": "object",
 			"properties": {
 				"button": {
 					"allOf": [
@@ -1950,6 +1949,7 @@
 							"$ref": "#/definitions/stylesElementsPseudoSelectorsProperties"
 						},
 						{
+							"type": "object",
 							"propertyNames": {
 								"anyOf": [
 									{
@@ -1972,6 +1972,7 @@
 							"$ref": "#/definitions/stylesElementsPseudoSelectorsProperties"
 						},
 						{
+							"type": "object",
 							"propertyNames": {
 								"anyOf": [
 									{
@@ -2338,6 +2339,7 @@
 					}
 				},
 				{
+					"type": "object",
 					"propertyNames": {
 						"anyOf": [
 							{
@@ -2376,6 +2378,7 @@
 					}
 				},
 				{
+					"type": "object",
 					"propertyNames": {
 						"anyOf": [
 							{
@@ -2414,6 +2417,7 @@
 					}
 				},
 				{
+					"type": "object",
 					"propertyNames": {
 						"anyOf": [
 							{
@@ -2746,6 +2750,7 @@
 					}
 				},
 				{
+					"type": "object",
 					"propertyNames": {
 						"anyOf": [
 							{
@@ -2810,6 +2815,7 @@
 					}
 				},
 				{
+					"type": "object",
 					"propertyNames": {
 						"anyOf": [
 							{
@@ -2847,6 +2853,7 @@
 					}
 				},
 				{
+					"type": "object",
 					"propertyNames": {
 						"anyOf": [
 							{
