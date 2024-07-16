@@ -85,10 +85,10 @@ Settings related to colors.
 | defaultDuotone | boolean | true |  |
 | defaultGradients | boolean | true |  |
 | defaultPalette | boolean | true |  |
-| duotone | array |  | colors, name, slug |
-| gradients | array |  | gradient, name, slug |
+| duotone | array |  | name, slug, colors |
+| gradients | array |  | name, slug, gradient |
 | link | boolean | false |  |
-| palette | array |  | color, name, slug |
+| palette | array |  | name, slug, color |
 | text | boolean | true |  |
 | heading | boolean | true |  |
 | button | boolean | true |  |
@@ -104,7 +104,7 @@ Settings related to dimensions.
 | ---       | ---    | ---     | ---    |
 | aspectRatio | boolean | false |  |
 | defaultAspectRatios | boolean | true |  |
-| aspectRatios | array |  | name, ratio, slug |
+| aspectRatios | array |  | name, slug, ratio |
 | minHeight | boolean | false |  |
 
 ---
@@ -150,7 +150,7 @@ Settings related to shadows.
 | Property  | Type   | Default | Props  |
 | ---       | ---    | ---     | ---    |
 | defaultPresets | boolean | true |  |
-| presets | array |  | name, shadow, slug |
+| presets | array |  | name, slug, shadow |
 
 ---
 
@@ -160,13 +160,13 @@ Settings related to spacing.
 
 | Property  | Type   | Default | Props  |
 | ---       | ---    | ---     | ---    |
-| blockGap | boolean, null | null |   |
+| blockGap | boolean, null |  |   |
 | margin | boolean | false |  |
 | padding | boolean | false |  |
 | units | array | px,em,rem,vh,vw,% |  |
 | customSpacingSize | boolean | true |  |
 | defaultSpacingSizes | boolean | true |  |
-| spacingSizes | array |  | name, size, slug |
+| spacingSizes | array |  | name, slug, size |
 | spacingScale | object |  |  |
 
 ---
@@ -181,7 +181,7 @@ Settings related to typography.
 | customFontSize | boolean | true |  |
 | fontStyle | boolean | true |  |
 | fontWeight | boolean | true |  |
-| fluid | object, boolean | false | _{maxViewportWidth, minFontSize, minViewportWidth}_  |
+| fluid | object, boolean | false | _{minFontSize, maxViewportWidth, minViewportWidth}_  |
 | letterSpacing | boolean | true |  |
 | lineHeight | boolean | false |  |
 | textAlign | boolean | true |  |
@@ -190,8 +190,8 @@ Settings related to typography.
 | writingMode | boolean | false |  |
 | textTransform | boolean | true |  |
 | dropCap | boolean | true |  |
-| fontSizes | array |  | fluid, name, size, slug |
-| fontFamilies | array |  | fontFace, fontFamily, name, slug |
+| fontSizes | array |  | name, slug, size, fluid |
+| fontFamilies | array |  | name, slug, fontFamily, fontFace |
 
 ---
 
@@ -302,8 +302,8 @@ Spacing styles.
 | Property  | Type   | Props  |
 | ---       | ---    | ---    |
 | blockGap | string, object |  |
-| margin | object | bottom, left, right, top |
-| padding | object | bottom, left, right, top |
+| margin | object | top, right, bottom, left |
+| padding | object | top, right, bottom, left |
 
 ---
 
