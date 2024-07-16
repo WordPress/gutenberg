@@ -240,7 +240,7 @@ autogen += getTemplatePropertiesMarkup(
 );
 
 // Patterns
-autogen += '## Patterns' + '\n\n';
+autogen += '## patterns' + '\n\n';
 autogen += themejson.properties.patterns.description + '\n';
 autogen += 'Type: `' + themejson.properties.patterns.type + '`.\n\n';
 
