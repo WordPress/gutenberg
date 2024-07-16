@@ -66,20 +66,6 @@ const TOKEN_PATTERN = new RegExp( START_TOKEN + '[^]*' + END_TOKEN );
 const themejson = await $RefParser.dereference( THEME_JSON_SCHEMA_FILE );
 
 /**
- * Convert object keys to an array.
- * Gracefully handles non-object values.
- *
- * @param {*} maybeObject
- * @return {Array} Object keys
- */
-const keys = ( maybeObject ) => {
-	if ( typeof maybeObject !== 'object' ) {
-		return [];
-	}
-	return Object.keys( maybeObject );
-};
-
-/**
  * Convert settings properties to markup.
  *
  * @param {Object} struct
@@ -90,7 +76,7 @@ const getSettingsPropertiesMarkup = ( struct ) => {
 		return '';
 	}
 	const props = struct.properties;
-	const ks = keys( props );
+	const ks = Object.keys( props );
 	if ( ks.length < 1 ) {
 		return '';
 	}
@@ -102,7 +88,9 @@ const getSettingsPropertiesMarkup = ( struct ) => {
 		let type = props[ key ].type || '';
 		let ps =
 			props[ key ].type === 'array'
-				? keys( props[ key ].items.properties ).sort().join( ', ' )
+				? Object.keys( props[ key ].items?.properties ?? {} )
+						.sort()
+						.join( ', ' )
 				: '';
 
 		/*
@@ -121,7 +109,9 @@ const getSettingsPropertiesMarkup = ( struct ) => {
 					.map( ( item ) =>
 						item?.type === 'object' && item?.properties
 							? '_{' +
-							  keys( item.properties ).sort().join( ', ' ) +
+							  Object.keys( item.properties )
+									.sort()
+									.join( ', ' ) +
 							  '}_'
 							: ''
 					)
@@ -146,7 +136,7 @@ const getStylePropertiesMarkup = ( struct ) => {
 		return '';
 	}
 	const props = struct.properties;
-	const ks = keys( props );
+	const ks = Object.keys( props );
 	if ( ks.length < 1 ) {
 		return '';
 	}
@@ -156,7 +146,7 @@ const getStylePropertiesMarkup = ( struct ) => {
 	ks.forEach( ( key ) => {
 		const ps =
 			props[ key ].type === 'object'
-				? keys( props[ key ].properties ).sort().join( ', ' )
+				? Object.keys( props[ key ].properties ).sort().join( ', ' )
 				: '';
 		const type = formatType( props[ key ] );
 		markup += `| ${ key } | ${ type } | ${ ps } |\n`;
@@ -227,7 +217,7 @@ const settings = Object.entries( themejson.definitions )
 			Object.assign( settingsObj, properties ),
 		{}
 	);
-const settingSections = keys( settings );
+const settingSections = Object.keys( settings );
 autogen += '## Settings' + '\n\n';
 settingSections.forEach( ( section ) => {
 	autogen += getSectionMarkup( section, settings[ section ], 'settings' );
@@ -249,7 +239,7 @@ const templateTableGeneration = ( themeJson, context ) => {
 		'Type: `' + themeJson.properties[ context ].items.type + '`.\n\n';
 	content += '| Property | Description | Type |\n';
 	content += '| ---      | ---         | ---  |\n';
-	keys( themeJson.properties[ context ].items.properties ).forEach(
+	Object.keys( themeJson.properties[ context ].items.properties ).forEach(
 		( key ) => {
 			content += `| ${ key } | ${ themeJson.properties[ context ].items.properties[ key ].description } | ${ themeJson.properties[ context ].items.properties[ key ].type } |\n`;
 		}
