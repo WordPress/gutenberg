@@ -15,7 +15,6 @@
 		"__experimentalExposeControlsToChildren": true,
 		"color": {
 			"gradients": true,
-			"button": true,
 			"text": false,
 			"__experimentalDefaultControls": {
 				"background": true
