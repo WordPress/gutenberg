@@ -149,17 +149,12 @@ const getStylePropertiesMarkup = ( { properties } ) => {
  * Parses a section for description and properties and
  * returns a marked up version.
  *
- * @param {string} title
- * @param {Object} data
- * @param {string} type  settings|style
+ * @param {string}   title
+ * @param {Object}   data
+ * @param {Function} markupFn
  * @return {string} markup
  */
-const getSectionMarkup = ( title, data, type ) => {
-	const markupFn =
-		type === 'settings'
-			? getSettingsPropertiesMarkup
-			: getStylePropertiesMarkup;
-
+const getSectionMarkup = ( title, data, markupFn ) => {
 	return `
 ### ${ title }
 
@@ -209,7 +204,7 @@ settings.unshift( [
 ] );
 autogen += '## Settings' + '\n\n';
 settings.forEach( ( [ section, data ] ) => {
-	autogen += getSectionMarkup( section, data, 'settings' );
+	autogen += getSectionMarkup( section, data, getSettingsPropertiesMarkup );
 } );
 
 // Styles
@@ -218,7 +213,7 @@ const styles = Object.entries(
 );
 autogen += '## Styles' + '\n\n';
 styles.forEach( ( [ section, data ] ) => {
-	autogen += getSectionMarkup( section, data, 'styles' );
+	autogen += getSectionMarkup( section, data, getStylePropertiesMarkup );
 } );
 
 const templateTableGeneration = ( themeJson, context ) => {
