@@ -20,12 +20,7 @@ const BackButton = Fill;
 const BackButtonSlot = () => {
 	const fills = useSlotFills( slotName );
 
-	return (
-		<Slot
-			bubblesVirtually
-			fillProps={ { length: ! fills ? 0 : fills.length } }
-		/>
-	);
+	return <Slot fillProps={ { length: ! fills ? 0 : fills.length } } />;
 };
 BackButton.Slot = BackButtonSlot;
 
