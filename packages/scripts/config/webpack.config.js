@@ -13,6 +13,7 @@ const RtlCssPlugin = require( 'rtlcss-webpack-plugin' );
 const TerserPlugin = require( 'terser-webpack-plugin' );
 const { realpathSync } = require( 'fs' );
 const { sync: glob } = require( 'fast-glob' );
+const { validate } = require( 'schema-utils' );
 
 /**
  * WordPress dependencies
@@ -49,6 +50,18 @@ const hasExperimentalModulesFlag = getAsBooleanFromENV(
 	'WP_EXPERIMENTAL_MODULES'
 );
 
+const phpFilePathsPluginSchema = {
+	type: 'object',
+	properties: {
+		props: {
+			type: 'array',
+			items: {
+				type: 'string',
+			},
+		},
+	},
+};
+
 /**
  * The plugin recomputes PHP file paths once on each compilation. It is necessary to avoid repeating processing
  * when filtering every discovered PHP file in the source folder. This is the most performant way to ensure that
@@ -62,14 +75,20 @@ class PhpFilePathsPlugin {
 	 */
 	static paths;
 
+	constructor( options = {} ) {
+		validate( phpFilePathsPluginSchema, options, {
+			name: 'PHP File Paths Plugin',
+			baseDataPath: 'options',
+		} );
+
+		this.options = options;
+	}
+
 	apply( compiler ) {
 		const pluginName = this.constructor.name;
 
 		compiler.hooks.thisCompilation.tap( pluginName, () => {
-			this.constructor.paths = getPhpFilePaths( [
-				'render',
-				'variations',
-			] );
+			this.constructor.paths = getPhpFilePaths( this.options.props );
 		} );
 	}
 }
@@ -324,7 +343,7 @@ const scriptConfig = {
 				cleanStaleWebpackAssets: false,
 			} ),
 
-		new PhpFilePathsPlugin(),
+		new PhpFilePathsPlugin( { props: [ 'render', 'variations' ] } ),
 		new CopyWebpackPlugin( {
 			patterns: [
 				{
