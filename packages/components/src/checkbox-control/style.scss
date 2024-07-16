@@ -61,8 +61,8 @@
 	margin-right: var(--checkbox-input-margin);
 	vertical-align: middle;
 	width: var(--checkbox-input-size);
-	height: var(--checkbox-input-size);
 	aspect-ratio: 1;
+	line-height: 1; // maintains proper height even with WP common.css
 	flex-shrink: 0;
 }
 
