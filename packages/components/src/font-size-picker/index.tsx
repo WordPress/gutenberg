@@ -45,19 +45,6 @@ const DEFAULT_UNITS = [ 'px', 'em', 'rem', 'vw', 'vh' ];
 const shouldUseSelectOverToggle = ( howManyfontSizes: number ) =>
 	howManyfontSizes > 5;
 
-const getPickerType = (
-	showCustomValuePicker: boolean,
-	fontSizes: FontSize[]
-): FontSizePickerType => {
-	if ( showCustomValuePicker ) {
-		return 'custom';
-	}
-
-	return shouldUseSelectOverToggle( fontSizes.length )
-		? 'select'
-		: 'togglegroup';
-};
-
 const getHeaderHint = (
 	currentPickerType: FontSizePickerType,
 	selectedFontSize: FontSize | undefined,
@@ -117,14 +104,17 @@ const UnforwardedFontSizePicker = (
 
 	if ( fontSizes.length === 0 && disableCustomFontSizes ) {
 		return null;
+	let currentPickerType;
+	if ( ! disableCustomFontSizes && userRequestedCustom ) {
+		// While showing the custom value picker, switch back to predef only if
+		// `disableCustomFontSizes` is set to `true`.
+		currentPickerType = 'custom' as const;
+	} else {
+		currentPickerType = shouldUseSelectOverToggle( fontSizes.length )
+			? ( 'select' as const )
+			: ( 'togglegroup' as const );
 	}
 
-	const currentPickerType = getPickerType(
-		// If showing the custom value picker, switch back to predef only
-		// if `disableCustomFontSizes` is set to `true`.
-		! disableCustomFontSizes && userRequestedCustom,
-		fontSizes
-	);
 
 	const headerHint = getHeaderHint(
 		currentPickerType,
