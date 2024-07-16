@@ -268,6 +268,7 @@ module.exports = {
 				'packages/*/src/**/*.[tj]s?(x)',
 				'storybook/stories/**/*.[tj]s?(x)',
 			],
+			excludedFiles: [ '**/*.native.js' ],
 			rules: {
 				'no-restricted-syntax': [
 					'error',
