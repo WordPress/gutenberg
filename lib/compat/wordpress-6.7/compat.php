@@ -25,7 +25,7 @@
 function _gutenberg_add_block_templates_from_registry( $query_result, $query, $template_type ) {
 	// Add `plugin` property to templates registered by a plugin.
 	foreach ( $query_result as $key => $value ) {
-		$registered_template = WP_Block_Templates_Registry::get_instance()->get_by_slug( $query_result[ $key ]->slug );
+		$registered_template = WP_Templates_Registry::get_instance()->get_by_slug( $query_result[ $key ]->slug );
 		if ( $registered_template ) {
 			$query_result[ $key ]->plugin = $registered_template->plugin;
 		}
@@ -37,7 +37,7 @@ function _gutenberg_add_block_templates_from_registry( $query_result, $query, $t
 		/*
 		 * Add templates registered in the template registry. Filtering out the ones which have a theme file.
 		 */
-		$registered_templates          = WP_Block_Templates_Registry::get_instance()->get_by_query( $query );
+		$registered_templates          = WP_Templates_Registry::get_instance()->get_by_query( $query );
 		$matching_registered_templates = array_filter(
 			$registered_templates,
 			function ( $registered_template ) use ( $template_files ) {
@@ -64,7 +64,7 @@ add_filter( 'get_block_templates', '_gutenberg_add_block_templates_from_registry
  */
 function _gutenberg_add_block_template_plugin_attribute( $block_template ) {
 	if ( $block_template ) {
-		$registered_template = WP_Block_Templates_Registry::get_instance()->get_by_slug( $block_template->slug );
+		$registered_template = WP_Templates_Registry::get_instance()->get_by_slug( $block_template->slug );
 		if ( $registered_template ) {
 			$block_template->plugin = $registered_template->plugin;
 		}
@@ -83,7 +83,7 @@ add_filter( 'get_block_template', '_gutenberg_add_block_template_plugin_attribut
  */
 function _gutenberg_add_block_file_templates_from_registry( $block_template, $id ) {
 	if ( $block_template ) {
-		$registered_template = WP_Block_Templates_Registry::get_instance()->get_by_slug( $block_template->slug );
+		$registered_template = WP_Templates_Registry::get_instance()->get_by_slug( $block_template->slug );
 		if ( $registered_template ) {
 			$block_template->plugin = $registered_template->plugin;
 		}
@@ -97,6 +97,6 @@ function _gutenberg_add_block_file_templates_from_registry( $block_template, $id
 	}
 
 	list( , $slug ) = $parts;
-	return WP_Block_Templates_Registry::get_instance()->get_by_slug( $slug );
+	return WP_Templates_Registry::get_instance()->get_by_slug( $slug );
 }
 add_filter( 'get_block_file_template', '_gutenberg_add_block_file_templates_from_registry', 10, 2 );
