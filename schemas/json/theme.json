@@ -827,6 +827,7 @@
 					"$ref": "#/definitions/settingsProperties"
 				},
 				{
+					"type": "object",
 					"propertyNames": {
 						"$ref": "#/definitions/settingsPropertyNames"
 					}
@@ -1891,12 +1892,12 @@
 			]
 		},
 		"stylesPropertiesComplete": {
-			"type": "object",
 			"allOf": [
 				{
 					"$ref": "#/definitions/stylesProperties"
 				},
 				{
+					"type": "object",
 					"propertyNames": {
 						"$ref": "#/definitions/stylesPropertyNames"
 					}
@@ -1938,7 +1939,6 @@
 		},
 		"stylesElementsPropertiesComplete": {
 			"description": "Styles defined on a per-element basis using the element's selector.",
-			"type": "object",
 			"properties": {
 				"button": {
 					"allOf": [
@@ -1949,6 +1949,7 @@
 							"$ref": "#/definitions/stylesElementsPseudoSelectorsProperties"
 						},
 						{
+							"type": "object",
 							"propertyNames": {
 								"anyOf": [
 									{
@@ -1971,6 +1972,7 @@
 							"$ref": "#/definitions/stylesElementsPseudoSelectorsProperties"
 						},
 						{
+							"type": "object",
 							"propertyNames": {
 								"anyOf": [
 									{
@@ -2326,6 +2328,7 @@
 					"$ref": "#/definitions/stylesProperties"
 				},
 				{
+					"type": "object",
 					"properties": {
 						"elements": {
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"
@@ -2336,6 +2339,7 @@
 					}
 				},
 				{
+					"type": "object",
 					"propertyNames": {
 						"anyOf": [
 							{
@@ -2363,6 +2367,7 @@
 					"$ref": "#/definitions/stylesProperties"
 				},
 				{
+					"type": "object",
 					"properties": {
 						"elements": {
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"
@@ -2373,6 +2378,7 @@
 					}
 				},
 				{
+					"type": "object",
 					"propertyNames": {
 						"anyOf": [
 							{
@@ -2400,6 +2406,7 @@
 					"$ref": "#/definitions/stylesProperties"
 				},
 				{
+					"type": "object",
 					"properties": {
 						"elements": {
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"
@@ -2410,6 +2417,7 @@
 					}
 				},
 				{
+					"type": "object",
 					"propertyNames": {
 						"anyOf": [
 							{
@@ -2734,6 +2742,7 @@
 					"$ref": "#/definitions/stylesProperties"
 				},
 				{
+					"type": "object",
 					"properties": {
 						"elements": {
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"
@@ -2741,6 +2750,7 @@
 					}
 				},
 				{
+					"type": "object",
 					"propertyNames": {
 						"anyOf": [
 							{
@@ -2792,6 +2802,7 @@
 					"$ref": "#/definitions/settingsProperties"
 				},
 				{
+					"type": "object",
 					"properties": {
 						"useRootPaddingAwareAlignments": {
 							"description": "Enables root padding (the values from `styles.spacing.padding`) to be applied to the contents of full-width blocks instead of the root block.\n\nPlease note that when using this setting, `styles.spacing.padding` should always be set as an object with `top`, `right`, `bottom`, `left` values declared separately.",
@@ -2804,6 +2815,7 @@
 					}
 				},
 				{
+					"type": "object",
 					"propertyNames": {
 						"anyOf": [
 							{
@@ -2827,6 +2839,7 @@
 					"$ref": "#/definitions/stylesProperties"
 				},
 				{
+					"type": "object",
 					"properties": {
 						"elements": {
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"
@@ -2840,6 +2853,7 @@
 					}
 				},
 				{
+					"type": "object",
 					"propertyNames": {
 						"anyOf": [
 							{
