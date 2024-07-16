@@ -55,7 +55,7 @@ function FontFamilies() {
 						<Subtitle level={ 3 }>
 							{
 								/* translators: Heading for a list of fonts provided by the theme. */
-								_x( 'Theme' )
+								_x( 'Theme', 'font source' )
 							}
 						</Subtitle>
 						<ItemGroup isBordered isSeparated>
@@ -73,7 +73,7 @@ function FontFamilies() {
 						<Subtitle level={ 3 }>
 							{
 								/* translators: Heading for a list of fonts installed by the user. */
-								_x( 'Custom' )
+								_x( 'Custom', 'font source' )
 							}
 						</Subtitle>
 						<ItemGroup isBordered isSeparated>

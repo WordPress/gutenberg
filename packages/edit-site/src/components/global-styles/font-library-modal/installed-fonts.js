@@ -174,7 +174,7 @@ function InstalledFonts() {
 										<h2 className="font-library-modal__fonts-title">
 											{
 												/* translators: Heading for a list of fonts provided by the theme. */
-												_x( 'Theme' )
+												_x( 'Theme', 'font source' )
 											}
 										</h2>
 										{ /*
@@ -214,7 +214,7 @@ function InstalledFonts() {
 										<h2 className="font-library-modal__fonts-title">
 											{
 												/* translators: Heading for a list of fonts installed by the user. */
-												_x( 'Custom' )
+												_x( 'Custom', 'font source' )
 											}
 										</h2>
 										{ /*
