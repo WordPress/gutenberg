@@ -193,6 +193,13 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 		box-shadow: none;
 	}
 
+	&[role="button"]::before {
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+	}
+
 	// Lightened spot color focus.
 	&:focus::before {
 		box-shadow:
