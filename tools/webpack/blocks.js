@@ -152,7 +152,7 @@ module.exports = [
 							filter: ( filepath ) => {
 								return (
 									filepath.endsWith( sep + 'index.php' ) ||
-									PhpFilePathsPlugin.renderPaths.includes(
+									PhpFilePathsPlugin.paths.includes(
 										realpathSync( filepath ).replace(
 											/\\/g,
 											'/'
