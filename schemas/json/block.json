@@ -1,6 +1,6 @@
 {
 	"title": "JSON schema for WordPress blocks",
-	"$schema": "http://json-schema.org/draft-04/schema#",
+	"$schema": "http://json-schema.org/draft-07/schema#",
 	"definitions": {
 		"//": {
 			"reference": "https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/",
