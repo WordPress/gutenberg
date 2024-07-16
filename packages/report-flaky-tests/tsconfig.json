@@ -2,11 +2,11 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
+		"isolatedDeclarations": false,
+
 		"module": "CommonJS",
-		"declarationDir": "build-types",
-		"rootDir": "src",
 		"types": [ "jest" ]
 	},
-	"include": [ "src/**/*" ],
+	"include": [ "src" ],
 	"exclude": [ "src/__tests__/**/*", "src/__fixtures__/**/*" ]
 }

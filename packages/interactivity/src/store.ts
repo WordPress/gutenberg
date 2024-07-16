@@ -41,7 +41,7 @@ const deepMerge = ( target: any, source: any ) => {
 	}
 };
 
-export const stores = new Map();
+export const stores: Map< string, object > = new Map();
 const rawStores = new Map();
 const storeLocks = new Map();
 const storeConfigs = new Map();
@@ -176,7 +176,7 @@ const handlers = {
  * @param namespace Store's namespace from which to retrieve the config.
  * @return Defined config for the given namespace.
  */
-export const getConfig = ( namespace?: string ) =>
+export const getConfig = ( namespace?: string ): any =>
 	storeConfigs.get( namespace || getNamespace() ) || {};
 
 interface StoreOptions {
@@ -318,7 +318,7 @@ export function store(
 	return stores.get( namespace );
 }
 
-export const parseInitialData = ( dom = document ) => {
+export const parseInitialData = ( dom: Document = document ): unknown => {
 	const jsonDataScriptTag =
 		// Preferred Script Module data passing form
 		dom.getElementById(
@@ -334,19 +334,23 @@ export const parseInitialData = ( dom = document ) => {
 	return {};
 };
 
-export const populateInitialData = ( data?: {
-	state?: Record< string, unknown >;
-	config?: Record< string, unknown >;
-} ) => {
-	if ( isObject( data?.state ) ) {
-		Object.entries( data!.state ).forEach( ( [ namespace, state ] ) => {
+export const populateInitialData = ( data?: unknown ): void => {
+	// eslint-disable-next-line dot-notation
+	if ( isObject( data?.[ 'state' ] ) ) {
+		// eslint-disable-next-line dot-notation
+		Object.entries( data[ 'state' ] ).forEach( ( [ namespace, state ] ) => {
 			store( namespace, { state }, { lock: universalUnlock } );
 		} );
 	}
-	if ( isObject( data?.config ) ) {
-		Object.entries( data!.config ).forEach( ( [ namespace, config ] ) => {
-			storeConfigs.set( namespace, config );
-		} );
+
+	// eslint-disable-next-line dot-notation
+	if ( isObject( data?.[ 'config' ] ) ) {
+		// eslint-disable-next-line dot-notation
+		Object.entries( data[ 'config' ] ).forEach(
+			( [ namespace, config ] ) => {
+				storeConfigs.set( namespace, config );
+			}
+		);
 	}
 };
 

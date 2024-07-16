@@ -82,7 +82,7 @@ ${ TEST_RESULTS_LIST.close }
 `;
 }
 
-function formatTestErrorMessage( flakyTestResult: FlakyTestResult ) {
+function formatTestErrorMessage( flakyTestResult: FlakyTestResult ): string {
 	switch ( flakyTestResult.runner ) {
 		case '@playwright/test': {
 			// Could do a slightly better formatting than this.
@@ -119,7 +119,7 @@ function formatTestResults( {
 	headBranch,
 	runURL,
 	errorMessage,
-}: ParsedTestResult ) {
+}: ParsedTestResult ): string {
 	const dateString = date.toISOString();
 
 	// It will look something like this without formatting:
@@ -168,7 +168,10 @@ ${ formattedTestResults }` );
 	};
 }
 
-function parseIssueBody( body: string ) {
+function parseIssueBody( body: string ): {
+	meta: MetaData;
+	testResults: ParsedTestResult[];
+} {
 	const meta = metaData.get( body );
 
 	if ( ! meta ) {
@@ -225,7 +228,7 @@ ${ reportedIssues
 	.join( '\n' ) }`;
 }
 
-function isReportComment( body: string ) {
+function isReportComment( body: string ): boolean {
 	return body.startsWith( `<!-- ${ FLAKY_TESTS_REPORT_COMMENT_TOKEN } -->` );
 }
 

@@ -10,8 +10,6 @@ import type { APIFetchOptions } from '@wordpress/api-fetch';
 /**
  * Dispatches a control action for triggering an api fetch call.
  *
- * @param {Object} request Arguments for the fetch request.
- *
  * @example
  * ```js
  * import { apiFetch } from '@wordpress/data-controls';
@@ -24,9 +22,13 @@ import type { APIFetchOptions } from '@wordpress/api-fetch';
  * }
  * ```
  *
- * @return {Object} The control descriptor.
+ * @param request Arguments for the fetch request.
+ * @return The control descriptor.
  */
-export function apiFetch( request: APIFetchOptions ) {
+export function apiFetch( request: APIFetchOptions ): {
+	type: 'API_FETCH';
+	request: APIFetchOptions;
+} {
 	return {
 		type: 'API_FETCH',
 		request,
@@ -45,7 +47,7 @@ export function select(
 	storeNameOrDescriptor: string | StoreDescriptor,
 	selectorName: string,
 	...args: any[]
-) {
+): any {
 	deprecated( '`select` control in `@wordpress/data-controls`', {
 		since: '5.7',
 		alternative: 'built-in `resolveSelect` control in `@wordpress/data`',
@@ -70,7 +72,7 @@ export function syncSelect(
 	storeNameOrDescriptor: string | StoreDescriptor,
 	selectorName: string,
 	...args: any[]
-) {
+): any {
 	deprecated( '`syncSelect` control in `@wordpress/data-controls`', {
 		since: '5.7',
 		alternative: 'built-in `select` control in `@wordpress/data`',
@@ -91,7 +93,7 @@ export function dispatch(
 	storeNameOrDescriptor: string | StoreDescriptor,
 	actionName: string,
 	...args: any[]
-) {
+): any {
 	deprecated( '`dispatch` control in `@wordpress/data-controls`', {
 		since: '5.7',
 		alternative: 'built-in `dispatch` control in `@wordpress/data`',
@@ -102,8 +104,6 @@ export function dispatch(
 
 /**
  * Dispatches a control action for awaiting on a promise to be resolved.
- *
- * @param {Object} promise Promise to wait for.
  *
  * @example
  * ```js
@@ -117,9 +117,13 @@ export function dispatch(
  * }
  * ```
  *
- * @return {Object} The control descriptor.
+ * @param promise Promise to wait for.
+ * @return The control descriptor.
  */
-export const __unstableAwaitPromise = function < T >( promise: Promise< T > ) {
+export const __unstableAwaitPromise = function < T >( promise: Promise< T > ): {
+	type: 'AWAIT_PROMISE';
+	promise: Promise< T >;
+} {
 	return {
 		type: 'AWAIT_PROMISE',
 		promise,
@@ -127,8 +131,7 @@ export const __unstableAwaitPromise = function < T >( promise: Promise< T > ) {
 };
 
 /**
- * The default export is what you use to register the controls with your custom
- * store.
+ * The default export is what you use to register the controls with your custom store.
  *
  * @example
  * ```js
@@ -143,19 +146,22 @@ export const __unstableAwaitPromise = function < T >( promise: Promise< T > ) {
  * import * as resolvers from './resolvers';
  *
  * registerStore( 'my-custom-store', {
- * reducer,
- * controls,
- * actions,
- * selectors,
- * resolvers,
+ * 	reducer,
+ * 	controls,
+ * 	actions,
+ * 	selectors,
+ * 	resolvers,
  * } );
  * ```
- * @return {Object} An object for registering the default controls with the
- * store.
  */
 export const controls = {
-	AWAIT_PROMISE: < T >( { promise }: { promise: Promise< T > } ) => promise,
-	API_FETCH( { request }: { request: APIFetchOptions } ) {
+	AWAIT_PROMISE: < T >( {
+		promise,
+	}: {
+		promise: Promise< T >;
+	} ): Promise< T > => promise,
+
+	API_FETCH( { request }: { request: APIFetchOptions } ): Promise< unknown > {
 		return triggerFetch( request );
 	},
 };

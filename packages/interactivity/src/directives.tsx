@@ -253,7 +253,7 @@ const getGlobalAsyncEventDirective = ( type: 'window' | 'document' ) => {
 	};
 };
 
-export default () => {
+export default (): void => {
 	// data-wp-context
 	directive(
 		'context',

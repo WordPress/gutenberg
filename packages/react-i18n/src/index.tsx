@@ -103,7 +103,7 @@ export function I18nProvider( props: I18nProviderProps ): JSX.Element {
  * }
  * ```
  */
-export const useI18n = () => useContext( I18nContext );
+export const useI18n = (): I18nContextProps => useContext( I18nContext );
 
 type PropsAndI18n< P > = Pick<
 	P,

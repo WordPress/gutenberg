@@ -36,7 +36,7 @@ const directiveParser = new RegExp(
 // forward slashes. References don't have any restrictions.
 const nsPathRegExp = /^([\w_\/-]+)::(.+)$/;
 
-export const hydratedIslands = new WeakSet();
+export const hydratedIslands: WeakSet< Element > = new WeakSet();
 
 /**
  * Recursive function that transforms a DOM tree into vDOM.

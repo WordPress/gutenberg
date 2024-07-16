@@ -2,10 +2,11 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"rootDir": "src",
-		"declarationDir": "build-types",
-		"types": [ "gutenberg-env" ],
-		"strictNullChecks": true
+		"allowJs": true,
+		"checkJs": false,
+		"isolatedDeclarations": false,
+
+		"types": [ "gutenberg-env" ]
 	},
 	"references": [
 		{ "path": "../a11y" },
@@ -36,5 +37,5 @@
 		{ "path": "../url" },
 		{ "path": "../wordcount" }
 	],
-	"include": [ "src/**/*.ts", "src/**/*.tsx" ]
+	"include": [ "src" ]
 }

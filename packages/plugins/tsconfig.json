@@ -2,8 +2,10 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"rootDir": "src",
-		"declarationDir": "build-types",
+		"allowJs": true,
+		"checkJs": true,
+		"isolatedDeclarations": false,
+
 		"types": [ "gutenberg-env" ]
 	},
 	"references": [
@@ -14,5 +16,5 @@
 		{ "path": "../icons" },
 		{ "path": "../is-shallow-equal" }
 	],
-	"include": [ "src/**/*" ]
+	"include": [ "src" ]
 }

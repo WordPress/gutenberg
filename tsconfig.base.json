@@ -1,8 +1,7 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"compilerOptions": {
-		"allowJs": true,
-		"checkJs": true,
+		"allowJs": false,
 		"allowSyntheticDefaultImports": true,
 		"jsx": "preserve",
 		"target": "esnext",
@@ -13,6 +12,7 @@
 		"composite": true,
 		"emitDeclarationOnly": true,
 		"isolatedModules": true,
+		"isolatedDeclarations": true,
 
 		"skipDefaultLibCheck": true,
 
@@ -31,7 +31,11 @@
 		"resolveJsonModule": true,
 
 		"typeRoots": [ "./typings", "./node_modules/@types" ],
-		"types": []
+		"types": [],
+
+		/* Configure package-specific settings */
+		"rootDir": "${configDir}/src",
+		"declarationDir": "${configDir}/build-types"
 	},
 	"exclude": [
 		"**/*.android.js",

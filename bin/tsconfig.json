@@ -2,6 +2,10 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../tsconfig.base.json",
 	"compilerOptions": {
+		"allowJs": true,
+		"checkJs": true,
+		"isolatedDeclarations": false,
+
 		"module": "commonjs",
 		"esModuleInterop": true,
 		"target": "ES6",

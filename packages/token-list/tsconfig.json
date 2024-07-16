@@ -2,8 +2,9 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"rootDir": "src",
-		"outDir": "build-types"
+		// This is blocked on allowing a Symbol.iterator computed property.
+		// https://github.com/microsoft/TypeScript/issues/58800
+		"isolatedDeclarations": false
 	},
-	"include": [ "src/**/*" ]
+	"include": [ "src" ]
 }
