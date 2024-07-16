@@ -82,10 +82,10 @@ Settings related to colors.
 | defaultDuotone | boolean | true |  |
 | defaultGradients | boolean | true |  |
 | defaultPalette | boolean | true |  |
-| duotone | array |  | name, slug, colors |
-| gradients | array |  | name, slug, gradient |
+| duotone | array |  | _[ { name, slug, colors } ]_ |
+| gradients | array |  | _[ { name, slug, gradient } ]_ |
 | link | boolean | false |  |
-| palette | array |  | name, slug, color |
+| palette | array |  | _[ { name, slug, color } ]_ |
 | text | boolean | true |  |
 | heading | boolean | true |  |
 | button | boolean | true |  |
@@ -101,7 +101,7 @@ Settings related to dimensions.
 | ---       | ---    | ---     | ---    |
 | aspectRatio | boolean | false |  |
 | defaultAspectRatios | boolean | true |  |
-| aspectRatios | array |  | name, slug, ratio |
+| aspectRatios | array |  | _[ { name, slug, ratio } ]_ |
 | minHeight | boolean | false |  |
 
 ---
@@ -148,7 +148,7 @@ Settings related to shadows.
 | Property  | Type   | Default | Props  |
 | ---       | ---    | ---     | ---    |
 | defaultPresets | boolean | true |  |
-| presets | array |  | name, slug, shadow |
+| presets | array |  | _[ { name, slug, shadow } ]_ |
 
 ---
 
@@ -158,14 +158,14 @@ Settings related to spacing.
 
 | Property  | Type   | Default | Props  |
 | ---       | ---    | ---     | ---    |
-| blockGap | boolean, null |  |   |
+| blockGap | boolean, null |  |  |
 | margin | boolean | false |  |
 | padding | boolean | false |  |
 | units | array | px,em,rem,vh,vw,% |  |
 | customSpacingSize | boolean | true |  |
 | defaultSpacingSizes | boolean | true |  |
-| spacingSizes | array |  | name, slug, size |
-| spacingScale | object |  |  |
+| spacingSizes | array |  | _[ { name, slug, size } ]_ |
+| spacingScale | object |  | _{ operator, increment, steps, mediumStep, unit }_ |
 
 ---
 
@@ -179,7 +179,7 @@ Settings related to typography.
 | customFontSize | boolean | true |  |
 | fontStyle | boolean | true |  |
 | fontWeight | boolean | true |  |
-| fluid | object, boolean | false | _{minFontSize, maxViewportWidth, minViewportWidth}_  |
+| fluid | object, boolean | false | _{ minFontSize, maxViewportWidth, minViewportWidth }_ |
 | letterSpacing | boolean | true |  |
 | lineHeight | boolean | false |  |
 | textAlign | boolean | true |  |
@@ -188,8 +188,8 @@ Settings related to typography.
 | writingMode | boolean | false |  |
 | textTransform | boolean | true |  |
 | dropCap | boolean | true |  |
-| fontSizes | array |  | name, slug, size, fluid |
-| fontFamilies | array |  | name, slug, fontFamily, fontFace |
+| fontSizes | array |  | _[ { name, slug, size, fluid } ]_ |
+| fontFamilies | array |  | _[ { name, slug, fontFamily, fontFace } ]_ |
 
 ---
 
@@ -207,11 +207,11 @@ Background styles.
 
 | Property  | Type   | Props  |
 | ---       | ---    | ---    |
-| backgroundImage | string, object |  |
-| backgroundPosition | string, object |  |
-| backgroundRepeat | string, object |  |
-| backgroundSize | string, object |  |
-| backgroundAttachment | string, object |  |
+| backgroundImage | string, object | _{ ref }_, _{ url }_ |
+| backgroundPosition | string, object | _{ ref }_ |
+| backgroundRepeat | string, object | _{ ref }_ |
+| backgroundSize | string, object | _{ ref }_ |
+| backgroundAttachment | string, object | _{ ref }_ |
 
 ---
 
@@ -221,14 +221,14 @@ Border styles.
 
 | Property  | Type   | Props  |
 | ---       | ---    | ---    |
-| color | string, object |  |
-| radius | string, object |  |
-| style | string, object |  |
-| width | string, object |  |
-| top | object | color, style, width |
-| right | object | color, style, width |
-| bottom | object | color, style, width |
-| left | object | color, style, width |
+| color | string, object | _{ ref }_ |
+| radius | string, object | _{ ref }_, _{ topLeft, topRight, bottomLeft, bottomRight }_ |
+| style | string, object | _{ ref }_ |
+| width | string, object | _{ ref }_ |
+| top | object | _{ color, style, width }_ |
+| right | object | _{ color, style, width }_ |
+| bottom | object | _{ color, style, width }_ |
+| left | object | _{ color, style, width }_ |
 
 ---
 
@@ -238,9 +238,9 @@ Color styles.
 
 | Property  | Type   | Props  |
 | ---       | ---    | ---    |
-| background | string, object |  |
-| gradient | string, object |  |
-| text | string, object |  |
+| background | string, object | _{ ref }_ |
+| gradient | string, object | _{ ref }_ |
+| text | string, object | _{ ref }_ |
 
 ---
 
@@ -256,8 +256,8 @@ Dimensions styles
 
 | Property  | Type   | Props  |
 | ---       | ---    | ---    |
-| aspectRatio | string, object |  |
-| minHeight | string, object |  |
+| aspectRatio | string, object | _{ ref }_ |
+| minHeight | string, object | _{ ref }_ |
 
 ---
 
@@ -267,7 +267,7 @@ CSS and SVG filter styles.
 
 | Property  | Type   | Props  |
 | ---       | ---    | ---    |
-| duotone | string, object |  |
+| duotone | string, object | _{ ref }_ |
 
 ---
 
@@ -277,10 +277,10 @@ Outline styles.
 
 | Property  | Type   | Props  |
 | ---       | ---    | ---    |
-| color | string, object |  |
-| offset | string, object |  |
-| style | string, object |  |
-| width | string, object |  |
+| color | string, object | _{ ref }_ |
+| offset | string, object | _{ ref }_ |
+| style | string, object | _{ ref }_ |
+| width | string, object | _{ ref }_ |
 
 ---
 
@@ -296,9 +296,9 @@ Spacing styles.
 
 | Property  | Type   | Props  |
 | ---       | ---    | ---    |
-| blockGap | string, object |  |
-| margin | object | top, right, bottom, left |
-| padding | object | top, right, bottom, left |
+| blockGap | string, object | _{ ref }_ |
+| margin | object | _{ top, right, bottom, left }_ |
+| padding | object | _{ top, right, bottom, left }_ |
 
 ---
 
@@ -308,17 +308,17 @@ Typography styles.
 
 | Property  | Type   | Props  |
 | ---       | ---    | ---    |
-| fontFamily | string, object |  |
-| fontSize | string, object |  |
-| fontStyle | string, object |  |
-| fontWeight | string, object |  |
-| letterSpacing | string, object |  |
-| lineHeight | string, object |  |
-| textAlign | string, object |  |
-| textColumns | string, object |  |
-| textDecoration | string, object |  |
-| writingMode | string, object |  |
-| textTransform | string, object |  |
+| fontFamily | string, object | _{ ref }_ |
+| fontSize | string, object | _{ ref }_ |
+| fontStyle | string, object | _{ ref }_ |
+| fontWeight | string, object | _{ ref }_ |
+| letterSpacing | string, object | _{ ref }_ |
+| lineHeight | string, object | _{ ref }_ |
+| textAlign | string, object | _{ ref }_ |
+| textColumns | string, object | _{ ref }_ |
+| textDecoration | string, object | _{ ref }_ |
+| writingMode | string, object | _{ ref }_ |
+| textTransform | string, object | _{ ref }_ |
 
 ---
 
