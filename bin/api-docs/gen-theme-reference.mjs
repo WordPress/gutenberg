@@ -208,27 +208,21 @@ const formatType = ( prop ) => {
 };
 
 // Settings
-const settings = Object.entries( themejson.definitions )
-	.filter( ( [ settingsKey ] ) =>
-		/^settings\w+Properties$/.test( settingsKey )
-	)
-	.reduce(
-		( settingsObj, [ , { properties } ] ) =>
-			Object.assign( settingsObj, properties ),
-		{}
-	);
-const settingSections = Object.keys( settings );
+const settings = themejson.definitions.settingsProperties.allOf.flatMap(
+	( settingsProperties ) => Object.entries( settingsProperties.properties )
+);
 autogen += '## Settings' + '\n\n';
-settingSections.forEach( ( section ) => {
-	autogen += getSectionMarkup( section, settings[ section ], 'settings' );
+settings.forEach( ( [ section, data ] ) => {
+	autogen += getSectionMarkup( section, data, 'settings' );
 } );
 
 // Styles
-const styles = themejson.definitions.stylesProperties.properties;
-const styleSections = keys( styles );
+const styles = Object.entries(
+	themejson.definitions.stylesProperties.properties
+);
 autogen += '## Styles' + '\n\n';
-styleSections.forEach( ( section ) => {
-	autogen += getSectionMarkup( section, styles[ section ], 'styles' );
+styles.forEach( ( [ section, data ] ) => {
+	autogen += getSectionMarkup( section, data, 'styles' );
 } );
 
 const templateTableGeneration = ( themeJson, context ) => {
