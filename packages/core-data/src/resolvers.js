@@ -419,8 +419,7 @@ export const canUser =
 		// Optional chaining operator is used here because the API requests don't
 		// return the expected result in the native version. Instead, API requests
 		// only return the result, without including response properties like the headers.
-		const allowHeader = response.headers?.get( 'allow' );
-		const allowedMethods = allowHeader?.allow || allowHeader || '';
+		const allowedMethods = response.headers?.get( 'allow' ) || '';
 
 		const permissions = {};
 		const methods = {
