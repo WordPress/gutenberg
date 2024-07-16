@@ -1,6 +1,6 @@
 {
 	"title": "JSON schema for WordPress block theme global settings and styles",
-	"$schema": "http://json-schema.org/draft-04/schema#",
+	"$schema": "http://json-schema.org/draft-07/schema#",
 	"definitions": {
 		"//": {
 			"explainer": "https://developer.wordpress.org/themes/advanced-topics/theme-json/",
@@ -469,8 +469,7 @@
 								"increment": {
 									"description": "The amount to increment each step by.",
 									"type": "number",
-									"exclusiveMinimum": true,
-									"minimum": 0,
+									"exclusiveMinimum": 0,
 									"default": 1.5
 								},
 								"steps": {
@@ -483,8 +482,7 @@
 								"mediumStep": {
 									"description": "The value to medium setting in the scale.",
 									"type": "number",
-									"exclusiveMinimum": true,
-									"minimum": 0,
+									"exclusiveMinimum": 0,
 									"default": 1.5
 								},
 								"unit": {
@@ -821,18 +819,18 @@
 				},
 				{
 					"properties": {
-						"appearanceTools": {},
-						"background": {},
-						"border": {},
-						"color": {},
-						"dimensions": {},
-						"layout": {},
-						"lightbox": {},
-						"position": {},
-						"shadow": {},
-						"spacing": {},
-						"typography": {},
-						"custom": {}
+						"appearanceTools": true,
+						"background": true,
+						"border": true,
+						"color": true,
+						"dimensions": true,
+						"layout": true,
+						"lightbox": true,
+						"position": true,
+						"shadow": true,
+						"spacing": true,
+						"typography": true,
+						"custom": true
 					},
 					"additionalProperties": false
 				}
@@ -1889,16 +1887,16 @@
 				},
 				{
 					"properties": {
-						"background": {},
-						"border": {},
-						"color": {},
-						"dimensions": {},
-						"spacing": {},
-						"typography": {},
-						"filter": {},
-						"shadow": {},
-						"outline": {},
-						"css": {}
+						"background": true,
+						"border": true,
+						"color": true,
+						"dimensions": true,
+						"spacing": true,
+						"typography": true,
+						"filter": true,
+						"shadow": true,
+						"outline": true,
+						"css": true
 					},
 					"additionalProperties": false
 				}
@@ -1916,16 +1914,16 @@
 						},
 						{
 							"properties": {
-								"border": {},
-								"background": {},
-								"color": {},
-								"dimensions": {},
-								"filter": {},
-								"shadow": {},
-								"outline": {},
-								"spacing": {},
-								"typography": {},
-								"css": {},
+								"border": true,
+								"background": true,
+								"color": true,
+								"dimensions": true,
+								"filter": true,
+								"shadow": true,
+								"outline": true,
+								"spacing": true,
+								"typography": true,
+								"css": true,
 								":hover": {
 									"$ref": "#/definitions/stylesPropertiesComplete"
 								},
@@ -1957,16 +1955,16 @@
 						},
 						{
 							"properties": {
-								"background": {},
-								"border": {},
-								"color": {},
-								"dimensions": {},
-								"spacing": {},
-								"typography": {},
-								"filter": {},
-								"shadow": {},
-								"outline": {},
-								"css": {},
+								"background": true,
+								"border": true,
+								"color": true,
+								"dimensions": true,
+								"spacing": true,
+								"typography": true,
+								"filter": true,
+								"shadow": true,
+								"outline": true,
+								"css": true,
 								":hover": {
 									"$ref": "#/definitions/stylesPropertiesComplete"
 								},
@@ -2334,16 +2332,16 @@
 				},
 				{
 					"properties": {
-						"background": {},
-						"border": {},
-						"color": {},
-						"dimensions": {},
-						"spacing": {},
-						"typography": {},
-						"filter": {},
-						"shadow": {},
-						"outline": {},
-						"css": {},
+						"background": true,
+						"border": true,
+						"color": true,
+						"dimensions": true,
+						"spacing": true,
+						"typography": true,
+						"filter": true,
+						"shadow": true,
+						"outline": true,
+						"css": true,
 						"elements": {
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"
 						},
@@ -2371,16 +2369,16 @@
 				},
 				{
 					"properties": {
-						"background": {},
-						"border": {},
-						"color": {},
-						"dimensions": {},
-						"spacing": {},
-						"typography": {},
-						"filter": {},
-						"shadow": {},
-						"outline": {},
-						"css": {},
+						"background": true,
+						"border": true,
+						"color": true,
+						"dimensions": true,
+						"spacing": true,
+						"typography": true,
+						"filter": true,
+						"shadow": true,
+						"outline": true,
+						"css": true,
 						"elements": {
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"
 						},
@@ -2408,16 +2406,16 @@
 				},
 				{
 					"properties": {
-						"background": {},
-						"border": {},
-						"color": {},
-						"dimensions": {},
-						"spacing": {},
-						"typography": {},
-						"filter": {},
-						"shadow": {},
-						"outline": {},
-						"css": {},
+						"background": true,
+						"border": true,
+						"color": true,
+						"dimensions": true,
+						"spacing": true,
+						"typography": true,
+						"filter": true,
+						"shadow": true,
+						"outline": true,
+						"css": true,
 						"elements": {
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"
 						},
@@ -2742,16 +2740,16 @@
 				},
 				{
 					"properties": {
-						"background": {},
-						"border": {},
-						"color": {},
-						"dimensions": {},
-						"spacing": {},
-						"typography": {},
-						"filter": {},
-						"shadow": {},
-						"outline": {},
-						"css": {},
+						"background": true,
+						"border": true,
+						"color": true,
+						"dimensions": true,
+						"spacing": true,
+						"typography": true,
+						"filter": true,
+						"shadow": true,
+						"outline": true,
+						"css": true,
 						"elements": {
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"
 						}
@@ -2770,7 +2768,7 @@
 		"version": {
 			"description": "Version of theme.json to use.",
 			"type": "integer",
-			"enum": [ 3 ]
+			"const": 3
 		},
 		"title": {
 			"type": "string",
@@ -2800,21 +2798,21 @@
 				},
 				{
 					"properties": {
-						"appearanceTools": {},
+						"appearanceTools": true,
 						"useRootPaddingAwareAlignments": {
 							"$ref": "#/definitions/settingsPropertiesUseRootPaddingAwareAlignments/properties/useRootPaddingAwareAlignments"
 						},
-						"background": {},
-						"color": {},
-						"layout": {},
-						"lightbox": {},
-						"spacing": {},
-						"typography": {},
-						"border": {},
-						"shadow": {},
-						"position": {},
-						"dimensions": {},
-						"custom": {},
+						"background": true,
+						"color": true,
+						"layout": true,
+						"lightbox": true,
+						"spacing": true,
+						"typography": true,
+						"border": true,
+						"shadow": true,
+						"position": true,
+						"dimensions": true,
+						"custom": true,
 						"blocks": {
 							"$ref": "#/definitions/settingsBlocksPropertiesComplete"
 						}
@@ -2832,16 +2830,16 @@
 				},
 				{
 					"properties": {
-						"background": {},
-						"border": {},
-						"color": {},
-						"dimensions": {},
-						"spacing": {},
-						"typography": {},
-						"filter": {},
-						"shadow": {},
-						"outline": {},
-						"css": {},
+						"background": true,
+						"border": true,
+						"color": true,
+						"dimensions": true,
+						"spacing": true,
+						"typography": true,
+						"filter": true,
+						"shadow": true,
+						"outline": true,
+						"css": true,
 						"elements": {
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"
 						},
