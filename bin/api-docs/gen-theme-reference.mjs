@@ -63,7 +63,7 @@ const TOKEN_PATTERN = new RegExp( START_TOKEN + '[^]*' + END_TOKEN );
  * @return {string} markup
  */
 function getSettingsPropertiesMarkup( { properties } ) {
-	if ( ! properties || typeof properties !== 'object' ) {
+	if ( ! properties ) {
 		return '';
 	}
 
@@ -91,7 +91,7 @@ function getSettingsPropertiesMarkup( { properties } ) {
 			if ( ! props ) {
 				props = subschema.oneOf
 					.map( ( item ) =>
-						item?.type === 'object' && item?.properties
+						item.properties
 							? '_{' +
 							  Object.keys( item.properties ).join( ', ' ) +
 							  '}_'
@@ -114,7 +114,7 @@ function getSettingsPropertiesMarkup( { properties } ) {
  * @return {string} markup
  */
 function getStylePropertiesMarkup( { properties } ) {
-	if ( ! properties || typeof properties !== 'object' ) {
+	if ( ! properties ) {
 		return '';
 	}
 
@@ -139,7 +139,7 @@ function getStylePropertiesMarkup( { properties } ) {
  * @return {string} markup
  */
 function getTemplatePropertiesMarkup( { properties } ) {
-	if ( ! properties || typeof properties !== 'object' ) {
+	if ( ! properties ) {
 		return '';
 	}
 
