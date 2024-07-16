@@ -156,26 +156,21 @@ function getTemplatePropertiesMarkup( { properties } ) {
 /**
  * Format list of types.
  *
- * @param {Object} prop
+ * @param {JSONSchema} schema
  * @return {string} type
  */
-function formatType( prop ) {
-	let type = prop.type || '';
-
-	if ( prop.hasOwnProperty( 'anyOf' ) || prop.hasOwnProperty( 'oneOf' ) ) {
-		const propTypes = prop.anyOf || prop.oneOf;
-		const types = [];
-
-		propTypes.forEach( ( item ) => {
-			if ( item.type ) {
-				types.push( item.type );
-			}
-		} );
-
-		type = [ ...new Set( types ) ].join( ', ' );
+function formatType( schema ) {
+	if ( schema.type ) {
+		return schema.type;
 	}
 
-	return type;
+	const subschemas = schema.anyOf || schema.oneOf;
+	if ( subschemas ) {
+		const types = subschemas.map( ( item ) => item.type ).filter( Boolean );
+		return [ ...new Set( types ) ].join( ', ' );
+	}
+
+	return '';
 }
 
 /**
