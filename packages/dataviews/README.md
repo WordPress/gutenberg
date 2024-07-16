@@ -274,9 +274,9 @@ Function that receives an item and returns an unique identifier for it. By defau
 
 Whether the data is loading. `false` by default.
 
-### `supportedLayouts`: `String[]`
+### `defaultLayouts`: `Record< string, view >`
 
-Array of layouts supported. By default, all are: `table`, `grid`, `list`.
+Default layouts. By default, uses empty layouts: `table`, `grid`, `list`.
 
 ### `onSelectionChange`: `function`
 

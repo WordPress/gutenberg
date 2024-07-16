@@ -38,6 +38,12 @@ import { getValueFromObjectPath, setImmutably } from '../../utils/object';
 import { unlock } from '../../lock-unlock';
 import { setThemeFileUris } from './theme-file-uri-utils';
 
+// Elements that rely on class names in their selectors.
+const ELEMENT_CLASS_NAMES = {
+	button: 'wp-element-button',
+	caption: 'wp-element-caption',
+};
+
 // List of block support features that can have their related styles
 // generated under their own feature level selector rather than the block's.
 const BLOCK_SUPPORT_FEATURE_LEVEL_SELECTORS = {
@@ -651,6 +657,9 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 			nodes.push( {
 				styles: tree.styles?.elements?.[ name ],
 				selector,
+				// Top level elements that don't use a class name should not receive the
+				// `:root :where()` wrapper to maintain backwards compatibility.
+				skipSelectorWrapper: ! ELEMENT_CLASS_NAMES[ name ],
 			} );
 		}
 	} );
@@ -671,7 +680,7 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 						}
 						const variationSelector =
 							blockSelectors[ blockName ]
-								.styleVariationSelectors?.[ variationName ];
+								?.styleVariationSelectors?.[ variationName ];
 
 						// Process the variation's inner element styles.
 						// This comes before the inner block styles so the
@@ -700,18 +709,18 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 								const variationBlockSelector = scopeSelector(
 									variationSelector,
 									blockSelectors[ variationBlockName ]
-										.selector
+										?.selector
 								);
 								const variationDuotoneSelector = scopeSelector(
 									variationSelector,
 									blockSelectors[ variationBlockName ]
-										.duotoneSelector
+										?.duotoneSelector
 								);
 								const variationFeatureSelectors =
 									scopeFeatureSelectors(
 										variationSelector,
 										blockSelectors[ variationBlockName ]
-											.featureSelectors
+											?.featureSelectors
 									);
 
 								const variationBlockStyleNodes =
@@ -728,10 +737,10 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 									featureSelectors: variationFeatureSelectors,
 									fallbackGapValue:
 										blockSelectors[ variationBlockName ]
-											.fallbackGapValue,
+											?.fallbackGapValue,
 									hasLayoutSupport:
 										blockSelectors[ variationBlockName ]
-											.hasLayoutSupport,
+											?.hasLayoutSupport,
 									styles: variationBlockStyleNodes,
 								} );
 
@@ -939,8 +948,8 @@ export const toStyles = (
 			ruleset += `padding-right: 0; padding-left: 0; padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom) }
 				.has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }
 				.has-global-padding > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); }
-				.has-global-padding :where(:not(.alignfull.is-layout-flow) > .has-global-padding:not(.wp-block-block, .alignfull, .alignwide)) { padding-right: 0; padding-left: 0; }
-				.has-global-padding :where(:not(.alignfull.is-layout-flow) > .has-global-padding:not(.wp-block-block, .alignfull, .alignwide)) > .alignfull { margin-left: 0; margin-right: 0;
+				.has-global-padding :where(:not(.alignfull.is-layout-flow) > .has-global-padding:not(.wp-block-block, .alignfull)) { padding-right: 0; padding-left: 0; }
+				.has-global-padding :where(:not(.alignfull.is-layout-flow) > .has-global-padding:not(.wp-block-block, .alignfull)) > .alignfull { margin-left: 0; margin-right: 0;
 				`;
 		}
 
@@ -957,6 +966,7 @@ export const toStyles = (
 				hasLayoutSupport,
 				featureSelectors,
 				styleVariationSelectors,
+				skipSelectorWrapper,
 			} ) => {
 				// Process styles for block support features with custom feature level
 				// CSS selectors set.
@@ -1015,7 +1025,10 @@ export const toStyles = (
 					disableRootPadding
 				);
 				if ( styleDeclarations?.length ) {
-					ruleset += `:root :where(${ selector }){${ styleDeclarations.join(
+					const generalSelector = skipSelectorWrapper
+						? selector
+						: `:root :where(${ selector })`;
+					ruleset += `${ generalSelector }{${ styleDeclarations.join(
 						';'
 					) };}`;
 				}
@@ -1109,7 +1122,11 @@ export const toStyles = (
 								.map( ( sel ) => sel + pseudoKey )
 								.join( ',' );
 
-							const pseudoRule = `${ _selector }{${ pseudoDeclarations.join(
+							// As pseudo classes such as :hover, :focus etc. have class-level
+							// specificity, they must use the `:root :where()` wrapper. This.
+							// caps the specificity at `0-1-0` to allow proper nesting of variations
+							// and block type element styles.
+							const pseudoRule = `:root :where(${ _selector }){${ pseudoDeclarations.join(
 								';'
 							) };}`;
 

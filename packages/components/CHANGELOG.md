@@ -2,23 +2,54 @@
 
 ## Unreleased
 
-### Enhancements
+### Deprecations
 
--   `Toolbar`: Add support for `vertical` orientation ([#60123](https://github.com/WordPress/gutenberg/pull/60123)).
+-   `FormTokenField`: Deprecate bottom margin. Add a `__nextHasNoMarginBottom` prop to start opting into the margin-free styles that will become the default in a future version, currently scheduled to be WordPress 7.0 ([#63491](https://github.com/WordPress/gutenberg/pull/63491)).
 
 ### Bug Fixes
 
--   `UnitControl`: Fix colors when disabled. ([#62970](https://github.com/WordPress/gutenberg/pull/62970))
--   `useUpdateEffect`: Correctly track mounted state in strict mode. ([#62974](https://github.com/WordPress/gutenberg/pull/62974))
--   `UnitControl`: Fix an issue where keyboard shortcuts unintentionally shift focus on Windows OS. ([#62988](https://github.com/WordPress/gutenberg/pull/62988))
--   Fix inaccessibly disabled `Button`s ([#62306](https://github.com/WordPress/gutenberg/pull/62306)).
+-   `ComboboxControl`: Fix ComboboxControl reset button when using the keyboard. ([#63410](https://github.com/WordPress/gutenberg/pull/63410))
+-   `Button`: Never apply `aria-disabled` to anchor ([#63376](https://github.com/WordPress/gutenberg/pull/63376)).
+
+### Internal
+
+-   `CustomSelectControl`: switch to ariakit-based implementation ([#63258](https://github.com/WordPress/gutenberg/pull/63258)).
+-   `CustomSelectControlV2`: animate select popover appearance. ([#63343](https://github.com/WordPress/gutenberg/pull/63343))
+-   `CustomSelectControlV2`: do not flip popover if legacy adapter. ([#63357](https://github.com/WordPress/gutenberg/pull/63357)).
+-   `DropdownMenuV2`: invert animation direction. ([#63443](https://github.com/WordPress/gutenberg/pull/63443)).
+-   `Tabs`: Vertical Tabs should be 40px min height. ([#63446](https://github.com/WordPress/gutenberg/pull/63446)).
 
 ### Enhancements
 
+-   `ToggleGroupControl`: support disabled options ([#63450](https://github.com/WordPress/gutenberg/pull/63450)).
+-   `CustomSelectControl`: Stabilize `__experimentalShowSelectedHint` and `options[]. __experimentalHint` props ([#63248](https://github.com/WordPress/gutenberg/pull/63248)).
+
+## 28.3.0 (2024-07-10)
+
+### Enhancements
+
+-   `Tabs`: hyphenate tab labels ([#63337](https://github.com/WordPress/gutenberg/pull/63337)).
+-   `Tooltip`: Add support for `className` prop ([#63157](https://github.com/WordPress/gutenberg/pull/63157)).
+-   `Toolbar`: Add support for `vertical` orientation ([#60123](https://github.com/WordPress/gutenberg/pull/60123)).
+-   `BaseControl`: forward ref on `VisualLabel` ([#63169](https://github.com/WordPress/gutenberg/pull/63169)).
 -   `ToolbarButton`: Deprecate `isDisabled` prop and merge with `disabled` ([#63101](https://github.com/WordPress/gutenberg/pull/63101)).
 -   `Button`: Stabilize `__experimentalIsFocusable` prop as `accessibleWhenDisabled` ([#62282](https://github.com/WordPress/gutenberg/pull/62282)).
 -   `ToolbarButton`: Always keep focusable when disabled ([#63102](https://github.com/WordPress/gutenberg/pull/63102)).
 -   `ProgressBar`: Fix indeterminate RTL support. ([#63129](https://github.com/WordPress/gutenberg/pull/63129)).
+-   `RangeControl`: Fix RTL support for custom marks ([#63198](https://github.com/WordPress/gutenberg/pull/63198)).
+-   `TimePicker`: Add `dateOrder` prop ([#62481](https://github.com/WordPress/gutenberg/pull/62481)).
+
+### Bug Fixes
+
+-   `Tabs`: Make Tabs have a fluid height ([#62027](https://github.com/WordPress/gutenberg/pull/62027)).
+-   `UnitControl`: Fix colors when disabled. ([#62970](https://github.com/WordPress/gutenberg/pull/62970))
+-   `useUpdateEffect`: Correctly track mounted state in strict mode. ([#62974](https://github.com/WordPress/gutenberg/pull/62974))
+-   `UnitControl`: Fix an issue where keyboard shortcuts unintentionally shift focus on Windows OS. ([#62988](https://github.com/WordPress/gutenberg/pull/62988))
+-   Fix inaccessibly disabled `Button`s ([#62306](https://github.com/WordPress/gutenberg/pull/62306)).
+-   `TimePicker`: Fix time zone overflow ([#63209](https://github.com/WordPress/gutenberg/pull/63209)).
+-   `SelectControl`: Fix disabled styles ([#63266](https://github.com/WordPress/gutenberg/pull/63266)).
+-   `Tabs`: Fix text-align when text wraps in vertical mode ([#63272](https://github.com/WordPress/gutenberg/pull/63272)).
+-   `Tabs`: Fix "With tab icons" Storybook example ([#63297](https://github.com/WordPress/gutenberg/pull/63297)).
 
 ### Internal
 
@@ -32,11 +63,15 @@
 -   `CustomSelectControlV2`: fix trigger text alignment in RTL languages ([#62869](https://github.com/WordPress/gutenberg/pull/62869)).
 -   `CustomSelectControlV2`: allow wrapping item hint to new line ([#62848](https://github.com/WordPress/gutenberg/pull/62848)).
 -   `CustomSelectControlV2`: fix select popover content overflow. ([#62844](https://github.com/WordPress/gutenberg/pull/62844))
+-   `CustomSelectControlV2`: keep item checkmark top aligned. ([#63230](https://github.com/WordPress/gutenberg/pull/63230))
 -   `CustomSelectControlV2`: keep legacy arrow down behavior only for legacy wrapper. ([#62919](https://github.com/WordPress/gutenberg/pull/62919))
 -   `CustomSelectControlV2`: fix trigger button font size. ([#63131](https://github.com/WordPress/gutenberg/pull/63131))
+-   `CustomSelectControlV2`: fix labelling with a visually hidden label. ([#63137](https://github.com/WordPress/gutenberg/pull/63137))
+-   `CustomSelectControlV2`: allow checkmark wrapper to collapse when not shown. ([#63229](https://github.com/WordPress/gutenberg/pull/63229))
 -   Extract `TimeInput` component from `TimePicker` ([#60613](https://github.com/WordPress/gutenberg/pull/60613)).
 -   `TimeInput`: Add `label` prop ([#63106](https://github.com/WordPress/gutenberg/pull/63106)).
 -   Method style type signatures have been changed to function style ([#62718](https://github.com/WordPress/gutenberg/pull/62718)).
+-   `FontSizePicker`: use CustomSelectControl V2 legacy adapter ([#63134](https://github.com/WordPress/gutenberg/pull/63134)).
 
 ## 28.2.0 (2024-06-26)
 

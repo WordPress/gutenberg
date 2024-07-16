@@ -171,17 +171,9 @@ class NativeEditorProvider extends Component {
 		);
 
 		this.subscriptionParentUpdateEditorSettings =
-			subscribeUpdateEditorSettings(
-				( { galleryWithImageBlocks, ...editorSettings } ) => {
-					if ( typeof galleryWithImageBlocks === 'boolean' ) {
-						window.wp.galleryBlockV2Enabled =
-							galleryWithImageBlocks;
-					}
-					updateEditorSettings(
-						this.getThemeColors( editorSettings )
-					);
-				}
-			);
+			subscribeUpdateEditorSettings( ( { ...editorSettings } ) => {
+				updateEditorSettings( this.getThemeColors( editorSettings ) );
+			} );
 
 		this.subscriptionParentUpdateCapabilities = subscribeUpdateCapabilities(
 			( payload ) => {

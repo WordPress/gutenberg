@@ -9,7 +9,7 @@ import { useEffect } from '@wordpress/element';
  */
 import { unlock } from '../../lock-unlock';
 import Editor from '../editor';
-import PostsList from '../posts-app/posts-list';
+import PostList from '../post-list';
 import PagePatterns from '../page-patterns';
 import PageTemplates from '../page-templates';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
@@ -91,12 +91,12 @@ export default function useLayoutAreas() {
 						content={ <DataViewsSidebarContent /> }
 					/>
 				),
-				content: <PostsList postType={ postType } />,
+				content: <PostList postType={ postType } />,
 				preview: ( isListLayout || hasEditCanvasMode ) && <Editor />,
 				mobile: hasEditCanvasMode ? (
 					<Editor />
 				) : (
-					<PostsList postType={ postType } />
+					<PostList postType={ postType } />
 				),
 			},
 			widths: {

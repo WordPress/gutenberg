@@ -144,7 +144,7 @@ test.describe( 'Font Size Picker', () => {
 				.click();
 			await page.keyboard.type( 'Paragraph to be made "large"' );
 			await page.click(
-				'role=group[name="Font size"i] >> role=button[name="Font size"i]'
+				'role=group[name="Font size"i] >> role=combobox[name="Font size"i]'
 			);
 			await pageUtils.pressKeys( 'ArrowDown', { times: 4 } );
 			await page.keyboard.press( 'Enter' );
@@ -168,7 +168,7 @@ test.describe( 'Font Size Picker', () => {
 				'Paragraph with font size reset using tools panel menu'
 			);
 			await page.click(
-				'role=group[name="Font size"i] >> role=button[name="Font size"i]'
+				'role=group[name="Font size"i] >> role=combobox[name="Font size"i]'
 			);
 			await pageUtils.pressKeys( 'ArrowDown', { times: 3 } );
 			await page.keyboard.press( 'Enter' );
@@ -201,7 +201,7 @@ test.describe( 'Font Size Picker', () => {
 				'Paragraph with font size reset using input field'
 			);
 			await page.click(
-				'role=group[name="Font size"i] >> role=button[name="Font size"i]'
+				'role=group[name="Font size"i] >> role=combobox[name="Font size"i]'
 			);
 			await pageUtils.pressKeys( 'ArrowDown', { times: 2 } );
 			await page.keyboard.press( 'Enter' );

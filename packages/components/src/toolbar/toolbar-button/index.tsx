@@ -16,7 +16,7 @@ import Button from '../../button';
 import ToolbarItem from '../toolbar-item';
 import ToolbarContext from '../toolbar-context';
 import ToolbarButtonContainer from './toolbar-button-container';
-import type { ToolbarButtonDeprecatedProps, ToolbarButtonProps } from './types';
+import type { ToolbarButtonOverriddenProps, ToolbarButtonProps } from './types';
 import type { WordPressComponentProps } from '../../context';
 
 function useDeprecatedProps( {
@@ -32,9 +32,9 @@ function useDeprecatedProps( {
 function UnforwardedToolbarButton(
 	props: Omit<
 		WordPressComponentProps< ToolbarButtonProps, typeof Button, false >,
-		'__experimentalIsFocusable' // ToolbarButton will always be focusable even when disabled.
+		'accessibleWhenDisabled' // By default, ToolbarButton will be focusable when disabled.
 	> &
-		ToolbarButtonDeprecatedProps,
+		ToolbarButtonOverriddenProps,
 	ref: ForwardedRef< any >
 ) {
 	const {
