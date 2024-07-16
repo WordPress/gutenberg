@@ -11,6 +11,9 @@ export const PagesControl = ( { pages, onChange } ) => {
 			value={ pages }
 			min={ 0 }
 			onChange={ ( newPages ) => {
+				if ( isNaN( newPages ) || newPages < 0 ) {
+					return;
+				}
 				onChange( { pages: newPages } );
 			} }
 			help={ __(
