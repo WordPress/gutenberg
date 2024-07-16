@@ -117,76 +117,6 @@ const formatArrayProperties = serialize.bind(
 );
 
 /**
- * Convert settings properties to markup.
- *
- * @param {JSONSchema} schema
- * @return {string} markup
- */
-function getSettingsPropertiesMarkup( { properties } ) {
-	if ( ! properties ) {
-		return '';
-	}
-
-	let markup = '';
-	markup += '| Property  | Type   | Default | Props  |\n';
-	markup += '| ---       | ---    | ---     | ---    |\n';
-	Object.entries( properties ).forEach( ( [ property, subschema ] ) => {
-		const defaultValue = subschema.default ?? '';
-		const type = formatType( subschema );
-		const props =
-			formatArrayProperties( subschema ) || formatProperties( subschema );
-
-		markup += `| ${ property } | ${ type } | ${ defaultValue } | ${ props } |\n`;
-	} );
-
-	return markup + '\n';
-}
-
-/**
- * Convert style properties to markup.
- *
- * @param {JSONSchema} schema
- * @return {string} markup
- */
-function getStylePropertiesMarkup( { properties } ) {
-	if ( ! properties ) {
-		return '';
-	}
-
-	let markup = '';
-	markup += '| Property  | Type   | Props  |\n';
-	markup += '| ---       | ---    | ---    |\n';
-	Object.entries( properties ).forEach( ( [ property, subschema ] ) => {
-		const props = formatProperties( subschema );
-		const type = formatType( subschema );
-		markup += `| ${ property } | ${ type } | ${ props } |\n`;
-	} );
-
-	return markup + '\n';
-}
-
-/**
- * Convert template properties to markup.
- *
- * @param {JSONSchema} schema
- * @return {string} markup
- */
-function getTemplatePropertiesMarkup( { properties } ) {
-	if ( ! properties ) {
-		return '';
-	}
-
-	let markup = '';
-	markup += '| Property | Description | Type |\n';
-	markup += '| ---      | ---         | ---  |\n';
-	Object.entries( properties ).forEach( ( [ property, subschema ] ) => {
-		const { description, type } = subschema;
-		markup += `| ${ property } | ${ description } | ${ type } |\n`;
-	} );
-	return markup + '\n';
-}
-
-/**
  * Main function.
  */
 async function main() {
@@ -215,7 +145,20 @@ async function main() {
 	for ( const [ section, data ] of settings ) {
 		autogen += `### ${ section }\n\n`;
 		autogen += `${ data.description }\n\n`;
-		autogen += getSettingsPropertiesMarkup( data );
+		if ( data.properties ) {
+			autogen += '| Property  | Type   | Default | Props  |\n';
+			autogen += '| ---       | ---    | ---     | ---    |\n';
+			const properties = Object.entries( data.properties );
+			for ( const [ property, subschema ] of properties ) {
+				const type = formatType( subschema );
+				const defaultValue = subschema.default ?? '';
+				const props =
+					formatArrayProperties( subschema ) ||
+					formatProperties( subschema );
+				autogen += `| ${ property } | ${ type } | ${ defaultValue } | ${ props } |\n`;
+			}
+			autogen += '\n';
+		}
 		autogen += `---\n\n`;
 	}
 
@@ -227,7 +170,17 @@ async function main() {
 	for ( const [ section, data ] of styles ) {
 		autogen += `### ${ section }\n\n`;
 		autogen += `${ data.description }\n\n`;
-		autogen += getStylePropertiesMarkup( data );
+		if ( data.properties ) {
+			autogen += '| Property  | Type   | Props  |\n';
+			autogen += '| ---       | ---    | ---    |\n';
+			const properties = Object.entries( data.properties );
+			for ( const [ property, subschema ] of properties ) {
+				const props = formatProperties( subschema );
+				const type = formatType( subschema );
+				autogen += `| ${ property } | ${ type } | ${ props } |\n`;
+			}
+			autogen += '\n';
+		}
 		autogen += `---\n\n`;
 	}
 
@@ -235,17 +188,31 @@ async function main() {
 	autogen += '## customTemplates\n\n';
 	autogen += `${ themejson.properties.customTemplates.description }\n\n`;
 	autogen += `Type: \`${ themejson.properties.customTemplates.items.type }\`.\n\n`;
-	autogen += getTemplatePropertiesMarkup(
-		themejson.properties.customTemplates.items
+	autogen += '| Property | Description | Type |\n';
+	autogen += '| ---      | ---         | ---  |\n';
+	const customTemplatesProperties = Object.entries(
+		themejson.properties.customTemplates.items.properties
 	);
+	for ( const [ property, subschema ] of customTemplatesProperties ) {
+		const { description, type } = subschema;
+		autogen += `| ${ property } | ${ description } | ${ type } |\n`;
+	}
+	autogen += '\n';
 
 	// templateParts
 	autogen += '## templateParts\n\n';
 	autogen += `${ themejson.properties.templateParts.description }\n\n`;
 	autogen += `Type: \`${ themejson.properties.templateParts.items.type }\`.\n\n`;
-	autogen += getTemplatePropertiesMarkup(
-		themejson.properties.templateParts.items
+	autogen += '| Property | Description | Type |\n';
+	autogen += '| ---      | ---         | ---  |\n';
+	const templatePartsProperties = Object.entries(
+		themejson.properties.templateParts.items.properties
 	);
+	for ( const [ property, subschema ] of templatePartsProperties ) {
+		const { description, type } = subschema;
+		autogen += `| ${ property } | ${ description } | ${ type } |\n`;
+	}
+	autogen += '\n';
 
 	// Patterns
 	autogen += '## patterns' + '\n\n';
