@@ -758,3 +758,178 @@ export const registerBlockVariation = ( blockName, variation ) => {
 export const unregisterBlockVariation = ( blockName, variationName ) => {
 	dispatch( blocksStore ).removeBlockVariations( blockName, variationName );
 };
+
+/**
+ * Registers a new block bindings source with an object defining its
+ * behavior. Once registered, the source is available to be connected
+ * to the supported block attributes.
+ *
+ * @param {Object}   source                    Properties of the source to be registered.
+ * @param {string}   source.name               The unique and machine-readable name.
+ * @param {string}   source.label              Human-readable label.
+ * @param {Function} [source.getValue]         Function to get the value of the source.
+ * @param {Function} [source.setValue]         Function to update the value of the source.
+ * @param {Function} [source.setValues]        Function to update multiple values connected to the source.
+ * @param {Function} [source.getPlaceholder]   Function to get the placeholder when the value is undefined.
+ * @param {Function} [source.canUserEditValue] Function to determine if the user can edit the value.
+ *
+ * @example
+ * ```js
+ * import { _x } from '@wordpress/i18n';
+ * import { registerBlockBindingsSource } from '@wordpress/blocks'
+ *
+ * registerBlockBindingsSource( {
+ *     name: 'plugin/my-custom-source',
+ *     label: _x( 'My Custom Source', 'block bindings source' ),
+ *     getValue: () => 'Value to place in the block attribute',
+ *     setValue: () => updateMyCustomValue(),
+ *     setValues: () => updateMyCustomValuesInBatch(),
+ *     getPlaceholder: () => 'Placeholder text when the value is undefined',
+ *     canUserEditValue: () => true,
+ * } );
+ * ```
+ */
+export const registerBlockBindingsSource = ( source ) => {
+	const {
+		name,
+		label,
+		getValue,
+		setValue,
+		setValues,
+		getPlaceholder,
+		canUserEditValue,
+	} = source;
+
+	// Check if the source is already registered.
+	const existingSource = unlock(
+		select( blocksStore )
+	).getBlockBindingsSource( name );
+	if ( existingSource ) {
+		console.error(
+			'Block bindings source "' + name + '" is already registered.'
+		);
+		return;
+	}
+
+	// Check the `name` property is correct.
+	if ( ! name ) {
+		console.error( 'Block bindings source must contain a name.' );
+		return;
+	}
+
+	if ( typeof name !== 'string' ) {
+		console.error( 'Block bindings source name must be a string.' );
+		return;
+	}
+
+	if ( /[A-Z]+/.test( name ) ) {
+		console.error(
+			'Block bindings source name must not contain uppercase characters.'
+		);
+		return;
+	}
+
+	if ( ! /^[a-z0-9/-]+$/.test( name ) ) {
+		console.error(
+			'Block bindings source name must contain only valid characters: lowercase characters, hyphens, or digits. Example: my-plugin/my-custom-source.'
+		);
+		return;
+	}
+
+	if ( ! /^[a-z0-9-]+\/[a-z0-9-]+$/.test( name ) ) {
+		console.error(
+			'Block bindings source name must contain a namespace and valid characters. Example: my-plugin/my-custom-source.'
+		);
+		return;
+	}
+
+	// Check the `label` property is correct.
+	if ( ! label ) {
+		console.error( 'Block bindings source must contain a label.' );
+		return;
+	}
+
+	if ( typeof label !== 'string' ) {
+		console.error( 'Block bindings source label must be a string.' );
+		return;
+	}
+
+	// Check the `getValue` property is correct.
+	if ( getValue && typeof getValue !== 'function' ) {
+		console.error( 'Block bindings source getValue must be a function.' );
+		return;
+	}
+
+	// Check the `setValue` property is correct.
+	if ( setValue && typeof setValue !== 'function' ) {
+		console.error( 'Block bindings source setValue must be a function.' );
+		return;
+	}
+
+	// Check the `setValues` property is correct.
+	if ( setValues && typeof setValues !== 'function' ) {
+		console.error( 'Block bindings source setValues must be a function.' );
+		return;
+	}
+
+	// Check the `getPlaceholder` property is correct.
+	if ( getPlaceholder && typeof getPlaceholder !== 'function' ) {
+		console.error(
+			'Block bindings source getPlaceholder must be a function.'
+		);
+		return;
+	}
+
+	// Check the `getPlaceholder` property is correct.
+	if ( canUserEditValue && typeof canUserEditValue !== 'function' ) {
+		console.error(
+			'Block bindings source canUserEditValue must be a function.'
+		);
+		return;
+	}
+
+	return unlock( dispatch( blocksStore ) ).addBlockBindingsSource( source );
+};
+
+/**
+ * Unregisters a block bindings source
+ *
+ * @param {string} name The name of the block bindings source to unregister.
+ *
+ * @example
+ * ```js
+ * import { unregisterBlockBindingsSource } from '@wordpress/blocks';
+ *
+ * unregisterBlockBindingsSource( 'plugin/my-custom-source' );
+ * ```
+ */
+export function unregisterBlockBindingsSource( name ) {
+	const oldSource = getBlockBindingsSource( name );
+	if ( ! oldSource ) {
+		console.error(
+			'Block bindings source "' + name + '" is not registered.'
+		);
+		return;
+	}
+	unlock( dispatch( blocksStore ) ).removeBlockBindingsSource( name );
+}
+
+/**
+ * Returns a registered block bindings source.
+ *
+ * @param {string} name Block bindings source name.
+ *
+ * @return {?Object} Block bindings source.
+ */
+export function getBlockBindingsSource( name ) {
+	return unlock( select( blocksStore ) ).getBlockBindingsSource( name );
+}
+
+/**
+ * Returns all registered block bindings sources.
+ *
+ * @return {Array} Block bindings sources.
+ */
+export function getBlockBindingsSources() {
+	return unlock( select( blocksStore ) ).getAllBlockBindingsSources();
+}
