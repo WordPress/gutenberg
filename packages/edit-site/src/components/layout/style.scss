@@ -264,6 +264,9 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 			.edit-site-site-icon svg {
 				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color, #3858e9);
 				outline: 3px solid #0000;
+				height: 40px;
+				width: 40px;
+				padding: 2px;
 			}
 
 		}
