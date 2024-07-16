@@ -64,50 +64,41 @@ const themejson = await $RefParser.dereference(
  * Convert settings properties to markup.
  *
  * @param {Object} struct
+ * @param {Object} struct.properties
  * @return {string} markup
  */
-const getSettingsPropertiesMarkup = ( struct ) => {
-	if ( ! ( 'properties' in struct ) ) {
-		return '';
-	}
-	const props = struct.properties;
-	const ks = Object.keys( props );
-	if ( ks.length < 1 ) {
+const getSettingsPropertiesMarkup = ( { properties } ) => {
+	if ( ! properties || typeof properties !== 'object' ) {
 		return '';
 	}
 
 	let markup = '';
 	markup += '| Property  | Type   | Default | Props  |\n';
 	markup += '| ---       | ---    | ---     | ---    |\n';
-	ks.forEach( ( key ) => {
-		const def = 'default' in props[ key ] ? props[ key ].default : '';
-		let type = props[ key ].type || '';
-		let ps =
-			props[ key ].type === 'array'
-				? Object.keys( props[ key ].items?.properties ?? {} )
-						.sort()
-						.join( ', ' )
-				: '';
+	Object.entries( properties ).forEach( ( [ property, subschema ] ) => {
+		const defaultValue = subschema.default ?? '';
+		let type = subschema.type ?? '';
+		let props = subschema.items?.properties
+			? Object.keys( subschema.items.properties ).join( ', ' )
+			: '';
 
 		/*
 		 * Handle`oneOf` type definitions - extract the type and properties.
 		 * See: https://json-schema.org/understanding-json-schema/reference/combining#oneOf
 		 */
-		if ( props[ key ].oneOf && Array.isArray( props[ key ].oneOf ) ) {
+		if ( Array.isArray( subschema.oneOf ) ) {
 			if ( ! type ) {
-				type = props[ key ].oneOf
+				type = subschema.oneOf
 					.map( ( item ) => item.type )
 					.join( ', ' );
 			}
 
-			if ( ! ps ) {
-				ps = props[ key ].oneOf
+			if ( ! props ) {
+				props = subschema.oneOf
 					.map( ( item ) =>
 						item?.type === 'object' && item?.properties
 							? '_{' +
-							  Object.keys( item.properties )
-									.sort()
-									.join( ', ' ) +
+							  Object.keys( item.properties ).join( ', ' ) +
 							  '}_'
 							: ''
 					)
@@ -115,7 +106,7 @@ const getSettingsPropertiesMarkup = ( struct ) => {
 			}
 		}
 
-		markup += `| ${ key } | ${ type } | ${ def } | ${ ps } |\n`;
+		markup += `| ${ property } | ${ type } | ${ defaultValue } | ${ props } |\n`;
 	} );
 
 	return markup;
@@ -125,28 +116,23 @@ const getSettingsPropertiesMarkup = ( struct ) => {
  * Convert style properties to markup.
  *
  * @param {Object} struct
+ * @param {Object} struct.properties
  * @return {string} markup
  */
-const getStylePropertiesMarkup = ( struct ) => {
-	if ( ! ( 'properties' in struct ) ) {
-		return '';
-	}
-	const props = struct.properties;
-	const ks = Object.keys( props );
-	if ( ks.length < 1 ) {
+const getStylePropertiesMarkup = ( { properties } ) => {
+	if ( ! properties || typeof properties !== 'object' ) {
 		return '';
 	}
 
 	let markup = '';
 	markup += '| Property  | Type   | Props  |\n';
 	markup += '| ---       | ---    | ---    |\n';
-	ks.forEach( ( key ) => {
-		const ps =
-			props[ key ].type === 'object'
-				? Object.keys( props[ key ].properties ).sort().join( ', ' )
-				: '';
-		const type = formatType( props[ key ] );
-		markup += `| ${ key } | ${ type } | ${ ps } |\n`;
+	Object.entries( properties ).forEach( ( [ property, subschema ] ) => {
+		const props = subschema.properties
+			? Object.keys( subschema.properties ).join( ', ' )
+			: '';
+		const type = formatType( subschema );
+		markup += `| ${ property } | ${ type } | ${ props } |\n`;
 	} );
 
 	return markup;
