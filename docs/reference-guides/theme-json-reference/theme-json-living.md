@@ -39,6 +39,17 @@ Setting that enables the following UI tools:
 
 ---
 
+### background
+
+Settings related to background.
+
+| Property  | Type   | Default | Props  |
+| ---    | ---    | ---    |---   |
+| backgroundImage | boolean | false |  |
+| backgroundSize | boolean | false |  |
+
+---
+
 ### border
 
 Settings related to borders.
@@ -49,17 +60,6 @@ Settings related to borders.
 | radius | boolean | false |  |
 | style | boolean | false |  |
 | width | boolean | false |  |
-
----
-
-### shadow
-
-Settings related to shadows.
-
-| Property  | Type   | Default | Props  |
-| ---    | ---    | ---    |---   |
-| defaultPresets | boolean | true |  |
-| presets | array |  | name, shadow, slug |
 
 ---
 
@@ -84,17 +84,6 @@ Settings related to colors.
 | heading | boolean | true |  |
 | button | boolean | true |  |
 | caption | boolean | true |  |
-
----
-
-### background
-
-Settings related to background.
-
-| Property  | Type   | Default | Props  |
-| ---    | ---    | ---    |---   |
-| backgroundImage | boolean | false |  |
-| backgroundSize | boolean | false |  |
 
 ---
 
@@ -142,6 +131,17 @@ Settings related to position.
 | Property  | Type   | Default | Props  |
 | ---    | ---    | ---    |---   |
 | sticky | boolean | false |  |
+
+---
+
+### shadow
+
+Settings related to shadows.
+
+| Property  | Type   | Default | Props  |
+| ---    | ---    | ---    |---   |
+| defaultPresets | boolean | true |  |
+| presets | array |  | name, shadow, slug |
 
 ---
 
