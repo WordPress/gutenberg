@@ -141,9 +141,7 @@ describe( 'FontSizePicker', () => {
 				render(
 					<FontSizePicker fontSizes={ fontSizes } value={ value } />
 				);
-				expect(
-					screen.getByLabelText( expectedLabel )
-				).toBeInTheDocument();
+				expect( screen.getByLabelText( expectedLabel ) ).toBeVisible();
 			}
 		);
 
@@ -266,9 +264,7 @@ describe( 'FontSizePicker', () => {
 				render(
 					<FontSizePicker fontSizes={ fontSizes } value={ value } />
 				);
-				expect(
-					screen.getByLabelText( expectedLabel )
-				).toBeInTheDocument();
+				expect( screen.getByLabelText( expectedLabel ) ).toBeVisible();
 			}
 		);
 
@@ -383,9 +379,7 @@ describe( 'FontSizePicker', () => {
 				render(
 					<FontSizePicker fontSizes={ fontSizes } value={ value } />
 				);
-				expect(
-					screen.getByLabelText( expectedLabel )
-				).toBeInTheDocument();
+				expect( screen.getByLabelText( expectedLabel ) ).toBeVisible();
 			}
 		);
 
@@ -457,9 +451,7 @@ describe( 'FontSizePicker', () => {
 				render(
 					<FontSizePicker fontSizes={ fontSizes } value={ value } />
 				);
-				expect(
-					screen.getByLabelText( expectedLabel )
-				).toBeInTheDocument();
+				expect( screen.getByLabelText( expectedLabel ) ).toBeVisible();
 			}
 		);
 
@@ -516,7 +508,7 @@ describe( 'FontSizePicker', () => {
 				render(
 					<FontSizePicker fontSizes={ fontSizes } value={ value } />
 				);
-				expect( screen.getByRole( 'radiogroup' ) ).toBeInTheDocument();
+				expect( screen.getByRole( 'radiogroup' ) ).toBeVisible();
 				expect(
 					screen.queryByRole( 'radio', { checked: true } )
 				).not.toBeInTheDocument();
@@ -537,7 +529,7 @@ describe( 'FontSizePicker', () => {
 			await user.click(
 				screen.getByRole( 'option', { name: 'Custom' } )
 			);
-			expect( screen.getByLabelText( 'Custom' ) ).toBeInTheDocument();
+			expect( screen.getByLabelText( 'Custom' ) ).toBeVisible();
 			expect( onChange ).not.toHaveBeenCalled();
 		} );
 	}
@@ -545,14 +537,14 @@ describe( 'FontSizePicker', () => {
 	function commonTests( fontSizes: FontSize[] ) {
 		it( 'shows custom input when value is unknown', () => {
 			render( <FontSizePicker fontSizes={ fontSizes } value="3px" /> );
-			expect( screen.getByLabelText( 'Custom' ) ).toBeInTheDocument();
+			expect( screen.getByLabelText( 'Custom' ) ).toBeVisible();
 		} );
 
 		it( 'hides custom input when disableCustomFontSizes is set to `true` with a custom font size', () => {
 			const { rerender } = render(
 				<FontSizePicker fontSizes={ fontSizes } value="3px" />
 			);
-			expect( screen.getByLabelText( 'Custom' ) ).toBeInTheDocument();
+			expect( screen.getByLabelText( 'Custom' ) ).toBeVisible();
 
 			rerender(
 				<FontSizePicker
@@ -570,7 +562,7 @@ describe( 'FontSizePicker', () => {
 			const { rerender } = render(
 				<FontSizePicker fontSizes={ fontSizes } value="3px" />
 			);
-			expect( screen.getByLabelText( 'Custom' ) ).toBeInTheDocument();
+			expect( screen.getByLabelText( 'Custom' ) ).toBeVisible();
 
 			rerender(
 				<FontSizePicker
@@ -578,7 +570,7 @@ describe( 'FontSizePicker', () => {
 					value={ fontSizes[ 0 ].size }
 				/>
 			);
-			expect( screen.getByLabelText( 'Custom' ) ).toBeInTheDocument();
+			expect( screen.getByLabelText( 'Custom' ) ).toBeVisible();
 		} );
 
 		it( 'allows custom values by default', async () => {
