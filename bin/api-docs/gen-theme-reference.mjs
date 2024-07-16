@@ -75,7 +75,7 @@ const themejson = await $RefParser.dereference(
  * @param {JSONSchema} schema
  * @return {string} markup
  */
-const getSettingsPropertiesMarkup = ( { properties } ) => {
+function getSettingsPropertiesMarkup( { properties } ) {
 	if ( ! properties || typeof properties !== 'object' ) {
 		return '';
 	}
@@ -118,7 +118,7 @@ const getSettingsPropertiesMarkup = ( { properties } ) => {
 	} );
 
 	return markup + '\n';
-};
+}
 
 /**
  * Convert style properties to markup.
@@ -126,7 +126,7 @@ const getSettingsPropertiesMarkup = ( { properties } ) => {
  * @param {JSONSchema} schema
  * @return {string} markup
  */
-const getStylePropertiesMarkup = ( { properties } ) => {
+function getStylePropertiesMarkup( { properties } ) {
 	if ( ! properties || typeof properties !== 'object' ) {
 		return '';
 	}
@@ -143,7 +143,7 @@ const getStylePropertiesMarkup = ( { properties } ) => {
 	} );
 
 	return markup + '\n';
-};
+}
 
 /**
  * Format list of types.
@@ -151,7 +151,7 @@ const getStylePropertiesMarkup = ( { properties } ) => {
  * @param {Object} prop
  * @return {string} type
  */
-const formatType = ( prop ) => {
+function formatType( prop ) {
 	let type = prop.type || '';
 
 	if ( prop.hasOwnProperty( 'anyOf' ) || prop.hasOwnProperty( 'oneOf' ) ) {
@@ -168,7 +168,7 @@ const formatType = ( prop ) => {
 	}
 
 	return type;
-};
+}
 
 let autogen = '';
 
@@ -202,7 +202,7 @@ styles.forEach( ( [ section, data ] ) => {
 	autogen += `---\n\n`;
 } );
 
-const templateTableGeneration = ( themeJson, context ) => {
+function templateTableGeneration( themeJson, context ) {
 	let content = '';
 	content += '## ' + context + '\n\n';
 	content += themeJson.properties[ context ].description + '\n\n';
@@ -218,7 +218,7 @@ const templateTableGeneration = ( themeJson, context ) => {
 	content += '\n\n';
 
 	return content;
-};
+}
 
 // customTemplates
 autogen += templateTableGeneration( themejson, 'customTemplates' );
