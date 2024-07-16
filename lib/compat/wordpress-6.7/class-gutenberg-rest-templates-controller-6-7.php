@@ -279,14 +279,16 @@ class Gutenberg_REST_Templates_Controller_6_7 extends Gutenberg_REST_Templates_C
 	 * @param WP_Block_Template $template_object Template instance.
 	 * @return string                            Original source of the template one of theme, plugin, site, or user.
 	 */
-	// @core-merge: Nothing has changed in this function, the only reason to include it here is that it's a private function.
+	// @core-merge: Only the comments format (from inline to multi-line) has changed in this file.
 	private static function get_wp_templates_original_source_field( $template_object ) {
 		if ( 'wp_template' === $template_object->type || 'wp_template_part' === $template_object->type ) {
-			// Added by theme.
-			// Template originally provided by a theme, but customized by a user.
-			// Templates originally didn't have the 'origin' field so identify
-			// older customized templates by checking for no origin and a 'theme'
-			// or 'custom' source.
+			/*
+			 * Added by theme.
+			 * Template originally provided by a theme, but customized by a user.
+			 * Templates originally didn't have the 'origin' field so identify
+			 * older customized templates by checking for no origin and a 'theme'
+			 * or 'custom' source.
+			 */
 			if ( $template_object->has_theme_file &&
 			( 'theme' === $template_object->origin || (
 				empty( $template_object->origin ) && in_array(
@@ -307,10 +309,12 @@ class Gutenberg_REST_Templates_Controller_6_7 extends Gutenberg_REST_Templates_C
 				return 'plugin';
 			}
 
-			// Added by site.
-			// Template was created from scratch, but has no author. Author support
-			// was only added to templates in WordPress 5.9. Fallback to showing the
-			// site logo and title.
+			/*
+			 * Added by site.
+			 * Template was created from scratch, but has no author. Author support
+			 * was only added to templates in WordPress 5.9. Fallback to showing the
+			 * site logo and title.
+			 */
 			if ( empty( $template_object->has_theme_file ) && 'custom' === $template_object->source && empty( $template_object->author ) ) {
 				return 'site';
 			}
