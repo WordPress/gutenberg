@@ -57,6 +57,10 @@ const UnforwardedFontSizePicker = (
 		withReset = true,
 	} = props;
 
+	const units = useCustomUnits( {
+		availableUnits: unitsProp,
+	} );
+
 	const selectedFontSize = fontSizes.find(
 		( fontSize ) => fontSize.size === value
 	);
@@ -65,10 +69,6 @@ const UnforwardedFontSizePicker = (
 	// Initially request a custom picker if the value is not from the predef list.
 	const [ userRequestedCustom, setUserRequestedCustom ] =
 		useState( isCustomValue );
-
-	const units = useCustomUnits( {
-		availableUnits: unitsProp,
-	} );
 
 	let currentPickerType;
 	if ( ! disableCustomFontSizes && userRequestedCustom ) {
