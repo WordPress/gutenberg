@@ -53,7 +53,7 @@ Setting that enables the following UI tools:
 Settings related to background.
 
 | Property  | Type   | Default | Props  |
-| ---    | ---    | ---    |---   |
+| ---       | ---    | ---     | ---    |
 | backgroundImage | boolean | false |  |
 | backgroundSize | boolean | false |  |
 
@@ -64,7 +64,7 @@ Settings related to background.
 Settings related to borders.
 
 | Property  | Type   | Default | Props  |
-| ---    | ---    | ---    |---   |
+| ---       | ---    | ---     | ---    |
 | color | boolean | false |  |
 | radius | boolean | false |  |
 | style | boolean | false |  |
@@ -77,7 +77,7 @@ Settings related to borders.
 Settings related to colors.
 
 | Property  | Type   | Default | Props  |
-| ---    | ---    | ---    |---   |
+| ---       | ---    | ---     | ---    |
 | background | boolean | true |  |
 | custom | boolean | true |  |
 | customDuotone | boolean | true |  |
@@ -101,7 +101,7 @@ Settings related to colors.
 Settings related to dimensions.
 
 | Property  | Type   | Default | Props  |
-| ---    | ---    | ---    |---   |
+| ---       | ---    | ---     | ---    |
 | aspectRatio | boolean | false |  |
 | defaultAspectRatios | boolean | true |  |
 | aspectRatios | array |  | name, ratio, slug |
@@ -114,7 +114,7 @@ Settings related to dimensions.
 Settings related to layout.
 
 | Property  | Type   | Default | Props  |
-| ---    | ---    | ---    |---   |
+| ---       | ---    | ---     | ---    |
 | contentSize | string |  |  |
 | wideSize | string |  |  |
 | allowEditing | boolean | true |  |
@@ -127,7 +127,7 @@ Settings related to layout.
 Settings related to the lightbox.
 
 | Property  | Type   | Default | Props  |
-| ---    | ---    | ---    |---   |
+| ---       | ---    | ---     | ---    |
 | enabled | boolean |  |  |
 | allowEditing | boolean |  |  |
 
@@ -138,7 +138,7 @@ Settings related to the lightbox.
 Settings related to position.
 
 | Property  | Type   | Default | Props  |
-| ---    | ---    | ---    |---   |
+| ---       | ---    | ---     | ---    |
 | fixed | boolean | false |  |
 | sticky | boolean | false |  |
 
@@ -149,7 +149,7 @@ Settings related to position.
 Settings related to shadows.
 
 | Property  | Type   | Default | Props  |
-| ---    | ---    | ---    |---   |
+| ---       | ---    | ---     | ---    |
 | defaultPresets | boolean | true |  |
 | presets | array |  | name, shadow, slug |
 
@@ -160,7 +160,7 @@ Settings related to shadows.
 Settings related to spacing.
 
 | Property  | Type   | Default | Props  |
-| ---    | ---    | ---    |---   |
+| ---       | ---    | ---     | ---    |
 | blockGap | boolean, null | null |   |
 | margin | boolean | false |  |
 | padding | boolean | false |  |
@@ -177,7 +177,7 @@ Settings related to spacing.
 Settings related to typography.
 
 | Property  | Type   | Default | Props  |
-| ---    | ---    | ---    |---   |
+| ---       | ---    | ---     | ---    |
 | defaultFontSizes | boolean | true |  |
 | customFontSize | boolean | true |  |
 | fontStyle | boolean | true |  |
@@ -209,8 +209,8 @@ Generate custom CSS custom properties of the form `--wp--custom--{key}--{nested-
 
 Background styles.
 
-| Property  | Type   |  Props  |
-| ---       | ---    |---   |
+| Property  | Type   | Props  |
+| ---       | ---    | ---    |
 | backgroundImage | string, object |  |
 | backgroundPosition | string, object |  |
 | backgroundRepeat | string, object |  |
@@ -223,8 +223,8 @@ Background styles.
 
 Border styles.
 
-| Property  | Type   |  Props  |
-| ---       | ---    |---   |
+| Property  | Type   | Props  |
+| ---       | ---    | ---    |
 | color | string, object |  |
 | radius | string, object |  |
 | style | string, object |  |
@@ -240,8 +240,8 @@ Border styles.
 
 Color styles.
 
-| Property  | Type   |  Props  |
-| ---       | ---    |---   |
+| Property  | Type   | Props  |
+| ---       | ---    | ---    |
 | background | string, object |  |
 | gradient | string, object |  |
 | text | string, object |  |
@@ -259,8 +259,8 @@ Sets custom CSS to apply styling not covered by other theme.json properties.
 
 Dimensions styles
 
-| Property  | Type   |  Props  |
-| ---       | ---    |---   |
+| Property  | Type   | Props  |
+| ---       | ---    | ---    |
 | aspectRatio | string, object |  |
 | minHeight | string, object |  |
 
@@ -270,8 +270,8 @@ Dimensions styles
 
 CSS and SVG filter styles.
 
-| Property  | Type   |  Props  |
-| ---       | ---    |---   |
+| Property  | Type   | Props  |
+| ---       | ---    | ---    |
 | duotone | string, object |  |
 
 ---
@@ -280,8 +280,8 @@ CSS and SVG filter styles.
 
 Outline styles.
 
-| Property  | Type   |  Props  |
-| ---       | ---    |---   |
+| Property  | Type   | Props  |
+| ---       | ---    | ---    |
 | color | string, object |  |
 | offset | string, object |  |
 | style | string, object |  |
@@ -300,8 +300,8 @@ Box shadow styles.
 
 Spacing styles.
 
-| Property  | Type   |  Props  |
-| ---       | ---    |---   |
+| Property  | Type   | Props  |
+| ---       | ---    | ---    |
 | blockGap | string, object |  |
 | margin | object | bottom, left, right, top |
 | padding | object | bottom, left, right, top |
@@ -312,8 +312,8 @@ Spacing styles.
 
 Typography styles.
 
-| Property  | Type   |  Props  |
-| ---       | ---    |---   |
+| Property  | Type   | Props  |
+| ---       | ---    | ---    |
 | fontFamily | string, object |  |
 | fontSize | string, object |  |
 | fontStyle | string, object |  |

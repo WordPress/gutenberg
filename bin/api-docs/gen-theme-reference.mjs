@@ -81,8 +81,9 @@ const getSettingsPropertiesMarkup = ( struct ) => {
 		return '';
 	}
 
-	let markup = '| Property  | Type   | Default | Props  |\n';
-	markup += '| ---    | ---    | ---    |---   |\n';
+	let markup = '';
+	markup += '| Property  | Type   | Default | Props  |\n';
+	markup += '| ---       | ---    | ---     | ---    |\n';
 	ks.forEach( ( key ) => {
 		const def = 'default' in props[ key ] ? props[ key ].default : '';
 		let type = props[ key ].type || '';
@@ -141,8 +142,9 @@ const getStylePropertiesMarkup = ( struct ) => {
 		return '';
 	}
 
-	let markup = '| Property  | Type   |  Props  |\n';
-	markup += '| ---       | ---    |---   |\n';
+	let markup = '';
+	markup += '| Property  | Type   | Props  |\n';
+	markup += '| ---       | ---    | ---    |\n';
 	ks.forEach( ( key ) => {
 		const ps =
 			props[ key ].type === 'object'
