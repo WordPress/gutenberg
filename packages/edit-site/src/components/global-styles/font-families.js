@@ -103,11 +103,15 @@ function FontFamilies() {
 					__next40pxDefaultSize
 					onClick={ () =>
 						setModalTabOpen(
-							hasFonts ? 'installed-fonts' : 'upload-fonts'
+							hasInstalledFonts
+								? 'installed-fonts'
+								: 'upload-fonts'
 						)
 					}
 				>
-					{ hasFonts ? __( 'Manage fonts' ) : __( 'Add fonts' ) }
+					{ hasInstalledFonts
+						? __( 'Manage fonts' )
+						: __( 'Add fonts' ) }
 				</Button>
 			</VStack>
 		</>
