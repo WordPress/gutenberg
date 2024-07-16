@@ -213,7 +213,7 @@ export const savePost =
 				.saveEntityRecord(
 					'postType',
 					previousRecord.type,
-					edits,
+					Promise.resolve( edits ),
 					options
 				);
 		}
