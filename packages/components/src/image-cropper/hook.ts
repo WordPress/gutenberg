@@ -15,8 +15,9 @@ import { useRef, useMemo, useReducer, useCallback } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { degreeToRadian, getRotatedScale } from './math';
+import { degreeToRadian } from './math';
 import { imageCropperReducer, createInitialState } from './reducer';
+import type { State } from './reducer';
 
 const useGesture = createUseGesture( [ dragAction, pinchAction, wheelAction ] );
 
@@ -62,49 +63,36 @@ export const useImageCropper = ( {
 		}
 	);
 
-	const getImageBlob = useCallback( async () => {
+	// FIXME: This doesn't work for rotated images for now.
+	const getImageBlob = useCallback( async ( cropperState: State ) => {
 		const offscreenCanvas = new OffscreenCanvas(
-			state.size.width,
-			state.size.height
+			cropperState.size.width,
+			cropperState.size.height
 		);
 		const ctx = offscreenCanvas.getContext( '2d' )!;
 		ctx.translate(
-			state.position.x + offscreenCanvas.width / 2,
-			state.position.y + offscreenCanvas.height / 2
+			cropperState.position.x + offscreenCanvas.width / 2,
+			cropperState.position.y + offscreenCanvas.height / 2
 		);
-		ctx.rotate( degreeToRadian( state.angle ) );
-		const rotatedScale = getRotatedScale(
-			state.angle,
-			state.scale,
-			width,
-			height
+		ctx.rotate(
+			degreeToRadian( cropperState.angle + cropperState.turns * 90 )
 		);
-		ctx.scale( rotatedScale, rotatedScale );
+		ctx.scale( cropperState.scale, cropperState.scale );
 		ctx.drawImage(
 			imageRef.current!,
-			-state.offset.x - offscreenCanvas.width / 2,
-			-state.offset.y - offscreenCanvas.height / 2,
-			width,
-			height
+			-cropperState.offset.x - offscreenCanvas.width / 2,
+			-cropperState.offset.y - offscreenCanvas.height / 2,
+			cropperState.width,
+			cropperState.height
 		);
 		const blob = await offscreenCanvas.convertToBlob();
 		return blob;
-	}, [
-		width,
-		height,
-		state.angle,
-		state.offset,
-		state.position,
-		state.scale,
-		state.size,
-	] );
+	}, [] );
 
 	return useMemo(
 		() => ( {
 			state,
 			src,
-			width,
-			height,
 			refs: {
 				imageRef,
 				cropperWindowRef,
@@ -112,6 +100,6 @@ export const useImageCropper = ( {
 			dispatch,
 			getImageBlob,
 		} ),
-		[ state, src, width, height, getImageBlob ]
+		[ state, src, getImageBlob ]
 	);
 };

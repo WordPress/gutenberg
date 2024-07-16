@@ -35,8 +35,6 @@ export const Container = styled.div`
 
 export const Img = styled.img`
 	position: absolute;
-	top: ${ PADDING.x }px;
-	left: ${ PADDING.y }px;
 	pointer-events: none;
 	transform-origin: center center;
 	rotate: var( --wp-cropper-angle );

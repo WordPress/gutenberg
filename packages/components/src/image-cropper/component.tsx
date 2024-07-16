@@ -1,59 +1,40 @@
 /**
  * External dependencies
  */
-import type { RefObject, ReactNode } from 'react';
+import type { RefObject, ReactNode, MouseEvent, TouchEvent } from 'react';
 /**
  * WordPress dependencies
  */
-import { useState, forwardRef, useContext } from '@wordpress/element';
+import { useState, forwardRef, useContext, useRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
 import { Resizable, Draggable, Container, Img } from './styles';
-import { getRotatedScale } from './math';
 import { ImageCropperContext } from './context';
 import { useImageCropper } from './hook';
+import type { Position } from './types';
+
+const RESIZING_THRESHOLDS: [ number, number ] = [ 10, 10 ]; // 10px.
 
 function CropWindow() {
 	const {
-		state: { size, offset },
-		width,
-		height,
+		state: { size, offset, scale, isResizing },
 		refs: { cropperWindowRef },
 		dispatch,
 	} = useContext( ImageCropperContext );
 	const [ element, setElement ] = useState< HTMLDivElement >();
+	const initialMousePositionRef = useRef< Position >( { x: 0, y: 0 } );
 
 	return (
 		<Resizable
 			size={ size }
-			maxWidth={ width }
-			maxHeight={ height }
+			// maxWidth={ width }
+			// maxHeight={ height }
 			showHandle
-			onResizeStart={ () => {
-				// setMaxSize((maxSize) => {
-				//   let maxWidth = maxSize.width;
-				//   let maxHeight = maxSize.height;
-				//   if (direction.toLowerCase().includes('left')) {
-				//     maxWidth = offset.x + size.width;
-				//   }
-				//   if (direction.toLowerCase().includes('right')) {
-				//     maxWidth = containerWidth - offset.x;
-				//   }
-				//   if (direction.startsWith('top')) {
-				//     maxHeight = offset.y + size.height;
-				//   }
-				//   if (direction.startsWith('bottom')) {
-				//     maxHeight = containerHeight - offset.y;
-				//   }
-				//   // Bail out updates if the states are the same.
-				//   if (maxWidth === maxSize.width && maxHeight === maxSize.height) {
-				//     return maxSize;
-				//   }
-				//   return { width: maxWidth, height: maxHeight };
-				// });
-
-				// Set the temporaray offset on resizing.
+			// Emulate the resizing thresholds.
+			grid={ isResizing ? undefined : RESIZING_THRESHOLDS }
+			onResizeStart={ ( event ) => {
+				// Set the temporary offset on resizing.
 				element!.style.setProperty(
 					'--wp-cropper-x',
 					`${ offset.x }px`
@@ -62,20 +43,64 @@ function CropWindow() {
 					'--wp-cropper-y',
 					`${ offset.y }px`
 				);
+
+				if ( event.type === 'mousedown' ) {
+					const mouseEvent = event as MouseEvent;
+					initialMousePositionRef.current = {
+						x: mouseEvent.clientX,
+						y: mouseEvent.clientY,
+					};
+				} else if ( event.type === 'touchstart' ) {
+					const touch = ( event as TouchEvent ).touches[ 0 ];
+					initialMousePositionRef.current = {
+						x: touch.clientX,
+						y: touch.clientY,
+					};
+				}
 			} }
 			onResize={ ( _event, direction, _element, delta ) => {
-				// Set the temporaray offset on resizing.
-				if ( direction.toLowerCase().includes( 'left' ) ) {
-					element!.style.setProperty(
-						'--wp-cropper-x',
-						`${ offset.x - delta.width }px`
-					);
+				if ( delta.width === 0 && delta.height === 0 ) {
+					if ( scale === 1 ) {
+						return;
+					}
+					// let x = 0;
+					// let y = 0;
+					// if ( event.type === 'mousemove' ) {
+					// 	const mouseEvent = event as unknown as MouseEvent;
+					// 	x =
+					// 		mouseEvent.clientX -
+					// 		initialMousePositionRef.current.x;
+					// 	y =
+					// 		mouseEvent.clientY -
+					// 		initialMousePositionRef.current.y;
+					// } else if ( event.type === 'touchmove' ) {
+					// 	const touch = ( event as unknown as TouchEvent )
+					// 		.touches[ 0 ];
+					// 	x = touch.clientX - initialMousePositionRef.current.x;
+					// 	y = touch.clientY - initialMousePositionRef.current.y;
+					// }
 				}
-				if ( direction.startsWith( 'top' ) ) {
-					element!.style.setProperty(
-						'--wp-cropper-y',
-						`${ offset.y - delta.height }px`
-					);
+				if ( ! isResizing ) {
+					if (
+						Math.abs( delta.width ) >= RESIZING_THRESHOLDS[ 0 ] ||
+						Math.abs( delta.height ) >= RESIZING_THRESHOLDS[ 1 ]
+					) {
+						dispatch( { type: 'RESIZE_START' } );
+					}
+				} else {
+					// Set the temporary offset on resizing.
+					if ( direction.toLowerCase().includes( 'left' ) ) {
+						element!.style.setProperty(
+							'--wp-cropper-x',
+							`${ offset.x - delta.width }px`
+						);
+					}
+					if ( direction.startsWith( 'top' ) ) {
+						element!.style.setProperty(
+							'--wp-cropper-y',
+							`${ offset.y - delta.height }px`
+						);
+					}
 				}
 			} }
 			onResizeStop={ ( _event, direction, _element, delta ) => {
@@ -100,21 +125,20 @@ function CropWindow() {
 
 const Cropper = forwardRef< HTMLDivElement >( ( {}, ref ) => {
 	const {
-		state: { angle, scale, offset, position },
+		state: { width, height, angle, turns, scale, offset, position },
 		src,
-		width,
-		height,
 		refs: { imageRef },
 	} = useContext( ImageCropperContext );
-	const rotatedScale = getRotatedScale( angle, scale, width, height );
+	const isAxisSwapped = turns % 2 !== 0;
+	const degree = angle + turns * 90;
 
 	return (
 		<Container
 			style={ {
-				width,
-				height,
-				'--wp-cropper-angle': `${ angle }deg`,
-				'--wp-cropper-scale': `${ rotatedScale }`,
+				width: `${ isAxisSwapped ? height : width }px`,
+				height: `${ isAxisSwapped ? width : height }px`,
+				'--wp-cropper-angle': `${ degree }deg`,
+				'--wp-cropper-scale': `${ scale }`,
 				'--wp-cropper-x': `${ offset.x }px`,
 				'--wp-cropper-y': `${ offset.y }px`,
 				'--wp-cropper-image-x': `${ position.x }px`,
@@ -122,14 +146,16 @@ const Cropper = forwardRef< HTMLDivElement >( ( {}, ref ) => {
 			} }
 			ref={ ref }
 		>
-			<Img
-				width={ width }
-				height={ height }
-				src={ src }
-				alt=""
-				crossOrigin="anonymous"
-				ref={ imageRef }
-			/>
+			<div style={ { position: 'relative' } }>
+				<Img
+					width={ width }
+					height={ height }
+					src={ src }
+					alt=""
+					crossOrigin="anonymous"
+					ref={ imageRef }
+				/>
+			</div>
 			<CropWindow />
 		</Container>
 	);

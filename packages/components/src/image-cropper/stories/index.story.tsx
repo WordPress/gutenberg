@@ -26,11 +26,7 @@ const meta: Meta< typeof ImageCropper.Provider > = {
 export default meta;
 
 function TemplateControls() {
-	const {
-		state: { angle },
-		dispatch,
-		getImageBlob,
-	} = useContext( ImageCropperContext );
+	const { state, dispatch, getImageBlob } = useContext( ImageCropperContext );
 	const [ previewUrl, setPreviewUrl ] = useState< string >( '' );
 
 	return (
@@ -40,17 +36,35 @@ function TemplateControls() {
 				min={ -45 }
 				max={ 45 }
 				step={ 1 }
-				value={ angle }
-				onChange={ ( event ) =>
+				value={ state.angle }
+				onChange={ ( event ) => {
 					dispatch( {
 						type: 'ROTATE',
 						angle: Number( event.target.value ),
-					} )
-				}
+					} );
+				} }
 			/>
+
+			<button
+				onClick={ () => {
+					dispatch( {
+						type: 'ROTATE_CLOCKWISE',
+						isCounterClockwise: true,
+					} );
+				} }
+			>
+				Rotate -90°
+			</button>
+			<button
+				onClick={ () => {
+					dispatch( { type: 'ROTATE_CLOCKWISE' } );
+				} }
+			>
+				Rotate 90°
+			</button>
 			<button
 				onClick={ async () => {
-					const blob = await getImageBlob();
+					const blob = await getImageBlob( state );
 					if ( previewUrl ) {
 						URL.revokeObjectURL( previewUrl );
 					}
