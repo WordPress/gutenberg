@@ -209,14 +209,21 @@ export const savePost =
 		}
 
 		if ( ! error ) {
-			error = await registry
-				.dispatch( coreStore )
-				.saveEntityRecord(
-					'postType',
-					previousRecord.type,
-					Promise.resolve( edits ),
-					options
-				);
+			try {
+				error = await registry
+					.dispatch( coreStore )
+					.saveEntityRecord(
+						'postType',
+						previousRecord.type,
+						Promise.resolve( edits ),
+						options
+					);
+			} catch ( err ) {
+				error =
+					err.message && err.code !== 'unknown_error'
+						? err.message
+						: __( 'An error occurred while updating.' );
+			}
 		}
 
 		if ( ! error ) {
