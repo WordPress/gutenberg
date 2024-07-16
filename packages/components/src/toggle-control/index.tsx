@@ -3,6 +3,7 @@
  */
 import type { ChangeEvent, ForwardedRef } from 'react';
 import { css } from '@emotion/react';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -109,7 +110,9 @@ export function ToggleControl(
 				<FlexBlock
 					as="label"
 					htmlFor={ id }
-					className="components-toggle-control__label"
+					className={ clsx( 'components-toggle-control__label', {
+						'is-disabled': disabled,
+					} ) }
 				>
 					{ label }
 				</FlexBlock>

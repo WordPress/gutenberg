@@ -1,6 +1,9 @@
 .components-toggle-control__label {
 	line-height: $toggle-height;
-	cursor: pointer;
+
+	&:not(.is-disabled) {
+		cursor: pointer;
+	}
 }
 
 .components-toggle-control__help {
