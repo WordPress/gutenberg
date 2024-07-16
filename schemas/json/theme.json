@@ -1904,6 +1904,39 @@
 				}
 			]
 		},
+		"stylesElementsPseudoSelectorsProperties": {
+			"type": "object",
+			"properties": {
+				":active": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				":any-link": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				":focus": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				":hover": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				":link": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				":visited": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				}
+			}
+		},
+		"stylesElementsPseudoSelectorsPropertyNames": {
+			"enum": [
+				":active",
+				":any-link",
+				":focus",
+				":hover",
+				":link",
+				":visited"
+			]
+		},
 		"stylesElementsPropertiesComplete": {
 			"description": "Styles defined on a per-element basis using the element's selector.",
 			"type": "object",
@@ -1914,27 +1947,7 @@
 							"$ref": "#/definitions/stylesProperties"
 						},
 						{
-							"type": "object",
-							"properties": {
-								":hover": {
-									"$ref": "#/definitions/stylesPropertiesComplete"
-								},
-								":focus": {
-									"$ref": "#/definitions/stylesPropertiesComplete"
-								},
-								":active": {
-									"$ref": "#/definitions/stylesPropertiesComplete"
-								},
-								":visited": {
-									"$ref": "#/definitions/stylesPropertiesComplete"
-								},
-								":link": {
-									"$ref": "#/definitions/stylesPropertiesComplete"
-								},
-								":any-link": {
-									"$ref": "#/definitions/stylesPropertiesComplete"
-								}
-							}
+							"$ref": "#/definitions/stylesElementsPseudoSelectorsProperties"
 						},
 						{
 							"propertyNames": {
@@ -1943,14 +1956,7 @@
 										"$ref": "#/definitions/stylesPropertyNames"
 									},
 									{
-										"enum": [
-											":hover",
-											":focus",
-											":active",
-											":visited",
-											":link",
-											":any-link"
-										]
+										"$ref": "#/definitions/stylesElementsPseudoSelectorsPropertyNames"
 									}
 								]
 							}
@@ -1963,27 +1969,7 @@
 							"$ref": "#/definitions/stylesProperties"
 						},
 						{
-							"type": "object",
-							"properties": {
-								":hover": {
-									"$ref": "#/definitions/stylesPropertiesComplete"
-								},
-								":focus": {
-									"$ref": "#/definitions/stylesPropertiesComplete"
-								},
-								":active": {
-									"$ref": "#/definitions/stylesPropertiesComplete"
-								},
-								":visited": {
-									"$ref": "#/definitions/stylesPropertiesComplete"
-								},
-								":link": {
-									"$ref": "#/definitions/stylesPropertiesComplete"
-								},
-								":any-link": {
-									"$ref": "#/definitions/stylesPropertiesComplete"
-								}
-							}
+							"$ref": "#/definitions/stylesElementsPseudoSelectorsProperties"
 						},
 						{
 							"propertyNames": {
@@ -1992,14 +1978,7 @@
 										"$ref": "#/definitions/stylesPropertyNames"
 									},
 									{
-										"enum": [
-											":hover",
-											":focus",
-											":active",
-											":visited",
-											":link",
-											":any-link"
-										]
+										"$ref": "#/definitions/stylesElementsPseudoSelectorsPropertyNames"
 									}
 								]
 							}
