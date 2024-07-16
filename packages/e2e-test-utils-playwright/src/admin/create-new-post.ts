@@ -9,6 +9,7 @@ interface NewPostOptions {
 	content?: string;
 	excerpt?: string;
 	showWelcomeGuide?: boolean;
+	fullscreenMode?: boolean;
 }
 
 /**
@@ -41,6 +42,6 @@ export async function createNewPost(
 
 	await this.editor.setPreferences( 'core/edit-post', {
 		welcomeGuide: options.showWelcomeGuide ?? false,
-		fullscreenMode: false,
+		fullscreenMode: options.fullscreenMode ?? false,
 	} );
 }

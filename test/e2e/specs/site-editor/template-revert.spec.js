@@ -20,10 +20,9 @@ test.describe( 'Template Revert', () => {
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
-	test.beforeEach( async ( { admin, requestUtils, editor } ) => {
+	test.beforeEach( async ( { admin, requestUtils } ) => {
 		await requestUtils.deleteAllTemplates( 'wp_template' );
-		await admin.visitSiteEditor();
-		await editor.canvas.locator( 'body' ).click();
+		await admin.visitSiteEditor( { canvas: 'edit' } );
 	} );
 
 	test( 'should delete the template after saving the reverted template', async ( {
@@ -56,7 +55,7 @@ test.describe( 'Template Revert', () => {
 			page.locator(
 				'role=region[name="Editor settings"i] >> role=button[name="Actions"i]'
 			)
-		).toBeHidden();
+		).toBeDisabled();
 	} );
 
 	test( 'should show the original content after revert', async ( {
@@ -179,6 +178,10 @@ test.describe( 'Template Revert', () => {
 		await editor.saveSiteEditorEntities( {
 			isOnlyCurrentEntityDirty: true,
 		} );
+		await page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.getByText( /(updated|published)\./ )
+			.click();
 		const contentBefore =
 			await templateRevertUtils.getCurrentSiteEditorContent();
 
@@ -190,7 +193,6 @@ test.describe( 'Template Revert', () => {
 		await editor.saveSiteEditorEntities( {
 			isOnlyCurrentEntityDirty: true,
 		} );
-
 		await admin.visitSiteEditor();
 
 		const contentAfter =

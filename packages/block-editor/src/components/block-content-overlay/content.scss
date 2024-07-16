@@ -5,10 +5,9 @@
 		pointer-events: none;
 	}
 
-	.block-editor-iframe__body.is-zoomed-out &::before {
-		// Unfortunately because of the vw unit, this is not always going to be exact
-		// When the scrollbar is visible, the frame exceeds the canvas by a few pixels.
-		width: calc(100vw);
-		left: calc(( 100% - 100vw ) / 2);
+	.block-editor-block-list__block.has-block-overlay::before {
+		left: 0;
+		right: 0;
+		width: auto;
 	}
 }

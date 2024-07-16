@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
 import * as Ariakit from '@ariakit/react';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -45,6 +45,7 @@ function UnforwardedTooltip(
 ) {
 	const {
 		children,
+		className,
 		delay = TOOLTIP_DELAY,
 		hideOnClick = true,
 		placement,
@@ -87,10 +88,7 @@ function UnforwardedTooltip(
 	}
 	computedPlacement = computedPlacement || 'bottom';
 
-	// Removing the `Ariakit` namespace from the hook name allows ESLint to
-	// properly identify the hook, and apply the correct linting rules.
-	const useAriakitTooltipStore = Ariakit.useTooltipStore;
-	const tooltipStore = useAriakitTooltipStore( {
+	const tooltipStore = Ariakit.useTooltipStore( {
 		placement: computedPlacement,
 		showTimeout: delay,
 	} );
@@ -116,7 +114,7 @@ function UnforwardedTooltip(
 			{ isOnlyChild && ( text || shortcut ) && (
 				<Ariakit.Tooltip
 					{ ...restProps }
-					className="components-tooltip"
+					className={ clsx( 'components-tooltip', className ) }
 					unmountOnHide
 					gutter={ 4 }
 					id={ describedById }

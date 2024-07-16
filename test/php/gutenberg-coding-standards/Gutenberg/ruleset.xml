@@ -6,5 +6,6 @@
 	<rule ref="Gutenberg.CodeAnalysis.GuardedFunctionAndClassNames"/>
 	<rule ref="Gutenberg.CodeAnalysis.ForbiddenFunctionsAndClasses"/>
 	<rule ref="Gutenberg.NamingConventions.ValidBlockLibraryFunctionName"/>
+	<rule ref="Gutenberg.Commenting.SinceTag"/>
 
 </ruleset>

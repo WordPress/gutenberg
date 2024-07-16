@@ -29,6 +29,7 @@ import { positionToPlacement } from '../popover/utils';
 const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ] as const;
 
 function useDeprecatedProps( {
+	__experimentalIsFocusable,
 	isDefault,
 	isPrimary,
 	isSecondary,
@@ -43,7 +44,8 @@ function useDeprecatedProps( {
 	let computedSize = size;
 	let computedVariant = variant;
 
-	const newProps: { 'aria-pressed'?: boolean } = {
+	const newProps = {
+		accessibleWhenDisabled: __experimentalIsFocusable,
 		// @todo Mark `isPressed` as deprecated
 		'aria-pressed': isPressed,
 	};
@@ -91,6 +93,7 @@ export function UnforwardedButton(
 ) {
 	const {
 		__next40pxDefaultSize,
+		accessibleWhenDisabled,
 		isBusy,
 		isDestructive,
 		className,
@@ -106,7 +109,6 @@ export function UnforwardedButton(
 		size = 'default',
 		text,
 		variant,
-		__experimentalIsFocusable: isFocusable,
 		describedBy,
 		...buttonOrAnchorProps
 	} = useDeprecatedProps( props );
@@ -159,8 +161,8 @@ export function UnforwardedButton(
 		'has-icon': !! icon,
 	} );
 
-	const trulyDisabled = disabled && ! isFocusable;
-	const Tag = href !== undefined && ! trulyDisabled ? 'a' : 'button';
+	const trulyDisabled = disabled && ! accessibleWhenDisabled;
+	const Tag = href !== undefined && ! disabled ? 'a' : 'button';
 	const buttonProps: ComponentPropsWithoutRef< 'button' > =
 		Tag === 'button'
 			? {
@@ -174,14 +176,16 @@ export function UnforwardedButton(
 	const anchorProps: ComponentPropsWithoutRef< 'a' > =
 		Tag === 'a' ? { href, target } : {};
 
-	if ( disabled && isFocusable ) {
+	const disableEventProps: {
+		[ key: string ]: ( event: MouseEvent ) => void;
+	} = {};
+	if ( disabled && accessibleWhenDisabled ) {
 		// In this case, the button will be disabled, but still focusable and
 		// perceivable by screen reader users.
 		buttonProps[ 'aria-disabled' ] = true;
 		anchorProps[ 'aria-disabled' ] = true;
-
 		for ( const disabledEvent of disabledEventsOnDisabledButton ) {
-			additionalProps[ disabledEvent ] = ( event: MouseEvent ) => {
+			disableEventProps[ disabledEvent ] = ( event: MouseEvent ) => {
 				if ( event ) {
 					event.stopPropagation();
 					event.preventDefault();
@@ -234,6 +238,7 @@ export function UnforwardedButton(
 			<a
 				{ ...anchorProps }
 				{ ...( additionalProps as HTMLAttributes< HTMLAnchorElement > ) }
+				{ ...disableEventProps }
 				{ ...commonProps }
 			>
 				{ elementChildren }
@@ -242,6 +247,7 @@ export function UnforwardedButton(
 			<button
 				{ ...buttonProps }
 				{ ...( additionalProps as HTMLAttributes< HTMLButtonElement > ) }
+				{ ...disableEventProps }
 				{ ...commonProps }
 			>
 				{ elementChildren }

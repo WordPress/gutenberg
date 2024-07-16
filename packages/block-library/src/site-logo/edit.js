@@ -73,7 +73,6 @@ const SiteLogo = ( {
 	const [ { naturalWidth, naturalHeight }, setNaturalSize ] = useState( {} );
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
 	const { toggleSelection } = useDispatch( blockEditorStore );
-	const classes = clsx( 'custom-logo-link' );
 	const { imageEditing, maxWidth, title } = useSelect( ( select ) => {
 		const settings = select( blockEditorStore ).getSettings();
 		const siteEntities = select( coreStore ).getEntityRecord(
@@ -136,7 +135,7 @@ const SiteLogo = ( {
 			/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 			<a
 				href={ siteUrl }
-				className={ classes }
+				className="custom-logo-link"
 				rel="home"
 				title={ title }
 				onClick={ ( event ) => event.preventDefault() }
@@ -404,7 +403,10 @@ export default function LogoEdit( {
 	} = useSelect( ( select ) => {
 		const { canUser, getEntityRecord, getEditedEntityRecord } =
 			select( coreStore );
-		const _canUserEdit = canUser( 'update', 'settings' );
+		const _canUserEdit = canUser( 'update', {
+			kind: 'root',
+			name: 'site',
+		} );
 		const siteSettings = _canUserEdit
 			? getEditedEntityRecord( 'root', 'site' )
 			: undefined;

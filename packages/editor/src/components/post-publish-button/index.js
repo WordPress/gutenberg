@@ -194,6 +194,9 @@ export class PostPublishButton extends Component {
 	}
 }
 
+/**
+ * Renders the publish button.
+ */
 export default compose( [
 	withSelect( ( select ) => {
 		const {

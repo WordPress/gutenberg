@@ -16,43 +16,9 @@ import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
 import { STORE_NAME } from './name';
 import { updateFootnotesFromMeta } from './footnotes';
 
-/** @typedef {import('@wordpress/blocks').WPBlock} WPBlock */
-
 const EMPTY_ARRAY = [];
 
-/**
- * Internal dependencies
- */
-import { rootEntitiesConfig, additionalEntityConfigLoaders } from './entities';
-
-const entityContexts = {
-	...rootEntitiesConfig.reduce( ( acc, loader ) => {
-		if ( ! acc[ loader.kind ] ) {
-			acc[ loader.kind ] = {};
-		}
-		acc[ loader.kind ][ loader.name ] = {
-			context: createContext( undefined ),
-		};
-		return acc;
-	}, {} ),
-	...additionalEntityConfigLoaders.reduce( ( acc, loader ) => {
-		acc[ loader.kind ] = {};
-		return acc;
-	}, {} ),
-};
-const getEntityContext = ( kind, name ) => {
-	if ( ! entityContexts[ kind ] ) {
-		throw new Error( `Missing entity config for kind: ${ kind }.` );
-	}
-
-	if ( ! entityContexts[ kind ][ name ] ) {
-		entityContexts[ kind ][ name ] = {
-			context: createContext( undefined ),
-		};
-	}
-
-	return entityContexts[ kind ][ name ].context;
-};
+const EntityContext = createContext( {} );
 
 /**
  * Context provider component for providing
@@ -68,8 +34,22 @@ const getEntityContext = ( kind, name ) => {
  *                   the entity's context provider.
  */
 export default function EntityProvider( { kind, type: name, id, children } ) {
-	const Provider = getEntityContext( kind, name ).Provider;
-	return <Provider value={ id }>{ children }</Provider>;
+	const parent = useContext( EntityContext );
+	const childContext = useMemo(
+		() => ( {
+			...parent,
+			[ kind ]: {
+				...parent?.[ kind ],
+				[ name ]: id,
+			},
+		} ),
+		[ parent, kind, name, id ]
+	);
+	return (
+		<EntityContext.Provider value={ childContext }>
+			{ children }
+		</EntityContext.Provider>
+	);
 }
 
 /**
@@ -80,7 +60,8 @@ export default function EntityProvider( { kind, type: name, id, children } ) {
  * @param {string} name The entity name.
  */
 export function useEntityId( kind, name ) {
-	return useContext( getEntityContext( kind, name ) );
+	const context = useContext( EntityContext );
+	return context?.[ kind ]?.[ name ];
 }
 
 /**
@@ -150,7 +131,7 @@ const parsedBlocksCache = new WeakMap();
  * @param {Object} options
  * @param {string} [options.id] An entity ID to use instead of the context-provided one.
  *
- * @return {[WPBlock[], Function, Function]} The block array and setters.
+ * @return {[unknown[], Function, Function]} The block array and setters.
  */
 export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 	const providerId = useEntityId( kind, name );

@@ -6,6 +6,7 @@ import {
 	findTransform,
 	getBlockTransforms,
 	hasBlockSupport,
+	switchToBlockType,
 } from '@wordpress/blocks';
 import {
 	documentHasSelection,
@@ -60,6 +61,25 @@ export default function useClipboardHandler() {
 				return;
 			}
 
+			// Let native copy/paste behaviour take over in input fields.
+			// But always handle multiple selected blocks.
+			if ( ! hasMultiSelection() ) {
+				const { target } = event;
+				const { ownerDocument } = target;
+				// If copying, only consider actual text selection as selection.
+				// Otherwise, any focus on an input field is considered.
+				const hasSelection =
+					event.type === 'copy' || event.type === 'cut'
+						? documentHasUncollapsedSelection( ownerDocument )
+						: documentHasSelection( ownerDocument ) &&
+						  ! ownerDocument.activeElement.isContentEditable;
+
+				// Let native copy behaviour take over in input fields.
+				if ( hasSelection ) {
+					return;
+				}
+			}
+
 			const { activeElement } = event.target.ownerDocument;
 
 			if ( ! node.contains( activeElement ) ) {
@@ -72,22 +92,6 @@ export default function useClipboardHandler() {
 			const expandSelectionIsNeeded =
 				! shouldHandleWholeBlocks && ! isSelectionMergeable;
 			if ( event.type === 'copy' || event.type === 'cut' ) {
-				if ( ! hasMultiSelection() ) {
-					const { target } = event;
-					const { ownerDocument } = target;
-					// If copying, only consider actual text selection as selection.
-					// Otherwise, any focus on an input field is considered.
-					const hasSelection =
-						event.type === 'copy' || event.type === 'cut'
-							? documentHasUncollapsedSelection( ownerDocument )
-							: documentHasSelection( ownerDocument );
-
-					// Let native copy behaviour take over in input fields.
-					if ( hasSelection ) {
-						return;
-					}
-				}
-
 				event.preventDefault();
 
 				if ( selectedBlockClientIds.length === 1 ) {
@@ -205,15 +209,36 @@ export default function useClipboardHandler() {
 					firstSelectedClientId
 				);
 
-				if (
-					! blocks.every( ( block ) =>
-						canInsertBlockType( block.name, rootClientId )
-					)
-				) {
-					return;
+				const newBlocks = [];
+
+				for ( const block of blocks ) {
+					if ( canInsertBlockType( block.name, rootClientId ) ) {
+						newBlocks.push( block );
+					} else {
+						// If a block cannot be inserted in a root block, try
+						// converting it to that root block type and insert the
+						// inner blocks.
+						// Example: paragraphs cannot be inserted into a list,
+						// so convert the paragraphs to a list for list items.
+						const rootBlockName = getBlockName( rootClientId );
+						const switchedBlocks =
+							block.name !== rootBlockName
+								? switchToBlockType( block, rootBlockName )
+								: [ block ];
+
+						if ( ! switchedBlocks ) {
+							return;
+						}
+
+						for ( const switchedBlock of switchedBlocks ) {
+							for ( const innerBlock of switchedBlock.innerBlocks ) {
+								newBlocks.push( innerBlock );
+							}
+						}
+					}
 				}
 
-				__unstableSplitSelection( blocks );
+				__unstableSplitSelection( newBlocks );
 				event.preventDefault();
 			}
 		}

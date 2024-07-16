@@ -310,20 +310,21 @@ There's one special setting property, `appearanceTools`, which is a boolean and 
 
 To retain backward compatibility, the existing `add_theme_support` declarations that configure the block editor are retrofit in the proper categories for the top-level section. For example, if a theme uses `add_theme_support('disable-custom-colors')`, it'll be the same as setting `settings.color.custom` to `false`. If the `theme.json` contains any settings, these will take precedence over the values declared via `add_theme_support`. This is the complete list of equivalences:
 
-| add_theme_support           | theme.json setting                                        |
-| --------------------------- | --------------------------------------------------------- |
-| `custom-line-height`        | Set `typography.lineHeight` to `true`.              |
-| `custom-spacing`            | Set `spacing.padding` to `true`.                    |
-| `custom-units`              | Provide the list of units via `spacing.units`.            |
-| `disable-custom-colors`     | Set `color.custom` to `false`.                            |
-| `disable-custom-font-sizes` | Set `typography.customFontSize` to `false`.               |
-| `disable-custom-gradients`  | Set `color.customGradient` to `false`.                    |
-| `editor-color-palette`      | Provide the list of colors via `color.palette`.           |
-| `editor-font-sizes`         | Provide the list of font size via `typography.fontSizes`. |
-| `editor-gradient-presets`   | Provide the list of gradients via `color.gradients`.      |
-| `appearance-tools`          | Set `appearanceTools` to `true`.                          |
-| `border`                    | Set `border: color, radius, style, width` to `true`.      |
-| `link-color `               | Set `color.link` to `true`.                               |
+| add_theme_support           | theme.json setting                                            |
+| --------------------------- | ------------------------------------------------------------- |
+| `custom-line-height`        | Set `typography.lineHeight` to `true`.                        |
+| `custom-spacing`            | Set `spacing.padding` to `true`.                              |
+| `custom-units`              | Provide the list of units via `spacing.units`.                |
+| `disable-custom-colors`     | Set `color.custom` to `false`.                                |
+| `disable-custom-font-sizes` | Set `typography.customFontSize` to `false`.                   |
+| `disable-custom-gradients`  | Set `color.customGradient` to `false`.                        |
+| `editor-color-palette`      | Provide the list of colors via `color.palette`.               |
+| `editor-font-sizes`         | Provide the list of font size via `typography.fontSizes`.     |
+| `editor-gradient-presets`   | Provide the list of gradients via `color.gradients`.          |
+| `editor-spacing-sizes`      | Provide the list of spacing sizes via `spacing.spacingSizes`. |
+| `appearance-tools`          | Set `appearanceTools` to `true`.                              |
+| `border`                    | Set `border: color, radius, style, width` to `true`.          |
+| `link-color `               | Set `color.link` to `true`.                                   |
 
 #### Presets
 
@@ -336,16 +337,7 @@ The following presets can be defined via `theme.json`:
 - `color.palette`:
     - generates 3 classes per preset value: color, background-color, and border-color.
     - generates a single custom property per preset value.
-- `spacing.spacingScale`: used to generate an array of spacing preset sizes for use with padding, margin, and gap settings.
-    - `operator`: specifies how to calculate the steps with either `*` for multiplier, or `+` for sum.
-    - `increment`: the amount to increment each step by. Core by default uses a 'perfect 5th' multiplier of `1.5`.
-    - `steps`: the number of steps to generate in the spacing scale. The default is 7. To prevent the generation of the spacing presets, and to disable the related UI, this can be set to `0`.
-    - `mediumStep`: the steps in the scale are generated descending and ascending from a medium step, so this should be the size value of the medium space, without the unit. The default medium step is `1.5rem` so the mediumStep value is `1.5`.
-    - `unit`: the unit the scale uses, eg. `px, rem, em, %`. The default is `rem`.
-- `spacing.spacingSizes`: themes can choose to include a static `spacing.spacingSizes` array of spacing preset sizes if they have a sequence of sizes that can't be generated via an increment or multiplier.
-    - `name`: a human readable name for the size, eg. `Small, Medium, Large`.
-    - `slug`: the machine readable name. In order to provide the best cross site/theme compatibility the slugs should be in the format, "10","20","30","40","50","60", with "50" representing the `Medium` size value.
-    - `size`: the size, including the unit, eg. `1.5rem`. It is possible to include fluid values like `clamp(2rem, 10vw, 20rem)`.
+- `spacing.spacingSizes`/`spacing.spacingScale`: generates a single custom property per preset value.
 - `typography.fontSizes`: generates a single class and custom property per preset value.
 - `typography.fontFamilies`: generates a single custom property per preset value.
 
@@ -1337,4 +1329,4 @@ The value defined for the root `styles.spacing.blockGap` style is also output as
 
 ### Why does it take so long to update the styles in the browser?
 
-When you are actively developing with theme.json you may notice it takes 30+ seconds for your changes to show up in the browser, this is because `theme.json` is cached. To remove this caching issue, set either [`WP_DEBUG`](https://wordpress.org/documentation/article/debugging-in-wordpress/#wp_debug) or [`SCRIPT_DEBUG`](https://wordpress.org/documentation/article/debugging-in-wordpress/#script_debug) to 'true' in your [`wp-config.php`](https://wordpress.org/documentation/article/editing-wp-config-php/). This tells WordPress to skip the cache and always use fresh data.
+When you are actively developing with theme.json you may notice it takes 30+ seconds for your changes to show up in the browser, this is because `theme.json` is cached. To remove this caching issue, set either [`WP_DEBUG`](https://developer.wordpress.org/advanced-administration/debug/debug-wordpress/#wp_debug) or [`SCRIPT_DEBUG`](https://developer.wordpress.org/advanced-administration/debug/debug-wordpress/#script_debug) to 'true' in your [`wp-config.php`](https://developer.wordpress.org/advanced-administration/wordpress/wp-config/). This tells WordPress to skip the cache and always use fresh data.

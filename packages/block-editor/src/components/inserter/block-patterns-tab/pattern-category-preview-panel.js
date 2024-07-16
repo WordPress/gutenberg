@@ -1,7 +1,6 @@
 /**
  * Internal dependencies
  */
-
 import { PatternCategoryPreviews } from './pattern-category-previews';
 
 export function PatternCategoryPreviewPanel( {

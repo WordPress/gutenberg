@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createRoot } from '@wordpress/element';
+import { createRoot, StrictMode } from '@wordpress/element';
 import {
 	registerCoreBlocks,
 	__experimentalGetCoreBlocks,
@@ -61,7 +61,7 @@ export function initialize( editorName, blockEditorSettings ) {
 	} );
 	registerCoreBlocks( coreBlocks );
 	registerLegacyWidgetBlock();
-	if ( process.env.IS_GUTENBERG_PLUGIN ) {
+	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 		__experimentalRegisterExperimentalCoreBlocks( {
 			enableFSEBlocks: ENABLE_EXPERIMENTAL_FSE_BLOCKS,
 		} );
@@ -92,11 +92,13 @@ export function initialize( editorName, blockEditorSettings ) {
 		} );
 
 		createRoot( container ).render(
-			<CustomizeWidgets
-				api={ wp.customize }
-				sidebarControls={ sidebarControls }
-				blockEditorSettings={ blockEditorSettings }
-			/>
+			<StrictMode>
+				<CustomizeWidgets
+					api={ wp.customize }
+					sidebarControls={ sidebarControls }
+					blockEditorSettings={ blockEditorSettings }
+				/>
+			</StrictMode>
 		);
 	} );
 }

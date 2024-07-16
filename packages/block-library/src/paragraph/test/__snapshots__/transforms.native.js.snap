@@ -32,7 +32,7 @@ exports[`Paragraph block transforms to Heading block 1`] = `
 
 exports[`Paragraph block transforms to List block 1`] = `
 "<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>Example text</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->"

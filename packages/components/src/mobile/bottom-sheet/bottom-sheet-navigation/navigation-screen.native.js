@@ -16,13 +16,14 @@ import {
 /**
  * WordPress dependencies
  */
-import { BottomSheetContext } from '@wordpress/components';
+
 import { useRef, useCallback, useContext, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { BottomSheetNavigationContext } from './bottom-sheet-navigation-context';
+import { BottomSheetContext } from '../bottom-sheet-context';
 import styles from './styles.scss';
 
 const BottomSheetNavigationScreen = ( {

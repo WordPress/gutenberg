@@ -89,7 +89,7 @@ const WarningMaxDepthExceeded = ( { clientId } ) => {
 		<TouchableWithoutFeedback
 			disabled={ ! isSelected }
 			accessibilityLabel={ __( 'Warning message' ) }
-			accessibilityRole={ 'button' }
+			accessibilityRole="button"
 			accessibilityHint={ __( 'Tap here to show more details.' ) }
 			onPress={ () => setShowDetails( true ) }
 		>

@@ -167,6 +167,7 @@ Settings related to spacing.
 | padding | boolean | false |  |
 | units | array | px,em,rem,vh,vw,% |  |
 | customSpacingSize | boolean | true |  |
+| defaultSpacingSizes | boolean | true |  |
 | spacingSizes | array |  | name, size, slug |
 | spacingScale | object |  |  |
 
@@ -204,6 +205,20 @@ Generate custom CSS custom properties of the form `--wp--custom--{key}--{nested-
 ---
 ## Styles
 
+
+### background
+
+Background styles.
+
+| Property  | Type   |  Props  |
+| ---       | ---    |---   |
+| backgroundImage | string, object |  |
+| backgroundPosition | string, object |  |
+| backgroundRepeat | string, object |  |
+| backgroundSize | string, object |  |
+| backgroundAttachment | string, object |  |
+
+---
 
 ### border
 

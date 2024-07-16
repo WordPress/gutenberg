@@ -30,8 +30,9 @@ test.describe( 'new editor filtered state', () => {
 		await expect
 			.poll( editor.getEditedPostContent )
 			.toBe( 'My default content' );
+		await page.getByRole( 'button', { name: 'Edit excerpt' } ).click();
 		await expect(
-			page.getByRole( 'button', { name: 'Edit excerpt' } )
-		).toHaveText( 'My default excerpt' );
+			page.getByRole( 'textbox', { name: 'Write an excerpt (optional)' } )
+		).toHaveValue( 'My default excerpt' );
 	} );
 } );

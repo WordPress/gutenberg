@@ -51,6 +51,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		support: [ 'background', 'backgroundSize' ],
 		useEngine: true,
 	},
+	backgroundPosition: {
+		value: [ 'background', 'backgroundPosition' ],
+		support: [ 'background', 'backgroundPosition' ],
+		useEngine: true,
+	},
 	borderColor: {
 		value: [ 'border', 'color' ],
 		support: [ '__experimentalBorder', 'color' ],

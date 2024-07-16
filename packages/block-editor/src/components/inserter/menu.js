@@ -30,9 +30,9 @@ import { PatternCategoryPreviewPanel } from './block-patterns-tab/pattern-catego
 import { MediaTab, MediaCategoryPanel } from './media-tab';
 import InserterSearchResults from './search-results';
 import useInsertionPoint from './hooks/use-insertion-point';
-import InserterTabs from './tabs';
-import { useZoomOut } from '../../hooks/use-zoom-out';
 import { store as blockEditorStore } from '../../store';
+import TabbedSidebar from '../tabbed-sidebar';
+import { useZoomOut } from '../../hooks/use-zoom-out';
 
 const NOOP = () => {};
 function InserterMenu(
@@ -46,8 +46,10 @@ function InserterMenu(
 		showMostUsedBlocks,
 		__experimentalFilterValue = '',
 		shouldFocusBlock = true,
-		__experimentalOnPatternCategorySelection = NOOP,
+		onPatternCategorySelection,
 		onClose,
+		__experimentalInitialTab,
+		__experimentalInitialCategory,
 	},
 	ref
 ) {
@@ -59,12 +61,15 @@ function InserterMenu(
 	const [ filterValue, setFilterValue, delayedFilterValue ] =
 		useDebouncedInput( __experimentalFilterValue );
 	const [ hoveredItem, setHoveredItem ] = useState( null );
-	const [ selectedPatternCategory, setSelectedPatternCategory ] =
-		useState( null );
+	const [ selectedPatternCategory, setSelectedPatternCategory ] = useState(
+		__experimentalInitialCategory
+	);
 	const [ patternFilter, setPatternFilter ] = useState( 'all' );
 	const [ selectedMediaCategory, setSelectedMediaCategory ] =
 		useState( null );
-	const [ selectedTab, setSelectedTab ] = useState( 'blocks' );
+	const [ selectedTab, setSelectedTab ] = useState(
+		__experimentalInitialTab
+	);
 
 	const [ destinationRootClientId, onInsertBlocks, onToggleInsertionPoint ] =
 		useInsertionPoint( {
@@ -74,13 +79,32 @@ function InserterMenu(
 			insertionIndex: __experimentalInsertionIndex,
 			shouldFocusBlock,
 		} );
+	const blockTypesTabRef = useRef();
 
 	const onInsert = useCallback(
-		( blocks, meta, shouldForceFocusBlock ) => {
-			onInsertBlocks( blocks, meta, shouldForceFocusBlock );
-			onSelect();
+		( blocks, meta, shouldForceFocusBlock, _rootClientId ) => {
+			onInsertBlocks(
+				blocks,
+				meta,
+				shouldForceFocusBlock,
+				_rootClientId
+			);
+			onSelect( blocks );
+
+			// Check for focus loss due to filtering blocks by selected block type
+			window.requestAnimationFrame( () => {
+				if (
+					! shouldFocusBlock &&
+					! blockTypesTabRef?.current.contains(
+						ref.current.ownerDocument.activeElement
+					)
+				) {
+					// There has been a focus loss, so focus the first button in the block types tab
+					blockTypesTabRef?.current.querySelector( 'button' ).focus();
+				}
+			} );
 		},
-		[ onInsertBlocks, onSelect ]
+		[ onInsertBlocks, onSelect, shouldFocusBlock ]
 	);
 
 	const onInsertPattern = useCallback(
@@ -93,7 +117,7 @@ function InserterMenu(
 
 	const onHover = useCallback(
 		( item ) => {
-			onToggleInsertionPoint( !! item );
+			onToggleInsertionPoint( item );
 			setHoveredItem( item );
 		},
 		[ onToggleInsertionPoint, setHoveredItem ]
@@ -106,21 +130,13 @@ function InserterMenu(
 		[ onToggleInsertionPoint ]
 	);
 
-	const isZoomedOutViewExperimentEnabled =
-		window?.__experimentalEnableZoomedOutView;
 	const onClickPatternCategory = useCallback(
 		( patternCategory, filter ) => {
 			setSelectedPatternCategory( patternCategory );
 			setPatternFilter( filter );
-			if ( isZoomedOutViewExperimentEnabled ) {
-				__experimentalOnPatternCategorySelection();
-			}
+			onPatternCategorySelection?.();
 		},
-		[
-			setSelectedPatternCategory,
-			__experimentalOnPatternCategorySelection,
-			isZoomedOutViewExperimentEnabled,
-		]
+		[ setSelectedPatternCategory, onPatternCategorySelection ]
 	);
 
 	const showPatternPanel =
@@ -129,6 +145,11 @@ function InserterMenu(
 		!! selectedPatternCategory;
 
 	const showMediaPanel = selectedTab === 'media' && !! selectedMediaCategory;
+
+	const showZoomOut =
+		showPatternPanel && !! window.__experimentalEnableZoomedOutPatternsTab;
+
+	useZoomOut( showZoomOut );
 
 	const inserterSearch = useMemo( () => {
 		if ( selectedTab === 'media' ) {
@@ -191,6 +212,7 @@ function InserterMenu(
 			<>
 				<div className="block-editor-inserter__block-list">
 					<BlockTypesTab
+						ref={ blockTypesTabRef }
 						rootClientId={ destinationRootClientId }
 						onInsert={ onInsert }
 						onHover={ onHover }
@@ -270,9 +292,6 @@ function InserterMenu(
 		showMediaPanel,
 	] );
 
-	// When the pattern panel is showing, we want to use zoom out mode
-	useZoomOut( showPatternPanel );
-
 	const handleSetSelectedTab = ( value ) => {
 		// If no longer on patterns tab remove the category setting.
 		if ( value !== 'patterns' ) {
@@ -302,20 +321,49 @@ function InserterMenu(
 			ref={ ref }
 		>
 			<div className="block-editor-inserter__main-area">
-				<InserterTabs
+				<TabbedSidebar
 					ref={ tabsRef }
 					onSelect={ handleSetSelectedTab }
 					onClose={ onClose }
-				>
-					{ inserterSearch }
-					{ selectedTab === 'blocks' &&
-						! delayedFilterValue &&
-						blocksTab }
-					{ selectedTab === 'patterns' &&
-						! delayedFilterValue &&
-						patternsTab }
-					{ selectedTab === 'media' && mediaTab }
-				</InserterTabs>
+					selectedTab={ selectedTab }
+					closeButtonLabel={ __( 'Close block inserter' ) }
+					tabs={ [
+						{
+							name: 'blocks',
+							title: __( 'Blocks' ),
+							panel: (
+								<>
+									{ inserterSearch }
+									{ selectedTab === 'blocks' &&
+										! delayedFilterValue &&
+										blocksTab }
+								</>
+							),
+						},
+						{
+							name: 'patterns',
+							title: __( 'Patterns' ),
+							panel: (
+								<>
+									{ inserterSearch }
+									{ selectedTab === 'patterns' &&
+										! delayedFilterValue &&
+										patternsTab }
+								</>
+							),
+						},
+						{
+							name: 'media',
+							title: __( 'Media' ),
+							panel: (
+								<>
+									{ inserterSearch }
+									{ mediaTab }
+								</>
+							),
+						},
+					] }
+				/>
 			</div>
 			{ showInserterHelpPanel && hoveredItem && (
 				<Popover
@@ -332,4 +380,16 @@ function InserterMenu(
 	);
 }
 
-export default forwardRef( InserterMenu );
+export const PrivateInserterMenu = forwardRef( InserterMenu );
+
+function PublicInserterMenu( props, ref ) {
+	return (
+		<PrivateInserterMenu
+			{ ...props }
+			onPatternCategorySelection={ NOOP }
+			ref={ ref }
+		/>
+	);
+}
+
+export default forwardRef( PublicInserterMenu );

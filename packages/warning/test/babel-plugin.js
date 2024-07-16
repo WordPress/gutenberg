@@ -28,7 +28,7 @@ describe( 'babel-plugin', () => {
 		);
 		const expected = join(
 			'import warning from "@wordpress/warning";',
-			'typeof SCRIPT_DEBUG !== "undefined" && SCRIPT_DEBUG === true ? warning("a") : void 0;'
+			'globalThis.SCRIPT_DEBUG === true ? warning("a") : void 0;'
 		);
 
 		expect( transformCode( input ) ).toEqual( expected );
@@ -45,7 +45,7 @@ describe( 'babel-plugin', () => {
 		const input = 'warning("a");';
 		const options = { callee: 'warning' };
 		const expected =
-			'typeof SCRIPT_DEBUG !== "undefined" && SCRIPT_DEBUG === true ? warning("a") : void 0;';
+			'globalThis.SCRIPT_DEBUG === true ? warning("a") : void 0;';
 
 		expect( transformCode( input, options ) ).toEqual( expected );
 	} );
@@ -59,9 +59,9 @@ describe( 'babel-plugin', () => {
 		);
 		const expected = join(
 			'import warning from "@wordpress/warning";',
-			'typeof SCRIPT_DEBUG !== "undefined" && SCRIPT_DEBUG === true ? warning("a") : void 0;',
-			'typeof SCRIPT_DEBUG !== "undefined" && SCRIPT_DEBUG === true ? warning("b") : void 0;',
-			'typeof SCRIPT_DEBUG !== "undefined" && SCRIPT_DEBUG === true ? warning("c") : void 0;'
+			'globalThis.SCRIPT_DEBUG === true ? warning("a") : void 0;',
+			'globalThis.SCRIPT_DEBUG === true ? warning("b") : void 0;',
+			'globalThis.SCRIPT_DEBUG === true ? warning("c") : void 0;'
 		);
 
 		expect( transformCode( input ) ).toEqual( expected );
@@ -76,9 +76,9 @@ describe( 'babel-plugin', () => {
 		);
 		const expected = join(
 			'import warn from "@wordpress/warning";',
-			'typeof SCRIPT_DEBUG !== "undefined" && SCRIPT_DEBUG === true ? warn("a") : void 0;',
-			'typeof SCRIPT_DEBUG !== "undefined" && SCRIPT_DEBUG === true ? warn("b") : void 0;',
-			'typeof SCRIPT_DEBUG !== "undefined" && SCRIPT_DEBUG === true ? warn("c") : void 0;'
+			'globalThis.SCRIPT_DEBUG === true ? warn("a") : void 0;',
+			'globalThis.SCRIPT_DEBUG === true ? warn("b") : void 0;',
+			'globalThis.SCRIPT_DEBUG === true ? warn("c") : void 0;'
 		);
 
 		expect( transformCode( input ) ).toEqual( expected );
@@ -93,9 +93,9 @@ describe( 'babel-plugin', () => {
 		);
 		const expected = join(
 			'import warn from "@wordpress/warning";',
-			'typeof SCRIPT_DEBUG !== "undefined" && SCRIPT_DEBUG === true ? warn("a") : void 0;',
-			'typeof SCRIPT_DEBUG !== "undefined" && SCRIPT_DEBUG === true ? warn("b") : void 0;',
-			'typeof SCRIPT_DEBUG !== "undefined" && SCRIPT_DEBUG === true ? warn("c") : void 0;'
+			'globalThis.SCRIPT_DEBUG === true ? warn("a") : void 0;',
+			'globalThis.SCRIPT_DEBUG === true ? warn("b") : void 0;',
+			'globalThis.SCRIPT_DEBUG === true ? warn("c") : void 0;'
 		);
 
 		expect( transformCode( input ) ).toEqual( expected );

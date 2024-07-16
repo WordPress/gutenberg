@@ -96,7 +96,7 @@ function DownloadableBlockListItem( { composite, item, onClick } ) {
 		<CompositeItem
 			render={
 				<Button
-					__experimentalIsFocusable
+					accessibleWhenDisabled
 					type="button"
 					role="option"
 					className="block-directory-downloadable-block-list-item"

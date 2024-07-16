@@ -201,13 +201,14 @@ export function blockStyles( state = {}, action ) {
 				),
 			};
 		case 'ADD_BLOCK_STYLES':
-			return {
-				...state,
-				[ action.blockName ]: getUniqueItemsByName( [
-					...( state[ action.blockName ] ?? [] ),
+			const updatedStyles = {};
+			action.blockNames.forEach( ( blockName ) => {
+				updatedStyles[ blockName ] = getUniqueItemsByName( [
+					...( state[ blockName ] ?? [] ),
 					...action.styles,
-				] ),
-			};
+				] );
+			} );
+			return { ...state, ...updatedStyles };
 		case 'REMOVE_BLOCK_STYLES':
 			return {
 				...state,
@@ -371,17 +372,22 @@ export function collections( state = {}, action ) {
 }
 
 export function blockBindingsSources( state = {}, action ) {
-	if ( action.type === 'REGISTER_BLOCK_BINDINGS_SOURCE' ) {
-		return {
-			...state,
-			[ action.sourceName ]: {
-				label: action.sourceLabel,
-				getValue: action.getValue,
-				setValue: action.setValue,
-				getPlaceholder: action.getPlaceholder,
-				lockAttributesEditing: action.lockAttributesEditing ?? true,
-			},
-		};
+	switch ( action.type ) {
+		case 'ADD_BLOCK_BINDINGS_SOURCE':
+			return {
+				...state,
+				[ action.name ]: {
+					label: action.label,
+					getValue: action.getValue,
+					setValue: action.setValue,
+					setValues: action.setValues,
+					getPlaceholder: action.getPlaceholder,
+					canUserEditValue:
+						action.canUserEditValue || ( () => false ),
+				},
+			};
+		case 'REMOVE_BLOCK_BINDINGS_SOURCE':
+			return omit( state, action.name );
 	}
 	return state;
 }

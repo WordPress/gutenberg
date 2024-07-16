@@ -66,10 +66,7 @@ export function UnforwardedInputControl(
 		onChange,
 	} );
 
-	// ARIA descriptions can only contain plain text, so fall back to aria-details if not.
-	const helpPropName =
-		typeof help === 'string' ? 'aria-describedby' : 'aria-details';
-	const helpProp = !! help ? { [ helpPropName ]: `${ id }__help` } : {};
+	const helpProp = !! help ? { 'aria-describedby': `${ id }__help` } : {};
 
 	return (
 		<BaseControl

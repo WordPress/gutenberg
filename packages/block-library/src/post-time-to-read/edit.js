@@ -66,7 +66,7 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 		const minutesToRead = Math.max(
 			1,
 			Math.round(
-				wordCount( content, wordCountType ) / AVERAGE_READING_RATE
+				wordCount( content || '', wordCountType ) / AVERAGE_READING_RATE
 			)
 		);
 
