@@ -3,8 +3,10 @@
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"types": [ "gutenberg-env" ],
-		"checkJs": false
+		"allowJs": true,
+		"checkJs": false,
+		"isolatedDeclarations": false
 	},
 	"references": [ { "path": "../a11y" }, { "path": "../data" } ],
-	"include": [ "src/**/*" ]
+	"include": [ "src" ]
 }
