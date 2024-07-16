@@ -223,8 +223,8 @@
 			}
 		},
 		"supports": {
-			"type": "object",
 			"description": "It contains as set of options to control features used in the editor. See the supports documentation at https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/ for more details.",
+			"type": "object",
 			"properties": {
 				"anchor": {
 					"type": "boolean",
@@ -269,8 +269,8 @@
 					"default": true
 				},
 				"color": {
-					"type": "object",
 					"description": "This value signals that a block supports some of the properties related to color. When it does, the block editor will show UI controls for the user to set their values.\n\nNote that the background and text keys have a default value of true, so if the color property is present they’ll also be considered enabled",
+					"type": "object",
 					"properties": {
 						"background": {
 							"type": "boolean",
@@ -315,8 +315,8 @@
 					"default": true
 				},
 				"dimensions": {
-					"type": "object",
 					"description": "This value signals that a block supports some of the CSS style properties related to dimensions. When it does, the block editor will show UI controls for the user to set their values if the theme declares support.\n\nWhen the block declares support for a specific dimensions property, its attributes definition is extended to include the style attribute.",
+					"type": "object",
 					"properties": {
 						"aspectRatio": {
 							"type": "boolean",
@@ -331,8 +331,8 @@
 					}
 				},
 				"filter": {
-					"type": "object",
 					"description": "This value signals that a block supports some of the properties related to filters. When it does, the block editor will show UI controls for the user to set their values if the theme declares support.\n\nWhen the block declares support for a specific filter property, its attributes definition is extended to include the style attribute.",
+					"type": "object",
 					"properties": {
 						"duotone": {
 							"type": "boolean",
@@ -342,8 +342,8 @@
 					}
 				},
 				"background": {
-					"type": "object",
 					"description": "This value signals that a block supports some of the CSS style properties related to background. When it does, the block editor will show UI controls for the user to set their values if the theme declares support.\n\nWhen the block declares support for a specific background property, its attributes definition is extended to include the style attribute.",
+					"type": "object",
 					"properties": {
 						"backgroundImage": {
 							"type": "boolean",
@@ -381,8 +381,8 @@
 							"type": "object",
 							"properties": {
 								"default": {
-									"type": "object",
 									"description": "Allows setting the `type` property to define what layout type is default for the block, and also default values for any properties inherent to that layout type, e.g., for a `flex` layout, a default value can be set for `flexWrap`.",
+									"type": "object",
 									"properties": {
 										"type": {
 											"type": "string",
@@ -503,8 +503,8 @@
 					"default": true
 				},
 				"position": {
-					"type": "object",
 					"description": "This value signals that a block supports some of the CSS style properties related to position. When it does, the block editor will show UI controls for the user to set their values if the theme declares support.\n\nWhen the block declares support for a specific position property, its attributes definition is extended to include the style attribute.",
+					"type": "object",
 					"properties": {
 						"sticky": {
 							"type": "boolean",
@@ -514,8 +514,8 @@
 					}
 				},
 				"spacing": {
-					"type": "object",
 					"description": "This value signals that a block supports some of the CSS style properties related to spacing. When it does, the block editor will show UI controls for the user to set their values if the theme declares support.\n\nWhen the block declares support for a specific spacing property, its attributes definition is extended to include the style attribute.",
+					"type": "object",
 					"properties": {
 						"margin": {
 							"oneOf": [
@@ -585,8 +585,8 @@
 					]
 				},
 				"typography": {
-					"type": "object",
 					"description": "This value signals that a block supports some of the CSS style properties related to typography. When it does, the block editor will show UI controls for the user to set their values if the theme declares support.\n\nWhen the block declares support for a specific typography property, its attributes definition is extended to include the style attribute.",
+					"type": "object",
 					"properties": {
 						"fontSize": {
 							"type": "boolean",
@@ -650,8 +650,8 @@
 			"additionalProperties": true
 		},
 		"selectors": {
-			"type": "object",
 			"description": "Provides custom CSS selectors and mappings for the block. Selectors may be set for the block itself or per-feature e.g. typography. Custom selectors per feature or sub-feature, allow different block styles to be applied to different elements within the block.",
+			"type": "object",
 			"properties": {
 				"root": {
 					"type": "string",
@@ -770,8 +770,8 @@
 			}
 		},
 		"example": {
-			"type": "object",
 			"description": "It provides structured example data for the block. This data is used to construct a preview for the block to be shown in the Inspector Help Panel when the user mouses over the block.\n\nSee the example documentation at https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/#example-optional for more details.",
+			"type": "object",
 			"properties": {
 				"viewportWidth": {
 					"type": "number",
@@ -908,8 +908,6 @@
 					"description": "An array of block variations.",
 					"items": {
 						"type": "object",
-						"required": [ "name", "title" ],
-						"additionalProperties": false,
 						"properties": {
 							"name": {
 								"type": "string",
@@ -987,7 +985,9 @@
 								},
 								"description": "The list of attributes that should be compared. Each attributes will be matched and the variation will be active if all of them are matching."
 							}
-						}
+						},
+						"required": [ "name", "title" ],
+						"additionalProperties": false
 					}
 				}
 			]
