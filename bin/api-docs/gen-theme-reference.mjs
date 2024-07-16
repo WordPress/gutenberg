@@ -11,7 +11,7 @@ import fs from 'fs';
 import $RefParser from '@apidevtools/json-schema-ref-parser';
 
 /**
- * Path to root project directory.
+ * Path to theme json schema file.
  *
  * @type {URL}
  */
@@ -21,7 +21,7 @@ const THEME_JSON_SCHEMA_FILE = new URL(
 );
 
 /**
- * Path to theme json schema file.
+ * Path to docs file.
  *
  * @type {URL}
  */
