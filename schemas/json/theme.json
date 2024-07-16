@@ -14,7 +14,8 @@
 					"description": "A reference to another property value. e.g. `styles.color.text`",
 					"type": "string"
 				}
-			}
+			},
+			"additionalProperties": false
 		},
 		"settingsPropertiesAppearanceTools": {
 			"type": "object",
@@ -792,7 +793,6 @@
 			"type": "object",
 			"properties": {
 				"custom": {
-					"description": "Generate custom CSS custom properties of the form `--wp--custom--{key}--{nested-key}: {value};`. `camelCased` keys are transformed to `kebab-case` as to follow the CSS property naming schema. Keys at different depth levels are separated by `--`, so keys should not include `--` in the name.",
 					"$ref": "#/definitions/settingsCustomAdditionalProperties"
 				}
 			}
@@ -839,6 +839,7 @@
 			]
 		},
 		"settingsBlocksPropertiesComplete": {
+			"description": "Settings defined on a per-block basis.",
 			"type": "object",
 			"properties": {
 				"core/archives": {
@@ -1144,6 +1145,7 @@
 			"additionalProperties": false
 		},
 		"settingsCustomAdditionalProperties": {
+			"description": "Generate custom CSS custom properties of the form `--wp--custom--{key}--{nested-key}: {value};`. `camelCased` keys are transformed to `kebab-case` as to follow the CSS property naming schema. Keys at different depth levels are separated by `--`, so keys should not include `--` in the name.",
 			"type": "object",
 			"additionalProperties": {
 				"oneOf": [
@@ -1843,6 +1845,7 @@
 			]
 		},
 		"stylesElementsPropertiesComplete": {
+			"description": "Styles defined on a per-element basis using the element's selector.",
 			"type": "object",
 			"properties": {
 				"button": {
@@ -1855,6 +1858,7 @@
 							"properties": {
 								"border": {},
 								"color": {},
+								"dimensions": {},
 								"filter": {},
 								"shadow": {},
 								"outline": {},
@@ -1892,10 +1896,16 @@
 						},
 						{
 							"properties": {
+								"background": {},
 								"border": {},
 								"color": {},
+								"dimensions": {},
 								"spacing": {},
 								"typography": {},
+								"filter": {},
+								"shadow": {},
+								"outline": {},
+								"css": {},
 								":hover": {
 									"$ref": "#/definitions/stylesPropertiesComplete"
 								},
@@ -1950,6 +1960,7 @@
 			"additionalProperties": false
 		},
 		"stylesBlocksPropertiesComplete": {
+			"description": "Styles defined on a per-block basis using the block's selector.",
 			"type": "object",
 			"properties": {
 				"variations": {
@@ -2311,6 +2322,7 @@
 								"type": "string"
 							}
 						},
+						"background": {},
 						"border": {},
 						"color": {},
 						"dimensions": {},
@@ -2347,6 +2359,7 @@
 				},
 				{
 					"properties": {
+						"background": {},
 						"border": {},
 						"color": {},
 						"dimensions": {},
@@ -2680,6 +2693,7 @@
 				},
 				{
 					"properties": {
+						"background": {},
 						"border": {},
 						"color": {},
 						"dimensions": {},
@@ -2753,7 +2767,6 @@
 						"dimensions": {},
 						"custom": {},
 						"blocks": {
-							"description": "Settings defined on a per-block basis.",
 							"$ref": "#/definitions/settingsBlocksPropertiesComplete"
 						}
 					},
@@ -2772,6 +2785,7 @@
 					"properties": {
 						"border": {},
 						"color": {},
+						"dimensions": {},
 						"spacing": {},
 						"typography": {},
 						"filter": {},
@@ -2779,11 +2793,9 @@
 						"outline": {},
 						"css": {},
 						"elements": {
-							"description": "Styles defined on a per-element basis using the element's selector.",
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"
 						},
 						"blocks": {
-							"description": "Styles defined on a per-block basis using the block's selector.",
 							"$ref": "#/definitions/stylesBlocksPropertiesComplete"
 						},
 						"background": {
