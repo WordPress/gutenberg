@@ -634,7 +634,7 @@ function useRenamePostAction( postType ) {
 	);
 }
 
-function OrderModal( { items, closeModal, onActionPerformed } ) {
+function ReorderModal( { items, closeModal, onActionPerformed } ) {
 	const [ item ] = items;
 	const { editEntityRecord, saveEditedEntityRecord } =
 		useDispatch( coreStore );
@@ -722,7 +722,7 @@ function OrderModal( { items, closeModal, onActionPerformed } ) {
 	);
 }
 
-function useOrderPagesAction( postType ) {
+function useReorderPagesAction( postType ) {
 	const supportsPageAttributes = useSelect(
 		( select ) => {
 			const { getPostType } = select( coreStore );
@@ -741,7 +741,7 @@ function useOrderPagesAction( postType ) {
 				isEligible( { status } ) {
 					return status !== 'trash';
 				},
-				RenderModal: OrderModal,
+				RenderModal: ReorderModal,
 			},
 		[ supportsPageAttributes ]
 	);
