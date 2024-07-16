@@ -1,5 +1,28 @@
 == Changelog ==
 
+= 18.8.0-rc.3 =
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Layout
+- Fix invalid css for nested fullwidth layouts with zero padding applied. ([63436](https://github.com/WordPress/gutenberg/pull/63436))
+
+#### Typography
+- Font Appearance Control: Refactor font appearance fallbacks. ([63215](https://github.com/WordPress/gutenberg/pull/63215))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@mikachan @richtabor
+
+
 = 18.8.0-rc.2 =
 
 
