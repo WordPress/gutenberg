@@ -204,24 +204,24 @@ async function main() {
 			.useRootPaddingAwareAlignments,
 	] );
 	autogen += '## Settings\n\n';
-	settings.forEach( ( [ section, data ] ) => {
+	for ( const [ section, data ] of settings ) {
 		autogen += `### ${ section }\n\n`;
 		autogen += `${ data.description }\n\n`;
 		autogen += getSettingsPropertiesMarkup( data );
 		autogen += `---\n\n`;
-	} );
+	}
 
 	// Styles
 	const styles = Object.entries(
 		themejson.definitions.stylesProperties.properties
 	);
 	autogen += '## Styles\n\n';
-	styles.forEach( ( [ section, data ] ) => {
+	for ( const [ section, data ] of styles ) {
 		autogen += `### ${ section }\n\n`;
 		autogen += `${ data.description }\n\n`;
 		autogen += getStylePropertiesMarkup( data );
 		autogen += `---\n\n`;
-	} );
+	}
 
 	// customTemplates
 	autogen += '## customTemplates\n\n';
