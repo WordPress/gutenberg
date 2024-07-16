@@ -3,6 +3,7 @@ iframe[name="editor-canvas"].is-zoomed-out {
 	$inset: var(--wp-block-editor-iframe-zoom-out-inset);
 	position: relative;
 	inset: $inset;
+	outline: calc(1px / #{$scale}) solid rgba($color: #000, $alpha: 0.133); // 0.133 = $gray-200 but with alpha.
 	transform: scale(#{$scale});
 	transform-origin: 50% 0;
 	// Transform scale doesn’t affect the layout size of the element, so counterscale
