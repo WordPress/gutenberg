@@ -353,15 +353,18 @@ class Gutenberg_REST_Templates_Controller_6_7 extends Gutenberg_REST_Templates_C
 						}
 					}
 				}
-				// @core-merge: End of changes to merge in core.
 
 				/*
-				 * Fallback to the theme name if the plugin is not defined. That's needed to keep backwards
+				 * Fall back to the theme name if the plugin is not defined. That's needed to keep backwards
 				 * compatibility with templates that were registered before the plugin attribute was added.
 				 */
-				$plugins = get_plugins();
-				$plugin  = $plugins[ plugin_basename( sanitize_text_field( $template_object->theme . '.php' ) ) ];
-				return empty( $plugin['Name'] ) ? $template_object->theme : $plugin['Name'];
+				$plugins         = get_plugins();
+				$plugin_basename = plugin_basename( sanitize_text_field( $template_object->theme . '.php' ) );
+				if ( isset( $plugins[ $plugin_basename ] ) && isset( $plugins[ $plugin_basename ]['Name'] ) ) {
+					return $plugins[ $plugin_basename ]['Name'];
+				}
+				return $template_object->theme;
+				// @core-merge: End of changes to merge in core.
 			case 'site':
 				return get_bloginfo( 'name' );
 			case 'user':
