@@ -117,7 +117,7 @@ const getSettingsPropertiesMarkup = ( { properties } ) => {
 		markup += `| ${ property } | ${ type } | ${ defaultValue } | ${ props } |\n`;
 	} );
 
-	return markup;
+	return markup + '\n';
 };
 
 /**
@@ -142,30 +142,8 @@ const getStylePropertiesMarkup = ( { properties } ) => {
 		markup += `| ${ property } | ${ type } | ${ props } |\n`;
 	} );
 
-	return markup;
+	return markup + '\n';
 };
-
-/**
- * Parses a section for description and properties and
- * returns a marked up version.
- *
- * @param {string}   title
- * @param {Object}   data
- * @param {Function} markupFn
- * @return {string} markup
- */
-const getSectionMarkup = ( title, data, markupFn ) => {
-	return `
-### ${ title }
-
-${ data.description }
-
-${ markupFn( data ) }
----
-`;
-};
-
-let autogen = '';
 
 /**
  * Format list of types.
@@ -192,6 +170,8 @@ const formatType = ( prop ) => {
 	return type;
 };
 
+let autogen = '';
+
 // Settings
 const settings = themejson.definitions.settingsProperties.allOf.flatMap(
 	( settingsProperties ) => Object.entries( settingsProperties.properties )
@@ -202,18 +182,24 @@ settings.unshift( [
 	themejson.properties.settings.allOf[ 1 ].properties
 		.useRootPaddingAwareAlignments,
 ] );
-autogen += '## Settings' + '\n\n';
+autogen += '## Settings\n\n';
 settings.forEach( ( [ section, data ] ) => {
-	autogen += getSectionMarkup( section, data, getSettingsPropertiesMarkup );
+	autogen += `### ${ section }\n\n`;
+	autogen += `${ data.description }\n\n`;
+	autogen += getSettingsPropertiesMarkup( data );
+	autogen += `---\n\n`;
 } );
 
 // Styles
 const styles = Object.entries(
 	themejson.definitions.stylesProperties.properties
 );
-autogen += '## Styles' + '\n\n';
+autogen += '## Styles\n\n';
 styles.forEach( ( [ section, data ] ) => {
-	autogen += getSectionMarkup( section, data, getStylePropertiesMarkup );
+	autogen += `### ${ section }\n\n`;
+	autogen += `${ data.description }\n\n`;
+	autogen += getStylePropertiesMarkup( data );
+	autogen += `---\n\n`;
 } );
 
 const templateTableGeneration = ( themeJson, context ) => {
