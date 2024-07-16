@@ -273,8 +273,8 @@ Typography styles.
 | fontWeight | string, object |  |
 | letterSpacing | string, object |  |
 | lineHeight | string, object |  |
-| textAlign | string |  |
-| textColumns | string |  |
+| textAlign | string, object |  |
+| textColumns | string, object |  |
 | textDecoration | string, object |  |
 | writingMode | string, object |  |
 | textTransform | string, object |  |

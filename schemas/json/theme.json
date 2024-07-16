@@ -1749,11 +1749,25 @@
 						},
 						"textAlign": {
 							"description": "Sets the `text-align` CSS property.",
-							"type": "string"
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
 						},
 						"textColumns": {
 							"description": "Sets the `column-count` CSS property.",
-							"type": "string"
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
 						},
 						"textDecoration": {
 							"description": "Sets the `text-decoration` CSS property.",
