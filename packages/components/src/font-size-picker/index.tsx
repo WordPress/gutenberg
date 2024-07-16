@@ -8,7 +8,7 @@ import type { ForwardedRef } from 'react';
  */
 import { __ } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
-import { useState, useEffect, forwardRef } from '@wordpress/element';
+import { useState, forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -107,27 +107,9 @@ const UnforwardedFontSizePicker = (
 	);
 	const isCustomValue = !! value && ! selectedFontSize;
 
-	const [ currentPickerType, setCurrentPickerType ] = useState(
-		getPickerType( ! disableCustomFontSizes && isCustomValue, fontSizes )
-	);
-
-	useEffect( () => {
-		setCurrentPickerType(
-			getPickerType(
-				// If showing the custom value picker, switch back to predef only
-				// if `disableCustomFontSizes` is set to `true`.
-				currentPickerType === 'custom'
-					? ! disableCustomFontSizes
-					: ! disableCustomFontSizes && isCustomValue,
-				fontSizes
-			)
-		);
-	}, [
-		currentPickerType,
-		disableCustomFontSizes,
-		isCustomValue,
-		fontSizes,
-	] );
+	// Initially request a custom picker if the value is not from the predef list.
+	const [ userRequestedCustom, setUserRequestedCustom ] =
+		useState( isCustomValue );
 
 	const units = useCustomUnits( {
 		availableUnits: unitsProp,
@@ -136,6 +118,13 @@ const UnforwardedFontSizePicker = (
 	if ( fontSizes.length === 0 && disableCustomFontSizes ) {
 		return null;
 	}
+
+	const currentPickerType = getPickerType(
+		// If showing the custom value picker, switch back to predef only
+		// if `disableCustomFontSizes` is set to `true`.
+		! disableCustomFontSizes && userRequestedCustom,
+		fontSizes
+	);
 
 	const headerHint = getHeaderHint(
 		currentPickerType,
@@ -180,14 +169,9 @@ const UnforwardedFontSizePicker = (
 									: __( 'Set custom size' )
 							}
 							icon={ settings }
-							onClick={ () => {
-								setCurrentPickerType(
-									getPickerType(
-										currentPickerType !== 'custom',
-										fontSizes
-									)
-								);
-							} }
+							onClick={ () =>
+								setUserRequestedCustom( ! userRequestedCustom )
+							}
 							isPressed={ currentPickerType === 'custom' }
 							size="small"
 						/>
@@ -215,9 +199,7 @@ const UnforwardedFontSizePicker = (
 								);
 							}
 						} }
-						onSelectCustom={ () =>
-							setCurrentPickerType( 'custom' )
-						}
+						onSelectCustom={ () => setUserRequestedCustom( true ) }
 					/>
 				) }
 				{ currentPickerType === 'togglegroup' && (
@@ -251,6 +233,8 @@ const UnforwardedFontSizePicker = (
 								hideLabelFromVision
 								value={ value }
 								onChange={ ( newValue ) => {
+									setUserRequestedCustom( true );
+
 									if ( newValue === undefined ) {
 										onChange?.( undefined );
 									} else {
@@ -281,6 +265,8 @@ const UnforwardedFontSizePicker = (
 										initialPosition={ fallbackFontSize }
 										withInputField={ false }
 										onChange={ ( newValue ) => {
+											setUserRequestedCustom( true );
+
 											if ( newValue === undefined ) {
 												onChange?.( undefined );
 											} else if ( hasUnits ) {
