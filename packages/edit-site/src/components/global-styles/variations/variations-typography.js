@@ -9,11 +9,10 @@ import {
 /**
  * Internal dependencies
  */
-
 import StylesPreviewTypography from '../preview-typography';
 import { useCurrentMergeThemeStyleVariationsWithUserConfig } from '../../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
-import Variation from './variation';
 import Subtitle from '../subtitle';
+import Variation from './variation';
 
 export default function TypographyVariations( { title, gap = 2 } ) {
 	const propertiesToFilter = [ 'typography' ];

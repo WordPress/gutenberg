@@ -86,7 +86,7 @@ export function FlatTermSelector( { slug } ) {
 
 			const query = {
 				...DEFAULT_QUERY,
-				include: _termIds.join( ',' ),
+				include: _termIds?.join( ',' ),
 				per_page: -1,
 			};
 
@@ -103,7 +103,7 @@ export function FlatTermSelector( { slug } ) {
 					: false,
 				taxonomy: _taxonomy,
 				termIds: _termIds,
-				terms: _termIds.length
+				terms: _termIds?.length
 					? getEntityRecords( 'taxonomy', slug, query )
 					: EMPTY_ARRAY,
 				hasResolvedTerms: hasFinishedResolution( 'getEntityRecords', [

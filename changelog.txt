@@ -1,5 +1,35 @@
 == Changelog ==
 
+= 18.8.0-rc.2 =
+
+
+## Changelog
+
+### Bug Fixes
+
+- Fix: Error when calling the PostActions `view-post` callback. ([63460](https://github.com/WordPress/gutenberg/pull/63460))
+
+
+### Various
+
+#### CSS & Styling
+- Only add customizer additional CSS to global styles in block themes. ([63331](https://github.com/WordPress/gutenberg/pull/63331))
+
+
+## First-time contributors
+
+The following PRs were merged by first-time contributors:
+
+- @sejas: Fix: Error when calling the PostActions `view-post` callback. ([63460](https://github.com/WordPress/gutenberg/pull/63460))
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@sejas @tellthemachines
+
+
 = 18.8.0-rc.1 =
 
 

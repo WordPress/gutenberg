@@ -71,7 +71,17 @@ export const __experimentalGetPreviewDeviceType = createRegistrySelector(
  * @return {Object} Whether the current user can create media or not.
  */
 export const getCanUserCreateMedia = createRegistrySelector(
-	( select ) => () => select( coreDataStore ).canUser( 'create', 'media' )
+	( select ) => () => {
+		deprecated(
+			`wp.data.select( 'core/edit-site' ).getCanUserCreateMedia()`,
+			{
+				since: '6.7',
+				alternative: `wp.data.select( 'core' ).canUser( 'create', { kind: 'root', type: 'media' } )`,
+			}
+		);
+
+		return select( coreDataStore ).canUser( 'create', 'media' );
+	}
 );
 
 /**
@@ -82,13 +92,11 @@ export const getCanUserCreateMedia = createRegistrySelector(
  * @return {Array} The available reusable blocks.
  */
 export const getReusableBlocks = createRegistrySelector( ( select ) => () => {
-	deprecated(
-		"select( 'core/core' ).getEntityRecords( 'postType', 'wp_block' )",
-		{
-			since: '6.5',
-			version: '6.8',
-		}
-	);
+	deprecated( `select( 'core/edit-site' ).getReusableBlocks()`, {
+		since: '6.5',
+		version: '6.8',
+		alternative: `select( 'core/core' ).getEntityRecords( 'postType', 'wp_block' )`,
+	} );
 	const isWeb = Platform.OS === 'web';
 	return isWeb
 		? select( coreDataStore ).getEntityRecords( 'postType', 'wp_block', {
