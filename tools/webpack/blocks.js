@@ -10,7 +10,7 @@ const { realpathSync } = require( 'fs' );
  * WordPress dependencies
  */
 const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
-const { getRenderPropPaths } = require( '@wordpress/scripts/utils' );
+const { PhpFilePathsPlugin } = require( '@wordpress/scripts/utils' );
 
 /**
  * Internal dependencies
@@ -79,28 +79,6 @@ const createEntrypoints = () => {
 	}, {} );
 };
 
-/**
- * The plugin recomputes the render paths once on each compilation. It is necessary to avoid repeating processing
- * when filtering every discovered PHP file in the source folder. This is the most performant way to ensure that
- * changes in `block.json` files are picked up in watch mode.
- */
-class RenderPathsPlugin {
-	/**
-	 * Paths with the `render` props included in `block.json` files.
-	 *
-	 * @type {string[]}
-	 */
-	static renderPaths;
-
-	apply( compiler ) {
-		const pluginName = this.constructor.name;
-
-		compiler.hooks.thisCompilation.tap( pluginName, () => {
-			this.constructor.renderPaths = getRenderPropPaths();
-		} );
-	}
-}
-
 module.exports = [
 	{
 		...baseConfig,
@@ -114,7 +92,7 @@ module.exports = [
 		plugins: [
 			...plugins,
 			new DependencyExtractionWebpackPlugin( { injectPolyfill: false } ),
-			new RenderPathsPlugin(),
+			new PhpFilePathsPlugin( { props: [ 'render' ] } ),
 			new CopyWebpackPlugin( {
 				patterns: [].concat(
 					[
@@ -171,7 +149,7 @@ module.exports = [
 							filter: ( filepath ) => {
 								return (
 									filepath.endsWith( sep + 'index.php' ) ||
-									RenderPathsPlugin.renderPaths.includes(
+									PhpFilePathsPlugin.renderPaths.includes(
 										realpathSync( filepath ).replace(
 											/\\/g,
 											'/'
