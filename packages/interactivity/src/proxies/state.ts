@@ -6,7 +6,7 @@ import { signal, type Signal } from '@preact/signals';
 /**
  * Internal dependencies
  */
-import { createProxy, getProxy, shouldProxy } from './registry';
+import { createProxy, getProxy, getProxyNs, shouldProxy } from './registry';
 import { PropSignal } from './signals';
 import { setNamespace, resetNamespace } from '../hooks';
 
@@ -64,6 +64,8 @@ const stateHandlers: ProxyHandler< object > = {
 		 */
 		const prop = getPropSignal( receiver, key );
 
+		const ns = getProxyNs( receiver );
+
 		/*
 		 * When the value is a getter, it updates the internal getter value. If
 		 * not, we get the actual value an wrap it with a proxy if needed.
@@ -77,9 +79,7 @@ const stateHandlers: ProxyHandler< object > = {
 		} else {
 			const value = Reflect.get( target, key, receiver );
 			prop.setValue(
-				shouldProxy( value )
-					? proxifyState( prop.namespace, value )
-					: value
+				shouldProxy( value ) ? proxifyState( ns, value ) : value
 			);
 		}
 
@@ -96,7 +96,7 @@ const stateHandlers: ProxyHandler< object > = {
 		 */
 		if ( typeof result === 'function' ) {
 			return ( ...args: unknown[] ) => {
-				setNamespace( prop.namespace );
+				setNamespace( ns );
 				try {
 					return result.call( receiver, ...args );
 				} finally {
@@ -117,15 +117,15 @@ const stateHandlers: ProxyHandler< object > = {
 		const result = Reflect.defineProperty( target, key, desc );
 
 		if ( result ) {
-			const prop = getPropSignal( getProxy( target ), key );
+			const receiver = getProxy( target );
+			const prop = getPropSignal( receiver, key );
 			const { get, value } = desc;
 			if ( get ) {
 				prop.setGetter( desc.get! );
 			} else {
+				const ns = getProxyNs( receiver );
 				prop.setValue(
-					shouldProxy( value )
-						? proxifyState( prop.namespace, value )
-						: value
+					shouldProxy( value ) ? proxifyState( ns, value ) : value
 				);
 			}
 
@@ -134,7 +134,6 @@ const stateHandlers: ProxyHandler< object > = {
 			}
 
 			if ( Array.isArray( target ) ) {
-				const receiver = getProxy( target );
 				const length = getPropSignal( receiver, 'length' );
 				length.setValue( target.length );
 			}

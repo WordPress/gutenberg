@@ -19,7 +19,6 @@ import { withScope } from '../utils';
 const NO_SCOPE = Symbol();
 
 export class PropSignal {
-	public readonly namespace: string;
 	private owner: object;
 	private computedsByScope: WeakMap< WeakKey, ReadonlySignal >;
 	private valueSignal?: Signal;
@@ -27,7 +26,6 @@ export class PropSignal {
 
 	constructor( owner: object ) {
 		this.owner = owner;
-		this.namespace = getProxyNs( owner )!;
 		this.computedsByScope = new WeakMap();
 	}
 
@@ -54,7 +52,7 @@ export class PropSignal {
 					: this.valueSignal?.value;
 			};
 
-			setNamespace( this.namespace );
+			setNamespace( getProxyNs( this.owner ) );
 			this.computedsByScope.set(
 				scope,
 				computed( withScope( callback ) )
