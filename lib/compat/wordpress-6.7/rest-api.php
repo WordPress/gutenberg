@@ -81,7 +81,7 @@ function gutenberg_register_wp_rest_templates_controller_plugin_field() {
 		array(
 			'get_callback'    => '_gutenberg_get_wp_templates_plugin_field',
 			'update_callback' => null,
-			'schema'       => array(
+			'schema'          => array(
 				'type'        => 'string',
 				'description' => __( 'Plugin that registered the template.', 'gutenberg' ),
 				'readonly'    => true,
