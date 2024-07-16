@@ -3,6 +3,6 @@ ul {
 	box-sizing: border-box;
 }
 
-:root :where(ul.has-background, ol.has-background) {
+:root :where(.wp-block-list.has-background) {
 	padding: $block-bg-padding--v $block-bg-padding--h;
 }

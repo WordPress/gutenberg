@@ -24,6 +24,7 @@ export const settings = {
 		attributes: {
 			content: __( 'Code is Poetry' ),
 			level: 2,
+			textAlign: 'center',
 		},
 	},
 	__experimentalLabel( attributes, { context } ) {
