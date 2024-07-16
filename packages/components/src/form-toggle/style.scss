@@ -112,4 +112,8 @@ $transition-duration: 0.2s;
 	&::before {
 		content: "";
 	}
+
+	&:not(:disabled, [aria-disabled="true"]) {
+		cursor: pointer;
+	}
 }
