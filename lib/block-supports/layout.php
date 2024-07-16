@@ -306,7 +306,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			 * They're added separately because padding might only be set on one side.
 			 */
 			if ( isset( $block_spacing_values['declarations']['padding-right'] ) ) {
-				$padding_right   = $block_spacing_values['declarations']['padding-right'];
+				$padding_right = $block_spacing_values['declarations']['padding-right'];
 				// Add unit if 0.
 				if ( '0' === $padding_right ) {
 					$padding_right = '0px';
@@ -317,7 +317,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 				);
 			}
 			if ( isset( $block_spacing_values['declarations']['padding-left'] ) ) {
-				$padding_left    = $block_spacing_values['declarations']['padding-left'];
+				$padding_left = $block_spacing_values['declarations']['padding-left'];
 				// Add unit if 0.
 				if ( '0' === $padding_left ) {
 					$padding_left = '0px';
