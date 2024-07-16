@@ -10,11 +10,21 @@
 import fs from 'fs';
 import $RefParser from '@apidevtools/json-schema-ref-parser';
 
+/**
+ * Path to root project directory.
+ *
+ * @type {URL}
+ */
 const THEME_JSON_SCHEMA_FILE = new URL(
 	'../../schemas/json/theme.json',
 	import.meta.url
 );
 
+/**
+ * Path to theme json schema file.
+ *
+ * @type {URL}
+ */
 const THEME_JSON_REF_DOC = new URL(
 	'../../docs/reference-guides/theme-json-reference/theme-json-living.md',
 	import.meta.url
