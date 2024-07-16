@@ -359,7 +359,7 @@ describe.each( [
 				expect( expectedFocusTarget ).toHaveFocus();
 			} );
 
-			it( 'should keep disabled radio options focusable but not selectable', async () => {
+			it( 'should ignore disabled radio options', async () => {
 				const mockOnChange = jest.fn();
 
 				render(
@@ -375,37 +375,35 @@ describe.each( [
 				await sleep();
 				await press.Tab();
 
-				const pizzaOption = screen.getByRole( 'radio', {
-					name: 'Pizza',
-				} );
-				expect( pizzaOption ).toHaveFocus();
-				expect( pizzaOption ).toBeChecked();
+				expect(
+					screen.getByRole( 'radio', { name: 'Pizza' } )
+				).toBeChecked();
+				expect(
+					screen.getByRole( 'radio', { name: 'Rice' } )
+				).toBeDisabled();
 
-				// Arrow navigation focuses the disabled option
+				// Arrow navigation skips the disabled option
 				await press.ArrowRight();
-				const riceOption = screen.getByRole( 'radio', {
-					name: 'Rice',
-				} );
-				expect( riceOption ).toHaveFocus();
-				expect( riceOption ).toHaveAttribute( 'aria-disabled', 'true' );
-				expect( riceOption ).not.toBeChecked();
-				expect( mockOnChange ).not.toHaveBeenCalled();
-
-				// Arrow navigation focuses the next enabled option
-				await press.ArrowRight();
-				const pastaOption = screen.getByRole( 'radio', {
-					name: 'Pasta',
-				} );
-				expect( pastaOption ).toHaveFocus();
-				expect( pastaOption ).toBeChecked();
+				expect(
+					screen.getByRole( 'radio', { name: 'Pasta' } )
+				).toBeChecked();
 				expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
 				expect( mockOnChange ).toHaveBeenLastCalledWith( 'pasta' );
 
-				// Clicks don't cause the option to be selected nor to be focused.
-				await click( riceOption );
-				expect( pastaOption ).toHaveFocus();
-				expect( pastaOption ).toBeChecked();
-				expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
+				// Arrow navigation skips the disabled option
+				await press.ArrowLeft();
+				expect(
+					screen.getByRole( 'radio', { name: 'Pizza' } )
+				).toBeChecked();
+				expect( mockOnChange ).toHaveBeenCalledTimes( 2 );
+				expect( mockOnChange ).toHaveBeenLastCalledWith( 'pizza' );
+
+				// Clicks don't cause the option to be selected
+				await click( screen.getByRole( 'radio', { name: 'Rice' } ) );
+				expect(
+					screen.getByRole( 'radio', { name: 'Pizza' } )
+				).toBeChecked();
+				expect( mockOnChange ).toHaveBeenCalledTimes( 2 );
 			} );
 		} );
 
@@ -478,7 +476,7 @@ describe.each( [
 				).toHaveFocus();
 			} );
 
-			it( 'should keep disabled button options focusable but not selectable', async () => {
+			it( 'should ignore disabled options', async () => {
 				const mockOnChange = jest.fn();
 
 				render(
@@ -500,20 +498,15 @@ describe.each( [
 						name: 'Pizza',
 						pressed: true,
 					} )
-				).toHaveFocus();
-
-				// Tab key navigation focuses the disabled option
-				await press.Tab();
-				await press.Space();
+				).toBeVisible();
 				expect(
 					screen.getByRole( 'button', {
 						name: 'Rice',
 						pressed: false,
 					} )
-				).toHaveFocus();
-				expect( mockOnChange ).not.toHaveBeenCalled();
+				).toBeDisabled();
 
-				// Tab key navigation focuses the next enabled option
+				// Tab key navigation skips the disabled option
 				await press.Tab();
 				await press.Space();
 				expect(
@@ -525,18 +518,21 @@ describe.each( [
 				expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
 				expect( mockOnChange ).toHaveBeenLastCalledWith( 'pasta' );
 
-				// Clicks don't cause the option to be selected nor to be focused.
+				// Tab key navigation skips the disabled option
+				await press.ShiftTab();
+				expect(
+					screen.getByRole( 'button', {
+						name: 'Pizza',
+						pressed: false,
+					} )
+				).toHaveFocus();
+
+				// Clicks don't cause the option to be selected.
 				await click(
 					screen.getByRole( 'button', {
 						name: 'Rice',
 					} )
 				);
-				expect(
-					screen.getByRole( 'button', {
-						name: 'Pasta',
-						pressed: true,
-					} )
-				).toHaveFocus();
 				expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
 			} );
 		} );

@@ -33,16 +33,6 @@ const REDUCED_MOTION_TRANSITION_CONFIG = {
 
 const LAYOUT_ID = 'toggle-group-backdrop-shared-layout-id';
 
-const handleDisabledMouseEvent = (
-	event: React.MouseEvent,
-	disabled?: boolean
-) => {
-	if ( disabled ) {
-		event.stopPropagation();
-		event.preventDefault();
-	}
-};
-
 const WithToolTip = ( { showTooltip, text, children }: WithToolTipProps ) => {
 	if ( showTooltip && text ) {
 		return (
@@ -119,35 +109,19 @@ function ToggleGroupControlOptionBase(
 	);
 	const backdropClasses = useMemo( () => cx( styles.backdropView ), [ cx ] );
 
+	const buttonOnClick = () => {
+		if ( isDeselectable && isPressed ) {
+			toggleGroupControlContext.setValue( undefined );
+		} else {
+			toggleGroupControlContext.setValue( value );
+		}
+	};
+
 	const commonProps = {
 		...otherButtonProps,
 		className: itemClasses,
 		'data-value': value,
 		ref: forwardedRef,
-	};
-
-	const buttonOnMouseDown: React.MouseEventHandler< HTMLButtonElement > = (
-		event
-	) => {
-		handleDisabledMouseEvent( event, disabled );
-
-		commonProps.onMouseDown?.( event );
-	};
-
-	const buttonOnClick: React.MouseEventHandler< HTMLButtonElement > = (
-		event
-	) => {
-		handleDisabledMouseEvent( event, disabled );
-
-		if ( ! disabled ) {
-			if ( isDeselectable && isPressed ) {
-				toggleGroupControlContext.setValue( undefined );
-			} else {
-				toggleGroupControlContext.setValue( value );
-			}
-		}
-
-		commonProps.onClick?.( event );
 	};
 
 	return (
@@ -159,18 +133,16 @@ function ToggleGroupControlOptionBase(
 				{ isDeselectable ? (
 					<button
 						{ ...commonProps }
-						aria-disabled={ disabled }
+						disabled={ disabled }
 						onFocus={ onFocusProp }
 						aria-pressed={ isPressed }
 						type="button"
 						onClick={ buttonOnClick }
-						onMouseDown={ buttonOnMouseDown }
 					>
 						<ButtonContentView>{ children }</ButtonContentView>
 					</button>
 				) : (
 					<Ariakit.Radio
-						accessibleWhenDisabled
 						disabled={ disabled }
 						render={
 							<button
@@ -181,11 +153,7 @@ function ToggleGroupControlOptionBase(
 									if ( event.defaultPrevented ) {
 										return;
 									}
-									if ( ! disabled ) {
-										toggleGroupControlContext.setValue(
-											value
-										);
-									}
+									toggleGroupControlContext.setValue( value );
 								} }
 							/>
 						}
