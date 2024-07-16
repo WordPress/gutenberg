@@ -1,10 +1,9 @@
-/* eslint no-console: [ 'error', { allow: [ 'error', 'warn' ] } ] */
-
 /**
  * WordPress dependencies
  */
 import { select, dispatch } from '@wordpress/data';
 import { _x } from '@wordpress/i18n';
+import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
@@ -225,18 +224,18 @@ export function registerBlockType( blockNameOrMetadata, settings ) {
 		: blockNameOrMetadata;
 
 	if ( typeof name !== 'string' ) {
-		console.error( 'Block names must be strings.' );
+		warning( 'Block names must be strings.' );
 		return;
 	}
 
 	if ( ! /^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$/.test( name ) ) {
-		console.error(
+		warning(
 			'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block'
 		);
 		return;
 	}
 	if ( select( blocksStore ).getBlockType( name ) ) {
-		console.error( 'Block "' + name + '" is already registered.' );
+		warning( 'Block "' + name + '" is already registered.' );
 		return;
 	}
 
@@ -381,7 +380,7 @@ export function unregisterBlockCollection( namespace ) {
 export function unregisterBlockType( name ) {
 	const oldBlock = select( blocksStore ).getBlockType( name );
 	if ( ! oldBlock ) {
-		console.error( 'Block "' + name + '" is not registered.' );
+		warning( 'Block "' + name + '" is not registered.' );
 		return;
 	}
 	dispatch( blocksStore ).removeBlockTypes( name );
@@ -724,7 +723,7 @@ export const getBlockVariations = ( blockName, scope ) => {
  */
 export const registerBlockVariation = ( blockName, variation ) => {
 	if ( typeof variation.name !== 'string' ) {
-		console.warn( 'Variation names must be unique strings.' );
+		warning( 'Variation names must be unique strings.' );
 	}
 
 	dispatch( blocksStore ).addBlockVariations( blockName, variation );
@@ -805,7 +804,7 @@ export const registerBlockBindingsSource = ( source ) => {
 		select( blocksStore )
 	).getBlockBindingsSource( name );
 	if ( existingSource ) {
-		console.error(
+		warning(
 			'Block bindings source "' + name + '" is already registered.'
 		);
 		return;
@@ -813,31 +812,31 @@ export const registerBlockBindingsSource = ( source ) => {
 
 	// Check the `name` property is correct.
 	if ( ! name ) {
-		console.error( 'Block bindings source must contain a name.' );
+		warning( 'Block bindings source must contain a name.' );
 		return;
 	}
 
 	if ( typeof name !== 'string' ) {
-		console.error( 'Block bindings source name must be a string.' );
+		warning( 'Block bindings source name must be a string.' );
 		return;
 	}
 
 	if ( /[A-Z]+/.test( name ) ) {
-		console.error(
+		warning(
 			'Block bindings source name must not contain uppercase characters.'
 		);
 		return;
 	}
 
 	if ( ! /^[a-z0-9/-]+$/.test( name ) ) {
-		console.error(
+		warning(
 			'Block bindings source name must contain only valid characters: lowercase characters, hyphens, or digits. Example: my-plugin/my-custom-source.'
 		);
 		return;
 	}
 
 	if ( ! /^[a-z0-9-]+\/[a-z0-9-]+$/.test( name ) ) {
-		console.error(
+		warning(
 			'Block bindings source name must contain a namespace and valid characters. Example: my-plugin/my-custom-source.'
 		);
 		return;
@@ -845,46 +844,42 @@ export const registerBlockBindingsSource = ( source ) => {
 
 	// Check the `label` property is correct.
 	if ( ! label ) {
-		console.error( 'Block bindings source must contain a label.' );
+		warning( 'Block bindings source must contain a label.' );
 		return;
 	}
 
 	if ( typeof label !== 'string' ) {
-		console.error( 'Block bindings source label must be a string.' );
+		warning( 'Block bindings source label must be a string.' );
 		return;
 	}
 
 	// Check the `getValue` property is correct.
 	if ( getValue && typeof getValue !== 'function' ) {
-		console.error( 'Block bindings source getValue must be a function.' );
+		warning( 'Block bindings source getValue must be a function.' );
 		return;
 	}
 
 	// Check the `setValue` property is correct.
 	if ( setValue && typeof setValue !== 'function' ) {
-		console.error( 'Block bindings source setValue must be a function.' );
+		warning( 'Block bindings source setValue must be a function.' );
 		return;
 	}
 
 	// Check the `setValues` property is correct.
 	if ( setValues && typeof setValues !== 'function' ) {
-		console.error( 'Block bindings source setValues must be a function.' );
+		warning( 'Block bindings source setValues must be a function.' );
 		return;
 	}
 
 	// Check the `getPlaceholder` property is correct.
 	if ( getPlaceholder && typeof getPlaceholder !== 'function' ) {
-		console.error(
-			'Block bindings source getPlaceholder must be a function.'
-		);
+		warning( 'Block bindings source getPlaceholder must be a function.' );
 		return;
 	}
 
 	// Check the `getPlaceholder` property is correct.
 	if ( canUserEditValue && typeof canUserEditValue !== 'function' ) {
-		console.error(
-			'Block bindings source canUserEditValue must be a function.'
-		);
+		warning( 'Block bindings source canUserEditValue must be a function.' );
 		return;
 	}
 
@@ -906,9 +901,7 @@ export const registerBlockBindingsSource = ( source ) => {
 export function unregisterBlockBindingsSource( name ) {
 	const oldSource = getBlockBindingsSource( name );
 	if ( ! oldSource ) {
-		console.error(
-			'Block bindings source "' + name + '" is not registered.'
-		);
+		warning( 'Block bindings source "' + name + '" is not registered.' );
 		return;
 	}
 	unlock( dispatch( blocksStore ) ).removeBlockBindingsSource( name );
