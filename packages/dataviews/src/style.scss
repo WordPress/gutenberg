@@ -962,7 +962,7 @@
 	position: absolute;
 	top: math.div(-$grid-unit-15, 2);
 	right: -$grid-unit-15;
-	background:var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+	background: var(--wp-admin-theme-color, #3858e9);
 	height: $grid-unit-15 + 2*$border-width;
 	width: $grid-unit-15 + 2*$border-width;
 	line-height: $grid-unit-15 + 2*$border-width;
