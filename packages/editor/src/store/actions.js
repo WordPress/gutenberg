@@ -195,6 +195,8 @@ export const savePost =
 				),
 			content,
 		};
+
+		dispatch( { type: 'REQUEST_POST_UPDATE_START', options } );
 		let error;
 		try {
 			edits = await applyFilters(
@@ -206,7 +208,6 @@ export const savePost =
 			error = err;
 		}
 
-		dispatch( { type: 'REQUEST_POST_UPDATE_START', options } );
 		if ( ! error ) {
 			error = await registry
 				.dispatch( coreStore )
