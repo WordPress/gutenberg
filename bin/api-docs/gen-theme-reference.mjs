@@ -146,6 +146,27 @@ function getStylePropertiesMarkup( { properties } ) {
 }
 
 /**
+ * Convert template properties to markup.
+ *
+ * @param {JSONSchema} schema
+ * @return {string} markup
+ */
+function getTemplatePropertiesMarkup( { properties } ) {
+	if ( ! properties || typeof properties !== 'object' ) {
+		return '';
+	}
+
+	let markup = '';
+	markup += '| Property | Description | Type |\n';
+	markup += '| ---      | ---         | ---  |\n';
+	Object.entries( properties ).forEach( ( [ property, subschema ] ) => {
+		const { description, type } = subschema;
+		markup += `| ${ property } | ${ description } | ${ type } |\n`;
+	} );
+	return markup + '\n';
+}
+
+/**
  * Format list of types.
  *
  * @param {Object} prop
@@ -202,29 +223,21 @@ styles.forEach( ( [ section, data ] ) => {
 	autogen += `---\n\n`;
 } );
 
-function templateTableGeneration( themeJson, context ) {
-	let content = '';
-	content += '## ' + context + '\n\n';
-	content += themeJson.properties[ context ].description + '\n\n';
-	content +=
-		'Type: `' + themeJson.properties[ context ].items.type + '`.\n\n';
-	content += '| Property | Description | Type |\n';
-	content += '| ---      | ---         | ---  |\n';
-	Object.keys( themeJson.properties[ context ].items.properties ).forEach(
-		( key ) => {
-			content += `| ${ key } | ${ themeJson.properties[ context ].items.properties[ key ].description } | ${ themeJson.properties[ context ].items.properties[ key ].type } |\n`;
-		}
-	);
-	content += '\n\n';
-
-	return content;
-}
-
 // customTemplates
-autogen += templateTableGeneration( themejson, 'customTemplates' );
+autogen += '## customTemplates\n\n';
+autogen += `${ themejson.properties.customTemplates.description }\n\n`;
+autogen += `Type: \`${ themejson.properties.customTemplates.items.type }\`.\n\n`;
+autogen += getTemplatePropertiesMarkup(
+	themejson.properties.customTemplates.items
+);
 
 // templateParts
-autogen += templateTableGeneration( themejson, 'templateParts' );
+autogen += '## templateParts\n\n';
+autogen += `${ themejson.properties.templateParts.description }\n\n`;
+autogen += `Type: \`${ themejson.properties.templateParts.items.type }\`.\n\n`;
+autogen += getTemplatePropertiesMarkup(
+	themejson.properties.templateParts.items
+);
 
 // Patterns
 autogen += '## Patterns' + '\n\n';
