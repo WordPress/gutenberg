@@ -26,7 +26,8 @@ import { unlock } from '../../lock-unlock';
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 
 function FontFamilies() {
-	const { modalTabOpen, setModalTabOpen } = useContext( FontLibraryContext );
+	const { baseCustomFonts, modalTabOpen, setModalTabOpen } =
+		useContext( FontLibraryContext );
 	const [ fontFamilies ] = useGlobalSetting( 'typography.fontFamilies' );
 	const [ baseFontFamilies ] = useGlobalSetting(
 		'typography.fontFamilies',
@@ -44,7 +45,9 @@ function FontFamilies() {
 				.sort( ( a, b ) => a.name.localeCompare( b.name ) )
 		: [];
 	const hasFonts = 0 < customFonts.length || 0 < themeFonts.length;
-	const hasBaseFonts = baseFontFamilies?.theme?.length > 0;
+
+	const hasInstalledFonts =
+		baseFontFamilies?.theme?.length > 0 || baseCustomFonts?.length > 0;
 
 	return (
 		<>
@@ -88,7 +91,7 @@ function FontFamilies() {
 					<VStack>
 						<Subtitle level={ 3 }>{ __( 'Fonts' ) }</Subtitle>
 						<Text as="p">
-							{ hasBaseFonts
+							{ hasInstalledFonts
 								? __( 'No fonts activated.' )
 								: __( 'No fonts installed.' ) }
 						</Text>
