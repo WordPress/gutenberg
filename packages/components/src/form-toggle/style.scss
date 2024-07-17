@@ -1,5 +1,10 @@
 @use "sass:math";
 
+$toggle-width: $grid-unit-40;
+$toggle-height: $grid-unit-20;
+$toggle-border-width: 1px;
+$toggle-thumb-size:  $grid-unit-15;
+
 $transition-duration: 0.2s;
 
 .components-form-toggle {
