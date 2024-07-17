@@ -57,8 +57,8 @@ Settings related to background.
 
 | Property | Description | Type | Default |
 | -------- | ----------- | ---- | ------- |
-| backgroundImage | Allow users to set a background image. | `boolean` |  |
-| backgroundSize | Allow users to set values related to the size of a background image, including size, position, and repeat controls. | `boolean` |  |
+| backgroundImage | Allow users to set a background image. | `boolean` | `false` |
+| backgroundSize | Allow users to set values related to the size of a background image, including size, position, and repeat controls. | `boolean` | `false` |
 
 ---
 
@@ -68,10 +68,10 @@ Settings related to borders.
 
 | Property | Description | Type | Default |
 | -------- | ----------- | ---- | ------- |
-| color | Allow users to set custom border colors. | `boolean` |  |
-| radius | Allow users to set custom border radius. | `boolean` |  |
-| style | Allow users to set custom border styles. | `boolean` |  |
-| width | Allow users to set custom border widths. | `boolean` |  |
+| color | Allow users to set custom border colors. | `boolean` | `false` |
+| radius | Allow users to set custom border radius. | `boolean` | `false` |
+| style | Allow users to set custom border styles. | `boolean` | `false` |
+| width | Allow users to set custom border widths. | `boolean` | `false` |
 
 ---
 
@@ -90,7 +90,7 @@ Settings related to colors.
 | defaultPalette | Allow users to choose colors from the default palette. | `boolean` | `true` |
 | duotone | Duotone presets for the duotone picker. | `[ { name, slug, colors } ]` |  |
 | gradients | Gradient presets for the gradient picker. | `[ { name, slug, gradient } ]` |  |
-| link | Allow users to set link colors in a block. | `boolean` |  |
+| link | Allow users to set link colors in a block. | `boolean` | `false` |
 | palette | Color palette presets for the color picker. | `[ { name, slug, color } ]` |  |
 | text | Allow users to set text colors in a block. | `boolean` | `true` |
 | heading | Allow users to set heading colors in a block. | `boolean` | `true` |
@@ -105,10 +105,10 @@ Settings related to dimensions.
 
 | Property | Description | Type | Default |
 | -------- | ----------- | ---- | ------- |
-| aspectRatio | Allow users to set an aspect ratio. | `boolean` |  |
+| aspectRatio | Allow users to set an aspect ratio. | `boolean` | `false` |
 | defaultAspectRatios | Allow users to choose aspect ratios from the default set of aspect ratios. | `boolean` | `true` |
 | aspectRatios | Allow users to define aspect ratios for some blocks. | `[ { name, slug, ratio } ]` |  |
-| minHeight | Allow users to set custom minimum height. | `boolean` |  |
+| minHeight | Allow users to set custom minimum height. | `boolean` | `false` |
 
 ---
 
@@ -142,8 +142,8 @@ Settings related to position.
 
 | Property | Description | Type | Default |
 | -------- | ----------- | ---- | ------- |
-| fixed | Allow users to set fixed position. | `boolean` |  |
-| sticky | Allow users to set sticky position. | `boolean` |  |
+| fixed | Allow users to set fixed position. | `boolean` | `false` |
+| sticky | Allow users to set sticky position. | `boolean` | `false` |
 
 ---
 
@@ -164,9 +164,9 @@ Settings related to spacing.
 
 | Property | Description | Type | Default |
 | -------- | ----------- | ---- | ------- |
-| blockGap | Enables `--wp--style--block-gap` to be generated from styles.spacing.blockGap. | `boolean`, `null` |  |
-| margin | Allow users to set a custom margin. | `boolean` |  |
-| padding | Allow users to set a custom padding. | `boolean` |  |
+| blockGap | Enables `--wp--style--block-gap` to be generated from styles.spacing.blockGap. | `boolean`, `null` | `null` |
+| margin | Allow users to set a custom margin. | `boolean` | `false` |
+| padding | Allow users to set a custom padding. | `boolean` | `false` |
 | units | List of units the user can use for spacing values. | `[ string ]` | `["px","em","rem","vh","vw","%"]` |
 | customSpacingSize | Allow users to set custom space sizes. | `boolean` | `true` |
 | defaultSpacingSizes | Allow users to choose space sizes from the default space size presets. | `boolean` | `true` |
@@ -185,13 +185,13 @@ Settings related to typography.
 | customFontSize | Allow users to set custom font sizes. | `boolean` | `true` |
 | fontStyle | Allow users to set custom font styles. | `boolean` | `true` |
 | fontWeight | Allow users to set custom font weights. | `boolean` | `true` |
-| fluid | Enables fluid typography and allows users to set global fluid typography parameters. | `boolean`, `{ minFontSize, maxViewportWidth, minViewportWidth }` |  |
+| fluid | Enables fluid typography and allows users to set global fluid typography parameters. | `boolean`, `{ minFontSize, maxViewportWidth, minViewportWidth }` | `false` |
 | letterSpacing | Allow users to set custom letter spacing. | `boolean` | `true` |
-| lineHeight | Allow users to set custom line height. | `boolean` |  |
+| lineHeight | Allow users to set custom line height. | `boolean` | `false` |
 | textAlign | Allow users to set the text align. | `boolean` | `true` |
-| textColumns | Allow users to set the number of text columns. | `boolean` |  |
+| textColumns | Allow users to set the number of text columns. | `boolean` | `false` |
 | textDecoration | Allow users to set custom text decorations. | `boolean` | `true` |
-| writingMode | Allow users to set the writing mode. | `boolean` |  |
+| writingMode | Allow users to set the writing mode. | `boolean` | `false` |
 | textTransform | Allow users to set custom text transforms. | `boolean` | `true` |
 | dropCap | Enable drop cap. | `boolean` | `true` |
 | fontSizes | Font size presets for the font size selector. | `[ { name, slug, size, fluid } ]` |  |
