@@ -65,13 +65,13 @@ const TOKEN_PATTERN = new RegExp( START_TOKEN + '[^]*' + END_TOKEN );
  */
 
 /**
- * Serialize a schema that may use `anyOf` or `oneOf`.
+ * Create a serializer function for a type. Supports merging anyOf and oneOf subschemas.
  *
  * @see {@link https://json-schema.org/understanding-json-schema/reference/combining.html}
  *
- * @param {PredicateFunction}  predicate
- * @param {SerializerFunction} serializer
- * @return {SerializerFunction} flattened schema
+ * @param {PredicateFunction}  predicate  Type predicate function to match a type.
+ * @param {SerializerFunction} serializer Serializer function to format a type.
+ * @return {SerializerFunction} Serializer function for the give type.
  */
 function createSerializer( predicate, serializer ) {
 	return ( schema ) => {
@@ -132,7 +132,7 @@ const serializePrimitiveArrayTypes = createSerializer(
  * @param {JSONSchema} schema
  * @return {string} generated types
  */
-function serializeTypes( schema ) {
+function generateTypes( schema ) {
 	return [
 		serializePrimitiveTypes( schema ),
 		serializeObjectTypes( schema ),
@@ -173,7 +173,7 @@ function generateDocs( themejson ) {
 			autogen += '| ---       | ---    | ---     |\n';
 			const properties = Object.entries( schema.properties );
 			for ( const [ property, subschema ] of properties ) {
-				const types = serializeTypes( subschema );
+				const types = generateTypes( subschema );
 				const defaultValue = subschema.default ?? '';
 				autogen += `| ${ property } | ${ types } | ${ defaultValue } |\n`;
 			}
@@ -196,7 +196,7 @@ function generateDocs( themejson ) {
 			autogen += '| ---       | ---    |\n';
 			const properties = Object.entries( schema.properties );
 			for ( const [ property, subschema ] of properties ) {
-				const types = serializeTypes( subschema );
+				const types = generateTypes( subschema );
 				autogen += `| ${ property } | ${ types } |\n`;
 			}
 			autogen += '\n';
@@ -214,7 +214,7 @@ function generateDocs( themejson ) {
 	);
 	for ( const [ property, subschema ] of customTemplatesProperties ) {
 		const { description } = subschema;
-		const types = serializeTypes( subschema );
+		const types = generateTypes( subschema );
 		autogen += `| ${ property } | ${ description } | ${ types } |\n`;
 	}
 	autogen += '\n';
@@ -229,16 +229,14 @@ function generateDocs( themejson ) {
 	);
 	for ( const [ property, subschema ] of templatePartsProperties ) {
 		const { description } = subschema;
-		const types = serializeTypes( subschema );
+		const types = generateTypes( subschema );
 		autogen += `| ${ property } | ${ description } | ${ types } |\n`;
 	}
 	autogen += '\n';
 
 	// Patterns
 	autogen += '## patterns' + '\n\n';
-	autogen += `Type: ${ serializeTypes(
-		themejson.properties.patterns
-	) }.\n\n`;
+	autogen += `Type: ${ generateTypes( themejson.properties.patterns ) }.\n\n`;
 	autogen += themejson.properties.patterns.description + '\n';
 
 	return `${ START_TOKEN }\n${ autogen }\n${ END_TOKEN }`;
