@@ -27,15 +27,17 @@
 .editor-header__toolbar {
 	grid-column: 1 / 3;
 	// When there is no back button or the viewport is <= mobile the margin keeps the content off
-	// the starting edge. Otherwise, it’s overriden to and the parent’s `gap` does the job instead.
+	// the starting edge.
 	> :first-child {
 		margin-inline: $grid-unit-20 0;
 	}
 
-	.has-back-button.editor-header & {
+	// This is the typical case, the back button takes up the first column.
+	.editor-header__back-button + & {
 		grid-column: 2 / 3;
 
 		@include break-mobile {
+			// Clears the margin; at this breakpoint the parent’s `gap` takes its place.
 			> :first-child {
 				margin-inline: 0;
 			}

@@ -94,12 +94,12 @@ function Header( {
 	return (
 		<div
 			className={ clsx( 'editor-header edit-post-header', {
-				'has-back-button': hasBackButton,
 				'has-center': hasCenter,
 			} ) }
 		>
 			{ hasBackButton && (
 				<motion.div
+					className="editor-header__back-button"
 					variants={ backButtonVariations }
 					transition={ { type: 'tween' } }
 				>
