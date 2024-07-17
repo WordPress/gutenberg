@@ -102,7 +102,7 @@ function ZoomOutModeInserters() {
 				previousClientId={ clientId }
 				nextClientId={ blockOrder[ index ] }
 			>
-				{ insertionPoint.insertionIndex === index && (
+				{ shouldRenderInsertionPoint && (
 					<div
 						style={ {
 							borderRadius: '0',
