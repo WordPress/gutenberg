@@ -38,7 +38,6 @@
 		"html": false,
 		"align": true,
 		"color": {
-			"text": true,
 			"background": true,
 			"gradients": true,
 			"link": true
