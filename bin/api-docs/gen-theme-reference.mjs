@@ -89,8 +89,9 @@ function serialize( predicate, serializer, schema ) {
  */
 const formatType = serialize.bind(
 	null,
-	( schema ) => schema.type,
-	( schema ) => schema.type
+	( schema ) =>
+		schema.type && ! [ 'object', 'array' ].includes( schema.type ),
+	( schema ) => `\`${ schema.type }\``
 );
 
 /**
@@ -101,7 +102,7 @@ const formatType = serialize.bind(
 const formatProperties = serialize.bind(
 	null,
 	( schema ) => schema.properties,
-	( schema ) => `_{ ${ Object.keys( schema.properties ).join( ', ' ) } }_`
+	( schema ) => `\`{ ${ Object.keys( schema.properties ).join( ', ' ) } }\``
 );
 
 /**
@@ -113,8 +114,38 @@ const formatArrayProperties = serialize.bind(
 	null,
 	( schema ) => schema.items && schema.items.properties,
 	( schema ) =>
-		`_[ { ${ Object.keys( schema.items.properties ).join( ', ' ) } } ]_`
+		`\`[ { ${ Object.keys( schema.items.properties ).join( ', ' ) } } ]\``
 );
+
+/**
+ * Format list of array types.
+ *
+ * @type {SerializerFunction}
+ */
+const formatArrayTypes = serialize.bind(
+	null,
+	( schema ) =>
+		schema.items &&
+		schema.items.type &&
+		! [ 'object', 'array' ].includes( schema.items.type ),
+	( schema ) => `\`[ ${ schema.items.type } ]\``
+);
+
+/**
+ * Generate types from schema.
+ *
+ * @param {JSONSchema} schema
+ * @return {string} generated types
+ */
+function generateTypes( schema ) {
+	const primitiveTypes = formatType( schema );
+	const arrayTypes = formatArrayTypes( schema );
+	const objectTypes = formatProperties( schema );
+	const arrayObjectTypes = formatArrayProperties( schema );
+	return [ primitiveTypes, arrayTypes, arrayObjectTypes, objectTypes ]
+		.filter( Boolean )
+		.join( ', ' );
+}
 
 /**
  * Generate documentation from theme.json schema.
@@ -142,16 +173,13 @@ function generateDocs( themejson ) {
 		autogen += `### ${ section }\n\n`;
 		autogen += `${ schema.description }\n\n`;
 		if ( schema.properties ) {
-			autogen += '| Property  | Type   | Default | Props  |\n';
-			autogen += '| ---       | ---    | ---     | ---    |\n';
+			autogen += '| Property  | Type   | Default |\n';
+			autogen += '| ---       | ---    | ---     |\n';
 			const properties = Object.entries( schema.properties );
 			for ( const [ property, subschema ] of properties ) {
-				const type = formatType( subschema );
+				const types = generateTypes( subschema );
 				const defaultValue = subschema.default ?? '';
-				const props =
-					formatArrayProperties( subschema ) ||
-					formatProperties( subschema );
-				autogen += `| ${ property } | ${ type } | ${ defaultValue } | ${ props } |\n`;
+				autogen += `| ${ property } | ${ types } | ${ defaultValue } |\n`;
 			}
 			autogen += '\n';
 		}
@@ -168,13 +196,12 @@ function generateDocs( themejson ) {
 		autogen += `### ${ section }\n\n`;
 		autogen += `${ schema.description }\n\n`;
 		if ( schema.properties ) {
-			autogen += '| Property  | Type   | Props  |\n';
-			autogen += '| ---       | ---    | ---    |\n';
+			autogen += '| Property  | Type   |\n';
+			autogen += '| ---       | ---    |\n';
 			const properties = Object.entries( schema.properties );
 			for ( const [ property, subschema ] of properties ) {
-				const props = formatProperties( subschema );
-				const type = formatType( subschema );
-				autogen += `| ${ property } | ${ type } | ${ props } |\n`;
+				const types = generateTypes( subschema );
+				autogen += `| ${ property } | ${ types } |\n`;
 			}
 			autogen += '\n';
 		}
