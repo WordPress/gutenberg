@@ -22,9 +22,16 @@ function ZoomOutModeInserters() {
 		insertionPoint,
 		setInserterIsOpened,
 		hasSelection,
+		selectedBlockClientId,
+		hoveredBlock,
 	} = useSelect( ( select ) => {
-		const { getSettings, getBlockOrder, getSelectionStart } =
-			select( blockEditorStore );
+		const {
+			getSettings,
+			getBlockOrder,
+			getSelectionStart,
+			getSelectedBlockClientId,
+			getHoveredBlock,
+		} = select( blockEditorStore );
 		const { sectionRootClientId: root } = unlock( getSettings() );
 		// To do: move ZoomOutModeInserters to core/editor.
 		// Or we perhaps we should move the insertion point state to the
@@ -40,6 +47,8 @@ function ZoomOutModeInserters() {
 			sectionRootClientId: root,
 			setInserterIsOpened:
 				getSettings().__experimentalSetIsInserterOpened,
+			selectedBlockClientId: getSelectedBlockClientId(),
+			hoveredBlock: getHoveredBlock(),
 		};
 	}, [] );
 
@@ -69,6 +78,16 @@ function ZoomOutModeInserters() {
 	}
 
 	return [ undefined, ...blockOrder ].map( ( clientId, index ) => {
+		const isSelected =
+			selectedBlockClientId === clientId ||
+			selectedBlockClientId === blockOrder[ index ];
+		const isHovered =
+			hoveredBlock === clientId || hoveredBlock === blockOrder[ index ];
+
+		const shouldRenderInserter =
+			( isHovered || isSelected ) &&
+			insertionPoint.insertionIndex !== index;
+
 		return (
 			<BlockPopoverInbetween
 				key={ index }
@@ -87,7 +106,7 @@ function ZoomOutModeInserters() {
 						className="block-editor-block-list__insertion-point-indicator"
 					/>
 				) }
-				{ insertionPoint.insertionIndex !== index && (
+				{ shouldRenderInserter && (
 					<Button
 						variant="primary"
 						icon={ plus }
