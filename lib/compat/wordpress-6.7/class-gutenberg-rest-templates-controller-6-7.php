@@ -158,6 +158,9 @@ class Gutenberg_REST_Templates_Controller_6_7 extends Gutenberg_REST_Templates_C
 				return empty( $theme_name ) ? $template_object->theme : $theme_name;
 			case 'plugin':
 				// @core-merge: Prioritize plugin name instead of theme name for plugin-registered templates.
+				if ( ! function_exists( 'get_plugins' ) || ! function_exists( 'get_plugin_data' ) ) {
+					require_once ABSPATH . 'wp-admin/includes/plugin.php';
+				}
 				if ( isset( $template_object->plugin ) ) {
 					$plugins = wp_get_active_and_valid_plugins();
 
@@ -182,9 +185,6 @@ class Gutenberg_REST_Templates_Controller_6_7 extends Gutenberg_REST_Templates_C
 				 * Fall back to the theme name if the plugin is not defined. That's needed to keep backwards
 				 * compatibility with templates that were registered before the plugin attribute was added.
 				 */
-				if ( ! function_exists( 'get_plugins' ) ) {
-					require_once ABSPATH . 'wp-admin/includes/plugin.php';
-				}
 				$plugins         = get_plugins();
 				$plugin_basename = plugin_basename( sanitize_text_field( $template_object->theme . '.php' ) );
 				if ( isset( $plugins[ $plugin_basename ] ) && isset( $plugins[ $plugin_basename ]['Name'] ) ) {
