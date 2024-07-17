@@ -151,16 +151,22 @@ function generateDocs( themejson ) {
 	 * --------------- */
 	autogen += '## settings\n\n';
 	autogen += `${ themejson.properties.settings.description }\n\n`;
-	const settings = themejson.definitions.settingsProperties.allOf.flatMap(
-		( settingsProperties ) =>
-			Object.entries( settingsProperties.properties )
-	);
-	// This property is only available at the root level, so it isn't included in the settingsProperties.
-	settings.unshift( [
-		'useRootPaddingAwareAlignments',
-		themejson.properties.settings.allOf[ 1 ].properties
-			.useRootPaddingAwareAlignments,
-	] );
+	const settings = [
+		// Top-level only properties.
+		...Object.entries( themejson.properties.settings.allOf[ 1 ].properties )
+			.filter( ( [ property ] ) => property !== 'blocks' )
+			.map( ( [ property, subschema ] ) => [
+				property,
+				{
+					...subschema,
+					description: `${ subschema.description }\n\n**Note:** Top-level only property. Not available in blocks.`,
+				},
+			] ),
+		// Top-level and blocks properties.
+		...themejson.properties.settings.allOf[ 0 ].allOf.flatMap(
+			( subschema ) => Object.entries( subschema.properties )
+		),
+	];
 	for ( const [ section, schema ] of settings ) {
 		autogen += `### ${ section }\n\n`;
 		autogen += `${ schema.description }\n\n`;
