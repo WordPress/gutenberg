@@ -1958,6 +1958,7 @@
 		},
 		"stylesElementsPropertiesComplete": {
 			"description": "Styles defined on a per-element basis using the element's selector.",
+			"type": "object",
 			"properties": {
 				"button": {
 					"allOf": [
