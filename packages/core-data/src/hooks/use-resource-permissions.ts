@@ -126,10 +126,16 @@ export default function useResourcePermissions< IdType = void >(
 
 	return useQuerySelect(
 		( resolve ) => {
+			const isEntity = typeof resource === 'object';
+			const hasId = isEntity ? !! resource.id : !! id;
 			const { canUser } = resolve( coreStore );
-			const create = canUser( 'create', resource );
+			const create = canUser(
+				'create',
+				isEntity
+					? { kind: resource.kind, name: resource.name }
+					: resource
+			);
 
-			const hasId = typeof resource === 'object' ? !! resource.id : !! id;
 			if ( ! hasId ) {
 				const read = canUser( 'read', resource );
 
