@@ -223,7 +223,7 @@ function generateDocs( themejson ) {
 	autogen += '## customTemplates\n\n';
 	autogen += `${ themejson.properties.customTemplates.description }\n\n`;
 	autogen += '| Property | Description | Type |\n';
-	autogen += '| ---      | ---         | ---  |\n';
+	autogen += '| -------- | ----------- | ---- |\n';
 	const customTemplatesProperties = Object.entries(
 		themejson.properties.customTemplates.items.properties
 	);
@@ -240,7 +240,7 @@ function generateDocs( themejson ) {
 	autogen += '## templateParts\n\n';
 	autogen += `${ themejson.properties.templateParts.description }\n\n`;
 	autogen += '| Property | Description | Type |\n';
-	autogen += '| ---      | ---         | ---  |\n';
+	autogen += '| -------- | ----------- | ---- |\n';
 	const templatePartsProperties = Object.entries(
 		themejson.properties.templateParts.items.properties
 	);
@@ -254,7 +254,7 @@ function generateDocs( themejson ) {
 	/* --------------- *
 	 * patterns        *
 	 * --------------- */
-	autogen += '## patterns' + '\n\n';
+	autogen += '## patterns\n\n';
 	autogen += `Type: ${ generateTypes( themejson.properties.patterns ) }.\n\n`;
 	autogen += themejson.properties.patterns.description + '\n';
 
