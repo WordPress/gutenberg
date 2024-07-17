@@ -49,15 +49,6 @@
 	}
 }
 
-.block-library-query-toolspanel__filters {
-	.components-form-token-field__help {
-		margin-bottom: 0;
-	}
-	.block-library-query-inspector__taxonomy-control:not(:last-child) {
-		margin-bottom: $grid-unit-30;
-	}
-}
-
 .wp-block-query__enhanced-pagination-modal {
 	@include break-small() {
 		max-width: $break-mobile;
