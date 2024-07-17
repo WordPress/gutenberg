@@ -95,7 +95,7 @@ if ( ! class_exists( 'WP_Templates_Registry' ) ) {
 				$template->source      = 'plugin';
 				$template->slug        = $template_name;
 				$template->type        = 'wp_template';
-				$template->title       = isset( $args['title'] ) ? $args['title'] : '';
+				$template->title       = isset( $args['title'] ) ? $args['title'] : $template_name;
 				$template->description = isset( $args['description'] ) ? $args['description'] : '';
 				$template->status      = 'publish';
 				$template->origin      = 'plugin';
