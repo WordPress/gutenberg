@@ -19,11 +19,7 @@ import {
 	useDefaultViews,
 	defaultLayouts,
 } from '../sidebar-dataviews/default-views';
-import {
-	LAYOUT_LIST,
-	OPERATOR_IS_ANY,
-	OPERATOR_IS_NONE,
-} from '../../utils/constants';
+import { OPERATOR_IS_ANY, OPERATOR_IS_NONE } from '../../utils/constants';
 
 import AddNewPostModal from '../add-new-post';
 import { unlock } from '../../lock-unlock';
@@ -147,17 +143,14 @@ export default function PostList( { postType } ) {
 		( items ) => {
 			setSelection( items );
 			const { params } = history.getLocationWithParams();
-			if (
-				( params.isCustom ?? 'false' ) === 'false' &&
-				view?.type === LAYOUT_LIST
-			) {
+			if ( ( params.isCustom ?? 'false' ) === 'false' ) {
 				history.push( {
 					...params,
 					postId: items.length === 1 ? items[ 0 ] : undefined,
 				} );
 			}
 		},
-		[ history, view?.type ]
+		[ history ]
 	);
 
 	const queryArgs = useMemo( () => {
@@ -304,6 +297,7 @@ export default function PostList( { postType } ) {
 				header={
 					postType === 'page' && (
 						<Button
+							isPressed={ quickEdit }
 							icon={ drawerLeft }
 							label={
 								quickEdit
