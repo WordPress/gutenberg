@@ -55,10 +55,10 @@ Setting that enables the following UI tools:
 
 Settings related to background.
 
-| Property  | Type   | Default |
-| ---       | ---    | ---     |
-| backgroundImage | `boolean` |  |
-| backgroundSize | `boolean` |  |
+| Property | Description | Type | Default |
+| -------- | ----------- | ---- | ------- |
+| backgroundImage | Allow users to set a background image. | `boolean` |  |
+| backgroundSize | Allow users to set values related to the size of a background image, including size, position, and repeat controls. | `boolean` |  |
 
 ---
 
@@ -66,12 +66,12 @@ Settings related to background.
 
 Settings related to borders.
 
-| Property  | Type   | Default |
-| ---       | ---    | ---     |
-| color | `boolean` |  |
-| radius | `boolean` |  |
-| style | `boolean` |  |
-| width | `boolean` |  |
+| Property | Description | Type | Default |
+| -------- | ----------- | ---- | ------- |
+| color | Allow users to set custom border colors. | `boolean` |  |
+| radius | Allow users to set custom border radius. | `boolean` |  |
+| style | Allow users to set custom border styles. | `boolean` |  |
+| width | Allow users to set custom border widths. | `boolean` |  |
 
 ---
 
@@ -79,23 +79,23 @@ Settings related to borders.
 
 Settings related to colors.
 
-| Property  | Type   | Default |
-| ---       | ---    | ---     |
-| background | `boolean` | `true` |
-| custom | `boolean` | `true` |
-| customDuotone | `boolean` | `true` |
-| customGradient | `boolean` | `true` |
-| defaultDuotone | `boolean` | `true` |
-| defaultGradients | `boolean` | `true` |
-| defaultPalette | `boolean` | `true` |
-| duotone | `[ { name, slug, colors } ]` |  |
-| gradients | `[ { name, slug, gradient } ]` |  |
-| link | `boolean` |  |
-| palette | `[ { name, slug, color } ]` |  |
-| text | `boolean` | `true` |
-| heading | `boolean` | `true` |
-| button | `boolean` | `true` |
-| caption | `boolean` | `true` |
+| Property | Description | Type | Default |
+| -------- | ----------- | ---- | ------- |
+| background | Allow users to set background colors. | `boolean` | `true` |
+| custom | Allow users to select custom colors. | `boolean` | `true` |
+| customDuotone | Allow users to create custom duotone filters. | `boolean` | `true` |
+| customGradient | Allow users to create custom gradients. | `boolean` | `true` |
+| defaultDuotone | Allow users to choose filters from the default duotone filter presets. | `boolean` | `true` |
+| defaultGradients | Allow users to choose colors from the default gradients. | `boolean` | `true` |
+| defaultPalette | Allow users to choose colors from the default palette. | `boolean` | `true` |
+| duotone | Duotone presets for the duotone picker. | `[ { name, slug, colors } ]` |  |
+| gradients | Gradient presets for the gradient picker. | `[ { name, slug, gradient } ]` |  |
+| link | Allow users to set link colors in a block. | `boolean` |  |
+| palette | Color palette presets for the color picker. | `[ { name, slug, color } ]` |  |
+| text | Allow users to set text colors in a block. | `boolean` | `true` |
+| heading | Allow users to set heading colors in a block. | `boolean` | `true` |
+| button | Allow users to set button colors in a block. | `boolean` | `true` |
+| caption | Allow users to set caption colors in a block. | `boolean` | `true` |
 
 ---
 
@@ -103,12 +103,12 @@ Settings related to colors.
 
 Settings related to dimensions.
 
-| Property  | Type   | Default |
-| ---       | ---    | ---     |
-| aspectRatio | `boolean` |  |
-| defaultAspectRatios | `boolean` | `true` |
-| aspectRatios | `[ { name, slug, ratio } ]` |  |
-| minHeight | `boolean` |  |
+| Property | Description | Type | Default |
+| -------- | ----------- | ---- | ------- |
+| aspectRatio | Allow users to set an aspect ratio. | `boolean` |  |
+| defaultAspectRatios | Allow users to choose aspect ratios from the default set of aspect ratios. | `boolean` | `true` |
+| aspectRatios | Allow users to define aspect ratios for some blocks. | `[ { name, slug, ratio } ]` |  |
+| minHeight | Allow users to set custom minimum height. | `boolean` |  |
 
 ---
 
@@ -116,12 +116,12 @@ Settings related to dimensions.
 
 Settings related to layout.
 
-| Property  | Type   | Default |
-| ---       | ---    | ---     |
-| contentSize | `string` |  |
-| wideSize | `string` |  |
-| allowEditing | `boolean` | `true` |
-| allowCustomContentAndWideSize | `boolean` | `true` |
+| Property | Description | Type | Default |
+| -------- | ----------- | ---- | ------- |
+| contentSize | Sets the max-width of the content. | `string` |  |
+| wideSize | Sets the max-width of wide (`.alignwide`) content. Also used as the maximum viewport when calculating fluid font sizes | `string` |  |
+| allowEditing | Disable the layout UI controls. | `boolean` | `true` |
+| allowCustomContentAndWideSize | Enable or disable the custom content and wide size controls. | `boolean` | `true` |
 
 ---
 
@@ -129,10 +129,10 @@ Settings related to layout.
 
 Settings related to the lightbox.
 
-| Property  | Type   | Default |
-| ---       | ---    | ---     |
-| enabled | `boolean` |  |
-| allowEditing | `boolean` |  |
+| Property | Description | Type | Default |
+| -------- | ----------- | ---- | ------- |
+| enabled | Defines whether the lightbox is enabled or not. | `boolean` |  |
+| allowEditing | Defines whether to show the Lightbox UI in the block editor. If set to `false`, the user won't be able to change the lightbox settings in the block editor. | `boolean` |  |
 
 ---
 
@@ -140,9 +140,9 @@ Settings related to the lightbox.
 
 Settings related to position.
 
-| Property  | Type   | Default |
-| ---       | ---    | ---     |
-| sticky | `boolean` |  |
+| Property | Description | Type | Default |
+| -------- | ----------- | ---- | ------- |
+| sticky | Allow users to set sticky position. | `boolean` |  |
 
 ---
 
@@ -150,10 +150,10 @@ Settings related to position.
 
 Settings related to shadows.
 
-| Property  | Type   | Default |
-| ---       | ---    | ---     |
-| defaultPresets | `boolean` | `true` |
-| presets | `[ { name, slug, shadow } ]` |  |
+| Property | Description | Type | Default |
+| -------- | ----------- | ---- | ------- |
+| defaultPresets | Allow users to choose shadows from the default shadow presets. | `boolean` | `true` |
+| presets | Shadow presets for the shadow picker. | `[ { name, slug, shadow } ]` |  |
 
 ---
 
@@ -161,16 +161,16 @@ Settings related to shadows.
 
 Settings related to spacing.
 
-| Property  | Type   | Default |
-| ---       | ---    | ---     |
-| blockGap | `boolean`, `null` |  |
-| margin | `boolean` |  |
-| padding | `boolean` |  |
-| units | `[ string ]` | `["px","em","rem","vh","vw","%"]` |
-| customSpacingSize | `boolean` | `true` |
-| defaultSpacingSizes | `boolean` | `true` |
-| spacingSizes | `[ { name, slug, size } ]` |  |
-| spacingScale | `{ operator, increment, steps, mediumStep, unit }` |  |
+| Property | Description | Type | Default |
+| -------- | ----------- | ---- | ------- |
+| blockGap | Enables `--wp--style--block-gap` to be generated from styles.spacing.blockGap. | `boolean`, `null` |  |
+| margin | Allow users to set a custom margin. | `boolean` |  |
+| padding | Allow users to set a custom padding. | `boolean` |  |
+| units | List of units the user can use for spacing values. | `[ string ]` | `["px","em","rem","vh","vw","%"]` |
+| customSpacingSize | Allow users to set custom space sizes. | `boolean` | `true` |
+| defaultSpacingSizes | Allow users to choose space sizes from the default space size presets. | `boolean` | `true` |
+| spacingSizes | Space size presets for the space size selector. | `[ { name, slug, size } ]` |  |
+| spacingScale | Settings to auto-generate space size presets for the space size selector. | `{ operator, increment, steps, mediumStep, unit }` |  |
 
 ---
 
@@ -178,23 +178,23 @@ Settings related to spacing.
 
 Settings related to typography.
 
-| Property  | Type   | Default |
-| ---       | ---    | ---     |
-| defaultFontSizes | `boolean` | `true` |
-| customFontSize | `boolean` | `true` |
-| fontStyle | `boolean` | `true` |
-| fontWeight | `boolean` | `true` |
-| fluid | `boolean`, `{ minFontSize, maxViewportWidth, minViewportWidth }` |  |
-| letterSpacing | `boolean` | `true` |
-| lineHeight | `boolean` |  |
-| textAlign | `boolean` | `true` |
-| textColumns | `boolean` |  |
-| textDecoration | `boolean` | `true` |
-| writingMode | `boolean` |  |
-| textTransform | `boolean` | `true` |
-| dropCap | `boolean` | `true` |
-| fontSizes | `[ { name, slug, size, fluid } ]` |  |
-| fontFamilies | `[ { name, slug, fontFamily, fontFace } ]` |  |
+| Property | Description | Type | Default |
+| -------- | ----------- | ---- | ------- |
+| defaultFontSizes | Allow users to choose font sizes from the default font size presets. | `boolean` | `true` |
+| customFontSize | Allow users to set custom font sizes. | `boolean` | `true` |
+| fontStyle | Allow users to set custom font styles. | `boolean` | `true` |
+| fontWeight | Allow users to set custom font weights. | `boolean` | `true` |
+| fluid | Enables fluid typography and allows users to set global fluid typography parameters. | `boolean`, `{ minFontSize, maxViewportWidth, minViewportWidth }` |  |
+| letterSpacing | Allow users to set custom letter spacing. | `boolean` | `true` |
+| lineHeight | Allow users to set custom line height. | `boolean` |  |
+| textAlign | Allow users to set the text align. | `boolean` | `true` |
+| textColumns | Allow users to set the number of text columns. | `boolean` |  |
+| textDecoration | Allow users to set custom text decorations. | `boolean` | `true` |
+| writingMode | Allow users to set the writing mode. | `boolean` |  |
+| textTransform | Allow users to set custom text transforms. | `boolean` | `true` |
+| dropCap | Enable drop cap. | `boolean` | `true` |
+| fontSizes | Font size presets for the font size selector. | `[ { name, slug, size, fluid } ]` |  |
+| fontFamilies | Font family presets for the font family selector. | `[ { name, slug, fontFamily, fontFace } ]` |  |
 
 ---
 
@@ -212,13 +212,13 @@ Organized way to set CSS properties. Styles in the top-level will be added in th
 
 Background styles.
 
-| Property  | Type   |
-| ---       | ---    |
-| backgroundImage | `string`, `{ ref }`, `{ url }` |
-| backgroundPosition | `string`, `{ ref }` |
-| backgroundRepeat | `string`, `{ ref }` |
-| backgroundSize | `string`, `{ ref }` |
-| backgroundAttachment | `string`, `{ ref }` |
+| Property | Description | Type |
+| -------- | ----------- | ---- |
+| backgroundImage | Sets the `background-image` CSS property. | `string`, `{ ref }`, `{ url }` |
+| backgroundPosition | Sets the `background-position` CSS property. | `string`, `{ ref }` |
+| backgroundRepeat | Sets the `background-repeat` CSS property. | `string`, `{ ref }` |
+| backgroundSize | Sets the `background-size` CSS property. | `string`, `{ ref }` |
+| backgroundAttachment | Sets the `background-attachment` CSS property. | `string`, `{ ref }` |
 
 ---
 
@@ -226,16 +226,16 @@ Background styles.
 
 Border styles.
 
-| Property  | Type   |
-| ---       | ---    |
-| color | `string`, `{ ref }` |
-| radius | `string`, `{ ref }`, `{ topLeft, topRight, bottomLeft, bottomRight }` |
-| style | `string`, `{ ref }` |
-| width | `string`, `{ ref }` |
-| top | `{ color, style, width }` |
-| right | `{ color, style, width }` |
-| bottom | `{ color, style, width }` |
-| left | `{ color, style, width }` |
+| Property | Description | Type |
+| -------- | ----------- | ---- |
+| color | Sets the `border-color` CSS property. | `string`, `{ ref }` |
+| radius | Sets the `border-radius` CSS property. | `string`, `{ ref }`, `{ topLeft, topRight, bottomLeft, bottomRight }` |
+| style | Sets the `border-style` CSS property. | `string`, `{ ref }` |
+| width | Sets the `border-width` CSS property. | `string`, `{ ref }` |
+| top |  | `{ color, style, width }` |
+| right |  | `{ color, style, width }` |
+| bottom |  | `{ color, style, width }` |
+| left |  | `{ color, style, width }` |
 
 ---
 
@@ -243,11 +243,11 @@ Border styles.
 
 Color styles.
 
-| Property  | Type   |
-| ---       | ---    |
-| background | `string`, `{ ref }` |
-| gradient | `string`, `{ ref }` |
-| text | `string`, `{ ref }` |
+| Property | Description | Type |
+| -------- | ----------- | ---- |
+| background | Sets the `background-color` CSS property. | `string`, `{ ref }` |
+| gradient | Sets the `background` CSS property. | `string`, `{ ref }` |
+| text | Sets the `color` CSS property. | `string`, `{ ref }` |
 
 ---
 
@@ -261,10 +261,10 @@ Sets custom CSS to apply styling not covered by other theme.json properties.
 
 Dimensions styles.
 
-| Property  | Type   |
-| ---       | ---    |
-| aspectRatio | `string`, `{ ref }` |
-| minHeight | `string`, `{ ref }` |
+| Property | Description | Type |
+| -------- | ----------- | ---- |
+| aspectRatio | Sets the `aspect-ratio` CSS property. | `string`, `{ ref }` |
+| minHeight | Sets the `min-height` CSS property. | `string`, `{ ref }` |
 
 ---
 
@@ -272,9 +272,9 @@ Dimensions styles.
 
 CSS and SVG filter styles.
 
-| Property  | Type   |
-| ---       | ---    |
-| duotone | `string`, `{ ref }` |
+| Property | Description | Type |
+| -------- | ----------- | ---- |
+| duotone | Sets the duotone filter. | `string`, `{ ref }` |
 
 ---
 
@@ -282,12 +282,12 @@ CSS and SVG filter styles.
 
 Outline styles.
 
-| Property  | Type   |
-| ---       | ---    |
-| color | `string`, `{ ref }` |
-| offset | `string`, `{ ref }` |
-| style | `string`, `{ ref }` |
-| width | `string`, `{ ref }` |
+| Property | Description | Type |
+| -------- | ----------- | ---- |
+| color | Sets the `outline-color` CSS property. | `string`, `{ ref }` |
+| offset | Sets the `outline-offset` CSS property. | `string`, `{ ref }` |
+| style | Sets the `outline-style` CSS property. | `string`, `{ ref }` |
+| width | Sets the `outline-width` CSS property. | `string`, `{ ref }` |
 
 ---
 
@@ -301,11 +301,11 @@ Box shadow styles.
 
 Spacing styles.
 
-| Property  | Type   |
-| ---       | ---    |
-| blockGap | `string`, `{ ref }` |
-| margin | `{ top, right, bottom, left }` |
-| padding | `{ top, right, bottom, left }` |
+| Property | Description | Type |
+| -------- | ----------- | ---- |
+| blockGap | Sets the `--wp--style--block-gap` CSS custom property when settings.spacing.blockGap is true. | `string`, `{ ref }` |
+| margin | Margin styles. | `{ top, right, bottom, left }` |
+| padding | Padding styles. | `{ top, right, bottom, left }` |
 
 ---
 
@@ -313,19 +313,19 @@ Spacing styles.
 
 Typography styles.
 
-| Property  | Type   |
-| ---       | ---    |
-| fontFamily | `string`, `{ ref }` |
-| fontSize | `string`, `{ ref }` |
-| fontStyle | `string`, `{ ref }` |
-| fontWeight | `string`, `{ ref }` |
-| letterSpacing | `string`, `{ ref }` |
-| lineHeight | `string`, `{ ref }` |
-| textAlign | `string`, `{ ref }` |
-| textColumns | `string`, `{ ref }` |
-| textDecoration | `string`, `{ ref }` |
-| writingMode | `string`, `{ ref }` |
-| textTransform | `string`, `{ ref }` |
+| Property | Description | Type |
+| -------- | ----------- | ---- |
+| fontFamily | Sets the `font-family` CSS property. | `string`, `{ ref }` |
+| fontSize | Sets the `font-size` CSS property. | `string`, `{ ref }` |
+| fontStyle | Sets the `font-style` CSS property. | `string`, `{ ref }` |
+| fontWeight | Sets the `font-weight` CSS property. | `string`, `{ ref }` |
+| letterSpacing | Sets the `letter-spacing` CSS property. | `string`, `{ ref }` |
+| lineHeight | Sets the `line-height` CSS property. | `string`, `{ ref }` |
+| textAlign | Sets the `text-align` CSS property. | `string`, `{ ref }` |
+| textColumns | Sets the `column-count` CSS property. | `string`, `{ ref }` |
+| textDecoration | Sets the `text-decoration` CSS property. | `string`, `{ ref }` |
+| writingMode | Sets the `writing-mode` CSS property. | `string`, `{ ref }` |
+| textTransform | Sets the `text-transform` CSS property. | `string`, `{ ref }` |
 
 ---
 
