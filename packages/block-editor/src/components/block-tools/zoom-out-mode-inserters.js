@@ -73,20 +73,28 @@ function ZoomOutModeInserters() {
 		};
 	}, [] );
 
-	if ( ! isReady || ! hasSelection ) {
+	if ( ! isReady ) {
 		return null;
 	}
 
 	return [ undefined, ...blockOrder ].map( ( clientId, index ) => {
 		const isSelected =
-			selectedBlockClientId === clientId ||
-			selectedBlockClientId === blockOrder[ index ];
+			hasSelection &&
+			( selectedBlockClientId === clientId ||
+				selectedBlockClientId === blockOrder[ index ] );
 		const isHovered =
 			hoveredBlock === clientId || hoveredBlock === blockOrder[ index ];
 
 		const shouldRenderInserter =
 			( isHovered || isSelected ) &&
 			insertionPoint.insertionIndex !== index;
+
+		const shouldRenderInsertionPoint =
+			insertionPoint.insertionIndex === index;
+
+		if ( ! shouldRenderInserter && ! shouldRenderInsertionPoint ) {
+			return null;
+		}
 
 		return (
 			<BlockPopoverInbetween
