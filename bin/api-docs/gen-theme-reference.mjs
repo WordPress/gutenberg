@@ -84,7 +84,7 @@ function createSerializer( predicate, serializer ) {
 }
 
 /**
- * Format list of types.
+ * Serialize primitive types.
  *
  * @type {SerializerFunction}
  */
@@ -95,7 +95,9 @@ const serializePrimitiveTypes = createSerializer(
 );
 
 /**
- * Format list of properties.
+ * Serialize object types.
+ *
+ * @type {SerializerFunction}
  */
 const serializeObjectTypes = createSerializer(
 	( schema ) => schema.properties,
@@ -103,7 +105,7 @@ const serializeObjectTypes = createSerializer(
 );
 
 /**
- * Format list of array properties.
+ * Serialize object array types.
  *
  * @type {SerializerFunction}
  */
@@ -114,7 +116,7 @@ const serializeObjectArrayTypes = createSerializer(
 );
 
 /**
- * Format list of array types.
+ * Serialize primitive array types.
  *
  * @type {SerializerFunction}
  */
@@ -129,8 +131,8 @@ const serializePrimitiveArrayTypes = createSerializer(
 /**
  * Generate types from schema.
  *
- * @param {JSONSchema} schema
- * @return {string} generated types
+ * @param {JSONSchema} schema JSON schema
+ * @return {string} serialized types
  */
 function generateTypes( schema ) {
 	return [
@@ -146,13 +148,15 @@ function generateTypes( schema ) {
 /**
  * Generate documentation from theme.json schema.
  *
- * @param {JSONSchema} themejson
+ * @param {JSONSchema} themejson JSON schema
  * @return {string} generated documentation
  */
 function generateDocs( themejson ) {
 	let autogen = '';
 
-	// Settings
+	/* --------------- *
+	 * Settings        *
+	 * --------------- */
 	autogen += '## Settings\n\n';
 	autogen += `${ themejson.properties.settings.description }\n\n`;
 	const settings = themejson.definitions.settingsProperties.allOf.flatMap(
@@ -182,7 +186,9 @@ function generateDocs( themejson ) {
 		autogen += `---\n\n`;
 	}
 
-	// Styles
+	/* --------------- *
+	 * Styles          *
+	 * --------------- */
 	autogen += '## Styles\n\n';
 	autogen += `${ themejson.properties.styles.description }\n\n`;
 	const styles = Object.entries(
@@ -204,7 +210,9 @@ function generateDocs( themejson ) {
 		autogen += `---\n\n`;
 	}
 
-	// customTemplates
+	/* --------------- *
+	 * customTemplates *
+	 * --------------- */
 	autogen += '## customTemplates\n\n';
 	autogen += `${ themejson.properties.customTemplates.description }\n\n`;
 	autogen += '| Property | Description | Type |\n';
@@ -219,7 +227,9 @@ function generateDocs( themejson ) {
 	}
 	autogen += '\n';
 
-	// templateParts
+	/* --------------- *
+	 * templateParts   *
+	 * --------------- */
 	autogen += '## templateParts\n\n';
 	autogen += `${ themejson.properties.templateParts.description }\n\n`;
 	autogen += '| Property | Description | Type |\n';
@@ -234,7 +244,9 @@ function generateDocs( themejson ) {
 	}
 	autogen += '\n';
 
-	// Patterns
+	/* --------------- *
+	 * patterns        *
+	 * --------------- */
 	autogen += '## patterns' + '\n\n';
 	autogen += `Type: ${ generateTypes( themejson.properties.patterns ) }.\n\n`;
 	autogen += themejson.properties.patterns.description + '\n';
