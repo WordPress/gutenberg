@@ -12,11 +12,18 @@ test.describe( 'Separator', () => {
 		await editor.canvas
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();
-		await page.keyboard.type( '---' );
+		// Should be able to keep typing after the separator transform.
+		await page.keyboard.type( '---a' );
 
 		expect( await editor.getBlocks() ).toMatchObject( [
 			{
 				name: 'core/separator',
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'a',
+				},
 			},
 		] );
 	} );
