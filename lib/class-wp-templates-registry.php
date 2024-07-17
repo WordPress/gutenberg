@@ -83,7 +83,8 @@ if ( ! class_exists( 'WP_Templates_Registry' ) ) {
 			}
 
 			if ( ! $template ) {
-				$theme_name = get_stylesheet();
+				$theme_name             = get_stylesheet();
+				$default_template_types = get_default_block_template_types();
 
 				$template              = new WP_Block_Template();
 				$template->id          = $theme_name . '//' . $template_name;
@@ -98,7 +99,7 @@ if ( ! class_exists( 'WP_Templates_Registry' ) ) {
 				$template->description = isset( $args['description'] ) ? $args['description'] : '';
 				$template->status      = 'publish';
 				$template->origin      = 'plugin';
-				$template->is_custom   = true;
+				$template->is_custom   = ! isset( $default_template_types[ $template_name ] );
 				$template->post_types  = isset( $args['post_types'] ) ? $args['post_types'] : '';
 			}
 
