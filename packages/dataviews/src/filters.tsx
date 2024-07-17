@@ -10,12 +10,11 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import FilterSummary from './filter-summary';
-import AddFilter from './add-filter';
+import { default as AddFilter, AddFilterDropdownMenu } from './add-filter';
 import ResetFilters from './reset-filters';
 import { sanitizeOperators } from './utils';
 import { ALL_OPERATORS, OPERATOR_IS, OPERATOR_IS_NOT } from './constants';
 import type { NormalizedField, NormalizedFilter, View } from './types';
-import { AddFilterDropdownMenu } from './add-filter';
 
 interface FiltersProps< Item > {
 	fields: NormalizedField< Item >[];
