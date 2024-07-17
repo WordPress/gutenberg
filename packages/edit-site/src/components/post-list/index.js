@@ -8,6 +8,8 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { DataViews } from '@wordpress/dataviews';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { __ } from '@wordpress/i18n';
+import { drawerLeft } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -25,10 +27,7 @@ import {
 
 import AddNewPostModal from '../add-new-post';
 import { unlock } from '../../lock-unlock';
-import {
-	useEditPostAction,
-	useQuickEditPostAction,
-} from '../dataviews-actions';
+import { useEditPostAction } from '../dataviews-actions';
 import { usePrevious } from '@wordpress/compose';
 import usePostFields from '../post-fields';
 
@@ -141,9 +140,8 @@ function getItemId( item ) {
 export default function PostList( { postType } ) {
 	const [ view, setView ] = useView( postType );
 	const history = useHistory();
-	const {
-		params: { postId },
-	} = useLocation();
+	const location = useLocation();
+	const { postId, quickEdit = false } = location.params;
 	const [ selection, setSelection ] = useState( [ postId ] );
 	const onChangeSelection = useCallback(
 		( items ) => {
@@ -247,10 +245,9 @@ export default function PostList( { postType } ) {
 		context: 'list',
 	} );
 	const editAction = useEditPostAction();
-	const quickEditAction = useQuickEditPostAction();
 	const actions = useMemo(
-		() => [ quickEditAction, editAction, ...postTypeActions ],
-		[ quickEditAction, postTypeActions, editAction ]
+		() => [ editAction, ...postTypeActions ],
+		[ postTypeActions, editAction ]
 	);
 
 	const [ showAddPostModal, setShowAddPostModal ] = useState( false );
@@ -304,6 +301,24 @@ export default function PostList( { postType } ) {
 				onChangeSelection={ onChangeSelection }
 				getItemId={ getItemId }
 				defaultLayouts={ defaultLayouts }
+				header={
+					postType === 'page' && (
+						<Button
+							icon={ drawerLeft }
+							label={
+								quickEdit
+									? __( 'Show quick edit sidebar' )
+									: __( 'Close quick edit sidebar' )
+							}
+							onClick={ () => {
+								history.push( {
+									...location.params,
+									quickEdit: quickEdit ? undefined : true,
+								} );
+							} }
+						/>
+					)
+				}
 			/>
 		</Page>
 	);

@@ -41,33 +41,3 @@ export const useEditPostAction = () => {
 		[ history ]
 	);
 };
-
-export const useQuickEditPostAction = () => {
-	const history = useHistory();
-	return useMemo(
-		() => ( {
-			id: 'quick-edit-post',
-			label: __( 'Quick Edit' ),
-			icon: edit,
-			isEligible( post ) {
-				if ( post.status === 'trash' ) {
-					return false;
-				}
-
-				// Temporary limitation to only support pages for now.
-				return post.type === 'page';
-			},
-			callback( items ) {
-				const post = items[ 0 ];
-				const { params } = history.getLocationWithParams();
-				history.push( {
-					...params,
-					postId: post.id,
-					postType: post.type,
-					quickEdit: true,
-				} );
-			},
-		} ),
-		[ history ]
-	);
-};
