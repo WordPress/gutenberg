@@ -71,15 +71,16 @@ const TOKEN_PATTERN = new RegExp( START_TOKEN + '[^]*' + END_TOKEN );
  *
  * @param {PredicateFunction}  predicate
  * @param {SerializerFunction} serializer
- * @param {JSONSchema}         schema
- * @return {string} flattened schema
+ * @return {SerializerFunction} flattened schema
  */
-function serialize( predicate, serializer, schema ) {
-	const schemas = predicate( schema )
-		? [ schema ]
-		: schema.anyOf || schema.oneOf || [];
-	const formatted = schemas.filter( predicate ).map( serializer );
-	return [ ...new Set( formatted ) ].join( ', ' );
+function createSerializer( predicate, serializer ) {
+	return ( schema ) => {
+		const schemas = predicate( schema )
+			? [ schema ]
+			: schema.anyOf || schema.oneOf || [];
+		const formatted = schemas.filter( predicate ).map( serializer );
+		return [ ...new Set( formatted ) ].join( ', ' );
+	};
 }
 
 /**
@@ -87,8 +88,7 @@ function serialize( predicate, serializer, schema ) {
  *
  * @type {SerializerFunction}
  */
-const formatType = serialize.bind(
-	null,
+const serializePrimitives = createSerializer(
 	( schema ) =>
 		schema.type && ! [ 'object', 'array' ].includes( schema.type ),
 	( schema ) => `\`${ schema.type }\``
@@ -96,11 +96,8 @@ const formatType = serialize.bind(
 
 /**
  * Format list of properties.
- *
- * @type {SerializerFunction}
  */
-const formatProperties = serialize.bind(
-	null,
+const serializeObjects = createSerializer(
 	( schema ) => schema.properties,
 	( schema ) => `\`{ ${ Object.keys( schema.properties ).join( ', ' ) } }\``
 );
@@ -110,8 +107,7 @@ const formatProperties = serialize.bind(
  *
  * @type {SerializerFunction}
  */
-const formatArrayProperties = serialize.bind(
-	null,
+const serializeObjectArrays = createSerializer(
 	( schema ) => schema.items && schema.items.properties,
 	( schema ) =>
 		`\`[ { ${ Object.keys( schema.items.properties ).join( ', ' ) } } ]\``
@@ -122,8 +118,7 @@ const formatArrayProperties = serialize.bind(
  *
  * @type {SerializerFunction}
  */
-const formatArrayTypes = serialize.bind(
-	null,
+const serializePrimitiveArrays = createSerializer(
 	( schema ) =>
 		schema.items &&
 		schema.items.type &&
@@ -138,10 +133,10 @@ const formatArrayTypes = serialize.bind(
  * @return {string} generated types
  */
 function generateTypes( schema ) {
-	const primitiveTypes = formatType( schema );
-	const arrayTypes = formatArrayTypes( schema );
-	const objectTypes = formatProperties( schema );
-	const arrayObjectTypes = formatArrayProperties( schema );
+	const primitiveTypes = serializePrimitives( schema );
+	const arrayTypes = serializePrimitiveArrays( schema );
+	const objectTypes = serializeObjects( schema );
+	const arrayObjectTypes = serializeObjectArrays( schema );
 	return [ primitiveTypes, arrayTypes, arrayObjectTypes, objectTypes ]
 		.filter( Boolean )
 		.join( ', ' );
@@ -217,8 +212,9 @@ function generateDocs( themejson ) {
 		themejson.properties.customTemplates.items.properties
 	);
 	for ( const [ property, subschema ] of customTemplatesProperties ) {
-		const { description, type } = subschema;
-		autogen += `| ${ property } | ${ description } | ${ type } |\n`;
+		const { description } = subschema;
+		const types = generateTypes( subschema );
+		autogen += `| ${ property } | ${ description } | ${ types } |\n`;
 	}
 	autogen += '\n';
 
@@ -231,15 +227,16 @@ function generateDocs( themejson ) {
 		themejson.properties.templateParts.items.properties
 	);
 	for ( const [ property, subschema ] of templatePartsProperties ) {
-		const { description, type } = subschema;
-		autogen += `| ${ property } | ${ description } | ${ type } |\n`;
+		const { description } = subschema;
+		const types = generateTypes( subschema );
+		autogen += `| ${ property } | ${ description } | ${ types } |\n`;
 	}
 	autogen += '\n';
 
 	// Patterns
 	autogen += '## patterns' + '\n\n';
+	autogen += `Type: ${ generateTypes( themejson.properties.patterns ) }.\n\n`;
 	autogen += themejson.properties.patterns.description + '\n';
-	autogen += 'Type: `' + themejson.properties.patterns.type + '`.\n\n';
 
 	return `${ START_TOKEN }\n${ autogen }\n${ END_TOKEN }`;
 }
