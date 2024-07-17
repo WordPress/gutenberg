@@ -1172,10 +1172,8 @@
 						"backgroundImage": {
 							"description": "Sets the `background-image` CSS property.",
 							"oneOf": [
-								{
-									"description": "A valid CSS value for the background-image CSS property.",
-									"type": "string"
-								},
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" },
 								{
 									"type": "object",
 									"properties": {
@@ -1185,54 +1183,35 @@
 										}
 									},
 									"additionalProperties": false
-								},
-								{
-									"$ref": "#/definitions/refComplete"
 								}
 							]
 						},
 						"backgroundPosition": {
 							"description": "Sets the `background-position` CSS property.",
 							"oneOf": [
-								{
-									"type": "string"
-								},
-								{
-									"$ref": "#/definitions/refComplete"
-								}
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
 							]
 						},
 						"backgroundRepeat": {
 							"description": "Sets the `background-repeat` CSS property.",
 							"oneOf": [
-								{
-									"type": "string"
-								},
-								{
-									"$ref": "#/definitions/refComplete"
-								}
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
 							]
 						},
 						"backgroundSize": {
 							"description": "Sets the `background-size` CSS property.",
 							"oneOf": [
-								{
-									"type": "string"
-								},
-								{
-									"$ref": "#/definitions/refComplete"
-								}
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
 							]
 						},
 						"backgroundAttachment": {
 							"description": "Sets the `background-attachment` CSS property.",
 							"oneOf": [
-								{
-									"type": "string"
-								},
-								{
-									"$ref": "#/definitions/refComplete"
-								}
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
 							]
 						}
 					},
@@ -1245,32 +1224,22 @@
 						"color": {
 							"description": "Sets the `border-color` CSS property.",
 							"oneOf": [
-								{
-									"type": "string"
-								},
-								{
-									"$ref": "#/definitions/refComplete"
-								}
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
 							]
 						},
 						"radius": {
 							"description": "Sets the `border-radius` CSS property.",
 							"anyOf": [
-								{
-									"type": "string"
-								},
-								{
-									"$ref": "#/definitions/refComplete"
-								},
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" },
 								{
 									"type": "object",
 									"properties": {
 										"topLeft": {
 											"description": "Sets the `border-top-left-radius` CSS property.",
 											"oneOf": [
-												{
-													"type": "string"
-												},
+												{ "type": "string" },
 												{
 													"$ref": "#/definitions/refComplete"
 												}
@@ -1279,9 +1248,7 @@
 										"topRight": {
 											"description": "Sets the `border-top-right-radius` CSS property.",
 											"oneOf": [
-												{
-													"type": "string"
-												},
+												{ "type": "string" },
 												{
 													"$ref": "#/definitions/refComplete"
 												}
@@ -1290,9 +1257,7 @@
 										"bottomLeft": {
 											"description": "Sets the `border-bottom-left-radius` CSS property.",
 											"oneOf": [
-												{
-													"type": "string"
-												},
+												{ "type": "string" },
 												{
 													"$ref": "#/definitions/refComplete"
 												}
@@ -1301,9 +1266,7 @@
 										"bottomRight": {
 											"description": "Sets the `border-bottom-right-radius` CSS property.",
 											"oneOf": [
-												{
-													"type": "string"
-												},
+												{ "type": "string" },
 												{
 													"$ref": "#/definitions/refComplete"
 												}
@@ -1316,23 +1279,15 @@
 						"style": {
 							"description": "Sets the `border-style` CSS property.",
 							"oneOf": [
-								{
-									"type": "string"
-								},
-								{
-									"$ref": "#/definitions/refComplete"
-								}
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
 							]
 						},
 						"width": {
 							"description": "Sets the `border-width` CSS property.",
 							"oneOf": [
-								{
-									"type": "string"
-								},
-								{
-									"$ref": "#/definitions/refComplete"
-								}
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
 							]
 						},
 						"top": {
@@ -1341,34 +1296,22 @@
 								"color": {
 									"description": "Sets the `border-top-color` CSS property.",
 									"oneOf": [
-										{
-											"type": "string"
-										},
-										{
-											"$ref": "#/definitions/refComplete"
-										}
+										{ "type": "string" },
+										{ "$ref": "#/definitions/refComplete" }
 									]
 								},
 								"style": {
 									"description": "Sets the `border-top-style` CSS property.",
 									"oneOf": [
-										{
-											"type": "string"
-										},
-										{
-											"$ref": "#/definitions/refComplete"
-										}
+										{ "type": "string" },
+										{ "$ref": "#/definitions/refComplete" }
 									]
 								},
 								"width": {
 									"description": "Sets the `border-top-width` CSS property.",
 									"oneOf": [
-										{
-											"type": "string"
-										},
-										{
-											"$ref": "#/definitions/refComplete"
-										}
+										{ "type": "string" },
+										{ "$ref": "#/definitions/refComplete" }
 									]
 								}
 							},
@@ -1380,34 +1323,22 @@
 								"color": {
 									"description": "Sets the `border-right-color` CSS property.",
 									"oneOf": [
-										{
-											"type": "string"
-										},
-										{
-											"$ref": "#/definitions/refComplete"
-										}
+										{ "type": "string" },
+										{ "$ref": "#/definitions/refComplete" }
 									]
 								},
 								"style": {
 									"description": "Sets the `border-right-style` CSS property.",
 									"oneOf": [
-										{
-											"type": "string"
-										},
-										{
-											"$ref": "#/definitions/refComplete"
-										}
+										{ "type": "string" },
+										{ "$ref": "#/definitions/refComplete" }
 									]
 								},
 								"width": {
 									"description": "Sets the `border-right-width` CSS property.",
 									"oneOf": [
-										{
-											"type": "string"
-										},
-										{
-											"$ref": "#/definitions/refComplete"
-										}
+										{ "type": "string" },
+										{ "$ref": "#/definitions/refComplete" }
 									]
 								}
 							},
@@ -1419,34 +1350,22 @@
 								"color": {
 									"description": "Sets the `border-bottom-color` CSS property.",
 									"oneOf": [
-										{
-											"type": "string"
-										},
-										{
-											"$ref": "#/definitions/refComplete"
-										}
+										{ "type": "string" },
+										{ "$ref": "#/definitions/refComplete" }
 									]
 								},
 								"style": {
 									"description": "Sets the `border-bottom-style` CSS property.",
 									"oneOf": [
-										{
-											"type": "string"
-										},
-										{
-											"$ref": "#/definitions/refComplete"
-										}
+										{ "type": "string" },
+										{ "$ref": "#/definitions/refComplete" }
 									]
 								},
 								"width": {
 									"description": "Sets the `border-bottom-width` CSS property.",
 									"oneOf": [
-										{
-											"type": "string"
-										},
-										{
-											"$ref": "#/definitions/refComplete"
-										}
+										{ "type": "string" },
+										{ "$ref": "#/definitions/refComplete" }
 									]
 								}
 							},
@@ -1458,34 +1377,22 @@
 								"color": {
 									"description": "Sets the `border-left-color` CSS property.",
 									"oneOf": [
-										{
-											"type": "string"
-										},
-										{
-											"$ref": "#/definitions/refComplete"
-										}
+										{ "type": "string" },
+										{ "$ref": "#/definitions/refComplete" }
 									]
 								},
 								"style": {
 									"description": "Sets the `border-left-style` CSS property.",
 									"oneOf": [
-										{
-											"type": "string"
-										},
-										{
-											"$ref": "#/definitions/refComplete"
-										}
+										{ "type": "string" },
+										{ "$ref": "#/definitions/refComplete" }
 									]
 								},
 								"width": {
 									"description": "Sets the `border-left-width` CSS property.",
 									"oneOf": [
-										{
-											"type": "string"
-										},
-										{
-											"$ref": "#/definitions/refComplete"
-										}
+										{ "type": "string" },
+										{ "$ref": "#/definitions/refComplete" }
 									]
 								}
 							},
@@ -1501,34 +1408,22 @@
 						"background": {
 							"description": "Sets the `background-color` CSS property.",
 							"oneOf": [
-								{
-									"type": "string"
-								},
-								{
-									"$ref": "#/definitions/refComplete"
-								}
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
 							]
 						},
 						"gradient": {
 							"description": "Sets the `background` CSS property.",
 							"oneOf": [
-								{
-									"type": "string"
-								},
-								{
-									"$ref": "#/definitions/refComplete"
-								}
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
 							]
 						},
 						"text": {
 							"description": "Sets the `color` CSS property.",
 							"oneOf": [
-								{
-									"type": "string"
-								},
-								{
-									"$ref": "#/definitions/refComplete"
-								}
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
 							]
 						}
 					},
@@ -1545,23 +1440,15 @@
 						"aspectRatio": {
 							"description": "Sets the `aspect-ratio` CSS property.",
 							"oneOf": [
-								{
-									"type": "string"
-								},
-								{
-									"$ref": "#/definitions/refComplete"
-								}
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
 							]
 						},
 						"minHeight": {
 							"description": "Sets the `min-height` CSS property.",
 							"oneOf": [
-								{
-									"type": "string"
-								},
-								{
-									"$ref": "#/definitions/refComplete"
-								}
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
 							]
 						}
 					}
@@ -1573,12 +1460,8 @@
 						"duotone": {
 							"description": "Sets the duotone filter.",
 							"oneOf": [
-								{
-									"type": "string"
-								},
-								{
-									"$ref": "#/definitions/refComplete"
-								}
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
 							]
 						}
 					},
@@ -1591,45 +1474,29 @@
 						"color": {
 							"description": "Sets the `outline-color` CSS property.",
 							"oneOf": [
-								{
-									"type": "string"
-								},
-								{
-									"$ref": "#/definitions/refComplete"
-								}
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
 							]
 						},
 						"offset": {
 							"description": "Sets the `outline-offset` CSS property.",
 							"oneOf": [
-								{
-									"type": "string"
-								},
-								{
-									"$ref": "#/definitions/refComplete"
-								}
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
 							]
 						},
 						"style": {
 							"description": "Sets the `outline-style` CSS property.",
 							"oneOf": [
-								{
-									"type": "string"
-								},
-								{
-									"$ref": "#/definitions/refComplete"
-								}
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
 							]
 						},
 						"width": {
 							"description": "Sets the `outline-width` CSS property.",
 							"oneOf": [
-								{
-									"type": "string"
-								},
-								{
-									"$ref": "#/definitions/refComplete"
-								}
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
 							]
 						}
 					},
@@ -1638,12 +1505,8 @@
 				"shadow": {
 					"description": "Box shadow styles.",
 					"oneOf": [
-						{
-							"type": "string"
-						},
-						{
-							"$ref": "#/definitions/refComplete"
-						}
+						{ "type": "string" },
+						{ "$ref": "#/definitions/refComplete" }
 					]
 				},
 				"spacing": {
@@ -1653,12 +1516,8 @@
 						"blockGap": {
 							"description": "Sets the `--wp--style--block-gap` CSS custom property when settings.spacing.blockGap is true.",
 							"oneOf": [
-								{
-									"type": "string"
-								},
-								{
-									"$ref": "#/definitions/refComplete"
-								}
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
 							]
 						},
 						"margin": {
@@ -1668,45 +1527,29 @@
 								"top": {
 									"description": "Sets the `margin-top` CSS property.",
 									"oneOf": [
-										{
-											"type": "string"
-										},
-										{
-											"$ref": "#/definitions/refComplete"
-										}
+										{ "type": "string" },
+										{ "$ref": "#/definitions/refComplete" }
 									]
 								},
 								"right": {
 									"description": "Sets the `margin-right` CSS property.",
 									"oneOf": [
-										{
-											"type": "string"
-										},
-										{
-											"$ref": "#/definitions/refComplete"
-										}
+										{ "type": "string" },
+										{ "$ref": "#/definitions/refComplete" }
 									]
 								},
 								"bottom": {
 									"description": "Sets the `margin-bottom` CSS property.",
 									"oneOf": [
-										{
-											"type": "string"
-										},
-										{
-											"$ref": "#/definitions/refComplete"
-										}
+										{ "type": "string" },
+										{ "$ref": "#/definitions/refComplete" }
 									]
 								},
 								"left": {
 									"description": "Sets the `margin-left` CSS property.",
 									"oneOf": [
-										{
-											"type": "string"
-										},
-										{
-											"$ref": "#/definitions/refComplete"
-										}
+										{ "type": "string" },
+										{ "$ref": "#/definitions/refComplete" }
 									]
 								}
 							},
@@ -1719,45 +1562,29 @@
 								"top": {
 									"description": "Sets the `padding-top` CSS property.",
 									"oneOf": [
-										{
-											"type": "string"
-										},
-										{
-											"$ref": "#/definitions/refComplete"
-										}
+										{ "type": "string" },
+										{ "$ref": "#/definitions/refComplete" }
 									]
 								},
 								"right": {
 									"description": "Sets the `padding-right` CSS property.",
 									"oneOf": [
-										{
-											"type": "string"
-										},
-										{
-											"$ref": "#/definitions/refComplete"
-										}
+										{ "type": "string" },
+										{ "$ref": "#/definitions/refComplete" }
 									]
 								},
 								"bottom": {
 									"description": "Sets the `padding-bottom` CSS property.",
 									"oneOf": [
-										{
-											"type": "string"
-										},
-										{
-											"$ref": "#/definitions/refComplete"
-										}
+										{ "type": "string" },
+										{ "$ref": "#/definitions/refComplete" }
 									]
 								},
 								"left": {
 									"description": "Sets the `padding-left` CSS property.",
 									"oneOf": [
-										{
-											"type": "string"
-										},
-										{
-											"$ref": "#/definitions/refComplete"
-										}
+										{ "type": "string" },
+										{ "$ref": "#/definitions/refComplete" }
 									]
 								}
 							},
@@ -1773,122 +1600,78 @@
 						"fontFamily": {
 							"description": "Sets the `font-family` CSS property.",
 							"oneOf": [
-								{
-									"type": "string"
-								},
-								{
-									"$ref": "#/definitions/refComplete"
-								}
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
 							]
 						},
 						"fontSize": {
 							"description": "Sets the `font-size` CSS property.",
 							"oneOf": [
-								{
-									"type": "string"
-								},
-								{
-									"$ref": "#/definitions/refComplete"
-								}
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
 							]
 						},
 						"fontStyle": {
 							"description": "Sets the `font-style` CSS property.",
 							"oneOf": [
-								{
-									"type": "string"
-								},
-								{
-									"$ref": "#/definitions/refComplete"
-								}
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
 							]
 						},
 						"fontWeight": {
 							"description": "Sets the `font-weight` CSS property.",
 							"oneOf": [
-								{
-									"type": "string"
-								},
-								{
-									"$ref": "#/definitions/refComplete"
-								}
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
 							]
 						},
 						"letterSpacing": {
 							"description": "Sets the `letter-spacing` CSS property.",
 							"oneOf": [
-								{
-									"type": "string"
-								},
-								{
-									"$ref": "#/definitions/refComplete"
-								}
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
 							]
 						},
 						"lineHeight": {
 							"description": "Sets the `line-height` CSS property.",
 							"oneOf": [
-								{
-									"type": "string"
-								},
-								{
-									"$ref": "#/definitions/refComplete"
-								}
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
 							]
 						},
 						"textAlign": {
 							"description": "Sets the `text-align` CSS property.",
 							"oneOf": [
-								{
-									"type": "string"
-								},
-								{
-									"$ref": "#/definitions/refComplete"
-								}
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
 							]
 						},
 						"textColumns": {
 							"description": "Sets the `column-count` CSS property.",
 							"oneOf": [
-								{
-									"type": "string"
-								},
-								{
-									"$ref": "#/definitions/refComplete"
-								}
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
 							]
 						},
 						"textDecoration": {
 							"description": "Sets the `text-decoration` CSS property.",
 							"oneOf": [
-								{
-									"type": "string"
-								},
-								{
-									"$ref": "#/definitions/refComplete"
-								}
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
 							]
 						},
 						"writingMode": {
 							"description": "Sets the `writing-mode` CSS property.",
 							"oneOf": [
-								{
-									"type": "string"
-								},
-								{
-									"$ref": "#/definitions/refComplete"
-								}
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
 							]
 						},
 						"textTransform": {
 							"description": "Sets the `text-transform` CSS property.",
 							"oneOf": [
-								{
-									"type": "string"
-								},
-								{
-									"$ref": "#/definitions/refComplete"
-								}
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
 							]
 						}
 					},
