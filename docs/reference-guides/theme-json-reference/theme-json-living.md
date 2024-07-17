@@ -57,8 +57,8 @@ Settings related to background.
 
 | Property  | Type   | Default |
 | ---       | ---    | ---     |
-| backgroundImage | `boolean` | false |
-| backgroundSize | `boolean` | false |
+| backgroundImage | `boolean` |  |
+| backgroundSize | `boolean` |  |
 
 ---
 
@@ -68,10 +68,10 @@ Settings related to borders.
 
 | Property  | Type   | Default |
 | ---       | ---    | ---     |
-| color | `boolean` | false |
-| radius | `boolean` | false |
-| style | `boolean` | false |
-| width | `boolean` | false |
+| color | `boolean` |  |
+| radius | `boolean` |  |
+| style | `boolean` |  |
+| width | `boolean` |  |
 
 ---
 
@@ -81,21 +81,21 @@ Settings related to colors.
 
 | Property  | Type   | Default |
 | ---       | ---    | ---     |
-| background | `boolean` | true |
-| custom | `boolean` | true |
-| customDuotone | `boolean` | true |
-| customGradient | `boolean` | true |
-| defaultDuotone | `boolean` | true |
-| defaultGradients | `boolean` | true |
-| defaultPalette | `boolean` | true |
+| background | `boolean` | `true` |
+| custom | `boolean` | `true` |
+| customDuotone | `boolean` | `true` |
+| customGradient | `boolean` | `true` |
+| defaultDuotone | `boolean` | `true` |
+| defaultGradients | `boolean` | `true` |
+| defaultPalette | `boolean` | `true` |
 | duotone | `[ { name, slug, colors } ]` |  |
 | gradients | `[ { name, slug, gradient } ]` |  |
-| link | `boolean` | false |
+| link | `boolean` |  |
 | palette | `[ { name, slug, color } ]` |  |
-| text | `boolean` | true |
-| heading | `boolean` | true |
-| button | `boolean` | true |
-| caption | `boolean` | true |
+| text | `boolean` | `true` |
+| heading | `boolean` | `true` |
+| button | `boolean` | `true` |
+| caption | `boolean` | `true` |
 
 ---
 
@@ -105,10 +105,10 @@ Settings related to dimensions.
 
 | Property  | Type   | Default |
 | ---       | ---    | ---     |
-| aspectRatio | `boolean` | false |
-| defaultAspectRatios | `boolean` | true |
+| aspectRatio | `boolean` |  |
+| defaultAspectRatios | `boolean` | `true` |
 | aspectRatios | `[ { name, slug, ratio } ]` |  |
-| minHeight | `boolean` | false |
+| minHeight | `boolean` |  |
 
 ---
 
@@ -120,8 +120,8 @@ Settings related to layout.
 | ---       | ---    | ---     |
 | contentSize | `string` |  |
 | wideSize | `string` |  |
-| allowEditing | `boolean` | true |
-| allowCustomContentAndWideSize | `boolean` | true |
+| allowEditing | `boolean` | `true` |
+| allowCustomContentAndWideSize | `boolean` | `true` |
 
 ---
 
@@ -142,7 +142,7 @@ Settings related to position.
 
 | Property  | Type   | Default |
 | ---       | ---    | ---     |
-| sticky | `boolean` | false |
+| sticky | `boolean` |  |
 
 ---
 
@@ -152,7 +152,7 @@ Settings related to shadows.
 
 | Property  | Type   | Default |
 | ---       | ---    | ---     |
-| defaultPresets | `boolean` | true |
+| defaultPresets | `boolean` | `true` |
 | presets | `[ { name, slug, shadow } ]` |  |
 
 ---
@@ -164,11 +164,11 @@ Settings related to spacing.
 | Property  | Type   | Default |
 | ---       | ---    | ---     |
 | blockGap | `boolean`, `null` |  |
-| margin | `boolean` | false |
-| padding | `boolean` | false |
-| units | `[ string ]` | px,em,rem,vh,vw,% |
-| customSpacingSize | `boolean` | true |
-| defaultSpacingSizes | `boolean` | true |
+| margin | `boolean` |  |
+| padding | `boolean` |  |
+| units | `[ string ]` | `["px","em","rem","vh","vw","%"]` |
+| customSpacingSize | `boolean` | `true` |
+| defaultSpacingSizes | `boolean` | `true` |
 | spacingSizes | `[ { name, slug, size } ]` |  |
 | spacingScale | `{ operator, increment, steps, mediumStep, unit }` |  |
 
@@ -180,19 +180,19 @@ Settings related to typography.
 
 | Property  | Type   | Default |
 | ---       | ---    | ---     |
-| defaultFontSizes | `boolean` | true |
-| customFontSize | `boolean` | true |
-| fontStyle | `boolean` | true |
-| fontWeight | `boolean` | true |
-| fluid | `boolean`, `{ minFontSize, maxViewportWidth, minViewportWidth }` | false |
-| letterSpacing | `boolean` | true |
-| lineHeight | `boolean` | false |
-| textAlign | `boolean` | true |
-| textColumns | `boolean` | false |
-| textDecoration | `boolean` | true |
-| writingMode | `boolean` | false |
-| textTransform | `boolean` | true |
-| dropCap | `boolean` | true |
+| defaultFontSizes | `boolean` | `true` |
+| customFontSize | `boolean` | `true` |
+| fontStyle | `boolean` | `true` |
+| fontWeight | `boolean` | `true` |
+| fluid | `boolean`, `{ minFontSize, maxViewportWidth, minViewportWidth }` |  |
+| letterSpacing | `boolean` | `true` |
+| lineHeight | `boolean` |  |
+| textAlign | `boolean` | `true` |
+| textColumns | `boolean` |  |
+| textDecoration | `boolean` | `true` |
+| writingMode | `boolean` |  |
+| textTransform | `boolean` | `true` |
+| dropCap | `boolean` | `true` |
 | fontSizes | `[ { name, slug, size, fluid } ]` |  |
 | fontFamilies | `[ { name, slug, fontFamily, fontFace } ]` |  |
 

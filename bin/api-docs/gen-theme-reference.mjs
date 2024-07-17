@@ -178,7 +178,9 @@ function generateDocs( themejson ) {
 			const properties = Object.entries( schema.properties );
 			for ( const [ property, subschema ] of properties ) {
 				const types = generateTypes( subschema );
-				const defaultValue = subschema.default ?? '';
+				const defaultValue = subschema.default
+					? `\`${ JSON.stringify( subschema.default ) }\``
+					: '';
 				autogen += `| ${ property } | ${ types } | ${ defaultValue } |\n`;
 			}
 			autogen += '\n';
