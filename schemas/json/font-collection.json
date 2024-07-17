@@ -22,28 +22,19 @@
 				},
 				"fontWeight": {
 					"description": "List of available font weights, separated by a space.",
-					"default": "400",
-					"oneOf": [
-						{
-							"type": "string"
-						},
-						{
-							"type": "integer"
-						}
-					]
+					"oneOf": [ { "type": "string" }, { "type": "integer" } ],
+					"default": "400"
 				},
 				"fontDisplay": {
 					"description": "CSS font-display value.",
 					"type": "string",
-					"default": "fallback",
-					"enum": [ "auto", "block", "fallback", "swap", "optional" ]
+					"enum": [ "auto", "block", "fallback", "swap", "optional" ],
+					"default": "fallback"
 				},
 				"src": {
 					"description": "Paths or URLs to the font files.",
 					"oneOf": [
-						{
-							"type": "string"
-						},
+						{ "type": "string" },
 						{
 							"type": "array",
 							"items": {
@@ -101,8 +92,8 @@
 			"type": "string"
 		},
 		"font_families": {
-			"type": "array",
 			"description": "Array of font families ready to be installed.",
+			"type": "array",
 			"items": {
 				"type": "object",
 				"properties": {
@@ -130,11 +121,7 @@
 								"description": "Array of font-face definitions.",
 								"type": "array",
 								"items": {
-									"allOf": [
-										{
-											"$ref": "#/definitions/fontFace"
-										}
-									]
+									"$ref": "#/definitions/fontFace"
 								}
 							}
 						},
