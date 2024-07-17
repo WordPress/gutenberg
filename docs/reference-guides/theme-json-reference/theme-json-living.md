@@ -55,10 +55,10 @@ Setting that enables the following UI tools:
 
 Settings related to background.
 
-| Property  | Type   | Default | Props  |
-| ---       | ---    | ---     | ---    |
-| backgroundImage | boolean | false |  |
-| backgroundSize | boolean | false |  |
+| Property  | Type   | Default |
+| ---       | ---    | ---     |
+| backgroundImage | `boolean` | false |
+| backgroundSize | `boolean` | false |
 
 ---
 
@@ -66,12 +66,12 @@ Settings related to background.
 
 Settings related to borders.
 
-| Property  | Type   | Default | Props  |
-| ---       | ---    | ---     | ---    |
-| color | boolean | false |  |
-| radius | boolean | false |  |
-| style | boolean | false |  |
-| width | boolean | false |  |
+| Property  | Type   | Default |
+| ---       | ---    | ---     |
+| color | `boolean` | false |
+| radius | `boolean` | false |
+| style | `boolean` | false |
+| width | `boolean` | false |
 
 ---
 
@@ -79,23 +79,23 @@ Settings related to borders.
 
 Settings related to colors.
 
-| Property  | Type   | Default | Props  |
-| ---       | ---    | ---     | ---    |
-| background | boolean | true |  |
-| custom | boolean | true |  |
-| customDuotone | boolean | true |  |
-| customGradient | boolean | true |  |
-| defaultDuotone | boolean | true |  |
-| defaultGradients | boolean | true |  |
-| defaultPalette | boolean | true |  |
-| duotone | array |  | _[ { name, slug, colors } ]_ |
-| gradients | array |  | _[ { name, slug, gradient } ]_ |
-| link | boolean | false |  |
-| palette | array |  | _[ { name, slug, color } ]_ |
-| text | boolean | true |  |
-| heading | boolean | true |  |
-| button | boolean | true |  |
-| caption | boolean | true |  |
+| Property  | Type   | Default |
+| ---       | ---    | ---     |
+| background | `boolean` | true |
+| custom | `boolean` | true |
+| customDuotone | `boolean` | true |
+| customGradient | `boolean` | true |
+| defaultDuotone | `boolean` | true |
+| defaultGradients | `boolean` | true |
+| defaultPalette | `boolean` | true |
+| duotone | `[ { name, slug, colors } ]` |  |
+| gradients | `[ { name, slug, gradient } ]` |  |
+| link | `boolean` | false |
+| palette | `[ { name, slug, color } ]` |  |
+| text | `boolean` | true |
+| heading | `boolean` | true |
+| button | `boolean` | true |
+| caption | `boolean` | true |
 
 ---
 
@@ -103,12 +103,12 @@ Settings related to colors.
 
 Settings related to dimensions.
 
-| Property  | Type   | Default | Props  |
-| ---       | ---    | ---     | ---    |
-| aspectRatio | boolean | false |  |
-| defaultAspectRatios | boolean | true |  |
-| aspectRatios | array |  | _[ { name, slug, ratio } ]_ |
-| minHeight | boolean | false |  |
+| Property  | Type   | Default |
+| ---       | ---    | ---     |
+| aspectRatio | `boolean` | false |
+| defaultAspectRatios | `boolean` | true |
+| aspectRatios | `[ { name, slug, ratio } ]` |  |
+| minHeight | `boolean` | false |
 
 ---
 
@@ -116,12 +116,12 @@ Settings related to dimensions.
 
 Settings related to layout.
 
-| Property  | Type   | Default | Props  |
-| ---       | ---    | ---     | ---    |
-| contentSize | string |  |  |
-| wideSize | string |  |  |
-| allowEditing | boolean | true |  |
-| allowCustomContentAndWideSize | boolean | true |  |
+| Property  | Type   | Default |
+| ---       | ---    | ---     |
+| contentSize | `string` |  |
+| wideSize | `string` |  |
+| allowEditing | `boolean` | true |
+| allowCustomContentAndWideSize | `boolean` | true |
 
 ---
 
@@ -129,10 +129,10 @@ Settings related to layout.
 
 Settings related to the lightbox.
 
-| Property  | Type   | Default | Props  |
-| ---       | ---    | ---     | ---    |
-| enabled | boolean |  |  |
-| allowEditing | boolean |  |  |
+| Property  | Type   | Default |
+| ---       | ---    | ---     |
+| enabled | `boolean` |  |
+| allowEditing | `boolean` |  |
 
 ---
 
@@ -140,9 +140,9 @@ Settings related to the lightbox.
 
 Settings related to position.
 
-| Property  | Type   | Default | Props  |
-| ---       | ---    | ---     | ---    |
-| sticky | boolean | false |  |
+| Property  | Type   | Default |
+| ---       | ---    | ---     |
+| sticky | `boolean` | false |
 
 ---
 
@@ -150,10 +150,10 @@ Settings related to position.
 
 Settings related to shadows.
 
-| Property  | Type   | Default | Props  |
-| ---       | ---    | ---     | ---    |
-| defaultPresets | boolean | true |  |
-| presets | array |  | _[ { name, slug, shadow } ]_ |
+| Property  | Type   | Default |
+| ---       | ---    | ---     |
+| defaultPresets | `boolean` | true |
+| presets | `[ { name, slug, shadow } ]` |  |
 
 ---
 
@@ -161,16 +161,16 @@ Settings related to shadows.
 
 Settings related to spacing.
 
-| Property  | Type   | Default | Props  |
-| ---       | ---    | ---     | ---    |
-| blockGap | boolean, null |  |  |
-| margin | boolean | false |  |
-| padding | boolean | false |  |
-| units | array | px,em,rem,vh,vw,% |  |
-| customSpacingSize | boolean | true |  |
-| defaultSpacingSizes | boolean | true |  |
-| spacingSizes | array |  | _[ { name, slug, size } ]_ |
-| spacingScale | object |  | _{ operator, increment, steps, mediumStep, unit }_ |
+| Property  | Type   | Default |
+| ---       | ---    | ---     |
+| blockGap | `boolean`, `null` |  |
+| margin | `boolean` | false |
+| padding | `boolean` | false |
+| units | `[ string ]` | px,em,rem,vh,vw,% |
+| customSpacingSize | `boolean` | true |
+| defaultSpacingSizes | `boolean` | true |
+| spacingSizes | `[ { name, slug, size } ]` |  |
+| spacingScale | `{ operator, increment, steps, mediumStep, unit }` |  |
 
 ---
 
@@ -178,23 +178,23 @@ Settings related to spacing.
 
 Settings related to typography.
 
-| Property  | Type   | Default | Props  |
-| ---       | ---    | ---     | ---    |
-| defaultFontSizes | boolean | true |  |
-| customFontSize | boolean | true |  |
-| fontStyle | boolean | true |  |
-| fontWeight | boolean | true |  |
-| fluid | object, boolean | false | _{ minFontSize, maxViewportWidth, minViewportWidth }_ |
-| letterSpacing | boolean | true |  |
-| lineHeight | boolean | false |  |
-| textAlign | boolean | true |  |
-| textColumns | boolean | false |  |
-| textDecoration | boolean | true |  |
-| writingMode | boolean | false |  |
-| textTransform | boolean | true |  |
-| dropCap | boolean | true |  |
-| fontSizes | array |  | _[ { name, slug, size, fluid } ]_ |
-| fontFamilies | array |  | _[ { name, slug, fontFamily, fontFace } ]_ |
+| Property  | Type   | Default |
+| ---       | ---    | ---     |
+| defaultFontSizes | `boolean` | true |
+| customFontSize | `boolean` | true |
+| fontStyle | `boolean` | true |
+| fontWeight | `boolean` | true |
+| fluid | `boolean`, `{ minFontSize, maxViewportWidth, minViewportWidth }` | false |
+| letterSpacing | `boolean` | true |
+| lineHeight | `boolean` | false |
+| textAlign | `boolean` | true |
+| textColumns | `boolean` | false |
+| textDecoration | `boolean` | true |
+| writingMode | `boolean` | false |
+| textTransform | `boolean` | true |
+| dropCap | `boolean` | true |
+| fontSizes | `[ { name, slug, size, fluid } ]` |  |
+| fontFamilies | `[ { name, slug, fontFamily, fontFace } ]` |  |
 
 ---
 
@@ -212,13 +212,13 @@ Organized way to set CSS properties. Styles in the top-level will be added in th
 
 Background styles.
 
-| Property  | Type   | Props  |
-| ---       | ---    | ---    |
-| backgroundImage | string, object | _{ ref }_, _{ url }_ |
-| backgroundPosition | string, object | _{ ref }_ |
-| backgroundRepeat | string, object | _{ ref }_ |
-| backgroundSize | string, object | _{ ref }_ |
-| backgroundAttachment | string, object | _{ ref }_ |
+| Property  | Type   |
+| ---       | ---    |
+| backgroundImage | `string`, `{ ref }`, `{ url }` |
+| backgroundPosition | `string`, `{ ref }` |
+| backgroundRepeat | `string`, `{ ref }` |
+| backgroundSize | `string`, `{ ref }` |
+| backgroundAttachment | `string`, `{ ref }` |
 
 ---
 
@@ -226,16 +226,16 @@ Background styles.
 
 Border styles.
 
-| Property  | Type   | Props  |
-| ---       | ---    | ---    |
-| color | string, object | _{ ref }_ |
-| radius | string, object | _{ ref }_, _{ topLeft, topRight, bottomLeft, bottomRight }_ |
-| style | string, object | _{ ref }_ |
-| width | string, object | _{ ref }_ |
-| top | object | _{ color, style, width }_ |
-| right | object | _{ color, style, width }_ |
-| bottom | object | _{ color, style, width }_ |
-| left | object | _{ color, style, width }_ |
+| Property  | Type   |
+| ---       | ---    |
+| color | `string`, `{ ref }` |
+| radius | `string`, `{ ref }`, `{ topLeft, topRight, bottomLeft, bottomRight }` |
+| style | `string`, `{ ref }` |
+| width | `string`, `{ ref }` |
+| top | `{ color, style, width }` |
+| right | `{ color, style, width }` |
+| bottom | `{ color, style, width }` |
+| left | `{ color, style, width }` |
 
 ---
 
@@ -243,11 +243,11 @@ Border styles.
 
 Color styles.
 
-| Property  | Type   | Props  |
-| ---       | ---    | ---    |
-| background | string, object | _{ ref }_ |
-| gradient | string, object | _{ ref }_ |
-| text | string, object | _{ ref }_ |
+| Property  | Type   |
+| ---       | ---    |
+| background | `string`, `{ ref }` |
+| gradient | `string`, `{ ref }` |
+| text | `string`, `{ ref }` |
 
 ---
 
@@ -261,10 +261,10 @@ Sets custom CSS to apply styling not covered by other theme.json properties.
 
 Dimensions styles.
 
-| Property  | Type   | Props  |
-| ---       | ---    | ---    |
-| aspectRatio | string, object | _{ ref }_ |
-| minHeight | string, object | _{ ref }_ |
+| Property  | Type   |
+| ---       | ---    |
+| aspectRatio | `string`, `{ ref }` |
+| minHeight | `string`, `{ ref }` |
 
 ---
 
@@ -272,9 +272,9 @@ Dimensions styles.
 
 CSS and SVG filter styles.
 
-| Property  | Type   | Props  |
-| ---       | ---    | ---    |
-| duotone | string, object | _{ ref }_ |
+| Property  | Type   |
+| ---       | ---    |
+| duotone | `string`, `{ ref }` |
 
 ---
 
@@ -282,12 +282,12 @@ CSS and SVG filter styles.
 
 Outline styles.
 
-| Property  | Type   | Props  |
-| ---       | ---    | ---    |
-| color | string, object | _{ ref }_ |
-| offset | string, object | _{ ref }_ |
-| style | string, object | _{ ref }_ |
-| width | string, object | _{ ref }_ |
+| Property  | Type   |
+| ---       | ---    |
+| color | `string`, `{ ref }` |
+| offset | `string`, `{ ref }` |
+| style | `string`, `{ ref }` |
+| width | `string`, `{ ref }` |
 
 ---
 
@@ -301,11 +301,11 @@ Box shadow styles.
 
 Spacing styles.
 
-| Property  | Type   | Props  |
-| ---       | ---    | ---    |
-| blockGap | string, object | _{ ref }_ |
-| margin | object | _{ top, right, bottom, left }_ |
-| padding | object | _{ top, right, bottom, left }_ |
+| Property  | Type   |
+| ---       | ---    |
+| blockGap | `string`, `{ ref }` |
+| margin | `{ top, right, bottom, left }` |
+| padding | `{ top, right, bottom, left }` |
 
 ---
 
@@ -313,19 +313,19 @@ Spacing styles.
 
 Typography styles.
 
-| Property  | Type   | Props  |
-| ---       | ---    | ---    |
-| fontFamily | string, object | _{ ref }_ |
-| fontSize | string, object | _{ ref }_ |
-| fontStyle | string, object | _{ ref }_ |
-| fontWeight | string, object | _{ ref }_ |
-| letterSpacing | string, object | _{ ref }_ |
-| lineHeight | string, object | _{ ref }_ |
-| textAlign | string, object | _{ ref }_ |
-| textColumns | string, object | _{ ref }_ |
-| textDecoration | string, object | _{ ref }_ |
-| writingMode | string, object | _{ ref }_ |
-| textTransform | string, object | _{ ref }_ |
+| Property  | Type   |
+| ---       | ---    |
+| fontFamily | `string`, `{ ref }` |
+| fontSize | `string`, `{ ref }` |
+| fontStyle | `string`, `{ ref }` |
+| fontWeight | `string`, `{ ref }` |
+| letterSpacing | `string`, `{ ref }` |
+| lineHeight | `string`, `{ ref }` |
+| textAlign | `string`, `{ ref }` |
+| textColumns | `string`, `{ ref }` |
+| textDecoration | `string`, `{ ref }` |
+| writingMode | `string`, `{ ref }` |
+| textTransform | `string`, `{ ref }` |
 
 ---
 
