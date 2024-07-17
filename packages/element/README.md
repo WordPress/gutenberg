@@ -371,7 +371,7 @@ _Related_
 
 _Related_
 
--   <https://reactjs.org/docs/hooks-reference.html#useeffect>
+-   <https://react.dev/reference/react/useEffect>
 
 ### useId
 

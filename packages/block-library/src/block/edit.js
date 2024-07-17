@@ -156,7 +156,11 @@ function ReusableBlockEdit( {
 				getBlockEditingMode: _getBlockEditingMode,
 			} = select( blockEditorStore );
 			const { getBlockBindingsSource } = unlock( select( blocksStore ) );
-			const canEdit = canUser( 'update', 'blocks', ref );
+			const canEdit = canUser( 'update', {
+				kind: 'postType',
+				name: 'wp_block',
+				id: ref,
+			} );
 
 			// For editing link to the site editor if the theme and user permissions support it.
 			return {

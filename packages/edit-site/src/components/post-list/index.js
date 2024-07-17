@@ -43,7 +43,7 @@ import Page from '../page';
 import { default as Link, useLink } from '../routes/link';
 import {
 	useDefaultViews,
-	DEFAULT_CONFIG_PER_VIEW_TYPE,
+	defaultLayouts,
 } from '../sidebar-dataviews/default-views';
 import {
 	LAYOUT_GRID,
@@ -85,9 +85,7 @@ function useView( postType ) {
 			return {
 				...defaultView,
 				type: layout,
-				layout: {
-					...( DEFAULT_CONFIG_PER_VIEW_TYPE[ layout ] || {} ),
-				},
+				layout: defaultLayouts[ layout ]?.layout,
 			};
 		}
 		return defaultView;
@@ -126,9 +124,7 @@ function useView( postType ) {
 
 		return {
 			...storedView,
-			layout: {
-				...( DEFAULT_CONFIG_PER_VIEW_TYPE[ storedView?.type ] || {} ),
-			},
+			layout: defaultLayouts[ storedView?.type ]?.layout,
 		};
 	}, [ editedViewRecord?.content ] );
 
@@ -195,7 +191,7 @@ function FeaturedImage( { item, viewType } ) {
 			: [ 'thumbnail', 'medium', 'large', 'full' ];
 	const media = hasMedia ? (
 		<Media
-			className="posts-list-page__featured-image"
+			className="edit-site-post-list__featured-image"
 			id={ item.featured_media }
 			size={ size }
 		/>
@@ -203,11 +199,11 @@ function FeaturedImage( { item, viewType } ) {
 	const renderButton = viewType !== LAYOUT_LIST && ! isDisabled;
 	return (
 		<div
-			className={ `posts-list-page__featured-image-wrapper is-layout-${ viewType }` }
+			className={ `edit-site-post-list__featured-image-wrapper is-layout-${ viewType }` }
 		>
 			{ renderButton ? (
 				<button
-					className="posts-list-page-preview-field__button"
+					className="edit-site-post-list__featured-image-button"
 					type="button"
 					onClick={ onClick }
 					aria-label={ item.title?.rendered || __( '(no title)' ) }
@@ -232,7 +228,7 @@ function PostStatusField( { item } ) {
 	return (
 		<HStack alignment="left" spacing={ 0 }>
 			{ icon && (
-				<div className="posts-list-page-post-author-field__icon-container">
+				<div className="edit-site-post-list__status-icon">
 					<Icon icon={ icon } />
 				</div>
 			) }
@@ -279,14 +275,14 @@ function PostAuthorField( { item } ) {
 	);
 }
 
-export default function PostsList( { postType } ) {
+export default function PostList( { postType } ) {
 	const [ view, setView ] = useView( postType );
 	const history = useHistory();
 	const {
 		params: { postId },
 	} = useLocation();
 	const [ selection, setSelection ] = useState( [ postId ] );
-	const onSelectionChange = useCallback(
+	const onChangeSelection = useCallback(
 		( items ) => {
 			const { params } = history.getLocationWithParams();
 			if (
@@ -376,15 +372,14 @@ export default function PostsList( { postType } ) {
 			const { getEntityRecord, getPostType, canUser } =
 				select( coreStore );
 			const siteSettings = getEntityRecord( 'root', 'site' );
-			const postTypeObject = getPostType( postType );
 			return {
 				frontPageId: siteSettings?.page_on_front,
 				postsPageId: siteSettings?.page_for_posts,
 				labels: getPostType( postType )?.labels,
-				canCreateRecord: canUser(
-					'create',
-					postTypeObject?.rest_base || 'posts'
-				),
+				canCreateRecord: canUser( 'create', {
+					kind: 'postType',
+					name: postType,
+				} ),
 			};
 		},
 		[ postType ]
@@ -401,7 +396,6 @@ export default function PostsList( { postType } ) {
 					<FeaturedImage item={ item } viewType={ view.type } />
 				),
 				enableSorting: false,
-				width: '1%',
 			},
 			{
 				header: __( 'Title' ),
@@ -432,13 +426,13 @@ export default function PostsList( { postType } ) {
 					let suffix = '';
 					if ( item.id === frontPageId ) {
 						suffix = (
-							<span className="posts-list-page-title-badge">
+							<span className="edit-site-post-list__title-badge">
 								{ __( 'Front Page' ) }
 							</span>
 						);
 					} else if ( item.id === postsPageId ) {
 						suffix = (
-							<span className="posts-list-page-title-badge">
+							<span className="edit-site-post-list__title-badge">
 								{ __( 'Posts Page' ) }
 							</span>
 						);
@@ -446,7 +440,7 @@ export default function PostsList( { postType } ) {
 
 					return (
 						<HStack
-							className="posts-list-page-title"
+							className="edit-site-post-list__title"
 							alignment="center"
 							justify="flex-start"
 						>
@@ -455,7 +449,6 @@ export default function PostsList( { postType } ) {
 						</HStack>
 					);
 				},
-				maxWidth: 300,
 				enableHiding: false,
 			},
 			{
@@ -571,22 +564,6 @@ export default function PostsList( { postType } ) {
 		[ postTypeActions, editAction ]
 	);
 
-	const onChangeView = useCallback(
-		( newView ) => {
-			if ( newView.type !== view.type ) {
-				newView = {
-					...newView,
-					layout: {
-						...DEFAULT_CONFIG_PER_VIEW_TYPE[ newView.type ],
-					},
-				};
-			}
-
-			setView( newView );
-		},
-		[ view.type, setView ]
-	);
-
 	const [ showAddPostModal, setShowAddPostModal ] = useState( false );
 
 	const openModal = () => setShowAddPostModal( true );
@@ -632,11 +609,12 @@ export default function PostsList( { postType } ) {
 				data={ records || EMPTY_ARRAY }
 				isLoading={ isLoadingMainEntities || isLoadingAuthors }
 				view={ view }
-				onChangeView={ onChangeView }
+				onChangeView={ setView }
 				selection={ selection }
 				setSelection={ setSelection }
-				onSelectionChange={ onSelectionChange }
+				onChangeSelection={ onChangeSelection }
 				getItemId={ getItemId }
+				defaultLayouts={ defaultLayouts }
 			/>
 		</Page>
 	);

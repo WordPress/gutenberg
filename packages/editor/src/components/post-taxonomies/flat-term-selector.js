@@ -5,6 +5,7 @@ import { __, _x, sprintf } from '@wordpress/i18n';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { FormTokenField, withFilters } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDebounce } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
@@ -55,15 +56,27 @@ const termNamesToIds = ( names, terms ) => {
 /**
  * Renders a flat term selector component.
  *
- * @param {Object} props      The component props.
- * @param {string} props.slug The slug of the taxonomy.
+ * @param {Object}  props                         The component props.
+ * @param {string}  props.slug                    The slug of the taxonomy.
+ * @param {boolean} props.__nextHasNoMarginBottom Start opting into the new margin-free styles that will become the default in a future version, currently scheduled to be WordPress 7.0. (The prop can be safely removed once this happens.)
  *
  * @return {JSX.Element} The rendered flat term selector component.
  */
-export function FlatTermSelector( { slug } ) {
+export function FlatTermSelector( { slug, __nextHasNoMarginBottom } ) {
 	const [ values, setValues ] = useState( [] );
 	const [ search, setSearch ] = useState( '' );
 	const debouncedSearch = useDebounce( setSearch, 500 );
+
+	if ( ! __nextHasNoMarginBottom ) {
+		deprecated(
+			'Bottom margin styles for wp.editor.PostTaxonomiesFlatTermSelector',
+			{
+				since: '6.7',
+				version: '7.0',
+				hint: 'Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version.',
+			}
+		);
+	}
 
 	const {
 		terms,
@@ -86,7 +99,7 @@ export function FlatTermSelector( { slug } ) {
 
 			const query = {
 				...DEFAULT_QUERY,
-				include: _termIds.join( ',' ),
+				include: _termIds?.join( ',' ),
 				per_page: -1,
 			};
 
@@ -103,7 +116,7 @@ export function FlatTermSelector( { slug } ) {
 					: false,
 				taxonomy: _taxonomy,
 				termIds: _termIds,
-				terms: _termIds.length
+				terms: _termIds?.length
 					? getEntityRecords( 'taxonomy', slug, query )
 					: EMPTY_ARRAY,
 				hasResolvedTerms: hasFinishedResolution( 'getEntityRecords', [
@@ -290,6 +303,7 @@ export function FlatTermSelector( { slug } ) {
 					removed: termRemovedLabel,
 					remove: removeTermLabel,
 				} }
+				__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 			/>
 			<MostUsedTerms taxonomy={ taxonomy } onSelect={ appendTerm } />
 		</>

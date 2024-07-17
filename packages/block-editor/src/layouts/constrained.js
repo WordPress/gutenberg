@@ -234,15 +234,23 @@ export default {
 			const paddingValues = getCSSRules( style );
 			paddingValues.forEach( ( rule ) => {
 				if ( rule.key === 'paddingRight' ) {
+					// Add unit if 0, to avoid calc(0 * -1) which is invalid.
+					const paddingRightValue =
+						rule.value === '0' ? '0px' : rule.value;
+
 					output += `
 					${ appendSelectors( selector, '> .alignfull' ) } {
-						margin-right: calc(${ rule.value } * -1);
+						margin-right: calc(${ paddingRightValue } * -1);
 					}
 					`;
 				} else if ( rule.key === 'paddingLeft' ) {
+					// Add unit if 0, to avoid calc(0 * -1) which is invalid.
+					const paddingLeftValue =
+						rule.value === '0' ? '0px' : rule.value;
+
 					output += `
 					${ appendSelectors( selector, '> .alignfull' ) } {
-						margin-left: calc(${ rule.value } * -1);
+						margin-left: calc(${ paddingLeftValue } * -1);
 					}
 					`;
 				}

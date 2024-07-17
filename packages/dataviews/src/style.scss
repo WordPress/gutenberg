@@ -91,7 +91,7 @@
 		padding: $grid-unit-15;
 		white-space: nowrap;
 
-		&[data-field-id="actions"] {
+		&.dataviews-view-table__actions-column {
 			text-align: right;
 		}
 
@@ -204,16 +204,10 @@
 			min-height: $grid-unit-40;
 			display: flex;
 			align-items: center;
+		}
 
-			> * {
-				flex-grow: 1;
-			}
-
-			&.dataviews-view-table__primary-field {
-				a {
-					flex-grow: 0;
-				}
-			}
+		.components-v-stack > .dataviews-view-table__cell-content-wrapper:not(:first-child) {
+			min-height: 0;
 		}
 	}
 	.dataviews-view-table-header-button {
@@ -248,6 +242,12 @@
 			opacity: 1;
 		}
 	}
+}
+
+.dataviews-view-table__cell-content-wrapper:empty,
+.dataviews-view-grid__field-value:empty,
+.dataviews-view-grid__field:empty {
+	display: none;
 }
 
 .dataviews-view-list__primary-field,
@@ -367,6 +367,7 @@
 
 		.dataviews-view-grid__field {
 			align-items: flex-start;
+			min-height: $grid-unit-30;
 
 			&:not(.is-column) {
 				align-items: center;
@@ -380,6 +381,12 @@
 					overflow: hidden;
 					text-overflow: ellipsis;
 					white-space: nowrap;
+				}
+			}
+
+			&.is-column {
+				& + .is-row {
+					margin-top: $grid-unit-05;
 				}
 			}
 
@@ -572,7 +579,7 @@
 	.dataviews-view-list__fields {
 		color: $gray-700;
 		display: flex;
-		gap: $grid-unit-10;
+		gap: $grid-unit-15;
 		row-gap: $grid-unit-05;
 		flex-wrap: wrap;
 		font-size: 12px;

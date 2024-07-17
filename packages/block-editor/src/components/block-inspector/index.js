@@ -133,6 +133,10 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 							className="color-block-support-panel__inner-wrapper"
 						/>
 						<InspectorControls.Slot
+							group="background"
+							label={ __( 'Background image' ) }
+						/>
+						<InspectorControls.Slot
 							group="typography"
 							label={ __( 'Typography' ) }
 						/>
@@ -286,6 +290,10 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 						className="color-block-support-panel__inner-wrapper"
 					/>
 					<InspectorControls.Slot
+						group="background"
+						label={ __( 'Background image' ) }
+					/>
+					<InspectorControls.Slot
 						group="typography"
 						label={ __( 'Typography' ) }
 					/>
@@ -298,10 +306,6 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 						label={ borderPanelLabel }
 					/>
 					<InspectorControls.Slot group="styles" />
-					<InspectorControls.Slot
-						group="background"
-						label={ __( 'Background image' ) }
-					/>
 					<PositionControls />
 					<div>
 						<AdvancedControls />

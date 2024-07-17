@@ -306,14 +306,22 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			 * They're added separately because padding might only be set on one side.
 			 */
 			if ( isset( $block_spacing_values['declarations']['padding-right'] ) ) {
-				$padding_right   = $block_spacing_values['declarations']['padding-right'];
+				$padding_right = $block_spacing_values['declarations']['padding-right'];
+				// Add unit if 0.
+				if ( '0' === $padding_right ) {
+					$padding_right = '0px';
+				}
 				$layout_styles[] = array(
 					'selector'     => "$selector > .alignfull",
 					'declarations' => array( 'margin-right' => "calc($padding_right * -1)" ),
 				);
 			}
 			if ( isset( $block_spacing_values['declarations']['padding-left'] ) ) {
-				$padding_left    = $block_spacing_values['declarations']['padding-left'];
+				$padding_left = $block_spacing_values['declarations']['padding-left'];
+				// Add unit if 0.
+				if ( '0' === $padding_left ) {
+					$padding_left = '0px';
+				}
 				$layout_styles[] = array(
 					'selector'     => "$selector > .alignfull",
 					'declarations' => array( 'margin-left' => "calc($padding_left * -1)" ),
@@ -646,10 +654,18 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		if ( ( $column_span || $column_start ) && ( $minimum_column_width || ! $column_count ) ) {
 			$column_span_number  = floatval( $column_span );
 			$column_start_number = floatval( $column_start );
-			$highest_number      = max( $column_span_number, $column_start_number );
 			$parent_column_width = $minimum_column_width ? $minimum_column_width : '12rem';
 			$parent_column_value = floatval( $parent_column_width );
 			$parent_column_unit  = explode( $parent_column_value, $parent_column_width );
+
+			$num_cols_to_break_at = 2;
+			if ( $column_span_number && $column_start_number ) {
+				$num_cols_to_break_at = $column_start_number + $column_span_number - 1;
+			} elseif ( $column_span_number ) {
+				$num_cols_to_break_at = $column_span_number;
+			} else {
+				$num_cols_to_break_at = $column_start_number;
+			}
 
 			/*
 			 * If there is no unit, the width has somehow been mangled so we reset both unit and value
@@ -672,7 +688,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			 * viable to use in the computation of the container query value.
 			 */
 			$default_gap_value             = 'px' === $parent_column_unit ? 24 : 1.5;
-			$container_query_value         = $highest_number * $parent_column_value + ( $highest_number - 1 ) * $default_gap_value;
+			$container_query_value         = $num_cols_to_break_at * $parent_column_value + ( $num_cols_to_break_at - 1 ) * $default_gap_value;
 			$minimum_container_query_value = $parent_column_value * 2 + $default_gap_value - 1;
 			$container_query_value         = max( $container_query_value, $minimum_container_query_value ) . $parent_column_unit;
 			// If a span is set we want to preserve it as long as possible, otherwise we just reset the value.

@@ -20,7 +20,7 @@ import { cog } from '@wordpress/icons';
  */
 import { unlock } from './lock-unlock';
 import { SORTING_DIRECTIONS, sortLabels } from './constants';
-import { VIEW_LAYOUTS } from './layouts';
+import { VIEW_LAYOUTS, getMandatoryFields } from './layouts';
 import type { NormalizedField, View, SupportedLayouts } from './types';
 
 const {
@@ -147,10 +147,11 @@ function FieldsVisibilityMenu< Item >( {
 	onChangeView,
 	fields,
 }: FieldsVisibilityMenuProps< Item > ) {
+	const mandatoryFields = getMandatoryFields( view );
 	const hidableFields = fields.filter(
 		( field ) =>
 			field.enableHiding !== false &&
-			field.id !== view?.layout?.mediaField
+			! mandatoryFields.includes( field.id )
 	);
 	const viewFields = view.fields || fields.map( ( field ) => field.id );
 	if ( ! hidableFields?.length ) {
