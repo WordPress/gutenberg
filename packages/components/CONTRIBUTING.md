@@ -369,7 +369,7 @@ Not all style changes justify a formal deprecation process. The main thing to lo
 
 ## Context system
 
-The `@wordpress/components` context system is based on [React's `Context` API](https://reactjs.org/docs/context.html), and is a way for components to adapt to the "context" they're being rendered in.
+The `@wordpress/components` context system is based on [React's `Context` API](https://react.dev/reference/react/createContext), and is a way for components to adapt to the "context" they're being rendered in.
 
 Components can use this system via a couple of functions:
 
