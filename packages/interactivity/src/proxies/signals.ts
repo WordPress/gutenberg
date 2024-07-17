@@ -16,27 +16,81 @@ import { getProxyNs } from './registry';
 import { getScope, setNamespace, resetNamespace } from '../hooks';
 import { withScope } from '../utils';
 
+/**
+ * Identifier for property computeds not associated to any scope.
+ */
 const NO_SCOPE = Symbol();
 
+/**
+ * Structure that manages reactivity for a property in a state object. It uses
+ * signals to keep track of property value or getter modifications.
+ */
 export class PropSignal {
+	/**
+	 * Proxy that holds the property this PropSignal is associated with.
+	 */
 	private owner: object;
+
+	/**
+	 * Relation of computeds by scope. These computeds are read-only signals
+	 * that depend on whether the property is a value or a getter and,
+	 * therefore, can return different values depending on the scope in which
+	 * the getter is accessed.
+	 */
 	private computedsByScope: WeakMap< WeakKey, ReadonlySignal >;
+
+	/**
+	 * Signal with the value assigned to the related property.
+	 */
 	private valueSignal?: Signal;
+
+	/**
+	 * Signal with the getter assigned to the related property.
+	 */
 	private getterSignal?: Signal< ( () => any ) | undefined >;
 
+	/**
+	 * Structure that manages reactivity for a property in a state object, using
+	 * signals to keep track of property value or getter modifications.
+	 *
+	 * @param owner Proxy that holds the property this instance is associated
+	 *              with.
+	 */
 	constructor( owner: object ) {
 		this.owner = owner;
 		this.computedsByScope = new WeakMap();
 	}
 
+	/**
+	 * Changes the internal value. If a getter was set before, it is set to
+	 * `undefined`.
+	 *
+	 * @param value New value.
+	 */
 	public setValue( value: unknown ) {
 		this.update( { value } );
 	}
 
+	/**
+	 * Changes the internal getter. If a value was set before, it is set to
+	 * `undefined`.
+	 *
+	 * @param getter New getter.
+	 */
 	public setGetter( getter: () => any ) {
 		this.update( { get: getter } );
 	}
 
+	/**
+	 * Returns the computed that holds the result of evaluating the prop in the
+	 * current scope.
+	 *
+	 * These computeds are read-only signals that depend on whether the property
+	 * is a value or a getter and, therefore, can return different values
+	 * depending on the scope in which the getter is accessed.
+	 *
+	 * @return Computed that depends on the scope.
+	 */
 	public getComputed(): ReadonlySignal {
 		const scope = getScope() || NO_SCOPE;
 
@@ -63,6 +117,14 @@ export class PropSignal {
 		return this.computedsByScope.get( scope )!;
 	}
 
+	/**
+	 *  Update the internal signals for the value and the getter of the
+	 *  corresponding prop.
+	 *
+	 * @param param0
+	 * @param param0.get   New getter.
+	 * @param param0.value New value.
+	 */
 	private update( { get, value }: { get?: () => any; value?: unknown } ) {
 		if ( ! this.valueSignal ) {
 			this.valueSignal = signal( value );
@@ -76,6 +138,5 @@ export class PropSignal {
 				this.getterSignal!.value = get;
 			} );
 		}
-		return this;
 	}
 }
