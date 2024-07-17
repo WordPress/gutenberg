@@ -201,7 +201,7 @@ if ( ! class_exists( 'WP_Templates_Registry' ) ) {
 					continue;
 				}
 
-				if ( ! empty( $post_type ) && ! in_array( $post_type, $template->post_types, true ) ) {
+				if ( ! empty( $post_types ) && ! in_array( $post_type, $template->post_types, true ) ) {
 					continue;
 				}
 
