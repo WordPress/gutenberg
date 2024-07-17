@@ -334,8 +334,6 @@ Typography styles.
 
 Additional metadata for custom templates defined in the templates folder.
 
-Type: `object`.
-
 | Property | Description | Type |
 | ---      | ---         | ---  |
 | name | Filename, without extension, of the template in the templates folder. | string |
@@ -345,8 +343,6 @@ Type: `object`.
 ## templateParts
 
 Additional metadata for template parts defined in the parts folder.
-
-Type: `object`.
 
 | Property | Description | Type |
 | ---      | ---         | ---  |

@@ -184,7 +184,6 @@ function generateDocs( themejson ) {
 	// customTemplates
 	autogen += '## customTemplates\n\n';
 	autogen += `${ themejson.properties.customTemplates.description }\n\n`;
-	autogen += `Type: \`${ themejson.properties.customTemplates.items.type }\`.\n\n`;
 	autogen += '| Property | Description | Type |\n';
 	autogen += '| ---      | ---         | ---  |\n';
 	const customTemplatesProperties = Object.entries(
@@ -199,7 +198,6 @@ function generateDocs( themejson ) {
 	// templateParts
 	autogen += '## templateParts\n\n';
 	autogen += `${ themejson.properties.templateParts.description }\n\n`;
-	autogen += `Type: \`${ themejson.properties.templateParts.items.type }\`.\n\n`;
 	autogen += '| Property | Description | Type |\n';
 	autogen += '| ---      | ---         | ---  |\n';
 	const templatePartsProperties = Object.entries(
