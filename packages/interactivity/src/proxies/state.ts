@@ -38,13 +38,11 @@ const wellKnownSymbols = new Set(
 		.filter( ( value ) => typeof value === 'symbol' )
 );
 
-const descriptor = Object.getOwnPropertyDescriptor;
-
 let peeking = false;
 
 const stateHandlers: ProxyHandler< object > = {
 	get( target: object, key: string, receiver: object ): any {
-		const desc = descriptor( target, key );
+		const desc = Object.getOwnPropertyDescriptor( target, key );
 
 		/*
 		 * If peeking, the property comes from the Object prototype, or the key
