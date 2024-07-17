@@ -93,4 +93,75 @@ describe( 'useResourcePermissions', () => {
 			} )
 		);
 	} );
+
+	it( 'retrieves the relevant permissions for a id-less entity', async () => {
+		let data;
+		const TestComponent = () => {
+			data = useResourcePermissions( {
+				kind: 'root',
+				name: 'media',
+			} );
+			return <div />;
+		};
+		render(
+			<RegistryProvider value={ registry }>
+				<TestComponent />
+			</RegistryProvider>
+		);
+		expect( data ).toEqual( {
+			status: 'IDLE',
+			isResolving: false,
+			hasResolved: false,
+			canCreate: false,
+			canRead: false,
+		} );
+
+		await waitFor( () =>
+			expect( data ).toEqual( {
+				status: 'SUCCESS',
+				isResolving: false,
+				hasResolved: true,
+				canCreate: true,
+				canRead: false,
+			} )
+		);
+	} );
+
+	it( 'retrieves the relevant permissions for an entity', async () => {
+		let data;
+		const TestComponent = () => {
+			data = useResourcePermissions( {
+				kind: 'root',
+				name: 'media',
+				id: 1,
+			} );
+			return <div />;
+		};
+		render(
+			<RegistryProvider value={ registry }>
+				<TestComponent />
+			</RegistryProvider>
+		);
+		expect( data ).toEqual( {
+			status: 'IDLE',
+			isResolving: false,
+			hasResolved: false,
+			canCreate: false,
+			canRead: false,
+			canUpdate: false,
+			canDelete: false,
+		} );
+
+		await waitFor( () =>
+			expect( data ).toEqual( {
+				status: 'SUCCESS',
+				isResolving: false,
+				hasResolved: true,
+				canCreate: true,
+				canRead: false,
+				canUpdate: false,
+				canDelete: false,
+			} )
+		);
+	} );
 } );

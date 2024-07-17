@@ -1173,7 +1173,10 @@ _Usage_
 import { useResourcePermissions } from '@wordpress/core-data';
 
 function PagesList() {
-	const { canCreate, isResolving } = useResourcePermissions( 'pages' );
+	const { canCreate, isResolving } = useResourcePermissions( {
+		kind: 'postType',
+		name: 'page',
+	} );
 
 	if ( isResolving ) {
 		return 'Loading ...';
@@ -1196,7 +1199,11 @@ import { useResourcePermissions } from '@wordpress/core-data';
 
 function Page( { pageId } ) {
 	const { canCreate, canUpdate, canDelete, isResolving } =
-		useResourcePermissions( 'pages', pageId );
+		useResourcePermissions( {
+			kind: 'postType',
+			name: 'page',
+			id: pageId,
+		} );
 
 	if ( isResolving ) {
 		return 'Loading ...';
@@ -1222,8 +1229,8 @@ the store state using `canUser()`, or resolved if missing.
 
 _Parameters_
 
--   _resource_ `string`: The resource in question, e.g. media.
--   _id_ `IdType`: ID of a specific resource entry, if needed, e.g. 10.
+-   _resource_ `string | EntityResource`: Entity resource to check. Accepts entity object `{ kind: 'root', name: 'media', id: 1 }` or REST base as a string - `media`.
+-   _id_ `IdType`: Optional ID of the rest resource to check. e.g. 10.
 
 _Returns_
 

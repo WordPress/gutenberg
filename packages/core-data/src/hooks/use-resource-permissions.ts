@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -41,20 +42,23 @@ type ResourcePermissionsResolution< IdType > = [
 		( IdType extends void ? SpecificResourcePermissionsResolution : {} ),
 ];
 
+type EntityResource = { kind: string; name: string; id?: string | number };
+
 /**
  * Resolves resource permissions.
  *
  * @since 6.1.0 Introduced in WordPress core.
  *
- * @param    resource The resource in question, e.g. media.
- * @param    id       ID of a specific resource entry, if needed, e.g. 10.
+ * @param    resource Entity resource to check. Accepts entity object `{ kind: 'root', name: 'media', id: 1 }`
+ *                    or REST base as a string - `media`.
+ * @param    id       Optional ID of the rest resource to check. e.g. 10.
  *
  * @example
  * ```js
  * import { useResourcePermissions } from '@wordpress/core-data';
  *
  * function PagesList() {
- *   const { canCreate, isResolving } = useResourcePermissions( 'pages' );
+ *   const { canCreate, isResolving } = useResourcePermissions( { kind: 'postType', name: 'page' } );
  *
  *   if ( isResolving ) {
  *     return 'Loading ...';
@@ -82,7 +86,7 @@ type ResourcePermissionsResolution< IdType > = [
  *     canUpdate,
  *     canDelete,
  *     isResolving
- *   } = useResourcePermissions( 'pages', pageId );
+ *   } = useResourcePermissions( { kind: 'postType', name: 'page', id: pageId } );
  *
  *   if ( isResolving ) {
  *     return 'Loading ...';
@@ -110,14 +114,23 @@ type ResourcePermissionsResolution< IdType > = [
  * @template IdType
  */
 export default function useResourcePermissions< IdType = void >(
-	resource: string,
+	resource: string | EntityResource,
 	id?: IdType
 ): ResourcePermissionsResolution< IdType > {
+	// Serialize `resource` to a string that can be safely used as a React dep.
+	// We can't just pass `resource` as one of the deps, because if it is passed
+	// as an object literal, then it will be a different object on each call even
+	// if the values remain the same.
+	const resourceAsString =
+		typeof resource === 'object' ? addQueryArgs( '', resource ) : resource;
+
 	return useQuerySelect(
 		( resolve ) => {
 			const { canUser } = resolve( coreStore );
 			const create = canUser( 'create', resource );
-			if ( ! id ) {
+
+			const hasId = typeof resource === 'object' ? !! resource.id : !! id;
+			if ( ! hasId ) {
 				const read = canUser( 'read', resource );
 
 				const isResolving = create.isResolving || read.isResolving;
@@ -168,7 +181,7 @@ export default function useResourcePermissions< IdType = void >(
 				canDelete: hasResolved && _delete.data,
 			};
 		},
-		[ resource, id ]
+		[ resourceAsString, id ]
 	);
 }
 
