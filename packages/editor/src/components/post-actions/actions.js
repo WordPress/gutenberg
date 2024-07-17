@@ -934,11 +934,16 @@ export const duplicateTemplatePartAction = {
 		const blocks = useMemo( () => {
 			return (
 				item.blocks ??
-				parse( item.content.raw, {
-					__unstableSkipMigrationLogs: true,
-				} )
+				parse(
+					typeof item.content === 'string'
+						? item.content
+						: item.content.raw,
+					{
+						__unstableSkipMigrationLogs: true,
+					}
+				)
 			);
-		}, [ item?.content?.raw, item.blocks ] );
+		}, [ item.content, item.blocks ] );
 		const { createSuccessNotice } = useDispatch( noticesStore );
 		function onTemplatePartSuccess() {
 			createSuccessNotice(
