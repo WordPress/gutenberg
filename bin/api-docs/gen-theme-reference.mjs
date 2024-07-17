@@ -88,7 +88,7 @@ function createSerializer( predicate, serializer ) {
  *
  * @type {SerializerFunction}
  */
-const serializePrimitives = createSerializer(
+const serializePrimitiveTypes = createSerializer(
 	( schema ) =>
 		schema.type && ! [ 'object', 'array' ].includes( schema.type ),
 	( schema ) => `\`${ schema.type }\``
@@ -97,7 +97,7 @@ const serializePrimitives = createSerializer(
 /**
  * Format list of properties.
  */
-const serializeObjects = createSerializer(
+const serializeObjectTypes = createSerializer(
 	( schema ) => schema.properties,
 	( schema ) => `\`{ ${ Object.keys( schema.properties ).join( ', ' ) } }\``
 );
@@ -107,7 +107,7 @@ const serializeObjects = createSerializer(
  *
  * @type {SerializerFunction}
  */
-const serializeObjectArrays = createSerializer(
+const serializeObjectArrayTypes = createSerializer(
 	( schema ) => schema.items && schema.items.properties,
 	( schema ) =>
 		`\`[ { ${ Object.keys( schema.items.properties ).join( ', ' ) } } ]\``
@@ -118,7 +118,7 @@ const serializeObjectArrays = createSerializer(
  *
  * @type {SerializerFunction}
  */
-const serializePrimitiveArrays = createSerializer(
+const serializePrimitiveArrayTypes = createSerializer(
 	( schema ) =>
 		schema.items &&
 		schema.items.type &&
@@ -132,12 +132,13 @@ const serializePrimitiveArrays = createSerializer(
  * @param {JSONSchema} schema
  * @return {string} generated types
  */
-function generateTypes( schema ) {
-	const primitiveTypes = serializePrimitives( schema );
-	const arrayTypes = serializePrimitiveArrays( schema );
-	const objectTypes = serializeObjects( schema );
-	const arrayObjectTypes = serializeObjectArrays( schema );
-	return [ primitiveTypes, arrayTypes, arrayObjectTypes, objectTypes ]
+function serializeTypes( schema ) {
+	return [
+		serializePrimitiveTypes( schema ),
+		serializeObjectTypes( schema ),
+		serializePrimitiveArrayTypes( schema ),
+		serializeObjectArrayTypes( schema ),
+	]
 		.filter( Boolean )
 		.join( ', ' );
 }
@@ -172,7 +173,7 @@ function generateDocs( themejson ) {
 			autogen += '| ---       | ---    | ---     |\n';
 			const properties = Object.entries( schema.properties );
 			for ( const [ property, subschema ] of properties ) {
-				const types = generateTypes( subschema );
+				const types = serializeTypes( subschema );
 				const defaultValue = subschema.default ?? '';
 				autogen += `| ${ property } | ${ types } | ${ defaultValue } |\n`;
 			}
@@ -195,7 +196,7 @@ function generateDocs( themejson ) {
 			autogen += '| ---       | ---    |\n';
 			const properties = Object.entries( schema.properties );
 			for ( const [ property, subschema ] of properties ) {
-				const types = generateTypes( subschema );
+				const types = serializeTypes( subschema );
 				autogen += `| ${ property } | ${ types } |\n`;
 			}
 			autogen += '\n';
@@ -213,7 +214,7 @@ function generateDocs( themejson ) {
 	);
 	for ( const [ property, subschema ] of customTemplatesProperties ) {
 		const { description } = subschema;
-		const types = generateTypes( subschema );
+		const types = serializeTypes( subschema );
 		autogen += `| ${ property } | ${ description } | ${ types } |\n`;
 	}
 	autogen += '\n';
@@ -228,14 +229,16 @@ function generateDocs( themejson ) {
 	);
 	for ( const [ property, subschema ] of templatePartsProperties ) {
 		const { description } = subschema;
-		const types = generateTypes( subschema );
+		const types = serializeTypes( subschema );
 		autogen += `| ${ property } | ${ description } | ${ types } |\n`;
 	}
 	autogen += '\n';
 
 	// Patterns
 	autogen += '## patterns' + '\n\n';
-	autogen += `Type: ${ generateTypes( themejson.properties.patterns ) }.\n\n`;
+	autogen += `Type: ${ serializeTypes(
+		themejson.properties.patterns
+	) }.\n\n`;
 	autogen += themejson.properties.patterns.description + '\n';
 
 	return `${ START_TOKEN }\n${ autogen }\n${ END_TOKEN }`;
