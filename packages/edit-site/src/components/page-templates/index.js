@@ -262,7 +262,7 @@ export default function PageTemplates() {
 			if ( view?.type === LAYOUT_LIST ) {
 				history.push( {
 					...params,
-					postId: items.length === 1 ? items[ 0 ].id : undefined,
+					postId: items.length === 1 ? items[ 0 ] : undefined,
 				} );
 			}
 		},

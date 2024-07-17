@@ -292,7 +292,7 @@ export default function PostList( { postType } ) {
 			) {
 				history.push( {
 					...params,
-					postId: items.length === 1 ? items[ 0 ].id : undefined,
+					postId: items.length === 1 ? items[ 0 ] : undefined,
 				} );
 			}
 		},
