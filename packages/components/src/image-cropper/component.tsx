@@ -36,11 +36,11 @@ function CropWindow() {
 			onResizeStart={ ( event ) => {
 				// Set the temporary offset on resizing.
 				element!.style.setProperty(
-					'--wp-cropper-x',
+					'--wp-cropper-window-x',
 					`${ offset.x }px`
 				);
 				element!.style.setProperty(
-					'--wp-cropper-y',
+					'--wp-cropper-window-y',
 					`${ offset.y }px`
 				);
 
@@ -91,13 +91,13 @@ function CropWindow() {
 					// Set the temporary offset on resizing.
 					if ( direction.toLowerCase().includes( 'left' ) ) {
 						element!.style.setProperty(
-							'--wp-cropper-x',
+							'--wp-cropper-window-x',
 							`${ offset.x - delta.width }px`
 						);
 					}
 					if ( direction.startsWith( 'top' ) ) {
 						element!.style.setProperty(
-							'--wp-cropper-y',
+							'--wp-cropper-window-y',
 							`${ offset.y - delta.height }px`
 						);
 					}
@@ -105,8 +105,8 @@ function CropWindow() {
 			} }
 			onResizeStop={ ( _event, direction, _element, delta ) => {
 				// Remove the temporary offset.
-				element!.style.removeProperty( '--wp-cropper-x' );
-				element!.style.removeProperty( '--wp-cropper-y' );
+				element!.style.removeProperty( '--wp-cropper-window-x' );
+				element!.style.removeProperty( '--wp-cropper-window-y' );
 				// Commit the offset to state if needed.
 				dispatch( { type: 'RESIZE_WINDOW', direction, delta } );
 			} }
@@ -125,7 +125,16 @@ function CropWindow() {
 
 const Cropper = forwardRef< HTMLDivElement >( ( {}, ref ) => {
 	const {
-		state: { width, height, angle, turns, scale, offset, position },
+		state: {
+			width,
+			height,
+			angle,
+			turns,
+			scale,
+			flipped,
+			offset,
+			position,
+		},
 		src,
 		refs: { imageRef },
 	} = useContext( ImageCropperContext );
@@ -142,9 +151,14 @@ const Cropper = forwardRef< HTMLDivElement >( ( {}, ref ) => {
 				width: `${ isAxisSwapped ? height : width }px`,
 				height: `${ isAxisSwapped ? width : height }px`,
 				'--wp-cropper-angle': `${ degree }deg`,
-				'--wp-cropper-scale': `${ scale }`,
-				'--wp-cropper-x': `${ offset.x }px`,
-				'--wp-cropper-y': `${ offset.y }px`,
+				'--wp-cropper-scale-x': `${
+					scale * ( flipped && ! isAxisSwapped ? -1 : 1 )
+				}`,
+				'--wp-cropper-scale-y': `${
+					scale * ( flipped && isAxisSwapped ? -1 : 1 )
+				}`,
+				'--wp-cropper-window-x': `${ offset.x }px`,
+				'--wp-cropper-window-y': `${ offset.y }px`,
 				'--wp-cropper-image-x': `${ position.x }px`,
 				'--wp-cropper-image-y': `${ position.y }px`,
 			} }

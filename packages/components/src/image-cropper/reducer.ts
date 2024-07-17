@@ -119,6 +119,11 @@ function imageCropperReducer( state: State, action: Action ) {
 			return {
 				...state,
 				flipped: ! flipped,
+				angle: -angle,
+				position: {
+					x: -position.x,
+					y: position.y,
+				},
 			};
 		}
 		case 'ROTATE': {

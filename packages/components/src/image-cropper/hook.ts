@@ -77,8 +77,13 @@ export const useImageCropper = ( {
 		ctx.rotate(
 			degreeToRadian( cropperState.angle + cropperState.turns * 90 )
 		);
-		ctx.scale( cropperState.scale, cropperState.scale );
 		const isAxisSwapped = cropperState.turns % 2 !== 0;
+		ctx.scale(
+			cropperState.scale *
+				( cropperState.flipped && ! isAxisSwapped ? -1 : 1 ),
+			cropperState.scale *
+				( cropperState.flipped && isAxisSwapped ? -1 : 1 )
+		);
 		const imageOffset = {
 			x: isAxisSwapped
 				? ( cropperState.height - cropperState.width ) / 2

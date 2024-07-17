@@ -63,6 +63,13 @@ function TemplateControls() {
 				Rotate 90°
 			</button>
 			<button
+				onClick={ () => {
+					dispatch( { type: 'FLIP' } );
+				} }
+			>
+				Flip horizontally
+			</button>
+			<button
 				onClick={ async () => {
 					const blob = await getImageBlob( state );
 					if ( previewUrl ) {

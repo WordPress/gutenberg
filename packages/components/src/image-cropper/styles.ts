@@ -21,7 +21,10 @@ export const Draggable = styled.div`
 `;
 
 export const Resizable = styled( ResizableBox )`
-	transform: translate( var( --wp-cropper-x ), var( --wp-cropper-y ) );
+	transform: translate(
+		var( --wp-cropper-window-x ),
+		var( --wp-cropper-window-y )
+	);
 	box-shadow: 0 0 0 100vmax rgba( 0, 0, 0, 0.5 );
 `;
 
@@ -38,6 +41,6 @@ export const Img = styled.img`
 	pointer-events: none;
 	transform-origin: center center;
 	rotate: var( --wp-cropper-angle );
-	scale: var( --wp-cropper-scale );
+	scale: var( --wp-cropper-scale-x ) var( --wp-cropper-scale-y );
 	translate: var( --wp-cropper-image-x ) var( --wp-cropper-image-y );
 `;
