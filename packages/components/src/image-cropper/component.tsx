@@ -131,6 +131,10 @@ const Cropper = forwardRef< HTMLDivElement >( ( {}, ref ) => {
 	} = useContext( ImageCropperContext );
 	const isAxisSwapped = turns % 2 !== 0;
 	const degree = angle + turns * 90;
+	const imageOffset = {
+		top: isAxisSwapped ? ( width - height ) / 2 : 0,
+		left: isAxisSwapped ? ( height - width ) / 2 : 0,
+	};
 
 	return (
 		<Container
@@ -154,6 +158,7 @@ const Cropper = forwardRef< HTMLDivElement >( ( {}, ref ) => {
 					alt=""
 					crossOrigin="anonymous"
 					ref={ imageRef }
+					style={ imageOffset }
 				/>
 			</div>
 			<CropWindow />

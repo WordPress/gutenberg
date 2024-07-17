@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import type { Position, Size } from './types';
+import type { Position, Size, ResizeDirection } from './types';
 import { rotatePoint, degreeToRadian, getFurthestVector } from './math';
 
 export type State = {
@@ -38,7 +38,7 @@ type Action =
 	| { type: 'TRANSLATE'; offset: Position }
 	| { type: 'MOVE'; x: number; y: number }
 	| { type: 'RESIZE_START' }
-	| { type: 'RESIZE_WINDOW'; direction: string; delta: Size }
+	| { type: 'RESIZE_WINDOW'; direction: ResizeDirection; delta: Size }
 	| { type: 'RESET' };
 
 function createInitialState( {
@@ -150,18 +150,6 @@ function imageCropperReducer( state: State, action: Action ) {
 				{ x: 0, y: 0 },
 				( Math.PI / 2 ) * ( isCounterClockwise ? -1 : 1 )
 			);
-			const isAxisSwapped = nextTurns % 2 !== 0;
-			// TODO: I'm sure there's a simpler way to do this...
-			const axisOffset = {
-				x: isAxisSwapped
-					? ( height - width ) / 2
-					: ( width - height ) / 2,
-				y: ( width - height ) / 2,
-			};
-			if ( isCounterClockwise && ! isAxisSwapped ) {
-				axisOffset.x = -axisOffset.x;
-				axisOffset.y = -axisOffset.y;
-			}
 			return {
 				...state,
 				size: {
@@ -173,10 +161,7 @@ function imageCropperReducer( state: State, action: Action ) {
 					y: offset.x,
 				},
 				turns: nextTurns,
-				position: {
-					x: rotatedPosition.x + axisOffset.x,
-					y: rotatedPosition.y + axisOffset.y,
-				},
+				position: rotatedPosition,
 			};
 		}
 		case 'TRANSLATE': {
@@ -188,17 +173,12 @@ function imageCropperReducer( state: State, action: Action ) {
 		case 'MOVE': {
 			const scaledWidth = width * scale;
 			const scaledHeight = height * scale;
-			const isAxisSwapped = turns % 2 !== 0;
-			const axisOffset = {
-				x: isAxisSwapped ? ( width - height ) / 2 : 0,
-				y: isAxisSwapped ? ( height - width ) / 2 : 0,
-			};
 			const vectorInUnrotated = getFurthestVector(
 				scaledWidth,
 				scaledHeight,
 				radian,
 				size,
-				{ x: action.x + axisOffset.x, y: action.y + axisOffset.y }
+				{ x: action.x, y: action.y }
 			);
 
 			// Step 3: Rotate the vector back to the original coordinate system
@@ -231,10 +211,14 @@ function imageCropperReducer( state: State, action: Action ) {
 		// TODO: No idea how this should work for rotated(turned) images.
 		case 'RESIZE_WINDOW': {
 			const { direction, delta } = action;
-			const deltaX = direction.toLowerCase().includes( 'left' )
+			const deltaX = [ 'left', 'bottomLeft', 'topLeft' ].includes(
+				direction
+			)
 				? delta.width
 				: -delta.width;
-			const deltaY = direction.startsWith( 'top' )
+			const deltaY = [ 'top', 'topLeft', 'topRight' ].includes(
+				direction
+			)
 				? delta.height
 				: -delta.height;
 			const newSize = {
@@ -242,25 +226,25 @@ function imageCropperReducer( state: State, action: Action ) {
 				height: size.height + delta.height,
 			};
 			const isAxisSwapped = turns % 2 !== 0;
-			const widthScale =
-				( isAxisSwapped ? height : width ) / newSize.width;
-			const heightScale =
-				( isAxisSwapped ? width : height ) / newSize.height;
+			const imageDimensions = {
+				width: isAxisSwapped ? height : width,
+				height: isAxisSwapped ? width : height,
+			};
+			const widthScale = imageDimensions.width / newSize.width;
+			const heightScale = imageDimensions.height / newSize.height;
 			const windowScale = Math.min( widthScale, heightScale );
-			const scaledSize = isAxisSwapped
-				? { width: height, height: width }
-				: { width, height };
+			const scaledSize = {
+				width: imageDimensions.width,
+				height: imageDimensions.height,
+			};
 			const translated = { x: 0, y: 0 };
 			if ( widthScale === windowScale ) {
 				scaledSize.height = newSize.height * windowScale;
 				translated.y =
-					( isAxisSwapped ? width : height ) / 2 -
-					scaledSize.height / 2;
+					imageDimensions.height / 2 - scaledSize.height / 2;
 			} else {
 				scaledSize.width = newSize.width * windowScale;
-				translated.x =
-					( isAxisSwapped ? height : width ) / 2 -
-					scaledSize.width / 2;
+				translated.x = imageDimensions.width / 2 - scaledSize.width / 2;
 			}
 			return {
 				...state,
@@ -268,8 +252,8 @@ function imageCropperReducer( state: State, action: Action ) {
 				size: scaledSize,
 				scale: scale * windowScale,
 				position: {
-					x: position.x + ( deltaX / 2 ) * windowScale,
-					y: position.y + ( deltaY / 2 ) * windowScale,
+					x: ( position.x + deltaX / 2 ) * windowScale,
+					y: ( position.y + deltaY / 2 ) * windowScale,
 				},
 				isResizing: false,
 			};

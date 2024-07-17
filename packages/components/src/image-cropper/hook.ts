@@ -78,10 +78,19 @@ export const useImageCropper = ( {
 			degreeToRadian( cropperState.angle + cropperState.turns * 90 )
 		);
 		ctx.scale( cropperState.scale, cropperState.scale );
+		const isAxisSwapped = cropperState.turns % 2 !== 0;
+		const imageOffset = {
+			x: isAxisSwapped
+				? ( cropperState.height - cropperState.width ) / 2
+				: 0,
+			y: isAxisSwapped
+				? ( cropperState.width - cropperState.height ) / 2
+				: 0,
+		};
 		ctx.drawImage(
 			imageRef.current!,
-			-cropperState.offset.x - offscreenCanvas.width / 2,
-			-cropperState.offset.y - offscreenCanvas.height / 2,
+			-cropperState.offset.x - offscreenCanvas.width / 2 + imageOffset.x,
+			-cropperState.offset.y - offscreenCanvas.height / 2 + imageOffset.y,
 			cropperState.width,
 			cropperState.height
 		);
