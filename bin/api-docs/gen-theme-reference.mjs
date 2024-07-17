@@ -199,6 +199,7 @@ function generateDocs( themejson ) {
 			autogen += '| -------- | ----------- | ---- |\n';
 			const properties = Object.entries( schema.properties );
 			for ( const [ property, subschema ] of properties ) {
+				// Assuming that the first line of a description is a summary.
 				const description =
 					subschema.description?.split( '\n', 1 )[ 0 ] ?? '';
 				const types = generateTypes( subschema );
