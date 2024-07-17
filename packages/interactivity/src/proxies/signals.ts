@@ -29,12 +29,12 @@ export class PropSignal {
 		this.computedsByScope = new WeakMap();
 	}
 
-	public setValue( value: unknown ): PropSignal {
-		return this.update( { value } );
+	public setValue( value: unknown ) {
+		this.update( { value } );
 	}
 
-	public setGetter( getter: () => any ): PropSignal {
-		return this.update( { get: getter } );
+	public setGetter( getter: () => any ) {
+		this.update( { get: getter } );
 	}
 
 	public getComputed(): ReadonlySignal {
@@ -63,13 +63,7 @@ export class PropSignal {
 		return this.computedsByScope.get( scope )!;
 	}
 
-	private update( {
-		get,
-		value,
-	}: {
-		get?: () => any;
-		value?: unknown;
-	} ): PropSignal {
+	private update( { get, value }: { get?: () => any; value?: unknown } ) {
 		if ( ! this.valueSignal ) {
 			this.valueSignal = signal( value );
 			this.getterSignal = signal( get );
