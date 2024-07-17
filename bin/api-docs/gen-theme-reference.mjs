@@ -220,7 +220,7 @@ const formatType = ( prop ) => {
 // Settings
 const settings = Object.entries( themejson.definitions )
 	.filter( ( [ settingsKey ] ) =>
-		/^settingsProperties(?!Complete)\w+$/.test( settingsKey )
+		/^settings\w+Properties$/.test( settingsKey )
 	)
 	.reduce(
 		( settingsObj, [ , { properties } ] ) =>

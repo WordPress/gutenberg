@@ -17,7 +17,7 @@
 			},
 			"additionalProperties": false
 		},
-		"settingsPropertiesAppearanceTools": {
+		"settingsAppearanceToolsProperties": {
 			"type": "object",
 			"properties": {
 				"appearanceTools": {
@@ -27,7 +27,7 @@
 				}
 			}
 		},
-		"settingsPropertiesBackground": {
+		"settingsBackgroundProperties": {
 			"type": "object",
 			"properties": {
 				"background": {
@@ -49,7 +49,7 @@
 				}
 			}
 		},
-		"settingsPropertiesBorder": {
+		"settingsBorderProperties": {
 			"type": "object",
 			"properties": {
 				"border": {
@@ -81,7 +81,7 @@
 				}
 			}
 		},
-		"settingsPropertiesColor": {
+		"settingsColorProperties": {
 			"type": "object",
 			"properties": {
 				"color": {
@@ -226,7 +226,7 @@
 				}
 			}
 		},
-		"settingsPropertiesDimensions": {
+		"settingsDimensionsProperties": {
 			"type": "object",
 			"properties": {
 				"dimensions": {
@@ -274,7 +274,7 @@
 				}
 			}
 		},
-		"settingsPropertiesLayout": {
+		"settingsLayoutProperties": {
 			"type": "object",
 			"properties": {
 				"layout": {
@@ -304,7 +304,7 @@
 				}
 			}
 		},
-		"settingsPropertiesLightbox": {
+		"settingsLightboxProperties": {
 			"type": "object",
 			"properties": {
 				"lightbox": {
@@ -324,7 +324,7 @@
 				}
 			}
 		},
-		"settingsPropertiesPosition": {
+		"settingsPositionProperties": {
 			"type": "object",
 			"properties": {
 				"position": {
@@ -346,7 +346,7 @@
 				}
 			}
 		},
-		"settingsPropertiesShadow": {
+		"settingsShadowProperties": {
 			"type": "object",
 			"properties": {
 				"shadow": {
@@ -386,7 +386,7 @@
 				}
 			}
 		},
-		"settingsPropertiesSpacing": {
+		"settingsSpacingProperties": {
 			"type": "object",
 			"properties": {
 				"spacing": {
@@ -524,7 +524,7 @@
 				}
 			}
 		},
-		"settingsPropertiesTypography": {
+		"settingsTypographyProperties": {
 			"type": "object",
 			"properties": {
 				"typography": {
@@ -786,7 +786,7 @@
 				}
 			}
 		},
-		"settingsPropertiesCustom": {
+		"settingsCustomProperties": {
 			"type": "object",
 			"properties": {
 				"custom": {
@@ -796,18 +796,18 @@
 		},
 		"settingsProperties": {
 			"allOf": [
-				{ "$ref": "#/definitions/settingsPropertiesAppearanceTools" },
-				{ "$ref": "#/definitions/settingsPropertiesBackground" },
-				{ "$ref": "#/definitions/settingsPropertiesBorder" },
-				{ "$ref": "#/definitions/settingsPropertiesColor" },
-				{ "$ref": "#/definitions/settingsPropertiesDimensions" },
-				{ "$ref": "#/definitions/settingsPropertiesLayout" },
-				{ "$ref": "#/definitions/settingsPropertiesLightbox" },
-				{ "$ref": "#/definitions/settingsPropertiesPosition" },
-				{ "$ref": "#/definitions/settingsPropertiesShadow" },
-				{ "$ref": "#/definitions/settingsPropertiesSpacing" },
-				{ "$ref": "#/definitions/settingsPropertiesTypography" },
-				{ "$ref": "#/definitions/settingsPropertiesCustom" }
+				{ "$ref": "#/definitions/settingsAppearanceToolsProperties" },
+				{ "$ref": "#/definitions/settingsBackgroundProperties" },
+				{ "$ref": "#/definitions/settingsBorderProperties" },
+				{ "$ref": "#/definitions/settingsColorProperties" },
+				{ "$ref": "#/definitions/settingsDimensionsProperties" },
+				{ "$ref": "#/definitions/settingsLayoutProperties" },
+				{ "$ref": "#/definitions/settingsLightboxProperties" },
+				{ "$ref": "#/definitions/settingsPositionProperties" },
+				{ "$ref": "#/definitions/settingsShadowProperties" },
+				{ "$ref": "#/definitions/settingsSpacingProperties" },
+				{ "$ref": "#/definitions/settingsTypographyProperties" },
+				{ "$ref": "#/definitions/settingsCustomProperties" }
 			]
 		},
 		"settingsPropertyNames": {
