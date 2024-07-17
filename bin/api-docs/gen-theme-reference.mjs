@@ -180,9 +180,10 @@ function generateDocs( themejson ) {
 				const description =
 					subschema.description?.split( '\n', 1 )[ 0 ] ?? '';
 				const types = generateTypes( subschema );
-				const defaultValue = subschema.default
-					? `\`${ JSON.stringify( subschema.default ) }\``
-					: '';
+				const defaultValue =
+					'default' in subschema
+						? `\`${ JSON.stringify( subschema.default ) }\``
+						: '';
 				autogen += `| ${ property } | ${ description } | ${ types } | ${ defaultValue } |\n`;
 			}
 			autogen += '\n';
