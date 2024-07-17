@@ -195,7 +195,7 @@ function generateDocs( themejson ) {
 	autogen += '## styles\n\n';
 	autogen += `${ themejson.properties.styles.description }\n\n`;
 	const styles = Object.entries(
-		themejson.definitions.stylesProperties.properties
+		themejson.properties.styles.allOf[ 0 ].properties
 	);
 	for ( const [ section, schema ] of styles ) {
 		autogen += `### ${ section }\n\n`;
