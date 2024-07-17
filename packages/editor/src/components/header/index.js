@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
@@ -92,11 +87,7 @@ function Header( {
 	// The edit-post-header classname is only kept for backward compatibilty
 	// as some plugins might be relying on its presence.
 	return (
-		<div
-			className={ clsx( 'editor-header edit-post-header', {
-				'has-center': hasCenter,
-			} ) }
-		>
+		<div className="editor-header edit-post-header">
 			{ hasBackButton && (
 				<motion.div
 					className="editor-header__back-button"

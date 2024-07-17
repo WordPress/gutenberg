@@ -4,7 +4,7 @@
 	display: grid;
 	grid-auto-flow: row;
 	grid-template: auto / $header-height minmax(0, max-content) minmax(min-content, 1fr) $header-height;
-	&.has-center {
+	&:has(> .editor-header__center) {
 		grid-template: auto / $header-height min-content 1fr min-content $header-height;
 		@include break-medium {
 			grid-template: auto / $header-height minmax(min-content, 1fr) 2fr minmax(min-content, 1fr) $header-height;
@@ -98,7 +98,7 @@
 
 .editor-header__settings {
 	grid-column: 3 / -1;
-	.has-center & {
+	.editor-header:has(> .editor-header__center) & {
 		grid-column: 4 / -1;
 	}
 	justify-self: end;
