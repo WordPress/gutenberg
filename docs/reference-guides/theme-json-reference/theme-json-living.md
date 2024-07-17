@@ -35,6 +35,8 @@ Enables root padding (the values from `styles.spacing.padding`) to be applied to
 
 Please note that when using this setting, `styles.spacing.padding` should always be set as an object with `top`, `right`, `bottom`, `left` values declared separately.
 
+**Note:** Top-level only property. Not available in blocks.
+
 ---
 
 ### appearanceTools
