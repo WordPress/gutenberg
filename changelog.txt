@@ -1,5 +1,22 @@
 == Changelog ==
 
+= 18.8.0-rc.4 =
+
+## Changelog
+
+### Bug Fixes
+
+#### Global Styles
+- Elements: Avoid specificity bump for top-level element-only selectors. ([63403](https://github.com/WordPress/gutenberg/pull/63403))
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@aaronrobertshaw
+
+
 = 18.8.0-rc.3 =
 
 
