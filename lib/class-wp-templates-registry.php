@@ -34,19 +34,13 @@ if ( ! class_exists( 'WP_Templates_Registry' ) ) {
 		 *
 		 * @since 6.7.0
 		 *
-		 * @param string|WP_Block_Template $template_name Template name including namespace, or alternatively
-		 *                                                a complete WP_Block_Template instance. In case a WP_Block_Template
-		 *                                                is provided, the $args parameter will be ignored.
-		 * @param array                    $args          Optional. Array of template arguments.
+		 * @param string $template_name Template name including namespace.
+		 * @param array  $args          Optional. Array of template arguments.
 		 * @return WP_Block_Template|false The registered template on success, or false on failure.
 		 */
 		public function register( $template_name, $args = array() ) {
 
 			$template = null;
-			if ( $template_name instanceof WP_Block_Template ) {
-				$template      = $template_name;
-				$template_name = $template->name;
-			}
 
 			if ( ! is_string( $template_name ) ) {
 				_doing_it_wrong(
