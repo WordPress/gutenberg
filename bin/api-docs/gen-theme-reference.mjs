@@ -157,7 +157,7 @@ function generateDocs( themejson ) {
 	/* --------------- *
 	 * Settings        *
 	 * --------------- */
-	autogen += '## Settings\n\n';
+	autogen += '## settings\n\n';
 	autogen += `${ themejson.properties.settings.description }\n\n`;
 	const settings = themejson.definitions.settingsProperties.allOf.flatMap(
 		( settingsProperties ) =>
@@ -194,7 +194,7 @@ function generateDocs( themejson ) {
 	/* --------------- *
 	 * Styles          *
 	 * --------------- */
-	autogen += '## Styles\n\n';
+	autogen += '## styles\n\n';
 	autogen += `${ themejson.properties.styles.description }\n\n`;
 	const styles = Object.entries(
 		themejson.definitions.stylesProperties.properties
