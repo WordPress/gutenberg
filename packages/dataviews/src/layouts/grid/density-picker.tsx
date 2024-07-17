@@ -5,12 +5,13 @@ import { RangeControl, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
 import { plus, lineSolid } from '@wordpress/icons';
+import { useEffect } from '@wordpress/element';
 
 const viewPortBreaks = {
-	xhuge: [ 2, 6 ],
-	huge: [ 2, 5 ],
-	xlarge: [ 1, 3 ],
-	mobile: [ 1, 2 ],
+	xhuge: { min: 2, max: 6, default: 4 },
+	huge: { min: 2, max: 5, default: 4 },
+	xlarge: { min: 2, max: 3, default: 3 },
+	mobile: { min: 2, max: 3, default: 2 },
 };
 
 function useViewPortBreakpoint() {
@@ -34,9 +35,12 @@ function useViewPortBreakpoint() {
 	return null;
 }
 
-function getRangeValue( density: number, breakValues: number[] ) {
-	const inverseDensity = breakValues[ 1 ] - density;
-	const max = breakValues[ 1 ] - breakValues[ 0 ];
+function getRangeValue(
+	density: number,
+	breakValues: { min: number; max: number; default: number }
+) {
+	const inverseDensity = breakValues.max - density;
+	const max = breakValues.max - breakValues.min;
 	return Math.round( ( inverseDensity * 100 ) / max );
 }
 
@@ -48,14 +52,17 @@ export default function DensityPicker( {
 	setDensity: ( density: number ) => void;
 } ) {
 	const viewPort = useViewPortBreakpoint();
+	useEffect( () => {
+		setDensity( 0 );
+	}, [ setDensity, viewPort ] );
 	if ( ! viewPort ) {
 		return null;
 	}
 	const breakValues = viewPortBreaks[ viewPort ];
-	const densityToUse = density || breakValues[ 1 ];
+	const densityToUse = density || breakValues.default;
 	const rangeValue = getRangeValue( densityToUse, breakValues );
 
-	const step = 100 / ( breakValues[ 1 ] - breakValues[ 0 ] + 1 );
+	const step = 100 / ( breakValues.max - breakValues.min + 1 );
 	return (
 		<>
 			<Button
@@ -70,6 +77,7 @@ export default function DensityPicker( {
 			/>
 			<RangeControl
 				__nextHasNoMarginBottom
+				showTooltip={ false }
 				className="dataviews-density-picker__range-control"
 				label={ __( 'Item size' ) }
 				hideLabelFromVision
@@ -82,9 +90,9 @@ export default function DensityPicker( {
 					setDensity(
 						Math.round(
 							( inverseValue *
-								( breakValues[ 1 ] - breakValues[ 0 ] ) ) /
+								( breakValues.max - breakValues.min ) ) /
 								100 +
-								breakValues[ 0 ]
+								breakValues.min
 						)
 					);
 				} }
