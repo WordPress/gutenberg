@@ -12,7 +12,7 @@ import { getTransformedMetadata } from '../utils/get-transformed-metadata';
 const transforms = {
 	from: [
 		{
-			type: 'enter',
+			type: 'input',
 			regExp: /^```$/,
 			transform: () => createBlock( 'core/code' ),
 		},
