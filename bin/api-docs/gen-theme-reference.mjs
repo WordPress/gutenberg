@@ -173,10 +173,12 @@ function generateDocs( themejson ) {
 		autogen += `### ${ section }\n\n`;
 		autogen += `${ schema.description }\n\n`;
 		if ( schema.properties ) {
-			autogen += '| Property  | Type   | Default |\n';
-			autogen += '| ---       | ---    | ---     |\n';
+			autogen += '| Property | Description | Type | Default |\n';
+			autogen += '| -------- | ----------- | ---- | ------- |\n';
 			const properties = Object.entries( schema.properties );
 			for ( const [ property, subschema ] of properties ) {
+				const description =
+					subschema.description?.split( '\n', 1 )[ 0 ] ?? '';
 				const types = generateTypes( subschema );
 				const defaultValue = subschema.default
 					? `\`${ JSON.stringify( subschema.default ) }\``
@@ -200,12 +202,14 @@ function generateDocs( themejson ) {
 		autogen += `### ${ section }\n\n`;
 		autogen += `${ schema.description }\n\n`;
 		if ( schema.properties ) {
-			autogen += '| Property  | Type   |\n';
-			autogen += '| ---       | ---    |\n';
+			autogen += '| Property | Description | Type |\n';
+			autogen += '| -------- | ----------- | ---- |\n';
 			const properties = Object.entries( schema.properties );
 			for ( const [ property, subschema ] of properties ) {
+				const description =
+					subschema.description?.split( '\n', 1 )[ 0 ] ?? '';
 				const types = generateTypes( subschema );
-				autogen += `| ${ property } | ${ types } |\n`;
+				autogen += `| ${ property } | ${ description } | ${ types } |\n`;
 			}
 			autogen += '\n';
 		}
