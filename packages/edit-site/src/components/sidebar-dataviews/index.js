@@ -18,7 +18,7 @@ const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 /**
  * Hook to switch to table layout when switching to the trash view.
- * When going out of the trash view, it switches back to the previous layout if 
+ * When going out of the trash view, it switches back to the previous layout if
  * there was an automatic switch to table layout.
  */
 function useSwitchToTableOnTrash() {
