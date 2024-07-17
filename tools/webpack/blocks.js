@@ -94,7 +94,7 @@ module.exports = [
 			new DependencyExtractionWebpackPlugin( { injectPolyfill: false } ),
 			new PhpFilePathsPlugin( {
 				context: './packages/block-library/src/',
-				props: [ 'render' ],
+				props: [ 'render', 'variations' ],
 			} ),
 			new CopyWebpackPlugin( {
 				patterns: [].concat(
