@@ -284,6 +284,7 @@ export default function PostList( { postType } ) {
 	const [ selection, setSelection ] = useState( [ postId ] );
 	const onChangeSelection = useCallback(
 		( items ) => {
+			setSelection( items );
 			const { params } = history.getLocationWithParams();
 			if (
 				( params.isCustom ?? 'false' ) === 'false' &&
@@ -611,7 +612,6 @@ export default function PostList( { postType } ) {
 				view={ view }
 				onChangeView={ setView }
 				selection={ selection }
-				setSelection={ setSelection }
 				onChangeSelection={ onChangeSelection }
 				getItemId={ getItemId }
 				defaultLayouts={ defaultLayouts }

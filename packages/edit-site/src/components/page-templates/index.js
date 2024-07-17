@@ -258,6 +258,7 @@ export default function PageTemplates() {
 	const history = useHistory();
 	const onChangeSelection = useCallback(
 		( items ) => {
+			setSelection( items );
 			if ( view?.type === LAYOUT_LIST ) {
 				history.push( {
 					...params,
@@ -374,7 +375,6 @@ export default function PageTemplates() {
 				onChangeView={ onChangeView }
 				onChangeSelection={ onChangeSelection }
 				selection={ selection }
-				setSelection={ setSelection }
 				defaultLayouts={ defaultLayouts }
 			/>
 		</Page>
