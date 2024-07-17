@@ -182,6 +182,8 @@ export default function useSelectionObserver() {
 					return;
 				}
 
+				setContentEditableWrapper( node, true );
+
 				const isSingularSelection = startClientId === endClientId;
 				if ( isSingularSelection ) {
 					if ( ! isMultiSelecting() ) {
