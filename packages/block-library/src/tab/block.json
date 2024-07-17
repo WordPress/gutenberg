@@ -4,14 +4,19 @@
 	"name": "core/tab",
 	"title": "Tab",
 	"category": "design",
-	"description": "Tab container for content (use within the Tabs block).",
+	"description": "Single tab within a tabs block.",
 	"textdomain": "default",
 	"__experimental": true,
-	"attributes": {},
+	"attributes": {
+		"title": {
+			"type": "string"
+		}
+	},
 	"parent": [ "core/tabs" ],
 	"supports": {
-		"align": false,
-		"html": false
+		"html": false,
+		"inserter": false,
+		"reusable": false
 	},
 	"editorScript": "file:./build/index.js",
 	"style": "file:./build/style.css"
