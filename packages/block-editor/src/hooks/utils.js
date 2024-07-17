@@ -135,7 +135,20 @@ export function shouldSkipSerialization(
 
 const pendingStyleOverrides = new WeakMap();
 
-export function useStyleOverride( {
+/**
+ * Override a block editor settings style. Leave the ID blank to create a new
+ * style.
+ *
+ * @param {Object} $0     Named parameters.
+ * @param {string} $0.id  Id of the style override, leave blank to create a new
+ *                        style.
+ * @param {string} $0.css CSS to apply.
+ */
+export function useStyleOverride( { id, css } ) {
+	return usePrivateStyleOverride( { id, css } );
+}
+
+export function usePrivateStyleOverride( {
 	id,
 	css,
 	assets,
