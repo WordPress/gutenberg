@@ -27,7 +27,7 @@ import type { SetSelection } from '../../private-types';
 
 interface GridItemProps< Item > {
 	selection: string[];
-	onSelectionChange: SetSelection;
+	onChangeSelection: SetSelection;
 	getItemId: ( item: Item ) => string;
 	item: Item;
 	actions: Action< Item >[];
@@ -40,7 +40,7 @@ interface GridItemProps< Item > {
 
 function GridItem< Item >( {
 	selection,
-	onSelectionChange,
+	onChangeSelection,
 	getItemId,
 	item,
 	actions,
@@ -53,6 +53,12 @@ function GridItem< Item >( {
 	const hasBulkAction = useHasAPossibleBulkAction( actions, item );
 	const id = getItemId( item );
 	const isSelected = selection.includes( id );
+	const renderedMediaField = mediaField?.render ? (
+		<mediaField.render item={ item } />
+	) : null;
+	const renderedPrimaryField = primaryField?.render ? (
+		<primaryField.render item={ item } />
+	) : null;
 	return (
 		<VStack
 			spacing={ 0 }
@@ -67,7 +73,7 @@ function GridItem< Item >( {
 					if ( ! hasBulkAction ) {
 						return;
 					}
-					onSelectionChange(
+					onChangeSelection(
 						selection.includes( id )
 							? selection.filter( ( itemId ) => id !== itemId )
 							: [ ...selection, id ]
@@ -76,7 +82,7 @@ function GridItem< Item >( {
 			} }
 		>
 			<div className="dataviews-view-grid__media">
-				{ mediaField?.render( { item } ) }
+				{ renderedMediaField }
 			</div>
 			<HStack
 				justify="space-between"
@@ -85,13 +91,13 @@ function GridItem< Item >( {
 				<SingleSelectionCheckbox
 					item={ item }
 					selection={ selection }
-					onSelectionChange={ onSelectionChange }
+					onChangeSelection={ onChangeSelection }
 					getItemId={ getItemId }
 					primaryField={ primaryField }
 					disabled={ ! hasBulkAction }
 				/>
 				<HStack className="dataviews-view-grid__primary-field">
-					{ primaryField?.render( { item } ) }
+					{ renderedPrimaryField }
 				</HStack>
 				<ItemActions item={ item } actions={ actions } isCompact />
 			</HStack>
@@ -104,32 +110,20 @@ function GridItem< Item >( {
 					justify="flex-start"
 				>
 					{ badgeFields.map( ( field ) => {
-						const renderedValue = field.render( {
-							item,
-						} );
-						if ( ! renderedValue ) {
-							return null;
-						}
 						return (
 							<FlexItem
 								key={ field.id }
 								className="dataviews-view-grid__field-value"
 							>
-								{ renderedValue }
+								<field.render item={ item } />
 							</FlexItem>
 						);
 					} ) }
 				</HStack>
 			) }
 			{ !! visibleFields?.length && (
-				<VStack className="dataviews-view-grid__fields" spacing={ 3 }>
+				<VStack className="dataviews-view-grid__fields" spacing={ 1 }>
 					{ visibleFields.map( ( field ) => {
-						const renderedValue = field.render( {
-							item,
-						} );
-						if ( ! renderedValue ) {
-							return null;
-						}
 						return (
 							<Flex
 								className={ clsx(
@@ -157,7 +151,7 @@ function GridItem< Item >( {
 										className="dataviews-view-grid__field-value"
 										style={ { maxHeight: 'none' } }
 									>
-										{ renderedValue }
+										<field.render item={ item } />
 									</FlexItem>
 								</>
 							</Flex>
@@ -175,7 +169,7 @@ export default function ViewGrid< Item >( {
 	fields,
 	getItemId,
 	isLoading,
-	onSelectionChange,
+	onChangeSelection,
 	selection,
 	view,
 }: ViewGridProps< Item > ) {
@@ -223,7 +217,7 @@ export default function ViewGrid< Item >( {
 							<GridItem
 								key={ getItemId( item ) }
 								selection={ selection }
-								onSelectionChange={ onSelectionChange }
+								onChangeSelection={ onChangeSelection }
 								getItemId={ getItemId }
 								item={ item }
 								actions={ actions }

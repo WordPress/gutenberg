@@ -3,7 +3,7 @@
  */
 import {
 	store as blockEditorStore,
-	BlockControls,
+	__unstableBlockToolbarLastItem as BlockToolbarLastItem,
 } from '@wordpress/block-editor';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { useRegistry, useSelect } from '@wordpress/data';
@@ -79,12 +79,12 @@ export default function ResetOverridesControl( props ) {
 	}
 
 	return (
-		<BlockControls group="other">
+		<BlockToolbarLastItem>
 			<ToolbarGroup>
 				<ToolbarButton onClick={ onClick } disabled={ ! isOverriden }>
 					{ __( 'Reset' ) }
 				</ToolbarButton>
 			</ToolbarGroup>
-		</BlockControls>
+		</BlockToolbarLastItem>
 	);
 }

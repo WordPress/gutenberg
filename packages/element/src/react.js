@@ -170,7 +170,7 @@ export { useDebugValue };
 export { useDeferredValue };
 
 /**
- * @see https://reactjs.org/docs/hooks-reference.html#useeffect
+ * @see https://react.dev/reference/react/useEffect
  */
 export { useEffect };
 

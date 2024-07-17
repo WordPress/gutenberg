@@ -18,7 +18,10 @@ import {
 } from '@wordpress/block-editor';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import {
+	privateApis as editorPrivateApis,
+	EditorProvider,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -42,9 +45,7 @@ import { useEditPostAction } from '../dataviews-actions';
 
 const { usePostActions } = unlock( editorPrivateApis );
 
-const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
-	blockEditorPrivateApis
-);
+const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
@@ -176,7 +177,7 @@ function Preview( { item, viewType } ) {
 	// the block editor settings are needed in context where we don't have the block editor.
 	// Explore how we can solve this in a better way.
 	return (
-		<ExperimentalBlockEditorProvider settings={ settings }>
+		<EditorProvider post={ item } settings={ settings }>
 			<div
 				className={ `page-templates-preview-field is-viewtype-${ viewType }` }
 				style={ { backgroundColor } }
@@ -202,7 +203,7 @@ function Preview( { item, viewType } ) {
 					</button>
 				) }
 			</div>
-		</ExperimentalBlockEditorProvider>
+		</EditorProvider>
 	);
 }
 
@@ -255,7 +256,7 @@ export default function PageTemplates() {
 		}
 	);
 	const history = useHistory();
-	const onSelectionChange = useCallback(
+	const onChangeSelection = useCallback(
 		( items ) => {
 			if ( view?.type === LAYOUT_LIST ) {
 				history.push( {
@@ -371,7 +372,7 @@ export default function PageTemplates() {
 				isLoading={ isLoadingData }
 				view={ view }
 				onChangeView={ onChangeView }
-				onSelectionChange={ onSelectionChange }
+				onChangeSelection={ onChangeSelection }
 				selection={ selection }
 				setSelection={ setSelection }
 				defaultLayouts={ defaultLayouts }

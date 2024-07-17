@@ -282,7 +282,7 @@ export default function PostList( { postType } ) {
 		params: { postId },
 	} = useLocation();
 	const [ selection, setSelection ] = useState( [ postId ] );
-	const onSelectionChange = useCallback(
+	const onChangeSelection = useCallback(
 		( items ) => {
 			const { params } = history.getLocationWithParams();
 			if (
@@ -372,15 +372,14 @@ export default function PostList( { postType } ) {
 			const { getEntityRecord, getPostType, canUser } =
 				select( coreStore );
 			const siteSettings = getEntityRecord( 'root', 'site' );
-			const postTypeObject = getPostType( postType );
 			return {
 				frontPageId: siteSettings?.page_on_front,
 				postsPageId: siteSettings?.page_for_posts,
 				labels: getPostType( postType )?.labels,
-				canCreateRecord: canUser(
-					'create',
-					postTypeObject?.rest_base || 'posts'
-				),
+				canCreateRecord: canUser( 'create', {
+					kind: 'postType',
+					name: postType,
+				} ),
 			};
 		},
 		[ postType ]
@@ -613,7 +612,7 @@ export default function PostList( { postType } ) {
 				onChangeView={ setView }
 				selection={ selection }
 				setSelection={ setSelection }
-				onSelectionChange={ onSelectionChange }
+				onChangeSelection={ onChangeSelection }
 				getItemId={ getItemId }
 				defaultLayouts={ defaultLayouts }
 			/>

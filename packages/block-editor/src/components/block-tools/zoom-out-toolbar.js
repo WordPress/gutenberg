@@ -129,7 +129,7 @@ export default function ZoomOutToolbar( { clientId, rootClientId } ) {
 				<ToolbarButton
 					className="zoom-out-toolbar-button"
 					icon={ trash }
-					label="Delete"
+					label={ __( 'Delete' ) }
 					onClick={ () => {
 						removeBlock( clientId );
 					} }

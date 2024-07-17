@@ -281,16 +281,10 @@ export const getEntityRecords =
 						.filter( ( record ) => record?.[ key ] )
 						.map( ( record ) => [ kind, name, record[ key ] ] );
 
-					dispatch( {
-						type: 'START_RESOLUTIONS',
-						selectorName: 'getEntityRecord',
-						args: resolutionsArgs,
-					} );
-					dispatch( {
-						type: 'FINISH_RESOLUTIONS',
-						selectorName: 'getEntityRecord',
-						args: resolutionsArgs,
-					} );
+					dispatch.finishResolutions(
+						'getEntityRecord',
+						resolutionsArgs
+					);
 				}
 
 				dispatch.__unstableReleaseStoreLock( lock );
@@ -425,8 +419,7 @@ export const canUser =
 		// Optional chaining operator is used here because the API requests don't
 		// return the expected result in the native version. Instead, API requests
 		// only return the result, without including response properties like the headers.
-		const allowHeader = response.headers?.get( 'allow' );
-		const allowedMethods = allowHeader?.allow || allowHeader || '';
+		const allowedMethods = response.headers?.get( 'allow' ) || '';
 
 		const permissions = {};
 		const methods = {
@@ -450,6 +443,15 @@ export const canUser =
 					.join( '/' );
 
 				dispatch.receiveUserPermission( key, permissions[ action ] );
+
+				// Mark related action resolutions as finished.
+				if ( action !== requestedAction ) {
+					dispatch.finishResolution( 'canUser', [
+						action,
+						resource,
+						id,
+					] );
+				}
 			}
 		} );
 	};
@@ -847,16 +849,8 @@ export const getRevisions =
 						record[ key ],
 					] );
 
-				dispatch( {
-					type: 'START_RESOLUTIONS',
-					selectorName: 'getRevision',
-					args: resolutionsArgs,
-				} );
-				dispatch( {
-					type: 'FINISH_RESOLUTIONS',
-					selectorName: 'getRevision',
-					args: resolutionsArgs,
-				} );
+				dispatch.startResolutions( 'getRevision', resolutionsArgs );
+				dispatch.finishResolutions( 'getRevision', resolutionsArgs );
 			}
 		}
 	};

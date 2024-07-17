@@ -29,7 +29,7 @@ export type FontSizePickerProps = {
 	/**
 	 * Available units for custom font size selection.
 	 *
-	 * @default `[ 'px', 'em', 'rem' ]`
+	 * @default [ 'px', 'em', 'rem', 'vw', 'vh' ]
 	 */
 	units?: string[];
 	/**
