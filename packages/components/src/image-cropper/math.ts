@@ -7,6 +7,14 @@ import memize from 'memize';
  */
 import type { Position, Size } from './types';
 
+const DEGREE_TO_RADIAN = Math.PI / 180;
+
+/**
+ * Rotate a point around a center point by a given degree.
+ * @param point  The point to rotate.
+ * @param center The center point to rotate around.
+ * @param radian The radian to rotate by.
+ */
 export function rotatePoint(
 	point: Position,
 	center: Position,
@@ -22,10 +30,18 @@ export function rotatePoint(
 	};
 }
 
+/**
+ * Convert degree to radian.
+ * @param degree The degree to convert.
+ */
 export function degreeToRadian( degree: number ): number {
-	return ( degree * Math.PI ) / 180;
+	return degree * DEGREE_TO_RADIAN;
 }
 
+/**
+ * Get the maximum (rotated) pair of (x,y) vector for each corner of a rotated rectangle (window)
+ * that is the furthest from a un-rotated rectangle.
+ */
 export const getFurthestVector = memize(
 	(
 		width: number,
@@ -52,29 +68,29 @@ export const getFurthestVector = memize(
 		for ( const point of windowVertices ) {
 			const rotatedPoint = rotatePoint( point, position, -radian );
 
-			if ( rotatedPoint.x < minX ) {
-				furthestX =
-					Math.abs( rotatedPoint.x - minX ) > Math.abs( furthestX )
-						? rotatedPoint.x - minX
-						: furthestX;
+			if (
+				rotatedPoint.x < minX &&
+				Math.abs( rotatedPoint.x - minX ) > Math.abs( furthestX )
+			) {
+				furthestX = rotatedPoint.x - minX;
 			}
-			if ( rotatedPoint.x > maxX ) {
-				furthestX =
-					Math.abs( rotatedPoint.x - maxX ) > Math.abs( furthestX )
-						? rotatedPoint.x - maxX
-						: furthestX;
+			if (
+				rotatedPoint.x > maxX &&
+				Math.abs( rotatedPoint.x - maxX ) > Math.abs( furthestX )
+			) {
+				furthestX = rotatedPoint.x - maxX;
 			}
-			if ( rotatedPoint.y < minY ) {
-				furthestY =
-					Math.abs( rotatedPoint.y - minY ) > Math.abs( furthestY )
-						? rotatedPoint.y - minY
-						: furthestY;
+			if (
+				rotatedPoint.y < minY &&
+				Math.abs( rotatedPoint.y - minY ) > Math.abs( furthestY )
+			) {
+				furthestY = rotatedPoint.y - minY;
 			}
-			if ( rotatedPoint.y > maxY ) {
-				furthestY =
-					Math.abs( rotatedPoint.y - maxY ) > Math.abs( furthestY )
-						? rotatedPoint.y - maxY
-						: furthestY;
+			if (
+				rotatedPoint.y > maxY &&
+				Math.abs( rotatedPoint.y - maxY ) > Math.abs( furthestY )
+			) {
+				furthestY = rotatedPoint.y - maxY;
 			}
 		}
 
