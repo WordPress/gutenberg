@@ -31,7 +31,7 @@ import type {
 	ViewBaseProps,
 	SupportedLayouts,
 } from './types';
-import type { SetSelection, SelectionOrUpdater } from './private-types';
+import type { SelectionOrUpdater } from './private-types';
 
 type ItemWithId = { id: string };
 
@@ -50,15 +50,12 @@ type DataViewsProps< Item > = {
 	};
 	defaultLayouts: SupportedLayouts;
 	selection?: string[];
-	setSelection?: SetSelection;
-	onChangeSelection?: ( items: Item[] ) => void;
+	onChangeSelection?: ( items: string[] ) => void;
 } & ( Item extends ItemWithId
 	? { getItemId?: ( item: Item ) => string }
 	: { getItemId: ( item: Item ) => string } );
 
 const defaultGetItemId = ( item: ItemWithId ) => item.id;
-
-const defaultOnChangeSelection = () => {};
 
 export default function DataViews< Item >( {
 	view,
@@ -73,25 +70,23 @@ export default function DataViews< Item >( {
 	paginationInfo,
 	defaultLayouts,
 	selection: selectionProperty,
-	setSelection: setSelectionProperty,
-	onChangeSelection = defaultOnChangeSelection,
+	onChangeSelection,
 }: DataViewsProps< Item > ) {
 	const [ selectionState, setSelectionState ] = useState< string[] >( [] );
 	const isUncontrolled =
-		selectionProperty === undefined || setSelectionProperty === undefined;
+		selectionProperty === undefined || onChangeSelection === undefined;
 	const selection = isUncontrolled ? selectionState : selectionProperty;
-	const setSelection = isUncontrolled
-		? setSelectionState
-		: setSelectionProperty;
 	const [ openedFilter, setOpenedFilter ] = useState< string | null >( null );
 
 	function setSelectionWithChange( value: SelectionOrUpdater ) {
 		const newValue =
 			typeof value === 'function' ? value( selection ) : value;
-		onChangeSelection(
-			data.filter( ( item ) => newValue.includes( getItemId( item ) ) )
-		);
-		return setSelection( value );
+		if ( ! isUncontrolled ) {
+			setSelectionState( newValue );
+		}
+		if ( onChangeSelection ) {
+			onChangeSelection( newValue );
+		}
 	}
 
 	const ViewComponent = VIEW_LAYOUTS.find( ( v ) => v.type === view.type )
