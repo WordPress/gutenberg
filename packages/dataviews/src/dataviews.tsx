@@ -6,17 +6,19 @@ import type { ComponentType } from 'react';
 /**
  * WordPress dependencies
  */
-import { __experimentalHStack as HStack, Button } from '@wordpress/components';
+import { __experimentalHStack as HStack } from '@wordpress/components';
 import { useMemo, useState } from '@wordpress/element';
-import { funnel } from '@wordpress/icons';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import Pagination from './pagination';
 import ViewActions from './view-actions';
-import Filters from './filters';
+import {
+	default as Filters,
+	useFilters,
+	FilterVisibilityToggle,
+} from './filters';
 import Search from './search';
 import { LAYOUT_TABLE, LAYOUT_GRID } from './constants';
 import { VIEW_LAYOUTS } from './layouts';
@@ -106,6 +108,8 @@ export default function DataViews< Item >( {
 			data.some( ( item ) => getItemId( item ) === id )
 		);
 	}, [ selection, data, getItemId ] );
+
+	const filters = useFilters( _fields, view );
 	return (
 		<div className="dataviews-wrapper">
 			<HStack
@@ -143,21 +147,14 @@ export default function DataViews< Item >( {
 					defaultLayouts={ defaultLayouts }
 				/>
 				<div className="dataviews-filters-toggle__container">
-					<Button
-						size="compact"
-						icon={ funnel }
-						label={ __( 'Toggle filter display' ) }
-						onClick={ () =>
-							setIsShowingFilter( ! isShowingFilter )
-						}
-						isPressed={ isShowingFilter }
-						aria-expanded={ isShowingFilter }
+					<FilterVisibilityToggle
+						filters={ filters }
+						view={ view }
+						onChangeView={ onChangeView }
+						setOpenedFilter={ setOpenedFilter }
+						setIsShowingFilter={ setIsShowingFilter }
+						isShowingFilter={ isShowingFilter }
 					/>
-					{ !! view.filters?.length && view.filters?.length > 0 && (
-						<span className="dataviews-filters-toggle__count">
-							{ view.filters.length }
-						</span>
-					) }
 				</div>
 			</HStack>
 			{ isShowingFilter && (
