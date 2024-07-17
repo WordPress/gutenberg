@@ -403,7 +403,10 @@ export default function LogoEdit( {
 	} = useSelect( ( select ) => {
 		const { canUser, getEntityRecord, getEditedEntityRecord } =
 			select( coreStore );
-		const _canUserEdit = canUser( 'update', 'settings' );
+		const _canUserEdit = canUser( 'update', {
+			kind: 'root',
+			name: 'site',
+		} );
 		const siteSettings = _canUserEdit
 			? getEditedEntityRecord( 'root', 'site' )
 			: undefined;

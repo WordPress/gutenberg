@@ -2,8 +2,13 @@
 
 ## Unreleased
 
+### Deprecations
+
+-   `FormTokenField`: Deprecate bottom margin. Add a `__nextHasNoMarginBottom` prop to start opting into the margin-free styles that will become the default in a future version, currently scheduled to be WordPress 7.0 ([#63491](https://github.com/WordPress/gutenberg/pull/63491)).
+
 ### Bug Fixes
 
+-   `ComboboxControl`: Fix ComboboxControl reset button when using the keyboard. ([#63410](https://github.com/WordPress/gutenberg/pull/63410))
 -   `Button`: Never apply `aria-disabled` to anchor ([#63376](https://github.com/WordPress/gutenberg/pull/63376)).
 
 ### Internal
@@ -12,9 +17,12 @@
 -   `CustomSelectControlV2`: animate select popover appearance. ([#63343](https://github.com/WordPress/gutenberg/pull/63343))
 -   `CustomSelectControlV2`: do not flip popover if legacy adapter. ([#63357](https://github.com/WordPress/gutenberg/pull/63357)).
 -   `DropdownMenuV2`: invert animation direction. ([#63443](https://github.com/WordPress/gutenberg/pull/63443)).
+-   `Tabs`: Vertical Tabs should be 40px min height. ([#63446](https://github.com/WordPress/gutenberg/pull/63446)).
 
 ### Enhancements
 
+-   `Button`: Rename Button describedBy prop to description and deprecate old name. ([#63486](https://github.com/WordPress/gutenberg/pull/63486))
+-   `ToggleGroupControl`: support disabled options ([#63450](https://github.com/WordPress/gutenberg/pull/63450)).
 -   `CustomSelectControl`: Stabilize `__experimentalShowSelectedHint` and `options[]. __experimentalHint` props ([#63248](https://github.com/WordPress/gutenberg/pull/63248)).
 
 ## 28.3.0 (2024-07-10)
