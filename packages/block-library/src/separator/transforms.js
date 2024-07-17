@@ -6,7 +6,7 @@ import { createBlock } from '@wordpress/blocks';
 const transforms = {
 	from: [
 		{
-			type: 'enter',
+			type: 'input',
 			regExp: /^-{3,}$/,
 			transform: () => createBlock( 'core/separator' ),
 		},
