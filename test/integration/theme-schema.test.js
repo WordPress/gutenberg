@@ -20,7 +20,7 @@ describe( 'theme.json schema', () => {
 		allowMatchingProperties: true,
 	} );
 
-	it( 'strictly adheres to the draft-04 meta schema', () => {
+	it( 'strictly adheres to the draft-07 meta schema', () => {
 		// Use ajv.compile instead of ajv.validateSchema to validate the schema
 		// because validateSchema only checks syntax, whereas, compile checks
 		// if the schema is semantically correct with strict mode.
