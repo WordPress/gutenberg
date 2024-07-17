@@ -60,7 +60,7 @@ if ( ! class_exists( 'WP_Templates_Registry' ) ) {
 				return new WP_Error( 'template_name_no_uppercase', __( 'Template names must not contain uppercase characters.', 'gutenberg' ) );
 			}
 
-			if ( ! isset( $args['plugin' ] ) ) {
+			if ( ! isset( $args['plugin'] ) ) {
 				_doing_it_wrong(
 					__METHOD__,
 					__( 'Registered templates must have a plugin property.', 'gutenberg' ),
