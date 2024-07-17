@@ -20,10 +20,6 @@ const labelStyles = css`
 	font-weight: 500;
 `;
 
-const focusBoxShadow = css`
-	box-shadow: inset ${ CONFIG.controlBoxShadowFocus };
-`;
-
 export const borderControl = css`
 	border: 0;
 	padding: 0;
@@ -68,16 +64,15 @@ export const borderControlDropdown = css`
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		margin-left: 4px;
+		border-radius: ${ CONFIG.radiusAtom };
 		${ rtl(
 			{ borderRadius: `2px 0 0 2px` },
 			{ borderRadius: `0 2px 2px 0` }
 		)() }
-		border: ${ CONFIG.borderWidth } solid ${ COLORS.ui.border };
 
 		&:focus,
 		&:hover:not( :disabled ) {
-			${ focusBoxShadow }
-			border-color: ${ COLORS.ui.borderFocus };
 			z-index: 1;
 			position: relative;
 		}

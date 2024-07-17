@@ -89,6 +89,7 @@ const unitSelectSizes = ( { selectSize = 'default' }: SelectProps ) => {
 		small: css`
 			height: 100%;
 			border: 1px solid transparent;
+			border-radius: ${ CONFIG.radiusAtom };
 			transition:
 				box-shadow 0.1s linear,
 				border 0.1s linear;
@@ -112,6 +113,7 @@ const unitSelectSizes = ( { selectSize = 'default' }: SelectProps ) => {
 			display: flex;
 			justify-content: center;
 			align-items: center;
+			border-radius: ${ CONFIG.radiusAtom };
 
 			&:where( :not( :disabled ) ):hover {
 				box-shadow: inset 0 0 0
