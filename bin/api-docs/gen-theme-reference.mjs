@@ -255,8 +255,8 @@ function generateDocs( themeJson ) {
 	 * patterns        *
 	 * --------------- */
 	md += '## patterns\n\n';
-	md += `Type: ${ generateTypes( themeJson.properties.patterns ) }.\n\n`;
-	md += themeJson.properties.patterns.description + '\n';
+	md += themeJson.properties.patterns.description + '\n\n';
+	md += `Type: ${ generateTypes( themeJson.properties.patterns ) }.\n`;
 
 	return md;
 }
