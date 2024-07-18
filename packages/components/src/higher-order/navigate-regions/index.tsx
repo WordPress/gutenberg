@@ -49,7 +49,7 @@ export function useNavigateRegions( shortcuts: Shortcuts = defaultShortcuts ) {
 	function focusRegion( offset: number ) {
 		const regions = Array.from(
 			ref.current?.querySelectorAll< HTMLElement >(
-				'[role="region"][tabindex="-1"]'
+				'[role="region"][tabindex="-1"]:not(:empty)'
 			) ?? []
 		);
 		if ( ! regions.length ) {
