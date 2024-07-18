@@ -34,7 +34,7 @@ function ZoomOutModeInserterButton( {
 			getSettings,
 			getSelectionStart,
 			getSelectedBlockClientId,
-			getHoveredBlock,
+			getHoveredBlockClientId,
 		} = select( blockEditorStore );
 		const { sectionRootClientId: root } = unlock( getSettings() );
 
