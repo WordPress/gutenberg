@@ -66,7 +66,8 @@ export default function Shuffle( { clientId, as = Container } ) {
 			);
 		} );
 	}, [ categories, patterns ] );
-	if ( sameCategoryPatternsWithSingleWrapper.length === 0 ) {
+
+	if ( sameCategoryPatternsWithSingleWrapper.length < 2 ) {
 		return null;
 	}
 
@@ -85,6 +86,7 @@ export default function Shuffle( { clientId, as = Container } ) {
 		<ComponentToUse
 			label={ __( 'Shuffle' ) }
 			icon={ shuffle }
+			className="block-editor-block-toolbar-shuffle"
 			onClick={ () => {
 				const nextPattern = getNextPattern();
 				nextPattern.blocks[ 0 ].attributes = {

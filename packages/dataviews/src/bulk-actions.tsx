@@ -47,7 +47,7 @@ interface BulkActionsProps< Item > {
 	data: Item[];
 	actions: Action< Item >[];
 	selection: string[];
-	onSelectionChange: SetSelection;
+	onChangeSelection: SetSelection;
 	getItemId: ( item: Item ) => string;
 }
 
@@ -133,7 +133,6 @@ function BulkActionItem< Item >( {
 	return (
 		<DropdownMenuItem
 			key={ action.id }
-			disabled={ eligibleItems.length === 0 }
 			hideOnClick={ ! shouldShowModal }
 			onClick={ async () => {
 				if ( shouldShowModal ) {
@@ -142,9 +141,7 @@ function BulkActionItem< Item >( {
 					action.callback( eligibleItems, { registry } );
 				}
 			} }
-			suffix={
-				eligibleItems.length > 0 ? eligibleItems.length : undefined
-			}
+			suffix={ eligibleItems.length }
 		>
 			{ action.label }
 		</DropdownMenuItem>
@@ -156,10 +153,20 @@ function ActionsMenuGroup< Item >( {
 	selectedItems,
 	setActionWithModal,
 }: ActionsMenuGroupProps< Item > ) {
+	const elligibleActions = useMemo( () => {
+		return actions.filter( ( action ) => {
+			return selectedItems.some(
+				( item ) => ! action.isEligible || action.isEligible( item )
+			);
+		} );
+	}, [ actions, selectedItems ] );
+	if ( ! elligibleActions.length ) {
+		return null;
+	}
 	return (
 		<>
 			<DropdownMenuGroup>
-				{ actions.map( ( action ) => (
+				{ elligibleActions.map( ( action ) => (
 					<BulkActionItem
 						key={ action.id }
 						action={ action }
@@ -177,7 +184,7 @@ export default function BulkActions< Item >( {
 	data,
 	actions,
 	selection,
-	onSelectionChange,
+	onChangeSelection,
 	getItemId,
 }: BulkActionsProps< Item > ) {
 	const bulkActions = useMemo(
@@ -249,7 +256,7 @@ export default function BulkActions< Item >( {
 						disabled={ areAllSelected }
 						hideOnClick={ false }
 						onClick={ () => {
-							onSelectionChange(
+							onChangeSelection(
 								selectableItems.map( ( item ) =>
 									getItemId( item )
 								)
@@ -263,7 +270,7 @@ export default function BulkActions< Item >( {
 						disabled={ selection.length === 0 }
 						hideOnClick={ false }
 						onClick={ () => {
-							onSelectionChange( [] );
+							onChangeSelection( [] );
 						} }
 					>
 						{ __( 'Deselect' ) }

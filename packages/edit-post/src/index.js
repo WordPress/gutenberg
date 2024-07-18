@@ -25,8 +25,11 @@ import {
 import Layout from './components/layout';
 import { unlock } from './lock-unlock';
 
-const { BackButton: __experimentalMainDashboardButton } =
-	unlock( editorPrivateApis );
+const {
+	BackButton: __experimentalMainDashboardButton,
+	registerDefaultActions,
+	registerCoreBlockBindingsSources,
+} = unlock( editorPrivateApis );
 
 /**
  * Initializes and returns an instance of Editor.
@@ -84,6 +87,7 @@ export function initializeEditor(
 	}
 
 	registerCoreBlocks();
+	registerCoreBlockBindingsSources();
 	registerLegacyWidgetBlock( { inserter: false } );
 	registerWidgetGroupBlock( { inserter: false } );
 	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
@@ -91,6 +95,7 @@ export function initializeEditor(
 			enableFSEBlocks: settings.__unstableEnableFullSiteEditingBlocks,
 		} );
 	}
+	registerDefaultActions();
 
 	// Show a console log warning if the browser is not in Standards rendering mode.
 	const documentMode =

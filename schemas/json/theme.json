@@ -14,7 +14,8 @@
 					"description": "A reference to another property value. e.g. `styles.color.text`",
 					"type": "string"
 				}
-			}
+			},
+			"additionalProperties": false
 		},
 		"settingsPropertiesAppearanceTools": {
 			"type": "object",
@@ -792,7 +793,6 @@
 			"type": "object",
 			"properties": {
 				"custom": {
-					"description": "Generate custom CSS custom properties of the form `--wp--custom--{key}--{nested-key}: {value};`. `camelCased` keys are transformed to `kebab-case` as to follow the CSS property naming schema. Keys at different depth levels are separated by `--`, so keys should not include `--` in the name.",
 					"$ref": "#/definitions/settingsCustomAdditionalProperties"
 				}
 			}
@@ -839,6 +839,7 @@
 			]
 		},
 		"settingsBlocksPropertiesComplete": {
+			"description": "Settings defined on a per-block basis.",
 			"type": "object",
 			"properties": {
 				"core/archives": {
@@ -1144,6 +1145,7 @@
 			"additionalProperties": false
 		},
 		"settingsCustomAdditionalProperties": {
+			"description": "Generate custom CSS custom properties of the form `--wp--custom--{key}--{nested-key}: {value};`. `camelCased` keys are transformed to `kebab-case` as to follow the CSS property naming schema. Keys at different depth levels are separated by `--`, so keys should not include `--` in the name.",
 			"type": "object",
 			"additionalProperties": {
 				"oneOf": [
@@ -1162,6 +1164,79 @@
 		"stylesProperties": {
 			"type": "object",
 			"properties": {
+				"background": {
+					"description": "Background styles.",
+					"type": "object",
+					"properties": {
+						"backgroundImage": {
+							"description": "Sets the `background-image` CSS property.",
+							"oneOf": [
+								{
+									"description": "A valid CSS value for the background-image CSS property.",
+									"type": "string"
+								},
+								{
+									"type": "object",
+									"properties": {
+										"url": {
+											"description": "A URL to an image file, or a path to a file relative to the theme root directory, and prefixed with `file:`, e.g., 'file:./path/to/file.png'.",
+											"type": "string"
+										}
+									},
+									"additionalProperties": false
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						},
+						"backgroundPosition": {
+							"description": "Sets the `background-position` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						},
+						"backgroundRepeat": {
+							"description": "Sets the `background-repeat` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						},
+						"backgroundSize": {
+							"description": "Sets the `background-size` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						},
+						"backgroundAttachment": {
+							"description": "Sets the `background-attachment` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						}
+					},
+					"additionalProperties": false
+				},
 				"border": {
 					"description": "Border styles.",
 					"type": "object",
@@ -1814,6 +1889,7 @@
 				},
 				{
 					"properties": {
+						"background": {},
 						"border": {},
 						"color": {},
 						"dimensions": {},
@@ -1829,6 +1905,7 @@
 			]
 		},
 		"stylesElementsPropertiesComplete": {
+			"description": "Styles defined on a per-element basis using the element's selector.",
 			"type": "object",
 			"properties": {
 				"button": {
@@ -1840,7 +1917,9 @@
 						{
 							"properties": {
 								"border": {},
+								"background": {},
 								"color": {},
+								"dimensions": {},
 								"filter": {},
 								"shadow": {},
 								"outline": {},
@@ -1878,10 +1957,16 @@
 						},
 						{
 							"properties": {
+								"background": {},
 								"border": {},
 								"color": {},
+								"dimensions": {},
 								"spacing": {},
 								"typography": {},
+								"filter": {},
+								"shadow": {},
+								"outline": {},
+								"css": {},
 								":hover": {
 									"$ref": "#/definitions/stylesPropertiesComplete"
 								},
@@ -1936,6 +2021,7 @@
 			"additionalProperties": false
 		},
 		"stylesBlocksPropertiesComplete": {
+			"description": "Styles defined on a per-block basis using the block's selector.",
 			"type": "object",
 			"properties": {
 				"core/archives": {
@@ -2248,6 +2334,7 @@
 				},
 				{
 					"properties": {
+						"background": {},
 						"border": {},
 						"color": {},
 						"dimensions": {},
@@ -2284,6 +2371,7 @@
 				},
 				{
 					"properties": {
+						"background": {},
 						"border": {},
 						"color": {},
 						"dimensions": {},
@@ -2320,6 +2408,7 @@
 				},
 				{
 					"properties": {
+						"background": {},
 						"border": {},
 						"color": {},
 						"dimensions": {},
@@ -2653,6 +2742,7 @@
 				},
 				{
 					"properties": {
+						"background": {},
 						"border": {},
 						"color": {},
 						"dimensions": {},
@@ -2726,7 +2816,6 @@
 						"dimensions": {},
 						"custom": {},
 						"blocks": {
-							"description": "Settings defined on a per-block basis.",
 							"$ref": "#/definitions/settingsBlocksPropertiesComplete"
 						}
 					},
@@ -2743,8 +2832,10 @@
 				},
 				{
 					"properties": {
+						"background": {},
 						"border": {},
 						"color": {},
+						"dimensions": {},
 						"spacing": {},
 						"typography": {},
 						"filter": {},
@@ -2752,74 +2843,10 @@
 						"outline": {},
 						"css": {},
 						"elements": {
-							"description": "Styles defined on a per-element basis using the element's selector.",
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"
 						},
 						"blocks": {
-							"description": "Styles defined on a per-block basis using the block's selector.",
 							"$ref": "#/definitions/stylesBlocksPropertiesComplete"
-						},
-						"background": {
-							"description": "Background styles.",
-							"type": "object",
-							"properties": {
-								"backgroundImage": {
-									"description": "Sets the `background-image` CSS property.",
-									"oneOf": [
-										{
-											"description": "A valid CSS value for the background-image property, or a path to a file relative to the theme root directory, and prefixed with `file:`, e.g., 'file:./path/to/file.png'.",
-											"type": "string"
-										},
-										{
-											"type": "object",
-											"properties": {
-												"url": {
-													"description": "A URL to an image file.",
-													"type": "string"
-												}
-											},
-											"additionalProperties": false
-										},
-										{
-											"$ref": "#/definitions/refComplete"
-										}
-									]
-								},
-								"backgroundPosition": {
-									"description": "Sets the `background-position` CSS property.",
-									"oneOf": [
-										{
-											"type": "string"
-										},
-										{
-											"$ref": "#/definitions/refComplete"
-										}
-									]
-								},
-								"backgroundRepeat": {
-									"description": "Sets the `background-repeat` CSS property.",
-									"oneOf": [
-										{
-											"type": "string"
-										},
-										{
-											"$ref": "#/definitions/refComplete"
-										}
-									]
-								},
-								"backgroundSize": {
-									"description": "Sets the `background-size` CSS property.",
-									"oneOf": [
-										{
-											"type": "string"
-										},
-										{
-											"$ref": "#/definitions/refComplete"
-										}
-									]
-								}
-							},
-							"additionalProperties": false
 						},
 						"variations": {
 							"$ref": "#/definitions/stylesVariationsProperties"

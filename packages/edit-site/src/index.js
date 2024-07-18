@@ -10,7 +10,10 @@ import {
 import { dispatch } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { createRoot, StrictMode } from '@wordpress/element';
-import { store as editorStore } from '@wordpress/editor';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	registerLegacyWidgetBlock,
@@ -22,7 +25,11 @@ import {
  */
 import './hooks';
 import { store as editSiteStore } from './store';
+import { unlock } from './lock-unlock';
 import App from './components/app';
+
+const { registerDefaultActions, registerCoreBlockBindingsSources } =
+	unlock( editorPrivateApis );
 
 /**
  * Initializes the site editor screen.
@@ -39,6 +46,7 @@ export function initializeEditor( id, settings ) {
 		( { name } ) => name !== 'core/freeform'
 	);
 	registerCoreBlocks( coreBlocks );
+	registerCoreBlockBindingsSources();
 	dispatch( blocksStore ).setFreeformFallbackBlockName( 'core/html' );
 	registerLegacyWidgetBlock( { inserter: false } );
 	registerWidgetGroupBlock( { inserter: false } );
@@ -47,6 +55,7 @@ export function initializeEditor( id, settings ) {
 			enableFSEBlocks: true,
 		} );
 	}
+	registerDefaultActions();
 
 	// We dispatch actions and update the store synchronously before rendering
 	// so that we won't trigger unnecessary re-renders with useEffect.

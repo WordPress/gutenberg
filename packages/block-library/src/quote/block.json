@@ -36,6 +36,18 @@
 				"backgroundImage": true
 			}
 		},
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true,
+			"__experimentalDefaultControls": {
+				"color": true,
+				"radius": true,
+				"style": true,
+				"width": true
+			}
+		},
 		"dimensions": {
 			"minHeight": true,
 			"__experimentalDefaultControls": {
@@ -70,7 +82,9 @@
 			"allowEditing": false
 		},
 		"spacing": {
-			"blockGap": true
+			"blockGap": true,
+			"padding": true,
+			"margin": true
 		},
 		"interactivity": {
 			"clientNavigation": true

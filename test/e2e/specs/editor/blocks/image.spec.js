@@ -293,10 +293,7 @@ test.describe( 'Image', () => {
 		).toMatchSnapshot();
 	} );
 
-	// Reason - skipped temporarily until this issue is fixed:
-	// https://github.com/WordPress/wordpress-develop/pull/6875#issuecomment-2185694119
-	// eslint-disable-next-line playwright/no-skipped-test
-	test.skip( 'allows changing aspect ratio using the crop tools', async ( {
+	test( 'allows changing aspect ratio using the crop tools', async ( {
 		editor,
 		page,
 		imageBlockUtils,
@@ -938,6 +935,37 @@ test.describe( 'Image - lightbox', () => {
 					} )
 				).toBeHidden();
 			} );
+		} );
+	} );
+
+	test.describe( 'should render as expected on front end', () => {
+		test( "Overlay image should not inherit content image's margins", async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.setContent( `<!-- wp:image {"id":${ uploadedMedia.id },"sizeSlug":"full","linkDestination":"none",
+			"lightbox":{"enabled":true},"style":{"spacing":{"margin":{"top":"var:preset|spacing|40","bottom":"var:preset|spacing|40","left":"var:preset|spacing|40","right":"var:preset|spacing|40"}}}} -->
+			<figure class="wp-block-image size-full" style="margin-top:var(--wp--preset--spacing--40);margin-right:var(--wp--preset--spacing--40);margin-bottom:var(--wp--preset--spacing--40);margin-left:var(--wp--preset--spacing--40)">
+			<img src="${ uploadedMedia.source_url }" alt="" class="wp-image-${ uploadedMedia.id }"/></figure>
+			<!-- /wp:image --> ` );
+
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
+
+			const lightboxImage = page.locator( '.wp-lightbox-container img' );
+			await expect( lightboxImage ).toBeVisible();
+			await lightboxImage.click();
+
+			const figure = page
+				.locator( '.wp-lightbox-overlay .wp-block-image' )
+				.first();
+			await expect( figure ).toBeVisible();
+			const margin = await figure.evaluate( ( element ) => {
+				return window
+					.getComputedStyle( element )
+					.getPropertyValue( 'margin' );
+			} );
+			expect( margin ).toBe( '0px' );
 		} );
 	} );
 } );

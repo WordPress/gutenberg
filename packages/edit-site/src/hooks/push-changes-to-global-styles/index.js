@@ -339,7 +339,7 @@ function PushChangesToGlobalStylesControl( {
 			<Button
 				__next40pxDefaultSize
 				variant="secondary"
-				__experimentalIsFocusable
+				accessibleWhenDisabled
 				disabled={ changes.length === 0 }
 				onClick={ pushChanges }
 			>
@@ -375,7 +375,7 @@ function PushChangesToGlobalStyles( props ) {
 const withPushChangesToGlobalStyles = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => (
 		<>
-			<BlockEdit { ...props } />
+			<BlockEdit key="edit" { ...props } />
 			{ props.isSelected && <PushChangesToGlobalStyles { ...props } /> }
 		</>
 	)

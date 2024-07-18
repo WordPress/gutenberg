@@ -138,7 +138,9 @@ function useEditorStyles() {
 			return [
 				...baseStyles,
 				{
-					css: 'body{padding-bottom: 40vh}',
+					// Should override global styles padding, so ensure 0-1-0
+					// specificity.
+					css: ':root :where(body){padding-bottom: 40vh}',
 				},
 			];
 		}
@@ -196,7 +198,10 @@ function Layout( {
 			const supportsTemplateMode = settings.supportsTemplateMode;
 			const isViewable =
 				getPostType( currentPost.postType )?.viewable ?? false;
-			const canViewTemplate = canUser( 'read', 'templates' );
+			const canViewTemplate = canUser( 'read', {
+				kind: 'postType',
+				name: 'wp_template',
+			} );
 
 			return {
 				mode: select( editorStore ).getEditorMode(),

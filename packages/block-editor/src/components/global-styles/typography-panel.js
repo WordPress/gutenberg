@@ -8,7 +8,7 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useCallback, useMemo } from '@wordpress/element';
+import { useCallback, useMemo, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -23,6 +23,10 @@ import TextDecorationControl from '../text-decoration-control';
 import WritingModeControl from '../writing-mode-control';
 import { getValueFromVariable, useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
+import {
+	getMergedFontFamiliesAndFontFamilyFaces,
+	findNearestStyleAndWeight,
+} from './typography-utils';
 
 const MIN_TEXT_COLUMNS = 1;
 const MAX_TEXT_COLUMNS = 6;
@@ -180,15 +184,13 @@ export default function TypographyPanel( {
 
 	// Font Family
 	const hasFontFamilyEnabled = useHasFontFamilyControl( settings );
-	const fontFamilies = settings?.typography?.fontFamilies;
-	const mergedFontFamilies = useMemo( () => {
-		return [ 'default', 'theme', 'custom' ].flatMap(
-			( key ) => fontFamilies?.[ key ] ?? []
-		);
-	}, [ fontFamilies ] );
 	const fontFamily = decodeValue( inheritedValue?.typography?.fontFamily );
+	const { fontFamilies, fontFamilyFaces } = useMemo( () => {
+		return getMergedFontFamiliesAndFontFamilyFaces( settings, fontFamily );
+	}, [ settings, fontFamily ] );
+
 	const setFontFamily = ( newValue ) => {
-		const slug = mergedFontFamilies?.find(
+		const slug = fontFamilies?.find(
 			( { fontFamily: f } ) => f === newValue
 		)?.slug;
 		onChange(
@@ -233,24 +235,50 @@ export default function TypographyPanel( {
 	const hasFontWeights = settings?.typography?.fontWeight;
 	const fontStyle = decodeValue( inheritedValue?.typography?.fontStyle );
 	const fontWeight = decodeValue( inheritedValue?.typography?.fontWeight );
-	const setFontAppearance = ( {
-		fontStyle: newFontStyle,
-		fontWeight: newFontWeight,
-	} ) => {
-		onChange( {
-			...value,
-			typography: {
-				...value?.typography,
-				fontStyle: newFontStyle || undefined,
-				fontWeight: newFontWeight || undefined,
-			},
-		} );
-	};
+	const { nearestFontStyle, nearestFontWeight } = findNearestStyleAndWeight(
+		fontFamilyFaces,
+		fontStyle,
+		fontWeight
+	);
+	const setFontAppearance = useCallback(
+		( { fontStyle: newFontStyle, fontWeight: newFontWeight } ) => {
+			// Only update the font style and weight if they have changed.
+			if ( newFontStyle !== fontStyle || newFontWeight !== fontWeight ) {
+				onChange( {
+					...value,
+					typography: {
+						...value?.typography,
+						fontStyle: newFontStyle || undefined,
+						fontWeight: newFontWeight || undefined,
+					},
+				} );
+			}
+		},
+		[ fontStyle, fontWeight, onChange, value ]
+	);
 	const hasFontAppearance = () =>
 		!! value?.typography?.fontStyle || !! value?.typography?.fontWeight;
-	const resetFontAppearance = () => {
+	const resetFontAppearance = useCallback( () => {
 		setFontAppearance( {} );
-	};
+	}, [ setFontAppearance ] );
+
+	// Check if previous font style and weight values are available in the new font family.
+	useEffect( () => {
+		if ( nearestFontStyle && nearestFontWeight ) {
+			setFontAppearance( {
+				fontStyle: nearestFontStyle,
+				fontWeight: nearestFontWeight,
+			} );
+		} else {
+			// Reset font appearance if there are no available styles or weights.
+			resetFontAppearance();
+		}
+	}, [
+		nearestFontStyle,
+		nearestFontWeight,
+		resetFontAppearance,
+		setFontAppearance,
+	] );
 
 	// Line Height
 	const hasLineHeightEnabled = useHasLineHeightControl( settings );
@@ -387,7 +415,7 @@ export default function TypographyPanel( {
 					panelId={ panelId }
 				>
 					<FontFamilyControl
-						fontFamilies={ mergedFontFamilies }
+						fontFamilies={ fontFamilies }
 						value={ fontFamily }
 						onChange={ setFontFamily }
 						size="__unstable-large"
@@ -431,8 +459,8 @@ export default function TypographyPanel( {
 						onChange={ setFontAppearance }
 						hasFontStyles={ hasFontStyles }
 						hasFontWeights={ hasFontWeights }
+						fontFamilyFaces={ fontFamilyFaces }
 						size="__unstable-large"
-						__nextHasNoMarginBottom
 					/>
 				</ToolsPanelItem>
 			) }

@@ -8,7 +8,7 @@ import {
 } from '@wordpress/components';
 import { createInterpolateElement, memo } from '@wordpress/element';
 import { sprintf, __, _x } from '@wordpress/i18n';
-import { chevronRight, chevronLeft } from '@wordpress/icons';
+import { next, previous } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -90,9 +90,9 @@ const Pagination = memo( function Pagination( {
 							} )
 						}
 						disabled={ currentPage === 1 }
-						__experimentalIsFocusable
+						accessibleWhenDisabled
 						label={ __( 'Previous page' ) }
-						icon={ chevronLeft }
+						icon={ previous }
 						showTooltip
 						size="compact"
 						tooltipPosition="top"
@@ -102,9 +102,9 @@ const Pagination = memo( function Pagination( {
 							onChangeView( { ...view, page: currentPage + 1 } )
 						}
 						disabled={ currentPage >= totalPages }
-						__experimentalIsFocusable
+						accessibleWhenDisabled
 						label={ __( 'Next page' ) }
-						icon={ chevronRight }
+						icon={ next }
 						showTooltip
 						size="compact"
 						tooltipPosition="top"

@@ -33,14 +33,14 @@ interface ToolbarContentProps< Item > {
 	selection: string[];
 	actionsToShow: Action< Item >[];
 	selectedItems: Item[];
-	onSelectionChange: SetSelection;
+	onChangeSelection: SetSelection;
 }
 
 interface BulkActionsToolbarProps< Item > {
 	data: Item[];
 	selection: string[];
 	actions: Action< Item >[];
-	onSelectionChange: SetSelection;
+	onChangeSelection: SetSelection;
 	getItemId: ( item: Item ) => string;
 }
 
@@ -80,7 +80,6 @@ function ActionTrigger< Item >( {
 			size="compact"
 			onClick={ onClick }
 			isBusy={ isBusy }
-			__experimentalIsFocusable
 			tooltipPosition="top"
 		/>
 	);
@@ -132,7 +131,7 @@ function renderToolbarContent< Item >(
 	selectedItems: Item[],
 	actionInProgress: string | null,
 	setActionInProgress: ( actionId: string | null ) => void,
-	onSelectionChange: SetSelection
+	onChangeSelection: SetSelection
 ) {
 	return (
 		<>
@@ -172,7 +171,7 @@ function renderToolbarContent< Item >(
 					label={ __( 'Cancel' ) }
 					disabled={ !! actionInProgress }
 					onClick={ () => {
-						onSelectionChange( EMPTY_ARRAY );
+						onChangeSelection( EMPTY_ARRAY );
 					} }
 				/>
 			</ToolbarGroup>
@@ -184,7 +183,7 @@ function ToolbarContent< Item >( {
 	selection,
 	actionsToShow,
 	selectedItems,
-	onSelectionChange,
+	onChangeSelection,
 }: ToolbarContentProps< Item > ) {
 	const [ actionInProgress, setActionInProgress ] = useState< string | null >(
 		null
@@ -200,7 +199,7 @@ function ToolbarContent< Item >( {
 			selectedItems,
 			actionInProgress,
 			setActionInProgress,
-			onSelectionChange
+			onChangeSelection
 		);
 	} else if ( ! buttons.current ) {
 		buttons.current = renderToolbarContent(
@@ -209,7 +208,7 @@ function ToolbarContent< Item >( {
 			selectedItems,
 			actionInProgress,
 			setActionInProgress,
-			onSelectionChange
+			onChangeSelection
 		);
 	}
 	return buttons.current;
@@ -219,7 +218,7 @@ export default function BulkActionsToolbar< Item >( {
 	data,
 	selection,
 	actions = EMPTY_ARRAY,
-	onSelectionChange,
+	onChangeSelection,
 	getItemId,
 }: BulkActionsToolbarProps< Item > ) {
 	const isReducedMotion = useReducedMotion();
@@ -267,7 +266,7 @@ export default function BulkActionsToolbar< Item >( {
 							selection={ selection }
 							actionsToShow={ actionsToShow }
 							selectedItems={ selectedItems }
-							onSelectionChange={ onSelectionChange }
+							onChangeSelection={ onChangeSelection }
 						/>
 					</div>
 				</Toolbar>

@@ -730,10 +730,6 @@ _Returns_
 
 -   `JSX.Element`: A React element.
 
-### ReusableBlocksRenameHint
-
-Undocumented declaration.
-
 ### RichText
 
 _Related_
@@ -780,7 +776,6 @@ _Properties_
 -   _\_\_experimentalBlockDirectory_ `boolean`: Whether the user has enabled the Block Directory
 -   _\_\_experimentalBlockPatterns_ `Array`: Array of objects representing the block patterns
 -   _\_\_experimentalBlockPatternCategories_ `Array`: Array of objects representing the block pattern categories
--   _\_\_unstableGalleryWithImageBlocks_ `boolean`: Whether the user has enabled the refactored gallery block which uses InnerBlocks
 
 ### SkipToSelectedBlock
 

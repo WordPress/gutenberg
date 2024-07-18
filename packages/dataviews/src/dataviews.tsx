@@ -18,11 +18,20 @@ import Filters from './filters';
 import Search from './search';
 import { LAYOUT_TABLE, LAYOUT_GRID } from './constants';
 import { VIEW_LAYOUTS } from './layouts';
-import BulkActions from './bulk-actions';
+import {
+	default as BulkActions,
+	useSomeItemHasAPossibleBulkAction,
+} from './bulk-actions';
 import { normalizeFields } from './normalize-fields';
 import BulkActionsToolbar from './bulk-actions-toolbar';
-import type { Action, Field, View, ViewBaseProps } from './types';
-import type { SetSelection, SelectionOrUpdater } from './private-types';
+import type {
+	Action,
+	Field,
+	View,
+	ViewBaseProps,
+	SupportedLayouts,
+} from './types';
+import type { SelectionOrUpdater } from './private-types';
 
 type ItemWithId = { id: string };
 
@@ -39,33 +48,14 @@ type DataViewsProps< Item > = {
 		totalItems: number;
 		totalPages: number;
 	};
-	supportedLayouts: string[];
+	defaultLayouts: SupportedLayouts;
 	selection?: string[];
-	setSelection?: SetSelection;
-	onSelectionChange?: ( items: Item[] ) => void;
+	onChangeSelection?: ( items: string[] ) => void;
 } & ( Item extends ItemWithId
 	? { getItemId?: ( item: Item ) => string }
 	: { getItemId: ( item: Item ) => string } );
 
 const defaultGetItemId = ( item: ItemWithId ) => item.id;
-
-const defaultOnSelectionChange = () => {};
-
-function useSomeItemHasAPossibleBulkAction< Item >(
-	actions: Action< Item >[],
-	data: Item[]
-) {
-	return useMemo( () => {
-		return data.some( ( item ) => {
-			return actions.some( ( action ) => {
-				return (
-					action.supportsBulk &&
-					( ! action.isEligible || action.isEligible( item ) )
-				);
-			} );
-		} );
-	}, [ actions, data ] );
-}
 
 export default function DataViews< Item >( {
 	view,
@@ -78,27 +68,25 @@ export default function DataViews< Item >( {
 	getItemId = defaultGetItemId,
 	isLoading = false,
 	paginationInfo,
-	supportedLayouts,
+	defaultLayouts,
 	selection: selectionProperty,
-	setSelection: setSelectionProperty,
-	onSelectionChange = defaultOnSelectionChange,
+	onChangeSelection,
 }: DataViewsProps< Item > ) {
 	const [ selectionState, setSelectionState ] = useState< string[] >( [] );
 	const isUncontrolled =
-		selectionProperty === undefined || setSelectionProperty === undefined;
+		selectionProperty === undefined || onChangeSelection === undefined;
 	const selection = isUncontrolled ? selectionState : selectionProperty;
-	const setSelection = isUncontrolled
-		? setSelectionState
-		: setSelectionProperty;
 	const [ openedFilter, setOpenedFilter ] = useState< string | null >( null );
 
 	function setSelectionWithChange( value: SelectionOrUpdater ) {
 		const newValue =
 			typeof value === 'function' ? value( selection ) : value;
-		onSelectionChange(
-			data.filter( ( item ) => newValue.includes( getItemId( item ) ) )
-		);
-		return setSelection( value );
+		if ( ! isUncontrolled ) {
+			setSelectionState( newValue );
+		}
+		if ( onChangeSelection ) {
+			onChangeSelection( newValue );
+		}
 	}
 
 	const ViewComponent = VIEW_LAYOUTS.find( ( v ) => v.type === view.type )
@@ -146,7 +134,7 @@ export default function DataViews< Item >( {
 						<BulkActions
 							actions={ actions }
 							data={ data }
-							onSelectionChange={ setSelectionWithChange }
+							onChangeSelection={ setSelectionWithChange }
 							selection={ _selection }
 							getItemId={ getItemId }
 						/>
@@ -155,7 +143,7 @@ export default function DataViews< Item >( {
 					fields={ _fields }
 					view={ view }
 					onChangeView={ onChangeView }
-					supportedLayouts={ supportedLayouts }
+					defaultLayouts={ defaultLayouts }
 				/>
 			</HStack>
 			<ViewComponent
@@ -165,7 +153,7 @@ export default function DataViews< Item >( {
 				getItemId={ getItemId }
 				isLoading={ isLoading }
 				onChangeView={ onChangeView }
-				onSelectionChange={ setSelectionWithChange }
+				onChangeSelection={ setSelectionWithChange }
 				selection={ _selection }
 				setOpenedFilter={ setOpenedFilter }
 				view={ view }
@@ -181,7 +169,7 @@ export default function DataViews< Item >( {
 						data={ data }
 						actions={ actions }
 						selection={ _selection }
-						onSelectionChange={ setSelectionWithChange }
+						onChangeSelection={ setSelectionWithChange }
 						getItemId={ getItemId }
 					/>
 				) }

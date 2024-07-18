@@ -166,7 +166,7 @@ export default function LinkPreview( {
 						isEmptyURL || showIconLabels ? '' : ': ' + value.url
 					) }
 					ref={ ref }
-					__experimentalIsFocusable
+					accessibleWhenDisabled
 					disabled={ isEmptyURL }
 					size="compact"
 				/>
