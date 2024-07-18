@@ -6,7 +6,6 @@ The following is a set of guidelines for contributing to the `@wordpress/compone
 
 This set of guidelines should apply especially to newly introduced components. In fact, while these guidelines should also be retroactively applied to existing components, it is sometimes impossible to do so for legacy/compatibility reasons.
 
-For an example of a component that follows these requirements, take a look at [`ItemGroup`](/packages/components/src/item-group).
 - [Introducing new components](#introducing-new-components)
 - [Compatibility](#compatibility)
 - [Compound components](#compound-components)
