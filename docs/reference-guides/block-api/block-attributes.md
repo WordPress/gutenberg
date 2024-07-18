@@ -375,9 +375,6 @@ Attribute definition:
 
 From here, meta attributes can be read and written by a block using the same interface as any attribute:
 
-
-{% JSX %}
-
 ```js
 edit( { attributes, setAttributes } ) {
 	function onChange( event ) {

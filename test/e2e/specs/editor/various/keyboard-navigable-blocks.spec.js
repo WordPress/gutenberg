@@ -108,14 +108,6 @@ test.describe( 'Order of block keyboard navigation', () => {
 		} );
 
 		await pageUtils.pressKeys( 'shift+Tab' );
-		await KeyboardNavigableBlocks.expectLabelToHaveFocus( 'Add block' );
-
-		await pageUtils.pressKeys( 'shift+Tab' );
-		await KeyboardNavigableBlocks.expectLabelToHaveFocus(
-			'Add default block'
-		);
-
-		await pageUtils.pressKeys( 'shift+Tab' );
 		await KeyboardNavigableBlocks.expectLabelToHaveFocus(
 			'Paragraph Block. Row 2. 1'
 		);

@@ -1,6 +1,6 @@
 # Global Settings & Styles (theme.json)
 
-WordPress 5.8 comes with [a new mechanism](https://make.wordpress.org/core/2021/06/25/introducing-theme-json-in-wordpress-5-8/) to configure the editor that enables a finer-grained control and introduces the first step in managing styles for future WordPress releases: the `theme.json` file. Then `theme.json` [evolved to a v2](https://make.wordpress.org/core/2022/01/08/updates-for-settings-styles-and-theme-json/) with WordPress 5.9 release. This page documents its format.
+WordPress 5.8 comes with [a new mechanism](https://make.wordpress.org/core/2021/06/25/introducing-theme-json-in-wordpress-5-8/) to configure the editor that enables a finer-grained control and introduces the first step in managing styles for future WordPress releases: the `theme.json` file.
 
 ## Rationale
 
@@ -48,7 +48,7 @@ To address this need, we've started to experiment with CSS Custom Properties, ak
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"settings": {
 		"color": {
 			"palette": [
@@ -86,7 +86,7 @@ body {
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"settings": {
 		"custom": {
 			"line-height": {
@@ -115,7 +115,7 @@ This specification is the same for the three different origins that use this for
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"settings": {},
 	"styles": {},
 	"customTemplates": {},
@@ -125,10 +125,13 @@ This specification is the same for the three different origins that use this for
 
 ### Version
 
-This field describes the format of the `theme.json` file. The current version is [v2](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-living/), [introduced in WordPress 5.9](https://make.wordpress.org/core/2022/01/08/updates-for-settings-styles-and-theme-json/). It also works with the current Gutenberg plugin.
+This field describes the format of the `theme.json` file. The latest version is [version 3](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-living/) introduced in WordPress 6.6.
 
-If you have used [v1](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-v1/) previously, you don’t need to update the version in the v1 file to v2, as it’ll be [migrated](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-migrations/) into v2 at runtime for you.
+New versions are introduced when a breaking change needs to be made. This allows theme authors to choose when to opt-in to the breaking changes and migrate their theme.json files to the new format.
 
+Older versions of `theme.json` are backwards-compatible and will continue to work with newer versions of WordPress and the Gutenberg plugin. However new features will be developed on the latest version.
+
+Follow the instructions in [migrating to newer versions](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-migrations/) for details on updating to the latest version.
 
 ### Settings
 
@@ -145,7 +148,7 @@ The settings section has the following structure:
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"settings": {
 		"border": {
 			"radius": false,
@@ -209,7 +212,7 @@ The settings section has the following structure:
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"settings": {
 		"appearanceTools": false,
 		"border": {
@@ -265,6 +268,7 @@ The settings section has the following structure:
 			"fontWeight": true,
 			"letterSpacing": true,
 			"lineHeight": false,
+			"textAlign": true,
 			"textColumns": false,
 			"textDecoration": true,
 			"textTransform": true
@@ -306,20 +310,21 @@ There's one special setting property, `appearanceTools`, which is a boolean and 
 
 To retain backward compatibility, the existing `add_theme_support` declarations that configure the block editor are retrofit in the proper categories for the top-level section. For example, if a theme uses `add_theme_support('disable-custom-colors')`, it'll be the same as setting `settings.color.custom` to `false`. If the `theme.json` contains any settings, these will take precedence over the values declared via `add_theme_support`. This is the complete list of equivalences:
 
-| add_theme_support           | theme.json setting                                        |
-| --------------------------- | --------------------------------------------------------- |
-| `custom-line-height`        | Set `typography.lineHeight` to `true`.              |
-| `custom-spacing`            | Set `spacing.padding` to `true`.                    |
-| `custom-units`              | Provide the list of units via `spacing.units`.            |
-| `disable-custom-colors`     | Set `color.custom` to `false`.                            |
-| `disable-custom-font-sizes` | Set `typography.customFontSize` to `false`.               |
-| `disable-custom-gradients`  | Set `color.customGradient` to `false`.                    |
-| `editor-color-palette`      | Provide the list of colors via `color.palette`.           |
-| `editor-font-sizes`         | Provide the list of font size via `typography.fontSizes`. |
-| `editor-gradient-presets`   | Provide the list of gradients via `color.gradients`.      |
-| `appearance-tools`          | Set `appearanceTools` to `true`.                          |
-| `border`                    | Set `border: color, radius, style, width` to `true`.      |
-| `link-color `               | Set `color.link` to `true`.                               |
+| add_theme_support           | theme.json setting                                            |
+| --------------------------- | ------------------------------------------------------------- |
+| `custom-line-height`        | Set `typography.lineHeight` to `true`.                        |
+| `custom-spacing`            | Set `spacing.padding` to `true`.                              |
+| `custom-units`              | Provide the list of units via `spacing.units`.                |
+| `disable-custom-colors`     | Set `color.custom` to `false`.                                |
+| `disable-custom-font-sizes` | Set `typography.customFontSize` to `false`.                   |
+| `disable-custom-gradients`  | Set `color.customGradient` to `false`.                        |
+| `editor-color-palette`      | Provide the list of colors via `color.palette`.               |
+| `editor-font-sizes`         | Provide the list of font size via `typography.fontSizes`.     |
+| `editor-gradient-presets`   | Provide the list of gradients via `color.gradients`.          |
+| `editor-spacing-sizes`      | Provide the list of spacing sizes via `spacing.spacingSizes`. |
+| `appearance-tools`          | Set `appearanceTools` to `true`.                              |
+| `border`                    | Set `border: color, radius, style, width` to `true`.          |
+| `link-color `               | Set `color.link` to `true`.                                   |
 
 #### Presets
 
@@ -332,16 +337,7 @@ The following presets can be defined via `theme.json`:
 - `color.palette`:
     - generates 3 classes per preset value: color, background-color, and border-color.
     - generates a single custom property per preset value.
-- `spacing.spacingScale`: used to generate an array of spacing preset sizes for use with padding, margin, and gap settings.
-    - `operator`: specifies how to calculate the steps with either `*` for multiplier, or `+` for sum.
-    - `increment`: the amount to increment each step by. Core by default uses a 'perfect 5th' multiplier of `1.5`.
-    - `steps`: the number of steps to generate in the spacing scale. The default is 7. To prevent the generation of the spacing presets, and to disable the related UI, this can be set to `0`.
-    - `mediumStep`: the steps in the scale are generated descending and ascending from a medium step, so this should be the size value of the medium space, without the unit. The default medium step is `1.5rem` so the mediumStep value is `1.5`.
-    - `unit`: the unit the scale uses, eg. `px, rem, em, %`. The default is `rem`.
-- `spacing.spacingSizes`: themes can choose to include a static `spacing.spacingSizes` array of spacing preset sizes if they have a sequence of sizes that can't be generated via an increment or multiplier.
-    - `name`: a human readable name for the size, eg. `Small, Medium, Large`.
-    - `slug`: the machine readable name. In order to provide the best cross site/theme compatibility the slugs should be in the format, "10","20","30","40","50","60", with "50" representing the `Medium` size value.
-    - `size`: the size, including the unit, eg. `1.5rem`. It is possible to include fluid values like `clamp(2rem, 10vw, 20rem)`.
+- `spacing.spacingSizes`/`spacing.spacingScale`: generates a single custom property per preset value.
 - `typography.fontSizes`: generates a single class and custom property per preset value.
 - `typography.fontFamilies`: generates a single custom property per preset value.
 
@@ -356,7 +352,7 @@ The naming schema for the classes and the custom properties is as follows:
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"settings": {
 		"color": {
 			"duotone": [
@@ -531,7 +527,7 @@ For example:
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"settings": {
 		"custom": {
 			"baseFont": 16,
@@ -576,7 +572,7 @@ Note that the name of the variable is created by adding `--` in between each nes
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"settings": {
 		"color": {
 			"custom": false
@@ -596,7 +592,7 @@ Note that the name of the variable is created by adding `--` in between each nes
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"settings": {
 		"blocks": {
 			"core/button": {
@@ -613,7 +609,7 @@ Note that the name of the variable is created by adding `--` in between each nes
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"settings": {
 		"color": {
 			"palette": [
@@ -681,7 +677,7 @@ Each block declares which style properties it exposes via the [block supports me
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"styles": {
 		"border": {
 			"radius": "value",
@@ -760,7 +756,7 @@ Each block declares which style properties it exposes via the [block supports me
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"styles": {
 		"border": {
 			"color": "value",
@@ -855,7 +851,7 @@ Styles found at the top-level will be enqueued using the `body` selector.
 
 ```json
 {
-	"version": 1,
+	"version": 3,
 	"styles": {
 		"color": {
 			"text": "var(--wp--preset--color--primary)"
@@ -884,7 +880,7 @@ By default, the block selector is generated based on its name such as `.wp-block
 
 ```json
 {
-	"version": 1,
+	"version": 3,
 	"styles": {
 		"color": {
 			"text": "var(--wp--preset--color--primary)"
@@ -971,7 +967,7 @@ If they're found in the top-level the element selector will be used. If they're 
 
 ```json
 {
-	"version": 1,
+	"version": 3,
 	"styles": {
 		"typography": {
 			"fontSize": "var(--wp--preset--font-size--normal)"
@@ -1065,7 +1061,7 @@ For example, this is how to provide styles for the existing `plain` variation fo
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"styles":{
 		"blocks": {
 			"core/quote": {
@@ -1102,7 +1098,7 @@ Within this field themes can list the custom templates present in the `templates
 
 ```json
 {
-    "version": 2,
+    "version": 3,
 	"customTemplates": [
 		{
 			"name": "my-custom-template",
@@ -1131,7 +1127,7 @@ Currently block variations exist for "header" and "footer" values of the area te
 
 ```json
 {
-    "version": 2,
+    "version": 3,
 	"templateParts": [
 		{
 			"name": "my-template-part",
@@ -1144,22 +1140,28 @@ Currently block variations exist for "header" and "footer" values of the area te
 
 ### patterns
 
-<div class="callout callout-alert">Supported in WordPress from version 6.0 using <a href="https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-living/">version 2</a> of <code>theme.json</code>.</div>
+<div class="callout callout-alert">Supported in WordPress from version 6.0.</div>
 
 Within this field themes can list patterns to register from [Pattern Directory](https://wordpress.org/patterns/). The `patterns` field is an array of pattern `slugs` from the Pattern Directory. Pattern slugs can be extracted by the `url` in single pattern view at the Pattern Directory. For example in this url `https://wordpress.org/patterns/pattern/partner-logos` the slug is `partner-logos`.
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"patterns": [ "short-text-surrounded-by-round-images", "partner-logos" ]
 }
 ```
 
 ## Developing with theme.json
 
-It can be difficult to remember the theme.json settings and properties while you develop, so a JSON scheme was created to help. The schema is available at https://schemas.wp.org/trunk/theme.json
+It can be difficult to remember the theme.json settings and properties and which versions of WordPress support which settings while you develop, so it can be helpful to use the provided JSON schema for theme.json.
 
-Code editors can pick up the schema and can provide help like tooltips, autocomplete, or schema validation in the editor. To use the schema in Visual Studio Code, add `"$schema": "https://schemas.wp.org/trunk/theme.json"` to the beginning of your theme.json file.
+Many code editors support JSON schema and can provide help like tooltips, autocomplete, or schema validation right in your editor.
+
+Theme.json schemas for each WordPress version are available at `https://schemas.wp.org/wp/{{version}}/theme.json`. For example a schema for WordPress 5.8 is available at `https://schemas.wp.org/wp/5.8/theme.json`. To ensure that you're only using features available to your users, it's best to use the oldest version that your theme supports.
+
+The latest schema including all the latest changes from the Gutenberg plugin is available at `https://schemas.wp.org/trunk/theme.json`.
+
+Check your editor's documentation for JSON schema support. In Visual Studio Code, for example, you need to add `"$schema": "https://schemas.wp.org/wp/x.x/theme.json"` as a top-level property of your theme.json file, but other editors may be configured differently.
 
 ![Example using validation with schema](https://developer.wordpress.org/files/2021/11/theme-json-schema-updated.gif)
 
@@ -1209,7 +1211,7 @@ For example:
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"settings": {
 		"custom": {
 			"lineHeight": {
@@ -1239,7 +1241,7 @@ A few notes about this process:
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"settings": {
 		"custom": {
 			"line--height": { // DO NOT DO THIS
@@ -1283,7 +1285,7 @@ body {
 
 ### Specificity for link colors provided by the user
 
-In v1, when a user selected a link color for a specific block we attached a class to that block in the form of `.wp-element-<ID>` and then enqueued the following style:
+In WordPress 5.8, when a user selected a link color for a specific block we attached a class to that block in the form of `.wp-element-<ID>` and then enqueued the following style:
 
 ```css
 .wp-element-<ID> a { color: <USER_COLOR_VALUE> !important; }
@@ -1303,7 +1305,7 @@ For blocks that contain inner blocks, such as Group, Columns, Buttons, and Socia
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"settings": {
 		"spacing": {
 			"blockGap": true,
@@ -1327,4 +1329,4 @@ The value defined for the root `styles.spacing.blockGap` style is also output as
 
 ### Why does it take so long to update the styles in the browser?
 
-When you are actively developing with theme.json you may notice it takes 30+ seconds for your changes to show up in the browser, this is because `theme.json` is cached. To remove this caching issue, set either [`WP_DEBUG`](https://wordpress.org/documentation/article/debugging-in-wordpress/#wp_debug) or [`SCRIPT_DEBUG`](https://wordpress.org/documentation/article/debugging-in-wordpress/#script_debug) to 'true' in your [`wp-config.php`](https://wordpress.org/documentation/article/editing-wp-config-php/). This tells WordPress to skip the cache and always use fresh data.
+When you are actively developing with theme.json you may notice it takes 30+ seconds for your changes to show up in the browser, this is because `theme.json` is cached. To remove this caching issue, set either [`WP_DEBUG`](https://developer.wordpress.org/advanced-administration/debug/debug-wordpress/#wp_debug) or [`SCRIPT_DEBUG`](https://developer.wordpress.org/advanced-administration/debug/debug-wordpress/#script_debug) to 'true' in your [`wp-config.php`](https://developer.wordpress.org/advanced-administration/wordpress/wp-config/). This tells WordPress to skip the cache and always use fresh data.

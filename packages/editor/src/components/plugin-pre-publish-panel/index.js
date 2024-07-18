@@ -24,7 +24,7 @@ const { Fill, Slot } = createSlotFill( 'PluginPrePublishPanel' );
  * ```jsx
  * // Using ESNext syntax
  * import { __ } from '@wordpress/i18n';
- * import { PluginPrePublishPanel } from '@wordpress/edit-post';
+ * import { PluginPrePublishPanel } from '@wordpress/editor';
  *
  * const MyPluginPrePublishPanel = () => (
  * 	<PluginPrePublishPanel

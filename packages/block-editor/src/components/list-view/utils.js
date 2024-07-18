@@ -74,7 +74,9 @@ export function focusListItem( focusClientId, treeGridElement ) {
 		const row = treeGridElement?.querySelector(
 			`[role=row][data-block="${ focusClientId }"]`
 		);
-		if ( ! row ) return null;
+		if ( ! row ) {
+			return null;
+		}
 		// Focus the first focusable in the row, which is the ListViewBlockSelectButton.
 		return focus.focusable.find( row )[ 0 ];
 	};

@@ -1,117 +1,93 @@
 /**
  * External dependencies
  */
-import classNames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import { memo, useRef } from '@wordpress/element';
 import {
-	__experimentalNavigatorProvider as NavigatorProvider,
-	__experimentalNavigatorScreen as NavigatorScreen,
-} from '@wordpress/components';
-import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { useViewportMatch } from '@wordpress/compose';
-import { __ } from '@wordpress/i18n';
+	createContext,
+	useContext,
+	useState,
+	useRef,
+	useLayoutEffect,
+} from '@wordpress/element';
+import { focus } from '@wordpress/dom';
 
-/**
- * Internal dependencies
- */
-import SidebarNavigationScreenMain from '../sidebar-navigation-screen-main';
-import SidebarNavigationScreenTemplate from '../sidebar-navigation-screen-template';
-import SidebarNavigationScreenPatterns from '../sidebar-navigation-screen-patterns';
-import SidebarNavigationScreenPattern from '../sidebar-navigation-screen-pattern';
-import useSyncPathWithURL, {
-	getPathFromURL,
-} from '../sync-state-with-url/use-sync-path-with-url';
-import SidebarNavigationScreenNavigationMenus from '../sidebar-navigation-screen-navigation-menus';
-import SidebarNavigationScreenNavigationMenu from '../sidebar-navigation-screen-navigation-menu';
-import SidebarNavigationScreenGlobalStyles from '../sidebar-navigation-screen-global-styles';
-import SidebarNavigationScreenTemplatesBrowse from '../sidebar-navigation-screen-templates-browse';
-import SaveHub from '../save-hub';
-import { unlock } from '../../lock-unlock';
-import SidebarNavigationScreen from '../sidebar-navigation-screen';
-import DataViewsSidebarContent from '../sidebar-dataviews';
-import SidebarNavigationScreenPage from '../sidebar-navigation-screen-page';
+export const SidebarNavigationContext = createContext( () => {} );
+// Focus a sidebar element after a navigation. The element to focus is either
+// specified by `focusSelector` (when navigating back) or it is the first
+// tabbable element (usually the "Back" button).
+function focusSidebarElement( el, direction, focusSelector ) {
+	let elementToFocus;
+	if ( direction === 'back' && focusSelector ) {
+		elementToFocus = el.querySelector( focusSelector );
+	}
+	if ( direction !== null && ! elementToFocus ) {
+		const [ firstTabbable ] = focus.tabbable.find( el );
+		elementToFocus = firstTabbable ?? el;
+	}
+	elementToFocus?.focus();
+}
 
-const { useLocation } = unlock( routerPrivateApis );
+// Navigation state that is updated when navigating back or forward. Helps us
+// manage the animations and also focus.
+function createNavState() {
+	let state = {
+		direction: null,
+		focusSelector: null,
+	};
 
-function SidebarScreenWrapper( { className, ...props } ) {
+	return {
+		get() {
+			return state;
+		},
+		navigate( direction, focusSelector = null ) {
+			state = {
+				direction,
+				focusSelector:
+					direction === 'forward' && focusSelector
+						? focusSelector
+						: state.focusSelector,
+			};
+		},
+	};
+}
+
+function SidebarContentWrapper( { children } ) {
+	const navState = useContext( SidebarNavigationContext );
+	const wrapperRef = useRef();
+	const [ navAnimation, setNavAnimation ] = useState( null );
+
+	useLayoutEffect( () => {
+		const { direction, focusSelector } = navState.get();
+		focusSidebarElement( wrapperRef.current, direction, focusSelector );
+		setNavAnimation( direction );
+	}, [ navState ] );
+
+	const wrapperCls = clsx( 'edit-site-sidebar__screen-wrapper', {
+		'slide-from-left': navAnimation === 'back',
+		'slide-from-right': navAnimation === 'forward',
+	} );
+
 	return (
-		<NavigatorScreen
-			className={ classNames(
-				'edit-site-sidebar__screen-wrapper',
-				className
-			) }
-			{ ...props }
-		/>
+		<div ref={ wrapperRef } className={ wrapperCls }>
+			{ children }
+		</div>
 	);
 }
 
-function SidebarScreens() {
-	useSyncPathWithURL();
-	const isMobileViewport = useViewportMatch( 'medium', '<' );
+export default function SidebarContent( { routeKey, children } ) {
+	const [ navState ] = useState( createNavState );
 
 	return (
-		<>
-			<SidebarScreenWrapper path="/">
-				<SidebarNavigationScreenMain />
-			</SidebarScreenWrapper>
-			<SidebarScreenWrapper path="/navigation">
-				<SidebarNavigationScreenNavigationMenus />
-			</SidebarScreenWrapper>
-			<SidebarScreenWrapper path="/navigation/:postType/:postId">
-				<SidebarNavigationScreenNavigationMenu />
-			</SidebarScreenWrapper>
-			<SidebarScreenWrapper path="/wp_global_styles">
-				<SidebarNavigationScreenGlobalStyles />
-			</SidebarScreenWrapper>
-			<SidebarScreenWrapper path="/page">
-				<SidebarNavigationScreen
-					title={ __( 'Manage pages' ) }
-					content={ <DataViewsSidebarContent /> }
-				/>
-			</SidebarScreenWrapper>
-			<SidebarScreenWrapper path="/page/:postId">
-				<SidebarNavigationScreenPage />
-			</SidebarScreenWrapper>
-			<SidebarScreenWrapper path="/:postType(wp_template)">
-				<SidebarNavigationScreenTemplatesBrowse />
-			</SidebarScreenWrapper>
-			{ ! isMobileViewport && (
-				<SidebarScreenWrapper path="/patterns">
-					<SidebarNavigationScreenPatterns />
-				</SidebarScreenWrapper>
-			) }
-			<SidebarScreenWrapper path="/:postType(wp_template_part)/all">
-				<SidebarNavigationScreenTemplatesBrowse />
-			</SidebarScreenWrapper>
-			<SidebarScreenWrapper path="/:postType(wp_template_part|wp_block)/:postId">
-				<SidebarNavigationScreenPattern />
-			</SidebarScreenWrapper>
-			<SidebarScreenWrapper path="/:postType(wp_template)/:postId">
-				<SidebarNavigationScreenTemplate />
-			</SidebarScreenWrapper>
-		</>
+		<SidebarNavigationContext.Provider value={ navState }>
+			<div className="edit-site-sidebar__content">
+				<SidebarContentWrapper key={ routeKey }>
+					{ children }
+				</SidebarContentWrapper>
+			</div>
+		</SidebarNavigationContext.Provider>
 	);
 }
-
-function Sidebar() {
-	const { params: urlParams } = useLocation();
-	const initialPath = useRef( getPathFromURL( urlParams ) );
-
-	return (
-		<>
-			<NavigatorProvider
-				className="edit-site-sidebar__content"
-				initialPath={ initialPath.current }
-			>
-				<SidebarScreens />
-			</NavigatorProvider>
-			<SaveHub />
-		</>
-	);
-}
-
-export default memo( Sidebar );

@@ -74,12 +74,23 @@ module.exports = {
 				rules: [
 					...config.module.rules,
 					{
-						// Adds a `sourceLink` parameter to the story metadata, based on the file path
 						test: /\/stories\/.+\.story\.(j|t)sx?$/,
-						loader: path.resolve(
-							__dirname,
-							'./webpack/source-link-loader.js'
-						),
+						use: [
+							{
+								// Adds a `sourceLink` parameter to the story metadata, based on the file path
+								loader: path.resolve(
+									__dirname,
+									'./webpack/source-link-loader.js'
+								),
+							},
+							{
+								// Reads `tags` from the story metadata and copies them to `badges`
+								loader: path.resolve(
+									__dirname,
+									'./webpack/copy-tags-to-badges.js'
+								),
+							},
+						],
 						enforce: 'post',
 					},
 					{

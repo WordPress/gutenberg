@@ -3,23 +3,10 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
-import {
-	edit,
-	trash,
-	rotateLeft,
-	rotateRight,
-	layout,
-	page,
-	drawerLeft,
-	drawerRight,
-	blockDefault,
-	keyboard,
-	symbol,
-} from '@wordpress/icons';
+import { trash, rotateLeft, rotateRight, layout, page } from '@wordpress/icons';
 import { useCommandLoader } from '@wordpress/commands';
 import { decodeEntities } from '@wordpress/html-entities';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { store as interfaceStore } from '@wordpress/interface';
 import { store as editorStore } from '@wordpress/editor';
 
 /**
@@ -29,9 +16,6 @@ import { store as editSiteStore } from '../../store';
 import useEditedEntityRecord from '../../components/use-edited-entity-record';
 import isTemplateRemovable from '../../utils/is-template-removable';
 import isTemplateRevertable from '../../utils/is-template-revertable';
-import { KEYBOARD_SHORTCUT_HELP_MODAL_NAME } from '../../components/keyboard-shortcut-help-modal';
-import { PREFERENCES_MODAL_NAME } from '../../components/preferences-modal';
-import { PATTERN_MODALS } from '../../components/pattern-modal';
 import { unlock } from '../../lock-unlock';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 import { useLink } from '../../components/routes/link';
@@ -153,10 +137,6 @@ function useManipulateDocumentCommands() {
 						__( 'Delete template part: %s' ),
 						decodeEntities( template.title )
 				  );
-		const path =
-			template.type === TEMPLATE_POST_TYPE
-				? '/wp_template'
-				: '/wp_template_part/all';
 		commands.push( {
 			name: 'core/remove-template',
 			label,
@@ -165,7 +145,7 @@ function useManipulateDocumentCommands() {
 				removeTemplate( template );
 				// Navigate to the template list
 				history.push( {
-					path,
+					postType: template.type,
 				} );
 				close();
 			},
@@ -178,130 +158,15 @@ function useManipulateDocumentCommands() {
 	};
 }
 
-function useEditUICommands() {
-	const { openGeneralSidebar, closeGeneralSidebar } =
-		useDispatch( editSiteStore );
-	const { canvasMode, activeSidebar } = useSelect( ( select ) => {
-		return {
-			canvasMode: unlock( select( editSiteStore ) ).getCanvasMode(),
-			activeSidebar: select( interfaceStore ).getActiveComplementaryArea(
-				editSiteStore.name
-			),
-		};
-	}, [] );
-	const { openModal } = useDispatch( interfaceStore );
-
-	if ( canvasMode !== 'edit' ) {
-		return { isLoading: false, commands: [] };
-	}
-
-	const commands = [];
-
-	commands.push( {
-		name: 'core/open-settings-sidebar',
-		label: __( 'Toggle settings sidebar' ),
-		icon: isRTL() ? drawerLeft : drawerRight,
-		callback: ( { close } ) => {
-			close();
-			if ( activeSidebar === 'edit-site/template' ) {
-				closeGeneralSidebar();
-			} else {
-				openGeneralSidebar( 'edit-site/template' );
-			}
-		},
-	} );
-
-	commands.push( {
-		name: 'core/open-block-inspector',
-		label: __( 'Toggle block inspector' ),
-		icon: blockDefault,
-		callback: ( { close } ) => {
-			close();
-			if ( activeSidebar === 'edit-site/block-inspector' ) {
-				closeGeneralSidebar();
-			} else {
-				openGeneralSidebar( 'edit-site/block-inspector' );
-			}
-		},
-	} );
-
-	commands.push( {
-		name: 'core/open-preferences',
-		label: __( 'Editor preferences' ),
-		callback: () => {
-			openModal( PREFERENCES_MODAL_NAME );
-		},
-	} );
-
-	commands.push( {
-		name: 'core/open-shortcut-help',
-		label: __( 'Keyboard shortcuts' ),
-		icon: keyboard,
-		callback: () => {
-			openModal( KEYBOARD_SHORTCUT_HELP_MODAL_NAME );
-		},
-	} );
-
-	return {
-		isLoading: false,
-		commands,
-	};
-}
-
-function usePatternCommands() {
-	const { isLoaded, record: pattern } = useEditedEntityRecord();
-	const { openModal } = useDispatch( interfaceStore );
-
-	if ( ! isLoaded ) {
-		return { isLoading: true, commands: [] };
-	}
-
-	const commands = [];
-
-	if ( pattern?.type === 'wp_block' ) {
-		commands.push( {
-			name: 'core/rename-pattern',
-			label: __( 'Rename pattern' ),
-			icon: edit,
-			callback: ( { close } ) => {
-				openModal( PATTERN_MODALS.rename );
-				close();
-			},
-		} );
-		commands.push( {
-			name: 'core/duplicate-pattern',
-			label: __( 'Duplicate pattern' ),
-			icon: symbol,
-			callback: ( { close } ) => {
-				openModal( PATTERN_MODALS.duplicate );
-				close();
-			},
-		} );
-	}
-
-	return { isLoading: false, commands };
-}
-
 export function useEditModeCommands() {
 	useCommandLoader( {
 		name: 'core/edit-site/page-content-focus',
 		hook: usePageContentFocusCommands,
-		context: 'site-editor-edit',
+		context: 'entity-edit',
 	} );
 
 	useCommandLoader( {
 		name: 'core/edit-site/manipulate-document',
 		hook: useManipulateDocumentCommands,
-	} );
-
-	useCommandLoader( {
-		name: 'core/edit-site/patterns',
-		hook: usePatternCommands,
-		context: 'site-editor-edit',
-	} );
-
-	useCommandLoader( {
-		name: 'core/edit-site/edit-ui',
-		hook: useEditUICommands,
 	} );
 }

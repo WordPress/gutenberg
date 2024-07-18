@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useMemo } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import {
 	applyFormat,
@@ -39,9 +39,15 @@ function parseCSS( css = '' ) {
 	return css.split( ';' ).reduce( ( accumulator, rule ) => {
 		if ( rule ) {
 			const [ property, value ] = rule.split( ':' );
-			if ( property === 'color' ) accumulator.color = value;
-			if ( property === 'background-color' && value !== transparentValue )
+			if ( property === 'color' ) {
+				accumulator.color = value;
+			}
+			if (
+				property === 'background-color' &&
+				value !== transparentValue
+			) {
 				accumulator.backgroundColor = value;
+			}
 		}
 		return accumulator;
 	}, {} );
@@ -108,8 +114,12 @@ function setColors( value, name, colorSettings, colors ) {
 		}
 	}
 
-	if ( styles.length ) attributes.style = styles.join( ';' );
-	if ( classNames.length ) attributes.class = classNames.join( ' ' );
+	if ( styles.length ) {
+		attributes.style = styles.join( ';' );
+	}
+	if ( classNames.length ) {
+		attributes.class = classNames.join( ' ' );
+	}
 
 	return applyFormat( value, { type: name, attributes } );
 }
@@ -119,14 +129,6 @@ function ColorPicker( { name, property, value, onChange } ) {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings().colors ?? [];
 	}, [] );
-	const onColorChange = useCallback(
-		( color ) => {
-			onChange(
-				setColors( value, name, colors, { [ property ]: color } )
-			);
-		},
-		[ colors, onChange, property ]
-	);
 	const activeColors = useMemo(
 		() => getActiveColors( value, name, colors ),
 		[ name, value, colors ]
@@ -135,7 +137,11 @@ function ColorPicker( { name, property, value, onChange } ) {
 	return (
 		<ColorPalette
 			value={ activeColors[ property ] }
-			onChange={ onColorChange }
+			onChange={ ( color ) => {
+				onChange(
+					setColors( value, name, colors, { [ property ]: color } )
+				);
+			} }
 		/>
 	);
 }

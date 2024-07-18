@@ -52,21 +52,14 @@ export function getPasteEventData( { clipboardData } ) {
 	let plainText = '';
 	let html = '';
 
-	// IE11 only supports `Text` as an argument for `getData` and will
-	// otherwise throw an invalid argument error, so we try the standard
-	// arguments first, then fallback to `Text` if they fail.
 	try {
 		plainText = clipboardData.getData( 'text/plain' );
 		html = clipboardData.getData( 'text/html' );
-	} catch ( error1 ) {
-		try {
-			html = clipboardData.getData( 'Text' );
-		} catch ( error2 ) {
-			// Some browsers like UC Browser paste plain text by default and
-			// don't support clipboardData at all, so allow default
-			// behaviour.
-			return;
-		}
+	} catch ( error ) {
+		// Some browsers like UC Browser paste plain text by default and
+		// don't support clipboardData at all, so allow default
+		// behaviour.
+		return;
 	}
 
 	// Remove Windows-specific metadata appended within copied HTML text.
@@ -112,7 +105,9 @@ export function shouldDismissPastedFiles( files, html /*, plainText */ ) {
 		// other elements found, like <figure>, but we assume that the user's
 		// intention is to paste the actual image file.
 		const IMAGE_TAG = /<\s*img\b/gi;
-		if ( html.match( IMAGE_TAG )?.length !== 1 ) return true;
+		if ( html.match( IMAGE_TAG )?.length !== 1 ) {
+			return true;
+		}
 
 		// Even when there is exactly one <img> tag in the HTML payload, we
 		// choose to weed out local images, i.e. those whose source starts with
@@ -121,7 +116,9 @@ export function shouldDismissPastedFiles( files, html /*, plainText */ ) {
 		// text and exactly one image, and pasting that content using Google
 		// Chrome.
 		const IMG_WITH_LOCAL_SRC = /<\s*img\b[^>]*\bsrc="file:\/\//i;
-		if ( html.match( IMG_WITH_LOCAL_SRC ) ) return true;
+		if ( html.match( IMG_WITH_LOCAL_SRC ) ) {
+			return true;
+		}
 	}
 
 	return false;

@@ -19,6 +19,8 @@ export default function convertEditorSettings( data ) {
 		'showIconLabels',
 		'showListViewByDefault',
 		'isPublishSidebarEnabled',
+		'isComplementaryAreaVisible',
+		'pinnedItems',
 	];
 
 	settingsToMoveToCore.forEach( ( setting ) => {

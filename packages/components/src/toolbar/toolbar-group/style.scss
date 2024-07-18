@@ -56,12 +56,7 @@
 
 div.components-toolbar {
 	& > div {
-		// IE11 does not support `position: sticky`, or Flex very well, so use block.
-		display: block;
-		@supports (position: sticky) {
-			display: flex;
-		}
-
+		display: flex;
 		margin: 0;
 	}
 

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 import type {
 	ForwardedRef,
 	KeyboardEvent,
@@ -154,7 +154,9 @@ function UnforwardedModal(
 	useEffect( () => {
 		dismissers.push( refOnRequestClose );
 		const [ first, second ] = dismissers;
-		if ( second ) first?.current?.();
+		if ( second ) {
+			first?.current?.();
+		}
 
 		const nested = nestedDismissers.current;
 		return () => {
@@ -243,7 +245,9 @@ function UnforwardedModal(
 		onPointerUp: ( { target, button } ) => {
 			const isSameTarget = target === pressTarget;
 			pressTarget = null;
-			if ( button === 0 && isSameTarget ) onRequestClose();
+			if ( button === 0 && isSameTarget ) {
+				onRequestClose();
+			}
 		},
 	};
 
@@ -251,7 +255,7 @@ function UnforwardedModal(
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
 			ref={ useMergeRefs( [ ref, forwardedRef ] ) }
-			className={ classnames(
+			className={ clsx(
 				'components-modal__screen-overlay',
 				overlayClassName
 			) }
@@ -260,7 +264,7 @@ function UnforwardedModal(
 		>
 			<StyleProvider document={ document }>
 				<div
-					className={ classnames(
+					className={ clsx(
 						'components-modal__frame',
 						sizeClass,
 						className
@@ -281,7 +285,7 @@ function UnforwardedModal(
 					onKeyDown={ onKeyDown }
 				>
 					<div
-						className={ classnames( 'components-modal__content', {
+						className={ clsx( 'components-modal__content', {
 							'hide-header': __experimentalHideHeader,
 							'is-scrollable': hasScrollableContent,
 							'has-scrolled-content': hasScrolledContent,

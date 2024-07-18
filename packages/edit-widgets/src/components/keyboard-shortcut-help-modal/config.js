@@ -37,7 +37,16 @@ export const textFormattingShortcuts = [
 		description: __( 'Make the selected text inline code.' ),
 	},
 	{
-		keyCombination: { modifier: 'access', character: '0' },
+		keyCombination: {
+			modifier: 'access',
+			character: '0',
+		},
+		aliases: [
+			{
+				modifier: 'access',
+				character: '7',
+			},
+		],
 		description: __( 'Convert the current heading to a paragraph.' ),
 	},
 	{

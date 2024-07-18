@@ -22,7 +22,12 @@ export default function RenameModal( { menuTitle, onClose, onSave } ) {
 		titleHasChanged && notEmptyString( editedMenuTitle );
 
 	return (
-		<Modal title={ __( 'Rename' ) } onRequestClose={ onClose }>
+		<Modal
+			title={ __( 'Rename' ) }
+			onRequestClose={ onClose }
+			focusOnMount="firstContentElement"
+			size="small"
+		>
 			<form className="sidebar-navigation__rename-modal-form">
 				<VStack spacing="3">
 					<TextControl
@@ -31,6 +36,7 @@ export default function RenameModal( { menuTitle, onClose, onSave } ) {
 						value={ editedMenuTitle }
 						placeholder={ __( 'Navigation title' ) }
 						onChange={ setEditedMenuTitle }
+						label={ __( 'Name' ) }
 					/>
 					<HStack justify="right">
 						<Button
@@ -43,6 +49,7 @@ export default function RenameModal( { menuTitle, onClose, onSave } ) {
 
 						<Button
 							__next40pxDefaultSize
+							accessibleWhenDisabled
 							disabled={ ! isEditedMenuTitleValid }
 							variant="primary"
 							type="submit"

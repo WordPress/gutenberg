@@ -1,10 +1,7 @@
 /**
  * Internal dependencies
  */
-import {
-	useBlockSelectionListener,
-	useUpdatePostLinkListener,
-} from './listener-hooks';
+import { useUpdatePostLinkListener } from './listener-hooks';
 
 /**
  * Data component used for initializing the editor and re-initializes
@@ -13,7 +10,6 @@ import {
  * @return {null} This is a data component so does not render any ui.
  */
 export default function EditorInitialization() {
-	useBlockSelectionListener();
 	useUpdatePostLinkListener();
 	return null;
 }

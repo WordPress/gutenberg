@@ -1,14 +1,12 @@
 .wp-block-table {
+	margin: 0 0 1em 0;
+
 	td,
 	th {
 		word-break: normal;
 	}
 
-	figcaption {
+	:where(figcaption) {
 		@include caption-style-theme();
 	}
-}
-
-:where(.wp-block-table) {
-	margin: 0 0 1em 0;
 }

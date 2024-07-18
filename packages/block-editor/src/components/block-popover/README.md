@@ -30,7 +30,7 @@ This determines whether the block popover always shifts into the viewport or rem
 -	Required: No
 -	Default: `true`
 
-## BlockPopoverInbetween
+## BlockPopoverInbetween - Private Component
 
 ### Props
 

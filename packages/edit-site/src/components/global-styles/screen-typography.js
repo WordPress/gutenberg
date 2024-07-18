@@ -13,6 +13,7 @@ import TypographyElements from './typography-elements';
 import TypographyVariations from './variations/variations-typography';
 import FontFamilies from './font-families';
 import ScreenHeader from './header';
+import FontSizesCount from './font-sizes/font-sizes-count';
 
 function ScreenTypography() {
 	const fontLibraryEnabled = useSelect(
@@ -31,10 +32,11 @@ function ScreenTypography() {
 			/>
 			<div className="edit-site-global-styles-screen">
 				<VStack spacing={ 7 }>
-					<TypographyVariations title={ __( 'Presets' ) } />
 					{ ! window.__experimentalDisableFontLibrary &&
 						fontLibraryEnabled && <FontFamilies /> }
 					<TypographyElements />
+					<TypographyVariations title={ __( 'Presets' ) } />
+					<FontSizesCount />
 				</VStack>
 			</div>
 		</>

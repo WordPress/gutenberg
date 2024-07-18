@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -29,12 +29,15 @@ export default function SiteTaglineEdit( {
 	const { canUserEdit, tagline } = useSelect( ( select ) => {
 		const { canUser, getEntityRecord, getEditedEntityRecord } =
 			select( coreStore );
-		const canEdit = canUser( 'update', 'settings' );
+		const canEdit = canUser( 'update', {
+			kind: 'root',
+			name: 'site',
+		} );
 		const settings = canEdit ? getEditedEntityRecord( 'root', 'site' ) : {};
 		const readOnlySettings = getEntityRecord( 'root', '__unstableBase' );
 
 		return {
-			canUserEdit: canUser( 'update', 'settings' ),
+			canUserEdit: canEdit,
 			tagline: canEdit
 				? settings?.description
 				: readOnlySettings?.description,
@@ -51,7 +54,7 @@ export default function SiteTaglineEdit( {
 	}
 
 	const blockProps = useBlockProps( {
-		className: classnames( {
+		className: clsx( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 			'wp-block-site-tagline__placeholder': ! canUserEdit && ! tagline,
 		} ),

@@ -3,23 +3,20 @@
 	font-size: $default-font-size;
 	box-sizing: border-box;
 	position: relative;
-	padding: 1em;
+	padding: $grid-unit-30;
 	width: 100%;
 	text-align: left;
 	margin: 0;
 	color: $gray-900;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: $grid-unit-20;
 
 	// Some editor styles unset this.
 	-moz-font-smoothing: subpixel-antialiased;
 	-webkit-font-smoothing: subpixel-antialiased;
 
-	// IE11 doesn't read rules inside this query. They are applied only to modern browsers.
-	@supports (position: sticky) {
-		display: flex;
-		flex-direction: column;
-		justify-content: top;
-		align-items: flex-start;
-	}
 
 	// Block UI appearance.
 	border-radius: $radius-block-ui;
@@ -42,15 +39,14 @@
 }
 
 .components-placeholder__label {
-	display: flex;
 	font-weight: 600;
-	margin-bottom: $grid-unit-20;
 	align-items: center;
+	display: flex;
 
 	> svg,
 	.dashicon,
 	.block-editor-block-icon {
-		margin-right: $grid-unit-15;
+		margin-right: $grid-unit-05;
 		fill: currentColor;
 		// Optimizate for high contrast modes.
 		// See also https://blogs.windows.com/msedgedev/2020/09/17/styling-for-windows-high-contrast-with-new-standards-for-forced-colors/.
@@ -71,6 +67,8 @@
 	flex-direction: row;
 	width: 100%;
 	flex-wrap: wrap;
+	gap: $grid-unit-20;
+	justify-content: flex-start;
 
 	p {
 		font-family: $default-font;
@@ -85,28 +83,14 @@
 
 .components-placeholder__input[type="url"] {
 	@include input-control;
-	margin: 0 8px 0 0;
 	flex: 1 1 auto;
 }
 
-.components-placeholder__instructions {
-	margin-bottom: 1em;
-}
-
 .components-placeholder__error {
-	margin-top: 1em;
 	width: 100%;
+	gap: $grid-unit-10;
 }
 
-.components-placeholder__fieldset .components-button {
-	margin-right: $grid-unit-15;
-	margin-bottom: $grid-unit-15; // If buttons wrap we need vertical space between.
-
-	&:last-child {
-		margin-bottom: 0;
-		margin-right: 0;
-	}
-}
 
 // Any `<Button />` component with `variant="link"` prop will need extra spacing if placed
 // immediately after a button which is *not* an `variant="link"` style button. This is because
@@ -123,14 +107,6 @@
 
 // Element queries to show different layouts at various sizes.
 .components-placeholder {
-	// Medium and large sizes.
-	&.is-large {
-		.components-placeholder__label {
-			font-size: 18pt;
-			font-weight: normal;
-		}
-	}
-
 	// Medium and small sizes.
 	&.is-medium,
 	&.is-small {
@@ -143,16 +119,15 @@
 			flex-direction: column;
 		}
 
-		.components-placeholder__fieldset .components-button {
-			margin-right: auto;
+		.components-placeholder__fieldset > *,
+		.components-button {
+			width: 100%;
+			justify-content: center;
 		}
 	}
 
-	// Small sizes.
 	&.is-small {
-		.components-button {
-			padding: 0 $grid-unit-10 2px;
-		}
+		padding: $grid-unit-20;
 	}
 }
 
@@ -183,8 +158,6 @@
 	}
 
 	.components-placeholder__fieldset {
-		width: auto;
-
 		// Unset intrinsic margins.
 		margin-left: 0;
 		margin-right: 0;

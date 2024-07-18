@@ -89,7 +89,7 @@ describe( 'NavigationMenuSelector', () => {
 			).toBeInTheDocument();
 		} );
 
-		it( 'should show correct dropdown toggle prompt to choose a menu when navigation menus have resolved', async () => {
+		it( 'should show correct dropdown toggle prompt to choose a menu when Navigation Menus have resolved', async () => {
 			useNavigationMenu.mockReturnValue( {
 				navigationMenus: [],
 				hasResolvedNavigationMenus: true,
@@ -101,7 +101,7 @@ describe( 'NavigationMenuSelector', () => {
 
 			expect(
 				screen.getByRole( 'button', {
-					name: 'Choose or create a Navigation menu',
+					name: 'Choose or create a Navigation Menu',
 				} )
 			).toBeInTheDocument();
 		} );
@@ -159,7 +159,7 @@ describe( 'NavigationMenuSelector', () => {
 				render( <NavigationMenuSelector /> );
 
 				const toggleButton = screen.getByRole( 'button', {
-					name: 'Choose or create a Navigation menu',
+					name: 'Choose or create a Navigation Menu',
 				} );
 
 				await user.click( toggleButton );
@@ -169,7 +169,7 @@ describe( 'NavigationMenuSelector', () => {
 				expect( menuPopover ).toHaveAttribute(
 					'aria-label',
 					expect.stringContaining(
-						'Choose or create a Navigation menu'
+						'Choose or create a Navigation Menu'
 					)
 				);
 
@@ -191,7 +191,7 @@ describe( 'NavigationMenuSelector', () => {
 				expect( toolsGroup ).toBeInTheDocument();
 
 				const createMenuButton = screen.getByRole( 'menuitem', {
-					name: 'Create new menu',
+					name: 'Create new Menu',
 				} );
 
 				expect( createMenuButton ).toBeInTheDocument();
@@ -236,7 +236,7 @@ describe( 'NavigationMenuSelector', () => {
 				await user.click( toggleButton );
 
 				const createMenuButton = screen.getByRole( 'menuitem', {
-					name: 'Create new menu',
+					name: 'Create new Menu',
 				} );
 
 				await user.click( createMenuButton );
@@ -268,7 +268,7 @@ describe( 'NavigationMenuSelector', () => {
 
 				await user.click(
 					screen.getByRole( 'menuitem', {
-						name: 'Create new menu',
+						name: 'Create new Menu',
 					} )
 				);
 
@@ -293,7 +293,7 @@ describe( 'NavigationMenuSelector', () => {
 				// Check the "Create menu" button is disabled.
 				expect(
 					screen.queryByRole( 'menuitem', {
-						name: 'Create new menu',
+						name: 'Create new Menu',
 					} )
 				).toBeDisabled();
 
@@ -318,13 +318,13 @@ describe( 'NavigationMenuSelector', () => {
 				// Check the button is enabled again.
 				expect(
 					screen.queryByRole( 'menuitem', {
-						name: 'Create new menu',
+						name: 'Create new Menu',
 					} )
 				).toBeEnabled();
 			} );
 		} );
 
-		describe( 'Navigation menus', () => {
+		describe( 'Navigation Menus', () => {
 			it( 'should not show a list of menus when menus exist but user does not have permission to switch menus', async () => {
 				const user = userEvent.setup();
 
@@ -445,7 +445,7 @@ describe( 'NavigationMenuSelector', () => {
 				expect( menuItem ).toBeChecked();
 			} );
 
-			it( 'should call the handler when the navigation menu is selected', async () => {
+			it( 'should call the handler when the Navigation Menu is selected', async () => {
 				const user = userEvent.setup();
 
 				const handler = jest.fn();

@@ -11,10 +11,7 @@ import { RegistryProvider, createRegistry } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import {
-	useBlockSelectionListener,
-	useUpdatePostLinkListener,
-} from '../listener-hooks';
+import { useUpdatePostLinkListener } from '../listener-hooks';
 import { STORE_NAME } from '../../../store/constants';
 
 describe( 'listener hook tests', () => {
@@ -71,10 +68,6 @@ describe( 'listener hook tests', () => {
 	const setMockReturnValue = ( store, functionName, value ) => {
 		mockStores[ store ].selectors[ functionName ].mockReturnValue( value );
 	};
-	const getSpyedFunction = ( store, functionName ) =>
-		mockStores[ store ].selectors[ functionName ];
-	const getSpyedAction = ( store, actionName ) =>
-		mockStores[ store ].actions[ actionName ];
 
 	afterEach( () => {
 		Object.values( mockStores ).forEach( ( storeMocks ) => {
@@ -84,94 +77,6 @@ describe( 'listener hook tests', () => {
 			Object.values( storeMocks.actions || {} ).forEach( ( mock ) => {
 				mock.mockClear();
 			} );
-		} );
-	} );
-	describe( 'useBlockSelectionListener', () => {
-		const registry = createRegistry( mockStores );
-		const TestComponent = () => {
-			useBlockSelectionListener();
-			return null;
-		};
-		const TestedOutput = () => {
-			return (
-				<RegistryProvider value={ registry }>
-					<TestComponent />
-				</RegistryProvider>
-			);
-		};
-
-		it( 'does nothing when editor sidebar is not open', () => {
-			setMockReturnValue( STORE_NAME, 'isEditorSidebarOpened', false );
-			render( <TestedOutput /> );
-
-			expect(
-				getSpyedFunction( STORE_NAME, 'isEditorSidebarOpened' )
-			).toHaveBeenCalled();
-			expect(
-				getSpyedAction( STORE_NAME, 'openGeneralSidebar' )
-			).not.toHaveBeenCalled();
-		} );
-		it( 'opens block sidebar if block is selected', () => {
-			setMockReturnValue( STORE_NAME, 'isEditorSidebarOpened', true );
-			setMockReturnValue(
-				'core/block-editor',
-				'getBlockSelectionStart',
-				true
-			);
-			setMockReturnValue( 'core/preferences', 'get', false );
-
-			render( <TestedOutput /> );
-
-			expect(
-				getSpyedAction( STORE_NAME, 'openGeneralSidebar' )
-			).toHaveBeenCalledWith( 'edit-post/block' );
-		} );
-		it( 'opens document sidebar if block is not selected', () => {
-			setMockReturnValue( STORE_NAME, 'isEditorSidebarOpened', true );
-			setMockReturnValue( STORE_NAME, 'isEditorSidebarOpened', true );
-			setMockReturnValue(
-				'core/block-editor',
-				'getBlockSelectionStart',
-				false
-			);
-			setMockReturnValue( 'core/preferences', 'get', false );
-
-			render( <TestedOutput /> );
-
-			expect(
-				getSpyedAction( STORE_NAME, 'openGeneralSidebar' )
-			).toHaveBeenCalledWith( 'edit-post/document' );
-		} );
-		it( 'does not open block sidebar if block is selected and distraction free mode is on', () => {
-			setMockReturnValue( STORE_NAME, 'isEditorSidebarOpened', true );
-			setMockReturnValue(
-				'core/block-editor',
-				'getBlockSelectionStart',
-				true
-			);
-			setMockReturnValue( 'core/preferences', 'get', true );
-
-			render( <TestedOutput /> );
-
-			expect(
-				getSpyedAction( STORE_NAME, 'openGeneralSidebar' )
-			).toHaveBeenCalledTimes( 0 );
-		} );
-		it( 'does not open document sidebar if block is not selected and distraction free is on', () => {
-			setMockReturnValue( STORE_NAME, 'isEditorSidebarOpened', true );
-			setMockReturnValue( STORE_NAME, 'isEditorSidebarOpened', true );
-			setMockReturnValue(
-				'core/block-editor',
-				'getBlockSelectionStart',
-				false
-			);
-			setMockReturnValue( 'core/preferences', 'get', true );
-
-			render( <TestedOutput /> );
-
-			expect(
-				getSpyedAction( STORE_NAME, 'openGeneralSidebar' )
-			).toHaveBeenCalledTimes( 0 );
 		} );
 	} );
 

@@ -226,12 +226,12 @@ describe( 'getCSSRules', () => {
 				{
 					background: {
 						backgroundImage: {
-							source: 'file',
 							url: 'https://example.com/image.jpg',
 						},
 						backgroundPosition: '50% 50%',
 						backgroundRepeat: 'no-repeat',
 						backgroundSize: '300px',
+						backgroundAttachment: 'fixed',
 					},
 					color: {
 						text: '#dddddd',
@@ -399,6 +399,11 @@ describe( 'getCSSRules', () => {
 				selector: '.some-selector',
 				key: 'backgroundSize',
 				value: '300px',
+			},
+			{
+				selector: '.some-selector',
+				key: 'backgroundAttachment',
+				value: 'fixed',
 			},
 		] );
 	} );

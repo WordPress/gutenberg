@@ -18,7 +18,7 @@ import { shadow as shadowIcon, Icon, check } from '@wordpress/icons';
 /**
  * External dependencies
  */
-import classNames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * Internal dependencies
@@ -32,6 +32,11 @@ import { unlock } from '../../lock-unlock';
  * @type {Array}
  */
 const EMPTY_ARRAY = [];
+const {
+	CompositeItemV2: CompositeItem,
+	CompositeV2: Composite,
+	useCompositeStoreV2: useCompositeStore,
+} = unlock( componentsPrivateApis );
 
 export function ShadowPopoverContainer( { shadow, onShadowChange, settings } ) {
 	const shadows = useShadowPresets( settings );
@@ -59,8 +64,6 @@ export function ShadowPopoverContainer( { shadow, onShadowChange, settings } ) {
 }
 
 export function ShadowPresets( { presets, activeShadow, onSelect } ) {
-	const { CompositeV2: Composite, useCompositeStoreV2: useCompositeStore } =
-		unlock( componentsPrivateApis );
 	const compositeStore = useCompositeStore();
 	return ! presets ? null : (
 		<Composite
@@ -86,21 +89,17 @@ export function ShadowPresets( { presets, activeShadow, onSelect } ) {
 }
 
 export function ShadowIndicator( { type, label, isActive, onSelect, shadow } ) {
-	const { CompositeItemV2: CompositeItem } = unlock( componentsPrivateApis );
 	return (
 		<CompositeItem
 			role="option"
 			aria-label={ label }
 			aria-selected={ isActive }
-			className={ classNames(
-				'block-editor-global-styles__shadow__item',
-				{
-					'is-active': isActive,
-				}
-			) }
+			className={ clsx( 'block-editor-global-styles__shadow__item', {
+				'is-active': isActive,
+			} ) }
 			render={
 				<Button
-					className={ classNames(
+					className={ clsx(
 						'block-editor-global-styles__shadow-indicator',
 						{
 							unset: type === 'unset',
@@ -147,7 +146,7 @@ function renderShadowToggle() {
 	return ( { onToggle, isOpen } ) => {
 		const toggleProps = {
 			onClick: onToggle,
-			className: classNames( { 'is-open': isOpen } ),
+			className: clsx( { 'is-open': isOpen } ),
 			'aria-expanded': isOpen,
 		};
 
@@ -173,8 +172,11 @@ export function useShadowPresets( settings ) {
 		}
 
 		const defaultPresetsEnabled = settings?.shadow?.defaultPresets;
-		const { default: defaultShadows, theme: themeShadows } =
-			settings?.shadow?.presets ?? {};
+		const {
+			default: defaultShadows,
+			theme: themeShadows,
+			custom: customShadows,
+		} = settings?.shadow?.presets ?? {};
 		const unsetShadow = {
 			name: __( 'Unset' ),
 			slug: 'unset',
@@ -184,6 +186,7 @@ export function useShadowPresets( settings ) {
 		const shadowPresets = [
 			...( ( defaultPresetsEnabled && defaultShadows ) || EMPTY_ARRAY ),
 			...( themeShadows || EMPTY_ARRAY ),
+			...( customShadows || EMPTY_ARRAY ),
 		];
 		if ( shadowPresets.length ) {
 			shadowPresets.unshift( unsetShadow );

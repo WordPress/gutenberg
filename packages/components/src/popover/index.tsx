@@ -2,7 +2,7 @@
  * External dependencies
  */
 import type { ForwardedRef, SyntheticEvent, RefCallback } from 'react';
-import classnames from 'classnames';
+import clsx from 'clsx';
 import {
 	useFloating,
 	flip as flipMiddleware,
@@ -13,9 +13,7 @@ import {
 	offset as offsetMiddleware,
 	size,
 } from '@floating-ui/react-dom';
-// eslint-disable-next-line no-restricted-imports
 import type { HTMLMotionProps, MotionProps } from 'framer-motion';
-// eslint-disable-next-line no-restricted-imports
 import { motion } from 'framer-motion';
 
 /**
@@ -78,7 +76,7 @@ export const SLOT_NAME = 'Popover';
 const ArrowTriangle = () => (
 	<SVG
 		xmlns="http://www.w3.org/2000/svg"
-		viewBox={ `0 0 100 100` }
+		viewBox="0 0 100 100"
 		className="components-popover__triangle"
 		role="presentation"
 	>
@@ -226,8 +224,9 @@ const UnforwardedPopover = (
 					const { firstElementChild } = refs.floating.current ?? {};
 
 					// Only HTMLElement instances have the `style` property.
-					if ( ! ( firstElementChild instanceof HTMLElement ) )
+					if ( ! ( firstElementChild instanceof HTMLElement ) ) {
 						return;
+					}
 
 					// Reduce the height of the popover to the available space.
 					Object.assign( firstElementChild.style, {
@@ -389,7 +388,7 @@ const UnforwardedPopover = (
 
 	let content = (
 		<motion.div
-			className={ classnames( className, {
+			className={ clsx( className, {
 				'is-expanded': isExpanded,
 				'is-positioned': isPositioned,
 				// Use the 'alternate' classname for 'toolbar' variant for back compat.

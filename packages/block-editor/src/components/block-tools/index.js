@@ -6,6 +6,9 @@ import { isTextField } from '@wordpress/dom';
 import { Popover } from '@wordpress/components';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
 import { useRef } from '@wordpress/element';
+import { switchToBlockType, store as blocksStore } from '@wordpress/blocks';
+import { speak } from '@wordpress/a11y';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -17,11 +20,13 @@ import {
 } from './insertion-point';
 import BlockToolbarPopover from './block-toolbar-popover';
 import BlockToolbarBreadcrumb from './block-toolbar-breadcrumb';
+import ZoomOutPopover from './zoom-out-popover';
 import { store as blockEditorStore } from '../../store';
 import usePopoverScroll from '../block-popover/use-popover-scroll';
 import ZoomOutModeInserters from './zoom-out-mode-inserters';
 import { useShowBlockTools } from './use-show-block-tools';
 import { unlock } from '../../lock-unlock';
+import getEditorRegion from '../../utils/get-editor-region';
 
 function selector( select ) {
 	const {
@@ -64,18 +69,25 @@ export default function BlockTools( {
 		[]
 	);
 	const isMatch = useShortcutEventMatch();
-	const { getSelectedBlockClientIds, getBlockRootClientId } =
-		useSelect( blockEditorStore );
-
+	const {
+		getBlocksByClientId,
+		getSelectedBlockClientIds,
+		getBlockRootClientId,
+		isGroupable,
+	} = useSelect( blockEditorStore );
+	const { getGroupingBlockName } = useSelect( blocksStore );
 	const {
 		showEmptyBlockSideInserter,
 		showBreadcrumb,
 		showBlockToolbarPopover,
+		showZoomOutToolbar,
 	} = useShowBlockTools();
 
 	const {
+		clearSelectedBlock,
 		duplicateBlocks,
 		removeBlocks,
+		replaceBlocks,
 		insertAfterBlock,
 		insertBeforeBlock,
 		selectBlock,
@@ -84,8 +96,12 @@ export default function BlockTools( {
 		expandBlock,
 	} = unlock( useDispatch( blockEditorStore ) );
 
+	const blockSelectionButtonRef = useRef();
+
 	function onKeyDown( event ) {
-		if ( event.defaultPrevented ) return;
+		if ( event.defaultPrevented ) {
+			return;
+		}
 
 		if ( isMatch( 'core/block-editor/move-up', event ) ) {
 			const clientIds = getSelectedBlockClientIds();
@@ -142,6 +158,13 @@ export default function BlockTools( {
 				// block so that focus is directed back to the beginning of the selection.
 				// In effect, to the user this feels like deselecting the multi-selection.
 				selectBlock( clientIds[ 0 ] );
+			} else if (
+				clientIds.length === 1 &&
+				event.target === blockSelectionButtonRef?.current
+			) {
+				event.preventDefault();
+				clearSelectedBlock();
+				getEditorRegion( __unstableContentRef.current )?.focus();
 			}
 		} else if ( isMatch( 'core/block-editor/collapse-list-view', event ) ) {
 			// If focus is currently within a text field, such as a rich text block or other editable field,
@@ -157,9 +180,21 @@ export default function BlockTools( {
 			}
 			event.preventDefault();
 			expandBlock( clientId );
+		} else if ( isMatch( 'core/block-editor/group', event ) ) {
+			const clientIds = getSelectedBlockClientIds();
+			if ( clientIds.length > 1 && isGroupable( clientIds ) ) {
+				event.preventDefault();
+				const blocks = getBlocksByClientId( clientIds );
+				const groupingBlockName = getGroupingBlockName();
+				const newBlocks = switchToBlockType(
+					blocks,
+					groupingBlockName
+				);
+				replaceBlocks( clientIds, newBlocks );
+				speak( __( 'Selected blocks are grouped.' ) );
+			}
 		}
 	}
-
 	const blockToolbarRef = usePopoverScroll( __unstableContentRef );
 	const blockToolbarAfterRef = usePopoverScroll( __unstableContentRef );
 
@@ -190,6 +225,14 @@ export default function BlockTools( {
 
 				{ showBreadcrumb && (
 					<BlockToolbarBreadcrumb
+						ref={ blockSelectionButtonRef }
+						__unstableContentRef={ __unstableContentRef }
+						clientId={ clientId }
+					/>
+				) }
+
+				{ showZoomOutToolbar && (
+					<ZoomOutPopover
 						__unstableContentRef={ __unstableContentRef }
 						clientId={ clientId }
 					/>
@@ -208,11 +251,12 @@ export default function BlockTools( {
 					name="__unstable-block-tools-after"
 					ref={ blockToolbarAfterRef }
 				/>
-				{ isZoomOutMode && (
-					<ZoomOutModeInserters
-						__unstableContentRef={ __unstableContentRef }
-					/>
-				) }
+				{ window.__experimentalEnableZoomedOutPatternsTab &&
+					isZoomOutMode && (
+						<ZoomOutModeInserters
+							__unstableContentRef={ __unstableContentRef }
+						/>
+					) }
 			</InsertionPointOpenRef.Provider>
 		</div>
 	);

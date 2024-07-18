@@ -51,4 +51,29 @@ test.describe( 'data-wp-on', () => {
 			.click( { clickCount: 3, delay: 100 } );
 		await expect( counter ).toHaveText( '3' );
 	} );
+
+	test( 'should work with multiple event handlers on the same event type', async ( {
+		page,
+	} ) => {
+		const button = page.getByTestId( 'multiple handlers button' );
+		const isOpen = page.getByTestId( 'multiple handlers isOpen' );
+		const clicked = page.getByTestId( 'multiple handlers clicked' );
+		const clickCount = page.getByTestId( 'multiple handlers clickCount' );
+
+		await expect( clicked ).toHaveText( 'false' );
+		await expect( clickCount ).toHaveText( '0' );
+		await expect( isOpen ).toHaveText( 'true' );
+
+		await button.click();
+
+		await expect( clicked ).toHaveText( 'true' );
+		await expect( clickCount ).toHaveText( '1' );
+		await expect( isOpen ).toHaveText( 'false' );
+
+		await button.click();
+
+		await expect( clicked ).toHaveText( 'true' );
+		await expect( clickCount ).toHaveText( '2' );
+		await expect( isOpen ).toHaveText( 'true' );
+	} );
 } );

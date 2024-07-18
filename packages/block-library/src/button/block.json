@@ -73,6 +73,7 @@
 	},
 	"supports": {
 		"anchor": true,
+		"splitting": true,
 		"align": false,
 		"alignWide": false,
 		"color": {
@@ -92,6 +93,7 @@
 			"__experimentalTextTransform": true,
 			"__experimentalTextDecoration": true,
 			"__experimentalLetterSpacing": true,
+			"__experimentalWritingMode": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}

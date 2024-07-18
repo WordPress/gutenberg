@@ -1,4 +1,7 @@
-figure.wp-block-gallery {
+// Adding `figure` to the selector increases the specificity above the global
+// styles specificity, which is levelled at 0-1-0. We should figure out why
+// `figure` is needed.
+:root :where(figure.wp-block-gallery) {
 	// Override the default list style type _only in the editor_
 	// to avoid :not() selector specificity issues.
 	// See https://github.com/WordPress/gutenberg/pull/10358

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -18,7 +18,7 @@ import deprecated from '@wordpress/deprecated';
 import Inserter from '../inserter';
 
 function ButtonBlockAppender(
-	{ rootClientId, className, onFocus, tabIndex },
+	{ rootClientId, className, onFocus, tabIndex, onSelect },
 	ref
 ) {
 	return (
@@ -26,6 +26,7 @@ function ButtonBlockAppender(
 			position="bottom center"
 			rootClientId={ rootClientId }
 			__experimentalIsQuick
+			onSelectOrClose={ onSelect }
 			renderToggle={ ( {
 				onToggle,
 				disabled,
@@ -53,13 +54,15 @@ function ButtonBlockAppender(
 						ref={ ref }
 						onFocus={ onFocus }
 						tabIndex={ tabIndex }
-						className={ classnames(
+						className={ clsx(
 							className,
 							'block-editor-button-block-appender'
 						) }
 						onClick={ onToggle }
 						aria-haspopup={ isToggleButton ? 'true' : undefined }
 						aria-expanded={ isToggleButton ? isOpen : undefined }
+						// Disable reason: There shouldn't be a case where this button is disabled but not visually hidden.
+						// eslint-disable-next-line no-restricted-syntax
 						disabled={ disabled }
 						label={ label }
 					>

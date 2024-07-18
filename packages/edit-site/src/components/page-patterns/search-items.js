@@ -16,15 +16,50 @@ const { extractWords, getNormalizedSearchTerms, normalizeString } = unlock(
  * Internal dependencies
  */
 import {
+	TEMPLATE_PART_ALL_AREAS_CATEGORY,
 	PATTERN_DEFAULT_CATEGORY,
 	PATTERN_USER_CATEGORY,
 	PATTERN_TYPES,
+	TEMPLATE_PART_POST_TYPE,
 } from '../../utils/constants';
 
 // Default search helpers.
-const defaultGetName = ( item ) => item.name || '';
-const defaultGetTitle = ( item ) => item.title;
-const defaultGetDescription = ( item ) => item.description || '';
+const defaultGetName = ( item ) => {
+	if ( item.type === PATTERN_TYPES.user ) {
+		return item.slug;
+	}
+
+	if ( item.type === TEMPLATE_PART_POST_TYPE ) {
+		return '';
+	}
+
+	return item.name || '';
+};
+
+export const defaultGetTitle = ( item ) => {
+	if ( typeof item.title === 'string' ) {
+		return item.title;
+	}
+
+	if ( item.title && item.title.rendered ) {
+		return item.title.rendered;
+	}
+
+	if ( item.title && item.title.raw ) {
+		return item.title.raw;
+	}
+
+	return '';
+};
+
+const defaultGetDescription = ( item ) => {
+	if ( item.type === PATTERN_TYPES.user ) {
+		return item.excerpt.raw;
+	}
+
+	return item.description || '';
+};
+
 const defaultGetKeywords = ( item ) => item.keywords || [];
 const defaultHasCategory = () => false;
 
@@ -48,6 +83,7 @@ const removeMatchingTerms = ( unmatchedTerms, unprocessedTerms ) => {
  */
 export const searchItems = ( items = [], searchInput = '', config = {} ) => {
 	const normalizedSearchTerms = getNormalizedSearchTerms( searchInput );
+
 	// Filter patterns by category: the default category indicates that all patterns will be shown.
 	const onlyFilterByCategory =
 		config.categoryId !== PATTERN_DEFAULT_CATEGORY &&
@@ -100,6 +136,7 @@ function getItemSearchRank( item, searchTerm, config ) {
 
 	let rank =
 		categoryId === PATTERN_DEFAULT_CATEGORY ||
+		categoryId === TEMPLATE_PART_ALL_AREAS_CATEGORY ||
 		( categoryId === PATTERN_USER_CATEGORY &&
 			item.type === PATTERN_TYPES.user ) ||
 		hasCategory( item, categoryId )

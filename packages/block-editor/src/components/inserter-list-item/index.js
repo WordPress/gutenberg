@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -62,7 +62,7 @@ function InserterListItem( {
 		>
 			{ ( { draggable, onDragStart, onDragEnd } ) => (
 				<div
-					className={ classnames(
+					className={ clsx(
 						'block-editor-block-types-list__list-item',
 						{
 							'is-synced': isSynced,
@@ -85,7 +85,7 @@ function InserterListItem( {
 				>
 					<InserterListboxItem
 						isFirst={ isFirst }
-						className={ classnames(
+						className={ clsx(
 							'block-editor-block-types-list__item',
 							className
 						) }

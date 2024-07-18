@@ -1,0 +1,81 @@
+// Developer notes: these rules are duplicated for the site editor.
+// They need to be updated in both places.
+
+.edit-post-fullscreen-mode-close.components-button {
+	// Do not show the toolbar icon on small screens,
+	// when Fullscreen Mode is not an option in the "More" menu.
+	display: none;
+
+	@include break-medium() {
+		display: flex;
+		align-items: center;
+		align-self: stretch;
+		border: none;
+		background: $gray-900;
+		color: $white;
+		border-radius: 0;
+		height: $header-height;
+		width: $header-height;
+		position: relative;
+
+		&:active {
+			color: $white;
+		}
+
+		&:focus {
+			box-shadow: none;
+		}
+
+		&::before {
+			transition: box-shadow 0.1s ease;
+			@include reduce-motion("transition");
+			content: "";
+			display: block;
+			position: absolute;
+			top: 9px;
+			right: 9px;
+			bottom: 9px + $border-width; // Height of toolbar in edit-post (not edit-site) is 61px tall.
+			left: 9px;
+			border-radius: $radius-block-ui + $border-width + $border-width;
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $gray-900;
+		}
+
+		// Hover color.
+		&:hover::before {
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $gray-700;
+		}
+
+		&.has-icon:hover::before {
+			box-shadow: none;
+		}
+
+		// Lightened spot color focus.
+		&:focus::before {
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) rgba($white, 0.1), inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		}
+	}
+
+	.edit-post-fullscreen-mode-close_site-icon {
+		width: $button-size;
+		height: $button-size;
+		border-radius: $radius-block-ui;
+		object-fit: cover;
+		// Compensate for the top-bar border.
+		margin-top: -($border-width);
+	}
+}
+
+/**
+ *  Show icon label overrides.
+ */
+.show-icon-labels .editor-header {
+	.edit-post-fullscreen-mode-close.has-icon {
+		width: $header-height;
+		svg {
+			display: block;
+		}
+		&::after {
+			content: none;
+		}
+	}
+}

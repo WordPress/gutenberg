@@ -141,13 +141,19 @@ figure.wp-block-image:not(.wp-block) {
 	width: 100%;
 	overflow: hidden;
 
-	// This removes the border from the img within the image cropper so it
-	// can be applied to the cropper itself. This then allows the image to be
-	// cropped within the visual border providing more accurate editing and
-	// smoother UX.
-	.reactEasyCrop_Container .reactEasyCrop_Image {
-		border: none;
-		border-radius: 0; // Prevent's theme.json radius bleeding into cropper.
+	.reactEasyCrop_Container {
+		// The linked Image block has `pointer-events: none` applied. Override it
+		// here to enable the crop action.
+		pointer-events: auto;
+
+		// This removes the border from the img within the image cropper so it
+		// can be applied to the cropper itself. This then allows the image to be
+		// cropped within the visual border providing more accurate editing and
+		// smoother UX.
+		.reactEasyCrop_Image {
+			border: none;
+			border-radius: 0; // Prevent's theme.json radius bleeding into cropper.
+		}
 	}
 }
 
@@ -167,19 +173,6 @@ figure.wp-block-image:not(.wp-block) {
 	.components-popover__content {
 		min-width: 260px;
 		overflow: visible !important;
-	}
-}
-
-.wp-block-image__aspect-ratio {
-	height: $grid-unit-60 - $border-width - $border-width;
-	margin-bottom: -$grid-unit-10;
-	display: flex;
-	align-items: center;
-
-	.components-button {
-		width: $button-size;
-		padding-left: 0;
-		padding-right: 0;
 	}
 }
 

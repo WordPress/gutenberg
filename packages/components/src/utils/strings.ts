@@ -4,66 +4,18 @@
 import removeAccents from 'remove-accents';
 import { paramCase } from 'change-case';
 
+/**
+ * All unicode characters that we consider "dash-like":
+ * - `\u007e`: ~ (tilde)
+ * - `\u00ad`: ­ (soft hyphen)
+ * - `\u2053`: ⁓ (swung dash)
+ * - `\u207b`: ⁻ (superscript minus)
+ * - `\u208b`: ₋ (subscript minus)
+ * - `\u2212`: − (minus sign)
+ * - `\\p{Pd}`: any other Unicode dash character
+ */
 const ALL_UNICODE_DASH_CHARACTERS = new RegExp(
-	`[${ [
-		// - (hyphen-minus)
-		'\u002d',
-		// ~ (tilde)
-		'\u007e',
-		// ­ (soft hyphen)
-		'\u00ad',
-		// ֊ (armenian hyphen)
-		'\u058a',
-		// ־ (hebrew punctuation maqaf)
-		'\u05be',
-		// ᐀ (canadian syllabics hyphen)
-		'\u1400',
-		// ᠆ (mongolian todo soft hyphen)
-		'\u1806',
-		// ‐ (hyphen)
-		'\u2010',
-		// non-breaking hyphen)
-		'\u2011',
-		// ‒ (figure dash)
-		'\u2012',
-		// – (en dash)
-		'\u2013',
-		// — (em dash)
-		'\u2014',
-		// ― (horizontal bar)
-		'\u2015',
-		// ⁓ (swung dash)
-		'\u2053',
-		// superscript minus)
-		'\u207b',
-		// subscript minus)
-		'\u208b',
-		// − (minus sign)
-		'\u2212',
-		// ⸗ (double oblique hyphen)
-		'\u2e17',
-		// ⸺ (two-em dash)
-		'\u2e3a',
-		// ⸻ (three-em dash)
-		'\u2e3b',
-		// 〜 (wave dash)
-		'\u301c',
-		// 〰 (wavy dash)
-		'\u3030',
-		// ゠ (katakana-hiragana double hyphen)
-		'\u30a0',
-		// ︱ (presentation form for vertical em dash)
-		'\ufe31',
-		// ︲ (presentation form for vertical en dash)
-		'\ufe32',
-		// ﹘ (small em dash)
-		'\ufe58',
-		// ﹣ (small hyphen-minus)
-		'\ufe63',
-		// － (fullwidth hyphen-minus)
-		'\uff0d',
-	].join( '' ) }]`,
-	'g'
+	/[\u007e\u00ad\u2053\u207b\u208b\u2212\p{Pd}]/gu
 );
 
 export const normalizeTextString = ( value: string ): string => {

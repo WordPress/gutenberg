@@ -8,13 +8,23 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
 
+/**
+ * Renders a button component that allows the user to switch a post to draft status.
+ *
+ * @return {JSX.Element} The rendered component.
+ */
 export default function PostSwitchToDraftButton() {
+	deprecated( 'wp.editor.PostSwitchToDraftButton', {
+		since: '6.7',
+		version: '6.9',
+	} );
 	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
 
 	const { editPost, savePost } = useDispatch( editorStore );
@@ -31,10 +41,13 @@ export default function PostSwitchToDraftButton() {
 	const isDisabled = isSaving || ( ! isPublished && ! isScheduled );
 
 	let alertMessage;
+	let confirmButtonText;
 	if ( isPublished ) {
 		alertMessage = __( 'Are you sure you want to unpublish this post?' );
+		confirmButtonText = __( 'Unpublish' );
 	} else if ( isScheduled ) {
 		alertMessage = __( 'Are you sure you want to unschedule this post?' );
+		confirmButtonText = __( 'Unschedule' );
 	}
 
 	const handleConfirm = () => {
@@ -63,6 +76,7 @@ export default function PostSwitchToDraftButton() {
 				isOpen={ showConfirmDialog }
 				onConfirm={ handleConfirm }
 				onCancel={ () => setShowConfirmDialog( false ) }
+				confirmButtonText={ confirmButtonText }
 			>
 				{ alertMessage }
 			</ConfirmDialog>

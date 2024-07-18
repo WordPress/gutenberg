@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
 	Modal,
 	privateApis as componentsPrivateApis,
@@ -23,7 +23,7 @@ const { Tabs } = unlock( componentsPrivateApis );
 
 const DEFAULT_TAB = {
 	id: 'installed-fonts',
-	title: __( 'Library' ),
+	title: _x( 'Library', 'Font library' ),
 };
 
 const UPLOAD_TAB = {
@@ -46,8 +46,10 @@ function FontLibraryModal( {
 } ) {
 	const { collections, setNotice } = useContext( FontLibraryContext );
 	const canUserCreate = useSelect( ( select ) => {
-		const { canUser } = select( coreStore );
-		return canUser( 'create', 'font-families' );
+		return select( coreStore ).canUser( 'create', {
+			kind: 'postType',
+			name: 'wp_font_family',
+		} );
 	}, [] );
 
 	const tabs = [ DEFAULT_TAB ];

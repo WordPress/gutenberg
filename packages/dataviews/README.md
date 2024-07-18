@@ -14,7 +14,6 @@ npm install @wordpress/dataviews --save
 
 ```jsx
 const Example = () => {
-
 	// Declare data, fields, etc.
 
 	return (
@@ -27,7 +26,7 @@ const Example = () => {
 			paginationInfo={ paginationInfo }
 		/>
 	);
-}
+};
 ```
 
 ## Properties
@@ -42,12 +41,14 @@ Example:
 const data = [
 	{
 		id: 1,
-		title: "Title",
-		author: "Admin",
-		date: "2012-04-23T18:25:43.511Z"
+		title: 'Title',
+		author: 'Admin',
+		date: '2012-04-23T18:25:43.511Z',
 	},
-	{ /* ... */ }
-]
+	{
+		/* ... */
+	},
+];
 ```
 
 By default, dataviews would use each record's `id` as an unique identifier. If it's not, the consumer should provide a `getItemId` function that returns one.
@@ -91,7 +92,7 @@ const fields = [
 			);
 		},
 		elements: [
-			{ value: 1, label: 'Admin' }
+			{ value: 1, label: 'Admin' },
 			{ value: 2, label: 'User' }
 		],
 		filterBy: {
@@ -125,8 +126,8 @@ Each field is an object with the following properties:
 -   `enableSorting`: whether the data can be sorted by the given field. True by default.
 -   `enableHiding`: whether the field can be hidden. True by default.
 -   `filterBy`: configuration for the filters.
-    - `operators`: the list of operators supported by the field.
-    - `isPrimary`: whether it is a primary filter. A primary filter is always visible and is not listed in the "Add filter" component, except for the list layout where it behaves like a secondary filter.
+    -   `operators`: the list of operators supported by the field.
+    -   `isPrimary`: whether it is a primary filter. A primary filter is always visible and is not listed in the "Add filter" component, except for the list layout where it behaves like a secondary filter.
 
 ### `view`: `object`
 
@@ -140,7 +141,7 @@ const view = {
 	search: '',
 	filters: [
 		{ field: 'author', operator: 'is', value: 2 },
-		{ field: 'status', operator: 'isAny', value: [ 'publish', 'draft'] }
+		{ field: 'status', operator: 'isAny', value: [ 'publish', 'draft' ] },
 	],
 	page: 1,
 	perPage: 5,
@@ -148,9 +149,9 @@ const view = {
 		field: 'date',
 		direction: 'desc',
 	},
-	hiddenFields: [ 'date', 'featured-image' ],
+	fields: [ 'author', 'status' ],
 	layout: {},
-}
+};
 ```
 
 Properties:
@@ -164,9 +165,9 @@ Properties:
 -   `perPage`: number of records to show per page.
 -   `page`: the page that is visible.
 -   `sort`:
-	- `field`: the field used for sorting the dataset.
-	- `direction`: the direction to use for sorting, one of `asc` or `desc`.
--   `hiddenFields`: the `id` of the fields that are hidden in the UI.
+    -   `field`: the field used for sorting the dataset.
+    -   `direction`: the direction to use for sorting, one of `asc` or `desc`.
+-   `fields`: the `id` of the fields that are visible in the UI.
 -   `layout`: config that is specific to a particular layout type.
     -   `mediaField`: used by the `grid` and `list` layouts. The `id` of the field to be used for rendering each card's media.
     -   `primaryField`: used by the `table`, `grid` and `list` layouts. The `id` of the field to be highlighted in each row/card/item.
@@ -192,9 +193,13 @@ function MyCustomPageTable() {
 		search: '',
 		filters: [
 			{ field: 'author', operator: 'is', value: 2 },
-			{ field: 'status', operator: 'isAny', value: [ 'publish', 'draft' ] }
+			{
+				field: 'status',
+				operator: 'isAny',
+				value: [ 'publish', 'draft' ],
+			},
 		],
-		hiddenFields: [ 'date', 'featured-image' ],
+		fields: [ 'author', 'status' ],
 		layout: {},
 	} );
 
@@ -219,9 +224,7 @@ function MyCustomPageTable() {
 		};
 	}, [ view ] );
 
-	const {
-		records
-	} = useEntityRecords( 'postType', 'page', queryArgs );
+	const { records } = useEntityRecords( 'postType', 'page', queryArgs );
 
 	return (
 		<DataViews
@@ -241,7 +244,7 @@ Collection of operations that can be performed upon each record.
 Each action is an object with the following properties:
 
 -   `id`: string, required. Unique identifier of the action. For example, `move-to-trash`.
--   `label`: string, required. User facing description of the action. For example, `Move to Trash`.
+-   `label`: string|function, required. User facing description of the action. For example, `Move to Trash`. In case we want to adjust the label based on the selected items, a function which accepts the selected records as input can be provided. This function should always return a `string` value.
 -   `isPrimary`: boolean, optional. Whether the action should be listed inline (primary) or in hidden in the more actions menu (secondary).
 -   `icon`: icon to show for primary actions. It's required for a primary action, otherwise the action would be considered secondary.
 -   `isEligible`: function, optional. Whether the action can be performed for a given record. If not present, the action is considered to be eligible for all items. It takes the given record as input.
@@ -252,8 +255,8 @@ Each action is an object with the following properties:
 
 ### `paginationInfo`: `Object`
 
-- `totalItems`: the total number of items in the datasets.
-- `totalPages`: the total number of pages, taking into account the total items in the dataset and the number of items per page provided by the user.
+-   `totalItems`: the total number of items in the datasets.
+-   `totalPages`: the total number of pages, taking into account the total items in the dataset and the number of items per page provided by the user.
 
 ### `search`: `boolean`
 
@@ -271,15 +274,11 @@ Function that receives an item and returns an unique identifier for it. By defau
 
 Whether the data is loading. `false` by default.
 
-### `supportedLayouts`: `String[]`
+### `defaultLayouts`: `Record< string, view >`
 
-Array of layouts supported. By default, all are: `table`, `grid`, `list`.
+Default layouts. By default, uses empty layouts: `table`, `grid`, `list`.
 
-### `deferredRendering`: `boolean`
-
-Whether the items should be rendered asynchronously. Useful when there's a field that takes a lot of time (e.g.: previews). `false` by default.
-
-### `onSelectionChange`: `function`
+### `onChangeSelection`: `function`
 
 Callback that signals the user selected one of more items, and takes them as parameter. So far, only the `list` view implements it.
 
@@ -287,9 +286,9 @@ Callback that signals the user selected one of more items, and takes them as par
 
 ### Layouts
 
-- `table`: the view uses a table layout.
-- `grid`: the view uses a grid layout.
-- `list`: the view uses a list layout.
+-   `table`: the view uses a table layout.
+-   `grid`: the view uses a grid layout.
+-   `list`: the view uses a list layout.
 
 ### Fields
 
@@ -299,13 +298,13 @@ Callback that signals the user selected one of more items, and takes them as par
 
 Allowed operators:
 
-| Operator | Selection | Description | Example |
-| --- | ---  | --- | --- |
-| `is` | Single item | `EQUAL TO`. The item's field is equal to a single value. | Author is Admin |
-| `isNot` | Single item | `NOT EQUAL TO`. The item's field is not equal to a single value. | Author is not Admin |
-| `isAny` | Multiple items | `OR`. The item's field is present in a list of values. | Author is any: Admin, Editor |
-| `isNone` | Multiple items | `NOT OR`. The item's field is not present in a list of values. | Author is none: Admin, Editor |
-| `isAll` | Multiple items | `AND`. The item's field has all of the values in the list. | Category is all: Book, Review, Science Fiction |
+| Operator   | Selection      | Description                                                             | Example                                            |
+| ---------- | -------------- | ----------------------------------------------------------------------- | -------------------------------------------------- |
+| `is`       | Single item    | `EQUAL TO`. The item's field is equal to a single value.                | Author is Admin                                    |
+| `isNot`    | Single item    | `NOT EQUAL TO`. The item's field is not equal to a single value.        | Author is not Admin                                |
+| `isAny`    | Multiple items | `OR`. The item's field is present in a list of values.                  | Author is any: Admin, Editor                       |
+| `isNone`   | Multiple items | `NOT OR`. The item's field is not present in a list of values.          | Author is none: Admin, Editor                      |
+| `isAll`    | Multiple items | `AND`. The item's field has all of the values in the list.              | Category is all: Book, Review, Science Fiction     |
 | `isNotAll` | Multiple items | `NOT AND`. The item's field doesn't have all of the values in the list. | Category is not all: Book, Review, Science Fiction |
 
 `is` and `isNot` are single-selection operators, while `isAny`, `isNone`, `isAll`, and `isNotALl` are multi-selection. By default, a filter with no operators declared will support the `isAny` and `isNone` multi-selection operators. A filter cannot mix single-selection & multi-selection operators; if a single-selection operator is present in the list of valid operators, the multi-selection ones will be discarded and the filter won't allow selecting more than one item.

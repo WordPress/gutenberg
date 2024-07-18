@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -174,23 +174,16 @@ export function addSaveProps( props, blockNameOrType, attributes ) {
 		style?.color?.background ||
 		( hasGradient && ( gradient || style?.color?.gradient ) );
 
-	const newClassName = classnames(
-		props.className,
-		textClass,
-		gradientClass,
-		{
-			// Don't apply the background class if there's a custom gradient.
-			[ backgroundClass ]:
-				( ! hasGradient || ! style?.color?.gradient ) &&
-				!! backgroundClass,
-			'has-text-color':
-				shouldSerialize( 'text' ) &&
-				( textColor || style?.color?.text ),
-			'has-background': serializeHasBackground && hasBackground,
-			'has-link-color':
-				shouldSerialize( 'link' ) && style?.elements?.link?.color,
-		}
-	);
+	const newClassName = clsx( props.className, textClass, gradientClass, {
+		// Don't apply the background class if there's a custom gradient.
+		[ backgroundClass ]:
+			( ! hasGradient || ! style?.color?.gradient ) && !! backgroundClass,
+		'has-text-color':
+			shouldSerialize( 'text' ) && ( textColor || style?.color?.text ),
+		'has-background': serializeHasBackground && hasBackground,
+		'has-link-color':
+			shouldSerialize( 'link' ) && style?.elements?.link?.color,
+	} );
 	props.className = newClassName ? newClassName : undefined;
 
 	return props;
@@ -399,7 +392,7 @@ function useBlockProps( {
 
 	return {
 		...saveProps,
-		className: classnames(
+		className: clsx(
 			saveProps.className,
 			// Add background image classes in the editor, if not already handled by background color values.
 			! hasBackgroundValue && getBackgroundImageClasses( style )

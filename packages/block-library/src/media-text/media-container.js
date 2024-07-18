@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -173,7 +173,7 @@ function MediaContainer( props, ref ) {
 		return (
 			<ResizableBoxContainer
 				as="figure"
-				className={ classnames(
+				className={ clsx(
 					className,
 					'editor-media-container__resizer',
 					{ 'is-transient': isTemporaryMedia }

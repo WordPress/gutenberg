@@ -9,24 +9,33 @@ import {
 /**
  * Internal dependencies
  */
-import Variation from './variation';
 import StylesPreviewColors from '../preview-colors';
-import { useColorVariations } from '../hooks';
+import { useCurrentMergeThemeStyleVariationsWithUserConfig } from '../../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
 import Subtitle from '../subtitle';
+import Variation from './variation';
 
 export default function ColorVariations( { title, gap = 2 } ) {
-	const colorVariations = useColorVariations();
+	const propertiesToFilter = [ 'color' ];
+	const colorVariations =
+		useCurrentMergeThemeStyleVariationsWithUserConfig( propertiesToFilter );
 
-	if ( ! colorVariations?.length ) {
+	// Return null if there is only one variation (the default).
+	if ( colorVariations?.length <= 1 ) {
 		return null;
 	}
 
 	return (
 		<VStack spacing={ 3 }>
 			{ title && <Subtitle level={ 3 }>{ title }</Subtitle> }
-			<Grid columns={ 3 } gap={ gap }>
+			<Grid spacing={ gap }>
 				{ colorVariations.map( ( variation, index ) => (
-					<Variation key={ index } variation={ variation }>
+					<Variation
+						key={ index }
+						variation={ variation }
+						isPill
+						properties={ propertiesToFilter }
+						showTooltip
+					>
 						{ () => <StylesPreviewColors /> }
 					</Variation>
 				) ) }

@@ -9,7 +9,6 @@ import { css } from '@emotion/react';
  */
 import Button from '../button';
 import { Heading } from '../heading';
-import { HStack } from '../h-stack';
 import { space } from '../utils/space';
 import { COLORS, CONFIG, font } from '../utils';
 import { View } from '../view';
@@ -131,8 +130,8 @@ export const PaletteActionsContainer = styled( View )`
 	display: flex;
 `;
 
-export const PaletteHStackHeader = styled( HStack )`
-	margin-bottom: ${ space( 2 ) };
+export const PaletteEditContents = styled( View )`
+	margin-top: ${ space( 2 ) };
 `;
 
 export const PaletteEditStyles = styled( View )`

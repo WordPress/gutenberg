@@ -32,10 +32,17 @@ export function PostTaxonomies( { taxonomyWrapper = identity } ) {
 		const TaxonomyComponent = taxonomy.hierarchical
 			? HierarchicalTermSelector
 			: FlatTermSelector;
+		const taxonomyComponentProps = {
+			slug: taxonomy.slug,
+			...( taxonomy.hierarchical
+				? {}
+				: { __nextHasNoMarginBottom: true } ),
+		};
+
 		return (
 			<Fragment key={ `taxonomy-${ taxonomy.slug }` }>
 				{ taxonomyWrapper(
-					<TaxonomyComponent slug={ taxonomy.slug } />,
+					<TaxonomyComponent { ...taxonomyComponentProps } />,
 					taxonomy
 				) }
 			</Fragment>
@@ -43,4 +50,12 @@ export function PostTaxonomies( { taxonomyWrapper = identity } ) {
 	} );
 }
 
+/**
+ * Renders the taxonomies associated with a post.
+ *
+ * @param {Object}   props                 The component props.
+ * @param {Function} props.taxonomyWrapper The wrapper function for each taxonomy component.
+ *
+ * @return {Array} An array of JSX elements representing the visible taxonomies.
+ */
 export default PostTaxonomies;

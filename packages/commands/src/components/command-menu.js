@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { Command, useCommandState } from 'cmdk';
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -55,7 +55,7 @@ function CommandMenuLoader( { name, search, hook, setLoader, close } ) {
 				>
 					<HStack
 						alignment="left"
-						className={ classnames( 'commands-command-menu__item', {
+						className={ clsx( 'commands-command-menu__item', {
 							'has-icon': command.icon,
 						} ) }
 					>
@@ -126,7 +126,7 @@ export function CommandMenuGroup( { isContextual, search, setLoader, close } ) {
 				>
 					<HStack
 						alignment="left"
-						className={ classnames( 'commands-command-menu__item', {
+						className={ clsx( 'commands-command-menu__item', {
 							'has-icon': command.icon,
 						} ) }
 					>
@@ -192,7 +192,6 @@ export function CommandMenu() {
 	);
 	const { open, close } = useDispatch( commandsStore );
 	const [ loaders, setLoaders ] = useState( {} );
-	const commandListRef = useRef();
 
 	useEffect( () => {
 		registerShortcut( {
@@ -206,22 +205,14 @@ export function CommandMenu() {
 		} );
 	}, [ registerShortcut ] );
 
-	// Temporary fix for the suggestions Listbox labeling.
-	// See https://github.com/pacocoursey/cmdk/issues/196
-	useEffect( () => {
-		commandListRef.current?.removeAttribute( 'aria-labelledby' );
-		commandListRef.current?.setAttribute(
-			'aria-label',
-			__( 'Command suggestions' )
-		);
-	}, [ commandListRef.current ] );
-
 	useShortcut(
 		'core/commands',
 		/** @type {import('react').KeyboardEventHandler} */
 		( event ) => {
 			// Bails to avoid obscuring the effect of the preceding handler(s).
-			if ( event.defaultPrevented ) return;
+			if ( event.defaultPrevented ) {
+				return;
+			}
 
 			event.preventDefault();
 			if ( isOpen ) {
@@ -285,7 +276,7 @@ export function CommandMenu() {
 						/>
 						<Icon icon={ inputIcon } />
 					</div>
-					<Command.List ref={ commandListRef }>
+					<Command.List label={ __( 'Command suggestions' ) }>
 						{ search && ! isLoading && (
 							<Command.Empty>
 								{ __( 'No results found.' ) }

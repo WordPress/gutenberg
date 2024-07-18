@@ -30,7 +30,7 @@ const StylesTab = ( { blockName, clientId, hasBlockStyles } ) => {
 			/>
 			<InspectorControls.Slot
 				group="background"
-				label={ __( 'Background' ) }
+				label={ __( 'Background image' ) }
 			/>
 			<InspectorControls.Slot group="filter" />
 			<InspectorControls.Slot

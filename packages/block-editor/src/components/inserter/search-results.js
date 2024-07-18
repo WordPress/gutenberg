@@ -50,6 +50,7 @@ function InserterSearchResults( {
 	shouldFocusBlock = true,
 	prioritizePatterns,
 	selectBlockOnInsert,
+	isQuick,
 } ) {
 	const debouncedSpeak = useDebounce( speak, 500 );
 
@@ -80,7 +81,7 @@ function InserterSearchResults( {
 		blockTypeCategories,
 		blockTypeCollections,
 		onSelectBlockType,
-	] = useBlockTypesState( destinationRootClientId, onInsertBlocks );
+	] = useBlockTypesState( destinationRootClientId, onInsertBlocks, isQuick );
 	const [ patterns, , onClickPattern ] = usePatternsState(
 		onInsertBlocks,
 		destinationRootClientId

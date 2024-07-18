@@ -41,9 +41,15 @@ function getFormatElement( range, editableContentElement, tagName, className ) {
 		element = element.parentElement;
 	}
 
-	if ( ! element ) return;
-	if ( element === editableContentElement ) return;
-	if ( ! editableContentElement.contains( element ) ) return;
+	if ( ! element ) {
+		return;
+	}
+	if ( element === editableContentElement ) {
+		return;
+	}
+	if ( ! editableContentElement.contains( element ) ) {
+		return;
+	}
 
 	const selector = tagName + ( className ? '.' + className : '' );
 
@@ -100,18 +106,26 @@ function createVirtualAnchorElement( range, editableContentElement ) {
  * @return {HTMLElement|VirtualAnchorElement|undefined} The anchor.
  */
 function getAnchor( editableContentElement, tagName, className ) {
-	if ( ! editableContentElement ) return;
+	if ( ! editableContentElement ) {
+		return;
+	}
 
 	const { ownerDocument } = editableContentElement;
 	const { defaultView } = ownerDocument;
 	const selection = defaultView.getSelection();
 
-	if ( ! selection ) return;
-	if ( ! selection.rangeCount ) return;
+	if ( ! selection ) {
+		return;
+	}
+	if ( ! selection.rangeCount ) {
+		return;
+	}
 
 	const range = selection.getRangeAt( 0 );
 
-	if ( ! range || ! range.startContainer ) return;
+	if ( ! range || ! range.startContainer ) {
+		return;
+	}
 
 	const formatElement = getFormatElement(
 		range,
@@ -120,7 +134,9 @@ function getAnchor( editableContentElement, tagName, className ) {
 		className
 	);
 
-	if ( formatElement ) return formatElement;
+	if ( formatElement ) {
+		return formatElement;
+	}
 
 	return createVirtualAnchorElement( range, editableContentElement );
 }
@@ -145,7 +161,9 @@ export function useAnchor( { editableContentElement, settings = {} } ) {
 	const wasActive = usePrevious( isActive );
 
 	useLayoutEffect( () => {
-		if ( ! editableContentElement ) return;
+		if ( ! editableContentElement ) {
+			return;
+		}
 
 		function callback() {
 			setAnchor(

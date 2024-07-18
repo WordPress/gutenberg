@@ -78,7 +78,7 @@ module.exports = {
 					const {
 						value: commentText,
 						loc: {
-							start: { line: commentLine },
+							end: { line: commentLine },
 						},
 					} = comment;
 

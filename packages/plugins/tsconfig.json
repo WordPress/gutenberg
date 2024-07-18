@@ -4,8 +4,7 @@
 	"compilerOptions": {
 		"rootDir": "src",
 		"declarationDir": "build-types",
-		"types": [ "gutenberg-env" ],
-		"skipLibCheck": true
+		"types": [ "gutenberg-env" ]
 	},
 	"references": [
 		{ "path": "../components" },
