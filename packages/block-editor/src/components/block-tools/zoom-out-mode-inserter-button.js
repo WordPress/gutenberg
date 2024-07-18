@@ -28,7 +28,7 @@ function ZoomOutModeInserterButton( {
 		setInserterIsOpened,
 		hasSelection,
 		selectedBlockClientId,
-		hoveredBlock,
+		hoveredBlockClientId,
 	} = useSelect( ( select ) => {
 		const {
 			getSettings,
