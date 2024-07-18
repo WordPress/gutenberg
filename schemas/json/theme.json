@@ -2580,20 +2580,20 @@
 			"const": 3
 		},
 		"title": {
-			"type": "string",
-			"description": "Title of the global styles variation. If not defined, the file name will be used."
+			"description": "Title of the global styles variation. If not defined, the file name will be used.",
+			"type": "string"
 		},
 		"slug": {
-			"type": "string",
-			"description": "Slug of the global styles variation. If not defined, the kebab-case title will be used."
+			"description": "Slug of the global styles variation. If not defined, the kebab-case title will be used.",
+			"type": "string"
 		},
 		"description": {
-			"type": "string",
-			"description": "Description of the global styles variation."
+			"description": "Description of the global styles variation.",
+			"type": "string"
 		},
 		"blockTypes": {
-			"type": "array",
 			"description": "List of block types that can use the block style variation this theme.json file represents.",
+			"type": "array",
 			"items": {
 				"type": "string"
 			}

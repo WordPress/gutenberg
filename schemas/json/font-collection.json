@@ -114,8 +114,8 @@
 								"type": "string"
 							},
 							"preview": {
-								"type": "string",
-								"description": "URL to a preview image of the font family."
+								"description": "URL to a preview image of the font family.",
+								"type": "string"
 							},
 							"fontFace": {
 								"description": "Array of font-face definitions.",
@@ -129,8 +129,8 @@
 						"additionalProperties": false
 					},
 					"categories": {
-						"type": "array",
 						"description": "Array of category slugs.",
+						"type": "array",
 						"items": {
 							"type": "string"
 						}
