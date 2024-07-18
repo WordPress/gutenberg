@@ -66,26 +66,6 @@ function findDepth( a, b ) {
 	return depth;
 }
 
-/**
- * Sets the `contenteditable` wrapper element to `value`.
- *
- * @param {HTMLElement} node  Block element.
- * @param {boolean}     value `contentEditable` value (true or false)
- */
-function setContentEditableWrapper( node, value ) {
-	// Since we are calling this on every selection change, check if the value
-	// needs to be updated first because it trigger the browser to recalculate
-	// style.
-	if ( node.contentEditable !== String( value ) ) {
-		node.contentEditable = value;
-
-		// Firefox doesn't automatically move focus.
-		if ( value ) {
-			node.focus();
-		}
-	}
-}
-
 function getRichTextElement( node ) {
 	const element =
 		node.nodeType === node.ELEMENT_NODE ? node : node.parentElement;
@@ -130,18 +110,6 @@ export default function useSelectionObserver() {
 				// For now we check if the event is a `mouse` event.
 				const isClickShift = event.shiftKey && event.type === 'mouseup';
 				if ( selection.isCollapsed && ! isClickShift ) {
-					if (
-						node.contentEditable === 'true' &&
-						! isMultiSelecting()
-					) {
-						setContentEditableWrapper( node, false );
-						let element =
-							startNode.nodeType === startNode.ELEMENT_NODE
-								? startNode
-								: startNode.parentElement;
-						element = element?.closest( '[contenteditable]' );
-						element?.focus();
-					}
 					return;
 				}
 
@@ -178,12 +146,7 @@ export default function useSelectionObserver() {
 					startClientId === undefined &&
 					endClientId === undefined
 				) {
-					setContentEditableWrapper( node, false );
 					return;
-				}
-
-				if ( node.contentEditable !== 'true' ) {
-					node.contentEditable = 'true';
 				}
 
 				const isSingularSelection = startClientId === endClientId;
