@@ -8,6 +8,7 @@ import { createContext } from '@wordpress/element';
  */
 import type { View, Action, NormalizedField } from '../../types';
 import type { SetSelection } from '../../private-types';
+import { LAYOUT_TABLE } from '../../constants';
 
 type DataViewsContextType< Item > = {
 	view: View;
@@ -28,7 +29,7 @@ type DataViewsContextType< Item > = {
 };
 
 const DataViewsContext = createContext< DataViewsContextType< any > >( {
-	view: { type: 'table' },
+	view: { type: LAYOUT_TABLE },
 	onChangeView: () => {},
 	fields: [],
 	data: [],
