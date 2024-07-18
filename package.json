@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "18.8.0-rc.3",
+	"version": "18.8.0",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -97,6 +97,7 @@
 	"devDependencies": {
 		"@actions/core": "1.9.1",
 		"@actions/github": "5.0.0",
+		"@apidevtools/json-schema-ref-parser": "11.6.4",
 		"@ariakit/test": "^0.3.7",
 		"@babel/core": "7.24.3",
 		"@babel/plugin-proposal-export-namespace-from": "7.18.9",
@@ -255,7 +256,7 @@
 		"strip-json-comments": "5.0.0",
 		"style-loader": "3.2.1",
 		"terser-webpack-plugin": "5.3.9",
-		"typescript": "5.4.5",
+		"typescript": "5.5.3",
 		"uglify-js": "3.13.7",
 		"uuid": "9.0.1",
 		"webdriverio": "8.16.20",
@@ -282,7 +283,7 @@
 		"docs:blocks": "node ./bin/api-docs/gen-block-lib-list.js",
 		"docs:build": "npm-run-all docs:gen docs:blocks docs:api-ref docs:theme-ref",
 		"docs:gen": "node ./docs/tool/index.js",
-		"docs:theme-ref": "node ./bin/api-docs/gen-theme-reference.js",
+		"docs:theme-ref": "node ./bin/api-docs/gen-theme-reference.mjs",
 		"env": "wp-env",
 		"fixtures:clean": "rimraf \"test/integration/fixtures/blocks/*.+(json|serialized.html)\"",
 		"fixtures:generate": "cross-env GENERATE_MISSING_FIXTURES=y npm run test:unit test/integration/full-content/ && npm run format test/integration/fixtures/blocks/*.json",

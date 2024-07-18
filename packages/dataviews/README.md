@@ -278,7 +278,7 @@ Whether the data is loading. `false` by default.
 
 Default layouts. By default, uses empty layouts: `table`, `grid`, `list`.
 
-### `onSelectionChange`: `function`
+### `onChangeSelection`: `function`
 
 Callback that signals the user selected one of more items, and takes them as parameter. So far, only the `list` view implements it.
 

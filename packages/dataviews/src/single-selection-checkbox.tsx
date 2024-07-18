@@ -12,7 +12,7 @@ import type { SetSelection } from './private-types';
 
 interface SingleSelectionCheckboxProps< Item > {
 	selection: string[];
-	onSelectionChange: SetSelection;
+	onChangeSelection: SetSelection;
 	item: Item;
 	getItemId: ( item: Item ) => string;
 	primaryField?: Field< Item >;
@@ -21,7 +21,7 @@ interface SingleSelectionCheckboxProps< Item > {
 
 export default function SingleSelectionCheckbox< Item >( {
 	selection,
-	onSelectionChange,
+	onChangeSelection,
 	item,
 	getItemId,
 	primaryField,
@@ -54,7 +54,7 @@ export default function SingleSelectionCheckbox< Item >( {
 					return;
 				}
 
-				onSelectionChange(
+				onChangeSelection(
 					selection.includes( id )
 						? selection.filter( ( itemId ) => id !== itemId )
 						: [ ...selection, id ]

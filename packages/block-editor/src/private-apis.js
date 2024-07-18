@@ -29,10 +29,6 @@ import {
 import DimensionsTool from './components/dimensions-tool';
 import ResolutionTool from './components/resolution-tool';
 import TextAlignmentControl from './components/text-alignment-control';
-import {
-	default as ReusableBlocksRenameHint,
-	useReusableBlocksRenameHint,
-} from './components/inserter/reusable-block-rename-hint';
 import { usesContextKey } from './components/rich-text/format-edit';
 import { ExperimentalBlockCanvas } from './components/block-canvas';
 import { getDuotoneFilter } from './components/duotone/utils';
@@ -82,8 +78,6 @@ lock( privateApis, {
 	ResolutionTool,
 	TabbedSidebar,
 	TextAlignmentControl,
-	ReusableBlocksRenameHint,
-	useReusableBlocksRenameHint,
 	usesContextKey,
 	useFlashEditableBlocks,
 	globalStylesDataKey,
