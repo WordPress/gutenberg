@@ -3,54 +3,45 @@
  */
 import { useSelect } from '@wordpress/data';
 import { useEffect, useRef, useState } from '@wordpress/element';
-import { Button } from '@wordpress/components';
-import { plus } from '@wordpress/icons';
-import { _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import BlockPopoverInbetween from '../block-popover/inbetween';
+import ZoomOutModeInserterButton from './zoom-out-mode-inserter-button';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 function ZoomOutModeInserters() {
 	const [ isReady, setIsReady ] = useState( false );
-	const {
-		blockOrder,
-		sectionRootClientId,
-		insertionPoint,
-		setInserterIsOpened,
-		hasSelection,
-		selectedBlockClientId,
-		hoveredBlock,
-	} = useSelect( ( select ) => {
-		const {
-			getSettings,
-			getBlockOrder,
-			getSelectionStart,
-			getSelectedBlockClientId,
-			getHoveredBlock,
-		} = select( blockEditorStore );
-		const { sectionRootClientId: root } = unlock( getSettings() );
-		// To do: move ZoomOutModeInserters to core/editor.
-		// Or we perhaps we should move the insertion point state to the
-		// block-editor store. I'm not sure what it was ever moved to the editor
-		// store, because all the inserter components all live in the
-		// block-editor package.
-		// eslint-disable-next-line @wordpress/data-no-store-string-literals
-		const editor = select( 'core/editor' );
-		return {
-			hasSelection: !! getSelectionStart().clientId,
-			blockOrder: getBlockOrder( root ),
-			insertionPoint: unlock( editor ).getInsertionPoint(),
-			sectionRootClientId: root,
-			setInserterIsOpened:
-				getSettings().__experimentalSetIsInserterOpened,
-			selectedBlockClientId: getSelectedBlockClientId(),
-			hoveredBlock: getHoveredBlock(),
-		};
-	}, [] );
+	const { blockOrder, insertionPoint, setInserterIsOpened } = useSelect(
+		( select ) => {
+			const {
+				getSettings,
+				getBlockOrder,
+				getSelectionStart,
+				getSelectedBlockClientId,
+			} = select( blockEditorStore );
+			const { sectionRootClientId: root } = unlock( getSettings() );
+			// To do: move ZoomOutModeInserters to core/editor.
+			// Or we perhaps we should move the insertion point state to the
+			// block-editor store. I'm not sure what it was ever moved to the editor
+			// store, because all the inserter components all live in the
+			// block-editor package.
+			// eslint-disable-next-line @wordpress/data-no-store-string-literals
+			const editor = select( 'core/editor' );
+			return {
+				hasSelection: !! getSelectionStart().clientId,
+				blockOrder: getBlockOrder( root ),
+				insertionPoint: unlock( editor ).getInsertionPoint(),
+				sectionRootClientId: root,
+				setInserterIsOpened:
+					getSettings().__experimentalSetIsInserterOpened,
+				selectedBlockClientId: getSelectedBlockClientId(),
+			};
+		},
+		[]
+	);
 
 	const isMounted = useRef( false );
 
@@ -78,16 +69,7 @@ function ZoomOutModeInserters() {
 	}
 
 	return [ undefined, ...blockOrder ].map( ( clientId, index ) => {
-		const isSelected =
-			hasSelection &&
-			( selectedBlockClientId === clientId ||
-				selectedBlockClientId === blockOrder[ index ] );
-		const isHovered =
-			hoveredBlock === clientId || hoveredBlock === blockOrder[ index ];
-
-		const shouldRenderInserter =
-			( isHovered || isSelected ) &&
-			insertionPoint.insertionIndex !== index;
+		const shouldRenderInserter = insertionPoint.insertionIndex !== index;
 
 		const shouldRenderInsertionPoint =
 			insertionPoint.insertionIndex === index;
@@ -115,23 +97,10 @@ function ZoomOutModeInserters() {
 					/>
 				) }
 				{ shouldRenderInserter && (
-					<Button
-						variant="primary"
-						icon={ plus }
-						size="compact"
-						className="block-editor-button-pattern-inserter__button"
-						onClick={ () => {
-							setInserterIsOpened( {
-								rootClientId: sectionRootClientId,
-								insertionIndex: index,
-								tab: 'patterns',
-								category: 'all',
-							} );
-						} }
-						label={ _x(
-							'Add pattern',
-							'Generic label for pattern inserter button'
-						) }
+					<ZoomOutModeInserterButton
+						previousClientId={ clientId }
+						nextClientId={ blockOrder[ index ] }
+						index={ index }
 					/>
 				) }
 			</BlockPopoverInbetween>

@@ -28,6 +28,8 @@ export function useIsHovered( { clientId } ) {
 
 		if ( action === 'add' ) {
 			hoverBlock( clientId );
+		} else {
+			hoverBlock( null );
 		}
 	}
 
@@ -41,6 +43,7 @@ export function useIsHovered( { clientId } ) {
 
 			// Remove class in case it lingers.
 			node.classList.remove( 'is-hovered' );
+			hoverBlock( null );
 		};
 	}, [] );
 }
