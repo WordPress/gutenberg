@@ -46,6 +46,18 @@
 		"isSearchFieldHidden": {
 			"type": "boolean",
 			"default": false
+		},
+		"limitResults": {
+			"type": "boolean",
+			"default": false
+		},
+		"postType": {
+			"type": "string",
+			"default": "post"
+		},
+		"categories": {
+			"type": "object",
+			"default": {}
 		}
 	},
 	"supports": {

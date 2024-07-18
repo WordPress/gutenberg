@@ -31,6 +31,8 @@ import {
 	BaseControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalUnitControl as UnitControl,
+	SelectControl,
+	ToggleControl,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { Icon, search } from '@wordpress/icons';
@@ -53,7 +55,10 @@ import {
 	PX_WIDTH_DEFAULT,
 	MIN_WIDTH,
 	isPercentageUnit,
+	usePostTypes,
+	useTaxonomies,
 } from './utils.js';
+import { TaxonomyControls } from './taxonomy-controls.js';
 
 // Used to calculate border radius adjustment to avoid "fat" corners when
 // button is placed inside wrapper.
@@ -79,7 +84,26 @@ export default function SearchEdit( {
 		buttonUseIcon,
 		isSearchFieldHidden,
 		style,
+		postType,
+		limitResults,
+		categories,
 	} = attributes;
+
+	const { postTypesTaxonomiesMap, postTypesSelectOptions } = usePostTypes();
+	const taxonomies = useTaxonomies( postType );
+	const onPostTypeChange = ( newValue ) => {
+		// We need to dynamically update the `taxQuery` property,
+		// by removing any not supported taxonomy from the query.
+		const supportedTaxonomies = postTypesTaxonomiesMap[ newValue ];
+
+		// Update the categories attribute
+		const updatedCategories = {};
+		supportedTaxonomies.forEach( ( taxonomy ) => {
+			updatedCategories[ taxonomy ] = [];
+		} );
+
+		setAttributes( { categories: updatedCategories, postType: newValue } );
+	};
 
 	const wasJustInsertedIntoNavigationBlock = useSelect(
 		( select ) => {
@@ -307,6 +331,10 @@ export default function SearchEdit( {
 		);
 	};
 
+	const handleTaxonomiesChange = ( newCategories ) => {
+		setAttributes( { categories: newCategories } );
+	};
+
 	const renderButton = () => {
 		// If the button is inside the wrapper, the wrapper gets the border color styles/classes, not the button.
 		const buttonClasses = clsx(
@@ -474,6 +502,35 @@ export default function SearchEdit( {
 							} ) }
 						</ButtonGroup>
 					</BaseControl>
+					<ToggleControl
+						__nextHasNoMarginBottom
+						label={ __( 'Limit Search Results' ) }
+						checked={ limitResults }
+						onChange={ () =>
+							setAttributes( {
+								limitResults: ! limitResults,
+							} )
+						}
+					/>
+					{ limitResults && (
+						<SelectControl
+							__nextHasNoMarginBottom
+							options={ postTypesSelectOptions }
+							value={ postType }
+							label={ __( 'Post type' ) }
+							onChange={ onPostTypeChange }
+							help={ __(
+								'WordPress contains different types of content and they are divided into collections called “Post types”. By default there are a few different ones such as blog posts and pages, but plugins could add more.'
+							) }
+						/>
+					) }
+					{ limitResults && taxonomies?.length && (
+						<TaxonomyControls
+							categories={ categories }
+							onChange={ handleTaxonomiesChange }
+							postType={ postType }
+						/>
+					) }
 				</PanelBody>
 			</InspectorControls>
 		</>
