@@ -248,7 +248,7 @@ Sets custom CSS to apply styling not covered by other theme.json properties.
 
 ### dimensions
 
-Dimensions styles
+Dimensions styles.
 
 | Property  | Type   |  Props  |
 | ---       | ---    |---   |

@@ -1434,7 +1434,7 @@
 					"type": "string"
 				},
 				"dimensions": {
-					"description": "Dimensions styles",
+					"description": "Dimensions styles.",
 					"type": "object",
 					"properties": {
 						"aspectRatio": {
