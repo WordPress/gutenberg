@@ -1,60 +1,6 @@
 == Changelog ==
 
-= 18.8.0-rc.3 =
-
-
-## Changelog
-
-### Bug Fixes
-
-#### Layout
-- Fix invalid css for nested fullwidth layouts with zero padding applied. ([63436](https://github.com/WordPress/gutenberg/pull/63436))
-
-#### Typography
-- Font Appearance Control: Refactor font appearance fallbacks. ([63215](https://github.com/WordPress/gutenberg/pull/63215))
-
-
-
-
-## Contributors
-
-The following contributors merged PRs in this release:
-
-@mikachan @richtabor
-
-
-= 18.8.0-rc.2 =
-
-
-## Changelog
-
-### Bug Fixes
-
-- Fix: Error when calling the PostActions `view-post` callback. ([63460](https://github.com/WordPress/gutenberg/pull/63460))
-
-
-### Various
-
-#### CSS & Styling
-- Only add customizer additional CSS to global styles in block themes. ([63331](https://github.com/WordPress/gutenberg/pull/63331))
-
-
-## First-time contributors
-
-The following PRs were merged by first-time contributors:
-
-- @sejas: Fix: Error when calling the PostActions `view-post` callback. ([63460](https://github.com/WordPress/gutenberg/pull/63460))
-
-
-## Contributors
-
-The following contributors merged PRs in this release:
-
-@sejas @tellthemachines
-
-
-= 18.8.0-rc.1 =
-
+= 18.8.0 =
 
 ## Changelog
 
@@ -192,6 +138,7 @@ The following contributors merged PRs in this release:
 - Fix Incorrect URL basename logic in EmbedPreview. ([63052](https://github.com/WordPress/gutenberg/pull/63052))
 - Fix: Update "Link Text" label to "Text" on Social Icons block #60966. ([61715](https://github.com/WordPress/gutenberg/pull/61715))
 - List: Maintain nested list on parent item removal. ([62949](https://github.com/WordPress/gutenberg/pull/62949))
+- Navigation: Allow themes to override block library text-decoration rule. ([63406](https://github.com/WordPress/gutenberg/pull/63406))
 - Patterns: Check for edited entity content property when exporting. ([63227](https://github.com/WordPress/gutenberg/pull/63227))
 - Reduce specificity of social link icon specific colors. ([63049](https://github.com/WordPress/gutenberg/pull/63049))
 - Refactor Post Date Relative Time Rendering for Future Dates. ([62979](https://github.com/WordPress/gutenberg/pull/62979))
@@ -224,11 +171,14 @@ The following contributors merged PRs in this release:
 - Only hide drop indicator when grid has `isManualPlacement` set. ([63226](https://github.com/WordPress/gutenberg/pull/63226))
 - Remove dotted border from grid dropzone. ([63162](https://github.com/WordPress/gutenberg/pull/63162))
 - Resizing in Auto mode shouldn't add `columnStart` and `rowStart` values. ([63160](https://github.com/WordPress/gutenberg/pull/63160))
+- Fix invalid css for nested fullwidth layouts with zero padding applied. ([63436](https://github.com/WordPress/gutenberg/pull/63436))
 
 #### Global Styles
+- Elements: Avoid specificity bump for top-level element-only selectors. ([63403](https://github.com/WordPress/gutenberg/pull/63403))
 - Global styles revisions: Ensure that user-defined variation styles CSS is generated. ([62768](https://github.com/WordPress/gutenberg/pull/62768))
 - Root padding styles: Include alignwide in nested has-outer-padding logic. ([63207](https://github.com/WordPress/gutenberg/pull/63207))
 - Remove letter-spacing from typography element preview. ([60322](https://github.com/WordPress/gutenberg/pull/60322))
+- Only add customizer additional CSS to global styles in block themes. ([63331](https://github.com/WordPress/gutenberg/pull/63331))
 
 #### Site Editor
 - Make SiteHub available for Pages, Patterns, and Templates in mobile viewports. ([63118](https://github.com/WordPress/gutenberg/pull/63118))
@@ -243,6 +193,7 @@ The following contributors merged PRs in this release:
 #### Block Editor
 - Featured Image Panel: Align text and icons horizontally to avoid clipping. ([62842](https://github.com/WordPress/gutenberg/pull/62842))
 - Zoom Out: Move the hook to the inserter component. ([63315](https://github.com/WordPress/gutenberg/pull/63315))
+- Fix error when calling the PostActions `view-post` callback. ([63460](https://github.com/WordPress/gutenberg/pull/63460))
 
 #### Block bindings
 - Disable post meta editing in blocks inside a Query Loop. ([63237](https://github.com/WordPress/gutenberg/pull/63237))
@@ -265,6 +216,7 @@ The following contributors merged PRs in this release:
 
 #### Typography
 - Use available font weights and styles in FontAppearanceControl. ([61915](https://github.com/WordPress/gutenberg/pull/61915))
+- Font Appearance Control: Refactor font appearance fallbacks. ([63215](https://github.com/WordPress/gutenberg/pull/63215))
 
 
 ### Accessibility
@@ -419,6 +371,7 @@ The following PRs were merged by first-time contributors:
 - @iworks: Translation should depend on number of items. ([62857](https://github.com/WordPress/gutenberg/pull/62857))
 - @roygbyte: Fix typo to be preposition, not verb, in some package comments and documentations. ([62945](https://github.com/WordPress/gutenberg/pull/62945))
 - @shreya0204: Add justification to block toolbar in addition to sidebar. ([62924](https://github.com/WordPress/gutenberg/pull/62924))
+- @sejas: Fix: Error when calling the PostActions `view-post` callback. ([63460](https://github.com/WordPress/gutenberg/pull/63460))
 
 
 ## Contributors
@@ -426,6 +379,8 @@ The following PRs were merged by first-time contributors:
 The following contributors merged PRs in this release:
 
 @aaronrobertshaw @afercia @airman5573 @akasunil @aliaghdam @amitraj2203 @bogiii @carolinan @Chrico @ciampo @costasovo @creativecoder @DaniGuardiola @desrosj @dhananjaykuber @dmsnell @ellatrix @fluiddot @geriux @hbhalodia @iamibrahimriaz @iworks @jameskoster @jasmussen @jeryj @jffng @jorgefilipecosta @jsnajdr @juanmaguitar @kevin940726 @luisherranz @MaggieCabrera @Mamaduka @matiasbenedetto @michalczaplinski @mikachan @mirka @ndiego @ntsekouras @oandregal @ockham @peterwilsoncc @ramonjd @richtabor @roygbyte @SantosGuillamot @scruffian @shail-mehta @shreya0204 @sirreal @stokesman @swissspidy @t-hamano @talldan @tellthemachines @tyxla @vipul0425 @westonruter @youknowriad
+
+
 
 
 = 18.7.1 =

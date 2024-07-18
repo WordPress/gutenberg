@@ -42,6 +42,15 @@ const { state, actions, callbacks } = store(
 					'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='
 				);
 			},
+			get figureStyles() {
+				return (
+					state.overlayOpened &&
+					`${ state.currentImage.figureStyles?.replace(
+						/margin[^;]*;?/g,
+						''
+					) };`
+				);
+			},
 			get imgStyles() {
 				return (
 					state.overlayOpened &&

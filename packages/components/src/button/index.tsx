@@ -39,6 +39,7 @@ function useDeprecatedProps( {
 	isSmall,
 	size,
 	variant,
+	describedBy,
 	...otherProps
 }: ButtonProps & DeprecatedButtonProps ): ButtonProps {
 	let computedSize = size;
@@ -48,6 +49,7 @@ function useDeprecatedProps( {
 		accessibleWhenDisabled: __experimentalIsFocusable,
 		// @todo Mark `isPressed` as deprecated
 		'aria-pressed': isPressed,
+		description: describedBy,
 	};
 
 	if ( isSmall ) {
@@ -109,7 +111,7 @@ export function UnforwardedButton(
 		size = 'default',
 		text,
 		variant,
-		describedBy,
+		description,
 		...buttonOrAnchorProps
 	} = useDeprecatedProps( props );
 
@@ -208,7 +210,7 @@ export function UnforwardedButton(
 				// The tooltip is not explicitly disabled.
 				false !== showTooltip ) );
 
-	const descriptionId = describedBy ? instanceId : undefined;
+	const descriptionId = description ? instanceId : undefined;
 
 	const describedById =
 		additionalProps[ 'aria-describedby' ] || descriptionId;
@@ -262,8 +264,8 @@ export function UnforwardedButton(
 		? {
 				text:
 					( children as string | ReactElement[] )?.length &&
-					describedBy
-						? describedBy
+					description
+						? description
 						: label,
 				shortcut,
 				placement:
@@ -276,9 +278,9 @@ export function UnforwardedButton(
 	return (
 		<>
 			<Tooltip { ...tooltipProps }>{ element }</Tooltip>
-			{ describedBy && (
+			{ description && (
 				<VisuallyHidden>
-					<span id={ descriptionId }>{ describedBy }</span>
+					<span id={ descriptionId }>{ description }</span>
 				</VisuallyHidden>
 			) }
 		</>
