@@ -43,7 +43,7 @@ _Parameters_
 -   _options.localStorageRestoreKey_ `?string`: The key to use for restoring the localStorage backup, used when the persistence layer calls `localStorage.getItem` or `localStorage.setItem`.
 -   _options.requestDebounceMS_ `?number`: Debounce requests to the API so that they only occur at minimum every `requestDebounceMS` milliseconds, and don't swamp the server. Defaults to 1000ms.
 -   _options.expensiveRequestDebounceMS_ `?number`: A longer debounce that can be defined for updates that have `isExpensive=true` defined. defaults to 5000ms.
--   _options.maxWaitMS_ `?number`:
+-   _options.maxWaitMS_ `?number`: The maximum wait, if the debouncing exceeds the wait, the callback will be invoked.
 
 _Returns_
 

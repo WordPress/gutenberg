@@ -25,11 +25,11 @@ const localStorage = window.localStorage;
  * @param {?number} options.requestDebounceMS          Debounce requests to the API so that they only occur at
  *                                                     minimum every `requestDebounceMS` milliseconds, and don't
  *                                                     swamp the server. Defaults to 1000ms.
- *
  * @param {?number} options.expensiveRequestDebounceMS A longer debounce that can be defined for updates that have
  *                                                     `isExpensive=true` defined. defaults to 5000ms.
+ * @param {?number} options.maxWaitMS                  The maximum wait, if the debouncing exceeds the wait, the callback
+ *                                                     will be invoked.
  *
- * @param {?number} options.maxWaitMS
  * @return {Object} A persistence layer for WordPress user meta.
  */
 export default function create( {
