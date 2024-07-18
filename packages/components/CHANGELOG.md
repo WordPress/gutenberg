@@ -26,6 +26,10 @@
 -   `DropdownMenuV2`: invert animation direction. ([#63443](https://github.com/WordPress/gutenberg/pull/63443)).
 -   `Tabs`: Vertical Tabs should be 40px min height. ([#63446](https://github.com/WordPress/gutenberg/pull/63446)).
 
+### Documentation
+
+-   `BaseControl`: Improve the base control help prop documentation. ([#63693](https://github.com/WordPress/gutenberg/pull/63693)).
+
 ## 28.3.0 (2024-07-10)
 
 ### Enhancements
