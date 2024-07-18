@@ -562,7 +562,7 @@ _Returns_
 
 -   `number`: Number of blocks in the post, or number of blocks with name equal to blockName.
 
-### getHoveredBlock
+### getHoveredBlockClientId
 
 Returns the currently hovered block.
 
