@@ -18,6 +18,7 @@
 		"inserter": false,
 		"reusable": false
 	},
+	"usesContext": [ "tabs/activeTab" ],
 	"editorScript": "file:./build/index.js",
 	"style": "file:./build/style.css"
 }

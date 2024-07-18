@@ -8,10 +8,19 @@
 	"textdomain": "default",
 	"__experimental": true,
 	"allowedBlocks": [ "core/tab" ],
-	"attributes": {},
+	"attributes": {
+		"activeTab": {
+			"type": "number",
+			"default": 0
+		}
+	},
+	"providesContext": {
+		"tabs/activeTab": "activeTab"
+	},
 	"supports": {
 		"align": [ "wide", "full" ],
 		"html": false,
+		"interactivity": true,
 		"layout": {
 			"default": { "type": "flex", "orientation": "horizontal" },
 			"allowSwitching": false,
@@ -23,6 +32,6 @@
 			"padding": true
 		}
 	},
-	"editorScript": "file:./build/index.js",
-	"style": "file:./build/style.css"
+	"editorStyle": "wp-block-tabs-editor",
+	"style": "wp-block-tabs"
 }

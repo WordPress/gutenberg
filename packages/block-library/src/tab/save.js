@@ -8,7 +8,6 @@ export default function save( { attributes } ) {
 
 	return (
 		<div { ...useBlockProps.save() }>
-			<div className="wp-block-tab__title">{ title }</div>
 			<div className="wp-block-tab__content">
 				<InnerBlocks.Content />
 			</div>

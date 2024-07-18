@@ -4,23 +4,22 @@
 import { InnerBlocks, RichText, useBlockProps } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
-export default function Edit( { attributes, setAttributes } ) {
-	const { title } = attributes;
-
+export default function Edit( { context } ) {
+	console.log( context );
+	const isActive = context[ 'tabs/activeTab' ];
 	return (
-		<div { ...useBlockProps() }>
-			<RichText
-				className="wp-block-tab__title"
-				tagName="div"
-				value={ title }
-				onChange={ ( newTitle ) =>
-					setAttributes( { title: newTitle } )
-				}
-				placeholder={ __( 'Add text…' ) }
+		<div
+			{ ...useBlockProps( {
+				className: isActive ? 'is-active' : '',
+			} ) }
+		>
+			<InnerBlocks
+				defaultBlock={ [
+					'core/paragraph',
+					{ placeholder: __( 'Enter tab content…' ) },
+				] }
+				directInsert
 			/>
-			<div className="wp-block-tab__content">
-				<InnerBlocks />
-			</div>
 		</div>
 	);
 }
