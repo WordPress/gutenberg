@@ -1,0 +1,123 @@
+/**
+ * WordPress dependencies
+ */
+import { __experimentalHStack as HStack } from '@wordpress/components';
+import { useMemo, useState } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import { default as DataViewsBulkActions } from '../dataviews-bulk-actions';
+import DataViewsBulkActionsToolbar from '../dataviews-bulk-actions-toolbar';
+import DataViewsContext from '../dataviews-context';
+import DataViewsFilters from '../dataviews-filters';
+import DataViewsLayout from '../dataviews-layout';
+import DataviewsPagination from '../dataviews-pagination';
+import DataViewsSearch from '../dataviews-search';
+import DataViewsViewConfig from '../dataviews-view-config';
+import { normalizeFields } from '../../normalize-fields';
+import type { Action, Field, View, SupportedLayouts } from '../../types';
+import type { SelectionOrUpdater } from '../../private-types';
+
+type ItemWithId = { id: string };
+
+type DataViewsProps< Item > = {
+	view: View;
+	onChangeView: ( view: View ) => void;
+	fields: Field< Item >[];
+	search?: boolean;
+	searchLabel?: string;
+	actions?: Action< Item >[];
+	data: Item[];
+	isLoading?: boolean;
+	paginationInfo: {
+		totalItems: number;
+		totalPages: number;
+	};
+	defaultLayouts: SupportedLayouts;
+	selection?: string[];
+	onChangeSelection?: ( items: string[] ) => void;
+} & ( Item extends ItemWithId
+	? { getItemId?: ( item: Item ) => string }
+	: { getItemId: ( item: Item ) => string } );
+
+const defaultGetItemId = ( item: ItemWithId ) => item.id;
+
+export default function DataViews< Item >( {
+	view,
+	onChangeView,
+	fields,
+	search = true,
+	searchLabel = undefined,
+	actions = [],
+	data,
+	getItemId = defaultGetItemId,
+	isLoading = false,
+	paginationInfo,
+	defaultLayouts,
+	selection: selectionProperty,
+	onChangeSelection,
+}: DataViewsProps< Item > ) {
+	const [ selectionState, setSelectionState ] = useState< string[] >( [] );
+	const isUncontrolled =
+		selectionProperty === undefined || onChangeSelection === undefined;
+	const selection = isUncontrolled ? selectionState : selectionProperty;
+	const [ openedFilter, setOpenedFilter ] = useState< string | null >( null );
+	function setSelectionWithChange( value: SelectionOrUpdater ) {
+		const newValue =
+			typeof value === 'function' ? value( selection ) : value;
+		if ( isUncontrolled ) {
+			setSelectionState( newValue );
+		}
+		if ( onChangeSelection ) {
+			onChangeSelection( newValue );
+		}
+	}
+	const _fields = useMemo( () => normalizeFields( fields ), [ fields ] );
+	const _selection = useMemo( () => {
+		return selection.filter( ( id ) =>
+			data.some( ( item ) => getItemId( item ) === id )
+		);
+	}, [ selection, data, getItemId ] );
+
+	return (
+		<DataViewsContext.Provider
+			value={ {
+				view,
+				onChangeView,
+				fields: _fields,
+				actions,
+				data,
+				isLoading,
+				paginationInfo,
+				selection: _selection,
+				onChangeSelection: setSelectionWithChange,
+				openedFilter,
+				setOpenedFilter,
+				getItemId,
+			} }
+		>
+			<div className="dataviews-wrapper">
+				<HStack
+					alignment="top"
+					justify="start"
+					className="dataviews__view-actions"
+				>
+					<HStack
+						justify="start"
+						className="dataviews-filters__container"
+						wrap
+					>
+						{ search && <DataViewsSearch label={ searchLabel } /> }
+						<DataViewsFilters />
+					</HStack>
+					<DataViewsBulkActions />
+					<DataViewsViewConfig defaultLayouts={ defaultLayouts } />
+				</HStack>
+				<DataViewsLayout />
+				<DataviewsPagination />
+				<DataViewsBulkActionsToolbar />
+			</div>
+		</DataViewsContext.Provider>
+	);
+}

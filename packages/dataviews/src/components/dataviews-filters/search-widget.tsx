@@ -21,8 +21,8 @@ import { SVG, Circle } from '@wordpress/primitives';
 /**
  * Internal dependencies
  */
-import { unlock } from './lock-unlock';
-import type { Filter, NormalizedFilter, View } from './types';
+import { unlock } from '../../lock-unlock';
+import type { Filter, NormalizedFilter, View } from '../../types';
 
 const {
 	CompositeV2: Composite,
@@ -101,7 +101,7 @@ function ListBox( { view, filter, onChangeView }: SearchWidgetProps ) {
 		<Composite
 			store={ compositeStore }
 			role="listbox"
-			className="dataviews-search-widget-listbox"
+			className="dataviews-filters__search-widget-listbox"
 			aria-label={ sprintf(
 				/* translators: List of items for a filter. 1: Filter name. e.g.: "List of: Author". */
 				__( 'List of: %1$s' ),
@@ -124,7 +124,7 @@ function ListBox( { view, filter, onChangeView }: SearchWidgetProps ) {
 								<div
 									aria-label={ element.label }
 									role="option"
-									className="dataviews-search-widget-listitem"
+									className="dataviews-filters__search-widget-listitem"
 								/>
 							}
 							onClick={ () => {
@@ -174,7 +174,7 @@ function ListBox( { view, filter, onChangeView }: SearchWidgetProps ) {
 						/>
 					}
 				>
-					<span className="dataviews-search-widget-listitem-check">
+					<span className="dataviews-filters__search-widget-listitem-check">
 						{ filter.singleSelection &&
 							currentValue === element.value && (
 								<Icon icon={ radioCheck } />
@@ -187,7 +187,7 @@ function ListBox( { view, filter, onChangeView }: SearchWidgetProps ) {
 					<span>
 						{ element.label }
 						{ !! element.description && (
-							<span className="dataviews-search-widget-listitem-description">
+							<span className="dataviews-filters__search-widget-listitem-description">
 								{ element.description }
 							</span>
 						) }
@@ -247,7 +247,7 @@ function ComboboxList( { view, filter, onChangeView }: SearchWidgetProps ) {
 			} }
 			setValue={ setSearchValue }
 		>
-			<div className="dataviews-search-widget-filter-combobox__wrapper">
+			<div className="dataviews-filters__search-widget-filter-combobox__wrapper">
 				<Ariakit.ComboboxLabel
 					render={
 						<VisuallyHidden>
@@ -260,14 +260,14 @@ function ComboboxList( { view, filter, onChangeView }: SearchWidgetProps ) {
 				<Ariakit.Combobox
 					autoSelect="always"
 					placeholder={ __( 'Search' ) }
-					className="dataviews-search-widget-filter-combobox__input"
+					className="dataviews-filters__search-widget-filter-combobox__input"
 				/>
-				<div className="dataviews-search-widget-filter-combobox__icon">
+				<div className="dataviews-filters__search-widget-filter-combobox__icon">
 					<Icon icon={ search } />
 				</div>
 			</div>
 			<Ariakit.ComboboxList
-				className="dataviews-search-widget-filter-combobox-list"
+				className="dataviews-filters__search-widget-filter-combobox-list"
 				alwaysVisible
 			>
 				{ matches.map( ( element ) => {
@@ -275,12 +275,12 @@ function ComboboxList( { view, filter, onChangeView }: SearchWidgetProps ) {
 						<Ariakit.ComboboxItem
 							key={ element.value }
 							value={ element.value }
-							className="dataviews-search-widget-listitem"
+							className="dataviews-filters__search-widget-listitem"
 							hideOnClick={ false }
 							setValueOnClick={ false }
 							focusOnHover
 						>
-							<span className="dataviews-search-widget-listitem-check">
+							<span className="dataviews-filters__search-widget-listitem-check">
 								{ filter.singleSelection &&
 									currentValue === element.value && (
 										<Icon icon={ radioCheck } />
@@ -292,11 +292,11 @@ function ComboboxList( { view, filter, onChangeView }: SearchWidgetProps ) {
 							</span>
 							<span>
 								<Ariakit.ComboboxItemValue
-									className="dataviews-search-widget-filter-combobox-item-value"
+									className="dataviews-filters__search-widget-filter-combobox-item-value"
 									value={ element.label }
 								/>
 								{ !! element.description && (
-									<span className="dataviews-search-widget-listitem-description">
+									<span className="dataviews-filters__search-widget-listitem-description">
 										{ element.description }
 									</span>
 								) }
