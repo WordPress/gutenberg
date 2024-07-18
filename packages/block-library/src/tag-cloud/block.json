@@ -39,6 +39,7 @@
 		"align": true,
 		"color": {
 			"background": true,
+			"text": false,
 			"gradients": true,
 			"link": true
 		},
