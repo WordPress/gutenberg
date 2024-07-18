@@ -47,7 +47,9 @@ function FontFamilies() {
 	const hasFonts = 0 < customFonts.length || 0 < themeFonts.length;
 
 	const hasInstalledFonts =
-		baseFontFamilies?.theme?.length > 0 || baseCustomFonts?.length > 0;
+		hasFonts ||
+		baseFontFamilies?.theme?.length > 0 ||
+		baseCustomFonts?.length > 0;
 
 	return (
 		<>
