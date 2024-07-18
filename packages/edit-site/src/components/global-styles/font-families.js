@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
 	__experimentalText as Text,
 	__experimentalItemGroup as ItemGroup,
@@ -52,7 +52,12 @@ function FontFamilies() {
 			<VStack spacing={ 4 }>
 				{ themeFonts.length > 0 && (
 					<VStack>
-						<Subtitle level={ 3 }>{ __( 'Theme Fonts' ) }</Subtitle>
+						<Subtitle level={ 3 }>
+							{
+								/* translators: Heading for a list of fonts provided by the theme. */
+								_x( 'Theme', 'font source' )
+							}
+						</Subtitle>
 						<ItemGroup isBordered isSeparated>
 							{ themeFonts.map( ( font ) => (
 								<FontFamilyItem
@@ -66,7 +71,10 @@ function FontFamilies() {
 				{ customFonts.length > 0 && (
 					<VStack>
 						<Subtitle level={ 3 }>
-							{ __( 'Custom fonts' ) }
+							{
+								/* translators: Heading for a list of fonts installed by the user. */
+								_x( 'Custom', 'font source' )
+							}
 						</Subtitle>
 						<ItemGroup isBordered isSeparated>
 							{ customFonts.map( ( font ) => (
