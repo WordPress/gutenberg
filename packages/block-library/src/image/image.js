@@ -14,6 +14,7 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalUseCustomUnits as useCustomUnits,
+	Placeholder,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -829,9 +830,12 @@ export default function Image( {
 		temporaryURL && hasImageErrored ? (
 			// Show a placeholder during upload when the blob URL can't be loaded. This can
 			// happen when the user uploads a HEIC image in a browser that doesn't support them.
-			<div className="block-editor-image__skeleton">
+			<Placeholder
+				className="wp-block-image__placeholder"
+				withIllustration
+			>
 				<Spinner />
-			</div>
+			</Placeholder>
 		) : (
 			// Disable reason: Image itself is not meant to be interactive, but
 			// should direct focus to block.
