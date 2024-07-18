@@ -44,7 +44,7 @@ function ZoomOutModeInserterButton( {
 			setInserterIsOpened:
 				getSettings().__experimentalSetIsInserterOpened,
 			selectedBlockClientId: getSelectedBlockClientId(),
-			hoveredBlock: getHoveredBlock(),
+			hoveredBlockClientId: getHoveredBlockClientId(),
 		};
 	}, [] );
 
