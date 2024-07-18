@@ -230,6 +230,8 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	// contain a caption, and we don't want to trigger the lightbox when the
 	// caption is clicked.
 	$p->set_attribute( 'data-wp-on-async--click', 'actions.showLightbox' );
+	$p->set_attribute( 'data-wp-class--hide', 'state.isContentHidden' );
+	$p->set_attribute( 'data-wp-class--show', 'state.isContentVisible' );
 
 	$body_content = $p->get_updated_html();
 
