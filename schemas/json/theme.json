@@ -417,8 +417,8 @@
 							"items": {
 								"type": "string"
 							},
-							"default": [ "px", "em", "rem", "vh", "vw", "%" ],
-							"minItems": 1
+							"minItems": 1,
+							"default": [ "px", "em", "rem", "vh", "vw", "%" ]
 						},
 						"customSpacingSize": {
 							"description": "Allow users to set custom space sizes.",
@@ -699,7 +699,6 @@
 												},
 												"fontWeight": {
 													"description": "List of available font weights, separated by a space.",
-													"default": "400",
 													"oneOf": [
 														{
 															"type": "string"
@@ -707,19 +706,20 @@
 														{
 															"type": "integer"
 														}
-													]
+													],
+													"default": "400"
 												},
 												"fontDisplay": {
 													"description": "CSS font-display value.",
 													"type": "string",
-													"default": "fallback",
 													"enum": [
 														"auto",
 														"block",
 														"fallback",
 														"swap",
 														"optional"
-													]
+													],
+													"default": "fallback"
 												},
 												"src": {
 													"description": "Paths or URLs to the font files.",
