@@ -36,39 +36,35 @@ import { store as editorStore } from '../../store';
  * @return {Component} The rendered PostURL component.
  */
 export default function PostURL( { onClose } ) {
-	const {
-		isEditable,
-		postSlug,
-		postLink,
-		permalinkPrefix,
-		permalinkSuffix,
-		permalink,
-	} = useSelect( ( select ) => {
-		const post = select( editorStore ).getCurrentPost();
-		const postTypeSlug = select( editorStore ).getCurrentPostType();
-		const postType = select( coreStore ).getPostType( postTypeSlug );
-		const permalinkParts = select( editorStore ).getPermalinkParts();
-		const hasPublishAction = post?._links?.[ 'wp:action-publish' ] ?? false;
+	const { isEditable, postSlug, postLink, permalinkPrefix, permalinkSuffix } =
+		useSelect( ( select ) => {
+			const post = select( editorStore ).getCurrentPost();
+			const postTypeSlug = select( editorStore ).getCurrentPostType();
+			const postType = select( coreStore ).getPostType( postTypeSlug );
+			const permalinkParts = select( editorStore ).getPermalinkParts();
+			const hasPublishAction =
+				post?._links?.[ 'wp:action-publish' ] ?? false;
 
-		return {
-			isEditable:
-				select( editorStore ).isPermalinkEditable() && hasPublishAction,
-			postSlug: safeDecodeURIComponent(
-				select( editorStore ).getEditedPostSlug()
-			),
-			viewPostLabel: postType?.labels.view_item,
-			postLink: post.link,
-			permalinkPrefix: permalinkParts?.prefix,
-			permalinkSuffix: permalinkParts?.suffix,
-			permalink: safeDecodeURIComponent(
-				select( editorStore ).getPermalink()
-			),
-		};
-	}, [] );
+			return {
+				isEditable:
+					select( editorStore ).isPermalinkEditable() &&
+					hasPublishAction,
+				postSlug: safeDecodeURIComponent(
+					select( editorStore ).getEditedPostSlug()
+				),
+				viewPostLabel: postType?.labels.view_item,
+				postLink: post.link,
+				permalinkPrefix: permalinkParts?.prefix,
+				permalinkSuffix: permalinkParts?.suffix,
+				permalink: safeDecodeURIComponent(
+					select( editorStore ).getPermalink()
+				),
+			};
+		}, [] );
 	const { editPost } = useDispatch( editorStore );
 	const { createNotice } = useDispatch( noticesStore );
 	const [ forceEmptyField, setForceEmptyField ] = useState( false );
-	const copyButtonRef = useCopyToClipboard( permalink, () => {
+	const copyButtonRef = useCopyToClipboard( '/' + postSlug, () => {
 		createNotice( 'info', __( 'Copied URL to clipboard.' ), {
 			isDismissible: true,
 			type: 'snackbar',
