@@ -135,6 +135,7 @@ test.describe( 'Block Toolbar', () => {
 		BlockToolbarUtils,
 		page,
 		pageUtils,
+		requestUtils,
 	} ) => {
 		/* eslint-disable playwright/expect-expect */
 		/* eslint-disable playwright/no-wait-for-timeout */
@@ -166,8 +167,8 @@ test.describe( 'Block Toolbar', () => {
 		await BlockToolbarUtils.testScrollable( blockToolbar, blockButton );
 
 		// Test cleanup
-		await editor.setIsFixedToolbar( false );
 		await pageUtils.setBrowserViewport( 'large' );
+		await requestUtils.resetPreferences();
 		/* eslint-enable playwright/expect-expect */
 		/* eslint-enable playwright/no-wait-for-timeout */
 	} );
@@ -177,6 +178,7 @@ test.describe( 'Block Toolbar', () => {
 		BlockToolbarUtils,
 		page,
 		pageUtils,
+		requestUtils,
 	} ) => {
 		// On default floating toolbar
 		await editor.insertBlock( { name: 'core/paragraph' } );
@@ -236,8 +238,8 @@ test.describe( 'Block Toolbar', () => {
 		await BlockToolbarUtils.expectLabelToHaveFocus( 'Block: Paragraph' );
 
 		// Test cleanup
-		await editor.setIsFixedToolbar( false );
 		await pageUtils.setBrowserViewport( 'large' );
+		await requestUtils.resetPreferences();
 	} );
 
 	test( 'Focus should remain on mover when moving blocks', async ( {
