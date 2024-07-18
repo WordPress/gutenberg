@@ -14,6 +14,10 @@ describe( 'theme.json schema', () => {
 		[ 'packages/*/src/**/theme.json', '{lib,phpunit,test}/**/theme.json' ],
 		{ onlyFiles: true }
 	);
+	const invalidFiles = glob.sync(
+		[ 'test/integration/fixtures/schemas/*.json' ],
+		{ onlyFiles: true }
+	);
 	const ajv = new Ajv( {
 		// Used for matching unknown blocks without repeating core blocks names
 		// with patternProperties in settings.blocks and settings.styles
@@ -44,5 +48,14 @@ describe( 'theme.json schema', () => {
 		const result = ajv.validate( themeSchema, metadata ) || ajv.errors;
 
 		expect( result ).toBe( true );
+	} );
+
+	test.each( invalidFiles )( 'invalidates schema for `%s`', ( filepath ) => {
+		// We want to validate the theme.json file using the local schema.
+		const { $schema, ...metadata } = require( filepath );
+
+		const result = ajv.validate( themeSchema, metadata );
+
+		expect( result ).toBe( false );
 	} );
 } );
