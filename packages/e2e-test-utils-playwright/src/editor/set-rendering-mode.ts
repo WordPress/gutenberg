@@ -11,8 +11,12 @@ import type { Editor } from './index';
 async function setRenderingMode( this: Editor ) {
 	await this.page.waitForFunction( () => window?.wp?.data );
 
-	// Set editing mode
-	window.wp.data.dispatch( 'core/editor' ).setRenderingMode( 'post-only' );
+	await this.page.evaluate( () => {
+		// Set editing mode
+		window.wp.data
+			.dispatch( 'core/editor' )
+			.setRenderingMode( 'post-only' );
+	} );
 }
 
 export { setRenderingMode };
