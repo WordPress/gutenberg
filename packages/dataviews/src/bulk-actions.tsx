@@ -47,7 +47,7 @@ interface BulkActionsProps< Item > {
 	data: Item[];
 	actions: Action< Item >[];
 	selection: string[];
-	onSelectionChange: SetSelection;
+	onChangeSelection: SetSelection;
 	getItemId: ( item: Item ) => string;
 }
 
@@ -160,7 +160,9 @@ function ActionsMenuGroup< Item >( {
 			);
 		} );
 	}, [ actions, selectedItems ] );
-
+	if ( ! elligibleActions.length ) {
+		return null;
+	}
 	return (
 		<>
 			<DropdownMenuGroup>
@@ -182,7 +184,7 @@ export default function BulkActions< Item >( {
 	data,
 	actions,
 	selection,
-	onSelectionChange,
+	onChangeSelection,
 	getItemId,
 }: BulkActionsProps< Item > ) {
 	const bulkActions = useMemo(
@@ -254,7 +256,7 @@ export default function BulkActions< Item >( {
 						disabled={ areAllSelected }
 						hideOnClick={ false }
 						onClick={ () => {
-							onSelectionChange(
+							onChangeSelection(
 								selectableItems.map( ( item ) =>
 									getItemId( item )
 								)
@@ -268,7 +270,7 @@ export default function BulkActions< Item >( {
 						disabled={ selection.length === 0 }
 						hideOnClick={ false }
 						onClick={ () => {
-							onSelectionChange( [] );
+							onChangeSelection( [] );
 						} }
 					>
 						{ __( 'Deselect' ) }
