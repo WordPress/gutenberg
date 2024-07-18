@@ -18,7 +18,12 @@ const RESIZING_THRESHOLDS: [ number, number ] = [ 10, 10 ]; // 10px.
 
 function CropWindow() {
 	const {
-		state: { width, height, size, offset, scale, turns, isResizing },
+		state: {
+			image,
+			transforms: { turns, scale },
+			cropper,
+			isResizing,
+		},
 		refs: { cropperWindowRef },
 		dispatch,
 	} = useContext( ImageCropperContext );
@@ -28,9 +33,12 @@ function CropWindow() {
 
 	return (
 		<Resizable
-			size={ size }
-			maxWidth={ isAxisSwapped ? height : width }
-			maxHeight={ isAxisSwapped ? width : height }
+			size={ {
+				width: cropper.width,
+				height: cropper.height,
+			} }
+			maxWidth={ isAxisSwapped ? image.height : image.width }
+			maxHeight={ isAxisSwapped ? image.width : image.height }
 			showHandle
 			// Emulate the resizing thresholds.
 			grid={ isResizing ? undefined : RESIZING_THRESHOLDS }
@@ -38,11 +46,11 @@ function CropWindow() {
 				// Set the temporary offset on resizing.
 				element!.style.setProperty(
 					'--wp-cropper-window-x',
-					`${ offset.x }px`
+					`${ cropper.x }px`
 				);
 				element!.style.setProperty(
 					'--wp-cropper-window-y',
-					`${ offset.y }px`
+					`${ cropper.y }px`
 				);
 
 				if ( event.type === 'mousedown' ) {
@@ -93,13 +101,13 @@ function CropWindow() {
 					if ( direction.toLowerCase().includes( 'left' ) ) {
 						element!.style.setProperty(
 							'--wp-cropper-window-x',
-							`${ offset.x - delta.width }px`
+							`${ cropper.x - delta.width }px`
 						);
 					}
 					if ( direction.startsWith( 'top' ) ) {
 						element!.style.setProperty(
 							'--wp-cropper-window-y',
-							`${ offset.y - delta.height }px`
+							`${ cropper.y - delta.height }px`
 						);
 					}
 				}
@@ -127,14 +135,9 @@ function CropWindow() {
 const Cropper = forwardRef< HTMLDivElement >( ( {}, ref ) => {
 	const {
 		state: {
-			width,
-			height,
-			angle,
-			turns,
-			scale,
-			flipped,
-			offset,
-			position,
+			image,
+			transforms: { angle, turns, scale, flipped },
+			cropper,
 		},
 		src,
 		refs: { imageRef },
@@ -142,15 +145,15 @@ const Cropper = forwardRef< HTMLDivElement >( ( {}, ref ) => {
 	const isAxisSwapped = turns % 2 !== 0;
 	const degree = angle + turns * 90;
 	const imageOffset = {
-		top: isAxisSwapped ? ( width - height ) / 2 : 0,
-		left: isAxisSwapped ? ( height - width ) / 2 : 0,
+		top: isAxisSwapped ? ( image.width - image.height ) / 2 : 0,
+		left: isAxisSwapped ? ( image.height - image.width ) / 2 : 0,
 	};
 
 	return (
 		<Container
 			style={ {
-				width: `${ isAxisSwapped ? height : width }px`,
-				height: `${ isAxisSwapped ? width : height }px`,
+				width: `${ isAxisSwapped ? image.height : image.width }px`,
+				height: `${ isAxisSwapped ? image.width : image.height }px`,
 				'--wp-cropper-angle': `${ degree }deg`,
 				'--wp-cropper-scale-x': `${
 					scale * ( flipped && ! isAxisSwapped ? -1 : 1 )
@@ -158,17 +161,17 @@ const Cropper = forwardRef< HTMLDivElement >( ( {}, ref ) => {
 				'--wp-cropper-scale-y': `${
 					scale * ( flipped && isAxisSwapped ? -1 : 1 )
 				}`,
-				'--wp-cropper-window-x': `${ offset.x }px`,
-				'--wp-cropper-window-y': `${ offset.y }px`,
-				'--wp-cropper-image-x': `${ position.x }px`,
-				'--wp-cropper-image-y': `${ position.y }px`,
+				'--wp-cropper-window-x': `${ cropper.x }px`,
+				'--wp-cropper-window-y': `${ cropper.y }px`,
+				'--wp-cropper-image-x': `${ image.x }px`,
+				'--wp-cropper-image-y': `${ image.y }px`,
 			} }
 			ref={ ref }
 		>
 			<div style={ { position: 'relative' } }>
 				<Img
-					width={ width }
-					height={ height }
+					width={ image.width }
+					height={ image.height }
 					src={ src }
 					alt=""
 					crossOrigin="anonymous"

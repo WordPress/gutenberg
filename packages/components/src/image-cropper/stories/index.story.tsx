@@ -55,7 +55,7 @@ function TemplateControls() {
 						min={ -45 }
 						max={ 45 }
 						step={ 1 }
-						value={ state.angle }
+						value={ state.transforms.angle }
 						onChange={ ( value ) => {
 							dispatch( {
 								type: 'ROTATE',

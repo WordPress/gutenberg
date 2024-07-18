@@ -59,45 +59,50 @@ export const useImageCropper = ( {
 			target: cropperWindowRef,
 			pinch: { scaleBounds: { min: 1, max: 10 } },
 			wheel: { threshold: 10 },
-			drag: { from: () => [ state.position.x, state.position.y ] },
+			drag: { from: () => [ state.image.x, state.image.y ] },
 		}
 	);
 
 	// FIXME: This doesn't work for rotated images for now.
 	const getImageBlob = useCallback( async ( cropperState: State ) => {
 		const offscreenCanvas = new OffscreenCanvas(
-			cropperState.size.width,
-			cropperState.size.height
+			cropperState.cropper.width,
+			cropperState.cropper.height
 		);
 		const ctx = offscreenCanvas.getContext( '2d' )!;
 		ctx.translate(
-			cropperState.position.x + offscreenCanvas.width / 2,
-			cropperState.position.y + offscreenCanvas.height / 2
+			cropperState.image.x + offscreenCanvas.width / 2,
+			cropperState.image.y + offscreenCanvas.height / 2
 		);
 		ctx.rotate(
-			degreeToRadian( cropperState.angle + cropperState.turns * 90 )
+			degreeToRadian(
+				cropperState.transforms.angle +
+					cropperState.transforms.turns * 90
+			)
 		);
-		const isAxisSwapped = cropperState.turns % 2 !== 0;
+		const isAxisSwapped = cropperState.transforms.turns % 2 !== 0;
 		ctx.scale(
-			cropperState.scale *
-				( cropperState.flipped && ! isAxisSwapped ? -1 : 1 ),
-			cropperState.scale *
-				( cropperState.flipped && isAxisSwapped ? -1 : 1 )
+			cropperState.transforms.scale *
+				( cropperState.transforms.flipped && ! isAxisSwapped ? -1 : 1 ),
+			cropperState.transforms.scale *
+				( cropperState.transforms.flipped && isAxisSwapped ? -1 : 1 )
 		);
 		const imageOffset = {
 			x: isAxisSwapped
-				? ( cropperState.height - cropperState.width ) / 2
+				? ( cropperState.image.height - cropperState.image.width ) / 2
 				: 0,
 			y: isAxisSwapped
-				? ( cropperState.width - cropperState.height ) / 2
+				? ( cropperState.image.width - cropperState.image.height ) / 2
 				: 0,
 		};
 		ctx.drawImage(
 			imageRef.current!,
-			-cropperState.offset.x - offscreenCanvas.width / 2 + imageOffset.x,
-			-cropperState.offset.y - offscreenCanvas.height / 2 + imageOffset.y,
-			cropperState.width,
-			cropperState.height
+			-cropperState.cropper.x - offscreenCanvas.width / 2 + imageOffset.x,
+			-cropperState.cropper.y -
+				offscreenCanvas.height / 2 +
+				imageOffset.y,
+			cropperState.image.width,
+			cropperState.image.height
 		);
 		const blob = await offscreenCanvas.convertToBlob();
 		return blob;

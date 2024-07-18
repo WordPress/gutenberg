@@ -5,24 +5,24 @@ import type { Position, Size, ResizeDirection } from './types';
 import { rotatePoint, degreeToRadian, getFurthestVector } from './math';
 
 export type State = {
-	// The container/image's width.
-	width: number;
-	// The container/image's height.
-	height: number;
-	// The rotation angle between -45deg to 45deg.
-	angle: number;
-	// The number of 90-degree turns.
-	turns: 0 | 1 | 2 | 3;
-	// The zoom scale.
-	scale: number;
-	// Whether the image is flipped horizontally.
-	flipped: boolean;
-	// The offset position of the cropper window.
-	offset: Position;
-	// The position of center of the image.
-	position: Position;
-	// The size of the cropper window.
-	size: Size;
+	image: {
+		x: number;
+		y: number;
+		width: number;
+		height: number;
+	};
+	transforms: {
+		angle: number;
+		turns: 0 | 1 | 2 | 3;
+		scale: number;
+		flipped: boolean;
+	};
+	cropper: {
+		x: number;
+		y: number;
+		width: number;
+		height: number;
+	};
 	// Whether the cropper window is resizing.
 	isResizing: boolean;
 	// Whether the image is dragging/moving.
@@ -49,15 +49,24 @@ function createInitialState( {
 	height: number;
 } ): State {
 	return {
-		width,
-		height,
-		angle: 0,
-		turns: 0,
-		scale: 1,
-		flipped: false,
-		offset: { x: 0, y: 0 },
-		position: { x: 0, y: 0 },
-		size: { width, height },
+		image: {
+			width,
+			height,
+			x: 0,
+			y: 0,
+		},
+		transforms: {
+			angle: 0,
+			turns: 0,
+			scale: 1,
+			flipped: false,
+		},
+		cropper: {
+			width,
+			height,
+			x: 0,
+			y: 0,
+		},
 		isResizing: false,
 		isDragging: false,
 	};
@@ -65,85 +74,97 @@ function createInitialState( {
 
 function imageCropperReducer( state: State, action: Action ) {
 	const {
-		width,
-		height,
-		scale,
-		flipped,
-		angle,
-		turns,
-		size,
-		position,
-		offset,
+		image,
+		transforms: { angle, turns, scale, flipped },
+		cropper,
 	} = state;
 	const radian = degreeToRadian( angle + turns * 90 );
 
 	switch ( action.type ) {
 		case 'ZOOM': {
 			const { x, y } = getFurthestVector(
-				width,
-				height,
+				image.width,
+				image.height,
 				radian,
-				size,
-				position
+				{ width: cropper.width, height: cropper.height },
+				{ x: image.x, y: image.y }
 			);
 
-			const widthScale = ( Math.abs( x ) * 2 + width ) / width;
-			const heightScale = ( Math.abs( y ) * 2 + height ) / height;
+			const widthScale =
+				( Math.abs( x ) * 2 + image.width ) / image.width;
+			const heightScale =
+				( Math.abs( y ) * 2 + image.height ) / image.height;
 			const minScale = Math.max( widthScale, heightScale );
 			return {
 				...state,
-				scale: Math.min( Math.max( action.scale, minScale ), 10 ),
+				transforms: {
+					...state.transforms,
+					scale: Math.min( Math.max( action.scale, minScale ), 10 ),
+				},
 			};
 		}
 		case 'ZOOM_BY': {
 			const { x, y } = getFurthestVector(
-				width,
-				height,
+				image.width,
+				image.height,
 				radian,
-				size,
-				position
+				{ width: cropper.width, height: cropper.height },
+				{ x: image.x, y: image.y }
 			);
 
-			const widthScale = ( Math.abs( x ) * 2 + width ) / width;
-			const heightScale = ( Math.abs( y ) * 2 + height ) / height;
+			const widthScale =
+				( Math.abs( x ) * 2 + image.width ) / image.width;
+			const heightScale =
+				( Math.abs( y ) * 2 + image.height ) / image.height;
 			const minScale = Math.max( widthScale, heightScale );
 			return {
 				...state,
-				scale: Math.min(
-					Math.max( state.scale + action.deltaScale, minScale ),
-					10
-				),
+				transforms: {
+					...state.transforms,
+					scale: Math.min(
+						Math.max( scale + action.deltaScale, minScale ),
+						10
+					),
+				},
 			};
 		}
 		case 'FLIP': {
 			return {
 				...state,
-				flipped: ! flipped,
-				angle: -angle,
-				position: {
-					x: -position.x,
-					y: position.y,
+				image: {
+					...state.image,
+					x: -image.x,
+				},
+				transforms: {
+					...state.transforms,
+					angle: -angle,
+					flipped: ! flipped,
 				},
 			};
 		}
 		case 'ROTATE': {
 			const nextRadian = degreeToRadian( action.angle + turns * 90 );
-			const scaledWidth = width * scale;
-			const scaledHeight = height * scale;
+			const scaledWidth = image.width * scale;
+			const scaledHeight = image.height * scale;
 			const { x, y } = getFurthestVector(
 				scaledWidth,
 				scaledHeight,
 				nextRadian,
-				size,
-				position
+				{ width: cropper.width, height: cropper.height },
+				{ x: image.x, y: image.y }
 			);
-			const widthScale = ( Math.abs( x ) * 2 + scaledWidth ) / width;
-			const heightScale = ( Math.abs( y ) * 2 + scaledHeight ) / height;
+			const widthScale =
+				( Math.abs( x ) * 2 + scaledWidth ) / image.width;
+			const heightScale =
+				( Math.abs( y ) * 2 + scaledHeight ) / image.height;
 			const minScale = Math.max( widthScale, heightScale );
 			return {
 				...state,
-				angle: action.angle,
-				scale: Math.max( scale, minScale ),
+				transforms: {
+					...state.transforms,
+					angle: action.angle,
+					scale: Math.max( scale, minScale ),
+				},
 			};
 		}
 		case 'ROTATE_CLOCKWISE': {
@@ -151,38 +172,48 @@ function imageCropperReducer( state: State, action: Action ) {
 			const nextTurns = ( ( turns + ( isCounterClockwise ? 3 : 1 ) ) %
 				4 ) as 0 | 1 | 2 | 3;
 			const rotatedPosition = rotatePoint(
-				position,
+				{ x: image.x, y: image.y },
 				{ x: 0, y: 0 },
 				( Math.PI / 2 ) * ( isCounterClockwise ? -1 : 1 )
 			);
 			return {
 				...state,
-				size: {
-					width: size.height,
-					height: size.width,
+				image: {
+					...state.image,
+					x: rotatedPosition.x,
+					y: rotatedPosition.y,
 				},
-				offset: {
-					x: offset.y,
-					y: offset.x,
+				transforms: {
+					...state.transforms,
+					turns: nextTurns,
 				},
-				turns: nextTurns,
-				position: rotatedPosition,
+				cropper: {
+					...state.cropper,
+					width: cropper.height,
+					height: cropper.width,
+					x: cropper.y,
+					y: cropper.x,
+				},
 			};
 		}
 		case 'TRANSLATE': {
 			return {
 				...state,
-				offset: action.offset,
+				cropper: {
+					...state.cropper,
+					x: action.offset.x,
+					y: action.offset.y,
+				},
 			};
 		}
 		case 'MOVE': {
-			const scaledWidth = width * scale;
-			const scaledHeight = height * scale;
+			const scaledWidth = image.width * scale;
+			const scaledHeight = image.height * scale;
 			const vectorInUnrotated = getFurthestVector(
 				scaledWidth,
 				scaledHeight,
 				radian,
-				size,
+				{ width: cropper.width, height: cropper.height },
 				{ x: action.x, y: action.y }
 			);
 
@@ -204,7 +235,11 @@ function imageCropperReducer( state: State, action: Action ) {
 
 			return {
 				...state,
-				position: nextPosition,
+				image: {
+					...state.image,
+					x: nextPosition.x,
+					y: nextPosition.y,
+				},
 			};
 		}
 		case 'RESIZE_START': {
@@ -227,13 +262,13 @@ function imageCropperReducer( state: State, action: Action ) {
 				? delta.height
 				: -delta.height;
 			const newSize = {
-				width: size.width + delta.width,
-				height: size.height + delta.height,
+				width: cropper.width + delta.width,
+				height: cropper.height + delta.height,
 			};
 			const isAxisSwapped = turns % 2 !== 0;
 			const imageDimensions = {
-				width: isAxisSwapped ? height : width,
-				height: isAxisSwapped ? width : height,
+				width: isAxisSwapped ? image.height : image.width,
+				height: isAxisSwapped ? image.width : image.height,
 			};
 			const widthScale = imageDimensions.width / newSize.width;
 			const heightScale = imageDimensions.height / newSize.height;
@@ -253,18 +288,30 @@ function imageCropperReducer( state: State, action: Action ) {
 			}
 			return {
 				...state,
-				offset: translated,
-				size: scaledSize,
-				scale: scale * windowScale,
-				position: {
-					x: ( position.x + deltaX / 2 ) * windowScale,
-					y: ( position.y + deltaY / 2 ) * windowScale,
+				image: {
+					...state.image,
+					x: ( image.x + deltaX / 2 ) * windowScale,
+					y: ( image.y + deltaY / 2 ) * windowScale,
+				},
+				transforms: {
+					...state.transforms,
+					scale: scale * windowScale,
+				},
+				cropper: {
+					...state.cropper,
+					width: scaledSize.width,
+					height: scaledSize.height,
+					x: translated.x,
+					y: translated.y,
 				},
 				isResizing: false,
 			};
 		}
 		case 'RESET': {
-			return createInitialState( { width, height } );
+			return createInitialState( {
+				width: image.width,
+				height: image.height,
+			} );
 		}
 		default: {
 			throw new Error( 'Unknown action' );
