@@ -3,6 +3,12 @@
  */
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import { useLink } from '../routes/link';
+import {
+	TEMPLATE_PART_POST_TYPE,
+	TEMPLATE_PART_ALL_AREAS_CATEGORY,
+	PATTERN_DEFAULT_CATEGORY,
+	PATTERN_TYPES,
+} from '../../utils/constants';
 
 export default function CategoryItem( {
 	count,
@@ -12,19 +18,17 @@ export default function CategoryItem( {
 	label,
 	type,
 } ) {
-	const linkInfo = useLink(
-		{
-			path: '/patterns',
-			categoryType: type,
-			categoryId: id,
-		},
-		{
-			// Keep a record of where we came from in state so we can
-			// use the browser's back button to go back to Patterns.
-			// See the implementation of the back button in patterns-list.
-			backPath: '/patterns',
-		}
-	);
+	const linkInfo = useLink( {
+		categoryId:
+			id !== TEMPLATE_PART_ALL_AREAS_CATEGORY &&
+			id !== PATTERN_DEFAULT_CATEGORY
+				? id
+				: undefined,
+		postType:
+			type === TEMPLATE_PART_POST_TYPE
+				? TEMPLATE_PART_POST_TYPE
+				: PATTERN_TYPES.user,
+	} );
 
 	if ( ! count ) {
 		return;

@@ -3,8 +3,8 @@
 ## Usage
 
 ```jsx
+import { useState } from 'react';
 import { DuotonePicker, DuotoneSwatch } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const DUOTONE_PALETTE = [
 	{ colors: [ '#8c00b7', '#fcff41' ], name: 'Purple and yellow', slug: 'purple-yellow' },
@@ -63,6 +63,20 @@ An array of colors for the duotone effect.
 -   Required: Yes
 
 Callback which is called when the duotone colors change.
+
+### `asButtons`: `boolean`
+
+Whether the control should present as a set of buttons, each with its own tab stop.
+
+- Required: No
+- Default: `false`
+
+### `loop`: `boolean`
+
+Prevents keyboard interaction from wrapping around. Only used when `asButtons` is not true.
+
+- Required: No
+- Default: `true`
 
 ## DuotoneSwatch Props
 

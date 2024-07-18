@@ -82,7 +82,7 @@
 		}
 
 		li[aria-current="step"] .components-button {
-			color: var(--wp-components-color-accent, var(--wp-admin-theme-color));
+			color: $components-color-accent;
 		}
 	}
 }

@@ -3,11 +3,6 @@
 		margin: 0 0 2rem 0;
 	}
 
-	&__main-shortcuts .edit-widgets-keyboard-shortcut-help-modal__shortcut-list {
-		// Push the shortcut to be flush with top modal header.
-		margin-top: -$grid-unit-30 -$border-width;
-	}
-
 	&__section-title {
 		font-size: 0.9rem;
 		font-weight: 600;
@@ -38,9 +33,6 @@
 	&__shortcut-description {
 		flex: 1;
 		margin: 0;
-
-		// IE 11 flex item fix - ensure the item does not collapse.
-		flex-basis: auto;
 	}
 
 	&__shortcut-key-combination {

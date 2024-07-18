@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -16,7 +16,6 @@ import {
 	ToolbarButton,
 	Dropdown,
 	withFilters,
-	Tooltip,
 } from '@wordpress/components';
 import { useSelect, withDispatch } from '@wordpress/data';
 import { DOWN } from '@wordpress/keycodes';
@@ -179,7 +178,7 @@ const MediaReplaceFlow = ( {
 									uploadFiles( event, onClose );
 								} }
 								accept={ accept }
-								multiple={ multiple }
+								multiple={ !! multiple }
 								render={ ( { openFileDialog } ) => {
 									return (
 										<MenuItem
@@ -208,7 +207,7 @@ const MediaReplaceFlow = ( {
 					{ onSelectURL && (
 						// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
 						<form
-							className={ classnames(
+							className={ clsx(
 								'block-editor-media-flow__url-input',
 								{
 									'has-siblings':
@@ -220,19 +219,15 @@ const MediaReplaceFlow = ( {
 								{ __( 'Current media URL:' ) }
 							</span>
 
-							<Tooltip text={ mediaURL } position="bottom">
-								<div>
-									<LinkControl
-										value={ { url: mediaURL } }
-										settings={ [] }
-										showSuggestions={ false }
-										onChange={ ( { url } ) => {
-											onSelectURL( url );
-											editMediaButtonRef.current.focus();
-										} }
-									/>
-								</div>
-							</Tooltip>
+							<LinkControl
+								value={ { url: mediaURL } }
+								settings={ [] }
+								showSuggestions={ false }
+								onChange={ ( { url } ) => {
+									onSelectURL( url );
+									editMediaButtonRef.current.focus();
+								} }
+							/>
 						</form>
 					) }
 				</>

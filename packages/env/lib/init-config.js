@@ -248,8 +248,8 @@ RUN rm /tmp/composer-setup.php`;
 	// Make sure to do this as the user and ensure the binaries are available in the $PATH.
 	dockerFileContent += `
 USER $HOST_UID:$HOST_GID
-ENV PATH="\${PATH}:~/.composer/vendor/bin"
-RUN composer global require --dev yoast/phpunit-polyfills:"^1.0"
+ENV PATH="\${PATH}:/home/$HOST_USERNAME/.composer/vendor/bin"
+RUN composer global require --dev phpunit/phpunit:"^5.7.21 || ^6.0 || ^7.0 || ^8.0 || ^9.0 || ^10.0"
 USER root`;
 
 	return dockerFileContent;

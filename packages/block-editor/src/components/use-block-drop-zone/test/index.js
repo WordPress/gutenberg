@@ -22,13 +22,6 @@ const elementData = [
 		bottom: 900,
 		right: 400,
 	},
-	// Fourth block wraps to the next row/column.
-	{
-		top: 0,
-		left: 400,
-		bottom: 300,
-		right: 800,
-	},
 ];
 
 const mapElements =
@@ -73,7 +66,7 @@ describe( 'getDropTargetPosition', () => {
 		const orientation = 'vertical';
 
 		it( 'returns `0` when the position is nearest to the start of the first block', () => {
-			const position = { x: 0, y: 0 };
+			const position = { x: 32, y: 0 };
 
 			const result = getDropTargetPosition(
 				verticalBlocksData,
@@ -85,7 +78,7 @@ describe( 'getDropTargetPosition', () => {
 		} );
 
 		it( 'returns `1` when the position is nearest to the end of the first block', () => {
-			const position = { x: 0, y: 190 };
+			const position = { x: 32, y: 190 };
 
 			const result = getDropTargetPosition(
 				verticalBlocksData,
@@ -97,7 +90,7 @@ describe( 'getDropTargetPosition', () => {
 		} );
 
 		it( 'returns `1` when the position is nearest to the start of the second block', () => {
-			const position = { x: 0, y: 210 };
+			const position = { x: 32, y: 210 };
 
 			const result = getDropTargetPosition(
 				verticalBlocksData,
@@ -109,7 +102,7 @@ describe( 'getDropTargetPosition', () => {
 		} );
 
 		it( 'returns `2` when the position is nearest to the end of the second block', () => {
-			const position = { x: 0, y: 450 };
+			const position = { x: 32, y: 450 };
 
 			const result = getDropTargetPosition(
 				verticalBlocksData,
@@ -121,7 +114,7 @@ describe( 'getDropTargetPosition', () => {
 		} );
 
 		it( 'returns `2` when the position is nearest to the start of the third block', () => {
-			const position = { x: 0, y: 510 };
+			const position = { x: 32, y: 510 };
 
 			const result = getDropTargetPosition(
 				verticalBlocksData,
@@ -133,7 +126,7 @@ describe( 'getDropTargetPosition', () => {
 		} );
 
 		it( 'returns `3` when the position is nearest to the end of the third block', () => {
-			const position = { x: 0, y: 880 };
+			const position = { x: 32, y: 880 };
 
 			const result = getDropTargetPosition(
 				verticalBlocksData,
@@ -145,7 +138,7 @@ describe( 'getDropTargetPosition', () => {
 		} );
 
 		it( 'returns `3` when the position is past the end of the third block', () => {
-			const position = { x: 0, y: 920 };
+			const position = { x: 32, y: 920 };
 
 			const result = getDropTargetPosition(
 				verticalBlocksData,
@@ -155,9 +148,8 @@ describe( 'getDropTargetPosition', () => {
 
 			expect( result ).toEqual( [ 3, 'insert' ] );
 		} );
-
-		it( 'returns `4` when the position is nearest to the start of the fourth block', () => {
-			const position = { x: 401, y: 0 };
+		it( 'returns group with index 0 when position is close to the right of the first block', () => {
+			const position = { x: 372, y: 0 };
 
 			const result = getDropTargetPosition(
 				verticalBlocksData,
@@ -165,11 +157,10 @@ describe( 'getDropTargetPosition', () => {
 				orientation
 			);
 
-			expect( result ).toEqual( [ 3, 'insert' ] );
+			expect( result ).toEqual( [ 0, 'group', 'right' ] );
 		} );
-
-		it( 'returns `5` when the position is nearest to the end of the fourth block', () => {
-			const position = { x: 401, y: 300 };
+		it( 'returns group with index 1 when position is close to the left of the second block', () => {
+			const position = { x: 12, y: 212 };
 
 			const result = getDropTargetPosition(
 				verticalBlocksData,
@@ -177,7 +168,7 @@ describe( 'getDropTargetPosition', () => {
 				orientation
 			);
 
-			expect( result ).toEqual( [ 4, 'insert' ] );
+			expect( result ).toEqual( [ 1, 'group', 'left' ] );
 		} );
 	} );
 
@@ -267,30 +258,6 @@ describe( 'getDropTargetPosition', () => {
 
 			expect( result ).toEqual( [ 3, 'insert' ] );
 		} );
-
-		it( 'returns `3` when the position is nearest to the start of the last block', () => {
-			const position = { x: 0, y: 401 };
-
-			const result = getDropTargetPosition(
-				horizontalBlocksData,
-				position,
-				orientation
-			);
-
-			expect( result ).toEqual( [ 3, 'insert' ] );
-		} );
-
-		it( 'returns `4` when the position is nearest to the end of the last block', () => {
-			const position = { x: 300, y: 401 };
-
-			const result = getDropTargetPosition(
-				horizontalBlocksData,
-				position,
-				orientation
-			);
-
-			expect( result ).toEqual( [ 4, 'insert' ] );
-		} );
 	} );
 
 	describe( 'Unmodified default blocks', () => {
@@ -316,14 +283,18 @@ describe( 'getDropTargetPosition', () => {
 
 			// Dropping above the first block.
 			expect(
-				getDropTargetPosition( blocksData, { x: 0, y: 0 }, orientation )
+				getDropTargetPosition(
+					blocksData,
+					{ x: 32, y: 0 },
+					orientation
+				)
 			).toEqual( [ 0, 'replace' ] );
 
 			// Dropping on the top half of the first block.
 			expect(
 				getDropTargetPosition(
 					blocksData,
-					{ x: 0, y: 20 },
+					{ x: 32, y: 20 },
 					orientation
 				)
 			).toEqual( [ 0, 'replace' ] );
@@ -332,7 +303,7 @@ describe( 'getDropTargetPosition', () => {
 			expect(
 				getDropTargetPosition(
 					blocksData,
-					{ x: 0, y: 200 },
+					{ x: 32, y: 200 },
 					orientation
 				)
 			).toEqual( [ 0, 'replace' ] );
@@ -341,7 +312,7 @@ describe( 'getDropTargetPosition', () => {
 			expect(
 				getDropTargetPosition(
 					blocksData,
-					{ x: 0, y: 211 },
+					{ x: 32, y: 211 },
 					orientation
 				)
 			).toEqual( [ 0, 'replace' ] );
@@ -350,7 +321,7 @@ describe( 'getDropTargetPosition', () => {
 			expect(
 				getDropTargetPosition(
 					blocksData,
-					{ x: 0, y: 219 },
+					{ x: 32, y: 219 },
 					orientation
 				)
 			).toEqual( [ 0, 'replace' ] );
@@ -359,7 +330,7 @@ describe( 'getDropTargetPosition', () => {
 			expect(
 				getDropTargetPosition(
 					blocksData,
-					{ x: 0, y: 230 },
+					{ x: 32, y: 230 },
 					orientation
 				)
 			).toEqual( [ 0, 'replace' ] );
@@ -368,7 +339,7 @@ describe( 'getDropTargetPosition', () => {
 			expect(
 				getDropTargetPosition(
 					blocksData,
-					{ x: 0, y: 410 },
+					{ x: 32, y: 410 },
 					orientation
 				)
 			).toEqual( [ 2, 'insert' ] );
@@ -377,7 +348,7 @@ describe( 'getDropTargetPosition', () => {
 			expect(
 				getDropTargetPosition(
 					blocksData,
-					{ x: 0, y: 421 },
+					{ x: 32, y: 421 },
 					orientation
 				)
 			).toEqual( [ 2, 'insert' ] );
@@ -410,7 +381,7 @@ describe( 'getDropTargetPosition', () => {
 			expect(
 				getDropTargetPosition(
 					blocksData,
-					{ x: 0, y: 20 },
+					{ x: 32, y: 20 },
 					orientation
 				)
 			).toEqual( [ 0, 'insert' ] );
@@ -419,7 +390,7 @@ describe( 'getDropTargetPosition', () => {
 			expect(
 				getDropTargetPosition(
 					blocksData,
-					{ x: 0, y: 200 },
+					{ x: 32, y: 200 },
 					orientation
 				)
 			).toEqual( [ 1, 'replace' ] );
@@ -428,7 +399,7 @@ describe( 'getDropTargetPosition', () => {
 			expect(
 				getDropTargetPosition(
 					blocksData,
-					{ x: 0, y: 211 },
+					{ x: 32, y: 211 },
 					orientation
 				)
 			).toEqual( [ 1, 'replace' ] );
@@ -437,7 +408,7 @@ describe( 'getDropTargetPosition', () => {
 			expect(
 				getDropTargetPosition(
 					blocksData,
-					{ x: 0, y: 219 },
+					{ x: 32, y: 219 },
 					orientation
 				)
 			).toEqual( [ 1, 'replace' ] );
@@ -446,7 +417,7 @@ describe( 'getDropTargetPosition', () => {
 			expect(
 				getDropTargetPosition(
 					blocksData,
-					{ x: 0, y: 230 },
+					{ x: 32, y: 230 },
 					orientation
 				)
 			).toEqual( [ 1, 'replace' ] );
@@ -455,7 +426,7 @@ describe( 'getDropTargetPosition', () => {
 			expect(
 				getDropTargetPosition(
 					blocksData,
-					{ x: 0, y: 410 },
+					{ x: 32, y: 410 },
 					orientation
 				)
 			).toEqual( [ 1, 'replace' ] );
@@ -464,7 +435,7 @@ describe( 'getDropTargetPosition', () => {
 			expect(
 				getDropTargetPosition(
 					blocksData,
-					{ x: 0, y: 421 },
+					{ x: 32, y: 421 },
 					orientation
 				)
 			).toEqual( [ 1, 'replace' ] );

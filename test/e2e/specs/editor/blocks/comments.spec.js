@@ -165,9 +165,9 @@ test.describe( 'Comments', () => {
 		await expect( warning ).toBeVisible();
 		await expect( placeholder ).toBeVisible();
 
-		await editor.canvas.click(
-			'role=button[name="Switch to editable mode"i]'
-		);
+		await editor.canvas
+			.locator( 'role=button[name="Switch to editable mode"i]' )
+			.click();
 
 		const commentTemplate = editor.canvas.locator(
 			'role=document[name="Block: Comment Template"i]'

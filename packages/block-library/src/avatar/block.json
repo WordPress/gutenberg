@@ -30,7 +30,11 @@
 		"alignWide": false,
 		"spacing": {
 			"margin": true,
-			"padding": true
+			"padding": true,
+			"__experimentalDefaultControls": {
+				"margin": false,
+				"padding": false
+			}
 		},
 		"__experimentalBorder": {
 			"__experimentalSkipSerialization": true,
@@ -46,7 +50,13 @@
 			"text": false,
 			"background": false,
 			"__experimentalDuotone": "img"
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
+	},
+	"selectors": {
+		"border": ".wp-block-avatar img"
 	},
 	"editorStyle": "wp-block-avatar-editor",
 	"style": "wp-block-avatar"

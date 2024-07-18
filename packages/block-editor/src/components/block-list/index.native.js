@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import { View, Platform, TouchableWithoutFeedback } from 'react-native';
+import { View, Platform, Pressable } from 'react-native';
 
 /**
  * WordPress dependencies
  */
-import { useRef, useState } from '@wordpress/element';
+import { useRef, useState, useCallback } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
 import {
@@ -139,7 +139,7 @@ export default function BlockList( {
 		insertBlock( newBlock, blockCount );
 	};
 
-	const scrollViewRef = useRef( null );
+	const scrollRef = useRef( null );
 
 	const shouldFlatListPreventAutomaticScroll = () =>
 		blockInsertionPointIsVisible;
@@ -211,7 +211,7 @@ export default function BlockList( {
 		);
 	};
 
-	const { blockToolbar, headerToolbar, floatingToolbar } = styles;
+	const { blockToolbar, floatingToolbar } = styles;
 
 	const containerStyle = {
 		flex: isRootList ? 1 : 0,
@@ -224,7 +224,6 @@ export default function BlockList( {
 	const isMultiBlocks = blockClientIds.length > 1;
 	const { isWider } = alignmentHelpers;
 	const extraScrollHeight =
-		headerToolbar.height +
 		blockToolbar.height +
 		( isFloatingToolbarVisible ? floatingToolbar.height : 0 );
 
@@ -239,22 +238,16 @@ export default function BlockList( {
 				<BlockListProvider
 					value={ {
 						...DEFAULT_BLOCK_LIST_CONTEXT,
-						scrollRef: scrollViewRef.current,
+						scrollRef: scrollRef.current,
 					} }
 				>
 					<BlockDraggableWrapper isRTL={ isRTL }>
 						{ ( { onScroll } ) => (
 							<KeyboardAwareFlatList
-								{ ...( Platform.OS === 'android'
-									? { removeClippedSubviews: false }
-									: {} ) } // Disable clipping on Android to fix focus losing. See https://github.com/wordpress-mobile/gutenberg-mobile/pull/741#issuecomment-472746541
 								accessibilityLabel="block-list"
-								innerRef={ ( ref ) => {
-									scrollViewRef.current = ref;
-								} }
+								ref={ scrollRef }
 								extraScrollHeight={ extraScrollHeight }
 								keyboardShouldPersistTaps="always"
-								scrollViewStyle={ { flex: 1 } }
 								extraData={ getExtraData() }
 								scrollEnabled={ isRootList }
 								contentContainerStyle={ [
@@ -372,20 +365,20 @@ function Footer( {
 	renderFooterAppender,
 	withFooter,
 } ) {
+	const onAddParagraphBlock = useCallback( () => {
+		const paragraphBlock = createBlock( 'core/paragraph' );
+		addBlockToEndOfPost( paragraphBlock );
+	}, [ addBlockToEndOfPost ] );
+
 	if ( ! isReadOnly && withFooter ) {
 		return (
-			<>
-				<TouchableWithoutFeedback
-					accessibilityLabel={ __( 'Add paragraph block' ) }
-					testID={ __( 'Add paragraph block' ) }
-					onPress={ () => {
-						const paragraphBlock = createBlock( 'core/paragraph' );
-						addBlockToEndOfPost( paragraphBlock );
-					} }
-				>
-					<View style={ styles.blockListFooter } />
-				</TouchableWithoutFeedback>
-			</>
+			<Pressable
+				accessibilityLabel={ __( 'Add paragraph block' ) }
+				testID={ __( 'Add paragraph block' ) }
+				onPress={ onAddParagraphBlock }
+			>
+				<View style={ styles.blockListFooter } />
+			</Pressable>
 		);
 	} else if ( renderFooterAppender ) {
 		return <View>{ renderFooterAppender() }</View>;

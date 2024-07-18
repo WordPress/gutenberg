@@ -1,7 +1,13 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
+import type { ForwardedRef } from 'react';
+
+/**
+ * WordPress dependencies
+ */
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -15,7 +21,8 @@ import {
 	StyledHelp,
 	StyledVisualLabel,
 } from './styles/base-control-styles';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
+import { contextConnectWithoutRef, useContextSystem } from '../context';
 
 export { useBaseControlProps } from './hooks';
 
@@ -42,19 +49,21 @@ export { useBaseControlProps } from './hooks';
  * );
  * ```
  */
-export const BaseControl = ( {
-	__nextHasNoMarginBottom = false,
-	id,
-	label,
-	hideLabelFromVision = false,
-	help,
-	className,
-	children,
-}: BaseControlProps ) => {
+const UnconnectedBaseControl = (
+	props: WordPressComponentProps< BaseControlProps, null >
+) => {
+	const {
+		__nextHasNoMarginBottom = false,
+		id,
+		label,
+		hideLabelFromVision = false,
+		help,
+		className,
+		children,
+	} = useContextSystem( props, 'BaseControl' );
+
 	return (
-		<Wrapper
-			className={ classnames( 'components-base-control', className ) }
-		>
+		<Wrapper className={ className }>
 			<StyledField
 				className="components-base-control__field"
 				// TODO: Official deprecation for this should start after all internal usages have been migrated
@@ -79,9 +88,7 @@ export const BaseControl = ( {
 					( hideLabelFromVision ? (
 						<VisuallyHidden as="label">{ label }</VisuallyHidden>
 					) : (
-						<BaseControl.VisualLabel>
-							{ label }
-						</BaseControl.VisualLabel>
+						<VisualLabel>{ label }</VisualLabel>
 					) ) }
 				{ children }
 			</StyledField>
@@ -115,23 +122,28 @@ export const BaseControl = ( {
  * 	</BaseControl>
  * );
  */
-export const VisualLabel = ( {
-	className,
-	children,
-	...props
-}: WordPressComponentProps< BaseControlVisualLabelProps, 'span' > ) => {
+const UnforwardedVisualLabel = (
+	props: WordPressComponentProps< BaseControlVisualLabelProps, 'span' >,
+	ref: ForwardedRef< any >
+) => {
+	const { className, children, ...restProps } = props;
+
 	return (
 		<StyledVisualLabel
-			{ ...props }
-			className={ classnames(
-				'components-base-control__label',
-				className
-			) }
+			ref={ ref }
+			{ ...restProps }
+			className={ clsx( 'components-base-control__label', className ) }
 		>
 			{ children }
 		</StyledVisualLabel>
 	);
 };
-BaseControl.VisualLabel = VisualLabel;
+
+export const VisualLabel = forwardRef( UnforwardedVisualLabel );
+
+export const BaseControl = Object.assign(
+	contextConnectWithoutRef( UnconnectedBaseControl, 'BaseControl' ),
+	{ VisualLabel }
+);
 
 export default BaseControl;

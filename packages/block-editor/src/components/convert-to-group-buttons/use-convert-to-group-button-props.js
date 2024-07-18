@@ -34,55 +34,28 @@ export default function useConvertToGroupButtonProps( selectedClientIds ) {
 	return useSelect(
 		( select ) => {
 			const {
-				getBlockRootClientId,
 				getBlocksByClientId,
-				canInsertBlockType,
 				getSelectedBlockClientIds,
+				isUngroupable,
+				isGroupable,
 			} = select( blockEditorStore );
 			const { getGroupingBlockName, getBlockType } =
 				select( blocksStore );
 			const clientIds = selectedClientIds?.length
 				? selectedClientIds
 				: getSelectedBlockClientIds();
-			const groupingBlockName = getGroupingBlockName();
-
-			const rootClientId = clientIds?.length
-				? getBlockRootClientId( clientIds[ 0 ] )
-				: undefined;
-
-			const groupingBlockAvailable = canInsertBlockType(
-				groupingBlockName,
-				rootClientId
-			);
-
 			const blocksSelection = getBlocksByClientId( clientIds );
-			const isSingleBlockSelected = blocksSelection.length === 1;
 			const [ firstSelectedBlock ] = blocksSelection;
-			// A block is ungroupable if it is a single grouping block with inner blocks.
-			// If a block has an `ungroup` transform, it is also ungroupable, without the
-			// requirement of being the default grouping block.
-			// Do we have a single grouping Block selected and does that group have inner blocks?
-			const isUngroupable =
-				isSingleBlockSelected &&
-				( firstSelectedBlock.name === groupingBlockName ||
-					getBlockType( firstSelectedBlock.name )?.transforms
-						?.ungroup ) &&
-				!! firstSelectedBlock.innerBlocks.length;
-
-			// Do we have
-			// 1. Grouping block available to be inserted?
-			// 2. One or more blocks selected
-			const isGroupable =
-				groupingBlockAvailable && blocksSelection.length;
-
+			const _isUngroupable =
+				clientIds.length === 1 && isUngroupable( clientIds[ 0 ] );
 			return {
 				clientIds,
-				isGroupable,
-				isUngroupable,
+				isGroupable: isGroupable( clientIds ),
+				isUngroupable: _isUngroupable,
 				blocksSelection,
-				groupingBlockName,
+				groupingBlockName: getGroupingBlockName(),
 				onUngroup:
-					isUngroupable &&
+					_isUngroupable &&
 					getBlockType( firstSelectedBlock.name )?.transforms
 						?.ungroup,
 			};

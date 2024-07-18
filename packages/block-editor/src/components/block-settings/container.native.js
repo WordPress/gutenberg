@@ -2,14 +2,9 @@
  * WordPress dependencies
  */
 import {
-	InspectorControls,
-	useMultipleOriginColorsAndGradients,
-} from '@wordpress/block-editor';
-import {
 	BottomSheet,
 	ColorSettings,
 	FocalPointSettingsPanel,
-	ImageLinkDestinationsScreen,
 	LinkPickerScreen,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -18,6 +13,11 @@ import { useDispatch, useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import styles from './container.native.scss';
+import InspectorControls from '../inspector-controls';
+import ImageLinkDestinationsScreen from '../image-link-destinations';
+import useMultipleOriginColorsAndGradients from '../colors-gradients/use-multiple-origin-colors-and-gradients';
+import { useMobileGlobalStylesColors } from '../global-styles/use-global-styles-context';
+import AdvancedControls from '../inspector-controls-tabs/advanced-controls-panel';
 
 export const blockSettingsScreens = {
 	settings: 'Settings',
@@ -29,6 +29,7 @@ export const blockSettingsScreens = {
 
 export default function BottomSheetSettings( props ) {
 	const colorSettings = useMultipleOriginColorsAndGradients();
+	colorSettings.allAvailableColors = useMobileGlobalStylesColors();
 	const { closeGeneralSidebar } = useDispatch( 'core/edit-post' );
 	const editorSidebarOpened = useSelect( ( select ) =>
 		select( 'core/edit-post' ).isEditorSidebarOpened()
@@ -48,7 +49,10 @@ export default function BottomSheetSettings( props ) {
 				<BottomSheet.NavigationScreen
 					name={ blockSettingsScreens.settings }
 				>
-					<InspectorControls.Slot />
+					<>
+						<InspectorControls.Slot />
+						<AdvancedControls />
+					</>
 				</BottomSheet.NavigationScreen>
 				<BottomSheet.NavigationScreen
 					name={ BottomSheet.SubSheet.screenName }

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -72,7 +72,7 @@ function PostAuthorEdit( {
 	}
 
 	const blockProps = useBlockProps( {
-		className: classnames( {
+		className: clsx( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
@@ -195,8 +195,8 @@ function PostAuthorEdit( {
 				<div className="wp-block-post-author__content">
 					{ ( ! RichText.isEmpty( byline ) || isSelected ) && (
 						<RichText
+							identifier="byline"
 							className="wp-block-post-author__byline"
-							multiline={ false }
 							aria-label={ __( 'Post author byline text' ) }
 							placeholder={ __( 'Write byline…' ) }
 							value={ byline }

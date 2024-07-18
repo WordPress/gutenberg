@@ -2,9 +2,9 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "core/post-date",
-	"title": "Post Date",
+	"title": "Date",
 	"category": "theme",
-	"description": "Add the date of this post.",
+	"description": "Display the publish date for an entry such as a post or page.",
 	"textdomain": "default",
 	"attributes": {
 		"textAlign": {
@@ -23,6 +23,9 @@
 		}
 	},
 	"usesContext": [ "postId", "postType", "queryId" ],
+	"example": {
+		"viewportWidth": 350
+	},
 	"supports": {
 		"html": false,
 		"color": {
@@ -50,6 +53,9 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	}
 }

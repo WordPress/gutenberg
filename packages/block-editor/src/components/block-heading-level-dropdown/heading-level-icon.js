@@ -12,7 +12,7 @@ import {
 } from '@wordpress/icons';
 import { Icon } from '@wordpress/components';
 
-/** @typedef {import('@wordpress/element').WPComponent} WPComponent */
+/** @typedef {import('react').ComponentType} ComponentType */
 
 /**
  * HeadingLevelIcon props.
@@ -37,7 +37,7 @@ const LEVEL_TO_PATH = {
  *
  * @param {WPHeadingLevelIconProps} props Component props.
  *
- * @return {?WPComponent} The icon.
+ * @return {?ComponentType} The icon.
  */
 export default function HeadingLevelIcon( { level } ) {
 	if ( LEVEL_TO_PATH[ level ] ) {

@@ -92,9 +92,9 @@ _Example:_
                 "check-node-version": "^4.1.0",
                 "cross-spawn": "^5.1.0",
                 "eslint": "^7.1.0",
--               "jest": "^29.5.0",
+-               "jest": "^29.6.2",
                 "minimist": "^1.2.0",
-                "npm-package-json-lint": "^3.6.0",
+                "npm-package-json-lint": "^6.4.0",
 ```
 
 Next, you need to run `npm install` in the root of the project to ensure that `package-lock.json` file gets properly regenerated.
@@ -170,10 +170,11 @@ _Example:_
 
 There are a number of common release subsections you can follow. Each is intended to align to a specific meaning in the context of the [Semantic Versioning (`semver`) specification](https://semver.org/) the project adheres to. It is important that you describe your changes accurately, since this is used in the packages release process to help determine the version of the next release.
 
--   "Breaking Change" - A backwards-incompatible change which requires specific attention of the impacted developers to reconcile (requires a major version bump).
--   "New Feature" - The addition of a new backwards-compatible function or feature to the existing public API (requires a minor version bump).
--   "Enhancement" - Backwards-compatible improvements to existing functionality (requires a minor version bump).
--   "Bug Fix" - Resolutions to existing buggy behavior (requires a patch version bump).
+-   "Breaking Changes" - A backwards-incompatible change which requires specific attention of the impacted developers to reconcile (requires a major version bump).
+-   "New Features" - The addition of a new backwards-compatible function or feature to the existing public API (requires a minor version bump).
+-   "Enhancements" - Backwards-compatible improvements to existing functionality (requires a minor version bump).
+-   "Deprecations" - Deprecation notices. These do not impact the public interface or behavior of the module (requires a minor version bump).
+-   "Bug Fixes" - Resolutions to existing buggy behavior (requires a patch version bump).
 -   "Internal" - Changes which do not have an impact on the public interface or behavior of the module (requires a patch version bump).
 
 While other section naming can be used when appropriate, it's important that are expressed clearly to avoid confusion for both the packages releaser and third-party consumers.

@@ -1,13 +1,9 @@
 /**
- * External dependencies
- */
-import turboCombineReducers from 'turbo-combine-reducers';
-
-/**
  * Internal dependencies
  */
 import defaultRegistry from './default-registry';
 import * as plugins from './plugins';
+import { combineReducers as combineReducersModule } from './redux-store';
 
 /** @typedef {import('./types').StoreDescriptor} StoreDescriptor */
 
@@ -27,6 +23,7 @@ export { useDispatch } from './components/use-dispatch';
 export { AsyncModeProvider } from './components/async-mode-provider';
 export { createRegistry } from './registry';
 export { createRegistrySelector, createRegistryControl } from './factory';
+export { createSelector } from './create-selector';
 export { controls } from './controls';
 export { default as createReduxStore } from './redux-store';
 export { dispatch } from './dispatch';
@@ -80,7 +77,7 @@ export { plugins };
  * @return {Function} A reducer that invokes every reducer inside the reducers
  *                    object, and constructs a state object with the same shape.
  */
-export const combineReducers = turboCombineReducers;
+export const combineReducers = combineReducersModule;
 
 /**
  * Given a store descriptor, returns an object containing the store's selectors pre-bound to state

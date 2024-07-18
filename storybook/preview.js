@@ -1,4 +1,16 @@
 /**
+ * External dependencies
+ */
+import {
+	ArgsTable,
+	Description,
+	Primary,
+	Stories,
+	Subtitle,
+	Title,
+} from '@storybook/blocks';
+
+/**
  * Internal dependencies
  */
 import { WithGlobalCSS } from './decorators/with-global-css';
@@ -6,6 +18,7 @@ import { WithMarginChecker } from './decorators/with-margin-checker';
 import { WithMaxWidthWrapper } from './decorators/with-max-width-wrapper';
 import { WithRTL } from './decorators/with-rtl';
 import { WithTheme } from './decorators/with-theme';
+import badgesConfig from './badges';
 
 export const globalTypes = {
 	direction: {
@@ -87,8 +100,25 @@ export const decorators = [
 ];
 
 export const parameters = {
+	// For @geometricpanda/storybook-addon-badges
+	badgesConfig,
 	controls: {
 		sort: 'requiredFirst',
+	},
+	docs: {
+		// Flips the order of the description and the primary component story
+		// so the component is always visible before the fold.
+		page: () => (
+			<>
+				<Title />
+				<Subtitle />
+				<Primary />
+				<Description />
+				{ /* `story="^"` enables Controls for the primary props table */ }
+				<ArgsTable story="^" />
+				<Stories includePrimary={ false } />
+			</>
+		),
 	},
 	options: {
 		storySort: {

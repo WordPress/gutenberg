@@ -24,7 +24,7 @@ export const StyledSpinner = styled.svg`
 	display: inline-block;
 	margin: 5px 11px 0;
 	position: relative;
-	color: ${ COLORS.ui.theme };
+	color: ${ COLORS.theme.accent };
 	overflow: visible;
 	opacity: 1;
 	background-color: transparent;

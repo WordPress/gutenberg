@@ -72,11 +72,12 @@ Value of Frame content default mode like 'browse', 'upload' etc.
 -   Required: No
 -   Default: false
 -   Platform: Web
+
 ### multiple
 
-Whether to allow multiple selections or not.
+Whether to allow multiple selection of files or not. This property will also accept a string with the value `add` to allow multiple selection of files without the need to use the `Shift` or `Ctrl`/`Cmd` keys.
 
--   Type: `Boolean`
+-   Type: `Boolean|String`
 -   Required: No
 -   Default: false
 -   Platform: Web

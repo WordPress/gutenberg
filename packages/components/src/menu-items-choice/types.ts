@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import type { ShortcutProps } from '../shortcut/types';
+import type { ButtonAsButtonProps } from '../button/types';
 
 export type MenuItemsChoiceProps = {
 	/**
@@ -19,7 +20,8 @@ export type MenuItemsChoiceProps = {
 	 * Callback function to be called with the selected choice when user
 	 * selects a new choice.
 	 */
-	onSelect( value: string ): void;
+	onSelect: ( value: string ) => void;
+
 	/**
 	 * Callback function to be called with a choice when user
 	 * hovers over a new choice (will be empty on mouse leave).
@@ -38,6 +40,10 @@ export type MenuItemChoice = {
 	 * Unique value for choice.
 	 */
 	value: string;
+	/**
+	 * Whether the menu item is disabled.
+	 */
+	disabled?: ButtonAsButtonProps[ 'disabled' ];
 	/**
 	 * Additional information which will be rendered below the given label.
 	 */

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -14,12 +14,6 @@ import {
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { select } from '@wordpress/data';
-import {
-	create,
-	replace,
-	toHTMLString,
-	__UNSTABLE_LINE_SEPARATOR,
-} from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -64,13 +58,14 @@ function parseBorderColor( styleString ) {
 }
 
 function multilineToInline( value ) {
-	return toHTMLString( {
-		value: replace(
-			create( { html: value, multilineTag: 'p' } ),
-			new RegExp( __UNSTABLE_LINE_SEPARATOR, 'g' ),
-			'\n'
-		),
-	} );
+	value = value || `<p></p>`;
+	const padded = `</p>${ value }<p>`;
+	const values = padded.split( `</p><p>` );
+
+	values.shift();
+	values.pop();
+
+	return values.join( '<br>' );
 }
 
 const v5 = {
@@ -100,7 +95,7 @@ const v5 = {
 		return (
 			<figure
 				{ ...useBlockProps.save( {
-					className: classnames( {
+					className: clsx( {
 						[ `has-text-align-${ textAlign }` ]: textAlign,
 					} ),
 				} ) }
@@ -150,7 +145,7 @@ const v4 = {
 				mainColor
 			);
 
-			figureClasses = classnames( {
+			figureClasses = clsx( {
 				'has-background': backgroundClass || customMainColor,
 				[ backgroundClass ]: backgroundClass,
 			} );
@@ -169,7 +164,7 @@ const v4 = {
 			'color',
 			textColor
 		);
-		const blockquoteClasses = classnames( {
+		const blockquoteClasses = clsx( {
 			'has-text-color': textColor || customTextColor,
 			[ blockquoteTextColorClass ]: blockquoteTextColorClass,
 		} );
@@ -280,7 +275,7 @@ const v3 = {
 				mainColor
 			);
 
-			figureClasses = classnames( {
+			figureClasses = clsx( {
 				'has-background': backgroundClass || customMainColor,
 				[ backgroundClass ]: backgroundClass,
 			} );
@@ -313,7 +308,7 @@ const v3 = {
 		);
 		const blockquoteClasses =
 			( textColor || customTextColor ) &&
-			classnames( 'has-text-color', {
+			clsx( 'has-text-color', {
 				[ blockquoteTextColorClass ]: blockquoteTextColorClass,
 			} );
 
@@ -451,7 +446,7 @@ const v2 = {
 		);
 		const blockquoteClasses =
 			textColor || customTextColor
-				? classnames( 'has-text-color', {
+				? clsx( 'has-text-color', {
 						[ blockquoteTextColorClass ]: blockquoteTextColorClass,
 				  } )
 				: undefined;

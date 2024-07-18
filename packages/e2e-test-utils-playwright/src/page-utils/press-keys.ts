@@ -8,23 +8,16 @@ import type { Page } from '@playwright/test';
  * Internal dependencies
  */
 import type { PageUtils } from './';
-
-/**
- * WordPress dependencies
- */
-import {
-	modifiers as baseModifiers,
-	SHIFT,
-	ALT,
-	CTRL,
-} from '@wordpress/keycodes';
+import { modifiers as baseModifiers, SHIFT, ALT, CTRL } from './keycodes';
 
 let clipboardDataHolder: {
-	plainText: string;
-	html: string;
+	'text/plain': string;
+	'text/html': string;
+	'rich-text': string;
 } = {
-	plainText: '',
-	html: '',
+	'text/plain': '',
+	'text/html': '',
+	'rich-text': '',
 };
 
 /**
@@ -38,30 +31,43 @@ let clipboardDataHolder: {
  */
 export function setClipboardData(
 	this: PageUtils,
-	{ plainText = '', html = '' }: typeof clipboardDataHolder
+	{ plainText = '', html = '' }
 ) {
 	clipboardDataHolder = {
-		plainText,
-		html,
+		'text/plain': plainText,
+		'text/html': html,
+		'rich-text': '',
 	};
 }
 
 async function emulateClipboard( page: Page, type: 'copy' | 'cut' | 'paste' ) {
-	clipboardDataHolder = await page.evaluate(
+	const output = await page.evaluate(
 		( [ _type, _clipboardData ] ) => {
 			const canvasDoc =
 				// @ts-ignore
 				document.activeElement?.contentDocument ?? document;
-			const clipboardDataTransfer = new DataTransfer();
+			const event = new ClipboardEvent( _type, {
+				bubbles: true,
+				cancelable: true,
+				clipboardData: new DataTransfer(),
+			} );
+
+			if ( ! event.clipboardData ) {
+				throw new Error( 'ClipboardEvent.clipboardData is null' );
+			}
 
 			if ( _type === 'paste' ) {
-				clipboardDataTransfer.setData(
+				event.clipboardData.setData(
 					'text/plain',
-					_clipboardData.plainText
+					_clipboardData[ 'text/plain' ]
 				);
-				clipboardDataTransfer.setData(
+				event.clipboardData.setData(
 					'text/html',
-					_clipboardData.html
+					_clipboardData[ 'text/html' ]
+				);
+				event.clipboardData.setData(
+					'rich-text',
+					_clipboardData[ 'rich-text' ]
 				);
 			} else {
 				const selection = canvasDoc.defaultView.getSelection()!;
@@ -78,25 +84,35 @@ async function emulateClipboard( page: Page, type: 'copy' | 'cut' | 'paste' ) {
 						)
 						.join( '' );
 				}
-				clipboardDataTransfer.setData( 'text/plain', plainText );
-				clipboardDataTransfer.setData( 'text/html', html );
+				event.clipboardData.setData( 'text/plain', plainText );
+				event.clipboardData.setData( 'text/html', html );
 			}
 
-			canvasDoc.activeElement?.dispatchEvent(
-				new ClipboardEvent( _type, {
-					bubbles: true,
-					cancelable: true,
-					clipboardData: clipboardDataTransfer,
-				} )
-			);
+			canvasDoc.activeElement.dispatchEvent( event );
+
+			if ( _type === 'paste' ) {
+				return event.defaultPrevented;
+			}
 
 			return {
-				plainText: clipboardDataTransfer.getData( 'text/plain' ),
-				html: clipboardDataTransfer.getData( 'text/html' ),
+				'text/plain': event.clipboardData.getData( 'text/plain' ),
+				'text/html': event.clipboardData.getData( 'text/html' ),
+				'rich-text': event.clipboardData.getData( 'rich-text' ),
 			};
 		},
 		[ type, clipboardDataHolder ] as const
 	);
+
+	if ( typeof output === 'object' ) {
+		clipboardDataHolder = output;
+	}
+
+	if ( output === false ) {
+		// Emulate paste by typing the clipboard content, which works across all
+		// elements and documents (keyboard.type does uses the nested active
+		// element automatically).
+		await page.keyboard.type( clipboardDataHolder[ 'text/plain' ] );
+	}
 }
 
 const isAppleOS = () => process.platform === 'darwin';

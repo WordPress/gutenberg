@@ -39,4 +39,8 @@
 			}
 		}
 	}
+
+	&:where(.alignleft, .alignright) {
+		width: 100%;
+	}
 }

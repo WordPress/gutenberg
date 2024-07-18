@@ -5,21 +5,21 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	Button,
 	__experimentalVStack as VStack,
-	__experimentalHStack as HStack,
+	__experimentalTruncate as Truncate,
+	Flex,
+	FlexBlock,
 	FlexItem,
 } from '@wordpress/components';
-import {
-	__experimentalGetBlockLabel,
-	store as blocksStore,
-} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
 import BlockIcon from '../block-icon';
+import useBlockDisplayInformation from '../use-block-display-information';
+import useBlockDisplayTitle from '../block-title/use-block-display-title';
 
-export default function BlockQuickNavigation( { clientIds } ) {
+export default function BlockQuickNavigation( { clientIds, onSelect } ) {
 	if ( ! clientIds.length ) {
 		return null;
 	}
@@ -27,6 +27,7 @@ export default function BlockQuickNavigation( { clientIds } ) {
 		<VStack spacing={ 1 }>
 			{ clientIds.map( ( clientId ) => (
 				<BlockQuickNavigationItem
+					onSelect={ onSelect }
 					key={ clientId }
 					clientId={ clientId }
 				/>
@@ -35,29 +36,18 @@ export default function BlockQuickNavigation( { clientIds } ) {
 	);
 }
 
-function BlockQuickNavigationItem( { clientId } ) {
-	const { name, icon, isSelected } = useSelect(
+function BlockQuickNavigationItem( { clientId, onSelect } ) {
+	const blockInformation = useBlockDisplayInformation( clientId );
+	const blockTitle = useBlockDisplayTitle( {
+		clientId,
+		context: 'list-view',
+	} );
+	const { isSelected } = useSelect(
 		( select ) => {
-			const {
-				getBlockName,
-				getBlockAttributes,
-				isBlockSelected,
-				hasSelectedInnerBlock,
-			} = select( blockEditorStore );
-			const { getBlockType } = select( blocksStore );
-
-			const blockType = getBlockType( getBlockName( clientId ) );
-			const attributes = getBlockAttributes( clientId );
+			const { isBlockSelected, hasSelectedInnerBlock } =
+				select( blockEditorStore );
 
 			return {
-				name:
-					blockType &&
-					__experimentalGetBlockLabel(
-						blockType,
-						attributes,
-						'list-view'
-					),
-				icon: blockType?.icon,
 				isSelected:
 					isBlockSelected( clientId ) ||
 					hasSelectedInnerBlock( clientId, /* deep: */ true ),
@@ -70,12 +60,21 @@ function BlockQuickNavigationItem( { clientId } ) {
 	return (
 		<Button
 			isPressed={ isSelected }
-			onClick={ () => selectBlock( clientId ) }
+			onClick={ async () => {
+				await selectBlock( clientId );
+				if ( onSelect ) {
+					onSelect( clientId );
+				}
+			} }
 		>
-			<HStack justify="flex-start">
-				<BlockIcon icon={ icon } />
-				<FlexItem>{ name }</FlexItem>
-			</HStack>
+			<Flex>
+				<FlexItem>
+					<BlockIcon icon={ blockInformation?.icon } />
+				</FlexItem>
+				<FlexBlock style={ { textAlign: 'left' } }>
+					<Truncate>{ blockTitle }</Truncate>
+				</FlexBlock>
+			</Flex>
 		</Button>
 	);
 }

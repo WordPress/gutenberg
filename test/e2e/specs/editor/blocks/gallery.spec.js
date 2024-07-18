@@ -51,7 +51,9 @@ test.describe( 'Gallery', () => {
 			plainText: `[gallery ids="${ uploadedMedia.id }"]`,
 		} );
 
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await pageUtils.pressKeys( 'primary+v' );
 
 		const img = editor.canvas.locator(
@@ -204,7 +206,9 @@ test.describe( 'Gallery', () => {
 	} ) => {
 		await admin.createNewPost();
 		await editor.insertBlock( { name: 'core/gallery' } );
-		await editor.canvas.click( 'role=button[name="Media Library"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Media Library"i]' )
+			.click();
 
 		const mediaLibrary = page.locator(
 			'role=dialog[name="Create gallery"i]'

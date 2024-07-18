@@ -4,12 +4,6 @@ TextareaControls are TextControls that allow for multiple lines of text, and wra
 
 ![An empty TextareaControl, and a focused TextareaControl with some content entered.](https://wordpress.org/gutenberg/files/2019/01/TextareaControl.png)
 
-## Table of contents
-
-1. [Design guidelines](#design-guidelines)
-2. [Development guidelines](#development-guidelines)
-3. [Related components](#related-components)
-
 ## Design guidelines
 
 ### Usage
@@ -77,14 +71,15 @@ When text input isn’t accepted, an error message can display instructions on h
 ### Usage
 
 ```jsx
+import { useState } from 'react';
 import { TextareaControl } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const MyTextareaControl = () => {
 	const [ text, setText ] = useState( '' );
 
 	return (
 		<TextareaControl
+		  __nextHasNoMarginBottom
 			label="Text"
 			help="Enter some text"
 			value={ text }
@@ -100,7 +95,7 @@ The set of props accepted by the component will be specified below.
 
 Props not included in this set will be applied to the textarea element.
 
-#### `help`: `string | WPElement`
+#### `help`: `string | Element`
 
 If this property is added, a help text will be generated using help property as the content.
 
@@ -136,6 +131,13 @@ The number of rows the textarea should contain.
 The current value of the textarea.
 
 -   Required: Yes
+
+#### `__nextHasNoMarginBottom`: `Boolean`
+
+Start opting into the new margin-free styles that will become the default in a future version.
+
+-   Required: No
+-   Default: `false`
 
 ## Related components
 

@@ -3,53 +3,54 @@
  */
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { useMemo, useState } from '@wordpress/element';
 
-const TRANSLATED_SITE_PROPERTIES = {
-	title: __( 'Title' ),
-	description: __( 'Tagline' ),
-	site_logo: __( 'Logo' ),
-	site_icon: __( 'Icon' ),
-	show_on_front: __( 'Show on front' ),
-	page_on_front: __( 'Page on front' ),
-	posts_per_page: __( 'Maximum posts per page' ),
-	default_comment_status: __( 'Allow comments on new posts' ),
-};
-
+/**
+ * Custom hook that determines if any entities are dirty (edited) and provides a way to manage selected/unselected entities.
+ *
+ * @return {Object} An object containing the following properties:
+ *   - dirtyEntityRecords: An array of dirty entity records.
+ *   - isDirty: A boolean indicating if there are any dirty entity records.
+ *   - setUnselectedEntities: A function to set the unselected entities.
+ *   - unselectedEntities: An array of unselected entities.
+ */
 export const useIsDirty = () => {
-	const { dirtyEntityRecords } = useSelect( ( select ) => {
-		const dirtyRecords =
-			select( coreStore ).__experimentalGetDirtyEntityRecords();
+	const { editedEntities, siteEdits, siteEntityConfig } = useSelect(
+		( select ) => {
+			const {
+				__experimentalGetDirtyEntityRecords,
+				getEntityRecordEdits,
+				getEntityConfig,
+			} = select( coreStore );
 
+			return {
+				editedEntities: __experimentalGetDirtyEntityRecords(),
+				siteEdits: getEntityRecordEdits( 'root', 'site' ),
+				siteEntityConfig: getEntityConfig( 'root', 'site' ),
+			};
+		},
+		[]
+	);
+
+	const dirtyEntityRecords = useMemo( () => {
 		// Remove site object and decouple into its edited pieces.
-		const dirtyRecordsWithoutSite = dirtyRecords.filter(
+		const editedEntitiesWithoutSite = editedEntities.filter(
 			( record ) => ! ( record.kind === 'root' && record.name === 'site' )
 		);
 
-		const siteEdits = select( coreStore ).getEntityRecordEdits(
-			'root',
-			'site'
-		);
-
-		const siteEditsAsEntities = [];
+		const siteEntityLabels = siteEntityConfig?.meta?.labels ?? {};
+		const editedSiteEntities = [];
 		for ( const property in siteEdits ) {
-			siteEditsAsEntities.push( {
+			editedSiteEntities.push( {
 				kind: 'root',
 				name: 'site',
-				title: TRANSLATED_SITE_PROPERTIES[ property ] || property,
+				title: siteEntityLabels[ property ] || property,
 				property,
 			} );
 		}
-		const dirtyRecordsWithSiteItems = [
-			...dirtyRecordsWithoutSite,
-			...siteEditsAsEntities,
-		];
 
-		return {
-			dirtyEntityRecords: dirtyRecordsWithSiteItems,
-		};
-	}, [] );
+		return [ ...editedEntitiesWithoutSite, ...editedSiteEntities ];
+	}, [ editedEntities, siteEdits, siteEntityConfig ] );
 
 	// Unchecked entities to be ignored by save function.
 	const [ unselectedEntities, _setUnselectedEntities ] = useState( [] );

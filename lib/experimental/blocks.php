@@ -5,27 +5,6 @@
  * @package gutenberg
  */
 
-/**
- * Checks whether the experimental Interactivity API should be used for a block.
- *
- * Note: This function is located here instead of in interactivity-api/blocks.php because it has to be available earler.
- *
- * @param string $block_name Block name.
- * @return bool Whether Interactivity API is used for block.
- */
-function gutenberg_should_block_use_interactivity_api( $block_name ) {
-
-	/**
-	 * Filters whether the experimental Interactivity API should be used for a block.
-	 *
-	 * @since 6.3.0
-	 *
-	 * @param bool   $enabled    Whether Interactivity API is used for block.
-	 * @param string $block_name Block name.
-	 */
-	return (bool) apply_filters( 'gutenberg_should_block_use_interactivity_api', true, $block_name );
-}
-
 if ( ! function_exists( 'wp_enqueue_block_view_script' ) ) {
 	/**
 	 * Enqueues a frontend script for a specific block.
@@ -63,7 +42,7 @@ if ( ! function_exists( 'wp_enqueue_block_view_script' ) ) {
 		 *                        is to ensure the content exists.
 		 * @return string Block content.
 		 */
-		$callback = static function( $content, $block ) use ( $args, $block_name ) {
+		$callback = static function ( $content, $block ) use ( $args, $block_name ) {
 
 			// Sanity check.
 			if ( empty( $block['blockName'] ) || $block_name !== $block['blockName'] ) {
@@ -99,25 +78,45 @@ if ( ! function_exists( 'wp_enqueue_block_view_script' ) ) {
 	}
 }
 
-
-/**
- * Registers the metadata block attribute for block types.
- *
- * @param array $args Array of arguments for registering a block type.
- * @return array $args
+/*
+ * WP_Block_Styles_Registry was marked as `final` in core so it cannot be
+ * updated via Gutenberg to allow registration of a style across multiple
+ * block types as well as with an optional style object. This function will
+ * support the desired functionality until the styles registry can be updated
+ * in core.
  */
-function gutenberg_register_metadata_attribute( $args ) {
-	// Setup attributes if needed.
-	if ( ! isset( $args['attributes'] ) || ! is_array( $args['attributes'] ) ) {
-		$args['attributes'] = array();
-	}
+if ( ! function_exists( 'gutenberg_register_block_style' ) ) {
+	/**
+	 * Registers a new block style for one or more block types.
+	 *
+	 * @param string|array $block_name       Block type name including namespace or array of namespaced block type names.
+	 * @param array        $style_properties Array containing the properties of the style name, label,
+	 *                                       style_handle (name of the stylesheet to be enqueued),
+	 *                                       inline_style (string containing the CSS to be added),
+	 *                                       style_data (theme.json-like object to generate CSS from).
+	 *
+	 * @return bool True if all block styles were registered with success and false otherwise.
+	 */
+	function gutenberg_register_block_style( $block_name, $style_properties ) {
+		if ( ! is_string( $block_name ) && ! is_array( $block_name ) ) {
+			_doing_it_wrong(
+				__METHOD__,
+				__( 'Block name must be a string or array.', 'gutenberg' ),
+				'6.6.0'
+			);
 
-	if ( ! array_key_exists( 'metadata', $args['attributes'] ) ) {
-		$args['attributes']['metadata'] = array(
-			'type' => 'object',
-		);
-	}
+			return false;
+		}
 
-	return $args;
+		$block_names = is_string( $block_name ) ? array( $block_name ) : $block_name;
+		$result      = true;
+
+		foreach ( $block_names as $name ) {
+			if ( ! WP_Block_Styles_Registry::get_instance()->register( $name, $style_properties ) ) {
+				$result = false;
+			}
+		}
+
+		return $result;
+	}
 }
-add_filter( 'register_block_type_args', 'gutenberg_register_metadata_attribute' );

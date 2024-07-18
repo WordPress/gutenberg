@@ -6,7 +6,6 @@ import { ActivityIndicator, FlatList, View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { BottomSheet, BottomSheetConsumer } from '@wordpress/components';
 import { debounce } from '@wordpress/compose';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
@@ -15,6 +14,8 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import styles from './styles.scss';
+import BottomSheet from '../bottom-sheet';
+import { BottomSheetConsumer } from '../bottom-sheet/bottom-sheet-context';
 
 const PER_PAGE = 20;
 const REQUEST_DEBOUNCE_DELAY = 400;
@@ -97,7 +98,7 @@ export default function LinkPickerResults( {
 	const onEndReached = () => fetchMoreSuggestions( { query, links } );
 
 	const spinner = ! hasAllSuggestions && meetsThreshold( query ) && (
-		<View style={ styles.spinner }>
+		<View style={ styles.spinner } testID="link-picker-loading">
 			<ActivityIndicator animating />
 		</View>
 	);

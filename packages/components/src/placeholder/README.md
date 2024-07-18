@@ -17,7 +17,7 @@ Class to set on the container div.
 
 -   Required: No
 
-### `icon`: `string|Function|WPComponent|null`
+### `icon`: `string|Function|Component|null`
 
 If provided, renders an icon next to the label.
 

@@ -8,8 +8,8 @@ import styled from '@emotion/styled';
  * Internal dependencies
  */
 import NumberControl from '../../number-control';
-import { COLORS, reduceMotion, rtl } from '../../utils';
-import { space } from '../../ui/utils/space';
+import { COLORS, rtl } from '../../utils';
+import { space } from '../../utils/space';
 
 import type {
 	RangeMarkProps,
@@ -168,12 +168,16 @@ const markLabelFill = ( { isFilled }: RangeMarkProps ) => {
 
 export const MarkLabel = styled.span`
 	color: ${ COLORS.gray[ 300 ] };
-	left: 0;
 	font-size: 11px;
 	position: absolute;
 	top: 12px;
-	transform: translateX( -50% );
 	white-space: nowrap;
+
+	${ rtl( { left: 0 } ) };
+	${ rtl(
+		{ transform: 'translateX( -50% )' },
+		{ transform: 'translateX( 50% )' }
+	) };
 
 	${ markLabelFill };
 `;
@@ -184,7 +188,7 @@ const thumbColor = ( { disabled }: ThumbProps ) =>
 				background-color: ${ COLORS.gray[ 400 ] };
 		  `
 		: css`
-				background-color: ${ COLORS.ui.theme };
+				background-color: ${ COLORS.theme.accent };
 		  `;
 
 export const ThumbWrapper = styled.span`
@@ -215,7 +219,7 @@ const thumbFocus = ( { isFocused }: ThumbProps ) => {
 				&::before {
 					content: ' ';
 					position: absolute;
-					background-color: ${ COLORS.ui.theme };
+					background-color: ${ COLORS.theme.accent };
 					opacity: 0.4;
 					border-radius: 50%;
 					height: ${ thumbSize + 8 }px;
@@ -287,21 +291,23 @@ export const Tooltip = styled.span< TooltipProps >`
 	pointer-events: none;
 	position: absolute;
 	text-align: center;
-	transition: opacity 120ms ease;
 	user-select: none;
 	line-height: 1.4;
 
+	@media not ( prefers-reduced-motion ) {
+		transition: opacity 120ms ease;
+	}
+
 	${ tooltipShow };
 	${ tooltipPosition };
-	${ reduceMotion( 'transition' ) };
 	${ rtl(
 		{ transform: 'translateX(-50%)' },
 		{ transform: 'translateX(50%)' }
 	) }
 `;
 
-// @todo: Refactor RangeControl with latest HStack configuration
-// @wordpress/components/ui/hstack.
+// @todo Refactor RangeControl with latest HStack configuration
+// @see: packages/components/src/h-stack
 export const InputNumber = styled( NumberControl )`
 	display: inline-block;
 	font-size: 13px;

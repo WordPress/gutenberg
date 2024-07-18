@@ -9,7 +9,7 @@
 
 add_action(
 	'enqueue_block_assets',
-	static function() {
+	static function () {
 		wp_enqueue_style(
 			'iframed-enqueue-block-assets',
 			plugin_dir_url( __FILE__ ) . 'iframed-enqueue-block-assets/style.css',

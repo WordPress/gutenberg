@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -34,7 +34,7 @@ export default function Token( {
 	termsCount,
 }: TokenProps ) {
 	const instanceId = useInstanceId( Token );
-	const tokenClasses = classnames( 'components-form-token-field__token', {
+	const tokenClasses = clsx( 'components-form-token-field__token', {
 		'is-error': 'error' === status,
 		'is-success': 'success' === status,
 		'is-validating': 'validating' === status,
@@ -74,6 +74,9 @@ export default function Token( {
 				className="components-form-token-field__remove-token"
 				icon={ closeSmall }
 				onClick={ ! disabled ? onClick : undefined }
+				// Disable reason: Even when FormTokenField itself is accessibly disabled, token reset buttons shouldn't be in the tab sequence.
+				// eslint-disable-next-line no-restricted-syntax
+				disabled={ disabled }
 				label={ messages.remove }
 				aria-describedby={ `components-form-token-field__token-text-${ instanceId }` }
 			/>

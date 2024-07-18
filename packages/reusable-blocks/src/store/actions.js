@@ -57,7 +57,7 @@ export const __experimentalConvertBlocksToReusable =
 				: undefined;
 
 		const reusableBlock = {
-			title: title || __( 'Untitled Pattern block' ),
+			title: title || __( 'Untitled pattern block' ),
 			content: serialize(
 				registry
 					.select( blockEditorStore )

@@ -2,13 +2,21 @@
  * External dependencies
  */
 import * as path from 'path';
-import { test as base, expect } from '@playwright/test';
+import { test as base, expect, chromium } from '@playwright/test';
 import type { ConsoleMessage } from '@playwright/test';
+import * as getPort from 'get-port';
 
 /**
  * Internal dependencies
  */
-import { Admin, Editor, PageUtils, RequestUtils } from './index';
+import {
+	Admin,
+	Editor,
+	PageUtils,
+	RequestUtils,
+	Metrics,
+	Lighthouse,
+} from './index';
 
 const STORAGE_STATE_PATH =
 	process.env.STORAGE_STATE_PATH ||
@@ -52,7 +60,12 @@ function observeConsoleLogging( message: ConsoleMessage ) {
 	// See: https://core.trac.wordpress.org/ticket/37000
 	// See: https://www.chromestatus.com/feature/5088147346030592
 	// See: https://www.chromestatus.com/feature/5633521622188032
-	if ( text.includes( 'A cookie associated with a cross-site resource' ) ) {
+	if (
+		text.includes( 'A cookie associated with a cross-site resource' ) ||
+		text.includes(
+			'https://developer.mozilla.org/docs/Web/HTTP/Headers/Set-Cookie/SameSite'
+		)
+	) {
 		return;
 	}
 
@@ -85,6 +98,18 @@ function observeConsoleLogging( message: ConsoleMessage ) {
 		return;
 	}
 
+	// https://bugzilla.mozilla.org/show_bug.cgi?id=1404468
+	if (
+		text.includes( 'Layout was forced before the page was fully loaded' )
+	) {
+		return;
+	}
+
+	// Deprecated warnings coming from the third-party libraries.
+	if ( text.includes( 'MouseEvent.moz' ) ) {
+		return;
+	}
+
 	const logFunction =
 		type as ( typeof OBSERVED_CONSOLE_MESSAGE_TYPES )[ number ];
 
@@ -92,7 +117,6 @@ function observeConsoleLogging( message: ConsoleMessage ) {
 	// which, unless the test explicitly anticipates the logging via
 	// @wordpress/jest-console matchers, will cause the intended test
 	// failure.
-
 	// eslint-disable-next-line no-console
 	console[ logFunction ]( text );
 }
@@ -103,13 +127,16 @@ const test = base.extend<
 		editor: Editor;
 		pageUtils: PageUtils;
 		snapshotConfig: void;
+		metrics: Metrics;
+		lighthouse: Lighthouse;
 	},
 	{
 		requestUtils: RequestUtils;
+		lighthousePort: number;
 	}
 >( {
-	admin: async ( { page, pageUtils }, use ) => {
-		await use( new Admin( { page, pageUtils } ) );
+	admin: async ( { page, pageUtils, editor }, use ) => {
+		await use( new Admin( { page, pageUtils, editor } ) );
 	},
 	editor: async ( { page }, use ) => {
 		await use( new Editor( { page } ) );
@@ -120,9 +147,15 @@ const test = base.extend<
 		await use( page );
 
 		// Clear local storage after each test.
-		await page.evaluate( () => {
-			window.localStorage.clear();
-		} );
+		// This needs to be wrapped with a try/catch because it can fail when
+		// the test is skipped (e.g. via fixme).
+		try {
+			await page.evaluate( () => {
+				window.localStorage.clear();
+			} );
+		} catch ( error ) {
+			// noop.
+		}
 
 		await page.close();
 	},
@@ -140,6 +173,30 @@ const test = base.extend<
 		},
 		{ scope: 'worker', auto: true },
 	],
+	// Spins up a new browser for use by the Lighthouse fixture
+	// so that Lighthouse can connect to the debugging port.
+	// As a worker-scoped fixture, this will only launch 1
+	// instance for the whole test worker, so multiple tests
+	// will share the same instance with the same port.
+	lighthousePort: [
+		async ( {}, use ) => {
+			const port = await getPort();
+			const browser = await chromium.launch( {
+				args: [ `--remote-debugging-port=${ port }` ],
+			} );
+
+			await use( port );
+
+			await browser.close();
+		},
+		{ scope: 'worker' },
+	],
+	lighthouse: async ( { page, lighthousePort }, use ) => {
+		await use( new Lighthouse( { page, port: lighthousePort } ) );
+	},
+	metrics: async ( { page }, use ) => {
+		await use( new Metrics( { page } ) );
+	},
 } );
 
 export { test, expect };

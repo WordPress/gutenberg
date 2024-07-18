@@ -42,9 +42,9 @@ test.describe( 'Draggable block', () => {
 <p>2</p>
 <!-- /wp:paragraph -->` );
 
-		await editor.canvas.focus(
-			'role=document[name="Paragraph block"i] >> text=2'
-		);
+		await editor.canvas
+			.locator( 'role=document[name="Block: Paragraph"i] >> text=2' )
+			.focus();
 		await editor.showBlockToolbar();
 
 		const dragHandle = page.locator(
@@ -57,7 +57,7 @@ test.describe( 'Draggable block', () => {
 
 		// Move to and hover on the upper half of the paragraph block to trigger the indicator.
 		const firstParagraph = editor.canvas.locator(
-			'role=document[name="Paragraph block"i] >> text=1'
+			'role=document[name="Block: Paragraph"i] >> text=1'
 		);
 		const firstParagraphBound = await firstParagraph.boundingBox();
 		// Call the move function twice to make sure the `dragOver` event is sent.
@@ -114,9 +114,9 @@ test.describe( 'Draggable block', () => {
 <p>2</p>
 <!-- /wp:paragraph -->` );
 
-		await editor.canvas.focus(
-			'role=document[name="Paragraph block"i] >> text=1'
-		);
+		await editor.canvas
+			.locator( 'role=document[name="Block: Paragraph"i] >> text=1' )
+			.focus();
 		await editor.showBlockToolbar();
 
 		const dragHandle = page.locator(
@@ -129,14 +129,15 @@ test.describe( 'Draggable block', () => {
 
 		// Move to and hover on the bottom half of the paragraph block to trigger the indicator.
 		const secondParagraph = editor.canvas.locator(
-			'role=document[name="Paragraph block"i] >> text=2'
+			'role=document[name="Block: Paragraph"i] >> text=2'
 		);
 		const secondParagraphBound = await secondParagraph.boundingBox();
 		// Call the move function twice to make sure the `dragOver` event is sent.
 		// @see https://github.com/microsoft/playwright/issues/17153
+		// Make sure mouse is > 30px within the block for bottom drop indicator to appear.
 		for ( let i = 0; i < 2; i += 1 ) {
 			await page.mouse.move(
-				secondParagraphBound.x,
+				secondParagraphBound.x + 32,
 				secondParagraphBound.y + secondParagraphBound.height * 0.75
 			);
 		}
@@ -197,9 +198,9 @@ test.describe( 'Draggable block', () => {
 			],
 		} );
 
-		await editor.canvas.focus(
-			'role=document[name="Paragraph block"i] >> text=2'
-		);
+		await editor.canvas
+			.locator( 'role=document[name="Block: Paragraph"i] >> text=2' )
+			.focus();
 		await editor.showBlockToolbar();
 
 		const dragHandle = page.locator(
@@ -212,7 +213,7 @@ test.describe( 'Draggable block', () => {
 
 		// Move to and hover on the left half of the paragraph block to trigger the indicator.
 		const firstParagraph = editor.canvas.locator(
-			'role=document[name="Paragraph block"i] >> text=1'
+			'role=document[name="Block: Paragraph"i] >> text=1'
 		);
 		const firstParagraphBound = await firstParagraph.boundingBox();
 		// Call the move function twice to make sure the `dragOver` event is sent.
@@ -278,9 +279,9 @@ test.describe( 'Draggable block', () => {
 			],
 		} );
 
-		await editor.canvas.focus(
-			'role=document[name="Paragraph block"i] >> text=1'
-		);
+		await editor.canvas
+			.locator( 'role=document[name="Block: Paragraph"i] >> text=1' )
+			.focus();
 		await editor.showBlockToolbar();
 
 		const dragHandle = page.locator(
@@ -293,7 +294,7 @@ test.describe( 'Draggable block', () => {
 
 		// Move to and hover on the right half of the paragraph block to trigger the indicator.
 		const secondParagraph = editor.canvas.locator(
-			'role=document[name="Paragraph block"i] >> text=2'
+			'role=document[name="Block: Paragraph"i] >> text=2'
 		);
 		const secondParagraphBound = await secondParagraph.boundingBox();
 		// Call the move function twice to make sure the `dragOver` event is sent.
@@ -342,13 +343,6 @@ test.describe( 'Draggable block', () => {
 		editor,
 		pageUtils,
 	} ) => {
-		// To do: run with iframe.
-		await page.evaluate( () => {
-			window.wp.blocks.registerBlockType( 'test/v2', {
-				apiVersion: '2',
-				title: 'test',
-			} );
-		} );
 		// Insert a row.
 		await editor.insertBlock( {
 			name: 'core/group',
@@ -394,9 +388,8 @@ test.describe( 'Draggable block', () => {
 		);
 
 		{
-			const { dragOver, drop } = await pageUtils.dragFiles(
-				testImagePath
-			);
+			const { dragOver, drop } =
+				await pageUtils.dragFiles( testImagePath );
 
 			const rowBlock = editor.canvas.getByRole( 'document', {
 				name: 'Block: Row',
@@ -434,9 +427,8 @@ test.describe( 'Draggable block', () => {
 		}
 
 		{
-			const { dragOver, drop } = await pageUtils.dragFiles(
-				testImagePath
-			);
+			const { dragOver, drop } =
+				await pageUtils.dragFiles( testImagePath );
 
 			const columnAppender = editor.canvas
 				.getByRole( 'document', {

@@ -27,7 +27,9 @@ test.describe( 'Footnotes', () => {
 	} );
 
 	test( 'can be inserted', async ( { editor, page } ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'first paragraph' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'second paragraph' );
@@ -38,7 +40,7 @@ test.describe( 'Footnotes', () => {
 
 		await page.keyboard.type( 'first footnote' );
 
-		const id1 = await editor.canvas.evaluate( () => {
+		const id1 = await editor.canvas.locator( ':root' ).evaluate( () => {
 			return document.activeElement.id;
 		} );
 
@@ -58,7 +60,10 @@ test.describe( 'Footnotes', () => {
 			},
 		] );
 
-		await editor.canvas.click( 'p:text("first paragraph")' );
+		// Check if the numbers in the editor content updated.
+		await expect( editor.canvas.locator( '.fn' ) ).toHaveText( '1' );
+
+		await editor.canvas.locator( 'p:text("first paragraph")' ).click();
 
 		await editor.showBlockToolbar();
 		await editor.clickBlockToolbarButton( 'More' );
@@ -66,7 +71,7 @@ test.describe( 'Footnotes', () => {
 
 		await page.keyboard.type( 'second footnote' );
 
-		const id2 = await editor.canvas.evaluate( () => {
+		const id2 = await editor.canvas.locator( ':root' ).evaluate( () => {
 			return document.activeElement.id;
 		} );
 
@@ -99,7 +104,7 @@ test.describe( 'Footnotes', () => {
 			},
 		] );
 
-		await editor.canvas.click( 'p:text("first paragraph")' );
+		await editor.canvas.locator( 'p:text("first paragraph")' ).click();
 
 		await editor.showBlockToolbar();
 		await editor.clickBlockToolbarButton( 'Move down' );
@@ -133,7 +138,7 @@ test.describe( 'Footnotes', () => {
 			},
 		] );
 
-		await editor.canvas.click( `a[href="#${ id2 }-link"]` );
+		await editor.canvas.locator( `a[href="#${ id2 }-link"]` ).click();
 		await page.keyboard.press( 'Backspace' );
 
 		expect( await editor.getBlocks() ).toMatchObject( [
@@ -161,7 +166,7 @@ test.describe( 'Footnotes', () => {
 			},
 		] );
 
-		await editor.canvas.click( `a[href="#${ id1 }-link"]` );
+		await editor.canvas.locator( `a[href="#${ id1 }-link"]` ).click();
 		await page.keyboard.press( 'Backspace' );
 
 		expect( await editor.getBlocks() ).toMatchObject( [
@@ -186,14 +191,16 @@ test.describe( 'Footnotes', () => {
 	} );
 
 	test( 'can be inserted in a list', async ( { editor, page } ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '* 1' );
 		await editor.clickBlockToolbarButton( 'More' );
 		await page.locator( 'button:text("Footnote")' ).click();
 
 		await page.keyboard.type( 'a' );
 
-		const id1 = await editor.canvas.evaluate( () => {
+		const id1 = await editor.canvas.locator( ':root' ).evaluate( () => {
 			return document.activeElement.id;
 		} );
 
@@ -224,7 +231,9 @@ test.describe( 'Footnotes', () => {
 
 	test( 'can be inserted in a table', async ( { editor, page } ) => {
 		await editor.insertBlock( { name: 'core/table' } );
-		await editor.canvas.click( 'role=button[name="Create Table"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Create Table"i]' )
+			.click();
 		await page.keyboard.type( '1' );
 		await editor.showBlockToolbar();
 		await editor.clickBlockToolbarButton( 'More' );
@@ -232,7 +241,7 @@ test.describe( 'Footnotes', () => {
 
 		await page.keyboard.type( 'a' );
 
-		const id1 = await editor.canvas.evaluate( () => {
+		const id1 = await editor.canvas.locator( ':root' ).evaluate( () => {
 			return document.activeElement.id;
 		} );
 
@@ -282,7 +291,9 @@ test.describe( 'Footnotes', () => {
 	} );
 
 	test( 'works with revisions', async ( { editor, page } ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'first paragraph' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'second paragraph' );
@@ -291,13 +302,14 @@ test.describe( 'Footnotes', () => {
 		await editor.clickBlockToolbarButton( 'More' );
 		await page.locator( 'button:text("Footnote")' ).click();
 
-		await page.keyboard.type( 'first footnote' );
+		// Check if content is correctly slashed on save and restore.
+		await page.keyboard.type( 'first footnote"' );
 
-		const id1 = await editor.canvas.evaluate( () => {
+		const id1 = await editor.canvas.locator( ':root' ).evaluate( () => {
 			return document.activeElement.id;
 		} );
 
-		await editor.canvas.click( 'p:text("first paragraph")' );
+		await editor.canvas.locator( 'p:text("first paragraph")' ).click();
 
 		await editor.showBlockToolbar();
 		await editor.clickBlockToolbarButton( 'More' );
@@ -305,7 +317,7 @@ test.describe( 'Footnotes', () => {
 
 		await page.keyboard.type( 'second footnote' );
 
-		const id2 = await editor.canvas.evaluate( () => {
+		const id2 = await editor.canvas.locator( ':root' ).evaluate( () => {
 			return document.activeElement.id;
 		} );
 
@@ -316,12 +328,12 @@ test.describe( 'Footnotes', () => {
 				id: id2,
 			},
 			{
-				content: 'first footnote',
+				content: 'first footnote"',
 				id: id1,
 			},
 		] );
 
-		await editor.canvas.click( 'p:text("first paragraph")' );
+		await editor.canvas.locator( 'p:text("first paragraph")' ).click();
 
 		await editor.showBlockToolbar();
 		await editor.clickBlockToolbarButton( 'Move down' );
@@ -329,7 +341,7 @@ test.describe( 'Footnotes', () => {
 		// This also saves the post!
 		expect( await getFootnotes( page ) ).toMatchObject( [
 			{
-				content: 'first footnote',
+				content: 'first footnote"',
 				id: id1,
 			},
 			{
@@ -338,13 +350,26 @@ test.describe( 'Footnotes', () => {
 			},
 		] );
 
+		const editorPage = page;
+		const previewPage = await editor.openPreviewPage();
+
+		await expect(
+			previewPage.locator( 'ol.wp-block-footnotes' )
+		).toHaveText( 'first footnote” ↩︎second footnote ↩︎' );
+
+		await previewPage.close();
+		await editorPage.bringToFront();
+		await editor.canvas.locator( 'p:text("first paragraph")' ).click();
+
 		// Open revisions.
 		await editor.openDocumentSettingsSidebar();
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Post' } )
+			.getByRole( 'tab', { name: 'Post' } )
 			.click();
-		await page.locator( 'a:text("2 Revisions")' ).click();
+		await page
+			.locator( '.editor-private-post-last-revision__button' )
+			.click();
 		await page.locator( '.revisions-controls .ui-slider-handle' ).focus();
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.locator( 'input:text("Restore This Revision")' ).click();
@@ -355,9 +380,80 @@ test.describe( 'Footnotes', () => {
 				id: id2,
 			},
 			{
-				content: 'first footnote',
+				content: 'first footnote"',
 				id: id1,
 			},
 		] );
+
+		const previewPage2 = await editor.openPreviewPage();
+
+		await expect(
+			previewPage2.locator( 'ol.wp-block-footnotes' )
+		).toHaveText( 'second footnote ↩︎first footnote” ↩︎' );
+
+		await previewPage2.close();
+		await editorPage.bringToFront();
+	} );
+
+	test( 'can be previewed when published', async ( { editor, page } ) => {
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( 'a' );
+
+		await editor.showBlockToolbar();
+		await editor.clickBlockToolbarButton( 'More' );
+		await page.locator( 'button:text("Footnote")' ).click();
+
+		await page.keyboard.type( '1' );
+
+		// Publish post with the footnote set to "1".
+		const postId = await editor.publishPost();
+
+		// Test previewing changes to meta.
+		await editor.canvas.locator( 'ol.wp-block-footnotes li span' ).click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( '2' );
+
+		const editorPage = page;
+		const previewPage = await editor.openPreviewPage();
+
+		await expect(
+			previewPage.locator( 'ol.wp-block-footnotes li' )
+		).toHaveText( '12 ↩︎' );
+
+		await previewPage.close();
+		await editorPage.bringToFront();
+
+		// Test again, this time with an existing revision (different code
+		// path).
+		await editor.canvas.locator( 'ol.wp-block-footnotes li span' ).click();
+		await page.keyboard.press( 'End' );
+		// Test slashing.
+		await page.keyboard.type( '3"' );
+
+		const previewPage2 = await editor.openPreviewPage();
+
+		// Note: quote will get curled by wptexturize.
+		await expect(
+			previewPage2.locator( 'ol.wp-block-footnotes li' )
+		).toHaveText( '123″  ↩︎' );
+
+		// Verify that the published post is unchanged after previewing changes to meta.
+		await previewPage2.close();
+		await editorPage.bringToFront();
+		await editor.openDocumentSettingsSidebar();
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'tab', { name: 'Post' } )
+			.click();
+
+		// Visit the published post.
+		await page.goto( `/?p=${ postId }` );
+
+		// Verify that the published post footnote still says "1".
+		await expect( page.locator( 'ol.wp-block-footnotes li' ) ).toHaveText(
+			'1 ↩︎'
+		);
 	} );
 } );

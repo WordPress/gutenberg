@@ -8,6 +8,8 @@
 /**
  * Renders the `core/avatar` block on the server.
  *
+ * @since 6.0.0
+ *
  * @param array    $attributes Block attributes.
  * @param string   $content    Block default content.
  * @param WP_Block $block      Block instance.
@@ -31,7 +33,18 @@ function render_block_core_avatar( $attributes, $content, $block ) {
 		: '';
 
 	if ( ! isset( $block->context['commentId'] ) ) {
-		$author_id   = isset( $attributes['userId'] ) ? $attributes['userId'] : get_post_field( 'post_author', $block->context['postId'] );
+		if ( isset( $attributes['userId'] ) ) {
+			$author_id = $attributes['userId'];
+		} elseif ( isset( $block->context['postId'] ) ) {
+			$author_id = get_post_field( 'post_author', $block->context['postId'] );
+		} else {
+			$author_id = get_query_var( 'author' );
+		}
+
+		if ( empty( $author_id ) ) {
+			return '';
+		}
+
 		$author_name = get_the_author_meta( 'display_name', $author_id );
 		// translators: %s is the Author name.
 		$alt          = sprintf( __( '%s Avatar' ), $author_name );
@@ -49,7 +62,7 @@ function render_block_core_avatar( $attributes, $content, $block ) {
 			$label = '';
 			if ( '_blank' === $attributes['linkTarget'] ) {
 				// translators: %s is the Author name.
-				$label = 'aria-label="' . sprintf( esc_attr__( '(%s author archive, opens in a new tab)' ), $author_name ) . '"';
+				$label = 'aria-label="' . esc_attr( sprintf( __( '(%s author archive, opens in a new tab)' ), $author_name ) ) . '"';
 			}
 			// translators: %1$s: Author archive link. %2$s: Link target. %3$s Aria label. %4$s Avatar image.
 			$avatar_block = sprintf( '<a href="%1$s" target="%2$s" %3$s class="wp-block-avatar__link">%4$s</a>', esc_url( get_author_posts_url( $author_id ) ), esc_attr( $attributes['linkTarget'] ), $label, $avatar_block );
@@ -76,7 +89,7 @@ function render_block_core_avatar( $attributes, $content, $block ) {
 		$label = '';
 		if ( '_blank' === $attributes['linkTarget'] ) {
 			// translators: %s is the Comment Author name.
-			$label = 'aria-label="' . sprintf( esc_attr__( '(%s website link, opens in a new tab)' ), $comment->comment_author ) . '"';
+			$label = 'aria-label="' . esc_attr( sprintf( __( '(%s website link, opens in a new tab)' ), $comment->comment_author ) ) . '"';
 		}
 		// translators: %1$s: Comment Author website link. %2$s: Link target. %3$s Aria label. %4$s Avatar image.
 		$avatar_block = sprintf( '<a href="%1$s" target="%2$s" %3$s class="wp-block-avatar__link">%4$s</a>', esc_url( $comment->comment_author_url ), esc_attr( $attributes['linkTarget'] ), $label, $avatar_block );
@@ -87,6 +100,8 @@ function render_block_core_avatar( $attributes, $content, $block ) {
 /**
  * Generates class names and styles to apply the border support styles for
  * the Avatar block.
+ *
+ * @since 6.3.0
  *
  * @param array $attributes The block attributes.
  * @return array The border-related classnames and styles for the block.
@@ -112,12 +127,12 @@ function get_block_core_avatar_border_attributes( $attributes ) {
 
 	// Border color.
 	$preset_color           = array_key_exists( 'borderColor', $attributes ) ? "var:preset|color|{$attributes['borderColor']}" : null;
-	$custom_color           = _wp_array_get( $attributes, array( 'style', 'border', 'color' ), null );
+	$custom_color           = $attributes['style']['border']['color'] ?? null;
 	$border_styles['color'] = $preset_color ? $preset_color : $custom_color;
 
 	// Individual border styles e.g. top, left etc.
 	foreach ( $sides as $side ) {
-		$border                 = _wp_array_get( $attributes, array( 'style', 'border', $side ), null );
+		$border                 = $attributes['style']['border'][ $side ] ?? null;
 		$border_styles[ $side ] = array(
 			'color' => isset( $border['color'] ) ? $border['color'] : null,
 			'style' => isset( $border['style'] ) ? $border['style'] : null,
@@ -138,6 +153,8 @@ function get_block_core_avatar_border_attributes( $attributes ) {
 
 /**
  * Registers the `core/avatar` block on the server.
+ *
+ * @since 6.0.0
  */
 function register_block_core_avatar() {
 	register_block_type_from_metadata(

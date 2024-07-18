@@ -8,6 +8,8 @@
 /**
  * Determines whether a block list contains a block that uses the featured image.
  *
+ * @since 6.0.0
+ *
  * @param WP_Block_List $inner_blocks Inner block instance.
  *
  * @return bool Whether the block list contains a block that uses the featured image.
@@ -36,6 +38,8 @@ function block_core_post_template_uses_featured_image( $inner_blocks ) {
  *
  * @since 6.3.0 Changed render_block_context priority to `1`.
  *
+ * @global WP_Query $wp_query WordPress Query object.
+ *
  * @param array    $attributes Block attributes.
  * @param string   $content    Block default content.
  * @param WP_Block $block      Block instance.
@@ -43,14 +47,26 @@ function block_core_post_template_uses_featured_image( $inner_blocks ) {
  * @return string Returns the output of the query, structured using the layout defined by the block's inner blocks.
  */
 function render_block_core_post_template( $attributes, $content, $block ) {
-	$page_key = isset( $block->context['queryId'] ) ? 'query-' . $block->context['queryId'] . '-page' : 'query-page';
-	$page     = empty( $_GET[ $page_key ] ) ? 1 : (int) $_GET[ $page_key ];
+	$page_key            = isset( $block->context['queryId'] ) ? 'query-' . $block->context['queryId'] . '-page' : 'query-page';
+	$enhanced_pagination = isset( $block->context['enhancedPagination'] ) && $block->context['enhancedPagination'];
+	$page                = empty( $_GET[ $page_key ] ) ? 1 : (int) $_GET[ $page_key ];
 
 	// Use global query if needed.
 	$use_global_query = ( isset( $block->context['query']['inherit'] ) && $block->context['query']['inherit'] );
 	if ( $use_global_query ) {
 		global $wp_query;
-		$query = clone $wp_query;
+
+		/*
+		 * If already in the main query loop, duplicate the query instance to not tamper with the main instance.
+		 * Since this is a nested query, it should start at the beginning, therefore rewind posts.
+		 * Otherwise, the main query loop has not started yet and this block is responsible for doing so.
+		 */
+		if ( in_the_loop() ) {
+			$query = clone $wp_query;
+			$query->rewind_posts();
+		} else {
+			$query = $wp_query;
+		}
 	} else {
 		$query_args = build_query_vars_from_query_block( $block, $page );
 		$query      = new WP_Query( $query_args );
@@ -94,7 +110,7 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 
 		$post_id              = get_the_ID();
 		$post_type            = get_post_type();
-		$filter_block_context = static function( $context ) use ( $post_id, $post_type ) {
+		$filter_block_context = static function ( $context ) use ( $post_id, $post_type ) {
 			$context['postType'] = $post_type;
 			$context['postId']   = $post_id;
 			return $context;
@@ -109,7 +125,10 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 
 		// Wrap the render inner blocks in a `li` element with the appropriate post classes.
 		$post_classes = implode( ' ', get_post_class( 'wp-block-post' ) );
-		$content     .= '<li class="' . esc_attr( $post_classes ) . '">' . $block_content . '</li>';
+
+		$inner_block_directives = $enhanced_pagination ? ' data-wp-key="post-template-item-' . $post_id . '"' : '';
+
+		$content .= '<li' . $inner_block_directives . ' class="' . esc_attr( $post_classes ) . '">' . $block_content . '</li>';
 	}
 
 	/*
@@ -128,6 +147,8 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 
 /**
  * Registers the `core/post-template` block on the server.
+ *
+ * @since 5.8.0
  */
 function register_block_core_post_template() {
 	register_block_type_from_metadata(

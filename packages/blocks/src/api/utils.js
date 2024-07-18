@@ -11,13 +11,13 @@ import a11yPlugin from 'colord/plugins/a11y';
 import { Component, isValidElement } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
+import { RichTextData } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
  */
 import { BLOCK_ICON_DEFAULT } from './constants';
 import { getBlockType, getDefaultBlockName } from './registration';
-import { createBlock } from './factory';
 
 extend( [ namesPlugin, a11yPlugin ] );
 
@@ -38,17 +38,25 @@ const ICON_COLORS = [ '#191e23', '#f8f9f9' ];
  * @return {boolean} Whether the block is an unmodified block.
  */
 export function isUnmodifiedBlock( block ) {
-	// Cache a created default block if no cache exists or the default block
-	// name changed.
-	if ( ! isUnmodifiedBlock[ block.name ] ) {
-		isUnmodifiedBlock[ block.name ] = createBlock( block.name );
-	}
+	return Object.entries( getBlockType( block.name )?.attributes ?? {} ).every(
+		( [ key, definition ] ) => {
+			const value = block.attributes[ key ];
 
-	const newBlock = isUnmodifiedBlock[ block.name ];
-	const blockType = getBlockType( block.name );
+			// Every attribute that has a default must match the default.
+			if ( definition.hasOwnProperty( 'default' ) ) {
+				return value === definition.default;
+			}
 
-	return Object.keys( blockType?.attributes ?? {} ).every(
-		( key ) => newBlock.attributes[ key ] === block.attributes[ key ]
+			// The rich text type is a bit different from the rest because it
+			// has an implicit default value of an empty RichTextData instance,
+			// so check the length of the value.
+			if ( definition.type === 'rich-text' ) {
+				return ! value?.length;
+			}
+
+			// Every attribute that doesn't have a default should be undefined.
+			return value === undefined;
+		}
 	);
 }
 
@@ -156,6 +164,10 @@ export function getBlockLabel( blockType, attributes, context = 'visual' ) {
 		return title;
 	}
 
+	if ( label.toPlainText ) {
+		return label.toPlainText();
+	}
+
 	// Strip any HTML (i.e. RichText formatting) before returning.
 	return stripHTML( label );
 }
@@ -243,6 +255,16 @@ export function getAccessibleBlockLabel(
 	);
 }
 
+export function getDefault( attributeSchema ) {
+	if ( attributeSchema.default !== undefined ) {
+		return attributeSchema.default;
+	}
+
+	if ( attributeSchema.type === 'rich-text' ) {
+		return new RichTextData();
+	}
+}
+
 /**
  * Ensure attributes contains only values defined by block type, and merge
  * default values for missing attributes.
@@ -264,9 +286,26 @@ export function __experimentalSanitizeBlockAttributes( name, attributes ) {
 			const value = attributes[ key ];
 
 			if ( undefined !== value ) {
-				accumulator[ key ] = value;
-			} else if ( schema.hasOwnProperty( 'default' ) ) {
-				accumulator[ key ] = schema.default;
+				if ( schema.type === 'rich-text' ) {
+					if ( value instanceof RichTextData ) {
+						accumulator[ key ] = value;
+					} else if ( typeof value === 'string' ) {
+						accumulator[ key ] =
+							RichTextData.fromHTMLString( value );
+					}
+				} else if (
+					schema.type === 'string' &&
+					value instanceof RichTextData
+				) {
+					accumulator[ key ] = value.toHTMLString();
+				} else {
+					accumulator[ key ] = value;
+				}
+			} else {
+				const _default = getDefault( schema );
+				if ( undefined !== _default ) {
+					accumulator[ key ] = _default;
+				}
 			}
 
 			if ( [ 'node', 'children' ].indexOf( schema.source ) !== -1 ) {
@@ -295,9 +334,13 @@ export function __experimentalSanitizeBlockAttributes( name, attributes ) {
  */
 export function __experimentalGetBlockAttributesNamesByRole( name, role ) {
 	const attributes = getBlockType( name )?.attributes;
-	if ( ! attributes ) return [];
+	if ( ! attributes ) {
+		return [];
+	}
 	const attributesNames = Object.keys( attributes );
-	if ( ! role ) return attributesNames;
+	if ( ! role ) {
+		return attributesNames;
+	}
 	return attributesNames.filter(
 		( attributeName ) =>
 			attributes[ attributeName ]?.__experimentalRole === role

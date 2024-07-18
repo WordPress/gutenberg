@@ -1,183 +1,130 @@
 /**
  * External dependencies
  */
-import path from 'path';
-import { existsSync, readFileSync, unlinkSync, writeFileSync } from 'fs';
+import { existsSync, readFileSync, unlinkSync } from 'fs';
+
+export function sum( array ) {
+	if ( ! array || ! array.length ) {
+		return undefined;
+	}
+
+	return array.reduce( ( a, b ) => a + b, 0 );
+}
+
+export function average( array ) {
+	if ( ! array || ! array.length ) {
+		return undefined;
+	}
+
+	return sum( array ) / array.length;
+}
+
+export function variance( array ) {
+	if ( ! array || ! array.length ) {
+		return undefined;
+	}
+
+	return Math.sqrt(
+		sum( array.map( ( x ) => x ** 2 ) ) / array.length -
+			( sum( array ) / array.length ) ** 2
+	);
+}
+
+export function median( array ) {
+	if ( ! array || ! array.length ) {
+		return undefined;
+	}
+
+	const numbers = [ ...array ].sort( ( a, b ) => a - b );
+	const middleIndex = Math.floor( numbers.length / 2 );
+
+	if ( numbers.length % 2 === 0 ) {
+		return ( numbers[ middleIndex - 1 ] + numbers[ middleIndex ] ) / 2;
+	}
+	return numbers[ middleIndex ];
+}
+
+export function quartiles( array ) {
+	const numbers = array.slice().sort( ( a, b ) => a - b );
+
+	function med( offset, length ) {
+		if ( length % 2 === 0 ) {
+			// even length, average of two middle numbers
+			return (
+				( numbers[ offset + length / 2 - 1 ] +
+					numbers[ offset + length / 2 ] ) /
+				2
+			);
+		}
+
+		// odd length, exact middle point
+		return numbers[ offset + ( length - 1 ) / 2 ];
+	}
+
+	const q50 = med( 0, numbers.length );
+
+	let q25, q75;
+	if ( numbers.length % 2 === 0 ) {
+		// medians of two exact halves
+		const mid = numbers.length / 2;
+		q25 = med( 0, mid );
+		q75 = med( mid, mid );
+	} else {
+		// quartiles are average of medians of the smaller and bigger slice
+		const midl = ( numbers.length - 1 ) / 2;
+		const midh = ( numbers.length + 1 ) / 2;
+		q25 = ( med( 0, midl ) + med( 0, midh ) ) / 2;
+		q75 = ( med( midl, midh ) + med( midh, midl ) ) / 2;
+	}
+	return { q25, q50, q75 };
+}
+
+export function stats( values ) {
+	if ( ! values || values.length === 0 ) {
+		return undefined;
+	}
+	const { q25, q50, q75 } = quartiles( values );
+	const cnt = values.length;
+	return {
+		q25: round( q25 ),
+		q50: round( q50 ),
+		q75: round( q75 ),
+		cnt,
+	};
+}
+
+export function minimum( array ) {
+	if ( ! array || ! array.length ) {
+		return undefined;
+	}
+
+	return Math.min( ...array );
+}
+
+export function maximum( array ) {
+	if ( ! array || ! array.length ) {
+		return undefined;
+	}
+
+	return Math.max( ...array );
+}
+
+export function round( number, decimalPlaces = 2 ) {
+	const factor = Math.pow( 10, decimalPlaces );
+
+	return Math.round( number * factor ) / factor;
+}
 
 export function readFile( filePath ) {
-	return existsSync( filePath )
-		? readFileSync( filePath, 'utf8' ).trim()
-		: '';
+	if ( ! existsSync( filePath ) ) {
+		throw new Error( `File does not exist: ${ filePath }` );
+	}
+
+	return readFileSync( filePath, 'utf8' ).trim();
 }
 
 export function deleteFile( filePath ) {
 	if ( existsSync( filePath ) ) {
 		unlinkSync( filePath );
 	}
-}
-
-export function getTraceFilePath() {
-	return path.join( process.env.WP_ARTIFACTS_PATH, '/trace.json' );
-}
-
-export function saveResultsFile( testFilename, results ) {
-	const resultsFilename =
-		process.env.RESULTS_FILENAME ||
-		path.basename( testFilename, '.js' ) + '.performance-results.json';
-
-	return writeFileSync(
-		path.join( process.env.WP_ARTIFACTS_PATH, resultsFilename ),
-		JSON.stringify( results, null, 2 )
-	);
-}
-
-function isEvent( item ) {
-	return (
-		item.cat === 'devtools.timeline' &&
-		item.name === 'EventDispatch' &&
-		item.dur &&
-		item.args &&
-		item.args.data
-	);
-}
-
-function isKeyDownEvent( item ) {
-	return isEvent( item ) && item.args.data.type === 'keydown';
-}
-
-function isKeyPressEvent( item ) {
-	return isEvent( item ) && item.args.data.type === 'keypress';
-}
-
-function isKeyUpEvent( item ) {
-	return isEvent( item ) && item.args.data.type === 'keyup';
-}
-
-function isFocusEvent( item ) {
-	return isEvent( item ) && item.args.data.type === 'focus';
-}
-
-function isFocusInEvent( item ) {
-	return isEvent( item ) && item.args.data.type === 'focusin';
-}
-
-function isClickEvent( item ) {
-	return isEvent( item ) && item.args.data.type === 'click';
-}
-
-function isMouseOverEvent( item ) {
-	return isEvent( item ) && item.args.data.type === 'mouseover';
-}
-
-function isMouseOutEvent( item ) {
-	return isEvent( item ) && item.args.data.type === 'mouseout';
-}
-
-function getEventDurationsForType( trace, filterFunction ) {
-	return trace.traceEvents
-		.filter( filterFunction )
-		.map( ( item ) => item.dur / 1000 );
-}
-
-export function getTypingEventDurations( trace ) {
-	return [
-		getEventDurationsForType( trace, isKeyDownEvent ),
-		getEventDurationsForType( trace, isKeyPressEvent ),
-		getEventDurationsForType( trace, isKeyUpEvent ),
-	];
-}
-
-export function getSelectionEventDurations( trace ) {
-	return [
-		getEventDurationsForType( trace, isFocusEvent ),
-		getEventDurationsForType( trace, isFocusInEvent ),
-	];
-}
-
-export function getClickEventDurations( trace ) {
-	return [ getEventDurationsForType( trace, isClickEvent ) ];
-}
-
-export function getHoverEventDurations( trace ) {
-	return [
-		getEventDurationsForType( trace, isMouseOverEvent ),
-		getEventDurationsForType( trace, isMouseOutEvent ),
-	];
-}
-
-export async function getLoadingDurations( page ) {
-	return await page.evaluate( () => {
-		const [
-			{
-				requestStart,
-				responseStart,
-				responseEnd,
-				domContentLoadedEventEnd,
-				loadEventEnd,
-			},
-		] = performance.getEntriesByType( 'navigation' );
-		const paintTimings = performance.getEntriesByType( 'paint' );
-		return {
-			// Server side metric.
-			serverResponse: responseStart - requestStart,
-			// For client side metrics, consider the end of the response (the
-			// browser receives the HTML) as the start time (0).
-			firstPaint:
-				paintTimings.find( ( { name } ) => name === 'first-paint' )
-					.startTime - responseEnd,
-			domContentLoaded: domContentLoadedEventEnd - responseEnd,
-			loaded: loadEventEnd - responseEnd,
-			firstContentfulPaint:
-				paintTimings.find(
-					( { name } ) => name === 'first-contentful-paint'
-				).startTime - responseEnd,
-			// This is evaluated right after Playwright found the block selector.
-			firstBlock: performance.now() - responseEnd,
-		};
-	} );
-}
-
-export function sum( arr ) {
-	return arr.reduce( ( a, b ) => a + b, 0 );
-}
-
-export function average( array ) {
-	return array.reduce( ( a, b ) => a + b ) / array.length;
-}
-
-export function round( number, decimalPlaces = 2 ) {
-	const factor = Math.pow( 10, decimalPlaces );
-	return Math.round( number * factor ) / factor;
-}
-
-export async function loadBlocksFromHtml( page, filepath ) {
-	if ( ! existsSync( filepath ) ) {
-		throw new Error( `File not found (${ filepath })` );
-	}
-
-	return await page.evaluate( ( html ) => {
-		const { parse } = window.wp.blocks;
-		const { dispatch } = window.wp.data;
-		const blocks = parse( html );
-
-		blocks.forEach( ( block ) => {
-			if ( block.name === 'core/image' ) {
-				delete block.attributes.id;
-				delete block.attributes.url;
-			}
-		} );
-
-		dispatch( 'core/block-editor' ).resetBlocks( blocks );
-	}, readFile( filepath ) );
-}
-
-export async function load1000Paragraphs( page ) {
-	await page.evaluate( () => {
-		const { createBlock } = window.wp.blocks;
-		const { dispatch } = window.wp.data;
-		const blocks = Array.from( { length: 1000 } ).map( () =>
-			createBlock( 'core/paragraph' )
-		);
-		dispatch( 'core/block-editor' ).resetBlocks( blocks );
-	} );
 }

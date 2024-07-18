@@ -12,6 +12,7 @@ import type { BaseControlProps } from '../base-control/types';
 type SelectControlBaseProps = Pick<
 	InputBaseProps,
 	| '__next36pxDefaultSize'
+	| '__next40pxDefaultSize'
 	| 'disabled'
 	| 'hideLabelFromVision'
 	| 'label'
@@ -52,6 +53,12 @@ type SelectControlBaseProps = Pick<
 		 * passed in as `children` for more customizability.
 		 */
 		children?: ReactNode;
+		/**
+		 * The style variant of the control.
+		 *
+		 * @default 'default'
+		 */
+		variant?: 'default' | 'minimal';
 	};
 
 export type SelectControlSingleSelectionProps = SelectControlBaseProps & {

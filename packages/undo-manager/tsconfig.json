@@ -1,0 +1,11 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"rootDir": "src",
+		"declarationDir": "build-types",
+		"types": [ "node" ]
+	},
+	"references": [ { "path": "../is-shallow-equal" } ],
+	"include": [ "src/**/*" ]
+}

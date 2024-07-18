@@ -9,7 +9,7 @@ import styled from '@emotion/styled';
 import BaseControl from '../base-control';
 import Button from '../button';
 import { HStack } from '../h-stack';
-import { space } from '../ui/utils/space';
+import { space } from '../utils/space';
 import { COLORS } from '../utils';
 
 export const Container = styled.fieldset`
@@ -35,11 +35,4 @@ export const HeaderLabel = styled( BaseControl.VisualLabel )`
 
 export const HeaderHint = styled.span`
 	color: ${ COLORS.gray[ 700 ] };
-`;
-
-export const Controls = styled.div< {
-	__nextHasNoMarginBottom: boolean;
-} >`
-	${ ( props ) =>
-		! props.__nextHasNoMarginBottom && `margin-bottom: ${ space( 6 ) };` }
 `;

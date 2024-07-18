@@ -60,7 +60,6 @@ const BlockActionsMenu = ( {
 	rootClientId,
 	selectedBlockClientId,
 	selectedBlockPossibleTransformations,
-	canRemove,
 	// Dispatch.
 	createSuccessNotice,
 	convertToRegularBlocks,
@@ -106,8 +105,7 @@ const BlockActionsMenu = ( {
 		selectedBlockClientId ? [ selectedBlockClientId ] : []
 	);
 	const { isGroupable, isUngroupable } = convertToGroupButtonProps;
-	const showConvertToGroupButton =
-		( isGroupable || isUngroupable ) && canRemove;
+	const showConvertToGroupButton = isGroupable || isUngroupable;
 	const convertToGroupButtons = useConvertToGroupButtons( {
 		...convertToGroupButtonProps,
 	} );
@@ -214,10 +212,7 @@ const BlockActionsMenu = ( {
 		},
 		convertToRegularBlocks: {
 			id: 'convertToRegularBlocksOption',
-			label:
-				innerBlockCount > 1
-					? __( 'Detach patterns' )
-					: __( 'Detach pattern' ),
+			label: __( 'Detach' ),
 			value: 'convertToRegularBlocksOption',
 			onSelect: () => {
 				/* translators: %s: name of the synced block */
@@ -261,7 +256,7 @@ const BlockActionsMenu = ( {
 				<ToolbarButton
 					title={ __( 'Open Block Actions Menu' ) }
 					icon={ moreHorizontalMobile }
-					disabled={ true }
+					disabled
 				/>
 			</ToolbarGroup>
 		);
@@ -316,7 +311,7 @@ const BlockActionsMenu = ( {
 				destructiveButtonIndex={ options.length }
 				disabledButtonIndices={ disabledButtonIndices }
 				hideCancelButton={ Platform.OS !== 'ios' }
-				leftAlign={ true }
+				leftAlign
 				getAnchor={ getAnchor }
 				// translators: %s: block title e.g: "Paragraph".
 				title={ sprintf( __( '%s block options' ), blockTitle ) }
@@ -348,7 +343,6 @@ export default compose(
 			getSelectedBlockClientIds,
 			canInsertBlockType,
 			getTemplateLock,
-			canRemoveBlock,
 		} = select( blockEditorStore );
 		const block = getBlock( clientId );
 		const blockName = getBlockName( clientId );
@@ -385,7 +379,6 @@ export default compose(
 		const selectedBlockPossibleTransformations = selectedBlock
 			? getBlockTransformItems( selectedBlock, rootClientId )
 			: EMPTY_BLOCK_LIST;
-		const canRemove = canRemoveBlock( selectedBlockClientId );
 
 		const isReusableBlockType = block ? isReusableBlock( block ) : false;
 		const reusableBlock = isReusableBlockType
@@ -411,7 +404,6 @@ export default compose(
 			rootClientId,
 			selectedBlockClientId,
 			selectedBlockPossibleTransformations,
-			canRemove,
 		};
 	} ),
 	withDispatch(

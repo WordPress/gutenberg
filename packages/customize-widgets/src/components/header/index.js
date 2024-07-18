@@ -1,16 +1,16 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import { createPortal, useState, useEffect } from '@wordpress/element';
-import { __, _x, isRTL } from '@wordpress/i18n';
 import { ToolbarButton } from '@wordpress/components';
 import { NavigableToolbar } from '@wordpress/block-editor';
+import { createPortal, useEffect, useState } from '@wordpress/element';
 import { displayShortcut, isAppleOS } from '@wordpress/keycodes';
+import { __, _x, isRTL } from '@wordpress/i18n';
 import { plus, undo as undoIcon, redo as redoIcon } from '@wordpress/icons';
 
 /**
@@ -44,7 +44,7 @@ function Header( {
 	return (
 		<>
 			<div
-				className={ classnames( 'customize-widgets-header', {
+				className={ clsx( 'customize-widgets-header', {
 					'is-fixed-toolbar-active': isFixedToolbarActive,
 				} ) }
 			>
@@ -57,10 +57,7 @@ function Header( {
 						/* translators: button label text should, if possible, be under 16 characters. */
 						label={ __( 'Undo' ) }
 						shortcut={ displayShortcut.primary( 'z' ) }
-						// If there are no undo levels we don't want to actually disable this
-						// button, because it will remove focus for keyboard users.
-						// See: https://github.com/WordPress/gutenberg/issues/3486
-						aria-disabled={ ! hasUndo }
+						disabled={ ! hasUndo }
 						onClick={ sidebar.undo }
 						className="customize-widgets-editor-history-button undo-button"
 					/>
@@ -69,10 +66,7 @@ function Header( {
 						/* translators: button label text should, if possible, be under 16 characters. */
 						label={ __( 'Redo' ) }
 						shortcut={ shortcut }
-						// If there are no undo levels we don't want to actually disable this
-						// button, because it will remove focus for keyboard users.
-						// See: https://github.com/WordPress/gutenberg/issues/3486
-						aria-disabled={ ! hasRedo }
+						disabled={ ! hasRedo }
 						onClick={ sidebar.redo }
 						className="customize-widgets-editor-history-button redo-button"
 					/>

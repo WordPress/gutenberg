@@ -16,7 +16,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { unlock } from '../../lock-unlock';
 import { useSelect } from '@wordpress/data';
 
-const { useGlobalSetting } = unlock( blockEditorPrivateApis );
+const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorPrivateApis );
 
 // Enable colord's a11y plugin.
 extend( [ a11yPlugin ] );
@@ -50,6 +50,49 @@ export function useColorRandomizer( name ) {
 	return window.__experimentalEnableColorRandomizer
 		? [ randomizeColors ]
 		: [];
+}
+
+export function useStylesPreviewColors() {
+	const [ textColor = 'black' ] = useGlobalStyle( 'color.text' );
+	const [ backgroundColor = 'white' ] = useGlobalStyle( 'color.background' );
+	const [ headingColor = textColor ] = useGlobalStyle(
+		'elements.h1.color.text'
+	);
+	const [ linkColor = headingColor ] = useGlobalStyle(
+		'elements.link.color.text'
+	);
+
+	const [ buttonBackgroundColor = linkColor ] = useGlobalStyle(
+		'elements.button.color.background'
+	);
+	const [ coreColors ] = useGlobalSetting( 'color.palette.core' );
+	const [ themeColors ] = useGlobalSetting( 'color.palette.theme' );
+	const [ customColors ] = useGlobalSetting( 'color.palette.custom' );
+
+	const paletteColors = ( themeColors ?? [] )
+		.concat( customColors ?? [] )
+		.concat( coreColors ?? [] );
+
+	const textColorObject = paletteColors.filter(
+		( { color } ) => color === textColor
+	);
+	const buttonBackgroundColorObject = paletteColors.filter(
+		( { color } ) => color === buttonBackgroundColor
+	);
+
+	const highlightedColors = textColorObject
+		.concat( buttonBackgroundColorObject )
+		.concat( paletteColors )
+		.filter(
+			// we exclude these background color because it is already visible in the preview.
+			( { color } ) => color !== backgroundColor
+		)
+		.slice( 0, 2 );
+
+	return {
+		paletteColors,
+		highlightedColors,
+	};
 }
 
 export function useSupportedStyles( name, element ) {

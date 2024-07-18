@@ -44,14 +44,26 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-zoomed-out-view',
-		__( 'Zoomed out view ', 'gutenberg' ),
+		'gutenberg-sync-collaboration',
+		__( 'Live Collaboration and offline persistence ', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Test a new zoomed out view on the site editor (Warning: The new feature is not ready. You may experience UX issues that are being addressed)', 'gutenberg' ),
-			'id'    => 'gutenberg-zoomed-out-view',
+			'label' => __( 'Enable the live collaboration and offline persistence between peers', 'gutenberg' ),
+			'id'    => 'gutenberg-sync-collaboration',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-custom-dataviews',
+		__( 'Custom dataviews', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Test the custom dataviews in the pages page.', 'gutenberg' ),
+			'id'    => 'gutenberg-custom-dataviews',
 		)
 	);
 
@@ -68,14 +80,26 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-group-grid-variation',
-		__( 'Grid variation for Group block ', 'gutenberg' ),
+		'gutenberg-form-blocks',
+		__( 'Form and input blocks ', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Test the Grid layout type as a new variation of Group block.', 'gutenberg' ),
-			'id'    => 'gutenberg-group-grid-variation',
+			'label' => __( 'Test new blocks to allow building forms (Warning: The new feature is not ready. You may experience UX issues that are being addressed)', 'gutenberg' ),
+			'id'    => 'gutenberg-form-blocks',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-grid-interactivity',
+		__( 'Grid interactivity ', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Test enhancements to the Grid block that let you move and resize items in the editor canvas.', 'gutenberg' ),
+			'id'    => 'gutenberg-grid-interactivity',
 		)
 	);
 
@@ -88,6 +112,42 @@ function gutenberg_initialize_experiments_settings() {
 		array(
 			'label' => __( 'Disable TinyMCE and Classic block', 'gutenberg' ),
 			'id'    => 'gutenberg-no-tinymce',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-full-page-client-side-navigation',
+		__( 'Enable full page client-side navigation', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enable full page client-side navigation using the Interactivity API', 'gutenberg' ),
+			'id'    => 'gutenberg-full-page-client-side-navigation',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-zoomed-out-patterns-tab',
+		__( 'Enable zoomed out view when patterns are browsed in the inserter', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enable zoomed out view when selecting a pattern category in the main inserter.', 'gutenberg' ),
+			'id'    => 'gutenberg-zoomed-out-patterns-tab',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-new-posts-dashboard',
+		__( 'Redesigned posts dashboard', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enable a redesigned posts dashboard.', 'gutenberg' ),
+			'id'    => 'gutenberg-new-posts-dashboard',
 		)
 	);
 

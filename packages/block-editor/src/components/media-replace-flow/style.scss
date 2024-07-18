@@ -17,6 +17,7 @@
 	&.has-siblings {
 		border-top: $border-width solid $gray-900;
 		margin-top: $grid-unit-10;
+		padding-bottom: $grid-unit-10;
 	}
 
 	.block-editor-media-replace-flow__image-url-label {
@@ -55,8 +56,7 @@
 		}
 
 		.block-editor-link-control__search-actions {
-			top: 0; // cancel default top positioning
-			right: 4px;
+			padding: $grid-unit-10 0 0;
 		}
 	}
 }

@@ -15,6 +15,7 @@
 
 // The modal window element.
 .components-modal__frame {
+	@include reset;
 	// Use the entire viewport on smaller screens.
 	margin: $grid-unit-50 0 0 0;
 	width: 100%;
@@ -50,6 +51,26 @@
 				max-width: none;
 			}
 		}
+
+		&.has-size-small,
+		&.has-size-medium,
+		&.has-size-large {
+			width: 100%;
+		}
+
+		// The following widths were selected to align with existing baselines
+		// found elsewhere in the editor.
+		// See https://github.com/WordPress/gutenberg/pull/54471#issuecomment-1723818809
+		&.has-size-small {
+			max-width: $modal-width-small;
+		}
+		&.has-size-medium {
+			max-width: $modal-width-medium;
+		}
+		&.has-size-large {
+			max-width: $modal-width-large;
+		}
+
 	}
 
 	@include break-large() {
@@ -140,7 +161,7 @@
 	}
 
 	&.is-scrollable:focus-visible {
-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
 
 		// Windows High Contrast mode will show this outline, but not the box-shadow.
 		outline: 2px solid transparent;

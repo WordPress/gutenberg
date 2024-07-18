@@ -10,11 +10,6 @@ This component is present in the block insertion tab, the reusable blocks tab an
 
 ![Block types list in the quick inserter modal](https://make.wordpress.org/core/files/2020/09/block-types-list-emplacement-3.png)
 
-## Table of contents
-
-1. [Development guidelines](#development-guidelines)
-2. [Related components](#related-components)
-
 ## Development guidelines
 
 ### Usage

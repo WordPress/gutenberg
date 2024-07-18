@@ -6,7 +6,7 @@ This slot allows for injecting items into the bottom of the post-publish panel t
 
 ```js
 import { registerPlugin } from '@wordpress/plugins';
-import { PluginPostPublishPanel } from '@wordpress/edit-post';
+import { PluginPostPublishPanel } from '@wordpress/editor';
 
 const PluginPostPublishPanelTest = () => (
 	<PluginPostPublishPanel>

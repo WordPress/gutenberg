@@ -3,6 +3,7 @@
  */
 import { useDispatch } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
+import { SlotFillProvider } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -12,6 +13,7 @@ import useBlockSync from './use-block-sync';
 import { store as blockEditorStore } from '../../store';
 import { BlockRefsProvider } from './block-refs-provider';
 import { unlock } from '../../lock-unlock';
+import KeyboardShortcuts from '../keyboard-shortcuts';
 
 /** @typedef {import('@wordpress/data').WPDataRegistry} WPDataRegistry */
 
@@ -42,16 +44,20 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 		// Syncs the entity provider with changes in the block-editor store.
 		useBlockSync( props );
 
-		return <BlockRefsProvider>{ children }</BlockRefsProvider>;
+		return (
+			<SlotFillProvider passthrough>
+				{ ! settings?.__unstableIsPreviewMode && (
+					<KeyboardShortcuts.Register />
+				) }
+				<BlockRefsProvider>{ children }</BlockRefsProvider>
+			</SlotFillProvider>
+		);
 	}
 );
 
 export const BlockEditorProvider = ( props ) => {
 	return (
-		<ExperimentalBlockEditorProvider
-			{ ...props }
-			stripExperimentalSettings={ true }
-		>
+		<ExperimentalBlockEditorProvider { ...props } stripExperimentalSettings>
 			{ props.children }
 		</ExperimentalBlockEditorProvider>
 	);

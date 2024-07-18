@@ -77,7 +77,6 @@ Callback when a segment is selected.
 -   Required: No
 -   Default: `() => {}`
 
-
 ### `value`: `string | number`
 
 The value of the `ToggleGroupControl`.

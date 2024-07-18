@@ -7,17 +7,52 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
-import type { BoxControlProps, BoxControlValue } from './types';
+import type {
+	BoxControlProps,
+	BoxControlValue,
+	CustomValueUnits,
+} from './types';
+
+export const CUSTOM_VALUE_SETTINGS: CustomValueUnits = {
+	px: { max: 300, step: 1 },
+	'%': { max: 100, step: 1 },
+	vw: { max: 100, step: 1 },
+	vh: { max: 100, step: 1 },
+	em: { max: 10, step: 0.1 },
+	rm: { max: 10, step: 0.1 },
+	svw: { max: 100, step: 1 },
+	lvw: { max: 100, step: 1 },
+	dvw: { max: 100, step: 1 },
+	svh: { max: 100, step: 1 },
+	lvh: { max: 100, step: 1 },
+	dvh: { max: 100, step: 1 },
+	vi: { max: 100, step: 1 },
+	svi: { max: 100, step: 1 },
+	lvi: { max: 100, step: 1 },
+	dvi: { max: 100, step: 1 },
+	vb: { max: 100, step: 1 },
+	svb: { max: 100, step: 1 },
+	lvb: { max: 100, step: 1 },
+	dvb: { max: 100, step: 1 },
+	vmin: { max: 100, step: 1 },
+	svmin: { max: 100, step: 1 },
+	lvmin: { max: 100, step: 1 },
+	dvmin: { max: 100, step: 1 },
+	vmax: { max: 100, step: 1 },
+	svmax: { max: 100, step: 1 },
+	lvmax: { max: 100, step: 1 },
+	dvmax: { max: 100, step: 1 },
+};
 
 export const LABELS = {
-	all: __( 'All' ),
-	top: __( 'Top' ),
-	bottom: __( 'Bottom' ),
-	left: __( 'Left' ),
-	right: __( 'Right' ),
+	all: __( 'All sides' ),
+	top: __( 'Top side' ),
+	bottom: __( 'Bottom side' ),
+	left: __( 'Left side' ),
+	right: __( 'Right side' ),
 	mixed: __( 'Mixed' ),
-	vertical: __( 'Vertical' ),
-	horizontal: __( 'Horizontal' ),
+	vertical: __( 'Top and bottom sides' ),
+	horizontal: __( 'Left and right sides' ),
 };
 
 export const DEFAULT_VALUES = {

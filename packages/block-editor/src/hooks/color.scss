@@ -5,6 +5,7 @@
 		 * injected color controls can appear as a single item group without
 		 * the contrast checkers suddenly appearing between items.
 		 */
+		/* stylelint-disable-next-line property-disallowed-list -- This should be removed when https://github.com/WordPress/gutenberg/issues/58936 is fixed. */
 		order: 9999;
 		grid-column: span 2;
 		margin-top: $grid-unit-20;

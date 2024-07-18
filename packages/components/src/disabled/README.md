@@ -7,8 +7,8 @@ Disabled is a component which disables descendant tabbable elements and prevents
 Assuming you have a form component, you can disable all form inputs by wrapping the form with `<Disabled>`.
 
 ```jsx
+import { useState } from 'react';
 import { Button, Disabled, TextControl } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const MyDisabled = () => {
 	const [ isDisabled, setIsDisabled ] = useState( true );
@@ -33,7 +33,7 @@ const MyDisabled = () => {
 };
 ```
 
-A component can detect if it has been wrapped in a `<Disabled />` by accessing its [context](https://reactjs.org/docs/context.html) using `Disabled.Context`.
+A component can detect if it has been wrapped in a `<Disabled />` by accessing its [context](https://react.dev/learn/passing-data-deeply-with-context) using `Disabled.Context`.
 
 ```jsx
 function CustomButton( props ) {

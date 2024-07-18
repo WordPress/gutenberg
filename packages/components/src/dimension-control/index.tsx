@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -42,6 +42,7 @@ import type { SelectControlSingleSelectionProps } from '../select-control/types'
  */
 export function DimensionControl( props: DimensionControlProps ) {
 	const {
+		__next40pxDefaultSize = false,
 		label,
 		value,
 		sizes = sizesTable,
@@ -85,10 +86,8 @@ export function DimensionControl( props: DimensionControlProps ) {
 
 	return (
 		<SelectControl
-			className={ classnames(
-				className,
-				'block-editor-dimension-control'
-			) }
+			__next40pxDefaultSize={ __next40pxDefaultSize }
+			className={ clsx( className, 'block-editor-dimension-control' ) }
 			label={ selectLabel }
 			hideLabelFromVision={ false }
 			value={ value }

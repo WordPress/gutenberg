@@ -1,15 +1,19 @@
 .edit-site-site-icon__icon {
 	fill: currentColor;
+
+	.edit-site-layout.is-full-canvas & {
+		// Make the WordPress icon not so big in full canvas.
+		padding: $grid-unit-15 * 0.5; // 6px.
+	}
 }
 
 .edit-site-site-icon__image {
 	width: 100%;
-	height: auto;
-	border-radius: $radius-block-ui * 2;
+	height: 100%;
 	object-fit: cover;
 	background: #333;
 
-	.edit-site-layout.is-full-canvas.is-edit-mode & {
+	.edit-site-layout.is-full-canvas & {
 		border-radius: 0;
 	}
 }

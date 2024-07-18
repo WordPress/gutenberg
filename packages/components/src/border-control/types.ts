@@ -8,6 +8,7 @@ import type { CSSProperties } from 'react';
  */
 import type { ColorPaletteProps } from '../color-palette/types';
 import type { PopoverProps } from '../popover/types';
+import type { ToggleGroupControlProps } from '../toggle-group-control/types';
 
 export type Border = {
 	color?: CSSProperties[ 'borderColor' ];
@@ -61,6 +62,10 @@ export type BorderControlProps = ColorProps &
 		 */
 		onChange: ( value?: Border ) => void;
 		/**
+		 * Placeholder text for the number input.
+		 */
+		placeholder?: HTMLInputElement[ 'placeholder' ];
+		/**
 		 * An internal prop used to control the visibility of the dropdown.
 		 */
 		__unstablePopoverProps?: Omit< PopoverProps, 'children' >;
@@ -99,6 +104,12 @@ export type BorderControlProps = ColorProps &
 		 * `RangeControl` for additional control over a border's width.
 		 */
 		withSlider?: boolean;
+		/**
+		 * Start opting into the larger default height that will become the default size in a future version.
+		 *
+		 * @default false
+		 */
+		__next40pxDefaultSize?: boolean;
 	};
 
 export type DropdownProps = ColorProps &
@@ -109,6 +120,10 @@ export type DropdownProps = ColorProps &
 		 * values for its popover controls.
 		 */
 		border?: Border;
+		/**
+		 * Whether a border style can be set, based on the border sanitization settings.
+		 */
+		isStyleSettable: boolean;
 		/**
 		 * An internal prop used to control the visibility of the dropdown.
 		 */
@@ -131,7 +146,10 @@ export type DropdownProps = ColorProps &
 		showDropdownHeader?: boolean;
 	};
 
-export type StylePickerProps = LabelProps & {
+export type StylePickerProps = Omit<
+	ToggleGroupControlProps,
+	'value' | 'onChange' | 'children'
+> & {
 	/**
 	 * A callback function invoked when a border style is selected or cleared.
 	 */

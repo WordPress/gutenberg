@@ -92,7 +92,7 @@ describe( 'Gallery block', () => {
 		expect( getBlock( screen, 'Gallery' ) ).toBeVisible();
 		expect( getEditorHtml() ).toMatchSnapshot();
 
-		getBlockSpy.mockReset();
+		getBlockSpy.mockRestore();
 	} );
 
 	it( 'selects a gallery item', async () => {
@@ -159,9 +159,7 @@ describe( 'Gallery block', () => {
 		/* eslint-enable jest/no-conditional-expect */
 	} );
 
-	// This case is disabled until the issue (https://github.com/WordPress/gutenberg/issues/38444)
-	// is addressed.
-	it.skip( 'block remains selected after dismissing the media options picker', async () => {
+	it( 'block remains selected after dismissing the media options picker', async () => {
 		// Initialize with an empty gallery
 		const { getByLabelText, getByText, getByTestId } =
 			await initializeEditor( {
@@ -622,6 +620,20 @@ describe( 'Gallery block', () => {
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
+	it( 'does not display MediaReplaceFlow component within the block toolbar', async () => {
+		const screen = await initializeWithGalleryBlock( {
+			numberOfItems: 3,
+			media,
+		} );
+		const { queryByTestId } = screen;
+
+		fireEvent.press( getBlock( screen, 'Gallery' ) );
+
+		// Expect the native MediaReplaceFlow component to not be present in the block toolbar
+		const mediaReplaceFlow = queryByTestId( 'media-replace-flow' );
+		expect( mediaReplaceFlow ).toBeNull();
+	} );
+
 	// Test cases related to TC013 - Settings - Columns
 	// Reference: https://github.com/wordpress-mobile/test-cases/blob/trunk/test-cases/gutenberg/gallery.md#tc013
 	describe( 'Columns setting', () => {
@@ -682,7 +694,7 @@ describe( 'Gallery block', () => {
 		await openBlockSettings( screen );
 
 		// Disable crop images setting
-		fireEvent.press( getByText( 'Crop images' ) );
+		fireEvent.press( getByText( 'Crop images to fit' ) );
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 } );

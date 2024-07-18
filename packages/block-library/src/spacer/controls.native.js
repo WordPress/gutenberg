@@ -8,7 +8,7 @@ import {
 	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
-import { useSetting } from '@wordpress/block-editor';
+import { useSettings } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -59,14 +59,9 @@ function Controls( {
 		[ height, width ]
 	);
 
+	const [ availableUnits ] = useSettings( 'spacing.units' );
 	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units' ) || [
-			'px',
-			'em',
-			'rem',
-			'vw',
-			'vh',
-		],
+		availableUnits: availableUnits || [ 'px', 'em', 'rem', 'vw', 'vh' ],
 		defaultValues: DEFAULT_VALUES,
 	} );
 

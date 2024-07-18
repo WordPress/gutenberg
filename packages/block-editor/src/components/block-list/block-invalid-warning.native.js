@@ -53,8 +53,8 @@ export default function BlockInvalidWarning( { clientId } ) {
 	return (
 		<TouchableWithoutFeedback
 			onPress={ attemptBlockRecovery }
-			accessible={ true }
-			accessibilityRole={ 'button' }
+			accessible
+			accessibilityRole="button"
 		>
 			<Warning
 				title={ blockTitle }

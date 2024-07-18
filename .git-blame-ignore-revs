@@ -6,3 +6,18 @@ f63053cace3c02e284f00918e1854284c85b9132
 
 # Prettier upgrade to 2.6.2.
 33d84b036592a5bf31af05b7710f3b2b14163dc4
+
+# Prettier upgrade to 2.8.5.
+c56e8a1910ed74f405b74bbb12fe81dea974e5c3
+
+# Prettier upgrade to 3.0.3.
+0bee15148fe4330c20cf372cb46a33693e45cb5f
+
+# ESLint: Enable react/jsx-boolean-value
+9a34927870df80ac3b2da14d71f81d20ec23e2b6
+
+# Autofix eslint curly rule.
+0221522f253e094b277a1485b7a2d186cb172632
+
+# ESLint: Enable react/jsx-curly-brace-presence
+5d4baa9ab5f57d207cc3a048003216a8574574d9

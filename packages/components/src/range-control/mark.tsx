@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * Internal dependencies
@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { Mark, MarkLabel } from './styles/range-control-styles';
 
 import type { RangeMarkProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 
 export default function RangeMark(
 	props: WordPressComponentProps< RangeMarkProps, 'span' >
@@ -22,12 +22,12 @@ export default function RangeMark(
 		...otherProps
 	} = props;
 
-	const classes = classnames(
+	const classes = clsx(
 		'components-range-control__mark',
 		isFilled && 'is-filled',
 		className
 	);
-	const labelClasses = classnames(
+	const labelClasses = clsx(
 		'components-range-control__mark-label',
 		isFilled && 'is-filled'
 	);

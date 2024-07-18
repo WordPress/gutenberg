@@ -4,34 +4,19 @@
 import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
+ * WordPress dependencies
+ */
+import { useViewportMatch } from '@wordpress/compose';
+
+/**
  * Internal dependencies
  */
-import {
-	getTypographyFontSizeValue,
-	getFluidTypographyOptionsFromSettings,
-} from './typography-utils';
+import { getTypographyFontSizeValue } from './typography-utils';
 import { getValueFromObjectPath } from '../../utils/object';
 
 /* Supporting data. */
-export const ROOT_BLOCK_NAME = 'root';
 export const ROOT_BLOCK_SELECTOR = 'body';
-export const ROOT_BLOCK_SUPPORTS = [
-	'background',
-	'backgroundColor',
-	'color',
-	'linkColor',
-	'captionColor',
-	'buttonColor',
-	'headingColor',
-	'fontFamily',
-	'fontSize',
-	'fontStyle',
-	'fontWeight',
-	'lineHeight',
-	'textDecoration',
-	'textTransform',
-	'padding',
-];
+export const ROOT_CSS_PROPERTIES_SELECTOR = ':root';
 
 export const PRESET_METADATA = [
 	{
@@ -77,10 +62,7 @@ export const PRESET_METADATA = [
 	{
 		path: [ 'typography', 'fontSizes' ],
 		valueFunc: ( preset, settings ) =>
-			getTypographyFontSizeValue(
-				preset,
-				getFluidTypographyOptionsFromSettings( settings )
-			),
+			getTypographyFontSizeValue( preset, settings ),
 		valueKey: 'size',
 		cssVarInfix: 'font-size',
 		classes: [ { classSuffix: 'font-size', propertyName: 'font-size' } ],
@@ -158,6 +140,19 @@ export const STYLE_PATH_TO_PRESET_BLOCK_ATTRIBUTE = {
 	'typography.fontSize': 'fontSize',
 	'typography.fontFamily': 'fontFamily',
 };
+
+export function useToolsPanelDropdownMenuProps() {
+	const isMobile = useViewportMatch( 'medium', '<' );
+	return ! isMobile
+		? {
+				popoverProps: {
+					placement: 'left-start',
+					// For non-mobile, inner sidebar width (248px) - button width (24px) - border (1px) + padding (16px) + spacing (20px)
+					offset: 259,
+				},
+		  }
+		: {};
+}
 
 function findInPresetsBy(
 	features,
@@ -380,6 +375,10 @@ export function getValueFromVariable( features, blockName, variable ) {
  * @return {string} Scoped selector.
  */
 export function scopeSelector( scope, selector ) {
+	if ( ! scope || ! selector ) {
+		return selector;
+	}
+
 	const scopes = scope.split( ',' );
 	const selectors = selector.split( ',' );
 
@@ -391,6 +390,78 @@ export function scopeSelector( scope, selector ) {
 	} );
 
 	return selectorsScoped.join( ', ' );
+}
+
+/**
+ * Scopes a collection of selectors for features and subfeatures.
+ *
+ * @example
+ * ```js
+ * const scope = '.custom-scope';
+ * const selectors = {
+ *     color: '.wp-my-block p',
+ *     typography: { fontSize: '.wp-my-block caption' },
+ * };
+ * const result = scopeFeatureSelector( scope, selectors );
+ * // result is {
+ * //     color: '.custom-scope .wp-my-block p',
+ * //     typography: { fonSize: '.custom-scope .wp-my-block caption' },
+ * // }
+ * ```
+ *
+ * @param {string} scope     Selector to scope collection of selectors with.
+ * @param {Object} selectors Collection of feature selectors e.g.
+ *
+ * @return {Object|undefined} Scoped collection of feature selectors.
+ */
+export function scopeFeatureSelectors( scope, selectors ) {
+	if ( ! scope || ! selectors ) {
+		return;
+	}
+
+	const featureSelectors = {};
+
+	Object.entries( selectors ).forEach( ( [ feature, selector ] ) => {
+		if ( typeof selector === 'string' ) {
+			featureSelectors[ feature ] = scopeSelector( scope, selector );
+		}
+
+		if ( typeof selector === 'object' ) {
+			featureSelectors[ feature ] = {};
+
+			Object.entries( selector ).forEach(
+				( [ subfeature, subfeatureSelector ] ) => {
+					featureSelectors[ feature ][ subfeature ] = scopeSelector(
+						scope,
+						subfeatureSelector
+					);
+				}
+			);
+		}
+	} );
+
+	return featureSelectors;
+}
+
+/**
+ * Appends a sub-selector to an existing one.
+ *
+ * Given the compounded `selector` "h1, h2, h3"
+ * and the `toAppend` selector ".some-class" the result will be
+ * "h1.some-class, h2.some-class, h3.some-class".
+ *
+ * @param {string} selector Original selector.
+ * @param {string} toAppend Selector to append.
+ *
+ * @return {string} The new selector.
+ */
+export function appendToSelector( selector, toAppend ) {
+	if ( ! selector.includes( ',' ) ) {
+		return selector + toAppend;
+	}
+	const selectors = selector.split( ',' );
+	const newSelectors = selectors.map( ( sel ) => sel + toAppend );
+	return newSelectors.join( ',' );
 }
 
 /**
@@ -415,7 +486,42 @@ export function areGlobalStyleConfigsEqual( original, variation ) {
 	}
 	return (
 		fastDeepEqual( original?.styles, variation?.styles ) &&
-		fastDeepEqual( original?.settings, variation?.settings ) &&
-		fastDeepEqual( original?.behaviors, variation?.behaviors )
+		fastDeepEqual( original?.settings, variation?.settings )
 	);
+}
+
+/**
+ * Generates the selector for a block style variation by creating the
+ * appropriate CSS class and adding it to the ancestor portion of the block's
+ * selector.
+ *
+ * For example, take the Button block which has a compound selector:
+ * `.wp-block-button .wp-block-button__link`. With a variation named 'custom',
+ * the class `.is-style-custom` should be added to the `.wp-block-button`
+ * ancestor only.
+ *
+ * This function will take into account comma separated and complex selectors.
+ *
+ * @param {string} variation     Name for the variation.
+ * @param {string} blockSelector CSS selector for the block.
+ *
+ * @return {string} CSS selector for the block style variation.
+ */
+export function getBlockStyleVariationSelector( variation, blockSelector ) {
+	const variationClass = `.is-style-${ variation }`;
+
+	if ( ! blockSelector ) {
+		return variationClass;
+	}
+
+	const ancestorRegex = /((?::\([^)]+\))?\s*)([^\s:]+)/;
+	const addVariationClass = ( _match, group1, group2 ) => {
+		return group1 + group2 + variationClass;
+	};
+
+	const result = blockSelector
+		.split( ',' )
+		.map( ( part ) => part.replace( ancestorRegex, addVariationClass ) );
+
+	return result.join( ',' );
 }

@@ -14,8 +14,8 @@
  */
 function gutenberg_menu() {
 	add_menu_page(
-		'Gutenberg',
-		'Gutenberg',
+		__( 'Gutenberg', 'gutenberg' ),
+		__( 'Gutenberg', 'gutenberg' ),
 		'edit_posts',
 		'gutenberg',
 		'',

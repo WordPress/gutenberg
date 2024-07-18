@@ -33,7 +33,7 @@ A callback invoked when the blocks have been modified in a non-persistent manner
 
 ### `children`
 
--   **Type:** `WPElement`
+-   **Type:** `Element`
 -   **Required** `no`
 
 Children elements for which the BlockEditorProvider context should apply.

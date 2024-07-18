@@ -24,6 +24,7 @@ class Gutenberg_REST_Block_Editor_Settings_Controller_Test extends WP_Test_REST_
 	public function set_up() {
 		parent::set_up();
 		switch_theme( 'block-theme' );
+		remove_action( 'wp_print_styles', 'print_emoji_styles' );
 	}
 
 	/**

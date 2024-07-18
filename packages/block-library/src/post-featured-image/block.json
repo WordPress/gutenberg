@@ -2,7 +2,7 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "core/post-featured-image",
-	"title": "Post Featured Image",
+	"title": "Featured Image",
 	"category": "theme",
 	"description": "Display a post's featured image.",
 	"textdomain": "default",
@@ -51,13 +51,19 @@
 		},
 		"customGradient": {
 			"type": "string"
+		},
+		"useFirstImageFromPost": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"usesContext": [ "postId", "postType", "queryId" ],
+	"example": {
+		"viewportWidth": 350
+	},
 	"supports": {
 		"align": [ "left", "right", "center", "wide", "full" ],
 		"color": {
-			"__experimentalDuotone": "img, .wp-block-post-featured-image__placeholder, .components-placeholder__illustration, .components-placeholder::before",
 			"text": false,
 			"background": false
 		},
@@ -65,7 +71,6 @@
 			"color": true,
 			"radius": true,
 			"width": true,
-			"__experimentalSelector": "img, .block-editor-media-placeholder, .wp-block-post-featured-image__overlay",
 			"__experimentalSkipSerialization": true,
 			"__experimentalDefaultControls": {
 				"color": true,
@@ -73,10 +78,26 @@
 				"width": true
 			}
 		},
+		"filter": {
+			"duotone": true
+		},
+		"shadow": {
+			"__experimentalSkipSerialization": true
+		},
 		"html": false,
 		"spacing": {
 			"margin": true,
 			"padding": true
+		},
+		"interactivity": {
+			"clientNavigation": true
+		}
+	},
+	"selectors": {
+		"border": ".wp-block-post-featured-image img, .wp-block-post-featured-image .block-editor-media-placeholder, .wp-block-post-featured-image .wp-block-post-featured-image__overlay",
+		"shadow": ".wp-block-post-featured-image img, .wp-block-post-featured-image .components-placeholder",
+		"filter": {
+			"duotone": ".wp-block-post-featured-image img, .wp-block-post-featured-image .wp-block-post-featured-image__placeholder, .wp-block-post-featured-image .components-placeholder__illustration, .wp-block-post-featured-image .components-placeholder::before"
 		}
 	},
 	"editorStyle": "wp-block-post-featured-image-editor",

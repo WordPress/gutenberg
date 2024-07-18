@@ -42,5 +42,7 @@
 
 	&.resize-horizontal {
 		margin-bottom: 0;
+		// Important is used to have higher specificity than the inline style set by re-resizable library.
+		height: 100% !important;
 	}
 }

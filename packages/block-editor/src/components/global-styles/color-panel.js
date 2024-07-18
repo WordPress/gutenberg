@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -12,12 +12,12 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalZStack as ZStack,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
-	TabPanel,
 	ColorIndicator,
 	Flex,
 	FlexItem,
 	Dropdown,
 	Button,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -27,8 +27,9 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import ColorGradientControl from '../colors-gradients/control';
 import { useColorsPerOrigin, useGradientsPerOrigin } from './hooks';
-import { getValueFromVariable } from './utils';
+import { getValueFromVariable, useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
+import { unlock } from '../../lock-unlock';
 
 export function useHasColorPanel( settings ) {
 	const hasTextPanel = useHasTextPanel( settings );
@@ -115,6 +116,7 @@ function ColorToolsPanel( {
 	panelId,
 	children,
 } ) {
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const resetAll = () => {
 		const updatedValue = resetAllFilter( value );
 		onChange( updatedValue );
@@ -122,13 +124,15 @@ function ColorToolsPanel( {
 
 	return (
 		<ToolsPanel
-			label={ __( 'Color' ) }
+			label={ __( 'Elements' ) }
 			resetAll={ resetAll }
 			panelId={ panelId }
 			hasInnerWrapper
+			headingLevel={ 3 }
 			className="color-block-support-panel"
 			__experimentalFirstVisibleItemClass="first"
 			__experimentalLastVisibleItemClass="last"
+			dropdownMenuProps={ dropdownMenuProps }
 		>
 			<div className="color-block-support-panel__inner-wrapper">
 				{ children }
@@ -151,6 +155,8 @@ const popoverProps = {
 	offset: 36,
 	shift: true,
 };
+
+const { Tabs } = unlock( componentsPrivateApis );
 
 const LabeledColorIndicators = ( { indicators, label } ) => (
 	<HStack justify="flex-start">
@@ -203,13 +209,8 @@ function ColorPanelDropdown( {
 	colorGradientControlSettings,
 	panelId,
 } ) {
-	const tabConfigs = tabs.map( ( { key, label: tabLabel } ) => {
-		return {
-			name: key,
-			title: tabLabel,
-		};
-	} );
-
+	const currentTab = tabs.find( ( tab ) => tab.userValue !== undefined );
+	const { key: firstTabKey, ...firstTab } = tabs[ 0 ] ?? {};
 	return (
 		<ToolsPanelItem
 			className="block-editor-tools-panel-color-gradient-settings__item"
@@ -225,7 +226,7 @@ function ColorPanelDropdown( {
 				renderToggle={ ( { onToggle, isOpen } ) => {
 					const toggleProps = {
 						onClick: onToggle,
-						className: classnames(
+						className: clsx(
 							'block-editor-panel-color-gradient-settings__dropdown',
 							{ 'is-open': isOpen }
 						),
@@ -251,33 +252,46 @@ function ColorPanelDropdown( {
 						<div className="block-editor-panel-color-gradient-settings__dropdown-content">
 							{ tabs.length === 1 && (
 								<ColorPanelTab
-									{ ...tabs[ 0 ] }
+									key={ firstTabKey }
+									{ ...firstTab }
 									colorGradientControlSettings={
 										colorGradientControlSettings
 									}
 								/>
 							) }
 							{ tabs.length > 1 && (
-								<TabPanel tabs={ tabConfigs }>
-									{ ( tab ) => {
-										const selectedTab = tabs.find(
-											( t ) => t.key === tab.name
-										);
+								<Tabs defaultTabId={ currentTab?.key }>
+									<Tabs.TabList>
+										{ tabs.map( ( tab ) => (
+											<Tabs.Tab
+												key={ tab.key }
+												tabId={ tab.key }
+											>
+												{ tab.label }
+											</Tabs.Tab>
+										) ) }
+									</Tabs.TabList>
 
-										if ( ! selectedTab ) {
-											return null;
-										}
-
+									{ tabs.map( ( tab ) => {
+										const { key: tabKey, ...restTabProps } =
+											tab;
 										return (
-											<ColorPanelTab
-												{ ...selectedTab }
-												colorGradientControlSettings={
-													colorGradientControlSettings
-												}
-											/>
+											<Tabs.TabPanel
+												key={ tabKey }
+												tabId={ tabKey }
+												focusable={ false }
+											>
+												<ColorPanelTab
+													key={ tabKey }
+													{ ...restTabProps }
+													colorGradientControlSettings={
+														colorGradientControlSettings
+													}
+												/>
+											</Tabs.TabPanel>
 										);
-									} }
-								</TabPanel>
+									} ) }
+								</Tabs>
 							) }
 						</div>
 					</DropdownContentWrapper>
@@ -534,7 +548,7 @@ export default function ColorPanel( {
 			tabs: [
 				hasSolidColors && {
 					key: 'background',
-					label: __( 'Solid' ),
+					label: __( 'Color' ),
 					inheritedValue: backgroundColor,
 					setValue: setBackgroundColor,
 					userValue: userBackgroundColor,
@@ -576,7 +590,9 @@ export default function ColorPanel( {
 	].filter( Boolean );
 
 	elements.forEach( ( { name, label, showPanel } ) => {
-		if ( ! showPanel ) return;
+		if ( ! showPanel ) {
+			return;
+		}
 
 		const elementBackgroundColor = decodeValue(
 			inheritedValue?.elements?.[ name ]?.color?.background
@@ -699,19 +715,22 @@ export default function ColorPanel( {
 			onChange={ onChange }
 			panelId={ panelId }
 		>
-			{ items.map( ( item ) => (
-				<ColorPanelDropdown
-					key={ item.key }
-					{ ...item }
-					colorGradientControlSettings={ {
-						colors,
-						disableCustomColors: ! areCustomSolidsEnabled,
-						gradients,
-						disableCustomGradients: ! areCustomGradientsEnabled,
-					} }
-					panelId={ panelId }
-				/>
-			) ) }
+			{ items.map( ( item ) => {
+				const { key, ...restItem } = item;
+				return (
+					<ColorPanelDropdown
+						key={ key }
+						{ ...restItem }
+						colorGradientControlSettings={ {
+							colors,
+							disableCustomColors: ! areCustomSolidsEnabled,
+							gradients,
+							disableCustomGradients: ! areCustomGradientsEnabled,
+						} }
+						panelId={ panelId }
+					/>
+				);
+			} ) }
 			{ children }
 		</Wrapper>
 	);

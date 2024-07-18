@@ -31,4 +31,10 @@ export type SandBoxProps = {
 	 * The `onFocus` callback for the iframe.
 	 */
 	onFocus?: React.DOMAttributes< HTMLIFrameElement >[ 'onFocus' ];
+	/**
+	 * The `tabindex` the iframe should receive.
+	 *
+	 * @default 0
+	 */
+	tabIndex?: HTMLElement[ 'tabIndex' ];
 };

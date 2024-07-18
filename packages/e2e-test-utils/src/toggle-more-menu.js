@@ -6,6 +6,22 @@
 export async function toggleMoreMenu( waitFor ) {
 	const menuSelector = '.interface-more-menu-dropdown [aria-label="Options"]';
 
+	const menuToggle = await page.waitForSelector( menuSelector );
+
+	const isOpen = await menuToggle.evaluate( ( el ) =>
+		el.getAttribute( 'aria-expanded' )
+	);
+
+	// If opening and it's already open then exit early.
+	if ( isOpen === 'true' && waitFor === 'open' ) {
+		return;
+	}
+
+	// If closing and it's already closed then exit early.
+	if ( isOpen === 'false' && waitFor === 'close' ) {
+		return;
+	}
+
 	await page.click( menuSelector );
 
 	if ( waitFor ) {

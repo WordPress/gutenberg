@@ -3,8 +3,8 @@
 	const Fragment = wp.element.Fragment;
 	const __ = wp.i18n.__;
 	const registerPlugin = wp.plugins.registerPlugin;
-	const PluginPostPublishPanel = wp.editPost.PluginPostPublishPanel;
-	const PluginPrePublishPanel = wp.editPost.PluginPrePublishPanel;
+	const PluginPostPublishPanel = wp.editor.PluginPostPublishPanel;
+	const PluginPrePublishPanel = wp.editor.PluginPrePublishPanel;
 
 	function PanelContent() {
 		return el( 'p', {}, __( 'Here is the panel content!' ) );

@@ -7,6 +7,7 @@ module.exports = {
 		'@wordpress/no-global-active-element': 'error',
 		'@wordpress/no-global-get-selection': 'error',
 		'@wordpress/no-unsafe-wp-apis': 'error',
+		'@wordpress/no-wp-process-env': 'error',
 	},
 	overrides: [
 		{

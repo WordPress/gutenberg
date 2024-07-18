@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -23,7 +23,7 @@ export default function separatorSave( { attributes } ) {
 	// using color, not backgroundColor.
 	const colorClass = getColorClassName( 'color', backgroundColor );
 
-	const className = classnames(
+	const className = clsx(
 		{
 			'has-text-color': backgroundColor || customColor,
 			[ colorClass ]: colorClass,
