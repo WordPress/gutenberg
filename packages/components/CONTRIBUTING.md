@@ -94,7 +94,7 @@ In these situations, one possible approach is to "soft-deprecate" a given legacy
 2. Updating all places in Gutenberg that use that API.
 3. Adding deprecation warnings (only after the previous point is completed, otherwise the Browser Console will be polluted by all those warnings and some e2e tests may fail).
 
-When adding new components or new props to existing components, it's recommended to prefix them with `__unstable` or `__experimental` until they're stable enough to be exposed as part of the public API.
+When adding new components or new props to existing components, it's recommended to create a [private version](/packages/private-apis/README.md)) of the component until the changes are stable enough to be exposed as part of the public API.
 
 ### Learn more
 
