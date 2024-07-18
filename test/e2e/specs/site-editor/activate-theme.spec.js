@@ -36,6 +36,12 @@ test.describe( 'Activate theme', () => {
 		await expect( page.locator( '.edit-site-canvas-loader' ) ).toHaveCount(
 			0
 		);
+		// Usually `visitSiteEditor` is used to test the site editor, and it
+		// hides the welcome guide. Since this test uses a different flow,
+		// manually update the preferences here.
+		await editor.setPreferences( 'core/edit-site', {
+			welcomeGuide: false,
+		} );
 		await editor.canvas.locator( 'body' ).click();
 		await page
 			.getByRole( 'region', { name: 'Editor top bar' } )
