@@ -54,7 +54,8 @@ function ZoomOutModeInserterButton( {
 			selectedBlockClientId === nextClientId );
 
 	const isHovered =
-		hoveredBlockClientId === previousClientId || hoveredBlockClientId === nextClientId;
+		hoveredBlockClientId === previousClientId ||
+		hoveredBlockClientId === nextClientId;
 
 	const [
 		zoomOutModeInserterButtonHovered,

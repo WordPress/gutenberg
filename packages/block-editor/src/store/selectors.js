@@ -2816,7 +2816,7 @@ export function isBlockVisible( state, clientId ) {
  * @return {Object} Client Id of the hovered block.
  */
 export function getHoveredBlockClientId( state ) {
-	return state.hoveredBlock;
+	return state.hoveredBlockClientId;
 }
 
 /**
