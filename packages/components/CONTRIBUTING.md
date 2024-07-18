@@ -10,6 +10,7 @@ This set of guidelines should apply especially to newly introduced components. I
 -   [Compatibility](#compatibility)
 -   [Compound components](#compound-components)
 -   [Components & Hooks](#components--hooks)
+-   [Naming Conventions](#naming-conventions)
 -   [TypeScript](#typescript)
 -   [Styling](#styling)
 -   [Context system](#context-system)
@@ -230,6 +231,53 @@ A couple of good examples of how hooks are used for composition are:
 ## Performance
 
 TDB -->
+
+## Naming Conventions
+
+It is recommended for compound components to use dot notation to separate the namespace from the individual component names. The top-level compound component should be called `Root`.
+
+In comparison to compound components, it is recommended for monolithic components not to use dot-notation or namespacing in their export names.
+
+Dedicated React context should be also using the dot notation, while hooks should not
+
+```tsx
+import { Component, useComponent } from '@wordpress/components';
+import { useContext } from '@wordpress/element';
+
+function CompoundExample() {
+	return (
+		<Component.Root>
+			<Component.SubComponent />
+		</Component.Root>
+	);
+}
+
+function MonolithExample() {
+	return <Component />;
+}
+
+function ContextProviderExample() {
+	return (
+		<Component.Context.Provider value={ /* ... */ }>
+			{ /* React tree */ }
+		</Component.Context.Provider>
+	);
+}
+
+function ContextConsumerExample() {
+	const componentContext = useContext( Component.Context );
+
+	// etc
+}
+
+function HookExample() {
+	const hookReturnValue = useComponent();
+
+	// etc.
+}
+```
+
+The suggested naming conventions can help consumers of the package to distinguish between monolithic a compound components, and allows components to expose at the same time a monolithic and a compound version if needed.
 
 ## TypeScript
 
