@@ -37,8 +37,9 @@ export type FontSizePickerProps = {
 	 */
 	value?: number | string;
 	/**
-	 * If `true`, the UI will contain a slider, instead of a numeric text input
-	 * field. If `false`, no slider will be present.
+	 * If `true`, a slider will be displayed alongside the input field when a
+	 * custom font size is active. Has no effect when `disableCustomFontSizes`
+	 * is `true`.
 	 *
 	 * @default false
 	 */
@@ -46,7 +47,7 @@ export type FontSizePickerProps = {
 	/**
 	 * If `true`, a reset button will be displayed alongside the input field
 	 * when a custom font size is active. Has no effect when
-	 * `disableCustomFontSizes` or `withSlider` is `true`.
+	 * `disableCustomFontSizes` is `true`.
 	 *
 	 * @default true
 	 */

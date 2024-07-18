@@ -256,12 +256,13 @@ export default function PageTemplates() {
 		}
 	);
 	const history = useHistory();
-	const onSelectionChange = useCallback(
+	const onChangeSelection = useCallback(
 		( items ) => {
+			setSelection( items );
 			if ( view?.type === LAYOUT_LIST ) {
 				history.push( {
 					...params,
-					postId: items.length === 1 ? items[ 0 ].id : undefined,
+					postId: items.length === 1 ? items[ 0 ] : undefined,
 				} );
 			}
 		},
@@ -372,9 +373,8 @@ export default function PageTemplates() {
 				isLoading={ isLoadingData }
 				view={ view }
 				onChangeView={ onChangeView }
-				onSelectionChange={ onSelectionChange }
+				onChangeSelection={ onChangeSelection }
 				selection={ selection }
-				setSelection={ setSelection }
 				defaultLayouts={ defaultLayouts }
 			/>
 		</Page>

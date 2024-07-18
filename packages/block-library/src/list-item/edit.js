@@ -53,14 +53,14 @@ export function IndentUI( { clientId } ) {
 			<ToolbarButton
 				icon={ isRTL() ? formatOutdentRTL : formatOutdent }
 				title={ __( 'Outdent' ) }
-				describedBy={ __( 'Outdent list item' ) }
+				description={ __( 'Outdent list item' ) }
 				disabled={ ! canOutdent }
 				onClick={ () => outdentListItem() }
 			/>
 			<ToolbarButton
 				icon={ isRTL() ? formatIndentRTL : formatIndent }
 				title={ __( 'Indent' ) }
-				describedBy={ __( 'Indent list item' ) }
+				description={ __( 'Indent list item' ) }
 				disabled={ ! canIndent }
 				onClick={ () => indentListItem() }
 			/>
