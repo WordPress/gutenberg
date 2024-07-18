@@ -94,7 +94,7 @@ export function FilterVisibilityToggle( {
 		[ onChangeView, setIsShowingFilter ]
 	);
 
-	const hasFilters = view.filters?.length;
+	const hasFilters = !! view.filters?.length;
 	if ( ! hasFilters ) {
 		return (
 			<AddFilterDropdownMenu
@@ -106,7 +106,7 @@ export function FilterVisibilityToggle( {
 					<Button
 						size="compact"
 						icon={ funnel }
-						label={ __( 'Toggle filter display' ) }
+						label={ __( 'Add filter' ) }
 						isPressed={ false }
 						aria-expanded={ false }
 					/>
@@ -129,9 +129,9 @@ export function FilterVisibilityToggle( {
 				isPressed={ isShowingFilter }
 				aria-expanded={ isShowingFilter }
 			/>
-			{ !! view.filters?.length && (
+			{ hasFilters && (
 				<span className="dataviews-filters-toggle__count">
-					{ view.filters.length }
+					{ view.filters?.length }
 				</span>
 			) }
 		</>
