@@ -131,18 +131,18 @@ When creating components that render a list of subcomponents, prefer to expose t
 
 ```jsx
 // ✅ Do:
-<List>
-	<ListItem value="Item 1" />
-	<ListItem value="Item 2" />
-	<ListItem value="Item 3" />
-</List>
+<List.Root>
+	<List.Item value="Item 1" />
+	<List.Item value="Item 2" />
+	<List.Item value="Item 3" />
+</List.Root>
 ```
 
 When implementing this pattern, avoid using `React.Children.map` and `React.cloneElement` to map through the children and augment them. Instead, use React Context to provide state to subcomponents and connect them:
 
 ```jsx
 // ❌ Don't:
-function List ( props ) {
+function ListRoot ( props ) {
 	const [ state, setState ] = useState();
 	return (
 		<div { ...props }>
@@ -156,7 +156,7 @@ function List ( props ) {
 // ✅ Do:
 const ListContext = createContext();
 
-function List( props ) {
+function ListRoot( props ) {
 	const [ state, setState ] = useState();
 	return (
 		<ListContext.Provider value={ state }>
