@@ -349,15 +349,6 @@ function getWebpackEntryPoints( buildType ) {
 }
 
 /**
- * Returns the list of paths included in the `render` props by scanning the `block.json` files.
- *
- * @return {Array}  The list of all the `render` prop paths included in `block.json` files.
- */
-function getRenderPropPaths() {
-	return getPhpFilePaths( [ 'render' ] );
-}
-
-/**
  * Returns the list of PHP file paths found in `block.json` files for the given props.
  *
  * @param {string[]} props The props to search for in the `block.json` files.
@@ -422,7 +413,6 @@ module.exports = {
 	getWordPressSrcDirectory,
 	getWebpackEntryPoints,
 	getPhpFilePaths,
-	getRenderPropPaths,
 	hasBabelConfig,
 	hasCssnanoConfig,
 	hasJestConfig,
