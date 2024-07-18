@@ -9,28 +9,14 @@
 		max-width: 100%;
 		vertical-align: bottom;
 		box-sizing: border-box;
-	}
 
-	@media (prefers-reduced-motion: no-preference) {
-		&.hide-content {
-			img {
+		@media (prefers-reduced-motion: no-preference) {
+			&.hide {
 				visibility: hidden;
 			}
-			figcaption {
-				.wp-block-gallery & {
-					visibility: hidden;
-				}
-			}
-		}
 
-		&.show-content {
-			img {
+			&.show {
 				animation: show-content-image 0.4s;
-			}
-			figcaption {
-				.wp-block-gallery & {
-					animation: show-content-image 0.4s;
-				}
 			}
 		}
 	}
