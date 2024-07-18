@@ -351,9 +351,12 @@ export default function DataviewsPatterns() {
 	// Reset the page number when the category changes.
 	useEffect( () => {
 		if ( previousCategoryId !== categoryId ) {
-			setView( DEFAULT_VIEW );
+			setView( {
+				...view,
+				page: 1,
+			} );
 		}
-	}, [ categoryId, previousCategoryId ] );
+	}, [ categoryId, previousCategoryId, view ] );
 	const { data, paginationInfo } = useMemo( () => {
 		// Search is managed server-side as well as filters for patterns.
 		// However, the author filter in template parts is done client-side.
