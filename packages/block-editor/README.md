@@ -578,6 +578,10 @@ _Returns_
 
 -   `Object`: Typography block support derived CSS classes & styles.
 
+### hasSplitBorders
+
+Undocumented declaration.
+
 ### HeadingLevelDropdown
 
 Dropdown for selecting a heading level (1 through 6) or paragraph (0).
@@ -628,6 +632,10 @@ Undocumented declaration.
 _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inspector-controls/README.md>
+
+### isDefinedBorder
+
+Undocumented declaration.
 
 ### isValueSpacingPreset
 

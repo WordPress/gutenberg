@@ -3,8 +3,6 @@
  */
 import {
 	__experimentalBorderBoxControl as BorderBoxControl,
-	__experimentalHasSplitBorders as hasSplitBorders,
-	__experimentalIsDefinedBorder as isDefinedBorder,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalItemGroup as ItemGroup,
@@ -22,6 +20,7 @@ import { getValueFromVariable, useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
 import { useBorderPanelLabel } from '../../hooks/border';
 import { ShadowPopover, useShadowPresets } from './shadow-panel-components';
+import { hasSplitBorders, isDefinedBorder } from '../border-box-utils';
 
 export function useHasBorderPanel( settings ) {
 	const controls = Object.values( useHasBorderPanelControls( settings ) );
