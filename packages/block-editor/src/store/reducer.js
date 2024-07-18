@@ -2117,7 +2117,7 @@ const combinedReducers = combineReducers( {
 	blockRemovalRules,
 	openedBlockSettingsMenu,
 	registeredInserterMediaCategories,
-	hoveredBlock,
+	hoveredBlockClientId,
 } );
 
 function withAutomaticChangeReset( reducer ) {
