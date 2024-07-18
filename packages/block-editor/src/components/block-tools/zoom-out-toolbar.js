@@ -33,8 +33,8 @@ export default function ZoomOutToolbar( { clientId, rootClientId } ) {
 				canMoveBlock,
 			} = select( blockEditorStore );
 			const { getBlockType } = select( blocksStore );
-			const { name } = getBlock( clientId );
-			const blockType = getBlockType( name );
+			const block = getBlock( clientId );
+			const blockType = getBlockType( block?.name );
 			const isBlockTemplatePart =
 				blockType?.name === 'core/template-part';
 
