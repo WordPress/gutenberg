@@ -38,7 +38,11 @@ export async function createNewPost(
 		query.set( 'excerpt', excerpt );
 	}
 
+	// Navigate to the new post page.
 	await this.visitAdminPage( 'post-new.php', query.toString() );
+
+	// Set editing mode
+	await this.editor.setRenderingMode();
 
 	await this.editor.setPreferences( 'core/edit-post', {
 		welcomeGuide: options.showWelcomeGuide ?? false,
