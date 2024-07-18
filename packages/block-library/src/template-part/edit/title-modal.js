@@ -29,6 +29,7 @@ export default function TitleModal( { areaLabel, onClose, onSubmit } ) {
 				areaLabel.toLowerCase()
 			) }
 			onRequestClose={ onClose }
+			focusOnMount="firstContentElement"
 			size="small"
 		>
 			<form onSubmit={ submitForCreation }>
