@@ -28,6 +28,7 @@ function _gutenberg_add_block_templates_from_registry( $query_result, $query, $t
 		$registered_template = WP_Templates_Registry::get_instance()->get_by_slug( $query_result[ $key ]->slug );
 		if ( $registered_template ) {
 			$query_result[ $key ]->plugin = $registered_template->plugin;
+			$query_result[ $key ]->origin = 'theme' !== $query_result[ $key ]->origin ? 'plugin' : $query_result[ $key ]->origin;
 		}
 	}
 
@@ -67,6 +68,7 @@ function _gutenberg_add_block_template_plugin_attribute( $block_template ) {
 		$registered_template = WP_Templates_Registry::get_instance()->get_by_slug( $block_template->slug );
 		if ( $registered_template ) {
 			$block_template->plugin = $registered_template->plugin;
+			$block_template->origin = 'theme' !== $block_template->origin ? 'plugin' : $block_template->origin;
 		}
 	}
 
@@ -86,6 +88,7 @@ function _gutenberg_add_block_file_templates_from_registry( $block_template, $id
 		$registered_template = WP_Templates_Registry::get_instance()->get_by_slug( $block_template->slug );
 		if ( $registered_template ) {
 			$block_template->plugin = $registered_template->plugin;
+			$block_template->origin = 'theme' !== $block_template->origin ? 'plugin' : $block_template->origin;
 		}
 		return $block_template;
 	}
