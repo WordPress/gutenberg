@@ -44,6 +44,7 @@ const Search = memo( function Search( {
 	const searchLabel = label || __( 'Search' );
 	return (
 		<SearchControl
+			className="dataviews-search"
 			__nextHasNoMarginBottom
 			onChange={ setSearch }
 			value={ search }

@@ -117,19 +117,13 @@ export default function DataViews< Item >( {
 				justify="start"
 				className="dataviews-filters__view-actions"
 			>
-				<HStack
-					justify="start"
-					className="dataviews-search__container"
-					wrap
-				>
-					{ search && (
-						<Search
-							label={ searchLabel }
-							view={ view }
-							onChangeView={ onChangeView }
-						/>
-					) }
-				</HStack>
+				{ search && (
+					<Search
+						label={ searchLabel }
+						view={ view }
+						onChangeView={ onChangeView }
+					/>
+				) }
 				{ [ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type ) &&
 					hasPossibleBulkAction && (
 						<BulkActions
