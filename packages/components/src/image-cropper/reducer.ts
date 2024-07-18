@@ -1,26 +1,41 @@
 /**
  * Internal dependencies
  */
-import type { Position, Size, ResizeDirection } from './types';
+import type { Size, ResizeDirection } from './types';
 import { rotatePoint, degreeToRadian, getFurthestVector } from './math';
 
 export type State = {
+	// The image dimensions.
 	image: {
+		// The x position of the image center.
 		x: number;
+		// The y position of the image center.
 		y: number;
-		width: number;
-		height: number;
+		// The width of the image. This doesn't change.
+		readonly width: number;
+		// The height of the image. This doesn't change.
+		readonly height: number;
 	};
+	// The image transforms.
 	transforms: {
+		// The angle of the image in degrees, from -45 to 45 degrees.
 		angle: number;
+		// The number of 90-degree turns clockwise.
 		turns: 0 | 1 | 2 | 3;
+		// The image scale.
 		scale: number;
+		// Whether the image is flipped horizontally.
 		flipped: boolean;
 	};
+	// The cropper window dimensions.
 	cropper: {
+		// The x position of the cropper window center.
 		x: number;
+		// The y position of the cropper window center.
 		y: number;
+		// The width of the cropper window.
 		width: number;
+		// The height of the cropper window
 		height: number;
 	};
 	// Whether the cropper window is resizing.
@@ -30,15 +45,25 @@ export type State = {
 };
 
 type Action =
+	// Zoom in/out to a  scale.
 	| { type: 'ZOOM'; scale: number }
+	// Zoom in/out by a delta scale.
 	| { type: 'ZOOM_BY'; deltaScale: number }
+	// Flip the image horizontally.
 	| { type: 'FLIP' }
+	// Rotate the image to an angle.
 	| { type: 'ROTATE'; angle: number }
+	// Rotate the image 90-degree clockwise or counter-clockwise.
 	| { type: 'ROTATE_CLOCKWISE'; isCounterClockwise?: boolean }
-	| { type: 'TRANSLATE'; offset: Position }
+	// Move the image to a position.
 	| { type: 'MOVE'; x: number; y: number }
+	// End moving the image.
+	| { type: 'MOVE_END' }
+	// Start resizing the cropper window.
 	| { type: 'RESIZE_START' }
+	// Resize the cropper window by a delta size in a direction.
 	| { type: 'RESIZE_WINDOW'; direction: ResizeDirection; delta: Size }
+	// Reset the state to the initial state.
 	| { type: 'RESET' };
 
 function createInitialState( {
@@ -196,16 +221,6 @@ function imageCropperReducer( state: State, action: Action ) {
 				},
 			};
 		}
-		case 'TRANSLATE': {
-			return {
-				...state,
-				cropper: {
-					...state.cropper,
-					x: action.offset.x,
-					y: action.offset.y,
-				},
-			};
-		}
 		case 'MOVE': {
 			const scaledWidth = image.width * scale;
 			const scaledHeight = image.height * scale;
@@ -240,6 +255,13 @@ function imageCropperReducer( state: State, action: Action ) {
 					x: nextPosition.x,
 					y: nextPosition.y,
 				},
+				isDragging: true,
+			};
+		}
+		case 'MOVE_END': {
+			return {
+				...state,
+				isDragging: false,
 			};
 		}
 		case 'RESIZE_START': {

@@ -54,6 +54,9 @@ export const useImageCropper = ( {
 			onDrag: ( { offset: [ x, y ] } ) => {
 				dispatch( { type: 'MOVE', x, y } );
 			},
+			onDragEnd: () => {
+				dispatch( { type: 'MOVE_END' } );
+			},
 		},
 		{
 			target: cropperWindowRef,
