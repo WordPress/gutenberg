@@ -8,16 +8,18 @@ import { plus, lineSolid } from '@wordpress/icons';
 import { useEffect } from '@wordpress/element';
 
 const viewPortBreaks = {
-	xhuge: { min: 2, max: 6, default: 4 },
-	huge: { min: 2, max: 5, default: 4 },
+	xhuge: { min: 3, max: 5, default: 5 },
+	huge: { min: 2, max: 4, default: 4 },
 	xlarge: { min: 2, max: 3, default: 3 },
-	mobile: { min: 2, max: 3, default: 2 },
+	large: { min: 1, max: 2, default: 2 },
+	mobile: { min: 1, max: 2, default: 2 },
 };
 
 function useViewPortBreakpoint() {
 	const isXHuge = useViewportMatch( 'xhuge', '>=' );
 	const isHuge = useViewportMatch( 'huge', '>=' );
 	const isXlarge = useViewportMatch( 'xlarge', '>=' );
+	const isLarge = useViewportMatch( 'large', '>=' );
 	const isMobile = useViewportMatch( 'mobile', '>=' );
 
 	if ( isXHuge ) {
@@ -28,6 +30,9 @@ function useViewPortBreakpoint() {
 	}
 	if ( isXlarge ) {
 		return 'xlarge';
+	}
+	if ( isLarge ) {
+		return 'large';
 	}
 	if ( isMobile ) {
 		return 'mobile';
