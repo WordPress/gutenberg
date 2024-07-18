@@ -6,57 +6,12 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { Button } from '@wordpress/components';
 import { plus } from '@wordpress/icons';
 import { _x } from '@wordpress/i18n';
 
-/**
- * Internal dependencies
- */
-import { store as blockEditorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
-
-function ZoomOutModeInserterButton( {
-	previousClientId,
-	nextClientId,
-	index,
-} ) {
-	const {
-		sectionRootClientId,
-		setInserterIsOpened,
-		hasSelection,
-		selectedBlockClientId,
-		hoveredBlockClientId,
-	} = useSelect( ( select ) => {
-		const {
-			getSettings,
-			getSelectionStart,
-			getSelectedBlockClientId,
-			getHoveredBlockClientId,
-		} = select( blockEditorStore );
-		const { sectionRootClientId: root } = unlock( getSettings() );
-
-		return {
-			hasSelection: !! getSelectionStart().clientId,
-			sectionRootClientId: root,
-			setInserterIsOpened:
-				getSettings().__experimentalSetIsInserterOpened,
-			selectedBlockClientId: getSelectedBlockClientId(),
-			hoveredBlockClientId: getHoveredBlockClientId(),
-		};
-	}, [] );
-
-	const isSelected =
-		hasSelection &&
-		( selectedBlockClientId === previousClientId ||
-			selectedBlockClientId === nextClientId );
-
-	const isHovered =
-		hoveredBlockClientId === previousClientId ||
-		hoveredBlockClientId === nextClientId;
-
+function ZoomOutModeInserterButton( { isVisible, onClick } ) {
 	const [
 		zoomOutModeInserterButtonHovered,
 		setZoomOutModeInserterButtonHovered,
@@ -71,20 +26,10 @@ function ZoomOutModeInserterButton( {
 				'block-editor-button-pattern-inserter__button',
 				'block-editor-block-tools__zoom-out-mode-inserter-button',
 				{
-					'is-visible':
-						isHovered ||
-						isSelected ||
-						zoomOutModeInserterButtonHovered,
+					'is-visible': isVisible || zoomOutModeInserterButtonHovered,
 				}
 			) }
-			onClick={ () => {
-				setInserterIsOpened( {
-					rootClientId: sectionRootClientId,
-					insertionIndex: index,
-					tab: 'patterns',
-					category: 'all',
-				} );
-			} }
+			onClick={ onClick }
 			onMouseOver={ () => {
 				setZoomOutModeInserterButtonHovered( true );
 			} }

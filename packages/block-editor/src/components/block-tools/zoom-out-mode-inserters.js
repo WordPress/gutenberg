@@ -14,34 +14,41 @@ import { unlock } from '../../lock-unlock';
 
 function ZoomOutModeInserters() {
 	const [ isReady, setIsReady ] = useState( false );
-	const { blockOrder, insertionPoint, setInserterIsOpened } = useSelect(
-		( select ) => {
-			const {
-				getSettings,
-				getBlockOrder,
-				getSelectionStart,
-				getSelectedBlockClientId,
-			} = select( blockEditorStore );
-			const { sectionRootClientId: root } = unlock( getSettings() );
-			// To do: move ZoomOutModeInserters to core/editor.
-			// Or we perhaps we should move the insertion point state to the
-			// block-editor store. I'm not sure what it was ever moved to the editor
-			// store, because all the inserter components all live in the
-			// block-editor package.
-			// eslint-disable-next-line @wordpress/data-no-store-string-literals
-			const editor = select( 'core/editor' );
-			return {
-				hasSelection: !! getSelectionStart().clientId,
-				blockOrder: getBlockOrder( root ),
-				insertionPoint: unlock( editor ).getInsertionPoint(),
-				sectionRootClientId: root,
-				setInserterIsOpened:
-					getSettings().__experimentalSetIsInserterOpened,
-				selectedBlockClientId: getSelectedBlockClientId(),
-			};
-		},
-		[]
-	);
+	const {
+		hasSelection,
+		blockOrder,
+		insertionPoint,
+		setInserterIsOpened,
+		sectionRootClientId,
+		selectedBlockClientId,
+		hoveredBlockClientId,
+	} = useSelect( ( select ) => {
+		const {
+			getSettings,
+			getBlockOrder,
+			getSelectionStart,
+			getSelectedBlockClientId,
+			getHoveredBlockClientId,
+		} = select( blockEditorStore );
+		const { sectionRootClientId: root } = unlock( getSettings() );
+		// To do: move ZoomOutModeInserters to core/editor.
+		// Or we perhaps we should move the insertion point state to the
+		// block-editor store. I'm not sure what it was ever moved to the editor
+		// store, because all the inserter components all live in the
+		// block-editor package.
+		// eslint-disable-next-line @wordpress/data-no-store-string-literals
+		const editor = select( 'core/editor' );
+		return {
+			hasSelection: !! getSelectionStart().clientId,
+			blockOrder: getBlockOrder( root ),
+			insertionPoint: unlock( editor ).getInsertionPoint(),
+			sectionRootClientId: root,
+			setInserterIsOpened:
+				getSettings().__experimentalSetIsInserterOpened,
+			selectedBlockClientId: getSelectedBlockClientId(),
+			hoveredBlockClientId: getHoveredBlockClientId(),
+		};
+	}, [] );
 
 	const isMounted = useRef( false );
 
@@ -78,11 +85,23 @@ function ZoomOutModeInserters() {
 			return null;
 		}
 
+		const previousClientId = clientId;
+		const nextClientId = blockOrder[ index ];
+
+		const isSelected =
+			hasSelection &&
+			( selectedBlockClientId === previousClientId ||
+				selectedBlockClientId === nextClientId );
+
+		const isHovered =
+			hoveredBlockClientId === previousClientId ||
+			hoveredBlockClientId === nextClientId;
+
 		return (
 			<BlockPopoverInbetween
 				key={ index }
-				previousClientId={ clientId }
-				nextClientId={ blockOrder[ index ] }
+				previousClientId={ previousClientId }
+				nextClientId={ nextClientId }
 			>
 				{ shouldRenderInsertionPoint && (
 					<div
@@ -98,9 +117,15 @@ function ZoomOutModeInserters() {
 				) }
 				{ shouldRenderInserter && (
 					<ZoomOutModeInserterButton
-						previousClientId={ clientId }
-						nextClientId={ blockOrder[ index ] }
-						index={ index }
+						isVisible={ isSelected || isHovered }
+						onClick={ () => {
+							setInserterIsOpened( {
+								rootClientId: sectionRootClientId,
+								insertionIndex: index,
+								tab: 'patterns',
+								category: 'all',
+							} );
+						} }
 					/>
 				) }
 			</BlockPopoverInbetween>
