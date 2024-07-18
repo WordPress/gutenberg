@@ -10,6 +10,7 @@ import { useState, useContext } from '@wordpress/element';
  * Internal dependencies
  */
 import { ImageCropper, ImageCropperContext } from '../';
+import { Button, RangeControl, Flex, FlexItem } from '../../';
 
 const meta: Meta< typeof ImageCropper.Provider > = {
 	component: ImageCropper.Provider,
@@ -25,75 +26,97 @@ const meta: Meta< typeof ImageCropper.Provider > = {
 };
 export default meta;
 
+function StateLogger() {
+	const { state } = useContext( ImageCropperContext );
+	return <pre>{ JSON.stringify( state, null, 2 ) }</pre>;
+}
+
 function TemplateControls() {
 	const { state, dispatch, getImageBlob } = useContext( ImageCropperContext );
 	const [ previewUrl, setPreviewUrl ] = useState< string >( '' );
 
 	return (
 		<>
-			<input
-				type="range"
-				min={ -45 }
-				max={ 45 }
-				step={ 1 }
-				value={ state.angle }
-				onChange={ ( event ) => {
-					dispatch( {
-						type: 'ROTATE',
-						angle: Number( event.target.value ),
-					} );
-				} }
-			/>
+			<Flex justify="flex-start">
+				<FlexItem>
+					<ImageCropper />
+				</FlexItem>
 
-			<button
-				onClick={ () => {
-					dispatch( {
-						type: 'ROTATE_CLOCKWISE',
-						isCounterClockwise: true,
-					} );
-				} }
-			>
-				Rotate -90°
-			</button>
-			<button
-				onClick={ () => {
-					dispatch( { type: 'ROTATE_CLOCKWISE' } );
-				} }
-			>
-				Rotate 90°
-			</button>
-			<button
-				onClick={ () => {
-					dispatch( { type: 'FLIP' } );
-				} }
-			>
-				Flip horizontally
-			</button>
-			<button
-				onClick={ async () => {
-					const blob = await getImageBlob( state );
-					if ( previewUrl ) {
+				{ previewUrl && (
+					<FlexItem>
+						<img src={ previewUrl } alt="preview" />
+					</FlexItem>
+				) }
+			</Flex>
+			<Flex wrap justify="flex-start">
+				<FlexItem style={ { width: 200 } }>
+					<RangeControl
+						label="angle"
+						min={ -45 }
+						max={ 45 }
+						step={ 1 }
+						value={ state.angle }
+						onChange={ ( value ) => {
+							dispatch( {
+								type: 'ROTATE',
+								angle: Number( value ),
+							} );
+						} }
+					/>
+				</FlexItem>
+
+				<Button
+					variant="secondary"
+					onClick={ () => {
+						dispatch( {
+							type: 'ROTATE_CLOCKWISE',
+							isCounterClockwise: true,
+						} );
+					} }
+				>
+					Rotate -90°
+				</Button>
+				<Button
+					variant="secondary"
+					onClick={ () => {
+						dispatch( { type: 'ROTATE_CLOCKWISE' } );
+					} }
+				>
+					Rotate 90°
+				</Button>
+				<Button
+					variant="secondary"
+					onClick={ () => {
+						dispatch( { type: 'FLIP' } );
+					} }
+				>
+					Flip horizontally
+				</Button>
+			</Flex>
+			<Flex justify="flex-start">
+				<Button
+					variant="primary"
+					onClick={ async () => {
+						const blob = await getImageBlob( state );
+						if ( previewUrl ) {
+							URL.revokeObjectURL( previewUrl );
+						}
+						setPreviewUrl( URL.createObjectURL( blob ) );
+					} }
+				>
+					Apply
+				</Button>
+				<Button
+					variant="secondary"
+					onClick={ () => {
+						dispatch( { type: 'RESET' } );
+						setPreviewUrl( '' );
 						URL.revokeObjectURL( previewUrl );
-					}
-					setPreviewUrl( URL.createObjectURL( blob ) );
-				} }
-			>
-				Apply
-			</button>
-			<button
-				onClick={ () => {
-					dispatch( { type: 'RESET' } );
-					setPreviewUrl( '' );
-					URL.revokeObjectURL( previewUrl );
-				} }
-			>
-				Reset
-			</button>
-			{ previewUrl && (
-				<div>
-					<img src={ previewUrl } alt="preview" />
-				</div>
-			) }
+					} }
+				>
+					Reset
+				</Button>
+			</Flex>
 		</>
 	);
 }
@@ -101,9 +124,8 @@ function TemplateControls() {
 const Template: StoryFn< typeof ImageCropper.Provider > = ( { ...args } ) => {
 	return (
 		<ImageCropper.Provider { ...args }>
-			<ImageCropper />
-
 			<TemplateControls />
+			<StateLogger />
 		</ImageCropper.Provider>
 	);
 };
