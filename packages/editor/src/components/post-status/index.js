@@ -208,7 +208,6 @@ export default function PostStatus() {
 							size="compact"
 							onClick={ onToggle }
 							icon={ postStatusesInfo[ status ]?.icon }
-							iconSize="20"
 							aria-label={ sprintf(
 								// translators: %s: Current post status.
 								__( 'Change post status: %s' ),
