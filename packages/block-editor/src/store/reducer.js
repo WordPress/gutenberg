@@ -2076,7 +2076,7 @@ export function lastFocus( state = false, action ) {
  *
  * @return {boolean} Updated state.
  */
-export function hoveredBlock( state = false, action ) {
+export function hoveredBlockClientId( state = false, action ) {
 	switch ( action.type ) {
 		case 'HOVER_BLOCK':
 			return action.clientId;
