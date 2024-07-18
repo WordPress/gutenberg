@@ -64,28 +64,29 @@ function BlockVerticalAlignmentUI( {
 	const UIComponent = isToolbar ? ToolbarGroup : ToolbarDropdownMenu;
 	const extraProps = isToolbar
 		? { isCollapsed }
-		: { toggleProps: { describedBy: description } };
+		: {
+				popoverProps: { focusOnMount: 'firstElement' },
+				toggleProps: {
+					describedBy: description,
+				},
+		  };
 
-	return (
-		<UIComponent
-			icon={
-				activeAlignment
-					? activeAlignment.icon
-					: defaultAlignmentControl.icon
-			}
-			label={ label }
-			describedBy={ description }
-			controls={ controls.map( ( control ) => {
-				return {
-					...BLOCK_ALIGNMENTS_CONTROLS[ control ],
-					isActive: value === control,
-					role: isCollapsed ? 'menuitemradio' : undefined,
-					onClick: applyOrUnset( control ),
-				};
-			} ) }
-			{ ...extraProps }
-		/>
-	);
+	const commonProps = {
+		icon: activeAlignment
+			? activeAlignment.icon
+			: defaultAlignmentControl.icon,
+		label,
+		controls: controls.map( ( control ) => {
+			return {
+				...BLOCK_ALIGNMENTS_CONTROLS[ control ],
+				isActive: value === control,
+				role: isCollapsed ? 'menuitemradio' : undefined,
+				onClick: applyOrUnset( control ),
+			};
+		} ),
+	};
+
+	return <UIComponent { ...commonProps } { ...extraProps } />;
 }
 
 /**

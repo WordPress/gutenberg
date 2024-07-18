@@ -50,7 +50,6 @@ function BlockAlignmentUI( {
 			? activeAlignmentControl.icon
 			: defaultAlignmentControl.icon,
 		label,
-		describedBy: description,
 	};
 	const extraProps = isToolbar
 		? {
@@ -67,7 +66,7 @@ function BlockAlignmentUI( {
 				} ),
 		  }
 		: {
-				toggleProps: { describedBy: description },
+				toggleProps: { 'aria-description': description },
 				children: ( { onClose } ) => {
 					return (
 						<>
