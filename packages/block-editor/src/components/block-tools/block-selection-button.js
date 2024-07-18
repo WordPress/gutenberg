@@ -9,7 +9,7 @@ import clsx from 'clsx';
 import { dragHandle } from '@wordpress/icons';
 import { Button, Flex, FlexItem } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { forwardRef, useEffect } from '@wordpress/element';
+import { forwardRef, useEffect, useMemo, useRef } from '@wordpress/element';
 import {
 	BACKSPACE,
 	DELETE,
@@ -38,6 +38,50 @@ import BlockIcon from '../block-icon';
 import { store as blockEditorStore } from '../../store';
 import BlockDraggable from '../block-draggable';
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
+import { unlock } from '../../lock-unlock';
+
+/**
+ * Given `clientIdsTree` data structure as the haystack, and `selectedClientId`
+ * as the needle, find the neighboring blocks (parent, firstChild, previous, next).
+ *
+ * @param {Object}  clientIdsTree  A block hierarchy with each block only containing
+ *                                 the `clientId` and `innerBlocks` properties.
+ * @param {string}  targetClientId The clientId to find.
+ * @param {?Object} parent         The parent block of the currently selected block.
+ *                                 This can be omitted when searching from the root.
+ */
+function findBlockNeighbors( clientIdsTree, targetClientId, parent ) {
+	for (
+		let blockIndex = 0;
+		blockIndex < clientIdsTree.length;
+		blockIndex++
+	) {
+		const block = clientIdsTree[ blockIndex ];
+
+		if ( block.clientId === targetClientId ) {
+			return {
+				parent: parent?.clientId,
+				previous: clientIdsTree[ blockIndex - 1 ]?.clientId,
+				next: clientIdsTree[ blockIndex + 1 ]?.clientId,
+				firstChild: block?.innerBlocks?.[ 0 ]?.clientId,
+				blockIndex,
+			};
+		}
+
+		// Search the inner blocks for the selected block.
+		if ( block?.innerBlocks?.length ) {
+			const result = findBlockNeighbors(
+				block.innerBlocks,
+				targetClientId,
+				block
+			);
+
+			if ( result ) {
+				return result;
+			}
+		}
+	}
+}
 
 /**
  * Block selection button component, displaying the label of the block. If the block
@@ -55,68 +99,101 @@ function BlockSelectionButton( { clientId, rootClientId }, ref ) {
 		( select ) => {
 			const {
 				getBlock,
-				getBlockIndex,
 				hasBlockMovingClientId,
-				getBlockListSettings,
 				__unstableGetEditorMode,
 				getNextBlockClientId,
 				getPreviousBlockClientId,
 				canMoveBlock,
 			} = select( blockEditorStore );
+			const { getEnabledClientIdsTree } = unlock(
+				select( blockEditorStore )
+			);
 			const { getActiveBlockVariation, getBlockType } =
 				select( blocksStore );
-			const index = getBlockIndex( clientId );
 			const { name, attributes } = getBlock( clientId );
 			const blockType = getBlockType( name );
-			const orientation =
-				getBlockListSettings( rootClientId )?.orientation;
 			const match = getActiveBlockVariation( name, attributes );
 
 			return {
+				blockType,
+				attributes,
 				blockMovingMode: hasBlockMovingClientId(),
 				editorMode: __unstableGetEditorMode(),
 				icon: match?.icon || blockType.icon,
-				label: getAccessibleBlockLabel(
-					blockType,
-					attributes,
-					index + 1,
-					orientation
-				),
 				canMove: canMoveBlock( clientId, rootClientId ),
 				getNextBlockClientId,
 				getPreviousBlockClientId,
+				enabledClientIdsTree: getEnabledClientIdsTree(),
 			};
 		},
 		[ clientId, rootClientId ]
 	);
-	const { label, icon, blockMovingMode, editorMode, canMove } = selected;
-	const { setNavigationMode, removeBlock } = useDispatch( blockEditorStore );
-
-	// Focus the breadcrumb in navigation mode.
-	useEffect( () => {
-		if ( editorMode === 'navigation' ) {
-			ref.current.focus();
-			speak( label );
-		}
-	}, [ label, editorMode ] );
-	const blockElement = useBlockElement( clientId );
-
 	const {
-		hasBlockMovingClientId,
-		getBlockIndex,
-		getBlockRootClientId,
-		getClientIdsOfDescendants,
-		getSelectedBlockClientId,
-		getMultiSelectedBlocksEndClientId,
-		getPreviousBlockClientId,
-		getNextBlockClientId,
-	} = useSelect( blockEditorStore );
+		blockType,
+		attributes,
+		icon,
+		blockMovingMode,
+		editorMode,
+		canMove,
+		enabledClientIdsTree,
+	} = selected;
 	const {
+		setNavigationMode,
+		removeBlock,
 		selectBlock,
 		clearSelectedBlock,
 		setBlockMovingClientId,
 		moveBlockToPosition,
 	} = useDispatch( blockEditorStore );
+
+	const {
+		hasBlockMovingClientId,
+		getBlockIndex,
+		getBlockRootClientId,
+		getSelectedBlockClientId,
+		getBlockListSettings,
+	} = useSelect( blockEditorStore );
+
+	const { parent, firstChild, previous, next, blockIndex } = useMemo(
+		() => findBlockNeighbors( enabledClientIdsTree, clientId ),
+		[ enabledClientIdsTree, clientId ]
+	);
+
+	const label = useMemo( () => {
+		const orientation = getBlockListSettings(
+			parent?.clientId ?? ''
+		)?.orientation;
+		return getAccessibleBlockLabel(
+			blockType,
+			attributes,
+			blockIndex,
+			orientation
+		);
+	}, [
+		attributes,
+		blockIndex,
+		blockType,
+		getBlockListSettings,
+		parent?.clientId,
+	] );
+
+	// Focus the block selection button in navigation mode.
+	// Only one block selection button renders at a time (for the individual selected block),
+	// so the instance should only be focused on change of client id.
+	const focusedClientId = useRef();
+	useEffect( () => {
+		const canFocus =
+			editorMode === 'navigation' &&
+			focusedClientId.current !== clientId &&
+			ref?.current?.focus;
+
+		if ( canFocus ) {
+			ref.current.focus();
+			speak( label );
+			focusedClientId.current = clientId;
+		}
+	}, [ clientId, editorMode, label, ref ] );
+	const blockElement = useBlockElement( clientId );
 
 	function onKeyDown( event ) {
 		const { keyCode } = event;
@@ -137,72 +214,31 @@ function BlockSelectionButton( { clientId, rootClientId }, ref ) {
 		}
 
 		const selectedBlockClientId = getSelectedBlockClientId();
-		const selectionEndClientId = getMultiSelectedBlocksEndClientId();
-		const selectionBeforeEndClientId = getPreviousBlockClientId(
-			selectionEndClientId || selectedBlockClientId
-		);
-		const selectionAfterEndClientId = getNextBlockClientId(
-			selectionEndClientId || selectedBlockClientId
-		);
-
-		const navigateUp = ( isTab && isShift ) || isUp;
-		const navigateDown = ( isTab && ! isShift ) || isDown;
+		const navigateUp = isUp || ( isTab && isShift );
+		const navigateDown = isDown || ( isTab && ! isShift );
 		// Move out of current nesting level (no effect if at root level).
 		const navigateOut = isLeft;
 		// Move into next nesting level (no effect if the current block has no innerBlocks).
 		const navigateIn = isRight;
 
-		let focusedBlockUid;
-		if ( navigateUp ) {
-			focusedBlockUid = selectionBeforeEndClientId;
-		} else if ( navigateDown ) {
-			focusedBlockUid = selectionAfterEndClientId;
-		} else if ( navigateOut ) {
-			focusedBlockUid =
-				getBlockRootClientId( selectedBlockClientId ) ??
-				selectedBlockClientId;
-		} else if ( navigateIn ) {
-			focusedBlockUid =
-				getClientIdsOfDescendants( selectedBlockClientId )[ 0 ] ??
-				selectedBlockClientId;
-		}
-		const startingBlockClientId = hasBlockMovingClientId();
-		if ( isEscape && startingBlockClientId && ! event.defaultPrevented ) {
-			setBlockMovingClientId( null );
-			event.preventDefault();
-		}
-		if ( ( isEnter || isSpace ) && startingBlockClientId ) {
-			const sourceRoot = getBlockRootClientId( startingBlockClientId );
-			const destRoot = getBlockRootClientId( selectedBlockClientId );
-			const sourceBlockIndex = getBlockIndex( startingBlockClientId );
-			let destinationBlockIndex = getBlockIndex( selectedBlockClientId );
-			if (
-				sourceBlockIndex < destinationBlockIndex &&
-				sourceRoot === destRoot
-			) {
-				destinationBlockIndex -= 1;
-			}
-			moveBlockToPosition(
-				startingBlockClientId,
-				sourceRoot,
-				destRoot,
-				destinationBlockIndex
-			);
-			selectBlock( startingBlockClientId );
-			setBlockMovingClientId( null );
-		}
-		// Prevent the block from being moved into itself.
-		if (
-			startingBlockClientId &&
-			selectedBlockClientId === startingBlockClientId &&
-			navigateIn
-		) {
-			return;
-		}
+		// Select mode block navigation.
 		if ( navigateDown || navigateUp || navigateOut || navigateIn ) {
+			let focusedBlockUid;
+			if ( navigateUp || navigateDown ) {
+				focusedBlockUid = navigateUp ? previous : next;
+			} else if ( navigateOut || navigateIn ) {
+				focusedBlockUid = navigateOut ? parent : firstChild;
+			}
+
+			// If a next block to focus was found, select it, else
+			// handle moving focus out of the block tree.
 			if ( focusedBlockUid ) {
 				event.preventDefault();
 				selectBlock( focusedBlockUid );
+			} else if ( ! isTab ) {
+				// Prevent screenreaders from moving beyond the bounds of
+				// the block list when using arrow key navigation.
+				event.preventDefault();
 			} else if ( isTab && selectedBlockClientId ) {
 				let nextTabbable;
 
@@ -229,6 +265,37 @@ function BlockSelectionButton( { clientId, rootClientId }, ref ) {
 					nextTabbable.focus();
 					clearSelectedBlock();
 				}
+			}
+		}
+
+		// Block moving mode.
+		const movingBlockClientId = hasBlockMovingClientId();
+		if ( movingBlockClientId ) {
+			if ( isEscape && ! event.defaultPrevented ) {
+				setBlockMovingClientId( null );
+				event.preventDefault();
+			}
+			if ( isEnter || isSpace ) {
+				const sourceRoot = getBlockRootClientId( movingBlockClientId );
+				const destRoot = getBlockRootClientId( selectedBlockClientId );
+				const sourceBlockIndex = getBlockIndex( movingBlockClientId );
+				let destinationBlockIndex = getBlockIndex(
+					selectedBlockClientId
+				);
+				if (
+					sourceBlockIndex < destinationBlockIndex &&
+					sourceRoot === destRoot
+				) {
+					destinationBlockIndex -= 1;
+				}
+				moveBlockToPosition(
+					movingBlockClientId,
+					sourceRoot,
+					destRoot,
+					destinationBlockIndex
+				);
+				selectBlock( movingBlockClientId );
+				setBlockMovingClientId( null );
 			}
 		}
 	}
