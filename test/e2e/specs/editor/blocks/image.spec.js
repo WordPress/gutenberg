@@ -945,7 +945,8 @@ test.describe( 'Image - lightbox', () => {
 		} ) => {
 			await editor.setContent( `<!-- wp:image {"id":${ uploadedMedia.id },"sizeSlug":"full","linkDestination":"none",
 			"lightbox":{"enabled":true},"style":{"spacing":{"margin":{"top":"var:preset|spacing|40","bottom":"var:preset|spacing|40","left":"var:preset|spacing|40","right":"var:preset|spacing|40"}}}} -->
-			<figure class="wp-block-image size-full" style="margin-top:var(--wp--preset--spacing--40);margin-right:var(--wp--preset--spacing--40);margin-bottom:var(--wp--preset--spacing--40);margin-left:var(--wp--preset--spacing--40)"><img src="${ uploadedMedia.source_url }" alt="" class="wp-image-${ uploadedMedia.id }"/></figure>
+			<figure class="wp-block-image size-full" style="margin-top:var(--wp--preset--spacing--40);margin-right:var(--wp--preset--spacing--40);margin-bottom:var(--wp--preset--spacing--40);margin-left:var(--wp--preset--spacing--40)">
+			<img src="${ uploadedMedia.source_url }" alt="" class="wp-image-${ uploadedMedia.id }"/></figure>
 			<!-- /wp:image --> ` );
 
 			const postId = await editor.publishPost();
