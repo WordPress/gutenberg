@@ -18,18 +18,19 @@ const RESIZING_THRESHOLDS: [ number, number ] = [ 10, 10 ]; // 10px.
 
 function CropWindow() {
 	const {
-		state: { size, offset, scale, isResizing },
+		state: { width, height, size, offset, scale, turns, isResizing },
 		refs: { cropperWindowRef },
 		dispatch,
 	} = useContext( ImageCropperContext );
 	const [ element, setElement ] = useState< HTMLDivElement >();
 	const initialMousePositionRef = useRef< Position >( { x: 0, y: 0 } );
+	const isAxisSwapped = turns % 2 !== 0;
 
 	return (
 		<Resizable
 			size={ size }
-			// maxWidth={ width }
-			// maxHeight={ height }
+			maxWidth={ isAxisSwapped ? height : width }
+			maxHeight={ isAxisSwapped ? width : height }
 			showHandle
 			// Emulate the resizing thresholds.
 			grid={ isResizing ? undefined : RESIZING_THRESHOLDS }
