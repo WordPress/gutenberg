@@ -456,7 +456,7 @@ Please refer to the [JavaScript Testing Overview docs](/docs/contributors/code/t
 
 All new components should add stories to the project's [Storybook](https://storybook.js.org/). Each [story](https://storybook.js.org/docs/react/get-started/whats-a-story) captures the rendered state of a UI component in isolation. This greatly simplifies working on a given component, while also serving as an interactive form of documentation.
 
-A component's story should be showcasing its different states — for example, the different variants of a  `Button`:
+A component's story should be showcasing its different states — for example, the different variants of a `Button`:
 
 ```jsx
 import Button from '../';
