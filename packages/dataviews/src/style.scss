@@ -793,8 +793,6 @@
 		background: $gray-100;
 		color: $gray-800;
 		position: relative;
-		display: flex;
-		align-items: center;
 
 		&.has-reset {
 			padding-inline-end: $button-size-small + $grid-unit-05;

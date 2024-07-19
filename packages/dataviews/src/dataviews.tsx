@@ -110,7 +110,7 @@ export default function DataViews< Item >( {
 				className="dataviews-filters__view-actions"
 			>
 				<HStack
-					justify="start"
+					justify="space-between"
 					className="dataviews-filters__container"
 					wrap
 				>
@@ -121,12 +121,11 @@ export default function DataViews< Item >( {
 							onChangeView={ onChangeView }
 						/>
 					) }
-					<Filters
+					<ViewActions
 						fields={ _fields }
 						view={ view }
 						onChangeView={ onChangeView }
-						openedFilter={ openedFilter }
-						setOpenedFilter={ setOpenedFilter }
+						defaultLayouts={ defaultLayouts }
 					/>
 				</HStack>
 				{ [ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type ) &&
@@ -139,13 +138,21 @@ export default function DataViews< Item >( {
 							getItemId={ getItemId }
 						/>
 					) }
-				<ViewActions
+			</HStack>
+			<HStack
+				style={ { paddingTop: 0 } }
+				justify="start"
+				className="dataviews-filters__view-actions"
+			>
+				<Filters
 					fields={ _fields }
 					view={ view }
 					onChangeView={ onChangeView }
-					defaultLayouts={ defaultLayouts }
+					openedFilter={ openedFilter }
+					setOpenedFilter={ setOpenedFilter }
 				/>
 			</HStack>
+
 			<ViewComponent
 				actions={ actions }
 				data={ data }
