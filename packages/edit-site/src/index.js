@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { store as blocksStore } from '@wordpress/blocks';
+import {
+	store as blocksStore,
+	privateApis as blocksPrivateApis,
+} from '@wordpress/blocks';
 import {
 	registerCoreBlocks,
 	__experimentalGetCoreBlocks,
@@ -46,6 +49,18 @@ export function initializeEditor( id, settings ) {
 		( { name } ) => name !== 'core/freeform'
 	);
 	registerCoreBlocks( coreBlocks );
+	// Bootstrap block bindings sources from the server.
+	if ( settings?.blockBindings ) {
+		const { registerBlockBindingsSource } = unlock( blocksPrivateApis );
+		for ( const [ name, args ] of Object.entries(
+			settings.blockBindings
+		) ) {
+			registerBlockBindingsSource( {
+				name,
+				...args,
+			} );
+		}
+	}
 	registerCoreBlockBindingsSources();
 	dispatch( blocksStore ).setFreeformFallbackBlockName( 'core/html' );
 	registerLegacyWidgetBlock( { inserter: false } );
