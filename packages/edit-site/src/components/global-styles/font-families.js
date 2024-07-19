@@ -26,7 +26,8 @@ import { unlock } from '../../lock-unlock';
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 
 function FontFamilies() {
-	const { modalTabOpen, setModalTabOpen } = useContext( FontLibraryContext );
+	const { modalTabOpen, setModalTabOpen, setNotice } =
+		useContext( FontLibraryContext );
 	const [ fontFamilies ] = useGlobalSetting( 'typography.fontFamilies' );
 	const themeFonts = fontFamilies?.theme
 		? fontFamilies.theme
@@ -96,11 +97,13 @@ function FontFamilies() {
 					className="edit-site-global-styles-font-families__manage-fonts"
 					variant="secondary"
 					__next40pxDefaultSize
-					onClick={ () =>
+					onClick={ () => {
+						// Reset notice when opening the modal.
+						setNotice( null );
 						setModalTabOpen(
 							hasFonts ? 'installed-fonts' : 'upload-fonts'
-						)
-					}
+						);
+					} }
 				>
 					{ hasFonts ? __( 'Manage fonts' ) : __( 'Add fonts' ) }
 				</Button>
