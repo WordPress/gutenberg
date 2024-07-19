@@ -11,10 +11,6 @@ export default {
 	label: _x( 'Pattern Overrides', 'block bindings source' ),
 	getValues( { registry, clientId, context, sourceBindings } ) {
 		const patternOverridesContent = context[ 'pattern/overrides' ];
-		if ( ! patternOverridesContent ) {
-			return {};
-		}
-
 		const { getBlockAttributes } = registry.select( blockEditorStore );
 		const currentBlockAttributes = getBlockAttributes( clientId );
 
@@ -24,8 +20,16 @@ export default {
 				patternOverridesContent?.[
 					currentBlockAttributes?.metadata?.name
 				]?.[ attributeName ];
-			overridesValues[ attributeName ] =
-				overridableValue === '' ? undefined : overridableValue;
+
+			// If it has not been overriden, return the original value.
+			if ( ! overridableValue ) {
+				overridesValues[ attributeName ] =
+					currentBlockAttributes[ attributeName ];
+				continue;
+			} else {
+				overridesValues[ attributeName ] =
+					overridableValue === '' ? undefined : overridableValue;
+			}
 		}
 		return overridesValues;
 	},
