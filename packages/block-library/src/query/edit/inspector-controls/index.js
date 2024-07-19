@@ -6,7 +6,6 @@ import {
 	TextControl,
 	SelectControl,
 	RangeControl,
-	ToggleControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	Notice,
@@ -101,6 +100,10 @@ export default function QueryInspectorControls( props ) {
 		return onChangeDebounced.cancel;
 	}, [ querySearch, onChangeDebounced ] );
 	const showInheritControl = isControlAllowed( allowedControls, 'inherit' );
+	const inheritControlLabel = __( 'Contents' );
+	const inheritControlHelp = __(
+		"Block will display items matching the page's context, e.g. category archive or search result"
+	);
 	const showPostTypeControl =
 		! inherit && isControlAllowed( allowedControls, 'postType' );
 	const postTypeControlLabel = __( 'Content type' );
@@ -146,17 +149,24 @@ export default function QueryInspectorControls( props ) {
 			{ showSettingsPanel && (
 				<PanelBody title={ __( 'Settings' ) }>
 					{ showInheritControl && (
-						<ToggleControl
-							__nextHasNoMarginBottom
-							label={ __( 'Inherit query from template' ) }
-							help={ __(
-								'Enable to use the global query context that is set with the current template, such as an archive or search. Disable to customize the settings independently.'
-							) }
-							checked={ !! inherit }
-							onChange={ ( value ) =>
-								setQuery( { inherit: !! value } )
-							}
-						/>
+						<ToggleGroupControl
+							label={ inheritControlLabel }
+							isBlock
+							onChange={ ( value ) => {
+								setQuery( { inherit: !! value } );
+							} }
+							help={ !! inherit ? inheritControlHelp : '' }
+							value={ !! inherit }
+						>
+							<ToggleGroupControlOption
+								value
+								label={ __( 'Default' ) }
+							/>
+							<ToggleGroupControlOption
+								value={ false }
+								label={ __( 'Custom' ) }
+							/>
+						</ToggleGroupControl>
 					) }
 					{ showPostTypeControl &&
 						( postTypesSelectOptions.length > 2 ? (
