@@ -49,7 +49,7 @@ export function initializeEditor( id, settings ) {
 		( { name } ) => name !== 'core/freeform'
 	);
 	registerCoreBlocks( coreBlocks );
-	bootstrapBlockBindingsSourcesFromServer( settings?.blockBindings );
+	bootstrapBlockBindingsSourcesFromServer( settings?.blockBindingsSources );
 	registerCoreBlockBindingsSources();
 	dispatch( blocksStore ).setFreeformFallbackBlockName( 'core/html' );
 	registerLegacyWidgetBlock( { inserter: false } );

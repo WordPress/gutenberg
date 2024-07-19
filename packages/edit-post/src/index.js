@@ -88,7 +88,7 @@ export function initializeEditor(
 	}
 
 	registerCoreBlocks();
-	bootstrapBlockBindingsSourcesFromServer( settings?.blockBindings );
+	bootstrapBlockBindingsSourcesFromServer( settings?.blockBindingsSources );
 	registerCoreBlockBindingsSources();
 	registerLegacyWidgetBlock( { inserter: false } );
 	registerWidgetGroupBlock( { inserter: false } );

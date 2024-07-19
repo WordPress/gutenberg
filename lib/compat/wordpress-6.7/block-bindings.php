@@ -15,22 +15,22 @@
  */
 function gutenberg_add_server_block_bindings_sources_to_editor_settings( $editor_settings ) {
 	// Check if the sources are already exposed in the editor settings.
-	if ( isset( $editor_settings['blockBindings'] ) ) {
+	if ( isset( $editor_settings['blockBindingsSources'] ) ) {
 		return $editor_settings;
 	}
 
 	$registered_block_bindings_sources = get_all_registered_block_bindings_sources();
 	if ( ! empty( $registered_block_bindings_sources ) ) {
 		// Initialize array.
-		$editor_settings['blockBindings'] = array();
+		$editor_settings['blockBindingsSources'] = array();
 		foreach ( $registered_block_bindings_sources as $source_name => $source_properties ) {
 			// Add source with the label to editor settings.
-			$editor_settings['blockBindings'][ $source_name ] = array(
+			$editor_settings['blockBindingsSources'][ $source_name ] = array(
 				'label' => $source_properties->label,
 			);
 			// Add `usesContext` property if exists.
 			if ( ! empty( $source_properties->uses_context ) ) {
-				$editor_settings['blockBindings'][ $source_name ]['usesContext'] = $source_properties->uses_context;
+				$editor_settings['blockBindingsSources'][ $source_name ]['usesContext'] = $source_properties->uses_context;
 			}
 		}
 	}
