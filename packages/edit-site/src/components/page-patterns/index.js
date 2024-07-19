@@ -252,7 +252,6 @@ export default function DataviewsPatterns() {
 	const {
 		params: { postType, categoryId: categoryIdFromURL },
 	} = useLocation();
-	const [ selection, setSelection ] = useState( [] );
 	const type = postType || PATTERN_TYPES.user;
 	const categoryId = categoryIdFromURL || PATTERN_DEFAULT_CATEGORY;
 	const [ view, setView ] = useState( DEFAULT_VIEW );
@@ -410,8 +409,6 @@ export default function DataviewsPatterns() {
 					isLoading={ isResolving }
 					view={ view }
 					onChangeView={ setView }
-					selection={ selection }
-					onChangeSelection={ setSelection }
 					defaultLayouts={ defaultLayouts }
 				/>
 			</Page>

@@ -81,7 +81,7 @@ export default function DataViews< Item >( {
 	function setSelectionWithChange( value: SelectionOrUpdater ) {
 		const newValue =
 			typeof value === 'function' ? value( selection ) : value;
-		if ( ! isUncontrolled ) {
+		if ( isUncontrolled ) {
 			setSelectionState( newValue );
 		}
 		if ( onChangeSelection ) {
