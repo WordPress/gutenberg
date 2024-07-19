@@ -69,10 +69,13 @@ export default function DensityPicker( {
 				return 0;
 			}
 			const breakValues = viewportBreaks[ viewport ];
-			if ( _density >= breakValues.min && _density <= breakValues.max ) {
-				return _density;
+			if ( _density < breakValues.min ) {
+				return breakValues.min;
 			}
-			return breakValues.default;
+			if ( _density > breakValues.max ) {
+				return breakValues.max;
+			}
+			return _density;
 		} );
 	}, [ setDensity, viewport ] );
 	if ( ! viewport ) {
