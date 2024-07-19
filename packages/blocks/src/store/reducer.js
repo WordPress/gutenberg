@@ -374,23 +374,15 @@ export function collections( state = {}, action ) {
 export function blockBindingsSources( state = {}, action ) {
 	switch ( action.type ) {
 		case 'ADD_BLOCK_BINDINGS_SOURCE':
-			// Filter the name property, the type property, and the undefined values.
-			const newProperties = Object.fromEntries(
-				Object.entries( action ).filter(
-					( [ key, value ] ) =>
-						value !== undefined && key !== 'name' && key !== 'type'
-				)
-			);
-
 			return {
 				...state,
 				[ action.name ]: {
-					// Keep the existing properties if it has been bootstrapped.
-					...state[ action.name ],
-					// Update with the new properties.
-					...newProperties,
-					canUserEditValue:
-						action.canUserEditValue || ( () => false ),
+					// Don't override the label if it's already set.
+					label: state[ action.name ]?.label || action.label,
+					getValues: action.getValues,
+					setValues: action.setValues,
+					getPlaceholder: action.getPlaceholder,
+					canUserEditValue: action.canUserEditValue,
 				},
 			};
 		case 'ADD_BOOTSTRAPPED_BLOCK_BINDINGS_SOURCE':
@@ -398,10 +390,6 @@ export function blockBindingsSources( state = {}, action ) {
 				...state,
 				[ action.name ]: {
 					label: action.label,
-					getValues: action.getValues,
-					setValues: action.setValues,
-					getPlaceholder: action.getPlaceholder,
-					canUserEditValue: action.canUserEditValue,
 					usesContext: action.usesContext,
 				},
 			};

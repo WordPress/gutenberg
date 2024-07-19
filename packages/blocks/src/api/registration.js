@@ -806,9 +806,9 @@ export const registerBlockBindingsSource = ( source ) => {
 
 	/*
 	 * Check if the source has been already registered on the client.
-	 * If the `getValue` property is defined, it could be assumed the source is already registered.
+	 * If the `getValues` property is defined, it could be assumed the source is already registered.
 	 */
-	if ( existingSource?.getValue ) {
+	if ( existingSource?.getValues ) {
 		warning(
 			'Block bindings source "' + name + '" is already registered.'
 		);
@@ -891,7 +891,14 @@ export const registerBlockBindingsSource = ( source ) => {
 		return;
 	}
 
-	return unlock( dispatch( blocksStore ) ).addBlockBindingsSource( source );
+	return unlock( dispatch( blocksStore ) ).addBlockBindingsSource( {
+		name,
+		label,
+		getValues,
+		setValues,
+		getPlaceholder,
+		canUserEditValue,
+	} );
 };
 
 /**
