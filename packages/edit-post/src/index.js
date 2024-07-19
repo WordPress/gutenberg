@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	store as blocksStore,
-	privateApis as blocksPrivateApis,
-} from '@wordpress/blocks';
+import { store as blocksStore } from '@wordpress/blocks';
 import {
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
@@ -32,6 +29,7 @@ const {
 	BackButton: __experimentalMainDashboardButton,
 	registerDefaultActions,
 	registerCoreBlockBindingsSources,
+	bootstrapBlockBindingsSourcesFromServer,
 } = unlock( editorPrivateApis );
 
 /**
@@ -90,18 +88,7 @@ export function initializeEditor(
 	}
 
 	registerCoreBlocks();
-	// Bootstrap block bindings sources from the server.
-	if ( settings?.blockBindings ) {
-		const { bootstrapBlockBindingsSource } = unlock( blocksPrivateApis );
-		for ( const [ name, args ] of Object.entries(
-			settings.blockBindings
-		) ) {
-			bootstrapBlockBindingsSource( {
-				name,
-				...args,
-			} );
-		}
-	}
+	bootstrapBlockBindingsSourcesFromServer( settings?.blockBindings );
 	registerCoreBlockBindingsSources();
 	registerLegacyWidgetBlock( { inserter: false } );
 	registerWidgetGroupBlock( { inserter: false } );
