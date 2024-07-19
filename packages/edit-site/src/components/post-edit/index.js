@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -14,7 +19,7 @@ import { useState, useMemo } from '@wordpress/element';
 import Page from '../page';
 import usePostFields from '../post-fields';
 
-export function PostEdit( { postType, postId } ) {
+function PostEditForm( { postType, postId } ) {
 	const { item } = useSelect(
 		( select ) => {
 			return {
@@ -45,21 +50,37 @@ export function PostEdit( { postType, postId } ) {
 		setEdits( {} );
 	};
 
+	if ( ! item ) {
+		return null;
+	}
+
 	return (
-		<Page className="edit-site-post-edit" label={ __( 'Post Edit' ) }>
-			{ item && (
-				<form onSubmit={ onSubmit }>
-					<DataForm
-						data={ itemWithEdits }
-						fields={ fields }
-						form={ form }
-						onChange={ setEdits }
-					/>
-					<Button variant="primary" type="submit">
-						{ __( 'Update' ) }
-					</Button>
-				</form>
+		<form onSubmit={ onSubmit }>
+			<DataForm
+				data={ itemWithEdits }
+				fields={ fields }
+				form={ form }
+				onChange={ setEdits }
+			/>
+			<Button variant="primary" type="submit">
+				{ __( 'Update' ) }
+			</Button>
+		</form>
+	);
+}
+
+export function PostEdit( { postType, postId } ) {
+	return (
+		<Page
+			className={ clsx( 'edit-site-post-edit', {
+				'is-empty': ! postId,
+			} ) }
+			label={ __( 'Post Edit' ) }
+		>
+			{ postId && (
+				<PostEditForm postType={ postType } postId={ postId } />
 			) }
+			{ ! postId && <p>{ __( 'Select a page to edit' ) }</p> }
 		</Page>
 	);
 }
