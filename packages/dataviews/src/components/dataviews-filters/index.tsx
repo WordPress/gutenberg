@@ -15,7 +15,7 @@ import { sanitizeOperators } from '../../utils';
 import { ALL_OPERATORS, OPERATOR_IS, OPERATOR_IS_NOT } from '../../constants';
 import type { NormalizedFilter } from '../../types';
 
-function _Filters() {
+function Filters() {
 	const { fields, view, onChangeView, openedFilter, setOpenedFilter } =
 		useContext( DataViewsContext );
 	const addFilterRef = useRef< HTMLButtonElement >( null );
@@ -108,7 +108,4 @@ function _Filters() {
 	);
 }
 
-// A type assertion is used here to keep the type argument.
-const Filters = memo( _Filters );
-
-export default Filters;
+export default memo( Filters );
