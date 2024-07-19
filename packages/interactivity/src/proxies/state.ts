@@ -25,19 +25,34 @@ type WellKnownSymbols =
 	| 'toStringTag'
 	| 'unscopables';
 
-const proxyToProps: WeakMap<
-	object,
-	Map< string | symbol, PropSignal >
-> = new WeakMap();
-
-const objToIterable = new WeakMap< object, Signal< number > >();
-
+/**
+ * Set of built-in symbols.
+ */
 const wellKnownSymbols = new Set(
 	Object.getOwnPropertyNames( Symbol )
 		.map( ( key ) => Symbol[ key as WellKnownSymbols ] )
 		.filter( ( value ) => typeof value === 'symbol' )
 );
 
+/**
+ * Relates each proxy with a map of {@link PropSignal} instances, representing
+ * the proxy's accessed properties.
+ */
+const proxyToProps: WeakMap<
+	object,
+	Map< string | symbol, PropSignal >
+> = new WeakMap();
+
+/**
+ * Relates each proxied object (i.e., the original object) with a signal that
+ * tracks changes in the number of properties.
+ */
+const objToIterable = new WeakMap< object, Signal< number > >();
+
+/**
+ * When this flag is `true`, it avoids any signal subscription, overriding state
+ * props' "reactive" behavior.
+ */
 let peeking = false;
 
 const stateHandlers: ProxyHandler< object > = {
