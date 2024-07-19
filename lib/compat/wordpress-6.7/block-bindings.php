@@ -14,6 +14,11 @@
  * @return array The editor settings including the block bindings sources.
  */
 function gutenberg_add_server_block_bindings_sources_to_editor_settings( $editor_settings ) {
+	// Check if the sources are already exposed in the editor settings.
+	if ( isset( $editor_settings['blockBindings'] ) ) {
+		return $editor_settings;
+	}
+
 	$registered_block_bindings_sources = get_all_registered_block_bindings_sources();
 	if ( ! empty( $registered_block_bindings_sources ) ) {
 		// Initialize array.
