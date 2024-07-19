@@ -1,5 +1,9 @@
 .components-radio-control__option {
-	display: flex;
+	display: grid;
+	grid-template-columns: auto 1fr;
+	grid-template-rows: auto minmax(0, max-content);
+	column-gap: $grid-unit-10;
+	row-gap: 0;
 	align-items: center;
 }
 
@@ -28,10 +32,33 @@
 }
 
 .components-radio-control__label {
+	grid-column: 2;
+	grid-row: 1 / -1;
+
+	display: grid;
+	grid-template-rows: subgrid;
+	align-items: center;
+
 	cursor: pointer;
 	line-height: $radio-input-size-sm;
 
 	@include break-small() {
 		line-height: $radio-input-size;
 	}
+}
+
+.components-radio-control__label-text {
+	grid-column: 1;
+	grid-row: 1;
+}
+
+.components-radio-control__help-text {
+	grid-column: 1;
+	grid-row: 2;
+
+	font-size: $helptext-font-size;
+	font-style: normal;
+	font-weight: normal;
+	line-height: $default-line-height;
+	color: $components-color-gray-700;
 }

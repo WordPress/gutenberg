@@ -68,3 +68,14 @@ Default.args = {
 		{ label: 'Password Protected', value: 'password' },
 	],
 };
+
+export const WithOptionHelpText: StoryFn< typeof RadioControl > = Template.bind(
+	{}
+);
+WithOptionHelpText.args = {
+	...Default.args,
+	options: Default.args.options?.map( ( option ) => ( {
+		...option,
+		helpText: 'This is some help text',
+	} ) ),
+};

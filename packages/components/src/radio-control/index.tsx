@@ -96,7 +96,17 @@ export function RadioControl(
 							className="components-radio-control__label"
 							htmlFor={ `${ id }-${ index }` }
 						>
-							{ option.label }
+							<span className="components-radio-control__label-text">
+								{ option.label }
+							</span>
+							{ !! option.helpText ? (
+								<span
+									aria-hidden="true"
+									className="components-radio-control__help-text"
+								>
+									{ option.helpText }
+								</span>
+							) : null }
 						</label>
 					</div>
 				) ) }
