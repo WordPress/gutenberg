@@ -51,11 +51,11 @@ export function initializeEditor( id, settings ) {
 	registerCoreBlocks( coreBlocks );
 	// Bootstrap block bindings sources from the server.
 	if ( settings?.blockBindings ) {
-		const { registerBlockBindingsSource } = unlock( blocksPrivateApis );
+		const { bootstrapBlockBindingsSource } = unlock( blocksPrivateApis );
 		for ( const [ name, args ] of Object.entries(
 			settings.blockBindings
 		) ) {
-			registerBlockBindingsSource( {
+			bootstrapBlockBindingsSource( {
 				name,
 				...args,
 			} );

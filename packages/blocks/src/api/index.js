@@ -7,6 +7,7 @@ import {
 	unregisterBlockBindingsSource,
 	getBlockBindingsSource,
 	getBlockBindingsSources,
+	bootstrapBlockBindingsSource,
 } from './registration';
 
 // The blocktype is the most important concept within the block API. It defines
@@ -182,4 +183,5 @@ lock( privateApis, {
 	unregisterBlockBindingsSource,
 	getBlockBindingsSource,
 	getBlockBindingsSources,
+	bootstrapBlockBindingsSource,
 } );
