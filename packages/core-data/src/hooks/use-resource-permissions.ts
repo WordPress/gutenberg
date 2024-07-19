@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
-import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -122,7 +121,7 @@ export default function useResourcePermissions< IdType = void >(
 	// as an object literal, then it will be a different object on each call even
 	// if the values remain the same.
 	const resourceAsString =
-		typeof resource === 'object' ? addQueryArgs( '', resource ) : resource;
+		typeof resource === 'object' ? JSON.stringify( resource ) : resource;
 
 	return useQuerySelect(
 		( resolve ) => {
