@@ -435,13 +435,11 @@ class SinceTagSniff implements Sniff {
 	}
 
 	/**
-	 * Finds the docblock associated with a hook, starting from a specified position in the token stack.
-	 * Since a line containing a hook can include any type of tokens, this method backtracks through the tokens
-	 * to locate the first token on the current line. This token is then used as the starting point for searching the docblock.
+	 * Finds the first token on the previous line relative to the stack pointer passed to the method.
 	 *
 	 * @param File $phpcs_file    The file being scanned.
-	 * @param int  $stack_pointer The position to start looking for the docblock.
-	 * @return int|false The last token on the previous line.
+	 * @param int  $stack_pointer The position to find the previous line token from.
+	 * @return int|false The last token on the previous line, or false if not found.
 	 */
 	protected static function find_previous_line_token( File $phpcs_file, $stack_pointer ) {
 		$tokens       = $phpcs_file->getTokens();
