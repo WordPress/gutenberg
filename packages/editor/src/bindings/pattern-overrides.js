@@ -1,14 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { _x } from '@wordpress/i18n';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 const CONTENT = 'content';
 
 export default {
 	name: 'core/pattern-overrides',
-	label: _x( 'Pattern Overrides', 'block bindings source' ),
 	getValue( { registry, clientId, context, attributeName } ) {
 		const patternOverridesContent = context[ 'pattern/overrides' ];
 		const { getBlockAttributes } = registry.select( blockEditorStore );
