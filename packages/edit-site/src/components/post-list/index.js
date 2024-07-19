@@ -297,10 +297,11 @@ export default function PostList( { postType } ) {
 				header={
 					postType === 'page' && (
 						<Button
+							size="compact"
 							isPressed={ quickEdit }
 							icon={ drawerLeft }
 							label={
-								quickEdit
+								! quickEdit
 									? __( 'Show quick edit sidebar' )
 									: __( 'Close quick edit sidebar' )
 							}
