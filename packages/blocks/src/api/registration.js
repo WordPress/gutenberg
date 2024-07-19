@@ -873,7 +873,7 @@ export const registerBlockBindingsSource = ( source ) => {
 	}
 
 	// Check the `label` property is correct.
-	if ( ! label ) {
+	if ( ! label && ! existingSource?.label ) {
 		warning( 'Block bindings source must contain a label.' );
 		return;
 	}
