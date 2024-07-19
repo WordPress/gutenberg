@@ -294,6 +294,7 @@ export default function DataviewsPatterns() {
 			{
 				header: __( 'Title' ),
 				id: 'title',
+				getValue: ( { item } ) => item.title?.raw || item.title,
 				render: ( { item } ) => <Title item={ item } />,
 				enableHiding: false,
 			},
