@@ -4,12 +4,7 @@
 	"compilerOptions": {
 		"rootDir": "src",
 		"declarationDir": "build-types",
-		"types": [
-			"gutenberg-env",
-			"gutenberg-test-env",
-			"jest",
-			"@testing-library/jest-dom"
-		]
+		"types": [ "gutenberg-env" ]
 	},
 	"references": [
 		{ "path": "../a11y" },
@@ -31,13 +26,15 @@
 		{ "path": "../rich-text" },
 		{ "path": "../warning" }
 	],
-	"include": [ "src/**/*" ],
+	"include": [ "src" ],
 	"exclude": [
 		"src/**/*.android.js",
 		"src/**/*.ios.js",
 		"src/**/*.native.js",
 		"src/**/react-native-*",
-		"src/**/stories/**/*.js", // only exclude js files, tsx files should be checked
-		"src/**/test/**/*.js" // only exclude js files, ts{x} files should be checked
+
+		// Stories and tests are included in another project.
+		"src/**/stories",
+		"src/**/test"
 	]
 }

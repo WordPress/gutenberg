@@ -2,6 +2,7 @@
  * External dependencies
  */
 import type { Meta, StoryFn } from '@storybook/react';
+import type { CSSProperties } from 'react';
 
 /**
  * WordPress dependencies
@@ -91,11 +92,13 @@ MultipleOrigins.args = {
 export const CSSVariables: StoryFn< typeof ColorPalette > = ( args ) => {
 	return (
 		<div
-			style={ {
-				'--red': '#f00',
-				'--yellow': '#ff0',
-				'--blue': '#00f',
-			} }
+			style={
+				{
+					'--red': '#f00',
+					'--yellow': '#ff0',
+					'--blue': '#00f',
+				} as CSSProperties
+			}
 		>
 			<Template { ...args } />
 		</div>

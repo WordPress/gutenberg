@@ -32,7 +32,7 @@ export default function ClipboardButton( {
 		alternative: 'wp.compose.useCopyToClipboard',
 	} );
 
-	const timeoutId = useRef< NodeJS.Timeout >();
+	const timeoutId = useRef< number >();
 	const ref = useCopyToClipboard( text, () => {
 		onCopy();
 		if ( timeoutId.current ) {
