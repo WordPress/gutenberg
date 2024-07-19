@@ -7,8 +7,8 @@ import { useViewportMatch } from '@wordpress/compose';
 import { plus, lineSolid } from '@wordpress/icons';
 import { useEffect } from '@wordpress/element';
 
-const viewPortBreaks = {
-	xhuge: { min: 3, max: 5, default: 5 },
+const viewportBreaks = {
+	xhuge: { min: 3, max: 6, default: 5 },
 	huge: { min: 2, max: 4, default: 4 },
 	xlarge: { min: 2, max: 3, default: 3 },
 	large: { min: 1, max: 2, default: 2 },
@@ -40,6 +40,12 @@ function useViewPortBreakpoint() {
 	return null;
 }
 
+// Value is number from 0 to 100 representing how big an item is in the grid
+// 100 being the biggest and 0 being the smallest.
+// The size is relative to the viewport size, if one a given viewport the
+// number of allowed items in a grid is 3 to 6 a 0 ( the smallest ) will mean that the grid will
+// have 6 items in a row, a 100 ( the biggest ) will mean that the grid will have 3 items in a row.
+// A value of 75 will mean that the grid will have 4 items in a row.
 function getRangeValue(
 	density: number,
 	breakValues: { min: number; max: number; default: number }
@@ -54,16 +60,25 @@ export default function DensityPicker( {
 	setDensity,
 }: {
 	density: number;
-	setDensity: ( density: number ) => void;
+	setDensity: React.Dispatch< React.SetStateAction< number > >;
 } ) {
-	const viewPort = useViewPortBreakpoint();
+	const viewport = useViewPortBreakpoint();
 	useEffect( () => {
-		setDensity( 0 );
-	}, [ setDensity, viewPort ] );
-	if ( ! viewPort ) {
+		setDensity( ( _density ) => {
+			if ( ! viewport || ! _density ) {
+				return 0;
+			}
+			const breakValues = viewportBreaks[ viewport ];
+			if ( _density >= breakValues.min && _density <= breakValues.max ) {
+				return _density;
+			}
+			return breakValues.default;
+		} );
+	}, [ setDensity, viewport ] );
+	if ( ! viewport ) {
 		return null;
 	}
-	const breakValues = viewPortBreaks[ viewPort ];
+	const breakValues = viewportBreaks[ viewport ];
 	const densityToUse = density || breakValues.default;
 	const rangeValue = getRangeValue( densityToUse, breakValues );
 
