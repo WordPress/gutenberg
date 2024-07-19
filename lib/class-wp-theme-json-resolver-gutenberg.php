@@ -764,7 +764,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @return array
 	 */
 	public static function get_style_variations( $scope = 'theme' ) {
-		return static::get_style_variations_from_directory( get_stylesheet_directory() );
+		return static::get_style_variations_from_directory( get_stylesheet_directory(), $scope );
 	}
 
 	/**
