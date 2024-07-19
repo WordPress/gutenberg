@@ -7,15 +7,16 @@ import {
 	Modal,
 } from '@wordpress/components';
 import { __, sprintf, _n } from '@wordpress/i18n';
-import { useMemo, useState, useCallback } from '@wordpress/element';
+import { useMemo, useState, useCallback, useContext } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { unlock } from './lock-unlock';
-import type { Action, ActionModal } from './types';
-import type { SetSelection } from './private-types';
+import DataViewsContext from '../dataviews-context';
+import { LAYOUT_TABLE, LAYOUT_GRID } from '../../constants';
+import { unlock } from '../../lock-unlock';
+import type { Action, ActionModal } from '../../types';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -41,14 +42,6 @@ interface ActionsMenuGroupProps< Item > {
 	actions: Action< Item >[];
 	selectedItems: Item[];
 	setActionWithModal: ( action?: ActionModal< Item > ) => void;
-}
-
-interface BulkActionsProps< Item > {
-	data: Item[];
-	actions: Action< Item >[];
-	selection: string[];
-	onChangeSelection: SetSelection;
-	getItemId: ( item: Item ) => string;
 }
 
 export function useHasAPossibleBulkAction< Item >(
@@ -105,7 +98,7 @@ function ActionWithModal< Item >( {
 			title={ ! hideModalHeader ? label : undefined }
 			__experimentalHideHeader={ !! hideModalHeader }
 			onRequestClose={ onCloseModal }
-			overlayClassName="dataviews-action-modal"
+			overlayClassName="dataviews-bulk-actions__modal"
 		>
 			<RenderModal
 				items={ eligibleItems }
@@ -180,20 +173,21 @@ function ActionsMenuGroup< Item >( {
 	);
 }
 
-export default function BulkActions< Item >( {
-	data,
-	actions,
-	selection,
-	onChangeSelection,
-	getItemId,
-}: BulkActionsProps< Item > ) {
+function _BulkActions() {
+	const {
+		data,
+		actions = [],
+		selection,
+		onChangeSelection,
+		getItemId,
+	} = useContext( DataViewsContext );
 	const bulkActions = useMemo(
 		() => actions.filter( ( action ) => action.supportsBulk ),
 		[ actions ]
 	);
 	const [ isMenuOpen, onMenuOpenChange ] = useState( false );
 	const [ actionWithModal, setActionWithModal ] = useState<
-		ActionModal< Item > | undefined
+		ActionModal< any > | undefined
 	>();
 	const selectableItems = useMemo( () => {
 		return data.filter( ( item ) => {
@@ -227,7 +221,7 @@ export default function BulkActions< Item >( {
 				style={ { minWidth: '240px' } }
 				trigger={
 					<Button
-						className="dataviews-bulk-edit-button"
+						className="dataviews-bulk-actions__edit-button"
 						__next40pxDefaultSize
 						variant="tertiary"
 						size="compact"
@@ -287,4 +281,20 @@ export default function BulkActions< Item >( {
 			) }
 		</>
 	);
+}
+
+export default function BulkActions() {
+	const { data, actions = [], view } = useContext( DataViewsContext );
+	const hasPossibleBulkAction = useSomeItemHasAPossibleBulkAction(
+		actions,
+		data
+	);
+	if (
+		! [ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type ) ||
+		! hasPossibleBulkAction
+	) {
+		return null;
+	}
+
+	return <_BulkActions />;
 }

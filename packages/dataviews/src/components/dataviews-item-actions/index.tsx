@@ -20,8 +20,8 @@ import { useRegistry } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { unlock } from './lock-unlock';
-import type { Action, ActionModal as ActionModalType } from './types';
+import { unlock } from '../../lock-unlock';
+import type { Action, ActionModal as ActionModalType } from '../../types';
 
 const {
 	DropdownMenuV2: DropdownMenu,

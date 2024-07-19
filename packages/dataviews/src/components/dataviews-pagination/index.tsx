@@ -6,29 +6,21 @@ import {
 	__experimentalHStack as HStack,
 	SelectControl,
 } from '@wordpress/components';
-import { createInterpolateElement, memo } from '@wordpress/element';
+import { createInterpolateElement, memo, useContext } from '@wordpress/element';
 import { sprintf, __, _x } from '@wordpress/i18n';
 import { next, previous } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import type { View } from './types';
+import DataViewsContext from '../dataviews-context';
 
-interface PaginationProps {
-	view: View;
-	onChangeView: ( view: View ) => void;
-	paginationInfo: {
-		totalItems: number;
-		totalPages: number;
-	};
-}
-
-const Pagination = memo( function Pagination( {
-	view,
-	onChangeView,
-	paginationInfo: { totalItems = 0, totalPages },
-}: PaginationProps ) {
+function DataViewsPagination() {
+	const {
+		view,
+		onChangeView,
+		paginationInfo: { totalItems = 0, totalPages },
+	} = useContext( DataViewsContext );
 	if ( ! totalItems || ! totalPages ) {
 		return null;
 	}
@@ -113,6 +105,6 @@ const Pagination = memo( function Pagination( {
 			</HStack>
 		)
 	);
-} );
+}
 
-export default Pagination;
+export default memo( DataViewsPagination );

@@ -8,7 +8,7 @@ import {
 	__unstableMotion as motion,
 	__unstableAnimatePresence as AnimatePresence,
 } from '@wordpress/components';
-import { useMemo, useState, useRef } from '@wordpress/element';
+import { useMemo, useState, useRef, useContext } from '@wordpress/element';
 import { _n, sprintf, __ } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
 import { useReducedMotion } from '@wordpress/compose';
@@ -17,10 +17,13 @@ import { useRegistry } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { ActionWithModal } from './item-actions';
-import type { Action } from './types';
-import type { ActionTriggerProps } from './item-actions';
-import type { SetSelection } from './private-types';
+import { useSomeItemHasAPossibleBulkAction } from '../dataviews-bulk-actions';
+import DataViewsContext from '../dataviews-context';
+import { ActionWithModal } from '../dataviews-item-actions';
+import { LAYOUT_GRID, LAYOUT_TABLE } from '../../constants';
+import type { Action } from '../../types';
+import type { ActionTriggerProps } from '../dataviews-item-actions';
+import type { SetSelection } from '../../private-types';
 
 interface ActionButtonProps< Item > {
 	action: Action< Item >;
@@ -34,14 +37,6 @@ interface ToolbarContentProps< Item > {
 	actionsToShow: Action< Item >[];
 	selectedItems: Item[];
 	onChangeSelection: SetSelection;
-}
-
-interface BulkActionsToolbarProps< Item > {
-	data: Item[];
-	selection: string[];
-	actions: Action< Item >[];
-	onChangeSelection: SetSelection;
-	getItemId: ( item: Item ) => string;
 }
 
 const SNACKBAR_VARIANTS = {
@@ -136,7 +131,7 @@ function renderToolbarContent< Item >(
 	return (
 		<>
 			<ToolbarGroup>
-				<div className="dataviews-bulk-actions__selection-count">
+				<div className="dataviews-bulk-actions-toolbar__selection-count">
 					{ selection.length === 1
 						? __( '1 item selected' )
 						: sprintf(
@@ -214,13 +209,14 @@ function ToolbarContent< Item >( {
 	return buttons.current;
 }
 
-export default function BulkActionsToolbar< Item >( {
-	data,
-	selection,
-	actions = EMPTY_ARRAY,
-	onChangeSelection,
-	getItemId,
-}: BulkActionsToolbarProps< Item > ) {
+function _BulkActionsToolbar() {
+	const {
+		data,
+		selection,
+		actions = EMPTY_ARRAY,
+		onChangeSelection,
+		getItemId,
+	} = useContext( DataViewsContext );
 	const isReducedMotion = useReducedMotion();
 	const selectedItems = useMemo( () => {
 		return data.filter( ( item ) =>
@@ -258,10 +254,10 @@ export default function BulkActionsToolbar< Item >( {
 				animate="open"
 				exit="exit"
 				variants={ isReducedMotion ? undefined : SNACKBAR_VARIANTS }
-				className="dataviews-bulk-actions"
+				className="dataviews-bulk-actions-toolbar"
 			>
 				<Toolbar label={ __( 'Bulk actions' ) }>
-					<div className="dataviews-bulk-actions-toolbar-wrapper">
+					<div className="dataviews-bulk-actions-toolbar__wrapper">
 						<ToolbarContent
 							selection={ selection }
 							actionsToShow={ actionsToShow }
@@ -273,4 +269,20 @@ export default function BulkActionsToolbar< Item >( {
 			</motion.div>
 		</AnimatePresence>
 	);
+}
+
+export default function BulkActionsToolbar() {
+	const { data, actions = [], view } = useContext( DataViewsContext );
+	const hasPossibleBulkAction = useSomeItemHasAPossibleBulkAction(
+		actions,
+		data
+	);
+	if (
+		! [ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type ) ||
+		! hasPossibleBulkAction
+	) {
+		return null;
+	}
+
+	return <_BulkActionsToolbar />;
 }

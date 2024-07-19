@@ -12,16 +12,17 @@ import {
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
-import { memo } from '@wordpress/element';
+import { memo, useContext } from '@wordpress/element';
 import { cog } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import { unlock } from './lock-unlock';
-import { SORTING_DIRECTIONS, sortLabels } from './constants';
-import { VIEW_LAYOUTS, getMandatoryFields } from './layouts';
-import type { NormalizedField, View, SupportedLayouts } from './types';
+import { unlock } from '../../lock-unlock';
+import { SORTING_DIRECTIONS, sortLabels } from '../../constants';
+import { VIEW_LAYOUTS, getMandatoryFields } from '../../layouts';
+import type { NormalizedField, View, SupportedLayouts } from '../../types';
+import DataViewsContext from '../dataviews-context';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -55,10 +56,7 @@ interface SortMenuProps< Item > {
 	onChangeView: ( view: View ) => void;
 }
 
-interface ViewActionsProps< Item > {
-	fields: NormalizedField< Item >[];
-	view: View;
-	onChangeView: ( view: View ) => void;
+interface ViewActionsProps {
 	defaultLayouts?: SupportedLayouts;
 }
 
@@ -282,12 +280,8 @@ function SortMenu< Item >( {
 	);
 }
 
-function _ViewActions< Item >( {
-	fields,
-	view,
-	onChangeView,
-	defaultLayouts,
-}: ViewActionsProps< Item > ) {
+function _DataViewsViewConfig( { defaultLayouts }: ViewActionsProps ) {
+	const { view, fields, onChangeView } = useContext( DataViewsContext );
 	const activeView = VIEW_LAYOUTS.find( ( v ) => view.type === v.type );
 	return (
 		<>
@@ -345,7 +339,6 @@ function _ViewActions< Item >( {
 	);
 }
 
-// A type assertion is used here to keep the type argument.
-const ViewActions = memo( _ViewActions ) as typeof _ViewActions;
+const DataViewsViewConfig = memo( _DataViewsViewConfig );
 
-export default ViewActions;
+export default DataViewsViewConfig;
