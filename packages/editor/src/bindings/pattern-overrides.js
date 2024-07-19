@@ -22,7 +22,8 @@ export default {
 				]?.[ attributeName ];
 
 			// If it has not been overriden, return the original value.
-			if ( ! overridableValue ) {
+			// Check undefined because empty string is a valid value.
+			if ( overridableValue === undefined ) {
 				overridesValues[ attributeName ] =
 					currentBlockAttributes[ attributeName ];
 				continue;
