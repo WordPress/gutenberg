@@ -14,6 +14,24 @@ test.describe( 'Font Library', () => {
 			await editor.canvas.locator( 'body' ).click();
 		} );
 
+		test( 'should display the "no font installed." message', async ( {
+			page,
+		} ) => {
+			await page.getByRole( 'button', { name: 'Styles' } ).click();
+			await page
+				.getByRole( 'button', { name: 'Typography Styles' } )
+				.click();
+			await page
+				.getByRole( 'button', {
+					name: 'Add fonts',
+				} )
+				.click();
+			await page.getByRole( 'tab', { name: 'Library' } ).click();
+			await expect(
+				page.getByLabel( 'library' ).getByText( 'No fonts installed.' )
+			).toBeVisible();
+		} );
+
 		test( 'should display the "Add fonts" button', async ( { page } ) => {
 			await page.getByRole( 'button', { name: 'Styles' } ).click();
 			await page
