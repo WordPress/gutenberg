@@ -181,7 +181,10 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 
 						const binding = bindings[ attributeName ];
 						const source = sources[ binding?.source ];
-						if ( ! source?.setValue && ! source?.setValues ) {
+						if (
+							! source?.setValue &&
+							! source?.setValuesInBatch
+						) {
 							continue;
 						}
 						updatesBySource.set( source, {
@@ -196,8 +199,8 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 							source,
 							attributes,
 						] of updatesBySource ) {
-							if ( source.setValues ) {
-								source.setValues( {
+							if ( source.setValuesInBatch ) {
+								source.setValuesInBatch( {
 									registry,
 									context,
 									clientId,

@@ -53,7 +53,7 @@ export function addBlockBindingsSource( source ) {
 		label: source.label,
 		getValue: source.getValue,
 		setValue: source.setValue,
-		setValues: source.setValues,
+		setValuesInBatch: source.setValuesInBatch,
 		getPlaceholder: source.getPlaceholder,
 		canUserEditValue: source.canUserEditValue,
 	};
