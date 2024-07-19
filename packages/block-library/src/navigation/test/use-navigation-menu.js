@@ -9,6 +9,12 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import useNavigationMenu from '../use-navigation-menu';
 
+const BASE_ENTITY = {
+	kind: 'postType',
+	name: 'wp_navigation',
+	id: undefined,
+};
+
 function createRegistryWithStores() {
 	// Create a registry and register used stores.
 	const registry = createRegistry();
@@ -64,14 +70,8 @@ function resolveRecords( registry, menus ) {
 function resolveReadPermission( registry, allowed ) {
 	const dispatch = registry.dispatch( coreStore );
 	dispatch.receiveUserPermission( 'read/postType/wp_navigation', allowed );
-	dispatch.startResolution( 'canUser', [
-		'read',
-		{ kind: 'postType', name: 'wp_navigation', id: undefined },
-	] );
-	dispatch.finishResolution( 'canUser', [
-		'read',
-		{ kind: 'postType', name: 'wp_navigation', id: undefined },
-	] );
+	dispatch.startResolution( 'canUser', [ 'read', BASE_ENTITY ] );
+	dispatch.finishResolution( 'canUser', [ 'read', BASE_ENTITY ] );
 }
 
 function resolveReadRecordPermission( registry, ref, allowed ) {
@@ -82,11 +82,11 @@ function resolveReadRecordPermission( registry, ref, allowed ) {
 	);
 	dispatch.startResolution( 'canUser', [
 		'read',
-		{ kind: 'postType', name: 'wp_navigation', id: ref },
+		{ ...BASE_ENTITY, id: ref },
 	] );
 	dispatch.finishResolution( 'canUser', [
 		'read',
-		{ kind: 'postType', name: 'wp_navigation', id: ref },
+		{ ...BASE_ENTITY, id: ref },
 	] );
 }
 
@@ -111,11 +111,11 @@ function resolveUpdatePermission( registry, ref, allowed ) {
 	);
 	dispatch.startResolution( 'canUser', [
 		'update',
-		{ kind: 'postType', name: 'wp_navigation', id: ref },
+		{ ...BASE_ENTITY, id: ref },
 	] );
 	dispatch.finishResolution( 'canUser', [
 		'update',
-		{ kind: 'postType', name: 'wp_navigation', id: ref },
+		{ ...BASE_ENTITY, id: ref },
 	] );
 }
 
@@ -127,11 +127,11 @@ function resolveDeletePermission( registry, ref, allowed ) {
 	);
 	dispatch.startResolution( 'canUser', [
 		'delete',
-		{ kind: 'postType', name: 'wp_navigation', id: ref },
+		{ ...BASE_ENTITY, id: ref },
 	] );
 	dispatch.finishResolution( 'canUser', [
 		'delete',
-		{ kind: 'postType', name: 'wp_navigation', id: ref },
+		{ ...BASE_ENTITY, id: ref },
 	] );
 }
 
