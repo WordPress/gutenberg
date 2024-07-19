@@ -2,7 +2,7 @@
 	position: relative;
 }
 
-.dataviews-filters__reset-button[aria-disabled="true"] {
+.dataviews-filters__reset-button.dataviews-filters__reset-button[aria-disabled="true"] {
 	&,
 	&:hover {
 		opacity: 0;
