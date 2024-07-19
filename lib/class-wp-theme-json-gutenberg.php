@@ -2921,7 +2921,7 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		/*
-		 * Root selector styles should not be wrapped in `:root where()` to keep
+		 * Root selector (body) styles should not be wrapped in `:root where()` to keep
 		 * specificity at (0,0,1) and maintain backwards compatibility.
 		 *
 		 * Top-level element styles using element-only specificity selectors should
