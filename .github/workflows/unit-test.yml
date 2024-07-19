@@ -21,17 +21,13 @@ concurrency:
 
 jobs:
     unit-js:
-        name: JavaScript (Node.js ${{ matrix.node.name }}) ${{ matrix.shard }}
+        name: JavaScript (Node.js ${{ matrix.node }}) ${{ matrix.shard }}
         runs-on: ubuntu-latest
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             fail-fast: false
             matrix:
-                node:
-                    - name: 20
-                      version: 20
-                    - name: 22
-                      version: 22.4
+                node: ['20', '22']
                 shard: ['1/4', '2/4', '3/4', '4/4']
 
         steps:
@@ -43,7 +39,7 @@ jobs:
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
               with:
-                  node-version: ${{ matrix.node.version }}
+                  node-version: ${{ matrix.node }}
 
             - name: Determine the number of CPU cores
               uses: SimenB/github-actions-cpu-cores@97ba232459a8e02ff6121db9362b09661c875ab8 # v2.0.0
@@ -64,17 +60,13 @@ jobs:
                     --cacheDirectory="$HOME/.jest-cache"
 
     unit-js-date:
-        name: JavaScript Date Tests (Node.js ${{ matrix.node.name }})
+        name: JavaScript Date Tests (Node.js ${{ matrix.node }})
         runs-on: ubuntu-latest
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             fail-fast: false
             matrix:
-                node:
-                    - name: 20
-                      version: 20
-                    - name: 22
-                      version: 22.4
+                node: ['20', '22']
 
         steps:
             - name: Checkout repository
@@ -85,7 +77,7 @@ jobs:
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
               with:
-                  node-version: ${{ matrix.node.version }}
+                  node-version: ${{ matrix.node }}
 
             - name: Determine the number of CPU cores
               uses: SimenB/github-actions-cpu-cores@97ba232459a8e02ff6121db9362b09661c875ab8 # v2.0.0
