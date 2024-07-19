@@ -252,6 +252,7 @@ export default function DataviewsPatterns() {
 	const {
 		params: { postType, categoryId: categoryIdFromURL },
 	} = useLocation();
+	const [ selection, setSelection ] = useState( [] );
 	const type = postType || PATTERN_TYPES.user;
 	const categoryId = categoryIdFromURL || PATTERN_DEFAULT_CATEGORY;
 	const [ view, setView ] = useState( DEFAULT_VIEW );
@@ -294,6 +295,7 @@ export default function DataviewsPatterns() {
 			{
 				header: __( 'Title' ),
 				id: 'title',
+				getValue: ( { item } ) => item.title?.raw || item.title,
 				render: ( { item } ) => <Title item={ item } />,
 				enableHiding: false,
 			},
@@ -351,7 +353,7 @@ export default function DataviewsPatterns() {
 	// Reset the page number when the category changes.
 	useEffect( () => {
 		if ( previousCategoryId !== categoryId ) {
-			setView( DEFAULT_VIEW );
+			setView( ( prevView ) => ( { ...prevView, page: 1 } ) );
 		}
 	}, [ categoryId, previousCategoryId ] );
 	const { data, paginationInfo } = useMemo( () => {
@@ -408,6 +410,8 @@ export default function DataviewsPatterns() {
 					isLoading={ isResolving }
 					view={ view }
 					onChangeView={ setView }
+					selection={ selection }
+					onChangeSelection={ setSelection }
 					defaultLayouts={ defaultLayouts }
 				/>
 			</Page>
