@@ -8,13 +8,14 @@ import type { ForwardedRef } from 'react';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { forwardRef } from '@wordpress/element';
+import { Fragment, forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import type { ExternalLinkProps } from './types';
 import type { WordPressComponentProps } from '../context';
+import { Suffix } from '../input-control/styles/input-control-styles';
 
 function UnforwardedExternalLink(
 	props: Omit<
@@ -23,7 +24,14 @@ function UnforwardedExternalLink(
 	>,
 	ref: ForwardedRef< HTMLAnchorElement >
 ) {
-	const { href, children, className, rel = '', ...additionalProps } = props;
+	const {
+		href,
+		children,
+		className,
+		rel = '',
+		suffix,
+		...additionalProps
+	} = props;
 	const optimizedRel = [
 		...new Set(
 			[
@@ -54,28 +62,33 @@ function UnforwardedExternalLink(
 
 	return (
 		/* eslint-disable react/jsx-no-target-blank */
-		<a
-			{ ...additionalProps }
-			className={ classes }
-			href={ href }
-			onClick={ onClickHandler }
-			target="_blank"
-			rel={ optimizedRel }
-			ref={ ref }
-		>
-			<span className="components-external-link__contents">
-				{ children }
-			</span>
-			<span
-				className="components-external-link__icon"
-				aria-label={
-					/* translators: accessibility text */
-					__( '(opens in a new tab)' )
-				}
-			>
-				&#8599;
-			</span>
-		</a>
+		<Fragment>
+			<div className="components-external-link__wrapper">
+				<a
+					{ ...additionalProps }
+					className={ classes }
+					href={ href }
+					onClick={ onClickHandler }
+					target="_blank"
+					rel={ optimizedRel }
+					ref={ ref }
+				>
+					<span className="components-external-link__contents">
+						{ children }
+					</span>
+					<span
+						className="components-external-link__icon"
+						aria-label={
+							/* translators: accessibility text */
+							__( '(opens in a new tab)' )
+						}
+					>
+						&#8599;
+					</span>
+				</a>
+				<div>{ suffix && <Suffix>{ suffix }</Suffix> }</div>
+			</div>
+		</Fragment>
 		/* eslint-enable react/jsx-no-target-blank */
 	);
 }

@@ -52,7 +52,6 @@ export function UnforwardedInputControl(
 		prefix,
 		size = 'default',
 		style,
-		suffix,
 		value,
 		...restProps
 	} = useDeprecated36pxDefaultSizeProp< InputControlProps >( props );
@@ -88,7 +87,6 @@ export function UnforwardedInputControl(
 				prefix={ prefix }
 				size={ size }
 				style={ style }
-				suffix={ suffix }
 			>
 				<InputField
 					{ ...restProps }
@@ -101,7 +99,7 @@ export function UnforwardedInputControl(
 					onKeyDown={ onKeyDown }
 					onValidate={ onValidate }
 					paddingInlineStart={ prefix ? space( 2 ) : undefined }
-					paddingInlineEnd={ suffix ? space( 2 ) : undefined }
+					paddingInlineEnd={ undefined }
 					ref={ ref }
 					size={ size }
 					stateReducer={ stateReducer }
