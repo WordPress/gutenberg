@@ -351,7 +351,7 @@ export default function DataviewsPatterns() {
 	// Reset the page number when the category changes.
 	useEffect( () => {
 		if ( previousCategoryId !== categoryId ) {
-			setView( DEFAULT_VIEW );
+			setView( ( prevView ) => ( { ...prevView, page: 1 } ) );
 		}
 	}, [ categoryId, previousCategoryId ] );
 	const { data, paginationInfo } = useMemo( () => {
