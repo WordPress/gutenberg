@@ -13,7 +13,13 @@ import {
 	Flex,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
-import { useState, useMemo, useId, useEffect } from '@wordpress/element';
+import {
+	useState,
+	useMemo,
+	useId,
+	useEffect,
+	useCallback,
+} from '@wordpress/element';
 import {
 	BlockPreview,
 	privateApis as blockEditorPrivateApis,
@@ -252,6 +258,10 @@ export default function DataviewsPatterns() {
 	const {
 		params: { postType, categoryId: categoryIdFromURL },
 	} = useLocation();
+	const [ selection, setSelection ] = useState( [] );
+	const onChangeSelection = useCallback( ( items ) => {
+		setSelection( items );
+	}, [] );
 	const type = postType || PATTERN_TYPES.user;
 	const categoryId = categoryIdFromURL || PATTERN_DEFAULT_CATEGORY;
 	const [ view, setView ] = useState( DEFAULT_VIEW );
@@ -409,6 +419,8 @@ export default function DataviewsPatterns() {
 					isLoading={ isResolving }
 					view={ view }
 					onChangeView={ setView }
+					selection={ selection }
+					onChangeSelection={ onChangeSelection }
 					defaultLayouts={ defaultLayouts }
 				/>
 			</Page>
