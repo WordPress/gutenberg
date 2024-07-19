@@ -14,7 +14,7 @@ if ( ! defined( 'PHP_CODESNIFFER_IN_TESTS' ) ) {
 
 $dir_separator = DIRECTORY_SEPARATOR;
 
-// Define the path to the PHPCS directory from an environment variable.
+// Define the path to the PHPCS directory.
 $phpcs_path            = dirname( __DIR__ ) . $dir_separator . 'vendor' . $dir_separator . 'squizlabs' . $dir_separator . 'php_codesniffer';
 $autoload_script_path  = $phpcs_path . $dir_separator . 'autoload.php';
 $bootstrap_script_path = $phpcs_path . $dir_separator . 'tests' . $dir_separator . 'bootstrap.php';
