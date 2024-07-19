@@ -56,6 +56,8 @@ export const getProxy = < T extends object >( obj: T ): T =>
 /**
  * Gets the namespace associated with the given proxy.
  *
+ * Proxies have a namespace assigned upon creation. See {@link createProxy}.
+ *
  * @param proxy Proxy.
  * @return Namespace.
  */
