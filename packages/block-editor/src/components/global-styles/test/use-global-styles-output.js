@@ -107,6 +107,7 @@ describe( 'global styles renderer', () => {
 						},
 					},
 					selector: ROOT_BLOCK_SELECTOR,
+					skipSelectorWrapper: true,
 				},
 				{
 					styles: {
