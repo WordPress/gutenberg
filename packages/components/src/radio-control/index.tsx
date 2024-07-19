@@ -16,6 +16,7 @@ import BaseControl from '../base-control';
 import type { WordPressComponentProps } from '../context';
 import type { RadioControlProps } from './types';
 import { VStack } from '../v-stack';
+import { Text } from '../text';
 
 /**
  * Render a user interface to select the user type using radio inputs.
@@ -105,12 +106,14 @@ export function RadioControl(
 							{ option.label }
 						</label>
 						{ !! option.helpText ? (
-							<span
+							<Text
+								variant="muted"
+								size={ 12 }
 								id={ `${ id }-${ index }-help` }
 								className="components-radio-control__help-text"
 							>
 								{ option.helpText }
-							</span>
+							</Text>
 						) : null }
 					</div>
 				) ) }
