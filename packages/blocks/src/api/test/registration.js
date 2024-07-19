@@ -1513,10 +1513,12 @@ describe( 'blocks', () => {
 		} );
 
 		it( 'should not override label from the server', () => {
+			// Simulate bootstrapping a source from the server registration.
 			registerBlockBindingsSource( {
 				name: 'core/server',
 				label: 'Server label',
 			} );
+			// Override the source with a different label in the client.
 			registerBlockBindingsSource( {
 				name: 'core/server',
 				label: 'Client label',

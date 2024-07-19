@@ -8,7 +8,7 @@
 /**
  * Adds the block bindings sources registered in the server to the editor settings.
  *
- * This allows to bootstrap them in the editor.
+ * This allows them to be bootstrapped in the editor.
  *
  * @param array $settings The block editor settings from the `block_editor_settings_all` filter.
  * @return array The editor settings including the block bindings sources.
