@@ -75,6 +75,7 @@ const Pagination = memo( function Pagination( {
 										} );
 									} }
 									size="compact"
+									variant="minimal"
 									__nextHasNoMarginBottom
 								/>
 							),
