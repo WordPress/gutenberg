@@ -51,10 +51,8 @@ export function addBlockBindingsSource( source ) {
 		type: 'ADD_BLOCK_BINDINGS_SOURCE',
 		name: source.name,
 		label: source.label,
-		getValue: source.getValue,
-		getValuesInBatch: source.getValuesInBatch,
-		setValue: source.setValue,
-		setValuesInBatch: source.setValuesInBatch,
+		getValues: source.getValues,
+		setValues: source.setValues,
 		getPlaceholder: source.getPlaceholder,
 		canUserEditValue: source.canUserEditValue,
 	};

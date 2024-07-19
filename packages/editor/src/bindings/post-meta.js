@@ -15,18 +15,7 @@ export default {
 	getPlaceholder( { args } ) {
 		return args.key;
 	},
-	// When `getValuesInBatch` is defined, this is not running.
-	// Keeping it here to show the different possibilities.
-	getValue( { registry, context, args } ) {
-		return registry
-			.select( coreDataStore )
-			.getEditedEntityRecord(
-				'postType',
-				context?.postType,
-				context?.postId
-			).meta?.[ args.key ];
-	},
-	getValuesInBatch( { registry, context, sourceBindings } ) {
+	getValues( { registry, context, sourceBindings } ) {
 		const meta = registry
 			.select( coreDataStore )
 			.getEditedEntityRecord(
@@ -42,18 +31,7 @@ export default {
 		}
 		return newValues;
 	},
-	// When `setValuesInBatch` is defined, this is not running.
-	// Keeping it here to show the different possibilities.
-	setValue( { registry, context, args, value } ) {
-		registry
-			.dispatch( coreDataStore )
-			.editEntityRecord( 'postType', context?.postType, context?.postId, {
-				meta: {
-					[ args.key ]: value,
-				},
-			} );
-	},
-	setValuesInBatch( { registry, context, sourceBindings } ) {
+	setValues( { registry, context, sourceBindings } ) {
 		const newMeta = {};
 		Object.values( sourceBindings ).forEach( ( { args, newValue } ) => {
 			newMeta[ args.key ] = newValue;

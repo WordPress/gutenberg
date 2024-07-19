@@ -9,30 +9,7 @@ const CONTENT = 'content';
 export default {
 	name: 'core/pattern-overrides',
 	label: _x( 'Pattern Overrides', 'block bindings source' ),
-	getValue( { registry, clientId, context, attributeName } ) {
-		const patternOverridesContent = context[ 'pattern/overrides' ];
-		const { getBlockAttributes } = registry.select( blockEditorStore );
-		const currentBlockAttributes = getBlockAttributes( clientId );
-
-		if ( ! patternOverridesContent ) {
-			return currentBlockAttributes[ attributeName ];
-		}
-
-		const overridableValue =
-			patternOverridesContent?.[
-				currentBlockAttributes?.metadata?.name
-			]?.[ attributeName ];
-
-		// If there is no pattern client ID, or it is not overwritten, return the default value.
-		if ( overridableValue === undefined ) {
-			return currentBlockAttributes[ attributeName ];
-		}
-
-		return overridableValue === '' ? undefined : overridableValue;
-	},
-	// When `getValuesInBatch` is defined, this is not running.
-	// Keeping it here to show the different possibilities.
-	getValuesInBatch( { registry, clientId, context, sourceBindings } ) {
+	getValues( { registry, clientId, context, sourceBindings } ) {
 		const patternOverridesContent = context[ 'pattern/overrides' ];
 		if ( ! patternOverridesContent ) {
 			return {};
@@ -52,7 +29,7 @@ export default {
 		}
 		return overridesValues;
 	},
-	setValuesInBatch( { registry, clientId, sourceBindings } ) {
+	setValues( { registry, clientId, sourceBindings } ) {
 		const { getBlockAttributes, getBlockParentsByBlockName, getBlocks } =
 			registry.select( blockEditorStore );
 		const currentBlockAttributes = getBlockAttributes( clientId );

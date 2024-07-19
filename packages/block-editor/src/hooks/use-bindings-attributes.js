@@ -129,7 +129,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 				const { source: sourceName, args: sourceArgs } = binding;
 				const source = sources[ sourceName ];
 				if (
-					( ! source?.getValue && ! source?.getValuesInBatch ) ||
+					! source?.getValues ||
 					! canBindAttribute( name, attributeName )
 				) {
 					continue;
@@ -146,39 +146,17 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 			if ( bindingsBySource.size ) {
 				for ( const [ source, sourceBindings ] of bindingsBySource ) {
 					// Get values in batch if the source supports it.
-					if ( source.getValuesInBatch ) {
-						const values = source.getValuesInBatch( {
-							registry,
-							context,
-							clientId,
-							sourceBindings,
-						} );
-						for ( const [ attributeName, value ] of Object.entries(
-							values
-						) ) {
-							attributes[ attributeName ] = value;
-						}
-					} else {
-						for ( const [
-							attributeName,
-							{ args },
-						] of Object.entries( sourceBindings ) ) {
-							attributes[ attributeName ] = source.getValue( {
-								registry,
-								context,
-								clientId,
-								attributeName,
-								args,
-							} );
-						}
-					}
-
-					// Add placeholders when value is undefined.
-					// TODO: Revisit this part.
-					for ( const [ attributeName, { args } ] of Object.entries(
-						sourceBindings
+					const values = source.getValues( {
+						registry,
+						context,
+						clientId,
+						sourceBindings,
+					} );
+					for ( const [ attributeName, value ] of Object.entries(
+						values
 					) ) {
-						if ( attributes[ attributeName ] === undefined ) {
+						// Use placeholder when value is undefined.
+						if ( value === undefined ) {
 							if ( attributeName === 'url' ) {
 								attributes[ attributeName ] = null;
 							} else {
@@ -188,9 +166,12 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 										context,
 										clientId,
 										attributeName,
-										args,
+										args: sourceBindings[ attributeName ]
+											.args,
 									} );
 							}
+						} else {
+							attributes[ attributeName ] = value;
 						}
 					}
 				}
@@ -225,10 +206,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 
 						const binding = bindings[ attributeName ];
 						const source = sources[ binding?.source ];
-						if (
-							! source?.setValue &&
-							! source?.setValuesInBatch
-						) {
+						if ( ! source?.setValues ) {
 							continue;
 						}
 						bindingsBySource.set( source, {
@@ -246,29 +224,12 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 							source,
 							sourceBindings,
 						] of bindingsBySource ) {
-							// Set values in batch if the source supports it.
-							if ( source.setValuesInBatch ) {
-								source.setValuesInBatch( {
-									registry,
-									context,
-									clientId,
-									sourceBindings,
-								} );
-							} else {
-								for ( const [
-									attributeName,
-									{ args, newValue: value },
-								] of Object.entries( sourceBindings ) ) {
-									source.setValue( {
-										registry,
-										context,
-										clientId,
-										attributeName,
-										args,
-										value,
-									} );
-								}
-							}
+							source.setValues( {
+								registry,
+								context,
+								clientId,
+								sourceBindings,
+							} );
 						}
 					}
 
