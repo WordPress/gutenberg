@@ -849,7 +849,7 @@ export const registerBlockBindingsSource = ( source ) => {
 
 	// Check the `label` property is correct.
 	if ( label && existingSource?.label ) {
-		console.warn(
+		warning(
 			'Block bindings "' +
 				name +
 				'" source label is already defined in the server.'
@@ -891,7 +891,7 @@ export const registerBlockBindingsSource = ( source ) => {
 		return;
 	}
 
-	unlock( dispatch( blocksStore ) ).addBlockBindingsSource( source );
+	return unlock( dispatch( blocksStore ) ).addBlockBindingsSource( source );
 };
 
 /**
