@@ -769,7 +769,7 @@ export const unregisterBlockVariation = ( blockName, variationName ) => {
  *
  * @param {Object}   source                    Properties of the source to be registered.
  * @param {string}   source.name               The unique and machine-readable name.
- * @param {string}   source.label              Human-readable label.
+ * @param {string}   [source.label]            Human-readable label.
  * @param {Function} [source.getValues]        Function to get the values from the source.
  * @param {Function} [source.setValues]        Function to update multiple values connected to the source.
  * @param {Function} [source.getPlaceholder]   Function to get the placeholder when the value is undefined.
@@ -815,31 +815,6 @@ export const registerBlockBindingsSource = ( source ) => {
 		return;
 	}
 
-	// Check the properties from the server aren't overriden.
-	if ( existingSource ) {
-		/*
-		 * It is not possible to just check the properties with a value because
-		 * in some of them, like `canUserEditValue`, a default one could be used.
-		 */
-		const serverProperties = [ 'label', 'usesContext' ];
-		let shouldReturn = false;
-		serverProperties.forEach( ( property ) => {
-			if ( existingSource[ property ] && source[ property ] ) {
-				console.error(
-					'Block bindings "' +
-						name +
-						'" source "' +
-						property +
-						'" is already defined in the server.'
-				);
-				shouldReturn = true;
-			}
-		} );
-		if ( shouldReturn ) {
-			return;
-		}
-	}
-
 	// Check the `name` property is correct.
 	if ( ! name ) {
 		warning( 'Block bindings source must contain a name.' );
@@ -873,6 +848,15 @@ export const registerBlockBindingsSource = ( source ) => {
 	}
 
 	// Check the `label` property is correct.
+	if ( label && existingSource?.label ) {
+		console.warn(
+			'Block bindings "' +
+				name +
+				'" source label is already defined in the server.'
+		);
+		return;
+	}
+
 	if ( ! label && ! existingSource?.label ) {
 		warning( 'Block bindings source must contain a label.' );
 		return;
