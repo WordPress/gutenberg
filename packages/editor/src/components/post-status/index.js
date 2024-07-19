@@ -49,59 +49,29 @@ const postStatusesInfo = {
 
 export const STATUS_OPTIONS = [
 	{
-		label: (
-			<>
-				{ __( 'Draft' ) }
-				<Text variant="muted" size={ 12 }>
-					{ __( 'Not ready to publish.' ) }
-				</Text>
-			</>
-		),
+		label: __( 'Draft' ),
 		value: 'draft',
+		helpText: __( 'Not ready to publish.' ),
 	},
 	{
-		label: (
-			<>
-				{ __( 'Pending' ) }
-				<Text variant="muted" size={ 12 }>
-					{ __( 'Waiting for review before publishing.' ) }
-				</Text>
-			</>
-		),
+		label: __( 'Pending' ),
 		value: 'pending',
+		helpText: __( 'Waiting for review before publishing.' ),
 	},
 	{
-		label: (
-			<>
-				{ __( 'Private' ) }
-				<Text variant="muted" size={ 12 }>
-					{ __( 'Only visible to site admins and editors.' ) }
-				</Text>
-			</>
-		),
+		label: __( 'Private' ),
 		value: 'private',
+		helpText: __( 'Only visible to site admins and editors.' ),
 	},
 	{
-		label: (
-			<>
-				{ __( 'Scheduled' ) }
-				<Text variant="muted" size={ 12 }>
-					{ __( 'Publish automatically on a chosen date.' ) }
-				</Text>
-			</>
-		),
+		label: __( 'Scheduled' ),
 		value: 'future',
+		helpText: __( 'Publish automatically on a chosen date.' ),
 	},
 	{
-		label: (
-			<>
-				{ __( 'Published' ) }
-				<Text variant="muted" size={ 12 }>
-					{ __( 'Visible to everyone.' ) }
-				</Text>
-			</>
-		),
+		label: __( 'Published' ),
 		value: 'publish',
+		helpText: __( 'Visible to everyone.' ),
 	},
 ];
 
