@@ -69,3 +69,22 @@ export function removeBlockBindingsSource( name ) {
 		name,
 	};
 }
+
+/**
+ * Updates an existing block bindings source.
+ * They could be initialized from the server.
+ *
+ * @param {string} source Name of the source to update.
+ */
+export function updateBlockBindingsSource( source ) {
+	return {
+		type: 'UPDATE_BLOCK_BINDINGS_SOURCE',
+		name: source.name,
+		label: source.label,
+		getValue: source.getValue,
+		setValue: source.setValue,
+		setValues: source.setValues,
+		getPlaceholder: source.getPlaceholder,
+		canUserEditValue: source.canUserEditValue,
+	};
+}
