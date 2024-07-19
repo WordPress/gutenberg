@@ -48,7 +48,6 @@ const interfaceLabels = {
 
 export default function EditorInterface( {
 	className,
-	enableRegionNavigation,
 	styles,
 	children,
 	forceIsDirty,
@@ -112,7 +111,6 @@ export default function EditorInterface( {
 
 	return (
 		<InterfaceSkeleton
-			enableRegionNavigation={ enableRegionNavigation }
 			isDistractionFree={ isDistractionFree }
 			className={ clsx( 'editor-editor-interface', className, {
 				'is-entity-save-view-open': !! entitiesSavedStatesCallback,
