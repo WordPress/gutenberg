@@ -55,8 +55,6 @@ export default function WidgetAreasBlockEditorProvider( {
 			? getEntityRecord( 'root', 'site' )
 			: undefined;
 		return {
-			widgetAreas: select( editWidgetsStore ).getWidgetAreas(),
-			widgets: select( editWidgetsStore ).getWidgets(),
 			reusableBlocks: ALLOW_REUSABLE_BLOCKS
 				? getEntityRecords( 'postType', 'wp_block' )
 				: EMPTY_ARRAY,
