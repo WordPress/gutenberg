@@ -8,7 +8,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import { unlock } from '../lock-unlock';
+import { unlock } from '../../lock-unlock';
 
 const DISTANCE_THRESHOLD = 500;
 
