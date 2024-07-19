@@ -1,29 +1,6 @@
-.wp-block-tabs {
-	.wp-block-tabs__tab-buttons {
-		display: flex;
-		border-bottom: 1px solid #ccc;
-	}
-
-	.wp-block-tabs__tab-button {
-		background: none;
-		border: none;
-		padding: 10px 15px;
-		cursor: pointer;
-
-		&.is-active {
-			border-bottom: 2px solid #007cba;
-		}
-	}
-
-	.wp-block-tabs__content {
-		padding: 15px 0;
-	}
-}
-
-.wp-block-tab {
-	display: none;
-
-	&.is-active {
-		display: block;
-	}
+.wp-block-tabs__list {
+	display: flex;
+	gap: 10px;
+	list-style: none;
+	padding: 0;
 }

@@ -1,25 +1,19 @@
 /**
  * WordPress dependencies
  */
-import { InnerBlocks, RichText, useBlockProps } from '@wordpress/block-editor';
-import { __ } from '@wordpress/i18n';
+import {
+	InnerBlocks,
+	useBlockProps,
+	useInnerBlocksProps,
+} from '@wordpress/block-editor';
 
-export default function Edit( { context } ) {
-	console.log( context );
-	const isActive = context[ 'tabs/activeTab' ];
-	return (
-		<div
-			{ ...useBlockProps( {
-				className: isActive ? 'is-active' : '',
-			} ) }
-		>
-			<InnerBlocks
-				defaultBlock={ [
-					'core/paragraph',
-					{ placeholder: __( 'Enter tab content…' ) },
-				] }
-				directInsert
-			/>
-		</div>
-	);
+export default function Edit( { clientId, context } ) {
+	const isActive = context[ 'tabs/activeTab' ] === clientId;
+	const blockProps = useBlockProps( {
+		className: isActive ? 'is-active' : '',
+	} );
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		renderAppender: InnerBlocks.ButtonBlockAppender,
+	} );
+	return <div { ...innerBlocksProps } role="tabpanel"></div>;
 }

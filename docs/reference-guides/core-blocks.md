@@ -889,13 +889,14 @@ Add white space between blocks and customize its height. ([Source](https://githu
 
 ## Tab
 
-Tab container for content (use within the Tabs block). ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tab))
+Single tab within a tabs block. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tab))
 
 -	**Name:** core/tab
 -	**Experimental:** true
 -	**Category:** design
 -	**Parent:** core/tabs
--	**Supports:** ~~align~~, ~~html~~
+-	**Supports:** ~~html~~, ~~inserter~~, ~~reusable~~
+-	**Attributes:** title
 
 ## Table
 
@@ -924,7 +925,8 @@ Organize content into tabs. ([Source](https://github.com/WordPress/gutenberg/tre
 -	**Experimental:** true
 -	**Category:** design
 -	**Allowed Blocks:** core/tab
--	**Supports:** align (full, wide), layout (default, ~~allowJustification~~, ~~allowSwitching~~), shadow, spacing (margin, padding), ~~html~~
+-	**Supports:** align (full, wide), interactivity, layout (default, ~~allowJustification~~, ~~allowSwitching~~), shadow, spacing (margin, padding), ~~html~~
+-	**Attributes:** activeTab
 
 ## Tag Cloud
 

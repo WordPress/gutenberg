@@ -10,8 +10,8 @@
 	"allowedBlocks": [ "core/tab" ],
 	"attributes": {
 		"activeTab": {
-			"type": "number",
-			"default": 0
+			"type": "string",
+			"default": ""
 		}
 	},
 	"providesContext": {
@@ -32,6 +32,5 @@
 			"padding": true
 		}
 	},
-	"editorStyle": "wp-block-tabs-editor",
 	"style": "wp-block-tabs"
 }
