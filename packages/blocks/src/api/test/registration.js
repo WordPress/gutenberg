@@ -1607,7 +1607,7 @@ describe( 'blocks', () => {
 			expect( source.setValue ).toBeUndefined();
 			expect( source.setValues ).toBeUndefined();
 			expect( source.getPlaceholder ).toBeUndefined();
-			expect( source.canUserEditValue() ).toBe( false );
+			expect( source.canUserEditValue ).toBeUndefined();
 			unregisterBlockBindingsSource( 'core/valid-source' );
 		} );
 

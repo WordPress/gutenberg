@@ -479,7 +479,7 @@ export default function Image( {
 			return {
 				lockUrlControls:
 					!! urlBinding &&
-					! urlBindingSource?.canUserEditValue( {
+					! urlBindingSource?.canUserEditValue?.( {
 						select,
 						context,
 						args: urlBinding?.args,
@@ -494,7 +494,7 @@ export default function Image( {
 					hasParentPattern,
 				lockAltControls:
 					!! altBinding &&
-					! altBindingSource?.canUserEditValue( {
+					! altBindingSource?.canUserEditValue?.( {
 						select,
 						context,
 						args: altBinding?.args,
@@ -508,7 +508,7 @@ export default function Image( {
 					: __( 'Connected to dynamic data' ),
 				lockTitleControls:
 					!! titleBinding &&
-					! titleBindingSource?.canUserEditValue( {
+					! titleBindingSource?.canUserEditValue?.( {
 						select,
 						context,
 						args: titleBinding?.args,

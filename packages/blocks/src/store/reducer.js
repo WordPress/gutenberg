@@ -382,8 +382,7 @@ export function blockBindingsSources( state = {}, action ) {
 					setValue: action.setValue,
 					setValues: action.setValues,
 					getPlaceholder: action.getPlaceholder,
-					canUserEditValue:
-						action.canUserEditValue || ( () => false ),
+					canUserEditValue: action.canUserEditValue,
 				},
 			};
 		case 'REMOVE_BLOCK_BINDINGS_SOURCE':
