@@ -9,13 +9,13 @@ const CONTENT = 'content';
 export default {
 	name: 'core/pattern-overrides',
 	label: _x( 'Pattern Overrides', 'block bindings source' ),
-	getValues( { registry, clientId, context, sourceBindings } ) {
+	getValues( { registry, clientId, context, bindings } ) {
 		const patternOverridesContent = context[ 'pattern/overrides' ];
 		const { getBlockAttributes } = registry.select( blockEditorStore );
 		const currentBlockAttributes = getBlockAttributes( clientId );
 
 		const overridesValues = {};
-		for ( const attributeName of Object.keys( sourceBindings ) ) {
+		for ( const attributeName of Object.keys( bindings ) ) {
 			const overridableValue =
 				patternOverridesContent?.[
 					currentBlockAttributes?.metadata?.name
@@ -34,7 +34,7 @@ export default {
 		}
 		return overridesValues;
 	},
-	setValues( { registry, clientId, sourceBindings } ) {
+	setValues( { registry, clientId, bindings } ) {
 		const { getBlockAttributes, getBlockParentsByBlockName, getBlocks } =
 			registry.select( blockEditorStore );
 		const currentBlockAttributes = getBlockAttributes( clientId );
@@ -50,7 +50,7 @@ export default {
 		);
 
 		// Extract the updated attributes from the source bindings.
-		const attributes = Object.entries( sourceBindings ).reduce(
+		const attributes = Object.entries( bindings ).reduce(
 			( attrs, [ key, { newValue } ] ) => {
 				attrs[ key ] = newValue;
 				return attrs;

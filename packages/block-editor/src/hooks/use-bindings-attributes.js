@@ -101,7 +101,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 		const hasPatternOverridesDefaultBinding =
 			props.attributes.metadata?.bindings?.[ DEFAULT_ATTRIBUTE ]
 				?.source === 'core/pattern-overrides';
-		const bindings = useMemo(
+		const blockBindings = useMemo(
 			() =>
 				replacePatternOverrideDefaultBindings(
 					name,
@@ -115,7 +115,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 		// there are attribute updates.
 		// `source.getValues` may also call a selector via `registry.select`.
 		const boundAttributes = useSelect( () => {
-			if ( ! bindings ) {
+			if ( ! blockBindings ) {
 				return;
 			}
 
@@ -124,7 +124,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 			const bindingsBySource = new Map();
 
 			for ( const [ attributeName, binding ] of Object.entries(
-				bindings
+				blockBindings
 			) ) {
 				const { source: sourceName, args: sourceArgs } = binding;
 				const source = sources[ sourceName ];
@@ -144,13 +144,13 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 			}
 
 			if ( bindingsBySource.size ) {
-				for ( const [ source, sourceBindings ] of bindingsBySource ) {
+				for ( const [ source, bindings ] of bindingsBySource ) {
 					// Get values in batch if the source supports it.
 					const values = source.getValues( {
 						registry,
 						context,
 						clientId,
-						sourceBindings,
+						bindings,
 					} );
 					for ( const [ attributeName, value ] of Object.entries(
 						values
@@ -166,8 +166,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 										context,
 										clientId,
 										attributeName,
-										args: sourceBindings[ attributeName ]
-											.args,
+										args: bindings[ attributeName ].args,
 									} );
 							}
 						} else {
@@ -178,14 +177,14 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 			}
 
 			return attributes;
-		}, [ bindings, name, clientId, context, registry, sources ] );
+		}, [ blockBindings, name, clientId, context, registry, sources ] );
 
 		const { setAttributes } = props;
 
 		const _setAttributes = useCallback(
 			( nextAttributes ) => {
 				registry.batch( () => {
-					if ( ! bindings ) {
+					if ( ! blockBindings ) {
 						setAttributes( nextAttributes );
 						return;
 					}
@@ -198,13 +197,13 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 						keptAttributes
 					) ) {
 						if (
-							! bindings[ attributeName ] ||
+							! blockBindings[ attributeName ] ||
 							! canBindAttribute( name, attributeName )
 						) {
 							continue;
 						}
 
-						const binding = bindings[ attributeName ];
+						const binding = blockBindings[ attributeName ];
 						const source = sources[ binding?.source ];
 						if ( ! source?.setValues ) {
 							continue;
@@ -220,15 +219,12 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 					}
 
 					if ( bindingsBySource.size ) {
-						for ( const [
-							source,
-							sourceBindings,
-						] of bindingsBySource ) {
+						for ( const [ source, bindings ] of bindingsBySource ) {
 							source.setValues( {
 								registry,
 								context,
 								clientId,
-								sourceBindings,
+								bindings,
 							} );
 						}
 					}
@@ -253,7 +249,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 			},
 			[
 				registry,
-				bindings,
+				blockBindings,
 				name,
 				clientId,
 				context,

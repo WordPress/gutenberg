@@ -15,7 +15,7 @@ export default {
 	getPlaceholder( { args } ) {
 		return args.key;
 	},
-	getValues( { registry, context, sourceBindings } ) {
+	getValues( { registry, context, bindings } ) {
 		const meta = registry
 			.select( coreDataStore )
 			.getEditedEntityRecord(
@@ -24,16 +24,14 @@ export default {
 				context?.postId
 			)?.meta;
 		const newValues = {};
-		for ( const [ attributeName, source ] of Object.entries(
-			sourceBindings
-		) ) {
+		for ( const [ attributeName, source ] of Object.entries( bindings ) ) {
 			newValues[ attributeName ] = meta?.[ source.args.key ];
 		}
 		return newValues;
 	},
-	setValues( { registry, context, sourceBindings } ) {
+	setValues( { registry, context, bindings } ) {
 		const newMeta = {};
-		Object.values( sourceBindings ).forEach( ( { args, newValue } ) => {
+		Object.values( bindings ).forEach( ( { args, newValue } ) => {
 			newMeta[ args.key ] = newValue;
 		} );
 		registry
