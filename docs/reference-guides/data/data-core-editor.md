@@ -495,6 +495,19 @@ _Returns_
 
 -   `Object`: An object containing the prefix, postName, and suffix for the permalink, or null if the post is not viewable.
 
+### getPostBlocksByName
+
+Similar to getBlocksByName in @wordpress/block-editor, but only returns the top-most blocks that aren't descendants of the query block.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _blockNames_ `Array|string`: Block names of the blocks to retrieve.
+
+_Returns_
+
+-   `Array`: Block client IDs.
+
 ### getPostEdits
 
 Returns any post values which have been changed in the editor but not yet been saved.
