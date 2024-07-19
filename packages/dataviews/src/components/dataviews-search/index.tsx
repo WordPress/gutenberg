@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -10,6 +15,7 @@ import { useDebouncedInput } from '@wordpress/compose';
  * Internal dependencies
  */
 import DataViewsContext from '../dataviews-context';
+import { LAYOUT_LIST } from '../../constants';
 
 interface SearchProps {
 	label?: string;
@@ -37,8 +43,12 @@ const DataViewsSearch = memo( function Search( { label }: SearchProps ) {
 		} );
 	}, [ debouncedSearch ] );
 	const searchLabel = label || __( 'Search' );
+
 	return (
 		<SearchControl
+			className={ classnames( 'dataviews-search', {
+				'is-expanded': view.type === LAYOUT_LIST,
+			} ) }
 			__nextHasNoMarginBottom
 			onChange={ setSearch }
 			value={ search }
