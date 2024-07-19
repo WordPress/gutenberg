@@ -83,6 +83,7 @@ export default function useLayoutAreas() {
 	// Page list
 	if ( postType === 'page' ) {
 		const isListLayout = layout === 'list' || ! layout;
+		const showQuickEdit = quickEdit && ! isListLayout;
 		return {
 			key: 'pages',
 			areas: {
@@ -94,20 +95,20 @@ export default function useLayoutAreas() {
 					/>
 				),
 				content: <PostList postType={ postType } />,
-				preview: ! quickEdit &&
+				preview: ! showQuickEdit &&
 					( isListLayout || hasEditCanvasMode ) && <Editor />,
 				mobile: hasEditCanvasMode ? (
 					<Editor />
 				) : (
 					<PostList postType={ postType } />
 				),
-				edit: quickEdit && (
+				edit: showQuickEdit && (
 					<PostEdit postType={ postType } postId={ postId } />
 				),
 			},
 			widths: {
-				content: ! quickEdit && isListLayout ? 380 : undefined,
-				edit: quickEdit ? 380 : undefined,
+				content: isListLayout ? 380 : undefined,
+				edit: showQuickEdit ? 380 : undefined,
 			},
 		};
 	}

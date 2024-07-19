@@ -19,7 +19,11 @@ import {
 	useDefaultViews,
 	defaultLayouts,
 } from '../sidebar-dataviews/default-views';
-import { OPERATOR_IS_ANY, OPERATOR_IS_NONE } from '../../utils/constants';
+import {
+	OPERATOR_IS_ANY,
+	OPERATOR_IS_NONE,
+	LAYOUT_LIST,
+} from '../../utils/constants';
 
 import AddNewPostModal from '../add-new-post';
 import { unlock } from '../../lock-unlock';
@@ -295,6 +299,7 @@ export default function PostList( { postType } ) {
 				getItemId={ getItemId }
 				defaultLayouts={ defaultLayouts }
 				header={
+					view.type !== LAYOUT_LIST &&
 					postType === 'page' && (
 						<Button
 							size="compact"
