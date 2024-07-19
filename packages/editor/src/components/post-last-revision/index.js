@@ -64,6 +64,7 @@ export function PrivatePostLastRevision() {
 					className="editor-private-post-last-revision__button"
 					text={ revisionsCount }
 					variant="tertiary"
+					size="compact"
 				/>
 			</PostPanelRow>
 		</PostLastRevisionCheck>
