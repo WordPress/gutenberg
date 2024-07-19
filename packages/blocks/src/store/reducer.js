@@ -374,10 +374,11 @@ export function collections( state = {}, action ) {
 export function blockBindingsSources( state = {}, action ) {
 	switch ( action.type ) {
 		case 'ADD_BLOCK_BINDINGS_SOURCE':
-			// Filter the name property and the undefined values.
+			// Filter the name property, the type property, and the undefined values.
 			const newProperties = Object.fromEntries(
 				Object.entries( action ).filter(
-					( [ key, value ] ) => value !== undefined && key !== 'name'
+					( [ key, value ] ) =>
+						value !== undefined && key !== 'name' && key !== 'type'
 				)
 			);
 

@@ -1614,6 +1614,7 @@ describe( 'blocks', () => {
 			const source = {
 				name: 'core/test-source',
 				label: 'Test Source',
+				getValue: () => 'value',
 			};
 			registerBlockBindingsSource( source );
 			registerBlockBindingsSource( source );
