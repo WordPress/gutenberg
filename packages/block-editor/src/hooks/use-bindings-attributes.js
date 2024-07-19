@@ -121,7 +121,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 
 			const attributes = {};
 
-			const bindingsBySource = new Map();
+			const blockBindingsBySource = new Map();
 
 			for ( const [ attributeName, binding ] of Object.entries(
 				blockBindings
@@ -135,16 +135,16 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 					continue;
 				}
 
-				bindingsBySource.set( source, {
-					...bindingsBySource.get( source ),
+				blockBindingsBySource.set( source, {
+					...blockBindingsBySource.get( source ),
 					[ attributeName ]: {
 						args: sourceArgs,
 					},
 				} );
 			}
 
-			if ( bindingsBySource.size ) {
-				for ( const [ source, bindings ] of bindingsBySource ) {
+			if ( blockBindingsBySource.size ) {
+				for ( const [ source, bindings ] of blockBindingsBySource ) {
 					// Get values in batch if the source supports it.
 					const values = source.getValues( {
 						registry,
@@ -190,7 +190,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 					}
 
 					const keptAttributes = { ...nextAttributes };
-					const bindingsBySource = new Map();
+					const blockBindingsBySource = new Map();
 
 					// Loop only over the updated attributes to avoid modifying the bound ones that haven't changed.
 					for ( const [ attributeName, newValue ] of Object.entries(
@@ -208,8 +208,8 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 						if ( ! source?.setValues ) {
 							continue;
 						}
-						bindingsBySource.set( source, {
-							...bindingsBySource.get( source ),
+						blockBindingsBySource.set( source, {
+							...blockBindingsBySource.get( source ),
 							[ attributeName ]: {
 								args: binding.args,
 								newValue,
@@ -218,8 +218,11 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 						delete keptAttributes[ attributeName ];
 					}
 
-					if ( bindingsBySource.size ) {
-						for ( const [ source, bindings ] of bindingsBySource ) {
+					if ( blockBindingsBySource.size ) {
+						for ( const [
+							source,
+							bindings,
+						] of blockBindingsBySource ) {
 							source.setValues( {
 								registry,
 								context,
