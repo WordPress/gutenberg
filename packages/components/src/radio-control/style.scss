@@ -8,6 +8,9 @@
 }
 
 .components-radio-control__input[type="radio"] {
+	grid-column: 1;
+	grid-row: 1;
+
 	@include radio-control;
 
 	display: inline-flex;
@@ -33,11 +36,7 @@
 
 .components-radio-control__label {
 	grid-column: 2;
-	grid-row: 1 / -1;
-
-	display: grid;
-	grid-template-rows: subgrid;
-	align-items: center;
+	grid-row: 1;
 
 	cursor: pointer;
 	line-height: $radio-input-size-sm;
@@ -47,13 +46,8 @@
 	}
 }
 
-.components-radio-control__label-text {
-	grid-column: 1;
-	grid-row: 1;
-}
-
 .components-radio-control__help-text {
-	grid-column: 1;
+	grid-column: 2;
 	grid-row: 2;
 
 	font-size: $helptext-font-size;

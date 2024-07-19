@@ -88,7 +88,13 @@ export function RadioControl(
 							onChange={ onChangeValue }
 							checked={ option.value === selected }
 							aria-describedby={
-								!! help ? `${ id }__help` : undefined
+								// TODO: will improve if we like this solution
+								// eslint-disable-next-line no-nested-ternary
+								!! option.helpText
+									? `${ id }-${ index }-help`
+									: !! help
+									? `${ id }__help`
+									: undefined
 							}
 							{ ...additionalProps }
 						/>
@@ -96,18 +102,16 @@ export function RadioControl(
 							className="components-radio-control__label"
 							htmlFor={ `${ id }-${ index }` }
 						>
-							<span className="components-radio-control__label-text">
-								{ option.label }
-							</span>
-							{ !! option.helpText ? (
-								<span
-									aria-hidden="true"
-									className="components-radio-control__help-text"
-								>
-									{ option.helpText }
-								</span>
-							) : null }
+							{ option.label }
 						</label>
+						{ !! option.helpText ? (
+							<span
+								id={ `${ id }-${ index }-help` }
+								className="components-radio-control__help-text"
+							>
+								{ option.helpText }
+							</span>
+						) : null }
 					</div>
 				) ) }
 			</VStack>
