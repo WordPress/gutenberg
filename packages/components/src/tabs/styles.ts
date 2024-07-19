@@ -76,10 +76,11 @@ export const Tab = styled( Ariakit.Tab )`
 		font-weight: 500;
 		text-align: inherit;
 		hyphens: auto;
+		color: ${ COLORS.theme.foreground };
 
 		&[aria-disabled='true'] {
 			cursor: default;
-			opacity: 0.3;
+			color: ${ COLORS.theme.gray[ 700 ] };
 		}
 
 		&:hover {
