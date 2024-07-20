@@ -2810,6 +2810,16 @@ export function isBlockVisible( state, clientId ) {
 }
 
 /**
+ * Returns the currently hovered block.
+ *
+ * @param {Object} state Global application state.
+ * @return {Object} Client Id of the hovered block.
+ */
+export function getHoveredBlockClientId( state ) {
+	return state.hoveredBlockClientId;
+}
+
+/**
  * Returns the list of all hidden blocks.
  *
  * @param {Object} state Global application state.

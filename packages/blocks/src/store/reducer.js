@@ -378,12 +378,10 @@ export function blockBindingsSources( state = {}, action ) {
 				...state,
 				[ action.name ]: {
 					label: action.label,
-					getValue: action.getValue,
-					setValue: action.setValue,
+					getValues: action.getValues,
 					setValues: action.setValues,
 					getPlaceholder: action.getPlaceholder,
-					canUserEditValue:
-						action.canUserEditValue || ( () => false ),
+					canUserEditValue: action.canUserEditValue,
 				},
 			};
 		case 'REMOVE_BLOCK_BINDINGS_SOURCE':

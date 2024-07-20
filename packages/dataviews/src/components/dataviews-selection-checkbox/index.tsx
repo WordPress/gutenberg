@@ -7,10 +7,10 @@ import { CheckboxControl } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import type { Field } from './types';
-import type { SetSelection } from './private-types';
+import type { Field } from '../../types';
+import type { SetSelection } from '../../private-types';
 
-interface SingleSelectionCheckboxProps< Item > {
+interface DataViewsSelectionCheckboxProps< Item > {
 	selection: string[];
 	onChangeSelection: SetSelection;
 	item: Item;
@@ -19,14 +19,14 @@ interface SingleSelectionCheckboxProps< Item > {
 	disabled: boolean;
 }
 
-export default function SingleSelectionCheckbox< Item >( {
+export default function DataViewsSelectionCheckbox< Item >( {
 	selection,
 	onChangeSelection,
 	item,
 	getItemId,
 	primaryField,
 	disabled,
-}: SingleSelectionCheckboxProps< Item > ) {
+}: DataViewsSelectionCheckboxProps< Item > ) {
 	const id = getItemId( item );
 	const checked = ! disabled && selection.includes( id );
 	let selectionLabel;
@@ -44,7 +44,7 @@ export default function SingleSelectionCheckbox< Item >( {
 	}
 	return (
 		<CheckboxControl
-			className="dataviews-view-table-selection-checkbox"
+			className="dataviews-selection-checkbox"
 			__nextHasNoMarginBottom
 			aria-label={ selectionLabel }
 			aria-disabled={ disabled }

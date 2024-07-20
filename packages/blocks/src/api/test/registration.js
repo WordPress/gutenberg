@@ -1512,28 +1512,15 @@ describe( 'blocks', () => {
 			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
 		} );
 
-		// Check the `getValue` callback is correct.
-		it( 'should reject invalid getValue callback', () => {
+		// Check the `getValues` callback is correct.
+		it( 'should reject invalid getValues callback', () => {
 			registerBlockBindingsSource( {
 				name: 'core/testing',
 				label: 'testing',
-				getValue: 'should be a function',
+				getValues: 'should be a function',
 			} );
 			expect( console ).toHaveWarnedWith(
-				'Block bindings source getValue must be a function.'
-			);
-			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
-		} );
-
-		// Check the `setValue` callback is correct.
-		it( 'should reject invalid setValue callback', () => {
-			registerBlockBindingsSource( {
-				name: 'core/testing',
-				label: 'testing',
-				setValue: 'should be a function',
-			} );
-			expect( console ).toHaveWarnedWith(
-				'Block bindings source setValue must be a function.'
+				'Block bindings source getValues must be a function.'
 			);
 			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
 		} );
@@ -1581,8 +1568,7 @@ describe( 'blocks', () => {
 		it( 'should register a valid source', () => {
 			const sourceProperties = {
 				label: 'Valid Source',
-				getValue: () => 'value',
-				setValue: () => 'new value',
+				getValues: () => 'value',
 				setValues: () => 'new values',
 				getPlaceholder: () => 'placeholder',
 				canUserEditValue: () => true,
@@ -1603,11 +1589,10 @@ describe( 'blocks', () => {
 				label: 'Valid Source',
 			} );
 			const source = getBlockBindingsSource( 'core/valid-source' );
-			expect( source.getValue ).toBeUndefined();
-			expect( source.setValue ).toBeUndefined();
+			expect( source.getValues ).toBeUndefined();
 			expect( source.setValues ).toBeUndefined();
 			expect( source.getPlaceholder ).toBeUndefined();
-			expect( source.canUserEditValue() ).toBe( false );
+			expect( source.canUserEditValue ).toBeUndefined();
 			unregisterBlockBindingsSource( 'core/valid-source' );
 		} );
 

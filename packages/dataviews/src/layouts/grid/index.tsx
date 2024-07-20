@@ -19,9 +19,9 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import ItemActions from '../../item-actions';
-import SingleSelectionCheckbox from '../../single-selection-checkbox';
-import { useHasAPossibleBulkAction } from '../../bulk-actions';
+import ItemActions from '../../components/dataviews-item-actions';
+import SingleSelectionCheckbox from '../../components/dataviews-selection-checkbox';
+import { useHasAPossibleBulkAction } from '../../components/dataviews-bulk-actions';
 import type { Action, NormalizedField, ViewGridProps } from '../../types';
 import type { SetSelection } from '../../private-types';
 
