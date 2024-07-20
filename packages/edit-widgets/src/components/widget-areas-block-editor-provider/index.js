@@ -48,12 +48,13 @@ export default function WidgetAreasBlockEditorProvider( {
 	} = useSelect( ( select ) => {
 		const { canUser, getEntityRecord, getEntityRecords } =
 			select( coreStore );
-		const siteSettings = canUser( 'read', 'settings' )
+		const siteSettings = canUser( 'read', {
+			kind: 'root',
+			name: 'site',
+		} )
 			? getEntityRecord( 'root', 'site' )
 			: undefined;
 		return {
-			widgetAreas: select( editWidgetsStore ).getWidgetAreas(),
-			widgets: select( editWidgetsStore ).getWidgets(),
 			reusableBlocks: ALLOW_REUSABLE_BLOCKS
 				? getEntityRecords( 'postType', 'wp_block' )
 				: EMPTY_ARRAY,

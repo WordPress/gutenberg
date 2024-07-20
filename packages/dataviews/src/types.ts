@@ -430,7 +430,7 @@ export interface ViewBaseProps< Item > {
 	getItemId: ( item: Item ) => string;
 	isLoading?: boolean;
 	onChangeView: ( view: View ) => void;
-	onSelectionChange: SetSelection;
+	onChangeSelection: SetSelection;
 	selection: string[];
 	setOpenedFilter: ( fieldId: string ) => void;
 	view: View;

@@ -214,6 +214,21 @@ export function selectBlock( clientId, initialPosition = 0 ) {
 }
 
 /**
+ * Returns an action object used in signalling that the block with the
+ * specified client ID has been hovered.
+ *
+ * @param {string} clientId Block client ID.
+ *
+ * @return {Object} Action object.
+ */
+export function hoverBlock( clientId ) {
+	return {
+		type: 'HOVER_BLOCK',
+		clientId,
+	};
+}
+
+/**
  * Yields action objects used in signalling that the block preceding the given
  * clientId (or optionally, its first parent from bottom to top)
  * should be selected.

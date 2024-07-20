@@ -20,7 +20,7 @@ import {
 import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useContext, useEffect, useState } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { chevronLeft } from '@wordpress/icons';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
@@ -93,7 +93,11 @@ function InstalledFonts() {
 			const { canUser } = select( coreStore );
 			return (
 				customFontFamilyId &&
-				canUser( 'delete', 'font-families', customFontFamilyId )
+				canUser( 'delete', {
+					kind: 'postType',
+					name: 'wp_font_family',
+					id: customFontFamilyId,
+				} )
 			);
 		},
 		[ customFontFamilyId ]
@@ -172,7 +176,10 @@ function InstalledFonts() {
 								{ baseThemeFonts.length > 0 && (
 									<VStack>
 										<h2 className="font-library-modal__fonts-title">
-											{ __( 'Theme Fonts' ) }
+											{
+												/* translators: Heading for a list of fonts provided by the theme. */
+												_x( 'Theme', 'font source' )
+											}
 										</h2>
 										{ /*
 										 * Disable reason: The `list` ARIA role is redundant but
@@ -209,7 +216,10 @@ function InstalledFonts() {
 								{ baseCustomFonts.length > 0 && (
 									<VStack>
 										<h2 className="font-library-modal__fonts-title">
-											{ __( 'Custom fonts' ) }
+											{
+												/* translators: Heading for a list of fonts installed by the user. */
+												_x( 'Custom', 'font source' )
+											}
 										</h2>
 										{ /*
 										 * Disable reason: The `list` ARIA role is redundant but
