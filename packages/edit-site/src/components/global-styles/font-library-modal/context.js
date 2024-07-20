@@ -384,27 +384,6 @@ function FontLibraryProvider( { children } ) {
 		return activeFonts;
 	};
 
-	const activateFontFamily = ( font ) => {
-		const initialFonts = fontFamilies?.[ font.source ] ?? [];
-		const newFonts = [ ...initialFonts, font ];
-		const activeFonts = {
-			...fontFamilies,
-			[ font.source ]: newFonts,
-		};
-		setFontFamilies( activeFonts );
-
-		if ( font.fontFace ) {
-			font.fontFace.forEach( ( face ) => {
-				loadFontFaceInBrowser(
-					face,
-					getDisplaySrcFromFontFace( face?.src ),
-					'all'
-				);
-			} );
-		}
-		return activeFonts;
-	};
-
 	const activateCustomFontFamilies = ( fontsToAdd ) => {
 		const fontsToActivate = cleanFontsForSave( fontsToAdd );
 
@@ -537,6 +516,7 @@ function FontLibraryProvider( { children } ) {
 				libraryFontSelected,
 				handleSetLibraryFontSelected,
 				fontFamilies,
+				setFontFamilies,
 				baseCustomFonts,
 				isFontActivated,
 				getFontFacesActivated,
@@ -555,8 +535,6 @@ function FontLibraryProvider( { children } ) {
 				isInstalling,
 				collections,
 				getFontCollection,
-				deactivateFontFamily,
-				activateFontFamily,
 			} }
 		>
 			{ children }
