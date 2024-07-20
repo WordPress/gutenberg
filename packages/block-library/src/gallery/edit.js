@@ -606,40 +606,40 @@ function GalleryEdit( props ) {
 				</PanelBody>
 			</InspectorControls>
 			<BlockControls group="block">
-				<ToolbarGroup>
-					<ToolbarDropdownMenu icon={ linkIcon } label={ __( 'Link To' ) }>
-						{ ( { onClose } ) => (
-							<MenuGroup>
-								{ linkOptions.map( ( linkItem ) => {
-									const isOptionSelected =
-										linkTo === linkItem.value;
-									return (
-										<MenuItem
-											key={ linkItem.value }
-											isSelected={ isOptionSelected }
-											className={ clsx(
-												'components-dropdown-menu__menu-item',
-												{
-													'is-active':
-														isOptionSelected,
-												}
-											) }
-											iconPosition="left"
-											icon={ linkItem.icon }
-											onClick={ () => {
-												setLinkTo( linkItem.value );
-												onClose();
-											} }
-											role="menuitemradio"
-										>
-											{ linkItem.label }
-										</MenuItem>
-									);
-								} ) }
-							</MenuGroup>
-						) }
-					</ToolbarDropdownMenu>
-				</ToolbarGroup>
+				<ToolbarDropdownMenu
+					icon={ linkIcon }
+					label={ __( 'Link To' ) }
+				>
+					{ ( { onClose } ) => (
+						<MenuGroup>
+							{ linkOptions.map( ( linkItem ) => {
+								const isOptionSelected =
+									linkTo === linkItem.value;
+								return (
+									<MenuItem
+										key={ linkItem.value }
+										isSelected={ isOptionSelected }
+										className={ clsx(
+											'components-dropdown-menu__menu-item',
+											{
+												'is-active': isOptionSelected,
+											}
+										) }
+										iconPosition="left"
+										icon={ linkItem.icon }
+										onClick={ () => {
+											setLinkTo( linkItem.value );
+											onClose();
+										} }
+										role="menuitemradio"
+									>
+										{ linkItem.label }
+									</MenuItem>
+								);
+							} ) }
+						</MenuGroup>
+					) }
+				</ToolbarDropdownMenu>
 			</BlockControls>
 			{ Platform.isWeb && (
 				<>
