@@ -18,6 +18,7 @@ import {
 	MenuGroup,
 	MenuItem,
 	ToolbarGroup,
+	ToolbarDropdownMenu,
 	withNotices,
 } from '@wordpress/components';
 import {
@@ -606,7 +607,7 @@ function GalleryEdit( props ) {
 			</InspectorControls>
 			<BlockControls group="block">
 				<ToolbarGroup>
-					<DropdownMenu icon={ linkIcon } label={ __( 'Link To' ) }>
+					<ToolbarDropdownMenu icon={ linkIcon } label={ __( 'Link To' ) }>
 						{ ( { onClose } ) => (
 							<MenuGroup>
 								{ linkOptions.map( ( linkItem ) => {
@@ -637,7 +638,7 @@ function GalleryEdit( props ) {
 								} ) }
 							</MenuGroup>
 						) }
-					</DropdownMenu>
+					</ToolbarDropdownMenu>
 				</ToolbarGroup>
 			</BlockControls>
 			{ Platform.isWeb && (
