@@ -516,7 +516,6 @@ function FontLibraryProvider( { children } ) {
 				libraryFontSelected,
 				handleSetLibraryFontSelected,
 				fontFamilies,
-				setFontFamilies,
 				baseCustomFonts,
 				isFontActivated,
 				getFontFacesActivated,
