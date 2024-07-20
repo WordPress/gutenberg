@@ -66,8 +66,7 @@ export default function Shuffle( { clientId, as = Container } ) {
 			);
 		} );
 	}, [ categories, patterns ] );
-
-	if ( sameCategoryPatternsWithSingleWrapper.length < 2 ) {
+	if ( sameCategoryPatternsWithSingleWrapper.length === 0 ) {
 		return null;
 	}
 

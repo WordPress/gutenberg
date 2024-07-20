@@ -64,11 +64,6 @@ export const buttonView = ( {
 		border: 0;
 	}
 
-	&[disabled] {
-		opacity: 0.4;
-		cursor: default;
-	}
-
 	&:active {
 		background: ${ CONFIG.toggleGroupControlBackgroundColor };
 	}

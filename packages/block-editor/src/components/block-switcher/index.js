@@ -306,7 +306,7 @@ export const BlockSwitcher = ( { clientIds, disabled, isUsingBindings } ) => {
 							</>
 						}
 						toggleProps={ {
-							description: blockSwitcherDescription,
+							describedBy: blockSwitcherDescription,
 							...toggleProps,
 						} }
 						menuProps={ { orientation: 'both' } }

@@ -375,7 +375,7 @@ function PushChangesToGlobalStyles( props ) {
 const withPushChangesToGlobalStyles = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => (
 		<>
-			<BlockEdit key="edit" { ...props } />
+			<BlockEdit { ...props } />
 			{ props.isSelected && <PushChangesToGlobalStyles { ...props } /> }
 		</>
 	)

@@ -138,7 +138,7 @@ An optional additional class name to apply to the rendered button.
 
 -   Required: No
 
-#### `description`: `string`
+#### `describedBy`: `string`
 
 An accessible description for the button.
 

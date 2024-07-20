@@ -4,6 +4,8 @@
 const { join } = require( 'path' );
 
 const importedVendors = {
+	react: { import: 'react', global: 'React' },
+	'react-dom': { import: 'react-dom', global: 'ReactDOM' },
 	'react-jsx-runtime': {
 		import: 'react/jsx-runtime',
 		global: 'ReactJSXRuntime',
@@ -33,9 +35,12 @@ module.exports = [
 					},
 				},
 
-				externals: {
-					react: 'React',
-				},
+				externals:
+					name === 'react'
+						? {}
+						: {
+								react: 'React',
+						  },
 			};
 		} );
 	} ),

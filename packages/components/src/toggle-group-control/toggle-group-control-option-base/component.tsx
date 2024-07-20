@@ -52,9 +52,7 @@ function ToggleGroupControlOptionBase(
 			false
 		>,
 		// the element's id is generated internally
-		| 'id'
-		// due to how the component works, only the `disabled` prop should be used
-		| 'aria-disabled'
+		'id'
 	>,
 	forwardedRef: ForwardedRef< any >
 ) {
@@ -84,7 +82,6 @@ function ToggleGroupControlOptionBase(
 		children,
 		showTooltip = false,
 		onFocus: onFocusProp,
-		disabled,
 		...otherButtonProps
 	} = buttonProps;
 
@@ -133,7 +130,6 @@ function ToggleGroupControlOptionBase(
 				{ isDeselectable ? (
 					<button
 						{ ...commonProps }
-						disabled={ disabled }
 						onFocus={ onFocusProp }
 						aria-pressed={ isPressed }
 						type="button"
@@ -143,7 +139,6 @@ function ToggleGroupControlOptionBase(
 					</button>
 				) : (
 					<Ariakit.Radio
-						disabled={ disabled }
 						render={
 							<button
 								type="button"

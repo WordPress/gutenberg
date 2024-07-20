@@ -80,7 +80,7 @@ export default function PatternsHeader( {
 							label={ __( 'Actions' ) }
 							toggleProps={ {
 								className: 'edit-site-patterns__button',
-								description: sprintf(
+								describedBy: sprintf(
 									/* translators: %s: pattern category name */
 									__( 'Action menu for %s pattern category' ),
 									title

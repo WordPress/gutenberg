@@ -14,11 +14,7 @@ import {
 	VisuallyHidden,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
-import {
-	InspectorControls,
-	useBlockProps,
-	RichText,
-} from '@wordpress/block-editor';
+import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 import { pin } from '@wordpress/icons';
@@ -31,8 +27,6 @@ export default function CategoriesEdit( {
 		showPostCounts,
 		showOnlyTopLevel,
 		showEmpty,
-		label,
-		showLabel,
 	},
 	setAttributes,
 	className,
@@ -98,22 +92,9 @@ export default function CategoriesEdit( {
 		const categoriesList = getCategoriesList( parentId );
 		return (
 			<>
-				{ showLabel ? (
-					<RichText
-						className="wp-block-categories__label"
-						aria-label={ __( 'Label text' ) }
-						placeholder={ __( 'Categories' ) }
-						withoutInteractiveFormatting
-						value={ label }
-						onChange={ ( html ) =>
-							setAttributes( { label: html } )
-						}
-					/>
-				) : (
-					<VisuallyHidden as="label" htmlFor={ selectId }>
-						{ label ? label : __( 'Categories' ) }
-					</VisuallyHidden>
-				) }
+				<VisuallyHidden as="label" htmlFor={ selectId }>
+					{ __( 'Categories' ) }
+				</VisuallyHidden>
 				<select id={ selectId }>
 					<option>{ __( 'Select Category' ) }</option>
 					{ categoriesList.map( ( category ) =>
@@ -167,15 +148,6 @@ export default function CategoriesEdit( {
 						checked={ displayAsDropdown }
 						onChange={ toggleAttribute( 'displayAsDropdown' ) }
 					/>
-					{ displayAsDropdown && (
-						<ToggleControl
-							__nextHasNoMarginBottom
-							className="wp-block-categories__indentation"
-							label={ __( 'Show label' ) }
-							checked={ showLabel }
-							onChange={ toggleAttribute( 'showLabel' ) }
-						/>
-					) }
 					<ToggleControl
 						__nextHasNoMarginBottom
 						label={ __( 'Show post counts' ) }

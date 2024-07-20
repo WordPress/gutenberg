@@ -82,21 +82,8 @@
 					"patternProperties": {
 						"[a-zA-Z]": {
 							"type": "object",
-							"allOf": [
-								{ "$ref": "#/definitions/wpEnvProperties" },
-								{
-									"properties": {
-										"core": {},
-										"phpVersion": {},
-										"plugins": {},
-										"themes": {},
-										"port": {},
-										"config": {},
-										"mappings": {}
-									},
-									"additionalProperties": false
-								}
-							]
+							"$ref": "#/definitions/wpEnvProperties",
+							"additionalProperties": false
 						}
 					}
 				}

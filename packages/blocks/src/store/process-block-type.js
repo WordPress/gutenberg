@@ -9,7 +9,6 @@ import { isValidElementType } from 'react-is';
  */
 import deprecated from '@wordpress/deprecated';
 import { applyFilters } from '@wordpress/hooks';
-import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
@@ -18,6 +17,9 @@ import { isValidIcon, normalizeIconObject, omit } from '../api/utils';
 import { BLOCK_ICON_DEFAULT, DEPRECATED_ENTRY_KEYS } from '../api/constants';
 
 /** @typedef {import('../api/registration').WPBlockType} WPBlockType */
+
+const error = ( ...args ) => window?.console?.error?.( ...args );
+const warn = ( ...args ) => window?.console?.warn?.( ...args );
 
 /**
  * Mapping of legacy category slugs to their latest normal values, used to
@@ -145,16 +147,16 @@ export const processBlockType =
 		}
 
 		if ( ! isPlainObject( settings ) ) {
-			warning( 'Block settings must be a valid object.' );
+			error( 'Block settings must be a valid object.' );
 			return;
 		}
 
 		if ( typeof settings.save !== 'function' ) {
-			warning( 'The "save" property must be a valid function.' );
+			error( 'The "save" property must be a valid function.' );
 			return;
 		}
 		if ( 'edit' in settings && ! isValidElementType( settings.edit ) ) {
-			warning( 'The "edit" property must be a valid component.' );
+			error( 'The "edit" property must be a valid component.' );
 			return;
 		}
 
@@ -169,7 +171,7 @@ export const processBlockType =
 				.getCategories()
 				.some( ( { slug } ) => slug === settings.category )
 		) {
-			warning(
+			warn(
 				'The block "' +
 					name +
 					'" is registered with an invalid category "' +
@@ -180,17 +182,17 @@ export const processBlockType =
 		}
 
 		if ( ! ( 'title' in settings ) || settings.title === '' ) {
-			warning( 'The block "' + name + '" must have a title.' );
+			error( 'The block "' + name + '" must have a title.' );
 			return;
 		}
 		if ( typeof settings.title !== 'string' ) {
-			warning( 'Block titles must be strings.' );
+			error( 'Block titles must be strings.' );
 			return;
 		}
 
 		settings.icon = normalizeIconObject( settings.icon );
 		if ( ! isValidIcon( settings.icon.src ) ) {
-			warning(
+			error(
 				'The icon passed is invalid. ' +
 					'The icon should be a string, an element, a function, or an object following the specifications documented in https://developer.wordpress.org/block-editor/developers/block-api/block-registration/#icon-optional'
 			);

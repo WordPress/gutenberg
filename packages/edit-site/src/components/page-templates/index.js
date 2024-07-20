@@ -18,10 +18,7 @@ import {
 } from '@wordpress/block-editor';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import {
-	privateApis as editorPrivateApis,
-	EditorProvider,
-} from '@wordpress/editor';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -45,7 +42,9 @@ import { useEditPostAction } from '../dataviews-actions';
 
 const { usePostActions } = unlock( editorPrivateApis );
 
-const { useGlobalStyle } = unlock( blockEditorPrivateApis );
+const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
+	blockEditorPrivateApis
+);
 const { useHistory, useLocation } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
@@ -177,7 +176,7 @@ function Preview( { item, viewType } ) {
 	// the block editor settings are needed in context where we don't have the block editor.
 	// Explore how we can solve this in a better way.
 	return (
-		<EditorProvider post={ item } settings={ settings }>
+		<ExperimentalBlockEditorProvider settings={ settings }>
 			<div
 				className={ `page-templates-preview-field is-viewtype-${ viewType }` }
 				style={ { backgroundColor } }
@@ -203,7 +202,7 @@ function Preview( { item, viewType } ) {
 					</button>
 				) }
 			</div>
-		</EditorProvider>
+		</ExperimentalBlockEditorProvider>
 	);
 }
 
@@ -256,13 +255,12 @@ export default function PageTemplates() {
 		}
 	);
 	const history = useHistory();
-	const onChangeSelection = useCallback(
+	const onSelectionChange = useCallback(
 		( items ) => {
-			setSelection( items );
 			if ( view?.type === LAYOUT_LIST ) {
 				history.push( {
 					...params,
-					postId: items.length === 1 ? items[ 0 ] : undefined,
+					postId: items.length === 1 ? items[ 0 ].id : undefined,
 				} );
 			}
 		},
@@ -373,8 +371,9 @@ export default function PageTemplates() {
 				isLoading={ isLoadingData }
 				view={ view }
 				onChangeView={ onChangeView }
-				onChangeSelection={ onChangeSelection }
+				onSelectionChange={ onSelectionChange }
 				selection={ selection }
+				setSelection={ setSelection }
 				defaultLayouts={ defaultLayouts }
 			/>
 		</Page>

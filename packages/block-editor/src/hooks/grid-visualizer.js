@@ -39,7 +39,7 @@ function GridTools( { clientId, layout } ) {
 const addGridVisualizerToBlockEdit = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		if ( props.attributes.layout?.type !== 'grid' ) {
-			return <BlockEdit key="edit" { ...props } />;
+			return <BlockEdit { ...props } />;
 		}
 
 		return (
@@ -48,7 +48,7 @@ const addGridVisualizerToBlockEdit = createHigherOrderComponent(
 					clientId={ props.clientId }
 					layout={ props.attributes.layout }
 				/>
-				<BlockEdit key="edit" { ...props } />
+				<BlockEdit { ...props } />
 			</>
 		);
 	},

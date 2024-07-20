@@ -72,13 +72,7 @@ module.exports = {
 				asyncArrow: 'always',
 			},
 		],
-		'space-in-parens': [
-			'error',
-			'always',
-			{
-				exceptions: [ 'empty' ],
-			},
-		],
+		'space-in-parens': [ 'error', 'always' ],
 		'space-infix-ops': 'error',
 		'space-unary-ops': [
 			'error',

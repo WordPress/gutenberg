@@ -18,10 +18,7 @@ function MaybeCategoryPanel() {
 		const postType = select( editorStore ).getCurrentPostType();
 		const { canUser, getEntityRecord, getTaxonomy } = select( coreStore );
 		const categoriesTaxonomy = getTaxonomy( 'category' );
-		const defaultCategoryId = canUser( 'read', {
-			kind: 'root',
-			name: 'site',
-		} )
+		const defaultCategoryId = canUser( 'read', 'settings' )
 			? getEntityRecord( 'root', 'site' )?.default_category
 			: undefined;
 		const defaultCategory = defaultCategoryId

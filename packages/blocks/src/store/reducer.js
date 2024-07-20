@@ -372,20 +372,18 @@ export function collections( state = {}, action ) {
 }
 
 export function blockBindingsSources( state = {}, action ) {
-	switch ( action.type ) {
-		case 'ADD_BLOCK_BINDINGS_SOURCE':
-			return {
-				...state,
-				[ action.name ]: {
-					label: action.label,
-					getValues: action.getValues,
-					setValues: action.setValues,
-					getPlaceholder: action.getPlaceholder,
-					canUserEditValue: action.canUserEditValue,
-				},
-			};
-		case 'REMOVE_BLOCK_BINDINGS_SOURCE':
-			return omit( state, action.name );
+	if ( action.type === 'REGISTER_BLOCK_BINDINGS_SOURCE' ) {
+		return {
+			...state,
+			[ action.sourceName ]: {
+				label: action.sourceLabel,
+				getValue: action.getValue,
+				setValue: action.setValue,
+				setValues: action.setValues,
+				getPlaceholder: action.getPlaceholder,
+				canUserEditValue: action.canUserEditValue || ( () => false ),
+			},
+		};
 	}
 	return state;
 }

@@ -17,10 +17,7 @@ export default function CreateNewTemplate( { onClick } ) {
 	const { canCreateTemplates } = useSelect( ( select ) => {
 		const { canUser } = select( coreStore );
 		return {
-			canCreateTemplates: canUser( 'create', {
-				kind: 'postType',
-				name: 'wp_template',
-			} ),
+			canCreateTemplates: canUser( 'create', 'templates' ),
 		};
 	}, [] );
 	const [ isCreateModalOpen, setIsCreateModalOpen ] = useState( false );

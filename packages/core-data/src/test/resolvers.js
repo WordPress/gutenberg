@@ -19,7 +19,6 @@ import {
 
 describe( 'getEntityRecord', () => {
 	const POST_TYPE = { slug: 'post' };
-	const POST_TYPE_RESPONSE = { json: () => Promise.resolve( POST_TYPE ) };
 	const ENTITIES = [
 		{
 			name: 'postType',
@@ -28,37 +27,28 @@ describe( 'getEntityRecord', () => {
 			baseURLParams: { context: 'edit' },
 		},
 	];
-	const registry = { batch: ( callback ) => callback() };
 
-	let dispatch;
 	beforeEach( async () => {
-		dispatch = Object.assign( jest.fn(), {
-			receiveEntityRecords: jest.fn(),
-			__unstableAcquireStoreLock: jest.fn(),
-			__unstableReleaseStoreLock: jest.fn(),
-			receiveUserPermission: jest.fn(),
-			finishResolution: jest.fn(),
-		} );
 		triggerFetch.mockReset();
 	} );
 
 	it( 'yields with requested post type', async () => {
+		const dispatch = Object.assign( jest.fn(), {
+			receiveEntityRecords: jest.fn(),
+			__unstableAcquireStoreLock: jest.fn(),
+			__unstableReleaseStoreLock: jest.fn(),
+		} );
 		// Provide entities
 		dispatch.mockReturnValueOnce( ENTITIES );
 
 		// Provide response
-		triggerFetch.mockImplementation( () => POST_TYPE_RESPONSE );
+		triggerFetch.mockImplementation( () => POST_TYPE );
 
-		await getEntityRecord(
-			'root',
-			'postType',
-			'post'
-		)( { dispatch, registry } );
+		await getEntityRecord( 'root', 'postType', 'post' )( { dispatch } );
 
 		// Fetch request should have been issued.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/types/post?context=edit',
-			parse: false,
 		} );
 
 		// The record should have been received.
@@ -85,18 +75,24 @@ describe( 'getEntityRecord', () => {
 		const select = {
 			hasEntityRecords: jest.fn( () => {} ),
 		};
+
+		const dispatch = Object.assign( jest.fn(), {
+			receiveEntityRecords: jest.fn(),
+			__unstableAcquireStoreLock: jest.fn(),
+			__unstableReleaseStoreLock: jest.fn(),
+		} );
 		// Provide entities
 		dispatch.mockReturnValueOnce( ENTITIES );
 
 		// Provide response
-		triggerFetch.mockImplementation( () => POST_TYPE_RESPONSE );
+		triggerFetch.mockImplementation( () => POST_TYPE );
 
 		await getEntityRecord(
 			'root',
 			'postType',
 			'post',
 			query
-		)( { dispatch, select, registry } );
+		)( { dispatch, select } );
 
 		// Check resolution cache for an existing entity that fulfills the request with query.
 		expect( select.hasEntityRecords ).toHaveBeenCalledWith(
@@ -108,7 +104,6 @@ describe( 'getEntityRecord', () => {
 		// Trigger apiFetch, test that the query is present in the url.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/types/post?context=view&_envelope=1',
-			parse: false,
 		} );
 
 		// The record should have been received.

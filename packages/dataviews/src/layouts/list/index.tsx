@@ -33,10 +33,7 @@ import { useRegistry } from '@wordpress/data';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import {
-	ActionsDropdownMenuGroup,
-	ActionModal,
-} from '../../components/dataviews-item-actions';
+import { ActionsDropdownMenuGroup, ActionModal } from '../../item-actions';
 import type { Action, NormalizedField, ViewListProps } from '../../types';
 
 interface ListViewItemProps< Item > {
@@ -323,7 +320,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 		fields,
 		getItemId,
 		isLoading,
-		onChangeSelection,
+		onSelectionChange,
 		selection,
 		view,
 	} = props;
@@ -348,7 +345,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 	);
 
 	const onSelect = ( item: Item ) =>
-		onChangeSelection( [ getItemId( item ) ] );
+		onSelectionChange( [ getItemId( item ) ] );
 
 	const getItemDomId = useCallback(
 		( item?: Item ) =>

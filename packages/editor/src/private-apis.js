@@ -24,7 +24,6 @@ import {
 	GlobalStylesProvider,
 } from './components/global-styles-provider';
 import registerDefaultActions from './dataviews/actions';
-import { registerCoreBlockBindingsSources } from './bindings/api';
 
 const { store: interfaceStore, ...remainingInterfaceApis } = interfaceApis;
 
@@ -44,7 +43,6 @@ lock( privateApis, {
 	ViewMoreMenuGroup,
 	ResizableEditor,
 	registerDefaultActions,
-	registerCoreBlockBindingsSources,
 
 	// This is a temporary private API while we're updating the site editor to use EditorProvider.
 	useBlockEditorSettings,

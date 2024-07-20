@@ -451,9 +451,6 @@ function BackgroundSizeControls( {
 	const positionValue =
 		style?.background?.backgroundPosition ||
 		inheritedValue?.background?.backgroundPosition;
-	const attachmentValue =
-		style?.background?.backgroundAttachment ||
-		inheritedValue?.background?.backgroundAttachment;
 
 	/*
 	 * An `undefined` value is replaced with any supplied
@@ -549,17 +546,8 @@ function BackgroundSizeControls( {
 			)
 		);
 
-	const toggleScrollWithPage = () =>
-		onChange(
-			setImmutably(
-				style,
-				[ 'background', 'backgroundAttachment' ],
-				attachmentValue === 'fixed' ? 'scroll' : 'fixed'
-			)
-		);
-
 	return (
-		<VStack spacing={ 4 } className="single-column">
+		<VStack spacing={ 3 } className="single-column">
 			<FocalPointPicker
 				__next40pxDefaultSize
 				__nextHasNoMarginBottom
@@ -567,14 +555,6 @@ function BackgroundSizeControls( {
 				url={ getResolvedThemeFilePath( imageValue, themeFileURIs ) }
 				value={ backgroundPositionToCoords( positionValue ) }
 				onChange={ updateBackgroundPosition }
-			/>
-			<ToggleControl
-				label={ __( 'Fixed background' ) }
-				checked={ attachmentValue === 'fixed' }
-				onChange={ toggleScrollWithPage }
-				help={ __(
-					'Whether your image should scroll with the page or stay fixed in place.'
-				) }
 			/>
 			<ToggleGroupControl
 				size="__unstable-large"

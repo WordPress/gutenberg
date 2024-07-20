@@ -101,7 +101,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 		const hasPatternOverridesDefaultBinding =
 			props.attributes.metadata?.bindings?.[ DEFAULT_ATTRIBUTE ]
 				?.source === 'core/pattern-overrides';
-		const blockBindings = useMemo(
+		const bindings = useMemo(
 			() =>
 				replacePatternOverrideDefaultBindings(
 					name,
@@ -115,120 +115,110 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 		// there are attribute updates.
 		// `source.getValues` may also call a selector via `registry.select`.
 		const boundAttributes = useSelect( () => {
-			if ( ! blockBindings ) {
+			if ( ! bindings ) {
 				return;
 			}
 
 			const attributes = {};
 
-			const blockBindingsBySource = new Map();
-
-			for ( const [ attributeName, binding ] of Object.entries(
-				blockBindings
+			for ( const [ attributeName, boundAttribute ] of Object.entries(
+				bindings
 			) ) {
-				const { source: sourceName, args: sourceArgs } = binding;
-				const source = sources[ sourceName ];
+				const source = sources[ boundAttribute.source ];
 				if (
-					! source?.getValues ||
+					! source?.getValue ||
 					! canBindAttribute( name, attributeName )
 				) {
 					continue;
 				}
 
-				blockBindingsBySource.set( source, {
-					...blockBindingsBySource.get( source ),
-					[ attributeName ]: {
-						args: sourceArgs,
-					},
-				} );
-			}
+				const args = {
+					registry,
+					context,
+					clientId,
+					attributeName,
+					args: boundAttribute.args,
+				};
 
-			if ( blockBindingsBySource.size ) {
-				for ( const [ source, bindings ] of blockBindingsBySource ) {
-					// Get values in batch if the source supports it.
-					const values = source.getValues( {
-						registry,
-						context,
-						clientId,
-						bindings,
-					} );
-					for ( const [ attributeName, value ] of Object.entries(
-						values
-					) ) {
-						// Use placeholder when value is undefined.
-						if ( value === undefined ) {
-							if ( attributeName === 'url' ) {
-								attributes[ attributeName ] = null;
-							} else {
-								attributes[ attributeName ] =
-									source.getPlaceholder?.( {
-										registry,
-										context,
-										clientId,
-										attributeName,
-										args: bindings[ attributeName ].args,
-									} );
-							}
-						} else {
-							attributes[ attributeName ] = value;
-						}
+				attributes[ attributeName ] = source.getValue( args );
+
+				if ( attributes[ attributeName ] === undefined ) {
+					if ( attributeName === 'url' ) {
+						attributes[ attributeName ] = null;
+					} else {
+						attributes[ attributeName ] =
+							source.getPlaceholder?.( args );
 					}
 				}
 			}
 
 			return attributes;
-		}, [ blockBindings, name, clientId, context, registry, sources ] );
+		}, [ bindings, name, clientId, context, registry, sources ] );
 
 		const { setAttributes } = props;
 
 		const _setAttributes = useCallback(
 			( nextAttributes ) => {
 				registry.batch( () => {
-					if ( ! blockBindings ) {
+					if ( ! bindings ) {
 						setAttributes( nextAttributes );
 						return;
 					}
 
 					const keptAttributes = { ...nextAttributes };
-					const blockBindingsBySource = new Map();
+					const updatesBySource = new Map();
 
 					// Loop only over the updated attributes to avoid modifying the bound ones that haven't changed.
 					for ( const [ attributeName, newValue ] of Object.entries(
 						keptAttributes
 					) ) {
 						if (
-							! blockBindings[ attributeName ] ||
+							! bindings[ attributeName ] ||
 							! canBindAttribute( name, attributeName )
 						) {
 							continue;
 						}
 
-						const binding = blockBindings[ attributeName ];
+						const binding = bindings[ attributeName ];
 						const source = sources[ binding?.source ];
-						if ( ! source?.setValues ) {
+						if ( ! source?.setValue && ! source?.setValues ) {
 							continue;
 						}
-						blockBindingsBySource.set( source, {
-							...blockBindingsBySource.get( source ),
-							[ attributeName ]: {
-								args: binding.args,
-								newValue,
-							},
+						updatesBySource.set( source, {
+							...updatesBySource.get( source ),
+							[ attributeName ]: newValue,
 						} );
 						delete keptAttributes[ attributeName ];
 					}
 
-					if ( blockBindingsBySource.size ) {
+					if ( updatesBySource.size ) {
 						for ( const [
 							source,
-							bindings,
-						] of blockBindingsBySource ) {
-							source.setValues( {
-								registry,
-								context,
-								clientId,
-								bindings,
-							} );
+							attributes,
+						] of updatesBySource ) {
+							if ( source.setValues ) {
+								source.setValues( {
+									registry,
+									context,
+									clientId,
+									attributes,
+								} );
+							} else {
+								for ( const [
+									attributeName,
+									value,
+								] of Object.entries( attributes ) ) {
+									const binding = bindings[ attributeName ];
+									source.setValue( {
+										registry,
+										context,
+										clientId,
+										attributeName,
+										args: binding.args,
+										value,
+									} );
+								}
+							}
 						}
 					}
 
@@ -252,7 +242,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 			},
 			[
 				registry,
-				blockBindings,
+				bindings,
 				name,
 				clientId,
 				context,

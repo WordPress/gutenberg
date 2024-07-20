@@ -32,10 +32,7 @@ export default function SiteTitleEdit( {
 	const { canUserEdit, title } = useSelect( ( select ) => {
 		const { canUser, getEntityRecord, getEditedEntityRecord } =
 			select( coreStore );
-		const canEdit = canUser( 'update', {
-			kind: 'root',
-			name: 'site',
-		} );
+		const canEdit = canUser( 'update', 'settings' );
 		const settings = canEdit ? getEditedEntityRecord( 'root', 'site' ) : {};
 		const readOnlySettings = getEntityRecord( 'root', '__unstableBase' );
 

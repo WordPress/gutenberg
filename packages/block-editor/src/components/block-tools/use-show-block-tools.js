@@ -29,11 +29,10 @@ export function useShowBlockTools() {
 		const clientId =
 			getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
 
-		const block = getBlock( clientId );
+		const block = getBlock( clientId ) || { name: '', attributes: {} };
 		const editorMode = __unstableGetEditorMode();
-		const hasSelectedBlock = !! clientId && !! block;
-		const isEmptyDefaultBlock =
-			hasSelectedBlock && isUnmodifiedDefaultBlock( block );
+		const hasSelectedBlock = clientId && block?.name;
+		const isEmptyDefaultBlock = isUnmodifiedDefaultBlock( block );
 		const _showEmptyBlockSideInserter =
 			clientId &&
 			! isTyping() &&
@@ -44,9 +43,8 @@ export function useShowBlockTools() {
 			! hasMultiSelection() &&
 			editorMode === 'navigation';
 
-		const isZoomOut = editorMode === 'zoom-out';
 		const _showBlockToolbarPopover =
-			! isZoomOut &&
+			editorMode !== 'zoom-out' &&
 			! getSettings().hasFixedToolbar &&
 			! _showEmptyBlockSideInserter &&
 			hasSelectedBlock &&
@@ -59,8 +57,7 @@ export function useShowBlockTools() {
 				! _showEmptyBlockSideInserter && maybeShowBreadcrumb,
 			showBlockToolbarPopover: _showBlockToolbarPopover,
 			showZoomOutToolbar:
-				hasSelectedBlock &&
-				isZoomOut &&
+				editorMode === 'zoom-out' &&
 				! _showEmptyBlockSideInserter &&
 				! maybeShowBreadcrumb &&
 				! _showBlockToolbarPopover,

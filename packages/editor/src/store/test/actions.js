@@ -90,9 +90,7 @@ describe( 'Post actions', () => {
 					method === 'GET' &&
 					path.startsWith( '/wp/v2/types/post' )
 				) {
-					return {
-						json: () => Promise.resolve( {} ),
-					};
+					return {};
 				}
 
 				throw {
@@ -180,9 +178,7 @@ describe( 'Post actions', () => {
 						path.startsWith( '/wp/v2/types/post' ) ||
 						path.startsWith( `/wp/v2/posts/${ postId }` )
 					) {
-						return {
-							json: () => Promise.resolve( {} ),
-						};
+						return {};
 					}
 				}
 
@@ -266,9 +262,7 @@ describe( 'Post actions', () => {
 					method === 'GET' &&
 					path.startsWith( '/wp/v2/types/post' )
 				) {
-					return {
-						json: () => Promise.resolve( {} ),
-					};
+					return {};
 				}
 
 				throw {

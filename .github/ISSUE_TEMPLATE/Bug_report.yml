@@ -49,19 +49,25 @@ body:
       validations:
           required: false
 
-    - type: checkboxes
+    - type: dropdown
       id: existing
       attributes:
           label: Please confirm that you have searched existing issues in the repo.
           description: You can do this by searching https://github.com/WordPress/gutenberg/issues and making sure the bug is not related to another plugin.
+          multiple: true
           options:
-              - label: 'Yes'
-                required: true
+              - 'Yes'
+              - 'No'
+      validations:
+          required: true
 
-    - type: checkboxes
+    - type: dropdown
       id: plugins
       attributes:
           label: Please confirm that you have tested with all plugins deactivated except Gutenberg.
+          multiple: true
           options:
-              - label: 'Yes'
-                required: true
+              - 'Yes'
+              - 'No'
+      validations:
+          required: true

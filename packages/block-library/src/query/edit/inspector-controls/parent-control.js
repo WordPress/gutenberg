@@ -138,7 +138,6 @@ function ParentControl( { parents, postType, onChange } ) {
 			suggestions={ suggestions }
 			onChange={ onParentChange }
 			__experimentalShowHowTo={ false }
-			__nextHasNoMarginBottom
 		/>
 	);
 }

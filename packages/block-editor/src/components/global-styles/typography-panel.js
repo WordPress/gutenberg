@@ -25,8 +25,9 @@ import { getValueFromVariable, useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
 import {
 	getMergedFontFamiliesAndFontFamilyFaces,
-	findNearestStyleAndWeight,
+	findNearestFontWeight,
 } from './typography-utils';
+import { getFontStylesAndWeights } from '../../utils/get-font-styles-and-weights';
 
 const MIN_TEXT_COLUMNS = 1;
 const MAX_TEXT_COLUMNS = 6;
@@ -235,50 +236,57 @@ export default function TypographyPanel( {
 	const hasFontWeights = settings?.typography?.fontWeight;
 	const fontStyle = decodeValue( inheritedValue?.typography?.fontStyle );
 	const fontWeight = decodeValue( inheritedValue?.typography?.fontWeight );
-	const { nearestFontStyle, nearestFontWeight } = findNearestStyleAndWeight(
-		fontFamilyFaces,
-		fontStyle,
-		fontWeight
-	);
-	const setFontAppearance = useCallback(
-		( { fontStyle: newFontStyle, fontWeight: newFontWeight } ) => {
-			// Only update the font style and weight if they have changed.
-			if ( newFontStyle !== fontStyle || newFontWeight !== fontWeight ) {
-				onChange( {
-					...value,
-					typography: {
-						...value?.typography,
-						fontStyle: newFontStyle || undefined,
-						fontWeight: newFontWeight || undefined,
-					},
-				} );
-			}
-		},
-		[ fontStyle, fontWeight, onChange, value ]
-	);
+	const setFontAppearance = ( {
+		fontStyle: newFontStyle,
+		fontWeight: newFontWeight,
+	} ) => {
+		onChange( {
+			...value,
+			typography: {
+				...value?.typography,
+				fontStyle: newFontStyle || undefined,
+				fontWeight: newFontWeight || undefined,
+			},
+		} );
+	};
 	const hasFontAppearance = () =>
 		!! value?.typography?.fontStyle || !! value?.typography?.fontWeight;
-	const resetFontAppearance = useCallback( () => {
+	const resetFontAppearance = () => {
 		setFontAppearance( {} );
-	}, [ setFontAppearance ] );
+	};
 
-	// Check if previous font style and weight values are available in the new font family.
+	// Check if previous font style and weight values are available in the new font family
 	useEffect( () => {
-		if ( nearestFontStyle && nearestFontWeight ) {
+		const { fontStyles, fontWeights, isSystemFont } =
+			getFontStylesAndWeights( fontFamilyFaces );
+		const hasFontStyle = fontStyles?.some(
+			( { value: fs } ) => fs === fontStyle
+		);
+		const hasFontWeight = fontWeights?.some(
+			( { value: fw } ) => fw === fontWeight
+		);
+
+		// Try to set nearest available font weight
+		if ( ! hasFontWeight && fontWeight ) {
 			setFontAppearance( {
-				fontStyle: nearestFontStyle,
-				fontWeight: nearestFontWeight,
+				fontStyle,
+				fontWeight: findNearestFontWeight( fontWeights, fontWeight ),
 			} );
-		} else {
-			// Reset font appearance if there are no available styles or weights.
+		}
+
+		// Set the same weight and style values if the font family is a system font or if both are the same
+		if ( isSystemFont || ( hasFontStyle && hasFontWeight ) ) {
+			setFontAppearance( {
+				fontStyle,
+				fontWeight,
+			} );
+		}
+
+		// Reset font appearance if the font family does not have the selected font style
+		if ( ! hasFontStyle ) {
 			resetFontAppearance();
 		}
-	}, [
-		nearestFontStyle,
-		nearestFontWeight,
-		resetFontAppearance,
-		setFontAppearance,
-	] );
+	}, [ fontFamily ] );
 
 	// Line Height
 	const hasLineHeightEnabled = useHasLineHeightControl( settings );

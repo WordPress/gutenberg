@@ -148,8 +148,7 @@ function PrivateExcerpt() {
 						isPattern ||
 						( template &&
 							template.source === TEMPLATE_ORIGINS.custom &&
-							! template.has_theme_file &&
-							template.is_custom ) ),
+							! template.has_theme_file ) ),
 			};
 		}, [] );
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );

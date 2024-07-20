@@ -83,7 +83,7 @@ const withMoveToSidebarToolbarItem = createHigherOrderComponent(
 
 		return (
 			<>
-				<BlockEdit key="edit" { ...props } />
+				<BlockEdit { ...props } />
 				{ hasMultipleSidebars && canInsertBlockInSidebar && (
 					<BlockControls>
 						<MoveToWidgetArea

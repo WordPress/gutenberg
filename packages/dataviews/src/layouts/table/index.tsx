@@ -2,48 +2,81 @@
  * External dependencies
  */
 import clsx from 'clsx';
+import type { ReactNode, Ref, PropsWithoutRef, RefAttributes } from 'react';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { unseen, funnel } from '@wordpress/icons';
 import {
+	Button,
+	Icon,
+	privateApis as componentsPrivateApis,
 	CheckboxControl,
 	Spinner,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import {
+	forwardRef,
 	useEffect,
 	useId,
 	useRef,
 	useState,
 	useMemo,
+	Children,
+	Fragment,
 } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import SingleSelectionCheckbox from '../../components/dataviews-selection-checkbox';
-import ItemActions from '../../components/dataviews-item-actions';
-import { sortValues } from '../../constants';
+import SingleSelectionCheckbox from '../../single-selection-checkbox';
+import { unlock } from '../../lock-unlock';
+import ItemActions from '../../item-actions';
+import { sanitizeOperators } from '../../utils';
+import {
+	SORTING_DIRECTIONS,
+	sortArrows,
+	sortLabels,
+	sortValues,
+} from '../../constants';
 import {
 	useSomeItemHasAPossibleBulkAction,
 	useHasAPossibleBulkAction,
-} from '../../components/dataviews-bulk-actions';
+} from '../../bulk-actions';
 import type {
 	Action,
 	NormalizedField,
+	SortDirection,
 	ViewTable as ViewTableType,
 	ViewTableProps,
 	CombinedField,
 } from '../../types';
 import type { SetSelection } from '../../private-types';
-import ColumnHeaderMenu from './column-header-menu';
+
+const {
+	DropdownMenuV2: DropdownMenu,
+	DropdownMenuGroupV2: DropdownMenuGroup,
+	DropdownMenuItemV2: DropdownMenuItem,
+	DropdownMenuRadioItemV2: DropdownMenuRadioItem,
+	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
+	DropdownMenuSeparatorV2: DropdownMenuSeparator,
+} = unlock( componentsPrivateApis );
+
+interface HeaderMenuProps< Item > {
+	fieldId: string;
+	view: ViewTableType;
+	fields: NormalizedField< Item >[];
+	onChangeView: ( view: ViewTableType ) => void;
+	onHide: ( field: NormalizedField< Item > ) => void;
+	setOpenedFilter: ( fieldId: string ) => void;
+}
 
 interface BulkSelectionCheckboxProps< Item > {
 	selection: string[];
-	onChangeSelection: SetSelection;
+	onSelectionChange: SetSelection;
 	data: Item[];
 	actions: Action< Item >[];
 	getItemId: ( item: Item ) => string;
@@ -81,12 +114,179 @@ interface TableRowProps< Item > {
 	primaryField?: NormalizedField< Item >;
 	selection: string[];
 	getItemId: ( item: Item ) => string;
-	onChangeSelection: SetSelection;
+	onSelectionChange: SetSelection;
 }
+
+function WithDropDownMenuSeparators( { children }: { children: ReactNode } ) {
+	return Children.toArray( children )
+		.filter( Boolean )
+		.map( ( child, i ) => (
+			<Fragment key={ i }>
+				{ i > 0 && <DropdownMenuSeparator /> }
+				{ child }
+			</Fragment>
+		) );
+}
+
+const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
+	{
+		fieldId,
+		view,
+		fields,
+		onChangeView,
+		onHide,
+		setOpenedFilter,
+	}: HeaderMenuProps< Item >,
+	ref: Ref< HTMLButtonElement >
+) {
+	const combinedField = view.layout?.combinedFields?.find(
+		( f ) => f.id === fieldId
+	);
+	if ( !! combinedField ) {
+		return combinedField.header;
+	}
+	const field = fields.find( ( f ) => f.id === fieldId );
+	if ( ! field ) {
+		return null;
+	}
+	const isHidable = field.enableHiding !== false;
+	const isSortable = field.enableSorting !== false;
+	const isSorted = view.sort?.field === field.id;
+	const operators = sanitizeOperators( field );
+	// Filter can be added:
+	// 1. If the field is not already part of a view's filters.
+	// 2. If the field meets the type and operator requirements.
+	// 3. If it's not primary. If it is, it should be already visible.
+	const canAddFilter =
+		! view.filters?.some( ( _filter ) => field.id === _filter.field ) &&
+		!! field.elements?.length &&
+		!! operators.length &&
+		! field.filterBy?.isPrimary;
+	if ( ! isSortable && ! isHidable && ! canAddFilter ) {
+		return field.header;
+	}
+	return (
+		<DropdownMenu
+			align="start"
+			trigger={
+				<Button
+					size="compact"
+					className="dataviews-view-table-header-button"
+					ref={ ref }
+					variant="tertiary"
+				>
+					{ field.header }
+					{ view.sort && isSorted && (
+						<span aria-hidden="true">
+							{ sortArrows[ view.sort.direction ] }
+						</span>
+					) }
+				</Button>
+			}
+			style={ { minWidth: '240px' } }
+		>
+			<WithDropDownMenuSeparators>
+				{ isSortable && (
+					<DropdownMenuGroup>
+						{ SORTING_DIRECTIONS.map(
+							( direction: SortDirection ) => {
+								const isChecked =
+									view.sort &&
+									isSorted &&
+									view.sort.direction === direction;
+
+								const value = `${ field.id }-${ direction }`;
+
+								return (
+									<DropdownMenuRadioItem
+										key={ value }
+										// All sorting radio items share the same name, so that
+										// selecting a sorting option automatically deselects the
+										// previously selected one, even if it is displayed in
+										// another submenu. The field and direction are passed via
+										// the `value` prop.
+										name="view-table-sorting"
+										value={ value }
+										checked={ isChecked }
+										onChange={ () => {
+											onChangeView( {
+												...view,
+												sort: {
+													field: field.id,
+													direction,
+												},
+											} );
+										} }
+									>
+										<DropdownMenuItemLabel>
+											{ sortLabels[ direction ] }
+										</DropdownMenuItemLabel>
+									</DropdownMenuRadioItem>
+								);
+							}
+						) }
+					</DropdownMenuGroup>
+				) }
+				{ canAddFilter && (
+					<DropdownMenuGroup>
+						<DropdownMenuItem
+							prefix={ <Icon icon={ funnel } /> }
+							onClick={ () => {
+								setOpenedFilter( field.id );
+								onChangeView( {
+									...view,
+									page: 1,
+									filters: [
+										...( view.filters || [] ),
+										{
+											field: field.id,
+											value: undefined,
+											operator: operators[ 0 ],
+										},
+									],
+								} );
+							} }
+						>
+							<DropdownMenuItemLabel>
+								{ __( 'Add filter' ) }
+							</DropdownMenuItemLabel>
+						</DropdownMenuItem>
+					</DropdownMenuGroup>
+				) }
+				{ isHidable && (
+					<DropdownMenuItem
+						prefix={ <Icon icon={ unseen } /> }
+						onClick={ () => {
+							const viewFields =
+								view.fields || fields.map( ( f ) => f.id );
+							onHide( field );
+							onChangeView( {
+								...view,
+								fields: viewFields.filter(
+									( id ) => id !== field.id
+								),
+							} );
+						} }
+					>
+						<DropdownMenuItemLabel>
+							{ __( 'Hide' ) }
+						</DropdownMenuItemLabel>
+					</DropdownMenuItem>
+				) }
+			</WithDropDownMenuSeparators>
+		</DropdownMenu>
+	);
+} );
+
+// @ts-expect-error Lift the `Item` type argument through the forwardRef.
+const HeaderMenu: < Item >(
+	props: PropsWithoutRef< HeaderMenuProps< Item > > &
+		RefAttributes< HTMLButtonElement >
+) => ReturnType< typeof _HeaderMenu > = _HeaderMenu;
 
 function BulkSelectionCheckbox< Item >( {
 	selection,
-	onChangeSelection,
+	onSelectionChange,
 	data,
 	actions,
 	getItemId,
@@ -114,9 +314,9 @@ function BulkSelectionCheckbox< Item >( {
 			indeterminate={ ! areAllSelected && !! selectedItems.length }
 			onChange={ () => {
 				if ( areAllSelected ) {
-					onChangeSelection( [] );
+					onSelectionChange( [] );
 				} else {
-					onChangeSelection(
+					onSelectionChange(
 						selectableItems.map( ( item ) => getItemId( item ) )
 					);
 				}
@@ -196,7 +396,7 @@ function TableRow< Item >( {
 	primaryField,
 	selection,
 	getItemId,
-	onChangeSelection,
+	onSelectionChange,
 }: TableRowProps< Item > ) {
 	const hasPossibleBulkAction = useHasAPossibleBulkAction( actions, item );
 	const isSelected = hasPossibleBulkAction && selection.includes( id );
@@ -235,7 +435,7 @@ function TableRow< Item >( {
 					! isTouchDevice.current &&
 					document.getSelection()?.type !== 'Range'
 				) {
-					onChangeSelection(
+					onSelectionChange(
 						selection.includes( id )
 							? selection.filter( ( itemId ) => id !== itemId )
 							: [ ...selection, id ]
@@ -254,7 +454,7 @@ function TableRow< Item >( {
 						<SingleSelectionCheckbox
 							item={ item }
 							selection={ selection }
-							onChangeSelection={ onChangeSelection }
+							onSelectionChange={ onSelectionChange }
 							getItemId={ getItemId }
 							primaryField={ primaryField }
 							disabled={ ! hasPossibleBulkAction }
@@ -306,7 +506,7 @@ function ViewTable< Item >( {
 	getItemId,
 	isLoading = false,
 	onChangeView,
-	onChangeSelection,
+	onSelectionChange,
 	selection,
 	setOpenedFilter,
 	view,
@@ -372,7 +572,7 @@ function ViewTable< Item >( {
 							>
 								<BulkSelectionCheckbox
 									selection={ selection }
-									onChangeSelection={ onChangeSelection }
+									onSelectionChange={ onSelectionChange }
 									data={ data }
 									actions={ actions }
 									getItemId={ getItemId }
@@ -394,7 +594,7 @@ function ViewTable< Item >( {
 									}
 									scope="col"
 								>
-									<ColumnHeaderMenu
+									<HeaderMenu
 										ref={ ( node ) => {
 											if ( node ) {
 												headerMenuRefs.current.set(
@@ -448,7 +648,7 @@ function ViewTable< Item >( {
 								primaryField={ primaryField }
 								selection={ selection }
 								getItemId={ getItemId }
-								onChangeSelection={ onChangeSelection }
+								onSelectionChange={ onSelectionChange }
 							/>
 						) ) }
 				</tbody>

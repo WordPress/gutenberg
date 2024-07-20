@@ -42,30 +42,19 @@ export function addUnprocessedBlockType( name, blockType ) {
 }
 
 /**
- * Adds new block bindings source.
+ * Register new block bindings source.
  *
  * @param {string} source Name of the source to register.
  */
-export function addBlockBindingsSource( source ) {
+export function registerBlockBindingsSource( source ) {
 	return {
-		type: 'ADD_BLOCK_BINDINGS_SOURCE',
-		name: source.name,
-		label: source.label,
-		getValues: source.getValues,
+		type: 'REGISTER_BLOCK_BINDINGS_SOURCE',
+		sourceName: source.name,
+		sourceLabel: source.label,
+		getValue: source.getValue,
+		setValue: source.setValue,
 		setValues: source.setValues,
 		getPlaceholder: source.getPlaceholder,
 		canUserEditValue: source.canUserEditValue,
-	};
-}
-
-/**
- * Removes existing block bindings source.
- *
- * @param {string} name Name of the source to remove.
- */
-export function removeBlockBindingsSource( name ) {
-	return {
-		type: 'REMOVE_BLOCK_BINDINGS_SOURCE',
-		name,
 	};
 }

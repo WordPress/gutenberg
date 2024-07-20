@@ -52,7 +52,7 @@ const FormatToolbar = () => {
 											toggleProps.className,
 											{ 'is-pressed': hasActive }
 										),
-										description: __(
+										describedBy: __(
 											'Displays more block tools'
 										),
 									} }

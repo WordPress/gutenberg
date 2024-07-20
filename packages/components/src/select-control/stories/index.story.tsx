@@ -100,9 +100,3 @@ export const WithCustomChildren: StoryFn< typeof SelectControl > = ( args ) => {
 		</SelectControlWithState>
 	);
 };
-
-export const Minimal = SelectControlWithState.bind( {} );
-Minimal.args = {
-	...Default.args,
-	variant: 'minimal',
-};

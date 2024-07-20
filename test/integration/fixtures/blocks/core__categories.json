@@ -7,8 +7,7 @@
 			"showHierarchy": false,
 			"showPostCounts": false,
 			"showOnlyTopLevel": false,
-			"showEmpty": false,
-			"showLabel": true
+			"showEmpty": false
 		},
 		"innerBlocks": []
 	}

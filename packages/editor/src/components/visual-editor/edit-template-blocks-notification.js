@@ -40,11 +40,7 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 
 	const canEditTemplate = useSelect(
 		( select ) =>
-			!! select( coreStore ).canUser( 'create', {
-				kind: 'postType',
-				name: 'wp_template',
-			} ),
-		[]
+			select( coreStore ).canUser( 'create', 'templates' ) ?? false
 	);
 
 	const [ isDialogOpen, setIsDialogOpen ] = useState( false );

@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	FormTokenField,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
+import { FormTokenField } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useState, useEffect } from '@wordpress/element';
@@ -56,7 +53,7 @@ export function TaxonomyControls( { onChange, query } ) {
 	}
 
 	return (
-		<VStack spacing={ 4 }>
+		<>
 			{ taxonomies.map( ( taxonomy ) => {
 				const termIds = taxQuery?.[ taxonomy.slug ] || [];
 				const handleChange = ( newTermIds ) =>
@@ -76,7 +73,7 @@ export function TaxonomyControls( { onChange, query } ) {
 					/>
 				);
 			} ) }
-		</VStack>
+		</>
 	);
 }
 
@@ -190,8 +187,6 @@ function TaxonomyItem( { taxonomy, termIds, onChange } ) {
 				displayTransform={ decodeEntities }
 				onChange={ onTermsChange }
 				__experimentalShowHowTo={ false }
-				__nextHasNoMarginBottom
-				__next40pxDefaultSize
 			/>
 		</div>
 	);

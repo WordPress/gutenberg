@@ -46,10 +46,8 @@ function FontLibraryModal( {
 } ) {
 	const { collections, setNotice } = useContext( FontLibraryContext );
 	const canUserCreate = useSelect( ( select ) => {
-		return select( coreStore ).canUser( 'create', {
-			kind: 'postType',
-			name: 'wp_font_family',
-		} );
+		const { canUser } = select( coreStore );
+		return canUser( 'create', 'font-families' );
 	}, [] );
 
 	const tabs = [ DEFAULT_TAB ];

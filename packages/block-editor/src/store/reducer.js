@@ -2068,23 +2068,6 @@ export function lastFocus( state = false, action ) {
 	return state;
 }
 
-/**
- * Reducer setting currently hovered block.
- *
- * @param {boolean} state  Current state.
- * @param {Object}  action Dispatched action.
- *
- * @return {boolean} Updated state.
- */
-export function hoveredBlockClientId( state = false, action ) {
-	switch ( action.type ) {
-		case 'HOVER_BLOCK':
-			return action.clientId;
-	}
-
-	return state;
-}
-
 const combinedReducers = combineReducers( {
 	blocks,
 	isDragging,
@@ -2117,7 +2100,6 @@ const combinedReducers = combineReducers( {
 	blockRemovalRules,
 	openedBlockSettingsMenu,
 	registeredInserterMediaCategories,
-	hoveredBlockClientId,
 } );
 
 function withAutomaticChangeReset( reducer ) {

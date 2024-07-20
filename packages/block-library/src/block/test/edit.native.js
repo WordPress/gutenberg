@@ -158,9 +158,7 @@ describe( 'Synced patterns', () => {
 			if ( path.startsWith( endpoint ) ) {
 				response = getMockedReusableBlock( id );
 			}
-			return Promise.resolve( {
-				json: () => Promise.resolve( response ),
-			} );
+			return Promise.resolve( response );
 		} );
 
 		const screen = await initializeEditor( {
@@ -231,9 +229,7 @@ describe( 'Synced patterns', () => {
 			response.content.raw = `<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"none"} -->
 <figure class="wp-block-image size-large"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/></figure>
 <!-- /wp:image -->`;
-			return Promise.resolve( {
-				json: () => Promise.resolve( response ),
-			} );
+			return Promise.resolve( response );
 		} );
 
 		const screen = await initializeEditor( {

@@ -349,12 +349,11 @@ function getWebpackEntryPoints( buildType ) {
 }
 
 /**
- * Returns the list of PHP file paths found in `block.json` files for the given props.
+ * Returns the list of paths included in the `render` props by scanning the `block.json` files.
  *
- * @param {string[]} props The props to search for in the `block.json` files.
- * @return {string[]} The list of PHP file paths.
+ * @return {Array}  The list of all the `render` prop paths included in `block.json` files.
  */
-function getPhpFilePaths( props ) {
+function getRenderPropPaths() {
 	// Continue only if the source directory exists.
 	if ( ! hasProjectFile( getWordPressSrcDirectory() ) ) {
 		return [];
@@ -368,29 +367,20 @@ function getPhpFilePaths( props ) {
 
 	const srcDirectory = fromProjectRoot( getWordPressSrcDirectory() + sep );
 
-	return blockMetadataFiles.flatMap( ( blockMetadataFile ) => {
-		const blockJson = JSON.parse( readFileSync( blockMetadataFile ) );
-
-		const paths = [];
-		for ( const prop of props ) {
-			if (
-				typeof blockJson?.[ prop ] !== 'string' ||
-				! blockJson[ prop ]?.startsWith( 'file:' )
-			) {
-				continue;
-			}
-
+	const renderPaths = blockMetadataFiles.map( ( blockMetadataFile ) => {
+		const { render } = JSON.parse( readFileSync( blockMetadataFile ) );
+		if ( render && render.startsWith( 'file:' ) ) {
 			// Removes the `file:` prefix.
 			const filepath = join(
 				dirname( blockMetadataFile ),
-				blockJson[ prop ].replace( 'file:', '' )
+				render.replace( 'file:', '' )
 			);
 
 			// Takes the path without the file extension, and relative to the defined source directory.
 			if ( ! filepath.startsWith( srcDirectory ) ) {
 				log(
 					chalk.yellow(
-						`Skipping "${ blockJson[ prop ].replace(
+						`Skipping "${ render.replace(
 							'file:',
 							''
 						) }" listed in "${ blockMetadataFile.replace(
@@ -399,12 +389,14 @@ function getPhpFilePaths( props ) {
 						) }". File is located outside of the "${ getWordPressSrcDirectory() }" directory.`
 					)
 				);
-				continue;
+				return false;
 			}
-			paths.push( filepath.replace( /\\/g, '/' ) );
+			return filepath.replace( /\\/g, '/' );
 		}
-		return paths;
+		return false;
 	} );
+
+	return renderPaths.filter( ( renderPath ) => renderPath );
 }
 
 module.exports = {
@@ -412,7 +404,7 @@ module.exports = {
 	getWebpackArgs,
 	getWordPressSrcDirectory,
 	getWebpackEntryPoints,
-	getPhpFilePaths,
+	getRenderPropPaths,
 	hasBabelConfig,
 	hasCssnanoConfig,
 	hasJestConfig,

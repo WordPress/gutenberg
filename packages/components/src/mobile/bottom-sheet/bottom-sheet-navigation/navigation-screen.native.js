@@ -65,7 +65,7 @@ const BottomSheetNavigationScreen = ( {
 			 * passed to useCallback here is what prevents erroneous callback
 			 * replacements, but leveraging memoization to achieve this is brittle and
 			 * explicitly discouraged in the React documentation.
-			 * https://react.dev/reference/react/useMemo
+			 * https://reactjs.org/docs/hooks-reference.html#usememo
 			 *
 			 * Ideally, we refactor onHandleHardwareButtonPress to manage multiple
 			 * callbacks triggered based upon which screen is currently active.

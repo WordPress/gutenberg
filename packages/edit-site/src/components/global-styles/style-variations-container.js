@@ -110,10 +110,6 @@ export default function StyleVariationsContainer( { gap = 2 } ) {
 		];
 	}, [ fullStyleVariations, userStyles?.blocks, userStyles?.css ] );
 
-	if ( ! fullStyleVariations || fullStyleVariations?.length < 1 ) {
-		return null;
-	}
-
 	return (
 		<Grid
 			columns={ 2 }

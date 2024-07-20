@@ -28,19 +28,16 @@ function PatternsManageButton( { clientId } ) {
 				isVisible:
 					!! reusableBlock &&
 					isReusableBlock( reusableBlock ) &&
-					!! canUser( 'update', {
-						kind: 'postType',
-						name: 'wp_block',
-						id: reusableBlock.attributes.ref,
-					} ),
+					!! canUser(
+						'update',
+						'blocks',
+						reusableBlock.attributes.ref
+					),
 				innerBlockCount: getBlockCount( clientId ),
 				// The site editor and templates both check whether the user
 				// has edit_theme_options capabilities. We can leverage that here
 				// and omit the manage patterns link if the user can't access it.
-				managePatternsUrl: canUser( 'create', {
-					kind: 'postType',
-					name: 'wp_template',
-				} )
+				managePatternsUrl: canUser( 'create', 'templates' )
 					? addQueryArgs( 'site-editor.php', {
 							path: '/patterns',
 					  } )

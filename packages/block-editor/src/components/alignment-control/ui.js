@@ -32,7 +32,7 @@ function AlignmentUI( {
 	onChange,
 	alignmentControls = DEFAULT_ALIGNMENT_CONTROLS,
 	label = __( 'Align text' ),
-	description = __( 'Change text alignment' ),
+	describedBy = __( 'Change text alignment' ),
 	isCollapsed = true,
 	isToolbar,
 } ) {
@@ -56,7 +56,7 @@ function AlignmentUI( {
 		? { isCollapsed }
 		: {
 				toggleProps: {
-					description,
+					describedBy,
 				},
 				popoverProps: POPOVER_PROPS,
 		  };

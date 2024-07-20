@@ -28,7 +28,6 @@ import { unlock } from './lock-unlock';
 const {
 	BackButton: __experimentalMainDashboardButton,
 	registerDefaultActions,
-	registerCoreBlockBindingsSources,
 } = unlock( editorPrivateApis );
 
 /**
@@ -87,7 +86,6 @@ export function initializeEditor(
 	}
 
 	registerCoreBlocks();
-	registerCoreBlockBindingsSources();
 	registerLegacyWidgetBlock( { inserter: false } );
 	registerWidgetGroupBlock( { inserter: false } );
 	if ( globalThis.IS_GUTENBERG_PLUGIN ) {

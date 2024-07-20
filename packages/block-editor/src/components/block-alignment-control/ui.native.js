@@ -77,7 +77,7 @@ function BlockAlignmentUI( {
 					};
 				} ),
 				popoverProps: POPOVER_PROPS,
-				toggleProps: { description: __( 'Change alignment' ) },
+				toggleProps: { describedBy: __( 'Change alignment' ) },
 		  };
 
 	return <UIComponent { ...commonProps } { ...extraProps } />;

@@ -59,10 +59,10 @@ function ContentOnlySettingsMenuItems( { clientId, onClose } ) {
 					);
 				}
 			}
-			const _canEditTemplates = select( coreStore ).canUser( 'create', {
-				kind: 'postType',
-				name: 'wp_template',
-			} );
+			const _canEditTemplates = select( coreStore ).canUser(
+				'create',
+				'templates'
+			);
 			return {
 				canEditTemplates: _canEditTemplates,
 				entity: record,

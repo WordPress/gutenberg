@@ -84,7 +84,6 @@ const {
 	FiltersPanel: StylesFiltersPanel,
 	ImageSettingsPanel,
 	AdvancedPanel: StylesAdvancedPanel,
-	useGlobalStyleLinks,
 } = unlock( blockEditorPrivateApis );
 
 function ScreenBlock( { name, variation } ) {
@@ -104,7 +103,6 @@ function ScreenBlock( { name, variation } ) {
 	const [ rawSettings, setSettings ] = useGlobalSetting( '', name );
 	const settings = useSettingsForBlockElement( rawSettings, name );
 	const blockType = getBlockType( name );
-	const _links = useGlobalStyleLinks();
 
 	// Only allow `blockGap` support if serialization has not been skipped, to be sure global spacing can be applied.
 	if (
@@ -313,7 +311,10 @@ function ScreenBlock( { name, variation } ) {
 					onChange={ setStyle }
 					settings={ settings }
 					defaultValues={ BACKGROUND_BLOCK_DEFAULT_VALUES }
-					themeFileURIs={ _links?.[ 'wp:theme-file' ] }
+					defaultControls={
+						blockType?.supports?.background
+							?.__experimentalDefaultControls
+					}
 				/>
 			) }
 

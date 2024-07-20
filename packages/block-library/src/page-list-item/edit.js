@@ -21,10 +21,10 @@ import {
 
 function useFrontPageId() {
 	return useSelect( ( select ) => {
-		const canReadSettings = select( coreStore ).canUser( 'read', {
-			kind: 'root',
-			name: 'site',
-		} );
+		const canReadSettings = select( coreStore ).canUser(
+			'read',
+			'settings'
+		);
 		if ( ! canReadSettings ) {
 			return undefined;
 		}

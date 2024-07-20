@@ -16,13 +16,6 @@ import { useState, useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
 import { useInstanceId } from '@wordpress/compose';
-import {
-	drafts,
-	published,
-	scheduled,
-	pending,
-	notAllowed,
-} from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -38,13 +31,13 @@ import PostSticky from '../post-sticky';
 import { PrivatePostSchedule } from '../post-schedule';
 import { store as editorStore } from '../../store';
 
-const postStatusesInfo = {
-	'auto-draft': { label: __( 'Draft' ), icon: drafts },
-	draft: { label: __( 'Draft' ), icon: drafts },
-	pending: { label: __( 'Pending' ), icon: pending },
-	private: { label: __( 'Private' ), icon: notAllowed },
-	future: { label: __( 'Scheduled' ), icon: scheduled },
-	publish: { label: __( 'Published' ), icon: published },
+const labels = {
+	'auto-draft': __( 'Draft' ),
+	draft: __( 'Draft' ),
+	pending: __( 'Pending' ),
+	private: __( 'Private' ),
+	future: __( 'Scheduled' ),
+	publish: __( 'Published' ),
 };
 
 export const STATUS_OPTIONS = [
@@ -207,14 +200,13 @@ export default function PostStatus() {
 							variant="tertiary"
 							size="compact"
 							onClick={ onToggle }
-							icon={ postStatusesInfo[ status ]?.icon }
 							aria-label={ sprintf(
 								// translators: %s: Current post status.
 								__( 'Change post status: %s' ),
-								postStatusesInfo[ status ]?.label
+								labels[ status ]
 							) }
 						>
-							{ postStatusesInfo[ status ]?.label }
+							{ labels[ status ] }
 						</Button>
 					) }
 					renderContent={ ( { onClose } ) => (
@@ -298,7 +290,7 @@ export default function PostStatus() {
 				/>
 			) : (
 				<div className="editor-post-status is-read-only">
-					{ postStatusesInfo[ status ]?.label }
+					{ labels[ status ] }
 				</div>
 			) }
 		</PostPanelRow>

@@ -24,9 +24,11 @@ describe( 'useResourcePermissions', () => {
 		registry.register( coreDataStore );
 
 		triggerFetch.mockImplementation( () => ( {
-			headers: new Headers( {
-				allow: 'POST',
-			} ),
+			headers: {
+				get: () => ( {
+					allow: 'POST',
+				} ),
+			},
 		} ) );
 	} );
 

@@ -14,7 +14,6 @@ export default function StickyControl( { value, onChange } ) {
 	return (
 		<SelectControl
 			__nextHasNoMarginBottom
-			__next40pxDefaultSize
 			label={ __( 'Sticky posts' ) }
 			options={ stickyOptions }
 			value={ value }

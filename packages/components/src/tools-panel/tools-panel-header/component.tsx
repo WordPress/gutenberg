@@ -200,7 +200,7 @@ const ToolsPanelHeader = (
 					menuProps={ { className: dropdownMenuClassName } }
 					toggleProps={ {
 						size: 'small',
-						description: dropdownMenuDescriptionText,
+						describedBy: dropdownMenuDescriptionText,
 					} }
 				>
 					{ () => (

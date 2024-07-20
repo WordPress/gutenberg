@@ -13,6 +13,15 @@ import {
 } from '@wordpress/components';
 import { useEffect, useState } from '@wordpress/element';
 import { store as editorStore } from '@wordpress/editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+
+/**
+ * Internal dependencies
+ */
+
+import { unlock } from '../../lock-unlock';
+
+const { ReusableBlocksRenameHint } = unlock( blockEditorPrivateApis );
 
 export default function InitPatternModal() {
 	const { editPost } = useDispatch( editorStore );
@@ -73,6 +82,7 @@ export default function InitPatternModal() {
 								__nextHasNoMarginBottom
 								__next40pxDefaultSize
 							/>
+							<ReusableBlocksRenameHint />
 							<ToggleControl
 								label={ _x( 'Synced', 'pattern (singular)' ) }
 								help={ __(

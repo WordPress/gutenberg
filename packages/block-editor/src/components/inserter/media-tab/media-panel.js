@@ -25,7 +25,6 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 	return (
 		<div className={ baseCssClass }>
 			<SearchControl
-				__nextHasNoMarginBottom
 				className={ `${ baseCssClass }-search` }
 				onChange={ setSearch }
 				value={ search }

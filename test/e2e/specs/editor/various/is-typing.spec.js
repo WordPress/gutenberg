@@ -53,9 +53,6 @@ test.describe( 'isTyping', () => {
 			.getByRole( 'button', { name: 'Title & Date' } )
 			.click();
 
-		await editor.openDocumentSettingsSidebar();
-		await page.getByLabel( 'Inherit query from template' ).click();
-
 		// Moving the mouse shows the toolbar.
 		await editor.showBlockToolbar();
 		// Open the dropdown.

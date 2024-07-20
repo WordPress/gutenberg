@@ -121,51 +121,6 @@ export default function ReusableBlockEditRecursionWrapper( props ) {
 	);
 }
 
-function ReusableBlockControl( {
-	recordId,
-	canOverrideBlocks,
-	hasContent,
-	handleEditOriginal,
-	resetContent,
-} ) {
-	const canUserEdit = useSelect(
-		( select ) =>
-			!! select( coreStore ).canUser( 'update', {
-				kind: 'postType',
-				name: 'wp_block',
-				id: recordId,
-			} ),
-		[ recordId ]
-	);
-
-	return (
-		<>
-			{ canUserEdit && !! handleEditOriginal && (
-				<BlockControls>
-					<ToolbarGroup>
-						<ToolbarButton onClick={ handleEditOriginal }>
-							{ __( 'Edit original' ) }
-						</ToolbarButton>
-					</ToolbarGroup>
-				</BlockControls>
-			) }
-
-			{ canOverrideBlocks && (
-				<BlockControls>
-					<ToolbarGroup>
-						<ToolbarButton
-							onClick={ resetContent }
-							disabled={ ! hasContent }
-						>
-							{ __( 'Reset' ) }
-						</ToolbarButton>
-					</ToolbarGroup>
-				</BlockControls>
-			) }
-		</>
-	);
-}
-
 function ReusableBlockEdit( {
 	name,
 	attributes: { ref, content },
@@ -188,20 +143,25 @@ function ReusableBlockEdit( {
 
 	const {
 		innerBlocks,
+		userCanEdit,
 		onNavigateToEntityRecord,
 		editingMode,
 		hasPatternOverridesSource,
 	} = useSelect(
 		( select ) => {
+			const { canUser } = select( coreStore );
 			const {
 				getBlocks,
 				getSettings,
 				getBlockEditingMode: _getBlockEditingMode,
 			} = select( blockEditorStore );
 			const { getBlockBindingsSource } = unlock( select( blocksStore ) );
+			const canEdit = canUser( 'update', 'blocks', ref );
+
 			// For editing link to the site editor if the theme and user permissions support it.
 			return {
 				innerBlocks: getBlocks( patternClientId ),
+				userCanEdit: canEdit,
 				getBlockEditingMode: _getBlockEditingMode,
 				onNavigateToEntityRecord:
 					getSettings().onNavigateToEntityRecord,
@@ -211,7 +171,7 @@ function ReusableBlockEdit( {
 				),
 			};
 		},
-		[ patternClientId ]
+		[ patternClientId, ref ]
 	);
 
 	// Sync the editing mode of the pattern block with the inner blocks.
@@ -292,18 +252,27 @@ function ReusableBlockEdit( {
 
 	return (
 		<>
-			{ hasResolved && (
-				<ReusableBlockControl
-					recordId={ ref }
-					canOverrideBlocks={ canOverrideBlocks }
-					hasContent={ !! content }
-					handleEditOriginal={
-						onNavigateToEntityRecord
-							? handleEditOriginal
-							: undefined
-					}
-					resetContent={ resetContent }
-				/>
+			{ userCanEdit && onNavigateToEntityRecord && (
+				<BlockControls>
+					<ToolbarGroup>
+						<ToolbarButton onClick={ handleEditOriginal }>
+							{ __( 'Edit original' ) }
+						</ToolbarButton>
+					</ToolbarGroup>
+				</BlockControls>
+			) }
+
+			{ canOverrideBlocks && (
+				<BlockControls>
+					<ToolbarGroup>
+						<ToolbarButton
+							onClick={ resetContent }
+							disabled={ ! content }
+						>
+							{ __( 'Reset' ) }
+						</ToolbarButton>
+					</ToolbarGroup>
+				</BlockControls>
 			) }
 
 			{ children === null ? (

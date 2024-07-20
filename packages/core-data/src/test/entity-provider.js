@@ -14,14 +14,13 @@ import {
 } from '@wordpress/blocks';
 import { RichText, useBlockProps } from '@wordpress/block-editor';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
-import { registerCoreBlocks } from '@wordpress/block-library';
-import { unregisterFormatType } from '@wordpress/rich-text';
+import '@wordpress/block-library';
 
 /**
  * Internal dependencies
  */
 import { store as coreDataStore } from '../index';
-import useEntityBlockEditor from '../hooks/use-entity-block-editor';
+import { useEntityBlockEditor } from '../entity-provider';
 
 const postTypeConfig = {
 	kind: 'postType',
@@ -138,15 +137,12 @@ describe( 'useEntityBlockEditor', () => {
 			title: 'block title',
 			edit,
 		} );
-
-		registerCoreBlocks();
 	} );
 
 	afterEach( () => {
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
 		} );
-		unregisterFormatType( 'core/footnote' );
 	} );
 
 	it( 'does not mutate block attributes that include an array of strings or null values', async () => {

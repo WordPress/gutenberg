@@ -29,15 +29,12 @@ export default function SiteTaglineEdit( {
 	const { canUserEdit, tagline } = useSelect( ( select ) => {
 		const { canUser, getEntityRecord, getEditedEntityRecord } =
 			select( coreStore );
-		const canEdit = canUser( 'update', {
-			kind: 'root',
-			name: 'site',
-		} );
+		const canEdit = canUser( 'update', 'settings' );
 		const settings = canEdit ? getEditedEntityRecord( 'root', 'site' ) : {};
 		const readOnlySettings = getEntityRecord( 'root', '__unstableBase' );
 
 		return {
-			canUserEdit: canEdit,
+			canUserEdit: canUser( 'update', 'settings' ),
 			tagline: canEdit
 				? settings?.description
 				: readOnlySettings?.description,

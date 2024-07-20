@@ -260,7 +260,6 @@ export default function CoverInspectorControls( {
 									gradient: undefined,
 									customGradient: undefined,
 								} ),
-								clearable: true,
 							},
 						] }
 						panelId={ clientId }

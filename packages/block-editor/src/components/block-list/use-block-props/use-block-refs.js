@@ -1,14 +1,8 @@
 /**
  * WordPress dependencies
  */
-import {
-	useContext,
-	useMemo,
-	useRef,
-	useState,
-	useLayoutEffect,
-} from '@wordpress/element';
-import { useRefEffect } from '@wordpress/compose';
+import { useContext, useMemo, useRef } from '@wordpress/element';
+import { useRefEffect, useObservableValue } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -73,17 +67,7 @@ function useBlockRef( clientId ) {
  */
 function useBlockElement( clientId ) {
 	const { refsMap } = useContext( BlockRefs );
-	const [ blockElement, setBlockElement ] = useState( null );
-	// Delay setting the resulting `blockElement` until an effect. If the block element
-	// changes (i.e., the block is unmounted and re-mounted), this allows enough time
-	// for the ref callbacks to clean up the old element and set the new one.
-	useLayoutEffect( () => {
-		setBlockElement( refsMap.get( clientId ) );
-		return refsMap.subscribe( clientId, () =>
-			setBlockElement( refsMap.get( clientId ) )
-		);
-	}, [ refsMap, clientId ] );
-	return blockElement;
+	return useObservableValue( refsMap, clientId ) ?? null;
 }
 
 export { useBlockRef as __unstableUseBlockRef };

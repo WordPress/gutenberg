@@ -198,10 +198,7 @@ function Layout( {
 			const supportsTemplateMode = settings.supportsTemplateMode;
 			const isViewable =
 				getPostType( currentPost.postType )?.viewable ?? false;
-			const canViewTemplate = canUser( 'read', {
-				kind: 'postType',
-				name: 'wp_template',
-			} );
+			const canViewTemplate = canUser( 'read', 'templates' );
 
 			return {
 				mode: select( editorStore ).getEditorMode(),

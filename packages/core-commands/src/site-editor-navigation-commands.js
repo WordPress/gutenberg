@@ -266,10 +266,7 @@ function useSiteEditorBasicNavigationCommands() {
 		'site-editor.php'
 	);
 	const canCreateTemplate = useSelect( ( select ) => {
-		return select( coreStore ).canUser( 'create', {
-			kind: 'postType',
-			name: 'wp_template',
-		} );
+		return select( coreStore ).canUser( 'create', 'templates' );
 	}, [] );
 	const isBlockBasedTheme = useIsBlockBasedTheme();
 	const commands = useMemo( () => {

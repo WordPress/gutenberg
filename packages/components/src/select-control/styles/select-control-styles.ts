@@ -17,7 +17,7 @@ import InputBase from '../../input-control/input-base';
 interface SelectProps
 	extends Pick<
 		SelectControlProps,
-		'__next40pxDefaultSize' | 'disabled' | 'multiple' | 'variant'
+		'__next40pxDefaultSize' | 'disabled' | 'multiple'
 	> {
 	// Using `selectSize` instead of `size` to avoid a type conflict with the
 	// `size` HTML attribute of the `select` element.
@@ -35,22 +35,11 @@ const disabledStyles = ( { disabled }: SelectProps ) => {
 	`;
 };
 
-const inputBaseVariantStyles = ( { variant }: SelectProps ) => {
-	if ( variant === 'minimal' ) {
-		return css`
-			display: inline-flex;
-		`;
-	}
-
-	return '';
-};
-
 export const StyledInputBase = styled( InputBase )`
 	color: ${ COLORS.theme.foreground };
 	cursor: pointer;
 
 	${ disabledStyles }
-	${ inputBaseVariantStyles }
 `;
 
 const sizeStyles = ( {
@@ -138,16 +127,6 @@ const overflowStyles = ( { multiple }: SelectProps ) => {
 	};
 };
 
-const variantStyles = ( { variant }: SelectProps ) => {
-	if ( variant === 'minimal' ) {
-		return css( {
-			fieldSizing: 'content',
-		} );
-	}
-
-	return '';
-};
-
 // TODO: Resolve need to use &&& to increase specificity
 // https://github.com/WordPress/gutenberg/issues/18483
 
@@ -171,7 +150,6 @@ export const Select = styled.select< SelectProps >`
 		${ sizeStyles };
 		${ sizePaddings };
 		${ overflowStyles }
-		${ variantStyles }
 	}
 `;
 

@@ -13,7 +13,6 @@ const RtlCssPlugin = require( 'rtlcss-webpack-plugin' );
 const TerserPlugin = require( 'terser-webpack-plugin' );
 const { realpathSync } = require( 'fs' );
 const { sync: glob } = require( 'fast-glob' );
-const { validate } = require( 'schema-utils' );
 
 /**
  * WordPress dependencies
@@ -32,7 +31,7 @@ const {
 	hasPostCSSConfig,
 	getWordPressSrcDirectory,
 	getWebpackEntryPoints,
-	getPhpFilePaths,
+	getRenderPropPaths,
 	getAsBooleanFromENV,
 	getBlockJsonModuleFields,
 	getBlockJsonScriptFields,
@@ -50,45 +49,24 @@ const hasExperimentalModulesFlag = getAsBooleanFromENV(
 	'WP_EXPERIMENTAL_MODULES'
 );
 
-const phpFilePathsPluginSchema = {
-	type: 'object',
-	properties: {
-		props: {
-			type: 'array',
-			items: {
-				type: 'string',
-			},
-		},
-	},
-};
-
 /**
- * The plugin recomputes PHP file paths once on each compilation. It is necessary to avoid repeating processing
+ * The plugin recomputes the render paths once on each compilation. It is necessary to avoid repeating processing
  * when filtering every discovered PHP file in the source folder. This is the most performant way to ensure that
  * changes in `block.json` files are picked up in watch mode.
  */
-class PhpFilePathsPlugin {
+class RenderPathsPlugin {
 	/**
-	 * PHP file paths from `render` and `variations` props found in `block.json` files.
+	 * Paths with the `render` props included in `block.json` files.
 	 *
 	 * @type {string[]}
 	 */
-	static paths;
-
-	constructor( options = {} ) {
-		validate( phpFilePathsPluginSchema, options, {
-			name: 'PHP File Paths Plugin',
-			baseDataPath: 'options',
-		} );
-
-		this.options = options;
-	}
+	static renderPaths;
 
 	apply( compiler ) {
 		const pluginName = this.constructor.name;
 
 		compiler.hooks.thisCompilation.tap( pluginName, () => {
-			this.constructor.paths = getPhpFilePaths( this.options.props );
+			this.constructor.renderPaths = getRenderPropPaths();
 		} );
 	}
 }
@@ -343,7 +321,7 @@ const scriptConfig = {
 				cleanStaleWebpackAssets: false,
 			} ),
 
-		new PhpFilePathsPlugin( { props: [ 'render', 'variations' ] } ),
+		new RenderPathsPlugin(),
 		new CopyWebpackPlugin( {
 			patterns: [
 				{
@@ -393,7 +371,7 @@ const scriptConfig = {
 					filter: ( filepath ) => {
 						return (
 							process.env.WP_COPY_PHP_FILES_TO_DIST ||
-							PhpFilePathsPlugin.paths.includes(
+							RenderPathsPlugin.renderPaths.includes(
 								realpathSync( filepath ).replace( /\\/g, '/' )
 							)
 						);

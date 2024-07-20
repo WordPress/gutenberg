@@ -120,12 +120,6 @@ export const Tab = styled( Ariakit.Tab )`
 			opacity: 1;
 		}
 	}
-
-	[aria-orientation='vertical'] & {
-		min-height: ${ space(
-			10
-		) }; // Avoid fixed height to allow for long strings that go in multiple lines.
-	}
 `;
 
 export const TabPanel = styled( Ariakit.TabPanel )`
