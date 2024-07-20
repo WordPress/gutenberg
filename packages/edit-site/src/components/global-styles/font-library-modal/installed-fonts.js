@@ -55,9 +55,11 @@ function InstalledFonts() {
 		getFontFacesActivated,
 		notice,
 		setNotice,
-		fontFamilies,
-		setFontFamilies,
 	} = useContext( FontLibraryContext );
+
+	const [ fontFamilies, setFontFamilies ] = useGlobalSetting(
+		'typography.fontFamilies'
+	);
 	const [ isConfirmDeleteOpen, setIsConfirmDeleteOpen ] = useState( false );
 	const [ baseFontFamilies ] = useGlobalSetting(
 		'typography.fontFamilies',
@@ -173,12 +175,12 @@ function InstalledFonts() {
 
 	// Toggle select all fonts.
 	const toggleSelectAll = () => {
-		const initialFonts = fontFamilies?.[ libraryFontSelected.source ] ?? [];
-		const deactivateFonts = isSelectAllChecked || isIndeterminate;
-		const newFonts = deactivateFonts
-			? initialFonts.filter(
-					( f ) => f.slug !== libraryFontSelected.slug
-			  )
+		const initialFonts =
+			fontFamilies?.[ libraryFontSelected.source ]?.filter(
+				( f ) => f.slug !== libraryFontSelected.slug
+			) ?? [];
+		const newFonts = isSelectAllChecked
+			? initialFonts
 			: [ ...initialFonts, libraryFontSelected ];
 
 		setFontFamilies( {
@@ -188,7 +190,7 @@ function InstalledFonts() {
 
 		if ( libraryFontSelected.fontFace ) {
 			libraryFontSelected.fontFace.forEach( ( face ) => {
-				if ( deactivateFonts ) {
+				if ( isSelectAllChecked ) {
 					unloadFontFaceInBrowser( face, 'all' );
 				} else {
 					loadFontFaceInBrowser(
