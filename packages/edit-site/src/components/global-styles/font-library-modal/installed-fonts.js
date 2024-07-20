@@ -32,7 +32,12 @@ import { FontLibraryContext } from './context';
 import FontCard from './font-card';
 import LibraryFontVariant from './library-font-variant';
 import { sortFontFaces } from './utils/sort-font-faces';
-import { setUIValuesNeeded } from './utils';
+import {
+	setUIValuesNeeded,
+	loadFontFaceInBrowser,
+	unloadFontFaceInBrowser,
+	getDisplaySrcFromFontFace,
+} from './utils';
 import { unlock } from '../../../lock-unlock';
 
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
@@ -51,11 +56,9 @@ function InstalledFonts() {
 		notice,
 		setNotice,
 		fontFamilies,
-		deactivateFontFamily,
-		activateFontFamily,
+		setFontFamilies,
 	} = useContext( FontLibraryContext );
 	const [ isConfirmDeleteOpen, setIsConfirmDeleteOpen ] = useState( false );
-	const [ isSelectAllChecked, setIsSelectAllChecked ] = useState( true );
 
 	const [ baseFontFamilies ] = useGlobalSetting(
 		'typography.fontFamilies',
@@ -153,14 +156,51 @@ function InstalledFonts() {
 		refreshLibrary();
 	}, [] );
 
-	const handleSelectAll = () => {
-		if ( isSelectAllChecked ) {
-			deactivateFontFamily( libraryFontSelected );
-		} else {
-			activateFontFamily( libraryFontSelected );
-		}
+	// Get activated fonts count.
+	const activeFontsCount = libraryFontSelected
+		? getFontFacesActivated(
+				libraryFontSelected.slug,
+				libraryFontSelected.source
+		  ).length
+		: 0;
 
-		setIsSelectAllChecked( ! isSelectAllChecked );
+	// Check if any fonts are selected.
+	const isIndeterminate =
+		activeFontsCount > 0 &&
+		activeFontsCount !== libraryFontSelected?.fontFace?.length;
+
+	// Check if all fonts are selected.
+	const isSelectAllChecked =
+		activeFontsCount === libraryFontSelected?.fontFace?.length;
+
+	// Toggle select all fonts.
+	const toggleSelectAll = () => {
+		const initialFonts = fontFamilies?.[ libraryFontSelected.source ] ?? [];
+		const deactivateFonts = isSelectAllChecked || isIndeterminate;
+		const newFonts = deactivateFonts
+			? initialFonts.filter(
+					( f ) => f.slug !== libraryFontSelected.slug
+			  )
+			: [ ...initialFonts, libraryFontSelected ];
+
+		setFontFamilies( {
+			...fontFamilies,
+			[ libraryFontSelected.source ]: newFonts,
+		} );
+
+		if ( libraryFontSelected.fontFace ) {
+			libraryFontSelected.fontFace.forEach( ( face ) => {
+				if ( deactivateFonts ) {
+					unloadFontFaceInBrowser( face, 'all' );
+				} else {
+					loadFontFaceInBrowser(
+						face,
+						getDisplaySrcFromFontFace( face?.src ),
+						'all'
+					);
+				}
+			} );
+		}
 	};
 
 	return (
@@ -324,7 +364,9 @@ function InstalledFonts() {
 									className="font-library-modal__select-all"
 									label={ __( 'Select all' ) }
 									checked={ isSelectAllChecked }
-									onChange={ handleSelectAll }
+									onChange={ toggleSelectAll }
+									indeterminate={ isIndeterminate }
+									__nextHasNoMarginBottom
 								/>
 								<Spacer margin={ 8 } />
 								{ getFontFacesToDisplay(
