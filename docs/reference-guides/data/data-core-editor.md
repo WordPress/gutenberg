@@ -248,6 +248,14 @@ _Returns_
 
 Returns the post type of the post currently being edited.
 
+_Usage_
+
+Get the current post type
+
+```js
+const currentPostType = wp.data.select('core/editor').getCurrentPostType()
+```
+
 _Parameters_
 
 -   _state_ `Object`: Global application state.
@@ -283,6 +291,60 @@ _Returns_
 ### getEditedPostAttribute
 
 Returns a single attribute of the post being edited, preferring the unsaved edit if one exists, but falling back to the attribute for the last known saved state of the post.
+
+_Usage_
+
+Fetch the featured image URL
+
+```js
+const getFeaturedMediaUrl = useSelect((select) => {
+	const getFeaturedMediaId = select('core/editor').getEditedPostAttribute('featured_media')
+	const getMedia = select('core').getMedia(getFeaturedMediaId)
+	return getMedia?.media_details?.sizes?.large?.source_url || getMedia?.source_url || '' // change large for any registered size
+}, [])
+```
+
+Update Post Meta from Media Upload in a Block
+
+```js
+import { useBlockProps, MediaUpload, MediaUploadCheck } from '@wordpress/block-editor'
+import { Button } from '@wordpress/components';
+import { useSelect, useDispatch } from '@wordpress/data'
+
+const Edit = () => {
+  const { editPost } = useDispatch('core/editor')
+
+  // Get core meta data
+  const { uploaded_file, file_description } = useSelect((select) => {
+    return select('core/editor').getEditedPostAttribute('meta')
+  })
+
+  const onMediaUpload = (media) => {
+    editPost({
+      meta: {
+        uploaded_file: media.url,
+        file_description: media.description,
+      },
+    })
+  }
+
+  return (
+    <div
+      {...useBlockProps()}
+    >
+      <MediaUploadCheck>
+        <MediaUpload
+          onSelect={onMediaUpload}
+          mode="upload"
+          render={({ open }) => (
+            <Button variant="primary" onClick={open} title={uploaded_file ? `Replace File` : `Add a File`} />
+          )}
+        />
+      </MediaUploadCheck>
+    </div>
+  )
+}
+```
 
 _Parameters_
 
@@ -1153,6 +1215,56 @@ Disables the publish sidebar.
 ### editPost
 
 Returns an action object used in signalling that attributes of the post have been edited.
+
+_Usage_
+
+Update the post title
+
+```js
+wp.data.dispatch('core/editor').editPost({ title: `${newTitle}` })
+```
+
+Update Post Meta from Media Upload in a Block
+
+```js
+import { useBlockProps, MediaUpload, MediaUploadCheck } from '@wordpress/block-editor'
+import { Button } from '@wordpress/components';
+import { useSelect, useDispatch } from '@wordpress/data'
+
+const Edit = () => {
+  const { editPost } = useDispatch('core/editor')
+
+  // Get core meta data
+  const { uploaded_file, file_description } = useSelect((select) => {
+    return select('core/editor').getEditedPostAttribute('meta')
+  })
+
+  const onFileUpload = (media) => {
+    editPost({
+      meta: {
+        uploaded_file: media.url,
+        file_description: media.description,
+      },
+    })
+  }
+
+  return (
+    <div
+      {...useBlockProps()}
+    >
+      <MediaUploadCheck>
+        <MediaUpload
+          onSelect={onFileUpload}
+          mode="upload"
+          render={({ open }) => (
+            <Button variant="primary" onClick={open} title={uploaded_file ? `Replace File` : `Add a File`} />
+          )}
+        />
+      </MediaUploadCheck>
+    </div>
+  )
+}
+```
 
 _Parameters_
 
