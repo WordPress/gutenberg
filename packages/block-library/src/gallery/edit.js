@@ -14,10 +14,8 @@ import {
 	ToggleControl,
 	RangeControl,
 	Spinner,
-	DropdownMenu,
 	MenuGroup,
 	MenuItem,
-	ToolbarGroup,
 	ToolbarDropdownMenu,
 	withNotices,
 } from '@wordpress/components';
