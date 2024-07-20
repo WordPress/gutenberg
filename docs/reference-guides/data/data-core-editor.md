@@ -307,6 +307,7 @@ const getFeaturedMediaUrl = useSelect((select) => {
 Update Post Meta from Media Upload in a Block
 
 ```js
+import { __ } from '@wordpress/i18n';
 import { useBlockProps, MediaUpload, MediaUploadCheck } from '@wordpress/block-editor'
 import { Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data'
@@ -337,7 +338,7 @@ const Edit = () => {
           onSelect={onMediaUpload}
           mode="upload"
           render={({ open }) => (
-            <Button variant="primary" onClick={open} title={uploaded_file ? `Replace File` : `Add a File`} />
+            <Button variant="primary" onClick={open} title={uploaded_file ? __( 'Replace File' ) : __( 'A a File' )} />
           )}
         />
       </MediaUploadCheck>
@@ -1227,6 +1228,7 @@ wp.data.dispatch('core/editor').editPost({ title: `${newTitle}` })
 Update Post Meta from Media Upload in a Block
 
 ```js
+import { __ } from '@wordpress/i18n';
 import { useBlockProps, MediaUpload, MediaUploadCheck } from '@wordpress/block-editor'
 import { Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data'
@@ -1239,7 +1241,7 @@ const Edit = () => {
     return select('core/editor').getEditedPostAttribute('meta')
   })
 
-  const onFileUpload = (media) => {
+  const onMediaUpload = (media) => {
     editPost({
       meta: {
         uploaded_file: media.url,
@@ -1254,10 +1256,10 @@ const Edit = () => {
     >
       <MediaUploadCheck>
         <MediaUpload
-          onSelect={onFileUpload}
+          onSelect={onMediaUpload}
           mode="upload"
           render={({ open }) => (
-            <Button variant="primary" onClick={open} title={uploaded_file ? `Replace File` : `Add a File`} />
+            <Button variant="primary" onClick={open} title={uploaded_file ? __( 'Replace File' ) : __( 'A a File' )} />
           )}
         />
       </MediaUploadCheck>
