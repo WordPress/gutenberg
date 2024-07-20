@@ -76,15 +76,10 @@ $navigation-icon-size: 24px;
 		}
 	}
 
-	&:where(:not([class*="has-text-decoration"])) {
-		a {
-			text-decoration: none;
-
-			&:focus,
-			&:active {
-				text-decoration: none;
-			}
-		}
+	& :where(a),
+	& :where(a:focus),
+	& :where(a:active) {
+		text-decoration: none;
 	}
 
 	// Submenu indicator.

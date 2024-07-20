@@ -60,7 +60,7 @@ Determines if the label can render.
 
 ### labelRef
 
-Callback [Ref](https://reactjs.org/docs/forwarding-refs.html) for the label element.
+Callback [Ref](https://react.dev/learn/manipulating-the-dom-with-refs) for the label element.
 
 -   Type: `Function`
 -   Required: No

@@ -46,6 +46,7 @@ function UnforwardedSelectControl(
 		children,
 		prefix,
 		suffix,
+		variant = 'default',
 		__next40pxDefaultSize = false,
 		__nextHasNoMarginBottom = false,
 		...restProps
@@ -86,6 +87,7 @@ function UnforwardedSelectControl(
 				disabled={ disabled }
 				hideLabelFromVision={ hideLabelFromVision }
 				id={ id }
+				isBorderless={ variant === 'minimal' }
 				label={ label }
 				size={ size }
 				suffix={
@@ -93,6 +95,10 @@ function UnforwardedSelectControl(
 				}
 				prefix={ prefix }
 				labelPosition={ labelPosition }
+				__unstableInputWidth={
+					variant === 'minimal' ? 'auto' : undefined
+				}
+				variant={ variant }
 				__next40pxDefaultSize={ __next40pxDefaultSize }
 			>
 				<Select
@@ -107,6 +113,7 @@ function UnforwardedSelectControl(
 					ref={ ref }
 					selectSize={ size }
 					value={ valueProp }
+					variant={ variant }
 				>
 					{ children ||
 						options.map( ( option, index ) => {

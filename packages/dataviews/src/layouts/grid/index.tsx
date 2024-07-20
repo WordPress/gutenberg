@@ -19,15 +19,15 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import ItemActions from '../../item-actions';
-import SingleSelectionCheckbox from '../../single-selection-checkbox';
-import { useHasAPossibleBulkAction } from '../../bulk-actions';
+import ItemActions from '../../components/dataviews-item-actions';
+import SingleSelectionCheckbox from '../../components/dataviews-selection-checkbox';
+import { useHasAPossibleBulkAction } from '../../components/dataviews-bulk-actions';
 import type { Action, NormalizedField, ViewGridProps } from '../../types';
 import type { SetSelection } from '../../private-types';
 
 interface GridItemProps< Item > {
 	selection: string[];
-	onSelectionChange: SetSelection;
+	onChangeSelection: SetSelection;
 	getItemId: ( item: Item ) => string;
 	item: Item;
 	actions: Action< Item >[];
@@ -40,7 +40,7 @@ interface GridItemProps< Item > {
 
 function GridItem< Item >( {
 	selection,
-	onSelectionChange,
+	onChangeSelection,
 	getItemId,
 	item,
 	actions,
@@ -73,7 +73,7 @@ function GridItem< Item >( {
 					if ( ! hasBulkAction ) {
 						return;
 					}
-					onSelectionChange(
+					onChangeSelection(
 						selection.includes( id )
 							? selection.filter( ( itemId ) => id !== itemId )
 							: [ ...selection, id ]
@@ -91,7 +91,7 @@ function GridItem< Item >( {
 				<SingleSelectionCheckbox
 					item={ item }
 					selection={ selection }
-					onSelectionChange={ onSelectionChange }
+					onChangeSelection={ onChangeSelection }
 					getItemId={ getItemId }
 					primaryField={ primaryField }
 					disabled={ ! hasBulkAction }
@@ -169,7 +169,7 @@ export default function ViewGrid< Item >( {
 	fields,
 	getItemId,
 	isLoading,
-	onSelectionChange,
+	onChangeSelection,
 	selection,
 	view,
 }: ViewGridProps< Item > ) {
@@ -217,7 +217,7 @@ export default function ViewGrid< Item >( {
 							<GridItem
 								key={ getItemId( item ) }
 								selection={ selection }
-								onSelectionChange={ onSelectionChange }
+								onChangeSelection={ onChangeSelection }
 								getItemId={ getItemId }
 								item={ item }
 								actions={ actions }

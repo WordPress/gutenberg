@@ -179,8 +179,8 @@ const child = spawn.sync(
 		'--json',
 		'--long',
 		'--all',
-		...( prod ? [ '--prod' ] : [] ),
-		...( dev ? [ '--dev' ] : [] ),
+		...( prod ? [ '--omit=dev' ] : [] ),
+		...( dev ? [ '--include=dev' ] : [] ),
 	],
 	/*
 	 * Set the max buffer to ~157MB, since the output size for
@@ -198,10 +198,14 @@ function traverseDepTree( deps ) {
 		const dep = deps[ key ];
 
 		if ( ignored.includes( dep.name ) ) {
-			return;
+			continue;
 		}
 
-		if ( ! dep.hasOwnProperty( 'path' ) ) {
+		if ( Object.keys( dep ).length === 0 ) {
+			continue;
+		}
+
+		if ( ! dep.hasOwnProperty( 'path' ) && ! dep.missing ) {
 			if ( dep.hasOwnProperty( 'peerMissing' ) ) {
 				process.stdout.write(
 					`${ WARNING } Unable to locate path for missing peer dep ${ dep.name }@${ dep.version }. `
@@ -213,17 +217,15 @@ function traverseDepTree( deps ) {
 				);
 			}
 		} else if ( dep.missing ) {
-			process.stdout.write(
-				`${ WARNING } missing dep ${ dep.name }@${ dep.version }. `
-			);
+			for ( const problem of dep.problems ) {
+				process.stdout.write( `${ WARNING } ${ problem }.\n` );
+			}
 		} else {
 			checkDepLicense( dep.path );
 		}
 
 		if ( dep.hasOwnProperty( 'dependencies' ) ) {
 			traverseDepTree( dep.dependencies );
-		} else {
-			return;
 		}
 	}
 }
@@ -271,6 +273,8 @@ function detectTypeFromLicenseText( licenseText ) {
 		false
 	);
 }
+
+const reportedPackages = new Set();
 
 function checkDepLicense( path ) {
 	if ( ! path ) {
@@ -333,7 +337,7 @@ function checkDepLicense( path ) {
 	}
 
 	let detectedLicenseTypes = [ detectedLicenseType ];
-	if ( detectedLicenseType.includes( ' AND ' ) ) {
+	if ( detectedLicenseType && detectedLicenseType.includes( ' AND ' ) ) {
 		detectedLicenseTypes = detectedLicenseType
 			.replace( /^\(*/g, '' )
 			.replace( /\)*$/, '' )
@@ -344,6 +348,13 @@ function checkDepLicense( path ) {
 	if ( checkAllCompatible( detectedLicenseTypes, licenses ) ) {
 		return;
 	}
+
+	// Do not report same package twice.
+	if ( reportedPackages.has( packageInfo.name ) ) {
+		return;
+	}
+
+	reportedPackages.add( packageInfo.name );
 
 	process.exitCode = 1;
 	process.stdout.write(

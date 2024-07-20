@@ -329,7 +329,7 @@ describe( 'Button', () => {
 		} );
 
 		it( 'should support adding aria-describedby text', () => {
-			render( <Button describedBy="Description text" /> );
+			render( <Button description="Description text" /> );
 			expect(
 				screen.getByRole( 'button', {
 					description: 'Description text',
@@ -342,7 +342,7 @@ describe( 'Button', () => {
 
 			render(
 				<Button
-					describedBy="Description text"
+					description="Description text"
 					label="Label"
 					icon={ plusCircle }
 				/>
@@ -364,7 +364,7 @@ describe( 'Button', () => {
 			render(
 				<Button
 					label="Label"
-					describedBy="Description text"
+					description="Description text"
 					icon={ plusCircle }
 					showTooltip
 				>
