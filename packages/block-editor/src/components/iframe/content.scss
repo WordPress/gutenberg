@@ -24,39 +24,6 @@ iframe[name="editor-canvas"].is-zoomed-out {
 }
 
 .block-editor-iframe__html.is-zoomed-out {
-	$scale: var(--wp-block-editor-iframe-zoom-out-scale);
-
-	// Customize the scrollbar to counterscale its width but only for devices with fine
-	// pointers as otherwise scrollbars are likely to be overlaid and not affected by
-	// scaling. This isn’t perfect as some devices might have a fine cursor but still use
-	// overlaid scrollbars. Additionally, the width of the scrollbar reduces the width of
-	// the content area so the "default" scaling should factor it in to accurately keep
-	// the content width the same as when unzoomed.
-	@media (pointer: fine) {
-		&::-webkit-scrollbar {
-			// 15px seems a de facto standard but likely not all devices. It may
-			// be possible to derive the device size with some DOM measurements
-			// if this needs to be improved.
-			width: calc(15px / #{$scale});
-		}
-		&::-webkit-scrollbar-track {
-			background-color: $gray-100;
-			border-inline-start: calc(1px / #{$scale}) solid $gray-300;
-		}
-		&::-webkit-scrollbar-thumb {
-			background-color: $gray-400;
-			background-clip: content-box;
-			border-color: transparent;
-			border-style: solid;
-			$border-width-base: calc(3px / #{$scale});
-			border-width: $border-width-base;
-			// One more pixel on the start side to make the thumb appear centered
-			// in the track due to its one pixel border on the start side.
-			border-inline-start-width: calc(4px / #{$scale});
-			border-radius: 999px;
-		}
-	}
-
 	// Expands main content area.
 	// See: https://github.com/WordPress/gutenberg/pull/59512
 	&,
