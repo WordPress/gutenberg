@@ -104,6 +104,11 @@ function useBubbleEvents( iframeDocument ) {
 	} );
 }
 
+// The max-width for the iframe when zoomed out, though the frameSize is treated as within
+// so the actual width of the iframe will be less than this by the frameSize on each side.
+// This is also hardcoded in the styles so be sure to keep them in sync.
+const ZOOM_OUT_MAX_WIDTH = 750;
+
 function Iframe( {
 	contentRef,
 	children,
@@ -262,8 +267,11 @@ function Iframe( {
 			refZoomOutStatus.current.effect = ( isActive, nextWidth ) => {
 				if ( isActive ) {
 					const { priorContainerWidth } = refZoomOutStatus.current;
-					nextWidth -= frameSize * 2;
-					const nextScale = nextWidth / priorContainerWidth;
+					const frameInlineWidth = frameSize * 2;
+					nextWidth -= frameInlineWidth;
+					const maxWidth = ZOOM_OUT_MAX_WIDTH - frameInlineWidth;
+					const nextScale =
+						Math.min( maxWidth, nextWidth ) / priorContainerWidth;
 					actualizeZoom( nextScale, `${ frameSize }px` );
 					clearTimeout( refZoomOutStatus.current.timerId );
 					refZoomOutStatus.current.timerId = setTimeout( () => {
