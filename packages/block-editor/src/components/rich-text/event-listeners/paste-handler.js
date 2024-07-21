@@ -27,12 +27,6 @@ export default ( props ) => ( element ) => {
 			pastePlainText,
 		} = props.current;
 
-		// The event listener is attached to the window, so we need to check if
-		// the target is the element.
-		if ( event.target !== element ) {
-			return;
-		}
-
 		if ( event.defaultPrevented ) {
 			return;
 		}
