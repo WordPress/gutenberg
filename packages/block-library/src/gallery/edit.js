@@ -70,16 +70,19 @@ const linkOptions = [
 		icon: customLink,
 		label: __( 'Link images to attachment pages' ),
 		value: LINK_DESTINATION_ATTACHMENT,
+		noticeText: __( 'Attachment Pages' ),
 	},
 	{
 		icon: imageIcon,
 		label: __( 'Link images to media files' ),
 		value: LINK_DESTINATION_MEDIA,
+		noticeText: __( 'Media Files' ),
 	},
 	{
 		icon: linkOff,
 		label: _x( 'None', 'Media item link option' ),
 		value: LINK_DESTINATION_NONE,
+		noticeText: __( 'None' ),
 	},
 ];
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
@@ -377,7 +380,7 @@ function GalleryEdit( props ) {
 			sprintf(
 				/* translators: %s: image size settings */
 				__( 'All gallery image links updated to: %s' ),
-				linkToText.label
+				linkToText.noticeText
 			),
 			{
 				id: 'gallery-attributes-linkTo',
