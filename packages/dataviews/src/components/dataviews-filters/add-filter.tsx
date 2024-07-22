@@ -16,8 +16,8 @@ import { forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { unlock } from './lock-unlock';
-import type { NormalizedFilter, View } from './types';
+import { unlock } from '../../lock-unlock';
+import type { NormalizedFilter, View } from '../../types';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -46,7 +46,7 @@ function AddFilter(
 				<Button
 					accessibleWhenDisabled
 					size="compact"
-					className="dataviews-filters-button"
+					className="dataviews-filters__button"
 					variant="tertiary"
 					disabled={ ! inactiveFilters.length }
 					ref={ ref }

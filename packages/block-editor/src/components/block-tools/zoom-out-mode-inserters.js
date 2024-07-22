@@ -3,28 +3,33 @@
  */
 import { useSelect } from '@wordpress/data';
 import { useEffect, useRef, useState } from '@wordpress/element';
-import { Button } from '@wordpress/components';
-import { plus } from '@wordpress/icons';
-import { _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import BlockPopoverInbetween from '../block-popover/inbetween';
+import ZoomOutModeInserterButton from './zoom-out-mode-inserter-button';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 function ZoomOutModeInserters() {
 	const [ isReady, setIsReady ] = useState( false );
 	const {
+		hasSelection,
 		blockOrder,
-		sectionRootClientId,
 		insertionPoint,
 		setInserterIsOpened,
-		hasSelection,
+		sectionRootClientId,
+		selectedBlockClientId,
+		hoveredBlockClientId,
 	} = useSelect( ( select ) => {
-		const { getSettings, getBlockOrder, getSelectionStart } =
-			select( blockEditorStore );
+		const {
+			getSettings,
+			getBlockOrder,
+			getSelectionStart,
+			getSelectedBlockClientId,
+			getHoveredBlockClientId,
+		} = select( blockEditorStore );
 		const { sectionRootClientId: root } = unlock( getSettings() );
 		// To do: move ZoomOutModeInserters to core/editor.
 		// Or we perhaps we should move the insertion point state to the
@@ -40,6 +45,8 @@ function ZoomOutModeInserters() {
 			sectionRootClientId: root,
 			setInserterIsOpened:
 				getSettings().__experimentalSetIsInserterOpened,
+			selectedBlockClientId: getSelectedBlockClientId(),
+			hoveredBlockClientId: getHoveredBlockClientId(),
 		};
 	}, [] );
 
@@ -64,18 +71,39 @@ function ZoomOutModeInserters() {
 		};
 	}, [] );
 
-	if ( ! isReady || ! hasSelection ) {
+	if ( ! isReady ) {
 		return null;
 	}
 
 	return [ undefined, ...blockOrder ].map( ( clientId, index ) => {
+		const shouldRenderInserter = insertionPoint.insertionIndex !== index;
+
+		const shouldRenderInsertionPoint =
+			insertionPoint.insertionIndex === index;
+
+		if ( ! shouldRenderInserter && ! shouldRenderInsertionPoint ) {
+			return null;
+		}
+
+		const previousClientId = clientId;
+		const nextClientId = blockOrder[ index ];
+
+		const isSelected =
+			hasSelection &&
+			( selectedBlockClientId === previousClientId ||
+				selectedBlockClientId === nextClientId );
+
+		const isHovered =
+			hoveredBlockClientId === previousClientId ||
+			hoveredBlockClientId === nextClientId;
+
 		return (
 			<BlockPopoverInbetween
 				key={ index }
-				previousClientId={ clientId }
-				nextClientId={ blockOrder[ index ] }
+				previousClientId={ previousClientId }
+				nextClientId={ nextClientId }
 			>
-				{ insertionPoint.insertionIndex === index && (
+				{ shouldRenderInsertionPoint && (
 					<div
 						style={ {
 							borderRadius: '0',
@@ -87,12 +115,9 @@ function ZoomOutModeInserters() {
 						className="block-editor-block-list__insertion-point-indicator"
 					/>
 				) }
-				{ insertionPoint.insertionIndex !== index && (
-					<Button
-						variant="primary"
-						icon={ plus }
-						size="compact"
-						className="block-editor-button-pattern-inserter__button"
+				{ shouldRenderInserter && (
+					<ZoomOutModeInserterButton
+						isVisible={ isSelected || isHovered }
 						onClick={ () => {
 							setInserterIsOpened( {
 								rootClientId: sectionRootClientId,
@@ -101,10 +126,6 @@ function ZoomOutModeInserters() {
 								category: 'all',
 							} );
 						} }
-						label={ _x(
-							'Add pattern',
-							'Generic label for pattern inserter button'
-						) }
 					/>
 				) }
 			</BlockPopoverInbetween>

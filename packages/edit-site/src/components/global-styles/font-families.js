@@ -26,8 +26,14 @@ import { unlock } from '../../lock-unlock';
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 
 function FontFamilies() {
-	const { modalTabOpen, setModalTabOpen } = useContext( FontLibraryContext );
+	const { baseCustomFonts, modalTabOpen, setModalTabOpen } =
+		useContext( FontLibraryContext );
 	const [ fontFamilies ] = useGlobalSetting( 'typography.fontFamilies' );
+	const [ baseFontFamilies ] = useGlobalSetting(
+		'typography.fontFamilies',
+		undefined,
+		'base'
+	);
 	const themeFonts = fontFamilies?.theme
 		? fontFamilies.theme
 				.map( ( f ) => setUIValuesNeeded( f, { source: 'theme' } ) )
@@ -39,6 +45,11 @@ function FontFamilies() {
 				.sort( ( a, b ) => a.name.localeCompare( b.name ) )
 		: [];
 	const hasFonts = 0 < customFonts.length || 0 < themeFonts.length;
+
+	const hasInstalledFonts =
+		hasFonts ||
+		baseFontFamilies?.theme?.length > 0 ||
+		baseCustomFonts?.length > 0;
 
 	return (
 		<>
@@ -89,7 +100,11 @@ function FontFamilies() {
 				{ ! hasFonts && (
 					<VStack>
 						<Subtitle level={ 3 }>{ __( 'Fonts' ) }</Subtitle>
-						<Text as="p">{ __( 'No fonts installed.' ) }</Text>
+						<Text as="p">
+							{ hasInstalledFonts
+								? __( 'No fonts activated.' )
+								: __( 'No fonts installed.' ) }
+						</Text>
 					</VStack>
 				) }
 				<Button
@@ -98,11 +113,15 @@ function FontFamilies() {
 					__next40pxDefaultSize
 					onClick={ () =>
 						setModalTabOpen(
-							hasFonts ? 'installed-fonts' : 'upload-fonts'
+							hasInstalledFonts
+								? 'installed-fonts'
+								: 'upload-fonts'
 						)
 					}
 				>
-					{ hasFonts ? __( 'Manage fonts' ) : __( 'Add fonts' ) }
+					{ hasInstalledFonts
+						? __( 'Manage fonts' )
+						: __( 'Add fonts' ) }
 				</Button>
 			</VStack>
 		</>

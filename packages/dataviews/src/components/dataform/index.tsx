@@ -12,8 +12,8 @@ import { useCallback, useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { Form, Field, NormalizedField } from './types';
-import { normalizeFields } from './normalize-fields';
+import type { Form, Field, NormalizedField } from '../../types';
+import { normalizeFields } from '../../normalize-fields';
 
 type DataFormProps< Item > = {
 	data: Item;

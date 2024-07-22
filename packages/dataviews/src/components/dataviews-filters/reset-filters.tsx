@@ -7,7 +7,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import type { NormalizedFilter, View } from './types';
+import type { NormalizedFilter, View } from '../../types';
 
 interface ResetFilterProps {
 	filters: NormalizedFilter[];

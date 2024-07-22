@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { memo, useRef } from '@wordpress/element';
+import { memo, useContext, useRef } from '@wordpress/element';
 import { __experimentalHStack as HStack } from '@wordpress/components';
 
 /**
@@ -10,25 +10,14 @@ import { __experimentalHStack as HStack } from '@wordpress/components';
 import FilterSummary from './filter-summary';
 import AddFilter from './add-filter';
 import ResetFilters from './reset-filters';
-import { sanitizeOperators } from './utils';
-import { ALL_OPERATORS, OPERATOR_IS, OPERATOR_IS_NOT } from './constants';
-import type { NormalizedField, NormalizedFilter, View } from './types';
+import DataViewsContext from '../dataviews-context';
+import { sanitizeOperators } from '../../utils';
+import { ALL_OPERATORS, OPERATOR_IS, OPERATOR_IS_NOT } from '../../constants';
+import type { NormalizedFilter } from '../../types';
 
-interface FiltersProps< Item > {
-	fields: NormalizedField< Item >[];
-	view: View;
-	onChangeView: ( view: View ) => void;
-	openedFilter: string | null;
-	setOpenedFilter: ( openedFilter: string | null ) => void;
-}
-
-function _Filters< Item >( {
-	fields,
-	view,
-	onChangeView,
-	openedFilter,
-	setOpenedFilter,
-}: FiltersProps< Item > ) {
+function Filters() {
+	const { fields, view, onChangeView, openedFilter, setOpenedFilter } =
+		useContext( DataViewsContext );
 	const addFilterRef = useRef< HTMLButtonElement >( null );
 	const filters: NormalizedFilter[] = [];
 	fields.forEach( ( field ) => {
@@ -119,7 +108,4 @@ function _Filters< Item >( {
 	);
 }
 
-// A type assertion is used here to keep the type argument.
-const Filters = memo( _Filters ) as typeof _Filters;
-
-export default Filters;
+export default memo( Filters );

@@ -35,8 +35,14 @@ import {
 	OPERATOR_IS_NONE,
 	OPERATOR_IS_ALL,
 	OPERATOR_IS_NOT_ALL,
-} from './constants';
-import type { Filter, NormalizedFilter, Operator, Option, View } from './types';
+} from '../../constants';
+import type {
+	Filter,
+	NormalizedFilter,
+	Operator,
+	Option,
+	View,
+} from '../../types';
 
 interface FilterTextProps {
 	activeElements: Option[];
@@ -65,8 +71,10 @@ const FilterText = ( {
 	}
 
 	const filterTextWrappers = {
-		Name: <span className="dataviews-filter-summary__filter-text-name" />,
-		Value: <span className="dataviews-filter-summary__filter-text-value" />,
+		Name: <span className="dataviews-filters__summary-filter-text-name" />,
+		Value: (
+			<span className="dataviews-filters__summary-filter-text-value" />
+		),
 	};
 
 	if ( filterInView?.operator === OPERATOR_IS_ANY ) {
@@ -166,9 +174,9 @@ function OperatorSelector( {
 			<HStack
 				spacing={ 2 }
 				justify="flex-start"
-				className="dataviews-filter-summary__operators-container"
+				className="dataviews-filters__summary-operators-container"
 			>
-				<FlexItem className="dataviews-filter-summary__operators-filter-name">
+				<FlexItem className="dataviews-filters__summary-operators-filter-name">
 					{ filter.name }
 				</FlexItem>
 
@@ -239,13 +247,13 @@ export default function FilterSummary( {
 	return (
 		<Dropdown
 			defaultOpen={ openedFilter === filter.field }
-			contentClassName="dataviews-filter-summary__popover"
+			contentClassName="dataviews-filters__summary-popover"
 			popoverProps={ { placement: 'bottom-start', role: 'dialog' } }
 			onClose={ () => {
 				toggleRef.current?.focus();
 			} }
 			renderToggle={ ( { isOpen, onToggle } ) => (
-				<div className="dataviews-filter-summary__chip-container">
+				<div className="dataviews-filters__summary-chip-container">
 					<Tooltip
 						text={ sprintf(
 							/* translators: 1: Filter name. */
@@ -256,7 +264,7 @@ export default function FilterSummary( {
 					>
 						<div
 							className={ clsx(
-								'dataviews-filter-summary__chip',
+								'dataviews-filters__summary-chip',
 								{
 									'has-reset': canResetOrRemove,
 									'has-values': hasValues,
@@ -289,7 +297,7 @@ export default function FilterSummary( {
 						>
 							<button
 								className={ clsx(
-									'dataviews-filter-summary__chip-remove',
+									'dataviews-filters__summary-chip-remove',
 									{ 'has-values': hasValues }
 								) }
 								onClick={ () => {
