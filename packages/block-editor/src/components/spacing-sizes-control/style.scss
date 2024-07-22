@@ -4,6 +4,11 @@
 		margin-bottom: 0;
 	}
 
+	.components-range-control__track {
+		transition: width ease 0.1s;
+		@include reduce-motion("transition");
+	}
+
 	.spacing-sizes-control__range-control,
 	.spacing-sizes-control__custom-value-range {
 		height: 40px;
@@ -36,6 +41,8 @@
 
 	.components-range-control__thumb-wrapper {
 		z-index: 3;
+		transition: left ease 0.1s;
+		@include reduce-motion("transition");
 	}
 }
 
