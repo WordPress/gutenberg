@@ -85,7 +85,7 @@ function FontSizePicker( {
 							: __( 'Default' )
 					}
 					onPress={ openSubSheet }
-					accessibilityRole={ 'button' }
+					accessibilityRole="button"
 					accessibilityLabel={ accessibilityLabel }
 					accessibilityHint={ sprintf(
 						// translators: %s: Select control button label e.g. Small
@@ -112,8 +112,8 @@ function FontSizePicker( {
 						label={ __( 'Default' ) }
 						onPress={ onChangeValue( undefined ) }
 						leftAlign
-						key={ 'default' }
-						accessibilityRole={ 'button' }
+						key="default"
+						accessibilityRole="button"
 						accessibilityLabel={ __( 'Selected: Default' ) }
 						accessibilityHint={ __(
 							'Double tap to select default font size'
@@ -139,7 +139,7 @@ function FontSizePicker( {
 								onPress={ onChangeValue( item.sizePx ) }
 								leftAlign
 								key={ index }
-								accessibilityRole={ 'button' }
+								accessibilityRole="button"
 								accessibilityLabel={
 									item.sizePx === selectedValue
 										? sprintf(

@@ -42,7 +42,7 @@ export default function PostActions( { onActionPerformed, buttonProps } ) {
 			postType: _postType,
 		};
 	}, [] );
-	const allActions = usePostActions( postType, onActionPerformed );
+	const allActions = usePostActions( { postType, onActionPerformed } );
 
 	const actions = useMemo( () => {
 		return allActions.filter( ( action ) => {
@@ -59,7 +59,7 @@ export default function PostActions( { onActionPerformed, buttonProps } ) {
 					icon={ moreVertical }
 					label={ __( 'Actions' ) }
 					disabled={ ! actions.length }
-					__experimentalIsFocusable
+					accessibleWhenDisabled
 					className="editor-all-actions-button"
 					onClick={ () =>
 						setIsActionsMenuOpen( ! isActionsMenuOpen )
@@ -87,13 +87,15 @@ export default function PostActions( { onActionPerformed, buttonProps } ) {
 // so duplicating the code here seems like the least bad option.
 
 // Copied as is from packages/dataviews/src/item-actions.js
-function DropdownMenuItemTrigger( { action, onClick } ) {
+function DropdownMenuItemTrigger( { action, onClick, items } ) {
+	const label =
+		typeof action.label === 'string' ? action.label : action.label( items );
 	return (
 		<DropdownMenuItem
 			onClick={ onClick }
 			hideOnClick={ ! action.RenderModal }
 		>
-			<DropdownMenuItemLabel>{ action.label }</DropdownMenuItemLabel>
+			<DropdownMenuItemLabel>{ label }</DropdownMenuItemLabel>
 		</DropdownMenuItem>
 	);
 }
@@ -105,6 +107,7 @@ function ActionWithModal( { action, item, ActionTrigger, onClose } ) {
 	const actionTriggerProps = {
 		action,
 		onClick: () => setIsModalOpen( true ),
+		items: [ item ],
 	};
 	const { RenderModal, hideModalHeader } = action;
 	return (
@@ -120,6 +123,8 @@ function ActionWithModal( { action, item, ActionTrigger, onClose } ) {
 					overlayClassName={ `editor-action-modal editor-action-modal__${ kebabCase(
 						action.id
 					) }` }
+					focusOnMount="firstContentElement"
+					size="small"
 				>
 					<RenderModal
 						items={ [ item ] }
@@ -156,6 +161,7 @@ function ActionsDropdownMenuGroup( { actions, item, onClose } ) {
 						key={ action.id }
 						action={ action }
 						onClick={ () => action.callback( [ item ] ) }
+						items={ [ item ] }
 					/>
 				);
 			} ) }

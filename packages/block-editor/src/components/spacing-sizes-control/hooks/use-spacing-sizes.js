@@ -1,28 +1,63 @@
 /**
  * WordPress dependencies
  */
+import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import { useSettings } from '../../use-settings';
+import { RANGE_CONTROL_MAX_SIZE } from '../utils';
+
+const EMPTY_ARRAY = [];
+
+const compare = new Intl.Collator( 'und', { numeric: true } ).compare;
 
 export default function useSpacingSizes() {
-	const spacingSizes = [ { name: 0, slug: '0', size: 0 } ];
+	const [
+		customSpacingSizes,
+		themeSpacingSizes,
+		defaultSpacingSizes,
+		defaultSpacingSizesEnabled,
+	] = useSettings(
+		'spacing.spacingSizes.custom',
+		'spacing.spacingSizes.theme',
+		'spacing.spacingSizes.default',
+		'spacing.defaultSpacingSizes'
+	);
 
-	const [ settingsSizes ] = useSettings( 'spacing.spacingSizes' );
-	if ( settingsSizes ) {
-		spacingSizes.push( ...settingsSizes );
-	}
+	const customSizes = customSpacingSizes ?? EMPTY_ARRAY;
 
-	if ( spacingSizes.length > 8 ) {
-		spacingSizes.unshift( {
-			name: __( 'Default' ),
-			slug: 'default',
-			size: undefined,
-		} );
-	}
+	const themeSizes = themeSpacingSizes ?? EMPTY_ARRAY;
 
-	return spacingSizes;
+	const defaultSizes =
+		defaultSpacingSizes && defaultSpacingSizesEnabled !== false
+			? defaultSpacingSizes
+			: EMPTY_ARRAY;
+
+	return useMemo( () => {
+		const sizes = [
+			{ name: __( 'None' ), slug: '0', size: 0 },
+			...customSizes,
+			...themeSizes,
+			...defaultSizes,
+		];
+
+		// Using numeric slugs opts-in to sorting by slug.
+		if ( sizes.every( ( { slug } ) => /^[0-9]/.test( slug ) ) ) {
+			sizes.sort( ( a, b ) => compare( a.slug, b.slug ) );
+		}
+
+		return sizes.length > RANGE_CONTROL_MAX_SIZE
+			? [
+					{
+						name: __( 'Default' ),
+						slug: 'default',
+						size: undefined,
+					},
+					...sizes,
+			  ]
+			: sizes;
+	}, [ customSizes, themeSizes, defaultSizes ] );
 }

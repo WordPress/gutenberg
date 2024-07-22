@@ -33,7 +33,7 @@ If you don't have one or more of these items, the [Block Development Environment
 The first step in creating the Copyright Date Block is to scaffold the initial block structure using the [`@wordpress/create-block`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/) package.
 
 <div class="callout callout-info">
-	Review the <a href="https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-wp-env/">Get started with create-block</a> documentation for an introduction to using this package.
+	Review the <a href="https://developer.wordpress.org/block-editor/getting-started/devenv/get-started-with-create-block/">Get started with create-block</a> documentation for an introduction to using this package.
 </div>
 
 You can use `create-block` from just about any directory (folder) on your computer and then use `wp-env` to create a local WordPress development environment with your new block plugin installed and activated.
@@ -156,7 +156,7 @@ Save the file and select the block in the Editor. You will now see both Color an
 
 #### Removing unnecessary code
 
-For simplicity, the styling for the Copyright Date Block will be controlled entirely by the color and typography block supports. This block also does not have any front-end Javascript. Therefore, you don't need to specify stylesheets or a `viewScript` in the `block.json` file.
+For simplicity, the styling for the Copyright Date Block will be controlled entirely by the color and typography block supports. This block also does not have any front-end JavaScript. Therefore, you don't need to specify stylesheets or a `viewScript` in the `block.json` file.
 
 1. Remove the line for `editorStyle`
 2. Remove the line for `style`
@@ -781,7 +781,7 @@ This block validation error occurs because the `save()` function returns block c
 
 You will see more of these errors as you update the `save()` function in subsequent steps. Just click "Attempt Block Recovery" and update the page.
 
-After preforming block recovery, open the Code editor and you will see the markup now looks like this.
+After performing block recovery, open the Code editor and you will see the markup now looks like this.
 
 ```html
 <!-- wp:create-block/copyright-date-block {"showStartingYear":true,"startingYear":"2017"} -->

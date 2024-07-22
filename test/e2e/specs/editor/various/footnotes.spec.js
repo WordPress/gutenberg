@@ -367,7 +367,9 @@ test.describe( 'Footnotes', () => {
 			.getByRole( 'region', { name: 'Editor settings' } )
 			.getByRole( 'tab', { name: 'Post' } )
 			.click();
-		await page.locator( 'a:text("Revisions (2)")' ).click();
+		await page
+			.locator( '.editor-private-post-last-revision__button' )
+			.click();
 		await page.locator( '.revisions-controls .ui-slider-handle' ).focus();
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.locator( 'input:text("Restore This Revision")' ).click();

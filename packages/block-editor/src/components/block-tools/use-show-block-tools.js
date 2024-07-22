@@ -29,10 +29,11 @@ export function useShowBlockTools() {
 		const clientId =
 			getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
 
-		const block = getBlock( clientId ) || { name: '', attributes: {} };
+		const block = getBlock( clientId );
 		const editorMode = __unstableGetEditorMode();
-		const hasSelectedBlock = clientId && block?.name;
-		const isEmptyDefaultBlock = isUnmodifiedDefaultBlock( block );
+		const hasSelectedBlock = !! clientId && !! block;
+		const isEmptyDefaultBlock =
+			hasSelectedBlock && isUnmodifiedDefaultBlock( block );
 		const _showEmptyBlockSideInserter =
 			clientId &&
 			! isTyping() &&
@@ -41,18 +42,28 @@ export function useShowBlockTools() {
 		const maybeShowBreadcrumb =
 			hasSelectedBlock &&
 			! hasMultiSelection() &&
-			( editorMode === 'navigation' || editorMode === 'zoom-out' );
+			editorMode === 'navigation';
+
+		const isZoomOut = editorMode === 'zoom-out';
+		const _showBlockToolbarPopover =
+			! isZoomOut &&
+			! getSettings().hasFixedToolbar &&
+			! _showEmptyBlockSideInserter &&
+			hasSelectedBlock &&
+			! isEmptyDefaultBlock &&
+			! maybeShowBreadcrumb;
 
 		return {
 			showEmptyBlockSideInserter: _showEmptyBlockSideInserter,
 			showBreadcrumb:
 				! _showEmptyBlockSideInserter && maybeShowBreadcrumb,
-			showBlockToolbarPopover:
-				! getSettings().hasFixedToolbar &&
-				! _showEmptyBlockSideInserter &&
+			showBlockToolbarPopover: _showBlockToolbarPopover,
+			showZoomOutToolbar:
 				hasSelectedBlock &&
-				! isEmptyDefaultBlock &&
-				! maybeShowBreadcrumb,
+				isZoomOut &&
+				! _showEmptyBlockSideInserter &&
+				! maybeShowBreadcrumb &&
+				! _showBlockToolbarPopover,
 		};
 	}, [] );
 }

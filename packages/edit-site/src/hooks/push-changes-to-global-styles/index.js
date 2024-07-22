@@ -287,7 +287,7 @@ function PushChangesToGlobalStylesControl( {
 			// notification.
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( newBlockAttributes );
-			setUserConfig( () => newUserConfig, { undoIgnore: true } );
+			setUserConfig( newUserConfig, { undoIgnore: true } );
 			createSuccessNotice(
 				sprintf(
 					// translators: %s: Title of the block e.g. 'Heading'.
@@ -302,7 +302,7 @@ function PushChangesToGlobalStylesControl( {
 							onClick() {
 								__unstableMarkNextChangeAsNotPersistent();
 								setAttributes( attributes );
-								setUserConfig( () => userConfig, {
+								setUserConfig( userConfig, {
 									undoIgnore: true,
 								} );
 							},
@@ -339,6 +339,7 @@ function PushChangesToGlobalStylesControl( {
 			<Button
 				__next40pxDefaultSize
 				variant="secondary"
+				accessibleWhenDisabled
 				disabled={ changes.length === 0 }
 				onClick={ pushChanges }
 			>
@@ -374,7 +375,7 @@ function PushChangesToGlobalStyles( props ) {
 const withPushChangesToGlobalStyles = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => (
 		<>
-			<BlockEdit { ...props } />
+			<BlockEdit key="edit" { ...props } />
 			{ props.isSelected && <PushChangesToGlobalStyles { ...props } /> }
 		</>
 	)

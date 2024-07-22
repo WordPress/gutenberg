@@ -221,22 +221,15 @@ public class Gutenberg: UIResponder {
         var data: [String: Any] = ["isConnected": isConnected]
         bridgeModule.sendEventIfNeeded(.connectionStatusChange, body: data)
     }
+    
+    public func onContentUpdate(content: String) {
+        var payload: [String: Any] = ["content": content]
+        bridgeModule.sendEventIfNeeded(.onContentUpdate, body: payload)
+    }
 
     private func properties(from editorSettings: GutenbergEditorSettings?) -> [String : Any] {
         var settingsUpdates = [String : Any]()
         settingsUpdates["isFSETheme"] = editorSettings?.isFSETheme ?? false
-        
-        if let galleryWithImageBlocks = editorSettings?.galleryWithImageBlocks {
-            settingsUpdates["galleryWithImageBlocks"] = galleryWithImageBlocks
-        }
-
-        if let quoteBlockV2 = editorSettings?.quoteBlockV2 {
-            settingsUpdates["quoteBlockV2"] = quoteBlockV2
-        }
-
-        if let listBlockV2 = editorSettings?.listBlockV2 {
-            settingsUpdates["listBlockV2"] = listBlockV2
-        }
 
         if let rawStyles = editorSettings?.rawStyles {
             settingsUpdates["rawStyles"] = rawStyles

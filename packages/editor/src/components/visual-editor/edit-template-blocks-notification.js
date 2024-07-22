@@ -40,7 +40,11 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 
 	const canEditTemplate = useSelect(
 		( select ) =>
-			select( coreStore ).canUser( 'create', 'templates' ) ?? false
+			!! select( coreStore ).canUser( 'create', {
+				kind: 'postType',
+				name: 'wp_template',
+			} ),
+		[]
 	);
 
 	const [ isDialogOpen, setIsDialogOpen ] = useState( false );
@@ -80,6 +84,7 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 				} );
 			} }
 			onCancel={ () => setIsDialogOpen( false ) }
+			size="medium"
 		>
 			{ __(
 				'You’ve tried to select a block that is part of a template, which may be used on other posts and pages. Would you like to edit the template?'

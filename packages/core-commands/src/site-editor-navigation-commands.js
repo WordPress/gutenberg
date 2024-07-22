@@ -18,6 +18,7 @@ import {
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { addQueryArgs, getPath } from '@wordpress/url';
 import { useDebounce } from '@wordpress/compose';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -93,7 +94,7 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 					name: postType + '-' + record.id,
 					searchLabel: record.title?.rendered + ' ' + record.id,
 					label: record.title?.rendered
-						? record.title?.rendered
+						? decodeEntities( record.title?.rendered )
 						: __( '(no title)' ),
 					icon: icons[ postType ],
 				};
@@ -265,7 +266,10 @@ function useSiteEditorBasicNavigationCommands() {
 		'site-editor.php'
 	);
 	const canCreateTemplate = useSelect( ( select ) => {
-		return select( coreStore ).canUser( 'create', 'templates' );
+		return select( coreStore ).canUser( 'create', {
+			kind: 'postType',
+			name: 'wp_template',
+		} );
 	}, [] );
 	const isBlockBasedTheme = useIsBlockBasedTheme();
 	const commands = useMemo( () => {
@@ -314,7 +318,7 @@ function useSiteEditorBasicNavigationCommands() {
 				icon: page,
 				callback: ( { close } ) => {
 					const args = {
-						post_type: 'page',
+						postType: 'page',
 					};
 					const targetUrl = addQueryArgs( 'site-editor.php', args );
 					if ( isSiteEditor ) {

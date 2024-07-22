@@ -92,11 +92,25 @@ export default function useMerge( clientId, onMerge ) {
 				// list.
 				const [ nestedListClientId ] = getBlockOrder( clientIdB );
 				if ( nestedListClientId ) {
-					moveBlocksToPosition(
-						getBlockOrder( nestedListClientId ),
-						nestedListClientId,
-						getBlockRootClientId( clientIdA )
-					);
+					// If we are merging with the previous list item, and the
+					// previous list item does not have nested list, move the
+					// nested list to the previous list item.
+					if (
+						getPreviousBlockClientId( clientIdB ) === clientIdA &&
+						! getBlockOrder( clientIdA ).length
+					) {
+						moveBlocksToPosition(
+							[ nestedListClientId ],
+							clientIdB,
+							clientIdA
+						);
+					} else {
+						moveBlocksToPosition(
+							getBlockOrder( nestedListClientId ),
+							nestedListClientId,
+							getBlockRootClientId( clientIdA )
+						);
+					}
 				}
 				mergeBlocks( clientIdA, clientIdB );
 			} );

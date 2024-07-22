@@ -20,6 +20,21 @@
 			opacity: 1;
 		}
 	}
+
+	.components-drop-zone__content {
+		border-radius: $radius-block-ui;
+	}
+
+	// Align text and icons horizontally to avoid clipping when the featured image is not set.
+	&:has(.editor-post-featured-image__toggle) .components-drop-zone .components-drop-zone__content-inner {
+		display: flex;
+		align-items: center;
+		gap: $grid-unit-10;
+
+		.components-drop-zone__content-icon {
+			margin: 0;
+		}
+	}
 }
 
 .editor-post-featured-image__toggle,

@@ -20,6 +20,11 @@ import { store as editorStore } from '../../store';
  */
 const AVERAGE_READING_RATE = 189;
 
+/**
+ * Component for showing Time To Read in Content.
+ *
+ * @return {JSX.Element} The rendered TimeToRead component.
+ */
 export default function TimeToRead() {
 	const content = useSelect(
 		( select ) => select( editorStore ).getEditedPostAttribute( 'content' ),
