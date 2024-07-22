@@ -40,38 +40,35 @@ function DataViewsPagination() {
 					spacing={ 2 }
 					className="dataviews-pagination__page-selection"
 				>
-					{ createInterpolateElement(
-						sprintf(
-							// translators: %s: Total number of pages.
-							_x( 'Page <CurrentPageControl /> of %s', 'paging' ),
-							totalPages
-						),
-						{
-							CurrentPageControl: (
-								<SelectControl
-									aria-label={ __( 'Current page' ) }
-									value={ view.page?.toString() }
-									options={ Array.from(
-										Array( totalPages )
-									).map( ( _, i ) => {
-										const page = i + 1;
-										return {
-											value: page.toString(),
-											label: page.toString(),
-										};
-									} ) }
-									onChange={ ( newValue ) => {
-										onChangeView( {
-											...view,
-											page: +newValue,
-										} );
-									} }
-									size="compact"
-									__nextHasNoMarginBottom
-								/>
-							),
-						}
-					) }
+					<SelectControl
+						aria-label={ __( 'Current page' ) }
+						value={ view.page?.toString() }
+						options={ Array.from( Array( totalPages ) ).map(
+							( _, i ) => {
+								const page = i + 1;
+								return {
+									value: page.toString(),
+									label:
+										__( 'Page ' ) +
+										page.toString() +
+										sprintf(
+											// translators: %s: Total number of pages.
+											_x( ' of %s', 'paging' ),
+											totalPages
+										),
+								};
+							}
+						) }
+						onChange={ ( newValue ) => {
+							onChangeView( {
+								...view,
+								page: +newValue,
+							} );
+						} }
+						size="compact"
+						__nextHasNoMarginBottom
+						variant="minimal"
+					/>
 				</HStack>
 				<HStack expanded={ false } spacing={ 1 }>
 					<Button
