@@ -4,9 +4,16 @@
 		margin-bottom: 0;
 	}
 
-	.components-range-control__track {
-		transition: width ease 0.1s;
-		@include reduce-motion("transition");
+	.is-marked {
+		.components-range-control__track {
+			transition: width ease 0.1s;
+			@include reduce-motion("transition");
+		}
+
+		.components-range-control__thumb-wrapper {
+			transition: left ease 0.1s;
+			@include reduce-motion("transition");
+		}
 	}
 
 	.spacing-sizes-control__range-control,
@@ -25,24 +32,28 @@
 	}
 
 	.components-range-control__mark {
-		height: $grid-unit-05;
-		width: 3px;
-		background-color: #fff;
+		height: 8px;
+		width: 2px;
+		background-color: $gray-300;
 		z-index: 1;
+		top: -6px;
+		border-radius: 2px;
+
+		&.is-filled {
+			z-index: -1;
+		}
 	}
 
 	.components-range-control__marks {
 		margin-top: 17px;
 
-		:first-child {
-			display: none;
+		:last-child {
+			transform: translateX(-2px);
 		}
 	}
 
 	.components-range-control__thumb-wrapper {
 		z-index: 3;
-		transition: left ease 0.1s;
-		@include reduce-motion("transition");
 	}
 }
 
