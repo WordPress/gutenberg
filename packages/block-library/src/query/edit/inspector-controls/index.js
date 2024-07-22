@@ -155,7 +155,7 @@ export default function QueryInspectorControls( props ) {
 							onChange={ ( value ) => {
 								setQuery( { inherit: !! value } );
 							} }
-							help={ !! inherit ? inheritControlHelp : '' }
+							help={ inherit && inheritControlHelp }
 							value={ !! inherit }
 						>
 							<ToggleGroupControlOption
