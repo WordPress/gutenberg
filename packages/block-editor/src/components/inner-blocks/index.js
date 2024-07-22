@@ -7,13 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { useMergeRefs } from '@wordpress/compose';
-import {
-	forwardRef,
-	useMemo,
-	memo,
-	useState,
-	useEffect,
-} from '@wordpress/element';
+import { forwardRef, useMemo, memo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import {
 	getBlockSupport,
@@ -192,7 +186,6 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		__unstableDisableDropZone,
 		dropZoneElement,
 	} = options;
-
 	const {
 		clientId,
 		layout = null,
@@ -269,28 +262,15 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		defaultLayout,
 	} = selected;
 
-	const [ isReady, setIsReady ] = useState( false );
-	// Defer the initial rendering to avoid the jumps due to the animation.
-	useEffect( () => {
-		const timeout = setTimeout( () => {
-			setIsReady( true );
-		}, 5000 );
-		return () => {
-			clearTimeout( timeout );
-		};
-	}, [] );
-
 	const blockDropZoneRef = useBlockDropZone( {
 		dropZoneElement,
 		rootClientId: clientId,
 		parentClientId,
-		isDropZoneDisabled,
 	} );
 
 	const ref = useMergeRefs( [
 		props.ref,
 		__unstableDisableDropZone ||
-		! isReady ||
 		isDropZoneDisabled ||
 		( layout?.isManualPlacement &&
 			window.__experimentalEnableGridInteractivity )
