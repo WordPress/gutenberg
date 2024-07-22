@@ -12,7 +12,7 @@ import {
 } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, store as blocksStore } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -34,6 +34,8 @@ import EditorKeyboardShortcuts from '../global-keyboard-shortcuts';
 import PatternRenameModal from '../pattern-rename-modal';
 import PatternDuplicateModal from '../pattern-duplicate-modal';
 import TemplatePartMenuItems from '../template-part-menu-items';
+import patternOverrides from './bindings/pattern-overrides';
+import postMeta from './bindings/post-meta';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
@@ -223,6 +225,9 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			setRenderingMode,
 		} = unlock( useDispatch( editorStore ) );
 		const { createWarningNotice } = useDispatch( noticesStore );
+		const { registerBlockBindingsSource } = unlock(
+			useDispatch( blocksStore )
+		);
 
 		// Ideally this should be synced on each change and not just something you do once.
 		useLayoutEffect( () => {
@@ -270,6 +275,13 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		useEffect( () => {
 			setRenderingMode( settings.defaultRenderingMode ?? 'post-only' );
 		}, [ settings.defaultRenderingMode, setRenderingMode ] );
+
+		// Register block bindings sources.
+		useEffect( () => {
+			// Initialize core sources.
+			registerBlockBindingsSource( postMeta );
+			registerBlockBindingsSource( patternOverrides );
+		}, [ postMeta, patternOverrides, registerBlockBindingsSource ] );
 
 		useHideBlocksFromInserter( post.type, mode );
 

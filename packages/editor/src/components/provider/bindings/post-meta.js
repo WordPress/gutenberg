@@ -6,7 +6,7 @@ import { store as coreDataStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import { store as editorStore } from '../store';
+import { store as editorStore } from '../../../store';
 
 export default {
 	name: 'core/post-meta',
