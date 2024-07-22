@@ -1,12 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	useContext,
-	useState,
-	useLayoutEffect,
-	useCallback,
-} from '@wordpress/element';
+import { useContext, useState, useLayoutEffect } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
 
 /**
@@ -35,6 +30,14 @@ export function useBlockRefProvider( clientId ) {
 	);
 }
 
+function assignRef( ref, value ) {
+	if ( typeof ref === 'function' ) {
+		ref( value );
+	} else if ( ref ) {
+		ref.current = value;
+	}
+}
+
 /**
  * Tracks the DOM element for the block identified by `clientId` and assigns it to the `ref`
  * whenever it changes.
@@ -44,27 +47,16 @@ export function useBlockRefProvider( clientId ) {
  */
 export function useBlockElementRef( clientId, ref ) {
 	const { refsMap } = useContext( BlockRefs );
-	const setRef = useCallback(
-		( el ) => {
-			if ( typeof ref === 'function' ) {
-				ref( el );
-			} else if ( ref ) {
-				ref.current = el;
-			}
-		},
-		[ ref ]
-	);
-
 	useLayoutEffect( () => {
-		setRef( refsMap.get( clientId ) );
+		assignRef( ref, refsMap.get( clientId ) );
 		const unsubscribe = refsMap.subscribe( clientId, () =>
-			setRef( refsMap.get( clientId ) )
+			assignRef( ref, refsMap.get( clientId ) )
 		);
 		return () => {
 			unsubscribe();
-			setRef( null );
+			assignRef( ref, null );
 		};
-	}, [ refsMap, clientId, setRef ] );
+	}, [ refsMap, clientId, ref ] );
 }
 
 /**
