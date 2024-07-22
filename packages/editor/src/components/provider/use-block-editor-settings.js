@@ -353,6 +353,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		setIsInserterOpened,
 		sectionRootClientId,
 		globalStylesData,
+		globalStylesLinksData,
 	] );
 }
 
