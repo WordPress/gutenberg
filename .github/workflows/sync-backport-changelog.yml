@@ -14,10 +14,11 @@ jobs:
               with:
                   fetch-depth: 2 # Fetch the last two commits to compare changes
             - name: Check for changes in backport-changelog
+              id: check-for-changes
               run: |
-                  git diff --quiet HEAD^ HEAD -- backport-changelog || echo "changes=true" >> $GITHUB_OUTPUT
+                  git diff --quiet HEAD^ HEAD -- backport-changelog || echo "HAS_CHANGES=1" >> "$GITHUB_OUTPUT"
             - name: Sync Issue
-              if: env.changes == 'true'
+              if: steps.check-for-changes.outputs.HAS_CHANGES
               uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
               with:
                   script: |
