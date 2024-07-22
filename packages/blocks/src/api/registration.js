@@ -916,11 +916,34 @@ export const registerBlockBindingsSource = ( source ) => {
 		return;
 	}
 
-	if ( existingSource ) {
-		unlock( dispatch( blocksStore ) ).updateBlockBindingsSource( source );
-	} else {
-		unlock( dispatch( blocksStore ) ).addBlockBindingsSource( source );
-	}
+	unlock( dispatch( blocksStore ) ).addBlockBindingsSource( source );
+};
+
+/**
+ * Bootstrap a new block bindings source with an object with initial properties.
+ * This function is meant to initialize block bindings sources from the server.
+ *
+ * @param {Object} source               Properties of the source to be bootstrapped.
+ * @param {string} source.name          The unique and machine-readable name.
+ * @param {string} source.label         Human-readable label.
+ * @param {Array}  [source.usesContext] Array of context needed by the source.
+ *
+ * @example
+ * ```js
+ * import { bootstrapBlockBindingsSource } from '@wordpress/blocks'
+ *
+ * bootstrapBlockBindingsSource( {
+ *     name: 'plugin/my-custom-source',
+ *     label: 'Label',
+ * 	   usesContext: [ 'postId', 'postType' ],
+ * } );
+ * ```
+ */
+export const bootstrapBlockBindingsSource = ( source ) => {
+	// No need for validation as it usually happens in the server.
+	unlock( dispatch( blocksStore ) ).addBootstrappedBlockBindingsSource(
+		source
+	);
 };
 
 /**
