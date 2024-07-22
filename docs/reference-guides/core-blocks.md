@@ -925,7 +925,7 @@ Organize content into tabs. ([Source](https://github.com/WordPress/gutenberg/tre
 -	**Experimental:** true
 -	**Category:** design
 -	**Allowed Blocks:** core/tab
--	**Supports:** align (full, wide), interactivity, layout (default, ~~allowJustification~~, ~~allowSwitching~~), shadow, spacing (margin, padding), ~~html~~
+-	**Supports:** align (full, wide), color (text, ~~background~~), interactivity, layout (default, ~~allowJustification~~, ~~allowSwitching~~), shadow, spacing (margin, padding), ~~html~~
 -	**Attributes:** activeTab
 
 ## Tag Cloud

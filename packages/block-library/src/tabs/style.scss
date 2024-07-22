@@ -2,5 +2,27 @@
 	display: flex;
 	gap: 10px;
 	list-style: none;
+	margin: 0;
 	padding: 0;
+}
+
+.wp-block-tabs__tab {
+	box-shadow: none;
+	border: 0;
+	border-radius: 0;
+	background: none;
+	font-size: var(--wp--preset--font-size--normal, inherit);
+	margin: 0;
+	opacity: 0.5;
+	outline: none;
+	padding: $grid-unit;
+
+	&.is-active {
+		border-bottom: currentColor 2px solid;
+		opacity: 1;
+	}
+}
+
+.wp-block-tabs__content {
+	border-top: var(--wp--preset--color--accent) 2px solid;
 }

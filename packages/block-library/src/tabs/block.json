@@ -19,6 +19,10 @@
 	},
 	"supports": {
 		"align": [ "wide", "full" ],
+		"color": {
+			"background": false,
+			"text": true
+		},
 		"html": false,
 		"interactivity": true,
 		"layout": {

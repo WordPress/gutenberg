@@ -13,13 +13,25 @@ import {
 	store as blockEditorStore,
 	RichText,
 } from '@wordpress/block-editor';
-import { Button } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 
-const initialTabsTemplate = [
+const TABS_TEMPLATE = [
 	[ 'core/tab', { title: 'Tab 1' } ],
 	[ 'core/tab', { title: 'Tab 2' } ],
+];
+
+const ALLOWED_FORMATS = [
+	'core/bold',
+	'core/code',
+	'core/image',
+	'core/italic',
+	'core/keyboard',
+	'core/language',
+	'core/strikethrough',
+	'core/subscript',
+	'core/superscript',
+	'core/text-color',
 ];
 
 export default function Edit( { attributes, clientId, setAttributes } ) {
@@ -33,11 +45,11 @@ export default function Edit( { attributes, clientId, setAttributes } ) {
 
 	const innerBlockProps = useInnerBlocksProps(
 		{
-			className: 'wp-block-tabs__tab-content',
+			className: 'wp-block-tabs__content',
 		},
 		{
 			renderAppender: InnerBlocks.ButtonBlockAppender,
-			template: initialTabsTemplate,
+			template: TABS_TEMPLATE,
 		}
 	);
 
@@ -75,16 +87,16 @@ export default function Edit( { attributes, clientId, setAttributes } ) {
 							className="wp-block-tabs__list-item"
 							role="presentation"
 						>
-							<Button
+							<button
 								className={ clsx( 'wp-block-tabs__tab', {
 									'is-active': isActive,
 								} ) }
 								onClick={ () => setActiveTab( block.clientId ) }
-								variant="link"
 								role="tab"
 								tabIndex={ tabIndex }
 							>
 								<RichText
+									allowedFormats={ ALLOWED_FORMATS }
 									tagName="span"
 									value={ block.attributes.title }
 									onChange={ ( value ) =>
@@ -93,7 +105,7 @@ export default function Edit( { attributes, clientId, setAttributes } ) {
 										} )
 									}
 								/>
-							</Button>
+							</button>
 						</li>
 					);
 				} ) }
