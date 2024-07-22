@@ -162,7 +162,7 @@ class WP_Navigation_Block_Renderer {
 	/**
 	 * Returns the inner container attributes.
 	 *
-	 * @since 6.6.0
+	 * @since 6.7.0
 	 *
 	 * @param array $extra_attributes The extra attributes to add.
 	 * @param string $exclude_class The class to exclude.
