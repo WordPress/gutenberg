@@ -871,7 +871,7 @@ export const registerBlockBindingsSource = ( source ) => {
 
 	// Check the `usesContext` property is correct.
 	if ( usesContext && ! Array.isArray( usesContext ) ) {
-		console.error( 'Block bindings source usesContext must be an array.' );
+		warning( 'Block bindings source usesContext must be an array.' );
 		return;
 	}
 
@@ -899,21 +899,7 @@ export const registerBlockBindingsSource = ( source ) => {
 		return;
 	}
 
-	// Merge context from server and client.
-	let mergedUsesContext = [
-		...( existingSource?.usesContext || [] ),
-		...( usesContext || [] ),
-	];
-	// Remove duplicates.
-	mergedUsesContext =
-		mergedUsesContext.length > 0
-			? [ ...new Set( mergedUsesContext ) ]
-			: undefined;
-
-	unlock( dispatch( blocksStore ) ).addBlockBindingsSource( {
-		...source,
-		usesContext: mergedUsesContext,
-	} );
+	unlock( dispatch( blocksStore ) ).addBlockBindingsSource( source );
 };
 
 /**

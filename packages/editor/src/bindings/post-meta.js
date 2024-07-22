@@ -13,25 +13,37 @@ export default {
 	getPlaceholder( { args } ) {
 		return args.key;
 	},
-	getValue( { registry, context, args } ) {
-		return registry
+	getValues( { registry, context, bindings } ) {
+		const meta = registry
 			.select( coreDataStore )
 			.getEditedEntityRecord(
 				'postType',
 				context?.postType,
 				context?.postId
-			).meta?.[ args.key ];
+			)?.meta;
+		const newValues = {};
+		for ( const [ attributeName, source ] of Object.entries( bindings ) ) {
+			newValues[ attributeName ] = meta?.[ source.args.key ];
+		}
+		return newValues;
 	},
-	setValue( { registry, context, args, value } ) {
+	setValues( { registry, context, bindings } ) {
+		const newMeta = {};
+		Object.values( bindings ).forEach( ( { args, newValue } ) => {
+			newMeta[ args.key ] = newValue;
+		} );
 		registry
 			.dispatch( coreDataStore )
 			.editEntityRecord( 'postType', context?.postType, context?.postId, {
-				meta: {
-					[ args.key ]: value,
-				},
+				meta: newMeta,
 			} );
 	},
 	canUserEditValue( { select, context, args } ) {
+		// Lock editing in query loop.
+		if ( context?.query || context?.queryId ) {
+			return false;
+		}
+
 		const postType =
 			context?.postType || select( editorStore ).getCurrentPostType();
 
@@ -52,11 +64,11 @@ export default {
 		}
 
 		// Check that the user has the capability to edit post meta.
-		const canUserEdit = select( coreDataStore ).canUserEditEntityRecord(
-			'postType',
-			context?.postType,
-			context?.postId
-		);
+		const canUserEdit = select( coreDataStore ).canUser( 'update', {
+			kind: 'postType',
+			name: context?.postType,
+			id: context?.postId,
+		} );
 		if ( ! canUserEdit ) {
 			return false;
 		}

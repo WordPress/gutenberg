@@ -188,7 +188,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 			}
 
 			return attributes;
-		}, [ bindings, name, clientId, blockContext, registry, sources ] );
+		}, [ blockBindings, name, clientId, blockContext, registry, sources ] );
 
 		const { setAttributes } = props;
 
