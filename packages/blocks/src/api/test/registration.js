@@ -1535,7 +1535,7 @@ describe( 'blocks', () => {
 				label: 'testing',
 				usesContext: 'should be an array',
 			} );
-			expect( console ).toHaveErroredWith(
+			expect( console ).toHaveWarnedWith(
 				'Block bindings source usesContext must be an array.'
 			);
 		} );
