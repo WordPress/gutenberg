@@ -14,16 +14,14 @@
 
 	&:hover {
 		background-color: $gray-200;
+		transition: all 0.1s ease-out;
+		@include reduce-motion("transition");
 	}
 
 	.components-button {
 		border-radius: $grid-unit-05;
 		transition: all 0.1s ease-out;
 		@include reduce-motion("transition");
-
-		&:hover {
-			background: $gray-200;
-		}
 	}
 
 	@include break-large() {
@@ -32,23 +30,27 @@
 }
 
 .editor-document-bar__command {
+	display: flex;
 	flex-grow: 1;
 	color: var(--wp-block-synced-color);
-	overflow: hidden;
+	position: relative;
 }
 
 .editor-document-bar__title {
-	flex-grow: 1;
 	overflow: hidden;
 	color: $gray-900;
-	gap: $grid-unit-05;
-	display: flex;
-	justify-content: center;
-	align-items: center;
+	height: auto;
+	position: absolute;
+	padding-left: 0;
+	padding-right: 0;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	max-width: 70%;
 
-	// Offset the layout based on the width of the ⌘K label. This ensures the title is centrally aligned.
-	@include break-medium() {
-		padding-left: $grid-unit-30;
+	&:focus:not(:disabled) {
+		outline: none;
+		box-shadow: none;
 	}
 
 	.editor-document-bar.is-global & {
@@ -60,11 +62,10 @@
 		flex-shrink: 0;
 	}
 
-	h1 {
+	span {
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		max-width: 70%;
 		color: currentColor;
 	}
 }
@@ -72,10 +73,15 @@
 .editor-document-bar__shortcut {
 	color: $gray-800;
 	min-width: $grid-unit-30;
-	display: none;
+	height: auto;
+	flex-grow: 2;
+	text-align: right;
+	position: relative; // This is always the button clicked, not the title.
+	z-index: 2;
+	display: initial;
 
-	@include break-medium() {
-		display: initial;
+	&:hover {
+		color: $gray-800;
 	}
 }
 
@@ -84,7 +90,7 @@
 	flex-shrink: 0;
 	color: $gray-700;
 	gap: 0;
-	z-index: 1;
+	z-index: 3;
 	position: absolute;
 
 	&:hover {

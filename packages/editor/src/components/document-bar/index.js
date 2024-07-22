@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { __, isRTL, sprintf } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	Button,
@@ -29,17 +29,6 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { TEMPLATE_POST_TYPES, GLOBAL_POST_TYPES } from '../../store/constants';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-
-const TYPE_LABELS = {
-	// translators: 1: Pattern title.
-	wp_pattern: __( 'Editing pattern: %s' ),
-	// translators: 1: Navigation menu title.
-	wp_navigation: __( 'Editing navigation menu: %s' ),
-	// translators: 1: Template title.
-	wp_template: __( 'Editing template: %s' ),
-	// translators: 1: Template part title.
-	wp_template_part: __( 'Editing template part: %s' ),
-};
 
 const MotionButton = motion( Button );
 
@@ -160,53 +149,49 @@ export default function DocumentBar( props ) {
 			{ isNotFound ? (
 				<Text>{ __( 'Document not found' ) }</Text>
 			) : (
-				<Button
+				<div
 					className="editor-document-bar__command"
-					onClick={ () => openCommandCenter() }
-					size="compact"
+					// Force entry animation when the back button is added or removed.
+					key={ hasBackButton }
+					initial={
+						mounted.current
+							? {
+									opacity: 0,
+									transform: hasBackButton
+										? 'translateX(15%)'
+										: 'translateX(-15%)',
+							  }
+							: false // Don't show entry animation when DocumentBar mounts.
+					}
+					animate={ {
+						opacity: 1,
+						transform: 'translateX(0%)',
+					} }
+					transition={ isReducedMotion ? { duration: 0 } : undefined }
 				>
-					<motion.div
+					<Button
 						className="editor-document-bar__title"
-						// Force entry animation when the back button is added or removed.
-						key={ hasBackButton }
-						initial={
-							mounted.current
-								? {
-										opacity: 0,
-										transform: hasBackButton
-											? 'translateX(15%)'
-											: 'translateX(-15%)',
-								  }
-								: false // Don't show entry animation when DocumentBar mounts.
-						}
-						animate={ {
-							opacity: 1,
-							transform: 'translateX(0%)',
-						} }
-						transition={
-							isReducedMotion ? { duration: 0 } : undefined
-						}
+						tabIndex="-1"
+						onClick={ () => openCommandCenter() }
+						size="compact"
 					>
 						<BlockIcon icon={ icon } />
-						<Text
-							size="body"
-							as="h1"
-							aria-label={
-								! props.title && TYPE_LABELS[ postType ]
-									? // eslint-disable-next-line @wordpress/valid-sprintf
-									  sprintf( TYPE_LABELS[ postType ], title )
-									: undefined
-							}
-						>
+						<Text size="body" as="span">
 							{ title
 								? decodeEntities( title )
 								: __( 'No Title' ) }
 						</Text>
-					</motion.div>
-					<span className="editor-document-bar__shortcut">
+					</Button>
+					<Button
+						onClick={ () => openCommandCenter() }
+						className="editor-document-bar__shortcut"
+						label={ __( 'Command palette' ) }
+						showTooltip
+						size="compact"
+					>
 						{ displayShortcut.primary( 'k' ) }
-					</span>
-				</Button>
+					</Button>
+				</div>
 			) }
 		</div>
 	);

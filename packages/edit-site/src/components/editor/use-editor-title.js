@@ -30,6 +30,8 @@ function useEditorTitle() {
 	// Only announce the title once the editor is ready to prevent "Replace"
 	// action in <URLQueryController> from double-announcing.
 	useTitle( hasLoadedPost && title );
+
+	return title;
 }
 
 export default useEditorTitle;
