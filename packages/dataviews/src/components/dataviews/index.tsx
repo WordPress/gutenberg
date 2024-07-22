@@ -129,8 +129,16 @@ export default function DataViews< Item >( {
 						/>
 					) }
 					<DataViewsBulkActions />
-					<DataViewsViewConfig defaultLayouts={ defaultLayouts } />
-					{ header }
+					<HStack
+						spacing={ 1 }
+						expanded={ false }
+						style={ { flexShrink: 0 } }
+					>
+						<DataViewsViewConfig
+							defaultLayouts={ defaultLayouts }
+						/>
+						{ header }
+					</HStack>
 				</HStack>
 				<DataViewsLayout />
 				<DataviewsPagination />
