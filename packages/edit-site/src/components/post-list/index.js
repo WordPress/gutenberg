@@ -299,6 +299,7 @@ export default function PostList( { postType } ) {
 				getItemId={ getItemId }
 				defaultLayouts={ defaultLayouts }
 				header={
+					window.__experimentalQuickEditDataViews &&
 					view.type !== LAYOUT_LIST &&
 					postType === 'page' && (
 						<Button
