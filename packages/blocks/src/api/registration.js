@@ -899,7 +899,7 @@ export const registerBlockBindingsSource = ( source ) => {
 		return;
 	}
 
-	unlock( dispatch( blocksStore ) ).addBlockBindingsSource( source );
+	return unlock( dispatch( blocksStore ) ).addBlockBindingsSource( source );
 };
 
 /**
