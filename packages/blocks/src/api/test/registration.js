@@ -1512,6 +1512,22 @@ describe( 'blocks', () => {
 			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
 		} );
 
+		it( 'should not override label from the server', () => {
+			// Simulate bootstrapping a source from the server registration.
+			registerBlockBindingsSource( {
+				name: 'core/server',
+				label: 'Server label',
+			} );
+			// Override the source with a different label in the client.
+			registerBlockBindingsSource( {
+				name: 'core/server',
+				label: 'Client label',
+			} );
+			expect( console ).toHaveWarnedWith(
+				'Block bindings "core/server" source label is already defined in the server.'
+			);
+		} );
+
 		// Check the `getValues` callback is correct.
 		it( 'should reject invalid getValues callback', () => {
 			registerBlockBindingsSource( {
@@ -1600,6 +1616,7 @@ describe( 'blocks', () => {
 			const source = {
 				name: 'core/test-source',
 				label: 'Test Source',
+				getValues: () => 'value',
 			};
 			registerBlockBindingsSource( source );
 			registerBlockBindingsSource( source );

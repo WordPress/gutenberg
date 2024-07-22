@@ -769,7 +769,7 @@ export const unregisterBlockVariation = ( blockName, variationName ) => {
  *
  * @param {Object}   source                    Properties of the source to be registered.
  * @param {string}   source.name               The unique and machine-readable name.
- * @param {string}   source.label              Human-readable label.
+ * @param {string}   [source.label]            Human-readable label.
  * @param {Function} [source.getValues]        Function to get the values from the source.
  * @param {Function} [source.setValues]        Function to update multiple values connected to the source.
  * @param {Function} [source.getPlaceholder]   Function to get the placeholder when the value is undefined.
@@ -800,11 +800,15 @@ export const registerBlockBindingsSource = ( source ) => {
 		canUserEditValue,
 	} = source;
 
-	// Check if the source is already registered.
 	const existingSource = unlock(
 		select( blocksStore )
 	).getBlockBindingsSource( name );
-	if ( existingSource ) {
+
+	/*
+	 * Check if the source has been already registered on the client.
+	 * If the `getValues` property is defined, it could be assumed the source is already registered.
+	 */
+	if ( existingSource?.getValues ) {
 		warning(
 			'Block bindings source "' + name + '" is already registered.'
 		);
@@ -844,12 +848,21 @@ export const registerBlockBindingsSource = ( source ) => {
 	}
 
 	// Check the `label` property is correct.
-	if ( ! label ) {
+	if ( label && existingSource?.label ) {
+		warning(
+			'Block bindings "' +
+				name +
+				'" source label is already defined in the server.'
+		);
+		return;
+	}
+
+	if ( ! label && ! existingSource?.label ) {
 		warning( 'Block bindings source must contain a label.' );
 		return;
 	}
 
-	if ( typeof label !== 'string' ) {
+	if ( label && typeof label !== 'string' ) {
 		warning( 'Block bindings source label must be a string.' );
 		return;
 	}
