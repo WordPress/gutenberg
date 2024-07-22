@@ -1540,6 +1540,62 @@ describe( 'blocks', () => {
 			);
 		} );
 
+		it( 'should add usesContext when only defined in the client', () => {
+			// Simulate server bootstrap.
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+				usesContext: [ 'postId', 'postType' ],
+			} );
+			// Register source in the client without usesContext.
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				getValue: () => 'value',
+			} );
+			const source = getBlockBindingsSource( 'core/testing' );
+			unregisterBlockBindingsSource( 'core/testing' );
+			expect( source.usesContext ).toEqual( [ 'postId', 'postType' ] );
+		} );
+
+		it( 'should keep usesContext when it is not defined in the client', () => {
+			// Simulate server bootstrap.
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+			} );
+			// Register source in the client with usesContext.
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				usesContext: [ 'postId', 'postType' ],
+				getValue: () => 'value',
+			} );
+			const source = getBlockBindingsSource( 'core/testing' );
+			unregisterBlockBindingsSource( 'core/testing' );
+			expect( source.usesContext ).toEqual( [ 'postId', 'postType' ] );
+		} );
+
+		it( 'should merge usesContext from server and client without duplicates', () => {
+			// Simulate server bootstrap.
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+				usesContext: [ 'postId', 'postType' ],
+			} );
+			// Register source in the client with usesContext.
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				usesContext: [ 'postType', 'clientContext' ],
+				getValue: () => 'value',
+			} );
+			const source = getBlockBindingsSource( 'core/testing' );
+			unregisterBlockBindingsSource( 'core/testing' );
+			expect( source.usesContext ).toEqual( [
+				'postId',
+				'postType',
+				'clientContext',
+			] );
+		} );
+
 		// Check the `getValues` callback is correct.
 		it( 'should reject invalid getValues callback', () => {
 			registerBlockBindingsSource( {

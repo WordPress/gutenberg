@@ -899,7 +899,21 @@ export const registerBlockBindingsSource = ( source ) => {
 		return;
 	}
 
-	unlock( dispatch( blocksStore ) ).addBlockBindingsSource( source );
+	// Merge context from server and client.
+	let mergedUsesContext = [
+		...( existingSource?.usesContext || [] ),
+		...( usesContext || [] ),
+	];
+	// Remove duplicates.
+	mergedUsesContext =
+		mergedUsesContext.length > 0
+			? [ ...new Set( mergedUsesContext ) ]
+			: undefined;
+
+	unlock( dispatch( blocksStore ) ).addBlockBindingsSource( {
+		...source,
+		usesContext: mergedUsesContext,
+	} );
 };
 
 /**
