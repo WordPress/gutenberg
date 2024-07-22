@@ -9,7 +9,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { DataViews } from '@wordpress/dataviews';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
-import { drawerLeft } from '@wordpress/icons';
+import { drawerRight } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -305,7 +305,7 @@ export default function PostList( { postType } ) {
 						<Button
 							size="compact"
 							isPressed={ quickEdit }
-							icon={ drawerLeft }
+							icon={ drawerRight }
 							label={
 								! quickEdit
 									? __( 'Show quick edit sidebar' )
