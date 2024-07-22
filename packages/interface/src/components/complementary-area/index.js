@@ -295,47 +295,51 @@ function ComplementaryArea( {
 				scope={ scope }
 				id={ identifier.replace( '/', ':' ) }
 			>
-				<ComplementaryAreaHeader
-					className={ headerClassName }
-					closeLabel={ closeLabel }
-					onClose={ () => disableComplementaryArea( scope ) }
-					smallScreenTitle={ smallScreenTitle }
-					toggleButtonProps={ {
-						label: closeLabel,
-						size: 'small',
-						shortcut: toggleShortcut,
-						scope,
-						identifier,
-					} }
-				>
-					{ header || (
-						<>
-							<h2 className="interface-complementary-area-header__title">
-								{ title }
-							</h2>
-							{ isPinnable && (
-								<Button
-									className="interface-complementary-area__pin-unpin-item"
-									icon={ isPinned ? starFilled : starEmpty }
-									label={
-										isPinned
-											? __( 'Unpin from toolbar' )
-											: __( 'Pin to toolbar' )
-									}
-									onClick={ () =>
-										( isPinned ? unpinItem : pinItem )(
-											scope,
-											identifier
-										)
-									}
-									isPressed={ isPinned }
-									aria-expanded={ isPinned }
-									size="compact"
-								/>
-							) }
-						</>
-					) }
-				</ComplementaryAreaHeader>
+				{ header !== false && (
+					<ComplementaryAreaHeader
+						className={ headerClassName }
+						closeLabel={ closeLabel }
+						onClose={ () => disableComplementaryArea( scope ) }
+						smallScreenTitle={ smallScreenTitle }
+						toggleButtonProps={ {
+							label: closeLabel,
+							size: 'small',
+							shortcut: toggleShortcut,
+							scope,
+							identifier,
+						} }
+					>
+						{ header || (
+							<>
+								<h2 className="interface-complementary-area-header__title">
+									{ title }
+								</h2>
+								{ isPinnable && (
+									<Button
+										className="interface-complementary-area__pin-unpin-item"
+										icon={
+											isPinned ? starFilled : starEmpty
+										}
+										label={
+											isPinned
+												? __( 'Unpin from toolbar' )
+												: __( 'Pin to toolbar' )
+										}
+										onClick={ () =>
+											( isPinned ? unpinItem : pinItem )(
+												scope,
+												identifier
+											)
+										}
+										isPressed={ isPinned }
+										aria-expanded={ isPinned }
+										size="compact"
+									/>
+								) }
+							</>
+						) }
+					</ComplementaryAreaHeader>
+				) }
 				<Panel className={ panelClassName }>{ children }</Panel>
 			</ComplementaryAreaFill>
 		</>

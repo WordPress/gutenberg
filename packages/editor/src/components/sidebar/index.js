@@ -4,19 +4,13 @@
 import {
 	BlockInspector,
 	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	Platform,
-	useCallback,
-	useContext,
-	useEffect,
-	useRef,
-} from '@wordpress/element';
-import { isRTL, __ } from '@wordpress/i18n';
+import { Platform, useCallback, useEffect, useRef } from '@wordpress/element';
+import { isRTL, __, _x } from '@wordpress/i18n';
 import { drawerLeft, drawerRight } from '@wordpress/icons';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { store as interfaceStore } from '@wordpress/interface';
 
 /**
@@ -28,7 +22,6 @@ import PluginSidebar from '../plugin-sidebar';
 import PostSummary from './post-summary';
 import PostTaxonomiesPanel from '../post-taxonomies/panel';
 import PostTransformPanel from '../post-transform-panel';
-import SidebarHeader from './header';
 import TemplateContentPanel from '../template-content-panel';
 import TemplatePartContentPanel from '../template-part-content-panel';
 import useAutoSwitchEditorSidebars from '../provider/use-auto-switch-editor-sidebars';
@@ -41,7 +34,7 @@ import {
 	TEMPLATE_POST_TYPE,
 } from '../../store/constants';
 
-const { Tabs } = unlock( componentsPrivateApis );
+const { TabbedSidebar } = unlock( blockEditorPrivateApis );
 
 const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {
 	web: true,
@@ -54,12 +47,9 @@ const SidebarContent = ( {
 	renderingMode,
 	onActionPerformed,
 	extraPanels,
+	onSelect,
 } ) => {
 	const tabListRef = useRef( null );
-	// Because `PluginSidebar` renders a `ComplementaryArea`, we
-	// need to forward the `Tabs` context so it can be passed through the
-	// underlying slot/fill.
-	const tabsContextValue = useContext( Tabs.Context );
 
 	// This effect addresses a race condition caused by tabbing from the last
 	// block in the editor into the settings sidebar. Without this effect, the
@@ -88,14 +78,20 @@ const SidebarContent = ( {
 		}
 	}, [ tabName ] );
 
+	const { documentLabel } = useSelect( ( select ) => {
+		const { getPostTypeLabel } = select( editorStore );
+
+		return {
+			// translators: Default label for the Document sidebar tab, not selected.
+			documentLabel: getPostTypeLabel() || _x( 'Document', 'noun' ),
+		};
+	}, [] );
+
+	const { disableComplementaryArea } = useDispatch( interfaceStore );
+
 	return (
 		<PluginSidebar
 			identifier={ tabName }
-			header={
-				<Tabs.Context.Provider value={ tabsContextValue }>
-					<SidebarHeader ref={ tabListRef } />
-				</Tabs.Context.Provider>
-			}
 			closeLabel={ __( 'Close Settings' ) }
 			// This classname is added so we can apply a corrective negative
 			// margin to the panel.
@@ -107,22 +103,43 @@ const SidebarContent = ( {
 			toggleShortcut={ keyboardShortcut }
 			icon={ isRTL() ? drawerLeft : drawerRight }
 			isActiveByDefault={ SIDEBAR_ACTIVE_BY_DEFAULT }
+			header={ false }
 		>
-			<Tabs.Context.Provider value={ tabsContextValue }>
-				<Tabs.TabPanel tabId={ sidebars.document } focusable={ false }>
-					<PostSummary onActionPerformed={ onActionPerformed } />
-					<PluginDocumentSettingPanel.Slot />
-					<TemplateContentPanel renderingMode={ renderingMode } />
-					<TemplatePartContentPanel />
-					<PostTransformPanel />
-					<PostTaxonomiesPanel />
-					<PatternOverridesPanel />
-					{ extraPanels }
-				</Tabs.TabPanel>
-				<Tabs.TabPanel tabId={ sidebars.block } focusable={ false }>
-					<BlockInspector />
-				</Tabs.TabPanel>
-			</Tabs.Context.Provider>
+			<TabbedSidebar
+				tabs={ [
+					{
+						name: sidebars.document,
+						title: documentLabel,
+						panel: (
+							<>
+								<PostSummary
+									onActionPerformed={ onActionPerformed }
+								/>
+								<PluginDocumentSettingPanel.Slot />
+								<TemplateContentPanel
+									renderingMode={ renderingMode }
+								/>
+								<TemplatePartContentPanel />
+								<PostTransformPanel />
+								<PostTaxonomiesPanel />
+								<PatternOverridesPanel />
+								{ extraPanels }
+							</>
+						),
+					},
+					{
+						name: sidebars.block,
+						title: __( 'Block' ),
+						panel: <BlockInspector />,
+					},
+				] }
+				onClose={ () => disableComplementaryArea( 'core' ) }
+				onSelect={ onSelect }
+				selectedTab={ tabName }
+				defaultTabId={ sidebars.document }
+				ref={ tabListRef }
+				closeButtonLabel={ __( 'Close Settings' ) }
+			/>
 		</PluginSidebar>
 	);
 };
@@ -142,6 +159,7 @@ const Sidebar = ( { extraPanels, onActionPerformed } ) => {
 				sidebars.document,
 			].includes( sidebar );
 			let _tabName = sidebar;
+
 			if ( ! _isEditorSidebarOpened ) {
 				_tabName = !! select(
 					blockEditorStore
@@ -176,20 +194,16 @@ const Sidebar = ( { extraPanels, onActionPerformed } ) => {
 	);
 
 	return (
-		<Tabs
+		<SidebarContent
+			tabName={ tabName }
+			keyboardShortcut={ keyboardShortcut }
+			showSummary={ showSummary }
+			renderingMode={ renderingMode }
+			onActionPerformed={ onActionPerformed }
+			extraPanels={ extraPanels }
 			selectedTabId={ tabName }
 			onSelect={ onTabSelect }
-			selectOnMove={ false }
-		>
-			<SidebarContent
-				tabName={ tabName }
-				keyboardShortcut={ keyboardShortcut }
-				showSummary={ showSummary }
-				renderingMode={ renderingMode }
-				onActionPerformed={ onActionPerformed }
-				extraPanels={ extraPanels }
-			/>
-		</Tabs>
+		/>
 	);
 };
 

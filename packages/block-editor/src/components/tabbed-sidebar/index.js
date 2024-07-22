@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -16,11 +21,19 @@ import { unlock } from '../../lock-unlock';
 const { Tabs } = unlock( componentsPrivateApis );
 
 function TabbedSidebar(
-	{ defaultTabId, onClose, onSelect, selectedTab, tabs, closeButtonLabel },
+	{
+		defaultTabId,
+		onClose,
+		onSelect,
+		selectedTab,
+		tabs,
+		closeButtonLabel,
+		className,
+	},
 	ref
 ) {
 	return (
-		<div className="block-editor-tabbed-sidebar">
+		<div className={ clsx( 'block-editor-tabbed-sidebar', className ) }>
 			<Tabs
 				selectOnMove={ false }
 				defaultTabId={ defaultTabId }

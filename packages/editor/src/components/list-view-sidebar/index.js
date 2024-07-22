@@ -119,6 +119,7 @@ export default function ListViewSidebar() {
 			ref={ sidebarRef }
 		>
 			<TabbedSidebar
+				className="block-editor__tabbed-sidebar"
 				tabs={ [
 					{
 						name: 'list-view',
