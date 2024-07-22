@@ -428,7 +428,7 @@ export default function PostList( { postType } ) {
 					if ( item.id === frontPageId ) {
 						suffix = (
 							<span className="edit-site-post-list__title-badge">
-								{ __( 'Front Page' ) }
+								{ __( 'Homepage' ) }
 							</span>
 						);
 					} else if ( item.id === postsPageId ) {
