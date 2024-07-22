@@ -35,7 +35,7 @@ import { scopeSelector } from '../components/global-styles/utils';
 import { useBlockSettings, useStyleOverride } from './utils';
 import { default as StylesFiltersPanel } from '../components/global-styles/filters-panel';
 import { useBlockEditingMode } from '../components/block-editing-mode';
-import { __unstableUseBlockElement as useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
+import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
 
 const EMPTY_ARRAY = [];
 
