@@ -243,11 +243,20 @@ export function isSaveViewOpened( state ) {
 /**
  * Returns the template parts and their blocks for the current edited template.
  *
+ * @deprecated
  * @param {Object} state Global application state.
  * @return {Array} Template parts and their blocks in an array.
  */
 export const getCurrentTemplateTemplateParts = createRegistrySelector(
 	( select ) => () => {
+		deprecated(
+			`select( 'core/edit-site' ).getCurrentTemplateTemplateParts()`,
+			{
+				since: '6.7',
+				version: '6.9',
+				alternative: `select( 'core/block-editor' ).getBlocksByName( 'core/template-part' )`,
+			}
+		);
 		return unlock(
 			select( editorStore )
 		).getCurrentTemplateTemplateParts();
