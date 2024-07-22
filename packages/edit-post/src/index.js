@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	store as blocksStore,
-	privateApis as blocksPrivateApis,
-} from '@wordpress/blocks';
+import { store as blocksStore } from '@wordpress/blocks';
 import {
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
