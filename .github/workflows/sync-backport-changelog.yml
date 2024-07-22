@@ -4,11 +4,20 @@ on:
     push:
         branches:
             - trunk
+    issues:
+        types: [labeled]
 
 jobs:
     sync-backport-changelog:
         name: Sync Core Backport Issue
         runs-on: ubuntu-latest
+        if: >
+            github.event_name == 'push' ||
+            (
+                github.event_name == 'issues' &&
+                github.event.action == 'labeled' &&
+                github.event.label.name == '🤖 Sync Backport Changelog'
+            )
         steps:
             - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
               with:
@@ -18,7 +27,13 @@ jobs:
               run: |
                   git diff --quiet HEAD^ HEAD -- backport-changelog || echo "HAS_CHANGES=1" >> "$GITHUB_OUTPUT"
             - name: Sync Issue
-              if: steps.check-for-changes.outputs.HAS_CHANGES
+              if: >
+                  steps.check-for-changes.outputs.HAS_CHANGES ||
+                  (
+                      github.event_name == 'issues' &&
+                      github.event.action == 'labeled' &&
+                      github.event.label.name == '🤖 Sync Backport Changelog'
+                  )
               uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
               with:
                   script: |
