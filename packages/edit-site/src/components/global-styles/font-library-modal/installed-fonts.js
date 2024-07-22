@@ -164,14 +164,16 @@ function InstalledFonts() {
 		  ).length
 		: 0;
 
+	const selectedFontsCount =
+		libraryFontSelected?.fontFace?.length ??
+		( libraryFontSelected?.fontFamily ? 1 : 0 );
+
 	// Check if any fonts are selected.
 	const isIndeterminate =
-		activeFontsCount > 0 &&
-		activeFontsCount !== libraryFontSelected?.fontFace?.length;
+		activeFontsCount > 0 && activeFontsCount !== selectedFontsCount;
 
 	// Check if all fonts are selected.
-	const isSelectAllChecked =
-		activeFontsCount === libraryFontSelected?.fontFace?.length;
+	const isSelectAllChecked = activeFontsCount === selectedFontsCount;
 
 	// Toggle select all fonts.
 	const toggleSelectAll = () => {
