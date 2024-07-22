@@ -267,6 +267,7 @@ export default function SpacingInputControl( {
 						className="spacing-sizes-control__custom-value-range"
 						__nextHasNoMarginBottom
 						label={ ariaLabel }
+						hideLabelFromVision
 					/>
 				</>
 			) }
