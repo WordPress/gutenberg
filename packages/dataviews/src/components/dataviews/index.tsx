@@ -18,6 +18,8 @@ import DataViewsViewConfig from '../dataviews-view-config';
 import { normalizeFields } from '../../normalize-fields';
 import type { Action, Field, View, SupportedLayouts } from '../../types';
 import type { SelectionOrUpdater } from '../../private-types';
+import DensityPicker from '../../layouts/grid/density-picker';
+import { LAYOUT_GRID } from '../../constants';
 
 type ItemWithId = { id: string };
 
@@ -59,6 +61,7 @@ export default function DataViews< Item >( {
 	onChangeSelection,
 }: DataViewsProps< Item > ) {
 	const [ selectionState, setSelectionState ] = useState< string[] >( [] );
+	const [ density, setDensity ] = useState< number >( 0 );
 	const isUncontrolled =
 		selectionProperty === undefined || onChangeSelection === undefined;
 	const selection = isUncontrolled ? selectionState : selectionProperty;
@@ -95,6 +98,7 @@ export default function DataViews< Item >( {
 				openedFilter,
 				setOpenedFilter,
 				getItemId,
+				density,
 			} }
 		>
 			<div className="dataviews-wrapper">
@@ -111,6 +115,12 @@ export default function DataViews< Item >( {
 						{ search && <DataViewsSearch label={ searchLabel } /> }
 						<DataViewsFilters />
 					</HStack>
+					{ view.type === LAYOUT_GRID && (
+						<DensityPicker
+							density={ density }
+							setDensity={ setDensity }
+						/>
+					) }
 					<DataViewsBulkActions />
 					<DataViewsViewConfig defaultLayouts={ defaultLayouts } />
 				</HStack>

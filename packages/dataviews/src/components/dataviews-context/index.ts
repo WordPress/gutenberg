@@ -26,6 +26,7 @@ type DataViewsContextType< Item > = {
 	openedFilter: string | null;
 	setOpenedFilter: ( openedFilter: string | null ) => void;
 	getItemId: ( item: Item ) => string;
+	density: number;
 };
 
 const DataViewsContext = createContext< DataViewsContextType< any > >( {
@@ -42,6 +43,7 @@ const DataViewsContext = createContext< DataViewsContextType< any > >( {
 	setOpenedFilter: () => {},
 	openedFilter: null,
 	getItemId: ( item ) => item.id,
+	density: 0,
 } );
 
 export default DataViewsContext;
