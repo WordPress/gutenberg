@@ -526,12 +526,12 @@ export default function LogoEdit( {
 
 	const mediaReplaceFlowProps = {
 		mediaURL: logoUrl,
-		name: ! logoUrl ? __( 'Choose Site Logo' ) : __( 'Replace' ),
+		name: ! logoUrl ? __( 'Choose logo' ) : __( 'Replace' ),
 		onSelect: onSelectLogo,
 		onError: onUploadError,
 		onRemoveLogo,
 	};
-	const controls = (
+	const controls = canUserEdit && (
 		<BlockControls group="other">
 			<SiteLogoReplaceFlow { ...mediaReplaceFlowProps } />
 		</BlockControls>
