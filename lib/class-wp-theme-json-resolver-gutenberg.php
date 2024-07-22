@@ -807,13 +807,13 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @return array
 	 */
 	public static function get_style_variations_from_directory( $directory, $scope = 'theme' ) {
-		$variation_files    = array();
-		$variations         = array();
+		$variation_files = array();
+		$variations      = array();
 		if ( is_dir( $directory ) ) {
-			if ( $directory === get_stylesheet_directory() ) {
+			if ( get_stylesheet_directory() === $directory ) {
 				$variation_files = static::get_style_variation_files_from_current_theme();
 			} else {
-				$variation_files = static::recursively_iterate_json( $base_directory );
+				$variation_files = static::recursively_iterate_json( $directory );
 			}
 		}
 		ksort( $variation_files );
