@@ -83,7 +83,7 @@ export const Tab = styled( Ariakit.Tab )`
 			color: ${ COLORS.ui.textDisabled };
 		}
 
-		&:hover {
+		&:not( [aria-disabled='true'] ):hover {
 			color: ${ COLORS.theme.accent };
 		}
 
