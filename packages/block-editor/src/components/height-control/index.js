@@ -69,7 +69,7 @@ export default function HeightControl( {
 	value,
 } ) {
 	const customRangeValue = parseFloat( value );
-	const id = useInstanceId( HeightControl, 'inspector-height-control' );
+	const id = useInstanceId( HeightControl, 'block-editor-height-control' );
 	const labelId = `${ id }__label`;
 	const inputId = `${ id }__input`;
 	const rangeId = `${ id }__range`;
