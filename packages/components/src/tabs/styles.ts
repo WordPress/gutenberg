@@ -80,7 +80,7 @@ export const Tab = styled( Ariakit.Tab )`
 
 		&[aria-disabled='true'] {
 			cursor: default;
-			color: ${ COLORS.theme.gray[ 700 ] };
+			color: ${ COLORS.ui.textDisabled };
 		}
 
 		&:hover {
