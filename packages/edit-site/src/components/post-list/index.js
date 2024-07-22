@@ -259,7 +259,7 @@ export default function PostList( { postType } ) {
 		} );
 		closeModal();
 	};
-	const { isLoading, fields } = usePostFields( view.type );
+	const { isLoading: isLoadingFields, fields } = usePostFields( view.type );
 
 	return (
 		<Page
@@ -291,7 +291,7 @@ export default function PostList( { postType } ) {
 				fields={ fields }
 				actions={ actions }
 				data={ records || EMPTY_ARRAY }
-				isLoading={ isLoadingMainEntities || isLoading }
+				isLoading={ isLoadingMainEntities || isLoadingFields }
 				view={ view }
 				onChangeView={ setView }
 				selection={ selection }
