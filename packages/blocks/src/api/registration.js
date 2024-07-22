@@ -815,6 +815,31 @@ export const registerBlockBindingsSource = ( source ) => {
 		return;
 	}
 
+	// Check the properties from the server aren't overriden.
+	if ( existingSource ) {
+		/*
+		 * It is not possible to just check the properties with a value because
+		 * in some of them, like `canUserEditValue`, a default one could be used.
+		 */
+		const serverProperties = [ 'label', 'usesContext' ];
+		let shouldReturn = false;
+		serverProperties.forEach( ( property ) => {
+			if ( existingSource[ property ] && source[ property ] ) {
+				console.error(
+					'Block bindings "' +
+						name +
+						'" source "' +
+						property +
+						'" is already defined in the server.'
+				);
+				shouldReturn = true;
+			}
+		} );
+		if ( shouldReturn ) {
+			return;
+		}
+	}
+
 	// Check the `name` property is correct.
 	if ( ! name ) {
 		warning( 'Block bindings source must contain a name.' );
@@ -891,7 +916,11 @@ export const registerBlockBindingsSource = ( source ) => {
 		return;
 	}
 
-	return unlock( dispatch( blocksStore ) ).addBlockBindingsSource( source );
+	if ( existingSource ) {
+		unlock( dispatch( blocksStore ) ).updateBlockBindingsSource( source );
+	} else {
+		unlock( dispatch( blocksStore ) ).addBlockBindingsSource( source );
+	}
 };
 
 /**
