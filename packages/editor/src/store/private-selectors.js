@@ -26,7 +26,6 @@ import {
 	__experimentalGetDefaultTemplatePartAreas,
 } from './selectors';
 import { getEntityActions as _getEntityActions } from '../dataviews/store/private-selectors';
-import { TEMPLATE_PART_POST_TYPE } from './constants';
 
 const EMPTY_INSERTION_POINT = {
 	rootClientId: undefined,
