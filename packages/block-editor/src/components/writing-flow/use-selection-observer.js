@@ -78,8 +78,12 @@ function getRichTextElement( node ) {
 export default function useSelectionObserver() {
 	const { multiSelect, selectBlock, selectionChange } =
 		useDispatch( blockEditorStore );
-	const { getBlockParents, getBlockSelectionStart, isMultiSelecting } =
-		useSelect( blockEditorStore );
+	const {
+		getBlockParents,
+		getBlockSelectionStart,
+		isMultiSelecting,
+		getSelectedBlockClientId,
+	} = useSelect( blockEditorStore );
 	return useRefEffect(
 		( node ) => {
 			const { ownerDocument } = node;
@@ -109,9 +113,6 @@ export default function useSelectionObserver() {
 				// update the clientIds to multi-select blocks.
 				// For now we check if the event is a `mouse` event.
 				const isClickShift = event.shiftKey && event.type === 'mouseup';
-				if ( selection.isCollapsed && ! isClickShift ) {
-					return;
-				}
 
 				let startClientId = getBlockClientId( startNode );
 				let endClientId = getBlockClientId( endNode );
@@ -152,7 +153,19 @@ export default function useSelectionObserver() {
 				const isSingularSelection = startClientId === endClientId;
 				if ( isSingularSelection ) {
 					if ( ! isMultiSelecting() ) {
-						selectBlock( startClientId );
+						if ( getSelectedBlockClientId() !== startClientId ) {
+							selectionChange( startClientId );
+						}
+
+						// Redirect focus to the selected block.
+						if ( node === ownerDocument.activeElement ) {
+							let startElement = startNode;
+							if ( startNode !== startNode.ELEMENT_NODE ) {
+								startElement = startNode.parentElement;
+							}
+
+							startElement.closest( '[contenteditable]' ).focus();
+						}
 					} else {
 						multiSelect( startClientId, startClientId );
 					}
@@ -218,12 +231,32 @@ export default function useSelectionObserver() {
 				}
 			}
 
+			function onFocusIn( event ) {
+				if (
+					event.target === node ||
+					event.target.closest( '[contenteditable]' ) !== node
+				) {
+					return;
+				}
+
+				defaultView.getSelection().removeAllRanges();
+
+				const clientId = getBlockClientId( event.target );
+
+				if ( getSelectedBlockClientId() !== clientId ) {
+					selectBlock( clientId );
+				}
+			}
+
+			node.addEventListener( 'focusin', onFocusIn );
+
 			ownerDocument.addEventListener(
 				'selectionchange',
 				onSelectionChange
 			);
 			defaultView.addEventListener( 'mouseup', onSelectionChange );
 			return () => {
+				node.removeEventListener( 'focusin', onFocusIn );
 				ownerDocument.removeEventListener(
 					'selectionchange',
 					onSelectionChange

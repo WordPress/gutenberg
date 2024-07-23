@@ -45,10 +45,12 @@ export default function useInput() {
 
 	return useRefEffect( ( node ) => {
 		function onBeforeInput( event ) {
+			// Prevent Chrome from moving focus to writing flow.
+			node.contentEditable = false;
 			// If writing flow is editable, NEVER allow the browser to alter the
 			// DOM. This will cause React errors (and the DOM should only be
 			// altered in a controlled fashion).
-			if ( node.contentEditable === 'true' ) {
+			if ( node === node.ownerDocument.activeElement ) {
 				event.preventDefault();
 			}
 		}
@@ -123,7 +125,6 @@ export default function useInput() {
 			}
 
 			if ( event.keyCode === ENTER ) {
-				node.contentEditable = false;
 				event.preventDefault();
 				if ( __unstableIsFullySelected() ) {
 					replaceBlocks(
@@ -137,7 +138,6 @@ export default function useInput() {
 				event.keyCode === BACKSPACE ||
 				event.keyCode === DELETE
 			) {
-				node.contentEditable = false;
 				event.preventDefault();
 				if ( __unstableIsFullySelected() ) {
 					removeBlocks( getSelectedBlockClientIds() );
@@ -152,7 +152,6 @@ export default function useInput() {
 				event.key.length === 1 &&
 				! ( event.metaKey || event.ctrlKey )
 			) {
-				node.contentEditable = false;
 				if ( __unstableIsSelectionMergeable() ) {
 					__unstableDeleteSelection( event.keyCode === DELETE );
 				} else {
@@ -172,8 +171,6 @@ export default function useInput() {
 				return;
 			}
 
-			node.contentEditable = false;
-
 			if ( __unstableIsSelectionMergeable() ) {
 				__unstableDeleteSelection();
 			} else {
@@ -185,10 +182,16 @@ export default function useInput() {
 			}
 		}
 
+		function onInput() {
+			node.contentEditable = true;
+		}
+
+		node.addEventListener( 'input', onInput );
 		node.addEventListener( 'beforeinput', onBeforeInput );
 		node.addEventListener( 'keydown', onKeyDown );
 		node.addEventListener( 'compositionstart', onCompositionStart );
 		return () => {
+			node.removeEventListener( 'input', onInput );
 			node.removeEventListener( 'beforeinput', onBeforeInput );
 			node.removeEventListener( 'keydown', onKeyDown );
 			node.removeEventListener( 'compositionstart', onCompositionStart );
