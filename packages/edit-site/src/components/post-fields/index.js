@@ -34,13 +34,12 @@ import {
 /**
  * Internal dependencies
  */
-import {
-	LAYOUT_GRID,
-	LAYOUT_TABLE,
-	LAYOUT_LIST,
-	OPERATOR_IS_ANY,
-} from '../../utils/constants';
 import { default as Link, useLink } from '../routes/link';
+
+const LAYOUT_GRID = 'grid';
+const LAYOUT_TABLE = 'table';
+const LAYOUT_LIST = 'list';
+const OPERATOR_IS_ANY = 'isAny';
 
 // See https://github.com/WordPress/gutenberg/issues/55886
 // We do not support custom statutes at the moment.
