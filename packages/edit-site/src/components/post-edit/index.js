@@ -8,7 +8,7 @@ import clsx from 'clsx';
  */
 import { __ } from '@wordpress/i18n';
 import { DataForm } from '@wordpress/dataviews';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { Button } from '@wordpress/components';
 import { useState, useMemo } from '@wordpress/element';
@@ -20,18 +20,25 @@ import Page from '../page';
 import usePostFields from '../post-fields';
 
 function PostEditForm( { postType, postId } ) {
-	const { item } = useSelect(
+	const ids = useMemo( () => postId.split( ',' ), [ postId ] );
+	const { initialEdits } = useSelect(
 		( select ) => {
+			if ( ids.length !== 1 ) {
+			}
 			return {
-				item: select( coreDataStore ).getEntityRecord(
-					'postType',
-					postType,
-					postId
-				),
+				initialEdits:
+					ids.length === 1
+						? select( coreDataStore ).getEntityRecord(
+								'postType',
+								postType,
+								ids[ 0 ]
+						  )
+						: null,
 			};
 		},
-		[ postType, postId ]
+		[ postType, ids ]
 	);
+	const registry = useRegistry();
 	const { saveEntityRecord } = useDispatch( coreDataStore );
 	const { fields } = usePostFields();
 	const form = {
@@ -40,19 +47,22 @@ function PostEditForm( { postType, postId } ) {
 	const [ edits, setEdits ] = useState( {} );
 	const itemWithEdits = useMemo( () => {
 		return {
-			...item,
+			...initialEdits,
 			...edits,
 		};
-	}, [ item, edits ] );
-	const onSubmit = ( event ) => {
+	}, [ initialEdits, edits ] );
+	const onSubmit = async ( event ) => {
 		event.preventDefault();
-		saveEntityRecord( 'postType', postType, itemWithEdits );
+		const { getEntityRecord } = registry.resolveSelect( coreDataStore );
+		for ( const id of ids ) {
+			const item = await getEntityRecord( 'postType', postType, id );
+			saveEntityRecord( 'postType', postType, {
+				...item,
+				...edits,
+			} );
+		}
 		setEdits( {} );
 	};
-
-	if ( ! item ) {
-		return null;
-	}
 
 	return (
 		<form onSubmit={ onSubmit }>

@@ -49,7 +49,7 @@ function DataFormTextControl< Item >( {
 		<TextControl
 			label={ header }
 			placeholder={ placeholder }
-			value={ value }
+			value={ value ?? '' }
 			onChange={ onChangeControl }
 			__next40pxDefaultSize
 		/>
