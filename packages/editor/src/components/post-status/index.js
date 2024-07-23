@@ -5,7 +5,6 @@ import {
 	Button,
 	CheckboxControl,
 	Dropdown,
-	__experimentalText as Text,
 	__experimentalVStack as VStack,
 	TextControl,
 	RadioControl,
