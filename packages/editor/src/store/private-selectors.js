@@ -26,7 +26,6 @@ import {
 	__experimentalGetDefaultTemplatePartAreas,
 } from './selectors';
 import { getEntityActions as _getEntityActions } from '../dataviews/store/private-selectors';
-import { getFilteredTemplatePartBlocks } from './utils/get-filtered-template-parts';
 import { TEMPLATE_PART_POST_TYPE } from './constants';
 
 const EMPTY_INSERTION_POINT = {
@@ -162,30 +161,3 @@ export const hasPostMetaChanges = createRegistrySelector(
 export function getEntityActions( state, ...args ) {
 	return _getEntityActions( state.dataviews, ...args );
 }
-
-/**
- * Returns the template parts and their blocks for the current edited template.
- * This selector is deprecated and not used on the codebase, was just kept because
- * it is called inside select( 'core/edit-site' ).getCurrentTemplateTemplateParts()
- * which is also deprecated.
- *
- * @deprecated
- * @param {Object} state Global application state.
- * @return {Array} Template parts and their blocks in an array.
- */
-export const getCurrentTemplateTemplateParts = createRegistrySelector(
-	( select ) => () => {
-		const templateParts = select( coreStore ).getEntityRecords(
-			'postType',
-			TEMPLATE_PART_POST_TYPE,
-			{ per_page: -1 }
-		);
-
-		const clientIds =
-			select( blockEditorStore ).getBlocksByName( 'core/template-part' );
-		const blocks =
-			select( blockEditorStore ).getBlocksByClientId( clientIds );
-
-		return getFilteredTemplatePartBlocks( blocks, templateParts );
-	}
-);
