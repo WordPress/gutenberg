@@ -70,5 +70,6 @@
 			}
 		}
 	},
-	"editorStyle": "wp-block-site-tagline-editor"
+	"editorStyle": "wp-block-site-tagline-editor",
+	"style": "wp-block-site-tagline"
 }
