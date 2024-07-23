@@ -25,7 +25,11 @@ import {
 } from '@wordpress/icons';
 import { __experimentalHStack as HStack, Icon } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
+import {
+	useEntityRecord,
+	useEntityRecords,
+	store as coreStore,
+} from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -37,7 +41,6 @@ import {
 	OPERATOR_IS_ANY,
 } from '../../utils/constants';
 import { default as Link, useLink } from '../routes/link';
-import Media from '../media';
 
 // See https://github.com/WordPress/gutenberg/issues/55886
 // We do not support custom statutes at the moment.
@@ -55,6 +58,23 @@ const getFormattedDate = ( dateToDisplay ) =>
 		getSettings().formats.datetimeAbbreviated,
 		getDate( dateToDisplay )
 	);
+
+function Media( { id, size = [ 'large', 'medium', 'thumbnail' ], ...props } ) {
+	const { record: media } = useEntityRecord( 'root', 'media', id );
+	const currentSize = size.find(
+		( s ) => !! media?.media_details?.sizes[ s ]
+	);
+
+	const mediaUrl =
+		media?.media_details?.sizes[ currentSize ]?.source_url ||
+		media?.source_url;
+
+	if ( ! mediaUrl ) {
+		return null;
+	}
+
+	return <img { ...props } src={ mediaUrl } alt={ media.alt_text } />;
+}
 
 function FeaturedImage( { item, viewType } ) {
 	const isDisabled = item.status === 'trash';
@@ -178,6 +198,7 @@ function usePostFields( viewType ) {
 				header: __( 'Title' ),
 				id: 'title',
 				type: 'text',
+				placeholder: __( 'No title' ),
 				getValue: ( { item } ) =>
 					typeof item.title === 'string'
 						? item.title
