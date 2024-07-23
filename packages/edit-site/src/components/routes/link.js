@@ -33,6 +33,9 @@ export function useLink( params, state, shouldReplace = false ) {
 		...Object.keys( currentArgs )
 	);
 
+	// TODO:
+	// This makes sure that the new HREF still contains the theme preview arg,
+	// but the history won't have it. Isn't that an issue?
 	if ( isPreviewingTheme() ) {
 		params = {
 			...params,
