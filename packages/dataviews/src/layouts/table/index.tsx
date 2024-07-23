@@ -24,13 +24,13 @@ import {
 /**
  * Internal dependencies
  */
-import SingleSelectionCheckbox from '../../single-selection-checkbox';
-import ItemActions from '../../item-actions';
+import SingleSelectionCheckbox from '../../components/dataviews-selection-checkbox';
+import ItemActions from '../../components/dataviews-item-actions';
 import { sortValues } from '../../constants';
 import {
 	useSomeItemHasAPossibleBulkAction,
 	useHasAPossibleBulkAction,
-} from '../../bulk-actions';
+} from '../../components/dataviews-bulk-actions';
 import type {
 	Action,
 	NormalizedField,
@@ -238,7 +238,7 @@ function TableRow< Item >( {
 					onChangeSelection(
 						selection.includes( id )
 							? selection.filter( ( itemId ) => id !== itemId )
-							: [ ...selection, id ]
+							: [ id ]
 					);
 				}
 			} }

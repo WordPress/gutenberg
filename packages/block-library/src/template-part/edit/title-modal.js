@@ -14,7 +14,7 @@ import {
 export default function TitleModal( { areaLabel, onClose, onSubmit } ) {
 	// Restructure onCreate to set the blocks on local state.
 	// Add modal to confirm title and trigger onCreate.
-	const [ title, setTitle ] = useState( __( 'Untitled Template Part' ) );
+	const [ title, setTitle ] = useState( '' );
 
 	const submitForCreation = ( event ) => {
 		event.preventDefault();
@@ -25,26 +25,40 @@ export default function TitleModal( { areaLabel, onClose, onSubmit } ) {
 		<Modal
 			title={ sprintf(
 				// Translators: %s as template part area title ("Header", "Footer", etc.).
-				__( 'Name and create your new %s' ),
+				__( 'Create new %s' ),
 				areaLabel.toLowerCase()
 			) }
-			overlayClassName="wp-block-template-part__placeholder-create-new__title-form"
 			onRequestClose={ onClose }
+			focusOnMount="firstContentElement"
+			size="small"
 		>
 			<form onSubmit={ submitForCreation }>
 				<VStack spacing="5">
 					<TextControl
-						__nextHasNoMarginBottom
 						label={ __( 'Name' ) }
 						value={ title }
 						onChange={ setTitle }
+						placeholder={ __( 'Custom Template Part' ) }
+						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 					/>
 					<HStack justify="right">
+						<Button
+							__next40pxDefaultSize
+							variant="tertiary"
+							onClick={ () => {
+								onClose();
+								setTitle( '' );
+							} }
+						>
+							{ __( 'Cancel' ) }
+						</Button>
 						<Button
 							variant="primary"
 							type="submit"
 							accessibleWhenDisabled
 							disabled={ ! title.length }
+							__next40pxDefaultSize
 						>
 							{ __( 'Create' ) }
 						</Button>
