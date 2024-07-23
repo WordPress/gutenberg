@@ -33,14 +33,7 @@ function gutenberg_admin_bar_edit_site_menu( $wp_admin_bar ) {
 		array(
 			'id'    => 'site-editor',
 			'title' => __( 'Edit site' ),
-			'href'  => add_query_arg(
-				array(
-					'postType' => 'wp_template',
-					'postId'   => $_wp_current_template_id,
-					'canvas'   => 'edit',
-				),
-				admin_url( 'site-editor.php' )
-			),
+			'href'  => admin_url( 'site-editor.php' ),
 		)
 	);
 }
