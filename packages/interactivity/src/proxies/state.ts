@@ -188,8 +188,8 @@ const stateHandlers: ProxyHandler< object > = {
 };
 
 /**
- * Returns the proxy associated to the given state object, creating it if does
- * not exist.
+ * Returns the proxy associated with the given state object, creating it if it
+ * does not exist.
  *
  * @param namespace The namespace that will be associated to this proxy.
  * @param obj       The object to proxify.
