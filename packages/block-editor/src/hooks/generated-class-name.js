@@ -40,6 +40,11 @@ export function addGeneratedClassName( extraProps, blockType, attributes ) {
 			generatedClassNames.push( variationClassName );
 		}
 	}
+
+	if ( generatedClassNames.length === 0 ) {
+		return extraProps;
+	}
+
 	if ( typeof extraProps.className === 'string' ) {
 		// We have some extra classes and want to add the default classname
 		// We use a Set to prevent duplicate classnames.
@@ -51,7 +56,7 @@ export function addGeneratedClassName( extraProps, blockType, attributes ) {
 		]
 			.join( ' ' )
 			.trim();
-	} else if ( generatedClassNames.length ) {
+	} else {
 		// There is no string in the className variable,
 		// so we just dump the default name(s) in there.
 		extraProps.className = generatedClassNames.join( ' ' );
