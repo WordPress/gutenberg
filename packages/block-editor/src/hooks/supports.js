@@ -353,7 +353,7 @@ export const hasBlockClassNameSupport = ( nameOrType ) => {
 		return classNameSupport;
 	}
 
-	// classNameSupport can be an object. If it doesn't have a block key,
+	// classNameSupport can be an object. If it doesn't have a `block` key,
 	// we default to true.
 	return (
 		! Object.hasOwn( classNameSupport, 'block' ) ||
