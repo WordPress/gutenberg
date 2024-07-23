@@ -6,13 +6,7 @@
 		"comment-empty-line-before": null,
 		"declaration-property-value-allowed-list": [
 			{
-				"flex-direction": [
-					"row",
-					"column",
-					"inherit",
-					"initial",
-					"unset"
-				]
+				"flex-direction": "/^(?!(row|column)-reverse).*$/"
 			},
 			{
 				"message": "Avoid the flex-direction reverse values. For accessibility reasons, visual, reading, and DOM order must match. Only use the reverse values when they do not affect reading order, meaning, and interaction."
