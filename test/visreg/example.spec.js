@@ -4,6 +4,8 @@
 import { test as base, expect } from '@playwright/test';
 
 const PLAYGROUND_URL = 'https://playground.wordpress.net';
+const CONTENT_IMPORT =
+	'https://raw.githubusercontent.com/smithjw1/gutenberg/try/add-vis-reg-test/test/visreg/visreg-wordpress-playground.zip';
 
 const test = base.extend( {
 	// Set up the baseURL fixture for the test. This will be the URL of the
@@ -14,11 +16,13 @@ const test = base.extend( {
 		if ( process.env.PR_NUMBER ) {
 			// 1. Go to the Gutenberg PR Preview page and submit the PR number.
 			await page.goto(
-				`${ PLAYGROUND_URL }/gutenberg.html?pr=${ process.env.PR_NUMBER }`
+				`${ PLAYGROUND_URL }/gutenberg.html?pr=${ process.env.PR_NUMBER }&import-site=${ CONTENT_IMPORT }`
 			);
 		} else {
 			// 1. Go to the WordPress Playground (Gutenberg plugin disabled).
-			await page.goto( PLAYGROUND_URL );
+			await page.goto(
+				`${ PLAYGROUND_URL }/?import-site=${ CONTENT_IMPORT }`
+			);
 		}
 
 		// 2. Wait for WordPress to be fully provisioned.
@@ -62,10 +66,6 @@ test.describe.configure( { mode: 'parallel' } );
 test( 'WP Editor default view', async ( { page, baseURL } ) => {
 	await page.goto( baseURL + '/wp-admin/post-new.php' );
 	await page.pause();
-	await page
-		.getByLabel( 'Welcome to the block editor' )
-		.getByLabel( 'Close' )
-		.click();
 
 	// Wait for the UI to stabilize. Not ideal, but good enough for the PoC.
 	await page.waitForTimeout( 5_000 ); // eslint-disable-line no-restricted-syntax
@@ -81,5 +81,15 @@ test( 'WP Site Editor "Pages" view', async ( { page, baseURL } ) => {
 	// Wait for the UI to stabilize. Not ideal, but good enough for the PoC.
 	await page.waitForTimeout( 5_000 ); // eslint-disable-line no-restricted-syntax
 
+	await expect( page ).toHaveScreenshot( { fullPage: true } );
+} );
+
+test( 'Gallery block', async ( { page, baseURL } ) => {
+	await page.goto( baseURL + '/wp-admin/post.php' );
+
+	await page.getByLabel( '“Kitchen Sink” (Edit)' ).click();
+	await page.getByLabel( 'Document Overview' ).click();
+	// eslint-disable-next-line testing-library/prefer-screen-queries
+	await page.getByRole( 'link', { name: 'Gallery' } ).click();
 	await expect( page ).toHaveScreenshot( { fullPage: true } );
 } );
