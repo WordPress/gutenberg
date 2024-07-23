@@ -69,10 +69,9 @@ Default.args = {
 	],
 };
 
-export const WithOptionHelpText: StoryFn< typeof RadioControl > = Template.bind(
-	{}
-);
-WithOptionHelpText.args = {
+export const WithOptionDescriptions: StoryFn< typeof RadioControl > =
+	Template.bind( {} );
+WithOptionDescriptions.args = {
 	...Default.args,
 	options: [
 		{
