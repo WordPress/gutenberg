@@ -21,10 +21,6 @@ import {
 	useCallback,
 } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import {
-	Icon,
-	__unstableAutocompletionItemsFill as AutocompletionItemsFill,
-} from '@wordpress/components';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
@@ -33,6 +29,8 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import BackgroundView from './background-view';
 import getDefaultUseItems from './get-default-use-items';
 import styles from './style.scss';
+import Icon from '../icon';
+import { __unstableAutocompletionItemsFill as AutocompletionItemsFill } from '../mobile/autocompletion-items';
 
 const { compose: stylesCompose } = StyleSheet;
 

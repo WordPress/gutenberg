@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -50,7 +50,7 @@ export default function ClipboardButton( {
 		}
 	}, [] );
 
-	const classes = classnames( 'components-clipboard-button', className );
+	const classes = clsx( 'components-clipboard-button', className );
 
 	// Workaround for inconsistent behavior in Safari, where <textarea> is not
 	// the document.activeElement at the moment when the copy event fires.

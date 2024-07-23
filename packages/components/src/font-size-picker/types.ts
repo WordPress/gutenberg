@@ -28,6 +28,8 @@ export type FontSizePickerProps = {
 	) => void;
 	/**
 	 * Available units for custom font size selection.
+	 *
+	 * @default [ 'px', 'em', 'rem', 'vw', 'vh' ]
 	 */
 	units?: string[];
 	/**
@@ -35,8 +37,9 @@ export type FontSizePickerProps = {
 	 */
 	value?: number | string;
 	/**
-	 * If `true`, the UI will contain a slider, instead of a numeric text input
-	 * field. If `false`, no slider will be present.
+	 * If `true`, a slider will be displayed alongside the input field when a
+	 * custom font size is active. Has no effect when `disableCustomFontSizes`
+	 * is `true`.
 	 *
 	 * @default false
 	 */
@@ -44,7 +47,7 @@ export type FontSizePickerProps = {
 	/**
 	 * If `true`, a reset button will be displayed alongside the input field
 	 * when a custom font size is active. Has no effect when
-	 * `disableCustomFontSizes` or `withSlider` is `true`.
+	 * `disableCustomFontSizes` is `true`.
 	 *
 	 * @default true
 	 */
@@ -108,7 +111,7 @@ export type FontSizePickerSelectOption = {
 	key: string;
 	name: string;
 	value?: FontSize[ 'size' ];
-	__experimentalHint?: string;
+	hint?: string;
 };
 
 export type FontSizePickerToggleGroupProps = Pick<

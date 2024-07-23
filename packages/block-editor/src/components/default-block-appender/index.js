@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -24,10 +24,14 @@ import { store as blockEditorStore } from '../../store';
 export const ZWNBSP = '\ufeff';
 
 export default function DefaultBlockAppender( { rootClientId } ) {
-	const { showPrompt, isLocked, placeholder } = useSelect(
+	const { showPrompt, isLocked, placeholder, isManualGrid } = useSelect(
 		( select ) => {
-			const { getBlockCount, getSettings, getTemplateLock } =
-				select( blockEditorStore );
+			const {
+				getBlockCount,
+				getSettings,
+				getTemplateLock,
+				getBlockAttributes,
+			} = select( blockEditorStore );
 
 			const isEmpty = ! getBlockCount( rootClientId );
 			const { bodyPlaceholder } = getSettings();
@@ -36,6 +40,9 @@ export default function DefaultBlockAppender( { rootClientId } ) {
 				showPrompt: isEmpty,
 				isLocked: !! getTemplateLock( rootClientId ),
 				placeholder: bodyPlaceholder,
+				isManualGrid:
+					getBlockAttributes( rootClientId )?.layout
+						?.isManualPlacement,
 			};
 		},
 		[ rootClientId ]
@@ -43,7 +50,7 @@ export default function DefaultBlockAppender( { rootClientId } ) {
 
 	const { insertDefaultBlock, startTyping } = useDispatch( blockEditorStore );
 
-	if ( isLocked ) {
+	if ( isLocked || isManualGrid ) {
 		return null;
 	}
 
@@ -58,7 +65,7 @@ export default function DefaultBlockAppender( { rootClientId } ) {
 	return (
 		<div
 			data-root-client-id={ rootClientId || '' }
-			className={ classnames( 'block-editor-default-block-appender', {
+			className={ clsx( 'block-editor-default-block-appender', {
 				'has-visible-prompt': showPrompt,
 			} ) }
 		>

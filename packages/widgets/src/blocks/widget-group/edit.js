@@ -52,6 +52,7 @@ function PreviewContent( { attributes, setAttributes } ) {
 		<>
 			<RichText
 				tagName="h2"
+				identifier="title"
 				className="widget-title"
 				allowedFormats={ [] }
 				placeholder={ __( 'Title' ) }

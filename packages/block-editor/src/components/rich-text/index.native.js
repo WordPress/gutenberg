@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -24,7 +24,6 @@ import {
 	create,
 	split,
 	toHTMLString,
-	slice,
 } from '@wordpress/rich-text';
 import { isURL } from '@wordpress/url';
 
@@ -46,6 +45,8 @@ import EmbedHandlerPicker from './embed-handler-picker';
 import { Content } from './content';
 import RichText from './native';
 import { withDeprecations } from './with-deprecations';
+import { findSelection } from './event-listeners/input-rules';
+import { START_OF_SELECTED_AREA } from '../../utils/selection';
 
 const classes = 'block-editor-rich-text__editable';
 
@@ -80,6 +81,7 @@ export function RichTextWrapper(
 		unstableOnFocus,
 		__unstableAllowPrefixTransformations,
 		// Native props.
+		__unstableUseSplitSelection,
 		__unstableMobileNoFocusOnMount,
 		deleteEnter,
 		placeholderTextColor,
@@ -94,14 +96,13 @@ export function RichTextWrapper(
 		minWidth,
 		maxWidth,
 		onBlur,
-		setRef,
 		disableSuggestions,
 		disableAutocorrection,
 		containerWidth,
 		onEnter: onCustomEnter,
 		...props
 	},
-	forwardedRef
+	providedRef
 ) {
 	const instanceId = useInstanceId( RichTextWrapper );
 
@@ -119,6 +120,7 @@ export function RichTextWrapper(
 			getBlock,
 			isMultiSelecting,
 			hasMultiSelection,
+			getSelectedBlockClientId,
 		} = select( blockEditorStore );
 
 		const selectionStart = getSelectionStart();
@@ -155,6 +157,7 @@ export function RichTextWrapper(
 			didAutomaticChange: didAutomaticChange(),
 			disabled: isMultiSelecting() || hasMultiSelection(),
 			undo,
+			getSelectedBlockClientId,
 			...extraProps,
 		};
 	};
@@ -165,6 +168,7 @@ export function RichTextWrapper(
 		selectionStart,
 		selectionEnd,
 		isSelected,
+		getSelectedBlockClientId,
 		didAutomaticChange,
 		disabled,
 		undo,
@@ -176,6 +180,8 @@ export function RichTextWrapper(
 		exitFormattedText,
 		selectionChange,
 		__unstableMarkAutomaticChange,
+		__unstableSplitSelection,
+		clearSelectedBlock,
 	} = useDispatch( blockEditorStore );
 	const adjustedAllowedFormats = getAllowedFormats( {
 		allowedFormats,
@@ -209,6 +215,12 @@ export function RichTextWrapper(
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[ clientId, identifier ]
 	);
+
+	const clearCurrentSelectionOnUnmount = useCallback( () => {
+		if ( getSelectedBlockClientId() === clientId ) {
+			clearSelectedBlock();
+		}
+	}, [ clearSelectedBlock, clientId, getSelectedBlockClientId ] );
 
 	const onDelete = useCallback(
 		( { value, isReverse } ) => {
@@ -316,6 +328,7 @@ export function RichTextWrapper(
 						transformation.transform( { content: value.text } ),
 					] );
 					__unstableMarkAutomaticChange();
+					return;
 				}
 			}
 
@@ -335,6 +348,8 @@ export function RichTextWrapper(
 				}
 			} else if ( canSplit ) {
 				splitValue( value );
+			} else if ( __unstableUseSplitSelection ) {
+				__unstableSplitSelection();
 			} else if ( canSplitAtEnd ) {
 				onSplitAtEnd();
 			} else if (
@@ -462,7 +477,9 @@ export function RichTextWrapper(
 						}
 						return;
 					}
-					onReplace( content, content.length - 1, -1 );
+					onReplace( content, content.length - 1, -1, {
+						source: 'clipboard',
+					} );
 				} else {
 					if ( canPasteEmbed ) {
 						onChange(
@@ -486,7 +503,7 @@ export function RichTextWrapper(
 	);
 
 	const inputRule = useCallback(
-		( value, valueToFormat ) => {
+		( value ) => {
 			if ( ! onReplace ) {
 				return;
 			}
@@ -502,7 +519,7 @@ export function RichTextWrapper(
 				return;
 			}
 
-			const trimmedTextBefore = text.slice( 0, startPosition ).trim();
+			const trimmedTextBefore = text.slice( 0, start ).trim();
 			const prefixTransforms = getBlockTransforms( 'from' ).filter(
 				( { type } ) => type === 'prefix'
 			);
@@ -517,24 +534,25 @@ export function RichTextWrapper(
 				return;
 			}
 
-			const content = valueToFormat(
-				slice( value, startPosition, text.length )
-			);
+			const content = toHTMLString( {
+				value: insert( value, START_OF_SELECTED_AREA, 0, start ),
+			} );
 			const block = transformation.transform( content );
-
+			const currentSelection = findSelection( [ block ] );
 			onReplace( [ block ] );
+			selectionChange( ...currentSelection );
 			__unstableMarkAutomaticChange();
 		},
-		[ onReplace, __unstableMarkAutomaticChange ]
+		[ onReplace, start, selectionChange, __unstableMarkAutomaticChange ]
 	);
 
-	const mergedRef = useMergeRefs( [ forwardedRef, fallbackRef ] );
+	const mergedRef = useMergeRefs( [ providedRef, fallbackRef ] );
 
 	return (
 		<RichText
 			clientId={ clientId }
 			identifier={ identifier }
-			ref={ mergedRef }
+			nativeEditorRef={ mergedRef }
 			value={ adjustedValue }
 			onChange={ adjustedOnChange }
 			selectionStart={ selectionStart }
@@ -585,10 +603,10 @@ export function RichTextWrapper(
 			minWidth={ minWidth }
 			maxWidth={ maxWidth }
 			onBlur={ onBlur }
-			setRef={ setRef }
 			disableSuggestions={ disableSuggestions }
 			disableAutocorrection={ disableAutocorrection }
 			containerWidth={ containerWidth }
+			clearCurrentSelectionOnUnmount={ clearCurrentSelectionOnUnmount }
 			// Props to be set on the editable container are destructured on the
 			// element itself for web (see below), but passed through rich text
 			// for native.
@@ -632,7 +650,7 @@ export function RichTextWrapper(
 										  }
 										: editableProps.style
 								}
-								className={ classnames(
+								className={ clsx(
 									classes,
 									props.className,
 									editableProps.className
@@ -656,27 +674,32 @@ export function RichTextWrapper(
 	);
 }
 
-const ForwardedRichTextContainer = withDeprecations(
+// This export does not actually implement a private API, but was exported
+// under this name for interoperability with the web version of the RichText
+// component.
+export const PrivateRichText = withDeprecations(
 	forwardRef( RichTextWrapper )
 );
 
-ForwardedRichTextContainer.Content = Content;
+PrivateRichText.Content = Content;
 
-ForwardedRichTextContainer.isEmpty = ( value ) => {
+PrivateRichText.isEmpty = ( value ) => {
 	return ! value || value.length === 0;
 };
 
-ForwardedRichTextContainer.Content.defaultProps = {
+PrivateRichText.Content.defaultProps = {
 	format: 'string',
 	value: '',
 };
 
-ForwardedRichTextContainer.Raw = RichText;
+PrivateRichText.Raw = forwardRef( ( props, ref ) => (
+	<RichText { ...props } nativeEditorRef={ ref } />
+) );
 
 /**
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md
  */
-export default ForwardedRichTextContainer;
+export default PrivateRichText;
 export { RichTextShortcut } from './shortcut';
 export { RichTextToolbarButton } from './toolbar-button';
 export { __unstableRichTextInputEvent } from './input-event';

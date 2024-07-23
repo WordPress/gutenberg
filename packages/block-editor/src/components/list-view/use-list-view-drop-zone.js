@@ -62,7 +62,7 @@ import { store as blockEditorStore } from '../../store';
 
 // When the indentation level, the corresponding left margin in `style.scss`
 // must be updated as well to ensure the drop zone is aligned with the indentation.
-export const NESTING_LEVEL_INDENTATION = 28;
+export const NESTING_LEVEL_INDENTATION = 24;
 
 /**
  * Determines whether the user is positioning the dragged block to be
@@ -556,9 +556,14 @@ export default function useListViewDropZone( {
 	const ref = useDropZone( {
 		dropZoneElement,
 		onDrop( event ) {
+			throttled.cancel();
 			if ( target ) {
 				onBlockDrop( event );
 			}
+			// Use `undefined` value to indicate that the drag has concluded.
+			// This allows styling rules that are active only when a user is
+			// dragging to be removed.
+			setTarget( undefined );
 		},
 		onDragLeave() {
 			throttled.cancel();

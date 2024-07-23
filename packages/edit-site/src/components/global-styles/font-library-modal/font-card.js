@@ -3,6 +3,7 @@
  */
 import { _n, sprintf } from '@wordpress/i18n';
 import {
+	__experimentalUseNavigator as useNavigator,
 	__experimentalText as Text,
 	Button,
 	Flex,
@@ -14,46 +15,30 @@ import {
  * Internal dependencies
  */
 import FontDemo from './font-demo';
-import { getFamilyPreviewStyle } from './utils/preview-styles';
 import { chevronRight } from '@wordpress/icons';
 
-function FontCard( { font, onClick, variantsText } ) {
-	const fakeFontFace = {
-		fontStyle: 'normal',
-		fontWeight: '400',
-		fontFamily: font.fontFamily,
-		fake: true,
-	};
-
-	const displayFontFace =
-		font.fontFace && font.fontFace.length
-			? font?.fontFace?.find(
-					( face ) =>
-						face.fontStyle === 'normal' && face.fontWeight === '400'
-			  ) || font.fontFace[ 0 ]
-			: fakeFontFace;
-
-	const demoStyle = getFamilyPreviewStyle( font );
-
+function FontCard( { font, onClick, variantsText, navigatorPath } ) {
 	const variantsCount = font.fontFace?.length || 1;
 
 	const style = {
 		cursor: !! onClick ? 'pointer' : 'default',
 	};
 
+	const navigator = useNavigator();
+
 	return (
 		<Button
-			onClick={ onClick }
+			onClick={ () => {
+				onClick();
+				if ( navigatorPath ) {
+					navigator.goTo( navigatorPath );
+				}
+			} }
 			style={ style }
 			className="font-library-modal__font-card"
 		>
 			<Flex justify="space-between" wrap={ false }>
-				<FontDemo
-					customPreviewUrl={ font.preview }
-					fontFace={ displayFontFace }
-					text={ font.name }
-					style={ demoStyle }
-				/>
+				<FontDemo font={ font } />
 				<Flex justify="flex-end">
 					<FlexItem>
 						<Text className="font-library-modal__font-card__count">

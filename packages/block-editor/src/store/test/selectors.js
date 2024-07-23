@@ -8,11 +8,13 @@ import {
 } from '@wordpress/blocks';
 import { RawHTML } from '@wordpress/element';
 import { symbol } from '@wordpress/icons';
+import { select, dispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import * as selectors from '../selectors';
+import { store } from '../';
 
 const {
 	getBlockName,
@@ -55,7 +57,6 @@ const {
 	isSelectionEnabled,
 	canInsertBlockType,
 	canInsertBlocks,
-	getInserterItems,
 	getBlockTransformItems,
 	isValidTemplate,
 	getTemplate,
@@ -3286,41 +3287,26 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getInserterItems', () => {
-		it( 'should properly list block type and reusable block items', () => {
-			const state = {
-				blocks: {
-					byClientId: new Map(),
-					attributes: new Map(),
-					order: new Map(),
-					parents: new Map(),
-					tree: new Map(
-						Object.entries( {
-							'': {
-								innerBlocks: [],
-							},
-						} )
-					),
-				},
-				settings: {
-					__experimentalReusableBlocks: [
-						{
-							id: 1,
-							isTemporary: false,
-							clientId: 'block1',
-							title: { raw: 'Reusable Block 1' },
-							content: { raw: '<!-- /wp:test-block-a -->' },
-						},
-					],
-				},
-				// Intentionally include a test case which considers
-				// `insertUsage` as not present within preferences.
-				//
-				// See: https://github.com/WordPress/gutenberg/issues/14580
-				preferences: {},
-				blockListSettings: {},
-				blockEditingModes: new Map(),
-			};
-			const items = getInserterItems( state );
+		afterAll( async () => {
+			await dispatch( store ).updateSettings( {
+				__experimentalReusableBlocks: [],
+			} );
+			await dispatch( store ).resetBlocks( [] );
+		} );
+
+		it( 'should properly list block type and reusable block items', async () => {
+			await dispatch( store ).updateSettings( {
+				__experimentalReusableBlocks: [
+					{
+						id: 1,
+						isTemporary: false,
+						clientId: 'block1',
+						title: { raw: 'Reusable Block 1' },
+						content: { raw: '<!-- /wp:test-block-a -->' },
+					},
+				],
+			} );
+			const items = select( store ).getInserterItems();
 			const testBlockAItem = items.find(
 				( item ) => item.id === 'core/test-block-a'
 			);
@@ -3361,93 +3347,48 @@ describe( 'selectors', () => {
 			} );
 		} );
 
-		it( 'should correctly cache the return values', () => {
-			const state = {
-				blocks: {
-					byClientId: new Map(
-						Object.entries( {
-							block3: { name: 'core/test-block-a' },
-							block4: { name: 'core/test-block-a' },
-						} )
-					),
-					attributes: new Map(
-						Object.entries( {
-							block3: {},
-							block4: {},
-						} )
-					),
-					order: new Map(
-						Object.entries( {
-							'': [ 'block3', 'block4' ],
-						} )
-					),
-					parents: new Map(
-						Object.entries( {
-							block3: '',
-							block4: '',
-						} )
-					),
-					tree: new Map(
-						Object.entries( {
-							block3: {
-								clientId: 'block3',
-								name: 'core/test-block-a',
-								attributes: {},
-								innerBlocks: [],
-							},
-							block4: {
-								clientId: 'block4',
-								name: 'core/test-block-a',
-								attributes: {},
-								innerBlocks: [],
-							},
-						} )
-					),
-					controlledInnerBlocks: {},
-				},
-				settings: {
-					__experimentalReusableBlocks: [
-						{
-							id: 1,
-							isTemporary: false,
-							clientId: 'block1',
-							title: { raw: 'Reusable Block 1' },
-							content: { raw: '<!-- /wp:test-block-a -->' },
-						},
-						{
-							id: 2,
-							isTemporary: false,
-							clientId: 'block2',
-							title: { raw: 'Reusable Block 2' },
-							content: { raw: '<!-- /wp:test-block-b -->' },
-						},
-					],
-				},
-				preferences: {
-					insertUsage: {},
-				},
-				blockListSettings: {
-					block3: {},
-					block4: {},
-				},
-				blockEditingModes: new Map(),
-			};
-
-			const stateSecondBlockRestricted = {
-				...state,
-				blockListSettings: {
-					...state.blockListSettings,
-					block4: {
-						allowedBlocks: [ 'core/test-block-b' ],
+		it( 'should correctly cache the return values', async () => {
+			await dispatch( store ).updateSettings( {
+				__experimentalReusableBlocks: [
+					{
+						id: 1,
+						isTemporary: false,
+						clientId: 'block1',
+						title: { raw: 'Reusable Block 1' },
+						content: { raw: '<!-- /wp:test-block-a -->' },
 					},
+					{
+						id: 2,
+						isTemporary: false,
+						clientId: 'block2',
+						title: { raw: 'Reusable Block 2' },
+						content: { raw: '<!-- /wp:test-block-b -->' },
+					},
+				],
+			} );
+			await dispatch( store ).resetBlocks( [
+				{
+					clientId: 'block3',
+					name: 'core/test-block-a',
+					innerBlocks: [],
 				},
-			};
+				{
+					clientId: 'block4',
+					name: 'core/test-block-a',
+					innerBlocks: [],
+				},
+			] );
+			await dispatch( store ).updateBlockListSettings( 'block3', {} );
+			await dispatch( store ).updateBlockListSettings( 'block4', {} );
 
-			const firstBlockFirstCall = getInserterItems( state, 'block3' );
-			const firstBlockSecondCall = getInserterItems(
-				stateSecondBlockRestricted,
-				'block3'
-			);
+			const firstBlockFirstCall =
+				select( store ).getInserterItems( 'block3' );
+			await dispatch( store ).updateBlockListSettings( 'block4', {
+				allowedBlocks: [ 'core/test-block-b' ],
+			} );
+			const firstBlockSecondCall =
+				select( store ).getInserterItems( 'block3' );
+			await dispatch( store ).updateBlockListSettings( 'block4', {} );
 			expect( firstBlockFirstCall ).toBe( firstBlockSecondCall );
 			expect( firstBlockFirstCall.map( ( item ) => item.id ) ).toEqual( [
 				'core/test-block-a',
@@ -3459,11 +3400,14 @@ describe( 'selectors', () => {
 				'core/block/2',
 			] );
 
-			const secondBlockFirstCall = getInserterItems( state, 'block4' );
-			const secondBlockSecondCall = getInserterItems(
-				stateSecondBlockRestricted,
-				'block4'
-			);
+			const secondBlockFirstCall =
+				select( store ).getInserterItems( 'block4' );
+			await dispatch( store ).updateBlockListSettings( 'block4', {
+				allowedBlocks: [ 'core/test-block-b' ],
+			} );
+			const secondBlockSecondCall =
+				select( store ).getInserterItems( 'block4' );
+			await dispatch( store ).updateBlockListSettings( 'block4', {} );
 			expect( secondBlockFirstCall ).not.toBe( secondBlockSecondCall );
 			expect( secondBlockFirstCall.map( ( item ) => item.id ) ).toEqual( [
 				'core/test-block-a',
@@ -3479,77 +3423,37 @@ describe( 'selectors', () => {
 			);
 		} );
 
-		it( 'should set isDisabled when a block with `multiple: false` has been used', () => {
-			const state = {
-				blocks: {
-					byClientId: new Map(
-						Object.entries( {
-							block1: {
-								clientId: 'block1',
-								name: 'core/test-block-b',
-							},
-						} )
-					),
-					attributes: new Map(
-						Object.entries( {
-							block1: { attribute: {} },
-						} )
-					),
-					order: new Map(
-						Object.entries( {
-							'': [ 'block1' ],
-						} )
-					),
-					tree: new Map(
-						Object.entries( {
-							block1: {
-								clientId: 'block1',
-								name: 'core/test-block-b',
-								attributes: {},
-								innerBlocks: [],
-							},
-						} )
-					),
-					controlledInnerBlocks: {},
-					parents: new Map(),
+		it( 'should set isDisabled when a block with `multiple: false` has been used', async () => {
+			await dispatch( store ).resetBlocks( [
+				{
+					clientId: 'block1',
+					name: 'core/test-block-b',
+					innerBlocks: [],
 				},
-				preferences: {
-					insertUsage: {},
-				},
-				blockListSettings: {},
-				settings: {},
-				blockEditingModes: new Map(),
-			};
-			const items = getInserterItems( state );
+			] );
+			const items = select( store ).getInserterItems();
 			const testBlockBItem = items.find(
 				( item ) => item.id === 'core/test-block-b'
 			);
 			expect( testBlockBItem.isDisabled ).toBe( true );
 		} );
 
-		it( 'should set a frecency', () => {
-			const state = {
-				blocks: {
-					byClientId: new Map(),
-					attributes: new Map(),
-					order: new Map(),
-					parents: new Map(),
-					cache: {},
-				},
-				preferences: {
-					insertUsage: {
-						'core/test-block-b': { count: 10, time: 1000 },
+		it( 'should set a frecency', async () => {
+			for ( let i = 0; i < 10; i++ ) {
+				await dispatch( store ).insertBlocks( [
+					{
+						clientId: 'block1',
+						name: 'core/test-block-b',
+						innerBlocks: [],
 					},
-				},
-				blockListSettings: {},
-				settings: {},
-				blockEditingModes: new Map(),
-			};
-			const items = getInserterItems( state );
+				] );
+			}
+
+			const items = select( store ).getInserterItems();
 			const reusableBlock2Item = items.find(
 				( item ) => item.id === 'core/test-block-b'
 			);
-			expect( reusableBlock2Item.frecency ).toBe( 2.5 );
+			expect( reusableBlock2Item.frecency ).toBe( 40 );
 		} );
 	} );
 
@@ -4304,20 +4208,7 @@ describe( 'getInserterItems with core blocks prioritization', () => {
 		].forEach( unregisterBlockType );
 	} );
 	it( 'should prioritize core blocks by sorting them at the top of the returned list', () => {
-		const state = {
-			blocks: {
-				byClientId: new Map(),
-				attributes: new Map(),
-				order: new Map(),
-				parents: new Map(),
-				cache: {},
-			},
-			settings: {},
-			preferences: {},
-			blockListSettings: {},
-			blockEditingModes: new Map(),
-		};
-		const items = getInserterItems( state );
+		const items = select( store ).getInserterItems();
 		const expectedResult = [
 			'core/block',
 			'core/test-block-a',

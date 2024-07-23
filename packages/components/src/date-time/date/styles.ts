@@ -84,8 +84,8 @@ export const DayButton = styled( Button, {
 
 	&&& {
 		border-radius: 100%;
-		height: ${ space( 8 ) };
-		width: ${ space( 8 ) };
+		height: ${ space( 7 ) };
+		width: ${ space( 7 ) };
 
 		${ ( props ) =>
 			props.isSelected &&

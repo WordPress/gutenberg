@@ -10,7 +10,7 @@ However, instead of opening up the selection in a modal, the selection opens up 
  * WordPress dependencies
  */
 import { BottomSheetSelectControl } from '@wordpress/components';
-import { useState } from '@wordpress/compose';
+import { useState } from 'react';
 
 const options = [
 	{

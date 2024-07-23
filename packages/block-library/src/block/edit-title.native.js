@@ -6,7 +6,8 @@ import { Text, View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { Icon, useGlobalStyles } from '@wordpress/components';
+import { Icon } from '@wordpress/components';
+import { useGlobalStyles } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { help, lock } from '@wordpress/icons';

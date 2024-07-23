@@ -300,19 +300,28 @@ class MediaUpload extends Component {
 	 */
 	buildAndSetFeatureImageFrame() {
 		const { wp } = window;
+		const { value: featuredImageId, multiple, allowedTypes } = this.props;
 		const featuredImageFrame = getFeaturedImageMediaFrame();
-		const attachments = getAttachmentsCollection( this.props.value );
+		const attachments = getAttachmentsCollection( featuredImageId );
 		const selection = new wp.media.model.Selection( attachments.models, {
 			props: attachments.props.toJSON(),
 		} );
 		this.frame = new featuredImageFrame( {
-			mimeType: this.props.allowedTypes,
+			mimeType: allowedTypes,
 			state: 'featured-image',
-			multiple: this.props.multiple,
+			multiple,
 			selection,
-			editing: this.props.value ? true : false,
+			editing: featuredImageId,
 		} );
 		wp.media.frame = this.frame;
+		// In order to select the current featured image when opening
+		// the media library we have to set the appropriate settings.
+		// Currently they are set in php for the post editor, but
+		// not for site editor.
+		wp.media.view.settings.post = {
+			...wp.media.view.settings.post,
+			featuredImageId: featuredImageId || -1,
+		};
 	}
 
 	componentWillUnmount() {
@@ -391,6 +400,8 @@ class MediaUpload extends Component {
 		if ( onClose ) {
 			onClose();
 		}
+
+		this.frame.detach();
 	}
 
 	updateCollection() {

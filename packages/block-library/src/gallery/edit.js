@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -14,6 +14,7 @@ import {
 	ToggleControl,
 	RangeControl,
 	Spinner,
+	withNotices,
 } from '@wordpress/components';
 import {
 	store as blockEditorStore,
@@ -73,6 +74,7 @@ const MOBILE_CONTROL_PROPS_RANGE_CONTROL = Platform.isNative
 	? { type: 'stepper' }
 	: {};
 
+const DEFAULT_BLOCK = { name: 'core/image' };
 const EMPTY_ARRAY = [];
 
 function GalleryEdit( props ) {
@@ -236,7 +238,7 @@ function GalleryEdit( props ) {
 		return (
 			ALLOWED_MEDIA_TYPES.some(
 				( mediaType ) => mediaTypeSelector?.indexOf( mediaType ) === 0
-			) || file.url?.indexOf( 'blob:' ) === 0
+			) || file.blob
 		);
 	}
 
@@ -248,9 +250,9 @@ function GalleryEdit( props ) {
 		const imageArray = newFileUploads
 			? Array.from( selectedImages ).map( ( file ) => {
 					if ( ! file.url ) {
-						return pickRelevantMediaFiles( {
-							url: createBlobURL( file ),
-						} );
+						return {
+							blob: createBlobURL( file ),
+						};
 					}
 
 					return file;
@@ -270,9 +272,9 @@ function GalleryEdit( props ) {
 			.filter( ( file ) => file.url || isValidFileType( file ) )
 			.map( ( file ) => {
 				if ( ! file.url ) {
-					return pickRelevantMediaFiles( {
-						url: createBlobURL( file ),
-					} );
+					return {
+						blob: file.blob || createBlobURL( file ),
+					};
 				}
 
 				return file;
@@ -306,6 +308,7 @@ function GalleryEdit( props ) {
 		const newBlocks = newImageList.map( ( image ) => {
 			return createBlock( 'core/image', {
 				id: image.id,
+				blob: image.blob,
 				url: image.url,
 				caption: image.caption,
 				alt: image.alt,
@@ -487,7 +490,7 @@ function GalleryEdit( props ) {
 	);
 
 	const blockProps = useBlockProps( {
-		className: classnames( className, 'has-nested-images' ),
+		className: clsx( className, 'has-nested-images' ),
 	} );
 
 	const nativeInnerBlockProps = Platform.isNative && {
@@ -496,6 +499,8 @@ function GalleryEdit( props ) {
 	};
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		defaultBlock: DEFAULT_BLOCK,
+		directInsert: true,
 		orientation: 'horizontal',
 		renderAppender: false,
 		...nativeInnerBlockProps,
@@ -543,7 +548,7 @@ function GalleryEdit( props ) {
 							value={ sizeSlug }
 							options={ imageSizeOptions }
 							onChange={ updateImagesSize }
-							hideCancelButton={ true }
+							hideCancelButton
 							size="__unstable-large"
 						/>
 					) }
@@ -553,7 +558,7 @@ function GalleryEdit( props ) {
 						value={ linkTo }
 						onChange={ setLinkTo }
 						options={ linkOptions }
-						hideCancelButton={ true }
+						hideCancelButton
 						size="__unstable-large"
 					/>
 					<ToggleControl
@@ -577,11 +582,11 @@ function GalleryEdit( props ) {
 						/>
 					) }
 					{ Platform.isWeb && ! imageSizeOptions && hasImageIds && (
-						<BaseControl className={ 'gallery-image-sizes' }>
+						<BaseControl className="gallery-image-sizes">
 							<BaseControl.VisualLabel>
 								{ __( 'Resolution' ) }
 							</BaseControl.VisualLabel>
-							<View className={ 'gallery-image-sizes__loading' }>
+							<View className="gallery-image-sizes__loading">
 								<Spinner />
 								{ __( 'Loading options…' ) }
 							</View>
@@ -599,7 +604,7 @@ function GalleryEdit( props ) {
 								handleUpload={ false }
 								onSelect={ updateImages }
 								name={ __( 'Add' ) }
-								multiple={ true }
+								multiple
 								mediaIds={ images
 									.filter( ( image ) => image.id )
 									.map( ( image ) => image.id ) }
@@ -629,6 +634,7 @@ function GalleryEdit( props ) {
 		</>
 	);
 }
-export default compose( [ withViewportMatch( { isNarrow: '< small' } ) ] )(
-	GalleryEdit
-);
+export default compose( [
+	withNotices,
+	withViewportMatch( { isNarrow: '< small' } ),
+] )( GalleryEdit );

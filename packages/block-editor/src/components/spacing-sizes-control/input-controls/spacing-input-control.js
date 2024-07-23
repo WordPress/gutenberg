@@ -3,13 +3,13 @@
  */
 import {
 	Button,
-	CustomSelectControl,
 	Icon,
 	RangeControl,
 	__experimentalHStack as HStack,
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useState, useMemo } from '@wordpress/element';
@@ -23,6 +23,7 @@ import { settings } from '@wordpress/icons';
 import { useSettings } from '../../use-settings';
 import { store as blockEditorStore } from '../../../store';
 import {
+	RANGE_CONTROL_MAX_SIZE,
 	ALL_SIDES,
 	LABELS,
 	getSliderValueFromPreset,
@@ -30,6 +31,11 @@ import {
 	getPresetValueFromCustomValue,
 	isValueSpacingPreset,
 } from '../utils';
+import { unlock } from '../../../lock-unlock';
+
+const { CustomSelectControlV2Legacy: CustomSelectControl } = unlock(
+	componentsPrivateApis
+);
 
 const CUSTOM_VALUE_SETTINGS = {
 	px: { max: 300, steps: 1 },
@@ -79,7 +85,7 @@ export default function SpacingInputControl( {
 	value = getPresetValueFromCustomValue( value, spacingSizes );
 
 	let selectListSizes = spacingSizes;
-	const showRangeControl = spacingSizes.length <= 8;
+	const showRangeControl = spacingSizes.length <= RANGE_CONTROL_MAX_SIZE;
 
 	const disableCustomSpacingSizes = useSelect( ( select ) => {
 		const editorSettings = select( blockEditorStore ).getSettings();
@@ -91,6 +97,8 @@ export default function SpacingInputControl( {
 			value !== undefined &&
 			! isValueSpacingPreset( value )
 	);
+
+	const [ minValue, setMinValue ] = useState( minimumCustomValue );
 
 	const previousValue = usePrevious( value );
 	if (
@@ -222,13 +230,26 @@ export default function SpacingInputControl( {
 						}
 						value={ currentValue }
 						units={ units }
-						min={ minimumCustomValue }
+						min={ minValue }
 						placeholder={ allPlaceholder }
 						disableUnits={ isMixed }
 						label={ ariaLabel }
-						hideLabelFromVision={ true }
+						hideLabelFromVision
 						className="spacing-sizes-control__custom-value-input"
-						size={ '__unstable-large' }
+						size="__unstable-large"
+						onDragStart={ () => {
+							if ( value?.charAt( 0 ) === '-' ) {
+								setMinValue( 0 );
+							}
+						} }
+						onDrag={ () => {
+							if ( value?.charAt( 0 ) === '-' ) {
+								setMinValue( 0 );
+							}
+						} }
+						onDragEnd={ () => {
+							setMinValue( minimumCustomValue );
+						} }
 					/>
 					<RangeControl
 						onMouseOver={ onMouseOver }
@@ -272,8 +293,8 @@ export default function SpacingInputControl( {
 					max={ spacingSizes.length - 1 }
 					marks={ marks }
 					label={ ariaLabel }
-					hideLabelFromVision={ true }
-					__nextHasNoMarginBottom={ true }
+					hideLabelFromVision
+					__nextHasNoMarginBottom
 					onFocus={ onMouseOver }
 					onBlur={ onMouseOut }
 				/>
@@ -282,9 +303,11 @@ export default function SpacingInputControl( {
 				<CustomSelectControl
 					className="spacing-sizes-control__custom-select-control"
 					value={
+						// passing empty string as a fallback to continue using the
+						// component in controlled mode
 						options.find(
 							( option ) => option.key === currentValue
-						) || '' // passing undefined here causes a downshift controlled/uncontrolled warning
+						) || ''
 					}
 					onChange={ ( selection ) => {
 						onChange(
@@ -296,9 +319,8 @@ export default function SpacingInputControl( {
 					} }
 					options={ options }
 					label={ ariaLabel }
-					hideLabelFromVision={ true }
-					__nextUnconstrainedWidth={ true }
-					size={ '__unstable-large' }
+					hideLabelFromVision
+					size="__unstable-large"
 					onMouseOver={ onMouseOver }
 					onMouseOut={ onMouseOut }
 					onFocus={ onMouseOver }

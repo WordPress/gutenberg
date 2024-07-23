@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -97,10 +97,7 @@ function UnforwardedSearchControl(
 				ref={ useMergeRefs( [ searchRef, forwardedRef ] ) }
 				type="search"
 				size={ size }
-				className={ classnames(
-					'components-search-control',
-					className
-				) }
+				className={ clsx( 'components-search-control', className ) }
 				onChange={ ( nextValue?: string ) =>
 					onChange( nextValue ?? '' )
 				}

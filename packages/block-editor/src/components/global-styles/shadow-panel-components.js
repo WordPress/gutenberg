@@ -5,28 +5,41 @@ import { __ } from '@wordpress/i18n';
 import {
 	__experimentalVStack as VStack,
 	__experimentalHeading as Heading,
-	__experimentalGrid as Grid,
 	__experimentalHStack as HStack,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	Button,
 	FlexItem,
 	Dropdown,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import { useMemo } from '@wordpress/element';
 import { shadow as shadowIcon, Icon, check } from '@wordpress/icons';
+
 /**
  * External dependencies
  */
-import classNames from 'classnames';
+import clsx from 'clsx';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../lock-unlock';
+
+/**
+ * Shared reference to an empty array for cases where it is important to avoid
+ * returning a new array reference on every invocation.
+ *
+ * @type {Array}
+ */
+const EMPTY_ARRAY = [];
+const {
+	CompositeItemV2: CompositeItem,
+	CompositeV2: Composite,
+	useCompositeStoreV2: useCompositeStore,
+} = unlock( componentsPrivateApis );
 
 export function ShadowPopoverContainer( { shadow, onShadowChange, settings } ) {
-	const defaultShadows = settings?.shadow?.presets?.default || [];
-	const themeShadows = settings?.shadow?.presets?.theme || [];
-	const defaultPresetsEnabled = settings?.shadow?.defaultPresets;
-
-	const shadows = [
-		...( defaultPresetsEnabled ? defaultShadows : [] ),
-		...themeShadows,
-	];
+	const shadows = useShadowPresets( settings );
 
 	return (
 		<div className="block-editor-global-styles__shadow-popover-container">
@@ -37,42 +50,70 @@ export function ShadowPopoverContainer( { shadow, onShadowChange, settings } ) {
 					activeShadow={ shadow }
 					onSelect={ onShadowChange }
 				/>
+				<div className="block-editor-global-styles__clear-shadow">
+					<Button
+						variant="tertiary"
+						onClick={ () => onShadowChange( undefined ) }
+					>
+						{ __( 'Clear' ) }
+					</Button>
+				</div>
 			</VStack>
 		</div>
 	);
 }
 
 export function ShadowPresets( { presets, activeShadow, onSelect } ) {
+	const compositeStore = useCompositeStore();
 	return ! presets ? null : (
-		<Grid columns={ 6 } gap={ 0 } align="center" justify="center">
+		<Composite
+			store={ compositeStore }
+			role="listbox"
+			className="block-editor-global-styles__shadow__list"
+			aria-label={ __( 'Drop shadows' ) }
+		>
 			{ presets.map( ( { name, slug, shadow } ) => (
 				<ShadowIndicator
 					key={ slug }
 					label={ name }
 					isActive={ shadow === activeShadow }
+					type={ slug === 'unset' ? 'unset' : 'preset' }
 					onSelect={ () =>
 						onSelect( shadow === activeShadow ? undefined : shadow )
 					}
 					shadow={ shadow }
 				/>
 			) ) }
-		</Grid>
+		</Composite>
 	);
 }
 
-export function ShadowIndicator( { label, isActive, onSelect, shadow } ) {
+export function ShadowIndicator( { type, label, isActive, onSelect, shadow } ) {
 	return (
-		<div className="block-editor-global-styles__shadow-indicator-wrapper">
-			<Button
-				className="block-editor-global-styles__shadow-indicator"
-				onClick={ onSelect }
-				label={ label }
-				style={ { boxShadow: shadow } }
-				showTooltip
-			>
-				{ isActive && <Icon icon={ check } /> }
-			</Button>
-		</div>
+		<CompositeItem
+			role="option"
+			aria-label={ label }
+			aria-selected={ isActive }
+			className={ clsx( 'block-editor-global-styles__shadow__item', {
+				'is-active': isActive,
+			} ) }
+			render={
+				<Button
+					className={ clsx(
+						'block-editor-global-styles__shadow-indicator',
+						{
+							unset: type === 'unset',
+						}
+					) }
+					onClick={ onSelect }
+					label={ label }
+					style={ { boxShadow: shadow } }
+					showTooltip
+				>
+					{ isActive && <Icon icon={ check } /> }
+				</Button>
+			}
+		/>
 	);
 }
 
@@ -105,7 +146,7 @@ function renderShadowToggle() {
 	return ( { onToggle, isOpen } ) => {
 		const toggleProps = {
 			onClick: onToggle,
-			className: classNames( { 'is-open': isOpen } ),
+			className: clsx( { 'is-open': isOpen } ),
 			'aria-expanded': isOpen,
 		};
 
@@ -122,4 +163,35 @@ function renderShadowToggle() {
 			</Button>
 		);
 	};
+}
+
+export function useShadowPresets( settings ) {
+	return useMemo( () => {
+		if ( ! settings?.shadow ) {
+			return EMPTY_ARRAY;
+		}
+
+		const defaultPresetsEnabled = settings?.shadow?.defaultPresets;
+		const {
+			default: defaultShadows,
+			theme: themeShadows,
+			custom: customShadows,
+		} = settings?.shadow?.presets ?? {};
+		const unsetShadow = {
+			name: __( 'Unset' ),
+			slug: 'unset',
+			shadow: 'none',
+		};
+
+		const shadowPresets = [
+			...( ( defaultPresetsEnabled && defaultShadows ) || EMPTY_ARRAY ),
+			...( themeShadows || EMPTY_ARRAY ),
+			...( customShadows || EMPTY_ARRAY ),
+		];
+		if ( shadowPresets.length ) {
+			shadowPresets.unshift( unsetShadow );
+		}
+
+		return shadowPresets;
+	}, [ settings ] );
 }

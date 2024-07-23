@@ -47,6 +47,14 @@ if ( ! class_exists( 'WP_Block_Bindings_Source' ) ) {
 		private $get_value_callback;
 
 		/**
+		 * The context added to the blocks needed by the source.
+		 *
+		 * @since 6.5.0
+		 * @var array|null
+		 */
+		public $uses_context = null;
+
+		/**
 		 * Constructor.
 		 *
 		 * Do not use this constructor directly. Instead, use the
@@ -58,9 +66,10 @@ if ( ! class_exists( 'WP_Block_Bindings_Source' ) ) {
 		 * @param array  $source_properties  The properties of the source.
 		 */
 		public function __construct( string $name, array $source_properties ) {
-			$this->name               = $name;
-			$this->label              = $source_properties['label'];
-			$this->get_value_callback = $source_properties['get_value_callback'];
+			$this->name = $name;
+			foreach ( $source_properties as $property_name => $property_value ) {
+				$this->$property_name = $property_value;
+			}
 		}
 
 		/**

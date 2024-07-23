@@ -144,7 +144,7 @@ test.describe( 'Font Size Picker', () => {
 				.click();
 			await page.keyboard.type( 'Paragraph to be made "large"' );
 			await page.click(
-				'role=group[name="Font size"i] >> role=button[name="Font size"i]'
+				'role=group[name="Font size"i] >> role=combobox[name="Font size"i]'
 			);
 			await pageUtils.pressKeys( 'ArrowDown', { times: 4 } );
 			await page.keyboard.press( 'Enter' );
@@ -168,7 +168,7 @@ test.describe( 'Font Size Picker', () => {
 				'Paragraph with font size reset using tools panel menu'
 			);
 			await page.click(
-				'role=group[name="Font size"i] >> role=button[name="Font size"i]'
+				'role=group[name="Font size"i] >> role=combobox[name="Font size"i]'
 			);
 			await pageUtils.pressKeys( 'ArrowDown', { times: 3 } );
 			await page.keyboard.press( 'Enter' );
@@ -179,7 +179,7 @@ test.describe( 'Font Size Picker', () => {
 <!-- /wp:paragraph -->` );
 
 			await page.click( 'role=button[name="Typography options"i]' );
-			await page.click( 'role=menuitem[name="Reset Font size"i]' );
+			await page.click( 'role=menuitem[name="Reset Size"i]' );
 			await page.keyboard.press( 'Escape' ); // Close the menu
 
 			await expect.poll( editor.getEditedPostContent )
@@ -201,7 +201,7 @@ test.describe( 'Font Size Picker', () => {
 				'Paragraph with font size reset using input field'
 			);
 			await page.click(
-				'role=group[name="Font size"i] >> role=button[name="Font size"i]'
+				'role=group[name="Font size"i] >> role=combobox[name="Font size"i]'
 			);
 			await pageUtils.pressKeys( 'ArrowDown', { times: 2 } );
 			await page.keyboard.press( 'Enter' );
@@ -266,7 +266,7 @@ test.describe( 'Font Size Picker', () => {
 <!-- /wp:paragraph -->` );
 
 			await page.click( 'role=button[name="Typography options"i]' );
-			await page.click( 'role=menuitem[name="Reset Font size"i]' );
+			await page.click( 'role=menuitem[name="Reset Size"i]' );
 			await page.keyboard.press( 'Escape' ); // Close the menu
 
 			await expect.poll( editor.getEditedPostContent )

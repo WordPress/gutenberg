@@ -123,6 +123,7 @@ test.describe( 'Block Switcher', () => {
 	test( 'Should show Columns block only if selected blocks are between limits (1-6)', async ( {
 		editor,
 		page,
+		pageUtils,
 	} ) => {
 		await editor.canvas
 			.getByRole( 'button', { name: 'Add default block' } )
@@ -131,9 +132,7 @@ test.describe( 'Block Switcher', () => {
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '## I am a header' );
-		await page.keyboard.down( 'Shift' );
-		await page.keyboard.press( 'ArrowUp' );
-		await page.keyboard.up( 'Shift' );
+		await pageUtils.pressKeys( 'primary+a', { times: 2 } );
 
 		await page
 			.getByRole( 'toolbar', { name: 'Block tools' } )

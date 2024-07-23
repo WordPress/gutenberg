@@ -13,5 +13,5 @@ inputs:
         required: true
         default: 'flaky-tests'
 runs:
-    using: 'node16'
+    using: 'node20'
     main: 'build/index.js'

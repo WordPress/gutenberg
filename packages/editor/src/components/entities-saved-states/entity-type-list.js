@@ -55,9 +55,11 @@ function GlobalStylesDescription( { record } ) {
 		}
 	);
 	return globalStylesChanges.length ? (
-		<PanelRow className="entities-saved-states__change-summary">
-			{ globalStylesChanges.join( ', ' ) }.
-		</PanelRow>
+		<ul className="entities-saved-states__changes">
+			{ globalStylesChanges.map( ( change ) => (
+				<li key={ change }>{ change }</li>
+			) ) }
+		</ul>
 	) : null;
 }
 
@@ -92,7 +94,7 @@ export default function EntityTypeList( {
 	}
 
 	return (
-		<PanelBody title={ entityLabel } initialOpen={ true }>
+		<PanelBody title={ entityLabel } initialOpen>
 			<EntityDescription record={ firstRecord } count={ count } />
 			{ list.map( ( record ) => {
 				return (

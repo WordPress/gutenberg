@@ -10,8 +10,7 @@
 		&[aria-controls="edit-post:document"],
 		&[aria-controls="edit-post:block"],
 		&[aria-controls="edit-site:template"],
-		&[aria-controls="edit-site:block-inspector"],
-		&[aria-controls="edit-site:global-styles"] {
+		&[aria-controls="edit-site:block-inspector"] {
 			display: flex;
 		}
 

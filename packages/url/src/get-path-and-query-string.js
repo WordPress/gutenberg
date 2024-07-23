@@ -20,7 +20,11 @@ export function getPathAndQueryString( url ) {
 	const path = getPath( url );
 	const queryString = getQueryString( url );
 	let value = '/';
-	if ( path ) value += path;
-	if ( queryString ) value += `?${ queryString }`;
+	if ( path ) {
+		value += path;
+	}
+	if ( queryString ) {
+		value += `?${ queryString }`;
+	}
 	return value;
 }

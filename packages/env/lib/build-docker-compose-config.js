@@ -166,14 +166,19 @@ module.exports = function buildDockerComposeConfig( config ) {
 
 	// Set the default ports based on the config values.
 	const developmentPorts = `\${WP_ENV_PORT:-${ config.env.development.port }}:80`;
+	const developmentMysqlPorts = `\${WP_ENV_MYSQL_PORT:-${
+		config.env.development.mysqlPort ?? ''
+	}}:3306`;
 	const testsPorts = `\${WP_ENV_TESTS_PORT:-${ config.env.tests.port }}:80`;
+	const testsMysqlPorts = `\${WP_ENV_TESTS_MYSQL_PORT:-${
+		config.env.tests.mysqlPort ?? ''
+	}}:3306`;
 
 	return {
-		version: '3.7',
 		services: {
 			mysql: {
-				image: 'mariadb',
-				ports: [ '3306' ],
+				image: 'mariadb:lts',
+				ports: [ developmentMysqlPorts ],
 				environment: {
 					MYSQL_ROOT_HOST: '%',
 					MYSQL_ROOT_PASSWORD:
@@ -183,8 +188,8 @@ module.exports = function buildDockerComposeConfig( config ) {
 				volumes: [ 'mysql:/var/lib/mysql' ],
 			},
 			'tests-mysql': {
-				image: 'mariadb',
-				ports: [ '3306' ],
+				image: 'mariadb:lts',
+				ports: [ testsMysqlPorts ],
 				environment: {
 					MYSQL_ROOT_HOST: '%',
 					MYSQL_ROOT_PASSWORD:

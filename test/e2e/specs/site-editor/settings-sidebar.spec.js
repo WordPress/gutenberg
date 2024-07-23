@@ -53,14 +53,11 @@ test.describe( 'Settings sidebar', () => {
 				name: 'Editor settings',
 			} );
 			const templateTitle = settingsSideber.locator(
-				'.edit-site-sidebar-card__title'
-			);
-			const templateDescription = settingsSideber.locator(
-				'.edit-site-sidebar-card__description'
+				'.editor-post-card-panel__title'
 			);
 
 			await expect( templateTitle ).toHaveText( 'Index' );
-			await expect( templateDescription ).toHaveText(
+			await expect( settingsSideber ).toContainText(
 				'Used as a fallback template for all pages when a more specific template is not defined.'
 			);
 
@@ -71,7 +68,7 @@ test.describe( 'Settings sidebar', () => {
 			} );
 
 			await expect( templateTitle ).toHaveText( 'Single Entries' );
-			await expect( templateDescription ).toHaveText(
+			await expect( settingsSideber ).toContainText(
 				'Displays any single entry, such as a post or a page. This template will serve as a fallback when a more specific template (e.g. Single Post, Page, or Attachment) cannot be found.'
 			);
 		} );

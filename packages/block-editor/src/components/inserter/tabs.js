@@ -1,8 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
+import {
+	Button,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { forwardRef } from '@wordpress/element';
+import { closeSmall } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -28,35 +33,41 @@ const mediaTab = {
 	title: __( 'Media' ),
 };
 
-function InserterTabs( {
-	showPatterns = false,
-	showMedia = false,
-	onSelect,
-	tabsContents,
-} ) {
-	const tabs = [
-		blocksTab,
-		showPatterns && patternsTab,
-		showMedia && mediaTab,
-	].filter( Boolean );
+function InserterTabs( { onSelect, children, onClose, selectedTab }, ref ) {
+	const tabs = [ blocksTab, patternsTab, mediaTab ];
 
 	return (
-		<div className="block-editor-inserter__tabs">
-			<Tabs onSelect={ onSelect }>
-				<Tabs.TabList>
-					{ tabs.map( ( tab ) => (
-						<Tabs.Tab key={ tab.name } tabId={ tab.name }>
-							{ tab.title }
-						</Tabs.Tab>
-					) ) }
-				</Tabs.TabList>
+		<div className="block-editor-inserter__tabs" ref={ ref }>
+			<Tabs onSelect={ onSelect } selectedTabId={ selectedTab }>
+				<div className="block-editor-inserter__tablist-and-close-button">
+					<Button
+						className="block-editor-inserter__close-button"
+						icon={ closeSmall }
+						label={ __( 'Close block inserter' ) }
+						onClick={ () => onClose() }
+						size="small"
+					/>
+
+					<Tabs.TabList className="block-editor-inserter__tablist">
+						{ tabs.map( ( tab ) => (
+							<Tabs.Tab
+								key={ tab.name }
+								tabId={ tab.name }
+								className="block-editor-inserter__tab"
+							>
+								{ tab.title }
+							</Tabs.Tab>
+						) ) }
+					</Tabs.TabList>
+				</div>
 				{ tabs.map( ( tab ) => (
 					<Tabs.TabPanel
 						key={ tab.name }
 						tabId={ tab.name }
 						focusable={ false }
+						className="block-editor-inserter__tabpanel"
 					>
-						{ tabsContents[ tab.name ] }
+						{ children }
 					</Tabs.TabPanel>
 				) ) }
 			</Tabs>
@@ -64,4 +75,4 @@ function InserterTabs( {
 	);
 }
 
-export default InserterTabs;
+export default forwardRef( InserterTabs );

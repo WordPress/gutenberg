@@ -22,8 +22,9 @@ test.describe( 'Plugins API Error Boundary', () => {
 	} ) => {
 		let hasError = false;
 		page.on( 'console', ( msg ) => {
-			if ( msg.type() === 'error' && msg.text().includes( 'Whoops!' ) )
+			if ( msg.type() === 'error' && msg.text().includes( 'Whoops!' ) ) {
 				hasError = true;
+			}
 		} );
 
 		await admin.createNewPost();

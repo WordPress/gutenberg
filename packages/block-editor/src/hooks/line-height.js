@@ -39,7 +39,7 @@ export function LineHeightEdit( props ) {
 	return (
 		<LineHeightControl
 			__unstableInputWidth="100%"
-			__nextHasNoMarginBottom={ true }
+			__nextHasNoMarginBottom
 			value={ style?.typography?.lineHeight }
 			onChange={ onChange }
 			size="__unstable-large"

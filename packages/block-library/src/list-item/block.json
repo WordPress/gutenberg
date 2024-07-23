@@ -21,7 +21,15 @@
 	},
 	"supports": {
 		"className": false,
-		"__experimentalSelector": "li",
+		"splitting": true,
+		"color": {
+			"gradients": true,
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
+		},
 		"spacing": {
 			"margin": true,
 			"padding": true,
@@ -46,5 +54,8 @@
 		"interactivity": {
 			"clientNavigation": true
 		}
+	},
+	"selectors": {
+		"root": ".wp-block-list > li"
 	}
 }

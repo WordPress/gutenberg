@@ -6,14 +6,11 @@ import { createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { Platform } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import { getFilteredTemplatePartBlocks } from './utils';
-import { TEMPLATE_PART_POST_TYPE } from '../utils/constants';
 import { unlock } from '../lock-unlock';
 
 /**
@@ -74,7 +71,17 @@ export const __experimentalGetPreviewDeviceType = createRegistrySelector(
  * @return {Object} Whether the current user can create media or not.
  */
 export const getCanUserCreateMedia = createRegistrySelector(
-	( select ) => () => select( coreDataStore ).canUser( 'create', 'media' )
+	( select ) => () => {
+		deprecated(
+			`wp.data.select( 'core/edit-site' ).getCanUserCreateMedia()`,
+			{
+				since: '6.7',
+				alternative: `wp.data.select( 'core' ).canUser( 'create', { kind: 'root', type: 'media' } )`,
+			}
+		);
+
+		return select( coreDataStore ).canUser( 'create', 'media' );
+	}
 );
 
 /**
@@ -85,13 +92,11 @@ export const getCanUserCreateMedia = createRegistrySelector(
  * @return {Array} The available reusable blocks.
  */
 export const getReusableBlocks = createRegistrySelector( ( select ) => () => {
-	deprecated(
-		"select( 'core/core' ).getEntityRecords( 'postType', 'wp_block' )",
-		{
-			since: '6.5',
-			version: '6.8',
-		}
-	);
+	deprecated( `select( 'core/edit-site' ).getReusableBlocks()`, {
+		since: '6.5',
+		version: '6.8',
+		alternative: `select( 'core/core' ).getEntityRecords( 'postType', 'wp_block' )`,
+	} );
 	const isWeb = Platform.OS === 'web';
 	return isWeb
 		? select( coreDataStore ).getEntityRecords( 'postType', 'wp_block', {
@@ -129,7 +134,7 @@ export function getHomeTemplateId() {
  *
  * @param {Object} state Global application state.
  *
- * @return {TemplateType?} Template type.
+ * @return {?TemplateType} Template type.
  */
 export function getEditedPostType( state ) {
 	return state.editedPost.postType;
@@ -140,7 +145,7 @@ export function getEditedPostType( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @return {string?} Post ID.
+ * @return {?string} Post ID.
  */
 export function getEditedPostId( state ) {
 	return state.editedPost.id;
@@ -243,18 +248,9 @@ export function isSaveViewOpened( state ) {
  */
 export const getCurrentTemplateTemplateParts = createRegistrySelector(
 	( select ) => () => {
-		const templateParts = select( coreDataStore ).getEntityRecords(
-			'postType',
-			TEMPLATE_PART_POST_TYPE,
-			{ per_page: -1 }
-		);
-
-		const clientIds =
-			select( blockEditorStore ).getBlocksByName( 'core/template-part' );
-		const blocks =
-			select( blockEditorStore ).getBlocksByClientId( clientIds );
-
-		return getFilteredTemplatePartBlocks( blocks, templateParts );
+		return unlock(
+			select( editorStore )
+		).getCurrentTemplateTemplateParts();
 	}
 );
 

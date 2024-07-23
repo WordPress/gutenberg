@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * Internal dependencies
@@ -48,7 +48,7 @@ function NoticeList( {
 		( id: NoticeListProps[ 'notices' ][ number ][ 'id' ] ) => () =>
 			onRemove( id );
 
-	className = classnames( 'components-notice-list', className );
+	className = clsx( 'components-notice-list', className );
 
 	return (
 		<div className={ className }>

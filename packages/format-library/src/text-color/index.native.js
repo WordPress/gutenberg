@@ -7,13 +7,13 @@ import { StyleSheet, View } from 'react-native';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useCallback, useMemo, useState } from '@wordpress/element';
-import { BlockControls, useSettings } from '@wordpress/block-editor';
+import { useMemo, useState } from '@wordpress/element';
 import {
-	ToolbarGroup,
-	ToolbarButton,
+	BlockControls,
+	useSettings,
 	useMobileGlobalStylesColors,
-} from '@wordpress/components';
+} from '@wordpress/block-editor';
+import { ToolbarGroup, ToolbarButton } from '@wordpress/components';
 import {
 	Icon,
 	color as colorIcon,
@@ -25,7 +25,7 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { getActiveColors } from './inline.js';
+import { getActiveColors } from './inline.native.js';
 import { default as InlineColorUI } from './inline';
 import styles from './style.scss';
 
@@ -72,32 +72,16 @@ function TextColorEdit( {
 	const [ allowCustomControl ] = useSettings( 'color.custom' );
 	const colors = useMobileGlobalStylesColors();
 	const [ isAddingColor, setIsAddingColor ] = useState( false );
-	const enableIsAddingColor = useCallback(
-		() => setIsAddingColor( true ),
-		[ setIsAddingColor ]
-	);
-	const disableIsAddingColor = useCallback(
-		() => setIsAddingColor( false ),
-		[ setIsAddingColor ]
-	);
 	const colorIndicatorStyle = useMemo(
 		() =>
 			fillComputedColors(
 				contentRef,
 				getActiveColors( value, name, colors )
 			),
-		[ value, colors ]
+		[ contentRef, value, colors ]
 	);
 
 	const hasColorsToChoose = colors.length || ! allowCustomControl;
-
-	const onPressButton = useCallback( () => {
-		if ( hasColorsToChoose ) {
-			enableIsAddingColor();
-		} else {
-			onChange( removeFormat( value, name ) );
-		}
-	}, [ hasColorsToChoose, value ] );
 
 	const outlineStyle = [
 		usePreferredColorSchemeStyle(
@@ -153,14 +137,18 @@ function TextColorEdit( {
 							customContainerStyles,
 						} }
 						// If has no colors to choose but a color is active remove the color onClick
-						onClick={ onPressButton }
+						onClick={
+							hasColorsToChoose
+								? () => setIsAddingColor( true )
+								: () => onChange( removeFormat( value, name ) )
+						}
 					/>
 				</ToolbarGroup>
 			</BlockControls>
 			{ isAddingColor && (
 				<InlineColorUI
 					name={ name }
-					onClose={ disableIsAddingColor }
+					onClose={ () => setIsAddingColor( false ) }
 					activeAttributes={ activeAttributes }
 					value={ value }
 					onChange={ onChange }

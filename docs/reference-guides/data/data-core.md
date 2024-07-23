@@ -18,7 +18,7 @@ _Parameters_
 
 -   _state_ `State`: Data state.
 -   _action_ `string`: Action to check. One of: 'create', 'read', 'update', 'delete'.
--   _resource_ `string`: REST resource to check, e.g. 'media' or 'posts'.
+-   _resource_ `string | EntityResource`: Entity resource to check. Accepts entity object `{ kind: 'root', name: 'media', id: 1 }` or REST base as a string - `media`.
 -   _id_ `EntityRecordKey`: Optional ID of the rest resource to check.
 
 _Returns_
@@ -150,7 +150,7 @@ _Parameters_
 
 _Returns_
 
--   `undefined< 'edit' >`: Current user object.
+-   `ET.User< 'edit' >`: Current user object.
 
 ### getDefaultTemplateId
 
@@ -178,7 +178,7 @@ _Parameters_
 
 _Returns_
 
--   `undefined< EntityRecord > | undefined`: The entity record, merged with its edits.
+-   `ET.Updatable< EntityRecord > | false`: The entity record, merged with its edits.
 
 ### getEmbedPreview
 
@@ -504,7 +504,7 @@ _Parameters_
 
 _Returns_
 
--   `undefined< 'edit' >[]`: Users list.
+-   `ET.User< 'edit' >[]`: Users list.
 
 ### hasEditsForEntityRecord
 
@@ -790,7 +790,7 @@ _Parameters_
 -   _kind_ `string`: Kind of the entity.
 -   _name_ `string`: Name of the entity.
 -   _recordId_ `Object`: ID of the record.
--   _options_ `Object`: Saving options.
+-   _options_ `Object=`: Saving options.
 
 ### saveEntityRecord
 

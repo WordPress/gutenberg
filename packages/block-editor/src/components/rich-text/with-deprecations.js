@@ -3,7 +3,6 @@
  */
 import { forwardRef } from '@wordpress/element';
 import { children as childrenSource } from '@wordpress/blocks';
-import { useInstanceId } from '@wordpress/compose';
 import { __unstableCreateElement } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
 
@@ -36,12 +35,10 @@ export function withDeprecations( Component ) {
 		}
 
 		const NewComponent = props.multiline ? RichTextMultiline : Component;
-		const instanceId = useInstanceId( NewComponent );
 
 		return (
 			<NewComponent
 				{ ...props }
-				identifier={ props.identifier || instanceId }
 				value={ value }
 				onChange={ onChange }
 				ref={ ref }

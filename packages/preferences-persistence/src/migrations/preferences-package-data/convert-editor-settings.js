@@ -18,6 +18,9 @@ export default function convertEditorSettings( data ) {
 		'showBlockBreadcrumbs',
 		'showIconLabels',
 		'showListViewByDefault',
+		'isPublishSidebarEnabled',
+		'isComplementaryAreaVisible',
+		'pinnedItems',
 	];
 
 	settingsToMoveToCore.forEach( ( setting ) => {

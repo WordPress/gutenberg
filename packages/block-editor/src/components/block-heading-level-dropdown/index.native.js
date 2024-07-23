@@ -18,9 +18,10 @@ const HEADING_LEVELS = [ 1, 2, 3, 4, 5, 6 ];
  *
  * @typedef WPHeadingLevelDropdownProps
  *
- * @property {number}                 selectedLevel The chosen heading level.
- * @property {(newValue:number)=>any} onChange      Callback to run when
- *                                                  toolbar value is changed.
+ * @property {number}     value    The chosen heading level.
+ * @property {number[]}   options  An array of supported heading levels.
+ * @property {()=>number} onChange Function called with
+ *                                 the selected value changes.
  */
 
 /**
@@ -48,7 +49,7 @@ export default function HeadingLevelDropdown( {
 					isPressed={ isActive }
 				/>
 			),
-			// translators: %s: heading level e.g: "1", "2", "3"
+			// translators: %d: heading level e.g: "1", "2", "3"
 			title: sprintf( __( 'Heading %d' ), targetLevel ),
 			isActive,
 			onClick: () => onChangeCallback( targetLevel ),

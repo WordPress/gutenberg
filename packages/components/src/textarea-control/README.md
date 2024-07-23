@@ -79,6 +79,7 @@ const MyTextareaControl = () => {
 
 	return (
 		<TextareaControl
+		  __nextHasNoMarginBottom
 			label="Text"
 			help="Enter some text"
 			value={ text }
@@ -130,6 +131,13 @@ The number of rows the textarea should contain.
 The current value of the textarea.
 
 -   Required: Yes
+
+#### `__nextHasNoMarginBottom`: `Boolean`
+
+Start opting into the new margin-free styles that will become the default in a future version.
+
+-   Required: No
+-   Default: `false`
 
 ## Related components
 

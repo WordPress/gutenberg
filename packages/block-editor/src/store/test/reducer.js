@@ -35,6 +35,7 @@ import {
 	lastBlockInserted,
 	blockEditingModes,
 	openedBlockSettingsMenu,
+	expandedBlock,
 } from '../reducer';
 
 const noop = () => {};
@@ -3454,6 +3455,31 @@ describe( 'state', () => {
 				'14501cc2-90a6-4f52-aa36-ab6e896135d1',
 				{
 					type: 'SET_OPENED_BLOCK_SETTINGS_MENU',
+				}
+			);
+			expect( state ).toBe( null );
+		} );
+	} );
+
+	describe( 'expandedBlock', () => {
+		it( 'should return null by default', () => {
+			expect( expandedBlock( undefined, {} ) ).toBe( null );
+		} );
+
+		it( 'should set client id for expanded block', () => {
+			const state = expandedBlock( null, {
+				type: 'SET_BLOCK_EXPANDED_IN_LIST_VIEW',
+				clientId: '14501cc2-90a6-4f52-aa36-ab6e896135d1',
+			} );
+			expect( state ).toBe( '14501cc2-90a6-4f52-aa36-ab6e896135d1' );
+		} );
+
+		it( 'should clear the state when a block is selected', () => {
+			const state = expandedBlock(
+				'14501cc2-90a6-4f52-aa36-ab6e896135d1',
+				{
+					type: 'SELECT_BLOCK',
+					clientId: 'a-different-block',
 				}
 			);
 			expect( state ).toBe( null );

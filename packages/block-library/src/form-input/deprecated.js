@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classNames from 'classnames';
+import clsx from 'clsx';
 import removeAccents from 'remove-accents';
 
 /**
@@ -101,7 +101,7 @@ const v1 = {
 			...colorProps.style,
 		};
 
-		const inputClasses = classNames(
+		const inputClasses = clsx(
 			'wp-block-form-input__input',
 			colorProps.className,
 			borderProps.className
@@ -115,7 +115,7 @@ const v1 = {
 		/* eslint-disable jsx-a11y/label-has-associated-control */
 		return (
 			<label
-				className={ classNames( 'wp-block-form-input__label', {
+				className={ clsx( 'wp-block-form-input__label', {
 					'is-label-inline': inlineLabel,
 				} ) }
 			>

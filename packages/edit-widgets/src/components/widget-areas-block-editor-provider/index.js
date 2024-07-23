@@ -14,6 +14,7 @@ import { useMemo } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
 
 /**
  * Internal dependencies
@@ -27,6 +28,10 @@ import { unlock } from '../../lock-unlock';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
+const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
+
+const EMPTY_ARRAY = [];
+
 export default function WidgetAreasBlockEditorProvider( {
 	blockEditorSettings,
 	children,
@@ -43,15 +48,16 @@ export default function WidgetAreasBlockEditorProvider( {
 	} = useSelect( ( select ) => {
 		const { canUser, getEntityRecord, getEntityRecords } =
 			select( coreStore );
-		const siteSettings = canUser( 'read', 'settings' )
+		const siteSettings = canUser( 'read', {
+			kind: 'root',
+			name: 'site',
+		} )
 			? getEntityRecord( 'root', 'site' )
 			: undefined;
 		return {
-			widgetAreas: select( editWidgetsStore ).getWidgetAreas(),
-			widgets: select( editWidgetsStore ).getWidgets(),
 			reusableBlocks: ALLOW_REUSABLE_BLOCKS
 				? getEntityRecords( 'postType', 'wp_block' )
-				: [],
+				: EMPTY_ARRAY,
 			isFixedToolbarActive: !! select( preferencesStore ).get(
 				'core/edit-widgets',
 				'fixedToolbar'
@@ -111,6 +117,7 @@ export default function WidgetAreasBlockEditorProvider( {
 	return (
 		<SlotFillProvider>
 			<KeyboardShortcuts.Register />
+			<BlockKeyboardShortcuts />
 			<ExperimentalBlockEditorProvider
 				value={ blocks }
 				onInput={ onInput }

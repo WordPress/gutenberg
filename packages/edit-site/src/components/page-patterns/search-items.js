@@ -1,77 +1,67 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import removeAccents from 'remove-accents';
-import { noCase } from 'change-case';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../lock-unlock';
+
+const { extractWords, getNormalizedSearchTerms, normalizeString } = unlock(
+	blockEditorPrivateApis
+);
 
 /**
  * Internal dependencies
  */
 import {
+	TEMPLATE_PART_ALL_AREAS_CATEGORY,
 	PATTERN_DEFAULT_CATEGORY,
 	PATTERN_USER_CATEGORY,
 	PATTERN_TYPES,
+	TEMPLATE_PART_POST_TYPE,
 } from '../../utils/constants';
 
 // Default search helpers.
-const defaultGetName = ( item ) => item.name || '';
-const defaultGetTitle = ( item ) => item.title;
-const defaultGetDescription = ( item ) => item.description || '';
+const defaultGetName = ( item ) => {
+	if ( item.type === PATTERN_TYPES.user ) {
+		return item.slug;
+	}
+
+	if ( item.type === TEMPLATE_PART_POST_TYPE ) {
+		return '';
+	}
+
+	return item.name || '';
+};
+
+export const defaultGetTitle = ( item ) => {
+	if ( typeof item.title === 'string' ) {
+		return item.title;
+	}
+
+	if ( item.title && item.title.rendered ) {
+		return item.title.rendered;
+	}
+
+	if ( item.title && item.title.raw ) {
+		return item.title.raw;
+	}
+
+	return '';
+};
+
+const defaultGetDescription = ( item ) => {
+	if ( item.type === PATTERN_TYPES.user ) {
+		return item.excerpt.raw;
+	}
+
+	return item.description || '';
+};
+
 const defaultGetKeywords = ( item ) => item.keywords || [];
 const defaultHasCategory = () => false;
-
-/**
- * Extracts words from an input string.
- *
- * @param {string} input The input string.
- *
- * @return {Array} Words, extracted from the input string.
- */
-function extractWords( input = '' ) {
-	return noCase( input, {
-		splitRegexp: [
-			/([\p{Ll}\p{Lo}\p{N}])([\p{Lu}\p{Lt}])/gu, // One lowercase or digit, followed by one uppercase.
-			/([\p{Lu}\p{Lt}])([\p{Lu}\p{Lt}][\p{Ll}\p{Lo}])/gu, // One uppercase followed by one uppercase and one lowercase.
-		],
-		stripRegexp: /(\p{C}|\p{P}|\p{S})+/giu, // Anything that's not a punctuation, symbol or control/format character.
-	} )
-		.split( ' ' )
-		.filter( Boolean );
-}
-
-/**
- * Sanitizes the search input string.
- *
- * @param {string} input The search input to normalize.
- *
- * @return {string} The normalized search input.
- */
-function normalizeSearchInput( input = '' ) {
-	// Disregard diacritics.
-	//  Input: "média"
-	input = removeAccents( input );
-
-	// Accommodate leading slash, matching autocomplete expectations.
-	//  Input: "/media"
-	input = input.replace( /^\//, '' );
-
-	// Lowercase.
-	//  Input: "MEDIA"
-	input = input.toLowerCase();
-
-	return input;
-}
-
-/**
- * Converts the search term into a list of normalized terms.
- *
- * @param {string} input The search term to normalize.
- *
- * @return {string[]} The normalized list of search terms.
- */
-export const getNormalizedSearchTerms = ( input = '' ) => {
-	return extractWords( normalizeSearchInput( input ) );
-};
 
 const removeMatchingTerms = ( unmatchedTerms, unprocessedTerms ) => {
 	return unmatchedTerms.filter(
@@ -93,6 +83,7 @@ const removeMatchingTerms = ( unmatchedTerms, unprocessedTerms ) => {
  */
 export const searchItems = ( items = [], searchInput = '', config = {} ) => {
 	const normalizedSearchTerms = getNormalizedSearchTerms( searchInput );
+
 	// Filter patterns by category: the default category indicates that all patterns will be shown.
 	const onlyFilterByCategory =
 		config.categoryId !== PATTERN_DEFAULT_CATEGORY &&
@@ -145,6 +136,7 @@ function getItemSearchRank( item, searchTerm, config ) {
 
 	let rank =
 		categoryId === PATTERN_DEFAULT_CATEGORY ||
+		categoryId === TEMPLATE_PART_ALL_AREAS_CATEGORY ||
 		( categoryId === PATTERN_USER_CATEGORY &&
 			item.type === PATTERN_TYPES.user ) ||
 		hasCategory( item, categoryId )
@@ -162,8 +154,8 @@ function getItemSearchRank( item, searchTerm, config ) {
 	const description = getDescription( item );
 	const keywords = getKeywords( item );
 
-	const normalizedSearchInput = normalizeSearchInput( searchTerm );
-	const normalizedTitle = normalizeSearchInput( title );
+	const normalizedSearchInput = normalizeString( searchTerm );
+	const normalizedTitle = normalizeString( title );
 
 	// Prefers exact matches
 	// Then prefers if the beginning of the title matches the search term

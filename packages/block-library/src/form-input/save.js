@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classNames from 'classnames';
+import clsx from 'clsx';
 import removeAccents from 'remove-accents';
 
 /**
@@ -46,7 +46,7 @@ export default function save( { attributes } ) {
 		...colorProps.style,
 	};
 
-	const inputClasses = classNames(
+	const inputClasses = clsx(
 		'wp-block-form-input__input',
 		colorProps.className,
 		borderProps.className
@@ -63,7 +63,7 @@ export default function save( { attributes } ) {
 		<div { ...blockProps }>
 			{ /* eslint-disable jsx-a11y/label-has-associated-control */ }
 			<label
-				className={ classNames( 'wp-block-form-input__label', {
+				className={ clsx( 'wp-block-form-input__label', {
 					'is-label-inline': inlineLabel,
 				} ) }
 			>

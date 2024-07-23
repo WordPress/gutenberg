@@ -7,25 +7,25 @@ Snapshot Diff:
 
 @@ -1,22 +1,18 @@
   <div
-    class="components-flex css-j6raph-View-Flex-base-ItemsRow e19lxcc00"
+    class="components-flex css-1hwd9hm-PolymorphicDiv-Flex-base-ItemsRow e19lxcc00"
 -   data-testid="flex"
 +   data-testid="base-flex"
     data-wp-c16t="true"
     data-wp-component="Flex"
   >
     <div
-      class="components-flex-item css-mw3lhz-View-Item-sx-Base e19lxcc00"
+      class="components-flex-item css-eno349-PolymorphicDiv-Item-sx-Base e19lxcc00"
       data-wp-c16t="true"
       data-wp-component="FlexItem"
     >
       Item
     </div>
 -   <div
--     class="css-1mm2cvy-View e19lxcc00"
+-     class="css-161q9d5-PolymorphicDiv e19lxcc00"
 -   />
 -   <div />
     <div
-      class="components-flex-item components-flex-block css-14wzr73-View-Item-sx-Base-block e19lxcc00"
+      class="components-flex-item components-flex-block css-10m3u8l-PolymorphicDiv-Item-sx-Base-block e19lxcc00"
       data-wp-c16t="true"
       data-wp-component="FlexBlock"
     >

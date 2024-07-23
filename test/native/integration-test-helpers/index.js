@@ -1,8 +1,5 @@
 export { addBlock } from './add-block';
-export {
-	advanceAnimationByTime,
-	advanceAnimationByFrames,
-} from './advance-animation';
+export { advanceAnimationByFrames } from './advance-animation';
 export * from './dismiss-modal';
 export * from './get-block';
 export * from './get-block-transform-options';

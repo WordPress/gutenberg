@@ -25,7 +25,6 @@ export function initializeEditor( id, postType, postId ) {
 		editorMode: 'visual',
 		fullscreenMode: true,
 		inactivePanels: [],
-		isPublishSidebarEnabled: true,
 		openPanels: [ 'post-status' ],
 		welcomeGuide: true,
 	} );
@@ -33,9 +32,7 @@ export function initializeEditor( id, postType, postId ) {
 		hiddenBlockTypes: [],
 		inactivePanels: [],
 		openPanels: [ 'post-status' ],
-	} );
-
-	dispatch( preferencesStore ).setDefaults( 'core', {
+		isPublishSidebarEnabled: true,
 		fixedToolbar: false,
 	} );
 

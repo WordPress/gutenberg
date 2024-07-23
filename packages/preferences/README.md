@@ -138,12 +138,10 @@ wp.data.dispatch( 'core/preferences' ).setPersistenceLayer( {
 
 The `PreferenceToggleMenuItem` components can be used with a `DropdownMenu` to implement a menu for changing preferences.
 
-Also see the `MoreMenuDropdown` component from the `@wordpress/interface` package for implementing a more menu.
-
 ```jsx
 function MyEditorMenu() {
 	return (
-		<MoreMenuDropdown>
+		<DropdownMenu>
 			{ () => (
 				<MenuGroup label={ __( 'Features' ) }>
 					<PreferenceToggleMenuItem
@@ -156,7 +154,7 @@ function MyEditorMenu() {
 					/>
 				</MenuGroup>
 			) }
-		</MoreMenuDropdown>
+		</DropdownMenu>
 	);
 }
 ```

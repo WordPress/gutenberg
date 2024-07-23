@@ -442,7 +442,6 @@ Link support has been made stable as part of WordPress 5.8. It's `false` by defa
 
 ```json
 {
-	"version": 1,
 	"settings": {
 		"color": {
 			"link": true

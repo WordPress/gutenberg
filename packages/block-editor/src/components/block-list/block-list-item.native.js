@@ -98,7 +98,7 @@ function BlockListItemContent( {
 			const name = getBlockName( clientId );
 			const parentName = getBlockName( rootClientId );
 			const { align } = getBlockAttributes( clientId ) || {};
-			const { align: parentBlockAlign } =
+			const { textAlign: parentBlockAlign } =
 				getBlockAttributes( rootClientId ) || {};
 
 			return {

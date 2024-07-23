@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
 import * as Ariakit from '@ariakit/react';
 import type { ForwardedRef } from 'react';
 
@@ -50,6 +49,7 @@ function ToolbarItem(
 
 	return (
 		<Ariakit.ToolbarItem
+			accessibleWhenDisabled
 			{ ...allProps }
 			store={ accessibleToolbarStore }
 			render={ render }

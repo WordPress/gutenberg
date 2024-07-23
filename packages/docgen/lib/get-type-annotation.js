@@ -237,16 +237,20 @@ function getMappedTypeAnnotation( typeAnnotation ) {
  * @param {babelTypes.TSTypeReference} typeAnnotation
  */
 function getTypeReferenceTypeAnnotation( typeAnnotation ) {
-	if ( ! typeAnnotation.typeParameters ) {
-		if ( babelTypes.isTSQualifiedName( typeAnnotation.typeName ) ) {
-			return unifyQualifiedName( typeAnnotation.typeName );
-		}
-		return typeAnnotation.typeName.name;
+	let typeName;
+	if ( babelTypes.isTSQualifiedName( typeAnnotation.typeName ) ) {
+		typeName = unifyQualifiedName( typeAnnotation.typeName );
+	} else {
+		typeName = typeAnnotation.typeName.name;
 	}
-	const typeParams = typeAnnotation.typeParameters.params
-		.map( getTypeAnnotation )
-		.join( ', ' );
-	return `${ typeAnnotation.typeName.name }< ${ typeParams } >`;
+
+	if ( typeAnnotation.typeParameters ) {
+		const typeParams = typeAnnotation.typeParameters.params
+			.map( getTypeAnnotation )
+			.join( ', ' );
+		typeName = `${ typeName }< ${ typeParams } >`;
+	}
+	return typeName;
 }
 
 /**
@@ -401,6 +405,10 @@ function unwrapWrappedSelectors( token ) {
 		return token;
 	}
 
+	if ( babelTypes.isFunctionExpression( token ) ) {
+		return token;
+	}
+
 	if ( babelTypes.isArrowFunctionExpression( token ) ) {
 		return token;
 	}
@@ -429,7 +437,7 @@ function unwrapWrappedSelectors( token ) {
 
 /**
  * @param {ASTNode} token
- * @return {babelTypes.ArrowFunctionExpression | babelTypes.FunctionDeclaration} The function token.
+ * @return {babelTypes.ArrowFunctionExpression | babelTypes.FunctionDeclaration | babelTypes.FunctionExpression} The function token.
  */
 function getFunctionToken( token ) {
 	let resolvedToken = token;
@@ -513,8 +521,7 @@ function getQualifiedObjectPatternTypeAnnotation( tag, paramType ) {
 function getParamTypeAnnotation( tag, declarationToken, paramIndex ) {
 	const functionToken = getFunctionToken( declarationToken );
 
-	// Otherwise find the corresponding parameter token for the documented parameter.
-	let paramToken = functionToken.params[ paramIndex ];
+	let paramToken = functionToken?.params[ paramIndex ];
 
 	// This shouldn't happen due to our ESLint enforcing correctly documented parameter names but just in case
 	// we'll give a descriptive error so that it's easy to diagnose the issue.

@@ -3,7 +3,7 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-test.describe( 'RichText', () => {
+test.describe( 'RichText (@firefox, @webkit)', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
 	} );
@@ -119,7 +119,7 @@ test.describe( 'RichText', () => {
 		expect( count ).toBe( 1 );
 	} );
 
-	test( 'should return focus when pressing formatting button', async ( {
+	test( 'should return focus when pressing formatting button (-firefox)', async ( {
 		page,
 		editor,
 	} ) => {
@@ -415,7 +415,7 @@ test.describe( 'RichText', () => {
 		] );
 	} );
 
-	test( 'should update internal selection after fresh focus', async ( {
+	test( 'should update internal selection after fresh focus (-firefox)', async ( {
 		page,
 		editor,
 		pageUtils,
@@ -438,7 +438,7 @@ test.describe( 'RichText', () => {
 		] );
 	} );
 
-	test( 'should keep internal selection after blur', async ( {
+	test( 'should keep internal selection after blur (-webkit)', async ( {
 		page,
 		editor,
 		pageUtils,
@@ -492,19 +492,11 @@ test.describe( 'RichText', () => {
 		expect( await editor.getBlocks() ).toMatchObject( [
 			{
 				name: 'core/paragraph',
-				attributes: { content: 'a' },
+				attributes: { content: 'a1' },
 			},
 			{
 				name: 'core/paragraph',
-				attributes: { content: '1' },
-			},
-			{
-				name: 'core/paragraph',
-				attributes: { content: '2' },
-			},
-			{
-				name: 'core/paragraph',
-				attributes: { content: 'b' },
+				attributes: { content: '2b' },
 			},
 		] );
 	} );
@@ -609,7 +601,8 @@ test.describe( 'RichText', () => {
 		] );
 	} );
 
-	test( 'should preserve internal formatting', async ( {
+	// For some reason, tabbing in the highlight popover doesn't work in WebKit.
+	test( 'should preserve internal formatting (-webkit, -firefox)', async ( {
 		page,
 		editor,
 		pageUtils,
