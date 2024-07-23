@@ -129,6 +129,20 @@ const stateHandlers: ProxyHandler< object > = {
 		return result;
 	},
 
+	set(
+		target: object,
+		key: string,
+		value: unknown,
+		receiver: object
+	): boolean {
+		setNamespace( getProxyNs( receiver ) );
+		try {
+			return Reflect.set( target, key, value, receiver );
+		} finally {
+			resetNamespace();
+		}
+	},
+
 	defineProperty(
 		target: object,
 		key: string,

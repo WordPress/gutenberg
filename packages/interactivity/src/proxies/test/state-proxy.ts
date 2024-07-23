@@ -294,6 +294,32 @@ describe( 'interactivity api - state proxy', () => {
 			expect( state2.obj ).toBe( state1.obj );
 			expect( raw2.obj ).toBe( state1.obj );
 		} );
+
+		it( 'should use its namespace by default inside setters', () => {
+			const state = proxifyState( 'test/right', {
+				set counter( val: number ) {
+					const ctx = getContext< { counter: number } >();
+					ctx.counter = val;
+				},
+			} );
+
+			const scope = {
+				context: {
+					'test/other': { counter: 0 },
+					'test/right': { counter: 0 },
+				},
+			};
+
+			try {
+				setScope( scope as any );
+				setNamespace( 'test/other' );
+				state.counter = 4;
+				expect( scope.context[ 'test/right' ].counter ).toBe( 4 );
+			} finally {
+				resetNamespace();
+				resetScope();
+			}
+		} );
 	} );
 
 	describe( 'computations', () => {
