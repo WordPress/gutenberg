@@ -32,15 +32,15 @@
 	}
 
 	.components-range-control__mark {
-		height: 8px;
-		width: 2px;
-		background-color: $gray-300;
+		height: 4px;
+		width: 4px;
+		background-color: rgba($black, 0.2);
 		z-index: 1;
-		top: -6px;
+		top: -4px;
 		border-radius: 2px;
 
 		&.is-filled {
-			z-index: -1;
+			background-color: rgba($white, 0.5);
 		}
 	}
 
@@ -48,7 +48,7 @@
 		margin-top: 17px;
 
 		:last-child {
-			transform: translateX(-2px);
+			transform: translateX(-4px);
 		}
 	}
 
