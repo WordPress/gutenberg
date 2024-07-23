@@ -34,6 +34,8 @@ import { isUnmodifiedDefaultBlock, normalizeBlockType } from './utils';
 /**
  * Returns the block's default classname from its name.
  *
+ * The return value can be filtered using the `blocks.getBlockDefaultClassName` filter.
+ *
  * @param {string} blockName The block name.
  *
  * @return {string} The block's default class.
@@ -56,6 +58,8 @@ export function getBlockDefaultClassName( blockName ) {
  *
  * If the given block matches a variation, the classname will be the block's default classname
  * with the variation name appended (separated by a hyphen).
+ *
+ * Note that the block's default classname  is affected by the `blocks.getBlockDefaultClassName` filter.
  *
  * @param {string} blockName  The block name.
  * @param {Object} attributes Block attributes.
