@@ -162,7 +162,7 @@ function gutenberg_initialize_experiments_settings() {
 			'id'    => 'gutenberg-quick-edit-dataviews',
 		)
 	);
-  
+
 	add_settings_field(
 		'gutenberg-playlist-block',
 		__( 'Playlist block', 'gutenberg' ),
