@@ -91,8 +91,8 @@ export function RadioControl(
 							aria-describedby={
 								// TODO: will improve if we like this solution
 								// eslint-disable-next-line no-nested-ternary
-								!! option.helpText
-									? `${ id }-${ index }-help`
+								!! option.description
+									? `${ id }-${ index }-option-description`
 									: !! help
 									? `${ id }__help`
 									: undefined
@@ -105,14 +105,14 @@ export function RadioControl(
 						>
 							{ option.label }
 						</label>
-						{ !! option.helpText ? (
+						{ !! option.description ? (
 							<Text
 								variant="muted"
 								size={ 12 }
-								id={ `${ id }-${ index }-help` }
-								className="components-radio-control__help-text"
+								id={ `${ id }-${ index }-option-description` }
+								className="components-radio-control__option-description"
 							>
-								{ option.helpText }
+								{ option.description }
 							</Text>
 						) : null }
 					</div>

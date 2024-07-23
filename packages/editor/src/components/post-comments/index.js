@@ -17,12 +17,12 @@ const COMMENT_OPTIONS = [
 	{
 		label: _x( 'Open', 'Adjective: e.g. "Comments are open"' ),
 		value: 'open',
-		helpText: __( 'Visitors can add new comments and replies.' ),
+		description: __( 'Visitors can add new comments and replies.' ),
 	},
 	{
 		label: __( 'Closed' ),
 		value: 'closed',
-		helpText: [
+		description: [
 			__( 'Visitors cannot add new comments or replies.' ),
 			__( 'Existing comments remain visible.' ),
 		].join( ' ' ),

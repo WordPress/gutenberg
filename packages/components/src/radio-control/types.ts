@@ -27,7 +27,7 @@ export type RadioControlProps = Pick<
 		/**
 		 * Optional help text to be shown in addition the label.
 		 */
-		helpText?: string;
+		description?: string;
 	}[];
 	/**
 	 * The value property of the currently selected option.

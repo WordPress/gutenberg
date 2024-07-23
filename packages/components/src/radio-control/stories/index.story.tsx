@@ -75,12 +75,20 @@ export const WithOptionHelpText: StoryFn< typeof RadioControl > = Template.bind(
 WithOptionHelpText.args = {
 	...Default.args,
 	options: [
-		{ label: 'Public', value: 'public', helpText: 'Visible to everyone' },
-		{ label: 'Private', value: 'private', helpText: 'Only visible to you' },
+		{
+			label: 'Public',
+			value: 'public',
+			description: 'Visible to everyone',
+		},
+		{
+			label: 'Private',
+			value: 'private',
+			description: 'Only visible to you',
+		},
 		{
 			label: 'Password Protected',
 			value: 'password',
-			helpText: 'Protected by a password',
+			description: 'Protected by a password',
 		},
 	],
 };

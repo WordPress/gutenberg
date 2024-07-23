@@ -51,27 +51,27 @@ export const STATUS_OPTIONS = [
 	{
 		label: __( 'Draft' ),
 		value: 'draft',
-		helpText: __( 'Not ready to publish.' ),
+		description: __( 'Not ready to publish.' ),
 	},
 	{
 		label: __( 'Pending' ),
 		value: 'pending',
-		helpText: __( 'Waiting for review before publishing.' ),
+		description: __( 'Waiting for review before publishing.' ),
 	},
 	{
 		label: __( 'Private' ),
 		value: 'private',
-		helpText: __( 'Only visible to site admins and editors.' ),
+		description: __( 'Only visible to site admins and editors.' ),
 	},
 	{
 		label: __( 'Scheduled' ),
 		value: 'future',
-		helpText: __( 'Publish automatically on a chosen date.' ),
+		description: __( 'Publish automatically on a chosen date.' ),
 	},
 	{
 		label: __( 'Published' ),
 		value: 'publish',
-		helpText: __( 'Visible to everyone.' ),
+		description: __( 'Visible to everyone.' ),
 	},
 ];
 
