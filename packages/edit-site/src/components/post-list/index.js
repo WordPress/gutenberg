@@ -142,7 +142,7 @@ export default function PostList( { postType } ) {
 	const history = useHistory();
 	const location = useLocation();
 	const { postId, quickEdit = false } = location.params;
-	const [ selection, setSelection ] = useState( postId.split( ',' ) );
+	const [ selection, setSelection ] = useState( postId?.split( ',' ) ?? [] );
 	const onChangeSelection = useCallback(
 		( items ) => {
 			setSelection( items );
