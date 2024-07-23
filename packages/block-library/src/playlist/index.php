@@ -8,6 +8,8 @@
 /**
  * Renders the `core/playlist` block on server.
  *
+ * @since 6.7.0
+ *
  * @param array $attributes The block attributes.
  *
  * @return string Returns the Playlist.
@@ -123,6 +125,8 @@ function render_block_core_playlist( $attributes ) {
 
 /**
  * Registers the `core/playlist` block on server.
+ * 
+ * @since 6.7.0
  */
 function register_block_core_playlist() {
 	register_block_type_from_metadata(
