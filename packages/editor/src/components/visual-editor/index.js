@@ -107,6 +107,7 @@ function VisualEditor( {
 } ) {
 	const [ resizeObserver, sizes ] = useResizeObserver();
 	const isMobileViewport = useViewportMatch( 'small', '<' );
+	const isTabletViewport = useViewportMatch( 'medium', '<' );
 	const {
 		renderingMode,
 		postContentAttributes,
@@ -341,12 +342,13 @@ function VisualEditor( {
 		} ),
 	] );
 
-	const zoomOutProps = isZoomOutMode
-		? {
-				scale: 'default',
-				frameSize: '48px',
-		  }
-		: {};
+	const zoomOutProps =
+		isZoomOutMode && ! isTabletViewport
+			? {
+					scale: 'default',
+					frameSize: '48px',
+			  }
+			: {};
 
 	const forceFullHeight = postType === NAVIGATION_POST_TYPE;
 	const enableResizing =

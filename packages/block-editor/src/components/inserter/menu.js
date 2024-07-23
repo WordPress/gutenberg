@@ -10,6 +10,7 @@ import {
 	forwardRef,
 	useState,
 	useCallback,
+	useEffect,
 	useMemo,
 	useRef,
 	useLayoutEffect,
@@ -17,7 +18,7 @@ import {
 import { VisuallyHidden, SearchControl, Popover } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useDebouncedInput } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -32,7 +33,6 @@ import InserterSearchResults from './search-results';
 import useInsertionPoint from './hooks/use-insertion-point';
 import { store as blockEditorStore } from '../../store';
 import TabbedSidebar from '../tabbed-sidebar';
-import { useZoomOut } from '../../hooks/use-zoom-out';
 
 const NOOP = () => {};
 function InserterMenu(
@@ -149,7 +149,18 @@ function InserterMenu(
 	const showZoomOut =
 		showPatternPanel && !! window.__experimentalEnableZoomedOutPatternsTab;
 
-	useZoomOut( showZoomOut );
+	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
+	useEffect( () => {
+		if ( showZoomOut ) {
+			__unstableSetEditorMode( 'zoom-out' );
+		}
+
+		return () => {
+			if ( showZoomOut ) {
+				__unstableSetEditorMode( 'edit' ); // TODO: set back to whatever it was previously
+			}
+		};
+	}, [ showZoomOut ] );
 
 	const inserterSearch = useMemo( () => {
 		if ( selectedTab === 'media' ) {
