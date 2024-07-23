@@ -46,7 +46,6 @@ import usePatternSettings from './use-pattern-settings';
 import { unlock } from '../../lock-unlock';
 import usePatterns from './use-patterns';
 import PatternsHeader from './header';
-import { useLink } from '../routes/link';
 import { useAddedBy } from '../page-templates/hooks';
 import { useEditPostAction } from '../dataviews-actions';
 import { defaultGetTitle } from './search-items';
@@ -55,7 +54,7 @@ const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
 	blockEditorPrivateApis
 );
 const { usePostActions } = unlock( editorPrivateApis );
-const { useLocation } = unlock( routerPrivateApis );
+const { useLocation, useLink } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
 const defaultLayouts = {

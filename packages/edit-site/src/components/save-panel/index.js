@@ -15,6 +15,7 @@ import {
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -23,7 +24,8 @@ import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useActivateTheme } from '../../utils/use-activate-theme';
 import { useActualCurrentTheme } from '../../utils/use-actual-current-theme';
-import { isPreviewingTheme } from '../../utils/is-previewing-theme';
+
+const { isPreviewingTheme } = unlock( routerPrivateApis );
 
 const { EntitiesSavedStatesExtensible, NavigableRegion } =
 	unlock( privateApis );

@@ -9,12 +9,9 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  * Internal dependencies
  */
 import { unlock } from '../lock-unlock';
-import {
-	isPreviewingTheme,
-	currentlyPreviewingTheme,
-} from './is-previewing-theme';
 
-const { useHistory } = unlock( routerPrivateApis );
+const { useHistory, isPreviewingTheme, currentlyPreviewingTheme } =
+	unlock( routerPrivateApis );
 
 /**
  * This should be refactored to use the REST API, once the REST API can activate themes.

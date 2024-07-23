@@ -5,12 +5,15 @@ import { useSelect } from '@wordpress/data';
 import { __experimentalHStack as HStack } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { check } from '@wordpress/icons';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
 import SaveButton from '../save-button';
-import { isPreviewingTheme } from '../../utils/is-previewing-theme';
+import { unlock } from '../../lock-unlock';
+
+const { isPreviewingTheme } = unlock( routerPrivateApis );
 
 export default function SaveHub() {
 	const { isDisabled, isSaving } = useSelect( ( select ) => {

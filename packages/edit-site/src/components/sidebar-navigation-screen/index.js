@@ -24,13 +24,10 @@ import { useContext } from '@wordpress/element';
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import SidebarButton from '../sidebar-button';
-import {
-	isPreviewingTheme,
-	currentlyPreviewingTheme,
-} from '../../utils/is-previewing-theme';
 import { SidebarNavigationContext } from '../sidebar';
 
-const { useHistory, useLocation } = unlock( routerPrivateApis );
+const { useHistory, useLocation, isPreviewingTheme, currentlyPreviewingTheme } =
+	unlock( routerPrivateApis );
 
 export default function SidebarNavigationScreen( {
 	isRoot,

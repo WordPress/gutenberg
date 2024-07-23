@@ -34,7 +34,6 @@ import { unlock } from '../../lock-unlock';
 import { useSpecificEditorSettings } from '../block-editor/use-site-editor-settings';
 import PluginTemplateSettingPanel from '../plugin-template-setting-panel';
 import GlobalStylesSidebar from '../global-styles-sidebar';
-import { isPreviewingTheme } from '../../utils/is-previewing-theme';
 import {
 	getEditorCanvasContainerTitleAndIcon,
 	useHasEditorCanvasContainer,
@@ -48,7 +47,8 @@ import useEditorTitle from './use-editor-title';
 import { useIsSiteEditorLoading } from '../layout/hooks';
 
 const { Editor, BackButton } = unlock( editorPrivateApis );
-const { useHistory, useLocation } = unlock( routerPrivateApis );
+const { useHistory, useLocation, isPreviewingTheme } =
+	unlock( routerPrivateApis );
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 
 export default function EditSiteEditor( { isPostsList = false } ) {

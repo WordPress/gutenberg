@@ -16,13 +16,10 @@ import {
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
-import {
-	currentlyPreviewingTheme,
-	isPreviewingTheme,
-} from '../../utils/is-previewing-theme';
 import { unlock } from '../../lock-unlock';
 
-const { useLocation } = unlock( routerPrivateApis );
+const { useLocation, currentlyPreviewingTheme, isPreviewingTheme } =
+	unlock( routerPrivateApis );
 
 export default function SaveButton( {
 	className = 'edit-site-save-button__button',

@@ -28,7 +28,6 @@ import {
  */
 import { Async } from '../async';
 import Page from '../page';
-import { default as Link, useLink } from '../routes/link';
 import AddNewTemplate from '../add-new-template';
 import { useAddedBy } from './hooks';
 import {
@@ -38,15 +37,13 @@ import {
 	LAYOUT_TABLE,
 	LAYOUT_LIST,
 } from '../../utils/constants';
-
 import usePatternSettings from '../page-patterns/use-pattern-settings';
 import { unlock } from '../../lock-unlock';
 import { useEditPostAction } from '../dataviews-actions';
 
 const { usePostActions } = unlock( editorPrivateApis );
-
 const { useGlobalStyle } = unlock( blockEditorPrivateApis );
-const { useHistory, useLocation } = unlock( routerPrivateApis );
+const { useHistory, useLocation, Link, useLink } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
 

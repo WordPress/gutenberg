@@ -13,10 +13,9 @@ import { VIEW_LAYOUTS } from '@wordpress/dataviews';
 /**
  * Internal dependencies
  */
-import { useLink } from '../routes/link';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import { unlock } from '../../lock-unlock';
-const { useLocation } = unlock( routerPrivateApis );
+const { useLocation, useLink } = unlock( routerPrivateApis );
 
 export default function DataViewItem( {
 	title,

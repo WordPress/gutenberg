@@ -30,11 +30,14 @@ import {
 	useEntityRecords,
 	store as coreStore,
 } from '@wordpress/core-data';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
-import { default as Link, useLink } from '../routes/link';
+import { unlock } from '../../lock-unlock';
+
+const { Link, useLink } = unlock( routerPrivateApis );
 
 const LAYOUT_GRID = 'grid';
 const LAYOUT_TABLE = 'table';
