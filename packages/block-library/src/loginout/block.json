@@ -58,5 +58,6 @@
 		"interactivity": {
 			"clientNavigation": true
 		}
-	}
+	},
+	"style": "wp-block-loginout"
 }
