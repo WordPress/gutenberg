@@ -25,14 +25,19 @@ export default function useSelectAll() {
 
 			const selectedClientIds = getSelectedBlockClientIds();
 
+			event.preventDefault();
+
 			if (
+				node !== event.target &&
 				selectedClientIds.length < 2 &&
 				! isEntirelySelected( event.target )
 			) {
+				event.target.ownerDocument.defaultView
+					.getSelection()
+					.selectAllChildren( event.target );
+				event.target.focus();
 				return;
 			}
-
-			event.preventDefault();
 
 			const [ firstSelectedClientId ] = selectedClientIds;
 			const rootClientId = getBlockRootClientId( firstSelectedClientId );
