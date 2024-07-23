@@ -262,12 +262,12 @@
 							"type": "object",
 							"properties": {
 								"block": {
-									"type": "boolean",
-									"description": "Add the .wp-block-your-block-name class to the block's wrapper element"
+									"description": "Add the .wp-block-your-block-name class to the block's wrapper element",
+									"type": "boolean"
 								},
 								"variation": {
-									"type": "boolean",
-									"description": "Add the .wp-block-your-block-name-your-block-variation class to the block's wrapper element"
+									"description": "Add the .wp-block-your-block-name-your-block-variation class to the block's wrapper element",
+									"type": "boolean"
 								}
 							}
 						}
