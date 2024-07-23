@@ -431,6 +431,7 @@ export function RichTextWrapper(
 					anchorRef,
 				] ) }
 				contentEditable={ ! shouldDisableEditing }
+				tabIndex={ 0 }
 				suppressContentEditableWarning
 				className={ clsx(
 					'block-editor-rich-text__editable',
