@@ -12,12 +12,15 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { Button } from '@wordpress/components';
 import { useState, useMemo } from '@wordpress/element';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
+import { unlock } from '../../lock-unlock';
 import Page from '../page';
-import usePostFields from '../post-fields';
+
+const { usePostFields } = unlock( editorPrivateApis );
 
 function PostEditForm( { postType, postId } ) {
 	const { item } = useSelect(

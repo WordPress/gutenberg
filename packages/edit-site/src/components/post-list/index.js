@@ -10,6 +10,7 @@ import { DataViews } from '@wordpress/dataviews';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { drawerRight } from '@wordpress/icons';
+import { usePrevious } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -28,10 +29,8 @@ import {
 import AddNewPostModal from '../add-new-post';
 import { unlock } from '../../lock-unlock';
 import { useEditPostAction } from '../dataviews-actions';
-import { usePrevious } from '@wordpress/compose';
-import usePostFields from '../post-fields';
 
-const { usePostActions } = unlock( editorPrivateApis );
+const { usePostActions, usePostFields } = unlock( editorPrivateApis );
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 const EMPTY_ARRAY = [];
 
