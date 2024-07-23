@@ -1513,8 +1513,10 @@ describe( 'blocks', () => {
 		} );
 
 		it( 'should not override label from the server', () => {
-			// Simulate bootstrapping a source from the server registration.
-			registerBlockBindingsSource( {
+			// Bootstrap source from the server.
+			unlock(
+				dispatch( blocksStore )
+			).addBootstrappedBlockBindingsSource( {
 				name: 'core/server',
 				label: 'Server label',
 			} );
@@ -1540,9 +1542,11 @@ describe( 'blocks', () => {
 			);
 		} );
 
-		it( 'should add usesContext when only defined in the client', () => {
-			// Simulate server bootstrap.
-			registerBlockBindingsSource( {
+		it( 'should add usesContext when only defined in the server', () => {
+			// Bootstrap source from the server.
+			unlock(
+				dispatch( blocksStore )
+			).addBootstrappedBlockBindingsSource( {
 				name: 'core/testing',
 				label: 'testing',
 				usesContext: [ 'postId', 'postType' ],
@@ -1557,9 +1561,11 @@ describe( 'blocks', () => {
 			expect( source.usesContext ).toEqual( [ 'postId', 'postType' ] );
 		} );
 
-		it( 'should keep usesContext when it is not defined in the client', () => {
-			// Simulate server bootstrap.
-			registerBlockBindingsSource( {
+		it( 'should add usesContext when only defined in the client', () => {
+			// Bootstrap source from the server.
+			unlock(
+				dispatch( blocksStore )
+			).addBootstrappedBlockBindingsSource( {
 				name: 'core/testing',
 				label: 'testing',
 			} );
@@ -1575,8 +1581,10 @@ describe( 'blocks', () => {
 		} );
 
 		it( 'should merge usesContext from server and client without duplicates', () => {
-			// Simulate server bootstrap.
-			registerBlockBindingsSource( {
+			// Bootstrap source from the server.
+			unlock(
+				dispatch( blocksStore )
+			).addBootstrappedBlockBindingsSource( {
 				name: 'core/testing',
 				label: 'testing',
 				usesContext: [ 'postId', 'postType' ],
