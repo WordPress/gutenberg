@@ -372,18 +372,29 @@ export function collections( state = {}, action ) {
 }
 
 export function blockBindingsSources( state = {}, action ) {
-	if ( action.type === 'REGISTER_BLOCK_BINDINGS_SOURCE' ) {
-		return {
-			...state,
-			[ action.sourceName ]: {
-				label: action.sourceLabel,
-				getValue: action.getValue,
-				setValue: action.setValue,
-				setValues: action.setValues,
-				getPlaceholder: action.getPlaceholder,
-				canUserEditValue: action.canUserEditValue || ( () => false ),
-			},
-		};
+	switch ( action.type ) {
+		case 'ADD_BLOCK_BINDINGS_SOURCE':
+			return {
+				...state,
+				[ action.name ]: {
+					// Don't override the label if it's already set.
+					label: state[ action.name ]?.label || action.label,
+					getValues: action.getValues,
+					setValues: action.setValues,
+					getPlaceholder: action.getPlaceholder,
+					canUserEditValue: action.canUserEditValue,
+				},
+			};
+		case 'ADD_BOOTSTRAPPED_BLOCK_BINDINGS_SOURCE':
+			return {
+				...state,
+				[ action.name ]: {
+					label: action.label,
+					usesContext: action.usesContext,
+				},
+			};
+		case 'REMOVE_BLOCK_BINDINGS_SOURCE':
+			return omit( state, action.name );
 	}
 	return state;
 }

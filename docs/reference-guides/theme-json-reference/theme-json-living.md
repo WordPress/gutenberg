@@ -216,6 +216,7 @@ Background styles.
 | backgroundPosition | string, object |  |
 | backgroundRepeat | string, object |  |
 | backgroundSize | string, object |  |
+| backgroundAttachment | string, object |  |
 
 ---
 

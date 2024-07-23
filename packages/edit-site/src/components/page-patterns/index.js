@@ -294,6 +294,7 @@ export default function DataviewsPatterns() {
 			{
 				header: __( 'Title' ),
 				id: 'title',
+				getValue: ( { item } ) => item.title?.raw || item.title,
 				render: ( { item } ) => <Title item={ item } />,
 				enableHiding: false,
 			},
@@ -351,7 +352,7 @@ export default function DataviewsPatterns() {
 	// Reset the page number when the category changes.
 	useEffect( () => {
 		if ( previousCategoryId !== categoryId ) {
-			setView( DEFAULT_VIEW );
+			setView( ( prevView ) => ( { ...prevView, page: 1 } ) );
 		}
 	}, [ categoryId, previousCategoryId ] );
 	const { data, paginationInfo } = useMemo( () => {

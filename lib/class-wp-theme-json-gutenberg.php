@@ -234,6 +234,7 @@ class WP_Theme_JSON_Gutenberg {
 		'background-position'               => array( 'background', 'backgroundPosition' ),
 		'background-repeat'                 => array( 'background', 'backgroundRepeat' ),
 		'background-size'                   => array( 'background', 'backgroundSize' ),
+		'background-attachment'             => array( 'background', 'backgroundAttachment' ),
 		'border-radius'                     => array( 'border', 'radius' ),
 		'border-top-left-radius'            => array( 'border', 'radius', 'topLeft' ),
 		'border-top-right-radius'           => array( 'border', 'radius', 'topRight' ),
@@ -503,10 +504,11 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	const VALID_STYLES = array(
 		'background' => array(
-			'backgroundImage'    => null,
-			'backgroundPosition' => null,
-			'backgroundRepeat'   => null,
-			'backgroundSize'     => null,
+			'backgroundImage'      => null,
+			'backgroundAttachment' => null,
+			'backgroundPosition'   => null,
+			'backgroundRepeat'     => null,
+			'backgroundSize'       => null,
 		),
 		'border'     => array(
 			'color'  => null,
@@ -2919,6 +2921,9 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		/*
+		 * Root selector (body) styles should not be wrapped in `:root where()` to keep
+		 * specificity at (0,0,1) and maintain backwards compatibility.
+		 *
 		 * Top-level element styles using element-only specificity selectors should
 		 * not get wrapped in `:root :where()` to maintain backwards compatibility.
 		 *
@@ -2926,11 +2931,13 @@ class WP_Theme_JSON_Gutenberg {
 		 * still need to be wrapped in `:root :where` to cap specificity for nested
 		 * variations etc. Pseudo selectors won't match the ELEMENTS selector exactly.
 		 */
-		$element_only_selector = $current_element &&
-			isset( static::ELEMENTS[ $current_element ] ) &&
-			// buttons, captions etc. still need `:root :where()` as they are class based selectors.
-			! isset( static::__EXPERIMENTAL_ELEMENT_CLASS_NAMES[ $current_element ] ) &&
-			static::ELEMENTS[ $current_element ] === $selector;
+		$element_only_selector = $is_root_selector || (
+				$current_element &&
+				isset( static::ELEMENTS[ $current_element ] ) &&
+				// buttons, captions etc. still need `:root :where()` as they are class based selectors.
+				! isset( static::__EXPERIMENTAL_ELEMENT_CLASS_NAMES[ $current_element ] ) &&
+				static::ELEMENTS[ $current_element ] === $selector
+			);
 
 		// 2. Generate and append the rules that use the general selector.
 		$general_selector = $element_only_selector ? $selector : ":root :where($selector)";

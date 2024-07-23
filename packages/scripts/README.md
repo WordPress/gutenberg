@@ -97,7 +97,7 @@ This is how you execute the script with presented setup:
 
 -   `npm run build` - builds the code for production.
 -   `npm run build:custom` - builds the code for production with two entry points and a custom output directory. Paths for custom entry points are relative to the project root.
--   `npm run build:copy-php` - builds the code for production and opts into copying all PHP files from the `src` directory and its subfolders to the output directory. By default, only PHP files listed in the `render` field in the detected `block.json` files get copied.
+-   `npm run build:copy-php` - builds the code for production and opts into copying all PHP files from the `src` directory and its subfolders to the output directory. By default, only PHP files listed in the `render` and `variations` fields in the detected `block.json` files get copied.
 -   `npm run build:custom-directory` - builds the code for production using the `custom-directory` as the source code directory.
 
 This script automatically use the optimized config but sometimes you may want to specify some custom options:
@@ -382,7 +382,7 @@ This is how you execute the script with presented setup:
 -   `npm start` - starts the build for development.
 -   `npm run start:hot` - starts the build for development with "Fast Refresh". The page will automatically reload if you make changes to the files.
 -   `npm run start:custom` - starts the build for development which contains two entry points and a custom output directory. Paths for custom entry points are relative to the project root.
--   `npm run start:copy-php` - starts the build for development and opts into copying all PHP files from the `src` directory and its subfolders to the output directory. By default, only PHP files listed in the `render` field in the detected `block.json` files get copied.
+-   `npm run start:copy-php` - starts the build for development and opts into copying all PHP files from the `src` directory and its subfolders to the output directory. By default, only PHP files listed in the `render` and `variations` fields in the detected `block.json` files get copied.
 -   `npm run start:custom-directory` - builds the code for production using the `custom-directory` as the source code directory.
 
 This script automatically use the optimized config but sometimes you may want to specify some custom options:

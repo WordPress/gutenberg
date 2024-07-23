@@ -19,6 +19,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { useState, memo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { useViewportMatch } from '@wordpress/compose';
 import {
 	archive,
 	blockMeta,
@@ -161,6 +162,8 @@ function NewTemplateModal( { onClose } ) {
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
 
+	const isMobile = useViewportMatch( 'medium', '<' );
+
 	const { homeUrl } = useSelect( ( select ) => {
 		const {
 			getUnstableBase, // Site index.
@@ -266,7 +269,7 @@ function NewTemplateModal( { onClose } ) {
 		>
 			{ modalContent === modalContentMap.templatesList && (
 				<Grid
-					columns={ 3 }
+					columns={ isMobile ? 2 : 3 }
 					gap={ 4 }
 					align="flex-start"
 					justify="center"

@@ -97,13 +97,12 @@
 }
 
 .edit-site-add-new-template__modal {
-	max-width: $grid-unit-80 * 13;
-	width: calc(100% - #{$grid-unit-80});
-	margin-top: $grid-unit-80;
-	max-height: calc(100% - #{$grid-unit-80 * 2});
 
 	@include break-large() {
+		max-width: $grid-unit-80 * 13;
+		margin-top: $grid-unit-80;
 		width: calc(100% - #{$grid-unit-80 * 2});
+		max-height: calc(100% - #{$grid-unit-80 * 2});
 	}
 
 	.edit-site-add-new-template__template-button,
@@ -175,8 +174,7 @@
 
 	.edit-site-add-new-template__custom-template-button,
 	.edit-site-add-new-template__template-list__prompt {
-		grid-column-start: 1;
-		grid-column-end: 4;
+		grid-column: 1 / -1;
 	}
 }
 

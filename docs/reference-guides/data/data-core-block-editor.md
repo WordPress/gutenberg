@@ -562,6 +562,18 @@ _Returns_
 
 -   `number`: Number of blocks in the post, or number of blocks with name equal to blockName.
 
+### getHoveredBlockClientId
+
+Returns the currently hovered block.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `Object`: Client Id of the hovered block.
+
 ### getInserterItems
 
 Determines the items that appear in the inserter. Includes both static items (e.g. a regular block type) and dynamic items (e.g. a reusable block).
@@ -1256,6 +1268,18 @@ _Parameters_
 ### hideInsertionPoint
 
 Action that hides the insertion point.
+
+### hoverBlock
+
+Returns an action object used in signalling that the block with the specified client ID has been hovered.
+
+_Parameters_
+
+-   _clientId_ `string`: Block client ID.
+
+_Returns_
+
+-   `Object`: Action object.
 
 ### insertAfterBlock
 
