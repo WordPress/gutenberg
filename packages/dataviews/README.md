@@ -170,8 +170,9 @@ Properties:
     -   `direction`: the direction to use for sorting, one of `asc` or `desc`.
 -   `fields`: the `id` of the fields that are visible in the UI.
 -   `layout`: config that is specific to a particular layout type.
-    -   `mediaField`: used by the `grid` and `list` layouts. The `id` of the field to be used for rendering each card's media. This field is not hiddable.
     -   `primaryField`: used by the `table`, `grid` and `list` layouts. The `id` of the field to be highlighted in each row/card/item. This field is not hiddable.
+    -   `mediaField`: used by the `grid` and `list` layouts. The `id` of the field to be used for rendering each card's media. This field is not hiddable.
+    -   `badgeFields`: used by the `grid` layout. It renders these fields as badges without a label.
 
 ### `onChangeView`: `function`
 
