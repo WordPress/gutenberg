@@ -1,6 +1,6 @@
 {
 	"title": "JSON schema for WordPress wp-env configuration files",
-	"$schema": "http://json-schema.org/draft-04/schema#",
+	"$schema": "http://json-schema.org/draft-07/schema#",
 	"definitions": {
 		"//": {
 			"reference": "https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/"
@@ -63,6 +63,17 @@
 					"type": "object"
 				}
 			}
+		},
+		"wpEnvPropertyNames": {
+			"enum": [
+				"core",
+				"phpVersion",
+				"plugins",
+				"themes",
+				"port",
+				"config",
+				"mappings"
+			]
 		}
 	},
 	"type": "object",
@@ -85,16 +96,9 @@
 							"allOf": [
 								{ "$ref": "#/definitions/wpEnvProperties" },
 								{
-									"properties": {
-										"core": {},
-										"phpVersion": {},
-										"plugins": {},
-										"themes": {},
-										"port": {},
-										"config": {},
-										"mappings": {}
-									},
-									"additionalProperties": false
+									"propertyNames": {
+										"$ref": "#/definitions/wpEnvPropertyNames"
+									}
 								}
 							]
 						}
@@ -103,18 +107,16 @@
 			}
 		},
 		{
-			"properties": {
-				"$schema": {},
-				"core": {},
-				"phpVersion": {},
-				"plugins": {},
-				"themes": {},
-				"port": {},
-				"config": {},
-				"mappings": {},
-				"env": {}
-			},
-			"additionalProperties": false
+			"propertyNames": {
+				"anyOf": [
+					{
+						"$ref": "#/definitions/wpEnvPropertyNames"
+					},
+					{
+						"enum": [ "$schema", "env" ]
+					}
+				]
+			}
 		}
 	]
 }

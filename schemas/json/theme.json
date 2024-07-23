@@ -1,6 +1,6 @@
 {
 	"title": "JSON schema for WordPress block theme global settings and styles",
-	"$schema": "http://json-schema.org/draft-04/schema#",
+	"$schema": "http://json-schema.org/draft-07/schema#",
 	"definitions": {
 		"//": {
 			"explainer": "https://developer.wordpress.org/themes/advanced-topics/theme-json/",
@@ -469,8 +469,7 @@
 								"increment": {
 									"description": "The amount to increment each step by.",
 									"type": "number",
-									"exclusiveMinimum": true,
-									"minimum": 0,
+									"exclusiveMinimum": 0,
 									"default": 1.5
 								},
 								"steps": {
@@ -483,8 +482,7 @@
 								"mediumStep": {
 									"description": "The value to medium setting in the scale.",
 									"type": "number",
-									"exclusiveMinimum": true,
-									"minimum": 0,
+									"exclusiveMinimum": 0,
 									"default": 1.5
 								},
 								"unit": {
@@ -813,6 +811,22 @@
 				{ "$ref": "#/definitions/settingsPropertiesCustom" }
 			]
 		},
+		"settingsPropertyNames": {
+			"enum": [
+				"appearanceTools",
+				"background",
+				"border",
+				"color",
+				"dimensions",
+				"layout",
+				"lightbox",
+				"position",
+				"shadow",
+				"spacing",
+				"typography",
+				"custom"
+			]
+		},
 		"settingsPropertiesComplete": {
 			"type": "object",
 			"allOf": [
@@ -820,21 +834,9 @@
 					"$ref": "#/definitions/settingsProperties"
 				},
 				{
-					"properties": {
-						"appearanceTools": {},
-						"background": {},
-						"border": {},
-						"color": {},
-						"dimensions": {},
-						"layout": {},
-						"lightbox": {},
-						"position": {},
-						"shadow": {},
-						"spacing": {},
-						"typography": {},
-						"custom": {}
-					},
-					"additionalProperties": false
+					"propertyNames": {
+						"$ref": "#/definitions/settingsPropertyNames"
+					}
 				}
 			]
 		},
@@ -1881,6 +1883,20 @@
 				}
 			}
 		},
+		"stylesPropertyNames": {
+			"enum": [
+				"background",
+				"border",
+				"color",
+				"dimensions",
+				"spacing",
+				"typography",
+				"filter",
+				"shadow",
+				"outline",
+				"css"
+			]
+		},
 		"stylesPropertiesComplete": {
 			"type": "object",
 			"allOf": [
@@ -1888,19 +1904,9 @@
 					"$ref": "#/definitions/stylesProperties"
 				},
 				{
-					"properties": {
-						"background": {},
-						"border": {},
-						"color": {},
-						"dimensions": {},
-						"spacing": {},
-						"typography": {},
-						"filter": {},
-						"shadow": {},
-						"outline": {},
-						"css": {}
-					},
-					"additionalProperties": false
+					"propertyNames": {
+						"$ref": "#/definitions/stylesPropertyNames"
+					}
 				}
 			]
 		},
@@ -1916,16 +1922,6 @@
 						},
 						{
 							"properties": {
-								"border": {},
-								"background": {},
-								"color": {},
-								"dimensions": {},
-								"filter": {},
-								"shadow": {},
-								"outline": {},
-								"spacing": {},
-								"typography": {},
-								"css": {},
 								":hover": {
 									"$ref": "#/definitions/stylesPropertiesComplete"
 								},
@@ -1944,8 +1940,26 @@
 								":any-link": {
 									"$ref": "#/definitions/stylesPropertiesComplete"
 								}
-							},
-							"additionalProperties": false
+							}
+						},
+						{
+							"propertyNames": {
+								"anyOf": [
+									{
+										"$ref": "#/definitions/stylesPropertyNames"
+									},
+									{
+										"enum": [
+											":hover",
+											":focus",
+											":active",
+											":visited",
+											":link",
+											":any-link"
+										]
+									}
+								]
+							}
 						}
 					]
 				},
@@ -1957,16 +1971,6 @@
 						},
 						{
 							"properties": {
-								"background": {},
-								"border": {},
-								"color": {},
-								"dimensions": {},
-								"spacing": {},
-								"typography": {},
-								"filter": {},
-								"shadow": {},
-								"outline": {},
-								"css": {},
 								":hover": {
 									"$ref": "#/definitions/stylesPropertiesComplete"
 								},
@@ -1985,8 +1989,26 @@
 								":any-link": {
 									"$ref": "#/definitions/stylesPropertiesComplete"
 								}
-							},
-							"additionalProperties": false
+							}
+						},
+						{
+							"propertyNames": {
+								"anyOf": [
+									{
+										"$ref": "#/definitions/stylesPropertyNames"
+									},
+									{
+										"enum": [
+											":hover",
+											":focus",
+											":active",
+											":visited",
+											":link",
+											":any-link"
+										]
+									}
+								]
+							}
 						}
 					]
 				},
@@ -2334,24 +2356,25 @@
 				},
 				{
 					"properties": {
-						"background": {},
-						"border": {},
-						"color": {},
-						"dimensions": {},
-						"spacing": {},
-						"typography": {},
-						"filter": {},
-						"shadow": {},
-						"outline": {},
-						"css": {},
 						"elements": {
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"
 						},
 						"variations": {
 							"$ref": "#/definitions/stylesVariationsPropertiesComplete"
 						}
-					},
-					"additionalProperties": false
+					}
+				},
+				{
+					"propertyNames": {
+						"anyOf": [
+							{
+								"$ref": "#/definitions/stylesPropertyNames"
+							},
+							{
+								"enum": [ "elements", "variations" ]
+							}
+						]
+					}
 				}
 			]
 		},
@@ -2371,24 +2394,25 @@
 				},
 				{
 					"properties": {
-						"background": {},
-						"border": {},
-						"color": {},
-						"dimensions": {},
-						"spacing": {},
-						"typography": {},
-						"filter": {},
-						"shadow": {},
-						"outline": {},
-						"css": {},
 						"elements": {
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"
 						},
 						"blocks": {
 							"$ref": "#/definitions/stylesVariationBlocksPropertiesComplete"
 						}
-					},
-					"additionalProperties": false
+					}
+				},
+				{
+					"propertyNames": {
+						"anyOf": [
+							{
+								"$ref": "#/definitions/stylesPropertyNames"
+							},
+							{
+								"enum": [ "elements", "blocks" ]
+							}
+						]
+					}
 				}
 			]
 		},
@@ -2408,24 +2432,25 @@
 				},
 				{
 					"properties": {
-						"background": {},
-						"border": {},
-						"color": {},
-						"dimensions": {},
-						"spacing": {},
-						"typography": {},
-						"filter": {},
-						"shadow": {},
-						"outline": {},
-						"css": {},
 						"elements": {
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"
 						},
 						"blocks": {
 							"$ref": "#/definitions/stylesVariationBlocksPropertiesComplete"
 						}
-					},
-					"additionalProperties": false
+					}
+				},
+				{
+					"propertyNames": {
+						"anyOf": [
+							{
+								"$ref": "#/definitions/stylesPropertyNames"
+							},
+							{
+								"enum": [ "elements", "blocks" ]
+							}
+						]
+					}
 				}
 			]
 		},
@@ -2742,21 +2767,22 @@
 				},
 				{
 					"properties": {
-						"background": {},
-						"border": {},
-						"color": {},
-						"dimensions": {},
-						"spacing": {},
-						"typography": {},
-						"filter": {},
-						"shadow": {},
-						"outline": {},
-						"css": {},
 						"elements": {
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"
 						}
-					},
-					"additionalProperties": false
+					}
+				},
+				{
+					"propertyNames": {
+						"anyOf": [
+							{
+								"$ref": "#/definitions/stylesPropertyNames"
+							},
+							{
+								"enum": [ "elements" ]
+							}
+						]
+					}
 				}
 			]
 		}
@@ -2770,7 +2796,7 @@
 		"version": {
 			"description": "Version of theme.json to use.",
 			"type": "integer",
-			"enum": [ 3 ]
+			"const": 3
 		},
 		"title": {
 			"type": "string",
@@ -2800,26 +2826,28 @@
 				},
 				{
 					"properties": {
-						"appearanceTools": {},
 						"useRootPaddingAwareAlignments": {
 							"$ref": "#/definitions/settingsPropertiesUseRootPaddingAwareAlignments/properties/useRootPaddingAwareAlignments"
 						},
-						"background": {},
-						"color": {},
-						"layout": {},
-						"lightbox": {},
-						"spacing": {},
-						"typography": {},
-						"border": {},
-						"shadow": {},
-						"position": {},
-						"dimensions": {},
-						"custom": {},
 						"blocks": {
 							"$ref": "#/definitions/settingsBlocksPropertiesComplete"
 						}
-					},
-					"additionalProperties": false
+					}
+				},
+				{
+					"propertyNames": {
+						"anyOf": [
+							{
+								"$ref": "#/definitions/settingsPropertyNames"
+							},
+							{
+								"enum": [
+									"useRootPaddingAwareAlignments",
+									"blocks"
+								]
+							}
+						]
+					}
 				}
 			]
 		},
@@ -2832,16 +2860,6 @@
 				},
 				{
 					"properties": {
-						"background": {},
-						"border": {},
-						"color": {},
-						"dimensions": {},
-						"spacing": {},
-						"typography": {},
-						"filter": {},
-						"shadow": {},
-						"outline": {},
-						"css": {},
 						"elements": {
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"
 						},
@@ -2851,8 +2869,19 @@
 						"variations": {
 							"$ref": "#/definitions/stylesVariationsProperties"
 						}
-					},
-					"additionalProperties": false
+					}
+				},
+				{
+					"propertyNames": {
+						"anyOf": [
+							{
+								"$ref": "#/definitions/stylesPropertyNames"
+							},
+							{
+								"enum": [ "elements", "blocks", "variations" ]
+							}
+						]
+					}
 				}
 			]
 		},
