@@ -18,9 +18,9 @@ After you create Core PR, you'll need to create a corresponding markdown file, a
 
 The filename is the Core PR number.
 
-For example, if your Core PR number is `1234` and is slated to be part of the WordPress 6.9 release, the filename should be `1234.md` and it should be placed in the `/backport-changelog/6.9` directory.
+For example, if your Core PR number is `1234` and is slated to be part of the WordPress 6.9 release, the filename will be `1234.md`, and will be placed in the `/backport-changelog/6.9` directory.
 
-The content of the markdown file should be the Github URL of the Core PR, followed by a list of the Github URLs for Gutenberg PRs that are part of the Core PR.
+The content of the markdown file should be the Github URL of the Core PR, followed by a list of Gutenberg PR Github URLs whose changes are backported in the Core PR.
 
 A single Core PR may contain changes from one or multiple Gutenberg PRs.
 
@@ -49,14 +49,16 @@ For the backport changelog, Gutenberg uses individual files as opposed to a sing
 
 ## Exceptions
 
-Some Gutenberg PRs may be flagged as needing a core backport PR when they don't, for example when the PR contains comment changes, or the changes already exist in Core.
+Some Gutenberg PRs may be flagged as needing a core backport PR when they don't, for example when the PR contains minor comment changes, or the changes already exist in Core.
 
-For individual PRs, there are two labels that can be used to exclude a PR from the backport changelog CI check:
+For individual PRs, there are two Github labels that can be used to exclude a PR from the backport changelog CI check:
 
 - `Backport from WordPress Core` - Indicates that the PR is a backport from WordPress Core and doesn't need a Core PR.
 - `No Core Sync Required` - Indicates that any changes do not need to be synced to WordPress Core.
 
-If there are specific file or directory changes that should **never** be flagged as requiring a Core backport PR, you can add it to the list of exceptions in `.github/workflows/check-backport-changelog.yml`.
+If there are specific file or directory changes that should **never** be flagged as requiring a Core backport PR, you can add it to the list of exceptions in [.github/workflows/check-backport-changelog.yml](https://github.com/WordPress/gutenberg/tree/trunk/.github/workflows/check-backport-changelog.yml).
+
+
 
 ## Where to get help
 
