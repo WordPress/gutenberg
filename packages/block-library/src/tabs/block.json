@@ -8,15 +8,7 @@
 	"textdomain": "default",
 	"__experimental": true,
 	"allowedBlocks": [ "core/tab" ],
-	"attributes": {
-		"activeTab": {
-			"type": "string",
-			"default": ""
-		}
-	},
-	"providesContext": {
-		"tabs/activeTab": "activeTab"
-	},
+	"attributes": {},
 	"supports": {
 		"align": [ "wide", "full" ],
 		"color": {
@@ -25,16 +17,11 @@
 		},
 		"html": false,
 		"interactivity": true,
-		"layout": {
-			"default": { "type": "flex", "orientation": "horizontal" },
-			"allowSwitching": false,
-			"allowJustification": false
-		},
-		"shadow": true,
 		"spacing": {
 			"margin": true,
 			"padding": true
 		}
 	},
+	"editorStyle": "wp-block-tabs-editor",
 	"style": "wp-block-tabs"
 }

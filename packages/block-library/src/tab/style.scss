@@ -1,8 +1,13 @@
 .wp-block-tab {
 	display: none;
+	padding: 1em 0;
 
 	&.is-active {
 		display: block;
+	}
+
+	> *:first-child {
+		margin-top: 0;
 	}
 }
 

@@ -8,16 +8,19 @@
 	"textdomain": "default",
 	"__experimental": true,
 	"attributes": {
-		"title": {
+		"isActive": {
+			"type": "boolean",
+			"default": false
+		},
+		"label": {
 			"type": "string"
 		}
 	},
 	"parent": [ "core/tabs" ],
 	"supports": {
+		"anchor": true,
 		"html": false,
-		"inserter": false,
 		"reusable": false
 	},
-	"usesContext": [ "tabs/activeTab" ],
 	"style": "wp-block-tab"
 }

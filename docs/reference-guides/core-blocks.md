@@ -895,8 +895,8 @@ Single tab within a tabs block. ([Source](https://github.com/WordPress/gutenberg
 -	**Experimental:** true
 -	**Category:** design
 -	**Parent:** core/tabs
--	**Supports:** ~~html~~, ~~inserter~~, ~~reusable~~
--	**Attributes:** title
+-	**Supports:** anchor, ~~html~~, ~~reusable~~
+-	**Attributes:** isActive, label
 
 ## Table
 
@@ -925,8 +925,7 @@ Organize content into tabs. ([Source](https://github.com/WordPress/gutenberg/tre
 -	**Experimental:** true
 -	**Category:** design
 -	**Allowed Blocks:** core/tab
--	**Supports:** align (full, wide), color (text, ~~background~~), interactivity, layout (default, ~~allowJustification~~, ~~allowSwitching~~), shadow, spacing (margin, padding), ~~html~~
--	**Attributes:** activeTab
+-	**Supports:** align (full, wide), color (text, ~~background~~), interactivity, spacing (margin, padding), ~~html~~
 
 ## Tag Cloud
 

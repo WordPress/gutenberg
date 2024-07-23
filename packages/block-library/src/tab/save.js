@@ -3,14 +3,10 @@
  */
 import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
 
-export default function save( { attributes } ) {
-	const { title } = attributes;
-
+export default function save() {
 	return (
 		<div { ...useBlockProps.save() }>
-			<div className="wp-block-tab__content">
-				<InnerBlocks.Content />
-			</div>
+			<InnerBlocks.Content />
 		</div>
 	);
 }

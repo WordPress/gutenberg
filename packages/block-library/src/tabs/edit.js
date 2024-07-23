@@ -7,18 +7,18 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import {
-	InnerBlocks,
 	useBlockProps,
 	useInnerBlocksProps,
 	store as blockEditorStore,
 	RichText,
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
+import { useCallback, useEffect } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 const TABS_TEMPLATE = [
-	[ 'core/tab', { title: 'Tab 1' } ],
-	[ 'core/tab', { title: 'Tab 2' } ],
+	[ 'core/tab', { label: 'Tab 1' } ],
+	[ 'core/tab', { label: 'Tab 2' } ],
 ];
 
 const ALLOWED_FORMATS = [
@@ -34,49 +34,96 @@ const ALLOWED_FORMATS = [
 	'core/text-color',
 ];
 
-export default function Edit( { attributes, clientId, setAttributes } ) {
-	const { activeTab } = attributes;
-	const innerBlocks = useSelect(
-		( select ) => select( blockEditorStore ).getBlocks( clientId ),
-		[ clientId ]
-	);
+export default function Edit( { clientId } ) {
+	const { innerTabs, selectedTabClientId } = useSelect(
+		( select ) => {
+			const {
+				getBlocks,
+				getSelectedBlockClientId,
+				hasSelectedInnerBlock,
+			} = select( blockEditorStore );
+			const innerBlocks = getBlocks( clientId );
+			const selectedBlockClientId = getSelectedBlockClientId();
+			let selectedTabId = null;
 
-	const blockProps = useBlockProps();
+			// Find the first tab that is selected or has selected inner blocks so we can set it as active.
+			for ( const block of innerBlocks ) {
+				if (
+					block.clientId === selectedBlockClientId ||
+					hasSelectedInnerBlock( block.clientId, true )
+				) {
+					selectedTabId = block.clientId;
+					break;
+				}
+			}
 
-	const innerBlockProps = useInnerBlocksProps(
-		{
-			className: 'wp-block-tabs__content',
+			return {
+				innerTabs: innerBlocks,
+				selectedTabClientId: selectedTabId,
+			};
 		},
-		{
-			renderAppender: InnerBlocks.ButtonBlockAppender,
-			template: TABS_TEMPLATE,
-		}
+		[ clientId ]
 	);
 
 	const { __unstableMarkNextChangeAsNotPersistent, updateBlockAttributes } =
 		useDispatch( blockEditorStore );
 
-	const setActiveTab = ( tabId ) => {
-		__unstableMarkNextChangeAsNotPersistent();
-		setAttributes( { activeTab: tabId } );
-	};
+	const setActiveTab = useCallback(
+		( activeTabClientId ) => {
+			// Set each inner tab's `isActive` attribute.
+			innerTabs.forEach( ( block ) => {
+				__unstableMarkNextChangeAsNotPersistent();
+				updateBlockAttributes( block.clientId, {
+					isActive: block.clientId === activeTabClientId,
+				} );
+			} );
+		},
+		[
+			innerTabs,
+			updateBlockAttributes,
+			__unstableMarkNextChangeAsNotPersistent,
+		]
+	);
 
 	useEffect( () => {
-		// Initialize the first tab as active when the component mounts.
-		if ( innerBlocks.length ) {
-			setActiveTab( innerBlocks[ 0 ].clientId );
+		if ( innerTabs?.length ) {
+			// Set the first tab as active when the editor is loaded
+			setActiveTab( innerTabs[ 0 ].clientId );
 		}
-	}, [] ); // eslint-disable-line react-hooks/exhaustive-deps -- only run effect once when component mounts.
+	}, [] ); // eslint-disable-line react-hooks/exhaustive-deps -- set first tab as active when the editor is loaded.
 
-	// if ( ! innerBlocks || innerBlocks.length === 0 ) {
-	// 	return null;
-	// }
+	useEffect( () => {
+		const hasActiveTab =
+			innerTabs &&
+			innerTabs.some( ( block ) => block.attributes.isActive );
+
+		if ( selectedTabClientId ) {
+			// If an inner tab block is selected, or its inner blocks are selected, it becomes the active tab.
+			setActiveTab( selectedTabClientId );
+		} else if ( ! hasActiveTab && innerTabs?.length ) {
+			// Otherwise, if there's no active tab, default to the first inner tab.
+			setActiveTab( innerTabs[ 0 ].clientId );
+		}
+	}, [ innerTabs, selectedTabClientId, setActiveTab ] );
+
+	const blockProps = useBlockProps();
+	const innerBlockProps = useInnerBlocksProps(
+		{
+			className: 'wp-block-tabs__content',
+		},
+		{
+			__experimentalCaptureToolbars: true,
+			clientId,
+			orientation: 'horizontal',
+			template: TABS_TEMPLATE,
+		}
+	);
 
 	return (
 		<div { ...blockProps }>
 			<ul className="wp-block-tabs__list" role="tablist">
-				{ innerBlocks.map( ( block ) => {
-					const isActive = block.clientId === activeTab;
+				{ innerTabs.map( ( block ) => {
+					const isActive = block.attributes.isActive;
 					const tabIndex = isActive ? '0' : '-1';
 
 					// TODO: Add unique ids and aria attributes for accessibility.
@@ -98,12 +145,13 @@ export default function Edit( { attributes, clientId, setAttributes } ) {
 								<RichText
 									allowedFormats={ ALLOWED_FORMATS }
 									tagName="span"
-									value={ block.attributes.title }
 									onChange={ ( value ) =>
 										updateBlockAttributes( block.clientId, {
-											title: value,
+											label: value,
 										} )
 									}
+									placeholder={ __( 'Add label…' ) }
+									value={ block.attributes.label }
 								/>
 							</button>
 						</li>
