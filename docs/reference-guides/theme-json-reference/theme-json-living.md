@@ -39,14 +39,14 @@ Setting that enables the following UI tools:
 
 ---
 
-### useRootPaddingAwareAlignments
+### background
 
-_**Note:** Since WordPress 6.1._
+Settings related to background.
 
-Enables root padding (the values from `styles.spacing.padding`) to be applied to the contents of full-width blocks instead of the root block.
-
-Please note that when using this setting, `styles.spacing.padding` should always be set as an object with `top`, `right`, `bottom`, `left` values declared separately.
-
+| Property  | Type   | Default | Props  |
+| ---    | ---    | ---    |---   |
+| backgroundImage | boolean | false |  |
+| backgroundSize | boolean | false |  |
 
 ---
 
@@ -60,17 +60,6 @@ Settings related to borders.
 | radius | boolean | false |  |
 | style | boolean | false |  |
 | width | boolean | false |  |
-
----
-
-### shadow
-
-Settings related to shadows.
-
-| Property  | Type   | Default | Props  |
-| ---    | ---    | ---    |---   |
-| defaultPresets | boolean | true |  |
-| presets | array |  | name, shadow, slug |
 
 ---
 
@@ -95,17 +84,6 @@ Settings related to colors.
 | heading | boolean | true |  |
 | button | boolean | true |  |
 | caption | boolean | true |  |
-
----
-
-### background
-
-Settings related to background.
-
-| Property  | Type   | Default | Props  |
-| ---    | ---    | ---    |---   |
-| backgroundImage | boolean | false |  |
-| backgroundSize | boolean | false |  |
 
 ---
 
@@ -153,6 +131,17 @@ Settings related to position.
 | Property  | Type   | Default | Props  |
 | ---    | ---    | ---    |---   |
 | sticky | boolean | false |  |
+
+---
+
+### shadow
+
+Settings related to shadows.
+
+| Property  | Type   | Default | Props  |
+| ---    | ---    | ---    |---   |
+| defaultPresets | boolean | true |  |
+| presets | array |  | name, shadow, slug |
 
 ---
 
@@ -249,14 +238,51 @@ Color styles.
 
 ---
 
+### css
+
+Sets custom CSS to apply styling not covered by other theme.json properties.
+
+
+---
+
 ### dimensions
 
-Dimensions styles
+Dimensions styles.
 
 | Property  | Type   |  Props  |
 | ---       | ---    |---   |
 | aspectRatio | string, object |  |
 | minHeight | string, object |  |
+
+---
+
+### filter
+
+CSS and SVG filter styles.
+
+| Property  | Type   |  Props  |
+| ---       | ---    |---   |
+| duotone | string, object |  |
+
+---
+
+### outline
+
+Outline styles.
+
+| Property  | Type   |  Props  |
+| ---       | ---    |---   |
+| color | string, object |  |
+| offset | string, object |  |
+| style | string, object |  |
+| width | string, object |  |
+
+---
+
+### shadow
+
+Box shadow styles.
+
 
 ---
 
@@ -284,48 +310,11 @@ Typography styles.
 | fontWeight | string, object |  |
 | letterSpacing | string, object |  |
 | lineHeight | string, object |  |
-| textAlign | string |  |
-| textColumns | string |  |
+| textAlign | string, object |  |
+| textColumns | string, object |  |
 | textDecoration | string, object |  |
 | writingMode | string, object |  |
 | textTransform | string, object |  |
-
----
-
-### filter
-
-CSS and SVG filter styles.
-
-| Property  | Type   |  Props  |
-| ---       | ---    |---   |
-| duotone | string, object |  |
-
----
-
-### shadow
-
-Box shadow styles.
-
-
----
-
-### outline
-
-Outline styles.
-
-| Property  | Type   |  Props  |
-| ---       | ---    |---   |
-| color | string, object |  |
-| offset | string, object |  |
-| style | string, object |  |
-| width | string, object |  |
-
----
-
-### css
-
-Sets custom CSS to apply styling not covered by other theme.json properties.
-
 
 ---
 ## customTemplates
