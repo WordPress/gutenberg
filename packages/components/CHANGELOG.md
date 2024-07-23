@@ -18,7 +18,6 @@
 -   `CustomSelectControl`: Stabilize `__experimentalShowSelectedHint` and `options[]. __experimentalHint` props ([#63248](https://github.com/WordPress/gutenberg/pull/63248)).
 -   `SelectControl`: Add `"minimal"` variant ([#63265](https://github.com/WordPress/gutenberg/pull/63265)).
 -   `FontSizePicker`: tidy up internal logic ([#63553](https://github.com/WordPress/gutenberg/pull/63553)).
--   `RangeControl`: Allow external `id` prop ([#63761](https://github.com/WordPress/gutenberg/pull/63761)).
 
 ### Internal
 
