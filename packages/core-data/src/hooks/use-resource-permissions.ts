@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
+import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
@@ -134,9 +135,15 @@ function useResourcePermissions< IdType = void >(
 	const resourceAsString =
 		typeof resource === 'object' ? JSON.stringify( resource ) : resource;
 
+	const isEntity = typeof resource === 'object';
+	if ( isEntity && typeof id !== 'undefined' ) {
+		warning(
+			`When 'resource' is an entity object, passing 'id' as a separate argument isn't supported.`
+		);
+	}
+
 	return useQuerySelect(
 		( resolve ) => {
-			const isEntity = typeof resource === 'object';
 			const hasId = isEntity ? !! resource.id : !! id;
 			const { canUser } = resolve( coreStore );
 			const create = canUser(

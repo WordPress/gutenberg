@@ -164,4 +164,26 @@ describe( 'useResourcePermissions', () => {
 			} )
 		);
 	} );
+
+	it( 'should warn when called with incorrect arguments signature', () => {
+		const TestComponent = () => {
+			useResourcePermissions(
+				{
+					kind: 'root',
+					name: 'media',
+				},
+				1
+			);
+			return null;
+		};
+		render(
+			<RegistryProvider value={ registry }>
+				<TestComponent />
+			</RegistryProvider>
+		);
+
+		expect( console ).toHaveWarnedWith(
+			`When 'resource' is an entity object, passing 'id' as a separate argument isn't supported.`
+		);
+	} );
 } );
