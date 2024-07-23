@@ -43,6 +43,16 @@ type ResourcePermissionsResolution< IdType > = [
 
 type EntityResource = { kind: string; name: string; id?: string | number };
 
+function useResourcePermissions< IdType = void >(
+	resource: string,
+	id?: IdType
+): ResourcePermissionsResolution< IdType >;
+
+function useResourcePermissions< IdType = void >(
+	resource: EntityResource,
+	id?: never
+): ResourcePermissionsResolution< IdType >;
+
 /**
  * Resolves resource permissions.
  *
@@ -50,7 +60,8 @@ type EntityResource = { kind: string; name: string; id?: string | number };
  *
  * @param    resource Entity resource to check. Accepts entity object `{ kind: 'root', name: 'media', id: 1 }`
  *                    or REST base as a string - `media`.
- * @param    id       Optional ID of the rest resource to check. e.g. 10.
+ * @param    id       Optional ID of the resource to check, e.g. 10. Note: The argument will be ignored
+ *                    when using an entity object as a resource to check permissions.
  *
  * @example
  * ```js
@@ -112,7 +123,7 @@ type EntityResource = { kind: string; name: string; id?: string | number };
  * @return Entity records data.
  * @template IdType
  */
-export default function useResourcePermissions< IdType = void >(
+function useResourcePermissions< IdType = void >(
 	resource: string | EntityResource,
 	id?: IdType
 ): ResourcePermissionsResolution< IdType > {
@@ -189,6 +200,8 @@ export default function useResourcePermissions< IdType = void >(
 		[ resourceAsString, id ]
 	);
 }
+
+export default useResourcePermissions;
 
 export function __experimentalUseResourcePermissions(
 	resource: string,
