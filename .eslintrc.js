@@ -306,7 +306,7 @@ module.exports = {
 					...[ 'RangeControl' ].map( ( componentName ) => ( {
 						selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="label"]))`,
 						message:
-							'Component must be accessibly labeled with a `label` prop. Use the `hideLabelFromVision` prop if desired. Only ignore this error if the component is correctly associated with a separate `<label>` element.',
+							'Component must be accessibly labeled with a `label` prop. Use the `hideLabelFromVision` prop if desired. Only ignore this error if you chose another means of accessible labeling, and confirmed it in the rendered accessibility tree.',
 					} ) ),
 				],
 			},
