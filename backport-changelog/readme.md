@@ -26,7 +26,7 @@ A single Core PR may contain changes from one or multiple Gutenberg PRs.
 
 ### Examples
 
-Let's say the next WordPress release is 6.9. You have two Gutenberg PRs  — `1111` and `2222` — whose changes are backported in a single Core PR, number `1234`.
+Let's say the next WordPress release is 6.9. You have two Gutenberg PRs — `1111` and `2222` — whose changes are backported in a single Core PR, number `1234`.
 
 First you would create a file named `1234.md` in the `/6.9` folder. 
 
