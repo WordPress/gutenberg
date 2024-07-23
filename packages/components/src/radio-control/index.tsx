@@ -16,7 +16,7 @@ import BaseControl from '../base-control';
 import type { WordPressComponentProps } from '../context';
 import type { RadioControlProps } from './types';
 import { VStack } from '../v-stack';
-import { Text } from '../text';
+import { StyledHelp } from '../base-control/styles/base-control-styles';
 
 // This is the id that BaseControl assigns to the help text element.
 function generateHelpTextId( id: string ) {
@@ -114,14 +114,13 @@ export function RadioControl(
 							{ option.label }
 						</label>
 						{ !! option.description ? (
-							<Text
-								variant="muted"
-								size={ 12 }
+							<StyledHelp
+								__nextHasNoMarginBottom
 								id={ generateOptionDescriptionId( id, index ) }
 								className="components-radio-control__option-description"
 							>
 								{ option.description }
-							</Text>
+							</StyledHelp>
 						) : null }
 					</div>
 				) ) }
