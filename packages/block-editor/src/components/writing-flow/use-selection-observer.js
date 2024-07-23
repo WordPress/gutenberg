@@ -182,9 +182,7 @@ export default function useSelectionObserver() {
 					return;
 				}
 
-				if ( node.contentEditable !== 'true' ) {
-					node.contentEditable = 'true';
-				}
+				setContentEditableWrapper( node, true );
 
 				const isSingularSelection = startClientId === endClientId;
 				if ( isSingularSelection ) {
