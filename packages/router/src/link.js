@@ -2,18 +2,15 @@
  * WordPress dependencies
  */
 import { addQueryArgs, getQueryArgs, removeQueryArgs } from '@wordpress/url';
-import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../../lock-unlock';
 import {
 	isPreviewingTheme,
 	currentlyPreviewingTheme,
-} from '../../utils/is-previewing-theme';
-
-const { useHistory } = unlock( routerPrivateApis );
+} from './is-previewing-theme';
+import { useHistory } from './router';
 
 export function useLink( params, state, shouldReplace = false ) {
 	const history = useHistory();
