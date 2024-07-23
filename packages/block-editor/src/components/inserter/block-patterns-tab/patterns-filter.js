@@ -24,9 +24,28 @@ import {
 
 const getShouldDisableSyncFilter = ( sourceFilter ) =>
 	sourceFilter !== 'all' && sourceFilter !== 'user';
-const getShouldDisableNonUserSources = ( category ) => {
+const getShouldHideNonUserSources = ( category ) => {
 	return category.name === myPatternsCategory.name;
 };
+
+const PATTERN_SOURCE_MENU_OPTIONS = [
+	{
+		value: 'all',
+		label: _x( 'All', 'patterns' ),
+	},
+	{
+		value: INSERTER_PATTERN_TYPES.directory,
+		label: __( 'Pattern Directory' ),
+	},
+	{
+		value: INSERTER_PATTERN_TYPES.theme,
+		label: __( 'Theme & Plugins' ),
+	},
+	{
+		value: INSERTER_PATTERN_TYPES.user,
+		label: __( 'User' ),
+	},
+];
 
 export function PatternsFilter( {
 	setPatternSyncFilter,
@@ -51,10 +70,9 @@ export function PatternsFilter( {
 		currentPatternSourceFilter
 	);
 
-	// We also need to disable the directory and theme source filter options if the category
-	// is `myPatterns` otherwise applying them will also just result in no patterns being shown.
-	const shouldDisableNonUserSources =
-		getShouldDisableNonUserSources( category );
+	// We also hide the directory and theme source filter if the category is `myPatterns`
+	// otherwise there will only be one option available.
+	const shouldHideSourcesFilter = getShouldHideNonUserSources( category );
 
 	const patternSyncMenuOptions = useMemo(
 		() => [
@@ -74,31 +92,6 @@ export function PatternsFilter( {
 			},
 		],
 		[ shouldDisableSyncFilter ]
-	);
-
-	const patternSourceMenuOptions = useMemo(
-		() => [
-			{
-				value: 'all',
-				label: _x( 'All', 'patterns' ),
-				disabled: shouldDisableNonUserSources,
-			},
-			{
-				value: INSERTER_PATTERN_TYPES.directory,
-				label: __( 'Pattern Directory' ),
-				disabled: shouldDisableNonUserSources,
-			},
-			{
-				value: INSERTER_PATTERN_TYPES.theme,
-				label: __( 'Theme & Plugins' ),
-				disabled: shouldDisableNonUserSources,
-			},
-			{
-				value: INSERTER_PATTERN_TYPES.user,
-				label: __( 'User' ),
-			},
-		],
-		[ shouldDisableNonUserSources ]
 	);
 
 	function handleSetSourceFilterChange( newSourceFilter ) {
@@ -137,19 +130,21 @@ export function PatternsFilter( {
 			>
 				{ () => (
 					<>
-						<MenuGroup label={ __( 'Source' ) }>
-							<MenuItemsChoice
-								choices={ patternSourceMenuOptions }
-								onSelect={ ( value ) => {
-									handleSetSourceFilterChange( value );
-									scrollContainerRef.current?.scrollTo(
-										0,
-										0
-									);
-								} }
-								value={ currentPatternSourceFilter }
-							/>
-						</MenuGroup>
+						{ ! shouldHideSourcesFilter && (
+							<MenuGroup label={ __( 'Source' ) }>
+								<MenuItemsChoice
+									choices={ PATTERN_SOURCE_MENU_OPTIONS }
+									onSelect={ ( value ) => {
+										handleSetSourceFilterChange( value );
+										scrollContainerRef.current?.scrollTo(
+											0,
+											0
+										);
+									} }
+									value={ currentPatternSourceFilter }
+								/>
+							</MenuGroup>
+						) }
 						<MenuGroup label={ __( 'Type' ) }>
 							<MenuItemsChoice
 								choices={ patternSyncMenuOptions }
