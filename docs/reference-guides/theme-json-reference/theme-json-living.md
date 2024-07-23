@@ -130,7 +130,6 @@ Settings related to position.
 
 | Property  | Type   | Default | Props  |
 | ---    | ---    | ---    |---   |
-| fixed | boolean | false |  |
 | sticky | boolean | false |  |
 
 ---

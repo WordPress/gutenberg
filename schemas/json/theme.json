@@ -331,11 +331,6 @@
 					"description": "Settings related to position.",
 					"type": "object",
 					"properties": {
-						"fixed": {
-							"description": "Allow users to set fixed position.",
-							"type": "boolean",
-							"default": false
-						},
 						"sticky": {
 							"description": "Allow users to set sticky position.",
 							"type": "boolean",
