@@ -5,7 +5,6 @@
 	background-color: $gray-300;
 	// Make this a stacking context to contain the z-index of children elements.
 	isolation: isolate;
-	z-index: 5;
 
 	// Centralize the editor horizontally (flex-direction is column).
 	align-items: center;

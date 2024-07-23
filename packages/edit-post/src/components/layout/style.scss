@@ -8,6 +8,10 @@
 	clear: both;
 }
 
+.edit-post-layout.has-metaboxes .edit-post-visual-editor {
+	z-index: 99;
+}
+
 // Adjust the position of the notices
 .components-editor-notices__snackbar {
 	position: fixed;
