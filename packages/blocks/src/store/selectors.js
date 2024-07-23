@@ -293,6 +293,11 @@ export function getActiveBlockVariation( state, blockName, attributes, scope ) {
 			return match || variation;
 		}
 	}
+
+	// If no variation matches the isActive condition, we return the default variation.
+	if ( ! match ) {
+		match = variations.find( ( { isDefault } ) => !! isDefault );
+	}
 	return match;
 }
 
