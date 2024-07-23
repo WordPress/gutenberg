@@ -161,7 +161,10 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		ref: mergedRefs,
 		id: `block-${ clientId }${ htmlSuffix }`,
 		role: isSubtreeDisabled ? 'presentation' : 'document',
-		'aria-disabled': isSubtreeDisabled ? true : undefined,
+		'aria-disabled': isEditingDisabled ? true : undefined,
+		'aria-description': isEditingDisabled
+			? __( 'This block is locked for editing.' )
+			: undefined,
 		'aria-label': blockLabel,
 		'data-block': clientId,
 		'data-type': name,
