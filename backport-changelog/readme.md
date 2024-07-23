@@ -58,8 +58,6 @@ For individual PRs, there are two Github labels that can be used to exclude a PR
 
 If there are specific file or directory changes that should **never** be flagged as requiring a Core backport PR, you can add it to the list of exceptions in [.github/workflows/check-backport-changelog.yml](https://github.com/WordPress/gutenberg/tree/trunk/.github/workflows/check-backport-changelog.yml).
 
-
-
 ## Where to get help
 
 If you're unsure, you can always ask the Gutenberg Core team for help on the Gutenberg PR `@WordPress/gutenberg-core` or via the #core-editor channel in [WordPress Slack](https://make.wordpress.org/chat/).
