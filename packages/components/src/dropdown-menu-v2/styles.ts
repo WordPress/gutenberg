@@ -161,12 +161,13 @@ const baseItem = css`
 	 */
 	scroll-margin: ${ CONTENT_WRAPPER_PADDING };
 
+	cursor: pointer;
 	user-select: none;
 	outline: none;
 
 	&[aria-disabled='true'] {
 		color: ${ COLORS.ui.textDisabled };
-		cursor: not-allowed;
+		cursor: default;
 	}
 
 	/* Hover */
