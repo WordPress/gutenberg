@@ -122,7 +122,7 @@
 		&:disabled,
 		&[aria-disabled="true"],
 		&[aria-disabled="true"]:hover {
-			color: $gray-600;
+			color: $gray-500;
 			background: transparent;
 			transform: none;
 		}
@@ -212,7 +212,7 @@
 
 			&:disabled,
 			&[aria-disabled="true"] {
-				color: lighten($alert-red, 40%);
+				color: $gray-500;
 			}
 		}
 	}
@@ -244,7 +244,7 @@
 
 		&:disabled,
 		&[aria-disabled="true"] {
-			color: $gray-600;
+			color: $gray-500;
 		}
 	}
 
