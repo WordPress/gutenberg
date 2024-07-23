@@ -7,6 +7,7 @@
 
 	// Centralize the editor horizontally (flex-direction is column).
 	align-items: center;
+	z-index: 20;
 
 	&.is-resizable {
 		max-height: 100%;
