@@ -349,7 +349,7 @@ export const hasStyleSupport = ( nameOrType ) =>
 export const hasBlockClassNameSupport = ( nameOrType ) => {
 	const classNameSupport = getBlockSupport( nameOrType, 'className', true );
 
-	if ( classNameSupport === true || classNameSupport === false ) {
+	if ( typeof classNameSupport === 'boolean' ) {
 		return classNameSupport;
 	}
 
