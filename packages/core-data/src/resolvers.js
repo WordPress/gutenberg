@@ -407,7 +407,6 @@ export const canUser =
 			resourcePath =
 				entityConfig.baseURL + ( resource.id ? '/' + resource.id : '' );
 		} else {
-			// @todo: Maybe warn when detecting a legacy usage.
 			resourcePath = `/wp/v2/${ resource }` + ( id ? '/' + id : '' );
 		}
 
