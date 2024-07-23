@@ -39,6 +39,10 @@ function useView( postType ) {
 	const {
 		params: { activeView = 'all', isCustom = 'false', layout },
 	} = useLocation();
+	const previousIsCustom = usePrevious( isCustom );
+	const previousLayout = usePrevious( layout );
+	const previousActiveView = usePrevious( activeView );
+	const previousPostType = usePrevious( postType );
 	const history = useHistory();
 	const DEFAULT_VIEWS = useDefaultViews( { postType } );
 	const selectedDefaultView = useMemo( () => {
@@ -59,10 +63,28 @@ function useView( postType ) {
 	const [ view, setView ] = useState( selectedDefaultView );
 
 	useEffect( () => {
-		if ( selectedDefaultView ) {
-			setView( selectedDefaultView );
+		if (
+			selectedDefaultView &&
+			( previousIsCustom !== isCustom ||
+				( previousLayout !== layout && layout !== view.type ) ||
+				previousActiveView !== activeView ||
+				previousPostType !== postType )
+		) {
+			setView( { ...view, ...selectedDefaultView } );
 		}
-	}, [ selectedDefaultView ] );
+	}, [
+		activeView,
+		isCustom,
+		layout,
+		postType,
+		previousActiveView,
+		previousIsCustom,
+		previousLayout,
+		previousPostType,
+		selectedDefaultView,
+		setView,
+		view,
+	] );
 	const editedViewRecord = useSelect(
 		( select ) => {
 			if ( isCustom !== 'true' ) {
