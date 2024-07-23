@@ -9,7 +9,7 @@ const ALIGN_WIDE_SUPPORT_KEY = 'alignWide';
 const BORDER_SUPPORT_KEY = '__experimentalBorder';
 const COLOR_SUPPORT_KEY = 'color';
 const CUSTOM_CLASS_NAME_SUPPORT_KEY = 'customClassName';
-const FONT_FAMILY_SUPPORT_KEY = 'typography.__experimentalFontFamily';
+const FONT_FAMILY_SUPPORT_KEY = 'typography.fontFamily';
 const FONT_SIZE_SUPPORT_KEY = 'typography.fontSize';
 const LINE_HEIGHT_SUPPORT_KEY = 'typography.lineHeight';
 /**

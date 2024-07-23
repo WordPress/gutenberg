@@ -20,17 +20,17 @@ function gutenberg_register_typography_support( $block_type ) {
 		return;
 	}
 
-	$has_font_family_support     = $typography_supports['__experimentalFontFamily'] ?? false;
+	$has_font_family_support     = $typography_supports['fontFamily'] ?? false;
 	$has_font_size_support       = $typography_supports['fontSize'] ?? false;
-	$has_font_style_support      = $typography_supports['__experimentalFontStyle'] ?? false;
-	$has_font_weight_support     = $typography_supports['__experimentalFontWeight'] ?? false;
-	$has_letter_spacing_support  = $typography_supports['__experimentalLetterSpacing'] ?? false;
+	$has_font_style_support      = $typography_supports['fontStyle'] ?? false;
+	$has_font_weight_support     = $typography_supports['fontWeight'] ?? false;
+	$has_letter_spacing_support  = $typography_supports['letterSpacing'] ?? false;
 	$has_line_height_support     = $typography_supports['lineHeight'] ?? false;
 	$has_text_align_support      = $typography_supports['textAlign'] ?? false;
 	$has_text_columns_support    = $typography_supports['textColumns'] ?? false;
-	$has_text_decoration_support = $typography_supports['__experimentalTextDecoration'] ?? false;
-	$has_text_transform_support  = $typography_supports['__experimentalTextTransform'] ?? false;
-	$has_writing_mode_support    = $typography_supports['__experimentalWritingMode'] ?? false;
+	$has_text_decoration_support = $typography_supports['textDecoration'] ?? false;
+	$has_text_transform_support  = $typography_supports['textTransform'] ?? false;
+	$has_writing_mode_support    = $typography_supports['writingMode'] ?? false;
 
 	$has_typography_support = $has_font_family_support
 		|| $has_font_size_support
@@ -91,17 +91,17 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 		return array();
 	}
 
-	$has_font_family_support     = $typography_supports['__experimentalFontFamily'] ?? false;
+	$has_font_family_support     = $typography_supports['fontFamily'] ?? false;
 	$has_font_size_support       = $typography_supports['fontSize'] ?? false;
-	$has_font_style_support      = $typography_supports['__experimentalFontStyle'] ?? false;
-	$has_font_weight_support     = $typography_supports['__experimentalFontWeight'] ?? false;
-	$has_letter_spacing_support  = $typography_supports['__experimentalLetterSpacing'] ?? false;
+	$has_font_style_support      = $typography_supports['fontStyle'] ?? false;
+	$has_font_weight_support     = $typography_supports['fontWeight'] ?? false;
+	$has_letter_spacing_support  = $typography_supports['letterSpacing'] ?? false;
 	$has_line_height_support     = $typography_supports['lineHeight'] ?? false;
 	$has_text_align_support      = $typography_supports['textAlign'] ?? false;
 	$has_text_columns_support    = $typography_supports['textColumns'] ?? false;
-	$has_text_decoration_support = $typography_supports['__experimentalTextDecoration'] ?? false;
-	$has_text_transform_support  = $typography_supports['__experimentalTextTransform'] ?? false;
-	$has_writing_mode_support    = $typography_supports['__experimentalWritingMode'] ?? false;
+	$has_text_decoration_support = $typography_supports['textDecoration'] ?? false;
+	$has_text_transform_support  = $typography_supports['textTransform'] ?? false;
+	$has_writing_mode_support    = $typography_supports['writingMode'] ?? false;
 
 	// Whether to skip individual block support features.
 	$should_skip_font_size       = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'fontSize' );
@@ -621,3 +621,42 @@ if ( function_exists( 'wp_render_typography_support' ) ) {
 	remove_filter( 'render_block', 'wp_render_typography_support' );
 }
 add_filter( 'render_block', 'gutenberg_render_typography_support', 10, 2 );
+
+/**
+ * Filters the block type arguments to stabilize experimental block supports.
+ *
+ * @param array $args Array of arguments for registering a block type.
+ * @return array Array of arguments for registering a block type.
+ */
+function gutenberg_stabilize_typography_block_supports( $args ) {
+	if ( empty( $args['supports']['typography'] ) ) {
+		return $args;
+	}
+
+	$experimental_typography_supports_to_stable = array(
+		'__experimentalFontFamily'     => 'fontFamily',
+		'__experimentalFontStyle'      => 'fontStyle',
+		'__experimentalFontWeight'     => 'fontWeight',
+		'__experimentalLetterSpacing'  => 'letterSpacing',
+		'__experimentalTextDecoration' => 'textDecoration',
+		'__experimentalTextTransform'  => 'textTransform',
+		'__experimentalWritingMode'    => 'writingMode',
+	);
+
+	$current_typography_supports = $args['supports']['typography'];
+	$stable_typography_supports  = array();
+
+	foreach ( $current_typography_supports as $key => $value ) {
+		if ( array_key_exists( $key, $experimental_typography_supports_to_stable ) ) {
+			$stable_typography_supports[ $experimental_typography_supports_to_stable[ $key ] ] = $value;
+		} else {
+			$stable_typography_supports[ $key ] = $value;
+		}
+	}
+
+	$args['supports']['typography'] = $stable_typography_supports;
+
+	return $args;
+}
+
+add_filter( 'register_block_type_args', 'gutenberg_stabilize_typography_block_supports', 10, 1 );
