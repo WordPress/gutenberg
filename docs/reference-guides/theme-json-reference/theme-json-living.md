@@ -178,6 +178,7 @@ Settings related to typography.
 | textAlign | boolean | true |  |
 | textColumns | boolean | false |  |
 | textDecoration | boolean | true |  |
+| textIndent | boolean | true |  |
 | writingMode | boolean | false |  |
 | textTransform | boolean | true |  |
 | dropCap | boolean | true |  |
@@ -313,6 +314,7 @@ Typography styles.
 | textAlign | string, object |  |
 | textColumns | string, object |  |
 | textDecoration | string, object |  |
+| textIndent | string, object |  |
 | writingMode | string, object |  |
 | textTransform | string, object |  |
 

@@ -598,6 +598,11 @@
 							"type": "boolean",
 							"default": true
 						},
+						"textIndent": {
+							"description": "Allow users to set custom text indent.",
+							"type": "boolean",
+							"default": true
+						},
 						"writingMode": {
 							"description": "Allow users to set the writing mode.",
 							"type": "boolean",
@@ -1653,6 +1658,17 @@
 							"oneOf": [
 								{ "type": "string" },
 								{ "$ref": "#/definitions/refComplete" }
+							]
+						},
+						"textIndent": {
+							"description": "Sets the `text-indent` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
 							]
 						},
 						"writingMode": {

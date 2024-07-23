@@ -243,6 +243,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		support: [ 'typography', '__experimentalTextDecoration' ],
 		useEngine: true,
 	},
+	textIndent: {
+		value: [ 'typography', 'textIndent' ],
+		support: [ 'typography', '__experimentalTextIndent' ],
+		useEngine: true,
+	},
 	textTransform: {
 		value: [ 'typography', 'textTransform' ],
 		support: [ 'typography', '__experimentalTextTransform' ],
