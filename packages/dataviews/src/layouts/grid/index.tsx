@@ -145,7 +145,7 @@ function GridItem< Item >( {
 							>
 								<>
 									<FlexItem className="dataviews-view-grid__field-name">
-										{ field.header }
+										{ field.label }
 									</FlexItem>
 									<FlexItem
 										className="dataviews-view-grid__field-value"
