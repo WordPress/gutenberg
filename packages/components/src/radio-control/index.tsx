@@ -18,6 +18,15 @@ import type { RadioControlProps } from './types';
 import { VStack } from '../v-stack';
 import { Text } from '../text';
 
+// This is the id that BaseControl assigns to the help text element.
+function generateHelpTextId( id: string ) {
+	return `${ id }__help`;
+}
+
+function generateOptionDescriptionId( id: string, index: number ) {
+	return `${ id }-${ index }-option-description`;
+}
+
 /**
  * Render a user interface to select the user type using radio inputs.
  *
@@ -88,15 +97,14 @@ export function RadioControl(
 							value={ option.value }
 							onChange={ onChangeValue }
 							checked={ option.value === selected }
-							aria-describedby={
-								// TODO: will improve if we like this solution
-								// eslint-disable-next-line no-nested-ternary
+							aria-describedby={ [
 								!! option.description
-									? `${ id }-${ index }-option-description`
-									: !! help
-									? `${ id }__help`
-									: undefined
-							}
+									? generateOptionDescriptionId( id, index )
+									: undefined,
+								!! help ? generateHelpTextId( id ) : undefined,
+							]
+								.filter( Boolean )
+								.join( ' ' ) }
 							{ ...additionalProps }
 						/>
 						<label
@@ -109,7 +117,7 @@ export function RadioControl(
 							<Text
 								variant="muted"
 								size={ 12 }
-								id={ `${ id }-${ index }-option-description` }
+								id={ generateOptionDescriptionId( id, index ) }
 								className="components-radio-control__option-description"
 							>
 								{ option.description }
