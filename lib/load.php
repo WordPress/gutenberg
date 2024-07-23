@@ -78,10 +78,11 @@ require __DIR__ . '/compat/plugin/footnotes.php';
 
 // The Token Map was created during 6.6 in order to support the HTML API. It must be loaded before it.
 require __DIR__ . '/compat/wordpress-6.6/class-gutenberg-token-map-6-6.php';
+require __DIR__ . '/compat/wordpress-6.7/class-gutenberg-token-map-6-7.php';
 
 /*
  * There are upstream updates to the Tag Processor that may not appear if Gutenberg is running
- * a version of WordPress newer than 6.3 and older than the latest `trunk`. This file should
+ * a version of WordPress newer than 6.4 and older than the latest `trunk`. This file should
  * always be loaded so that Gutenberg code can run the newest version of the Tag Processor.
  */
 require __DIR__ . '/compat/wordpress-6.4/html-api/class-gutenberg-html-tag-processor-6-4.php';
@@ -100,6 +101,20 @@ require __DIR__ . '/compat/wordpress-6.6/html-api/class-gutenberg-html-open-elem
 require __DIR__ . '/compat/wordpress-6.6/html-api/class-gutenberg-html-stack-event-6-6.php';
 require __DIR__ . '/compat/wordpress-6.6/html-api/class-gutenberg-html-processor-state-6-6.php';
 require __DIR__ . '/compat/wordpress-6.6/html-api/class-gutenberg-html-processor-6-6.php';
+
+// Type annotations were added in 6.7 so every file is updated.
+require __DIR__ . '/compat/wordpress-6.7/html-api/class-gutenberg-html-active-formatting-elements-6-7.php';
+require __DIR__ . '/compat/wordpress-6.7/html-api/class-gutenberg-html-attribute-token-6-7.php';
+require __DIR__ . '/compat/wordpress-6.7/html-api/class-gutenberg-html-decoder-6-7.php';
+require __DIR__ . '/compat/wordpress-6.7/html-api/class-gutenberg-html-open-elements-6-7.php';
+require __DIR__ . '/compat/wordpress-6.7/html-api/class-gutenberg-html-span-6-7.php';
+require __DIR__ . '/compat/wordpress-6.7/html-api/class-gutenberg-html-stack-event-6-7.php';
+require __DIR__ . '/compat/wordpress-6.7/html-api/class-gutenberg-html-text-replacement-6-7.php';
+require __DIR__ . '/compat/wordpress-6.7/html-api/class-gutenberg-html-token-6-7.php';
+require __DIR__ . '/compat/wordpress-6.7/html-api/class-gutenberg-html-unsupported-exception-6-7.php';
+require __DIR__ . '/compat/wordpress-6.7/html-api/class-gutenberg-html-tag-processor-6-7.php';
+require __DIR__ . '/compat/wordpress-6.7/html-api/class-gutenberg-html-processor-state-6-7.php';
+require __DIR__ . '/compat/wordpress-6.7/html-api/class-gutenberg-html-processor-6-7.php';
 
 /*
  * The HTML Processor appeared after WordPress 6.3. If Gutenberg is running on a version of
@@ -154,6 +169,7 @@ require __DIR__ . '/compat/wordpress-6.6/post.php';
 
 // WordPress 6.7 compat.
 require __DIR__ . '/compat/wordpress-6.7/blocks.php';
+require __DIR__ . '/compat/wordpress-6.7/block-bindings.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';

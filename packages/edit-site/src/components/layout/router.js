@@ -26,6 +26,7 @@ import {
 	TEMPLATE_PART_POST_TYPE,
 	TEMPLATE_POST_TYPE,
 } from '../../utils/constants';
+import { PostEdit } from '../post-edit';
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
@@ -74,13 +75,15 @@ function useRedirectOldPaths() {
 
 export default function useLayoutAreas() {
 	const { params } = useLocation();
-	const { postType, postId, path, layout, isCustom, canvas } = params;
+	const { postType, postId, path, layout, isCustom, canvas, quickEdit } =
+		params;
 	const hasEditCanvasMode = canvas === 'edit';
 	useRedirectOldPaths();
 
 	// Page list
 	if ( postType === 'page' ) {
 		const isListLayout = layout === 'list' || ! layout;
+		const showQuickEdit = quickEdit && ! isListLayout;
 		return {
 			key: 'pages',
 			areas: {
@@ -92,15 +95,20 @@ export default function useLayoutAreas() {
 					/>
 				),
 				content: <PostList postType={ postType } />,
-				preview: ( isListLayout || hasEditCanvasMode ) && <Editor />,
+				preview: ! showQuickEdit &&
+					( isListLayout || hasEditCanvasMode ) && <Editor />,
 				mobile: hasEditCanvasMode ? (
 					<Editor />
 				) : (
 					<PostList postType={ postType } />
 				),
+				edit: showQuickEdit && (
+					<PostEdit postType={ postType } postId={ postId } />
+				),
 			},
 			widths: {
 				content: isListLayout ? 380 : undefined,
+				edit: showQuickEdit ? 380 : undefined,
 			},
 		};
 	}

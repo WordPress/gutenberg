@@ -430,10 +430,11 @@ export interface ViewBaseProps< Item > {
 	getItemId: ( item: Item ) => string;
 	isLoading?: boolean;
 	onChangeView: ( view: View ) => void;
-	onSelectionChange: SetSelection;
+	onChangeSelection: SetSelection;
 	selection: string[];
 	setOpenedFilter: ( fieldId: string ) => void;
 	view: View;
+	density: number;
 }
 
 export interface ViewTableProps< Item > extends ViewBaseProps< Item > {
