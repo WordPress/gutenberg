@@ -58,7 +58,7 @@ const defaultLayouts = {
 			combinedFields: [
 				{
 					id: 'template',
-					header: __( 'Template' ),
+					label: __( 'Template' ),
 					children: [ 'title', 'description' ],
 					direction: 'vertical',
 				},
@@ -286,7 +286,7 @@ export default function PageTemplates() {
 	const fields = useMemo(
 		() => [
 			{
-				header: __( 'Preview' ),
+				label: __( 'Preview' ),
 				id: 'preview',
 				render: ( { item } ) => {
 					return <Preview item={ item } viewType={ view.type } />;
@@ -294,7 +294,7 @@ export default function PageTemplates() {
 				enableSorting: false,
 			},
 			{
-				header: __( 'Template' ),
+				label: __( 'Template' ),
 				id: 'title',
 				getValue: ( { item } ) => item.title?.rendered,
 				render: ( { item } ) => (
@@ -304,7 +304,7 @@ export default function PageTemplates() {
 				enableGlobalSearch: true,
 			},
 			{
-				header: __( 'Description' ),
+				label: __( 'Description' ),
 				id: 'description',
 				render: ( { item } ) => {
 					return (
@@ -319,7 +319,7 @@ export default function PageTemplates() {
 				enableGlobalSearch: true,
 			},
 			{
-				header: __( 'Author' ),
+				label: __( 'Author' ),
 				id: 'author',
 				getValue: ( { item } ) => item.author_text,
 				render: ( { item } ) => {

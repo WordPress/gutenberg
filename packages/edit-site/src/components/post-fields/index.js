@@ -167,7 +167,7 @@ function usePostFields( viewType ) {
 		() => [
 			{
 				id: 'featured-image',
-				header: __( 'Featured Image' ),
+				label: __( 'Featured Image' ),
 				getValue: ( { item } ) => item.featured_media,
 				render: ( { item } ) => (
 					<FeaturedImage item={ item } viewType={ viewType } />
@@ -175,7 +175,7 @@ function usePostFields( viewType ) {
 				enableSorting: false,
 			},
 			{
-				header: __( 'Title' ),
+				label: __( 'Title' ),
 				id: 'title',
 				type: 'text',
 				getValue: ( { item } ) =>
@@ -233,7 +233,7 @@ function usePostFields( viewType ) {
 				enableHiding: false,
 			},
 			{
-				header: __( 'Author' ),
+				label: __( 'Author' ),
 				id: 'author',
 				getValue: ( { item } ) => item._embedded?.author[ 0 ]?.name,
 				elements:
@@ -244,7 +244,7 @@ function usePostFields( viewType ) {
 				render: PostAuthorField,
 			},
 			{
-				header: __( 'Status' ),
+				label: __( 'Status' ),
 				id: 'status',
 				getValue: ( { item } ) =>
 					STATUSES.find( ( { value } ) => value === item.status )
@@ -257,7 +257,7 @@ function usePostFields( viewType ) {
 				},
 			},
 			{
-				header: __( 'Date' ),
+				label: __( 'Date' ),
 				id: 'date',
 				render: ( { item } ) => {
 					const isDraftOrPrivate = [ 'draft', 'private' ].includes(

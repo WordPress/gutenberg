@@ -183,7 +183,7 @@ function FieldsVisibilityMenu< Item >( {
 						} }
 					>
 						<DropdownMenuItemLabel>
-							{ field.header }
+							{ field.label }
 						</DropdownMenuItemLabel>
 					</DropdownMenuCheckboxItem>
 				);
@@ -212,7 +212,7 @@ function SortMenu< Item >( {
 				<DropdownMenuItem
 					suffix={
 						<span aria-hidden="true">
-							{ currentSortedField?.header }
+							{ currentSortedField?.label }
 						</span>
 					}
 				>
@@ -230,7 +230,7 @@ function SortMenu< Item >( {
 						trigger={
 							<DropdownMenuItem>
 								<DropdownMenuItemLabel>
-									{ field.header }
+									{ field.label }
 								</DropdownMenuItemLabel>
 							</DropdownMenuItem>
 						}

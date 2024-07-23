@@ -160,7 +160,7 @@ export const actions = [
 
 export const fields = [
 	{
-		header: 'Image',
+		label: 'Image',
 		id: 'image',
 		render: ( { item } ) => {
 			return (
@@ -170,13 +170,13 @@ export const fields = [
 		enableSorting: false,
 	},
 	{
-		header: 'Title',
+		label: 'Title',
 		id: 'title',
 		enableHiding: false,
 		enableGlobalSearch: true,
 	},
 	{
-		header: 'Type',
+		label: 'Type',
 		id: 'type',
 		enableHiding: false,
 		elements: [
@@ -187,18 +187,18 @@ export const fields = [
 		],
 	},
 	{
-		header: 'Satellites',
+		label: 'Satellites',
 		id: 'satellites',
 		enableSorting: true,
 	},
 	{
-		header: 'Description',
+		label: 'Description',
 		id: 'description',
 		enableSorting: false,
 		enableGlobalSearch: true,
 	},
 	{
-		header: 'Categories',
+		label: 'Categories',
 		id: 'categories',
 		elements: [
 			{ value: 'Space', label: 'Space' },
