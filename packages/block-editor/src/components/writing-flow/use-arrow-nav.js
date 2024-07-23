@@ -134,7 +134,11 @@ export function getClosestTabbable(
 		}
 
 		// Skip focusable elements such as links within content editable nodes.
-		if ( node.isContentEditable && node.contentEditable !== 'true' ) {
+		if (
+			node.isContentEditable &&
+			node.contentEditable !== 'true' &&
+			! node.getAttribute( 'tabindex' )
+		) {
 			return false;
 		}
 

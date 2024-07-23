@@ -85,6 +85,16 @@ export function useFocusFirstElement( { clientId, initialPosition } ) {
 				return;
 			}
 		}
+		const { defaultView } = ownerDocument;
+		const selection = defaultView.getSelection();
+
+		if (
+			target.contains( selection.anchorNode ) &&
+			target.contains( selection.focusNode )
+		) {
+			return;
+		}
+
 		placeCaretAtHorizontalEdge( target, isReverse );
 	}, [ initialPosition, clientId ] );
 

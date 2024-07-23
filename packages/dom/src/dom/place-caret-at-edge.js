@@ -67,7 +67,7 @@ export default function placeCaretAtEdge( container, isReverse, x ) {
 		return;
 	}
 
-	if ( ! container.isContentEditable ) {
+	if ( ! container.getAttribute( 'contenteditable' ) ) {
 		return;
 	}
 
