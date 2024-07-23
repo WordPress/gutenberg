@@ -33,11 +33,10 @@
 
 	.components-range-control__mark {
 		height: 4px;
-		width: 4px;
-		background-color: rgba($black, 0.2);
+		width: 1.5px;
+		background-color: rgba($black, 0.15);
 		z-index: 1;
 		top: -4px;
-		border-radius: 2px;
 
 		&.is-filled {
 			background-color: rgba($white, 0.5);
@@ -47,8 +46,9 @@
 	.components-range-control__marks {
 		margin-top: 17px;
 
-		:last-child {
-			transform: translateX(-4px);
+		:last-child,
+		:first-child {
+			display: none;
 		}
 	}
 
