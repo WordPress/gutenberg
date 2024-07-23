@@ -142,7 +142,7 @@ export default function PostList( { postType } ) {
 	const history = useHistory();
 	const location = useLocation();
 	const { postId, quickEdit = false } = location.params;
-	const [ selection, setSelection ] = useState( [ postId ] );
+	const [ selection, setSelection ] = useState( postId?.split( ',' ) ?? [] );
 	const onChangeSelection = useCallback(
 		( items ) => {
 			setSelection( items );
@@ -150,7 +150,7 @@ export default function PostList( { postType } ) {
 			if ( ( params.isCustom ?? 'false' ) === 'false' ) {
 				history.push( {
 					...params,
-					postId: items.length === 1 ? items[ 0 ] : undefined,
+					postId: items.join( ',' ),
 				} );
 			}
 		},
