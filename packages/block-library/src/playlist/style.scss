@@ -1,7 +1,4 @@
 .wp-block-playlist {
-	border: 1px solid #ccc;
-	padding: 10px;
-	font-size: 14px;
 
 	.wp-block-playlist__current-item {
 		audio {
@@ -47,6 +44,7 @@
 		font-size: 14px;
 		line-height: 1.5;
 		background-color: transparent;
+		color: inherit;
 		border: 0;
 
 		span {

@@ -125,7 +125,7 @@ function render_block_core_playlist( $attributes ) {
 
 /**
  * Registers the `core/playlist` block on server.
- * 
+ *
  * @since 6.7.0
  */
 function register_block_core_playlist() {
