@@ -34,21 +34,11 @@ import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { CreateTemplatePartModalContents } from '../create-template-part-modal';
 import { getItemTitle } from '../../dataviews/actions/utils';
+import usePostFields from '../post-fields';
 
 // Patterns.
 const { PATTERN_TYPES, CreatePatternModalContents, useDuplicatePatternProps } =
 	unlock( patternsPrivateApis );
-
-// TODO: this should be shared with other components (page-pages).
-const fields = [
-	{
-		type: 'text',
-		header: __( 'Title' ),
-		id: 'title',
-		placeholder: __( 'No title' ),
-		getValue: ( { item } ) => item.title,
-	},
-];
 
 const form = {
 	visibleFields: [ 'title' ],
@@ -772,6 +762,7 @@ const useDuplicatePostAction = ( postType ) => {
 						),
 					} );
 
+					const { fields } = usePostFields();
 					const [ isCreatingPage, setIsCreatingPage ] =
 						useState( false );
 
