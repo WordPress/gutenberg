@@ -10,27 +10,12 @@ import { createProxy, getProxy, getProxyNs, shouldProxy } from './registry';
 import { PropSignal } from './signals';
 import { setNamespace, resetNamespace } from '../hooks';
 
-type WellKnownSymbols =
-	| 'asyncIterator'
-	| 'hasInstance'
-	| 'isConcatSpreadable'
-	| 'iterator'
-	| 'match'
-	| 'matchAll'
-	| 'replace'
-	| 'search'
-	| 'species'
-	| 'split'
-	| 'toPrimitive'
-	| 'toStringTag'
-	| 'unscopables';
-
 /**
  * Set of built-in symbols.
  */
 const wellKnownSymbols = new Set(
 	Object.getOwnPropertyNames( Symbol )
-		.map( ( key ) => Symbol[ key as WellKnownSymbols ] )
+		.map( ( key ) => Symbol[ key ] )
 		.filter( ( value ) => typeof value === 'symbol' )
 );
 
@@ -44,6 +29,46 @@ const proxyToProps: WeakMap<
 > = new WeakMap();
 
 /**
+ * Returns the {@link PropSignal | `PropSignal`} instance associated with the
+ * specified prop in the passed proxy.
+ *
+ * The `PropSignal` instance is generated if it doesn't exist yet, using the
+ * `initial` parameter to initialize the internal signals.
+ *
+ * @param proxy   Proxy of a state object or array.
+ * @param key     The property key.
+ * @param initial Initial data for the `PropSignal` instance.
+ * @return The `PropSignal` instance.
+ */
+const getPropSignal = (
+	proxy: object,
+	key: string | number | symbol,
+	initial?: PropertyDescriptor
+) => {
+	if ( ! proxyToProps.has( proxy ) ) {
+		proxyToProps.set( proxy, new Map() );
+	}
+	key = typeof key === 'number' ? `${ key }` : key;
+	const props = proxyToProps.get( proxy )!;
+	if ( ! props.has( key ) ) {
+		const ns = getProxyNs( proxy );
+		const prop = new PropSignal( proxy );
+		props.set( key, prop );
+		if ( initial ) {
+			const { get, value } = initial;
+			if ( get ) {
+				prop.setGetter( get );
+			} else {
+				prop.setValue(
+					shouldProxy( value ) ? proxifyState( ns, value ) : value
+				);
+			}
+		}
+	}
+	return props.get( key )!;
+};
+
+/**
  * Relates each proxied object (i.e., the original object) with a signal that
  * tracks changes in the number of properties.
  */
@@ -55,46 +80,28 @@ const objToIterable = new WeakMap< object, Signal< number > >();
  */
 let peeking = false;
 
+/**
+ * Handlers for reactive objects and arrays in the state.
+ */
 const stateHandlers: ProxyHandler< object > = {
-	get( target: object, key: string, receiver: object ): any {
-		const desc = Object.getOwnPropertyDescriptor( target, key );
-
+	get( target: object, key: string | symbol, receiver: object ): any {
 		/*
-		 * If peeking, the property comes from the Object prototype, or the key
-		 * is a well-known symbol, then it should not be processed.
+		 * The property should not be reactive for the following cases:
+		 * 1. While using the `peek` function to read the property.
+		 * 2. The property exists but comes from the Object or Array prototypes.
+		 * 3. The property key is a known symbol.
 		 */
 		if (
 			peeking ||
-			( ! desc && key in Object.prototype ) ||
+			( ! target.hasOwnProperty( key ) && key in target ) ||
 			( typeof key === 'symbol' && wellKnownSymbols.has( key ) )
 		) {
 			return Reflect.get( target, key, receiver );
 		}
 
-		/*
-		 * First, we get a reference of the property we want to access. The
-		 * property object is automatically instanciated if needed.
-		 */
-		const prop = getPropSignal( receiver, key );
-
-		const ns = getProxyNs( receiver );
-
-		/*
-		 * When the value is a getter, it updates the internal getter value. If
-		 * not, we get the actual value an wrap it with a proxy if needed.
-		 *
-		 * These updates only triggers a re-render when either the getter or the
-		 * value has changed.
-		 */
-		const getter = desc?.get;
-		if ( getter ) {
-			prop.setGetter( getter );
-		} else {
-			const value = Reflect.get( target, key, receiver );
-			prop.setValue(
-				shouldProxy( value ) ? proxifyState( ns, value ) : value
-			);
-		}
+		// At this point, the property should be reactive.
+		const desc = Object.getOwnPropertyDescriptor( target, key );
+		const prop = getPropSignal( receiver, key, desc );
 
 		if ( peeking ) {
 			return prop.getComputed().peek();
@@ -108,6 +115,7 @@ const stateHandlers: ProxyHandler< object > = {
 		 * which is set by the Directives component.
 		 */
 		if ( typeof result === 'function' ) {
+			const ns = getProxyNs( receiver );
 			return ( ...args: unknown[] ) => {
 				setNamespace( ns );
 				try {
@@ -179,11 +187,30 @@ const stateHandlers: ProxyHandler< object > = {
 	},
 };
 
+/**
+ * Returns the proxy associated to the given state object, creating it if does
+ * not exist.
+ *
+ * @param namespace The namespace that will be associated to this proxy.
+ * @param obj       The object to proxify.
+ *
+ * @throws Error if the object cannot be proxified. Use {@link shouldProxy} to
+ *         check if a proxy can be created for a specific object.
+ *
+ * @return The associated proxy.
+ */
 export const proxifyState = < T extends object >(
 	namespace: string,
 	obj: T
 ): T => createProxy( namespace, obj, stateHandlers ) as T;
 
+/**
+ * Reads the value of the specified property without subscribing to it.
+ *
+ * @param obj The object to read the property from.
+ * @param key The property key.
+ * @return The property value.
+ */
 export const peek = < T extends object, K extends keyof T >(
 	obj: T,
 	key: K
@@ -194,19 +221,4 @@ export const peek = < T extends object, K extends keyof T >(
 	} finally {
 		peeking = false;
 	}
-};
-
-export const getPropSignal = (
-	proxy: object,
-	key: string | number | symbol
-) => {
-	if ( ! proxyToProps.has( proxy ) ) {
-		proxyToProps.set( proxy, new Map() );
-	}
-	key = typeof key === 'number' ? `${ key }` : key;
-	const props = proxyToProps.get( proxy )!;
-	if ( ! props.has( key ) ) {
-		props.set( key, new PropSignal( proxy ) );
-	}
-	return props.get( key )!;
 };
