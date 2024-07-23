@@ -602,7 +602,7 @@ function BlockListBlockProvider( props ) {
 				getSettings();
 			const hasLightBlockWrapper = blockType?.apiVersion > 1;
 			const defaultClassNames = [];
-			if ( hasLightBlockWrapper && blockName ) {
+			if ( hasLightBlockWrapper ) {
 				defaultClassNames.push( getBlockDefaultClassName( blockName ) );
 
 				if ( hasVariationClassNameSupport( blockType ) ) {
