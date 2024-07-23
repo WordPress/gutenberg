@@ -483,6 +483,8 @@ const viewPostAction = {
 	},
 	callback( posts, { onActionPerformed } ) {
 		const post = posts[ 0 ];
+		// TODO: shouldn't this respect the wp_theme_preview parameter?
+		// We are currently adding it via useLink/Link.
 		window.open( post.link, '_blank' );
 		if ( onActionPerformed ) {
 			onActionPerformed( posts );
