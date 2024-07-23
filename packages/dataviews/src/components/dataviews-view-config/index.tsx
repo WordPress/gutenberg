@@ -19,10 +19,11 @@ import { cog } from '@wordpress/icons';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import { SORTING_DIRECTIONS, sortLabels } from '../../constants';
+import { SORTING_DIRECTIONS, sortLabels, LAYOUT_GRID } from '../../constants';
 import { VIEW_LAYOUTS, getMandatoryFields } from '../../layouts';
 import type { NormalizedField, View, SupportedLayouts } from '../../types';
 import DataViewsContext from '../dataviews-context';
+import DensityPicker from '../../layouts/grid/density-picker';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -31,6 +32,7 @@ const {
 	DropdownMenuRadioItemV2: DropdownMenuRadioItem,
 	DropdownMenuCheckboxItemV2: DropdownMenuCheckboxItem,
 	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
+	DropdownMenuSeparatorV2: DropdownMenuSeparator,
 } = unlock( componentsPrivateApis );
 
 interface ViewTypeMenuProps {
@@ -58,6 +60,8 @@ interface SortMenuProps< Item > {
 
 interface ViewActionsProps {
 	defaultLayouts?: SupportedLayouts;
+	density: number;
+	setDensity: React.Dispatch< React.SetStateAction< number > >;
 }
 
 function ViewTypeMenu( {
@@ -280,7 +284,11 @@ function SortMenu< Item >( {
 	);
 }
 
-function _DataViewsViewConfig( { defaultLayouts }: ViewActionsProps ) {
+function _DataViewsViewConfig( {
+	defaultLayouts,
+	density,
+	setDensity,
+}: ViewActionsProps ) {
 	const { view, fields, onChangeView } = useContext( DataViewsContext );
 	const activeView = VIEW_LAYOUTS.find( ( v ) => view.type === v.type );
 	return (
@@ -333,6 +341,15 @@ function _DataViewsViewConfig( { defaultLayouts }: ViewActionsProps ) {
 							onChangeView={ onChangeView }
 						/>
 					</DropdownMenuGroup>
+					{ view.type === LAYOUT_GRID && (
+						<>
+							<DropdownMenuSeparator />
+							<DensityPicker
+								density={ density }
+								setDensity={ setDensity }
+							/>
+						</>
+					) }
 				</DropdownMenu>
 			</HStack>
 		</>

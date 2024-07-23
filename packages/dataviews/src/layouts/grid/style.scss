@@ -138,3 +138,24 @@
 .dataviews-view-grid__field:empty {
 	display: none;
 }
+
+.dataviews-density-picker {
+	grid-column: 2;
+	margin-left: -$grid-unit-10;
+	.dataviews-density-picker__range-control {
+		width: 120px;
+	}
+	.components-h-stack {
+		margin-top: $grid-unit-05;
+	}
+}
+.dataviews-density-picker__label {
+	padding: 0 $grid-unit-10;
+	margin-top: $grid-unit-05;
+	margin-bottom: $grid-unit-15;
+	color: $gray-700;
+	text-transform: uppercase;
+	font-size: 11px;
+	font-weight: 500;
+	white-space: nowrap;
+}
