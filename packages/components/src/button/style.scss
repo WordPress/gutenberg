@@ -255,11 +255,7 @@
 	&:disabled,
 	&[aria-disabled="true"] {
 		cursor: default;
-		color: $gray-600;
-
-		svg {
-			opacity: 0.66;
-		}
+		color: $gray-500;
 	}
 
 	&.is-busy,
