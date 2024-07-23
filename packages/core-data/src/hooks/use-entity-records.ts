@@ -13,6 +13,7 @@ import useQuerySelect from './use-query-select';
 import { store as coreStore } from '../';
 import type { Options } from './use-entity-record';
 import type { Status } from './constants';
+import { unlock } from '../lock-unlock';
 
 interface EntityRecordsResolution< RecordType > {
 	/** The requested entity record */
@@ -179,22 +180,12 @@ export function useEntityRecordsWithPermissions< RecordType >(
 		[ data, entityConfig?.key ]
 	);
 
-	// Todo: this selector is not memoized properly.
 	const permissions = useSelect(
 		( select ) => {
-			const { canUser } = select( coreStore );
-			return ids.map( ( id ) => ( {
-				delete: canUser( 'delete', {
-					kind,
-					name,
-					id,
-				} ),
-				update: canUser( 'update', {
-					kind,
-					name,
-					id,
-				} ),
-			} ) );
+			const { getEntityRecordsPermissions } = unlock(
+				select( coreStore )
+			);
+			return getEntityRecordsPermissions( kind, name, ids );
 		},
 		[ ids, kind, name ]
 	);
