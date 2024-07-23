@@ -135,7 +135,7 @@ async function runNpmReleaseBranchSyncStep( pluginReleaseBranch, config ) {
 		/*
 		 * Replace content from remote branch.
 		 *
-		 * @TODO: What is our goal here? Could `git reset --hard origin/${pluginReleaseBranch}` work?
+		 * @todo What is our goal here? Could `git reset --hard origin/${pluginReleaseBranch}` work?
 		 *        Why are we manually removing and then adding files back in?
 		 */
 		await repo

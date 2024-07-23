@@ -32,6 +32,7 @@ const { state, foo } = store( 'directive-bind', {
 
 			context.previousValue = context.value;
 			context.value = previousValue;
+			context.count = ( context.count ?? 0 ) + 1;
 		},
 	},
 } );

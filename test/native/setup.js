@@ -14,7 +14,7 @@ global.navigator = global.navigator ?? {};
 require( '../../packages/react-native-editor/src/globals' );
 
 // Set up Reanimated library for testing
-require( 'react-native-reanimated/lib/reanimated2/jestUtils' ).setUpTests();
+require( 'react-native-reanimated' ).setUpTests();
 global.__reanimatedWorkletInit = jest.fn();
 global.ReanimatedDataMock = {
 	now: () => 0,
@@ -81,6 +81,7 @@ jest.mock( '@wordpress/api-fetch', () => {
 jest.mock( '@wordpress/react-native-bridge', () => {
 	return {
 		addEventListener: jest.fn(),
+		logException: jest.fn(),
 		mediaUploadSync: jest.fn(),
 		removeEventListener: jest.fn(),
 		requestBlockTypeImpressions: jest.fn( ( callback ) => {
@@ -108,6 +109,7 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 		subscribeOnUndoPressed: jest.fn(),
 		subscribeOnRedoPressed: jest.fn(),
 		subscribeConnectionStatus: jest.fn( () => ( { remove: jest.fn() } ) ),
+		subscribeToContentUpdate: jest.fn(),
 		requestConnectionStatus: jest.fn( ( callback ) => callback( true ) ),
 		editorDidMount: jest.fn(),
 		showAndroidSoftKeyboard: jest.fn(),
@@ -119,6 +121,7 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 		provideToNative_Html: jest.fn(),
 		requestImageFailedRetryDialog: jest.fn(),
 		requestImageUploadCancelDialog: jest.fn(),
+		requestImageUploadCancel: jest.fn(),
 		requestMediaEditor: jest.fn(),
 		requestMediaPicker: jest.fn(),
 		requestMediaImport: jest.fn(),

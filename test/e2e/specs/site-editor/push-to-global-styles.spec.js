@@ -12,12 +12,12 @@ test.describe( 'Push to Global Styles button', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test.beforeEach( async ( { admin, editor } ) => {
+	test.beforeEach( async ( { admin } ) => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//index',
 			postType: 'wp_template',
+			canvas: 'edit',
 		} );
-		await editor.canvas.locator( 'body' ).click();
 	} );
 
 	test( 'should apply Heading block styles to all Heading blocks', async ( {

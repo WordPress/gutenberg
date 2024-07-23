@@ -29,7 +29,6 @@ const MyFontSizePicker = () => {
 
 	return (
 		<FontSizePicker
-			__nextHasNoMarginBottom
 			fontSizes={ fontSizes }
 			value={ fontSize }
 			fallbackFontSize={ fallbackFontSize }
@@ -93,6 +92,7 @@ Size of the control.
 Available units for custom font size selection.
 
 -   Required: No
+-   Default: `[ 'px', 'em', 'rem', 'vw', 'vh' ]`
 
 ### `value`: `number | string`
 
@@ -110,13 +110,6 @@ If `true`, a reset button will be displayed alongside the input field when a cus
 ### `withSlider`: `boolean`
 
 If `true`, a slider will be displayed alongside the input field when a custom font size is active. Has no effect when `disableCustomFontSizes` is `true`.
-
--   Required: no
--   Default: `false`
-
-### `__nextHasNoMarginBottom`: `boolean`
-
-Start opting into the new margin-free styles that will become the default in a future version, currently scheduled to be WordPress 6.4. (The prop can be safely removed once this happens.)
 
 -   Required: no
 -   Default: `false`

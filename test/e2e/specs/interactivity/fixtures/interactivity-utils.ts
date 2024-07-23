@@ -46,7 +46,9 @@ export default class InteractivityUtils {
 			? `${ name } ${ JSON.stringify( attributes ) }`
 			: name;
 
-		if ( ! alias ) alias = block;
+		if ( ! alias ) {
+			alias = block;
+		}
 
 		const payload = {
 			content: `<!-- wp:${ block } /-->`,

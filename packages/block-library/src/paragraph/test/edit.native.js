@@ -12,6 +12,7 @@ import {
 	initializeEditor,
 	render,
 	setupCoreBlocks,
+	triggerBlockListLayout,
 	waitFor,
 	within,
 	withFakeTimers,
@@ -61,6 +62,131 @@ describe( 'Paragraph block', () => {
 	it( 'should render without crashing and match snapshot', () => {
 		const screen = getTestComponentWithContent( '' );
 		expect( screen.toJSON() ).toMatchSnapshot();
+	} );
+
+	it( 'should prevent deleting the first Paragraph block when pressing backspace at the start', async () => {
+		// Arrange
+		const screen = await initializeEditor();
+		await addBlock( screen, 'Paragraph' );
+
+		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		typeInRichText(
+			paragraphTextInput,
+			'A quick brown fox jumps over the lazy dog.',
+			{ finalSelectionStart: 0, finalSelectionEnd: 0 }
+		);
+
+		fireEvent( paragraphTextInput, 'onKeyDown', {
+			nativeEvent: {},
+			preventDefault() {},
+			keyCode: BACKSPACE,
+		} );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'should be able to use a prefix to create a Heading block', async () => {
+		const screen = await initializeEditor();
+		await addBlock( screen, 'Paragraph' );
+		const text = '# ';
+
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		typeInRichText( paragraphTextInput, text, {
+			finalSelectionStart: 1,
+			finalSelectionEnd: 1,
+		} );
+
+		fireEvent( paragraphTextInput, 'onChange', {
+			nativeEvent: { text },
+			preventDefault() {},
+		} );
+
+		const headingBlock = getBlock( screen, 'Heading' );
+		expect( headingBlock ).toBeVisible();
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'should be able to use a prefix to create a Quote block', async () => {
+		const screen = await initializeEditor();
+		await addBlock( screen, 'Paragraph' );
+		const text = '> ';
+
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		typeInRichText( paragraphTextInput, text, {
+			finalSelectionStart: 1,
+			finalSelectionEnd: 1,
+		} );
+
+		fireEvent( paragraphTextInput, 'onChange', {
+			nativeEvent: { text },
+			preventDefault() {},
+		} );
+		const quoteBlock = getBlock( screen, 'Quote' );
+		await triggerBlockListLayout( quoteBlock );
+
+		expect( quoteBlock ).toBeVisible();
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'should be able to use a prefix to create a List block', async () => {
+		const screen = await initializeEditor();
+		await addBlock( screen, 'Paragraph' );
+		const text = '- ';
+
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		typeInRichText( paragraphTextInput, text, {
+			finalSelectionStart: 1,
+			finalSelectionEnd: 1,
+		} );
+
+		fireEvent( paragraphTextInput, 'onChange', {
+			nativeEvent: { text },
+			preventDefault() {},
+		} );
+		const listBlock = getBlock( screen, 'List' );
+		await triggerBlockListLayout( listBlock );
+
+		expect( listBlock ).toBeVisible();
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'should be able to use a prefix to create a numbered List block', async () => {
+		const screen = await initializeEditor();
+		await addBlock( screen, 'Paragraph' );
+		const text = '1. ';
+
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		typeInRichText( paragraphTextInput, text, {
+			finalSelectionStart: 2,
+			finalSelectionEnd: 2,
+		} );
+
+		fireEvent( paragraphTextInput, 'onChange', {
+			nativeEvent: { text },
+			preventDefault() {},
+		} );
+		const listBlock = getBlock( screen, 'List' );
+		await triggerBlockListLayout( listBlock );
+
+		expect( listBlock ).toBeVisible();
+		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
 	it( 'should bold text', async () => {
@@ -211,6 +337,41 @@ describe( 'Paragraph block', () => {
 		<p class="has-text-align-right">A quick brown fox jumps over the lazy dog.</p>
 		<!-- /wp:paragraph -->"
 	` );
+	} );
+
+	it( 'should inherit parent alignment', async () => {
+		// Arrange
+		const screen = await initializeEditor();
+		await addBlock( screen, 'Quote' );
+		await triggerBlockListLayout( getBlock( screen, 'Quote' ) );
+
+		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		typeInRichText(
+			paragraphTextInput,
+			'A quick brown fox jumps over the lazy dog.'
+		);
+		fireEvent.press( screen.getByLabelText( 'Navigate Up' ) );
+		fireEvent.press( screen.getByLabelText( 'Align text' ) );
+		fireEvent.press( screen.getByLabelText( 'Align text right' ) );
+
+		// Assert
+		// This not an ideal assertion, as it relies implementation details of the
+		// component: prop names. However, the only aspect we can assert is the prop
+		// passed to Aztec, the native module controlling visual alignment. A less
+		// brittle alternative might be snapshotting, but RNTL does not yet support
+		// focused snapshots, which means the snapshot would be huge.
+		// https://github.com/facebook/react/pull/25329
+		expect(
+			screen.UNSAFE_queryAllByProps( {
+				value: '<p>A quick brown fox jumps over the lazy dog.</p>',
+				placeholder: 'Start writing…',
+				textAlign: 'right',
+			} ).length
+		).toBe( 2 ); // One for Aztec mock, one for the TextInput.
 	} );
 
 	it( 'should preserve alignment when split', async () => {

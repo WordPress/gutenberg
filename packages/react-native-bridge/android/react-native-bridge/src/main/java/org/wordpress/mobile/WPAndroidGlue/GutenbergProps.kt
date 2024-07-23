@@ -9,6 +9,7 @@ data class GutenbergProps @JvmOverloads constructor(
     val enableLayoutGridBlock: Boolean,
     val enableTiledGalleryBlock: Boolean,
     val enableVideoPressBlock: Boolean,
+    val enableVideoPressV5Support: Boolean,
     val enableFacebookEmbed: Boolean,
     val enableInstagramEmbed: Boolean,
     val enableLoomEmbed: Boolean,
@@ -53,12 +54,6 @@ data class GutenbergProps @JvmOverloads constructor(
                     ?.let { putSerializable(PROP_FEATURES, it) }
             theme.getSerializable(PROP_IS_FSE_THEME)
                     ?.let { putSerializable(PROP_IS_FSE_THEME, it) }
-            theme.getSerializable(PROP_GALLERY_WITH_IMAGE_BLOCKS)
-                    ?.let { putSerializable(PROP_GALLERY_WITH_IMAGE_BLOCKS, it) }
-            theme.getSerializable(PROP_QUOTE_BLOCK_V2)
-                    ?.let { putSerializable(PROP_QUOTE_BLOCK_V2, it) }
-            theme.getSerializable(PROP_LIST_BLOCK_V2)
-                    ?.let { putSerializable(PROP_LIST_BLOCK_V2, it) }
         }
     }
 
@@ -69,6 +64,7 @@ data class GutenbergProps @JvmOverloads constructor(
         putBoolean(PROP_CAPABILITIES_LAYOUT_GRID_BLOCK, enableLayoutGridBlock)
         putBoolean(PROP_CAPABILITIES_TILED_GALLERY_BLOCK, enableTiledGalleryBlock)
         putBoolean(PROP_CAPABILITIES_VIDEOPRESS_BLOCK, enableVideoPressBlock)
+        putBoolean(PROP_CAPABILITIES_VIDEOPRESS_V5_SUPPORT, enableVideoPressV5Support)
         putBoolean(PROP_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR, enableUnsupportedBlockEditor)
         putBoolean(PROP_CAPABILITIES_CAN_ENABLE_UNSUPPORTED_BLOCK_EDITOR, canEnableUnsupportedBlockEditor)
         putBoolean(PROP_CAPABILITIES_IS_AUDIO_BLOCK_MEDIA_UPLOAD_ENABLED, isAudioBlockMediaUploadEnabled)
@@ -98,9 +94,6 @@ data class GutenbergProps @JvmOverloads constructor(
         private const val PROP_COLORS = "colors"
         private const val PROP_GRADIENTS = "gradients"
         private const val PROP_IS_FSE_THEME = "isFSETheme"
-        private const val PROP_GALLERY_WITH_IMAGE_BLOCKS = "galleryWithImageBlocks"
-        private const val PROP_QUOTE_BLOCK_V2 = "quoteBlockV2"
-        private const val PROP_LIST_BLOCK_V2 = "listBlockV2"
 
         const val PROP_INITIAL_TITLE = "initialTitle"
         const val PROP_INITIAL_DATA = "initialData"
@@ -112,6 +105,7 @@ data class GutenbergProps @JvmOverloads constructor(
         const val PROP_CAPABILITIES_LAYOUT_GRID_BLOCK = "layoutGridBlock"
         const val PROP_CAPABILITIES_TILED_GALLERY_BLOCK = "tiledGalleryBlock"
         const val PROP_CAPABILITIES_VIDEOPRESS_BLOCK = "videoPressBlock"
+        const val PROP_CAPABILITIES_VIDEOPRESS_V5_SUPPORT = "videoPressV5Support"
         const val PROP_CAPABILITIES_FACEBOOK_EMBED_BLOCK = "facebookEmbed"
         const val PROP_CAPABILITIES_INSTAGRAM_EMBED_BLOCK = "instagramEmbed"
         const val PROP_CAPABILITIES_LOOM_EMBED_BLOCK = "loomEmbed"

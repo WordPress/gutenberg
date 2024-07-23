@@ -164,6 +164,10 @@ export function getBlockLabel( blockType, attributes, context = 'visual' ) {
 		return title;
 	}
 
+	if ( label.toPlainText ) {
+		return label.toPlainText();
+	}
+
 	// Strip any HTML (i.e. RichText formatting) before returning.
 	return stripHTML( label );
 }
@@ -330,9 +334,13 @@ export function __experimentalSanitizeBlockAttributes( name, attributes ) {
  */
 export function __experimentalGetBlockAttributesNamesByRole( name, role ) {
 	const attributes = getBlockType( name )?.attributes;
-	if ( ! attributes ) return [];
+	if ( ! attributes ) {
+		return [];
+	}
 	const attributesNames = Object.keys( attributes );
-	if ( ! role ) return attributesNames;
+	if ( ! role ) {
+		return attributesNames;
+	}
 	return attributesNames.filter(
 		( attributeName ) =>
 			attributes[ attributeName ]?.__experimentalRole === role

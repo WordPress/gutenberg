@@ -28,11 +28,13 @@ import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.ConnectionStatusCallback;
+import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.LogExceptionCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaType;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.OtherMediaOptionsReceivedCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.FocalPointPickerTooltipShownCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.BlockTypeImpressionsCallback;
 import org.wordpress.mobile.WPAndroidGlue.DeferredEventEmitter;
+import org.wordpress.mobile.WPAndroidGlue.GutenbergJsException;
 import org.wordpress.mobile.WPAndroidGlue.MediaOption;
 
 import java.io.Serializable;
@@ -64,6 +66,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     private static final String EVENT_NAME_ON_UNDO_PRESSED = "onUndoPressed";
 
     private static final String EVENT_NAME_ON_REDO_PRESSED = "onRedoPressed";
+    private static final String EVENT_NAME_ON_CONTENT_UPDATE = "onContentUpdate";
 
     private static final String MAP_KEY_UPDATE_HTML = "html";
     private static final String MAP_KEY_UPDATE_TITLE = "title";
@@ -77,7 +80,6 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     private static final String MAP_KEY_THEME_UPDATE_GRADIENTS = "gradients";
     private static final String MAP_KEY_THEME_UPDATE_RAW_STYLES = "rawStyles";
     private static final String MAP_KEY_THEME_UPDATE_RAW_FEATURES = "rawFeatures";
-    private static final String MAP_KEY_GALLERY_WITH_IMAGE_BLOCKS = "galleryWithImageBlocks";
     public static final String MAP_KEY_MEDIA_FINAL_SAVE_RESULT_SUCCESS_VALUE = "success";
 
     private static final String MAP_KEY_IS_PREFERRED_COLOR_SCHEME_DARK = "isPreferredColorSchemeDark";
@@ -89,6 +91,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     private static final String MAP_KEY_REPLACE_BLOCK_HTML = "html";
     private static final String MAP_KEY_REPLACE_BLOCK_BLOCK_ID = "clientId";
 
+    private static final String MAP_KEY_UPDATE_CONTENT = "content";
     public static final String MAP_KEY_FEATURED_IMAGE_ID = "featuredImageId";
 
     public static final String MAP_KEY_IS_CONNECTED = "isConnected";
@@ -170,13 +173,6 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
         Serializable rawStyles = editorTheme.getSerializable(MAP_KEY_THEME_UPDATE_RAW_STYLES);
         Serializable rawFeatures = editorTheme.getSerializable(MAP_KEY_THEME_UPDATE_RAW_FEATURES);
 
-        // We must assign null here to distinguish between a missing value and false
-        Boolean galleryWithImageBlocks = null;
-        if (editorTheme.containsKey(MAP_KEY_GALLERY_WITH_IMAGE_BLOCKS)) {
-            galleryWithImageBlocks = editorTheme.getBoolean(MAP_KEY_GALLERY_WITH_IMAGE_BLOCKS);
-        }
-
-
         if (colors != null) {
             writableMap.putArray(MAP_KEY_THEME_UPDATE_COLORS, Arguments.fromList((ArrayList)colors));
         }
@@ -193,10 +189,6 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
             writableMap.putString(MAP_KEY_THEME_UPDATE_RAW_FEATURES, rawFeatures.toString());
         }
 
-        if (galleryWithImageBlocks != null) {
-            writableMap.putBoolean(MAP_KEY_GALLERY_WITH_IMAGE_BLOCKS, galleryWithImageBlocks);
-        }
-
         emitToJS(EVENT_NAME_UPDATE_EDITOR_SETTINGS, writableMap);
     }
 
@@ -210,6 +202,13 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
 
     public void onRedoPressed() {
         emitToJS(EVENT_NAME_ON_REDO_PRESSED, null);
+    }
+
+    public void onContentUpdate(String content) {
+        WritableMap writableMap = new WritableNativeMap();
+
+        writableMap.putString(MAP_KEY_UPDATE_CONTENT, content);
+        emitToJS(EVENT_NAME_ON_CONTENT_UPDATE, writableMap);
     }
 
     @ReactMethod
@@ -274,11 +273,6 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
     @ReactMethod
-    public void mediaSaveSync() {
-        mGutenbergBridgeJS2Parent.mediaSaveSync(getNewMediaSelectedCallback(true,null));
-    }
-
-    @ReactMethod
     public void requestImageFailedRetryDialog(final int mediaId) {
         mGutenbergBridgeJS2Parent.requestImageFailedRetryDialog(mediaId);
     }
@@ -306,31 +300,6 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     @ReactMethod
     public void requestMediaEditor(String mediaUrl, final Callback onUploadMediaSelected) {
         mGutenbergBridgeJS2Parent.requestMediaEditor(getNewMediaSelectedCallback(false, onUploadMediaSelected), mediaUrl);
-    }
-
-    @ReactMethod
-    public void requestMediaFilesEditorLoad(ReadableArray mediaFiles, String blockId) {
-        mGutenbergBridgeJS2Parent.requestMediaFilesEditorLoad(mediaFiles, blockId);
-    }
-
-    @ReactMethod
-    public void requestMediaFilesFailedRetryDialog(ReadableArray mediaFiles) {
-        mGutenbergBridgeJS2Parent.requestMediaFilesFailedRetryDialog(mediaFiles);
-    }
-
-    @ReactMethod
-    public void requestMediaFilesUploadCancelDialog(ReadableArray mediaFiles) {
-        mGutenbergBridgeJS2Parent.requestMediaFilesUploadCancelDialog(mediaFiles);
-    }
-
-    @ReactMethod
-    public void requestMediaFilesSaveCancelDialog(ReadableArray mediaFiles) {
-        mGutenbergBridgeJS2Parent.requestMediaFilesSaveCancelDialog(mediaFiles);
-    }
-
-    @ReactMethod
-    public void mediaFilesBlockReplaceSync(ReadableArray mediaFiles, String blockId) {
-        mGutenbergBridgeJS2Parent.mediaFilesBlockReplaceSync(mediaFiles, blockId);
     }
 
     @ReactMethod
@@ -623,4 +592,19 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
             }
         }
     }
+
+    @ReactMethod
+    public void logException(final ReadableMap rawException, final Callback jsCallback) {
+        GutenbergJsException exception = GutenbergJsException.fromReadableMap(rawException);
+        LogExceptionCallback logExceptionCallback = onLogExceptionCallback(jsCallback);
+        mGutenbergBridgeJS2Parent.logException(exception, logExceptionCallback);
+    }
+
+   private LogExceptionCallback onLogExceptionCallback(final Callback jsCallback) {
+       return new GutenbergBridgeJS2Parent.LogExceptionCallback() {
+           @Override public void onLogException(boolean success) {
+               jsCallback.invoke(success);
+           }
+       };
+   }
 }

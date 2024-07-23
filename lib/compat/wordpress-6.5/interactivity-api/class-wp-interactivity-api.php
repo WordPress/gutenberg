@@ -4,13 +4,16 @@
  *
  * @package WordPress
  * @subpackage Interactivity API
+ * @since 6.5.0
  */
 
 if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 	/**
-	 * Class used to process the Interactivity API in the server.
+	 * Class used to process the Interactivity API on the server.
+	 *
+	 * @since 6.5.0
 	 */
-	class WP_Interactivity_API {
+	final class WP_Interactivity_API {
 		/**
 		 * Holds the mapping of directive attribute names to their processor methods.
 		 *
@@ -83,9 +86,10 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 		 * @param string $store_namespace The unique store namespace identifier.
 		 * @param array  $state           Optional. The array that will be merged with the existing state for the specified
 		 *                                store namespace.
-		 * @return array The current state for the specified store namespace.
+		 * @return array The current state for the specified store namespace. This will be the updated state if a $state
+		 *               argument was provided.
 		 */
-		public function state( string $store_namespace, array $state = null ): array {
+		public function state( string $store_namespace, array $state = array() ): array {
 			if ( ! isset( $this->state_data[ $store_namespace ] ) ) {
 				$this->state_data[ $store_namespace ] = array();
 			}
@@ -110,9 +114,10 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 		 * @param string $store_namespace The unique store namespace identifier.
 		 * @param array  $config          Optional. The array that will be merged with the existing configuration for the
 		 *                                specified store namespace.
-		 * @return array The current configuration for the specified store namespace.
+		 * @return array The configuration for the specified store namespace. This will be the updated configuration if a
+		 *               $config argument was provided.
 		 */
-		public function config( string $store_namespace, array $config = null ): array {
+		public function config( string $store_namespace, array $config = array() ): array {
 			if ( ! isset( $this->config_data[ $store_namespace ] ) ) {
 				$this->config_data[ $store_namespace ] = array();
 			}
@@ -136,20 +141,36 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 		 * @since 6.5.0
 		 */
 		public function print_client_interactivity_data() {
-			$store      = array();
-			$has_state  = ! empty( $this->state_data );
-			$has_config = ! empty( $this->config_data );
+			if ( empty( $this->state_data ) && empty( $this->config_data ) ) {
+				return;
+			}
 
-			if ( $has_state || $has_config ) {
-				if ( $has_config ) {
-					$store['config'] = $this->config_data;
+			$interactivity_data = array();
+
+			$config = array();
+			foreach ( $this->config_data as $key => $value ) {
+				if ( ! empty( $value ) ) {
+					$config[ $key ] = $value;
 				}
-				if ( $has_state ) {
-					$store['state'] = $this->state_data;
+			}
+			if ( ! empty( $config ) ) {
+				$interactivity_data['config'] = $config;
+			}
+
+			$state = array();
+			foreach ( $this->state_data as $key => $value ) {
+				if ( ! empty( $value ) ) {
+					$state[ $key ] = $value;
 				}
+			}
+			if ( ! empty( $state ) ) {
+				$interactivity_data['state'] = $state;
+			}
+
+			if ( ! empty( $interactivity_data ) ) {
 				wp_print_inline_script_tag(
 					wp_json_encode(
-						$store,
+						$interactivity_data,
 						JSON_HEX_TAG | JSON_HEX_AMP
 					),
 					array(
@@ -166,18 +187,17 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 		 * @since 6.5.0
 		 */
 		public function register_script_modules() {
+			$suffix = wp_scripts_get_suffix();
+
 			wp_register_script_module(
 				'@wordpress/interactivity',
-				gutenberg_url( '/build/interactivity/index.min.js' ),
-				array(),
-				defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
+				includes_url( "js/dist/interactivity$suffix.js" )
 			);
 
 			wp_register_script_module(
 				'@wordpress/interactivity-router',
-				gutenberg_url( '/build/interactivity/router.min.js' ),
-				array( '@wordpress/interactivity' ),
-				defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
+				includes_url( "js/dist/interactivity-router$suffix.js" ),
+				array( '@wordpress/interactivity' )
 			);
 		}
 
@@ -187,6 +207,7 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 		 * @since 6.5.0
 		 */
 		public function add_hooks() {
+			add_action( 'wp_enqueue_scripts', array( $this, 'register_script_modules' ) );
 			add_action( 'wp_footer', array( $this, 'print_client_interactivity_data' ) );
 		}
 
@@ -200,6 +221,9 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 		 * @return string The processed HTML content. It returns the original content when the HTML contains unbalanced tags.
 		 */
 		public function process_directives( string $html ): string {
+			if ( ! str_contains( $html, 'data-wp-' ) ) {
+				return $html;
+			}
 			$context_stack   = array();
 			$namespace_stack = array();
 			$result          = $this->process_directives_args( $html, $context_stack, $namespace_stack );
@@ -210,7 +234,7 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 		 * Processes the interactivity directives contained within the HTML content
 		 * and updates the markup accordingly.
 		 *
-		 * It needs the context and namespace stacks to be passed by reference and
+		 * It needs the context and namespace stacks to be passed by reference, and
 		 * it returns null if the HTML contains unbalanced tags.
 		 *
 		 * @since 6.5.0
@@ -228,8 +252,13 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 			$directive_processor_prefixes          = array_keys( self::$directive_processors );
 			$directive_processor_prefixes_reversed = array_reverse( $directive_processor_prefixes );
 
-			while ( $p->next_tag( array( 'tag_closers' => 'visit' ) ) && false === $unbalanced ) {
+			while ( $p->next_tag( array( 'tag_closers' => 'visit' ) ) ) {
 				$tag_name = $p->get_tag();
+
+				if ( 'SVG' === $tag_name || 'MATH' === $tag_name ) {
+					$unbalanced = true;
+					break;
+				}
 
 				if ( $p->is_tag_closer() ) {
 					list( $opening_tag_name, $directives_prefixes ) = end( $tag_stack );
@@ -242,27 +271,23 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 						 * stops processing it.
 						 */
 						$unbalanced = true;
-						continue;
+						break;
 					} else {
-
-						/*
-						 * It removes the last tag from the stack.
-						 */
+						// Remove the last tag from the stack.
 						array_pop( $tag_stack );
-
-						/*
-						 * If the matching opening tag didn't have any directives, it can skip
-						 * the processing.
-						 */
-						if ( 0 === count( $directives_prefixes ) ) {
-							continue;
-						}
 					}
 				} else {
-					if ( 0 === count( $p->get_attribute_names_with_prefix( 'data-wp-each-child' ) ) ) {
+					if ( 0 !== count( $p->get_attribute_names_with_prefix( 'data-wp-each-child' ) ) ) {
+						/*
+						 * If the tag has a `data-wp-each-child` directive, jump to its closer
+						 * tag because those tags have already been processed.
+						 */
+						$p->next_balanced_tag_closer_tag();
+						continue;
+					} else {
 						$directives_prefixes = array();
 
-						// Checks if there is is a server directive processor registered for each directive.
+						// Checks if there is a server directive processor registered for each directive.
 						foreach ( $p->get_attribute_names_with_prefix( 'data-wp-' ) as $attribute_name ) {
 							list( $directive_prefix ) = $this->extract_prefix_and_suffix( $attribute_name );
 							if ( array_key_exists( $directive_prefix, self::$directive_processors ) ) {
@@ -271,40 +296,50 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 						}
 
 						/*
-						* If this is not a void element, it adds it to the tag stack so it can
-						* process its closing tag and check for unbalanced tags.
-						*/
-						if ( ! $p->is_void() ) {
+						 * If this tag will visit its closer tag, it adds it to the tag stack
+						 * so it can process its closing tag and check for unbalanced tags.
+						 */
+						if ( $p->has_and_visits_its_closer_tag() ) {
 							$tag_stack[] = array( $tag_name, $directives_prefixes );
 						}
-					} else {
-						// Jumps to the tag closer if the tag has a `data-wp-each-child` directive.
-						$p->next_balanced_tag_closer_tag();
-						continue;
 					}
 				}
-
 				/*
-				 * Sorts the attributes by the order of the `directives_processor` array
-				 * and checks what directives are present in this element. The processing
-				 * order is reversed for tag closers.
+				 * If the matching opener tag didn't have any directives, it can skip the
+				 * processing.
 				 */
-				$directives_prefixes = array_intersect(
-					$p->is_tag_closer()
-						? $directive_processor_prefixes_reversed
-						: $directive_processor_prefixes,
-					$directives_prefixes
-				);
+				if ( 0 === count( $directives_prefixes ) ) {
+					continue;
+				}
 
-				// Executes the directive processors present in this element.
-				foreach ( $directives_prefixes as $directive_prefix ) {
-					$func = is_array( self::$directive_processors[ $directive_prefix ] )
-						? self::$directive_processors[ $directive_prefix ]
-						: array( $this, self::$directive_processors[ $directive_prefix ] );
-					call_user_func_array(
-						$func,
-						array( $p, &$context_stack, &$namespace_stack, &$tag_stack )
+				// Directive processing might be different depending on if it is entering the tag or exiting it.
+				$modes = array(
+					'enter' => ! $p->is_tag_closer(),
+					'exit'  => $p->is_tag_closer() || ! $p->has_and_visits_its_closer_tag(),
+				);
+				foreach ( $modes as $mode => $should_run ) {
+					if ( ! $should_run ) {
+						continue;
+					}
+
+					/*
+					 * Sorts the attributes by the order of the `directives_processor` array
+					 * and checks what directives are present in this element.
+					 */
+					$existing_directives_prefixes = array_intersect(
+						'enter' === $mode ? $directive_processor_prefixes : $directive_processor_prefixes_reversed,
+						$directives_prefixes
 					);
+					foreach ( $existing_directives_prefixes as $directive_prefix ) {
+						$func = is_array( self::$directive_processors[ $directive_prefix ] )
+							? self::$directive_processors[ $directive_prefix ]
+							: array( $this, self::$directive_processors[ $directive_prefix ] );
+
+						call_user_func_array(
+							$func,
+							array( $p, $mode, &$context_stack, &$namespace_stack, &$tag_stack )
+						);
+					}
 				}
 			}
 
@@ -336,11 +371,11 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 			}
 
 			$store = array(
-				'state'   => isset( $this->state_data[ $ns ] ) ? $this->state_data[ $ns ] : array(),
-				'context' => isset( $context[ $ns ] ) ? $context[ $ns ] : array(),
+				'state'   => $this->state_data[ $ns ] ?? array(),
+				'context' => $context[ $ns ] ?? array(),
 			);
 
-			// Checks if the reference path is preceded by a negator operator (!).
+			// Checks if the reference path is preceded by a negation operator (!).
 			$should_negate_value = '!' === $path[0];
 			$path                = $should_negate_value ? substr( $path, 1 ) : $path;
 
@@ -355,7 +390,7 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 				}
 			}
 
-			// Returns the opposite if it contains a negator operator (!).
+			// Returns the opposite if it contains a negation operator (!).
 			return $should_negate_value ? ! $current : $current;
 		}
 
@@ -388,7 +423,7 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 		 * If the value doesn't contain an explicit namespace, it returns the
 		 * default one. If the value contains a JSON object instead of a reference
 		 * path, the function tries to parse it and return the resulting array. If
-		 * the value contains strings that reprenset booleans ("true" and "false"),
+		 * the value contains strings that represent booleans ("true" and "false"),
 		 * numbers ("1" and "1.2") or "null", the function also transform them to
 		 * regular booleans, numbers and `null`.
 		 *
@@ -443,7 +478,7 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 					function ( $matches ) {
 						return strtoupper( $matches[2] );
 					},
-					strtolower( preg_replace( '/-+$/', '', $str ) )
+					strtolower( rtrim( $str, '-' ) )
 				)
 			);
 		}
@@ -452,25 +487,24 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 		 * Processes the `data-wp-interactive` directive.
 		 *
 		 * It adds the default store namespace defined in the directive value to the
-		 * stack so it's available for the nested interactivity elements.
+		 * stack so that it's available for the nested interactivity elements.
 		 *
 		 * @since 6.5.0
 		 *
 		 * @param WP_Interactivity_API_Directives_Processor $p               The directives processor instance.
+		 * @param string                                    $mode            Whether the processing is entering or exiting the tag.
 		 * @param array                                     $context_stack   The reference to the context stack.
 		 * @param array                                     $namespace_stack The reference to the store namespace stack.
 		 */
-		private function data_wp_interactive_processor( WP_Interactivity_API_Directives_Processor $p, array &$context_stack, array &$namespace_stack ) {
-			// In closing tags, it removes the last namespace from the stack.
-			if ( $p->is_tag_closer() ) {
-				return array_pop( $namespace_stack );
+		private function data_wp_interactive_processor( WP_Interactivity_API_Directives_Processor $p, string $mode, array &$context_stack, array &$namespace_stack ) {
+			// When exiting tags, it removes the last namespace from the stack.
+			if ( 'exit' === $mode ) {
+				array_pop( $namespace_stack );
+				return;
 			}
 
 			// Tries to decode the `data-wp-interactive` attribute value.
 			$attribute_value = $p->get_attribute( 'data-wp-interactive' );
-			$decoded_json    = is_string( $attribute_value ) && ! empty( $attribute_value )
-				? json_decode( $attribute_value, true )
-				: null;
 
 			/*
 			 * Pushes the newly defined namespace or the current one if the
@@ -480,27 +514,38 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 			 * independently of whether the previous `data-wp-interactive` definition
 			 * contained a valid namespace.
 			 */
-			$namespace_stack[] = isset( $decoded_json['namespace'] )
-				? $decoded_json['namespace']
-				: end( $namespace_stack );
+			$new_namespace = null;
+			if ( is_string( $attribute_value ) && ! empty( $attribute_value ) ) {
+				$decoded_json = json_decode( $attribute_value, true );
+				if ( is_array( $decoded_json ) ) {
+					$new_namespace = $decoded_json['namespace'] ?? null;
+				} else {
+					$new_namespace = $attribute_value;
+				}
+			}
+			$namespace_stack[] = ( $new_namespace && 1 === preg_match( '/^([\w\-_\/]+)/', $new_namespace ) )
+			? $new_namespace
+			: end( $namespace_stack );
 		}
 
 		/**
 		 * Processes the `data-wp-context` directive.
 		 *
-		 * It adds the context defined in the directive value to the stack so it's
-		 * available for the nested interactivity elements.
+		 * It adds the context defined in the directive value to the stack so that
+		 * it's available for the nested interactivity elements.
 		 *
 		 * @since 6.5.0
 		 *
 		 * @param WP_Interactivity_API_Directives_Processor $p               The directives processor instance.
+		 * @param string                                    $mode            Whether the processing is entering or exiting the tag.
 		 * @param array                                     $context_stack   The reference to the context stack.
 		 * @param array                                     $namespace_stack The reference to the store namespace stack.
 		 */
-		private function data_wp_context_processor( WP_Interactivity_API_Directives_Processor $p, array &$context_stack, array &$namespace_stack ) {
-			// In closing tags, it removes the last context from the stack.
-			if ( $p->is_tag_closer() ) {
-				return array_pop( $context_stack );
+		private function data_wp_context_processor( WP_Interactivity_API_Directives_Processor $p, string $mode, array &$context_stack, array &$namespace_stack ) {
+			// When exiting tags, it removes the last context from the stack.
+			if ( 'exit' === $mode ) {
+				array_pop( $context_stack );
+				return;
 			}
 
 			$attribute_value = $p->get_attribute( 'data-wp-context' );
@@ -508,20 +553,17 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 
 			// Separates the namespace from the context JSON object.
 			list( $namespace_value, $decoded_json ) = is_string( $attribute_value ) && ! empty( $attribute_value )
-				? $this->extract_directive_value( $attribute_value, $namespace_value )
-				: array( $namespace_value, null );
+			? $this->extract_directive_value( $attribute_value, $namespace_value )
+			: array( $namespace_value, null );
 
 			/*
 			 * If there is a namespace, it adds a new context to the stack merging the
 			 * previous context with the new one.
 			 */
 			if ( is_string( $namespace_value ) ) {
-				array_push(
-					$context_stack,
-					array_replace_recursive(
-						end( $context_stack ) !== false ? end( $context_stack ) : array(),
-						array( $namespace_value => is_array( $decoded_json ) ? $decoded_json : array() )
-					)
+				$context_stack[] = array_replace_recursive(
+					end( $context_stack ) !== false ? end( $context_stack ) : array(),
+					array( $namespace_value => is_array( $decoded_json ) ? $decoded_json : array() )
 				);
 			} else {
 				/*
@@ -529,7 +571,7 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 				 * It needs to do so because the function pops out the current context
 				 * from the stack whenever it finds a `data-wp-context`'s closing tag.
 				 */
-				array_push( $context_stack, end( $context_stack ) );
+				$context_stack[] = end( $context_stack );
 			}
 		}
 
@@ -542,11 +584,12 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 		 * @since 6.5.0
 		 *
 		 * @param WP_Interactivity_API_Directives_Processor $p               The directives processor instance.
+		 * @param string                                    $mode            Whether the processing is entering or exiting the tag.
 		 * @param array                                     $context_stack   The reference to the context stack.
 		 * @param array                                     $namespace_stack The reference to the store namespace stack.
 		 */
-		private function data_wp_bind_processor( WP_Interactivity_API_Directives_Processor $p, array &$context_stack, array &$namespace_stack ) {
-			if ( ! $p->is_tag_closer() ) {
+		private function data_wp_bind_processor( WP_Interactivity_API_Directives_Processor $p, string $mode, array &$context_stack, array &$namespace_stack ) {
+			if ( 'enter' === $mode ) {
 				$all_bind_directives = $p->get_attribute_names_with_prefix( 'data-wp-bind--' );
 
 				foreach ( $all_bind_directives as $attribute_name ) {
@@ -558,7 +601,10 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 					$attribute_value = $p->get_attribute( $attribute_name );
 					$result          = $this->evaluate( $attribute_value, end( $namespace_stack ), end( $context_stack ) );
 
-					if ( null !== $result && ( false !== $result || '-' === $bound_attribute[4] ) ) {
+					if ( null !== $result && (
+						false !== $result ||
+						( strlen( $bound_attribute ) > 5 && '-' === $bound_attribute[4] )
+					) ) {
 						/*
 						 * If the result of the evaluation is a boolean and the attribute is
 						 * `aria-` or `data-, convert it to a string "true" or "false". It
@@ -566,7 +612,10 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 						 * replicate what Preact will later do in the client:
 						 * https://github.com/preactjs/preact/blob/ea49f7a0f9d1ff2c98c0bdd66aa0cbc583055246/src/diff/props.js#L131C24-L136
 						 */
-						if ( is_bool( $result ) && '-' === $bound_attribute[4] ) {
+						if (
+							is_bool( $result ) &&
+							( strlen( $bound_attribute ) > 5 && '-' === $bound_attribute[4] )
+						) {
 							$result = $result ? 'true' : 'false';
 						}
 						$p->set_attribute( $bound_attribute, $result );
@@ -577,7 +626,6 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 			}
 		}
 
-
 		/**
 		 * Processes the `data-wp-class` directive.
 		 *
@@ -587,11 +635,12 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 		 * @since 6.5.0
 		 *
 		 * @param WP_Interactivity_API_Directives_Processor $p               The directives processor instance.
+		 * @param string                                    $mode            Whether the processing is entering or exiting the tag.
 		 * @param array                                     $context_stack   The reference to the context stack.
 		 * @param array                                     $namespace_stack The reference to the store namespace stack.
 		 */
-		private function data_wp_class_processor( WP_Interactivity_API_Directives_Processor $p, array &$context_stack, array &$namespace_stack ) {
-			if ( ! $p->is_tag_closer() ) {
+		private function data_wp_class_processor( WP_Interactivity_API_Directives_Processor $p, string $mode, array &$context_stack, array &$namespace_stack ) {
+			if ( 'enter' === $mode ) {
 				$all_class_directives = $p->get_attribute_names_with_prefix( 'data-wp-class--' );
 
 				foreach ( $all_class_directives as $attribute_name ) {
@@ -621,11 +670,12 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 		 * @since 6.5.0
 		 *
 		 * @param WP_Interactivity_API_Directives_Processor $p               The directives processor instance.
+		 * @param string                                    $mode            Whether the processing is entering or exiting the tag.
 		 * @param array                                     $context_stack   The reference to the context stack.
 		 * @param array                                     $namespace_stack The reference to the store namespace stack.
 		 */
-		private function data_wp_style_processor( WP_Interactivity_API_Directives_Processor $p, array &$context_stack, array &$namespace_stack ) {
-			if ( ! $p->is_tag_closer() ) {
+		private function data_wp_style_processor( WP_Interactivity_API_Directives_Processor $p, string $mode, array &$context_stack, array &$namespace_stack ) {
+			if ( 'enter' === $mode ) {
 				$all_style_attributes = $p->get_attribute_names_with_prefix( 'data-wp-style--' );
 
 				foreach ( $all_style_attributes as $attribute_name ) {
@@ -644,8 +694,8 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 					 * attribute value is not empty because if it is, it doesn't need to
 					 * update the attribute value.
 					 */
-					if ( $style_property_value || ( ! $style_property_value && $style_attribute_value ) ) {
-						$style_attribute_value = $this->set_style_property( $style_attribute_value, $style_property, $style_property_value );
+					if ( $style_property_value || $style_attribute_value ) {
+						$style_attribute_value = $this->merge_style_property( $style_attribute_value, $style_property, $style_property_value );
 						/*
 						 * If the style attribute value is not empty, it sets it. Otherwise,
 						 * it removes it.
@@ -661,19 +711,19 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 		}
 
 		/**
-		 * Sets an individual style property in the `style` attribute of an HTML
+		 * Merges an individual style property in the `style` attribute of an HTML
 		 * element, updating or removing the property when necessary.
 		 *
-		 * If a property is modified, it is added at the end of the list to make sure
-		 * that it overrides the previous ones.
+		 * If a property is modified, the old one is removed and the new one is added
+		 * at the end of the list.
 		 *
 		 * @since 6.5.0
 		 *
 		 * Example:
 		 *
-		 *     set_style_property( 'color:green;', 'color', 'red' )      => 'color:red;'
-		 *     set_style_property( 'background:green;', 'color', 'red' ) => 'background:green;color:red;'
-		 *     set_style_property( 'color:green;', 'color', null )       => ''
+		 *     merge_style_property( 'color:green;', 'color', 'red' )      => 'color:red;'
+		 *     merge_style_property( 'background:green;', 'color', 'red' ) => 'background:green;color:red;'
+		 *     merge_style_property( 'color:green;', 'color', null )       => ''
 		 *
 		 * @param string            $style_attribute_value The current style attribute value.
 		 * @param string            $style_property_name   The style property name to set.
@@ -681,13 +731,13 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 		 *                                                 empty string, it removes the style property.
 		 * @return string The new style attribute value after the specified property has been added, updated or removed.
 		 */
-		private function set_style_property( string $style_attribute_value, string $style_property_name, $style_property_value ): string {
+		private function merge_style_property( string $style_attribute_value, string $style_property_name, $style_property_value ): string {
 			$style_assignments    = explode( ';', $style_attribute_value );
 			$result               = array();
 			$style_property_value = ! empty( $style_property_value ) ? rtrim( trim( $style_property_value ), ';' ) : null;
 			$new_style_property   = $style_property_value ? $style_property_name . ':' . $style_property_value . ';' : '';
 
-			// Generate an array with all the properties but the modified one.
+			// Generates an array with all the properties but the modified one.
 			foreach ( $style_assignments as $style_assignment ) {
 				if ( empty( trim( $style_assignment ) ) ) {
 					continue;
@@ -698,8 +748,8 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 				}
 			}
 
-			// Add the new/modified property at the end of the list.
-			array_push( $result, $new_style_property );
+			// Adds the new/modified property at the end of the list.
+			$result[] = $new_style_property;
 
 			return implode( '', $result );
 		}
@@ -713,11 +763,12 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 		 * @since 6.5.0
 		 *
 		 * @param WP_Interactivity_API_Directives_Processor $p               The directives processor instance.
+		 * @param string                                    $mode            Whether the processing is entering or exiting the tag.
 		 * @param array                                     $context_stack   The reference to the context stack.
 		 * @param array                                     $namespace_stack The reference to the store namespace stack.
 		 */
-		private function data_wp_text_processor( WP_Interactivity_API_Directives_Processor $p, array &$context_stack, array &$namespace_stack ) {
-			if ( ! $p->is_tag_closer() ) {
+		private function data_wp_text_processor( WP_Interactivity_API_Directives_Processor $p, string $mode, array &$context_stack, array &$namespace_stack ) {
+			if ( 'enter' === $mode ) {
 				$attribute_value = $p->get_attribute( 'data-wp-text' );
 				$result          = $this->evaluate( $attribute_value, end( $namespace_stack ), end( $context_stack ) );
 
@@ -735,6 +786,72 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 		}
 
 		/**
+		 * Returns the CSS styles for animating the top loading bar in the router.
+		 *
+		 * @since 6.5.0
+		 *
+		 * @return string The CSS styles for the router's top loading bar animation.
+		 */
+		private function get_router_animation_styles(): string {
+			return <<<CSS
+			.wp-interactivity-router-loading-bar {
+				position: fixed;
+				top: 0;
+				left: 0;
+				margin: 0;
+				padding: 0;
+				width: 100vw;
+				max-width: 100vw !important;
+				height: 4px;
+				background-color: #000;
+				opacity: 0
+			}
+			.wp-interactivity-router-loading-bar.start-animation {
+				animation: wp-interactivity-router-loading-bar-start-animation 30s cubic-bezier(0.03, 0.5, 0, 1) forwards
+			}
+			.wp-interactivity-router-loading-bar.finish-animation {
+				animation: wp-interactivity-router-loading-bar-finish-animation 300ms ease-in
+			}
+			@keyframes wp-interactivity-router-loading-bar-start-animation {
+				0% { transform: scaleX(0); transform-origin: 0 0; opacity: 1 }
+				100% { transform: scaleX(1); transform-origin: 0 0; opacity: 1 }
+			}
+			@keyframes wp-interactivity-router-loading-bar-finish-animation {
+				0% { opacity: 1 }
+				50% { opacity: 1 }
+				100% { opacity: 0 }
+			}
+CSS;
+		}
+
+		/**
+		 * Outputs the markup for the top loading indicator and the screen reader
+		 * notifications during client-side navigations.
+		 *
+		 * This method prints a div element representing a loading bar visible during
+		 * navigation, as well as an aria-live region that can be read by screen
+		 * readers to announce navigation status.
+		 *
+		 * @since 6.5.0
+		 */
+		public function print_router_loading_and_screen_reader_markup() {
+			echo <<<HTML
+			<div
+				class="wp-interactivity-router-loading-bar"
+				data-wp-interactive="core/router"
+				data-wp-class--start-animation="state.navigation.hasStarted"
+				data-wp-class--finish-animation="state.navigation.hasFinished"
+			></div>
+			<div
+				class="screen-reader-text"
+				aria-live="polite"
+				data-wp-interactive="core/router"
+				data-wp-text="state.navigation.message"
+			></div>
+HTML;
+		}
+
+		/**
 		 * Processes the `data-wp-router-region` directive.
 		 *
 		 * It renders in the footer a set of HTML elements to notify users about
@@ -744,10 +861,11 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 		 *
 		 * @since 6.5.0
 		 *
-		 * @param WP_Interactivity_API_Directives_Processor $p The directives processor instance.
+		 * @param WP_Interactivity_API_Directives_Processor $p               The directives processor instance.
+		 * @param string                                    $mode            Whether the processing is entering or exiting the tag.
 		 */
-		private function data_wp_router_region_processor( WP_Interactivity_API_Directives_Processor $p ) {
-			if ( ! $p->is_tag_closer() && ! $this->has_processed_router_region ) {
+		private function data_wp_router_region_processor( WP_Interactivity_API_Directives_Processor $p, string $mode ) {
+			if ( 'enter' === $mode && ! $this->has_processed_router_region ) {
 				$this->has_processed_router_region = true;
 
 				// Initialize the `core/router` store.
@@ -755,10 +873,7 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 					'core/router',
 					array(
 						'navigation' => array(
-							'message'     => '',
-							'hasStarted'  => false,
-							'hasFinished' => false,
-							'texts'       => array(
+							'texts' => array(
 								'loading' => __( 'Loading page, please wait.' ),
 								'loaded'  => __( 'Page Loaded.' ),
 							),
@@ -766,54 +881,13 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 					)
 				);
 
-				$callback = static function () {
-					echo <<<HTML
-<style id="wp-interactivity-router_animations">
-.wp-interactivity-router_loading-bar {
-	position: fixed;
-	top: 0;
-	left: 0;
-	margin: 0;
-	padding: 0;
-	width: 100vw;
-	max-width: 100vw !important;
-	height: 4px;
-	background-color: var(--wp--preset--color--primary, #000);
-	opacity: 0
-}
-.wp-interactivity-router_loading-bar.start-animation {
-	animation: wp-interactivity-router_loading-bar-start-animation 30s cubic-bezier(0.03, 0.5, 0, 1) forwards
-}
-.wp-interactivity-router_loading-bar.finish-animation {
-	animation: wp-interactivity-router_loading-bar-finish-animation 300ms ease-in
-}
+				// Enqueues as an inline style.
+				wp_register_style( 'wp-interactivity-router-animations', false );
+				wp_add_inline_style( 'wp-interactivity-router-animations', $this->get_router_animation_styles() );
+				wp_enqueue_style( 'wp-interactivity-router-animations' );
 
-@keyframes wp-interactivity-router_loading-bar-start-animation {
-	0% { transform: scaleX(0); transform-origin: 0% 0%; opacity: 1 }
-	100% { transform: scaleX(1); transform-origin: 0% 0%; opacity: 1 }
-}
-@keyframes wp-interactivity-router_loading-bar-finish-animation {
-	0% { opacity: 1 }
-	50% { opacity: 1 }
-	100% { opacity: 0 }
-}
-</style>
-<div
-	class="wp-interactivity-router_loading-bar"
-	data-wp-interactive='{"namespace":"core/router"}'
-	data-wp-class--start-animation="state.navigation.hasStarted"
-	data-wp-class--finish-animation="state.navigation.hasFinished"
-></div>
-<div
-	class="screen-reader-text"
-	aria-live="polite"
-	data-wp-interactive='{"namespace":"core/router"}'
-	data-wp-text="state.navigation.message"
-></div>
-HTML;
-				};
-
-				add_action( 'wp_footer', $callback );
+				// Adds the necessary markup to the footer.
+				add_action( 'wp_footer', array( $this, 'print_router_loading_and_screen_reader_markup' ) );
 			}
 		}
 
@@ -827,12 +901,13 @@ HTML;
 		 * @since 6.5.0
 		 *
 		 * @param WP_Interactivity_API_Directives_Processor $p               The directives processor instance.
+		 * @param string                                    $mode            Whether the processing is entering or exiting the tag.
 		 * @param array                                     $context_stack   The reference to the context stack.
 		 * @param array                                     $namespace_stack The reference to the store namespace stack.
 		 * @param array                                     $tag_stack       The reference to the tag stack.
 		 */
-		private function data_wp_each_processor( WP_Interactivity_API_Directives_Processor $p, array &$context_stack, array &$namespace_stack, array &$tag_stack ) {
-			if ( ! $p->is_tag_closer() && 'TEMPLATE' === $p->get_tag() ) {
+		private function data_wp_each_processor( WP_Interactivity_API_Directives_Processor $p, string $mode, array &$context_stack, array &$namespace_stack, array &$tag_stack ) {
+			if ( 'enter' === $mode && 'TEMPLATE' === $p->get_tag() ) {
 				$attribute_name   = $p->get_attribute_names_with_prefix( 'data-wp-each' )[0];
 				$extracted_suffix = $this->extract_prefix_and_suffix( $attribute_name );
 				$item_name        = isset( $extracted_suffix[1] ) ? $this->kebab_to_camel_case( $extracted_suffix[1] ) : 'item';
@@ -859,13 +934,13 @@ HTML;
 				 *   identified and removed in the client.
 				 */
 				if (
-					$manual_sdp ||
-					empty( $result ) ||
-					! is_array( $result ) ||
-					! array_is_list( $result ) ||
-					! str_starts_with( trim( $inner_content ), '<' ) ||
-					! str_ends_with( trim( $inner_content ), '>' )
-					) {
+				$manual_sdp ||
+				empty( $result ) ||
+				! is_array( $result ) ||
+				! array_is_list( $result ) ||
+				! str_starts_with( trim( $inner_content ), '<' ) ||
+				! str_ends_with( trim( $inner_content ), '>' )
+				) {
 					array_pop( $tag_stack );
 					return;
 				}
@@ -880,12 +955,9 @@ HTML;
 				$processed_content = '';
 				foreach ( $result as $item ) {
 					// Creates a new context that includes the current item of the array.
-					array_push(
-						$context_stack,
-						array_replace_recursive(
-							end( $context_stack ) !== false ? end( $context_stack ) : array(),
-							array( $namespace_value => array( $item_name => $item ) )
-						)
+					$context_stack[] = array_replace_recursive(
+						end( $context_stack ) !== false ? end( $context_stack ) : array(),
+						array( $namespace_value => array( $item_name => $item ) )
 					);
 
 					// Processes the inner content with the new context.

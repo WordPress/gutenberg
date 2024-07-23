@@ -23,10 +23,17 @@ test.describe( 'toVdom - islands', () => {
 		await expect( el ).toBeVisible();
 	} );
 
-	test( 'directives that are inside islands should be hydrated', async ( {
+	test( 'directives that are inside islands with json objects should be hydrated', async ( {
 		page,
 	} ) => {
-		const el = page.getByTestId( 'inside an island' );
+		const el = page.getByTestId( 'inside an island with json object' );
+		await expect( el ).toBeHidden();
+	} );
+
+	test( 'directives that are inside islands with strings should be hydrated', async ( {
+		page,
+	} ) => {
+		const el = page.getByTestId( 'inside an island with string' );
 		await expect( el ).toBeHidden();
 	} );
 

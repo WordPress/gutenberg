@@ -1,24 +1,24 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	Button,
 	ExternalLink,
 	__experimentalTruncate as Truncate,
-	Tooltip,
 } from '@wordpress/components';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { filterURLForDisplay, safeDecodeURI } from '@wordpress/url';
-import { Icon, globe, info, linkOff, edit, copy } from '@wordpress/icons';
+import { Icon, globe, info, linkOff, edit, copySmall } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -27,14 +27,33 @@ import { ViewerSlot } from './viewer-slot';
 
 import useRichUrlData from './use-rich-url-data';
 
+/**
+ * Filters the title for display. Removes the protocol and www prefix.
+ *
+ * @param {string} title The title to be filtered.
+ *
+ * @return {string} The filtered title.
+ */
+function filterTitleForDisplay( title ) {
+	// Derived from `filterURLForDisplay` in `@wordpress/url`.
+	return title
+		.replace( /^[a-z\-.\+]+[0-9]*:(\/\/)?/i, '' )
+		.replace( /^www\./i, '' );
+}
+
 export default function LinkPreview( {
 	value,
 	onEditClick,
 	hasRichPreviews = false,
 	hasUnlinkControl = false,
 	onRemove,
-	additionalControls,
 } ) {
+	const showIconLabels = useSelect(
+		( select ) =>
+			select( preferencesStore ).get( 'core', 'showIconLabels' ),
+		[]
+	);
+
 	// Avoid fetching if rich previews are not desired.
 	const showRichPreviews = hasRichPreviews ? value?.url : null;
 
@@ -54,6 +73,9 @@ export default function LinkPreview( {
 		! isEmptyURL &&
 		stripHTML( richData?.title || value?.title || displayURL );
 
+	const isUrlRedundant =
+		! value?.url || filterTitleForDisplay( displayTitle ) === displayURL;
+
 	let icon;
 
 	if ( richData?.icon ) {
@@ -66,7 +88,7 @@ export default function LinkPreview( {
 
 	const { createNotice } = useDispatch( noticesStore );
 	const ref = useCopyToClipboard( value.url, () => {
-		createNotice( 'info', __( 'Copied URL to clipboard.' ), {
+		createNotice( 'info', __( 'Link copied to clipboard.' ), {
 			isDismissible: true,
 			type: 'snackbar',
 		} );
@@ -75,7 +97,7 @@ export default function LinkPreview( {
 	return (
 		<div
 			aria-label={ __( 'Currently selected' ) }
-			className={ classnames( 'block-editor-link-control__search-item', {
+			className={ clsx( 'block-editor-link-control__search-item', {
 				'is-current': true,
 				'is-rich': hasRichData,
 				'is-fetching': !! isFetching,
@@ -87,7 +109,7 @@ export default function LinkPreview( {
 			<div className="block-editor-link-control__search-item-top">
 				<span className="block-editor-link-control__search-item-header">
 					<span
-						className={ classnames(
+						className={ clsx(
 							'block-editor-link-control__search-item-icon',
 							{
 								'is-image': richData?.icon,
@@ -99,17 +121,15 @@ export default function LinkPreview( {
 					<span className="block-editor-link-control__search-item-details">
 						{ ! isEmptyURL ? (
 							<>
-								<Tooltip text={ value.url }>
-									<ExternalLink
-										className="block-editor-link-control__search-item-title"
-										href={ value.url }
-									>
-										<Truncate numberOfLines={ 1 }>
-											{ displayTitle }
-										</Truncate>
-									</ExternalLink>
-								</Tooltip>
-								{ value?.url && displayTitle !== displayURL && (
+								<ExternalLink
+									className="block-editor-link-control__search-item-title"
+									href={ value.url }
+								>
+									<Truncate numberOfLines={ 1 }>
+										{ displayTitle }
+									</Truncate>
+								</ExternalLink>
+								{ ! isUrlRedundant && (
 									<span className="block-editor-link-control__search-item-info">
 										<Truncate numberOfLines={ 1 }>
 											{ displayURL }
@@ -124,34 +144,34 @@ export default function LinkPreview( {
 						) }
 					</span>
 				</span>
-
 				<Button
 					icon={ edit }
-					label={ __( 'Edit' ) }
-					className="block-editor-link-control__search-item-action"
+					label={ __( 'Edit link' ) }
 					onClick={ onEditClick }
 					size="compact"
 				/>
 				{ hasUnlinkControl && (
 					<Button
 						icon={ linkOff }
-						label={ __( 'Unlink' ) }
-						className="block-editor-link-control__search-item-action block-editor-link-control__unlink"
+						label={ __( 'Remove link' ) }
 						onClick={ onRemove }
 						size="compact"
 					/>
 				) }
 				<Button
-					icon={ copy }
-					label={ __( 'Copy URL' ) }
-					className="block-editor-link-control__search-item-action block-editor-link-control__copy"
+					icon={ copySmall }
+					label={ sprintf(
+						// Translators: %s is a placeholder for the link URL and an optional colon, (if a Link URL is present).
+						__( 'Copy link%s' ), // Ends up looking like "Copy link: https://example.com".
+						isEmptyURL || showIconLabels ? '' : ': ' + value.url
+					) }
 					ref={ ref }
+					accessibleWhenDisabled
 					disabled={ isEmptyURL }
 					size="compact"
 				/>
 				<ViewerSlot fillProps={ value } />
 			</div>
-			{ additionalControls && additionalControls() }
 		</div>
 	);
 }

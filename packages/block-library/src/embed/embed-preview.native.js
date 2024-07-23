@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { TouchableWithoutFeedback } from 'react-native';
-import classnames from 'classnames/dedupe';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -86,7 +86,7 @@ const EmbedPreview = ( {
 		__( 'Embedded content from %s' ),
 		parsedHostBaseUrl
 	);
-	const sandboxClassnames = classnames(
+	const sandboxClassnames = clsx(
 		type,
 		className,
 		'wp-block-embed__wrapper'

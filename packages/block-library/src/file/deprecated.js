@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -127,11 +127,11 @@ const v3 = {
 					{ showDownloadButton && (
 						<a
 							href={ href }
-							className={ classnames(
+							className={ clsx(
 								'wp-block-file__button',
 								__experimentalGetElementClassName( 'button' )
 							) }
-							download={ true }
+							download
 							aria-describedby={ describedById }
 						>
 							<RichText.Content value={ downloadButtonText } />
@@ -259,7 +259,7 @@ const v2 = {
 						<a
 							href={ href }
 							className="wp-block-file__button"
-							download={ true }
+							download
 							aria-describedby={ describedById }
 						>
 							<RichText.Content value={ downloadButtonText } />
@@ -372,7 +372,7 @@ const v1 = {
 						<a
 							href={ href }
 							className="wp-block-file__button"
-							download={ true }
+							download
 						>
 							<RichText.Content value={ downloadButtonText } />
 						</a>

@@ -7,6 +7,7 @@ import {
 	isBlockSubtreeDisabled,
 	getEnabledClientIdsTree,
 	getEnabledBlockParents,
+	getExpandedBlock,
 	isDragging,
 } from '../private-selectors';
 import { getBlockEditingMode } from '../selectors';
@@ -494,6 +495,18 @@ describe( 'private selectors', () => {
 			};
 
 			expect( isDragging( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'getExpandedBlock', () => {
+		it( 'should return the expanded block', () => {
+			const state = {
+				expandedBlock: '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+			};
+
+			expect( getExpandedBlock( state ) ).toBe(
+				'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f'
+			);
 		} );
 	} );
 } );

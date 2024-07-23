@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -10,16 +10,21 @@ import { useState, useEffect, useCallback } from '@wordpress/element';
 import { usePrevious } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import {
-	RichText,
 	BlockControls,
 	__experimentalGetElementClassName,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { ToolbarButton } from '@wordpress/components';
 import { caption as captionIcon } from '@wordpress/icons';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../lock-unlock';
+
 export function Caption( {
-	key = 'caption',
+	attributeKey = 'caption',
 	attributes,
 	setAttributes,
 	isSelected,
@@ -27,10 +32,18 @@ export function Caption( {
 	placeholder = __( 'Add caption' ),
 	label = __( 'Caption text' ),
 	showToolbarButton = true,
+	excludeElementClassName,
 	className,
+	readOnly,
+	tagName = 'figcaption',
+	addLabel = __( 'Add caption' ),
+	removeLabel = __( 'Remove caption' ),
+	icon = captionIcon,
+	...props
 } ) {
-	const caption = attributes[ key ];
+	const caption = attributes[ attributeKey ];
 	const prevCaption = usePrevious( caption );
+	const { PrivateRichText: RichText } = unlock( blockEditorPrivateApis );
 	const isCaptionEmpty = RichText.isEmpty( caption );
 	const isPrevCaptionEmpty = RichText.isEmpty( prevCaption );
 	const [ showCaption, setShowCaption ] = useState( ! isCaptionEmpty );
@@ -58,6 +71,7 @@ export function Caption( {
 		},
 		[ isCaptionEmpty ]
 	);
+
 	return (
 		<>
 			{ showToolbarButton && (
@@ -66,34 +80,34 @@ export function Caption( {
 						onClick={ () => {
 							setShowCaption( ! showCaption );
 							if ( showCaption && caption ) {
-								setAttributes( { caption: undefined } );
+								setAttributes( {
+									[ attributeKey ]: undefined,
+								} );
 							}
 						} }
-						icon={ captionIcon }
+						icon={ icon }
 						isPressed={ showCaption }
-						label={
-							showCaption
-								? __( 'Remove caption' )
-								: __( 'Add caption' )
-						}
+						label={ showCaption ? removeLabel : addLabel }
 					/>
 				</BlockControls>
 			) }
 			{ showCaption &&
 				( ! RichText.isEmpty( caption ) || isSelected ) && (
 					<RichText
-						identifier={ key }
-						tagName="figcaption"
-						className={ classnames(
+						identifier={ attributeKey }
+						tagName={ tagName }
+						className={ clsx(
 							className,
-							__experimentalGetElementClassName( 'caption' )
+							excludeElementClassName
+								? ''
+								: __experimentalGetElementClassName( 'caption' )
 						) }
 						ref={ ref }
 						aria-label={ label }
 						placeholder={ placeholder }
 						value={ caption }
 						onChange={ ( value ) =>
-							setAttributes( { caption: value } )
+							setAttributes( { [ attributeKey ]: value } )
 						}
 						inlineToolbar
 						__unstableOnSplitAtEnd={ () =>
@@ -101,6 +115,8 @@ export function Caption( {
 								createBlock( getDefaultBlockName() )
 							)
 						}
+						readOnly={ readOnly }
+						{ ...props }
 					/>
 				) }
 		</>

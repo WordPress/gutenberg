@@ -80,6 +80,28 @@ describe( 'BoxControl', () => {
 			expect( input ).toHaveValue( '50' );
 			expect( screen.getByRole( 'slider' ) ).toHaveValue( '50' );
 		} );
+
+		it( 'should render the number input with a default min value of 0', () => {
+			render( <BoxControl onChange={ () => {} } /> );
+
+			const input = screen.getByRole( 'textbox', { name: 'All sides' } );
+
+			expect( input ).toHaveAttribute( 'min', '0' );
+		} );
+
+		it( 'should pass down `inputProps` to the underlying number input', () => {
+			render(
+				<BoxControl
+					onChange={ () => {} }
+					inputProps={ { min: 10, max: 50 } }
+				/>
+			);
+
+			const input = screen.getByRole( 'textbox', { name: 'All sides' } );
+
+			expect( input ).toHaveAttribute( 'min', '10' );
+			expect( input ).toHaveAttribute( 'max', '50' );
+		} );
 	} );
 
 	describe( 'Reset', () => {

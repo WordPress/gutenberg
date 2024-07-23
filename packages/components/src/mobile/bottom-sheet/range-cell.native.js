@@ -181,7 +181,7 @@ class BottomSheetRangeCell extends Component {
 
 		return (
 			<View
-				accessible={ true }
+				accessible
 				accessibilityRole="adjustable"
 				accessibilityActions={ [
 					{ name: 'increment' },

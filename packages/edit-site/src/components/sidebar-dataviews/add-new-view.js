@@ -19,19 +19,17 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  * Internal dependencies
  */
 import SidebarNavigationItem from '../sidebar-navigation-item';
-import { DEFAULT_VIEWS } from './default-views';
+import { useDefaultViews } from './default-views';
 import { unlock } from '../../lock-unlock';
 
-const { useHistory, useLocation } = unlock( routerPrivateApis );
+const { useHistory } = unlock( routerPrivateApis );
 
 function AddNewItemModalContent( { type, setIsAdding } ) {
-	const {
-		params: { path },
-	} = useLocation();
 	const history = useHistory();
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const [ title, setTitle ] = useState( '' );
 	const [ isSaving, setIsSaving ] = useState( false );
+	const DEFAULT_VIEWS = useDefaultViews( { postType: type } );
 	return (
 		<form
 			onSubmit={ async ( event ) => {
@@ -68,8 +66,11 @@ function AddNewItemModalContent( { type, setIsAdding } ) {
 						),
 					}
 				);
+				const {
+					params: { postType },
+				} = history.getLocationWithParams();
 				history.push( {
-					path,
+					postType,
 					activeView: savedRecord.id,
 					isCustom: 'true',
 				} );

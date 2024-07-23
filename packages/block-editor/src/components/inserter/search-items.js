@@ -12,6 +12,17 @@ const defaultGetKeywords = ( item ) => item.keywords || [];
 const defaultGetCategory = ( item ) => item.category;
 const defaultGetCollection = () => null;
 
+// Normalization regexes
+const splitRegexp = [
+	/([\p{Ll}\p{Lo}\p{N}])([\p{Lu}\p{Lt}])/gu, // One lowercase or digit, followed by one uppercase.
+	/([\p{Lu}\p{Lt}])([\p{Lu}\p{Lt}][\p{Ll}\p{Lo}])/gu, // One uppercase followed by one uppercase and one lowercase.
+];
+const stripRegexp = /(\p{C}|\p{P}|\p{S})+/giu; // Anything that's not a punctuation, symbol or control/format character.
+
+// Normalization cache
+const extractedWords = new Map();
+const normalizedStrings = new Map();
+
 /**
  * Extracts words from an input string.
  *
@@ -19,16 +30,21 @@ const defaultGetCollection = () => null;
  *
  * @return {Array} Words, extracted from the input string.
  */
-function extractWords( input = '' ) {
-	return noCase( input, {
-		splitRegexp: [
-			/([\p{Ll}\p{Lo}\p{N}])([\p{Lu}\p{Lt}])/gu, // One lowercase or digit, followed by one uppercase.
-			/([\p{Lu}\p{Lt}])([\p{Lu}\p{Lt}][\p{Ll}\p{Lo}])/gu, // One uppercase followed by one uppercase and one lowercase.
-		],
-		stripRegexp: /(\p{C}|\p{P}|\p{S})+/giu, // Anything that's not a punctuation, symbol or control/format character.
+export function extractWords( input = '' ) {
+	if ( extractedWords.has( input ) ) {
+		return extractedWords.get( input );
+	}
+
+	const result = noCase( input, {
+		splitRegexp,
+		stripRegexp,
 	} )
 		.split( ' ' )
 		.filter( Boolean );
+
+	extractedWords.set( input, result );
+
+	return result;
 }
 
 /**
@@ -38,20 +54,26 @@ function extractWords( input = '' ) {
  *
  * @return {string} The normalized search input.
  */
-function normalizeSearchInput( input = '' ) {
+export function normalizeString( input = '' ) {
+	if ( normalizedStrings.has( input ) ) {
+		return normalizedStrings.get( input );
+	}
+
 	// Disregard diacritics.
 	//  Input: "média"
-	input = removeAccents( input );
+	let result = removeAccents( input );
 
 	// Accommodate leading slash, matching autocomplete expectations.
 	//  Input: "/media"
-	input = input.replace( /^\//, '' );
+	result = result.replace( /^\//, '' );
 
 	// Lowercase.
 	//  Input: "MEDIA"
-	input = input.toLowerCase();
+	result = result.toLowerCase();
 
-	return input;
+	normalizedStrings.set( input, result );
+
+	return result;
 }
 
 /**
@@ -62,7 +84,7 @@ function normalizeSearchInput( input = '' ) {
  * @return {string[]} The normalized list of search terms.
  */
 export const getNormalizedSearchTerms = ( input = '' ) => {
-	return extractWords( normalizeSearchInput( input ) );
+	return extractWords( normalizeString( input ) );
 };
 
 const removeMatchingTerms = ( unmatchedTerms, unprocessedTerms ) => {
@@ -148,8 +170,8 @@ export function getItemSearchRank( item, searchTerm, config = {} ) {
 	const category = getCategory( item );
 	const collection = getCollection( item );
 
-	const normalizedSearchInput = normalizeSearchInput( searchTerm );
-	const normalizedTitle = normalizeSearchInput( title );
+	const normalizedSearchInput = normalizeString( searchTerm );
+	const normalizedTitle = normalizeString( title );
 
 	let rank = 0;
 

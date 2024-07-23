@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 import type {
 	ForwardedRef,
 	KeyboardEvent,
@@ -41,6 +41,7 @@ import * as ariaHelper from './aria-helper';
 import Button from '../button';
 import StyleProvider from '../style-provider';
 import type { ModalProps } from './types';
+import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
 
 // Used to track and dismiss the prior modal when another opens unless nested.
 const ModalContext = createContext<
@@ -153,7 +154,9 @@ function UnforwardedModal(
 	useEffect( () => {
 		dismissers.push( refOnRequestClose );
 		const [ first, second ] = dismissers;
-		if ( second ) first?.current?.();
+		if ( second ) {
+			first?.current?.();
+		}
 
 		const nested = nestedDismissers.current;
 		return () => {
@@ -196,17 +199,6 @@ function UnforwardedModal(
 	}, [ isContentScrollable, childrenContainerRef ] );
 
 	function handleEscapeKeyDown( event: KeyboardEvent< HTMLDivElement > ) {
-		if (
-			// Ignore keydowns from IMEs
-			event.nativeEvent.isComposing ||
-			// Workaround for Mac Safari where the final Enter/Backspace of an IME composition
-			// is `isComposing=false`, even though it's technically still part of the composition.
-			// These can only be detected by keyCode.
-			event.keyCode === 229
-		) {
-			return;
-		}
-
 		if (
 			shouldCloseOnEsc &&
 			( event.code === 'Escape' || event.key === 'Escape' ) &&
@@ -253,7 +245,9 @@ function UnforwardedModal(
 		onPointerUp: ( { target, button } ) => {
 			const isSameTarget = target === pressTarget;
 			pressTarget = null;
-			if ( button === 0 && isSameTarget ) onRequestClose();
+			if ( button === 0 && isSameTarget ) {
+				onRequestClose();
+			}
 		},
 	};
 
@@ -261,16 +255,16 @@ function UnforwardedModal(
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
 			ref={ useMergeRefs( [ ref, forwardedRef ] ) }
-			className={ classnames(
+			className={ clsx(
 				'components-modal__screen-overlay',
 				overlayClassName
 			) }
-			onKeyDown={ handleEscapeKeyDown }
+			onKeyDown={ withIgnoreIMEEvents( handleEscapeKeyDown ) }
 			{ ...( shouldCloseOnClickOutside ? overlayPressHandlers : {} ) }
 		>
 			<StyleProvider document={ document }>
 				<div
-					className={ classnames(
+					className={ clsx(
 						'components-modal__frame',
 						sizeClass,
 						className
@@ -291,7 +285,7 @@ function UnforwardedModal(
 					onKeyDown={ onKeyDown }
 				>
 					<div
-						className={ classnames( 'components-modal__content', {
+						className={ clsx( 'components-modal__content', {
 							'hide-header': __experimentalHideHeader,
 							'is-scrollable': hasScrollableContent,
 							'has-scrolled-content': hasScrolledContent,

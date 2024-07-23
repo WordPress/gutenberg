@@ -6,11 +6,11 @@ import { ToolbarGroup, ToolbarItem } from '@wordpress/components';
 /**
  * Internal dependencies
  */
+import AspectRatioDropdown from './aspect-ratio-dropdown';
 import BlockControls from '../block-controls';
 import ImageEditingProvider from './context';
 import Cropper from './cropper';
 import ZoomDropdown from './zoom-dropdown';
-import AspectRatioDropdown from './aspect-ratio-dropdown';
 import RotationButton from './rotation-button';
 import FormControls from './form-controls';
 
@@ -19,7 +19,6 @@ export default function ImageEditor( {
 	url,
 	width,
 	height,
-	clientWidth,
 	naturalHeight,
 	naturalWidth,
 	onSaveImage,
@@ -40,7 +39,6 @@ export default function ImageEditor( {
 				url={ url }
 				width={ width }
 				height={ height }
-				clientWidth={ clientWidth }
 				naturalHeight={ naturalHeight }
 				naturalWidth={ naturalWidth }
 			/>

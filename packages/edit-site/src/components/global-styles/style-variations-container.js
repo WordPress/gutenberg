@@ -1,134 +1,136 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { useMemo, useContext, useState } from '@wordpress/element';
-import { ENTER } from '@wordpress/keycodes';
+import { useContext, useEffect, useMemo, useState } from '@wordpress/element';
 import { __experimentalGrid as Grid } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import { mergeBaseAndUserConfigs } from './global-styles-provider';
-import StylesPreview from './preview';
+import PreviewStyles from './preview-styles';
+import Variation from './variations/variation';
+import { isVariationWithProperties } from '../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
 import { unlock } from '../../lock-unlock';
 
-const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
-	blockEditorPrivateApis
-);
+const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
 
-function Variation( { variation } ) {
-	const [ isFocused, setIsFocused ] = useState( false );
-	const { base, user, setUserConfig } = useContext( GlobalStylesContext );
-	const context = useMemo( () => {
-		return {
-			user: {
-				settings: variation.settings ?? {},
-				styles: variation.styles ?? {},
-			},
-			base,
-			merged: mergeBaseAndUserConfigs( base, variation ),
-			setUserConfig: () => {},
-		};
-	}, [ variation, base ] );
+export default function StyleVariationsContainer( { gap = 2 } ) {
+	const { user } = useContext( GlobalStylesContext );
+	const [ currentUserStyles, setCurrentUserStyles ] = useState( user );
+	const userStyles = currentUserStyles?.styles;
 
-	const selectVariation = () => {
-		setUserConfig( () => {
-			return {
-				settings: variation.settings,
-				styles: variation.styles,
-			};
-		} );
-	};
+	useEffect( () => {
+		setCurrentUserStyles( user );
+	}, [ user ] );
 
-	const selectOnEnter = ( event ) => {
-		if ( event.keyCode === ENTER ) {
-			event.preventDefault();
-			selectVariation();
-		}
-	};
-
-	const isActive = useMemo( () => {
-		return areGlobalStyleConfigsEqual( user, variation );
-	}, [ user, variation ] );
-
-	let label = variation?.title;
-	if ( variation?.description ) {
-		label = sprintf(
-			/* translators: %1$s: variation title. %2$s variation description. */
-			__( '%1$s (%2$s)' ),
-			variation?.title,
-			variation?.description
-		);
-	}
-
-	return (
-		<GlobalStylesContext.Provider value={ context }>
-			<div
-				className={ classnames(
-					'edit-site-global-styles-variations_item',
-					{
-						'is-active': isActive,
-					}
-				) }
-				role="button"
-				onClick={ selectVariation }
-				onKeyDown={ selectOnEnter }
-				tabIndex="0"
-				aria-label={ label }
-				aria-current={ isActive }
-				onFocus={ () => setIsFocused( true ) }
-				onBlur={ () => setIsFocused( false ) }
-			>
-				<div className="edit-site-global-styles-variations_item-preview">
-					<StylesPreview
-						label={ variation?.title }
-						isFocused={ isFocused }
-						withHoverView
-					/>
-				</div>
-			</div>
-		</GlobalStylesContext.Provider>
-	);
-}
-
-export default function StyleVariationsContainer() {
 	const variations = useSelect( ( select ) => {
 		return select(
 			coreStore
 		).__experimentalGetCurrentThemeGlobalStylesVariations();
 	}, [] );
 
-	const withEmptyVariation = useMemo( () => {
-		return [
+	// Filter out variations that are color or typography variations.
+	const fullStyleVariations = variations?.filter( ( variation ) => {
+		return (
+			! isVariationWithProperties( variation, [ 'color' ] ) &&
+			! isVariationWithProperties( variation, [
+				'typography',
+				'spacing',
+			] )
+		);
+	} );
+
+	const themeVariations = useMemo( () => {
+		const withEmptyVariation = [
 			{
 				title: __( 'Default' ),
 				settings: {},
 				styles: {},
 			},
-			...( variations ?? [] ).map( ( variation ) => ( {
-				...variation,
-				settings: variation.settings ?? {},
-				styles: variation.styles ?? {},
-			} ) ),
+			...( fullStyleVariations ?? [] ),
 		];
-	}, [ variations ] );
+		return [
+			...withEmptyVariation.map( ( variation ) => {
+				const blockStyles = { ...variation?.styles?.blocks } || {};
+
+				// We need to copy any user custom CSS to the variation to prevent it being lost
+				// when switching variations.
+				if ( userStyles?.blocks ) {
+					Object.keys( userStyles.blocks ).forEach( ( blockName ) => {
+						// First get any block specific custom CSS from the current user styles and merge with any custom CSS for
+						// that block in the variation.
+						if ( userStyles.blocks[ blockName ].css ) {
+							const variationBlockStyles =
+								blockStyles[ blockName ] || {};
+							const customCSS = {
+								css: `${
+									blockStyles[ blockName ]?.css || ''
+								} ${
+									userStyles.blocks[ blockName ].css.trim() ||
+									''
+								}`,
+							};
+							blockStyles[ blockName ] = {
+								...variationBlockStyles,
+								...customCSS,
+							};
+						}
+					} );
+				}
+				// Now merge any global custom CSS from current user styles with global custom CSS in the variation.
+				const css =
+					userStyles?.css || variation.styles?.css
+						? {
+								css: `${ variation.styles?.css || '' } ${
+									userStyles?.css || ''
+								}`,
+						  }
+						: {};
+
+				const blocks =
+					Object.keys( blockStyles ).length > 0
+						? { blocks: blockStyles }
+						: {};
+
+				const styles = {
+					...variation.styles,
+					...css,
+					...blocks,
+				};
+				return {
+					...variation,
+					settings: variation.settings ?? {},
+					styles,
+				};
+			} ),
+		];
+	}, [ fullStyleVariations, userStyles?.blocks, userStyles?.css ] );
+
+	if ( ! fullStyleVariations || fullStyleVariations?.length < 1 ) {
+		return null;
+	}
 
 	return (
 		<Grid
 			columns={ 2 }
 			className="edit-site-global-styles-style-variations-container"
+			gap={ gap }
 		>
-			{ withEmptyVariation.map( ( variation, index ) => (
-				<Variation key={ index } variation={ variation } />
+			{ themeVariations.map( ( variation, index ) => (
+				<Variation key={ index } variation={ variation }>
+					{ ( isFocused ) => (
+						<PreviewStyles
+							label={ variation?.title }
+							withHoverView
+							isFocused={ isFocused }
+							variation={ variation }
+						/>
+					) }
+				</Variation>
 			) ) }
 		</Grid>
 	);

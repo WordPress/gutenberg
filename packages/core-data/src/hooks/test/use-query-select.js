@@ -116,6 +116,7 @@ describe( 'useQuerySelect', () => {
 			data: 'bar',
 			isResolving: false,
 			hasResolved: false,
+			hasStarted: false,
 			status: 'IDLE',
 		} );
 	} );
@@ -165,6 +166,7 @@ describe( 'useQuerySelect', () => {
 			data: 10,
 			isResolving: false,
 			hasResolved: false,
+			hasStarted: false,
 			status: 'IDLE',
 		} );
 
@@ -180,6 +182,7 @@ describe( 'useQuerySelect', () => {
 				data: 15,
 				isResolving: false,
 				hasResolved: true,
+				hasStarted: true,
 				status: 'SUCCESS',
 			} )
 		);

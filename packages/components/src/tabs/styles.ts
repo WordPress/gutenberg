@@ -2,7 +2,6 @@
  * External dependencies
  */
 import styled from '@emotion/styled';
-// eslint-disable-next-line no-restricted-imports
 import * as Ariakit from '@ariakit/react';
 
 /**
@@ -10,14 +9,50 @@ import * as Ariakit from '@ariakit/react';
  */
 import { COLORS } from '../utils';
 import { space } from '../utils/space';
-import { reduceMotion } from '../utils/reduce-motion';
 
 export const TabListWrapper = styled.div`
+	position: relative;
 	display: flex;
 	align-items: stretch;
 	flex-direction: row;
+	text-align: center;
+
 	&[aria-orientation='vertical'] {
 		flex-direction: column;
+		text-align: start;
+	}
+
+	@media not ( prefers-reduced-motion: reduce ) {
+		&.is-animation-enabled::after {
+			transition-property: left, top, width, height;
+			transition-duration: 0.2s;
+			transition-timing-function: ease-out;
+		}
+	}
+	&::after {
+		content: '';
+		position: absolute;
+		pointer-events: none;
+
+		// Windows high contrast mode.
+		outline: 2px solid transparent;
+		outline-offset: -1px;
+	}
+	&:not( [aria-orientation='vertical'] )::after {
+		bottom: 0;
+		left: var( --indicator-left );
+		width: var( --indicator-width );
+		height: 0;
+		border-bottom: var( --wp-admin-border-width-focus ) solid
+			${ COLORS.theme.accent };
+	}
+	&[aria-orientation='vertical']::after {
+		z-index: -1;
+		left: 0;
+		width: 100%;
+		top: var( --indicator-top );
+		height: var( --indicator-height );
+		background-color: ${ COLORS.theme.gray[ 100 ] };
 	}
 `;
 
@@ -27,21 +62,28 @@ export const Tab = styled( Ariakit.Tab )`
 		align-items: center;
 		position: relative;
 		border-radius: 0;
-		height: ${ space( 12 ) };
+		min-height: ${ space(
+			12
+		) }; // Avoid fixed height to allow for long strings that go in multiple lines.
+		height: auto;
 		background: transparent;
 		border: none;
 		box-shadow: none;
 		cursor: pointer;
-		padding: 3px ${ space( 4 ) }; // Use padding to offset the [aria-selected="true"] border, this benefits Windows High Contrast mode
+		line-height: 1.2; // Some languages characters e.g. Japanese may have a native higher line-height.
+		padding: ${ space( 4 ) };
 		margin-left: 0;
 		font-weight: 500;
+		text-align: inherit;
+		hyphens: auto;
+		color: ${ COLORS.theme.foreground };
 
 		&[aria-disabled='true'] {
 			cursor: default;
-			opacity: 0.3;
+			color: ${ COLORS.ui.textDisabled };
 		}
 
-		&:hover {
+		&:not( [aria-disabled='true'] ):hover {
 			color: ${ COLORS.theme.accent };
 		}
 
@@ -49,34 +91,6 @@ export const Tab = styled( Ariakit.Tab )`
 			position: relative;
 			box-shadow: none;
 			outline: none;
-		}
-
-		// Tab indicator
-		&::after {
-			content: '';
-			position: absolute;
-			right: 0;
-			bottom: 0;
-			left: 0;
-			pointer-events: none;
-
-			// Draw the indicator.
-			background: ${ COLORS.theme.accent };
-			height: calc( 0 * var( --wp-admin-border-width-focus ) );
-			border-radius: 0;
-
-			// Animation
-			transition: all 0.1s linear;
-			${ reduceMotion( 'transition' ) };
-		}
-
-		// Active.
-		&[aria-selected='true']::after {
-			height: calc( 1 * var( --wp-admin-border-width-focus ) );
-
-			// Windows high contrast mode.
-			outline: 2px solid transparent;
-			outline-offset: -1px;
 		}
 
 		// Focus.
@@ -90,21 +104,28 @@ export const Tab = styled( Ariakit.Tab )`
 			pointer-events: none;
 
 			// Draw the indicator.
-			box-shadow: 0 0 0 0 transparent;
+			// Outline works for Windows high contrast mode as well.
+			outline: var( --wp-admin-border-width-focus ) solid
+				${ COLORS.theme.accent };
 			border-radius: 2px;
 
 			// Animation
-			transition: all 0.1s linear;
-			${ reduceMotion( 'transition' ) };
+			opacity: 0;
+
+			@media not ( prefers-reduced-motion ) {
+				transition: opacity 0.1s linear;
+			}
 		}
 
 		&:focus-visible::before {
-			box-shadow: 0 0 0 var( --wp-admin-border-width-focus )
-				${ COLORS.theme.accent };
-
-			// Windows high contrast mode.
-			outline: 2px solid transparent;
+			opacity: 1;
 		}
+	}
+
+	[aria-orientation='vertical'] & {
+		min-height: ${ space(
+			10
+		) }; // Avoid fixed height to allow for long strings that go in multiple lines.
 	}
 `;
 

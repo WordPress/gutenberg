@@ -1,7 +1,13 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
+import type { ForwardedRef } from 'react';
+
+/**
+ * WordPress dependencies
+ */
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -31,7 +37,8 @@ export const noop = () => {};
  * ```
  */
 export function FormToggle(
-	props: WordPressComponentProps< FormToggleProps, 'input', false >
+	props: WordPressComponentProps< FormToggleProps, 'input', false >,
+	ref: ForwardedRef< HTMLInputElement >
 ) {
 	const {
 		className,
@@ -41,7 +48,7 @@ export function FormToggle(
 		onChange = noop,
 		...additionalProps
 	} = props;
-	const wrapperClasses = classnames( 'components-form-toggle', className, {
+	const wrapperClasses = clsx( 'components-form-toggle', className, {
 		'is-checked': checked,
 		'is-disabled': disabled,
 	} );
@@ -56,6 +63,7 @@ export function FormToggle(
 				onChange={ onChange }
 				disabled={ disabled }
 				{ ...additionalProps }
+				ref={ ref }
 			/>
 			<span className="components-form-toggle__track"></span>
 			<span className="components-form-toggle__thumb"></span>
@@ -63,4 +71,4 @@ export function FormToggle(
 	);
 }
 
-export default FormToggle;
+export default forwardRef( FormToggle );

@@ -10,7 +10,7 @@ import { useCallback } from '@wordpress/element';
  */
 import { store as blockEditorStore } from '../../store';
 import { cleanEmptyObject } from '../../hooks/utils';
-import { TOOLSPANEL_DROPDOWNMENU_PROPS } from '../global-styles/utils';
+import { useToolsPanelDropdownMenuProps } from '../global-styles/utils';
 
 export default function BlockSupportToolsPanel( { children, group, label } ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
@@ -20,7 +20,7 @@ export default function BlockSupportToolsPanel( { children, group, label } ) {
 		getSelectedBlockClientId,
 		hasMultiSelection,
 	} = useSelect( blockEditorStore );
-
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const panelId = getSelectedBlockClientId();
 	const resetAll = useCallback(
 		( resetFilters = [] ) => {
@@ -68,11 +68,11 @@ export default function BlockSupportToolsPanel( { children, group, label } ) {
 			resetAll={ resetAll }
 			key={ panelId }
 			panelId={ panelId }
-			hasInnerWrapper={ true }
-			shouldRenderPlaceholderItems={ true } // Required to maintain fills ordering.
+			hasInnerWrapper
+			shouldRenderPlaceholderItems // Required to maintain fills ordering.
 			__experimentalFirstVisibleItemClass="first"
 			__experimentalLastVisibleItemClass="last"
-			dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
+			dropdownMenuProps={ dropdownMenuProps }
 		>
 			{ children }
 		</ToolsPanel>

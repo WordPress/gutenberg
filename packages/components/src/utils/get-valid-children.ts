@@ -18,7 +18,9 @@ import { Children, isValidElement } from '@wordpress/element';
 export function getValidChildren(
 	children: ReactNode
 ): Array< ReactChild | ReactFragment | ReactPortal > {
-	if ( typeof children === 'string' ) return [ children ];
+	if ( typeof children === 'string' ) {
+		return [ children ];
+	}
 
 	return Children.toArray( children ).filter( ( child ) =>
 		isValidElement( child )

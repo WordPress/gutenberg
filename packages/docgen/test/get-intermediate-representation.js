@@ -284,6 +284,47 @@ describe( 'Intermediate Representation', () => {
 					} ),
 				] ) );
 
+			it( 'named identifier with RestElements', () => {
+				expect(
+					parse( `
+						/**
+						 * RestElement example.
+						 */
+						const { someKey, ...someApi } = { someKey: 2, restOne: 1, restTwo: 2 };
+
+						export {someApi};
+					` )
+				).toEqual( [
+					{
+						description: 'RestElement example.',
+						lineEnd: 6,
+						lineStart: 6,
+						name: 'someApi',
+						path: 'test-code.ts',
+						tags: [],
+					},
+				] );
+			} );
+
+			it( 'named identifier with undocumented RestElement', () => {
+				expect(
+					parse( `
+						const { someKey, ...otherKeys } = { someKey: 2, restOne: 1, restTwo: 2 };
+
+						export const someApi = {};
+					` )
+				).toEqual( [
+					{
+						description: 'Undocumented declaration.',
+						lineEnd: 3,
+						lineStart: 3,
+						name: 'someApi',
+						path: 'test-code.ts',
+						tags: [],
+					},
+				] );
+			} );
+
 			it( 'named identifier with destructuring', () =>
 				expect(
 					parse( `

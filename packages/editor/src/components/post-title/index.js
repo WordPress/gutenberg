@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
-
+import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
@@ -25,23 +24,18 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 /**
  * Internal dependencies
  */
-import { store as editorStore } from '../../store';
 import { DEFAULT_CLASSNAMES, REGEXP_NEWLINES } from './constants';
 import usePostTitleFocus from './use-post-title-focus';
 import usePostTitle from './use-post-title';
 import PostTypeSupportCheck from '../post-type-support-check';
 
 function PostTitle( _, forwardedRef ) {
-	const { placeholder, hasFixedToolbar } = useSelect( ( select ) => {
-		const { getEditedPostAttribute } = select( editorStore );
+	const { placeholder } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
-		const { titlePlaceholder, hasFixedToolbar: _hasFixedToolbar } =
-			getSettings();
+		const { titlePlaceholder } = getSettings();
 
 		return {
-			title: getEditedPostAttribute( 'title' ),
 			placeholder: titlePlaceholder,
-			hasFixedToolbar: _hasFixedToolbar,
 		};
 	}, [] );
 
@@ -91,21 +85,14 @@ function PostTitle( _, forwardedRef ) {
 		let plainText = '';
 		let html = '';
 
-		// IE11 only supports `Text` as an argument for `getData` and will
-		// otherwise throw an invalid argument error, so we try the standard
-		// arguments first, then fallback to `Text` if they fail.
 		try {
 			plainText = clipboardData.getData( 'text/plain' );
 			html = clipboardData.getData( 'text/html' );
-		} catch ( error1 ) {
-			try {
-				html = clipboardData.getData( 'Text' );
-			} catch ( error2 ) {
-				// Some browsers like UC Browser paste plain text by default and
-				// don't support clipboardData at all, so allow default
-				// behaviour.
-				return;
-			}
+		} catch ( error ) {
+			// Some browsers like UC Browser paste plain text by default and
+			// don't support clipboardData at all, so allow default
+			// behaviour.
+			return;
 		}
 
 		// Allows us to ask for this information when we get a report.
@@ -188,9 +175,8 @@ function PostTitle( _, forwardedRef ) {
 
 	// The wp-block className is important for editor styles.
 	// This same block is used in both the visual and the code editor.
-	const className = classnames( DEFAULT_CLASSNAMES, {
+	const className = clsx( DEFAULT_CLASSNAMES, {
 		'is-selected': isSelected,
-		'has-fixed-toolbar': hasFixedToolbar,
 	} );
 
 	return (
@@ -214,4 +200,12 @@ function PostTitle( _, forwardedRef ) {
 	);
 }
 
+/**
+ * Renders the `PostTitle` component.
+ *
+ * @param {Object}  _            Unused parameter.
+ * @param {Element} forwardedRef Forwarded ref for the component.
+ *
+ * @return {Component} The rendered PostTitle component.
+ */
 export default forwardRef( PostTitle );

@@ -18,12 +18,12 @@ test.describe( 'Site Editor - Multi-entity save flow', () => {
 		] );
 	} );
 
-	test.beforeEach( async ( { admin, editor } ) => {
+	test.beforeEach( async ( { admin } ) => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//index',
 			postType: 'wp_template',
+			canvas: 'edit',
 		} );
-		await editor.canvas.locator( 'body' ).click();
 	} );
 
 	test( 'save flow should work as expected', async ( { editor, page } ) => {
@@ -41,16 +41,20 @@ test.describe( 'Site Editor - Multi-entity save flow', () => {
 		).toBeEnabled();
 		await expect(
 			page
-				.getByRole( 'region', { name: 'Save panel' } )
+				.getByRole( 'region', { name: 'Editor publish' } )
 				.getByRole( 'button', { name: 'Open save panel' } )
 		).toBeVisible();
 
-		await editor.saveSiteEditorEntities();
-		await expect(
-			page
-				.getByRole( 'region', { name: 'Editor top bar' } )
-				.getByRole( 'button', { name: 'Saved' } )
-		).toBeDisabled();
+		await editor.saveSiteEditorEntities( {
+			isOnlyCurrentEntityDirty: true,
+		} );
+		const saveButton = page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Save' } );
+		await expect( saveButton ).toBeDisabled();
+
+		// Check focus returns to Saved button.
+		await expect( saveButton ).toBeFocused();
 	} );
 
 	test( 'save flow should allow re-saving after changing the same block attribute', async ( {
@@ -72,7 +76,9 @@ test.describe( 'Site Editor - Multi-entity save flow', () => {
 		// Change font size.
 		await fontSizePicker.getByRole( 'radio', { name: 'Small' } ).click();
 
-		await editor.saveSiteEditorEntities();
+		await editor.saveSiteEditorEntities( {
+			isOnlyCurrentEntityDirty: true,
+		} );
 
 		// Change font size again.
 		await fontSizePicker.getByRole( 'radio', { name: 'Medium' } ).click();

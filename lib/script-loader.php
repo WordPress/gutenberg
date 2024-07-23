@@ -43,6 +43,21 @@ function gutenberg_enqueue_global_styles() {
 	add_filter( 'wp_theme_json_get_style_nodes', 'wp_filter_out_block_nodes' );
 
 	$stylesheet = gutenberg_get_global_stylesheet();
+
+	if ( $is_block_theme ) {
+		/*
+		 * Dequeue the Customizer's custom CSS
+		 * and add it before the global styles custom CSS.
+		 */
+		remove_action( 'wp_head', 'wp_custom_css_cb', 101 );
+		// Get the custom CSS from the Customizer and add it to the global stylesheet.
+		$custom_css  = wp_get_custom_css();
+		$stylesheet .= $custom_css;
+
+		// Add the global styles custom CSS at the end.
+		$stylesheet .= gutenberg_get_global_stylesheet( array( 'custom-css' ) );
+	}
+
 	if ( empty( $stylesheet ) ) {
 		return;
 	}
@@ -63,6 +78,7 @@ add_action( 'wp_footer', 'gutenberg_enqueue_global_styles', 1 );
  * @since 6.2.0
  */
 function gutenberg_enqueue_global_styles_custom_css() {
+	_deprecated_function( __FUNCTION__, 'Gutenberg 17.8.0', 'gutenberg_enqueue_global_styles' );
 	if ( ! wp_is_block_theme() ) {
 		return;
 	}
@@ -77,8 +93,6 @@ function gutenberg_enqueue_global_styles_custom_css() {
 		wp_add_inline_style( 'global-styles', $custom_css );
 	}
 }
-remove_action( 'wp_enqueue_scripts', 'wp_enqueue_global_styles_custom_css' );
-add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_global_styles_custom_css' );
 
 /**
  * Function that enqueues the CSS Custom Properties coming from theme.json.

@@ -1,5 +1,9 @@
 .block-library-query-toolbar__popover .components-popover__content {
 	min-width: 230px;
+
+	.block-library-query-toolbar__popover-number-control {
+		margin-bottom: $grid-unit-10;
+	}
 }
 
 .wp-block-query__create-new-link {
@@ -39,17 +43,9 @@
 		position: sticky;
 		top: 0;
 		padding: $grid-unit-20 0;
-		margin-bottom: 2px;
+		transform: translateY(- $grid-unit-05); // Offsets the top padding on the modal content container
+		margin-bottom: - $grid-unit-05;
 		z-index: z-index(".block-library-query-pattern__selection-search");
-	}
-}
-
-.block-library-query-toolspanel__filters {
-	.components-form-token-field__help {
-		margin-bottom: 0;
-	}
-	.block-library-query-inspector__taxonomy-control:not(:last-child) {
-		margin-bottom: $grid-unit-30;
 	}
 }
 

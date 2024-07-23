@@ -19,8 +19,8 @@ test.describe( 'Editing Navigation Menus', () => {
 		requestUtils,
 		editor,
 	} ) => {
-		await test.step( 'Manually browse to focus mode for a Navigation Menu', async () => {
-			// create a Navigation Menu called "Test Menu" using the REST API helpers
+		await test.step( 'Check Navigation block is present and locked', async () => {
+			// Create a Navigation Menu called "Primary Menu" using the REST API helpers.
 			const createdMenu = await requestUtils.createNavigationMenu( {
 				title: 'Primary Menu',
 				content:
@@ -34,75 +34,18 @@ test.describe( 'Editing Navigation Menus', () => {
 					'<!-- wp:navigation-link {"label":"Another Item","type":"custom","url":"http://www.wordpress.org/","kind":"custom"} /-->',
 			} );
 
-			// We could Navigate directly to editing the Navigation Menu but we intentionally do not do this.
-			//
-			// Why? To provide coverage for a bug that caused the Navigation Editor behaviours to fail
-			// only when navigating through the editor screens (rather than going directly to the editor by URL).
-			// See: https://github.com/WordPress/gutenberg/pull/56856.
-			//
-			// Example (what we could do):
-			// await admin.visitSiteEditor( {
-			// 	postId: createdMenu?.id,
-			// 	postType: 'wp_navigation',
-			// } );
-			//
-			await admin.visitSiteEditor();
-
-			const editorSidebar = page.getByRole( 'region', {
-				name: 'Navigation',
+			await admin.visitSiteEditor( {
+				postId: createdMenu?.id,
+				postType: 'wp_navigation',
+				canvas: 'edit',
 			} );
 
-			await editorSidebar
-				.getByRole( 'button', {
-					name: 'Navigation',
-				} )
-				.click();
-
-			// Wait for list of Navigations to appear.
-			await expect(
-				editorSidebar.getByRole( 'heading', {
-					name: 'Navigation',
-					level: 1,
-				} )
-			).toBeVisible();
-
-			await expect( page ).toHaveURL(
-				`wp-admin/site-editor.php?path=%2Fnavigation`
-			);
-
-			await editorSidebar
-				.getByRole( 'button', {
-					name: 'Primary Menu',
-				} )
-				.click();
-
-			await expect( page ).toHaveURL(
-				`wp-admin/site-editor.php?postId=${ createdMenu?.id }&postType=wp_navigation`
-			);
-
-			// Wait for list of Navigations to appear.
-			await expect(
-				editorSidebar.getByRole( 'heading', {
-					name: 'Primary Menu',
-					level: 1,
-				} )
-			).toBeVisible();
-
-			// Switch to editing the Navigation Menu
-			await editorSidebar
-				.getByRole( 'link', {
-					name: 'Edit',
-				} )
-				.click();
-		} );
-
-		await test.step( 'Check Navigation block is present and locked', async () => {
 			// Open List View.
 			await pageUtils.pressKeys( 'access+o' );
 
 			const listView = page
 				.getByRole( 'region', {
-					name: 'List View',
+					name: 'Document Overview',
 				} )
 				.getByRole( 'treegrid', {
 					name: 'Block navigation structure',
@@ -111,19 +54,25 @@ test.describe( 'Editing Navigation Menus', () => {
 			await expect( listView ).toBeVisible();
 
 			const navBlockNode = listView.getByRole( 'link', {
-				name: 'Navigation (locked)',
+				name: 'Navigation',
 				exact: true,
 			} );
 
-			// The Navigation block should be present and locked.
+			// The Navigation block should be present.
 			await expect( navBlockNode ).toBeVisible();
+
+			// The Navigation block description should contain the locked state information.
+			await expect( navBlockNode ).toHaveAccessibleDescription(
+				/This block is locked./
+			);
 
 			// The block should have no options menu.
 			await expect(
-				listView.getByRole( 'button', {
-					name: 'Options for Navigation',
-					exact: true,
-				} )
+				navBlockNode
+					.locator( '..' ) // parent selector.
+					.getByRole( 'button', {
+						name: 'Options',
+					} )
 			).toBeHidden();
 
 			// Select the Navigation block.
@@ -148,7 +97,7 @@ test.describe( 'Editing Navigation Menus', () => {
 
 			// Check the standard tabs are not present.
 			await expect(
-				sidebar.getByRole( 'tab', { name: 'List View' } )
+				sidebar.getByRole( 'tab', { name: 'Document Overview' } )
 			).toBeHidden();
 			await expect(
 				sidebar.getByRole( 'tab', { name: 'Settings' } )

@@ -21,6 +21,7 @@ export const TEMPLATE_ORIGINS = {
 	plugin: 'plugin',
 };
 export const TEMPLATE_PART_AREA_DEFAULT_CATEGORY = 'uncategorized';
+export const TEMPLATE_PART_ALL_AREAS_CATEGORY = 'all-parts';
 
 // Patterns.
 export const {
@@ -49,6 +50,8 @@ export const POST_TYPE_LABELS = {
 export const LAYOUT_GRID = 'grid';
 export const LAYOUT_TABLE = 'table';
 export const LAYOUT_LIST = 'list';
-export const ENUMERATION_TYPE = 'enumeration';
-export const OPERATOR_IN = 'in';
-export const OPERATOR_NOT_IN = 'notIn';
+
+export const OPERATOR_IS = 'is';
+export const OPERATOR_IS_NOT = 'isNot';
+export const OPERATOR_IS_ANY = 'isAny';
+export const OPERATOR_IS_NONE = 'isNone';

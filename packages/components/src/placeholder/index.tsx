@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -68,14 +68,14 @@ export function Placeholder(
 		};
 	}
 
-	const classes = classnames(
+	const classes = clsx(
 		'components-placeholder',
 		className,
 		modifierClassNames,
 		withIllustration ? 'has-illustration' : null
 	);
 
-	const fieldsetClasses = classnames( 'components-placeholder__fieldset', {
+	const fieldsetClasses = clsx( 'components-placeholder__fieldset', {
 		'is-column-layout': isColumnLayout,
 	} );
 

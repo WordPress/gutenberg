@@ -75,7 +75,9 @@ export default function placeCaretAtEdge( container, isReverse, x ) {
 		getRange( container, isReverse, x )
 	);
 
-	if ( ! range ) return;
+	if ( ! range ) {
+		return;
+	}
 
 	const { ownerDocument } = container;
 	const { defaultView } = ownerDocument;

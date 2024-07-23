@@ -9,8 +9,11 @@ const browserslist = require( 'browserslist' );
 const MiniCSSExtractPlugin = require( 'mini-css-extract-plugin' );
 const { basename, dirname, resolve } = require( 'path' );
 const ReactRefreshWebpackPlugin = require( '@pmmmwh/react-refresh-webpack-plugin' );
+const RtlCssPlugin = require( 'rtlcss-webpack-plugin' );
 const TerserPlugin = require( 'terser-webpack-plugin' );
 const { realpathSync } = require( 'fs' );
+const { sync: glob } = require( 'fast-glob' );
+const { validate } = require( 'schema-utils' );
 
 /**
  * WordPress dependencies
@@ -29,10 +32,11 @@ const {
 	hasPostCSSConfig,
 	getWordPressSrcDirectory,
 	getWebpackEntryPoints,
-	getRenderPropPaths,
+	getPhpFilePaths,
 	getAsBooleanFromENV,
 	getBlockJsonModuleFields,
 	getBlockJsonScriptFields,
+	fromProjectRoot,
 } = require( '../utils' );
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -46,24 +50,45 @@ const hasExperimentalModulesFlag = getAsBooleanFromENV(
 	'WP_EXPERIMENTAL_MODULES'
 );
 
+const phpFilePathsPluginSchema = {
+	type: 'object',
+	properties: {
+		props: {
+			type: 'array',
+			items: {
+				type: 'string',
+			},
+		},
+	},
+};
+
 /**
- * The plugin recomputes the render paths once on each compilation. It is necessary to avoid repeating processing
+ * The plugin recomputes PHP file paths once on each compilation. It is necessary to avoid repeating processing
  * when filtering every discovered PHP file in the source folder. This is the most performant way to ensure that
  * changes in `block.json` files are picked up in watch mode.
  */
-class RenderPathsPlugin {
+class PhpFilePathsPlugin {
 	/**
-	 * Paths with the `render` props included in `block.json` files.
+	 * PHP file paths from `render` and `variations` props found in `block.json` files.
 	 *
 	 * @type {string[]}
 	 */
-	static renderPaths;
+	static paths;
+
+	constructor( options = {} ) {
+		validate( phpFilePathsPluginSchema, options, {
+			name: 'PHP File Paths Plugin',
+			baseDataPath: 'options',
+		} );
+
+		this.options = options;
+	}
 
 	apply( compiler ) {
 		const pluginName = this.constructor.name;
 
 		compiler.hooks.thisCompilation.tap( pluginName, () => {
-			this.constructor.renderPaths = getRenderPropPaths();
+			this.constructor.paths = getPhpFilePaths( this.options.props );
 		} );
 	}
 }
@@ -304,7 +329,8 @@ const scriptConfig = {
 	plugins: [
 		new webpack.DefinePlugin( {
 			// Inject the `SCRIPT_DEBUG` global, used for development features flagging.
-			SCRIPT_DEBUG: ! isProduction,
+			'globalThis.SCRIPT_DEBUG': JSON.stringify( ! isProduction ),
+			SCRIPT_DEBUG: JSON.stringify( ! isProduction ),
 		} ),
 
 		// If we run a modules build, the 2 compilations can "clean" each other's output
@@ -317,7 +343,7 @@ const scriptConfig = {
 				cleanStaleWebpackAssets: false,
 			} ),
 
-		new RenderPathsPlugin(),
+		new PhpFilePathsPlugin( { props: [ 'render', 'variations' ] } ),
 		new CopyWebpackPlugin( {
 			patterns: [
 				{
@@ -367,7 +393,7 @@ const scriptConfig = {
 					filter: ( filepath ) => {
 						return (
 							process.env.WP_COPY_PHP_FILES_TO_DIST ||
-							RenderPathsPlugin.renderPaths.includes(
+							PhpFilePathsPlugin.paths.includes(
 								realpathSync( filepath ).replace( /\\/g, '/' )
 							)
 						);
@@ -380,6 +406,10 @@ const scriptConfig = {
 		process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
 		// MiniCSSExtractPlugin to extract the CSS thats gets imported into JavaScript.
 		new MiniCSSExtractPlugin( { filename: '[name].css' } ),
+		// RtlCssPlugin to generate RTL CSS files.
+		new RtlCssPlugin( {
+			filename: `[name]-rtl.css`,
+		} ),
 		// React Fast Refresh.
 		hasReactFastRefresh && new ReactRefreshWebpackPlugin(),
 		// WP_NO_EXTERNALS global variable controls whether scripts' assets get
@@ -390,6 +420,37 @@ const scriptConfig = {
 };
 
 if ( hasExperimentalModulesFlag ) {
+	/**
+	 * Add block.json files to compilation to ensure changes trigger rebuilds when watching
+	 */
+	class BlockJsonDependenciesPlugin {
+		constructor() {
+			/** @type {ReadonlyArray<string>} */
+			this.blockJsonFiles = glob( '**/block.json', {
+				absolute: true,
+				cwd: fromProjectRoot( getWordPressSrcDirectory() ),
+			} );
+		}
+
+		/**
+		 * Apply the plugin
+		 * @param {webpack.Compiler} compiler the compiler instance
+		 * @return {void}
+		 */
+		apply( compiler ) {
+			if ( this.blockJsonFiles.length ) {
+				compiler.hooks.compilation.tap(
+					'BlockJsonDependenciesPlugin',
+					( compilation ) => {
+						compilation.fileDependencies.addAll(
+							this.blockJsonFiles
+						);
+					}
+				);
+			}
+		}
+	}
+
 	/** @type {webpack.Configuration} */
 	const moduleConfig = {
 		...baseConfig,
@@ -418,7 +479,8 @@ if ( hasExperimentalModulesFlag ) {
 		plugins: [
 			new webpack.DefinePlugin( {
 				// Inject the `SCRIPT_DEBUG` global, used for development features flagging.
-				SCRIPT_DEBUG: ! isProduction,
+				'globalThis.SCRIPT_DEBUG': JSON.stringify( ! isProduction ),
+				SCRIPT_DEBUG: JSON.stringify( ! isProduction ),
 			} ),
 			// The WP_BUNDLE_ANALYZER global variable enables a utility that represents
 			// bundle content as a convenient interactive zoomable treemap.
@@ -429,6 +491,7 @@ if ( hasExperimentalModulesFlag ) {
 			// generated, and the default externals set.
 			! process.env.WP_NO_EXTERNALS &&
 				new DependencyExtractionWebpackPlugin(),
+			new BlockJsonDependenciesPlugin(),
 		].filter( Boolean ),
 	};
 

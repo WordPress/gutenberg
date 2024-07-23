@@ -144,8 +144,11 @@ export class RichTextData {
 	}
 	// We could expose `toHTMLElement` at some point as well, but we'd only use
 	// it internally.
-	toHTMLString() {
-		return this.originalHTML || toHTMLString( { value: this.#value } );
+	toHTMLString( { preserveWhiteSpace } = {} ) {
+		return (
+			this.originalHTML ||
+			toHTMLString( { value: this.#value, preserveWhiteSpace } )
+		);
 	}
 	valueOf() {
 		return this.toHTMLString();
@@ -401,14 +404,26 @@ function collapseWhiteSpace( element, isRoot = true ) {
 }
 
 /**
- * Removes reserved characters used by rich-text (zero width non breaking spaces added by `toTree` and object replacement characters).
+ * We need to normalise line breaks to `\n` so they are consistent across
+ * platforms and serialised properly. Not removing \r would cause it to
+ * linger and result in double line breaks when whitespace is preserved.
+ */
+const CARRIAGE_RETURN = '\r';
+
+/**
+ * Removes reserved characters used by rich-text (zero width non breaking spaces
+ * added by `toTree` and object replacement characters).
  *
  * @param {string} string
  */
 export function removeReservedCharacters( string ) {
-	// with the global flag, note that we should create a new regex each time OR reset lastIndex state.
+	// with the global flag, note that we should create a new regex each time OR
+	// reset lastIndex state.
 	return string.replace(
-		new RegExp( `[${ ZWNBSP }${ OBJECT_REPLACEMENT_CHARACTER }]`, 'gu' ),
+		new RegExp(
+			`[${ ZWNBSP }${ OBJECT_REPLACEMENT_CHARACTER }${ CARRIAGE_RETURN }]`,
+			'gu'
+		),
 		''
 	);
 }
@@ -460,11 +475,9 @@ function createFromElement( { element, range, isEditableTree } ) {
 
 		if (
 			isEditableTree &&
-			// Ignore any placeholders.
-			( node.getAttribute( 'data-rich-text-placeholder' ) ||
-				// Ignore any line breaks that are not inserted by us.
-				( tagName === 'br' &&
-					! node.getAttribute( 'data-rich-text-line-break' ) ) )
+			// Ignore any line breaks that are not inserted by us.
+			tagName === 'br' &&
+			! node.getAttribute( 'data-rich-text-line-break' )
 		) {
 			accumulateSelection( accumulator, node, range, createEmptyValue() );
 			continue;
@@ -519,7 +532,9 @@ function createFromElement( { element, range, isEditableTree } ) {
 			continue;
 		}
 
-		if ( format ) delete format.formatType;
+		if ( format ) {
+			delete format.formatType;
+		}
 
 		const value = createFromElement( {
 			element: node,
@@ -529,7 +544,9 @@ function createFromElement( { element, range, isEditableTree } ) {
 
 		accumulateSelection( accumulator, node, range, value );
 
-		if ( ! format ) {
+		// Ignore any placeholders, but keep their content since the browser
+		// might insert text inside them when the editable element is flex.
+		if ( ! format || node.getAttribute( 'data-rich-text-placeholder' ) ) {
 			mergePair( accumulator, value );
 		} else if ( value.text.length === 0 ) {
 			if ( format.attributes ) {

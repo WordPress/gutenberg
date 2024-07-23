@@ -1,12 +1,14 @@
 /**
  * External dependencies
  */
-import type { ChangeEvent } from 'react';
+import type { ChangeEvent, ForwardedRef } from 'react';
 import { css } from '@emotion/react';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
+import { forwardRef } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 
 /**
@@ -41,15 +43,18 @@ import { space } from '../utils/space';
  * };
  * ```
  */
-export function ToggleControl( {
-	__nextHasNoMarginBottom,
-	label,
-	checked,
-	help,
-	className,
-	onChange,
-	disabled,
-}: WordPressComponentProps< ToggleControlProps, 'input', false > ) {
+export function ToggleControl(
+	{
+		__nextHasNoMarginBottom,
+		label,
+		checked,
+		help,
+		className,
+		onChange,
+		disabled,
+	}: WordPressComponentProps< ToggleControlProps, 'input', false >,
+	ref: ForwardedRef< HTMLInputElement >
+) {
 	function onChangeToggle( event: ChangeEvent< HTMLInputElement > ) {
 		onChange( event.target.checked );
 	}
@@ -83,22 +88,31 @@ export function ToggleControl( {
 	return (
 		<BaseControl
 			id={ id }
-			help={ helpLabel }
+			help={
+				helpLabel && (
+					<span className="components-toggle-control__help">
+						{ helpLabel }
+					</span>
+				)
+			}
 			className={ classes }
 			__nextHasNoMarginBottom
 		>
-			<HStack justify="flex-start" spacing={ 3 }>
+			<HStack justify="flex-start" spacing={ 2 }>
 				<FormToggle
 					id={ id }
 					checked={ checked }
 					onChange={ onChangeToggle }
 					aria-describedby={ describedBy }
 					disabled={ disabled }
+					ref={ ref }
 				/>
 				<FlexBlock
 					as="label"
 					htmlFor={ id }
-					className="components-toggle-control__label"
+					className={ clsx( 'components-toggle-control__label', {
+						'is-disabled': disabled,
+					} ) }
 				>
 					{ label }
 				</FlexBlock>
@@ -107,4 +121,4 @@ export function ToggleControl( {
 	);
 }
 
-export default ToggleControl;
+export default forwardRef( ToggleControl );

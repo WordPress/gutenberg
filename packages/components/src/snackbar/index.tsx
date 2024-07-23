@@ -2,7 +2,7 @@
  * External dependencies
  */
 import type { ForwardedRef, KeyboardEvent, MouseEvent } from 'react';
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -113,7 +113,7 @@ function UnforwardedSnackbar(
 		return () => clearTimeout( timeoutHandle );
 	}, [ explicitDismiss ] );
 
-	const classes = classnames( className, 'components-snackbar', {
+	const classes = clsx( className, 'components-snackbar', {
 		'components-snackbar-explicit-dismiss': !! explicitDismiss,
 	} );
 	if ( actions && actions.length > 1 ) {
@@ -125,12 +125,9 @@ function UnforwardedSnackbar(
 		actions = [ actions[ 0 ] ];
 	}
 
-	const snackbarContentClassnames = classnames(
-		'components-snackbar__content',
-		{
-			'components-snackbar__content-with-icon': !! icon,
-		}
-	);
+	const snackbarContentClassnames = clsx( 'components-snackbar__content', {
+		'components-snackbar__content-with-icon': !! icon,
+	} );
 
 	return (
 		<div
@@ -138,9 +135,12 @@ function UnforwardedSnackbar(
 			className={ classes }
 			onClick={ ! explicitDismiss ? dismissMe : undefined }
 			tabIndex={ 0 }
-			role={ ! explicitDismiss ? 'button' : '' }
+			role={ ! explicitDismiss ? 'button' : undefined }
 			onKeyPress={ ! explicitDismiss ? dismissMe : undefined }
-			aria-label={ ! explicitDismiss ? __( 'Dismiss this notice' ) : '' }
+			aria-label={
+				! explicitDismiss ? __( 'Dismiss this notice' ) : undefined
+			}
+			data-testid="snackbar"
 		>
 			<div className={ snackbarContentClassnames }>
 				{ icon && (
@@ -165,7 +165,7 @@ function UnforwardedSnackbar(
 				{ explicitDismiss && (
 					<span
 						role="button"
-						aria-label="Dismiss this notice"
+						aria-label={ __( 'Dismiss this notice' ) }
 						tabIndex={ 0 }
 						className="components-snackbar__dismiss-button"
 						onClick={ dismissMe }

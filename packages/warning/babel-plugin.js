@@ -14,22 +14,13 @@ const pkg = require( './package.json' );
 function babelPlugin( { types: t } ) {
 	const seen = Symbol();
 
-	const typeofProcessExpression = t.binaryExpression(
-		'!==',
-		t.unaryExpression( 'typeof', t.identifier( 'SCRIPT_DEBUG' ), false ),
-		t.stringLiteral( 'undefined' )
-	);
-
 	const scriptDebugCheckExpression = t.binaryExpression(
 		'===',
-		t.identifier( 'SCRIPT_DEBUG' ),
+		t.memberExpression(
+			t.identifier( 'globalThis' ),
+			t.identifier( 'SCRIPT_DEBUG' )
+		),
 		t.booleanLiteral( true )
-	);
-
-	const logicalExpression = t.logicalExpression(
-		'&&',
-		typeofProcessExpression,
-		scriptDebugCheckExpression
 	);
 
 	return {
@@ -70,7 +61,7 @@ function babelPlugin( { types: t } ) {
 					node[ seen ] = true;
 					path.replaceWith(
 						t.ifStatement(
-							logicalExpression,
+							scriptDebugCheckExpression,
 							t.blockStatement( [
 								t.expressionStatement( node ),
 							] )

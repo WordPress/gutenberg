@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -79,7 +79,7 @@ export function UnforwardedPanelBody(
 		}
 	}, [ isOpened, scrollBehavior ] );
 
-	const classes = classnames( 'components-panel__body', className, {
+	const classes = clsx( 'components-panel__body', className, {
 		'is-opened': isOpened,
 	} );
 
@@ -109,7 +109,9 @@ const PanelBodyTitle = forwardRef(
 		}: WordPressComponentProps< PanelBodyTitleProps, 'button' >,
 		ref: React.ForwardedRef< any >
 	) => {
-		if ( ! title ) return null;
+		if ( ! title ) {
+			return null;
+		}
 
 		return (
 			<h2 className="components-panel__body-title">

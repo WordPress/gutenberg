@@ -20,7 +20,15 @@ import ScreenHeader from './header';
 import BlockPreviewPanel from './block-preview-panel';
 import { unlock } from '../../lock-unlock';
 import Subtitle from './subtitle';
-import { useBlockVariations, VariationsPanel } from './variations-panel';
+import {
+	useBlockVariations,
+	VariationsPanel,
+} from './variations/variations-panel';
+
+// Initial control values where no block style is set.
+const BACKGROUND_BLOCK_DEFAULT_VALUES = {
+	backgroundSize: 'cover',
+};
 
 function applyFallbackStyle( border ) {
 	if ( ! border ) {
@@ -64,18 +72,19 @@ const {
 	useGlobalSetting,
 	useSettingsForBlockElement,
 	useHasColorPanel,
-	useHasEffectsPanel,
 	useHasFiltersPanel,
 	useHasImageSettingsPanel,
 	useGlobalStyle,
+	useHasBackgroundPanel,
+	BackgroundPanel: StylesBackgroundPanel,
 	BorderPanel: StylesBorderPanel,
 	ColorPanel: StylesColorPanel,
 	TypographyPanel: StylesTypographyPanel,
 	DimensionsPanel: StylesDimensionsPanel,
-	EffectsPanel: StylesEffectsPanel,
 	FiltersPanel: StylesFiltersPanel,
 	ImageSettingsPanel,
 	AdvancedPanel: StylesAdvancedPanel,
+	useGlobalStyleLinks,
 } = unlock( blockEditorPrivateApis );
 
 function ScreenBlock( { name, variation } ) {
@@ -95,6 +104,7 @@ function ScreenBlock( { name, variation } ) {
 	const [ rawSettings, setSettings ] = useGlobalSetting( '', name );
 	const settings = useSettingsForBlockElement( rawSettings, name );
 	const blockType = getBlockType( name );
+	const _links = useGlobalStyleLinks();
 
 	// Only allow `blockGap` support if serialization has not been skipped, to be sure global spacing can be applied.
 	if (
@@ -120,11 +130,11 @@ function ScreenBlock( { name, variation } ) {
 	}
 
 	const blockVariations = useBlockVariations( name );
+	const hasBackgroundPanel = useHasBackgroundPanel( settings );
 	const hasTypographyPanel = useHasTypographyPanel( settings );
 	const hasColorPanel = useHasColorPanel( settings );
 	const hasBorderPanel = useHasBorderPanel( settings );
 	const hasDimensionsPanel = useHasDimensionsPanel( settings );
-	const hasEffectsPanel = useHasEffectsPanel( settings );
 	const hasFiltersPanel = useHasFiltersPanel( settings );
 	const hasImageSettingsPanel = useHasImageSettingsPanel(
 		name,
@@ -235,7 +245,7 @@ function ScreenBlock( { name, variation } ) {
 	return (
 		<>
 			<ScreenHeader
-				title={ variation ? currentBlockStyle.label : blockType.title }
+				title={ variation ? currentBlockStyle?.label : blockType.title }
 			/>
 			<BlockPreviewPanel name={ name } variation={ variation } />
 			{ hasVariationsPanel && (
@@ -279,15 +289,6 @@ function ScreenBlock( { name, variation } ) {
 					settings={ settings }
 				/>
 			) }
-			{ hasEffectsPanel && (
-				<StylesEffectsPanel
-					inheritedValue={ inheritedStyleWithLayout }
-					value={ styleWithLayout }
-					onChange={ setStyle }
-					settings={ settings }
-					includeLayoutControls
-				/>
-			) }
 			{ hasFiltersPanel && (
 				<StylesFiltersPanel
 					inheritedValue={ inheritedStyleWithLayout }
@@ -302,6 +303,17 @@ function ScreenBlock( { name, variation } ) {
 					onChange={ onChangeLightbox }
 					value={ userSettings }
 					inheritedValue={ settings }
+				/>
+			) }
+
+			{ hasBackgroundPanel && (
+				<StylesBackgroundPanel
+					inheritedValue={ inheritedStyle }
+					value={ style }
+					onChange={ setStyle }
+					settings={ settings }
+					defaultValues={ BACKGROUND_BLOCK_DEFAULT_VALUES }
+					themeFileURIs={ _links?.[ 'wp:theme-file' ] }
 				/>
 			) }
 

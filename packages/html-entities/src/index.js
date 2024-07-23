@@ -8,6 +8,8 @@ let _decodeTextArea;
  *
  * @example
  * ```js
+ * import { decodeEntities } from '@wordpress/html-entities';
+ *
  * const result = decodeEntities( '&aacute;' );
  * console.log( result ); // result will be "á"
  * ```

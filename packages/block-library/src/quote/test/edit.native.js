@@ -10,7 +10,6 @@ import {
 	getEditorHtml,
 	fireEvent,
 	within,
-	waitFor,
 	typeInRichText,
 } from 'test/helpers';
 
@@ -40,14 +39,9 @@ describe( 'Quote', () => {
 				},
 			}
 		);
-		// Await inner blocks to be rendered
-		const citationBlock = await waitFor( () =>
-			screen.getByPlaceholderText( 'Add citation' )
-		);
 
 		// Act
 		fireEvent.press( quoteBlock );
-		// screen.debug();
 		let quoteTextInput =
 			within( quoteBlock ).getByPlaceholderText( 'Start writing…' );
 		typeInRichText( quoteTextInput, 'A great statement.' );
@@ -61,6 +55,10 @@ describe( 'Quote', () => {
 				'Start writing…'
 			)[ 1 ];
 		typeInRichText( quoteTextInput, 'Again.' );
+		fireEvent.press( screen.getByLabelText( 'Navigate Up' ) );
+		fireEvent.press( screen.getByLabelText( 'Add citation' ) );
+		const citationBlock =
+			await screen.findByPlaceholderText( 'Add citation' );
 		const citationTextInput =
 			within( citationBlock ).getByPlaceholderText( 'Add citation' );
 		typeInRichText( citationTextInput, 'A person' );

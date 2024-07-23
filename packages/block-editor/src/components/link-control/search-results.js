@@ -7,7 +7,7 @@ import { VisuallyHidden, MenuGroup } from '@wordpress/components';
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * Internal dependencies
@@ -30,7 +30,7 @@ export default function LinkControlSearchResults( {
 	createSuggestionButtonText,
 	suggestionsQuery,
 } ) {
-	const resultsListClasses = classnames(
+	const resultsListClasses = clsx(
 		'block-editor-link-control__search-results',
 		{
 			'is-loading': isLoading,

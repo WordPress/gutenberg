@@ -165,7 +165,9 @@ function useToolbarFocus( {
 		}
 		return () => {
 			window.cancelAnimationFrame( raf );
-			if ( ! onIndexChange || ! navigableToolbarRef ) return;
+			if ( ! onIndexChange || ! navigableToolbarRef ) {
+				return;
+			}
 			// When the toolbar element is unmounted and onIndexChange is passed, we
 			// pass the focused toolbar item index so it can be hydrated later.
 			const items = getAllFocusableToolbarItemsIn( navigableToolbarRef );
@@ -208,6 +210,7 @@ export default function NavigableToolbar( {
 	shouldUseKeyboardFocusShortcut = true,
 	__experimentalInitialIndex: initialIndex,
 	__experimentalOnIndexChange: onIndexChange,
+	orientation = 'horizontal',
 	...props
 } ) {
 	const toolbarRef = useRef();
@@ -228,6 +231,7 @@ export default function NavigableToolbar( {
 			<Toolbar
 				label={ props[ 'aria-label' ] }
 				ref={ toolbarRef }
+				orientation={ orientation }
 				{ ...props }
 			>
 				{ children }
@@ -237,7 +241,7 @@ export default function NavigableToolbar( {
 
 	return (
 		<NavigableMenu
-			orientation="horizontal"
+			orientation={ orientation }
 			role="toolbar"
 			ref={ toolbarRef }
 			{ ...props }

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -19,8 +19,7 @@ import {
 	DimensionsPanel as StylesDimensionsPanel,
 	useHasDimensionsPanel,
 } from '../components/global-styles';
-import { MarginVisualizer } from './margin';
-import { PaddingVisualizer } from './padding';
+import { MarginVisualizer, PaddingVisualizer } from './spacing-visualizer';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
 import { cleanEmptyObject, shouldSkipSerialization } from './utils';
@@ -171,7 +170,7 @@ function useBlockProps( { name, minHeight, style } ) {
 		return {};
 	}
 
-	const className = classnames( {
+	const className = clsx( {
 		'has-aspect-ratio': !! style?.dimensions?.aspectRatio,
 	} );
 

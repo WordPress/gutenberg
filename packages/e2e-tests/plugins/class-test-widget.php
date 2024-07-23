@@ -56,12 +56,13 @@ class Test_Widget extends WP_Widget {
 	/**
 	 * Handles updating settings for the current widget instance.
 	 *
+	 * @since 4.8.1
+	 *
 	 * @param array $new_instance New settings for this instance as input by the user via
 	 *                            WP_Widget::form().
 	 * @param array $old_instance Old settings for this instance.
 	 *
 	 * @return array Settings to save or bool false to cancel saving.
-	 * @since 4.8.1
 	 */
 	// @codingStandardsIgnoreStart – to prevent phpcs from complaining about unused function argument.
 	public function update( $new_instance, $old_instance ) {

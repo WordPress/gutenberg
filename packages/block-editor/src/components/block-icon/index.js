@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -30,7 +30,7 @@ function BlockIcon( { icon, showColors = false, className, context } ) {
 	return (
 		<span
 			style={ style }
-			className={ classnames( 'block-editor-block-icon', className, {
+			className={ clsx( 'block-editor-block-icon', className, {
 				'has-colors': showColors,
 			} ) }
 		>

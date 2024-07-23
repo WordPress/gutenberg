@@ -15,7 +15,7 @@ import { getCSSRules, compileCSS } from '@wordpress/style-engine';
  * Internal dependencies
  */
 import { BACKGROUND_SUPPORT_KEY, BackgroundImagePanel } from './background';
-import { BORDER_SUPPORT_KEY, BorderPanel } from './border';
+import { BORDER_SUPPORT_KEY, BorderPanel, SHADOW_SUPPORT_KEY } from './border';
 import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
 import {
 	TypographyPanel,
@@ -28,11 +28,6 @@ import {
 	DimensionsPanel,
 } from './dimensions';
 import {
-	EFFECTS_SUPPORT_KEYS,
-	SHADOW_SUPPORT_KEY,
-	EffectsPanel,
-} from './effects';
-import {
 	shouldSkipSerialization,
 	useStyleOverride,
 	useBlockSettings,
@@ -42,12 +37,12 @@ import { useBlockEditingMode } from '../components/block-editing-mode';
 
 const styleSupportKeys = [
 	...TYPOGRAPHY_SUPPORT_KEYS,
-	...EFFECTS_SUPPORT_KEYS,
 	BORDER_SUPPORT_KEY,
 	COLOR_SUPPORT_KEY,
 	DIMENSIONS_SUPPORT_KEY,
 	BACKGROUND_SUPPORT_KEY,
 	SPACING_SUPPORT_KEY,
+	SHADOW_SUPPORT_KEY,
 ];
 
 const hasStyleSupport = ( nameOrType ) =>
@@ -337,7 +332,15 @@ function BlockStyleControls( {
 		clientId,
 		name,
 		setAttributes,
-		settings,
+		settings: {
+			...settings,
+			typography: {
+				...settings.typography,
+				// The text alignment UI for individual blocks is rendered in
+				// the block toolbar, so disable it here.
+				textAlign: false,
+			},
+		},
 	};
 	if ( blockEditingMode !== 'default' ) {
 		return null;
@@ -349,7 +352,6 @@ function BlockStyleControls( {
 			<TypographyPanel { ...passedProps } />
 			<BorderPanel { ...passedProps } />
 			<DimensionsPanel { ...passedProps } />
-			<EffectsPanel { ...passedProps } />
 		</>
 	);
 }

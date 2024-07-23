@@ -71,6 +71,9 @@ const URLPopover = forwardRef(
 		return (
 			<Popover
 				ref={ ref }
+				role="dialog"
+				aria-modal="true"
+				aria-label={ __( 'Edit URL' ) }
 				className="block-editor-url-popover"
 				focusOnMount={ focusOnMount }
 				placement={ computedPlacement }
@@ -92,12 +95,12 @@ const URLPopover = forwardRef(
 							/>
 						) }
 					</div>
-					{ showSettings && (
-						<div className="block-editor-url-popover__row block-editor-url-popover__settings">
-							{ renderSettings() }
-						</div>
-					) }
 				</div>
+				{ showSettings && (
+					<div className="block-editor-url-popover__settings">
+						{ renderSettings() }
+					</div>
+				) }
 				{ additionalControls && ! showSettings && (
 					<div className="block-editor-url-popover__additional-controls">
 						{ additionalControls }

@@ -71,13 +71,20 @@ const optionsWithTooltip = (
 			value="gnocchi"
 			label="Delicious Gnocchi"
 			aria-label="Click for Delicious Gnocchi"
-			showTooltip={ true }
+			showTooltip
 		/>
 		<ToggleGroupControlOption
 			value="caponata"
 			label="Sumptuous Caponata"
 			aria-label="Click for Sumptuous Caponata"
 		/>
+	</>
+);
+const optionsWithDisabledOption = (
+	<>
+		<ToggleGroupControlOption value="pizza" label="Pizza" />
+		<ToggleGroupControlOption value="rice" label="Rice" disabled />
+		<ToggleGroupControlOption value="pasta" label="Pasta" />
 	</>
 );
 
@@ -334,9 +341,11 @@ describe.each( [
 					name: 'R',
 				} );
 
+				await sleep();
 				await press.Tab();
 				expect( rigas ).toHaveFocus();
 
+				await sleep();
 				await press.Tab();
 
 				// When in controlled mode, there is an additional "Reset" button.
@@ -348,6 +357,53 @@ describe.each( [
 						: screen.getByRole( 'button', { name: 'Reset' } );
 
 				expect( expectedFocusTarget ).toHaveFocus();
+			} );
+
+			it( 'should ignore disabled radio options', async () => {
+				const mockOnChange = jest.fn();
+
+				render(
+					<Component
+						value="pizza"
+						onChange={ mockOnChange }
+						label="Test Toggle Group Control"
+					>
+						{ optionsWithDisabledOption }
+					</Component>
+				);
+
+				await sleep();
+				await press.Tab();
+
+				expect(
+					screen.getByRole( 'radio', { name: 'Pizza' } )
+				).toBeChecked();
+				expect(
+					screen.getByRole( 'radio', { name: 'Rice' } )
+				).toBeDisabled();
+
+				// Arrow navigation skips the disabled option
+				await press.ArrowRight();
+				expect(
+					screen.getByRole( 'radio', { name: 'Pasta' } )
+				).toBeChecked();
+				expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
+				expect( mockOnChange ).toHaveBeenLastCalledWith( 'pasta' );
+
+				// Arrow navigation skips the disabled option
+				await press.ArrowLeft();
+				expect(
+					screen.getByRole( 'radio', { name: 'Pizza' } )
+				).toBeChecked();
+				expect( mockOnChange ).toHaveBeenCalledTimes( 2 );
+				expect( mockOnChange ).toHaveBeenLastCalledWith( 'pizza' );
+
+				// Clicks don't cause the option to be selected
+				await click( screen.getByRole( 'radio', { name: 'Rice' } ) );
+				expect(
+					screen.getByRole( 'radio', { name: 'Pizza' } )
+				).toBeChecked();
+				expect( mockOnChange ).toHaveBeenCalledTimes( 2 );
 			} );
 		} );
 
@@ -392,6 +448,7 @@ describe.each( [
 					</Component>
 				);
 
+				await sleep();
 				await press.Tab();
 				expect(
 					screen.getByRole( 'button', {
@@ -400,6 +457,7 @@ describe.each( [
 					} )
 				).toHaveFocus();
 
+				await sleep();
 				await press.Tab();
 				expect(
 					screen.getByRole( 'button', {
@@ -416,6 +474,66 @@ describe.each( [
 						pressed: false,
 					} )
 				).toHaveFocus();
+			} );
+
+			it( 'should ignore disabled options', async () => {
+				const mockOnChange = jest.fn();
+
+				render(
+					<Component
+						value="pizza"
+						isDeselectable
+						onChange={ mockOnChange }
+						label="Test Toggle Group Control"
+					>
+						{ optionsWithDisabledOption }
+					</Component>
+				);
+
+				await sleep();
+				await press.Tab();
+
+				expect(
+					screen.getByRole( 'button', {
+						name: 'Pizza',
+						pressed: true,
+					} )
+				).toBeVisible();
+				expect(
+					screen.getByRole( 'button', {
+						name: 'Rice',
+						pressed: false,
+					} )
+				).toBeDisabled();
+
+				// Tab key navigation skips the disabled option
+				await press.Tab();
+				await press.Space();
+				expect(
+					screen.getByRole( 'button', {
+						name: 'Pasta',
+						pressed: true,
+					} )
+				).toHaveFocus();
+				expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
+				expect( mockOnChange ).toHaveBeenLastCalledWith( 'pasta' );
+
+				// Tab key navigation skips the disabled option
+				await press.ShiftTab();
+				expect(
+					screen.getByRole( 'button', {
+						name: 'Pizza',
+						pressed: false,
+					} )
+				).toHaveFocus();
+
+				// Clicks don't cause the option to be selected.
+				await click(
+					screen.getByRole( 'button', {
+						name: 'Rice',
+					} )
+				);
+				expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
 			} );
 		} );
 	} );

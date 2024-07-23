@@ -7,7 +7,7 @@ import { Keyboard } from 'react-native';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import '@wordpress/interface';
+import '@wordpress/editor';
 
 /**
  * Internal dependencies

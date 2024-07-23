@@ -21,10 +21,7 @@ import {
 	shouldSkipSerialization,
 } from './utils';
 import { useSettings } from '../components/use-settings';
-import {
-	getTypographyFontSizeValue,
-	getFluidTypographyOptionsFromSettings,
-} from '../components/global-styles/typography-utils';
+import { getTypographyFontSizeValue } from '../components/global-styles/typography-utils';
 
 export const FONT_SIZE_SUPPORT_KEY = 'typography.fontSize';
 
@@ -131,7 +128,6 @@ export function FontSizeEdit( props ) {
 			withReset={ false }
 			withSlider
 			size="__unstable-large"
-			__nextHasNoMarginBottom
 		/>
 	);
 }
@@ -174,18 +170,16 @@ function useBlockProps( { name, fontSize, style } ) {
 	let props;
 
 	if ( style?.typography?.fontSize ) {
-		const fluidSettings = getFluidTypographyOptionsFromSettings( {
-			typography: {
-				fluid: fluidTypographySettings,
-			},
-			layout: layoutSettings,
-		} );
-
 		props = {
 			style: {
 				fontSize: getTypographyFontSizeValue(
 					{ size: style.typography.fontSize },
-					fluidSettings
+					{
+						typography: {
+							fluid: fluidTypographySettings,
+						},
+						layout: layoutSettings,
+					}
 				),
 			},
 		};

@@ -65,4 +65,25 @@ test.describe( 'data-wp-on-window', () => {
 		await page.setViewportSize( { width: 200, height: 600 } );
 		await expect( counter ).toHaveText( '2' );
 	} );
+	test( 'should work with multiple event handlers on the same event type', async ( {
+		page,
+	} ) => {
+		const resizeHandler = page.getByTestId( 'resizeHandler' );
+		const resizeSecondHandler = page.getByTestId( 'resizeSecondHandler' );
+
+		// Initial value.
+		await expect( resizeHandler ).toHaveText( 'no' );
+		await expect( resizeSecondHandler ).toHaveText( 'no' );
+
+		// Make sure the event listener is attached.
+		await page
+			.getByTestId( 'isEventAttached' )
+			.filter( { hasText: 'yes' } )
+			.waitFor();
+
+		// This keyboard press should increase the counter.
+		await page.setViewportSize( { width: 600, height: 600 } );
+		await expect( resizeHandler ).toHaveText( 'yes' );
+		await expect( resizeSecondHandler ).toHaveText( 'yes' );
+	} );
 } );

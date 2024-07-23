@@ -31,7 +31,9 @@ export function getDefaultColors(
 	palette: DuotonePickerProps[ 'colorPalette' ]
 ) {
 	// A default dark and light color are required.
-	if ( ! palette || palette.length < 2 ) return [ '#000', '#fff' ];
+	if ( ! palette || palette.length < 2 ) {
+		return [ '#000', '#fff' ];
+	}
 
 	return palette
 		.map( ( { color } ) => ( {

@@ -76,7 +76,7 @@ const BorderBoxControlSplitControls = (
 			<BorderBoxControlVisualizer value={ value } size={ size } />
 			<BorderControl
 				className={ centeredClassName }
-				hideLabelFromVision={ true }
+				hideLabelFromVision
 				label={ __( 'Top border' ) }
 				onChange={ ( newBorder ) => onChange( newBorder, 'top' ) }
 				__unstablePopoverProps={ popoverProps }
@@ -84,7 +84,7 @@ const BorderBoxControlSplitControls = (
 				{ ...sharedBorderControlProps }
 			/>
 			<BorderControl
-				hideLabelFromVision={ true }
+				hideLabelFromVision
 				label={ __( 'Left border' ) }
 				onChange={ ( newBorder ) => onChange( newBorder, 'left' ) }
 				__unstablePopoverProps={ popoverProps }
@@ -93,7 +93,7 @@ const BorderBoxControlSplitControls = (
 			/>
 			<BorderControl
 				className={ rightAlignedClassName }
-				hideLabelFromVision={ true }
+				hideLabelFromVision
 				label={ __( 'Right border' ) }
 				onChange={ ( newBorder ) => onChange( newBorder, 'right' ) }
 				__unstablePopoverProps={ popoverProps }
@@ -102,7 +102,7 @@ const BorderBoxControlSplitControls = (
 			/>
 			<BorderControl
 				className={ centeredClassName }
-				hideLabelFromVision={ true }
+				hideLabelFromVision
 				label={ __( 'Bottom border' ) }
 				onChange={ ( newBorder ) => onChange( newBorder, 'bottom' ) }
 				__unstablePopoverProps={ popoverProps }

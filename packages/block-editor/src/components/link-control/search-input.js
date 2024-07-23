@@ -125,12 +125,12 @@ const LinkControlSearchInput = forwardRef(
 					className={ className }
 					value={ value }
 					onChange={ onInputChange }
-					placeholder={ placeholder ?? __( 'Search or type url' ) }
+					placeholder={ placeholder ?? __( 'Search or type URL' ) }
 					__experimentalRenderSuggestions={
 						showSuggestions ? handleRenderSuggestions : null
 					}
 					__experimentalFetchLinkSuggestions={ searchHandler }
-					__experimentalHandleURLSuggestions={ true }
+					__experimentalHandleURLSuggestions
 					__experimentalShowInitialSuggestions={
 						showInitialSuggestions
 					}

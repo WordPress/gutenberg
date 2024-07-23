@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -52,7 +52,7 @@ function ResponsiveBlockControl( props ) {
 		toggleLabel ||
 		sprintf(
 			/* translators: %s: Property value for the control (eg: margin, padding, etc.). */
-			__( 'Use the same %s on all screensizes.' ),
+			__( 'Use the same %s on all screen sizes.' ),
 			property
 		);
 
@@ -98,7 +98,7 @@ function ResponsiveBlockControl( props ) {
 					help={ toggleHelpText }
 				/>
 				<div
-					className={ classnames(
+					className={ clsx(
 						'block-editor-responsive-block-control__group',
 						{
 							'is-responsive': isResponsive,
