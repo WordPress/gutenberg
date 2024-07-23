@@ -18,6 +18,7 @@ import {
 	Container,
 	Root,
 	Prefix,
+	Suffix,
 	getSizeConfig,
 } from './styles/input-control-styles';
 import type { InputBaseProps, LabelPosition } from './types';
@@ -80,6 +81,7 @@ function InputBase(
 		label,
 		prefix,
 		size = 'default',
+		suffix,
 		...restProps
 	} = useDeprecated36pxDefaultSizeProp(
 		useContextSystem( props, 'InputBase' )
@@ -130,6 +132,11 @@ function InputBase(
 						</Prefix>
 					) }
 					{ children }
+					{ suffix && (
+						<Suffix className="components-input-control__suffix">
+							{ suffix }
+						</Suffix>
+					) }
 				</ContextSystemProvider>
 				<Backdrop disabled={ disabled } isBorderless={ isBorderless } />
 			</Container>
