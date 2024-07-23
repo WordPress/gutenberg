@@ -21,6 +21,7 @@ $z-layers: (
 	".interface-complementary-area .components-panel__header": 1, // higher sticky element
 
 	".components-modal__header": 10,
+	".edit-post-layout.has-metaboxes .edit-post-visual-editor": 1, // The popovers contained in visual editor go in front of the metabox container.
 	".edit-post-meta-boxes-area.is-loading::before": 1,
 	".edit-post-meta-boxes-area .spinner": 5,
 	".components-popover__close": 5,

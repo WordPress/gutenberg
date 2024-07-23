@@ -9,7 +9,7 @@
 }
 
 .edit-post-layout.has-metaboxes .edit-post-visual-editor {
-	z-index: 99;
+	z-index: z-index(".edit-post-layout.has-metaboxes .edit-post-visual-editor");
 }
 
 // Adjust the position of the notices
