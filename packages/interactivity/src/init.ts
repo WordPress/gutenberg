@@ -46,9 +46,6 @@ export const init = async () => {
 				}
 
 				if ( ! hydratedIslands.has( node ) ) {
-					while ( window.navigator.scheduling?.isInputPending() ) {
-						await splitTask();
-					}
 					const fragment = getRegionRootFragment( node );
 					const vdom = toVdom( node );
 					await splitTask();
