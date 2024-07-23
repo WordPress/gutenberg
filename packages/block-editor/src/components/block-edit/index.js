@@ -28,7 +28,7 @@ import { PrivateBlockContext } from '../block-list/private-block-context';
  *
  * @return {Object} Block edit context
  */
-export { useBlockEditContext };
+export { useBlockEditContext, blockEditingModeKey };
 
 export default function BlockEdit( {
 	mayDisplayControls,

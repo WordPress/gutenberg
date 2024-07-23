@@ -160,12 +160,12 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		...props,
 		ref: mergedRefs,
 		id: `block-${ clientId }${ htmlSuffix }`,
-		role: 'document',
+		role: isSubtreeDisabled ? 'presentation' : 'document',
+		'aria-disabled': isSubtreeDisabled ? true : undefined,
 		'aria-label': blockLabel,
 		'data-block': clientId,
 		'data-type': name,
 		'data-title': blockTitle,
-		inert: isSubtreeDisabled ? 'true' : undefined,
 		className: clsx(
 			'block-editor-block-list__block',
 			{

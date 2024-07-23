@@ -27,7 +27,7 @@ import deprecated from '@wordpress/deprecated';
  * Internal dependencies
  */
 import { useBlockEditorAutocompleteProps } from '../autocomplete';
-import { useBlockEditContext } from '../block-edit';
+import { useBlockEditContext, blockEditingModeKey } from '../block-edit';
 import { blockBindingsKey, isPreviewModeKey } from '../block-edit/context';
 import FormatToolbarContainer from './format-toolbar-container';
 import { store as blockEditorStore } from '../../store';
@@ -121,6 +121,7 @@ export function RichTextWrapper(
 	const instanceId = useInstanceId( RichTextWrapper );
 	const anchorRef = useRef();
 	const context = useBlockEditContext();
+	const blockEditingMode = context[ blockEditingModeKey ];
 	const { clientId, isSelected: isBlockSelected, name: blockName } = context;
 	const blockBindings = context[ blockBindingsKey ];
 	const blockContext = useContext( BlockContext );
@@ -205,7 +206,8 @@ export function RichTextWrapper(
 		[ blockBindings, blockName ]
 	);
 
-	const shouldDisableEditing = readOnly || disableBoundBlocks;
+	const shouldDisableEditing =
+		readOnly || disableBoundBlocks || blockEditingMode === 'disabled';
 
 	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
 		useSelect( blockEditorStore );
