@@ -48,14 +48,12 @@ function DataViewsPagination() {
 								const page = i + 1;
 								return {
 									value: page.toString(),
-									label:
-										__( 'Page ' ) +
-										page.toString() +
-										sprintf(
-											// translators: %s: Total number of pages.
-											_x( ' of %s', 'paging' ),
-											totalPages
-										),
+									label: sprintf(
+										// translators: 1: Current page number, 2: Total number of pages
+										__( 'Page %1$s of %2$s' ),
+										page.toString(),
+										totalPages
+									),
 								};
 							}
 						) }
