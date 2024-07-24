@@ -372,19 +372,19 @@ export function collections( state = {}, action ) {
 }
 
 export function blockBindingsSources( state = {}, action ) {
+	// Merge usesContext with existing values, potentially defined in the server registration.
+	let mergedUsesContext = [
+		...( state[ action.name ]?.usesContext || [] ),
+		...( action.usesContext || [] ),
+	];
+	// Remove duplicates.
+	mergedUsesContext =
+		mergedUsesContext.length > 0
+			? [ ...new Set( mergedUsesContext ) ]
+			: undefined;
+
 	switch ( action.type ) {
 		case 'ADD_BLOCK_BINDINGS_SOURCE':
-			// Merge usesContext with existing values, potentially defined in the server registration.
-			let mergedUsesContext = [
-				...( state[ action.name ]?.usesContext || [] ),
-				...( action.usesContext || [] ),
-			];
-			// Remove duplicates.
-			mergedUsesContext =
-				mergedUsesContext.length > 0
-					? [ ...new Set( mergedUsesContext ) ]
-					: undefined;
-
 			return {
 				...state,
 				[ action.name ]: {
@@ -407,7 +407,7 @@ export function blockBindingsSources( state = {}, action ) {
 					 */
 					...state[ action.name ],
 					label: action.label,
-					usesContext: action.usesContext,
+					usesContext: mergedUsesContext,
 				},
 			};
 		case 'REMOVE_BLOCK_BINDINGS_SOURCE':
