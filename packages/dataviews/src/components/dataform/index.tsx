@@ -15,7 +15,7 @@ import { useCallback, useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { Form, Field, NormalizedField } from '../../types';
+import type { Form, Field, NormalizedField, FieldType } from '../../types';
 import { normalizeFields } from '../../normalize-fields';
 
 type DataFormProps< Item > = {
@@ -88,8 +88,7 @@ function DataFormNumberControl< Item >( {
 }
 
 const controls: {
-	// TODO: make the key type specific to FieldType.
-	[ key: string ]: < Item >(
+	[ key in FieldType ]: < Item >(
 		props: DataFormControlProps< Item >
 	) => JSX.Element;
 } = {
