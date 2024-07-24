@@ -84,7 +84,8 @@ const linkOptions = [
 		icon: fullscreen,
 		label: __( 'Expand on click' ),
 		value: LINK_DESTINATION_LIGHTBOX,
-		noticeText: __( 'Scales the image with a lightbox effect' ),
+		noticeText: __( 'Lightbox effect' ),
+		infoText: __( 'Scales the image with a lightbox effect' ),
 	},
 	{
 		icon: linkOff,
@@ -641,6 +642,7 @@ function GalleryEdit( props ) {
 											onClose();
 										} }
 										role="menuitemradio"
+										info={ linkItem.infoText ?? false }
 									>
 										{ linkItem.label }
 									</MenuItem>
