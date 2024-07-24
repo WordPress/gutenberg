@@ -1704,7 +1704,7 @@ describe( 'blocks', () => {
 			);
 		} );
 
-		it( 'should not be overriden if bootstrap happens after registration', () => {
+		it( 'should correctly merge properties when bootstrap happens after registration', () => {
 			// Register source in the client.
 			const clientProperties = {
 				getValues: () => 'values',
