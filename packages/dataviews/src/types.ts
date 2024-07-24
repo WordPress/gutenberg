@@ -44,7 +44,7 @@ export type Operator =
 
 export type ItemRecord = Record< string, unknown >;
 
-export type FieldType = 'text';
+export type FieldType = 'text' | 'integer';
 
 /**
  * A dataview field for a specific property of a data type.

@@ -3,3 +3,4 @@ export { default as DataForm } from './components/dataform';
 export { VIEW_LAYOUTS } from './layouts';
 export { filterSortAndPaginate } from './filter-and-sort-data-view';
 export type * from './types';
+export { isItemValid } from './validation';

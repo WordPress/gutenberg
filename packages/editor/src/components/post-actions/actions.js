@@ -11,7 +11,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { useMemo, useState } from '@wordpress/element';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { parse } from '@wordpress/blocks';
-import { DataForm } from '@wordpress/dataviews';
+import { DataForm, isItemValid } from '@wordpress/dataviews';
 import {
 	Button,
 	TextControl,
@@ -48,7 +48,7 @@ const fields = [
 		getValue: ( { item } ) => item.title,
 	},
 	{
-		type: 'number',
+		type: 'integer',
 		id: 'menu_order',
 		label: __( 'Order' ),
 		description: __( 'Determines the order of pages.' ),
@@ -653,12 +653,18 @@ function ReorderModal( { items, closeModal, onActionPerformed } ) {
 
 	async function onOrder( event ) {
 		event.preventDefault();
+
 		if (
-			! Number.isInteger( Number( orderInput ) ) ||
-			orderInput?.trim?.() === ''
+			! isItemValid(
+				item,
+				fields.filter( ( field ) =>
+					formOrderAction.visibleFields.includes( field.id )
+				)
+			)
 		) {
 			return;
 		}
+
 		try {
 			await editEntityRecord( 'postType', item.type, item.id, {
 				menu_order: orderInput,
@@ -682,9 +688,12 @@ function ReorderModal( { items, closeModal, onActionPerformed } ) {
 			} );
 		}
 	}
-	const saveIsDisabled =
-		! Number.isInteger( Number( orderInput ) ) ||
-		orderInput?.trim?.() === '';
+	const isSaveDisabled = ! isItemValid(
+		item,
+		fields.filter( ( field ) =>
+			formOrderAction.visibleFields.includes( field.id )
+		)
+	);
 	return (
 		<form onSubmit={ onOrder }>
 			<VStack spacing="5">
@@ -714,7 +723,7 @@ function ReorderModal( { items, closeModal, onActionPerformed } ) {
 						variant="primary"
 						type="submit"
 						accessibleWhenDisabled
-						disabled={ saveIsDisabled }
+						disabled={ isSaveDisabled }
 						__experimentalIsFocusable
 					>
 						{ __( 'Save' ) }

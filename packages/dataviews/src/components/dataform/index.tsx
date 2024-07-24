@@ -88,12 +88,13 @@ function DataFormNumberControl< Item >( {
 }
 
 const controls: {
+	// TODO: make the key type specific to FieldType.
 	[ key: string ]: < Item >(
 		props: DataFormControlProps< Item >
 	) => JSX.Element;
 } = {
 	text: DataFormTextControl,
-	number: DataFormNumberControl,
+	integer: DataFormNumberControl,
 };
 
 function getControlForField< Item >( field: NormalizedField< Item > ) {
