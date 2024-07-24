@@ -293,6 +293,7 @@ module.exports = {
 						'CheckboxControl',
 						'ComboboxControl',
 						'FocalPointPicker',
+						'RangeControl',
 						'SearchControl',
 						'TextareaControl',
 						'TreeSelect',

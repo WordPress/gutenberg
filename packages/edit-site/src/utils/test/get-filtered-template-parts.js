@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { getFilteredTemplatePartBlocks } from '../get-filtered-template-parts';
+import getFilteredTemplatePartBlocks from '../get-filtered-template-parts';
 
 const NESTED_BLOCKS = [
 	{
@@ -98,16 +98,6 @@ const FLATTENED_BLOCKS = [
 	},
 ];
 
-const SINGLE_TEMPLATE_PART_BLOCK = {
-	clientId: '1',
-	name: 'core/template-part',
-	innerBlocks: [],
-	attributes: {
-		slug: 'aside',
-		theme: 'my-theme',
-	},
-};
-
 const TEMPLATE_PARTS = [
 	{
 		id: 'my-theme//header',
@@ -133,57 +123,5 @@ describe( 'getFilteredTemplatePartBlocks', () => {
 			TEMPLATE_PARTS
 		);
 		expect( flattenedFilteredTemplateParts ).toEqual( FLATTENED_BLOCKS );
-	} );
-
-	it( 'returns a cached result when passed the same params', () => {
-		// Clear the cache and call the function twice.
-		getFilteredTemplatePartBlocks.clear();
-		getFilteredTemplatePartBlocks( NESTED_BLOCKS, TEMPLATE_PARTS );
-		expect(
-			getFilteredTemplatePartBlocks( NESTED_BLOCKS, TEMPLATE_PARTS )
-		).toEqual( FLATTENED_BLOCKS );
-
-		// The function has been called twice with the same params, so the cache size should be 1.
-		/**
-		 * TODO what should be done about this?
-		 * Can it be tested another way?
-		 * Is it necessary?
-		 */
-		// const [ , , originalSize ] =
-		// 	getFilteredTemplatePartBlocks.getCache();
-		// expect( originalSize ).toBe( 1 );
-
-		// Call the function again, with different params.
-		expect(
-			getFilteredTemplatePartBlocks(
-				[ SINGLE_TEMPLATE_PART_BLOCK ],
-				TEMPLATE_PARTS
-			)
-		).toEqual( [
-			{
-				block: {
-					clientId: '1',
-					name: 'core/template-part',
-					attributes: {
-						slug: 'aside',
-						theme: 'my-theme',
-					},
-				},
-				templatePart: {
-					id: 'my-theme//aside',
-					slug: 'aside',
-					theme: 'my-theme',
-				},
-			},
-		] );
-
-		// The function has been called with different params, so the cache size should now be 2.
-		/**
-		 * TODO what should be done about this?
-		 * Can it be tested another way?
-		 * Is it necessary?
-		 */
-		// const [ , , finalSize ] = getFilteredTemplatePartBlocks.getCache();
-		// expect( finalSize ).toBe( 2 );
 	} );
 } );

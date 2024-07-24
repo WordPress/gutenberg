@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import memoize from 'memize';
-
-/**
  * WordPress dependencies
  */
 import { isTemplatePart } from '@wordpress/blocks';
@@ -20,7 +15,10 @@ const EMPTY_ARRAY = [];
  * @param {?Array} templateParts Available template parts.
  * @return {Array} An array of template parts and their blocks.
  */
-function getFilteredTemplatePartBlocks( blocks = EMPTY_ARRAY, templateParts ) {
+export default function getFilteredTemplatePartBlocks(
+	blocks = EMPTY_ARRAY,
+	templateParts
+) {
 	const templatePartsById = templateParts
 		? // Key template parts by their ID.
 		  templateParts.reduce(
@@ -61,9 +59,3 @@ function getFilteredTemplatePartBlocks( blocks = EMPTY_ARRAY, templateParts ) {
 
 	return result;
 }
-
-const memoizedGetFilteredTemplatePartBlocks = memoize(
-	getFilteredTemplatePartBlocks
-);
-
-export { memoizedGetFilteredTemplatePartBlocks as getFilteredTemplatePartBlocks };

@@ -10,6 +10,7 @@
 
 -   `ComboboxControl`: Fix ComboboxControl reset button when using the keyboard. ([#63410](https://github.com/WordPress/gutenberg/pull/63410))
 -   `Button`: Never apply `aria-disabled` to anchor ([#63376](https://github.com/WordPress/gutenberg/pull/63376)).
+-   `SelectControl`: Fix hover/focus color in wp-admin ([#63855](https://github.com/WordPress/gutenberg/pull/63855)).
 
 ### Enhancements
 
@@ -18,7 +19,10 @@
 -   `CustomSelectControl`: Stabilize `__experimentalShowSelectedHint` and `options[]. __experimentalHint` props ([#63248](https://github.com/WordPress/gutenberg/pull/63248)).
 -   `SelectControl`: Add `"minimal"` variant ([#63265](https://github.com/WordPress/gutenberg/pull/63265)).
 -   `FontSizePicker`: tidy up internal logic ([#63553](https://github.com/WordPress/gutenberg/pull/63553)).
--   `RangeControl`: Allow external `id` prop ([#63761](https://github.com/WordPress/gutenberg/pull/63761)).
+-   `ToggleControl`: Update spacing and appearance to adhere to 4px baseline, slightly reducing footprint. Make label treatment and focus styles consistent with `RadioControl` and `CheckboxControl`. ([#63490](https://github.com/WordPress/gutenberg/pull/63490)).
+-   `CheckboxControl`: Slightly reduced footprint. Make label treatment, focus styles, and spacing consistent with `ToggleControl` and `RadioControl`. ([#63490](https://github.com/WordPress/gutenberg/pull/63490)).
+-   `RadioControl`: Slightly reduced footprint. Make label treatment, focus styles, and spacing consistent with `ToggleControl` and `CheckboxControl`. ([#63490](https://github.com/WordPress/gutenberg/pull/63490)).
+-   `FormToggle`: Update spacing and appearance to adhere to 4px baseline, slightly reducing footprint. Make label treatment and focus styles consistent with `RadioControl` and `CheckboxControl`. ([#63490](https://github.com/WordPress/gutenberg/pull/63490)).
 
 ### Internal
 
@@ -28,6 +32,7 @@
 -   `DropdownMenuV2`: invert animation direction. ([#63443](https://github.com/WordPress/gutenberg/pull/63443)).
 -   `Tabs`: Vertical Tabs should be 40px min height. ([#63446](https://github.com/WordPress/gutenberg/pull/63446)).
 -   `ColorPicker`: Use `minimal` variant for `SelectControl` ([#63676](https://github.com/WordPress/gutenberg/pull/63676)).
+-   `Tabs`: keep full opacity of focus ring and remove hover styles on disabled tabs ([#63754](https://github.com/WordPress/gutenberg/pull/63754)).
 
 ### Documentation
 
