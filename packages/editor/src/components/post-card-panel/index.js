@@ -104,7 +104,7 @@ export default function PostCardPanel( { actions } ) {
 					{ title ? decodeEntities( title ) : __( 'No Title' ) }
 					{ isFrontPage && (
 						<span className="editor-post-card-panel__title-badge">
-							{ __( 'Front Page' ) }
+							{ __( 'Homepage' ) }
 						</span>
 					) }
 					{ isPostsPage && (

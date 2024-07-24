@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useEffect, useRef, useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -49,17 +49,6 @@ function ZoomOutModeInserters() {
 			hoveredBlockClientId: getHoveredBlockClientId(),
 		};
 	}, [] );
-
-	const isMounted = useRef( false );
-
-	useEffect( () => {
-		if ( ! isMounted.current ) {
-			isMounted.current = true;
-			return;
-		}
-		// reset insertion point when the block order changes
-		setInserterIsOpened( true );
-	}, [ blockOrder, setInserterIsOpened ] );
 
 	// Defer the initial rendering to avoid the jumps due to the animation.
 	useEffect( () => {

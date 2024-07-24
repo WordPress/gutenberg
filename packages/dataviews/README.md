@@ -22,6 +22,7 @@ const Example = () => {
 			fields={ fields }
 			view={ view }
 			onChangeView={ onChangeView }
+			defaultLayouts={ defaultLayouts }
 			actions={ actions }
 			paginationInfo={ paginationInfo }
 		/>
@@ -169,8 +170,10 @@ Properties:
     -   `direction`: the direction to use for sorting, one of `asc` or `desc`.
 -   `fields`: the `id` of the fields that are visible in the UI.
 -   `layout`: config that is specific to a particular layout type.
-    -   `mediaField`: used by the `grid` and `list` layouts. The `id` of the field to be used for rendering each card's media.
-    -   `primaryField`: used by the `table`, `grid` and `list` layouts. The `id` of the field to be highlighted in each row/card/item.
+    -   `primaryField`: used by the `table`, `grid` and `list` layouts. The `id` of the field to be highlighted in each row/card/item. This field is not hiddable.
+    -   `mediaField`: used by the `grid` and `list` layouts. The `id` of the field to be used for rendering each card's media. This field is not hiddable.
+    -   `badgeFields`: used by the `grid` layout. It renders these fields without a label and styled as badges.
+    -   `columnFields`: used by the `grid` layout. It renders the label and the field data vertically stacked instead of horizontally (the default).
 
 ### `onChangeView`: `function`
 
@@ -276,7 +279,19 @@ Whether the data is loading. `false` by default.
 
 ### `defaultLayouts`: `Record< string, view >`
 
-Default layouts. By default, uses empty layouts: `table`, `grid`, `list`.
+This property provides layout information about the view types that are active. If empty, enables all layout types (see "Layout Types") with empty layout data.
+
+For example, this is how you'd enable only the table view type:
+
+```js
+const defaultLayouts = {
+	table: {
+		layout: {
+			primaryKey: 'my-key',
+		}
+	}
+};
+```
 
 ### `onChangeSelection`: `function`
 

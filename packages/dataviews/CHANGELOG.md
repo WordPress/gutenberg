@@ -6,6 +6,7 @@
 
 - `onSelectionChange` prop has been renamed to `onChangeSelection` and its argument has been updated to be a list of ids.
 - `setSelection` prop has been removed. Please use `onChangeSelection` instead.
+- `header` field property has been renamed to `label`.
 
 ## 3.0.0 (2024-07-10)
 
