@@ -14,7 +14,6 @@ import {
 	__experimentalInputControl as InputControl,
 	__experimentalUnitControl as UnitControl,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
-	__experimentalGrid as Grid,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	__experimentalUseNavigator as useNavigator,
 	__experimentalToggleGroupControl as ToggleGroupControl,
@@ -464,7 +463,8 @@ function ShadowPopover( { shadowObj, onChange } ) {
 					label={ __( 'Inset' ) }
 				/>
 			</ToggleGroupControl>
-			<Grid columns={ 2 } gap={ 4 }>
+			<VStack gap={ 4 }>
+				>
 				<ShadowInputControl
 					label={ __( 'X Position' ) }
 					value={ shadowObj.x }
@@ -488,7 +488,7 @@ function ShadowPopover( { shadowObj, onChange } ) {
 					hasNegativeRange
 					onChange={ ( value ) => onShadowChange( 'spread', value ) }
 				/>
-			</Grid>
+			</VStack>
 		</VStack>
 	);
 }
@@ -510,29 +510,18 @@ function ShadowInputControl( { label, value, onChange, hasNegativeRange } ) {
 	};
 
 	return (
-		<VStack justify="flex-start">
-			<HStack justify="space-between">
-				<Subtitle>{ label }</Subtitle>
-				<Button
-					label={ __( 'Use custom size' ) }
-					icon={ settings }
-					onClick={ () => {
-						setIsCustomInput( ! isCustomInput );
-					} }
-					isPressed={ isCustomInput }
-					size="small"
-				/>
-			</HStack>
+		<HStack align="flex-end">
 			{ isCustomInput ? (
 				<UnitControl
 					label={ label }
-					hideLabelFromVision
 					__next40pxDefaultSize
 					value={ value }
 					onChange={ onValueChange }
+					className="edit-site-global-styles__shadow-editor-control"
 				/>
 			) : (
 				<RangeControl
+					label={ label }
 					value={ parsedQuantity ?? 0 }
 					onChange={ sliderOnChange }
 					withInputField={ false }
@@ -552,8 +541,24 @@ function ShadowInputControl( { label, value, onChange, hasNegativeRange } ) {
 					step={
 						CUSTOM_VALUE_SETTINGS[ parsedUnit ?? 'px' ]?.step ?? 0.1
 					}
+					className="edit-site-global-styles__shadow-editor-control"
 				/>
 			) }
-		</VStack>
+			<Flex
+				expanded={ false }
+				align="center"
+				className="edit-site-global-styles__shadow-editor-control-toggle-wrapper"
+			>
+				<Button
+					label={ __( 'Use custom size' ) }
+					icon={ settings }
+					onClick={ () => {
+						setIsCustomInput( ! isCustomInput );
+					} }
+					isPressed={ isCustomInput }
+					size="small"
+				/>
+			</Flex>
+		</HStack>
 	);
 }
