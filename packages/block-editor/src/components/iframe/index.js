@@ -112,14 +112,18 @@ function Iframe( {
 	title = __( 'Editor canvas' ),
 	...props
 } ) {
-	const { resolvedAssets, isPreviewMode } = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		const settings = getSettings();
-		return {
-			resolvedAssets: settings.__unstableResolvedAssets,
-			isPreviewMode: settings.__unstableIsPreviewMode,
-		};
-	}, [] );
+	const { resolvedAssets, isPreviewMode, siteLocale } = useSelect(
+		( select ) => {
+			const { getSettings } = select( blockEditorStore );
+			const settings = getSettings();
+			return {
+				resolvedAssets: settings.__unstableResolvedAssets,
+				isPreviewMode: settings.__unstableIsPreviewMode,
+				siteLocale: settings.locale?.site,
+			};
+		},
+		[]
+	);
 	const { styles = '', scripts = '' } = resolvedAssets;
 	const [ iframeDocument, setIframeDocument ] = useState();
 	const prevContainerWidthRef = useRef();
@@ -161,7 +165,9 @@ function Iframe( {
 				)
 			);
 
-			contentDocument.dir = ownerDocument.dir;
+			if ( ! contentDocument.dir ) {
+				contentDocument.dir = ownerDocument.dir;
+			}
 
 			for ( const compatStyle of getCompatibilityStyles() ) {
 				if ( contentDocument.getElementById( compatStyle.id ) ) {
@@ -264,7 +270,9 @@ function Iframe( {
 	// mode. Also preload the styles to avoid a flash of unstyled
 	// content.
 	const html = `<!doctype html>
-<html>
+<html lang="${ siteLocale?.lang }" dir="${
+		siteLocale?.isRTL ? 'rtl' : undefined
+	}">
 	<head>
 		<meta charset="utf-8">
 		<script>window.frameElement._load()</script>
