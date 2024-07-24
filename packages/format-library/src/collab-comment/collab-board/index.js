@@ -28,36 +28,25 @@ import { store as editorStore } from '@wordpress/editor';
 /**
  * Represents a collaborative comment board component.
  *
- * @param {Object} props - The component props.
- * @param {string} props.threadId - The ID of the comment thread.
- * @param {function} props.setThreadId - The function to set the comment thread ID.
- * @param {Object} props.contentRef - The reference to the content element.
- * @param {function} props.onClose - The function to close the comment board.
+ * @param {Object}   props - The component props.
+ * @param {String}   props.threadId - The ID of the comment thread.
+ * @param {Function} props.setThreadId - The function to set the comment thread ID.
+ * @param {Object}   props.contentRef - The reference to the content element.
+ * @param {Function} props.onClose - The function to close the comment board.
  * 
  * @return {Component} CollabBoard component.
  */
 const CollabBoard = ( { threadId, setThreadId, contentRef, onClose } ) => {
-	console.log( 'CollabBoard' ,threadId);
 	// Get the anchor for the popover.
 	const popoverAnchor = useAnchor( {
 		editableContentElement: contentRef.current,
 	} );
-	// const classList = contentRef.current?.classList?.value
-	// 	.split( ' ' )
-	// 	.find( ( className ) =>
-	// 		className.startsWith( 'block-editor-collab__' )
-	// 	);
 
 	// State to manage the comment thread.
 	const [ inputComment, setInputComment ] = useState( '' );
 	const [ isResolved, setIsResolved ] = useState( false );
 	const [ isEditing, setIsEditing ] = useState( null );
 	const [ showConfirmation, setShowConfirmation ] = useState( false );
-	// const [ threadId, setThreadId ] = useState(
-	// 	classList
-	// 		? classList.slice( 'block-editor-collab__'.length )
-	// 		: Date.now()
-	// );
 
 	// Get the dispatch functions to save the comment and update the block attributes.
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );

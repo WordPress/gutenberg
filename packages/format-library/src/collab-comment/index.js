@@ -44,7 +44,6 @@ function Edit( { isActive, value, onChange, onFocus, contentRef } ) {
 
 	// Function to toggle the visibility of the discussion board.
 	const toggleDiscussionBoardVisibility = () => {
-			console.log('toggleDiscussionBoardVisibility');
 		onChange( removeFormat( value, name ) );
 		setIsDiscussionBoardVisible( ( state ) => ! state );
 	};
