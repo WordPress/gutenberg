@@ -373,15 +373,13 @@ export function collections( state = {}, action ) {
 
 export function blockBindingsSources( state = {}, action ) {
 	// Merge usesContext with existing values, potentially defined in the server registration.
-	let mergedUsesContext = [
-		...( state[ action.name ]?.usesContext || [] ),
-		...( action.usesContext || [] ),
-	];
-	// Remove duplicates.
-	mergedUsesContext =
-		mergedUsesContext.length > 0
-			? [ ...new Set( mergedUsesContext ) ]
-			: undefined;
+	const existingUsesContext = state[ action.name ]?.usesContext || [];
+	const newUsesContext = action.usesContext || [];
+	const mergedArrays = Array.from(
+		new Set( existingUsesContext.concat( newUsesContext ) )
+	);
+	const mergedUsesContext =
+		mergedArrays.length > 0 ? mergedArrays : undefined;
 
 	switch ( action.type ) {
 		case 'ADD_BLOCK_BINDINGS_SOURCE':
