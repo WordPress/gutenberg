@@ -88,18 +88,6 @@ function ZoomOutModeInserters() {
 				previousClientId={ previousClientId }
 				nextClientId={ nextClientId }
 			>
-				{ shouldRenderInsertionPoint && (
-					<div
-						style={ {
-							borderRadius: '0',
-							height: '12px',
-							opacity: 1,
-							transform: 'translateY(-50%)',
-							width: '100%',
-						} }
-						className="block-editor-block-list__insertion-point-indicator"
-					/>
-				) }
 				{ ! shouldRenderInsertionPoint && (
 					<ZoomOutModeInserterButton
 						isVisible={ isSelected || isHovered }

@@ -453,3 +453,15 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 		margin-bottom: auto;
 	}
 }
+
+.block-editor-block-list__zoom-out-separator {
+	/* same color as the iframe's background */
+	background: $gray-300;
+}
+
+// In Post Editor allow the separator to occupy the full width by ignoring (cancelling out) the global padding.
+.has-global-padding > .block-editor-block-list__zoom-out-separator,
+.block-editor-block-list__layout.is-root-container.has-global-padding > .block-editor-block-list__zoom-out-separator {
+	max-width: none;
+	margin: 0 calc(-1 * var(--wp--style--root--padding-right)) 0 calc(-1 * var(--wp--style--root--padding-left)) !important;
+}
