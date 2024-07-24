@@ -170,21 +170,26 @@ export function getEntityActions( state, ...args ) {
  *
  * @return {Array} Block client IDs.
  */
-export const getPostBlocksByName = createRegistrySelector(
-	( select ) => ( state, blockNames ) => {
-		blockNames = Array.isArray( blockNames ) ? blockNames : [ blockNames ];
-		const { getBlocksByName, getBlockParents, getBlockName } =
-			select( blockEditorStore );
-		return getBlocksByName( blockNames ).filter( ( clientId ) =>
-			getBlockParents( clientId ).every( ( parentClientId ) => {
-				const parentBlockName = getBlockName( parentClientId );
-				return (
-					// Ignore descendents of the query block.
-					parentBlockName !== 'core/query' &&
-					// Enable only the top-most block.
-					! blockNames.includes( parentBlockName )
-				);
-			} )
-		);
-	}
+export const getPostBlocksByName = createRegistrySelector( ( select ) =>
+	createSelector(
+		( state, blockNames ) => {
+			blockNames = Array.isArray( blockNames )
+				? blockNames
+				: [ blockNames ];
+			const { getBlocksByName, getBlockParents, getBlockName } =
+				select( blockEditorStore );
+			return getBlocksByName( blockNames ).filter( ( clientId ) =>
+				getBlockParents( clientId ).every( ( parentClientId ) => {
+					const parentBlockName = getBlockName( parentClientId );
+					return (
+						// Ignore descendents of the query block.
+						parentBlockName !== 'core/query' &&
+						// Enable only the top-most block.
+						! blockNames.includes( parentBlockName )
+					);
+				} )
+			);
+		},
+		() => [ select( blockEditorStore ).getBlocks() ]
+	)
 );

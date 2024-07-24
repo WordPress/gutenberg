@@ -3,7 +3,7 @@
  */
 import { useSelect, useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useMemo } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 
 /**
@@ -28,17 +28,18 @@ export default function DisableNonPageContentBlocks() {
 		POST_CONTENT_BLOCK_TYPES
 	);
 
-	// Note that there are two separate subscription because the result for each
+	// Note that there are two separate subscriptions because the result for each
 	// returns a new array.
+	const contentOnlyBlockTypes = useMemo(
+		() => [ ...postContentBlockTypes, 'core/template-part' ],
+		[ postContentBlockTypes ]
+	);
 	const contentOnlyIds = useSelect(
 		( select ) => {
 			const { getPostBlocksByName } = unlock( select( editorStore ) );
-			return getPostBlocksByName( [
-				...postContentBlockTypes,
-				'core/template-part',
-			] );
+			return getPostBlocksByName( contentOnlyBlockTypes );
 		},
-		[ postContentBlockTypes ]
+		[ contentOnlyBlockTypes ]
 	);
 	const disabledIds = useSelect( ( select ) => {
 		const { getBlocksByName, getBlockOrder } = select( blockEditorStore );

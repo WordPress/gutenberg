@@ -7,6 +7,7 @@ import { PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as interfaceStore } from '@wordpress/interface';
 import { applyFilters } from '@wordpress/hooks';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -26,9 +27,13 @@ const POST_CONTENT_BLOCK_TYPES = [
 const TEMPLATE_PART_BLOCK = 'core/template-part';
 
 export default function TemplateContentPanel() {
-	const postContentBlockTypes = applyFilters(
-		'editor.postContentBlockTypes',
-		POST_CONTENT_BLOCK_TYPES
+	const postContentBlockTypes = useMemo(
+		() =>
+			applyFilters(
+				'editor.postContentBlockTypes',
+				POST_CONTENT_BLOCK_TYPES
+			),
+		[]
 	);
 
 	const { clientIds, postType, renderingMode } = useSelect(
