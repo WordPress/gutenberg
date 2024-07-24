@@ -374,11 +374,23 @@ export function collections( state = {}, action ) {
 export function blockBindingsSources( state = {}, action ) {
 	switch ( action.type ) {
 		case 'ADD_BLOCK_BINDINGS_SOURCE':
+			// Merge usesContext with existing values, potentially defined in the server registration.
+			let mergedUsesContext = [
+				...( state[ action.name ]?.usesContext || [] ),
+				...( action.usesContext || [] ),
+			];
+			// Remove duplicates.
+			mergedUsesContext =
+				mergedUsesContext.length > 0
+					? [ ...new Set( mergedUsesContext ) ]
+					: undefined;
+
 			return {
 				...state,
 				[ action.name ]: {
 					// Don't override the label if it's already set.
 					label: state[ action.name ]?.label || action.label,
+					usesContext: mergedUsesContext,
 					getValues: action.getValues,
 					setValues: action.setValues,
 					getPlaceholder: action.getPlaceholder,
