@@ -39,7 +39,7 @@ const TEXT_DECORATION_SUPPORT_KEY = 'typography.textDecoration';
  * Key within block settings' supports array indicating support for writing mode
  * e.g. settings found in `block.json`.
  */
-const WRITING_MODE_SUPPORT_KEY = 'typography.writingMode';
+const WRITING_MODE_SUPPORT_KEY = 'typography.__experimentalWritingMode';
 /**
  * Key within block settings' supports array indicating support for text
  * transforms e.g. settings found in `block.json`.

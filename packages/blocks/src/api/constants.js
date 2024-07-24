@@ -255,7 +255,7 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	},
 	writingMode: {
 		value: [ 'typography', 'writingMode' ],
-		support: [ 'typography', 'writingMode' ],
+		support: [ 'typography', '__experimentalWritingMode' ],
 		useEngine: true,
 	},
 	'--wp--style--root--padding': {
@@ -305,5 +305,4 @@ export const TYPOGRAPHY_SUPPORTS_EXPERIMENTAL_TO_STABLE = {
 	__experimentalFontWeight: 'fontWeight',
 	__experimentalLetterSpacing: 'letterSpacing',
 	__experimentalTextTransform: 'textTransform',
-	__experimentalWritingMode: 'writingMode',
 };

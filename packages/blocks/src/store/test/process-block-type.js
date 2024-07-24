@@ -54,7 +54,7 @@ describe( 'processBlockType', () => {
 			letterSpacing: true,
 			textTransform: true,
 			textDecoration: true,
-			writingMode: true,
+			__experimentalWritingMode: true,
 			__experimentalDefaultControls: {
 				fontSize: true,
 				fontAppearance: true,
@@ -76,7 +76,7 @@ describe( 'processBlockType', () => {
 					letterSpacing: true,
 					textTransform: true,
 					textDecoration: true,
-					writingMode: true,
+					__experimentalWritingMode: true,
 					__experimentalDefaultControls: {
 						fontSize: true,
 						fontAppearance: true,
@@ -100,7 +100,7 @@ describe( 'processBlockType', () => {
 			letterSpacing: true,
 			textTransform: true,
 			textDecoration: true,
-			writingMode: true,
+			__experimentalWritingMode: true,
 			__experimentalDefaultControls: {
 				fontSize: true,
 				fontAppearance: true,
@@ -122,7 +122,7 @@ describe( 'processBlockType', () => {
 					letterSpacing: true,
 					textTransform: true,
 					textDecoration: true,
-					writingMode: true,
+					__experimentalWritingMode: true,
 					__experimentalDefaultControls: {
 						fontSize: true,
 						fontAppearance: true,
@@ -161,7 +161,7 @@ describe( 'processBlockType', () => {
 			letterSpacing: true,
 			textTransform: true,
 			textDecoration: true,
-			writingMode: true,
+			__experimentalWritingMode: true,
 		} );
 	} );
 } );
