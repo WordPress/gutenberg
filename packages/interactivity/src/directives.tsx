@@ -131,20 +131,20 @@ const proxifyContext = ( current: object, inherited: object = {} ): object => {
 };
 
 /**
- * Recursively update values within a deepSignal object.
+ * Recursively update values within a context object.
  *
- * @param proxy  A deepSignal instance.
- * @param source Object with properties to update in `proxy`.
+ * @param target A context instance.
+ * @param source Object with properties to update in `target`.
  */
-const updateSignals = ( proxy: any, source: any ) => {
+const updateContext = ( target: any, source: any ) => {
 	for ( const k in source ) {
 		if (
-			isPlainObject( peek( proxy, k ) ) &&
+			isPlainObject( peek( target, k ) ) &&
 			isPlainObject( source[ k ] )
 		) {
-			updateSignals( peek( proxy, k ) as object, source[ k ] );
+			updateContext( peek( target, k ) as object, source[ k ] );
 		} else {
-			proxy[ k ] = source[ k ];
+			target[ k ] = source[ k ];
 		}
 	}
 };
@@ -287,7 +287,7 @@ export default () => {
 							`The value of data-wp-context in "${ namespace }" store must be a valid stringified JSON object.`
 						);
 					}
-					updateSignals(
+					updateContext(
 						currentValue.current[ namespace ],
 						deepClone( value ) as object
 					);
