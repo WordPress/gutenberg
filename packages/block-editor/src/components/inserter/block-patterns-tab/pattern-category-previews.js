@@ -13,10 +13,12 @@ import { __ } from '@wordpress/i18n';
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
-	__experimentalHeading as Heading,
 	__experimentalText as Text,
-	FlexBlock,
+	FormToggle,
+	VisuallyHidden,
 } from '@wordpress/components';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { Icon, fullscreen } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -32,6 +34,7 @@ import {
 	myPatternsCategory,
 	INSERTER_PATTERN_TYPES,
 } from './utils';
+import { store as blockEditorStore } from '../../../store';
 
 const noop = () => {};
 
@@ -42,6 +45,12 @@ export function PatternCategoryPreviews( {
 	category,
 	showTitlesAsTooltip,
 } ) {
+	const isZoomOut = useSelect( ( select ) => {
+		return (
+			select( blockEditorStore ).__unstableGetEditorMode() === 'zoom-out'
+		);
+	}, [] );
+
 	const [ allPatterns, , onClickPattern ] = usePatternsState(
 		onInsert,
 		rootClientId,
@@ -109,6 +118,8 @@ export function PatternCategoryPreviews( {
 	);
 	const { changePage } = pagingProps;
 
+	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
+
 	// Hide block pattern preview on unmount.
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	useEffect( () => () => onHover( null ), [] );
@@ -135,16 +146,21 @@ export function PatternCategoryPreviews( {
 				className="block-editor-inserter__patterns-category-panel-header"
 			>
 				<HStack>
-					<FlexBlock>
-						<Heading
-							className="block-editor-inserter__patterns-category-panel-title"
-							size={ 13 }
-							level={ 4 }
-							as="div"
-						>
-							{ category.label }
-						</Heading>
-					</FlexBlock>
+					<HStack as="label" expanded={ false }>
+						<FormToggle
+							onChange={ () => {
+								if ( isZoomOut ) {
+									// TODO: We should set it back to what it was, not to edit.
+									__unstableSetEditorMode( 'edit' );
+								} else {
+									__unstableSetEditorMode( 'zoom-out' );
+								}
+							} }
+							checked={ isZoomOut }
+						/>
+						<VisuallyHidden>Full Screen View</VisuallyHidden>
+						<Icon icon={ fullscreen } size="24" />
+					</HStack>
 					<PatternsFilter
 						patternSyncFilter={ patternSyncFilter }
 						patternSourceFilter={ patternSourceFilter }
