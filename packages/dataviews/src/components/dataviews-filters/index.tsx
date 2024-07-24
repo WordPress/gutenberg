@@ -33,7 +33,7 @@ function Filters() {
 		const isPrimary = !! field.filterBy?.isPrimary;
 		filters.push( {
 			field: field.id,
-			name: field.header,
+			name: field.label,
 			elements: field.elements,
 			singleSelection: operators.some( ( op ) =>
 				[ OPERATOR_IS, OPERATOR_IS_NOT ].includes( op )

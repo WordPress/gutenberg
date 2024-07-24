@@ -27,6 +27,7 @@ export default function DataViewsLayout() {
 		selection,
 		onChangeSelection,
 		setOpenedFilter,
+		density,
 	} = useContext( DataViewsContext );
 
 	const ViewComponent = VIEW_LAYOUTS.find( ( v ) => v.type === view.type )
@@ -44,6 +45,7 @@ export default function DataViewsLayout() {
 			selection={ selection }
 			setOpenedFilter={ setOpenedFilter }
 			view={ view }
+			density={ density }
 		/>
 	);
 }

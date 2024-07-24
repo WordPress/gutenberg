@@ -205,6 +205,7 @@ function InstalledFonts() {
 		}
 	};
 
+	const hasFonts = baseThemeFonts.length > 0 || baseCustomFonts.length > 0;
 	return (
 		<div className="font-library-modal__tabpanel-layout">
 			{ isResolvingLibrary && (
@@ -229,6 +230,11 @@ function InstalledFonts() {
 									>
 										{ notice.message }
 									</Notice>
+								) }
+								{ ! hasFonts && (
+									<Text as="p">
+										{ __( 'No fonts installed.' ) }
+									</Text>
 								) }
 								{ baseThemeFonts.length > 0 && (
 									<VStack>

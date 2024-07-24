@@ -679,6 +679,12 @@ $block-inserter-tabs-height: 44px;
 			height: 100%;
 		}
 	}
+
+	// Remove doubled-up shadow that occurs when categories panel is opened, only in zoom out.
+	// Shadow cannot be removed from the source, as it is required when not zoomed out.
+	.block-editor-inserter__category-panel {
+		box-shadow: none;
+	}
 }
 
 .show-icon-labels {

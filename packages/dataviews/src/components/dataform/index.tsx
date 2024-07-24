@@ -33,7 +33,7 @@ function DataFormTextControl< Item >( {
 	field,
 	onChange,
 }: DataFormControlProps< Item > ) {
-	const { id, header, placeholder } = field;
+	const { id, label, placeholder } = field;
 	const value = field.getValue( { item: data } );
 
 	const onChangeControl = useCallback(
@@ -47,9 +47,9 @@ function DataFormTextControl< Item >( {
 
 	return (
 		<TextControl
-			label={ header }
+			label={ label }
 			placeholder={ placeholder }
-			value={ value }
+			value={ value ?? '' }
 			onChange={ onChangeControl }
 			__next40pxDefaultSize
 		/>

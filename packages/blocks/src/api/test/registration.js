@@ -1512,6 +1512,98 @@ describe( 'blocks', () => {
 			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();
 		} );
 
+		it( 'should not override label from the server', () => {
+			// Bootstrap source from the server.
+			unlock(
+				dispatch( blocksStore )
+			).addBootstrappedBlockBindingsSource( {
+				name: 'core/server',
+				label: 'Server label',
+			} );
+			// Override the source with a different label in the client.
+			registerBlockBindingsSource( {
+				name: 'core/server',
+				label: 'Client label',
+			} );
+			expect( console ).toHaveWarnedWith(
+				'Block bindings "core/server" source label is already defined in the server.'
+			);
+		} );
+
+		// Check the `usesContext` array is correct.
+		it( 'should reject invalid usesContext property', () => {
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+				usesContext: 'should be an array',
+			} );
+			expect( console ).toHaveWarnedWith(
+				'Block bindings source usesContext must be an array.'
+			);
+		} );
+
+		it( 'should add usesContext when only defined in the server', () => {
+			// Bootstrap source from the server.
+			unlock(
+				dispatch( blocksStore )
+			).addBootstrappedBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+				usesContext: [ 'postId', 'postType' ],
+			} );
+			// Register source in the client without usesContext.
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				getValue: () => 'value',
+			} );
+			const source = getBlockBindingsSource( 'core/testing' );
+			unregisterBlockBindingsSource( 'core/testing' );
+			expect( source.usesContext ).toEqual( [ 'postId', 'postType' ] );
+		} );
+
+		it( 'should add usesContext when only defined in the client', () => {
+			// Bootstrap source from the server.
+			unlock(
+				dispatch( blocksStore )
+			).addBootstrappedBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+			} );
+			// Register source in the client with usesContext.
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				usesContext: [ 'postId', 'postType' ],
+				getValue: () => 'value',
+			} );
+			const source = getBlockBindingsSource( 'core/testing' );
+			unregisterBlockBindingsSource( 'core/testing' );
+			expect( source.usesContext ).toEqual( [ 'postId', 'postType' ] );
+		} );
+
+		it( 'should merge usesContext from server and client without duplicates', () => {
+			// Bootstrap source from the server.
+			unlock(
+				dispatch( blocksStore )
+			).addBootstrappedBlockBindingsSource( {
+				name: 'core/testing',
+				label: 'testing',
+				usesContext: [ 'postId', 'postType' ],
+			} );
+			// Register source in the client with usesContext.
+			registerBlockBindingsSource( {
+				name: 'core/testing',
+				usesContext: [ 'postType', 'clientContext' ],
+				getValue: () => 'value',
+			} );
+			const source = getBlockBindingsSource( 'core/testing' );
+			unregisterBlockBindingsSource( 'core/testing' );
+			expect( source.usesContext ).toEqual( [
+				'postId',
+				'postType',
+				'clientContext',
+			] );
+		} );
+
 		// Check the `getValues` callback is correct.
 		it( 'should reject invalid getValues callback', () => {
 			registerBlockBindingsSource( {
@@ -1568,6 +1660,7 @@ describe( 'blocks', () => {
 		it( 'should register a valid source', () => {
 			const sourceProperties = {
 				label: 'Valid Source',
+				usesContext: [ 'postId' ],
 				getValues: () => 'value',
 				setValues: () => 'new values',
 				getPlaceholder: () => 'placeholder',
@@ -1589,6 +1682,7 @@ describe( 'blocks', () => {
 				label: 'Valid Source',
 			} );
 			const source = getBlockBindingsSource( 'core/valid-source' );
+			expect( source.usesContext ).toBeUndefined();
 			expect( source.getValues ).toBeUndefined();
 			expect( source.setValues ).toBeUndefined();
 			expect( source.getPlaceholder ).toBeUndefined();
@@ -1600,6 +1694,7 @@ describe( 'blocks', () => {
 			const source = {
 				name: 'core/test-source',
 				label: 'Test Source',
+				getValues: () => 'value',
 			};
 			registerBlockBindingsSource( source );
 			registerBlockBindingsSource( source );
