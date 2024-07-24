@@ -79,7 +79,7 @@ if ( ! class_exists( 'WP_Templates_Registry' ) ) {
 					'6.7.0'
 				);
 				/* translators: %s: Template id. */
-				return new WP_Error( 'template_already_registered', __( 'Template "%s" is already registered.', 'gutenberg' ) );
+				return new WP_Error( 'template_already_registered', sprintf( __( 'Template "%s" is already registered.', 'gutenberg' ), $template_id ) );
 			}
 
 			if ( ! $template ) {
