@@ -255,5 +255,9 @@ export default ( props ) => ( element ) => {
 		element.removeEventListener( 'compositionstart', onCompositionStart );
 		element.removeEventListener( 'compositionend', onCompositionEnd );
 		element.removeEventListener( 'focus', onFocus );
+		ownerDocument.removeEventListener(
+			'selectionchange',
+			handleSelectionChange
+		);
 	};
 };
