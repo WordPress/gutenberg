@@ -173,14 +173,11 @@ export function getEntityActions( state, ...args ) {
 export const getPostBlocksByName = createRegistrySelector(
 	( select ) => ( state, blockNames ) => {
 		blockNames = Array.isArray( blockNames ) ? blockNames : [ blockNames ];
-		const {
-			getBlocksByName,
-			getBlockParents,
-			getBlockName: _getBlockName,
-		} = select( blockEditorStore );
+		const { getBlocksByName, getBlockParents, getBlockName } =
+			select( blockEditorStore );
 		return getBlocksByName( blockNames ).filter( ( clientId ) =>
 			getBlockParents( clientId ).every( ( parentClientId ) => {
-				const parentBlockName = _getBlockName( parentClientId );
+				const parentBlockName = getBlockName( parentClientId );
 				return (
 					// Ignore descendents of the query block.
 					parentBlockName !== 'core/query' &&
