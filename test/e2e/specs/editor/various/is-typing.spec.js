@@ -4,8 +4,16 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'isTyping', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.activatePlugin( 'gutenberg-test-observe-typing' );
+	} );
+
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deactivatePlugin( 'gutenberg-test-observe-typing' );
 	} );
 
 	test( 'should hide the toolbar when typing', async ( { editor, page } ) => {
@@ -42,33 +50,23 @@ test.describe( 'isTyping', () => {
 		page,
 	} ) => {
 		// Add a block with a dropdown in the toolbar that contains an input.
-		await editor.insertBlock( { name: 'core/query' } );
-
-		await editor.canvas
-			.getByRole( 'document', { name: 'Block: Query Loop' } )
-			.getByRole( 'button', { name: 'Start blank' } )
-			.click();
-
-		await editor.canvas
-			.getByRole( 'button', { name: 'Title & Date' } )
-			.click();
-
-		await editor.openDocumentSettingsSidebar();
-		await page.getByLabel( 'Inherit query from template' ).click();
+		await editor.insertBlock( { name: 'e2e-tests/observe-typing' } );
 
 		// Moving the mouse shows the toolbar.
 		await editor.showBlockToolbar();
 		// Open the dropdown.
-		const displaySettings = page.getByRole( 'button', {
-			name: 'Display settings',
+		await page
+			.getByRole( 'button', {
+				name: 'Open Dropdown',
+			} )
+			.click();
+
+		const textControl = page.getByRole( 'textbox', {
+			name: 'Dropdown field',
 		} );
-		await displaySettings.click();
-		const itemsPerPageInput = page.getByLabel( 'Items per Page' );
-		// Make sure we're where we think we are
-		await expect( itemsPerPageInput ).toBeFocused();
 		// Type inside the dropdown's input
-		await page.keyboard.type( '00' );
+		await textControl.pressSequentially( 'Hello' );
 		// The input should still be visible.
-		await expect( itemsPerPageInput ).toBeVisible();
+		await expect( textControl ).toBeVisible();
 	} );
 } );
