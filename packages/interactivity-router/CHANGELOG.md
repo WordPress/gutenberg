@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 2.4.0 (2024-07-24)
+
+## 2.3.0 (2024-07-10)
+
+## 2.2.0 (2024-06-26)
+
+## 2.1.0 (2024-06-15)
+
+## 2.0.0 (2024-05-31)
+
 ### Breaking Changes
 
 -   Variables like `process.env.IS_GUTENBERG_PLUGIN` have been replaced by `globalThis.IS_GUTENBERG_PLUGIN`. Build systems using `process.env` should be updated ([#61486](https://github.com/WordPress/gutenberg/pull/61486)).
@@ -33,6 +43,6 @@
 
 ## 1.0.0 (2024-01-24)
 
-### Breaking changes
+### Breaking Changes
 
 -   Initial version. ([57924](https://github.com/WordPress/gutenberg/pull/57924))

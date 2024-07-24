@@ -145,7 +145,7 @@ export default function ShadowsEditPanel() {
 	};
 
 	return ! selectedShadow ? (
-		<ScreenHeader title={ '' } />
+		<ScreenHeader title="" />
 	) : (
 		<>
 			<HStack justify="space-between">
@@ -201,6 +201,7 @@ export default function ShadowsEditPanel() {
 						setIsConfirmDialogVisible( false );
 					} }
 					confirmButtonText={ __( 'Delete' ) }
+					size="medium"
 				>
 					{ sprintf(
 						// translators: %s: name of the shadow
@@ -305,7 +306,7 @@ function ShadowEditor( { shadow, onChange } ) {
 						align="center"
 						className="edit-site-global-styles__shadows-panel__title"
 					>
-						<Subtitle level={ 3 }>{ 'Shadows' }</Subtitle>
+						<Subtitle level={ 3 }>{ __( 'Shadows' ) }</Subtitle>
 					</Flex>
 					<FlexItem className="edit-site-global-styles__shadows-panel__options-container">
 						<Button
@@ -362,10 +363,7 @@ function ShadowItem( { shadow, onChange, canRemove, onRemove } ) {
 						'edit-site-global-styles__shadow-editor__dropdown-toggle',
 						{ 'is-open': isOpen }
 					),
-					ariaExpanded: isOpen,
-					ariaLabel: shadowObj.inset
-						? __( 'Inner shadow' )
-						: __( 'Drop shadow' ),
+					'aria-expanded': isOpen,
 				};
 				const removeButtonProps = {
 					onClick: onRemove,
@@ -373,8 +371,7 @@ function ShadowItem( { shadow, onChange, canRemove, onRemove } ) {
 						'edit-site-global-styles__shadow-editor__remove-button',
 						{ 'is-open': isOpen }
 					),
-					ariaLabel: __( 'Remove shadow' ),
-					tooltip: __( 'Remove shadow' ),
+					label: __( 'Remove shadow' ),
 				};
 
 				return (
@@ -509,7 +506,7 @@ function ShadowInputControl( { label, value, onChange, hasNegativeRange } ) {
 	};
 
 	return (
-		<VStack justify={ 'flex-start' }>
+		<VStack justify="flex-start">
 			<HStack justify="space-between">
 				<Subtitle>{ label }</Subtitle>
 				<Button

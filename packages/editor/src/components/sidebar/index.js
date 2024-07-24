@@ -22,16 +22,15 @@ import { store as interfaceStore } from '@wordpress/interface';
 /**
  * Internal dependencies
  */
-import PageAttributesPanel from '../page-attributes/panel';
 import PatternOverridesPanel from '../pattern-overrides-panel';
 import PluginDocumentSettingPanel from '../plugin-document-setting-panel';
 import PluginSidebar from '../plugin-sidebar';
-import PostLastRevisionPanel from '../post-last-revision/panel';
 import PostSummary from './post-summary';
 import PostTaxonomiesPanel from '../post-taxonomies/panel';
 import PostTransformPanel from '../post-transform-panel';
 import SidebarHeader from './header';
 import TemplateContentPanel from '../template-content-panel';
+import TemplatePartContentPanel from '../template-part-content-panel';
 import useAutoSwitchEditorSidebars from '../provider/use-auto-switch-editor-sidebars';
 import { sidebars } from './constants';
 import { unlock } from '../../lock-unlock';
@@ -52,7 +51,6 @@ const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {
 const SidebarContent = ( {
 	tabName,
 	keyboardShortcut,
-	renderingMode,
 	onActionPerformed,
 	extraPanels,
 } ) => {
@@ -113,13 +111,10 @@ const SidebarContent = ( {
 				<Tabs.TabPanel tabId={ sidebars.document } focusable={ false }>
 					<PostSummary onActionPerformed={ onActionPerformed } />
 					<PluginDocumentSettingPanel.Slot />
-					{ renderingMode !== 'post-only' && (
-						<TemplateContentPanel />
-					) }
+					<TemplateContentPanel />
+					<TemplatePartContentPanel />
 					<PostTransformPanel />
-					<PostLastRevisionPanel />
 					<PostTaxonomiesPanel />
-					<PageAttributesPanel />
 					<PatternOverridesPanel />
 					{ extraPanels }
 				</Tabs.TabPanel>
@@ -133,7 +128,7 @@ const SidebarContent = ( {
 
 const Sidebar = ( { extraPanels, onActionPerformed } ) => {
 	useAutoSwitchEditorSidebars();
-	const { tabName, keyboardShortcut, showSummary, renderingMode } = useSelect(
+	const { tabName, keyboardShortcut, showSummary } = useSelect(
 		( select ) => {
 			const shortcut = select(
 				keyboardShortcutsStore
@@ -162,7 +157,6 @@ const Sidebar = ( { extraPanels, onActionPerformed } ) => {
 					TEMPLATE_PART_POST_TYPE,
 					NAVIGATION_POST_TYPE,
 				].includes( select( editorStore ).getCurrentPostType() ),
-				renderingMode: select( editorStore ).getRenderingMode(),
 			};
 		},
 		[]
@@ -189,7 +183,6 @@ const Sidebar = ( { extraPanels, onActionPerformed } ) => {
 				tabName={ tabName }
 				keyboardShortcut={ keyboardShortcut }
 				showSummary={ showSummary }
-				renderingMode={ renderingMode }
 				onActionPerformed={ onActionPerformed }
 				extraPanels={ extraPanels }
 			/>

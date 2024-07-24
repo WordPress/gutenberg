@@ -6,6 +6,7 @@ import { useSelect } from '@wordpress/data';
 import { Dropdown, Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { safeDecodeURIComponent } from '@wordpress/url';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -58,10 +59,22 @@ export default function PostURLPanel() {
 }
 
 function PostURLToggle( { isOpen, onClick } ) {
-	const slug = useSelect(
-		( select ) => select( editorStore ).getEditedPostSlug(),
-		[]
-	);
+	const { slug, isFrontPage, postLink } = useSelect( ( select ) => {
+		const { getCurrentPostId, getCurrentPost } = select( editorStore );
+		const { getEditedEntityRecord, canUser } = select( coreStore );
+		const siteSettings = canUser( 'read', {
+			kind: 'root',
+			name: 'site',
+		} )
+			? getEditedEntityRecord( 'root', 'site' )
+			: undefined;
+		const _id = getCurrentPostId();
+		return {
+			slug: select( editorStore ).getEditedPostSlug(),
+			isFrontPage: siteSettings?.page_on_front === _id,
+			postLink: getCurrentPost()?.link,
+		};
+	}, [] );
 	const decodedSlug = safeDecodeURIComponent( slug );
 	return (
 		<Button
@@ -73,7 +86,7 @@ function PostURLToggle( { isOpen, onClick } ) {
 			aria-label={ sprintf( __( 'Change link: %s' ), decodedSlug ) }
 			onClick={ onClick }
 		>
-			{ decodedSlug }
+			{ isFrontPage ? postLink : <>/{ decodedSlug }</> }
 		</Button>
 	);
 }

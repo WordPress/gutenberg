@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/commands",
-	"version": "0.29.0",
+	"version": "1.4.0",
 	"description": "Handles the commands menu.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -36,7 +36,7 @@
 		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
 		"@wordpress/private-apis": "file:../private-apis",
 		"clsx": "^2.1.1",
-		"cmdk": "^0.2.0"
+		"cmdk": "^1.0.0"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",

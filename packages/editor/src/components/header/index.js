@@ -1,13 +1,8 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useViewportMatch } from '@wordpress/compose';
+import { useMediaQuery, useViewportMatch } from '@wordpress/compose';
 import { __unstableMotion as motion } from '@wordpress/components';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { useState } from '@wordpress/element';
@@ -17,22 +12,32 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import CollapsableBlockToolbar from '../collapsible-block-toolbar';
+import BackButton, { useHasBackButton } from './back-button';
+import CollapsibleBlockToolbar from '../collapsible-block-toolbar';
 import DocumentBar from '../document-bar';
 import DocumentTools from '../document-tools';
 import MoreMenu from '../more-menu';
 import PostPreviewButton from '../post-preview-button';
 import PostPublishButtonOrToggle from '../post-publish-button/post-publish-button-or-toggle';
 import PostSavedState from '../post-saved-state';
-import PostTypeSupportCheck from '../post-type-support-check';
 import PostViewLink from '../post-view-link';
 import PreviewDropdown from '../preview-dropdown';
 import { store as editorStore } from '../../store';
 
-const slideY = {
-	hidden: { y: '-50px' },
-	distractionFreeInactive: { y: 0 },
-	hover: { y: 0, transition: { type: 'tween', delay: 0.2 } },
+const toolbarVariations = {
+	distractionFreeDisabled: { y: '-50px' },
+	distractionFreeHover: { y: 0 },
+	distractionFreeHidden: { y: '-50px' },
+	visible: { y: 0 },
+	hidden: { y: 0 },
+};
+
+const backButtonVariations = {
+	distractionFreeDisabled: { x: '-100%' },
+	distractionFreeHover: { x: 0 },
+	distractionFreeHidden: { x: '-100%' },
+	visible: { x: 0 },
+	hidden: { x: 0 },
 };
 
 function Header( {
@@ -41,10 +46,11 @@ function Header( {
 	forceDisableBlockTools,
 	setEntitiesSavedStatesCallback,
 	title,
-	children,
+	icon,
 } ) {
 	const isWideViewport = useViewportMatch( 'large' );
 	const isLargeViewport = useViewportMatch( 'medium' );
+	const isTooNarrowForDocumentBar = useMediaQuery( '(max-width: 403px)' );
 	const {
 		isTextEditor,
 		isPublishSidebarOpened,
@@ -72,48 +78,52 @@ function Header( {
 		};
 	}, [] );
 
-	const hasTopToolbar = isLargeViewport && hasFixedToolbar;
-
 	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
 		useState( true );
+
+	const hasCenter = isBlockToolsCollapsed && ! isTooNarrowForDocumentBar;
+	const hasBackButton = useHasBackButton();
 
 	// The edit-post-header classname is only kept for backward compatibilty
 	// as some plugins might be relying on its presence.
 	return (
 		<div className="editor-header edit-post-header">
-			{ children }
+			{ hasBackButton && (
+				<motion.div
+					className="editor-header__back-button"
+					variants={ backButtonVariations }
+					transition={ { type: 'tween' } }
+				>
+					<BackButton.Slot />
+				</motion.div>
+			) }
 			<motion.div
-				variants={ slideY }
-				transition={ { type: 'tween', delay: 0.8 } }
+				variants={ toolbarVariations }
 				className="editor-header__toolbar"
+				transition={ { type: 'tween' } }
 			>
 				<DocumentTools
 					disableBlockTools={ forceDisableBlockTools || isTextEditor }
 				/>
-				{ hasTopToolbar && (
-					<CollapsableBlockToolbar
+				{ hasFixedToolbar && isLargeViewport && (
+					<CollapsibleBlockToolbar
 						isCollapsed={ isBlockToolsCollapsed }
 						onToggle={ setIsBlockToolsCollapsed }
 					/>
 				) }
-				<div
-					className={ clsx( 'editor-header__center', {
-						'is-collapsed':
-							! isBlockToolsCollapsed && hasTopToolbar,
-					} ) }
-				>
-					{ ! title ? (
-						<PostTypeSupportCheck supportKeys="title">
-							<DocumentBar />
-						</PostTypeSupportCheck>
-					) : (
-						title
-					) }
-				</div>
 			</motion.div>
+			{ hasCenter && (
+				<motion.div
+					className="editor-header__center"
+					variants={ toolbarVariations }
+					transition={ { type: 'tween' } }
+				>
+					<DocumentBar title={ title } icon={ icon } />
+				</motion.div>
+			) }
 			<motion.div
-				variants={ slideY }
-				transition={ { type: 'tween', delay: 0.8 } }
+				variants={ toolbarVariations }
+				transition={ { type: 'tween' } }
 				className="editor-header__settings"
 			>
 				{ ! customSaveButton && ! isPublishSidebarOpened && (

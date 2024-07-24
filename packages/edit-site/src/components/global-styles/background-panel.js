@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -46,22 +45,13 @@ export default function BackgroundPanel() {
 	const _links = useGlobalStyleLinks();
 	const [ settings ] = useGlobalSetting( '' );
 
-	const defaultControls = {
-		backgroundImage: true,
-		backgroundSize:
-			hasBackgroundImageValue( style ) ||
-			hasBackgroundImageValue( inheritedStyle ),
-	};
-
 	return (
 		<StylesBackgroundPanel
 			inheritedValue={ inheritedStyle }
 			value={ style }
 			onChange={ setStyle }
 			settings={ settings }
-			headerLabel={ __( 'Background' ) }
 			defaultValues={ BACKGROUND_DEFAULT_VALUES }
-			defaultControls={ defaultControls }
 			themeFileURIs={ _links?.[ 'wp:theme-file' ] }
 		/>
 	);

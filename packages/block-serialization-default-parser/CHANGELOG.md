@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 5.4.0 (2024-07-24)
+
+## 5.3.0 (2024-07-10)
+
+## 5.2.0 (2024-06-26)
+
+## 5.1.0 (2024-06-15)
+
+## 5.0.0 (2024-05-31)
+
 ### Breaking Changes
 
 -   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
@@ -90,7 +100,7 @@
 
 ## 4.17.0 (2022-09-13)
 
-### New Feature
+### New Features
 
 -   Include TypeScript type declarations ([#43722](https://github.com/WordPress/gutenberg/pull/43722)).
 

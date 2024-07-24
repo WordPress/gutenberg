@@ -33,17 +33,24 @@ export function mergeBaseAndUserConfigs( base, user ) {
 function useGlobalStylesUserConfig() {
 	const { globalStylesId, isReady, settings, styles, _links } = useSelect(
 		( select ) => {
-			const { getEditedEntityRecord, hasFinishedResolution } =
+			const { getEditedEntityRecord, hasFinishedResolution, canUser } =
 				select( coreStore );
 			const _globalStylesId =
 				select( coreStore ).__experimentalGetCurrentGlobalStylesId();
-			const record = _globalStylesId
-				? getEditedEntityRecord(
-						'root',
-						'globalStyles',
-						_globalStylesId
-				  )
-				: undefined;
+
+			const record =
+				_globalStylesId &&
+				canUser( 'read', {
+					kind: 'root',
+					name: 'globalStyles',
+					id: _globalStylesId,
+				} )
+					? getEditedEntityRecord(
+							'root',
+							'globalStyles',
+							_globalStylesId
+					  )
+					: undefined;
 
 			let hasResolved = false;
 			if (
@@ -82,7 +89,13 @@ function useGlobalStylesUserConfig() {
 	}, [ settings, styles, _links ] );
 
 	const setConfig = useCallback(
-		( callback, options = {} ) => {
+		/**
+		 * Set the global styles config.
+		 * @param {Function|Object} callbackOrObject If the callbackOrObject is a function, pass the current config to the callback so the consumer can merge values.
+		 *                                           Otherwise, overwrite the current config with the incoming object.
+		 * @param {Object}          options          Options for editEntityRecord Core selector.
+		 */
+		( callbackOrObject, options = {} ) => {
 			const record = getEditedEntityRecord(
 				'root',
 				'globalStyles',
@@ -94,7 +107,11 @@ function useGlobalStylesUserConfig() {
 				settings: record?.settings ?? {},
 				_links: record?._links ?? {},
 			};
-			const updatedConfig = callback( currentConfig );
+
+			const updatedConfig =
+				typeof callbackOrObject === 'function'
+					? callbackOrObject( currentConfig )
+					: callbackOrObject;
 
 			editEntityRecord(
 				'root',
@@ -108,7 +125,7 @@ function useGlobalStylesUserConfig() {
 				options
 			);
 		},
-		[ globalStylesId ]
+		[ globalStylesId, editEntityRecord, getEditedEntityRecord ]
 	);
 
 	return [ isReady, config, setConfig ];
@@ -116,9 +133,13 @@ function useGlobalStylesUserConfig() {
 
 function useGlobalStylesBaseConfig() {
 	const baseConfig = useSelect( ( select ) => {
-		return select(
-			coreStore
-		).__experimentalGetCurrentThemeBaseGlobalStyles();
+		const { __experimentalGetCurrentThemeBaseGlobalStyles, canUser } =
+			select( coreStore );
+
+		return (
+			canUser( 'read', { kind: 'root', name: 'theme' } ) &&
+			__experimentalGetCurrentThemeBaseGlobalStyles()
+		);
 	}, [] );
 
 	return [ !! baseConfig, baseConfig ];
@@ -128,10 +149,12 @@ export function useGlobalStylesContext() {
 	const [ isUserConfigReady, userConfig, setUserConfig ] =
 		useGlobalStylesUserConfig();
 	const [ isBaseConfigReady, baseConfig ] = useGlobalStylesBaseConfig();
+
 	const mergedConfig = useMemo( () => {
 		if ( ! baseConfig || ! userConfig ) {
 			return {};
 		}
+
 		return mergeBaseAndUserConfigs( baseConfig, userConfig );
 	}, [ userConfig, baseConfig ] );
 

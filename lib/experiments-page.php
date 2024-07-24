@@ -139,6 +139,30 @@ function gutenberg_initialize_experiments_settings() {
 		)
 	);
 
+	add_settings_field(
+		'gutenberg-new-posts-dashboard',
+		__( 'Redesigned posts dashboard', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enable a redesigned posts dashboard.', 'gutenberg' ),
+			'id'    => 'gutenberg-new-posts-dashboard',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-quick-edit-dataviews',
+		__( 'Quick Edit in DataViews', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Allow access to a quick edit panel in the pages data views.', 'gutenberg' ),
+			'id'    => 'gutenberg-quick-edit-dataviews',
+		)
+	);
+
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments'
@@ -172,7 +196,7 @@ function gutenberg_display_experiment_field( $args ) {
  */
 function gutenberg_display_experiment_section() {
 	?>
-	<p><?php echo __( "The block editor includes experimental features that are useable while they're in development. Select the ones you'd like to enable. These features are likely to change, so avoid using them in production.", 'gutenberg' ); ?></p>
+	<p><?php echo __( "The block editor includes experimental features that are usable while they're in development. Select the ones you'd like to enable. These features are likely to change, so avoid using them in production.", 'gutenberg' ); ?></p>
 
 	<?php
 }

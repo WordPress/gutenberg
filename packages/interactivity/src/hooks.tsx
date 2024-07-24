@@ -19,7 +19,7 @@ import type { VNode, Context, RefObject } from 'preact';
  */
 import { store, stores, universalUnlock } from './store';
 import { warn } from './utils';
-interface DirectiveEntry {
+export interface DirectiveEntry {
 	value: string | object;
 	namespace: string;
 	suffix: string;
@@ -231,7 +231,7 @@ const directivePriorities: Record< string, number > = {};
  * ```js
  * directive(
  *   'color', // Name without prefix and suffix.
- *   ( { directives: { color }, ref, evaluate } ) =>
+ *   ( { directives: { color: colors }, ref, evaluate } ) =>
  *     colors.forEach( ( color ) => {
  *       if ( color.suffix = 'text' ) {
  *         ref.style.setProperty(

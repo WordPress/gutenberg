@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+## 3.4.0 (2024-07-24)
+
+## 3.3.0 (2024-07-10)
+
+## 3.2.0 (2024-06-26)
+
+## 3.1.0 (2024-06-15)
+
+### Internal
+
+-   Refactor to TypeScript ([#62584](https://github.com/WordPress/gutenberg/pull/62584)).
+
+## 3.0.0 (2024-05-31)
+
 ### Breaking Changes
 
 -   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
@@ -133,7 +147,7 @@
 
 ## 1.10.0 (2020-04-15)
 
-### New feature
+### New Features
 
 -   Include TypeScript type declarations ([#18942](https://github.com/WordPress/gutenberg/pull/18942))
 

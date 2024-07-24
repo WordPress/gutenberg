@@ -181,6 +181,12 @@ function ListViewBlock( {
 			return;
 		}
 
+		// Do not handle events if it comes from modals;
+		// retain the default behavior for these keys.
+		if ( event.target.closest( '[role=dialog]' ) ) {
+			return;
+		}
+
 		const isDeleteKey = [ BACKSPACE, DELETE ].includes( event.keyCode );
 
 		// If multiple blocks are selected, deselect all blocks when the user
@@ -196,12 +202,6 @@ function ListViewBlock( {
 			isDeleteKey ||
 			isMatch( 'core/block-editor/remove', event )
 		) {
-			// Do not handle single-key block deletion shortcuts when events come from modals;
-			// retain the default behavior for these keys.
-			if ( isDeleteKey && event.target.closest( '[role=dialog]' ) ) {
-				return;
-			}
-
 			const {
 				blocksToUpdate: blocksToDelete,
 				firstBlockClientId,
@@ -210,7 +210,7 @@ function ListViewBlock( {
 			} = getBlocksToUpdate();
 
 			// Don't update the selection if the blocks cannot be deleted.
-			if ( ! canRemoveBlocks( blocksToDelete, firstBlockRootClientId ) ) {
+			if ( ! canRemoveBlocks( blocksToDelete ) ) {
 				return;
 			}
 
@@ -465,8 +465,10 @@ function ListViewBlock( {
 		level
 	);
 
-	const blockPropertiesDescription =
-		getBlockPropertiesDescription( isLocked );
+	const blockPropertiesDescription = getBlockPropertiesDescription(
+		blockInformation,
+		isLocked
+	);
 
 	const hasSiblings = siblingBlockCount > 0;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;
@@ -562,7 +564,12 @@ function ListViewBlock( {
 							ariaDescribedBy={ descriptionId }
 						/>
 						<AriaReferencedText id={ descriptionId }>
-							{ `${ blockPositionDescription } ${ blockPropertiesDescription }` }
+							{ [
+								blockPositionDescription,
+								blockPropertiesDescription,
+							]
+								.filter( Boolean )
+								.join( ' ' ) }
 						</AriaReferencedText>
 					</div>
 				) }

@@ -1,0 +1,7 @@
+.dataviews-bulk-actions__modal {
+	z-index: z-index(".dataviews-bulk-actions__modal");
+}
+
+.dataviews-bulk-actions__edit-button.components-button {
+	flex-shrink: 0;
+}

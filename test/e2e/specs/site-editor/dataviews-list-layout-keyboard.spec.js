@@ -48,13 +48,20 @@ test.describe( 'Dataviews List Layout', () => {
 
 		await page.keyboard.press( 'Tab' );
 		await expect(
+			page.getByRole( 'button', { name: 'Layout' } )
+		).toBeFocused();
+
+		await page.keyboard.press( 'Tab' );
+		await expect(
 			page.getByRole( 'button', { name: 'View options' } )
 		).toBeFocused();
 
 		// Make sure the items have loaded before reaching for the 1st item in the list.
 		await expect( page.getByRole( 'grid' ) ).toBeVisible();
 		await page.keyboard.press( 'Tab' );
-		await expect( page.getByLabel( 'Privacy Policy' ) ).toBeFocused();
+		await expect(
+			page.getByRole( 'grid' ).getByRole( 'button' ).first()
+		).toBeFocused();
 	} );
 
 	test( 'Navigates from items list to preview via TAB, and vice versa', async ( {
@@ -64,6 +71,7 @@ test.describe( 'Dataviews List Layout', () => {
 		await page.getByRole( 'searchbox', { name: 'Search' } ).click();
 
 		// Tab until reaching the items list.
+		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
@@ -96,6 +104,7 @@ test.describe( 'Dataviews List Layout', () => {
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
 
 		// Make sure the items have loaded before reaching for the 1st item in the list.
 		await expect( page.getByRole( 'grid' ) ).toBeVisible();
@@ -116,6 +125,7 @@ test.describe( 'Dataviews List Layout', () => {
 		await page.getByRole( 'searchbox', { name: 'Search' } ).click();
 
 		// Tab until reaching the items list.
+		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
@@ -157,6 +167,7 @@ test.describe( 'Dataviews List Layout', () => {
 		await page.getByRole( 'searchbox', { name: 'Search' } ).click();
 
 		// Tab until reaching the items list.
+		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );

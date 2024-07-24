@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 7.4.0 (2024-07-24)
+
+## 7.3.0 (2024-07-10)
+
+## 7.2.0 (2024-06-26)
+
+## 7.1.0 (2024-06-15)
+
+## 7.0.0 (2024-05-31)
+
 ### Breaking Changes
 
 -   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
@@ -130,7 +140,7 @@
 
 ## 5.1.1 (2022-02-10)
 
-### Bug Fix
+### Bug Fixes
 
 -   Removed unused `@wordpress/dom`, `@wordpress/is-shallow-equal` and `classnames` dependencies ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
 
@@ -138,7 +148,7 @@
 
 ## 5.0.0 (2021-07-29)
 
-### Breaking Change
+### Breaking Changes
 
 -   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
 
@@ -157,7 +167,7 @@
 
 ## 3.24.0 (2020-12-17)
 
-### New Feature
+### New Features
 
 -   Added a store definition `store` for the rich-text namespace to use with `@wordpress/data` API ([#26655](https://github.com/WordPress/gutenberg/pull/26655)).
 
@@ -181,7 +191,7 @@
 
 ## 3.1.0 (2019-03-06)
 
-### Enhancement
+### Enhancements
 
 -   Added format boundaries.
 -   Removed parameters from `create` to filter out content.
@@ -211,7 +221,7 @@
 
 ## 2.0.3 (2018-11-09)
 
-### Bug Fix
+### Bug Fixes
 
 -   Fix Format Type Assignment During Parsing.
 -   Fix applying formats on multiline values without wrapper tags.

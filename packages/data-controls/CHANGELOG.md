@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 4.4.0 (2024-07-24)
+
+## 4.3.0 (2024-07-10)
+
+## 4.2.0 (2024-06-26)
+
+## 4.1.0 (2024-06-15)
+
+## 4.0.0 (2024-05-31)
+
 ### Breaking Changes
 
 -   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
@@ -137,7 +147,7 @@
 
 ## 1.18.0 (2020-10-06)
 
-### New Feature
+### New Features
 
 -   Expose the `syncSelect` control for synchronous calls of registry selectors
 
