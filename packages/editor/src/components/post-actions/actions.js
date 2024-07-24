@@ -654,14 +654,7 @@ function ReorderModal( { items, closeModal, onActionPerformed } ) {
 	async function onOrder( event ) {
 		event.preventDefault();
 
-		if (
-			! isItemValid(
-				item,
-				fields.filter( ( field ) =>
-					formOrderAction.visibleFields.includes( field.id )
-				)
-			)
-		) {
+		if ( ! isItemValid( item, fields, formOrderAction ) ) {
 			return;
 		}
 
@@ -688,12 +681,7 @@ function ReorderModal( { items, closeModal, onActionPerformed } ) {
 			} );
 		}
 	}
-	const isSaveDisabled = ! isItemValid(
-		item,
-		fields.filter( ( field ) =>
-			formOrderAction.visibleFields.includes( field.id )
-		)
-	);
+	const isSaveDisabled = ! isItemValid( item, fields, formOrderAction );
 	return (
 		<form onSubmit={ onOrder }>
 			<VStack spacing="5">
