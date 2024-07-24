@@ -20,7 +20,7 @@ const storeHandlers: ProxyHandler< object > = {
 		if ( typeof result === 'undefined' && storeRoots.has( receiver ) ) {
 			const obj = {};
 			Reflect.set( target, key, obj );
-			return proxifyStore( ns, obj, true );
+			return proxifyStore( ns, obj, false );
 		}
 
 		// Check if the property is a function. If it is, add the store
@@ -36,7 +36,7 @@ const storeHandlers: ProxyHandler< object > = {
 
 		// Check if the property is an object. If it is, proxyify it.
 		if ( isObject( result ) && shouldProxy( result ) ) {
-			return proxifyStore( ns, result, true );
+			return proxifyStore( ns, result, false );
 		}
 
 		return result;
@@ -46,10 +46,10 @@ const storeHandlers: ProxyHandler< object > = {
 export const proxifyStore = < T extends object >(
 	namespace: string,
 	obj: T,
-	isNotRoot = false
+	isRoot = true
 ): T => {
 	const proxy = createProxy( namespace, obj, storeHandlers );
-	if ( proxy && ! isNotRoot ) {
+	if ( proxy && isRoot ) {
 		storeRoots.add( proxy );
 	}
 	return proxy as T;
