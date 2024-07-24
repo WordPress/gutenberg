@@ -24,10 +24,6 @@ export default function useSelectAll() {
 				return;
 			}
 
-			if ( node !== node.ownerDocument.activeElement ) {
-				return;
-			}
-
 			const selectionRoot = getSelectionRoot( node.ownerDocument );
 			const selectedClientIds = getSelectedBlockClientIds();
 
@@ -36,6 +32,14 @@ export default function useSelectAll() {
 				selectedClientIds.length < 2 &&
 				! isEntirelySelected( selectionRoot )
 			) {
+				if ( node === node.ownerDocument.activeElement ) {
+					event.preventDefault();
+					node.ownerDocument.defaultView
+						.getSelection()
+						.selectAllChildren( selectionRoot );
+					return;
+				}
+
 				return;
 			}
 
