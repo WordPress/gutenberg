@@ -217,12 +217,20 @@ export default function BlockLockModal( { clientId, onClose } ) {
 					expanded={ false }
 				>
 					<FlexItem>
-						<Button variant="tertiary" onClick={ onClose }>
+						<Button
+							variant="tertiary"
+							onClick={ onClose }
+							__next40pxDefaultSize
+						>
 							{ __( 'Cancel' ) }
 						</Button>
 					</FlexItem>
 					<FlexItem>
-						<Button variant="primary" type="submit">
+						<Button
+							variant="primary"
+							type="submit"
+							__next40pxDefaultSize
+						>
 							{ __( 'Apply' ) }
 						</Button>
 					</FlexItem>
