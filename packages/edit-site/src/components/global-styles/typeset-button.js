@@ -23,7 +23,7 @@ import { getFontFamilies } from './utils';
 import { NavigationButtonAsItem } from './navigation-button';
 import Subtitle from './subtitle';
 import { unlock } from '../../lock-unlock';
-import { filterObjectByProperty } from '../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
+import { filterObjectByProperties } from '../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
 
 const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
 const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
