@@ -105,6 +105,7 @@ export function useWritingFlow() {
 					'compositionstart',
 					'compositionend',
 					'compositionupdate',
+					'keydown',
 				];
 
 				events.forEach( ( eventType ) => {
