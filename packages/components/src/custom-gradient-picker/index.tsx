@@ -7,6 +7,7 @@ import { type LinearGradientNode } from 'gradient-parser';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -16,6 +17,7 @@ import CustomGradientBar from './gradient-bar';
 import { Flex } from '../flex';
 import SelectControl from '../select-control';
 import { VStack } from '../v-stack';
+import CSSVariableGetter from './css-variable-getter';
 import {
 	getGradientAstWithDefault,
 	getLinearGradientRepresentation,
@@ -142,7 +144,12 @@ export function CustomGradientPicker( {
 	onChange,
 	__experimentalIsRenderedInSidebar = false,
 }: CustomGradientPickerProps ) {
-	const { gradientAST, hasGradient } = getGradientAstWithDefault( value );
+	const [ cssVars, setCssVars ] = useState< Record< string, string > >();
+
+	const { gradientAST, hasGradient } = getGradientAstWithDefault(
+		value,
+		cssVars
+	);
 
 	// On radial gradients the bar should display a linear gradient.
 	// On radial gradients the bar represents a slice of the gradient from the center until the outside.
@@ -163,6 +170,7 @@ export function CustomGradientPicker( {
 
 	return (
 		<VStack spacing={ 4 } className="components-custom-gradient-picker">
+			<CSSVariableGetter cssString={ value } onChange={ setCssVars } />
 			<CustomGradientBar
 				__experimentalIsRenderedInSidebar={
 					__experimentalIsRenderedInSidebar
