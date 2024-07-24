@@ -10,6 +10,7 @@ import { applyFilters } from '@wordpress/hooks';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 const POST_CONTENT_BLOCK_TYPES = [
 	'core/post-title',
@@ -31,7 +32,7 @@ export default function DisableNonPageContentBlocks() {
 	// returns a new array.
 	const contentOnlyIds = useSelect(
 		( select ) => {
-			const { getPostBlocksByName } = select( editorStore );
+			const { getPostBlocksByName } = unlock( select( editorStore ) );
 			return getPostBlocksByName( [
 				...postContentBlockTypes,
 				'core/template-part',

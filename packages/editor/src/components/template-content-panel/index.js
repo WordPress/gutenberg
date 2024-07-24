@@ -37,7 +37,7 @@ export default function TemplateContentPanel() {
 				getCurrentPostType,
 				getPostBlocksByName,
 				getRenderingMode,
-			} = select( editorStore );
+			} = unlock( select( editorStore ) );
 			const _postType = getCurrentPostType();
 			return {
 				postType: _postType,
