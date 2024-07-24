@@ -18,7 +18,7 @@ function enqueue_observe_typing_plugin_script() {
 			'wp-blocks',
 			'wp-block-editor',
 			'wp-components',
-			'wp-element'
+			'wp-element',
 		),
 		filemtime( plugin_dir_path( __FILE__ ) . 'observe-typing/index.js' ),
 		true
