@@ -12,7 +12,22 @@
 }
 
 .dataviews-pagination__page-selection {
+	.components-select-control {
+		gap: $grid-unit-05;
+	}
+
+	.components-input-control__container {
+		font-size: 11px;
+		font-weight: 500;
+		text-transform: uppercase;
+	}
+
 	.components-select-control__input {
+		font-size: 11px !important;
+		line-height: $default-line-height; // Override wp-admin style bleed
+		font-weight: 500;
+		text-transform: uppercase;
+
 		&:hover,
 		&:focus {
 			color: $gray-900;

@@ -37,11 +37,13 @@ function DataViewsPagination() {
 				<HStack
 					justify="flex-start"
 					expanded={ false }
-					spacing={ 2 }
+					spacing={ 0 }
 					className="dataviews-pagination__page-selection"
 				>
 					<SelectControl
 						aria-label={ __( 'Current page' ) }
+						label={ __( 'Page:' ) }
+						labelPosition="side"
 						value={ view.page?.toString() }
 						options={ Array.from( Array( totalPages ) ).map(
 							( _, i ) => {
@@ -50,7 +52,7 @@ function DataViewsPagination() {
 									value: page.toString(),
 									label: sprintf(
 										// translators: 1: Current page number, 2: Total number of pages
-										__( 'Page %1$s of %2$s' ),
+										__( '%1$s of %2$s' ),
 										page.toString(),
 										totalPages
 									),
