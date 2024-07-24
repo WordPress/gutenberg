@@ -191,8 +191,9 @@
 		bottom: 0;
 		left: 0;
 		pointer-events: none;
-		background: $gray-900;
-		opacity: 0.7;
+		background: rgba($white, 0.8);
+		z-index: 1;
+		backdrop-filter: blur(4px);
 	}
 
 	overflow: hidden;
