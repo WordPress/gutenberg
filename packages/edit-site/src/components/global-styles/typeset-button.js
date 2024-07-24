@@ -40,7 +40,7 @@ function TypesetButton() {
 			coreStore
 		).__experimentalGetCurrentThemeGlobalStylesVariations();
 	}, [] );
-	const userTypographyConfig = filterObjectByProperty(
+	const userTypographyConfig = filterObjectByProperties(
 		userConfig,
 		'typography'
 	);
