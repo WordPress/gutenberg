@@ -24,6 +24,7 @@ import useClickSelection from './use-click-selection';
 import useInput from './use-input';
 import useClipboardHandler from './use-clipboard-handler';
 import { store as blockEditorStore } from '../../store';
+import { getSelectionRoot } from './utils';
 
 export function useWritingFlow() {
 	const [ before, ref, after ] = useTabNav();
@@ -76,24 +77,9 @@ export function useWritingFlow() {
 					const prototype = Object.getPrototypeOf( event );
 					const constructorName = prototype.constructor.name;
 					const Constructor = defaultView[ constructorName ];
-					const { anchorNode, focusNode } =
-						defaultView.getSelection();
+					const root = getSelectionRoot( ownerDocument );
 
-					if ( ! anchorNode || ! focusNode ) {
-						return;
-					}
-
-					const anchorElement = (
-						anchorNode.nodeType === anchorNode.ELEMENT_NODE
-							? anchorNode
-							: anchorNode.parentElement
-					).closest( '[contenteditable]' );
-
-					if ( ! anchorElement ) {
-						return;
-					}
-
-					if ( ! anchorElement.contains( focusNode ) ) {
+					if ( ! root ) {
 						return;
 					}
 
@@ -106,7 +92,7 @@ export function useWritingFlow() {
 					init.bubbles = false;
 
 					const newEvent = new Constructor( event.type, init );
-					const cancelled = ! anchorElement.dispatchEvent( newEvent );
+					const cancelled = ! root.dispatchEvent( newEvent );
 
 					if ( cancelled ) {
 						event.preventDefault();

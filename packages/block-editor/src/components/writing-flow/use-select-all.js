@@ -10,6 +10,7 @@ import { useRefEffect } from '@wordpress/compose';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { getSelectionRoot } from './utils';
 
 export default function useSelectAll() {
 	const { getBlockOrder, getSelectedBlockClientIds, getBlockRootClientId } =
@@ -23,11 +24,17 @@ export default function useSelectAll() {
 				return;
 			}
 
+			if ( node !== node.ownerDocument.activeElement ) {
+				return;
+			}
+
+			const selectionRoot = getSelectionRoot( node.ownerDocument );
 			const selectedClientIds = getSelectedBlockClientIds();
 
 			if (
+				selectionRoot &&
 				selectedClientIds.length < 2 &&
-				! isEntirelySelected( event.target )
+				! isEntirelySelected( selectionRoot )
 			) {
 				return;
 			}

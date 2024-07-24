@@ -115,15 +115,15 @@ export default ( props ) => ( element ) => {
 		}
 
 		// Ensure the active element is the rich text element.
-		if ( ownerDocument.activeElement !== element ) {
-			// If it is not, we can stop listening for selection changes. We
-			// resume listening when the element is focused.
-			ownerDocument.removeEventListener(
-				'selectionchange',
-				handleSelectionChange
-			);
-			return;
-		}
+		// if ( ownerDocument.activeElement !== element ) {
+		// 	// If it is not, we can stop listening for selection changes. We
+		// 	// resume listening when the element is focused.
+		// 	ownerDocument.removeEventListener(
+		// 		'selectionchange',
+		// 		handleSelectionChange
+		// 	);
+		// 	return;
+		// }
 
 		// In case of a keyboard event, ignore selection changes during
 		// composition.

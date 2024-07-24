@@ -116,3 +116,28 @@ function toPlainText( html ) {
 	// Merge any consecutive line breaks
 	return plainText.replace( /\n\n+/g, '\n\n' );
 }
+
+export function getSelectionRoot( ownerDocument ) {
+	const { defaultView } = ownerDocument;
+	const { anchorNode, focusNode } = defaultView.getSelection();
+
+	if ( ! anchorNode || ! focusNode ) {
+		return;
+	}
+
+	const anchorElement = (
+		anchorNode.nodeType === anchorNode.ELEMENT_NODE
+			? anchorNode
+			: anchorNode.parentElement
+	).closest( '[contenteditable]' );
+
+	if ( ! anchorElement ) {
+		return;
+	}
+
+	if ( ! anchorElement.contains( focusNode ) ) {
+		return;
+	}
+
+	return anchorElement;
+}
