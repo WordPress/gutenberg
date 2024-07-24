@@ -8,6 +8,7 @@ import * as Ariakit from '@ariakit/react';
  */
 import { createContext, useCallback, useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -95,6 +96,7 @@ function _CustomSelect(
 		store,
 		className,
 		isLegacy = false,
+		describedBy,
 		...restProps
 	} = props;
 
@@ -109,6 +111,8 @@ function _CustomSelect(
 		);
 
 	const contextValue = useMemo( () => ( { store, size } ), [ store, size ] );
+	const instanceId = useInstanceId( _CustomSelect );
+	const describedByID = `custom-select-described-by-${ instanceId }`;
 
 	return (
 		// Where should `restProps` be forwarded to?
@@ -138,7 +142,13 @@ function _CustomSelect(
 					store={ store }
 					// Match legacy behavior (move selection rather than open the popover)
 					showOnKeyDown={ ! isLegacy }
+					aria-describedby={ describedBy ? describedByID : undefined }
 				/>
+				{ describedBy && (
+					<div id={ describedByID } hidden>
+						{ describedBy }
+					</div>
+				) }
 				<Styled.SelectPopover
 					gutter={ 12 }
 					store={ store }
