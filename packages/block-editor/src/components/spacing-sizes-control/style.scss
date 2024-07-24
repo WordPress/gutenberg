@@ -34,13 +34,9 @@
 	.components-range-control__mark {
 		height: 4px;
 		width: 1.5px;
-		background-color: rgba($black, 0.15);
+		background-color: $white;
 		z-index: 1;
 		top: -4px;
-
-		&.is-filled {
-			background-color: rgba($white, 0.5);
-		}
 	}
 
 	.components-range-control__marks {
