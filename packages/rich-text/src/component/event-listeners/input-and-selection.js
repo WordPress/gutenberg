@@ -114,6 +114,14 @@ export default ( props ) => ( element ) => {
 			return;
 		}
 
+		const { anchorNode, focusNode } = defaultView.getSelection();
+		const containsSelection =
+			element.contains( anchorNode ) && element.contains( focusNode );
+
+		if ( ! containsSelection ) {
+			return;
+		}
+
 		// Ensure the active element is the rich text element.
 		// if ( ownerDocument.activeElement !== element ) {
 		// 	// If it is not, we can stop listening for selection changes. We
