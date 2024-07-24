@@ -23,6 +23,7 @@
 -   `CheckboxControl`: Slightly reduced footprint. Make label treatment, focus styles, and spacing consistent with `ToggleControl` and `RadioControl`. ([#63490](https://github.com/WordPress/gutenberg/pull/63490)).
 -   `RadioControl`: Slightly reduced footprint. Make label treatment, focus styles, and spacing consistent with `ToggleControl` and `CheckboxControl`. ([#63490](https://github.com/WordPress/gutenberg/pull/63490)).
 -   `FormToggle`: Update spacing and appearance to adhere to 4px baseline, slightly reducing footprint. Make label treatment and focus styles consistent with `RadioControl` and `CheckboxControl`. ([#63490](https://github.com/WordPress/gutenberg/pull/63490)).
+-   `Placeholder`: New styling when using `hasIllustration` prop ([#63885](https://github.com/WordPress/gutenberg/pull/63885)).
 
 ### Internal
 
