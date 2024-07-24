@@ -3,23 +3,7 @@
  */
 import { createProxy, getProxyNs, shouldProxy } from './registry';
 import { setNamespace, resetNamespace } from '../hooks';
-import { withScope } from '../utils';
-
-/**
- * Checks if the passed `candidate` is an object with just the `Object`
- * prototype.
- *
- * @param candidate The item to check.
- * @return Whether `candidate` is an object.
- */
-const isObject = (
-	candidate: unknown
-): candidate is Record< string, unknown > =>
-	Boolean(
-		candidate &&
-			typeof candidate === 'object' &&
-			candidate.constructor === Object
-	);
+import { withScope, isPlainObject } from '../utils';
 
 /**
  * Identifies the store proxies handling the root objects of each store.
@@ -58,7 +42,7 @@ const storeHandlers: ProxyHandler< object > = {
 		}
 
 		// Check if the property is an object. If it is, proxyify it.
-		if ( isObject( result ) && shouldProxy( result ) ) {
+		if ( isPlainObject( result ) && shouldProxy( result ) ) {
 			return proxifyStore( ns, result, false );
 		}
 

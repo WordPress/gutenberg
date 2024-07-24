@@ -354,3 +354,19 @@ export const warn = ( message: string ): void => {
 		logged.add( message );
 	}
 };
+
+/**
+ * Checks if the passed `candidate` is a plain object with just the `Object`
+ * prototype.
+ *
+ * @param candidate The item to check.
+ * @return Whether `candidate` is a plain object.
+ */
+export const isPlainObject = (
+	candidate: unknown
+): candidate is Record< string, unknown > =>
+	Boolean(
+		candidate &&
+			typeof candidate === 'object' &&
+			candidate.constructor === Object
+	);

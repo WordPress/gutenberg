@@ -14,9 +14,15 @@ import { proxifyState, peek } from './proxies';
 /**
  * Internal dependencies
  */
-import { useWatch, useInit, kebabToCamelCase, warn, splitTask } from './utils';
-import type { DirectiveEntry } from './hooks';
-import { directive, getScope, getEvaluate } from './hooks';
+import {
+	useWatch,
+	useInit,
+	kebabToCamelCase,
+	warn,
+	splitTask,
+	isPlainObject,
+} from './utils';
+import { directive, getScope, getEvaluate, type DirectiveEntry } from './hooks';
 
 // Assigned objects should be ignored during proxification.
 const contextAssignedObjects = new WeakMap();
@@ -25,9 +31,6 @@ const contextAssignedObjects = new WeakMap();
 const contextObjectToProxy = new WeakMap();
 const contextProxyToObject = new WeakMap();
 const contextObjectToFallback = new WeakMap();
-
-const isPlainObject = ( item: unknown ): boolean =>
-	Boolean( item && typeof item === 'object' && item.constructor === Object );
 
 const descriptor = Reflect.getOwnPropertyDescriptor;
 
