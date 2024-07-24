@@ -66,6 +66,11 @@ export type Field< Item > = {
 	label?: string;
 
 	/**
+	 * A description of the field.
+	 */
+	description?: string;
+
+	/**
 	 * Placeholder for the field.
 	 */
 	placeholder?: string;

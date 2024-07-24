@@ -18,7 +18,6 @@ import {
 	__experimentalText as Text,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
-	__experimentalNumberControl as NumberControl,
 } from '@wordpress/components';
 
 /**
@@ -39,19 +38,29 @@ import { getItemTitle } from '../../dataviews/actions/utils';
 const { PATTERN_TYPES, CreatePatternModalContents, useDuplicatePatternProps } =
 	unlock( patternsPrivateApis );
 
-// TODO: this should be shared with other components (page-pages).
+// TODO: this should be shared with other components (see post-fields in edit-site).
 const fields = [
 	{
 		type: 'text',
-		header: __( 'Title' ),
 		id: 'title',
+		label: __( 'Title' ),
 		placeholder: __( 'No title' ),
 		getValue: ( { item } ) => item.title,
+	},
+	{
+		type: 'number',
+		id: 'menu_order',
+		label: __( 'Order' ),
+		description: __( 'Determines the order of pages.' ),
 	},
 ];
 
 const form = {
 	visibleFields: [ 'title' ],
+};
+
+const formOrderAction = {
+	visibleFields: [ 'menu_order' ],
 };
 
 /**
@@ -635,12 +644,12 @@ function useRenamePostAction( postType ) {
 }
 
 function ReorderModal( { items, closeModal, onActionPerformed } ) {
-	const [ item ] = items;
+	const [ item, setItem ] = useState( items[ 0 ] );
+	const orderInput = item.menu_order;
 	const { editEntityRecord, saveEditedEntityRecord } =
 		useDispatch( coreStore );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
-	const [ orderInput, setOrderInput ] = useState( item.menu_order );
 
 	async function onOrder( event ) {
 		event.preventDefault();
@@ -684,12 +693,11 @@ function ReorderModal( { items, closeModal, onActionPerformed } ) {
 						'Determines the order of pages. Pages with the same order value are sorted alphabetically. Negative order values are supported.'
 					) }
 				</div>
-				<NumberControl
-					__next40pxDefaultSize
-					label={ __( 'Order' ) }
-					help={ __( 'Set the page order.' ) }
-					value={ orderInput }
-					onChange={ setOrderInput }
+				<DataForm
+					data={ item }
+					fields={ fields }
+					form={ formOrderAction }
+					onChange={ setItem }
 				/>
 				<HStack justify="right">
 					<Button
