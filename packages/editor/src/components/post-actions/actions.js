@@ -55,7 +55,7 @@ const fields = [
 	},
 ];
 
-const form = {
+const formDuplicateAction = {
 	visibleFields: [ 'title' ],
 };
 
@@ -890,7 +890,7 @@ const useDuplicatePostAction = ( postType ) => {
 								<DataForm
 									data={ item }
 									fields={ fields }
-									form={ form }
+									form={ formDuplicateAction }
 									onChange={ setItem }
 								/>
 								<HStack spacing={ 2 } justify="end">
