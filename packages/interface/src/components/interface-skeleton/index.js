@@ -19,6 +19,8 @@ import {
 	useViewportMatch,
 	useResizeObserver,
 } from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -92,6 +94,10 @@ function InterfaceSkeleton(
 	},
 	ref
 ) {
+	const selectedPatternCategory = useSelect(
+		( select ) => select( blockEditorStore ).selectedPatternCategory(),
+		[]
+	);
 	const [ secondarySidebarResizeListener, secondarySidebarSize ] =
 		useResizeObserver();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
@@ -120,6 +126,15 @@ function InterfaceSkeleton(
 	};
 
 	const mergedLabels = { ...defaultLabels, ...labels };
+
+	let animation;
+	if ( isMobileViewport ) {
+		animation = 'mobileOpen';
+	} else if ( selectedPatternCategory ) {
+		animation = 'patternsOpen';
+	} else {
+		animation = 'open';
+	}
 
 	return (
 		<div
@@ -182,14 +197,15 @@ function InterfaceSkeleton(
 								ariaLabel={ mergedLabels.secondarySidebar }
 								as={ motion.div }
 								initial="closed"
-								animate={
-									isMobileViewport ? 'mobileOpen' : 'open'
-								}
+								animate={ animation }
 								exit="closed"
 								variants={ {
 									open: { width: secondarySidebarSize.width },
 									closed: { width: 0 },
 									mobileOpen: { width: '100vw' },
+									patternsOpen: {
+										width: '650px',
+									},
 								} }
 								transition={ defaultTransition }
 							>

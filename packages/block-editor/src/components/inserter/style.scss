@@ -87,6 +87,10 @@ $block-inserter-tabs-height: 44px;
 	overflow: visible;
 }
 
+.block-editor-inserter__menu.show-panel {
+	width: 650px;
+}
+
 .block-editor-inserter__inline-elements {
 	margin-top: -1px;
 }
@@ -299,7 +303,7 @@ $block-inserter-tabs-height: 44px;
 	@include break-medium {
 		border-left: $border-width solid $gray-200;
 		padding: 0;
-		left: 100%;
+		right: 0;
 		width: 300px;
 		position: absolute;
 		top: -$border-width;

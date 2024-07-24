@@ -2820,6 +2820,16 @@ export function getHoveredBlockClientId( state ) {
 }
 
 /**
+ * Returns the open state of the patterns explorer.
+ *
+ * @param {Object} state Global application state.
+ * @return {boolean} True if the patterns explorer is open.
+ */
+export function selectedPatternCategory( state ) {
+	return state.selectedPatternCategory;
+}
+
+/**
  * Returns the list of all hidden blocks.
  *
  * @param {Object} state Global application state.
