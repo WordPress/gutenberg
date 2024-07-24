@@ -88,13 +88,7 @@ export function ToggleControl(
 	return (
 		<BaseControl
 			id={ id }
-			help={
-				helpLabel && (
-					<span className="components-toggle-control__help">
-						{ helpLabel }
-					</span>
-				)
-			}
+			help={ helpLabel }
 			className={ classes }
 			__nextHasNoMarginBottom
 		>
