@@ -6,9 +6,9 @@ import {
 	__experimentalHStack as HStack,
 	SelectControl,
 } from '@wordpress/components';
-import { createInterpolateElement, memo, useContext } from '@wordpress/element';
+import { memo, useContext } from '@wordpress/element';
 import { sprintf, __, _x } from '@wordpress/i18n';
-import { next, previous } from '@wordpress/icons';
+import { Icon, next, previous, chevronDownSmall } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -42,20 +42,13 @@ function DataViewsPagination() {
 				>
 					<SelectControl
 						aria-label={ __( 'Current page' ) }
-						label={ __( 'Page:' ) }
-						labelPosition="side"
 						value={ view.page?.toString() }
 						options={ Array.from( Array( totalPages ) ).map(
 							( _, i ) => {
 								const page = i + 1;
 								return {
 									value: page.toString(),
-									label: sprintf(
-										// translators: 1: Current page number, 2: Total number of pages
-										__( '%1$s of %2$s' ),
-										page.toString(),
-										totalPages
-									),
+									label: page.toString(),
 								};
 							}
 						) }
@@ -68,6 +61,16 @@ function DataViewsPagination() {
 						size="compact"
 						__nextHasNoMarginBottom
 						variant="minimal"
+						suffix={
+							<span className="dataviews-pagination__page-selection-suffix">
+								{ sprintf(
+									// translators: Total number of pages
+									__( 'of %s pages' ),
+									totalPages
+								) }
+								<Icon icon={ chevronDownSmall } />
+							</span>
+						}
 					/>
 				</HStack>
 				<HStack expanded={ false } spacing={ 1 }>

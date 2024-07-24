@@ -20,6 +20,7 @@
 		font-size: 11px;
 		font-weight: 500;
 		text-transform: uppercase;
+		padding: 0 0 0 $grid-unit-10;
 	}
 
 	.components-select-control__input {
@@ -27,11 +28,21 @@
 		line-height: $default-line-height; // Override wp-admin style bleed
 		font-weight: 500;
 		text-transform: uppercase;
+		padding: 0 $grid-unit-05 0 0 !important;
 
 		&:hover,
 		&:focus {
 			color: $gray-900;
 		}
+	}
+
+	.components-input-control__suffix {
+		flex-shrink: 0;
+	}
+
+	.dataviews-pagination__page-selection-suffix {
+		display: flex;
+		align-items: center;
 	}
 }
 
