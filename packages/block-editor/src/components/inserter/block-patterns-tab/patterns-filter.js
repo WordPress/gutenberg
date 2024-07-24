@@ -24,7 +24,7 @@ import {
 
 const getShouldDisableSyncFilter = ( sourceFilter ) =>
 	sourceFilter !== 'all' && sourceFilter !== 'user';
-const getShouldHideNonUserSources = ( category ) => {
+const getShouldHideSourcesFilter = ( category ) => {
 	return category.name === myPatternsCategory.name;
 };
 
@@ -72,7 +72,7 @@ export function PatternsFilter( {
 
 	// We also hide the directory and theme source filter if the category is `myPatterns`
 	// otherwise there will only be one option available.
-	const shouldHideSourcesFilter = getShouldHideNonUserSources( category );
+	const shouldHideSourcesFilter = getShouldHideSourcesFilter( category );
 
 	const patternSyncMenuOptions = useMemo(
 		() => [
