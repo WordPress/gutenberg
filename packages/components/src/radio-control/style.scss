@@ -1,8 +1,12 @@
+.components-radio-control__group-wrapper--with-help {
+	margin-block-end: $grid-unit-15;
+}
+
 .components-radio-control__option {
 	display: grid;
 	grid-template-columns: auto 1fr;
 	grid-template-rows: auto minmax(0, max-content);
-	column-gap: $grid-unit-15;
+	column-gap: $grid-unit-10;
 	align-items: center;
 }
 
@@ -49,7 +53,7 @@
 	grid-column: 2;
 	grid-row: 2;
 
-	padding-block-start: $grid-unit-10;
+	padding-block-start: $grid-unit-05;
 
 	// Override the top margin of the StyledHelp component from BaseControl.
 	// TODO: we should tweak the StyledHelp component to not have a top margin.
