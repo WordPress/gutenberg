@@ -44,12 +44,12 @@ export default function useInput() {
 	} = useDispatch( blockEditorStore );
 
 	return useRefEffect( ( node ) => {
-		function onBeforeInput( event ) {
+		function onBeforeInput() {
 			// If writing flow is editable, NEVER allow the browser to alter the
 			// DOM. This will cause React errors (and the DOM should only be
 			// altered in a controlled fashion).
 			if ( node.contentEditable === 'true' ) {
-				event.preventDefault();
+				// event.preventDefault();
 			}
 		}
 

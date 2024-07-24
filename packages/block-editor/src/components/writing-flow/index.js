@@ -65,6 +65,72 @@ export function useWritingFlow() {
 				},
 				[ hasMultiSelection ]
 			),
+			useRefEffect( ( node ) => {
+				function onInput( event ) {
+					if ( event.target !== node ) {
+						return;
+					}
+
+					const { ownerDocument } = node;
+					const { defaultView } = ownerDocument;
+					const prototype = Object.getPrototypeOf( event );
+					const constructorName = prototype.constructor.name;
+					const Constructor = defaultView[ constructorName ];
+					const { anchorNode, focusNode } =
+						defaultView.getSelection();
+
+					if ( ! anchorNode || ! focusNode ) {
+						return;
+					}
+
+					const anchorElement = (
+						anchorNode.nodeType === anchorNode.ELEMENT_NODE
+							? anchorNode
+							: anchorNode.parentElement
+					).closest( '[contenteditable]' );
+
+					if ( ! anchorElement ) {
+						return;
+					}
+
+					if ( ! anchorElement.contains( focusNode ) ) {
+						return;
+					}
+
+					const init = {};
+
+					for ( const key in event ) {
+						init[ key ] = event[ key ];
+					}
+
+					init.bubbles = false;
+
+					const newEvent = new Constructor( event.type, init );
+					const cancelled = ! anchorElement.dispatchEvent( newEvent );
+
+					if ( cancelled ) {
+						event.preventDefault();
+					}
+				}
+
+				const events = [
+					'beforeinput',
+					'input',
+					'compositionstart',
+					'compositionend',
+					'compositionupdate',
+				];
+
+				events.forEach( ( eventType ) => {
+					node.addEventListener( eventType, onInput );
+				} );
+
+				return () => {
+					events.forEach( ( eventType ) => {
+						node.removeEventListener( eventType, onInput );
+					} );
+				};
+			}, [] ),
 		] ),
 		after,
 	];
