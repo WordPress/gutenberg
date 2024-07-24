@@ -17,8 +17,8 @@ export const getBlockPropertiesDescription = ( blockInformation, isLocked ) =>
 	[
 		blockInformation?.positionLabel
 			? `${ sprintf(
-					// translators: 1: Position of selected block, e.g. "Sticky" or "Fixed".
-					__( 'Position: %1$s' ),
+					// translators: %s: Position of selected block, e.g. "Sticky" or "Fixed".
+					__( 'Position: %s' ),
 					blockInformation.positionLabel
 			  ) }.`
 			: undefined,
