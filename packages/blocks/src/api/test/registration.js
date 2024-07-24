@@ -1703,6 +1703,39 @@ describe( 'blocks', () => {
 				'Block bindings source "core/test-source" is already registered.'
 			);
 		} );
+
+		it( 'should not be overriden if bootstrap happens after registration', () => {
+			// Register source in the client.
+			const clientProperties = {
+				getValues: () => 'values',
+				setValues: () => 'new values',
+				getPlaceholder: () => 'placeholder',
+				canUserEditValue: () => true,
+			};
+			registerBlockBindingsSource( {
+				name: 'core/custom-source',
+				label: 'Client Label',
+				...clientProperties,
+			} );
+
+			// Bootstrap source from the server.
+			unlock(
+				dispatch( blocksStore )
+			).addBootstrappedBlockBindingsSource( {
+				name: 'core/custom-source',
+				label: 'Server Label',
+				usesContext: [ 'postId' ],
+			} );
+
+			// Check that the bootstrap values prevail and the client properties are still there.
+			expect( getBlockBindingsSource( 'core/custom-source' ) ).toEqual( {
+				label: 'Server Label',
+				usesContext: [ 'postId' ],
+				...clientProperties,
+			} );
+
+			unregisterBlockBindingsSource( 'core/custom-source' );
+		} );
 	} );
 
 	describe( 'unregisterBlockBindingsSource', () => {
