@@ -135,85 +135,88 @@ function Iframe( {
 	const [ containerResizeListener, { width: containerWidth } ] =
 		useResizeObserver();
 
-	const setRef = useRefEffect( ( node ) => {
-		node._load = () => {
-			setIframeDocument( node.contentDocument );
-		};
-		let iFrameDocument;
-		// Prevent the default browser action for files dropped outside of dropzones.
-		function preventFileDropDefault( event ) {
-			event.preventDefault();
-		}
-		function onLoad() {
-			const { contentDocument, ownerDocument } = node;
-			const { documentElement } = contentDocument;
-			iFrameDocument = contentDocument;
-
-			documentElement.classList.add( 'block-editor-iframe__html' );
-
-			clearerRef( documentElement );
-
-			// Ideally ALL classes that are added through get_body_class should
-			// be added in the editor too, which we'll somehow have to get from
-			// the server in the future (which will run the PHP filters).
-			setBodyClasses(
-				Array.from( ownerDocument.body.classList ).filter(
-					( name ) =>
-						name.startsWith( 'admin-color-' ) ||
-						name.startsWith( 'post-type-' ) ||
-						name === 'wp-embed-responsive'
-				)
-			);
-
-			if ( ! contentDocument.dir ) {
-				contentDocument.dir = ownerDocument.dir;
+	const setRef = useRefEffect(
+		( node ) => {
+			node._load = () => {
+				setIframeDocument( node.contentDocument );
+			};
+			let iFrameDocument;
+			// Prevent the default browser action for files dropped outside of dropzones.
+			function preventFileDropDefault( event ) {
+				event.preventDefault();
 			}
+			function onLoad() {
+				const { contentDocument, ownerDocument } = node;
+				const { documentElement } = contentDocument;
+				iFrameDocument = contentDocument;
 
-			for ( const compatStyle of getCompatibilityStyles() ) {
-				if ( contentDocument.getElementById( compatStyle.id ) ) {
-					continue;
-				}
+				documentElement.classList.add( 'block-editor-iframe__html' );
 
-				contentDocument.head.appendChild(
-					compatStyle.cloneNode( true )
+				clearerRef( documentElement );
+
+				// Ideally ALL classes that are added through get_body_class should
+				// be added in the editor too, which we'll somehow have to get from
+				// the server in the future (which will run the PHP filters).
+				setBodyClasses(
+					Array.from( ownerDocument.body.classList ).filter(
+						( name ) =>
+							name.startsWith( 'admin-color-' ) ||
+							name.startsWith( 'post-type-' ) ||
+							name === 'wp-embed-responsive'
+					)
 				);
 
-				if ( ! isPreviewMode ) {
-					// eslint-disable-next-line no-console
-					console.warn(
-						`${ compatStyle.id } was added to the iframe incorrectly. Please use block.json or enqueue_block_assets to add styles to the iframe.`,
-						compatStyle
-					);
+				if ( ! siteLocale ) {
+					contentDocument.dir = ownerDocument.dir;
 				}
+
+				for ( const compatStyle of getCompatibilityStyles() ) {
+					if ( contentDocument.getElementById( compatStyle.id ) ) {
+						continue;
+					}
+
+					contentDocument.head.appendChild(
+						compatStyle.cloneNode( true )
+					);
+
+					if ( ! isPreviewMode ) {
+						// eslint-disable-next-line no-console
+						console.warn(
+							`${ compatStyle.id } was added to the iframe incorrectly. Please use block.json or enqueue_block_assets to add styles to the iframe.`,
+							compatStyle
+						);
+					}
+				}
+
+				iFrameDocument.addEventListener(
+					'dragover',
+					preventFileDropDefault,
+					false
+				);
+				iFrameDocument.addEventListener(
+					'drop',
+					preventFileDropDefault,
+					false
+				);
 			}
 
-			iFrameDocument.addEventListener(
-				'dragover',
-				preventFileDropDefault,
-				false
-			);
-			iFrameDocument.addEventListener(
-				'drop',
-				preventFileDropDefault,
-				false
-			);
-		}
+			node.addEventListener( 'load', onLoad );
 
-		node.addEventListener( 'load', onLoad );
-
-		return () => {
-			delete node._load;
-			node.removeEventListener( 'load', onLoad );
-			iFrameDocument?.removeEventListener(
-				'dragover',
-				preventFileDropDefault
-			);
-			iFrameDocument?.removeEventListener(
-				'drop',
-				preventFileDropDefault
-			);
-		};
-	}, [] );
+			return () => {
+				delete node._load;
+				node.removeEventListener( 'load', onLoad );
+				iFrameDocument?.removeEventListener(
+					'dragover',
+					preventFileDropDefault
+				);
+				iFrameDocument?.removeEventListener(
+					'drop',
+					preventFileDropDefault
+				);
+			};
+		},
+		[ siteLocale ]
+	);
 
 	const [ iframeWindowInnerHeight, setIframeWindowInnerHeight ] = useState();
 
@@ -270,9 +273,7 @@ function Iframe( {
 	// mode. Also preload the styles to avoid a flash of unstyled
 	// content.
 	const html = `<!doctype html>
-<html lang="${ siteLocale?.lang }" dir="${
-		siteLocale?.isRTL ? 'rtl' : undefined
-	}">
+<html lang="${ siteLocale?.lang }" dir="${ siteLocale?.isRTL ? 'rtl' : 'ltr' }">
 	<head>
 		<meta charset="utf-8">
 		<script>window.frameElement._load()</script>
