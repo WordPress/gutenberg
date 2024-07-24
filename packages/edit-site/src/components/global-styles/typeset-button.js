@@ -52,7 +52,7 @@ function TypesetButton() {
 		const activeVariation = variations.find( ( variation ) => {
 			return (
 				JSON.stringify(
-					filterObjectByProperty( variation, 'typography' )
+					filterObjectByProperties( variation, 'typography' )
 				) === JSON.stringify( userTypographyConfig )
 			);
 		} );
