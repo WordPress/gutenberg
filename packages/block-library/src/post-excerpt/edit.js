@@ -231,6 +231,7 @@ export default function PostExcerptEditor( {
 						}
 					/>
 					<RangeControl
+						__nextHasNoMarginBottom
 						label={ __( 'Max number of words' ) }
 						value={ excerptLength }
 						onChange={ ( value ) => {

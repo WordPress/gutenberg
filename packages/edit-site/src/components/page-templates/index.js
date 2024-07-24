@@ -6,12 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import {
-	Icon,
-	__experimentalText as Text,
-	__experimentalHStack as HStack,
-	VisuallyHidden,
-} from '@wordpress/components';
+import { Icon, __experimentalHStack as HStack } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
@@ -23,7 +18,10 @@ import {
 } from '@wordpress/block-editor';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import {
+	privateApis as editorPrivateApis,
+	EditorProvider,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -47,20 +45,41 @@ import { useEditPostAction } from '../dataviews-actions';
 
 const { usePostActions } = unlock( editorPrivateApis );
 
-const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
-	blockEditorPrivateApis
-);
+const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
 
 const defaultLayouts = {
 	[ LAYOUT_TABLE ]: {
+		fields: [ 'template', 'author' ],
 		layout: {
 			primaryField: 'title',
+			combinedFields: [
+				{
+					id: 'template',
+					label: __( 'Template' ),
+					children: [ 'title', 'description' ],
+					direction: 'vertical',
+				},
+			],
+			styles: {
+				template: {
+					maxWidth: 400,
+					minWidth: 320,
+				},
+				preview: {
+					minWidth: 120,
+					maxWidth: 120,
+				},
+				author: {
+					width: '1%',
+				},
+			},
 		},
 	},
 	[ LAYOUT_GRID ]: {
+		fields: [ 'title', 'description', 'author' ],
 		layout: {
 			mediaField: 'preview',
 			primaryField: 'title',
@@ -68,6 +87,7 @@ const defaultLayouts = {
 		},
 	},
 	[ LAYOUT_LIST ]: {
+		fields: [ 'title', 'description', 'author' ],
 		layout: {
 			primaryField: 'title',
 			mediaField: 'preview',
@@ -84,7 +104,7 @@ const DEFAULT_VIEW = {
 		field: 'title',
 		direction: 'asc',
 	},
-	fields: [ 'title', 'description', 'author' ],
+	fields: defaultLayouts[ LAYOUT_GRID ].fields,
 	layout: defaultLayouts[ LAYOUT_GRID ].layout,
 	filters: [],
 };
@@ -107,14 +127,13 @@ function Title( { item, viewType } ) {
 	);
 }
 
-function AuthorField( { item, viewType } ) {
+function AuthorField( { item } ) {
 	const [ isImageLoaded, setIsImageLoaded ] = useState( false );
 	const { text, icon, imageUrl } = useAddedBy( item.type, item.id );
-	const withIcon = viewType !== LAYOUT_LIST;
 
 	return (
-		<HStack alignment="left" spacing={ 1 }>
-			{ withIcon && imageUrl && (
+		<HStack alignment="left" spacing={ 0 }>
+			{ imageUrl && (
 				<div
 					className={ clsx( 'page-templates-author-field__avatar', {
 						'is-loaded': isImageLoaded,
@@ -127,7 +146,7 @@ function AuthorField( { item, viewType } ) {
 					/>
 				</div>
 			) }
-			{ withIcon && ! imageUrl && (
+			{ ! imageUrl && (
 				<div className="page-templates-author-field__icon">
 					<Icon icon={ icon } />
 				</div>
@@ -158,7 +177,7 @@ function Preview( { item, viewType } ) {
 	// the block editor settings are needed in context where we don't have the block editor.
 	// Explore how we can solve this in a better way.
 	return (
-		<ExperimentalBlockEditorProvider settings={ settings }>
+		<EditorProvider post={ item } settings={ settings }>
 			<div
 				className={ `page-templates-preview-field is-viewtype-${ viewType }` }
 				style={ { backgroundColor } }
@@ -184,7 +203,7 @@ function Preview( { item, viewType } ) {
 					</button>
 				) }
 			</div>
-		</ExperimentalBlockEditorProvider>
+		</EditorProvider>
 	);
 }
 
@@ -199,6 +218,7 @@ export default function PageTemplates() {
 			...DEFAULT_VIEW,
 			type: usedType,
 			layout: defaultLayouts[ usedType ].layout,
+			fields: defaultLayouts[ usedType ].fields,
 			filters:
 				activeView !== 'all'
 					? [
@@ -236,12 +256,13 @@ export default function PageTemplates() {
 		}
 	);
 	const history = useHistory();
-	const onSelectionChange = useCallback(
+	const onChangeSelection = useCallback(
 		( items ) => {
+			setSelection( items );
 			if ( view?.type === LAYOUT_LIST ) {
 				history.push( {
 					...params,
-					postId: items.length === 1 ? items[ 0 ].id : undefined,
+					postId: items.length === 1 ? items[ 0 ] : undefined,
 				} );
 			}
 		},
@@ -265,61 +286,46 @@ export default function PageTemplates() {
 	const fields = useMemo(
 		() => [
 			{
-				header: __( 'Preview' ),
+				label: __( 'Preview' ),
 				id: 'preview',
 				render: ( { item } ) => {
 					return <Preview item={ item } viewType={ view.type } />;
 				},
-				minWidth: 120,
-				maxWidth: 120,
 				enableSorting: false,
 			},
 			{
-				header: __( 'Template' ),
+				label: __( 'Template' ),
 				id: 'title',
 				getValue: ( { item } ) => item.title?.rendered,
 				render: ( { item } ) => (
 					<Title item={ item } viewType={ view.type } />
 				),
-				maxWidth: 400,
 				enableHiding: false,
 				enableGlobalSearch: true,
 			},
 			{
-				header: __( 'Description' ),
+				label: __( 'Description' ),
 				id: 'description',
 				render: ( { item } ) => {
-					return item.description ? (
-						<span className="page-templates-description">
-							{ decodeEntities( item.description ) }
-						</span>
-					) : (
-						view.type === LAYOUT_TABLE && (
-							<>
-								<Text variant="muted" aria-hidden="true">
-									&#8212;
-								</Text>
-								<VisuallyHidden>
-									{ __( 'No description.' ) }
-								</VisuallyHidden>
-							</>
+					return (
+						item.description && (
+							<span className="page-templates-description">
+								{ decodeEntities( item.description ) }
+							</span>
 						)
 					);
 				},
-				maxWidth: 400,
-				minWidth: 320,
 				enableSorting: false,
 				enableGlobalSearch: true,
 			},
 			{
-				header: __( 'Author' ),
+				label: __( 'Author' ),
 				id: 'author',
 				getValue: ( { item } ) => item.author_text,
 				render: ( { item } ) => {
 					return <AuthorField viewType={ view.type } item={ item } />;
 				},
 				elements: authors,
-				width: '1%',
 			},
 		],
 		[ authors, view.type ]
@@ -367,9 +373,8 @@ export default function PageTemplates() {
 				isLoading={ isLoadingData }
 				view={ view }
 				onChangeView={ onChangeView }
-				onSelectionChange={ onSelectionChange }
+				onChangeSelection={ onChangeSelection }
 				selection={ selection }
-				setSelection={ setSelection }
 				defaultLayouts={ defaultLayouts }
 			/>
 		</Page>

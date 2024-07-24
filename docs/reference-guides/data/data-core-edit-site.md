@@ -24,6 +24,8 @@ _Returns_
 
 ### getCurrentTemplateTemplateParts
 
+> **Deprecated**
+
 Returns the template parts and their blocks for the current edited template.
 
 _Parameters_

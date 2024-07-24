@@ -62,6 +62,14 @@ const defaultLayouts = {
 	[ LAYOUT_TABLE ]: {
 		layout: {
 			primaryField: 'title',
+			styles: {
+				preview: {
+					width: '1%',
+				},
+				author: {
+					width: '1%',
+				},
+			},
 		},
 	},
 	[ LAYOUT_GRID ]: {
@@ -169,7 +177,7 @@ function Author( { item, viewType } ) {
 	const withIcon = viewType !== LAYOUT_LIST;
 
 	return (
-		<HStack alignment="left" spacing={ 1 }>
+		<HStack alignment="left" spacing={ 0 }>
 			{ withIcon && imageUrl && (
 				<div
 					className={ clsx( 'page-templates-author-field__avatar', {
@@ -276,17 +284,17 @@ export default function DataviewsPatterns() {
 	const fields = useMemo( () => {
 		const _fields = [
 			{
-				header: __( 'Preview' ),
+				label: __( 'Preview' ),
 				id: 'preview',
 				render: ( { item } ) => (
 					<Preview item={ item } viewType={ view.type } />
 				),
 				enableSorting: false,
-				width: '1%',
 			},
 			{
-				header: __( 'Title' ),
+				label: __( 'Title' ),
 				id: 'title',
+				getValue: ( { item } ) => item.title?.raw || item.title,
 				render: ( { item } ) => <Title item={ item } />,
 				enableHiding: false,
 			},
@@ -294,7 +302,7 @@ export default function DataviewsPatterns() {
 
 		if ( type === PATTERN_TYPES.user ) {
 			_fields.push( {
-				header: __( 'Sync status' ),
+				label: __( 'Sync status' ),
 				id: 'sync-status',
 				render: ( { item } ) => {
 					const syncStatus =
@@ -325,7 +333,7 @@ export default function DataviewsPatterns() {
 			} );
 		} else if ( type === TEMPLATE_PART_POST_TYPE ) {
 			_fields.push( {
-				header: __( 'Author' ),
+				label: __( 'Author' ),
 				id: 'author',
 				getValue: ( { item } ) => item.author_text,
 				render: ( { item } ) => {
@@ -335,7 +343,6 @@ export default function DataviewsPatterns() {
 				filterBy: {
 					isPrimary: true,
 				},
-				width: '1%',
 			} );
 		}
 
@@ -345,7 +352,7 @@ export default function DataviewsPatterns() {
 	// Reset the page number when the category changes.
 	useEffect( () => {
 		if ( previousCategoryId !== categoryId ) {
-			setView( DEFAULT_VIEW );
+			setView( ( prevView ) => ( { ...prevView, page: 1 } ) );
 		}
 	}, [ categoryId, previousCategoryId ] );
 	const { data, paginationInfo } = useMemo( () => {

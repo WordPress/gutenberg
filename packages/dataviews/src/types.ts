@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ReactElement, ReactNode } from 'react';
+import type { ReactElement, ComponentType } from 'react';
 
 /**
  * Internal dependencies
@@ -63,7 +63,7 @@ export type Field< Item > = {
 	/**
 	 * The label of the field. Defaults to the id.
 	 */
-	header?: string;
+	label?: string;
 
 	/**
 	 * Placeholder for the field.
@@ -73,22 +73,7 @@ export type Field< Item > = {
 	/**
 	 * Callback used to render the field. Defaults to `field.getValue`.
 	 */
-	render?: ( args: { item: Item } ) => ReactNode;
-
-	/**
-	 * The width of the field column.
-	 */
-	width?: string | number;
-
-	/**
-	 * The minimum width of the field column.
-	 */
-	maxWidth?: string | number;
-
-	/**
-	 * The maximum width of the field column.
-	 */
-	minWidth?: string | number;
+	render?: ComponentType< { item: Item } >;
 
 	/**
 	 * Whether the field is sortable.
@@ -131,9 +116,9 @@ export type Field< Item > = {
 	  } );
 
 export type NormalizedField< Item > = Field< Item > & {
-	header: string;
+	label: string;
 	getValue: ( args: { item: Item } ) => any;
-	render: ( args: { item: Item } ) => ReactNode;
+	render: ComponentType< { item: Item } >;
 };
 
 /**
@@ -249,9 +234,42 @@ interface ViewBase {
 	perPage?: number;
 
 	/**
-	 * The hidden fields.
+	 * The fields to render
 	 */
 	fields?: string[];
+}
+
+export interface CombinedField {
+	id: string;
+
+	label: string;
+
+	/**
+	 * The fields to use as columns.
+	 */
+	children: string[];
+
+	/**
+	 * The direction of the stack.
+	 */
+	direction: 'horizontal' | 'vertical';
+}
+
+export interface ColumnStyle {
+	/**
+	 * The width of the field column.
+	 */
+	width?: string | number;
+
+	/**
+	 * The minimum width of the field column.
+	 */
+	maxWidth?: string | number;
+
+	/**
+	 * The maximum width of the field column.
+	 */
+	minWidth?: string | number;
 }
 
 export interface ViewTable extends ViewBase {
@@ -264,9 +282,14 @@ export interface ViewTable extends ViewBase {
 		primaryField?: string;
 
 		/**
-		 * The field to use as the media field.
+		 * The fields to use as columns.
 		 */
-		mediaField?: string;
+		combinedFields?: CombinedField[];
+
+		/**
+		 * The styles for the columns.
+		 */
+		styles?: Record< string, ColumnStyle >;
 	};
 }
 
@@ -407,10 +430,11 @@ export interface ViewBaseProps< Item > {
 	getItemId: ( item: Item ) => string;
 	isLoading?: boolean;
 	onChangeView: ( view: View ) => void;
-	onSelectionChange: SetSelection;
+	onChangeSelection: SetSelection;
 	selection: string[];
 	setOpenedFilter: ( fieldId: string ) => void;
 	view: View;
+	density: number;
 }
 
 export interface ViewTableProps< Item > extends ViewBaseProps< Item > {

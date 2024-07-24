@@ -38,6 +38,12 @@ import { getValueFromObjectPath, setImmutably } from '../../utils/object';
 import { unlock } from '../../lock-unlock';
 import { setThemeFileUris } from './theme-file-uri-utils';
 
+// Elements that rely on class names in their selectors.
+const ELEMENT_CLASS_NAMES = {
+	button: 'wp-element-button',
+	caption: 'wp-element-caption',
+};
+
 // List of block support features that can have their related styles
 // generated under their own feature level selector rather than the block's.
 const BLOCK_SUPPORT_FEATURE_LEVEL_SELECTORS = {
@@ -643,6 +649,9 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 		nodes.push( {
 			styles,
 			selector: ROOT_BLOCK_SELECTOR,
+			// Root selector (body) styles should not be wrapped in `:root where()` to keep
+			// specificity at (0,0,1) and maintain backwards compatibility.
+			skipSelectorWrapper: true,
 		} );
 	}
 
@@ -651,6 +660,9 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 			nodes.push( {
 				styles: tree.styles?.elements?.[ name ],
 				selector,
+				// Top level elements that don't use a class name should not receive the
+				// `:root :where()` wrapper to maintain backwards compatibility.
+				skipSelectorWrapper: ! ELEMENT_CLASS_NAMES[ name ],
 			} );
 		}
 	} );
@@ -957,6 +969,7 @@ export const toStyles = (
 				hasLayoutSupport,
 				featureSelectors,
 				styleVariationSelectors,
+				skipSelectorWrapper,
 			} ) => {
 				// Process styles for block support features with custom feature level
 				// CSS selectors set.
@@ -1015,7 +1028,10 @@ export const toStyles = (
 					disableRootPadding
 				);
 				if ( styleDeclarations?.length ) {
-					ruleset += `:root :where(${ selector }){${ styleDeclarations.join(
+					const generalSelector = skipSelectorWrapper
+						? selector
+						: `:root :where(${ selector })`;
+					ruleset += `${ generalSelector }{${ styleDeclarations.join(
 						';'
 					) };}`;
 				}
@@ -1109,7 +1125,11 @@ export const toStyles = (
 								.map( ( sel ) => sel + pseudoKey )
 								.join( ',' );
 
-							const pseudoRule = `${ _selector }{${ pseudoDeclarations.join(
+							// As pseudo classes such as :hover, :focus etc. have class-level
+							// specificity, they must use the `:root :where()` wrapper. This.
+							// caps the specificity at `0-1-0` to allow proper nesting of variations
+							// and block type element styles.
+							const pseudoRule = `:root :where(${ _selector }){${ pseudoDeclarations.join(
 								';'
 							) };}`;
 

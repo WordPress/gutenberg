@@ -90,6 +90,7 @@ const MyRangeControl = () => {
 
 	return(
 		<RangeControl
+			__nextHasNoMarginBottom
 			label="Columns"
 			value={ columns }
 			onChange={ ( value ) => setColumns( value ) }
@@ -360,6 +361,13 @@ Determines if the `input` number field will render next to the RangeControl. Thi
 
 -   Required: No
 -   Platform: Web
+
+### `__nextHasNoMarginBottom`: `boolean`
+
+Start opting into the new margin-free styles that will become the default in a future version.
+
+-   Required: No
+-   Default: `false`
 
 ## Related components
 

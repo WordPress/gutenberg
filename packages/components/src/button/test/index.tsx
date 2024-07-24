@@ -329,7 +329,7 @@ describe( 'Button', () => {
 		} );
 
 		it( 'should support adding aria-describedby text', () => {
-			render( <Button describedBy="Description text" /> );
+			render( <Button description="Description text" /> );
 			expect(
 				screen.getByRole( 'button', {
 					description: 'Description text',
@@ -342,7 +342,7 @@ describe( 'Button', () => {
 
 			render(
 				<Button
-					describedBy="Description text"
+					description="Description text"
 					label="Label"
 					icon={ plusCircle }
 				/>
@@ -364,7 +364,7 @@ describe( 'Button', () => {
 			render(
 				<Button
 					label="Label"
-					describedBy="Description text"
+					description="Description text"
 					icon={ plusCircle }
 					showTooltip
 				>
@@ -542,6 +542,19 @@ describe( 'Button', () => {
 
 			expect( screen.getByRole( 'button' ) ).toBeVisible();
 		} );
+
+		it( 'should become a button again when disabled is supplied, even with `accessibleWhenDisabled`', () => {
+			render(
+				<Button
+					// @ts-expect-error - a button should not have `href`
+					// eslint-disable-next-line no-restricted-syntax
+					href="https://wordpress.org/"
+					disabled
+					accessibleWhenDisabled
+				/>
+			);
+			expect( screen.getByRole( 'button' ) ).toBeVisible();
+		} );
 	} );
 
 	describe( 'ref forwarding', () => {
@@ -646,7 +659,7 @@ describe( 'Button', () => {
 			<Button type="image/png" />
 			{ /* @ts-expect-error */ }
 			<Button type="invalidtype" />
-			{ /* @ts-expect-error - although the runtime behavior will allow this to be an anchor, this is probably a mistake. */ }
+			{ /* @ts-expect-error */ }
 			<Button disabled accessibleWhenDisabled href="foo" />
 		</>;
 	} );

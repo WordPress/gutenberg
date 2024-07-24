@@ -16,11 +16,12 @@ import {
 	Flex,
 	Notice,
 	ProgressBar,
+	CheckboxControl,
 } from '@wordpress/components';
 import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useContext, useEffect, useState } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { chevronLeft } from '@wordpress/icons';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
@@ -31,7 +32,12 @@ import { FontLibraryContext } from './context';
 import FontCard from './font-card';
 import LibraryFontVariant from './library-font-variant';
 import { sortFontFaces } from './utils/sort-font-faces';
-import { setUIValuesNeeded } from './utils';
+import {
+	setUIValuesNeeded,
+	loadFontFaceInBrowser,
+	unloadFontFaceInBrowser,
+	getDisplaySrcFromFontFace,
+} from './utils';
 import { unlock } from '../../../lock-unlock';
 
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
@@ -49,8 +55,11 @@ function InstalledFonts() {
 		getFontFacesActivated,
 		notice,
 		setNotice,
-		fontFamilies,
 	} = useContext( FontLibraryContext );
+
+	const [ fontFamilies, setFontFamilies ] = useGlobalSetting(
+		'typography.fontFamilies'
+	);
 	const [ isConfirmDeleteOpen, setIsConfirmDeleteOpen ] = useState( false );
 	const [ baseFontFamilies ] = useGlobalSetting(
 		'typography.fontFamilies',
@@ -61,7 +70,6 @@ function InstalledFonts() {
 		const { __experimentalGetCurrentGlobalStylesId } = select( coreStore );
 		return __experimentalGetCurrentGlobalStylesId();
 	} );
-
 	const globalStyles = useEntityRecord(
 		'root',
 		'globalStyles',
@@ -93,7 +101,11 @@ function InstalledFonts() {
 			const { canUser } = select( coreStore );
 			return (
 				customFontFamilyId &&
-				canUser( 'delete', 'font-families', customFontFamilyId )
+				canUser( 'delete', {
+					kind: 'postType',
+					name: 'wp_font_family',
+					id: customFontFamilyId,
+				} )
 			);
 		},
 		[ customFontFamilyId ]
@@ -144,6 +156,56 @@ function InstalledFonts() {
 		refreshLibrary();
 	}, [] );
 
+	// Get activated fonts count.
+	const activeFontsCount = libraryFontSelected
+		? getFontFacesActivated(
+				libraryFontSelected.slug,
+				libraryFontSelected.source
+		  ).length
+		: 0;
+
+	const selectedFontsCount =
+		libraryFontSelected?.fontFace?.length ??
+		( libraryFontSelected?.fontFamily ? 1 : 0 );
+
+	// Check if any fonts are selected.
+	const isIndeterminate =
+		activeFontsCount > 0 && activeFontsCount !== selectedFontsCount;
+
+	// Check if all fonts are selected.
+	const isSelectAllChecked = activeFontsCount === selectedFontsCount;
+
+	// Toggle select all fonts.
+	const toggleSelectAll = () => {
+		const initialFonts =
+			fontFamilies?.[ libraryFontSelected.source ]?.filter(
+				( f ) => f.slug !== libraryFontSelected.slug
+			) ?? [];
+		const newFonts = isSelectAllChecked
+			? initialFonts
+			: [ ...initialFonts, libraryFontSelected ];
+
+		setFontFamilies( {
+			...fontFamilies,
+			[ libraryFontSelected.source ]: newFonts,
+		} );
+
+		if ( libraryFontSelected.fontFace ) {
+			libraryFontSelected.fontFace.forEach( ( face ) => {
+				if ( isSelectAllChecked ) {
+					unloadFontFaceInBrowser( face, 'all' );
+				} else {
+					loadFontFaceInBrowser(
+						face,
+						getDisplaySrcFromFontFace( face?.src ),
+						'all'
+					);
+				}
+			} );
+		}
+	};
+
+	const hasFonts = baseThemeFonts.length > 0 || baseCustomFonts.length > 0;
 	return (
 		<div className="font-library-modal__tabpanel-layout">
 			{ isResolvingLibrary && (
@@ -169,10 +231,18 @@ function InstalledFonts() {
 										{ notice.message }
 									</Notice>
 								) }
-								{ baseCustomFonts.length > 0 && (
+								{ ! hasFonts && (
+									<Text as="p">
+										{ __( 'No fonts installed.' ) }
+									</Text>
+								) }
+								{ baseThemeFonts.length > 0 && (
 									<VStack>
 										<h2 className="font-library-modal__fonts-title">
-											{ __( 'Installed Fonts' ) }
+											{
+												/* translators: Heading for a list of fonts provided by the theme. */
+												_x( 'Theme', 'font source' )
+											}
 										</h2>
 										{ /*
 										 * Disable reason: The `list` ARIA role is redundant but
@@ -183,7 +253,7 @@ function InstalledFonts() {
 											role="list"
 											className="font-library-modal__fonts-list"
 										>
-											{ baseCustomFonts.map( ( font ) => (
+											{ baseThemeFonts.map( ( font ) => (
 												<li
 													key={ font.slug }
 													className="font-library-modal__fonts-list-item"
@@ -206,10 +276,13 @@ function InstalledFonts() {
 										{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
 									</VStack>
 								) }
-								{ baseThemeFonts.length > 0 && (
+								{ baseCustomFonts.length > 0 && (
 									<VStack>
 										<h2 className="font-library-modal__fonts-title">
-											{ __( 'Theme Fonts' ) }
+											{
+												/* translators: Heading for a list of fonts installed by the user. */
+												_x( 'Custom', 'font source' )
+											}
 										</h2>
 										{ /*
 										 * Disable reason: The `list` ARIA role is redundant but
@@ -220,7 +293,7 @@ function InstalledFonts() {
 											role="list"
 											className="font-library-modal__fonts-list"
 										>
-											{ baseThemeFonts.map( ( font ) => (
+											{ baseCustomFonts.map( ( font ) => (
 												<li
 													key={ font.slug }
 													className="font-library-modal__fonts-list-item"
@@ -295,6 +368,14 @@ function InstalledFonts() {
 							</Text>
 							<Spacer margin={ 4 } />
 							<VStack spacing={ 0 }>
+								<CheckboxControl
+									className="font-library-modal__select-all"
+									label={ __( 'Select all' ) }
+									checked={ isSelectAllChecked }
+									onChange={ toggleSelectAll }
+									indeterminate={ isIndeterminate }
+									__nextHasNoMarginBottom
+								/>
 								<Spacer margin={ 8 } />
 								{ getFontFacesToDisplay(
 									libraryFontSelected

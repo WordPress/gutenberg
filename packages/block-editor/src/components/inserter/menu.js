@@ -147,7 +147,7 @@ function InserterMenu(
 	const showMediaPanel = selectedTab === 'media' && !! selectedMediaCategory;
 
 	const showZoomOut =
-		showPatternPanel && window.__experimentalEnableZoomedOutPatternsTab;
+		showPatternPanel && !! window.__experimentalEnableZoomedOutPatternsTab;
 
 	useZoomOut( showZoomOut );
 
