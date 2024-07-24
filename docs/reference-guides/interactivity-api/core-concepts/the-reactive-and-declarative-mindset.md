@@ -1,3 +1,5 @@
+# The Reactive and Declarative mindset
+
 The Interactivity API is a reactive and declarative framework, similar to other modern frameworks like React, Vue, Svelte, or Alpine. When working with the Interactivity API, adopting the right mindset is crucial for maximizing its potential. This guide will explain the core concepts of reactivity and declarativeness, providing a foundation for effective use of the Interactivity API.
 
 ## Understanding Declarative vs. Imperative Code

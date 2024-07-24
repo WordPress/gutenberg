@@ -205,6 +205,13 @@
 			{
 				"docs/reference-guides/interactivity-api/README.md": [
 					{
+						"docs/reference-guides/interactivity-api/core-concepts/README.md": [
+							{
+								"docs/reference-guides/interactivity-api/core-concepts/the-reactive-and-declarative-mindset.md": []
+							}
+						]
+					},
+					{
 						"docs/reference-guides/interactivity-api/iapi-quick-start-guide.md": []
 					},
 					{
