@@ -10,10 +10,12 @@ export default ( props ) => ( element ) => {
 	function onCopy( event ) {
 		const { record } = props.current;
 		const { ownerDocument } = element;
-		if (
-			isCollapsed( record.current ) ||
-			! element.contains( ownerDocument.activeElement )
-		) {
+		const { defaultView } = ownerDocument;
+		const { anchorNode, focusNode } = defaultView.getSelection();
+		const containsSelection =
+			element.contains( anchorNode ) && element.contains( focusNode );
+
+		if ( isCollapsed( record.current ) || ! containsSelection ) {
 			return;
 		}
 
