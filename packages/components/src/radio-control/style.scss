@@ -2,7 +2,7 @@
 	display: grid;
 	grid-template-columns: auto 1fr;
 	grid-template-rows: auto minmax(0, max-content);
-	column-gap: $grid-unit-10;
+	column-gap: $grid-unit-15;
 	align-items: center;
 }
 
