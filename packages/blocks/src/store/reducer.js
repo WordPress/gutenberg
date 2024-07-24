@@ -401,6 +401,11 @@ export function blockBindingsSources( state = {}, action ) {
 			return {
 				...state,
 				[ action.name ]: {
+					/*
+					 * Keep the exisitng properties in case the source has been registered
+					 * in the client before bootstrapping.
+					 */
+					...state[ action.name ],
 					label: action.label,
 					usesContext: action.usesContext,
 				},
