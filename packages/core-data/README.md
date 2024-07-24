@@ -1230,7 +1230,7 @@ the store state using `canUser()`, or resolved if missing.
 _Parameters_
 
 -   _resource_ `string | EntityResource`: Entity resource to check. Accepts entity object `{ kind: 'root', name: 'media', id: 1 }` or REST base as a string - `media`.
--   _id_ `IdType`: Optional ID of the resource to check, e.g. 10. Note: The argument will be ignored when using an entity object as a resource to check permissions.
+-   _id_ `IdType`: Optional ID of the resource to check, e.g. 10. Note: This argument is discouraged when using an entity object as a resource to check permissions and will be ignored.
 
 _Returns_
 

@@ -61,8 +61,8 @@ function useResourcePermissions< IdType = void >(
  *
  * @param    resource Entity resource to check. Accepts entity object `{ kind: 'root', name: 'media', id: 1 }`
  *                    or REST base as a string - `media`.
- * @param    id       Optional ID of the resource to check, e.g. 10. Note: The argument will be ignored
- *                    when using an entity object as a resource to check permissions.
+ * @param    id       Optional ID of the resource to check, e.g. 10. Note: This argument is discouraged
+ *                    when using an entity object as a resource to check permissions and will be ignored.
  *
  * @example
  * ```js
@@ -132,10 +132,9 @@ function useResourcePermissions< IdType = void >(
 	// We can't just pass `resource` as one of the deps, because if it is passed
 	// as an object literal, then it will be a different object on each call even
 	// if the values remain the same.
-	const resourceAsString =
-		typeof resource === 'object' ? JSON.stringify( resource ) : resource;
-
 	const isEntity = typeof resource === 'object';
+	const resourceAsString = isEntity ? JSON.stringify( resource ) : resource;
+
 	if ( isEntity && typeof id !== 'undefined' ) {
 		warning(
 			`When 'resource' is an entity object, passing 'id' as a separate argument isn't supported.`
