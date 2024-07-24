@@ -61,13 +61,13 @@ function DimensionInput( { label, onChange, isResizing, value = '' } ) {
 					isResetValueOnUnitChange
 					min={ MIN_SPACER_SIZE }
 					onChange={ handleOnChange }
-					style={ { maxWidth: 80 } }
+					style={ { maxWidth: '50%' } }
 					value={ computedValue }
 					units={ units }
 					label={ label }
+					__next40pxDefaultSize
 				/>
 			) }
-
 			{ spacingSizes?.length > 0 && (
 				<View className="tools-panel-item-spacing">
 					<SpacingSizesControl
