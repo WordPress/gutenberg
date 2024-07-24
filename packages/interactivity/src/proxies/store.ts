@@ -5,28 +5,51 @@ import { createProxy, getProxyNs, shouldProxy } from './registry';
 import { setNamespace, resetNamespace } from '../hooks';
 import { withScope } from '../utils';
 
-const isObject = ( item: unknown ): item is Record< string, unknown > =>
-	Boolean( item && typeof item === 'object' && item.constructor === Object );
+/**
+ * Checks if the passed `candidate` is an object with just the `Object`
+ * prototype.
+ *
+ * @param candidate The item to check.
+ * @return Whether `candidate` is an object.
+ */
+const isObject = (
+	candidate: unknown
+): candidate is Record< string, unknown > =>
+	Boolean(
+		candidate &&
+			typeof candidate === 'object' &&
+			candidate.constructor === Object
+	);
 
+/**
+ * Identifies the store proxies handling the root objects of each store.
+ */
 const storeRoots = new WeakSet();
 
+/**
+ * Handlers for store proxies.
+ */
 const storeHandlers: ProxyHandler< object > = {
 	get: ( target: any, key: string | symbol, receiver: any ) => {
 		const result = Reflect.get( target, key );
 		const ns = getProxyNs( receiver );
 
-		// Check if the proxy is the store root and no key with that name exist. In
-		// that case, return an empty object for the requested key.
+		/*
+		 * Check if the proxy is the store root and no key with that name exist. In
+		 * that case, return an empty object for the requested key.
+		 */
 		if ( typeof result === 'undefined' && storeRoots.has( receiver ) ) {
 			const obj = {};
 			Reflect.set( target, key, obj );
 			return proxifyStore( ns, obj, false );
 		}
 
-		// Check if the property is a function. If it is, add the store
-		// namespace to the stack and wrap the function with the current scope.
-		// The `withScope` util handles both synchronous functions and generator
-		// functions.
+		/*
+		 * Check if the property is a function. If it is, add the store
+		 * namespace to the stack and wrap the function with the current scope.
+		 * The `withScope` util handles both synchronous functions and generator
+		 * functions.
+		 */
 		if ( typeof result === 'function' ) {
 			setNamespace( ns );
 			const scoped = withScope( result );
@@ -43,6 +66,19 @@ const storeHandlers: ProxyHandler< object > = {
 	},
 };
 
+/**
+ * Returns the proxy associated with the given store object, creating it if it
+ * does not exist.
+ *
+ * @param namespace The namespace that will be associated to this proxy.
+ * @param obj       The object to proxify.
+ *
+ * @param isRoot    Whether the passed object is the store root object.
+ * @throws Error if the object cannot be proxified. Use {@link shouldProxy} to
+ *         check if a proxy can be created for a specific object.
+ *
+ * @return The associated proxy.
+ */
 export const proxifyStore = < T extends object >(
 	namespace: string,
 	obj: T,
