@@ -23,17 +23,19 @@ const POST_CONTENT_BLOCK_TYPES = [
  * page content to be edited.
  */
 export default function DisableNonPageContentBlocks() {
-	const postContentBlockTypes = applyFilters(
-		'editor.postContentBlockTypes',
-		POST_CONTENT_BLOCK_TYPES
+	const contentOnlyBlockTypes = useMemo(
+		() => [
+			...applyFilters(
+				'editor.postContentBlockTypes',
+				POST_CONTENT_BLOCK_TYPES
+			),
+			'core/template-part',
+		],
+		[]
 	);
 
 	// Note that there are two separate subscriptions because the result for each
 	// returns a new array.
-	const contentOnlyBlockTypes = useMemo(
-		() => [ ...postContentBlockTypes, 'core/template-part' ],
-		[ postContentBlockTypes ]
-	);
 	const contentOnlyIds = useSelect(
 		( select ) => {
 			const { getPostBlocksByName } = unlock( select( editorStore ) );
