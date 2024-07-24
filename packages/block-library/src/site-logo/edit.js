@@ -10,6 +10,7 @@ import { isBlobURL } from '@wordpress/blob';
 import {
 	createInterpolateElement,
 	useEffect,
+	useRef,
 	useState,
 } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
@@ -45,6 +46,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { crop, upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
+import { focus } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -398,7 +400,7 @@ export default function LogoEdit( {
 	isSelected,
 } ) {
 	const { width, shouldSyncIcon } = attributes;
-
+	const blockToolbarContainerRef = useRef();
 	const {
 		siteLogoId,
 		canUserEdit,
@@ -498,9 +500,15 @@ export default function LogoEdit( {
 		setLogo( media.id, shouldForceSync );
 	};
 
-	const onRemoveLogo = () => {
+	const onRemoveLogo = ( ref ) => {
 		setLogo( null );
 		setAttributes( { width: undefined } );
+		// Focus the toggle button and close the dropdown menu.
+		if ( ref.current ) {
+			const [ toggleButton ] = focus.tabbable.find( ref.current );
+			toggleButton?.focus();
+			toggleButton?.click();
+		}
 	};
 
 	const { createErrorNotice } = useDispatch( noticesStore );
@@ -529,11 +537,17 @@ export default function LogoEdit( {
 		name: ! logoUrl ? __( 'Choose logo' ) : __( 'Replace' ),
 		onSelect: onSelectLogo,
 		onError: onUploadError,
-		onRemoveLogo,
 	};
 	const controls = canUserEdit && (
 		<BlockControls group="other">
-			<SiteLogoReplaceFlow { ...mediaReplaceFlowProps } />
+			<div ref={ blockToolbarContainerRef }>
+				<SiteLogoReplaceFlow
+					{ ...mediaReplaceFlowProps }
+					onRemoveLogo={ () =>
+						onRemoveLogo( blockToolbarContainerRef )
+					}
+				/>
+			</div>
 		</BlockControls>
 	);
 
@@ -616,6 +630,7 @@ export default function LogoEdit( {
 					{ canUserEdit && !! logoUrl && (
 						<SiteLogoReplaceFlow
 							{ ...mediaReplaceFlowProps }
+							onRemoveLogo={ onRemoveLogo }
 							name={
 								<InspectorLogoPreview
 									mediaItemData={ mediaItemData }
