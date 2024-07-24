@@ -22,7 +22,8 @@ import {
 	INSERTER_PATTERN_TYPES,
 } from './utils';
 
-const getShouldDisableSyncFilter = ( sourceFilter ) => sourceFilter !== 'all';
+const getShouldDisableSyncFilter = ( sourceFilter ) =>
+	sourceFilter !== 'all' && sourceFilter !== 'user';
 const getShouldDisableNonUserSources = ( category ) => {
 	return category.name === myPatternsCategory.name;
 };
