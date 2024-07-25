@@ -1507,6 +1507,33 @@ test.describe( 'Block bindings', () => {
 				} );
 				await expect( contentAttribute ).toBeVisible();
 			} );
+			test( 'should use a selector to update the content', async ( {
+				editor,
+				page,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+				} );
+				await page
+					.getByRole( 'tabpanel', {
+						name: 'Settings',
+					} )
+					.getByLabel( 'Attributes options' )
+					.click();
+				await page
+					.getByRole( 'menuitemcheckbox', {
+						name: 'Show content',
+					} )
+					.click();
+				await page.getByRole( 'button', { name: 'content' } ).click();
+				await page.keyboard.press( 'Enter' );
+				const paragraphBlock = editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} );
+				await expect( paragraphBlock ).toHaveText(
+					'Value of the text_custom_field'
+				);
+			} );
 		} );
 
 		test.describe( 'Button', () => {
