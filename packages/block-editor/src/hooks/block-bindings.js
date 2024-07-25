@@ -6,13 +6,10 @@ import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
-	__experimentalVStack as VStack,
 	__experimentalText as Text,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
-	__experimentalTruncate as Truncate,
-	__experimentalDropdownContentWrapper as DropdownContentWrapper,
-	Dropdown,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { useContext } from '@wordpress/element';
@@ -30,11 +27,13 @@ import { unlock } from '../lock-unlock';
 import InspectorControls from '../components/inspector-controls';
 import BlockContext from '../components/block-context';
 
-const popoverProps = {
-	placement: 'left-start',
-	offset: 36,
-	shift: true,
-};
+const {
+	DropdownMenuV2: DropdownMenu,
+	DropdownMenuGroupV2: DropdownMenuGroup,
+	DropdownMenuCheckboxItemV2: DropdownMenuCheckboxItem,
+	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
+	DropdownMenuItemHelpTextV2: DropdownMenuItemHelpText,
+} = unlock( componentsPrivateApis );
 
 const useToolsPanelDropdownMenuProps = () => {
 	const isMobile = useViewportMatch( 'medium', '<' );
@@ -53,53 +52,73 @@ function BlockBindingsPanelDropdown( {
 	fieldsList,
 	addConnection,
 	attribute,
+	binding,
 } ) {
+	const currentKey = binding?.args?.key;
 	return (
-		<DropdownContentWrapper
-			paddingSize="small"
-			className="block-editor-bindings__popover"
-		>
+		<>
 			{ Object.entries( fieldsList ).map( ( [ label, fields ] ) => (
-				<ItemGroup
+				<DropdownMenuGroup
 					key={ label }
 					label={
 						Object.keys( fieldsList ).length > 1 ? label : null
 					}
 				>
 					{ Object.entries( fields ).map( ( [ key, value ] ) => (
-						<Item
+						<DropdownMenuCheckboxItem
 							key={ key }
 							onClick={ () => addConnection( key, attribute ) }
+							name={ attribute + '-binding' }
+							value={ key }
+							checked={ key === currentKey }
+							hideOnClick
 						>
-							<VStack spacing={ 0 }>
-								<Truncate>{ key }</Truncate>
-								<Truncate className="block-editor-bindings__item-explanation">
-									{ value }
-								</Truncate>
-							</VStack>
-						</Item>
+							<DropdownMenuItemLabel>
+								{ key }
+							</DropdownMenuItemLabel>
+							<DropdownMenuItemHelpText>
+								{ value }
+							</DropdownMenuItemHelpText>
+						</DropdownMenuCheckboxItem>
 					) ) }
-				</ItemGroup>
+				</DropdownMenuGroup>
 			) ) }
-		</DropdownContentWrapper>
+		</>
 	);
 }
 
-function BlockBindingsAttribute( { toggleProps, attribute, binding } ) {
+function BlockBindingsAttribute( {
+	fieldsList,
+	addConnection,
+	attribute,
+	binding,
+} ) {
 	const { source: sourceName, args } = binding || {};
 	const sourceProps =
 		unlock( blocksPrivateApis ).getBlockBindingsSource( sourceName );
 	return (
-		<Item { ...toggleProps }>
-			<VStack spacing={ 0 }>
-				<Truncate>{ attribute }</Truncate>
-				{ !! binding && (
-					<Truncate className="block-editor-bindings__item-explanation">
-						{ args?.key || sourceProps?.label || sourceName }
-					</Truncate>
-				) }
-			</VStack>
-		</Item>
+		<DropdownMenu
+			placement="left-start"
+			gutter={ 36 }
+			style={ { width: '360px' } }
+			trigger={
+				<Item>
+					<DropdownMenuItemLabel>{ attribute }</DropdownMenuItemLabel>
+					{ !! binding && (
+						<DropdownMenuItemHelpText className="block-editor-bindings__item-explanation">
+							{ args?.key || sourceProps?.label || sourceName }
+						</DropdownMenuItemHelpText>
+					) }
+				</Item>
+			}
+		>
+			<BlockBindingsPanelDropdown
+				fieldsList={ fieldsList }
+				addConnection={ addConnection }
+				attribute={ attribute }
+				binding={ binding }
+			/>
+		</DropdownMenu>
 	);
 }
 
@@ -227,32 +246,11 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 								removeConnection( attribute );
 							} }
 						>
-							<Dropdown
-								popoverProps={ popoverProps }
-								className="block-editor-bindings__dropdown"
-								renderToggle={ ( { onToggle, isOpen } ) => {
-									const toggleProps = {
-										onClick: onToggle,
-										className: isOpen ? 'is-open' : '',
-										'aria-expanded': isOpen,
-									};
-									return (
-										<BlockBindingsAttribute
-											toggleProps={ toggleProps }
-											attribute={ attribute }
-											binding={
-												filteredBindings[ attribute ]
-											}
-										/>
-									);
-								} }
-								renderContent={ () => (
-									<BlockBindingsPanelDropdown
-										fieldsList={ fieldsList }
-										addConnection={ addConnection }
-										attribute={ attribute }
-									/>
-								) }
+							<BlockBindingsAttribute
+								fieldsList={ fieldsList }
+								addConnection={ addConnection }
+								attribute={ attribute }
+								binding={ filteredBindings[ attribute ] }
 							/>
 						</ToolsPanelItem>
 					) ) }

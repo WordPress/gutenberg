@@ -4,24 +4,6 @@
 		font-size: $helptext-font-size;
 		grid-column: 1/-1;
 	}
-	.block-editor-bindings__dropdown {
-		width: 100%;
-		button {
-			width: 100%;
-			&.is-open {
-				background-color: $gray-100;
-			}
-		}
-	}
-}
-.block-editor-bindings__popover {
-	width: 360px;
-}
-.block-editor-bindings__panel,
-.block-editor-bindings__popover {
-	.block-editor-bindings__item-explanation {
-		color: $gray-700;
-	}
 	button:hover .block-editor-bindings__item-explanation {
 		color: inherit;
 	}
