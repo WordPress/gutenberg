@@ -445,11 +445,13 @@ export function useAutocompleteProps( options: UseAutocompleteProps ) {
 				onKeyDownRef.current?.( event );
 			}
 			element.ownerDocument.addEventListener( 'keydown', _onKeyDown );
+			element.addEventListener( 'keydown', _onKeyDown );
 			return () => {
 				element.ownerDocument.removeEventListener(
 					'keydown',
 					_onKeyDown
 				);
+				element.removeEventListener( 'keydown', _onKeyDown );
 			};
 		}, [] ),
 	] );
