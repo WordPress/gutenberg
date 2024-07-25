@@ -80,10 +80,10 @@ function BlockBindingsPanelDropdown( {
 							value={ key }
 							checked={ key === currentKey }
 						>
-							<DropdownMenuItemLabel numberOfLines={ 1 }>
+							<DropdownMenuItemLabel>
 								{ key }
 							</DropdownMenuItemLabel>
-							<DropdownMenuItemHelpText numberOfLines={ 1 }>
+							<DropdownMenuItemHelpText>
 								{ value }
 							</DropdownMenuItemHelpText>
 						</DropdownMenuRadioItem>
