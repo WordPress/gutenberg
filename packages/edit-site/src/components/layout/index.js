@@ -34,7 +34,7 @@ import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands
  */
 import ErrorBoundary from '../error-boundary';
 import { store as editSiteStore } from '../../store';
-import SiteHub from '../site-hub';
+import { default as SiteHub, SiteHubMobile } from '../site-hub';
 import ResizableFrame from '../resizable-frame';
 import { unlock } from '../../lock-unlock';
 import KeyboardShortcutsRegister from '../keyboard-shortcuts/register';
@@ -174,6 +174,16 @@ export default function Layout( { route } ) {
 
 					{ isMobileViewport && areas.mobile && (
 						<div className="edit-site-layout__mobile">
+							{ canvasMode !== 'edit' && (
+								<SidebarContent routeKey={ routeKey }>
+									<SiteHubMobile
+										ref={ toggleRef }
+										isTransparent={
+											isResizableFrameOversized
+										}
+									/>
+								</SidebarContent>
+							) }
 							{ areas.mobile }
 						</div>
 					) }
@@ -190,6 +200,17 @@ export default function Layout( { route } ) {
 								{ areas.content }
 							</div>
 						) }
+
+					{ ! isMobileViewport && areas.edit && (
+						<div
+							className="edit-site-layout__area"
+							style={ {
+								maxWidth: widths?.edit,
+							} }
+						>
+							{ areas.edit }
+						</div>
+					) }
 
 					{ ! isMobileViewport && areas.preview && (
 						<div className="edit-site-layout__canvas-container">

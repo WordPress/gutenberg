@@ -29,7 +29,7 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation 
   -webkit-flex-direction: row;
   -ms-flex-direction: row;
   flex-direction: row;
-  gap: calc(4px * 3);
+  gap: calc(4px * 2);
   -webkit-box-pack: start;
   -ms-flex-pack: start;
   -webkit-justify-content: flex-start;
@@ -135,7 +135,7 @@ exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields 
   -webkit-flex-direction: row;
   -ms-flex-direction: row;
   flex-direction: row;
-  gap: calc(4px * 3);
+  gap: calc(4px * 2);
   -webkit-box-pack: start;
   -ms-flex-pack: start;
   -webkit-justify-content: flex-start;
@@ -231,7 +231,7 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
   -webkit-flex-direction: row;
   -ms-flex-direction: row;
   flex-direction: row;
-  gap: calc(4px * 3);
+  gap: calc(4px * 2);
   -webkit-box-pack: start;
   -ms-flex-pack: start;
   -webkit-justify-content: flex-start;
@@ -338,7 +338,7 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox when custom fiel
   -webkit-flex-direction: row;
   -ms-flex-direction: row;
   flex-direction: row;
-  gap: calc(4px * 3);
+  gap: calc(4px * 2);
   -webkit-box-pack: start;
   -ms-flex-pack: start;
   -webkit-justify-content: flex-start;

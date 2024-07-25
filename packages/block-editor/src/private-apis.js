@@ -21,6 +21,7 @@ import BlockQuickNavigation from './components/block-quick-navigation';
 import { LayoutStyle } from './components/block-list/layout';
 import { BlockRemovalWarningModal } from './components/block-removal-warning-modal';
 import {
+	setBackgroundStyleDefaults,
 	useLayoutClasses,
 	useLayoutStyles,
 	__unstableBlockStyleVariationOverridesWithConfig,
@@ -28,10 +29,6 @@ import {
 import DimensionsTool from './components/dimensions-tool';
 import ResolutionTool from './components/resolution-tool';
 import TextAlignmentControl from './components/text-alignment-control';
-import {
-	default as ReusableBlocksRenameHint,
-	useReusableBlocksRenameHint,
-} from './components/inserter/reusable-block-rename-hint';
 import { usesContextKey } from './components/rich-text/format-edit';
 import { ExperimentalBlockCanvas } from './components/block-canvas';
 import { getDuotoneFilter } from './components/duotone/utils';
@@ -40,6 +37,7 @@ import {
 	selectBlockPatternsKey,
 	reusableBlocksSelectKey,
 	globalStylesDataKey,
+	globalStylesLinksDataKey,
 } from './store/private-keys';
 import { requiresWrapperOnCopy } from './components/writing-flow/utils';
 import { PrivateRichText } from './components/rich-text/';
@@ -80,11 +78,10 @@ lock( privateApis, {
 	ResolutionTool,
 	TabbedSidebar,
 	TextAlignmentControl,
-	ReusableBlocksRenameHint,
-	useReusableBlocksRenameHint,
 	usesContextKey,
 	useFlashEditableBlocks,
 	globalStylesDataKey,
+	globalStylesLinksDataKey,
 	selectBlockPatternsKey,
 	requiresWrapperOnCopy,
 	PrivateRichText,
@@ -95,4 +92,5 @@ lock( privateApis, {
 	useSpacingSizes,
 	useBlockDisplayTitle,
 	__unstableBlockStyleVariationOverridesWithConfig,
+	setBackgroundStyleDefaults,
 } );

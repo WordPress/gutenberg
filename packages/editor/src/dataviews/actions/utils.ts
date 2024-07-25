@@ -24,7 +24,13 @@ export function getItemTitle( item: Post ) {
 	if ( typeof item.title === 'string' ) {
 		return decodeEntities( item.title );
 	}
-	return decodeEntities( item.title?.rendered || '' );
+	if ( 'rendered' in item.title ) {
+		return decodeEntities( item.title.rendered );
+	}
+	if ( 'raw' in item.title ) {
+		return decodeEntities( item.title.raw );
+	}
+	return '';
 }
 
 /**

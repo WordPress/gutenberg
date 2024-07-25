@@ -13,13 +13,7 @@ import {
 	Flex,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
-import {
-	useState,
-	useMemo,
-	useCallback,
-	useId,
-	useEffect,
-} from '@wordpress/element';
+import { useState, useMemo, useId, useEffect } from '@wordpress/element';
 import {
 	BlockPreview,
 	privateApis as blockEditorPrivateApis,
@@ -64,14 +58,26 @@ const { usePostActions } = unlock( editorPrivateApis );
 const { useLocation } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
-const defaultConfigPerViewType = {
+const defaultLayouts = {
 	[ LAYOUT_TABLE ]: {
-		primaryField: 'title',
+		layout: {
+			primaryField: 'title',
+			styles: {
+				preview: {
+					width: '1%',
+				},
+				author: {
+					width: '1%',
+				},
+			},
+		},
 	},
 	[ LAYOUT_GRID ]: {
-		mediaField: 'preview',
-		primaryField: 'title',
-		badgeFields: [ 'sync-status' ],
+		layout: {
+			mediaField: 'preview',
+			primaryField: 'title',
+			badgeFields: [ 'sync-status' ],
+		},
 	},
 };
 const DEFAULT_VIEW = {
@@ -79,9 +85,8 @@ const DEFAULT_VIEW = {
 	search: '',
 	page: 1,
 	perPage: 20,
-	layout: {
-		...defaultConfigPerViewType[ LAYOUT_GRID ],
-	},
+	layout: defaultLayouts[ LAYOUT_GRID ].layout,
+	fields: [ 'title', 'sync-status' ],
 	filters: [],
 };
 
@@ -117,6 +122,7 @@ function PreviewWrapper( { item, onClick, ariaDescribedBy, children } ) {
 
 function Preview( { item, viewType } ) {
 	const descriptionId = useId();
+	const description = item.description || item?.excerpt?.raw;
 	const isUserPattern = item.type === PATTERN_TYPES.user;
 	const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
 	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
@@ -143,7 +149,7 @@ function Preview( { item, viewType } ) {
 			<PreviewWrapper
 				item={ item }
 				onClick={ onClick }
-				ariaDescribedBy={ item.description ? descriptionId : undefined }
+				ariaDescribedBy={ !! description ? descriptionId : undefined }
 			>
 				{ isEmpty && isTemplatePart && __( 'Empty template part' ) }
 				{ isEmpty && ! isTemplatePart && __( 'Empty pattern' ) }
@@ -156,9 +162,9 @@ function Preview( { item, viewType } ) {
 					</Async>
 				) }
 			</PreviewWrapper>
-			{ item.description && (
+			{ !! description && (
 				<div hidden id={ descriptionId }>
-					{ item.description }
+					{ description }
 				</div>
 			) }
 		</div>
@@ -171,7 +177,7 @@ function Author( { item, viewType } ) {
 	const withIcon = viewType !== LAYOUT_LIST;
 
 	return (
-		<HStack alignment="left" spacing={ 1 }>
+		<HStack alignment="left" spacing={ 0 }>
 			{ withIcon && imageUrl && (
 				<div
 					className={ clsx( 'page-templates-author-field__avatar', {
@@ -222,7 +228,7 @@ function Title( { item } ) {
 						// See https://github.com/WordPress/gutenberg/pull/51898#discussion_r1243399243.
 						tabIndex="-1"
 					>
-						{ title || item.name }
+						{ title }
 					</Button>
 				) }
 			</Flex>
@@ -278,18 +284,17 @@ export default function DataviewsPatterns() {
 	const fields = useMemo( () => {
 		const _fields = [
 			{
-				header: __( 'Preview' ),
+				label: __( 'Preview' ),
 				id: 'preview',
 				render: ( { item } ) => (
 					<Preview item={ item } viewType={ view.type } />
 				),
 				enableSorting: false,
-				enableHiding: false,
-				width: '1%',
 			},
 			{
-				header: __( 'Title' ),
+				label: __( 'Title' ),
 				id: 'title',
+				getValue: ( { item } ) => item.title?.raw || item.title,
 				render: ( { item } ) => <Title item={ item } />,
 				enableHiding: false,
 			},
@@ -297,26 +302,23 @@ export default function DataviewsPatterns() {
 
 		if ( type === PATTERN_TYPES.user ) {
 			_fields.push( {
-				header: __( 'Sync status' ),
+				label: __( 'Sync status' ),
 				id: 'sync-status',
 				render: ( { item } ) => {
+					const syncStatus =
+						'wp_pattern_sync_status' in item
+							? item.wp_pattern_sync_status ||
+							  PATTERN_SYNC_TYPES.full
+							: PATTERN_SYNC_TYPES.unsynced;
 					// User patterns can have their sync statuses checked directly.
 					// Non-user patterns are all unsynced for the time being.
 					return (
 						<span
-							className={ `edit-site-patterns__field-sync-status-${ item.syncStatus }` }
+							className={ `edit-site-patterns__field-sync-status-${ syncStatus }` }
 						>
 							{
-								(
-									SYNC_FILTERS.find(
-										( { value } ) =>
-											value === item.syncStatus
-									) ||
-									SYNC_FILTERS.find(
-										( { value } ) =>
-											value ===
-											PATTERN_SYNC_TYPES.unsynced
-									)
+								SYNC_FILTERS.find(
+									( { value } ) => value === syncStatus
 								).label
 							}
 						</span>
@@ -331,7 +333,7 @@ export default function DataviewsPatterns() {
 			} );
 		} else if ( type === TEMPLATE_PART_POST_TYPE ) {
 			_fields.push( {
-				header: __( 'Author' ),
+				label: __( 'Author' ),
 				id: 'author',
 				getValue: ( { item } ) => item.author_text,
 				render: ( { item } ) => {
@@ -341,7 +343,6 @@ export default function DataviewsPatterns() {
 				filterBy: {
 					isPrimary: true,
 				},
-				width: '1%',
 			} );
 		}
 
@@ -351,7 +352,7 @@ export default function DataviewsPatterns() {
 	// Reset the page number when the category changes.
 	useEffect( () => {
 		if ( previousCategoryId !== categoryId ) {
-			setView( DEFAULT_VIEW );
+			setView( ( prevView ) => ( { ...prevView, page: 1 } ) );
 		}
 	}, [ categoryId, previousCategoryId ] );
 	const { data, paginationInfo } = useMemo( () => {
@@ -381,20 +382,6 @@ export default function DataviewsPatterns() {
 		}
 		return [ editAction, ...patternActions ].filter( Boolean );
 	}, [ editAction, type, templatePartActions, patternActions ] );
-	const onChangeView = useCallback(
-		( newView ) => {
-			if ( newView.type !== view.type ) {
-				newView = {
-					...newView,
-					layout: {
-						...defaultConfigPerViewType[ newView.type ],
-					},
-				};
-			}
-			setView( newView );
-		},
-		[ view.type, setView ]
-	);
 	const id = useId();
 	const settings = usePatternSettings();
 	// Wrap everything in a block editor provider.
@@ -421,8 +408,8 @@ export default function DataviewsPatterns() {
 					getItemId={ ( item ) => item.name ?? item.id }
 					isLoading={ isResolving }
 					view={ view }
-					onChangeView={ onChangeView }
-					supportedLayouts={ [ LAYOUT_GRID, LAYOUT_TABLE ] }
+					onChangeView={ setView }
+					defaultLayouts={ defaultLayouts }
 				/>
 			</Page>
 		</ExperimentalBlockEditorProvider>

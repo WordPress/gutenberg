@@ -16,6 +16,7 @@ async function clearInput( input: HTMLInputElement ) {
 	await click( input );
 
 	// Press backspace as many times as the input's current value
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	for ( const _ of Array( input.value.length ) ) {
 		await press.Backspace();
 	}

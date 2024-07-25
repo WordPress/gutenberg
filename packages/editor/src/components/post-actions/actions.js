@@ -18,6 +18,7 @@ import {
 	__experimentalText as Text,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
+	__experimentalNumberControl as NumberControl,
 } from '@wordpress/components';
 
 /**
@@ -31,8 +32,8 @@ import {
 } from '../../store/constants';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import { exportPatternAsJSONAction } from './export-pattern-action';
 import { CreateTemplatePartModalContents } from '../create-template-part-modal';
+import { getItemTitle } from '../../dataviews/actions/utils';
 
 // Patterns.
 const { PATTERN_TYPES, CreatePatternModalContents, useDuplicatePatternProps } =
@@ -70,13 +71,6 @@ function isTemplateRemovable( template ) {
 		template?.source === TEMPLATE_ORIGINS.custom &&
 		! template?.has_theme_file
 	);
-}
-
-function getItemTitle( item ) {
-	if ( typeof item.title === 'string' ) {
-		return decodeEntities( item.title );
-	}
-	return decodeEntities( item.title?.rendered || '' );
 }
 
 const trashPostAction = {
@@ -120,7 +114,7 @@ const trashPostAction = {
 						variant="tertiary"
 						onClick={ closeModal }
 						disabled={ isBusy }
-						__experimentalIsFocusable
+						accessibleWhenDisabled
 					>
 						{ __( 'Cancel' ) }
 					</Button>
@@ -152,7 +146,7 @@ const trashPostAction = {
 										__( '"%s" moved to trash.' ),
 										getItemTitle( items[ 0 ] )
 									);
-								} else if ( items[ 0 ].type === 'page' ) {
+								} else {
 									successMessage = sprintf(
 										/* translators: The number of items. */
 										_n(
@@ -160,12 +154,6 @@ const trashPostAction = {
 											'%s items moved to trash.',
 											items.length
 										),
-										items.length
-									);
-								} else {
-									successMessage = sprintf(
-										/* translators: The number of posts. */
-										__( '%s items move to trash.' ),
 										items.length
 									);
 								}
@@ -233,7 +221,7 @@ const trashPostAction = {
 						} }
 						isBusy={ isBusy }
 						disabled={ isBusy }
-						__experimentalIsFocusable
+						accessibleWhenDisabled
 					>
 						{ __( 'Trash' ) }
 					</Button>
@@ -243,7 +231,7 @@ const trashPostAction = {
 	},
 };
 
-function useCanUserEligibilityCheckPostType( capability, resource, action ) {
+function useCanUserEligibilityCheckPostType( capability, postType, action ) {
 	const registry = useRegistry();
 	return useMemo(
 		() => ( {
@@ -251,20 +239,22 @@ function useCanUserEligibilityCheckPostType( capability, resource, action ) {
 			isEligible( item ) {
 				return (
 					action.isEligible( item ) &&
-					registry
-						.select( coreStore )
-						.canUser( capability, resource, item.id )
+					registry.select( coreStore ).canUser( capability, {
+						kind: 'postType',
+						name: postType,
+						id: item.id,
+					} )
 				);
 			},
 		} ),
-		[ action, registry, capability, resource ]
+		[ action, registry, capability, postType ]
 	);
 }
 
-function useTrashPostAction( resource ) {
+function useTrashPostAction( postType ) {
 	return useCanUserEligibilityCheckPostType(
 		'delete',
-		resource,
+		postType,
 		trashPostAction
 	);
 }
@@ -276,7 +266,7 @@ const permanentlyDeletePostAction = {
 	isEligible( { status } ) {
 		return status === 'trash';
 	},
-	async callback( posts, { registry } ) {
+	async callback( posts, { registry, onActionPerformed } ) {
 		const { createSuccessNotice, createErrorNotice } =
 			registry.dispatch( noticesStore );
 		const { deleteEntityRecord } = registry.dispatch( coreStore );
@@ -307,6 +297,7 @@ const permanentlyDeletePostAction = {
 				type: 'snackbar',
 				id: 'permanently-delete-post-action',
 			} );
+			onActionPerformed?.( posts );
 		} else {
 			// If there was at lease one failure.
 			let errorMessage;
@@ -359,10 +350,10 @@ const permanentlyDeletePostAction = {
 	},
 };
 
-function usePermanentlyDeletePostAction( resource ) {
+function usePermanentlyDeletePostAction( postType ) {
 	return useCanUserEligibilityCheckPostType(
 		'delete',
-		resource,
+		postType,
 		permanentlyDeletePostAction
 	);
 }
@@ -474,10 +465,10 @@ const restorePostAction = {
 	},
 };
 
-function useRestorePostAction( resource ) {
+function useRestorePostAction( postType ) {
 	return useCanUserEligibilityCheckPostType(
 		'update',
-		resource,
+		postType,
 		restorePostAction
 	);
 }
@@ -635,22 +626,129 @@ const renamePostAction = {
 	},
 };
 
-function useRenamePostAction( resource ) {
+function useRenamePostAction( postType ) {
 	return useCanUserEligibilityCheckPostType(
 		'update',
-		resource,
+		postType,
 		renamePostAction
 	);
 }
 
-const useDuplicatePostAction = ( postType ) => {
-	const { userCanCreatePost } = useSelect(
+function ReorderModal( { items, closeModal, onActionPerformed } ) {
+	const [ item ] = items;
+	const { editEntityRecord, saveEditedEntityRecord } =
+		useDispatch( coreStore );
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticesStore );
+	const [ orderInput, setOrderInput ] = useState( item.menu_order );
+
+	async function onOrder( event ) {
+		event.preventDefault();
+		if (
+			! Number.isInteger( Number( orderInput ) ) ||
+			orderInput?.trim?.() === ''
+		) {
+			return;
+		}
+		try {
+			await editEntityRecord( 'postType', item.type, item.id, {
+				menu_order: orderInput,
+			} );
+			closeModal();
+			// Persist edited entity.
+			await saveEditedEntityRecord( 'postType', item.type, item.id, {
+				throwOnError: true,
+			} );
+			createSuccessNotice( __( 'Order updated' ), {
+				type: 'snackbar',
+			} );
+			onActionPerformed?.( items );
+		} catch ( error ) {
+			const errorMessage =
+				error.message && error.code !== 'unknown_error'
+					? error.message
+					: __( 'An error occurred while updating the order' );
+			createErrorNotice( errorMessage, {
+				type: 'snackbar',
+			} );
+		}
+	}
+	const saveIsDisabled =
+		! Number.isInteger( Number( orderInput ) ) ||
+		orderInput?.trim?.() === '';
+	return (
+		<form onSubmit={ onOrder }>
+			<VStack spacing="5">
+				<div>
+					{ __(
+						'Determines the order of pages. Pages with the same order value are sorted alphabetically. Negative order values are supported.'
+					) }
+				</div>
+				<NumberControl
+					__next40pxDefaultSize
+					label={ __( 'Order' ) }
+					help={ __( 'Set the page order.' ) }
+					value={ orderInput }
+					onChange={ setOrderInput }
+				/>
+				<HStack justify="right">
+					<Button
+						__next40pxDefaultSize
+						variant="tertiary"
+						onClick={ () => {
+							closeModal();
+						} }
+					>
+						{ __( 'Cancel' ) }
+					</Button>
+					<Button
+						__next40pxDefaultSize
+						variant="primary"
+						type="submit"
+						accessibleWhenDisabled
+						disabled={ saveIsDisabled }
+						__experimentalIsFocusable
+					>
+						{ __( 'Save' ) }
+					</Button>
+				</HStack>
+			</VStack>
+		</form>
+	);
+}
+
+function useReorderPagesAction( postType ) {
+	const supportsPageAttributes = useSelect(
 		( select ) => {
-			const { getPostType, canUser } = select( coreStore );
-			const resource = getPostType( postType )?.rest_base || '';
-			return {
-				userCanCreatePost: canUser( 'create', resource ),
-			};
+			const { getPostType } = select( coreStore );
+			const postTypeObject = getPostType( postType );
+
+			return !! postTypeObject?.supports?.[ 'page-attributes' ];
+		},
+		[ postType ]
+	);
+
+	return useMemo(
+		() =>
+			supportsPageAttributes && {
+				id: 'order-pages',
+				label: __( 'Order' ),
+				isEligible( { status } ) {
+					return status !== 'trash';
+				},
+				RenderModal: ReorderModal,
+			},
+		[ supportsPageAttributes ]
+	);
+}
+
+const useDuplicatePostAction = ( postType ) => {
+	const userCanCreatePost = useSelect(
+		( select ) => {
+			return select( coreStore ).canUser( 'create', {
+				kind: 'postType',
+				name: postType,
+			} );
 		},
 		[ postType ]
 	);
@@ -782,6 +880,7 @@ const useDuplicatePostAction = ( postType ) => {
 									<Button
 										variant="tertiary"
 										onClick={ closeModal }
+										__next40pxDefaultSize
 									>
 										{ __( 'Cancel' ) }
 									</Button>
@@ -790,6 +889,7 @@ const useDuplicatePostAction = ( postType ) => {
 										type="submit"
 										isBusy={ isCreatingPage }
 										aria-disabled={ isCreatingPage }
+										__next40pxDefaultSize
 									>
 										{ _x( 'Duplicate', 'action label' ) }
 									</Button>
@@ -810,10 +910,8 @@ export const duplicatePatternAction = {
 	modalHeader: _x( 'Duplicate pattern', 'action label' ),
 	RenderModal: ( { items, closeModal } ) => {
 		const [ item ] = items;
-		const isThemePattern = item.type === PATTERN_TYPES.theme;
 		const duplicatedProps = useDuplicatePatternProps( {
-			pattern:
-				isThemePattern || ! item.patternPost ? item : item.patternPost,
+			pattern: item,
 			onSuccess: () => closeModal(),
 		} );
 		return (
@@ -836,11 +934,16 @@ export const duplicateTemplatePartAction = {
 		const blocks = useMemo( () => {
 			return (
 				item.blocks ??
-				parse( item.content.raw, {
-					__unstableSkipMigrationLogs: true,
-				} )
+				parse(
+					typeof item.content === 'string'
+						? item.content
+						: item.content.raw,
+					{
+						__unstableSkipMigrationLogs: true,
+					}
+				)
 			);
-		}, [ item?.content?.raw, item.blocks ] );
+		}, [ item.content, item.blocks ] );
 		const { createSuccessNotice } = useDispatch( noticesStore );
 		function onTemplatePartSuccess() {
 			createSuccessNotice(
@@ -875,7 +978,6 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 		defaultActions,
 		postTypeObject,
 		userCanCreatePostType,
-		resource,
 		cachedCanUserResolvers,
 	} = useSelect(
 		( select ) => {
@@ -883,12 +985,13 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 				select( coreStore );
 			const { getEntityActions } = unlock( select( editorStore ) );
 			const _postTypeObject = getPostType( postType );
-			const _resource = _postTypeObject?.rest_base || '';
 			return {
 				postTypeObject: _postTypeObject,
 				defaultActions: getEntityActions( 'postType', postType ),
-				userCanCreatePostType: canUser( 'create', _resource ),
-				resource: _resource,
+				userCanCreatePostType: canUser( 'create', {
+					kind: 'postType',
+					name: postType,
+				} ),
 				cachedCanUserResolvers: getCachedResolvers()?.canUser,
 			};
 		},
@@ -896,11 +999,12 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 	);
 
 	const duplicatePostAction = useDuplicatePostAction( postType );
-	const trashPostActionForPostType = useTrashPostAction( resource );
+	const trashPostActionForPostType = useTrashPostAction( postType );
 	const permanentlyDeletePostActionForPostType =
-		usePermanentlyDeletePostAction( resource );
-	const renamePostActionForPostType = useRenamePostAction( resource );
-	const restorePostActionForPostType = useRestorePostAction( resource );
+		usePermanentlyDeletePostAction( postType );
+	const renamePostActionForPostType = useRenamePostAction( postType );
+	const restorePostActionForPostType = useRestorePostAction( postType );
+	const reorderPagesAction = useReorderPagesAction( postType );
 	const isTemplateOrTemplatePart = [
 		TEMPLATE_POST_TYPE,
 		TEMPLATE_PART_POST_TYPE,
@@ -927,7 +1031,7 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 				duplicateTemplatePartAction,
 			isPattern && userCanCreatePostType && duplicatePatternAction,
 			supportsTitle && renamePostActionForPostType,
-			isPattern && exportPatternAsJSONAction,
+			reorderPagesAction,
 			! isTemplateOrTemplatePart && restorePostActionForPostType,
 			! isTemplateOrTemplatePart &&
 				! isPattern &&
@@ -959,7 +1063,7 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 							existingCallback( items, {
 								...argsObject,
 								onActionPerformed: ( _items ) => {
-									if ( argsObject.onActionPerformed ) {
+									if ( argsObject?.onActionPerformed ) {
 										argsObject.onActionPerformed( _items );
 									}
 									onActionPerformed(
@@ -1007,6 +1111,7 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 		isPattern,
 		postTypeObject?.viewable,
 		duplicatePostAction,
+		reorderPagesAction,
 		trashPostActionForPostType,
 		restorePostActionForPostType,
 		renamePostActionForPostType,

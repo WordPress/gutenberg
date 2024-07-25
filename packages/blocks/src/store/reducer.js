@@ -372,18 +372,44 @@ export function collections( state = {}, action ) {
 }
 
 export function blockBindingsSources( state = {}, action ) {
-	if ( action.type === 'REGISTER_BLOCK_BINDINGS_SOURCE' ) {
-		return {
-			...state,
-			[ action.sourceName ]: {
-				label: action.sourceLabel,
-				getValue: action.getValue,
-				setValue: action.setValue,
-				setValues: action.setValues,
-				getPlaceholder: action.getPlaceholder,
-				canUserEditValue: action.canUserEditValue || ( () => false ),
-			},
-		};
+	// Merge usesContext with existing values, potentially defined in the server registration.
+	const existingUsesContext = state[ action.name ]?.usesContext || [];
+	const newUsesContext = action.usesContext || [];
+	const mergedArrays = Array.from(
+		new Set( existingUsesContext.concat( newUsesContext ) )
+	);
+	const mergedUsesContext =
+		mergedArrays.length > 0 ? mergedArrays : undefined;
+
+	switch ( action.type ) {
+		case 'ADD_BLOCK_BINDINGS_SOURCE':
+			return {
+				...state,
+				[ action.name ]: {
+					// Don't override the label if it's already set.
+					label: state[ action.name ]?.label || action.label,
+					usesContext: mergedUsesContext,
+					getValues: action.getValues,
+					setValues: action.setValues,
+					getPlaceholder: action.getPlaceholder,
+					canUserEditValue: action.canUserEditValue,
+				},
+			};
+		case 'ADD_BOOTSTRAPPED_BLOCK_BINDINGS_SOURCE':
+			return {
+				...state,
+				[ action.name ]: {
+					/*
+					 * Keep the exisitng properties in case the source has been registered
+					 * in the client before bootstrapping.
+					 */
+					...state[ action.name ],
+					label: action.label,
+					usesContext: mergedUsesContext,
+				},
+			};
+		case 'REMOVE_BLOCK_BINDINGS_SOURCE':
+			return omit( state, action.name );
 	}
 	return state;
 }

@@ -1,3 +1,18 @@
+// Allow these default styles to be overridden by global styles.
+:where(.wp-block-post-comments-form) {
+	textarea,
+	input:not([type="submit"]) {
+		border: 1px solid $gray-600;
+		font-size: 1em;
+		font-family: inherit;
+	}
+
+	textarea,
+	input:where(:not([type="submit"]):not([type="checkbox"])) {
+		padding: calc(0.667em + 2px); // The extra 2px is added to match outline buttons.
+	}
+}
+
 .wp-block-post-comments-form {
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;
@@ -23,24 +38,12 @@
 	}
 
 	// Styles copied from button block styles.
-	input[type="submit"] {
+	:where(input[type="submit"]) {
 		box-shadow: none;
 		cursor: pointer;
 		display: inline-block;
 		text-align: center;
 		overflow-wrap: break-word;
-	}
-
-	textarea,
-	input:not([type="submit"]) {
-		border: 1px solid $gray-600;
-		font-size: 1em;
-		font-family: inherit;
-	}
-
-	textarea,
-	input:not([type="submit"]):not([type="checkbox"]) {
-		padding: calc(0.667em + 2px); // The extra 2px is added to match outline buttons.
 	}
 
 	.comment-form {
