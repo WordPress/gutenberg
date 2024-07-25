@@ -32,7 +32,7 @@ import BlockContext from '../components/block-context';
 const {
 	DropdownMenuV2: DropdownMenu,
 	DropdownMenuGroupV2: DropdownMenuGroup,
-	DropdownMenuCheckboxItemV2: DropdownMenuCheckboxItem,
+	DropdownMenuRadioItemV2: DropdownMenuRadioItem,
 	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
 	DropdownMenuItemHelpTextV2: DropdownMenuItemHelpText,
 	DropdownMenuSeparatorV2: DropdownMenuSeparator,
@@ -74,7 +74,7 @@ function BlockBindingsPanelDropdown( {
 							</Text>
 						) }
 						{ Object.entries( fields ).map( ( [ key, value ] ) => (
-							<DropdownMenuCheckboxItem
+							<DropdownMenuRadioItem
 								key={ key }
 								onClick={ () =>
 									addConnection( key, attribute )
@@ -89,7 +89,7 @@ function BlockBindingsPanelDropdown( {
 								<DropdownMenuItemHelpText numberOfLines={ 1 }>
 									{ value }
 								</DropdownMenuItemHelpText>
-							</DropdownMenuCheckboxItem>
+							</DropdownMenuRadioItem>
 						) ) }
 					</DropdownMenuGroup>
 					<DropdownMenuSeparator />
