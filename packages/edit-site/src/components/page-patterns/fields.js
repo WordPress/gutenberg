@@ -54,7 +54,7 @@ function PreviewWrapper( { item, onClick, ariaDescribedBy, children } ) {
 	);
 }
 
-function Preview( { item } ) {
+function PreviewField( { item } ) {
 	const descriptionId = useId();
 	const description = item.description || item?.excerpt?.raw;
 	const isUserPattern = item.type === PATTERN_TYPES.user;
@@ -108,11 +108,11 @@ function Preview( { item } ) {
 export const previewField = {
 	label: __( 'Preview' ),
 	id: 'preview',
-	render: ( { item } ) => <Preview item={ item } />,
+	render: PreviewField,
 	enableSorting: false,
 };
 
-function Title( { item } ) {
+function TitleField( { item } ) {
 	const isUserPattern = item.type === PATTERN_TYPES.user;
 	const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
 	const { onClick } = useLink( {
@@ -163,7 +163,7 @@ export const titleField = {
 	label: __( 'Title' ),
 	id: 'title',
 	getValue: ( { item } ) => item.title?.raw || item.title,
-	render: ( { item } ) => <Title item={ item } />,
+	render: TitleField,
 	enableHiding: false,
 };
 
@@ -211,7 +211,7 @@ export const patternStatusField = {
 	enableSorting: false,
 };
 
-function Author( { item } ) {
+function AuthorField( { item } ) {
 	const [ isImageLoaded, setIsImageLoaded ] = useState( false );
 	const { text, icon, imageUrl } = useAddedBy( item.type, item.id );
 
@@ -244,9 +244,7 @@ export const templatePartAuthorField = {
 	label: __( 'Author' ),
 	id: 'author',
 	getValue: ( { item } ) => item.author_text,
-	render: ( { item } ) => {
-		return <Author item={ item } />;
-	},
+	render: AuthorField,
 	filterBy: {
 		isPrimary: true,
 	},
