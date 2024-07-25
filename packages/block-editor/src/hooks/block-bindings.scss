@@ -1,4 +1,8 @@
 .block-editor-bindings__panel {
+	// Use all columns in list items.
+	[role="listitem"] {
+		grid-column: 1/-1;
+	}
 	.block-editor-bindings__helper {
 		margin: 0;
 		font-size: $helptext-font-size;

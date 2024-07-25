@@ -110,45 +110,87 @@ function BlockBindingsPanelDropdown( {
 	);
 }
 
-function BlockBindingsAttribute( {
-	fieldsList,
-	addConnection,
-	removeConnection,
-	attribute,
-	binding,
-} ) {
+function BlockBindingsAttribute( { attribute, binding } ) {
 	const { source: sourceName, args } = binding || {};
 	const sourceProps =
 		unlock( blocksPrivateApis ).getBlockBindingsSource( sourceName );
 	return (
-		<DropdownMenu
-			placement="left-start"
-			gutter={ 36 }
-			className="block-editor-bindings__popover"
-			trigger={
-				<Item>
-					<DropdownMenuItemLabel numberOfLines={ 1 }>
-						{ attribute }
-					</DropdownMenuItemLabel>
-					{ !! binding && (
-						<DropdownMenuItemHelpText
-							numberOfLines={ 1 }
-							className="block-editor-bindings__item-explanation"
-						>
-							{ args?.key || sourceProps?.label || sourceName }
-						</DropdownMenuItemHelpText>
-					) }
+		<>
+			<DropdownMenuItemLabel numberOfLines={ 1 }>
+				{ attribute }
+			</DropdownMenuItemLabel>
+			{ !! binding && (
+				<DropdownMenuItemHelpText
+					numberOfLines={ 1 }
+					className="block-editor-bindings__item-explanation"
+				>
+					{ args?.key || sourceProps?.label || sourceName }
+				</DropdownMenuItemHelpText>
+			) }
+		</>
+	);
+}
+
+function ReadOnlyBlockBindingsPanelItems( { bindings } ) {
+	return (
+		<>
+			{ Object.entries( bindings ).map( ( [ attribute, binding ] ) => (
+				<Item key={ attribute }>
+					<BlockBindingsAttribute
+						attribute={ attribute }
+						binding={ binding }
+					/>
 				</Item>
-			}
-		>
-			<BlockBindingsPanelDropdown
-				fieldsList={ fieldsList }
-				addConnection={ addConnection }
-				removeConnection={ removeConnection }
-				attribute={ attribute }
-				binding={ binding }
-			/>
-		</DropdownMenu>
+			) ) }
+		</>
+	);
+}
+
+function EditableBlockBindingsPanelItems( {
+	attributes,
+	bindings,
+	fieldsList,
+	addConnection,
+	removeConnection,
+} ) {
+	return (
+		<>
+			{ attributes.map( ( attribute ) => {
+				const binding = bindings[ attribute ];
+				return (
+					<ToolsPanelItem
+						key={ attribute }
+						hasValue={ () => !! binding }
+						label={ attribute }
+						onDeselect={ () => {
+							removeConnection( attribute );
+						} }
+					>
+						<DropdownMenu
+							placement="left-start"
+							gutter={ 36 }
+							className="block-editor-bindings__popover"
+							trigger={
+								<Item>
+									<BlockBindingsAttribute
+										attribute={ attribute }
+										binding={ binding }
+									/>
+								</Item>
+							}
+						>
+							<BlockBindingsPanelDropdown
+								fieldsList={ fieldsList }
+								addConnection={ addConnection }
+								removeConnection={ removeConnection }
+								attribute={ attribute }
+								binding={ binding }
+							/>
+						</DropdownMenu>
+					</ToolsPanelItem>
+				);
+			} ) }
+		</>
 	);
 }
 
@@ -251,7 +293,10 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 		}
 	);
 
-	if ( Object.keys( fieldsList ).length === 0 ) {
+	// At this moment, the UI can be locked when there are no fields to connect to.
+	const readOnly = ! Object.keys( fieldsList ).length;
+
+	if ( readOnly && Object.keys( filteredBindings ).length === 0 ) {
 		return null;
 	}
 
@@ -267,24 +312,19 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 				hasInnerWrapper
 			>
 				<ItemGroup isBordered isSeparated style={ { rowGap: 0 } }>
-					{ bindableAttributes.map( ( attribute ) => (
-						<ToolsPanelItem
-							key={ attribute }
-							hasValue={ () => !! filteredBindings[ attribute ] }
-							label={ attribute }
-							onDeselect={ () => {
-								removeConnection( attribute );
-							} }
-						>
-							<BlockBindingsAttribute
-								fieldsList={ fieldsList }
-								addConnection={ addConnection }
-								removeConnection={ removeConnection }
-								attribute={ attribute }
-								binding={ filteredBindings[ attribute ] }
-							/>
-						</ToolsPanelItem>
-					) ) }
+					{ readOnly ? (
+						<ReadOnlyBlockBindingsPanelItems
+							bindings={ filteredBindings }
+						/>
+					) : (
+						<EditableBlockBindingsPanelItems
+							attributes={ bindableAttributes }
+							bindings={ filteredBindings }
+							fieldsList={ fieldsList }
+							addConnection={ addConnection }
+							removeConnection={ removeConnection }
+						/>
+					) }
 				</ItemGroup>
 				{ /* TODO: Add a helper to ToolPanel item */ }
 				<Text variant="muted" className="block-editor-bindings__helper">
