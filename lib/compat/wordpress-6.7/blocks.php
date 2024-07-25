@@ -83,4 +83,4 @@ function gutenberg_stabilize_experimental_block_supports( $args ) {
 	return $args;
 }
 
-add_filter( 'register_block_type_args', 'gutenberg_stabilize_experimental_block_supports', 10, 1 );
+add_filter( 'register_block_type_args', 'gutenberg_stabilize_experimental_block_supports', PHP_INT_MAX, 1 );
