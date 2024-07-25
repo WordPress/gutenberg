@@ -273,10 +273,7 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 						</ToolsPanelItem>
 					) ) }
 					{ /* TODO: Add a helper to ToolPanel item */ }
-					<p
-						as="p"
-						className="block-editor-block-bindings-styled-help"
-					>
+					<p className="block-editor-block-bindings-styled-help">
 						{ __( 'Attributes connected to various sources.' ) }
 					</p>
 				</div>
