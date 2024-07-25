@@ -49,7 +49,24 @@ export function activeModal( state = null, action ) {
 	return state;
 }
 
+/**
+ * Reducer for storing the state of the sidebar.
+ *
+ * @param {Object} state  Previous state.
+ * @param {Object} action Action object containing the `isWide` state of the sidebar.
+ * @return {boolean} Updated state.
+ */
+export function wideSidebar( state = false, action ) {
+	switch ( action.type ) {
+		case 'SET_WIDE_SIDEBAR':
+			return action.isWide;
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	complementaryAreas,
 	activeModal,
+	wideSidebar,
 } );

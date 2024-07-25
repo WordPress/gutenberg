@@ -2183,16 +2183,3 @@ export function unsetBlockEditingMode( clientId = '' ) {
 		clientId,
 	};
 }
-
-/**
- * Sets the open state of the pattern explorer.
- *
- * @param {string} category The selected pattern category.
- * @return {Object} Action object.
- */
-export function setSelectedPatternCategory( category ) {
-	return {
-		type: 'SELECTED_PATTERN_CATEGORY',
-		category,
-	};
-}

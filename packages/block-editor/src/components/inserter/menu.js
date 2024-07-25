@@ -17,7 +17,7 @@ import {
 import { VisuallyHidden, SearchControl, Popover } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useDebouncedInput } from '@wordpress/compose';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -62,17 +62,9 @@ function InserterMenu(
 		useDebouncedInput( __experimentalFilterValue );
 	const [ hoveredItem, setHoveredItem ] = useState( null );
 
-	const selectedPatternCategory = useSelect(
-		( select ) => {
-			const _selectedPatternCategory =
-				select( blockEditorStore ).selectedPatternCategory();
-			return _selectedPatternCategory
-				? _selectedPatternCategory
-				: __experimentalInitialCategory;
-		},
-		[ __experimentalInitialCategory ]
+	const [ selectedPatternCategory, setSelectedPatternCategory ] = useState(
+		__experimentalInitialCategory
 	);
-	const { setSelectedPatternCategory } = useDispatch( blockEditorStore );
 
 	const [ patternFilter, setPatternFilter ] = useState( 'all' );
 	const [ selectedMediaCategory, setSelectedMediaCategory ] =

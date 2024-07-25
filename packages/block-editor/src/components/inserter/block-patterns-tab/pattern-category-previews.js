@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { useDispatch } from '@wordpress/data';
 import {
 	useMemo,
 	useState,
@@ -17,6 +18,7 @@ import {
 	__experimentalText as Text,
 	FlexBlock,
 } from '@wordpress/components';
+import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -54,6 +56,10 @@ export function PatternCategoryPreviews( {
 		rootClientId,
 		patternSourceFilter
 	);
+
+	const { setWideSidebar } = useDispatch( interfaceStore );
+	setWideSidebar( true );
+
 	const scrollContainerRef = useRef();
 	const currentCategoryPatterns = useMemo(
 		() =>

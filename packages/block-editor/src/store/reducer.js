@@ -2085,22 +2085,6 @@ export function hoveredBlockClientId( state = false, action ) {
 	return state;
 }
 
-/**
- * Reducer setting the state of the pattern explorer.
- *
- * @param {string} state  Current state.
- * @param {Object} action Dispacted action.
- * @return {string} Updated state.
- */
-export function selectedPatternCategory( state = null, action ) {
-	switch ( action.type ) {
-		case 'SELECTED_PATTERN_CATEGORY':
-			return action.category;
-	}
-
-	return state;
-}
-
 const combinedReducers = combineReducers( {
 	blocks,
 	isDragging,
@@ -2134,7 +2118,6 @@ const combinedReducers = combineReducers( {
 	openedBlockSettingsMenu,
 	registeredInserterMediaCategories,
 	hoveredBlockClientId,
-	selectedPatternCategory,
 } );
 
 function withAutomaticChangeReset( reducer ) {

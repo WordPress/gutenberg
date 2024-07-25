@@ -20,7 +20,7 @@ import {
 	useResizeObserver,
 } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -94,12 +94,14 @@ function InterfaceSkeleton(
 	},
 	ref
 ) {
-	const selectedPatternCategory = useSelect(
-		( select ) => select( blockEditorStore ).selectedPatternCategory(),
+	const isWideSidebar = useSelect(
+		( select ) => select( interfaceStore ).isWideSidebar(),
 		[]
 	);
+
 	const [ secondarySidebarResizeListener, secondarySidebarSize ] =
 		useResizeObserver();
+
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const disableMotion = useReducedMotion();
 	const defaultTransition = {
@@ -130,8 +132,8 @@ function InterfaceSkeleton(
 	let animation;
 	if ( isMobileViewport ) {
 		animation = 'mobileOpen';
-	} else if ( selectedPatternCategory ) {
-		animation = 'patternsOpen';
+	} else if ( isWideSidebar ) {
+		animation = 'wide';
 	} else {
 		animation = 'open';
 	}
@@ -203,7 +205,7 @@ function InterfaceSkeleton(
 									open: { width: secondarySidebarSize.width },
 									closed: { width: 0 },
 									mobileOpen: { width: '100vw' },
-									patternsOpen: {
+									wide: {
 										width: '650px',
 									},
 								} }
