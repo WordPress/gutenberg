@@ -10,13 +10,13 @@ import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
 	Modal,
-	FormTokenField,
 	MenuGroup,
 	MenuItem,
 	MenuItemsChoice,
+	Icon,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { plus } from '@wordpress/icons';
+import { plus, reset } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
 
 /**
@@ -109,6 +109,14 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 		} );
 	};
 
+	const removeConnection = ( key ) => {
+		const newMetadata = { ...metadata };
+		delete newMetadata.bindings[ key ];
+		updateBlockAttributes( _id, {
+			...newMetadata,
+		} );
+	};
+
 	return (
 		<InspectorControls>
 			<PanelBody
@@ -118,7 +126,7 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 				<BaseControl
 					help={ __( 'Attributes connected to various sources.' ) }
 				>
-					<ItemGroup isBordered isSeparated size="large">
+					<MenuGroup isBordered isSeparated size="large">
 						<MenuItem
 							iconPosition="right"
 							icon={ plus }
@@ -169,27 +177,28 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 								</MenuGroup>
 							</Modal>
 						) }
-						{ Object.keys( filteredBindings ).map( ( key ) => {
-							return (
-								<Item key={ key }>
-									<HStack>
-										<span>{ key }</span>
-										<span className="components-item__block-bindings-source">
-											{ sources[
-												filteredBindings[ key ].source
-											]
-												? sources[
-														filteredBindings[ key ]
-															.source
-												  ].label
-												: filteredBindings[ key ]
-														.source }
-										</span>
-									</HStack>
-								</Item>
-							);
-						} ) }
-					</ItemGroup>
+						<MenuGroup>
+							{ Object.keys( filteredBindings ).map( ( key ) => {
+								const source = sources[
+									filteredBindings[ key ].source
+								]
+									? sources[ filteredBindings[ key ].source ]
+											.label
+									: filteredBindings[ key ].source;
+								return (
+									<MenuItem
+										key={ key }
+										onClick={ () =>
+											removeConnection( key )
+										}
+										icon={ reset }
+									>
+										{ key } - { source }
+									</MenuItem>
+								);
+							} ) }
+						</MenuGroup>
+					</MenuGroup>
 				</BaseControl>
 			</PanelBody>
 		</InspectorControls>
