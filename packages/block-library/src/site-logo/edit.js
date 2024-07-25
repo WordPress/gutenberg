@@ -348,14 +348,29 @@ const SiteLogo = ( {
 
 // This is a light wrapper around MediaReplaceFlow because the block has two
 // different MediaReplaceFlows, one for the inspector and one for the toolbar.
-function SiteLogoReplaceFlow( { onRemoveLogo, ...mediaReplaceProps } ) {
+function SiteLogoReplaceFlow( {
+	mediaURL,
+	onRemoveLogo,
+	...mediaReplaceProps
+} ) {
 	return (
 		<MediaReplaceFlow
 			{ ...mediaReplaceProps }
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
 			accept={ ACCEPT_MEDIA_STRING }
 		>
-			<MenuItem onClick={ onRemoveLogo }>{ __( 'Reset' ) }</MenuItem>
+			{ ( { onClose } ) =>
+				mediaURL && (
+					<MenuItem
+						onClick={ () => {
+							onRemoveLogo();
+							onClose();
+						} }
+					>
+						{ __( 'Reset' ) }
+					</MenuItem>
+				)
+			}
 		</MediaReplaceFlow>
 	);
 }
@@ -392,7 +407,6 @@ export default function LogoEdit( {
 	isSelected,
 } ) {
 	const { width, shouldSyncIcon } = attributes;
-
 	const {
 		siteLogoId,
 		canUserEdit,
@@ -515,16 +529,18 @@ export default function LogoEdit( {
 				onInitialSelectLogo( image );
 			},
 			onError: onUploadError,
+			onRemoveLogo,
 		} );
 	};
 
 	const mediaReplaceFlowProps = {
 		mediaURL: logoUrl,
+		name: ! logoUrl ? __( 'Choose logo' ) : __( 'Replace' ),
 		onSelect: onSelectLogo,
 		onError: onUploadError,
 		onRemoveLogo,
 	};
-	const controls = canUserEdit && logoUrl && ! temporaryURL && (
+	const controls = canUserEdit && (
 		<BlockControls group="other">
 			<SiteLogoReplaceFlow { ...mediaReplaceFlowProps } />
 		</BlockControls>
