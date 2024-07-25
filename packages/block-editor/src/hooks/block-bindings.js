@@ -13,17 +13,14 @@ import {
 	MenuItem,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
-	__experimentalHStack as Hstack,
 	__experimentalTruncate as Truncate,
-	__experimentalItemGroup as ItemGroup,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	Dropdown,
-	Button,
 	Icon,
 } from '@wordpress/components';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { useContext } from '@wordpress/element';
-import { chevronRightSmall, customPostType } from '@wordpress/icons';
+import { customPostType, edit } from '@wordpress/icons';
 import { useViewportMatch } from '@wordpress/compose';
 
 /**
@@ -77,18 +74,12 @@ function BlockBindingsPanelDropdown( {
 							icon={ <Icon icon={ customPostType } /> }
 							iconPosition="left"
 							suffix={
-								<Truncate
-									numberOfLines={ 1 }
-									ellipsis="…"
-									className="block-editor-block-bindings-panel-item-source"
-								>
+								<Truncate className="block-editor-block-bindings-panel-item-source">
 									{ value }
 								</Truncate>
 							}
 						>
-							<Truncate numberOfLines={ 1 } ellipsis="…">
-								{ key }
-							</Truncate>
+							<Truncate>{ key }</Truncate>
 						</MenuItem>
 					) ) }
 				</MenuGroup>
@@ -103,28 +94,16 @@ function BlockBindingsAttribute( {
 	filteredBindings,
 } ) {
 	return (
-		<ItemGroup>
-			<Button { ...toggleProps }>
-				<Hstack align="center" justify="flex-start" expanded={ false }>
-					<Icon icon={ customPostType } />
-					<Truncate numberOfLines={ 1 } ellipsis="…">
-						{ attribute }
-					</Truncate>
-					{ !! filteredBindings[ attribute ] && (
-						<>
-							<Icon icon={ chevronRightSmall } />
-							<Truncate
-								numberOfLines={ 1 }
-								ellipsis="…"
-								className="block-editor-block-bindings-panel-item-source"
-							>
-								{ filteredBindings[ attribute ]?.args?.key }
-							</Truncate>
-						</>
-					) }
-				</Hstack>
-			</Button>
-		</ItemGroup>
+		<MenuItem { ...toggleProps }>
+			<Truncate className="block-editor-block-bindings-panel-item__attribute">
+				{ attribute }
+			</Truncate>
+			{ !! filteredBindings[ attribute ] && (
+				<Truncate className="block-editor-block-bindings-panel-item__source">
+					{ filteredBindings[ attribute ].args.key }
+				</Truncate>
+			) }
+		</MenuItem>
 	);
 }
 
@@ -263,10 +242,15 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 								renderToggle={ ( { onToggle, isOpen } ) => {
 									const toggleProps = {
 										onClick: onToggle,
-										className: clsx( {
-											'is-open': isOpen,
-										} ),
+										className: clsx(
+											'block-editor-block-bindings-attributes',
+											{
+												'is-open': isOpen,
+											}
+										),
 										'aria-expanded': isOpen,
+										icon: edit,
+										iconPosition: 'right',
 									};
 									return (
 										<BlockBindingsAttribute

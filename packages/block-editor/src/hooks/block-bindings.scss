@@ -1,4 +1,4 @@
-$popover-width: 320px;
+$popover-width: 360px;
 .block-editor-block-bindings-support-panel {
 	/* Increased specificity required to remove the slot wrapper's row gap */
 	&#{&} {
@@ -60,6 +60,28 @@ $popover-width: 320px;
 			&.is-open {
 				background-color: $gray-100;
 			}
+		}
+	}
+	.block-editor-block-bindings-attributes {
+		height: 100%;
+		min-height: $grid-unit-50;
+		text-transform: capitalize;
+		> span {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			justify-content: center;
+		}
+		&[aria-expanded="true"],
+		&:hover {
+			.block-editor-block-bindings-panel-item__source {
+				color: inherit;
+			}
+		}
+		.block-editor-block-bindings-panel-item__source {
+			color: $gray-700;
+			width: 100%;
+			text-align: left;
 		}
 	}
 }
