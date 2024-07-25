@@ -113,6 +113,7 @@ test.describe( 'Content-only lock', () => {
 			.locator( 'role=document[name="Block: Paragraph"i]' )
 			.first()
 			.click();
+		await page.getByRole( 'tab', { name: 'Styles' } ).click();
 		await expect(
 			page.locator( '.color-block-support-panel' )
 		).toBeAttached();

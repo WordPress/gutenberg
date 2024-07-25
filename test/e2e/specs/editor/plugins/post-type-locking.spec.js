@@ -367,6 +367,7 @@ test.describe( 'Post-type locking', () => {
 				'Preformatted',
 				'Pullquote',
 				'Verse',
+				'Connect Block',
 			] );
 		} );
 	} );

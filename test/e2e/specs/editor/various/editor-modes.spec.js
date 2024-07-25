@@ -39,6 +39,7 @@ test.describe( 'Editing modes (visual/HTML)', () => {
 		await editor.clickBlockOptionsMenuItem( 'Edit as HTML' );
 		await editor.openDocumentSettingsSidebar();
 
+		await page.getByRole( 'tab', { name: 'Styles' } ).click();
 		// The `drop cap` toggle for the paragraph block should appear, even in
 		// HTML editing mode.
 		await page
@@ -69,6 +70,7 @@ test.describe( 'Editing modes (visual/HTML)', () => {
 		// Make sure the paragraph content is rendered as expected.
 		await expect( paragraphHTML ).toHaveValue( '<p>Hello world!</p>' );
 
+		await page.getByRole( 'tab', { name: 'Styles' } ).click();
 		// Change the `drop cap` using the sidebar.
 		await page
 			.getByRole( 'button', { name: 'Typography options' } )
@@ -93,10 +95,11 @@ test.describe( 'Editing modes (visual/HTML)', () => {
 		const editorSettings = page.getByRole( 'region', {
 			name: 'Editor settings',
 		} );
-		const activeTab = editorSettings.getByRole( 'tab', { selected: true } );
+
+		const blockTab = editorSettings.getByRole( 'tab', { name: 'Block' } );
 
 		// The Block inspector should be active.
-		await expect( activeTab ).toHaveText( 'Block' );
+		await expect( blockTab ).toHaveAttribute( 'data-active-item' );
 		await expect(
 			editorSettings.locator( '.block-editor-block-card__title' )
 		).toHaveText( 'Paragraph' );
@@ -105,9 +108,9 @@ test.describe( 'Editing modes (visual/HTML)', () => {
 		await pageUtils.pressKeys( 'secondary+M' );
 
 		// The Block inspector should not be active anymore.
-		await expect( activeTab ).not.toHaveText( 'Block' );
+		await expect( blockTab ).not.toHaveAttribute( 'data-active-item' );
 
-		await editorSettings.getByRole( 'tab', { name: 'Block' } ).click();
+		await blockTab.click();
 		await expect(
 			editorSettings.locator( '.block-editor-block-inspector__no-blocks' )
 		).toHaveText( 'No block selected.' );
