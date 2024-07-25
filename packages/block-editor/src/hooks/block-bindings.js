@@ -9,8 +9,9 @@ import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
 import { store as blocksStore } from '@wordpress/blocks';
 import {
-	MenuGroup,
-	MenuItem,
+	__experimentalItemGroup as ItemGroup,
+	__experimentalItem as Item,
+	__experimentalVStack as VStack,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalTruncate as Truncate,
@@ -63,27 +64,26 @@ function BlockBindingsPanelDropdown( {
 			className="block-editor-bindings__popover"
 		>
 			{ Object.entries( fieldsList ).map( ( [ label, fields ] ) => (
-				<MenuGroup
+				<ItemGroup
 					key={ label }
 					label={
 						Object.keys( fieldsList ).length > 1 ? label : null
 					}
 				>
 					{ Object.entries( fields ).map( ( [ key, value ] ) => (
-						<MenuItem
+						<Item
 							key={ key }
 							onClick={ () => addConnection( key, attribute ) }
-							className="block-editor-bindings__attributes"
 						>
-							<Truncate className="block-editor-bindings__item-key">
-								{ key }
-							</Truncate>
-							<Truncate className="block-editor-bindings__item-source">
-								{ value }
-							</Truncate>
-						</MenuItem>
+							<VStack spacing={ 0 }>
+								<Truncate>{ key }</Truncate>
+								<Truncate className="block-editor-bindings__item-explanation">
+									{ value }
+								</Truncate>
+							</VStack>
+						</Item>
 					) ) }
-				</MenuGroup>
+				</ItemGroup>
 			) ) }
 		</DropdownContentWrapper>
 	);
@@ -95,14 +95,16 @@ function BlockBindingsAttribute( {
 	filteredBindings,
 } ) {
 	return (
-		<MenuItem { ...toggleProps }>
-			<Truncate>{ attribute }</Truncate>
-			{ !! filteredBindings[ attribute ] && (
-				<Truncate className="block-editor-bindings__item-source">
-					{ filteredBindings[ attribute ].args.key }
-				</Truncate>
-			) }
-		</MenuItem>
+		<Item { ...toggleProps }>
+			<VStack spacing={ 0 }>
+				<Truncate>{ attribute }</Truncate>
+				{ !! filteredBindings[ attribute ] && (
+					<Truncate className="block-editor-bindings__item-explanation">
+						{ filteredBindings[ attribute ].args.key }
+					</Truncate>
+				) }
+			</VStack>
+		</Item>
 	);
 }
 
@@ -224,7 +226,7 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 				__experimentalFirstVisibleItemClass="first"
 				__experimentalLastVisibleItemClass="last"
 			>
-				<div className="block-editor-bindings__panel__inner-wrapper">
+				<ItemGroup isBordered isSeparated style={ { rowGap: 0 } }>
 					{ bindableAttributes.map( ( attribute ) => (
 						<ToolsPanelItem
 							key={ attribute }
@@ -269,11 +271,11 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 							/>
 						</ToolsPanelItem>
 					) ) }
-					{ /* TODO: Add a helper to ToolPanel item */ }
-					<p className="block-editor-bindings__helper">
-						{ __( 'Attributes connected to various sources.' ) }
-					</p>
-				</div>
+				</ItemGroup>
+				{ /* TODO: Add a helper to ToolPanel item */ }
+				<p className="block-editor-bindings__helper">
+					{ __( 'Attributes connected to various sources.' ) }
+				</p>
 			</ToolsPanel>
 		</InspectorControls>
 	);
