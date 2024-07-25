@@ -73,13 +73,14 @@ function BlockBindingsPanelDropdown( {
 						<MenuItem
 							key={ key }
 							onClick={ () => addConnection( key, attribute ) }
-							suffix={
-								<Truncate className="block-editor-bindings__item-source">
-									{ value }
-								</Truncate>
-							}
+							className="block-editor-bindings__attributes"
 						>
-							<Truncate>{ key }</Truncate>
+							<Truncate className="block-editor-bindings__item-key">
+								{ key }
+							</Truncate>
+							<Truncate className="block-editor-bindings__item-source">
+								{ value }
+							</Truncate>
 						</MenuItem>
 					) ) }
 				</MenuGroup>
