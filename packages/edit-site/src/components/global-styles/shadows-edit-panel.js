@@ -422,22 +422,19 @@ function ShadowPopover( { shadowObj, onChange } ) {
 
 	return (
 		<div className="edit-site-global-styles__shadow-editor-panel">
-			<VStack spacing={ 2 }>
+			<VStack spacing={ 4 }>
 				<Heading level={ 5 }>{ __( 'Shadow' ) }</Heading>
-				<div className="edit-site-global-styles__shadow-editor-color-palette">
-					<ColorPalette
-						clearable={ false }
-						enableAlpha={ enableAlpha }
-						__experimentalIsRenderedInSidebar={
-							__experimentalIsRenderedInSidebar
-						}
-						value={ shadowObj.color }
-						onChange={ ( value ) =>
-							onShadowChange( 'color', value )
-						}
-					/>
-				</div>
+				<ColorPalette
+					clearable={ false }
+					enableAlpha={ enableAlpha }
+					__experimentalIsRenderedInSidebar={
+						__experimentalIsRenderedInSidebar
+					}
+					value={ shadowObj.color }
+					onChange={ ( value ) => onShadowChange( 'color', value ) }
+				/>
 				<ToggleGroupControl
+					__nextHasNoMarginBottom
 					value={ shadowObj.inset ? 'inset' : 'outset' }
 					isBlock
 					onChange={ ( value ) =>
