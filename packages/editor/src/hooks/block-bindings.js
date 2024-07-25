@@ -1,11 +1,15 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * Internal dependencies
  */
 import {
 	canBindAttribute,
 	getBindableAttributes,
 } from './use-bindings-attributes';
-import { unlock } from '../lock-unlock';
 import { store as editorStore } from '../store';
 import {
 	useBindingsUtils,
@@ -19,21 +23,18 @@ import { __ } from '@wordpress/i18n';
 import {
 	MenuGroup,
 	MenuItem,
-	privateApis as componentsPrivateApis,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalHStack as Hstack,
 	__experimentalTruncate as Truncate,
-	__experimentalText as Text,
+	__experimentalItemGroup as ItemGroup,
+	__experimentalDropdownContentWrapper as DropdownContentWrapper,
+	Dropdown,
+	Button,
 	Icon,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	chevronRightSmall,
-	customPostType,
-	plus,
-	reset,
-} from '@wordpress/icons';
+import { chevronRightSmall, customPostType } from '@wordpress/icons';
 import {
 	InspectorControls,
 	store as blockEditorStore,
@@ -41,7 +42,13 @@ import {
 import { addFilter } from '@wordpress/hooks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 
-const { DropdownMenuV2: DropdownMenu } = unlock( componentsPrivateApis );
+const popoverProps = {
+	placement: 'left-start',
+	offset: 36,
+	shift: true,
+	className: 'block-editor-block-bindings__popover',
+	headerTitle: __( 'Custom Fields' ),
+};
 
 const BlockBindingsPanel = ( { name, attributes: { metadata } } ) => {
 	const { bindings } = metadata || {};
@@ -82,7 +89,7 @@ const BlockBindingsPanel = ( { name, attributes: { metadata } } ) => {
 	return (
 		<InspectorControls>
 			<ToolsPanel
-				label={ __( 'Connections' ) }
+				label={ __( 'Attributes' ) }
 				resetAll={ () => {
 					removeAllConnections(
 						metadata,
@@ -111,93 +118,123 @@ const BlockBindingsPanel = ( { name, attributes: { metadata } } ) => {
 									);
 								} }
 							>
-								{ !! filteredBindings[ attribute ] ? (
-									<MenuItem
-										onClick={ () =>
-											removeConnection(
-												attribute,
-												metadata,
-												_id,
-												updateBlockAttributes
-											)
-										}
-										suffix={ <Icon icon={ reset } /> }
-										className="components-panel__block-bindings-panel-item"
-									>
-										<Hstack
-											align="center"
-											expanded={ false }
-										>
-											<Text as="span">{ attribute }</Text>
-											<Icon icon={ chevronRightSmall } />
-											<Text
-												as="span"
-												className="components-panel__block-bindings-panel-item-source"
-											>
-												{
-													filteredBindings[
-														attribute
-													].source
-												}
-											</Text>
-										</Hstack>
-									</MenuItem>
-								) : (
-									<DropdownMenu
-										trigger={
-											<Hstack align="center">
-												<Text as="span">
-													{ attribute }
-												</Text>
-												<Icon icon={ plus } />
-											</Hstack>
-										}
-										placement="left"
-										gutter={ 20 }
-									>
-										<MenuGroup
-											label={ __( 'Custom Fields' ) }
-										>
-											{ Object.keys( postMeta ).map(
-												( key ) => (
-													<MenuItem
-														className="components-panel__block-bindings-panel-item"
-														key={ key }
-														onClick={ () => {
-															addConnection(
-																key,
-																attribute,
-																metadata,
-																_id,
-																updateBlockAttributes
-															);
-														} }
-														icon={
-															<Icon
-																icon={
-																	customPostType
-																}
-																size={ 24 }
-															/>
-														}
-														iconPosition="left"
-														suffix={
-															<Truncate>
-																{
-																	postMeta[
-																		key
-																	]
-																}
-															</Truncate>
-														}
+								<Dropdown
+									popoverProps={ popoverProps }
+									className="block-editor-block-bindings-filters-panel__dropdown"
+									renderToggle={ ( { onToggle, isOpen } ) => {
+										const toggleProps = {
+											onClick: onToggle,
+											className: clsx( {
+												'is-open': isOpen,
+											} ),
+											'aria-expanded': isOpen,
+										};
+
+										return (
+											<ItemGroup isBordered isSeparated>
+												<Button { ...toggleProps }>
+													<Hstack
+														align="center"
+														justify="flex-start"
+														expanded={ false }
 													>
-														{ key }
-													</MenuItem>
-												)
-											) }
-										</MenuGroup>
-									</DropdownMenu>
-								) }
+														<Icon
+															icon={
+																customPostType
+															}
+														/>
+														<Truncate
+															numberOfLines={ 1 }
+															ellipsis="…"
+														>
+															{ attribute }
+														</Truncate>
+														{ !! filteredBindings[
+															attribute
+														] && (
+															<>
+																<Icon
+																	icon={
+																		chevronRightSmall
+																	}
+																/>
+																<Truncate
+																	numberOfLines={
+																		1
+																	}
+																	ellipsis="…"
+																>
+																	{
+																		filteredBindings[
+																			attribute
+																		]?.args
+																			?.key
+																	}
+																</Truncate>
+															</>
+														) }
+													</Hstack>
+												</Button>
+											</ItemGroup>
+										);
+									} }
+									renderContent={ () => (
+										<DropdownContentWrapper paddingSize="small">
+											<MenuGroup
+												label={ __( 'Custom Fields' ) }
+											>
+												{ Object.keys( postMeta ).map(
+													( key ) => (
+														<MenuItem
+															className="components-panel__block-bindings-panel-item"
+															key={ key }
+															onClick={ () => {
+																addConnection(
+																	key,
+																	attribute,
+																	metadata,
+																	_id,
+																	updateBlockAttributes
+																);
+															} }
+															icon={
+																<Icon
+																	icon={
+																		customPostType
+																	}
+																/>
+															}
+															iconPosition="left"
+															suffix={
+																<Truncate
+																	numberOfLines={
+																		1
+																	}
+																	ellipsis="…"
+																>
+																	{
+																		postMeta[
+																			key
+																		]
+																	}
+																</Truncate>
+															}
+														>
+															<Truncate
+																numberOfLines={
+																	1
+																}
+																ellipsis="…"
+															>
+																{ key }
+															</Truncate>
+														</MenuItem>
+													)
+												) }
+											</MenuGroup>
+										</DropdownContentWrapper>
+									) }
+								/>
 							</ToolsPanelItem>
 						) ) }
 					</>

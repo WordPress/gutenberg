@@ -1,6 +1,42 @@
+$swatch-size: 28px;
+$swatch-gap: 12px;
+$popover-width: 460px;
+$popover-padding: $grid-unit-20;
+
+$swatch-columns: math.floor(math.div($popover-width + $swatch-gap - 2 * $popover-padding, $swatch-size + $swatch-gap));
+
 .components-panel__block-bindings-panel .components-panel__block-bindings-panel-item-source {
 	color: $gray-700;
 }
-.components-panel__block-bindings-panel .components-panel__block-bindings-panel-item {
+
+
+.block-editor-block-bindings__popover {
+	> .components-popover__content {
+		padding: $popover-padding;
+		width: $popover-width;
+	}
+
+	.components-menu-group__label {
+		padding: 0;
+	}
+
+	.components-circular-option-picker__swatches {
+		display: grid;
+		grid-template-columns: repeat($swatch-columns, $swatch-size);
+		gap: $swatch-gap;
+		justify-content: space-between;
+	}
+}
+.block-editor-block-bindings-filters-panel__dropdown {
+	display: block;
 	padding: 0;
+
+	button {
+		width: 100%;
+		padding: $grid-unit-10;
+
+		&.is-open {
+			background-color: $gray-100;
+		}
+	}
 }
