@@ -1,4 +1,14 @@
 /**
+ * Internal dependencies
+ */
+import {
+	canBindAttribute,
+	getBindableAttributes,
+} from './use-bindings-attributes';
+import { unlock } from '../lock-unlock';
+import { store as editorStore } from '../store';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -12,17 +22,10 @@ import {
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { plus, reset } from '@wordpress/icons';
-import { InspectorControls } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import {
-	canBindAttribute,
-	getBindableAttributes,
-} from './use-bindings-attributes';
-import { unlock } from '../lock-unlock';
-import { store as blockEditorStore } from '../store';
+	InspectorControls,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { addFilter } from '@wordpress/hooks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 
@@ -60,7 +63,7 @@ const BlockBindingsPanel = ( { name, metadata } ) => {
 	} );
 	const postMeta = useSelect( ( select ) => {
 		// eslint-disable-next-line @wordpress/data-no-store-string-literals
-		return select( 'core/editor' ).getEditedPostAttribute( 'meta' );
+		return select( editorStore ).getEditedPostAttribute( 'meta' );
 	}, [] );
 
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
@@ -214,6 +217,7 @@ const BlockBindingsPanel = ( { name, metadata } ) => {
  * @return {Component} Wrapped component.
  */
 const withBlockBindings = createHigherOrderComponent(
+	// Prevent this from running on every write block.
 	( BlockEdit ) => ( props ) => {
 		const bindableAttributes = getBindableAttributes( props?.name );
 		return (
