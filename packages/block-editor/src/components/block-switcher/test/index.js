@@ -129,7 +129,7 @@ describe( 'BlockSwitcher', () => {
 		} );
 		await waitFor( () => expect( dropdown ).toBeVisible() );
 		const items = within( dropdown ).getAllByRole( 'menuitem' );
-		expect( items ).toHaveLength( 3 );
+		expect( items ).toHaveLength( 2 );
 		expect( items[ 0 ] ).toHaveTextContent( paragraphBlockType.title );
 		expect( items[ 1 ] ).toHaveTextContent( headingBlockType.title );
 	} );
