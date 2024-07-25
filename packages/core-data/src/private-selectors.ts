@@ -73,3 +73,22 @@ export const getEntityRecordsPermissions = createRegistrySelector( ( select ) =>
 		( state ) => [ state.userPermissions ]
 	)
 );
+
+/**
+ * Returns the entity record permissions for the given entity record id.
+ *
+ * @param state Data state.
+ * @param kind  Entity kind.
+ * @param name  Entity name.
+ * @param id    Entity record id.
+ *
+ * @return The entity record permissions.
+ */
+export function getEntityRecordPermissions(
+	state: State,
+	kind: string,
+	name: string,
+	id: string
+) {
+	return getEntityRecordsPermissions( state, kind, name, [ id ] )[ 0 ];
+}
