@@ -11,6 +11,14 @@ $swatch-columns: math.floor(math.div($popover-width + $swatch-gap - 2 * $popover
 		.block-bindings-block-support-panel__inner-wrapper {
 			row-gap: 0;
 		}
+		.block-bindings-styled-help {
+			margin-top: $grid-unit-10;
+			margin-bottom: 0;
+			font-size: $helptext-font-size;
+			font-style: normal;
+			color: $gray-700;
+			grid-column: 1/-1;
+		}
 	}
 
 	.components-panel__block-bindings-panel-item-source {

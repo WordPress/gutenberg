@@ -28,7 +28,6 @@ import {
 	Dropdown,
 	Button,
 	Icon,
-	BaseControl,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { chevronRightSmall, customPostType } from '@wordpress/icons';
@@ -222,54 +221,50 @@ const BlockBindingsPanel = ( { name, attributes: { metadata } } ) => {
 				__experimentalLastVisibleItemClass="last"
 			>
 				<div className="block-bindings-block-support-panel__inner-wrapper">
-					<BaseControl
-						help={ __(
-							'Attributes connected to various sources.'
-						) }
-					>
-						{ bindableAttributes.map( ( attribute ) => (
-							<ToolsPanelItem
-								key={ attribute }
-								hasValue={ () =>
-									!! filteredBindings[ attribute ]
-								}
-								label={ attribute }
-								onDeselect={ () => {
-									removeConnection( attribute );
-								} }
-							>
-								<Dropdown
-									popoverProps={ popoverProps }
-									className="block-editor-block-bindings-filters-panel__dropdown"
-									renderToggle={ ( { onToggle, isOpen } ) => {
-										const toggleProps = {
-											onClick: onToggle,
-											className: clsx( {
-												'is-open': isOpen,
-											} ),
-											'aria-expanded': isOpen,
-										};
-										return (
-											<BlockBindingsAttribute
-												toggleProps={ toggleProps }
-												attribute={ attribute }
-												filteredBindings={
-													filteredBindings
-												}
-											/>
-										);
-									} }
-									renderContent={ () => (
-										<BlockBindingsPanelDropdown
-											postMeta={ postMeta }
-											addConnection={ addConnection }
+					{ bindableAttributes.map( ( attribute ) => (
+						<ToolsPanelItem
+							key={ attribute }
+							hasValue={ () => !! filteredBindings[ attribute ] }
+							label={ attribute }
+							onDeselect={ () => {
+								removeConnection( attribute );
+							} }
+						>
+							<Dropdown
+								popoverProps={ popoverProps }
+								className="block-editor-block-bindings-filters-panel__dropdown"
+								renderToggle={ ( { onToggle, isOpen } ) => {
+									const toggleProps = {
+										onClick: onToggle,
+										className: clsx( {
+											'is-open': isOpen,
+										} ),
+										'aria-expanded': isOpen,
+									};
+									return (
+										<BlockBindingsAttribute
+											toggleProps={ toggleProps }
 											attribute={ attribute }
+											filteredBindings={
+												filteredBindings
+											}
 										/>
-									) }
-								/>
-							</ToolsPanelItem>
-						) ) }
-					</BaseControl>
+									);
+								} }
+								renderContent={ () => (
+									<BlockBindingsPanelDropdown
+										postMeta={ postMeta }
+										addConnection={ addConnection }
+										attribute={ attribute }
+									/>
+								) }
+							/>
+						</ToolsPanelItem>
+					) ) }
+					{ /* TODO: Add a helper to ToolPanel item */ }
+					<p as="p" className="block-bindings-styled-help">
+						{ __( 'Attributes connected to various sources.' ) }
+					</p>
 				</div>
 			</ToolsPanel>
 		</InspectorControls>
