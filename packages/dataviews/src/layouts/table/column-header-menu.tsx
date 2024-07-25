@@ -72,7 +72,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 	);
 	const index = view.fields?.indexOf( fieldId ) as number;
 	if ( !! combinedField ) {
-		return combinedField.header;
+		return combinedField.label;
 	}
 	const field = fields.find( ( f ) => f.id === fieldId );
 	if ( ! field ) {
@@ -92,7 +92,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 		!! operators.length &&
 		! field.filterBy?.isPrimary;
 	if ( ! isSortable && ! isHidable && ! canAddFilter ) {
-		return field.header;
+		return field.label;
 	}
 	return (
 		<DropdownMenu
@@ -104,7 +104,7 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 					ref={ ref }
 					variant="tertiary"
 				>
-					{ field.header }
+					{ field.label }
 					{ view.sort && isSorted && (
 						<span aria-hidden="true">
 							{ sortArrows[ view.sort.direction ] }

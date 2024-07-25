@@ -23,7 +23,6 @@ import { decodeEntities } from '@wordpress/html-entities';
 /**
  * Internal dependencies
  */
-import { useIsBlockBasedTheme } from './hooks';
 import { unlock } from './lock-unlock';
 import { orderEntityRecordsBySearch } from './utils/order-entity-records-by-search';
 
@@ -51,7 +50,19 @@ function useDebouncedValue( value ) {
 const getNavigationCommandLoaderPerPostType = ( postType ) =>
 	function useNavigationCommandLoader( { search } ) {
 		const history = useHistory();
-		const isBlockBasedTheme = useIsBlockBasedTheme();
+		const { isBlockBasedTheme, canCreateTemplate } = useSelect(
+			( select ) => {
+				return {
+					isBlockBasedTheme:
+						select( coreStore ).getCurrentTheme()?.is_block_theme,
+					canCreateTemplate: select( coreStore ).canUser( 'create', {
+						kind: 'postType',
+						name: 'wp_template',
+					} ),
+				};
+			},
+			[]
+		);
 		const delayedSearch = useDebouncedValue( search );
 		const { records, isLoading } = useSelect(
 			( select ) => {
@@ -100,6 +111,7 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 				};
 
 				if (
+					! canCreateTemplate ||
 					postType === 'post' ||
 					( postType === 'page' && ! isBlockBasedTheme )
 				) {
@@ -142,7 +154,7 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 					},
 				};
 			} );
-		}, [ records, isBlockBasedTheme, history ] );
+		}, [ canCreateTemplate, records, isBlockBasedTheme, history ] );
 
 		return {
 			commands,
@@ -153,7 +165,19 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
 	function useNavigationCommandLoader( { search } ) {
 		const history = useHistory();
-		const isBlockBasedTheme = useIsBlockBasedTheme();
+		const { isBlockBasedTheme, canCreateTemplate } = useSelect(
+			( select ) => {
+				return {
+					isBlockBasedTheme:
+						select( coreStore ).getCurrentTheme()?.is_block_theme,
+					canCreateTemplate: select( coreStore ).canUser( 'create', {
+						kind: 'postType',
+						name: templateType,
+					} ),
+				};
+			},
+			[]
+		);
 		const { records, isLoading } = useSelect( ( select ) => {
 			const { getEntityRecords } = select( coreStore );
 			const query = { per_page: -1 };
@@ -177,8 +201,8 @@ const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
 
 		const commands = useMemo( () => {
 			if (
-				! isBlockBasedTheme &&
-				! templateType === 'wp_template_part'
+				! canCreateTemplate ||
+				( ! isBlockBasedTheme && ! templateType === 'wp_template_part' )
 			) {
 				return [];
 			}
@@ -243,7 +267,7 @@ const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
 				} );
 			}
 			return result;
-		}, [ isBlockBasedTheme, orderedRecords, history ] );
+		}, [ canCreateTemplate, isBlockBasedTheme, orderedRecords, history ] );
 
 		return {
 			commands,
@@ -265,13 +289,16 @@ function useSiteEditorBasicNavigationCommands() {
 	const isSiteEditor = getPath( window.location.href )?.includes(
 		'site-editor.php'
 	);
-	const canCreateTemplate = useSelect( ( select ) => {
-		return select( coreStore ).canUser( 'create', {
-			kind: 'postType',
-			name: 'wp_template',
-		} );
+	const { isBlockBasedTheme, canCreateTemplate } = useSelect( ( select ) => {
+		return {
+			isBlockBasedTheme:
+				select( coreStore ).getCurrentTheme()?.is_block_theme,
+			canCreateTemplate: select( coreStore ).canUser( 'create', {
+				kind: 'postType',
+				name: 'wp_template',
+			} ),
+		};
 	}, [] );
-	const isBlockBasedTheme = useIsBlockBasedTheme();
 	const commands = useMemo( () => {
 		const result = [];
 

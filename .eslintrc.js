@@ -290,7 +290,11 @@ module.exports = {
 					...restrictedSyntax,
 					...restrictedSyntaxComponents,
 					...[
+						'CheckboxControl',
+						'ComboboxControl',
 						'FocalPointPicker',
+						'RangeControl',
+						'SearchControl',
 						'TextareaControl',
 						'TreeSelect',
 					].map( ( componentName ) => ( {

@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "18.8.0",
+	"version": "18.9.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -172,7 +172,6 @@
 		"@wordpress/scripts": "file:packages/scripts",
 		"@wordpress/stylelint-config": "file:packages/stylelint-config",
 		"ajv": "8.7.1",
-		"ajv-draft-04": "1.0.0",
 		"appium": "2.0.0",
 		"babel-jest": "29.7.0",
 		"babel-loader": "9.1.3",
