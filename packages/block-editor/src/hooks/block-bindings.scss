@@ -18,12 +18,4 @@
 		grid-column: 2;
 		margin: $grid-unit-10 0;
 	}
-	.block-editor-bindings__clear-binding {
-		button {
-			box-shadow: none;
-		}
-		padding-right: 4px;
-		justify-self: end;
-		grid-column: 1/-1;
-	}
 }
