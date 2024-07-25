@@ -112,7 +112,7 @@ function Iframe( {
 	title = __( 'Editor canvas' ),
 	...props
 } ) {
-	const { resolvedAssets, isPreviewMode, siteLocale } = useSelect(
+	const { resolvedAssets, isPreviewMode, siteLocale, userLocale } = useSelect(
 		( select ) => {
 			const { getSettings } = select( blockEditorStore );
 			const settings = getSettings();
@@ -120,6 +120,7 @@ function Iframe( {
 				resolvedAssets: settings.__unstableResolvedAssets,
 				isPreviewMode: settings.__unstableIsPreviewMode,
 				siteLocale: settings.locale?.site,
+				userLocale: settings.locale?.user,
 			};
 		},
 		[]
@@ -157,18 +158,15 @@ function Iframe( {
 				// Ideally ALL classes that are added through get_body_class should
 				// be added in the editor too, which we'll somehow have to get from
 				// the server in the future (which will run the PHP filters).
-				setBodyClasses(
-					Array.from( ownerDocument.body.classList ).filter(
+				setBodyClasses( [
+					...Array.from( ownerDocument.body.classList ).filter(
 						( name ) =>
 							name.startsWith( 'admin-color-' ) ||
 							name.startsWith( 'post-type-' ) ||
 							name === 'wp-embed-responsive'
-					)
-				);
-
-				if ( ! siteLocale ) {
-					contentDocument.dir = ownerDocument.dir;
-				}
+					),
+					siteLocale?.isRTL ? 'rtl' : '',
+				] );
 
 				for ( const compatStyle of getCompatibilityStyles() ) {
 					if ( contentDocument.getElementById( compatStyle.id ) ) {
@@ -288,6 +286,13 @@ function Iframe( {
 				/* Default background color in case zoom out mode background
 				colors the html element */
 				background-color: white;
+			}
+			/* 
+				Block placeholders are "technically" part of the editor UI,
+				and should therefore match the editor UI's directionality.
+			*/
+			.block-editor-block-list__layout .components-placeholder { 
+				direction: ${ userLocale?.isRTL ? 'rtl' : 'ltr' };
 			}
 		</style>
 		${ styles }
