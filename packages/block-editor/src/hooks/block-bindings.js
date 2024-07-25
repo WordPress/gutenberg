@@ -140,6 +140,7 @@ function EditableBlockBindingsPanelItems( {
 	addConnection,
 	removeConnection,
 } ) {
+	const isMobile = useViewportMatch( 'medium', '<' );
 	return (
 		<>
 			{ attributes.map( ( attribute ) => {
@@ -154,8 +155,10 @@ function EditableBlockBindingsPanelItems( {
 						} }
 					>
 						<DropdownMenu
-							placement="left-start"
-							gutter={ 36 }
+							placement={
+								isMobile ? 'bottom-start' : 'left-start'
+							}
+							gutter={ isMobile ? 8 : 36 }
 							className="block-editor-bindings__popover"
 							trigger={
 								<Item>
