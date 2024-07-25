@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -234,7 +229,6 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 							onDeselect={ () => {
 								removeConnection( attribute );
 							} }
-							className="block-editor-bindings__item"
 						>
 							<Dropdown
 								popoverProps={ popoverProps }
@@ -242,12 +236,7 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 								renderToggle={ ( { onToggle, isOpen } ) => {
 									const toggleProps = {
 										onClick: onToggle,
-										className: clsx(
-											'block-editor-bindings__attributes',
-											{
-												'is-open': isOpen,
-											}
-										),
+										className: isOpen ? 'is-open' : '',
 										'aria-expanded': isOpen,
 									};
 									return (
