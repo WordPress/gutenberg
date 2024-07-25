@@ -464,12 +464,14 @@ button.wp-block-navigation-item__content {
 	}
 }
 .wp-block-navigation__responsive-container {
-	display: none;
 	position: fixed;
 	top: 0;
 	left: 0;
 	right: 0;
 	bottom: 0;
+	width: auto;
+	height: auto;
+	border: 0;
 
 	// Low specificity so that themes can override.
 	& :where(.wp-block-navigation-item a) {
@@ -486,7 +488,7 @@ button.wp-block-navigation-item__content {
 
 	// If the responsive wrapper is present but overlay is not open,
 	// overlay styles shouldn't apply.
-	&:not(.is-menu-open.is-menu-open) {
+	&:not(:popover-open:popover-open) {
 		color: inherit !important;
 		background-color: inherit !important;
 	}
@@ -496,7 +498,7 @@ button.wp-block-navigation-item__content {
 	// Inherit as much as we can regarding colors, fonts, sizes,
 	// but otherwise provide a baseline.
 	// In a future version, we can explore more customizability.
-	&.is-menu-open {
+	&:popover-open {
 		display: flex; // Needs to be set to override "none".
 		flex-direction: column;
 		background-color: inherit;
@@ -609,7 +611,7 @@ button.wp-block-navigation-item__content {
 
 	@include break-small() {
 		&:not(.hidden-by-default) {
-			&:not(.is-menu-open) {
+			&:not(:popover-open) {
 				display: block;
 				width: 100%;
 				position: relative;
@@ -622,7 +624,7 @@ button.wp-block-navigation-item__content {
 			}
 		}
 
-		&.is-menu-open {
+		&:popover-open {
 			// Override breakpoint-inherited submenu rules.
 			.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container {
 				left: 0;
@@ -633,12 +635,12 @@ button.wp-block-navigation-item__content {
 
 // Default menu background and font color.
 .wp-block-navigation:not(.has-background)
-.wp-block-navigation__responsive-container.is-menu-open {
+.wp-block-navigation__responsive-container:popover-open {
 	background-color: #fff;
 }
 
 .wp-block-navigation:not(.has-text-color)
-.wp-block-navigation__responsive-container.is-menu-open {
+.wp-block-navigation__responsive-container:popover-open {
 	color: #000;
 }
 
@@ -725,9 +727,9 @@ button.wp-block-navigation-item__content {
 	}
 }
 
-.is-menu-open .wp-block-navigation__responsive-close,
-.is-menu-open .wp-block-navigation__responsive-dialog,
-.is-menu-open .wp-block-navigation__responsive-container-content {
+.wp-block-navigation__responsive-container:popover-open .wp-block-navigation__responsive-close,
+.wp-block-navigation__responsive-container:popover-open .wp-block-navigation__responsive-dialog,
+.wp-block-navigation__responsive-container:popover-open .wp-block-navigation__responsive-container-content {
 	box-sizing: border-box;
 }
 
@@ -736,8 +738,8 @@ button.wp-block-navigation-item__content {
 }
 
 // Adjust open dialog top margin when admin-bar is visible.
-// Needs to be scoped to .is-menu-open, or it will shift the position of any other navigations that may be present.
-.has-modal-open .admin-bar .is-menu-open .wp-block-navigation__responsive-dialog {
+// Needs to be scoped to :popover-open, or it will shift the position of any other navigations that may be present.
+.admin-bar .wp-block-navigation__responsive-container:popover-open .wp-block-navigation__responsive-dialog {
 	margin-top: $admin-bar-height-big;
 
 	// Handle smaller admin-bar.
@@ -747,6 +749,6 @@ button.wp-block-navigation-item__content {
 }
 
 // Prevent scrolling of the parent content when the modal is open.
-html.has-modal-open {
-	overflow: hidden;
-}
+//html.has-modal-open {
+//	overflow: hidden;
+//}

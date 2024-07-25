@@ -77,16 +77,6 @@ const { state, actions } = store(
 					actions.closeMenu( 'hover' );
 				}
 			},
-			openMenuOnClick() {
-				const ctx = getContext();
-				const { ref } = getElement();
-				ctx.previousFocus = ref;
-				actions.openMenu( 'click' );
-			},
-			closeMenuOnClick() {
-				actions.closeMenu( 'click' );
-				actions.closeMenu( 'focus' );
-			},
 			openMenuOnFocus() {
 				actions.openMenu( 'focus' );
 			},
@@ -104,38 +94,6 @@ const { state, actions } = store(
 				} else {
 					ctx.previousFocus = ref;
 					actions.openMenu( 'click' );
-				}
-			},
-			handleMenuKeydown( event ) {
-				const { type, firstFocusableElement, lastFocusableElement } =
-					getContext();
-				if ( state.menuOpenedBy.click ) {
-					// If Escape close the menu.
-					if ( event?.key === 'Escape' ) {
-						actions.closeMenu( 'click' );
-						actions.closeMenu( 'focus' );
-						return;
-					}
-
-					// Trap focus if it is an overlay (main menu).
-					if ( type === 'overlay' && event.key === 'Tab' ) {
-						// If shift + tab it change the direction.
-						if (
-							event.shiftKey &&
-							window.document.activeElement ===
-								firstFocusableElement
-						) {
-							event.preventDefault();
-							lastFocusableElement.focus();
-						} else if (
-							! event.shiftKey &&
-							window.document.activeElement ===
-								lastFocusableElement
-						) {
-							event.preventDefault();
-							firstFocusableElement.focus();
-						}
-					}
 				}
 			},
 			handleMenuFocusout( event ) {
