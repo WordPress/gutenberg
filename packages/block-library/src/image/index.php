@@ -291,7 +291,7 @@ function block_core_image_print_lightbox_overlay() {
 		<div
 			class="wp-lightbox-overlay zoom"
 			data-wp-interactive="core/image"
-			data-wp-context='{ "carousel": "true" }'
+			data-wp-context='{}'
 			data-wp-bind--role="state.roleAttribute"
 			data-wp-bind--aria-label="state.currentImage.ariaLabel"
 			data-wp-bind--aria-modal="state.ariaModal"
