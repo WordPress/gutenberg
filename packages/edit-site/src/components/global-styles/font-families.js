@@ -69,7 +69,7 @@ function FontFamilies() {
 								_x( 'Theme', 'font source' )
 							}
 						</Subtitle>
-						<ItemGroup isBordered isSeparated>
+						<ItemGroup size="large" isBordered isSeparated>
 							{ themeFonts.map( ( font ) => (
 								<FontFamilyItem
 									key={ font.slug }
@@ -87,7 +87,7 @@ function FontFamilies() {
 								_x( 'Custom', 'font source' )
 							}
 						</Subtitle>
-						<ItemGroup isBordered isSeparated>
+						<ItemGroup size="large" isBordered isSeparated>
 							{ customFonts.map( ( font ) => (
 								<FontFamilyItem
 									key={ font.slug }
