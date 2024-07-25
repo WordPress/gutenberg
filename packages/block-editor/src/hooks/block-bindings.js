@@ -12,6 +12,7 @@ import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
 	__experimentalVStack as VStack,
+	__experimentalText as Text,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalTruncate as Truncate,
@@ -273,9 +274,9 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 					) ) }
 				</ItemGroup>
 				{ /* TODO: Add a helper to ToolPanel item */ }
-				<p className="block-editor-bindings__helper">
+				<Text variant="muted" className="block-editor-bindings__helper">
 					{ __( 'Attributes connected to various sources.' ) }
-				</p>
+				</Text>
 			</ToolsPanel>
 		</InspectorControls>
 	);

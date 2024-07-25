@@ -1,11 +1,7 @@
-$popover-width: 360px;
 .block-editor-bindings__panel {
 	.block-editor-bindings__helper {
-		margin-top: $grid-unit-10;
-		margin-bottom: 0;
+		margin: 0;
 		font-size: $helptext-font-size;
-		font-style: normal;
-		color: $gray-700;
 		grid-column: 1/-1;
 	}
 	.block-editor-bindings__dropdown {
@@ -19,7 +15,7 @@ $popover-width: 360px;
 	}
 }
 .block-editor-bindings__popover {
-	width: $popover-width;
+	max-width: 360px;
 }
 .block-editor-bindings__panel,
 .block-editor-bindings__popover {
