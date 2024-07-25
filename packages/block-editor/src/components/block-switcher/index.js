@@ -3,12 +3,12 @@
  */
 import { __, _n, sprintf, _x } from '@wordpress/i18n';
 import {
+	DropdownMenu,
 	ToolbarButton,
 	ToolbarGroup,
 	ToolbarItem,
 	__experimentalText as Text,
 	MenuGroup,
-	DropdownMenu,
 } from '@wordpress/components';
 import {
 	switchToBlockType,
@@ -114,7 +114,6 @@ function BlockSwitcherDropdownMenuContents( {
 		hasBlockStyles ||
 		hasBlockOrBlockVariationTransforms ||
 		hasPatternTransformation;
-
 	if ( ! hasContents ) {
 		return (
 			<p className="block-editor-block-switcher__no-transforms">
