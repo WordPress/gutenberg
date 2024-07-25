@@ -111,6 +111,9 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 		} );
 	};
 
+	const allAttributesBinded =
+		Object.keys( filteredBindings ).length === bindableAttributes.length;
+
 	return (
 		<InspectorControls>
 			<PanelBody
@@ -122,53 +125,58 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 				>
 					<MenuGroup isBordered isSeparated size="large">
 						{ /* TODO: Hide this input if all metadata attributes are bind */ }
-						<DropdownMenu
-							trigger={
-								<MenuItem
-									iconPosition="right"
-									icon={ plus }
-									className="block-editor-link-control__search-item"
-								>
-									{ __( 'Add new connection' ) }
-								</MenuItem>
-							}
-							placement="left"
-							gutter={ 20 }
-						>
-							{ bindableAttributes.map( ( attribute ) => (
+						{ bindableAttributes.length > 0 &&
+							! allAttributesBinded && (
 								<DropdownMenu
-									key={ attribute }
 									trigger={
-										<DropdownMenuItem>
-											<DropdownMenuItemLabel>
-												{ attribute }
-											</DropdownMenuItemLabel>
-										</DropdownMenuItem>
+										<MenuItem
+											iconPosition="right"
+											icon={ plus }
+											className="block-editor-link-control__search-item"
+										>
+											{ __( 'Add new connection' ) }
+										</MenuItem>
 									}
 									placement="left"
-									gutter={ 10 }
+									gutter={ 20 }
 								>
-									{ Object.keys( data ).map( ( key ) => (
-										<DropdownMenuItem
-											key={ key }
-											onClick={ () => {
-												onCloseNewConnection(
-													key,
-													attribute
-												);
-											} }
+									{ bindableAttributes.map( ( attribute ) => (
+										<DropdownMenu
+											key={ attribute }
+											trigger={
+												<DropdownMenuItem>
+													<DropdownMenuItemLabel>
+														{ attribute }
+													</DropdownMenuItemLabel>
+												</DropdownMenuItem>
+											}
+											placement="left"
+											gutter={ 10 }
 										>
-											<DropdownMenuItemLabel>
-												{ data[ key ] }
-											</DropdownMenuItemLabel>
-											<DropDownMenuItemHelpText>
-												{ key }
-											</DropDownMenuItemHelpText>
-										</DropdownMenuItem>
+											{ Object.keys( data ).map(
+												( key ) => (
+													<DropdownMenuItem
+														key={ key }
+														onClick={ () => {
+															onCloseNewConnection(
+																key,
+																attribute
+															);
+														} }
+													>
+														<DropdownMenuItemLabel>
+															{ data[ key ] }
+														</DropdownMenuItemLabel>
+														<DropDownMenuItemHelpText>
+															{ key }
+														</DropDownMenuItemHelpText>
+													</DropdownMenuItem>
+												)
+											) }
+										</DropdownMenu>
 									) ) }
 								</DropdownMenu>
-							) ) }
-						</DropdownMenu>
+							) }
 						<MenuGroup>
 							{ Object.keys( filteredBindings ).map( ( key ) => {
 								const source = sources[
