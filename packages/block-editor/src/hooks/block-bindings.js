@@ -16,11 +16,9 @@ import {
 	__experimentalTruncate as Truncate,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	Dropdown,
-	Icon,
 } from '@wordpress/components';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { useContext } from '@wordpress/element';
-import { customPostType } from '@wordpress/icons';
 import { useViewportMatch } from '@wordpress/compose';
 
 /**
@@ -66,13 +64,16 @@ function BlockBindingsPanelDropdown( {
 			className="block-editor-block-bindings__popover_inner-wrapper"
 		>
 			{ Object.entries( fieldsList ).map( ( [ label, fields ] ) => (
-				<MenuGroup key={ label } label={ label }>
+				<MenuGroup
+					key={ label }
+					label={
+						Object.keys( fieldsList ).length > 1 ? label : null
+					}
+				>
 					{ Object.entries( fields ).map( ( [ key, value ] ) => (
 						<MenuItem
 							key={ key }
 							onClick={ () => addConnection( key, attribute ) }
-							icon={ <Icon icon={ customPostType } /> }
-							iconPosition="left"
 							suffix={
 								<Truncate className="block-editor-block-bindings-panel-item-source">
 									{ value }
