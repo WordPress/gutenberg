@@ -182,9 +182,7 @@ export default function useSelectionObserver() {
 					return;
 				}
 
-				if ( startClientId && endClientId ) {
-					setContentEditableWrapper( node, true );
-				}
+				setContentEditableWrapper( node, startClientId && endClientId );
 
 				const isSingularSelection = startClientId === endClientId;
 				if ( isSingularSelection ) {
