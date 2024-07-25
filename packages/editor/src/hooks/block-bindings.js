@@ -68,9 +68,6 @@ const BlockBindingsPanel = ( { name, attributes: { metadata } } ) => {
 	const bindableAttributes = getBindableAttributes( name );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	// Don't show not allowed attributes.
-	// Don't show the bindings connected to pattern overrides in the inspectors panel.
-	// TODO: Explore if this should be abstracted to let other sources decide.
 	const filteredBindings = { ...bindings };
 	Object.keys( filteredBindings ).forEach( ( key ) => {
 		if (
@@ -81,7 +78,6 @@ const BlockBindingsPanel = ( { name, attributes: { metadata } } ) => {
 		}
 	} );
 	const postMeta = useSelect( ( select ) => {
-		// eslint-disable-next-line @wordpress/data-no-store-string-literals
 		return select( editorStore ).getEditedPostAttribute( 'meta' );
 	}, [] );
 
