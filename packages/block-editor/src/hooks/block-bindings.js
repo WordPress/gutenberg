@@ -14,7 +14,7 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
-import { useContext } from '@wordpress/element';
+import { useContext, Fragment } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 
 /**
@@ -61,37 +61,41 @@ function BlockBindingsPanelDropdown( {
 	return (
 		<>
 			{ Object.entries( fieldsList ).map( ( [ label, fields ], i ) => (
-				<DropdownMenuGroup key={ label }>
-					{ Object.keys( fieldsList ).length > 1 && (
-						<Text
-							className="block-editor-bindings__source-label"
-							upperCase
-							variant="muted"
-							aria-hidden
-						>
-							{ label }
-						</Text>
-					) }
-					{ Object.entries( fields ).map( ( [ key, value ] ) => (
-						<DropdownMenuRadioItem
-							key={ key }
-							onChange={ () => addConnection( key, attribute ) }
-							name={ attribute + '-binding' }
-							value={ key }
-							checked={ key === currentKey }
-						>
-							<DropdownMenuItemLabel>
-								{ key }
-							</DropdownMenuItemLabel>
-							<DropdownMenuItemHelpText>
-								{ value }
-							</DropdownMenuItemHelpText>
-						</DropdownMenuRadioItem>
-					) ) }
+				<Fragment key={ label }>
+					<DropdownMenuGroup>
+						{ Object.keys( fieldsList ).length > 1 && (
+							<Text
+								className="block-editor-bindings__source-label"
+								upperCase
+								variant="muted"
+								aria-hidden
+							>
+								{ label }
+							</Text>
+						) }
+						{ Object.entries( fields ).map( ( [ key, value ] ) => (
+							<DropdownMenuRadioItem
+								key={ key }
+								onChange={ () =>
+									addConnection( key, attribute )
+								}
+								name={ attribute + '-binding' }
+								value={ key }
+								checked={ key === currentKey }
+							>
+								<DropdownMenuItemLabel>
+									{ key }
+								</DropdownMenuItemLabel>
+								<DropdownMenuItemHelpText>
+									{ value }
+								</DropdownMenuItemHelpText>
+							</DropdownMenuRadioItem>
+						) ) }
+					</DropdownMenuGroup>
 					{ i !== Object.keys( fieldsList ).length - 1 && (
 						<DropdownMenuSeparator />
 					) }
-				</DropdownMenuGroup>
+				</Fragment>
 			) ) }
 		</>
 	);
