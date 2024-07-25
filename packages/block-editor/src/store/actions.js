@@ -2160,13 +2160,19 @@ export const registerInserterMediaCategory =
  *
  * @return {Object} Action object.
  */
-export function setBlockEditingMode( clientId = '', mode ) {
-	return {
-		type: 'SET_BLOCK_EDITING_MODE',
-		clientId,
-		mode,
+export const setBlockEditingMode =
+	( clientId = '', mode ) =>
+	( { select } ) => {
+		if ( select.getBlockEditingMode( clientId ) === mode ) {
+			return;
+		}
+
+		return {
+			type: 'SET_BLOCK_EDITING_MODE',
+			clientId,
+			mode,
+		};
 	};
-}
 
 /**
  * Clears the block editing mode for a given block.

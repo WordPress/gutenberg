@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { useRef, useMemo, useEffect } from '@wordpress/element';
 import {
 	useEntityRecord,
@@ -74,18 +74,19 @@ const useInferredLayout = ( blocks, parentLayout ) => {
 	}, [ blocks, parentLayout ] );
 };
 
-function setBlockEditMode( setEditMode, blocks, mode ) {
+function updateInnerBlocksEditingMode( blocks, mode, setBlockEditingMode ) {
 	blocks.forEach( ( block ) => {
-		const editMode =
+		const newMode =
 			mode ||
 			( isOverridableBlock( block ) ? 'contentOnly' : 'disabled' );
-		setEditMode( block.clientId, editMode );
 
-		setBlockEditMode(
-			setEditMode,
+		setBlockEditingMode( block.clientId, newMode );
+
+		updateInnerBlocksEditingMode(
 			block.innerBlocks,
 			// Disable editing for nested patterns.
-			block.name === patternBlockName ? 'disabled' : mode
+			block.name === patternBlockName ? 'disabled' : mode,
+			setBlockEditingMode
 		);
 	} );
 }
@@ -173,6 +174,7 @@ function ReusableBlockEdit( {
 	clientId: patternClientId,
 	setAttributes,
 } ) {
+	const registry = useRegistry();
 	const { record, hasResolved } = useEntityRecord(
 		'postType',
 		'wp_block',
@@ -216,19 +218,23 @@ function ReusableBlockEdit( {
 
 	// Sync the editing mode of the pattern block with the inner blocks.
 	useEffect( () => {
-		setBlockEditMode(
-			setBlockEditingMode,
-			innerBlocks,
-			// Disable editing if the pattern itself is disabled.
-			editingMode === 'disabled' || ! hasPatternOverridesSource
-				? 'disabled'
-				: undefined
-		);
+		registry.batch( () => {
+			updateInnerBlocksEditingMode(
+				innerBlocks,
+				// Disable editing if the pattern itself is disabled.
+				editingMode === 'disabled' || ! hasPatternOverridesSource
+					? 'disabled'
+					: undefined,
+				setBlockEditingMode
+			);
+		} );
 	}, [
-		editingMode,
 		innerBlocks,
+		editingMode,
 		setBlockEditingMode,
 		hasPatternOverridesSource,
+		registry.batch,
+		registry,
 	] );
 
 	const canOverrideBlocks = useMemo(
