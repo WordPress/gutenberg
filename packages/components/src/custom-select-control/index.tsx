@@ -8,6 +8,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -41,6 +42,15 @@ function applyOptionDeprecations( {
 	};
 }
 
+function getDescribedBy( currentValue: string, describedBy?: string ) {
+	if ( describedBy ) {
+		return describedBy;
+	}
+
+	// translators: %s: The selected option.
+	return sprintf( __( 'Currently selected: %s' ), currentValue );
+}
+
 function CustomSelectControl( props: CustomSelectProps ) {
 	const {
 		__next40pxDefaultSize = false,
@@ -60,7 +70,7 @@ function CustomSelectControl( props: CustomSelectProps ) {
 	);
 
 	// Forward props + store from v2 implementation
-	const store = Ariakit.useSelectStore( {
+	const store = Ariakit.useSelectStore< string >( {
 		async setValue( nextValue ) {
 			const nextOption = options.find(
 				( item ) => item.name === nextValue
@@ -128,9 +138,9 @@ function CustomSelectControl( props: CustomSelectProps ) {
 			);
 		} );
 
-	const renderSelectedValueHint = () => {
-		const { value: currentValue } = store.getState();
+	const { value: currentValue } = store.getState();
 
+	const renderSelectedValueHint = () => {
 		const selectedOptionHint = options
 			?.map( applyOptionDeprecations )
 			?.find( ( { name } ) => currentValue === name )?.hint;
@@ -182,11 +192,11 @@ function CustomSelectControl( props: CustomSelectProps ) {
 			>
 				{ children }
 			</_CustomSelect>
-			{ describedBy && (
-				<VisuallyHidden>
-					<span id={ descriptionId }>{ describedBy }</span>
-				</VisuallyHidden>
-			) }
+			<VisuallyHidden>
+				<span id={ descriptionId }>
+					{ getDescribedBy( currentValue, describedBy ) }
+				</span>
+			</VisuallyHidden>
 		</>
 	);
 }

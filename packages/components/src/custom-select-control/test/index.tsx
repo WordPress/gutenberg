@@ -671,7 +671,7 @@ describe.each( [
 			expect( onBlurMock ).toHaveBeenCalledTimes( 1 );
 		} );
 
-		it( 'should render the describedBy text', async () => {
+		it( 'should render the describedBy text when specified', async () => {
 			const describedByText = 'My description.';
 
 			render(
@@ -681,6 +681,16 @@ describe.each( [
 			expect(
 				screen.getByRole( 'combobox' )
 			).toHaveAccessibleDescription( describedByText );
+		} );
+
+		it( 'should render the default ARIA description when describedBy is not specified', async () => {
+			render( <Component { ...props } /> );
+
+			expect(
+				screen.getByRole( 'combobox' )
+			).toHaveAccessibleDescription(
+				`Currently selected: ${ props.options[ 0 ].name }`
+			);
 		} );
 	} );
 } );
