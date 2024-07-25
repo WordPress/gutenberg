@@ -9,6 +9,8 @@ import {
 	__experimentalText as Text,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalTruncate as Truncate,
+	__experimentalVStack as VStack,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
@@ -103,19 +105,19 @@ function BlockBindingsAttribute( { attribute, binding } ) {
 	const sourceProps =
 		unlock( blocksPrivateApis ).getBlockBindingsSource( sourceName );
 	return (
-		<>
-			<DropdownMenuItemLabel numberOfLines={ 1 }>
-				{ attribute }
-			</DropdownMenuItemLabel>
+		<VStack>
+			<Truncate>{ attribute }</Truncate>
 			{ !! binding && (
-				<DropdownMenuItemHelpText
-					numberOfLines={ 1 }
+				<Text
+					variant="muted"
 					className="block-editor-bindings__item-explanation"
 				>
-					{ args?.key || sourceProps?.label || sourceName }
-				</DropdownMenuItemHelpText>
+					<Truncate>
+						{ args?.key || sourceProps?.label || sourceName }
+					</Truncate>
+				</Text>
 			) }
-		</>
+		</VStack>
 	);
 }
 
