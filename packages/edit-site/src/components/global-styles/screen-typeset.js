@@ -32,8 +32,7 @@ function ScreenTypeset() {
 				<VStack spacing={ 7 }>
 					<TypographyVariations />
 
-					{ ! window.__experimentalDisableFontLibrary &&
-						fontLibraryEnabled && <FontFamilies /> }
+					{ fontLibraryEnabled && <FontFamilies /> }
 				</VStack>
 			</div>
 		</>
