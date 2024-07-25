@@ -4,8 +4,6 @@
 import { __ } from '@wordpress/i18n';
 import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
 import {
-	Button,
-	ButtonGroup,
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
 	__experimentalText as Text,
@@ -54,14 +52,13 @@ const useToolsPanelDropdownMenuProps = () => {
 function BlockBindingsPanelDropdown( {
 	fieldsList,
 	addConnection,
-	removeConnection,
 	attribute,
 	binding,
 } ) {
 	const currentKey = binding?.args?.key;
 	return (
 		<>
-			{ Object.entries( fieldsList ).map( ( [ label, fields ] ) => (
+			{ Object.entries( fieldsList ).map( ( [ label, fields ], i ) => (
 				<>
 					<DropdownMenuGroup key={ label }>
 						{ Object.keys( fieldsList ).length > 1 && (
@@ -92,20 +89,11 @@ function BlockBindingsPanelDropdown( {
 							</DropdownMenuRadioItem>
 						) ) }
 					</DropdownMenuGroup>
-					<DropdownMenuSeparator />
+					{ i !== Object.keys( fieldsList ).length - 1 && (
+						<DropdownMenuSeparator />
+					) }
 				</>
 			) ) }
-			<ButtonGroup className="block-editor-bindings__clear-binding">
-				<Button
-					__next40pxDefaultSize
-					disabled={ ! binding }
-					accessibleWhenDisabled
-					onClick={ () => removeConnection( attribute ) }
-					variant="tertiary"
-				>
-					{ __( 'Clear' ) }
-				</Button>
-			</ButtonGroup>
 		</>
 	);
 }
@@ -182,7 +170,6 @@ function EditableBlockBindingsPanelItems( {
 							<BlockBindingsPanelDropdown
 								fieldsList={ fieldsList }
 								addConnection={ addConnection }
-								removeConnection={ removeConnection }
 								attribute={ attribute }
 								binding={ binding }
 							/>
