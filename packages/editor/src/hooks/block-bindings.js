@@ -11,10 +11,6 @@ import {
 	getBindableAttributes,
 } from './use-bindings-attributes';
 import { store as editorStore } from '../store';
-import {
-	useBindingsUtils,
-	useToolsPanelDropdownMenuProps,
-} from '../bindings/utils';
 
 /**
  * WordPress dependencies
@@ -40,7 +36,10 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { addFilter } from '@wordpress/hooks';
-import { createHigherOrderComponent } from '@wordpress/compose';
+import {
+	createHigherOrderComponent,
+	useViewportMatch,
+} from '@wordpress/compose';
 
 const popoverProps = {
 	placement: 'left-start',
@@ -50,12 +49,23 @@ const popoverProps = {
 	headerTitle: __( 'Custom Fields' ),
 };
 
+const useToolsPanelDropdownMenuProps = () => {
+	const isMobile = useViewportMatch( 'medium', '<' );
+	return ! isMobile
+		? {
+				popoverProps: {
+					placement: 'left-start',
+					// For non-mobile, inner sidebar width (248px) - button width (24px) - border (1px) + padding (16px) + spacing (20px)
+					offset: 259,
+				},
+		  }
+		: {};
+};
+
 const BlockBindingsPanel = ( { name, attributes: { metadata } } ) => {
 	const { bindings } = metadata || {};
 
 	const bindableAttributes = getBindableAttributes( name );
-	const { addConnection, removeConnection, removeAllConnections } =
-		useBindingsUtils();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	// Don't show not allowed attributes.
@@ -86,16 +96,60 @@ const BlockBindingsPanel = ( { name, attributes: { metadata } } ) => {
 		};
 	}, [] );
 
+	const removeAllConnections = () => {
+		const newMetadata = { ...metadata };
+		delete newMetadata.bindings;
+		updateBlockAttributes( _id, {
+			metadata:
+				Object.keys( newMetadata ).length === 0
+					? undefined
+					: newMetadata,
+		} );
+	};
+
+	const addConnection = ( value, attribute ) => {
+		// Assuming the block expects a flat structure for its metadata attribute
+		const newMetadata = {
+			...metadata,
+			// Adjust this according to the actual structure expected by your block
+			bindings: {
+				...metadata?.bindings,
+				[ attribute ]: {
+					source: 'core/post-meta',
+					args: { key: value },
+				},
+			},
+		};
+		// Update the block's attributes with the new metadata
+		updateBlockAttributes( _id, {
+			metadata: newMetadata,
+		} );
+	};
+
+	const removeConnection = ( key ) => {
+		const newMetadata = { ...metadata };
+		if ( ! newMetadata.bindings ) {
+			return;
+		}
+
+		delete newMetadata.bindings[ key ];
+		if ( Object.keys( newMetadata.bindings ).length === 0 ) {
+			delete newMetadata.bindings;
+		}
+		updateBlockAttributes( _id, {
+			metadata:
+				Object.keys( newMetadata ).length === 0
+					? undefined
+					: newMetadata,
+		} );
+	};
+
 	return (
 		<InspectorControls>
 			<ToolsPanel
 				label={ __( 'Attributes' ) }
 				resetAll={ () => {
-					removeAllConnections(
-						metadata,
-						_id,
-						updateBlockAttributes
-					);
+					removeAllConnections();
 				} }
 				dropdownMenuProps={ dropdownMenuProps }
 				className="block-bindings-support-panel"
@@ -114,12 +168,7 @@ const BlockBindingsPanel = ( { name, attributes: { metadata } } ) => {
 									}
 									label={ attribute }
 									onDeselect={ () => {
-										removeConnection(
-											attribute,
-											metadata,
-											_id,
-											updateBlockAttributes
-										);
+										removeConnection( attribute );
 									} }
 								>
 									<Dropdown
@@ -209,10 +258,7 @@ const BlockBindingsPanel = ( { name, attributes: { metadata } } ) => {
 																onClick={ () => {
 																	addConnection(
 																		key,
-																		attribute,
-																		metadata,
-																		_id,
-																		updateBlockAttributes
+																		attribute
 																	);
 																} }
 																icon={
