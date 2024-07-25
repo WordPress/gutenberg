@@ -801,22 +801,10 @@ describe( 'Tabs', () => {
 				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
 			} );
 
-			function UI() {
-				return null;
-			}
-
-			function NewUI() {
-				return null;
-			}
-
 			it( 'should have no active tabs when the tab associated to `defaultTabId` is removed while being the active tab', async () => {
-				// asd
-
-				const { rerender } = await render( <UI /> );
-
-				// later on...
-
-				await rerender( <NewUI /> );
+				const { rerender } = await render(
+					<UncontrolledTabs tabs={ TABS } defaultTabId="gamma" />
+				);
 
 				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
 
