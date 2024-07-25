@@ -12,6 +12,7 @@ import {
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { plus, reset } from '@wordpress/icons';
+import { InspectorControls } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -19,10 +20,11 @@ import { plus, reset } from '@wordpress/icons';
 import {
 	canBindAttribute,
 	getBindableAttributes,
-} from '../hooks/use-bindings-attributes';
+} from './use-bindings-attributes';
 import { unlock } from '../lock-unlock';
-import InspectorControls from '../components/inspector-controls';
 import { store as blockEditorStore } from '../store';
+import { addFilter } from '@wordpress/hooks';
+import { createHigherOrderComponent } from '@wordpress/compose';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -31,7 +33,7 @@ const {
 	DropdownMenuItemHelpTextV2: DropDownMenuItemHelpText,
 } = unlock( componentsPrivateApis );
 
-export const BlockBindingsPanel = ( { name, metadata } ) => {
+const BlockBindingsPanel = ( { name, metadata } ) => {
 	const { bindings } = metadata || {};
 	const { sources } = useSelect( ( select ) => {
 		const _sources = unlock(
@@ -56,17 +58,12 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 			delete filteredBindings[ key ];
 		}
 	} );
-	const data = useSelect( ( select ) => {
-		// Access the core/editor store
-		const { getEditedPostAttribute } = select( 'core/editor' );
-
-		// Fetch the meta data for the current post
-		const metaData = getEditedPostAttribute( 'meta' );
-		// Return the meta data if you need to use it in your component
-		return metaData;
+	const postMeta = useSelect( ( select ) => {
+		// eslint-disable-next-line @wordpress/data-no-store-string-literals
+		return select( 'core/editor' ).getEditedPostAttribute( 'meta' );
 	}, [] );
 
-	const { updateBlockAttributes } = useDispatch( 'core/block-editor' );
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	const { _id } = useSelect( ( select ) => {
 		const { getSelectedBlockClientId } = select( blockEditorStore );
@@ -112,7 +109,7 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 	};
 
 	const allAttributesBinded =
-		Object.keys( filteredBindings ).length === bindableAttributes.length;
+		Object.keys( filteredBindings ).length === bindableAttributes?.length;
 
 	return (
 		<InspectorControls>
@@ -152,8 +149,12 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 											placement="left"
 											gutter={ 10 }
 										>
-											{ Object.keys( data ).map(
-												( key ) => (
+											{ Object.keys( postMeta )
+												.filter(
+													( value ) =>
+														value !== 'footnotes'
+												)
+												.map( ( key ) => (
 													<DropdownMenuItem
 														key={ key }
 														onClick={ () => {
@@ -164,14 +165,13 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 														} }
 													>
 														<DropdownMenuItemLabel>
-															{ data[ key ] }
+															{ postMeta[ key ] }
 														</DropdownMenuItemLabel>
 														<DropDownMenuItemHelpText>
 															{ key }
 														</DropDownMenuItemHelpText>
 													</DropdownMenuItem>
-												)
-											) }
+												) ) }
 										</DropdownMenu>
 									) ) }
 								</DropdownMenu>
@@ -204,10 +204,32 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 	);
 };
 
-export default {
-	edit: BlockBindingsPanel,
-	attributeKeys: [ 'metadata' ],
-	hasSupport() {
-		return true;
+/**
+ * Override the default edit UI to include a new block inspector control for
+ * assigning a partial syncing controls to supported blocks in the pattern editor.
+ * Currently, only the `core/paragraph` block is supported.
+ *
+ * @param {Component} BlockEdit Original component.
+ *
+ * @return {Component} Wrapped component.
+ */
+const withBlockBindings = createHigherOrderComponent(
+	( BlockEdit ) => ( props ) => {
+		const bindableAttributes = getBindableAttributes( props?.name );
+		return (
+			<>
+				<BlockEdit { ...props } />
+				{ bindableAttributes.length > 0 && (
+					<BlockBindingsPanel { ...props } />
+				) }
+			</>
+		);
 	},
-};
+	'withBlockBindings'
+);
+
+addFilter(
+	'editor.BlockEdit',
+	'core/editor/with-block-bindings',
+	withBlockBindings
+);
