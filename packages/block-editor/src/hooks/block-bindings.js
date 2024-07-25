@@ -217,8 +217,6 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 				dropdownMenuProps={ dropdownMenuProps }
 				className="block-editor-bindings__panel"
 				hasInnerWrapper
-				__experimentalFirstVisibleItemClass="first"
-				__experimentalLastVisibleItemClass="last"
 			>
 				<ItemGroup isBordered isSeparated style={ { rowGap: 0 } }>
 					{ bindableAttributes.map( ( attribute ) => (
