@@ -14,6 +14,7 @@ import {
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalUnitControl as UnitControl,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
+	__experimentalGrid as Grid,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { View } from '@wordpress/primitives';
@@ -56,17 +57,18 @@ function DimensionInput( { label, onChange, isResizing, value = '' } ) {
 	return (
 		<>
 			{ ( ! spacingSizes || spacingSizes?.length === 0 ) && (
-				<UnitControl
-					id={ inputId }
-					isResetValueOnUnitChange
-					min={ MIN_SPACER_SIZE }
-					onChange={ handleOnChange }
-					style={ { maxWidth: '50%' } }
-					value={ computedValue }
-					units={ units }
-					label={ label }
-					__next40pxDefaultSize
-				/>
+				<Grid gap="2" templateColumns="1fr 1fr 24px">
+					<UnitControl
+						id={ inputId }
+						isResetValueOnUnitChange
+						min={ MIN_SPACER_SIZE }
+						onChange={ handleOnChange }
+						value={ computedValue }
+						units={ units }
+						label={ label }
+						__next40pxDefaultSize
+					/>
+				</Grid>
 			) }
 			{ spacingSizes?.length > 0 && (
 				<View className="tools-panel-item-spacing">
