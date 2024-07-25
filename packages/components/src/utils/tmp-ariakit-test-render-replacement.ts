@@ -145,14 +145,27 @@ export async function render( ui: ReactNode, options?: RenderOptions ) {
 		return createElement( StrictMode, undefined, element );
 	};
 
-	return wrapAsync( async () => {
-		const { unmount } = ReactTestingLibrary.render( ui, {
+	function wrapRender< T extends ( ...args: any[] ) => any >(
+		renderFn: T
+	): Promise< ReturnType< T > > {
+		return wrapAsync( async () => {
+			const output: ReturnType< T > = renderFn();
+			await flushMicrotasks();
+			await nextFrame();
+			await flushMicrotasks();
+			return output;
+		} );
+	}
+
+	return wrapRender( () => {
+		const output = ReactTestingLibrary.render( ui, {
 			...options,
 			wrapper,
 		} );
-		await flushMicrotasks();
-		await nextFrame();
-		await flushMicrotasks();
-		return unmount;
+		return {
+			...output,
+			rerender: ( newUi: ReactNode ) =>
+				wrapRender( () => output.rerender( newUi ) ),
+		};
 	} );
 }
