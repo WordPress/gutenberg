@@ -269,8 +269,8 @@ function block_core_image_render_lightbox( $block_content, $block ) {
  */
 function block_core_image_print_lightbox_overlay() {
 	$close_button_label = esc_attr__( 'Close' );
-	$prev_button_label = esc_attr__( 'Previous' );
-	$next_button_label = esc_attr__( 'Next' );
+	$prev_button_label  = esc_attr__( 'Previous' );
+	$next_button_label  = esc_attr__( 'Next' );
 
 	// If the current theme does NOT have a `theme.json`, or the colors are not
 	// defined, it needs to set the background color & close button color to some
