@@ -88,32 +88,36 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 		setConnectionModal( false );
 		setMetaValues( [] );
 
-		// Use useDispatch to get the updateBlockAttributes function
-
 		// Assuming the block expects a flat structure for its metadata attribute
 		const newMetadata = {
-			metadata: {
-				// Adjust this according to the actual structure expected by your block
-				bindings: {
-					content: {
-						source: 'core/post-meta',
-						args: { key: value },
-					},
+			...metadata,
+			// Adjust this according to the actual structure expected by your block
+			bindings: {
+				...bindings,
+				content: {
+					source: 'core/post-meta',
+					args: { key: value },
 				},
 			},
 		};
 
 		// Update the block's attributes with the new metadata
 		updateBlockAttributes( _id, {
-			...newMetadata,
+			metadata: newMetadata,
 		} );
 	};
 
 	const removeConnection = ( key ) => {
 		const newMetadata = { ...metadata };
 		delete newMetadata.bindings[ key ];
+		if ( Object.keys( newMetadata.bindings ).length === 0 ) {
+			delete newMetadata.bindings;
+		}
 		updateBlockAttributes( _id, {
-			...newMetadata,
+			metadata:
+				Object.keys( newMetadata ).length === 0
+					? undefined
+					: newMetadata,
 		} );
 	};
 
