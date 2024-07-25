@@ -57,9 +57,13 @@ export function getFontFamilies( themeJson ) {
 	const customFontFamilies =
 		themeJson?.settings?.typography?.fontFamilies?.custom;
 
-	let fontFamilies = themeFontFamilies;
-	if ( customFontFamilies ) {
+	let fontFamilies = [];
+	if ( themeFontFamilies && customFontFamilies ) {
 		fontFamilies = [ ...themeFontFamilies, ...customFontFamilies ];
+	} else if ( themeFontFamilies ) {
+		fontFamilies = themeFontFamilies;
+	} else if ( customFontFamilies ) {
+		fontFamilies = customFontFamilies;
 	}
 	const bodyFontFamilySetting = themeJson?.styles?.typography?.fontFamily;
 	const bodyFontFamily = getFontFamilyFromSetting(
