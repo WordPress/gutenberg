@@ -159,7 +159,7 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 		};
 	}, [] );
 
-	if ( bindableAttributes.length === 0 ) {
+	if ( ! bindableAttributes || bindableAttributes.length === 0 ) {
 		return null;
 	}
 
