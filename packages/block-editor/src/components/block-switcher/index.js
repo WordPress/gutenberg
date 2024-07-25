@@ -3,12 +3,15 @@
  */
 import { __, _n, sprintf, _x } from '@wordpress/i18n';
 import {
-	DropdownMenu,
 	ToolbarButton,
 	ToolbarGroup,
 	ToolbarItem,
 	__experimentalText as Text,
 	MenuGroup,
+	MenuItem,
+	Dropdown,
+	DropdownMenu,
+	FormTokenField,
 } from '@wordpress/components';
 import {
 	switchToBlockType,
@@ -29,6 +32,7 @@ import { useBlockVariationTransforms } from './block-variation-transformations';
 import BlockStylesMenu from './block-styles-menu';
 import PatternTransformationsMenu from './pattern-transformations-menu';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
+import { unlock } from '../../lock-unlock';
 
 function BlockSwitcherDropdownMenuContents( {
 	onClose,
@@ -114,6 +118,17 @@ function BlockSwitcherDropdownMenuContents( {
 		hasBlockStyles ||
 		hasBlockOrBlockVariationTransforms ||
 		hasPatternTransformation;
+
+	const { sources } = useSelect( ( select ) => {
+		const _sources = unlock(
+			select( blocksStore )
+		).getAllBlockBindingsSources();
+
+		return {
+			sources: _sources,
+		};
+	}, [] );
+
 	if ( ! hasContents ) {
 		return (
 			<p className="block-editor-block-switcher__no-transforms">
@@ -170,11 +185,35 @@ function BlockSwitcherDropdownMenuContents( {
 					onSwitch={ onClose }
 				/>
 			) }
-			{ isUsingBindings && (
+			{ isUsingBindings ? (
 				<MenuGroup>
 					<Text className="block-editor-block-switcher__binding-indicator">
 						{ connectedBlockDescription }
 					</Text>
+				</MenuGroup>
+			) : (
+				<MenuGroup>
+					<Dropdown
+						className="block-editor-block-switcher__binding-indicator"
+						popoverProps={ { placement: 'bottom-start' } }
+						renderToggle={ ( { onToggle, isOpen } ) => (
+							<MenuItem
+								onClick={ onToggle }
+								aria-expanded={ isOpen }
+							>
+								{ __( 'Connect Block' ) }
+							</MenuItem>
+						) }
+						renderContent={ () => (
+							<FormTokenField
+								label="Type a custom field key"
+								onChange={ () => {} }
+								suggestions={ Object.keys( sources ) }
+								value={ [] }
+								className="block-editor-block-switcher__binding-connector"
+							/>
+						) }
+					/>
 				</MenuGroup>
 			) }
 		</div>
