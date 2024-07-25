@@ -52,7 +52,13 @@
 }
 
 .page-templates-description {
-	white-space: normal;
+	display: block;
+	max-width: $maximum-text-width;
+	text-wrap: pretty;
+
+	&.is-viewtype-table {
+		margin-bottom: $grid-unit-10;
+	}
 }
 
 .edit-site-page-templates {

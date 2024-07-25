@@ -309,7 +309,9 @@ export default function PageTemplates() {
 				render: ( { item } ) => {
 					return (
 						item.description && (
-							<span className="page-templates-description">
+							<span
+								className={ `page-templates-description is-viewtype-${ view.type }` }
+							>
 								{ decodeEntities( item.description ) }
 							</span>
 						)
