@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   `DropdownMenuV2`: break menu item help text on multiple lines for better truncation. ([#63916](https://github.com/WordPress/gutenberg/pull/63916)).
+
 ## 28.4.0 (2024-07-24)
 
 ### Deprecations
