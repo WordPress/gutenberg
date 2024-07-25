@@ -2,7 +2,6 @@
  * Internal dependencies
  */
 import { toHTMLString } from '../../to-html-string';
-import { isCollapsed } from '../../is-collapsed';
 import { slice } from '../../slice';
 import { getTextContent } from '../../get-text-content';
 
@@ -11,11 +10,12 @@ export default ( props ) => ( element ) => {
 		const { record } = props.current;
 		const { ownerDocument } = element;
 		const { defaultView } = ownerDocument;
-		const { anchorNode, focusNode } = defaultView.getSelection();
+		const { anchorNode, focusNode, isCollapsed } =
+			defaultView.getSelection();
 		const containsSelection =
 			element.contains( anchorNode ) && element.contains( focusNode );
 
-		if ( isCollapsed( record.current ) || ! containsSelection ) {
+		if ( isCollapsed || ! containsSelection ) {
 			return;
 		}
 
