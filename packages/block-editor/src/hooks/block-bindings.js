@@ -20,7 +20,7 @@ import {
 } from '@wordpress/components';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { useContext } from '@wordpress/element';
-import { customPostType, edit } from '@wordpress/icons';
+import { customPostType } from '@wordpress/icons';
 import { useViewportMatch } from '@wordpress/compose';
 
 /**
@@ -249,8 +249,6 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 											}
 										),
 										'aria-expanded': isOpen,
-										icon: edit,
-										iconPosition: 'right',
 									};
 									return (
 										<BlockBindingsAttribute
