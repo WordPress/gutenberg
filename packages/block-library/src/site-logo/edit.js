@@ -590,8 +590,6 @@ export default function LogoEdit( {
 
 	const blockProps = useBlockProps( { className: classes } );
 
-	const label = __( 'Add a site logo' );
-
 	const mediaInspectorPanel = ( canUserEdit || logoUrl ) && (
 		<InspectorControls>
 			<PanelBody title={ __( 'Media' ) }>
@@ -631,7 +629,7 @@ export default function LogoEdit( {
 											{ isLoading ? (
 												<Spinner />
 											) : (
-												__( 'Add media' )
+												__( 'Choose logo' )
 											) }
 										</Button>
 										<DropZone onFilesDrop={ onFilesDrop } />
@@ -671,9 +669,9 @@ export default function LogoEdit( {
 							<Button
 								icon={ upload }
 								variant="primary"
-								label={ label }
+								label={ __( 'Choose logo' ) }
 								showTooltip
-								tooltipPosition="top center"
+								tooltipPosition="bottom center"
 								onClick={ () => {
 									open();
 								} }

@@ -160,3 +160,36 @@ export const hasPostMetaChanges = createRegistrySelector(
 export function getEntityActions( state, ...args ) {
 	return _getEntityActions( state.dataviews, ...args );
 }
+
+/**
+ * Similar to getBlocksByName in @wordpress/block-editor, but only returns the top-most
+ * blocks that aren't descendants of the query block.
+ *
+ * @param {Object}       state      Global application state.
+ * @param {Array|string} blockNames Block names of the blocks to retrieve.
+ *
+ * @return {Array} Block client IDs.
+ */
+export const getPostBlocksByName = createRegistrySelector( ( select ) =>
+	createSelector(
+		( state, blockNames ) => {
+			blockNames = Array.isArray( blockNames )
+				? blockNames
+				: [ blockNames ];
+			const { getBlocksByName, getBlockParents, getBlockName } =
+				select( blockEditorStore );
+			return getBlocksByName( blockNames ).filter( ( clientId ) =>
+				getBlockParents( clientId ).every( ( parentClientId ) => {
+					const parentBlockName = getBlockName( parentClientId );
+					return (
+						// Ignore descendents of the query block.
+						parentBlockName !== 'core/query' &&
+						// Enable only the top-most block.
+						! blockNames.includes( parentBlockName )
+					);
+				} )
+			);
+		},
+		() => [ select( blockEditorStore ).getBlocks() ]
+	)
+);

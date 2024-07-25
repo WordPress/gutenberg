@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.0.0 (2024-07-24)
+
 ### Breaking Changes
 
 - `onSelectionChange` prop has been renamed to `onChangeSelection` and its argument has been updated to be a list of ids.
