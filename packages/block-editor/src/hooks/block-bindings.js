@@ -4,6 +4,8 @@
 import { __ } from '@wordpress/i18n';
 import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
 import {
+	Button,
+	ButtonGroup,
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
 	__experimentalText as Text,
@@ -51,6 +53,7 @@ const useToolsPanelDropdownMenuProps = () => {
 function BlockBindingsPanelDropdown( {
 	fieldsList,
 	addConnection,
+	removeConnection,
 	attribute,
 	binding,
 } ) {
@@ -71,7 +74,6 @@ function BlockBindingsPanelDropdown( {
 							name={ attribute + '-binding' }
 							value={ key }
 							checked={ key === currentKey }
-							hideOnClick
 						>
 							<DropdownMenuItemLabel>
 								{ key }
@@ -83,6 +85,17 @@ function BlockBindingsPanelDropdown( {
 					) ) }
 				</DropdownMenuGroup>
 			) ) }
+			<ButtonGroup className="block-editor-bindings__clear-binding">
+				<Button
+					__next40pxDefaultSize
+					disabled={ ! binding }
+					accessibleWhenDisabled
+					onClick={ () => removeConnection( attribute ) }
+					variant="tertiary"
+				>
+					{ __( 'Clear' ) }
+				</Button>
+			</ButtonGroup>
 		</>
 	);
 }
@@ -90,6 +103,7 @@ function BlockBindingsPanelDropdown( {
 function BlockBindingsAttribute( {
 	fieldsList,
 	addConnection,
+	removeConnection,
 	attribute,
 	binding,
 } ) {
@@ -100,7 +114,7 @@ function BlockBindingsAttribute( {
 		<DropdownMenu
 			placement="left-start"
 			gutter={ 36 }
-			style={ { width: '360px' } }
+			className="block-editor-bindings__popover"
 			trigger={
 				<Item>
 					<DropdownMenuItemLabel>{ attribute }</DropdownMenuItemLabel>
@@ -115,6 +129,7 @@ function BlockBindingsAttribute( {
 			<BlockBindingsPanelDropdown
 				fieldsList={ fieldsList }
 				addConnection={ addConnection }
+				removeConnection={ removeConnection }
 				attribute={ attribute }
 				binding={ binding }
 			/>
@@ -249,6 +264,7 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 							<BlockBindingsAttribute
 								fieldsList={ fieldsList }
 								addConnection={ addConnection }
+								removeConnection={ removeConnection }
 								attribute={ attribute }
 								binding={ filteredBindings[ attribute ] }
 							/>

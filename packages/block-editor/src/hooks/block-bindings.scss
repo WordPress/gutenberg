@@ -8,3 +8,14 @@
 		color: inherit;
 	}
 }
+
+.block-editor-bindings__popover {
+	.block-editor-bindings__clear-binding {
+		button {
+			box-shadow: none;
+		}
+		padding-right: 4px;
+		justify-self: end;
+		grid-column: 1/-1;
+	}
+}
