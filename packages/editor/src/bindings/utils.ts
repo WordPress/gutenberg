@@ -11,7 +11,7 @@ type UpdateBlockAttributes = (
 	attributes: Record< string, any >
 ) => void;
 
-export const addConnection = (
+const addConnection = (
 	value: string,
 	attribute: string,
 	metadata: MetaData,
@@ -30,14 +30,13 @@ export const addConnection = (
 			},
 		},
 	};
-
 	// Update the block's attributes with the new metadata
 	updateBlockAttributes( _id, {
 		metadata: newMetadata,
 	} );
 };
 
-export const removeConnection = (
+const removeConnection = (
 	key: string,
 	metadata: MetaData,
 	_id: string,
@@ -50,6 +49,7 @@ export const removeConnection = (
 	if ( ! newMetadata.bindings ) {
 		return;
 	}
+
 	delete newMetadata.bindings[ key ];
 	if ( Object.keys( newMetadata.bindings ).length === 0 ) {
 		delete newMetadata.bindings;
@@ -59,6 +59,27 @@ export const removeConnection = (
 			Object.keys( newMetadata ).length === 0 ? undefined : newMetadata,
 	} );
 };
+
+const removeAllConnections = (
+	metadata: MetaData,
+	_id: string,
+	updateBlockAttributes: UpdateBlockAttributes
+) => {
+	const newMetadata = { ...metadata };
+	delete newMetadata.bindings;
+	updateBlockAttributes( _id, {
+		metadata:
+			Object.keys( newMetadata ).length === 0 ? undefined : newMetadata,
+	} );
+};
+
+export function useBindingsUtils() {
+	return {
+		addConnection,
+		removeConnection,
+		removeAllConnections,
+	};
+}
 
 export function useToolsPanelDropdownMenuProps() {
 	const isMobile = useViewportMatch( 'medium', '<' );

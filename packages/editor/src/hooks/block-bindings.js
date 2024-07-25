@@ -8,8 +8,7 @@ import {
 import { unlock } from '../lock-unlock';
 import { store as editorStore } from '../store';
 import {
-	removeConnection,
-	addConnection,
+	useBindingsUtils,
 	useToolsPanelDropdownMenuProps,
 } from '../bindings/utils';
 
@@ -17,7 +16,6 @@ import {
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { store as blocksStore } from '@wordpress/blocks';
 import {
 	MenuGroup,
 	MenuItem,
@@ -26,9 +24,8 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalHStack as Hstack,
 	__experimentalTruncate as Truncate,
-	FlexItem,
+	__experimentalText as Text,
 	Icon,
-	Button,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
@@ -48,16 +45,10 @@ const { DropdownMenuV2: DropdownMenu } = unlock( componentsPrivateApis );
 
 const BlockBindingsPanel = ( { name, attributes: { metadata } } ) => {
 	const { bindings } = metadata || {};
-	const { sources } = useSelect( ( select ) => {
-		const _sources = unlock(
-			select( blocksStore )
-		).getAllBlockBindingsSources();
-		return {
-			sources: _sources,
-		};
-	}, [] );
 
 	const bindableAttributes = getBindableAttributes( name );
+	const { addConnection, removeConnection, removeAllConnections } =
+		useBindingsUtils();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	// Don't show not allowed attributes.
@@ -88,74 +79,125 @@ const BlockBindingsPanel = ( { name, attributes: { metadata } } ) => {
 		};
 	}, [] );
 
-	const allAttributesBinded =
-		Object.keys( filteredBindings ).length === bindableAttributes?.length;
-
 	return (
 		<InspectorControls>
 			<ToolsPanel
 				label={ __( 'Connections' ) }
-				resetAll={ () => {} }
+				resetAll={ () => {
+					removeAllConnections(
+						metadata,
+						_id,
+						updateBlockAttributes
+					);
+				} }
 				dropdownMenuProps={ dropdownMenuProps }
+				className="components-panel__block-bindings-panel"
 			>
-				{ bindableAttributes.length > 0 && ! allAttributesBinded && (
+				{ bindableAttributes.length > 0 && (
 					<>
 						{ bindableAttributes.map( ( attribute ) => (
 							<ToolsPanelItem
 								key={ attribute }
-								hasValue={ () => false }
+								hasValue={ () =>
+									!! filteredBindings[ attribute ]
+								}
 								label={ attribute }
-								onDeselect={ () => {} }
+								onDeselect={ () => {
+									removeConnection(
+										attribute,
+										metadata,
+										_id,
+										updateBlockAttributes
+									);
+								} }
 							>
-								<DropdownMenu
-									trigger={
-										<Hstack align="center">
-											<FlexItem as="span">
-												{ attribute }
-											</FlexItem>
-											<FlexItem as="span">
-												<Icon icon={ plus } />
-											</FlexItem>
-										</Hstack>
-									}
-									placement="left"
-									gutter={ 20 }
-								>
-									<MenuGroup label={ __( 'Custom Fields' ) }>
-										{ Object.keys( postMeta ).map(
-											( key ) => (
-												<MenuItem
-													key={ key }
-													onClick={ () => {
-														addConnection(
-															key,
-															attribute,
-															metadata,
-															_id,
-															updateBlockAttributes
-														);
-													} }
-													icon={
-														<Icon
-															icon={
-																customPostType
-															}
-															size={ 24 }
-														/>
-													}
-													iconPosition="left"
-													suffix={
-														<Truncate>
-															{ postMeta[ key ] }
-														</Truncate>
-													}
-												>
-													{ key }
-												</MenuItem>
+								{ !! filteredBindings[ attribute ] ? (
+									<MenuItem
+										onClick={ () =>
+											removeConnection(
+												attribute,
+												metadata,
+												_id,
+												updateBlockAttributes
 											)
-										) }
-									</MenuGroup>
-								</DropdownMenu>
+										}
+										suffix={ <Icon icon={ reset } /> }
+										className="components-panel__block-bindings-panel-item"
+									>
+										<Hstack
+											align="center"
+											expanded={ false }
+										>
+											<Text as="span">{ attribute }</Text>
+											<Icon icon={ chevronRightSmall } />
+											<Text
+												as="span"
+												className="components-panel__block-bindings-panel-item-source"
+											>
+												{
+													filteredBindings[
+														attribute
+													].source
+												}
+											</Text>
+										</Hstack>
+									</MenuItem>
+								) : (
+									<DropdownMenu
+										trigger={
+											<Hstack align="center">
+												<Text as="span">
+													{ attribute }
+												</Text>
+												<Icon icon={ plus } />
+											</Hstack>
+										}
+										placement="left"
+										gutter={ 20 }
+									>
+										<MenuGroup
+											label={ __( 'Custom Fields' ) }
+										>
+											{ Object.keys( postMeta ).map(
+												( key ) => (
+													<MenuItem
+														className="components-panel__block-bindings-panel-item"
+														key={ key }
+														onClick={ () => {
+															addConnection(
+																key,
+																attribute,
+																metadata,
+																_id,
+																updateBlockAttributes
+															);
+														} }
+														icon={
+															<Icon
+																icon={
+																	customPostType
+																}
+																size={ 24 }
+															/>
+														}
+														iconPosition="left"
+														suffix={
+															<Truncate>
+																{
+																	postMeta[
+																		key
+																	]
+																}
+															</Truncate>
+														}
+													>
+														{ key }
+													</MenuItem>
+												)
+											) }
+										</MenuGroup>
+									</DropdownMenu>
+								) }
 							</ToolsPanelItem>
 						) ) }
 					</>
