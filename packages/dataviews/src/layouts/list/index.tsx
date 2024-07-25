@@ -33,7 +33,10 @@ import { useRegistry } from '@wordpress/data';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import { ActionsDropdownMenuGroup, ActionModal } from '../../item-actions';
+import {
+	ActionsDropdownMenuGroup,
+	ActionModal,
+} from '../../components/dataviews-item-actions';
 import type { Action, NormalizedField, ViewListProps } from '../../types';
 
 interface ListViewItemProps< Item > {
@@ -182,7 +185,7 @@ function ListItem< Item >( {
 												as="span"
 												className="dataviews-view-list__field-label"
 											>
-												{ field.header }
+												{ field.label }
 											</VisuallyHidden>
 											<span className="dataviews-view-list__field-value">
 												<field.render item={ item } />
@@ -320,7 +323,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 		fields,
 		getItemId,
 		isLoading,
-		onSelectionChange,
+		onChangeSelection,
 		selection,
 		view,
 	} = props;
@@ -345,7 +348,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 	);
 
 	const onSelect = ( item: Item ) =>
-		onSelectionChange( [ getItemId( item ) ] );
+		onChangeSelection( [ getItemId( item ) ] );
 
 	const getItemDomId = useCallback(
 		( item?: Item ) =>
