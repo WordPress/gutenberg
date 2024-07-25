@@ -83,6 +83,11 @@ export default {
 				context?.postType,
 				context?.postId
 			).meta;
+
+		if ( ! metaFields ) {
+			return null;
+		}
+
 		// Remove footnotes from the list of fields
 		delete metaFields.footnotes;
 		return metaFields;

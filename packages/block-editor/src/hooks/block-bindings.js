@@ -216,10 +216,14 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 		( { getFieldsList, label } ) => {
 			if ( getFieldsList ) {
 				// TODO: Filter only the needed context defined in usesContext.
-				fieldsList[ label ] = getFieldsList( {
+				const sourceList = getFieldsList( {
 					registry,
 					context,
 				} );
+				// Only add source if the list is not empty.
+				if ( sourceList ) {
+					fieldsList[ label ] = { ...sourceList };
+				}
 			}
 		}
 	);
