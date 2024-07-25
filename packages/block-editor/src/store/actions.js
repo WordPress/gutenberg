@@ -2162,16 +2162,16 @@ export const registerInserterMediaCategory =
  */
 export const setBlockEditingMode =
 	( clientId = '', mode ) =>
-	( { select } ) => {
+	( { select, dispatch } ) => {
 		if ( select.getBlockEditingMode( clientId ) === mode ) {
 			return;
 		}
 
-		return {
+		dispatch( {
 			type: 'SET_BLOCK_EDITING_MODE',
 			clientId,
 			mode,
-		};
+		} );
 	};
 
 /**
