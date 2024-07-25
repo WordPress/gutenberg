@@ -309,6 +309,7 @@
 			"textColumns": false,
 			"textDecoration": true,
 			"textTransform": true,
+			"textShadow": false,
 			"writingMode": false
 		},
 		"blocks": {
