@@ -6,26 +6,30 @@ import { store as blocksStore } from '@wordpress/blocks';
 import {
 	BaseControl,
 	PanelBody,
-	__experimentalHStack as HStack,
-	__experimentalItemGroup as ItemGroup,
-	__experimentalItem as Item,
-	Modal,
 	MenuGroup,
 	MenuItem,
-	MenuItemsChoice,
-	Icon,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { plus, reset } from '@wordpress/icons';
-import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { canBindAttribute } from '../hooks/use-bindings-attributes';
+import {
+	canBindAttribute,
+	getBindableAttributes,
+} from '../hooks/use-bindings-attributes';
 import { unlock } from '../lock-unlock';
 import InspectorControls from '../components/inspector-controls';
 import { store as blockEditorStore } from '../store';
+
+const {
+	DropdownMenuV2: DropdownMenu,
+	DropdownMenuItemV2: DropdownMenuItem,
+	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
+	DropdownMenuItemHelpTextV2: DropDownMenuItemHelpText,
+} = unlock( componentsPrivateApis );
 
 export const BlockBindingsPanel = ( { name, metadata } ) => {
 	const { bindings } = metadata || {};
@@ -33,14 +37,12 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 		const _sources = unlock(
 			select( blocksStore )
 		).getAllBlockBindingsSources();
-
 		return {
 			sources: _sources,
 		};
 	}, [] );
 
-	const [ connectionModal, setConnectionModal ] = useState( false );
-	const [ metaValues, setMetaValues ] = useState( [] );
+	const bindableAttributes = getBindableAttributes( name );
 
 	// Don't show not allowed attributes.
 	// Don't show the bindings connected to pattern overrides in the inspectors panel.
@@ -66,14 +68,6 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 
 	const { updateBlockAttributes } = useDispatch( 'core/block-editor' );
 
-	// Inside your component
-	const fetchMetas = ( value ) => {
-		// If array contains "core/post-meta" and is array with at least one value.
-		if ( value === 'core/post-meta' ) {
-			setMetaValues( Object.keys( data ) );
-		}
-	};
-
 	const { _id } = useSelect( ( select ) => {
 		const { getSelectedBlockClientId } = select( blockEditorStore );
 
@@ -84,10 +78,6 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 	}, [] );
 
 	const onCloseNewConnection = ( value ) => {
-		// Alert the selected value
-		setConnectionModal( false );
-		setMetaValues( [] );
-
 		// Assuming the block expects a flat structure for its metadata attribute
 		const newMetadata = {
 			...metadata,
@@ -131,56 +121,51 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 					help={ __( 'Attributes connected to various sources.' ) }
 				>
 					<MenuGroup isBordered isSeparated size="large">
-						<MenuItem
-							iconPosition="right"
-							icon={ plus }
-							className="block-editor-link-control__search-item"
-							onClick={ () => setConnectionModal( true ) }
+						{ /* TODO: Hide this input if all metadata attributes are bind */ }
+						<DropdownMenu
+							trigger={
+								<MenuItem
+									iconPosition="right"
+									icon={ plus }
+									className="block-editor-link-control__search-item"
+								>
+									{ __( 'Add new connection' ) }
+								</MenuItem>
+							}
+							placement="left"
+							gutter={ 20 }
 						>
-							{ __( 'Add new connection' ) }
-						</MenuItem>
-						{ connectionModal && (
-							<Modal
-								title={ __( 'Select your source' ) }
-								onRequestClose={ () =>
-									setConnectionModal( false )
-								}
-								className="components-modal__block-bindings-modal"
-							>
-								<MenuGroup>
-									<MenuItemsChoice
-										choices={ Object.keys( sources ).map(
-											( key ) => {
-												return {
-													label: key,
-													value: key,
-												};
+							{ bindableAttributes.map( ( attribute ) => (
+								<DropdownMenu
+									key={ attribute }
+									trigger={
+										<DropdownMenuItem>
+											<DropdownMenuItemLabel>
+												{ attribute }
+											</DropdownMenuItemLabel>
+										</DropdownMenuItem>
+									}
+									placement="left"
+									gutter={ 10 }
+								>
+									{ Object.keys( data ).map( ( key ) => (
+										<DropdownMenuItem
+											key={ key }
+											onClick={ () =>
+												onCloseNewConnection( key )
 											}
-										) }
-										onSelect={ ( key ) => {
-											fetchMetas( key );
-										} }
-									/>
-								</MenuGroup>
-							</Modal>
-						) }
-						{ metaValues && metaValues.length > 0 && (
-							<Modal title={ __( 'Add custom field' ) }>
-								<MenuGroup>
-									<MenuItemsChoice
-										choices={ metaValues.map( ( key ) => {
-											return {
-												label: key,
-												value: key,
-											};
-										} ) }
-										onSelect={ ( key ) => {
-											onCloseNewConnection( key );
-										} }
-									/>
-								</MenuGroup>
-							</Modal>
-						) }
+										>
+											<DropdownMenuItemLabel>
+												{ data[ key ] }
+											</DropdownMenuItemLabel>
+											<DropDownMenuItemHelpText>
+												{ key }
+											</DropDownMenuItemHelpText>
+										</DropdownMenuItem>
+									) ) }
+								</DropdownMenu>
+							) ) }
+						</DropdownMenu>
 						<MenuGroup>
 							{ Object.keys( filteredBindings ).map( ( key ) => {
 								const source = sources[
