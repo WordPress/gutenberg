@@ -47,7 +47,7 @@ function ZoomOutModeInserters() {
 		};
 	}, [] );
 
-	const blockEditorDispatch = useDispatch( blockEditorStore );
+	const { showInsertionPoint } = useDispatch( blockEditorStore );
 
 	// Defer the initial rendering to avoid the jumps due to the animation.
 	useEffect( () => {
@@ -78,8 +78,6 @@ function ZoomOutModeInserters() {
 		const isHovered =
 			hoveredBlockClientId === previousClientId ||
 			hoveredBlockClientId === nextClientId;
-
-		const { showInsertionPoint } = blockEditorDispatch;
 
 		return (
 			<BlockPopoverInbetween
