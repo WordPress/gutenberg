@@ -75,10 +75,10 @@ function BlockBindingsPanelDropdown( {
 							value={ key }
 							checked={ key === currentKey }
 						>
-							<DropdownMenuItemLabel>
+							<DropdownMenuItemLabel numberOfLines={ 1 }>
 								{ key }
 							</DropdownMenuItemLabel>
-							<DropdownMenuItemHelpText>
+							<DropdownMenuItemHelpText numberOfLines={ 1 }>
 								{ value }
 							</DropdownMenuItemHelpText>
 						</DropdownMenuCheckboxItem>
@@ -117,9 +117,14 @@ function BlockBindingsAttribute( {
 			className="block-editor-bindings__popover"
 			trigger={
 				<Item>
-					<DropdownMenuItemLabel>{ attribute }</DropdownMenuItemLabel>
+					<DropdownMenuItemLabel numberOfLines={ 1 }>
+						{ attribute }
+					</DropdownMenuItemLabel>
 					{ !! binding && (
-						<DropdownMenuItemHelpText className="block-editor-bindings__item-explanation">
+						<DropdownMenuItemHelpText
+							numberOfLines={ 1 }
+							className="block-editor-bindings__item-explanation"
+						>
 							{ args?.key || sourceProps?.label || sourceName }
 						</DropdownMenuItemHelpText>
 					) }
