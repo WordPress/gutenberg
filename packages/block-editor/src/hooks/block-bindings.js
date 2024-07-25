@@ -37,7 +37,6 @@ const popoverProps = {
 	placement: 'left-start',
 	offset: 36,
 	shift: true,
-	className: 'block-editor-block-bindings__popover',
 };
 
 const useToolsPanelDropdownMenuProps = () => {
@@ -61,7 +60,7 @@ function BlockBindingsPanelDropdown( {
 	return (
 		<DropdownContentWrapper
 			paddingSize="small"
-			className="block-editor-block-bindings__popover_inner-wrapper"
+			className="block-editor-bindings__popover"
 		>
 			{ Object.entries( fieldsList ).map( ( [ label, fields ] ) => (
 				<MenuGroup
@@ -75,7 +74,7 @@ function BlockBindingsPanelDropdown( {
 							key={ key }
 							onClick={ () => addConnection( key, attribute ) }
 							suffix={
-								<Truncate className="block-editor-block-bindings-panel-item-source">
+								<Truncate className="block-editor-bindings__item-source">
 									{ value }
 								</Truncate>
 							}
@@ -96,11 +95,9 @@ function BlockBindingsAttribute( {
 } ) {
 	return (
 		<MenuItem { ...toggleProps }>
-			<Truncate className="block-editor-block-bindings-panel-item__attribute">
-				{ attribute }
-			</Truncate>
+			<Truncate>{ attribute }</Truncate>
 			{ !! filteredBindings[ attribute ] && (
-				<Truncate className="block-editor-block-bindings-panel-item__source">
+				<Truncate className="block-editor-bindings__item-source">
 					{ filteredBindings[ attribute ].args.key }
 				</Truncate>
 			) }
@@ -221,12 +218,12 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 					removeAllConnections();
 				} }
 				dropdownMenuProps={ dropdownMenuProps }
-				className="block-editor-block-bindings-support-panel"
+				className="block-editor-bindings__panel"
 				hasInnerWrapper
 				__experimentalFirstVisibleItemClass="first"
 				__experimentalLastVisibleItemClass="last"
 			>
-				<div className="block-editor-block-bindings-block-support-panel__inner-wrapper">
+				<div className="block-editor-bindings__panel__inner-wrapper">
 					{ bindableAttributes.map( ( attribute ) => (
 						<ToolsPanelItem
 							key={ attribute }
@@ -235,16 +232,16 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 							onDeselect={ () => {
 								removeConnection( attribute );
 							} }
-							className="block-editor-block-bindings-panel-item"
+							className="block-editor-bindings__item"
 						>
 							<Dropdown
 								popoverProps={ popoverProps }
-								className="block-editor-block-bindings-filters-panel__dropdown"
+								className="block-editor-bindings__dropdown"
 								renderToggle={ ( { onToggle, isOpen } ) => {
 									const toggleProps = {
 										onClick: onToggle,
 										className: clsx(
-											'block-editor-block-bindings-attributes',
+											'block-editor-bindings__attributes',
 											{
 												'is-open': isOpen,
 											}
@@ -272,7 +269,7 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 						</ToolsPanelItem>
 					) ) }
 					{ /* TODO: Add a helper to ToolPanel item */ }
-					<p className="block-editor-block-bindings-styled-help">
+					<p className="block-editor-bindings__helper">
 						{ __( 'Attributes connected to various sources.' ) }
 					</p>
 				</div>

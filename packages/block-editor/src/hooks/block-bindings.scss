@@ -1,11 +1,11 @@
 $popover-width: 360px;
-.block-editor-block-bindings-support-panel {
+.block-editor-bindings__panel {
 	/* Increased specificity required to remove the slot wrapper's row gap */
 	&#{&} {
-		.block-editor-block-bindings-block-support-panel__inner-wrapper {
+		.block-editor-bindings__panel__inner-wrapper {
 			row-gap: 0;
 		}
-		.block-editor-block-bindings-styled-help {
+		.block-editor-bindings__helper {
 			margin-top: $grid-unit-10;
 			margin-bottom: 0;
 			font-size: $helptext-font-size;
@@ -15,10 +15,10 @@ $popover-width: 360px;
 		}
 	}
 
-	.block-editor-block-bindings-panel-item-source {
+	.block-editor-bindings__item-source {
 		color: $gray-700;
 	}
-	button:hover .block-editor-block-bindings-panel-item-source {
+	button:hover .block-editor-bindings__item-source {
 		color: inherit;
 	}
 
@@ -29,7 +29,7 @@ $popover-width: 360px;
 	* must at least render a placeholder which would otherwise interfere
 	* with the `:last-child` styles.
 	*/
-	.block-editor-block-bindings-panel-item {
+	.block-editor-bindings__item {
 		// Border styles.
 		border-left: 1px solid $gray-300;
 		border-right: 1px solid $gray-300;
@@ -53,7 +53,7 @@ $popover-width: 360px;
 			border-radius: inherit;
 		}
 	}
-	.block-editor-block-bindings-filters-panel__dropdown {
+	.block-editor-bindings__dropdown {
 		width: 100%;
 		button {
 			width: 100%;
@@ -62,7 +62,7 @@ $popover-width: 360px;
 			}
 		}
 	}
-	.block-editor-block-bindings-attributes {
+	.block-editor-bindings__attributes {
 		height: 100%;
 		min-height: $grid-unit-50;
 		text-transform: capitalize;
@@ -74,17 +74,18 @@ $popover-width: 360px;
 		}
 		&[aria-expanded="true"],
 		&:hover {
-			.block-editor-block-bindings-panel-item__source {
+			.block-editor-bindings__item-source {
 				color: inherit;
 			}
 		}
-		.block-editor-block-bindings-panel-item__source {
+		.block-editor-bindings__item-source {
 			color: $gray-700;
 			width: 100%;
 			text-align: left;
 		}
 	}
 }
-.block-editor-block-bindings__popover_inner-wrapper {
+.block-editor-bindings__popover {
 	width: $popover-width;
 }
+
