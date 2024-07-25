@@ -61,40 +61,36 @@ function BlockBindingsPanelDropdown( {
 	return (
 		<>
 			{ Object.entries( fieldsList ).map( ( [ label, fields ], i ) => (
-				<>
-					<DropdownMenuGroup key={ label }>
-						{ Object.keys( fieldsList ).length > 1 && (
-							<Text
-								className="block-editor-bindings__source-label"
-								upperCase
-								variant="muted"
-							>
-								{ label }
-							</Text>
-						) }
-						{ Object.entries( fields ).map( ( [ key, value ] ) => (
-							<DropdownMenuRadioItem
-								key={ key }
-								onClick={ () =>
-									addConnection( key, attribute )
-								}
-								name={ attribute + '-binding' }
-								value={ key }
-								checked={ key === currentKey }
-							>
-								<DropdownMenuItemLabel numberOfLines={ 1 }>
-									{ key }
-								</DropdownMenuItemLabel>
-								<DropdownMenuItemHelpText numberOfLines={ 1 }>
-									{ value }
-								</DropdownMenuItemHelpText>
-							</DropdownMenuRadioItem>
-						) ) }
-					</DropdownMenuGroup>
+				<DropdownMenuGroup key={ label }>
+					{ Object.keys( fieldsList ).length > 1 && (
+						<Text
+							className="block-editor-bindings__source-label"
+							upperCase
+							variant="muted"
+						>
+							{ label }
+						</Text>
+					) }
+					{ Object.entries( fields ).map( ( [ key, value ] ) => (
+						<DropdownMenuRadioItem
+							key={ key }
+							onClick={ () => addConnection( key, attribute ) }
+							name={ attribute + '-binding' }
+							value={ key }
+							checked={ key === currentKey }
+						>
+							<DropdownMenuItemLabel numberOfLines={ 1 }>
+								{ key }
+							</DropdownMenuItemLabel>
+							<DropdownMenuItemHelpText numberOfLines={ 1 }>
+								{ value }
+							</DropdownMenuItemHelpText>
+						</DropdownMenuRadioItem>
+					) ) }
 					{ i !== Object.keys( fieldsList ).length - 1 && (
 						<DropdownMenuSeparator />
 					) }
-				</>
+				</DropdownMenuGroup>
 			) ) }
 		</>
 	);
