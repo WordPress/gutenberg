@@ -141,9 +141,6 @@ const BlockBindingsPanel = ( { name, attributes: { metadata } } ) => {
 			delete filteredBindings[ key ];
 		}
 	} );
-	const postMeta = useSelect( ( select ) => {
-		return select( editorStore ).getEditedPostAttribute( 'meta' );
-	}, [] );
 
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
@@ -203,6 +200,12 @@ const BlockBindingsPanel = ( { name, attributes: { metadata } } ) => {
 					: newMetadata,
 		} );
 	};
+	const postMeta = useSelect( ( select ) => {
+		return select( editorStore ).getEditedPostAttribute( 'meta' );
+	}, [] );
+	if ( postMeta === undefined || bindableAttributes.length === 0 ) {
+		return null;
+	}
 
 	return (
 		<InspectorControls>
@@ -218,49 +221,46 @@ const BlockBindingsPanel = ( { name, attributes: { metadata } } ) => {
 				__experimentalLastVisibleItemClass="last"
 			>
 				<div className="block-bindings-block-support-panel__inner-wrapper">
-					{ bindableAttributes.length > 0 &&
-						bindableAttributes.map( ( attribute ) => (
-							<ToolsPanelItem
-								key={ attribute }
-								hasValue={ () =>
-									!! filteredBindings[ attribute ]
-								}
-								label={ attribute }
-								onDeselect={ () => {
-									removeConnection( attribute );
-								} }
-							>
-								<Dropdown
-									popoverProps={ popoverProps }
-									className="block-editor-block-bindings-filters-panel__dropdown"
-									renderToggle={ ( { onToggle, isOpen } ) => {
-										const toggleProps = {
-											onClick: onToggle,
-											className: clsx( {
-												'is-open': isOpen,
-											} ),
-											'aria-expanded': isOpen,
-										};
-										return (
-											<BlockBindingsAttribute
-												toggleProps={ toggleProps }
-												attribute={ attribute }
-												filteredBindings={
-													filteredBindings
-												}
-											/>
-										);
-									} }
-									renderContent={ () => (
-										<BlockBindingsPanelDropdown
-											postMeta={ postMeta }
-											addConnection={ addConnection }
+					{ bindableAttributes.map( ( attribute ) => (
+						<ToolsPanelItem
+							key={ attribute }
+							hasValue={ () => !! filteredBindings[ attribute ] }
+							label={ attribute }
+							onDeselect={ () => {
+								removeConnection( attribute );
+							} }
+						>
+							<Dropdown
+								popoverProps={ popoverProps }
+								className="block-editor-block-bindings-filters-panel__dropdown"
+								renderToggle={ ( { onToggle, isOpen } ) => {
+									const toggleProps = {
+										onClick: onToggle,
+										className: clsx( {
+											'is-open': isOpen,
+										} ),
+										'aria-expanded': isOpen,
+									};
+									return (
+										<BlockBindingsAttribute
+											toggleProps={ toggleProps }
 											attribute={ attribute }
+											filteredBindings={
+												filteredBindings
+											}
 										/>
-									) }
-								/>
-							</ToolsPanelItem>
-						) ) }
+									);
+								} }
+								renderContent={ () => (
+									<BlockBindingsPanelDropdown
+										postMeta={ postMeta }
+										addConnection={ addConnection }
+										attribute={ attribute }
+									/>
+								) }
+							/>
+						</ToolsPanelItem>
+					) ) }
 				</div>
 			</ToolsPanel>
 		</InspectorControls>
