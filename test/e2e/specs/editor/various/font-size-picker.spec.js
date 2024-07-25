@@ -28,6 +28,7 @@ test.describe( 'Font Size Picker', () => {
 				.locator( 'role=button[name="Add default block"i]' )
 				.click();
 			await page.keyboard.type( 'Paragraph to be made "small"' );
+			await page.getByRole( 'tab', { name: 'Styles' } ).click();
 			await page.click(
 				'role=region[name="Editor settings"i] >> role=button[name="Set custom size"i]'
 			);
@@ -51,6 +52,7 @@ test.describe( 'Font Size Picker', () => {
 				.locator( 'role=button[name="Add default block"i]' )
 				.click();
 			await page.keyboard.type( 'Paragraph reset - custom size' );
+			await page.getByRole( 'tab', { name: 'Styles' } ).click();
 			await page.click(
 				'role=region[name="Editor settings"i] >> role=button[name="Set custom size"i]'
 			);
@@ -143,6 +145,7 @@ test.describe( 'Font Size Picker', () => {
 				.locator( 'role=button[name="Add default block"i]' )
 				.click();
 			await page.keyboard.type( 'Paragraph to be made "large"' );
+			await page.getByRole( 'tab', { name: 'Styles' } ).click();
 			await page.click(
 				'role=group[name="Font size"i] >> role=combobox[name="Font size"i]'
 			);
@@ -167,6 +170,7 @@ test.describe( 'Font Size Picker', () => {
 			await page.keyboard.type(
 				'Paragraph with font size reset using tools panel menu'
 			);
+			await page.getByRole( 'tab', { name: 'Styles' } ).click();
 			await page.click(
 				'role=group[name="Font size"i] >> role=combobox[name="Font size"i]'
 			);
@@ -200,6 +204,7 @@ test.describe( 'Font Size Picker', () => {
 			await page.keyboard.type(
 				'Paragraph with font size reset using input field'
 			);
+			await page.getByRole( 'tab', { name: 'Styles' } ).click();
 			await page.click(
 				'role=group[name="Font size"i] >> role=combobox[name="Font size"i]'
 			);
@@ -235,6 +240,7 @@ test.describe( 'Font Size Picker', () => {
 				.locator( 'role=button[name="Add default block"i]' )
 				.click();
 			await page.keyboard.type( 'Paragraph to be made "large"' );
+			await page.getByRole( 'tab', { name: 'Styles' } ).click();
 			await page.click(
 				'role=radiogroup[name="Font size"i] >> role=radio[name="Large"i]'
 			);
@@ -256,6 +262,7 @@ test.describe( 'Font Size Picker', () => {
 			await page.keyboard.type(
 				'Paragraph with font size reset using tools panel menu'
 			);
+			await page.getByRole( 'tab', { name: 'Styles' } ).click();
 			await page.click(
 				'role=radiogroup[name="Font size"i] >> role=radio[name="Small"i]'
 			);
@@ -287,6 +294,7 @@ test.describe( 'Font Size Picker', () => {
 			await page.keyboard.type(
 				'Paragraph with font size reset using input field'
 			);
+			await page.getByRole( 'tab', { name: 'Styles' } ).click();
 			await page.click(
 				'role=radiogroup[name="Font size"i] >> role=radio[name="Small"i]'
 			);

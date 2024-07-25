@@ -17,6 +17,7 @@ test.describe( 'Keep styles on block transforms', () => {
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '## Heading' );
+		await page.getByRole( 'tab', { name: 'Styles' } ).click();
 		await page.click( 'role=button[name="Color Text styles"i]' );
 		await page.click( 'role=option[name="Color: Luminous vivid orange"i]' );
 
@@ -50,6 +51,7 @@ test.describe( 'Keep styles on block transforms', () => {
 		await page.keyboard.type( 'Line 3 to be made large' );
 		await pageUtils.pressKeys( 'shift+ArrowUp' );
 		await pageUtils.pressKeys( 'shift+ArrowUp' );
+		await page.getByRole( 'tab', { name: 'Styles' } ).click();
 		await page.click( 'role=radio[name="Large"i]' );
 		await page.click( 'role=button[name="Multiple blocks selected"i]' );
 		await page.click( 'role=menuitem[name="Heading"i]' );
@@ -79,6 +81,7 @@ test.describe( 'Keep styles on block transforms', () => {
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'Line 1 to be made large' );
+		await page.getByRole( 'tab', { name: 'Styles' } ).click();
 		await page.click( 'role=radio[name="Large"i]' );
 		await editor.showBlockToolbar();
 		await page.click( 'role=button[name="Paragraph"i]' );
