@@ -357,7 +357,13 @@ export function RichTextWrapper(
 	const inputEvents = useRef( new Set() );
 
 	function onFocus() {
-		anchorRef.current?.focus();
+		let element = anchorRef.current;
+
+		while ( element?.parentElement?.isContentEditable ) {
+			element = element.parentElement;
+		}
+
+		element.focus();
 	}
 
 	const registry = useRegistry();
