@@ -182,7 +182,7 @@ function EditableBlockBindingsPanelItems( {
 
 export const BlockBindingsPanel = ( { name, metadata } ) => {
 	const registry = useRegistry();
-	const context = useContext( BlockContext );
+	const blockContext = useContext( BlockContext );
 	const { bindings } = metadata || {};
 
 	const bindableAttributes = getBindableAttributes( name );
@@ -264,9 +264,15 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 	const { getBlockBindingsSources } = unlock( blocksPrivateApis );
 	const registeredSources = getBlockBindingsSources();
 	Object.values( registeredSources ).forEach(
-		( { getFieldsList, label } ) => {
+		( { getFieldsList, label, usesContext } ) => {
 			if ( getFieldsList ) {
-				// TODO: Filter only the needed context defined in usesContext.
+				// Populate context.
+				const context = {};
+				if ( usesContext?.length ) {
+					for ( const key of usesContext ) {
+						context[ key ] = blockContext[ key ];
+					}
+				}
 				const sourceList = getFieldsList( {
 					registry,
 					context,
