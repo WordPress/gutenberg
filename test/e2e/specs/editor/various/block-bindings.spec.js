@@ -1527,6 +1527,10 @@ test.describe( 'Block bindings', () => {
 					.click();
 				await page.getByRole( 'button', { name: 'content' } ).click();
 				await page.keyboard.press( 'Enter' );
+				await page
+					.getByRole( 'menuitemradio' )
+					.filter( { hasText: 'Value of the text_custom_field' } )
+					.click();
 				const paragraphBlock = editor.canvas.getByRole( 'document', {
 					name: 'Block: Paragraph',
 				} );
@@ -2353,7 +2357,7 @@ test.describe( 'Block bindings', () => {
 			} );
 
 			const bindingLabel = page.locator(
-				'.components-item__block-bindings-source'
+				'.block-editor-bindings__item-explanation .components-truncate'
 			);
 			await expect( bindingLabel ).toHaveText( 'Server Source' );
 		} );
