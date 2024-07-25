@@ -129,7 +129,7 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 						</MenuItem>
 						{ connectionModal && (
 							<Modal
-								title={ __( 'Add new connection' ) }
+								title={ __( 'Select your source' ) }
 								onRequestClose={ () =>
 									setConnectionModal( false )
 								}
