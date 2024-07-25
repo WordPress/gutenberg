@@ -29,7 +29,7 @@ import { unlock } from '../../lock-unlock';
 
 const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 
-function Preview( { item } ) {
+function PreviewField( { item } ) {
 	const settings = usePatternSettings();
 	const [ backgroundColor = 'white' ] = useGlobalStyle( 'color.background' );
 	const blocks = useMemo( () => {
@@ -76,13 +76,11 @@ function Preview( { item } ) {
 export const previewField = {
 	label: __( 'Preview' ),
 	id: 'preview',
-	render: ( { item } ) => {
-		return <Preview item={ item } />;
-	},
+	render: PreviewField,
 	enableSorting: false,
 };
 
-function Title( { item } ) {
+function TitleField( { item } ) {
 	const linkProps = {
 		params: {
 			postId: item.id,
@@ -101,7 +99,7 @@ export const titleField = {
 	label: __( 'Template' ),
 	id: 'title',
 	getValue: ( { item } ) => item.title?.rendered,
-	render: ( { item } ) => <Title item={ item } />,
+	render: TitleField,
 	enableHiding: false,
 	enableGlobalSearch: true,
 };
@@ -155,7 +153,5 @@ export const authorField = {
 	label: __( 'Author' ),
 	id: 'author',
 	getValue: ( { item } ) => item.author_text,
-	render: ( { item } ) => {
-		return <AuthorField item={ item } />;
-	},
+	render: AuthorField,
 };
