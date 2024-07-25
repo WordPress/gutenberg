@@ -1,3 +1,8 @@
+/**
+ * WordPress dependencies
+ */
+import { useViewportMatch } from '@wordpress/compose';
+
 type MetaData = {
 	bindings?: Record< string, string >;
 };
@@ -54,3 +59,16 @@ export const removeConnection = (
 			Object.keys( newMetadata ).length === 0 ? undefined : newMetadata,
 	} );
 };
+
+export function useToolsPanelDropdownMenuProps() {
+	const isMobile = useViewportMatch( 'medium', '<' );
+	return ! isMobile
+		? {
+				popoverProps: {
+					placement: 'left-start',
+					// For non-mobile, inner sidebar width (248px) - button width (24px) - border (1px) + padding (16px) + spacing (20px)
+					offset: 259,
+				},
+		  }
+		: {};
+}

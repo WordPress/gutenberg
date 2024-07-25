@@ -7,7 +7,11 @@ import {
 } from './use-bindings-attributes';
 import { unlock } from '../lock-unlock';
 import { store as editorStore } from '../store';
-import { removeConnection, addConnection } from '../bindings/utils';
+import {
+	removeConnection,
+	addConnection,
+	useToolsPanelDropdownMenuProps,
+} from '../bindings/utils';
 
 /**
  * WordPress dependencies
@@ -15,14 +19,24 @@ import { removeConnection, addConnection } from '../bindings/utils';
 import { __ } from '@wordpress/i18n';
 import { store as blocksStore } from '@wordpress/blocks';
 import {
-	BaseControl,
-	PanelBody,
 	MenuGroup,
 	MenuItem,
 	privateApis as componentsPrivateApis,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalHStack as Hstack,
+	__experimentalTruncate as Truncate,
+	FlexItem,
+	Icon,
+	Button,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { plus, reset } from '@wordpress/icons';
+import {
+	chevronRightSmall,
+	customPostType,
+	plus,
+	reset,
+} from '@wordpress/icons';
 import {
 	InspectorControls,
 	store as blockEditorStore,
@@ -30,12 +44,7 @@ import {
 import { addFilter } from '@wordpress/hooks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 
-const {
-	DropdownMenuV2: DropdownMenu,
-	DropdownMenuItemV2: DropdownMenuItem,
-	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
-	DropdownMenuItemHelpTextV2: DropDownMenuItemHelpText,
-} = unlock( componentsPrivateApis );
+const { DropdownMenuV2: DropdownMenu } = unlock( componentsPrivateApis );
 
 const BlockBindingsPanel = ( { name, attributes: { metadata } } ) => {
 	const { bindings } = metadata || {};
@@ -49,6 +58,7 @@ const BlockBindingsPanel = ( { name, attributes: { metadata } } ) => {
 	}, [] );
 
 	const bindableAttributes = getBindableAttributes( name );
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	// Don't show not allowed attributes.
 	// Don't show the bindings connected to pattern overrides in the inspectors panel.
@@ -83,99 +93,74 @@ const BlockBindingsPanel = ( { name, attributes: { metadata } } ) => {
 
 	return (
 		<InspectorControls>
-			<PanelBody
-				title={ __( 'Connections' ) }
-				className="components-panel__block-bindings-panel"
+			<ToolsPanel
+				label={ __( 'Connections' ) }
+				resetAll={ () => {} }
+				dropdownMenuProps={ dropdownMenuProps }
 			>
-				<BaseControl
-					help={ __( 'Attributes connected to various sources.' ) }
-				>
-					<MenuGroup isBordered isSeparated size="large">
-						{ bindableAttributes.length > 0 &&
-							! allAttributesBinded && (
+				{ bindableAttributes.length > 0 && ! allAttributesBinded && (
+					<>
+						{ bindableAttributes.map( ( attribute ) => (
+							<ToolsPanelItem
+								key={ attribute }
+								hasValue={ () => false }
+								label={ attribute }
+								onDeselect={ () => {} }
+							>
 								<DropdownMenu
 									trigger={
-										<MenuItem
-											iconPosition="right"
-											icon={ plus }
-											className="block-editor-link-control__search-item"
-										>
-											{ __( 'Add new connection' ) }
-										</MenuItem>
+										<Hstack align="center">
+											<FlexItem as="span">
+												{ attribute }
+											</FlexItem>
+											<FlexItem as="span">
+												<Icon icon={ plus } />
+											</FlexItem>
+										</Hstack>
 									}
 									placement="left"
 									gutter={ 20 }
 								>
-									{ bindableAttributes.map( ( attribute ) => (
-										<DropdownMenu
-											key={ attribute }
-											trigger={
-												<DropdownMenuItem>
-													<DropdownMenuItemLabel>
-														{ attribute }
-													</DropdownMenuItemLabel>
-												</DropdownMenuItem>
-											}
-											placement="left"
-											gutter={ 10 }
-										>
-											{ Object.keys( postMeta )
-												.filter(
-													( value ) =>
-														value !== 'footnotes'
-												)
-												.map( ( key ) => (
-													<DropdownMenuItem
-														key={ key }
-														onClick={ () => {
-															addConnection(
-																key,
-																attribute,
-																metadata,
-																_id,
-																updateBlockAttributes
-															);
-														} }
-													>
-														<DropdownMenuItemLabel>
+									<MenuGroup label={ __( 'Custom Fields' ) }>
+										{ Object.keys( postMeta ).map(
+											( key ) => (
+												<MenuItem
+													key={ key }
+													onClick={ () => {
+														addConnection(
+															key,
+															attribute,
+															metadata,
+															_id,
+															updateBlockAttributes
+														);
+													} }
+													icon={
+														<Icon
+															icon={
+																customPostType
+															}
+															size={ 24 }
+														/>
+													}
+													iconPosition="left"
+													suffix={
+														<Truncate>
 															{ postMeta[ key ] }
-														</DropdownMenuItemLabel>
-														<DropDownMenuItemHelpText>
-															{ key }
-														</DropDownMenuItemHelpText>
-													</DropdownMenuItem>
-												) ) }
-										</DropdownMenu>
-									) ) }
+														</Truncate>
+													}
+												>
+													{ key }
+												</MenuItem>
+											)
+										) }
+									</MenuGroup>
 								</DropdownMenu>
-							) }
-						{ Object.keys( filteredBindings ).map( ( key ) => {
-							const source = sources[
-								filteredBindings[ key ].source
-							]
-								? sources[ filteredBindings[ key ].source ]
-										.label
-								: filteredBindings[ key ].source;
-							return (
-								<MenuItem
-									key={ key }
-									onClick={ () =>
-										removeConnection(
-											key,
-											metadata,
-											_id,
-											updateBlockAttributes
-										)
-									}
-									icon={ reset }
-								>
-									{ key } - { source }
-								</MenuItem>
-							);
-						} ) }
-					</MenuGroup>
-				</BaseControl>
-			</PanelBody>
+							</ToolsPanelItem>
+						) ) }
+					</>
+				) }
+			</ToolsPanel>
 		</InspectorControls>
 	);
 };
