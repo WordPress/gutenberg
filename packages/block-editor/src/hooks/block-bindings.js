@@ -7,7 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { store as blocksStore } from '@wordpress/blocks';
+import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
@@ -129,15 +129,11 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
-	const { _id, registeredSources } = useSelect( ( select ) => {
+	const { _id } = useSelect( ( select ) => {
 		const { getSelectedBlockClientId } = select( blockEditorStore );
 
-		const selectedBlockClientId = getSelectedBlockClientId();
 		return {
-			_id: selectedBlockClientId,
-			registeredSources: unlock(
-				select( blocksStore )
-			).getAllBlockBindingsSources(),
+			_id: getSelectedBlockClientId(),
 		};
 	}, [] );
 
@@ -194,6 +190,8 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 	};
 
 	const fieldsList = {};
+	const { getBlockBindingsSources } = unlock( blocksPrivateApis );
+	const registeredSources = getBlockBindingsSources();
 	Object.values( registeredSources ).forEach(
 		( { getFieldsList, label } ) => {
 			if ( getFieldsList ) {
