@@ -124,7 +124,6 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 					help={ __( 'Attributes connected to various sources.' ) }
 				>
 					<MenuGroup isBordered isSeparated size="large">
-						{ /* TODO: Hide this input if all metadata attributes are bind */ }
 						{ bindableAttributes.length > 0 &&
 							! allAttributesBinded && (
 								<DropdownMenu
