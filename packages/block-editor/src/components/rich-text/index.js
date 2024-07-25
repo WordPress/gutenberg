@@ -359,7 +359,11 @@ export function RichTextWrapper(
 	function onFocus() {
 		let element = anchorRef.current;
 
-		while ( element?.parentElement?.isContentEditable ) {
+		if ( ! element ) {
+			return;
+		}
+
+		while ( element.parentElement?.isContentEditable ) {
 			element = element.parentElement;
 		}
 
