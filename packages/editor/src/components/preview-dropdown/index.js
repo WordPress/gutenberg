@@ -78,18 +78,21 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 						<MenuItem
 							onClick={ () => setDeviceType( 'Desktop' ) }
 							icon={ deviceType === 'Desktop' && check }
+							aria-label={ __( 'Desktop View' ) }
 						>
 							{ __( 'Desktop' ) }
 						</MenuItem>
 						<MenuItem
 							onClick={ () => setDeviceType( 'Tablet' ) }
 							icon={ deviceType === 'Tablet' && check }
+							aria-label={ __( 'Tablet View' ) }
 						>
 							{ __( 'Tablet' ) }
 						</MenuItem>
 						<MenuItem
 							onClick={ () => setDeviceType( 'Mobile' ) }
 							icon={ deviceType === 'Mobile' && check }
+							aria-label={ __( 'Mobile View' ) }
 						>
 							{ __( 'Mobile' ) }
 						</MenuItem>
@@ -118,6 +121,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 								className="editor-preview-dropdown__button-external"
 								role="menuitem"
 								forceIsAutosaveable={ forceIsAutosaveable }
+								aria-label={ __( 'Preview in new tab' ) }
 								textContent={
 									<>
 										{ __( 'Preview in new tab' ) }
