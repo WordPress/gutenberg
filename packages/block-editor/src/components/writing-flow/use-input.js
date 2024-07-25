@@ -16,6 +16,7 @@ import {
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { getSelectionRoot } from './utils';
 
 /**
  * Handles input for selections across blocks.
@@ -59,6 +60,23 @@ export default function useInput() {
 			}
 
 			if ( ! hasMultiSelection() ) {
+				const { ownerDocument } = node;
+				if ( node === ownerDocument.activeElement ) {
+					if ( event.key === 'End' || event.key === 'Home' ) {
+						const selectionRoot = getSelectionRoot( ownerDocument );
+						const selection =
+							ownerDocument.defaultView.getSelection();
+						selection.selectAllChildren( selectionRoot );
+						const method =
+							event.key === 'End'
+								? 'collapseToEnd'
+								: 'collapseToStart';
+						selection[ method ]();
+						event.preventDefault();
+						return;
+					}
+				}
+
 				if ( event.keyCode === ENTER ) {
 					if ( event.shiftKey || __unstableIsFullySelected() ) {
 						return;
