@@ -98,8 +98,12 @@ function getRichTextElement( node ) {
 export default function useSelectionObserver() {
 	const { multiSelect, selectBlock, selectionChange } =
 		useDispatch( blockEditorStore );
-	const { getBlockParents, getBlockSelectionStart, isMultiSelecting } =
-		useSelect( blockEditorStore );
+	const {
+		getBlockParents,
+		getBlockSelectionStart,
+		isMultiSelecting,
+		getSelectedBlockClientId,
+	} = useSelect( blockEditorStore );
 	return useRefEffect(
 		( node ) => {
 			const { ownerDocument } = node;
@@ -190,7 +194,9 @@ export default function useSelectionObserver() {
 				const isSingularSelection = startClientId === endClientId;
 				if ( isSingularSelection ) {
 					if ( ! isMultiSelecting() ) {
-						selectBlock( startClientId );
+						if ( getSelectedBlockClientId() !== startClientId ) {
+							selectBlock( startClientId );
+						}
 					} else {
 						multiSelect( startClientId, startClientId );
 					}
