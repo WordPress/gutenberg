@@ -55,7 +55,7 @@ function DimensionInput( { label, onChange, isResizing, value = '' } ) {
 
 	return (
 		<>
-			{ ( spacingSizes || spacingSizes?.length === 0 ) && (
+			{ ( ! spacingSizes || spacingSizes?.length === 0 ) && (
 				<UnitControl
 					id={ inputId }
 					isResetValueOnUnitChange
