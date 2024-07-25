@@ -317,8 +317,7 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 						/>
 					) }
 				</ItemGroup>
-				{ /* TODO: Add a helper to ToolPanel item */ }
-				<Text variant="muted" className="block-editor-bindings__helper">
+				<Text variant="muted">
 					{ __( 'Attributes connected to various sources.' ) }
 				</Text>
 			</ToolsPanel>
