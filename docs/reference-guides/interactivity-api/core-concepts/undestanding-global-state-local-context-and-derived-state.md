@@ -28,9 +28,9 @@ Let's now dive into each of these concepts to study them in more detail and prov
     ```php
     // Populates the initial global state values.
     wp_interactivity_state( 'myPlugin', array(
-     'counter' => 0,
-     'shown' => false,
-     'highlighted' => true,
+      'counter' => 0,
+      'shown' => false,
+      'highlighted' => true,
     ));
     ```
 
@@ -122,7 +122,7 @@ Let's now dive into each of these concepts to study them in more detail and prov
 
     ```php
     wp_interactivity_state( 'myPlugin', array(
-     'someValue' => 1,
+      'someValue' => 1,
     ));
     ```
 
@@ -266,7 +266,7 @@ Local context is particularly useful when you need independent state for individ
     ?>
 
     <div <?php echo wp_interactivity_data_wp_context( $context ); ?>>
-    	<!-- Child elements will have access to `context.counter` -->
+      <!-- Child elements will have access to `context.counter` -->
     </div>
     ```
 
@@ -409,8 +409,8 @@ In essence, derived state allows you to express relationships between different 
     ```php
     // Populates both the initial global and derived state values.
     wp_interactivity_state( 'myPlugin', array(
-     'counter' => 1, // This is global state.
-     'double' => 2, // This is derived state.
+      'counter' => 1, // This is global state.
+      'double' => 2, // This is derived state.
     ));
     ```
 
@@ -424,7 +424,7 @@ In essence, derived state allows you to express relationships between different 
       'counter' => 1 // This is local context.
     );
     wp_interactivity_state( 'myPlugin', array(
-     'double' => 2, // This is derived state.
+      'double' => 2, // This is derived state.
     ));
     ?>
 
@@ -475,9 +475,9 @@ In essence, derived state allows you to express relationships between different 
       'list'    => array( 1, 2, 3 ),
       'factor'  => 3,
       'product' => function() {
-         $state   = wp_interactivity_state();
-         $context = wp_interactivity_get_context();
-         return $context['item'] * $state['factor'];
+        $state   = wp_interactivity_state();
+        $context = wp_interactivity_get_context();
+        return $context['item'] * $state['factor'];
       }
     ));
     ?>
