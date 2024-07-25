@@ -406,7 +406,7 @@ describe( 'Tabs', () => {
 		it( 'should not move tab selection when pressing the up/down arrow keys, unless the orientation is changed to `vertical`', async () => {
 			const mockOnSelect = jest.fn();
 
-			await render(
+			const { rerender } = await render(
 				<UncontrolledTabs tabs={ TABS } onSelect={ mockOnSelect } />
 			);
 
@@ -438,9 +438,7 @@ describe( 'Tabs', () => {
 
 			// Change orientation to `vertical`. When the orientation is vertical,
 			// left/right arrow keys are replaced by up/down arrow keys.
-			// TODO: waiting on re-render support from Ariakit
-			// see: https://github.com/ariakit/ariakit/issues/3939#issuecomment-2251231903
-			await render(
+			await rerender(
 				<UncontrolledTabs
 					tabs={ TABS }
 					onSelect={ mockOnSelect }
@@ -649,12 +647,12 @@ describe( 'Tabs', () => {
 				).toBeInTheDocument();
 			} );
 			it( 'should fall back to first enabled tab if the active tab is removed', async () => {
-				await render( <UncontrolledTabs tabs={ TABS } /> );
+				const { rerender } = await render(
+					<UncontrolledTabs tabs={ TABS } />
+				);
 
 				// Remove first item from `TABS` array
-				// TODO: waiting on re-render support from Ariakit
-				// see: https://github.com/ariakit/ariakit/issues/3939#issuecomment-2251231903
-				await render( <UncontrolledTabs tabs={ TABS.slice( 1 ) } /> );
+				await rerender( <UncontrolledTabs tabs={ TABS.slice( 1 ) } /> );
 				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 			} );
 			it( 'should not load any tab if the active tab is removed and there are no enabled tabs', async () => {
@@ -670,15 +668,13 @@ describe( 'Tabs', () => {
 						: tabObj
 				);
 
-				await render(
+				const { rerender } = await render(
 					<UncontrolledTabs tabs={ TABS_WITH_BETA_GAMMA_DISABLED } />
 				);
 				expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
 
 				// Remove alpha
-				// TODO: waiting on re-render support from Ariakit
-				// see: https://github.com/ariakit/ariakit/issues/3939#issuecomment-2251231903
-				await render(
+				await rerender(
 					<UncontrolledTabs
 						tabs={ TABS_WITH_BETA_GAMMA_DISABLED.slice( 1 ) }
 					/>
@@ -726,13 +722,11 @@ describe( 'Tabs', () => {
 				).not.toBeInTheDocument();
 			} );
 			it( 'should not change tabs when defaultTabId is changed', async () => {
-				await render(
+				const { rerender } = await render(
 					<UncontrolledTabs tabs={ TABS } defaultTabId="beta" />
 				);
 
-				// TODO: waiting on re-render support from Ariakit
-				// see: https://github.com/ariakit/ariakit/issues/3939#issuecomment-2251231903
-				await render(
+				await rerender(
 					<UncontrolledTabs tabs={ TABS } defaultTabId="alpha" />
 				);
 
@@ -742,7 +736,7 @@ describe( 'Tabs', () => {
 			it( 'should fall back to the tab associated to `defaultTabId` if the currently active tab is removed', async () => {
 				const mockOnSelect = jest.fn();
 
-				await render(
+				const { rerender } = await render(
 					<UncontrolledTabs
 						tabs={ TABS }
 						defaultTabId="gamma"
@@ -756,9 +750,7 @@ describe( 'Tabs', () => {
 				expect( await getSelectedTab() ).toHaveTextContent( 'Alpha' );
 				expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 
-				// TODO: waiting on re-render support from Ariakit
-				// see: https://github.com/ariakit/ariakit/issues/3939#issuecomment-2251231903
-				await render(
+				await rerender(
 					<UncontrolledTabs
 						tabs={ TABS.slice( 1 ) }
 						defaultTabId="gamma"
@@ -772,7 +764,7 @@ describe( 'Tabs', () => {
 			it( 'should fall back to the tab associated to `defaultTabId` if the currently active tab becomes disabled', async () => {
 				const mockOnSelect = jest.fn();
 
-				await render(
+				const { rerender } = await render(
 					<UncontrolledTabs
 						tabs={ TABS }
 						defaultTabId="gamma"
@@ -798,9 +790,7 @@ describe( 'Tabs', () => {
 						: tabObj
 				);
 
-				// TODO: waiting on re-render support from Ariakit
-				// see: https://github.com/ariakit/ariakit/issues/3939#issuecomment-2251231903
-				await render(
+				await rerender(
 					<UncontrolledTabs
 						tabs={ TABS_WITH_ALPHA_DISABLED }
 						defaultTabId="gamma"
@@ -811,17 +801,27 @@ describe( 'Tabs', () => {
 				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
 			} );
 
+			function UI() {
+				return null;
+			}
+
+			function NewUI() {
+				return null;
+			}
+
 			it( 'should have no active tabs when the tab associated to `defaultTabId` is removed while being the active tab', async () => {
-				await render(
-					<UncontrolledTabs tabs={ TABS } defaultTabId="gamma" />
-				);
+				// asd
+
+				const { rerender } = await render( <UI /> );
+
+				// later on...
+
+				await rerender( <NewUI /> );
 
 				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
 
 				// Remove gamma
-				// TODO: waiting on re-render support from Ariakit
-				// see: https://github.com/ariakit/ariakit/issues/3939#issuecomment-2251231903
-				await render(
+				await rerender(
 					<UncontrolledTabs
 						tabs={ TABS.slice( 0, 2 ) }
 						defaultTabId="gamma"
@@ -840,7 +840,7 @@ describe( 'Tabs', () => {
 			} );
 
 			it( 'waits for the tab with the `defaultTabId` to be present in the `tabs` array before selecting it', async () => {
-				await render(
+				const { rerender } = await render(
 					<UncontrolledTabs tabs={ TABS } defaultTabId="delta" />
 				);
 
@@ -849,9 +849,7 @@ describe( 'Tabs', () => {
 					screen.queryByRole( 'tab', { selected: true } )
 				).not.toBeInTheDocument();
 
-				// TODO: waiting on re-render support from Ariakit
-				// see: https://github.com/ariakit/ariakit/issues/3939#issuecomment-2251231903
-				await render(
+				await rerender(
 					<UncontrolledTabs
 						tabs={ TABS_WITH_DELTA }
 						defaultTabId="delta"
@@ -928,7 +926,7 @@ describe( 'Tabs', () => {
 						: tabObj
 				);
 
-				await render(
+				const { rerender } = await render(
 					<UncontrolledTabs tabs={ TABS_WITH_ALPHA_DISABLED } />
 				);
 
@@ -937,9 +935,7 @@ describe( 'Tabs', () => {
 				expect( await getSelectedTab() ).toHaveTextContent( 'Beta' );
 
 				// Re-enable all tabs
-				// TODO: waiting on re-render support from Ariakit
-				// see: https://github.com/ariakit/ariakit/issues/3939#issuecomment-2251231903
-				await render( <UncontrolledTabs tabs={ TABS } /> );
+				await rerender( <UncontrolledTabs tabs={ TABS } /> );
 
 				// Even if the initial tab becomes enabled again, the selected
 				// tab doesn't change.
@@ -958,7 +954,7 @@ describe( 'Tabs', () => {
 						  }
 						: tabObj
 				);
-				await render(
+				const { rerender } = await render(
 					<UncontrolledTabs
 						tabs={ TABS_ONLY_GAMMA_ENABLED }
 						defaultTabId="beta"
@@ -970,9 +966,7 @@ describe( 'Tabs', () => {
 				expect( await getSelectedTab() ).toHaveTextContent( 'Gamma' );
 
 				// Re-enable all tabs
-				// TODO: waiting on re-render support from Ariakit
-				// see: https://github.com/ariakit/ariakit/issues/3939#issuecomment-2251231903
-				await render(
+				await rerender(
 					<UncontrolledTabs tabs={ TABS } defaultTabId="beta" />
 				);
 
@@ -983,7 +977,7 @@ describe( 'Tabs', () => {
 
 			it( 'should select the first enabled tab when the selected tab becomes disabled', async () => {
 				const mockOnSelect = jest.fn();
-				await render(
+				const { rerender } = await render(
 					<UncontrolledTabs tabs={ TABS } onSelect={ mockOnSelect } />
 				);
 
@@ -1004,9 +998,7 @@ describe( 'Tabs', () => {
 				);
 
 				// Disable alpha
-				// TODO: waiting on re-render support from Ariakit
-				// see: https://github.com/ariakit/ariakit/issues/3939#issuecomment-2251231903
-				await render(
+				await rerender(
 					<UncontrolledTabs
 						tabs={ TABS_WITH_ALPHA_DISABLED }
 						onSelect={ mockOnSelect }
@@ -1018,9 +1010,7 @@ describe( 'Tabs', () => {
 				expect( mockOnSelect ).toHaveBeenLastCalledWith( 'beta' );
 
 				// Re-enable all tabs
-				// TODO: waiting on re-render support from Ariakit
-				// see: https://github.com/ariakit/ariakit/issues/3939#issuecomment-2251231903
-				await render(
+				await rerender(
 					<UncontrolledTabs tabs={ TABS } onSelect={ mockOnSelect } />
 				);
 
@@ -1032,7 +1022,7 @@ describe( 'Tabs', () => {
 			it( 'should select the first enabled tab when the tab associated to `defaultTabId` becomes disabled while being the active tab', async () => {
 				const mockOnSelect = jest.fn();
 
-				await render(
+				const { rerender } = await render(
 					<UncontrolledTabs
 						tabs={ TABS }
 						onSelect={ mockOnSelect }
@@ -1055,9 +1045,7 @@ describe( 'Tabs', () => {
 				);
 
 				// Disable gamma
-				// TODO: waiting on re-render support from Ariakit
-				// see: https://github.com/ariakit/ariakit/issues/3939#issuecomment-2251231903
-				await render(
+				await rerender(
 					<UncontrolledTabs
 						tabs={ TABS_WITH_GAMMA_DISABLED }
 						onSelect={ mockOnSelect }
@@ -1070,9 +1058,7 @@ describe( 'Tabs', () => {
 				expect( mockOnSelect ).toHaveBeenLastCalledWith( 'alpha' );
 
 				// Re-enable all tabs
-				// TODO: waiting on re-render support from Ariakit
-				// see: https://github.com/ariakit/ariakit/issues/3939#issuecomment-2251231903
-				await render(
+				await rerender(
 					<UncontrolledTabs
 						tabs={ TABS }
 						onSelect={ mockOnSelect }
@@ -1126,14 +1112,12 @@ describe( 'Tabs', () => {
 			expect( screen.queryByRole( 'tabpanel' ) ).not.toBeInTheDocument();
 		} );
 		it( 'should not render any tab if the active tab is removed', async () => {
-			await render(
+			const { rerender } = await render(
 				<ControlledTabs tabs={ TABS } selectedTabId="beta" />
 			);
 
 			// Remove beta
-			// TODO: waiting on re-render support from Ariakit
-			// see: https://github.com/ariakit/ariakit/issues/3939#issuecomment-2251231903
-			await render(
+			await rerender(
 				<ControlledTabs
 					tabs={ TABS.filter( ( tab ) => tab.tabId !== 'beta' ) }
 					selectedTabId="beta"
@@ -1154,9 +1138,7 @@ describe( 'Tabs', () => {
 			expect( screen.queryByRole( 'tabpanel' ) ).not.toBeInTheDocument();
 
 			// Restore beta
-			// TODO: waiting on re-render support from Ariakit
-			// see: https://github.com/ariakit/ariakit/issues/3939#issuecomment-2251231903
-			await render(
+			await rerender(
 				<ControlledTabs tabs={ TABS } selectedTabId="beta" />
 			);
 
@@ -1203,7 +1185,7 @@ describe( 'Tabs', () => {
 				).not.toBeInTheDocument();
 			} );
 			it( 'should not render any tab when the selected tab becomes disabled', async () => {
-				await render(
+				const { rerender } = await render(
 					<ControlledTabs tabs={ TABS } selectedTabId="beta" />
 				);
 
@@ -1221,9 +1203,7 @@ describe( 'Tabs', () => {
 						: tabObj
 				);
 
-				// TODO: waiting on re-render support from Ariakit
-				// see: https://github.com/ariakit/ariakit/issues/3939#issuecomment-2251231903
-				await render(
+				await rerender(
 					<ControlledTabs
 						tabs={ TABS_WITH_BETA_DISABLED }
 						selectedTabId="beta"
@@ -1243,9 +1223,7 @@ describe( 'Tabs', () => {
 				).not.toBeInTheDocument();
 
 				// re-enable all tabs
-				// TODO: waiting on re-render support from Ariakit
-				// see: https://github.com/ariakit/ariakit/issues/3939#issuecomment-2251231903
-				await render(
+				await rerender(
 					<ControlledTabs tabs={ TABS } selectedTabId="beta" />
 				);
 
@@ -1265,7 +1243,7 @@ describe( 'Tabs', () => {
 				'and `selectOnMove` is %s',
 				( selectOnMove ) => {
 					it( 'should continue to handle arrow key navigation properly', async () => {
-						await render(
+						const { rerender } = await render(
 							<ControlledTabs
 								tabs={ TABS }
 								selectedTabId="beta"
@@ -1288,9 +1266,7 @@ describe( 'Tabs', () => {
 						);
 						expect( await getSelectedTab() ).toHaveFocus();
 
-						// TODO: waiting on re-render support from Ariakit
-						// see: https://github.com/ariakit/ariakit/issues/3939#issuecomment-2251231903
-						await render(
+						await rerender(
 							<ControlledTabs
 								tabs={ TABS }
 								selectedTabId="gamma"
@@ -1316,7 +1292,7 @@ describe( 'Tabs', () => {
 					} );
 
 					it( 'should focus the correct tab when tabbing out and back into the tablist', async () => {
-						await render(
+						const { rerender } = await render(
 							<>
 								<button>Focus me</button>
 								<ControlledTabs
@@ -1337,9 +1313,7 @@ describe( 'Tabs', () => {
 						);
 						expect( await getSelectedTab() ).toHaveFocus();
 
-						// TODO: waiting on re-render support from Ariakit
-						// see: https://github.com/ariakit/ariakit/issues/3939#issuecomment-2251231903
-						await render(
+						await rerender(
 							<>
 								<button>Focus me</button>
 								<ControlledTabs
