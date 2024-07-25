@@ -62,6 +62,70 @@ const useToolsPanelDropdownMenuProps = () => {
 		: {};
 };
 
+function BlockBindingsPanelDropdown( { postMeta, addConnection, attribute } ) {
+	return (
+		<DropdownContentWrapper paddingSize="small">
+			<MenuGroup label={ __( 'Custom Fields' ) }>
+				{ Object.entries( postMeta )
+					.filter( ( [ key ] ) => key !== 'footnotes' )
+					.map( ( [ key, value ] ) => (
+						<MenuItem
+							className="components-panel__block-bindings-panel-item"
+							key={ key }
+							onClick={ () => addConnection( key, attribute ) }
+							icon={ <Icon icon={ customPostType } /> }
+							iconPosition="left"
+							suffix={
+								<Truncate
+									numberOfLines={ 1 }
+									ellipsis="…"
+									className="components-panel__block-bindings-panel-item-source"
+								>
+									{ value }
+								</Truncate>
+							}
+						>
+							<Truncate numberOfLines={ 1 } ellipsis="…">
+								{ key }
+							</Truncate>
+						</MenuItem>
+					) ) }
+			</MenuGroup>
+		</DropdownContentWrapper>
+	);
+}
+
+function BlockBindingsAttribute( {
+	toggleProps,
+	attribute,
+	filteredBindings,
+} ) {
+	return (
+		<ItemGroup>
+			<Button { ...toggleProps }>
+				<Hstack align="center" justify="flex-start" expanded={ false }>
+					<Icon icon={ customPostType } />
+					<Truncate numberOfLines={ 1 } ellipsis="…">
+						{ attribute }
+					</Truncate>
+					{ !! filteredBindings[ attribute ] && (
+						<>
+							<Icon icon={ chevronRightSmall } />
+							<Truncate
+								numberOfLines={ 1 }
+								ellipsis="…"
+								className="components-panel__block-bindings-panel-item-source"
+							>
+								{ filteredBindings[ attribute ]?.args?.key }
+							</Truncate>
+						</>
+					) }
+				</Hstack>
+			</Button>
+		</ItemGroup>
+	);
+}
+
 const BlockBindingsPanel = ( { name, attributes: { metadata } } ) => {
 	const { bindings } = metadata || {};
 
@@ -154,151 +218,49 @@ const BlockBindingsPanel = ( { name, attributes: { metadata } } ) => {
 				__experimentalLastVisibleItemClass="last"
 			>
 				<div className="block-bindings-block-support-panel__inner-wrapper">
-					{ bindableAttributes.length > 0 && (
-						<>
-							{ bindableAttributes.map( ( attribute ) => (
-								<ToolsPanelItem
-									key={ attribute }
-									hasValue={ () =>
-										!! filteredBindings[ attribute ]
-									}
-									label={ attribute }
-									onDeselect={ () => {
-										removeConnection( attribute );
+					{ bindableAttributes.length > 0 &&
+						bindableAttributes.map( ( attribute ) => (
+							<ToolsPanelItem
+								key={ attribute }
+								hasValue={ () =>
+									!! filteredBindings[ attribute ]
+								}
+								label={ attribute }
+								onDeselect={ () => {
+									removeConnection( attribute );
+								} }
+							>
+								<Dropdown
+									popoverProps={ popoverProps }
+									className="block-editor-block-bindings-filters-panel__dropdown"
+									renderToggle={ ( { onToggle, isOpen } ) => {
+										const toggleProps = {
+											onClick: onToggle,
+											className: clsx( {
+												'is-open': isOpen,
+											} ),
+											'aria-expanded': isOpen,
+										};
+										return (
+											<BlockBindingsAttribute
+												toggleProps={ toggleProps }
+												attribute={ attribute }
+												filteredBindings={
+													filteredBindings
+												}
+											/>
+										);
 									} }
-								>
-									<Dropdown
-										popoverProps={ popoverProps }
-										className="block-editor-block-bindings-filters-panel__dropdown"
-										renderToggle={ ( {
-											onToggle,
-											isOpen,
-										} ) => {
-											const toggleProps = {
-												onClick: onToggle,
-												className: clsx( {
-													'is-open': isOpen,
-												} ),
-												'aria-expanded': isOpen,
-											};
-
-											return (
-												<ItemGroup>
-													<Button { ...toggleProps }>
-														<Hstack
-															align="center"
-															justify="flex-start"
-															expanded={ false }
-														>
-															<Icon
-																icon={
-																	customPostType
-																}
-															/>
-															<Truncate
-																numberOfLines={
-																	1
-																}
-																ellipsis="…"
-															>
-																{ attribute }
-															</Truncate>
-															{ !! filteredBindings[
-																attribute
-															] && (
-																<>
-																	<Icon
-																		icon={
-																			chevronRightSmall
-																		}
-																	/>
-																	<Truncate
-																		numberOfLines={
-																			1
-																		}
-																		ellipsis="…"
-																		className="components-panel__block-bindings-panel-item-source"
-																	>
-																		{
-																			filteredBindings[
-																				attribute
-																			]
-																				?.args
-																				?.key
-																		}
-																	</Truncate>
-																</>
-															) }
-														</Hstack>
-													</Button>
-												</ItemGroup>
-											);
-										} }
-										renderContent={ () => (
-											<DropdownContentWrapper paddingSize="small">
-												<MenuGroup
-													label={ __(
-														'Custom Fields'
-													) }
-												>
-													{ Object.keys( postMeta )
-														.filter(
-															( key ) =>
-																key !==
-																'footnotes'
-														)
-														.map( ( key ) => (
-															<MenuItem
-																className="components-panel__block-bindings-panel-item"
-																key={ key }
-																onClick={ () => {
-																	addConnection(
-																		key,
-																		attribute
-																	);
-																} }
-																icon={
-																	<Icon
-																		icon={
-																			customPostType
-																		}
-																	/>
-																}
-																iconPosition="left"
-																suffix={
-																	<Truncate
-																		numberOfLines={
-																			1
-																		}
-																		ellipsis="…"
-																		className="components-panel__block-bindings-panel-item-source"
-																	>
-																		{
-																			postMeta[
-																				key
-																			]
-																		}
-																	</Truncate>
-																}
-															>
-																<Truncate
-																	numberOfLines={
-																		1
-																	}
-																	ellipsis="…"
-																>
-																	{ key }
-																</Truncate>
-															</MenuItem>
-														) ) }
-												</MenuGroup>
-											</DropdownContentWrapper>
-										) }
-									/>
-								</ToolsPanelItem>
-							) ) }
-						</>
-					) }
+									renderContent={ () => (
+										<BlockBindingsPanelDropdown
+											postMeta={ postMeta }
+											addConnection={ addConnection }
+											attribute={ attribute }
+										/>
+									) }
+								/>
+							</ToolsPanelItem>
+						) ) }
 				</div>
 			</ToolsPanel>
 		</InspectorControls>
