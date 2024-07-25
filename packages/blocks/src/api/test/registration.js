@@ -1663,7 +1663,7 @@ describe( 'blocks', () => {
 				label: 'testing',
 				getFieldsList: 'should be a function',
 			} );
-			expect( console ).toHaveErroredWith(
+			expect( console ).toHaveWarnedWith(
 				'Block bindings source getFieldsList must be a function.'
 			);
 			expect( getBlockBindingsSource( 'core/testing' ) ).toBeUndefined();

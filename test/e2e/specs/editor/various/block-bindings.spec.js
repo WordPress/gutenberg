@@ -1408,6 +1408,42 @@ test.describe( 'Block bindings', () => {
 				} );
 				await expect( contentAttribute ).toBeVisible();
 			} );
+			test( 'should use a selector to update the content', async ( {
+				editor,
+				page,
+			} ) => {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						content: 'fallback value',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/post-meta',
+									args: { key: 'undefined_field' },
+								},
+							},
+						},
+					},
+				} );
+				await page
+					.getByRole( 'tabpanel', {
+						name: 'Settings',
+					} )
+					.getByRole( 'button', { name: 'content' } )
+					.click();
+
+				await page
+					.getByRole( 'menuitemradio' )
+					.filter( { hasText: 'text_custom_field' } )
+					.click();
+				const paragraphBlock = editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} );
+				await expect( paragraphBlock ).toHaveText(
+					'Value of the text_custom_field'
+				);
+			} );
 		} );
 
 		test.describe( 'Heading', () => {
@@ -1494,7 +1530,7 @@ test.describe( 'Block bindings', () => {
 				page,
 			} ) => {
 				await editor.insertBlock( {
-					name: 'core/paragraph',
+					name: 'core/heading',
 				} );
 				await page
 					.getByRole( 'tabpanel', {
@@ -1506,37 +1542,6 @@ test.describe( 'Block bindings', () => {
 					name: 'Show content',
 				} );
 				await expect( contentAttribute ).toBeVisible();
-			} );
-			test( 'should use a selector to update the content', async ( {
-				editor,
-				page,
-			} ) => {
-				await editor.insertBlock( {
-					name: 'core/paragraph',
-				} );
-				await page
-					.getByRole( 'tabpanel', {
-						name: 'Settings',
-					} )
-					.getByLabel( 'Attributes options' )
-					.click();
-				await page
-					.getByRole( 'menuitemcheckbox', {
-						name: 'Show content',
-					} )
-					.click();
-				await page.getByRole( 'button', { name: 'content' } ).click();
-				await page.keyboard.press( 'Enter' );
-				await page
-					.getByRole( 'menuitemradio' )
-					.filter( { hasText: 'Value of the text_custom_field' } )
-					.click();
-				const paragraphBlock = editor.canvas.getByRole( 'document', {
-					name: 'Block: Paragraph',
-				} );
-				await expect( paragraphBlock ).toHaveText(
-					'Value of the text_custom_field'
-				);
 			} );
 		} );
 
@@ -1724,19 +1729,6 @@ test.describe( 'Block bindings', () => {
 					innerBlocks: [
 						{
 							name: 'core/button',
-							attributes: {
-								anchor: 'button-text-binding',
-								text: 'button default text',
-								url: '#default-url',
-								metadata: {
-									bindings: {
-										text: {
-											source: 'core/post-meta',
-											args: { key: 'text_custom_field' },
-										},
-									},
-								},
-							},
 						},
 					],
 				} );
@@ -1758,7 +1750,7 @@ test.describe( 'Block bindings', () => {
 				} );
 				await expect( urlAttribute ).toBeVisible();
 				const textAttribute = page.getByRole( 'menuitemcheckbox', {
-					name: 'Hide and reset text',
+					name: 'Show text',
 				} );
 				await expect( textAttribute ).toBeVisible();
 				const linkTargetAttribute = page.getByRole(
@@ -2064,12 +2056,6 @@ test.describe( 'Block bindings', () => {
 			} ) => {
 				await editor.insertBlock( {
 					name: 'core/image',
-					attributes: {
-						anchor: 'image-multiple-bindings',
-						url: imagePlaceholderSrc,
-						alt: 'default alt value',
-						title: 'default title value',
-					},
 				} );
 				await page
 					.getByRole( 'tabpanel', {
@@ -2356,10 +2342,12 @@ test.describe( 'Block bindings', () => {
 				},
 			} );
 
-			const bindingLabel = page.locator(
-				'.block-editor-bindings__item-explanation .components-truncate'
-			);
-			await expect( bindingLabel ).toHaveText( 'Server Source' );
+			const bindingLabel = page
+				.getByRole( 'tabpanel', {
+					name: 'Settings',
+				} )
+				.getByRole( 'button', { name: 'Server Source' } );
+			await expect( bindingLabel ).toBeVisible();
 		} );
 	} );
 } );

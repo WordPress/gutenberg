@@ -904,9 +904,7 @@ export const registerBlockBindingsSource = ( source ) => {
 	// Check the `getFieldsList` property is correct.
 	if ( getFieldsList && typeof getFieldsList !== 'function' ) {
 		// eslint-disable-next-line no-console
-		console.error(
-			'Block bindings source getFieldsList must be a function.'
-		);
+		warning( 'Block bindings source getFieldsList must be a function.' );
 		return;
 	}
 
