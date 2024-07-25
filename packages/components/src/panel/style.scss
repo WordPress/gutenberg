@@ -40,7 +40,7 @@
 
 	// This helps ensure the correct panel height, including the border, avoiding subpixel rounding issues.
 	box-sizing: content-box;
-	height: $grid-unit-60 - $border-width;
+	height: $grid-unit-60;
 
 	h2 {
 		margin: 0;
