@@ -34,6 +34,12 @@ const { state, actions, callbacks } = store(
 			get currentImage() {
 				return state.metadata[ state.currentImageId ];
 			},
+			get hasNextImage() {
+				return state.currentImageIndex + 1 < state.images.length;
+			},
+			get hasPreviousImage() {
+				return state.currentImageIndex - 1 >= 0;
+			},
 			get overlayOpened() {
 				return state.currentImageId !== null;
 			},
@@ -112,7 +118,6 @@ const { state, actions, callbacks } = store(
 
 				// Sets the current expanded image in the state and enables the overlay.
 				state.overlayEnabled = true;
-				state.currentImageId = imageId;
 
 				// Computes the styles of the overlay for the animation.
 				callbacks.setOverlayStyles();
@@ -366,7 +371,7 @@ const { state, actions, callbacks } = store(
 				// the image resolution.
 				let horizontalPadding = 0;
 				if ( window.innerWidth > 480 ) {
-					horizontalPadding = 80;
+					horizontalPadding = state.isGallery ? 140 : 80;
 				} else if ( window.innerWidth > 1920 ) {
 					horizontalPadding = 160;
 				}

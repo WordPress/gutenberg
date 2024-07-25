@@ -227,6 +227,7 @@
 
 	.prev-button,
 	.next-button {
+		display: none;
 		position: absolute;
 		top: 50%;
 		transform: translateY(-50%);
@@ -235,7 +236,6 @@
 		z-index: 5000000;
 		min-width: 40px; // equivalent to $button-size-next-default-40px
 		min-height: 40px; // equivalent to $button-size-next-default-40px;
-		display: flex;
 		align-items: center;
 		justify-content: center;
 
@@ -243,11 +243,19 @@
 			display: none;
 		}
 
+		&[disabled] {
+			opacity: 0.25;
+		}
+
 		&:hover,
 		&:focus,
 		&:not(:hover):not(:active):not(.has-background) {
 			background: none;
 			border: none;
+		}
+
+		@include break-mobile() {
+			display: flex;
 		}
 	}
 
