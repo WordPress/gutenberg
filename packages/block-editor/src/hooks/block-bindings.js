@@ -70,7 +70,6 @@ function BlockBindingsPanelDropdown( {
 				<MenuGroup key={ label } label={ label }>
 					{ Object.entries( fields ).map( ( [ key, value ] ) => (
 						<MenuItem
-							className="components-panel__block-bindings-panel-item"
 							key={ key }
 							onClick={ () => addConnection( key, attribute ) }
 							icon={ <Icon icon={ customPostType } /> }
@@ -79,7 +78,7 @@ function BlockBindingsPanelDropdown( {
 								<Truncate
 									numberOfLines={ 1 }
 									ellipsis="…"
-									className="components-panel__block-bindings-panel-item-source"
+									className="block-editor-block-bindings-panel-item-source"
 								>
 									{ value }
 								</Truncate>
@@ -115,7 +114,7 @@ function BlockBindingsAttribute( {
 							<Truncate
 								numberOfLines={ 1 }
 								ellipsis="…"
-								className="components-panel__block-bindings-panel-item-source"
+								className="block-editor-block-bindings-panel-item-source"
 							>
 								{ filteredBindings[ attribute ]?.args?.key }
 							</Truncate>
@@ -240,12 +239,12 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 					removeAllConnections();
 				} }
 				dropdownMenuProps={ dropdownMenuProps }
-				className="block-bindings-support-panel"
+				className="block-editor-block-bindings-support-panel"
 				hasInnerWrapper
 				__experimentalFirstVisibleItemClass="first"
 				__experimentalLastVisibleItemClass="last"
 			>
-				<div className="block-bindings-block-support-panel__inner-wrapper">
+				<div className="block-editor-block-bindings-block-support-panel__inner-wrapper">
 					{ bindableAttributes.map( ( attribute ) => (
 						<ToolsPanelItem
 							key={ attribute }
@@ -287,7 +286,10 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 						</ToolsPanelItem>
 					) ) }
 					{ /* TODO: Add a helper to ToolPanel item */ }
-					<p as="p" className="block-bindings-styled-help">
+					<p
+						as="p"
+						className="block-editor-block-bindings-styled-help"
+					>
 						{ __( 'Attributes connected to various sources.' ) }
 					</p>
 				</div>

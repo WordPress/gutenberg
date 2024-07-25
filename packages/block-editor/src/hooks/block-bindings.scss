@@ -1,10 +1,11 @@
-.block-bindings-support-panel {
+$popover-width: 320px;
+.block-editor-block-bindings-support-panel {
 	/* Increased specificity required to remove the slot wrapper's row gap */
 	&#{&} {
-		.block-bindings-block-support-panel__inner-wrapper {
+		.block-editor-block-bindings-block-support-panel__inner-wrapper {
 			row-gap: 0;
 		}
-		.block-bindings-styled-help {
+		.block-editor-block-bindings-styled-help {
 			margin-top: $grid-unit-10;
 			margin-bottom: 0;
 			font-size: $helptext-font-size;
@@ -14,15 +15,15 @@
 		}
 	}
 
-	.components-panel__block-bindings-panel-item-source {
+	.block-editor-block-bindings-panel-item-source {
 		color: $gray-700;
 	}
-	.components-button:hover .components-panel__block-bindings-panel-item-source {
+	.components-button:hover .block-editor-block-bindings-panel-item-source {
 		color: inherit;
 	}
 
 	/**
-	* The following styles replicate the separated border of the
+	* The following styles replicatxºe the separated border of the
 	* `ItemGroup` component but allows for hidden items. This is because
 	* to maintain the order of `ToolsPanel` controls, each `ToolsPanelItem`
 	* must at least render a placeholder which would otherwise interfere
@@ -52,13 +53,25 @@
 			border-radius: inherit;
 		}
 	}
+	.block-editor-block-bindings-filters-panel__dropdown {
+		width: 100%;
+		button {
+			width: 100%;
+			&.is-open {
+				background-color: $gray-100;
+			}
+		}
+	}
 }
 
 .block-editor-block-bindings__popover {
-	.components-panel__block-bindings-panel-item-source {
-		color: $gray-700;
-	}
-	.components-button:hover .components-panel__block-bindings-panel-item-source {
-		color: inherit;
+	> .components-popover__content {
+		width: $popover-width;
+		.block-editor-block-bindings-panel-item-source {
+			color: $gray-700;
+		}
+		.components-button:hover .block-editor-block-bindings-panel-item-source {
+			color: inherit;
+		}
 	}
 }
