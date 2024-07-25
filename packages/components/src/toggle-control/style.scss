@@ -6,6 +6,7 @@
 	}
 }
 
-.components-base-control__help {
-	margin-left: $toggle-width + $grid-unit-10;
+.components-toggle-control__help {
+	display: inline-block;
+	margin-inline-start: $toggle-width + $grid-unit-10;
 }
