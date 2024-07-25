@@ -465,8 +465,10 @@ function ListViewBlock( {
 		level
 	);
 
-	const blockPropertiesDescription =
-		getBlockPropertiesDescription( isLocked );
+	const blockPropertiesDescription = getBlockPropertiesDescription(
+		blockInformation,
+		isLocked
+	);
 
 	const hasSiblings = siblingBlockCount > 0;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;
@@ -562,7 +564,12 @@ function ListViewBlock( {
 							ariaDescribedBy={ descriptionId }
 						/>
 						<AriaReferencedText id={ descriptionId }>
-							{ `${ blockPositionDescription } ${ blockPropertiesDescription }` }
+							{ [
+								blockPositionDescription,
+								blockPropertiesDescription,
+							]
+								.filter( Boolean )
+								.join( ' ' ) }
 						</AriaReferencedText>
 					</div>
 				) }

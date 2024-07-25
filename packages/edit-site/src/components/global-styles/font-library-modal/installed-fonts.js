@@ -16,6 +16,7 @@ import {
 	Flex,
 	Notice,
 	ProgressBar,
+	CheckboxControl,
 } from '@wordpress/components';
 import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
@@ -31,7 +32,12 @@ import { FontLibraryContext } from './context';
 import FontCard from './font-card';
 import LibraryFontVariant from './library-font-variant';
 import { sortFontFaces } from './utils/sort-font-faces';
-import { setUIValuesNeeded } from './utils';
+import {
+	setUIValuesNeeded,
+	loadFontFaceInBrowser,
+	unloadFontFaceInBrowser,
+	getDisplaySrcFromFontFace,
+} from './utils';
 import { unlock } from '../../../lock-unlock';
 
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
@@ -49,8 +55,11 @@ function InstalledFonts() {
 		getFontFacesActivated,
 		notice,
 		setNotice,
-		fontFamilies,
 	} = useContext( FontLibraryContext );
+
+	const [ fontFamilies, setFontFamilies ] = useGlobalSetting(
+		'typography.fontFamilies'
+	);
 	const [ isConfirmDeleteOpen, setIsConfirmDeleteOpen ] = useState( false );
 	const [ baseFontFamilies ] = useGlobalSetting(
 		'typography.fontFamilies',
@@ -61,7 +70,6 @@ function InstalledFonts() {
 		const { __experimentalGetCurrentGlobalStylesId } = select( coreStore );
 		return __experimentalGetCurrentGlobalStylesId();
 	} );
-
 	const globalStyles = useEntityRecord(
 		'root',
 		'globalStyles',
@@ -147,6 +155,55 @@ function InstalledFonts() {
 		handleSetLibraryFontSelected( libraryFontSelected );
 		refreshLibrary();
 	}, [] );
+
+	// Get activated fonts count.
+	const activeFontsCount = libraryFontSelected
+		? getFontFacesActivated(
+				libraryFontSelected.slug,
+				libraryFontSelected.source
+		  ).length
+		: 0;
+
+	const selectedFontsCount =
+		libraryFontSelected?.fontFace?.length ??
+		( libraryFontSelected?.fontFamily ? 1 : 0 );
+
+	// Check if any fonts are selected.
+	const isIndeterminate =
+		activeFontsCount > 0 && activeFontsCount !== selectedFontsCount;
+
+	// Check if all fonts are selected.
+	const isSelectAllChecked = activeFontsCount === selectedFontsCount;
+
+	// Toggle select all fonts.
+	const toggleSelectAll = () => {
+		const initialFonts =
+			fontFamilies?.[ libraryFontSelected.source ]?.filter(
+				( f ) => f.slug !== libraryFontSelected.slug
+			) ?? [];
+		const newFonts = isSelectAllChecked
+			? initialFonts
+			: [ ...initialFonts, libraryFontSelected ];
+
+		setFontFamilies( {
+			...fontFamilies,
+			[ libraryFontSelected.source ]: newFonts,
+		} );
+
+		if ( libraryFontSelected.fontFace ) {
+			libraryFontSelected.fontFace.forEach( ( face ) => {
+				if ( isSelectAllChecked ) {
+					unloadFontFaceInBrowser( face, 'all' );
+				} else {
+					loadFontFaceInBrowser(
+						face,
+						getDisplaySrcFromFontFace( face?.src ),
+						'all'
+					);
+				}
+			} );
+		}
+	};
 
 	const hasFonts = baseThemeFonts.length > 0 || baseCustomFonts.length > 0;
 	return (
@@ -311,6 +368,14 @@ function InstalledFonts() {
 							</Text>
 							<Spacer margin={ 4 } />
 							<VStack spacing={ 0 }>
+								<CheckboxControl
+									className="font-library-modal__select-all"
+									label={ __( 'Select all' ) }
+									checked={ isSelectAllChecked }
+									onChange={ toggleSelectAll }
+									indeterminate={ isIndeterminate }
+									__nextHasNoMarginBottom
+								/>
 								<Spacer margin={ 8 } />
 								{ getFontFacesToDisplay(
 									libraryFontSelected
