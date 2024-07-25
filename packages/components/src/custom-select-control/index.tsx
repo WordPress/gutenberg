@@ -5,12 +5,18 @@ import * as Ariakit from '@ariakit/react';
 import clsx from 'clsx';
 
 /**
+ * WordPress dependencies
+ */
+import { useInstanceId } from '@wordpress/compose';
+
+/**
  * Internal dependencies
  */
 import _CustomSelect from '../custom-select-control-v2/custom-select';
 import CustomSelectItem from '../custom-select-control-v2/item';
 import * as Styled from '../custom-select-control-v2/styles';
 import type { CustomSelectProps } from './types';
+import { VisuallyHidden } from '../visually-hidden';
 
 function useDeprecatedProps( {
 	__experimentalShowSelectedHint,
@@ -47,6 +53,11 @@ function CustomSelectControl( props: CustomSelectProps ) {
 		showSelectedHint = false,
 		...restProps
 	} = useDeprecatedProps( props );
+
+	const descriptionId = useInstanceId(
+		CustomSelectControl,
+		'custom-select-control__description'
+	);
 
 	// Forward props + store from v2 implementation
 	const store = Ariakit.useSelectStore( {
@@ -153,23 +164,30 @@ function CustomSelectControl( props: CustomSelectProps ) {
 	} )();
 
 	return (
-		<_CustomSelect
-			aria-describedby={ describedBy }
-			renderSelectedValue={
-				showSelectedHint ? renderSelectedValueHint : undefined
-			}
-			size={ translatedSize }
-			store={ store }
-			className={ clsx(
-				// Keeping the classname for legacy reasons
-				'components-custom-select-control',
-				classNameProp
+		<>
+			<_CustomSelect
+				aria-describedby={ descriptionId }
+				renderSelectedValue={
+					showSelectedHint ? renderSelectedValueHint : undefined
+				}
+				size={ translatedSize }
+				store={ store }
+				className={ clsx(
+					// Keeping the classname for legacy reasons
+					'components-custom-select-control',
+					classNameProp
+				) }
+				isLegacy
+				{ ...restProps }
+			>
+				{ children }
+			</_CustomSelect>
+			{ describedBy && (
+				<VisuallyHidden>
+					<span id={ descriptionId }>{ describedBy }</span>
+				</VisuallyHidden>
 			) }
-			isLegacy
-			{ ...restProps }
-		>
-			{ children }
-		</_CustomSelect>
+		</>
 	);
 }
 

@@ -670,5 +670,17 @@ describe.each( [
 			expect( currentSelectedItem ).not.toHaveFocus();
 			expect( onBlurMock ).toHaveBeenCalledTimes( 1 );
 		} );
+
+		it( 'should render the describedBy text', async () => {
+			const describedByText = 'My description.';
+
+			render(
+				<Component { ...props } describedBy={ describedByText } />
+			);
+
+			expect(
+				screen.getByRole( 'combobox' )
+			).toHaveAccessibleDescription( describedByText );
+		} );
 	} );
 } );
