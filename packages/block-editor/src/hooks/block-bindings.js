@@ -77,14 +77,14 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 		};
 	}, [] );
 
-	const onCloseNewConnection = ( value ) => {
+	const onCloseNewConnection = ( value, attribute ) => {
 		// Assuming the block expects a flat structure for its metadata attribute
 		const newMetadata = {
 			...metadata,
 			// Adjust this according to the actual structure expected by your block
 			bindings: {
 				...bindings,
-				content: {
+				[ attribute ]: {
 					source: 'core/post-meta',
 					args: { key: value },
 				},
@@ -151,9 +151,12 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 									{ Object.keys( data ).map( ( key ) => (
 										<DropdownMenuItem
 											key={ key }
-											onClick={ () =>
-												onCloseNewConnection( key )
-											}
+											onClick={ () => {
+												onCloseNewConnection(
+													key,
+													attribute
+												);
+											} }
 										>
 											<DropdownMenuItemLabel>
 												{ data[ key ] }
