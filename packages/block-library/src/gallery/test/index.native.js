@@ -610,10 +610,11 @@ describe( 'Gallery block', () => {
 		<!-- /wp:gallery -->`,
 			numberOfItems: 2,
 		} );
-		const { getByLabelText, getByText } = screen;
+		const { getByText } = screen;
 
-		fireEvent.press( getBlock( screen, 'Gallery' ) );
-		fireEvent.press( getByLabelText( 'Link To' ) );
+		// Set "Link to" setting via Gallery block settings
+		await openBlockSettings( screen );
+		fireEvent.press( getByText( 'Link to' ) );
 		fireEvent.press( getByText( 'Link images to media files' ) );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
