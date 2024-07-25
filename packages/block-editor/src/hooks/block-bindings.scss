@@ -18,7 +18,7 @@ $popover-width: 320px;
 	.block-editor-block-bindings-panel-item-source {
 		color: $gray-700;
 	}
-	.components-button:hover .block-editor-block-bindings-panel-item-source {
+	button:hover .block-editor-block-bindings-panel-item-source {
 		color: inherit;
 	}
 
@@ -29,7 +29,7 @@ $popover-width: 320px;
 	* must at least render a placeholder which would otherwise interfere
 	* with the `:last-child` styles.
 	*/
-	.components-tools-panel-item {
+	.block-editor-block-bindings-panel-item {
 		// Border styles.
 		border-left: 1px solid $gray-300;
 		border-right: 1px solid $gray-300;
@@ -63,15 +63,6 @@ $popover-width: 320px;
 		}
 	}
 }
-
-.block-editor-block-bindings__popover {
-	> .components-popover__content {
-		width: $popover-width;
-		.block-editor-block-bindings-panel-item-source {
-			color: $gray-700;
-		}
-		.components-button:hover .block-editor-block-bindings-panel-item-source {
-			color: inherit;
-		}
-	}
+.block-editor-block-bindings__popover_inner-wrapper {
+	width: $popover-width;
 }

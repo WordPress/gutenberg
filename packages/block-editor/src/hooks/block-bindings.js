@@ -43,7 +43,6 @@ const popoverProps = {
 	offset: 36,
 	shift: true,
 	className: 'block-editor-block-bindings__popover',
-	headerTitle: __( 'Custom Fields' ),
 };
 
 const useToolsPanelDropdownMenuProps = () => {
@@ -65,7 +64,10 @@ function BlockBindingsPanelDropdown( {
 	attribute,
 } ) {
 	return (
-		<DropdownContentWrapper paddingSize="small">
+		<DropdownContentWrapper
+			paddingSize="small"
+			className="block-editor-block-bindings__popover_inner-wrapper"
+		>
 			{ Object.entries( fieldsList ).map( ( [ label, fields ] ) => (
 				<MenuGroup key={ label } label={ label }>
 					{ Object.entries( fields ).map( ( [ key, value ] ) => (
@@ -253,6 +255,7 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 							onDeselect={ () => {
 								removeConnection( attribute );
 							} }
+							className="block-editor-block-bindings-panel-item"
 						>
 							<Dropdown
 								popoverProps={ popoverProps }
