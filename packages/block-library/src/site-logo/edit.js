@@ -10,7 +10,6 @@ import { isBlobURL } from '@wordpress/blob';
 import {
 	createInterpolateElement,
 	useEffect,
-	useRef,
 	useState,
 } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
@@ -46,7 +45,6 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { crop, upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
-import { focus } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -361,9 +359,18 @@ function SiteLogoReplaceFlow( {
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
 			accept={ ACCEPT_MEDIA_STRING }
 		>
-			{ mediaURL && (
-				<MenuItem onClick={ onRemoveLogo }>{ __( 'Reset' ) }</MenuItem>
-			) }
+			{ ( { onClose } ) =>
+				mediaURL && (
+					<MenuItem
+						onClick={ () => {
+							onRemoveLogo();
+							onClose();
+						} }
+					>
+						{ __( 'Reset' ) }
+					</MenuItem>
+				)
+			}
 		</MediaReplaceFlow>
 	);
 }
@@ -400,7 +407,6 @@ export default function LogoEdit( {
 	isSelected,
 } ) {
 	const { width, shouldSyncIcon } = attributes;
-	const blockToolbarContainerRef = useRef();
 	const {
 		siteLogoId,
 		canUserEdit,
@@ -500,15 +506,9 @@ export default function LogoEdit( {
 		setLogo( media.id, shouldForceSync );
 	};
 
-	const onRemoveLogo = ( ref ) => {
+	const onRemoveLogo = () => {
 		setLogo( null );
 		setAttributes( { width: undefined } );
-		// Focus the toggle button and close the dropdown menu.
-		if ( ref.current ) {
-			const [ toggleButton ] = focus.tabbable.find( ref.current );
-			toggleButton?.focus();
-			toggleButton?.click();
-		}
 	};
 
 	const { createErrorNotice } = useDispatch( noticesStore );
@@ -529,6 +529,7 @@ export default function LogoEdit( {
 				onInitialSelectLogo( image );
 			},
 			onError: onUploadError,
+			onRemoveLogo,
 		} );
 	};
 
@@ -537,17 +538,11 @@ export default function LogoEdit( {
 		name: ! logoUrl ? __( 'Choose logo' ) : __( 'Replace' ),
 		onSelect: onSelectLogo,
 		onError: onUploadError,
+		onRemoveLogo,
 	};
 	const controls = canUserEdit && (
 		<BlockControls group="other">
-			<div ref={ blockToolbarContainerRef }>
-				<SiteLogoReplaceFlow
-					{ ...mediaReplaceFlowProps }
-					onRemoveLogo={ () =>
-						onRemoveLogo( blockToolbarContainerRef )
-					}
-				/>
-			</div>
+			<SiteLogoReplaceFlow { ...mediaReplaceFlowProps } />
 		</BlockControls>
 	);
 
@@ -630,7 +625,6 @@ export default function LogoEdit( {
 					{ canUserEdit && !! logoUrl && (
 						<SiteLogoReplaceFlow
 							{ ...mediaReplaceFlowProps }
-							onRemoveLogo={ onRemoveLogo }
 							name={
 								<InspectorLogoPreview
 									mediaItemData={ mediaItemData }
