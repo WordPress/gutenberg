@@ -7,6 +7,7 @@ import {
 } from './use-bindings-attributes';
 import { unlock } from '../lock-unlock';
 import { store as editorStore } from '../store';
+import { removeConnection, addConnection } from '../bindings/utils';
 
 /**
  * WordPress dependencies
@@ -36,7 +37,7 @@ const {
 	DropdownMenuItemHelpTextV2: DropDownMenuItemHelpText,
 } = unlock( componentsPrivateApis );
 
-const BlockBindingsPanel = ( { name, metadata } ) => {
+const BlockBindingsPanel = ( { name, attributes: { metadata } } ) => {
 	const { bindings } = metadata || {};
 	const { sources } = useSelect( ( select ) => {
 		const _sources = unlock(
@@ -77,47 +78,13 @@ const BlockBindingsPanel = ( { name, metadata } ) => {
 		};
 	}, [] );
 
-	const onCloseNewConnection = ( value, attribute ) => {
-		// Assuming the block expects a flat structure for its metadata attribute
-		const newMetadata = {
-			...metadata,
-			// Adjust this according to the actual structure expected by your block
-			bindings: {
-				...bindings,
-				[ attribute ]: {
-					source: 'core/post-meta',
-					args: { key: value },
-				},
-			},
-		};
-
-		// Update the block's attributes with the new metadata
-		updateBlockAttributes( _id, {
-			metadata: newMetadata,
-		} );
-	};
-
-	const removeConnection = ( key ) => {
-		const newMetadata = { ...metadata };
-		delete newMetadata.bindings[ key ];
-		if ( Object.keys( newMetadata.bindings ).length === 0 ) {
-			delete newMetadata.bindings;
-		}
-		updateBlockAttributes( _id, {
-			metadata:
-				Object.keys( newMetadata ).length === 0
-					? undefined
-					: newMetadata,
-		} );
-	};
-
 	const allAttributesBinded =
 		Object.keys( filteredBindings ).length === bindableAttributes?.length;
 
 	return (
 		<InspectorControls>
 			<PanelBody
-				title={ __( 'Attributes' ) }
+				title={ __( 'Connections' ) }
 				className="components-panel__block-bindings-panel"
 			>
 				<BaseControl
@@ -161,9 +128,12 @@ const BlockBindingsPanel = ( { name, metadata } ) => {
 													<DropdownMenuItem
 														key={ key }
 														onClick={ () => {
-															onCloseNewConnection(
+															addConnection(
 																key,
-																attribute
+																attribute,
+																metadata,
+																_id,
+																updateBlockAttributes
 															);
 														} }
 													>
@@ -179,27 +149,30 @@ const BlockBindingsPanel = ( { name, metadata } ) => {
 									) ) }
 								</DropdownMenu>
 							) }
-						<MenuGroup>
-							{ Object.keys( filteredBindings ).map( ( key ) => {
-								const source = sources[
-									filteredBindings[ key ].source
-								]
-									? sources[ filteredBindings[ key ].source ]
-											.label
-									: filteredBindings[ key ].source;
-								return (
-									<MenuItem
-										key={ key }
-										onClick={ () =>
-											removeConnection( key )
-										}
-										icon={ reset }
-									>
-										{ key } - { source }
-									</MenuItem>
-								);
-							} ) }
-						</MenuGroup>
+						{ Object.keys( filteredBindings ).map( ( key ) => {
+							const source = sources[
+								filteredBindings[ key ].source
+							]
+								? sources[ filteredBindings[ key ].source ]
+										.label
+								: filteredBindings[ key ].source;
+							return (
+								<MenuItem
+									key={ key }
+									onClick={ () =>
+										removeConnection(
+											key,
+											metadata,
+											_id,
+											updateBlockAttributes
+										)
+									}
+									icon={ reset }
+								>
+									{ key } - { source }
+								</MenuItem>
+							);
+						} ) }
 					</MenuGroup>
 				</BaseControl>
 			</PanelBody>
