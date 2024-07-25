@@ -10,6 +10,10 @@
 }
 
 .block-editor-bindings__popover {
+	.block-editor-bindings__source-label {
+		grid-column: 2;
+		margin: $grid-unit-10 0;
+	}
 	.block-editor-bindings__clear-binding {
 		button {
 			box-shadow: none;

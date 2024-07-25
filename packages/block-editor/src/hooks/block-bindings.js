@@ -35,6 +35,7 @@ const {
 	DropdownMenuCheckboxItemV2: DropdownMenuCheckboxItem,
 	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
 	DropdownMenuItemHelpTextV2: DropdownMenuItemHelpText,
+	DropdownMenuSeparatorV2: DropdownMenuSeparator,
 } = unlock( componentsPrivateApis );
 
 const useToolsPanelDropdownMenuProps = () => {
@@ -61,29 +62,38 @@ function BlockBindingsPanelDropdown( {
 	return (
 		<>
 			{ Object.entries( fieldsList ).map( ( [ label, fields ] ) => (
-				<DropdownMenuGroup
-					key={ label }
-					label={
-						Object.keys( fieldsList ).length > 1 ? label : null
-					}
-				>
-					{ Object.entries( fields ).map( ( [ key, value ] ) => (
-						<DropdownMenuCheckboxItem
-							key={ key }
-							onClick={ () => addConnection( key, attribute ) }
-							name={ attribute + '-binding' }
-							value={ key }
-							checked={ key === currentKey }
-						>
-							<DropdownMenuItemLabel numberOfLines={ 1 }>
-								{ key }
-							</DropdownMenuItemLabel>
-							<DropdownMenuItemHelpText numberOfLines={ 1 }>
-								{ value }
-							</DropdownMenuItemHelpText>
-						</DropdownMenuCheckboxItem>
-					) ) }
-				</DropdownMenuGroup>
+				<>
+					<DropdownMenuGroup key={ label }>
+						{ Object.keys( fieldsList ).length > 1 && (
+							<Text
+								className="block-editor-bindings__source-label"
+								upperCase
+								variant="muted"
+							>
+								{ label }
+							</Text>
+						) }
+						{ Object.entries( fields ).map( ( [ key, value ] ) => (
+							<DropdownMenuCheckboxItem
+								key={ key }
+								onClick={ () =>
+									addConnection( key, attribute )
+								}
+								name={ attribute + '-binding' }
+								value={ key }
+								checked={ key === currentKey }
+							>
+								<DropdownMenuItemLabel numberOfLines={ 1 }>
+									{ key }
+								</DropdownMenuItemLabel>
+								<DropdownMenuItemHelpText numberOfLines={ 1 }>
+									{ value }
+								</DropdownMenuItemHelpText>
+							</DropdownMenuCheckboxItem>
+						) ) }
+					</DropdownMenuGroup>
+					<DropdownMenuSeparator />
+				</>
 			) ) }
 			<ButtonGroup className="block-editor-bindings__clear-binding">
 				<Button
