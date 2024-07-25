@@ -5,38 +5,83 @@ $popover-padding: $grid-unit-20;
 
 $swatch-columns: math.floor(math.div($popover-width + $swatch-gap - 2 * $popover-padding, $swatch-size + $swatch-gap));
 
-.components-panel__block-bindings-panel .components-panel__block-bindings-panel-item-source {
-	color: $gray-700;
-}
+.block-bindings-support-panel {
+	/* Increased specificity required to remove the slot wrapper's row gap */
+	&#{&} {
+		.block-bindings-block-support-panel__inner-wrapper {
+			row-gap: 0;
+		}
+	}
 
+	.components-panel__block-bindings-panel-item-source {
+		color: $gray-700;
+	}
+	.components-button:hover .components-panel__block-bindings-panel-item-source {
+		color: inherit;
+	}
+
+	/**
+	* The following styles replicate the separated border of the
+	* `ItemGroup` component but allows for hidden items. This is because
+	* to maintain the order of `ToolsPanel` controls, each `ToolsPanelItem`
+	* must at least render a placeholder which would otherwise interfere
+	* with the `:last-child` styles.
+	*/
+	.components-tools-panel-item {
+		padding: 0;
+		max-width: 100%;
+
+		// Border styles.
+		border-left: 1px solid $gray-300;
+		border-right: 1px solid $gray-300;
+		border-bottom: 1px solid $gray-300;
+
+		// Identify the first visible instance as placeholder items will not have this class.
+		&:nth-child(1 of &) {
+			border-top-left-radius: $radius-block-ui;
+			border-top-right-radius: $radius-block-ui;
+			border-top: 1px solid $gray-300;
+		}
+
+		// Identify the last visible instance as placeholder items will not have this class.
+		&:nth-last-child(1 of &) {
+			border-bottom-left-radius: $radius-block-ui;
+			border-bottom-right-radius: $radius-block-ui;
+		}
+
+		> div,
+		> div > button {
+			border-radius: inherit;
+		}
+	}
+
+	.block-editor-block-bindings-filters-panel__dropdown {
+		display: block;
+		padding: 0;
+		width: 100%;
+		button {
+			width: 100%;
+			padding: $grid-unit-10;
+			&.is-open {
+				background-color: $gray-100;
+			}
+		}
+	}
+}
 
 .block-editor-block-bindings__popover {
 	> .components-popover__content {
 		padding: $popover-padding;
 		width: $popover-width;
+		.components-panel__block-bindings-panel-item-source {
+			color: $gray-700;
+		}
+		.components-button:hover .components-panel__block-bindings-panel-item-source {
+			color: inherit;
+		}
 	}
 
 	.components-menu-group__label {
 		padding: 0;
-	}
-
-	.components-circular-option-picker__swatches {
-		display: grid;
-		grid-template-columns: repeat($swatch-columns, $swatch-size);
-		gap: $swatch-gap;
-		justify-content: space-between;
-	}
-}
-.block-editor-block-bindings-filters-panel__dropdown {
-	display: block;
-	padding: 0;
-
-	button {
-		width: 100%;
-		padding: $grid-unit-10;
-
-		&.is-open {
-			background-color: $gray-100;
-		}
 	}
 }
