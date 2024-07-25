@@ -69,11 +69,7 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 	// Inside your component
 	const fetchMetas = ( value ) => {
 		// If array contains "core/post-meta" and is array with at least one value.
-		if (
-			Array.isArray( value ) &&
-			value.length > 0 &&
-			value.includes( 'core/post-meta' )
-		) {
+		if ( value === 'core/post-meta' ) {
 			setMetaValues( Object.keys( data ) );
 		}
 	};
@@ -139,16 +135,21 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 								}
 								className="components-modal__block-bindings-modal"
 							>
-								<FormTokenField
-									label="Type a custom source"
-									onChange={ ( value ) => {
-										// Add {"metadata":{"bindings":{"content":{"source":"core/post-meta","args":{"key":"page_text_custom_field"}}}}}
-										fetchMetas( value );
-									} }
-									suggestions={ Object.keys( sources ) }
-									value={ [] }
-									className="block-editor-block-switcher__binding-connector"
-								/>
+								<MenuGroup>
+									<MenuItemsChoice
+										choices={ Object.keys( sources ).map(
+											( key ) => {
+												return {
+													label: key,
+													value: key,
+												};
+											}
+										) }
+										onSelect={ ( key ) => {
+											fetchMetas( key );
+										} }
+									/>
+								</MenuGroup>
 							</Modal>
 						) }
 						{ metaValues && metaValues.length > 0 && (
