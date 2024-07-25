@@ -74,7 +74,7 @@ function BlockBindingsPanelDropdown( {
 					{ Object.entries( fields ).map( ( [ key, value ] ) => (
 						<DropdownMenuRadioItem
 							key={ key }
-							onClick={ () => addConnection( key, attribute ) }
+							onChange={ () => addConnection( key, attribute ) }
 							name={ attribute + '-binding' }
 							value={ key }
 							checked={ key === currentKey }
