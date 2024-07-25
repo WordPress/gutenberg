@@ -85,18 +85,17 @@ function BlockBindingsPanelDropdown( {
 	);
 }
 
-function BlockBindingsAttribute( {
-	toggleProps,
-	attribute,
-	filteredBindings,
-} ) {
+function BlockBindingsAttribute( { toggleProps, attribute, binding } ) {
+	const { source: sourceName, args } = binding || {};
+	const sourceProps =
+		unlock( blocksPrivateApis ).getBlockBindingsSource( sourceName );
 	return (
 		<Item { ...toggleProps }>
 			<VStack spacing={ 0 }>
 				<Truncate>{ attribute }</Truncate>
-				{ !! filteredBindings[ attribute ] && (
+				{ !! binding && (
 					<Truncate className="block-editor-bindings__item-explanation">
-						{ filteredBindings[ attribute ].args.key }
+						{ args?.key || sourceProps?.label || sourceName }
 					</Truncate>
 				) }
 			</VStack>
@@ -241,8 +240,8 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 										<BlockBindingsAttribute
 											toggleProps={ toggleProps }
 											attribute={ attribute }
-											filteredBindings={
-												filteredBindings
+											binding={
+												filteredBindings[ attribute ]
 											}
 										/>
 									);
