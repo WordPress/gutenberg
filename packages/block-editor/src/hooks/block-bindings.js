@@ -295,9 +295,8 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 				} }
 				dropdownMenuProps={ dropdownMenuProps }
 				className="block-editor-bindings__panel"
-				hasInnerWrapper
 			>
-				<ItemGroup isBordered isSeparated style={ { rowGap: 0 } }>
+				<ItemGroup isBordered isSeparated>
 					{ readOnly ? (
 						<ReadOnlyBlockBindingsPanelItems
 							bindings={ filteredBindings }
