@@ -3,7 +3,6 @@
  */
 import { screen } from '@testing-library/react';
 import { click, press, sleep, type, waitFor } from '@ariakit/test';
-import { render } from '@ariakit/test/react';
 
 /**
  * WordPress dependencies
@@ -14,6 +13,7 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import UncontrolledCustomSelectControl from '..';
+import { render } from '../../utils/tmp-ariakit-test-render-replacement';
 
 const customClassName = 'amber-skies';
 const customStyles = {
@@ -86,7 +86,7 @@ const ControlledCustomSelectControl = ( {
 
 it( 'Should apply external controlled updates', async () => {
 	const mockOnChange = jest.fn();
-	await render(
+	const { rerender } = await render(
 		<UncontrolledCustomSelectControl
 			{ ...props }
 			value={ props.options[ 0 ] }
@@ -102,9 +102,7 @@ it( 'Should apply external controlled updates', async () => {
 
 	expect( mockOnChange ).not.toHaveBeenCalled();
 
-	// TODO: waiting on re-render support from Ariakit
-	// see: https://github.com/ariakit/ariakit/issues/3939#issuecomment-2251231903
-	await render(
+	await rerender(
 		<UncontrolledCustomSelectControl
 			{ ...props }
 			value={ props.options[ 1 ] }
