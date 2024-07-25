@@ -79,7 +79,7 @@ function ZoomOutModeInserters() {
 			hoveredBlockClientId === previousClientId ||
 			hoveredBlockClientId === nextClientId;
 
-		const { showInsertionPoint } = unlock( blockEditorDispatch );
+		const { showInsertionPoint } = blockEditorDispatch;
 
 		return (
 			<BlockPopoverInbetween
