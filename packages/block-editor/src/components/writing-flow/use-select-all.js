@@ -56,6 +56,7 @@ export default function useSelectAll() {
 					node.ownerDocument.defaultView
 						.getSelection()
 						.removeAllRanges();
+					node.contentEditable = 'false';
 					selectBlock( rootClientId );
 				}
 				return;
