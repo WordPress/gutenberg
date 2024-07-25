@@ -67,6 +67,7 @@ function BlockBindingsPanelDropdown( {
 							className="block-editor-bindings__source-label"
 							upperCase
 							variant="muted"
+							aria-hidden
 						>
 							{ label }
 						</Text>
