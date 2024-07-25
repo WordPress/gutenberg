@@ -75,4 +75,16 @@ export default {
 
 		return true;
 	},
+	getFieldsList( { registry, context } ) {
+		const metaFields = registry
+			.select( coreDataStore )
+			.getEditedEntityRecord(
+				'postType',
+				context?.postType,
+				context?.postId
+			).meta;
+		// Remove footnotes from the list of fields
+		delete metaFields.footnotes;
+		return metaFields;
+	},
 };

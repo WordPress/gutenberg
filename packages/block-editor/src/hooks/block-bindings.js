@@ -4,18 +4,10 @@
 import clsx from 'clsx';
 
 /**
- * Internal dependencies
- */
-import {
-	canBindAttribute,
-	getBindableAttributes,
-} from './use-bindings-attributes';
-import { store as editorStore } from '../store';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { store as blocksStore } from '@wordpress/blocks';
 import {
 	MenuGroup,
 	MenuItem,
@@ -29,17 +21,22 @@ import {
 	Button,
 	Icon,
 } from '@wordpress/components';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+import { useContext } from '@wordpress/element';
 import { chevronRightSmall, customPostType } from '@wordpress/icons';
+import { useViewportMatch } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
 import {
-	InspectorControls,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
-import { addFilter } from '@wordpress/hooks';
-import {
-	createHigherOrderComponent,
-	useViewportMatch,
-} from '@wordpress/compose';
+	canBindAttribute,
+	getBindableAttributes,
+} from '../hooks/use-bindings-attributes';
+import { store as blockEditorStore } from '../store';
+import { unlock } from '../lock-unlock';
+import InspectorControls from '../components/inspector-controls';
+import BlockContext from '../components/block-context';
 
 const popoverProps = {
 	placement: 'left-start',
@@ -62,13 +59,16 @@ const useToolsPanelDropdownMenuProps = () => {
 		: {};
 };
 
-function BlockBindingsPanelDropdown( { postMeta, addConnection, attribute } ) {
+function BlockBindingsPanelDropdown( {
+	fieldsList,
+	addConnection,
+	attribute,
+} ) {
 	return (
 		<DropdownContentWrapper paddingSize="small">
-			<MenuGroup label={ __( 'Custom Fields' ) }>
-				{ Object.entries( postMeta )
-					.filter( ( [ key ] ) => key !== 'footnotes' )
-					.map( ( [ key, value ] ) => (
+			{ Object.entries( fieldsList ).map( ( [ label, fields ] ) => (
+				<MenuGroup key={ label } label={ label }>
+					{ Object.entries( fields ).map( ( [ key, value ] ) => (
 						<MenuItem
 							className="components-panel__block-bindings-panel-item"
 							key={ key }
@@ -90,7 +90,8 @@ function BlockBindingsPanelDropdown( { postMeta, addConnection, attribute } ) {
 							</Truncate>
 						</MenuItem>
 					) ) }
-			</MenuGroup>
+				</MenuGroup>
+			) ) }
 		</DropdownContentWrapper>
 	);
 }
@@ -126,7 +127,9 @@ function BlockBindingsAttribute( {
 	);
 }
 
-const BlockBindingsPanel = ( { name, attributes: { metadata } } ) => {
+export const BlockBindingsPanel = ( { name, metadata } ) => {
+	const registry = useRegistry();
+	const context = useContext( BlockContext );
 	const { bindings } = metadata || {};
 
 	const bindableAttributes = getBindableAttributes( name );
@@ -144,14 +147,21 @@ const BlockBindingsPanel = ( { name, attributes: { metadata } } ) => {
 
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
-	const { _id } = useSelect( ( select ) => {
+	const { _id, registeredSources } = useSelect( ( select ) => {
 		const { getSelectedBlockClientId } = select( blockEditorStore );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 		return {
 			_id: selectedBlockClientId,
+			registeredSources: unlock(
+				select( blocksStore )
+			).getAllBlockBindingsSources(),
 		};
 	}, [] );
+
+	if ( bindableAttributes.length === 0 ) {
+		return null;
+	}
 
 	const removeAllConnections = () => {
 		const newMetadata = { ...metadata };
@@ -200,10 +210,21 @@ const BlockBindingsPanel = ( { name, attributes: { metadata } } ) => {
 					: newMetadata,
 		} );
 	};
-	const postMeta = useSelect( ( select ) => {
-		return select( editorStore ).getEditedPostAttribute( 'meta' );
-	}, [] );
-	if ( postMeta === undefined || bindableAttributes.length === 0 ) {
+
+	const fieldsList = {};
+	Object.values( registeredSources ).forEach(
+		( { getFieldsList, label } ) => {
+			if ( getFieldsList ) {
+				// TODO: Filter only the needed context defined in usesContext.
+				fieldsList[ label ] = getFieldsList( {
+					registry,
+					context,
+				} );
+			}
+		}
+	);
+
+	if ( Object.keys( fieldsList ).length === 0 ) {
 		return null;
 	}
 
@@ -253,7 +274,7 @@ const BlockBindingsPanel = ( { name, attributes: { metadata } } ) => {
 								} }
 								renderContent={ () => (
 									<BlockBindingsPanelDropdown
-										postMeta={ postMeta }
+										fieldsList={ fieldsList }
 										addConnection={ addConnection }
 										attribute={ attribute }
 									/>
@@ -271,33 +292,10 @@ const BlockBindingsPanel = ( { name, attributes: { metadata } } ) => {
 	);
 };
 
-/**
- * Override the default edit UI to include a new block inspector control for
- * assigning a partial syncing controls to supported blocks in the pattern editor.
- * Currently, only the `core/paragraph` block is supported.
- *
- * @param {Component} BlockEdit Original component.
- *
- * @return {Component} Wrapped component.
- */
-const withBlockBindings = createHigherOrderComponent(
-	// Prevent this from running on every write block.
-	( BlockEdit ) => ( props ) => {
-		const bindableAttributes = getBindableAttributes( props?.name );
-		return (
-			<>
-				<BlockEdit { ...props } />
-				{ bindableAttributes.length > 0 && (
-					<BlockBindingsPanel { ...props } />
-				) }
-			</>
-		);
+export default {
+	edit: BlockBindingsPanel,
+	attributeKeys: [ 'metadata' ],
+	hasSupport() {
+		return true;
 	},
-	'withBlockBindings'
-);
-
-addFilter(
-	'editor.BlockEdit',
-	'core/editor/with-block-bindings',
-	withBlockBindings
-);
+};
