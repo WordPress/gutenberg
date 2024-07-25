@@ -21,6 +21,7 @@ test.describe( 'Font Appearance Control dropdown menu', () => {
 				},
 			},
 		} );
+		await page.getByRole( 'tab', { name: 'Styles' } ).click();
 		await page
 			.getByRole( 'button', { name: 'Typography options' } )
 			.click();
@@ -37,6 +38,7 @@ test.describe( 'Font Appearance Control dropdown menu', () => {
 				},
 			},
 		} );
+		await page.getByRole( 'tab', { name: 'Styles' } ).click();
 		await page
 			.getByRole( 'button', { name: 'Typography options' } )
 			.click();
@@ -53,6 +55,7 @@ test.describe( 'Font Appearance Control dropdown menu', () => {
 				},
 			},
 		} );
+		await page.getByRole( 'tab', { name: 'Styles' } ).click();
 		await page
 			.getByRole( 'button', { name: 'Typography options' } )
 			.click();
@@ -77,6 +80,7 @@ test.describe( 'Font Appearance Control dropdown menu', () => {
 				},
 			},
 		} );
+		await page.getByRole( 'tab', { name: 'Styles' } ).click();
 		await page
 			.getByRole( 'button', { name: 'Typography options' } )
 			.click();
