@@ -94,7 +94,7 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__menu.show-panel {
-	width: $secondary-sidebar-width + $category-panel-width;
+	width: $secondary-sidebar-width + $sidebar-width;
 }
 
 .block-editor-inserter__inline-elements {
@@ -310,7 +310,7 @@ $block-inserter-tabs-height: 44px;
 		border-left: $border-width solid $gray-200;
 		padding: 0;
 		left: 100%;
-		width: $category-panel-width;
+		width: $sidebar-width;
 		position: absolute;
 		top: -$border-width;
 		height: calc(100% + #{$border-width});
