@@ -1466,9 +1466,11 @@ class WP_Theme_JSON_Gutenberg {
 				$nested_selector = $part[0];
 				$css_value       = $part[1];
 
-				// Handle pseudo elements such as ::before, ::after etc. Regex will also
-				// capture any leading combinator such as >, +, or ~, as well as spaces.
-				// This allows pseudo elements as descendants e.g. `.parent ::before`.
+				/*
+				 * Handle pseudo elements such as ::before, ::after etc. Regex will also
+				 * capture any leading combinator such as >, +, or ~, as well as spaces.
+				 * This allows pseudo elements as descendants e.g. `.parent ::before`.
+				 */
 				$matches            = array();
 				$has_pseudo_element = preg_match( '/([>+~\s]*::[a-zA-Z-]+)/', $nested_selector, $matches );
 				$pseudo_part        = $has_pseudo_element ? $matches[1] : '';
