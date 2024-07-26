@@ -88,7 +88,7 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__menu.show-panel {
-	width: 650px;
+	width: $secondary-sidebar-width + $category-panel-width;
 }
 
 .block-editor-inserter__inline-elements {
