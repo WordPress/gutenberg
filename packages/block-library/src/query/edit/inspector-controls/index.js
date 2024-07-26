@@ -100,13 +100,6 @@ export default function QueryInspectorControls( props ) {
 		return onChangeDebounced.cancel;
 	}, [ querySearch, onChangeDebounced ] );
 	const showInheritControl = isControlAllowed( allowedControls, 'inherit' );
-	const inheritControlLabel = __( 'Query Type' );
-	const inheritControlDefaultHelp = __(
-		'Display a list of posts or custom post types based on the current template.'
-	);
-	const inheritControlCustomHelp = __(
-		'Display a list of posts or custom post types based on specific criteria.'
-	);
 	const showPostTypeControl =
 		! inherit && isControlAllowed( allowedControls, 'postType' );
 	const postTypeControlLabel = __( 'Post type' );
@@ -153,15 +146,19 @@ export default function QueryInspectorControls( props ) {
 				<PanelBody title={ __( 'Settings' ) }>
 					{ showInheritControl && (
 						<ToggleGroupControl
-							label={ inheritControlLabel }
+							label={ __( 'Query type' ) }
 							isBlock
 							onChange={ ( value ) => {
 								setQuery( { inherit: !! value } );
 							} }
 							help={
 								inherit
-									? inheritControlDefaultHelp
-									: inheritControlCustomHelp
+									? __(
+											'Display a list of posts or custom post types based on the current template.'
+									  )
+									: __(
+											'Display a list of posts or custom post types based on specific criteria.'
+									  )
 							}
 							value={ !! inherit }
 						>
