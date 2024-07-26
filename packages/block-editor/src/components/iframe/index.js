@@ -14,7 +14,7 @@ import {
 	useEffect,
 	useRef,
 } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import {
 	useResizeObserver,
 	useMergeRefs,
@@ -64,7 +64,7 @@ function bubbleEvent( event, Constructor, frame ) {
 }
 
 /**
- * Bubbles some event types (keydown, keypress, and dragover) to parent document
+ * Bubbles some event types (keydown, keypress, and dragover) to parent
  * document to ensure that the keyboard shortcuts and drag and drop work.
  *
  * Ideally, we should remove event bubbling in the future. Keyboard shortcuts
@@ -112,15 +112,14 @@ function Iframe( {
 	title = __( 'Editor canvas' ),
 	...props
 } ) {
-	const { resolvedAssets, isPreviewMode, siteLocale, userLocale } = useSelect(
+	const { resolvedAssets, isPreviewMode, siteLocale } = useSelect(
 		( select ) => {
 			const { getSettings } = select( blockEditorStore );
 			const settings = getSettings();
 			return {
 				resolvedAssets: settings.__unstableResolvedAssets,
 				isPreviewMode: settings.__unstableIsPreviewMode,
-				siteLocale: settings.locale?.site,
-				userLocale: settings.locale?.user,
+				siteLocale: settings.siteLocale,
 			};
 		},
 		[]
@@ -288,7 +287,7 @@ function Iframe( {
 				and should therefore match the editor UI's directionality.
 			*/
 			.block-editor-block-list__layout .components-placeholder { 
-				direction: ${ userLocale?.isRTL ? 'rtl' : 'ltr' };
+				direction: ${ isRTL() ? 'rtl' : 'ltr' };
 			}
 		</style>
 		${ styles }

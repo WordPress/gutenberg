@@ -45,15 +45,10 @@ function gutenberg_get_block_editor_settings_6_7( $settings ) {
 		}
 	}
 
-	$settings['locale'] = array(
-		'site' => array(
-			'lang'  => $current_site_locale,
-			'isRTL' => $current_site_is_rtl,
-		),
-		'user' => array(
-			'lang'  => $current_user_locale,
-			'isRTL' => $current_user_is_rtl,
-		),
+	// @TODO confirm if `lang` just needs to be added to the `/wp/v2/settings` response`.
+	$settings['siteLocale'] = array(
+		'lang'  => $current_site_locale,
+		'isRTL' => $current_site_is_rtl,
 	);
 
 	return $settings;
