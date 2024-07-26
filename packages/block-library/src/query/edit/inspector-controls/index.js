@@ -146,6 +146,7 @@ export default function QueryInspectorControls( props ) {
 				<PanelBody title={ __( 'Settings' ) }>
 					{ showInheritControl && (
 						<ToggleGroupControl
+							__next40pxDefaultSize
 							label={ __( 'Query type' ) }
 							isBlock
 							onChange={ ( value ) => {
