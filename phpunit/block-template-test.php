@@ -14,13 +14,13 @@ class Tests_Block_Template extends WP_UnitTestCase {
 			'plugin' => 'test-plugin',
 		);
 
-		gutenberg_register_template( $template_name, $args );
+		wp_register_template( $template_name, $args );
 
 		$templates = get_block_templates();
 
 		$this->assertArrayHasKey( 'test-plugin//test-template', $templates );
 
-		gutenberg_unregister_template( 'test-plugin//' . $template_name );
+		wp_unregister_template( 'test-plugin//' . $template_name );
 	}
 
 	public function test_get_block_template_from_registry() {
@@ -30,12 +30,12 @@ class Tests_Block_Template extends WP_UnitTestCase {
 			'title'  => 'Test Template',
 		);
 
-		gutenberg_register_template( $template_name, $args );
+		wp_register_template( $template_name, $args );
 
 		$template = get_block_template( 'block-theme//test-template' );
 
 		$this->assertEquals( 'Test Template', $template->title );
 
-		gutenberg_unregister_template( 'test-plugin//' . $template_name );
+		wp_unregister_template( 'test-plugin//' . $template_name );
 	}
 }
