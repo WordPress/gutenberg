@@ -918,6 +918,8 @@ describe( 'DropdownMenu', () => {
 			await sleep();
 			await press.Tab();
 			expect( outerButton ).toBeInTheDocument();
+			// TODO: ariakit-0-4 - the failure below is due to the animation change which leaves the popover open for a bit after closing, see note in the styles.ts file
+			// it also helps to open the storybook with 0.4.0 installed and seeing it in the browser, direct link: http://localhost:50240/iframe.html?args=&id=components-experimental-dropdownmenu-v2--default&viewMode=story
 			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
 		} );
 	} );
