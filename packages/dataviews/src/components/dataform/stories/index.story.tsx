@@ -20,15 +20,21 @@ const fields = [
 		label: 'Title',
 		type: 'text' as const,
 	},
+	{
+		id: 'order',
+		label: 'Order',
+		type: 'integer' as const,
+	},
 ];
 
 export const Default = () => {
 	const [ post, setPost ] = useState( {
 		title: 'Hello, World!',
+		order: 2,
 	} );
 
 	const form = {
-		visibleFields: [ 'title' ],
+		visibleFields: [ 'title', 'order' ],
 	};
 
 	return (
