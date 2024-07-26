@@ -82,6 +82,7 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__menu {
+	display: flex;
 	height: 100%;
 	position: relative;
 	overflow: visible;
@@ -673,7 +674,6 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__menu.is-zoom-out {
-	display: flex;
 	&.show-panel::after {
 		// Makes space for the inserter flyout panel
 		@include break-medium {
