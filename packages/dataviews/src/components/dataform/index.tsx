@@ -11,6 +11,7 @@ import {
 	__experimentalNumberControl as NumberControl,
 	SelectControl,
 } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 import { useCallback, useMemo } from '@wordpress/element';
 
 /**
@@ -66,7 +67,7 @@ function DataFormNumberControl< Item >( {
 	onChange,
 }: DataFormControlProps< Item > ) {
 	const { id, label, description } = field;
-	const value = field.getValue( { item: data } );
+	const value = field.getValue( { item: data } ) ?? '';
 	const onChangeControl = useCallback(
 		( newValue: string | undefined ) =>
 			onChange( ( prevItem: Item ) => ( {
@@ -77,11 +78,23 @@ function DataFormNumberControl< Item >( {
 	);
 
 	if ( field.elements ) {
+		const elements = [
+			/*
+			 * Value can be undefined when:
+			 *
+			 * - the field is not required
+			 * - in bulk editing
+			 *
+			 */
+			{ label: __( 'Select item' ), value: '' },
+			...field.elements,
+		];
+
 		return (
 			<SelectControl
 				label={ label }
 				value={ value }
-				options={ field.elements }
+				options={ elements }
 				onChange={ onChangeControl }
 			/>
 		);
