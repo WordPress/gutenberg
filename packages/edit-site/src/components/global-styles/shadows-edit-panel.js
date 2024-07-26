@@ -11,7 +11,6 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalSpacer as Spacer,
 	__experimentalItemGroup as ItemGroup,
-	__experimentalHeading as Heading,
 	__experimentalInputControl as InputControl,
 	__experimentalUnitControl as UnitControl,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
@@ -423,7 +422,6 @@ function ShadowPopover( { shadowObj, onChange } ) {
 	return (
 		<div className="edit-site-global-styles__shadow-editor-panel">
 			<VStack spacing={ 4 }>
-				<Heading level={ 5 }>{ __( 'Shadow' ) }</Heading>
 				<ColorPalette
 					clearable={ false }
 					enableAlpha={ enableAlpha }
