@@ -17,6 +17,7 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__main-area {
+	width: 100%;
 	height: 100%;
 	gap: $grid-unit-20;
 	position: relative;
