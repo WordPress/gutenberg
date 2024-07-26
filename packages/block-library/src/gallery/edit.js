@@ -41,6 +41,7 @@ import {
 	customLink,
 	image as imageIcon,
 	linkOff,
+	fullscreen,
 } from '@wordpress/icons';
 
 /**
@@ -58,6 +59,7 @@ import {
 	LINK_DESTINATION_ATTACHMENT,
 	LINK_DESTINATION_MEDIA,
 	LINK_DESTINATION_NONE,
+	LINK_DESTINATION_LIGHTBOX,
 } from './constants';
 import useImageSizes from './use-image-sizes';
 import useGetNewImages from './use-get-new-images';
@@ -77,6 +79,13 @@ const linkOptions = [
 		label: __( 'Link images to media files' ),
 		value: LINK_DESTINATION_MEDIA,
 		noticeText: __( 'Media Files' ),
+	},
+	{
+		icon: fullscreen,
+		label: __( 'Expand on click' ),
+		value: LINK_DESTINATION_LIGHTBOX,
+		noticeText: __( 'Lightbox effect' ),
+		infoText: __( 'Scales the image with a lightbox effect' ),
 	},
 	{
 		icon: linkOff,
