@@ -2,7 +2,6 @@
  * External dependencies
  */
 import postcss, { CssSyntaxError } from 'postcss';
-import wrap from 'postcss-prefixwrap';
 import prefixSelector from 'postcss-prefix-selector';
 import rebaseUrl from 'postcss-urlrebase';
 
@@ -55,7 +54,6 @@ function transformStyle(
 				baseURL && rebaseUrl( { rootUrl: baseURL } ),
 			].filter( Boolean )
 		).process( css, {} ).css; // use sync PostCSS API
-		// console.log( posted );
 		return posted;
 	} catch ( error ) {
 		if ( error instanceof CssSyntaxError ) {

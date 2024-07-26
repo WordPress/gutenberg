@@ -210,6 +210,23 @@ describe( 'transformStyles', () => {
 
 			expect( output ).toEqual( [ input ] );
 		} );
+
+		it( 'should not try to wrap items within `:where` selectors', () => {
+			const input = `:where(.wp-element-button:active, .wp-block-button__link:active) { color: blue; }`;
+			const prefix = '.my-namespace';
+			const expected = [ `${ prefix } ${ input }` ];
+
+			const output = transformStyles(
+				[
+					{
+						css: input,
+					},
+				],
+				prefix
+			);
+
+			expect( output ).toEqual( expected );
+		} );
 	} );
 
 	it( 'should not break with data urls', () => {
