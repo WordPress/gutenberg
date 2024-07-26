@@ -74,6 +74,7 @@
 		"memize": "^2.1.0",
 		"postcss": "^8.4.21",
 		"postcss-prefixwrap": "^1.41.0",
+		"postcss-prefix-selector": "^1.16.0",
 		"postcss-urlrebase": "^1.4.0",
 		"react-autosize-textarea": "^7.1.0",
 		"react-easy-crop": "^5.0.6",
