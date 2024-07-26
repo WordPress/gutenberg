@@ -615,7 +615,7 @@ describe( 'Gallery block', () => {
 		// Set "Link to" setting via Gallery block settings
 		await openBlockSettings( screen );
 		fireEvent.press( getByText( 'Link to' ) );
-		fireEvent.press( getByText( 'Media File' ) );
+		fireEvent.press( getByText( 'Link images to media files' ) );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
