@@ -6,7 +6,7 @@
 	overflow: hidden;
 
 	@include break-medium() {
-		width: 355px;
+		width: $secondary-sidebar-width;
 	}
 }
 

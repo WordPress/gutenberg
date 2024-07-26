@@ -303,8 +303,8 @@ $block-inserter-tabs-height: 44px;
 	@include break-medium {
 		border-left: $border-width solid $gray-200;
 		padding: 0;
-		right: 0;
-		width: 300px;
+		left: 100%;
+		width: $category-panel-width;
 		position: absolute;
 		top: -$border-width;
 		height: calc(100% + #{$border-width});

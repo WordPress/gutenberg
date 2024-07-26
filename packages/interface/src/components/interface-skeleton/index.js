@@ -206,7 +206,10 @@ function InterfaceSkeleton(
 									closed: { width: 0 },
 									mobileOpen: { width: '100vw' },
 									wide: {
-										width: '650px',
+										width:
+											secondarySidebarSize.width +
+											300 +
+											'px',
 									},
 								} }
 								transition={ defaultTransition }
