@@ -3,11 +3,6 @@
 	transition: opacity 0.1s ease-out;
 	@include reduce-motion("transition");
 
-	.interface-interface-skeleton__body {
-		// Make this a stacking context to contain the z-index of children elements.
-		isolation: isolate;
-	}
-
 	&.is-loading {
 		opacity: 0;
 	}
