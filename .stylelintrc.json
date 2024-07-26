@@ -26,7 +26,7 @@
 		"property-disallowed-list": [
 			[ "order" ],
 			{
-				"message": "Avoid the order property. For accessibility reasons, visual, reading, and DOM order must match. Only use the order property when it does not affect reading order, meaning, and interaction,"
+				"message": "Avoid the order property. For accessibility reasons, visual, reading, and DOM order must match. Only use the order property when it does not affect reading order, meaning, and interaction."
 			}
 		],
 		"rule-empty-line-before": null,
