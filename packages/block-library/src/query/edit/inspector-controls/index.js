@@ -100,15 +100,18 @@ export default function QueryInspectorControls( props ) {
 		return onChangeDebounced.cancel;
 	}, [ querySearch, onChangeDebounced ] );
 	const showInheritControl = isControlAllowed( allowedControls, 'inherit' );
-	const inheritControlLabel = __( 'Contents' );
-	const inheritControlHelp = __(
-		"Block will display items matching the page's context, e.g. category archive or search result"
+	const inheritControlLabel = __( 'Query Type' );
+	const inheritControlDefaultHelp = __(
+		'Display a list of posts or custom post types based on the current template.'
+	);
+	const inheritControlCustomHelp = __(
+		'Display a list of posts or custom post types based on specific criteria.'
 	);
 	const showPostTypeControl =
 		! inherit && isControlAllowed( allowedControls, 'postType' );
-	const postTypeControlLabel = __( 'Content type' );
+	const postTypeControlLabel = __( 'Post type' );
 	const postTypeControlHelp = __(
-		'WordPress contains different types of content you can filter by. Posts and pages are the default types, but plugins could add more.'
+		'Select the type of content to display: posts, pages, or custom post types.'
 	);
 	const showColumnsControl = false;
 	const showOrderControl =
@@ -155,7 +158,11 @@ export default function QueryInspectorControls( props ) {
 							onChange={ ( value ) => {
 								setQuery( { inherit: !! value } );
 							} }
-							help={ inherit && inheritControlHelp }
+							help={
+								inherit
+									? inheritControlDefaultHelp
+									: inheritControlCustomHelp
+							}
 							value={ !! inherit }
 						>
 							<ToggleGroupControlOption
