@@ -48,12 +48,20 @@ export default function PostTemplatePanel() {
 		}
 
 		const canCreateTemplates =
-			select( coreStore ).canUser( 'create', 'templates' ) ?? false;
+			select( coreStore ).canUser( 'create', {
+				kind: 'postType',
+				name: 'wp_template',
+			} ) ?? false;
 		return canCreateTemplates;
 	}, [] );
 
 	const canViewTemplates = useSelect( ( select ) => {
-		return select( coreStore ).canUser( 'read', 'templates' ) ?? false;
+		return (
+			select( coreStore ).canUser( 'read', {
+				kind: 'postType',
+				name: 'wp_template',
+			} ) ?? false
+		);
 	}, [] );
 
 	if ( ( ! isBlockTheme || ! canViewTemplates ) && isVisible ) {

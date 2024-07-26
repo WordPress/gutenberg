@@ -25,8 +25,6 @@ import {
 	getCurrentPost,
 	__experimentalGetDefaultTemplatePartAreas,
 } from './selectors';
-import { TEMPLATE_PART_POST_TYPE } from './constants';
-import { getFilteredTemplatePartBlocks } from './utils/get-filtered-template-parts';
 import { getEntityActions as _getEntityActions } from '../dataviews/store/private-selectors';
 
 const EMPTY_INSERTION_POINT = {
@@ -121,29 +119,6 @@ export const getPostIcon = createRegistrySelector(
 );
 
 /**
- * Returns the template parts and their blocks for the current edited template.
- *
- * @param {Object} state Global application state.
- * @return {Array} Template parts and their blocks in an array.
- */
-export const getCurrentTemplateTemplateParts = createRegistrySelector(
-	( select ) => () => {
-		const templateParts = select( coreStore ).getEntityRecords(
-			'postType',
-			TEMPLATE_PART_POST_TYPE,
-			{ per_page: -1 }
-		);
-
-		const clientIds =
-			select( blockEditorStore ).getBlocksByName( 'core/template-part' );
-		const blocks =
-			select( blockEditorStore ).getBlocksByClientId( clientIds );
-
-		return getFilteredTemplatePartBlocks( blocks, templateParts );
-	}
-);
-
-/**
  * Returns true if there are unsaved changes to the
  * post's meta fields, and false otherwise.
  *
@@ -185,3 +160,36 @@ export const hasPostMetaChanges = createRegistrySelector(
 export function getEntityActions( state, ...args ) {
 	return _getEntityActions( state.dataviews, ...args );
 }
+
+/**
+ * Similar to getBlocksByName in @wordpress/block-editor, but only returns the top-most
+ * blocks that aren't descendants of the query block.
+ *
+ * @param {Object}       state      Global application state.
+ * @param {Array|string} blockNames Block names of the blocks to retrieve.
+ *
+ * @return {Array} Block client IDs.
+ */
+export const getPostBlocksByName = createRegistrySelector( ( select ) =>
+	createSelector(
+		( state, blockNames ) => {
+			blockNames = Array.isArray( blockNames )
+				? blockNames
+				: [ blockNames ];
+			const { getBlocksByName, getBlockParents, getBlockName } =
+				select( blockEditorStore );
+			return getBlocksByName( blockNames ).filter( ( clientId ) =>
+				getBlockParents( clientId ).every( ( parentClientId ) => {
+					const parentBlockName = getBlockName( parentClientId );
+					return (
+						// Ignore descendents of the query block.
+						parentBlockName !== 'core/query' &&
+						// Enable only the top-most block.
+						! blockNames.includes( parentBlockName )
+					);
+				} )
+			);
+		},
+		() => [ select( blockEditorStore ).getBlocks() ]
+	)
+);

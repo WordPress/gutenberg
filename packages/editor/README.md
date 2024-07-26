@@ -532,7 +532,7 @@ _Returns_
 
 ### PageAttributesOrder
 
-Renders the Page Attributes Order component. A number input in an editor interface for setting the order of a given page.
+Renders the Page Attributes Order component. A number input in an editor interface for setting the order of a given page. The component is now not used in core but was kept for backward compatibility.
 
 _Returns_
 
@@ -1364,6 +1364,7 @@ _Parameters_
 
 -   _props_ `Object`: The component props.
 -   _props.slug_ `string`: The slug of the taxonomy.
+-   _props.\_\_nextHasNoMarginBottom_ `boolean`: Start opting into the new margin-free styles that will become the default in a future version, currently scheduled to be WordPress 7.0. (The prop can be safely removed once this happens.)
 
 _Returns_
 

@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 2.4.0 (2024-07-24)
+
+## 2.3.0 (2024-07-10)
+
+### Bug Fixes
+
+-   Fix getting param annotations for exported variables assigned to function expressions ([#tbd](https://github.com/WordPress/gutenberg/pull/tbd)).
+
 ## 2.2.0 (2024-06-26)
 
 ## 2.1.0 (2024-06-15)
@@ -98,7 +106,7 @@
 
 ### Bug Fixes
 
--   Fix getting param annotations for default exported functions. ([#31603](https://github.com/WordPress/gutenberg/pull/31603))
+-   Fix getting param annotations for default exported functions ([#31603](https://github.com/WordPress/gutenberg/pull/31603)).
 
 ## 1.17.0 (2021-04-29)
 

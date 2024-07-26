@@ -3,7 +3,7 @@
  */
 import { trash } from '@wordpress/icons';
 import { useDispatch } from '@wordpress/data';
-import { __, _n, sprintf, _x } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import {
 	Button,
@@ -77,7 +77,8 @@ const deletePostAction: Action< Post > = {
 						variant="tertiary"
 						onClick={ closeModal }
 						disabled={ isBusy }
-						__experimentalIsFocusable
+						accessibleWhenDisabled
+						__next40pxDefaultSize
 					>
 						{ __( 'Cancel' ) }
 					</Button>
@@ -94,7 +95,8 @@ const deletePostAction: Action< Post > = {
 						} }
 						isBusy={ isBusy }
 						disabled={ isBusy }
-						__experimentalIsFocusable
+						accessibleWhenDisabled
+						__next40pxDefaultSize
 					>
 						{ __( 'Delete' ) }
 					</Button>

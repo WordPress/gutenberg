@@ -53,6 +53,12 @@ type SelectControlBaseProps = Pick<
 		 * passed in as `children` for more customizability.
 		 */
 		children?: ReactNode;
+		/**
+		 * The style variant of the control.
+		 *
+		 * @default 'default'
+		 */
+		variant?: 'default' | 'minimal';
 	};
 
 export type SelectControlSingleSelectionProps = SelectControlBaseProps & {

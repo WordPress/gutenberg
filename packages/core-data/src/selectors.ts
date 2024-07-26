@@ -20,6 +20,7 @@ import {
 	isRawAttribute,
 	setNestedValue,
 	isNumericID,
+	getUserPermissionCacheKey,
 } from './utils';
 import type * as ET from './entity-types';
 import type { UndoManager } from '@wordpress/undo-manager';
@@ -119,6 +120,8 @@ type GetRecordsHttpQuery = Record< string, any >;
 type EntityRecordArgs =
 	| [ string, string, EntityRecordKey ]
 	| [ string, string, EntityRecordKey, GetRecordsHttpQuery ];
+
+type EntityResource = { kind: string; name: string; id?: EntityRecordKey };
 
 /**
  * Shared reference to an empty object for cases where it is important to avoid
@@ -232,7 +235,9 @@ export function getEntitiesByKind( state: State, kind: string ): Array< any > {
 export const getEntitiesConfig = createSelector(
 	( state: State, kind: string ): Array< any > =>
 		state.entities.config.filter( ( entity ) => entity.kind === kind ),
+	/* eslint-disable @typescript-eslint/no-unused-vars */
 	( state: State, kind: string ) => state.entities.config
+	/* eslint-enable @typescript-eslint/no-unused-vars */
 );
 /**
  * Returns the entity config given its kind and name.
@@ -992,6 +997,7 @@ export function getLastEntityDeleteError(
 		?.error;
 }
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Returns the previous edit from the current undo offset
  * for the entity records edits history, if any.
@@ -1008,7 +1014,9 @@ export function getUndoEdit( state: State ): Optional< any > {
 	} );
 	return undefined;
 }
+/* eslint-enable @typescript-eslint/no-unused-vars */
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Returns the next edit from the current undo offset
  * for the entity records edits history, if any.
@@ -1025,6 +1033,7 @@ export function getRedoEdit( state: State ): Optional< any > {
 	} );
 	return undefined;
 }
+/* eslint-enable @typescript-eslint/no-unused-vars */
 
 /**
  * Returns true if there is a previous edit from the current undo offset
@@ -1130,7 +1139,8 @@ export function isPreviewEmbedFallback( state: State, url: string ): boolean {
  *
  * @param state    Data state.
  * @param action   Action to check. One of: 'create', 'read', 'update', 'delete'.
- * @param resource REST resource to check, e.g. 'media' or 'posts'.
+ * @param resource Entity resource to check. Accepts entity object `{ kind: 'root', name: 'media', id: 1 }`
+ *                 or REST base as a string - `media`.
  * @param id       Optional ID of the rest resource to check.
  *
  * @return Whether or not the user can perform the action,
@@ -1139,10 +1149,16 @@ export function isPreviewEmbedFallback( state: State, url: string ): boolean {
 export function canUser(
 	state: State,
 	action: string,
-	resource: string,
+	resource: string | EntityResource,
 	id?: EntityRecordKey
 ): boolean | undefined {
-	const key = [ action, resource, id ].filter( Boolean ).join( '/' );
+	const isEntity = typeof resource === 'object';
+	if ( isEntity && ( ! resource.kind || ! resource.name ) ) {
+		return false;
+	}
+
+	const key = getUserPermissionCacheKey( action, resource, id );
+
 	return state.userPermissions[ key ];
 }
 
@@ -1167,13 +1183,12 @@ export function canUserEditEntityRecord(
 	name: string,
 	recordId: EntityRecordKey
 ): boolean | undefined {
-	const entityConfig = getEntityConfig( state, kind, name );
-	if ( ! entityConfig ) {
-		return false;
-	}
-	const resource = entityConfig.__unstable_rest_base;
+	deprecated( `wp.data.select( 'core' ).canUserEditEntityRecord()`, {
+		since: '6.7',
+		alternative: `wp.data.select( 'core' ).canUser( 'update', { kind, name, id } )`,
+	} );
 
-	return canUser( state, 'update', resource, recordId );
+	return canUser( state, 'update', { kind, name, id: recordId } );
 }
 
 /**
