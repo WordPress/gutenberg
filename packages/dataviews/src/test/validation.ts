@@ -60,4 +60,21 @@ describe( 'validation', () => {
 		const result = isItemValid( item, fields, form );
 		expect( result ).toBe( false );
 	} );
+
+	it( 'field is invalid if value is not one of the elements', () => {
+		const item = { id: 1, author: 3 };
+		const fields: Field< {} >[] = [
+			{
+				id: 'author',
+				type: 'integer',
+				elements: [
+					{ value: 1, label: 'Jane' },
+					{ value: 2, label: 'John' },
+				],
+			},
+		];
+		const form = { visibleFields: [ 'author' ] };
+		const result = isItemValid( item, fields, form );
+		expect( result ).toBe( false );
+	} );
 } );
