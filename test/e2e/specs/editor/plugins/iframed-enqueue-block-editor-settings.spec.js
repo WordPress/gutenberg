@@ -96,4 +96,31 @@ test.describe( 'iframed block editor settings styles', () => {
 		// Expect a 2px border because theme styles are enabled.
 		await expect( defaultBlock ).toHaveCSS( 'border-width', '2px' );
 	} );
+
+	test( 'should set iframe html attributes based on locale through block editor settings', async ( {
+		editor,
+		page,
+	} ) => {
+		await page.evaluate( () => {
+			const settings = window.wp.data
+				.select( 'core/editor' )
+				.getEditorSettings();
+			window.wp.data.dispatch( 'core/editor' ).updateEditorSettings( {
+				...settings,
+				locale: {
+					site: {
+						lang: 'ar',
+						isRTL: true,
+					},
+					user: {
+						lang: 'en_US',
+						isRTL: false,
+					},
+				},
+			} );
+		} );
+		const htmlElement = editor.canvas.locator( 'css=html' );
+		await expect( htmlElement ).toHaveAttribute( 'lang', 'ar' );
+		await expect( htmlElement ).toHaveAttribute( 'dir', 'rtl' );
+	} );
 } );
