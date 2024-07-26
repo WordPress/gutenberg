@@ -371,16 +371,21 @@ export function collections( state = {}, action ) {
 	return state;
 }
 
-export function blockBindingsSources( state = {}, action ) {
-	// Merge usesContext with existing values, potentially defined in the server registration.
-	const existingUsesContext = state[ action.name ]?.usesContext || [];
-	const newUsesContext = action.usesContext || [];
+/**
+ * Merges usesContext with existing values, potentially defined in the server registration.
+ *
+ * @param {string[]} existingUsesContext Existing `usesContext`.
+ * @param {string[]} newUsesContext      Newly added `usesContext`.
+ * @return {string[]|undefined} Merged `usesContext`.
+ */
+function getMergedUsesContext( existingUsesContext = [], newUsesContext = [] ) {
 	const mergedArrays = Array.from(
 		new Set( existingUsesContext.concat( newUsesContext ) )
 	);
-	const mergedUsesContext =
-		mergedArrays.length > 0 ? mergedArrays : undefined;
+	return mergedArrays.length > 0 ? mergedArrays : undefined;
+}
 
+export function blockBindingsSources( state = {}, action ) {
 	switch ( action.type ) {
 		case 'ADD_BLOCK_BINDINGS_SOURCE':
 			return {
@@ -388,7 +393,10 @@ export function blockBindingsSources( state = {}, action ) {
 				[ action.name ]: {
 					// Don't override the label if it's already set.
 					label: state[ action.name ]?.label || action.label,
-					usesContext: mergedUsesContext,
+					usesContext: getMergedUsesContext(
+						state[ action.name ]?.usesContext,
+						action.usesContext
+					),
 					getValues: action.getValues,
 					setValues: action.setValues,
 					getPlaceholder: action.getPlaceholder,
@@ -405,7 +413,10 @@ export function blockBindingsSources( state = {}, action ) {
 					 */
 					...state[ action.name ],
 					label: action.label,
-					usesContext: mergedUsesContext,
+					usesContext: getMergedUsesContext(
+						state[ action.name ]?.usesContext,
+						action.usesContext
+					),
 				},
 			};
 		case 'REMOVE_BLOCK_BINDINGS_SOURCE':

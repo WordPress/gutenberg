@@ -1,6 +1,6 @@
 <?php
 /**
- * Temporary compatibility code for new functionalitites/changes related to block bindings APIs present in Gutenberg.
+ * Temporary compatibility code for new functionalities/changes related to block bindings APIs present in Gutenberg.
  *
  * @package gutenberg
  */

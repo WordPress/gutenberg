@@ -98,7 +98,7 @@ function GridItemResizerInner( {
 		<BlockPopoverCover
 			className="block-editor-grid-item-resizer"
 			clientId={ clientId }
-			__unstablePopoverSlot="block-toolbar"
+			__unstablePopoverSlot="__unstable-block-tools-after"
 			additionalStyles={ styles }
 		>
 			<ResizableBox
