@@ -624,7 +624,7 @@ function GalleryEdit( props ) {
 						label={ __( 'Link To' ) }
 					>
 						{ ( { onClose } ) => (
-							<MenuGroup className="blocks-gallery__link-to-control">
+							<MenuGroup>
 								{ linkOptions.map( ( linkItem ) => {
 									const isOptionSelected =
 										linkTo === linkItem.value;
