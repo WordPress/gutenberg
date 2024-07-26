@@ -7,8 +7,8 @@ import {
 	SelectControl,
 } from '@wordpress/components';
 import { memo, useContext } from '@wordpress/element';
-import { sprintf, __, _x } from '@wordpress/i18n';
-import { Icon, next, previous, chevronDownSmall } from '@wordpress/icons';
+import { sprintf, __ } from '@wordpress/i18n';
+import { next, previous } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -21,10 +21,30 @@ function DataViewsPagination() {
 		onChangeView,
 		paginationInfo: { totalItems = 0, totalPages },
 	} = useContext( DataViewsContext );
+
 	if ( ! totalItems || ! totalPages ) {
 		return null;
 	}
+
 	const currentPage = view.page ?? 1;
+	const pageSelectOptions = Array.from( Array( totalPages ) ).map(
+		( _, i ) => {
+			const page = i + 1;
+			return {
+				value: page.toString(),
+				label:
+					currentPage === page
+						? sprintf(
+								// translators: Current page number in total number of pages
+								__( 'Page %1$s of %2$s' ),
+								currentPage,
+								totalPages
+						  )
+						: page.toString(),
+			};
+		}
+	);
+
 	return (
 		!! totalItems &&
 		totalPages !== 1 && (
@@ -34,24 +54,12 @@ function DataViewsPagination() {
 				justify="end"
 				className="dataviews-pagination"
 			>
-				<HStack
-					justify="flex-start"
-					expanded={ false }
-					spacing={ 0 }
-					className="dataviews-pagination__page-selection"
-				>
+				<HStack justify="flex-start" expanded={ false } spacing={ 0 }>
 					<SelectControl
 						aria-label={ __( 'Current page' ) }
-						value={ view.page?.toString() }
-						options={ Array.from( Array( totalPages ) ).map(
-							( _, i ) => {
-								const page = i + 1;
-								return {
-									value: page.toString(),
-									label: page.toString(),
-								};
-							}
-						) }
+						className="dataviews-pagination__page-select"
+						value={ currentPage.toString() }
+						options={ pageSelectOptions }
 						onChange={ ( newValue ) => {
 							onChangeView( {
 								...view,
@@ -61,16 +69,6 @@ function DataViewsPagination() {
 						size="compact"
 						__nextHasNoMarginBottom
 						variant="minimal"
-						suffix={
-							<span className="dataviews-pagination__page-selection-suffix">
-								{ sprintf(
-									// translators: Total number of pages
-									__( 'of %s pages' ),
-									totalPages
-								) }
-								<Icon icon={ chevronDownSmall } />
-							</span>
-						}
 					/>
 				</HStack>
 				<HStack expanded={ false } spacing={ 1 }>
