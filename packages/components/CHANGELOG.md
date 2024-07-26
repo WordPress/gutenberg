@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   `CustomSelectControl`: Support generic props type ([#todo](https://github.com/WordPress/gutenberg/pull/todo)).
+-   `CustomSelectControl`: Support generic props type ([#63985](https://github.com/WordPress/gutenberg/pull/63985)).
 
 ### Internal
 
