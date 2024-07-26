@@ -258,8 +258,7 @@ function ComboboxList( { view, filter, onChangeView }: SearchWidgetProps ) {
 					{ __( 'Search items' ) }
 				</Ariakit.ComboboxLabel>
 				<Ariakit.Combobox
-					// autoSelect="always" - TODO: undo this once PR reaches 0.4.1 ariakit version
-					autoSelect
+					autoSelect="always"
 					placeholder={ __( 'Search' ) }
 					className="dataviews-filters__search-widget-filter-combobox__input"
 				/>
