@@ -53,7 +53,7 @@
 
 .page-templates-description {
 	display: block;
-	max-width: $maximum-text-width;
+	max-width: 50em;
 	text-wrap: pretty;
 
 	&.is-viewtype-table {
