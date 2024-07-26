@@ -5004,12 +5004,26 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	public function data_process_blocks_custom_css() {
 		return array(
 			// Simple CSS without any nested selectors.
+			'empty css'                    => array(
+				'input'    => array(
+					'selector' => '.foo',
+					'css'      => '',
+				),
+				'expected' => '',
+			),
 			'no nested selectors'          => array(
 				'input'    => array(
 					'selector' => '.foo',
 					'css'      => 'color: red; margin: auto;',
 				),
 				'expected' => ':root :where(.foo){color: red; margin: auto;}',
+			),
+			'no root styles'               => array(
+				'input'    => array(
+					'selector' => '.foo',
+					'css'      => '&::before{color: red;}',
+				),
+				'expected' => ':root :where(.foo)::before{color: red;}',
 			),
 			// CSS with nested selectors.
 			'with nested selector'         => array(
