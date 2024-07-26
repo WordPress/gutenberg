@@ -197,7 +197,7 @@ describe( 'transformStyles', () => {
 		} );
 
 		it( 'should not double wrap selectors', () => {
-			const input = ` .my-namespace h1, .red { color: red; }`;
+			const input = ` .my-namespace h1, .my-namespace .red { color: red; }`;
 
 			const output = transformStyles(
 				[
@@ -208,7 +208,7 @@ describe( 'transformStyles', () => {
 				'.my-namespace'
 			);
 
-			expect( output ).toMatchSnapshot();
+			expect( output ).toEqual( [ input ] );
 		} );
 	} );
 
