@@ -31,7 +31,7 @@
 	],
 	"types": "build-types",
 	"dependencies": {
-		"@ariakit/react": "0.4.3",
+		"@ariakit/react": "0.4.4",
 		"@babel/runtime": "^7.16.0",
 		"@emotion/cache": "^11.7.1",
 		"@emotion/css": "^11.7.1",
