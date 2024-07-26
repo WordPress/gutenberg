@@ -9,6 +9,7 @@ import type { Dispatch, SetStateAction } from 'react';
 import {
 	TextControl,
 	__experimentalNumberControl as NumberControl,
+	SelectControl,
 } from '@wordpress/components';
 import { useCallback, useMemo } from '@wordpress/element';
 
@@ -66,7 +67,6 @@ function DataFormNumberControl< Item >( {
 }: DataFormControlProps< Item > ) {
 	const { id, label, description } = field;
 	const value = field.getValue( { item: data } );
-
 	const onChangeControl = useCallback(
 		( newValue: string | undefined ) =>
 			onChange( ( prevItem: Item ) => ( {
@@ -75,6 +75,17 @@ function DataFormNumberControl< Item >( {
 			} ) ),
 		[ id, onChange ]
 	);
+
+	if ( field.elements ) {
+		return (
+			<SelectControl
+				label={ label }
+				value={ value }
+				options={ field.elements }
+				onChange={ onChangeControl }
+			/>
+		);
+	}
 
 	return (
 		<NumberControl
