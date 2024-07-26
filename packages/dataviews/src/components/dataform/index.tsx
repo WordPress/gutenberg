@@ -6,13 +6,16 @@ import type { Dispatch, SetStateAction } from 'react';
 /**
  * WordPress dependencies
  */
-import { TextControl } from '@wordpress/components';
+import {
+	TextControl,
+	__experimentalNumberControl as NumberControl,
+} from '@wordpress/components';
 import { useCallback, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import type { Form, Field, NormalizedField } from '../../types';
+import type { Form, Field, NormalizedField, FieldType } from '../../types';
 import { normalizeFields } from '../../normalize-fields';
 
 type DataFormProps< Item > = {
@@ -33,7 +36,7 @@ function DataFormTextControl< Item >( {
 	field,
 	onChange,
 }: DataFormControlProps< Item > ) {
-	const { id, header, placeholder } = field;
+	const { id, label, placeholder } = field;
 	const value = field.getValue( { item: data } );
 
 	const onChangeControl = useCallback(
@@ -47,8 +50,36 @@ function DataFormTextControl< Item >( {
 
 	return (
 		<TextControl
-			label={ header }
+			label={ label }
 			placeholder={ placeholder }
+			value={ value ?? '' }
+			onChange={ onChangeControl }
+			__next40pxDefaultSize
+		/>
+	);
+}
+
+function DataFormNumberControl< Item >( {
+	data,
+	field,
+	onChange,
+}: DataFormControlProps< Item > ) {
+	const { id, label, description } = field;
+	const value = field.getValue( { item: data } );
+
+	const onChangeControl = useCallback(
+		( newValue: string | undefined ) =>
+			onChange( ( prevItem: Item ) => ( {
+				...prevItem,
+				[ id ]: newValue,
+			} ) ),
+		[ id, onChange ]
+	);
+
+	return (
+		<NumberControl
+			label={ label }
+			help={ description }
 			value={ value }
 			onChange={ onChangeControl }
 			__next40pxDefaultSize
@@ -57,11 +88,12 @@ function DataFormTextControl< Item >( {
 }
 
 const controls: {
-	[ key: string ]: < Item >(
+	[ key in FieldType ]: < Item >(
 		props: DataFormControlProps< Item >
 	) => JSX.Element;
 } = {
 	text: DataFormTextControl,
+	integer: DataFormNumberControl,
 };
 
 function getControlForField< Item >( field: NormalizedField< Item > ) {

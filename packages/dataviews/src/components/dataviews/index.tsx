@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { ReactNode } from 'react';
+
+/**
  * WordPress dependencies
  */
 import { __experimentalHStack as HStack } from '@wordpress/components';
@@ -39,6 +44,7 @@ type DataViewsProps< Item > = {
 	defaultLayouts: SupportedLayouts;
 	selection?: string[];
 	onChangeSelection?: ( items: string[] ) => void;
+	header?: ReactNode;
 } & ( Item extends ItemWithId
 	? { getItemId?: ( item: Item ) => string }
 	: { getItemId: ( item: Item ) => string } );
@@ -59,6 +65,7 @@ export default function DataViews< Item >( {
 	defaultLayouts,
 	selection: selectionProperty,
 	onChangeSelection,
+	header,
 }: DataViewsProps< Item > ) {
 	const [ selectionState, setSelectionState ] = useState< string[] >( [] );
 	const [ density, setDensity ] = useState< number >( 0 );
@@ -122,7 +129,16 @@ export default function DataViews< Item >( {
 						/>
 					) }
 					<DataViewsBulkActions />
-					<DataViewsViewConfig defaultLayouts={ defaultLayouts } />
+					<HStack
+						spacing={ 1 }
+						expanded={ false }
+						style={ { flexShrink: 0 } }
+					>
+						<DataViewsViewConfig
+							defaultLayouts={ defaultLayouts }
+						/>
+						{ header }
+					</HStack>
 				</HStack>
 				<DataViewsLayout />
 				<DataviewsPagination />

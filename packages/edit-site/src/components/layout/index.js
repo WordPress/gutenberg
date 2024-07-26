@@ -201,6 +201,17 @@ export default function Layout( { route } ) {
 							</div>
 						) }
 
+					{ ! isMobileViewport && areas.edit && (
+						<div
+							className="edit-site-layout__area"
+							style={ {
+								maxWidth: widths?.edit,
+							} }
+						>
+							{ areas.edit }
+						</div>
+					) }
+
 					{ ! isMobileViewport && areas.preview && (
 						<div className="edit-site-layout__canvas-container">
 							{ canvasResizer }

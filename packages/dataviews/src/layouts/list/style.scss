@@ -179,7 +179,10 @@
 		}
 
 		.dataviews-view-list__field-value {
-			line-height: $grid-unit-05 * 6;
+			min-height: $grid-unit-30;
+			line-height: $grid-unit-05 * 5;
+			display: flex;
+			align-items: center;
 		}
 	}
 

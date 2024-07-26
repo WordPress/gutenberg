@@ -311,7 +311,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			__experimentalUndo: undo,
 			// Check whether we want all site editor frames to have outlines
 			// including the navigation / pattern / parts editors.
-			outlineMode: postType === 'wp_template',
+			outlineMode: ! isDistractionFree && postType === 'wp_template',
 			// Check these two properties: they were not present in the site editor.
 			__experimentalCreatePageEntity: createPageEntity,
 			__experimentalUserCanCreatePages: userCanCreatePages,
@@ -353,6 +353,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		setIsInserterOpened,
 		sectionRootClientId,
 		globalStylesData,
+		globalStylesLinksData,
 	] );
 }
 
