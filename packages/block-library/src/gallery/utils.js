@@ -7,7 +7,6 @@ import {
 	LINK_DESTINATION_NONE,
 	LINK_DESTINATION_MEDIA_WP_CORE,
 	LINK_DESTINATION_ATTACHMENT_WP_CORE,
-	LINK_DESTINATION_LIGHTBOX,
 } from './constants';
 import {
 	LINK_DESTINATION_ATTACHMENT as IMAGE_LINK_DESTINATION_ATTACHMENT,
@@ -43,12 +42,6 @@ export function getHrefAndDestination(
 			return {
 				href: image?.link,
 				linkDestination: IMAGE_LINK_DESTINATION_ATTACHMENT,
-			};
-		case LINK_DESTINATION_LIGHTBOX:
-			return {
-				href: undefined,
-				lightbox: { enabled: true },
-				linkDestination: IMAGE_LINK_DESTINATION_NONE,
 			};
 		case LINK_DESTINATION_NONE:
 			return {
