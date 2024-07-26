@@ -17,10 +17,14 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__main-area {
-	width: 100%;
-	height: 100%;
 	gap: $grid-unit-20;
+	height: 100%;
 	position: relative;
+	width: 100%;
+
+	@include break-medium {
+		width: auto;
+	}
 
 	&.show-as-tabs {
 		gap: 0;
