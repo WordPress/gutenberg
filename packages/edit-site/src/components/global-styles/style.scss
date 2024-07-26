@@ -135,9 +135,11 @@
 	}
 }
 
-.edit-site-global-styles__shadow-editor-panel {
+.edit-site-global-styles__shadow-editor__dropdown-content {
 	width: 280px;
-	padding: $grid-unit-20;
+}
+
+.edit-site-global-styles__shadow-editor-panel {
 	// because tooltip of the range control is too close to the edge and creates overflow
 	margin-bottom: $grid-unit-05;
 }

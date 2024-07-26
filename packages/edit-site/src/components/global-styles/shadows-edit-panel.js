@@ -394,13 +394,14 @@ function ShadowItem( { shadow, onChange, canRemove, onRemove } ) {
 				);
 			} }
 			renderContent={ () => (
-				<DropdownContentWrapper paddingSize="none">
-					<div className="edit-site-global-styles__shadow-editor__dropdown-content">
-						<ShadowPopover
-							shadowObj={ shadowObj }
-							onChange={ onShadowChange }
-						/>
-					</div>
+				<DropdownContentWrapper
+					paddingSize="medium"
+					className="edit-site-global-styles__shadow-editor__dropdown-content"
+				>
+					<ShadowPopover
+						shadowObj={ shadowObj }
+						onChange={ onShadowChange }
+					/>
 				</DropdownContentWrapper>
 			) }
 		/>
@@ -420,67 +421,64 @@ function ShadowPopover( { shadowObj, onChange } ) {
 	};
 
 	return (
-		<div className="edit-site-global-styles__shadow-editor-panel">
-			<VStack spacing={ 4 }>
-				<ColorPalette
-					clearable={ false }
-					enableAlpha={ enableAlpha }
-					__experimentalIsRenderedInSidebar={
-						__experimentalIsRenderedInSidebar
-					}
-					value={ shadowObj.color }
-					onChange={ ( value ) => onShadowChange( 'color', value ) }
+		<VStack
+			spacing={ 4 }
+			className="edit-site-global-styles__shadow-editor-panel"
+		>
+			<ColorPalette
+				clearable={ false }
+				enableAlpha={ enableAlpha }
+				__experimentalIsRenderedInSidebar={
+					__experimentalIsRenderedInSidebar
+				}
+				value={ shadowObj.color }
+				onChange={ ( value ) => onShadowChange( 'color', value ) }
+			/>
+			<ToggleGroupControl
+				__nextHasNoMarginBottom
+				value={ shadowObj.inset ? 'inset' : 'outset' }
+				isBlock
+				onChange={ ( value ) =>
+					onShadowChange( 'inset', value === 'inset' )
+				}
+				hideLabelFromVision
+				__next40pxDefaultSize
+			>
+				<ToggleGroupControlOption
+					value="outset"
+					label={ __( 'Outset' ) }
 				/>
-				<ToggleGroupControl
-					__nextHasNoMarginBottom
-					value={ shadowObj.inset ? 'inset' : 'outset' }
-					isBlock
-					onChange={ ( value ) =>
-						onShadowChange( 'inset', value === 'inset' )
-					}
-					hideLabelFromVision
-					__next40pxDefaultSize
-				>
-					<ToggleGroupControlOption
-						value="outset"
-						label={ __( 'Outset' ) }
-					/>
-					<ToggleGroupControlOption
-						value="inset"
-						label={ __( 'Inset' ) }
-					/>
-				</ToggleGroupControl>
-				<Grid columns={ 2 } gap={ 4 }>
-					<ShadowInputControl
-						label={ __( 'X Position' ) }
-						value={ shadowObj.x }
-						hasNegativeRange
-						onChange={ ( value ) => onShadowChange( 'x', value ) }
-					/>
-					<ShadowInputControl
-						label={ __( 'Y Position' ) }
-						value={ shadowObj.y }
-						hasNegativeRange
-						onChange={ ( value ) => onShadowChange( 'y', value ) }
-					/>
-					<ShadowInputControl
-						label={ __( 'Blur' ) }
-						value={ shadowObj.blur }
-						onChange={ ( value ) =>
-							onShadowChange( 'blur', value )
-						}
-					/>
-					<ShadowInputControl
-						label={ __( 'Spread' ) }
-						value={ shadowObj.spread }
-						hasNegativeRange
-						onChange={ ( value ) =>
-							onShadowChange( 'spread', value )
-						}
-					/>
-				</Grid>
-			</VStack>
-		</div>
+				<ToggleGroupControlOption
+					value="inset"
+					label={ __( 'Inset' ) }
+				/>
+			</ToggleGroupControl>
+			<Grid columns={ 2 } gap={ 4 }>
+				<ShadowInputControl
+					label={ __( 'X Position' ) }
+					value={ shadowObj.x }
+					hasNegativeRange
+					onChange={ ( value ) => onShadowChange( 'x', value ) }
+				/>
+				<ShadowInputControl
+					label={ __( 'Y Position' ) }
+					value={ shadowObj.y }
+					hasNegativeRange
+					onChange={ ( value ) => onShadowChange( 'y', value ) }
+				/>
+				<ShadowInputControl
+					label={ __( 'Blur' ) }
+					value={ shadowObj.blur }
+					onChange={ ( value ) => onShadowChange( 'blur', value ) }
+				/>
+				<ShadowInputControl
+					label={ __( 'Spread' ) }
+					value={ shadowObj.spread }
+					hasNegativeRange
+					onChange={ ( value ) => onShadowChange( 'spread', value ) }
+				/>
+			</Grid>
+		</VStack>
 	);
 }
 
