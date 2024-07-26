@@ -3,6 +3,7 @@
  */
 import postcss, { CssSyntaxError } from 'postcss';
 import wrap from 'postcss-prefixwrap';
+import prefixSelector from 'postcss-prefix-selector';
 import rebaseUrl from 'postcss-urlrebase';
 
 const cacheByWrapperSelector = new Map();
@@ -18,22 +19,37 @@ function transformStyle(
 	if ( ! wrapperSelector && ! baseURL ) {
 		return css;
 	}
-	const postcssFriendlyCSS = css
-		.replace( /:root :where\(body\)/g, 'body' )
-		.replace( /:where\(body\)/g, 'body' );
+	// const postcssFriendlyCSS = css
+	// 	.replace( /:root :where\(body\)/g, 'body' )
+	// 	.replace( /:where\(body\)/g, 'body' );
 	try {
-		return postcss(
+		const posted = postcss(
 			[
 				wrapperSelector &&
-					wrap( wrapperSelector, {
-						ignoredSelectors: [
-							...ignoredSelectors,
-							wrapperSelector,
-						],
+					prefixSelector( {
+						prefix: wrapperSelector,
+						exclude: [ ...ignoredSelectors, wrapperSelector ],
+						transform(
+							prefix,
+							selector,
+							prefixedSelector,
+							filePath,
+							rule
+						) {
+							if ( selector.includes( 'body' ) ) {
+								return selector.replace( 'body', prefix );
+							}
+							if ( selector.startsWith( ':root' ) ) {
+								return selector.replace( ':root', prefix );
+							}
+							return prefixedSelector;
+						},
 					} ),
 				baseURL && rebaseUrl( { rootUrl: baseURL } ),
 			].filter( Boolean )
-		).process( postcssFriendlyCSS, {} ).css; // use sync PostCSS API
+		).process( css, {} ).css; // use sync PostCSS API
+		console.log( posted );
+		return posted;
 	} catch ( error ) {
 		if ( error instanceof CssSyntaxError ) {
 			// eslint-disable-next-line no-console
