@@ -101,44 +101,24 @@ export const DropdownMenu = styled( Ariakit.Menu )<
 	outline: 2px solid transparent !important;
 
 	/* Animation */
-	animation-duration: ${ ANIMATION_PARAMS.DURATION };
-	animation-timing-function: ${ ANIMATION_PARAMS.EASING };
-	will-change: transform, opacity;
-	/* Default animation.*/
-	animation-name: ${ slideDownAndFade };
+	&[data-open] {
+		@media not ( prefers-reduced-motion ) {
+			animation-duration: ${ ANIMATION_PARAMS.DURATION };
+			animation-timing-function: ${ ANIMATION_PARAMS.EASING };
+			will-change: transform, opacity;
+			/* Default animation.*/
+			animation-name: ${ slideDownAndFade };
 
-	&[data-side='left'] {
-		animation-name: ${ slideLeftAndFade };
-	}
-	&[data-side='up'] {
-		animation-name: ${ slideUpAndFade };
-	}
-	&[data-side='right'] {
-		animation-name: ${ slideRightAndFade };
-	}
-	@media ( prefers-reduced-motion ) {
-		animation-duration: 0s;
-	}
-
-	// TODO: ariakit-0-4 - now animation is enabled by default, and since there's no exit animation this section should be replaced by the styles below:
-	// &[data-open] {
-	// 	@media not ( prefers-reduced-motion ) {
-	// 		animation-duration: ${ ANIMATION_PARAMS.DURATION };
-	// 		animation-timing-function: ${ ANIMATION_PARAMS.EASING };
-	// 		will-change: transform, opacity;
-	// 		/* Default animation.*/
-	// 		animation-name: ${ slideDownAndFade };
-
-	// 		&[data-side='left'] {
-	// 			animation-name: ${ slideLeftAndFade };
-	// 		}
-	// 		&[data-side='up'] {
-	// 			animation-name: ${ slideUpAndFade };
-	// 		}
-	// 		&[data-side='right'] {
-	// 			animation-name: ${ slideRightAndFade };
-	// 		}
-	// 	}
+			&[data-side='left'] {
+				animation-name: ${ slideLeftAndFade };
+			}
+			&[data-side='up'] {
+				animation-name: ${ slideUpAndFade };
+			}
+			&[data-side='right'] {
+				animation-name: ${ slideRightAndFade };
+			}
+		}
 	}
 `;
 

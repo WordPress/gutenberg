@@ -206,8 +206,6 @@ describe.each( [
 		).toBeVisible();
 
 		await press.Escape();
-		// TODO: ariakit-0-4 - since this version depends on v2 for styles, the same test failure happens here for the same reason
-		// see note in the v2 tests, fixing that will also fix this
 		expect(
 			screen.queryByRole( 'listbox', {
 				name: props.label,
