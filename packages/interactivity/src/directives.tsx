@@ -260,7 +260,6 @@ export default () => {
 	// data-wp-context
 	directive(
 		'context',
-		// @ts-ignore-next-line
 		( {
 			directives: { context },
 			props: { children },

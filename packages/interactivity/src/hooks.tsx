@@ -56,7 +56,7 @@ interface DirectiveArgs {
 }
 
 interface DirectiveCallback {
-	( args: DirectiveArgs ): VNode | null | void;
+	( args: DirectiveArgs ): VNode< any > | null | void;
 }
 
 interface DirectiveOptions {
