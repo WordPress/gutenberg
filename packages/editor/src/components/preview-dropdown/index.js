@@ -78,21 +78,33 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 						<MenuItem
 							onClick={ () => setDeviceType( 'Desktop' ) }
 							icon={ deviceType === 'Desktop' && check }
-							aria-label={ __( 'Desktop View' ) }
+							aria-label={
+								deviceType === 'Desktop'
+									? __( 'Desktop Selected' )
+									: __( 'Desktop' )
+							}
 						>
 							{ __( 'Desktop' ) }
 						</MenuItem>
 						<MenuItem
 							onClick={ () => setDeviceType( 'Tablet' ) }
 							icon={ deviceType === 'Tablet' && check }
-							aria-label={ __( 'Tablet View' ) }
+							aria-label={
+								deviceType === 'Tablet'
+									? __( 'Tablet Selected' )
+									: __( 'Tablet' )
+							}
 						>
 							{ __( 'Tablet' ) }
 						</MenuItem>
 						<MenuItem
 							onClick={ () => setDeviceType( 'Mobile' ) }
 							icon={ deviceType === 'Mobile' && check }
-							aria-label={ __( 'Mobile View' ) }
+							aria-label={
+								deviceType === 'Mobile'
+									? __( 'Mobile Selected' )
+									: __( 'Mobile' )
+							}
 						>
 							{ __( 'Mobile' ) }
 						</MenuItem>
