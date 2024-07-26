@@ -1,0 +1,12 @@
+.components-toggle-control__label {
+	line-height: $toggle-height;
+
+	&:not(.is-disabled) {
+		cursor: pointer;
+	}
+}
+
+.components-toggle-control__help {
+	display: inline-block;
+	margin-inline-start: $toggle-width + $grid-unit-10;
+}

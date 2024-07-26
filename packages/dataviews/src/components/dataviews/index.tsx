@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { ReactNode } from 'react';
+
+/**
  * WordPress dependencies
  */
 import { __experimentalHStack as HStack } from '@wordpress/components';
@@ -18,6 +23,8 @@ import DataViewsViewConfig from '../dataviews-view-config';
 import { normalizeFields } from '../../normalize-fields';
 import type { Action, Field, View, SupportedLayouts } from '../../types';
 import type { SelectionOrUpdater } from '../../private-types';
+import DensityPicker from '../../layouts/grid/density-picker';
+import { LAYOUT_GRID } from '../../constants';
 
 type ItemWithId = { id: string };
 
@@ -37,6 +44,7 @@ type DataViewsProps< Item > = {
 	defaultLayouts: SupportedLayouts;
 	selection?: string[];
 	onChangeSelection?: ( items: string[] ) => void;
+	header?: ReactNode;
 } & ( Item extends ItemWithId
 	? { getItemId?: ( item: Item ) => string }
 	: { getItemId: ( item: Item ) => string } );
@@ -57,8 +65,10 @@ export default function DataViews< Item >( {
 	defaultLayouts,
 	selection: selectionProperty,
 	onChangeSelection,
+	header,
 }: DataViewsProps< Item > ) {
 	const [ selectionState, setSelectionState ] = useState< string[] >( [] );
+	const [ density, setDensity ] = useState< number >( 0 );
 	const isUncontrolled =
 		selectionProperty === undefined || onChangeSelection === undefined;
 	const selection = isUncontrolled ? selectionState : selectionProperty;
@@ -95,6 +105,7 @@ export default function DataViews< Item >( {
 				openedFilter,
 				setOpenedFilter,
 				getItemId,
+				density,
 			} }
 		>
 			<div className="dataviews-wrapper">
@@ -111,8 +122,23 @@ export default function DataViews< Item >( {
 						{ search && <DataViewsSearch label={ searchLabel } /> }
 						<DataViewsFilters />
 					</HStack>
+					{ view.type === LAYOUT_GRID && (
+						<DensityPicker
+							density={ density }
+							setDensity={ setDensity }
+						/>
+					) }
 					<DataViewsBulkActions />
-					<DataViewsViewConfig defaultLayouts={ defaultLayouts } />
+					<HStack
+						spacing={ 1 }
+						expanded={ false }
+						style={ { flexShrink: 0 } }
+					>
+						<DataViewsViewConfig
+							defaultLayouts={ defaultLayouts }
+						/>
+						{ header }
+					</HStack>
 				</HStack>
 				<DataViewsLayout />
 				<DataviewsPagination />
