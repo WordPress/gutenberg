@@ -65,6 +65,7 @@ describe( 'Tooltip', () => {
 			expectTooltipToBeHidden();
 		} );
 
+		// TODO: ariakit-0-4 - probably want to remove this test since ariakit doesn't support tooltip as description anymore and it's just not a good idea in general to rely on that behavior (see description: https://github.com/WordPress/gutenberg/pull/62947)
 		it( 'should associate the tooltip text with its anchor via the accessible description when visible', async () => {
 			render( <Tooltip { ...props } /> );
 
@@ -493,6 +494,7 @@ describe( 'Tooltip', () => {
 			expect(
 				screen.queryByRole( 'tooltip', { name: 'Inner tooltip' } )
 			).not.toBeInTheDocument();
+			// TODO: ariakit-0-4 - need to remove the assertion below since ariakit doesn't support tooltip as description anymore (see description: https://github.com/WordPress/gutenberg/pull/62947)
 			expect(
 				screen.getByRole( 'button', {
 					description: 'Outer tooltip',
