@@ -5,6 +5,7 @@
 ### Internal
 
 -   `DropdownMenuV2`: break menu item help text on multiple lines for better truncation. ([#63916](https://github.com/WordPress/gutenberg/pull/63916)).
+-   Upgrade `framer-motion` package to version `^11.3.18` ([#64003](https://github.com/WordPress/gutenberg/pull/64003)).
 
 ## 28.4.0 (2024-07-24)
 
