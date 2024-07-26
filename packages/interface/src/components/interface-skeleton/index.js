@@ -20,12 +20,12 @@ import {
 	useResizeObserver,
 } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
  */
 import NavigableRegion from '../navigable-region';
+import { store as interfaceStore } from '../../store';
 
 const ANIMATION_DURATION = 0.25;
 const commonTransition = {
