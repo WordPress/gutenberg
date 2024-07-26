@@ -253,7 +253,7 @@ _Usage_
 Get the current post type
 
 ```js
-const currentPostType = wp.data.select('core/editor').getCurrentPostType()
+const currentPostType = wp.data.select( 'core/editor' ).getCurrentPostType();
 ```
 
 _Parameters_
@@ -297,54 +297,69 @@ _Usage_
 Fetch the featured image URL
 
 ```js
-const getFeaturedMediaUrl = useSelect((select) => {
-	const getFeaturedMediaId = select('core/editor').getEditedPostAttribute('featured_media')
-	const getMedia = select('core').getMedia(getFeaturedMediaId)
-	return getMedia?.media_details?.sizes?.large?.source_url || getMedia?.source_url || '' // change large for any registered size
-}, [])
+const getFeaturedMediaUrl = useSelect( ( select ) => {
+	const getFeaturedMediaId =
+		select( 'core/editor' ).getEditedPostAttribute( 'featured_media' );
+	const getMedia = select( 'core' ).getMedia( getFeaturedMediaId );
+	return (
+		getMedia?.media_details?.sizes?.large?.source_url ||
+		getMedia?.source_url ||
+		''
+	); // change large for any registered size
+}, [] );
 ```
 
 Update Post Meta from Media Upload in a Block
 
 ```js
 import { __ } from '@wordpress/i18n';
-import { useBlockProps, MediaUpload, MediaUploadCheck } from '@wordpress/block-editor'
+import {
+	useBlockProps,
+	MediaUpload,
+	MediaUploadCheck,
+} from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
-import { useSelect, useDispatch } from '@wordpress/data'
+import { useSelect, useDispatch } from '@wordpress/data';
 
 const Edit = () => {
-  const { editPost } = useDispatch('core/editor')
+	const { editPost } = useDispatch( 'core/editor' );
 
-  // Get core meta data
-  const { uploaded_file, file_description } = useSelect((select) => {
-    return select('core/editor').getEditedPostAttribute('meta')
-  })
+	// Get core meta data
+	const { uploaded_file, file_description } = useSelect( ( select ) => {
+		return select( 'core/editor' ).getEditedPostAttribute( 'meta' );
+	} );
 
-  const onMediaUpload = (media) => {
-    editPost({
-      meta: {
-        uploaded_file: media.url,
-        file_description: media.description,
-      },
-    })
-  }
+	const onMediaUpload = ( media ) => {
+		editPost( {
+			meta: {
+				uploaded_file: media.url,
+				file_description: media.description,
+			},
+		} );
+	};
 
-  return (
-    <div
-      {...useBlockProps()}
-    >
-      <MediaUploadCheck>
-        <MediaUpload
-          onSelect={onMediaUpload}
-          mode="upload"
-          render={({ open }) => (
-            <Button variant="primary" onClick={open} title={uploaded_file ? __( 'Replace File' ) : __( 'A a File' )} />
-          )}
-        />
-      </MediaUploadCheck>
-    </div>
-  )
-}
+	return (
+		<div { ...useBlockProps() }>
+			<MediaUploadCheck>
+				<MediaUpload
+					onSelect={ onMediaUpload }
+					mode="upload"
+					render={ ( { open } ) => (
+						<Button
+							variant="primary"
+							onClick={ open }
+							title={
+								uploaded_file
+									? __( 'Replace File' )
+									: __( 'A a File' )
+							}
+						/>
+					) }
+				/>
+			</MediaUploadCheck>
+		</div>
+	);
+};
 ```
 
 _Parameters_
@@ -1222,50 +1237,60 @@ _Usage_
 Update the post title
 
 ```js
-wp.data.dispatch('core/editor').editPost({ title: `${newTitle}` })
+wp.data.dispatch( 'core/editor' ).editPost( { title: `${ newTitle }` } );
 ```
 
 Update Post Meta from Media Upload in a Block
 
 ```js
 import { __ } from '@wordpress/i18n';
-import { useBlockProps, MediaUpload, MediaUploadCheck } from '@wordpress/block-editor'
+import {
+	useBlockProps,
+	MediaUpload,
+	MediaUploadCheck,
+} from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
-import { useSelect, useDispatch } from '@wordpress/data'
+import { useSelect, useDispatch } from '@wordpress/data';
 
 const Edit = () => {
-  const { editPost } = useDispatch('core/editor')
+	const { editPost } = useDispatch( 'core/editor' );
 
-  // Get core meta data
-  const { uploaded_file, file_description } = useSelect((select) => {
-    return select('core/editor').getEditedPostAttribute('meta')
-  })
+	// Get core meta data
+	const { uploaded_file, file_description } = useSelect( ( select ) => {
+		return select( 'core/editor' ).getEditedPostAttribute( 'meta' );
+	} );
 
-  const onMediaUpload = (media) => {
-    editPost({
-      meta: {
-        uploaded_file: media.url,
-        file_description: media.description,
-      },
-    })
-  }
+	const onMediaUpload = ( media ) => {
+		editPost( {
+			meta: {
+				uploaded_file: media.url,
+				file_description: media.description,
+			},
+		} );
+	};
 
-  return (
-    <div
-      {...useBlockProps()}
-    >
-      <MediaUploadCheck>
-        <MediaUpload
-          onSelect={onMediaUpload}
-          mode="upload"
-          render={({ open }) => (
-            <Button variant="primary" onClick={open} title={uploaded_file ? __( 'Replace File' ) : __( 'A a File' )} />
-          )}
-        />
-      </MediaUploadCheck>
-    </div>
-  )
-}
+	return (
+		<div { ...useBlockProps() }>
+			<MediaUploadCheck>
+				<MediaUpload
+					onSelect={ onMediaUpload }
+					mode="upload"
+					render={ ( { open } ) => (
+						<Button
+							variant="primary"
+							onClick={ open }
+							title={
+								uploaded_file
+									? __( 'Replace File' )
+									: __( 'A a File' )
+							}
+						/>
+					) }
+				/>
+			</MediaUploadCheck>
+		</div>
+	);
+};
 ```
 
 _Parameters_
