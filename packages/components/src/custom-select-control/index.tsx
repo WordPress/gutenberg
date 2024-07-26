@@ -154,7 +154,6 @@ function CustomSelectControl( props: CustomSelectProps ) {
 
 	return (
 		<_CustomSelect
-			aria-describedby={ describedBy }
 			renderSelectedValue={
 				showSelectedHint ? renderSelectedValueHint : undefined
 			}
@@ -166,6 +165,7 @@ function CustomSelectControl( props: CustomSelectProps ) {
 				classNameProp
 			) }
 			isLegacy
+			describedBy={ describedBy }
 			{ ...restProps }
 		>
 			{ children }

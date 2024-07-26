@@ -77,6 +77,10 @@ export type _CustomSelectProps = CustomSelectButtonProps & {
 	 * Accessible label for the control.
 	 */
 	label: string;
+	/**
+	 * Described by.
+	 */
+	describedBy?: string;
 };
 
 export type CustomSelectProps = _CustomSelectProps & CustomSelectSize;
