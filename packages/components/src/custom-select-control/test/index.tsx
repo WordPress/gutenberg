@@ -206,11 +206,13 @@ describe.each( [
 		).toBeVisible();
 
 		await press.Escape();
-		expect(
-			screen.queryByRole( 'listbox', {
-				name: props.label,
-			} )
-		).not.toBeInTheDocument();
+		await waitFor( () =>
+			expect(
+				screen.queryByRole( 'listbox', {
+					name: props.label,
+				} )
+			).not.toBeInTheDocument()
+		);
 
 		expect( currentSelectedItem ).toHaveTextContent(
 			props.options[ 0 ].name
