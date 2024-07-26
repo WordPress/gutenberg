@@ -41,7 +41,6 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 					<PanelBody title={ __( 'Settings' ) }>
 						{ 'checkbox' !== type && (
 							<CheckboxControl
-								__nextHasNoMarginBottom
 								label={ __( 'Inline label' ) }
 								checked={ inlineLabel }
 								onChange={ ( newVal ) => {
@@ -49,10 +48,10 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 										inlineLabel: newVal,
 									} );
 								} }
+								__nextHasNoMarginBottom
 							/>
 						) }
 						<CheckboxControl
-							__nextHasNoMarginBottom
 							label={ __( 'Required' ) }
 							checked={ required }
 							onChange={ ( newVal ) => {
@@ -60,6 +59,7 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 									required: newVal,
 								} );
 							} }
+							__nextHasNoMarginBottom
 						/>
 					</PanelBody>
 				</InspectorControls>
