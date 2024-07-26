@@ -91,3 +91,10 @@ Removes a media replace notice.
 -   Required: No
 
 If passed, children are rendered inside the dropdown.
+
+### children
+
+-   Type: `Element | func`
+-   Required: No
+
+If passed, children are rendered inside the dropdown. If a function is provided for this prop, it will receive an object with the `onClose` prop as an argument.

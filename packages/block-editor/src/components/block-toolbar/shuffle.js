@@ -54,10 +54,16 @@ export default function Shuffle( { clientId, as = Container } ) {
 			return EMPTY_ARRAY;
 		}
 		return patterns.filter( ( pattern ) => {
+			const isCorePattern =
+				pattern.source === 'core' ||
+				( pattern.source?.startsWith( 'pattern-directory' ) &&
+					pattern.source !== 'pattern-directory/theme' );
 			return (
 				// Check if the pattern has only one top level block,
 				// otherwise we may shuffle to pattern that will not allow to continue shuffling.
 				pattern.blocks.length === 1 &&
+				// We exclude the core patterns and pattern directory patterns that are not theme patterns.
+				! isCorePattern &&
 				pattern.categories?.some( ( category ) => {
 					return categories.includes( category );
 				} ) &&

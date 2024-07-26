@@ -186,3 +186,11 @@ button.font-library-modal__upload-area {
 		justify-content: center;
 	}
 }
+
+.font-library-modal__select-all {
+	padding: $grid-unit-20 $grid-unit-20 $grid-unit-20 $grid-unit-20 + $border-width;
+
+	.components-checkbox-control__label {
+		padding-left: $grid-unit-20;
+	}
+}

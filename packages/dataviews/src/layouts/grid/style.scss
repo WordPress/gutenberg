@@ -1,22 +1,10 @@
 .dataviews-view-grid {
 	margin-bottom: auto;
-	grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
 	grid-template-rows: max-content;
 	padding: 0 $grid-unit-60 $grid-unit-30;
 	transition: padding ease-out 0.1s;
 	@include reduce-motion("transition");
 
-	@include break-mobile() {
-		grid-template-columns: repeat(2, minmax(0, 1fr)) !important; // Todo: eliminate !important dependency
-	}
-
-	@include break-xlarge() {
-		grid-template-columns: repeat(3, minmax(0, 1fr)) !important; // Todo: eliminate !important dependency
-	}
-
-	@include break-huge() {
-		grid-template-columns: repeat(4, minmax(0, 1fr)) !important; // Todo: eliminate !important dependency
-	}
 
 	.dataviews-view-grid__card {
 		height: 100%;
@@ -120,6 +108,30 @@
 			font-size: 12px;
 		}
 	}
+}
+
+.dataviews-view-grid.dataviews-view-grid {
+	grid-template-columns: repeat(1, minmax(0, 1fr));
+
+	@include break-mobile() {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	@include break-xlarge() {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+
+	@include break-huge() {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+	}
+
+	@include break-xhuge() {
+		grid-template-columns: repeat(5, minmax(0, 1fr));
+	}
+}
+
+.dataviews-density-picker__range-control {
+	width: 200px;
 }
 
 .dataviews-view-grid__field-value:empty,

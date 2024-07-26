@@ -3,6 +3,7 @@
  */
 import type { ChangeEvent, ForwardedRef } from 'react';
 import { css } from '@emotion/react';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -87,11 +88,17 @@ export function ToggleControl(
 	return (
 		<BaseControl
 			id={ id }
-			help={ helpLabel }
+			help={
+				helpLabel && (
+					<span className="components-toggle-control__help">
+						{ helpLabel }
+					</span>
+				)
+			}
 			className={ classes }
 			__nextHasNoMarginBottom
 		>
-			<HStack justify="flex-start" spacing={ 3 }>
+			<HStack justify="flex-start" spacing={ 2 }>
 				<FormToggle
 					id={ id }
 					checked={ checked }
@@ -103,7 +110,9 @@ export function ToggleControl(
 				<FlexBlock
 					as="label"
 					htmlFor={ id }
-					className="components-toggle-control__label"
+					className={ clsx( 'components-toggle-control__label', {
+						'is-disabled': disabled,
+					} ) }
 				>
 					{ label }
 				</FlexBlock>

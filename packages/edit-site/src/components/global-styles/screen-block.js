@@ -264,6 +264,16 @@ function ScreenBlock( { name, variation } ) {
 					settings={ settings }
 				/>
 			) }
+			{ hasBackgroundPanel && (
+				<StylesBackgroundPanel
+					inheritedValue={ inheritedStyle }
+					value={ style }
+					onChange={ setStyle }
+					settings={ settings }
+					defaultValues={ BACKGROUND_BLOCK_DEFAULT_VALUES }
+					themeFileURIs={ _links?.[ 'wp:theme-file' ] }
+				/>
+			) }
 			{ hasTypographyPanel && (
 				<StylesTypographyPanel
 					inheritedValue={ inheritedStyle }
@@ -303,17 +313,6 @@ function ScreenBlock( { name, variation } ) {
 					onChange={ onChangeLightbox }
 					value={ userSettings }
 					inheritedValue={ settings }
-				/>
-			) }
-
-			{ hasBackgroundPanel && (
-				<StylesBackgroundPanel
-					inheritedValue={ inheritedStyle }
-					value={ style }
-					onChange={ setStyle }
-					settings={ settings }
-					defaultValues={ BACKGROUND_BLOCK_DEFAULT_VALUES }
-					themeFileURIs={ _links?.[ 'wp:theme-file' ] }
 				/>
 			) }
 

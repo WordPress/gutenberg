@@ -63,7 +63,7 @@ export type Field< Item > = {
 	/**
 	 * The label of the field. Defaults to the id.
 	 */
-	header?: string;
+	label?: string;
 
 	/**
 	 * Placeholder for the field.
@@ -116,7 +116,7 @@ export type Field< Item > = {
 	  } );
 
 export type NormalizedField< Item > = Field< Item > & {
-	header: string;
+	label: string;
 	getValue: ( args: { item: Item } ) => any;
 	render: ComponentType< { item: Item } >;
 };
@@ -242,7 +242,7 @@ interface ViewBase {
 export interface CombinedField {
 	id: string;
 
-	header: string;
+	label: string;
 
 	/**
 	 * The fields to use as columns.
@@ -434,6 +434,7 @@ export interface ViewBaseProps< Item > {
 	selection: string[];
 	setOpenedFilter: ( fieldId: string ) => void;
 	view: View;
+	density: number;
 }
 
 export interface ViewTableProps< Item > extends ViewBaseProps< Item > {

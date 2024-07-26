@@ -238,7 +238,7 @@ function TableRow< Item >( {
 					onChangeSelection(
 						selection.includes( id )
 							? selection.filter( ( itemId ) => id !== itemId )
-							: [ ...selection, id ]
+							: [ id ]
 					);
 				}
 			} }

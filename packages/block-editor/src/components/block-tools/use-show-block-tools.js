@@ -45,8 +45,13 @@ export function useShowBlockTools() {
 			editorMode === 'navigation';
 
 		const isZoomOut = editorMode === 'zoom-out';
+		const _showZoomOutToolbar =
+			isZoomOut &&
+			block?.attributes?.align === 'full' &&
+			! _showEmptyBlockSideInserter &&
+			! maybeShowBreadcrumb;
 		const _showBlockToolbarPopover =
-			! isZoomOut &&
+			! _showZoomOutToolbar &&
 			! getSettings().hasFixedToolbar &&
 			! _showEmptyBlockSideInserter &&
 			hasSelectedBlock &&
@@ -58,12 +63,7 @@ export function useShowBlockTools() {
 			showBreadcrumb:
 				! _showEmptyBlockSideInserter && maybeShowBreadcrumb,
 			showBlockToolbarPopover: _showBlockToolbarPopover,
-			showZoomOutToolbar:
-				hasSelectedBlock &&
-				isZoomOut &&
-				! _showEmptyBlockSideInserter &&
-				! maybeShowBreadcrumb &&
-				! _showBlockToolbarPopover,
+			showZoomOutToolbar: _showZoomOutToolbar,
 		};
 	}, [] );
 }

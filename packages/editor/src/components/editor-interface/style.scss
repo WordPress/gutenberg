@@ -1,3 +1,7 @@
 .editor-editor-interface .entities-saved-states__panel-header {
 	height: $header-height + $border-width;
 }
+
+.editor-visual-editor {
+	flex: 1 0 auto;
+}

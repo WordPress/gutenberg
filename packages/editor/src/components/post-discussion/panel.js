@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
 	Dropdown,
 	Button,
@@ -62,9 +62,11 @@ function PostDiscussionToggle( { isOpen, onClick } ) {
 	let label;
 	if ( commentStatus === 'open' ) {
 		if ( pingStatus === 'open' ) {
-			label = __( 'Open' );
+			label = _x( 'Open', 'Adjective: e.g. "Comments are open"' );
 		} else {
-			label = trackbacksSupported ? __( 'Comments only' ) : __( 'Open' );
+			label = trackbacksSupported
+				? __( 'Comments only' )
+				: _x( 'Open', 'Adjective: e.g. "Comments are open"' );
 		}
 	} else if ( pingStatus === 'open' ) {
 		label = commentsSupported ? __( 'Pings only' ) : __( 'Pings enabled' );
