@@ -8,7 +8,7 @@ import clsx from 'clsx';
  */
 import { useDispatch, useSelect } from '@wordpress/data';
 import { Button, __unstableMotion as motion } from '@wordpress/components';
-import { useInstanceId } from '@wordpress/compose';
+import { useInstanceId, useReducedMotion } from '@wordpress/compose';
 import {
 	EditorKeyboardShortcutsRegister,
 	privateApis as editorPrivateApis,
@@ -52,41 +52,6 @@ const { Editor, BackButton } = unlock( editorPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 
-const toggleVariants = {
-	edit: {
-		width: 60,
-		height: 60,
-		top: 0,
-		left: 0,
-		borderRadius: '0px',
-		boxShadow: 'none',
-		transition: {
-			delay: 0.1,
-			duration: 0.2,
-			type: 'tween',
-			stiffness: 400,
-		},
-	},
-};
-
-const siteIconVariants = {
-	edit: {
-		clipPath: 'inset(0% round 0)',
-	},
-	hover: {
-		clipPath: 'inset( 22% round 2px )',
-		transition: {
-			duration: 0.2,
-		},
-	},
-	tap: {
-		clipPath: 'inset(0% round 0)',
-		transition: {
-			delay: 0.1,
-		},
-	},
-};
-
 const toggleHomeIconVariants = {
 	edit: {
 		opacity: 0,
@@ -100,6 +65,7 @@ const toggleHomeIconVariants = {
 };
 
 export default function EditSiteEditor( { isPostsList = false } ) {
+	const disableMotion = useReducedMotion();
 	const { params } = useLocation();
 	const isLoading = useIsSiteEditorLoading();
 	const {
@@ -227,6 +193,44 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 		getEditorCanvasContainerTitleAndIcon( editorCanvasView );
 
 	const isReady = ! isLoading;
+
+	const toggleVariants = {
+		edit: {
+			width: 60,
+			height: 60,
+			top: 0,
+			left: 0,
+			borderRadius: '0px',
+			boxShadow: 'none',
+			transition: {
+				delay: 0.1,
+				duration: disableMotion ? 0 : 0.2,
+				type: 'tween',
+				stiffness: 400,
+			},
+		},
+	};
+
+	const siteIconVariants = {
+		edit: {
+			clipPath: 'inset(0% round 0)',
+			transition: {
+				duration: disableMotion ? 0 : 0.2,
+			},
+		},
+		hover: {
+			clipPath: 'inset( 22% round 2px )',
+			transition: {
+				duration: disableMotion ? 0 : 0.2,
+			},
+		},
+		tap: {
+			clipPath: 'inset(0% round 0)',
+			transition: {
+				delay: disableMotion ? 0 : 0.1,
+			},
+		},
+	};
 
 	return (
 		<>
