@@ -51,16 +51,14 @@
 	}
 }
 
-.dataviews-view-table {
-	.page-templates-description {
-		margin-bottom: $grid-unit-10;
-	}
-}
-
 .page-templates-description {
 	max-width: 50em;
 	text-wrap: balance; // Fallback for Safari
 	text-wrap: pretty;
+
+	.dataviews-view-table & {
+		margin-bottom: $grid-unit-10;
+	}
 }
 
 .edit-site-page-templates {
