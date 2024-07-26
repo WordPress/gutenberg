@@ -47,6 +47,8 @@ async function renderAndValidate( ...args: Parameters< typeof render > ) {
 		const activeButton = queryByAttribute(
 			'data-active-item',
 			view.baseElement,
+			// TODO: ariakit-0-4 - this is a problem due to https://ariakit.org/changelog#public-data-attributes-have-now-boolean-values
+			// to fix all tests, simply replace '' -> 'true' below
 			''
 		);
 		expect( activeButton ).not.toBeNull();
