@@ -105,6 +105,8 @@ describe.each( [
 			expect( container ).toMatchSnapshot();
 		} );
 
+		// TODO: ariakit-0-4 - snapshots fail simply because of the change from data-active-item="true" to data-active-item="", which does not affect anything else
+		// we just need to update the snapshots
 		it( 'with icons', () => {
 			const { container } = render(
 				<Component value="uppercase" label="Test Toggle Group Control">
