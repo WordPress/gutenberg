@@ -6,6 +6,7 @@
 	bottom: 0;
 	left: 0;
 	background-color: rgba($black, 0.35);
+	backdrop-filter: blur(4px);
 	z-index: z-index(".components-modal__screen-overlay");
 	display: flex;
 	// backdrop-filter: blur($grid-unit);
@@ -26,8 +27,9 @@
 	// Have the content element fill the vertical space yet not overflow.
 	display: flex;
 	// Animate the modal frame/contents appearing on the page.
-	animation: components-modal__appear-animation 0.1s ease-out;
+	animation: components-modal__appear-animation 0.2s ease-out;
 	animation-fill-mode: forwards;
+	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 	@include reduce-motion("animation");
 
 	// Show a centered modal on bigger screens.
@@ -80,10 +82,12 @@
 
 @keyframes components-modal__appear-animation {
 	from {
-		transform: translateY($grid-unit-40);
+		opacity: 0;
+		transform: scale(0.8);
 	}
 	to {
-		transform: translateY(0);
+		opacity: 1;
+		transform: scale(1);
 	}
 }
 
