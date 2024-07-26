@@ -7,7 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
-import { Button } from '@wordpress/components';
+import { Button, __unstableMotion as motion } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import {
 	EditorKeyboardShortcutsRegister,
@@ -22,6 +22,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { decodeEntities } from '@wordpress/html-entities';
+import { Icon, chevronLeft } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -50,6 +51,53 @@ import { useIsSiteEditorLoading } from '../layout/hooks';
 const { Editor, BackButton } = unlock( editorPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
+
+const toggleVariants = {
+	edit: {
+		width: 60,
+		height: 60,
+		top: 0,
+		left: 0,
+		borderRadius: '0px',
+		boxShadow: 'none',
+		transition: {
+			delay: 0.1,
+			duration: 0.2,
+			type: 'tween',
+			stiffness: 400,
+		},
+	},
+};
+
+const siteIconVariants = {
+	edit: {
+		clipPath: 'inset(0% round 0)',
+	},
+	hover: {
+		clipPath: 'inset( 22% round 2px )',
+		transition: {
+			duration: 0.2,
+		},
+	},
+	tap: {
+		clipPath: 'inset(0% round 0)',
+		transition: {
+			delay: 0.1,
+		},
+	},
+};
+
+const toggleHomeIconVariants = {
+	edit: {
+		opacity: 0,
+		scale: 0.2,
+	},
+	hover: {
+		opacity: 1,
+		scale: 1,
+		clipPath: 'inset( 22% round 2px )',
+	},
+};
 
 export default function EditSiteEditor( { isPostsList = false } ) {
 	const { params } = useLocation();
@@ -217,26 +265,46 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 						<BackButton>
 							{ ( { length } ) =>
 								length <= 1 && (
-									<Button
-										label={ __( 'Open Navigation' ) }
-										className="edit-site-layout__view-mode-toggle"
-										onClick={ () => {
-											setCanvasMode( 'view' );
-											// TODO: this is a temporary solution to navigate to the posts list if we are
-											// come here through `posts list` and are in focus mode editing a template, template part etc..
-											if (
-												isPostsList &&
-												params?.focusMode
-											) {
-												history.push( {
-													page: 'gutenberg-posts-dashboard',
-													postType: 'post',
-												} );
-											}
-										} }
+									<motion.div
+										className="edit-site-editor__view-mode-toggle"
+										variants={ toggleVariants }
+										animate="edit"
+										initial="edit"
+										whileHover="hover"
+										whileTap="tap"
 									>
-										<SiteIcon className="edit-site-layout__view-mode-toggle-icon" />
-									</Button>
+										<Button
+											label={ __( 'Open Navigation' ) }
+											showTooltip
+											tooltipPosition="middle right"
+											onClick={ () => {
+												setCanvasMode( 'view' );
+												// TODO: this is a temporary solution to navigate to the posts list if we are
+												// come here through `posts list` and are in focus mode editing a template, template part etc..
+												if (
+													isPostsList &&
+													params?.focusMode
+												) {
+													history.push( {
+														page: 'gutenberg-posts-dashboard',
+														postType: 'post',
+													} );
+												}
+											} }
+										>
+											<motion.div
+												variants={ siteIconVariants }
+											>
+												<SiteIcon className="edit-site-editor__view-mode-toggle-icon" />
+											</motion.div>
+										</Button>
+										<motion.div
+											className="edit-site-editor__back-icon"
+											variants={ toggleHomeIconVariants }
+										>
+											<Icon icon={ chevronLeft } />
+										</motion.div>
+									</motion.div>
 								)
 							}
 						</BackButton>
