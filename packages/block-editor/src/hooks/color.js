@@ -10,6 +10,7 @@ import { addFilter } from '@wordpress/hooks';
 import { getBlockSupport } from '@wordpress/blocks';
 import { useMemo, Platform, useCallback } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
+import { getCSSRules } from '@wordpress/style-engine';
 
 /**
  * Internal dependencies
@@ -33,9 +34,7 @@ import {
 } from '../components/global-styles/color-panel';
 import BlockColorContrastChecker from './contrast-checker';
 import { store as blockEditorStore } from '../store';
-import {
-	globalStylesDataKey,
-} from '../store/private-keys';
+import { globalStylesDataKey } from '../store/private-keys';
 
 export const COLOR_SUPPORT_KEY = 'color';
 
@@ -179,7 +178,10 @@ export function addSaveProps(
 		! hasBackgroundImage && shouldSerialize( 'gradients' )
 			? __experimentalGetGradientClass( gradient )
 			: undefined;
-
+	/*
+		@TODO- if there's an inherited background image and an applied attribute present,
+		we need to rebuild the background image value to include both the inherited and applied values.
+	 */
 	const backgroundClass = shouldSerialize( 'background' )
 		? getColorClassName( 'background-color', backgroundColor )
 		: undefined;
@@ -420,6 +422,38 @@ function useBlockProps( {
 			colors,
 			backgroundColor
 		)?.color;
+	}
+
+	const hasBackgroundImage =
+		typeof style?.background?.backgroundImage === 'string' ||
+		typeof style?.background?.backgroundImage?.url === 'string' ||
+		typeof inheritedValue?.background?.backgroundImage === 'string' ||
+		typeof inheritedValue?.background?.backgroundImage?.url === 'string';
+
+	const hasInheritedGradient = typeof inheritedValue?.color?.gradient === 'string';
+
+	// Builds a custom style if there's an inherited image,
+	// and gradient present applied in editor.
+	// @TODO - same has to be done where's there's an inherited gradient, and image applied in editor.
+	if ( hasBackgroundImage || hasInheritedGradient ) {
+		const backgroundStyles = {
+			color: {
+				gradient: gradient
+					? `var:preset|gradient|${ gradient }`
+					: inheritedValue?.color?.gradient,
+			},
+			background: {
+				backgroundImage:
+					style?.background?.backgroundImage ||
+					inheritedValue?.background?.backgroundImage,
+			},
+		};
+		const css = getCSSRules( backgroundStyles );
+		const rule = css.find(
+			( { key } ) => key === 'backgroundImage'
+		)?.value;
+
+		extraStyles.backgroundImage = rule;
 	}
 
 	const saveProps = addSaveProps(
