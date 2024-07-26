@@ -34,6 +34,7 @@ import {
 	myPatternsCategory,
 	INSERTER_PATTERN_TYPES,
 } from './utils';
+import { unlock } from '../../../lock-unlock';
 
 const noop = () => {};
 
@@ -57,7 +58,7 @@ export function PatternCategoryPreviews( {
 		patternSourceFilter
 	);
 
-	const { setWideSidebar } = useDispatch( interfaceStore );
+	const { setWideSidebar } = unlock( useDispatch( interfaceStore ) );
 	setWideSidebar( true );
 
 	const scrollContainerRef = useRef();

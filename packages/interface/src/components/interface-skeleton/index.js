@@ -26,6 +26,7 @@ import { useSelect } from '@wordpress/data';
  */
 import NavigableRegion from '../navigable-region';
 import { store as interfaceStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 const ANIMATION_DURATION = 0.25;
 const commonTransition = {
@@ -95,7 +96,7 @@ function InterfaceSkeleton(
 	ref
 ) {
 	const isWideSidebar = useSelect(
-		( select ) => select( interfaceStore ).isWideSidebar(),
+		( select ) => unlock( select( interfaceStore ) ).isWideSidebar(),
 		[]
 	);
 	const [ secondarySidebarResizeListener, secondarySidebarSize ] =
