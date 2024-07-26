@@ -24,9 +24,8 @@ class Gutenberg_REST_Templates_Controller_6_7_Test extends WP_Test_REST_Controll
 	public function test_get_item() {
 		wp_set_current_user( self::$admin_id );
 
-		$template_name = 'test-template';
+		$template_name = 'test-plugin//test-template';
 		$args          = array(
-			'plugin'      => 'test-plugin',
 			'content'     => 'Template content',
 			'title'       => 'Test Template',
 			'description' => 'Description of test template',
@@ -52,7 +51,7 @@ class Gutenberg_REST_Templates_Controller_6_7_Test extends WP_Test_REST_Controll
 		$this->assertEquals( 'Test Template', $data['title']['rendered'] );
 		$this->assertEquals( 'test-plugin', $data['plugin'] );
 
-		wp_unregister_template( 'test-plugin//' . $template_name );
+		wp_unregister_template( $template_name );
 
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/templates/test-plugin//test-template' );
 		$response = rest_get_server()->dispatch( $request );
