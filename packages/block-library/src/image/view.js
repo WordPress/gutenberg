@@ -19,6 +19,14 @@ let isTouching = false;
  */
 let lastTouchTime = 0;
 
+/**
+ * Holds all elements that are made inert when the lightbox is open; used to
+ * remove inert attribute of only those elements explicitly made inert.
+ *
+ * @type {Array}
+ */
+let inertElements = [];
+
 const { state, actions, callbacks } = store(
 	'core/image',
 	{
@@ -122,6 +130,17 @@ const { state, actions, callbacks } = store(
 
 				// Computes the styles of the overlay for the animation.
 				callbacks.setOverlayStyles();
+
+				// make all children of the document inert exempt .wp-lightbox-overlay
+				inertElements = [];
+				document
+					.querySelectorAll( 'body > :not(.wp-lightbox-overlay)' )
+					.forEach( ( el ) => {
+						if ( ! el.hasAttribute( 'inert' ) ) {
+							el.setAttribute( 'inert', '' );
+							inertElements.push( el );
+						}
+					} );
 			},
 			hideLightbox() {
 				if ( state.overlayEnabled ) {
@@ -147,6 +166,12 @@ const { state, actions, callbacks } = store(
 						state.currentImageIndex = -1;
 						state.images = [];
 					}, 450 );
+
+					// remove inert attribute from all children of the document
+					inertElements.forEach( ( el ) => {
+						el.removeAttribute( 'inert' );
+					} );
+					inertElements = [];
 				}
 			},
 			showPreviousImage( e ) {
@@ -175,14 +200,6 @@ const { state, actions, callbacks } = store(
 			},
 			handleKeydown( event ) {
 				if ( state.overlayEnabled ) {
-					// Focuses the close button when the user presses the tab key.
-					if ( event.key === 'Tab' ) {
-						event.preventDefault();
-						const { ref } = getElement();
-						ref.querySelector( 'button' ).focus();
-
-						// TODO: now that there are next and prev buttons, rotate the focus
-					}
 					// Closes the lightbox when the user presses the escape key.
 					if ( event.key === 'Escape' ) {
 						actions.hideLightbox();
