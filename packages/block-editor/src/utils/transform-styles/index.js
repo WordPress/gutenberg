@@ -11,7 +11,7 @@ function transformStyle(
 	{ css, ignoredSelectors = [], baseURL },
 	wrapperSelector = ''
 ) {
-	// When there is no wrapper selector or base URL, there is no need
+	// When there is no wrapper selector and no base URL, there is no need
 	// to transform the CSS. This is most cases because in the default
 	// iframed editor, no wrapping is needed, and not many styles
 	// provide a base URL.
@@ -19,7 +19,7 @@ function transformStyle(
 		return css;
 	}
 	try {
-		const posted = postcss(
+		return postcss(
 			[
 				wrapperSelector &&
 					prefixSelector( {
@@ -54,7 +54,6 @@ function transformStyle(
 				baseURL && rebaseUrl( { rootUrl: baseURL } ),
 			].filter( Boolean )
 		).process( css, {} ).css; // use sync PostCSS API
-		return posted;
 	} catch ( error ) {
 		if ( error instanceof CssSyntaxError ) {
 			// eslint-disable-next-line no-console
