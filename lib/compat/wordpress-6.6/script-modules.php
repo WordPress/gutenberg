@@ -89,12 +89,15 @@ function gutenberg_print_script_module_data(): void {
 	}
 }
 
-add_action( 'after_setup_theme', function () {
-	if ( ! has_action( 'wp_footer', array( wp_script_modules(), 'print_script_module_data' ) ) ) {
-		add_action( 'wp_footer', 'gutenberg_print_script_module_data' );
-	}
+add_action(
+	'after_setup_theme',
+	function () {
+		if ( ! has_action( 'wp_footer', array( wp_script_modules(), 'print_script_module_data' ) ) ) {
+			add_action( 'wp_footer', 'gutenberg_print_script_module_data' );
+		}
 
-	if ( ! has_action( 'admin_print_footer_scripts', array( wp_script_modules(), 'print_script_module_data' ) ) ) {
-		add_action( 'admin_print_footer_scripts', 'gutenberg_print_script_module_data' );
+		if ( ! has_action( 'admin_print_footer_scripts', array( wp_script_modules(), 'print_script_module_data' ) ) ) {
+			add_action( 'admin_print_footer_scripts', 'gutenberg_print_script_module_data' );
+		}
 	}
-} );
+);
