@@ -140,6 +140,16 @@ export const SelectPopover = styled( Ariakit.SelectPopover )`
 		animation-duration: 0s;
 	}
 
+	// TODO: ariakit-0-4 - now animation is enabled by default, and since there's no exit animation this section should be replaced by the styles below:
+	// &[data-open] {
+	// 	@media not ( prefers-reduced-motion ) {
+	// 		animation-duration: ${ ANIMATION_PARAMS.DURATION };
+	// 		animation-timing-function: ${ ANIMATION_PARAMS.EASING };
+	// 		animation-name: ${ slideDownAndFade };
+	// 		will-change: transform, opacity;
+	// 	}
+	// }
+
 	&[data-focus-visible] {
 		/* The outline will be on the trigger, rather than the popover. */
 		outline: none;
