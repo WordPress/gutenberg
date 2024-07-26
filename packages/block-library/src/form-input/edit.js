@@ -31,9 +31,6 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 		ref.current.focus();
 	}
 
-	// Note: radio inputs aren't implemented yet.
-	const isCheckboxOrRadio = type === 'checkbox' || type === 'radio';
-
 	const controls = (
 		<>
 			{ 'hidden' !== type && (
@@ -41,6 +38,7 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 					<PanelBody title={ __( 'Settings' ) }>
 						{ 'checkbox' !== type && (
 							<CheckboxControl
+								__nextHasNoMarginBottom
 								label={ __( 'Inline label' ) }
 								checked={ inlineLabel }
 								onChange={ ( newVal ) => {
@@ -48,10 +46,10 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 										inlineLabel: newVal,
 									} );
 								} }
-								__nextHasNoMarginBottom
 							/>
 						) }
 						<CheckboxControl
+							__nextHasNoMarginBottom
 							label={ __( 'Required' ) }
 							checked={ required }
 							onChange={ ( newVal ) => {
@@ -59,7 +57,6 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 									required: newVal,
 								} );
 							} }
-							__nextHasNoMarginBottom
 						/>
 					</PanelBody>
 				</InspectorControls>
@@ -112,21 +109,17 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 					'is-label-inline': inlineLabel || 'checkbox' === type,
 				} ) }
 			>
-				{ ! isCheckboxOrRadio && (
-					<RichText
-						tagName="span"
-						className="wp-block-form-input__label-content"
-						value={ label }
-						onChange={ ( newLabel ) =>
-							setAttributes( { label: newLabel } )
-						}
-						aria-label={
-							label ? __( 'Label' ) : __( 'Empty label' )
-						}
-						data-empty={ label ? false : true }
-						placeholder={ __( 'Type the label for this input' ) }
-					/>
-				) }
+				<RichText
+					tagName="span"
+					className="wp-block-form-input__label-content"
+					value={ label }
+					onChange={ ( newLabel ) =>
+						setAttributes( { label: newLabel } )
+					}
+					aria-label={ label ? __( 'Label' ) : __( 'Empty label' ) }
+					data-empty={ label ? false : true }
+					placeholder={ __( 'Type the label for this input' ) }
+				/>
 				<TagName
 					type={ 'textarea' === type ? undefined : type }
 					className={ clsx(
@@ -152,21 +145,6 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 						...colorProps.style,
 					} }
 				/>
-				{ isCheckboxOrRadio && (
-					<RichText
-						tagName="span"
-						className="wp-block-form-input__label-content"
-						value={ label }
-						onChange={ ( newLabel ) =>
-							setAttributes( { label: newLabel } )
-						}
-						aria-label={
-							label ? __( 'Label' ) : __( 'Empty label' )
-						}
-						data-empty={ label ? false : true }
-						placeholder={ __( 'Type the label for this input' ) }
-					/>
-				) }
 			</span>
 		</div>
 	);
