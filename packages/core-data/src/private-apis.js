@@ -1,10 +1,10 @@
 /**
- * WordPress dependencies
+ * Internal dependencies
  */
-import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
+import { useEntityRecordsWithPermissions } from './hooks/use-entity-records';
+import { lock } from './lock-unlock';
 
-export const { lock, unlock } =
-	__dangerousOptInToUnstableAPIsOnlyForCoreModules(
-		'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.',
-		'@wordpress/core-data'
-	);
+export const privateApis = {};
+lock( privateApis, {
+	useEntityRecordsWithPermissions,
+} );

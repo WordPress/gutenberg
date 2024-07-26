@@ -5,12 +5,19 @@ import * as Ariakit from '@ariakit/react';
 import clsx from 'clsx';
 
 /**
+ * WordPress dependencies
+ */
+import { useInstanceId } from '@wordpress/compose';
+import { __, sprintf } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
 import _CustomSelect from '../custom-select-control-v2/custom-select';
 import CustomSelectItem from '../custom-select-control-v2/item';
 import * as Styled from '../custom-select-control-v2/styles';
 import type { CustomSelectProps } from './types';
+import { VisuallyHidden } from '../visually-hidden';
 
 function useDeprecatedProps( {
 	__experimentalShowSelectedHint,
@@ -35,6 +42,15 @@ function applyOptionDeprecations( {
 	};
 }
 
+function getDescribedBy( currentValue: string, describedBy?: string ) {
+	if ( describedBy ) {
+		return describedBy;
+	}
+
+	// translators: %s: The selected option.
+	return sprintf( __( 'Currently selected: %s' ), currentValue );
+}
+
 function CustomSelectControl( props: CustomSelectProps ) {
 	const {
 		__next40pxDefaultSize = false,
@@ -48,8 +64,13 @@ function CustomSelectControl( props: CustomSelectProps ) {
 		...restProps
 	} = useDeprecatedProps( props );
 
+	const descriptionId = useInstanceId(
+		CustomSelectControl,
+		'custom-select-control__description'
+	);
+
 	// Forward props + store from v2 implementation
-	const store = Ariakit.useSelectStore( {
+	const store = Ariakit.useSelectStore< string >( {
 		async setValue( nextValue ) {
 			const nextOption = options.find(
 				( item ) => item.name === nextValue
@@ -117,9 +138,9 @@ function CustomSelectControl( props: CustomSelectProps ) {
 			);
 		} );
 
-	const renderSelectedValueHint = () => {
-		const { value: currentValue } = store.getState();
+	const { value: currentValue } = store.getState();
 
+	const renderSelectedValueHint = () => {
 		const selectedOptionHint = options
 			?.map( applyOptionDeprecations )
 			?.find( ( { name } ) => currentValue === name )?.hint;
@@ -153,23 +174,30 @@ function CustomSelectControl( props: CustomSelectProps ) {
 	} )();
 
 	return (
-		<_CustomSelect
-			aria-describedby={ describedBy }
-			renderSelectedValue={
-				showSelectedHint ? renderSelectedValueHint : undefined
-			}
-			size={ translatedSize }
-			store={ store }
-			className={ clsx(
-				// Keeping the classname for legacy reasons
-				'components-custom-select-control',
-				classNameProp
-			) }
-			isLegacy
-			{ ...restProps }
-		>
-			{ children }
-		</_CustomSelect>
+		<>
+			<_CustomSelect
+				aria-describedby={ descriptionId }
+				renderSelectedValue={
+					showSelectedHint ? renderSelectedValueHint : undefined
+				}
+				size={ translatedSize }
+				store={ store }
+				className={ clsx(
+					// Keeping the classname for legacy reasons
+					'components-custom-select-control',
+					classNameProp
+				) }
+				isLegacy
+				{ ...restProps }
+			>
+				{ children }
+			</_CustomSelect>
+			<VisuallyHidden>
+				<span id={ descriptionId }>
+					{ getDescribedBy( currentValue, describedBy ) }
+				</span>
+			</VisuallyHidden>
+		</>
 	);
 }
 

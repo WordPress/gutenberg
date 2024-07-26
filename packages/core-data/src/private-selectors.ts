@@ -50,3 +50,26 @@ export const getBlockPatternsForPostType = createRegistrySelector(
 			() => [ select( STORE_NAME ).getBlockPatterns() ]
 		)
 );
+
+/**
+ * Returns the entity records permissions for the given entity record ids.
+ */
+export const getEntityRecordsPermissions = createRegistrySelector( ( select ) =>
+	createSelector(
+		( state: State, kind: string, name: string, ids: string[] ) => {
+			return ids.map( ( id ) => ( {
+				delete: select( STORE_NAME ).canUser( 'delete', {
+					kind,
+					name,
+					id,
+				} ),
+				update: select( STORE_NAME ).canUser( 'update', {
+					kind,
+					name,
+					id,
+				} ),
+			} ) );
+		},
+		( state ) => [ state.userPermissions ]
+	)
+);
