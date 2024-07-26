@@ -6,7 +6,6 @@ import { createSelector, createRegistrySelector } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { canUser } from './selectors';
 import type { State } from './selectors';
 import { STORE_NAME } from './name';
 
@@ -55,20 +54,22 @@ export const getBlockPatternsForPostType = createRegistrySelector(
 /**
  * Returns the entity records permissions for the given entity record ids.
  */
-export const getEntityRecordsPermissions = createSelector(
-	( state: State, kind: string, name: string, ids: string[] ) => {
-		return ids.map( ( id ) => ( {
-			delete: canUser( state, 'delete', {
-				kind,
-				name,
-				id,
-			} ),
-			update: canUser( state, 'update', {
-				kind,
-				name,
-				id,
-			} ),
-		} ) );
-	},
-	( state ) => [ state.userPermissions ]
+export const getEntityRecordsPermissions = createRegistrySelector( ( select ) =>
+	createSelector(
+		( state: State, kind: string, name: string, ids: string[] ) => {
+			return ids.map( ( id ) => ( {
+				delete: select( STORE_NAME ).canUser( 'delete', {
+					kind,
+					name,
+					id,
+				} ),
+				update: select( STORE_NAME ).canUser( 'update', {
+					kind,
+					name,
+					id,
+				} ),
+			} ) );
+		},
+		( state ) => [ state.userPermissions ]
+	)
 );
