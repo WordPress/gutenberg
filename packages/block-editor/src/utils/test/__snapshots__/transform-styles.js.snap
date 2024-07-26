@@ -57,12 +57,6 @@ exports[`transformStyles selector wrap should ignore selectors 1`] = `
 ]
 `;
 
-exports[`transformStyles selector wrap should not double wrap selectors 1`] = `
-[
-  " .my-namespace h1, .my-namespace .red { color: red; }",
-]
-`;
-
 exports[`transformStyles selector wrap should replace :root selectors 1`] = `
 [
   "

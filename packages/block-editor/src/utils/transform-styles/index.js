@@ -19,9 +19,6 @@ function transformStyle(
 	if ( ! wrapperSelector && ! baseURL ) {
 		return css;
 	}
-	// const postcssFriendlyCSS = css
-	// 	.replace( /:root :where\(body\)/g, 'body' )
-	// 	.replace( /:where\(body\)/g, 'body' );
 	try {
 		const posted = postcss(
 			[
@@ -29,18 +26,28 @@ function transformStyle(
 					prefixSelector( {
 						prefix: wrapperSelector,
 						exclude: [ ...ignoredSelectors, wrapperSelector ],
-						transform(
-							prefix,
-							selector,
-							prefixedSelector,
-							filePath,
-							rule
-						) {
+						transform( prefix, selector, prefixedSelector ) {
+							// `html`, `body` and `:root` need some special handling since they
+							// generally cannot be prefixed with a classname and produce a valid
+							// selector.
 							if ( selector.includes( 'body' ) ) {
-								return selector.replace( 'body', prefix );
+								return selector
+									.replace( /:root :where\(body\)/g, prefix )
+									.replace( /:where\(body\)/g, prefix )
+									.replace( 'body', prefix );
 							}
 							if ( selector.startsWith( ':root' ) ) {
 								return selector.replace( ':root', prefix );
+							}
+							if ( selector.startsWith( 'html' ) ) {
+								return selector.replace( 'html', prefix );
+							}
+							// Avoid prefixing an already prefixed selector.
+							if ( selector.startsWith( prefix ) ) {
+								return prefixedSelector.replace(
+									`${ prefix } ${ prefix }`,
+									prefix
+								);
 							}
 							return prefixedSelector;
 						},
@@ -48,7 +55,7 @@ function transformStyle(
 				baseURL && rebaseUrl( { rootUrl: baseURL } ),
 			].filter( Boolean )
 		).process( css, {} ).css; // use sync PostCSS API
-		console.log( posted );
+		// console.log( posted );
 		return posted;
 	} catch ( error ) {
 		if ( error instanceof CssSyntaxError ) {
