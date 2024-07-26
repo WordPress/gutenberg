@@ -98,10 +98,8 @@ function InterfaceSkeleton(
 		( select ) => select( interfaceStore ).isWideSidebar(),
 		[]
 	);
-
 	const [ secondarySidebarResizeListener, secondarySidebarSize ] =
 		useResizeObserver();
-
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const disableMotion = useReducedMotion();
 	const defaultTransition = {
