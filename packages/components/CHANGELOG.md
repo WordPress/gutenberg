@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `CustomSelectControl`: Support generic props type ([#todo](https://github.com/WordPress/gutenberg/pull/todo)).
+
 ### Internal
 
 -   `DropdownMenuV2`: break menu item help text on multiple lines for better truncation. ([#63916](https://github.com/WordPress/gutenberg/pull/63916)).
