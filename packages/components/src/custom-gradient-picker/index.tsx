@@ -17,7 +17,7 @@ import CustomGradientBar from './gradient-bar';
 import { Flex } from '../flex';
 import SelectControl from '../select-control';
 import { VStack } from '../v-stack';
-import CSSVariableGetter from './css-variable-getter';
+import CSSVariableGetter from '../utils/css-variable-getter';
 import {
 	getGradientAstWithDefault,
 	getLinearGradientRepresentation,
