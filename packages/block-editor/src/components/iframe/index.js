@@ -136,85 +136,81 @@ function Iframe( {
 	const [ containerResizeListener, { width: containerWidth } ] =
 		useResizeObserver();
 
-	const setRef = useRefEffect(
-		( node ) => {
-			node._load = () => {
-				setIframeDocument( node.contentDocument );
-			};
-			let iFrameDocument;
-			// Prevent the default browser action for files dropped outside of dropzones.
-			function preventFileDropDefault( event ) {
-				event.preventDefault();
-			}
-			function onLoad() {
-				const { contentDocument, ownerDocument } = node;
-				const { documentElement } = contentDocument;
-				iFrameDocument = contentDocument;
+	const setRef = useRefEffect( ( node ) => {
+		node._load = () => {
+			setIframeDocument( node.contentDocument );
+		};
+		let iFrameDocument;
+		// Prevent the default browser action for files dropped outside of dropzones.
+		function preventFileDropDefault( event ) {
+			event.preventDefault();
+		}
+		function onLoad() {
+			const { contentDocument, ownerDocument } = node;
+			const { documentElement } = contentDocument;
+			iFrameDocument = contentDocument;
 
-				documentElement.classList.add( 'block-editor-iframe__html' );
+			documentElement.classList.add( 'block-editor-iframe__html' );
 
-				clearerRef( documentElement );
+			clearerRef( documentElement );
 
-				// Ideally ALL classes that are added through get_body_class should
-				// be added in the editor too, which we'll somehow have to get from
-				// the server in the future (which will run the PHP filters).
-				setBodyClasses( [
-					...Array.from( ownerDocument.body.classList ).filter(
-						( name ) =>
-							name.startsWith( 'admin-color-' ) ||
-							name.startsWith( 'post-type-' ) ||
-							name === 'wp-embed-responsive'
-					),
-					siteLocale?.isRTL ? 'rtl' : '',
-				] );
+			// Ideally ALL classes that are added through get_body_class should
+			// be added in the editor too, which we'll somehow have to get from
+			// the server in the future (which will run the PHP filters).
+			setBodyClasses(
+				Array.from( ownerDocument.body.classList ).filter(
+					( name ) =>
+						name.startsWith( 'admin-color-' ) ||
+						name.startsWith( 'post-type-' ) ||
+						name === 'wp-embed-responsive'
+				)
+			);
 
-				for ( const compatStyle of getCompatibilityStyles() ) {
-					if ( contentDocument.getElementById( compatStyle.id ) ) {
-						continue;
-					}
-
-					contentDocument.head.appendChild(
-						compatStyle.cloneNode( true )
-					);
-
-					if ( ! isPreviewMode ) {
-						// eslint-disable-next-line no-console
-						console.warn(
-							`${ compatStyle.id } was added to the iframe incorrectly. Please use block.json or enqueue_block_assets to add styles to the iframe.`,
-							compatStyle
-						);
-					}
+			for ( const compatStyle of getCompatibilityStyles() ) {
+				if ( contentDocument.getElementById( compatStyle.id ) ) {
+					continue;
 				}
 
-				iFrameDocument.addEventListener(
-					'dragover',
-					preventFileDropDefault,
-					false
+				contentDocument.head.appendChild(
+					compatStyle.cloneNode( true )
 				);
-				iFrameDocument.addEventListener(
-					'drop',
-					preventFileDropDefault,
-					false
-				);
+
+				if ( ! isPreviewMode ) {
+					// eslint-disable-next-line no-console
+					console.warn(
+						`${ compatStyle.id } was added to the iframe incorrectly. Please use block.json or enqueue_block_assets to add styles to the iframe.`,
+						compatStyle
+					);
+				}
 			}
 
-			node.addEventListener( 'load', onLoad );
+			iFrameDocument.addEventListener(
+				'dragover',
+				preventFileDropDefault,
+				false
+			);
+			iFrameDocument.addEventListener(
+				'drop',
+				preventFileDropDefault,
+				false
+			);
+		}
 
-			return () => {
-				delete node._load;
-				node.removeEventListener( 'load', onLoad );
-				iFrameDocument?.removeEventListener(
-					'dragover',
-					preventFileDropDefault
-				);
-				iFrameDocument?.removeEventListener(
-					'drop',
-					preventFileDropDefault
-				);
-			};
-		},
-		[ siteLocale ]
-	);
+		node.addEventListener( 'load', onLoad );
+
+		return () => {
+			delete node._load;
+			node.removeEventListener( 'load', onLoad );
+			iFrameDocument?.removeEventListener(
+				'dragover',
+				preventFileDropDefault
+			);
+			iFrameDocument?.removeEventListener(
+				'drop',
+				preventFileDropDefault
+			);
+		};
+	}, [] );
 
 	const [ iframeWindowInnerHeight, setIframeWindowInnerHeight ] = useState();
 
@@ -443,7 +439,10 @@ function Iframe( {
 							className={ clsx(
 								'block-editor-iframe__body',
 								'editor-styles-wrapper',
-								...bodyClasses
+								...bodyClasses,
+								{
+									rtl: siteLocale?.isRTL,
+								}
 							) }
 						>
 							{ contentResizeListener }
