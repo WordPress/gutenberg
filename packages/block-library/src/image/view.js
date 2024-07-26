@@ -23,7 +23,6 @@ const { state, actions, callbacks } = store(
 	'core/image',
 	{
 		state: {
-			isGallery: false,
 			images: [],
 			currentImageIndex: -1,
 			get currentImageId() {
@@ -33,6 +32,9 @@ const { state, actions, callbacks } = store(
 			},
 			get currentImage() {
 				return state.metadata[ state.currentImageId ];
+			},
+			get hasNavigation() {
+				return state.images.length > 1;
 			},
 			get hasNextImage() {
 				return state.currentImageIndex + 1 < state.images.length;
@@ -110,8 +112,7 @@ const { state, actions, callbacks } = store(
 				state.scrollLeftReset = document.documentElement.scrollLeft;
 
 				const { lightbox, images } = getContext( 'core/gallery' ) || {};
-				state.isGallery = !! lightbox;
-				state.images = state.isGallery ? images || [] : [ imageId ];
+				state.images = lightbox ? images || [] : [ imageId ];
 
 				// Sets the current image index to the one that was clicked.
 				callbacks.setCurrentImageIndex( imageId );
@@ -149,7 +150,7 @@ const { state, actions, callbacks } = store(
 				}
 			},
 			showPreviousImage( e ) {
-				if ( ! state.isGallery ) {
+				if ( ! state.hasNavigation ) {
 					return;
 				}
 
@@ -161,7 +162,7 @@ const { state, actions, callbacks } = store(
 				callbacks.setOverlayStyles();
 			},
 			showNextImage( e ) {
-				if ( ! state.isGallery ) {
+				if ( ! state.hasNavigation ) {
 					return;
 				}
 
@@ -239,7 +240,7 @@ const { state, actions, callbacks } = store(
 			},
 		},
 		callbacks: {
-			initImage() {
+			populateGalleryArray() {
 				const { lightbox, images } = getContext( 'core/gallery' ) || {};
 				if ( ! lightbox ) {
 					return;
@@ -371,7 +372,7 @@ const { state, actions, callbacks } = store(
 				// the image resolution.
 				let horizontalPadding = 0;
 				if ( window.innerWidth > 480 ) {
-					horizontalPadding = state.isGallery ? 140 : 80;
+					horizontalPadding = state.hasNavigation ? 140 : 80;
 				} else if ( window.innerWidth > 1920 ) {
 					horizontalPadding = 160;
 				}
