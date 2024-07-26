@@ -14,6 +14,9 @@
 		},
 		"label": {
 			"type": "string"
+		},
+		"tabIndex": {
+			"type": "number"
 		}
 	},
 	"parent": [ "core/tabs" ],

@@ -34,8 +34,8 @@ const ALLOWED_FORMATS = [
 	'core/text-color',
 ];
 
-export default function Edit( { clientId } ) {
-	const { innerTabs, selectedTabClientId } = useSelect(
+export default function Edit( { clientId, setAttributes } ) {
+	const { innerTabBlocks, selectedTabClientId } = useSelect(
 		( select ) => {
 			const {
 				getBlocks,
@@ -58,7 +58,7 @@ export default function Edit( { clientId } ) {
 			}
 
 			return {
-				innerTabs: innerBlocks,
+				innerTabBlocks: innerBlocks,
 				selectedTabClientId: selectedTabId,
 			};
 		},
@@ -71,7 +71,7 @@ export default function Edit( { clientId } ) {
 	const setActiveTab = useCallback(
 		( activeTabClientId ) => {
 			// Set each inner tab's `isActive` attribute.
-			innerTabs.forEach( ( block ) => {
+			innerTabBlocks.forEach( ( block ) => {
 				__unstableMarkNextChangeAsNotPersistent();
 				updateBlockAttributes( block.clientId, {
 					isActive: block.clientId === activeTabClientId,
@@ -79,32 +79,58 @@ export default function Edit( { clientId } ) {
 			} );
 		},
 		[
-			innerTabs,
+			innerTabBlocks,
 			updateBlockAttributes,
 			__unstableMarkNextChangeAsNotPersistent,
 		]
 	);
 
+	// Set the first tab as active when the editor is loaded.
 	useEffect( () => {
-		if ( innerTabs?.length ) {
-			// Set the first tab as active when the editor is loaded
-			setActiveTab( innerTabs[ 0 ].clientId );
+		if ( innerTabBlocks?.length ) {
+			setActiveTab( innerTabBlocks[ 0 ].clientId );
 		}
 	}, [] ); // eslint-disable-line react-hooks/exhaustive-deps -- set first tab as active when the editor is loaded.
 
+	// Update active tab when selection or blocks change.
 	useEffect( () => {
 		const hasActiveTab =
-			innerTabs &&
-			innerTabs.some( ( block ) => block.attributes.isActive );
+			innerTabBlocks &&
+			innerTabBlocks.some( ( block ) => block.attributes.isActive );
 
 		if ( selectedTabClientId ) {
 			// If an inner tab block is selected, or its inner blocks are selected, it becomes the active tab.
 			setActiveTab( selectedTabClientId );
-		} else if ( ! hasActiveTab && innerTabs?.length ) {
+		} else if ( ! hasActiveTab && innerTabBlocks?.length ) {
 			// Otherwise, if there's no active tab, default to the first inner tab.
-			setActiveTab( innerTabs[ 0 ].clientId );
+			setActiveTab( innerTabBlocks[ 0 ].clientId );
 		}
-	}, [ innerTabs, selectedTabClientId, setActiveTab ] );
+	}, [ innerTabBlocks, selectedTabClientId, setActiveTab ] );
+
+	/**
+	 * Cache data needed for save functions:
+	 * - Labels for inner tabs to generate tab list
+	 * - tabIndex to save the first tab as active, independent of the editor view
+	 */
+	useEffect( () => {
+		setAttributes( {
+			innerTabs: innerTabBlocks.map( ( block ) => ( {
+				label: block.attributes.label,
+			} ) ),
+		} );
+
+		innerTabBlocks.forEach( ( block, index ) => {
+			__unstableMarkNextChangeAsNotPersistent();
+			updateBlockAttributes( block.clientId, {
+				tabIndex: index,
+			} );
+		} );
+	}, [
+		__unstableMarkNextChangeAsNotPersistent,
+		innerTabBlocks,
+		setAttributes,
+		updateBlockAttributes,
+	] );
 
 	const blockProps = useBlockProps();
 	const innerBlockProps = useInnerBlocksProps(
@@ -122,9 +148,9 @@ export default function Edit( { clientId } ) {
 	return (
 		<div { ...blockProps }>
 			<ul className="wp-block-tabs__list" role="tablist">
-				{ innerTabs.map( ( block ) => {
+				{ innerTabBlocks.map( ( block ) => {
 					const isActive = block.attributes.isActive;
-					const tabIndex = isActive ? '0' : '-1';
+					const tabIndex = isActive ? 0 : -1;
 
 					// TODO: Add unique ids and aria attributes for accessibility.
 					// (Try the anchor generation functionality from the heading block?)
@@ -134,10 +160,12 @@ export default function Edit( { clientId } ) {
 							className="wp-block-tabs__list-item"
 							role="presentation"
 						>
-							<button
-								className={ clsx( 'wp-block-tabs__tab', {
+							<a // eslint-disable-line jsx-a11y/anchor-is-valid -- TODO: add tab ids to href
+								aria-selected={ isActive }
+								className={ clsx( 'wp-block-tabs__tab-label', {
 									'is-active': isActive,
 								} ) }
+								href="#"
 								onClick={ () => setActiveTab( block.clientId ) }
 								role="tab"
 								tabIndex={ tabIndex }
@@ -153,7 +181,7 @@ export default function Edit( { clientId } ) {
 									placeholder={ __( 'Add label…' ) }
 									value={ block.attributes.label }
 								/>
-							</button>
+							</a>
 						</li>
 					);
 				} ) }

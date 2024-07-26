@@ -6,16 +6,12 @@
 	padding: 0;
 }
 
-.wp-block-tabs__tab {
-	box-shadow: none;
-	border: 0;
-	border-radius: 0;
-	background: none;
-	font-size: var(--wp--preset--font-size--normal, inherit);
+.wp-block-tabs__tab-label {
+	display: block;
 	margin: 0;
 	opacity: 0.5;
-	outline: none;
 	padding: $grid-unit;
+	text-decoration: none;
 
 	&.is-active {
 		border-bottom: currentColor 2px solid;

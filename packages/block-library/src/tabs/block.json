@@ -8,7 +8,23 @@
 	"textdomain": "default",
 	"__experimental": true,
 	"allowedBlocks": [ "core/tab" ],
-	"attributes": {},
+	"attributes": {
+		"innerTabs": {
+			"type": "array",
+			"items": {
+				"type": "string"
+			},
+			"default": [],
+			"source": "query",
+			"selector": ".wp-block-tabs__tab-label",
+			"query": {
+				"label": {
+					"type": "string",
+					"source": "html"
+				}
+			}
+		}
+	},
 	"supports": {
 		"align": [ "wide", "full" ],
 		"color": {
