@@ -54,7 +54,7 @@ test.describe( 'isTyping', () => {
 			.click();
 
 		await editor.openDocumentSettingsSidebar();
-		await page.getByLabel( 'Inherit query from template' ).click();
+		await page.getByLabel( 'Custom' ).click();
 
 		// Moving the mouse shows the toolbar.
 		await editor.showBlockToolbar();
