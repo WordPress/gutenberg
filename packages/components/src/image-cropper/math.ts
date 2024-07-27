@@ -12,13 +12,13 @@ const DEGREE_TO_RADIAN = Math.PI / 180;
 /**
  * Rotate a point around a center point by a given degree.
  * @param point  The point to rotate.
- * @param center The center point to rotate around.
  * @param radian The radian to rotate by.
+ * @param center The optional center point to rotate around. If not provided then the origin is used.
  */
 export function rotatePoint(
 	point: Position,
-	center: Position,
-	radian: number
+	radian: number,
+	center: Position = { x: 0, y: 0 }
 ): Position {
 	const cos = Math.cos( radian );
 	const sin = Math.sin( radian );
@@ -66,7 +66,7 @@ export const getFurthestVector = memize(
 		let furthestY = 0;
 
 		for ( const point of windowVertices ) {
-			const rotatedPoint = rotatePoint( point, position, -radian );
+			const rotatedPoint = rotatePoint( point, -radian, position );
 
 			if (
 				rotatedPoint.x < minX &&
@@ -95,6 +95,48 @@ export const getFurthestVector = memize(
 		}
 
 		return { x: furthestX, y: furthestY };
+	},
+	{ maxSize: 1 }
+);
+
+export const calculateRotatedBounds = memize(
+	(
+		radian: number,
+		imageWidth: number,
+		imageHeight: number,
+		cropperWidth: number,
+		cropperHeight: number
+	) => {
+		// Calculate half dimensions of the image and cropper.
+		const halfImageWidth = imageWidth / 2;
+		const halfImageHeight = imageHeight / 2;
+		const halfCropperWidth = cropperWidth / 2;
+		const halfCropperHeight = cropperHeight / 2;
+
+		// Calculate absolute values of sin and cos for the rotation angle.
+		// This works for all angles due to the periodicity of sine and cosine.
+		const sin = Math.abs( Math.sin( radian ) );
+		const cos = Math.abs( Math.cos( radian ) );
+
+		// Calculate the dimensions of the rotated rectangle's bounding box.
+		// This formula works for all angles because it considers the maximum extent
+		// of the rotated rectangle in each direction.
+		const rotatedWidth = halfCropperWidth * cos + halfCropperHeight * sin;
+		const rotatedHeight = halfCropperHeight * cos + halfCropperWidth * sin;
+
+		// Calculate the boundaries of the area where the cropper can move.
+		// These boundaries ensure the cropper stays within the image.
+		const minX = -halfImageWidth + rotatedWidth;
+		const maxX = halfImageWidth - rotatedWidth;
+		const minY = -halfImageHeight + rotatedHeight;
+		const maxY = halfImageHeight - rotatedHeight;
+
+		return {
+			minX,
+			maxX,
+			minY,
+			maxY,
+		};
 	},
 	{ maxSize: 1 }
 );

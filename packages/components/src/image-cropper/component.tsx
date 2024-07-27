@@ -9,7 +9,7 @@ import { useState, forwardRef, useContext, useRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { Resizable, Draggable, Container, Img } from './styles';
+import { Resizable, Draggable, Container, Img, PADDING } from './styles';
 import { ImageCropperContext } from './context';
 import { useImageCropper } from './hook';
 import type { Position } from './types';
@@ -145,8 +145,12 @@ const Cropper = forwardRef< HTMLDivElement >( ( {}, ref ) => {
 	const isAxisSwapped = turns % 2 !== 0;
 	const degree = angle + turns * 90;
 	const imageOffset = {
-		top: isAxisSwapped ? ( image.width - image.height ) / 2 : 0,
-		left: isAxisSwapped ? ( image.height - image.width ) / 2 : 0,
+		top: isAxisSwapped
+			? PADDING.y + ( image.width - image.height ) / 2
+			: PADDING.y,
+		left: isAxisSwapped
+			? PADDING.x + ( image.height - image.width ) / 2
+			: PADDING.x,
 	};
 
 	return (
@@ -168,17 +172,15 @@ const Cropper = forwardRef< HTMLDivElement >( ( {}, ref ) => {
 			} }
 			ref={ ref }
 		>
-			<div style={ { position: 'relative' } }>
-				<Img
-					width={ image.width }
-					height={ image.height }
-					src={ src }
-					alt=""
-					crossOrigin="anonymous"
-					ref={ imageRef }
-					style={ imageOffset }
-				/>
-			</div>
+			<Img
+				width={ image.width }
+				height={ image.height }
+				src={ src }
+				alt=""
+				crossOrigin="anonymous"
+				ref={ imageRef }
+				style={ imageOffset }
+			/>
 			<CropWindow />
 		</Container>
 	);

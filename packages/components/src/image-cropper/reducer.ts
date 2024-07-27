@@ -2,7 +2,12 @@
  * Internal dependencies
  */
 import type { Size, ResizeDirection } from './types';
-import { rotatePoint, degreeToRadian, getFurthestVector } from './math';
+import {
+	rotatePoint,
+	degreeToRadian,
+	getFurthestVector,
+	calculateRotatedBounds,
+} from './math';
 
 export type State = {
 	// The image dimensions.
@@ -198,7 +203,6 @@ function imageCropperReducer( state: State, action: Action ) {
 				4 ) as 0 | 1 | 2 | 3;
 			const rotatedPosition = rotatePoint(
 				{ x: image.x, y: image.y },
-				{ x: 0, y: 0 },
 				( Math.PI / 2 ) * ( isCounterClockwise ? -1 : 1 )
 			);
 			return {
@@ -222,31 +226,31 @@ function imageCropperReducer( state: State, action: Action ) {
 			};
 		}
 		case 'MOVE': {
-			const scaledWidth = image.width * scale;
-			const scaledHeight = image.height * scale;
-			const vectorInUnrotated = getFurthestVector(
-				scaledWidth,
-				scaledHeight,
+			// Calculate the boundaries of the area where the cropper can move.
+			// These boundaries ensure the cropper stays within the image.
+			const { minX, maxX, minY, maxY } = calculateRotatedBounds(
 				radian,
-				{ width: cropper.width, height: cropper.height },
-				{ x: action.x, y: action.y }
+				image.width * scale,
+				image.height * scale,
+				cropper.width,
+				cropper.height
 			);
 
-			// Step 3: Rotate the vector back to the original coordinate system
-			const vector = rotatePoint(
-				vectorInUnrotated,
-				{ x: 0, y: 0 },
-				radian
+			// Rotate the action point to align with the non-rotated coordinate system.
+			const rotatedPoint = rotatePoint(
+				{ x: action.x, y: action.y },
+				-radian
 			);
 
-			const nextPosition = { x: action.x, y: action.y };
-			if (
-				Math.round( vector.x ) !== 0 ||
-				Math.round( vector.y ) !== 0
-			) {
-				nextPosition.x += vector.x;
-				nextPosition.y += vector.y;
-			}
+			// Constrain the rotated point to within the calculated boundaries.
+			// This ensures the cropper doesn't move outside the image.
+			const boundPoint = {
+				x: Math.min( Math.max( rotatedPoint.x, minX ), maxX ),
+				y: Math.min( Math.max( rotatedPoint.y, minY ), maxY ),
+			};
+
+			// Rotate the constrained point back to the original coordinate system.
+			const nextPosition = rotatePoint( boundPoint, radian );
 
 			return {
 				...state,

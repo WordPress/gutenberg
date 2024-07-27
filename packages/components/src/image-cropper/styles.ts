@@ -26,6 +26,8 @@ export const Resizable = styled( ResizableBox )`
 		var( --wp-cropper-window-y )
 	);
 	box-shadow: 0 0 0 100vmax rgba( 0, 0, 0, 0.5 );
+	will-change: transform;
+	contain: layout size style;
 `;
 
 export const Container = styled.div`
@@ -34,6 +36,7 @@ export const Container = styled.div`
 	overflow: hidden;
 	padding: ${ PADDING.y }px ${ PADDING.x }px;
 	box-sizing: content-box;
+	contain: strict;
 `;
 
 export const Img = styled.img`
@@ -43,4 +46,6 @@ export const Img = styled.img`
 	rotate: var( --wp-cropper-angle );
 	scale: var( --wp-cropper-scale-x ) var( --wp-cropper-scale-y );
 	translate: var( --wp-cropper-image-x ) var( --wp-cropper-image-y );
+	will-change: transform;
+	contain: strict;
 `;
