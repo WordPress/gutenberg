@@ -96,7 +96,7 @@
 	// itself allows __center to collapse completely, i.e. to occupy no space.
 	@media (max-width: #{$break-mobile - 1}) {
 		// The start side should only apply when the __center follows __toolbar. A case where it
-		// doesn’t is in the Post Editor with Distraction Free mode on.
+		// doesn’t is in the Post Editor with Distraction Free mode on at less than medium breakpoint.
 		.editor-header__toolbar + & > :first-child {
 			margin-inline-start: $grid-unit;
 		}
