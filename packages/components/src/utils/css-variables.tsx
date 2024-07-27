@@ -10,13 +10,34 @@ import { VisuallyHidden } from '../visually-hidden';
 
 type CSSVariableReplacerProps = {
 	cssString?: string | null;
+	/**
+	 * Callback to be called when CSS variables in the given string
+	 * have been replaced with their computed values.
+	 *
+	 * Should be memoized to avoid unnecessary reflows.
+	 */
 	onChange: ( args: {
 		replacedCssString: string;
 		computedVariables: ComputedCSSVariables;
 	} ) => void;
 };
 type ComputedCSSVariables = Record< string, string >;
+type VarFunction = {
+	/** Start index of match. */
+	start: number;
+	/** End index of match. */
+	end: number;
+	/** Matched string, e.g. `var( --foo, #000 )`. */
+	raw: string;
+	/** CSS variable name, e.g. `--foo`. */
+	value: string;
+	/** Second argument of the `var()`, which could be a literal color or another `var()`. */
+	fallback?: string;
+};
 
+/**
+ * Find the index of the matching closing parenthesis for a given opening parenthesis in a string.
+ */
 function findMatchingParenthesis( str: string, startPos: number ) {
 	let stack = 0;
 
@@ -34,9 +55,12 @@ function findMatchingParenthesis( str: string, startPos: number ) {
 	throw new Error( 'No matching closing parenthesis found.' );
 }
 
+/**
+ * Find all `var()` functions in a CSS string.
+ */
 export function findVarFunctionsInString( str: string ) {
 	const regex = /(?<=\bvar)\(/g;
-	const matches = [];
+	const matches: VarFunction[] = [];
 
 	let openingParen;
 	while ( ( openingParen = regex.exec( str ) ) !== null ) {
@@ -60,12 +84,15 @@ export function findVarFunctionsInString( str: string ) {
 			fallback: raw.match( /,(.+)\)/ )?.[ 1 ].trim(),
 		} );
 
-		regex.lastIndex = closingParen + 1;
+		regex.lastIndex = closingParen + 1; // resume next regex search after this closing parenthesis
 	}
 
 	return matches;
 }
 
+/**
+ * Get the computed CSS variables for a given element.
+ */
 function getComputedCSSVariables(
 	propertyStrings: string[],
 	element: HTMLDivElement
@@ -78,6 +105,9 @@ function getComputedCSSVariables(
 	}, {} as ComputedCSSVariables );
 }
 
+/**
+ * Replace all `var()` functions in a CSS string with their computed values.
+ */
 export function replaceCSSVariablesInString(
 	str: string,
 	computedVariables: ComputedCSSVariables
@@ -105,10 +135,32 @@ export function replaceCSSVariablesInString(
 	return result;
 }
 
+/**
+ * Find all CSS variable names (e.g. `--foo`) in a string.
+ */
 function getCSSVariablesInString( str: string ) {
 	return str.match( /(?<=\bvar\(\s*)--[\w-]+/g ) ?? [];
 }
 
+/**
+ * A component that replaces CSS variables in a given CSS string with their computed values.
+ * The result is passed to the `onChange` callback.
+ *
+ * ```jsx
+ * function MyComponent() {
+ * 	const onChange = useCallback(
+ * 		( { replacedCssString } ) => console.log( replacedCssString ),
+ * 		[]
+ * 	);
+ * 	return (
+ * 		<CSSVariableReplacer
+ * 			cssString="var(--text-color, red)"
+ * 			onChange={ onChange }
+ * 		/>
+ * 	);
+ * }
+ * ```
+ */
 export function CSSVariableReplacer( {
 	cssString,
 	onChange,
