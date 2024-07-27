@@ -105,6 +105,10 @@ export function replaceCSSVariablesInString(
 	return result;
 }
 
+function getCSSVariablesInString( str: string ) {
+	return str.match( /(?<=\bvar\(\s*)--[\w-]+/g ) ?? [];
+}
+
 export function CSSVariableReplacer( {
 	cssString,
 	onChange,
@@ -113,9 +117,8 @@ export function CSSVariableReplacer( {
 
 	useEffect( () => {
 		if ( cssString && ref.current ) {
-			const varFunctions = findVarFunctionsInString( cssString );
 			const computedVariables = getComputedCSSVariables(
-				varFunctions.map( ( { value } ) => value ),
+				getCSSVariablesInString( cssString ),
 				ref.current
 			);
 
