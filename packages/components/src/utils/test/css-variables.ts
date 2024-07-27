@@ -2,30 +2,37 @@
  * Internal dependencies
  */
 import {
-	getCSSVariablesInString,
+	findVarFunctionsInString,
 	replaceCSSVariablesInString,
 } from '../css-variables';
 
-describe( 'getCSSVariablesInString', () => {
-	it( 'should parse CSS variables from a string', () => {
-		const result = getCSSVariablesInString(
-			'color: var( --text-color ); background: linear-gradient(135deg, var(--background-color) 0%, var(--background-color-darker-20) 100%);'
+describe( 'findVarFunctionsInString', () => {
+	it( 'should parse var() functions correctly', () => {
+		const result = findVarFunctionsInString(
+			'color: var(--text-color, var(--bar, red)); background: linear-gradient(135deg, var(--background-color, rgb(0,0,0)) 0%, var(--background-color-darker-20) 100%);'
 		);
 		expect( result ).toEqual( [
-			'--text-color',
-			'--background-color',
-			'--background-color-darker-20',
-		] );
-	} );
-
-	it( 'should parse CSS variables with fallbacks', () => {
-		const result = getCSSVariablesInString(
-			'color: var(--text-color, #000); background: linear-gradient(135deg, var(--background-color, #fff) 0%, var(--background-color-darker-20, #000) 100%);'
-		);
-		expect( result ).toEqual( [
-			'--text-color',
-			'--background-color',
-			'--background-color-darker-20',
+			{
+				end: 41,
+				fallback: 'var(--bar, red)',
+				raw: 'var(--text-color, var(--bar, red))',
+				start: 7,
+				value: '--text-color',
+			},
+			{
+				end: 114,
+				fallback: 'rgb(0,0,0)',
+				raw: 'var(--background-color, rgb(0,0,0))',
+				start: 79,
+				value: '--background-color',
+			},
+			{
+				end: 152,
+				fallback: undefined,
+				raw: 'var(--background-color-darker-20)',
+				start: 119,
+				value: '--background-color-darker-20',
+			},
 		] );
 	} );
 } );
@@ -43,7 +50,7 @@ describe( 'replaceCSSVariablesInString', () => {
 
 	it( 'should replace CSS variables in a string', () => {
 		const result = replaceCSSVariablesInString(
-			'color: var(--text-color); background: linear-gradient(135deg, var(--background-color) 0%, var(--background-color-darker-20) 100%);',
+			'color: var(--text-color, rgb(3,3,3)); background: linear-gradient(135deg, var(--background-color) 0%, var(--background-color-darker-20) 100%);',
 			{
 				'--text-color': 'red',
 				'--background-color': '#fff',

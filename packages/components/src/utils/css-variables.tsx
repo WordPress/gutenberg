@@ -12,13 +12,58 @@ type CSSVariableReplacerProps = {
 	cssString?: string | null;
 	onChange: ( args: {
 		replacedCssString: string;
-		variables: CSSVariables;
+		computedVariables: ComputedCSSVariables;
 	} ) => void;
 };
-type CSSVariables = Record< string, string >;
+type ComputedCSSVariables = Record< string, string >;
 
-export function getCSSVariablesInString( cssString: string ) {
-	return cssString.match( /(?<=\bvar\(\s*)--[\w-]+/g ) ?? [];
+function findMatchingParenthesis( str: string, startPos: number ) {
+	let stack = 0;
+
+	for ( let i = startPos; i < str.length; i++ ) {
+		if ( str[ i ] === '(' ) {
+			stack++;
+		} else if ( str[ i ] === ')' ) {
+			stack--;
+			if ( stack === 0 ) {
+				return i;
+			}
+		}
+	}
+
+	throw new Error( 'No matching closing parenthesis found.' );
+}
+
+export function findVarFunctionsInString( str: string ) {
+	const regex = /(?<=\bvar)\(/g;
+	const matches = [];
+
+	let openingParen;
+	while ( ( openingParen = regex.exec( str ) ) !== null ) {
+		const closingParen = findMatchingParenthesis( str, openingParen.index );
+		const [ start, end ] = [
+			openingParen.index - 'var'.length,
+			closingParen + 1,
+		];
+		const raw = str.slice( start, end );
+		const value = raw.match( /--[\w-]+/ )?.[ 0 ];
+
+		if ( ! value ) {
+			throw new Error( 'No CSS variable found in var() function.' );
+		}
+
+		matches.push( {
+			start,
+			end,
+			raw,
+			value,
+			fallback: raw.match( /,(.+)\)/ )?.[ 1 ].trim(),
+		} );
+
+		regex.lastIndex = closingParen + 1;
+	}
+
+	return matches;
 }
 
 function getComputedCSSVariables(
@@ -30,40 +75,34 @@ function getComputedCSSVariables(
 			.getComputedStyle( element )
 			.getPropertyValue( propertyString );
 		return acc;
-	}, {} as CSSVariables );
+	}, {} as ComputedCSSVariables );
 }
 
 export function replaceCSSVariablesInString(
-	cssString: string,
-	cssVariables: CSSVariables
+	str: string,
+	computedVariables: ComputedCSSVariables
 ): string {
-	const getRegexForNestingLevel = ( fallbackCount: number ) => {
-		const closingParens =
-			fallbackCount > 1 ? '\\)'.repeat( fallbackCount - 1 ) : '';
-		return new RegExp(
-			'var\\((\\s*--[\\w-]+)\\s*(?:,([^)]+' + closingParens + '))?\\s*\\)'
-		);
-	};
+	const varFunctions = findVarFunctionsInString( str );
 
-	const baseRegex = /var\((\s*--[\w-]+)(?:\s*,([^)]+))?\s*\)/g;
-	const nestedRegexes = cssString.match( baseRegex )?.map( ( match ) => {
-		const fallbacksInMatch = match.match( /,/g )?.length ?? 0;
-		return getRegexForNestingLevel( fallbacksInMatch );
+	let result = '';
+	let lastIndex = 0;
+
+	varFunctions.forEach( ( { start, end, value, fallback } ) => {
+		const replacement =
+			computedVariables[ value ] ??
+			replaceCSSVariablesInString( fallback ?? '', computedVariables );
+
+		if ( ! replacement ) {
+			throw new Error( `No value found for CSS variable ${ value }.` );
+		}
+
+		result += str.slice( lastIndex, start ) + replacement;
+		lastIndex = end;
 	} );
 
-	const result = nestedRegexes?.reduce( ( acc, regex ) => {
-		return acc.replace( regex, ( match, variable, fallback ) => {
-			const value = cssVariables[ variable ];
-			if ( value ) {
-				return value;
-			}
-			return fallback
-				? replaceCSSVariablesInString( fallback.trim(), cssVariables )
-				: match;
-		} );
-	}, cssString );
+	result += str.slice( lastIndex );
 
-	return result ?? cssString;
+	return result;
 }
 
 export function CSSVariableReplacer( {
@@ -74,18 +113,18 @@ export function CSSVariableReplacer( {
 
 	useEffect( () => {
 		if ( cssString && ref.current ) {
-			const propertyStrings = getCSSVariablesInString( cssString );
-			const variables = getComputedCSSVariables(
-				propertyStrings,
+			const varFunctions = findVarFunctionsInString( cssString );
+			const computedVariables = getComputedCSSVariables(
+				varFunctions.map( ( { value } ) => value ),
 				ref.current
 			);
 
 			onChange( {
 				replacedCssString: replaceCSSVariablesInString(
 					cssString,
-					variables
+					computedVariables
 				),
-				variables,
+				computedVariables,
 			} );
 		}
 	}, [ cssString, onChange ] );
