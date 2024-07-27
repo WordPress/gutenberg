@@ -60,7 +60,7 @@ export function replaceCSSVariablesInString(
 		} );
 	}, cssString );
 
-	return result ?? '';
+	return result ?? cssString;
 }
 
 export function CSSVariableGetter( {
