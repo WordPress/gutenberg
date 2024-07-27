@@ -110,7 +110,10 @@ export const getPostIcon = createRegistrySelector(
 			// `icon` is the `menu_icon` property of a post type. We
 			// only handle `dashicons` for now, even if the `menu_icon`
 			// also supports urls and svg as values.
-			if ( postTypeEntity?.icon?.startsWith( 'dashicons-' ) ) {
+			if (
+				typeof postTypeEntity?.icon === 'string' &&
+				postTypeEntity.icon.startsWith( 'dashicons-' )
+			) {
 				return postTypeEntity.icon.slice( 10 );
 			}
 			return pageIcon;
