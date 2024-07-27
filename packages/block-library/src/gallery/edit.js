@@ -576,7 +576,7 @@ function GalleryEdit( props ) {
 					{ Platform.isNative ? (
 						<SelectControl
 							__nextHasNoMarginBottom
-							label={ __( 'Link to' ) }
+							label={ __( 'Link' ) }
 							value={ linkTo }
 							onChange={ setLinkTo }
 							options={ linkOptions }
@@ -621,7 +621,7 @@ function GalleryEdit( props ) {
 				<BlockControls group="block">
 					<ToolbarDropdownMenu
 						icon={ linkIcon }
-						label={ __( 'Link To' ) }
+						label={ __( 'Link' ) }
 					>
 						{ ( { onClose } ) => (
 							<MenuGroup>
