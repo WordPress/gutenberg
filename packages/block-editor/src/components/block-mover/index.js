@@ -69,7 +69,11 @@ function BlockMover( {
 		[ clientIds ]
 	);
 
-	if ( ! canMove || ( isFirst && isLast && ! rootClientId ) ) {
+	if (
+		! canMove ||
+		( isFirst && isLast && ! rootClientId ) ||
+		( hideDragHandle && isManualGrid )
+	) {
 		return null;
 	}
 
