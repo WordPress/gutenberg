@@ -114,7 +114,7 @@
 		// If a browser supports it, we will switch to using a circular SVG mask.
 		@supports (mask-image: none) or (-webkit-mask-image: none) {
 			/* stylelint-disable-next-line function-url-quotes -- We need quotes for the data URL to use the SVG inline. */
-			mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="50"/></svg>');
+			mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="https://www.w3.org/2000/svg"><circle cx="50" cy="50" r="50"/></svg>');
 			mask-mode: alpha;
 			mask-repeat: no-repeat;
 			mask-size: contain;
