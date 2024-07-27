@@ -68,6 +68,7 @@ describe( 'replaceCSSVariablesInString', () => {
 				'color: var(--text-color, var(--undefined-color, #000)); background: linear-gradient(135deg, var( --undefined-color, var(--background-color, #fff) ) 0%, var(--background-color-darker-20, #000) 100%);',
 				{
 					'--text-color': 'red',
+					'--undefined-color': '',
 					'--background-color': 'blue',
 					'--background-color-darker-20': 'darkblue',
 				}
@@ -79,8 +80,19 @@ describe( 'replaceCSSVariablesInString', () => {
 		expect(
 			replaceCSSVariablesInString(
 				'linear-gradient(135deg,var(--undefined-color, red) 0%,blue 100%)',
-				{}
+				{
+					'--undefined-color': '',
+				}
 			)
 		).toEqual( 'linear-gradient(135deg,red 0%,blue 100%)' );
+
+		expect(
+			replaceCSSVariablesInString(
+				'linear-gradient(135deg,var(--undefined-color, red) 0%,pink 100%)',
+				{
+					'--undefined-color': '',
+				}
+			)
+		).toEqual( 'linear-gradient(135deg,red 0%,pink 100%)' );
 	} );
 } );

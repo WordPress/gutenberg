@@ -89,7 +89,7 @@ export function replaceCSSVariablesInString(
 
 	varFunctions.forEach( ( { start, end, value, fallback } ) => {
 		const replacement =
-			computedVariables[ value ] ??
+			computedVariables[ value ] ||
 			replaceCSSVariablesInString( fallback ?? '', computedVariables );
 
 		if ( ! replacement ) {
