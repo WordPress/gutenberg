@@ -122,13 +122,22 @@ export function CSSVariableReplacer( {
 				ref.current
 			);
 
-			onChange( {
-				replacedCssString: replaceCSSVariablesInString(
+			let replacedCssString = cssString;
+
+			try {
+				replacedCssString = replaceCSSVariablesInString(
 					cssString,
 					computedVariables
-				),
-				computedVariables,
-			} );
+				);
+			} catch ( error ) {
+				// eslint-disable-next-line no-console
+				console.warn(
+					'wp.components.CSSVariableReplacer failed to parse the CSS string with error',
+					error
+				);
+			}
+
+			onChange( { replacedCssString, computedVariables } );
 		}
 	}, [ cssString, onChange ] );
 
