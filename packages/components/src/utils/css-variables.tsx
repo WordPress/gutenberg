@@ -10,7 +10,10 @@ import { VisuallyHidden } from '../visually-hidden';
 
 type CSSVariableGetterProps = {
 	cssString?: string | null;
-	onChange: ( cssVariables: CSSVariables ) => void;
+	onChange: ( args: {
+		replacedCssString: string;
+		variables: CSSVariables;
+	} ) => void;
 };
 type CSSVariables = Record< string, string >;
 
@@ -72,11 +75,18 @@ export function CSSVariableGetter( {
 	useEffect( () => {
 		if ( cssString && ref.current ) {
 			const propertyStrings = getCSSVariablesInString( cssString );
-			const vars = getComputedCSSVariables(
+			const variables = getComputedCSSVariables(
 				propertyStrings,
 				ref.current
 			);
-			onChange( vars );
+
+			onChange( {
+				replacedCssString: replaceCSSVariablesInString(
+					cssString,
+					variables
+				),
+				variables,
+			} );
 		}
 	}, [ cssString, onChange ] );
 
