@@ -49,7 +49,7 @@ function Header( {
 	icon,
 } ) {
 	const isWideViewport = useViewportMatch( 'large' );
-	const isLessThanMediumViewport = useViewportMatch( 'medium', '<' );
+	const isLargeViewport = useViewportMatch( 'medium' );
 	const isTooNarrowForDocumentBar = useMediaQuery( '(max-width: 403px)' );
 	const {
 		isTextEditor,
@@ -84,7 +84,7 @@ function Header( {
 		useState( true );
 
 	const hasDocumentOrCollapsedBlockToolbars =
-		! isDistractionFree || ! isLessThanMediumViewport;
+		! isDistractionFree || isLargeViewport;
 	const hasCenter = isBlockToolsCollapsed && ! isTooNarrowForDocumentBar;
 	const hasBackButton = useHasBackButton();
 
@@ -112,7 +112,7 @@ function Header( {
 							forceDisableBlockTools || isTextEditor
 						}
 					/>
-					{ hasFixedToolbar && ! isLessThanMediumViewport && (
+					{ hasFixedToolbar && isLargeViewport && (
 						<CollapsibleBlockToolbar
 							isCollapsed={ isBlockToolsCollapsed }
 							onToggle={ setIsBlockToolsCollapsed }
