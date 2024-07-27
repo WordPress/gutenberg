@@ -7,7 +7,7 @@ import { type LinearGradientNode } from 'gradient-parser';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { useCallback, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -145,6 +145,11 @@ export function CustomGradientPicker( {
 	__experimentalIsRenderedInSidebar = false,
 }: CustomGradientPickerProps ) {
 	const [ replacedCssString, setReplacedCssString ] = useState< string >();
+	const cssVariableReplaceOnChange: React.ComponentProps<
+		typeof CSSVariableReplacer
+	>[ 'onChange' ] = useCallback( ( { replacedCssString: str } ) => {
+		setReplacedCssString( str );
+	}, [] );
 
 	const { gradientAST, hasGradient } =
 		getGradientAstWithDefault( replacedCssString );
@@ -170,9 +175,7 @@ export function CustomGradientPicker( {
 		<VStack spacing={ 4 } className="components-custom-gradient-picker">
 			<CSSVariableReplacer
 				cssString={ value }
-				onChange={ ( { replacedCssString: str } ) =>
-					setReplacedCssString( str )
-				}
+				onChange={ cssVariableReplaceOnChange }
 			/>
 			<CustomGradientBar
 				__experimentalIsRenderedInSidebar={
