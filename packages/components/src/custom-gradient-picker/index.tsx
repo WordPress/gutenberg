@@ -17,7 +17,7 @@ import CustomGradientBar from './gradient-bar';
 import { Flex } from '../flex';
 import SelectControl from '../select-control';
 import { VStack } from '../v-stack';
-import { CSSVariableGetter } from '../utils/css-variables';
+import { CSSVariableReplacer } from '../utils/css-variables';
 import {
 	getGradientAstWithDefault,
 	getLinearGradientRepresentation,
@@ -168,7 +168,7 @@ export function CustomGradientPicker( {
 
 	return (
 		<VStack spacing={ 4 } className="components-custom-gradient-picker">
-			<CSSVariableGetter
+			<CSSVariableReplacer
 				cssString={ value }
 				onChange={ ( { replacedCssString: str } ) =>
 					setReplacedCssString( str )

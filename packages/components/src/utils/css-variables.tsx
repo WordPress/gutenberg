@@ -8,7 +8,7 @@ import { useEffect, useRef } from '@wordpress/element';
  */
 import { VisuallyHidden } from '../visually-hidden';
 
-type CSSVariableGetterProps = {
+type CSSVariableReplacerProps = {
 	cssString?: string | null;
 	onChange: ( args: {
 		replacedCssString: string;
@@ -66,10 +66,10 @@ export function replaceCSSVariablesInString(
 	return result ?? cssString;
 }
 
-export function CSSVariableGetter( {
+export function CSSVariableReplacer( {
 	cssString,
 	onChange,
-}: CSSVariableGetterProps ) {
+}: CSSVariableReplacerProps ) {
 	const ref = useRef< HTMLDivElement >( null );
 
 	useEffect( () => {
