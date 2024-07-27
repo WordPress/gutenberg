@@ -6,11 +6,12 @@ import {
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,
+	MenuItemsChoice,
 	VisuallyHidden,
 	Icon,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { check, desktop, mobile, tablet, external } from '@wordpress/icons';
+import { desktop, mobile, tablet, external } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -62,6 +63,54 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		desktop,
 	};
 
+	/**
+	 * The choices for the device type.
+	 *
+	 * @type {Array}
+	 */
+	const choices = [
+		{
+			value: 'Desktop',
+			label: __( 'Desktop' ),
+			icon: desktop,
+		},
+		{
+			value: 'Tablet',
+			label: __( 'Tablet' ),
+			icon: tablet,
+		},
+		{
+			value: 'Mobile',
+			label: __( 'Mobile' ),
+			icon: mobile,
+		},
+	];
+
+	/**
+	 * The selected choice.
+	 *
+	 * @type {Object}
+	 */
+	let selectedChoice = choices.find(
+		( choice ) => choice.value === deviceType
+	);
+
+	/**
+	 * If no selected choice is found, default to the first
+	 */
+	if ( ! selectedChoice ) {
+		selectedChoice = choices[ 0 ];
+	}
+
+	/**
+	 * Handles the selection of a device type.
+	 *
+	 * @param {string} value The device type.
+	 */
+	const onSelect = ( value ) => {
+		setDeviceType( value );
+	};
+
 	return (
 		<DropdownMenu
 			className="editor-preview-dropdown"
@@ -75,39 +124,11 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 			{ ( { onClose } ) => (
 				<>
 					<MenuGroup>
-						<MenuItem
-							onClick={ () => setDeviceType( 'Desktop' ) }
-							icon={ deviceType === 'Desktop' && check }
-							aria-label={
-								deviceType === 'Desktop'
-									? __( 'Desktop Selected' )
-									: __( 'Desktop' )
-							}
-						>
-							{ __( 'Desktop' ) }
-						</MenuItem>
-						<MenuItem
-							onClick={ () => setDeviceType( 'Tablet' ) }
-							icon={ deviceType === 'Tablet' && check }
-							aria-label={
-								deviceType === 'Tablet'
-									? __( 'Tablet Selected' )
-									: __( 'Tablet' )
-							}
-						>
-							{ __( 'Tablet' ) }
-						</MenuItem>
-						<MenuItem
-							onClick={ () => setDeviceType( 'Mobile' ) }
-							icon={ deviceType === 'Mobile' && check }
-							aria-label={
-								deviceType === 'Mobile'
-									? __( 'Mobile Selected' )
-									: __( 'Mobile' )
-							}
-						>
-							{ __( 'Mobile' ) }
-						</MenuItem>
+						<MenuItemsChoice
+							choices={ choices }
+							value={ selectedChoice.value }
+							onSelect={ onSelect }
+						/>
 					</MenuGroup>
 					{ isTemplate && (
 						<MenuGroup>
