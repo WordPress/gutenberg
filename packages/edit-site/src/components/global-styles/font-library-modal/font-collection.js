@@ -63,20 +63,15 @@ function FontCollection( { slug } ) {
 	};
 
 	const [ selectedFont, setSelectedFont ] = useState( null );
+	const [ notice, setNotice ] = useState( false );
 	const [ fontsToInstall, setFontsToInstall ] = useState( [] );
 	const [ page, setPage ] = useState( 1 );
 	const [ filters, setFilters ] = useState( {} );
 	const [ renderConfirmDialog, setRenderConfirmDialog ] = useState(
 		requiresPermission && ! getGoogleFontsPermissionFromStorage()
 	);
-	const {
-		collections,
-		getFontCollection,
-		installFonts,
-		isInstalling,
-		notice,
-		setNotice,
-	} = useContext( FontLibraryContext );
+	const { collections, getFontCollection, installFonts, isInstalling } =
+		useContext( FontLibraryContext );
 	const selectedCollection = collections.find(
 		( collection ) => collection.slug === slug
 	);
@@ -116,8 +111,7 @@ function FontCollection( { slug } ) {
 
 	useEffect( () => {
 		setSelectedFont( null );
-		setNotice( null );
-	}, [ slug, setNotice ] );
+	}, [ slug ] );
 
 	useEffect( () => {
 		// If the selected fonts change, reset the selected fonts to install
