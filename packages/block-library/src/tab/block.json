@@ -13,7 +13,12 @@
 			"default": false
 		},
 		"label": {
-			"type": "string"
+			"type": "string",
+			"default": ""
+		},
+		"slug": {
+			"type": "string",
+			"default": ""
 		},
 		"tabIndex": {
 			"type": "number"

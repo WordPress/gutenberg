@@ -896,7 +896,7 @@ Single tab within a tabs block. ([Source](https://github.com/WordPress/gutenberg
 -	**Category:** design
 -	**Parent:** core/tabs
 -	**Supports:** anchor, ~~html~~, ~~reusable~~
--	**Attributes:** isActive, label, tabIndex
+-	**Attributes:** isActive, label, slug, tabIndex
 
 ## Table
 

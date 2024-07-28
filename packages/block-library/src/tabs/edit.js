@@ -113,9 +113,11 @@ export default function Edit( { clientId, setAttributes } ) {
 	 * - tabIndex to save the first tab as active, independent of the editor view
 	 */
 	useEffect( () => {
+		__unstableMarkNextChangeAsNotPersistent();
 		setAttributes( {
 			innerTabs: innerTabBlocks.map( ( block ) => ( {
 				label: block.attributes.label,
+				id: block.attributes.anchor || block.attributes.slug,
 			} ) ),
 		} );
 
@@ -149,26 +151,28 @@ export default function Edit( { clientId, setAttributes } ) {
 		<div { ...blockProps }>
 			<ul className="wp-block-tabs__list" role="tablist">
 				{ innerTabBlocks.map( ( block ) => {
-					const isActive = block.attributes.isActive;
-					const tabIndex = isActive ? 0 : -1;
+					const { anchor, isActive, label, slug } = block.attributes;
+					const tabIndexAttr = isActive ? 0 : -1;
+					const tabPanelId = anchor || slug;
+					const tabLabelId = tabPanelId + '--tab';
 
-					// TODO: Add unique ids and aria attributes for accessibility.
-					// (Try the anchor generation functionality from the heading block?)
 					return (
 						<li
 							key={ block.clientId }
 							className="wp-block-tabs__list-item"
 							role="presentation"
 						>
-							<a // eslint-disable-line jsx-a11y/anchor-is-valid -- TODO: add tab ids to href
+							<a
+								aria-controls={ tabPanelId }
 								aria-selected={ isActive }
 								className={ clsx( 'wp-block-tabs__tab-label', {
 									'is-active': isActive,
 								} ) }
-								href="#"
+								href={ '#' + tabPanelId }
+								id={ tabLabelId }
 								onClick={ () => setActiveTab( block.clientId ) }
 								role="tab"
-								tabIndex={ tabIndex }
+								tab-index={ tabIndexAttr }
 							>
 								<RichText
 									allowedFormats={ ALLOWED_FORMATS }
@@ -179,7 +183,7 @@ export default function Edit( { clientId, setAttributes } ) {
 										} )
 									}
 									placeholder={ __( 'Add label…' ) }
-									value={ block.attributes.label }
+									value={ label }
 								/>
 							</a>
 						</li>

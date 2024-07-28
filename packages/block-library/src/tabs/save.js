@@ -24,8 +24,8 @@ export default function save( { attributes } ) {
 			<ul className="wp-block-tabs__list" role="tablist">
 				{ innerTabs.map( ( tab, index ) => {
 					const isActive = index === 0;
-					const tabIndex = isActive ? 0 : -1;
-
+					const tabIndexAttr = isActive ? 0 : -1;
+					const tabLabelId = tab.id + '--tab';
 					return (
 						<li
 							className="wp-block-tabs__list-item"
@@ -33,13 +33,15 @@ export default function save( { attributes } ) {
 							role="presentation"
 						>
 							<RichText.Content
+								aria-controls={ tab.id }
 								aria-selected={ isActive }
 								className={ clsx( 'wp-block-tabs__tab-label', {
 									'is-active': isActive,
 								} ) }
-								href="#"
+								href={ '#' + tab.id }
+								id={ tabLabelId }
 								role="tab"
-								tabIndex={ tabIndex }
+								tab-index={ tabIndexAttr }
 								tagName="a"
 								value={ tab.label }
 							/>

@@ -4,7 +4,9 @@
 import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	const { tabIndex } = attributes;
+	const { anchor, slug, tabIndex } = attributes;
+	const tabPanelId = anchor || slug;
+	const tabLabelId = tabPanelId + '--tab';
 
 	// The first tab in the set is always active on initial load.
 	const blockProps = useBlockProps.save( {
@@ -12,5 +14,12 @@ export default function save( { attributes } ) {
 	} );
 	const innerBlocksProps = useInnerBlocksProps.save( blockProps );
 
-	return <div { ...innerBlocksProps } role="tabpanel"></div>;
+	return (
+		<div
+			{ ...innerBlocksProps }
+			aria-labelledby={ tabLabelId }
+			id={ tabPanelId }
+			role="tabpanel"
+		/>
+	);
 }

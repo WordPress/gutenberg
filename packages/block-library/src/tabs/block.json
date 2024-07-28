@@ -11,13 +11,15 @@
 	"attributes": {
 		"innerTabs": {
 			"type": "array",
-			"items": {
-				"type": "string"
-			},
 			"default": [],
 			"source": "query",
 			"selector": ".wp-block-tabs__tab-label",
 			"query": {
+				"id": {
+					"type": "string",
+					"source": "attribute",
+					"attribute": "aria-controls"
+				},
 				"label": {
 					"type": "string",
 					"source": "html"
