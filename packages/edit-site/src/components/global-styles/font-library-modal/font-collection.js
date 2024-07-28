@@ -376,7 +376,7 @@ function FontCollection( { slug } ) {
 										</li>
 									) ) }
 								</ul>
-								{ /* eslint-enable jsx-a11y/no-redundant-roles */ }{ ' ' }
+								{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
 							</div>
 						</NavigatorScreen>
 
@@ -425,26 +425,40 @@ function FontCollection( { slug } ) {
 								__nextHasNoMarginBottom
 							/>
 							<VStack spacing={ 0 }>
-								<Spacer margin={ 8 } />
-								{ getSortedFontFaces( selectedFont ).map(
-									( face, i ) => (
-										<CollectionFontVariant
-											font={ selectedFont }
-											face={ face }
-											key={ `face${ i }` }
-											handleToggleVariant={
-												handleToggleVariant
-											}
-											selected={ isFontFontFaceInOutline(
-												selectedFont.slug,
-												selectedFont.fontFace
-													? face
-													: null, // If the font has no fontFace, we want to check if the font is in the outline
-												fontToInstallOutline
-											) }
-										/>
-									)
-								) }
+								{ /*
+								 * Disable reason: The `list` ARIA role is redundant but
+								 * Safari+VoiceOver won't announce the list otherwise.
+								 */
+								/* eslint-disable jsx-a11y/no-redundant-roles */ }
+								<ul
+									role="list"
+									className="font-library-modal__fonts-list"
+								>
+									{ getSortedFontFaces( selectedFont ).map(
+										( face, i ) => (
+											<li
+												key={ `face${ i }` }
+												className="font-library-modal__fonts-list-item"
+											>
+												<CollectionFontVariant
+													font={ selectedFont }
+													face={ face }
+													handleToggleVariant={
+														handleToggleVariant
+													}
+													selected={ isFontFontFaceInOutline(
+														selectedFont.slug,
+														selectedFont.fontFace
+															? face
+															: null, // If the font has no fontFace, we want to check if the font is in the outline
+														fontToInstallOutline
+													) }
+												/>
+											</li>
+										)
+									) }
+								</ul>
+								{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
 							</VStack>
 							<Spacer margin={ 16 } />
 						</NavigatorScreen>

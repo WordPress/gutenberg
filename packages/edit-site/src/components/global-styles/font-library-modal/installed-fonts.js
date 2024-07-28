@@ -397,15 +397,31 @@ function InstalledFonts() {
 									__nextHasNoMarginBottom
 								/>
 								<Spacer margin={ 8 } />
-								{ getFontFacesToDisplay(
-									libraryFontSelected
-								).map( ( face, i ) => (
-									<LibraryFontVariant
-										font={ libraryFontSelected }
-										face={ face }
-										key={ `face${ i }` }
-									/>
-								) ) }
+								{ /*
+								 * Disable reason: The `list` ARIA role is redundant but
+								 * Safari+VoiceOver won't announce the list otherwise.
+								 */
+								/* eslint-disable jsx-a11y/no-redundant-roles */ }
+								<ul
+									role="list"
+									className="font-library-modal__fonts-list"
+								>
+									{ getFontFacesToDisplay(
+										libraryFontSelected
+									).map( ( face, i ) => (
+										<li
+											key={ `face${ i }` }
+											className="font-library-modal__fonts-list-item"
+										>
+											<LibraryFontVariant
+												font={ libraryFontSelected }
+												face={ face }
+												key={ `face${ i }` }
+											/>
+										</li>
+									) ) }
+								</ul>
+								{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
 							</VStack>
 						</NavigatorScreen>
 					</NavigatorProvider>
