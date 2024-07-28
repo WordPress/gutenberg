@@ -89,8 +89,7 @@ function useEditorCommandLoader() {
 		name: 'core/open-shortcut-help',
 		label: __( 'Keyboard shortcuts' ),
 		icon: keyboard,
-		callback: ( { close } ) => {
-			close();
+		callback: () => {
 			openModal( 'editor/keyboard-shortcut-help' );
 		},
 	} );
@@ -109,8 +108,7 @@ function useEditorCommandLoader() {
 	commands.push( {
 		name: 'core/open-preferences',
 		label: __( 'Editor preferences' ),
-		callback: ( { close } ) => {
-			close();
+		callback: () => {
 			openModal( 'editor/preferences' );
 		},
 	} );
