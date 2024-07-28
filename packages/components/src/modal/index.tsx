@@ -153,9 +153,9 @@ function UnforwardedModal(
 	// onRequestClose for any prior and/or nested modals as applicable.
 	useEffect( () => {
 		dismissers.push( refOnRequestClose );
-		const [ first, second ] = dismissers;
-		if ( second ) {
-			first?.current?.();
+		const [ prior ] = dismissers;
+		if ( prior && prior !== refOnRequestClose ) {
+			prior.current?.();
 		}
 
 		const nested = nestedDismissers.current;
