@@ -764,25 +764,55 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @return array
 	 */
 	public static function get_style_variations( $scope = 'theme' ) {
-		$variation_files    = array();
-		$variations         = array();
-		$base_directory     = get_stylesheet_directory() . '/styles';
-		$template_directory = get_template_directory() . '/styles';
-		if ( is_dir( $base_directory ) ) {
-			$variation_files = static::recursively_iterate_json( $base_directory );
+		$variation_files = array();
+		$variations      = array();
+
+		// Default directories to scan for JSON files.
+		$directories = array(
+			'base_directory'     => get_stylesheet_directory() . '/styles',
+			'template_directory' => get_template_directory() . '/styles',
+		);
+
+		// Apply filter hook to modify directories.
+		$directories = apply_filters( 'wp_theme_json_style_variation_directories', $directories );
+
+		// Collect variation files from all directories.
+		$all_variation_files = array();
+
+		foreach ( $directories as $key => $directory ) {
+			if ( is_dir( $directory ) ) {
+				$files = static::recursively_iterate_json( $directory );
+				if ( 'base_directory' === $key || 'template_directory' === $key ) {
+					// Handle parent and child theme conflict resolution.
+					if ( 'base_directory' === $key ) {
+						$all_variation_files['child'] = $files;
+					} elseif ( 'template_directory' === $key ) {
+						$all_variation_files['parent'] = $files;
+					}
+				} else {
+					// For custom directories, simply add the files.
+					$all_variation_files[ $key ] = $files;
+				}
+			}
 		}
-		if ( is_dir( $template_directory ) && $template_directory !== $base_directory ) {
-			$variation_files_parent = static::recursively_iterate_json( $template_directory );
-			// If the child and parent variation file basename are the same, only include the child theme's.
-			foreach ( $variation_files_parent as $parent_path => $parent ) {
-				foreach ( $variation_files as $child_path => $child ) {
+
+		// Merge variation files with proper conflict resolution.
+		if ( isset( $all_variation_files['parent'] ) && isset( $all_variation_files['child'] ) ) {
+			// Remove parent variations that have the same basename as child variations.
+			foreach ( $all_variation_files['parent'] as $parent_path => $parent ) {
+				foreach ( $all_variation_files['child'] as $child_path => $child ) {
 					if ( basename( $parent_path ) === basename( $child_path ) ) {
-						unset( $variation_files_parent[ $parent_path ] );
+						unset( $all_variation_files['parent'][ $parent_path ] );
 					}
 				}
 			}
-			$variation_files = array_merge( $variation_files, $variation_files_parent );
 		}
+
+		// Merge all variation files into a single array.
+		foreach ( $all_variation_files as $files ) {
+			$variation_files = array_merge( $variation_files, $files );
+		}
+
 		ksort( $variation_files );
 		foreach ( $variation_files as $path => $file ) {
 			$decoded_file = self::read_json_file( $path );
@@ -795,7 +825,9 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				$variations[] = $variation;
 			}
 		}
-		return $variations;
+
+		// Apply filter hook to modify final variations.
+		return apply_filters( 'wp_theme_json_style_variations', $variations );
 	}
 
 
