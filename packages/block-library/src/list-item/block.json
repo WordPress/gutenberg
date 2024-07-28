@@ -6,7 +6,7 @@
 	"category": "text",
 	"parent": [ "core/list" ],
 	"allowedBlocks": [ "core/list" ],
-	"description": "Create a list item.",
+	"description": "An individual item within a list.",
 	"textdomain": "default",
 	"attributes": {
 		"placeholder": {
@@ -26,7 +26,7 @@
 			"gradients": true,
 			"link": true,
 			"__experimentalDefaultControls": {
-				"background": true,
+				"background": false,
 				"text": true
 			}
 		},

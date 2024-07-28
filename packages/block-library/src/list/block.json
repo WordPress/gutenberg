@@ -5,7 +5,7 @@
 	"title": "List",
 	"category": "text",
 	"allowedBlocks": [ "core/list-item" ],
-	"description": "Create a bulleted or numbered list.",
+	"description": "An organized collection of items displayed in a specific order.",
 	"keywords": [ "bullet list", "ordered list", "numbered list" ],
 	"textdomain": "default",
 	"attributes": {

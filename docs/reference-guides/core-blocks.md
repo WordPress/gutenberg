@@ -410,7 +410,7 @@ Display a list of your most recent posts. ([Source](https://github.com/WordPress
 
 ## List
 
-Create a bulleted or numbered list. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/list))
+An organized collection of items displayed in a specific order. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/list))
 
 -	**Name:** core/list
 -	**Category:** text
@@ -420,7 +420,7 @@ Create a bulleted or numbered list. ([Source](https://github.com/WordPress/guten
 
 ## List item
 
-Create a list item. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/list-item))
+An individual item within a list. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/list-item))
 
 -	**Name:** core/list-item
 -	**Category:** text
