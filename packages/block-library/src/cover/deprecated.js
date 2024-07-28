@@ -331,6 +331,7 @@ const v13 = {
 			<Tag { ...useBlockProps.save( { className: classes, style } ) }>
 				<span
 					aria-hidden="true"
+					tabIndex={ 0 }
 					className={ clsx(
 						'wp-block-cover__background',
 						overlayColorClass,
@@ -493,6 +494,7 @@ const v12 = {
 			<Tag { ...useBlockProps.save( { className: classes, style } ) }>
 				<span
 					aria-hidden="true"
+					tabIndex={ 0 }
 					className={ clsx(
 						'wp-block-cover__background',
 						overlayColorClass,
@@ -642,6 +644,7 @@ const v11 = {
 			<div { ...useBlockProps.save( { className: classes, style } ) }>
 				<span
 					aria-hidden="true"
+					tabIndex={ 0 }
 					className={ clsx(
 						'wp-block-cover__background',
 						overlayColorClass,
@@ -782,6 +785,7 @@ const v10 = {
 			<div { ...useBlockProps.save( { className: classes, style } ) }>
 				<span
 					aria-hidden="true"
+					tabIndex={ 0 }
 					className={ clsx(
 						'wp-block-cover__background',
 						overlayColorClass,
@@ -917,6 +921,7 @@ const v9 = {
 			<div { ...useBlockProps.save( { className: classes, style } ) }>
 				<span
 					aria-hidden="true"
+					tabIndex={ 0 }
 					className={ clsx(
 						'wp-block-cover__background',
 						overlayColorClass,
@@ -1047,6 +1052,7 @@ const v8 = {
 			<div { ...useBlockProps.save( { className: classes, style } ) }>
 				<span
 					aria-hidden="true"
+					tabIndex={ 0 }
 					className={ clsx(
 						overlayColorClass,
 						dimRatioToClass( dimRatio ),
@@ -1202,6 +1208,7 @@ const v7 = {
 				{ url && ( gradient || customGradient ) && dimRatio !== 0 && (
 					<span
 						aria-hidden="true"
+						tabIndex={ 0 }
 						className={ clsx(
 							'wp-block-cover__gradient-background',
 							gradientClass
@@ -1353,6 +1360,7 @@ const v6 = {
 				{ url && ( gradient || customGradient ) && dimRatio !== 0 && (
 					<span
 						aria-hidden="true"
+						tabIndex={ 0 }
 						className={ clsx(
 							'wp-block-cover__gradient-background',
 							gradientClass
@@ -1452,6 +1460,7 @@ const v5 = {
 				{ url && ( gradient || customGradient ) && dimRatio !== 0 && (
 					<span
 						aria-hidden="true"
+						tabIndex={ 0 }
 						className={ clsx(
 							'wp-block-cover__gradient-background',
 							gradientClass
@@ -1549,6 +1558,7 @@ const v4 = {
 				{ url && ( gradient || customGradient ) && dimRatio !== 0 && (
 					<span
 						aria-hidden="true"
+						tabIndex={ 0 }
 						className={ clsx(
 							'wp-block-cover__gradient-background',
 							gradientClass

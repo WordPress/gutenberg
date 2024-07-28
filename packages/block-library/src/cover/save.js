@@ -106,6 +106,7 @@ export default function save( { attributes } ) {
 		<Tag { ...useBlockProps.save( { className: classes, style } ) }>
 			<span
 				aria-hidden="true"
+				tabIndex={ 0 }
 				className={ clsx(
 					'wp-block-cover__background',
 					overlayColorClass,
