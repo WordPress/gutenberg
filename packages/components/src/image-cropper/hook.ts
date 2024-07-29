@@ -66,16 +66,18 @@ export const useImageCropper = ( {
 		}
 	);
 
-	// FIXME: This doesn't work for rotated images for now.
 	const getImageBlob = useCallback( async ( cropperState: State ) => {
+		const image = imageRef.current;
+		const { naturalWidth, naturalHeight } = image;
+		const scaleFactor = naturalWidth / cropperState.image.width;
 		const offscreenCanvas = new OffscreenCanvas(
-			cropperState.cropper.width,
-			cropperState.cropper.height
+			cropperState.cropper.width * scaleFactor,
+			cropperState.cropper.height * scaleFactor
 		);
 		const ctx = offscreenCanvas.getContext( '2d' )!;
 		ctx.translate(
-			cropperState.image.x + offscreenCanvas.width / 2,
-			cropperState.image.y + offscreenCanvas.height / 2
+			cropperState.image.x * scaleFactor + offscreenCanvas.width / 2,
+			cropperState.image.y * scaleFactor + offscreenCanvas.height / 2
 		);
 		ctx.rotate(
 			degreeToRadian(
@@ -91,21 +93,17 @@ export const useImageCropper = ( {
 				( cropperState.transforms.flipped && isAxisSwapped ? -1 : 1 )
 		);
 		const imageOffset = {
-			x: isAxisSwapped
-				? ( cropperState.image.height - cropperState.image.width ) / 2
-				: 0,
-			y: isAxisSwapped
-				? ( cropperState.image.width - cropperState.image.height ) / 2
-				: 0,
+			x: isAxisSwapped ? ( naturalHeight - naturalWidth ) / 2 : 0,
+			y: isAxisSwapped ? ( naturalWidth - naturalHeight ) / 2 : 0,
 		};
 		ctx.drawImage(
-			imageRef.current!,
-			-cropperState.cropper.x - offscreenCanvas.width / 2 + imageOffset.x,
-			-cropperState.cropper.y -
+			image,
+			-cropperState.cropper.x * scaleFactor -
+				offscreenCanvas.width / 2 +
+				imageOffset.x,
+			-cropperState.cropper.y * scaleFactor -
 				offscreenCanvas.height / 2 +
-				imageOffset.y,
-			cropperState.image.width,
-			cropperState.image.height
+				imageOffset.y
 		);
 		const blob = await offscreenCanvas.convertToBlob();
 		return blob;

@@ -44,7 +44,14 @@ function TemplateControls() {
 
 				{ previewUrl && (
 					<FlexItem>
-						<img src={ previewUrl } alt="preview" />
+						<a href={ previewUrl } target="_blank" rel="noreferrer">
+							<img
+								src={ previewUrl }
+								alt="preview"
+								width={ state.cropper.width }
+								height={ state.cropper.height }
+							/>
+						</a>
 					</FlexItem>
 				) }
 			</Flex>
@@ -135,6 +142,6 @@ export const Default: StoryObj< typeof ImageCropper.Provider > = Template.bind(
 );
 Default.args = {
 	src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Hydrochoeris_hydrochaeris_in_Brazil_in_Petr%C3%B3polis%2C_Rio_de_Janeiro%2C_Brazil_09.jpg/1200px-Hydrochoeris_hydrochaeris_in_Brazil_in_Petr%C3%B3polis%2C_Rio_de_Janeiro%2C_Brazil_09.jpg',
-	width: 250,
+	width: 300,
 	height: 200,
 };
