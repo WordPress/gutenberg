@@ -7,6 +7,10 @@ import rebaseUrl from 'postcss-urlrebase';
 
 const cacheByWrapperSelector = new Map();
 
+// Ordering is important since `:root` would also match `:root :where(body)`.
+const ROOT_SELECTOR_REGEX =
+	/^(:root :where\(body\)|:where\(body\)|:root|html|body)/;
+
 function transformStyle(
 	{ css, ignoredSelectors = [], baseURL },
 	wrapperSelector = ''
@@ -27,8 +31,12 @@ function transformStyle(
 						exclude: [ ...ignoredSelectors, wrapperSelector ],
 						transform( prefix, selector, prefixedSelector ) {
 							// Avoid prefixing an already prefixed selector.
-							if ( selector.startsWith( prefix ) ) {
-								return prefixedSelector.replace(
+							if (
+								prefixedSelector.startsWith(
+									`${ prefix } ${ prefix }`
+								)
+							) {
+								prefixedSelector = prefixedSelector.replace(
 									`${ prefix } ${ prefix }`,
 									prefix
 								);
@@ -39,10 +47,16 @@ function transformStyle(
 							// selector.
 							// Also include some special rules for various forms of :root and body
 							// that crop up.
-							return selector
-								.replace( /:root :where\(body\)/g, prefix )
-								.replace( /:where\(body\)/g, prefix )
-								.replace( /^(html|body|:root)/, prefix );
+							if ( ROOT_SELECTOR_REGEX.test( selector ) ) {
+								return selector.replace(
+									ROOT_SELECTOR_REGEX,
+									prefix
+								);
+							}
+
+							// console.log( out, rootSelector, prefixedSelector );
+
+							return prefixedSelector;
 						},
 					} ),
 				baseURL && rebaseUrl( { rootUrl: baseURL } ),
