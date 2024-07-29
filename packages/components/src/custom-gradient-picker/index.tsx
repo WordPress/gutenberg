@@ -17,7 +17,10 @@ import CustomGradientBar from './gradient-bar';
 import { Flex } from '../flex';
 import SelectControl from '../select-control';
 import { VStack } from '../v-stack';
-import { CSSVariableReplacer } from '../utils/css-variables';
+import {
+	CSSVariableReplacer,
+	getCSSVariablesInString,
+} from '../utils/css-variables';
 import {
 	getGradientAstWithDefault,
 	getLinearGradientRepresentation,
@@ -144,7 +147,11 @@ export function CustomGradientPicker( {
 	onChange,
 	__experimentalIsRenderedInSidebar = false,
 }: CustomGradientPickerProps ) {
-	const [ normalizedValue, setNormalizedValue ] = useState( value );
+	const [ normalizedValue, setNormalizedValue ] = useState(
+		!! getCSSVariablesInString( value ?? '' ).length
+			? 'linear-gradient( #fff, #fff )' // prevent FOUC when there are CSS variables
+			: value
+	);
 	const cssVariableReplacerOnChange: React.ComponentProps<
 		typeof CSSVariableReplacer
 	>[ 'onChange' ] = useCallback( ( { replacedCssString: str } ) => {

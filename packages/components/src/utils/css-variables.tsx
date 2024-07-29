@@ -138,7 +138,7 @@ export function replaceCSSVariablesInString(
 /**
  * Find all CSS variable names (e.g. `--foo`) in a string.
  */
-function getCSSVariablesInString( str: string ) {
+export function getCSSVariablesInString( str: string ) {
 	return str.match( /(?<=\bvar\(\s*)--[\w-]+/g ) ?? [];
 }
 
