@@ -100,7 +100,7 @@ if ( ! class_exists( 'WP_Templates_Registry' ) ) {
 				$template->status      = 'publish';
 				$template->origin      = 'plugin';
 				$template->is_custom   = ! isset( $default_template_types[ $template_name ] );
-				$template->post_types  = isset( $args['post_types'] ) ? $args['post_types'] : '';
+				$template->post_types  = isset( $args['post_types'] ) ? $args['post_types'] : array();
 			}
 
 			$this->registered_templates[ $template_name ] = $template;
