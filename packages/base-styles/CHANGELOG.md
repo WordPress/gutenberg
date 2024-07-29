@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 5.4.0 (2024-07-24)
+
+## 5.3.0 (2024-07-10)
+
+## 5.2.0 (2024-06-26)
+
+## 5.1.0 (2024-06-15)
+
+## 5.0.0 (2024-05-31)
+
 ### Breaking Changes
 
 -   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
@@ -94,7 +104,7 @@
 
 ## 4.0.0 (2021-09-09)
 
-### Breaking Change
+### Breaking Changes
 
 -   Remove the background-colors, foreground-colors, and gradient-colors mixins.
 
@@ -107,6 +117,6 @@
 
 ## 1.2.0 (2020-01-13)
 
-### Bug Fix
+### Bug Fixes
 
 -   Import `colors` into `variables` since the latter depends on the former.

@@ -157,7 +157,7 @@ test.describe( 'Global styles variations', () => {
 		await page.click( 'role=button[name="pink"i]' );
 		await page.click( 'role=button[name="Back"i]' );
 		await page.click( 'role=button[name="Colors styles"i]' );
-		await page.click( 'role=button[name="Color palettes"i]' );
+		await page.click( 'role=button[name="Edit palette"i]' );
 
 		await expect(
 			page.locator( 'role=option[name="Color: Foreground"i]' )

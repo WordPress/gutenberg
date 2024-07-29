@@ -14,7 +14,7 @@ import {
 	START_OF_SELECTED_AREA,
 } from '../../../utils/selection';
 
-function findSelection( blocks ) {
+export function findSelection( blocks ) {
 	let i = blocks.length;
 
 	while ( i-- ) {

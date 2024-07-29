@@ -21,6 +21,7 @@ jest.mock( '../../wordpress', () => ( {
 const DEFAULT_CONFIG = {
 	port: 8888,
 	testsPort: 8889,
+	mysqlPort: null,
 	phpVersion: null,
 	coreSource: {
 		type: 'git',
@@ -251,6 +252,26 @@ describe( 'parseConfig', () => {
 				},
 			},
 		} );
+	} );
+
+	it( 'should ignore `$schema` key', async () => {
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+				return {
+					$schema: 'test',
+				};
+			}
+
+			if ( configFile === '/test/gutenberg/.wp-env.override.json' ) {
+				return {};
+			}
+
+			throw new Error( 'Invalid File: ' + configFile );
+		} );
+
+		const parsed = await parseConfig( '/test/gutenberg', '/cache' );
+
+		expect( parsed ).toEqual( DEFAULT_CONFIG );
 	} );
 
 	it( 'should override with environment variables', async () => {

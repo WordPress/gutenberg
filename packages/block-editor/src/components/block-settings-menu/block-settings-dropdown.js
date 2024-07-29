@@ -256,7 +256,7 @@ export function BlockSettingsDropdown( {
 										{ __( 'Duplicate' ) }
 									</MenuItem>
 								) }
-								{ canInsertBlock && (
+								{ canInsertBlock && ! isContentOnly && (
 									<>
 										<MenuItem
 											onClick={ pipe(

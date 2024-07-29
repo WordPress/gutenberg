@@ -16,6 +16,13 @@ import { useState, useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
 import { useInstanceId } from '@wordpress/compose';
+import {
+	drafts,
+	published,
+	scheduled,
+	pending,
+	notAllowed,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -27,18 +34,20 @@ import {
 	NAVIGATION_POST_TYPE,
 } from '../../store/constants';
 import PostPanelRow from '../post-panel-row';
+import PostSticky from '../post-sticky';
+import { PrivatePostSchedule } from '../post-schedule';
 import { store as editorStore } from '../../store';
 
-const labels = {
-	'auto-draft': __( 'Draft' ),
-	draft: __( 'Draft' ),
-	pending: __( 'Pending' ),
-	private: __( 'Private' ),
-	future: __( 'Scheduled' ),
-	publish: __( 'Published' ),
+const postStatusesInfo = {
+	'auto-draft': { label: __( 'Draft' ), icon: drafts },
+	draft: { label: __( 'Draft' ), icon: drafts },
+	pending: { label: __( 'Pending' ), icon: pending },
+	private: { label: __( 'Private' ), icon: notAllowed },
+	future: { label: __( 'Scheduled' ), icon: scheduled },
+	publish: { label: __( 'Published' ), icon: published },
 };
 
-const STATUS_OPTIONS = [
+export const STATUS_OPTIONS = [
 	{
 		label: (
 			<>
@@ -174,11 +183,6 @@ export default function PostStatus() {
 		let newPassword = password;
 		if ( status === 'future' && new Date( date ) > new Date() ) {
 			newDate = null;
-		} else if ( value === 'future' ) {
-			if ( ! date || new Date( date ) < new Date() ) {
-				newDate = new Date();
-				newDate.setDate( newDate.getDate() + 7 );
-			}
 		}
 		if ( value === 'private' && password ) {
 			newPassword = '';
@@ -203,13 +207,14 @@ export default function PostStatus() {
 							variant="tertiary"
 							size="compact"
 							onClick={ onToggle }
+							icon={ postStatusesInfo[ status ]?.icon }
 							aria-label={ sprintf(
 								// translators: %s: Current post status.
 								__( 'Change post status: %s' ),
-								labels[ status ]
+								postStatusesInfo[ status ]?.label
 							) }
 						>
-							{ labels[ status ] }
+							{ postStatusesInfo[ status ]?.label }
 						</Button>
 					) }
 					renderContent={ ( { onClose } ) => (
@@ -232,6 +237,16 @@ export default function PostStatus() {
 												: status
 										}
 									/>
+									{ status === 'future' && (
+										<div className="editor-change-status__publish-date-wrapper">
+											<PrivatePostSchedule
+												showPopoverHeaderActions={
+													false
+												}
+												isCompact
+											/>
+										</div>
+									) }
 									{ status !== 'private' && (
 										<VStack
 											as="fieldset"
@@ -275,6 +290,7 @@ export default function PostStatus() {
 											) }
 										</VStack>
 									) }
+									<PostSticky />
 								</VStack>
 							</form>
 						</>
@@ -282,7 +298,7 @@ export default function PostStatus() {
 				/>
 			) : (
 				<div className="editor-post-status is-read-only">
-					{ labels[ status ] }
+					{ postStatusesInfo[ status ]?.label }
 				</div>
 			) }
 		</PostPanelRow>

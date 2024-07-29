@@ -27,9 +27,14 @@ export default function BlogTitle() {
 	const { editEntityRecord } = useDispatch( coreStore );
 	const { postsPageTitle, postsPageId, isTemplate, postSlug } = useSelect(
 		( select ) => {
-			const { getEntityRecord, getEditedEntityRecord } =
+			const { getEntityRecord, getEditedEntityRecord, canUser } =
 				select( coreStore );
-			const siteSettings = getEntityRecord( 'root', 'site' );
+			const siteSettings = canUser( 'read', {
+				kind: 'root',
+				name: 'site',
+			} )
+				? getEntityRecord( 'root', 'site' )
+				: undefined;
 			const _postsPageRecord = siteSettings?.page_for_posts
 				? getEditedEntityRecord(
 						'postType',
@@ -107,7 +112,7 @@ export default function BlogTitle() {
 						/>
 						<InputControl
 							placeholder={ __( 'No Title' ) }
-							size={ '__unstable-large' }
+							size="__unstable-large"
 							value={ postsPageTitle }
 							onChange={ debounce( setPostsPageTitle, 300 ) }
 							label={ __( 'Blog title' ) }

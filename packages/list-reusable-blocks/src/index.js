@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createRoot } from '@wordpress/element';
+import { createRoot, StrictMode } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -44,6 +44,8 @@ document.addEventListener( 'DOMContentLoaded', () => {
 	container.className = 'list-reusable-blocks__container';
 	button.parentNode.insertBefore( container, button );
 	createRoot( container ).render(
-		<ImportDropdown onUpload={ showNotice } />
+		<StrictMode>
+			<ImportDropdown onUpload={ showNotice } />
+		</StrictMode>
 	);
 } );

@@ -2031,8 +2031,8 @@ class Gutenberg_HTML_Tag_Processor_6_4 {
 		 *
 		 * @see https://html.spec.whatwg.org/#attributes-2
 		 *
-		 * @todo As the only regex pattern maybe we should take it out?
-		 *       Are Unicode patterns available broadly in Core?
+		 * @TODO as the only regex pattern maybe we should take it out? are
+		 *       Unicode patterns available broadly in Core?
 		 */
 		if ( preg_match(
 			'~[' .
@@ -2071,7 +2071,14 @@ class Gutenberg_HTML_Tag_Processor_6_4 {
 		if ( true === $value ) {
 			$updated_attribute = $name;
 		} else {
-			$escaped_new_value = esc_attr( $value );
+			$comparable_name = strtolower( $name );
+
+			/*
+			 * Escape URL attributes.
+			 *
+			 * @see https://html.spec.whatwg.org/#attributes-3
+			 */
+			$escaped_new_value = in_array( $comparable_name, wp_kses_uri_attributes() ) ? esc_url( $value ) : esc_attr( $value );
 			$updated_attribute = "{$name}=\"{$escaped_new_value}\"";
 		}
 

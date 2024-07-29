@@ -9,17 +9,11 @@ import { press, sleep } from '@ariakit/test';
  */
 import CircularOptionPicker from '..';
 
-const SINGLE_OPTION = [ <CircularOptionPicker.Option key={ 'option' } /> ];
+const SINGLE_OPTION = [ <CircularOptionPicker.Option key="option" /> ];
 
 const MULTIPLE_OPTIONS = [
-	<CircularOptionPicker.Option
-		key={ 'option-1' }
-		aria-label={ 'Option One' }
-	/>,
-	<CircularOptionPicker.Option
-		key={ 'option-2' }
-		aria-label={ 'Option Two' }
-	/>,
+	<CircularOptionPicker.Option key="option-1" aria-label="Option One" />,
+	<CircularOptionPicker.Option key="option-2" aria-label="Option Two" />,
 ];
 
 const DEFAULT_PROPS = {

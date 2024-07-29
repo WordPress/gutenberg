@@ -6,7 +6,8 @@
 	}
 }
 
-.editor-change-status__password-fieldset {
+.editor-change-status__password-fieldset,
+.editor-change-status__publish-date-wrapper {
 	border-top: $border-width solid $gray-200;
 	padding-top: $grid-unit-20;
 }
@@ -40,4 +41,9 @@
 		padding: 0;
 		margin-bottom: $grid-unit-10;
 	}
+
+	p.components-base-control__help:has(.components-checkbox-control__help) {
+		margin-top: $grid-unit-05;
+	}
+
 }

@@ -20,7 +20,7 @@ export default function SidebarNavigationScreenTemplatesBrowse( { backPath } ) {
 
 	return (
 		<SidebarNavigationScreen
-			title={ __( 'Manage templates' ) }
+			title={ __( 'Templates' ) }
 			description={ __(
 				'Create new templates, or reset any customizations made to the templates supplied by your theme.'
 			) }

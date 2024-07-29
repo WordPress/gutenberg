@@ -263,7 +263,7 @@ function ResizableFrame( {
 			} }
 			minWidth={ FRAME_MIN_WIDTH }
 			maxWidth={ isFullWidth ? '100%' : '150%' }
-			maxHeight={ '100%' }
+			maxHeight="100%"
 			onFocus={ () => setShouldShowHandle( true ) }
 			onBlur={ () => setShouldShowHandle( false ) }
 			onMouseOver={ () => setShouldShowHandle( true ) }

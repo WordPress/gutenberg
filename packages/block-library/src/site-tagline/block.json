@@ -16,7 +16,12 @@
 			"default": 0
 		}
 	},
-	"example": {},
+	"example": {
+		"viewportWidth": 350,
+		"attributes": {
+			"textAlign": "center"
+		}
+	},
 	"supports": {
 		"align": [ "wide", "full" ],
 		"html": false,
@@ -44,6 +49,7 @@
 			"__experimentalFontStyle": true,
 			"__experimentalFontWeight": true,
 			"__experimentalLetterSpacing": true,
+			"__experimentalWritingMode": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}

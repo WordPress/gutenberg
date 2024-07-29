@@ -15,7 +15,7 @@ import {
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
+import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import { hasStickyOrFixedPositionValue } from '../../hooks/position';
 
 const COMMON_PROPS = {

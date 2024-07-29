@@ -16,6 +16,7 @@ async function clearInput( input: HTMLInputElement ) {
 	await click( input );
 
 	// Press backspace as many times as the input's current value
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	for ( const _ of Array( input.value.length ) ) {
 		await press.Backspace();
 	}
@@ -154,7 +155,7 @@ describe( 'PaletteEdit', () => {
 		render(
 			<PaletteEdit
 				{ ...defaultProps }
-				emptyMessage={ 'Test empty message' }
+				emptyMessage="Test empty message"
 			/>
 		);
 
@@ -306,7 +307,7 @@ describe( 'PaletteEdit', () => {
 		await click( screen.getByRole( 'button', { name: 'Edit: Primary' } ) );
 		await click(
 			screen.getByRole( 'button', {
-				name: 'Remove color',
+				name: 'Remove color: Primary',
 			} )
 		);
 
@@ -337,9 +338,7 @@ describe( 'PaletteEdit', () => {
 			} )
 		);
 		await click( screen.getByRole( 'button', { name: 'Edit: Primary' } ) );
-		const nameInput = screen.getByRole( 'textbox', {
-			name: 'Color name',
-		} );
+		const nameInput = screen.getByDisplayValue( 'Primary' );
 
 		await clearInput( nameInput as HTMLInputElement );
 

@@ -11,7 +11,6 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalSpacer as Spacer,
 	__experimentalItemGroup as ItemGroup,
-	__experimentalHeading as Heading,
 	__experimentalInputControl as InputControl,
 	__experimentalUnitControl as UnitControl,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
@@ -145,7 +144,7 @@ export default function ShadowsEditPanel() {
 	};
 
 	return ! selectedShadow ? (
-		<ScreenHeader title={ '' } />
+		<ScreenHeader title="" />
 	) : (
 		<>
 			<HStack justify="space-between">
@@ -201,6 +200,7 @@ export default function ShadowsEditPanel() {
 						setIsConfirmDialogVisible( false );
 					} }
 					confirmButtonText={ __( 'Delete' ) }
+					size="medium"
 				>
 					{ sprintf(
 						// translators: %s: name of the shadow
@@ -305,7 +305,7 @@ function ShadowEditor( { shadow, onChange } ) {
 						align="center"
 						className="edit-site-global-styles__shadows-panel__title"
 					>
-						<Subtitle level={ 3 }>{ 'Shadows' }</Subtitle>
+						<Subtitle level={ 3 }>{ __( 'Shadows' ) }</Subtitle>
 					</Flex>
 					<FlexItem className="edit-site-global-styles__shadows-panel__options-container">
 						<Button
@@ -370,8 +370,7 @@ function ShadowItem( { shadow, onChange, canRemove, onRemove } ) {
 						'edit-site-global-styles__shadow-editor__remove-button',
 						{ 'is-open': isOpen }
 					),
-					ariaLabel: __( 'Remove shadow' ),
-					tooltip: __( 'Remove shadow' ),
+					label: __( 'Remove shadow' ),
 				};
 
 				return (
@@ -395,13 +394,14 @@ function ShadowItem( { shadow, onChange, canRemove, onRemove } ) {
 				);
 			} }
 			renderContent={ () => (
-				<DropdownContentWrapper paddingSize="none">
-					<div className="edit-site-global-styles__shadow-editor__dropdown-content">
-						<ShadowPopover
-							shadowObj={ shadowObj }
-							onChange={ onShadowChange }
-						/>
-					</div>
+				<DropdownContentWrapper
+					paddingSize="medium"
+					className="edit-site-global-styles__shadow-editor__dropdown-content"
+				>
+					<ShadowPopover
+						shadowObj={ shadowObj }
+						onChange={ onShadowChange }
+					/>
 				</DropdownContentWrapper>
 			) }
 		/>
@@ -421,71 +421,64 @@ function ShadowPopover( { shadowObj, onChange } ) {
 	};
 
 	return (
-		<div className="edit-site-global-styles__shadow-editor-panel">
-			<VStack spacing={ 2 }>
-				<Heading level={ 5 }>{ __( 'Shadow' ) }</Heading>
-				<div className="edit-site-global-styles__shadow-editor-color-palette">
-					<ColorPalette
-						clearable={ false }
-						enableAlpha={ enableAlpha }
-						__experimentalIsRenderedInSidebar={
-							__experimentalIsRenderedInSidebar
-						}
-						value={ shadowObj.color }
-						onChange={ ( value ) =>
-							onShadowChange( 'color', value )
-						}
-					/>
-				</div>
-				<ToggleGroupControl
-					value={ shadowObj.inset ? 'inset' : 'outset' }
-					isBlock
-					onChange={ ( value ) =>
-						onShadowChange( 'inset', value === 'inset' )
-					}
-					hideLabelFromVision
-					__next40pxDefaultSize
-				>
-					<ToggleGroupControlOption
-						value="outset"
-						label={ __( 'Outset' ) }
-					/>
-					<ToggleGroupControlOption
-						value="inset"
-						label={ __( 'Inset' ) }
-					/>
-				</ToggleGroupControl>
-				<Grid columns={ 2 } gap={ 4 }>
-					<ShadowInputControl
-						label={ __( 'X Position' ) }
-						value={ shadowObj.x }
-						hasNegativeRange
-						onChange={ ( value ) => onShadowChange( 'x', value ) }
-					/>
-					<ShadowInputControl
-						label={ __( 'Y Position' ) }
-						value={ shadowObj.y }
-						hasNegativeRange
-						onChange={ ( value ) => onShadowChange( 'y', value ) }
-					/>
-					<ShadowInputControl
-						label={ __( 'Blur' ) }
-						value={ shadowObj.blur }
-						onChange={ ( value ) =>
-							onShadowChange( 'blur', value )
-						}
-					/>
-					<ShadowInputControl
-						label={ __( 'Spread' ) }
-						value={ shadowObj.spread }
-						hasNegativeRange
-						onChange={ ( value ) =>
-							onShadowChange( 'spread', value )
-						}
-					/>
-				</Grid>
-			</VStack>
-		</div>
+		<VStack
+			spacing={ 4 }
+			className="edit-site-global-styles__shadow-editor-panel"
+		>
+			<ColorPalette
+				clearable={ false }
+				enableAlpha={ enableAlpha }
+				__experimentalIsRenderedInSidebar={
+					__experimentalIsRenderedInSidebar
+				}
+				value={ shadowObj.color }
+				onChange={ ( value ) => onShadowChange( 'color', value ) }
+			/>
+			<ToggleGroupControl
+				__nextHasNoMarginBottom
+				value={ shadowObj.inset ? 'inset' : 'outset' }
+				isBlock
+				onChange={ ( value ) =>
+					onShadowChange( 'inset', value === 'inset' )
+				}
+				hideLabelFromVision
+				__next40pxDefaultSize
+			>
+				<ToggleGroupControlOption
+					value="outset"
+					label={ __( 'Outset' ) }
+				/>
+				<ToggleGroupControlOption
+					value="inset"
+					label={ __( 'Inset' ) }
+				/>
+			</ToggleGroupControl>
+			<Grid columns={ 2 } gap={ 4 }>
+				<ShadowInputControl
+					label={ __( 'X Position' ) }
+					value={ shadowObj.x }
+					hasNegativeRange
+					onChange={ ( value ) => onShadowChange( 'x', value ) }
+				/>
+				<ShadowInputControl
+					label={ __( 'Y Position' ) }
+					value={ shadowObj.y }
+					hasNegativeRange
+					onChange={ ( value ) => onShadowChange( 'y', value ) }
+				/>
+				<ShadowInputControl
+					label={ __( 'Blur' ) }
+					value={ shadowObj.blur }
+					onChange={ ( value ) => onShadowChange( 'blur', value ) }
+				/>
+				<ShadowInputControl
+					label={ __( 'Spread' ) }
+					value={ shadowObj.spread }
+					hasNegativeRange
+					onChange={ ( value ) => onShadowChange( 'spread', value ) }
+				/>
+			</Grid>
+		</VStack>
 	);
 }
 
@@ -506,7 +499,7 @@ function ShadowInputControl( { label, value, onChange, hasNegativeRange } ) {
 	};
 
 	return (
-		<VStack justify={ 'flex-start' }>
+		<VStack justify="flex-start">
 			<HStack justify="space-between">
 				<Subtitle>{ label }</Subtitle>
 				<Button

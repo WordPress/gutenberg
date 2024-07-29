@@ -22,3 +22,19 @@ export function isOverridableBlock( block ) {
 		)
 	);
 }
+
+/**
+ * Determines whether the blocks list has overridable blocks.
+ *
+ * @param {WPBlock[]} blocks The blocks list.
+ *
+ * @return {boolean} `true` if the list has overridable blocks, `false` otherwise.
+ */
+export function hasOverridableBlocks( blocks ) {
+	return blocks.some( ( block ) => {
+		if ( isOverridableBlock( block ) ) {
+			return true;
+		}
+		return hasOverridableBlocks( block.innerBlocks );
+	} );
+}

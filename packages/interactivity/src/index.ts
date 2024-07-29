@@ -25,6 +25,7 @@ export {
 	useLayoutEffect,
 	useCallback,
 	useMemo,
+	splitTask,
 } from './utils';
 
 export { useState, useRef } from 'preact/hooks';

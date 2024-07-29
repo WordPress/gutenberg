@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 2.4.0 (2024-07-24)
+
+## 2.3.0 (2024-07-10)
+
+## 2.2.0 (2024-06-26)
+
+## 2.1.0 (2024-06-15)
+
+## 2.0.0 (2024-05-31)
+
 ### Breaking Changes
 
 -   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
@@ -16,7 +26,7 @@
 
 ## 1.17.0 (2024-03-21)
 
-### Enhancement
+### Enhancements
 
 -   Update the template to use `wp_interactivity_data_wp_context` for the context attribute ([#59995](https://github.com/WordPress/gutenberg/pull/59995)).
 
@@ -30,7 +40,7 @@
 
 ## 1.12.0 (2024-01-10)
 
-### Enhancement
+### Enhancements
 
 -   Update the template to use `viewModule` in block.json ([#57712](https://github.com/WordPress/gutenberg/pull/57712)).
 
@@ -45,7 +55,7 @@
 
 ## 1.10.0 (2023-11-29)
 
-### Enhancement
+### Enhancements
 
 -   Update `view.js` and `render.php` templates to the new `store()` API ([#56613](https://github.com/WordPress/gutenberg/pull/56613)).
 
@@ -65,6 +75,6 @@
 
 ## 1.2.0 (2023-08-10)
 
-### Enhancement
+### Enhancements
 
 -   Moves the `example` property into block.json by leveraging changes to create-block to now support `example` ([#52801](https://github.com/WordPress/gutenberg/pull/52801)).

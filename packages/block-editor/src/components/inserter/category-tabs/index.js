@@ -27,7 +27,7 @@ function CategoryTabs( {
 			className="block-editor-inserter__category-tabs"
 			selectOnMove={ false }
 			selectedTabId={ selectedCategory ? selectedCategory.name : null }
-			orientation={ 'vertical' }
+			orientation="vertical"
 			onSelect={ ( categoryId ) => {
 				// Pass the full category object
 				onSelectCategory(

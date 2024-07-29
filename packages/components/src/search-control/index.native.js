@@ -237,7 +237,7 @@ function SearchControl( {
 					onPress={ onCancel }
 					style={ cancelButtonTextStyle }
 					accessible
-					accessibilityRole={ 'button' }
+					accessibilityRole="button"
 					accessibilityLabel={ __( 'Cancel search' ) }
 					accessibilityHint={ __( 'Cancel search' ) }
 				>

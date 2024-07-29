@@ -1,0 +1,53 @@
+.block-editor-tabbed-sidebar {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+	overflow: hidden;
+
+	@include break-medium() {
+		width: 350px;
+	}
+}
+
+.block-editor-tabbed-sidebar__tablist-and-close-button {
+	border-bottom: $border-width solid $gray-300;
+	display: flex;
+	justify-content: space-between;
+	padding-right: $grid-unit-15;
+}
+
+
+.block-editor-tabbed-sidebar__close-button {
+	background: $white;
+	/* stylelint-disable-next-line property-disallowed-list -- This should be removed when https://github.com/WordPress/gutenberg/issues/59013 is fixed. */
+	order: 1;
+	align-self: center;
+}
+
+.block-editor-tabbed-sidebar__tablist {
+	box-sizing: border-box;
+	flex-grow: 1;
+	margin-bottom: -$border-width;
+	width: 100%;
+}
+
+.block-editor-tabbed-sidebar__tab {
+	flex-grow: 1;
+	margin-bottom: -$border-width;
+
+	&[id$="reusable"] {
+		flex-grow: inherit;
+		// These are to align the `reusable` icon with the search icon.
+		padding-left: $grid-unit-20;
+		padding-right: $grid-unit-20;
+	}
+}
+
+.block-editor-tabbed-sidebar__tabpanel {
+	display: flex;
+	flex-grow: 1;
+	flex-direction: column;
+	overflow-y: auto;
+	scrollbar-gutter: auto;
+}

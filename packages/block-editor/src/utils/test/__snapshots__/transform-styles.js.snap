@@ -24,7 +24,7 @@ exports[`transformStyles URL rewrite should rewrite relative paths 1`] = `
 ]
 `;
 
-exports[`transformStyles error handling should handle multiple instances of \`:where(body)\` 1`] = `
+exports[`transformStyles error handling should handle multiple instances of \`:root :where(body)\` 1`] = `
 [
   ".my-namespace { color: pink; } .my-namespace { color: orange; }",
 ]

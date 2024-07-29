@@ -371,22 +371,56 @@ export function collections( state = {}, action ) {
 	return state;
 }
 
+/**
+ * Merges usesContext with existing values, potentially defined in the server registration.
+ *
+ * @param {string[]} existingUsesContext Existing `usesContext`.
+ * @param {string[]} newUsesContext      Newly added `usesContext`.
+ * @return {string[]|undefined} Merged `usesContext`.
+ */
+function getMergedUsesContext( existingUsesContext = [], newUsesContext = [] ) {
+	const mergedArrays = Array.from(
+		new Set( existingUsesContext.concat( newUsesContext ) )
+	);
+	return mergedArrays.length > 0 ? mergedArrays : undefined;
+}
+
 export function blockBindingsSources( state = {}, action ) {
-	if ( action.type === 'REGISTER_BLOCK_BINDINGS_SOURCE' ) {
-		return {
-			...state,
-			[ action.sourceName ]: {
-				label: action.sourceLabel,
-				getValue: action.getValue,
-				setValue: action.setValue,
-				setValues: action.setValues,
-				getPlaceholder: action.getPlaceholder,
-				lockAttributesEditing: () =>
-					action.lockAttributesEditing
-						? action.lockAttributesEditing()
-						: true,
-			},
-		};
+	switch ( action.type ) {
+		case 'ADD_BLOCK_BINDINGS_SOURCE':
+			return {
+				...state,
+				[ action.name ]: {
+					// Don't override the label if it's already set.
+					label: state[ action.name ]?.label || action.label,
+					usesContext: getMergedUsesContext(
+						state[ action.name ]?.usesContext,
+						action.usesContext
+					),
+					getValues: action.getValues,
+					setValues: action.setValues,
+					getPlaceholder: action.getPlaceholder,
+					canUserEditValue: action.canUserEditValue,
+				},
+			};
+		case 'ADD_BOOTSTRAPPED_BLOCK_BINDINGS_SOURCE':
+			return {
+				...state,
+				[ action.name ]: {
+					/*
+					 * Keep the exisitng properties in case the source has been registered
+					 * in the client before bootstrapping.
+					 */
+					...state[ action.name ],
+					label: action.label,
+					usesContext: getMergedUsesContext(
+						state[ action.name ]?.usesContext,
+						action.usesContext
+					),
+				},
+			};
+		case 'REMOVE_BLOCK_BINDINGS_SOURCE':
+			return omit( state, action.name );
 	}
 	return state;
 }

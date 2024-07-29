@@ -50,9 +50,15 @@ function TagCloudEdit( { attributes, setAttributes } ) {
 	} = attributes;
 
 	const [ availableUnits ] = useSettings( 'spacing.units' );
+
+	// The `pt` unit is used as the default value and is therefore
+	// always considered an available unit.
 	const units = useCustomUnits( {
-		availableUnits: availableUnits || [ '%', 'px', 'em', 'rem' ],
+		availableUnits: availableUnits
+			? [ ...availableUnits, 'pt' ]
+			: [ '%', 'px', 'em', 'rem', 'pt' ],
 	} );
+
 	const taxonomies = useSelect(
 		( select ) => select( coreStore ).getTaxonomies( { per_page: -1 } ),
 		[]

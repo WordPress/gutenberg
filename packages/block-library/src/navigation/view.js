@@ -143,7 +143,7 @@ const { state, actions } = store(
 				// If focus is outside modal, and in the document, close menu
 				// event.target === The element losing focus
 				// event.relatedTarget === The element receiving focus (if any)
-				// When focusout is outsite the document,
+				// When focusout is outside the document,
 				// `window.document.activeElement` doesn't change.
 
 				// The event.relatedTarget is null when something outside the navigation menu is clicked. This is only necessary for Safari.

@@ -1,9 +1,15 @@
 .edit-site-sidebar__content {
 	flex-grow: 1;
 	overflow-y: auto;
+	// Prevents horizontal overflow while animating screen transitions
+	overflow-x: hidden;
+	// Mark this section of the DOM as isolated, providing performance benefits
+	// by limiting calculations of layout, style and paint to a DOM subtree rather
+	// than the entire page.
+	contain: content;
 }
 
-@keyframes slide-from-right {
+@keyframes local--slide-from-right {
 	from {
 		transform: translateX(50px);
 		opacity: 0;
@@ -14,7 +20,7 @@
 	}
 }
 
-@keyframes slide-from-left {
+@keyframes local--slide-from-left {
 	from {
 		transform: translateX(-50px);
 		opacity: 0;
@@ -47,11 +53,11 @@
 	}
 
 	&.slide-from-left {
-		animation-name: slide-from-left;
+		animation-name: local--slide-from-left;
 	}
 
 	&.slide-from-right {
-		animation-name: slide-from-right;
+		animation-name: local--slide-from-right;
 	}
 
 }

@@ -92,6 +92,7 @@ const getIndexOfMatchingSuggestion = (
  * 	const [ filteredOptions, setFilteredOptions ] = useState( options );
  * 	return (
  * 		<ComboboxControl
+ * 			__nextHasNoMarginBottom
  * 			label="Font Size"
  * 			value={ fontSize }
  * 			onChange={ setFontSize }
@@ -267,6 +268,15 @@ function ComboboxControl( props: ComboboxControlProps ) {
 		inputContainer.current?.focus();
 	};
 
+	// Stop propagation of the keydown event when pressing Enter on the Reset
+	// button to prevent calling the onKeydown callback on the container div
+	// element which actually sets the selected suggestion.
+	const handleResetStopPropagation: React.KeyboardEventHandler<
+		HTMLButtonElement
+	> = ( event ) => {
+		event.stopPropagation();
+	};
+
 	// Update current selections when the filter input changes.
 	useEffect( () => {
 		const hasMatchingSuggestions = matchingSuggestions.length > 0;
@@ -346,8 +356,11 @@ function ComboboxControl( props: ComboboxControlProps ) {
 								<Button
 									className="components-combobox-control__reset"
 									icon={ closeSmall }
+									// Disable reason: Focus returns to input field when reset is clicked.
+									// eslint-disable-next-line no-restricted-syntax
 									disabled={ ! value }
 									onClick={ handleOnReset }
+									onKeyDown={ handleResetStopPropagation }
 									label={ __( 'Reset' ) }
 								/>
 							</FlexItem>

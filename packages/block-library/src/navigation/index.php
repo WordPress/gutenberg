@@ -483,7 +483,7 @@ class WP_Navigation_Block_Renderer {
 			}
 		}
 		$toggle_button_content       = $should_display_icon_label ? $toggle_button_icon : __( 'Menu' );
-		$toggle_close_button_icon    = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg>';
+		$toggle_close_button_icon    = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><path d="m13.06 12 6.47-6.47-1.06-1.06L12 10.94 5.53 4.47 4.47 5.53 10.94 12l-6.47 6.47 1.06 1.06L12 13.06l6.47 6.47 1.06-1.06L13.06 12Z"></path></svg>';
 		$toggle_close_button_content = $should_display_icon_label ? $toggle_close_button_icon : __( 'Close' );
 		$toggle_aria_label_open      = $should_display_icon_label ? 'aria-label="' . __( 'Open menu' ) . '"' : ''; // Open button label.
 		$toggle_aria_label_close     = $should_display_icon_label ? 'aria-label="' . __( 'Close menu' ) . '"' : ''; // Close button label.
@@ -495,7 +495,7 @@ class WP_Navigation_Block_Renderer {
 		$close_button_directives         = '';
 		if ( $is_interactive ) {
 			$open_button_directives                  = '
-				data-wp-on--click="actions.openMenuOnClick"
+				data-wp-on-async--click="actions.openMenuOnClick"
 				data-wp-on--keydown="actions.handleMenuKeydown"
 			';
 			$responsive_container_directives         = '
@@ -503,7 +503,7 @@ class WP_Navigation_Block_Renderer {
 				data-wp-class--is-menu-open="state.isMenuOpen"
 				data-wp-watch="callbacks.initMenu"
 				data-wp-on--keydown="actions.handleMenuKeydown"
-				data-wp-on--focusout="actions.handleMenuFocusout"
+				data-wp-on-async--focusout="actions.handleMenuFocusout"
 				tabindex="-1"
 			';
 			$responsive_dialog_directives            = '
@@ -512,16 +512,18 @@ class WP_Navigation_Block_Renderer {
 				data-wp-bind--role="state.roleAttribute"
 			';
 			$close_button_directives                 = '
-				data-wp-on--click="actions.closeMenuOnClick"
+				data-wp-on-async--click="actions.closeMenuOnClick"
 			';
 			$responsive_container_content_directives = '
 				data-wp-watch="callbacks.focusFirstElement"
 			';
 		}
 
+		$overlay_inline_styles = esc_attr( safecss_filter_attr( $colors['overlay_inline_styles'] ) );
+
 		return sprintf(
 			'<button aria-haspopup="dialog" %3$s class="%6$s" %10$s>%8$s</button>
-				<div class="%5$s" style="%7$s" id="%1$s" %11$s>
+				<div class="%5$s" %7$s id="%1$s" %11$s>
 					<div class="wp-block-navigation__responsive-close" tabindex="-1">
 						<div class="wp-block-navigation__responsive-dialog" %12$s>
 							<button %4$s class="wp-block-navigation__responsive-container-close" %13$s>%9$s</button>
@@ -537,7 +539,7 @@ class WP_Navigation_Block_Renderer {
 			$toggle_aria_label_close,
 			esc_attr( implode( ' ', $responsive_container_classes ) ),
 			esc_attr( implode( ' ', $open_button_classes ) ),
-			esc_attr( safecss_filter_attr( $colors['overlay_inline_styles'] ) ),
+			( ! empty( $overlay_inline_styles ) ) ? "style=\"$overlay_inline_styles\"" : '',
 			$toggle_button_content,
 			$toggle_close_button_content,
 			$open_button_directives,
@@ -836,8 +838,8 @@ function block_core_navigation_add_directives_to_submenu( $tags, $block_attribut
 		$tags->set_attribute( 'tabindex', '-1' );
 
 		if ( ! isset( $block_attributes['openSubmenusOnClick'] ) || false === $block_attributes['openSubmenusOnClick'] ) {
-			$tags->set_attribute( 'data-wp-on--mouseenter', 'actions.openMenuOnHover' );
-			$tags->set_attribute( 'data-wp-on--mouseleave', 'actions.closeMenuOnHover' );
+			$tags->set_attribute( 'data-wp-on-async--mouseenter', 'actions.openMenuOnHover' );
+			$tags->set_attribute( 'data-wp-on-async--mouseleave', 'actions.closeMenuOnHover' );
 		}
 
 		// Add directives to the toggle submenu button.
@@ -847,7 +849,7 @@ function block_core_navigation_add_directives_to_submenu( $tags, $block_attribut
 				'class_name' => 'wp-block-navigation-submenu__toggle',
 			)
 		) ) {
-			$tags->set_attribute( 'data-wp-on--click', 'actions.toggleMenuOnClick' );
+			$tags->set_attribute( 'data-wp-on-async--click', 'actions.toggleMenuOnClick' );
 			$tags->set_attribute( 'data-wp-bind--aria-expanded', 'state.isMenuOpen' );
 			// The `aria-expanded` attribute for SSR is already added in the submenu block.
 		}
@@ -858,7 +860,7 @@ function block_core_navigation_add_directives_to_submenu( $tags, $block_attribut
 				'class_name' => 'wp-block-navigation__submenu-container',
 			)
 		) ) {
-			$tags->set_attribute( 'data-wp-on--focus', 'actions.openMenuOnFocus' );
+			$tags->set_attribute( 'data-wp-on-async--focus', 'actions.openMenuOnFocus' );
 		}
 
 		// Iterate through subitems if exist.
@@ -1674,9 +1676,15 @@ function block_core_navigation_insert_hooked_blocks_into_rest_response( $respons
 $rest_prepare_wp_navigation_core_callback = 'block_core_navigation_' . 'insert_hooked_blocks_into_rest_response';
 
 /*
- * Injection of hooked blocks into the Navigation block relies on some functions present in WP >= 6.5
- * that are not present in Gutenberg's WP 6.5 compatibility layer.
+ * Do not add the `block_core_navigation_insert_hooked_blocks_into_rest_response` filter in the following cases:
+ * - If Core has added the `insert_hooked_blocks_into_rest_response` filter already (WP >= 6.6);
+ * - or if the `set_ignored_hooked_blocks_metadata` function is unavailable (which is required for the filter to work. It was introduced by WP 6.5 but is not present in Gutenberg's WP 6.5 compatibility layer);
+ * - or if the `$rest_prepare_wp_navigation_core_callback` filter has already been added.
  */
-if ( function_exists( 'set_ignored_hooked_blocks_metadata' ) && ! has_filter( 'rest_prepare_wp_navigation', $rest_prepare_wp_navigation_core_callback ) ) {
+if (
+	! has_filter( 'rest_prepare_wp_navigation', 'insert_hooked_blocks_into_rest_response' ) &&
+	function_exists( 'set_ignored_hooked_blocks_metadata' ) &&
+	! has_filter( 'rest_prepare_wp_navigation', $rest_prepare_wp_navigation_core_callback )
+) {
 	add_filter( 'rest_prepare_wp_navigation', 'block_core_navigation_insert_hooked_blocks_into_rest_response', 10, 3 );
 }

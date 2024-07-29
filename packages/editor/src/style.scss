@@ -3,11 +3,13 @@
 @import "./components/autocompleters/style.scss";
 @import "./components/block-manager/style.scss";
 @import "./components/collapsible-block-toolbar/style.scss";
+@import "./components/create-template-part-modal/style.scss";
 @import "./components/block-settings-menu/style.scss";
 @import "./components/blog-title/style.scss";
 @import "./components/document-bar/style.scss";
 @import "./components/document-outline/style.scss";
 @import "./components/document-tools/style.scss";
+@import "./components/editor-interface/style.scss";
 @import "./components/editor-notices/style.scss";
 @import "./components/entities-saved-states/style.scss";
 @import "./components/error-boundary/style.scss";
@@ -15,6 +17,7 @@
 @import "./components/inserter-sidebar/style.scss";
 @import "./components/keyboard-shortcut-help-modal/style.scss";
 @import "./components/list-view-sidebar/style.scss";
+@import "./components/page-attributes/style.scss";
 @import "./components/post-author/style.scss";
 @import "./components/post-actions/style.scss";
 @import "./components/post-card-panel/style.scss";
@@ -51,6 +54,5 @@
 @import "./components/sidebar/style.scss";
 @import "./components/site-discussion/style.scss";
 @import "./components/table-of-contents/style.scss";
-@import "./components/template-areas/style.scss";
 @import "./components/text-editor/style.scss";
 @import "./components/visual-editor/style.scss";

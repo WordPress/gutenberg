@@ -330,7 +330,7 @@ class MediaContainer extends Component {
 				onSelect={ this.onSelectMediaUploadOption }
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				onFocus={ this.props.onFocus }
-				className={ 'no-block-outline' }
+				className="no-block-outline"
 			/>
 		);
 	}

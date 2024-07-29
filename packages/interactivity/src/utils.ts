@@ -54,7 +54,7 @@ const afterNextFrame = ( callback: () => void ) => {
  *
  * @return Promise
  */
-export const yieldToMain = () => {
+export const splitTask = () => {
 	return new Promise( ( resolve ) => {
 		// TODO: Use scheduler.yield() when available.
 		setTimeout( resolve, 0 );

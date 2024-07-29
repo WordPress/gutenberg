@@ -213,7 +213,7 @@ function Controls( {
 										videoRef?.current.seek( 0 );
 									} }
 									ref={ videoRef }
-									resizeMode={ 'cover' }
+									resizeMode="cover"
 									source={ { uri: url } }
 									style={ videoPreviewStyles }
 								/>
@@ -281,7 +281,7 @@ function Controls( {
 						value={ dimRatio }
 						onChange={ onOpacityChange }
 						style={ styles.rangeCellContainer }
-						separatorType={ 'topFullWidth' }
+						separatorType="topFullWidth"
 					/>
 				</PanelBody>
 			) : null }

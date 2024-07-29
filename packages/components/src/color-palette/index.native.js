@@ -285,7 +285,7 @@ function ColorPalette( {
 						<View key={ `${ color }-${ isSelected( color ) }` }>
 							<TouchableWithoutFeedback
 								onPress={ () => onColorPress( color ) }
-								accessibilityRole={ 'button' }
+								accessibilityRole="button"
 								accessibilityState={ {
 									selected: isSelected( color ),
 								} }
@@ -326,7 +326,7 @@ function ColorPalette( {
 						) }
 						<TouchableWithoutFeedback
 							onPress={ onCustomPress }
-							accessibilityRole={ 'button' }
+							accessibilityRole="button"
 							accessibilityState={ {
 								selected: isSelectedCustom(),
 							} }

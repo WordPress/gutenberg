@@ -1,12 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
 	Dropdown,
 	Button,
 	__experimentalVStack as VStack,
-	__experimentalText as Text,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useState, useMemo } from '@wordpress/element';
@@ -63,9 +62,11 @@ function PostDiscussionToggle( { isOpen, onClick } ) {
 	let label;
 	if ( commentStatus === 'open' ) {
 		if ( pingStatus === 'open' ) {
-			label = __( 'Open' );
+			label = _x( 'Open', 'Adjective: e.g. "Comments are open"' );
 		} else {
-			label = trackbacksSupported ? __( 'Comments only' ) : __( 'Open' );
+			label = trackbacksSupported
+				? __( 'Comments only' )
+				: _x( 'Open', 'Adjective: e.g. "Comments are open"' );
 		}
 	} else if ( pingStatus === 'open' ) {
 		label = commentsSupported ? __( 'Pings only' ) : __( 'Pings enabled' );
@@ -81,11 +82,19 @@ function PostDiscussionToggle( { isOpen, onClick } ) {
 			aria-expanded={ isOpen }
 			onClick={ onClick }
 		>
-			<Text>{ label }</Text>
+			{ label }
 		</Button>
 	);
 }
 
+/**
+ * This component allows to update comment and pingback
+ * settings for the current post. Internally there are
+ * checks whether the current post has support for the
+ * above and if the `discussion-panel` panel is enabled.
+ *
+ * @return {JSX.Element|null} The rendered PostDiscussionPanel component.
+ */
 export default function PostDiscussionPanel() {
 	const { isEnabled } = useSelect( ( select ) => {
 		const { isEditorPanelEnabled } = select( editorStore );

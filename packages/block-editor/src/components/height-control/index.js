@@ -156,7 +156,7 @@ export default function HeightControl( {
 						onChange={ onChange }
 						onUnitChange={ handleUnitChange }
 						min={ 0 }
-						size={ '__unstable-large' }
+						size="__unstable-large"
 						label={ label }
 						hideLabelFromVision
 					/>

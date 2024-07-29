@@ -5,6 +5,7 @@ import { Button } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -13,7 +14,7 @@ import { store as editorStore } from '../../store';
 import PostTextEditor from '../post-text-editor';
 import PostTitleRaw from '../post-title/post-title-raw';
 
-export default function TextEditor() {
+export default function TextEditor( { autoFocus = false } ) {
 	const { switchEditorMode } = useDispatch( editorStore );
 	const { shortcut, isRichEditingEnabled } = useSelect( ( select ) => {
 		const { getEditorSettings } = select( editorStore );
@@ -24,6 +25,14 @@ export default function TextEditor() {
 			isRichEditingEnabled: getEditorSettings().richEditingEnabled,
 		};
 	}, [] );
+
+	const titleRef = useRef();
+	useEffect( () => {
+		if ( autoFocus ) {
+			return;
+		}
+		titleRef?.current?.focus();
+	}, [ autoFocus ] );
 
 	return (
 		<div className="editor-text-editor">
@@ -40,7 +49,7 @@ export default function TextEditor() {
 				</div>
 			) }
 			<div className="editor-text-editor__body">
-				<PostTitleRaw />
+				<PostTitleRaw ref={ titleRef } />
 				<PostTextEditor />
 			</div>
 		</div>

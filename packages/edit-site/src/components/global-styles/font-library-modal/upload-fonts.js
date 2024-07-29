@@ -11,7 +11,7 @@ import {
 	Notice,
 	FormFileUpload,
 	FlexItem,
-	privateApis as componentsPrivateApis,
+	ProgressBar,
 } from '@wordpress/components';
 import { useContext, useState } from '@wordpress/element';
 
@@ -23,9 +23,6 @@ import { FontLibraryContext } from './context';
 import { Font } from '../../../../lib/lib-font.browser';
 import makeFamiliesFromFaces from './utils/make-families-from-faces';
 import { loadFontFaceInBrowser } from './utils';
-import { unlock } from '../../../lock-unlock';
-
-const { ProgressBar } = unlock( componentsPrivateApis );
 
 function UploadFonts() {
 	const { installFonts, notice, setNotice } =

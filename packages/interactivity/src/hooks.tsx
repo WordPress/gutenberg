@@ -231,7 +231,7 @@ const directivePriorities: Record< string, number > = {};
  * ```js
  * directive(
  *   'color', // Name without prefix and suffix.
- *   ( { directives: { color }, ref, evaluate } ) =>
+ *   ( { directives: { color: colors }, ref, evaluate } ) =>
  *     colors.forEach( ( color ) => {
  *       if ( color.suffix = 'text' ) {
  *         ref.style.setProperty(

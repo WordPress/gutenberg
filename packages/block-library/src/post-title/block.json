@@ -29,6 +29,9 @@
 			"default": "_self"
 		}
 	},
+	"example": {
+		"viewportWidth": 350
+	},
 	"supports": {
 		"align": [ "wide", "full" ],
 		"html": false,
@@ -60,6 +63,18 @@
 		},
 		"interactivity": {
 			"clientNavigation": true
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true,
+			"__experimentalDefaultControls": {
+				"radius": true,
+				"color": true,
+				"width": true,
+				"style": true
+			}
 		}
 	},
 	"style": "wp-block-post-title"

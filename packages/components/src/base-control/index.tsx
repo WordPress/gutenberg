@@ -2,6 +2,12 @@
  * External dependencies
  */
 import clsx from 'clsx';
+import type { ForwardedRef } from 'react';
+
+/**
+ * WordPress dependencies
+ */
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -116,20 +122,24 @@ const UnconnectedBaseControl = (
  * 	</BaseControl>
  * );
  */
-export const VisualLabel = ( {
-	className,
-	children,
-	...props
-}: WordPressComponentProps< BaseControlVisualLabelProps, 'span' > ) => {
+const UnforwardedVisualLabel = (
+	props: WordPressComponentProps< BaseControlVisualLabelProps, 'span' >,
+	ref: ForwardedRef< any >
+) => {
+	const { className, children, ...restProps } = props;
+
 	return (
 		<StyledVisualLabel
-			{ ...props }
+			ref={ ref }
+			{ ...restProps }
 			className={ clsx( 'components-base-control__label', className ) }
 		>
 			{ children }
 		</StyledVisualLabel>
 	);
 };
+
+export const VisualLabel = forwardRef( UnforwardedVisualLabel );
 
 export const BaseControl = Object.assign(
 	contextConnectWithoutRef( UnconnectedBaseControl, 'BaseControl' ),

@@ -23,11 +23,11 @@ jobs:
                 native-test-name: [gutenberg-editor-rendering]
 
         steps:
-            - uses: actions/checkout@44c2b7a8a4ea60a981eaca3cf939b5f4305c123b # v4.1.5
+            - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
-            - uses: ruby/setup-ruby@cacc9f1c0b3f4eb8a16a6bb0ed10897b43b9de49 # v1.176.0
+            - uses: ruby/setup-ruby@50ba3386b050ad5b97a41fcb81240cbee1d1821f # v1.188.0
               with:
                   # `.ruby-version` file location
                   working-directory: packages/react-native-editor/ios

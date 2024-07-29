@@ -9,7 +9,7 @@ import {
 } from '@wordpress/blocks';
 import { dispatch } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
-import { createRoot } from '@wordpress/element';
+import { StrictMode, createRoot } from '@wordpress/element';
 import {
 	registerCoreBlocks,
 	__experimentalGetCoreBlocks,
@@ -91,7 +91,11 @@ export function initializeEditor( id, settings ) {
 	// see: https://github.com/WordPress/gutenberg/issues/33097
 	setFreeformContentHandlerName( 'core/html' );
 
-	root.render( <Layout blockEditorSettings={ settings } /> );
+	root.render(
+		<StrictMode>
+			<Layout blockEditorSettings={ settings } />
+		</StrictMode>
+	);
 
 	return root;
 }

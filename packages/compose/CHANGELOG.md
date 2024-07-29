@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+## 7.4.0 (2024-07-24)
+
+## 7.3.0 (2024-07-10)
+
+### Internal
+
+-   Method style type signatures have been changed to function style ([#62718](https://github.com/WordPress/gutenberg/pull/62718)).
+
+## 7.2.0 (2024-06-26)
+
+## 7.1.0 (2024-06-15)
+
+## 7.0.0 (2024-05-31)
+
 ### Breaking Changes
 
 -   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
@@ -46,7 +60,7 @@
 
 ## 6.19.0 (2023-09-20)
 
-### Features
+### New Features
 
 -   `useStateWithHistory`: Add a new hook to manage state with undo/redo support.
 
@@ -139,7 +153,7 @@
 
 ## 5.7.0 (2022-05-18)
 
-### Bug Fix
+### Bug Fixes
 
 -   `useRefEffect`: Allow `void` as a valid callback return type ([#40798](https://github.com/WordPress/gutenberg/pull/40798)).
 
@@ -165,7 +179,7 @@
 
 ## 5.0.0 (2021-07-29)
 
-### Breaking Change
+### Breaking Changes
 
 -   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
 
@@ -214,7 +228,7 @@
 
 ## 2.1.0 (2018-10-29)
 
-### Deprecation
+### Deprecations
 
 -   `remountOnPropChange` has been deprecated.
 
@@ -224,6 +238,6 @@
 
 ## 2.0.0 (2018-09-05)
 
-### Breaking Change
+### Breaking Changes
 
 -   Change how required built-ins are polyfilled with Babel 7 ([#9171](https://github.com/WordPress/gutenberg/pull/9171)). If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods.

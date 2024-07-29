@@ -22,7 +22,6 @@ $text-editor-font-size: 15px;
 $editor-line-height: 1.8;
 $mobile-text-min-font-size: 16px; // Any font size below 16px will cause Mobile Safari to "zoom in".
 
-
 /**
  * Grid System.
  * https://make.wordpress.org/design/2019/10/31/proposal-a-consistent-spacing-system-for-wordpress/
@@ -51,7 +50,7 @@ $button-size-small: 24px;
 $button-size-compact: 32px;
 $header-height: 60px;
 $panel-header-height: $grid-unit-60;
-$nav-sidebar-width: 360px;
+$nav-sidebar-width: 300px;
 $admin-bar-height: 32px;
 $admin-bar-height-big: 46px;
 $admin-sidebar-width: 160px;
@@ -93,7 +92,7 @@ $border-width-tab: 1.5px;
 $helptext-font-size: 12px;
 $radius-round: 50%;
 $radius-block-ui: 2px;
-$radio-input-size: 20px;
+$radio-input-size: 16px;
 $radio-input-size-sm: 24px; // Width & height for small viewports.
 
 // Deprecated, please avoid using these.

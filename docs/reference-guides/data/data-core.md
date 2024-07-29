@@ -18,7 +18,7 @@ _Parameters_
 
 -   _state_ `State`: Data state.
 -   _action_ `string`: Action to check. One of: 'create', 'read', 'update', 'delete'.
--   _resource_ `string`: REST resource to check, e.g. 'media' or 'posts'.
+-   _resource_ `string | EntityResource`: Entity resource to check. Accepts entity object `{ kind: 'root', name: 'media', id: 1 }` or REST base as a string - `media`.
 -   _id_ `EntityRecordKey`: Optional ID of the rest resource to check.
 
 _Returns_
@@ -755,7 +755,7 @@ _Parameters_
 
 ### receiveThemeSupports
 
-> **Deprecated** since WP 5.9, this is not useful anymore, use the selector direclty.
+> **Deprecated** since WP 5.9, this is not useful anymore, use the selector directly.
 
 Returns an action object used in signalling that the index has been received.
 
@@ -790,7 +790,7 @@ _Parameters_
 -   _kind_ `string`: Kind of the entity.
 -   _name_ `string`: Name of the entity.
 -   _recordId_ `Object`: ID of the record.
--   _options_ `Object`: Saving options.
+-   _options_ `Object=`: Saving options.
 
 ### saveEntityRecord
 

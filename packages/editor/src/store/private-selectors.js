@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import fastDeepEqual from 'fast-deep-equal';
+
+/**
  * WordPress dependencies
  */
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -17,10 +22,10 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import {
 	getRenderingMode,
+	getCurrentPost,
 	__experimentalGetDefaultTemplatePartAreas,
 } from './selectors';
-import { TEMPLATE_PART_POST_TYPE } from './constants';
-import { getFilteredTemplatePartBlocks } from './utils/get-filtered-template-parts';
+import { getEntityActions as _getEntityActions } from '../dataviews/store/private-selectors';
 
 const EMPTY_INSERTION_POINT = {
 	rootClientId: undefined,
@@ -114,24 +119,77 @@ export const getPostIcon = createRegistrySelector(
 );
 
 /**
- * Returns the template parts and their blocks for the current edited template.
+ * Returns true if there are unsaved changes to the
+ * post's meta fields, and false otherwise.
  *
- * @param {Object} state Global application state.
- * @return {Array} Template parts and their blocks in an array.
+ * @param {Object} state    Global application state.
+ * @param {string} postType The post type of the post.
+ * @param {number} postId   The ID of the post.
+ *
+ * @return {boolean} Whether there are edits or not in the meta fields of the relevant post.
  */
-export const getCurrentTemplateTemplateParts = createRegistrySelector(
-	( select ) => () => {
-		const templateParts = select( coreStore ).getEntityRecords(
+export const hasPostMetaChanges = createRegistrySelector(
+	( select ) => ( state, postType, postId ) => {
+		const { type: currentPostType, id: currentPostId } =
+			getCurrentPost( state );
+		// If no postType or postId is passed, use the current post.
+		const edits = select( coreStore ).getEntityRecordNonTransientEdits(
 			'postType',
-			TEMPLATE_PART_POST_TYPE,
-			{ per_page: -1 }
+			postType || currentPostType,
+			postId || currentPostId
 		);
 
-		const clientIds =
-			select( blockEditorStore ).getBlocksByName( 'core/template-part' );
-		const blocks =
-			select( blockEditorStore ).getBlocksByClientId( clientIds );
+		if ( ! edits?.meta ) {
+			return false;
+		}
 
-		return getFilteredTemplatePartBlocks( blocks, templateParts );
+		// Compare if anything apart from `footnotes` has changed.
+		const originalPostMeta = select( coreStore ).getEntityRecord(
+			'postType',
+			postType || currentPostType,
+			postId || currentPostId
+		)?.meta;
+
+		return ! fastDeepEqual(
+			{ ...originalPostMeta, footnotes: undefined },
+			{ ...edits.meta, footnotes: undefined }
+		);
 	}
+);
+
+export function getEntityActions( state, ...args ) {
+	return _getEntityActions( state.dataviews, ...args );
+}
+
+/**
+ * Similar to getBlocksByName in @wordpress/block-editor, but only returns the top-most
+ * blocks that aren't descendants of the query block.
+ *
+ * @param {Object}       state      Global application state.
+ * @param {Array|string} blockNames Block names of the blocks to retrieve.
+ *
+ * @return {Array} Block client IDs.
+ */
+export const getPostBlocksByName = createRegistrySelector( ( select ) =>
+	createSelector(
+		( state, blockNames ) => {
+			blockNames = Array.isArray( blockNames )
+				? blockNames
+				: [ blockNames ];
+			const { getBlocksByName, getBlockParents, getBlockName } =
+				select( blockEditorStore );
+			return getBlocksByName( blockNames ).filter( ( clientId ) =>
+				getBlockParents( clientId ).every( ( parentClientId ) => {
+					const parentBlockName = getBlockName( parentClientId );
+					return (
+						// Ignore descendents of the query block.
+						parentBlockName !== 'core/query' &&
+						// Enable only the top-most block.
+						! blockNames.includes( parentBlockName )
+					);
+				} )
+			);
+		},
+		() => [ select( blockEditorStore ).getBlocks() ]
+	)
 );

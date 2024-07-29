@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 2.4.0 (2024-07-24)
+
+## 2.3.0 (2024-07-10)
+
+## 2.2.0 (2024-06-26)
+
+## 2.1.0 (2024-06-15)
+
+## 2.0.0 (2024-05-31)
+
 ### Breaking Changes
 
 -   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
@@ -100,7 +110,7 @@
 
 ## 1.1.0 (2022-09-21)
 
-### Enhancement
+### Enhancements
 
 -   Allow for prettified output ([#42909](https://github.com/WordPress/gutenberg/pull/42909)).
 -   Enqueue block supports styles in Gutenberg ([#42880](https://github.com/WordPress/gutenberg/pull/42880)).

@@ -14,6 +14,7 @@ import {
 	ToggleControl,
 	RangeControl,
 	Spinner,
+	withNotices,
 } from '@wordpress/components';
 import {
 	store as blockEditorStore,
@@ -237,7 +238,7 @@ function GalleryEdit( props ) {
 		return (
 			ALLOWED_MEDIA_TYPES.some(
 				( mediaType ) => mediaTypeSelector?.indexOf( mediaType ) === 0
-			) || file.url?.indexOf( 'blob:' ) === 0
+			) || file.blob
 		);
 	}
 
@@ -249,9 +250,9 @@ function GalleryEdit( props ) {
 		const imageArray = newFileUploads
 			? Array.from( selectedImages ).map( ( file ) => {
 					if ( ! file.url ) {
-						return pickRelevantMediaFiles( {
-							url: createBlobURL( file ),
-						} );
+						return {
+							blob: createBlobURL( file ),
+						};
 					}
 
 					return file;
@@ -271,9 +272,9 @@ function GalleryEdit( props ) {
 			.filter( ( file ) => file.url || isValidFileType( file ) )
 			.map( ( file ) => {
 				if ( ! file.url ) {
-					return pickRelevantMediaFiles( {
-						url: createBlobURL( file ),
-					} );
+					return {
+						blob: file.blob || createBlobURL( file ),
+					};
 				}
 
 				return file;
@@ -307,6 +308,7 @@ function GalleryEdit( props ) {
 		const newBlocks = newImageList.map( ( image ) => {
 			return createBlock( 'core/image', {
 				id: image.id,
+				blob: image.blob,
 				url: image.url,
 				caption: image.caption,
 				alt: image.alt,
@@ -580,11 +582,11 @@ function GalleryEdit( props ) {
 						/>
 					) }
 					{ Platform.isWeb && ! imageSizeOptions && hasImageIds && (
-						<BaseControl className={ 'gallery-image-sizes' }>
+						<BaseControl className="gallery-image-sizes">
 							<BaseControl.VisualLabel>
 								{ __( 'Resolution' ) }
 							</BaseControl.VisualLabel>
-							<View className={ 'gallery-image-sizes__loading' }>
+							<View className="gallery-image-sizes__loading">
 								<Spinner />
 								{ __( 'Loading options…' ) }
 							</View>
@@ -632,6 +634,7 @@ function GalleryEdit( props ) {
 		</>
 	);
 }
-export default compose( [ withViewportMatch( { isNarrow: '< small' } ) ] )(
-	GalleryEdit
-);
+export default compose( [
+	withNotices,
+	withViewportMatch( { isNarrow: '< small' } ),
+] )( GalleryEdit );

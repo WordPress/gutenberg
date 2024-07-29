@@ -166,7 +166,7 @@ export default compose(
 			numberOfBlocks: blockOrder.length - 1,
 			isFirst: firstIndex === 0,
 			isLast: lastIndex === blockOrder.length - 1,
-			canMove: canMoveBlocks( clientIds, rootClientId ),
+			canMove: canMoveBlocks( clientIds ),
 			rootClientId,
 		};
 	} ),

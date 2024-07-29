@@ -50,7 +50,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		size: 'compact',
 		showTooltip: ! showIconLabels,
 		disabled,
-		__experimentalIsFocusable: disabled,
+		accessibleWhenDisabled: disabled,
 	};
 	const menuProps = {
 		'aria-label': __( 'View options' ),

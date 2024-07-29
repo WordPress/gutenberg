@@ -6,14 +6,10 @@
 @import "./components/global-styles/style.scss";
 @import "./components/global-styles/screen-revisions/style.scss";
 @import "./components/global-styles-sidebar/style.scss";
-@import "./components/header-edit-mode/style.scss";
 @import "./components/page/style.scss";
-@import "./components/page-pages/style.scss";
 @import "./components/page-patterns/style.scss";
 @import "./components/page-templates/style.scss";
-@import "./components/table/style.scss";
 @import "./components/editor/style.scss";
-@import "./components/create-template-part-modal/style.scss";
 @import "./components/welcome-guide/style.scss";
 @import "./components/layout/style.scss";
 @import "./components/save-hub/style.scss";
@@ -32,11 +28,26 @@
 @import "./components/site-icon/style.scss";
 @import "./components/style-book/style.scss";
 @import "./components/editor-canvas-container/style.scss";
+@import "./components/post-edit/style.scss";
+@import "./components/post-list/style.scss";
 @import "./components/resizable-frame/style.scss";
 @import "./hooks/push-changes-to-global-styles/style.scss";
 @import "./components/global-styles/font-library-modal/style.scss";
 @import "./components/pagination/style.scss";
 @import "./components/global-styles/variations/style.scss";
+
+/* stylelint-disable -- Disable reason: View Transitions not supported properly by stylelint. */
+::view-transition-image-pair(root) {
+	isolation: auto;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+	animation: none;
+	mix-blend-mode: normal;
+	display: block;
+}
+/* stylelint-enable */
 
 body.js #wpadminbar {
 	display: none;

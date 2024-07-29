@@ -112,7 +112,7 @@ if ( ! class_exists( 'WP_HTML_Open_Elements' ) ) {
 		 * @param string[] $termination_list List of elements that terminate the search.
 		 * @return bool Whether the element was found in a specific scope.
 		 */
-		public function has_element_in_specific_scope( $tag_name, $termination_list ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+		public function has_element_in_specific_scope( $tag_name, $termination_list ) {
 			foreach ( $this->walk_up() as $node ) {
 				if ( $node->node_name === $tag_name ) {
 					return true;
@@ -147,12 +147,12 @@ if ( ! class_exists( 'WP_HTML_Open_Elements' ) ) {
 				array(
 
 					/*
-					* Because it's not currently possible to encounter
-					* one of the termination elements, they don't need
-					* to be listed here. If they were, they would be
-					* unreachable and only waste CPU cycles while
-					* scanning through HTML.
-					*/
+					 * Because it's not currently possible to encounter
+					 * one of the termination elements, they don't need
+					 * to be listed here. If they were, they would be
+					 * unreachable and only waste CPU cycles while
+					 * scanning through HTML.
+					 */
 				)
 			);
 		}
@@ -169,7 +169,7 @@ if ( ! class_exists( 'WP_HTML_Open_Elements' ) ) {
 		 * @param string $tag_name Name of tag to check.
 		 * @return bool Whether given element is in scope.
 		 */
-		public function has_element_in_list_item_scope( $tag_name ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+		public function has_element_in_list_item_scope( $tag_name ) {
 			throw new WP_HTML_Unsupported_Exception( 'Cannot process elements depending on list item scope.' );
 
 			return false; // The linter requires this unreachable code until the function is implemented and can return.
@@ -201,7 +201,7 @@ if ( ! class_exists( 'WP_HTML_Open_Elements' ) ) {
 		 * @param string $tag_name Name of tag to check.
 		 * @return bool Whether given element is in scope.
 		 */
-		public function has_element_in_table_scope( $tag_name ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+		public function has_element_in_table_scope( $tag_name ) {
 			throw new WP_HTML_Unsupported_Exception( 'Cannot process elements depending on table scope.' );
 
 			return false; // The linter requires this unreachable code until the function is implemented and can return.
@@ -219,7 +219,7 @@ if ( ! class_exists( 'WP_HTML_Open_Elements' ) ) {
 		 * @param string $tag_name Name of tag to check.
 		 * @return bool Whether given element is in scope.
 		 */
-		public function has_element_in_select_scope( $tag_name ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+		public function has_element_in_select_scope( $tag_name ) {
 			throw new WP_HTML_Unsupported_Exception( 'Cannot process elements depending on select scope.' );
 
 			return false; // The linter requires this unreachable code until the function is implemented and can return.
@@ -371,8 +371,8 @@ if ( ! class_exists( 'WP_HTML_Open_Elements' ) ) {
 		}
 
 		/*
-		* Internal helpers.
-		*/
+		 * Internal helpers.
+		 */
 
 		/**
 		 * Updates internal flags after adding an element.
@@ -389,9 +389,9 @@ if ( ! class_exists( 'WP_HTML_Open_Elements' ) ) {
 		 */
 		public function after_element_push( $item ) {
 			/*
-			* When adding support for new elements, expand this switch to trap
-			* cases where the precalculated value needs to change.
-			*/
+			 * When adding support for new elements, expand this switch to trap
+			 * cases where the precalculated value needs to change.
+			 */
 			switch ( $item->node_name ) {
 				case 'BUTTON':
 					$this->has_p_in_button_scope = false;
@@ -418,9 +418,9 @@ if ( ! class_exists( 'WP_HTML_Open_Elements' ) ) {
 		 */
 		public function after_element_pop( $item ) {
 			/*
-			* When adding support for new elements, expand this switch to trap
-			* cases where the precalculated value needs to change.
-			*/
+			 * When adding support for new elements, expand this switch to trap
+			 * cases where the precalculated value needs to change.
+			 */
 			switch ( $item->node_name ) {
 				case 'BUTTON':
 					$this->has_p_in_button_scope = $this->has_element_in_button_scope( 'P' );

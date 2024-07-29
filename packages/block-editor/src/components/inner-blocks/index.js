@@ -132,7 +132,10 @@ function UncontrolledInnerBlocks( props ) {
 		/>
 	);
 
-	if ( Object.keys( blockType.providesContext ).length === 0 ) {
+	if (
+		! blockType?.providesContext ||
+		Object.keys( blockType.providesContext ).length === 0
+	) {
 		return items;
 	}
 
@@ -267,7 +270,10 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 
 	const ref = useMergeRefs( [
 		props.ref,
-		__unstableDisableDropZone || isDropZoneDisabled
+		__unstableDisableDropZone ||
+		isDropZoneDisabled ||
+		( layout?.isManualPlacement &&
+			window.__experimentalEnableGridInteractivity )
 			? null
 			: blockDropZoneRef,
 	] );

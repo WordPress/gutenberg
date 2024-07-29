@@ -42,4 +42,10 @@ function PostPingbacks() {
 	);
 }
 
+/**
+ * Renders a control for enabling or disabling pingbacks and trackbacks
+ * in a WordPress post.
+ *
+ * @module PostPingbacks
+ */
 export default PostPingbacks;

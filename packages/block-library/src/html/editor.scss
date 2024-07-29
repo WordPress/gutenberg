@@ -13,5 +13,8 @@
 		box-sizing: border-box;
 		max-height: 250px;
 		@include editor-input-reset();
+		// HTML input is always LTR regardless of language.
+		/*rtl:ignore*/
+		direction: ltr;
 	}
 }

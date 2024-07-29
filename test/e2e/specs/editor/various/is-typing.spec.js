@@ -53,6 +53,9 @@ test.describe( 'isTyping', () => {
 			.getByRole( 'button', { name: 'Title & Date' } )
 			.click();
 
+		await editor.openDocumentSettingsSidebar();
+		await page.getByLabel( 'Custom' ).click();
+
 		// Moving the mouse shows the toolbar.
 		await editor.showBlockToolbar();
 		// Open the dropdown.

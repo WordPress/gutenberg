@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
 import * as Ariakit from '@ariakit/react';
 import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
@@ -232,7 +231,7 @@ const UnforwardedTabPanel = (
 					id={ `${ prependInstanceId( selectedTab.name ) }-view` }
 					store={ tabStore }
 					tabId={ prependInstanceId( selectedTab.name ) }
-					className={ 'components-tab-panel__tab-content' }
+					className="components-tab-panel__tab-content"
 				>
 					{ children( selectedTab ) }
 				</Ariakit.TabPanel>

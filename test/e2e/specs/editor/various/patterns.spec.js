@@ -388,6 +388,13 @@ test.describe( 'Synced pattern', () => {
 			.getByRole( 'button', { name: 'Add' } )
 			.click();
 
+		// Wait until the pattern is created.
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: Pattern',
+			} )
+		).toBeVisible();
+
 		await admin.createNewPost();
 		await editor.canvas
 			.getByRole( 'button', { name: 'Add default block' } )
@@ -432,11 +439,11 @@ test.describe( 'Synced pattern', () => {
 			.click();
 
 		// Wait until the pattern is created.
-		await editor.canvas
-			.getByRole( 'document', {
+		await expect(
+			editor.canvas.getByRole( 'document', {
 				name: 'Block: Pattern',
 			} )
-			.waitFor();
+		).toBeVisible();
 
 		// Check that only the pattern block is present.
 		const existingBlocks = await editor.getBlocks();

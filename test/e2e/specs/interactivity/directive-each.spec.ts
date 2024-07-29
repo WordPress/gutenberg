@@ -492,4 +492,17 @@ test.describe( 'data-wp-each', () => {
 		await expect( avocado ).toHaveAttribute( 'data-tag', '0' );
 		await expect( banana ).toHaveAttribute( 'data-tag', '1' );
 	} );
+
+	test( 'directives inside elements with `wp-each-child` should not run', async ( {
+		page,
+	} ) => {
+		const element = page
+			.getByTestId( 'elements with directives' )
+			.getByTestId( 'item' );
+		const callbackRunCount = page
+			.getByTestId( 'elements with directives' )
+			.getByTestId( 'callbackRunCount' );
+		await expect( element ).toHaveText( 'beta' );
+		await expect( callbackRunCount ).toHaveText( '1' );
+	} );
 } );
