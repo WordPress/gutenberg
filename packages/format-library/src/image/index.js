@@ -85,11 +85,10 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 						size="__unstable-large"
 					/>
 					<Button
-						className="block-editor-format-toolbar__image-container-button"
 						icon={ keyboardReturn }
 						label={ __( 'Apply' ) }
 						type="submit"
-						size="compact"
+						__next40pxDefaultSize
 					/>
 				</HStack>
 			</form>
