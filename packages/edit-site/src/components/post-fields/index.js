@@ -242,6 +242,16 @@ function usePostFields( viewType ) {
 						label: name,
 					} ) ) || [],
 				render: PostAuthorField,
+				sort: ( a, b, direction ) => {
+					const nameA =
+						authors.find( ( { id } ) => id === a )?.name || '';
+					const nameB =
+						authors.find( ( { id } ) => id === b )?.name || '';
+
+					return direction === 'asc'
+						? nameA.localeCompare( nameB )
+						: nameB.localeCompare( nameA );
+				},
 			},
 			{
 				label: __( 'Status' ),

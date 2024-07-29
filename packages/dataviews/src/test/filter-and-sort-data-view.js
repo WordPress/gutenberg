@@ -257,6 +257,21 @@ describe( 'sorting', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
+				sort: { field: 'satellites_no_type', direction: 'desc' },
+			},
+			fields
+		);
+
+		expect( result ).toHaveLength( 11 );
+		expect( result[ 0 ].title ).toBe( 'Saturn' );
+		expect( result[ 1 ].title ).toBe( 'Jupiter' );
+		expect( result[ 2 ].title ).toBe( 'Uranus' );
+	} );
+
+	it( 'should sort by type integer', () => {
+		const { data: result } = filterSortAndPaginate(
+			data,
+			{
 				sort: { field: 'satellites', direction: 'desc' },
 			},
 			fields

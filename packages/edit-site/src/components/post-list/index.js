@@ -9,7 +9,7 @@ import {
 import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { DataViews } from '@wordpress/dataviews';
+import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { drawerRight } from '@wordpress/icons';
@@ -161,6 +161,8 @@ export default function PostList( { postType } ) {
 		[ history ]
 	);
 
+	const { isLoading: isLoadingFields, fields } = usePostFields( view.type );
+
 	const queryArgs = useMemo( () => {
 		const filters = {};
 		view.filters.forEach( ( filter ) => {
@@ -205,7 +207,13 @@ export default function PostList( { postType } ) {
 		totalPages,
 	} = useEntityRecordsWithPermissions( 'postType', postType, queryArgs );
 
-	const ids = records?.map( ( record ) => getItemId( record ) ) ?? [];
+	// The REST API sort the authors by ID, but we want to sort them by name.
+	const data =
+		! isLoadingFields && view?.sort?.field === 'author'
+			? filterSortAndPaginate( records, view, fields ).data
+			: records;
+
+	const ids = data?.map( ( record ) => getItemId( record ) ) ?? [];
 	const prevIds = usePrevious( ids ) ?? [];
 	const deletedIds = prevIds.filter( ( id ) => ! ids.includes( id ) );
 	const postIdWasDeleted = deletedIds.includes( postId );
@@ -263,7 +271,6 @@ export default function PostList( { postType } ) {
 		} );
 		closeModal();
 	};
-	const { isLoading: isLoadingFields, fields } = usePostFields( view.type );
 
 	return (
 		<Page
@@ -294,7 +301,7 @@ export default function PostList( { postType } ) {
 				paginationInfo={ paginationInfo }
 				fields={ fields }
 				actions={ actions }
-				data={ records || EMPTY_ARRAY }
+				data={ data || EMPTY_ARRAY }
 				isLoading={ isLoadingData || isLoadingFields }
 				view={ view }
 				onChangeView={ setView }
