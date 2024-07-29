@@ -7,6 +7,7 @@ import { type LinearGradientNode } from 'gradient-parser';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { useCallback, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -16,6 +17,10 @@ import CustomGradientBar from './gradient-bar';
 import { Flex } from '../flex';
 import SelectControl from '../select-control';
 import { VStack } from '../v-stack';
+import {
+	CSSVariableReplacer,
+	getCSSVariablesInString,
+} from '../utils/css-variables';
 import {
 	getGradientAstWithDefault,
 	getLinearGradientRepresentation,
@@ -142,7 +147,19 @@ export function CustomGradientPicker( {
 	onChange,
 	__experimentalIsRenderedInSidebar = false,
 }: CustomGradientPickerProps ) {
-	const { gradientAST, hasGradient } = getGradientAstWithDefault( value );
+	const [ normalizedValue, setNormalizedValue ] = useState(
+		!! getCSSVariablesInString( value ?? '' ).length
+			? 'linear-gradient( #fff, #fff )' // prevent FOUC when there are CSS variables
+			: value
+	);
+	const cssVariableReplacerOnChange: React.ComponentProps<
+		typeof CSSVariableReplacer
+	>[ 'onChange' ] = useCallback( ( { replacedCssString: str } ) => {
+		setNormalizedValue( str );
+	}, [] );
+
+	const { gradientAST, hasGradient } =
+		getGradientAstWithDefault( normalizedValue );
 
 	// On radial gradients the bar should display a linear gradient.
 	// On radial gradients the bar represents a slice of the gradient from the center until the outside.
@@ -163,6 +180,10 @@ export function CustomGradientPicker( {
 
 	return (
 		<VStack spacing={ 4 } className="components-custom-gradient-picker">
+			<CSSVariableReplacer
+				cssString={ value }
+				onChange={ cssVariableReplacerOnChange }
+			/>
 			<CustomGradientBar
 				__experimentalIsRenderedInSidebar={
 					__experimentalIsRenderedInSidebar

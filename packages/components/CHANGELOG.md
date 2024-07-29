@@ -7,9 +7,14 @@
 -   `ColorPalette`: Remove extra bottom margin when `CircularOptionPicker` is unneeded ([#63961](https://github.com/WordPress/gutenberg/pull/63961)).
 -   `CustomSelectControl`: Restore `describedBy` functionality ([#63957](https://github.com/WordPress/gutenberg/pull/63957)).
 
+### Enhancements
+
+-   `CustomGradientPicker`: Support CSS variables ([#63915](https://github.com/WordPress/gutenberg/pull/63915)).
+
 ### Internal
 
 -   `DropdownMenuV2`: break menu item help text on multiple lines for better truncation. ([#63916](https://github.com/WordPress/gutenberg/pull/63916)).
+-   Introduce `CSSVariableReplacer` utility component to get computed CSS variables ([#63915](https://github.com/WordPress/gutenberg/pull/63915)).
 
 ## 28.4.0 (2024-07-24)
 

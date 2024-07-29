@@ -25,8 +25,8 @@ export default meta;
 
 const CustomGradientPickerWithState: StoryFn<
 	typeof CustomGradientPicker
-> = ( { onChange, ...props } ) => {
-	const [ gradient, setGradient ] = useState< string >();
+> = ( { onChange, value, ...props } ) => {
+	const [ gradient, setGradient ] = useState( value );
 	return (
 		<CustomGradientPicker
 			{ ...props }
@@ -40,3 +40,9 @@ const CustomGradientPickerWithState: StoryFn<
 };
 
 export const Default = CustomGradientPickerWithState.bind( {} );
+
+export const WithCSSVariables = CustomGradientPickerWithState.bind( {} );
+WithCSSVariables.args = {
+	// eslint-disable-next-line no-restricted-syntax
+	value: 'linear-gradient(135deg,var(--wp-admin-theme-color) 0%,var(--undefined-color, magenta) 100%)',
+};
