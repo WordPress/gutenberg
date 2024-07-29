@@ -3,12 +3,10 @@
  */
 import { proxifyState, proxifyStore } from './proxies';
 import { getNamespace } from './hooks';
-
-const isObject = ( item: unknown ): item is Record< string, unknown > =>
-	Boolean( item && typeof item === 'object' && item.constructor === Object );
+import { isPlainObject } from './utils';
 
 const deepMerge = ( target: any, source: any ) => {
-	if ( isObject( target ) && isObject( source ) ) {
+	if ( isPlainObject( target ) && isPlainObject( source ) ) {
 		for ( const key in source ) {
 			const getter = Object.getOwnPropertyDescriptor( source, key )?.get;
 			if ( typeof getter === 'function' ) {
@@ -16,7 +14,7 @@ const deepMerge = ( target: any, source: any ) => {
 					get: getter,
 					configurable: true,
 				} );
-			} else if ( isObject( source[ key ] ) ) {
+			} else if ( isPlainObject( source[ key ] ) ) {
 				if ( ! target[ key ] ) {
 					target[ key ] = {};
 				}
@@ -148,7 +146,10 @@ export function store(
 			storeLocks.set( namespace, lock );
 		}
 		const rawStore = {
-			state: proxifyState( namespace, isObject( state ) ? state : {} ),
+			state: proxifyState(
+				namespace,
+				isPlainObject( state ) ? state : {}
+			),
 			...block,
 		};
 		const proxiedStore = proxifyStore( namespace, rawStore );
@@ -205,12 +206,12 @@ export const populateInitialData = ( data?: {
 	state?: Record< string, unknown >;
 	config?: Record< string, unknown >;
 } ) => {
-	if ( isObject( data?.state ) ) {
+	if ( isPlainObject( data?.state ) ) {
 		Object.entries( data!.state ).forEach( ( [ namespace, state ] ) => {
 			store( namespace, { state }, { lock: universalUnlock } );
 		} );
 	}
-	if ( isObject( data?.config ) ) {
+	if ( isPlainObject( data?.config ) ) {
 		Object.entries( data!.config ).forEach( ( [ namespace, config ] ) => {
 			storeConfigs.set( namespace, config );
 		} );
