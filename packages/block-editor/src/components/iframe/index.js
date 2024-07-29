@@ -126,6 +126,7 @@ function Iframe( {
 	);
 	const { styles = '', scripts = '' } = resolvedAssets;
 	const [ iframeDocument, setIframeDocument ] = useState();
+	const [ iframeOwnerDocument, setIframeOwnerDocument ] = useState();
 	const prevContainerWidthRef = useRef();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
 	const clearerRef = useBlockSelectionClearer();
@@ -138,6 +139,7 @@ function Iframe( {
 	const setRef = useRefEffect( ( node ) => {
 		node._load = () => {
 			setIframeDocument( node.contentDocument );
+			setIframeOwnerDocument( node.ownerDocument );
 		};
 		let iFrameDocument;
 		// Prevent the default browser action for files dropped outside of dropzones.
@@ -262,11 +264,25 @@ function Iframe( {
 		isZoomedOut ? iframeResizeRef : null,
 	] );
 
+	const userIsRTL = isRTL();
+
+	// Fallback locale values from parent frame.
+	let defaultLang = iframeOwnerDocument?.lang;
+	let defaultDir = iframeOwnerDocument?.dir;
+
+	if (
+		siteLocale?.hasOwnProperty( 'isRTL' ) &&
+		typeof siteLocale?.lang === 'string'
+	) {
+		defaultLang = siteLocale.lang;
+		defaultDir = siteLocale.isRTL ? 'rtl' : 'ltr';
+	}
+
 	// Correct doctype is required to enable rendering in standards
 	// mode. Also preload the styles to avoid a flash of unstyled
 	// content.
 	const html = `<!doctype html>
-<html lang="${ siteLocale?.lang }" dir="${ siteLocale?.isRTL ? 'rtl' : 'ltr' }">
+<html lang="${ defaultLang }" dir="${ defaultDir }">
 	<head>
 		<meta charset="utf-8">
 		<script>window.frameElement._load()</script>
@@ -287,7 +303,7 @@ function Iframe( {
 				and should therefore match the editor UI's directionality.
 			*/
 			.block-editor-block-list__layout .components-placeholder { 
-				direction: ${ isRTL() ? 'rtl' : 'ltr' };
+				direction: ${ userIsRTL ? 'rtl' : 'ltr' };
 			}
 		</style>
 		${ styles }

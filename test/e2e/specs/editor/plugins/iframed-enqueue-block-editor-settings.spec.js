@@ -101,25 +101,23 @@ test.describe( 'iframed block editor settings styles', () => {
 		editor,
 		page,
 	} ) => {
+		const htmlElement = editor.canvas.locator( 'css=html' );
+		await expect( htmlElement ).toHaveAttribute( 'lang', 'en_US' );
+		await expect( htmlElement ).toHaveAttribute( 'dir', 'ltr' );
+
 		await page.evaluate( () => {
 			const settings = window.wp.data
 				.select( 'core/editor' )
 				.getEditorSettings();
 			window.wp.data.dispatch( 'core/editor' ).updateEditorSettings( {
 				...settings,
-				locale: {
-					site: {
-						lang: 'ar',
-						isRTL: true,
-					},
-					user: {
-						lang: 'en_US',
-						isRTL: false,
-					},
+				siteLocale: {
+					lang: 'ar',
+					isRTL: true,
 				},
 			} );
 		} );
-		const htmlElement = editor.canvas.locator( 'css=html' );
+
 		await expect( htmlElement ).toHaveAttribute( 'lang', 'ar' );
 		await expect( htmlElement ).toHaveAttribute( 'dir', 'rtl' );
 	} );
