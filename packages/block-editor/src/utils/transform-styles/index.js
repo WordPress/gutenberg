@@ -26,21 +26,6 @@ function transformStyle(
 						prefix: wrapperSelector,
 						exclude: [ ...ignoredSelectors, wrapperSelector ],
 						transform( prefix, selector, prefixedSelector ) {
-							// `html`, `body` and `:root` need some special handling since they
-							// generally cannot be prefixed with a classname and produce a valid
-							// selector.
-							if ( selector.includes( 'body' ) ) {
-								return selector
-									.replace( /:root :where\(body\)/g, prefix )
-									.replace( /:where\(body\)/g, prefix )
-									.replace( 'body', prefix );
-							}
-							if ( selector.startsWith( ':root' ) ) {
-								return selector.replace( ':root', prefix );
-							}
-							if ( selector.startsWith( 'html' ) ) {
-								return selector.replace( 'html', prefix );
-							}
 							// Avoid prefixing an already prefixed selector.
 							if ( selector.startsWith( prefix ) ) {
 								return prefixedSelector.replace(
@@ -48,7 +33,16 @@ function transformStyle(
 									prefix
 								);
 							}
-							return prefixedSelector;
+
+							// `html`, `body` and `:root` need some special handling since they
+							// generally cannot be prefixed with a classname and produce a valid
+							// selector.
+							// Also include some special rules for various forms of :root and body
+							// that crop up.
+							return selector
+								.replace( /:root :where\(body\)/g, prefix )
+								.replace( /:where\(body\)/g, prefix )
+								.replace( /^(html|body|:root)/, prefix );
 						},
 					} ),
 				baseURL && rebaseUrl( { rootUrl: baseURL } ),
