@@ -313,11 +313,7 @@ export default () => {
 								end: performance.now(),
 								detail: {
 									devtools: {
-										metadata: {
-											extensionName:
-												'Interactivity API: Watch',
-											dataType: 'track-entry',
-										},
+										dataType: 'track-entry',
 										color: 'primary',
 										track: `IA: watch ${ entry.namespace }`,
 									},
@@ -353,11 +349,7 @@ export default () => {
 								end: performance.now(),
 								detail: {
 									devtools: {
-										metadata: {
-											extensionName:
-												'Interactivity API: Init',
-											dataType: 'track-entry',
-										},
+										dataType: 'track-entry',
 										color: 'primary',
 										track: `IA: init ${ entry.namespace }`,
 									},
@@ -408,11 +400,7 @@ export default () => {
 									end: performance.now(),
 									detail: {
 										devtools: {
-											metadata: {
-												extensionName:
-													'Interactivity API: On',
-												dataType: 'track-entry',
-											},
+											dataType: 'track-entry',
 											color: 'primary',
 											track: `IA: on ${ entry.namespace }`,
 										},
