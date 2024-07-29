@@ -292,7 +292,22 @@ function usePostFields( viewType ) {
 						);
 					}
 
-					// Pending & Published posts show the modified date if it's newer.
+					const isPublished = item.status === 'publish';
+					if ( isPublished ) {
+						return createInterpolateElement(
+							sprintf(
+								/* translators: %s: page creation time */
+								__( '<span>Published: <time>%s</time></span>' ),
+								getFormattedDate( item.date )
+							),
+							{
+								span: <span />,
+								time: <time />,
+							}
+						);
+					}
+
+					// Pending posts show the modified date if it's newer.
 					const dateToDisplay =
 						getDate( item.modified ) > getDate( item.date )
 							? item.modified
@@ -304,21 +319,6 @@ function usePostFields( viewType ) {
 							sprintf(
 								/* translators: %s: the newest of created or modified date for the page */
 								__( '<span>Modified: <time>%s</time></span>' ),
-								getFormattedDate( dateToDisplay )
-							),
-							{
-								span: <span />,
-								time: <time />,
-							}
-						);
-					}
-
-					const isPublished = item.status === 'publish';
-					if ( isPublished ) {
-						return createInterpolateElement(
-							sprintf(
-								/* translators: %s: the newest of created or modified date for the page */
-								__( '<span>Published: <time>%s</time></span>' ),
 								getFormattedDate( dateToDisplay )
 							),
 							{
