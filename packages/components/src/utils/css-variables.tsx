@@ -31,7 +31,7 @@ type VarFunction = {
 	raw: string;
 	/** CSS variable name, e.g. `--foo`. */
 	value: string;
-	/** Second argument of the `var()`, which could be a literal color or another `var()`. */
+	/** Second argument of the `var()`, which could be a literal or another `var()`. */
 	fallback?: string;
 };
 
