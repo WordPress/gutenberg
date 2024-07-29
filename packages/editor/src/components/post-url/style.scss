@@ -27,6 +27,12 @@
 	padding-inline-start: 0 !important;
 }
 
-.editor-post-url__panel-toggle {
-	word-break: break-word;
+.editor-post-panel__row-control {
+	.components-button.editor-post-url__panel-toggle {
+		word-break: break-word;
+		display: inline-block;
+		text-overflow: ellipsis;
+		overflow: hidden;
+		white-space: nowrap;
+	}
 }
