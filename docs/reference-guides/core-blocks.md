@@ -634,7 +634,7 @@ Display the excerpt. ([Source](https://github.com/WordPress/gutenberg/tree/trunk
 -	**Name:** core/post-excerpt
 -	**Category:** theme
 -	**Supports:** color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** excerptLength, moreText, showMoreOnNewLine, textAlign
+-	**Attributes:** excerptLength, moreText, readMoreColors, showMoreOnNewLine, textAlign
 
 ## Featured Image
 

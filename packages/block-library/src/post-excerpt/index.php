@@ -20,6 +20,54 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 		return '';
 	}
 
+	// Generate a border string based on border attributes.
+	$border_attributes = isset( $attributes['style']['border'] ) ? $attributes['style']['border'] : null;
+	if ( isset( $border_attributes ) && ! empty( $border_attributes ) ) {
+		$border_array = array();
+		foreach ( $border_attributes as $border_attributes_key => $border_attributes_value ) {
+
+			$border_array[] = 'border-' . $border_attributes_key . ': ' . $border_attributes_value;
+		}
+	}
+	if ( isset( $attributes['borderColor'] ) && ! empty( $attributes['borderColor'] ) ) {
+		$border_array[] = 'border-color: ' . $attributes['borderColor'];
+	}
+	if ( isset( $border_array ) && ! empty( $border_array ) ) {
+		$border_string = implode( ';', $border_array );
+	}
+	$border_classes = block_core_post_excerpt_get_border_color_classes( $attributes );
+
+	// Generate a readmoreColors string based on readmoreColors attributes.
+	$read_more_colors = isset( $attributes['readMoreColors'] ) ? $attributes['readMoreColors'] : null;
+
+	// Generate a style string based on readmoreColors and border_string.
+	$style_string  = '';
+	$padding_class = '';
+
+	if ( isset( $read_more_colors ) ) {
+		$bg_color   = isset( $read_more_colors['bgColor'] ) ? $read_more_colors['bgColor'] : '';
+		$text_color = isset( $read_more_colors['textColor'] ) ? $read_more_colors['textColor'] : '';
+
+		// Construct the CSS for background and text colors.
+		if ( $bg_color || $text_color ) {
+			$style_string .= '';
+			if ( $bg_color ) {
+				$style_string .= 'background-color:' . esc_attr( $bg_color ) . ';';
+			}
+			if ( $text_color ) {
+				$style_string .= 'color:' . esc_attr( $text_color ) . ';';
+			}
+		}
+	}
+
+	// Add the $border_string to the style string if it exists.
+	if ( isset( $border_string ) && ! empty( $border_string ) ) {
+		$style_string .= esc_attr( $border_string );
+		if ( strpos( $border_string, 'border-width: 0px;' ) === false ) {
+			$padding_class = 'wp-block-post-excerpt__more-link--padding';
+		}
+	}
+
 	/*
 	* The purpose of the excerpt length setting is to limit the length of both
 	* automatically generated and user-created excerpts.
@@ -32,7 +80,7 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 		$excerpt = wp_trim_words( $excerpt, $excerpt_length );
 	}
 
-	$more_text           = ! empty( $attributes['moreText'] ) ? '<a class="wp-block-post-excerpt__more-link" href="' . esc_url( get_the_permalink( $block->context['postId'] ) ) . '">' . wp_kses_post( $attributes['moreText'] ) . '</a>' : '';
+	$more_text           = ! empty( $attributes['moreText'] ) ? '<a class="wp-block-post-excerpt__more-link ' . esc_attr( $border_classes ) . ' ' . esc_attr( $padding_class ) . '" style="' . esc_attr( $style_string ) . '" href="' . esc_url( get_the_permalink( $block->context['postId'] ) ) . '" >' . wp_kses_post( $attributes['moreText'] ) . '</a>' : '';
 	$filter_excerpt_more = static function ( $more ) use ( $more_text ) {
 		return empty( $more_text ) ? $more : '';
 	};
@@ -96,4 +144,27 @@ if ( is_admin() ||
 		},
 		PHP_INT_MAX
 	);
+}
+
+/**
+ * Returns border color classnames depending on whether there are named or custom border colors.
+ *
+ * @param array $attributes The block attributes.
+ *
+ * @return string The border color classnames to be applied to the block elements.
+ */
+function block_core_post_excerpt_get_border_color_classes( $attributes ) {
+	$border_color_classes    = array();
+	$has_custom_border_color = ! empty( $attributes['style']['border']['color'] );
+	$has_named_border_color  = ! empty( $attributes['borderColor'] );
+
+	if ( $has_custom_border_color || $has_named_border_color ) {
+		$border_color_classes[] = 'has-border-color';
+	}
+
+	if ( $has_named_border_color ) {
+		$border_color_classes[] = sprintf( 'has-%s-border-color', esc_attr( $attributes['borderColor'] ) );
+	}
+
+	return implode( ' ', $border_color_classes );
 }

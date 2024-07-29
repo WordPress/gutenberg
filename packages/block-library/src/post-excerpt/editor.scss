@@ -3,3 +3,16 @@
 		display: inline;
 	}
 }
+
+.full-width-control-wrapper {
+	grid-column: 1 / -1;
+}
+
+.custom-color-panel {
+	padding-left: 0 !important;
+	padding-right: 0 !important;
+
+	.components-tools-panel-header {
+		margin-bottom: 16px !important;
+	}
+}

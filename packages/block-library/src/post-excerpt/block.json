@@ -20,6 +20,9 @@
 		"excerptLength": {
 			"type": "number",
 			"default": 55
+		},
+		"readMoreColors": {
+			"type": "object"
 		}
 	},
 	"usesContext": [ "postId", "postType", "queryId" ],
@@ -56,6 +59,19 @@
 		},
 		"interactivity": {
 			"clientNavigation": true
+		},
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true,
+			"__experimentalSkipSerialization": true,
+			"__experimentalDefaultControls": {
+				"color": true,
+				"radius": true,
+				"style": true,
+				"width": true
+			}
 		}
 	},
 	"editorStyle": "wp-block-post-excerpt-editor",

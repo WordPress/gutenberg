@@ -15,6 +15,8 @@ import {
 	RichText,
 	Warning,
 	useBlockProps,
+	__experimentalUseBorderProps as useBorderProps,
+	PanelColorSettings,
 } from '@wordpress/block-editor';
 import { PanelBody, ToggleControl, RangeControl } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
@@ -28,7 +30,14 @@ import { useCanEditEntity } from '../utils/hooks';
 const ELLIPSIS = '…';
 
 export default function PostExcerptEditor( {
-	attributes: { textAlign, moreText, showMoreOnNewLine, excerptLength },
+	attributes,
+	attributes: {
+		textAlign,
+		moreText,
+		showMoreOnNewLine,
+		excerptLength,
+		readMoreColors,
+	},
 	setAttributes,
 	isSelected,
 	context: { postId, postType, queryId },
@@ -40,6 +49,14 @@ export default function PostExcerptEditor( {
 		setExcerpt,
 		{ rendered: renderedExcerpt, protected: isProtected } = {},
 	] = useEntityProp( 'postType', postType, 'excerpt', postId );
+
+	// Border props.
+	const borderProps = useBorderProps( attributes );
+	const { borderWidth } = borderProps.style;
+
+	// Read More colors constants.
+	const bgColor = readMoreColors?.bgColor || '#fff';
+	const textColor = readMoreColors?.textColor || '#000';
 
 	/**
 	 * Check if the post type supports excerpts.
@@ -129,8 +146,12 @@ export default function PostExcerptEditor( {
 	}
 	const readMoreLink = (
 		<RichText
+			className={ `wp-block-post-excerpt__more-link ${
+				borderWidth !== undefined && borderWidth !== '0px'
+					? 'wp-block-post-excerpt__more-link--padding'
+					: ''
+			}` }
 			identifier="moreText"
-			className="wp-block-post-excerpt__more-link"
 			tagName="a"
 			aria-label={ __( '“Read more” link text' ) }
 			placeholder={ __( 'Add "read more" link text' ) }
@@ -138,6 +159,11 @@ export default function PostExcerptEditor( {
 			onChange={ ( newMoreText ) =>
 				setAttributes( { moreText: newMoreText } )
 			}
+			style={ {
+				...borderProps.style,
+				color: textColor,
+				backgroundColor: bgColor,
+			} }
 			withoutInteractiveFormatting
 		/>
 	);
@@ -253,6 +279,47 @@ export default function PostExcerptEditor( {
 					readMoreLink
 				) }
 			</div>
+			<InspectorControls group="color">
+				<div className="full-width-control-wrapper">
+					<PanelColorSettings
+						className="custom-color-panel"
+						title={ __( '"read more" Link Text' ) }
+						colorSettings={ [
+							{
+								value: bgColor,
+								onChange: ( colorValue ) =>
+									setAttributes( {
+										readMoreColors: {
+											...readMoreColors,
+											bgColor: colorValue,
+										},
+									} ),
+								label: __( 'Background' ),
+							},
+							{
+								value: textColor,
+								onChange: ( colorValue ) =>
+									setAttributes( {
+										readMoreColors: {
+											...readMoreColors,
+											textColor: colorValue,
+										},
+									} ),
+								label: __( 'Text' ),
+							},
+						] }
+					></PanelColorSettings>
+				</div>
+			</InspectorControls>
+			<InspectorControls group="border">
+				<div className="full-width-control-wrapper">
+					<p>
+						{ __(
+							'Note: Border will only apply to read more link.'
+						) }
+					</p>
+				</div>
+			</InspectorControls>
 		</>
 	);
 }
