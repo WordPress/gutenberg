@@ -29,7 +29,7 @@ export function isItemValid< Item >(
 
 		if ( field.elements ) {
 			const validValues = field.elements.map( ( f ) => f.value );
-			if ( ! validValues.includes( value ) ) {
+			if ( ! validValues.includes( Number( value ) ) ) {
 				return false;
 			}
 		}
