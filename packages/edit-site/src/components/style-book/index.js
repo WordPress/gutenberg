@@ -155,6 +155,10 @@ function getExamples() {
 				content: __( 'Heading 5' ),
 				level: 5,
 			} ),
+			createBlock( 'core/heading', {
+				content: __( 'Heading 6' ),
+				level: 6,
+			} ),
 		],
 	};
 
