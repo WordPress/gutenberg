@@ -20,7 +20,11 @@ export default function save( { attributes } ) {
 	} );
 
 	return (
-		<div { ...blockProps }>
+		<div
+			{ ...blockProps }
+			data-wp-interactive="core/tabs"
+			data-wp-context='{ "activeTab": 0 }'
+		>
 			<ul className="wp-block-tabs__list" role="tablist">
 				{ innerTabs.map( ( tab, index ) => {
 					const isActive = index === 0;
@@ -34,7 +38,9 @@ export default function save( { attributes } ) {
 						>
 							<RichText.Content
 								aria-controls={ tab.id }
-								aria-selected={ isActive }
+								data-wp-bind--aria-selected={ `${ index } === context.activeTab` }
+								data-wp-class--is-active={ `${ index } === context.activeTab` }
+								data-wp-on--click={ `actions.setActiveTab.bind( null, ${ index } )` }
 								className={ clsx( 'wp-block-tabs__tab-label', {
 									'is-active': isActive,
 								} ) }

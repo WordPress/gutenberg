@@ -18,6 +18,7 @@ export default function save( { attributes } ) {
 		<div
 			{ ...innerBlocksProps }
 			aria-labelledby={ tabLabelId }
+			data-wp-class--is-active={ `${ tabIndex } === context.activeTab` }
 			id={ tabPanelId }
 			role="tabpanel"
 		/>
