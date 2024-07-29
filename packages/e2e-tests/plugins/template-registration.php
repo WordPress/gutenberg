@@ -40,21 +40,21 @@ add_action(
 
 		// Custom template used to test unregistration.
 		wp_register_template(
-			'gutenberg//custom-unregistered-template',
+			'gutenberg//plugin-unregistered-template',
 			array(
-				'title'       => 'Custom Unregistered Template',
-				'description' => 'A custom template that is unregistered.',
+				'title'       => 'Plugin Unregistered Template',
+				'description' => 'A plugin-registered template that is unregistered.',
 				'content'     => '<!-- wp:template-part {"slug":"header","tagName":"header"} /--><!-- wp:group {"tagName":"main","layout":{"inherit":true}} --><main class="wp-block-group"><!-- wp:paragraph --><p>This is a plugin-registered template that is also unregistered.</p><!-- /wp:paragraph --></main><!-- /wp:group -->',
 			)
 		);
-		wp_unregister_template( 'gutenberg//custom-unregistered-template' );
+		wp_unregister_template( 'gutenberg//plugin-unregistered-template' );
 
 		// Custom template used to test overriding default WP templates.
 		wp_register_template(
 			'gutenberg//page',
 			array(
-				'title'       => 'Custom Page Template',
-				'description' => 'A custom page template.',
+				'title'       => 'Plugin Page Template',
+				'description' => 'A plugin-registered page template.',
 				'content'     => '<!-- wp:template-part {"slug":"header","tagName":"header"} /--><!-- wp:group {"tagName":"main","layout":{"inherit":true}} --><main class="wp-block-group"><!-- wp:paragraph --><p>This is a plugin-registered page template.</p><!-- /wp:paragraph --></main><!-- /wp:group -->',
 			)
 		);
@@ -63,8 +63,8 @@ add_action(
 		wp_register_template(
 			'gutenberg//author-admin',
 			array(
-				'title'       => 'Custom Author Template',
-				'description' => 'A custom author template.',
+				'title'       => 'Plugin Author Template',
+				'description' => 'A plugin-registered author template.',
 				'content'     => '<!-- wp:template-part {"slug":"header","tagName":"header"} /--><!-- wp:group {"tagName":"main","layout":{"inherit":true}} --><main class="wp-block-group"><!-- wp:paragraph --><p>This is a plugin-registered author template.</p><!-- /wp:paragraph --></main><!-- /wp:group -->',
 			)
 		);

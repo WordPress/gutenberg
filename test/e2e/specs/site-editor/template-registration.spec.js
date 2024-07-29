@@ -23,6 +23,7 @@ test.describe( 'Template registration', () => {
 	} );
 	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllTemplates( 'wp_template' );
+		await requestUtils.deleteAllPosts();
 	} );
 
 	test( 'templates can be registered and edited', async ( {
@@ -104,7 +105,7 @@ test.describe( 'Template registration', () => {
 
 		// Swap template.
 		await page.getByRole( 'button', { name: 'Post' } ).click();
-		await page.getByLabel( 'Template options' ).click();
+		await page.getByRole( 'button', { name: 'Template options' } ).click();
 		await page.getByRole( 'menuitem', { name: 'Swap template' } ).click();
 		await page.getByText( 'Plugin Template' ).click();
 
@@ -131,7 +132,7 @@ test.describe( 'Template registration', () => {
 
 		// Swap template.
 		await page.getByRole( 'button', { name: 'Post' } ).click();
-		await page.getByLabel( 'Template options' ).click();
+		await page.getByRole( 'button', { name: 'Template options' } ).click();
 		await page.getByRole( 'menuitem', { name: 'Swap template' } ).click();
 		await page.getByText( 'Custom', { exact: true } ).click();
 
@@ -223,10 +224,10 @@ test.describe( 'Template registration', () => {
 			postType: 'wp_template',
 		} );
 		await templateRegistrationUtils.searchForTemplate(
-			'Custom Unregistered Template'
+			'Plugin Unregistered Template'
 		);
 		await expect(
-			page.getByText( 'Custom Unregistered Template' )
+			page.getByText( 'Plugin Unregistered Template' )
 		).toBeHidden();
 	} );
 
@@ -283,14 +284,14 @@ test.describe( 'Template registration', () => {
 			page.getByText( 'This is a plugin-registered author template.' )
 		).toBeHidden();
 
-		// Verify the template registered by the plugin is not visible in the Site Editor either.
+		// Verify the template registered by the plugin is not visible in the Site Editor.
 		await admin.visitSiteEditor( {
 			postType: 'wp_template',
 		} );
 		await templateRegistrationUtils.searchForTemplate(
-			'Custom Author Template'
+			'Plugin Author Template'
 		);
-		await expect( page.getByText( 'Custom Author Template' ) ).toBeHidden();
+		await expect( page.getByText( 'Plugin Author Template' ) ).toBeHidden();
 
 		// Reset the user-modified template.
 		const resetNotice = page
