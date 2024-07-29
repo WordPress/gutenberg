@@ -44,10 +44,10 @@ $grid-unit-80: 8 * $grid-unit;		// 64px
  * Radius scale.
  */
 
-$radius-xs: 1px;
-$radius-s: 2px;
-$radius-m: 4px;
-$radius-l: 8px;
+$radius-x-small: 1px;
+$radius-small: 2px;
+$radius-medium: 4px;
+$radius-large: 8px;
 $radius-full: 9999px; // For lozenges
 $radius-round: 50%; // For circles and ovals
 
