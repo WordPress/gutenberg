@@ -45,11 +45,15 @@ export type State = {
 	isResizing: boolean;
 	// Whether the image is dragging/moving.
 	isDragging: boolean;
+	// Whether the image is zooming/pinching.
+	isZooming: boolean;
 };
 
 type Action =
-	// Zoom in/out to a  scale.
+	// Zoom in/out to a scale.
 	| { type: 'ZOOM'; scale: number }
+	// End zooming.
+	| { type: 'ZOOM_END' }
 	// Zoom in/out by a delta scale.
 	| { type: 'ZOOM_BY'; deltaScale: number }
 	// Flip the image horizontally.
@@ -98,6 +102,7 @@ function createInitialState( {
 		},
 		isResizing: false,
 		isDragging: false,
+		isZooming: false,
 	};
 }
 
@@ -139,6 +144,7 @@ function imageCropperReducer( state: State, action: Action ) {
 						y: nextScale * Math.sign( scale.y ),
 					},
 				},
+				isZooming: true,
 			};
 		}
 		case 'ZOOM_BY': {
@@ -168,6 +174,13 @@ function imageCropperReducer( state: State, action: Action ) {
 						y: nextScale * Math.sign( scale.y ),
 					},
 				},
+				isZooming: true,
+			};
+		}
+		case 'ZOOM_END': {
+			return {
+				...state,
+				isZooming: false,
 			};
 		}
 		case 'FLIP': {

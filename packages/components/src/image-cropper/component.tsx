@@ -154,6 +154,7 @@ const Cropper = forwardRef< HTMLDivElement >( ( {}, ref ) => {
 			image,
 			transforms: { angle, rotations, scale },
 			isDragging,
+			isZooming,
 		},
 		src,
 		refs: { imageRef },
@@ -173,8 +174,12 @@ const Cropper = forwardRef< HTMLDivElement >( ( {}, ref ) => {
 		<Container
 			animate={ {
 				'--wp-cropper-angle': `${ degree }deg`,
-				'--wp-cropper-scale-x': scale.x,
-				'--wp-cropper-scale-y': scale.y,
+				...( isZooming
+					? {}
+					: {
+							'--wp-cropper-scale-x': scale.x,
+							'--wp-cropper-scale-y': scale.y,
+					  } ),
 				...( isDragging
 					? {}
 					: {
@@ -187,6 +192,8 @@ const Cropper = forwardRef< HTMLDivElement >( ( {}, ref ) => {
 				height: `${ isAxisSwapped ? image.width : image.height }px`,
 				'--wp-cropper-image-x': `${ image.x }px`,
 				'--wp-cropper-image-y': `${ image.y }px`,
+				'--wp-cropper-scale-x': scale.x,
+				'--wp-cropper-scale-y': scale.y,
 			} }
 			ref={ ref }
 		>

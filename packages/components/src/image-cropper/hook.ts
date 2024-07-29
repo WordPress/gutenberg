@@ -44,12 +44,18 @@ export const useImageCropper = ( {
 			onPinch: ( { offset: [ scale ] } ) => {
 				dispatch( { type: 'ZOOM', scale } );
 			},
+			onPinchEnd: () => {
+				dispatch( { type: 'ZOOM_END' } );
+			},
 			onWheel: ( { pinching, movement: [ , deltaY ] } ) => {
 				if ( pinching ) {
 					return;
 				}
 				const deltaScale = deltaY * 0.001;
 				dispatch( { type: 'ZOOM_BY', deltaScale } );
+			},
+			onWheelEnd: () => {
+				dispatch( { type: 'ZOOM_END' } );
 			},
 			onDrag: ( { offset: [ x, y ] } ) => {
 				dispatch( { type: 'MOVE', x, y } );
