@@ -116,8 +116,8 @@ function useInsertionPoint( {
 		insertBlocks,
 		showInsertionPoint,
 		hideInsertionPoint,
-		setLastFocus,
-	} = unlock( useDispatch( blockEditorStore ) );
+	} = useDispatch( blockEditorStore );
+	const { setLastFocus } = unlock( useDispatch( blockEditorStore ) );
 
 	const onInsertBlocks = useCallback(
 		( blocks, meta, shouldForceFocusBlock = false, _rootClientId ) => {

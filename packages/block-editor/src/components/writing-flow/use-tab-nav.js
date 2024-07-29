@@ -21,15 +21,15 @@ export default function useTabNav() {
 
 	const { hasMultiSelection, getSelectedBlockClientId, getBlockCount } =
 		useSelect( blockEditorStore );
-	const { setNavigationMode, setLastFocus } = unlock(
-		useDispatch( blockEditorStore )
-	);
+	const { getLastFocus } = unlock( useSelect( blockEditorStore ) );
+
+	const { setNavigationMode } = useDispatch( blockEditorStore );
+	const { setLastFocus } = unlock( useDispatch( blockEditorStore ) );
+
 	const isNavigationMode = useSelect(
 		( select ) => select( blockEditorStore ).isNavigationMode(),
 		[]
 	);
-
-	const { getLastFocus } = unlock( useSelect( blockEditorStore ) );
 
 	// Don't allow tabbing to this element in Navigation mode.
 	const focusCaptureTabIndex = ! isNavigationMode ? '0' : undefined;
