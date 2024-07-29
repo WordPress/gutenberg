@@ -26,8 +26,8 @@ function useUniqueId( idProp?: string ) {
 	return idProp || id;
 }
 
-function UnforwardedSelectControl(
-	props: WordPressComponentProps< SelectControlProps, 'select', false >,
+function UnforwardedSelectControl< T extends string >(
+	props: WordPressComponentProps< SelectControlProps< T >, 'select', false >,
 	ref: React.ForwardedRef< HTMLSelectElement >
 ) {
 	const {
@@ -66,12 +66,14 @@ function UnforwardedSelectControl(
 			const selectedOptions = Array.from( event.target.options ).filter(
 				( { selected } ) => selected
 			);
-			const newValues = selectedOptions.map( ( { value } ) => value );
+			const newValues = selectedOptions.map(
+				( { value } ) => value as T
+			);
 			props.onChange?.( newValues, { event } );
 			return;
 		}
 
-		props.onChange?.( event.target.value, { event } );
+		props.onChange?.( event.target.value as T, { event } );
 	};
 
 	const classes = clsx( 'components-select-control', className );
@@ -164,6 +166,14 @@ function UnforwardedSelectControl(
  * };
  * ```
  */
-export const SelectControl = forwardRef( UnforwardedSelectControl );
+export const SelectControl = forwardRef( UnforwardedSelectControl ) as <
+	T extends string,
+>(
+	props: WordPressComponentProps<
+		SelectControlProps< T >,
+		'select',
+		false
+	> & { ref?: React.Ref< HTMLSelectElement > }
+) => ReturnType< typeof UnforwardedSelectControl >;
 
 export default SelectControl;

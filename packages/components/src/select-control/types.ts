@@ -9,7 +9,7 @@ import type { ChangeEvent, FocusEvent, ReactNode } from 'react';
 import type { InputBaseProps } from '../input-control/types';
 import type { BaseControlProps } from '../base-control/types';
 
-type SelectControlBaseProps = Pick<
+type SelectControlBaseProps< T extends string > = Pick<
 	InputBaseProps,
 	| '__next36pxDefaultSize'
 	| '__next40pxDefaultSize'
@@ -24,7 +24,7 @@ type SelectControlBaseProps = Pick<
 	Pick< BaseControlProps, 'help' | '__nextHasNoMarginBottom' > & {
 		onBlur?: ( event: FocusEvent< HTMLSelectElement > ) => void;
 		onFocus?: ( event: FocusEvent< HTMLSelectElement > ) => void;
-		options?: {
+		options?: readonly {
 			/**
 			 * The label to be shown to the user.
 			 */
@@ -33,7 +33,7 @@ type SelectControlBaseProps = Pick<
 			 * The internal value used to choose the selected value.
 			 * This is also the value passed to `onChange` when the option is selected.
 			 */
-			value: string;
+			value: T;
 			id?: string;
 			/**
 			 * Whether or not the option should have the disabled attribute.
@@ -61,50 +61,52 @@ type SelectControlBaseProps = Pick<
 		variant?: 'default' | 'minimal';
 	};
 
-export type SelectControlSingleSelectionProps = SelectControlBaseProps & {
-	/**
-	 * If this property is added, multiple values can be selected. The `value` passed should be an array.
-	 *
-	 * In most cases, it is preferable to use the `FormTokenField` or `CheckboxControl` components instead.
-	 *
-	 * @default false
-	 */
-	multiple?: false;
-	value?: string;
-	/**
-	 * A function that receives the value of the new option that is being selected as input.
-	 *
-	 * If `multiple` is `true`, the value received is an array of the selected value.
-	 * Otherwise, the value received is a single value with the new selected value.
-	 */
-	onChange?: (
-		value: string,
-		extra?: { event?: ChangeEvent< HTMLSelectElement > }
-	) => void;
-};
+export type SelectControlSingleSelectionProps< T extends string = string > =
+	SelectControlBaseProps< T > & {
+		/**
+		 * If this property is added, multiple values can be selected. The `value` passed should be an array.
+		 *
+		 * In most cases, it is preferable to use the `FormTokenField` or `CheckboxControl` components instead.
+		 *
+		 * @default false
+		 */
+		multiple?: false;
+		value?: NoInfer< T >;
+		/**
+		 * A function that receives the value of the new option that is being selected as input.
+		 *
+		 * If `multiple` is `true`, the value received is an array of the selected value.
+		 * Otherwise, the value received is a single value with the new selected value.
+		 */
+		onChange?: (
+			value: T,
+			extra?: { event?: ChangeEvent< HTMLSelectElement > }
+		) => void;
+	};
 
-export type SelectControlMultipleSelectionProps = SelectControlBaseProps & {
-	/**
-	 * If this property is added, multiple values can be selected. The `value` passed should be an array.
-	 *
-	 * In most cases, it is preferable to use the `FormTokenField` or `CheckboxControl` components instead.
-	 *
-	 * @default false
-	 */
-	multiple: true;
-	value?: string[];
-	/**
-	 * A function that receives the value of the new option that is being selected as input.
-	 *
-	 * If `multiple` is `true`, the value received is an array of the selected value.
-	 * Otherwise, the value received is a single value with the new selected value.
-	 */
-	onChange?: (
-		value: string[],
-		extra?: { event?: ChangeEvent< HTMLSelectElement > }
-	) => void;
-};
+export type SelectControlMultipleSelectionProps< T extends string > =
+	SelectControlBaseProps< T > & {
+		/**
+		 * If this property is added, multiple values can be selected. The `value` passed should be an array.
+		 *
+		 * In most cases, it is preferable to use the `FormTokenField` or `CheckboxControl` components instead.
+		 *
+		 * @default false
+		 */
+		multiple: true;
+		value?: NoInfer< T >[];
+		/**
+		 * A function that receives the value of the new option that is being selected as input.
+		 *
+		 * If `multiple` is `true`, the value received is an array of the selected value.
+		 * Otherwise, the value received is a single value with the new selected value.
+		 */
+		onChange?: (
+			value: T[],
+			extra?: { event?: ChangeEvent< HTMLSelectElement > }
+		) => void;
+	};
 
-export type SelectControlProps =
-	| SelectControlSingleSelectionProps
-	| SelectControlMultipleSelectionProps;
+export type SelectControlProps< T extends string = string > =
+	| SelectControlSingleSelectionProps< T >
+	| SelectControlMultipleSelectionProps< T >;
