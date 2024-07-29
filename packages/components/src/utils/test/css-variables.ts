@@ -95,4 +95,22 @@ describe( 'replaceCSSVariablesInString', () => {
 			)
 		).toEqual( 'linear-gradient(135deg,red 0%,pink 100%)' );
 	} );
+
+	it( 'should work with non-color values', () => {
+		expect(
+			replaceCSSVariablesInString( 'font-size: var(--font-size, 16px);', {
+				'--font-size': '20px',
+			} )
+		).toEqual( 'font-size: 20px;' );
+
+		expect(
+			replaceCSSVariablesInString(
+				'linear-gradient(var(--deg), var(--color) 0%, pink 100%)',
+				{
+					'--deg': '135deg',
+					'--color': 'red',
+				}
+			)
+		).toEqual( 'linear-gradient(135deg, red 0%, pink 100%)' );
+	} );
 } );
