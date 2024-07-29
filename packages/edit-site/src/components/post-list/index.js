@@ -200,7 +200,7 @@ export default function PostList( { postType } ) {
 	}, [ view ] );
 	const {
 		records,
-		isResolving: isLoadingMainEntities,
+		isResolving: isLoadingData,
 		totalItems,
 		totalPages,
 	} = useEntityRecordsWithPermissions( 'postType', postType, queryArgs );
@@ -295,7 +295,7 @@ export default function PostList( { postType } ) {
 				fields={ fields }
 				actions={ actions }
 				data={ records || EMPTY_ARRAY }
-				isLoading={ isLoadingMainEntities || isLoadingFields }
+				isLoading={ isLoadingData || isLoadingFields }
 				view={ view }
 				onChangeView={ setView }
 				selection={ selection }
