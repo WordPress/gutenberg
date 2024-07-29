@@ -56,7 +56,5 @@ export const privateApis = ( lock ): any => {
 	throw new Error( 'Forbidden access.' );
 };
 
-document.addEventListener( 'DOMContentLoaded', async () => {
-	registerDirectives();
-	await init();
-} );
+registerDirectives();
+init();
