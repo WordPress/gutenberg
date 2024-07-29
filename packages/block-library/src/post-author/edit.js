@@ -21,6 +21,8 @@ import {
 	PanelBody,
 	SelectControl,
 	ToggleControl,
+	__experimentalText as Text,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -32,7 +34,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { migrateToRecommendedBlocks } from './utils';
 import { unlock } from '../lock-unlock';
 
-const { BlockInfo } = unlock( blockEditorPrivateApis );
+const { InspectorControlsLastItem } = unlock( blockEditorPrivateApis );
 
 const minimumUsersForCombobox = 25;
 
@@ -115,17 +117,6 @@ function PostAuthorEdit( {
 
 	return (
 		<>
-			<BlockInfo>
-				<div className="wp-block-post-author__transform-button">
-					<Button
-						variant="primary"
-						onClick={ transformBlock }
-						__next40pxDefaultSize
-					>
-						{ __( 'Migrate block' ) }
-					</Button>
-				</div>
-			</BlockInfo>
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					{ showAuthorControl &&
@@ -196,6 +187,26 @@ function PostAuthorEdit( {
 					) }
 				</PanelBody>
 			</InspectorControls>
+			<InspectorControlsLastItem>
+				<VStack
+					className="wp-block-post-author__transform"
+					alignment="left"
+					spacing={ 4 }
+				>
+					<Text as="p">
+						{ __(
+							'This block is no longer supported. Please migrate to the Author Name, Avatar, and Biography blocks to design youor content as needed.'
+						) }
+					</Text>
+					<Button
+						variant="primary"
+						onClick={ transformBlock }
+						__next40pxDefaultSize
+					>
+						{ __( 'Migrate' ) }
+					</Button>
+				</VStack>
+			</InspectorControlsLastItem>
 
 			<BlockControls group="block">
 				<AlignmentControl

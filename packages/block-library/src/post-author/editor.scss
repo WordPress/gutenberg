@@ -1,3 +1,6 @@
-.wp-block-post-author__transform-button {
-	padding: 0 $grid-unit-20 $grid-unit-20 52px;
+.wp-block-post-author__transform {
+	background: $gray-100;
+	border-radius: $radius-block-ui;
+	margin: $grid-unit-20;
+	padding: $grid-unit-20;
 }

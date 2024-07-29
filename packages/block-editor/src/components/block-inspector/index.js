@@ -27,6 +27,7 @@ import AdvancedControls from '../inspector-controls-tabs/advanced-controls-panel
 import PositionControls from '../inspector-controls-tabs/position-controls-panel';
 import useBlockInspectorAnimationSettings from './useBlockInspectorAnimationSettings';
 import BlockInfo from '../block-info-slot-fill';
+import InspectorControlsLastItem from '../inspector-controls-last-item-slot-fill';
 import BlockQuickNavigation from '../block-quick-navigation';
 import { useBorderPanelLabel } from '../../hooks/border';
 
@@ -266,12 +267,15 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 			<BlockVariationTransforms blockClientId={ clientId } />
 			<BlockInfo.Slot />
 			{ showTabs && (
-				<InspectorControlsTabs
-					hasBlockStyles={ hasBlockStyles }
-					clientId={ clientId }
-					blockName={ blockName }
-					tabs={ availableTabs }
-				/>
+				<>
+					<InspectorControlsTabs
+						hasBlockStyles={ hasBlockStyles }
+						clientId={ clientId }
+						blockName={ blockName }
+						tabs={ availableTabs }
+					/>
+					<InspectorControlsLastItem.Slot />
+				</>
 			) }
 			{ ! showTabs && (
 				<>
@@ -310,6 +314,7 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 					<div>
 						<AdvancedControls />
 					</div>
+					<InspectorControlsLastItem.Slot />
 				</>
 			) }
 			<SkipToSelectedBlock key="back" />
