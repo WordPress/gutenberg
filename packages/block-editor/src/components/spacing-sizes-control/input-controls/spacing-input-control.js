@@ -266,6 +266,8 @@ export default function SpacingInputControl( {
 						onChange={ handleCustomValueSliderChange }
 						className="spacing-sizes-control__custom-value-range"
 						__nextHasNoMarginBottom
+						label={ ariaLabel }
+						hideLabelFromVision
 					/>
 				</>
 			) }
