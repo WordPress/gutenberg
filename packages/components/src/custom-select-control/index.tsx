@@ -16,13 +16,13 @@ import { __, sprintf } from '@wordpress/i18n';
 import _CustomSelect from '../custom-select-control-v2/custom-select';
 import CustomSelectItem from '../custom-select-control-v2/item';
 import * as Styled from '../custom-select-control-v2/styles';
-import type { CustomSelectProps } from './types';
+import type { CustomSelectProps, CustomSelectOption } from './types';
 import { VisuallyHidden } from '../visually-hidden';
 
-function useDeprecatedProps( {
+function useDeprecatedProps< T extends CustomSelectOption >( {
 	__experimentalShowSelectedHint,
 	...otherProps
-}: CustomSelectProps ) {
+}: CustomSelectProps< T > ) {
 	return {
 		showSelectedHint: __experimentalShowSelectedHint,
 		...otherProps,
@@ -35,7 +35,7 @@ function useDeprecatedProps( {
 function applyOptionDeprecations( {
 	__experimentalHint,
 	...rest
-}: CustomSelectProps[ 'options' ][ number ] ) {
+}: CustomSelectOption ) {
 	return {
 		hint: __experimentalHint,
 		...rest,
@@ -51,7 +51,9 @@ function getDescribedBy( currentValue: string, describedBy?: string ) {
 	return sprintf( __( 'Currently selected: %s' ), currentValue );
 }
 
-function CustomSelectControl( props: CustomSelectProps ) {
+function CustomSelectControl< T extends CustomSelectOption >(
+	props: CustomSelectProps< T >
+) {
 	const {
 		__next40pxDefaultSize = false,
 		describedBy,

@@ -10,6 +10,7 @@
 ### Internal
 
 -   `DropdownMenuV2`: break menu item help text on multiple lines for better truncation. ([#63916](https://github.com/WordPress/gutenberg/pull/63916)).
+-   `CustomSelectControl`: Support generic props type ([#63985](https://github.com/WordPress/gutenberg/pull/63985)).
 
 ## 28.4.0 (2024-07-24)
 
