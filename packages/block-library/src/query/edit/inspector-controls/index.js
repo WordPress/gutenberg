@@ -147,6 +147,7 @@ export default function QueryInspectorControls( props ) {
 					{ showInheritControl && (
 						<ToggleGroupControl
 							__next40pxDefaultSize
+							__nextHasNoMarginBottom
 							label={ __( 'Query type' ) }
 							isBlock
 							onChange={ ( value ) => {
