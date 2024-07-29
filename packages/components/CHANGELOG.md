@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `ColorPalette`: Remove extra bottom margin when `CircularOptionPicker` is unneeded ([#63961](https://github.com/WordPress/gutenberg/pull/63961)).
+-   `CustomSelectControl`: Restore `describedBy` functionality ([#63957](https://github.com/WordPress/gutenberg/pull/63957)).
+
 ### Internal
 
 -   `DropdownMenuV2`: break menu item help text on multiple lines for better truncation. ([#63916](https://github.com/WordPress/gutenberg/pull/63916)).

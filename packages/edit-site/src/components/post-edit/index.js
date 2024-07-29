@@ -7,7 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { DataForm } from '@wordpress/dataviews';
+import { DataForm, isItemValid } from '@wordpress/dataviews';
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { Button } from '@wordpress/components';
@@ -42,7 +42,7 @@ function PostEditForm( { postType, postId } ) {
 	const { saveEntityRecord } = useDispatch( coreDataStore );
 	const { fields } = usePostFields();
 	const form = {
-		visibleFields: [ 'title' ],
+		visibleFields: [ 'title', 'author' ],
 	};
 	const [ edits, setEdits ] = useState( {} );
 	const itemWithEdits = useMemo( () => {
@@ -53,6 +53,11 @@ function PostEditForm( { postType, postId } ) {
 	}, [ initialEdits, edits ] );
 	const onSubmit = async ( event ) => {
 		event.preventDefault();
+
+		if ( ! isItemValid( itemWithEdits, fields, form ) ) {
+			return;
+		}
+
 		const { getEntityRecord } = registry.resolveSelect( coreDataStore );
 		for ( const id of ids ) {
 			const item = await getEntityRecord( 'postType', postType, id );
@@ -64,6 +69,7 @@ function PostEditForm( { postType, postId } ) {
 		setEdits( {} );
 	};
 
+	const isUpdateDisabled = ! isItemValid( itemWithEdits, fields, form );
 	return (
 		<form onSubmit={ onSubmit }>
 			<DataForm
@@ -72,7 +78,12 @@ function PostEditForm( { postType, postId } ) {
 				form={ form }
 				onChange={ setEdits }
 			/>
-			<Button variant="primary" type="submit">
+			<Button
+				variant="primary"
+				type="submit"
+				accessibleWhenDisabled
+				disabled={ isUpdateDisabled }
+			>
 				{ __( 'Update' ) }
 			</Button>
 		</form>

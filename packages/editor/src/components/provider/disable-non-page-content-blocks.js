@@ -45,8 +45,8 @@ export default function DisableNonPageContentBlocks() {
 	);
 	const disabledIds = useSelect( ( select ) => {
 		const { getBlocksByName, getBlockOrder } = select( blockEditorStore );
-		return getBlocksByName( [ 'core/template-part' ] ).flatMap(
-			( clientId ) => getBlockOrder( clientId )
+		return getBlocksByName( 'core/template-part' ).flatMap( ( clientId ) =>
+			getBlockOrder( clientId )
 		);
 	}, [] );
 
