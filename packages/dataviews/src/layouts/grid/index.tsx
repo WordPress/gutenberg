@@ -124,38 +124,49 @@ function GridItem< Item >( {
 			{ !! visibleFields?.length && (
 				<VStack className="dataviews-view-grid__fields" spacing={ 1 }>
 					{ visibleFields.map( ( field ) => {
-						return (
-							<Flex
-								className={ clsx(
-									'dataviews-view-grid__field',
-									columnFields?.includes( field.id )
-										? 'is-column'
-										: 'is-row'
-								) }
-								key={ field.id }
-								gap={ 1 }
-								justify="flex-start"
-								expanded
-								style={ { height: 'auto' } }
-								direction={
-									columnFields?.includes( field.id )
-										? 'column'
-										: 'row'
-								}
-							>
-								<>
-									<FlexItem className="dataviews-view-grid__field-name">
-										{ field.label }
-									</FlexItem>
-									<FlexItem
-										className="dataviews-view-grid__field-value"
-										style={ { maxHeight: 'none' } }
-									>
-										<field.render item={ item } />
-									</FlexItem>
-								</>
-							</Flex>
-						);
+						const isDescriptionField = field.id === 'description';
+						const hasDescription =
+							isDescriptionField &&
+							( item as { description?: string } ).description;
+						if (
+							field.id === 'author' ||
+							! isDescriptionField ||
+							hasDescription
+						) {
+							return (
+								<Flex
+									className={ clsx(
+										'dataviews-view-grid__field',
+										columnFields?.includes( field.id )
+											? 'is-column'
+											: 'is-row'
+									) }
+									key={ field.id }
+									gap={ 1 }
+									justify="flex-start"
+									expanded
+									style={ { height: 'auto' } }
+									direction={
+										columnFields?.includes( field.id )
+											? 'column'
+											: 'row'
+									}
+								>
+									<>
+										<FlexItem className="dataviews-view-grid__field-name">
+											{ field.label }
+										</FlexItem>
+										<FlexItem
+											className="dataviews-view-grid__field-value"
+											style={ { maxHeight: 'none' } }
+										>
+											<field.render item={ item } />
+										</FlexItem>
+									</>
+								</Flex>
+							);
+						}
+						return null;
 					} ) }
 				</VStack>
 			) }
