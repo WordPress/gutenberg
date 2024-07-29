@@ -1,12 +1,12 @@
 /**
  * Internal dependencies
  */
-import type { Size, ResizeDirection } from './types';
+import type { ResizeDirection } from './types';
 import {
 	rotatePoint,
 	degreeToRadian,
-	getFurthestVector,
 	calculateRotatedBounds,
+	getMinScale,
 } from './math';
 
 export type State = {
@@ -71,7 +71,11 @@ type Action =
 	// Resize the cropper window by a delta size in a direction.
 	| { type: 'MOVE_WINDOW'; x: number; y: number }
 	// Resize the cropper window by a delta size in a direction.
-	| { type: 'RESIZE_WINDOW'; direction: ResizeDirection; delta: Size }
+	| {
+			type: 'RESIZE_WINDOW';
+			direction: ResizeDirection;
+			delta: { width: number; height: number };
+	  }
 	// Reset the state to the initial state.
 	| { type: 'RESET' };
 
@@ -118,23 +122,20 @@ function imageCropperReducer( state: State, action: Action ) {
 
 	switch ( action.type ) {
 		case 'ZOOM': {
-			const { x, y } = getFurthestVector(
+			const minScale = getMinScale(
+				radian,
 				image.width,
 				image.height,
-				radian,
-				{ width: cropper.width, height: cropper.height },
-				{ x: image.x, y: image.y }
+				cropper.width,
+				cropper.height,
+				image.x,
+				image.y
 			);
-
-			const widthScale =
-				( Math.abs( x ) * 2 + image.width ) / image.width;
-			const heightScale =
-				( Math.abs( y ) * 2 + image.height ) / image.height;
-			const minScale = Math.max( widthScale, heightScale );
 			const nextScale = Math.min(
 				Math.max( action.scale, minScale ),
 				10
 			);
+
 			return {
 				...state,
 				transforms: {
@@ -148,23 +149,20 @@ function imageCropperReducer( state: State, action: Action ) {
 			};
 		}
 		case 'ZOOM_BY': {
-			const { x, y } = getFurthestVector(
+			const minScale = getMinScale(
+				radian,
 				image.width,
 				image.height,
-				radian,
-				{ width: cropper.width, height: cropper.height },
-				{ x: image.x, y: image.y }
+				cropper.width,
+				cropper.height,
+				image.x,
+				image.y
 			);
-
-			const widthScale =
-				( Math.abs( x ) * 2 + image.width ) / image.width;
-			const heightScale =
-				( Math.abs( y ) * 2 + image.height ) / image.height;
-			const minScale = Math.max( widthScale, heightScale );
 			const nextScale = Math.min(
 				Math.max( absScale + action.deltaScale, minScale ),
 				10
 			);
+
 			return {
 				...state,
 				transforms: {
@@ -205,19 +203,18 @@ function imageCropperReducer( state: State, action: Action ) {
 			const nextRadian = degreeToRadian( action.angle + rotations * 90 );
 			const scaledWidth = image.width * absScale;
 			const scaledHeight = image.height * absScale;
-			const { x, y } = getFurthestVector(
-				scaledWidth,
-				scaledHeight,
-				nextRadian,
-				{ width: cropper.width, height: cropper.height },
-				{ x: image.x, y: image.y }
-			);
-			const widthScale =
-				( Math.abs( x ) * 2 + scaledWidth ) / image.width;
-			const heightScale =
-				( Math.abs( y ) * 2 + scaledHeight ) / image.height;
-			const minScale = Math.max( widthScale, heightScale );
-			const nextScale = Math.max( absScale, minScale );
+			const minScale =
+				getMinScale(
+					nextRadian,
+					scaledWidth,
+					scaledHeight,
+					cropper.width,
+					cropper.height,
+					image.x,
+					image.y
+				) * absScale;
+			const nextScale = Math.min( Math.max( absScale, minScale ), 10 );
+
 			return {
 				...state,
 				transforms: {
