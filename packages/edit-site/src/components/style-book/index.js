@@ -136,24 +136,28 @@ function getExamples() {
 		category: 'text',
 		blocks: [
 			createBlock( 'core/heading', {
-				content: __( 'Code Is Poetry' ),
+				content: __( 'Heading 1' ),
 				level: 1,
 			} ),
 			createBlock( 'core/heading', {
-				content: __( 'Code Is Poetry' ),
+				content: __( 'Heading 2' ),
 				level: 2,
 			} ),
 			createBlock( 'core/heading', {
-				content: __( 'Code Is Poetry' ),
+				content: __( 'Heading 3' ),
 				level: 3,
 			} ),
 			createBlock( 'core/heading', {
-				content: __( 'Code Is Poetry' ),
+				content: __( 'Heading 4' ),
 				level: 4,
 			} ),
 			createBlock( 'core/heading', {
-				content: __( 'Code Is Poetry' ),
+				content: __( 'Heading 5' ),
 				level: 5,
+			} ),
+			createBlock( 'core/heading', {
+				content: __( 'Heading 6' ),
+				level: 6,
 			} ),
 		],
 	};
