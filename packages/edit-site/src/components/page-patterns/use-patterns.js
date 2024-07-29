@@ -26,9 +26,8 @@ const EMPTY_PATTERN_LIST = [];
 
 const selectTemplateParts = createSelector(
 	( select, categoryId, search = '' ) => {
-		const { getEntityRecords, isResolving: isResolvingSelector } = unlock(
-			select( coreStore )
-		);
+		const { getEntityRecords, isResolving: isResolvingSelector } =
+			select( coreStore );
 		const { __experimentalGetDefaultTemplatePartAreas } =
 			select( editorStore );
 		const query = { per_page: -1 };
