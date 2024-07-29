@@ -83,7 +83,7 @@ function CropWindow() {
 			} }
 			onResize={ ( _event, direction, _element, delta ) => {
 				if ( delta.width === 0 && delta.height === 0 ) {
-					if ( scale === 1 ) {
+					if ( Math.abs( scale.x ) === 1 ) {
 						return;
 					}
 					// let x = 0;
@@ -152,7 +152,7 @@ const Cropper = forwardRef< HTMLDivElement >( ( {}, ref ) => {
 	const {
 		state: {
 			image,
-			transforms: { angle, rotations, scale, flipped },
+			transforms: { angle, rotations, scale },
 			isDragging,
 		},
 		src,
@@ -173,10 +173,8 @@ const Cropper = forwardRef< HTMLDivElement >( ( {}, ref ) => {
 		<Container
 			animate={ {
 				'--wp-cropper-angle': `${ degree }deg`,
-				'--wp-cropper-scale-x':
-					scale * ( flipped && ! isAxisSwapped ? -1 : 1 ),
-				'--wp-cropper-scale-y':
-					scale * ( flipped && isAxisSwapped ? -1 : 1 ),
+				'--wp-cropper-scale-x': scale.x,
+				'--wp-cropper-scale-y': scale.y,
 				...( isDragging
 					? {}
 					: {

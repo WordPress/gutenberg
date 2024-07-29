@@ -28,9 +28,7 @@ export type State = {
 		// The number of 90-degree rotations clockwise.
 		rotations: number;
 		// The image scale.
-		scale: number;
-		// Whether the image is flipped horizontally.
-		flipped: boolean;
+		scale: { x: number; y: number };
 	};
 	// The cropper window dimensions.
 	cropper: {
@@ -90,8 +88,7 @@ function createInitialState( {
 		transforms: {
 			angle: 0,
 			rotations: 0,
-			scale: 1,
-			flipped: false,
+			scale: { x: 1, y: 1 },
 		},
 		cropper: {
 			width,
@@ -107,10 +104,12 @@ function createInitialState( {
 function imageCropperReducer( state: State, action: Action ) {
 	const {
 		image,
-		transforms: { angle, rotations, scale, flipped },
+		transforms: { angle, rotations, scale },
 		cropper,
 	} = state;
 	const radian = degreeToRadian( angle + ( rotations % 4 ) * 90 );
+	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+	const absScale = Math.abs( scale.x );
 
 	switch ( action.type ) {
 		case 'ZOOM': {
@@ -127,11 +126,18 @@ function imageCropperReducer( state: State, action: Action ) {
 			const heightScale =
 				( Math.abs( y ) * 2 + image.height ) / image.height;
 			const minScale = Math.max( widthScale, heightScale );
+			const nextScale = Math.min(
+				Math.max( action.scale, minScale ),
+				10
+			);
 			return {
 				...state,
 				transforms: {
 					...state.transforms,
-					scale: Math.min( Math.max( action.scale, minScale ), 10 ),
+					scale: {
+						x: nextScale * Math.sign( scale.x ),
+						y: nextScale * Math.sign( scale.y ),
+					},
 				},
 			};
 		}
@@ -149,18 +155,23 @@ function imageCropperReducer( state: State, action: Action ) {
 			const heightScale =
 				( Math.abs( y ) * 2 + image.height ) / image.height;
 			const minScale = Math.max( widthScale, heightScale );
+			const nextScale = Math.min(
+				Math.max( absScale + action.deltaScale, minScale ),
+				10
+			);
 			return {
 				...state,
 				transforms: {
 					...state.transforms,
-					scale: Math.min(
-						Math.max( scale + action.deltaScale, minScale ),
-						10
-					),
+					scale: {
+						x: nextScale * Math.sign( scale.x ),
+						y: nextScale * Math.sign( scale.y ),
+					},
 				},
 			};
 		}
 		case 'FLIP': {
+			const isAxisSwapped = rotations % 2 !== 0;
 			return {
 				...state,
 				image: {
@@ -170,14 +181,17 @@ function imageCropperReducer( state: State, action: Action ) {
 				transforms: {
 					...state.transforms,
 					angle: -angle,
-					flipped: ! flipped,
+					scale: {
+						x: scale.x * ( isAxisSwapped ? 1 : -1 ),
+						y: scale.y * ( isAxisSwapped ? -1 : 1 ),
+					},
 				},
 			};
 		}
 		case 'ROTATE': {
 			const nextRadian = degreeToRadian( action.angle + rotations * 90 );
-			const scaledWidth = image.width * scale;
-			const scaledHeight = image.height * scale;
+			const scaledWidth = image.width * absScale;
+			const scaledHeight = image.height * absScale;
 			const { x, y } = getFurthestVector(
 				scaledWidth,
 				scaledHeight,
@@ -190,12 +204,16 @@ function imageCropperReducer( state: State, action: Action ) {
 			const heightScale =
 				( Math.abs( y ) * 2 + scaledHeight ) / image.height;
 			const minScale = Math.max( widthScale, heightScale );
+			const nextScale = Math.max( absScale, minScale );
 			return {
 				...state,
 				transforms: {
 					...state.transforms,
 					angle: action.angle,
-					scale: Math.max( scale, minScale ),
+					scale: {
+						x: nextScale * Math.sign( scale.x ),
+						y: nextScale * Math.sign( scale.y ),
+					},
 				},
 			};
 		}
@@ -231,8 +249,8 @@ function imageCropperReducer( state: State, action: Action ) {
 			// These boundaries ensure the cropper stays within the image.
 			const { minX, maxX, minY, maxY } = calculateRotatedBounds(
 				radian,
-				image.width * scale,
-				image.height * scale,
+				image.width * absScale,
+				image.height * absScale,
 				cropper.width,
 				cropper.height
 			);
@@ -311,6 +329,7 @@ function imageCropperReducer( state: State, action: Action ) {
 			const widthScale = imageDimensions.width / newSize.width;
 			const heightScale = imageDimensions.height / newSize.height;
 			const windowScale = Math.min( widthScale, heightScale );
+			const nextScale = absScale * windowScale;
 			const scaledSize = {
 				width: imageDimensions.width,
 				height: imageDimensions.height,
@@ -333,7 +352,10 @@ function imageCropperReducer( state: State, action: Action ) {
 				},
 				transforms: {
 					...state.transforms,
-					scale: scale * windowScale,
+					scale: {
+						x: nextScale * Math.sign( scale.x ),
+						y: nextScale * Math.sign( scale.y ),
+					},
 				},
 				cropper: {
 					...state.cropper,

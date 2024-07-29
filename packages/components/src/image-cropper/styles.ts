@@ -25,7 +25,7 @@ export const Resizable = styled( ResizableBox )`
 	translate: var( --wp-cropper-window-x ) var( --wp-cropper-window-y );
 	box-shadow: 0 0 0 100vmax rgba( 0, 0, 0, 0.5 );
 	will-change: translate;
-	contain: layout size style;
+	contain: layout, size, style;
 
 	&:active {
 		&::after,
@@ -79,6 +79,6 @@ export const Img = styled( motion.img )`
 	rotate: var( --wp-cropper-angle );
 	scale: var( --wp-cropper-scale-x ) var( --wp-cropper-scale-y );
 	translate: var( --wp-cropper-image-x ) var( --wp-cropper-image-y );
-	will-change: rotate scale translate;
+	will-change: rotate, scale, translate;
 	contain: strict;
 `;
