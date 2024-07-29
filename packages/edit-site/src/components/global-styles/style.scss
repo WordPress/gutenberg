@@ -135,16 +135,13 @@
 	}
 }
 
-.edit-site-global-styles__shadow-editor-panel {
+.edit-site-global-styles__shadow-editor__dropdown-content {
 	width: 280px;
-	padding: $grid-unit-20;
+}
+
+.edit-site-global-styles__shadow-editor-panel {
 	// because tooltip of the range control is too close to the edge and creates overflow
 	margin-bottom: $grid-unit-05;
-
-	& .edit-site-global-styles__shadow-editor-color-palette {
-		// color palette adds empty .components-circular-option-picker
-		margin-bottom: -1 * $grid-unit-05;
-	}
 }
 
 .edit-site-global-styles__shadow-editor__dropdown {

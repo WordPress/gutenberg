@@ -335,26 +335,28 @@ function UnforwardedColorPalette(
 					) }
 				/>
 			) }
-			<CircularOptionPicker
-				{ ...metaProps }
-				actions={ actions }
-				options={
-					hasMultipleColorOrigins ? (
-						<MultiplePalettes
-							{ ...paletteCommonProps }
-							headingLevel={ headingLevel }
-							colors={ colors as PaletteObject[] }
-							value={ value }
-						/>
-					) : (
-						<SinglePalette
-							{ ...paletteCommonProps }
-							colors={ colors as ColorObject[] }
-							value={ value }
-						/>
-					)
-				}
-			/>
+			{ ( colors.length > 0 || actions ) && (
+				<CircularOptionPicker
+					{ ...metaProps }
+					actions={ actions }
+					options={
+						hasMultipleColorOrigins ? (
+							<MultiplePalettes
+								{ ...paletteCommonProps }
+								headingLevel={ headingLevel }
+								colors={ colors as PaletteObject[] }
+								value={ value }
+							/>
+						) : (
+							<SinglePalette
+								{ ...paletteCommonProps }
+								colors={ colors as ColorObject[] }
+								value={ value }
+							/>
+						)
+					}
+				/>
+			) }
 		</VStack>
 	);
 }

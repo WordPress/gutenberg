@@ -27,6 +27,13 @@ export function isItemValid< Item >(
 			return false;
 		}
 
+		if ( field.elements ) {
+			const validValues = field.elements.map( ( f ) => f.value );
+			if ( ! validValues.includes( Number( value ) ) ) {
+				return false;
+			}
+		}
+
 		// Nothing to validate.
 		return true;
 	} );
