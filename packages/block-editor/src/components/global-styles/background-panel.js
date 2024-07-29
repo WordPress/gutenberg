@@ -577,6 +577,7 @@ function BackgroundSizeControls( {
 				) }
 			/>
 			<ToggleGroupControl
+				__nextHasNoMarginBottom
 				size="__unstable-large"
 				label={ __( 'Size' ) }
 				value={ currentValueForToggle }
