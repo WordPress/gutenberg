@@ -22,6 +22,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { decodeEntities } from '@wordpress/html-entities';
+import { Warning } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -185,6 +186,11 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 			<GlobalStylesRenderer />
 			<EditorKeyboardShortcutsRegister />
 			{ isEditMode && <BlockKeyboardShortcuts /> }
+			{ ! isReady && ! editedPostType && (
+				<Warning className="editor-error-boundary">
+					{ __( 'The template can not be previewed.' ) }
+				</Warning>
+			) }
 			{ ! isReady ? <CanvasLoader id={ loadingProgressId } /> : null }
 			{ isEditMode && <WelcomeGuide /> }
 			{ isReady && (
