@@ -33,7 +33,7 @@ add_filter( 'register_post_type_args', 'wp_api_template_access_controller', 10, 
 /**
  * Adds the post classes to the REST API response.
  *
- * @param  array $post  The response object data.
+ * @param  array $post The response object data.
  *
  * @return array
  */
