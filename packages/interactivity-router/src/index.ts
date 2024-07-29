@@ -104,6 +104,7 @@ const regionsToVdom: RegionsToVdom = async ( dom, { vdom } = {} ) => {
 	}
 	const title = dom.querySelector( 'title' )?.innerText;
 	const initialData = parseServerData( dom );
+	populateServerData( initialData );
 	return { regions, head, title, initialData };
 };
 
