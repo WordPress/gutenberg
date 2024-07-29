@@ -3,16 +3,15 @@
  */
 import styled from '@emotion/styled';
 import { motion } from 'framer-motion';
-
+import type { ComponentProps } from 'react';
+/**
+ * WordPress dependencies
+ */
+import { forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
 import ResizableBox from '../resizable-box';
-
-export const PADDING = {
-	x: 30,
-	y: 30,
-};
 
 export const Draggable = styled.div`
 	position: absolute;
@@ -21,11 +20,36 @@ export const Draggable = styled.div`
 	touch-action: none;
 `;
 
-export const Resizable = styled( ResizableBox )`
+const MotionResizable = motion(
+	forwardRef< HTMLDivElement, ComponentProps< typeof ResizableBox > >(
+		( props, ref ) => {
+			const updateRef = ( element: HTMLDivElement | null ) => {
+				if ( typeof ref === 'function' ) {
+					ref( element );
+				} else if ( ref ) {
+					ref.current = element;
+				}
+			};
+
+			return (
+				<ResizableBox
+					{ ...props }
+					ref={ ( resizable ) => {
+						updateRef(
+							resizable?.resizable as HTMLDivElement | null
+						);
+					} }
+				/>
+			);
+		}
+	)
+);
+
+export const Resizable = styled( MotionResizable )`
 	translate: var( --wp-cropper-window-x ) var( --wp-cropper-window-y );
 	box-shadow: 0 0 0 100vmax rgba( 0, 0, 0, 0.5 );
 	will-change: translate;
-	contain: layout, size, style;
+	contain: layout size style;
 
 	&:active {
 		&::after,
@@ -67,7 +91,6 @@ export const Container = styled( motion.div )`
 	position: relative;
 	display: flex;
 	overflow: hidden;
-	padding: ${ PADDING.y }px ${ PADDING.x }px;
 	box-sizing: content-box;
 	contain: strict;
 `;

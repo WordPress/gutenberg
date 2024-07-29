@@ -6,22 +6,17 @@ import { animate } from 'framer-motion';
 /**
  * WordPress dependencies
  */
-import {
-	useState,
-	forwardRef,
-	useContext,
-	useRef,
-	useEffect,
-} from '@wordpress/element';
+import { forwardRef, useContext, useRef, useEffect } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { Resizable, Draggable, Container, Img, PADDING } from './styles';
+import { Resizable, Draggable, Container, Img } from './styles';
 import { ImageCropperContext } from './context';
 import { useImageCropper } from './hook';
 import type { Position } from './types';
 
 const RESIZING_THRESHOLDS: [ number, number ] = [ 10, 10 ]; // 10px.
+const MIN_PADDING = 20; // 20px;
 
 function CropWindow() {
 	const {
@@ -34,23 +29,24 @@ function CropWindow() {
 		refs: { cropperWindowRef },
 		dispatch,
 	} = useContext( ImageCropperContext );
-	const [ element, setElement ] = useState< HTMLDivElement >( null! );
+	const resizableElementRef = useRef< HTMLDivElement >( null! );
 	const initialMousePositionRef = useRef< Position >( { x: 0, y: 0 } );
 	const isAxisSwapped = rotations % 2 !== 0;
 
 	useEffect( () => {
-		if ( element ) {
-			animate( element, {
+		if ( resizableElementRef.current ) {
+			animate( resizableElementRef.current, {
 				'--wp-cropper-window-x': `${ cropper.x }px`,
 				'--wp-cropper-window-y': `${ cropper.y }px`,
 				width: `${ cropper.width }px`,
 				height: `${ cropper.height }px`,
 			} );
 		}
-	}, [ element, cropper.x, cropper.y, cropper.width, cropper.height ] );
+	}, [ cropper.x, cropper.y, cropper.width, cropper.height ] );
 
 	return (
 		<Resizable
+			layout="position"
 			size={ {
 				width: cropper.width,
 				height: cropper.height,
@@ -62,7 +58,7 @@ function CropWindow() {
 			grid={ isResizing ? undefined : RESIZING_THRESHOLDS }
 			onResizeStart={ ( event ) => {
 				// Set the temporary offset on resizing.
-				animate( element, {
+				animate( resizableElementRef.current, {
 					'--wp-cropper-window-x': `${ cropper.x }px`,
 					'--wp-cropper-window-y': `${ cropper.y }px`,
 				} ).complete();
@@ -124,7 +120,7 @@ function CropWindow() {
 					) {
 						y -= delta.height;
 					}
-					animate( element, {
+					animate( resizableElementRef.current, {
 						'--wp-cropper-window-x': `${ x }px`,
 						'--wp-cropper-window-y': `${ y }px`,
 						width: `${ cropper.width + delta.width }px`,
@@ -135,11 +131,7 @@ function CropWindow() {
 			onResizeStop={ ( _event, direction, _element, delta ) => {
 				dispatch( { type: 'RESIZE_WINDOW', direction, delta } );
 			} }
-			ref={ ( resizable ) => {
-				if ( resizable ) {
-					setElement( resizable.resizable as HTMLDivElement );
-				}
-			} }
+			ref={ resizableElementRef }
 		>
 			<Draggable
 				ref={ cropperWindowRef as RefObject< HTMLDivElement > }
@@ -161,13 +153,19 @@ const Cropper = forwardRef< HTMLDivElement >( ( {}, ref ) => {
 	} = useContext( ImageCropperContext );
 	const isAxisSwapped = rotations % 2 !== 0;
 	const degree = angle + rotations * 90;
+
+	const squareImageHorizontalOffset = ( image.width - image.height ) / 2;
+	const paddingY = Math.max(
+		MIN_PADDING + squareImageHorizontalOffset,
+		MIN_PADDING
+	);
+	const paddingX = Math.max(
+		MIN_PADDING - squareImageHorizontalOffset,
+		MIN_PADDING
+	);
 	const imageOffset = {
-		top: isAxisSwapped
-			? PADDING.y + ( image.width - image.height ) / 2
-			: PADDING.y,
-		left: isAxisSwapped
-			? PADDING.x + ( image.height - image.width ) / 2
-			: PADDING.x,
+		top: isAxisSwapped ? paddingX + squareImageHorizontalOffset : paddingY,
+		left: isAxisSwapped ? paddingY - squareImageHorizontalOffset : paddingX,
 	};
 
 	return (
@@ -194,6 +192,8 @@ const Cropper = forwardRef< HTMLDivElement >( ( {}, ref ) => {
 				'--wp-cropper-image-y': `${ image.y }px`,
 				'--wp-cropper-scale-x': scale.x,
 				'--wp-cropper-scale-y': scale.y,
+				paddingBlock: `${ isAxisSwapped ? paddingX : paddingY }px`,
+				paddingInline: `${ isAxisSwapped ? paddingY : paddingX }px`,
 			} }
 			ref={ ref }
 		>
