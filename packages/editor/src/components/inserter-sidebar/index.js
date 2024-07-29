@@ -24,13 +24,13 @@ export default function InserterSidebar() {
 	const {
 		blockSectionRootClientId,
 		inserterSidebarToggleRef,
-		insertionPoint,
+		blockInsertionPoint,
 		showMostUsedBlocks,
 		sidebarIsOpened,
 	} = useSelect( ( select ) => {
 		const {
 			getInserterSidebarToggleRef,
-			getInsertionPoint,
+			getBlockInsertionPoint,
 			isPublishSidebarOpened,
 		} = unlock( select( editorStore ) );
 		const { getBlockRootClientId, __unstableGetEditorMode, getSettings } =
@@ -48,7 +48,7 @@ export default function InserterSidebar() {
 		};
 		return {
 			inserterSidebarToggleRef: getInserterSidebarToggleRef(),
-			insertionPoint: getInsertionPoint(),
+			blockInsertionPoint: getBlockInsertionPoint(),
 			showMostUsedBlocks: get( 'core', 'mostUsedBlocks' ),
 			blockSectionRootClientId: getBlockSectionRootClientId(),
 			sidebarIsOpened: !! (
@@ -85,13 +85,15 @@ export default function InserterSidebar() {
 				showInserterHelpPanel
 				shouldFocusBlock={ isMobileViewport }
 				rootClientId={
-					blockSectionRootClientId ?? insertionPoint.rootClientId
+					blockSectionRootClientId ?? blockInsertionPoint.rootClientId
 				}
-				__experimentalInsertionIndex={ insertionPoint.insertionIndex }
-				onSelect={ insertionPoint.onSelect }
-				__experimentalInitialTab={ insertionPoint.tab }
-				__experimentalInitialCategory={ insertionPoint.category }
-				__experimentalFilterValue={ insertionPoint.filterValue }
+				__experimentalInsertionIndex={
+					blockInsertionPoint.insertionIndex
+				}
+				onSelect={ blockInsertionPoint.onSelect }
+				__experimentalInitialTab={ blockInsertionPoint.tab }
+				__experimentalInitialCategory={ blockInsertionPoint.category }
+				__experimentalFilterValue={ blockInsertionPoint.filterValue }
 				onPatternCategorySelection={
 					sidebarIsOpened
 						? () => disableComplementaryArea( 'core' )
