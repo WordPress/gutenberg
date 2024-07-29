@@ -84,7 +84,7 @@ export default {
 				context?.postId
 			).meta;
 
-		if ( ! metaFields ) {
+		if ( ! metaFields || ! Object.keys( metaFields ).length ) {
 			return null;
 		}
 

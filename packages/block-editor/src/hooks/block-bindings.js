@@ -291,6 +291,12 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 			}
 		}
 	);
+	// Remove empty sources.
+	Object.entries( fieldsList ).forEach( ( [ key, value ] ) => {
+		if ( ! Object.keys( value ).length ) {
+			delete fieldsList[ key ];
+		}
+	} );
 
 	// At this moment, the UI can be locked when there are no fields to connect to.
 	const readOnly = ! Object.keys( fieldsList ).length;
