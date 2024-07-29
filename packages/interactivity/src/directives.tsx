@@ -313,8 +313,6 @@ export default () => {
 								end: performance.now(),
 								detail: {
 									devtools: {
-										dataType: 'track-entry',
-										color: 'primary',
 										track: `IA: watch ${ entry.namespace }`,
 									},
 								},
@@ -349,8 +347,6 @@ export default () => {
 								end: performance.now(),
 								detail: {
 									devtools: {
-										dataType: 'track-entry',
-										color: 'primary',
 										track: `IA: init ${ entry.namespace }`,
 									},
 								},
@@ -400,8 +396,6 @@ export default () => {
 									end: performance.now(),
 									detail: {
 										devtools: {
-											dataType: 'track-entry',
-											color: 'primary',
 											track: `IA: on ${ entry.namespace }`,
 										},
 									},
