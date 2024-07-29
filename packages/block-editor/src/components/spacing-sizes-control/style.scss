@@ -32,11 +32,11 @@
 	}
 
 	.components-range-control__mark {
-		height: 4px;
-		width: 1.5px;
+		height: $grid-unit-05;
+		width: math.div($grid-unit-05, 2);
 		background-color: $white;
 		z-index: 1;
-		top: -4px;
+		top: -#{$grid-unit-05};
 	}
 
 	.components-range-control__marks {
