@@ -80,10 +80,10 @@ export const useImageCropper = ( {
 		ctx.rotate(
 			degreeToRadian(
 				cropperState.transforms.angle +
-					cropperState.transforms.turns * 90
+					cropperState.transforms.rotations * 90
 			)
 		);
-		const isAxisSwapped = cropperState.transforms.turns % 2 !== 0;
+		const isAxisSwapped = cropperState.transforms.rotations % 2 !== 0;
 		ctx.scale(
 			cropperState.transforms.scale *
 				( cropperState.transforms.flipped && ! isAxisSwapped ? -1 : 1 ),

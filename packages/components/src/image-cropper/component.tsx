@@ -2,10 +2,17 @@
  * External dependencies
  */
 import type { RefObject, ReactNode, MouseEvent, TouchEvent } from 'react';
+import { animate } from 'framer-motion';
 /**
  * WordPress dependencies
  */
-import { useState, forwardRef, useContext, useRef } from '@wordpress/element';
+import {
+	useState,
+	forwardRef,
+	useContext,
+	useRef,
+	useEffect,
+} from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -20,16 +27,27 @@ function CropWindow() {
 	const {
 		state: {
 			image,
-			transforms: { turns, scale },
+			transforms: { rotations, scale },
 			cropper,
 			isResizing,
 		},
 		refs: { cropperWindowRef },
 		dispatch,
 	} = useContext( ImageCropperContext );
-	const [ element, setElement ] = useState< HTMLDivElement >();
+	const [ element, setElement ] = useState< HTMLDivElement >( null! );
 	const initialMousePositionRef = useRef< Position >( { x: 0, y: 0 } );
-	const isAxisSwapped = turns % 2 !== 0;
+	const isAxisSwapped = rotations % 2 !== 0;
+
+	useEffect( () => {
+		if ( element ) {
+			animate( element, {
+				'--wp-cropper-window-x': `${ cropper.x }px`,
+				'--wp-cropper-window-y': `${ cropper.y }px`,
+				width: `${ cropper.width }px`,
+				height: `${ cropper.height }px`,
+			} );
+		}
+	}, [ element, cropper.x, cropper.y, cropper.width, cropper.height ] );
 
 	return (
 		<Resizable
@@ -44,14 +62,10 @@ function CropWindow() {
 			grid={ isResizing ? undefined : RESIZING_THRESHOLDS }
 			onResizeStart={ ( event ) => {
 				// Set the temporary offset on resizing.
-				element!.style.setProperty(
-					'--wp-cropper-window-x',
-					`${ cropper.x }px`
-				);
-				element!.style.setProperty(
-					'--wp-cropper-window-y',
-					`${ cropper.y }px`
-				);
+				animate( element, {
+					'--wp-cropper-window-x': `${ cropper.x }px`,
+					'--wp-cropper-window-y': `${ cropper.y }px`,
+				} ).complete();
 
 				if ( event.type === 'mousedown' ) {
 					const mouseEvent = event as MouseEvent;
@@ -97,26 +111,28 @@ function CropWindow() {
 						dispatch( { type: 'RESIZE_START' } );
 					}
 				} else {
-					// Set the temporary offset on resizing.
-					if ( direction.toLowerCase().includes( 'left' ) ) {
-						element!.style.setProperty(
-							'--wp-cropper-window-x',
-							`${ cropper.x - delta.width }px`
-						);
+					let { x, y } = cropper;
+					if (
+						[ 'left', 'topLeft', 'bottomLeft' ].includes(
+							direction
+						)
+					) {
+						x -= delta.width;
 					}
-					if ( direction.startsWith( 'top' ) ) {
-						element!.style.setProperty(
-							'--wp-cropper-window-y',
-							`${ cropper.y - delta.height }px`
-						);
+					if (
+						[ 'top', 'topLeft', 'topRight' ].includes( direction )
+					) {
+						y -= delta.height;
 					}
+					animate( element, {
+						'--wp-cropper-window-x': `${ x }px`,
+						'--wp-cropper-window-y': `${ y }px`,
+						width: `${ cropper.width + delta.width }px`,
+						height: `${ cropper.height + delta.height }px`,
+					} ).complete();
 				}
 			} }
 			onResizeStop={ ( _event, direction, _element, delta ) => {
-				// Remove the temporary offset.
-				element!.style.removeProperty( '--wp-cropper-window-x' );
-				element!.style.removeProperty( '--wp-cropper-window-y' );
-				// Commit the offset to state if needed.
 				dispatch( { type: 'RESIZE_WINDOW', direction, delta } );
 			} }
 			ref={ ( resizable ) => {
@@ -136,14 +152,14 @@ const Cropper = forwardRef< HTMLDivElement >( ( {}, ref ) => {
 	const {
 		state: {
 			image,
-			transforms: { angle, turns, scale, flipped },
-			cropper,
+			transforms: { angle, rotations, scale, flipped },
+			isDragging,
 		},
 		src,
 		refs: { imageRef },
 	} = useContext( ImageCropperContext );
-	const isAxisSwapped = turns % 2 !== 0;
-	const degree = angle + turns * 90;
+	const isAxisSwapped = rotations % 2 !== 0;
+	const degree = angle + rotations * 90;
 	const imageOffset = {
 		top: isAxisSwapped
 			? PADDING.y + ( image.width - image.height ) / 2
@@ -155,18 +171,22 @@ const Cropper = forwardRef< HTMLDivElement >( ( {}, ref ) => {
 
 	return (
 		<Container
+			animate={ {
+				'--wp-cropper-angle': `${ degree }deg`,
+				'--wp-cropper-scale-x':
+					scale * ( flipped && ! isAxisSwapped ? -1 : 1 ),
+				'--wp-cropper-scale-y':
+					scale * ( flipped && isAxisSwapped ? -1 : 1 ),
+				...( isDragging
+					? {}
+					: {
+							'--wp-cropper-image-x': `${ image.x }px`,
+							'--wp-cropper-image-y': `${ image.y }px`,
+					  } ),
+			} }
 			style={ {
 				width: `${ isAxisSwapped ? image.height : image.width }px`,
 				height: `${ isAxisSwapped ? image.width : image.height }px`,
-				'--wp-cropper-angle': `${ degree }deg`,
-				'--wp-cropper-scale-x': `${
-					scale * ( flipped && ! isAxisSwapped ? -1 : 1 )
-				}`,
-				'--wp-cropper-scale-y': `${
-					scale * ( flipped && isAxisSwapped ? -1 : 1 )
-				}`,
-				'--wp-cropper-window-x': `${ cropper.x }px`,
-				'--wp-cropper-window-y': `${ cropper.y }px`,
 				'--wp-cropper-image-x': `${ image.x }px`,
 				'--wp-cropper-image-y': `${ image.y }px`,
 			} }

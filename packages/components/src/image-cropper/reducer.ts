@@ -25,8 +25,8 @@ export type State = {
 	transforms: {
 		// The angle of the image in degrees, from -45 to 45 degrees.
 		angle: number;
-		// The number of 90-degree turns clockwise.
-		turns: 0 | 1 | 2 | 3;
+		// The number of 90-degree rotations clockwise.
+		rotations: number;
 		// The image scale.
 		scale: number;
 		// Whether the image is flipped horizontally.
@@ -67,6 +67,8 @@ type Action =
 	// Start resizing the cropper window.
 	| { type: 'RESIZE_START' }
 	// Resize the cropper window by a delta size in a direction.
+	| { type: 'MOVE_WINDOW'; x: number; y: number }
+	// Resize the cropper window by a delta size in a direction.
 	| { type: 'RESIZE_WINDOW'; direction: ResizeDirection; delta: Size }
 	// Reset the state to the initial state.
 	| { type: 'RESET' };
@@ -87,7 +89,7 @@ function createInitialState( {
 		},
 		transforms: {
 			angle: 0,
-			turns: 0,
+			rotations: 0,
 			scale: 1,
 			flipped: false,
 		},
@@ -105,10 +107,10 @@ function createInitialState( {
 function imageCropperReducer( state: State, action: Action ) {
 	const {
 		image,
-		transforms: { angle, turns, scale, flipped },
+		transforms: { angle, rotations, scale, flipped },
 		cropper,
 	} = state;
-	const radian = degreeToRadian( angle + turns * 90 );
+	const radian = degreeToRadian( angle + ( rotations % 4 ) * 90 );
 
 	switch ( action.type ) {
 		case 'ZOOM': {
@@ -173,7 +175,7 @@ function imageCropperReducer( state: State, action: Action ) {
 			};
 		}
 		case 'ROTATE': {
-			const nextRadian = degreeToRadian( action.angle + turns * 90 );
+			const nextRadian = degreeToRadian( action.angle + rotations * 90 );
 			const scaledWidth = image.width * scale;
 			const scaledHeight = image.height * scale;
 			const { x, y } = getFurthestVector(
@@ -199,8 +201,7 @@ function imageCropperReducer( state: State, action: Action ) {
 		}
 		case 'ROTATE_CLOCKWISE': {
 			const isCounterClockwise = action.isCounterClockwise;
-			const nextTurns = ( ( turns + ( isCounterClockwise ? 3 : 1 ) ) %
-				4 ) as 0 | 1 | 2 | 3;
+			const nextRotations = rotations + ( isCounterClockwise ? -1 : 1 );
 			const rotatedPosition = rotatePoint(
 				{ x: image.x, y: image.y },
 				( Math.PI / 2 ) * ( isCounterClockwise ? -1 : 1 )
@@ -214,7 +215,7 @@ function imageCropperReducer( state: State, action: Action ) {
 				},
 				transforms: {
 					...state.transforms,
-					turns: nextTurns,
+					rotations: nextRotations,
 				},
 				cropper: {
 					...state.cropper,
@@ -274,6 +275,17 @@ function imageCropperReducer( state: State, action: Action ) {
 				isResizing: true,
 			};
 		}
+		case 'MOVE_WINDOW': {
+			const { x, y } = action;
+			return {
+				...state,
+				cropper: {
+					...state.cropper,
+					x,
+					y,
+				},
+			};
+		}
 		// TODO: No idea how this should work for rotated(turned) images.
 		case 'RESIZE_WINDOW': {
 			const { direction, delta } = action;
@@ -291,7 +303,7 @@ function imageCropperReducer( state: State, action: Action ) {
 				width: cropper.width + delta.width,
 				height: cropper.height + delta.height,
 			};
-			const isAxisSwapped = turns % 2 !== 0;
+			const isAxisSwapped = rotations % 2 !== 0;
 			const imageDimensions = {
 				width: isAxisSwapped ? image.height : image.width,
 				height: isAxisSwapped ? image.width : image.height,
