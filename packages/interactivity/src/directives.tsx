@@ -22,7 +22,8 @@ import {
 	splitTask,
 	isPlainObject,
 } from './utils';
-import { directive, getScope, getEvaluate, type DirectiveEntry } from './hooks';
+import { directive, getEvaluate, type DirectiveEntry } from './hooks';
+import { getScope } from './scopes';
 
 // Assigned objects should be ignored during proxification.
 const contextAssignedObjects = new WeakMap();

@@ -2,7 +2,10 @@
  * Internal dependencies
  */
 import { createProxy, getProxyNs, shouldProxy } from './registry';
-import { setNamespace, resetNamespace } from '../hooks';
+/**
+ * External dependencies
+ */
+import { setNamespace, resetNamespace } from '../namespaces';
 import { withScope, isPlainObject } from '../utils';
 
 /**

@@ -8,7 +8,6 @@ import { hydrate, type ContainerNode, type ComponentChild } from 'preact';
 import { toVdom, hydratedIslands } from './vdom';
 import { createRootFragment, splitTask } from './utils';
 import { directivePrefix } from './constants';
-import { parseInitialData, populateInitialData } from './store';
 
 // Keep the same root fragment for each interactive region node.
 const regionRootFragments = new WeakMap();
@@ -30,10 +29,6 @@ export const initialVdom = new WeakMap< Element, ComponentChild[] >();
 
 // Initialize the router with the initial DOM.
 export const init = async () => {
-	// Parse and populate the initial state and config.
-	const data = parseInitialData();
-	populateInitialData( data );
-
 	const nodes = document.querySelectorAll(
 		`[data-${ directivePrefix }-interactive]`
 	);

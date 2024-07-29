@@ -13,7 +13,8 @@ import {
  * Internal dependencies
  */
 import { getProxyNs } from './registry';
-import { getScope, setNamespace, resetNamespace } from '../hooks';
+import { getScope } from '../scopes';
+import { setNamespace, resetNamespace } from '../namespaces';
 import { withScope } from '../utils';
 
 /**

@@ -2,13 +2,8 @@
  * Internal dependencies
  */
 import { proxifyStore, proxifyState } from '../';
-import {
-	setScope,
-	resetScope,
-	setNamespace,
-	resetNamespace,
-	getContext,
-} from '../../hooks';
+import { setScope, resetScope, getContext } from '../../scopes';
+import { setNamespace, resetNamespace } from '../../namespaces';
 
 describe( 'interactivity api - store proxy', () => {
 	describe( 'get', () => {

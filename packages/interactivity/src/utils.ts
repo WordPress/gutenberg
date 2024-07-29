@@ -14,14 +14,8 @@ import { effect } from '@preact/signals';
 /**
  * Internal dependencies
  */
-import {
-	getScope,
-	setScope,
-	resetScope,
-	getNamespace,
-	setNamespace,
-	resetNamespace,
-} from './hooks';
+import { getScope, setScope, resetScope } from './scopes';
+import { getNamespace, setNamespace, resetNamespace } from './namespaces';
 
 interface Flusher {
 	readonly flush: () => void;

@@ -11,12 +11,13 @@ import registerDirectives from './directives';
 import { init, getRegionRootFragment, initialVdom } from './init';
 import { directivePrefix } from './constants';
 import { toVdom } from './vdom';
-import { directive, getNamespace } from './hooks';
+import { directive } from './hooks';
+import { getNamespace } from './namespaces';
 import { parseInitialData, populateInitialData } from './store';
 import { proxifyState } from './proxies';
 
 export { store, getConfig } from './store';
-export { getContext, getElement } from './hooks';
+export { getContext, getElement } from './scopes';
 export {
 	withScope,
 	useWatch,

@@ -2,7 +2,10 @@
  * Internal dependencies
  */
 import { proxifyState, proxifyStore } from './proxies';
-import { getNamespace } from './hooks';
+/**
+ * External dependencies
+ */
+import { getNamespace } from './namespaces';
 import { isPlainObject } from './utils';
 
 const deepMerge = ( target: any, source: any ) => {
@@ -217,3 +220,7 @@ export const populateInitialData = ( data?: {
 		} );
 	}
 };
+
+// Parse and populate the initial state and config.
+const data = parseInitialData();
+populateInitialData( data );

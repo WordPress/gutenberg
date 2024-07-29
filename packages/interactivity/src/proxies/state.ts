@@ -8,7 +8,7 @@ import { signal, type Signal } from '@preact/signals';
  */
 import { createProxy, getProxy, getProxyNs, shouldProxy } from './registry';
 import { PropSignal } from './signals';
-import { setNamespace, resetNamespace } from '../hooks';
+import { setNamespace, resetNamespace } from '../namespaces';
 
 /**
  * Set of built-in symbols.

@@ -10,14 +10,8 @@ import { effect } from '@preact/signals-core';
  * Internal dependencies
  */
 import { proxifyState, peek } from '../';
-import {
-	setScope,
-	resetScope,
-	setNamespace,
-	resetNamespace,
-	getContext,
-	getElement,
-} from '../../hooks';
+import { setScope, resetScope, getContext, getElement } from '../../scopes';
+import { setNamespace, resetNamespace } from '../../namespaces';
 
 type State = {
 	a?: number;
