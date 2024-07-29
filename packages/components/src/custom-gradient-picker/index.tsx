@@ -144,15 +144,15 @@ export function CustomGradientPicker( {
 	onChange,
 	__experimentalIsRenderedInSidebar = false,
 }: CustomGradientPickerProps ) {
-	const [ replacedCssString, setReplacedCssString ] = useState< string >();
-	const cssVariableReplaceOnChange: React.ComponentProps<
+	const [ normalizedValue, setNormalizedValue ] = useState( value );
+	const cssVariableReplacerOnChange: React.ComponentProps<
 		typeof CSSVariableReplacer
 	>[ 'onChange' ] = useCallback( ( { replacedCssString: str } ) => {
-		setReplacedCssString( str );
+		setNormalizedValue( str );
 	}, [] );
 
 	const { gradientAST, hasGradient } =
-		getGradientAstWithDefault( replacedCssString );
+		getGradientAstWithDefault( normalizedValue );
 
 	// On radial gradients the bar should display a linear gradient.
 	// On radial gradients the bar represents a slice of the gradient from the center until the outside.
@@ -175,7 +175,7 @@ export function CustomGradientPicker( {
 		<VStack spacing={ 4 } className="components-custom-gradient-picker">
 			<CSSVariableReplacer
 				cssString={ value }
-				onChange={ cssVariableReplaceOnChange }
+				onChange={ cssVariableReplacerOnChange }
 			/>
 			<CustomGradientBar
 				__experimentalIsRenderedInSidebar={
