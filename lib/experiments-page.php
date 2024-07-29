@@ -152,6 +152,18 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
+		'gutenberg-quick-edit-dataviews',
+		__( 'Quick Edit in DataViews', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Allow access to a quick edit panel in the pages data views.', 'gutenberg' ),
+			'id'    => 'gutenberg-quick-edit-dataviews',
+		)
+	);
+
+	add_settings_field(
 		'gutenberg-block-comment',
 		__( 'Enable block Comment', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
