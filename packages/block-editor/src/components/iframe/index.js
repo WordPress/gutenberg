@@ -14,7 +14,7 @@ import {
 	useEffect,
 	useRef,
 } from '@wordpress/element';
-import { __, isRTL } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import {
 	useResizeObserver,
 	useMergeRefs,
@@ -264,8 +264,6 @@ function Iframe( {
 		isZoomedOut ? iframeResizeRef : null,
 	] );
 
-	const userIsRTL = isRTL();
-
 	// Fallback locale values from parent frame.
 	let defaultLang = iframeOwnerDocument?.lang;
 	let defaultDir = iframeOwnerDocument?.dir;
@@ -297,13 +295,6 @@ function Iframe( {
 				/* Default background color in case zoom out mode background
 				colors the html element */
 				background-color: white;
-			}
-			/* 
-				Block placeholders are "technically" part of the editor UI,
-				and should therefore match the editor UI's directionality.
-			*/
-			.block-editor-block-list__layout .components-placeholder { 
-				direction: ${ userIsRTL ? 'rtl' : 'ltr' };
 			}
 		</style>
 		${ styles }
