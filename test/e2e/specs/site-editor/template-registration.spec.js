@@ -152,10 +152,12 @@ test.describe( 'Template registration', () => {
 		await admin.visitSiteEditor( {
 			postType: 'wp_template',
 		} );
-		await templateRegistrationUtils.searchForTemplate( 'Custom Template' );
+		await templateRegistrationUtils.searchForTemplate( 'Custom' );
 		await expect(
 			page.getByText( 'Custom Template (overridden by the theme)' )
 		).toBeHidden();
+		// Verify the theme template shows the theme name as the author.
+		await expect( page.getByText( 'AuthorEmptytheme' ) ).toBeVisible();
 	} );
 
 	test( 'templates can be deleted if the registered plugin is deactivated', async ( {
