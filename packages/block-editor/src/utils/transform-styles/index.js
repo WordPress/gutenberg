@@ -44,17 +44,13 @@ function transformStyle(
 
 							// `html`, `body` and `:root` need some special handling since they
 							// generally cannot be prefixed with a classname and produce a valid
-							// selector.
-							// Also include some special rules for various forms of :root and body
-							// that crop up.
+							// selector. Instead we replace the whole root part of the selector.
 							if ( ROOT_SELECTOR_REGEX.test( selector ) ) {
 								return selector.replace(
 									ROOT_SELECTOR_REGEX,
 									prefix
 								);
 							}
-
-							// console.log( out, rootSelector, prefixedSelector );
 
 							return prefixedSelector;
 						},
