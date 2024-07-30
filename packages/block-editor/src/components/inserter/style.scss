@@ -16,12 +16,6 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
-.block-editor-inserter__menu.show-panel {
-	@include break-medium() {
-		width: $secondary-sidebar-width + $sidebar-width;
-	}
-}
-
 .block-editor-inserter__main-area {
 	height: 100%;
 	gap: $grid-unit-20;
@@ -29,6 +23,12 @@ $block-inserter-tabs-height: 44px;
 
 	&.show-as-tabs {
 		gap: 0;
+	}
+
+	.block-editor-tabbed-sidebar {
+		@include break-medium() {
+			width: $secondary-sidebar-width;
+		}
 	}
 }
 
@@ -91,6 +91,12 @@ $block-inserter-tabs-height: 44px;
 	height: 100%;
 	position: relative;
 	overflow: visible;
+
+	&.show-panel {
+		@include break-medium() {
+			width: $secondary-sidebar-width + $sidebar-width;
+		}
+	}
 }
 
 .block-editor-inserter__inline-elements {
@@ -306,7 +312,7 @@ $block-inserter-tabs-height: 44px;
 		border-left: $border-width solid $gray-200;
 		padding: 0;
 		left: $secondary-sidebar-width;
-		width: 300px;
+		width: $sidebar-width;
 		position: absolute;
 		top: -$border-width;
 		height: calc(100% + #{$border-width});
