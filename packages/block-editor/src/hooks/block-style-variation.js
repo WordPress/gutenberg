@@ -14,6 +14,7 @@ import {
 	getBlockSelectors,
 } from '../components/global-styles';
 import { useStyleOverride } from './utils';
+import { getValueFromObjectPath } from '../utils/object';
 import { store as blockEditorStore } from '../store';
 import { globalStylesDataKey } from '../store/private-keys';
 import { unlock } from '../lock-unlock';
@@ -180,6 +181,77 @@ export function __unstableBlockStyleVariationOverridesWithConfig( { config } ) {
 	);
 }
 
+/**
+ * Retrieves any variation styles data and resolves any referenced values.
+ *
+ * @param {Object}    globalStyles A complete global styles object, containing settings and styles.
+ * @param {string}    name         The name of the desired block type.
+ * @param {variation} variation    The of the block style variation to retrieve data for.
+ *
+ * @return {Object|undefined} The global styles data for the specified variation.
+ */
+export function getVariationStylesWithRefValues(
+	globalStyles,
+	name,
+	variation
+) {
+	if ( ! globalStyles?.styles?.blocks?.[ name ]?.variations?.[ variation ] ) {
+		return;
+	}
+
+	// Helper to recursively look for `ref` values to resolve.
+	const replaceRefs = ( variationStyles ) => {
+		Object.keys( variationStyles ).forEach( ( key ) => {
+			const value = variationStyles[ key ];
+
+			// Only process objects.
+			if ( typeof value === 'object' && value !== null ) {
+				// Process `ref` value if present.
+				if ( value.ref !== undefined ) {
+					if (
+						typeof value.ref !== 'string' ||
+						value.ref.trim() === ''
+					) {
+						// Remove invalid ref.
+						delete variationStyles[ key ];
+					} else {
+						// Resolve `ref` value.
+						const refValue = getValueFromObjectPath(
+							globalStyles,
+							value.ref
+						);
+
+						if ( refValue ) {
+							variationStyles[ key ] = refValue;
+						} else {
+							delete variationStyles[ key ];
+						}
+					}
+				} else {
+					// Recursively resolve `ref` values in nested objects.
+					replaceRefs( value );
+
+					// After recursion, if value is empty due to explicitly
+					// `undefined` ref value, remove it.
+					if ( Object.keys( value ).length === 0 ) {
+						delete variationStyles[ key ];
+					}
+				}
+			}
+		} );
+	};
+
+	// Deep clone variation node to avoid mutating it within global styles and losing refs.
+	const styles = JSON.parse(
+		JSON.stringify(
+			globalStyles.styles.blocks[ name ].variations[ variation ]
+		)
+	);
+	replaceRefs( styles );
+
+	return styles;
+}
+
 function useBlockStyleVariation( name, variation, clientId ) {
 	// Prefer global styles data in GlobalStylesContext, which are available
 	// if in the site editor. Otherwise fall back to whatever is in the
@@ -194,9 +266,14 @@ function useBlockStyleVariation( name, variation, clientId ) {
 	}, [] );
 
 	return useMemo( () => {
-		const styles = mergedConfig?.styles ?? globalStyles;
-		const variationStyles =
-			styles?.blocks?.[ name ]?.variations?.[ variation ];
+		const variationStyles = getVariationStylesWithRefValues(
+			{
+				settings: mergedConfig?.settings ?? globalSettings,
+				styles: mergedConfig?.styles ?? globalStyles,
+			},
+			name,
+			variation
+		);
 
 		return {
 			settings: mergedConfig?.settings ?? globalSettings,

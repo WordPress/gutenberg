@@ -9,6 +9,16 @@
 		max-width: 100%;
 		vertical-align: bottom;
 		box-sizing: border-box;
+
+		@media (prefers-reduced-motion: no-preference) {
+			&.hide {
+				visibility: hidden;
+			}
+
+			&.show {
+				animation: show-content-image 0.4s;
+			}
+		}
 	}
 
 	// The following style maintains border radius application for deprecated
@@ -316,6 +326,18 @@
 				}
 			}
 		}
+	}
+}
+
+@keyframes show-content-image {
+	0% {
+		visibility: hidden;
+	}
+	99% {
+		visibility: hidden;
+	}
+	100% {
+		visibility: visible;
 	}
 }
 

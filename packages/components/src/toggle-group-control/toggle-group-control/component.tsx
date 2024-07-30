@@ -8,7 +8,6 @@ import { LayoutGroup } from 'framer-motion';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { __ } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 
 /**

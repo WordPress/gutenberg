@@ -2172,4 +2172,33 @@ test.describe( 'Block bindings', () => {
 			} );
 		} );
 	} );
+
+	test.describe( 'Sources registration', () => {
+		test.beforeEach( async ( { admin } ) => {
+			await admin.createNewPost( { title: 'Test bindings' } );
+		} );
+
+		test( 'should show the label of a source only registered in the server', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: {
+					metadata: {
+						bindings: {
+							content: {
+								source: 'core/server-source',
+							},
+						},
+					},
+				},
+			} );
+
+			const bindingLabel = page.locator(
+				'.components-item__block-bindings-source'
+			);
+			await expect( bindingLabel ).toHaveText( 'Server Source' );
+		} );
+	} );
 } );

@@ -105,6 +105,24 @@ describe( 'Tooltip', () => {
 				screen.getByRole( 'button', { name: 'Anchor' } )
 			).not.toHaveAttribute( 'data-foo' );
 		} );
+
+		it( 'should add default and custom class names to the tooltip', async () => {
+			render( <Tooltip { ...props } className="foo" /> );
+
+			// Hover over the anchor, tooltip should show
+			await hover(
+				screen.getByRole( 'button', { name: 'Tooltip anchor' } )
+			);
+
+			// Check default and custom classnames
+			await waitFor( () =>
+				expect(
+					screen.getByRole( 'tooltip', {
+						name: 'tooltip text',
+					} )
+				).toHaveClass( 'components-tooltip', 'foo' )
+			);
+		} );
 	} );
 
 	describe( 'keyboard focus', () => {

@@ -214,6 +214,14 @@ If multiple is false the value received is a single value with the new selected 
 -   Type: `function`
 -   Required: Yes
 
+#### variant
+
+The style variant of the control.
+
+-   Type: `'default' | 'minimal'`
+-   Required: No
+-   Default: `'default'`
+
 ### __nextHasNoMarginBottom
 
 Start opting into the new margin-free styles that will become the default in a future version.

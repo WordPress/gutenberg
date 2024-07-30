@@ -16,7 +16,12 @@
 			"default": 0
 		}
 	},
-	"example": {},
+	"example": {
+		"viewportWidth": 350,
+		"attributes": {
+			"textAlign": "center"
+		}
+	},
 	"supports": {
 		"align": [ "wide", "full" ],
 		"html": false,
@@ -51,7 +56,14 @@
 		},
 		"interactivity": {
 			"clientNavigation": true
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true
 		}
 	},
-	"editorStyle": "wp-block-site-tagline-editor"
+	"editorStyle": "wp-block-site-tagline-editor",
+	"style": "wp-block-site-tagline"
 }

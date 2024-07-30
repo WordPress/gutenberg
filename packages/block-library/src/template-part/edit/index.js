@@ -151,8 +151,10 @@ export default function TemplatePartEdit( {
 				  )
 				: false;
 
-			const _canEditTemplate =
-				select( coreStore ).canUser( 'create', 'templates' ) ?? false;
+			const _canEditTemplate = select( coreStore ).canUser( 'create', {
+				kind: 'postType',
+				name: 'wp_template_part',
+			} );
 
 			return {
 				hasInnerBlocks: getBlockCount( clientId ) > 0,
@@ -165,7 +167,7 @@ export default function TemplatePartEdit( {
 				onNavigateToEntityRecord:
 					getSettings().onNavigateToEntityRecord,
 				title: entityRecord?.title,
-				canEditTemplate: _canEditTemplate,
+				canEditTemplate: !! _canEditTemplate,
 			};
 		},
 		[ templatePartId, attributes.area, clientId ]

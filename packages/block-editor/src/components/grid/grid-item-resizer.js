@@ -7,7 +7,7 @@ import { useState, useEffect } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
+import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockPopoverCover from '../block-popover/cover';
 import { getComputedCSS, getGridTracks, getClosestTrack } from './utils';
 
@@ -19,7 +19,7 @@ export function GridItemResizer( {
 } ) {
 	const blockElement = useBlockElement( clientId );
 	const rootBlockElement = blockElement?.parentElement;
-	const { columnCount } = parentLayout;
+	const { isManualPlacement } = parentLayout;
 
 	if ( ! blockElement || ! rootBlockElement ) {
 		return null;
@@ -33,7 +33,8 @@ export function GridItemResizer( {
 			rootBlockElement={ rootBlockElement }
 			onChange={ onChange }
 			isManualGrid={
-				!! columnCount && window.__experimentalEnableGridInteractivity
+				isManualPlacement &&
+				window.__experimentalEnableGridInteractivity
 			}
 		/>
 	);
@@ -97,7 +98,7 @@ function GridItemResizerInner( {
 		<BlockPopoverCover
 			className="block-editor-grid-item-resizer"
 			clientId={ clientId }
-			__unstablePopoverSlot="block-toolbar"
+			__unstablePopoverSlot="__unstable-block-tools-after"
 			additionalStyles={ styles }
 		>
 			<ResizableBox

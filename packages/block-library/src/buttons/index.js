@@ -21,6 +21,12 @@ export { metadata, name };
 export const settings = {
 	icon,
 	example: {
+		attributes: {
+			layout: {
+				type: 'flex',
+				justifyContent: 'center',
+			},
+		},
 		innerBlocks: [
 			{
 				name: 'core/button',

@@ -88,6 +88,7 @@ export default function InserterSidebar() {
 					blockSectionRootClientId ?? insertionPoint.rootClientId
 				}
 				__experimentalInsertionIndex={ insertionPoint.insertionIndex }
+				onSelect={ insertionPoint.onSelect }
 				__experimentalInitialTab={ insertionPoint.tab }
 				__experimentalInitialCategory={ insertionPoint.category }
 				__experimentalFilterValue={ insertionPoint.filterValue }

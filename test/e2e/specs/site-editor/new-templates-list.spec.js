@@ -86,15 +86,14 @@ test.describe( 'Templates', () => {
 	test( 'Field visibility', async ( { admin, page } ) => {
 		await admin.visitSiteEditor( { postType: 'wp_template' } );
 
-		await page.getByRole( 'button', { name: 'View options' } ).click();
-		await page.getByRole( 'menuitem', { name: 'Layout' } ).click();
+		await page.getByRole( 'button', { name: 'Layout' } ).click();
 		await page.getByRole( 'menuitemradio', { name: 'Table' } ).click();
 
-		await page.getByRole( 'button', { name: 'Description' } ).click();
+		await page.getByRole( 'button', { name: 'Author' } ).click();
 		await page.getByRole( 'menuitem', { name: 'Hide' } ).click();
 
 		await expect(
-			page.getByRole( 'button', { name: 'Description' } )
+			page.getByRole( 'button', { name: 'Author' } )
 		).toBeHidden();
 	} );
 } );

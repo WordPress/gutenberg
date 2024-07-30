@@ -26,8 +26,8 @@ function render_block_core_button( $attributes, $content ) {
 	 * conditional statement will be removed and the core class `WP_HTML_Tag_Processor`
 	 * should be used.
 	 */
-	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN && class_exists( 'Gutenberg_HTML_Tag_Processor_6_5' ) ) {
-		$p = new Gutenberg_HTML_Tag_Processor_6_5( $content );
+	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN && class_exists( 'Gutenberg_HTML_Tag_Processor_6_7' ) ) {
+		$p = new Gutenberg_HTML_Tag_Processor_6_7( $content );
 	} else {
 		$p = new WP_HTML_Tag_Processor( $content );
 	}

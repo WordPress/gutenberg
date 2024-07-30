@@ -28,7 +28,11 @@ import { store as editSiteStore } from './store';
 import { unlock } from './lock-unlock';
 import App from './components/app';
 
-const { registerDefaultActions } = unlock( editorPrivateApis );
+const {
+	registerDefaultActions,
+	registerCoreBlockBindingsSources,
+	bootstrapBlockBindingsSourcesFromServer,
+} = unlock( editorPrivateApis );
 
 /**
  * Initializes the site editor screen.
@@ -45,6 +49,8 @@ export function initializeEditor( id, settings ) {
 		( { name } ) => name !== 'core/freeform'
 	);
 	registerCoreBlocks( coreBlocks );
+	bootstrapBlockBindingsSourcesFromServer( settings?.blockBindingsSources );
+	registerCoreBlockBindingsSources();
 	dispatch( blocksStore ).setFreeformFallbackBlockName( 'core/html' );
 	registerLegacyWidgetBlock( { inserter: false } );
 	registerWidgetGroupBlock( { inserter: false } );

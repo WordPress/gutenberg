@@ -61,7 +61,7 @@ export function filterSortAndPaginate< Item >(
 		} );
 	}
 
-	if ( view.filters.length > 0 ) {
+	if ( view.filters && view.filters?.length > 0 ) {
 		view.filters.forEach( ( filter ) => {
 			const field = _fields.find(
 				( _field ) => _field.id === filter.field
@@ -142,6 +142,16 @@ export function filterSortAndPaginate< Item >(
 			filteredData.sort( ( a, b ) => {
 				const valueA = fieldToSort.getValue( { item: a } ) ?? '';
 				const valueB = fieldToSort.getValue( { item: b } ) ?? '';
+
+				if (
+					typeof valueA === 'number' &&
+					typeof valueB === 'number'
+				) {
+					return view.sort?.direction === 'asc'
+						? valueA - valueB
+						: valueB - valueA;
+				}
+
 				return view.sort?.direction === 'asc'
 					? valueA.localeCompare( valueB )
 					: valueB.localeCompare( valueA );

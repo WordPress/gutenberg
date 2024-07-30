@@ -62,14 +62,18 @@ function BlockMover( {
 				orientation: getBlockListSettings( _rootClientId )?.orientation,
 				isManualGrid:
 					layout.type === 'grid' &&
-					!! layout.columnCount &&
+					layout.isManualPlacement &&
 					window.__experimentalEnableGridInteractivity,
 			};
 		},
 		[ clientIds ]
 	);
 
-	if ( ! canMove || ( isFirst && isLast && ! rootClientId ) ) {
+	if (
+		! canMove ||
+		( isFirst && isLast && ! rootClientId ) ||
+		( hideDragHandle && isManualGrid )
+	) {
 		return null;
 	}
 

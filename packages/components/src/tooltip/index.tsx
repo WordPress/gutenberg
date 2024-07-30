@@ -2,6 +2,7 @@
  * External dependencies
  */
 import * as Ariakit from '@ariakit/react';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -44,6 +45,7 @@ function UnforwardedTooltip(
 ) {
 	const {
 		children,
+		className,
 		delay = TOOLTIP_DELAY,
 		hideOnClick = true,
 		placement,
@@ -112,7 +114,7 @@ function UnforwardedTooltip(
 			{ isOnlyChild && ( text || shortcut ) && (
 				<Ariakit.Tooltip
 					{ ...restProps }
-					className="components-tooltip"
+					className={ clsx( 'components-tooltip', className ) }
 					unmountOnHide
 					gutter={ 4 }
 					id={ describedById }

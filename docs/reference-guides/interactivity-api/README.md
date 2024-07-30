@@ -42,6 +42,21 @@ You can start creating interactions once you set up a block development environm
 
 ### Code requirements
 
+#### Add `interactivity` to your project
+
+Install the Interactivity API to your project with the following command:
+
+```bash
+npm install @wordpress/interactivity --save
+```
+
+Import the store into your `view.js`. Refer to the [store documentation](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/api-reference/#the-store) for more information.
+
+```js
+import { store } from '@wordpress/interactivity';
+```
+
+
 #### Add `interactivity` support to `block.json`
 
 To indicate that the block [supports](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/) the Interactivity API features, add `"interactivity": true` to the `supports` attribute of the block's `block.json` file.
@@ -104,7 +119,7 @@ Here you have some more resources to learn/read more about the Interactivity API
 - [Interactivity API Discussions](https://github.com/WordPress/gutenberg/discussions/52882), especially the [showcase](https://github.com/WordPress/gutenberg/discussions/55642#discussioncomment-9667164) discussions.   
 - [wpmovies.dev](http://wpmovies.dev/) demo and its [wp-movies-demo](https://github.com/WordPress/wp-movies-demo) repo
 - Examples using the Interactivity API at [block-development-examples](https://github.com/WordPress/block-development-examples):
-  - [`interactivity-api-block-833d15`](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/833d15)
+  - [`interactivity-api-block-833d15`](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/interactivity-api-block-833d15)
   - [`interactivity-api-countdown-3cd73e`](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/interactivity-api-countdown-3cd73e)
   - [`interactivity-api-quiz-1835fa`](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/interactivity-api-quiz-1835fa)
 

@@ -278,6 +278,36 @@ module.exports = {
 			},
 		},
 		{
+			// Temporary rules until we're ready to officially deprecate the bottom margins.
+			files: [ 'packages/*/src/**/*.[tj]s?(x)' ],
+			excludedFiles: [
+				'packages/components/src/**/@(test|stories)/**',
+				'**/*.@(native|ios|android).js',
+			],
+			rules: {
+				'no-restricted-syntax': [
+					'error',
+					...restrictedSyntax,
+					...restrictedSyntaxComponents,
+					...[
+						'CheckboxControl',
+						'ComboboxControl',
+						'FocalPointPicker',
+						'RangeControl',
+						'SearchControl',
+						'TextareaControl',
+						'ToggleGroupControl',
+						'TreeSelect',
+					].map( ( componentName ) => ( {
+						selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__nextHasNoMarginBottom"]))`,
+						message:
+							componentName +
+							' should have the `__nextHasNoMarginBottom` prop to opt-in to the new margin-free styles.',
+					} ) ),
+				],
+			},
+		},
+		{
 			files: [
 				// Components package.
 				'packages/components/src/**/*.[tj]s?(x)',

@@ -20,8 +20,6 @@
 		"strict": true,
 
 		/* Additional Checks */
-		"noUnusedLocals": true,
-		"noUnusedParameters": true,
 		"noImplicitReturns": true,
 		"noFallthroughCasesInSwitch": true,
 
