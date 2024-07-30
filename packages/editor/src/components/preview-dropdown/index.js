@@ -21,7 +21,6 @@ import { store as preferencesStore } from '@wordpress/preferences';
  */
 import { store as editorStore } from '../../store';
 import PostPreviewButton from '../post-preview-button';
-import { speak } from '@wordpress/a11y';
 
 export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 	const { deviceType, homeUrl, isTemplate, isViewable, showIconLabels } =
@@ -103,22 +102,6 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		selectedChoice = choices[ 0 ];
 	}
 
-	/**
-	 * Handles the selection of a device type.
-	 *
-	 * @param {string} value The device type.
-	 */
-	const onSelect = ( value ) => {
-		setDeviceType( value );
-		if ( value === 'Desktop' ) {
-			speak( __( 'Desktop selected' ), 'assertive' );
-		} else if ( value === 'Tablet' ) {
-			speak( __( 'Tablet selected' ), 'assertive' );
-		} else {
-			speak( __( 'Mobile selected' ), 'assertive' );
-		}
-	};
-
 	return (
 		<DropdownMenu
 			className="editor-preview-dropdown"
@@ -135,7 +118,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 						<MenuItemsChoice
 							choices={ choices }
 							value={ selectedChoice.value }
-							onSelect={ onSelect }
+							onSelect={ setDeviceType }
 						/>
 					</MenuGroup>
 					{ isTemplate && (
