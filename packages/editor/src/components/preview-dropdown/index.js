@@ -102,15 +102,6 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		selectedChoice = choices[ 0 ];
 	}
 
-	/**
-	 * Handles the selection of a device type.
-	 *
-	 * @param {string} value The device type.
-	 */
-	const onSelect = ( value ) => {
-		setDeviceType( value );
-	};
-
 	return (
 		<DropdownMenu
 			className="editor-preview-dropdown"
@@ -127,7 +118,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 						<MenuItemsChoice
 							choices={ choices }
 							value={ selectedChoice.value }
-							onSelect={ onSelect }
+							onSelect={ setDeviceType }
 						/>
 					</MenuGroup>
 					{ isTemplate && (
