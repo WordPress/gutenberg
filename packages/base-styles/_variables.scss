@@ -40,6 +40,17 @@ $grid-unit-70: 7 * $grid-unit;		// 56px
 $grid-unit-80: 8 * $grid-unit;		// 64px
 
 /**
+ * Radius scale.
+ */
+
+$radius-x-small: 1px;   // Applied to elements like buttons nested within primitives like inputs.
+$radius-small: 2px;     // Applied to most primitives.
+$radius-medium: 4px;    // Applied to containers with smaller padding.
+$radius-large: 8px;     // Applied to containers with larger padding.
+$radius-full: 9999px;   // For lozenges.
+$radius-round: 50%;     // For circles and ovals.
+
+/**
  * Dimensions.
  */
 
@@ -90,13 +101,12 @@ $border-width: 1px;
 $border-width-focus-fallback: 2px; // This exists as a fallback, and is ideally overridden by var(--wp-admin-border-width-focus) unless in some SASS math cases.
 $border-width-tab: 1.5px;
 $helptext-font-size: 12px;
-$radius-round: 50%;
-$radius-block-ui: 2px;
 $radio-input-size: 16px;
 $radio-input-size-sm: 24px; // Width & height for small viewports.
 
 // Deprecated, please avoid using these.
 $block-padding: 14px; // Used to define space between block footprint and surrouding borders.
+$radius-block-ui: $radius-small;
 
 
 /**
