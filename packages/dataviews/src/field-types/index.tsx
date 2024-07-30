@@ -15,7 +15,7 @@ export default function getFieldTypeDefinition( type?: FieldType ) {
 		return integer;
 	}
 
-	// TODO: What's the default when the type is undefined?
+	// If no type found, the sort function doesn't do anything.
 	return {
 		sort: () => 0,
 	};
