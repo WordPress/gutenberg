@@ -87,7 +87,7 @@ export type Field< Item > = {
 		a: Item,
 		b: Item,
 		direction: SortDirection,
-		field?: any
+		getValue: ( args: { item: Item } ) => any
 	) => number;
 
 	/**
@@ -134,7 +134,12 @@ export type NormalizedField< Item > = Field< Item > & {
 	label: string;
 	getValue: ( args: { item: Item } ) => any;
 	render: ComponentType< { item: Item } >;
-	sort: ( a: Item, b: Item, direction: SortDirection, field?: any ) => number;
+	sort: (
+		a: Item,
+		b: Item,
+		direction: SortDirection,
+		getValue: ( args: { item: Item } ) => any
+	) => number;
 };
 
 /**

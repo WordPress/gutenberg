@@ -145,7 +145,7 @@ export function filterSortAndPaginate< Item >(
 						a,
 						b,
 						view.sort?.direction ?? 'desc',
-						fieldToSort
+						fieldToSort.getValue
 					);
 				}
 
