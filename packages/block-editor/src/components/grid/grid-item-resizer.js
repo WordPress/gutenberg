@@ -119,6 +119,10 @@ function GridItemResizerInner( {
 				} }
 				bounds={ bounds }
 				boundsByDirection
+				// Captures the pointer to avoid hiccups while dragging over objects like iframes.
+				onPointerDown={ ( { target, pointerId } ) => {
+					target.setPointerCapture( pointerId );
+				} }
 				onResizeStart={ ( event, direction ) => {
 					/*
 					 * The container justification and alignment need to be set
