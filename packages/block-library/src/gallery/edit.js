@@ -655,6 +655,7 @@ function GalleryEdit( props ) {
 												onClose();
 											} }
 											role="menuitemradio"
+											info={ linkItem.infoText ?? false }
 										>
 											{ linkItem.label }
 										</MenuItem>
