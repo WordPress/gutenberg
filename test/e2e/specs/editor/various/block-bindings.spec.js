@@ -1394,6 +1394,11 @@ test.describe( 'Block bindings', () => {
 				editor,
 				page,
 			} ) => {
+				// Activate the block bindings UI experiment.
+				await page.evaluate( () => {
+					window.__experimentalBlockBindingsUI = true;
+				} );
+
 				await editor.insertBlock( {
 					name: 'core/paragraph',
 				} );
@@ -1412,6 +1417,11 @@ test.describe( 'Block bindings', () => {
 				editor,
 				page,
 			} ) => {
+				// Activate the block bindings UI experiment.
+				await page.evaluate( () => {
+					window.__experimentalBlockBindingsUI = true;
+				} );
+
 				await editor.insertBlock( {
 					name: 'core/paragraph',
 					attributes: {
@@ -1529,6 +1539,11 @@ test.describe( 'Block bindings', () => {
 				editor,
 				page,
 			} ) => {
+				// Activate the block bindings UI experiment.
+				await page.evaluate( () => {
+					window.__experimentalBlockBindingsUI = true;
+				} );
+
 				await editor.insertBlock( {
 					name: 'core/heading',
 				} );
@@ -1724,6 +1739,11 @@ test.describe( 'Block bindings', () => {
 				editor,
 				page,
 			} ) => {
+				// Activate the block bindings UI experiment.
+				await page.evaluate( () => {
+					window.__experimentalBlockBindingsUI = true;
+				} );
+
 				await editor.insertBlock( {
 					name: 'core/buttons',
 					innerBlocks: [
@@ -2054,6 +2074,11 @@ test.describe( 'Block bindings', () => {
 				editor,
 				page,
 			} ) => {
+				// Activate the block bindings UI experiment.
+				await page.evaluate( () => {
+					window.__experimentalBlockBindingsUI = true;
+				} );
+
 				await editor.insertBlock( {
 					name: 'core/image',
 				} );

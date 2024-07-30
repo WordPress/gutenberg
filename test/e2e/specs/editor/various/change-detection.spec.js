@@ -451,7 +451,6 @@ test.describe( 'Change detection', () => {
 		] );
 
 		// Change the paragraph's `drop cap`.
-		await page.getByRole( 'tab', { name: 'Styles' } ).click();
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
 			.getByRole( 'button', { name: 'Typography options' } )
