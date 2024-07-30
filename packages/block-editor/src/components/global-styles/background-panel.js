@@ -42,7 +42,7 @@ import { isBlobURL } from '@wordpress/blob';
 /**
  * Internal dependencies
  */
-import { useToolsPanelDropdownMenuProps } from './utils';
+import { useToolsPanelDropdownMenuProps } from '../../utils/use-tools-panel-dropdown-menu-props';
 import { setImmutably } from '../../utils/object';
 import MediaReplaceFlow from '../media-replace-flow';
 import { store as blockEditorStore } from '../../store';

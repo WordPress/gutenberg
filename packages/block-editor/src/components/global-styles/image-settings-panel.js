@@ -11,7 +11,7 @@ import { __, _x } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { useToolsPanelDropdownMenuProps } from './utils';
+import { useToolsPanelDropdownMenuProps } from '../../utils/use-tools-panel-dropdown-menu-props';
 
 export function useHasImageSettingsPanel( name, value, inheritedValue ) {
 	// Note: If lightbox `value` exists, that means it was

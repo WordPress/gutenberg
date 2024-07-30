@@ -28,7 +28,8 @@ import { useCallback, useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { getValueFromVariable, useToolsPanelDropdownMenuProps } from './utils';
+import { getValueFromVariable } from './utils';
+import { useToolsPanelDropdownMenuProps } from '../../utils/use-tools-panel-dropdown-menu-props';
 import { setImmutably } from '../../utils/object';
 
 const EMPTY_ARRAY = [];

@@ -50,11 +50,11 @@ import { Caption } from '../utils/caption';
 /**
  * Module constants
  */
-import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { MIN_SIZE, ALLOWED_MEDIA_TYPES } from './constants';
 import { evalAspectRatio } from './utils';
 
-const { DimensionsTool, ResolutionTool } = unlock( blockEditorPrivateApis );
+const { DimensionsTool, ResolutionTool, useToolsPanelDropdownMenuProps } =
+	unlock( blockEditorPrivateApis );
 
 const scaleOptions = [
 	{

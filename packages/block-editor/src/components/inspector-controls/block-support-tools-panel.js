@@ -10,7 +10,7 @@ import { useCallback } from '@wordpress/element';
  */
 import { store as blockEditorStore } from '../../store';
 import { cleanEmptyObject } from '../../hooks/utils';
-import { useToolsPanelDropdownMenuProps } from '../global-styles/utils';
+import { useToolsPanelDropdownMenuProps } from '../../utils/use-tools-panel-dropdown-menu-props';
 
 export default function BlockSupportToolsPanel( { children, group, label } ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
