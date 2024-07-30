@@ -3,7 +3,7 @@
 	"apiVersion": 3,
 	"name": "core/post-featured-image",
 	"title": "Featured Image",
-	"category": "theme",
+	"category": "media",
 	"description": "Display a post's featured image.",
 	"textdomain": "default",
 	"attributes": {

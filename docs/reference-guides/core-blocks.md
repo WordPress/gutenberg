@@ -367,7 +367,7 @@ Introduce new sections and organize content to help visitors (and search engines
 Create a link that always points to the homepage of the site. Usually not necessary if there is already a site title link present in the header. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/home-link))
 
 -	**Name:** core/home-link
--	**Category:** design
+-	**Category:** text
 -	**Parent:** core/navigation
 -	**Supports:** interactivity (clientNavigation), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** label
@@ -470,7 +470,7 @@ Content before this block will be shown in the excerpt on your archives page. ([
 A collection of blocks that allow visitors to get around your site. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/navigation))
 
 -	**Name:** core/navigation
--	**Category:** theme
+-	**Category:** design
 -	**Allowed Blocks:** core/navigation-link, core/search, core/social-links, core/page-list, core/spacer, core/home-link, core/site-title, core/site-logo, core/navigation-submenu, core/loginout, core/buttons
 -	**Supports:** align (full, wide), ariaLabel, inserter, interactivity, layout (allowSizingOnChildren, default, ~~allowInheriting~~, ~~allowSwitching~~, ~~allowVerticalAlignment~~), spacing (blockGap, units), typography (fontSize, lineHeight), ~~html~~, ~~renaming~~
 -	**Attributes:** __unstableLocation, backgroundColor, customBackgroundColor, customOverlayBackgroundColor, customOverlayTextColor, customTextColor, hasIcon, icon, maxNestingLevel, openSubmenusOnClick, overlayBackgroundColor, overlayMenu, overlayTextColor, ref, rgbBackgroundColor, rgbTextColor, showSubmenuIcon, templateLock, textColor
@@ -615,7 +615,7 @@ Displays the link to the current post comments. ([Source](https://github.com/Wor
 Displays the contents of a post or page. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-content))
 
 -	**Name:** core/post-content
--	**Category:** theme
+-	**Category:** text
 -	**Supports:** align (full, wide), background (backgroundImage, backgroundSize), color (background, gradients, link, text), dimensions (minHeight), layout, spacing (blockGap, padding), typography (fontSize, lineHeight), ~~html~~
 
 ## Date
@@ -641,7 +641,7 @@ Display the excerpt. ([Source](https://github.com/WordPress/gutenberg/tree/trunk
 Display a post's featured image. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-featured-image))
 
 -	**Name:** core/post-featured-image
--	**Category:** theme
+-	**Category:** media
 -	**Supports:** align (center, full, left, right, wide), color (~~background~~, ~~text~~), filter (duotone), interactivity (clientNavigation), shadow (), spacing (margin, padding), ~~html~~
 -	**Attributes:** aspectRatio, customGradient, customOverlayColor, dimRatio, gradient, height, isLink, linkTarget, overlayColor, rel, scale, sizeSlug, useFirstImageFromPost, width
 
