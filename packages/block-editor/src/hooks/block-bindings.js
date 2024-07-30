@@ -298,8 +298,10 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 		}
 	} );
 
-	// At this moment, the UI can be locked when there are no fields to connect to.
-	const readOnly = ! Object.keys( fieldsList ).length;
+	// Lock the UI when the experiment is not enabled or there are no fields to connect to.
+	const readOnly =
+		! window.__experimentalBlockBindingsUI ||
+		! Object.keys( fieldsList ).length;
 
 	if ( readOnly && Object.keys( filteredBindings ).length === 0 ) {
 		return null;
