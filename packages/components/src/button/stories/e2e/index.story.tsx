@@ -48,8 +48,29 @@ export const VariantStates: StoryFn< typeof Button > = (
 						accessibleWhenDisabled
 					/>
 					<Button { ...props } variant={ variant } isBusy />
+					<Button
+						{ ...props }
+						variant={ variant }
+						isBusy
+						disabled
+						accessibleWhenDisabled
+					/>
 					<Button { ...props } variant={ variant } isDestructive />
+					<Button
+						{ ...props }
+						variant={ variant }
+						isDestructive
+						disabled
+						accessibleWhenDisabled
+					/>
 					<Button { ...props } variant={ variant } isPressed />
+					<Button
+						{ ...props }
+						variant={ variant }
+						isPressed
+						disabled
+						accessibleWhenDisabled
+					/>
 				</div>
 			) ) }
 		</div>
