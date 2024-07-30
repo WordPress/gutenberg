@@ -1,5 +1,6 @@
 $block-inserter-preview-height: 350px;
 $block-inserter-width: 350px;
+$block-inserter-panel-width: 300px;
 $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter {
@@ -14,7 +15,15 @@ $block-inserter-tabs-height: 44px;
 	@include break-medium {
 		position: relative;
 	}
+
 }
+
+.block-editor-inserter__menu.show-panel {
+	@include break-large() {
+		width: $block-inserter-width + $block-inserter-panel-width;
+	}
+}
+
 
 .block-editor-inserter__main-area {
 	height: 100%;
@@ -312,6 +321,10 @@ $block-inserter-tabs-height: 44px;
 		.block-editor-block-patterns-list {
 			padding: 0 $grid-unit-30 $grid-unit-20;
 		}
+	}
+
+	@include break-large {
+		left: $block-inserter-width;
 	}
 }
 
