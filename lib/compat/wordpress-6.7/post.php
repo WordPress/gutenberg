@@ -38,6 +38,7 @@ function gutenberg_post_type_default_rendering_mode( $args, $post_type ) {
 
 	// Make sure the post type supports the block editor.
 	if (
+		wp_is_block_theme() &&
 		( isset( $args['show_in_rest'] ) && $args['show_in_rest'] ) &&
 		( isset( $args['supports'] ) && in_array( 'editor', $args['supports'], true ) )
 	) {
