@@ -5,7 +5,7 @@
 /**
  * External dependencies
  */
-import { effect } from '@preact/signals-core';
+import { effect } from '@preact/signals';
 /**
  * Internal dependencies
  */

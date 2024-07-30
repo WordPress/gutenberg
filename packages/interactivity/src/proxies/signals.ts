@@ -7,7 +7,7 @@ import {
 	batch,
 	type Signal,
 	type ReadonlySignal,
-} from '@preact/signals-core';
+} from '@preact/signals';
 
 /**
  * Internal dependencies
