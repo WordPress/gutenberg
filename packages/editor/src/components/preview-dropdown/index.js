@@ -167,14 +167,15 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 	};
 
 	const getIcon = () => {
+		if (
+			deviceType === 'ZoomOut' ||
+			editorMode === 'zoom-out' // This can happen if zoom out is enabled from by other means - like the patterns tab.
+		) {
+			return <>{ __( '50%' ) }</>;
+		}
+
 		switch ( deviceType ) {
-			case 'ZoomOut':
-				return <>{ __( '50%' ) }</>;
 			case 'Desktop':
-				if ( editorMode === 'zoom-out' ) {
-					// This can happen if zoom out is enabled from by other means - like the patterns tab.
-					return <>{ __( '50%' ) }</>;
-				}
 				return <>{ __( '100%' ) }</>;
 			default:
 				return deviceIcons[ deviceType.toLowerCase() ];
