@@ -2367,12 +2367,12 @@ test.describe( 'Block bindings', () => {
 				},
 			} );
 
-			const bindingLabel = page
+			const bindingsPanel = page
 				.getByRole( 'tabpanel', {
 					name: 'Settings',
 				} )
-				.getByRole( 'button', { name: 'Server Source' } );
-			await expect( bindingLabel ).toBeVisible();
+				.locator( '.block-editor-bindings__panel' );
+			await expect( bindingsPanel ).toContainText( 'Server Source' );
 		} );
 	} );
 } );
