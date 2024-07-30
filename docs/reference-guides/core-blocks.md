@@ -856,7 +856,7 @@ Displays the name of this site. Update the block, and the changes apply everywhe
 -	**Name:** core/site-title
 -	**Category:** theme
 -	**Supports:** align (full, wide), color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** isLink, level, linkTarget, textAlign
+-	**Attributes:** isLink, level, levelOptions, linkTarget, textAlign
 
 ## Social Icon
 
