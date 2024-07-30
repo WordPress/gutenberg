@@ -2329,7 +2329,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * ```php
 	 * array(
 	 *   'name'  => 'property_name',
-	 *   'value' => 'property_value,
+	 *   'value' => 'property_value',
 	 * )
 	 * ```
 	 *
@@ -2338,6 +2338,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.1.0 Added `$theme_json`, `$selector`, and `$use_root_padding` parameters.
 	 * @since 6.5.0 Output a `min-height: unset` rule when `aspect-ratio` is set.
 	 * @since 6.6.0 Passing current theme JSON settings to wp_get_typography_font_size_value(). Using style engine to correctly fetch background CSS values.
+	 * @since 6.7.0 Allow ref resolution of background properties.
 	 *
 	 * @param array   $styles Styles to process.
 	 * @param array   $settings Theme settings.
@@ -2381,22 +2382,25 @@ class WP_Theme_JSON_Gutenberg {
 				$root_variable_duplicates[] = substr( $css_property, $root_style_length );
 			}
 
-			// Processes background styles.
-			if ( 'background' === $value_path[0] && isset( $styles['background'] ) ) {
-				/*
-				 * For user-uploaded images at the block level, assign defaults.
-				 * Matches defaults applied in the editor and in block supports: background.php.
-				 */
-				if ( static::ROOT_BLOCK_SELECTOR !== $selector && ! empty( $styles['background']['backgroundImage']['id'] ) ) {
-					$styles['background']['backgroundSize'] = $styles['background']['backgroundSize'] ?? 'cover';
-					// If the background size is set to `contain` and no position is set, set the position to `center`.
-					if ( 'contain' === $styles['background']['backgroundSize'] && empty( $styles['background']['backgroundPosition'] ) ) {
-						$styles['background']['backgroundPosition'] = '50% 50%';
-					}
-				}
-				$background_styles = gutenberg_style_engine_get_styles( array( 'background' => $styles['background'] ) );
-				$value             = $background_styles['declarations'][ $css_property ] ?? $value;
+			// Processes background image styles.
+			if ( 'background-image' === $css_property && ! empty( $value ) ) {
+				$background_styles = gutenberg_style_engine_get_styles(
+					array( 'background' => array( 'backgroundImage' => $value ) )
+				);
+
+				$value = $background_styles['declarations'][ $css_property ];
 			}
+
+			if ( static::ROOT_BLOCK_SELECTOR !== $selector && ! empty( $styles['background']['backgroundImage']['id'] ) ) {
+				if ( 'background-size' === $css_property && empty( $value ) ) {
+					$value = 'cover';
+				}
+				// If the background size is set to `contain` and no position is set, set the position to `center`.
+				if ( 'background-position' === $css_property && empty( $value ) && 'contain' === $styles['background']['backgroundSize'] ) {
+					$value = '50% 50%';
+				}
+			}
+
 
 			// Skip if empty and not "0" or value represents array of longhand values.
 			$has_missing_value = empty( $value ) && ! is_numeric( $value );
@@ -2485,9 +2489,11 @@ class WP_Theme_JSON_Gutenberg {
 		 */
 		if ( is_array( $value ) && isset( $value['ref'] ) ) {
 			$value_path = explode( '.', $value['ref'] );
-			$ref_value  = _wp_array_get( $theme_json, $value_path );
+			$ref_value  = _wp_array_get( $theme_json, $value_path, null );
+			// Background Image refs can refer to a string or an array containing a URL string.
+			$ref_value_url = $ref_value['url'] ?? null;
 			// Only use the ref value if we find anything.
-			if ( ! empty( $ref_value ) && is_string( $ref_value ) ) {
+			if ( ! empty( $ref_value ) && ( is_string( $ref_value ) || is_string( $ref_value_url ) ) ) {
 				$value = $ref_value;
 			}
 
