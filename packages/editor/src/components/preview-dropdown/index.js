@@ -178,13 +178,15 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 	};
 
 	const getIcon = () => {
-		if ( isZoomOutExperiment ) {
-			if ( deviceType === 'Desktop' || deviceType === 'ZoomIn' ) {
-				return <>{ __( '100%' ) }</>;
-			}
-			if ( deviceType === 'ZoomOut' ) {
+		if (
+			isZoomOutExperiment &&
+			deviceType !== 'Mobile' &&
+			deviceType !== 'Tablet'
+		) {
+			if ( editorMode === 'zoom-out' ) {
 				return <>{ __( '50%' ) }</>;
 			}
+			return <>{ __( '100%' ) }</>;
 		}
 
 		return deviceIcons[ deviceType.toLowerCase() ];
