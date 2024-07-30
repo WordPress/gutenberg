@@ -341,7 +341,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	 *
 	 * @covers ::wp_apply_typography_support
 	 */
-	public function test_should_apply_to_stabilized_typography_supports() {
+	public function test_should_apply_stabilized_typography_supports() {
 		$this->test_block_name = 'test/experimental-typography-supports';
 		register_block_type(
 			$this->test_block_name,
