@@ -52,7 +52,13 @@
 }
 
 .page-templates-description {
-	white-space: normal;
+	max-width: 50em;
+	text-wrap: balance; // Fallback for Safari
+	text-wrap: pretty;
+
+	.dataviews-view-table & {
+		margin-bottom: $grid-unit-10;
+	}
 }
 
 .edit-site-page-templates {

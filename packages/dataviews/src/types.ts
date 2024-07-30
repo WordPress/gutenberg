@@ -44,7 +44,7 @@ export type Operator =
 
 export type ItemRecord = Record< string, unknown >;
 
-export type FieldType = 'text';
+export type FieldType = 'text' | 'integer';
 
 /**
  * A dataview field for a specific property of a data type.
@@ -64,6 +64,11 @@ export type Field< Item > = {
 	 * The label of the field. Defaults to the id.
 	 */
 	label?: string;
+
+	/**
+	 * A description of the field.
+	 */
+	description?: string;
 
 	/**
 	 * Placeholder for the field.

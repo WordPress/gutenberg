@@ -188,7 +188,7 @@ const { state, actions, callbacks } = store(
 		},
 		callbacks: {
 			setOverlayStyles() {
-				if ( ! state.currentImage.imageRef ) {
+				if ( ! state.overlayEnabled ) {
 					return;
 				}
 

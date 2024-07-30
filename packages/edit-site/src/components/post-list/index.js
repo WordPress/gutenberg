@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
-import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
+import {
+	store as coreStore,
+	privateApis as coreDataPrivateApis,
+} from '@wordpress/core-data';
 import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -33,6 +36,7 @@ import usePostFields from '../post-fields';
 
 const { usePostActions } = unlock( editorPrivateApis );
 const { useLocation, useHistory } = unlock( routerPrivateApis );
+const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
 const EMPTY_ARRAY = [];
 
 function useView( postType ) {
@@ -199,7 +203,7 @@ export default function PostList( { postType } ) {
 		isResolving: isLoadingMainEntities,
 		totalItems,
 		totalPages,
-	} = useEntityRecords( 'postType', postType, queryArgs );
+	} = useEntityRecordsWithPermissions( 'postType', postType, queryArgs );
 
 	const ids = records?.map( ( record ) => getItemId( record ) ) ?? [];
 	const prevIds = usePrevious( ids ) ?? [];
