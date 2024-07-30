@@ -681,25 +681,17 @@ export const duplicateTemplatePartAction = {
 };
 
 export function usePostActions( { postType, onActionPerformed, context } ) {
-	const {
-		defaultActions,
-		postTypeObject,
-		userCanCreatePostType,
-		cachedCanUserResolvers,
-	} = useSelect(
+	const { defaultActions, postTypeObject, userCanCreatePostType } = useSelect(
 		( select ) => {
-			const { getPostType, canUser, getCachedResolvers } =
-				select( coreStore );
+			const { getPostType, canUser } = select( coreStore );
 			const { getEntityActions } = unlock( select( editorStore ) );
-			const _postTypeObject = getPostType( postType );
 			return {
-				postTypeObject: _postTypeObject,
+				postTypeObject: getPostType( postType ),
 				defaultActions: getEntityActions( 'postType', postType ),
 				userCanCreatePostType: canUser( 'create', {
 					kind: 'postType',
 					name: postType,
 				} ),
-				cachedCanUserResolvers: getCachedResolvers()?.canUser,
 			};
 		},
 		[ postType ]
@@ -798,9 +790,6 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 		}
 
 		return actions;
-		// We are making this use memo depend on cachedCanUserResolvers as a way to make the component using this hook re-render
-		// when user capabilities are resolved. This makes sure the isEligible functions of actions dependent on capabilities are re-evaluated.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [
 		defaultActions,
 		userCanCreatePostType,
@@ -814,6 +803,5 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 		supportsRevisions,
 		supportsTitle,
 		context,
-		cachedCanUserResolvers,
 	] );
 }
