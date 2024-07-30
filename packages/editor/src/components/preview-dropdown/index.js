@@ -11,7 +11,7 @@ import {
 	Icon,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { desktop, mobile, tablet, external } from '@wordpress/icons';
+import { mobile, tablet, external } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useEffect, useRef } from '@wordpress/element';
@@ -25,9 +25,6 @@ import { store as editorStore } from '../../store';
 import PostPreviewButton from '../post-preview-button';
 
 export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
-	const isZoomOutExperiment =
-		!! window.__experimentalEnableZoomedOutPatternsTab;
-
 	const {
 		deviceType,
 		editorMode,
@@ -95,7 +92,6 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 	const deviceIcons = {
 		mobile,
 		tablet,
-		desktop,
 	};
 
 	/**
@@ -104,6 +100,16 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 	 * @type {Array}
 	 */
 	const choices = [
+		{
+			value: 'Desktop',
+			label: __( 'Zoom to 100%' ),
+			icon: <>{ __( '100%' ) }</>,
+		},
+		{
+			value: 'ZoomOut',
+			label: __( 'Zoom to 50%' ),
+			icon: <>{ __( '50%' ) }</>,
+		},
 		{
 			value: 'Tablet',
 			label: __( 'Tablet' ),
@@ -115,25 +121,6 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 			icon: mobile,
 		},
 	];
-
-	if ( isZoomOutExperiment ) {
-		choices.unshift( {
-			value: 'ZoomOut',
-			label: __( 'Zoom to 50%' ),
-			icon: <p>{ __( '50%' ) }</p>,
-		} );
-		choices.unshift( {
-			value: 'ZoomIn',
-			label: __( 'Zoom to 100%' ),
-			icon: <p>{ __( '100%' ) }</p>,
-		} );
-	} else {
-		choices.unshift( {
-			value: 'Desktop',
-			label: __( 'Desktop' ),
-			icon: desktop,
-		} );
-	}
 
 	/**
 	 * The selected choice.
@@ -176,21 +163,22 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 			newEditorMode = 'zoom-out';
 		}
 
-		if ( isZoomOutExperiment ) {
-			__unstableSetEditorMode( newEditorMode );
-		}
+		__unstableSetEditorMode( newEditorMode );
 	};
 
 	const getIcon = () => {
-		switch (deviceType) {
+		switch ( deviceType ) {
 			case 'ZoomOut':
-				return __( '50%' );
-			case 'ZoomIn':
-				return __( '100%' );
+				return <>{ __( '50%' ) }</>;
+			case 'Desktop':
+				if ( editorMode === 'zoom-out' ) {
+					// This can happen if zoom out is enabled from by other means - like the patterns tab.
+					return <>{ __( '50%' ) }</>;
+				}
+				return <>{ __( '100%' ) }</>;
 			default:
 				return deviceIcons[ deviceType.toLowerCase() ];
 		}
-	}
 	};
 
 	return (
