@@ -16,15 +16,15 @@ import BaseControl from '../base-control';
 import type { WordPressComponentProps } from '../context';
 import type { RadioControlProps } from './types';
 import { VStack } from '../v-stack';
+import { useBaseControlProps } from '../base-control/hooks';
 import { StyledHelp } from '../base-control/styles/base-control-styles';
 
-// This is the id that BaseControl assigns to the help text element.
-function generateHelpTextId( id: string ) {
-	return `${ id }__help`;
+function generateOptionDescriptionId( radioGroupId: string, index: number ) {
+	return `${ radioGroupId }-${ index }-option-description`;
 }
 
-function generateOptionDescriptionId( id: string, index: number ) {
-	return `${ id }-${ index }-option-description`;
+function generateOptionId( radioGroupId: string, index: number ) {
+	return `${ radioGroupId }-${ index }`;
 }
 
 /**
@@ -63,12 +63,22 @@ export function RadioControl(
 		onChange,
 		hideLabelFromVision,
 		options = [],
+		id: preferredId,
 		...additionalProps
 	} = props;
-	const instanceId = useInstanceId( RadioControl );
-	const id = `inspector-radio-control-${ instanceId }`;
+	const id = useInstanceId(
+		RadioControl,
+		'inspector-radio-control',
+		preferredId
+	);
+
 	const onChangeValue = ( event: ChangeEvent< HTMLInputElement > ) =>
 		onChange( event.target.value );
+
+	// Use `useBaseControlProps` to get the id of the help text.
+	const {
+		controlProps: { 'aria-describedby': helpTextId },
+	} = useBaseControlProps( { id, help } );
 
 	if ( ! options?.length ) {
 		return null;
@@ -93,30 +103,32 @@ export function RadioControl(
 			>
 				{ options.map( ( option, index ) => (
 					<div
-						key={ `${ id }-${ index }` }
+						key={ generateOptionId( id, index ) }
 						className="components-radio-control__option"
 					>
 						<input
-							id={ `${ id }-${ index }` }
+							id={ generateOptionId( id, index ) }
 							className="components-radio-control__input"
 							type="radio"
 							name={ id }
 							value={ option.value }
 							onChange={ onChangeValue }
 							checked={ option.value === selected }
-							aria-describedby={ [
-								!! option.description
-									? generateOptionDescriptionId( id, index )
-									: undefined,
-								!! help ? generateHelpTextId( id ) : undefined,
-							]
-								.filter( Boolean )
-								.join( ' ' ) }
+							aria-describedby={
+								clsx( [
+									!! option.description &&
+										generateOptionDescriptionId(
+											id,
+											index
+										),
+									helpTextId,
+								] ) || undefined
+							}
 							{ ...additionalProps }
 						/>
 						<label
 							className="components-radio-control__label"
-							htmlFor={ `${ id }-${ index }` }
+							htmlFor={ generateOptionId( id, index ) }
 						>
 							{ option.label }
 						</label>
