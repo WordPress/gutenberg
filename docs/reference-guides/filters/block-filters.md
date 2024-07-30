@@ -152,7 +152,7 @@ In the following example, the class `example-class` is added to all Paragraph bl
 ```php
 function example_add_custom_class_to_paragraph_block( $block_content, $block ) {
 	
-	// Check if the block is a paragraph block.
+	// Check if the block is a Paragraph block.
 	if ( 'core/paragraph' === $block['blockName'] ) {
 	   
 		// Add the custom class to the block content using the HTML API.
