@@ -47,6 +47,7 @@ import { PrivatePublishDateTimePicker } from './components/publish-date-time-pic
 import useSpacingSizes from './components/spacing-sizes-control/hooks/use-spacing-sizes';
 import useBlockDisplayTitle from './components/block-title/use-block-display-title';
 import TabbedSidebar from './components/tabbed-sidebar';
+import { useBlockBindingsUtils } from './utils/block-bindings';
 
 /**
  * Private @wordpress/block-editor APIs.
@@ -93,4 +94,5 @@ lock( privateApis, {
 	useBlockDisplayTitle,
 	__unstableBlockStyleVariationOverridesWithConfig,
 	setBackgroundStyleDefaults,
+	useBlockBindingsUtils,
 } );
