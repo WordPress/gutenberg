@@ -32,7 +32,7 @@ import {
 } from '../components/duotone/utils';
 import { getBlockCSSSelector } from '../components/global-styles/get-block-css-selector';
 import { scopeSelector } from '../components/global-styles/utils';
-import { useBlockSettings, useStyleOverride } from './utils';
+import { useBlockSettings, usePrivateStyleOverride } from './utils';
 import { default as StylesFiltersPanel } from '../components/global-styles/filters-panel';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
@@ -265,7 +265,7 @@ function useDuotoneStyles( {
 
 	const isValidFilter = Array.isArray( colors ) || colors === 'unset';
 
-	useStyleOverride(
+	usePrivateStyleOverride(
 		isValidFilter
 			? {
 					css:
@@ -276,7 +276,7 @@ function useDuotoneStyles( {
 			  }
 			: undefined
 	);
-	useStyleOverride(
+	usePrivateStyleOverride(
 		isValidFilter
 			? {
 					assets:
