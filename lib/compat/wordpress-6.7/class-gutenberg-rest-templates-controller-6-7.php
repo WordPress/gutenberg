@@ -17,13 +17,8 @@ class Gutenberg_REST_Templates_Controller_6_7 extends Gutenberg_REST_Templates_C
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public function get_item( $request ) {
-		if ( isset( $request['source'] ) && 'theme' === $request['source'] ) {
+		if ( isset( $request['source'] ) && ( 'theme' === $request['source'] || 'plugin' === $request['source'] ) ) {
 			$template = get_block_file_template( $request['id'], $this->post_type );
-			// @core-merge: Add a special case for plugin templates.
-		} elseif ( isset( $request['source'] ) && 'plugin' === $request['source'] ) {
-			list( , $slug ) = explode( '//', $request['id'] );
-			$template       = WP_Templates_Registry::get_instance()->get_by_slug( $slug );
-			// @core-merge: End of changes to merge in core.
 		} else {
 			$template = get_block_template( $request['id'], $this->post_type );
 		}
