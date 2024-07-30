@@ -42,6 +42,7 @@ class Gutenberg_REST_Templates_Controller_6_7 extends Gutenberg_REST_Templates_C
 	 * @param WP_REST_Request   $request Request object.
 	 * @return WP_REST_Response Response object.
 	 */
+	// @core-merge: Fix wrong author in plugin templates.
 	public function prepare_item_for_response( $item, $request ) {
 		$template = $item;
 
@@ -50,7 +51,6 @@ class Gutenberg_REST_Templates_Controller_6_7 extends Gutenberg_REST_Templates_C
 		if ( 'plugin' !== $item->origin ) {
 			return parent::prepare_item_for_response( $item, $request );
 		}
-		// @core-merge: Fix wrong author in plugin templates.
 		$cloned_item = clone $item;
 		// Set the origin as theme when calling the previous `prepare_item_for_response()` to prevent warnings when generating the author text.
 		$cloned_item->origin = 'theme';
@@ -99,7 +99,7 @@ class Gutenberg_REST_Templates_Controller_6_7 extends Gutenberg_REST_Templates_C
 	 * @param WP_Block_Template $template_object Template instance.
 	 * @return string                            Original source of the template one of theme, plugin, site, or user.
 	 */
-	// @core-merge: Only the comments format (from inline to multi-line) has changed in this file.
+	// @core-merge: Changed the comments format (from inline to multi-line) in the entire function.
 	private static function get_wp_templates_original_source_field( $template_object ) {
 		if ( 'wp_template' === $template_object->type || 'wp_template_part' === $template_object->type ) {
 			/*
@@ -125,6 +125,7 @@ class Gutenberg_REST_Templates_Controller_6_7 extends Gutenberg_REST_Templates_C
 			}
 
 			// Added by plugin.
+			// @core-merge: Removed `$template_object->has_theme_file` check from this if clause.
 			if ( 'plugin' === $template_object->origin ) {
 				return 'plugin';
 			}
