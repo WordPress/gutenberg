@@ -1,8 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { useContext } from '@wordpress/element';
+import { forwardRef, useContext } from '@wordpress/element';
 import { Icon, check } from '@wordpress/icons';
+
 /**
  * Internal dependencies
  */
@@ -11,7 +12,7 @@ import type { WordPressComponentProps } from '../context';
 import * as Styled from './styles';
 import { CustomSelectContext } from './custom-select';
 
-export function CustomSelectItem( {
+function UnforwardedCustomSelectItem( {
 	children,
 	...props
 }: WordPressComponentProps< CustomSelectItemProps, 'div', false > ) {
@@ -29,6 +30,8 @@ export function CustomSelectItem( {
 		</Styled.SelectItem>
 	);
 }
+
+export const CustomSelectItem = forwardRef( UnforwardedCustomSelectItem );
 
 CustomSelectItem.displayName = 'CustomSelectControlV2.Item';
 

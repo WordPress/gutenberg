@@ -2,6 +2,12 @@
  * External dependencies
  */
 import * as Ariakit from '@ariakit/react';
+
+/**
+ * WordPress dependencies
+ */
+import { forwardRef } from '@wordpress/element';
+
 /**
  * Internal dependencies
  */
@@ -10,7 +16,7 @@ import type { CustomSelectProps } from './types';
 import type { WordPressComponentProps } from '../context';
 import Item from './item';
 
-function CustomSelectControlV2(
+function UnforwardedCustomSelectControlV2(
 	props: WordPressComponentProps< CustomSelectProps, 'button', false >
 ) {
 	const { defaultValue, onChange, value, ...restProps } = props;
@@ -24,6 +30,13 @@ function CustomSelectControlV2(
 	return <_CustomSelect { ...restProps } store={ store } />;
 }
 
-CustomSelectControlV2.Item = Item;
+/** The main description. */
+export const CustomSelectControlV2 = Object.assign(
+	forwardRef( UnforwardedCustomSelectControlV2 ),
+	{
+		/** The subcomponent description. */
+		Item,
+	}
+);
 
 export default CustomSelectControlV2;
