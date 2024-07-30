@@ -14,7 +14,6 @@ $block-inserter-tabs-height: 44px;
 	@include break-medium {
 		position: relative;
 	}
-
 }
 
 .block-editor-inserter__menu.show-panel {
@@ -22,7 +21,6 @@ $block-inserter-tabs-height: 44px;
 		width: $secondary-sidebar-width + $sidebar-width;
 	}
 }
-
 
 .block-editor-inserter__main-area {
 	height: 100%;
