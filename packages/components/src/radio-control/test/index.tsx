@@ -49,6 +49,7 @@ const defaultPropsWithDescriptions = {
 };
 
 describe.each( [
+	// TODO: `RadioControl` doesn't currently support uncontrolled mode.
 	// [ 'uncontrolled', RadioControl ],
 	[ 'controlled', ControlledRadioControl ],
 ] )( 'RadioControl %s', ( ...modeAndComponent ) => {
