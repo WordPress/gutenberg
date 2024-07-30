@@ -3,7 +3,7 @@
 	"apiVersion": 3,
 	"name": "core/post-content",
 	"title": "Content",
-	"category": "theme",
+	"category": "text",
 	"description": "Displays the contents of a post or page.",
 	"textdomain": "default",
 	"usesContext": [ "postId", "postType", "queryId" ],

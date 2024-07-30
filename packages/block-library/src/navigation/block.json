@@ -3,7 +3,7 @@
 	"apiVersion": 3,
 	"name": "core/navigation",
 	"title": "Navigation",
-	"category": "theme",
+	"category": "design",
 	"allowedBlocks": [
 		"core/navigation-link",
 		"core/search",
