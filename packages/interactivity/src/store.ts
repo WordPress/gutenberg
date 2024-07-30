@@ -155,9 +155,9 @@ export function store(
 			),
 			...block,
 		};
-		const proxiedStore = proxifyStore( namespace, rawStore );
+		const proxifiedStore = proxifyStore( namespace, rawStore );
 		rawStores.set( namespace, rawStore );
-		stores.set( namespace, proxiedStore );
+		stores.set( namespace, proxifiedStore );
 	} else {
 		// Lock the store if it wasn't locked yet and the passed lock is
 		// different from the universal unlock. If no lock is given, the store
