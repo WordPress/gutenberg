@@ -27,7 +27,11 @@ import {
 import { unlock } from '../lock-unlock';
 import InspectorControls from '../components/inspector-controls';
 import BlockContext from '../components/block-context';
+<<<<<<< HEAD
 import { useBlockBindingsUtils } from '../utils/block-bindings';
+=======
+import { useToolsPanelDropdownMenuProps } from '../utils/use-tools-panel-dropdown-menu-props';
+>>>>>>> fcd2c19c62 (Remove old utils)
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -38,6 +42,7 @@ const {
 	DropdownMenuSeparatorV2: DropdownMenuSeparator,
 } = unlock( componentsPrivateApis );
 
+<<<<<<< HEAD
 const useToolsPanelDropdownMenuProps = () => {
 	const isMobile = useViewportMatch( 'medium', '<' );
 	return ! isMobile
@@ -55,6 +60,14 @@ function BlockBindingsPanelDropdown( { fieldsList, attribute, binding } ) {
 	const { getBlockBindingsSources } = unlock( blocksPrivateApis );
 	const registeredSources = getBlockBindingsSources();
 	const { updateBlockBindings } = useBlockBindingsUtils();
+=======
+function BlockBindingsPanelDropdown( {
+	fieldsList,
+	addConnection,
+	attribute,
+	binding,
+} ) {
+>>>>>>> fcd2c19c62 (Remove old utils)
 	const currentKey = binding?.args?.key;
 	return (
 		<>
