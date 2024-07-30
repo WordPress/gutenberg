@@ -9,6 +9,7 @@ import { type StoreDescriptor, dispatch } from '@wordpress/data';
 import deletePost from './delete-post';
 import exportPattern from './export-pattern';
 import resetPost from './reset-post';
+import trashPost from './trash-post';
 
 // @ts-ignore
 import { store as editorStore } from '../../store';
@@ -22,4 +23,5 @@ export default function registerDefaultActions() {
 	registerEntityAction( 'postType', 'wp_block', exportPattern );
 	registerEntityAction( 'postType', '*', resetPost );
 	registerEntityAction( 'postType', '*', deletePost );
+	registerEntityAction( 'postType', '*', trashPost );
 }

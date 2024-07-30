@@ -1,12 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { external, trash, backup } from '@wordpress/icons';
+import { external, backup } from '@wordpress/icons';
 import { addQueryArgs } from '@wordpress/url';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
-import { __, _n, sprintf, _x } from '@wordpress/i18n';
+import { __, sprintf, _x } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useMemo, useState } from '@wordpress/element';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
@@ -15,7 +15,6 @@ import { DataForm, isItemValid } from '@wordpress/dataviews';
 import {
 	Button,
 	TextControl,
-	__experimentalText as Text,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
@@ -81,167 +80,6 @@ function isTemplateRemovable( template ) {
 		! template?.has_theme_file
 	);
 }
-
-const trashPostAction = {
-	id: 'move-to-trash',
-	label: __( 'Move to Trash' ),
-	isPrimary: true,
-	icon: trash,
-	isEligible( item ) {
-		return (
-			! [ 'auto-draft', 'trash' ].includes( item.status ) &&
-			item.permissions?.delete
-		);
-	},
-	supportsBulk: true,
-	hideModalHeader: true,
-	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
-		const [ isBusy, setIsBusy ] = useState( false );
-		const { createSuccessNotice, createErrorNotice } =
-			useDispatch( noticesStore );
-		const { deleteEntityRecord } = useDispatch( coreStore );
-		return (
-			<VStack spacing="5">
-				<Text>
-					{ items.length === 1
-						? sprintf(
-								// translators: %s: The item's title.
-								__(
-									'Are you sure you want to move to trash "%s"?'
-								),
-								getItemTitle( items[ 0 ] )
-						  )
-						: sprintf(
-								// translators: %d: The number of items (2 or more).
-								_n(
-									'Are you sure you want to move to trash %d item?',
-									'Are you sure you want to move to trash %d items?',
-									items.length
-								),
-								items.length
-						  ) }
-				</Text>
-				<HStack justify="right">
-					<Button
-						variant="tertiary"
-						onClick={ closeModal }
-						disabled={ isBusy }
-						accessibleWhenDisabled
-					>
-						{ __( 'Cancel' ) }
-					</Button>
-					<Button
-						variant="primary"
-						onClick={ async () => {
-							setIsBusy( true );
-							const promiseResult = await Promise.allSettled(
-								items.map( ( item ) =>
-									deleteEntityRecord(
-										'postType',
-										item.type,
-										item.id,
-										{},
-										{ throwOnError: true }
-									)
-								)
-							);
-							// If all the promises were fulfilled with success.
-							if (
-								promiseResult.every(
-									( { status } ) => status === 'fulfilled'
-								)
-							) {
-								let successMessage;
-								if ( promiseResult.length === 1 ) {
-									successMessage = sprintf(
-										/* translators: The item's title. */
-										__( '"%s" moved to trash.' ),
-										getItemTitle( items[ 0 ] )
-									);
-								} else {
-									successMessage = sprintf(
-										/* translators: The number of items. */
-										_n(
-											'%s item moved to trash.',
-											'%s items moved to trash.',
-											items.length
-										),
-										items.length
-									);
-								}
-								createSuccessNotice( successMessage, {
-									type: 'snackbar',
-									id: 'move-to-trash-action',
-								} );
-							} else {
-								// If there was at least one failure.
-								let errorMessage;
-								// If we were trying to delete a single item.
-								if ( promiseResult.length === 1 ) {
-									if ( promiseResult[ 0 ].reason?.message ) {
-										errorMessage =
-											promiseResult[ 0 ].reason.message;
-									} else {
-										errorMessage = __(
-											'An error occurred while moving to trash the item.'
-										);
-									}
-									// If we were trying to delete multiple items.
-								} else {
-									const errorMessages = new Set();
-									const failedPromises = promiseResult.filter(
-										( { status } ) => status === 'rejected'
-									);
-									for ( const failedPromise of failedPromises ) {
-										if ( failedPromise.reason?.message ) {
-											errorMessages.add(
-												failedPromise.reason.message
-											);
-										}
-									}
-									if ( errorMessages.size === 0 ) {
-										errorMessage = __(
-											'An error occurred while moving to trash the items.'
-										);
-									} else if ( errorMessages.size === 1 ) {
-										errorMessage = sprintf(
-											/* translators: %s: an error message */
-											__(
-												'An error occurred while moving to trash the item: %s'
-											),
-											[ ...errorMessages ][ 0 ]
-										);
-									} else {
-										errorMessage = sprintf(
-											/* translators: %s: a list of comma separated error messages */
-											__(
-												'Some errors occurred while moving to trash the items: %s'
-											),
-											[ ...errorMessages ].join( ',' )
-										);
-									}
-								}
-								createErrorNotice( errorMessage, {
-									type: 'snackbar',
-								} );
-							}
-							if ( onActionPerformed ) {
-								onActionPerformed( items );
-							}
-							setIsBusy( false );
-							closeModal();
-						} }
-						isBusy={ isBusy }
-						disabled={ isBusy }
-						accessibleWhenDisabled
-					>
-						{ __( 'Trash' ) }
-					</Button>
-				</HStack>
-			</VStack>
-		);
-	},
-};
 
 const permanentlyDeletePostAction = {
 	id: 'permanently-delete',
@@ -988,7 +826,6 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 			supportsTitle && renamePostAction,
 			reorderPagesAction,
 			! isTemplateOrTemplatePart && ! isPattern && restorePostAction,
-			! isTemplateOrTemplatePart && ! isPattern && trashPostAction,
 			! isTemplateOrTemplatePart &&
 				! isPattern &&
 				permanentlyDeletePostAction,
