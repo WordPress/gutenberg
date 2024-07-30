@@ -26,7 +26,7 @@ export function useBlockBindingsUtils() {
 	 * ```js
 	 * import { useBlockBindingsUtils } from '@wordpress/block-editor'
 	 *
-	 * const { removeAllBlockBindings } = useBlockBindingsUtils();
+	 * const { updateBlockBindings } = useBlockBindingsUtils();
 	 * updateBlockBindings( {
 	 *     url: {
 	 *         source: 'core/post-meta',
