@@ -119,8 +119,13 @@ function GridItemResizerInner( {
 				} }
 				bounds={ bounds }
 				boundsByDirection
-				// Captures the pointer to avoid hiccups while dragging over objects like iframes.
 				onPointerDown={ ( { target, pointerId } ) => {
+					/*
+					 * Captures the pointer to avoid hiccups while dragging over objects
+					 * like iframes and ensures that the event to end the drag is
+					 * captured by the target (resize handle) whether or not it’s under
+					 * the pointer.
+					 */
 					target.setPointerCapture( pointerId );
 				} }
 				onResizeStart={ ( event, direction ) => {
@@ -130,21 +135,6 @@ function GridItemResizerInner( {
 					 * so that it resizes in the right direction.
 					 */
 					setResizeDirection( direction );
-
-					/*
-					 * The mouseup event on the resize handle doesn't trigger if the mouse
-					 * isn't directly above the handle, so we try to detect if it happens
-					 * outside the grid and dispatch a mouseup event on the handle.
-					 */
-					blockElement.ownerDocument.addEventListener(
-						'mouseup',
-						() => {
-							event.target.dispatchEvent(
-								new Event( 'mouseup', { bubbles: true } )
-							);
-						},
-						{ once: true }
-					);
 				} }
 				onResizeStop={ ( event, direction, boxElement ) => {
 					const columnGap = parseFloat(
