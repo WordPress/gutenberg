@@ -52,12 +52,14 @@ const useToolsPanelDropdownMenuProps = () => {
 };
 
 function BlockBindingsPanelDropdown( { fieldsList, attribute, binding } ) {
+	const { getBlockBindingsSources } = unlock( blocksPrivateApis );
+	const registeredSources = getBlockBindingsSources();
 	const { updateBlockBindings } = useBlockBindingsUtils();
 	const currentKey = binding?.args?.key;
 	return (
 		<>
-			{ Object.entries( fieldsList ).map( ( [ label, fields ], i ) => (
-				<Fragment key={ label }>
+			{ Object.entries( fieldsList ).map( ( [ name, fields ], i ) => (
+				<Fragment key={ name }>
 					<DropdownMenuGroup>
 						{ Object.keys( fieldsList ).length > 1 && (
 							<Text
@@ -66,18 +68,17 @@ function BlockBindingsPanelDropdown( { fieldsList, attribute, binding } ) {
 								variant="muted"
 								aria-hidden
 							>
-								{ label }
+								{ registeredSources[ name ].label }
 							</Text>
 						) }
 						{ Object.entries( fields ).map( ( [ key, value ] ) => (
 							<DropdownMenuRadioItem
 								key={ key }
 								onChange={ () =>
-									// TODO: Pass source key and not label and extract the label in the appropriate place.
 									updateBlockBindings( {
 										[ attribute ]: {
-											source: 'core/post-meta',
-											args: { key: value },
+											source: name,
+											args: { key },
 										},
 									} )
 								}
@@ -189,18 +190,18 @@ function EditableBlockBindingsPanelItems( {
 	);
 }
 
-export const BlockBindingsPanel = ( { name, metadata } ) => {
+export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 	const registry = useRegistry();
 	const blockContext = useContext( BlockContext );
 	const { bindings } = metadata || {};
 	const { removeAllBlockBindings } = useBlockBindingsUtils();
-	const bindableAttributes = getBindableAttributes( name );
+	const bindableAttributes = getBindableAttributes( blockName );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const filteredBindings = { ...bindings };
 	Object.keys( filteredBindings ).forEach( ( key ) => {
 		if (
-			! canBindAttribute( name, key ) ||
+			! canBindAttribute( blockName, key ) ||
 			filteredBindings[ key ].source === 'core/pattern-overrides'
 		) {
 			delete filteredBindings[ key ];
@@ -214,8 +215,8 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 	const fieldsList = {};
 	const { getBlockBindingsSources } = unlock( blocksPrivateApis );
 	const registeredSources = getBlockBindingsSources();
-	Object.values( registeredSources ).forEach(
-		( { getFieldsList, label, usesContext } ) => {
+	Object.entries( registeredSources ).forEach(
+		( [ sourceName, { getFieldsList, usesContext } ] ) => {
 			if ( getFieldsList ) {
 				// Populate context.
 				const context = {};
@@ -230,7 +231,7 @@ export const BlockBindingsPanel = ( { name, metadata } ) => {
 				} );
 				// Only add source if the list is not empty.
 				if ( sourceList ) {
-					fieldsList[ label ] = { ...sourceList };
+					fieldsList[ sourceName ] = { ...sourceList };
 				}
 			}
 		}
