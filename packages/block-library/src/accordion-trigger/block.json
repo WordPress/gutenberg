@@ -1,0 +1,94 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "core/accordion-trigger",
+	"version": "0.1.0",
+	"title": "Trigger",
+	"category": "design",
+	"description": "Accordion item trigger.",
+	"example": {},
+	"parent": [ "core/accordion-item" ],
+	"supports": {
+		"anchor": true,
+		"color": {
+			"background": true,
+			"gradient": true
+		},
+		"align": false,
+		"border": true,
+		"interactivity": true,
+		"spacing": {
+			"padding": true,
+			"margin": [ "top", "bottom" ],
+			"__experimentalDefaultControls": {
+				"padding": true,
+				"margin": true
+			}
+		},
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true,
+			"__experimentalDefaultControls": {
+				"color": true,
+				"radius": true,
+				"style": true,
+				"width": true
+			}
+		},
+		"typography": {
+			"textAlign": true,
+			"fontSize": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true,
+				"fontFamily": true
+			}
+		},
+		"shadow": true,
+		"layout": true
+	},
+	"attributes": {
+		"openByDefault": {
+			"type": "boolean",
+			"default": false
+		},
+		"title": {
+			"type": "rich-text",
+			"source": "rich-text",
+			"selector": "span"
+		},
+		"level": {
+			"type": "number",
+			"default": 3
+		},
+		"textAlignment": {
+			"type": "string",
+			"default": "left"
+		},
+		"icon": {
+			"type": [ "string", "boolean" ],
+			"enum": [
+				"plus",
+				"chevron",
+				"chevronRight",
+				"caret",
+				"circlePlus",
+				false
+			],
+			"default": "plus"
+		},
+		"iconPosition": {
+			"type": "string",
+			"enum": [ "left", "right" ],
+			"default": "right"
+		}
+	},
+	"textdomain": "default"
+}

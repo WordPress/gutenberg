@@ -20,6 +20,10 @@ import {
 // production build to make the final bundle smaller.
 //
 // See https://github.com/WordPress/gutenberg/pull/40655 for more context.
+import * as accordionGroup from './accordion-group';
+import * as accordionItem from './accordion-item';
+import * as accordionTrigger from './accordion-trigger';
+import * as accordionContent from './accordion-content';
 import * as archives from './archives';
 import * as avatar from './avatar';
 import * as audio from './audio';
@@ -232,6 +236,14 @@ const getAllBlocks = () => {
 		queryTitle,
 		postAuthorBiography,
 	];
+
+	if ( window?.__experimentalEnableBlockExperiments ) {
+		blocks.push( accordionGroup );
+		blocks.push( accordionItem );
+		blocks.push( accordionTrigger );
+		blocks.push( accordionContent );
+	}
+
 	if ( window?.__experimentalEnableFormBlocks ) {
 		blocks.push( form );
 		blocks.push( formInput );
