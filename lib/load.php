@@ -119,9 +119,6 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {
 	require __DIR__ . '/experimental/disable-tinymce.php';
 }
 
-// Fonts API / Font Face.
-remove_action( 'plugins_loaded', '_wp_theme_json_webfonts_handler' ); // Turns off WordPress 6.0's stopgap handler.
-
 // Load the BC Layer to avoid fatal errors of extenders using the Fonts API.
 // @core-merge: do not merge the BC layer files into WordPress Core.
 require __DIR__ . '/experimental/font-face/bc-layer/class-wp-fonts-provider.php';
