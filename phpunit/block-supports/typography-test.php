@@ -339,7 +339,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	/**
 	 * Tests that stabilized typography supports are applied correctly.
 	 *
-	 * @covers ::wp_apply_typography_support
+	 * @covers ::gutenberg_apply_typography_support
 	 */
 	public function test_should_apply_stabilized_typography_supports() {
 		$this->test_block_name = 'test/experimental-typography-supports';
