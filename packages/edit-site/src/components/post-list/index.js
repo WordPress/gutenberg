@@ -208,10 +208,17 @@ export default function PostList( { postType } ) {
 	} = useEntityRecordsWithPermissions( 'postType', postType, queryArgs );
 
 	// The REST API sort the authors by ID, but we want to sort them by name.
-	const data =
-		! isLoadingFields && view?.sort?.field === 'author'
-			? filterSortAndPaginate( records, view, fields ).data
-			: records;
+	const data = useMemo( () => {
+		if ( ! isLoadingFields && view?.sort?.field === 'author' ) {
+			return filterSortAndPaginate(
+				records,
+				{ sort: { ...view.sort } },
+				fields
+			).data;
+		}
+
+		return records;
+	}, [ records, fields, isLoadingFields, view?.sort ] );
 
 	const ids = data?.map( ( record ) => getItemId( record ) ) ?? [];
 	const prevIds = usePrevious( ids ) ?? [];
