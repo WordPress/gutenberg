@@ -83,7 +83,7 @@ export type Field< Item > = {
 	/**
 	 * Callback used to sort the field.
 	 */
-	sort?: ( a: any, b: any, direction: SortDirection ) => number;
+	sort?: ( a: any, b: any, direction: SortDirection, field?: any ) => number;
 
 	/**
 	 * Whether the field is sortable.
@@ -129,7 +129,7 @@ export type NormalizedField< Item > = Field< Item > & {
 	label: string;
 	getValue: ( args: { item: Item } ) => any;
 	render: ComponentType< { item: Item } >;
-	sort: ( a: any, b: any, direction: SortDirection ) => number;
+	sort: ( a: any, b: any, direction: SortDirection, field?: any ) => number;
 };
 
 /**

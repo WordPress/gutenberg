@@ -4,6 +4,10 @@
 import type { SortDirection } from '../types';
 
 export default {
-	sort: ( a: number, b: number, direction: SortDirection ) =>
-		direction === 'asc' ? a - b : b - a,
+	sort: ( itemA: any, itemB: any, direction: SortDirection, field: any ) => {
+		const valueA = field.getValue( { item: itemA } );
+		const valueB = field.getValue( { item: itemB } );
+
+		return direction === 'asc' ? valueA - valueB : valueB - valueA;
+	},
 };

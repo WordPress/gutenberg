@@ -140,18 +140,18 @@ export function filterSortAndPaginate< Item >(
 		} );
 		if ( fieldToSort ) {
 			filteredData.sort( ( a, b ) => {
-				const valueA = fieldToSort.getValue( { item: a } ) ?? '';
-				const valueB = fieldToSort.getValue( { item: b } ) ?? '';
-
 				if ( fieldToSort.type === 'integer' ) {
-					// TODO: should we pass the item instead of the resolved value?
 					return fieldToSort.sort(
-						valueA,
-						valueB,
-						view.sort?.direction ?? 'desc'
+						a,
+						b,
+						view.sort?.direction ?? 'desc',
+						fieldToSort
 					);
 				}
 
+				// When/if types become required, we can remove the following logic.
+				const valueA = fieldToSort.getValue( { item: a } ) ?? '';
+				const valueB = fieldToSort.getValue( { item: b } ) ?? '';
 				if (
 					typeof valueA === 'number' &&
 					typeof valueB === 'number'

@@ -242,11 +242,9 @@ function usePostFields( viewType ) {
 						label: name,
 					} ) ) || [],
 				render: PostAuthorField,
-				sort: ( a, b, direction ) => {
-					const nameA =
-						authors.find( ( { id } ) => id === a )?.name || '';
-					const nameB =
-						authors.find( ( { id } ) => id === b )?.name || '';
+				sort: ( fieldA, fieldB, direction ) => {
+					const nameA = fieldA._embedded?.author?.[ 0 ]?.name || '';
+					const nameB = fieldB._embedded?.author?.[ 0 ]?.name || '';
 
 					return direction === 'asc'
 						? nameA.localeCompare( nameB )
