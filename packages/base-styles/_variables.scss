@@ -102,12 +102,12 @@ $border-width: 1px;
 $border-width-focus-fallback: 2px; // This exists as a fallback, and is ideally overridden by var(--wp-admin-border-width-focus) unless in some SASS math cases.
 $border-width-tab: 1.5px;
 $helptext-font-size: 12px;
-$radius-block-ui: 2px;
 $radio-input-size: 16px;
 $radio-input-size-sm: 24px; // Width & height for small viewports.
 
 // Deprecated, please avoid using these.
 $block-padding: 14px; // Used to define space between block footprint and surrouding borders.
+$radius-block-ui: $radius-small;
 
 
 /**
