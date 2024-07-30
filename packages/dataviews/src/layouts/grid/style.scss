@@ -71,10 +71,6 @@
 			align-items: flex-start;
 			min-height: $grid-unit-30;
 
-			&:has(.dataviews-view-grid__field-value:not(:empty)) {
-				display: flex;
-			}
-
 			&:not(:has(.dataviews-view-grid__field-value:not(:empty))) {
 				display: none;
 			}
