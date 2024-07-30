@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   RichText: make readOnly prop work properly ([#todo](https://github.com/WordPress/gutenberg/pull/todo)).
+
 ## 13.4.0 (2024-07-24)
 
 ## 13.3.0 (2024-07-10)

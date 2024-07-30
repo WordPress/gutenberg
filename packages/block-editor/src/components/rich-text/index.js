@@ -515,7 +515,7 @@ const PublicForwardedRichTextContainer = forwardRef( ( props, ref ) => {
 		);
 	}
 
-	return <PrivateRichText ref={ ref } { ...props } readOnly={ false } />;
+	return <PrivateRichText ref={ ref } { ...props } />;
 } );
 
 PublicForwardedRichTextContainer.Content = Content;
