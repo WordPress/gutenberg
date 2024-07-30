@@ -115,7 +115,6 @@ Display content in multiple columns, with blocks added to each column. ([Source]
 This block is deprecated. Please use the Avatar block instead. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comment-author-avatar))
 
 -	**Name:** core/comment-author-avatar
--	**Experimental:** fse
 -	**Category:** theme
 -	**Ancestor:** core/comment-template
 -	**Supports:** color (background, ~~text~~), interactivity (clientNavigation), spacing (margin, padding), ~~html~~, ~~inserter~~
@@ -575,7 +574,6 @@ The author name. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/pac
 This block is deprecated. Please use the Comments block instead. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comment))
 
 -	**Name:** core/post-comment
--	**Experimental:** fse
 -	**Category:** theme
 -	**Allowed Blocks:** core/avatar, core/comment-author-name, core/comment-content, core/comment-date, core/comment-edit-link, core/comment-reply-link
 -	**Supports:** interactivity (clientNavigation), ~~html~~, ~~inserter~~
@@ -586,7 +584,6 @@ This block is deprecated. Please use the Comments block instead. ([Source](https
 Display a post's comments count. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comments-count))
 
 -	**Name:** core/post-comments-count
--	**Experimental:** fse
 -	**Category:** theme
 -	**Supports:** color (background, gradients, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** textAlign
@@ -605,7 +602,6 @@ Display a post's comments form. ([Source](https://github.com/WordPress/gutenberg
 Displays the link to the current post comments. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comments-link))
 
 -	**Name:** core/post-comments-link
--	**Experimental:** fse
 -	**Category:** theme
 -	**Supports:** color (background, link, ~~text~~), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** textAlign
