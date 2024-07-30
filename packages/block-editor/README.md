@@ -1035,9 +1035,9 @@ Override a block editor settings style. Leave the ID blank to create a new style
 
 _Parameters_
 
--   _$0_ `Object`: Named parameters.
--   _$0.id_ `string`: Id of the style override, leave blank to create a new style.
--   _$0.css_ `string`: CSS to apply.
+-   _override_ `Object`: Override object.
+-   _override.id_ `?string`: Id of the style override, leave blank to create a new style.
+-   _override.css_ `string`: CSS to apply.
 
 ### useZoomOut
 

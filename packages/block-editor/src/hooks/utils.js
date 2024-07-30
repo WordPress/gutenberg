@@ -139,10 +139,10 @@ const pendingStyleOverrides = new WeakMap();
  * Override a block editor settings style. Leave the ID blank to create a new
  * style.
  *
- * @param {Object} $0     Named parameters.
- * @param {string} $0.id  Id of the style override, leave blank to create a new
- *                        style.
- * @param {string} $0.css CSS to apply.
+ * @param {Object}  override     Override object.
+ * @param {?string} override.id  Id of the style override, leave blank to create
+ *                               a new style.
+ * @param {string}  override.css CSS to apply.
  */
 export function useStyleOverride( { id, css } ) {
 	return usePrivateStyleOverride( { id, css } );
