@@ -30,6 +30,17 @@ test.describe( 'Site editor command palette', () => {
 		await expect( page ).toHaveURL(
 			'/wp-admin/post-new.php?post_type=page'
 		);
+		await page.evaluate( () => {
+			window.wp.data
+				.dispatch( 'core/preferences' )
+				.set( 'core/edit-post', 'welcomeGuide', false );
+		}, false );
+		await page.getByLabel( 'Template options' ).click();
+
+		await page
+			.getByRole( 'menuitemcheckbox', { name: 'Show template' } )
+			.click();
+
 		await expect(
 			editor.canvas.getByRole( 'textbox', { name: 'Add title' } )
 		).toBeVisible();
