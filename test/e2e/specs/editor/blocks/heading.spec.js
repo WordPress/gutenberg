@@ -176,8 +176,6 @@ test.describe( 'Heading', () => {
 		await page.keyboard.type( '### Heading' );
 		await editor.openDocumentSettingsSidebar();
 
-		await page.getByRole( 'tab', { name: 'Styles' } ).click();
-
 		const textColor = page
 			.getByRole( 'region', {
 				name: 'Editor settings',
@@ -211,8 +209,6 @@ test.describe( 'Heading', () => {
 			.click();
 		await page.keyboard.type( '## Heading' );
 		await editor.openDocumentSettingsSidebar();
-
-		await page.getByRole( 'tab', { name: 'Styles' } ).click();
 
 		const textColor = page
 			.getByRole( 'region', {
