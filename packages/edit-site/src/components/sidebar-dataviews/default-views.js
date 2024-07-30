@@ -77,105 +77,103 @@ export function useDefaultViews( { postType } ) {
 		[ postType ]
 	);
 	return useMemo( () => {
-		return {
-			[ postType ]: [
-				{
-					title: labels?.all_items || __( 'All items' ),
-					slug: 'all',
-					icon: pages,
-					view: DEFAULT_POST_BASE,
+		return [
+			{
+				title: labels?.all_items || __( 'All items' ),
+				slug: 'all',
+				icon: pages,
+				view: DEFAULT_POST_BASE,
+			},
+			{
+				title: __( 'Published' ),
+				slug: 'published',
+				icon: published,
+				view: {
+					...DEFAULT_POST_BASE,
+					filters: [
+						{
+							field: 'status',
+							operator: OPERATOR_IS_ANY,
+							value: 'publish',
+						},
+					],
 				},
-				{
-					title: __( 'Published' ),
-					slug: 'published',
-					icon: published,
-					view: {
-						...DEFAULT_POST_BASE,
-						filters: [
-							{
-								field: 'status',
-								operator: OPERATOR_IS_ANY,
-								value: 'publish',
-							},
-						],
-					},
+			},
+			{
+				title: __( 'Scheduled' ),
+				slug: 'future',
+				icon: scheduled,
+				view: {
+					...DEFAULT_POST_BASE,
+					filters: [
+						{
+							field: 'status',
+							operator: OPERATOR_IS_ANY,
+							value: 'future',
+						},
+					],
 				},
-				{
-					title: __( 'Scheduled' ),
-					slug: 'future',
-					icon: scheduled,
-					view: {
-						...DEFAULT_POST_BASE,
-						filters: [
-							{
-								field: 'status',
-								operator: OPERATOR_IS_ANY,
-								value: 'future',
-							},
-						],
-					},
+			},
+			{
+				title: __( 'Drafts' ),
+				slug: 'drafts',
+				icon: drafts,
+				view: {
+					...DEFAULT_POST_BASE,
+					filters: [
+						{
+							field: 'status',
+							operator: OPERATOR_IS_ANY,
+							value: 'draft',
+						},
+					],
 				},
-				{
-					title: __( 'Drafts' ),
-					slug: 'drafts',
-					icon: drafts,
-					view: {
-						...DEFAULT_POST_BASE,
-						filters: [
-							{
-								field: 'status',
-								operator: OPERATOR_IS_ANY,
-								value: 'draft',
-							},
-						],
-					},
+			},
+			{
+				title: __( 'Pending' ),
+				slug: 'pending',
+				icon: pending,
+				view: {
+					...DEFAULT_POST_BASE,
+					filters: [
+						{
+							field: 'status',
+							operator: OPERATOR_IS_ANY,
+							value: 'pending',
+						},
+					],
 				},
-				{
-					title: __( 'Pending' ),
-					slug: 'pending',
-					icon: pending,
-					view: {
-						...DEFAULT_POST_BASE,
-						filters: [
-							{
-								field: 'status',
-								operator: OPERATOR_IS_ANY,
-								value: 'pending',
-							},
-						],
-					},
+			},
+			{
+				title: __( 'Private' ),
+				slug: 'private',
+				icon: notAllowed,
+				view: {
+					...DEFAULT_POST_BASE,
+					filters: [
+						{
+							field: 'status',
+							operator: OPERATOR_IS_ANY,
+							value: 'private',
+						},
+					],
 				},
-				{
-					title: __( 'Private' ),
-					slug: 'private',
-					icon: notAllowed,
-					view: {
-						...DEFAULT_POST_BASE,
-						filters: [
-							{
-								field: 'status',
-								operator: OPERATOR_IS_ANY,
-								value: 'private',
-							},
-						],
-					},
+			},
+			{
+				title: __( 'Trash' ),
+				slug: 'trash',
+				icon: trash,
+				view: {
+					...DEFAULT_POST_BASE,
+					filters: [
+						{
+							field: 'status',
+							operator: OPERATOR_IS_ANY,
+							value: 'trash',
+						},
+					],
 				},
-				{
-					title: __( 'Trash' ),
-					slug: 'trash',
-					icon: trash,
-					view: {
-						...DEFAULT_POST_BASE,
-						filters: [
-							{
-								field: 'status',
-								operator: OPERATOR_IS_ANY,
-								value: 'trash',
-							},
-						],
-					},
-				},
-			],
-		};
-	}, [ labels, postType ] );
+			},
+		];
+	}, [ labels ] );
 }

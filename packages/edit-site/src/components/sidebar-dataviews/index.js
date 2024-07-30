@@ -52,7 +52,7 @@ export default function DataViewsSidebarContent() {
 		params: { postType, activeView = 'all', isCustom = 'false' },
 	} = useLocation();
 	useSwitchToTableOnTrash();
-	const DEFAULT_VIEWS = useDefaultViews( { postType } );
+	const defaultViews = useDefaultViews( { postType } );
 	if ( ! postType ) {
 		return null;
 	}
@@ -61,7 +61,7 @@ export default function DataViewsSidebarContent() {
 	return (
 		<>
 			<ItemGroup>
-				{ DEFAULT_VIEWS[ postType ].map( ( dataview ) => {
+				{ defaultViews.map( ( dataview ) => {
 					return (
 						<DataViewItem
 							key={ dataview.slug }

@@ -44,13 +44,12 @@ function useView( postType ) {
 		params: { activeView = 'all', isCustom = 'false', layout },
 	} = useLocation();
 	const history = useHistory();
-	const DEFAULT_VIEWS = useDefaultViews( { postType } );
+
+	const defaultViews = useDefaultViews( { postType } );
 	const selectedDefaultView = useMemo( () => {
 		const defaultView =
 			isCustom === 'false' &&
-			DEFAULT_VIEWS[ postType ].find(
-				( { slug } ) => slug === activeView
-			)?.view;
+			defaultViews.find( ( { slug } ) => slug === activeView )?.view;
 		if ( isCustom === 'false' && layout ) {
 			return {
 				...defaultView,
@@ -59,7 +58,7 @@ function useView( postType ) {
 			};
 		}
 		return defaultView;
-	}, [ isCustom, activeView, layout, postType, DEFAULT_VIEWS ] );
+	}, [ isCustom, activeView, layout, defaultViews ] );
 	const [ view, setView ] = useState( selectedDefaultView );
 
 	useEffect( () => {
@@ -131,8 +130,9 @@ function useView( postType ) {
 	} else if ( isCustom === 'true' && customView ) {
 		return [ customView, setCustomView ];
 	}
-	// Loading state where no the view was not found on custom views or default views.
-	return [ DEFAULT_VIEWS[ postType ][ 0 ].view, setDefaultViewAndUpdateUrl ];
+
+	// No view was found.
+	return [ defaultViews[ 0 ].view, setDefaultViewAndUpdateUrl ];
 }
 
 const DEFAULT_STATUSES = 'draft,future,pending,private,publish'; // All but 'trash'.
