@@ -37,7 +37,6 @@ import './grid-visualizer';
 
 createBlockEditFilter(
 	[
-		blockBindingsPanel,
 		align,
 		textAlign,
 		anchor,
@@ -48,6 +47,7 @@ createBlockEditFilter(
 		layout,
 		contentLockUI,
 		blockHooks,
+		blockBindingsPanel,
 		childLayout,
 	].filter( Boolean )
 );
