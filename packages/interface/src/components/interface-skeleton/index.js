@@ -178,6 +178,7 @@ function InterfaceSkeleton(
 					<AnimatePresence initial={ false }>
 						{ !! secondarySidebar && (
 							<NavigableRegion
+								layout
 								className="interface-interface-skeleton__secondary-sidebar"
 								ariaLabel={ mergedLabels.secondarySidebar }
 								as={ motion.div }
@@ -187,31 +188,46 @@ function InterfaceSkeleton(
 								}
 								exit="closed"
 								variants={ {
-									open: { width: secondarySidebarSize.width },
+									open: {
+										width: secondarySidebarSize.width,
+									},
 									closed: { width: 0 },
 									mobileOpen: { width: '100vw' },
 								} }
 								transition={ defaultTransition }
 							>
-								<div
+								<motion.div
 									style={ {
 										position: 'absolute',
 										width: isMobileViewport
 											? '100vw'
 											: 'fit-content',
 										height: '100%',
-										right: 0,
+										left: 0,
 									} }
+									initial="closed"
+									animate="open"
+									exit="closed"
+									variants={ {
+										open: {
+											transform: 'translateX( 0 )',
+										},
+										closed: {
+											transform: 'translateX( -100% )',
+										},
+									} }
+									transition={ defaultTransition }
 								>
 									{ secondarySidebarResizeListener }
 									{ secondarySidebar }
-								</div>
+								</motion.div>
 							</NavigableRegion>
 						) }
 					</AnimatePresence>
 					<NavigableRegion
 						className="interface-interface-skeleton__content"
 						ariaLabel={ mergedLabels.body }
+						layout
 					>
 						{ content }
 					</NavigableRegion>
@@ -219,6 +235,7 @@ function InterfaceSkeleton(
 						<NavigableRegion
 							className="interface-interface-skeleton__sidebar"
 							ariaLabel={ mergedLabels.sidebar }
+							layout
 						>
 							{ sidebar }
 						</NavigableRegion>
