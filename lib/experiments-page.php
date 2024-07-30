@@ -163,6 +163,18 @@ function gutenberg_initialize_experiments_settings() {
 		)
 	);
 
+	add_settings_field(
+		'gutenberg-block-bindings-ui',
+		__( 'UI to create block bindings', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Add UI to create and update block bindings in block inspector controls.', 'gutenberg' ),
+			'id'    => 'gutenberg-block-bindings-ui',
+		)
+	);
+
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments'
