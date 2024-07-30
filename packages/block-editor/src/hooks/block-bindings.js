@@ -28,6 +28,7 @@ import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
 import InspectorControls from '../components/inspector-controls';
 import BlockContext from '../components/block-context';
+import { useToolsPanelDropdownMenuProps } from '../utils/use-tools-panel-dropdown-menu-props';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -37,19 +38,6 @@ const {
 	DropdownMenuItemHelpTextV2: DropdownMenuItemHelpText,
 	DropdownMenuSeparatorV2: DropdownMenuSeparator,
 } = unlock( componentsPrivateApis );
-
-const useToolsPanelDropdownMenuProps = () => {
-	const isMobile = useViewportMatch( 'medium', '<' );
-	return ! isMobile
-		? {
-				popoverProps: {
-					placement: 'left-start',
-					// For non-mobile, inner sidebar width (248px) - button width (24px) - border (1px) + padding (16px) + spacing (20px)
-					offset: 259,
-				},
-		  }
-		: {};
-};
 
 function BlockBindingsPanelDropdown( {
 	fieldsList,

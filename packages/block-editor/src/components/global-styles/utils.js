@@ -4,11 +4,6 @@
 import fastDeepEqual from 'fast-deep-equal/es6';
 
 /**
- * WordPress dependencies
- */
-import { useViewportMatch } from '@wordpress/compose';
-
-/**
  * Internal dependencies
  */
 import { getTypographyFontSizeValue } from './typography-utils';
@@ -140,19 +135,6 @@ export const STYLE_PATH_TO_PRESET_BLOCK_ATTRIBUTE = {
 	'typography.fontSize': 'fontSize',
 	'typography.fontFamily': 'fontFamily',
 };
-
-export function useToolsPanelDropdownMenuProps() {
-	const isMobile = useViewportMatch( 'medium', '<' );
-	return ! isMobile
-		? {
-				popoverProps: {
-					placement: 'left-start',
-					// For non-mobile, inner sidebar width (248px) - button width (24px) - border (1px) + padding (16px) + spacing (20px)
-					offset: 259,
-				},
-		  }
-		: {};
-}
 
 function findInPresetsBy(
 	features,
