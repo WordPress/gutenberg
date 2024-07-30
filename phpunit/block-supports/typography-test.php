@@ -287,7 +287,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	 * Tests that stabilized typography supports will also apply to blocks using
 	 * the experimental syntax, for backwards compatibility with existing blocks.
 	 *
-	 * @covers ::wp_apply_typography_support
+	 * @covers ::gutenberg_apply_typography_support
 	 */
 	public function test_should_apply_experimental_typography_supports() {
 		$this->test_block_name = 'test/experimental-typography-supports';
