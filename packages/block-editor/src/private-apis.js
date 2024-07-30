@@ -33,6 +33,7 @@ import { usesContextKey } from './components/rich-text/format-edit';
 import { ExperimentalBlockCanvas } from './components/block-canvas';
 import { getDuotoneFilter } from './components/duotone/utils';
 import { useFlashEditableBlocks } from './components/use-flash-editable-blocks';
+import { useToolsPanelDropdownMenuProps } from './utils/use-tools-panel-dropdown-menu-props';
 import {
 	selectBlockPatternsKey,
 	reusableBlocksSelectKey,
@@ -93,4 +94,5 @@ lock( privateApis, {
 	useBlockDisplayTitle,
 	__unstableBlockStyleVariationOverridesWithConfig,
 	setBackgroundStyleDefaults,
+	useToolsPanelDropdownMenuProps,
 } );
