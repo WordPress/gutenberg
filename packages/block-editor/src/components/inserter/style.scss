@@ -1,6 +1,5 @@
 $block-inserter-preview-height: 350px;
-$block-inserter-width: 350px;
-$block-inserter-panel-width: 300px;
+$block-quick-inserter-width: 350px;
 $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter {
@@ -19,8 +18,8 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__menu.show-panel {
-	@include break-large() {
-		width: $block-inserter-width + $block-inserter-panel-width;
+	@include break-medium() {
+		width: $secondary-sidebar-width + $sidebar-width;
 	}
 }
 
@@ -308,7 +307,7 @@ $block-inserter-tabs-height: 44px;
 	@include break-medium {
 		border-left: $border-width solid $gray-200;
 		padding: 0;
-		left: 100%;
+		left: $secondary-sidebar-width;
 		width: 300px;
 		position: absolute;
 		top: -$border-width;
@@ -321,10 +320,6 @@ $block-inserter-tabs-height: 44px;
 		.block-editor-block-patterns-list {
 			padding: 0 $grid-unit-30 $grid-unit-20;
 		}
-	}
-
-	@include break-large {
-		left: $block-inserter-width;
 	}
 }
 
@@ -379,7 +374,7 @@ $block-inserter-tabs-height: 44px;
 	max-width: 100%;
 
 	@include break-medium {
-		width: $block-inserter-width;
+		width: $block-quick-inserter-width;
 	}
 }
 
