@@ -6,8 +6,10 @@ import {
 	SVG,
 	Popover,
 	Button,
-	__experimentalNumberControl as NumberControl,
 	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
+	__experimentalNumberControl as NumberControl,
+	TextareaControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
@@ -17,7 +19,6 @@ import {
 	RichTextToolbarButton,
 	MediaUploadCheck,
 } from '@wordpress/block-editor';
-import { keyboardReturn } from '@wordpress/icons';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
@@ -41,8 +42,10 @@ export const image = {
 };
 
 function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
-	const { style } = activeObjectAttributes;
+	const { style, alt: _alt } = activeObjectAttributes;
 	const [ width, setWidth ] = useState( style?.replace( /\D/g, '' ) );
+	const [ alt, setAlt ] = useState( _alt );
+	const [ hasChanged, setHasChanged ] = useState( false );
 	const popoverAnchor = useAnchor( {
 		editableContentElement: contentRef.current,
 		settings: image,
@@ -65,6 +68,7 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 						attributes: {
 							...activeObjectAttributes,
 							style: width ? `width: ${ width }px;` : '',
+							alt,
 						},
 					};
 
@@ -73,24 +77,43 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 						replacements: newReplacements,
 					} );
 
+					setHasChanged( false );
+
 					event.preventDefault();
 				} }
 			>
-				<HStack alignment="bottom">
+				<VStack>
 					<NumberControl
 						label={ __( 'Width' ) }
 						value={ width }
 						min={ 1 }
-						onChange={ ( newWidth ) => setWidth( newWidth ) }
-						size="__unstable-large"
+						onChange={ ( newWidth ) => {
+							setWidth( newWidth );
+							setHasChanged( true );
+						} }
+						size="compact"
 					/>
-					<Button
-						icon={ keyboardReturn }
-						label={ __( 'Apply' ) }
-						type="submit"
-						__next40pxDefaultSize
+					<TextareaControl
+						label={ __( 'Alternative text' ) }
+						__nextHasNoMarginBottom
+						value={ alt }
+						onChange={ ( newAlt ) => {
+							setAlt( newAlt );
+							setHasChanged( true );
+						} }
 					/>
-				</HStack>
+					<HStack justify="right">
+						<Button
+							disabled={ ! hasChanged }
+							accessibleWhenDisabled
+							variant="primary"
+							type="submit"
+							size="compact"
+						>
+							{ __( 'Apply' ) }
+						</Button>
+					</HStack>
+				</VStack>
 			</form>
 		</Popover>
 	);
