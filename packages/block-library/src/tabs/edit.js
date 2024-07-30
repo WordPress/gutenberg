@@ -16,19 +16,6 @@ const TABS_TEMPLATE = [
 	[ 'core/tab', { label: 'Tab 2' } ],
 ];
 
-const ALLOWED_FORMATS = [
-	'core/bold',
-	'core/code',
-	'core/image',
-	'core/italic',
-	'core/keyboard',
-	'core/language',
-	'core/strikethrough',
-	'core/subscript',
-	'core/superscript',
-	'core/text-color',
-];
-
 export default function Edit( { clientId, setAttributes } ) {
 	const { innerTabBlocks, selectedTabClientId } = useSelect(
 		( select ) => {
@@ -169,7 +156,6 @@ export default function Edit( { clientId, setAttributes } ) {
 								tabIndex={ tabIndexAttr }
 							>
 								<RichText
-									allowedFormats={ ALLOWED_FORMATS }
 									tagName="span"
 									onChange={ ( value ) =>
 										updateBlockAttributes( block.clientId, {
@@ -178,6 +164,7 @@ export default function Edit( { clientId, setAttributes } ) {
 									}
 									placeholder={ __( 'Add label…' ) }
 									value={ label }
+									withoutInteractiveFormatting
 								/>
 							</a>
 						</li>
