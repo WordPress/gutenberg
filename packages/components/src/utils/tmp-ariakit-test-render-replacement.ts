@@ -160,14 +160,14 @@ export async function render( ui: ReactNode, options?: RenderOptions ) {
 	}
 
 	return wrapRender( () => {
-		const output = ReactTestingLibrary.render( ui, {
+		const { rerender, unmount } = ReactTestingLibrary.render( ui, {
 			...options,
 			wrapper,
 		} );
 		return {
-			...output,
+			unmount,
 			rerender: ( newUi: ReactNode ) =>
-				wrapRender( () => output.rerender( newUi ) ),
+				wrapRender( () => rerender( newUi ) ),
 		};
 	} );
 }
