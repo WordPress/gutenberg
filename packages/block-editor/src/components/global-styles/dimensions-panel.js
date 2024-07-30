@@ -22,7 +22,8 @@ import { useCallback, useState, Platform } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { getValueFromVariable, useToolsPanelDropdownMenuProps } from './utils';
+import { getValueFromVariable } from './utils';
+import { useToolsPanelDropdownMenuProps } from '../../utils/use-tools-panel-dropdown-menu-props';
 import SpacingSizesControl from '../spacing-sizes-control';
 import HeightControl from '../height-control';
 import ChildLayoutControl from '../child-layout-control';

@@ -46,9 +46,10 @@ import {
 	TEMPLATE,
 } from './constants';
 import { unlock } from '../lock-unlock';
-import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
-const { ResolutionTool } = unlock( blockEditorPrivateApis );
+const { ResolutionTool, useToolsPanelDropdownMenuProps } = unlock(
+	blockEditorPrivateApis
+);
 
 // this limits the resize to a safe zone to avoid making broken layouts
 const applyWidthConstraints = ( width ) =>

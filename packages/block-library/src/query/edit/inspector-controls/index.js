@@ -38,9 +38,10 @@ import {
 	isControlAllowed,
 	useTaxonomies,
 } from '../../utils';
-import { useToolsPanelDropdownMenuProps } from '../../../utils/hooks';
 
-const { BlockInfo } = unlock( blockEditorPrivateApis );
+const { BlockInfo, useToolsPanelDropdownMenuProps } = unlock(
+	blockEditorPrivateApis
+);
 
 export default function QueryInspectorControls( props ) {
 	const { attributes, setQuery, setDisplayLayout, setAttributes, clientId } =

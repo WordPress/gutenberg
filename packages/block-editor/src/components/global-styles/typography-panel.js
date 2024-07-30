@@ -21,7 +21,8 @@ import TextAlignmentControl from '../text-alignment-control';
 import TextTransformControl from '../text-transform-control';
 import TextDecorationControl from '../text-decoration-control';
 import WritingModeControl from '../writing-mode-control';
-import { getValueFromVariable, useToolsPanelDropdownMenuProps } from './utils';
+import { getValueFromVariable } from './utils';
+import { useToolsPanelDropdownMenuProps } from '../../utils/use-tools-panel-dropdown-menu-props';
 import { setImmutably } from '../../utils/object';
 import {
 	getMergedFontFamiliesAndFontFamilyFaces,

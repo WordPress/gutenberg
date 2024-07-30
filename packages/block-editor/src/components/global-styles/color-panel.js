@@ -27,7 +27,8 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import ColorGradientControl from '../colors-gradients/control';
 import { useColorsPerOrigin, useGradientsPerOrigin } from './hooks';
-import { getValueFromVariable, useToolsPanelDropdownMenuProps } from './utils';
+import { getValueFromVariable } from './utils';
+import { useToolsPanelDropdownMenuProps } from '../../utils/use-tools-panel-dropdown-menu-props';
 import { setImmutably } from '../../utils/object';
 import { unlock } from '../../lock-unlock';
 
