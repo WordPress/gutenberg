@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ReactElement, ReactNode } from 'react';
+import type { ReactElement, ComponentType } from 'react';
 
 /**
  * Internal dependencies
@@ -44,7 +44,7 @@ export type Operator =
 
 export type ItemRecord = Record< string, unknown >;
 
-export type FieldType = 'text';
+export type FieldType = 'text' | 'integer';
 
 /**
  * A dataview field for a specific property of a data type.
@@ -63,7 +63,12 @@ export type Field< Item > = {
 	/**
 	 * The label of the field. Defaults to the id.
 	 */
-	header?: string;
+	label?: string;
+
+	/**
+	 * A description of the field.
+	 */
+	description?: string;
 
 	/**
 	 * Placeholder for the field.
@@ -73,7 +78,7 @@ export type Field< Item > = {
 	/**
 	 * Callback used to render the field. Defaults to `field.getValue`.
 	 */
-	render?: ( args: { item: Item } ) => ReactNode;
+	render?: ComponentType< { item: Item } >;
 
 	/**
 	 * Whether the field is sortable.
@@ -116,9 +121,9 @@ export type Field< Item > = {
 	  } );
 
 export type NormalizedField< Item > = Field< Item > & {
-	header: string;
+	label: string;
 	getValue: ( args: { item: Item } ) => any;
-	render: ( args: { item: Item } ) => ReactNode;
+	render: ComponentType< { item: Item } >;
 };
 
 /**
@@ -242,7 +247,7 @@ interface ViewBase {
 export interface CombinedField {
 	id: string;
 
-	header: string;
+	label: string;
 
 	/**
 	 * The fields to use as columns.
@@ -430,10 +435,11 @@ export interface ViewBaseProps< Item > {
 	getItemId: ( item: Item ) => string;
 	isLoading?: boolean;
 	onChangeView: ( view: View ) => void;
-	onSelectionChange: SetSelection;
+	onChangeSelection: SetSelection;
 	selection: string[];
 	setOpenedFilter: ( fieldId: string ) => void;
 	view: View;
+	density: number;
 }
 
 export interface ViewTableProps< Item > extends ViewBaseProps< Item > {

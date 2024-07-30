@@ -26,14 +26,12 @@ function GridTools( { clientId, layout } ) {
 		};
 	} );
 
-	if ( ! isSelected && ! isDragging ) {
-		return null;
-	}
-
 	return (
 		<>
-			<GridVisualizer clientId={ clientId } parentLayout={ layout } />
 			<GridLayoutSync clientId={ clientId } />
+			{ ( isSelected || isDragging ) && (
+				<GridVisualizer clientId={ clientId } parentLayout={ layout } />
+			) }
 		</>
 	);
 }
@@ -41,7 +39,7 @@ function GridTools( { clientId, layout } ) {
 const addGridVisualizerToBlockEdit = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		if ( props.attributes.layout?.type !== 'grid' ) {
-			return <BlockEdit { ...props } />;
+			return <BlockEdit key="edit" { ...props } />;
 		}
 
 		return (
@@ -50,7 +48,7 @@ const addGridVisualizerToBlockEdit = createHigherOrderComponent(
 					clientId={ props.clientId }
 					layout={ props.attributes.layout }
 				/>
-				<BlockEdit { ...props } />
+				<BlockEdit key="edit" { ...props } />
 			</>
 		);
 	},

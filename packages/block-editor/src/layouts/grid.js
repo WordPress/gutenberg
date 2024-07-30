@@ -264,6 +264,7 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 				</FlexItem>
 				<FlexItem isBlock>
 					<RangeControl
+						__nextHasNoMarginBottom
 						onChange={ handleSliderChange }
 						value={ quantity || 0 }
 						min={ 0 }
@@ -367,6 +368,7 @@ function GridLayoutColumnsAndRowsControl( {
 							/>
 						) : (
 							<RangeControl
+								__nextHasNoMarginBottom
 								value={ columnCount ?? 0 }
 								onChange={ ( value ) =>
 									onChange( {

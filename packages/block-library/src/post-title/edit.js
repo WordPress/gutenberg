@@ -42,11 +42,11 @@ export default function PostTitleEdit( {
 			if ( isDescendentOfQueryLoop ) {
 				return false;
 			}
-			return select( coreStore ).canUserEditEntityRecord(
-				'postType',
-				postType,
-				postId
-			);
+			return select( coreStore ).canUser( 'update', {
+				kind: 'postType',
+				name: postType,
+				id: postId,
+			} );
 		},
 		[ isDescendentOfQueryLoop, postType, postId ]
 	);

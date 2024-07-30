@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
 	RadioControl,
 	__experimentalText as Text,
@@ -18,7 +18,7 @@ const COMMENT_OPTIONS = [
 	{
 		label: (
 			<>
-				{ __( 'Open' ) }
+				{ _x( 'Open', 'Adjective: e.g. "Comments are open"' ) }
 				<Text variant="muted" size={ 12 }>
 					{ __( 'Visitors can add new comments and replies.' ) }
 				</Text>

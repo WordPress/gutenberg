@@ -107,13 +107,13 @@ export const DropdownMenu = styled( Ariakit.Menu )<
 	/* Default animation.*/
 	animation-name: ${ slideDownAndFade };
 
-	&[data-side='right'] {
+	&[data-side='left'] {
 		animation-name: ${ slideLeftAndFade };
 	}
-	&[data-side='bottom'] {
+	&[data-side='up'] {
 		animation-name: ${ slideUpAndFade };
 	}
-	&[data-side='left'] {
+	&[data-side='right'] {
 		animation-name: ${ slideRightAndFade };
 	}
 	@media ( prefers-reduced-motion ) {
@@ -344,6 +344,7 @@ export const DropdownMenuItemHelpText = styled( Truncate )`
 	font-size: ${ font( 'helpText.fontSize' ) };
 	line-height: 16px;
 	color: ${ COLORS.gray[ '700' ] };
+	word-break: break-all;
 
 	[data-active-item]:not( [data-focus-visible] ) *:not( ${ DropdownMenu } ) &,
 	[aria-disabled='true'] *:not( ${ DropdownMenu } ) & {

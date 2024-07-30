@@ -318,6 +318,7 @@
 	height: $radio-input-size-sm;
 	min-width: $radio-input-size-sm;
 	max-width: $radio-input-size-sm;
+	position: relative;
 
 	@include break-small() {
 		height: $radio-input-size;
@@ -328,9 +329,12 @@
 
 	&:checked::before {
 		box-sizing: inherit;
-		width: 8px;
-		height: 8px;
-		transform: translate(7px, 7px);
+		width: math.div($radio-input-size-sm, 2);
+		height: math.div($radio-input-size-sm, 2);
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
 		margin: 0;
 		background-color: $white;
 
@@ -338,7 +342,8 @@
 		border: 4px solid $white;
 
 		@include break-small() {
-			transform: translate(5px, 5px);
+			width: math.div($radio-input-size, 2);
+			height: math.div($radio-input-size, 2);
 		}
 	}
 
@@ -351,7 +356,7 @@
 
 	&:checked {
 		background: var(--wp-admin-theme-color);
-		border-color: var(--wp-admin-theme-color);
+		border: none;
 	}
 }
 

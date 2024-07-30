@@ -96,3 +96,117 @@
 	}
 }
 
+.block-editor-grid-item-mover__move-button-container {
+	display: flex;
+	padding: 0;
+	border: none;
+	justify-content: center;
+
+	.block-editor-grid-item-mover-button {
+		width: $block-toolbar-height * 0.5;
+		min-width: 0 !important; // overrides default button width.
+		overflow: hidden;
+		padding-left: 0;
+		padding-right: 0;
+
+		svg {
+			min-width: $grid-unit-30;
+		}
+
+		// Focus and toggle pseudo elements.
+		&::before {
+			content: "";
+			position: absolute;
+			display: block;
+			border-radius: $radius-block-ui;
+			height: $grid-unit-40;
+
+			// Position the focus rectangle.
+			left: $grid-unit-10;
+			right: $grid-unit-10;
+			z-index: -1;
+
+			// Animate in.
+			animation: components-button__appear-animation 0.1s ease;
+			animation-fill-mode: forwards;
+			@include reduce-motion("animation");
+		}
+
+		// Don't show the focus inherited by the Button component.
+		&:focus,
+		&:focus:enabled,
+		&:focus::before {
+			box-shadow: none;
+			outline: none;
+		}
+
+		&:focus-visible::before {
+			@include block-toolbar-button-style__focus();
+		}
+	}
+}
+
+
+.block-editor-grid-item-mover__move-vertical-button-container {
+	display: flex;
+	position: relative;
+	@include break-small() {
+		flex-direction: column;
+		justify-content: space-around;
+
+		> .block-editor-grid-item-mover-button.block-editor-grid-item-mover-button {
+			height: $block-toolbar-height * 0.5 - $grid-unit-05;
+			width: 100%;
+			min-width: 0 !important; // overrides default button width.
+
+			// Focus style.
+			&::before {
+				height: calc(100% - 4px);
+			}
+		}
+
+		.block-editor-grid-item-mover-button.is-up-button svg,
+		.block-editor-grid-item-mover-button.is-down-button svg {
+			flex-shrink: 0;
+			height: $block-toolbar-height * 0.5 - $grid-unit-05;
+		}
+	}
+}
+
+.show-icon-labels {
+
+	.block-editor-grid-item-mover-button.block-editor-grid-item-mover-button.is-left-button {
+		border-right: 1px solid $gray-700;
+		padding-right: 12px;
+	}
+
+	.block-editor-grid-item-mover-button.block-editor-grid-item-mover-button.is-right-button {
+		border-left: 1px solid $gray-700;
+		padding-left: 12px;
+	}
+
+
+	.block-editor-grid-item-mover__move-vertical-button-container {
+		&::before {
+			@include break-small() {
+				content: "";
+				height: $border-width;
+				width: 100%;
+				background: $gray-200;
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				// With Top toolbar enabled, this separator has a smaller width. Translating the
+				// X axis allows to make the separator always centered regardless of its width.
+				transform: translate(-50%, 0);
+				margin-top: -$border-width * 0.5;
+			}
+
+			@include break-medium {
+				background: $gray-900;
+			}
+		}
+	}
+
+}
+

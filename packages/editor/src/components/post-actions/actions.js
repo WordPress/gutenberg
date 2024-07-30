@@ -3,7 +3,7 @@
  */
 import { external, trash, backup } from '@wordpress/icons';
 import { addQueryArgs } from '@wordpress/url';
-import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, _n, sprintf, _x } from '@wordpress/i18n';
@@ -11,7 +11,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { useMemo, useState } from '@wordpress/element';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { parse } from '@wordpress/blocks';
-import { DataForm } from '@wordpress/dataviews';
+import { DataForm, isItemValid } from '@wordpress/dataviews';
 import {
 	Button,
 	TextControl,
@@ -38,19 +38,29 @@ import { getItemTitle } from '../../dataviews/actions/utils';
 const { PATTERN_TYPES, CreatePatternModalContents, useDuplicatePatternProps } =
 	unlock( patternsPrivateApis );
 
-// TODO: this should be shared with other components (page-pages).
+// TODO: this should be shared with other components (see post-fields in edit-site).
 const fields = [
 	{
 		type: 'text',
-		header: __( 'Title' ),
 		id: 'title',
+		label: __( 'Title' ),
 		placeholder: __( 'No title' ),
 		getValue: ( { item } ) => item.title,
 	},
+	{
+		type: 'integer',
+		id: 'menu_order',
+		label: __( 'Order' ),
+		description: __( 'Determines the order of pages.' ),
+	},
 ];
 
-const form = {
+const formDuplicateAction = {
 	visibleFields: [ 'title' ],
+};
+
+const formOrderAction = {
+	visibleFields: [ 'menu_order' ],
 };
 
 /**
@@ -78,7 +88,10 @@ const trashPostAction = {
 	isPrimary: true,
 	icon: trash,
 	isEligible( item ) {
-		return ! [ 'auto-draft', 'trash' ].includes( item.status );
+		return (
+			! [ 'auto-draft', 'trash' ].includes( item.status ) &&
+			item.permissions?.delete
+		);
 	},
 	supportsBulk: true,
 	hideModalHeader: true,
@@ -230,38 +243,12 @@ const trashPostAction = {
 	},
 };
 
-function useCanUserEligibilityCheckPostType( capability, resource, action ) {
-	const registry = useRegistry();
-	return useMemo(
-		() => ( {
-			...action,
-			isEligible( item ) {
-				return (
-					action.isEligible( item ) &&
-					registry
-						.select( coreStore )
-						.canUser( capability, resource, item.id )
-				);
-			},
-		} ),
-		[ action, registry, capability, resource ]
-	);
-}
-
-function useTrashPostAction( resource ) {
-	return useCanUserEligibilityCheckPostType(
-		'delete',
-		resource,
-		trashPostAction
-	);
-}
-
 const permanentlyDeletePostAction = {
 	id: 'permanently-delete',
 	label: __( 'Permanently delete' ),
 	supportsBulk: true,
-	isEligible( { status } ) {
-		return status === 'trash';
+	isEligible( { status, permissions } ) {
+		return status === 'trash' && permissions?.delete;
 	},
 	async callback( posts, { registry, onActionPerformed } ) {
 		const { createSuccessNotice, createErrorNotice } =
@@ -347,22 +334,14 @@ const permanentlyDeletePostAction = {
 	},
 };
 
-function usePermanentlyDeletePostAction( resource ) {
-	return useCanUserEligibilityCheckPostType(
-		'delete',
-		resource,
-		permanentlyDeletePostAction
-	);
-}
-
 const restorePostAction = {
 	id: 'restore',
 	label: __( 'Restore' ),
 	isPrimary: true,
 	icon: backup,
 	supportsBulk: true,
-	isEligible( { status } ) {
-		return status === 'trash';
+	isEligible( { status, permissions } ) {
+		return status === 'trash' && permissions?.update;
 	},
 	async callback( posts, { registry, onActionPerformed } ) {
 		const { createSuccessNotice, createErrorNotice } =
@@ -462,14 +441,6 @@ const restorePostAction = {
 	},
 };
 
-function useRestorePostAction( resource ) {
-	return useCanUserEligibilityCheckPostType(
-		'update',
-		resource,
-		restorePostAction
-	);
-}
-
 const viewPostAction = {
 	id: 'view-post',
 	label: __( 'View' ),
@@ -536,11 +507,15 @@ const renamePostAction = {
 				...Object.values( PATTERN_TYPES ),
 			].includes( post.type )
 		) {
-			return true;
+			return post.permissions?.update;
 		}
 		// In the case of templates, we can only rename custom templates.
 		if ( post.type === TEMPLATE_POST_TYPE ) {
-			return isTemplateRemovable( post ) && post.is_custom;
+			return (
+				isTemplateRemovable( post ) &&
+				post.is_custom &&
+				post.permissions?.update
+			);
 		}
 		// Make necessary checks for template parts and patterns.
 		const isTemplatePart = post.type === TEMPLATE_PART_POST_TYPE;
@@ -552,7 +527,7 @@ const renamePostAction = {
 			isUserPattern ||
 			( isTemplatePart && post.source === TEMPLATE_ORIGINS.custom );
 		const hasThemeFile = post?.has_theme_file;
-		return isCustomPattern && ! hasThemeFile;
+		return isCustomPattern && ! hasThemeFile && post.permissions?.update;
 	},
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ item ] = items;
@@ -623,22 +598,117 @@ const renamePostAction = {
 	},
 };
 
-function useRenamePostAction( resource ) {
-	return useCanUserEligibilityCheckPostType(
-		'update',
-		resource,
-		renamePostAction
+function ReorderModal( { items, closeModal, onActionPerformed } ) {
+	const [ item, setItem ] = useState( items[ 0 ] );
+	const orderInput = item.menu_order;
+	const { editEntityRecord, saveEditedEntityRecord } =
+		useDispatch( coreStore );
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticesStore );
+
+	async function onOrder( event ) {
+		event.preventDefault();
+
+		if ( ! isItemValid( item, fields, formOrderAction ) ) {
+			return;
+		}
+
+		try {
+			await editEntityRecord( 'postType', item.type, item.id, {
+				menu_order: orderInput,
+			} );
+			closeModal();
+			// Persist edited entity.
+			await saveEditedEntityRecord( 'postType', item.type, item.id, {
+				throwOnError: true,
+			} );
+			createSuccessNotice( __( 'Order updated' ), {
+				type: 'snackbar',
+			} );
+			onActionPerformed?.( items );
+		} catch ( error ) {
+			const errorMessage =
+				error.message && error.code !== 'unknown_error'
+					? error.message
+					: __( 'An error occurred while updating the order' );
+			createErrorNotice( errorMessage, {
+				type: 'snackbar',
+			} );
+		}
+	}
+	const isSaveDisabled = ! isItemValid( item, fields, formOrderAction );
+	return (
+		<form onSubmit={ onOrder }>
+			<VStack spacing="5">
+				<div>
+					{ __(
+						'Determines the order of pages. Pages with the same order value are sorted alphabetically. Negative order values are supported.'
+					) }
+				</div>
+				<DataForm
+					data={ item }
+					fields={ fields }
+					form={ formOrderAction }
+					onChange={ setItem }
+				/>
+				<HStack justify="right">
+					<Button
+						__next40pxDefaultSize
+						variant="tertiary"
+						onClick={ () => {
+							closeModal();
+						} }
+					>
+						{ __( 'Cancel' ) }
+					</Button>
+					<Button
+						__next40pxDefaultSize
+						variant="primary"
+						type="submit"
+						accessibleWhenDisabled
+						disabled={ isSaveDisabled }
+						__experimentalIsFocusable
+					>
+						{ __( 'Save' ) }
+					</Button>
+				</HStack>
+			</VStack>
+		</form>
+	);
+}
+
+function useReorderPagesAction( postType ) {
+	const supportsPageAttributes = useSelect(
+		( select ) => {
+			const { getPostType } = select( coreStore );
+			const postTypeObject = getPostType( postType );
+
+			return !! postTypeObject?.supports?.[ 'page-attributes' ];
+		},
+		[ postType ]
+	);
+
+	return useMemo(
+		() =>
+			supportsPageAttributes && {
+				id: 'order-pages',
+				label: __( 'Order' ),
+				isEligible( { status } ) {
+					return status !== 'trash';
+				},
+				RenderModal: ReorderModal,
+			},
+		[ supportsPageAttributes ]
 	);
 }
 
 const useDuplicatePostAction = ( postType ) => {
-	const { userCanCreatePost } = useSelect(
+	const userCanCreatePost = useSelect(
 		( select ) => {
-			const { getPostType, canUser } = select( coreStore );
-			const resource = getPostType( postType )?.rest_base || '';
-			return {
-				userCanCreatePost: canUser( 'create', resource ),
-			};
+			return select( coreStore ).canUser( 'create', {
+				kind: 'postType',
+				name: postType,
+			} );
 		},
 		[ postType ]
 	);
@@ -763,7 +833,7 @@ const useDuplicatePostAction = ( postType ) => {
 								<DataForm
 									data={ item }
 									fields={ fields }
-									form={ form }
+									form={ formDuplicateAction }
 									onChange={ setItem }
 								/>
 								<HStack spacing={ 2 } justify="end">
@@ -824,11 +894,16 @@ export const duplicateTemplatePartAction = {
 		const blocks = useMemo( () => {
 			return (
 				item.blocks ??
-				parse( item.content.raw, {
-					__unstableSkipMigrationLogs: true,
-				} )
+				parse(
+					typeof item.content === 'string'
+						? item.content
+						: item.content.raw,
+					{
+						__unstableSkipMigrationLogs: true,
+					}
+				)
 			);
-		}, [ item?.content?.raw, item.blocks ] );
+		}, [ item.content, item.blocks ] );
 		const { createSuccessNotice } = useDispatch( noticesStore );
 		function onTemplatePartSuccess() {
 			createSuccessNotice(
@@ -863,7 +938,6 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 		defaultActions,
 		postTypeObject,
 		userCanCreatePostType,
-		resource,
 		cachedCanUserResolvers,
 	} = useSelect(
 		( select ) => {
@@ -871,12 +945,13 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 				select( coreStore );
 			const { getEntityActions } = unlock( select( editorStore ) );
 			const _postTypeObject = getPostType( postType );
-			const _resource = _postTypeObject?.rest_base || '';
 			return {
 				postTypeObject: _postTypeObject,
 				defaultActions: getEntityActions( 'postType', postType ),
-				userCanCreatePostType: canUser( 'create', _resource ),
-				resource: _resource,
+				userCanCreatePostType: canUser( 'create', {
+					kind: 'postType',
+					name: postType,
+				} ),
 				cachedCanUserResolvers: getCachedResolvers()?.canUser,
 			};
 		},
@@ -884,11 +959,7 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 	);
 
 	const duplicatePostAction = useDuplicatePostAction( postType );
-	const trashPostActionForPostType = useTrashPostAction( resource );
-	const permanentlyDeletePostActionForPostType =
-		usePermanentlyDeletePostAction( resource );
-	const renamePostActionForPostType = useRenamePostAction( resource );
-	const restorePostActionForPostType = useRestorePostAction( resource );
+	const reorderPagesAction = useReorderPagesAction( postType );
 	const isTemplateOrTemplatePart = [
 		TEMPLATE_POST_TYPE,
 		TEMPLATE_PART_POST_TYPE,
@@ -914,13 +985,13 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 				userCanCreatePostType &&
 				duplicateTemplatePartAction,
 			isPattern && userCanCreatePostType && duplicatePatternAction,
-			supportsTitle && renamePostActionForPostType,
-			! isTemplateOrTemplatePart && restorePostActionForPostType,
+			supportsTitle && renamePostAction,
+			reorderPagesAction,
+			! isTemplateOrTemplatePart && ! isPattern && restorePostAction,
+			! isTemplateOrTemplatePart && ! isPattern && trashPostAction,
 			! isTemplateOrTemplatePart &&
 				! isPattern &&
-				trashPostActionForPostType,
-			! isTemplateOrTemplatePart &&
-				permanentlyDeletePostActionForPostType,
+				permanentlyDeletePostAction,
 			...defaultActions,
 		].filter( Boolean );
 		// Filter actions based on provided context. If not provided
@@ -946,7 +1017,7 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 							existingCallback( items, {
 								...argsObject,
 								onActionPerformed: ( _items ) => {
-									if ( argsObject.onActionPerformed ) {
+									if ( argsObject?.onActionPerformed ) {
 										argsObject.onActionPerformed( _items );
 									}
 									onActionPerformed(
@@ -994,10 +1065,7 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 		isPattern,
 		postTypeObject?.viewable,
 		duplicatePostAction,
-		trashPostActionForPostType,
-		restorePostActionForPostType,
-		renamePostActionForPostType,
-		permanentlyDeletePostActionForPostType,
+		reorderPagesAction,
 		onActionPerformed,
 		isLoaded,
 		supportsRevisions,

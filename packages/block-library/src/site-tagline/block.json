@@ -16,7 +16,12 @@
 			"default": 0
 		}
 	},
-	"example": {},
+	"example": {
+		"viewportWidth": 350,
+		"attributes": {
+			"textAlign": "center"
+		}
+	},
 	"supports": {
 		"align": [ "wide", "full" ],
 		"html": false,

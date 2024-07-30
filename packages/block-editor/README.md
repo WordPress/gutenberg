@@ -730,10 +730,6 @@ _Returns_
 
 -   `JSX.Element`: A React element.
 
-### ReusableBlocksRenameHint
-
-Undocumented declaration.
-
 ### RichText
 
 _Related_

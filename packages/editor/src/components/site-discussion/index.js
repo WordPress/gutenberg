@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
@@ -25,7 +25,7 @@ const COMMENT_OPTIONS = [
 	{
 		label: (
 			<>
-				{ __( 'Open' ) }
+				{ _x( 'Open', 'Adjective: e.g. "Comments are open"' ) }
 				<Text variant="muted" size={ 12 }>
 					{ __( 'Visitors can add new comments and replies.' ) }
 				</Text>
@@ -55,8 +55,13 @@ export default function SiteDiscussion() {
 		( select ) => {
 			const { getEditedPostAttribute, getCurrentPostType } =
 				select( editorStore );
-			const { getEditedEntityRecord } = select( coreStore );
-			const siteSettings = getEditedEntityRecord( 'root', 'site' );
+			const { getEditedEntityRecord, canUser } = select( coreStore );
+			const siteSettings = canUser( 'read', {
+				kind: 'root',
+				name: 'site',
+			} )
+				? getEditedEntityRecord( 'root', 'site' )
+				: undefined;
 			return {
 				isTemplate: getCurrentPostType() === TEMPLATE_POST_TYPE,
 				postSlug: getEditedPostAttribute( 'slug' ),
