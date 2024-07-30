@@ -58,8 +58,8 @@ const trashPost: Action< PostWithPermissions > = {
 						: sprintf(
 								// translators: %d: The number of items (2 or more).
 								_n(
-									'Are you sure you want to move to the trash %d item?',
-									'Are you sure you want to move to the trash %d items?',
+									'Are you sure you want to move %d item to the trash ?',
+									'Are you sure you want to move %d items to the trash ?',
 									items.length
 								),
 								items.length
