@@ -14,6 +14,7 @@ import { __ } from '@wordpress/i18n';
 import { desktop, mobile, tablet, external } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { useEffect, useRef } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
@@ -27,22 +28,51 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 	const isZoomOutExperiment =
 		!! window.__experimentalEnableZoomedOutPatternsTab;
 
-	const { deviceType, homeUrl, isTemplate, isViewable, showIconLabels } =
-		useSelect( ( select ) => {
-			const { getDeviceType, getCurrentPostType } = select( editorStore );
-			const { getUnstableBase, getPostType } = select( coreStore );
-			const { get } = select( preferencesStore );
-			const _currentPostType = getCurrentPostType();
-			return {
-				deviceType: getDeviceType(),
-				homeUrl: getUnstableBase()?.home,
-				isTemplate: _currentPostType === 'wp_template',
-				isViewable: getPostType( _currentPostType )?.viewable ?? false,
-				showIconLabels: get( 'core', 'showIconLabels' ),
-			};
-		}, [] );
+	const {
+		deviceType,
+		editorMode,
+		homeUrl,
+		isTemplate,
+		isViewable,
+		showIconLabels,
+	} = useSelect( ( select ) => {
+		const { getDeviceType, getCurrentPostType } = select( editorStore );
+		const { getUnstableBase, getPostType } = select( coreStore );
+		const { get } = select( preferencesStore );
+		const { __unstableGetEditorMode } = select( blockEditorStore );
+		const _currentPostType = getCurrentPostType();
+		return {
+			deviceType: getDeviceType(),
+			editorMode: __unstableGetEditorMode(),
+			homeUrl: getUnstableBase()?.home,
+			isTemplate: _currentPostType === 'wp_template',
+			isViewable: getPostType( _currentPostType )?.viewable ?? false,
+			showIconLabels: get( 'core', 'showIconLabels' ),
+		};
+	}, [] );
 	const { setDeviceType } = useDispatch( editorStore );
 	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
+
+	/**
+	 * Save the original editing mode in a ref to restore it when we exit zoom out.
+	 */
+	const originalEditingMode = useRef( editorMode );
+	useEffect( () => {
+		if ( editorMode !== 'zoom-out' ) {
+			originalEditingMode.current = editorMode;
+		}
+
+		return () => {
+			// We need to use  __unstableGetEditorMode() here and not `mode`, as mode may not update on unmount
+			if (
+				editorMode === 'zoom-out' &&
+				editorMode !== originalEditingMode.current
+			) {
+				__unstableSetEditorMode( originalEditingMode.current );
+			}
+		};
+	}, [ editorMode, __unstableSetEditorMode ] );
+
 	const isMobile = useViewportMatch( 'medium', '<' );
 	if ( isMobile ) {
 		return null;
@@ -128,7 +158,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 	 */
 	const onSelect = ( value ) => {
 		setDeviceType( value );
-		let editorMode = 'edit'; // Rather than setting to edit, we may need to set back to whatever it was previously.
+		let newEditorMode = originalEditingMode.current;
 		if ( value === 'Desktop' ) {
 			speak( __( 'Desktop selected' ), 'assertive' );
 		} else if ( value === 'Tablet' ) {
@@ -136,14 +166,14 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		} else if ( value === 'Mobile' ) {
 			speak( __( 'Mobile selected' ), 'assertive' );
 		} else if ( value === 'ZoomIn' ) {
-			speak( __( 'Zoom to 100% selected' ), 'assertive' );
+			speak( __( 'Zoom to 100 percent selected' ), 'assertive' );
 		} else {
-			speak( __( 'Zoom to 50% selected' ), 'assertive' );
-			editorMode = 'zoom-out';
+			speak( __( 'Zoom to 50 percent selected' ), 'assertive' );
+			newEditorMode = 'zoom-out';
 		}
 
 		if ( isZoomOutExperiment ) {
-			__unstableSetEditorMode( editorMode );
+			__unstableSetEditorMode( newEditorMode );
 		}
 	};
 
