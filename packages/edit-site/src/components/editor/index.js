@@ -64,6 +64,18 @@ const toggleHomeIconVariants = {
 	},
 };
 
+const siteIconVariants = {
+	edit: {
+		clipPath: 'inset(0% round 0)',
+	},
+	hover: {
+		clipPath: 'inset( 22% round 2px )',
+	},
+	tap: {
+		clipPath: 'inset(0% round 0)',
+	},
+};
+
 export default function EditSiteEditor( { isPostsList = false } ) {
 	const disableMotion = useReducedMotion();
 	const { params } = useLocation();
@@ -79,6 +91,7 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 		showIconLabels,
 		editorCanvasView,
 		currentPostIsTrashed,
+		hasSiteIcon,
 	} = useSelect( ( select ) => {
 		const {
 			getEditorCanvasContainerView,
@@ -89,8 +102,9 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 			getEditedPostId,
 		} = unlock( select( editSiteStore ) );
 		const { get } = select( preferencesStore );
-		const { getCurrentTheme } = select( coreDataStore );
+		const { getCurrentTheme, getEntityRecord } = select( coreDataStore );
 		const _context = getEditedPostContext();
+		const siteData = getEntityRecord( 'root', '__unstableBase', undefined );
 
 		// The currently selected entity to display.
 		// Typically template or template part in the site editor.
@@ -107,6 +121,7 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 			currentPostIsTrashed:
 				select( editorStore ).getCurrentPostAttribute( 'status' ) ===
 				'trash',
+			hasSiteIcon: !! siteData?.site_icon_url,
 		};
 	}, [] );
 	useEditorTitle();
@@ -193,43 +208,8 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 		getEditorCanvasContainerTitleAndIcon( editorCanvasView );
 
 	const isReady = ! isLoading;
-
-	const toggleVariants = {
-		edit: {
-			width: 60,
-			height: 60,
-			top: 0,
-			left: 0,
-			borderRadius: '0px',
-			boxShadow: 'none',
-			transition: {
-				delay: 0.1,
-				duration: disableMotion ? 0 : 0.2,
-				type: 'tween',
-				stiffness: 400,
-			},
-		},
-	};
-
-	const siteIconVariants = {
-		edit: {
-			clipPath: 'inset(0% round 0)',
-			transition: {
-				duration: disableMotion ? 0 : 0.2,
-			},
-		},
-		hover: {
-			clipPath: 'inset( 22% round 2px )',
-			transition: {
-				duration: disableMotion ? 0 : 0.2,
-			},
-		},
-		tap: {
-			clipPath: 'inset(0% round 0)',
-			transition: {
-				delay: disableMotion ? 0 : 0.1,
-			},
-		},
+	const transition = {
+		duration: disableMotion ? 0 : 0.2,
 	};
 
 	return (
@@ -271,7 +251,7 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 								length <= 1 && (
 									<motion.div
 										className="edit-site-editor__view-mode-toggle"
-										variants={ toggleVariants }
+										transition={ transition }
 										animate="edit"
 										initial="edit"
 										whileHover="hover"
@@ -303,7 +283,13 @@ export default function EditSiteEditor( { isPostsList = false } ) {
 											</motion.div>
 										</Button>
 										<motion.div
-											className="edit-site-editor__back-icon"
+											className={ clsx(
+												'edit-site-editor__back-icon',
+												{
+													'has-site-icon':
+														hasSiteIcon,
+												}
+											) }
 											variants={ toggleHomeIconVariants }
 										>
 											<Icon icon={ chevronLeft } />

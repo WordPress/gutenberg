@@ -1,7 +1,7 @@
 .edit-site-editor__editor-interface {
 	opacity: 1;
 	transition: opacity 0.1s ease-out;
-	@include reduce-motion("transition");
+	@include reduce-motion( "transition" );
 
 	&.is-loading {
 		opacity: 0;
@@ -23,7 +23,8 @@
 	view-transition-name: toggle;
 	/* stylelint-enable */
 	position: fixed;
-	top: $canvas-padding;
+	top: 0;
+	left: 0;
 	height: $header-height;
 	width: $header-height;
 	z-index: 100;
@@ -66,8 +67,10 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	-webkit-backdrop-filter: saturate(180%) blur(15px);
-	backdrop-filter: saturate(180%) blur(15px);
-	background-color: hsla(0, 0%, 100%, 0.6);
+	background-color: hsla(0, 0%, 80%);
 	pointer-events: none;
+
+	&.has-site-icon {
+		background-color: hsla(0, 0%, 100%, 0.6);
+	}
 }
