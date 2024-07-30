@@ -235,7 +235,7 @@ function usePostFields( viewType ) {
 			{
 				label: __( 'Author' ),
 				id: 'author',
-				getValue: ( { item } ) => item._embedded?.author[ 0 ]?.name,
+				type: 'integer',
 				elements:
 					authors?.map( ( { id, name } ) => ( {
 						value: id,

@@ -3,7 +3,7 @@
  */
 import { external, trash, backup } from '@wordpress/icons';
 import { addQueryArgs } from '@wordpress/url';
-import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, _n, sprintf, _x } from '@wordpress/i18n';
@@ -88,7 +88,10 @@ const trashPostAction = {
 	isPrimary: true,
 	icon: trash,
 	isEligible( item ) {
-		return ! [ 'auto-draft', 'trash' ].includes( item.status );
+		return (
+			! [ 'auto-draft', 'trash' ].includes( item.status ) &&
+			item.permissions?.delete
+		);
 	},
 	supportsBulk: true,
 	hideModalHeader: true,
@@ -240,40 +243,12 @@ const trashPostAction = {
 	},
 };
 
-function useCanUserEligibilityCheckPostType( capability, postType, action ) {
-	const registry = useRegistry();
-	return useMemo(
-		() => ( {
-			...action,
-			isEligible( item ) {
-				return (
-					action.isEligible( item ) &&
-					registry.select( coreStore ).canUser( capability, {
-						kind: 'postType',
-						name: postType,
-						id: item.id,
-					} )
-				);
-			},
-		} ),
-		[ action, registry, capability, postType ]
-	);
-}
-
-function useTrashPostAction( postType ) {
-	return useCanUserEligibilityCheckPostType(
-		'delete',
-		postType,
-		trashPostAction
-	);
-}
-
 const permanentlyDeletePostAction = {
 	id: 'permanently-delete',
 	label: __( 'Permanently delete' ),
 	supportsBulk: true,
-	isEligible( { status } ) {
-		return status === 'trash';
+	isEligible( { status, permissions } ) {
+		return status === 'trash' && permissions?.delete;
 	},
 	async callback( posts, { registry, onActionPerformed } ) {
 		const { createSuccessNotice, createErrorNotice } =
@@ -359,22 +334,14 @@ const permanentlyDeletePostAction = {
 	},
 };
 
-function usePermanentlyDeletePostAction( postType ) {
-	return useCanUserEligibilityCheckPostType(
-		'delete',
-		postType,
-		permanentlyDeletePostAction
-	);
-}
-
 const restorePostAction = {
 	id: 'restore',
 	label: __( 'Restore' ),
 	isPrimary: true,
 	icon: backup,
 	supportsBulk: true,
-	isEligible( { status } ) {
-		return status === 'trash';
+	isEligible( { status, permissions } ) {
+		return status === 'trash' && permissions?.update;
 	},
 	async callback( posts, { registry, onActionPerformed } ) {
 		const { createSuccessNotice, createErrorNotice } =
@@ -474,14 +441,6 @@ const restorePostAction = {
 	},
 };
 
-function useRestorePostAction( postType ) {
-	return useCanUserEligibilityCheckPostType(
-		'update',
-		postType,
-		restorePostAction
-	);
-}
-
 const viewPostAction = {
 	id: 'view-post',
 	label: __( 'View' ),
@@ -548,11 +507,15 @@ const renamePostAction = {
 				...Object.values( PATTERN_TYPES ),
 			].includes( post.type )
 		) {
-			return true;
+			return post.permissions?.update;
 		}
 		// In the case of templates, we can only rename custom templates.
 		if ( post.type === TEMPLATE_POST_TYPE ) {
-			return isTemplateRemovable( post ) && post.is_custom;
+			return (
+				isTemplateRemovable( post ) &&
+				post.is_custom &&
+				post.permissions?.update
+			);
 		}
 		// Make necessary checks for template parts and patterns.
 		const isTemplatePart = post.type === TEMPLATE_PART_POST_TYPE;
@@ -564,7 +527,7 @@ const renamePostAction = {
 			isUserPattern ||
 			( isTemplatePart && post.source === TEMPLATE_ORIGINS.custom );
 		const hasThemeFile = post?.has_theme_file;
-		return isCustomPattern && ! hasThemeFile;
+		return isCustomPattern && ! hasThemeFile && post.permissions?.update;
 	},
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ item ] = items;
@@ -634,14 +597,6 @@ const renamePostAction = {
 		);
 	},
 };
-
-function useRenamePostAction( postType ) {
-	return useCanUserEligibilityCheckPostType(
-		'update',
-		postType,
-		renamePostAction
-	);
-}
 
 function ReorderModal( { items, closeModal, onActionPerformed } ) {
 	const [ item, setItem ] = useState( items[ 0 ] );
@@ -1004,11 +959,6 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 	);
 
 	const duplicatePostAction = useDuplicatePostAction( postType );
-	const trashPostActionForPostType = useTrashPostAction( postType );
-	const permanentlyDeletePostActionForPostType =
-		usePermanentlyDeletePostAction( postType );
-	const renamePostActionForPostType = useRenamePostAction( postType );
-	const restorePostActionForPostType = useRestorePostAction( postType );
 	const reorderPagesAction = useReorderPagesAction( postType );
 	const isTemplateOrTemplatePart = [
 		TEMPLATE_POST_TYPE,
@@ -1035,14 +985,13 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 				userCanCreatePostType &&
 				duplicateTemplatePartAction,
 			isPattern && userCanCreatePostType && duplicatePatternAction,
-			supportsTitle && renamePostActionForPostType,
+			supportsTitle && renamePostAction,
 			reorderPagesAction,
-			! isTemplateOrTemplatePart && restorePostActionForPostType,
+			! isTemplateOrTemplatePart && ! isPattern && restorePostAction,
+			! isTemplateOrTemplatePart && ! isPattern && trashPostAction,
 			! isTemplateOrTemplatePart &&
 				! isPattern &&
-				trashPostActionForPostType,
-			! isTemplateOrTemplatePart &&
-				permanentlyDeletePostActionForPostType,
+				permanentlyDeletePostAction,
 			...defaultActions,
 		].filter( Boolean );
 		// Filter actions based on provided context. If not provided
@@ -1117,10 +1066,6 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 		postTypeObject?.viewable,
 		duplicatePostAction,
 		reorderPagesAction,
-		trashPostActionForPostType,
-		restorePostActionForPostType,
-		renamePostActionForPostType,
-		permanentlyDeletePostActionForPostType,
 		onActionPerformed,
 		isLoaded,
 		supportsRevisions,

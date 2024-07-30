@@ -64,7 +64,7 @@
 		.dataviews-view-grid__field-value:not(:empty) {
 			min-height: $grid-unit-30;
 			line-height: $grid-unit-05 * 5;
-			padding-top: $grid-unit-05 / 2;
+			padding-top: math.div($grid-unit-05, 2);
 		}
 
 		.dataviews-view-grid__field {
