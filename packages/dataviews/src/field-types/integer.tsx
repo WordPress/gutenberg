@@ -4,15 +4,17 @@
 import type { SortDirection } from '../types';
 
 function sort< Item >(
-	itemA: Item,
-	itemB: Item,
-	direction: SortDirection,
-	getValue: ( args: { item: Item } ) => any
+	a: {
+		item: Item;
+		value: any;
+	},
+	b: {
+		item: Item;
+		value: any;
+	},
+	direction: SortDirection
 ) {
-	const valueA = getValue( { item: itemA } );
-	const valueB = getValue( { item: itemB } );
-
-	return direction === 'asc' ? valueA - valueB : valueB - valueA;
+	return direction === 'asc' ? a.value - b.value : b.value - a.value;
 }
 
 export default {

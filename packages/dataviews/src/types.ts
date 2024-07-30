@@ -84,10 +84,15 @@ export type Field< Item > = {
 	 * Callback used to sort the field.
 	 */
 	sort?: (
-		a: Item,
-		b: Item,
-		direction: SortDirection,
-		getValue: ( args: { item: Item } ) => any
+		a: {
+			item: Item;
+			value: any;
+		},
+		b: {
+			item: Item;
+			value: any;
+		},
+		direction: SortDirection
 	) => number;
 
 	/**
@@ -135,10 +140,15 @@ export type NormalizedField< Item > = Field< Item > & {
 	getValue: ( args: { item: Item } ) => any;
 	render: ComponentType< { item: Item } >;
 	sort: (
-		a: Item,
-		b: Item,
-		direction: SortDirection,
-		getValue: ( args: { item: Item } ) => any
+		a: {
+			item: Item;
+			value: any;
+		},
+		b: {
+			item: Item;
+			value: any;
+		},
+		direction: SortDirection
 	) => number;
 };
 
