@@ -51,7 +51,7 @@ const trashPost: Action< PostWithPermissions > = {
 						? sprintf(
 								// translators: %s: The item's title.
 								__(
-									'Are you sure you want to move to the trash "%s"?'
+									'Are you sure you want to move "%s" to the trash?'
 								),
 								getItemTitle( items[ 0 ] )
 						  )
@@ -130,7 +130,7 @@ const trashPost: Action< PostWithPermissions > = {
 											typedError.reason.message;
 									} else {
 										errorMessage = __(
-											'An error occurred while moving to the trash the item.'
+											'An error occurred while moving the item to the trash.'
 										);
 									}
 									// If we were trying to delete multiple items.
@@ -151,13 +151,13 @@ const trashPost: Action< PostWithPermissions > = {
 									}
 									if ( errorMessages.size === 0 ) {
 										errorMessage = __(
-											'An error occurred while moving to the trash the items.'
+											'An error occurred while moving the items to the trash.'
 										);
 									} else if ( errorMessages.size === 1 ) {
 										errorMessage = sprintf(
 											/* translators: %s: an error message */
 											__(
-												'An error occurred while moving to the trash the item: %s'
+												'An error occurred while moving the item to the trash: %s'
 											),
 											[ ...errorMessages ][ 0 ]
 										);
@@ -165,7 +165,7 @@ const trashPost: Action< PostWithPermissions > = {
 										errorMessage = sprintf(
 											/* translators: %s: a list of comma separated error messages */
 											__(
-												'Some errors occurred while moving to the trash the items: %s'
+												'Some errors occurred while moving the items to the trash: %s'
 											),
 											[ ...errorMessages ].join( ',' )
 										);
