@@ -42,9 +42,7 @@ export default function Edit( { attributes, clientId, setAttributes } ) {
 		}
 	}, [ label, setAttributes, tabIndex ] );
 
-	const blockProps = useBlockProps( {
-		className: isActive ? 'is-active' : '',
-	} );
+	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		renderAppender: hasChildBlocks
 			? undefined
@@ -54,6 +52,7 @@ export default function Edit( { attributes, clientId, setAttributes } ) {
 		<div
 			{ ...innerBlocksProps }
 			aria-labelledby={ tabLabelId }
+			hidden={ ! isActive }
 			id={ tabPanelId }
 			role="tabpanel"
 		/>

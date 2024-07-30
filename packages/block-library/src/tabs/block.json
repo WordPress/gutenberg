@@ -15,10 +15,10 @@
 			"source": "query",
 			"selector": ".wp-block-tabs__tab-label",
 			"query": {
-				"id": {
+				"href": {
 					"type": "string",
 					"source": "attribute",
-					"attribute": "aria-controls"
+					"attribute": "href"
 				},
 				"label": {
 					"type": "string",

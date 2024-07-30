@@ -1,24 +1,30 @@
-.wp-block-tabs__list {
-	display: flex;
-	gap: 10px;
-	list-style: none;
-	margin: 0;
-	padding: 0;
-}
-
-.wp-block-tabs__tab-label {
-	display: block;
-	margin: 0;
-	opacity: 0.5;
-	padding: $grid-unit;
-	text-decoration: none;
-
-	&.is-active {
-		border-bottom: currentColor 2px solid;
-		opacity: 1;
+.wp-block-tabs.interactive {
+	.wp-block-tabs__title {
+		display: none;
 	}
-}
 
-.wp-block-tabs__content {
-	border-top: var(--wp--preset--color--accent) 2px solid;
+	.wp-block-tabs__list {
+		display: flex;
+		gap: 10px;
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	.wp-block-tabs__tab-label {
+		display: block;
+		margin: 0;
+		opacity: 0.5;
+		padding: $grid-unit;
+		text-decoration: none;
+
+		&[aria-selected="true"] {
+			border-bottom: currentColor 2px solid;
+			opacity: 1;
+		}
+	}
+
+	.wp-block-tabs__content {
+		border-top: var(--wp--preset--color--accent) 2px solid;
+	}
 }

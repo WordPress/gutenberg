@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -117,7 +112,8 @@ export default function Edit( { clientId, setAttributes } ) {
 		setAttributes( {
 			innerTabs: innerTabBlocks.map( ( block ) => ( {
 				label: block.attributes.label,
-				id: block.attributes.anchor || block.attributes.slug,
+				href:
+					'#' + ( block.attributes.anchor || block.attributes.slug ),
 			} ) ),
 		} );
 
@@ -134,7 +130,7 @@ export default function Edit( { clientId, setAttributes } ) {
 		updateBlockAttributes,
 	] );
 
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps( { className: 'interactive' } );
 	const innerBlockProps = useInnerBlocksProps(
 		{
 			className: 'wp-block-tabs__content',
@@ -165,14 +161,12 @@ export default function Edit( { clientId, setAttributes } ) {
 							<a
 								aria-controls={ tabPanelId }
 								aria-selected={ isActive }
-								className={ clsx( 'wp-block-tabs__tab-label', {
-									'is-active': isActive,
-								} ) }
+								className="wp-block-tabs__tab-label"
 								href={ '#' + tabPanelId }
 								id={ tabLabelId }
 								onClick={ () => setActiveTab( block.clientId ) }
 								role="tab"
-								tab-index={ tabIndexAttr }
+								tabIndex={ tabIndexAttr }
 							>
 								<RichText
 									allowedFormats={ ALLOWED_FORMATS }

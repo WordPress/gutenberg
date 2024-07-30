@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -11,6 +6,7 @@ import {
 	useBlockProps,
 	useInnerBlocksProps,
 } from '@wordpress/block-editor';
+import { __ } from '@wordpress/i18n';
 
 export default function save( { attributes } ) {
 	const { innerTabs } = attributes;
@@ -20,34 +16,18 @@ export default function save( { attributes } ) {
 	} );
 
 	return (
-		<div
-			{ ...blockProps }
-			data-wp-interactive="core/tabs"
-			data-wp-context='{ "activeTab": 0 }'
-		>
-			<ul className="wp-block-tabs__list" role="tablist">
+		<div { ...blockProps }>
+			{ /* translators: Title for a list of content sections linked below. */ }
+			<h3 className="wp-block-tabs__title">{ __( 'Contents' ) }</h3>
+			<ul className="wp-block-tabs__list">
 				{ innerTabs.map( ( tab, index ) => {
-					const isActive = index === 0;
-					const tabIndexAttr = isActive ? 0 : -1;
-					const tabLabelId = tab.id + '--tab';
+					const tabId = tab.href.replace( '#', '' ) + '--tab';
 					return (
-						<li
-							className="wp-block-tabs__list-item"
-							key={ index }
-							role="presentation"
-						>
+						<li className="wp-block-tabs__list-item" key={ index }>
 							<RichText.Content
-								aria-controls={ tab.id }
-								data-wp-bind--aria-selected={ `${ index } === context.activeTab` }
-								data-wp-class--is-active={ `${ index } === context.activeTab` }
-								data-wp-on--click={ `actions.setActiveTab.bind( null, ${ index } )` }
-								className={ clsx( 'wp-block-tabs__tab-label', {
-									'is-active': isActive,
-								} ) }
-								href={ '#' + tab.id }
-								id={ tabLabelId }
-								role="tab"
-								tab-index={ tabIndexAttr }
+								id={ tabId }
+								className="wp-block-tabs__tab-label"
+								href={ tab.href }
 								tagName="a"
 								value={ tab.label }
 							/>
