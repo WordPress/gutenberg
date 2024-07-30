@@ -32,8 +32,10 @@
 			"width": true,
 			"style": true,
 			"__experimentalDefaultControls": {
-				"color": true,
-				"radius": true
+				"radius": false,
+				"color": false,
+				"width": false,
+				"style": false
 			}
 		},
 		"html": false,
