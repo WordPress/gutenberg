@@ -95,11 +95,9 @@ export function RadioControl(
 		>
 			<VStack
 				spacing={ 3 }
-				className={ clsx(
-					'components-radio-control__group-wrapper',
-					!! help &&
-						'components-radio-control__group-wrapper--with-help'
-				) }
+				className={ clsx( 'components-radio-control__group-wrapper', {
+					'has-help': !! help,
+				} ) }
 			>
 				{ options.map( ( option, index ) => (
 					<div
