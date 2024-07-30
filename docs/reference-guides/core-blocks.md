@@ -689,7 +689,7 @@ Displays the title of a post, page, or any other content-type. ([Source](https:/
 -	**Name:** core/post-title
 -	**Category:** theme
 -	**Supports:** align (full, wide), color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** isLink, level, linkTarget, rel, textAlign
+-	**Attributes:** isLink, level, levelOptions, linkTarget, rel, textAlign
 
 ## Preformatted
 
