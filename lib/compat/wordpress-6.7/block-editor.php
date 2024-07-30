@@ -39,13 +39,13 @@ function gutenberg_get_block_editor_settings_6_7( $settings ) {
 
 	if ( $current_user_locale !== $current_site_locale ) {
 		$switched_locale = switch_to_locale( $current_site_locale );
-		if ( is_locale_switched() && $switched_locale ) {
+		if ( $switched_locale ) {
 			$current_site_is_rtl = is_rtl();
 			restore_previous_locale();
 		}
 	}
 
-	// @TODO confirm if `lang` just needs to be added to the `/wp/v2/settings` response`.
+	// @TODO confirm if `is_rtl` just needs to be added to the `/wp/v2/settings` response`.
 	$settings['siteLocale'] = array(
 		'lang'  => $current_site_locale,
 		'isRTL' => $current_site_is_rtl,
