@@ -2,11 +2,11 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "core/accordion-group",
-	"version": "0.1.0",
 	"title": "Accordion Group",
 	"category": "design",
 	"description": "A group of headers and associated expandable content.",
 	"example": {},
+	"__experimental": true,
 	"supports": {
 		"html": false,
 		"align": [ "wide", "full" ],
@@ -45,5 +45,5 @@
 	},
 	"allowedBlocks": [ "core/accordion-item" ],
 	"textdomain": "default",
-	"viewScriptModule": "file:./view.min.js"
+	"style": "wp-block-accordion-group"
 }

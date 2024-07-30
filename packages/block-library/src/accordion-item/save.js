@@ -1,12 +1,25 @@
 /**
  * WordPress dependencies
  */
-import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
+import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
+/**
+ * External dependencies
+ */
+import clsx from 'clsx';
 
-export default function save() {
-	return (
-		<div { ...useBlockProps.save() }>
-			<InnerBlocks.Content />
-		</div>
+export default function save( { attributes } ) {
+	const { openByDefault } = attributes;
+	const blockProps = useBlockProps.save();
+	const className = clsx(
+		{
+			'is-open': openByDefault,
+		},
+		blockProps.className
 	);
+	const innerBlocksProps = useInnerBlocksProps.save( {
+		...blockProps,
+		className,
+	} );
+
+	return <div { ...innerBlocksProps } />;
 }

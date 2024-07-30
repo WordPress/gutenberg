@@ -21,18 +21,21 @@ export default function Edit( {
 	clientId,
 	setAttributes,
 } ) {
-	/* eslint-disable-next-line no-shadow */
-	const [ isSelected, getBlockOrder ] = useSelect(
+	const isSelected = useSelect(
 		( select ) => {
-			const { isBlockSelected, hasSelectedInnerBlock, getBlockOrder } =
+			const { isBlockSelected, hasSelectedInnerBlock } =
 				select( blockEditorStore );
-			return [
+			return (
 				isBlockSelected( clientId ) ||
-					hasSelectedInnerBlock( clientId, true ),
-				getBlockOrder,
-			];
+				hasSelectedInnerBlock( clientId, true )
+			);
 		},
 		[ clientId ]
+	);
+
+	const getBlockOrder = useSelect(
+		( select ) => select( blockEditorStore ).getBlockOrder,
+		[]
 	);
 
 	const contentBlockClientId = getBlockOrder( clientId )[ 1 ];

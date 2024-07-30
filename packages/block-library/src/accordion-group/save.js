@@ -5,18 +5,19 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
+import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
 	const { iconPosition } = attributes;
-
-	const className = clsx( {
-		'icon-position-left': iconPosition === 'left',
-	} );
+	const blockProps = useBlockProps.save();
+	const className = clsx(
+		{
+			'icon-position-left': iconPosition === 'left',
+		},
+		blockProps.className
+	);
 
 	return (
-		<div { ...useBlockProps.save( { className } ) }>
-			<InnerBlocks.Content />
-		</div>
+		<div { ...useInnerBlocksProps.save( { ...blockProps, className } ) } />
 	);
 }

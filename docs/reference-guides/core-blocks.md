@@ -13,6 +13,7 @@ This page lists the blocks included in the block-library package.
 Accordion item content ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion-content))
 
 -	**Name:** core/accordion-content
+-	**Experimental:** true
 -	**Category:** design
 -	**Parent:** core/accordion-item
 -	**Supports:** border, color (background, gradient, text), interactivity, layout, shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight)
@@ -23,6 +24,7 @@ Accordion item content ([Source](https://github.com/WordPress/gutenberg/tree/tru
 A group of headers and associated expandable content. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion-group))
 
 -	**Name:** core/accordion-group
+-	**Experimental:** true
 -	**Category:** design
 -	**Allowed Blocks:** core/accordion-item
 -	**Supports:** align (full, wide), background (backgroundImage, backgroundSize), color (background, gradient, text), interactivity, layout, shadow, spacing (blockGap, margin, padding), ~~html~~
@@ -33,6 +35,7 @@ A group of headers and associated expandable content. ([Source](https://github.c
 A single accordion that displays a header and expandable content. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion-item))
 
 -	**Name:** core/accordion-item
+-	**Experimental:** true
 -	**Category:** design
 -	**Parent:** core/accordion-group
 -	**Allowed Blocks:** core/accordion-trigger, core/accordion-content
@@ -44,6 +47,7 @@ A single accordion that displays a header and expandable content. ([Source](http
 Accordion item trigger. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion-trigger))
 
 -	**Name:** core/accordion-trigger
+-	**Experimental:** true
 -	**Category:** design
 -	**Parent:** core/accordion-item
 -	**Supports:** anchor, border, color (background, gradient, text), interactivity, layout, shadow, spacing (margin, padding), typography (fontSize, textAlign), ~~align~~

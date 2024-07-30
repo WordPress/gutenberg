@@ -5,7 +5,7 @@ import { SVG, Path } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import Edit from './edit';
+import edit from './edit';
 import save from './save';
 import metadata from './block.json';
 import initBlock from '../utils/init-block';
@@ -34,7 +34,7 @@ export { metadata, name };
 export const settings = {
 	icon,
 	example: {},
-	Edit,
+	edit,
 	save,
 };
 

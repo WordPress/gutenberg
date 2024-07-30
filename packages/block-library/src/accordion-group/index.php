@@ -4,29 +4,43 @@
  *
  * @package WordPress
  * @since 6.6.0
- * 
+ *
  * @param array $attributes The block attributes.
  * @param string $content The block content.
  *
  * @return string Returns the updated markup.
  */
 
-function block_core_accordion_group_render( $attributes, $content ) {
-    if ( ! $content ) {
-        return $content;
-    }
-    
-    $p = new WP_HTML_Tag_Processor( $content );
-    $autoclose = $attributes['autoclose'];
+function render_block_core_accordion_group( $attributes, $content ) {
+	$suffix = wp_scripts_get_suffix();
+	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+		$module_url = gutenberg_url( '/build/interactivity/accordionGroup.min.js' );
+	}
 
-    while ( $p->next_tag() ){
-        if ( $p->has_class( 'wp-block-accordion-group') ) {
-            $p->set_attribute( 'data-wp-interactive', 'core/accordion' );
-            $p->set_attribute( 'data-wp-context', '{"isOpen":[],"autoclose":"' . $autoclose . '"}' );
-        }
-    }
+	wp_register_script_module(
+		'@wordpress/block-library/accordion-group',
+		isset( $module_url ) ? $module_url : includes_url( "blocks/accordion-group/view{$suffix}.js" ),
+		array( '@wordpress/interactivity' ),
+		defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
+	);
 
-    return $p->get_updated_html();
+	wp_enqueue_script_module( '@wordpress/block-library/accordion-group' );
+
+	if ( ! $content ) {
+		return $content;
+	}
+
+	$p         = new WP_HTML_Tag_Processor( $content );
+	$autoclose = $attributes['autoclose'];
+
+	while ( $p->next_tag() ) {
+		if ( $p->has_class( 'wp-block-accordion-group' ) ) {
+			$p->set_attribute( 'data-wp-interactive', 'core/accordion' );
+			$p->set_attribute( 'data-wp-context', '{"isOpen":[],"autoclose":"' . $autoclose . '"}' );
+		}
+	}
+
+	return $p->get_updated_html();
 }
 
 /**
@@ -35,10 +49,11 @@ function block_core_accordion_group_render( $attributes, $content ) {
  * @since 6.6.0
  */
 function register_block_core_accordion_group() {
-    register_block_type_from_metadata(
-        __DIR__ . '/accordion-group',
-        array(
-            'render_callback' => 'block_core_accordion_group_render',
-        )
-    );
+	register_block_type_from_metadata(
+		__DIR__ . '/accordion-group',
+		array(
+			'render_callback' => 'render_block_core_accordion_group',
+		)
+	);
 }
+add_action( 'init', 'register_block_core_accordion_group' );

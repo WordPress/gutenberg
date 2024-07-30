@@ -1,92 +1,94 @@
-.wp-block-accordion-item {
-	display: grid;
-	grid-template-rows: max-content 0fr;
-}
-
-.wp-block-accordion-item.is-open {
-	grid-template-rows: max-content 1fr;
-}
-
-.wp-block-accordion-item .accordion-item__heading {
-	color: inherit;
-	padding: 0;
-	margin: 0;
-}
-
-.accordion-item__toggle {
-	font-family: inherit;
-	font-size: inherit;
-	font-weight: inherit;
-	line-height: inherit;
-	letter-spacing: inherit;
-	text-transform: inherit;
-	text-decoration: inherit;
-	word-spacing: inherit;
-	background: none;
-	border: none;
-	color: inherit;
-	padding: 0;
-	cursor: pointer;
-	outline: none;
-	display: flex;
-	align-items: center;
-	text-align: inherit;
-	position: relative;
-	width: 100%;
-}
-
-.accordion-item__toggle > span {
-	width: 100%;
-}
-
-.is-layout-flow > .wp-block-accordion-content,
-.wp-block-accordion-content {
-	overflow: hidden;
-	margin: 0;
-}
-
-
-/* No icon block style */
-.is-style-no-icon .accordion-item__toggle-icon {
-	background-color: unset;
-}
-
-.wp-block-accordion-trigger.icon-position-left .accordion-item__toggle {
-	/* stylelint-disable-next-line declaration-property-value-allowed-list -- This should be refactored to not use the row-reverse value. */
-	flex-direction: row-reverse;
-}
-
-.accordion-item__toggle:focus,
-.accordion-item__toggle:focus-visible {
-	outline: 2px solid -webkit-focus-ring-color;
-	outline-offset: 2px;
-}
-
-/* Add transitions only for users who do not prefer reduced motion */
-@media (prefers-reduced-motion: no-preference) {
-	.wp-block-accordion-item .accordion-item__toggle-icon {
-		transition: transform 0.2s ease-in-out;
-	}
-
+.wp-block-accordion-group {
 	.wp-block-accordion-item {
-		transition: grid-template-rows 0.3s ease-out;
+		display: grid;
+		grid-template-rows: max-content 0fr;
 	}
-}
 
-.is-open {
-	.accordion-item__toggle-icon.has-icon-plus {
-		transform: rotate(45deg);
+	.wp-block-accordion-item.is-open {
+		grid-template-rows: max-content 1fr;
 	}
-	.accordion-item__toggle-icon.has-icon-chevron {
-		transform: rotate(-180deg);
+
+	.wp-block-accordion-item .accordion-item__heading {
+		color: inherit;
+		padding: 0;
+		margin: 0;
 	}
-	.accordion-item__toggle-icon.has-icon-circlePlus {
-		transform: rotate(45deg);
+
+	.accordion-item__toggle {
+		font-family: inherit;
+		font-size: inherit;
+		font-weight: inherit;
+		line-height: inherit;
+		letter-spacing: inherit;
+		text-transform: inherit;
+		text-decoration: inherit;
+		word-spacing: inherit;
+		background: none;
+		border: none;
+		color: inherit;
+		padding: 0;
+		cursor: pointer;
+		outline: none;
+		display: flex;
+		align-items: center;
+		text-align: inherit;
+		position: relative;
+		width: 100%;
 	}
-	.accordion-item__toggle-icon.has-icon-caret {
-		transform: rotate(-180deg);
+
+	.accordion-item__toggle > span {
+		width: 100%;
 	}
-	.accordion-item__toggle-icon.has-icon-chevronRight {
-		transform: rotate(90deg);
+
+	.is-layout-flow > .wp-block-accordion-content,
+	.wp-block-accordion-content {
+		overflow: hidden;
+		margin: 0;
+	}
+
+
+	/* No icon block style */
+	.is-style-no-icon .accordion-item__toggle-icon {
+		background-color: unset;
+	}
+
+	.wp-block-accordion-trigger.icon-position-left .accordion-item__toggle {
+		/* stylelint-disable-next-line declaration-property-value-allowed-list -- This should be refactored to not use the row-reverse value. */
+		flex-direction: row-reverse;
+	}
+
+	.accordion-item__toggle:focus,
+	.accordion-item__toggle:focus-visible {
+		outline: 2px solid -webkit-focus-ring-color;
+		outline-offset: 2px;
+	}
+
+	/* Add transitions only for users who do not prefer reduced motion */
+	@media (prefers-reduced-motion: no-preference) {
+		.wp-block-accordion-item .accordion-item__toggle-icon {
+			transition: transform 0.2s ease-in-out;
+		}
+
+		.wp-block-accordion-item {
+			transition: grid-template-rows 0.3s ease-out;
+		}
+	}
+
+	.is-open {
+		.accordion-item__toggle-icon.has-icon-plus {
+			transform: rotate(45deg);
+		}
+		.accordion-item__toggle-icon.has-icon-chevron {
+			transform: rotate(-180deg);
+		}
+		.accordion-item__toggle-icon.has-icon-circlePlus {
+			transform: rotate(45deg);
+		}
+		.accordion-item__toggle-icon.has-icon-caret {
+			transform: rotate(-180deg);
+		}
+		.accordion-item__toggle-icon.has-icon-chevronRight {
+			transform: rotate(90deg);
+		}
 	}
 }

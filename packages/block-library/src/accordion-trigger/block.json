@@ -7,6 +7,7 @@
 	"category": "design",
 	"description": "Accordion item trigger.",
 	"example": {},
+	"__experimental": true,
 	"parent": [ "core/accordion-item" ],
 	"supports": {
 		"anchor": true,

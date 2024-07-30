@@ -7,6 +7,7 @@
 	"category": "design",
 	"description": "A single accordion that displays a header and expandable content.",
 	"example": {},
+	"__experimental": true,
 	"parent": [ "core/accordion-group" ],
 	"allowedBlocks": [ "core/accordion-trigger", "core/accordion-content" ],
 	"supports": {
