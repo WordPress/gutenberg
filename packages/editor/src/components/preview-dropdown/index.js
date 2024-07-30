@@ -140,8 +140,12 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 	 *
 	 * @type {Object}
 	 */
+	let previewValue = deviceType;
+	if ( editorMode === 'zoom-out' ) {
+		previewValue = 'ZoomOut';
+	}
 	let selectedChoice = choices.find(
-		( choice ) => choice.value === deviceType
+		( choice ) => choice.value === previewValue
 	);
 
 	/**
