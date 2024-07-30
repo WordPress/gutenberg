@@ -44,12 +44,12 @@ $grid-unit-80: 8 * $grid-unit;		// 64px
  * Radius scale.
  */
 
-$radius-x-small: 1px;   // Applied to contained elements within primitives like inputs or buttons. E.g. the selected item in a ToggleGroupControl, or the unit selector in UnitControl.
-$radius-small: 2px;     // Applied to primitive components like Badges, Buttons, Inputs, Checkboxes.
-$radius-medium: 4px;    // Applied to containers with smaller padding, e.g. Menus, Notices, Snackbars, Block toolbar. Also used for focus rings on primitive components.
-$radius-large: 8px;     // Applied to containers with larger padding, e.g. Modals, Pages, and the Preview Frame.
-$radius-full: 9999px;   // For lozenges
-$radius-round: 50%;     // For circles and ovals
+$radius-x-small: 1px;   // Applied to elements like buttons nested within primitives like inputs.
+$radius-small: 2px;     // Applied to most primitives.
+$radius-medium: 4px;    // Applied to containers with smaller padding.
+$radius-large: 8px;     // Applied to containers with larger padding.
+$radius-full: 9999px;   // For lozenges.
+$radius-round: 50%;     // For circles and ovals.
 
 /**
  * Dimensions.
