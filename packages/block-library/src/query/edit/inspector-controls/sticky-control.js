@@ -20,7 +20,7 @@ export default function StickyControl( { value, onChange } ) {
 			value={ value }
 			onChange={ onChange }
 			help={ __(
-				'Blog posts can be “stickied”, a feature that places them at the top of the front page of posts. Multiple posts can be sticky at the same time.'
+				'Sticky posts always appear first, regardless of their publish date.'
 			) }
 		/>
 	);
