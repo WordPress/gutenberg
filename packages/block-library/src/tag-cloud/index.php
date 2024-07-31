@@ -29,8 +29,13 @@ function render_block_core_tag_cloud( $attributes ) {
 	);
 	$tag_cloud = wp_tag_cloud( $args );
 
-	if ( ! $tag_cloud ) {
-		return '';
+	if ( empty( $tag_cloud ) ) {
+		// Display placeholder content when there are no tags only in editor.
+		if ( ( defined('REST_REQUEST') && REST_REQUEST ) || is_admin() ) {
+			$tag_cloud = __( 'There&#8217;s no content to show here yet.' );
+		} else {
+			return '';
+		}
 	}
 
 	$wrapper_attributes = get_block_wrapper_attributes();
