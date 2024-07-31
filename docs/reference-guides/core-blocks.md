@@ -237,7 +237,7 @@ Displays a title with the number of comments. ([Source](https://github.com/WordP
 -	**Category:** theme
 -	**Ancestor:** core/comments
 -	**Supports:** align, color (background, gradients, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~anchor~~, ~~html~~
--	**Attributes:** level, showCommentsCount, showPostTitle, textAlign
+-	**Attributes:** level, levelOptions, showCommentsCount, showPostTitle, textAlign
 
 ## Cover
 
