@@ -49,7 +49,7 @@ function TypesetButton() {
 		if ( Object.keys( userTypographyConfig ).length === 0 ) {
 			return __( 'Default' );
 		}
-		const activeVariation = variations.find( ( variation ) => {
+		const activeVariation = variations?.find( ( variation ) => {
 			return (
 				JSON.stringify(
 					filterObjectByProperties( variation, 'typography' )
