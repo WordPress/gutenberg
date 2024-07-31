@@ -46,9 +46,14 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		static::$user_id = self::factory()->user->create();
 	}
 
-	// Pretty print CSS in test assertions so that it provides a better diff when a test fails.
-	// Without this: the failing test outputs the entire css string as being different.
-	// With this: the failing test only highlights the specific CSS rule that is different.
+	/**
+	 * Pretty print CSS in test assertions so that it provides a better diff when a test fails.
+	 * Without this: the failing test outputs the entire css string as being different.
+	 * With this: the failing test only highlights the specific CSS rule that is different.
+	 *
+	 * @param string $css A string of raw css with no line breaks.
+	 * @return string The css with line breaks.
+	 */
 	private static function pretty_print_css( $css ) {
 		$css = str_replace( '{', " {\n", $css );
 		$css = str_replace( '}', "}\n\n", $css );
