@@ -127,18 +127,18 @@ When creating components that render a list of subcomponents, prefer to expose t
 
 ```jsx
 // ✅ Do:
-<List.Root>
+<List>
 	<List.Item value="Item 1" />
 	<List.Item value="Item 2" />
 	<List.Item value="Item 3" />
-</List.Root>
+</List>
 ```
 
 When implementing this pattern, avoid using `React.Children.map` and `React.cloneElement` to map through the children and augment them. Instead, use React Context to provide state to subcomponents and connect them:
 
 ```jsx
 // ❌ Don't:
-function ListRoot ( props ) {
+function List ( props ) {
 	const [ state, setState ] = useState();
 	return (
 		<div { ...props }>
@@ -152,7 +152,7 @@ function ListRoot ( props ) {
 // ✅ Do:
 const ListContext = createContext();
 
-function ListRoot( props ) {
+function List( props ) {
 	const [ state, setState ] = useState();
 	return (
 		<ListContext.Provider value={ state }>
@@ -234,26 +234,36 @@ TDB -->
 
 ## Naming Conventions
 
-It is recommended for compound components to use dot notation to separate the namespace from the individual component names. The top-level compound component should be called `Root`.
+It is recommended for compound components to use dot notation to separate the namespace from the individual component names. The top-level compound component should be called as the namespace (no dot notation).
 
-In comparison to compound components, it is recommended for monolithic components not to use dot-notation or namespacing in their export names.
-
-Dedicated React context should be also using the dot notation, while hooks should not
+Dedicated React context should also use the dot notation, while hooks should not.
 
 ```tsx
+// Component.tsx
+//=======================
+/** The top-level component's JSDoc. */
+export const Component = Object.assign( TopLevelComponent, {
+	/** The sub-component's JSDoc. */
+	SubComponent,
+	/** The sub-component's JSDoc. */
+	Content,
+} );
+
+export function useComponent() {
+	/* ... */
+}
+
+// App.tsx
+//=======================
 import { Component, useComponent } from '@wordpress/components';
 import { useContext } from '@wordpress/element';
 
-function CompoundExample() {
+function CompoundComponentExample() {
 	return (
-		<Component.Root>
+		<Component>
 			<Component.SubComponent />
-		</Component.Root>
+		</Component>
 	);
-}
-
-function MonolithExample() {
-	return <Component />;
 }
 
 function ContextProviderExample() {
@@ -276,8 +286,6 @@ function HookExample() {
 	// etc.
 }
 ```
-
-The suggested naming conventions can help consumers of the package to distinguish between monolithic a compound components, and allows components to expose at the same time a monolithic and a compound version if needed.
 
 ## TypeScript
 
