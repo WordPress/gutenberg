@@ -38,13 +38,7 @@
 			"radius": true,
 			"width": true,
 			"style": true,
-			"__experimentalSkipSerialization": true,
-			"__experimentalDefaultControls": {
-				"color": true,
-				"radius": true,
-				"width": true,
-				"style": true
-			}
+			"__experimentalSkipSerialization": true
 		},
 		"color": {
 			"__experimentalDuotone": "img, .components-placeholder__illustration, .components-placeholder::before",
