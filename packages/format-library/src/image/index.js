@@ -84,13 +84,13 @@ function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 			>
 				<VStack spacing={ 4 }>
 					<NumberControl
+						__next40pxDefaultSize
 						label={ __( 'Width' ) }
 						value={ editedWidth }
 						min={ 1 }
 						onChange={ ( newWidth ) => {
 							setEditedWidth( newWidth );
 						} }
-						size="compact"
 					/>
 					<TextareaControl
 						label={ __( 'Alternative text' ) }
