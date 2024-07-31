@@ -226,6 +226,23 @@ describe( 'transformStyles', () => {
 			expect( output ).toEqual( [ input ] );
 		} );
 
+		it( 'should not double prefix a root selector', () => {
+			const input = 'body .my-namespace h1  { color: goldenrod; }';
+
+			const output = transformStyles(
+				[
+					{
+						css: input,
+					},
+				],
+				'.my-namespace'
+			);
+
+			expect( output ).toEqual( [
+				'.my-namespace h1  { color: goldenrod; }',
+			] );
+		} );
+
 		it( 'should not try to wrap items within `:where` selectors', () => {
 			const input = `:where(.wp-element-button:active, .wp-block-button__link:active) { color: blue; }`;
 			const prefix = '.my-namespace';
