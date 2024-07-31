@@ -7,6 +7,7 @@ import { animate } from 'framer-motion';
  * WordPress dependencies
  */
 import { forwardRef, useContext, useRef, useEffect } from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
@@ -149,7 +150,11 @@ const Cropper = forwardRef< HTMLDivElement >( ( {}, ref ) => {
 			isZooming,
 		},
 		src,
+		originalWidth,
+		originalHeight,
 		refs: { imageRef },
+		getState,
+		dispatch,
 	} = useContext( ImageCropperContext );
 	const isAxisSwapped = rotations % 2 !== 0;
 	const degree = angle + rotations * 90;
@@ -163,10 +168,47 @@ const Cropper = forwardRef< HTMLDivElement >( ( {}, ref ) => {
 		MIN_PADDING - squareImageHorizontalOffset,
 		MIN_PADDING
 	);
+	const paddingInline = isAxisSwapped ? paddingY : paddingX;
+	const paddingBlock = isAxisSwapped ? paddingX : paddingY;
 	const imageOffset = {
 		top: isAxisSwapped ? paddingX + squareImageHorizontalOffset : paddingY,
 		left: isAxisSwapped ? paddingY - squareImageHorizontalOffset : paddingX,
 	};
+
+	const containerRef = useRef< HTMLDivElement >( null! );
+	useEffect( () => {
+		const container = containerRef.current;
+		const aspectRatio = originalWidth / originalHeight;
+
+		const resizeObserver = new ResizeObserver( ( [ entry ] ) => {
+			const [ { inlineSize: width } ] = entry.contentBoxSize;
+			const _isAxisSwapped = getState().transforms.rotations % 2 !== 0;
+			const { width: imageWidth, height: imageHeight } = getState().image;
+			const imageDimensions = _isAxisSwapped
+				? {
+						width: imageHeight,
+						height: imageWidth,
+				  }
+				: {
+						width: imageWidth,
+						height: imageHeight,
+				  };
+
+			if ( width < imageDimensions.width ) {
+				dispatch( {
+					type: 'RESIZE_CONTAINER',
+					width: _isAxisSwapped ? width * aspectRatio : width,
+					height: _isAxisSwapped ? width : width / aspectRatio,
+				} );
+			}
+		} );
+
+		resizeObserver.observe( container );
+
+		return () => {
+			resizeObserver.disconnect();
+		};
+	}, [ getState, dispatch, originalWidth, originalHeight ] );
 
 	return (
 		<Container
@@ -178,7 +220,7 @@ const Cropper = forwardRef< HTMLDivElement >( ( {}, ref ) => {
 							'--wp-cropper-scale-x': scale.x,
 							'--wp-cropper-scale-y': scale.y,
 					  } ),
-				...( isDragging
+				...( isDragging || isZooming
 					? {}
 					: {
 							'--wp-cropper-image-x': `${ image.x }px`,
@@ -186,16 +228,22 @@ const Cropper = forwardRef< HTMLDivElement >( ( {}, ref ) => {
 					  } ),
 			} }
 			style={ {
-				width: `${ isAxisSwapped ? image.height : image.width }px`,
-				height: `${ isAxisSwapped ? image.width : image.height }px`,
+				width: `${
+					paddingInline * 2 +
+					( isAxisSwapped ? image.height : image.width )
+				}px`,
+				height: `${
+					paddingBlock * 2 +
+					( isAxisSwapped ? image.width : image.height )
+				}px`,
 				'--wp-cropper-image-x': `${ image.x }px`,
 				'--wp-cropper-image-y': `${ image.y }px`,
 				'--wp-cropper-scale-x': scale.x,
 				'--wp-cropper-scale-y': scale.y,
-				paddingBlock: `${ isAxisSwapped ? paddingX : paddingY }px`,
-				paddingInline: `${ isAxisSwapped ? paddingY : paddingX }px`,
+				paddingBlock: `${ paddingBlock }px`,
+				paddingInline: `${ paddingInline }px`,
 			} }
-			ref={ ref }
+			ref={ useMergeRefs( [ containerRef, ref ] ) }
 		>
 			<Img
 				width={ image.width }

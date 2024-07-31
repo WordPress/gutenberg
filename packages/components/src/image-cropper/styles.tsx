@@ -18,6 +18,7 @@ export const Draggable = styled.div`
 	inset: 0;
 	cursor: move;
 	touch-action: none;
+	overscroll-behavior: none;
 `;
 
 const MotionResizable = motion(
@@ -91,8 +92,9 @@ export const Container = styled( motion.div )`
 	position: relative;
 	display: flex;
 	overflow: hidden;
-	box-sizing: content-box;
 	contain: strict;
+	max-width: 100%;
+	box-sizing: border-box;
 `;
 
 export const Img = styled( motion.img )`

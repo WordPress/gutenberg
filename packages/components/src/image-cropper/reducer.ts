@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import type { ResizeDirection } from './types';
+import type { ResizeDirection, Position } from './types';
 import {
 	rotatePoint,
 	degreeToRadian,
@@ -16,10 +16,10 @@ export type State = {
 		x: number;
 		// The y position of the image center.
 		y: number;
-		// The width of the image. This doesn't change.
-		readonly width: number;
-		// The height of the image. This doesn't change.
-		readonly height: number;
+		// The width of the image.
+		width: number;
+		// The height of the image.
+		height: number;
 	};
 	// The image transforms.
 	transforms: {
@@ -51,11 +51,9 @@ export type State = {
 
 type Action =
 	// Zoom in/out to a scale.
-	| { type: 'ZOOM'; scale: number }
+	| { type: 'ZOOM'; scale: number; position: Position }
 	// End zooming.
 	| { type: 'ZOOM_END' }
-	// Zoom in/out by a delta scale.
-	| { type: 'ZOOM_BY'; deltaScale: number }
 	// Flip the image horizontally.
 	| { type: 'FLIP' }
 	// Rotate the image to an angle.
@@ -77,7 +75,9 @@ type Action =
 			delta: { width: number; height: number };
 	  }
 	// Reset the state to the initial state.
-	| { type: 'RESET' };
+	| { type: 'RESET' }
+	// Resize the container and image to a new width and height.
+	| { type: 'RESIZE_CONTAINER'; width: number; height: number };
 
 function createInitialState( {
 	width,
@@ -138,33 +138,10 @@ function imageCropperReducer( state: State, action: Action ) {
 
 			return {
 				...state,
-				transforms: {
-					...state.transforms,
-					scale: {
-						x: nextScale * Math.sign( scale.x ),
-						y: nextScale * Math.sign( scale.y ),
-					},
+				image: {
+					...state.image,
+					...action.position,
 				},
-				isZooming: true,
-			};
-		}
-		case 'ZOOM_BY': {
-			const minScale = getMinScale(
-				radian,
-				image.width,
-				image.height,
-				cropper.width,
-				cropper.height,
-				image.x,
-				image.y
-			);
-			const nextScale = Math.min(
-				Math.max( absScale + action.deltaScale, minScale ),
-				10
-			);
-
-			return {
-				...state,
 				transforms: {
 					...state.transforms,
 					scale: {
@@ -314,9 +291,45 @@ function imageCropperReducer( state: State, action: Action ) {
 				},
 			};
 		}
-		// TODO: No idea how this should work for rotated(turned) images.
 		case 'RESIZE_WINDOW': {
 			const { direction, delta } = action;
+
+			// Calculate the new size of the cropper.
+			const newSize = {
+				width: cropper.width + delta.width,
+				height: cropper.height + delta.height,
+			};
+
+			// Determine the actual dimensions of the image, considering rotations.
+			const isAxisSwapped = rotations % 2 !== 0;
+			const imageDimensions = {
+				width: isAxisSwapped ? image.height : image.width,
+				height: isAxisSwapped ? image.width : image.height,
+			};
+
+			// Calculate the scale of the image to fit within the new size.
+			const widthScale = imageDimensions.width / newSize.width;
+			const heightScale = imageDimensions.height / newSize.height;
+			const windowScale = Math.min( widthScale, heightScale );
+			const nextScale = absScale * windowScale;
+
+			const scaledSize = {
+				width: imageDimensions.width,
+				height: imageDimensions.height,
+			};
+			const translated = { x: 0, y: 0 };
+			// Adjust scaled size and translation based on which dimension is limiting.
+			// We do this instead of multiplying by windowScale to account for floating point errors.
+			if ( widthScale === windowScale ) {
+				scaledSize.height = newSize.height * windowScale;
+				translated.y =
+					imageDimensions.height / 2 - scaledSize.height / 2;
+			} else {
+				scaledSize.width = newSize.width * windowScale;
+				translated.x = imageDimensions.width / 2 - scaledSize.width / 2;
+			}
+
+			// Calculate the delta for the image in each direction.
 			const deltaX = [ 'left', 'bottomLeft', 'topLeft' ].includes(
 				direction
 			)
@@ -327,32 +340,7 @@ function imageCropperReducer( state: State, action: Action ) {
 			)
 				? delta.height
 				: -delta.height;
-			const newSize = {
-				width: cropper.width + delta.width,
-				height: cropper.height + delta.height,
-			};
-			const isAxisSwapped = rotations % 2 !== 0;
-			const imageDimensions = {
-				width: isAxisSwapped ? image.height : image.width,
-				height: isAxisSwapped ? image.width : image.height,
-			};
-			const widthScale = imageDimensions.width / newSize.width;
-			const heightScale = imageDimensions.height / newSize.height;
-			const windowScale = Math.min( widthScale, heightScale );
-			const nextScale = absScale * windowScale;
-			const scaledSize = {
-				width: imageDimensions.width,
-				height: imageDimensions.height,
-			};
-			const translated = { x: 0, y: 0 };
-			if ( widthScale === windowScale ) {
-				scaledSize.height = newSize.height * windowScale;
-				translated.y =
-					imageDimensions.height / 2 - scaledSize.height / 2;
-			} else {
-				scaledSize.width = newSize.width * windowScale;
-				translated.x = imageDimensions.width / 2 - scaledSize.width / 2;
-			}
+
 			return {
 				...state,
 				image: {
@@ -375,6 +363,32 @@ function imageCropperReducer( state: State, action: Action ) {
 					y: translated.y,
 				},
 				isResizing: false,
+			};
+		}
+		case 'RESIZE_CONTAINER': {
+			if (
+				action.width === image.width &&
+				action.height === image.height
+			) {
+				return state;
+			}
+			const ratio = action.width / image.width;
+			return {
+				...state,
+				image: {
+					...state.image,
+					width: action.width,
+					height: action.height,
+					x: image.x * ratio,
+					y: image.y * ratio,
+				},
+				cropper: {
+					...state.cropper,
+					width: cropper.width * ratio,
+					height: cropper.height * ratio,
+					x: cropper.x * ratio,
+					y: cropper.y * ratio,
+				},
 			};
 		}
 		case 'RESET': {

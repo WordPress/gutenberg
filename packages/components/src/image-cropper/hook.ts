@@ -10,7 +10,13 @@ import {
 /**
  * WordPress dependencies
  */
-import { useRef, useMemo, useReducer, useCallback } from '@wordpress/element';
+import {
+	useRef,
+	useMemo,
+	useReducer,
+	useCallback,
+	useEffect,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -41,20 +47,43 @@ export const useImageCropper = ( {
 
 	useGesture(
 		{
-			onPinch: ( { offset: [ scale ] } ) => {
-				dispatch( { type: 'ZOOM', scale } );
+			onPinch: ( {
+				origin: [ originX, originY ],
+				offset: [ scale ],
+				movement: [ deltaScale ],
+				memo,
+				first,
+			} ) => {
+				if ( first ) {
+					const {
+						width: imageWidth,
+						height: imageHeight,
+						x,
+						y,
+					} = imageRef.current.getBoundingClientRect();
+					memo = {
+						initial: { x: state.image.x, y: state.image.y },
+						distances: {
+							x: originX - ( x + imageWidth / 2 ),
+							y: originY - ( y + imageHeight / 2 ),
+						},
+					};
+				}
+				dispatch( {
+					type: 'ZOOM',
+					scale,
+					position: {
+						x:
+							memo.initial.x -
+							( deltaScale - 1 ) * memo.distances.x,
+						y:
+							memo.initial.y -
+							( deltaScale - 1 ) * memo.distances.y,
+					},
+				} );
+				return memo;
 			},
 			onPinchEnd: () => {
-				dispatch( { type: 'ZOOM_END' } );
-			},
-			onWheel: ( { pinching, movement: [ , deltaY ] } ) => {
-				if ( pinching ) {
-					return;
-				}
-				const deltaScale = deltaY * 0.001;
-				dispatch( { type: 'ZOOM_BY', deltaScale } );
-			},
-			onWheelEnd: () => {
 				dispatch( { type: 'ZOOM_END' } );
 			},
 			onDrag: ( { offset: [ x, y ] } ) => {
@@ -66,8 +95,10 @@ export const useImageCropper = ( {
 		},
 		{
 			target: cropperWindowRef,
-			pinch: { scaleBounds: { min: 1, max: 10 } },
-			wheel: { threshold: 10 },
+			pinch: {
+				scaleBounds: { min: 1, max: 10 },
+				from: () => [ Math.abs( state.transforms.scale.x ), 0 ],
+			},
 			drag: { from: () => [ state.image.x, state.image.y ] },
 		}
 	);
@@ -113,17 +144,26 @@ export const useImageCropper = ( {
 		return blob;
 	}, [] );
 
+	const stateRef = useRef< State >( state );
+	useEffect( () => {
+		stateRef.current = state;
+	}, [ state ] );
+	const getState = useCallback( () => stateRef.current, [] );
+
 	return useMemo(
 		() => ( {
 			state,
 			src,
+			originalWidth: width,
+			originalHeight: height,
 			refs: {
 				imageRef,
 				cropperWindowRef,
 			},
+			getState,
 			dispatch,
 			getImageBlob,
 		} ),
-		[ state, src, getImageBlob ]
+		[ state, src, width, height, getImageBlob, getState ]
 	);
 };
