@@ -87,12 +87,16 @@
 			border-top-right-radius: $radius-block-ui;
 			border-top: 1px solid $gray-300;
 			border-bottom: 0;
+			border-bottom-left-radius: 0;
+			border-bottom-right-radius: 0;
 		}
 
 		// Identify the last visible instance as placeholder items will not have this class.
 		&:nth-last-child(1 of &) {
 			border-bottom-left-radius: $radius-block-ui;
 			border-bottom-right-radius: $radius-block-ui;
+			border-top-left-radius: 0;
+			border-top-right-radius: 0;
 		}
 
 		> div,
