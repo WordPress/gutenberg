@@ -11,7 +11,7 @@ const PerPageControl = ( { perPage, offset = 0, onChange } ) => {
 	return (
 		<RangeControl
 			__next40pxDefaultSize
-			label={ __( 'Items per page' ) }
+			label={ __( 'Posts per page' ) }
 			min={ MIN_POSTS_PER_PAGE }
 			max={ MAX_POSTS_PER_PAGE }
 			onChange={ ( newPerPage ) => {
